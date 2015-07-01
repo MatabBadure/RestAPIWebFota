@@ -4,8 +4,10 @@ angular.module('hillromvestApp')
     .factory('AuthServerProvider', function loginService($http, localStorageService, Base64) {
         return {
             login: function(credentials) {
-                var data = "username=" + credentials.username + "&password="
-                    + credentials.password;
+                var data = {
+                  'username' : credentials.username,
+                  'password' : credentials.password
+                };
                 return $http.post('api/authenticate', data, {
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",

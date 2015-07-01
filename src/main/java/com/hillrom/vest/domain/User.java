@@ -1,10 +1,11 @@
 package com.hillrom.vest.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.Email;
+import org.joda.time.DateTime;
 
 import javax.persistence.*;
-import org.hibernate.annotations.Type;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -12,13 +13,11 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.joda.time.DateTime;
-
 /**
  * A user.
  */
 @Entity
-@Table(name = "JHI_USER")
+@Table(name = "USER")
 public class User extends AbstractAuditingEntity implements Serializable {
 
     @Id
@@ -33,7 +32,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     @JsonIgnore
     @NotNull
-    @Size(min = 60, max = 60) 
+    @Size(min = 60, max = 60)
     @Column(length = 60)
     private String password;
 
@@ -73,7 +72,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @JsonIgnore
     @ManyToMany
     @JoinTable(
-            name = "JHI_USER_AUTHORITY",
+            name = "USER_AUTHORITY",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})
     private Set<Authority> authorities = new HashSet<>();

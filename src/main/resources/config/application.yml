@@ -32,7 +32,6 @@ authentication:
 swagger:
     title: HillRomVest API
     description: HillRomVest applications and beyond!
-    termsOfServiceUrl: http://jhipster.github.io/
     contact:
-    license: Apache 2.0
-    licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.html
+    license: Restricted license
+    licenseUrl:

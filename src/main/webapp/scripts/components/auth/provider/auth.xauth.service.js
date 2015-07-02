@@ -10,7 +10,7 @@ angular.module('hillromvestApp')
                 };
                 return $http.post('api/authenticate', data, {
                     headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
+                        "Content-Type": "application/json",
                         "Accept": "application/json"
                     }
                 }).success(function (response) {

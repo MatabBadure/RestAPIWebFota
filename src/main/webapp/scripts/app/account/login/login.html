@@ -1,6 +1,8 @@
 <div>
     <div class="row">
         <div class="col-md-4 col-md-offset-4">
+
+          <div ng-show="showLogin">
             <h1 translate="login.title">Authentication</h1>
 
             <div class="alert alert-danger" ng-show="authenticationError" translate="login.messages.error.authentication">
@@ -25,6 +27,40 @@
             <div class="alert alert-warning" translate="global.messages.info.register">
                 You don't have an account yet? <a href="#/register">Register a new account</a>
             </div>
+          </div>
+
+          <div ng-show="!isEmailExist">
+            <form class="form" role="form" ng-submit="submitEmail($event)">
+              <div class="form-group">
+                <label for="Email ID" translate="global.form.email">E-Mail</label>
+                <input type="text" class="form-control" id="" placeholder="{{'login.form.email.placeholder' | translate}}" ng-model="user.email">
+              </div>
+              <div class="form-group">
+                <label for="Password" >Password</label>
+                <input type="password" class="form-control" id="" placeholder="password" ng-model="user.email">
+              </div>
+              <div class="form-group">
+                <label for="Confirm Password" > Confirm Password</label>
+                <input type="password" class="form-control" id="" placeholder="confirm password" ng-model="user.email">
+              </div>
+              <button type="submit" class="btn btn-primary">Submit Email</button>
+            </form>
+          </div>
+
+          <div ng-show="isFirstLogin">
+            <form class="form" role="form" ng-submit="submitPassword($event)">
+              <div class="form-group">
+                <label for="Password" >Password</label>
+                <input type="password" class="form-control" id="" placeholder="password" ng-model="user.email">
+              </div>
+              <div class="form-group">
+                <label for="Confirm Password" > Confirm Password</label>
+                <input type="password" class="form-control" id="" placeholder="confirm password" ng-model="user.email">
+              </div>
+              <button type="submit" class="btn btn-primary">Submit Password</button>
+            </form>
+          </div>
+
         </div>
     </div>
 </div>

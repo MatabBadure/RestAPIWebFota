@@ -10,6 +10,7 @@
             "contact-us": "Contact Us",
             "entities": {
                 "main": "Entities",
+                "patientVestDeviceRawLog": "PatientVestDeviceRawLog",
                 "additionalEntity": "JHipster will add additional entities here (do not translate!)"
             },
             "account": {

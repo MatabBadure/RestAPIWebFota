@@ -43,6 +43,10 @@ module.exports = function (grunt) {
             ngconstant: {
                 files: ['Gruntfile.js', 'pom.xml'],
                 tasks: ['ngconstant:dev']
+            },
+            sass: {
+                files: 'src/main/webapp/assets/sass/{,*/}*.{scss,sass}',
+                tasks: ['sass:dev']
             }
         },
         autoprefixer: {
@@ -71,6 +75,18 @@ module.exports = function (grunt) {
                             js: '\'{{filePath}}\','
                         }
                     }
+                }
+            },
+            css: {src: ['src/main/webapp/assets/sass/style.scss']}
+        },
+        sass: {
+            dev: {
+                options: {
+                    style: 'expanded',
+                    compass: false
+                },
+                files: {
+                    'src/main/webapp/assets/styles/main.css':'src/main/webapp/assets/sass/style.scss'
                 }
             }
         },
@@ -322,7 +338,8 @@ module.exports = function (grunt) {
             }
         }
     });
-
+    grunt.loadNpmTasks('grunt-contrib-sass');
+    grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.registerTask('serve', [
         'clean:server',
         'wiredep',

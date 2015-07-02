@@ -153,7 +153,7 @@ public class AccountResourceTest {
             "Shmoe",                // lastName
             "joe@example.com",      // e-mail
             "en",                   // langKey
-            Arrays.asList(AuthoritiesConstants.USER)
+            Arrays.asList(AuthoritiesConstants.PATIENT)
         );
 
         restMvc.perform(
@@ -176,7 +176,7 @@ public class AccountResourceTest {
             "One",                  // lastName
             "funky@example.com",    // e-mail
             "en",                   // langKey
-            Arrays.asList(AuthoritiesConstants.USER)
+            Arrays.asList(AuthoritiesConstants.PATIENT)
         );
 
         restUserMockMvc.perform(
@@ -199,7 +199,7 @@ public class AccountResourceTest {
             "Green",            // lastName
             "invalid",          // e-mail <-- invalid
             "en",               // langKey
-            Arrays.asList(AuthoritiesConstants.USER)
+            Arrays.asList(AuthoritiesConstants.PATIENT)
         );
 
         restUserMockMvc.perform(
@@ -223,7 +223,7 @@ public class AccountResourceTest {
             "Something",            // lastName
             "alice@example.com",    // e-mail
             "en",                   // langKey
-            Arrays.asList(AuthoritiesConstants.USER)
+            Arrays.asList(AuthoritiesConstants.PATIENT)
         );
 
         // Duplicate login, different e-mail
@@ -259,7 +259,7 @@ public class AccountResourceTest {
             "Doe",                  // lastName
             "john@example.com",     // e-mail
             "en",                   // langKey
-            Arrays.asList(AuthoritiesConstants.USER)
+            Arrays.asList(AuthoritiesConstants.PATIENT)
         );
 
         // Duplicate e-mail, different login
@@ -306,6 +306,6 @@ public class AccountResourceTest {
         Optional<User> userDup = userRepository.findOneByLogin("badguy");
         assertThat(userDup.isPresent()).isTrue();
         assertThat(userDup.get().getAuthorities()).hasSize(1)
-            .containsExactly(authorityRepository.findOne(AuthoritiesConstants.USER));
+            .containsExactly(authorityRepository.findOne(AuthoritiesConstants.PATIENT));
     }
 }

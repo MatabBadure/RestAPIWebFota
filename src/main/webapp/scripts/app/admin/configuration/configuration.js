@@ -7,7 +7,7 @@ angular.module('hillromvestApp')
                 parent: 'admin',
                 url: '/configuration',
                 data: {
-                    roles: ['ROLE_ADMIN'],
+                    roles: ['ADMIN'],
                     pageTitle: 'configuration.title'
                 },
                 views: {

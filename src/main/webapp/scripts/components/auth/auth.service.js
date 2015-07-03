@@ -119,6 +119,36 @@ angular.module('hillromvestApp')
                 }, function (err) {
                     return cb(err);
                 }).$promise;
+            },
+
+            submitPassword : function(obj, callback){
+                var deferred = $q.defer();
+                var cb = callback || angular.noop;
+                AuthServerProvider.submitPassword(obj).then(function (data) {
+                    deferred.resolve(data);
+                    return cb(data);
+                }).catch(function (err) {
+                    this.logout();
+                    deferred.reject(err);
+                    return cb(err);
+                }.bind(this));
+                return deferred.promise;
+            },
+
+
+            /*Temp Fix from  angular*/
+            captcha: function(captchaData, callback){
+                var deferred = $q.defer();
+                var cb = callback || angular.noop;
+                AuthServerProvider.captcha(captchaData).then(function (data) {
+                    deferred.resolve(data);
+                    return cb(data);
+                }).catch(function (err) {
+                    this.logout();
+                    deferred.reject(err);
+                    return cb(err);
+                }.bind(this));
+                return deferred.promise;
             }
         };
     });

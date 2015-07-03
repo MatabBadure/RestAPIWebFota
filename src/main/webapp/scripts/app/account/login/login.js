@@ -1,13 +1,19 @@
 'use strict';
 
 angular.module('hillromvestApp')
-    .config(function ($stateProvider) {
+    .config(function ($stateProvider, reCAPTCHAProvider) {
+
+        reCAPTCHAProvider.setPublicKey('6LfwMAkTAAAAAG0CeUbZljDztBq8l8iovStQeqHM');
+        reCAPTCHAProvider.setOptions({
+          theme: 'clean'
+        });
+
         $stateProvider
             .state('login', {
                 parent: 'account',
                 url: '/login',
                 data: {
-                    roles: [], 
+                    roles: [],
                     pageTitle: 'login.title'
                 },
                 views: {

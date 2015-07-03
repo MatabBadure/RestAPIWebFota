@@ -8,7 +8,7 @@
             <div class="alert alert-danger" ng-show="authenticationError" translate="login.messages.error.authentication">
                 <strong>Authentication failed!</strong> Please check your credentials and try again.
             </div>
-            <form class="form" role="form" ng-submit="login($event)">
+            <form class="form" role="form" ng-submit="login($event)" name="loginForm">
                 <div class="form-group">
                     <label for="username" translate="global.form.username">Login</label>
                     <input type="text" class="form-control" id="username" placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="username">
@@ -18,7 +18,11 @@
                     <input type="password" class="form-control" id="password" placeholder="{{'login.form.password.placeholder' | translate}}"
                            ng-model="password">
                 </div>
-                <button type="submit" class="btn btn-primary" translate="login.form.button">Authenticate</button>
+                <div class="form-group" ng-show="showCpatcha">
+                  <div re-captcha ng-model="user.captcha"></div>
+                </div>
+                <button class="btn btn-primary" translate="login.form.button" ng-click="login($event)">Authenticate</button>
+                <!-- <button type="submit" class="btn btn-primary" translate="login.form.button">Authenticate</button> -->
             </form>
             <p></p>
             <div class="alert alert-warning">
@@ -29,35 +33,21 @@
             </div>
           </div>
 
-          <div ng-show="!isEmailExist">
-            <form class="form" role="form" ng-submit="submitEmail($event)">
-              <div class="form-group">
+          <div ng-show="isFirstLogin">
+            <form class="form" role="form" ng-submit="submitPassword($event)">
+              <div class="form-group" ng-show="!isEmailExist">
                 <label for="Email ID" translate="global.form.email">E-Mail</label>
                 <input type="text" class="form-control" id="" placeholder="{{'login.form.email.placeholder' | translate}}" ng-model="user.email">
               </div>
               <div class="form-group">
                 <label for="Password" >Password</label>
-                <input type="password" class="form-control" id="" placeholder="password" ng-model="user.email">
+                <input type="password" class="form-control" id="" placeholder="password" ng-model="user.password">
               </div>
               <div class="form-group">
                 <label for="Confirm Password" > Confirm Password</label>
-                <input type="password" class="form-control" id="" placeholder="confirm password" ng-model="user.email">
+                <input type="password" class="form-control" id="" placeholder="confirm password" ng-model="user.confirmPassword">
               </div>
-              <button type="submit" class="btn btn-primary">Submit Email</button>
-            </form>
-          </div>
-
-          <div ng-show="isFirstLogin">
-            <form class="form" role="form" ng-submit="submitPassword($event)">
-              <div class="form-group">
-                <label for="Password" >Password</label>
-                <input type="password" class="form-control" id="" placeholder="password" ng-model="user.email">
-              </div>
-              <div class="form-group">
-                <label for="Confirm Password" > Confirm Password</label>
-                <input type="password" class="form-control" id="" placeholder="confirm password" ng-model="user.email">
-              </div>
-              <button type="submit" class="btn btn-primary">Submit Password</button>
+              <button type="submit" class="btn btn-primary">Submit</button>
             </form>
           </div>
 

@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('hillromvestApp', ['LocalStorageModule', 'tmh.dynamicLocale', 'pascalprecht.translate', 
-    'ngResource', 'ui.router', 'ngCookies', 'ngCacheBuster', 'infinite-scroll'])
+angular.module('hillromvestApp', ['LocalStorageModule', 'tmh.dynamicLocale', 'pascalprecht.translate',
+    'ngResource', 'ui.router', 'ngCookies', 'ngCacheBuster', 'infinite-scroll', 'reCAPTCHA'])
 
     .run(function ($rootScope, $location, $window, $http, $state, $translate, Language, Auth, Principal, ENV, VERSION) {
         $rootScope.ENV = ENV;
@@ -13,12 +13,12 @@ angular.module('hillromvestApp', ['LocalStorageModule', 'tmh.dynamicLocale', 'pa
             if (Principal.isIdentityResolved()) {
                 Auth.authorize();
             }
-            
+
             // Update the language
             Language.getCurrent().then(function (language) {
                 $translate.use(language);
             });
-            
+
         });
 
         $rootScope.$on('$stateChangeSuccess',  function(event, toState, toParams, fromState, fromParams) {
@@ -31,12 +31,12 @@ angular.module('hillromvestApp', ['LocalStorageModule', 'tmh.dynamicLocale', 'pa
             if (toState.data.pageTitle) {
                 titleKey = toState.data.pageTitle;
             }
-            
+
             $translate(titleKey).then(function (title) {
                 // Change window title with translated one
                 $window.document.title = title;
             });
-            
+
         });
 
         $rootScope.back = function() {
@@ -54,11 +54,11 @@ angular.module('hillromvestApp', ['LocalStorageModule', 'tmh.dynamicLocale', 'pa
             request: function (config) {
                 config.headers = config.headers || {};
                 var token = localStorageService.get('token');
-                
+
                 if (token && token.expires && token.expires > new Date().getTime()) {
                   config.headers['x-auth-token'] = token.token;
                 }
-                
+
                 return config;
             }
         };
@@ -94,7 +94,7 @@ angular.module('hillromvestApp', ['LocalStorageModule', 'tmh.dynamicLocale', 'pa
 
 
         $httpProvider.interceptors.push('authInterceptor');
-        
+
         // Initialize angular-translate
         $translateProvider.useLoader('$translatePartialLoader', {
             urlTemplate: 'i18n/{lang}/{part}.json'
@@ -107,5 +107,5 @@ angular.module('hillromvestApp', ['LocalStorageModule', 'tmh.dynamicLocale', 'pa
         tmhDynamicLocaleProvider.localeLocationPattern('bower_components/angular-i18n/angular-locale_{{locale}}.js');
         tmhDynamicLocaleProvider.useCookieStorage();
         tmhDynamicLocaleProvider.storageKey('NG_TRANSLATE_LANG_KEY');
-        
+
     });

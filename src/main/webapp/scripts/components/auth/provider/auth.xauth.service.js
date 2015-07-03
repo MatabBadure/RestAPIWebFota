@@ -26,6 +26,33 @@ angular.module('hillromvestApp')
             hasValidToken: function () {
                 var token = this.getToken();
                 return token && token.expires && token.expires > new Date().getTime();
+            },
+
+            submitPassword: function (data) {
+                return $http.post('api/', data, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    }
+                }).success(function (response) {
+                    localStorageService.set('token', response);
+                    return response;
+                });
+            },
+
+            /*Temp Service Call From angular*/
+            captcha: function (captchaData){
+                var data = {
+                    'secret': '6LfwMAkTAAAAAHnNpBlH7fEixBPQBqLffYfArQ0E',
+                    'response': captchaData
+                };
+                return $http.post('https://www.google.com/recaptcha/api/siteverify', data).
+                  success(function(data, status, headers, config) {
+                    console.log(data);
+                  }).
+                  error(function(data, status, headers, config) {
+                    console.log(data , status, headers, config);
+                  });
             }
         };
     });

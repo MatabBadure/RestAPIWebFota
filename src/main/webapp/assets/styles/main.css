@@ -4232,12 +4232,43 @@ select[multiple].input-lg,
     display: none !important;
   }
 }
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  color: #A7A7A7;
+}
+
 .container-top-indent {
   margin-top: 50px;
+  height: inherit;
 }
 
 .content-body {
   background-color: #EEEEEE;
+  height: 85%;
+}
+
+.clr {
+  clear: both;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.textUpperCase {
+  text-transform: uppercase;
+}
+
+.indent-bottom-5 {
+  padding-bottom: 5px;
+}
+
+.indent-top-15 {
+  padding-top: 15px;
 }
 
 .navbar-default {
@@ -4262,6 +4293,108 @@ select[multiple].input-lg,
 .custom-navbar .navbar-header > .navbar-brand .hillrom_logo {
   height: 27px;
   width: 138px;
+}
+
+.login {
+  display: table;
+  height: 100%;
+  width: 100%;
+}
+.login__container {
+  padding: 0 15px;
+  display: table-cell;
+  vertical-align: middle;
+}
+.login__container--left-section {
+  height: 100%;
+  display: table;
+}
+.login__container--left-section-description {
+  display: table-cell;
+  vertical-align: middle;
+}
+.login__container--left-section-description_content {
+  float: left;
+  width: 70%;
+  padding-top: 8%;
+}
+.login__container--left-section-description_image {
+  border-right: 1px solid;
+  margin-right: 50px;
+}
+.login__container--right-section {
+  height: 100%;
+  display: table;
+}
+.login__container--right-section-form {
+  display: table-cell;
+  vertical-align: middle;
+}
+.login .login-button {
+  color: #FFF;
+  border: none;
+  padding: 3px 30px;
+  background-color: #9A9A9A;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.login input::-webkit-input-placeholder {
+  color: #A7A7A7;
+  opacity: 0.6;
+}
+.login a {
+  color: inherit;
+}
+
+.reset {
+  display: table;
+  height: 100%;
+  width: 100%;
+}
+.reset__container {
+  padding: 0 15px;
+  display: table-cell;
+  vertical-align: middle;
+}
+.reset__container--left-section {
+  height: 100%;
+  display: table;
+}
+.reset__container--left-section-description {
+  display: table-cell;
+  vertical-align: middle;
+}
+.reset__container--left-section-description_content {
+  float: left;
+  width: 70%;
+  padding-top: 8%;
+}
+.reset__container--left-section-description_image {
+  border-right: 1px solid;
+  margin-right: 50px;
+}
+.reset__container--right-section {
+  height: 100%;
+  display: table;
+}
+.reset__container--right-section-form {
+  display: table-cell;
+  vertical-align: middle;
+}
+.reset .reset-button {
+  color: #FFF;
+  border: none;
+  padding: 3px 30px;
+  background-color: #9A9A9A;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.reset input::-webkit-input-placeholder {
+  color: #A7A7A7;
+  opacity: 0.6;
+}
+.reset a {
+  color: inherit;
 }
 
 /*# sourceMappingURL=main.css.map */

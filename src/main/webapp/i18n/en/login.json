@@ -1,11 +1,11 @@
 {
     "login": {
-        "title": "Authentication",
+        "title": "Login To Your Account",
         "form": {
             "password": "Password",
-            "password.placeholder": "Your password",
+            "password.placeholder": "password",
             "rememberme": "Automatic Login",
-            "button": "Authenticate"
+            "button": "Login"
         },
         "messages": {
             "error": {
@@ -13,7 +13,7 @@
             }
         },
         "password" : {
-            "forgot": "Did you forget your password?"
+            "forgot": "forget password?"
         }
     }
 }

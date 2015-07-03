@@ -570,10 +570,10 @@
                     <changeLogFile>src/main/resources/config/liquibase/master.xml</changeLogFile>
                     <diffChangeLogFile>src/main/resources/config/liquibase/changelog/${maven.build.timestamp}_changelog.xml</diffChangeLogFile>
                     <driver>com.mysql.jdbc.Driver</driver>
-                    <url>jdbc:mysql://localhost:3306/HillRomVest</url>
+                    <url>jdbc:mysql://hillrom.ckyg8erbez54.us-west-2.rds.amazonaws.com:3306/hillromvest-dev</url>
                     <defaultSchemaName>HillRomVest</defaultSchemaName>
                     <username>root</username>
-                    <password />
+                    <password>hillrom123<password/>
                     <referenceUrl>hibernate:spring:com.hillrom.vest.domain?dialect=org.hibernate.dialect.MySQLInnoDBDialect</referenceUrl>
                     <verbose>true</verbose>
                     <logging>debug</logging>

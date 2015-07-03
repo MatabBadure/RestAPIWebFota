@@ -11,7 +11,6 @@
             "entities": {
                 "main": "Entities",
                 "patientVestDeviceRawLog": "PatientVestDeviceRawLog",
-                "patientInfo": "PatientInfo",
                 "additionalEntity": "JHipster will add additional entities here (do not translate!)"
             },
             "account": {

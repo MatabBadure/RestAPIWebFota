@@ -7,3 +7,12 @@
     background-color: #ffffff;
     color: #555;
 }
+.custom-navbar{
+	.navbar-header > .navbar-brand{
+		padding: 12px;
+		.hillrom_logo{
+			height: 27px;
+    	width: 138px;
+		}
+	}
+}

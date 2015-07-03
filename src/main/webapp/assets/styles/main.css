@@ -4232,6 +4232,10 @@ select[multiple].input-lg,
     display: none !important;
   }
 }
+.container-top-indent {
+  margin-top: 50px;
+}
+
 .navbar-default {
   background-color: #ffffff;
   border-color: #ffffff;
@@ -4240,6 +4244,14 @@ select[multiple].input-lg,
 .navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
   background-color: #ffffff;
   color: #555;
+}
+
+.custom-navbar .navbar-header > .navbar-brand {
+  padding: 12px;
+}
+.custom-navbar .navbar-header > .navbar-brand .hillrom_logo {
+  height: 27px;
+  width: 138px;
 }
 
 /*# sourceMappingURL=main.css.map */

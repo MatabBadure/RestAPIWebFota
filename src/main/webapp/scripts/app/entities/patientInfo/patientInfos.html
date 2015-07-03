@@ -1,0 +1,240 @@
+<div>
+
+    <h2 translate="hillromvestApp.patientInfo.home.title">PatientInfos</h2>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <button class="btn btn-primary" data-toggle="modal" data-target="#savePatientInfoModal" ng-click="clear()">
+                    <span class="glyphicon glyphicon-flash"></span> <span translate="hillromvestApp.patientInfo.home.createLabel">Create a new PatientInfo</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="savePatientInfoModal" tabindex="-1" role="dialog" aria-labelledby="myPatientInfoLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="editForm" role="form" novalidate ng-submit="save()" show-validation>
+
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                                ng-click="clear()">&times;</button>
+                        <h4 class="modal-title" id="myPatientInfoLabel" translate="hillromvestApp.patientInfo.home.createOrEditLabel">Create or edit a PatientInfo</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label translate="global.field.id">ID</label>
+                            <input type="text" class="form-control" name="id"
+                                   ng-model="patientInfo.id" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label translate="hillromvestApp.patientInfo.mrn">Mrn</label>
+                            <input type="text" class="form-control" name="mrn"
+                                   ng-model="patientInfo.mrn">
+
+                            <div ng-show="editForm.mrn.$invalid">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label translate="hillromvestApp.patientInfo.hillromId">HillromId</label>
+                            <input type="text" class="form-control" name="hillromId"
+                                   ng-model="patientInfo.hillromId">
+
+                            <div ng-show="editForm.hillromId.$invalid">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label translate="hillromvestApp.patientInfo.hubId">HubId</label>
+                            <input type="text" class="form-control" name="hubId"
+                                   ng-model="patientInfo.hubId">
+
+                        </div>
+                        <div class="form-group">
+                            <label translate="hillromvestApp.patientInfo.serialNumber">SerialNumber</label>
+                            <input type="text" class="form-control" name="serialNumber"
+                                   ng-model="patientInfo.serialNumber">
+
+                            <div ng-show="editForm.serialNumber.$invalid">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label translate="hillromvestApp.patientInfo.bluetoothId">BluetoothId</label>
+                            <input type="text" class="form-control" name="bluetoothId"
+                                   ng-model="patientInfo.bluetoothId">
+
+                            <div ng-show="editForm.bluetoothId.$invalid">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label translate="hillromvestApp.patientInfo.title">Title</label>
+                            <input type="text" class="form-control" name="title"
+                                   ng-model="patientInfo.title">
+
+                            <div ng-show="editForm.title.$invalid">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label translate="hillromvestApp.patientInfo.firstName">FirstName</label>
+                            <input type="text" class="form-control" name="firstName"
+                                   ng-model="patientInfo.firstName">
+
+                            <div ng-show="editForm.firstName.$invalid">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label translate="hillromvestApp.patientInfo.middleName">MiddleName</label>
+                            <input type="text" class="form-control" name="middleName"
+                                   ng-model="patientInfo.middleName">
+
+                        </div>
+                        <div class="form-group">
+                            <label translate="hillromvestApp.patientInfo.lastName">LastName</label>
+                            <input type="text" class="form-control" name="lastName"
+                                   ng-model="patientInfo.lastName">
+
+                            <div ng-show="editForm.lastName.$invalid">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label translate="hillromvestApp.patientInfo.dob">Dob</label>
+                            <input type="date" class="form-control" name="dob"
+                                   ng-model="patientInfo.dob">
+
+                            <div ng-show="editForm.dob.$invalid">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label translate="hillromvestApp.patientInfo.email">Email</label>
+                            <input type="text" class="form-control" name="email"
+                                   ng-model="patientInfo.email">
+
+                        </div>
+                        <div class="form-group">
+                            <label translate="hillromvestApp.patientInfo.webLoginCreated">WebLoginCreated</label>
+                            <input type="checkbox" class="form-control" name="webLoginCreated"
+                                   ng-model="patientInfo.webLoginCreated">
+
+                        </div>
+                        <div class="form-group">
+                            <label translate="hillromvestApp.patientInfo.isDeleted">IsDeleted</label>
+                            <input type="checkbox" class="form-control" name="isDeleted"
+                                   ng-model="patientInfo.isDeleted">
+
+                        </div>
+
+                        <div class="form-group">
+                            <label translate="hillromvestApp.patientInfo.user">user</label>
+                            <select class="form-control" name="user" ng-model="patientInfo.user.id" ng-options="user.id as user.id for user in users">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="clear()">
+                            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span translate="entity.action.cancel">Cancel</span>
+                        </button>
+                        <button type="submit" ng-disabled="editForm.$invalid" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-save"></span>&nbsp;<span translate="entity.action.save">Save</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deletePatientInfoConfirmation">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="deleteForm" ng-submit="confirmDelete(patientInfo.id)">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                                ng-click="clear()">&times;</button>
+                        <h4 class="modal-title" translate="entity.delete.title">Confirm delete operation</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p translate="hillromvestApp.patientInfo.delete.question" translate-values="{id: '{{patientInfo.id}}'}">Are you sure you want to delete this PatientInfo?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="clear()">
+                            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span translate="entity.action.cancel">Cancel</span>
+                        </button>
+                        <button type="submit" ng-disabled="deleteForm.$invalid" class="btn btn-danger">
+                            <span class="glyphicon glyphicon-remove-circle"></span>&nbsp;<span translate="entity.action.delete">Delete</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th translate="global.field.id">ID</th>
+                    <th translate="hillromvestApp.patientInfo.mrn">Mrn</th>
+                    <th translate="hillromvestApp.patientInfo.hillromId">HillromId</th>
+                    <th translate="hillromvestApp.patientInfo.hubId">HubId</th>
+                    <th translate="hillromvestApp.patientInfo.serialNumber">SerialNumber</th>
+                    <th translate="hillromvestApp.patientInfo.bluetoothId">BluetoothId</th>
+                    <th translate="hillromvestApp.patientInfo.title">Title</th>
+                    <th translate="hillromvestApp.patientInfo.firstName">FirstName</th>
+                    <th translate="hillromvestApp.patientInfo.middleName">MiddleName</th>
+                    <th translate="hillromvestApp.patientInfo.lastName">LastName</th>
+                    <th translate="hillromvestApp.patientInfo.dob">Dob</th>
+                    <th translate="hillromvestApp.patientInfo.email">Email</th>
+                    <th translate="hillromvestApp.patientInfo.webLoginCreated">WebLoginCreated</th>
+                    <th translate="hillromvestApp.patientInfo.isDeleted">IsDeleted</th>
+                    <th translate="hillromvestApp.patientInfo.user">user</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="patientInfo in patientInfos">
+                    <td><a ui-sref="patientInfoDetail({id:patientInfo.id})">{{patientInfo.id}}</a></td>
+                    <td>{{patientInfo.mrn}}</td>
+                    <td>{{patientInfo.hillromId}}</td>
+                    <td>{{patientInfo.hubId}}</td>
+                    <td>{{patientInfo.serialNumber}}</td>
+                    <td>{{patientInfo.bluetoothId}}</td>
+                    <td>{{patientInfo.title}}</td>
+                    <td>{{patientInfo.firstName}}</td>
+                    <td>{{patientInfo.middleName}}</td>
+                    <td>{{patientInfo.lastName}}</td>
+                    <td>{{patientInfo.dob}}</td>
+                    <td>{{patientInfo.email}}</td>
+                    <td>{{patientInfo.webLoginCreated}}</td>
+                    <td>{{patientInfo.isDeleted}}</td>
+                    <td>{{patientInfo.user.id}}</td>
+                    <td>
+                        <button type="submit"
+                                ui-sref="patientInfoDetail({id:patientInfo.id})"
+                                class="btn btn-info btn-sm">
+                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;<span translate="entity.action.view"> View</span>
+                        </button>
+                        <button type="submit"
+                                ng-click="showUpdate(patientInfo.id)"
+                                class="btn btn-primary btn-sm">
+                            <span class="glyphicon glyphicon-pencil"></span>&nbsp;<span translate="entity.action.edit"> Edit</span>
+                        </button>
+                        <button type="submit"
+                                ng-click="delete(patientInfo.id)"
+                                class="btn btn-danger btn-sm">
+                            <span class="glyphicon glyphicon-remove-circle"></span>&nbsp;<span translate="entity.action.delete"> Delete</span>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <nav>
+            <ul class="pager">
+                <li ng-show="links['first']" ng-click="loadPage(links['first'])"><a href="#">&lt;&lt;</a></li>
+                <li ng-show="links['prev']" ng-click="loadPage(links['prev'])"><a href="#">&lt;</a></li>
+                <li ng-show="links['next']" ng-click="loadPage(links['next'])"><a href="#">&gt;</a></li>
+                <li ng-show="links['last']" ng-click="loadPage(links['last'])"><a href="#">&gt;&gt;</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>

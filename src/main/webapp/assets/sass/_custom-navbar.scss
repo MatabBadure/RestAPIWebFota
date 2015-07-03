@@ -8,6 +8,12 @@
     color: #555;
 }
 .custom-navbar{
+	.left-padding{
+		padding-left: 15px;
+	}
+	.right-padding{
+		padding-right: 15px;
+	}
 	.navbar-header > .navbar-brand{
 		padding: 12px;
 		.hillrom_logo{

@@ -4236,6 +4236,10 @@ select[multiple].input-lg,
   margin-top: 50px;
 }
 
+.content-body {
+  background-color: #EEEEEE;
+}
+
 .navbar-default {
   background-color: #ffffff;
   border-color: #ffffff;
@@ -4246,6 +4250,12 @@ select[multiple].input-lg,
   color: #555;
 }
 
+.custom-navbar .left-padding {
+  padding-left: 15px;
+}
+.custom-navbar .right-padding {
+  padding-right: 15px;
+}
 .custom-navbar .navbar-header > .navbar-brand {
   padding: 12px;
 }

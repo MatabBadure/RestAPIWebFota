@@ -9,7 +9,7 @@ spring:
         active: dev
     datasource:
         dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
-        url: jdbc:mysql://hillrom.ckyg8erbez54.us-west-2.rds.amazonaws.com:3306/HillRomVest-dev
+        url: jdbc:mysql://hillrom.ckyg8erbez54.us-west-2.rds.amazonaws.com:3306/hillromvest-dev
         databaseName:
         serverName:
         username: root

@@ -1,0 +1,34 @@
+{
+    "hillromvestApp": {
+        "patientVestDeviceRawLog" : {
+            "home": {
+                "title": "PatientVestDeviceRawLogs",
+                "createLabel": "Créer un nouveau PatientVestDeviceRawLog",
+                "createOrEditLabel": "Créer ou éditer un PatientVestDeviceRawLog"
+            },
+            "delete": {
+                "question": "Etes-vous certain de vouloir supprimer le PatientVestDeviceRawLog {{ id }} ?"
+            },
+            "detail": {
+                "title": "PatientVestDeviceRawLog"
+            },
+            "deviceModelType": "DeviceModelType",
+            "deviceData": "DeviceData",
+            "deviceSerialNo": "DeviceSerialNo",
+            "deviceType": "DeviceType",
+            "hubId": "HubId",
+            "airInterfaceType": "AirInterfaceType",
+            "customerName": "CustomerName",
+            "timeZone": "TimeZone",
+            "spReceiveTime": "SpReceiveTime",
+            "hubReceiveTime": "HubReceiveTime",
+            "deviceAddress": "DeviceAddress",
+            "hubReceiveTimeOffset": "HubReceiveTimeOffset",
+            "cucVersion": "CucVersion",
+            "customerId": "CustomerId",
+            "rawMessage": "RawMessage",
+            "rawHexaData": "RawHexaData"
+        }
+    }
+}
+

@@ -1,0 +1,30 @@
+
+<div>
+    <h2><span translate="hillromvestApp.userLoginToken.detail.title">UserLoginToken</span> {{userLoginToken.id}}</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th translate="entity.detail.field">Field</th>
+                    <th translate="entity.detail.value">Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <span translate="hillromvestApp.userLoginToken.createdTime">CreatedTime</span>
+                    </td>
+                    <td>
+                        <input type="text" class="input-sm form-control" value="{{userLoginToken.createdTime}}" readonly>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <button type="submit"
+            ui-sref="userLoginToken"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span translate="entity.action.back"> Back</span>
+    </button>
+</div>

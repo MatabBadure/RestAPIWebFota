@@ -1,0 +1,31 @@
+{
+    "hillromvestApp": {
+        "patientInfo" : {
+            "home": {
+                "title": "PatientInfos",
+                "createLabel": "Create a new PatientInfo",
+                "createOrEditLabel": "Create or edit a PatientInfo"
+            },
+            "delete": {
+                "question": "Are you sure you want to delete PatientInfo {{ id }}?"
+            },
+            "detail": {
+                "title": "PatientInfo"
+            },
+            "mrn": "Mrn",
+            "hillromId": "HillromId",
+            "hubId": "HubId",
+            "serialNumber": "SerialNumber",
+            "bluetoothId": "BluetoothId",
+            "title": "Title",
+            "firstName": "FirstName",
+            "middleName": "MiddleName",
+            "lastName": "LastName",
+            "dob": "Dob",
+            "email": "Email",
+            "webLoginCreated": "WebLoginCreated",
+            "isDeleted": "IsDeleted",
+            "user": "user"
+        }
+    }
+}

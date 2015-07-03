@@ -38,8 +38,12 @@
                             Your e-mail cannot be longer than 100 characters.
                         </p>
                     </div>
+                    <div class="form-group" ng-show="showCaptcha">
+                  		<div re-captcha ng-model="user.captcha"></div>
+                	</div>
                 </div>
-                <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" translate="reset.request.form.button">Register</button>
+                <button class="btn btn-primary" translate="reset.request.form.button" ng-click="requestReset()">Register</button>
+                <!-- <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" translate="reset.request.form.button">Register</button> -->
             </form>
 
         </div>

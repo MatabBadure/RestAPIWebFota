@@ -573,7 +573,7 @@
                     <url>jdbc:mysql://hillrom.ckyg8erbez54.us-west-2.rds.amazonaws.com:3306/hillromvest-dev</url>
                     <defaultSchemaName>HillRomVest</defaultSchemaName>
                     <username>root</username>
-                    <password>hillrom123<password/>
+                    <password>hillrom123</password>
                     <referenceUrl>hibernate:spring:com.hillrom.vest.domain?dialect=org.hibernate.dialect.MySQLInnoDBDialect</referenceUrl>
                     <verbose>true</verbose>
                     <logging>debug</logging>

@@ -1,5 +1,6 @@
 package com.hillrom.vest.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
@@ -19,7 +20,7 @@ import java.util.Objects;
  * A PatientInfo.
  */
 @Entity
-@Table(name = "PATIENTINFO")
+@Table(name = "PATIENT_INFO")
 public class PatientInfo implements Serializable {
 
     @Id
@@ -68,8 +69,9 @@ public class PatientInfo implements Serializable {
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
-    @ManyToOne
-    private User user;
+    @ManyToMany(mappedBy = "patients")
+    @JsonIgnore
+    private Set<User> users = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -183,12 +185,12 @@ public class PatientInfo implements Serializable {
         this.isDeleted = isDeleted;
     }
 
-    public User getUser() {
-        return user;
+    public Set<User> getUsers() {
+        return users;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUsers(Set<User> users) {
+        this.users = users;
     }
 
     @Override

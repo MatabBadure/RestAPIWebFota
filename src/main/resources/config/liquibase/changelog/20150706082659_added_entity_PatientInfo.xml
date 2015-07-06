@@ -13,7 +13,7 @@
     <!--
         Added the entity PatientInfo.
     -->
-    <changeSet id="20150703080114" author="jhipster">
+    <changeSet id="20150706082659" author="jhipster">
         <createTable tableName="PATIENT_INFO">
             <column name="id" type="bigint" autoIncrement="${autoIncrement}" >
                 <constraints primaryKey="true" nullable="false"/>
@@ -51,7 +51,6 @@
 		<addForeignKeyConstraint baseColumnNames="patient_id"
 			baseTableName="USER_PATIENT_ASSOC" constraintName="fk_upa_patient_id"
 			referencedColumnNames="id" referencedTableName="PATIENT_INFO" />
-		
-
+        
     </changeSet>
 </databaseChangeLog>

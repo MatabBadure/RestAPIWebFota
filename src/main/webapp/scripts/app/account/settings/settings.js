@@ -7,7 +7,7 @@ angular.module('hillromvestApp')
                 parent: 'account',
                 url: '/settings',
                 data: {
-                    roles: ['ROLE_USER'],
+                    roles: ['PATIENT'],
                     pageTitle: 'global.menu.account.settings'
                 },
                 views: {

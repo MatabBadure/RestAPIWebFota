@@ -9,7 +9,6 @@
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
         <!-- build:css assets/styles/vendor.css -->
         <!-- bower:css -->
-        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
         <!-- endbower -->
         <!-- endbuild -->
         <!-- build:css assets/styles/main.css -->
@@ -20,7 +19,7 @@
         <!--[if lt IE 9]>
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-        <div ng-show="{{ENV === 'dev'}}" class="development" ng-cloak=""></div>
+        <!-- <div ng-show="{{ENV === 'dev'}}" class="development" ng-cloak=""></div> -->
         <div ui-view="navbar" ng-cloak=""></div>
         <div class="container">
             <div class="well" ui-view="content"></div>
@@ -44,7 +43,18 @@
         <!-- bower:js -->
         <script src="bower_components/modernizr/modernizr.js"></script>
         <script src="bower_components/jquery/dist/jquery.js"></script>
-        <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/affix.js"></script>
+        <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/alert.js"></script>
+        <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/button.js"></script>
+        <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/carousel.js"></script>
+        <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/collapse.js"></script>
+        <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/dropdown.js"></script>
+        <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/tab.js"></script>
+        <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/transition.js"></script>
+        <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/scrollspy.js"></script>
+        <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/modal.js"></script>
+        <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/tooltip.js"></script>
+        <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/popover.js"></script>
         <script src="bower_components/json3/lib/json3.js"></script>
         <script src="bower_components/angular/angular.js"></script>
         <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
@@ -126,6 +136,18 @@
     <script src="scripts/components/auth/provider/auth.xauth.service.js"></script>
     <script src="scripts/app/account/dashboard/dashboard.js"></script>
     <script src="scripts/app/account/dashboard/dashboard.controller.js"></script>
+    <script src="scripts/app/entities/patientVestDeviceRawLog/patientVestDeviceRawLog.js"></script>
+    <script src="scripts/app/entities/patientVestDeviceRawLog/patientVestDeviceRawLog.controller.js"></script>
+    <script src="scripts/app/entities/patientVestDeviceRawLog/patientVestDeviceRawLog-detail.controller.js"></script>
+    <script src="scripts/components/entities/patientVestDeviceRawLog/patientVestDeviceRawLog.service.js"></script>
+    <script src="scripts/app/entities/patientInfo/patientInfo.js"></script>
+    <script src="scripts/app/entities/patientInfo/patientInfo.controller.js"></script>
+    <script src="scripts/app/entities/patientInfo/patientInfo-detail.controller.js"></script>
+    <script src="scripts/components/entities/patientInfo/patientInfo.service.js"></script>
+    <script src="scripts/app/entities/userLoginToken/userLoginToken.js"></script>
+    <script src="scripts/app/entities/userLoginToken/userLoginToken.controller.js"></script>
+    <script src="scripts/app/entities/userLoginToken/userLoginToken-detail.controller.js"></script>
+    <script src="scripts/components/entities/userLoginToken/userLoginToken.service.js"></script>
     <!-- endbuild -->
 </body>
 </html>

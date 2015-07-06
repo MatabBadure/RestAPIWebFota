@@ -1,0 +1,166 @@
+{
+    "relationships": [
+        {
+            "relationshipId": 1,
+            "relationshipName": "user",
+            "relationshipNameCapitalized": "User",
+            "relationshipFieldName": "user",
+            "otherEntityName": "user",
+            "relationshipType": "many-to-one",
+            "otherEntityNameCapitalized": "User",
+            "otherEntityField": "id"
+        }
+    ],
+    "fields": [
+        {
+            "fieldId": 1,
+            "fieldName": "mrn",
+            "fieldType": "String",
+            "fieldIsEnum": false,
+            "fieldNameCapitalized": "Mrn",
+            "fieldNameUnderscored": "mrn",
+            "fieldInJavaBeanMethod": "Mrn",
+            "fieldValidate": true,
+            "fieldValidateRules": []
+        },
+        {
+            "fieldId": 2,
+            "fieldName": "hillromId",
+            "fieldType": "String",
+            "fieldIsEnum": false,
+            "fieldNameCapitalized": "HillromId",
+            "fieldNameUnderscored": "hillrom_id",
+            "fieldInJavaBeanMethod": "HillromId",
+            "fieldValidate": true,
+            "fieldValidateRules": []
+        },
+        {
+            "fieldId": 3,
+            "fieldName": "hubId",
+            "fieldType": "String",
+            "fieldIsEnum": false,
+            "fieldNameCapitalized": "HubId",
+            "fieldNameUnderscored": "hub_id",
+            "fieldInJavaBeanMethod": "HubId",
+            "fieldValidate": false
+        },
+        {
+            "fieldId": 4,
+            "fieldName": "serialNumber",
+            "fieldType": "String",
+            "fieldIsEnum": false,
+            "fieldNameCapitalized": "SerialNumber",
+            "fieldNameUnderscored": "serial_number",
+            "fieldInJavaBeanMethod": "SerialNumber",
+            "fieldValidate": true,
+            "fieldValidateRules": []
+        },
+        {
+            "fieldId": 5,
+            "fieldName": "bluetoothId",
+            "fieldType": "String",
+            "fieldIsEnum": false,
+            "fieldNameCapitalized": "BluetoothId",
+            "fieldNameUnderscored": "bluetooth_id",
+            "fieldInJavaBeanMethod": "BluetoothId",
+            "fieldValidate": true,
+            "fieldValidateRules": []
+        },
+        {
+            "fieldId": 6,
+            "fieldName": "title",
+            "fieldType": "String",
+            "fieldIsEnum": false,
+            "fieldNameCapitalized": "Title",
+            "fieldNameUnderscored": "title",
+            "fieldInJavaBeanMethod": "Title",
+            "fieldValidate": true,
+            "fieldValidateRules": []
+        },
+        {
+            "fieldId": 7,
+            "fieldName": "firstName",
+            "fieldType": "String",
+            "fieldIsEnum": false,
+            "fieldNameCapitalized": "FirstName",
+            "fieldNameUnderscored": "first_name",
+            "fieldInJavaBeanMethod": "FirstName",
+            "fieldValidate": true,
+            "fieldValidateRules": []
+        },
+        {
+            "fieldId": 8,
+            "fieldName": "middleName",
+            "fieldType": "String",
+            "fieldIsEnum": false,
+            "fieldNameCapitalized": "MiddleName",
+            "fieldNameUnderscored": "middle_name",
+            "fieldInJavaBeanMethod": "MiddleName",
+            "fieldValidate": false
+        },
+        {
+            "fieldId": 9,
+            "fieldName": "lastName",
+            "fieldType": "String",
+            "fieldIsEnum": false,
+            "fieldNameCapitalized": "LastName",
+            "fieldNameUnderscored": "last_name",
+            "fieldInJavaBeanMethod": "LastName",
+            "fieldValidate": true,
+            "fieldValidateRules": []
+        },
+        {
+            "fieldId": 10,
+            "fieldName": "dob",
+            "fieldType": "LocalDate",
+            "fieldIsEnum": false,
+            "fieldNameCapitalized": "Dob",
+            "fieldNameUnderscored": "dob",
+            "fieldInJavaBeanMethod": "Dob",
+            "fieldValidate": true,
+            "fieldValidateRules": []
+        },
+        {
+            "fieldId": 11,
+            "fieldName": "email",
+            "fieldType": "String",
+            "fieldIsEnum": false,
+            "fieldNameCapitalized": "Email",
+            "fieldNameUnderscored": "email",
+            "fieldInJavaBeanMethod": "Email",
+            "fieldValidate": false
+        },
+        {
+            "fieldId": 12,
+            "fieldName": "webLoginCreated",
+            "fieldType": "Boolean",
+            "fieldIsEnum": false,
+            "fieldNameCapitalized": "WebLoginCreated",
+            "fieldNameUnderscored": "web_login_created",
+            "fieldInJavaBeanMethod": "WebLoginCreated",
+            "fieldValidate": false
+        },
+        {
+            "fieldId": 13,
+            "fieldName": "isDeleted",
+            "fieldType": "Boolean",
+            "fieldIsEnum": false,
+            "fieldNameCapitalized": "IsDeleted",
+            "fieldNameUnderscored": "is_deleted",
+            "fieldInJavaBeanMethod": "IsDeleted",
+            "fieldValidate": false
+        }
+    ],
+    "fieldsContainOwnerManyToMany": false,
+    "fieldsContainOwnerOneToOne": false,
+    "fieldsContainOneToMany": false,
+    "fieldsContainLocalDate": true,
+    "fieldsContainCustomTime": true,
+    "fieldsContainBigDecimal": false,
+    "fieldsContainDateTime": false,
+    "fieldsContainDate": false,
+    "changelogDate": "20150703080114",
+    "dto": "no",
+    "pagination": "pager",
+    "validation": true
+}

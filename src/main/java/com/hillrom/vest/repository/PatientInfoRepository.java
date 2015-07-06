@@ -10,7 +10,4 @@ import java.util.List;
  */
 public interface PatientInfoRepository extends JpaRepository<PatientInfo,Long> {
 
-    @Query("select patientInfo from PatientInfo patientInfo where patientInfo.user.email = ?#{principal.username}")
-    List<PatientInfo> findAllForCurrentUser();
-
 }

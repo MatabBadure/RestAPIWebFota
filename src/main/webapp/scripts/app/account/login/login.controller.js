@@ -12,7 +12,6 @@ angular.module('hillromvestApp')
         $scope.rememberMe = true;
         $timeout(function (){angular.element('[ng-model="username"]').focus();});
         $scope.login = function (event) {
-            console.log($scope.user.captcha);
             event.preventDefault();
             // if ($scope.showCpatcha) {
             //   Auth.captcha($scope.user.captcha).then(function (data) {

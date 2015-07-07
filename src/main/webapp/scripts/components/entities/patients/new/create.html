@@ -1,5 +1,5 @@
-<form class="indent-top user-form">
-  <div class="new_user_type">Create Patient</div>
+<form class="dashboard-page__form--new">
+  <div class="dashboard-page__form--new_user-type">Create Patient</div>
   <div class="col-md-16 indent-form-top">
     <div class="col-md-6">
       <label for="exampleInputEmail1">Hill-Rom ID*</label>
@@ -23,7 +23,7 @@
       <label for="exampleInputEmail1">Title</label>
     </div>
     <div class="col-md-10">
-      <select class="form-control user-title">
+      <select class="form-control dashboard-page__form--new_user-title">
         <option>Mr.</option>
         <option>Mrs.</option>
         <option>Miss</option>
@@ -62,8 +62,8 @@
     <div class="col-md-6">
       <label for="exampleInputEmail1">Data of Birth*</label>
     </div>
-    <div class="col-md-10">
-      <input type="email" class="form-control" id="exampleInputEmail1" placeholder="mm/dd/yy">
+    <div class="col-md-10 dashboard-page__form--new_calendar">
+      <input type="text" class="span2" value="02/16/12" data-date-format="mm/dd/yy" id="dp2">
     </div>
   </div>
 
@@ -102,7 +102,15 @@
       <input type="email" class="form-control" id="exampleInputEmail1">
     </div>
   </div>
-  <div class="col-md-16 form-submit">
-    <button type="submit" class="submit-button">Submit</button>
+  <div class="col-md-16 dashboard-page__form--new_form-submit">
+    <button type="submit" class="dashboard-page__form--new_form-submit--button">Submit</button>
   </div>
 </form>
+<script type="text/javascript">
+//   $('#dp2').datepicker({
+// });
+  $("#dp2").datepicker().datepicker("setDate", new Date());
+  $('#dp2').on('changeDate', function(ev){
+    $(this).datepicker('hide');
+});
+</script>

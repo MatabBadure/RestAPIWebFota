@@ -49,49 +49,47 @@
 	  	}
   	}
 	}
-}
-
-
-
-
-// #navbar-collapse{
-// 	height: 100%;
-// }
-.indent-top{
-	padding-top: 15px;
-}
-.new_user_type{
-	padding: 5px;
-	font-weight: bold;
-	font-size: 14px;
-}
-.user-form{
-	font-size: 10px;
-}
-.user-form label{
-	padding-top: 10px;
-}
-.indent-form-top{
-	padding-top: 5px;
-}
-.user-form input{
-	height: 30px;
-  border-radius: 0;
-}
-.form-submit{
-	text-align: right;
-  padding: 0 30px;
-  margin-top: 10px;
-}
-.submit-button{
-	background-color: #bababa;
-  color: #FAFAFA;
-  padding: 5px 30px;
-  border: none;
-  text-transform: uppercase;
-  font-weight: 700;
-  border-radius: 2px;
-}
-.user-title{
-	width: 85px;
+	&__form{
+		&--new{
+			font-size: 10px;
+			&_user-type{
+				padding: 5px;
+				font-weight: bold;
+				font-size: 14px;
+			}
+			label{
+				padding-top: 10px;
+			}
+			input{
+				height: 30px;
+			  border-radius: 0;
+			}
+			&_form-submit{
+				text-align: right;
+			  padding: 0 30px;
+			  margin-top: 10px;
+			  &--button{
+					background-color: #bababa;
+				  color: #FAFAFA;
+				  padding: 5px 30px;
+				  border: none;
+				  text-transform: uppercase;
+				  font-weight: 700;
+				  border-radius: 2px;
+				}
+			}
+			&_user-title{
+				width: 80px;
+				height: 30px;
+			  border-radius: 0;
+			}
+			&_calendar{
+				color: #727272;
+				input{
+					width: 100%;
+					padding-left: 5px;
+				}
+			}
+		}
+	}
 }

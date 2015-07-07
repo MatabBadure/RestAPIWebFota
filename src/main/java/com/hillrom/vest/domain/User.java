@@ -17,6 +17,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.boon.json.annotations.JsonProperty;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.Email;
 import org.joda.time.DateTime;
@@ -35,7 +36,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private Long id;
 
     @JsonIgnore
-    @NotNull
     @Size(min = 60, max = 60)
     @Column(length = 60)
     private String password;
@@ -97,6 +97,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
         return password;
     }
 
+    @JsonProperty("password")
     public void setPassword(String password) {
         this.password = password;
     }
@@ -162,7 +163,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     }
 
     public void setLangKey(String langKey) {
-        this.langKey = langKey;
+        this.langKey = (langKey != null) ? langKey : "en";
     }
 
     public Set<Authority> getAuthorities() {

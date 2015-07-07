@@ -1,19 +1,19 @@
 'use strict';
 
 angular.module('hillromvestApp')
-    .config(function ($stateProvider, reCAPTCHAProvider) {
+    .config(function ($stateProvider) {
         $stateProvider
-            .state('dashboard', {
-                parent: 'account',
-                url: '/dashboard',
+            .state('clinic', {
+                parent: 'entity',
+                url: '/clinic',
                 data: {
                     roles: [],
-                    pageTitle: 'login.title'
+                    pageTitle: 'clinic.title'
                 },
                 views: {
                     'content@': {
-                        templateUrl: 'scripts/app/account/dashboard/dashboard.html',
-                        controller: 'DashboardController'
+                        templateUrl: 'scripts/app/entities/clinics/clinics.html',
+                        controller: 'PatientsController'
                     }
                 },
                 resolve: {

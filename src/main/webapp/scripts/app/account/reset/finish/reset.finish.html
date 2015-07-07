@@ -64,11 +64,15 @@
                                 Your password confirmation cannot be longer than 50 characters.
                             </p>
                         </div>
+                         
                     </div>
-                    <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" translate="reset.finish.form.button">Reset Password</button>
+                    <div class="form-group" ng-show="showCaptcha">
+                  			<div re-captcha ng-model="resetAccount.captcha"></div>
+                	</div>
+                    	 <button ng-disabled="form.confirmPassword.$invalid || form.password.$invalid || ((resetAccount.captcha.response == '' || resetAccount.captcha.response == undefined) && showCaptcha )" class="btn btn-primary" translate="reset.finish.form.button" ng-click="finishReset()">Reset Password</button>
+                   <!--  <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" translate="reset.finish.form.button">Reset Password</button> -->
                 </form>
             </div>
-
         </div>
     </div>
 </div>

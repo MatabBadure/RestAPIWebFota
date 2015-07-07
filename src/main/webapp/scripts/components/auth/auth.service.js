@@ -110,26 +110,7 @@ angular.module('hillromvestApp')
                     return cb(err);
                 }).$promise;
             },
-            
-           
-            
-            /*resetPasswordInit: function (email, callback) {
-                var cb = callback || angular.noop;
-                var deferred = $q.defer();
-
-                PasswordResetInit.resetPassword(email).then(function (data) {
-                    // retrieve the logged account information
-                    
-                    return cb(data);
-                }).catch(function (err) {
-                    deferred.reject(err);
-                    return cb(err);
-                });
-
-                return deferred.promise;
-            },*/
-            
-           
+               
 
             resetPasswordFinish: function(key, newPassword, callback) {
                 var cb = callback || angular.noop;

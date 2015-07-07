@@ -1,8 +1,11 @@
 package com.hillrom.vest.security;
 
-import com.hillrom.vest.domain.Authority;
-import com.hillrom.vest.domain.User;
-import com.hillrom.vest.repository.UserRepository;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,13 +15,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.Collections;
-import java.util.List;
+import com.hillrom.vest.domain.User;
+import com.hillrom.vest.repository.UserRepository;
 
 /**
  * Authenticate a user from the database.

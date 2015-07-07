@@ -1,13 +1,13 @@
 package com.hillrom.vest.service;
 
-import com.hillrom.vest.domain.Authority;
-import com.hillrom.vest.domain.User;
-import com.hillrom.vest.repository.AuthorityRepository;
-import com.hillrom.vest.repository.UserRepository;
-import com.hillrom.vest.security.SecurityUtils;
-import com.hillrom.vest.service.util.RandomUtil;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,11 +15,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import com.hillrom.vest.domain.Authority;
+import com.hillrom.vest.domain.PatientInfo;
+import com.hillrom.vest.domain.User;
+import com.hillrom.vest.repository.AuthorityRepository;
+import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.security.SecurityUtils;
+import com.hillrom.vest.service.util.RandomUtil;
 
 /**
  * Service class for managing users.
@@ -38,6 +41,9 @@ public class UserService {
 
     @Inject
     private AuthorityRepository authorityRepository;
+    
+    @Inject
+    private PatientInfoService patientInfoService;
 
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
@@ -149,4 +155,29 @@ public class UserService {
             userRepository.delete(user);
         }
     }
+    
+    public Optional<User> findOneByEmail(String email) {
+		return userRepository.findOneByEmail(email);
+	}
+
+	public User createUserFromPatientInfo(PatientInfo patientInfo) {
+		User newUser = new User();
+		newUser.setActivated(true);
+		newUser.setDeleted(false);
+		
+		Authority patientAuthority = authorityRepository.findOne("PATIENT");
+		newUser.getAuthorities().add(patientAuthority);
+		
+		newUser.setCreatedDate(new DateTime());
+		newUser.setEmail(patientInfo.getEmail());
+		newUser.setFirstName(patientInfo.getFirstName());
+		newUser.setLastName(patientInfo.getLastName());
+		
+		User persistedUser = userRepository.save(newUser);
+		// Update WebLoginCreated to be true  
+		patientInfoService.updateWebLoginCreated(patientInfo.getHillromId());
+		return persistedUser;
+		
+	}
+	
 }

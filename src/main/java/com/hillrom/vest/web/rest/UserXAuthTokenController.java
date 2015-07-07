@@ -4,7 +4,9 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,10 +41,15 @@ public class UserXAuthTokenController {
     	
     	String username = credentialsMap.get("username");
     	String password = credentialsMap.get("password"); 
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
-        Authentication authentication = this.authenticationManager.authenticate(token);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        UserDetails details = this.userDetailsService.loadUserByUsername(username);
-        return tokenProvider.createToken(details);
+    	if(StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)){
+    		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
+    		Authentication authentication = this.authenticationManager.authenticate(token);
+    		SecurityContextHolder.getContext().setAuthentication(authentication);
+    		UserDetails details = this.userDetailsService.loadUserByUsername(username);
+    		return tokenProvider.createToken(details);    		
+    	}else{
+    		throw new BadCredentialsException("Please provide Username and Password");
+    	}
+    	
     }
 }

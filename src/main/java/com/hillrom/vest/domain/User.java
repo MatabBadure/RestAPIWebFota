@@ -16,17 +16,22 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.Where;
 import org.hibernate.validator.constraints.Email;
 import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * A user.
  */
 @Entity
 @Table(name = "USER")
+@SQLDelete(sql="UPDATE user SET is_deleted = 1 WHERE id = ?")
+@Where(clause="is_deleted=0")
 public class User extends AbstractAuditingEntity implements Serializable {
 
     @Id
@@ -88,6 +93,12 @@ public class User extends AbstractAuditingEntity implements Serializable {
             inverseJoinColumns = {@JoinColumn(name = "patient_id", referencedColumnName = "id")})
     private Set<PatientInfo> patients = new HashSet<>();
     
+    @Column(name="last_loggedin_at")
+    private DateTime lastLoggedInAt;
+    
+    @Column(name="is_deleted", nullable = false)
+    private boolean isDeleted = false;
+    
     public Long getId() {
         return id;
     }
@@ -100,6 +111,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
         return password;
     }
 
+    @JsonProperty
     public void setPassword(String password) {
         this.password = password;
     }
@@ -156,7 +168,15 @@ public class User extends AbstractAuditingEntity implements Serializable {
        return resetDate;
     }
 
-    public void setResetDate(DateTime resetDate) {
+    public DateTime getLastLoggedInAt() {
+		return lastLoggedInAt;
+	}
+
+	public void setLastLoggedInAt(DateTime lastLoggedInAt) {
+		this.lastLoggedInAt = lastLoggedInAt;
+	}
+
+	public void setResetDate(DateTime resetDate) {
        this.resetDate = resetDate;
     }
 
@@ -184,6 +204,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.patients = patients;
 	}
 
+	public boolean isDeleted() {
+	  return isDeleted;
+	}
+
+	public void setDeleted(boolean isDeleted) {
+	  this.isDeleted = isDeleted;
+	}
+		 
 	@Override
     public boolean equals(Object o) {
         if (this == o) {

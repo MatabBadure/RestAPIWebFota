@@ -1,19 +1,28 @@
 package com.hillrom.vest.domain;
 
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.Where;
+import org.joda.time.LocalDate;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
 import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
-import org.hibernate.annotations.Type;
-import org.joda.time.LocalDate;
-
-import javax.persistence.*;
-import javax.validation.constraints.*;
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Objects;
 
 
 /**
@@ -21,6 +30,8 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "PATIENT_INFO")
+@SQLDelete(sql="UPDATE PATIENT_INFO SET is_deleted = 1 WHERE id = ?")
+@Where(clause="is_deleted=0")
 public class PatientInfo implements Serializable {
 
     @Id
@@ -72,6 +83,9 @@ public class PatientInfo implements Serializable {
     @ManyToMany(mappedBy = "patients")
     @JsonIgnore
     private Set<User> users = new HashSet<>();
+    
+    @Column(name="zipcode")
+    private String zipcode;
 
     public Long getId() {
         return id;
@@ -193,7 +207,16 @@ public class PatientInfo implements Serializable {
         this.users = users;
     }
 
-    @Override
+    
+    public String getZipcode() {
+		return zipcode;
+	}
+
+	public void setZipcode(String zipcode) {
+		this.zipcode = zipcode;
+	}
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;

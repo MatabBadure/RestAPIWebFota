@@ -1,28 +1,69 @@
-<div>
-  Create Patient
+<form class="indent-top user-form" ng-submit="createUser()">
+  <div class="new_user_type">Create User</div>
 
-  <div>
-    <form ng-submit="createUser()">
-      <div>Title
-        <select>
-          <option>
-            Mr.
-          </option>
-        </select>
-      </div>
-      <div>First Name * <input type="text" ng-model="firstName"/></div>
-      <div>Middle Name <input type="text" ng-model="middleName"/></div>
-      <div>Last Name * <input type="text" ng-model="lastName"/></div>
-      <div>Email <input type="text" ng-model="email"/></div>
-      <div>Select Role
-        <select>
-          <option>
-            Super Admin
-          </option>
-        </select>
-      </div>
-      <input type="submit"></form>
-    </form>
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Title</label>
+    </div>
+    <div class="col-md-10">
+      <select class="form-control user-title">
+        <option>Mr.</option>
+        <option>Mrs.</option>
+        <option>Miss</option>
+      </select>
+    </div>
   </div>
 
-</div>
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">First Name*</label>
+    </div>
+    <div class="col-md-10">
+      <input type="email" class="form-control" id="exampleInputEmail1">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Middle Name</label>
+    </div>
+    <div class="col-md-10">
+      <input type="email" class="form-control" id="exampleInputEmail1">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Last Name*</label>
+    </div>
+    <div class="col-md-10">
+      <input type="email" class="form-control" id="exampleInputEmail1">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Email</label>
+    </div>
+    <div class="col-md-10">
+      <input type="email" class="form-control" id="exampleInputEmail1">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Select Role</label>
+    </div>
+    <div class="col-md-10">
+      <select class="form-control user-title">
+        <option>Super Admin</option>
+        <option>Admin</option>
+        <option>Member</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="col-md-16 form-submit">
+    <button type="submit" class="submit-button">Submit</button>
+  </div>
+</form>

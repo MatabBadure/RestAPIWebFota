@@ -152,11 +152,11 @@ public class AccountResource {
 
     @RequestMapping(value = "/account/reset_password/init",
         method = RequestMethod.POST,
-        produces = MediaType.TEXT_PLAIN_VALUE)
+        produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> requestPasswordReset(@RequestBody String mail, HttpServletRequest request) {
+    public ResponseEntity<?> requestPasswordReset(@RequestBody Map<String, String> body, HttpServletRequest request) {
         
-        return userService.requestPasswordReset(mail)
+        return userService.requestPasswordReset(body.get("email"))
             .map(user -> {
                 String baseUrl = request.getScheme() +
                     "://" +
@@ -164,7 +164,7 @@ public class AccountResource {
                     ":" +
                     request.getServerPort();
             mailService.sendPasswordResetMail(user, baseUrl);
-            return new ResponseEntity<>("e-mail was sent", HttpStatus.OK);
+            return new ResponseEntity<>("e-mail sent successfully.", HttpStatus.OK);
             }).orElse(new ResponseEntity<>("e-mail address not registered", HttpStatus.BAD_REQUEST));
         
     }
@@ -173,12 +173,13 @@ public class AccountResource {
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<String> finishPasswordReset(@RequestParam(value = "key") String key, @RequestParam(value = "newPassword") String newPassword) {
+    public ResponseEntity<String> finishPasswordReset(@RequestParam(value = "key") String key, @RequestBody(required=true) Map<String,String> body) {
+    	String newPassword = body.get("newPassword");
         if (!checkPasswordLength(newPassword)) {
             return new ResponseEntity<>("Incorrect password", HttpStatus.BAD_REQUEST);
         }
         return userService.completePasswordReset(newPassword, key)
-              .map(user -> new ResponseEntity<String>(HttpStatus.OK)).orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+              .map(user -> new ResponseEntity<String>("Password reset successfully.", HttpStatus.OK)).orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
     private boolean checkPasswordLength(String password) {

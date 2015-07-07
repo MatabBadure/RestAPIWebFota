@@ -12,7 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -81,10 +80,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})
     private Set<Authority> authorities = new HashSet<>();
     
-    @OneToMany(mappedBy = "user")
     @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "USER_PATIENT_ASSOC",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "patient_id", referencedColumnName = "id")})
     private Set<PatientInfo> patients = new HashSet<>();
-
+    
     public Long getId() {
         return id;
     }
@@ -174,7 +177,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
         this.authorities = authorities;
     }
 
-    public Set<PatientInfo> getPatients() {
+	public Set<PatientInfo> getPatients() {
 		return patients;
 	}
 

@@ -3308,6 +3308,154 @@ select[multiple].input-lg,
   }
 }
 
+.caret {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  vertical-align: middle;
+  border-top: 4px solid;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-toggle:focus {
+  outline: 0;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  display: none;
+  float: left;
+  min-width: 160px;
+  padding: 5px 0;
+  margin: 2px 0 0;
+  list-style: none;
+  font-size: 14px;
+  text-align: left;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  background-clip: padding-box;
+}
+.dropdown-menu.pull-right {
+  right: 0;
+  left: auto;
+}
+.dropdown-menu .divider {
+  height: 1px;
+  margin: 9px 0;
+  overflow: hidden;
+  background-color: #e5e5e5;
+}
+.dropdown-menu > li > a {
+  display: block;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: normal;
+  line-height: 1.42857;
+  color: #333333;
+  white-space: nowrap;
+}
+
+.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus {
+  text-decoration: none;
+  color: #262626;
+  background-color: #f5f5f5;
+}
+
+.dropdown-menu > .active > a, .dropdown-menu > .active > a:hover, .dropdown-menu > .active > a:focus {
+  color: #fff;
+  text-decoration: none;
+  outline: 0;
+  background-color: #428bca;
+}
+
+.dropdown-menu > .disabled > a, .dropdown-menu > .disabled > a:hover, .dropdown-menu > .disabled > a:focus {
+  color: #777777;
+}
+
+.dropdown-menu > .disabled > a:hover, .dropdown-menu > .disabled > a:focus {
+  text-decoration: none;
+  background-color: transparent;
+  background-image: none;
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+  cursor: not-allowed;
+}
+
+.open > .dropdown-menu {
+  display: block;
+}
+.open > a {
+  outline: 0;
+}
+
+.dropdown-menu-right {
+  left: auto;
+  right: 0;
+}
+
+.dropdown-menu-left {
+  left: 0;
+  right: auto;
+}
+
+.dropdown-header {
+  display: block;
+  padding: 3px 20px;
+  font-size: 12px;
+  line-height: 1.42857;
+  color: #777777;
+  white-space: nowrap;
+}
+
+.dropdown-backdrop {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  z-index: 990;
+}
+
+.pull-right > .dropdown-menu {
+  right: 0;
+  left: auto;
+}
+
+.dropup .caret,
+.navbar-fixed-bottom .dropdown .caret {
+  border-top: 0;
+  border-bottom: 4px solid;
+  content: "";
+}
+.dropup .dropdown-menu,
+.navbar-fixed-bottom .dropdown .dropdown-menu {
+  top: auto;
+  bottom: 100%;
+  margin-bottom: 1px;
+}
+
+@media (min-width: 768px) {
+  .navbar-right .dropdown-menu {
+    right: 0;
+    left: auto;
+  }
+  .navbar-right .dropdown-menu-left {
+    left: 0;
+    right: auto;
+  }
+}
 .nav {
   margin-bottom: 0;
   padding-left: 0;
@@ -4232,6 +4380,45 @@ select[multiple].input-lg,
     display: none !important;
   }
 }
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  color: #A7A7A7;
+}
+
+.container-top-indent {
+  margin-top: 50px;
+  height: inherit;
+}
+
+.content-body {
+  background-color: #EEEEEE;
+  height: 85%;
+}
+
+.clr {
+  clear: both;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.textUpperCase {
+  text-transform: uppercase;
+}
+
+.indent-bottom-5 {
+  padding-bottom: 5px;
+}
+
+.indent-top-15 {
+  padding-top: 15px;
+}
+
 .navbar-default {
   background-color: #ffffff;
   border-color: #ffffff;
@@ -4240,6 +4427,122 @@ select[multiple].input-lg,
 .navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
   background-color: #ffffff;
   color: #555;
+}
+
+.custom-navbar .left-padding {
+  padding-left: 15px;
+}
+.custom-navbar .right-padding {
+  padding-right: 15px;
+}
+.custom-navbar .navbar-header > .navbar-brand {
+  padding: 12px;
+}
+.custom-navbar .navbar-header > .navbar-brand .hillrom_logo {
+  height: 27px;
+  width: 138px;
+}
+
+.login {
+  display: table;
+  height: 100%;
+  width: 100%;
+}
+.login__container {
+  padding: 0 15px;
+  display: table-cell;
+  vertical-align: middle;
+}
+.login__container--left-section {
+  height: 100%;
+  display: table;
+}
+.login__container--left-section-description {
+  display: table-cell;
+  vertical-align: middle;
+}
+.login__container--left-section-description_content {
+  float: left;
+  width: 70%;
+  padding-top: 8%;
+}
+.login__container--left-section-description_image {
+  border-right: 1px solid;
+  margin-right: 50px;
+}
+.login__container--right-section {
+  height: 100%;
+  display: table;
+}
+.login__container--right-section-form {
+  display: table-cell;
+  vertical-align: middle;
+}
+.login .login-button {
+  color: #FFF;
+  border: none;
+  padding: 3px 30px;
+  background-color: #9A9A9A;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.login input::-webkit-input-placeholder {
+  color: #A7A7A7;
+  opacity: 0.6;
+}
+.login a {
+  color: inherit;
+}
+
+.reset {
+  display: table;
+  height: 100%;
+  width: 100%;
+}
+.reset__container {
+  padding: 0 15px;
+  display: table-cell;
+  vertical-align: middle;
+}
+.reset__container--left-section {
+  height: 100%;
+  display: table;
+}
+.reset__container--left-section-description {
+  display: table-cell;
+  vertical-align: middle;
+}
+.reset__container--left-section-description_content {
+  float: left;
+  width: 70%;
+  padding-top: 8%;
+}
+.reset__container--left-section-description_image {
+  border-right: 1px solid;
+  margin-right: 50px;
+}
+.reset__container--right-section {
+  height: 100%;
+  display: table;
+}
+.reset__container--right-section-form {
+  display: table-cell;
+  vertical-align: middle;
+}
+.reset .reset-button {
+  color: #FFF;
+  border: none;
+  padding: 3px 30px;
+  background-color: #9A9A9A;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.reset input::-webkit-input-placeholder {
+  color: #A7A7A7;
+  opacity: 0.6;
+}
+.reset a {
+  color: inherit;
 }
 
 /*# sourceMappingURL=main.css.map */

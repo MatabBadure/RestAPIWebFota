@@ -99,7 +99,7 @@ public class UserLoginTokenResourceTest {
         restUserLoginTokenMockMvc.perform(get("/api/userLoginTokens"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(userLoginToken.getId().intValue())))
+                .andExpect(jsonPath("$.[*].id").value(hasItem(userLoginToken.getId())))
                 .andExpect(jsonPath("$.[*].createdTime").value(hasItem(DEFAULT_CREATED_TIME_STR)));
     }
 
@@ -113,7 +113,7 @@ public class UserLoginTokenResourceTest {
         restUserLoginTokenMockMvc.perform(get("/api/userLoginTokens/{id}", userLoginToken.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.id").value(userLoginToken.getId().intValue()))
+            .andExpect(jsonPath("$.id").value(userLoginToken.getId()))
             .andExpect(jsonPath("$.createdTime").value(DEFAULT_CREATED_TIME_STR));
     }
 

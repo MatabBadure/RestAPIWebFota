@@ -1,30 +1,66 @@
-<div>
-    <div class="row">
-        <div class="col-md-4 col-md-offset-4">
-            <h1 translate="login.title">Authentication</h1>
+<div class="login">
+  <div class="row login__container">
+    <div class="col-md-12 login__container--left-section">
+      <div class="login__container--left-section-description">
+        <div class="login__container--left-section-description_content">
+          The Vest Airway Clearance System, Model 105, is a designed to assist patients in the mobilization of retained secretions that, if not removed, may lead to increased rates of respiratory infaction, hospitalization and reduced lung function.
+        </div>
+        <div class="login__container--left-section-description_image">
+          <img src="assets/images/heart.jpeg">
+        </div>
+      </div>
+    </div>
 
-            <div class="alert alert-danger" ng-show="authenticationError" translate="login.messages.error.authentication">
-                <strong>Authentication failed!</strong> Please check your credentials and try again.
+    <div class="col-md-4 login__container--right-section">
+
+        <div class="login__container--right-section-form" ng-show="showLogin">
+          <div class="text-center textUpperCase indent-bottom-5" translate="login.title">Login to your Account</div>
+          <!-- <div class="alert alert-danger" ng-show="authenticationError" translate="login.messages.error.authentication">
+                  <strong>Authentication failed!</strong> Please check your credentials and try again.
+              </div> -->
+          <form class="form" role="form" ng-submit="login($event)">
+            <div class="form-group">
+              <!-- <label for="username" translate="global.form.username">Login</label> -->
+              <input type="text" class="form-control" id="username" placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="username">
             </div>
-            <form class="form" role="form" ng-submit="login($event)">
-                <div class="form-group">
-                    <label for="username" translate="global.form.username">Login</label>
-                    <input type="text" class="form-control" id="username" placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="username">
-                </div>
-                <div class="form-group">
-                    <label for="password" translate="login.form.password">Password</label>
-                    <input type="password" class="form-control" id="password" placeholder="{{'login.form.password.placeholder' | translate}}"
-                           ng-model="password">
-                </div>
-                <button type="submit" class="btn btn-primary" translate="login.form.button">Authenticate</button>
-            </form>
-            <p></p>
-            <div class="alert alert-warning">
-                <a href="#/reset/request" translate="login.password.forgot">Did you forget your password?</a>
+            <div class="form-group">
+              <!-- <label for="password" translate="login.form.password">Password</label> -->
+              <input type="password" class="form-control" id="password" placeholder="{{'login.form.password.placeholder' | translate}}" ng-model="password">
             </div>
-            <div class="alert alert-warning" translate="global.messages.info.register">
-                You don't have an account yet? <a href="#/register">Register a new account</a>
+            <div class="form-group" ng-show="showCpatcha">
+              <div re-captcha ng-model="user.captcha"></div>
             </div>
+            <button class="login-button center-block" translate="login.form.button" ng-click="login($event)">Authenticate</button>
+            <!-- <button type="submit" class="login-button center-block" translate="login.form.button">Authenticate</button> -->
+          </form>
+
+          <div class="alert alert-warning text-center">
+            <a href="#/reset/request" translate="login.password.forgot">Did you forget your password?</a>
+          </div>
+
+          <!-- <div class="alert alert-warning" translate="global.messages.info.register">
+                  You don't have an account yet? <a href="#/register">Register a new account</a>
+              </div> -->
+        </div>
+
+        <div class="login__container--right-section-form" ng-show="isFirstLogin">
+          <form class="form" role="form" ng-submit="submitPassword($event)">
+            <div class="form-group" ng-show="!isEmailExist">
+              <label for="Email ID" translate="global.form.email">E-Mail</label>
+              <input type="text" class="form-control" id="" placeholder="{{'login.form.email.placeholder' | translate}}" ng-model="user.email">
+            </div>
+            <div class="form-group">
+              <label for="Password" >Password</label>
+              <input type="password" class="form-control" id="" placeholder="password" ng-model="user.password">
+            </div>
+            <div class="form-group">
+              <label for="Confirm Password" > Confirm Password</label>
+              <input type="password" class="form-control" id="" placeholder="confirm password" ng-model="user.confirmPassword">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
         </div>
     </div>
+
+  </div>
 </div>

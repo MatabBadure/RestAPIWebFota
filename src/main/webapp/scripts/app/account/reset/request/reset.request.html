@@ -1,13 +1,25 @@
-<div>
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            <h1 translate="reset.request.title">Reset your password</h1>
+<div class="reset">
+    <div class="row reset__container">
+        <div class="col-md-12 reset__container--left-section">
+            <div class="reset__container--left-section-description">
+                <div class="reset__container--left-section-description_content">
+                    The Vest Airway Clearance System, Model 105, is a designed to assist patients in the mobilization of retained secretions that, if not removed, may lead to increased rates of respiratory infaction, hospitalization and reduced lung function.
+                </div>
+                <div class="reset__container--left-section-description_image">
+                    <img src="assets/images/heart.jpeg">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 reset__container--right-section">
+        <div class="reset__container--right-section-form">
+            <div class="text-center"><span class="glyphicon glyphicon-lock"></span></div>
+            <div class="text-center textUpperCase indent-bottom-5" translate="reset.request.title">Login to your Account</div>
 
             <div class="alert alert-danger" translate="reset.request.messages.notfound" ng-show="errorEmailNotExists">
                 <strong>E-Mail address isn't registered!</strong> Please check and try again.
             </div>
 
-            <div class="alert alert-warning" ng-hide="success">
+            <div class="alert alert-warning text-center" ng-hide="success">
                 <p translate="reset.request.messages.info">Enter the e-mail address you used to register.</p>
             </div>
 
@@ -17,7 +29,7 @@
 
             <form ng-show="!success" name="form" role="form" novalidate ng-submit="requestReset()" show-validation>
                 <div class="form-group">
-                    <label translate="global.form.email">E-mail</label>
+                    <!-- <label translate="global.form.email">E-mail</label> -->
                     <input type="email" class="form-control" name="email" placeholder="{{'global.form.email.placeholder' | translate}}"
                            ng-model="resetAccount.email" ng-minlength=5 ng-maxlength=100 required>
                     <div ng-show="form.email.$dirty && form.email.$invalid">
@@ -38,10 +50,16 @@
                             Your e-mail cannot be longer than 100 characters.
                         </p>
                     </div>
+                    <div class="form-group" ng-show="showCaptcha">
+                  		<div re-captcha ng-model="user.captcha"></div>
+                	</div>
                 </div>
-                <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" translate="reset.request.form.button">Register</button>
-            </form>
+                <!-- <button class="btn btn-primary" translate="reset.request.form.button" ng-click="requestReset()">Register</button> -->
+                <!-- <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" translate="reset.request.form.button">Register</button> -->
 
+                <button type="submit" ng-disabled="form.$invalid" class="reset-button center-block" translate="reset.request.form.button">Register</button>
+            </form>
         </div>
     </div>
 </div>
+

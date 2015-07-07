@@ -1,0 +1,50 @@
+.login {
+	display: table;
+  height: 100%;
+  width: 100%;
+ 	&__container {
+ 		padding: 0 15px;
+ 		display: table-cell;
+  	vertical-align: middle;
+  	&--left-section{
+  		height: 100%;
+  		display: table;
+  		&-description{
+			  display: table-cell;
+  			vertical-align: middle;
+  			&_content{
+  				float: left;
+				  width: 70%;
+				  padding-top: 8%;
+  			}
+  			&_image{
+  				border-right: 1px solid;
+  				margin-right: 50px;
+  			}
+  		}
+  	}
+  	&--right-section{
+  		height: 100%;
+  		display: table;
+  		&-form{
+  			display: table-cell;
+  			vertical-align: middle;
+  		}
+  	}
+ 	}
+ 	.login-button{
+ 		color: #FFF;
+ 		border: none;
+ 		padding: 3px 30px;
+ 		background-color:	#9A9A9A;
+ 		border-radius: 4px;
+ 		text-transform: uppercase;
+ 	}
+ 	input::-webkit-input-placeholder {
+ 		color: #A7A7A7;
+ 		opacity: 0.6;
+	}
+	a{
+		color: inherit;
+	}
+}

@@ -6,9 +6,10 @@
             "relationshipNameCapitalized": "User",
             "relationshipFieldName": "user",
             "otherEntityName": "user",
-            "relationshipType": "many-to-one",
+            "relationshipType": "many-to-many",
             "otherEntityNameCapitalized": "User",
-            "otherEntityField": "id"
+            "ownerSide": false,
+            "otherEntityRelationshipName": "patients"
         }
     ],
     "fields": [
@@ -159,7 +160,7 @@
     "fieldsContainBigDecimal": false,
     "fieldsContainDateTime": false,
     "fieldsContainDate": false,
-    "changelogDate": "20150703080114",
+    "changelogDate": "20150706082659",
     "dto": "no",
     "pagination": "pager",
     "validation": true

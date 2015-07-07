@@ -12,39 +12,24 @@ angular.module('hillromvestApp')
         $timeout(function (){angular.element('[ng-model="resetAccount.email"]').focus();});
 
         
-       /* $http.get("scripts/app/account/reset/request/text.json").success(function (data) {
-            console.log('success: ' + data)
-        });
-        */
-        
         $scope.requestReset = function () {
         	console.log($scope.form.valid);
         	event.preventDefault();
-        	var data = {"email": $scope.resetAccount.email};
-        	$http.post('api/account/reset_password/init', data, {
+        	/*var data = {"newPassword":"dsfdsgdgdf"};
+        	$http.post('api/account/reset_password/finish?key=80547938130900477475', data, {
                 headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
+              
+                   "Content-Type": "application/json",
+                   "Accept": "application/json"
+                    	
                 }
-            }).success(function (response) {
+            }).success(function (data, status, headers, config) {
                 console.log('Success');
-            }).error(function (response) {
-            	console.log('Error', response);
-            });
-        	/*
-        	 var request = $http({
-                 method: "post",
-                 url: "api/account/reset_password/init",
-                 data: data,
-                 contentType: 'application/json'
-             });
-        	 
-        	 request.success(function(data){
-        		 console.log("success");
-        	 }).error(function(data){
-        		 console.log("fail");
-        	 })
-        	 */
+            }).error(function (data, status, headers, config) {
+            	console.log('Error', data, status, headers, config);
+            });*/
+        	
+
         	
         	  /*if ($scope.showCaptcha) {
         		  //
@@ -95,12 +80,13 @@ angular.module('hillromvestApp')
              }else*/
         	
         	
-            	/* Auth.resetPasswordInit($scope.resetAccount.email).then(function () {
+            	 Auth.resetPasswordInit($scope.resetAccount.email).then(function () {
                      $scope.success = 'OK';
+                     $scope.errorEmailNotExists = null;
                      localStorage.setItem('passResetCount',0);
                  }).catch(function (response) {
                      $scope.success = null;
-                     if (response.status === 400 && response.data === 'e-mail address not registered') {
+                     if (response.status === 400 && response.data.message === 'e-mail address not registered') {
                          $scope.errorEmailNotExists = 'ERROR';
                          var passResetCount = parseInt(localStorage.getItem('passResetCount')) || 0;
                          localStorage.setItem('passResetCount', passResetCount + 1);
@@ -111,7 +97,7 @@ angular.module('hillromvestApp')
                          $scope.error = 'ERROR';
                      }
                  });
-        	*/
+        	
         }
 
     });

@@ -23,11 +23,8 @@ angular.module('hillromvestApp')
                     $state.go('home');
                 }).catch(function (response) {
                     $scope.success = null;
-                    $scope.error = 'ERROR';
-                    var resetFinishCount = parseInt(localStorage.getItem('resetFinishCount')) || 0 ;
-                    localStorage.setItem('resetFinishCount', resetFinishCount + 1);
-                    if(resetFinishCount >2){
-                    	$scope.showCaptcha = true;
+                    if(response.status === 400){
+                    	$scope.error = 'ERROR';
                     }
                 });
             }

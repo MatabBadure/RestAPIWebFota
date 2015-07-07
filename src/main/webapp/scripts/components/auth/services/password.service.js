@@ -7,29 +7,18 @@ angular.module('hillromvestApp')
     });
 
 angular.module('hillromvestApp')
-    .factory('PasswordResetInit', function ($http) {
-        /*return $resource('api/account/reset_password/init', {}, {
-         * 
-        })*/
-    	 return {
-             resetPassword: function(mail) {
-                 var data = {
-                   'email' : mail
-                 };
-                 return $http.post('api/account/reset_password/init', data, {
-                     headers: {
-                         "Content-Type": "application/json",
-                         "Accept": "application/json"
-                     }
-                 });/*.success(function (response) {
-                     return response;
-                 });*/
-             }
-    	 }
+    .factory('PasswordResetInit', function ($resource) {
+    	return $resource('api/account/reset_password/init', {}, {
+    	 })
     });
 
 angular.module('hillromvestApp')
     .factory('PasswordResetFinish', function ($resource) {
-        return $resource('api/account/reset_password/finish', {}, {
-        })
+        return{
+        	resetPassFinish : function(key){
+        		return  $resource('api/account/reset_password/finish?key='+key, {}, {
+                });
+        	}
+        	
+        }
     });

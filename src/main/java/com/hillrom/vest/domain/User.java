@@ -17,9 +17,12 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.boon.json.annotations.JsonProperty;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.Where;
 import org.hibernate.validator.constraints.Email;
 import org.joda.time.DateTime;
+import org.springframework.test.context.jdbc.Sql;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -28,6 +31,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name = "USER")
+@SQLDelete(sql="UPDATE user SET is_deleted = 1 WHERE id = ?")
+@Where(clause="is_deleted=0")
 public class User extends AbstractAuditingEntity implements Serializable {
 
     @Id
@@ -87,6 +92,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "patient_id", referencedColumnName = "id")})
     private Set<PatientInfo> patients = new HashSet<>();
+    
+    @Column(name="is_deleted", nullable = false)
+    private boolean isDeleted = false;
     
     public Long getId() {
         return id;
@@ -183,6 +191,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	public void setPatients(Set<PatientInfo> patients) {
 		this.patients = patients;
+	}
+
+	public boolean isDeleted() {
+		return isDeleted;
+	}
+
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
 	}
 
 	@Override

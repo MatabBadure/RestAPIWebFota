@@ -1,0 +1,97 @@
+.dashboard-page{
+	height: 100%;
+	&__admin-nav{
+  	height: 100%;
+  	&--nav{
+  		height: 100%;
+	  	&_dashboard{
+	  		background-color: #727272;
+			  padding: 10px;
+			  margin-bottom: 0px;
+	  	}
+	  	&_nav-list{
+	  		height: 90%;
+				background-color: #9A9A9A;
+				li{
+					line-height: 2.5;
+					border-bottom: 1px solid #FAFAFA;
+					a{
+						color: #FAFAFA;
+						background-color: #9A9A9A;
+						cursor: pointer;
+					}
+					a:hover{
+						color: #FAFAFA;
+						background-color: #9A9A9A;
+					}
+				}
+				li.active a:after{
+					content: '';
+				  display: none;
+				  width: 0;
+				  height: 0;
+				  border-style: solid;
+					border-width: 8px 0 8px 17px;
+					border-color: transparent transparent transparent #727272;
+				  position: absolute;
+				  z-index: 1;
+				  top: 30%;
+				  left: 100%;
+				}
+				li.active a {
+				  background-color: #727272;
+				  color: white;
+				  position: relative;
+				}
+				li.active a:after {
+				  display: block;
+				}
+	  	}
+  	}
+	}
+}
+
+
+
+
+#navbar-collapse{
+	height: 100%;
+}
+.indent-top{
+	padding-top: 15px;
+}
+.new_user_type{
+	padding: 5px;
+	font-weight: bold;
+	font-size: 14px;
+}
+.user-form{
+	font-size: 10px;
+}
+.user-form label{
+	padding-top: 10px;
+}
+.indent-form-top{
+	padding-top: 5px;
+}
+.user-form input{
+	height: 30px;
+  border-radius: 0;
+}
+.form-submit{
+	text-align: right;
+  padding: 0 30px;
+  margin-top: 10px;
+}
+.submit-button{
+	background-color: #bababa;
+  color: #FAFAFA;
+  padding: 5px 30px;
+  border: none;
+  text-transform: uppercase;
+  font-weight: 700;
+  border-radius: 2px;
+}
+.user-title{
+	width: 85px;
+}

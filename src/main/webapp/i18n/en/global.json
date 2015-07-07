@@ -39,7 +39,7 @@
         },
         "form": {
             "username": "Login",
-            "username.placeholder": "Your login",
+            "username.placeholder": "enter your Hill-Rom ID or Email ID",
             "newpassword": "New password",
             "newpassword.placeholder": "New password",
             "confirmpassword": "New password confirmation",
@@ -103,5 +103,5 @@
             "datetimelocal": "This field should be a date and time."
         }
     },
-    "footer": "This is your footer"
+    "footer": "Copyright @ Your Company 2015. All Rights Reserved"
 }

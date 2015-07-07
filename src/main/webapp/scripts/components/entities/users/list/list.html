@@ -1,0 +1,9 @@
+<div>
+  Recenmtly Created Hill-Rom Users
+
+  <div><input type="text" ng-model="searchItem"/><span>Sort</span></div>
+
+  <div ng-repeat="user in users | filter:searchItem">
+    <div ng-click="selectUser(user)">{{user.name}} -- {{user.role}} </div>
+  </div>
+</div>

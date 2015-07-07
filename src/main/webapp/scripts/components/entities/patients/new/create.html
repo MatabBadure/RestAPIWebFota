@@ -5,7 +5,7 @@
       <label for="exampleInputEmail1">Hill-Rom ID*</label>
     </div>
     <div class="col-md-10">
-      <input type="email" class="form-control" id="exampleInputEmail1">
+      <input type="text" class="form-control" id="exampleInputEmail1">
     </div>
   </div>
 
@@ -14,7 +14,7 @@
       <label for="exampleInputEmail1">EMR ID*</label>
     </div>
     <div class="col-md-10">
-      <input type="email" class="form-control" id="exampleInputEmail1">
+      <input type="text" class="form-control" id="exampleInputEmail1">
     </div>
   </div>
 
@@ -36,7 +36,7 @@
       <label for="exampleInputEmail1">First Name*</label>
     </div>
     <div class="col-md-10">
-      <input type="email" class="form-control" id="exampleInputEmail1">
+      <input type="text" class="form-control" id="exampleInputEmail1">
     </div>
   </div>
 
@@ -45,7 +45,7 @@
       <label for="exampleInputEmail1">Middle Name</label>
     </div>
     <div class="col-md-10">
-      <input type="email" class="form-control" id="exampleInputEmail1">
+      <input type="text" class="form-control" id="exampleInputEmail1">
     </div>
   </div>
 
@@ -54,7 +54,7 @@
       <label for="exampleInputEmail1">Last Name*</label>
     </div>
     <div class="col-md-10">
-      <input type="email" class="form-control" id="exampleInputEmail1">
+      <input type="text" class="form-control" id="exampleInputEmail1">
     </div>
   </div>
 
@@ -72,7 +72,7 @@
       <label for="exampleInputEmail1">Age</label>
     </div>
     <div class="col-md-10">
-      <input type="email" class="form-control" id="exampleInputEmail1">
+      <input type="text" class="form-control age" id="exampleInputEmail1" readonly>
     </div>
   </div>
 
@@ -89,8 +89,12 @@
     <div class="col-md-6">
       <label for="exampleInputEmail1">Clinic</label>
     </div>
-    <div class="col-md-10">
-      <input type="email" class="form-control" id="exampleInputEmail1">
+    <div class="col-md-10 dashboard-page__form--new_select-box">
+      <select class="form-control">
+        <option>Manipal</option>
+        <option>Fortis</option>
+        <option>Appolo</option>
+      </select>
     </div>
   </div>
 
@@ -98,8 +102,12 @@
     <div class="col-md-6">
       <label for="exampleInputEmail1">Doctor</label>
     </div>
-    <div class="col-md-10">
-      <input type="email" class="form-control" id="exampleInputEmail1">
+    <div class="col-md-10 dashboard-page__form--new_select-box">
+      <select class="form-control">
+        <option>Dr. A. Shah</option>
+        <option>Dr. S. Ali</option>
+        <option>Dr. R. Ranjan</option>
+      </select>
     </div>
   </div>
   <div class="col-md-16 dashboard-page__form--new_form-submit">
@@ -110,7 +118,23 @@
 //   $('#dp2').datepicker({
 // });
   $("#dp2").datepicker().datepicker("setDate", new Date());
+
+
   $('#dp2').on('changeDate', function(ev){
-    $(this).datepicker('hide');
+
+  var currentDate = new Date();
+  var selectedDate = new Date($(this).val());
+  var age = currentDate.getFullYear() - selectedDate.getFullYear();
+  var m = currentDate.getMonth() - selectedDate.getMonth();
+
+  if (m < 0 || (m === 0 && currentDate.getDate() < selectedDate.getDate())) {
+      age--;
+  }
+
+  $('.age').val(age);
+
+  $(this).datepicker('hide');
 });
+
+  
 </script>

@@ -1,20 +1,100 @@
-<div>
-  Create Clinic
-
-  <div>
-    <form ng-submit="">
-      <div>Clinic Name * <input type="text" ng-model="clinicName"/></div>
-      <div>Satellite Clinic * <input type="text" ng-model="satelliteClinic"/></div>
-      <div><input type="checkbox"/> Add another Clinic</div>
-
-      <div>Address <input type="text" ng-model="address"/></div>
-      <div>Zip Code <input type="text" ng-model="zipCode"/></div>
-      <div>City <input type="text" ng-model="city"/></div>
-      <div>State <input type="text" ng-model="state"/></div>
-      <div>Phone Number <input type="text" ng-model="phoneNumber"/></div>
-      <div>Fax Number <input type="text" ng-model="faxNumber"/></div>
-      <div>Clinic Admin <input type="text" ng-model="clinicAdmin"/></div>
-    </form>
+<form class="dashboard-page__form--new">
+  <div class="dashboard-page__form--new_user-type">Create Clinic</div>
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Clinic Name *</label>
+    </div>
+    <div class="col-md-10">
+      <input type="text" class="form-control" id="exampleInputEmail1">
+    </div>
   </div>
 
-</div>
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Satellite Clinic *</label>
+    </div>
+    <div class="col-md-10">
+      <input type="text" class="form-control" id="exampleInputEmail1">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1"></label>
+    </div>
+    <div class="col-md-10 dashboard-page__form--new_checkbox">
+      <input class="float-left" type="checkbox" value=""><span class="float-left">Add Another Clinic</span>
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Address</label>
+    </div>
+    <div class="col-md-10">
+      <input type="text" class="form-control" id="exampleInputEmail1">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Zip Code</label>
+    </div>
+    <div class="col-md-10">
+      <input type="text" class="form-control" id="exampleInputEmail1">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">City</label>
+    </div>
+    <div class="col-md-10">
+      <input type="text" class="form-control" id="exampleInputEmail1">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">State</label>
+    </div>
+    <div class="col-md-10 dashboard-page__form--new_calendar">
+      <input type="text" class="form-control" id="exampleInputEmail1">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Phone Number</label>
+    </div>
+    <div class="col-md-10">
+      <input type="text" class="form-control age" id="exampleInputEmail1">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Fax Number</label>
+    </div>
+    <div class="col-md-10">
+      <input type="email" class="form-control" id="exampleInputEmail1">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Clinic Admin</label>
+    </div>
+    <div class="col-md-10 dashboard-page__form--new_select-box">
+      <select class="form-control">
+        <option>Manipal</option>
+        <option>Fortis</option>
+        <option>Appolo</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="col-md-16 dashboard-page__form--new_form-submit">
+    <button type="submit" class="dashboard-page__form--new_form-submit--button">Submit</button>
+  </div>
+</form>

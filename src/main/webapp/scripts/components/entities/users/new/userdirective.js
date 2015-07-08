@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .directive('user', function () {
+  .directive('user', function (User) {
     return {
       templateUrl: 'scripts/components/entities/users/new/create.html',
       restrict: 'E',
@@ -21,6 +21,11 @@ angular.module('hillromvestApp')
             'role': $scope.user.role,
             'email': $scope.user.email
           };
+          User.createUser(data).then(function (data) {
+            console.log('Success');
+          }).catch(function () {
+            console.log('Error');
+          });
           console.log('data: ',data);
         }
       }

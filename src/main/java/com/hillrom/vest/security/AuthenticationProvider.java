@@ -1,9 +1,6 @@
 package com.hillrom.vest.security;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -16,14 +13,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.service.PatientInfoService;
@@ -32,7 +26,9 @@ import com.hillrom.vest.service.util.RandomUtil;
 
 public class AuthenticationProvider extends DaoAuthenticationProvider {
 
-    private final Logger log = LoggerFactory.getLogger(AuthenticationProvider.class);
+    private static final int NO_OF_CHARACTERS_TO_BE_EXTRACTED = 4;
+
+	private final Logger log = LoggerFactory.getLogger(AuthenticationProvider.class);
 
     private PasswordEncoder passwordEncoder;
 
@@ -56,8 +52,8 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         UsernamePasswordAuthenticationToken token =
                 (UsernamePasswordAuthenticationToken) authentication;
-
         String login = token.getName();
+        log.debug("login : ",login);
         
         return RandomUtil.isValidEmail(login)? loginWithEmail(token, login) : loginWithHillromId(token, login);
     }
@@ -88,14 +84,15 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
     		}
     		
     		String defaultPassword = generateDefaultPassword(patientInfo);
+    		String encodedPassword = passwordEncoder.encode(defaultPassword);
     		
     		matchWithDefaultPassword(token.getCredentials().toString(), defaultPassword);
     		
     		//If email doesn't exist, send response to register with email and password
     		if(null == patientInfo.getEmail()){
     			
-    			User newUser = userService.createUserFromPatientInfo(patientInfo,passwordEncoder.encode(defaultPassword));
-    			JSONObject jsonObject = prepareJSONForPatientUser(login,defaultPassword);
+    			userService.createUserFromPatientInfo(patientInfo,encodedPassword);
+    			JSONObject jsonObject = prepareJSONForPatientUser(login,encodedPassword);
     			throw new EmailNotPresentForPatientException("Please Register with Email and Password to Login",jsonObject);
     		}
     		
@@ -103,15 +100,14 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
     		
     		if(userFromDatabase.isPresent()){
     			User existingPatientuser = userFromDatabase.get();
-    			/* User exists and it is the first time login,
-    			 * else block is not required since WebLogginCreated will be true for subsequent logins which has been checked in prior condition*/ 
+    			// User exists and it is the first time login 
     			if(null == existingPatientuser.getLastLoggedInAt()){
     				JSONObject jsonObject = prepareJSONForPatientUser(patientInfo.getEmail(),defaultPassword);
         	        throw new FirstLoginException("First Time Login, please reset your password",jsonObject);
     			}
     		}else{
-    			User newUser = userService.createUserFromPatientInfo(patientInfo,passwordEncoder.encode(defaultPassword));
-    			JSONObject jsonObject = prepareJSONForPatientUser(login,defaultPassword);
+    			userService.createUserFromPatientInfo(patientInfo,encodedPassword);
+    			JSONObject jsonObject = prepareJSONForPatientUser(login,encodedPassword);
     			throw new FirstLoginException("Please Register with Email and Password to Login",jsonObject);
     		}
     	}else{
@@ -132,31 +128,25 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
 		}
 	}
     
-	private org.springframework.security.core.userdetails.User buildUserWithAuthorities(
-			User user) {
-		List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
-		        .map(authority -> new SimpleGrantedAuthority(authority.getName()))
-		        .collect(Collectors.toList());
-		return new org.springframework.security.core.userdetails.User(user.getEmail().toLowerCase(),
-		        user.getPassword(),
-		        grantedAuthorities);
-	}
-    
-    
+	 /**Default Password for PatientUser is zipcode+1st 4 characters in last_name+dob in MMddyyy format
+	  *    
+	  * @param patientUser
+	  * @return default password for the PatientUser
+	  */
 	private String generateDefaultPassword(PatientInfo patientUser) {
 		StringBuilder defaultPassword = new StringBuilder();
 		defaultPassword.append(patientUser.getZipcode());
 		// default password will have the first 4 letters from last name, if length of last name <= 4, use complete string
-		int endIndex = patientUser.getLastName().length() > 5 ? 5 : patientUser.getLastName().length() ; 
+		int endIndex = patientUser.getLastName().length() > NO_OF_CHARACTERS_TO_BE_EXTRACTED ? NO_OF_CHARACTERS_TO_BE_EXTRACTED : patientUser.getLastName().length() ; 
 		defaultPassword.append(patientUser.getLastName().substring(0, endIndex));
 		defaultPassword.append(patientUser.getDob().toString("MMddyyyy"));
 		return defaultPassword.toString();
 	}
 
-	private JSONObject prepareJSONForPatientUser(String username,String password){
+	private JSONObject prepareJSONForPatientUser(String username,String encodedPassword){
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("username", username);
-		jsonObject.put("password", password);
+		jsonObject.put("password", encodedPassword);
 		return jsonObject;
 	}
 	

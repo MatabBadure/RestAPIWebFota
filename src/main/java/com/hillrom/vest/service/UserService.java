@@ -162,7 +162,7 @@ public class UserService {
 		return userRepository.findOneByEmail(email);
 	}
 
-	public User createUserFromPatientInfo(PatientInfo patientInfo,String defaultPassword) {
+	public User createUserFromPatientInfo(PatientInfo patientInfo,String encodedPassword) {
 		User newUser = new User();
 		newUser.setActivated(true);
 		newUser.setDeleted(false);
@@ -186,7 +186,7 @@ public class UserService {
 		newUser.setEmail(username.toLowerCase());
 		newUser.setFirstName(patientInfo.getFirstName());
 		newUser.setLastName(patientInfo.getLastName());
-		newUser.setPassword(defaultPassword);
+		newUser.setPassword(encodedPassword);
 		newUser.getPatients().add(patientInfo);
 		
 		User persistedUser = userRepository.save(newUser);
@@ -210,6 +210,7 @@ public class UserService {
 			String password = params.get("password");
             String encryptedPassword = passwordEncoder.encode(password);
             u.setPassword(encryptedPassword);
+            u.setLastLoggedInAt(DateTime.now());
             userRepository.save(u);
             log.debug("updateEmailOrPassword for User: {}", u);
         });

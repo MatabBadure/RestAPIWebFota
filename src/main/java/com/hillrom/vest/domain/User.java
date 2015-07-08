@@ -93,6 +93,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private Set<PatientInfo> patients = new HashSet<>();
     
     @Column(name="last_loggedin_at")
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime lastLoggedInAt;
     
     @Column(name="is_deleted", nullable = false)

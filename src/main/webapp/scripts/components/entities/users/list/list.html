@@ -12,13 +12,13 @@
 			
 		</div>
 	</div>
-	<div>
+	<div class="dashboard-page__user-list__detailed__list">
 		<div ng-repeat="user in users | filter:searchItem">
-	    <div ng-click="selectUser(user)">
-	    <span>
+	    <div ng-click="selectUser(user)" class="dashboard-page__user-list__detailed__list--details" >
+	    <span class="user-detail">
 	    	{{user.lastName}} {{user.firstName}}
 	    </span> 
-	    <span>
+	    <span class="user-role">
 	    	{{user.role}}
 	    </span> 
 	    </div>

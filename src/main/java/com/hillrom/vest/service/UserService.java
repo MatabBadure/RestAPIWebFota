@@ -6,6 +6,8 @@ import com.hillrom.vest.repository.AuthorityRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
+import com.hillrom.vest.web.rest.dto.HillromTeamUserDTO;
+
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -149,4 +152,20 @@ public class UserService {
             userRepository.delete(user);
         }
     }
+    
+    public User createUser(HillromTeamUserDTO hillromTeamUser) {
+		User newUser = new User();
+		newUser.setFirstName(hillromTeamUser.getFirstName());
+		newUser.setLastName(hillromTeamUser.getLastName());
+		newUser.setEmail(hillromTeamUser.getEmail());
+		newUser.setLangKey(null);
+		// new user is not active
+		newUser.setActivated(false);
+		// new user gets registration key
+		newUser.setActivationKey(RandomUtil.generateActivationKey());
+		newUser.getAuthorities().add(authorityRepository.findOne(hillromTeamUser.getRole()));
+		userRepository.save(newUser);
+		log.debug("Created Information for User: {}", newUser);
+		return newUser;
+	}
 }

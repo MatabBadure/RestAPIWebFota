@@ -8,26 +8,25 @@ angular.module('hillromvestApp')
       link: function postLink(scope, element, attrs) {
       },
       scope: {
-        user:'=userData'
+        user:'=userData',
+        isCreate:'=isCreate'
       },
       controller: function ($scope) {
         $scope.createUser = function () {
-          console.log('Inside the Controller');
           var data = {
             'title': $scope.user.title,
             'firstName': $scope.user.firstName,
             'middleName': $scope.user.middleName,
             'lastName': $scope.user.lastName,
-            'role': $scope.user.role,
+            'role': 'ACCT_SERVICES',
             'email': $scope.user.email
           };
           User.createUser(data).then(function (data) {
-            console.log('Success');
+            $scope.user = {};
           }).catch(function () {
-            console.log('Error');
+
           });
-          console.log('data: ',data);
-        }
+        };
       }
     };
   });

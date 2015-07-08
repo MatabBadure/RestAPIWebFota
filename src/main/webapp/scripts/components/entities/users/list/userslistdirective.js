@@ -18,11 +18,11 @@ angular.module('hillromvestApp')
         $scope.selectUser = function(user) {
           $scope.user = user;
           $scope.onSelect({'user': user});
-        },
+        };
 
         $scope.sortList = function () {
           console.log('Todo Sort Functionality...!');
-        },
+        };
         $scope.searchUsers = function() {
             $scope.users = [{
               'title':'Mr.',
@@ -153,7 +153,7 @@ angular.module('hillromvestApp')
               'role':'role',
               'role': 'Account Services'
             }];
-          }
+        };
       }
     };
   });

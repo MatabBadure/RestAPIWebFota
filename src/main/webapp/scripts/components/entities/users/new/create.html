@@ -56,12 +56,12 @@
       </select>
     </div>
   </div>
-  <div class="col-md-16 dashboard-page__form--new_form-submit">
+  <div class="col-md-16 dashboard-page__form--new_form-submit" ng-show="isCreate">
     <button type="submit" class="dashboard-page__form--new_form-submit--button">Submit</button>
   </div>
   <div class="col-md-16 dashboard-page__form--new_form-submit">
     <div class="col-md-6"></div>
-    <div class="col-md-10">
+    <div class="col-md-10" ng-show="!isCreate">
       <button type="submit" class="dashboard-page__form--new_form-submit--button">Disassociate</button>
       <button type="submit" class="dashboard-page__form--new_form-submit--button">Edit</button>
     </div>

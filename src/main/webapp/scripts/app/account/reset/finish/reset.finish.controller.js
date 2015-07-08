@@ -15,7 +15,6 @@ angular.module('hillromvestApp')
             if ($scope.resetAccount.password !== $scope.confirmPassword) {
                 $scope.doNotMatch = 'ERROR';
             } else {
-            	console.log($scope.form.$invalid);
             	$scope.doNotMatch = null;
                 Auth.resetPasswordFinish($stateParams.key,$scope.resetAccount.password).then(function () {
                     $scope.success = 'OK';

@@ -6,10 +6,10 @@
 			<input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" ng-model-options="{ debounce: 1000 }" ng-keyup="searchUsers()">
 		</div>
 		<div class="col-md-4 dashboard-page__user-list__detailed__list-form--sort-list">
-			<div class="sort-link">
+			<div class="sort-link" ng-click="sortList()">
 				<span class="sort-link--text">Sort</span><span class="glyphicon glyphicon-sort class="sort-link--text""></span>
 			</div>
-			
+
 		</div>
 	</div>
 	<div class="dashboard-page__user-list__detailed__list">
@@ -17,10 +17,10 @@
 	    <div ng-click="selectUser(user)" class="dashboard-page__user-list__detailed__list--details" >
 	    <span class="user-detail">
 	    	{{user.lastName}} {{user.firstName}}
-	    </span> 
+	    </span>
 	    <span class="user-role">
 	    	{{user.role}}
-	    </span> 
+	    </span>
 	    </div>
 	  </div>
 	</div>

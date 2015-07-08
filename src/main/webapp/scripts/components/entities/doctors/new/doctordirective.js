@@ -7,7 +7,9 @@ angular.module('hillromvestApp')
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
       },
-      scope: {},
+      scope: {
+          doctor:'=doctorData'
+      },
       controller: function($scope){
     	  $scope.doctor = {};
     	  $scope.createDoctor = function(){
@@ -28,6 +30,7 @@ angular.module('hillromvestApp')
     				  'state' : $scope.doctor.state
     				  
     		  }
+          //service  to be called 
     		  console.log("doctor form info", data);
     	  }
       }

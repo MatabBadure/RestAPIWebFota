@@ -1,6 +1,6 @@
 <div class="reset">
     <div class="row reset__container">
-        <div class="col-md-12 reset__container--left-section">
+        <div class="col-md-8 reset__container--left-section">
             <div class="reset__container--left-section-description">
                 <div class="reset__container--left-section-description_content">
                     The Vest Airway Clearance System, Model 105, is a designed to assist patients in the mobilization of retained secretions that, if not removed, may lead to increased rates of respiratory infaction, hospitalization and reduced lung function.
@@ -27,7 +27,7 @@
                 <p translate="reset.request.messages.success">Check your e-mails for details on how to reset your password.</p>
             </div>
 
-            <form ng-show="!success" name="form" role="form" novalidate ng-submit="requestReset()" show-validation>
+            <form ng-show="!success" name="form" role="form" novalidate  show-validation>
                 <div class="form-group">
                     <!-- <label translate="global.form.email">E-mail</label> -->
                     <input type="email" class="form-control" name="email" placeholder="{{'global.form.email.placeholder' | translate}}"
@@ -50,14 +50,13 @@
                             Your e-mail cannot be longer than 100 characters.
                         </p>
                     </div>
-                    <div class="form-group" ng-show="showCaptcha">
+                    
+                </div>
+                <div class="form-group" ng-show="showCaptcha">
                   		<div re-captcha ng-model="user.captcha"></div>
                 	</div>
-                </div>
-                <!-- <button class="btn btn-primary" translate="reset.request.form.button" ng-click="requestReset()">Register</button> -->
+                <button class="btn btn-primary" ng-disabled="form.email.$invalid || ((user.captcha.response == '' || user.captcha.response == undefined) && showCaptcha )" translate="reset.request.form.button" ng-click="requestReset()">Register</button>
                 <!-- <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" translate="reset.request.form.button">Register</button> -->
-
-                <button type="submit" ng-disabled="form.$invalid" class="reset-button center-block" translate="reset.request.form.button">Register</button>
             </form>
         </div>
     </div>

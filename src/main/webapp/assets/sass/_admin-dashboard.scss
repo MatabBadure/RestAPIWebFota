@@ -116,6 +116,29 @@
 	}
 	&__user-list{
 		&__detailed{
+			/* Customize scroll */
+			::-webkit-scrollbar {
+			    width: 5px;
+			}
+			 
+			/* Track */
+			::-webkit-scrollbar-track {
+			    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+			    -webkit-border-radius: 10px;
+			    border-radius: 10px;
+			}
+			 
+			/* Handle */
+			::-webkit-scrollbar-thumb {
+			    -webkit-border-radius: 10px;
+			    border-radius: 10px;
+			    background: #EEEEEE; 
+			    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+			}
+			::-webkit-scrollbar-thumb:window-inactive {
+				background: #EEEEEE; 
+			}
+
 			&--list-type{
 				padding: 5px;
 				font-weight: bold;
@@ -171,6 +194,9 @@
 			&__list{
 				margin-top: 50px;
 				background-color: #FAFAFA;
+				max-height: 280px;
+			  overflow-y: scroll;
+			  overflow-x: hidden;
 				&--details{
 					padding: 10px 20px;
   				border-bottom: 1px solid #EEEEEE;
@@ -184,6 +210,11 @@
 						float:right;
   				}
 				}
+			}
+			&__more-link{
+				float: right;
+				padding-right: 6px;
+				padding-top: 10px;
 			}
 		}
 	}

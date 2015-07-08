@@ -3,7 +3,7 @@
 	<div class="dashboard-page__user-list__detailed__list-form indent-form-top">
 		<div class="col-md-12 dashboard-page__user-list__detailed__list-form--input-wrapper">
 			<i class="glyphicon glyphicon-search"></i>
-			<input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" ng-model-options="{ debounce: 1000 }" ng-keyup="searchUsers()">
+			<input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" ng-model-options="{ debounce: 1000 }" ng-keyup="searchUsers()" autocomplete="off">
 		</div>
 		<div class="col-md-4 dashboard-page__user-list__detailed__list-form--sort-list">
 			<div class="sort-link">
@@ -24,4 +24,7 @@
 	    </div>
 	  </div>
 	</div>
+	<div class="dashboard-page__user-list__detailed__more-link" ng-if="users.length>0">
+  	<span>More</span><span>&gt;&gt;</span>
+  </div>
 </div>

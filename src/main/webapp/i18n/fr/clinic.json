@@ -1,0 +1,31 @@
+{
+    "hillromvestApp": {
+        "clinic" : {
+            "home": {
+                "title": "Clinics",
+                "createLabel": "Créer un nouveau Clinic",
+                "createOrEditLabel": "Créer ou éditer un Clinic"
+            },
+            "delete": {
+                "question": "Etes-vous certain de vouloir supprimer le Clinic {{ id }} ?"
+            },
+            "detail": {
+                "title": "Clinic"
+            },
+            "name": "Name",
+            "address": "Address",
+            "zipcode": "Zipcode",
+            "city": "City",
+            "state": "State",
+            "phoneNumber": "PhoneNumber",
+            "faxNumber": "FaxNumber",
+            "hillromId": "HillromId",
+            "parentClinicId": "ParentClinicId",
+            "npiNumber": "NpiNumber",
+            "user": "user",
+            "patients": "patients",
+            "parent": "parent"
+        }
+    }
+}
+

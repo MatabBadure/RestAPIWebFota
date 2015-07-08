@@ -19,10 +19,8 @@ import javax.validation.constraints.Size;
 import org.boon.json.annotations.JsonProperty;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.Where;
 import org.hibernate.validator.constraints.Email;
 import org.joda.time.DateTime;
-import org.springframework.test.context.jdbc.Sql;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

@@ -7,15 +7,25 @@ angular.module('hillromvestApp')
         $scope.error = null;
         $scope.errorEmailNotExists = null;
         $scope.resetAccount = {};
-        $scope.showCaptcha = false;
+        $scope.showCaptcha = true;
         $scope.user = {};
         $timeout(function (){angular.element('[ng-model="resetAccount.email"]').focus();});
 
         
         $scope.requestReset = function () {
-        	console.log($scope.form.valid);
+        	
         	event.preventDefault();
-            	 Auth.resetPasswordInit($scope.resetAccount.email).then(function () {
+        	if($scope.showCaptcha == true){
+        		  if ($scope.showCpatcha) {
+                   Auth.captcha($scope.user.captcha).then(function (data) {
+                    console.log(data)
+                   }).catch(function (err) {
+                	   
+                     console.log('ERROR :::',err)
+                   });
+                 }
+        	}else{
+        		 Auth.resetPasswordInit($scope.resetAccount.email).then(function () {
                      $scope.success = 'OK';
                      $scope.errorEmailNotExists = null;
                      localStorage.setItem('passResetCount',0);
@@ -32,6 +42,8 @@ angular.module('hillromvestApp')
                          $scope.error = 'ERROR';
                      }
                  });
+        	}
+            	
         	
         }
 

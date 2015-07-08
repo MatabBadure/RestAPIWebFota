@@ -52,7 +52,8 @@
                     </div>
                     
                 </div>
-                <div class="form-group" ng-show="showCaptcha">
+               <!--  <div class="form-group" ng-show="showCaptcha"> -->
+               		<div class="form-group">
                   		<div re-captcha ng-model="user.captcha"></div>
                 	</div>
                 <button class="btn btn-primary" ng-disabled="form.email.$invalid || ((user.captcha.response == '' || user.captcha.response == undefined) && showCaptcha )" translate="reset.request.form.button" ng-click="requestReset()">Register</button>

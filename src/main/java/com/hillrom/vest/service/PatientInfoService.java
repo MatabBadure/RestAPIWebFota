@@ -28,8 +28,8 @@ public class PatientInfoService {
     	return patientInfo;
     }
  
-    public void updateWebLoginCreated(String hillRomId){
-    	log.debug("hillRomId :: "+hillRomId);
-    	patientInfoRepository.updateWebLoginCreated(hillRomId);
+    public void update(PatientInfo patientInfo){
+    	log.debug("hillRomId :: "+patientInfo);
+    	patientInfoRepository.save(patientInfo);
     }
 }

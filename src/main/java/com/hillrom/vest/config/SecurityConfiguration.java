@@ -24,6 +24,7 @@ import com.hillrom.vest.security.RestExceptionTranslationFilter;
 import com.hillrom.vest.security.xauth.TokenProvider;
 import com.hillrom.vest.security.xauth.XAuthTokenConfigurer;
 import com.hillrom.vest.service.PatientInfoService;
+import com.hillrom.vest.service.UserService;
 
 @Configuration
 @EnableWebSecurity
@@ -42,13 +43,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Inject
     private PatientInfoService patientInfoService;
 
+    @Inject
+    private UserService userService;
+    
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     public AuthenticationProvider getAuthenticationProvider(){
-    	return new com.hillrom.vest.security.AuthenticationProvider(userDetailsService,passwordEncoder());
+    	return new com.hillrom.vest.security.AuthenticationProvider(userDetailsService,passwordEncoder(),patientInfoService,userService);
     }
     
     @Inject

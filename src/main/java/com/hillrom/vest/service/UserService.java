@@ -160,23 +160,30 @@ public class UserService {
 		return userRepository.findOneByEmail(email);
 	}
 
-	public User createUserFromPatientInfo(PatientInfo patientInfo) {
+	public User createUserFromPatientInfo(PatientInfo patientInfo,String defaultPassword) {
 		User newUser = new User();
 		newUser.setActivated(true);
 		newUser.setDeleted(false);
 		
-		Authority patientAuthority = authorityRepository.findOne("PATIENT");
+		Authority patientAuthority = authorityRepository.findOne(AuthoritiesConstants.PATIENT);
 		newUser.getAuthorities().add(patientAuthority);
 		
 		newUser.setCreatedDate(new DateTime());
 		newUser.setEmail(patientInfo.getEmail());
 		newUser.setFirstName(patientInfo.getFirstName());
 		newUser.setLastName(patientInfo.getLastName());
+		newUser.setPassword(defaultPassword);
 		
 		User persistedUser = userRepository.save(newUser);
+		newUser.setId(persistedUser.getId());
 		// Update WebLoginCreated to be true  
-		patientInfoService.updateWebLoginCreated(patientInfo.getHillromId());
-		return persistedUser;
+		patientInfoService.findOneByHillromId(patientInfo.getHillromId()).map(patientUser ->{
+			patientUser.setWebLoginCreated(true);
+			patientUser.getUsers().add(persistedUser);
+			patientInfoService.update(patientUser);
+			return patientUser;
+		});
+		return newUser;
 		
 	}
 	

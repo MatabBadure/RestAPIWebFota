@@ -1,8 +1,8 @@
 package com.hillrom.vest.security;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -11,7 +11,6 @@ import net.minidev.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -24,6 +23,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.service.PatientInfoService;
@@ -45,19 +45,12 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
     @Inject
     private UserService userService;
 
-    public AuthenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+    public AuthenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder,PatientInfoService patientInfoService,UserService userService) {
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
+        this.patientInfoService = patientInfoService;
+        this.userService = userService;
     }
-    
-    @Autowired
-    public void setPatientInfoService(PatientInfoService patientInfoService) {
-		this.patientInfoService = patientInfoService;
-	}
-    
-	public void setUserService(UserService userService) {
-		this.userService = userService;
-	}
     
 	@Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -94,35 +87,39 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
     			throw new BadCredentialsException("User "+login+" was not found");
     		}
     		
-    		String defaultPassword = generateDefaultPassword(patientInfo);
-    		
     		/*If the User already have a record in User table and 
     		tries to login with JDE_ID/HillromId second time, we should throw an Excpetion*/ 
     		if(patientInfo.getWebLoginCreated()){
     			throw new BadCredentialsException("Invalid Username, please use your registered email");
     		}
     		
+    		String defaultPassword = generateDefaultPassword(patientInfo);
+    		
+    		matchWithDefaultPassword(token.getCredentials().toString(), defaultPassword);
+    		
     		//If email doesn't exist, send response to register with email and password
     		if(null == patientInfo.getEmail()){
-    			matchPasswords(token.getCredentials().toString(), defaultPassword);
-    			User newUser = userService.createUserFromPatientInfo(patientInfo);
-    			JSONObject jsonObject = prepareJSONForPatientUser(login,defaultPassword,newUser.getId());
+    			
+    			User newUser = userService.createUserFromPatientInfo(patientInfo,passwordEncoder.encode(defaultPassword));
+    			JSONObject jsonObject = prepareJSONForPatientUser(login,defaultPassword,newUser.getId(),newUser.getAuthorities());
     			throw new EmailNotPresentForPatientException("Please Register with Email and Password to Login",jsonObject);
     		}
     		
     		Optional<User> userFromDatabase = userService.findOneByEmail(patientInfo.getEmail().toLowerCase());
-    		userFromDatabase.map(user -> {
-    			
+    		
+    		if(userFromDatabase.isPresent()){
+    			User existingPatientuser = userFromDatabase.get();
     			/* User exists and it is the first time login,
     			 * else block is not required since WebLogginCreated will be true for subsequent logins which has been checked in prior condition*/ 
-    			if(null == user.getLastLoggedInAt()){
-    				user.setPassword(defaultPassword);
+    			if(null == existingPatientuser.getLastLoggedInAt()){
+    				JSONObject jsonObject = prepareJSONForPatientUser(login,defaultPassword,existingPatientuser.getId(),existingPatientuser.getAuthorities());
+        	        throw new FirstLoginException("First Time Login, please reset your password",jsonObject);
     			}
-    			
-    			matchPasswords(token.getCredentials().toString(), defaultPassword);
-    	        JSONObject jsonObject = prepareJSONForPatientUser(login,defaultPassword,user.getId());
-    	        throw new FirstLoginException("First Time Login, please reset your password",jsonObject);
-            }).orElse(null);
+    		}else{
+    			User newUser = userService.createUserFromPatientInfo(patientInfo,passwordEncoder.encode(defaultPassword));
+    			JSONObject jsonObject = prepareJSONForPatientUser(login,defaultPassword,newUser.getId(),newUser.getAuthorities());
+    			throw new FirstLoginException("Please Register with Email and Password to Login",jsonObject);
+    		}
     	}else{
     		throw new BadCredentialsException("Invalid username/password");
     	}
@@ -132,6 +129,12 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
 	private void matchPasswords(String password, String tokenPassword) {
 		if (!passwordEncoder.matches(tokenPassword, password)) {
 		    throw new BadCredentialsException("Invalid username/password");
+		}
+	}
+	
+	private void matchWithDefaultPassword(String password, String tokenPassword){
+		if(!password.equals(tokenPassword)){
+			throw new BadCredentialsException("Invalid username/password");
 		}
 	}
     
@@ -149,16 +152,19 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
 	private String generateDefaultPassword(PatientInfo patientUser) {
 		StringBuilder defaultPassword = new StringBuilder();
 		defaultPassword.append(patientUser.getZipcode());
-		defaultPassword.append(patientUser.getLastName().substring(0, 5));
-		defaultPassword.append(new SimpleDateFormat("MMDDYYYY").format(patientUser.getDob()));
+		// default password will have the first 4 letters from last name, if length of last name <= 4, use complete string
+		int endIndex = patientUser.getLastName().length() > 5 ? 5 : patientUser.getLastName().length() ; 
+		defaultPassword.append(patientUser.getLastName().substring(0, endIndex));
+		defaultPassword.append(patientUser.getDob().toString("MMddyyyy"));
 		return defaultPassword.toString();
 	}
 
-	private JSONObject prepareJSONForPatientUser(String username,String password,Long userId){
+	private JSONObject prepareJSONForPatientUser(String username,String password,Long userId,Set<Authority> authorities){
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("username", username);
 		jsonObject.put("password", password);
 		jsonObject.put("userId", userId);
+		jsonObject.put("authorities", authorities);
 		return jsonObject;
 	}
 	

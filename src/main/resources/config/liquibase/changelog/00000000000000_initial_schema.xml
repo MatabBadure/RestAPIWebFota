@@ -44,6 +44,9 @@
 			</column>
 			<column name="last_modified_by" type="varchar(50)" />
 			<column name="last_modified_date" type="timestamp" />
+			<column name="is_deleted" type="boolean" valueBoolean="false">
+				<constraints nullable="false" />
+			</column>
 		</createTable>
 
 		<createIndex indexName="idx_user_email" tableName="USER"
@@ -77,12 +80,15 @@
 			separator=";" tableName="USER">
 			<column name="activated" type="boolean" />
 			<column name="created_date" type="timestamp" />
+			<column name="is_deleted" type="boolean" />
 		</loadData>
 		<dropDefaultValue tableName="USER" columnName="created_date"
 			columnDataType="datetime" />
 
 		<loadData encoding="UTF-8" file="config/liquibase/users_authorities.csv"
 			separator=";" tableName="USER_AUTHORITY" />
+		
+		<loadData encoding="UTF-8" file="config/liquibase/authorities.csv" tableName="AUTHORITY" />
 
 		<createTable tableName="PERSISTENT_AUDIT_EVENT">
 			<column name="event_id" type="bigint" autoIncrement="${autoIncrement}">

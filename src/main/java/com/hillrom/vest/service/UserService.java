@@ -154,10 +154,7 @@ public class UserService {
     }
     
     public User createUser(HillromTeamUserDTO hillromTeamUser) {
-
 		User newUser = new User();
-		Authority authority = authorityRepository.findOne(hillromTeamUser.getRole());
-		Set<Authority> authorities = new HashSet<>();
 		newUser.setFirstName(hillromTeamUser.getFirstName());
 		newUser.setLastName(hillromTeamUser.getLastName());
 		newUser.setEmail(hillromTeamUser.getEmail());
@@ -166,8 +163,7 @@ public class UserService {
 		newUser.setActivated(false);
 		// new user gets registration key
 		newUser.setActivationKey(RandomUtil.generateActivationKey());
-		authorities.add(authority);
-		newUser.setAuthorities(authorities);
+		newUser.getAuthorities().add(authorityRepository.findOne(hillromTeamUser.getRole()));
 		userRepository.save(newUser);
 		log.debug("Created Information for User: {}", newUser);
 		return newUser;

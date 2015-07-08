@@ -9,6 +9,8 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import net.minidev.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -56,12 +58,15 @@ public class HillromTeamUserResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Void> create(@RequestBody HillromTeamUserDTO hillromTeamUserDTO, HttpServletRequest request) throws URISyntaxException {
+    public ResponseEntity<JSONObject> create(@RequestBody HillromTeamUserDTO hillromTeamUserDTO, HttpServletRequest request) throws URISyntaxException {
         log.debug("REST request to save HillromTeamUser : {}", hillromTeamUserDTO);
+        JSONObject jsonObject = new JSONObject();
         User user = userService.createUser(hillromTeamUserDTO);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         mailService.sendActivationEmail(user, baseUrl);
-        return ResponseEntity.created(new URI("/api/hillromteamuser/" + user.getId())).build();
+        jsonObject.put("message", "User created successfully.");
+        jsonObject.put("user", user);
+        return ResponseEntity.ok().body(jsonObject);
     }
 
     /**
@@ -71,13 +76,15 @@ public class HillromTeamUserResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Void> update(@RequestBody Map<String, String> body, @RequestBody User hillromTeamUser, HttpServletRequest request) throws URISyntaxException {
+    public ResponseEntity<JSONObject> update(@RequestBody Map<String, String> body, @RequestBody User hillromTeamUser, HttpServletRequest request) throws URISyntaxException {
         log.debug("REST request to update HillromTeamUser : {}", body);
+        JSONObject jsonObject = new JSONObject();
         if (body.get("id") == null) {
             return create(new HillromTeamUserDTO(body.get("title"), body.get("firstName"), body.get("middleName"), body.get("lastName"), body.get("email"), body.get("role")), request);
         }
         userRepository.save(hillromTeamUser);
-        return ResponseEntity.ok().build();
+        jsonObject.put("message", "User updated successfully.");
+        return ResponseEntity.ok().body(jsonObject);
     }
 
     /**
@@ -118,8 +125,11 @@ public class HillromTeamUserResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<JSONObject> delete(@PathVariable Long id) {
         log.debug("REST request to delete HillromTeamUser : {}", id);
+        JSONObject jsonObject = new JSONObject();
         userRepository.delete(id);
+        jsonObject.put("message", "User deleted successfully.");
+        return ResponseEntity.ok().body(jsonObject);
     }
 }

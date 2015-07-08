@@ -87,12 +87,6 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
     			throw new BadCredentialsException("User "+login+" was not found");
     		}
     		
-    		/*If the User already have a record in User table and 
-    		tries to login with JDE_ID/HillromId second time, we should throw an Excpetion*/ 
-    		if(patientInfo.getWebLoginCreated()){
-    			throw new BadCredentialsException("Invalid Username, please use your registered email");
-    		}
-    		
     		String defaultPassword = generateDefaultPassword(patientInfo);
     		
     		matchWithDefaultPassword(token.getCredentials().toString(), defaultPassword);
@@ -101,7 +95,7 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
     		if(null == patientInfo.getEmail()){
     			
     			User newUser = userService.createUserFromPatientInfo(patientInfo,passwordEncoder.encode(defaultPassword));
-    			JSONObject jsonObject = prepareJSONForPatientUser(login,defaultPassword,newUser.getId(),newUser.getAuthorities());
+    			JSONObject jsonObject = prepareJSONForPatientUser(login,defaultPassword);
     			throw new EmailNotPresentForPatientException("Please Register with Email and Password to Login",jsonObject);
     		}
     		
@@ -112,12 +106,12 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
     			/* User exists and it is the first time login,
     			 * else block is not required since WebLogginCreated will be true for subsequent logins which has been checked in prior condition*/ 
     			if(null == existingPatientuser.getLastLoggedInAt()){
-    				JSONObject jsonObject = prepareJSONForPatientUser(login,defaultPassword,existingPatientuser.getId(),existingPatientuser.getAuthorities());
+    				JSONObject jsonObject = prepareJSONForPatientUser(patientInfo.getEmail(),defaultPassword);
         	        throw new FirstLoginException("First Time Login, please reset your password",jsonObject);
     			}
     		}else{
     			User newUser = userService.createUserFromPatientInfo(patientInfo,passwordEncoder.encode(defaultPassword));
-    			JSONObject jsonObject = prepareJSONForPatientUser(login,defaultPassword,newUser.getId(),newUser.getAuthorities());
+    			JSONObject jsonObject = prepareJSONForPatientUser(login,defaultPassword);
     			throw new FirstLoginException("Please Register with Email and Password to Login",jsonObject);
     		}
     	}else{
@@ -159,12 +153,10 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
 		return defaultPassword.toString();
 	}
 
-	private JSONObject prepareJSONForPatientUser(String username,String password,Long userId,Set<Authority> authorities){
+	private JSONObject prepareJSONForPatientUser(String username,String password){
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("username", username);
 		jsonObject.put("password", password);
-		jsonObject.put("userId", userId);
-		jsonObject.put("authorities", authorities);
 		return jsonObject;
 	}
 	

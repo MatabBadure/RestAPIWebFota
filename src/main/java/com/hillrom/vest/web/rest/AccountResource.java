@@ -185,4 +185,21 @@ public class AccountResource {
     private boolean checkPasswordLength(String password) {
       return (!StringUtils.isEmpty(password) && password.length() >= UserDTO.PASSWORD_MIN_LENGTH && password.length() <= UserDTO.PASSWORD_MAX_LENGTH);
     }
+    
+    /**
+     * POST  /update_emailpassword -> changes the current user's email,password
+     */
+    @RequestMapping(value = "/account/update_emailpassword",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> updateEmailOrPassword(@RequestBody(required=true) Map<String,String> params) {
+    	String email = params.get("email");
+    	String password = params.get("password");
+        if (!checkPasswordLength(password)) {
+            return new ResponseEntity<>("Incorrect password", HttpStatus.BAD_REQUEST);
+        }
+        userService.updateEmailOrPassword(params);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

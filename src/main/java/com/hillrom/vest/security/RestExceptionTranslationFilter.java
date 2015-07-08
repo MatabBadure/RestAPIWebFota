@@ -2,6 +2,7 @@ package com.hillrom.vest.security;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 
 import com.hillrom.vest.domain.Authority;
+import com.hillrom.vest.domain.UserLoginToken;
 import com.hillrom.vest.security.xauth.Token;
 import com.hillrom.vest.security.xauth.TokenProvider;
 
@@ -71,11 +73,9 @@ public class RestExceptionTranslationFilter extends ExceptionTranslationFilter {
 			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(),userDetails.getAuthorities());
 			SecurityContextHolder.getContext().setAuthentication(authToken);
 			
-			Token token = tokenProvider.createToken(userDetails);
+			UserLoginToken token = tokenProvider.createToken(userDetails);
 			
-			jsonObject.put("token", token.getToken());
-            
-			response.setStatus(100);
+			jsonObject.put("token", token.getId());
 			
 		}else if(reason instanceof EmailNotPresentForPatientException){
 			EmailNotPresentForPatientException firstLoginException = (EmailNotPresentForPatientException) reason;
@@ -89,30 +89,31 @@ public class RestExceptionTranslationFilter extends ExceptionTranslationFilter {
 			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(),userDetails.getAuthorities());
 			SecurityContextHolder.getContext().setAuthentication(authToken);
 			
-			Token token = tokenProvider.createToken(userDetails);
+			UserLoginToken token = tokenProvider.createToken(userDetails);
 			
-			jsonObject.put("token", token.getToken());
-			
-            response.setStatus(100);
+			jsonObject.put("token", token.getId());
             
 		}else{
 			jsonObject = new JSONObject();
 			jsonObject.put(ERROR,reason.getMessage());
 		}
 		
+		// These should not be passed in response
+		jsonObject.remove("username");
+		jsonObject.remove("password");
+		
 		out.print(jsonObject);
         out.flush();
         out.close();
+        return;
 	}
 
 	private UserDetails prepareUserDetailsObjectFromJson(JSONObject jsonObject){
 		String username = (String) jsonObject.get("username");
 		String password = (String) jsonObject.get("password");
-		Set<Authority> authroities = (Set<Authority>) jsonObject.get("authorities");
 		
-		List<GrantedAuthority> grantedAuthorities = authroities.stream()
-                .map(authority -> new SimpleGrantedAuthority(authority.getName()))
-                .collect(Collectors.toList());
+		List<GrantedAuthority> grantedAuthorities = new LinkedList<GrantedAuthority>();
+		grantedAuthorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.PATIENT));
 		
 		return new org.springframework.security.core.userdetails.User(username,
 				password,

@@ -2,11 +2,13 @@ package com.hillrom.vest.service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,10 +168,22 @@ public class UserService {
 		newUser.setDeleted(false);
 		
 		Authority patientAuthority = authorityRepository.findOne(AuthoritiesConstants.PATIENT);
-		newUser.getAuthorities().add(patientAuthority);
+		Set<Authority> authorities = new HashSet<>();
+		authorities.add(patientAuthority);
+		//newUser.getAuthorities().add(patientAuthority);
+		newUser.setAuthorities(authorities);
 		
 		newUser.setCreatedDate(new DateTime());
-		newUser.setEmail(patientInfo.getEmail());
+		
+		// Set the email to hillromId if email is blank
+		String username = null;
+		if(StringUtils.isNotBlank(patientInfo.getEmail())){
+			username = patientInfo.getEmail();
+		}else{
+			username = patientInfo.getHillromId();
+		}
+		
+		newUser.setEmail(username.toLowerCase());
 		newUser.setFirstName(patientInfo.getFirstName());
 		newUser.setLastName(patientInfo.getLastName());
 		newUser.setPassword(defaultPassword);
@@ -185,6 +199,19 @@ public class UserService {
 		});
 		return newUser;
 		
+	}
+	
+	public void updateEmailOrPassword(Map<String,String> params){
+		String email = params.get("email");
+		userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).ifPresent(u-> {
+			if(null != email)
+				u.setEmail(email);
+			String password = params.get("password");
+            String encryptedPassword = passwordEncoder.encode(password);
+            u.setPassword(encryptedPassword);
+            userRepository.save(u);
+            log.debug("updateEmailOrPassword for User: {}", u);
+        });
 	}
 	
 }

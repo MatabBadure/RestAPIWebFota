@@ -1,11 +1,11 @@
-<form class="dashboard-page__form--new">
+<form class="dashboard-page__form--new" ng-submit="createDoctor()">
   <div class="dashboard-page__form--new_user-type">Create Doctor</div>
   <div class="col-md-16 indent-form-top">
     <div class="col-md-6">
       <label for="exampleInputEmail1">Clinic Name *</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" id="exampleInputEmail1">
+      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="doctor.clinicName">
     </div>
   </div>
 
@@ -32,7 +32,7 @@
       <label for="exampleInputEmail1">First Name*</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" id="exampleInputEmail1">
+      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="doctor.firstName">
     </div>
   </div>
 
@@ -41,7 +41,7 @@
       <label for="exampleInputEmail1">Middle Name</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" id="exampleInputEmail1">
+      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="doctor.middleName">
     </div>
   </div>
 
@@ -50,7 +50,7 @@
       <label for="exampleInputEmail1">Last Name*</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" id="exampleInputEmail1">
+      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="doctor.lastName">
     </div>
   </div>
 
@@ -59,7 +59,7 @@
       <label for="exampleInputEmail1">Speciality</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" id="exampleInputEmail1">
+      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="doctor.speciality">
     </div>
   </div>
 
@@ -68,7 +68,7 @@
       <label for="exampleInputEmail1">Credentials</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" id="exampleInputEmail1">
+      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="doctor.credentials">
     </div>
   </div>
 
@@ -77,7 +77,7 @@
       <label for="exampleInputEmail1">Email *</label>
     </div>
     <div class="col-md-10">
-      <input type="email" class="form-control" id="exampleInputEmail1">
+      <input type="email" class="form-control" id="exampleInputEmail1" ng-model="doctor.email">
     </div>
   </div>
 
@@ -86,7 +86,7 @@
       <label for="exampleInputEmail1">Primary Phone</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control age" id="exampleInputEmail1">
+      <input type="text" class="form-control age" id="exampleInputEmail1" ng-model="doctor.primaryPhone">
     </div>
   </div>
 
@@ -95,7 +95,7 @@
       <label for="exampleInputEmail1">Mobile Phone</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control age" id="exampleInputEmail1">
+      <input type="text" class="form-control age" id="exampleInputEmail1" ng-model="doctor.mobilePhone">
     </div>
   </div>
 
@@ -104,7 +104,7 @@
       <label for="exampleInputEmail1">Fax Number</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control age" id="exampleInputEmail1">
+      <input type="text" class="form-control age" id="exampleInputEmail1" ng-model="doctor.faxNumber">
     </div>
   </div>
 
@@ -113,7 +113,7 @@
       <label for="exampleInputEmail1">Address</label>
     </div>
     <div class="col-md-10">
-      <input type="email" class="form-control" id="exampleInputEmail1">
+      <input type="email" class="form-control" id="exampleInputEmail1" ng-model="doctor.address">
     </div>
   </div>
 
@@ -122,7 +122,7 @@
       <label for="exampleInputEmail1">Zip Code</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control age" id="exampleInputEmail1">
+      <input type="text" class="form-control age" id="exampleInputEmail1" ng-model="doctor.zipCode">
     </div>
   </div>
 
@@ -131,7 +131,7 @@
       <label for="exampleInputEmail1">City</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" id="exampleInputEmail1">
+      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="doctor.city">
     </div>
   </div>
 
@@ -140,7 +140,7 @@
       <label for="exampleInputEmail1">State</label>
     </div>
     <div class="col-md-10 dashboard-page__form--new_calendar">
-      <input type="text" class="form-control" id="exampleInputEmail1">
+      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="doctor.state">
     </div>
   </div>
 

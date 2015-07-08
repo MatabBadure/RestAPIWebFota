@@ -1,23 +1,9 @@
-<!-- <div>
-  Recenmtly Created Hill-Rom Users
-
-  <div>
-    <!-- <input type="text" ng-model="searchItem"/> -->
-    <input type="text" name="userName" ng-model="searchItem" ng-model-options="{ debounce: 1000 }" ng-keyup="searchUsers()"/>
-    <span>Sort</span>
-  </div>
-
-  <div ng-repeat="user in users | filter:searchItem">
-    <div ng-click="selectUser(user)">{{user.lastName}} {{user.firstName}} -- {{user.role}} </div>
-  </div>
-</div>
- -->
 <div class="col-md-16 dashboard-page__user-list__detailed">
 	<div class="dashboard-page__user-list__detailed--list-type">Recenmtly Created Hill-Rom Users</div>
-	<form class="dashboard-page__user-list__detailed__list-form indent-form-top">
+	<div class="dashboard-page__user-list__detailed__list-form indent-form-top">
 		<div class="col-md-12 dashboard-page__user-list__detailed__list-form--input-wrapper">
 			<i class="glyphicon glyphicon-search"></i>
-			<input type="text" class="form-control" id="searchListParam">
+			<input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" ng-model-options="{ debounce: 1000 }" ng-keyup="searchUsers()">
 		</div>
 		<div class="col-md-4 dashboard-page__user-list__detailed__list-form--sort-list">
 			<div class="sort-link">
@@ -25,5 +11,17 @@
 			</div>
 			
 		</div>
-	</form>
+	</div>
+	<div>
+		<div ng-repeat="user in users | filter:searchItem">
+	    <div ng-click="selectUser(user)">
+	    <span>
+	    	{{user.lastName}} {{user.firstName}}
+	    </span> 
+	    <span>
+	    	{{user.role}}
+	    </span> 
+	    </div>
+	  </div>
+	</div>
 </div>

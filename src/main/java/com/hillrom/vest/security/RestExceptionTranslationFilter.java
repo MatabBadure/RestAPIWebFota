@@ -70,7 +70,7 @@ public class RestExceptionTranslationFilter extends ExceptionTranslationFilter {
 			
 			userDetails = prepareUserDetailsObjectFromJson(jsonObject);
 			
-			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(),userDetails.getAuthorities());
+			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(),userDetails.getAuthorities());
 			SecurityContextHolder.getContext().setAuthentication(authToken);
 			
 			UserLoginToken token = tokenProvider.createToken(userDetails);
@@ -86,7 +86,7 @@ public class RestExceptionTranslationFilter extends ExceptionTranslationFilter {
          
 			userDetails = prepareUserDetailsObjectFromJson(jsonObject);
 			
-			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(),userDetails.getAuthorities());
+			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(),userDetails.getAuthorities());
 			SecurityContextHolder.getContext().setAuthentication(authToken);
 			
 			UserLoginToken token = tokenProvider.createToken(userDetails);
@@ -115,7 +115,7 @@ public class RestExceptionTranslationFilter extends ExceptionTranslationFilter {
 		List<GrantedAuthority> grantedAuthorities = new LinkedList<GrantedAuthority>();
 		grantedAuthorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.PATIENT));
 		
-		return new org.springframework.security.core.userdetails.User(username,
+		return new org.springframework.security.core.userdetails.User(username.toLowerCase(),
 				password,
 				grantedAuthorities);
 	}

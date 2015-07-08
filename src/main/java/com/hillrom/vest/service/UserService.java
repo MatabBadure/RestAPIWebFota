@@ -187,6 +187,7 @@ public class UserService {
 		newUser.setFirstName(patientInfo.getFirstName());
 		newUser.setLastName(patientInfo.getLastName());
 		newUser.setPassword(defaultPassword);
+		newUser.getPatients().add(patientInfo);
 		
 		User persistedUser = userRepository.save(newUser);
 		newUser.setId(persistedUser.getId());

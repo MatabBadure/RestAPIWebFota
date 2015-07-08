@@ -1,4 +1,4 @@
-<div>
+<!-- <div>
   Recenmtly Created Hill-Rom Users
 
   <div><input type="text" ng-model="searchItem"/><span>Sort</span></div>
@@ -6,4 +6,20 @@
   <div ng-repeat="user in users | filter:searchItem">
     <div ng-click="selectUser(user)">{{user.name}} -- {{user.role}} </div>
   </div>
+</div>
+ -->
+<div class="col-md-16 dashboard-page__user-list__detailed">
+	<div class="dashboard-page__user-list__detailed--list-type">Recenmtly Created Hill-Rom Users</div>
+	<form class="dashboard-page__user-list__detailed__list-form indent-form-top">
+		<div class="col-md-12 dashboard-page__user-list__detailed__list-form--input-wrapper">
+			<i class="glyphicon glyphicon-search"></i>
+			<input type="text" class="form-control" id="searchListParam">
+		</div>
+		<div class="col-md-4 dashboard-page__user-list__detailed__list-form--sort-list">
+			<div class="sort-link">
+				<span class="sort-link--text">Sort</span><span class="glyphicon glyphicon-sort class="sort-link--text""></span>
+			</div>
+			
+		</div>
+	</form>
 </div>

@@ -8,12 +8,17 @@ angular.module('hillromvestApp')
 
 angular.module('hillromvestApp')
     .factory('PasswordResetInit', function ($resource) {
-        return $resource('api/account/reset_password/init', {}, {
-        })
+    	return $resource('api/account/reset_password/init', {}, {
+    	 })
     });
 
 angular.module('hillromvestApp')
     .factory('PasswordResetFinish', function ($resource) {
-        return $resource('api/account/reset_password/finish', {}, {
-        })
+        return{
+        	resetPassFinish : function(key){
+        		return  $resource('api/account/reset_password/finish?key='+key, {}, {
+                });
+        	}
+        	
+        }
     });

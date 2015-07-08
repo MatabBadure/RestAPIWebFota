@@ -194,6 +194,7 @@ public class AccountResource {
         return userService.completePasswordReset(newPassword, key)          
         		.map(user -> { 
         			jsonObject.put("message", "Password reset successfully.");
+        			jsonObject.put("email", user.getEmail());
         			return ResponseEntity.ok().body(jsonObject);}).orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 

@@ -61,12 +61,19 @@ public class HillromTeamUserResource {
     public ResponseEntity<JSONObject> create(@RequestBody HillromTeamUserDTO hillromTeamUserDTO, HttpServletRequest request) throws URISyntaxException {
         log.debug("REST request to save HillromTeamUser : {}", hillromTeamUserDTO);
         JSONObject jsonObject = new JSONObject();
-        User user = userService.createUser(hillromTeamUserDTO);
-        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-        mailService.sendActivationEmail(user, baseUrl);
-        jsonObject.put("message", "User created successfully.");
-        jsonObject.put("user", user);
-        return ResponseEntity.ok().body(jsonObject);
+        jsonObject.put("message", "e-mail address already in use");
+        return userRepository.findOneByEmail(hillromTeamUserDTO.getEmail())
+        		.map(user -> {
+        			return ResponseEntity.badRequest().body(jsonObject);
+        		})
+                .orElseGet(() -> {
+                    User user = userService.createUser(hillromTeamUserDTO);
+                    String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+                    mailService.sendActivationEmail(user, baseUrl);
+                    jsonObject.put("message", "User created successfully.");
+                    jsonObject.put("user", user);
+                    return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+                });
     }
 
     /**

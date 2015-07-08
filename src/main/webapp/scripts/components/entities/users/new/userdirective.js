@@ -10,15 +10,16 @@ angular.module('hillromvestApp')
       scope: {
         user:'=userData'
       },
-      controller: function($scope) {
+      controller: function ($scope) {
         $scope.createUser = function () {
           console.log('Inside the Controller');
           var data = {
-            'title': $scope.title,
-            'firstName': $scope.firstName,
-            'lastName': $scope.lastName,
-            'role': $scope.role,
-            'email': $scope.email
+            'title': $scope.user.title,
+            'firstName': $scope.user.firstName,
+            'middleName': $scope.user.middleName,
+            'lastName': $scope.user.lastName,
+            'role': $scope.user.role,
+            'email': $scope.user.email
           };
           console.log('data: ',data);
         }

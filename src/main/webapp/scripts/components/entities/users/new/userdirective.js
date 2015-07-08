@@ -8,6 +8,7 @@ angular.module('hillromvestApp')
       link: function postLink(scope, element, attrs) {
       },
       scope: {
+        user:'=userData'
       },
       controller: function($scope) {
         $scope.createUser = function () {

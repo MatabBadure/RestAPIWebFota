@@ -1,10 +1,14 @@
 <!-- <div>
   Recenmtly Created Hill-Rom Users
 
-  <div><input type="text" ng-model="searchItem"/><span>Sort</span></div>
+  <div>
+    <!-- <input type="text" ng-model="searchItem"/> -->
+    <input type="text" name="userName" ng-model="searchItem" ng-model-options="{ debounce: 1000 }" ng-keyup="searchUsers()"/>
+    <span>Sort</span>
+  </div>
 
   <div ng-repeat="user in users | filter:searchItem">
-    <div ng-click="selectUser(user)">{{user.name}} -- {{user.role}} </div>
+    <div ng-click="selectUser(user)">{{user.lastName}} {{user.firstName}} -- {{user.role}} </div>
   </div>
 </div>
  -->

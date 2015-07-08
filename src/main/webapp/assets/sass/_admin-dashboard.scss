@@ -1,7 +1,15 @@
 .dashboard-page{
 	height: 100%;
+	display: table;
+	padding-left: 0;
+	background-color: #EEEEEE;
 	&__admin-nav{
   	height: 100%;
+  	display: table-cell;
+  	background-color: #9A9A9A;
+  	padding-left: 0;
+  	padding-right: 0;
+  	float: none;
   	&--nav{
   		height: 100%;
 	  	&_dashboard{
@@ -50,6 +58,9 @@
   	}
 	}
 	&__form{
+		float: none;
+		display: table-cell;
+		padding-bottom: 20px;
 		&--new{
 			font-size: 10px;
 			&_user-type{
@@ -116,6 +127,8 @@
 		}
 	}
 	&__user-list{
+		float: none;
+		display: table-cell;
 		&__detailed{
 			/* Customize scroll */
 			::-webkit-scrollbar {
@@ -199,6 +212,7 @@
 			  overflow-y: scroll;
 			  overflow-x: hidden;
 				&--details{
+					cursor: pointer;
 					padding: 10px 20px;
   				border-bottom: 1px solid #EEEEEE;
   				height: 40px;
@@ -210,6 +224,10 @@
 						display: block;
 						float:right;
   				}
+				}
+				&--details:hover, &--details:active{
+					background-color: #9A9A9A;
+  				color: #fafafa;
 				}
 			}
 			&__more-link{

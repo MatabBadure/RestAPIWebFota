@@ -58,16 +58,16 @@
                 	</div> -->
                 	
                 	<div  ng-show="showCaptcha">
-	                	<!-- <div vc-recaptcha
+	                	 <div vc-recaptcha
 	                		theme="'light'"
 	                		key="siteKey"
 	                		on-create="setWidgetId(widgetId)"
 	                		on-success="setResponse(response)">
 	                	</div>
-	                	 -->
+	                	
             		</div>
             
-                <button class="btn btn-primary" ng-disabled="form.email.$invalid" translate="reset.request.form.button" ng-click="requestReset()">Register</button>
+                <button class="btn btn-primary" ng-disabled="form.email.$invalid || (showCaptcha && response === null)" translate="reset.request.form.button" ng-click="requestReset()">Register</button>
                 <!-- <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" translate="reset.request.form.button">Register</button> -->
             </form>
         </div>

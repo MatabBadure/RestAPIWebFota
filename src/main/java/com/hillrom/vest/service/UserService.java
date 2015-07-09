@@ -1,14 +1,13 @@
 package com.hillrom.vest.service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import com.hillrom.vest.domain.Authority;
+import com.hillrom.vest.domain.User;
+import com.hillrom.vest.repository.AuthorityRepository;
+import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.security.SecurityUtils;
+import com.hillrom.vest.service.util.RandomUtil;
+import com.hillrom.vest.web.rest.dto.HillromTeamUserDTO;
 
-import javax.inject.Inject;
-
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +16,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
@@ -25,6 +29,7 @@ import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Service class for managing users.
@@ -158,6 +163,22 @@ public class UserService {
         }
     }
     
+    public User createUser(HillromTeamUserDTO hillromTeamUser) {
+		User newUser = new User();
+		newUser.setFirstName(hillromTeamUser.getFirstName());
+		newUser.setLastName(hillromTeamUser.getLastName());
+		newUser.setEmail(hillromTeamUser.getEmail());
+		newUser.setLangKey(null);
+		// new user is not active
+		newUser.setActivated(false);
+		// new user gets registration key
+		newUser.setActivationKey(RandomUtil.generateActivationKey());
+		newUser.getAuthorities().add(authorityRepository.findOne(hillromTeamUser.getRole()));
+		userRepository.save(newUser);
+		log.debug("Created Information for User: {}", newUser);
+		return newUser;
+	}
+
     public Optional<User> findOneByEmail(String email) {
 		return userRepository.findOneByEmail(email);
 	}

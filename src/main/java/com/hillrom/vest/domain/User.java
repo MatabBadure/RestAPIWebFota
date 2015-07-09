@@ -16,11 +16,16 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+<<<<<<< HEAD
+=======
+import org.boon.json.annotations.JsonProperty;
+>>>>>>> origin/dev
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
 import org.hibernate.validator.constraints.Email;
 import org.joda.time.DateTime;
+import org.springframework.test.context.jdbc.Sql;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -31,7 +36,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Entity
 @Table(name = "USER")
 @SQLDelete(sql="UPDATE user SET is_deleted = 1 WHERE id = ?")
-@Where(clause="is_deleted=0")
 public class User extends AbstractAuditingEntity implements Serializable {
 
     @Id
@@ -39,7 +43,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private Long id;
 
     @JsonIgnore
-    @NotNull
     @Size(min = 60, max = 60)
     @Column(length = 60)
     private String password;
@@ -92,12 +95,12 @@ public class User extends AbstractAuditingEntity implements Serializable {
             inverseJoinColumns = {@JoinColumn(name = "patient_id", referencedColumnName = "id")})
     private Set<PatientInfo> patients = new HashSet<>();
     
+    @Column(name="is_deleted", nullable = false)
+    private boolean isDeleted = false;
+    
     @Column(name="last_loggedin_at")
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime lastLoggedInAt;
-    
-    @Column(name="is_deleted", nullable = false)
-    private boolean isDeleted = false;
     
     public Long getId() {
         return id;
@@ -111,7 +114,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
         return password;
     }
 
-    @JsonProperty
+    @JsonProperty("password")
     public void setPassword(String password) {
         this.password = password;
     }
@@ -185,7 +188,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     }
 
     public void setLangKey(String langKey) {
-        this.langKey = langKey;
+        this.langKey = (langKey != null) ? langKey : "en";
     }
 
     public Set<Authority> getAuthorities() {
@@ -205,13 +208,13 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	}
 
 	public boolean isDeleted() {
-	  return isDeleted;
+		return isDeleted;
 	}
 
 	public void setDeleted(boolean isDeleted) {
-	  this.isDeleted = isDeleted;
+		this.isDeleted = isDeleted;
 	}
-		 
+
 	@Override
     public boolean equals(Object o) {
         if (this == o) {

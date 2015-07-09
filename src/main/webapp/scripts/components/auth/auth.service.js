@@ -103,18 +103,19 @@ angular.module('hillromvestApp')
 
             resetPasswordInit: function (mail, callback) {
                 var cb = callback || angular.noop;
-
-                return PasswordResetInit.save(mail, function() {
+                var data ={"email":mail};
+                return PasswordResetInit.save(data, function() {
                     return cb();
                 }, function (err) {
                     return cb(err);
                 }).$promise;
             },
+               
 
             resetPasswordFinish: function(key, newPassword, callback) {
                 var cb = callback || angular.noop;
-
-                return PasswordResetFinish.save(key, newPassword, function () {
+                var data = {"newPassword":newPassword};
+                return PasswordResetFinish.resetPassFinish(key).save(data, function () {
                     return cb();
                 }, function (err) {
                     return cb(err);

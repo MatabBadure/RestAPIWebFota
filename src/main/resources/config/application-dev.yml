@@ -38,7 +38,7 @@ spring:
         mode: XHTML
         cache: false
     recaptcha:
-        recaptchaPrivateKey: 6LeJewkTAAAAANM2xOZHtyC3Ehrc6vqZs9Homzvq
+        recaptchaPrivateKey: 6LcXjQkTAAAAACiA7rx7o7wlifQ7n3VQ_It-sncc
 metrics:
     jmx.enabled: true
     spark:

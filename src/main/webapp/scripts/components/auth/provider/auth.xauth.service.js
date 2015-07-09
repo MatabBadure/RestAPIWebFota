@@ -45,7 +45,6 @@ angular.module('hillromvestApp')
             /*Temp Service Call From angular*/
             captcha: function (captchaData){
                 var data = {
-                    'secret': '6LfwMAkTAAAAAHnNpBlH7fEixBPQBqLffYfArQ0E',
                     'response': captchaData
                 };
 

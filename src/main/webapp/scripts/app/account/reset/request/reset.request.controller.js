@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('hillromvestApp')
-    .controller('RequestResetController', function ($rootScope, $scope, $state, $timeout, Auth, localStorageService, $http) {
+angular.module('hillromvestApp',[])
+    .controller('RequestResetController', function ($rootScope, $scope, $state, $timeout, Auth, localStorageService, vcRecaptchaService) {
 
         $scope.success = null;
         $scope.error = null;
@@ -10,6 +10,8 @@ angular.module('hillromvestApp')
         $scope.showCaptcha = true;//change to false
         $scope.user = {};
         $scope.response = null;
+        $scope.widgetId = null;
+        $scope.siteKey ='6LeJewkTAAAAANM2xOZHtyC3Ehrc6vqZs9Homzvq';
         $timeout(function (){angular.element('[ng-model="resetAccount.email"]').focus();});
 
         
@@ -21,8 +23,16 @@ angular.module('hillromvestApp')
                      console.info('Response available', response);
                      $scope.response = response;
                  };
-                   Auth.captcha($scope.user.captcha).then(function (data) {
-                    console.log(data)
+                 
+                 $scope.setWidgetId = function (widgetId) {
+                     console.info('Created widget ID:', widgetId);
+
+                     $scope.widgetId = widgetId;
+                 };
+                 
+                   Auth.captcha($scope.response).then(function (data) {
+                    console.log(data);
+                    $scope.showCaptcha = false;
                     //regular reset passowrd flow from here
            		 Auth.resetPasswordInit($scope.resetAccount.email).then(function () {
                         $scope.success = 'OK';
@@ -43,8 +53,10 @@ angular.module('hillromvestApp')
                     });       
                     //
                    }).catch(function (err) { 
-                     console.log('ERROR :::',err)
-                     //handling re-Captcha failure part
+                     console.log('ERROR :::',err);
+                     // reloading re-Captcha widget
+                     vcRecaptchaService.reload($scope.widgetId);
+                     
                    });
         	}else{
         		 Auth.resetPasswordInit($scope.resetAccount.email).then(function () {

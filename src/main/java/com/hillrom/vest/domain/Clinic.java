@@ -21,6 +21,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.SQLDelete;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.ObjectIdGenerator;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 /**
@@ -28,7 +33,7 @@ import org.hibernate.annotations.SQLDelete;
  */
 @Entity
 @Table(name = "CLINIC")
-@SQLDelete(sql="UPDATE clinic SET is_deleted = 1 WHERE id = ?")
+@SQLDelete(sql="UPDATE CLINIC SET is_deleted = 1 WHERE id = ?")
 public class Clinic implements Serializable {
 
     @Id
@@ -59,11 +64,12 @@ public class Clinic implements Serializable {
     @Column(name = "hillrom_id")
     private String hillromId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name="parent_clinic_id")
     private Clinic parentClinic;
  
     @OneToMany(mappedBy="parentClinic")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id")
     private Set<Clinic> childClinics = new HashSet<Clinic>();
 
     @Column(name = "npi_number")
@@ -82,7 +88,8 @@ public class Clinic implements Serializable {
     private Set<PatientInfo> patients = new HashSet<>();
     
     @Column(name="is_deleted", nullable = false)
-    private boolean isDeleted = false;
+    @JsonIgnore
+    private boolean deleted = false;
 
     public Long getId() {
         return id;
@@ -197,11 +204,11 @@ public class Clinic implements Serializable {
     }
 
     public boolean isDeleted() {
-		return isDeleted;
+		return deleted;
 	}
 
 	public void setDeleted(boolean isDeleted) {
-		this.isDeleted = isDeleted;
+		this.deleted = isDeleted;
 	}
 
 	@Override
@@ -239,7 +246,7 @@ public class Clinic implements Serializable {
                 ", hillromId='" + hillromId + "'" +
                 ", parentClinic='" + parentClinic + "'" +
                 ", npiNumber='" + npiNumber + "'" +
-                ", deleted='" + isDeleted + "'" +
+                ", deleted='" + deleted + "'" +
                 '}';
     }
 }

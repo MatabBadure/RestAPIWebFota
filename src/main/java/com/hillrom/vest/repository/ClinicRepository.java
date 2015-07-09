@@ -17,5 +17,8 @@ public interface ClinicRepository extends JpaRepository<Clinic,Long> {
     Clinic findOneWithEagerRelationships(@Param("id") Long id);
     
     Optional<Clinic> findOneByName(String name);
+    
+    @Override
+    void delete(Clinic t);
 
 }

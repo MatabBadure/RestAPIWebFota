@@ -128,8 +128,12 @@ public class ClinicResource {
     public ResponseEntity<JSONObject> delete(@PathVariable Long id) {
     	log.debug("REST request to delete Clinic : {}", id);
     	JSONObject jsonObject = new JSONObject();
-    	clinicRepository.delete(id);
-    	jsonObject.put("message", "Clinic deleted successfully.");
-    	return ResponseEntity.ok().body(jsonObject);
+        jsonObject.put("message", "No such clinic exists.");
+        return Optional.ofNullable(clinicRepository.findOne(id))
+                .map(clinic -> {
+                	clinicRepository.delete(clinic);
+                    jsonObject.put("message", "Clinic deleted successfully.");
+                    return ResponseEntity.ok().body(jsonObject);
+                }).orElse(new ResponseEntity<JSONObject>(jsonObject, HttpStatus.NOT_FOUND));
     }
 }

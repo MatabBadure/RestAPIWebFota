@@ -29,7 +29,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name = "USER")
-@SQLDelete(sql="UPDATE user SET is_deleted = 1 WHERE id = ?")
+@SQLDelete(sql="UPDATE USER SET is_deleted = 1 WHERE id = ?")
 public class User extends AbstractAuditingEntity implements Serializable {
 
     @Id
@@ -91,7 +91,8 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private Set<PatientInfo> patients = new HashSet<>();
     
     @Column(name="is_deleted", nullable = false)
-    private boolean isDeleted = false;
+    @JsonIgnore
+    private boolean deleted = false;
     
     public Long getId() {
         return id;
@@ -191,11 +192,11 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	}
 
 	public boolean isDeleted() {
-		return isDeleted;
+		return deleted;
 	}
 
 	public void setDeleted(boolean isDeleted) {
-		this.isDeleted = isDeleted;
+		this.deleted = isDeleted;
 	}
 
 	@Override

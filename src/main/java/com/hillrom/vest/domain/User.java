@@ -31,7 +31,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name = "USER")
-@SQLDelete(sql="UPDATE user SET is_deleted = 1 WHERE id = ?")
+@SQLDelete(sql="UPDATE USER SET is_deleted = 1 WHERE id = ?")
 public class User extends AbstractAuditingEntity implements Serializable {
 
     @Id

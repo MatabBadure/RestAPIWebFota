@@ -7,7 +7,11 @@ import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.MailService;
 import com.hillrom.vest.service.UserService;
+import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.UserDTO;
+
+import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
@@ -193,11 +198,18 @@ public class AccountResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> updateEmailOrPassword(@RequestBody(required=true) Map<String,String> params) {
+    public ResponseEntity<JSONObject> updateEmailOrPassword(@RequestBody(required=true) Map<String,String> params) {
     	String email = params.get("email");
     	String password = params.get("password");
+    	JSONObject jsonObject = new JSONObject();
         if (!checkPasswordLength(password)) {
-            return new ResponseEntity<>("Incorrect password", HttpStatus.BAD_REQUEST);
+        	jsonObject.put("ERROR", "Incorrect password");
+            return ResponseEntity.badRequest().body(jsonObject);
+        }
+        User currentUser = userService.findOneByEmail(SecurityUtils.getCurrentLogin()).get();
+        if(!RandomUtil.isValidEmail(currentUser.getEmail()) && StringUtils.isBlank(email)){
+        	jsonObject.put("ERROR", "Email is required");
+        	return ResponseEntity.badRequest().body(jsonObject);
         }
         userService.updateEmailOrPassword(params);
         return new ResponseEntity<>(HttpStatus.OK);

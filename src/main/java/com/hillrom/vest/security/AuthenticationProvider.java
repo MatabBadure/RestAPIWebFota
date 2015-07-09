@@ -104,6 +104,8 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
     			if(null == existingPatientuser.getLastLoggedInAt()){
     				JSONObject jsonObject = prepareJSONForPatientUser(patientInfo.getEmail(),defaultPassword);
         	        throw new FirstLoginException("First Time Login, please reset your password",jsonObject);
+    			}else { // User should not login with hillromId more than once.
+    				throw new BadCredentialsException("Invalid username,Please login with registered email");
     			}
     		}else{
     			userService.createUserFromPatientInfo(patientInfo,encodedPassword);
@@ -113,7 +115,6 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
     	}else{
     		throw new BadCredentialsException("Invalid username/password");
     	}
-    	return null;
     }
 
 	private void matchPasswords(String password, String tokenPassword) {

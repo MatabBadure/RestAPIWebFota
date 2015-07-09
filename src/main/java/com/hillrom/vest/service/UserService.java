@@ -17,10 +17,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
@@ -29,6 +32,7 @@ import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
+
 import org.apache.commons.lang3.StringUtils;
 
 /**

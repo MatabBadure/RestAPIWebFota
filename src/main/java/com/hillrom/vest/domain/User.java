@@ -16,10 +16,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-<<<<<<< HEAD
-=======
 import org.boon.json.annotations.JsonProperty;
->>>>>>> origin/dev
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
@@ -28,7 +25,6 @@ import org.joda.time.DateTime;
 import org.springframework.test.context.jdbc.Sql;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * A user.

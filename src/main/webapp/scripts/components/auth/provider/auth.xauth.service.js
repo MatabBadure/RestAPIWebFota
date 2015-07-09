@@ -45,17 +45,13 @@ angular.module('hillromvestApp')
             /*Temp Service Call From angular*/
             captcha: function (captchaData){
                 var data = {
-                    'secret': '6LfwMAkTAAAAAHnNpBlH7fEixBPQBqLffYfArQ0E',
                     'response': captchaData
                 };
 
-                // return $http.post('https://www.google.com/recaptcha/api/siteverify', data).
-                //   success(function(data, status, headers, config) {
-                //     console.log(data);
-                //   }).
-                //   error(function(data, status, headers, config) {
-                //     console.log(data , status, headers, config);
-                //   });
+                 return $http.post('/api/recaptcha', data).
+                   success(function(response) {
+                	   return response;
+                   });
             }
         };
     });

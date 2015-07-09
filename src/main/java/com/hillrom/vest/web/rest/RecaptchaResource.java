@@ -2,6 +2,7 @@ package com.hillrom.vest.web.rest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -28,8 +29,9 @@ public class RecaptchaResource {
 	private RecaptchaService recaptchaService;
 	
 	@RequestMapping(value="/recaptcha",method=RequestMethod.POST)
-	public ResponseEntity<JSONObject> processRecaptchaVerification(@RequestBody String response)throws URISyntaxException{
+	public ResponseEntity<JSONObject> processRecaptchaVerification(@RequestBody Map<String,String> paramsMap)throws URISyntaxException{
 		RestTemplate restClient = new RestTemplate();
+		String response = paramsMap.get("response");
 		StringBuilder uriBuilder = buildUri(response);
 		return ResponseEntity.ok().body(restClient.postForObject(new URI(uriBuilder.toString()), null,JSONObject.class));
 	}

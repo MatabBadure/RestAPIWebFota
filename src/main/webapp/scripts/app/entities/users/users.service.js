@@ -8,7 +8,19 @@ angular.module('hillromvestApp')
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
-            'x-auth-token' : 'admin@localhost:1436370910897:fd29d697fb51f9e04fb5ff8daf778ac7'
+            'x-auth-token' : 'admin@localhost:1436421984245:f1bf30edec0aabf93ab6d883ef01ad69'
+          }
+        }).success(function (response) {
+          return response;
+        });
+      },
+      deleteUser : function(id){
+        id=16;
+        return $http.delete('api/hillromteamuser/'+id, {
+          headers: {
+            'Content-Type' : 'application/json',
+            'Accept' : 'application/json',
+            'x-auth-token' : 'admin@localhost:1436421984245:f1bf30edec0aabf93ab6d883ef01ad69'
           }
         }).success(function (response) {
           return response;

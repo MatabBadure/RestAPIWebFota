@@ -27,6 +27,16 @@ angular.module('hillromvestApp')
 
           });
         };
+
+        $scope.deleteUser = function(){
+          console.log('Selected User: ', $scope.user);
+          User.deleteUser($scope.user.id).then(function (data) {
+            $scope.user = {};
+
+          }).catch(function () {
+            console.log('Giving Error');
+          });
+        };
       }
     };
   });

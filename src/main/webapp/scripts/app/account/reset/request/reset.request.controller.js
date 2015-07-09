@@ -11,8 +11,8 @@ angular.module('hillromvestApp')
         $scope.user = {};
         $scope.response = null;
         $scope.widgetId = null;
-       // $scope.siteKey ='6LcXjQkTAAAAAMZ7kb5v9YZ8vrYKFJmDcg2oE-SH';
-        $scope.siteKey = '6LclfwkTAAAAAEwFT2axlD-NCGVYTAN7IWB9d6t9'
+        $scope.siteKey ='6LcXjQkTAAAAAMZ7kb5v9YZ8vrYKFJmDcg2oE-SH';
+        
         $timeout(function (){angular.element('[ng-model="resetAccount.email"]').focus();});
 
         $scope.setResponse = function (response) {

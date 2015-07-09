@@ -52,11 +52,21 @@
                     </div>
                     
                 </div>
-               <!--  <div class="form-group" ng-show="showCaptcha"> -->
-               		<div class="form-group">
+               		<!-- <div class="form-group" ng-show="showCaptcha">
+               		
                   		<div re-captcha ng-model="user.captcha"></div>
-                	</div>
-                <button class="btn btn-primary" ng-disabled="form.email.$invalid || ((user.captcha.response == '' || user.captcha.response == undefined) && showCaptcha )" translate="reset.request.form.button" ng-click="requestReset()">Register</button>
+                	</div> -->
+                	
+                	<div  ng-show="showCaptcha">
+	                	<div vc-recaptcha
+	                		theme="'light'"
+	                		key="model.key"
+	                		on-create="setWidgetId(widgetId)"
+	                		on-success="setResponse(response)">
+	                	</div>
+            		</div>
+            
+                <button class="btn btn-primary" ng-disabled="form.email.$invalid" translate="reset.request.form.button" ng-click="requestReset()">Register</button>
                 <!-- <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" translate="reset.request.form.button">Register</button> -->
             </form>
         </div>

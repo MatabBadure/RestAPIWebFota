@@ -9,6 +9,7 @@ angular.module('hillromvestApp')
 
                 AuthServerProvider.login(credentials).then(function (data) {
                     // retrieve the logged account information
+                    // localStorage.setItem('token',);
                     Principal.identity(true).then(function(account) {
 
                         // After the login the language will be changed to
@@ -23,7 +24,6 @@ angular.module('hillromvestApp')
                     deferred.reject(err);
                     return cb(err);
                 }.bind(this));
-
                 return deferred.promise;
             },
 
@@ -110,7 +110,7 @@ angular.module('hillromvestApp')
                     return cb(err);
                 }).$promise;
             },
-               
+
 
             resetPasswordFinish: function(key, newPassword, callback) {
                 var cb = callback || angular.noop;

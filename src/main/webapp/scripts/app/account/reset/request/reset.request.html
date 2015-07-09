@@ -56,7 +56,10 @@
                		
                   		<div re-captcha ng-model="user.captcha"></div>
                 	</div> -->
-                	
+                	<p class="help-block"
+                           ng-show="captchaError">
+                            Please verify again you are not a robot.
+                    </p>
                 	<div  ng-show="showCaptcha">
 	                	 <div vc-recaptcha
 	                		theme="'light'"

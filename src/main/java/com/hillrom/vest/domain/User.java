@@ -9,20 +9,20 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.boon.json.annotations.JsonProperty;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.Where;
 import org.hibernate.validator.constraints.Email;
 import org.joda.time.DateTime;
-import org.springframework.test.context.jdbc.Sql;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -31,21 +31,31 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name = "USER")
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @SQLDelete(sql="UPDATE USER SET is_deleted = 1 WHERE id = ?")
 public class User extends AbstractAuditingEntity implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.TABLE)
     private Long id;
 
     @JsonIgnore
     @Size(min = 60, max = 60)
     @Column(length = 60)
     private String password;
+    
+    @Size(max = 50)
+    @Column(name = "title", length = 50)
+    private String title;
 
     @Size(max = 50)
     @Column(name = "first_name", length = 50)
     private String firstName;
+    
+    @Size(max = 50)
+    @Column(name = "middle_name", length = 50)
+    private String middleName;
 
     @Size(max = 50)
     @Column(name = "last_name", length = 50)
@@ -93,7 +103,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private Set<PatientInfo> patients = new HashSet<>();
     
     @Column(name="is_deleted", nullable = false)
-    private boolean isDeleted = false;
+    private boolean deleted = false;
     
     public Long getId() {
         return id;
@@ -111,6 +121,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
     public void setPassword(String password) {
         this.password = password;
     }
+    
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -118,6 +136,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
+    }
+    
+    public String getMiddleName() {
+        return middleName;
+    }
+
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
     }
 
     public String getLastName() {
@@ -193,11 +219,11 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	}
 
 	public boolean isDeleted() {
-		return isDeleted;
+		return deleted;
 	}
 
-	public void setDeleted(boolean isDeleted) {
-		this.isDeleted = isDeleted;
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 
 	@Override
@@ -227,7 +253,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
     public String toString() {
         return "User{" +
                 " password='" + password + '\'' +
+                ", title='" + title + '\'' +
                 ", firstName='" + firstName + '\'' +
+                ", middleName='" + middleName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", activated='" + activated + '\'' +

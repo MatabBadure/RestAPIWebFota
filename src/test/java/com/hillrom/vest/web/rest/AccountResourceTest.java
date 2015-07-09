@@ -147,7 +147,9 @@ public class AccountResourceTest {
     public void testRegisterValid() throws Exception {
         UserDTO u = new UserDTO(
             "password",             // password
+            "Mr",					// title
             "Joe",                  // firstName
+            "Snoy",					// middleName
             "Shmoe",                // lastName
             "joe@example.com",      // e-mail
             "en",                   // langKey
@@ -169,7 +171,9 @@ public class AccountResourceTest {
     public void testRegisterInvalidLogin() throws Exception {
         UserDTO u = new UserDTO(
             "password",             // password
+            "Mr",					// title
             "Funky",                // firstName
+            "Snoy",					// middleName
             "One",                  // lastName
             "funky@example.com",    // e-mail
             "en",                   // langKey
@@ -191,7 +195,9 @@ public class AccountResourceTest {
     public void testRegisterInvalidEmail() throws Exception {
         UserDTO u = new UserDTO(
             "password",         // password
-            "Bob",              // firstName
+            "Mr",					// title
+            "Bob",                // firstName
+            "Snoy",					// middleName
             "Green",            // lastName
             "invalid",          // e-mail <-- invalid
             "en",               // langKey
@@ -215,7 +221,9 @@ public class AccountResourceTest {
         // Good
         UserDTO u = new UserDTO(
             "password",             // password
-            "John",                 // firstName
+            "Mr",					// title
+            "John",                // firstName
+            "Snoy",					// middleName
             "Doe",                  // lastName
             "john@example.com",     // e-mail
             "en",                   // langKey
@@ -223,7 +231,7 @@ public class AccountResourceTest {
         );
 
         // Duplicate e-mail, different login
-        UserDTO dup = new UserDTO( u.getPassword(), u.getEmail(), u.getLastName(),
+        UserDTO dup = new UserDTO( u.getPassword(), u.getTitle(), u.getEmail(), u.getMiddleName(), u.getLastName(),
             u.getEmail(), u.getLangKey(), u.getRoles());
 
         // Good user
@@ -249,7 +257,9 @@ public class AccountResourceTest {
     public void testRegisterAdminIsIgnored() throws Exception {
         UserDTO u = new UserDTO(
             "password",             // password
-            "Bad",                  // firstName
+            "Mr",					// title
+            "Bad",                // firstName
+            "Snoy",					// middleName
             "Guy",                  // lastName
             "badguy@example.com",   // e-mail
             "en",                   // langKey

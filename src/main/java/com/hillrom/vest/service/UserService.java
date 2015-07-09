@@ -2,11 +2,14 @@ package com.hillrom.vest.service;
 
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.User;
+import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.repository.AuthorityRepository;
+import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.HillromTeamUserDTO;
+import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -38,6 +41,9 @@ public class UserService {
 
     @Inject
     private UserRepository userRepository;
+    
+    @Inject
+    private UserExtensionRepository userExtensionRepository;
 
     @Inject
     private AuthorityRepository authorityRepository;
@@ -168,4 +174,33 @@ public class UserService {
 		log.debug("Created Information for User: {}", newUser);
 		return newUser;
 	}
+    
+    public UserExtension createDoctor(UserExtensionDTO userExtensionDTO) {
+		UserExtension newUser = new UserExtension();
+		newUser.setTitle(userExtensionDTO.getTitle());
+		newUser.setFirstName(userExtensionDTO.getFirstName());
+		newUser.setMiddleName(userExtensionDTO.getMiddleName());
+		newUser.setLastName(userExtensionDTO.getLastName());
+		newUser.setEmail(userExtensionDTO.getEmail());
+		newUser.setSpeciality(userExtensionDTO.getSpeciality());
+		newUser.setCredentials(userExtensionDTO.getCredentials());
+		newUser.setAddress(userExtensionDTO.getAddress());
+		newUser.setZipcode(userExtensionDTO.getZipcode());
+		newUser.setCity(userExtensionDTO.getCity());
+		newUser.setState(userExtensionDTO.getState());
+		newUser.setPrimaryPhone(userExtensionDTO.getPrimaryPhone());
+		newUser.setMobilePhone(userExtensionDTO.getMobilePhone());
+		newUser.setFaxNumber(userExtensionDTO.getFaxNumber());
+		newUser.setLangKey(null);
+		// new user is not active
+		newUser.setActivated(false);
+		newUser.setDeleted(false);
+		// new user gets registration key
+		newUser.setActivationKey(RandomUtil.generateActivationKey());
+		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
+		userExtensionRepository.save(newUser);
+		log.debug("Created Information for User: {}", newUser);
+		return newUser;
+	}
 }
+

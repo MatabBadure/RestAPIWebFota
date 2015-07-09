@@ -63,12 +63,8 @@ public class TokenProvider {
         String[] parts = authToken.split(SEPERATOR);
         return parts[0];
     }
-
-    public boolean validateToken(String authToken, UserDetails userDetails) {
-        String[] parts = authToken.split(SEPERATOR);
-        long expires = Long.parseLong(parts[1]);
-        String signature = parts[2];
-        String signatureToMatch = computeSignature(userDetails, expires);
-        return expires >= System.currentTimeMillis() && signature.equals(signatureToMatch);
+    
+    public int getTokenValidity(){
+    	return tokenValidity;
     }
 }

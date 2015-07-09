@@ -80,7 +80,7 @@ public class UserLoginTokenResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<UserLoginToken> get(@PathVariable Long id) {
+    public ResponseEntity<UserLoginToken> get(@PathVariable String id) {
         log.debug("REST request to get UserLoginToken : {}", id);
         return Optional.ofNullable(userLoginTokenRepository.findOne(id))
             .map(userLoginToken -> new ResponseEntity<>(
@@ -96,7 +96,7 @@ public class UserLoginTokenResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable String id) {
         log.debug("REST request to delete UserLoginToken : {}", id);
         userLoginTokenRepository.delete(id);
     }

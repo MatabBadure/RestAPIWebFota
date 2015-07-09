@@ -21,9 +21,9 @@ import org.springframework.security.web.access.ExceptionTranslationFilter;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.Http401UnauthorizedEntryPoint;
 import com.hillrom.vest.security.RestExceptionTranslationFilter;
-import com.hillrom.vest.security.xauth.TokenProvider;
 import com.hillrom.vest.security.xauth.XAuthTokenConfigurer;
 import com.hillrom.vest.service.PatientInfoService;
+import com.hillrom.vest.service.UserLoginTokenService;
 import com.hillrom.vest.service.UserService;
 
 @Configuration
@@ -38,7 +38,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private UserDetailsService userDetailsService;
 
     @Inject
-    private TokenProvider tokenProvider;
+    private UserLoginTokenService authTokenService;
     
     @Inject
     private PatientInfoService patientInfoService;
@@ -113,7 +113,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     private XAuthTokenConfigurer securityConfigurerAdapter() {
-      return new XAuthTokenConfigurer(userDetailsService, tokenProvider);
+      return new XAuthTokenConfigurer(userDetailsService, authTokenService);
     }
 
     @Bean

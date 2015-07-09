@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,14 +14,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.UserLoginToken;
-import com.hillrom.vest.security.xauth.Token;
 import com.hillrom.vest.security.xauth.TokenProvider;
+import com.hillrom.vest.service.UserLoginTokenService;
 
 @RestController
 @RequestMapping("/api")
@@ -34,6 +36,9 @@ public class UserXAuthTokenController {
 
     @Inject
     private UserDetailsService userDetailsService;
+    
+    @Inject
+    private UserLoginTokenService authTokenService;
 
     @RequestMapping(value = "/authenticate",
             method = RequestMethod.POST)
@@ -52,5 +57,13 @@ public class UserXAuthTokenController {
     		throw new BadCredentialsException("Please provide Username and Password");
     	}
     	
+    }
+
+    @RequestMapping(value = "/logout",
+            method = RequestMethod.POST)
+    public ResponseEntity<?> logout(@RequestHeader(value="x-auth-token",required=true)String authToken){
+    	authTokenService.deleteToken(authToken);
+		SecurityContextHolder.getContext().setAuthentication(null);
+    	return ResponseEntity.ok().build();
     }
 }

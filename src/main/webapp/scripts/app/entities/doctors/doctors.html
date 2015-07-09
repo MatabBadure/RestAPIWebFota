@@ -2,10 +2,12 @@
 	<div class="col-md-4 dashboard-page__admin-nav">
 		<nav-bar></nav-bar>
 	</div>
-
-	<div class="col-md-6 dashboard-page__form">
-		<doctor></doctor>
+	
+	<div class="col-md-6 dashboard-page__form margin-top-15">
+		<doctor doctor-data="doctor"></doctor>
 	</div>
 	
-	<div class="col-md-6"></div>
+	<div class="col-md-6">
+		<doctor-list on-select="selectedDoctor(doctor)"></doctor-list>
+	</div>
 </div>

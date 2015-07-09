@@ -3,9 +3,11 @@
 		<nav-bar></nav-bar>
 	</div>
 
-	<div class="col-md-6 dashboard-page__form">
-		<clinic></clinic>
+	<div class="col-md-6 dashboard-page__form margin-top-15">
+		<clinic clinic-data="clinic"></clinic>
 	</div>
 	
-	<div class="col-md-6 dashboard-page__user-list"></div>
+	<div class="col-md-6">
+		<clinic-list on-select="selectedClinic(clinic)"></clinic-list>
+	</div>
 </div>

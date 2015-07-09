@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -39,7 +38,7 @@ public class PatientInfoResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Void> create(@Valid @RequestBody PatientInfo patientInfo) throws URISyntaxException {
+    public ResponseEntity<Void> create(@RequestBody PatientInfo patientInfo) throws URISyntaxException {
         log.debug("REST request to save PatientInfo : {}", patientInfo);
         if (patientInfo.getId() != null) {
             return ResponseEntity.badRequest().header("Failure", "A new patientInfo cannot already have an ID").build();
@@ -55,7 +54,7 @@ public class PatientInfoResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Void> update(@Valid @RequestBody PatientInfo patientInfo) throws URISyntaxException {
+    public ResponseEntity<Void> update(@RequestBody PatientInfo patientInfo) throws URISyntaxException {
         log.debug("REST request to update PatientInfo : {}", patientInfo);
         if (patientInfo.getId() == null) {
             return create(patientInfo);

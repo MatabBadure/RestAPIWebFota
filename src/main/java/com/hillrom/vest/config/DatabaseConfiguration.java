@@ -4,10 +4,13 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+
 import liquibase.integration.spring.SpringLiquibase;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.ApplicationContextException;
@@ -22,6 +25,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
+
 import java.util.Arrays;
 
 @Configuration
@@ -35,6 +39,8 @@ public class DatabaseConfiguration implements EnvironmentAware {
     private RelaxedPropertyResolver dataSourcePropertyResolver;
 
     private RelaxedPropertyResolver liquiBasePropertyResolver;
+    
+    private RelaxedPropertyResolver recaptchaPropertyResolver;
 
     private Environment env;
 
@@ -46,6 +52,7 @@ public class DatabaseConfiguration implements EnvironmentAware {
         this.env = env;
         this.dataSourcePropertyResolver = new RelaxedPropertyResolver(env, "spring.datasource.");
         this.liquiBasePropertyResolver = new RelaxedPropertyResolver(env, "liquiBase.");
+        this.recaptchaPropertyResolver = new RelaxedPropertyResolver(env, "spring.recaptcha.");
     }
 
     @Bean(destroyMethod = "shutdown")
@@ -105,5 +112,11 @@ public class DatabaseConfiguration implements EnvironmentAware {
     @Bean
     public Hibernate4Module hibernate4Module() {
         return new Hibernate4Module();
+    }
+    
+    @Bean
+    @Qualifier("recaptchaPrivateKey")
+    public String recaptchaPrivateKey(){
+    	return recaptchaPropertyResolver.getProperty("recaptchaPrivateKey"); 
     }
 }

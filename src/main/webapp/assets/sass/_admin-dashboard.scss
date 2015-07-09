@@ -1,0 +1,240 @@
+.dashboard-page{
+	height: 100%;
+	display: table;
+	padding-left: 0;
+	background-color: #EEEEEE;
+	&__admin-nav{
+  	height: 100%;
+  	display: table-cell;
+  	background-color: #9A9A9A;
+  	padding-left: 0;
+  	padding-right: 0;
+  	float: none;
+  	&--nav{
+  		height: 100%;
+	  	&_dashboard{
+	  		background-color: #727272;
+			  padding: 10px;
+			  margin-bottom: 0px;
+	  	}
+	  	&_nav-list{
+	  		height: 90%;
+				background-color: #9A9A9A;
+				li{
+					line-height: 2.5;
+					border-bottom: 1px solid #FAFAFA;
+					a{
+						color: #FAFAFA;
+						background-color: #9A9A9A;
+						cursor: pointer;
+					}
+					a:hover{
+						color: #FAFAFA;
+						background-color: #9A9A9A;
+					}
+				}
+				li.active a:after{
+					content: '';
+				  display: none;
+				  width: 0;
+				  height: 0;
+				  border-style: solid;
+					border-width: 8px 0 8px 17px;
+					border-color: transparent transparent transparent #727272;
+				  position: absolute;
+				  z-index: 1;
+				  top: 30%;
+				  left: 100%;
+				}
+				li.active a {
+				  background-color: #727272;
+				  color: white;
+				  position: relative;
+				}
+				li.active a:after {
+				  display: block;
+				}
+	  	}
+  	}
+	}
+	&__form{
+		float: none;
+		display: table-cell;
+		padding-bottom: 20px;
+		&--new{
+			font-size: 10px;
+			&_user-type{
+				padding: 5px;
+				font-weight: bold;
+				font-size: 14px;
+			}
+			label{
+				padding-top: 10px;
+			}
+			input{
+				height: 30px;
+			  border-radius: 0;
+			}
+			&_form-submit{
+				text-align: right;
+			  padding: 0 30px;
+			  margin-top: 10px;
+			  &--button{
+					background-color: #bababa;
+				  color: #FAFAFA;
+				  padding: 5px 5px;
+				  border: none;
+				  text-transform: uppercase;
+				  font-weight: 700;
+				  border-radius: 2px;
+				  width: 85px;
+				}
+			}
+			&_user-title{
+				width: 80px;
+				height: 30px;
+			  border-radius: 0;
+			}
+			&_calendar{
+				color: #727272;
+				input{
+					width: 100%;
+					padding-left: 5px;
+				}
+			}
+			&_select-box{
+				select{
+					height: 30px;
+					border-radius: 0;
+				}
+			}
+			&_checkbox{
+				input[type=checkbox]{
+					border-radius: 0;
+					width: 15px;
+				}
+				span{
+					padding-left: 10px;
+					padding-top: 12px;
+				}
+			}
+			&_spec-title{
+				input{
+					width: 35px;
+	  			padding: 0 0 0 8px;	
+				}
+			}
+		}
+	}
+	&__user-list{
+		float: none;
+		display: table-cell;
+		&__detailed{
+			/* Customize scroll */
+			::-webkit-scrollbar {
+			    width: 5px;
+			}
+			 
+			/* Track */
+			::-webkit-scrollbar-track {
+			    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+			    -webkit-border-radius: 10px;
+			    border-radius: 10px;
+			}
+			 
+			/* Handle */
+			::-webkit-scrollbar-thumb {
+			    -webkit-border-radius: 10px;
+			    border-radius: 10px;
+			    background: #EEEEEE; 
+			    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+			}
+			::-webkit-scrollbar-thumb:window-inactive {
+				background: #EEEEEE; 
+			}
+
+			&--list-type{
+				padding: 5px;
+				font-weight: bold;
+				font-size: 14px;
+			}
+			&__list-form{
+				&--input-wrapper{
+					position: relative;
+					i{
+						position: absolute;
+					  right: 0;
+					  padding: 10px 13px;
+					}
+					input {
+					  border-radius: 2px;
+					  border: none;
+					  padding-left: 7px;
+					  height: 34px;
+					  color: #aaa;
+					  margin-bottom: 5px;
+					  background-color: #EEEEEE;
+					  box-shadow: none;
+					}
+					input:focus {
+					  outline: none;
+					  box-shadow: none;
+					}
+				}
+				&--input-wrapper:after {
+				  position: absolute;
+				  border: 1px solid #ccc;
+				  border-top: none;
+				  height: 5px;
+				  width: 100%;
+				  bottom: 6px;
+				  left: 0;
+				  content: "";
+				}
+				&--sort-list{
+					padding: 10px 20px;
+  				.sort-link{
+  					cursor: pointer;
+  					&--text{
+  						padding-right: 8px;
+  					}
+  				}
+  				.sort-link:active{
+  					cursor: pointer;
+  					color: #000000;
+  				}
+				}
+			}
+			&__list{
+				margin-top: 50px;
+				background-color: #FAFAFA;
+				max-height: 280px;
+			  overflow-y: scroll;
+			  overflow-x: hidden;
+				&--details{
+					cursor: pointer;
+					padding: 10px 20px;
+  				border-bottom: 1px solid #EEEEEE;
+  				height: 40px;
+  				.user-detail{
+  					display: block;
+  					float:left;
+  				}
+  				.user-role{
+						display: block;
+						float:right;
+  				}
+				}
+				&--details:hover, &--details:active{
+					background-color: #9A9A9A;
+  				color: #fafafa;
+				}
+			}
+			&__more-link{
+				float: right;
+				padding-right: 6px;
+				padding-top: 10px;
+			}
+		}
+	}
+}

@@ -7,7 +7,7 @@ angular.module('hillromvestApp')
         $scope.error = null;
         $scope.errorEmailNotExists = null;
         $scope.resetAccount = {};
-        $scope.showCaptcha = true;
+        $scope.showCaptcha = false;
         $scope.user = {};
         $scope.response = null;
         $scope.widgetId = null;
@@ -17,22 +17,16 @@ angular.module('hillromvestApp')
         $timeout(function (){angular.element('[ng-model="resetAccount.email"]').focus();});
 
         $scope.setResponse = function (response) {
-            console.info('Response available', response);
             $scope.response = response;
         };
         
         $scope.setWidgetId = function (widgetId) {
-            console.info('Created widget ID:', widgetId);
-
             $scope.widgetId = widgetId;
         };
         $scope.requestReset = function () {
-        	
         	if($scope.showCaptcha){
                   Auth.captcha($scope.response).then(function (data) {
-                   console.log(data);
                    $scope.showCaptcha = false;
-                   //regular reset passowrd flow from here
           		 Auth.resetPasswordInit($scope.resetAccount.email).then(function () {
                        $scope.success = 'OK';
                        $scope.errorEmailNotExists = null;
@@ -52,8 +46,6 @@ angular.module('hillromvestApp')
                    });       
                    //
                   }).catch(function (err) { 
-                    console.log('ERROR :::',err);
-                    // reloading re-Captcha widget
                     $scope.captchaError = true;
                     $scope.response = null;
                     vcRecaptchaService.reload($scope.widgetId);

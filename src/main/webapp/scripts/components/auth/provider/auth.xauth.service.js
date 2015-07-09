@@ -48,7 +48,7 @@ angular.module('hillromvestApp')
                     'response': captchaData
                 };
 
-                 return $http.post('https://www.google.com/recaptcha/api/siteverify', data).
+                 return $http.post('/api/recaptcha', data).
                    success(function(response) {
                 	   return response;
                    });

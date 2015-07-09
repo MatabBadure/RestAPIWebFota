@@ -102,14 +102,14 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
     			User existingPatientuser = userFromDatabase.get();
     			// User exists and it is the first time login 
     			if(null == existingPatientuser.getLastLoggedInAt()){
-    				JSONObject jsonObject = prepareJSONForPatientUser(patientInfo.getEmail(),defaultPassword);
+    				JSONObject jsonObject = prepareJSONForPatientUser(patientInfo.getEmail().toLowerCase(),encodedPassword);
         	        throw new FirstLoginException("First Time Login, please reset your password",jsonObject);
     			}else { // User should not login with hillromId more than once.
     				throw new BadCredentialsException("Invalid username,Please login with registered email");
     			}
     		}else{
     			userService.createUserFromPatientInfo(patientInfo,encodedPassword);
-    			JSONObject jsonObject = prepareJSONForPatientUser(login,encodedPassword);
+    			JSONObject jsonObject = prepareJSONForPatientUser(patientInfo.getEmail().toLowerCase(),encodedPassword);
     			throw new FirstLoginException("Please Register with Email and Password to Login",jsonObject);
     		}
     	}else{

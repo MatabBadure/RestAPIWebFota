@@ -48,11 +48,10 @@ angular.module('hillromvestApp')
                 var data = {
                     'response': captchaData
                 };
-
-                 return $http.post('/api/recaptcha', data).
+                return $http.post('/api/recaptcha', data).
                    success(function(response) {
-                	   return response;
-                   });
+                   return response;
+               });
             }
         };
     });

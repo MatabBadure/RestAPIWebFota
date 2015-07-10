@@ -26,6 +26,7 @@
 				<constraints unique="true" />
 			</column>
 			<column name="PASSWORD" type="varchar(60)" />
+			<column name="title" type="varchar(50)" />
 			<column name="first_name" type="varchar(50)" />
 			<column name="middle_name" type="varchar(50)" />
 			<column name="last_name" type="varchar(50)" />

@@ -119,7 +119,9 @@ public class AccountResource {
                 return new ResponseEntity<>(
                     new UserDTO(
                         null,
+                        user.getTitle(),
                         user.getFirstName(),
+                        user.getMiddleName(),
                         user.getLastName(),
                         user.getEmail(),
                         user.getLangKey(),

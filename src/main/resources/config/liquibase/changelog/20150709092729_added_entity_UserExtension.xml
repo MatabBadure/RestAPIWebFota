@@ -15,7 +15,7 @@
     -->
     <changeSet id="20150709092729" author="jhipster">
         <createTable tableName="USER_EXTENSION">
-            <column name="id" type="bigint">
+            <column name="user_id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="speciality" type="varchar(255)"/>
@@ -27,9 +27,12 @@
             <column name="zipcode" type="integer"/>
             <column name="city" type="varchar(255)"/>
             <column name="state" type="varchar(255)"/>
+            <column name="is_deleted" type="boolean" valueBoolean="false">
+				<constraints nullable="false" />
+			</column>
         </createTable>
         
-        <addForeignKeyConstraint baseColumnNames="id"
+        <addForeignKeyConstraint baseColumnNames="user_id"
 			baseTableName="USER_EXTENSION" constraintName="fk_user_extension_id"
 			referencedColumnNames="id" referencedTableName="USER" />
         

@@ -72,7 +72,7 @@ public class UserExtensionResource {
         			return ResponseEntity.badRequest().body(jsonObject);
         		})
                 .orElseGet(() -> {
-                	if (userExtensionDTO.getRole() == AuthoritiesConstants.DOCTOR) {
+                	if (AuthoritiesConstants.DOCTOR.equals(userExtensionDTO.getRole())) {
                 		UserExtension user = userService.createDoctor(userExtensionDTO);
                         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
                         mailService.sendActivationEmail(user, baseUrl);

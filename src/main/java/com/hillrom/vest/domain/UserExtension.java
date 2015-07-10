@@ -1,16 +1,19 @@
 package com.hillrom.vest.domain;
 
 import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import org.hibernate.annotations.SQLDelete;
 
 /**
  * A UserExtension.
  */
 @Entity
 @Table(name = "USER_EXTENSION")
+@PrimaryKeyJoinColumn(name="USER_ID",referencedColumnName="id")
+@SQLDelete(sql="UPDATE USER_EXTENSION SET is_deleted = 1 WHERE USER_ID = ?")
 public class UserExtension extends User implements Serializable {
 
     @Column(name = "speciality")
@@ -39,6 +42,9 @@ public class UserExtension extends User implements Serializable {
     
     @Column(name = "state")
     private String state;
+    
+    @Column(name="is_deleted", nullable = false)
+    private boolean deleted = false;
     
 	public String getSpeciality() {
         return speciality;
@@ -110,6 +116,14 @@ public class UserExtension extends User implements Serializable {
 
 	public void setState(String state) {
 		this.state = state;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 
 	@Override

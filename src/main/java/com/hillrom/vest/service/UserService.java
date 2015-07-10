@@ -12,7 +12,6 @@ import com.hillrom.vest.web.rest.dto.HillromTeamUserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;

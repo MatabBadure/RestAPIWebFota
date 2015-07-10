@@ -22,7 +22,6 @@ angular.module('hillromvestApp')
               if(data.status === 200){
                 localStorage.removeItem('loginCount');
                 $state.go('patient');
-                localStorage.setItem('token', data.data.token);
               }
             }).catch(function (data) {
               if (data.status === 401) {
@@ -34,21 +33,22 @@ angular.module('hillromvestApp')
                     $scope.showCpatcha = true;
                   }
                 }else if (data.data.APP_CODE === 'EMAIL_PASSWORD_RESET') {
-                  localStorage.setItem('token', data.data.token);
+                  localStorage.setItem('token', data.data.id);
                   $scope.isFirstLogin = true;
                   $scope.isEmailExist = false;
                   $scope.showLogin = false;
                 } else if (data.data.APP_CODE === 'PASSWORD_RESET') {
-                  localStorage.setItem('token', data.data.token);
+                  localStorage.setItem('token', data.data.id);
                   $scope.isFirstLogin = true;
                   $scope.showLogin = false;
                 }
               }
 
-                // var loginCount = parseInt(localStorage.getItem('loginCount')) || 0;
+                // var loginCount = parseInt(localStorage.getItem('loginCount'))
+				// || 0;
                 // localStorage.setItem('loginCount', loginCount + 1);
                 // if(loginCount > 2){
-                //   $scope.showCpatcha = true;
+                // $scope.showCpatcha = true;
                 // }
             });
         };

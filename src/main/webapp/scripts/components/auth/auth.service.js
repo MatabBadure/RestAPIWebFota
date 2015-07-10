@@ -10,6 +10,7 @@ angular.module('hillromvestApp')
                 AuthServerProvider.login(credentials).then(function (data) {
                     // retrieve the logged account information
                     // localStorage.setItem('token',);
+                	localStorage.setItem('token', data.data.id);
                     Principal.identity(true).then(function(account) {
 
                         // After the login the language will be changed to

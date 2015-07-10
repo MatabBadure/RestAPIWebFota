@@ -1,0 +1,49 @@
+{
+    "relationships": [
+        {
+            "relationshipId": 1,
+            "relationshipName": "user",
+            "relationshipNameCapitalized": "User",
+            "relationshipFieldName": "user",
+            "otherEntityName": "user",
+            "relationshipType": "one-to-one",
+            "otherEntityNameCapitalized": "User",
+            "ownerSide": false,
+            "otherEntityRelationshipName": "userExtension"
+        }
+    ],
+    "fields": [
+        {
+            "fieldId": 1,
+            "fieldName": "speciality",
+            "fieldType": "String",
+            "fieldIsEnum": false,
+            "fieldNameCapitalized": "Speciality",
+            "fieldNameUnderscored": "speciality",
+            "fieldInJavaBeanMethod": "Speciality",
+            "fieldValidate": false
+        },
+        {
+            "fieldId": 2,
+            "fieldName": "credentials",
+            "fieldType": "String",
+            "fieldIsEnum": false,
+            "fieldNameCapitalized": "Credentials",
+            "fieldNameUnderscored": "credentials",
+            "fieldInJavaBeanMethod": "Credentials",
+            "fieldValidate": false
+        }
+    ],
+    "fieldsContainOwnerManyToMany": false,
+    "fieldsContainOwnerOneToOne": false,
+    "fieldsContainOneToMany": false,
+    "fieldsContainLocalDate": false,
+    "fieldsContainCustomTime": false,
+    "fieldsContainBigDecimal": false,
+    "fieldsContainDateTime": false,
+    "fieldsContainDate": false,
+    "changelogDate": "20150709092729",
+    "dto": "no",
+    "pagination": "pager",
+    "validation": false
+}

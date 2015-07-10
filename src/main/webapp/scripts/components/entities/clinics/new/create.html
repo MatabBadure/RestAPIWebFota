@@ -1,22 +1,57 @@
-<form class="dashboard-page__form--new" ng-submit="createClinic()">
+<span ng-show="isClinicCreated">The clinic has been created!</span>
+<span ng-show="isClinicDeleted">The clinic has been deleted!</span>
+<form name="form" ng-show="!isClinicCreated && !isClinicDeleted"class="dashboard-page__form--new" ng-submit="createClinic()">
   <div class="dashboard-page__form--new_user-type">Create Clinic</div>
   <div class="col-md-16 indent-form-top">
     <div class="col-md-6">
       <label for="exampleInputEmail1">Clinic Name *</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="clinic.clinicName">
+      <input type="text" class="form-control" name="clinicName" id="exampleInputEmail1" ng-model="clinic.clinicName" minlength=5 ng-maxlength=50 required>
     </div>
   </div>
 
+	 <div ng-show="form.clinicName.$dirty && form.clinicName.$invalid">
+                        <p class="help-block"
+                               ng-show="form.clinicName.$error.required">
+                            First Name is required.
+                        </p>
+                        <p class="help-block"
+                               ng-show="form.clinicName.$error.minlength" >
+                            First Name is required to be at least 5 character.
+                        </p>
+                        <p class="help-block"
+                               ng-show="form.clinicName.$error.maxlength" >
+                            First Name cannot be longer than 50 characters.
+                        </p>
+
+  </div>
+  
   <div class="col-md-16 indent-form-top">
     <div class="col-md-6">
       <label for="exampleInputEmail1">Satellite Clinic *</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="clinic.satelliteName">
+      <input type="text" class="form-control" name="satellite" id="exampleInputEmail1" ng-model="clinic.satelliteName" minlength=5 ng-maxlength=50 required>
     </div>
   </div>
+  
+  <div ng-show="form.satellite.$dirty && form.satellite.$invalid">
+                        <p class="help-block"
+                               ng-show="form.satellite.$error.required">
+                            First Name is required.
+                        </p>
+                        <p class="help-block"
+                               ng-show="form.satellite.$error.minlength" >
+                            First Name is required to be at least 5 character.
+                        </p>
+                        <p class="help-block"
+                               ng-show="form.satellite.$error.maxlength" >
+                            First Name cannot be longer than 50 characters.
+                        </p>
+
+  </div>
+  
 
   <div class="col-md-16 indent-form-top">
     <div class="col-md-6">
@@ -77,7 +112,7 @@
       <label for="exampleInputEmail1">Fax Number</label>
     </div>
     <div class="col-md-10">
-      <input type="email" class="form-control" id="exampleInputEmail1" ng-model="clinic.faxNumber">
+      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="clinic.faxNumber">
     </div>
   </div>
 
@@ -94,7 +129,15 @@
     </div>
   </div>
 
-  <div class="col-md-16 dashboard-page__form--new_form-submit">
-    <button type="submit" class="dashboard-page__form--new_form-submit--button">Submit</button>
+  <div class="col-md-16 dashboard-page__form--new_form-submit" ng-show="isCreate">
+    <button type="submit" ng-disabled="form.$invalid" class="dashboard-page__form--new_form-submit--button">Submit</button>
+  </div>
+  
+   <div class="col-md-16 dashboard-page__form--new_form-submit">
+    <div class="col-md-6"></div>
+    <div class="col-md-10" ng-show="!isCreate">
+      <button type="button" class="dashboard-page__form--new_form-submit--button" ng-click="deleteClinic()">Disassociate</button>
+      <button type="button" class="dashboard-page__form--new_form-submit--button">Edit</button>
+    </div>
   </div>
 </form>

@@ -2,11 +2,17 @@
 
 angular.module('hillromvestApp')
     .controller('ClinicsController', function ($rootScope, $scope, $state, $timeout, Auth) {
-    	$scope.clinic = {};
-
+    $scope.clinic = {};
+    $scope.isCreate = true;
+    $scope.isClinicCreated = false;
+    $scope.isClinicDeleted = false;
     $scope.selectedClinic = function(clinic) {
-      console.info(clinic, 'controller');
+    	$scope.isCreate = false;
+    	$scope.isClinicCreated = false;
+    	$scope.isClinicDeleted = false;
       $scope.clinic = clinic;
     };
 
     });
+
+

@@ -9,11 +9,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.boon.json.annotations.JsonProperty;
@@ -29,21 +30,31 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name = "USER")
+@Inheritance(strategy = InheritanceType.JOINED)
 @SQLDelete(sql="UPDATE USER SET is_deleted = 1 WHERE id = ?")
 public class User extends AbstractAuditingEntity implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    @GeneratedValue
     private Long id;
 
     @JsonIgnore
     @Size(min = 60, max = 60)
     @Column(length = 60)
     private String password;
+    
+    @Size(max = 50)
+    @Column(name = "title", length = 50)
+    private String title;
 
     @Size(max = 50)
     @Column(name = "first_name", length = 50)
     private String firstName;
+    
+    @Size(max = 50)
+    @Column(name = "middle_name", length = 50)
+    private String middleName;
 
     @Size(max = 50)
     @Column(name = "last_name", length = 50)
@@ -113,6 +124,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
     public void setPassword(String password) {
         this.password = password;
     }
+    
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -120,6 +139,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
+    }
+    
+    public String getMiddleName() {
+        return middleName;
+    }
+
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
     }
 
     public String getLastName() {
@@ -206,8 +233,8 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		return deleted;
 	}
 
-	public void setDeleted(boolean isDeleted) {
-		this.deleted = isDeleted;
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 
 	@Override
@@ -237,7 +264,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
     public String toString() {
         return "User{" +
                 " password='" + password + '\'' +
+                ", title='" + title + '\'' +
                 ", firstName='" + firstName + '\'' +
+                ", middleName='" + middleName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", activated='" + activated + '\'' +

@@ -1,0 +1,21 @@
+{
+    "hillromvestApp": {
+        "userExtension" : {
+            "home": {
+                "title": "UserExtensions",
+                "createLabel": "Créer un nouveau UserExtension",
+                "createOrEditLabel": "Créer ou éditer un UserExtension"
+            },
+            "delete": {
+                "question": "Etes-vous certain de vouloir supprimer le UserExtension {{ id }} ?"
+            },
+            "detail": {
+                "title": "UserExtension"
+            },
+            "speciality": "Speciality",
+            "credentials": "Credentials",
+            "user": "user"
+        }
+    }
+}
+

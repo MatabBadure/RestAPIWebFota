@@ -51,7 +51,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "last_name", length = 50)
     private String lastName;
 
-    @Email
     @Size(max = 100)
     @Column(length = 100, unique = true)
     private String email;
@@ -94,6 +93,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
     
     @Column(name="is_deleted", nullable = false)
     private boolean isDeleted = false;
+    
+    @Column(name="last_loggedin_at")
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime lastLoggedInAt;
     
     public Long getId() {
         return id;
@@ -164,7 +167,15 @@ public class User extends AbstractAuditingEntity implements Serializable {
        return resetDate;
     }
 
-    public void setResetDate(DateTime resetDate) {
+    public DateTime getLastLoggedInAt() {
+		return lastLoggedInAt;
+	}
+
+	public void setLastLoggedInAt(DateTime lastLoggedInAt) {
+		this.lastLoggedInAt = lastLoggedInAt;
+	}
+
+	public void setResetDate(DateTime resetDate) {
        this.resetDate = resetDate;
     }
 

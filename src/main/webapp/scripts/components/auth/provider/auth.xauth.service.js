@@ -13,9 +13,8 @@ angular.module('hillromvestApp')
                         "Content-Type": "application/json",
                         "Accept": "application/json"
                     }
-                }).success(function (response) {
-                    localStorageService.set('token', response);
-                    return response;
+                }).success(function (data, status, headers, config) {
+                    return {'response': data, 'status': status, 'headers' : headers, 'config' : config};
                 });
             },
             logout: function() {
@@ -31,31 +30,29 @@ angular.module('hillromvestApp')
             },
 
             submitPassword: function (data) {
-                return $http.post('api/', data, {
+                return $http.put('api/account/update_emailpassword', data, {
                     headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json"
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'x-auth-token': localStorage.getItem('token')
                     }
-                }).success(function (response) {
-                    localStorageService.set('token', response);
-                    return response;
+                }).success(function (data, status, headers, config) {
+                    return {'response' : data, 'status' : status, 'headers' : headers, 'config' : config};
+                }).error(function (data, status, headers, config) {
+
                 });
             },
 
             /*Temp Service Call From angular*/
             captcha: function (captchaData){
                 var data = {
-                    'secret': '6LfwMAkTAAAAAHnNpBlH7fEixBPQBqLffYfArQ0E',
                     'response': captchaData
                 };
 
-                // return $http.post('https://www.google.com/recaptcha/api/siteverify', data).
-                //   success(function(data, status, headers, config) {
-                //     console.log(data);
-                //   }).
-                //   error(function(data, status, headers, config) {
-                //     console.log(data , status, headers, config);
-                //   });
+                 return $http.post('/api/recaptcha', data).
+                   success(function(response) {
+                	   return response;
+                   });
             }
         };
     });

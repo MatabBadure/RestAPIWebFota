@@ -1,5 +1,23 @@
 package com.hillrom.vest.service;
 
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
@@ -10,21 +28,8 @@ import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.HillromTeamUserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
-
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.inject.Inject;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import com.hillrom.vest.domain.PatientInfo;
+import com.hillrom.vest.security.AuthoritiesConstants;
 
 /**
  * Service class for managing users.
@@ -46,6 +51,9 @@ public class UserService {
 
     @Inject
     private AuthorityRepository authorityRepository;
+    
+    @Inject
+    private PatientInfoService patientInfoService;
 
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
@@ -200,6 +208,93 @@ public class UserService {
 		userExtensionRepository.save(newUser);
 		log.debug("Created Information for User: {}", newUser);
 		return newUser;
+	}
+
+    public Optional<User> findOneByEmail(String email) {
+		return userRepository.findOneByEmail(email);
+	}
+
+	public User createUserFromPatientInfo(PatientInfo patientInfo,String encodedPassword) {
+
+		String username = getUsernameAsEmailOrHillromIdFromPatientInfo(patientInfo);
+
+		// If User exists already , then return the existing user.
+		Optional<User> existingUser = userRepository.findOneByEmail(username);
+		if(existingUser.isPresent()){
+			return existingUser.get();
+		}
+		
+		User newUser = new User();
+		newUser.setActivated(true);
+		newUser.setDeleted(false);
+		
+		Authority patientAuthority = authorityRepository.findOne(AuthoritiesConstants.PATIENT);
+		newUser.getAuthorities().add(patientAuthority);
+		
+		newUser.setCreatedDate(new DateTime());
+		
+		newUser.setEmail(username.toLowerCase());
+		newUser.setFirstName(patientInfo.getFirstName());
+		newUser.setLastName(patientInfo.getLastName());
+		newUser.setPassword(encodedPassword);
+		newUser.getPatients().add(patientInfo);
+		
+		User persistedUser = userRepository.save(newUser);
+		newUser.setId(persistedUser.getId());
+		// Update WebLoginCreated to be true  and user patient association
+		updateWebLoginStatusAndUserPatientAssoc(patientInfo, persistedUser);
+		return newUser;
+		
+	}
+
+	/**
+	 * @param patientInfo
+	 * @return
+	 */
+	private String getUsernameAsEmailOrHillromIdFromPatientInfo(
+			PatientInfo patientInfo) {
+		// Set the email to hillromId if email is blank
+		String username = null;
+		if(StringUtils.isNotBlank(patientInfo.getEmail())){
+			username = patientInfo.getEmail();
+		}else{
+			username = patientInfo.getHillromId();
+		}
+		return username;
+	}	
+
+	/**
+	 * @param patientInfo
+	 * @param persistedUser
+	 */
+	private void updateWebLoginStatusAndUserPatientAssoc(
+			PatientInfo patientInfo, User persistedUser) {
+		patientInfoService.findOneByHillromId(patientInfo.getHillromId()).map(patientUser ->{
+			patientUser.setWebLoginCreated(true);
+			patientUser.getUsers().add(persistedUser);
+			patientInfoService.update(patientUser);
+			return patientUser;
+		});
+	}
+	
+	public void updateEmailOrPassword(Map<String,String> params){
+		String email = params.get("email");
+		userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).ifPresent(u-> {
+			if(null != email)
+				u.setEmail(email);
+			String password = params.get("password");
+            String encryptedPassword = passwordEncoder.encode(password);
+            u.setPassword(encryptedPassword);
+            u.setLastLoggedInAt(DateTime.now());
+            userRepository.save(u);
+            // update email in patientInfo
+            if(null != email){
+            	PatientInfo patientInfo = patientInfoService.findOneByHillromId(SecurityUtils.getCurrentLogin()).get();
+            	patientInfo.setEmail(email);
+            	patientInfoService.update(patientInfo);
+            }
+            log.debug("updateEmailOrPassword for User: {}", u);
+        });
 	}
 }
 

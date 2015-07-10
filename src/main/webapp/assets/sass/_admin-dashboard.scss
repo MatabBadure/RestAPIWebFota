@@ -13,9 +13,12 @@
   	&--nav{
   		height: 100%;
 	  	&_dashboard{
+	  		border-bottom: 1px solid #fafafa;
 	  		background-color: #727272;
 			  padding: 10px;
 			  margin-bottom: 0px;
+			  line-height: 2.5;
+  			color: #FAFAFA;
 	  	}
 	  	&_nav-list{
 	  		height: 90%;
@@ -209,7 +212,7 @@
 				margin-top: 50px;
 				background-color: #FAFAFA;
 				max-height: 280px;
-			  overflow-y: scroll;
+			  overflow-y: auto;
 			  overflow-x: hidden;
 				&--details{
 					cursor: pointer;

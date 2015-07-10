@@ -29,6 +29,7 @@
             <column name="last_name" type="varchar(255)"/>
             <column name="dob" type="date"/>
             <column name="email" type="varchar(255)"/>
+			<column name="zipcode" type="varchar(10)"/>
             <column name="web_login_created" type="bit"/>
             <column name="is_deleted" type="bit"/>
         </createTable>

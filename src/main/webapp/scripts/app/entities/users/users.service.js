@@ -15,7 +15,6 @@ angular.module('hillromvestApp')
         });
       },
       deleteUser : function(id){
-        console.log('URL: api/hillromteamuser/'+id);
         id=16;
         return $http.delete('api/hillromteamuser/'+id, {
           headers: {

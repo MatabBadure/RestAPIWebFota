@@ -30,128 +30,112 @@ angular.module('hillromvestApp')
               'lastName': 'Smith',
               'middleName':'MiddleName',
               'email':'email',
-              'role':'role',
-              'role': 'Super Admin'
+              'role':{'key': 'SUPER_ADMIN', 'value': 'Super Admin'}
             }, {
               'title':'Mr.',
               'firstName': 'James',
               'lastName': 'Williams',
               'middleName':'MiddleName',
               'email':'email',
-              'role':'role',
-              'role': 'Account Service'
+              'role':{'key': 'ACCT_SERVICES', 'value': 'Account Service'}
             }, {
               'title':'Mr.',
               'firstName': 'David',
               'lastName': 'Jones',
               'middleName':'MiddleName',
               'email':'email',
-              'role':'role',
-              'role': 'Associates'
+              'role':{'key': 'ASSOCIATES', 'value': 'Associates'}
             }, {
               'title':'Mr.',
               'firstName': 'William',
               'lastName': 'Davis',
               'middleName':'MiddleName',
               'email':'email',
-              'role':'role',
-              'role': 'Super Admin'
+              'role':{'key': 'CLINIC_ADMIN', 'value': 'Clinic Admin'}
             }, {
               'title':'Mr.',
               'firstName': 'Joseph',
               'lastName': 'Taylor',
               'middleName':'MiddleName',
               'email':'email',
-              'role':'role',
-              'role': 'Associates'
+              'role':{'key': 'ACCT_SERVICES', 'value': 'Acct Services'}
             }, {
               'title':'Mr.',
               'firstName': 'William',
               'lastName': 'Davis',
               'middleName':'MiddleName',
               'email':'email',
-              'role':'role',
-              'role': 'Account Services'
+              'role':{'key': 'SUPER_ADMIN', 'value': 'Super Admin'}
             }, {
               'title':'Mr.',
               'firstName': 'William',
               'lastName': 'Davis',
               'middleName':'MiddleName',
               'email':'email',
-              'role':'role',
-              'role': 'Account Services'
+              'role':{'key': 'SUPER_ADMIN', 'value': 'Super Admin'}
             }, {
               'title':'Mr.',
               'firstName': 'William',
               'lastName': 'Davis',
               'middleName':'MiddleName',
               'email':'email',
-              'role':'role',
-              'role': 'Account Services'
+              'role':{'key': 'SUPER_ADMIN', 'value': 'Super Admin'}
             }, {
               'title':'Mr.',
               'firstName': 'William',
               'lastName': 'Davis',
               'middleName':'MiddleName',
               'email':'email',
-              'role':'role',
-              'role': 'Account Services'
+              'role':{'key': 'SUPER_ADMIN', 'value': 'Super Admin'}
             }, {
               'title':'Mr.',
               'firstName': 'William',
               'lastName': 'Davis',
               'middleName':'MiddleName',
               'email':'email',
-              'role':'role',
-              'role': 'Account Services'
+              'role':{'key': 'SUPER_ADMIN', 'value': 'Super Admin'}
             }, {
               'title':'Mr.',
               'firstName': 'William',
               'lastName': 'Davis',
               'middleName':'MiddleName',
               'email':'email',
-              'role':'role',
-              'role': 'Account Services'
+              'role':{'key': 'SUPER_ADMIN', 'value': 'Super Admin'}
             }, {
               'title':'Mr.',
               'firstName': 'William',
               'lastName': 'Davis',
               'middleName':'MiddleName',
               'email':'email',
-              'role':'role',
-              'role': 'Account Services'
+              'role':{'key': 'SUPER_ADMIN', 'value': 'Super Admin'}
             }, {
               'title':'Mr.',
               'firstName': 'William',
               'lastName': 'Davis',
               'middleName':'MiddleName',
               'email':'email',
-              'role':'role',
-              'role': 'Account Services'
+              'role':{'key': 'SUPER_ADMIN', 'value': 'Super Admin'}
             }, {
               'title':'Mr.',
               'firstName': 'William',
               'lastName': 'Davis',
               'middleName':'MiddleName',
               'email':'email',
-              'role':'role',
-              'role': 'Account Services'
+              'role':{'key': 'SUPER_ADMIN', 'value': 'Super Admin'}
             }, {
               'title':'Mr.',
               'firstName': 'William',
               'lastName': 'Davis',
               'middleName':'MiddleName',
               'email':'email',
-              'role':'role',
-              'role': 'Account Services'
+              'role':{'key': 'SUPER_ADMIN', 'value': 'Super Admin'}
             }, {
               'title':'Mr.',
               'firstName': 'William',
               'lastName': 'Davis',
               'middleName':'MiddleName',
               'email':'email',
-              'role':'role',
-              'role': 'Account Services'
+              'role':{'key': 'SUPER_ADMIN', 'value': 'Super Admin'}
             }];
         };
       }

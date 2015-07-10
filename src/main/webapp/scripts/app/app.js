@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp', ['LocalStorageModule', 'tmh.dynamicLocale', 'pascalprecht.translate',
-    'ngResource', 'ui.router', 'ngCookies', 'ngCacheBuster', 'infinite-scroll', 'reCAPTCHA','vcRecaptcha'])
+    'ngResource', 'ui.router', 'ngCookies', 'ngCacheBuster', 'infinite-scroll', 'vcRecaptcha'])
 
     .run(function ($rootScope, $location, $window, $http, $state, $translate, Language, Auth, Principal, ENV, VERSION) {
         $rootScope.ENV = ENV;

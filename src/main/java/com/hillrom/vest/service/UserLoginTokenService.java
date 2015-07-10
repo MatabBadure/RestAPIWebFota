@@ -17,6 +17,7 @@ public class UserLoginTokenService {
 	@Inject
 	private UserLoginTokenRepository tokenRepository;
 	
+	@Inject
 	private TokenProvider tokenProvider;
 	
 	public UserLoginToken findOneById(String id){
@@ -32,6 +33,8 @@ public class UserLoginTokenService {
 		if(null == securityToken){
 			return false;
 		}else{
+			DateTime tokenCreatedAt = securityToken.getCreatedTime();
+			System.out.println("tokenCreatedAt : "+tokenCreatedAt);
 			long expiryTimeInMillis = securityToken.getCreatedTime().plus(1000 * tokenProvider.getTokenValidity()).getMillis();
 			boolean flag = System.currentTimeMillis() <= expiryTimeInMillis ;
 			securityToken.setCreatedTime(DateTime.now());

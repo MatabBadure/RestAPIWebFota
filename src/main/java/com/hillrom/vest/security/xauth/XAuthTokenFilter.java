@@ -43,7 +43,7 @@ public class XAuthTokenFilter extends GenericFilterBean {
             if (StringUtils.hasText(authToken)) {
                 String username = authToken != null && authToken.contains("#")? authToken.split("#")[0]: null;
                 UserDetails details = this.detailsService.loadUserByUsername(username);
-                if(this.authTokenService.validateToken(authToken)){
+                if(authTokenService.validateToken(authToken)){
                     UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(details, details.getPassword(), details.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(token);
                 }

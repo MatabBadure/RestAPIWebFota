@@ -1,0 +1,30 @@
+<div class="col-md-16 dashboard-page__user-list__detailed">
+	<div class="dashboard-page__user-list__detailed--list-type">Recently Created Clinics</div>
+	<div class="dashboard-page__user-list__detailed__list-form indent-form-top">
+		<div class="col-md-12 dashboard-page__user-list__detailed__list-form--input-wrapper">
+			<i class="glyphicon glyphicon-search"></i>
+			<input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" ng-model-options="{ debounce: 1000 }" ng-keyup="searchClinics()" autocomplete="off">
+		</div>
+		<div class="col-md-4 dashboard-page__user-list__detailed__list-form--sort-list">
+			<div class="sort-link" ng-click="sortList()">
+				<span class="sort-link--text">Sort</span><span class="glyphicon glyphicon-sort class="sort-link--text""></span>
+			</div>
+
+		</div>
+	</div>
+	<div class="dashboard-page__user-list__detailed__list">
+		<div ng-repeat="clinic in clinics | filter:searchItem">
+		    <div ng-click="selectClinic(clinic)" class="dashboard-page__user-list__detailed__list--details" >
+			    <span class="user-detail">
+			    	{{clinic.clinicName}}
+			    </span>
+			    <span class="user-role">
+			    	{{clinic.city}}
+			    </span>
+		    </div>
+	  	</div>
+	</div>
+	<div class="dashboard-page__user-list__detailed__more-link" ng-if="clinics.length>0">
+  	<span>More</span><span>&gt;&gt;</span>
+  </div>
+</div>

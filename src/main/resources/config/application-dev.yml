@@ -37,7 +37,8 @@ spring:
     thymeleaf:
         mode: XHTML
         cache: false
-
+    recaptcha:
+        recaptchaPrivateKey: 6LcXjQkTAAAAACiA7rx7o7wlifQ7n3VQ_It-sncc
 metrics:
     jmx.enabled: true
     spark:

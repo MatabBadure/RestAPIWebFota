@@ -145,7 +145,7 @@ angular.module('hillromvestApp')
                     deferred.resolve(data);
                     return cb(data);
                 }).catch(function (err) {
-                    this.logout();
+                    //this.logout();
                     deferred.reject(err);
                     return cb(err);
                 }.bind(this));

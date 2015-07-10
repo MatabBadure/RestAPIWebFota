@@ -20,8 +20,8 @@
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
         <!-- <div ng-show="{{ENV === 'dev'}}" class="development" ng-cloak=""></div> -->
-        <div ui-view="navbar" ng-cloak=""></div>
         <div class="container container-top-indent">
+            <div ui-view="navbar" ng-cloak=""></div>
             <div class="well content-body" ui-view="content"></div>
 
             <div class="footer text-center indent-top-15">
@@ -69,6 +69,8 @@
         <script src="bower_components/angular-cache-buster/angular-cache-buster.js"></script>
         <script src="bower_components/ngInfiniteScroll/build/ng-infinite-scroll.js"></script>
         <script src="bower_components/angular-re-captcha/angular-re-captcha.js"></script>
+        <script src="bower_components/angular-recaptcha/release/angular-recaptcha.js"></script>
+        <script src="bower_components/bootstrap-sass-datepicker/js/bootstrap-sass-datepicker.js"></script>
         <!-- endbower -->
         <!-- endbuild -->
 
@@ -134,7 +136,7 @@
     <script src="scripts/components/language/language.service.js"></script>
     <script src="scripts/components/language/language.controller.js"></script>
     <script src="scripts/components/auth/provider/auth.xauth.service.js"></script>
-
+	<script src="https://www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit" async defer></script>
 
     <script src="scripts/app/entities/patientVestDeviceRawLog/patientVestDeviceRawLog.js"></script>
     <script src="scripts/app/entities/patientVestDeviceRawLog/patientVestDeviceRawLog.controller.js"></script>
@@ -151,20 +153,24 @@
 
     <script src="scripts/app/entities/patients/patients.js"></script>
     <script src="scripts/app/entities/patients/patients.controller.js"></script>
-    <script src="scripts/app/entities/patients/new/patientdirective.js"></script>
-    <script src="scripts/app/entities/patients/list/patientlistdirective.js"></script>
+    <script src="scripts/components/entities/patients/new/patientdirective.js"></script>
+    <script src="scripts/components/entities/patients/list/patientlistdirective.js"></script>
 
     <script src="scripts/app/entities/clinics/clinics.js"></script>
     <script src="scripts/app/entities/clinics/clinics.controller.js"></script>
-    <script src="scripts/app/entities/clinics/new/clinicdirective.js"></script>
+    <script src="scripts/components/entities/clinics/new/clinicdirective.js"></script>
+    <script src="scripts/components/entities/clinics/list/cliniclistdirective.js"></script>
 
     <script src="scripts/app/entities/doctors/doctors.js"></script>
     <script src="scripts/app/entities/doctors/doctors.controller.js"></script>
-    <script src="scripts/app/entities/doctors/new/doctordirective.js"></script>
+    <script src="scripts/components/entities/doctors/new/doctordirective.js"></script>
+    <script src="scripts/components/entities/doctors/list/doctorslistdirective.js"></script>
 
     <script src="scripts/app/entities/users/users.js"></script>
     <script src="scripts/app/entities/users/users.controller.js"></script>
-    <script src="scripts/app/entities/users/new/userdirective.js"></script>
+    <script src="scripts/app/entities/users/users.service.js"></script>
+    <script src="scripts/components/entities/users/new/userdirective.js"></script>
+    <script src="scripts/components/entities/users/list/userslistdirective.js"></script>
 
     <script src="scripts/app/navbar/nav-bar.js"></script>
     <!-- endbuild -->

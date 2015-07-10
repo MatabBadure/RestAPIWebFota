@@ -135,8 +135,12 @@ public class HillromTeamUserResource {
     public ResponseEntity<JSONObject> delete(@PathVariable Long id) {
         log.debug("REST request to delete HillromTeamUser : {}", id);
         JSONObject jsonObject = new JSONObject();
-        userRepository.delete(id);
-        jsonObject.put("message", "User deleted successfully.");
-        return ResponseEntity.ok().body(jsonObject);
+        jsonObject.put("message", "No such user exists.");
+        return Optional.ofNullable(userRepository.findOne(id))
+                .map(user -> {
+                	userRepository.delete(user);
+                    jsonObject.put("message", "User deleted successfully.");
+                    return ResponseEntity.ok().body(jsonObject);
+                }).orElse(new ResponseEntity<JSONObject>(jsonObject, HttpStatus.NOT_FOUND));
     }
 }

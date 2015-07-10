@@ -1,8 +1,13 @@
-<div>
-  <div class="col-md-4">
-    <nav-bar></nav-bar>
-  </div>
-  <div class="col-md-8">
-    <doctor></doctor>
-  </div>
+<div class="col-md-16 dashboard-page">
+	<div class="col-md-4 dashboard-page__admin-nav">
+		<nav-bar></nav-bar>
+	</div>
+
+	<div class="col-md-6 dashboard-page__form margin-top-15">
+		<doctor doctor-data="doctor"></doctor>
+	</div>
+	
+	<div class="col-md-6 dashboard-page__user-list">
+		<doctor-list on-select="selectedDoctor(doctor)"></doctor-list>
+	</div>
 </div>

@@ -1,0 +1,100 @@
+<form class="dashboard-page__form--new" ng-submit="createClinic()">
+  <div class="dashboard-page__form--new_user-type">Create Clinic</div>
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Clinic Name *</label>
+    </div>
+    <div class="col-md-10">
+      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="clinic.clinicName">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Satellite Clinic *</label>
+    </div>
+    <div class="col-md-10">
+      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="clinic.satelliteName">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1"></label>
+    </div>
+    <div class="col-md-10 dashboard-page__form--new_checkbox">
+      <input class="float-left" type="checkbox" value=""><span class="float-left">Add Another Clinic</span>
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Address</label>
+    </div>
+    <div class="col-md-10">
+      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="clinic.address">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Zip Code</label>
+    </div>
+    <div class="col-md-10">
+      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="clinic.zip">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">City</label>
+    </div>
+    <div class="col-md-10">
+      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="clinic.city">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">State</label>
+    </div>
+    <div class="col-md-10 dashboard-page__form--new_calendar">
+      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="clinic.state">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Phone Number</label>
+    </div>
+    <div class="col-md-10">
+      <input type="text" class="form-control age" id="exampleInputEmail1" ng-model="clinic.phoneNumber">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Fax Number</label>
+    </div>
+    <div class="col-md-10">
+      <input type="email" class="form-control" id="exampleInputEmail1" ng-model="clinic.faxNumber">
+    </div>
+  </div>
+
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Clinic Admin</label>
+    </div>
+    <div class="col-md-10 dashboard-page__form--new_select-box">
+      <select class="form-control" ng-model="clinic.admin">
+        <option>Manipal</option>
+        <option>Fortis</option>
+        <option>Appolo</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="col-md-16 dashboard-page__form--new_form-submit">
+    <button type="submit" class="dashboard-page__form--new_form-submit--button">Submit</button>
+  </div>
+</form>

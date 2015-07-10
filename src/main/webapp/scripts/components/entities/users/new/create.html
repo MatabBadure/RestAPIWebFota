@@ -1,0 +1,69 @@
+<form class="dashboard-page__form--new" ng-submit="createUser()">
+  <div class="dashboard-page__form--new_user-type">Create User</div>
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Title</label>
+    </div>
+    <div class="col-md-10">
+      <select class="form-control dashboard-page__form--new_user-title" ng-model="user.title">
+        <option value="Mr.">Mr.</option>
+        <option value="Mrs.">Mrs.</option>
+        <option value="Miss">Miss</option>
+      </select>
+    </div>
+  </div>
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">First Name*</label>
+    </div>
+    <div class="col-md-10">
+      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="user.firstName">
+    </div>
+  </div>
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Middle Name</label>
+    </div>
+    <div class="col-md-10">
+      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="user.middleName">
+    </div>
+  </div>
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Last Name*</label>
+    </div>
+    <div class="col-md-10">
+      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="user.lastName">
+    </div>
+  </div>
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Email</label>
+    </div>
+    <div class="col-md-10">
+      <input type="email" class="form-control" id="exampleInputEmail1" ng-model="user.email">
+    </div>
+  </div>
+  <div class="col-md-16 indent-form-top">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Select Role</label>
+    </div>
+    <div class="col-md-10 dashboard-page__form--new_select-box">
+      <select class="form-control" ng-model="user.role">
+        <option value="ADMIN">Super Admin</option>
+        <option value="ASSOCIATES"> Associates</option>
+        <option value="ACCT_SERVICES"> Acct Services</option>
+      </select>
+    </div>
+  </div>
+  <div class="col-md-16 dashboard-page__form--new_form-submit" ng-show="isCreate">
+    <button type="submit" class="dashboard-page__form--new_form-submit--button">Submit</button>
+  </div>
+  <div class="col-md-16 dashboard-page__form--new_form-submit">
+    <div class="col-md-6"></div>
+    <div class="col-md-10" ng-show="!isCreate">
+      <button type="button" class="dashboard-page__form--new_form-submit--button" ng-click="deleteUser()">Disassociate</button>
+      <button type="button" class="dashboard-page__form--new_form-submit--button">Edit</button>
+    </div>
+  </div>
+</form>

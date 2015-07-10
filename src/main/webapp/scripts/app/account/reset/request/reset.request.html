@@ -50,15 +50,29 @@
                             Your e-mail cannot be longer than 100 characters.
                         </p>
                     </div>
-                    
+
                 </div>
-                <div class="form-group" ng-show="showCaptcha">
+               		<!-- <div class="form-group" ng-show="showCaptcha">
+
                   		<div re-captcha ng-model="user.captcha"></div>
-                	</div>
-                <button class="btn btn-primary" ng-disabled="form.email.$invalid || ((user.captcha.response == '' || user.captcha.response == undefined) && showCaptcha )" translate="reset.request.form.button" ng-click="requestReset()">Register</button>
+                	</div> -->
+                	<p class="help-block"
+                           ng-show="captchaError">
+                            Please verify again you are not a robot.
+                    </p>
+                	<div  ng-show="showCaptcha">
+	                	 <div vc-recaptcha
+	                		theme="'light'"
+	                		key="siteKey"
+	                		on-create="setWidgetId(widgetId)"
+	                		on-success="setResponse(response)">
+	                	</div>
+
+            		</div>
+
+                <button class="btn btn-primary" ng-disabled="form.email.$invalid || (showCaptcha && response === null)" translate="reset.request.form.button" ng-click="requestReset()">Register</button>
                 <!-- <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" translate="reset.request.form.button">Register</button> -->
             </form>
         </div>
     </div>
 </div>
-

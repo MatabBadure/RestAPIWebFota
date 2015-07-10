@@ -1,8 +1,13 @@
-<div>
-  <div class="col-md-4">
-    <nav-bar></nav-bar>
-  </div>
-  <div class="col-md-8">
-    <clinic data="clinicData"></clinic>
-  </div>
+<div class="col-md-16 dashboard-page">
+	<div class="col-md-4 dashboard-page__admin-nav">
+		<nav-bar></nav-bar>
+	</div>
+
+	<div class="col-md-6 dashboard-page__form margin-top-15">
+		<clinic clinic-data="clinic"></clinic>
+	</div>
+	
+	<div class="col-md-6 dashboard-page__user-list">
+		<clinic-list on-select="selectedClinic(clinic)"></clinic-list>
+	</div>
 </div>

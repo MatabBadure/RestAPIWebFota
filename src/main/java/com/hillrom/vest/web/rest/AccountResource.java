@@ -1,7 +1,5 @@
 package com.hillrom.vest.web.rest;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,10 +17,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
@@ -31,8 +29,11 @@ import com.hillrom.vest.domain.User;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.MailService;
+import com.hillrom.vest.service.UserLoginTokenService;
 import com.hillrom.vest.service.UserService;
+import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.UserDTO;
+
 
 /**
  * REST controller for managing the current user's account.
@@ -51,6 +52,9 @@ public class AccountResource {
 
     @Inject
     private MailService mailService;
+    
+    @Inject
+    private UserLoginTokenService authTokenService;
 
     /**
      * POST  /register -> register the user.
@@ -200,5 +204,30 @@ public class AccountResource {
 
     private boolean checkPasswordLength(String password) {
       return (!StringUtils.isEmpty(password) && password.length() >= UserDTO.PASSWORD_MIN_LENGTH && password.length() <= UserDTO.PASSWORD_MAX_LENGTH);
+    }
+    
+    /**
+     * POST  /update_emailpassword -> changes the current user's email,password
+     */
+    @RequestMapping(value = "/account/update_emailpassword",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<JSONObject> updateEmailOrPassword(@RequestBody(required=true) Map<String,String> params,@RequestHeader(value="x-auth-token",required=true)String authToken) {
+    	String email = params.get("email");
+    	String password = params.get("password");
+    	JSONObject jsonObject = new JSONObject();
+        if (!checkPasswordLength(password)) {
+        	jsonObject.put("ERROR", "Incorrect password");
+            return ResponseEntity.badRequest().body(jsonObject);
+        }
+        User currentUser = userService.findOneByEmail(SecurityUtils.getCurrentLogin()).get();
+        if(!RandomUtil.isValidEmail(currentUser.getEmail()) && StringUtils.isBlank(email)){
+        	jsonObject.put("ERROR", "Email is required");
+        	return ResponseEntity.badRequest().body(jsonObject);
+        }
+        userService.updateEmailOrPassword(params);
+        authTokenService.deleteToken(authToken); // Token must be deleted to avoid subsequent request
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

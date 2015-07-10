@@ -18,7 +18,7 @@ angular.module('hillromvestApp')
             'firstName': $scope.user.firstName,
             'middleName': $scope.user.middleName,
             'lastName': $scope.user.lastName,
-            'role': 'ACCT_SERVICES',
+            'role': $scope.user.role,
             'email': $scope.user.email
           };
           User.createUser(data).then(function (data) {
@@ -29,10 +29,8 @@ angular.module('hillromvestApp')
         };
 
         $scope.deleteUser = function(){
-          console.log('Selected User: ', $scope.user);
           User.deleteUser($scope.user.id).then(function (data) {
             $scope.user = {};
-
           }).catch(function () {
             console.log('Giving Error');
           });

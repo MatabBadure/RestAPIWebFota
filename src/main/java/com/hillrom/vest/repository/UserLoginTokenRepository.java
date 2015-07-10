@@ -1,13 +1,12 @@
 package com.hillrom.vest.repository;
 
-import com.hillrom.vest.domain.UserLoginToken;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import com.hillrom.vest.domain.UserLoginToken;
 
 /**
  * Spring Data JPA repository for the UserLoginToken entity.
  */
-public interface UserLoginTokenRepository extends JpaRepository<UserLoginToken,Long> {
-
+public interface UserLoginTokenRepository extends JpaRepository<UserLoginToken,String> {
+	
 }

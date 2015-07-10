@@ -9,13 +9,11 @@ spring:
         active: dev
     datasource:
         dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
-        #url: jdbc:mysql://hillrom.ckyg8erbez54.us-west-2.rds.amazonaws.com:3306/hillromvest-dev
-        url: jdbc:mysql://127.0.0.1:3306/hillromvestlocal
+        url: jdbc:mysql://hillrom.ckyg8erbez54.us-west-2.rds.amazonaws.com:3306/hillromvest-dev
         databaseName:
         serverName:
         username: root
-        #password: hillrom123
-        password: sysadmin
+		password: hillrom123
         cachePrepStmts: true
         prepStmtCacheSize: 250
         prepStmtCacheSqlLimit: 2048

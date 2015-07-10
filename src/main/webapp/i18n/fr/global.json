@@ -9,6 +9,7 @@
                 "patientVestDeviceRawLog": "PatientVestDeviceRawLog",
                 "patientInfo": "PatientInfo",
                 "userLoginToken": "UserLoginToken",
+                "userExtension": "UserExtension",
                 "clinic": "Clinic",
                 "additionalEntity": "JHipster will add additional entities here (do not translate!)"
             },

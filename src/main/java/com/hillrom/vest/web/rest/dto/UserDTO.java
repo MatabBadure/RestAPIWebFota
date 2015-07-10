@@ -17,7 +17,13 @@ public class UserDTO {
     private String password;
 
     @Size(max = 50)
+    private String title;
+    
+    @Size(max = 50)
     private String firstName;
+    
+    @Size(max = 50)
+    private String middleName;
 
     @Size(max = 50)
     private String lastName;
@@ -34,17 +40,29 @@ public class UserDTO {
     public UserDTO() {
     }
 
-    public UserDTO(String password, String firstName, String lastName, String email, String langKey,
-                   List<String> roles) {
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.langKey = langKey;
-        this.roles = roles;
-    }
+    public UserDTO(String password, String title, String firstName,
+			String middleName, String lastName, String email, String langKey,
+			List<String> roles) {
+		super();
+		this.password = password;
+		this.title = title;
+		this.firstName = firstName;
+		this.middleName = middleName;
+		this.lastName = lastName;
+		this.email = email;
+		this.langKey = langKey;
+		this.roles = roles;
+	}
 
-    public String getPassword() {
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getPassword() {
         return password;
     }
 
@@ -52,7 +70,11 @@ public class UserDTO {
         return firstName;
     }
 
-    public String getLastName() {
+    public String getMiddleName() {
+		return middleName;
+	}
+
+	public String getLastName() {
         return lastName;
     }
 
@@ -72,7 +94,9 @@ public class UserDTO {
     public String toString() {
         return "UserDTO{" +
         "  password='" + password + '\'' +
+        ", title='" + title + '\'' +
         ", firstName='" + firstName + '\'' +
+        ", middleName='" + middleName + '\'' +
         ", lastName='" + lastName + '\'' +
         ", email='" + email + '\'' +
         ", langKey='" + langKey + '\'' +

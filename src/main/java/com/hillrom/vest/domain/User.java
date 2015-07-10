@@ -19,10 +19,8 @@ import javax.validation.constraints.Size;
 import org.boon.json.annotations.JsonProperty;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.Where;
 import org.hibernate.validator.constraints.Email;
 import org.joda.time.DateTime;
-import org.springframework.test.context.jdbc.Sql;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -92,7 +90,8 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private Set<PatientInfo> patients = new HashSet<>();
     
     @Column(name="is_deleted", nullable = false)
-    private boolean isDeleted = false;
+    @JsonIgnore
+    private boolean deleted = false;
     
     @Column(name="last_loggedin_at")
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
@@ -204,11 +203,11 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	}
 
 	public boolean isDeleted() {
-		return isDeleted;
+		return deleted;
 	}
 
 	public void setDeleted(boolean isDeleted) {
-		this.isDeleted = isDeleted;
+		this.deleted = isDeleted;
 	}
 
 	@Override

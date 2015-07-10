@@ -2,16 +2,18 @@ html{
 	height: 100%;
 }
 body{
-	height: 100%;
+	height: inherit;
 	color: #A7A7A7;
 }
 .container-top-indent{
-	margin-top: 50px;
 	height: inherit;
 }
 .content-body{
 	background-color: #EEEEEE;
-	height: 100%;
+	height: -o-calc(100% - 100px); /* opera */
+	height: -webkit-calc(100% - 100px); /* google, safari */
+	height: -moz-calc(100% - 100px);
+	margin-top: 50px;
 }
 .clr{
 	clear: both;

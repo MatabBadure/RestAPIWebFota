@@ -1,19 +1,19 @@
 <div class="login">
   <div class="col-md-16 login__container">
-    <div class="col-md-11 login__container--left-section">
-      <div class="login__container--left-section-description">
-        <div class="login__container--left-section-description_content">
+    <div class="col-md-11 login__container__left-section">
+      <div class="login__container__left-section--description">
+        <div class="login__container__left-section--description content">
           The Vest Airway Clearance System, Model 105, is a designed to assist patients in the mobilization of retained secretions that, if not removed, may lead to increased rates of respiratory infaction, hospitalization and reduced lung function.
         </div>
-        <div class="login__container--left-section-description_image">
+        <div class="login__container__left-section--description image">
           <img src="assets/images/heart.png">
         </div>
       </div>
     </div>
 
-    <div class="col-md-5 login__container--right-section">
+    <div class="col-md-5 login__container__right-section">
 
-        <div class="login__container--right-section-form" ng-show="showLogin">
+        <div class="login__container__right-section--form" ng-show="showLogin">
           <div class="text-center textUpperCase indent-bottom-5" translate="login.title">Login to your Account</div>
           <!-- <div class="alert alert-danger" ng-show="authenticationError" translate="login.messages.error.authentication">
                   <strong>Authentication failed!</strong> Please check your credentials and try again.
@@ -49,7 +49,7 @@
               </div> -->
         </div>
 
-        <div class="login__container--right-section-form" ng-show="isFirstLogin">
+        <div class="login__container__right-section--form" ng-show="isFirstLogin">
           <form class="form" role="form" ng-submit="submitPassword($event)">
             <div class="form-group" ng-show="!isEmailExist">
               <label for="Email ID" translate="global.form.email">E-Mail</label>
@@ -63,7 +63,7 @@
               <label for="Confirm Password" > Confirm Password</label>
               <input type="password" class="form-control" id="" placeholder="confirm password" ng-model="user.confirmPassword">
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="login-button center-block">Submit</button>
           </form>
         </div>
     </div>

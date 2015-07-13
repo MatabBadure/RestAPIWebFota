@@ -13,9 +13,8 @@ angular.module('hillromvestApp')
                         "Content-Type": "application/json",
                         "Accept": "application/json"
                     }
-                }).success(function (response) {
-                    localStorageService.set('token', response);
-                    return response;
+                }).success(function (data, status, headers, config) {
+                    return {'response': data, 'status': status, 'headers' : headers, 'config' : config};
                 });
             },
             logout: function() {
@@ -31,14 +30,16 @@ angular.module('hillromvestApp')
             },
 
             submitPassword: function (data) {
-                return $http.post('api/', data, {
+                return $http.put('api/account/update_emailpassword', data, {
                     headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json"
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'x-auth-token': localStorage.getItem('token')
                     }
-                }).success(function (response) {
-                    localStorageService.set('token', response);
-                    return response;
+                }).success(function (data, status, headers, config) {
+                    return {'response' : data, 'status' : status, 'headers' : headers, 'config' : config};
+                }).error(function (data, status, headers, config) {
+
                 });
             },
 
@@ -47,11 +48,10 @@ angular.module('hillromvestApp')
                 var data = {
                     'response': captchaData
                 };
-
-                 return $http.post('/api/recaptcha', data).
+                return $http.post('/api/recaptcha', data).
                    success(function(response) {
-                	   return response;
-                   });
+                   return response;
+               });
             }
         };
     });

@@ -1,17 +1,17 @@
 <div class="login">
   <div class="col-md-16 login__container">
-    <div class="col-md-12 login__container--left-section">
+    <div class="col-md-11 login__container--left-section">
       <div class="login__container--left-section-description">
         <div class="login__container--left-section-description_content">
           The Vest Airway Clearance System, Model 105, is a designed to assist patients in the mobilization of retained secretions that, if not removed, may lead to increased rates of respiratory infaction, hospitalization and reduced lung function.
         </div>
         <div class="login__container--left-section-description_image">
-          <img src="assets/images/heart.jpeg">
+          <img src="assets/images/heart.png">
         </div>
       </div>
     </div>
 
-    <div class="col-md-4 login__container--right-section">
+    <div class="col-md-5 login__container--right-section">
 
         <div class="login__container--right-section-form" ng-show="showLogin">
           <div class="text-center textUpperCase indent-bottom-5" translate="login.title">Login to your Account</div>
@@ -27,8 +27,14 @@
               <!-- <label for="password" translate="login.form.password">Password</label> -->
               <input type="password" class="form-control" id="password" placeholder="{{'login.form.password.placeholder' | translate}}" ng-model="password">
             </div>
-            <div class="form-group" ng-show="showCpatcha">
-              <!-- <div re-captcha ng-model="user.captcha"></div> -->
+            <p class="help-block" ng-show="captchaError">Please verify again you are not a robot.</p>
+            <div class="form-group" ng-show="showCaptcha">
+              <div vc-recaptcha
+                theme="'light'"
+                key="siteKey"
+                on-create="setWidgetId(widgetId)"
+                on-success="setResponse(response)">
+              </div>
             </div>
             <button class="login-button center-block" translate="login.form.button" ng-click="login($event)">Authenticate</button>
             <!-- <button type="submit" class="login-button center-block" translate="login.form.button">Authenticate</button> -->

@@ -1,13 +1,12 @@
 package com.hillrom.vest.repository;
 
-import com.hillrom.vest.domain.User;
+import java.util.List;
+import java.util.Optional;
 
 import org.joda.time.DateTime;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
-import java.util.Optional;
+import com.hillrom.vest.domain.User;
 
 /**
  * Spring Data JPA repository for the User entity.

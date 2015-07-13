@@ -1,30 +1,30 @@
 package com.hillrom.vest.config;
 
-import com.hillrom.vest.security.*;
-import com.hillrom.vest.security.xauth.*;
+import javax.inject.Inject;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import org.springframework.data.repository.query.spi.EvaluationContextExtension;
-import org.springframework.data.repository.query.spi.EvaluationContextExtensionSupport;
-import org.springframework.security.access.expression.SecurityExpressionRoot;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
 
-
-import javax.inject.Inject;
+import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.security.Http401UnauthorizedEntryPoint;
+import com.hillrom.vest.security.RestExceptionTranslationFilter;
+import com.hillrom.vest.security.xauth.XAuthTokenConfigurer;
+import com.hillrom.vest.service.PatientInfoService;
+import com.hillrom.vest.service.UserLoginTokenService;
+import com.hillrom.vest.service.UserService;
 
 @Configuration
 @EnableWebSecurity
@@ -38,18 +38,26 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private UserDetailsService userDetailsService;
 
     @Inject
-    private TokenProvider tokenProvider;
+    private UserLoginTokenService authTokenService;
+    
+    @Inject
+    private PatientInfoService patientInfoService;
 
+    @Inject
+    private UserService userService;
+    
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    public AuthenticationProvider getAuthenticationProvider(){
+    	return new com.hillrom.vest.security.AuthenticationProvider(userDetailsService,passwordEncoder(),patientInfoService,userService);
+    }
+    
     @Inject
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-            .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder());
+        auth.authenticationProvider(getAuthenticationProvider());
     }
 
     @Override
@@ -106,11 +114,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     private XAuthTokenConfigurer securityConfigurerAdapter() {
-      return new XAuthTokenConfigurer(userDetailsService, tokenProvider);
+      return new XAuthTokenConfigurer(userDetailsService, authTokenService);
     }
 
     @Bean
     public SecurityEvaluationContextExtension securityEvaluationContextExtension() {
         return new SecurityEvaluationContextExtension();
+    }
+    
+    @Bean
+    public ExceptionTranslationFilter exceptionTranslationFilter() {
+    RestExceptionTranslationFilter exceptionTranslationFilter = new  RestExceptionTranslationFilter(authenticationEntryPoint);
+    exceptionTranslationFilter.afterPropertiesSet();
+    return exceptionTranslationFilter;
     }
 }

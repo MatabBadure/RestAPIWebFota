@@ -15,12 +15,12 @@
   <div class="dashboard-page__user-list__detailed__list">
     <div ng-repeat="doctor in doctors | filter:searchItem">
       <div ng-click="selectDoctor(doctor)" class="dashboard-page__user-list__detailed__list--details" >
-      <span class="user-detail">
-        {{doctor.name}} {{doctor.email}}
-      </span>
-      <span class="user-role">
-        {{doctor.hospital}}
-      </span>
+        <span class="user-detail">
+          {{doctor.name}} {{doctor.email}}
+        </span>
+        <span class="user-role">
+          {{doctor.hospital}}
+        </span>
       </div>
     </div>
   </div>

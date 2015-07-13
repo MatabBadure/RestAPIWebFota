@@ -1,17 +1,17 @@
 <div class="reset">
     <div class="col-md-16 reset__container">
-        <div class="col-md-12 reset__container--left-section">
-            <div class="reset__container--left-section-description">
-                <div class="reset__container--left-section-description_content">
+        <div class="col-md-11 reset__container__left-section">
+            <div class="reset__container__left-section--description">
+                <div class="reset__container__left-section--description content">
                     The Vest Airway Clearance System, Model 105, is a designed to assist patients in the mobilization of retained secretions that, if not removed, may lead to increased rates of respiratory infaction, hospitalization and reduced lung function.
                 </div>
-                <div class="reset__container--left-section-description_image">
+                <div class="reset__container__left-section--description image">
                     <img src="assets/images/heart.png">
                 </div>
             </div>
         </div>
-        <div class="col-md-4 reset__container--right-section">
-        <div class="reset__container--right-section-form">
+        <div class="col-md-5 reset__container__right-section">
+        <div class="reset__container__right-section--form">
             <div class="text-center"><span class="glyphicon glyphicon-lock"></span></div>
             <div class="text-center textUpperCase indent-bottom-5" translate="reset.request.title">Login to your Account</div>
 
@@ -60,7 +60,7 @@
                            ng-show="captchaError">
                             Please verify again you are not a robot.
                     </p>
-                	<div  ng-show="showCaptcha">
+                	<div class="form-group" ng-show="showCaptcha">
 	                	 <div vc-recaptcha
 	                		theme="'light'"
 	                		key="siteKey"
@@ -70,7 +70,7 @@
 
             		</div>
 
-                <button class="btn btn-primary" ng-disabled="form.email.$invalid || (showCaptcha && response === null)" translate="reset.request.form.button" ng-click="requestReset()">Register</button>
+                <button class="reset-button center-block" ng-disabled="form.email.$invalid || (showCaptcha && response === null)" translate="reset.request.form.button" ng-click="requestReset()">Register</button>
                 <!-- <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" translate="reset.request.form.button">Register</button> -->
             </form>
         </div>

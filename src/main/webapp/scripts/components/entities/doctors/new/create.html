@@ -1,5 +1,5 @@
-<span ng-show="isDoctorCreated"> Doctor has been created!</span>
-<span ng-show="isDoctorDeleted"> Doctor has been deleted!</span>
+<span ng-show="doctorStatus.isDoctorCreated"> Doctor has been created!</span>
+<span ng-show="doctorStatus.isDoctorDeleted"> Doctor has been deleted!</span>
 
 <form  name="form" class="dashboard-page__form--new" ng-submit="createDoctor()">
   <div class="dashboard-page__form--new_user-type">Create Doctor</div>
@@ -9,213 +9,213 @@
       <label for="exampleInputEmail1">Clinic Name *</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" name="clinicName" id="exampleInputEmail1" ng-model="doctor.clinicName" required>
+      <input type="text" class="form-control" name="clinicName"  ng-model="doctor.clinic" required>
     </div>
   </div>
 
   <div ng-show="form.clinicName.$dirty && form.clinicName.$invalid">
-                        <p class="help-block"
-                               ng-show="form.clinicName.$error.required">
-                            Clinic Name is required.
-                        </p>
+    <p class="help-block"
+    ng-show="form.clinicName.$error.required">
+    Clinic Name is required.
+  </p>
+</div>
+
+
+<div class="col-md-16 indent-form-top">
+  <div class="col-md-6">
+    <label for="exampleInputEmail1"></label>
   </div>
-
-
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1"></label>
-    </div>
-    <div class="col-md-10 dashboard-page__form--new_checkbox">
-      <input class="float-left" type="checkbox" value=""><span class="float-left">Add Another Clinic</span>
-    </div>
+  <div class="col-md-10 dashboard-page__form--new_checkbox">
+    <input class="float-left" type="checkbox" value=""><span class="float-left">Add Another Clinic</span>
   </div>
+</div>
 
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">Title</label>
-    </div>
-    <div class="col-md-10  dashboard-page__form--new_spec-title">
-      <input type="text" class="form-control" id="exampleInputEmail1" value="Dr." readonly>
-    </div>
+<div class="col-md-16 indent-form-top">
+  <div class="col-md-6">
+    <label for="exampleInputEmail1">Title</label>
   </div>
-  
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">First Name*</label>
-    </div>
-    <div class="col-md-10">
-      <input type="text" class="form-control" name="firstName" id="exampleInputEmail1" ng-model="doctor.firstName" ng-minlength=5 ng-maxlength=50 required>
-    </div>
+  <div class="col-md-10  dashboard-page__form--new_spec-title">
+    <input type="text" class="form-control"  value="Dr." readonly>
   </div>
+</div>
 
-  <div ng-show="form.firstName.$dirty && form.firstName.$invalid">
-                        <p class="help-block"
-                               ng-show="form.firstName.$error.required">
-                            First Name is required.
-                        </p>
-                        <p class="help-block"
-                               ng-show="form.firstName.$error.minlength" >
-                            First Name is required to be at least 5 character.
-                        </p>
-                        <p class="help-block"
-                               ng-show="form.firstName.$error.maxlength" >
-                            First Name cannot be longer than 50 characters.
-                        </p>
-
+<div class="col-md-16 indent-form-top">
+  <div class="col-md-6">
+    <label for="exampleInputEmail1">First Name*</label>
   </div>
-
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">Middle Name</label>
-    </div>
-    <div class="col-md-10">
-      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="doctor.middleName">
-    </div>
+  <div class="col-md-10">
+    <input type="text" class="form-control" name="firstName"  ng-model="doctor.firstName" ng-minlength=5 ng-maxlength=50 required>
   </div>
+</div>
 
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">Last Name*</label>
-    </div>
-    <div class="col-md-10">
-      <input type="text" class="form-control" name="lastName" id="exampleInputEmail1" ng-model="doctor.lastName" ng-minlength=5 ng-maxlength=50 required>
-    </div>
+<div ng-show="form.firstName.$dirty && form.firstName.$invalid">
+  <p class="help-block"
+  ng-show="form.firstName.$error.required">
+  First Name is required.
+</p>
+<p class="help-block"
+ng-show="form.firstName.$error.minlength" >
+First Name is required to be at least 5 character.
+</p>
+<p class="help-block"
+ng-show="form.firstName.$error.maxlength" >
+First Name cannot be longer than 50 characters.
+</p>
+
+</div>
+
+<div class="col-md-16 indent-form-top">
+  <div class="col-md-6">
+    <label for="exampleInputEmail1">Middle Name</label>
   </div>
-  <div ng-show="form.lastName.$dirty && form.lastName.$invalid">
-                        <p class="help-block"
-                               ng-show="form.lastName.$error.required">
-                            Last Name is required.
-                        </p>
-                        <p class="help-block"
-                               ng-show="form.lastName.$error.minlength" >
-                            Last Name is required to be at least 5 character.
-                        </p>
-                        <p class="help-block"
-                               ng-show="form.lastName.$error.maxlength" >
-                            Last Name cannot be longer than 50 characters.
-                        </p>
-
+  <div class="col-md-10">
+    <input type="text" class="form-control"  ng-model="doctor.middleName">
   </div>
+</div>
 
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">Speciality</label>
-    </div>
-    <div class="col-md-10">
-      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="doctor.speciality">
-    </div>
+<div class="col-md-16 indent-form-top">
+  <div class="col-md-6">
+    <label for="exampleInputEmail1">Last Name*</label>
   </div>
-
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">Credentials</label>
-    </div>
-    <div class="col-md-10">
-      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="doctor.credentials">
-    </div>
+  <div class="col-md-10">
+    <input type="text" class="form-control" name="lastName" ng-model="doctor.lastName" ng-minlength=5 ng-maxlength=50 required>
   </div>
+</div>
+<div ng-show="form.lastName.$dirty && form.lastName.$invalid">
+  <p class="help-block"
+  ng-show="form.lastName.$error.required">
+  Last Name is required.
+</p>
+<p class="help-block"
+ng-show="form.lastName.$error.minlength" >
+Last Name is required to be at least 5 character.
+</p>
+<p class="help-block"
+ng-show="form.lastName.$error.maxlength" >
+Last Name cannot be longer than 50 characters.
+</p>
 
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">Email *</label>
-    </div>
-    <div class="col-md-10">
-      <input type="email" class="form-control" name="email" id="exampleInputEmail1" ng-model="doctor.email" ng-minlength=5 ng-maxlength=100 required>
-    </div>
+</div>
+
+<div class="col-md-16 indent-form-top">
+  <div class="col-md-6">
+    <label for="exampleInputEmail1">Speciality</label>
   </div>
-
-  <div ng-show="form.email.$dirty && form.email.$invalid">
-                        <p class="help-block"
-                               ng-show="form.email.$error.required">
-                            Your e-mail is required.
-                        </p>
-                        <p class="help-block"
-                               ng-show="form.email.$error.email">
-                            Your e-mail is invalid.
-                        </p>
-                        <p class="help-block"
-                               ng-show="form.email.$error.minlength">
-                            Your e-mail is required to be at least 5 characters.
-                        </p>
-                        <p class="help-block"
-                               ng-show="form.email.$error.maxlength">
-                            Your e-mail cannot be longer than 100 characters.
-                        </p>
-    </div>
-
-
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">Primary Phone</label>
-    </div>
-    <div class="col-md-10">
-      <input type="text" class="form-control age" id="exampleInputEmail1" ng-model="doctor.primaryPhone">
-    </div>
+  <div class="col-md-10">
+    <input type="text" class="form-control"  ng-model="doctor.speciality">
   </div>
+</div>
 
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">Mobile Phone</label>
-    </div>
-    <div class="col-md-10">
-      <input type="text" class="form-control age" id="exampleInputEmail1" ng-model="doctor.mobilePhone">
-    </div>
+<div class="col-md-16 indent-form-top">
+  <div class="col-md-6">
+    <label for="exampleInputEmail1">Credentials</label>
   </div>
+  <div class="col-md-10">
+    <input type="text" class="form-control"  ng-model="doctor.credentials">
+  </div>
+</div>
 
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">Fax Number</label>
-    </div>
-    <div class="col-md-10">
-      <input type="text" class="form-control age" id="exampleInputEmail1" ng-model="doctor.faxNumber">
-    </div>
+<div class="col-md-16 indent-form-top">
+  <div class="col-md-6">
+    <label for="exampleInputEmail1">Email *</label>
   </div>
+  <div class="col-md-10">
+    <input type="email" class="form-control" name="email"  ng-model="doctor.email" ng-minlength=5 ng-maxlength=100 required>
+  </div>
+</div>
 
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">Address</label>
-    </div>
-    <div class="col-md-10">
-      <input type="email" class="form-control" id="exampleInputEmail1" ng-model="doctor.address">
-    </div>
-  </div>
+<div ng-show="form.email.$dirty && form.email.$invalid">
+  <p class="help-block"
+  ng-show="form.email.$error.required">
+  Your e-mail is required.
+</p>
+<p class="help-block"
+ng-show="form.email.$error.email">
+Your e-mail is invalid.
+</p>
+<p class="help-block"
+ng-show="form.email.$error.minlength">
+Your e-mail is required to be at least 5 characters.
+</p>
+<p class="help-block"
+ng-show="form.email.$error.maxlength">
+Your e-mail cannot be longer than 100 characters.
+</p>
+</div>
 
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">Zip Code</label>
-    </div>
-    <div class="col-md-10">
-      <input type="text" class="form-control age" id="exampleInputEmail1" ng-model="doctor.zipCode">
-    </div>
-  </div>
 
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">City</label>
-    </div>
-    <div class="col-md-10">
-      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="doctor.city">
-    </div>
+<div class="col-md-16 indent-form-top">
+  <div class="col-md-6">
+    <label for="exampleInputEmail1">Primary Phone</label>
   </div>
+  <div class="col-md-10">
+    <input type="text" class="form-control age"  ng-model="doctor.primaryPhone">
+  </div>
+</div>
 
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">State</label>
-    </div>
-    <div class="col-md-10 dashboard-page__form--new_calendar">
-      <input type="text" class="form-control" id="exampleInputEmail1" ng-model="doctor.state">
-    </div>
+<div class="col-md-16 indent-form-top">
+  <div class="col-md-6">
+    <label for="exampleInputEmail1">Mobile Phone</label>
   </div>
+  <div class="col-md-10">
+    <input type="text" class="form-control age" ng-model="doctor.mobilePhone">
+  </div>
+</div>
 
-  <div class="col-md-16 dashboard-page__form--new_form-submit" ng-show="isCreate">
-    <button type="submit" ng-disabled="form.$invalid" class="dashboard-page__form--new_form-submit--button">Submit</button>
+<div class="col-md-16 indent-form-top">
+  <div class="col-md-6">
+    <label for="exampleInputEmail1">Fax Number</label>
   </div>
+  <div class="col-md-10">
+    <input type="text" class="form-control age"  ng-model="doctor.faxNumber">
+  </div>
+</div>
 
-  <div class="col-md-16 dashboard-page__form--new_form-submit">
-    <div class="col-md-6"></div>
-    <div class="col-md-10" ng-show="!isCreate">
-      <button type="button" class="dashboard-page__form--new_form-submit--button" ng-click="deleteDoctor()">Disassociate</button>
-      <button type="button" ng-disabled="true" class="dashboard-page__form--new_form-submit--button">Edit</button>
-    </div>
+<div class="col-md-16 indent-form-top">
+  <div class="col-md-6">
+    <label for="exampleInputEmail1">Address</label>
   </div>
+  <div class="col-md-10">
+    <input type="email" class="form-control"  ng-model="doctor.address">
+  </div>
+</div>
+
+<div class="col-md-16 indent-form-top">
+  <div class="col-md-6">
+    <label for="exampleInputEmail1">Zip Code</label>
+  </div>
+  <div class="col-md-10">
+    <input type="text" class="form-control age"  ng-model="doctor.zipCode">
+  </div>
+</div>
+
+<div class="col-md-16 indent-form-top">
+  <div class="col-md-6">
+    <label for="exampleInputEmail1">City</label>
+  </div>
+  <div class="col-md-10">
+    <input type="text" class="form-control"  ng-model="doctor.city">
+  </div>
+</div>
+
+<div class="col-md-16 indent-form-top">
+  <div class="col-md-6">
+    <label for="exampleInputEmail1">State</label>
+  </div>
+  <div class="col-md-10 dashboard-page__form--new_calendar">
+    <input type="text" class="form-control"  ng-model="doctor.state">
+  </div>
+</div>
+
+<div class="col-md-16 dashboard-page__form--new_form-submit" ng-show="doctorStatus.isCreate">
+  <button type="submit" ng-disabled="form.$invalid" class="dashboard-page__form--new_form-submit--button">Submit</button>
+</div>
+
+<div class="col-md-16 dashboard-page__form--new_form-submit">
+  <div class="col-md-6"></div>
+  <div class="col-md-10" ng-show="!doctorStatus.isCreate">
+    <button type="button" class="dashboard-page__form--new_form-submit--button" ng-click="deleteDoctor()">Disassociate</button>
+    <button type="button" ng-disabled="true" class="dashboard-page__form--new_form-submit--button">Edit</button>
+  </div>
+</div>
 </form>

@@ -1,20 +1,21 @@
 'use strict';
 
-describe('Controllers Tests ', function () {
+describe('Controllers Tests ', function() {
 
-    beforeEach(module('hillromvestApp'));
+  beforeEach(module('hillromvestApp'));
 
-    describe('LoginController', function () {
-        var $scope;
+  describe('LoginController', function() {
+    var $scope;
 
+    beforeEach(inject(function($rootScope, $controller) {
+      $scope = $rootScope.$new();
+      $controller('LoginController', {
+        $scope: $scope
+      });
+    }));
 
-        beforeEach(inject(function ($rootScope, $controller) {
-            $scope = $rootScope.$new();
-            $controller('LoginController', {$scope: $scope});
-        }));
-
-        it('should set remember Me', function () {
-            expect($scope.rememberMe).toBeTruthy();
-        });
+    it('should set remember Me', function() {
+      expect($scope.rememberMe).toBeTruthy();
     });
+  });
 });

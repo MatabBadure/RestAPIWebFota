@@ -5,11 +5,10 @@ angular.module('hillromvestApp')
     return {
       templateUrl: 'scripts/components/entities/users/list/list.html',
       restrict: 'E',
-      link: function postLink(scope, element, attrs) {},
       scope: {
         onSelect: '&'
       },
-      link: function(scope, element, attrs) {
+      link: function(scope) {
         var user = scope.user;
       },
       controller: function($scope) {
@@ -17,142 +16,129 @@ angular.module('hillromvestApp')
 
         $scope.selectUser = function(user) {
           $scope.user = user;
-          $scope.onSelect({'user': user});
+          $scope.onSelect({
+            'user': user
+          });
         };
 
-        $scope.sortList = function () {
+        $scope.sortList = function() {
           console.log('Todo Sort Functionality...!');
         };
+
         $scope.searchUsers = function() {
-            $scope.users = [{
-              'title':'Mr.',
-              'firstName': 'John',
-              'lastName': 'Smith',
-              'middleName':'MiddleName',
-              'email':'email',
-              'role':'role',
-              'role': 'Super Admin'
-            }, {
-              'title':'Mr.',
-              'firstName': 'James',
-              'lastName': 'Williams',
-              'middleName':'MiddleName',
-              'email':'email',
-              'role':'role',
-              'role': 'Account Service'
-            }, {
-              'title':'Mr.',
-              'firstName': 'David',
-              'lastName': 'Jones',
-              'middleName':'MiddleName',
-              'email':'email',
-              'role':'role',
-              'role': 'Associates'
-            }, {
-              'title':'Mr.',
-              'firstName': 'William',
-              'lastName': 'Davis',
-              'middleName':'MiddleName',
-              'email':'email',
-              'role':'role',
-              'role': 'Super Admin'
-            }, {
-              'title':'Mr.',
-              'firstName': 'Joseph',
-              'lastName': 'Taylor',
-              'middleName':'MiddleName',
-              'email':'email',
-              'role':'role',
-              'role': 'Associates'
-            }, {
-              'title':'Mr.',
-              'firstName': 'William',
-              'lastName': 'Davis',
-              'middleName':'MiddleName',
-              'email':'email',
-              'role':'role',
-              'role': 'Account Services'
-            }, {
-              'title':'Mr.',
-              'firstName': 'William',
-              'lastName': 'Davis',
-              'middleName':'MiddleName',
-              'email':'email',
-              'role':'role',
-              'role': 'Account Services'
-            }, {
-              'title':'Mr.',
-              'firstName': 'William',
-              'lastName': 'Davis',
-              'middleName':'MiddleName',
-              'email':'email',
-              'role':'role',
-              'role': 'Account Services'
-            }, {
-              'title':'Mr.',
-              'firstName': 'William',
-              'lastName': 'Davis',
-              'middleName':'MiddleName',
-              'email':'email',
-              'role':'role',
-              'role': 'Account Services'
-            }, {
-              'title':'Mr.',
-              'firstName': 'William',
-              'lastName': 'Davis',
-              'middleName':'MiddleName',
-              'email':'email',
-              'role':'role',
-              'role': 'Account Services'
-            }, {
-              'title':'Mr.',
-              'firstName': 'William',
-              'lastName': 'Davis',
-              'middleName':'MiddleName',
-              'email':'email',
-              'role':'role',
-              'role': 'Account Services'
-            }, {
-              'title':'Mr.',
-              'firstName': 'William',
-              'lastName': 'Davis',
-              'middleName':'MiddleName',
-              'email':'email',
-              'role':'role',
-              'role': 'Account Services'
-            }, {
-              'title':'Mr.',
-              'firstName': 'William',
-              'lastName': 'Davis',
-              'middleName':'MiddleName',
-              'email':'email',
-              'role':'role',
-              'role': 'Account Services'
-            }, {
-              'title':'Mr.',
-              'firstName': 'William',
-              'lastName': 'Davis',
-              'middleName':'MiddleName',
-              'email':'email',
-              'role':'role',
-              'role': 'Account Services'
-            }, {
-              'title':'Mr.',
-              'firstName': 'William',
-              'lastName': 'Davis',
-              'middleName':'MiddleName',
-              'email':'email',
-              'role':'role',
-              'role': 'Account Services'
-            }, {
-              'title':'Mr.',
-              'firstName': 'William',
-              'lastName': 'Davis',
-              'middleName':'MiddleName',
-              'email':'email',
-              'role':'role',
-              'role': 'Account Services'
-            }];
+          $scope.users = [{
+            'title': 'Mr.',
+            'firstName': 'John',
+            'lastName': 'Smith',
+            'middleName': 'MiddleName',
+            'email': 'email',
+            'role': 'Super Admin'
+          }, {
+            'title': 'Mr.',
+            'firstName': 'James',
+            'lastName': 'Williams',
+            'middleName': 'MiddleName',
+            'email': 'email',
+            'role': 'Account Service'
+          }, {
+            'title': 'Mr.',
+            'firstName': 'David',
+            'lastName': 'Jones',
+            'middleName': 'MiddleName',
+            'email': 'email',
+            'role': 'Associates'
+          }, {
+            'title': 'Mr.',
+            'firstName': 'William',
+            'lastName': 'Davis',
+            'middleName': 'MiddleName',
+            'email': 'email',
+            'role': 'Super Admin'
+          }, {
+            'title': 'Mr.',
+            'firstName': 'Joseph',
+            'lastName': 'Taylor',
+            'middleName': 'MiddleName',
+            'email': 'email',
+            'role': 'Associates'
+          }, {
+            'title': 'Mr.',
+            'firstName': 'William',
+            'lastName': 'Davis',
+            'middleName': 'MiddleName',
+            'email': 'email',
+            'role': 'Account Services'
+          }, {
+            'title': 'Mr.',
+            'firstName': 'William',
+            'lastName': 'Davis',
+            'middleName': 'MiddleName',
+            'email': 'email',
+            'role': 'Account Services'
+          }, {
+            'title': 'Mr.',
+            'firstName': 'William',
+            'lastName': 'Davis',
+            'middleName': 'MiddleName',
+            'email': 'email',
+            'role': 'Account Services'
+          }, {
+            'title': 'Mr.',
+            'firstName': 'William',
+            'lastName': 'Davis',
+            'middleName': 'MiddleName',
+            'email': 'email',
+            'role': 'Account Services'
+          }, {
+            'title': 'Mr.',
+            'firstName': 'William',
+            'lastName': 'Davis',
+            'middleName': 'MiddleName',
+            'email': 'email',
+            'role': 'Account Services'
+          }, {
+            'title': 'Mr.',
+            'firstName': 'William',
+            'lastName': 'Davis',
+            'middleName': 'MiddleName',
+            'email': 'email',
+            'role': 'Account Services'
+          }, {
+            'title': 'Mr.',
+            'firstName': 'William',
+            'lastName': 'Davis',
+            'middleName': 'MiddleName',
+            'email': 'email',
+            'role': 'Account Services'
+          }, {
+            'title': 'Mr.',
+            'firstName': 'William',
+            'lastName': 'Davis',
+            'middleName': 'MiddleName',
+            'email': 'email',
+            'role': 'Account Services'
+          }, {
+            'title': 'Mr.',
+            'firstName': 'William',
+            'lastName': 'Davis',
+            'middleName': 'MiddleName',
+            'email': 'email',
+            'role': 'Account Services'
+          }, {
+            'title': 'Mr.',
+            'firstName': 'William',
+            'lastName': 'Davis',
+            'middleName': 'MiddleName',
+            'email': 'email',
+            'role': 'Account Services'
+          }, {
+            'title': 'Mr.',
+            'firstName': 'William',
+            'lastName': 'Davis',
+            'middleName': 'MiddleName',
+            'email': 'email',
+            'role': 'Account Services'
+          }];
         };
       }
     };

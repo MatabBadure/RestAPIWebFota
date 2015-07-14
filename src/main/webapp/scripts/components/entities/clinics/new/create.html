@@ -1,23 +1,23 @@
   <span ng-show="clinicStatus.isMessage">{{clinicStatus.message}}</span>
-  <form name="form" class="dashboard-page__form--new" ng-submit="createClinic()">
+  <form name="form" class="dashboard-page__form--new" ng-submit="createClinic()" novalidate>
     <div class="dashboard-page__form--new_user-type">Create Clinic</div>
     <div class="col-md-16 indent-form-top">
       <div class="col-md-6">
         <label for="exampleInputEmail1">Clinic Name *</label>
       </div>
       <div class="col-md-10">
-        <input type="text" class="form-control" name="clinicName"  ng-model="clinic.name" minlength=5 ng-maxlength=50 required>
+        <input type="text" class="form-control" name="clinicName"  ng-model="clinic.name" minlength=3 ng-maxlength=50 required>
       </div>
     </div>
 
-    <div ng-show="form.clinicName.$dirty && form.clinicName.$invalid">
+    <div ng-show="(form.clinicName.$dirty && form.clinicName.$invalid) || submitted">
           <p class="help-block"
                 ng-show="form.clinicName.$error.required">
                 Clinic Name is required.
           </p>
           <p class="help-block"
                 ng-show="form.clinicName.$error.minlength" >
-                Clinic Name is required to be at least 5 character.
+                Clinic Name is required to be at least 3 character.
           </p>
           <p class="help-block"
                 ng-show="form.clinicName.$error.maxlength" >
@@ -30,18 +30,18 @@
         <label for="exampleInputEmail1">Satellite Clinic *</label>
       </div>
       <div class="col-md-10">
-        <input type="text" class="form-control" name="satellite"  ng-model="clinic.parentClinicName" minlength=5 ng-maxlength=50 required>
+        <input type="text" class="form-control" name="satellite"  ng-model="clinic.parentClinicName" minlength=3 ng-maxlength=50 required>
       </div>
     </div>
 
-      <div ng-show="form.satellite.$dirty && form.satellite.$invalid">
+      <div ng-show="(form.satellite.$dirty && form.satellite.$invalid) || submitted">
             <p class="help-block"
               ng-show="form.satellite.$error.required">
               Satellite Clinic is required.
             </p>
             <p class="help-block"
               ng-show="form.satellite.$error.minlength" >
-              Satellite Clinic is required to be at least 5 character.
+              Satellite Clinic is required to be at least 3 character.
             </p>
             <p class="help-block"
               ng-show="form.satellite.$error.maxlength" >
@@ -149,7 +149,7 @@
     </div>
 
     <div class="col-md-16 dashboard-page__form--new_form-submit" ng-show="clinicStatus.isCreate">
-      <button type="submit" ng-disabled="form.$invalid" class="dashboard-page__form--new_form-submit--button">Submit</button>
+      <button type="submit"  ng-click="submitted = true" class="dashboard-page__form--new_form-submit--button">Submit</button>
     </div>
 
     <div class="col-md-16 dashboard-page__form--new_form-submit">

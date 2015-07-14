@@ -25,26 +25,24 @@
             <div class="form-group">
               <!-- <label for="username" translate="global.form.username">Login</label> -->
               <input type="text" class="form-control" id="username" name="username" placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="username" required>
-            </div>
-
-             <div ng-show="form.username.$dirty && form.username.$invalid">
-              <p class="help-block"
-                             ng-show="form.username.$error.required ">
-                              Your Username is required.
-              </p>
+              <div class="form-error" ng-show="form.username.$dirty && form.username.$invalid">
+                <span class="help-block" ng-show="form.username.$error.required ">
+                  Your Username is required.
+                </span>
+              </div>
             </div>
 
             <div class="form-group">
               <!-- <label for="password" translate="login.form.password">Password</label> -->
               <input type="password" class="form-control" id="password" name="password" placeholder="{{'login.form.password.placeholder' | translate}}" ng-model="password" required>
+
+              <div class="form-error" ng-show="form.password.$dirty && form.password.$invalid">
+                <span class="help-block" ng-show="form.password.$error.required">
+                  password is required.
+                </span>
+              </div>
             </div>
 
-             <div ng-show="form.password.$dirty && form.password.$invalid">
-              <p class="help-block"
-                             ng-show="form.password.$error.required">
-                              password is required.
-              </p>
-            </div>
             <p class="help-block" ng-show="captchaError">Please verify again you are not a robot.</p>
             <div  ng-show="showCaptcha">
               <div vc-recaptcha

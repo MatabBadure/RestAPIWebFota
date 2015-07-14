@@ -5,14 +5,12 @@ angular.module('hillromvestApp')
     $scope.clinic = {};
     $scope.clinicStatus ={
         'isCreate':true,
-        'isClinicCreated':false,
-        'isClinicDeleted':false
+        'isMessage':false
     }
     $scope.selectedClinic = function(clinic) {
         $scope.clinicStatus ={
         'isCreate':false,
-        'isClinicCreated':false,
-        'isClinicDeleted':false
+        'isMessage':false
     }
         $scope.clinic = clinic;
     };

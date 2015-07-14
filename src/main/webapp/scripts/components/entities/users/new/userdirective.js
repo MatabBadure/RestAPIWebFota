@@ -21,18 +21,30 @@ angular.module('hillromvestApp')
             'role': $scope.user.role,
             'email': $scope.user.email
           };
-          User.createUser(data).then(function (data) {
-            $scope.user = {};
-          }).catch(function () {
-
+          User.createUser(data).then(function (response) {
+            $scope.isMessage = true;  
+            $scope.message = response.data.message+" with ID "+response.data.user.id;
+          }).catch(function (response) {
+            $scope.isMessage = true;  
+            if(response.data.message != undefined){
+              $scope.message = response.data.message;
+            }else{
+              $scope.message = 'Error occured! Please try again';
+           }
           });
         };
 
         $scope.deleteUser = function(){
-          User.deleteUser($scope.user.id).then(function (data) {
-            $scope.user = {};
-          }).catch(function () {
-            console.log('Giving Error');
+          User.deleteUser($scope.user.id).then(function (response) {
+            $scope.isMessage = true;  
+            $scope.message = response.data.message;
+          }).catch(function (response) {
+            $scope.isMessage = true;  
+            if(response.data.message != undefined){
+              $scope.message = response.data.message;
+            }else{
+              $scope.message = 'Error occured! Please try again';
+           }
           });
         };
       }

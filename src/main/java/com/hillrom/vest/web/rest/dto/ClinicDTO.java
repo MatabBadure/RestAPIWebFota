@@ -1,5 +1,7 @@
 package com.hillrom.vest.web.rest.dto;
 
+import java.util.ArrayList;
+
 import javax.persistence.Column;
 import javax.validation.constraints.Size;
 
@@ -10,7 +12,7 @@ import com.hillrom.vest.domain.Clinic;
 public class ClinicDTO {
 	
 	@Size(max = 50)
-	private String name;
+	private String parentClinicName;
 
 	@Size(max = 50)
     private String address;
@@ -34,7 +36,7 @@ public class ClinicDTO {
     private String clinicAdminId;
 
 	@Size(max = 50)
-    private String parentClinicName;
+    private ArrayList<String> childClinicList;
 
 	@Size(max = 50)
     private String npiNumber;
@@ -43,11 +45,11 @@ public class ClinicDTO {
 		super();
 	}
 
-	public ClinicDTO(String name, String address, Integer zipcode, String city,
+	public ClinicDTO(String parentClinicName, String address, Integer zipcode, String city,
 			String state, Long phoneNumber, Long faxNumber, String clinicAdminId,
-			String parentClinicName, String npiNumber) {
+			ArrayList<String> childClinicList, String npiNumber) {
 		super();
-		this.name = name;
+		this.parentClinicName = parentClinicName;
 		this.address = address;
 		this.zipcode = zipcode;
 		this.city = city;
@@ -55,16 +57,16 @@ public class ClinicDTO {
 		this.phoneNumber = phoneNumber;
 		this.faxNumber = faxNumber;
 		this.clinicAdminId = clinicAdminId;
-		this.parentClinicName = parentClinicName;
+		this.childClinicList = childClinicList;
 		this.npiNumber = npiNumber;
 	}
 
-	public String getName() {
-		return name;
+	public String getParentClinicName() {
+		return parentClinicName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setParentClinicName(String parentClinicName) {
+		this.parentClinicName = parentClinicName;
 	}
 
 	public String getAddress() {
@@ -123,12 +125,12 @@ public class ClinicDTO {
 		this.clinicAdminId = clinicAdminId;
 	}
 
-	public String getParentClinicName() {
-		return parentClinicName;
+	public ArrayList<String> getChildClinicList() {
+		return childClinicList;
 	}
 
-	public void setParentClinic(String parentClinicName) {
-		this.parentClinicName = parentClinicName;
+	public void setChildClinicList(ArrayList<String> childClinicList) {
+		this.childClinicList = childClinicList;
 	}
 
 	public String getNpiNumber() {

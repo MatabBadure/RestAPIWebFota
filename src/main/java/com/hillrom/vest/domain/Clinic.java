@@ -2,14 +2,14 @@ package com.hillrom.vest.domain;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -22,9 +22,10 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.SQLDelete;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.ObjectIdGenerator;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
@@ -66,11 +67,13 @@ public class Clinic implements Serializable {
 
     @ManyToOne
     @JoinColumn(name="parent_clinic_id")
+    @JsonManagedReference
     private Clinic parentClinic;
  
     @OneToMany(mappedBy="parentClinic")
     @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id")
-    private Set<Clinic> childClinics = new HashSet<Clinic>();
+    @JsonBackReference
+    private List<Clinic> childClinics = new ArrayList<Clinic>();
 
     @Column(name = "npi_number")
     private String npiNumber;
@@ -171,11 +174,11 @@ public class Clinic implements Serializable {
 		this.parentClinic = (parentClinic != null) ? parentClinic : null;
 	}
 
-	public Set<Clinic> getChildClinics() {
+	public List<Clinic> getChildClinics() {
 		return childClinics;
 	}
 
-	public void setChildClinics(Set<Clinic> childClinics) {
+	public void setChildClinics(List<Clinic> childClinics) {
 		this.childClinics = childClinics;
 	}
 
@@ -246,7 +249,6 @@ public class Clinic implements Serializable {
                 ", hillromId='" + hillromId + "'" +
                 ", parentClinic='" + parentClinic + "'" +
                 ", npiNumber='" + npiNumber + "'" +
-                ", deleted='" + deleted + "'" +
                 '}';
     }
 }

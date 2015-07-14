@@ -10,10 +10,14 @@ import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 
+import net.minidev.json.JSONObject;
+
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,6 +27,7 @@ import scala.annotation.cloneable;
 
 import javax.inject.Inject;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -42,26 +47,46 @@ public class ClinicService {
     private ClinicRepository clinicRepository;
 
     public Clinic createClinic(ClinicDTO clinicDTO) {
-    	Clinic newClinic = new Clinic();
-    	newClinic.setName(clinicDTO.getName());
-    	newClinic.setAddress(clinicDTO.getAddress());
-    	newClinic.setZipcode(clinicDTO.getZipcode());
-    	newClinic.setCity(clinicDTO.getCity());
-    	newClinic.setState(clinicDTO.getState());
-    	newClinic.setPhoneNumber(clinicDTO.getPhoneNumber());
-    	newClinic.setHillromId(clinicDTO.getClinicAdminId());
-    	newClinic.setDeleted(false);
-    	if(clinicDTO.getParentClinicName() != null){
-    		clinicRepository.findOneByName(clinicDTO.getParentClinicName())
-    		.map(parentClinic -> {
-    			System.out.println("PArentClinic Found: "+parentClinic);
-    			newClinic.setParentClinic(parentClinic);
-    			return newClinic;
-    		});
+    	Clinic newParentClinic = new Clinic();
+    	clinicRepository.findOneByName(clinicDTO.getParentClinicName())
+		.map(parentClinic -> {
+			newParentClinic.setId(parentClinic.getId());
+			newParentClinic.setName(parentClinic.getName());
+			newParentClinic.setAddress(parentClinic.getAddress());
+			newParentClinic.setZipcode(parentClinic.getZipcode());
+			newParentClinic.setCity(parentClinic.getCity());
+			newParentClinic.setState(parentClinic.getState());
+			newParentClinic.setPhoneNumber(parentClinic.getPhoneNumber());
+			newParentClinic.setHillromId(parentClinic.getHillromId());
+			newParentClinic.setDeleted(parentClinic.isDeleted());
+			return newParentClinic;
+		}).orElseGet(() -> {
+			newParentClinic.setName(clinicDTO.getParentClinicName());
+			newParentClinic.setAddress(clinicDTO.getAddress());
+			newParentClinic.setZipcode(clinicDTO.getZipcode());
+			newParentClinic.setCity(clinicDTO.getCity());
+			newParentClinic.setState(clinicDTO.getState());
+			newParentClinic.setPhoneNumber(clinicDTO.getPhoneNumber());
+			newParentClinic.setHillromId(clinicDTO.getClinicAdminId());
+			newParentClinic.setDeleted(false);
+			clinicRepository.save(newParentClinic);
+			return newParentClinic;
+        });
+    	for(String childClinicName : clinicDTO.getChildClinicList()) {
+    		Clinic childClinic = new Clinic();
+    		childClinic.setName(childClinicName);
+    		childClinic.setAddress(clinicDTO.getAddress());
+    		childClinic.setZipcode(clinicDTO.getZipcode());
+    		childClinic.setCity(clinicDTO.getCity());
+    		childClinic.setState(clinicDTO.getState());
+    		childClinic.setPhoneNumber(clinicDTO.getPhoneNumber());
+    		childClinic.setHillromId(clinicDTO.getClinicAdminId());
+    		childClinic.setParentClinic(newParentClinic);
+    		childClinic.setDeleted(false);
+    		clinicRepository.save(childClinic);
+    		newParentClinic.getChildClinics().add(childClinic);
     	}
-    	System.out.println("PArentClinic Not found !! " +clinicDTO.getParentClinicName());
-    	clinicRepository.save(newClinic);
-    	return newClinic;
+    	return newParentClinic;
     }
 
     public void updateUserInformation(String firstName, String lastName, String email, String langKey) {

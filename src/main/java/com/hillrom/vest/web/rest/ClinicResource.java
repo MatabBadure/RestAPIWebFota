@@ -55,18 +55,16 @@ public class ClinicResource {
     public ResponseEntity<JSONObject> create(@RequestBody ClinicDTO clinicDTO) throws URISyntaxException {
         log.debug("REST request to save Clinic : {}", clinicDTO);
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("message", "Clinic name already in use");
-        return clinicRepository.findOneByName(clinicDTO.getName())
-        		.map(newClinic -> {
-        			System.out.println("Clinic found : "+newClinic);
-        			return ResponseEntity.badRequest().body(jsonObject);
-        		})
-                .orElseGet(() -> {
-                    Clinic newClinic = clinicService.createClinic(clinicDTO);
-                    jsonObject.put("message", "Clinic created successfully.");
-                    jsonObject.put("clinic", newClinic);
-                    return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
-                });
+        Clinic newClinic = clinicService.createClinic(clinicDTO);
+        if(newClinic.getChildClinics().size() == clinicDTO.getChildClinicList().size()) {
+        	jsonObject.put("message", "Clinics created successfully.");
+            jsonObject.put("ParentClinic", newClinic);
+            jsonObject.put("ChildClinics", newClinic.getChildClinics());
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+        } else {
+	      	jsonObject.put("message", "Unable to complete the transaction.");
+	        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_GATEWAY);
+        }
     }
 
     /**

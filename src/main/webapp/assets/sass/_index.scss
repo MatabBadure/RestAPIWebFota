@@ -1,13 +1,16 @@
 html{
 	height: 100%;
 }
+
 body{
 	height: inherit;
 	color: #A7A7A7;
 }
+
 .container-top-indent{
 	height: inherit;
 }
+
 .content-body{
 	background-color: #EEEEEE;
 	height: -o-calc(100% - 100px); /* opera */
@@ -15,27 +18,42 @@ body{
 	height: -moz-calc(100% - 100px);
 	margin-top: 50px;
 }
+
 .clr{
 	clear: both;
 }
+
 .text-center{
 	text-align: center;
 }
+
 .textUpperCase{
 	text-transform: uppercase;
 }
+
 .indent-bottom-5{
 	padding-bottom: 5px;
 }
+
 .indent-top-15{
 	padding-top: 15px;
 }
+
 .margin-top-15{
 	margin-top: 15px;
 }
+
 .indent-form-top{
 	padding-top: 10px;
 }
+
 .float-left{
 	float: left;
+}
+
+.form-error{
+	padding-top: 5px;
+	span{
+		color: black;
+	}
 }

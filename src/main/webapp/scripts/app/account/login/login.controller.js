@@ -10,7 +10,9 @@ angular.module('hillromvestApp')
     $scope.widgetId = null;
     $scope.user = {};
     $scope.errors = {};
+    $scope.authenticationError = false;
     $scope.siteKey = globalConfig.siteKey;
+    $scope.loginSubmitted = false;
 
     $scope.setResponse = function (response) {
       $scope.response = response;
@@ -20,36 +22,33 @@ angular.module('hillromvestApp')
       $scope.widgetId = widgetId;
     };
 
-    $scope.authenticate = function () {
+    $scope.authenticate = function(){
+      $scope.authenticationError = false;
       Auth.login({
         username: $scope.username,
         password: $scope.password,
         captcha: $scope.user.captcha
       }).then(function (data) {
-        $scope.authenticationError = false;
-        if (data.status === 200) {
+        if(data.status === 200){
           localStorage.removeItem('loginCount');
           $state.go('patient');
-          localStorage.setItem('token', data.data.token);
         }
       }).catch(function (data) {
-        console.info(data, 'fail');
         if (data.status === 401) {
-          if (!data.data.APP_CODE) {
+          if(!data.data.APP_CODE){
             $scope.authenticationError = true;
             var loginCount = parseInt(localStorage.getItem('loginCount')) || 0;
             localStorage.setItem('loginCount', loginCount + 1);
-            localStorage.removeItem('token');
             if (loginCount > 2) {
               $scope.showCaptcha = true;
             }
-          } else if (data.data.APP_CODE === 'EMAIL_PASSWORD_RESET') {
-            localStorage.setItem('token', data.data.token);
+          }else if (data.data.APP_CODE === 'EMAIL_PASSWORD_RESET') {
+            localStorage.setItem('token', data.data.id);
             $scope.isFirstLogin = true;
             $scope.isEmailExist = false;
             $scope.showLogin = false;
           } else if (data.data.APP_CODE === 'PASSWORD_RESET') {
-            localStorage.setItem('token', data.data.token);
+            localStorage.setItem('token', data.data.id);
             $scope.isFirstLogin = true;
             $scope.showLogin = false;
           }
@@ -62,8 +61,12 @@ angular.module('hillromvestApp')
     });
 
     $scope.login = function (event) {
+      $scope.loginSubmitted = true;
+      if($scope.form.username.$invalid || $scope.form.username.$invalid ||($scope.showCaptcha && $scope.response === null) ){
+        return false;
+      }
       event.preventDefault();
-      if ($scope.showCaptcha) {
+      if($scope.showCaptcha){
         Auth.captcha($scope.response).then(function (data) {
           $scope.showCaptcha = false;
           $scope.captchaError = false;

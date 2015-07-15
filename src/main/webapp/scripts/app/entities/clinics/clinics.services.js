@@ -1,11 +1,11 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .factory('User', function ($http,localStorageService) {
-    var token = localStorage.getItem('token');
+  .factory('ClinicService', function ($http,localStorageService) {
+	var token = localStorage.getItem('token');
     return {
-      createUser: function (data) {
-        return $http.post('api/hillromteamuser', data, {
+      createClinic: function (data) {
+        return $http.post('api/clinics', data, {
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
@@ -15,9 +15,9 @@ angular.module('hillromvestApp')
           return response;
         });
       },
-      deleteUser : function(id){
-        id=16;
-        return $http.delete('api/hillromteamuser/'+id, {
+      deleteClinic : function(id){
+       
+        return $http.delete('api/clinics/'+id, {
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
@@ -29,3 +29,5 @@ angular.module('hillromvestApp')
       }
     };
   });
+
+

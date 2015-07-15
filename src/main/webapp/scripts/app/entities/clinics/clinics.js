@@ -13,7 +13,7 @@ angular.module('hillromvestApp')
                 views: {
                     'content@': {
                         templateUrl: 'scripts/app/entities/clinics/clinics.html',
-                        controller: 'PatientsController'
+                        controller: 'ClinicsController'
                     }
                 },
                 resolve: {

@@ -14,17 +14,17 @@
 	</div>
 	<div class="dashboard-page__user-list__detailed__list">
 		<div ng-repeat="clinic in clinics | filter:searchItem">
-		    <div ng-click="selectClinic(clinic)" class="dashboard-page__user-list__detailed__list--details" >
-			    <span class="user-detail">
-			    	{{clinic.clinicName}}
-			    </span>
-			    <span class="user-role">
-			    	{{clinic.city}}
-			    </span>
-		    </div>
-	  	</div>
+			<div ng-click="selectClinic(clinic)" class="dashboard-page__user-list__detailed__list--details" >
+				<span class="user-detail">
+					{{clinic.clinicName}}
+				</span>
+				<span class="user-role">
+					{{clinic.city}}
+				</span>
+			</div>
+		</div>
 	</div>
 	<div class="dashboard-page__user-list__detailed__more-link" ng-if="clinics.length>0">
-  	<span>More</span><span>&gt;&gt;</span>
-  </div>
+		<span>More</span><span>&gt;&gt;</span>
+	</div>
 </div>

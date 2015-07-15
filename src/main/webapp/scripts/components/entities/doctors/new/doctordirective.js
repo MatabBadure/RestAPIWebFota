@@ -14,6 +14,9 @@ angular.module('hillromvestApp')
     },
     controller: function($scope){
      $scope.createDoctor = function(){
+      if($scope.form.$invalid){
+              return false;
+            }
       var data ={
 			  'title' : 'Dr',
 			  'clinic' : $scope.doctor.clinic,
@@ -36,7 +39,7 @@ angular.module('hillromvestApp')
 
       Doctor.createDoctor(data).then(function (response) {
          $scope.doctorStatus.isMessage = true;
-         $scope.doctorStatus.message = response.data.message+" with ID "+response.data.user.id;
+         $scope.doctorStatus.message = "Doctor created successfully" + " with ID "+response.data.user.id;
      }).catch(function (response) {
          $scope.doctorStatus.isMessage = true;  
          if(response.data.message !== undefined){

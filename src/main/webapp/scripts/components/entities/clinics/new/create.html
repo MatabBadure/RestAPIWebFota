@@ -6,14 +6,14 @@
         <label for="exampleInputEmail1">Clinic Name *</label>
       </div>
       <div class="col-md-10">
-        <input type="text" class="form-control" name="clinicName"  ng-model="clinic.name" minlength=5 ng-maxlength=50 required>
+        <input type="text" class="form-control" name="clinicName"  ng-model="clinic.name" minlength=3 ng-maxlength=50 required>
 
         <div class="form-error" ng-show="(form.clinicName.$dirty && form.clinicName.$invalid) || submitted">
           <span class="help-block" ng-show="form.clinicName.$error.required">
             Clinic Name is required.
           </span>
           <span class="help-block" ng-show="form.clinicName.$error.minlength" >
-            Clinic Name is required to be at least 5 character.
+            Clinic Name is required to be at least 3 character.
           </span>
           <span class="help-block" ng-show="form.clinicName.$error.maxlength" >
             Clinic Name cannot be longer than 50 characters.
@@ -27,14 +27,14 @@
         <label for="exampleInputEmail1">Satellite Clinic *</label>
       </div>
       <div class="col-md-10">
-        <input type="text" class="form-control" name="satellite"  ng-model="clinic.parentClinicName" minlength=5 ng-maxlength=50 required>
+        <input type="text" class="form-control" name="satellite"  ng-model="clinic.parentClinicName" minlength=3 ng-maxlength=50 required>
 
         <div class="form-error" ng-show="(form.satellite.$dirty && form.satellite.$invalid) || submitted">
           <span class="help-block" ng-show="form.satellite.$error.required">
             Satellite Clinic is required.
           </span>
           <span class="help-block" ng-show="form.satellite.$error.minlength" >
-            Satellite Clinic is required to be at least 5 character.
+            Satellite Clinic is required to be at least 3 character.
           </span>
           <span class="help-block" ng-show="form.satellite.$error.maxlength" >
             Satellite Clinic cannot be longer than 50 characters.

@@ -13,6 +13,7 @@ angular.module('hillromvestApp')
         $scope.widgetId = null;
         $scope.captchaError = false;
         $scope.siteKey ='6LcXjQkTAAAAAMZ7kb5v9YZ8vrYKFJmDcg2oE-SH';
+        $scope.submitted = false;
         
         $timeout(function (){angular.element('[ng-model="resetAccount.email"]').focus();});
 
@@ -24,6 +25,10 @@ angular.module('hillromvestApp')
             $scope.widgetId = widgetId;
         };
         $scope.requestReset = function () {
+          $scope.submitted = true;
+          if($scope.form.email.$invalid ||($scope.showCaptcha && $scope.response === null)){
+            return false;
+          }
         	if($scope.showCaptcha){
                   Auth.captcha($scope.response).then(function (data) {
                    $scope.showCaptcha = false;

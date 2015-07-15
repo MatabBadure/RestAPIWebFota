@@ -13,6 +13,9 @@
 
           controller: function($scope) {
            $scope.createClinic = function () {
+            if($scope.form.$invalid){
+              return false;
+            }
             var data = {
               'name': $scope.clinic.name,
               'parentClinicName': $scope.clinic.parentClinicName,
@@ -27,7 +30,7 @@
 
             ClinicService.createClinic(data).then(function (data) {    	 
                  $scope.clinicStatus.isMessage = true;
-                 $scope.clinicStatus.message = data.data.message+" with ID "+data.data.clinic.id;
+                 $scope.clinicStatus.message = "Clinic created successfully" + " with ID "+data.data.clinic.id;
            }).catch(function (response) {
                 if(response.data.message !== undefined){
                   $scope.clinicStatus.message = response.data.message;

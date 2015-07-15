@@ -21,13 +21,13 @@
            <div class="text-center indent-bottom-5" ng-show="form.username.$invalid || form.password.$invalid" >Please enter username and password</div>   
 
             
-          <form class="form" role="form" name="form" ng-submit="login($event)">
+          <form class="form" role="form" name="form" novalidate>
             <div class="form-group">
               <!-- <label for="username" translate="global.form.username">Login</label> -->
               <input type="text" class="form-control" id="username" name="username" placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="username" required>
             </div>
 
-             <div ng-show="form.username.$dirty && form.username.$invalid">
+             <div ng-show="(form.username.$dirty && form.username.$invalid) || loginSubmitted">
               <p class="help-block"
                              ng-show="form.username.$error.required ">
                               Your Username is required.
@@ -39,7 +39,7 @@
               <input type="password" class="form-control" id="password" name="password" placeholder="{{'login.form.password.placeholder' | translate}}" ng-model="password" required>
             </div>
 
-             <div ng-show="form.password.$dirty && form.password.$invalid">
+             <div ng-show="(form.password.$dirty && form.password.$invalid) || loginSubmitted">
               <p class="help-block"
                              ng-show="form.password.$error.required">
                               password is required.
@@ -54,7 +54,7 @@
                 on-success="setResponse(response)">
               </div>
             </div>
-            <button class="login-button center-block" ng-disabled="form.username.$invalid || form.password.$invalid || (showCaptcha && response === null)" translate="login.form.button" ng-click="login($event)">Authenticate</button>
+            <button class="login-button center-block" translate="login.form.button" ng-click="login($event)">Authenticate</button>
             <!-- <button type="submit" class="login-button center-block" translate="login.form.button">Authenticate</button> -->
           </form>
 

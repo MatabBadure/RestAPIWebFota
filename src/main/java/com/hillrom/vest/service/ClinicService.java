@@ -75,12 +75,6 @@ public class ClinicService {
     	for(String childClinicName : clinicDTO.getChildClinicList()) {
     		Clinic childClinic = new Clinic();
     		childClinic.setName(childClinicName);
-    		childClinic.setAddress(clinicDTO.getAddress());
-    		childClinic.setZipcode(clinicDTO.getZipcode());
-    		childClinic.setCity(clinicDTO.getCity());
-    		childClinic.setState(clinicDTO.getState());
-    		childClinic.setPhoneNumber(clinicDTO.getPhoneNumber());
-    		childClinic.setHillromId(clinicDTO.getClinicAdminId());
     		childClinic.setParentClinic(newParentClinic);
     		childClinic.setDeleted(false);
     		clinicRepository.save(childClinic);

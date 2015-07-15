@@ -91,7 +91,6 @@ public class Clinic implements Serializable {
     private Set<PatientInfo> patients = new HashSet<>();
     
     @Column(name="is_deleted", nullable = false)
-    @JsonIgnore
     private boolean deleted = false;
 
     public Long getId() {
@@ -249,6 +248,7 @@ public class Clinic implements Serializable {
                 ", hillromId='" + hillromId + "'" +
                 ", parentClinic='" + parentClinic + "'" +
                 ", npiNumber='" + npiNumber + "'" +
+                ", deleted='" + deleted + "'" +
                 '}';
     }
 }

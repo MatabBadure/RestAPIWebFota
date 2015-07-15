@@ -13,6 +13,9 @@ angular.module('hillromvestApp')
       },
       controller: function ($scope) {
         $scope.createUser = function () {
+          if($scope.form.$invalid){
+            return false;
+          }
           var data = {
             'title': $scope.user.title,
             'firstName': $scope.user.firstName,
@@ -23,7 +26,7 @@ angular.module('hillromvestApp')
           };
           User.createUser(data).then(function (response) {
             $scope.isMessage = true;  
-            $scope.message = response.data.message+" with ID "+response.data.user.id;
+            $scope.message = "User created successfully"+" with ID "+response.data.user.id;
           }).catch(function (response) {
             $scope.isMessage = true;  
             if(response.data.message != undefined){

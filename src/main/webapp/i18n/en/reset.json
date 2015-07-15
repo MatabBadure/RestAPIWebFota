@@ -6,7 +6,7 @@
                 "button": "Reset password"
             },
             "messages": {
-                "info": "Enter the e-mail address you used to register",
+                "info": "Enter the registered e-mail address ",
                 "success": "Check your e-mails for details on how to reset your password.",
                 "notfound": "<strong>E-Mail address isn't registered!</strong> Please check and try again"
 

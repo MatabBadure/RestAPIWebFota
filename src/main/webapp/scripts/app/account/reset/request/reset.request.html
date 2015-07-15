@@ -15,12 +15,12 @@
             <div class="text-center"><span class="glyphicon glyphicon-lock"></span></div>
             <div class="text-center textUpperCase indent-bottom-5" translate="reset.request.title">Login to your Account</div>
 
-            <div class="alert alert-danger" translate="reset.request.messages.notfound" ng-show="errorEmailNotExists">
+            <div class="alert alert-danger text-center" translate="reset.request.messages.notfound" ng-show="errorEmailNotExists">
                 <strong>E-Mail address isn't registered!</strong> Please check and try again.
             </div>
 
-            <div class="alert alert-warning text-center" ng-hide="success">
-                <p translate="reset.request.messages.info">Enter the e-mail address you used to register.</p>
+            <div class="alert alert-warning text-center" ng-hide="submitted">
+                <p translate="reset.request.messages.info">Enter the registered e-mail address .</p>
             </div>
 
             <div class="alert alert-success" ng-show="success == 'OK'">
@@ -31,8 +31,8 @@
                 <div class="form-group">
                     <!-- <label translate="global.form.email">E-mail</label> -->
                     <input type="email" class="form-control" name="email" placeholder="{{'global.form.email.placeholder' | translate}}"
-                           ng-model="resetAccount.email" ng-minlength=5 ng-maxlength=100 required>
-                    <div ng-show="form.email.$dirty && form.email.$invalid">
+                           ng-model="resetAccount.email"  ng-maxlength=100 required>
+                    <div ng-show="(form.email.$dirty && form.email.$invalid) || submitted">
                         <p class="help-block"
                            ng-show="form.email.$error.required" translate="global.messages.validate.email.required">
                             Your e-mail is required.
@@ -40,10 +40,6 @@
                         <p class="help-block"
                            ng-show="form.email.$error.email" translate="global.messages.validate.email.invalid">
                             Your e-mail is invalid.
-                        </p>
-                        <p class="help-block"
-                           ng-show="form.email.$error.minlength" translate="global.messages.validate.email.minlength">
-                            Your e-mail is required to be at least 5 characters.
                         </p>
                         <p class="help-block"
                            ng-show="form.email.$error.maxlength" translate="global.messages.validate.email.maxlength">
@@ -60,7 +56,7 @@
                            ng-show="captchaError">
                             Please verify again you are not a robot.
                     </p>
-                	<div class="form-group" ng-show="showCaptcha">
+                	<div  ng-show="showCaptcha">
 	                	 <div vc-recaptcha
 	                		theme="'light'"
 	                		key="siteKey"
@@ -70,7 +66,7 @@
 
             		</div>
 
-                <button class="reset-button center-block" ng-disabled="form.email.$invalid || (showCaptcha && response === null)" translate="reset.request.form.button" ng-click="requestReset()">Register</button>
+                <button class="reset-button center-block"  translate="reset.request.form.button" ng-click="requestReset()" >Register</button>
                 <!-- <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" translate="reset.request.form.button">Register</button> -->
             </form>
         </div>

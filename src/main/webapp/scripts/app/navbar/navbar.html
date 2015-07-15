@@ -1,26 +1,26 @@
 <div class="dashboard-page__admin-nav--nav" id="navbar-collapse" ng-switch="isAuthenticated()">
     <div class="dashboard-page__admin-nav--nav_dashboard">admin Home</div>
     <ul class="nav nav-stacked dashboard-page__admin-nav--nav_nav-list">
-        <li ui-sref-active="active" class="active">
+        <li ui-sref-active="active" ng-class="{ active: isActive('patient')}">
             <a ng-href="#/patient">
                 <span>Manage Patients</span>
             </a>
         </li>
-        <li>
+        <li ng-class="{ active: isActive('clinic')}">
             <a ng-href="#/clinic">
                 <span>Manage Clinics</span>
             </a>
         </li>
-        <li>
+        <li ng-class="{ active: isActive('doctor')}">
             <a ng-href="#/doctor">
                 <span>Manage Doctors</span>
             </a>
         </li>
-        <li>
+        <li ng-class="{ active: isActive('user')}">
             <a ng-href="#/user">
                 <span>Manage Hill-Rom Users</span>
             </a>
         </li>
-        
+
     </ul>
 </div>

@@ -15,20 +15,35 @@
 
         <div class="login__container__right-section--form" ng-show="showLogin">
           <div class="text-center textUpperCase indent-bottom-5" translate="login.title">Login to your Account</div>
-          <!-- <div class="alert alert-danger" ng-show="authenticationError" translate="login.messages.error.authentication">
+          <div class="alert alert-danger" ng-show="authenticationError" translate="login.messages.error.authentication">
                   <strong>Authentication failed!</strong> Please check your credentials and try again.
-              </div> -->
-          <form class="form" role="form" ng-submit="login($event)">
+          </div> 
+           <div class="text-center indent-bottom-5" ng-show="form.username.$invalid || form.password.$invalid" >Please enter username and password</div>   
+
+            
+          <form class="form" role="form" name="form" novalidate>
             <div class="form-group">
               <!-- <label for="username" translate="global.form.username">Login</label> -->
-              <input type="text" class="form-control" id="username" placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="username">
+              <input type="text" class="form-control" id="username" name="username" placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="username" required>
+              <div class="form-error" ng-show="(form.username.$dirty && form.username.$invalid) || loginSubmitted">
+                <span class="help-block" ng-show="form.username.$error.required ">
+                  Your Username is required.
+                </span>
+              </div>
             </div>
+
             <div class="form-group">
               <!-- <label for="password" translate="login.form.password">Password</label> -->
-              <input type="password" class="form-control" id="password" placeholder="{{'login.form.password.placeholder' | translate}}" ng-model="password">
+              <input type="password" class="form-control" id="password" name="password" placeholder="{{'login.form.password.placeholder' | translate}}" ng-model="password" required>
+              <div class="form-error" ng-show="(form.password.$dirty && form.password.$invalid) || loginSubmitted">
+                <span class="help-block" ng-show="form.password.$error.required">
+                  password is required.
+                </span>
+              </div>
             </div>
+
             <p class="help-block" ng-show="captchaError">Please verify again you are not a robot.</p>
-            <div class="form-group" ng-show="showCaptcha">
+            <div  ng-show="showCaptcha">
               <div vc-recaptcha
                 theme="'light'"
                 key="siteKey"

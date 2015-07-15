@@ -10,7 +10,9 @@ angular.module('hillromvestApp')
         $scope.widgetId = null;
         $scope.user = {};
         $scope.errors = {};
+        $scope.authenticationError = false;
         $scope.siteKey = '6LcXjQkTAAAAAMZ7kb5v9YZ8vrYKFJmDcg2oE-SH';
+        $scope.loginSubmitted = false;
 
         $scope.setResponse = function (response) {
             $scope.response = response;
@@ -21,12 +23,12 @@ angular.module('hillromvestApp')
         };
 
         $scope.authenticate = function(){
+          $scope.authenticationError = false;
           Auth.login({
             username: $scope.username,
             password: $scope.password,
             captcha: $scope.user.captcha
           }).then(function (data) {
-            $scope.authenticationError = false;
             if(data.status === 200){
               localStorage.removeItem('loginCount');
               $state.go('patient');
@@ -58,6 +60,10 @@ angular.module('hillromvestApp')
         $timeout(function (){angular.element('[ng-model="username"]').focus();});
 
         $scope.login = function (event) {
+          $scope.loginSubmitted = true;
+          if($scope.form.username.$invalid || $scope.form.username.$invalid ||($scope.showCaptcha && $scope.response === null) ){
+            return false;
+          }
             event.preventDefault();
             if($scope.showCaptcha){
                   Auth.captcha($scope.response).then(function (data) {

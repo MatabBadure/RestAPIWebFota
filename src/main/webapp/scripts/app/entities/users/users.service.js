@@ -1,14 +1,15 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .factory('User', function ($http) {
+  .factory('User', function ($http,localStorageService) {
+    var token = localStorage.getItem('token');
     return {
       createUser: function (data) {
         return $http.post('api/hillromteamuser', data, {
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
-            'x-auth-token' : 'admin@localhost:1436421984245:f1bf30edec0aabf93ab6d883ef01ad69'
+            'x-auth-token' : token
           }
         }).success(function (response) {
           return response;
@@ -20,7 +21,7 @@ angular.module('hillromvestApp')
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
-            'x-auth-token' : 'admin@localhost:1436421984245:f1bf30edec0aabf93ab6d883ef01ad69'
+            'x-auth-token' : token
           }
         }).success(function (response) {
           return response;

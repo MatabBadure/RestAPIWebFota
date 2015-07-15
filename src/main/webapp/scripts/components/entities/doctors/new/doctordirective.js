@@ -14,6 +14,9 @@ angular.module('hillromvestApp')
     },
     controller: function($scope){
      $scope.createDoctor = function(){
+      if($scope.form.$invalid){
+              return false;
+            }
       var data ={
 			  'title' : 'Dr',
 			  'clinic' : $scope.doctor.clinic,
@@ -34,19 +37,31 @@ angular.module('hillromvestApp')
 			  		 
 	  }
 
-      Doctor.createDoctor(data).then(function (data) {
-       $scope.isDoctorCreated = true;
-     }).catch(function () {
-      $scope.isDoctorCreated = true;   
+      Doctor.createDoctor(data).then(function (response) {
+         $scope.doctorStatus.isMessage = true;
+         $scope.doctorStatus.message = "Doctor created successfully" + " with ID "+response.data.user.id;
+     }).catch(function (response) {
+         $scope.doctorStatus.isMessage = true;  
+         if(response.data.message !== undefined){
+          $scope.doctorStatus.message = response.data.message;
+        }else{
+          $scope.doctorStatus.message = 'Error occured! Please try again';
+        }
     });
    }
 
    $scope.deleteDoctor = function(){
     $scope.doctor.id=1;
-    Doctor.deleteDoctor($scope.doctor.id).then(function (data) {
-      $scope.isDoctorDeleted = true;
-    }).catch(function () {
-      $scope.isDoctorDeleted = true;
+    Doctor.deleteDoctor($scope.doctor.id).then(function (response) {
+         $scope.doctorStatus.isMessage = true;
+         $scope.doctorStatus.message = response.data.message;
+    }).catch(function (response) {
+         $scope.doctorStatus.isMessage = true;
+         if(response.data.message !== undefined){
+          $scope.doctorStatus.message = response.data.message;
+        }else{
+          $scope.doctorStatus.message = 'Error occured! Please try again';
+        }
     });
   };
 

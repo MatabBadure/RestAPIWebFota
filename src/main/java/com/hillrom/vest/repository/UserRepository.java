@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.joda.time.DateTime;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import com.hillrom.vest.domain.User;
 
@@ -19,6 +20,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findOneByResetKey(String resetKey);
 
+    @Query("from User user where LOWER(user.email) = ?1")
     Optional<User> findOneByEmail(String email);
 
     @Override

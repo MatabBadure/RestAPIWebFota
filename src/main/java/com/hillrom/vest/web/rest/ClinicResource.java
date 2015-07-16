@@ -2,9 +2,9 @@ package com.hillrom.vest.web.rest;
 
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 
 import net.minidev.json.JSONObject;
@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.repository.ClinicRepository;
+import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.ClinicService;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
@@ -52,11 +53,12 @@ public class ClinicResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<JSONObject> create(@RequestBody ClinicDTO clinicDTO) throws URISyntaxException {
+    @RolesAllowed(AuthoritiesConstants.ACCT_SERVICES)
+    public ResponseEntity<JSONObject> create(@RequestBody ClinicDTO clinicDTO) {
         log.debug("REST request to save Clinic : {}", clinicDTO);
         JSONObject jsonObject = new JSONObject();
         Clinic newClinic = clinicService.createClinic(clinicDTO);
-        if(newClinic.getChildClinics().size() == clinicDTO.getChildClinicList().size()) {
+        if(newClinic.getChildClinics().size() == clinicDTO.getChildClinics().size()) {
         	jsonObject.put("message", "Clinics created successfully.");
             jsonObject.put("ParentClinic", newClinic);
             jsonObject.put("ChildClinics", newClinic.getChildClinics());
@@ -70,19 +72,27 @@ public class ClinicResource {
     /**
      * PUT  /clinics -> Updates an existing clinic.
      */
-    @RequestMapping(value = "/clinics",
+    @RequestMapping(value = "/clinics/{id}",
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<JSONObject> update(@RequestBody Clinic clinic) throws URISyntaxException {
-        log.debug("REST request to update Clinic : {}", clinic);
+    @RolesAllowed(AuthoritiesConstants.ACCT_SERVICES)
+    public ResponseEntity<JSONObject> update(@PathVariable Long id, @RequestBody ClinicDTO clinicDTO) {
+        log.debug("REST request to update Clinic : {}", clinicDTO);
         JSONObject jsonObject = new JSONObject();
-        if (clinic.getId() == null) {
-            //return create(clinic);
+        Clinic clinic = clinicService.updateClinic(id, clinicDTO);
+        if(clinic == null) {
+	      	jsonObject.put("message", "No such clinic found.");
+	        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_GATEWAY);
+        } else if(clinic.getChildClinics().size() == clinicDTO.getChildClinics().size()) {
+        	jsonObject.put("message", "Clinics updated successfully.");
+            jsonObject.put("ParentClinic", clinic);
+            jsonObject.put("ChildClinics", clinic.getChildClinics());
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        } else {
+	      	jsonObject.put("message", "Unable to update the Clinic.");
+	        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_GATEWAY);
         }
-        clinicRepository.save(clinic);
-        jsonObject.put("message", "User updated successfully.");
-        return ResponseEntity.ok().body(jsonObject);
     }
 
     /**

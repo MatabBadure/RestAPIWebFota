@@ -26,8 +26,6 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.J
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 
 /**
  * A Clinic.

@@ -1,6 +1,9 @@
 package com.hillrom.vest.web.rest.dto;
 
+import javax.persistence.Column;
 import javax.validation.constraints.Size;
+
+import org.joda.time.LocalDate;
 
 public class UserExtensionDTO extends UserDTO {
 
@@ -36,6 +39,12 @@ public class UserExtensionDTO extends UserDTO {
     
     @Size(min = 2, max = 100)
     private String clinicName;
+    
+    @Size(min = 2, max = 100)
+    private String hillromId;
+    
+    @Column(name = "dob")
+    private LocalDate dob;
 
     public UserExtensionDTO() {
     }
@@ -141,6 +150,22 @@ public class UserExtensionDTO extends UserDTO {
 
 	public void setClinicName(String clinicName) {
 		this.clinicName = clinicName;
+	}
+
+	public String getHillromId() {
+		return hillromId;
+	}
+
+	public void setHillromId(String hillromId) {
+		this.hillromId = hillromId;
+	}
+
+	public LocalDate getDob() {
+		return dob;
+	}
+
+	public void setDob(LocalDate dob) {
+		this.dob = dob;
 	}
 
 	@Override

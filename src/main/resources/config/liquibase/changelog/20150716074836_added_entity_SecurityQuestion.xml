@@ -19,7 +19,7 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="question" type="varchar(255)">
-            	<constraints nullable="false" />
+            	<constraints nullable="false" unique="true" />
             </column>
         </createTable>
         

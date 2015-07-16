@@ -4,10 +4,10 @@
 	</div>
 
 	<div class="col-md-6 dashboard-page__form">
-		<patient></patient>
+		<patient patient-data="patient" patient-status="patientStatus" ></patient>
 	</div>
 
 	<div class="col-md-6 dashboard-page__user-list">
-		<patient-list></patient-list>
+		<patient-list on-select="selectedPatient(patient)"></patient-list>
 	</div>
 </div>

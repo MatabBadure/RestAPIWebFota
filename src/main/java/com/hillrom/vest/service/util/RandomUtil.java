@@ -1,7 +1,9 @@
 package com.hillrom.vest.service.util;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.RandomStringUtils;
 
@@ -61,5 +63,12 @@ public final class RandomUtil {
 	   pattern = Pattern.compile(HILLROM_ID_PATTERN);
 	   matcher = pattern.matcher(hillromId);
 	   return matcher.matches();
+   }
+   
+   public static <T> List<T> getDifference(List<T> list1, List<T> list2){
+	   List<T> diff = list1.stream()
+               .filter(i -> !list2.contains(i))
+               .collect (Collectors.toList());
+	   return diff;
    }
 }

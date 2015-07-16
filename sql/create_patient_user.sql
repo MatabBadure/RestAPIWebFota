@@ -1,10 +1,4 @@
-/** 
- * Author : Ravi Petlur
- * Date : 16th July 2015
- * Description : This procedure is going to create patient and user based on 
-**/
-
-CREATE procedure create_patient_user (
+CREATE DEFINER=`root`@`localhost` PROCEDURE `create_patient_user`(
     IN hr_id varchar(15),
     IN device_serial_number varchar(10), 
     IN pat_first_name varchar(50),
@@ -18,10 +12,8 @@ CREATE procedure create_patient_user (
     IN pat_dob date,
     IN pat_lang varchar(10),
     IN pat_gender varchar(5),
-    IN pat_email varchar(50),
-    OUT status varchar(10)
+    IN pat_email varchar(50)
 )
-
 BEGIN
     DECLARE created_by varchar(10);
     DECLARE hillrom_id varchar(15);
@@ -54,4 +46,4 @@ insert into user (email, password, first_name, middle_name, last_name, activated
                   1, pat_lang, created_by, today_date, pat_gender);
 COMMIT;
 
-END;
+END

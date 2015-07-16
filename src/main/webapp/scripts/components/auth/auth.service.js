@@ -113,9 +113,12 @@ angular.module('hillromvestApp')
             },
 
 
-            resetPasswordFinish: function(key, newPassword, callback) {
+            resetPasswordFinish: function(key, data, callback) {
                 var cb = callback || angular.noop;
-                var data = {"newPassword":newPassword};
+                var data = {"newPassword":data.password,
+                            "question": data.question,
+                            "answer":data.answer
+                           };
                 return PasswordResetFinish.resetPassFinish(key).save(data, function () {
                     return cb();
                 }, function (err) {
@@ -127,6 +130,20 @@ angular.module('hillromvestApp')
                 var deferred = $q.defer();
                 var cb = callback || angular.noop;
                 AuthServerProvider.submitPassword(obj).then(function (data) {
+                    deferred.resolve(data);
+                    return cb(data);
+                }).catch(function (err) {
+                    this.logout();
+                    deferred.reject(err);
+                    return cb(err);
+                }.bind(this));
+                return deferred.promise;
+            },
+
+            getSecurityQuestions : function(callback){
+                var deferred = $q.defer();
+                var cb = callback || angular.noop;
+                AuthServerProvider.getSecurityQuestions().then(function (data) {
                     deferred.resolve(data);
                     return cb(data);
                 }).catch(function (err) {

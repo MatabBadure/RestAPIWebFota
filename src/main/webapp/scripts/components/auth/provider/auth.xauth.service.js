@@ -43,6 +43,15 @@ angular.module('hillromvestApp')
                 });
             },
 
+            getSecurityQuestions: function () {
+                return $http.get('')
+                .success(function (data, status, headers, config) {
+                    return {'response' : data, 'status' : status, 'headers' : headers, 'config' : config};
+                }).error(function (data, status, headers, config) {
+
+                });
+            },
+
             /*Temp Service Call From angular*/
             captcha: function (captchaData){
                 var data = {

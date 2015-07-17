@@ -12,5 +12,6 @@
     <include file="classpath:config/liquibase/changelog/20150708083611_added_entity_Clinic.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:config/liquibase/changelog/20150716152729_altered_datatype_Clinic.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20150716074836_added_entity_SecurityQuestion.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20150717110234_updated_as_new_erd.xml" relativeToChangelogFile="false"/>
     <!-- JHipster will add liquibase changelogs here -->
 </databaseChangeLog>

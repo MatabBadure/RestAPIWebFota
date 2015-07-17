@@ -21,8 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.repository.AuthorityRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
+import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
@@ -51,6 +53,9 @@ public class UserService {
 
     @Inject
     private AuthorityRepository authorityRepository;
+    
+    @Inject
+    private UserPatientRepository userPatientRepository;
     
     @Inject
     private PatientInfoService patientInfoService;
@@ -237,9 +242,13 @@ public class UserService {
 		newUser.setFirstName(patientInfo.getFirstName());
 		newUser.setLastName(patientInfo.getLastName());
 		newUser.setPassword(encodedPassword);
-		newUser.getPatients().add(patientInfo);
-		
 		User persistedUser = userRepository.save(newUser);
+
+		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.PATIENT, "SELF");
+		userPatientRepository.save(userPatientAssoc);
+		newUser.getUserPatientAssoc().add(userPatientAssoc);
+		patientInfo.getUserPatientAssoc().add(userPatientAssoc);
+		
 		newUser.setId(persistedUser.getId());
 		// Update WebLoginCreated to be true  and user patient association
 		updateWebLoginStatusAndUserPatientAssoc(patientInfo, persistedUser);
@@ -271,7 +280,6 @@ public class UserService {
 			PatientInfo patientInfo, User persistedUser) {
 		patientInfoService.findOneByHillromId(patientInfo.getHillromId()).map(patientUser ->{
 			patientUser.setWebLoginCreated(true);
-			patientUser.getUsers().add(persistedUser);
 			patientInfoService.update(patientUser);
 			return patientUser;
 		});

@@ -14,6 +14,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
@@ -66,6 +67,13 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Size(max = 100)
     @Column(length = 100, unique = true)
     private String email;
+    
+    @Size(max = 10)
+    @Column(name = "gender", length = 10)
+    private String gender;
+    
+    @Column(name = "zipcode")
+    private Integer zipcode;
 
     @Column(nullable = false)
     private boolean activated = false;
@@ -86,6 +94,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "reset_date", nullable = true)
     private DateTime resetDate = null;
+    
+    @Size(max = 20)
+    @Column(name = "terms_condition_accepted", length = 20)
+    private Boolean termsConditionAccepted;
+
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @Column(name = "terms_condition_accepted_date", nullable = true)
+    private DateTime termsConditionAcceptedDate = null;
 
     @JsonIgnore
     @ManyToMany
@@ -94,14 +110,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})
     private Set<Authority> authorities = new HashSet<>();
-    
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(
-            name = "USER_PATIENT_ASSOC",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "patient_id", referencedColumnName = "id")})
-    private Set<PatientInfo> patients = new HashSet<>();
     
     @Column(name="is_deleted", nullable = false)
     @JsonIgnore
@@ -114,6 +122,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @OneToOne(mappedBy = "user",fetch=FetchType.LAZY)
     @JsonIgnore
     private UserSecurityQuestion securityQuestion;
+    
+    @OneToMany(mappedBy = "user",fetch=FetchType.LAZY)
+    @JsonIgnore
+    private Set<UserPatientAssoc> userPatientAssoc = new HashSet<>();
     
     public Long getId() {
         return id;
@@ -228,14 +240,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
         this.authorities = authorities;
     }
 
-	public Set<PatientInfo> getPatients() {
-		return patients;
-	}
-
-	public void setPatients(Set<PatientInfo> patients) {
-		this.patients = patients;
-	}
-
 	public boolean isDeleted() {
 		return deleted;
 	}
@@ -250,6 +254,46 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	public void setSecurityQuestion(UserSecurityQuestion securityQuestion) {
 		this.securityQuestion = securityQuestion;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public Integer getZipcode() {
+		return zipcode;
+	}
+
+	public void setZipcode(Integer zipcode) {
+		this.zipcode = zipcode;
+	}
+
+	public Boolean getTermsConditionAccepted() {
+		return termsConditionAccepted;
+	}
+
+	public void setTermsConditionAccepted(Boolean termsConditionAccepted) {
+		this.termsConditionAccepted = termsConditionAccepted;
+	}
+
+	public DateTime getTermsConditionAcceptedDate() {
+		return termsConditionAcceptedDate;
+	}
+
+	public void setTermsConditionAcceptedDate(DateTime termsConditionAcceptedDate) {
+		this.termsConditionAcceptedDate = termsConditionAcceptedDate;
+	}
+
+	public Set<UserPatientAssoc> getUserPatientAssoc() {
+		return userPatientAssoc;
+	}
+
+	public void setUserPatientAssoc(Set<UserPatientAssoc> userPatientAssoc) {
+		this.userPatientAssoc = userPatientAssoc;
 	}
 
 	@Override
@@ -275,18 +319,15 @@ public class User extends AbstractAuditingEntity implements Serializable {
         return email.hashCode();
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                " password='" + password + '\'' +
-                ", title='" + title + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", middleName='" + middleName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", activated='" + activated + '\'' +
-                ", langKey='" + langKey + '\'' +
-                ", activationKey='" + activationKey + '\'' +
-                "}";
-    }
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", password=" + password + ", title=" + title
+				+ ", firstName=" + firstName + ", middleName=" + middleName
+				+ ", lastName=" + lastName + ", email=" + email + ", gender="
+				+ gender + ", zipcode=" + zipcode + ", activated=" + activated
+				+ ", langKey=" + langKey + ", termsConditionAccepted="
+				+ termsConditionAccepted + ", deleted=" + deleted
+				+ ", lastLoggedInAt=" + lastLoggedInAt + "]";
+	}
+
 }

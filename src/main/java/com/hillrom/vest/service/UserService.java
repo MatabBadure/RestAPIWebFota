@@ -12,7 +12,6 @@ import javax.inject.Inject;
 import net.minidev.json.JSONObject;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.engine.transaction.jta.platform.internal.JOnASJtaPlatform;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +61,7 @@ public class UserService {
     @Inject
     private UserLoginTokenService authTokenService;
     
+    @Inject
     private UserSecurityQuestionService userSecurityQuestionService;
 
     public Optional<User> activateRegistration(String key) {
@@ -297,20 +297,18 @@ public class UserService {
     	JSONObject errorsJsonObject = validateRequest(password, questionId,
 				answer);
         
-        if( null != errorsJsonObject)
+        if( null != errorsJsonObject.get("ERROR"))
         	return errorsJsonObject;
         
         User currentUser = findOneByEmail(SecurityUtils.getCurrentLogin()).get();
-        if(!RandomUtil.isValidEmail(currentUser.getEmail()) && StringUtils.isBlank(email)){
-        	JSONObject jsonObject = new JSONObject();
-        	jsonObject.put("ERROR", "Required field Email is missing");
-        	return jsonObject;
+
+        errorsJsonObject = isUserExistsWithEmail(email, currentUser);
+        
+        if(null != errorsJsonObject.get("ERROR")){
+        	return errorsJsonObject;
         }
         
-        // Update Email for the firstTime Login , if not present
-        if(null !=  email){
-        	currentUser.setEmail(email);
-        }
+        currentUser.setEmail(email);
         currentUser.setPassword(passwordEncoder.encode(password));
         currentUser.setLastLoggedInAt(DateTime.now());
         
@@ -322,9 +320,31 @@ public class UserService {
         log.debug("updateEmailOrPassword for User: {}", currentUser);
        
         Long qid = Long.parseLong(questionId);
-        userSecurityQuestionService.update(currentUser.getId(), qid, answer);
+        userSecurityQuestionService.saveOrUpdate(currentUser.getId(), qid, answer);
 		authTokenService.deleteToken(authToken); // Token must be deleted to avoid subsequent request
-		return null;
+		return new JSONObject();
+	}
+
+	/**
+	 * Checks whether User Exists with provided Email or Whether Email is left blank
+	 * @param email
+	 * @param currentUser
+	 * @return
+	 */
+	private JSONObject isUserExistsWithEmail(String email, User currentUser) {
+		JSONObject jsonObject = new JSONObject();
+		if(!RandomUtil.isValidEmail(currentUser.getEmail()) && StringUtils.isBlank(email)){
+        	jsonObject.put("ERROR", "Required field Email is missing");
+        }
+        
+        // Update Email for the firstTime Login , if not present
+        if(StringUtils.isNotBlank(email)){
+        	Optional<User> existingUser = findOneByEmail(email);
+        	if(existingUser.isPresent()){
+            	jsonObject.put("ERROR", "Email Already registered, please choose another email");
+        	}
+        }
+        return jsonObject;
 	}
 
 	/**

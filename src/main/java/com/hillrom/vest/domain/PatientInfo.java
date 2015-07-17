@@ -7,15 +7,17 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -73,19 +75,45 @@ public class PatientInfo implements Serializable {
 
     @Column(name = "email")
     private String email;
-
+    
+    @Column(name = "gender")
+    private String gender;
+    
+    @Column(name = "lang_key")
+    private String langKey;
+    
+    @Column(name = "address")
+    private String address;
+    
+    @Column(name="zipcode")
+    private String zipcode;
+    
+    @Column(name = "city")
+    private String city;
+    
+    @Column(name = "state")
+    private String state;
+    
+    @Column(name = "expired")
+    private Boolean expired;
+    
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @Column(name = "expired_date", nullable = true)
+    private DateTime expiredDate = null;
+    
     @Column(name = "web_login_created")
     private Boolean webLoginCreated;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
-    @ManyToMany(mappedBy = "patients")
+    @OneToMany(mappedBy = "patient",fetch=FetchType.LAZY)
     @JsonIgnore
-    private Set<User> users = new HashSet<>();
+    private Set<ClinicPatientAssoc> clinicPatientAssoc = new HashSet<>();
     
-    @Column(name="zipcode")
-    private String zipcode;
+    @OneToMany(mappedBy = "patient",fetch=FetchType.LAZY)
+    @JsonIgnore
+    private Set<UserPatientAssoc> userPatientAssoc = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -199,21 +227,84 @@ public class PatientInfo implements Serializable {
         this.isDeleted = isDeleted;
     }
 
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
-    }
-
-    
     public String getZipcode() {
 		return zipcode;
 	}
 
 	public void setZipcode(String zipcode) {
 		this.zipcode = zipcode;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public String getLangKey() {
+		return langKey;
+	}
+
+	public void setLangKey(String langKey) {
+		this.langKey = langKey;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public Boolean getExpired() {
+		return expired;
+	}
+
+	public void setExpired(Boolean expired) {
+		this.expired = expired;
+	}
+
+	public DateTime getExpiredDate() {
+		return expiredDate;
+	}
+
+	public void setExpiredDate(DateTime expiredDate) {
+		this.expiredDate = expiredDate;
+	}
+
+	public Set<ClinicPatientAssoc> getClinicPatientAssoc() {
+		return clinicPatientAssoc;
+	}
+
+	public void setClinicPatientAssoc(Set<ClinicPatientAssoc> clinicPatientAssoc) {
+		this.clinicPatientAssoc = clinicPatientAssoc;
+	}
+
+	public Set<UserPatientAssoc> getUserPatientAssoc() {
+		return userPatientAssoc;
+	}
+
+	public void setUserPatientAssoc(Set<UserPatientAssoc> userPatientAssoc) {
+		this.userPatientAssoc = userPatientAssoc;
 	}
 
 	@Override

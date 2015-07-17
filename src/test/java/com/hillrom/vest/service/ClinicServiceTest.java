@@ -52,7 +52,7 @@ public class ClinicServiceTest {
 	    	childClinic.put("name", "Fortis-Branch"+i+1);
 	    	childClinics.add(childClinic);
     	}
-        clinicDTO = new ClinicDTO("Fortis Hospital", "Bannerghatta Road", 560042, "Bangalore", "Karnataka", Long.parseLong("7896541230"), Long.parseLong("9874563210"), null, childClinics, null);
+        clinicDTO = new ClinicDTO("Fortis Hospital", "Bannerghatta Road", 560042, "Bangalore", "Karnataka", Long.parseLong("7896541230"), Long.parseLong("9874563210"), null, childClinics);
 
         clinic = clinicService.createClinic(clinicDTO);
     }

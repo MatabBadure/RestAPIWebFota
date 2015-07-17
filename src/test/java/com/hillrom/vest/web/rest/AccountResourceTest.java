@@ -152,6 +152,8 @@ public class AccountResourceTest {
             "Snoy",					// middleName
             "Shmoe",                // lastName
             "joe@example.com",      // e-mail
+            "male",					//gender
+            123456,					//zipcode
             "en",                   // langKey
             Arrays.asList(AuthoritiesConstants.PATIENT)
         );
@@ -176,6 +178,8 @@ public class AccountResourceTest {
             "Snoy",					// middleName
             "One",                  // lastName
             "funky@example.com",    // e-mail
+            "male",					//gender
+            123456,					//zipcode
             "en",                   // langKey
             Arrays.asList(AuthoritiesConstants.PATIENT)
         );
@@ -200,6 +204,8 @@ public class AccountResourceTest {
             "Snoy",					// middleName
             "Green",            // lastName
             "invalid",          // e-mail <-- invalid
+            "male",					//gender
+            123456,					//zipcode
             "en",               // langKey
             Arrays.asList(AuthoritiesConstants.PATIENT)
         );
@@ -226,13 +232,15 @@ public class AccountResourceTest {
             "Snoy",					// middleName
             "Doe",                  // lastName
             "john@example.com",     // e-mail
+            "male",					//gender
+            123456,					//zipcode
             "en",                   // langKey
             Arrays.asList(AuthoritiesConstants.PATIENT)
         );
 
         // Duplicate e-mail, different login
         UserDTO dup = new UserDTO( u.getPassword(), u.getTitle(), u.getEmail(), u.getMiddleName(), u.getLastName(),
-            u.getEmail(), u.getLangKey(), u.getRoles());
+            u.getEmail(), u.getGender(), u.getZipcode(), u.getLangKey(), u.getRoles());
 
         // Good user
         restMvc.perform(
@@ -262,6 +270,8 @@ public class AccountResourceTest {
             "Snoy",					// middleName
             "Guy",                  // lastName
             "badguy@example.com",   // e-mail
+            "male",					//gender
+            123456,					//zipcode
             "en",                   // langKey
             Arrays.asList(AuthoritiesConstants.ADMIN) // <-- only admin should be able to do that
         );

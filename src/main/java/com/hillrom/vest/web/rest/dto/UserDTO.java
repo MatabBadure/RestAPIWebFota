@@ -31,18 +31,26 @@ public class UserDTO {
     @Email
     @Size(min = 5, max = 100)
     private String email;
-
+    
+    @Size(max = 50)
+    private String gender;
+    
+    @Size(max = 50)
+    private Integer zipcode;
+    
     @Size(min = 2, max = 5)
     private String langKey;
 
     private List<String> roles;
+    
+    private Boolean termsConditionAccepted;
 
     public UserDTO() {
     }
 
-    public UserDTO(String password, String title, String firstName,
-			String middleName, String lastName, String email, String langKey,
-			List<String> roles) {
+	public UserDTO(String password, String title, String firstName,
+			String middleName, String lastName, String email, String gender,
+			Integer zipcode, String langKey, List<String> roles) {
 		super();
 		this.password = password;
 		this.title = title;
@@ -50,8 +58,18 @@ public class UserDTO {
 		this.middleName = middleName;
 		this.lastName = lastName;
 		this.email = email;
+		this.gender = gender;
+		this.zipcode = zipcode;
 		this.langKey = langKey;
 		this.roles = roles;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public String getTitle() {
@@ -62,45 +80,86 @@ public class UserDTO {
 		this.title = title;
 	}
 
-	public String getPassword() {
-        return password;
-    }
+	public String getFirstName() {
+		return firstName;
+	}
 
-    public String getFirstName() {
-        return firstName;
-    }
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
 
-    public String getMiddleName() {
+	public String getMiddleName() {
 		return middleName;
 	}
 
+	public void setMiddleName(String middleName) {
+		this.middleName = middleName;
+	}
+
 	public String getLastName() {
-        return lastName;
-    }
+		return lastName;
+	}
 
-    public String getEmail() {
-        return email;
-    }
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
 
-    public String getLangKey() {
-        return langKey;
-    }
+	public String getEmail() {
+		return email;
+	}
 
-    public List<String> getRoles() {
-        return roles;
-    }
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
-    @Override
-    public String toString() {
-        return "UserDTO{" +
-        "  password='" + password + '\'' +
-        ", title='" + title + '\'' +
-        ", firstName='" + firstName + '\'' +
-        ", middleName='" + middleName + '\'' +
-        ", lastName='" + lastName + '\'' +
-        ", email='" + email + '\'' +
-        ", langKey='" + langKey + '\'' +
-        ", roles=" + roles +
-        '}';
-    }
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public Integer getZipcode() {
+		return zipcode;
+	}
+
+	public void setZipcode(Integer zipcode) {
+		this.zipcode = zipcode;
+	}
+
+	public String getLangKey() {
+		return langKey;
+	}
+
+	public void setLangKey(String langKey) {
+		this.langKey = langKey;
+	}
+
+	public List<String> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<String> roles) {
+		this.roles = roles;
+	}
+
+	public Boolean getTermsConditionAccepted() {
+		return termsConditionAccepted;
+	}
+
+	public void setTermsConditionAccepted(Boolean termsConditionAccepted) {
+		this.termsConditionAccepted = termsConditionAccepted;
+	}
+
+	@Override
+	public String toString() {
+		return "UserDTO [password=" + password + ", title=" + title
+				+ ", firstName=" + firstName + ", middleName=" + middleName
+				+ ", lastName=" + lastName + ", email=" + email + ", gender="
+				+ gender + ", zipcode=" + zipcode + ", langKey=" + langKey
+				+ ", roles=" + roles + ", termsConditionAccepted="
+				+ termsConditionAccepted + "]";
+	}
+
 }

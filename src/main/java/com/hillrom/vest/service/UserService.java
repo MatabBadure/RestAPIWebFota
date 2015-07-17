@@ -9,7 +9,10 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.engine.transaction.jta.platform.internal.JOnASJtaPlatform;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,17 +22,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.Authority;
+import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.repository.AuthorityRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.HillromTeamUserDTO;
+import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
-import com.hillrom.vest.domain.PatientInfo;
-import com.hillrom.vest.security.AuthoritiesConstants;
 
 /**
  * Service class for managing users.
@@ -54,6 +58,11 @@ public class UserService {
     
     @Inject
     private PatientInfoService patientInfoService;
+    
+    @Inject
+    private UserLoginTokenService authTokenService;
+    
+    private UserSecurityQuestionService userSecurityQuestionService;
 
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
@@ -277,24 +286,88 @@ public class UserService {
 		});
 	}
 	
-	public void updateEmailOrPassword(Map<String,String> params){
+	public JSONObject updateEmailOrPassword(Map<String,String> params){
+		
 		String email = params.get("email");
-		userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).ifPresent(u-> {
-			if(null != email)
-				u.setEmail(email);
-			String password = params.get("password");
-            String encryptedPassword = passwordEncoder.encode(password);
-            u.setPassword(encryptedPassword);
-            u.setLastLoggedInAt(DateTime.now());
-            userRepository.save(u);
-            // update email in patientInfo
-            if(null != email){
-            	PatientInfo patientInfo = patientInfoService.findOneByHillromId(SecurityUtils.getCurrentLogin()).get();
-            	patientInfo.setEmail(email);
-            	patientInfoService.update(patientInfo);
-            }
-            log.debug("updateEmailOrPassword for User: {}", u);
-        });
+    	String password = params.get("password");
+    	String questionId = params.get("questionId");
+    	String answer = params.get("answer");
+    	String authToken = params.get("x-auth-token");
+    	
+    	JSONObject errorsJsonObject = validateRequest(password, questionId,
+				answer);
+        
+        if( null != errorsJsonObject)
+        	return errorsJsonObject;
+        
+        User currentUser = findOneByEmail(SecurityUtils.getCurrentLogin()).get();
+        if(!RandomUtil.isValidEmail(currentUser.getEmail()) && StringUtils.isBlank(email)){
+        	JSONObject jsonObject = new JSONObject();
+        	jsonObject.put("ERROR", "Required field Email is missing");
+        	return jsonObject;
+        }
+        
+        // Update Email for the firstTime Login , if not present
+        if(null !=  email){
+        	currentUser.setEmail(email);
+        }
+        currentUser.setPassword(passwordEncoder.encode(password));
+        currentUser.setLastLoggedInAt(DateTime.now());
+        
+        userRepository.save(currentUser);
+        
+        // update email in patientInfo, if the User is Patient
+        updatePatientEmailIfNotPresent(email);
+        
+        log.debug("updateEmailOrPassword for User: {}", currentUser);
+       
+        Long qid = Long.parseLong(questionId);
+        userSecurityQuestionService.update(currentUser.getId(), qid, answer);
+		authTokenService.deleteToken(authToken); // Token must be deleted to avoid subsequent request
+		return null;
+	}
+
+	/**
+	 * This updates Email in PatientInfo, if the loggedIn User is Patient
+	 * @param email
+	 */
+	private void updatePatientEmailIfNotPresent(String email) {
+		if(null != email){
+        	patientInfoService.findOneByHillromId(SecurityUtils.getCurrentLogin()).ifPresent(patient -> {
+        		patient.setEmail(email);        		
+        		patientInfoService.update(patient);
+        	});
+        }
+	}
+
+	/**
+	 * Validate whether all required fields present in the request
+	 * @param password
+	 * @param questionId
+	 * @param answer
+	 * @return
+	 */
+	private JSONObject validateRequest(String password,
+			String questionId, String answer) {
+		JSONObject jsonObject = new JSONObject();
+    	
+    	if(StringUtils.isBlank(answer)){
+    		jsonObject.put("ERROR", "Required field Answer is missing");
+    		return jsonObject;
+    	}
+    	if(StringUtils.isBlank(questionId)){
+    		jsonObject.put("ERROR", "Required field SecurityQuestion is missing");
+    		return jsonObject;
+    	}
+        if (!checkPasswordLength(password)) {
+        	jsonObject.put("ERROR", "Incorrect password");
+            return jsonObject;
+        }
+		return jsonObject;
+	}
+	
+	private boolean checkPasswordLength(String password) {
+	      return (!StringUtils.isEmpty(password) && password.length() >= UserDTO.PASSWORD_MIN_LENGTH && password.length() <= UserDTO.PASSWORD_MAX_LENGTH);
 	}
 }
 

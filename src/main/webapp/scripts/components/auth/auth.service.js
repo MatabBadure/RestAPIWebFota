@@ -94,12 +94,16 @@ angular.module('hillromvestApp')
 
             changePassword: function (newPassword, callback) {
                 var cb = callback || angular.noop;
-
-                return Password.save(newPassword, function () {
-                    return cb();
-                }, function (err) {
+                var data = {"password":newPassword};
+                var deferred = $q.defer();
+                Password.changePassword(data).then(function (data) {
+                    deferred.resolve(data);
+                    return cb(data);
+                }).catch(function (err) {
+                    deferred.reject(err);
                     return cb(err);
-                }).$promise;
+                });
+                return deferred.promise;
             },
 
             resetPasswordInit: function (mail, callback) {

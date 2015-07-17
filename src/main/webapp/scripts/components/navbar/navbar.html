@@ -1,62 +1,34 @@
-<!-- <li ui-sref-active="active">
-  <a ui-sref="userLoginToken">
-    <span class="glyphicon glyphicon-asterisk"></span>
-    &#xA0;
-    <span translate="global.menu.entities.userLoginToken">userLoginToken</span>
-  </a>
-</li>
-<li ui-sref-active="active">
-  <a ui-sref="patientInfo">
-    <span class="glyphicon glyphicon-asterisk"></span>
-    &#xA0;<span translate="global.menu.entities.patientInfo">patientInfo</span>
-  </a>
-</li>
-
-<li ui-sref-active="active">
-  <a ui-sref="patientVestDeviceRawLog">
-    <span class="glyphicon glyphicon-asterisk"></span>
-    &#xA0;<span translate="global.menu.entities.patientVestDeviceRawLog">patientVestDeviceRawLog
-    </span>
-  </a>
-</li> -->
-
-<nav class="navbar navbar-default navbar-fixed-top custom-navbar" role="navigation">
+<nav class="navbar navbar-default navbar-fixed-top">
   <div class="container">
-    <div class="navbar-header left-padding">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <!-- <a class="navbar-brand" href="#/"><span translate="global.title">jhipster</span> <span class="navbar-version">v{{VERSION}}</span></a> -->
-      <a class="navbar-brand" href="#/"><img class="hillrom_logo" src="assets/images/logo.jpeg"></a>
+    <div class="navbar-header left-padding navbar-primary">
+      <a class="navbar-brand" href="#/"><img class="hillrom_logo" src="assets/images/logo-HillRom.png" alt="HillRom Logo"></a>
     </div>
-    <div class="collapse navbar-collapse right-padding" id="navbar-collapse" ng-switch="isAuthenticated()">
-      <ul class="nav navbar-nav nav-pills navbar-right">
-        <li ui-sref-active="active">
-          <a ui-sref="home">
-            <span translate="global.menu.home">Home</span>
+    <div class="collapse navbar-collapse pull-right navbar-secondary" id="navbar-collapse" ng-switch="isAuthenticated()">
+      <ul class="nav navbar-nav nav-pills">
+        <li>
+          <a class="active" ui-sref="home">
+            <img src="assets/images/patient.png" alt="Patient">
           </a>
         </li>
-        <li ui-sref-active="active">
+        <li>
           <a ui-sref="home">
-            <span translate="global.menu.about-us">About Us</span>
+            <img src="assets/images/doctor.png" alt="Healthcare Professional">
           </a>
         </li>
-        <li ui-sref-active="active">
+        <li>
           <a ui-sref="home">
-            <span translate="global.menu.services">Services</span>
+            <img src="assets/images/clinic.png" alt="Clinic">
           </a>
         </li>
-        <li ui-sref-active="active">
+        <li>
           <a ui-sref="home">
-            <span translate="global.menu.product">Product</span>
+            <img src="assets/images/user.png" alt="User">
           </a>
         </li>
-        <li ui-sref-active="active">
+        <li>
           <a ui-sref="home">
-            <span translate="global.menu.contact-us">Contact Us</span>
+            <span class="padding-right">Jose Rubert</span>
+            <img src="assets/images/down-arrow.png">
           </a>
         </li>
       </ul>

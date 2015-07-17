@@ -1,24 +1,78 @@
-.navbar-default{
-	background-color: #ffffff;
-	border-color: #ffffff;
+$header--background: $waikawa-gray;
+.navbar-default {
+	background-color: $header--background;
+	color: $bombay;
+	min-height: 60px;
+	.navbar-brand{
+		padding: 19px 10px;
+	}
+}
+.navbar-default > .container, 
+.navbar-default > .container > .navbar-header, 
+.navbar-default > .container > .navbar-header > .navbar-brand, 
+.navbar-default > .container > .navbar-secondary,
+.navbar-default > .container > .navbar-secondary ul,
+.navbar-default > .container > .navbar-secondary ul li {
+	min-height: inherit;
+	background-color: inherit;
+	color: inherit;
 }
 
-.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
-    background-color: #ffffff;
-    color: #555;
+.navbar-secondary .nav-pills > li {
+  min-width: 40px;
 }
-.custom-navbar{
-	.left-padding{
-		padding-left: 15px;
-	}
-	.right-padding{
-		padding-right: 15px;
-	}
-	.navbar-header > .navbar-brand{
-		padding: 12px;
-		.hillrom_logo{
-			height: 27px;
-    	width: 138px;
-		}
+
+.navbar-secondary .nav-pills > li + li {
+  margin-left: 20px;
+}
+
+.navbar-secondary .nav-pills li a {
+	color: inherit;
+	padding: 19px 10px;
+	&:hover {
+		background-color: inherit;
+		color: inherit;
+		box-shadow : 0 -3px 0 0 #ef7164 inset;
+		border-radius: 0;
+  	padding-bottom: 20px;
 	}
 }
+.navbar-secondary .nav-pills li:last-child a{
+	color: inherit;
+	padding: 19px 0;
+	&:hover {
+		background-color: inherit;
+		color: inherit;
+		border-radius: 0;
+  	padding-bottom: 20px;
+  	box-shadow : 0 0 0 0 #ef7164 inset;
+	}
+}
+
+.navbar-secondary .nav-pills li a.active{
+	background-color: inherit;
+	color: inherit;
+	box-shadow : 0 -3px 0 0 #ef7164 inset;
+	border-radius: 0;
+	padding-bottom: 20px;
+}
+
+// .navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
+//     background-color: #ffffff;
+//     color: #555;
+// }
+// .custom-navbar{
+// 	.left-padding{
+// 		padding-left: 15px;
+// 	}
+// 	.right-padding{
+// 		padding-right: 15px;
+// 	}
+// 	.navbar-header > .navbar-brand{
+// 		padding: 12px;
+// 		.hillrom_logo{
+// 			height: 27px;
+//     	width: 138px;
+// 		}
+// 	}
+// }

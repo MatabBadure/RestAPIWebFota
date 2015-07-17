@@ -6,21 +6,21 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 import org.boon.json.annotations.JsonProperty;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
-import org.hibernate.validator.constraints.Email;
 import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -34,7 +34,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @SQLDelete(sql="UPDATE USER SET is_deleted = 1 WHERE id = ?")
 public class User extends AbstractAuditingEntity implements Serializable {
 
-    @Id
+    
+	private static final long serialVersionUID = 1L;
+
+	@Id
     @Column(name = "id")
     @GeneratedValue
     private Long id;
@@ -107,6 +110,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name="last_loggedin_at")
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime lastLoggedInAt;
+    
+    @OneToOne(mappedBy = "user",fetch=FetchType.LAZY)
+    @JsonIgnore
+    private UserSecurityQuestion securityQuestion;
     
     public Long getId() {
         return id;
@@ -235,6 +242,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
+	}
+
+	public UserSecurityQuestion getSecurityQuestion() {
+		return securityQuestion;
+	}
+
+	public void setSecurityQuestion(UserSecurityQuestion securityQuestion) {
+		this.securityQuestion = securityQuestion;
 	}
 
 	@Override

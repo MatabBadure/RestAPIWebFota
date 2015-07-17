@@ -11,17 +11,34 @@ $bootstrap-sass-asset-helper: (twbs-font-path("") != unquote('twbs-font-path("")
 //
 //## Gray and brand colors for use across Bootstrap.
 
-$gray-darker:            lighten(#000, 13.5%) !default; // #222
-$gray-dark:              lighten(#000, 20%) !default;   // #333
-$gray:                   lighten(#000, 33.5%) !default; // #555
-$gray-light:             lighten(#000, 46.7%) !default; // #777
-$gray-lighter:           lighten(#000, 93.5%) !default; // #eee
+$gray-darker:           lighten(#000, 13.5%) !default; // #222
+$gray-dark:             lighten(#000, 20%) !default;   // #333
+$gray:                  lighten(#000, 33.5%) !default; // #555
+$gray-light:            lighten(#000, 46.7%) !default; // #777
+$gray-lighter:          lighten(#000, 93.5%) !default; // #eee
 
 $brand-primary:         #428bca !default;
 $brand-success:         #5cb85c !default;
 $brand-info:            #5bc0de !default;
 $brand-warning:         #f0ad4e !default;
 $brand-danger:          #d9534f !default;
+
+//HillRom Primary Colours
+$cyan-blue-light:				#7ca3dc  !default;
+
+//HillRom Secondary Colours
+$terracotta:						#ef7164  !default;
+$seashell:							#f1f1f1  !default;
+
+//HillRom Primary Colour Shades
+$waikawa-gray:					#58749C  !default;
+$pickled-bluewood:			#34455C  !default;
+$blue-portage-light:		#83ACE9  !default;
+$ship-cove-dark:				#6E90C2  !default;
+
+//HillRom Font Colours
+$nevada:								#5d6a7d !default;
+$bombay:								#aeb5be !default;
 
 
 //== Scaffolding
@@ -31,7 +48,7 @@ $brand-danger:          #d9534f !default;
 //** Background color for `<body>`.
 $body-bg:               #fff !default;
 //** Global text color on `<body>`.
-$text-color:            $gray-dark !default;
+$text-color:            $bombay !default;
 
 //** Global textual link color.
 $link-color:            $brand-primary !default;
@@ -44,31 +61,38 @@ $link-hover-color:      darken($link-color, 15%) !default;
 //## Font, line-height, and color for body text, headings, and more.
 
 $font-family-sans-serif:  "Helvetica Neue", Helvetica, Arial, sans-serif !default;
+//HillRom font-family
+$font-family-myriad: "Myriad Pro", Arial, Helvetica, sans-serif;
+
 $font-family-serif:       Georgia, "Times New Roman", Times, serif !default;
 //** Default monospace fonts for `<code>`, `<kbd>`, and `<pre>`.
 $font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace !default;
-$font-family-base:        $font-family-sans-serif !default;
+// $font-family-base:        $font-family-sans-serif !default;
+
+// HillRom base font-family
+$font-family-base:        $font-family-myriad !default;
 
 $font-size-base:          14px !default;
 $font-size-large:         ceil(($font-size-base * 1.25)) !default; // ~18px
+$font-size-larger:        ceil(($font-size-base * 1.5)) !default; // ~21px
 $font-size-small:         ceil(($font-size-base * 0.85)) !default; // ~12px
 
-$font-size-h1:            floor(($font-size-base * 2.6)) !default; // ~36px
-$font-size-h2:            floor(($font-size-base * 2.15)) !default; // ~30px
-$font-size-h3:            ceil(($font-size-base * 1.7)) !default; // ~24px
+$font-size-h1:            floor(($font-size-base * 3)) !default; // ~42px
+$font-size-h2:            floor(($font-size-base * 2)) !default; // ~28px
+$font-size-h3:            ceil(($font-size-base * 1.5)) !default; // ~21px
 $font-size-h4:            ceil(($font-size-base * 1.25)) !default; // ~18px
 $font-size-h5:            $font-size-base !default;
 $font-size-h6:            ceil(($font-size-base * 0.85)) !default; // ~12px
 
 //** Unit-less `line-height` for use in components like buttons.
-$line-height-base:        1.428571429 !default; // 20/14
+$line-height-base:        1.5 !default; // 21/14
 //** Computed "line-height" (`font-size` * `line-height`) for use with `margin`, `padding`, etc.
 $line-height-computed:    floor(($font-size-base * $line-height-base)) !default; // ~20px
 
 //** By default, this inherits from the `<body>`.
 $headings-font-family:    inherit !default;
 $headings-font-weight:    500 !default;
-$headings-line-height:    1.1 !default;
+$headings-line-height:    2 !default;
 $headings-color:          inherit !default;
 
 
@@ -306,7 +330,7 @@ $screen-md-max:              ($screen-lg-min - 1) !default;
 //** Number of columns in the grid.
 $grid-columns:              16 !default;
 //** Padding between columns. Gets divided in half for the left and right.
-$grid-gutter-width:         30px !default;
+$grid-gutter-width:         20px !default;
 // Navbar collapse
 //** Point at which the navbar becomes uncollapsed.
 $grid-float-breakpoint:     $screen-sm-min !default;
@@ -846,5 +870,3 @@ $page-header-border-color:    $gray-lighter !default;
 $dl-horizontal-offset:        $component-offset-horizontal !default;
 //** Horizontal line color.
 $hr-border:                   $gray-lighter !default;
-
-

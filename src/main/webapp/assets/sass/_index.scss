@@ -1,17 +1,8 @@
-html{
-	height: 100%;
-}
-
-body{
-	height: inherit;
-	color: #A7A7A7;
-}
-
-.container-top-indent{
+.container-top-indent {
 	height: inherit;
 }
 
-.content-body{
+.content-body {
 	background-color: #EEEEEE;
 	height: -o-calc(100% - 100px); /* opera */
 	height: -webkit-calc(100% - 100px); /* google, safari */
@@ -19,41 +10,34 @@ body{
 	margin-top: 50px;
 }
 
-.clr{
+.clr {
 	clear: both;
 }
 
-.text-center{
-	text-align: center;
+.padding-left {
+	padding-left: 10px;
 }
 
-.textUpperCase{
-	text-transform: uppercase;
+.padding-right {
+	padding-right: 10px;
 }
 
-.indent-bottom-5{
-	padding-bottom: 5px;
+.padding-left-ls {
+	padding-left: 20px;
 }
 
-.indent-top-15{
-	padding-top: 15px;
+.padding-right-ls {
+	padding-right: 20px;
 }
 
-.margin-top-15{
-	margin-top: 15px;
+.no-padding {
+	padding: 0;
 }
 
-.indent-form-top{
-	padding-top: 10px;
+.no-padding-left {
+	padding-left: 0;
 }
 
-.float-left{
-	float: left;
-}
-
-.form-error{
-	padding-top: 5px;
-	span{
-		color: black;
-	}
+.no-padding-right {
+	padding-right: 0;
 }

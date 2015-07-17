@@ -1,4 +1,4 @@
-package com.hillrom.vest.web.rest;
+/*package com.hillrom.vest.web.rest;
 
 import com.hillrom.vest.Application;
 import com.hillrom.vest.domain.PatientInfo;
@@ -29,11 +29,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-/**
+*//**
  * Test class for the PatientInfoResource REST controller.
  *
  * @see PatientInfoResource
- */
+ *//*
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
@@ -257,3 +257,4 @@ public class PatientInfoResourceTest {
         assertThat(patientInfos).hasSize(databaseSizeBeforeDelete - 1);
     }
 }
+*/

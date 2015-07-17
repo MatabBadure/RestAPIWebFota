@@ -119,7 +119,7 @@ public class ClinicResource {
     @Timed
     public ResponseEntity<Clinic> get(@PathVariable Long id) {
         log.debug("REST request to get Clinic : {}", id);
-        return Optional.ofNullable(clinicRepository.findOneWithEagerRelationships(id))
+        return Optional.ofNullable(clinicRepository.findOne(id))
             .map(clinic -> new ResponseEntity<>(
                 clinic,
                 HttpStatus.OK))

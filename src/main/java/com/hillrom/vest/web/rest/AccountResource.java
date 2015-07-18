@@ -31,7 +31,6 @@ import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.MailService;
 import com.hillrom.vest.service.UserLoginTokenService;
 import com.hillrom.vest.service.UserService;
-import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 
 
@@ -218,20 +217,10 @@ public class AccountResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<JSONObject> updateEmailOrPassword(@RequestBody(required=true) Map<String,String> params,@RequestHeader(value="x-auth-token",required=true)String authToken) {
-    	String email = params.get("email");
-    	String password = params.get("password");
-    	JSONObject jsonObject = new JSONObject();
-        if (!checkPasswordLength(password)) {
-        	jsonObject.put("ERROR", "Incorrect password");
-            return ResponseEntity.badRequest().body(jsonObject);
-        }
-        User currentUser = userService.findOneByEmail(SecurityUtils.getCurrentLogin()).get();
-        if(!RandomUtil.isValidEmail(currentUser.getEmail()) && StringUtils.isBlank(email)){
-        	jsonObject.put("ERROR", "Email is required");
-        	return ResponseEntity.badRequest().body(jsonObject);
-        }
-        userService.updateEmailOrPassword(params);
-        authTokenService.deleteToken(authToken); // Token must be deleted to avoid subsequent request
+    	params.put("x-auth-token", authToken);
+    	JSONObject errorsJsonObject = userService.updateEmailOrPassword(params);
+    	if(null != errorsJsonObject.get("ERROR"))
+    		return ResponseEntity.badRequest().body(errorsJsonObject);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

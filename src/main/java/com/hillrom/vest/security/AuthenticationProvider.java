@@ -28,6 +28,8 @@ import com.hillrom.vest.service.util.RandomUtil;
 public class AuthenticationProvider extends DaoAuthenticationProvider {
 
 	private final Logger log = LoggerFactory.getLogger(AuthenticationProvider.class);
+	
+	private static final int NO_OF_CHARACTERS_TO_BE_EXTRACTED = 4;
 
     private PasswordEncoder passwordEncoder;
     
@@ -81,6 +83,16 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
 		return user;
 	}
 
+	private String generateDefaultPassword(User patientUser) {
+		StringBuilder defaultPassword = new StringBuilder();
+		defaultPassword.append(patientUser.getZipcode());
+		// default password will have the first 4 letters from last name, if length of last name <= 4, use complete string
+		int endIndex = patientUser.getLastName().length() > NO_OF_CHARACTERS_TO_BE_EXTRACTED ? NO_OF_CHARACTERS_TO_BE_EXTRACTED : patientUser.getLastName().length() ; 
+		defaultPassword.append(patientUser.getLastName().substring(0, endIndex));
+		defaultPassword.append(patientUser.getDob().toString("MMddyyyy"));
+		return defaultPassword.toString();
+	}
+	
 	/**
 	 * Handles password verification 
 	 * @param password

@@ -119,10 +119,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime lastLoggedInAt;
     
-    @OneToOne(mappedBy = "user",fetch=FetchType.LAZY)
-    @JsonIgnore
-    private UserSecurityQuestion securityQuestion;
-    
     @OneToMany(mappedBy = "user",fetch=FetchType.LAZY)
     @JsonIgnore
     private Set<UserPatientAssoc> userPatientAssoc = new HashSet<>();
@@ -246,14 +242,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
-	}
-
-	public UserSecurityQuestion getSecurityQuestion() {
-		return securityQuestion;
-	}
-
-	public void setSecurityQuestion(UserSecurityQuestion securityQuestion) {
-		this.securityQuestion = securityQuestion;
 	}
 
 	public String getGender() {

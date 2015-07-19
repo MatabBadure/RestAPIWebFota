@@ -23,8 +23,13 @@ import org.boon.json.annotations.JsonProperty;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
+import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 
 /**
  * A user.
@@ -122,6 +127,13 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @OneToMany(mappedBy = "user",fetch=FetchType.LAZY)
     @JsonIgnore
     private Set<UserPatientAssoc> userPatientAssoc = new HashSet<>();
+    
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
+    @JsonSerialize(using = CustomLocalDateSerializer.class)
+    @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
+    @Column(name = "dob")
+    private LocalDate dob;
+
     
     public Long getId() {
         return id;
@@ -282,6 +294,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	public void setUserPatientAssoc(Set<UserPatientAssoc> userPatientAssoc) {
 		this.userPatientAssoc = userPatientAssoc;
+	}
+
+	public LocalDate getDob() {
+		return dob;
+	}
+
+	public void setDob(LocalDate dob) {
+		this.dob = dob;
 	}
 
 	@Override

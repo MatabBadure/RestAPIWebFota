@@ -94,6 +94,7 @@ public class UserService {
            })
            .map(user -> {
                user.setPassword(passwordEncoder.encode(newPassword));
+               user.setLastLoggedInAt(DateTime.now());
                user.setResetKey(null);
                user.setResetDate(null);
                userRepository.save(user);
@@ -301,9 +302,10 @@ public class UserService {
     	String questionId = params.get("questionId");
     	String answer = params.get("answer");
     	String authToken = params.get("x-auth-token");
+    	String termsAndConditionsAccepted = params.get("termsAndConditionsAccepted");
     	
     	JSONObject errorsJsonObject = validateRequest(password, questionId,
-				answer);
+				answer,termsAndConditionsAccepted);
         
         if( null != errorsJsonObject.get("ERROR"))
         	return errorsJsonObject;
@@ -316,10 +318,13 @@ public class UserService {
         	return errorsJsonObject;
         }
         
-        currentUser.setEmail(email);
+        if(null!= email)
+        	currentUser.setEmail(email);
+        
         currentUser.setPassword(passwordEncoder.encode(password));
         currentUser.setLastLoggedInAt(DateTime.now());
-        
+        currentUser.setTermsConditionAccepted(true);
+        currentUser.setTermsConditionAcceptedDate(DateTime.now());
         userRepository.save(currentUser);
         
         // update email in patientInfo, if the User is Patient
@@ -376,9 +381,12 @@ public class UserService {
 	 * @return
 	 */
 	private JSONObject validateRequest(String password,
-			String questionId, String answer) {
+			String questionId, String answer,String termsAndConditionsAccepted) {
 		JSONObject jsonObject = new JSONObject();
-    	
+    	if(!StringUtils.isNotBlank(termsAndConditionsAccepted) || "false".equalsIgnoreCase(termsAndConditionsAccepted)){
+    		jsonObject.put("ERROR", "Please accept terms and conditions");
+    		return jsonObject;
+    	}
     	if(StringUtils.isBlank(answer)){
     		jsonObject.put("ERROR", "Required field Answer is missing");
     		return jsonObject;

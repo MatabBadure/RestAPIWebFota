@@ -1,24 +1,28 @@
 package com.hillrom.vest.service;
 
-import com.hillrom.vest.Application;
-import com.hillrom.vest.domain.User;
-import com.hillrom.vest.repository.UserRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
+
+import net.minidev.json.JSONObject;
+
 import org.joda.time.DateTime;
-import com.hillrom.vest.service.util.RandomUtil;
-import org.joda.time.LocalDate;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import java.util.Optional;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
+import com.hillrom.vest.Application;
+import com.hillrom.vest.domain.User;
+import com.hillrom.vest.domain.UserLoginToken;
+import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.service.util.RandomUtil;
 
 /**
  * Test class for the UserResource REST controller.
@@ -37,6 +41,9 @@ public class UserServiceTest {
 
     @Inject
     private UserService userService;
+    
+    @Inject
+    private AuthenticationService authService;
 
     @Test
     public void assertThatUserMustExistToResetPassword() {
@@ -134,5 +141,23 @@ public class UserServiceTest {
         DateTime now = new DateTime();
         List<User> users = userRepository.findAllByActivatedIsFalseAndCreatedDateBefore(now.minusDays(3));
         assertThat(users).isEmpty();
+    }
+    
+    @Test
+    public void testFailureChangePasswordDueToMissingPassword() {
+    	String username = "admin@localhost.com";
+    	String password = "admin";
+    	UserLoginToken authToken = authService.authenticate(username, password);
+        JSONObject jsonObject = userService.changePassword(null);
+        assertThat(jsonObject.containsKey("ERROR")).isTrue();
+    }
+    
+    @Test
+    public void testSuccessChangePasswordDueToMissingPassword() {
+    	String username = "admin@localhost.com";
+    	String password = "admin";
+    	UserLoginToken authToken = authService.authenticate(username, password);
+        JSONObject jsonObject = userService.changePassword("admin");
+        assertThat(jsonObject.containsKey("ERROR")).isFalse();
     }
 }

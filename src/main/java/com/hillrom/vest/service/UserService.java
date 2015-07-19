@@ -9,6 +9,8 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -29,6 +31,7 @@ import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.HillromTeamUserDTO;
+import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.security.AuthoritiesConstants;
@@ -138,14 +141,24 @@ public class UserService {
         });
     }
 
-    public void changePassword(String password) {
-        userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).ifPresent(u-> {
-            String encryptedPassword = passwordEncoder.encode(password);
-            u.setPassword(encryptedPassword);
-            userRepository.save(u);
-            log.debug("Changed password for User: {}", u);
-        });
+    public JSONObject changePassword(String password) {
+    	JSONObject jsonObject = new JSONObject();
+    	if(!checkPasswordLength(password)){
+    		jsonObject.put("ERROR", "Incorrect password");
+    	}else{
+    		userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).ifPresent(u-> {
+    			String encryptedPassword = passwordEncoder.encode(password);
+    			u.setPassword(encryptedPassword);
+    			userRepository.save(u);
+    			log.debug("Changed password for User: {}", u);
+    		});    		
+    	}
+    	return jsonObject;
     }
+    
+    private boolean checkPasswordLength(String password) {
+        return (!StringUtils.isEmpty(password) && password.length() >= UserDTO.PASSWORD_MIN_LENGTH && password.length() <= UserDTO.PASSWORD_MAX_LENGTH);
+      }
 
     @Transactional(readOnly = true)
     public User getUserWithAuthorities() {

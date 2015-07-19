@@ -160,12 +160,12 @@ public class AccountResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> changePassword(@RequestBody String password) {
-        if (!checkPasswordLength(password)) {
-            return new ResponseEntity<>("Incorrect password", HttpStatus.BAD_REQUEST);
+    public ResponseEntity<JSONObject> changePassword(@RequestBody String password) {
+        JSONObject jsonObject = userService.changePassword(password);
+        if(jsonObject.containsKey("ERROR")){
+        	return ResponseEntity.badRequest().body(jsonObject);
         }
-        userService.changePassword(password);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().body(jsonObject);
     }
 
     @RequestMapping(value = "/account/reset_password/init",

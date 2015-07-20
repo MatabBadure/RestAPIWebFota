@@ -59,7 +59,7 @@ public class ClinicResource {
         JSONObject jsonObject = new JSONObject();
         Clinic newClinic = clinicService.createClinic(clinicDTO);
         if(newClinic.getId() != null) {
-        	jsonObject.put("message", "Clinics created successfully.");
+        	jsonObject.put("message", "Clinic created successfully.");
             jsonObject.put("Clinic", newClinic);
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
         } else {
@@ -84,7 +84,7 @@ public class ClinicResource {
 	      	jsonObject.put("message", "No such clinic found.");
 	        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_GATEWAY);
         } else if(clinic.getId() != null) {
-        	jsonObject.put("message", "Clinics updated successfully.");
+        	jsonObject.put("message", "Clinic updated successfully.");
             jsonObject.put("Clinic", clinic);
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         } else {

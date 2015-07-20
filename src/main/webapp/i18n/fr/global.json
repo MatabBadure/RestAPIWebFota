@@ -11,6 +11,7 @@
                 "userLoginToken": "UserLoginToken",
                 "userExtension": "UserExtension",
                 "clinic": "Clinic",
+                "securityQuestion": "SecurityQuestion",
                 "additionalEntity": "JHipster will add additional entities here (do not translate!)"
             },
             "account": {

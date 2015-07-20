@@ -196,18 +196,26 @@ public class UserService {
     	PatientInfo patientInfo = new PatientInfo();
     	patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId())
     	.map(patient -> {
-    		if(patient != null) {
-    			return newUser;
-    		} else {
-    			assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
-    			patientInfoRepository.save(patientInfo);
-    			assignValuesToUserObj(userExtensionDTO, newUser);
-    			userExtensionRepository.save(newUser);
-    			// TO-DO ENTRY IN USER_PATIENT_ASSOC
-    			log.debug("Created Information for Patient User: {}", newUser);
-    			return newUser;
-    		}
+    		System.out.println("Patient: "+patient);
+    		return newUser;
+    	})
+    	.orElseGet(() -> {
+    		System.out.println("code reachable : ");
+    		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
+    		patientInfoRepository.save(patientInfo);
+    		System.out.println("patientInfo : "+patientInfo);
+    		assignValuesToUserObj(userExtensionDTO, newUser);
+    		System.out.println("User to be saved : "+newUser.getFirstName());
+			userExtensionRepository.save(newUser);
+			System.out.println("User : "+newUser);
+			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.PATIENT, "SELF");
+			userPatientRepository.save(userPatientAssoc);
+			newUser.getUserPatientAssoc().add(userPatientAssoc);
+			patientInfo.getUserPatientAssoc().add(userPatientAssoc);
+			log.debug("Created Information for Patient User: {}", newUser);
+			return newUser;
     	});
+    	System.out.println("code not reachable : ");
 		return newUser;
 	}
 
@@ -221,10 +229,23 @@ public class UserService {
 			patientInfo.setMiddleName(userExtensionDTO.getMiddleName());
 		if(userExtensionDTO.getLastName() != null)
 			patientInfo.setLastName(userExtensionDTO.getLastName());
-		if(userExtensionDTO.getTitle() != null)
+		if(userExtensionDTO.getGender() != null)
+			patientInfo.setGender(userExtensionDTO.getGender());
+		if(userExtensionDTO.getDob() != null)
 			patientInfo.setDob(userExtensionDTO.getDob());
+		if(userExtensionDTO.getLangKey() != null)
+			patientInfo.setLangKey(userExtensionDTO.getLangKey());
 		if(userExtensionDTO.getEmail() != null)
 			patientInfo.setEmail(userExtensionDTO.getEmail());
+		if(userExtensionDTO.getAddress() != null)
+			patientInfo.setAddress(userExtensionDTO.getAddress());
+		if(userExtensionDTO.getZipcode() != null)
+			patientInfo.setZipcode(userExtensionDTO.getZipcode());
+		if(userExtensionDTO.getCity() != null)
+			patientInfo.setCity(userExtensionDTO.getCity());
+		if(userExtensionDTO.getState() != null)
+			patientInfo.setState(userExtensionDTO.getState());
+		patientInfo.setWebLoginCreated(true);
 	}
     
     public UserExtension createDoctor(UserExtensionDTO userExtensionDTO) {
@@ -264,6 +285,8 @@ public class UserService {
 			newUser.setMobilePhone(userExtensionDTO.getMobilePhone());
 		if(userExtensionDTO.getFaxNumber() != null)
 			newUser.setFaxNumber(userExtensionDTO.getFaxNumber());
+		if(userExtensionDTO.getNpiNumber() != null)
+			newUser.setNpiNumber(userExtensionDTO.getNpiNumber());
 		newUser.setLangKey(userExtensionDTO.getLangKey());
 		// new user is not active
 		newUser.setActivated(false);

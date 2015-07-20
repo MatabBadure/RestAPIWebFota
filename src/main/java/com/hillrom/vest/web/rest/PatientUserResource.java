@@ -14,21 +14,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.MailService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 
+@RestController
+@RequestMapping("/api")
 public class PatientUserResource {
 	
 	private final Logger log = LoggerFactory.getLogger(PatientUserResource.class);
 	
 	@Inject
-    private UserRepository userRepository;
+    private PatientInfoRepository patientInfoRepository;
 	
 	@Inject
 	private UserService userService;
@@ -43,19 +47,19 @@ public class PatientUserResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-   // @RolesAllowed(AuthoritiesConstants.ACCT_SERVICES)
+    @RolesAllowed(AuthoritiesConstants.ACCT_SERVICES)
     public ResponseEntity<JSONObject> create(@RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
         log.debug("REST request to save Patient User : {}", userExtensionDTO);
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("message", "e-mail address already in use");
-        return userRepository.findOneByEmail(userExtensionDTO.getEmail())
+        jsonObject.put("message", "HR Id already in use.");
+        return patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId())
         		.map(user -> {
         			return ResponseEntity.badRequest().body(jsonObject);
         		})
                 .orElseGet(() -> {
                 	if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
                 		UserExtension user = userService.createPatientUser(userExtensionDTO);
-                		if(user != null) {
+                		if(user.getId() != null) {
 	                        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
 	                        mailService.sendActivationEmail(user, baseUrl);
 	                        jsonObject.put("message", "Patient User created successfully.");

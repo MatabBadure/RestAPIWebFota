@@ -202,7 +202,7 @@ public class UserService {
     		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
     		patientInfoRepository.save(patientInfo);
     		assignValuesToUserObj(userExtensionDTO, newUser);
-    		if(userExtensionDTO.getRole() == AuthoritiesConstants.PATIENT) {
+    		if(AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
     			newUser.setEmail(userExtensionDTO.getHillromId());
     		}
 			userExtensionRepository.save(newUser);
@@ -213,7 +213,6 @@ public class UserService {
 			log.debug("Created Information for Patient User: {}", newUser);
 			return newUser;
     	});
-    	System.out.println("code not reachable : ");
 		return newUser;
 	}
 
@@ -247,10 +246,17 @@ public class UserService {
 	}
     
     public UserExtension createDoctor(UserExtensionDTO userExtensionDTO) {
-		UserExtension newUser = new UserExtension();
-		assignValuesToUserObj(userExtensionDTO, newUser);
-		userExtensionRepository.save(newUser);
-		log.debug("Created Information for User: {}", newUser);
+    	UserExtension newUser = new UserExtension();
+    	userRepository.findOneByEmail(userExtensionDTO.getEmail())
+    	.map(user -> {
+    		return newUser;
+    	})
+    	.orElseGet(() -> {
+    		assignValuesToUserObj(userExtensionDTO, newUser);
+			userExtensionRepository.save(newUser);
+			log.debug("Created Information for User: {}", newUser);
+			return newUser;
+    	});
 		return newUser;
 	}
 

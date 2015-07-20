@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
@@ -51,39 +53,76 @@ public class UserExtensionResource {
     private UserRepository userRepository;
     
     @Inject
+    private PatientInfoRepository patientInfoRepository;
+    
+    @Inject
     private MailService mailService;
     
     @Inject
     private UserService userService;
 
     /**
-     * POST  /userExtensions -> Create a new userExtension.
+     * POST  /user -> Create a new User.
      */
-    @RequestMapping(value = "/doctor",
+    @RequestMapping(value = "/user",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<JSONObject> create(@RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) throws URISyntaxException {
-        log.debug("REST request to save UserExtension : {}", userExtensionDTO);
+    @RolesAllowed(AuthoritiesConstants.ACCT_SERVICES)
+    public ResponseEntity<JSONObject> create(@RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
+        log.debug("REST request to save User : {}", userExtensionDTO);
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("message", "e-mail address already in use");
-        return userRepository.findOneByEmail(userExtensionDTO.getEmail())
-        		.map(user -> {
-        			return ResponseEntity.badRequest().body(jsonObject);
-        		})
-                .orElseGet(() -> {
-                	if (AuthoritiesConstants.DOCTOR.equals(userExtensionDTO.getRole())) {
-                		UserExtension user = userService.createDoctor(userExtensionDTO);
-                        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-                        mailService.sendActivationEmail(user, baseUrl);
-                        jsonObject.put("message", "Doctor created successfully.");
-                        jsonObject.put("user", user);
-                        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
-                	} else {
-                		jsonObject.put("message", "Incorrect data.");
-                		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.PARTIAL_CONTENT);
-                	}
-                });
+        if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
+        	return patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId())
+        			.map(user -> {
+        				jsonObject.put("message", "HR Id already in use.");
+            			return ResponseEntity.badRequest().body(jsonObject);
+            		})
+                    .orElseGet(() -> {
+                    	if(userExtensionDTO.getEmail() != null) {
+	                    	userRepository.findOneByEmail(userExtensionDTO.getEmail())
+	            			.map(user -> {
+	            				jsonObject.put("message", "e-mail address already in use");
+	                			return ResponseEntity.badRequest().body(jsonObject);
+	                		});
+                    	}
+                    	UserExtension user = userService.createPatientUser(userExtensionDTO);
+                		if(user.getId() != null) {
+                			if(userExtensionDTO.getEmail() != null) {
+                				String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+                				mailService.sendActivationEmail(user, baseUrl);
+                			}
+	                        jsonObject.put("message", "Patient User created successfully.");
+	                        jsonObject.put("user", user);
+	                        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+                		} else {
+                			jsonObject.put("message", "Unable to create Patient.");
+	                        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+                		}
+                    });
+        } else if (AuthoritiesConstants.HCP.equals(userExtensionDTO.getRole())) {
+        	jsonObject.put("message", "e-mail address already in use");
+        	return userRepository.findOneByEmail(userExtensionDTO.getEmail())
+            		.map(user -> {
+            			return ResponseEntity.badRequest().body(jsonObject);
+            		})
+                    .orElseGet(() -> {
+                    	UserExtension user = userService.createDoctor(userExtensionDTO);
+                    	if(user.getId() != null) {
+		                    String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+		                    mailService.sendActivationEmail(user, baseUrl);
+		                    jsonObject.put("message", "Doctor created successfully.");
+		                    jsonObject.put("user", user);
+		                    return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+                    	} else {
+                			jsonObject.put("message", "Unable to create Doctor.");
+	                        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+                		}
+                    });
+        } else {
+    		jsonObject.put("message", "Incorrect data.");
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.PARTIAL_CONTENT);
+    	}
     }
 
     /**

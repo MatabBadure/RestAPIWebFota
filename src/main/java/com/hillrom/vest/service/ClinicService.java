@@ -41,6 +41,7 @@ public class ClinicService {
 			newParentClinic.setPhoneNumber(parentClinic.getPhoneNumber());
 			newParentClinic.setHillromId(parentClinic.getHillromId());
 			newParentClinic.setDeleted(parentClinic.isDeleted());
+			newParentClinic.setParent(true);
 			return newParentClinic;
 		}).orElseGet(() -> {
 			newParentClinic.setName(clinicDTO.getName());
@@ -50,7 +51,7 @@ public class ClinicService {
 			newParentClinic.setState(clinicDTO.getState());
 			newParentClinic.setPhoneNumber(clinicDTO.getPhoneNumber());
 			newParentClinic.setHillromId(clinicDTO.getHillromId());
-			newParentClinic.setDeleted(false);
+			newParentClinic.setParent(true);
 			clinicRepository.save(newParentClinic);
 			return newParentClinic;
         });
@@ -58,7 +59,6 @@ public class ClinicService {
     		Clinic childClinic = new Clinic();
     		childClinic.setName(childClinicName.get("name"));
     		childClinic.setParentClinic(newParentClinic);
-    		childClinic.setDeleted(false);
     		clinicRepository.save(childClinic);
     		newParentClinic.getChildClinics().add(childClinic);
     	}
@@ -116,8 +116,6 @@ public class ClinicService {
 			clinic.setFaxNumber(clinicDTO.getFaxNumber());
 		if (clinicDTO.getHillromId() != null)
 			clinic.setHillromId(clinicDTO.getHillromId());
-		if (clinicDTO.getNpiNumber() != null)
-			clinic.setNpiNumber(clinicDTO.getNpiNumber());
 	}
 
 }

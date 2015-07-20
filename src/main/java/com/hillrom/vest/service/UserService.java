@@ -9,6 +9,8 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -19,17 +21,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.Authority;
+import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.domain.UserPatientAssoc;
+import com.hillrom.vest.domain.UserSecurityQuestion;
 import com.hillrom.vest.repository.AuthorityRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
+import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
+import com.hillrom.vest.service.util.RequestUtil;
 import com.hillrom.vest.web.rest.dto.HillromTeamUserDTO;
+import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
-import com.hillrom.vest.domain.PatientInfo;
-import com.hillrom.vest.security.AuthoritiesConstants;
 
 /**
  * Service class for managing users.
@@ -53,7 +60,14 @@ public class UserService {
     private AuthorityRepository authorityRepository;
     
     @Inject
+    private UserPatientRepository userPatientRepository;
+    
+    @Inject
     private PatientInfoService patientInfoService;
+    
+    @Inject
+    private UserSecurityQuestionService userSecurityQuestionService;
+
 
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
@@ -69,24 +83,82 @@ public class UserService {
         return Optional.empty();
     }
 
-    public Optional<User> completePasswordReset(String newPassword, String key) {
-       log.debug("Reset user password for reset key {}", key);
-
+    /**
+     * Completes the reset password flow
+     * @param paramsMap
+     * @return
+     */
+    public JSONObject completePasswordReset(Map<String,String> paramsMap) {
+       log.debug("Reset user password for reset key {}", paramsMap);
+   
+       String requiredParams[] = {"password","questionId","answer"};
+       JSONObject errorJSON =  RequestUtil.checkRequiredParams(paramsMap,requiredParams);
+       if(null != errorJSON.get("ERROR"))
+    	   return errorJSON;
+       
+       String key = paramsMap.get("key");
+       String newPassword = paramsMap.get("password");
+       String questionId = paramsMap.get("questionId");
+       String answer = paramsMap.get("answer");
+       
+       JSONObject jsonObject = new JSONObject();
+       if (!checkPasswordLength(newPassword)) {
+    	   jsonObject.put("message", "Incorrect password");
+    	   return jsonObject;
+       }
+       
        Optional<User> opUser = userRepository.findOneByResetKey(key);
-       System.out.println("opUser>>> "+opUser);
-       return opUser.filter(user -> {
-               DateTime oneDayAgo = DateTime.now().minusHours(24);
-               return user.getResetDate().isAfter(oneDayAgo.toInstant().getMillis());
-           })
-           .map(user -> {
-               user.setPassword(passwordEncoder.encode(newPassword));
-               user.setResetKey(null);
-               user.setResetDate(null);
-               userRepository.save(user);
-               return user;
-           });
+       if(opUser.isPresent()){
+    	   User user = opUser.get();
+    	   errorJSON = canProceedPasswordReset(questionId, answer,user);
+    	   if(null != errorJSON.get("ERROR")){
+    		   return errorJSON;
+    	   }
+           user.setPassword(passwordEncoder.encode(newPassword));
+           user.setResetKey(null);
+           user.setResetDate(null);
+           userRepository.save(user);
+           jsonObject.put("email", user.getEmail());
+           return jsonObject;
+       }else{
+    	   jsonObject.put("ERROR", "Invalid Reset Key");
+    	   return jsonObject;   
+       }
+       
     }
 
+    /**
+     * Verifies whether Token expired or the security question answer matches 
+     * @param questionId
+     * @param answer
+     * @param user
+     * @return
+     */
+	private JSONObject canProceedPasswordReset(String questionId, String answer,
+			 User user) {
+		JSONObject jsonObject = new JSONObject();
+		DateTime oneDayAgo = DateTime.now().minusHours(24);
+           if(user.getResetDate().isBefore(oneDayAgo.toInstant().getMillis())){
+        	   jsonObject.put("ERROR", "Reset Key Expired");
+           }
+           if(!verifySecurityQuestion(user,questionId,answer)){
+        	   jsonObject.put("ERROR", "Incorrect Security Question or Password");
+           }
+           return jsonObject;
+	}
+
+    private boolean verifySecurityQuestion(User user,String questionId,String answer){
+    	Optional<UserSecurityQuestion> opUserSecurityQuestion =  userSecurityQuestionService.findOneByUserIdAndQuestionId(user.getId(), Long.parseLong(questionId));
+    	if(opUserSecurityQuestion.isPresent()){
+    		return answer.equals(opUserSecurityQuestion.get().getAnswer());
+    	}
+    	return false;
+    }
+    
+    private boolean checkPasswordLength(String password) {
+        return (!StringUtils.isEmpty(password) && password.length() >= UserDTO.PASSWORD_MIN_LENGTH && password.length() <= UserDTO.PASSWORD_MAX_LENGTH);
+    }
+    
     public Optional<User> requestPasswordReset(String mail) {
        return userRepository.findOneByEmail(mail)
            .filter(user -> user.getActivated() == true)
@@ -102,7 +174,7 @@ public class UserService {
                                       String langKey) {
 
         User newUser = new User();
-        Authority authority = authorityRepository.findOne("ROLE_USER");
+        Authority authority = authorityRepository.findOne(AuthoritiesConstants.ADMIN);
         Set<Authority> authorities = new HashSet<>();
         String encryptedPassword = passwordEncoder.encode(password);
         // new user gets initially a generated password
@@ -237,9 +309,13 @@ public class UserService {
 		newUser.setFirstName(patientInfo.getFirstName());
 		newUser.setLastName(patientInfo.getLastName());
 		newUser.setPassword(encodedPassword);
-		newUser.getPatients().add(patientInfo);
-		
 		User persistedUser = userRepository.save(newUser);
+
+		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.PATIENT, "SELF");
+		userPatientRepository.save(userPatientAssoc);
+		newUser.getUserPatientAssoc().add(userPatientAssoc);
+		patientInfo.getUserPatientAssoc().add(userPatientAssoc);
+		
 		newUser.setId(persistedUser.getId());
 		// Update WebLoginCreated to be true  and user patient association
 		updateWebLoginStatusAndUserPatientAssoc(patientInfo, persistedUser);
@@ -271,7 +347,6 @@ public class UserService {
 			PatientInfo patientInfo, User persistedUser) {
 		patientInfoService.findOneByHillromId(patientInfo.getHillromId()).map(patientUser ->{
 			patientUser.setWebLoginCreated(true);
-			patientUser.getUsers().add(persistedUser);
 			patientInfoService.update(patientUser);
 			return patientUser;
 		});

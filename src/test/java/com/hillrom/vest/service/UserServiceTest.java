@@ -145,19 +145,30 @@ public class UserServiceTest {
     
     @Test
     public void testFailureChangePasswordDueToMissingPassword() {
-    	String username = "admin@localhost.com";
-    	String password = "admin";
+    	String username = "john.doe@localhost";
+    	String password = "johndoe";
+    	User user = userService.createUserInformation(password, "John", "Doe", username, "en-US");
+    	user.setActivated(true);
+    	user.setLastLoggedInAt(DateTime.now());
+    	userRepository.save(user);
+    	
     	UserLoginToken authToken = authService.authenticate(username, password);
         JSONObject jsonObject = userService.changePassword(null);
         assertThat(jsonObject.containsKey("ERROR")).isTrue();
+        userRepository.delete(user);
     }
     
     @Test
-    public void testSuccessChangePasswordDueToMissingPassword() {
-    	String username = "admin@localhost.com";
-    	String password = "admin";
+    public void testSuccessChangePassword() {
+    	String username = "john.doe@localhost";
+    	String password = "johndoe";
+    	User user = userService.createUserInformation(password, "John", "Doe", username, "en-US");
+    	user.setActivated(true);
+    	user.setLastLoggedInAt(DateTime.now());
+    	userRepository.save(user);
     	UserLoginToken authToken = authService.authenticate(username, password);
         JSONObject jsonObject = userService.changePassword("admin");
         assertThat(jsonObject.containsKey("ERROR")).isFalse();
+        userRepository.delete(user);
     }
 }

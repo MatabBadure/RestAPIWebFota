@@ -76,7 +76,7 @@
 
                     <div class="form-group">
                         <label>Choose security question*</label>
-                        <select class="form-control" name="question" ng-model="resetAccount.question" required ng-options="question for question in questions">
+                        <select class="form-control" name="question" ng-model="resetAccount.question" required ng-options="question.question for question in questions">
                           <option value="">-- select a security question --</option>
                         </select>
 

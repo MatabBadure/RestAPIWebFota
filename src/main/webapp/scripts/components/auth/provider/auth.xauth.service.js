@@ -44,7 +44,7 @@ angular.module('hillromvestApp')
             },
 
             getSecurityQuestions: function () {
-                return $http.get('')
+                return $http.get('api/securityQuestions')
                 .success(function (data, status, headers, config) {
                     return {'response' : data, 'status' : status, 'headers' : headers, 'config' : config};
                 }).error(function (data, status, headers, config) {

@@ -115,9 +115,9 @@ angular.module('hillromvestApp')
 
             resetPasswordFinish: function(key, data, callback) {
                 var cb = callback || angular.noop;
-                var data = {"newPassword":data.password,
-                            "question": data.question,
-                            "answer":data.answer
+                var data = {"questionId":data.question.id,
+                            "answer": data.answer,
+                            "password":data.password
                            };
                 return PasswordResetFinish.resetPassFinish(key).save(data, function () {
                     return cb();
@@ -147,7 +147,6 @@ angular.module('hillromvestApp')
                     deferred.resolve(data);
                     return cb(data);
                 }).catch(function (err) {
-                    this.logout();
                     deferred.reject(err);
                     return cb(err);
                 }.bind(this));

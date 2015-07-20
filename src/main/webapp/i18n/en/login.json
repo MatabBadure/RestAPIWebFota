@@ -13,7 +13,7 @@
             }
         },
         "password" : {
-            "forgot": "forget password?"
+            "forgot": "forgot password?"
         }
     }
 }

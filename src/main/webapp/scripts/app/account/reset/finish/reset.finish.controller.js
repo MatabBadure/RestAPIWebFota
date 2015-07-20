@@ -16,14 +16,8 @@ angular.module('hillromvestApp')
              $scope.submitted  = true;
         }
         Auth.getSecurityQuestions().
-        then(function (data) {
-            $scope.questions = [
-              'black',
-              'white',
-              'red',
-              'blue',
-              'yellow'
-            ];
+        then(function (response) {
+            $scope.questions = response.data;
         }).catch(function (err) {
             $scope.questionsNotLoaded = true;  
         });

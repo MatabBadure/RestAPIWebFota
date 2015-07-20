@@ -10,9 +10,11 @@ angular.module('hillromvestApp')
         $scope.widgetId = null;
         $scope.user = {};
         $scope.errors = {};
+        $scope.questions = [];
         $scope.authenticationError = false;
         $scope.siteKey = '6LcXjQkTAAAAAMZ7kb5v9YZ8vrYKFJmDcg2oE-SH';
         $scope.loginSubmitted = false;
+        $scope.submitted = false;
 
         $scope.setResponse = function (response) {
             $scope.response = response;
@@ -21,6 +23,17 @@ angular.module('hillromvestApp')
         $scope.setWidgetId = function (widgetId) {
             $scope.widgetId = widgetId;
         };
+
+        $scope.submitConfirmForm = function() {
+            $scope.submitted = true;
+        };
+
+        Auth.getSecurityQuestions().
+        then(function (response) {
+            $scope.questions = response.data;
+        }).catch(function (err) {
+            $scope.questionsNotLoaded = true;  
+        });
 
         $scope.authenticate = function(){
           $scope.authenticationError = false;
@@ -31,7 +44,10 @@ angular.module('hillromvestApp')
           }).then(function (data) {
             if(data.status === 200){
               localStorage.removeItem('loginCount');
-              $state.go('patient');
+              //$state.go('patient');
+              //below 2 lines to be removed and above line to be un-commented
+              $scope.isFirstLogin = true;
+              $scope.isEmailExist = false;
             }
           }).catch(function (data) {
             if (data.status === 401) {
@@ -81,10 +97,15 @@ angular.module('hillromvestApp')
         };
 
         $scope.submitPassword = function (event){
+          if($scope.confirmForm.$invalid){
+            return false;
+          }
           event.preventDefault();
           Auth.submitPassword({
-                email: $scope.user.email,
-                password: $scope.user.password
+                'email': $scope.user.email,
+                'password': $scope.user.password,
+                'answer': $scope.user.answer,
+                'questionId': $scope.user.question.id
             }).then(function (data) {
               Auth.logout();
               $state.go('home');

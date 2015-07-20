@@ -5,7 +5,6 @@ angular.module('hillromvestApp')
   return {
     templateUrl: 'scripts/components/entities/clinics/list/list.html',
     restrict: 'E',
-    link: function postLink(scope, element, attrs) {},
     scope: {
       onSelect: '&'
     },

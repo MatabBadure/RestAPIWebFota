@@ -1,13 +1,16 @@
 'use strict';
 describe('Service: User', function () {
 
-  var User;
+  var User, httpBackend, http, q;
 
   beforeEach(module('hillromvestApp'));
 
 
-  beforeEach(inject(function (_User_) {
+  beforeEach(inject(function (_User_, $httpBackend,  _$http_, _$q_) {
     User = _User_;
+    http = _$http_;
+    q = _$q_;
+    httpBackend = $httpBackend;
   }));
 
 
@@ -20,13 +23,15 @@ describe('Service: User', function () {
       'role' : 'SUPER_ADMIN',
       'title' : 'Mr.'
     };
-    var response = User.createClinic(data);
+    var response = User.createUser(data);
+    httpBackend.flush();
     expect(response.status).toEqual(201);
   });
 
   it('deleteUser', function () {
     var id = '';
     var response = User.deleteUser(id);
+    httpBackend.flush();
     expect(response.status).toEqual(200);
   });
 });

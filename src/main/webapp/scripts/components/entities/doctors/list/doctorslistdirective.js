@@ -5,8 +5,6 @@ angular.module('hillromvestApp')
   return {
     templateUrl: 'scripts/components/entities/doctors/list/list.html',
     restrict: 'E',
-    link: function postLink(scope, element, attrs) {
-    },
     scope: {
       onSelect: '&'
     },
@@ -29,10 +27,10 @@ angular.module('hillromvestApp')
         ,{'name':'Joseph taylor','email':'josephtaylor@gmail.com','hospital':'xyz hospital'}
         ,{'name':'David Jones','email':'davijones@gmail.com','hospital':'abc hospital'}];
       }
-      
-      
+
+
     }
-    
+
     //
   };
 });

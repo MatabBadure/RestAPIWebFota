@@ -5,7 +5,7 @@ angular.module('hillromvestApp')
     var token = localStorage.getItem('token');
     return {
       createUser: function (data) {
-        return $http.post('api/hillromteamuser', data, {
+        return $http.post('api/user', data, {
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
@@ -17,7 +17,7 @@ angular.module('hillromvestApp')
       },
       deleteUser : function(id){
         id=16;
-        return $http.delete('api/hillromteamuser/'+id, {
+        return $http.delete('api/user/'+id, {
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',

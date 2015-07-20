@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .directive('patient', function (Patient) {
+  .directive('patient', function (User) {
     return {
       templateUrl: 'scripts/components/entities/patients/new/create.html',
       restrict: 'E',
@@ -19,10 +19,10 @@ angular.module('hillromvestApp')
             return false;
           }
           var data = {
-            'id': $scope.patient.HRID,
+            'hillromId': $scope.patient.HRID,
             'title': $scope.patient.title,
             'gender': $scope.patient.gender,
-            'language': $scope.patient.language,
+            'langKey': $scope.patient.language,
             'firstName': $scope.patient.firstName,
             'middleName': $scope.patient.middleName,
             'lastName':$scope.patient.lastName,
@@ -31,17 +31,25 @@ angular.module('hillromvestApp')
             'address': $scope.patient.address,
             'city': $scope.patient.city,
             'state': $scope.patient.state,
-            'zipCode': $scope.patient.zipCode,
-            'email': $scope.patient.email
+            'zipcode': $scope.patient.zipCode,
+            'email': $scope.patient.email,
+            'role':'PATIENT'
           };
-          Patient.createPatient(data).then(function (response) {
-		            $scope.patientStatus.isMessage = true;
-		            $scope.message = "Patient created successfully"+" with ID "+response.data.patient.id;
+          User.createUser(data).then(function (response) {
+            if(response.status == '201')
+            {
+              $scope.patientStatus.isMessage = true;
+              $scope.patientStatus.message = "Patient created successfully"+" with ID "+response.data.user.id;
+            }else{
+                  $scope.patientStatus.message = 'Error occured! Please try again';
+               }
+		            
           }).catch(function (response) {
 		            $scope.patientStatus.isMessage = true;
-		            if(response.data.message !== undefined){
-		              $scope.patientStatus.message = response.data.message;
-		            }else{
+                if(response.status == '400' && response.data.message == "HR Id already in use."){
+                  $scope.patientStatus.message = 'Patient ID ' + $scope.patient.HRID + " already in use.";
+                }
+		            else{
 		              $scope.patientStatus.message = 'Error occured! Please try again';
 		           }
           });
@@ -50,7 +58,7 @@ angular.module('hillromvestApp')
 
         $scope.deletePatient = function(){
         	$scope.patient.id="1"
-          	Patient.deletePatient($scope.patient.id).then(function (response) {
+          	User.createUser($scope.patient.id).then(function (response) {
 		            $scope.isMessage = true;  
 		            $scope.patientStatus.message = response.data.message;
           }).catch(function (response) {
@@ -63,7 +71,6 @@ angular.module('hillromvestApp')
           });
         };
 
-        //
          angular.element("#dp2").datepicker().datepicker("setDate", new Date());
 
 
@@ -82,7 +89,6 @@ angular.module('hillromvestApp')
         angular.element("#dp2").datepicker('hide');
       });
 
-        //
       }
     };
   });

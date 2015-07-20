@@ -1,4 +1,4 @@
-$header--background: $waikawa-gray;
+$header--background: $pickled-bluewood;
 .navbar-default {
 	background-color: $header--background;
 	color: $bombay;
@@ -35,6 +35,9 @@ $header--background: $waikawa-gray;
 		box-shadow : 0 -3px 0 0 #ef7164 inset;
 		border-radius: 0;
   	padding-bottom: 20px;
+  	span{
+			color: white;
+		}
 	}
 }
 .navbar-secondary .nav-pills li:last-child a{
@@ -55,24 +58,7 @@ $header--background: $waikawa-gray;
 	box-shadow : 0 -3px 0 0 #ef7164 inset;
 	border-radius: 0;
 	padding-bottom: 20px;
+	span{
+		color: white;
+	}
 }
-
-// .navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
-//     background-color: #ffffff;
-//     color: #555;
-// }
-// .custom-navbar{
-// 	.left-padding{
-// 		padding-left: 15px;
-// 	}
-// 	.right-padding{
-// 		padding-right: 15px;
-// 	}
-// 	.navbar-header > .navbar-brand{
-// 		padding: 12px;
-// 		.hillrom_logo{
-// 			height: 27px;
-//     	width: 138px;
-// 		}
-// 	}
-// }

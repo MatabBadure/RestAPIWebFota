@@ -196,18 +196,16 @@ public class UserService {
     	PatientInfo patientInfo = new PatientInfo();
     	patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId())
     	.map(patient -> {
-    		System.out.println("Patient: "+patient);
     		return newUser;
     	})
     	.orElseGet(() -> {
-    		System.out.println("code reachable : ");
     		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
     		patientInfoRepository.save(patientInfo);
-    		System.out.println("patientInfo : "+patientInfo);
     		assignValuesToUserObj(userExtensionDTO, newUser);
-    		System.out.println("User to be saved : "+newUser.getFirstName());
+    		if(userExtensionDTO.getRole() == AuthoritiesConstants.PATIENT) {
+    			newUser.setEmail(userExtensionDTO.getHillromId());
+    		}
 			userExtensionRepository.save(newUser);
-			System.out.println("User : "+newUser);
 			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.PATIENT, "SELF");
 			userPatientRepository.save(userPatientAssoc);
 			newUser.getUserPatientAssoc().add(userPatientAssoc);

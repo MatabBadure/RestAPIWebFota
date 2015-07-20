@@ -47,5 +47,10 @@
         </addColumn>
         <dropColumn tableName="USER_EXTENSION" columnName="zipcode"/>
         
+        <addColumn tableName="USER_PATIENT_ASSOC">
+        	<column name="user_role" type="varchar(45)"/>
+        	<column name="relation_label" type="varchar(45)"/>
+        </addColumn>
+        
     </changeSet>
 </databaseChangeLog>

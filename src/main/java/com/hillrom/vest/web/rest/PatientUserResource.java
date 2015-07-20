@@ -60,8 +60,10 @@ public class PatientUserResource {
                 	if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
                 		UserExtension user = userService.createPatientUser(userExtensionDTO);
                 		if(user.getId() != null) {
-	                        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-	                        mailService.sendActivationEmail(user, baseUrl);
+                			if(userExtensionDTO.getEmail() != null) {
+                				String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+                				mailService.sendActivationEmail(user, baseUrl);
+                			}
 	                        jsonObject.put("message", "Patient User created successfully.");
 	                        jsonObject.put("user", user);
 	                        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);

@@ -4,6 +4,43 @@
     <div ng-switch-when="true" class="dashboard-page__form--new_user-type">Create Clinics</div>
     <div ng-switch-when="false" class="dashboard-page__form--new_user-type">Edit Clinic</div>
   </div>
+  <div class="col-md-16 indent-form-top" ng-show="clinicStatus.isCreate">
+    <label><input type="radio" ng-model="clinic.type" value="parent">Parent Clinic</label>
+    <label><input type="radio" ng-model="clinic.type" value="child">Child Clinic</label>
+  </div>
+  <div class="col-md-16 indent-form-top" ng-show="clinic.type === 'child' || clinic.parent">
+    <div class="col-md-6">
+      <label for="exampleInputEmail1">Select Parent Clinic *</label>
+    </div>
+    <div class="col-md-10">
+      <input type="text" id={{$index}} class="form-control" name="satellite_{{$index}}" ng-model="clinic.parent" minlength=0 ng-maxlength=50 ng-keyup="getParentClinic()">
+      <span ng-show="!clinicStatus.isCreate" ng-click="removeParent()">Remove</span>
+      <div class="dashboard-page__user-list__detailed__list">
+        <div ng-repeat="clinic in clinics | filter:clinic.parent">
+          <div ng-click="selectClinic(clinic)" class="dashboard-page__user-list__detailed__list--details" >
+            <span class="user-detail">
+              {{clinic.name}}
+            </span>
+            <span class="user-role">
+              {{clinic.city}}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-error" ng-show="(form.satellite_{{$index}}.$dirty && form.satellite_{{$index}}.$invalid) || submitted">
+        <span class="help-block" ng-show="form.satellite_{{$index}}.$error.required">
+            Satellite Clinic is required.
+          </span>
+        <span class="help-block" ng-show="form.satellite_{{$index}}.$error.minlength">
+            Satellite Clinic is required to be at least 3 character.
+          </span>
+        <span class="help-block" ng-show="form.satellite_{{$index}}.$error.maxlength">
+            Satellite Clinic cannot be longer than 50 characters.
+          </span>
+      </div>
+    </div>
+  </div>
   <div class="col-md-16 indent-form-top">
     <div class="col-md-6">
       <label for="exampleInputEmail1">Clinic Name *</label>
@@ -23,34 +60,7 @@
       </div>
     </div>
   </div>
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">Satellite Clinic *</label>
-    </div>
-    <div class="col-md-10" ng-repeat="childClinic in clinic.childClinics">
-      <input type="text" id={{$index}} class="form-control" name="satellite_{{$index}}" ng-model="childClinic.name" minlength=3 ng-maxlength=50 required>
-      <span ng-show="{{$index}} > 0" ng-click="removeChildClinic($index)">Remove</span>
-      <div class="form-error" ng-show="(form.satellite_{{$index}}.$dirty && form.satellite_{{$index}}.$invalid) || submitted">
-        <span class="help-block" ng-show="form.satellite_{{$index}}.$error.required">
-            Satellite Clinic is required.
-          </span>
-        <span class="help-block" ng-show="form.satellite_{{$index}}.$error.minlength">
-            Satellite Clinic is required to be at least 3 character.
-          </span>
-        <span class="help-block" ng-show="form.satellite_{{$index}}.$error.maxlength">
-            Satellite Clinic cannot be longer than 50 characters.
-          </span>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1"></label>
-    </div>
-    <div class="col-md-10 dashboard-page__form--new_checkbox">
-      <a href="javascript:;" ng-click="newChildClinic()"><span class="float-left">+ Add Another Clinic</span></a>
-    </div>
-  </div>
+
   <div class="col-md-16 indent-form-top">
     <div class="col-md-6">
       <label for="exampleInputEmail1">Address</label>

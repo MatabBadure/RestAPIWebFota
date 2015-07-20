@@ -95,9 +95,8 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "reset_date", nullable = true)
     private DateTime resetDate = null;
     
-    @Size(max = 20)
-    @Column(name = "terms_condition_accepted", length = 20)
-    private Boolean termsConditionAccepted;
+    @Column(name = "terms_condition_accepted")
+    private boolean termsConditionAccepted  = false;
 
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "terms_condition_accepted_date", nullable = true)
@@ -111,7 +110,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})
     private Set<Authority> authorities = new HashSet<>();
     
-    @Column(name="is_deleted", nullable = false)
+    @Column(name="is_deleted")
     @JsonIgnore
     private boolean deleted = false;
     
@@ -272,11 +271,11 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.zipcode = zipcode;
 	}
 
-	public Boolean getTermsConditionAccepted() {
+	public boolean getTermsConditionAccepted() {
 		return termsConditionAccepted;
 	}
 
-	public void setTermsConditionAccepted(Boolean termsConditionAccepted) {
+	public void setTermsConditionAccepted(boolean termsConditionAccepted) {
 		this.termsConditionAccepted = termsConditionAccepted;
 	}
 

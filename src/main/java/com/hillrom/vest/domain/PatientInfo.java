@@ -40,9 +40,6 @@ public class PatientInfo implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "mrn")
-    private String mrn;
-
     @Column(name = "hillrom_id")
     private String hillromId;
 
@@ -104,9 +101,6 @@ public class PatientInfo implements Serializable {
     @Column(name = "web_login_created")
     private Boolean webLoginCreated;
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
-
     @OneToMany(mappedBy = "patient",fetch=FetchType.LAZY)
     @JsonIgnore
     private Set<ClinicPatientAssoc> clinicPatientAssoc = new HashSet<>();
@@ -121,14 +115,6 @@ public class PatientInfo implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getMrn() {
-        return mrn;
-    }
-
-    public void setMrn(String mrn) {
-        this.mrn = mrn;
     }
 
     public String getHillromId() {
@@ -217,15 +203,7 @@ public class PatientInfo implements Serializable {
 
     public void setWebLoginCreated(Boolean webLoginCreated) {
         this.webLoginCreated = webLoginCreated;
-    }
-
-    public Boolean getIsDeleted() {
-        return isDeleted;
-    }
-
-    public void setIsDeleted(Boolean isDeleted) {
-        this.isDeleted = isDeleted;
-    }
+    } 
 
     public String getZipcode() {
 		return zipcode;
@@ -332,7 +310,6 @@ public class PatientInfo implements Serializable {
     public String toString() {
         return "PatientInfo{" +
                 "id=" + id +
-                ", mrn='" + mrn + "'" +
                 ", hillromId='" + hillromId + "'" +
                 ", hubId='" + hubId + "'" +
                 ", serialNumber='" + serialNumber + "'" +
@@ -344,7 +321,6 @@ public class PatientInfo implements Serializable {
                 ", dob='" + dob + "'" +
                 ", email='" + email + "'" +
                 ", webLoginCreated='" + webLoginCreated + "'" +
-                ", isDeleted='" + isDeleted + "'" +
                 '}';
     }
 }

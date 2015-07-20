@@ -15,26 +15,14 @@
     -->
     <changeSet id="20150717110234" author="jhipster">
         <addColumn tableName="CLINIC">
-        	<column name="is_parent" type="boolean" valueBoolean="false">
-				<constraints nullable="false" />
-			</column>
+        	<column name="is_parent" type="boolean" valueBoolean="false"/>
         </addColumn>
         <dropColumn tableName="CLINIC" columnName="npi_number"/>
-        
-        <addColumn tableName="CLINIC_PATIENTS_ASSOC">
-        	<column name="notes" type="text" />
-        	<column name="is_deleted" type="boolean" valueBoolean="false">
-				<constraints nullable="false" />
-			</column>
-        </addColumn>
-        <renameColumn tableName="CLINIC_PATIENTS_ASSOC" oldColumnName="patient_mrn" newColumnName="mrn_id" columnDataType="varchar(15)"/>
         
         <addColumn tableName="PATIENT_INFO">
         	<column name="gender" type="varchar(10)" />
         	<column name="lang_key" type="varchar(10)" />
-        	<column name="expired" type="boolean" valueBoolean="false">
-				<constraints nullable="false" />
-			</column>
+        	<column name="expired" type="boolean" valueBoolean="false"/>
 			<column name="expired_date" type="timestamp">
 				<constraints nullable="true" />
 			</column>
@@ -48,9 +36,7 @@
         <addColumn tableName="USER">
         	<column name="gender" type="varchar(10)" />
         	<column name="zipcode" type="integer"/>
-        	<column name="terms_condition_accepted" type="boolean" valueBoolean="false">
-				<constraints nullable="false" />
-			</column>
+        	<column name="terms_condition_accepted" type="boolean" valueBoolean="false"/>
 			<column name="terms_condition_accepted_date" type="timestamp">
 				<constraints nullable="true" />
 			</column>

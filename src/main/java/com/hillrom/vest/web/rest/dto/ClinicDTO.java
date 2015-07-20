@@ -34,16 +34,13 @@ public class ClinicDTO {
 	@Size(max = 50)
     private ArrayList<Map<String, String>> childClinics;
 
-	@Size(max = 50)
-    private String npiNumber;
-
 	public ClinicDTO() {
 		super();
 	}
 
 	public ClinicDTO(String name, String address, Integer zipcode, String city,
 			String state, Long phoneNumber, Long faxNumber, String hillromId,
-			ArrayList<Map<String, String>> childClinics, String npiNumber) {
+			ArrayList<Map<String, String>> childClinics) {
 		super();
 		this.name = name;
 		this.address = address;
@@ -54,7 +51,6 @@ public class ClinicDTO {
 		this.faxNumber = faxNumber;
 		this.hillromId = hillromId;
 		this.childClinics = childClinics;
-		this.npiNumber = npiNumber;
 	}
 
 	public String getName() {
@@ -127,13 +123,5 @@ public class ClinicDTO {
 
 	public void setChildClinics(ArrayList<Map<String, String>> childClinics) {
 		this.childClinics = childClinics;
-	}
-
-	public String getNpiNumber() {
-		return npiNumber;
-	}
-
-	public void setNpiNumber(String npiNumber) {
-		this.npiNumber = npiNumber;
 	}
 }

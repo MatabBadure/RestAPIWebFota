@@ -39,7 +39,7 @@ public class UserPatientAssoc implements Serializable {
     @Column(name="user_role", nullable = false)
     private String userRole;
     
-    @Column(name="relationship_label", nullable = false)
+    @Column(name="relation_label", nullable = false)
     private String relationshipLabel;
 
     public UserPatientAssoc() {

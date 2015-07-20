@@ -3,11 +3,11 @@
 }
 
 .content-body {
-	background-color: #EEEEEE;
-	height: -o-calc(100% - 100px); /* opera */
-	height: -webkit-calc(100% - 100px); /* google, safari */
-	height: -moz-calc(100% - 100px);
-	margin-top: 50px;
+	background-color: inherit;
+	height: -o-calc(100% - 200px); /* opera */
+	height: -webkit-calc(100% - 200px); /* google, safari */
+	height: -moz-calc(100% - 200px);
+	margin-top: 60px;
 }
 
 .clr {
@@ -40,4 +40,34 @@
 
 .no-padding-right {
 	padding-right: 0;
+}
+
+.margin-top {
+	margin-top: 20px;
+}
+
+.margin-top-xl{
+	margin-top: 40px;
+}
+
+.custom-dropdown:before {
+  content:'\e600';
+  font-family:"hill-rom";
+  color: $pickled-bluewood;
+  padding: 0;
+  font-size: 10px;
+  position: absolute;
+  top: 1px; 
+  right: 8px; 
+  z-index: -1;
+  z-index: 1 \0;
+}
+
+.custom-dropdown {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  z-index: 1;
+  display: inline;
+  line-height: 100%;
+  position: relative;
 }

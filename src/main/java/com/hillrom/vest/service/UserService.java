@@ -138,7 +138,7 @@ public class UserService {
 			 User user) {
 		JSONObject jsonObject = new JSONObject();
 		DateTime oneDayAgo = DateTime.now().minusHours(24);
-           if(user.getResetDate().isAfter(oneDayAgo.toInstant().getMillis())){
+           if(user.getResetDate().isBefore(oneDayAgo.toInstant().getMillis())){
         	   jsonObject.put("ERROR", "Reset Key Expired");
            }
            if(!verifySecurityQuestion(user,questionId,answer)){
@@ -174,7 +174,7 @@ public class UserService {
                                       String langKey) {
 
         User newUser = new User();
-        Authority authority = authorityRepository.findOne("ROLE_USER");
+        Authority authority = authorityRepository.findOne(AuthoritiesConstants.ADMIN);
         Set<Authority> authorities = new HashSet<>();
         String encryptedPassword = passwordEncoder.encode(password);
         // new user gets initially a generated password

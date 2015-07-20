@@ -25,6 +25,7 @@ import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
+import com.hillrom.vest.domain.UserSecurityQuestion;
 import com.hillrom.vest.repository.AuthorityRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
@@ -321,20 +322,27 @@ public class UserService {
         if(null!= email)
         	currentUser.setEmail(email);
         
-        currentUser.setPassword(passwordEncoder.encode(password));
-        currentUser.setLastLoggedInAt(DateTime.now());
-        currentUser.setTermsConditionAccepted(true);
-        currentUser.setTermsConditionAcceptedDate(DateTime.now());
-        userRepository.save(currentUser);
-        
-        // update email in patientInfo, if the User is Patient
-        updatePatientEmailIfNotPresent(email);
-        
-        log.debug("updateEmailOrPassword for User: {}", currentUser);
-       
         Long qid = Long.parseLong(questionId);
-        userSecurityQuestionService.saveOrUpdate(currentUser.getId(), qid, answer);
-		authTokenService.deleteToken(authToken); // Token must be deleted to avoid subsequent request
+        Optional<UserSecurityQuestion> opUserSecQ = userSecurityQuestionService.saveOrUpdate(currentUser.getId(), qid, answer);
+        
+        if(opUserSecQ.isPresent()){
+        	
+        	currentUser.setPassword(passwordEncoder.encode(password));
+        	currentUser.setLastLoggedInAt(DateTime.now());
+        	currentUser.setTermsConditionAccepted(true);
+        	currentUser.setTermsConditionAcceptedDate(DateTime.now());
+        	userRepository.save(currentUser);
+        	
+        	// update email in patientInfo, if the User is Patient
+        	updatePatientEmailIfNotPresent(email);
+        	
+        	log.debug("updateEmailOrPassword for User: {}", currentUser);
+        	
+        	authTokenService.deleteToken(authToken); // Token must be deleted to avoid subsequent request
+        }else{
+        	errorsJsonObject.put("ERROR", "Invalid Security Question or Answer");
+        	return errorsJsonObject;
+        }
 		return new JSONObject();
 	}
 
@@ -391,7 +399,7 @@ public class UserService {
     		jsonObject.put("ERROR", "Required field Answer is missing");
     		return jsonObject;
     	}
-    	if(StringUtils.isBlank(questionId)){
+    	if(StringUtils.isBlank(questionId) || !StringUtils.isNumeric(questionId)){
     		jsonObject.put("ERROR", "Required field SecurityQuestion is missing");
     		return jsonObject;
     	}

@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import com.hillrom.vest.domain.SecurityQuestion;
 import com.hillrom.vest.domain.UserSecurityQuestion;
 import com.hillrom.vest.repository.SecurityQuestionRepository;
 import com.hillrom.vest.repository.UserRepository;
@@ -48,7 +49,11 @@ public class UserSecurityQuestionService {
 		}else{
 			UserSecurityQuestion userSecurityQuestion = new  UserSecurityQuestion();
 			userSecurityQuestion.setAnswer(answer);
-			userSecurityQuestion.setSecurityQuestion(questionRepository.findOne(questionId));
+			SecurityQuestion question = questionRepository.findOne(questionId);
+			if(null == question){
+				return Optional.empty();
+			}
+			userSecurityQuestion.setSecurityQuestion(question);
 			userSecurityQuestion.setUser(userRepository.findOne(userId));
 			return Optional.of(userSecurityQuestionRepository.save(userSecurityQuestion));						
 		}

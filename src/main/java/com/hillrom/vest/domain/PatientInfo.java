@@ -14,9 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.Where;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -32,8 +30,6 @@ import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
  */
 @Entity
 @Table(name = "PATIENT_INFO")
-@SQLDelete(sql="UPDATE PATIENT_INFO SET is_deleted = 1 WHERE id = ?")
-@Where(clause="is_deleted=0")
 public class PatientInfo implements Serializable {
 
     @Id
@@ -83,7 +79,7 @@ public class PatientInfo implements Serializable {
     private String address;
     
     @Column(name="zipcode")
-    private String zipcode;
+    private Integer zipcode;
     
     @Column(name = "city")
     private String city;
@@ -92,7 +88,7 @@ public class PatientInfo implements Serializable {
     private String state;
     
     @Column(name = "expired")
-    private Boolean expired;
+    private Boolean expired = false;
     
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "expired_date", nullable = true)
@@ -203,13 +199,13 @@ public class PatientInfo implements Serializable {
 
     public void setWebLoginCreated(Boolean webLoginCreated) {
         this.webLoginCreated = webLoginCreated;
-    } 
+    }
 
-    public String getZipcode() {
+    public Integer getZipcode() {
 		return zipcode;
 	}
 
-	public void setZipcode(String zipcode) {
+	public void setZipcode(Integer zipcode) {
 		this.zipcode = zipcode;
 	}
 

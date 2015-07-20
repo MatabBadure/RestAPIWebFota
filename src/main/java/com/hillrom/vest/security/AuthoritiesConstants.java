@@ -12,7 +12,9 @@ public final class AuthoritiesConstants {
 
     public static final String PATIENT = "PATIENT";
     
-    public static final String DOCTOR = "DOCTOR";
+    public static final String HCP = "HCP";
+    
+    public static final String ACCT_SERVICES = "ACCT_SERVICES";
 
     public static final String ANONYMOUS = "ANONYMOUS";
 }

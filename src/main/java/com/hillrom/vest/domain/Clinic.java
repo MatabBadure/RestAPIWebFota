@@ -2,11 +2,12 @@ package com.hillrom.vest.domain;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -14,19 +15,17 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.SQLDelete;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.ObjectIdGenerator;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 
 /**
  * A Clinic.
@@ -66,30 +65,23 @@ public class Clinic implements Serializable {
 
     @ManyToOne
     @JoinColumn(name="parent_clinic_id")
+    @JsonManagedReference
     private Clinic parentClinic;
  
     @OneToMany(mappedBy="parentClinic")
     @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id")
-    private Set<Clinic> childClinics = new HashSet<Clinic>();
+    @JsonBackReference
+    private List<Clinic> childClinics = new ArrayList<Clinic>();
 
-    @Column(name = "npi_number")
-    private String npiNumber;
-
-    @ManyToMany
-    @JoinTable(name = "CLINIC_USER_ASSOC",
-               joinColumns = @JoinColumn(name="clinics_id", referencedColumnName="ID"),
-               inverseJoinColumns = @JoinColumn(name="users_id", referencedColumnName="ID"))
-    private Set<User> users = new HashSet<>();
-
-    @ManyToMany
-    @JoinTable(name = "CLINIC_PATIENTS_ASSOC",
-               joinColumns = @JoinColumn(name="clinics_id", referencedColumnName="ID"),
-               inverseJoinColumns = @JoinColumn(name="patients_id", referencedColumnName="ID"))
-    private Set<PatientInfo> patients = new HashSet<>();
+    @OneToMany(mappedBy = "clinic",fetch=FetchType.LAZY)
+    @JsonIgnore
+    private Set<ClinicPatientAssoc> clinicPatientAssoc = new HashSet<>();
     
     @Column(name="is_deleted", nullable = false)
-    @JsonIgnore
     private boolean deleted = false;
+    
+    @Column(name="is_parent", nullable = false)
+    private boolean parent = false;
 
     public Long getId() {
         return id;
@@ -171,37 +163,13 @@ public class Clinic implements Serializable {
 		this.parentClinic = (parentClinic != null) ? parentClinic : null;
 	}
 
-	public Set<Clinic> getChildClinics() {
+	public List<Clinic> getChildClinics() {
 		return childClinics;
 	}
 
-	public void setChildClinics(Set<Clinic> childClinics) {
+	public void setChildClinics(List<Clinic> childClinics) {
 		this.childClinics = childClinics;
 	}
-
-	public String getNpiNumber() {
-        return npiNumber;
-    }
-
-    public void setNpiNumber(String npiNumber) {
-        this.npiNumber = npiNumber;
-    }
-
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
-    }
-
-    public Set<PatientInfo> getPatients() {
-        return patients;
-    }
-
-    public void setPatients(Set<PatientInfo> patientInfos) {
-        this.patients = patientInfos;
-    }
 
     public boolean isDeleted() {
 		return deleted;
@@ -209,6 +177,22 @@ public class Clinic implements Serializable {
 
 	public void setDeleted(boolean isDeleted) {
 		this.deleted = isDeleted;
+	}
+
+	public boolean isParent() {
+		return parent;
+	}
+
+	public void setParent(boolean parent) {
+		this.parent = parent;
+	}
+
+	public Set<ClinicPatientAssoc> getClinicPatientAssoc() {
+		return clinicPatientAssoc;
+	}
+
+	public void setClinicPatientAssoc(Set<ClinicPatientAssoc> clinicPatientAssoc) {
+		this.clinicPatientAssoc = clinicPatientAssoc;
 	}
 
 	@Override
@@ -245,8 +229,8 @@ public class Clinic implements Serializable {
                 ", faxNumber='" + faxNumber + "'" +
                 ", hillromId='" + hillromId + "'" +
                 ", parentClinic='" + parentClinic + "'" +
-                ", npiNumber='" + npiNumber + "'" +
                 ", deleted='" + deleted + "'" +
+                ", isParent='" + parent + "'" +
                 '}';
     }
 }

@@ -21,8 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.repository.AuthorityRepository;
+import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
+import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
@@ -51,6 +54,12 @@ public class UserService {
 
     @Inject
     private AuthorityRepository authorityRepository;
+    
+    @Inject
+    private UserPatientRepository userPatientRepository;
+    
+    @Inject
+    private PatientInfoRepository patientInfoRepository;
     
     @Inject
     private PatientInfoService patientInfoService;
@@ -182,32 +191,114 @@ public class UserService {
 		return newUser;
 	}
     
+    public UserExtension createPatientUser(UserExtensionDTO userExtensionDTO) {
+    	UserExtension newUser = new UserExtension();
+    	PatientInfo patientInfo = new PatientInfo();
+    	patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId())
+    	.map(patient -> {
+    		return newUser;
+    	})
+    	.orElseGet(() -> {
+    		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
+    		patientInfoRepository.save(patientInfo);
+    		assignValuesToUserObj(userExtensionDTO, newUser);
+    		if(AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
+    			newUser.setEmail(userExtensionDTO.getHillromId());
+    		}
+			userExtensionRepository.save(newUser);
+			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.PATIENT, "SELF");
+			userPatientRepository.save(userPatientAssoc);
+			newUser.getUserPatientAssoc().add(userPatientAssoc);
+			patientInfo.getUserPatientAssoc().add(userPatientAssoc);
+			log.debug("Created Information for Patient User: {}", newUser);
+			return newUser;
+    	});
+		return newUser;
+	}
+
+	private void assignValuesToPatientInfoObj(UserExtensionDTO userExtensionDTO, PatientInfo patientInfo) {
+		patientInfo.setHillromId(userExtensionDTO.getHillromId());
+		if(userExtensionDTO.getTitle() != null)
+			patientInfo.setTitle(userExtensionDTO.getTitle());
+		if(userExtensionDTO.getFirstName() != null)
+			patientInfo.setFirstName(userExtensionDTO.getFirstName());
+		if(userExtensionDTO.getMiddleName() != null)
+			patientInfo.setMiddleName(userExtensionDTO.getMiddleName());
+		if(userExtensionDTO.getLastName() != null)
+			patientInfo.setLastName(userExtensionDTO.getLastName());
+		if(userExtensionDTO.getGender() != null)
+			patientInfo.setGender(userExtensionDTO.getGender());
+		if(userExtensionDTO.getDob() != null)
+			patientInfo.setDob(userExtensionDTO.getDob());
+		if(userExtensionDTO.getLangKey() != null)
+			patientInfo.setLangKey(userExtensionDTO.getLangKey());
+		if(userExtensionDTO.getEmail() != null)
+			patientInfo.setEmail(userExtensionDTO.getEmail());
+		if(userExtensionDTO.getAddress() != null)
+			patientInfo.setAddress(userExtensionDTO.getAddress());
+		if(userExtensionDTO.getZipcode() != null)
+			patientInfo.setZipcode(userExtensionDTO.getZipcode());
+		if(userExtensionDTO.getCity() != null)
+			patientInfo.setCity(userExtensionDTO.getCity());
+		if(userExtensionDTO.getState() != null)
+			patientInfo.setState(userExtensionDTO.getState());
+		patientInfo.setWebLoginCreated(true);
+	}
+    
     public UserExtension createDoctor(UserExtensionDTO userExtensionDTO) {
-		UserExtension newUser = new UserExtension();
-		newUser.setTitle(userExtensionDTO.getTitle());
-		newUser.setFirstName(userExtensionDTO.getFirstName());
-		newUser.setMiddleName(userExtensionDTO.getMiddleName());
-		newUser.setLastName(userExtensionDTO.getLastName());
-		newUser.setEmail(userExtensionDTO.getEmail());
-		newUser.setSpeciality(userExtensionDTO.getSpeciality());
-		newUser.setCredentials(userExtensionDTO.getCredentials());
-		newUser.setAddress(userExtensionDTO.getAddress());
-		newUser.setZipcode(userExtensionDTO.getZipcode());
-		newUser.setCity(userExtensionDTO.getCity());
-		newUser.setState(userExtensionDTO.getState());
-		newUser.setPrimaryPhone(userExtensionDTO.getPrimaryPhone());
-		newUser.setMobilePhone(userExtensionDTO.getMobilePhone());
-		newUser.setFaxNumber(userExtensionDTO.getFaxNumber());
-		newUser.setLangKey(null);
+    	UserExtension newUser = new UserExtension();
+    	userRepository.findOneByEmail(userExtensionDTO.getEmail())
+    	.map(user -> {
+    		return newUser;
+    	})
+    	.orElseGet(() -> {
+    		assignValuesToUserObj(userExtensionDTO, newUser);
+			userExtensionRepository.save(newUser);
+			log.debug("Created Information for User: {}", newUser);
+			return newUser;
+    	});
+		return newUser;
+	}
+
+	private void assignValuesToUserObj(UserExtensionDTO userExtensionDTO, UserExtension newUser) {
+		if(userExtensionDTO.getTitle() != null)
+			newUser.setTitle(userExtensionDTO.getTitle());
+		if(userExtensionDTO.getFirstName() != null)
+			newUser.setFirstName(userExtensionDTO.getFirstName());
+		if(userExtensionDTO.getMiddleName() != null)
+			newUser.setMiddleName(userExtensionDTO.getMiddleName());
+		if(userExtensionDTO.getLastName() != null)
+			newUser.setLastName(userExtensionDTO.getLastName());
+		if(userExtensionDTO.getEmail() != null)
+			newUser.setEmail(userExtensionDTO.getEmail());
+		if(userExtensionDTO.getSpeciality() != null)
+			newUser.setSpeciality(userExtensionDTO.getSpeciality());
+		if(userExtensionDTO.getCredentials() != null)
+			newUser.setCredentials(userExtensionDTO.getCredentials());
+		if(userExtensionDTO.getAddress() != null)
+			newUser.setAddress(userExtensionDTO.getAddress());
+		if(userExtensionDTO.getZipcode() != null)
+			newUser.setZipcode(userExtensionDTO.getZipcode());
+		if(userExtensionDTO.getCity() != null)
+			newUser.setCity(userExtensionDTO.getCity());
+		if(userExtensionDTO.getState() != null)
+			newUser.setState(userExtensionDTO.getState());
+		if(userExtensionDTO.getPrimaryPhone() != null)
+			newUser.setPrimaryPhone(userExtensionDTO.getPrimaryPhone());
+		if(userExtensionDTO.getMobilePhone() != null)
+			newUser.setMobilePhone(userExtensionDTO.getMobilePhone());
+		if(userExtensionDTO.getFaxNumber() != null)
+			newUser.setFaxNumber(userExtensionDTO.getFaxNumber());
+		if(userExtensionDTO.getNpiNumber() != null)
+			newUser.setNpiNumber(userExtensionDTO.getNpiNumber());
+		newUser.setLangKey(userExtensionDTO.getLangKey());
 		// new user is not active
 		newUser.setActivated(false);
 		newUser.setDeleted(false);
 		// new user gets registration key
 		newUser.setActivationKey(RandomUtil.generateActivationKey());
-		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
-		userExtensionRepository.save(newUser);
-		log.debug("Created Information for User: {}", newUser);
-		return newUser;
+		if(userExtensionDTO.getRole() != null)
+			newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
 	}
 
     public Optional<User> findOneByEmail(String email) {
@@ -237,9 +328,13 @@ public class UserService {
 		newUser.setFirstName(patientInfo.getFirstName());
 		newUser.setLastName(patientInfo.getLastName());
 		newUser.setPassword(encodedPassword);
-		newUser.getPatients().add(patientInfo);
-		
 		User persistedUser = userRepository.save(newUser);
+
+		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.PATIENT, "SELF");
+		userPatientRepository.save(userPatientAssoc);
+		newUser.getUserPatientAssoc().add(userPatientAssoc);
+		patientInfo.getUserPatientAssoc().add(userPatientAssoc);
+		
 		newUser.setId(persistedUser.getId());
 		// Update WebLoginCreated to be true  and user patient association
 		updateWebLoginStatusAndUserPatientAssoc(patientInfo, persistedUser);
@@ -271,7 +366,6 @@ public class UserService {
 			PatientInfo patientInfo, User persistedUser) {
 		patientInfoService.findOneByHillromId(patientInfo.getHillromId()).map(patientUser ->{
 			patientUser.setWebLoginCreated(true);
-			patientUser.getUsers().add(persistedUser);
 			patientInfoService.update(patientUser);
 			return patientUser;
 		});

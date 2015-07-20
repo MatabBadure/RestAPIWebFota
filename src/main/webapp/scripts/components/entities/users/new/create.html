@@ -18,7 +18,7 @@
       <label for="exampleInputEmail1">First Name*</label>
     </div>
     <div class="col-md-10">
-    <input type="text" class="form-control" name="firstName"  ng-model="doctor.firstName" ng-minlength=3 ng-maxlength=50 ng-pattern="/^[a-zA-Z]+$/" required>
+    <input type="text" class="form-control" name="firstName"  ng-model="user.firstName" ng-minlength=3 ng-maxlength=50 ng-pattern="/^[a-zA-Z]+$/" required>
     <div ng-show="(form.clinicName.$dirty && form.clinicName.$invalid) || submitted" class="form-error">
       <span class="help-block" ng-show="form.firstName.$error.required">
         First Name is required.
@@ -41,7 +41,7 @@
       <label for="exampleInputEmail1">Middle Name</label>
     </div>
       <div class="col-md-10">
-    <input type="text" class="form-control"  name="middleName" ng-model="doctor.middleName" ng-pattern="/^[a-zA-Z]+$/">
+    <input type="text" class="form-control"  name="middleName" ng-model="user.middleName" ng-pattern="/^[a-zA-Z]+$/">
     <div ng-show="(form.middleName.$dirty && form.middleName.$invalid)" class="form-error"> 
       <span class="help-block" ng-show="form.middleName.$error.pattern" >
         Middle Name cannot have number.
@@ -54,7 +54,7 @@
       <label for="exampleInputEmail1">Last Name*</label>
     </div>
     <div class="col-md-10">
-    <input type="text" class="form-control" name="lastName" ng-pattern="/^[a-zA-Z]+$/" ng-model="doctor.lastName" ng-minlength=3 ng-maxlength=50 required>
+    <input type="text" class="form-control" name="lastName" ng-pattern="/^[a-zA-Z]+$/" ng-model="user.lastName" ng-minlength=3 ng-maxlength=50 required>
     <div ng-show="(form.satellite.$dirty && form.satellite.$invalid) || submitted" class="form-error">
       <span class="help-block" ng-show="form.lastName.$error.required">
         Last Name is required.

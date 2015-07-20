@@ -34,14 +34,14 @@ public class UserExtension extends User implements Serializable {
     @Column(name = "address")
     private String address;
     
-    @Column(name = "zipcode")
-    private Integer zipcode;
-    
     @Column(name = "city")
     private String city;
     
     @Column(name = "state")
     private String state;
+    
+    @Column(name = "npi_number")
+    private String npiNumber;
     
     @Column(name="is_deleted", nullable = false)
     private boolean deleted = false;
@@ -94,14 +94,6 @@ public class UserExtension extends User implements Serializable {
 		this.address = address;
 	}
 
-	public Integer getZipcode() {
-		return zipcode;
-	}
-
-	public void setZipcode(Integer zipcode) {
-		this.zipcode = zipcode;
-	}
-
 	public String getCity() {
 		return city;
 	}
@@ -126,12 +118,21 @@ public class UserExtension extends User implements Serializable {
 		this.deleted = deleted;
 	}
 
+	public String getNpiNumber() {
+		return npiNumber;
+	}
+
+	public void setNpiNumber(String npiNumber) {
+		this.npiNumber = npiNumber;
+	}
+
 	@Override
 	public String toString() {
 		return "UserExtension [speciality=" + speciality + ", credentials="
 				+ credentials + ", primaryPhone=" + primaryPhone
 				+ ", mobilePhone=" + mobilePhone + ", faxNumber=" + faxNumber
-				+ ", address=" + address + ", zipcode=" + zipcode + ", city="
-				+ city + ", state=" + state + "]";
+				+ ", address=" + address + ", city=" + city + ", state="
+				+ state + ", npiNumber=" + npiNumber + "]";
 	}
+
 }

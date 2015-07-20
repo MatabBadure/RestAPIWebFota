@@ -202,7 +202,7 @@ public class PatientInfo implements Serializable {
 
     public void setWebLoginCreated(Boolean webLoginCreated) {
         this.webLoginCreated = webLoginCreated;
-    }
+    } 
 
     public String getZipcode() {
 		return zipcode;

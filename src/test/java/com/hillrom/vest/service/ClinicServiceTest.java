@@ -46,14 +46,7 @@ public class ClinicServiceTest {
     
     @Before
     public void initTest() {
-    	ArrayList<Map<String, String>> childClinics = new ArrayList<Map<String,String>>();
-    	for(int i = 0; i<2; i++ ) {
-	    	Map<String, String> childClinic = new HashMap<String, String>();
-	    	childClinic.put("name", "Fortis-Branch"+i+1);
-	    	childClinics.add(childClinic);
-    	}
-        clinicDTO = new ClinicDTO("Fortis Hospital", "Bannerghatta Road", 560042, "Bangalore", "Karnataka", Long.parseLong("7896541230"), Long.parseLong("9874563210"), null, childClinics);
-
+        clinicDTO = new ClinicDTO("Fortis Hospital", "Bannerghatta Road", 560042, "Bangalore", "Karnataka", Long.parseLong("7896541230"), Long.parseLong("9874563210"), null, null);
         clinic = clinicService.createClinic(clinicDTO);
     }
     
@@ -65,9 +58,6 @@ public class ClinicServiceTest {
         assertThat(newClinic.getId()).isNotNull();
         assertThat(newClinic.getName()).isNotNull();
 
-        for(Clinic childClinic : newClinic.getChildClinics()) {
-        	clinicRepository.delete(childClinic);
-        }
         clinicRepository.delete(newClinic);
     }
 
@@ -75,21 +65,15 @@ public class ClinicServiceTest {
     public void assertThatClinicIsUpdated() {
     	
     	clinicRepository.saveAndFlush(clinic);
-    	
-    	ArrayList<Map<String, String>> childClinics = new ArrayList<Map<String,String>>();
-    	for(Clinic childClinic : clinic.getChildClinics()) {
-	    	Map<String, String> child = new HashMap<String, String>();
-	    	child.put("id", childClinic.getId().toString());
-	    	child.put("name", childClinic.getName());
-	    	childClinics.add(child);
-    	}
-    	clinicDTO.setChildClinics(childClinics);
+    	clinicDTO.setName("Fortis Hospital - Main");
     	
         clinic = clinicService.updateClinic(clinic.getId(), clinicDTO);
-
+        
         assertThat(clinic.isDeleted()).isFalse();
+        assertThat(clinic.getName()).isEqualTo("Fortis Hospital - Main");
         assertThat(clinic.getId()).isNotNull();
         assertThat(clinic.getName()).isNotNull();
-        assertThat(clinic.getChildClinics().size() == clinicDTO.getChildClinics().size()).isTrue();
+        
+        clinicRepository.delete(clinic);
     }
 }

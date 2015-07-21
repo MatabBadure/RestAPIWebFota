@@ -9,10 +9,14 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -63,6 +67,9 @@ public class UserService {
     
     @Inject
     private PatientInfoService patientInfoService;
+    
+    @Inject
+    private MailService mailService;
 
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
@@ -215,6 +222,34 @@ public class UserService {
     	});
 		return newUser;
 	}
+    
+    public JSONObject updateUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl){
+    	JSONObject jsonObject = new JSONObject();
+        if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
+        	if(userExtensionDTO.getEmail() != null) {
+            	userRepository.findOneByEmail(userExtensionDTO.getEmail())
+    			.map(user -> {
+    				jsonObject.put("error", "e-mail address already in use");
+        			return ResponseEntity.badRequest().body(jsonObject);
+        		});
+        	}
+           	UserExtension user = updatePatientUser(id, userExtensionDTO);
+    		if(user.getId() != null) {
+    			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
+    				mailService.sendActivationEmail(user, baseUrl);
+    			}
+                jsonObject.put("message", "Patient User updated successfully.");
+                jsonObject.put("user", user);
+                return jsonObject;
+    		} else {
+    			jsonObject.put("error", "Unable to update Patient.");
+                return jsonObject;
+    		}
+        } else {
+    		jsonObject.put("error", "Incorrect data.");
+    		return jsonObject;
+    	}
+    }
     
     public UserExtension updatePatientUser(Long id, UserExtensionDTO userExtensionDTO) {
     	UserExtension user = userExtensionRepository.findOne(id);

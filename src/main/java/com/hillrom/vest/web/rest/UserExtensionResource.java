@@ -133,32 +133,13 @@ public class UserExtensionResource {
     @RolesAllowed({AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> update(@PathVariable Long id, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
         log.debug("REST request to update User : {}", userExtensionDTO);
-        JSONObject jsonObject = new JSONObject();
-        if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
-        	if(userExtensionDTO.getEmail() != null) {
-            	userRepository.findOneByEmail(userExtensionDTO.getEmail())
-    			.map(user -> {
-    				jsonObject.put("message", "e-mail address already in use");
-        			return ResponseEntity.badRequest().body(jsonObject);
-        		});
-        	}
-           	UserExtension user = userService.updatePatientUser(id, userExtensionDTO);
-    		if(user.getId() != null) {
-    			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
-    				String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-    				mailService.sendActivationEmail(user, baseUrl);
-    			}
-                jsonObject.put("message", "Patient User updated successfully.");
-                jsonObject.put("user", user);
-                return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
-    		} else {
-    			jsonObject.put("message", "Unable to update Patient.");
-                return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-    		}
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        JSONObject jsonObject = userService.updateUser(id, userExtensionDTO, baseUrl);
+        if (jsonObject.containsKey("error")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {
-    		jsonObject.put("message", "Incorrect data.");
-    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.PARTIAL_CONTENT);
-    	}
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
     }
 
     /**

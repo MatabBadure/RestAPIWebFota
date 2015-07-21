@@ -215,6 +215,20 @@ public class UserService {
     	});
 		return newUser;
 	}
+    
+    public UserExtension updatePatientUser(Long id, UserExtensionDTO userExtensionDTO) {
+    	UserExtension user = userExtensionRepository.findOne(id);
+    	patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId())
+    	.map(patient -> {
+    		assignValuesToPatientInfoObj(userExtensionDTO, patient);
+    		patientInfoRepository.save(patient);
+    		assignValuesToUserObj(userExtensionDTO, user);
+			userExtensionRepository.save(user);
+			log.debug("Updated Information for Patient User: {}", user);
+    		return user;
+    	});
+		return user;
+	}
 
 	private void assignValuesToPatientInfoObj(UserExtensionDTO userExtensionDTO, PatientInfo patientInfo) {
 		patientInfo.setHillromId(userExtensionDTO.getHillromId());

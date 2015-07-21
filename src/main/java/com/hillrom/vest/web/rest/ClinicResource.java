@@ -58,10 +58,9 @@ public class ClinicResource {
         log.debug("REST request to save Clinic : {}", clinicDTO);
         JSONObject jsonObject = new JSONObject();
         Clinic newClinic = clinicService.createClinic(clinicDTO);
-        if(newClinic.getChildClinics().size() == clinicDTO.getChildClinics().size()) {
-        	jsonObject.put("message", "Clinics created successfully.");
-            jsonObject.put("ParentClinic", newClinic);
-            jsonObject.put("ChildClinics", newClinic.getChildClinics());
+        if(newClinic.getId() != null) {
+        	jsonObject.put("message", "Clinic created successfully.");
+            jsonObject.put("Clinic", newClinic);
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
         } else {
 	      	jsonObject.put("message", "Unable to complete the transaction.");
@@ -84,10 +83,9 @@ public class ClinicResource {
         if(clinic == null) {
 	      	jsonObject.put("message", "No such clinic found.");
 	        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_GATEWAY);
-        } else if(clinic.getChildClinics().size() == clinicDTO.getChildClinics().size()) {
-        	jsonObject.put("message", "Clinics updated successfully.");
-            jsonObject.put("ParentClinic", clinic);
-            jsonObject.put("ChildClinics", clinic.getChildClinics());
+        } else if(clinic.getId() != null) {
+        	jsonObject.put("message", "Clinic updated successfully.");
+            jsonObject.put("Clinic", clinic);
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         } else {
 	      	jsonObject.put("message", "Unable to update the Clinic.");

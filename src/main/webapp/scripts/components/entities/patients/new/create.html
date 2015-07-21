@@ -8,7 +8,7 @@
       <label for="JDE ID">JDE/HR ID*</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" ng-model="patient.HRID" name="HRID" required>
+      <input type="text" class="form-control" ng-model="patient.HRID" name="HRID" ng-readonly="patientStatus.editMode" required>
         <div ng-show="(form.HRID.$dirty && form.HRID.$invalid) || submitted" class="form-error">
           <span class="help-block" ng-show="form.HRID.$error.required">
             JDE/HR ID is required.
@@ -22,7 +22,7 @@
       <label for="title">Title</label>
     </div>
     <div class="col-md-10">
-      <select class="form-control dashboard-page__form--new_user-title" name="title" ng-model="patient.title">
+      <select class="form-control dashboard-page__form--new_user-title" name="title" ng-readonly="validateADMINorASP()" ng-model="patient.title">
         <option>Mr.</option>
         <option>Mrs.</option>
         <option>Dr.</option>
@@ -35,7 +35,7 @@
       <label for="gender">Gender</label>
     </div>
     <div class="col-md-10">
-      <select class="form-control dashboard-page__form--new_user-title" name="gender" ng-model="patient.gender">
+      <select class="form-control dashboard-page__form--new_user-title" name="gender" ng-readonly="validateADMINorASP()" ng-model="patient.gender">
         <option>Male</option>
         <option>Female</option>
         <option>Others</option>
@@ -48,7 +48,7 @@
       <label for="language">Primary Language</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" name="language" ng-model="patient.language">
+      <input type="text" class="form-control" name="language" ng-readonly="validateADMINorASP()" ng-model="patient.language">
     </div>
   </div>
 
@@ -57,7 +57,7 @@
       <label for="firstName">First Name*</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" name="firstName" ng-model="patient.firstName" ng-minlength=3 ng-maxlength=50 ng-pattern="/^[a-zA-Z]+$/" required>
+      <input type="text" class="form-control" name="firstName" ng-model="patient.firstName" ng-readonly="validateADMINorASP()" ng-minlength=3 ng-maxlength=50 ng-pattern="/^[a-zA-Z]+$/" required>
         <div ng-show="(form.firstName.$dirty && form.firstName.$invalid) || submitted" class="form-error">
         <span class="help-block" ng-show="form.firstName.$error.required">
           First Name is required.
@@ -80,7 +80,7 @@
       <label for="language">Middle Name</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" name="language" ng-model="patient.middleName">
+      <input type="text" class="form-control" ng-readonly="validateADMINorASP()" name="language" ng-model="patient.middleName">
     </div>
   </div>
 
@@ -89,7 +89,7 @@
       <label for="lastName">Last Name*</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" name="lastName" ng-model="patient.lastName" ng-minlength=3 ng-maxlength=50 ng-pattern="/^[a-zA-Z]+$/" required>
+      <input type="text" class="form-control" name="lastName" ng-readonly="validateADMINorASP()" ng-model="patient.lastName" ng-minlength=3 ng-maxlength=50 ng-pattern="/^[a-zA-Z]+$/" required>
         <div ng-show="(form.lastName.$dirty && form.lastName.$invalid) || submitted" class="form-error">
             <span class="help-block" ng-show="form.lastName.$error.required">
               Last Name is required.
@@ -112,7 +112,7 @@
       <label for="dob">Data of Birth</label>
     </div>
     <div class="col-md-10 dashboard-page__form--new_calendar">
-      <input type="text" name="dob" class="span2" value="02/16/12" data-date-format="mm/dd/yy" id="dp2">
+      <input type="text" name="dob" class="span2" value="" ng-model="patient.dob" ng-readonly="validateADMINorASP()" data-date-format="mm/dd/yy" id="dp2">
     </div>
   </div>
 
@@ -121,7 +121,7 @@
       <label for="age">Age</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control age" name="age" ng-model="patient.age" ng-pattern="/^[^-]+$/" readonly>
+      <input type="text" class="form-control age" name="age" ng-model="patient.age"  ng-pattern="/^[^-]+$/" readonly>
         <div ng-show="form.age.$invalid" class="form-error">
             <span class="help-block" ng-show="form.age.$error.pattern">
               Age cannot be in negative.
@@ -135,7 +135,7 @@
       <label for="address">Address</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" ng-model="patient.address">
+      <input type="text" class="form-control"  ng-readonly="validateADMINorASP()" ng-model="patient.address">
     </div>
   </div>
 
@@ -144,7 +144,7 @@
       <label for="city">City</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" ng-model="patient.city">
+      <input type="text" class="form-control"ng-readonly="validateADMINorASP()"  ng-model="patient.city">
     </div>
   </div>
 
@@ -153,7 +153,7 @@
       <label for="state">State</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" ng-model="patient.state">
+      <input type="text" class="form-control" ng-readonly="validateADMINorASP()" ng-model="patient.state">
     </div>
   </div>
 
@@ -162,7 +162,7 @@
       <label for="zip">Zip Code</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control" name="zip" maxlength="6" ng-pattern="/^[0-9]{6}$/" ng-model="patient.zipCode">
+      <input type="text" class="form-control" name="zip" ng-readonly="validateADMINorASP()" maxlength="6" ng-pattern="/^[0-9]{6}$/" ng-model="patient.zipCode">
       <div ng-show="form.zip.$dirty && form.zip.$invalid" class="form-error">
         <span class="help-block" ng-show="form.zip.$error.pattern">
           Zip Code is invalid.
@@ -176,7 +176,7 @@
       <label for="email">Email</label>
     </div>
     <div class="col-md-10">
-      <input type="email" class="form-control" name="email"  ng-model="patient.email" ng-maxlength=100>
+      <input type="email" class="form-control" name="email"  ng-readonly="validateADMINorASP()" ng-model="patient.email" ng-maxlength=100>
         <div ng-show="(form.email.$dirty && form.email.$invalid) || submitted" class="form-error">
           <span class="help-block" ng-show="form.email.$error.email">
             Your e-mail is invalid.
@@ -188,6 +188,15 @@
     </div>
   </div>
 
+  <div class="col-md-16 indent-form-top" ng-show="patientStatus.editMode">
+    <div class="col-md-6">
+      <label for="state">Patient ID</label>
+    </div>
+    <div class="col-md-10">
+      <input type="text" class="form-control" ng-readonly="patientStatus.editMode" ng-model="patient.PID">
+    </div>
+  </div>
+
   <div class="col-md-16 dashboard-page__form--new_form-submit" ng-show="patientStatus.isCreate">
     <button type="submit" ng-click="submitted=true" class="dashboard-page__form--new_form-submit--button">Submit</button>
   </div>
@@ -195,7 +204,7 @@
   <div class="col-md-16 dashboard-page__form--new_form-submit">
     <div class="col-md-10" ng-show="!patientStatus.isCreate">
       <button type="button" class="dashboard-page__form--new_form-submit--button" ng-click="deletePatient()">Disassociate</button>
-      <button type="button" ng-disabled="true" class="dashboard-page__form--new_form-submit--button">Edit</button>
+      <button type="submit" ng-click="submitted=true" class="dashboard-page__form--new_form-submit--button">Update</button>
     </div>
   </div>
 

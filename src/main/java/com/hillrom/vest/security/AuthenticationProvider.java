@@ -27,7 +27,11 @@ import com.hillrom.vest.service.util.RandomUtil;
 
 public class AuthenticationProvider extends DaoAuthenticationProvider {
 
+	private static final String DATEFORMAT_MMddyyyy = "MMddyyyy";
+
 	private final Logger log = LoggerFactory.getLogger(AuthenticationProvider.class);
+	
+	private static final int NO_OF_CHARACTERS_TO_BE_EXTRACTED = 4;
 
     private PasswordEncoder passwordEncoder;
     
@@ -50,9 +54,9 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
         
         String password = user.getPassword();
         String tokenPassword = (String) token.getCredentials();
-        matchPasswords(password, tokenPassword);
         
-        processFirstTimeLogin(user);
+        processFirstTimeLogin(user,tokenPassword);
+        matchPasswords(password, tokenPassword);
         
         UserDetails userDetails = buildUserDetails(user);
         
@@ -81,6 +85,16 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
 		return user;
 	}
 
+	private String generateDefaultPassword(User patientUser) {
+		StringBuilder defaultPassword = new StringBuilder();
+		defaultPassword.append(patientUser.getZipcode());
+		// default password will have the first 4 letters from last name, if length of last name <= 4, use complete string
+		int endIndex = patientUser.getLastName().length() > NO_OF_CHARACTERS_TO_BE_EXTRACTED ? NO_OF_CHARACTERS_TO_BE_EXTRACTED : patientUser.getLastName().length() ; 
+		defaultPassword.append(patientUser.getLastName().substring(0, endIndex));
+		defaultPassword.append(patientUser.getDob().toString(DATEFORMAT_MMddyyyy));
+		return defaultPassword.toString();
+	}
+	
 	/**
 	 * Handles password verification 
 	 * @param password
@@ -96,12 +110,17 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
 	 * Throws appropriate exceptions if the User loggedin for the first time
 	 * @param user
 	 */
-	private void processFirstTimeLogin(User user) {
+	private void processFirstTimeLogin(User user,String tokenPassword) {
 		if(null == user.getLastLoggedInAt()){
-        	if(!RandomUtil.isValidEmail(user.getEmail()))
-        		throw new EmailNotPresentForPatientException("Please Register with Email and Password to Login",prepareJSONForPatientUser(user.getEmail().toLowerCase(),user.getPassword()));
-        	else
-        		throw new FirstLoginException("First Time Login, please reset your password",prepareJSONForPatientUser(user.getEmail().toLowerCase(),user.getPassword()));
+			String defaultPassword = generateDefaultPassword(user);
+			if(defaultPassword.equals(tokenPassword)){
+				if(!RandomUtil.isValidEmail(user.getEmail()))
+					throw new EmailNotPresentForPatientException("Please Register with Email and Password to Login",prepareJSONForPatientUser(user.getEmail().toLowerCase(),user.getPassword()));
+				else
+					throw new FirstLoginException("First Time Login, please reset your password",prepareJSONForPatientUser(user.getEmail().toLowerCase(),user.getPassword()));				
+			}else{
+				throw new BadCredentialsException("Invalid username/password");
+			}
         }
 	}
 	

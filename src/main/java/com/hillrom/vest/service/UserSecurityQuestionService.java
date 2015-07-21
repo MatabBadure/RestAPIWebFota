@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import com.hillrom.vest.domain.SecurityQuestion;
 import com.hillrom.vest.domain.UserSecurityQuestion;
 import com.hillrom.vest.repository.SecurityQuestionRepository;
 import com.hillrom.vest.repository.UserRepository;
@@ -37,22 +38,25 @@ public class UserSecurityQuestionService {
 		return userSecurityQuestionRepository.findOneByUserIdAndQuestionId(userId,questionId);
 	}
 	
-	public Optional<UserSecurityQuestion> save(Long userId,Long questionId,String answer){
+	public Optional<UserSecurityQuestion> saveOrUpdate(Long userId,Long questionId,String answer){
 		if(null == userId || null == questionId || null == answer)
 			return Optional.empty();
-		UserSecurityQuestion userSecurityQuestion = new  UserSecurityQuestion();
-		userSecurityQuestion.setAnswer(answer);
-		userSecurityQuestion.setSecurityQuestion(questionRepository.findOne(questionId));
-		userSecurityQuestion.setUser(userRepository.findOne(userId));
-		return Optional.of(userSecurityQuestionRepository.save(userSecurityQuestion));
+		Optional<UserSecurityQuestion> fromDatabase = findOneByUserIdAndQuestionId(userId, questionId);
+		if(fromDatabase.isPresent()){
+			UserSecurityQuestion userSecQ = fromDatabase.get(); 
+			userSecQ.setAnswer(answer);
+			return Optional.of(userSecurityQuestionRepository.save(userSecQ));
+		}else{
+			UserSecurityQuestion userSecurityQuestion = new  UserSecurityQuestion();
+			userSecurityQuestion.setAnswer(answer);
+			SecurityQuestion question = questionRepository.findOne(questionId);
+			if(null == question){
+				return Optional.empty();
+			}
+			userSecurityQuestion.setSecurityQuestion(question);
+			userSecurityQuestion.setUser(userRepository.findOne(userId));
+			return Optional.of(userSecurityQuestionRepository.save(userSecurityQuestion));						
+		}
 	}
-	
-	public Optional<UserSecurityQuestion> update(Long userId,Long questionId,String answer){
-		if(null == userId || null == questionId || null == answer)
-			return Optional.empty();
-		return  findOneByUserIdAndQuestionId(userId,questionId).map(existingQ ->{
-			existingQ.setAnswer(answer);
-			return userSecurityQuestionRepository.save(existingQ);
-		});
-	}
+
 }

@@ -1,0 +1,57 @@
+{
+    "doctor" : {
+        "home": {
+            "title": "doctor",
+            "createLabel": "Create doctor",
+            "createOrEditLabel": "Create or edit a Doctor"
+        },
+        "delete": {
+            "question": "Are you sure you want to delete Doctor {{ id }}?"
+        },
+        "detail": {
+            "title": "Doctor"
+        },
+        "general-details":  "General Details",
+        "personal-details": "Personal Details",
+        "health-details":   "Health Details",
+        "clinic": "Clinic",
+        "doctor": "Doctor",
+        "add-caregiver": "Add Caregiver",
+        "create-caregiver": "Yes",
+        "clinic-name":  "Clinic Name",
+        "emr-id":   "EMR-ID",
+        "mrn-id": "MRN-ID",
+        "title": {
+                    "name": "Title",
+                    "mr":   "Mr.",
+                    "mrs": "Mrs.",
+                    "miss": "Miss"
+        },
+        "gender": {
+                    "name": "Gender",
+                    "male":   "M",
+                    "female": "F",
+                    "others": "O"
+        },
+        "primary-language": "Primary Language",
+        "first-name": "First Name",
+        "middle-name": "Middle Name",
+        "last-name": "Last Name",
+        "date-of-birth": "Date of Birth",
+        "address": "Address",
+        "city": "City",
+        "zipcode": "Zip",
+        "email": "Email",
+        "state": "State",
+        "phone-number": "Phone No",
+        "mobile-number": "Mobile No",
+        "faxNumber": "FaxNumber",
+        "hillromId": "HillromId",
+        "parentClinicId": "ParentClinicId",
+        "npiNumber": "NpiNumber",
+        "user": "user",
+        "doctors": "Doctors",
+        "parent": "parent",
+        "submit-button-text": "submit"
+    }
+}

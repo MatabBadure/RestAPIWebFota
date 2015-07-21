@@ -1,30 +1,33 @@
 {
-    "hillromvestApp": {
-        "clinic" : {
-            "home": {
-                "title": "Clinics",
-                "createLabel": "Create a new Clinic",
-                "createOrEditLabel": "Create or edit a Clinic"
-            },
-            "delete": {
-                "question": "Are you sure you want to delete Clinic {{ id }}?"
-            },
-            "detail": {
-                "title": "Clinic"
-            },
-            "name": "Name",
-            "address": "Address",
-            "zipcode": "Zipcode",
-            "city": "City",
-            "state": "State",
-            "phoneNumber": "PhoneNumber",
-            "faxNumber": "FaxNumber",
-            "hillromId": "HillromId",
-            "parentClinicId": "ParentClinicId",
-            "npiNumber": "NpiNumber",
-            "user": "user",
-            "patients": "patients",
-            "parent": "parent"
-        }
+    "clinic" : {
+        "home": {
+            "title": "Clinics",
+            "createLabel": "Create Clinic",
+            "createOrEditLabel": "Create or edit a Clinic"
+        },
+        "delete": {
+            "question": "Are you sure you want to delete Clinic {{ id }}?"
+        },
+        "detail": {
+            "title": "Clinic"
+        },
+        "general-details": "General Details",
+        "clinic-name": "Clinic Name",
+        "hr-id": "HR-ID",
+        "personal-details": "Personal Details",
+        "address": "Address",
+        "zipcode": "Zip",
+        "city": "City",
+        "state": "State",
+        "phoneNumber": "PhoneNumber",
+        "fax-number": "Clinic Fax Number",
+        "clinic-phone": "Clinic Phone Number",
+        "hillromId": "HillromId",
+        "parentClinicId": "ParentClinicId",
+        "npiNumber": "NpiNumber",
+        "user": "user",
+        "patients": "patients",
+        "parent": "parent",
+        "submit-button-text": "submit"
     }
 }

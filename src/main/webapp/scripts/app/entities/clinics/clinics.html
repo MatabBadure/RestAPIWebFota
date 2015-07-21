@@ -1,13 +1,111 @@
-<div class="col-md-16 dashboard-page">
-	<div class="col-md-4 dashboard-page__admin-nav">
-		<nav-bar></nav-bar>
+<div class="navbar dashboard">
+	<div class="container">
+		<div class="dashbord-nav__primary secondary-fix-navbar pull-left">
+			<span class="dashbord-nav__primary--title" translate="clinic.home.createLabel">Create Clinic</span>
+		</div>
+		<div class="dashbord-nav__secondary navbar-right">
+			<span class="dashbord-nav__secondary--create-new" translate=""></span>
+		</div>
 	</div>
+	<div class="container dashboard__form">
+		<div class="row margin-top-xl">
+			<div class="col-md-16">
+				<span class="dashboard__form--type" translate="clinic.general-details"></span>
+			</div>
 
-	<div class="col-md-6 dashboard-page__form margin-top-15">
-		<clinic clinic-data="clinic" clinic-status="clinicStatus"></clinic>
-	</div>
-	
-	<div class="col-md-6 dashboard-page__user-list">
-		<clinic-list on-select="selectedClinic(clinic)"></clinic-list>
+			<div class="col-md-16 row margin-top">
+				<div class="col-md-7 row">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="clinic.clinic-name"></span>
+						<span class="">*</span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+						<div class="">
+		          <span class="has-error">
+		           *Clinic Name is required.
+		          </span>
+		        </div>
+					</div>
+				</div>
+				<div class="col-md-7 col-md-offset-2">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="dashboard__form--type" translate="clinic.hr-id"></span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row margin-top-xl">
+			<div class="col-md-16">
+				<span class="dashboard__form--type" translate="clinic.personal-details"></span>
+			</div>
+
+			<div class="col-md-16 row margin-top">
+				<div class="col-md-7 row">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="clinic.address"></span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div>
+				<div class="col-md-7 col-md-offset-2">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="clinic.city"></span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-16 row margin-top">
+				<div class="col-md-7 row">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="clinic.state"></span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div>
+				<div class="col-md-7 col-md-offset-2">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="clinic.zipcode"></span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-16 row margin-top">
+				<div class="col-md-7 row">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="clinic.clinic-phone"></span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div>
+				<div class="col-md-7 col-md-offset-2">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="clinic.fax-number"></span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-16 row margin-top margin-bottom-extream">
+				<div class="col-md-4 col-md-offset-12">
+					<span class="hillrom-btn btn-submit" translate="clinic.submit-button-text"></span>
+				</div>		
+			</div>
+		</div>
 	</div>
 </div>

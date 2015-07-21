@@ -1,7 +1,7 @@
 'use strict';
 describe('Service: UserService', function() {
 
-  var UserService, httpBackend, http, q, data, usersURL, deleteURL, date, accountDetailsURL;
+  var UserService, httpBackend, http, q, data, usersURL, deleteURL, date, accountDetailsURL, id;
 
   beforeEach(module('hillromvestApp'));
 
@@ -19,6 +19,7 @@ describe('Service: UserService', function() {
       'role': 'SUPER_ADMIN',
       'title': 'Mr.'
     };
+    id = 20;
     date = new Date('2015-01-01T00:00:00Z');
     spyOn(window, 'Date').and.callFake(function() {
       return date;
@@ -36,17 +37,16 @@ describe('Service: UserService', function() {
 
   it('createUser', function() {
     var response = UserService.createUser(data);
-    httpBackend.flush();
     response.then(function(data) {
+      httpBackend.flush();
       expect(response.status).toEqual(201);
     });
   });
 
   it('deleteUser', function() {
-    var id  = 16;
     var response = UserService.deleteUser(id);
-    httpBackend.flush();
     response.then(function(data){
+      httpBackend.flush();
       expect(response.status).toEqual(200);
     });
   });

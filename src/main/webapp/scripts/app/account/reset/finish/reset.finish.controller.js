@@ -20,10 +20,10 @@ angular.module('hillromvestApp')
         then(function (response) {
             $scope.questions = response.data;
         }).catch(function (err) {
-            $scope.questionsNotLoaded = true;  
+            $scope.questionsNotLoaded = true;
         });
 
-        $scope.finishReset = function() {
+        $scope.finishReset = function(event) {
             if($scope.form.$invalid){
                 return false;
             }
@@ -39,13 +39,13 @@ angular.module('hillromvestApp')
                     $state.go('home');
                 }).catch(function (response) {
                     $scope.success = null;
-                    
+
                     if(response.status === 400 && response.data.ERROR === 'Invalid Reset Key'){
                     	$scope.error = true;
                     }else if(response.status === 400 && response.data.ERROR === 'Incorrect Security Question or Password'){
                         $scope.questionVerificationFailed = true;
                     }else{
-                       $scope.otherError = true; 
+                       $scope.otherError = true;
                     }
                 });
             }

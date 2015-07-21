@@ -78,7 +78,7 @@ angular.module('hillromvestApp')
 
             var currentDate = new Date();
             var selectedDate = new Date($(this).val());
-
+            $scope.patient.dob = selectedDate.getMonth() +"/"+selectedDate.getDate()+"/"+selectedDate.getFullYear();
             var diff = currentDate - selectedDate ;
             var days = Math.floor(diff/(1000*60*60*24));
             var years = Math.floor(days/365);
@@ -114,7 +114,6 @@ angular.module('hillromvestApp')
             }
             angular.element('.age').val(age);
             $scope.patient.age=age;
-
             angular.element("#dp2").datepicker('hide');
         
       });

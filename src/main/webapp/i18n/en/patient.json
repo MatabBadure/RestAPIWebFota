@@ -20,12 +20,20 @@
         "create-caregiver": "Yes",
         "hill-rom-id":  "Hill-Rom ID",
         "emr-id":   "EMR-ID",
+        "mrn-id": "MRN-ID",
         "title": {
                     "name": "Title",
                     "mr":   "Mr.",
                     "mrs": "Mrs.",
                     "miss": "Miss"
         },
+        "gender": {
+                    "name": "Gender",
+                    "male":   "M",
+                    "female": "F",
+                    "others": "O"
+        },
+        "primary-language": "Primary Language",
         "first-name": "First Name",
         "middle-name": "Middle Name",
         "last-name": "Last Name",
@@ -35,13 +43,15 @@
         "zipcode": "Zip",
         "email": "Email",
         "state": "State",
-        "phoneNumber": "PhoneNumber",
+        "phone-number": "Phone No",
+        "mobile-number": "Mobile No",
         "faxNumber": "FaxNumber",
         "hillromId": "HillromId",
         "parentClinicId": "ParentClinicId",
         "npiNumber": "NpiNumber",
         "user": "user",
         "patients": "patients",
-        "parent": "parent"
+        "parent": "parent",
+        "submit-button-text": "submit"
     }
 }

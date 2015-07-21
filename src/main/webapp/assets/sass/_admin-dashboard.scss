@@ -1,6 +1,10 @@
+.secondary-fix-navbar{
+	top: 60px;
+  border-width: 0 0 0px;
+}
+
 .dashboard {
 	left:0;
-	width: 100%;
 	// position: fixed;
 	background-color: $seashell;
 	max-height: 40px;
@@ -37,7 +41,8 @@
 
 .dashboard__form--input input {
 	height: 30px;
-	width: 270px;
+	//width: 270px;
+	width: 100%;
 	color: $pickled-bluewood;
 	border: 1px solid $bombay;
 	padding-left: 10px;
@@ -58,6 +63,65 @@
   text-overflow: '';
 }
 
+.label-next input{
+	width: 100%;
+	color: $pickled-bluewood;
+	border: 1px solid $bombay;
+	padding-left: 10px;
+	font-weight: normal;
+}
+
+.hillrom-btn {
+	right: 40px;
+  position: absolute;
+  padding: 5px 24px;
+  border-radius: 3px;
+  text-transform: capitalize;
+  font-size: $font-size-small;
+  cursor: pointer;
+}
+
+.btn-submit {
+  border: 1px solid $terracotta;
+  background-color: $terracotta;
+  color: $body-bg;
+}
+
+.btn-submit-disable {
+  border: 1px solid $terracotta;
+  background-color: $terracotta;
+  color: $body-bg;
+}
+
+.has-error {
+	color: $terracotta;
+	font-size: $font-size-small;
+	font-weight: normal;
+	padding: 5px 0;
+}
+
+.margin-bottom-extream {
+	margin-bottom: 110px;
+}
+
+.checkbox-add span{
+	padding-left: 5px;
+	height: 30px;
+	line-height: 30px;
+	font-weight: normal;
+
+}
+
+.dashboard__form--label-age {
+  position: absolute;
+  right: 10px;
+  border: 1px solid $bombay;
+  top: 0;
+  height: 30px;
+  padding: 0 13px;
+  line-height: 30px;
+  font-weight: normal;
+}
 // input[type=checkbox]{
 // 	padding-left:5px;
 //   padding-right:5px;

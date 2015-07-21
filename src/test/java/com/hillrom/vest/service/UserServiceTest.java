@@ -23,13 +23,11 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.Application;
-import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.SecurityQuestion;
 import com.hillrom.vest.domain.User;
-import com.hillrom.vest.repository.AuthorityRepository;
+import com.hillrom.vest.domain.UserLoginToken;
 import com.hillrom.vest.repository.SecurityQuestionRepository;
 import com.hillrom.vest.repository.UserRepository;
-import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.util.RandomUtil;
 
 /**
@@ -44,11 +42,18 @@ import com.hillrom.vest.service.util.RandomUtil;
 @Transactional
 public class UserServiceTest {
 
-    @Inject
+    private static final String PASSWORD = "johndoe";
+
+	private static final String USERNAME = "john.doe@localhost";
+
+	@Inject
     private UserRepository userRepository;
 
     @Inject
     private UserService userService;
+    
+    @Inject
+    private AuthenticationService authService;
 
     @Inject
     private SecurityQuestionRepository sqrepository;
@@ -63,7 +68,7 @@ public class UserServiceTest {
     
     @Before
     public void setup(){
-    	user = userService.createUserInformation("johndoe", "John", "Doe", "john.doe@localhost", "en-US");
+    	user = userService.createUserInformation(PASSWORD, "John", "Doe", USERNAME, "en-US");
     	
     	question = new SecurityQuestion();
     	question.setQuestion("what is your pet name?");
@@ -80,7 +85,7 @@ public class UserServiceTest {
     @Test
     public void assertThatUserMustExistToResetPassword() {
         
-        Optional<User> maybeUser = userService.requestPasswordReset("john.doe@localhost");
+        Optional<User> maybeUser = userService.requestPasswordReset(USERNAME);
         assertThat(maybeUser.isPresent()).isFalse();
 
         maybeUser = userService.requestPasswordReset("admin@localhost.com");
@@ -94,7 +99,7 @@ public class UserServiceTest {
 
     @Test
     public void assertThatOnlyActivatedUserCanRequestPasswordReset() {
-        Optional<User> maybeUser = userService.requestPasswordReset("john.doe@localhost");
+        Optional<User> maybeUser = userService.requestPasswordReset(USERNAME);
         assertThat(maybeUser.isPresent()).isFalse();
     }
 
@@ -213,4 +218,24 @@ public class UserServiceTest {
         
     }
     
+    @Test
+	public void testFailureChangePasswordDueToMissingPassword() {
+		user.setActivated(true);
+		user.setLastLoggedInAt(DateTime.now());
+		userRepository.save(user);
+		
+		UserLoginToken authToken = authService.authenticate(USERNAME, PASSWORD);
+	    JSONObject jsonObject = userService.changePassword(null);
+	    assertThat(jsonObject.containsKey("ERROR")).isTrue();
+	}
+	
+	@Test
+	public void testSuccessChangePassword() {
+		user.setActivated(true);
+		user.setLastLoggedInAt(DateTime.now());
+		userRepository.save(user);
+		UserLoginToken authToken = authService.authenticate(USERNAME, PASSWORD);
+	    JSONObject jsonObject = userService.changePassword("admin");
+	    assertThat(jsonObject.containsKey("ERROR")).isFalse();
+	}
 }

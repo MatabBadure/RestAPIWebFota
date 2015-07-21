@@ -215,15 +215,21 @@ public class UserService {
         });
     }
 
-    public void changePassword(String password) {
-        userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).ifPresent(u-> {
-            String encryptedPassword = passwordEncoder.encode(password);
-            u.setPassword(encryptedPassword);
-            userRepository.save(u);
-            log.debug("Changed password for User: {}", u);
-        });
+    public JSONObject changePassword(String password) {
+    	JSONObject jsonObject = new JSONObject();
+    	if(!checkPasswordLength(password)){
+    		jsonObject.put("ERROR", "Incorrect password");
+    	}else{
+    		userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).ifPresent(u-> {
+    			String encryptedPassword = passwordEncoder.encode(password);
+    			u.setPassword(encryptedPassword);
+    			userRepository.save(u);
+    			log.debug("Changed password for User: {}", u);
+    		});    		
+    	}
+    	return jsonObject;
     }
-
+    
     @Transactional(readOnly = true)
     public User getUserWithAuthorities() {
         User currentUser = userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).get();

@@ -1,14 +1,14 @@
 package com.hillrom.vest.web.rest.dto;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.validation.constraints.Size;
 
 import org.joda.time.LocalDate;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public class UserExtensionDTO extends UserDTO {
 
@@ -168,8 +168,8 @@ public class UserExtensionDTO extends UserDTO {
 	}
 
 	public LocalDate getDob() {
-		String[] date = dob.split("/");
-		return new LocalDate(Integer.parseInt(date[2]), Integer.parseInt(date[0]), Integer.parseInt(date[1]));
+		DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yyyy");
+		return LocalDate.parse(dob, fmt);
 	}
 	
 	public void setDob(String dob) {

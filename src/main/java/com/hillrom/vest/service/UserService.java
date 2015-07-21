@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,6 +34,7 @@ import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.security.OnCredentialsChangeEvent;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.service.util.RequestUtil;
@@ -78,6 +80,9 @@ public class UserService {
     
     @Inject
     private UserSecurityQuestionService userSecurityQuestionService;
+    
+    @Inject
+    private ApplicationEventPublisher eventPublisher;
 
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
@@ -128,6 +133,7 @@ public class UserService {
            user.setResetKey(null);
            user.setResetDate(null);
            userRepository.save(user);
+   		   eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
            jsonObject.put("email", user.getEmail());
            return jsonObject;
        }else{
@@ -211,6 +217,7 @@ public class UserService {
             u.setEmail(email);
             u.setLangKey(langKey);
             userRepository.save(u);
+    		eventPublisher.publishEvent(new OnCredentialsChangeEvent(u.getId()));
             log.debug("Changed Information for User: {}", u);
         });
     }
@@ -220,10 +227,13 @@ public class UserService {
     	if(!checkPasswordLength(password)){
     		jsonObject.put("ERROR", "Incorrect password");
     	}else{
+    		
     		userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).ifPresent(u-> {
     			String encryptedPassword = passwordEncoder.encode(password);
     			u.setPassword(encryptedPassword);
+    			u.setLastLoggedInAt(DateTime.now());
     			userRepository.save(u);
+    			eventPublisher.publishEvent(new OnCredentialsChangeEvent(u.getId()));
     			log.debug("Changed password for User: {}", u);
     		});    		
     	}
@@ -309,6 +319,7 @@ public class UserService {
     		if(user.getId() != null) {
     			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
     				mailService.sendActivationEmail(user, baseUrl);
+    	    		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
     			}
                 jsonObject.put("message", "Patient User updated successfully.");
                 jsonObject.put("user", user);
@@ -528,7 +539,7 @@ public class UserService {
         	currentUser.setTermsConditionAccepted(true);
         	currentUser.setTermsConditionAcceptedDate(DateTime.now());
         	userRepository.save(currentUser);
-        	
+    		eventPublisher.publishEvent(new OnCredentialsChangeEvent(currentUser.getId()));
         	// update email in patientInfo, if the User is Patient
         	updatePatientEmailIfNotPresent(email);
         	

@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.validation.constraints.Size;
 
 import org.joda.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
 
 public class UserExtensionDTO extends UserDTO {
 
@@ -44,6 +45,7 @@ public class UserExtensionDTO extends UserDTO {
     private String hillromId;
     
     @Column(name = "dob")
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
     private LocalDate dob;
 
     public UserExtensionDTO() {

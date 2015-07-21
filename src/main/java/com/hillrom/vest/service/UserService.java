@@ -286,16 +286,31 @@ public class UserService {
 		return newUser;
 	}
     
+    public UserExtension createHCPUser(UserExtensionDTO userExtensionDTO) {
+    	UserExtension newUser = new UserExtension();
+    	userRepository.findOneByEmail(userExtensionDTO.getEmail())
+    	.map(user -> {
+    		return newUser;
+    	})
+    	.orElseGet(() -> {
+    		assignValuesToUserObj(userExtensionDTO, newUser);
+			userExtensionRepository.save(newUser);
+			log.debug("Created Information for User: {}", newUser);
+			return newUser;
+    	});
+		return newUser;
+	}
+    
     public JSONObject updateUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl){
     	JSONObject jsonObject = new JSONObject();
-        if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
-        	if(userExtensionDTO.getEmail() != null) {
-            	userRepository.findOneByEmail(userExtensionDTO.getEmail())
-    			.map(user -> {
-    				jsonObject.put("error", "e-mail address already in use");
-        			return ResponseEntity.badRequest().body(jsonObject);
-        		});
-        	}
+        if(userExtensionDTO.getEmail() != null) {
+    		Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
+			if(existingUser.isPresent() && existingUser.get().getId() != id) {
+				jsonObject.put("error", "e-mail address already in use");
+				return jsonObject;
+			}
+    	}
+		if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updatePatientUser(id, userExtensionDTO);
     		if(user.getId() != null) {
     			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
@@ -306,6 +321,19 @@ public class UserService {
                 return jsonObject;
     		} else {
     			jsonObject.put("error", "Unable to update Patient.");
+                return jsonObject;
+    		}
+        } else if (AuthoritiesConstants.HCP.equals(userExtensionDTO.getRole())) {
+           	UserExtension user = updateHCPUser(id, userExtensionDTO);
+    		if(user.getId() != null) {
+    			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
+    				mailService.sendActivationEmail(user, baseUrl);
+    			}
+                jsonObject.put("message", "HealthCare Proffessional updated successfully.");
+                jsonObject.put("user", user);
+                return jsonObject;
+    		} else {
+    			jsonObject.put("error", "Unable to update HealthCare Proffessional.");
                 return jsonObject;
     		}
         } else {
@@ -326,6 +354,14 @@ public class UserService {
     		return user;
     	});
 		return user;
+	}
+    
+    public UserExtension updateHCPUser(Long id, UserExtensionDTO userExtensionDTO) {
+    	UserExtension hcpUser = userExtensionRepository.findOne(id);
+		assignValuesToUserObj(userExtensionDTO, hcpUser);
+		userExtensionRepository.save(hcpUser);
+		log.debug("Updated Information for HealthCare Proffessional: {}", hcpUser);
+		return hcpUser;
 	}
 
 	private void assignValuesToPatientInfoObj(UserExtensionDTO userExtensionDTO, PatientInfo patientInfo) {
@@ -357,21 +393,6 @@ public class UserService {
 		patientInfo.setWebLoginCreated(true);
 	}
     
-    public UserExtension createDoctor(UserExtensionDTO userExtensionDTO) {
-    	UserExtension newUser = new UserExtension();
-    	userRepository.findOneByEmail(userExtensionDTO.getEmail())
-    	.map(user -> {
-    		return newUser;
-    	})
-    	.orElseGet(() -> {
-    		assignValuesToUserObj(userExtensionDTO, newUser);
-			userExtensionRepository.save(newUser);
-			log.debug("Created Information for User: {}", newUser);
-			return newUser;
-    	});
-		return newUser;
-	}
-
 	private void assignValuesToUserObj(UserExtensionDTO userExtensionDTO, UserExtension newUser) {
 		if(userExtensionDTO.getTitle() != null)
 			newUser.setTitle(userExtensionDTO.getTitle());

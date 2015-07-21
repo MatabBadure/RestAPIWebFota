@@ -105,7 +105,7 @@ public class UserExtensionResource {
             			return ResponseEntity.badRequest().body(jsonObject);
             		})
                     .orElseGet(() -> {
-                    	UserExtension user = userService.createDoctor(userExtensionDTO);
+                    	UserExtension user = userService.createHCPUser(userExtensionDTO);
                     	if(user.getId() != null) {
 		                    String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
 		                    mailService.sendActivationEmail(user, baseUrl);

@@ -14,24 +14,9 @@ angular.module('hillromvestApp')
           if ($scope.form.$invalid) {
             return false;
           }
-          var data = {
-            'title' : 'Dr',
-            'clinic' : $scope.doctor.clinic,
-            'firstName' : $scope.doctor.firstName,
-            'middleName' : $scope.doctor.middleName,
-            'lastName' : $scope.doctor.lastName,
-            'speciality' : $scope.doctor.speciality,
-            'credentials' : $scope.doctor.credentials,
-            'email' : $scope.doctor.email,
-            'primaryPhone' : $scope.doctor.primaryPhone,
-            'mobilePhone' : $scope.doctor.mobilePhone,
-            'faxNumber' : $scope.doctor.faxNumber,
-            'address' : $scope.doctor.address,
-            'zipcode' : $scope.doctor.zipCode,
-            'city' : $scope.doctor.city,
-            'state' : $scope.doctor.state,
-            'role': 'DOCTOR'
-          };
+          var data = $scope.doctor;
+          data.title = 'Dr';
+          data.role = 'DOCTOR';
 
           Doctor.createDoctor(data).then(function (response) {
             $scope.doctorStatus.isMessage = true;

@@ -464,6 +464,8 @@ public class UserService {
 			newUser.setLastName(userExtensionDTO.getLastName());
 		if(userExtensionDTO.getEmail() != null)
 			newUser.setEmail(userExtensionDTO.getEmail());
+		if(userExtensionDTO.getDob() != null)
+			newUser.setDob(userExtensionDTO.getDob());
 		if(userExtensionDTO.getSpeciality() != null)
 			newUser.setSpeciality(userExtensionDTO.getSpeciality());
 		if(userExtensionDTO.getCredentials() != null)

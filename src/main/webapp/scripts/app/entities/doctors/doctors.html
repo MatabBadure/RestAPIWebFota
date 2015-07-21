@@ -30,19 +30,13 @@
 				</div>
 				<div class="col-md-7 col-md-offset-2">
 					<div class="col-md-6 dashboard__form--label">
-						<span class="" translate="doctor.mrn-id"></span>
-						<span class="">*</span>
+						<span class="dashboard__form--type font-add-text" translate="doctor.add-clinic"></span>
 					</div>
-					<div class="col-md-10 dashboard__form--input">
-						<input class="" type="text" >
+					<div class="col-md-10 checkbox-add">
+						<input type="checkbox" name="isCreate">
+						<span translate="doctor.create-caregiver"></span>
 					</div>
 				</div>
-			</div>
-		</div>
-
-		<div class="row margin-top-xl">
-			<div class="col-md-16">
-				<span class="dashboard__form--type" translate="doctor.personal-details"></span>
 			</div>
 
 			<div class="col-md-16 row margin-top">
@@ -50,38 +44,15 @@
 					<div class="col-md-6 dashboard__form--label">
 						<span class="" translate="doctor.title.name"></span>
 					</div>
-					<div class="col-md-3 dashboard__form__input">
+					<div class="col-md-10 dashboard__form__input">
 						<div class="custom-dropdown">
 								<select>
-					        <option selected translate="doctor.title.mr"></option>
+								<option selected translate="doctor.title.dr"></option>
+					        <option translate="doctor.title.mr"></option>
 					        <option translate="doctor.title.mrs"></option>
 					        <option translate="doctor.title.miss"></option>
 						    </select>
 							</div>
-					</div>
-					<div class="col-md-4">
-						<div class="dashboard__form--label text-center">
-							<span class="" translate="doctor.gender.name"></span>
-						</div>
-
-					</div>
-					<div class="col-md-3 dashboard__form__input">
-						<div class="custom-dropdown">
-							<select>
-				        <option selected translate="doctor.gender.male"></option>
-				        <option translate="doctor.gender.female"></option>
-				        <option translate="doctor.gender.others"></option>
-					    </select>
-						</div>
-					</div>
-				</div>
-
-				<div class="col-md-7 col-md-offset-2">
-					<div class="col-md-6 dashboard__form--label">
-						<span class="" translate="doctor.primary-language"></span>
-					</div>
-					<div class="col-md-10 dashboard__form--input">
-						<input class="" type="text" >
 					</div>
 				</div>
 			</div>
@@ -118,12 +89,75 @@
 				</div>
 				<div class="col-md-7 col-md-offset-2">
 					<div class="col-md-6 dashboard__form--label">
-						<span class="" translate="doctor.date-of-birth"></span>
+						<span class="" translate="doctor.npi-number"></span>
 						<span class="">*</span>
 					</div>
-					<div class="col-md-6 dashboard__form--input">
+					<div class="col-md-10 dashboard__form--input">
 						<input class="" type="text" >
-						<span class="dashboard__form--label-age">28</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-16 row margin-top">
+				<div class="col-md-7 row">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="doctor.specialty"></span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div>
+				<div class="col-md-7 col-md-offset-2">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="doctor.credentials"></span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row margin-top-xl">
+			<div class="col-md-16">
+				<span class="dashboard__form--type" translate="doctor.personal-details"></span>
+			</div>
+
+			<div class="col-md-16 row margin-top">
+				<div class="col-md-7 row">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="doctor.email"></span>
+						<span class="">*</span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div>
+				<div class="col-md-7 col-md-offset-2">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="doctor.primary-phone"></span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-16 row margin-top">
+				<div class="col-md-7 row">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="doctor.mobile-number"></span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div>
+				<div class="col-md-7 col-md-offset-2">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="doctor.fax-number"></span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
 					</div>
 				</div>
 			</div>
@@ -132,7 +166,6 @@
 				<div class="col-md-7 row">
 					<div class="col-md-6 dashboard__form--label">
 						<span class="" translate="doctor.address"></span>
-						<span class="">*</span>
 					</div>
 					<div class="col-md-10 dashboard__form--input">
 						<input class="" type="text" >
@@ -153,50 +186,13 @@
 					<div class="col-md-6 dashboard__form--label">
 						<span class="" translate="doctor.state"></span>
 					</div>
-					<div class="col-md-4 dashboard__form__input label-next">
-						<input class="" type="text" >
-					</div>
-					<div class="col-md-2">
-						<div class="dashboard__form--label text-center">
-							<span class="" translate="doctor.zipcode"></span>
-						</div>
-
-					</div>
-					<div class="col-md-4 dashboard__form__input label-next">
-						<input class="" type="text" >
-					</div>
-				</div>
-				<div class="col-md-7 col-md-offset-2">
-					<div class="col-md-6 dashboard__form--label">
-						<span class="" translate="doctor.email"></span>
-						<span class="">*</span>
-					</div>
-					<div class="col-md-10 dashboard__form--input">
-						<input class="" type="text" >
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="row margin-top-xl margin-bottom-extream">
-			<div class="col-md-16">
-				<span class="dashboard__form--type" translate="doctor.health-details"></span>
-			</div>
-
-			<div class="col-md-16 row margin-top">
-				<div class="col-md-7 row">
-					<div class="col-md-6 dashboard__form--label">
-						<span class="" translate="doctor.clinic"></span>
-						<span class="">*</span>
-					</div>
 					<div class="col-md-10 dashboard__form--input">
 						<input class="" type="text" >
 					</div>
 				</div>
 				<div class="col-md-7 col-md-offset-2">
 					<div class="col-md-6 dashboard__form--label">
-						<span class="" translate="doctor.doctor"></span>
-						<span class="">*</span>
+						<span class="" translate="doctor.zipcode"></span>
 					</div>
 					<div class="col-md-10 dashboard__form--input">
 						<input class="" type="text" >
@@ -204,20 +200,7 @@
 				</div>
 			</div>
 
-			<div class="col-md-16 row margin-top">
-				<div class="col-md-7 row">
-					<div class="col-md-6 dashboard__form--label">
-						<span class="dashboard__form--type" translate="doctor.add-caregiver"></span>
-						<span class="">*</span>
-					</div>
-					<div class="col-md-10 checkbox-add">
-						<input type="checkbox" name="isCreate">
-						<span translate="doctor.create-caregiver"></span>
-					</div>
-				</div>
-			</div>
-
-			<div class="col-md-16 row margin-top margin-bottom-extreem">
+			<div class="col-md-16 row margin-top margin-bottom-extream">
 				<div class="col-md-4 col-md-offset-12">
 					<span class="hillrom-btn btn-submit" translate="doctor.submit-button-text"></span>
 				</div>		

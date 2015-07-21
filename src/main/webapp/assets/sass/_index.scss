@@ -1,12 +1,9 @@
-.container-top-indent {
+.container-body {
 	height: inherit;
 }
 
 .content-body {
 	background-color: inherit;
-	height: -o-calc(100% - 200px); /* opera */
-	height: -webkit-calc(100% - 200px); /* google, safari */
-	height: -moz-calc(100% - 200px);
 	margin-top: 60px;
 }
 

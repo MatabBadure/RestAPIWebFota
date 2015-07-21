@@ -74,6 +74,9 @@ public class UserService {
     private MailService mailService;
 
     @Inject
+    private UserLoginTokenService authTokenService;
+    
+    @Inject
     private UserSecurityQuestionService userSecurityQuestionService;
 
     public Optional<User> activateRegistration(String key) {
@@ -483,24 +486,119 @@ public class UserService {
 		});
 	}
 	
-	public void updateEmailOrPassword(Map<String,String> params){
+	public JSONObject updateEmailOrPassword(Map<String,String> params){
+		
 		String email = params.get("email");
-		userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).ifPresent(u-> {
-			if(null != email)
-				u.setEmail(email);
-			String password = params.get("password");
-            String encryptedPassword = passwordEncoder.encode(password);
-            u.setPassword(encryptedPassword);
-            u.setLastLoggedInAt(DateTime.now());
-            userRepository.save(u);
-            // update email in patientInfo
-            if(null != email){
-            	PatientInfo patientInfo = patientInfoService.findOneByHillromId(SecurityUtils.getCurrentLogin()).get();
-            	patientInfo.setEmail(email);
-            	patientInfoService.update(patientInfo);
-            }
-            log.debug("updateEmailOrPassword for User: {}", u);
-        });
+    	String password = params.get("password");
+    	String questionId = params.get("questionId");
+    	String answer = params.get("answer");
+    	String authToken = params.get("x-auth-token");
+    	String termsAndConditionsAccepted = params.get("termsAndConditionsAccepted");
+    	
+    	JSONObject errorsJsonObject = validateRequest(password, questionId,
+				answer,termsAndConditionsAccepted);
+        
+        if( null != errorsJsonObject.get("ERROR"))
+        	return errorsJsonObject;
+        
+        User currentUser = findOneByEmail(SecurityUtils.getCurrentLogin()).get();
+
+        errorsJsonObject = isUserExistsWithEmail(email, currentUser);
+        
+        if(null != errorsJsonObject.get("ERROR")){
+        	return errorsJsonObject;
+        }
+        
+        if(null!= email)
+        	currentUser.setEmail(email);
+        
+        Long qid = Long.parseLong(questionId);
+        Optional<UserSecurityQuestion> opUserSecQ = userSecurityQuestionService.saveOrUpdate(currentUser.getId(), qid, answer);
+        
+        if(opUserSecQ.isPresent()){
+        	
+        	currentUser.setPassword(passwordEncoder.encode(password));
+        	currentUser.setLastLoggedInAt(DateTime.now());
+        	currentUser.setTermsConditionAccepted(true);
+        	currentUser.setTermsConditionAcceptedDate(DateTime.now());
+        	userRepository.save(currentUser);
+        	
+        	// update email in patientInfo, if the User is Patient
+        	updatePatientEmailIfNotPresent(email);
+        	
+        	log.debug("updateEmailOrPassword for User: {}", currentUser);
+        	
+        	authTokenService.deleteToken(authToken); // Token must be deleted to avoid subsequent request
+        }else{
+        	errorsJsonObject.put("ERROR", "Invalid Security Question or Answer");
+        	return errorsJsonObject;
+        }
+		return new JSONObject();
 	}
+
+	/**
+	 * Checks whether User Exists with provided Email or Whether Email is left blank
+	 * @param email
+	 * @param currentUser
+	 * @return
+	 */
+	private JSONObject isUserExistsWithEmail(String email, User currentUser) {
+		JSONObject jsonObject = new JSONObject();
+		if(!RandomUtil.isValidEmail(currentUser.getEmail()) && StringUtils.isBlank(email)){
+        	jsonObject.put("ERROR", "Required field Email is missing");
+        }
+        
+        // Update Email for the firstTime Login , if not present
+        if(StringUtils.isNotBlank(email)){
+        	Optional<User> existingUser = findOneByEmail(email);
+        	if(existingUser.isPresent()){
+            	jsonObject.put("ERROR", "Email Already registered, please choose another email");
+        	}
+        }
+        return jsonObject;
+	}
+
+	/**
+	 * This updates Email in PatientInfo, if the loggedIn User is Patient
+	 * @param email
+	 */
+	private void updatePatientEmailIfNotPresent(String email) {
+		if(null != email){
+        	patientInfoService.findOneByHillromId(SecurityUtils.getCurrentLogin()).ifPresent(patient -> {
+        		patient.setEmail(email);        		
+        		patientInfoService.update(patient);
+        	});
+        }
+	}
+
+	/**
+	 * Validate whether all required fields present in the request
+	 * @param password
+	 * @param questionId
+	 * @param answer
+	 * @return
+	 */
+	private JSONObject validateRequest(String password,
+			String questionId, String answer,String termsAndConditionsAccepted) {
+		JSONObject jsonObject = new JSONObject();
+    	if(!StringUtils.isNotBlank(termsAndConditionsAccepted) || "false".equalsIgnoreCase(termsAndConditionsAccepted)){
+    		jsonObject.put("ERROR", "Please accept terms and conditions");
+    		return jsonObject;
+    	}
+    	if(StringUtils.isBlank(answer)){
+    		jsonObject.put("ERROR", "Required field Answer is missing");
+    		return jsonObject;
+    	}
+    	if(StringUtils.isBlank(questionId) || !StringUtils.isNumeric(questionId)){
+    		jsonObject.put("ERROR", "Required field SecurityQuestion is missing");
+    		return jsonObject;
+    	}
+        if (!checkPasswordLength(password)) {
+        	jsonObject.put("ERROR", "Incorrect password");
+            return jsonObject;
+        }
+		return jsonObject;
+	}
+	
 }
 

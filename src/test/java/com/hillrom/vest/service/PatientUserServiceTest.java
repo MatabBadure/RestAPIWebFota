@@ -2,6 +2,8 @@ package com.hillrom.vest.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 
 import org.junit.Before;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.Application;
 import com.hillrom.vest.domain.User;
+import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
@@ -60,11 +63,24 @@ public class PatientUserServiceTest {
 	
 	@Test
 	public void createPatientUserSuccessfully(){
-		User newPatientUser = userService.createPatientUser(userExtensionDTO);
+		UserExtension newPatientUser = userService.createPatientUser(userExtensionDTO);
 		assertThat(newPatientUser.isDeleted()).isFalse();
         assertThat(newPatientUser.getId()).isNotNull();
         assertThat(newPatientUser.getEmail()).isNotNull();
         userRepository.delete(newPatientUser);
 	}
 	
+	@Test
+	public void updatePatientUserSuccessfully(){
+		UserExtension newPatientUser = userService.createPatientUser(userExtensionDTO);
+		userExtensionDTO.setMiddleName("Smith");
+		userExtensionDTO.setCity("Bangalore");
+		UserExtension updatedPatientUser = userService.updatePatientUser(newPatientUser.getId(), userExtensionDTO);
+		assertThat(updatedPatientUser.isDeleted()).isFalse();
+        assertThat(updatedPatientUser.getId()).isNotNull();
+        assertThat(updatedPatientUser.getMiddleName()).isEqualTo(userExtensionDTO.getMiddleName());
+        assertThat(updatedPatientUser.getCity()).isEqualTo(userExtensionDTO.getCity());
+        assertThat(updatedPatientUser.getEmail()).isNotNull();
+        userRepository.delete(updatedPatientUser);
+	}
 }

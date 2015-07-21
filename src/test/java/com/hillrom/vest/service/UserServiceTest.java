@@ -1,24 +1,36 @@
 package com.hillrom.vest.service;
 
-import com.hillrom.vest.Application;
-import com.hillrom.vest.domain.User;
-import com.hillrom.vest.repository.UserRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.inject.Inject;
+
+import net.minidev.json.JSONObject;
+
 import org.joda.time.DateTime;
-import com.hillrom.vest.service.util.RandomUtil;
-import org.joda.time.LocalDate;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import java.util.Optional;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
+import com.hillrom.vest.Application;
+import com.hillrom.vest.domain.Authority;
+import com.hillrom.vest.domain.SecurityQuestion;
+import com.hillrom.vest.domain.User;
+import com.hillrom.vest.repository.AuthorityRepository;
+import com.hillrom.vest.repository.SecurityQuestionRepository;
+import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.service.util.RandomUtil;
 
 /**
  * Test class for the UserResource REST controller.
@@ -38,16 +50,43 @@ public class UserServiceTest {
     @Inject
     private UserService userService;
 
+    @Inject
+    private SecurityQuestionRepository sqrepository;
+    
+    @Inject
+    private UserSecurityQuestionService userSecurityQuestionService;
+    
+    private User user ;
+    
+    private SecurityQuestion question;
+    
+    
+    @Before
+    public void setup(){
+    	user = userService.createUserInformation("johndoe", "John", "Doe", "john.doe@localhost", "en-US");
+    	
+    	question = new SecurityQuestion();
+    	question.setQuestion("what is your pet name?");
+        
+        question = sqrepository.save(question);
+       
+    }
+
+    @After
+    public void destroy(){
+    	userRepository.delete(user);
+    	sqrepository.delete(question);
+    }
     @Test
     public void assertThatUserMustExistToResetPassword() {
         
         Optional<User> maybeUser = userService.requestPasswordReset("john.doe@localhost");
         assertThat(maybeUser.isPresent()).isFalse();
 
-        maybeUser = userService.requestPasswordReset("admin@localhost");
+        maybeUser = userService.requestPasswordReset("admin@localhost.com");
         assertThat(maybeUser.isPresent()).isTrue();
 
-        assertThat(maybeUser.get().getEmail()).isEqualTo("admin@localhost");
+        assertThat(maybeUser.get().getEmail()).isEqualTo("admin@localhost.com");
         assertThat(maybeUser.get().getResetDate()).isNotNull();
         assertThat(maybeUser.get().getResetKey()).isNotNull();
         
@@ -55,76 +94,79 @@ public class UserServiceTest {
 
     @Test
     public void assertThatOnlyActivatedUserCanRequestPasswordReset() {
-        User user = userService.createUserInformation("johndoe", "John", "Doe", "john.doe@localhost", "en-US");
         Optional<User> maybeUser = userService.requestPasswordReset("john.doe@localhost");
         assertThat(maybeUser.isPresent()).isFalse();
-        userRepository.delete(user);
     }
 
     @Test
     public void assertThatResetKeyMustNotBeOlderThan24Hours() {
-        
-        User user = userService.createUserInformation("johndoe", "John", "Doe", "john.doe@localhost", "en-US");
 
         DateTime daysAgo = DateTime.now().minusHours(25);
         String resetKey = RandomUtil.generateResetKey();
         user.setActivated(true);
         user.setResetDate(daysAgo);
         user.setResetKey(resetKey);
-
-        userRepository.save(user);
-
-        Optional<User> maybeUser = userService.completePasswordReset("johndoe2", user.getResetKey());
-
-        assertThat(maybeUser.isPresent()).isFalse();
-
-        userRepository.delete(user);
+        
+        user = userRepository.save(user);
+        
+        userSecurityQuestionService.saveOrUpdate(user.getId(), question.getId(), "test");
+        
+        Map<String,String> paramsMap = new HashMap<String,String>();
+        paramsMap.put("key", user.getResetKey());
+        paramsMap.put("answer", "test");
+        paramsMap.put("questionId", question.getId().toString());
+        paramsMap.put("password", "password");
+        
+        JSONObject jsonObject = userService.completePasswordReset(paramsMap);
+        assertThat(jsonObject.containsKey("ERROR")).isTrue();
         
     }
 
     @Test
     public void assertThatResetKeyMustBeValid() {
         
-        User user = userService.createUserInformation("johndoe", "John", "Doe", "john.doe@localhost", "en-US");
+        
 
         DateTime daysAgo = DateTime.now().minusHours(25);
         user.setActivated(true);
         user.setResetDate(daysAgo);
-        user.setResetKey("1234");
-
+        user.setResetKey(RandomUtil.generateResetKey());
+        
         userRepository.save(user);
-
-        Optional<User> maybeUser = userService.completePasswordReset("johndoe2", user.getResetKey());
-
-        assertThat(maybeUser.isPresent()).isFalse();
-
-        userRepository.delete(user);
+        userSecurityQuestionService.saveOrUpdate(user.getId(), question.getId(), "test");
+        
+        Map<String,String> paramsMap = new HashMap<String,String>();
+        paramsMap.put("key", "1234");
+        paramsMap.put("answer", "test");
+        paramsMap.put("questionId", question.getId().toString());
+        paramsMap.put("password", "password");
+        
+        JSONObject jsonObject = userService.completePasswordReset(paramsMap);
+    
+        assertThat(jsonObject.containsKey("ERROR")).isTrue();
         
     }
 
     @Test
     public void assertThatUserCanResetPassword() {
-        
-        User user = userService.createUserInformation("johndoe", "John", "Doe", "john.doe@localhost", "en-US");
-
-        String oldPassword = user.getPassword();
 
         DateTime daysAgo = DateTime.now().minusHours(2);
         String resetKey = RandomUtil.generateResetKey();
         user.setActivated(true);
         user.setResetDate(daysAgo);
         user.setResetKey(resetKey);
-
+        
         userRepository.save(user);
-
-        Optional<User> maybeUser = userService.completePasswordReset("johndoe2", user.getResetKey());
-
-        assertThat(maybeUser.isPresent()).isTrue();
-        assertThat(maybeUser.get().getResetDate()).isNull();
-        assertThat(maybeUser.get().getResetKey()).isNull();
-        assertThat(maybeUser.get().getPassword()).isNotEqualTo(oldPassword);
-
-        userRepository.delete(user);
+        userSecurityQuestionService.saveOrUpdate(user.getId(), question.getId(), "test");
+        
+        Map<String,String> paramsMap = new HashMap<>();
+        paramsMap.put("key", user.getResetKey());
+        paramsMap.put("answer", "test");
+        paramsMap.put("questionId", question.getId().toString());
+        paramsMap.put("password", "password");
+        JSONObject jsonObject = userService.completePasswordReset(paramsMap);
+    
+        assertThat(jsonObject.containsKey("email")).isTrue();
         
     }
 
@@ -135,4 +177,40 @@ public class UserServiceTest {
         List<User> users = userRepository.findAllByActivatedIsFalseAndCreatedDateBefore(now.minusDays(3));
         assertThat(users).isEmpty();
     }
+    
+    @Test
+    public void assertThatUserMustProvideAnswerSecurityQuestion() {
+        
+        Map<String,String> paramsMap = new HashMap<>();
+        paramsMap.put("key", "1234");
+        paramsMap.put("questionId", question.getId().toString());
+        paramsMap.put("password", "password");
+        JSONObject jsonObject = userService.completePasswordReset(paramsMap);
+        assertThat(jsonObject.containsKey("ERROR")).isTrue();
+        
+    }
+    
+    @Test
+    public void assertThatUserMustProvideCorrectAnswerSecurityQuestion() {
+
+        DateTime daysAgo = DateTime.now();
+        String resetKey = RandomUtil.generateResetKey();
+        user.setActivated(true);
+        user.setResetDate(daysAgo);
+        user.setResetKey(resetKey);
+        
+        userRepository.save(user);
+        userSecurityQuestionService.saveOrUpdate(user.getId(), question.getId(), "test");
+        
+        Map<String,String> paramsMap = new HashMap<>();
+        paramsMap.put("key", user.getResetKey());
+        paramsMap.put("answer", "test");
+        paramsMap.put("questionId", question.getId().toString());
+        paramsMap.put("password", "password");
+        JSONObject jsonObject = userService.completePasswordReset(paramsMap);
+    
+        assertThat(jsonObject.containsKey("email")).isTrue();
+        
+    }
+    
 }

@@ -2,6 +2,8 @@ var token = 'token',
   timeStamp = '1420070400000',
   loginURL = 'api/authenticate?cacheBuster=' + timeStamp,
   accountDetailsURL = 'api/account?cacheBuster=' + timeStamp,
+  resetPassInitURL = 'api/account/reset_password/init?cacheBuster=' + timeStamp,
+  recaptchaURL = 'api/recaptcha?cacheBuster=' + timeStamp,
   responses = {
     'authenticate': {
       'success': {

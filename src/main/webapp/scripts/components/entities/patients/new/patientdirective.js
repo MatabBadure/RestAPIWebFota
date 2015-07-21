@@ -35,6 +35,7 @@ angular.module('hillromvestApp')
             'email': $scope.patient.email,
             'role':'PATIENT'
           };
+          data = JSON.stringify(data);
           User.createUser(data).then(function (response) {
             if(response.status == '201')
             {
@@ -73,20 +74,49 @@ angular.module('hillromvestApp')
 
          angular.element("#dp2").datepicker().datepicker("setDate", new Date());
 
+         angular.element('#dp2').on('changeDate', function(ev){
 
-        angular.element('#dp2').on('changeDate', function(ev){
+            var currentDate = new Date();
+            var selectedDate = new Date($(this).val());
 
-        var currentDate = new Date();
-        var selectedDate = new Date($(this).val());
-        var age = currentDate.getFullYear() - selectedDate.getFullYear();
-        var m = currentDate.getMonth() - selectedDate.getMonth();
-        if (m < 0 || (m === 0 && currentDate.getDate() < selectedDate.getDate())) {
-            age--;
-        }
-        angular.element('.age').val(age);
-        $scope.patient.age=age;
+            var diff = currentDate - selectedDate ;
+            var days = Math.floor(diff/(1000*60*60*24));
+            var years = Math.floor(days/365);
+            var months = ((days % 365)/30).toFixed(1)
+            var age = 0;
+            console.log (days + " days" + years + " years" + months + " months")
 
-        angular.element("#dp2").datepicker('hide');
+            if(years === 0){
+                if(months > 1){
+                  age = months + " months ";
+                }else{
+                  age = months + " month ";
+                }
+            }
+            if(years > 0){
+                  if(years > 1){
+                        if(months > 1){
+                          age = years + " years " + months + " months ";
+                        }else{
+                          age = years + " years " + months + " month ";
+                        }
+                  }else{
+                        if(months > 1){
+                          age = years + " year " + months + " months ";
+                        }else{
+                          age = years + " year " + months + " month ";
+                        }
+                  }
+              }
+
+            if(diff < 0){
+              age = age-1;
+            }
+            angular.element('.age').val(age);
+            $scope.patient.age=age;
+
+            angular.element("#dp2").datepicker('hide');
+        
       });
 
       }

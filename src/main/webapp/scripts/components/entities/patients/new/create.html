@@ -121,9 +121,9 @@
       <label for="age">Age</label>
     </div>
     <div class="col-md-10">
-      <input type="text" class="form-control age" name="age" ng-model="patient.age" ng-pattern="/^[0-9]+$/" readonly>
-        <div ng-show="form.age.$dirty && form.age.$invalid" class="form-error">
-            <span class="help-block" ng-show="form.age.$error.pattern" >
+      <input type="text" class="form-control age" name="age" ng-model="patient.age" ng-pattern="/^[^-]+$/" readonly>
+        <div ng-show="form.age.$invalid" class="form-error">
+            <span class="help-block" ng-show="form.age.$error.pattern">
               Age cannot be in negative.
             </span>
         </div>

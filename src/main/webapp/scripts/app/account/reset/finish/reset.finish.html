@@ -14,13 +14,17 @@
             <div class="alert alert-danger" ng-show="error">
                 <p translate="reset.finish.messages.error">Your password couldn't be reset. Remember a password request is only valid for 24 hours.</p>
             </div>
+            
+            <div class="alert alert-danger" ng-show="otherError">
+                <p >Error occured!. Please try again</p>
+            </div>
 
             <div class="alert alert-danger" ng-show="questionsNotLoaded">
-                <p >Security questions failed to load. Please try again</p>
+                <p >Security questions failed to load! Please try again</p>
             </div>
 
             <div class="alert alert-danger" ng-show="questionVerificationFailed">
-                <p >Security question and answer didn't match. Please try again</p>
+                <p >Security question and answer didn't match!. Please try again</p>
             </div>
 
             <div class="alert alert-success" ng-show="success">

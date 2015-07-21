@@ -11,6 +11,7 @@ angular.module('hillromvestApp')
         $scope.questionsNotLoaded = false;
         $scope.questionVerificationFailed =false;
         $scope.submitted  = false;
+        $scope.otherError = false;
         $timeout(function (){angular.element('[ng-model="resetAccount.password"]').focus();});
         $scope.formSubmit = function(){
              $scope.submitted  = true;
@@ -38,10 +39,13 @@ angular.module('hillromvestApp')
                     $state.go('home');
                 }).catch(function (response) {
                     $scope.success = null;
-                    //will put condition to check security question & answer combination is correct or wrong
-                    // make questionVerificationFailed = true
-                    if(response.status === 400){
-                    	$scope.error = 'ERROR';
+                    
+                    if(response.status === 400 && response.data.ERROR === 'Invalid Reset Key'){
+                    	$scope.error = true;
+                    }else if(response.status === 400 && response.data.ERROR === 'Incorrect Security Question or Password'){
+                        $scope.questionVerificationFailed = true;
+                    }else{
+                       $scope.otherError = true; 
                     }
                 });
             }

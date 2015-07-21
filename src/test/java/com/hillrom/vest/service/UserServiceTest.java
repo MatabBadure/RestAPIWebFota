@@ -109,7 +109,7 @@ public class UserServiceTest {
         
         user = userRepository.save(user);
         
-        userSecurityQuestionService.save(user.getId(), question.getId(), "test");
+        userSecurityQuestionService.saveOrUpdate(user.getId(), question.getId(), "test");
         
         Map<String,String> paramsMap = new HashMap<String,String>();
         paramsMap.put("key", user.getResetKey());
@@ -133,7 +133,7 @@ public class UserServiceTest {
         user.setResetKey(RandomUtil.generateResetKey());
         
         userRepository.save(user);
-        userSecurityQuestionService.save(user.getId(), question.getId(), "test");
+        userSecurityQuestionService.saveOrUpdate(user.getId(), question.getId(), "test");
         
         Map<String,String> paramsMap = new HashMap<String,String>();
         paramsMap.put("key", "1234");
@@ -157,7 +157,7 @@ public class UserServiceTest {
         user.setResetKey(resetKey);
         
         userRepository.save(user);
-        userSecurityQuestionService.save(user.getId(), question.getId(), "test");
+        userSecurityQuestionService.saveOrUpdate(user.getId(), question.getId(), "test");
         
         Map<String,String> paramsMap = new HashMap<>();
         paramsMap.put("key", user.getResetKey());
@@ -200,7 +200,7 @@ public class UserServiceTest {
         user.setResetKey(resetKey);
         
         userRepository.save(user);
-        userSecurityQuestionService.save(user.getId(), question.getId(), "test");
+        userSecurityQuestionService.saveOrUpdate(user.getId(), question.getId(), "test");
         
         Map<String,String> paramsMap = new HashMap<>();
         paramsMap.put("key", user.getResetKey());

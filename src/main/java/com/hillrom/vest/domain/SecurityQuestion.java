@@ -31,10 +31,6 @@ public class SecurityQuestion implements Serializable {
 
     @Column(name = "question")
     private String question;
-    
-    @OneToOne(mappedBy = "securityQuestion",fetch=FetchType.LAZY)
-    @JsonIgnore
-    private UserSecurityQuestion securityQuestion;
 
     public Long getId() {
         return id;

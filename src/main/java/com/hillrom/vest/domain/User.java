@@ -2,6 +2,7 @@ package com.hillrom.vest.domain;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -19,12 +20,18 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.boon.json.annotations.JsonProperty;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
+import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 
 /**
  * A user.
@@ -96,7 +103,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private DateTime resetDate = null;
     
     @Column(name = "terms_condition_accepted")
-    private boolean termsConditionAccepted  = false;
+    private boolean termsConditionAccepted = false;
 
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "terms_condition_accepted_date", nullable = true)
@@ -118,13 +125,16 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime lastLoggedInAt;
     
-    @OneToOne(mappedBy = "user",fetch=FetchType.LAZY)
-    @JsonIgnore
-    private UserSecurityQuestion securityQuestion;
-    
     @OneToMany(mappedBy = "user",fetch=FetchType.LAZY)
     @JsonIgnore
     private Set<UserPatientAssoc> userPatientAssoc = new HashSet<>();
+    
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
+    @JsonSerialize(using = CustomLocalDateSerializer.class)
+    @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
+    @Column(name = "dob")
+    private LocalDate dob;
+
     
     public Long getId() {
         return id;
@@ -247,14 +257,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.deleted = deleted;
 	}
 
-	public UserSecurityQuestion getSecurityQuestion() {
-		return securityQuestion;
-	}
-
-	public void setSecurityQuestion(UserSecurityQuestion securityQuestion) {
-		this.securityQuestion = securityQuestion;
-	}
-
 	public String getGender() {
 		return gender;
 	}
@@ -295,6 +297,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.userPatientAssoc = userPatientAssoc;
 	}
 
+	public LocalDate getDob() {
+		return dob;
+	}
+
+	public void setDob(LocalDate dob) {
+		this.dob = dob;
+	}
+
 	@Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -306,7 +316,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
         User user = (User) o;
 
-        if (!email.equals(user.email)) {
+        if (! Objects.equals(email, user.email)) {
             return false;
         }
 
@@ -315,7 +325,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     @Override
     public int hashCode() {
-        return email.hashCode();
+        if(email != null) return email.hashCode();
+        else {
+        	return HashCodeBuilder.reflectionHashCode(this);
+        }
     }
 
 	@Override

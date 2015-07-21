@@ -32,7 +32,7 @@ public class ClinicDTO {
     private String hillromId;
 
 	@Size(max = 50)
-    private ArrayList<Map<String, String>> childClinics;
+    private Map<String, Long> parentClinic;
 
 	public ClinicDTO() {
 		super();
@@ -40,7 +40,7 @@ public class ClinicDTO {
 
 	public ClinicDTO(String name, String address, Integer zipcode, String city,
 			String state, Long phoneNumber, Long faxNumber, String hillromId,
-			ArrayList<Map<String, String>> childClinics) {
+			Map<String, Long> parentClinic) {
 		super();
 		this.name = name;
 		this.address = address;
@@ -50,7 +50,7 @@ public class ClinicDTO {
 		this.phoneNumber = phoneNumber;
 		this.faxNumber = faxNumber;
 		this.hillromId = hillromId;
-		this.childClinics = childClinics;
+		this.parentClinic = parentClinic;
 	}
 
 	public String getName() {
@@ -117,11 +117,11 @@ public class ClinicDTO {
 		this.hillromId = hillromId;
 	}
 
-	public ArrayList<Map<String, String>> getChildClinics() {
-		return childClinics;
+	public Map<String, Long> getParentClinic() {
+		return parentClinic;
 	}
 
-	public void setChildClinics(ArrayList<Map<String, String>> childClinics) {
-		this.childClinics = childClinics;
+	public void setParentClinic(Map<String, Long> parentClinic) {
+		this.parentClinic = parentClinic;
 	}
 }

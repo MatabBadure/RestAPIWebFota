@@ -22,7 +22,6 @@ import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.Http401UnauthorizedEntryPoint;
 import com.hillrom.vest.security.RestExceptionTranslationFilter;
 import com.hillrom.vest.security.xauth.XAuthTokenConfigurer;
-import com.hillrom.vest.service.PatientInfoService;
 import com.hillrom.vest.service.UserLoginTokenService;
 import com.hillrom.vest.service.UserService;
 
@@ -40,8 +39,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Inject
     private UserLoginTokenService authTokenService;
     
-    @Inject
-    private PatientInfoService patientInfoService;
 
     @Inject
     private UserService userService;
@@ -52,7 +49,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     public AuthenticationProvider getAuthenticationProvider(){
-    	return new com.hillrom.vest.security.AuthenticationProvider(userDetailsService,passwordEncoder(),patientInfoService,userService);
+    	return new com.hillrom.vest.security.AuthenticationProvider(passwordEncoder(),userService);
     }
     
     @Inject
@@ -109,10 +106,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/env/**").hasAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/trace/**").hasAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/api-docs/**").hasAuthority(AuthoritiesConstants.ADMIN)
-            .antMatchers("/clinics/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES)
-            .antMatchers("/hillromteamuser/**").hasAnyAuthority(AuthoritiesConstants.ADMIN)
-            .antMatchers("/hcp/**").hasAnyAuthority(AuthoritiesConstants.ADMIN)
+            .antMatchers("/api/clinics/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES)
+            .antMatchers("/api/hillromteamuser/**").hasAnyAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/protected/**").authenticated()
+            .antMatchers("/api/user/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES)
         .and()
             .apply(securityConfigurerAdapter());
 

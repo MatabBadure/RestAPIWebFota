@@ -1,6 +1,8 @@
 package com.hillrom.vest.security;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -13,38 +15,31 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import com.hillrom.vest.domain.PatientInfo;
+
 import com.hillrom.vest.domain.User;
-import com.hillrom.vest.service.PatientInfoService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.service.util.RandomUtil;
 
 public class AuthenticationProvider extends DaoAuthenticationProvider {
 
-    private static final int NO_OF_CHARACTERS_TO_BE_EXTRACTED = 4;
+	private static final String DATEFORMAT_MMddyyyy = "MMddyyyy";
 
 	private final Logger log = LoggerFactory.getLogger(AuthenticationProvider.class);
+	
+	private static final int NO_OF_CHARACTERS_TO_BE_EXTRACTED = 4;
 
     private PasswordEncoder passwordEncoder;
-
-    @Inject
-    private UserDetailsService userDetailsService;
-    
-    @Inject
-    private PatientInfoService patientInfoService;
     
     @Inject
     private UserService userService;
 
-    public AuthenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder,PatientInfoService patientInfoService,UserService userService) {
-        this.userDetailsService = userDetailsService;
+    public AuthenticationProvider(PasswordEncoder passwordEncoder,UserService userService) {
         this.passwordEncoder = passwordEncoder;
-        this.patientInfoService = patientInfoService;
         this.userService = userService;
     }
     
@@ -52,103 +47,108 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         UsernamePasswordAuthenticationToken token =
                 (UsernamePasswordAuthenticationToken) authentication;
-        String login = token.getName();
-        log.debug("login : ",login);
+        String login = token.getName().toLowerCase();
+        log.debug("login : "+login);
         
-        return RandomUtil.isValidEmail(login)? loginWithEmail(token, login) : loginWithHillromId(token, login);
+        User user = getUserByLogin(login);
+        
+        String password = user.getPassword();
+        String tokenPassword = (String) token.getCredentials();
+        
+        processFirstTimeLogin(user,tokenPassword);
+        matchPasswords(password, tokenPassword);
+        
+        UserDetails userDetails = buildUserDetails(user);
+        
+        return new UsernamePasswordAuthenticationToken(userDetails, user.getPassword(),
+        		userDetails.getAuthorities());
     }
 
-	private Authentication loginWithEmail(
-			UsernamePasswordAuthenticationToken token, String login) {
-			login = login.toLowerCase();
-			UserDetails user = userDetailsService.loadUserByUsername(login);
-	        if (user == null) {
-	            throw new UsernameNotFoundException("User does not exists");
-	        }
-	        String password = user.getPassword();
-	        String tokenPassword = (String) token.getCredentials();
-	        matchPasswords(password, tokenPassword);
-	        return new UsernamePasswordAuthenticationToken(user, password,
-	            user.getAuthorities());
+	/**
+	 * Returns User from DB if User is Not ( Active | Deleted )
+	 * @param login
+	 * @return User
+	 */
+	private User getUserByLogin(String login) {
+		Optional<User> userFromDatabase = userService.findOneByEmail(login);
+        User user = null;
+        if(userFromDatabase.isPresent()){
+        	user = userFromDatabase.get();
+        }else{
+        	throw new UsernameNotFoundException("User does not exists");
+        }
+        
+        // User is not activated or Deleted
+        if (!user.getActivated() || user.isDeleted()) {
+            throw new UserNotActivatedException("User " + login + " was not activated");
+        }
+		return user;
+	}
+
+	private String generateDefaultPassword(User patientUser) {
+		StringBuilder defaultPassword = new StringBuilder();
+		defaultPassword.append(patientUser.getZipcode());
+		// default password will have the first 4 letters from last name, if length of last name <= 4, use complete string
+		int endIndex = patientUser.getLastName().length() > NO_OF_CHARACTERS_TO_BE_EXTRACTED ? NO_OF_CHARACTERS_TO_BE_EXTRACTED : patientUser.getLastName().length() ; 
+		defaultPassword.append(patientUser.getLastName().substring(0, endIndex));
+		defaultPassword.append(patientUser.getDob().toString(DATEFORMAT_MMddyyyy));
+		return defaultPassword.toString();
 	}
 	
-    private Authentication loginWithHillromId(UsernamePasswordAuthenticationToken token,String login){
-    	PatientInfo patientInfo = null;
-    	if(RandomUtil.isValidHillromId(login)){
-    		Optional<PatientInfo> patientInfoFromDatabase = patientInfoService.findOneByHillromId(login);
-    		
-    		if(patientInfoFromDatabase.isPresent()){
-    			patientInfo = patientInfoFromDatabase.get();
-    		}else{
-    			throw new BadCredentialsException("User "+login+" was not found");
-    		}
-    		
-    		String defaultPassword = generateDefaultPassword(patientInfo);
-    		String encodedPassword = passwordEncoder.encode(defaultPassword);
-    		
-    		matchWithDefaultPassword(token.getCredentials().toString(), defaultPassword);
-    		
-    		//If email doesn't exist, send response to register with email and password
-    		if(null == patientInfo.getEmail()){
-    			
-    			userService.createUserFromPatientInfo(patientInfo,encodedPassword);
-    			JSONObject jsonObject = prepareJSONForPatientUser(login,encodedPassword);
-    			throw new EmailNotPresentForPatientException("Please Register with Email and Password to Login",jsonObject);
-    		}
-    		
-    		Optional<User> userFromDatabase = userService.findOneByEmail(patientInfo.getEmail().toLowerCase());
-    		
-    		if(userFromDatabase.isPresent()){
-    			User existingPatientuser = userFromDatabase.get();
-    			// User exists and it is the first time login 
-    			if(null == existingPatientuser.getLastLoggedInAt()){
-    				JSONObject jsonObject = prepareJSONForPatientUser(patientInfo.getEmail().toLowerCase(),encodedPassword);
-        	        throw new FirstLoginException("First Time Login, please reset your password",jsonObject);
-    			}else { // User should not login with hillromId more than once.
-    				throw new BadCredentialsException("Invalid username,Please login with registered email");
-    			}
-    		}else{
-    			userService.createUserFromPatientInfo(patientInfo,encodedPassword);
-    			JSONObject jsonObject = prepareJSONForPatientUser(patientInfo.getEmail().toLowerCase(),encodedPassword);
-    			throw new FirstLoginException("Please Register with Email and Password to Login",jsonObject);
-    		}
-    	}else{
-    		throw new BadCredentialsException("Invalid username/password");
-    	}
-    }
-
+	/**
+	 * Handles password verification 
+	 * @param password
+	 * @param tokenPassword
+	 */
 	private void matchPasswords(String password, String tokenPassword) {
 		if (!passwordEncoder.matches(tokenPassword, password)) {
 		    throw new BadCredentialsException("Invalid username/password");
 		}
 	}
 	
-	private void matchWithDefaultPassword(String password, String tokenPassword){
-		if(!password.equals(tokenPassword)){
-			throw new BadCredentialsException("Invalid username/password");
-		}
+	/**
+	 * Throws appropriate exceptions if the User loggedin for the first time
+	 * @param user
+	 */
+	private void processFirstTimeLogin(User user,String tokenPassword) {
+		if(null == user.getLastLoggedInAt()){
+			String defaultPassword = generateDefaultPassword(user);
+			if(defaultPassword.equals(tokenPassword)){
+				if(!RandomUtil.isValidEmail(user.getEmail()))
+					throw new EmailNotPresentForPatientException("Please Register with Email and Password to Login",prepareJSONForPatientUser(user.getEmail().toLowerCase(),user.getPassword()));
+				else
+					throw new FirstLoginException("First Time Login, please reset your password",prepareJSONForPatientUser(user.getEmail().toLowerCase(),user.getPassword()));				
+			}else{
+				throw new BadCredentialsException("Invalid username/password");
+			}
+        }
 	}
-    
-	 /**Default Password for PatientUser is zipcode+1st 4 characters in last_name+dob in MMddyyy format
-	  *    
-	  * @param patientUser
-	  * @return default password for the PatientUser
-	  */
-	private String generateDefaultPassword(PatientInfo patientUser) {
-		StringBuilder defaultPassword = new StringBuilder();
-		defaultPassword.append(patientUser.getZipcode());
-		// default password will have the first 4 letters from last name, if length of last name <= 4, use complete string
-		int endIndex = patientUser.getLastName().length() > NO_OF_CHARACTERS_TO_BE_EXTRACTED ? NO_OF_CHARACTERS_TO_BE_EXTRACTED : patientUser.getLastName().length() ; 
-		defaultPassword.append(patientUser.getLastName().substring(0, endIndex));
-		defaultPassword.append(patientUser.getDob().toString("MMddyyyy"));
-		return defaultPassword.toString();
-	}
-
+	
+	/**
+	 *  prepares the JSONObject to be passed with Exception to create auth token
+	 * @param username
+	 * @param encodedPassword
+	 * @return JSONObject
+	 */
 	private JSONObject prepareJSONForPatientUser(String username,String encodedPassword){
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("username", username);
 		jsonObject.put("password", encodedPassword);
 		return jsonObject;
+	}
+
+	/**
+	 *  build UserDetails Object with granted authorities
+	 * @param user
+	 * @return UserDetails
+	 */
+	private UserDetails buildUserDetails(User user){
+		List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
+                .map(authority -> new SimpleGrantedAuthority(authority.getName()))
+                .collect(Collectors.toList());
+        return  new org.springframework.security.core.userdetails.User(user.getEmail(),
+                user.getPassword(),
+                grantedAuthorities);
 	}
 	
 	@Override

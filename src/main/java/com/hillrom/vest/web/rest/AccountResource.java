@@ -192,17 +192,13 @@ public class AccountResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<JSONObject> finishPasswordReset(@RequestParam(value = "key") String key, @RequestBody(required=true) Map<String,String> body) {
-        String newPassword = body.get("newPassword");
-        JSONObject jsonObject = new JSONObject();
-        if (!checkPasswordLength(newPassword)) {
-        	jsonObject.put("message", "Incorrect password");
-            return ResponseEntity.badRequest().body(jsonObject);
+        body.put("key", key);
+        JSONObject jsonObject = userService.completePasswordReset(body);
+        if(jsonObject.containsKey("ERROR")){
+        	return ResponseEntity.badRequest().body(jsonObject);
+        }else{
+        	return ResponseEntity.ok().body(jsonObject);
         }
-        return userService.completePasswordReset(newPassword, key)          
-        		.map(user -> { 
-        			jsonObject.put("message", "Password reset successfully.");
-        			jsonObject.put("email", user.getEmail());
-        			return ResponseEntity.ok().body(jsonObject);}).orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
     private boolean checkPasswordLength(String password) {

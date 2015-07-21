@@ -1,0 +1,9 @@
+$footer--background: $waikawa-gray;
+
+.footer{
+	min-height: 40px;
+	background-color: $footer--background;
+	line-height: 40px;
+	font-size: $font-size-small;
+	color: $bombay;
+}

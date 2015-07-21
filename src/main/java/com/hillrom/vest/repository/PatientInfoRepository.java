@@ -12,6 +12,6 @@ import com.hillrom.vest.domain.PatientInfo;
  */
 public interface PatientInfoRepository extends JpaRepository<PatientInfo,Long> {
   
-    @Query("from PatientInfo  where hillromId = ?1")
-    Optional<PatientInfo> findOneByHillromId( String hillRomId);
+	@Query("from PatientInfo where hillromId = ?1")
+    Optional<PatientInfo> findOneByHillromId(String hillRomId);
 }

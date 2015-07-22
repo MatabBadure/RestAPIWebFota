@@ -11,6 +11,12 @@
         "detail": {
             "title": "Clinic"
         },
+        "clinic-type": "Clinic Type",
+        "clinic-option": {
+            "parent-clinic": "Parent Clinic",
+            "satellite-clinic": "Satellite Clinic"
+        },
+        "select-parent": "Select Parent Clinic",
         "general-details": "General Details",
         "clinic-name": "Clinic Name",
         "hr-id": "HR-ID",

@@ -14,9 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.Where;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -32,16 +30,11 @@ import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
  */
 @Entity
 @Table(name = "PATIENT_INFO")
-@SQLDelete(sql="UPDATE PATIENT_INFO SET is_deleted = 1 WHERE id = ?")
-@Where(clause="is_deleted=0")
 public class PatientInfo implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
-    @Column(name = "mrn")
-    private String mrn;
 
     @Column(name = "hillrom_id")
     private String hillromId;
@@ -86,7 +79,7 @@ public class PatientInfo implements Serializable {
     private String address;
     
     @Column(name="zipcode")
-    private String zipcode;
+    private Integer zipcode;
     
     @Column(name = "city")
     private String city;
@@ -95,7 +88,7 @@ public class PatientInfo implements Serializable {
     private String state;
     
     @Column(name = "expired")
-    private Boolean expired;
+    private Boolean expired = false;
     
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "expired_date", nullable = true)
@@ -103,9 +96,6 @@ public class PatientInfo implements Serializable {
     
     @Column(name = "web_login_created")
     private Boolean webLoginCreated;
-
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
 
     @OneToMany(mappedBy = "patient",fetch=FetchType.LAZY)
     @JsonIgnore
@@ -121,14 +111,6 @@ public class PatientInfo implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getMrn() {
-        return mrn;
-    }
-
-    public void setMrn(String mrn) {
-        this.mrn = mrn;
     }
 
     public String getHillromId() {
@@ -219,19 +201,11 @@ public class PatientInfo implements Serializable {
         this.webLoginCreated = webLoginCreated;
     }
 
-    public Boolean getIsDeleted() {
-        return isDeleted;
-    }
-
-    public void setIsDeleted(Boolean isDeleted) {
-        this.isDeleted = isDeleted;
-    }
-
-    public String getZipcode() {
+    public Integer getZipcode() {
 		return zipcode;
 	}
 
-	public void setZipcode(String zipcode) {
+	public void setZipcode(Integer zipcode) {
 		this.zipcode = zipcode;
 	}
 
@@ -332,7 +306,6 @@ public class PatientInfo implements Serializable {
     public String toString() {
         return "PatientInfo{" +
                 "id=" + id +
-                ", mrn='" + mrn + "'" +
                 ", hillromId='" + hillromId + "'" +
                 ", hubId='" + hubId + "'" +
                 ", serialNumber='" + serialNumber + "'" +
@@ -344,7 +317,6 @@ public class PatientInfo implements Serializable {
                 ", dob='" + dob + "'" +
                 ", email='" + email + "'" +
                 ", webLoginCreated='" + webLoginCreated + "'" +
-                ", isDeleted='" + isDeleted + "'" +
                 '}';
     }
 }

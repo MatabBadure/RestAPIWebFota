@@ -77,20 +77,20 @@ public class UserSecurityQuestionServiceTest {
 	
 	@Test
 	public void createUserSecurityQuestionSuccessfully(){
-		Optional<UserSecurityQuestion> mayBeSaved = securityQuestionService.save(user.getId(), question.getId(), ANSWER);
+		Optional<UserSecurityQuestion> mayBeSaved = securityQuestionService.saveOrUpdate(user.getId(), question.getId(), ANSWER);
 		assertThat(mayBeSaved.isPresent()).isTrue();
 		assertThat(mayBeSaved.get().getAnswer()).isEqualTo(ANSWER);
 	}
 	
 	@Test
 	public void failCreateUserSecurityQuestion(){
-		Optional<UserSecurityQuestion> mayBeSaved = securityQuestionService.save(user.getId(), null, ANSWER);
+		Optional<UserSecurityQuestion> mayBeSaved = securityQuestionService.saveOrUpdate(user.getId(), null, ANSWER);
 		assertThat(mayBeSaved.isPresent()).isFalse();
 	}
 	
 	@Test
 	public void updateUserSecurityQuestionSuccessfully(){
-		Optional<UserSecurityQuestion> mayBeSaved = securityQuestionService.save(user.getId(), question.getId(), ANSWER);
+		Optional<UserSecurityQuestion> mayBeSaved = securityQuestionService.saveOrUpdate(user.getId(), question.getId(), ANSWER);
 		mayBeSaved = securityQuestionService.findOneByUserIdAndQuestionId(user.getId(), question.getId());
 		mayBeSaved.get().setAnswer(PASSWORD);
 		UserSecurityQuestion updated = securityQuestionRepository.save(mayBeSaved.get());
@@ -100,7 +100,7 @@ public class UserSecurityQuestionServiceTest {
 	
 	@Test
 	public void failUpdateUserSecurityQuestion(){
-		Optional<UserSecurityQuestion> updated = securityQuestionService.update(user.getId(), question.getId(), null);
+		Optional<UserSecurityQuestion> updated = securityQuestionService.saveOrUpdate(user.getId(), question.getId(), null);
 		assertThat(updated.isPresent()).isFalse();
 	}
 	

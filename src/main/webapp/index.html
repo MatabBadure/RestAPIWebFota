@@ -24,8 +24,10 @@
             <div ui-view="navbar" ng-cloak=""></div>
             <div class="well content-body" ui-view="content"></div>
 
-            <div class="footer text-center indent-top-15">
-                <p translate="footer">This is your footer</p>
+            <div class="footer navbar-fixed-bottom">
+                <div class="container text-center">
+                    <span translate="footer">This is your footer</span>
+                </div>
             </div>
         </div>
 
@@ -77,6 +79,7 @@
     <!-- build:js({.tmp,src/main/webapp}) scripts/app.js -->
     <script src="scripts/app/app.js"></script>
     <script src="scripts/app/app.constants.js"></script>
+    <script src="scripts/app/globalconfig.js"></script>
     <script src="scripts/components/auth/auth.service.js"></script>
     <script src="scripts/components/auth/principal.service.js"></script>
     <script src="scripts/components/auth/authority.directive.js"></script>
@@ -177,6 +180,8 @@
     <script src="scripts/app/navbar/nav-bar.js"></script>
     <script src="scripts/app/entities/userExtension/userExtension.js"></script>
     <script src="scripts/components/entities/userExtension/userExtension.service.js"></script>
+
+    <script src="scripts/app/api-mock.js"></script>
 
     <!-- endbuild -->
 </body>

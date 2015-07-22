@@ -9,29 +9,36 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.Authority;
+import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
+import com.hillrom.vest.domain.UserSecurityQuestion;
 import com.hillrom.vest.repository.AuthorityRepository;
+import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
+import com.hillrom.vest.service.util.RequestUtil;
 import com.hillrom.vest.web.rest.dto.HillromTeamUserDTO;
+import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
-import com.hillrom.vest.domain.PatientInfo;
-import com.hillrom.vest.security.AuthoritiesConstants;
 
 /**
  * Service class for managing users.
@@ -58,7 +65,19 @@ public class UserService {
     private UserPatientRepository userPatientRepository;
     
     @Inject
+    private PatientInfoRepository patientInfoRepository;
+    
+    @Inject
     private PatientInfoService patientInfoService;
+    
+    @Inject
+    private MailService mailService;
+
+    @Inject
+    private UserLoginTokenService authTokenService;
+    
+    @Inject
+    private UserSecurityQuestionService userSecurityQuestionService;
 
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
@@ -74,24 +93,82 @@ public class UserService {
         return Optional.empty();
     }
 
-    public Optional<User> completePasswordReset(String newPassword, String key) {
-       log.debug("Reset user password for reset key {}", key);
-
+    /**
+     * Completes the reset password flow
+     * @param paramsMap
+     * @return
+     */
+    public JSONObject completePasswordReset(Map<String,String> paramsMap) {
+       log.debug("Reset user password for reset key {}", paramsMap);
+   
+       String requiredParams[] = {"password","questionId","answer"};
+       JSONObject errorJSON =  RequestUtil.checkRequiredParams(paramsMap,requiredParams);
+       if(null != errorJSON.get("ERROR"))
+    	   return errorJSON;
+       
+       String key = paramsMap.get("key");
+       String newPassword = paramsMap.get("password");
+       String questionId = paramsMap.get("questionId");
+       String answer = paramsMap.get("answer");
+       
+       JSONObject jsonObject = new JSONObject();
+       if (!checkPasswordLength(newPassword)) {
+    	   jsonObject.put("message", "Incorrect password");
+    	   return jsonObject;
+       }
+       
        Optional<User> opUser = userRepository.findOneByResetKey(key);
-       System.out.println("opUser>>> "+opUser);
-       return opUser.filter(user -> {
-               DateTime oneDayAgo = DateTime.now().minusHours(24);
-               return user.getResetDate().isAfter(oneDayAgo.toInstant().getMillis());
-           })
-           .map(user -> {
-               user.setPassword(passwordEncoder.encode(newPassword));
-               user.setResetKey(null);
-               user.setResetDate(null);
-               userRepository.save(user);
-               return user;
-           });
+       if(opUser.isPresent()){
+    	   User user = opUser.get();
+    	   errorJSON = canProceedPasswordReset(questionId, answer,user);
+    	   if(null != errorJSON.get("ERROR")){
+    		   return errorJSON;
+    	   }
+           user.setPassword(passwordEncoder.encode(newPassword));
+           user.setResetKey(null);
+           user.setResetDate(null);
+           userRepository.save(user);
+           jsonObject.put("email", user.getEmail());
+           return jsonObject;
+       }else{
+    	   jsonObject.put("ERROR", "Invalid Reset Key");
+    	   return jsonObject;   
+       }
+       
     }
 
+    /**
+     * Verifies whether Token expired or the security question answer matches 
+     * @param questionId
+     * @param answer
+     * @param user
+     * @return
+     */
+	private JSONObject canProceedPasswordReset(String questionId, String answer,
+			 User user) {
+		JSONObject jsonObject = new JSONObject();
+		DateTime oneDayAgo = DateTime.now().minusHours(24);
+           if(user.getResetDate().isBefore(oneDayAgo.toInstant().getMillis())){
+        	   jsonObject.put("ERROR", "Reset Key Expired");
+           }
+           if(!verifySecurityQuestion(user,questionId,answer)){
+        	   jsonObject.put("ERROR", "Incorrect Security Question or Password");
+           }
+           return jsonObject;
+	}
+
+    private boolean verifySecurityQuestion(User user,String questionId,String answer){
+    	Optional<UserSecurityQuestion> opUserSecurityQuestion =  userSecurityQuestionService.findOneByUserIdAndQuestionId(user.getId(), Long.parseLong(questionId));
+    	if(opUserSecurityQuestion.isPresent()){
+    		return answer.equals(opUserSecurityQuestion.get().getAnswer());
+    	}
+    	return false;
+    }
+    
+    private boolean checkPasswordLength(String password) {
+        return (!StringUtils.isEmpty(password) && password.length() >= UserDTO.PASSWORD_MIN_LENGTH && password.length() <= UserDTO.PASSWORD_MAX_LENGTH);
+    }
+    
     public Optional<User> requestPasswordReset(String mail) {
        return userRepository.findOneByEmail(mail)
            .filter(user -> user.getActivated() == true)
@@ -107,7 +184,7 @@ public class UserService {
                                       String langKey) {
 
         User newUser = new User();
-        Authority authority = authorityRepository.findOne("ROLE_USER");
+        Authority authority = authorityRepository.findOne(AuthoritiesConstants.ADMIN);
         Set<Authority> authorities = new HashSet<>();
         String encryptedPassword = passwordEncoder.encode(password);
         // new user gets initially a generated password
@@ -138,15 +215,21 @@ public class UserService {
         });
     }
 
-    public void changePassword(String password) {
-        userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).ifPresent(u-> {
-            String encryptedPassword = passwordEncoder.encode(password);
-            u.setPassword(encryptedPassword);
-            userRepository.save(u);
-            log.debug("Changed password for User: {}", u);
-        });
+    public JSONObject changePassword(String password) {
+    	JSONObject jsonObject = new JSONObject();
+    	if(!checkPasswordLength(password)){
+    		jsonObject.put("ERROR", "Incorrect password");
+    	}else{
+    		userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).ifPresent(u-> {
+    			String encryptedPassword = passwordEncoder.encode(password);
+    			u.setPassword(encryptedPassword);
+    			userRepository.save(u);
+    			log.debug("Changed password for User: {}", u);
+    		});    		
+    	}
+    	return jsonObject;
     }
-
+    
     @Transactional(readOnly = true)
     public User getUserWithAuthorities() {
         User currentUser = userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).get();
@@ -187,32 +270,156 @@ public class UserService {
 		return newUser;
 	}
     
+    public UserExtension createPatientUser(UserExtensionDTO userExtensionDTO) {
+    	UserExtension newUser = new UserExtension();
+    	PatientInfo patientInfo = new PatientInfo();
+    	patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId())
+    	.map(patient -> {
+    		return newUser;
+    	})
+    	.orElseGet(() -> {
+    		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
+    		patientInfoRepository.save(patientInfo);
+    		assignValuesToUserObj(userExtensionDTO, newUser);
+    		if(AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
+    			newUser.setEmail(userExtensionDTO.getHillromId());
+    		}
+			userExtensionRepository.save(newUser);
+			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.PATIENT, "SELF");
+			userPatientRepository.save(userPatientAssoc);
+			newUser.getUserPatientAssoc().add(userPatientAssoc);
+			patientInfo.getUserPatientAssoc().add(userPatientAssoc);
+			log.debug("Created Information for Patient User: {}", newUser);
+			return newUser;
+    	});
+		return newUser;
+	}
+    
+    public JSONObject updateUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl){
+    	JSONObject jsonObject = new JSONObject();
+        if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
+        	if(userExtensionDTO.getEmail() != null) {
+            	userRepository.findOneByEmail(userExtensionDTO.getEmail())
+    			.map(user -> {
+    				jsonObject.put("error", "e-mail address already in use");
+        			return ResponseEntity.badRequest().body(jsonObject);
+        		});
+        	}
+           	UserExtension user = updatePatientUser(id, userExtensionDTO);
+    		if(user.getId() != null) {
+    			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
+    				mailService.sendActivationEmail(user, baseUrl);
+    			}
+                jsonObject.put("message", "Patient User updated successfully.");
+                jsonObject.put("user", user);
+                return jsonObject;
+    		} else {
+    			jsonObject.put("error", "Unable to update Patient.");
+                return jsonObject;
+    		}
+        } else {
+    		jsonObject.put("error", "Incorrect data.");
+    		return jsonObject;
+    	}
+    }
+    
+    public UserExtension updatePatientUser(Long id, UserExtensionDTO userExtensionDTO) {
+    	UserExtension user = userExtensionRepository.findOne(id);
+    	patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId())
+    	.map(patient -> {
+    		assignValuesToPatientInfoObj(userExtensionDTO, patient);
+    		patientInfoRepository.save(patient);
+    		assignValuesToUserObj(userExtensionDTO, user);
+			userExtensionRepository.save(user);
+			log.debug("Updated Information for Patient User: {}", user);
+    		return user;
+    	});
+		return user;
+	}
+
+	private void assignValuesToPatientInfoObj(UserExtensionDTO userExtensionDTO, PatientInfo patientInfo) {
+		patientInfo.setHillromId(userExtensionDTO.getHillromId());
+		if(userExtensionDTO.getTitle() != null)
+			patientInfo.setTitle(userExtensionDTO.getTitle());
+		if(userExtensionDTO.getFirstName() != null)
+			patientInfo.setFirstName(userExtensionDTO.getFirstName());
+		if(userExtensionDTO.getMiddleName() != null)
+			patientInfo.setMiddleName(userExtensionDTO.getMiddleName());
+		if(userExtensionDTO.getLastName() != null)
+			patientInfo.setLastName(userExtensionDTO.getLastName());
+		if(userExtensionDTO.getGender() != null)
+			patientInfo.setGender(userExtensionDTO.getGender());
+		if(userExtensionDTO.getDob() != null)
+			patientInfo.setDob(userExtensionDTO.getDob());
+		if(userExtensionDTO.getLangKey() != null)
+			patientInfo.setLangKey(userExtensionDTO.getLangKey());
+		if(userExtensionDTO.getEmail() != null)
+			patientInfo.setEmail(userExtensionDTO.getEmail());
+		if(userExtensionDTO.getAddress() != null)
+			patientInfo.setAddress(userExtensionDTO.getAddress());
+		if(userExtensionDTO.getZipcode() != null)
+			patientInfo.setZipcode(userExtensionDTO.getZipcode());
+		if(userExtensionDTO.getCity() != null)
+			patientInfo.setCity(userExtensionDTO.getCity());
+		if(userExtensionDTO.getState() != null)
+			patientInfo.setState(userExtensionDTO.getState());
+		patientInfo.setWebLoginCreated(true);
+	}
+    
     public UserExtension createDoctor(UserExtensionDTO userExtensionDTO) {
-		UserExtension newUser = new UserExtension();
-		newUser.setTitle(userExtensionDTO.getTitle());
-		newUser.setFirstName(userExtensionDTO.getFirstName());
-		newUser.setMiddleName(userExtensionDTO.getMiddleName());
-		newUser.setLastName(userExtensionDTO.getLastName());
-		newUser.setEmail(userExtensionDTO.getEmail());
-		newUser.setSpeciality(userExtensionDTO.getSpeciality());
-		newUser.setCredentials(userExtensionDTO.getCredentials());
-		newUser.setAddress(userExtensionDTO.getAddress());
-		newUser.setZipcode(userExtensionDTO.getZipcode());
-		newUser.setCity(userExtensionDTO.getCity());
-		newUser.setState(userExtensionDTO.getState());
-		newUser.setPrimaryPhone(userExtensionDTO.getPrimaryPhone());
-		newUser.setMobilePhone(userExtensionDTO.getMobilePhone());
-		newUser.setFaxNumber(userExtensionDTO.getFaxNumber());
-		newUser.setLangKey(null);
+    	UserExtension newUser = new UserExtension();
+    	userRepository.findOneByEmail(userExtensionDTO.getEmail())
+    	.map(user -> {
+    		return newUser;
+    	})
+    	.orElseGet(() -> {
+    		assignValuesToUserObj(userExtensionDTO, newUser);
+			userExtensionRepository.save(newUser);
+			log.debug("Created Information for User: {}", newUser);
+			return newUser;
+    	});
+		return newUser;
+	}
+
+	private void assignValuesToUserObj(UserExtensionDTO userExtensionDTO, UserExtension newUser) {
+		if(userExtensionDTO.getTitle() != null)
+			newUser.setTitle(userExtensionDTO.getTitle());
+		if(userExtensionDTO.getFirstName() != null)
+			newUser.setFirstName(userExtensionDTO.getFirstName());
+		if(userExtensionDTO.getMiddleName() != null)
+			newUser.setMiddleName(userExtensionDTO.getMiddleName());
+		if(userExtensionDTO.getLastName() != null)
+			newUser.setLastName(userExtensionDTO.getLastName());
+		if(userExtensionDTO.getEmail() != null)
+			newUser.setEmail(userExtensionDTO.getEmail());
+		if(userExtensionDTO.getSpeciality() != null)
+			newUser.setSpeciality(userExtensionDTO.getSpeciality());
+		if(userExtensionDTO.getCredentials() != null)
+			newUser.setCredentials(userExtensionDTO.getCredentials());
+		if(userExtensionDTO.getAddress() != null)
+			newUser.setAddress(userExtensionDTO.getAddress());
+		if(userExtensionDTO.getZipcode() != null)
+			newUser.setZipcode(userExtensionDTO.getZipcode());
+		if(userExtensionDTO.getCity() != null)
+			newUser.setCity(userExtensionDTO.getCity());
+		if(userExtensionDTO.getState() != null)
+			newUser.setState(userExtensionDTO.getState());
+		if(userExtensionDTO.getPrimaryPhone() != null)
+			newUser.setPrimaryPhone(userExtensionDTO.getPrimaryPhone());
+		if(userExtensionDTO.getMobilePhone() != null)
+			newUser.setMobilePhone(userExtensionDTO.getMobilePhone());
+		if(userExtensionDTO.getFaxNumber() != null)
+			newUser.setFaxNumber(userExtensionDTO.getFaxNumber());
+		if(userExtensionDTO.getNpiNumber() != null)
+			newUser.setNpiNumber(userExtensionDTO.getNpiNumber());
+		newUser.setLangKey(userExtensionDTO.getLangKey());
 		// new user is not active
 		newUser.setActivated(false);
 		newUser.setDeleted(false);
 		// new user gets registration key
 		newUser.setActivationKey(RandomUtil.generateActivationKey());
-		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
-		userExtensionRepository.save(newUser);
-		log.debug("Created Information for User: {}", newUser);
-		return newUser;
+		if(userExtensionDTO.getRole() != null)
+			newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
 	}
 
     public Optional<User> findOneByEmail(String email) {
@@ -285,24 +492,119 @@ public class UserService {
 		});
 	}
 	
-	public void updateEmailOrPassword(Map<String,String> params){
+	public JSONObject updateEmailOrPassword(Map<String,String> params){
+		
 		String email = params.get("email");
-		userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).ifPresent(u-> {
-			if(null != email)
-				u.setEmail(email);
-			String password = params.get("password");
-            String encryptedPassword = passwordEncoder.encode(password);
-            u.setPassword(encryptedPassword);
-            u.setLastLoggedInAt(DateTime.now());
-            userRepository.save(u);
-            // update email in patientInfo
-            if(null != email){
-            	PatientInfo patientInfo = patientInfoService.findOneByHillromId(SecurityUtils.getCurrentLogin()).get();
-            	patientInfo.setEmail(email);
-            	patientInfoService.update(patientInfo);
-            }
-            log.debug("updateEmailOrPassword for User: {}", u);
-        });
+    	String password = params.get("password");
+    	String questionId = params.get("questionId");
+    	String answer = params.get("answer");
+    	String authToken = params.get("x-auth-token");
+    	String termsAndConditionsAccepted = params.get("termsAndConditionsAccepted");
+    	
+    	JSONObject errorsJsonObject = validateRequest(password, questionId,
+				answer,termsAndConditionsAccepted);
+        
+        if( null != errorsJsonObject.get("ERROR"))
+        	return errorsJsonObject;
+        
+        User currentUser = findOneByEmail(SecurityUtils.getCurrentLogin()).get();
+
+        errorsJsonObject = isUserExistsWithEmail(email, currentUser);
+        
+        if(null != errorsJsonObject.get("ERROR")){
+        	return errorsJsonObject;
+        }
+        
+        if(null!= email)
+        	currentUser.setEmail(email);
+        
+        Long qid = Long.parseLong(questionId);
+        Optional<UserSecurityQuestion> opUserSecQ = userSecurityQuestionService.saveOrUpdate(currentUser.getId(), qid, answer);
+        
+        if(opUserSecQ.isPresent()){
+        	
+        	currentUser.setPassword(passwordEncoder.encode(password));
+        	currentUser.setLastLoggedInAt(DateTime.now());
+        	currentUser.setTermsConditionAccepted(true);
+        	currentUser.setTermsConditionAcceptedDate(DateTime.now());
+        	userRepository.save(currentUser);
+        	
+        	// update email in patientInfo, if the User is Patient
+        	updatePatientEmailIfNotPresent(email);
+        	
+        	log.debug("updateEmailOrPassword for User: {}", currentUser);
+        	
+        	authTokenService.deleteToken(authToken); // Token must be deleted to avoid subsequent request
+        }else{
+        	errorsJsonObject.put("ERROR", "Invalid Security Question or Answer");
+        	return errorsJsonObject;
+        }
+		return new JSONObject();
 	}
+
+	/**
+	 * Checks whether User Exists with provided Email or Whether Email is left blank
+	 * @param email
+	 * @param currentUser
+	 * @return
+	 */
+	private JSONObject isUserExistsWithEmail(String email, User currentUser) {
+		JSONObject jsonObject = new JSONObject();
+		if(!RandomUtil.isValidEmail(currentUser.getEmail()) && StringUtils.isBlank(email)){
+        	jsonObject.put("ERROR", "Required field Email is missing");
+        }
+        
+        // Update Email for the firstTime Login , if not present
+        if(StringUtils.isNotBlank(email)){
+        	Optional<User> existingUser = findOneByEmail(email);
+        	if(existingUser.isPresent()){
+            	jsonObject.put("ERROR", "Email Already registered, please choose another email");
+        	}
+        }
+        return jsonObject;
+	}
+
+	/**
+	 * This updates Email in PatientInfo, if the loggedIn User is Patient
+	 * @param email
+	 */
+	private void updatePatientEmailIfNotPresent(String email) {
+		if(null != email){
+        	patientInfoService.findOneByHillromId(SecurityUtils.getCurrentLogin()).ifPresent(patient -> {
+        		patient.setEmail(email);        		
+        		patientInfoService.update(patient);
+        	});
+        }
+	}
+
+	/**
+	 * Validate whether all required fields present in the request
+	 * @param password
+	 * @param questionId
+	 * @param answer
+	 * @return
+	 */
+	private JSONObject validateRequest(String password,
+			String questionId, String answer,String termsAndConditionsAccepted) {
+		JSONObject jsonObject = new JSONObject();
+    	if(!StringUtils.isNotBlank(termsAndConditionsAccepted) || "false".equalsIgnoreCase(termsAndConditionsAccepted)){
+    		jsonObject.put("ERROR", "Please accept terms and conditions");
+    		return jsonObject;
+    	}
+    	if(StringUtils.isBlank(answer)){
+    		jsonObject.put("ERROR", "Required field Answer is missing");
+    		return jsonObject;
+    	}
+    	if(StringUtils.isBlank(questionId) || !StringUtils.isNumeric(questionId)){
+    		jsonObject.put("ERROR", "Required field SecurityQuestion is missing");
+    		return jsonObject;
+    	}
+        if (!checkPasswordLength(password)) {
+        	jsonObject.put("ERROR", "Incorrect password");
+            return jsonObject;
+        }
+		return jsonObject;
+	}
+	
 }
 

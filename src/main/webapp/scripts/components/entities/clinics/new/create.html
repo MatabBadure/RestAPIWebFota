@@ -8,15 +8,15 @@
     <label><input type="radio" ng-model="clinic.type" value="parent">Parent Clinic</label>
     <label><input type="radio" ng-model="clinic.type" value="child">Child Clinic</label>
   </div>
-  <div class="col-md-16 indent-form-top" ng-show="clinic.type === 'child' || clinic.parent">
+  <div class="col-md-16 indent-form-top" ng-show="clinic.type === 'child' ">
     <div class="col-md-6">
       <label for="exampleInputEmail1">Select Parent Clinic *</label>
     </div>
     <div class="col-md-10">
-      <input type="text" id={{$index}} class="form-control" name="satellite_{{$index}}" ng-model="clinic.parent" minlength=0 ng-maxlength=50 ng-keyup="getParentClinic()">
+      <input type="text" id={{$index}} class="form-control" name="satellite_{{$index}}" ng-model="clinic.parent.name" minlength=0 ng-maxlength=50 ng-keyup="getParentClinic()">
       <span ng-show="!clinicStatus.isCreate" ng-click="removeParent()">Remove</span>
       <div class="dashboard-page__user-list__detailed__list">
-        <div ng-repeat="clinic in clinics | filter:clinic.parent">
+        <div ng-repeat="clinic in clinics | filter:clinic.parent.name">
           <div ng-click="selectClinic(clinic)" class="dashboard-page__user-list__detailed__list--details" >
             <span class="user-detail">
               {{clinic.name}}

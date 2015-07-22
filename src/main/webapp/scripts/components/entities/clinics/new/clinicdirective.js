@@ -31,14 +31,21 @@ angular.module('hillromvestApp')
             return false;
           }
           if ($scope.clinicStatus.isCreate) {
-            $scope.clinic.hillromId = null;
-            var data = $scope.clinic;
 
-            console.info(data);
+            if($scope.clinic.type === 'parent' && $scope.clinic.parent) {
+              delete $scope.clinic.parent;
+            }else {
+              for(var i = 0; i < clinicsList.length; i++) {
+                if ($scope.clinic.parent && clinicsList[i].name === $scope.clinic.parent.name) {
+                  $scope.clinic.parent.id = clinicsList[i].id;
+                }
+              }
+            }
+            var data = $scope.clinic;
 
             ClinicService.createClinic(data).then(function (data) {
               $scope.clinicStatus.isMessage = true;
-              $scope.clinicStatus.message = "Clinic created successfully" + " with ID " + data.data.ParentClinic.id;
+              $scope.clinicStatus.message = "Clinic created successfully" + " with ID " + data.data.Clinic.id;
               $scope.init();
               $scope.form.$setPristine();
             }).catch(function (response) {
@@ -54,7 +61,7 @@ angular.module('hillromvestApp')
             var data = $scope.clinic;
             ClinicService.updateClinic(data).then(function (data) {
               $scope.clinicStatus.isMessage = true;
-              $scope.clinicStatus.message = "Clinic updated successfully" + " with ID " + data.data.ParentClinic.id;
+              $scope.clinicStatus.message = "Clinic updated successfully" + " with ID " + data.data.Clinic.id;
               $scope.init();
               $scope.form.$setPristine();
             }).catch(function (response) {
@@ -84,59 +91,11 @@ angular.module('hillromvestApp')
         };
 
         $scope.getParentClinic = function () {
-          $scope.clinics = [{
-            "id": 64,
-            "name": "Hill Rom",
-            "address": "Neev",
-            "zipcode": 560042,
-            "city": "Bangalore",
-            "state": "Karnataka",
-            "phoneNumber": 9740353872,
-            "faxNumber": 9942354883,
-            "hillromId": null,
-            "parentClinic": null,
-            "npiNumber": null,
-            "users": [],
-            "patients": [],
-            "deleted": false,
-            "childClinics": [{
-              "id": 65,
-              "name": "abc"
-            }, {
-              "id": 66,
-              "name": "xyz"
-            }, {
-              "id": 67,
-              "name": "pqrs"
-            }, {
-              "id": 68,
-              "name": "qwerty"
-            }]
-          }, {
-            "id": 69,
-            "name": "Neevtech",
-            "parent": "Razorfish",
-            "address": "RazorFish",
-            "zipcode": 560048,
-            "city": "bangalore",
-            "state": "karnataka",
-            "phoneNumber": 9740932492,
-            "faxNumber": null,
-            "hillromId": null,
-            "parentClinic": null,
-            "npiNumber": null,
-            "users": [],
-            "patients": [],
-            "deleted": false,
-            "childClinics": [{
-              "id": 70,
-              "name": "12345678"
-            }]
-          }];
+          $scope.clinics = clinicsList;
         };
 
         $scope.selectClinic = function (clinic) {
-          $scope.clinic.parent = clinic.name;
+          $scope.clinic.parent.name = clinic.name;
           $scope.clinics = [];
         };
 

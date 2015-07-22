@@ -123,15 +123,14 @@ public class UserExtensionResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> delete(@PathVariable Long id) {
         log.debug("REST request to delete UserExtension : {}", id);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("message", "No such user exists.");
-        return Optional.ofNullable(userExtensionRepository.findOne(id))
-                .map(user -> {
-                	userExtensionRepository.delete(user);
-                    jsonObject.put("message", "User deleted successfully.");
-                    return ResponseEntity.ok().body(jsonObject);
-                }).orElse(new ResponseEntity<JSONObject>(jsonObject, HttpStatus.NOT_FOUND));
+        JSONObject jsonObject = userService.deleteUser(id);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
     }
 }

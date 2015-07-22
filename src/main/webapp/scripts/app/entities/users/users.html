@@ -1,18 +1,148 @@
-<div class="col-md-16 dashboard-page">
-	<div class="col-md-4 dashboard-page__admin-nav">
-		<nav-bar></nav-bar>
+<div class="navbar dashboard">
+	<div class="container">
+		<div class="dashbord-nav__primary secondary-fix-navbar pull-left">
+			<span class="dashbord-nav__primary--title" translate="user.home.createLabel">Create Hill-Rom User</span>
+		</div>
+		<div class="dashbord-nav__secondary navbar-right">
+			<span class="dashbord-nav__secondary--create-new" translate=""></span>
+		</div>
 	</div>
+	<div class="container dashboard__form">
+		<!-- <div class="row margin-top-xl">
+			<div class="col-md-16">
+				<span class="dashboard__form--type" translate="user.general-details"></span>
+			</div>
 
-	<div class="col-md-6 dashboard-page__form margin-top-15">
-		<user user-data="user" user-status="userStatus" is-create="isCreate" is-message="isMessage"></user>
+			<div class="col-md-16 row margin-top">
+				<div class="col-md-7 row">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="user.hill-rom-id"></span>
+						<span class="">*</span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+						<div class="">
+		          <span class="has-error">
+		           *User Name is required.
+		          </span>
+		        </div>
+					</div>
+				</div>
+				<div class="col-md-7 col-md-offset-2">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="user.mrn-id"></span>
+						<span class="">*</span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div>
+			</div>
+		</div> -->
+
+		<div class="row margin-top-xl">
+			<div class="col-md-16">
+				<span class="dashboard__form--type" translate="user.personal-details"></span>
+			</div>
+
+			<div class="col-md-16 row margin-top">
+				<div class="col-md-7 row">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="user.title.name"></span>
+					</div>
+					<div class="col-md-10 dashboard__form__input">
+						<div class="custom-dropdown">
+							<select>
+				        <option selected translate="user.title.mr"></option>
+				        <option translate="user.title.mrs"></option>
+				        <option translate="user.title.miss"></option>
+					    </select>
+						</div>
+					</div>
+				</div>
+
+				<!-- <div class="col-md-7 col-md-offset-2">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="user.primary-language"></span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div> -->
+			</div>
+
+			<div class="col-md-16 row margin-top">
+				<div class="col-md-7 row">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="user.first-name"></span>
+						<span class="">*</span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div>
+				<div class="col-md-7 col-md-offset-2">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="user.middle-name"></span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-16 row margin-top">
+				<div class="col-md-7 row">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="user.last-name"></span>
+						<span class="">*</span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div>
+				<div class="col-md-7 col-md-offset-2">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="user.employee-id"></span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-16 row margin-top">
+				<div class="col-md-7 row">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="user.email"></span>
+						<span class="">*</span>
+					</div>
+					<div class="col-md-10 dashboard__form--input">
+						<input class="" type="text" >
+					</div>
+				</div>
+				<div class="col-md-7 col-md-offset-2">
+					<div class="col-md-6 dashboard__form--label">
+						<span class="" translate="user.role-text"></span>
+					</div>
+					<div class="col-md-10 dashboard__form__input--role">
+						<div class="custom-dropdown">
+							<select>
+				        <option selected translate="user.role.super-admin"></option>
+				        <option translate="user.role.account-services"></option>
+				        <option translate="user.role.associates"></option>
+					    </select>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-16 row margin-top margin-bottom-extreem">
+				<div class="col-md-4 col-md-offset-12">
+					<span class="hillrom-btn btn-submit" translate="user.submit-button-text"></span>
+				</div>		
+			</div>
+		</div>
 	</div>
-
-
-	<div class="col-md-6 dashboard-page__user-list">
-    <user-list on-select="selectedUser(user)"><user-list>
-  </div>
 </div>
-
-
-
 

@@ -112,3 +112,12 @@ var usersList = [
     'email' : 'email',
     'role' : {'key' : 'SUPER_ADMIN', 'value' : 'Super Admin'}
   }];
+
+var doctorsList = [
+  { 'firstName' : 'Johny', 'lastName' : 'Dep', 'name' : 'Johny Dep', 'email' : 'JohnyDep@gmail.com', 'hospital' : 'Appolo hospital'},
+  { 'name' : 'James williams', 'email' : 'JamesWilliams@gmail.com', 'hospital' : 'Manipal hospital'},
+  { 'name' : 'David Jones', 'email' : 'davijones@gmail.com', 'hospital' : 'abc hospital'},
+  { 'name' : 'William Davis', 'email' : 'williamdavis@gmail.com', 'hospital' : 'mno hospital'},
+  { 'name' : 'Joseph taylor', 'email' : 'josephtaylor@gmail.com', 'hospital' : 'xyz hospital'},
+  { 'name' : 'David Jones', 'email' : 'davijones@gmail.com', 'hospital' : 'abc hospital'}
+];

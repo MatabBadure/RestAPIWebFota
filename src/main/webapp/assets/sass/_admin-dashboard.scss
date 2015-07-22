@@ -63,7 +63,11 @@
   text-overflow: '';
 }
 
+<<<<<<< HEAD
 .dashboard__form__input--role select {
+=======
+.dashboard__form__input--option select{
+>>>>>>> 67f306c40f91e8ded6b07ddf3cdbc979e7e1078d
 	height: 30px;
 	width: 150px;
 	font-weight: normal;
@@ -77,7 +81,11 @@
   text-overflow: '';
 }
 
+<<<<<<< HEAD
 .label-next input{
+=======
+.label-next input {
+>>>>>>> 67f306c40f91e8ded6b07ddf3cdbc979e7e1078d
 	width: 100%;
 	color: $pickled-bluewood;
 	border: 1px solid $bombay;
@@ -112,6 +120,10 @@
 	font-size: $font-size-small;
 	font-weight: normal;
 	padding: 5px 0;
+}
+
+.font-add-text {
+	font-weight: bold;
 }
 
 .margin-bottom-extream {

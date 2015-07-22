@@ -26,11 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.UserExtension;
-import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
-import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
-import com.hillrom.vest.service.MailService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
@@ -48,15 +45,6 @@ public class UserExtensionResource {
     private UserExtensionRepository userExtensionRepository;
     
     @Inject
-    private UserRepository userRepository;
-    
-    @Inject
-    private PatientInfoRepository patientInfoRepository;
-    
-    @Inject
-    private MailService mailService;
-    
-    @Inject
     private UserService userService;
 
     /**
@@ -69,62 +57,17 @@ public class UserExtensionResource {
     @RolesAllowed(AuthoritiesConstants.ACCT_SERVICES)
     public ResponseEntity<JSONObject> create(@RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
         log.debug("REST request to save User : {}", userExtensionDTO);
-        JSONObject jsonObject = new JSONObject();
-        if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
-        	return patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId())
-        			.map(user -> {
-        				jsonObject.put("message", "HR Id already in use.");
-            			return ResponseEntity.badRequest().body(jsonObject);
-            		})
-                    .orElseGet(() -> {
-                    	if(userExtensionDTO.getEmail() != null) {
-	                    	userRepository.findOneByEmail(userExtensionDTO.getEmail())
-	            			.map(user -> {
-	            				jsonObject.put("message", "e-mail address already in use");
-	                			return ResponseEntity.badRequest().body(jsonObject);
-	                		});
-                    	}
-                    	UserExtension user = userService.createPatientUser(userExtensionDTO);
-                		if(user.getId() != null) {
-                			if(userExtensionDTO.getEmail() != null) {
-                				String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-                				mailService.sendActivationEmail(user, baseUrl);
-                			}
-	                        jsonObject.put("message", "Patient User created successfully.");
-	                        jsonObject.put("user", user);
-	                        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
-                		} else {
-                			jsonObject.put("message", "Unable to create Patient.");
-	                        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-                		}
-                    });
-        } else if (AuthoritiesConstants.HCP.equals(userExtensionDTO.getRole())) {
-        	jsonObject.put("message", "e-mail address already in use");
-        	return userRepository.findOneByEmail(userExtensionDTO.getEmail())
-            		.map(user -> {
-            			return ResponseEntity.badRequest().body(jsonObject);
-            		})
-                    .orElseGet(() -> {
-                    	UserExtension user = userService.createDoctor(userExtensionDTO);
-                    	if(user.getId() != null) {
-		                    String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-		                    mailService.sendActivationEmail(user, baseUrl);
-		                    jsonObject.put("message", "Doctor created successfully.");
-		                    jsonObject.put("user", user);
-		                    return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
-                    	} else {
-                			jsonObject.put("message", "Unable to create Doctor.");
-	                        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-                		}
-                    });
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        JSONObject jsonObject = userService.createUser(userExtensionDTO, baseUrl);
+        if (jsonObject.containsKey("error")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {
-    		jsonObject.put("message", "Incorrect data.");
-    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.PARTIAL_CONTENT);
-    	}
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+        }
     }
 
     /**
-     * PUT  /user/{id} -> Updates an existing user (patient).
+     * PUT  /user/:id -> Updates an existing user (patient).
      */
     @RequestMapping(value = "/user/{id}",
         method = RequestMethod.PUT,
@@ -180,15 +123,14 @@ public class UserExtensionResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> delete(@PathVariable Long id) {
         log.debug("REST request to delete UserExtension : {}", id);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("message", "No such user exists.");
-        return Optional.ofNullable(userExtensionRepository.findOne(id))
-                .map(user -> {
-                	userExtensionRepository.delete(user);
-                    jsonObject.put("message", "User deleted successfully.");
-                    return ResponseEntity.ok().body(jsonObject);
-                }).orElse(new ResponseEntity<JSONObject>(jsonObject, HttpStatus.NOT_FOUND));
+        JSONObject jsonObject = userService.deleteUser(id);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
     }
 }

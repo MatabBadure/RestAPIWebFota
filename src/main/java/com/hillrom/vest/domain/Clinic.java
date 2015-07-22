@@ -15,6 +15,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -76,6 +77,10 @@ public class Clinic implements Serializable {
     @OneToMany(mappedBy = "clinic",fetch=FetchType.LAZY)
     @JsonIgnore
     private Set<ClinicPatientAssoc> clinicPatientAssoc = new HashSet<>();
+    
+    @ManyToMany(mappedBy="clinics")
+    @JsonBackReference
+    private Set<UserExtension> users = new HashSet<>();
     
     @Column(name="is_deleted", nullable = false)
     private boolean deleted = false;
@@ -171,7 +176,15 @@ public class Clinic implements Serializable {
 		this.childClinics = childClinics;
 	}
 
-    public boolean isDeleted() {
+    public Set<UserExtension> getUsers() {
+		return users;
+	}
+
+	public void setUsers(Set<UserExtension> users) {
+		this.users = users;
+	}
+
+	public boolean isDeleted() {
 		return deleted;
 	}
 

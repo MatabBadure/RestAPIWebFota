@@ -1,6 +1,6 @@
 package com.hillrom.vest.web.rest.dto;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.validation.constraints.Size;
@@ -32,7 +32,7 @@ public class ClinicDTO {
     private String hillromId;
 
 	@Size(max = 50)
-    private Map<String, Long> parentClinic;
+    private Map<String, Long> parentClinic = new HashMap<>();
 
 	public ClinicDTO() {
 		super();

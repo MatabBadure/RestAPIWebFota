@@ -15,19 +15,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.Authority;
+import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.domain.UserSecurityQuestion;
 import com.hillrom.vest.repository.AuthorityRepository;
+import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
@@ -78,6 +79,9 @@ public class UserService {
     
     @Inject
     private UserSecurityQuestionService userSecurityQuestionService;
+    
+    @Inject
+    private ClinicRepository clinicRepository;
 
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
@@ -270,6 +274,53 @@ public class UserService {
 		return newUser;
 	}
     
+    public JSONObject createUser(UserExtensionDTO userExtensionDTO, String baseUrl){
+    	JSONObject jsonObject = new JSONObject();
+    	if(userExtensionDTO.getEmail() != null) {
+        	userRepository.findOneByEmail(userExtensionDTO.getEmail())
+			.map(user -> {
+				jsonObject.put("error", "e-mail address already in use");
+    			return jsonObject;
+    		});
+    	}
+    	if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
+        	return patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId())
+        			.map(user -> {
+        				jsonObject.put("error", "HR Id already in use.");
+            			return jsonObject;
+            		})
+                    .orElseGet(() -> {
+                    	UserExtension user = createPatientUser(userExtensionDTO);
+                		if(user.getId() != null) {
+                			if(userExtensionDTO.getEmail() != null) {
+                				mailService.sendActivationEmail(user, baseUrl);
+                			}
+	                        jsonObject.put("message", "Patient User created successfully.");
+	                        jsonObject.put("user", user);
+	                        return jsonObject;
+                		} else {
+                			jsonObject.put("error", "Unable to create Patient.");
+	                        return jsonObject;
+                		}
+                    });
+        } else if (AuthoritiesConstants.HCP.equals(userExtensionDTO.getRole())) {
+        	UserExtension user = createHCPUser(userExtensionDTO);
+        	if(user.getId() != null) {
+                mailService.sendActivationEmail(user, baseUrl);
+                jsonObject.put("message", "HealthCare Professional created successfully.");
+                jsonObject.put("user", user);
+                jsonObject.put("clinics", user.getClinics());
+                return jsonObject;
+        	} else {
+    			jsonObject.put("error", "Unable to create HealthCare Professional.");
+                return jsonObject;
+    		}
+        } else {
+    		jsonObject.put("error", "Incorrect data.");
+    		return jsonObject;
+    	}
+    }
+    
     public UserExtension createPatientUser(UserExtensionDTO userExtensionDTO) {
     	UserExtension newUser = new UserExtension();
     	PatientInfo patientInfo = new PatientInfo();
@@ -284,6 +335,7 @@ public class UserService {
     		if(AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
     			newUser.setEmail(userExtensionDTO.getHillromId());
     		}
+    		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
 			userExtensionRepository.save(newUser);
 			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.PATIENT, "SELF");
 			userPatientRepository.save(userPatientAssoc);
@@ -295,16 +347,36 @@ public class UserService {
 		return newUser;
 	}
     
+    public UserExtension createHCPUser(UserExtensionDTO userExtensionDTO) {
+    	UserExtension newUser = new UserExtension();
+    	userRepository.findOneByEmail(userExtensionDTO.getEmail())
+    	.map(user -> {
+    		return newUser;
+    	})
+    	.orElseGet(() -> {
+    		assignValuesToUserObj(userExtensionDTO, newUser);
+			for(Map<String, String> clinicObj : userExtensionDTO.getClinicList()){
+				Clinic clinic = clinicRepository.getOne(Long.parseLong(clinicObj.get("id")));
+				newUser.getClinics().add(clinic);
+			}
+			newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
+			userExtensionRepository.save(newUser);
+			log.debug("Created Information for User: {}", newUser);
+			return newUser;
+    	});
+		return newUser;
+	}
+    
     public JSONObject updateUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl){
     	JSONObject jsonObject = new JSONObject();
-        if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
-        	if(userExtensionDTO.getEmail() != null) {
-            	userRepository.findOneByEmail(userExtensionDTO.getEmail())
-    			.map(user -> {
-    				jsonObject.put("error", "e-mail address already in use");
-        			return ResponseEntity.badRequest().body(jsonObject);
-        		});
-        	}
+        if(userExtensionDTO.getEmail() != null) {
+    		Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
+			if(existingUser.isPresent() && existingUser.get().getId() != id) {
+				jsonObject.put("error", "e-mail address already in use");
+				return jsonObject;
+			}
+    	}
+		if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updatePatientUser(id, userExtensionDTO);
     		if(user.getId() != null) {
     			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
@@ -315,6 +387,19 @@ public class UserService {
                 return jsonObject;
     		} else {
     			jsonObject.put("error", "Unable to update Patient.");
+                return jsonObject;
+    		}
+        } else if (AuthoritiesConstants.HCP.equals(userExtensionDTO.getRole())) {
+           	UserExtension user = updateHCPUser(id, userExtensionDTO);
+    		if(user.getId() != null) {
+    			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
+    				mailService.sendActivationEmail(user, baseUrl);
+    			}
+                jsonObject.put("message", "HealthCare Professional updated successfully.");
+                jsonObject.put("user", user);
+                return jsonObject;
+    		} else {
+    			jsonObject.put("error", "Unable to update HealthCare Professional.");
                 return jsonObject;
     		}
         } else {
@@ -335,6 +420,14 @@ public class UserService {
     		return user;
     	});
 		return user;
+	}
+    
+    public UserExtension updateHCPUser(Long id, UserExtensionDTO userExtensionDTO) {
+    	UserExtension hcpUser = userExtensionRepository.findOne(id);
+		assignValuesToUserObj(userExtensionDTO, hcpUser);
+		userExtensionRepository.save(hcpUser);
+		log.debug("Updated Information for HealthCare Proffessional: {}", hcpUser);
+		return hcpUser;
 	}
 
 	private void assignValuesToPatientInfoObj(UserExtensionDTO userExtensionDTO, PatientInfo patientInfo) {
@@ -366,21 +459,6 @@ public class UserService {
 		patientInfo.setWebLoginCreated(true);
 	}
     
-    public UserExtension createDoctor(UserExtensionDTO userExtensionDTO) {
-    	UserExtension newUser = new UserExtension();
-    	userRepository.findOneByEmail(userExtensionDTO.getEmail())
-    	.map(user -> {
-    		return newUser;
-    	})
-    	.orElseGet(() -> {
-    		assignValuesToUserObj(userExtensionDTO, newUser);
-			userExtensionRepository.save(newUser);
-			log.debug("Created Information for User: {}", newUser);
-			return newUser;
-    	});
-		return newUser;
-	}
-
 	private void assignValuesToUserObj(UserExtensionDTO userExtensionDTO, UserExtension newUser) {
 		if(userExtensionDTO.getTitle() != null)
 			newUser.setTitle(userExtensionDTO.getTitle());

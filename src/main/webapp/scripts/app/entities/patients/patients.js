@@ -18,7 +18,7 @@ angular.module('hillromvestApp')
                 },
                 resolve: {
                     translatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate, $translatePartialLoader) {
-                        // $translatePartialLoader.addPart('dashboard');
+                        $translatePartialLoader.addPart('patient');
                         return $translate.refresh();
                     }]
                 }

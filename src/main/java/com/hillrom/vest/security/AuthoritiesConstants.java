@@ -16,6 +16,10 @@ public final class AuthoritiesConstants {
     
     public static final String ACCT_SERVICES = "ACCT_SERVICES";
     
+    public static final String ASSOCIATES = "ASSOCIATES";
+    
+    public static final String HILLROM_ADMIN = "HILLROM_ADMIN";
+    
     public static final String CLINIC_ADMIN = "CLINIC_ADMIN";
 
     public static final String ANONYMOUS = "ANONYMOUS";

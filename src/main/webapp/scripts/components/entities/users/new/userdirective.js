@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .directive('user', function (User) {
+  .directive('user', function (UserService) {
     return {
       templateUrl: 'scripts/components/entities/users/new/create.html',
       restrict: 'E',
@@ -24,11 +24,11 @@ angular.module('hillromvestApp')
             'role': $scope.user.role,
             'email': $scope.user.email
           };
-          User.createUser(data).then(function (response) {
-            $scope.isMessage = true;  
+          UserService.createUser(data).then(function (response) {
+            $scope.isMessage = true;
             $scope.message = "User created successfully"+" with ID "+response.data.user.id;
           }).catch(function (response) {
-            $scope.isMessage = true;  
+            $scope.isMessage = true;
             if(response.data.message != undefined){
               $scope.message = response.data.message;
             }else{
@@ -38,11 +38,11 @@ angular.module('hillromvestApp')
         };
 
         $scope.deleteUser = function(){
-          User.deleteUser($scope.user.id).then(function (response) {
-            $scope.isMessage = true;  
+          UserService.deleteUser($scope.user.id).then(function (response) {
+            $scope.isMessage = true;
             $scope.message = response.data.message;
           }).catch(function (response) {
-            $scope.isMessage = true;  
+            $scope.isMessage = true;
             if(response.data.message != undefined){
               $scope.message = response.data.message;
             }else{

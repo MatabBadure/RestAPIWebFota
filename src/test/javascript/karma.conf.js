@@ -29,7 +29,6 @@ module.exports = function (config) {
             'main/webapp/bower_components/angular-cache-buster/angular-cache-buster.js',
             'main/webapp/bower_components/ngInfiniteScroll/build/ng-infinite-scroll.js',
             'main/webapp/bower_components/angular-mocks/angular-mocks.js',
-            // endbower
             'main/webapp/bower_components/angular-recaptcha/release/angular-recaptcha.js',
             'main/webapp/scripts/app/app.js',
             'main/webapp/scripts/app/**/*.js',

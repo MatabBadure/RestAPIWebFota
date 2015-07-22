@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import net.minidev.json.JSONObject;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,17 +29,19 @@ import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 @WebAppConfiguration
 @IntegrationTest
 @Transactional
-public class PatientUserServiceTest {
+public class HealthCareProfessionalUserServiceTest {
 	
 	private static final String HILLROM_ID = "HR000026";
 	private static final String TITLE = "Mr";
 	private static final String FIRST_NAME = "Peter";
 	private static final String MIDDLE_NAME = "John";
 	private static final String LAST_NAME = "Parker";
-	private static final String GENDER = "male";
-	private static final String LANG_KEY = "en";
+	private static final String EMAIL = "rishabhjain+"+Math.random()*100+"@neevtech.com";
+	private static final String SPECIALITY = "Orthpedician";
+	private static final String CREDENTIALS = "MD,MBBS";
 	private static final String ZIPCODE = "560009";
-	private static final String ROLE = AuthoritiesConstants.PATIENT;
+	private static final String ROLE = AuthoritiesConstants.HCP;
+	private static final String BASE_URL = "http://localhost:8080";
 	
 	@Inject
 	private UserService userService;
@@ -55,32 +59,35 @@ public class PatientUserServiceTest {
 		userExtensionDTO.setFirstName(FIRST_NAME);
 		userExtensionDTO.setMiddleName(MIDDLE_NAME);
 		userExtensionDTO.setLastName(LAST_NAME);
-		userExtensionDTO.setGender(GENDER);
-		userExtensionDTO.setLangKey(LANG_KEY);
+		userExtensionDTO.setEmail(EMAIL);
+		userExtensionDTO.setSpeciality(SPECIALITY);
+		userExtensionDTO.setCredentials(CREDENTIALS);;
 		userExtensionDTO.setZipcode(Integer.parseInt(ZIPCODE));
 		userExtensionDTO.setRole(ROLE);
     }
 	
 	@Test
-	public void createPatientUserSuccessfully(){
-		UserExtension newPatientUser = userService.createPatientUser(userExtensionDTO);
-		assertThat(newPatientUser.isDeleted()).isFalse();
-        assertThat(newPatientUser.getId()).isNotNull();
-        assertThat(newPatientUser.getEmail()).isNotNull();
-        userRepository.delete(newPatientUser);
+	public void createHCPUserSuccessfully(){
+		JSONObject jsonObject = userService.createUser(userExtensionDTO, BASE_URL);
+		UserExtension newHCP = (UserExtension)jsonObject.get("user");
+		assertThat(newHCP.isDeleted()).isFalse();
+        assertThat(newHCP.getId()).isNotNull();
+        assertThat(newHCP.getEmail()).isNotNull();
+        userRepository.delete(newHCP);
 	}
 	
 	@Test
-	public void updatePatientUserSuccessfully(){
+	public void updateHCPUserSuccessfully(){
 		UserExtension newPatientUser = userService.createPatientUser(userExtensionDTO);
-		userExtensionDTO.setMiddleName("Smith");
+		userExtensionDTO.setFirstName("Remus");
 		userExtensionDTO.setCity("Bangalore");
-		UserExtension updatedPatientUser = userService.updatePatientUser(newPatientUser.getId(), userExtensionDTO);
-		assertThat(updatedPatientUser.isDeleted()).isFalse();
-        assertThat(updatedPatientUser.getId()).isNotNull();
-        assertThat(updatedPatientUser.getMiddleName()).isEqualTo(userExtensionDTO.getMiddleName());
-        assertThat(updatedPatientUser.getCity()).isEqualTo(userExtensionDTO.getCity());
-        assertThat(updatedPatientUser.getEmail()).isNotNull();
-        userRepository.delete(updatedPatientUser);
+		JSONObject jsonObject = userService.updateUser(newPatientUser.getId(), userExtensionDTO, BASE_URL);
+		UserExtension updatedHCP = (UserExtension)jsonObject.get("user");
+		assertThat(updatedHCP.isDeleted()).isFalse();
+        assertThat(updatedHCP.getId()).isNotNull();
+        assertThat(updatedHCP.getFirstName()).isEqualTo(userExtensionDTO.getFirstName());
+        assertThat(updatedHCP.getCity()).isEqualTo(userExtensionDTO.getCity());
+        assertThat(updatedHCP.getEmail()).isNotNull();
+        userRepository.delete(updatedHCP);
 	}
 }

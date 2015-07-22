@@ -38,6 +38,12 @@ angular.module('hillromvestApp')
         }).success(function (response) {
           return response;
         });
+      },
+      getState : function(){
+         return $http.get('scripts/components/entities/patients/new/state.json')
+         .success(function (response) {
+          return response;
+        });
       }
     };
   });

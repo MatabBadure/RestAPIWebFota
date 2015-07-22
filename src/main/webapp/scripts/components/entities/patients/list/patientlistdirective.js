@@ -8,7 +8,8 @@ angular.module('hillromvestApp')
 	      link: function postLink(scope, element, attrs) {
 	      },
 	      scope: {
-	      onSelect: '&'
+	      onSelect: '&',
+	      onCreate: '&'
 	    },
 	    link: function(scope, element, attrs) {
 	      var patient = scope.patient;
@@ -19,6 +20,9 @@ angular.module('hillromvestApp')
 	      $scope.selectPatient = function(patient) {
 	        $scope.patient = patient;
 	        $scope.onSelect({'patient': patient});
+	      },
+	      $scope.createPatient = function(){
+	      	$scope.onCreate();
 	      },
 
 	      $scope.searchPatients = function(){

@@ -12,6 +12,20 @@ angular.module('hillromvestApp')
       patientStatus:'=patientStatus'
     },
     controller: function ($scope) {
+      $scope.submitted = false;
+      $scope.formSubmit = function(){
+        $scope.submitted = true;
+      }
+
+      $scope.states = [];
+      $scope.languages = [{"name":"English"},{"name":"French"}];
+
+       User.getState().then(function (response) {
+                $scope.states = response.data.states;
+              }).catch(function (response) {
+                console.log("getState call failed!");
+              });
+
       if($scope.patientStatus.editMode){
           var selectedDate = new Date($scope.patient.dob);
           $scope.patient.age = getAge(selectedDate);
@@ -127,8 +141,6 @@ angular.module('hillromvestApp')
                 var years = Math.floor(days/365);
                 var months = ((days % 365)/30).toFixed(1)
                 var age = 0;
-              console.log (days + " days" + years + " years" + months + " months")
-
               if(years === 0){
                 if(months > 1){
                   age = months + " months ";
@@ -159,7 +171,7 @@ angular.module('hillromvestApp')
               return age;
         }
 
-        angular.element("#dp2").datepicker();
+        angular.element("#dp2").datepicker({maxDate: new Date});
 
         angular.element('#dp2').on('changeDate', function(ev){
           var selectedDate = new Date($(this).val());
@@ -168,7 +180,7 @@ angular.module('hillromvestApp')
           angular.element('.age').val(age);
           $scope.patient.age=age;
           angular.element("#dp2").datepicker('hide');
-
+          $scope.$digest();
         });
 
 }

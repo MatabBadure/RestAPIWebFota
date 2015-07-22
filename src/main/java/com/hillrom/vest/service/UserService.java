@@ -1,23 +1,21 @@
 package com.hillrom.vest.service;
 
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
 import javax.inject.Inject;
-
 import net.minidev.json.JSONObject;
-
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -287,7 +285,8 @@ public class UserService {
     		});
     	}
     	List<String> rolesAdminCanModerate = rolesAdminCanModerate();
-    	if(rolesAdminCanModerate.contains(userExtensionDTO.getRole()) && SecurityUtils.isUserInRole(AuthoritiesConstants.ADMIN)) {
+    	if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())
+    			&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
     		UserExtension user = createHillromTeamUser(userExtensionDTO);
     		if(user.getId() != null) {
     			if(userExtensionDTO.getEmail() != null) {
@@ -396,7 +395,8 @@ public class UserService {
 			}
     	}
         List<String> rolesAdminCanModerate = rolesAdminCanModerate();
-        if(rolesAdminCanModerate.contains(userExtensionDTO.getRole()) && SecurityUtils.isUserInRole(AuthoritiesConstants.ADMIN)) {
+        if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())
+        		&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
         	UserExtension user = updateHillromTeamUser(id, userExtensionDTO);
     		if(user.getId() != null) {
     			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
@@ -730,18 +730,18 @@ public class UserService {
 	public JSONObject deleteUser(Long id) {
     	JSONObject jsonObject = new JSONObject();
     	UserExtension existingUser = userExtensionRepository.findOne(id);
-		if(existingUser != null) {
-			if(SecurityUtils.isUserInRole(AuthoritiesConstants.ACCT_SERVICES)
-					&& (existingUser.getAuthorities().contains(AuthoritiesConstants.HCP)
-							|| existingUser.getAuthorities().contains(AuthoritiesConstants.PATIENT)
-							|| existingUser.getAuthorities().contains(AuthoritiesConstants.CLINIC_ADMIN))) {
+		if(existingUser.getId() != null) {
+			if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))
+					&& (existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.HCP))
+							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.PATIENT))
+							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.CLINIC_ADMIN)))) {
 				userExtensionRepository.delete(existingUser);
 				jsonObject.put("message", "User deleted successfully.");
-			} else if(SecurityUtils.isUserInRole(AuthoritiesConstants.ADMIN)
-					&& (existingUser.getAuthorities().contains(AuthoritiesConstants.HILLROM_ADMIN)
-							|| existingUser.getAuthorities().contains(AuthoritiesConstants.ASSOCIATES)
-							|| existingUser.getAuthorities().contains(AuthoritiesConstants.ACCT_SERVICES)
-							|| existingUser.getAuthorities().contains(AuthoritiesConstants.CLINIC_ADMIN))) {
+			} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))
+					&& (existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.HILLROM_ADMIN))
+							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.ACCT_SERVICES))
+							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.ASSOCIATES))
+							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.CLINIC_ADMIN)))) {
 				userExtensionRepository.delete(existingUser);
 				jsonObject.put("message", "User deleted successfully.");
 			} else {

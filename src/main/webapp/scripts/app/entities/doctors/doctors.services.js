@@ -16,8 +16,20 @@ angular.module('hillromvestApp')
       });
     },
     deleteDoctor : function(id){
-     
+
       return $http.delete('api/doctor/'+id, {
+        headers: {
+          'Content-Type' : 'application/json',
+          'Accept' : 'application/json',
+          'x-auth-token' : token
+        }
+      }).success(function (response) {
+        return response;
+      });
+    },
+
+    editDoctor : function (data) {
+      return $http.put('/api/user/'+data.id, data, {
         headers: {
           'Content-Type' : 'application/json',
           'Accept' : 'application/json',

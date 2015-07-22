@@ -1,10 +1,10 @@
 package com.hillrom.vest.web.rest.dto;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Column;
 import javax.validation.constraints.Size;
 
 import org.joda.time.LocalDate;
@@ -48,7 +48,9 @@ public class UserExtensionDTO extends UserDTO {
     @Size(min = 2, max = 100)
     private String hillromId;
     
-    private String dob;
+    @Column(name = "dob")
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    private LocalDate dob;
 
     public UserExtensionDTO() {
     }
@@ -168,11 +170,10 @@ public class UserExtensionDTO extends UserDTO {
 	}
 
 	public LocalDate getDob() {
-		String[] date = dob.split("/");
-		return new LocalDate(Integer.parseInt(date[2]), Integer.parseInt(date[0]), Integer.parseInt(date[1]));
+		return dob;
 	}
-	
-	public void setDob(String dob) {
+
+	public void setDob(LocalDate dob) {
 		this.dob = dob;
 	}
 

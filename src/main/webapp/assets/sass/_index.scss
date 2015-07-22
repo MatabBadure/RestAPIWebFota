@@ -1,13 +1,25 @@
-.container-top-indent {
-	height: inherit;
+html {
+	min-height: 100%;
+	height: 100%;
+	margin: 0;
+}
+
+body {
+	min-height: 100%;
+	height: 100%;
+	margin: 0;
 }
 
 .content-body {
-	background-color: #EEEEEE;
-	height: -o-calc(100% - 100px); /* opera */
-	height: -webkit-calc(100% - 100px); /* google, safari */
-	height: -moz-calc(100% - 100px);
-	margin-top: 50px;
+	background-color: inherit;
+	min-height: -o-calc(100% + 150px); /* opera */
+	min-height: -webkit-calc(100% + 150px); /* google, safari */
+	min-height: -moz-calc(100% + 150px);
+
+	height: -o-calc(100% + 150px); /* opera */
+	height: -webkit-calc(100% + 150px); /* google, safari */
+	height: -moz-calc(100% + 150px);
+	margin-top: 60px;
 }
 
 .clr {
@@ -30,6 +42,14 @@
 	padding-right: 20px;
 }
 
+.margin-top-xl {
+	margin-top: 40px;
+}
+
+.margin-bottom-xl {
+	margin-bottom: 40px;
+}
+
 .no-padding {
 	padding: 0;
 }
@@ -40,4 +60,42 @@
 
 .no-padding-right {
 	padding-right: 0;
+}
+
+.margin-right {
+	padding-right: -10px !important;
+}
+
+.margin-left {
+	padding-left: -10px !important;
+}
+
+.margin-top {
+	margin-top: 20px;
+}
+
+.margin-top-xl{
+	margin-top: 40px;
+}
+
+.custom-dropdown:before {
+  content:'\e600';
+  font-family:"hill-rom";
+  color: $pickled-bluewood;
+  padding: 0;
+  font-size: 10px;
+  position: absolute;
+  top: 1px; 
+  right: 8px; 
+  z-index: -1;
+  z-index: 1 \0;
+}
+
+.custom-dropdown {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  z-index: 1;
+  display: inline;
+  line-height: 100%;
+  position: relative;
 }

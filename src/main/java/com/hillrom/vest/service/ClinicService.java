@@ -1,17 +1,13 @@
 package com.hillrom.vest.service;
 
-
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
-
 import net.minidev.json.JSONObject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.inject.Inject;
 
 /**

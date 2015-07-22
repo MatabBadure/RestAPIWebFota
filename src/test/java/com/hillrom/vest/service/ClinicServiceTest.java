@@ -6,7 +6,6 @@ import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 
 import net.minidev.json.JSONObject;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,9 +14,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-
 import javax.inject.Inject;
-
 import static org.assertj.core.api.Assertions.*;
 
 /**

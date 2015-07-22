@@ -1,0 +1,59 @@
+{
+    "user" : {
+        "home": {
+            "title": "Hill-Rom User",
+            "createLabel": "Create Hill-Rom User",
+            "createOrEditLabel": "Create or edit a user"
+        },
+        "delete": {
+            "question": "Are you sure you want to delete user {{ id }}?"
+        },
+        "detail": {
+            "title": "Hill-Rom User"
+        },
+        "general-details":  "General Details",
+        "personal-details": "Personal Details",
+        "health-details":   "Health Details",
+        "clinic": "Clinic",
+        "user": "Hill-Rom User",
+        "add-clinic": "Add Another Clinic",
+        "create-caregiver": "Yes",
+        "clinic-name":  "Clinic Name",
+        "title": {
+                    "name": "Title",
+                    "dr":   "Dr", 
+                    "mr":   "Mr.",
+                    "mrs": "Mrs.",
+                    "miss": "Miss"
+        },
+        "gender": {
+                    "name": "Gender",
+                    "male":   "M",
+                    "female": "F",
+                    "others": "O"
+        },
+        "role-text":"Select Role",
+        "role": {
+            "super-admin": "Super Admin",
+            "account-services": "Account Services",
+            "associates":"Associates"
+        },
+        "first-name": "First Name",
+        "middle-name": "Middle Name",
+        "last-name": "Last Name",
+        "employee-id": "Employee ID",
+        "address": "Address",
+        "city": "City",
+        "zipcode": "Zip",
+        "email": "Email",
+        "state": "State",
+        "primary-phone": "Primary Phone",
+        "mobile-number": "Mobile Number",
+        "fax-number": "Fax Number",
+        "hillromId": "HillromId",
+        "parentClinicId": "ParentClinicId",
+        "npiNumber": "NpiNumber",
+        "parent": "parent",
+        "submit-button-text": "submit"
+    }
+}

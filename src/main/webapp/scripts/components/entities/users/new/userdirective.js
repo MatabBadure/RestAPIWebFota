@@ -5,8 +5,6 @@ angular.module('hillromvestApp')
     return {
       templateUrl: 'scripts/components/entities/users/new/create.html',
       restrict: 'E',
-      link: function postLink(scope, element, attrs) {
-      },
       scope: {
         user:'=userData',
         isCreate:'=isCreate'

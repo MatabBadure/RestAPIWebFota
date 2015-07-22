@@ -1,5 +1,11 @@
 'use strict';
-
+/**
+ * @ngdoc directive
+ * @name user
+ *
+ * @description
+ * User Directive with create, edit and delete functions
+ */
 angular.module('hillromvestApp')
   .directive('user', function (UserService) {
     return {
@@ -8,46 +14,72 @@ angular.module('hillromvestApp')
       link: function postLink(scope, element, attrs) {
       },
       scope: {
-        user:'=userData',
-        isCreate:'=isCreate'
+        user: '=userData',
+        isCreate: '=isCreate'
       },
       controller: function ($scope) {
+
+        /**
+        * @ngdoc function
+        * @name createUser
+        * @description
+        * Function to create a user
+        */
         $scope.createUser = function () {
-          if($scope.form.$invalid){
+          if ($scope.form.$invalid) {
             return false;
           }
-          var data = {
-            'title': $scope.user.title,
-            'firstName': $scope.user.firstName,
-            'middleName': $scope.user.middleName,
-            'lastName': $scope.user.lastName,
-            'role': $scope.user.role,
-            'email': $scope.user.email
-          };
+          var data = $scope.user;
           UserService.createUser(data).then(function (response) {
             $scope.isMessage = true;
-            $scope.message = "User created successfully"+" with ID "+response.data.user.id;
+            $scope.message = 'User created successfully' + ' with ID ' + response.data.user.id;
           }).catch(function (response) {
             $scope.isMessage = true;
-            if(response.data.message != undefined){
+            if (response.data.message !== undefined) {
               $scope.message = response.data.message;
-            }else{
+            } else {
               $scope.message = 'Error occured! Please try again';
-           }
+            }
           });
         };
 
-        $scope.deleteUser = function(){
+        /**
+        * @ngdoc function
+        * @name deleteUser
+        * @description
+        * Function to delete a User
+        */
+        $scope.deleteUser = function () {
           UserService.deleteUser($scope.user.id).then(function (response) {
             $scope.isMessage = true;
             $scope.message = response.data.message;
           }).catch(function (response) {
             $scope.isMessage = true;
-            if(response.data.message != undefined){
+            if (response.data.message !== undefined) {
               $scope.message = response.data.message;
-            }else{
+            } else {
               $scope.message = 'Error occured! Please try again';
-           }
+            }
+          });
+        };
+
+        /**
+        * @ngdoc function
+        * @name editUser
+        * @description
+        * Function to Edit User
+        */
+        $scope.editUser = function () {
+          UserService.editUser($scope.user).then(function (response) {
+            $scope.isMessage = true;
+            $scope.message = response.data.message;
+          }).catch(function (response) {
+            $scope.isMessage = true;
+            if (response.data.message !== undefined) {
+              $scope.message = response.data.message;
+            } else {
+              $scope.message = 'Error occured! Please try again';
+            }
           });
         };
       }

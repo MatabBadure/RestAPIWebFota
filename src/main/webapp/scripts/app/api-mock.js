@@ -119,5 +119,6 @@ var doctorsList = [
   { 'name' : 'David Jones', 'email' : 'davijones@gmail.com', 'hospital' : 'abc hospital'},
   { 'name' : 'William Davis', 'email' : 'williamdavis@gmail.com', 'hospital' : 'mno hospital'},
   { 'name' : 'Joseph taylor', 'email' : 'josephtaylor@gmail.com', 'hospital' : 'xyz hospital'},
-  { 'name' : 'David Jones', 'email' : 'davijones@gmail.com', 'hospital' : 'abc hospital'}
+  { 'name' : 'David Jones', 'email' : 'davijones@gmail.com', 'hospital' : 'abc hospital'},
+  { 'id' : 28, 'name' : 'DoctorName', 'email' : 'syedmohammed+122@neevtech.com', 'hospital' : 'Appolo hospital'}
 ];

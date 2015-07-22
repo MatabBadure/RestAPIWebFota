@@ -27,9 +27,13 @@ angular.module('hillromvestApp')
           if ($scope.form.$invalid) {
             return false;
           }
+
+          $scope.doctor.clinicList = [];
+          $scope.doctor.clinicList.push({'id': 1});
+
           var data = $scope.doctor;
           data.title = 'Dr';
-          data.role = 'DOCTOR';
+          data.role = 'HCP';
           Doctor.createDoctor(data).then(function (response) {
             $scope.doctorStatus.isMessage = true;
             $scope.doctorStatus.message = "Doctor created successfully" + " with ID " + response.data.user.id;
@@ -51,7 +55,7 @@ angular.module('hillromvestApp')
         */
         $scope.deleteDoctor = function () {
           //'$scope.doctor.id = 1;' Will be Removed after get REST API is up and runnig
-          $scope.doctor.id = 1;
+          $scope.doctor.id = 27;
           Doctor.deleteDoctor($scope.doctor.id).then(function (response) {
             $scope.doctorStatus.isMessage = true;
             $scope.doctorStatus.message = response.data.message;

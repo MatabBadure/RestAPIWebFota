@@ -78,10 +78,11 @@ public class HealthCareProfessionalUserServiceTest {
 	
 	@Test
 	public void updateHCPUserSuccessfully(){
-		UserExtension newPatientUser = userService.createPatientUser(userExtensionDTO);
+		JSONObject jsonObject = userService.createUser(userExtensionDTO, BASE_URL);
+		UserExtension newHCP = (UserExtension)jsonObject.get("user");
 		userExtensionDTO.setFirstName("Remus");
 		userExtensionDTO.setCity("Bangalore");
-		JSONObject jsonObject = userService.updateUser(newPatientUser.getId(), userExtensionDTO, BASE_URL);
+		jsonObject = userService.updateUser(newHCP.getId(), userExtensionDTO, BASE_URL);
 		UserExtension updatedHCP = (UserExtension)jsonObject.get("user");
 		assertThat(updatedHCP.isDeleted()).isFalse();
         assertThat(updatedHCP.getId()).isNotNull();

@@ -1,19 +1,13 @@
 package com.hillrom.vest.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.repository.ClinicRepository;
-import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
-
+import net.minidev.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.inject.Inject;
 
 /**
@@ -28,71 +22,73 @@ public class ClinicService {
     @Inject
     private ClinicRepository clinicRepository;
 
-    public Clinic createClinic(ClinicDTO clinicDTO) {
-    	Clinic newParentClinic = new Clinic();
-    	clinicRepository.findOneByName(clinicDTO.getName())
-		.map(parentClinic -> {
-			newParentClinic.setId(parentClinic.getId());
-			newParentClinic.setName(parentClinic.getName());
-			newParentClinic.setAddress(parentClinic.getAddress());
-			newParentClinic.setZipcode(parentClinic.getZipcode());
-			newParentClinic.setCity(parentClinic.getCity());
-			newParentClinic.setState(parentClinic.getState());
-			newParentClinic.setPhoneNumber(parentClinic.getPhoneNumber());
-			newParentClinic.setHillromId(parentClinic.getHillromId());
-			newParentClinic.setDeleted(parentClinic.isDeleted());
-			newParentClinic.setParent(true);
-			return newParentClinic;
-		}).orElseGet(() -> {
-			newParentClinic.setName(clinicDTO.getName());
-			newParentClinic.setAddress(clinicDTO.getAddress());
-			newParentClinic.setZipcode(clinicDTO.getZipcode());
-			newParentClinic.setCity(clinicDTO.getCity());
-			newParentClinic.setState(clinicDTO.getState());
-			newParentClinic.setPhoneNumber(clinicDTO.getPhoneNumber());
-			newParentClinic.setHillromId(clinicDTO.getHillromId());
-			newParentClinic.setParent(true);
-			clinicRepository.save(newParentClinic);
-			return newParentClinic;
-        });
-    	for(Map<String, String> childClinicName : clinicDTO.getChildClinics()) {
-    		Clinic childClinic = new Clinic();
-    		childClinic.setName(childClinicName.get("name"));
-    		childClinic.setParentClinic(newParentClinic);
-    		clinicRepository.save(childClinic);
-    		newParentClinic.getChildClinics().add(childClinic);
+    public JSONObject createClinic(ClinicDTO clinicDTO) {
+    	JSONObject jsonObject = new JSONObject();
+    	Clinic newClinic = new Clinic();
+    	if(clinicDTO.getParentClinic() != null) {
+    		Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
+   			parentClinic.setParent(true);
+   			clinicRepository.save(parentClinic);
+   			newClinic.setParentClinic(parentClinic);
     	}
-    	return newParentClinic;
+    	assignUpdatedValues(clinicDTO, newClinic);
+		newClinic.setParent(false);
+		clinicRepository.save(newClinic);
+        if(newClinic.getId() != null) {
+        	jsonObject.put("message", "Clinic created successfully.");
+            jsonObject.put("Clinic", newClinic);
+            return jsonObject;
+        } else {
+	      	jsonObject.put("ERROR", "Unable to create Clinic.");
+	        return jsonObject;
+        }
     }
 
-    public Clinic updateClinic(Long id, ClinicDTO clinicDTO) {
-        Clinic clinic = clinicRepository.getOne(id);
-        if (clinic != null) {
+    public JSONObject updateClinic(Long id, ClinicDTO clinicDTO) {
+    	JSONObject jsonObject = new JSONObject();
+    	Clinic clinic = clinicRepository.getOne(id);
+        if(clinic == null) {
+	      	jsonObject.put("ERROR", "No such clinic found.");
+        } else if(clinic.getId() != null) {
         	assignUpdatedValues(clinicDTO, clinic);
-        	List<String> existingChildClinicIds = new ArrayList<String>();
-        	List<String> newChildClinicIds = new ArrayList<String>();
-        	for(Clinic childClinic : clinic.getChildClinics()) {
-        		existingChildClinicIds.add(childClinic.getId().toString());
+        	if(clinicDTO.getParentClinic() != null) {
+        		Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
+       			parentClinic.setParent(true);
+       			clinicRepository.save(parentClinic);
+       			clinic.setParentClinic(parentClinic);
         	}
-        	for(Map<String, String> childClinic : clinicDTO.getChildClinics()) {
-        		newChildClinicIds.add(childClinic.get("id"));
-        	}
-        	List<String> clinicsToBeAdded = RandomUtil.getDifference(newChildClinicIds, existingChildClinicIds);
-        	List<String> clinicsToBeRemoved = RandomUtil.getDifference(existingChildClinicIds, newChildClinicIds);
-    		for(String clinicId : clinicsToBeAdded) {
-        		Clinic childClinic = clinicRepository.getOne(Long.parseLong(clinicId));
-        		childClinic.setParentClinic(clinic);
-        		clinicRepository.save(childClinic);
-        		clinic.getChildClinics().add(childClinic);
-        	}
-    		for(String clinicId : clinicsToBeRemoved) {
-        		Clinic childClinic = clinicRepository.getOne(Long.parseLong(clinicId));
-        		childClinic.setParentClinic(null);
-        		clinicRepository.save(childClinic);
-        		clinic.getChildClinics().remove(childClinic);
-        	}
+    		clinicRepository.save(clinic);
+        	jsonObject.put("message", "Clinic updated successfully.");
+            jsonObject.put("Clinic", clinic);
+        } else {
+	      	jsonObject.put("ERROR", "Unable to update Clinic.");
         }
-    	return clinic;
+    	return jsonObject;
+    }
+    
+    public JSONObject deleteClinic(Long id) {
+    	JSONObject jsonObject = new JSONObject();
+    	Clinic existingClinic = clinicRepository.findOne(id);
+		if(existingClinic != null) {
+			if(existingClinic.getHillromId() != null) {
+				jsonObject.put("ERROR", "Unable to delete Clinic. Clinic admin exists.");
+			} else if(existingClinic.getUsers().size() > 0) {
+				jsonObject.put("ERROR", "Unable to delete Clinic. Healthcare Professionals are associated with it.");
+			} else {
+				if(existingClinic.isParent()) {
+					for(Clinic childClinic : existingClinic.getChildClinics()) {
+						childClinic.setParentClinic(null);
+						clinicRepository.save(childClinic);
+					}
+					existingClinic.setParent(false);
+				}
+				clinicRepository.delete(existingClinic);
+				jsonObject.put("message", "Clinic deleted successfully.");
+			}
+		} else {
+			jsonObject.put("ERROR", "No such clinic exists.");
+		}
+		return jsonObject;
     }
 
 	/**

@@ -79,6 +79,5 @@ describe('Controllers Tests ', function () {
             expect($scope.success).toBe('OK');
             expect($scope.error).toBe(null);
           });
-
     });
 });

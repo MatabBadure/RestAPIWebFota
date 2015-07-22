@@ -97,6 +97,8 @@ public class ClinicServiceTest {
         
         assertThat(error).isNotNull();
         assertThat(error).containsIgnoringCase("Unable to delete Clinic.");
+        
+        clinicRepository.delete(newClinic);
     }
     
 }

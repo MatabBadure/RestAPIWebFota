@@ -100,6 +100,62 @@
 	padding: 5px 0;
 }
 
+//.dashboard__form__input--role select {
+.dashboard__form__input--option select {
+	height: 30px;
+	width: 150px;
+	font-weight: normal;
+	color: $pickled-bluewood;
+	border: 1px solid $bombay;
+	background-color: inherit;
+	padding-left: 5px;
+	-webkit-appearance: none;
+  -moz-appearance: none;
+  text-indent: 1px;
+  text-overflow: '';
+}
+
+.label-next input{
+	width: 100%;
+	color: $pickled-bluewood;
+	border: 1px solid $bombay;
+	padding-left: 10px;
+	font-weight: normal;
+}
+
+.hillrom-btn {
+	right: 40px;
+  position: absolute;
+  padding: 5px 24px;
+  border-radius: 3px;
+  text-transform: capitalize;
+  font-size: $font-size-small;
+  cursor: pointer;
+}
+
+.btn-submit {
+  border: 1px solid $terracotta;
+  background-color: $terracotta;
+  color: $body-bg;
+}
+
+.btn-submit-disable {
+  border: 1px solid $terracotta;
+  background-color: $terracotta;
+  color: $body-bg;
+}
+
+.has-error {
+	color: $terracotta;
+	font-size: $font-size-small;
+	font-weight: normal;
+	padding: 5px 0;
+}
+
+.font-add-text {
+	font-weight: bold;
+}
+
 .margin-bottom-extream {
 	margin-bottom: 110px;
 }

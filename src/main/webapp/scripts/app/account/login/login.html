@@ -1,87 +1,24 @@
-<div class="login">
-  <div class="col-md-16 login__container">
-    <div class="col-md-11 login__container__left-section">
-      <div class="login__container__left-section--description">
-        <div class="login__container__left-section--description content">
-          The Vest Airway Clearance System, Model 105, is a designed to assist patients in the mobilization of retained secretions that, if not removed, may lead to increased rates of respiratory infaction, hospitalization and reduced lung function.
-        </div>
-        <div class="login__container__left-section--description image">
-          <img src="assets/images/heart.png">
-        </div>
+<div class="container login">
+  <div class="row">
+    <div class="col-xs-1 col-sm-3 col-md-4 col-lg-4">
+    </div>
+    <div class="col-xs-14 col-sm-10 col-md-8 col-lg-8 form_container">
+      <div class="col-md-6 col-lg-6 ">
+        <img src="assets/images/man.svg">
+      </div>
+      <div class=" col-md-10 col-lg-10">
+        <form>
+         <!--  <div class="form-group"> -->
+            <p><strong>LOGIN TO YOUR ACCOUNT<strong></p>
+            <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter your Hill-Rom ID or Email-id">
+         <!--  </div> -->
+          <!-- <div class="form-group"> -->
+            <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+         <!--  </div> -->
+            <div class="col-md-8 col-lg-8 "><a href="#">Forgot Password?</div>
+            <div class="col-md-8 col-lg-8"><button type="button" class="btn btn-warning">Login</button></div>
+        </form>
       </div>
     </div>
-
-    <div class="col-md-5 login__container__right-section">
-
-        <div class="login__container__right-section--form" ng-show="showLogin">
-          <div class="text-center textUpperCase indent-bottom-5" translate="login.title">Login to your Account</div>
-          <div class="alert alert-danger" ng-show="authenticationError" translate="login.messages.error.authentication">
-                  <strong>Authentication failed!</strong> Please check your credentials and try again.
-          </div> 
-           <div class="text-center indent-bottom-5" ng-show="form.username.$invalid || form.password.$invalid" >Please enter username and password</div>   
-
-            
-          <form class="form" role="form" name="form" novalidate>
-            <div class="form-group">
-              <!-- <label for="username" translate="global.form.username">Login</label> -->
-              <input type="text" class="form-control" id="username" name="username" placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="username" required>
-              <div class="form-error" ng-show="(form.username.$dirty && form.username.$invalid) || loginSubmitted">
-                <span class="help-block" ng-show="form.username.$error.required ">
-                  Your Username is required.
-                </span>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <!-- <label for="password" translate="login.form.password">Password</label> -->
-              <input type="password" class="form-control" id="password" name="password" placeholder="{{'login.form.password.placeholder' | translate}}" ng-model="password" required>
-              <div class="form-error" ng-show="(form.password.$dirty && form.password.$invalid) || loginSubmitted">
-                <span class="help-block" ng-show="form.password.$error.required">
-                  password is required.
-                </span>
-              </div>
-            </div>
-
-            <p class="help-block" ng-show="captchaError">Please verify again you are not a robot.</p>
-            <div  ng-show="showCaptcha">
-              <div vc-recaptcha
-                theme="'light'"
-                key="siteKey"
-                on-create="setWidgetId(widgetId)"
-                on-success="setResponse(response)">
-              </div>
-            </div>
-            <button class="login-button center-block" translate="login.form.button" ng-click="login($event)">Authenticate</button>
-            <!-- <button type="submit" class="login-button center-block" translate="login.form.button">Authenticate</button> -->
-          </form>
-
-          <div class="alert alert-warning text-center">
-            <a href="#/reset/request" translate="login.password.forgot">Did you forget your password?</a>
-          </div>
-
-          <!-- <div class="alert alert-warning" translate="global.messages.info.register">
-                  You don't have an account yet? <a href="#/register">Register a new account</a>
-              </div> -->
-        </div>
-
-        <div class="login__container__right-section--form" ng-show="isFirstLogin">
-          <form class="form" role="form" ng-submit="submitPassword($event)">
-            <div class="form-group" ng-show="!isEmailExist">
-              <label for="Email ID" translate="global.form.email">E-Mail</label>
-              <input type="text" class="form-control" id="" placeholder="{{'login.form.email.placeholder' | translate}}" ng-model="user.email">
-            </div>
-            <div class="form-group">
-              <label for="Password" >Password</label>
-              <input type="password" class="form-control" id="" placeholder="password" ng-model="user.password">
-            </div>
-            <div class="form-group">
-              <label for="Confirm Password" > Confirm Password</label>
-              <input type="password" class="form-control" id="" placeholder="confirm password" ng-model="user.confirmPassword">
-            </div>
-            <button type="submit" class="login-button center-block">Submit</button>
-          </form>
-        </div>
-    </div>
-
   </div>
 </div>

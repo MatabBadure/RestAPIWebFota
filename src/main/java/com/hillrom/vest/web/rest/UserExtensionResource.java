@@ -1,10 +1,10 @@
 package com.hillrom.vest.web.rest;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
@@ -25,18 +25,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
-import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.repository.UserExtensionRepository;
-import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
-import com.hillrom.vest.service.MailService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 /**
- * REST controller for managing UserExtension.
+ * REST controller for managing user.
  */
 @RestController
 @RequestMapping("/api")
@@ -48,64 +45,50 @@ public class UserExtensionResource {
     private UserExtensionRepository userExtensionRepository;
     
     @Inject
-    private UserRepository userRepository;
-    
-    @Inject
-    private MailService mailService;
-    
-    @Inject
     private UserService userService;
 
     /**
-     * POST  /userExtensions -> Create a new userExtension.
+     * POST  /user -> Create a new User.
      */
-    @RequestMapping(value = "/doctor",
+    @RequestMapping(value = "/user",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<JSONObject> create(@RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) throws URISyntaxException {
-        log.debug("REST request to save UserExtension : {}", userExtensionDTO);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("message", "e-mail address already in use");
-        return userRepository.findOneByEmail(userExtensionDTO.getEmail())
-        		.map(user -> {
-        			return ResponseEntity.badRequest().body(jsonObject);
-        		})
-                .orElseGet(() -> {
-                	if (AuthoritiesConstants.DOCTOR.equals(userExtensionDTO.getRole())) {
-                		UserExtension user = userService.createDoctor(userExtensionDTO);
-                        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-                        mailService.sendActivationEmail(user, baseUrl);
-                        jsonObject.put("message", "Doctor created successfully.");
-                        jsonObject.put("user", user);
-                        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
-                	} else {
-                		jsonObject.put("message", "Incorrect data.");
-                		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.PARTIAL_CONTENT);
-                	}
-                });
+    @RolesAllowed(AuthoritiesConstants.ACCT_SERVICES)
+    public ResponseEntity<JSONObject> create(@RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
+        log.debug("REST request to save User : {}", userExtensionDTO);
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        JSONObject jsonObject = userService.createUser(userExtensionDTO, baseUrl);
+        if (jsonObject.containsKey("error")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+        }
     }
 
     /**
-     * PUT  /userExtensions -> Updates an existing userExtension.
+     * PUT  /user/:id -> Updates an existing user (patient).
      */
-    @RequestMapping(value = "/doctor",
+    @RequestMapping(value = "/user/{id}",
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Void> update(@RequestBody UserExtension userExtension, HttpServletRequest request) throws URISyntaxException {
-        log.debug("REST request to update UserExtension : {}", userExtension);
-        if (userExtension.getId() == null) {
-            //return create(userExtension, request);
+    @RolesAllowed({AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<JSONObject> update(@PathVariable Long id, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
+        log.debug("REST request to update User : {}", userExtensionDTO);
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        JSONObject jsonObject = userService.updateUser(id, userExtensionDTO, baseUrl);
+        if (jsonObject.containsKey("error")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         }
-        userExtensionRepository.save(userExtension);
-        return ResponseEntity.ok().build();
     }
 
     /**
-     * GET  /userExtensions -> get all the userExtensions.
+     * GET  /user -> get all the userExtensions.
      */
-    @RequestMapping(value = "/doctor",
+    @RequestMapping(value = "/user",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
@@ -118,9 +101,9 @@ public class UserExtensionResource {
     }
 
     /**
-     * GET  /userExtensions/:id -> get the "id" userExtension.
+     * GET  /user/:id -> get the "id" userExtension.
      */
-    @RequestMapping(value = "/doctor/{id}",
+    @RequestMapping(value = "/user/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
@@ -134,9 +117,9 @@ public class UserExtensionResource {
     }
 
     /**
-     * DELETE  /userExtensions/:id -> delete the "id" userExtension.
+     * DELETE  /user/:id -> delete the "id" userExtension.
      */
-    @RequestMapping(value = "/doctor/{id}",
+    @RequestMapping(value = "/user/{id}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed

@@ -142,6 +142,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
+        </dependency>
         <!-- The HikariCP Java Agent is disabled by default, as it is experimental
         <dependency>
             <groupId>com.zaxxer</groupId>
@@ -209,6 +214,11 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>io.fastjson</groupId>
+            <artifactId>boon</artifactId>
+            <version>0.19</version>
+        </dependency>
+        <dependency>
             <groupId>io.gatling.highcharts</groupId>
             <artifactId>gatling-charts-highcharts</artifactId>
             <version>${gatling.version}</version>
@@ -233,6 +243,11 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
         <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+            <version>1.0.9</version>
+        </dependency>
+        <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core-java8</artifactId>
             <version>${assertj-core.version}</version>
@@ -241,6 +256,10 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-envers</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jpamodelgen</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -268,8 +287,23 @@
             <version>${mapstruct.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-cypher-compiler-2.1</artifactId>
+            <version>2.1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.10.4</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>4.1.7.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -288,6 +322,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-gemfire</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -343,43 +381,8 @@
             <artifactId>spring-security-data</artifactId>
             <version>${spring-security.version}</version>
         </dependency>
-        <dependency>
-        	<groupId>org.hibernate</groupId>
-        	<artifactId>hibernate-jpamodelgen</artifactId>
-        </dependency>
-        <dependency>
-        	<groupId>commons-httpclient</groupId>
-        	<artifactId>commons-httpclient</artifactId>
-        	<version>3.1</version>
-        </dependency>
-        <dependency>
-        	<groupId>org.neo4j</groupId>
-        	<artifactId>neo4j-cypher-compiler-2.1</artifactId>
-        	<version>2.1.5</version>
-        </dependency>
-        <dependency>
-        	<groupId>org.scala-lang</groupId>
-        	<artifactId>scala-library</artifactId>
-        	<version>2.10.4</version>
-        </dependency>
-		<dependency>
-            <groupId>net.minidev</groupId>
-            <artifactId>json-smart</artifactId>
-            <version>1.0.9</version>
-        </dependency>
-        <dependency>
-            <groupId>io.fastjson</groupId>
-            <artifactId>boon</artifactId>
-            <version>0.19</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>4.1.7.RELEASE</version>
-        </dependency>
     </dependencies>
     <build>
-        <finalName>hillromvest</finalName>
         <resources>
             <resource>
                 <filtering>true</filtering>
@@ -396,6 +399,7 @@
                 </excludes>
             </resource>
         </resources>
+        <finalName>hillromvest</finalName>
         <pluginManagement>
             <plugins>
                 <!--This plugin's configuration is used to store Eclipse m2e settings

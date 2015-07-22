@@ -2,28 +2,36 @@ package com.hillrom.vest.domain;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.boon.json.annotations.JsonProperty;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
-import org.hibernate.validator.constraints.Email;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
+import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 
 /**
  * A user.
@@ -34,7 +42,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @SQLDelete(sql="UPDATE USER SET is_deleted = 1 WHERE id = ?")
 public class User extends AbstractAuditingEntity implements Serializable {
 
-    @Id
+    
+	private static final long serialVersionUID = 1L;
+
+	@Id
     @Column(name = "id")
     @GeneratedValue
     private Long id;
@@ -63,6 +74,13 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Size(max = 100)
     @Column(length = 100, unique = true)
     private String email;
+    
+    @Size(max = 10)
+    @Column(name = "gender", length = 10)
+    private String gender;
+    
+    @Column(name = "zipcode")
+    private Integer zipcode;
 
     @Column(nullable = false)
     private boolean activated = false;
@@ -83,6 +101,13 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "reset_date", nullable = true)
     private DateTime resetDate = null;
+    
+    @Column(name = "terms_condition_accepted")
+    private boolean termsConditionAccepted = false;
+
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @Column(name = "terms_condition_accepted_date", nullable = true)
+    private DateTime termsConditionAcceptedDate = null;
 
     @JsonIgnore
     @ManyToMany
@@ -92,21 +117,24 @@ public class User extends AbstractAuditingEntity implements Serializable {
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})
     private Set<Authority> authorities = new HashSet<>();
     
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(
-            name = "USER_PATIENT_ASSOC",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "patient_id", referencedColumnName = "id")})
-    private Set<PatientInfo> patients = new HashSet<>();
-    
-    @Column(name="is_deleted", nullable = false)
+    @Column(name="is_deleted")
     @JsonIgnore
     private boolean deleted = false;
     
     @Column(name="last_loggedin_at")
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime lastLoggedInAt;
+    
+    @OneToMany(mappedBy = "user",fetch=FetchType.LAZY)
+    @JsonIgnore
+    private Set<UserPatientAssoc> userPatientAssoc = new HashSet<>();
+    
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
+    @JsonSerialize(using = CustomLocalDateSerializer.class)
+    @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
+    @Column(name = "dob")
+    private LocalDate dob;
+
     
     public Long getId() {
         return id;
@@ -221,20 +249,60 @@ public class User extends AbstractAuditingEntity implements Serializable {
         this.authorities = authorities;
     }
 
-	public Set<PatientInfo> getPatients() {
-		return patients;
-	}
-
-	public void setPatients(Set<PatientInfo> patients) {
-		this.patients = patients;
-	}
-
 	public boolean isDeleted() {
 		return deleted;
 	}
 
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public Integer getZipcode() {
+		return zipcode;
+	}
+
+	public void setZipcode(Integer zipcode) {
+		this.zipcode = zipcode;
+	}
+
+	public boolean getTermsConditionAccepted() {
+		return termsConditionAccepted;
+	}
+
+	public void setTermsConditionAccepted(boolean termsConditionAccepted) {
+		this.termsConditionAccepted = termsConditionAccepted;
+	}
+
+	public DateTime getTermsConditionAcceptedDate() {
+		return termsConditionAcceptedDate;
+	}
+
+	public void setTermsConditionAcceptedDate(DateTime termsConditionAcceptedDate) {
+		this.termsConditionAcceptedDate = termsConditionAcceptedDate;
+	}
+
+	public Set<UserPatientAssoc> getUserPatientAssoc() {
+		return userPatientAssoc;
+	}
+
+	public void setUserPatientAssoc(Set<UserPatientAssoc> userPatientAssoc) {
+		this.userPatientAssoc = userPatientAssoc;
+	}
+
+	public LocalDate getDob() {
+		return dob;
+	}
+
+	public void setDob(LocalDate dob) {
+		this.dob = dob;
 	}
 
 	@Override
@@ -248,7 +316,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
         User user = (User) o;
 
-        if (!email.equals(user.email)) {
+        if (! Objects.equals(email, user.email)) {
             return false;
         }
 
@@ -257,21 +325,21 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     @Override
     public int hashCode() {
-        return email.hashCode();
+        if(email != null) return email.hashCode();
+        else {
+        	return HashCodeBuilder.reflectionHashCode(this);
+        }
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                " password='" + password + '\'' +
-                ", title='" + title + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", middleName='" + middleName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", activated='" + activated + '\'' +
-                ", langKey='" + langKey + '\'' +
-                ", activationKey='" + activationKey + '\'' +
-                "}";
-    }
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", password=" + password + ", title=" + title
+				+ ", firstName=" + firstName + ", middleName=" + middleName
+				+ ", lastName=" + lastName + ", email=" + email + ", gender="
+				+ gender + ", zipcode=" + zipcode + ", activated=" + activated
+				+ ", langKey=" + langKey + ", termsConditionAccepted="
+				+ termsConditionAccepted + ", deleted=" + deleted
+				+ ", lastLoggedInAt=" + lastLoggedInAt + "]";
+	}
+
 }

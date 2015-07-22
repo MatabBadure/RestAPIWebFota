@@ -2,9 +2,9 @@ package com.hillrom.vest.web.rest;
 
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 
 import net.minidev.json.JSONObject;
@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.repository.ClinicRepository;
+import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.ClinicService;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
@@ -52,39 +53,33 @@ public class ClinicResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<JSONObject> create(@RequestBody ClinicDTO clinicDTO) throws URISyntaxException {
+    @RolesAllowed(AuthoritiesConstants.ACCT_SERVICES)
+    public ResponseEntity<JSONObject> create(@RequestBody ClinicDTO clinicDTO) {
         log.debug("REST request to save Clinic : {}", clinicDTO);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("message", "Clinic name already in use");
-        return clinicRepository.findOneByName(clinicDTO.getName())
-        		.map(newClinic -> {
-        			System.out.println("Clinic found : "+newClinic);
-        			return ResponseEntity.badRequest().body(jsonObject);
-        		})
-                .orElseGet(() -> {
-                    Clinic newClinic = clinicService.createClinic(clinicDTO);
-                    jsonObject.put("message", "Clinic created successfully.");
-                    jsonObject.put("clinic", newClinic);
-                    return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
-                });
+        JSONObject jsonObject = clinicService.createClinic(clinicDTO);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+        }
     }
 
     /**
      * PUT  /clinics -> Updates an existing clinic.
      */
-    @RequestMapping(value = "/clinics",
+    @RequestMapping(value = "/clinics/{id}",
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<JSONObject> update(@RequestBody Clinic clinic) throws URISyntaxException {
-        log.debug("REST request to update Clinic : {}", clinic);
-        JSONObject jsonObject = new JSONObject();
-        if (clinic.getId() == null) {
-            //return create(clinic);
+    @RolesAllowed(AuthoritiesConstants.ACCT_SERVICES)
+    public ResponseEntity<JSONObject> update(@PathVariable Long id, @RequestBody ClinicDTO clinicDTO) {
+        log.debug("REST request to update Clinic : {}", clinicDTO);
+        JSONObject jsonObject = clinicService.updateClinic(id, clinicDTO);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
         }
-        clinicRepository.save(clinic);
-        jsonObject.put("message", "User updated successfully.");
-        return ResponseEntity.ok().body(jsonObject);
     }
 
     /**
@@ -111,7 +106,7 @@ public class ClinicResource {
     @Timed
     public ResponseEntity<Clinic> get(@PathVariable Long id) {
         log.debug("REST request to get Clinic : {}", id);
-        return Optional.ofNullable(clinicRepository.findOneWithEagerRelationships(id))
+        return Optional.ofNullable(clinicRepository.findOne(id))
             .map(clinic -> new ResponseEntity<>(
                 clinic,
                 HttpStatus.OK))
@@ -125,15 +120,14 @@ public class ClinicResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @RolesAllowed(AuthoritiesConstants.ACCT_SERVICES)
     public ResponseEntity<JSONObject> delete(@PathVariable Long id) {
     	log.debug("REST request to delete Clinic : {}", id);
-    	JSONObject jsonObject = new JSONObject();
-        jsonObject.put("message", "No such clinic exists.");
-        return Optional.ofNullable(clinicRepository.findOne(id))
-                .map(clinic -> {
-                	clinicRepository.delete(clinic);
-                    jsonObject.put("message", "Clinic deleted successfully.");
-                    return ResponseEntity.ok().body(jsonObject);
-                }).orElse(new ResponseEntity<JSONObject>(jsonObject, HttpStatus.NOT_FOUND));
+    	JSONObject jsonObject = clinicService.deleteClinic(id);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
     }
 }

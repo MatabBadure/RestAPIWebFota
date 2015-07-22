@@ -1,11 +1,21 @@
 package com.hillrom.vest.domain;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+
 import org.hibernate.annotations.SQLDelete;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * A UserExtension.
@@ -34,14 +44,23 @@ public class UserExtension extends User implements Serializable {
     @Column(name = "address")
     private String address;
     
-    @Column(name = "zipcode")
-    private Integer zipcode;
-    
     @Column(name = "city")
     private String city;
     
     @Column(name = "state")
     private String state;
+    
+    @Column(name = "npi_number")
+    private String npiNumber;
+    
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "CLINIC_USER_ASSOC",
+            joinColumns = {@JoinColumn(name = "users_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "clinics_id", referencedColumnName = "id")})
+    @JsonManagedReference
+    private Set<Clinic> clinics = new HashSet<>();
     
     @Column(name="is_deleted", nullable = false)
     private boolean deleted = false;
@@ -94,14 +113,6 @@ public class UserExtension extends User implements Serializable {
 		this.address = address;
 	}
 
-	public Integer getZipcode() {
-		return zipcode;
-	}
-
-	public void setZipcode(Integer zipcode) {
-		this.zipcode = zipcode;
-	}
-
 	public String getCity() {
 		return city;
 	}
@@ -126,12 +137,29 @@ public class UserExtension extends User implements Serializable {
 		this.deleted = deleted;
 	}
 
+	public String getNpiNumber() {
+		return npiNumber;
+	}
+
+	public void setNpiNumber(String npiNumber) {
+		this.npiNumber = npiNumber;
+	}
+
+	public Set<Clinic> getClinics() {
+		return clinics;
+	}
+
+	public void setClinics(Set<Clinic> clinics) {
+		this.clinics = clinics;
+	}
+
 	@Override
 	public String toString() {
 		return "UserExtension [speciality=" + speciality + ", credentials="
 				+ credentials + ", primaryPhone=" + primaryPhone
 				+ ", mobilePhone=" + mobilePhone + ", faxNumber=" + faxNumber
-				+ ", address=" + address + ", zipcode=" + zipcode + ", city="
-				+ city + ", state=" + state + "]";
+				+ ", address=" + address + ", city=" + city + ", state="
+				+ state + ", npiNumber=" + npiNumber + "]";
 	}
+
 }

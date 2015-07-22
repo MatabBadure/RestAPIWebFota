@@ -1,0 +1,21 @@
+{
+    "hillromvestApp": {
+        "securityQuestion" : {
+            "home": {
+                "title": "SecurityQuestions",
+                "createLabel": "Créer un nouveau SecurityQuestion",
+                "createOrEditLabel": "Créer ou éditer un SecurityQuestion"
+            },
+            "delete": {
+                "question": "Etes-vous certain de vouloir supprimer le SecurityQuestion {{ id }} ?"
+            },
+            "detail": {
+                "title": "SecurityQuestion"
+            },
+            "question": "Question",
+            "answer": "Answer",
+            "user": "user"
+        }
+    }
+}
+

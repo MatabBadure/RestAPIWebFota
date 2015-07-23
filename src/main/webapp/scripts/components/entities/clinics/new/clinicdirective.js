@@ -32,12 +32,12 @@ angular.module('hillromvestApp')
           }
           if ($scope.clinicStatus.isCreate) {
 
-            if($scope.clinic.type === 'parent' && $scope.clinic.parent) {
-              delete $scope.clinic.parent;
+            if($scope.clinic.type === 'parent' && $scope.clinic.parentClinic) {
+              delete $scope.clinic.parentClinic;
             }else {
               for(var i = 0; i < clinicsList.length; i++) {
-                if ($scope.clinic.parent && clinicsList[i].name === $scope.clinic.parent.name) {
-                  $scope.clinic.parent.id = clinicsList[i].id;
+                if ($scope.clinic.parentClinic && clinicsList[i].name === $scope.clinic.parentClinic.name) {
+                  $scope.clinic.parentClinic.id = clinicsList[i].id;
                 }
               }
             }
@@ -95,12 +95,12 @@ angular.module('hillromvestApp')
         };
 
         $scope.selectClinic = function (clinic) {
-          $scope.clinic.parent.name = clinic.name;
+          $scope.clinic.parentClinic.name = clinic.name;
           $scope.clinics = [];
         };
 
         $scope.removeParent = function () {
-          $scope.clinic.parent = null;
+          $scope.clinic.parentClinic = null;
         };
       }
     };

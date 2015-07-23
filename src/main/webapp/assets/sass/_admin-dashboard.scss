@@ -63,6 +63,43 @@
   text-overflow: '';
 }
 
+.label-next input{
+	width: 100%;
+	color: $pickled-bluewood;
+	border: 1px solid $bombay;
+	padding-left: 10px;
+	font-weight: normal;
+}
+
+.hillrom-btn {
+	right: 40px;
+  position: absolute;
+  padding: 5px 24px;
+  border-radius: 3px;
+  text-transform: capitalize;
+  font-size: $font-size-small;
+  cursor: pointer;
+}
+
+.btn-submit {
+  border: 1px solid $terracotta;
+  background-color: $terracotta;
+  color: $body-bg;
+}
+
+.btn-submit-disable {
+  border: 1px solid $terracotta;
+  background-color: $terracotta;
+  color: $body-bg;
+}
+
+.has-error {
+	color: $terracotta;
+	font-size: $font-size-small;
+	font-weight: normal;
+	padding: 5px 0;
+}
+
 //.dashboard__form__input--role select {
 .dashboard__form__input--option select {
 	height: 30px;
@@ -78,7 +115,7 @@
   text-overflow: '';
 }
 
-.label-next input {
+.label-next input{
 	width: 100%;
 	color: $pickled-bluewood;
 	border: 1px solid $bombay;

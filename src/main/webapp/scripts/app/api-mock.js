@@ -119,7 +119,7 @@ var clinicsList = [
     "id": 13,
     "name": "Hill Rom",
     "address": "Neev",
-    "zipcode": 560042,
+    "zipcode": 56004,
     "city": "Bangalore",
     "phoneNumber": 9740353872,
     "faxNumber": 9942354883,
@@ -128,8 +128,6 @@ var clinicsList = [
     "parent": true,
 
     "npiNumber": null,
-    "users": [],
-    "patients": [],
     "deleted": false,
     "childClinics": [
       {

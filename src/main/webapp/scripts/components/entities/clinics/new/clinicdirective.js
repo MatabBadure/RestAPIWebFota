@@ -51,7 +51,6 @@ angular.module('hillromvestApp')
 
           if ($scope.clinicStatus.editMode) {
             // edit Clinic section
-            $scope.clinic.hillromId = null;
             var data = $scope.clinic;
             ClinicService.updateClinic(data).then(function(data) {
               $scope.clinicStatus.isMessage = true;

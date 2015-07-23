@@ -15,6 +15,7 @@ angular.module('hillromvestApp')
 
                         // After the login the language will be changed to
                         // the language selected by the user during his registration
+                        localStorage.setItem('role', account.roles[0]);
                         $translate.use(account.langKey);
                         $translate.refresh();
                         deferred.resolve(data);

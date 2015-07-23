@@ -9,7 +9,7 @@
             clinic: '=clinicData',
             clinicStatus: '=clinicStatus'
           },
-          link: function postLink(scope, element, attrs) {},
+         
 
           controller: function($scope) {
            $scope.createClinic = function () {

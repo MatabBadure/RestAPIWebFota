@@ -6,7 +6,8 @@ angular.module('hillromvestApp')
     templateUrl: 'scripts/components/entities/clinics/list/list.html',
     restrict: 'E',
     scope: {
-      onSelect: '&'
+      onSelect: '&',
+      onCreate: '&'
     },
     link: function(scope, element, attrs) {
       var clinic = scope.clinic;
@@ -18,6 +19,10 @@ angular.module('hillromvestApp')
         $scope.clinic = clinic;
         $scope.onSelect({'clinic': clinic});
       },
+
+      $scope.createClinic = function(){
+          $scope.onCreate();
+        },
 
       $scope.searchClinics = function() {
         $scope.clinics = [{

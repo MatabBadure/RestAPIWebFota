@@ -1,7 +1,7 @@
   'use strict';
 
   angular.module('hillromvestApp')
-  .directive('clinic', function(ClinicService) {
+  .directive('clinic', function(ClinicService,User) {
         return {
           templateUrl: 'scripts/components/entities/clinics/new/create.html',
           restrict: 'E',
@@ -12,11 +12,27 @@
           link: function postLink(scope, element, attrs) {},
 
           controller: function($scope) {
+
+             $scope.submitted = false;
+              $scope.formSubmit = function(){
+                $scope.submitted = true;
+              }
+               $scope.states = [];
+               /* User.getState().then(function (response) {
+                  $scope.states = response.data.states;
+                }).catch(function (response) {
+                  console.log("getState call failed!");
+                });*/
            $scope.createClinic = function () {
             if($scope.form.$invalid){
               return false;
             }
-            var data = {
+
+            if($scope.userStatus.editMode){
+              // edit Clinic section
+            }else{
+              // create clinic section
+              var data = {
               'name': $scope.clinic.name,
               'parentClinicName': $scope.clinic.parentClinicName,
               'address': $scope.clinic.address,
@@ -28,7 +44,7 @@
               'hillromId': null
             };
 
-            ClinicService.createClinic(data).then(function (data) {    	 
+            ClinicService.createClinic(data).then(function (data) {      
                  $scope.clinicStatus.isMessage = true;
                  $scope.clinicStatus.message = "Clinic created successfully" + " with ID "+data.data.clinic.id;
            }).catch(function (response) {
@@ -39,6 +55,7 @@
                 }
                $scope.clinicStatus.isMessage = true;
             });
+            }  
          };
 
          $scope.deleteClinic = function(){

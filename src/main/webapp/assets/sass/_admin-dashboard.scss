@@ -4,7 +4,6 @@
 }
 
 .dashboard {
-	left:0;
 	// position: fixed;
 	background-color: $seashell;
 	max-height: 40px;
@@ -88,7 +87,6 @@
 
 .hillrom-btn {
 	right: 40px;
-  position: absolute;
   padding: 5px 24px;
   border-radius: 3px;
   text-transform: capitalize;
@@ -117,10 +115,6 @@
 
 .font-add-text {
 	font-weight: bold;
-}
-
-.margin-bottom-extream {
-	margin-bottom: 110px;
 }
 
 .checkbox-add span{

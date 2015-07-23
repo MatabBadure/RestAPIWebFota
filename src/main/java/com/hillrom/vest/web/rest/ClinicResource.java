@@ -56,15 +56,11 @@ public class ClinicResource {
     @RolesAllowed(AuthoritiesConstants.ACCT_SERVICES)
     public ResponseEntity<JSONObject> create(@RequestBody ClinicDTO clinicDTO) {
         log.debug("REST request to save Clinic : {}", clinicDTO);
-        JSONObject jsonObject = new JSONObject();
-        Clinic newClinic = clinicService.createClinic(clinicDTO);
-        if(newClinic.getId() != null) {
-        	jsonObject.put("message", "Clinic created successfully.");
-            jsonObject.put("Clinic", newClinic);
-            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+        JSONObject jsonObject = clinicService.createClinic(clinicDTO);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {
-	      	jsonObject.put("message", "Unable to complete the transaction.");
-	        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_GATEWAY);
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
         }
     }
 
@@ -78,18 +74,11 @@ public class ClinicResource {
     @RolesAllowed(AuthoritiesConstants.ACCT_SERVICES)
     public ResponseEntity<JSONObject> update(@PathVariable Long id, @RequestBody ClinicDTO clinicDTO) {
         log.debug("REST request to update Clinic : {}", clinicDTO);
-        JSONObject jsonObject = new JSONObject();
-        Clinic clinic = clinicService.updateClinic(id, clinicDTO);
-        if(clinic == null) {
-	      	jsonObject.put("message", "No such clinic found.");
-	        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_GATEWAY);
-        } else if(clinic.getId() != null) {
-        	jsonObject.put("message", "Clinic updated successfully.");
-            jsonObject.put("Clinic", clinic);
-            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        JSONObject jsonObject = clinicService.updateClinic(id, clinicDTO);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {
-	      	jsonObject.put("message", "Unable to update the Clinic.");
-	        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_GATEWAY);
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
         }
     }
 
@@ -131,15 +120,14 @@ public class ClinicResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @RolesAllowed(AuthoritiesConstants.ACCT_SERVICES)
     public ResponseEntity<JSONObject> delete(@PathVariable Long id) {
     	log.debug("REST request to delete Clinic : {}", id);
-    	JSONObject jsonObject = new JSONObject();
-        jsonObject.put("message", "No such clinic exists.");
-        return Optional.ofNullable(clinicRepository.findOne(id))
-                .map(clinic -> {
-                	clinicRepository.delete(clinic);
-                    jsonObject.put("message", "Clinic deleted successfully.");
-                    return ResponseEntity.ok().body(jsonObject);
-                }).orElse(new ResponseEntity<JSONObject>(jsonObject, HttpStatus.NOT_FOUND));
+    	JSONObject jsonObject = clinicService.deleteClinic(id);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
     }
 }

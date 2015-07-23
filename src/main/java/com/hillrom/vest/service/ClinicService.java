@@ -3,12 +3,11 @@ package com.hillrom.vest.service;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
-
+import net.minidev.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.inject.Inject;
 
 /**
@@ -23,7 +22,8 @@ public class ClinicService {
     @Inject
     private ClinicRepository clinicRepository;
 
-    public Clinic createClinic(ClinicDTO clinicDTO) {
+    public JSONObject createClinic(ClinicDTO clinicDTO) {
+    	JSONObject jsonObject = new JSONObject();
     	Clinic newClinic = new Clinic();
     	if(clinicDTO.getParentClinic() != null) {
     		Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
@@ -34,12 +34,22 @@ public class ClinicService {
     	assignUpdatedValues(clinicDTO, newClinic);
 		newClinic.setParent(false);
 		clinicRepository.save(newClinic);
-		return newClinic;
+        if(newClinic.getId() != null) {
+        	jsonObject.put("message", "Clinic created successfully.");
+            jsonObject.put("Clinic", newClinic);
+            return jsonObject;
+        } else {
+	      	jsonObject.put("ERROR", "Unable to create Clinic.");
+	        return jsonObject;
+        }
     }
 
-    public Clinic updateClinic(Long id, ClinicDTO clinicDTO) {
-        Clinic clinic = clinicRepository.getOne(id);
-        if (clinic != null) {
+    public JSONObject updateClinic(Long id, ClinicDTO clinicDTO) {
+    	JSONObject jsonObject = new JSONObject();
+    	Clinic clinic = clinicRepository.getOne(id);
+        if(clinic == null) {
+	      	jsonObject.put("ERROR", "No such clinic found.");
+        } else if(clinic.getId() != null) {
         	assignUpdatedValues(clinicDTO, clinic);
         	if(clinicDTO.getParentClinic() != null) {
         		Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
@@ -48,8 +58,37 @@ public class ClinicService {
        			clinic.setParentClinic(parentClinic);
         	}
     		clinicRepository.save(clinic);
+        	jsonObject.put("message", "Clinic updated successfully.");
+            jsonObject.put("Clinic", clinic);
+        } else {
+	      	jsonObject.put("ERROR", "Unable to update Clinic.");
         }
-    	return clinic;
+    	return jsonObject;
+    }
+    
+    public JSONObject deleteClinic(Long id) {
+    	JSONObject jsonObject = new JSONObject();
+    	Clinic existingClinic = clinicRepository.findOne(id);
+		if(existingClinic != null) {
+			if(existingClinic.getHillromId() != null) {
+				jsonObject.put("ERROR", "Unable to delete Clinic. Clinic admin exists.");
+			} else if(existingClinic.getUsers().size() > 0) {
+				jsonObject.put("ERROR", "Unable to delete Clinic. Healthcare Professionals are associated with it.");
+			} else {
+				if(existingClinic.isParent()) {
+					for(Clinic childClinic : existingClinic.getChildClinics()) {
+						childClinic.setParentClinic(null);
+						clinicRepository.save(childClinic);
+					}
+					existingClinic.setParent(false);
+				}
+				clinicRepository.delete(existingClinic);
+				jsonObject.put("message", "Clinic deleted successfully.");
+			}
+		} else {
+			jsonObject.put("ERROR", "No such clinic exists.");
+		}
+		return jsonObject;
     }
 
 	/**

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .factory('User', function ($http,localStorageService) {
+  .factory('UserService', function ($http,localStorageService) {
     var token = localStorage.getItem('token');
     return {
       createUser: function (data) {

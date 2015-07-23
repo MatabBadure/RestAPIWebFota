@@ -1,15 +1,30 @@
-.login{
+.login{   
+  background: url("../images/Hill-Rombackground.jpg") no-repeat scroll center center / cover rgba(0, 0, 0, 0);
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
   display: table;
   height: 100%;
+  position: absolute;
   width: 100%;
-  background-color: yellow;
+  //position: relative;
 }
 
+.login--position{
+  left: 25%;
+  position: relative;
+  top: 100px;
+}
+.login__cover{
+  margin: 13% 0;
+}
 .login__container{
   height: 100%;
   padding: 0 15px;
   display: table;
   vertical-align: middle;
+  //position: absolute;
+  //margin: 13% 0;
 }
 
 .login__container__left-section{
@@ -18,7 +33,7 @@
 }
 
 .login__container__left-section--description{
-  display: table-cell;
+  //display: table-cell;
   vertical-align: middle;
   &.content{
     float: left;
@@ -56,12 +71,13 @@
   opacity: 0.6;
 }
 
-.login a{
-  color: inherit;
+#error_msg{
+  color: red;
+  margin-bottom: -8%;
 }
-
 .form_container{
-  background-color:rgba(0, 0, 0, 0.5);
+  background-color: rgba(255,255,255,0.7);
+  padding: 5% 0;
   img{
     height: 200px;
     display: block;
@@ -71,14 +87,47 @@
   input{
     margin: 8% 0;
     border-radius: 0;
+    border: 1px solid #CECEF6;
   }
 
   p{
     text-align: center;
+    color: #5858FA;
   }
   
   a{
     font-weight: 100;
+    color: #ffffff;
   }
 
+  .link{
+    display: inline-block;
+  }
+
+  #forgotpwd a{
+    color: #585858;
+  }
+}
+
+.myButton {
+  background-color:#e4685d;
+  -moz-border-radius:2px;
+  -webkit-border-radius:2px;
+  border-radius:4px;  
+  display:inline-block;
+  cursor:pointer;
+  color:#ffffff;
+  font-family:Arial;
+  font-size:15px;
+  padding:2px 35px;
+  text-decoration:none;
+  text-shadow:0px 1px 0px #b23e35;
+  float: right;
+}
+// .myButton:hover {
+//   background-color:#eb675e;
+// }
+.myButton:active {
+  position:relative;
+  top:1px;
 }

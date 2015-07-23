@@ -1,22 +1,21 @@
 <div class="container login">
-  <div class="row">
-    <div class="col-xs-1 col-sm-3 col-md-4 col-lg-4">
-    </div>
-    <div class="col-xs-14 col-sm-10 col-md-8 col-lg-8 form_container">
+    <div class="login--position">
+    <div class=" form_container login__container col-md-8 col-lg-8">
       <div class="col-md-6 col-lg-6 ">
         <img src="assets/images/man.svg">
       </div>
-      <div class=" col-md-10 col-lg-10">
+      <div class=" col-md-10 col-lg-10 login__container__right-section">
         <form>
          <!--  <div class="form-group"> -->
-            <p><strong>LOGIN TO YOUR ACCOUNT<strong></p>
+            <p><strong>LOGIN TO YOUR ACCOUNT</strong></p>
+            <!-- <p id="error_msg">UserName & Password do not match.Please try again.</p> -->
             <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter your Hill-Rom ID or Email-id">
          <!--  </div> -->
           <!-- <div class="form-group"> -->
             <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
          <!--  </div> -->
-            <div class="col-md-8 col-lg-8 "><a href="#">Forgot Password?</div>
-            <div class="col-md-8 col-lg-8"><button type="button" class="btn btn-warning">Login</button></div>
+            <div class="col-md-8 col-lg-8 link" id="forgotpwd"><a href="#">Forgot Password?</a></div>
+            <div class="col-md-8 col-lg-8 link"><a href="#" class="myButton">LOGIN</a></div>
         </form>
       </div>
     </div>

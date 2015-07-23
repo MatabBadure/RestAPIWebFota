@@ -7,7 +7,9 @@ angular.module('hillromvestApp')
                 parent: 'account',
                 url: '/password',
                 data: {
-                    roles: ['ROLE_USER'],
+                    // roles will be assigned later here
+                    /*roles: ['ROLE_USER'],*/
+                    roles: [],
                     pageTitle: 'global.menu.account.password'
                 },
                 views: {

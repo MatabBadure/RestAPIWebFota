@@ -1,13 +1,21 @@
 package com.hillrom.vest.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.repository.ClinicRepository;
+import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
+
 import net.minidev.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.inject.Inject;
 
 /**
@@ -25,6 +33,9 @@ public class ClinicService {
     public JSONObject createClinic(ClinicDTO clinicDTO) {
     	JSONObject jsonObject = new JSONObject();
     	Clinic newClinic = new Clinic();
+    	if(clinicDTO.getIsParent()) {
+    		newClinic.setParent(clinicDTO.getIsParent());
+    	}
     	if(clinicDTO.getParentClinic() != null) {
     		Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
    			parentClinic.setParent(true);
@@ -32,7 +43,6 @@ public class ClinicService {
    			newClinic.setParentClinic(parentClinic);
     	}
     	assignUpdatedValues(clinicDTO, newClinic);
-		newClinic.setParent(false);
 		clinicRepository.save(newClinic);
         if(newClinic.getId() != null) {
         	jsonObject.put("message", "Clinic created successfully.");
@@ -51,15 +61,37 @@ public class ClinicService {
 	      	jsonObject.put("ERROR", "No such clinic found.");
         } else if(clinic.getId() != null) {
         	assignUpdatedValues(clinicDTO, clinic);
-        	if(clinicDTO.getParentClinic() != null) {
+        	if(clinicDTO.getIsParent()) {
+	        	List<String> existingChildClinicIds = new ArrayList<String>();
+	        	List<String> newChildClinicIds = new ArrayList<String>();
+	        	for(Clinic childClinic : clinic.getChildClinics()) {
+	        		existingChildClinicIds.add(childClinic.getId().toString());
+	        	}
+	        	for(Map<String, String> childClinic : clinicDTO.getChildClinicList()) {
+	        		newChildClinicIds.add(childClinic.get("id"));
+	        	}
+	        	List<String> clinicsToBeRemoved = RandomUtil.getDifference(existingChildClinicIds, newChildClinicIds);
+	        	for(String clinicId : clinicsToBeRemoved) {
+	        		Clinic childClinic = clinicRepository.getOne(Long.parseLong(clinicId));
+	        		childClinic.setParentClinic(null);
+	        		clinicRepository.save(childClinic);
+	        		clinic.getChildClinics().remove(childClinic);
+	        	}
+        	} else if(clinicDTO.getParentClinic() != null && id != clinicDTO.getParentClinic().get("id")) {
         		Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
        			parentClinic.setParent(true);
        			clinicRepository.save(parentClinic);
        			clinic.setParentClinic(parentClinic);
+        	} else {
+        		jsonObject.put("ERROR", "Clinic can't be parent of his own.");
+        		return jsonObject;
         	}
     		clinicRepository.save(clinic);
         	jsonObject.put("message", "Clinic updated successfully.");
             jsonObject.put("Clinic", clinic);
+            if(clinicDTO.getIsParent()) {
+            	jsonObject.put("ChildClinic", clinic.getChildClinics());
+            }
         } else {
 	      	jsonObject.put("ERROR", "Unable to update Clinic.");
         }
@@ -70,7 +102,7 @@ public class ClinicService {
     	JSONObject jsonObject = new JSONObject();
     	Clinic existingClinic = clinicRepository.findOne(id);
 		if(existingClinic != null) {
-			if(existingClinic.getHillromId() != null) {
+			if(existingClinic.getClinicAdminId() != null) {
 				jsonObject.put("ERROR", "Unable to delete Clinic. Clinic admin exists.");
 			} else if(existingClinic.getUsers().size() > 0) {
 				jsonObject.put("ERROR", "Unable to delete Clinic. Healthcare Professionals are associated with it.");
@@ -112,6 +144,8 @@ public class ClinicService {
 			clinic.setFaxNumber(clinicDTO.getFaxNumber());
 		if (clinicDTO.getHillromId() != null)
 			clinic.setHillromId(clinicDTO.getHillromId());
+		if (clinicDTO.getClinicAdminId() != null)
+			clinic.setClinicAdminId(clinicDTO.getClinicAdminId());
 	}
 
 }

@@ -10,6 +10,8 @@ import javax.inject.Inject;
 import net.minidev.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -486,7 +488,7 @@ public class UserService {
 		if(userExtensionDTO.getGender() != null)
 			patientInfo.setGender(userExtensionDTO.getGender());
 		if(userExtensionDTO.getDob() != null)
-			patientInfo.setDob(userExtensionDTO.getDob());
+			patientInfo.setDob(LocalDate.parse(userExtensionDTO.getDob(), DateTimeFormat.forPattern("MM/dd/yyyy")));
 		if(userExtensionDTO.getLangKey() != null)
 			patientInfo.setLangKey(userExtensionDTO.getLangKey());
 		if(userExtensionDTO.getEmail() != null)
@@ -534,7 +536,7 @@ public class UserService {
 		if(userExtensionDTO.getNpiNumber() != null)
 			newUser.setNpiNumber(userExtensionDTO.getNpiNumber());
 		if(userExtensionDTO.getDob() != null)
-			newUser.setDob(userExtensionDTO.getDob());
+			newUser.setDob(LocalDate.parse(userExtensionDTO.getDob(), DateTimeFormat.forPattern("MM/dd/yyyy")));
 		newUser.setLangKey(userExtensionDTO.getLangKey());
 		// new user is not active
 		newUser.setActivated(false);

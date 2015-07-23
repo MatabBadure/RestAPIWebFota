@@ -166,8 +166,8 @@ public class UserExtensionDTO extends UserDTO {
 		this.hillromId = hillromId;
 	}
 
-	public LocalDate getDob() {
-		return LocalDate.parse(dob, DateTimeFormat.forPattern("MM/dd/yyyy"));
+	public String getDob() {
+		return dob;
 	}
 
 	public void setDob(String dob) {

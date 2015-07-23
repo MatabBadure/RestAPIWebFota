@@ -11,16 +11,12 @@
                 <p >Error occured!. Please try again</p>
             </div>
 
+            <div class="alert alert-danger" ng-show="alreadyActive">
+                <p >User is already active and authenticated.</p>
+            </div>
+
             <div class="alert alert-danger" ng-show="questionsNotLoaded">
                 <p >Security questions failed to load! Please try again</p>
-            </div>
-
-            <div class="alert alert-danger" ng-show="questionVerificationFailed">
-                <p >Security question and answer didn't match!. Please try again</p>
-            </div>
-
-            <div class="alert alert-success" ng-show="success">
-                <p ><strong>Your password has been reset.</strong> Please <a href="#/login">Login</a>.</p>
             </div>
 
             <div class="alert alert-danger" ng-show="doNotMatch">

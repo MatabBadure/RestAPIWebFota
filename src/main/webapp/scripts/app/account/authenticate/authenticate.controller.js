@@ -8,6 +8,7 @@ angular.module('hillromvestApp')
         $scope.questionVerificationFailed = false;
         $scope.success = false;
         $scope.doNotMatch = false;
+        $scope.alreadyActive = false;
         $scope.authenticate = {};
         
         $scope.formSubmit = function(){
@@ -39,8 +40,10 @@ angular.module('hillromvestApp')
                     $state.go('home');
                 }).catch(function (response) {
                     $scope.success = false;
-                    if(response.status === 400){
-                    	$scope.error = 'ERROR';
+                    if(response.status == 400 && response.data.ERROR == "Invalid Activation Key"){
+                    	$scope.alreadyActive = true;
+                    }else{
+                    	$scope.otherError = true;
                     }
                 });
             }

@@ -116,16 +116,17 @@ var usersList = [
 
 var clinicsList = [
   {
-    "id": 64,
+    "id": 13,
     "name": "Hill Rom",
     "address": "Neev",
     "zipcode": 560042,
     "city": "Bangalore",
-    "state": "Karnataka",
     "phoneNumber": 9740353872,
     "faxNumber": 9942354883,
-    "hillromId": null,
-    "parentClinic": null,
+    "hillromId": 123,
+    "state": "AL",
+    "parent": true,
+
     "npiNumber": null,
     "users": [],
     "patients": [],

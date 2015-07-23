@@ -17,9 +17,10 @@ public interface ClinicRepository extends JpaRepository<Clinic,Long> {
 	
 	@Query("from Clinic clinic where  "
 			+ "LOWER(clinic.name) like LOWER(:queryString) or "
-			+ "LOWER(clinic.address) like LOWER(:queryString) or "
-			+ "clinic.city like LOWER(:queryString) "
-			+ "order by clinic.name,clinic.address,clinic.city   ")
+			+ "LOWER(clinic.hillromId) like LOWER(:queryString) or "
+			+ "LOWER(clinic.zipcode) like LOWER(:queryString) or "
+			+ "LOWER(clinic.state) like LOWER(:queryString) "
+			+ "order by clinic.name,clinic.state,clinic.zipcode   ")
 	Page<Clinic> findBy(@Param("queryString") String queryString,Pageable pageable); 
 
     Optional<Clinic> findOneByName(String name);

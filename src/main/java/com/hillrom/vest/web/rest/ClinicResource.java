@@ -133,16 +133,19 @@ public class ClinicResource {
     
     /**
      * GET  /clinics -> search clinis.
+     * @throws URISyntaxException 
      */
     @RequestMapping(value = "/clinics/search",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<Clinic>> search(@RequestParam(value = "searchString")String searchString) {
-        /*Page<Clinic> page = clinicRepository.findAll(PaginationUtil.generatePageRequest(offset, limit));
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/clinics", offset, limit);*/
-    	List<Clinic> clinics = clinicService.searchClinics(searchString);
-		return new ResponseEntity<>(clinics,HttpStatus.OK);
-        
+    public ResponseEntity<List<Clinic>> search(@RequestParam(value = "searchString")String searchString,
+    		@RequestParam(value = "page" , required = false) Integer offset,
+            @RequestParam(value = "per_page", required = false) Integer limit) throws URISyntaxException {
+    	 String queryString = new StringBuilder().append("%").append(searchString).append("%").toString();
+    	 Page<Clinic> page = clinicRepository.findBy(queryString,PaginationUtil.generatePageRequest(offset, limit));
+         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/clinics/search", offset, limit);
+         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
+    
 }

@@ -35,7 +35,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "CLINIC")
 @SQLDelete(sql="UPDATE CLINIC SET is_deleted = 1 WHERE id = ?")
-@NamedQuery(name="findBy",query="select clinic from Clinic clinic where  LOWER(clinic.name) like LOWER(:queryString) or LOWER(clinic.address) like LOWER(:queryString) or clinic.city like LOWER(:queryString)")
 public class Clinic implements Serializable {
 
     @Id

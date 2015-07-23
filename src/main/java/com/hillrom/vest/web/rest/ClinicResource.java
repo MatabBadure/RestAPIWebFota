@@ -130,4 +130,19 @@ public class ClinicResource {
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         }
     }
+    
+    /**
+     * GET  /clinics -> search clinis.
+     */
+    @RequestMapping(value = "/clinics/search",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<List<Clinic>> search(@RequestParam(value = "searchString")String searchString) {
+        /*Page<Clinic> page = clinicRepository.findAll(PaginationUtil.generatePageRequest(offset, limit));
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/clinics", offset, limit);*/
+    	List<Clinic> clinics = clinicService.searchClinics(searchString);
+		return new ResponseEntity<>(clinics,HttpStatus.OK);
+        
+    }
 }

@@ -1,14 +1,20 @@
 package com.hillrom.vest.service;
 
-import com.hillrom.vest.domain.Clinic;
-import com.hillrom.vest.repository.ClinicRepository;
-import com.hillrom.vest.web.rest.dto.ClinicDTO;
+import java.util.List;
+
+import javax.inject.Inject;
+
 import net.minidev.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import javax.inject.Inject;
+
+import com.hillrom.vest.domain.Clinic;
+import com.hillrom.vest.repository.ClinicRepository;
+import com.hillrom.vest.repository.SearchCriteria;
+import com.hillrom.vest.web.rest.dto.ClinicDTO;
 
 /**
  * Service class for managing users.
@@ -21,6 +27,9 @@ public class ClinicService {
 
     @Inject
     private ClinicRepository clinicRepository;
+    
+    @Inject
+    private SearchService<Clinic> clinicSearchService;
 
     public JSONObject createClinic(ClinicDTO clinicDTO) {
     	JSONObject jsonObject = new JSONObject();
@@ -112,6 +121,11 @@ public class ClinicService {
 			clinic.setFaxNumber(clinicDTO.getFaxNumber());
 		if (clinicDTO.getHillromId() != null)
 			clinic.setHillromId(clinicDTO.getHillromId());
+	}
+	
+	public List<Clinic> searchClinics(String queryString){
+		SearchCriteria<Clinic> criteria = new SearchCriteria<>(Clinic.class, queryString, 0, 10);
+		return clinicSearchService.findBy(criteria);
 	}
 
 }

@@ -1,7 +1,7 @@
   'use strict';
 
   angular.module('hillromvestApp')
-  .directive('patient', function (User) {
+  .directive('patient', function (UserService) {
     return {
       templateUrl: 'scripts/components/entities/patients/new/create.html',
       restrict: 'E',
@@ -18,7 +18,7 @@
         $scope.states = [];
         $scope.languages = [{"name":"English"},{"name":"French"}];
 
-        User.getState().then(function (response) {
+        UserService.getState().then(function (response) {
           $scope.states = response.data.states;
         }).catch(function (response) {
           console.log("getState call failed!");
@@ -29,7 +29,7 @@
           $scope.patient.age = getAge(selectedDate);
         }
         $scope.validateADMINorASP = function(){
-          if($scope.patientStatus.editMode && 
+          if($scope.patientStatus.editMode &&
             $scope.patientStatus.role != 'ADMIN' &&
             $scope.patientStatus.role != 'Account Services Professional'){
             return true;
@@ -61,7 +61,7 @@
                 };
                 data = JSON.stringify(data);
 
-                User.editUser($scope.patient.PID,data).then(function (response) {
+                UserService.editUser($scope.patient.PID,data).then(function (response) {
                   if(response.status == '200')
                   {
                     $scope.patientStatus.isMessage = true;
@@ -95,7 +95,7 @@
                   'role':'PATIENT'
                 };
                 data = JSON.stringify(data);
-                User.createUser(data).then(function (response) {
+                UserService.createUser(data).then(function (response) {
                   if(response.status == '201')
                   {
                     $scope.patientStatus.isMessage = true;
@@ -115,14 +115,14 @@
                 });
               };
             }
-            
+
             $scope.deletePatient = function(){
              $scope.patient.id="1"
-             User.createUser($scope.patient.id).then(function (response) {
-              $scope.isMessage = true;  
+             UserService.createUser($scope.patient.id).then(function (response) {
+              $scope.isMessage = true;
               $scope.patientStatus.message = response.data.message;
             }).catch(function (response) {
-              $scope.isMessage = true;  
+              $scope.isMessage = true;
               if(response.data.message != undefined){
                $scope.message = response.data.message;
              }else{

@@ -1,5 +1,4 @@
 'use strict';
-
 angular.module('hillromvestApp')
   .factory('ClinicService', function ($http,localStorageService) {
 	var token = localStorage.getItem('token');
@@ -15,8 +14,9 @@ angular.module('hillromvestApp')
           return response;
         });
       },
+
       deleteClinic : function(id){
-       
+
         return $http.delete('api/clinics/'+id, {
           headers: {
             'Content-Type' : 'application/json',
@@ -24,6 +24,13 @@ angular.module('hillromvestApp')
             'x-auth-token' : token
           }
         }).success(function (response) {
+          return response;
+        });
+      },
+
+      getClinics : function (searchString, pageNo, offset) {
+        return $http.get('api/clinics/search?searchString=' + searchString + '&pageNo=' + pageNo + '&ofset=' + offset)
+         .success(function (response) {
           return response;
         });
       }

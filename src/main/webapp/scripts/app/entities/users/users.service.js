@@ -44,6 +44,12 @@ angular.module('hillromvestApp')
          .success(function (response) {
           return response;
         });
+      },
+      getUsers : function(searchString, pageNo, offset){
+        return $http.get('api/users/search?searchString=' + searchString + '&pageNo=' + pageNo + '&ofset=' + offset)
+         .success(function (response) {
+          return response;
+        });
       }
     };
   });

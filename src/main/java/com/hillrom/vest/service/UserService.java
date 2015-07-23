@@ -533,6 +533,8 @@ public class UserService {
 			newUser.setFaxNumber(userExtensionDTO.getFaxNumber());
 		if(userExtensionDTO.getNpiNumber() != null)
 			newUser.setNpiNumber(userExtensionDTO.getNpiNumber());
+		if(userExtensionDTO.getDob() != null)
+			newUser.setDob(userExtensionDTO.getDob());
 		newUser.setLangKey(userExtensionDTO.getLangKey());
 		// new user is not active
 		newUser.setActivated(false);
@@ -731,12 +733,19 @@ public class UserService {
     	JSONObject jsonObject = new JSONObject();
     	UserExtension existingUser = userExtensionRepository.findOne(id);
 		if(existingUser.getId() != null) {
-			if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))
-					&& (existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.HCP))
-							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.PATIENT))
+			System.out.println("authorities :" +SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+			if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))) {
+				if(existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.PATIENT))) {
+					userExtensionRepository.delete(existingUser);
+					jsonObject.put("message", "Patient User deleted successfully.");
+					//TO-DO CareGiver deactivate Stuff
+				} else if((existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.HCP))
 							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.CLINIC_ADMIN)))) {
-				userExtensionRepository.delete(existingUser);
-				jsonObject.put("message", "User deleted successfully.");
+					userExtensionRepository.delete(existingUser);
+					jsonObject.put("message", "User deleted successfully.");
+				} else {
+					jsonObject.put("ERROR", "Unable to delete User.");
+				}
 			} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))
 					&& (existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.HILLROM_ADMIN))
 							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.ACCT_SERVICES))

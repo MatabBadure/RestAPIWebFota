@@ -2,7 +2,10 @@ package com.hillrom.vest.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -18,10 +21,12 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.Application;
-import com.hillrom.vest.domain.User;
+import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -36,7 +41,7 @@ public class HealthCareProfessionalUserServiceTest {
 	private static final String FIRST_NAME = "Peter";
 	private static final String MIDDLE_NAME = "John";
 	private static final String LAST_NAME = "Parker";
-	private static final String EMAIL = "rishabhjain+"+Math.random()*100+"@neevtech.com";
+	private static final String EMAIL = "rishabhjain+"+Math.abs(Math.random()*100)+"@neevtech.com";
 	private static final String SPECIALITY = "Orthpedician";
 	private static final String CREDENTIALS = "MD,MBBS";
 	private static final String ZIPCODE = "560009";
@@ -47,9 +52,20 @@ public class HealthCareProfessionalUserServiceTest {
 	private UserService userService;
 	
 	@Inject
+	private HCPClinicService hcpClinicService;
+	
+	@Inject
+	private ClinicService clinicService;
+	
+	@Inject
 	private UserRepository userRepository;
+	
+	@Inject
+	private ClinicRepository clinicRepository;
 
 	private UserExtensionDTO userExtensionDTO;
+	private ClinicDTO clinicDTO;
+	private Clinic clinic;
 	
 	@Before
     public void initTest() {
@@ -91,4 +107,32 @@ public class HealthCareProfessionalUserServiceTest {
         assertThat(updatedHCP.getEmail()).isNotNull();
         userRepository.delete(updatedHCP);
 	}
+	
+	@Test
+	public void dissociateClinicFromHCPUserSuccessfully(){
+		clinicDTO = new ClinicDTO("Fortis Hospital", "Bannerghatta Road", 560042, "Bangalore", "Karnataka", Long.parseLong("7896541230"), Long.parseLong("9874563210"), null, null);
+	    JSONObject clinicJsonObject = clinicService.createClinic(clinicDTO);
+		clinic = (Clinic)clinicJsonObject.get("Clinic");
+		
+		List<Map<String, String>> clinicList = new ArrayList<Map<String, String>>();
+		Map<String, String> clinicId = new HashMap<String, String>();
+		clinicId.put("id", clinic.getId().toString());
+		clinicList.add(clinicId);
+		userExtensionDTO.setClinicList(clinicList);
+		
+		JSONObject jsonObject = userService.createUser(userExtensionDTO, BASE_URL);
+		UserExtension newHCP = (UserExtension)jsonObject.get("user");
+
+		jsonObject = hcpClinicService.dissociateClinicFromHCP(newHCP.getId(), clinicList);
+		UserExtension dissociatedHCP = (UserExtension)jsonObject.get("HCPUser");
+		String message = (String) jsonObject.get("message");
+
+		assertThat(dissociatedHCP.isDeleted()).isFalse();
+        assertThat(dissociatedHCP.getId()).isNotNull();
+        assertThat(dissociatedHCP.getEmail()).isNotNull();
+        assertThat(message).isEqualTo("HCP is dissociated with Clinics successfully.");
+        userRepository.delete(dissociatedHCP);
+        clinicRepository.delete(clinic);
+	}
+	
 }

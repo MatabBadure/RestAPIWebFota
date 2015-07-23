@@ -219,4 +219,18 @@ public class AccountResource {
     		return ResponseEntity.badRequest().body(errorsJsonObject);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+    
+    /**
+     * POST  /update_emailpassword -> changes the current user's email,password
+     */
+    @RequestMapping(value = "/account/update_passwordsecurityquestion",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<JSONObject> updatePasswordSecurityQuestion(@RequestBody(required=true) Map<String,String> params) {
+    	JSONObject errorsJsonObject = userService.updatePasswordSecurityQuestion(params);
+    	if(null != errorsJsonObject.get("ERROR"))
+    		return ResponseEntity.badRequest().body(errorsJsonObject);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

@@ -24,9 +24,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import scala.collection.mutable.StringBuilder;
+
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.repository.UserExtensionRepository;
+import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
@@ -46,6 +49,9 @@ public class UserExtensionResource {
     
     @Inject
     private UserService userService;
+    
+    @Inject
+    private UserSearchRepository userSearchRepository;
 
     /**
      * POST  /user -> Create a new User.
@@ -132,5 +138,22 @@ public class UserExtensionResource {
         } else {
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         }
+    }
+    
+    /**
+     * GET  /user -> get all the userExtensions.
+     */
+    @RequestMapping(value = "/user/search",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> search(@RequestParam(value = "searchString" , required = true) String searchString,
+    		@RequestParam(value = "page" , required = false) Integer offset,@RequestParam(value = "per_page", required = false) Integer limit)
+        throws URISyntaxException {
+    	String queryString = new StringBuilder().append("\'%").append(searchString).append("%\'").toString();
+    	;
+        /*Page<UserExtension> page = userExtensionRepository.findBy(queryString,PaginationUtil.generatePageRequest(offset, limit));
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/userExtensions", offset, limit);*/
+        return ResponseEntity.ok(userSearchRepository.findHillRomUserBy(queryString, 0, 10));
     }
 }

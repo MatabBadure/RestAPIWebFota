@@ -11,23 +11,23 @@
     </div>
     <div class="collapse navbar-collapse navbar-secondary" id="navbar-collapse" ng-switch="isAuthenticated()">
       <ul class="nav navbar-nav navbar-right">
-        <li>
-          <a class="active" ui-sref="home">
+        <li >
+          <a ng-class="{ active: isActive('patient')}" ng-href="#/patient">
             <span class="icon-patient"></span>
           </a>
         </li>
         <li>
-          <a ui-sref="home">
+          <a ng-class="{ active: isActive('doctor')}" ng-href="#/doctor">
             <span class="icon-doctor"></span>
           </a>
         </li>
         <li>
-          <a ui-sref="home">
+          <a ng-class="{ active: isActive('clinic')}" ng-href="#/clinic">
             <span class="icon-clinic"></span>
           </a>
         </li>
         <li>
-          <a ui-sref="home">
+          <a ng-class="{ active: isActive('user')}" ng-href="#/user">
             <span class="icon-user"></span>
           </a>
         </li>

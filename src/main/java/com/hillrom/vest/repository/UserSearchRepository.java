@@ -23,10 +23,10 @@ public class UserSearchRepository {
 		int firstResult = pageable.getPageNumber()*pageable.getOffset();
 		int maxResult = firstResult+pageable.getPageSize();
 		
-		String countSqlQuery = "select count(hillromUsers.id) from (select user.id,user.first_name,user.last_name,user.email,authority.name from  USER_EXTENSION userExt join USER user "
-				+ " join  USER_AUTHORITY user_authority join  AUTHORITY authority "
+		String countSqlQuery = "select count(hillromUsers.id) from (select distinct(user.id) from  USER_EXTENSION userExt join USER user "
+				+ " join  USER_AUTHORITY user_authority "
 				+ " where user.id = userExt.user_id and user_authority.user_id = user.id "
-				+ " and user_authority.authority_name = authority.name "
+				+ " and user_authority.authority_name in ('ADMIN','ACCT_SERVICES','ASSOCIATES','HILLROM_ADMIN','CLINIC_ADMIN') "
 				+ " and (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or "
 				+ " lower(user.email) like lower(:queryString)) order by user.first_name,user.last_name,user.email ) hillromUsers";

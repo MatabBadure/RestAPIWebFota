@@ -7,15 +7,18 @@ public class HillRomUserVO {
 	private String lastName;
 	private String email;
 	private String role;
+	private boolean isDeleted;
+	
 	
 	public HillRomUserVO(Long id, String firstName, String lastName,
-			String email, String role) {
+			String email, String role,boolean isDeleted) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
 		this.role = role;
+		this.isDeleted = isDeleted;
 	}
 	public Long getId() {
 		return id;
@@ -47,7 +50,12 @@ public class HillRomUserVO {
 	public void setRole(String role) {
 		this.role = role;
 	}
-	
+	public boolean isDeleted() {
+		return isDeleted;
+	}
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
 	
 	
 }

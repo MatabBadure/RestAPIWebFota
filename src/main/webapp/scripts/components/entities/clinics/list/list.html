@@ -16,7 +16,7 @@
 		<div ng-repeat="clinic in clinics | filter:searchItem">
 			<div ng-click="selectClinic(clinic)" class="dashboard-page__user-list__detailed__list--details" >
 				<span class="user-detail">
-					{{clinic.clinicName}}
+					{{clinic.name}}
 				</span>
 				<span class="user-role">
 					{{clinic.city}}
@@ -28,3 +28,5 @@
 		<span>More</span><span>&gt;&gt;</span>
 	</div>
 </div>
+
+<button ng-click="createClinic()">Create Clinic</button>

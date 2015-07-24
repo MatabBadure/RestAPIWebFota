@@ -1,21 +1,23 @@
-'use strict';
+    'use strict';
 
-angular.module('hillromvestApp')
+    angular.module('hillromvestApp')
     .controller('ClinicsController', function ($rootScope, $scope, $state, $timeout, Auth) {
-    $scope.clinic = {};
-    $scope.clinicStatus =
-    {
-        'isCreate':true,
-        'isMessage':false
-    }
-    $scope.selectedClinic = function(clinic) {
+        $scope.clinic = {};
         $scope.clinicStatus =
-    {
-        'isCreate':false,
-        'isMessage':false
-    }
-        $scope.clinic = clinic;
-    };
+        {
+            'role':localStorage.getItem('role'),
+            'editMode':false,
+            'isCreate':false,
+            'isMessage':false
+        }
+        $scope.selectedClinic = function(clinic) {
+            $scope.clinicStatus.editMode = true;
+            $scope.clinicStatus.isCreate = false;
+            $scope.clinic = clinic;
+        };
+        $scope.createClinic = function(){
+            $scope.clinicStatus.isCreate = true;
+        }
 
     });
 

@@ -2,6 +2,7 @@ package com.hillrom.vest.web.rest;
 
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.security.RolesAllowed;
@@ -26,8 +27,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.repository.HillRomUserVO;
 import com.hillrom.vest.repository.UserExtensionRepository;
+import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.service.HCPClinicService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
@@ -47,6 +51,11 @@ public class UserExtensionResource {
     @Inject
     private UserService userService;
 
+    @Inject
+    private HCPClinicService hcpClinicService;
+    
+    @Inject
+    private UserSearchRepository userSearchRepository;
     /**
      * POST  /user -> Create a new User.
      */
@@ -67,7 +76,7 @@ public class UserExtensionResource {
     }
 
     /**
-     * PUT  /user/:id -> Updates an existing user (patient).
+     * PUT  /user/:id -> Updates an existing user.
      */
     @RequestMapping(value = "/user/{id}",
         method = RequestMethod.PUT,
@@ -86,7 +95,7 @@ public class UserExtensionResource {
     }
 
     /**
-     * GET  /user -> get all the userExtensions.
+     * GET  /user -> get all the users.
      */
     @RequestMapping(value = "/user",
             method = RequestMethod.GET,
@@ -101,7 +110,7 @@ public class UserExtensionResource {
     }
 
     /**
-     * GET  /user/:id -> get the "id" userExtension.
+     * GET  /user/:id -> get the "id" user.
      */
     @RequestMapping(value = "/user/{id}",
             method = RequestMethod.GET,
@@ -117,21 +126,56 @@ public class UserExtensionResource {
     }
 
     /**
-     * DELETE  /user/:id -> delete the "id" userExtension.
+     * DELETE  /user/:id -> delete the "id" user.
      */
     @RequestMapping(value = "/user/{id}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> delete(@PathVariable Long id) {
         log.debug("REST request to delete UserExtension : {}", id);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("message", "No such user exists.");
-        return Optional.ofNullable(userExtensionRepository.findOne(id))
-                .map(user -> {
-                	userExtensionRepository.delete(user);
-                    jsonObject.put("message", "User deleted successfully.");
-                    return ResponseEntity.ok().body(jsonObject);
-                }).orElse(new ResponseEntity<JSONObject>(jsonObject, HttpStatus.NOT_FOUND));
+        JSONObject jsonObject = userService.deleteUser(id);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * DELETE  /user/:id/dissociateclinic -> dissociate clinic from the "id" user.
+     */
+    @RequestMapping(value = "/user/{id}/dissociateclinic",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> dissociateClinicFromHCP(@PathVariable Long id, @RequestBody List<Map<String, String>> clinicList) {
+        log.debug("REST request to dissociate clinic from HCP : {}", id);
+        JSONObject jsonObject = hcpClinicService.dissociateClinicFromHCP(id, clinicList);
+        if (jsonObject.containsKey("message")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    /**
+     * GET  /user/search -> get all HillromTeamUser.
+     */
+    @RequestMapping(value = "/user/search",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<List<HillRomUserVO>> search(@RequestParam(required=true,value = "searchString")String searchString,
+    		@RequestParam(value = "page" , required = false) Integer offset,
+            @RequestParam(value = "per_page", required = false) Integer limit)
+        throws URISyntaxException {
+    	String queryString = new StringBuilder("%").append(searchString).append("%").toString();
+    	Page<HillRomUserVO> page = userSearchRepository.findHillRomTeamUsersBy(queryString,PaginationUtil.generatePageRequest(offset, limit));
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/userExtensions", offset, limit);
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+        
     }
 }

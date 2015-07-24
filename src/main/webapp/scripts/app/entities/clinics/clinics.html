@@ -1,13 +1,8 @@
-<div class="col-md-16 dashboard-page">
-	<div class="col-md-4 dashboard-page__admin-nav">
-		<nav-bar></nav-bar>
+	<div ng-show="clinicStatus.editMode || clinicStatus.isCreate">
+		<clinic clinic-data="clinic" clinic-status="clinicStatus" ></clinic>
 	</div>
 
-	<div class="col-md-6 dashboard-page__form margin-top-15">
-		<clinic clinic-data="clinic" clinic-status="clinicStatus"></clinic>
+
+	<div ng-show="!clinicStatus.editMode && !clinicStatus.isCreate">
+		<clinic-list on-select="selectedClinic(clinic)" on-create="createClinic()"></clinic-list>
 	</div>
-	
-	<div class="col-md-6 dashboard-page__user-list">
-		<clinic-list on-select="selectedClinic(clinic)"></clinic-list>
-	</div>
-</div>

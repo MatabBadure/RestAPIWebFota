@@ -35,7 +35,6 @@ angular.module('hillromvestApp')
       *
       */
       deleteUser : function (id) {
-        id = 16;
         return $http.delete('api/user/' + id, {
           headers: {
             'Content-Type' : 'application/json',

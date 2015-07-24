@@ -1,11 +1,12 @@
 var usersList = [
   {
+    'id': 12,
     'title' : 'Mr.',
     'firstName' : 'John',
-    'lastName' : 'Smith',
+    'lastName' : 'Ceena',
     'middleName' : 'MiddleName',
-    'email' : 'email',
-    'role' : {'key' : 'SUPER_ADMIN', 'value' : 'Super Admin'}
+    'email' : 'syedmohammed+222@neevtech.com',
+    'role' : 'ADMIN'
   }, {
     'title' : 'Mr.',
     'firstName' : 'James',

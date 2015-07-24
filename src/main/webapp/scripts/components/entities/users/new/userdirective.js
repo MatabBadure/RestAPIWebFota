@@ -44,6 +44,7 @@ angular.module('hillromvestApp')
             UserService.editUser($scope.user).then(function (response) {
               $scope.isMessage = true;
               $scope.message = response.data.message;
+              $scope.user = " ";
             }).catch(function (response) {
               $scope.isMessage = true;
               if (response.data.message !== undefined) {
@@ -57,6 +58,7 @@ angular.module('hillromvestApp')
             UserService.createUser(data).then(function (response) {
               $scope.isMessage = true;
               $scope.message = 'User created successfully' + ' with ID ' + response.data.user.id;
+              $scope.user = " ";
             }).catch(function (response) {
               $scope.isMessage = true;
               if (response.data.message !== undefined) {

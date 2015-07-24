@@ -64,7 +64,7 @@
   </div>
   <div class="col-md-10">
     <input type="text" class="form-control"  name="middleName" ng-model="doctor.middleName" ng-pattern="/^[a-zA-Z]+$/">
-    <div ng-show="(form.middleName.$dirty && form.middleName.$invalid)" class="form-error"> 
+    <div ng-show="(form.middleName.$dirty && form.middleName.$invalid)" class="form-error">
       <span class="help-block" ng-show="form.middleName.$error.pattern" >
         Middle Name cannot have number.
       </span>
@@ -226,7 +226,7 @@
   <div class="col-md-6"></div>
   <div class="col-md-10" ng-show="!doctorStatus.isCreate">
     <button type="button" class="dashboard-page__form--new_form-submit--button" ng-click="deleteDoctor()">Disassociate</button>
-    <button type="button" ng-disabled="true" class="dashboard-page__form--new_form-submit--button">Edit</button>
+    <button type="button" ng-disabled="true" class="dashboard-page__form--new_form-submit--button" ng-click="editDoctor()">Edit</button>
   </div>
 </div>
 </form>

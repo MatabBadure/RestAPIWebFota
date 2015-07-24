@@ -63,6 +63,9 @@ public class Clinic implements Serializable {
 
     @Column(name = "hillrom_id")
     private String hillromId;
+    
+    @Column(name = "clinic_admin_id")
+    private Long clinicAdminId;
 
     @ManyToOne
     @JoinColumn(name="parent_clinic_id")
@@ -160,7 +163,15 @@ public class Clinic implements Serializable {
         this.hillromId = hillromId;
     }
 
-    public Clinic getParentClinic() {
+    public Long getClinicAdminId() {
+		return clinicAdminId;
+	}
+
+	public void setClinicAdminId(Long clinicAdminId) {
+		this.clinicAdminId = clinicAdminId;
+	}
+
+	public Clinic getParentClinic() {
 		return parentClinic;
 	}
 

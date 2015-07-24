@@ -1,23 +1,23 @@
 package com.hillrom.vest.service;
 
-
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
 import javax.inject.Inject;
-
 import net.minidev.json.JSONObject;
-
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +40,6 @@ import com.hillrom.vest.security.OnCredentialsChangeEvent;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.service.util.RequestUtil;
-import com.hillrom.vest.web.rest.dto.HillromTeamUserDTO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 
@@ -95,7 +94,6 @@ public class UserService {
             .map(user -> {
                 // activate given user for the registration key.
                 user.setActivated(true);
-                user.setActivationKey(null);
                 userRepository.save(user);
                 log.debug("Activated user: {}", user);
                 return user;
@@ -269,20 +267,13 @@ public class UserService {
         }
     }
     
-    public User createUser(HillromTeamUserDTO hillromTeamUser) {
-		User newUser = new User();
-		newUser.setFirstName(hillromTeamUser.getFirstName());
-		newUser.setLastName(hillromTeamUser.getLastName());
-		newUser.setEmail(hillromTeamUser.getEmail());
-		newUser.setLangKey(null);
-		// new user is not active
-		newUser.setActivated(false);
-		// new user gets registration key
-		newUser.setActivationKey(RandomUtil.generateActivationKey());
-		newUser.getAuthorities().add(authorityRepository.findOne(hillromTeamUser.getRole()));
-		userRepository.save(newUser);
-		log.debug("Created Information for User: {}", newUser);
-		return newUser;
+    private List<String> rolesAdminCanModerate() {
+		List<String> rolesAdminCanModerate = new ArrayList<String>();
+    	rolesAdminCanModerate.add(AuthoritiesConstants.ACCT_SERVICES);
+    	rolesAdminCanModerate.add(AuthoritiesConstants.CLINIC_ADMIN);
+    	rolesAdminCanModerate.add(AuthoritiesConstants.ASSOCIATES);
+    	rolesAdminCanModerate.add(AuthoritiesConstants.HILLROM_ADMIN);
+		return rolesAdminCanModerate;
 	}
     
     public JSONObject createUser(UserExtensionDTO userExtensionDTO, String baseUrl){
@@ -294,10 +285,25 @@ public class UserService {
     			return jsonObject;
     		});
     	}
-    	if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
+    	List<String> rolesAdminCanModerate = rolesAdminCanModerate();
+    	if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())
+    			&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
+    		UserExtension user = createHillromTeamUser(userExtensionDTO);
+    		if(user.getId() != null) {
+    			if(userExtensionDTO.getEmail() != null) {
+    				mailService.sendActivationEmail(user, baseUrl);
+    			}
+                jsonObject.put("message", "Hillrom User created successfully.");
+                jsonObject.put("user", user);
+                return jsonObject;
+    		} else {
+    			jsonObject.put("ERROR", "Unable to create Hillrom User.");
+                return jsonObject;
+    		}
+    	} else if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
         	return patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId())
         			.map(user -> {
-        				jsonObject.put("error", "HR Id already in use.");
+        				jsonObject.put("ERROR", "HR Id already in use.");
             			return jsonObject;
             		})
                     .orElseGet(() -> {
@@ -310,7 +316,7 @@ public class UserService {
 	                        jsonObject.put("user", user);
 	                        return jsonObject;
                 		} else {
-                			jsonObject.put("error", "Unable to create Patient.");
+                			jsonObject.put("ERROR", "Unable to create Patient.");
 	                        return jsonObject;
                 		}
                     });
@@ -323,14 +329,23 @@ public class UserService {
                 jsonObject.put("clinics", user.getClinics());
                 return jsonObject;
         	} else {
-    			jsonObject.put("error", "Unable to create HealthCare Professional.");
+    			jsonObject.put("ERROR", "Unable to create HealthCare Professional.");
                 return jsonObject;
     		}
         } else {
-    		jsonObject.put("error", "Incorrect data.");
+    		jsonObject.put("ERROR", "Incorrect data.");
     		return jsonObject;
     	}
     }
+
+    public UserExtension createHillromTeamUser(UserExtensionDTO userExtensionDTO) {
+    	UserExtension newUser = new UserExtension();
+		assignValuesToUserObj(userExtensionDTO, newUser);
+		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
+		userExtensionRepository.save(newUser);
+		log.debug("Created Information for User: {}", newUser);
+		return newUser;
+	}
     
     public UserExtension createPatientUser(UserExtensionDTO userExtensionDTO) {
     	UserExtension newUser = new UserExtension();
@@ -360,21 +375,14 @@ public class UserService {
     
     public UserExtension createHCPUser(UserExtensionDTO userExtensionDTO) {
     	UserExtension newUser = new UserExtension();
-    	userRepository.findOneByEmail(userExtensionDTO.getEmail())
-    	.map(user -> {
-    		return newUser;
-    	})
-    	.orElseGet(() -> {
-    		assignValuesToUserObj(userExtensionDTO, newUser);
-			for(Map<String, String> clinicObj : userExtensionDTO.getClinicList()){
-				Clinic clinic = clinicRepository.getOne(Long.parseLong(clinicObj.get("id")));
-				newUser.getClinics().add(clinic);
-			}
-			newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
-			userExtensionRepository.save(newUser);
-			log.debug("Created Information for User: {}", newUser);
-			return newUser;
-    	});
+		assignValuesToUserObj(userExtensionDTO, newUser);
+		for(Map<String, String> clinicObj : userExtensionDTO.getClinicList()){
+			Clinic clinic = clinicRepository.getOne(Long.parseLong(clinicObj.get("id")));
+			newUser.getClinics().add(clinic);
+		}
+		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
+		userExtensionRepository.save(newUser);
+		log.debug("Created Information for User: {}", newUser);
 		return newUser;
 	}
     
@@ -383,11 +391,26 @@ public class UserService {
         if(userExtensionDTO.getEmail() != null) {
     		Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
 			if(existingUser.isPresent() && existingUser.get().getId() != id) {
-				jsonObject.put("error", "e-mail address already in use");
+				jsonObject.put("ERROR", "e-mail address already in use");
 				return jsonObject;
 			}
     	}
-		if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
+        List<String> rolesAdminCanModerate = rolesAdminCanModerate();
+        if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())
+        		&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
+        	UserExtension user = updateHillromTeamUser(id, userExtensionDTO);
+    		if(user.getId() != null) {
+    			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
+    				mailService.sendActivationEmail(user, baseUrl);
+    			}
+                jsonObject.put("message", "Hillrom User updated successfully.");
+                jsonObject.put("user", user);
+                return jsonObject;
+    		} else {
+    			jsonObject.put("ERROR", "Unable to update Hillrom User.");
+                return jsonObject;
+    		}
+    	} else if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updatePatientUser(id, userExtensionDTO);
     		if(user.getId() != null) {
     			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
@@ -398,7 +421,7 @@ public class UserService {
                 jsonObject.put("user", user);
                 return jsonObject;
     		} else {
-    			jsonObject.put("error", "Unable to update Patient.");
+    			jsonObject.put("ERROR", "Unable to update Patient.");
                 return jsonObject;
     		}
         } else if (AuthoritiesConstants.HCP.equals(userExtensionDTO.getRole())) {
@@ -411,14 +434,23 @@ public class UserService {
                 jsonObject.put("user", user);
                 return jsonObject;
     		} else {
-    			jsonObject.put("error", "Unable to update HealthCare Professional.");
+    			jsonObject.put("ERROR", "Unable to update HealthCare Professional.");
                 return jsonObject;
     		}
         } else {
-    		jsonObject.put("error", "Incorrect data.");
+    		jsonObject.put("ERROR", "Incorrect data.");
     		return jsonObject;
     	}
     }
+    
+    public UserExtension updateHillromTeamUser(Long id, UserExtensionDTO userExtensionDTO) {
+    	UserExtension user = userExtensionRepository.findOne(id);
+		assignValuesToUserObj(userExtensionDTO, user);
+		user.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
+		userExtensionRepository.save(user);
+		log.debug("Updated Information for Hillrom User: {}", user);
+		return user;
+	}
     
     public UserExtension updatePatientUser(Long id, UserExtensionDTO userExtensionDTO) {
     	UserExtension user = userExtensionRepository.findOne(id);
@@ -455,7 +487,7 @@ public class UserService {
 		if(userExtensionDTO.getGender() != null)
 			patientInfo.setGender(userExtensionDTO.getGender());
 		if(userExtensionDTO.getDob() != null)
-			patientInfo.setDob(userExtensionDTO.getDob());
+			patientInfo.setDob(LocalDate.parse(userExtensionDTO.getDob(), DateTimeFormat.forPattern("MM/dd/yyyy")));
 		if(userExtensionDTO.getLangKey() != null)
 			patientInfo.setLangKey(userExtensionDTO.getLangKey());
 		if(userExtensionDTO.getEmail() != null)
@@ -502,6 +534,8 @@ public class UserService {
 			newUser.setFaxNumber(userExtensionDTO.getFaxNumber());
 		if(userExtensionDTO.getNpiNumber() != null)
 			newUser.setNpiNumber(userExtensionDTO.getNpiNumber());
+		if(userExtensionDTO.getDob() != null)
+			newUser.setDob(LocalDate.parse(userExtensionDTO.getDob(), DateTimeFormat.forPattern("MM/dd/yyyy")));
 		newUser.setLangKey(userExtensionDTO.getLangKey());
 		// new user is not active
 		newUser.setActivated(false);
@@ -588,7 +622,6 @@ public class UserService {
     	String password = params.get("password");
     	String questionId = params.get("questionId");
     	String answer = params.get("answer");
-    	String authToken = params.get("x-auth-token");
     	String termsAndConditionsAccepted = params.get("termsAndConditionsAccepted");
     	
     	JSONObject errorsJsonObject = validateRequest(password, questionId,
@@ -624,7 +657,6 @@ public class UserService {
         	
         	log.debug("updateEmailOrPassword for User: {}", currentUser);
         	
-        	authTokenService.deleteToken(authToken); // Token must be deleted to avoid subsequent request
         }else{
         	errorsJsonObject.put("ERROR", "Invalid Security Question or Answer");
         	return errorsJsonObject;
@@ -696,5 +728,79 @@ public class UserService {
 		return jsonObject;
 	}
 	
+	public JSONObject deleteUser(Long id) {
+    	JSONObject jsonObject = new JSONObject();
+    	UserExtension existingUser = userExtensionRepository.findOne(id);
+		if(existingUser.getId() != null) {
+			System.out.println("authorities :" +SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+			if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))) {
+				if(existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.PATIENT))) {
+					userExtensionRepository.delete(existingUser);
+					jsonObject.put("message", "Patient User deleted successfully.");
+					//TO-DO CareGiver deactivate Stuff
+				} else if((existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.HCP))
+							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.CLINIC_ADMIN)))) {
+					userExtensionRepository.delete(existingUser);
+					jsonObject.put("message", "User deleted successfully.");
+				} else {
+					jsonObject.put("ERROR", "Unable to delete User.");
+				}
+			} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))
+					&& (existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.HILLROM_ADMIN))
+							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.ACCT_SERVICES))
+							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.ASSOCIATES))
+							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.CLINIC_ADMIN)))) {
+				userExtensionRepository.delete(existingUser);
+				jsonObject.put("message", "User deleted successfully.");
+			} else {
+				jsonObject.put("ERROR", "Unable to delete User.");
+			}
+		} else {
+			jsonObject.put("ERROR", "Unable to delete User.");
+		}
+		return jsonObject;
+    }
+
+	public JSONObject updatePasswordSecurityQuestion(Map<String,String> params){
+		String requiredParams[] = {"key","password","questionId","answer","termsAndConditionsAccepted"};
+		JSONObject errorsJson = RequestUtil.checkRequiredParams(params, requiredParams);
+		if(errorsJson.containsKey("ERROR")){
+			return errorsJson;
+		}
+		
+		String password = params.get("password");
+		if(!checkPasswordLength(password)){
+			errorsJson.put("ERROR", "Incorrect Password");
+			return errorsJson;
+		}
+		
+		String key = params.get("key");
+		Optional<User> existingUser = userRepository.findOneByActivationKey(key);
+		User currentUser = null;
+		if(existingUser.isPresent()){
+			currentUser = existingUser.get();
+		}else{
+			errorsJson.put("ERROR", "Invalid Activation Key");
+			return errorsJson;
+		}
+		
+		Long qid = Long.parseLong(params.get("questionId"));
+		String answer = params.get("answer");
+		Optional<UserSecurityQuestion> opUserSecQ = userSecurityQuestionService.saveOrUpdate(currentUser.getId(), qid, answer);		
+		
+		if(opUserSecQ.isPresent()){
+			currentUser.setActivationKey(null);
+			currentUser.setLastLoggedInAt(DateTime.now());
+			currentUser.setLastModifiedDate(DateTime.now());
+			currentUser.setPassword(passwordEncoder.encode(params.get("password")));
+			currentUser.setTermsConditionAccepted(true);
+			currentUser.setTermsConditionAcceptedDate(DateTime.now());
+			userRepository.save(currentUser);
+		}else{
+			errorsJson.put("ERROR","Invalid Security Question or Answer");
+			return errorsJson;
+		}
+		return new JSONObject();
+	}
 }
 

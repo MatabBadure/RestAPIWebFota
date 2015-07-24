@@ -28,7 +28,10 @@
           </div> 
            <div class="text-center indent-bottom-5" ng-show="form.username.$invalid || form.password.$invalid" >Please enter username and password</div>   
 
-            
+           <div class="text-center indent-bottom-5" ng-show="firstTimeAccessFailed" >Authentication failed!</div> 
+
+           <div class="text-center indent-bottom-5" ng-show="otherError">Error occured!</div> 
+  
           <form class="form" role="form" name="form" novalidate>
             <div class="form-group">
               <!-- <label for="username" translate="global.form.username">Login</label> -->

@@ -276,11 +276,11 @@ public class UserService {
     public JSONObject createUser(UserExtensionDTO userExtensionDTO, String baseUrl){
     	JSONObject jsonObject = new JSONObject();
     	if(userExtensionDTO.getEmail() != null) {
-        	userRepository.findOneByEmail(userExtensionDTO.getEmail())
-			.map(user -> {
+			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
+			if (existingUser.isPresent()) {
 				jsonObject.put("ERROR", "e-mail address already in use");
     			return jsonObject;
-    		});
+    		}
     	}
     	List<String> rolesAdminCanModerate = rolesAdminCanModerate();
     	if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())

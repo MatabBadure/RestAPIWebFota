@@ -40,7 +40,7 @@ $header--background: $pickled-bluewood;
 		}
 	}
 }
-.navbar-secondary .navbar-right li:last-child a{
+.navbar-secondary .navbar-right li:last-child a {
 	color: inherit;
 	padding: 19px 0;
 	&:hover {
@@ -52,7 +52,7 @@ $header--background: $pickled-bluewood;
 	}
 }
 
-.navbar-secondary .navbar-right li a.active{
+.navbar-secondary .navbar-right li a.active {
 	background-color: inherit;
 	color: inherit;
 	box-shadow : 0 -3px 0 0 #ef7164 inset;
@@ -60,5 +60,42 @@ $header--background: $pickled-bluewood;
 	padding-bottom: 20px;
 	span{
 		color: white;
+	}
+}
+
+.header-popover {
+	.popover.bottom {
+	  margin-top: -1px;
+	}
+
+	.popover.bottom > .arrow {
+		left: 89%;
+	}
+
+	.popover {
+		left: -32px !important;
+		border-radius: 0;
+	}
+
+	.popover-content {
+		display: table;
+		padding: 10px 14px;
+		div{
+			display: table-cell;
+			text-align: center;
+			border-right: 1px solid $bombay;
+			cursor: pointer;
+			&:nth-last-child(1) {
+				border-right:none;
+			}
+			
+			.hillrom-icon{
+				padding-bottom: 10px;
+			}
+			span {
+				display: block;
+				padding: 0 10px;
+			}
+		}
 	}
 }

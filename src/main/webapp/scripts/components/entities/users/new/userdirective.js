@@ -11,44 +11,69 @@ angular.module('hillromvestApp')
     return {
       templateUrl: 'scripts/components/entities/users/new/create.html',
       restrict: 'E',
-      link: function postLink(scope, element, attrs) {
-      },
       scope: {
         user: '=userData',
-        isCreate: '=isCreate'
+        isCreate: '=isCreate',
+        userStatus: '=userStatus'
       },
       controller: function ($scope) {
 
+        $scope.submitted = false;
+        $scope.formSubmit = function () {
+          $scope.submitted = true;
+        };
+
+        $scope.validateSuperAdmin = function () {
+          //role will be replaced by super admin
+          if ($scope.userStatus.editMode && $scope.userStatus.role !== 'ADMIN') {
+            return true;
+          }
+        };
+
         /**
-        * @ngdoc function
-        * @name createUser
-        * @description
-        * Function to create a user
-        */
+         * @ngdoc function
+         * @name createUser
+         * @description
+         * Function to create a user
+         */
         $scope.createUser = function () {
           if ($scope.form.$invalid) {
             return false;
           }
-          var data = $scope.user;
-          UserService.createUser(data).then(function (response) {
-            $scope.isMessage = true;
-            $scope.message = 'User created successfully' + ' with ID ' + response.data.user.id;
-          }).catch(function (response) {
-            $scope.isMessage = true;
-            if (response.data.message !== undefined) {
+          if ($scope.userStatus.editMode) {
+            UserService.editUser($scope.user).then(function (response) {
+              $scope.isMessage = true;
               $scope.message = response.data.message;
-            } else {
-              $scope.message = 'Error occured! Please try again';
-            }
-          });
+            }).catch(function (response) {
+              $scope.isMessage = true;
+              if (response.data.message !== undefined) {
+                $scope.message = response.data.message;
+              } else {
+                $scope.message = 'Error occured! Please try again';
+              }
+            });
+          } else {
+            var data = $scope.user;
+            UserService.createUser(data).then(function (response) {
+              $scope.isMessage = true;
+              $scope.message = 'User created successfully' + ' with ID ' + response.data.user.id;
+            }).catch(function (response) {
+              $scope.isMessage = true;
+              if (response.data.message !== undefined) {
+                $scope.message = response.data.message;
+              } else {
+                $scope.message = 'Error occured! Please try again';
+              }
+            });
+          }
         };
 
         /**
-        * @ngdoc function
-        * @name deleteUser
-        * @description
-        * Function to delete a User
-        */
+         * @ngdoc function
+         * @name deleteUser
+         * @description
+         * Function to delete a User
+         */
         $scope.deleteUser = function () {
           UserService.deleteUser($scope.user.id).then(function (response) {
             $scope.isMessage = true;
@@ -64,11 +89,11 @@ angular.module('hillromvestApp')
         };
 
         /**
-        * @ngdoc function
-        * @name editUser
-        * @description
-        * Function to Edit User
-        */
+         * @ngdoc function
+         * @name editUser
+         * @description
+         * Function to Edit User
+         */
         $scope.editUser = function () {
           UserService.editUser($scope.user).then(function (response) {
             $scope.isMessage = true;

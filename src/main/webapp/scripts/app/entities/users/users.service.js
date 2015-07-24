@@ -54,13 +54,20 @@ angular.module('hillromvestApp')
       *
       */
       editUser : function (data) {
-        return $http.delete('api/user/' + data.id, data, {
+        return $http.put('api/user/' + data.id, data, {
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
             'x-auth-token' : token
           }
         }).success(function (response) {
+          return response;
+        });
+      },
+
+      getState : function(){
+         return $http.get('scripts/components/entities/patients/new/state.json')
+         .success(function (response) {
           return response;
         });
       }

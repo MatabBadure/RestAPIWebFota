@@ -1,6 +1,6 @@
-'use strict';
+  'use strict';
 
-angular.module('hillromvestApp')
+  angular.module('hillromvestApp')
   .directive('doctor', function (Doctor) {
     return {
       templateUrl: 'scripts/components/entities/doctors/new/create.html',
@@ -48,3 +48,4 @@ angular.module('hillromvestApp')
       }
     };
   });
+

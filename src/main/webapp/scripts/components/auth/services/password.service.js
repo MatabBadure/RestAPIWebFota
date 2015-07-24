@@ -1,10 +1,30 @@
 'use strict';
 
 angular.module('hillromvestApp')
-    .factory('Password', function ($resource) {
-        return $resource('api/account/change_password', {}, {
-        });
+    .factory('Password', function ($http,localStorageService) {
+        /*return $resource('api/account/change_password', {}, {
+            headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'x-auth-token': localStorage.getItem('token')
+                    }
+        });*/
+    return {
+            changePassword: function(data) {
+                
+                return $http.post('api/account/change_password', data, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        'x-auth-token': localStorage.getItem('token')
+                    }
+                }).success(function (data, status, headers, config) {
+                    return {'response': data, 'status': status, 'headers' : headers, 'config' : config};
+                });
+            },
+        }
     });
+
 
 angular.module('hillromvestApp')
     .factory('PasswordResetInit', function ($resource) {

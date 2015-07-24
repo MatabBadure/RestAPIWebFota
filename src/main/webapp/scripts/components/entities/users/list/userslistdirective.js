@@ -12,7 +12,8 @@ angular.module('hillromvestApp')
       templateUrl: 'scripts/components/entities/users/list/list.html',
       restrict: 'E',
       scope: {
-        onSelect: '&'
+        onSelect: '&',
+        onCreate: '&'
       },
       link: function (scope) {
         var user = scope.user;
@@ -42,6 +43,10 @@ angular.module('hillromvestApp')
         $scope.sortList = function () {
           console.log('Todo Sort Functionality...!');
         };
+
+         $scope.createUser = function(){
+          $scope.onCreate();
+        },
 
         /**
         * @ngdoc function

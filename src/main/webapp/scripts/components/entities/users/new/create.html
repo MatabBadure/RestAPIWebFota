@@ -1,128 +1,172 @@
-<span ng-show="isMessage">{{message}}</span>
-<form name="form" class="dashboard-page__form--new" ng-submit="createUser()" novalidate>
-  <div class="dashboard-page__form--new_user-type">Create User</div>
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">Title</label>
-    </div>
-    <div class="col-md-10">
-      <select class="form-control dashboard-page__form--new_user-title" ng-model="user.title">
-        <option value="Mr.">Mr.</option>
-        <option value="Mrs.">Mrs.</option>
-        <option value="Miss">Miss</option>
-      </select>
-    </div>
-  </div>
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">First Name*</label>
-    </div>
-    <div class="col-md-10">
-    <input type="text" class="form-control" name="firstName"  ng-model="user.firstName" ng-minlength=3 ng-maxlength=50 ng-pattern="/^[a-zA-Z]+$/" required>
-    <div ng-show="(form.clinicName.$dirty && form.clinicName.$invalid) || submitted" class="form-error">
-      <span class="help-block" ng-show="form.firstName.$error.required">
-        First Name is required.
-      </span>
-      <span class="help-block" ng-show="form.firstName.$error.pattern" >
-        First Name cannot have number.
-      </span>
-      <span class="help-block" ng-show="form.firstName.$error.minlength" >
-        First Name is required to be at least 3 character.
-      </span>
-      <span class="help-block" ng-show="form.firstName.$error.maxlength" >
-        First Name cannot be longer than 50 characters.
-      </span>
-    </div>
-  </div>
-  </div>
 
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">Middle Name</label>
+  <form name="form" ng-submit="createUser()" novalidate>
+  <div class="navbar dashboard">
+    <div class="container">
+      <div class="dashbord-nav__primary secondary-fix-navbar pull-left">
+        <span class="dashbord-nav__primary--title" translate="user.home.createLabel">Create Hill-Rom User</span>
+      </div>
+      <div class="dashbord-nav__secondary navbar-right">
+        <span class="dashbord-nav__secondary--create-new" translate=""></span>
+      </div>
     </div>
-      <div class="col-md-10">
-    <input type="text" class="form-control"  name="middleName" ng-model="user.middleName" ng-pattern="/^[a-zA-Z]+$/">
-    <div ng-show="(form.middleName.$dirty && form.middleName.$invalid)" class="form-error"> 
-      <span class="help-block" ng-show="form.middleName.$error.pattern" >
-        Middle Name cannot have number.
-      </span>
-    </div>
-  </div>
-  </div>
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">Last Name*</label>
-    </div>
-    <div class="col-md-10">
-    <input type="text" class="form-control" name="lastName" ng-pattern="/^[a-zA-Z]+$/" ng-model="user.lastName" ng-minlength=3 ng-maxlength=50 required>
-    <div ng-show="(form.satellite.$dirty && form.satellite.$invalid) || submitted" class="form-error">
-      <span class="help-block" ng-show="form.lastName.$error.required">
-        Last Name is required.
-      </span>
-       <span class="help-block" ng-show="form.lastName.$error.pattern" >
-        Last Name cannot have number.
-      </span>
-      <span class="help-block" ng-show="form.lastName.$error.minlength" >
-        Last Name is required to be at least 3 character.
-      </span>
-      <span class="help-block" ng-show="form.lastName.$error.maxlength" >
-        Last Name cannot be longer than 50 characters.
-      </span>
-    </div>
-  </div>
-  </div>
+    <div class="container dashboard__form">
+      
+      <div class="row margin-top-xl">
+        <div class="col-md-16">
+          <span class="dashboard__form--type" translate="user.personal-details"></span>
+        </div>
 
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">Email*</label>
-    </div>
-    <div class="col-md-10">
-      <input type="email" class="form-control" name="email"  ng-model="user.email" ng-minlength=3 ng-maxlength=100 required>
+        <div class="col-md-16 row margin-top">
+          <div class="col-md-7 row">
+            <div class="col-md-6 dashboard__form--label">
+              <span class="" translate="user.title.name"></span>
+            </div>
+            <div class="col-md-10 dashboard__form__input">
+              <div class="custom-dropdown">
+                <select ng-model="user.title" name="title" ng-readonly="validateSuperAdmin()">
+                  <option selected translate="user.title.mr"></option>
+                  <option translate="user.title.mrs"></option>
+                  <option translate="user.title.miss"></option>
+                </select>
+              </div>
+            </div>
+          </div>
 
-      <div ng-show="(form.email.$dirty && form.email.$invalid) || submitted" class="form-error">
-        <span class="help-block" ng-show="form.email.$error.required">
-        Your e-mail is required.
-        </span>
-        <span class="help-block" ng-show="form.email.$error.email">
-          Your e-mail is invalid.
-        </span>
-        <span class="help-block" ng-show="form.email.$error.maxlength">
-          Your e-mail cannot be longer than 100 characters.
-        </span>
+           <div class="col-md-7 col-md-offset-2" ng-show="userStatus.editMode">
+            <div class="col-md-6 dashboard__form--label">
+              <span class="" >User ID</span>
+            </div>
+            <div class="col-md-10 dashboard__form--input">
+              <input class="" type="text" readonly>
+            </div>
+          </div>
+          
+        </div>
+          
+        </div>
+
+        <div class="col-md-16 row margin-top">
+          <div class="col-md-7 row">
+            <div class="col-md-6 dashboard__form--label">
+              <span class="" translate="user.first-name"></span>
+              <span class="">*</span>
+            </div>
+            <div class="col-md-10 dashboard__form--input">
+              <input class="" type="text" name="firstName"  ng-model="user.firstName" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-zA-Z]+$/" ng-readonly="validateSuperAdmin()" required>
+                  <div ng-show="(form.firstName.$dirty && form.firstName.$invalid) || submitted">
+                    <span class="has-error" ng-show="form.firstName.$error.required">
+                      First Name is required.
+                    </span>
+                    <span class="has-error" ng-show="form.firstName.$error.pattern" >
+                      First Name cannot have number.
+                    </span>
+                    <span class="has-error" ng-show="form.firstName.$error.minlength" >
+                      First Name is required to be at least 2 character.
+                    </span>
+                    <span class="has-error" ng-show="form.firstName.$error.maxlength" >
+                      First Name cannot be longer than 15 characters.
+                    </span>
+                </div>
+            </div>
+          </div>
+          <div class="col-md-7 col-md-offset-2">
+            <div class="col-md-6 dashboard__form--label">
+              <span class="" translate="user.middle-name"></span>
+            </div>
+            <div class="col-md-10 dashboard__form--input">
+              <input class="" type="text" name="middleName" ng-model="user.middleName" ng-pattern="/^[a-zA-Z]+$/" ng-minlength=2 ng-maxlength=15 ng-readonly="validateSuperAdmin()">
+              <div ng-show="(form.middleName.$dirty && form.middleName.$invalid)"> 
+                <span class="has-error" ng-show="form.middleName.$error.pattern" >
+                  Middle Name cannot have number.
+                </span>
+                <span class="has-error" ng-show="form.middleName.$error.minlength" >
+                  Middle Name is required to be at least 2 character.
+                </span>
+                <span class="has-error" ng-show="form.middleName.$error.maxlength" >
+                  Middle Name cannot be longer than 15 characters.
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-16 row margin-top">
+          <div class="col-md-7 row">
+            <div class="col-md-6 dashboard__form--label">
+              <span class="" translate="user.last-name"></span>
+              <span class="">*</span>
+            </div>
+            <div class="col-md-10 dashboard__form--input">
+              <input class="" type="text" name="lastName" ng-pattern="/^[a-zA-Z]+$/" ng-model="user.lastName" ng-minlength=2 ng-maxlength=15 ng-readonly="validateSuperAdmin()" required>
+              <div ng-show="(form.lastName.$dirty && form.lastName.$invalid) || submitted">
+                <span class="has-error" ng-show="form.lastName.$error.required">
+                  Last Name is required.
+                </span>
+                <span class="has-error" ng-show="form.lastName.$error.pattern" >
+                  Last Name cannot have number.
+                </span>
+                <span class="has-error" ng-show="form.lastName.$error.minlength" >
+                  Last Name is required to be at least 2 character.
+                </span>
+                <span class="has-error" ng-show="form.lastName.$error.maxlength" >
+                  Last Name cannot be longer than 15 characters.
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-7 col-md-offset-2">
+            <div class="col-md-6 dashboard__form--label">
+              <span class="" translate="user.employee-id"></span>
+            </div>
+            <div class="col-md-10 dashboard__form--input">
+              <input class="" type="text" name="employeeID" ng-model="user.employeeID" ng-readonly="validateSuperAdmin()">
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-16 row margin-top">
+          <div class="col-md-7 row">
+            <div class="col-md-6 dashboard__form--label">
+              <span class="" translate="user.email"></span>
+              <span class="">*</span>
+            </div>
+            <div class="col-md-10 dashboard__form--input">
+              <input class="" type="email" name="email" ng-model="user.email" ng-maxlength=100 ng-readonly="validateSuperAdmin()">
+              <div ng-show="(form.email.$dirty && form.email.$invalid) || submitted">
+              <span class="has-error" ng-show="form.email.$error.email">
+                Your e-mail is invalid.
+              </span>
+              <span class="has-error" ng-show="form.email.$error.maxlength">
+                Your e-mail cannot be longer than 100 characters.
+              </span>
+            </div>
+            </div>
+          </div>
+          <div class="col-md-7 col-md-offset-2">
+            <div class="col-md-6 dashboard__form--label">
+              <span class="" translate="user.role-text"></span>
+            </div>
+            <div class="col-md-10 dashboard__form__input--role">
+              <div class="custom-dropdown">
+                <select name="role" ng-model="user.role" ng-readonly="validateSuperAdmin()">
+                  <option selected translate="user.role.super-admin">Super Admin</option>
+                  <option translate="user.role.account-services">Account Services</option>
+                  <option translate="user.role.associates">Associates</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-16 row margin-top margin-bottom-extreem">
+          <div class="col-md-4 col-md-offset-12">
+            <button class="hillrom-btn btn-submit" ng-show="userStatus.isCreate" ng-click="formSubmit()" translate="user.submit-button-text">Submit</button>
+            <button class="hillrom-btn btn-submit" ng-click="deleteUser()" ng-show="!userStatus.isCreate">Delete</button>
+            <button class="hillrom-btn btn-submit" ng-click="formSubmit()" ng-show="!userStatus.isCreate">Update</button>
+          </div>    
+        </div>
       </div>
     </div>
   </div>
+  </form>
 
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">Select Role*</label>
-    </div>
-    <div class="col-md-10 dashboard-page__form--new_select-box">
-      <select class="form-control" name="role" ng-model="user.role" required>
-        <option value="SUPER_ADMIN">HillRom Admin</option>
-        <option value="CLINIC_ADMIN">Clinic Admin</option>
-        <option value="ASSOCIATES"> Associates</option>
-        <option value="ACCT_SERVICES"> Acct Services</option>
-      </select>
-    </div>
-  </div>
-
-  <div ng-show="(form.email.$dirty && form.email.$invalid) || submitted">
-  <p class="help-block"
-    ng-show="form.role.$error.required">
-    Your role is required.
-  </p>
-  
-</div>
-
-
-  <div class="col-md-16 dashboard-page__form--new_form-submit" ng-show="isCreate">
-    <button type="submit" ng-click="submitted=true" class="dashboard-page__form--new_form-submit--button">Submit</button>
-  </div>
-  <div class="col-md-16 dashboard-page__form--new_form-submit">
-    <div class="col-md-10" ng-show="!isCreate">
-      <button type="button" class="dashboard-page__form--new_form-submit--button" ng-click="deleteUser()">Disassociate</button>
-      <button type="button" class="dashboard-page__form--new_form-submit--button">Edit</button>
-    </div>
-  </div>
-</form>

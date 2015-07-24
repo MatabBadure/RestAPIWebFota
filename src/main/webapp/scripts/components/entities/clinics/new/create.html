@@ -1,4 +1,4 @@
-  <span ng-show="clinicStatus.isMessage">{{clinicStatus.message}}</span>
+<!--   <span ng-show="clinicStatus.isMessage">{{clinicStatus.message}}</span>
   <form name="form" class="dashboard-page__form--new" ng-submit="createClinic()" novalidate>
     <div class="dashboard-page__form--new_user-type">Create Clinic</div>
     <div class="col-md-16 indent-form-top">
@@ -148,5 +148,192 @@
         <button type="button" class="dashboard-page__form--new_form-submit--button" ng-click="deleteClinic()">Disassociate</button>
         <button type="button" class="dashboard-page__form--new_form-submit--button">Edit</button>
       </div>
+</div>
+</form> -->
+
+<span ng-show="clinicStatus.isMessage">{{clinicStatus.message}}</span>
+<form name="form" ng-submit="createClinic()" novalidate>
+<div class="navbar dashboard">
+  <div class="container">
+    <div class="dashbord-nav__primary secondary-fix-navbar pull-left">
+      <span class="dashbord-nav__primary--title" translate="clinic.home.createLabel">Create Clinic</span>
+    </div>
+    <div class="dashbord-nav__secondary navbar-right">
+      <span class="dashbord-nav__secondary--create-new" translate=""></span>
+    </div>
+  </div>
+  <div class="container dashboard__form">
+    <div class="row margin-top-xl">
+      <div class="col-md-16">
+        <span class="dashboard__form--type" translate="clinic.general-details"></span>
+      </div>
+
+      <div class="col-md-16 row margin-top">
+        <div class="col-md-7 row">
+          <div class="col-md-6 dashboard__form--label">
+            <span class="" translate="clinic.clinic-type"></span>
+            <span class="">*</span>
+          </div>
+          <div class="col-md-10 dashboard__form__input--option">
+            <div class="custom-dropdown">
+              <select name="type" ng-model="clinic.type">
+                <option selected translate="clinic.clinic-option.parent-clinic"></option>
+                <option translate="clinic.clinic-option.satellite-clinic"></option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-7 col-md-offset-2">
+          <div class="col-md-6 dashboard__form--label">
+            <span class="dashboard__form--type" translate="clinic.select-parent"></span>
+            <span class="">*</span>
+          </div>
+          <div class="col-md-10 dashboard__form--input">
+            <input class="" type="text" name="parentClinicName" ng-model="clinic.parentClinicName" required>
+            <div ng-show="(form.parentClinicName.$dirty && form.parentClinicName.$invalid) || submitted">
+                <span class="has-error" ng-show="form.parentClinicName.$error.required">
+                  Parent Clinic Name is required.
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-16 row margin-top">
+        <div class="col-md-7 row">
+          <div class="col-md-6 dashboard__form--label">
+            <span class="" translate="clinic.clinic-name"></span>
+            <span class="">*</span>
+          </div>
+          <div class="col-md-10 dashboard__form--input">
+            <input class="" type="text" ng-model="clinic.name" name="name" required>
+            <div ng-show="(form.name.$dirty && form.name.$invalid) || submitted">
+                <span class="has-error" ng-show="form.name.$error.required">
+                  Clinic Name is required.
+                </span>
+              </div>
+          </div>
+        </div>
+        <div class="col-md-7 col-md-offset-2">
+          <div class="col-md-6 dashboard__form--label">
+            <span class="dashboard__form--type" translate="clinic.hr-id"></span>
+          </div>
+          <div class="col-md-10 dashboard__form--input">
+            <input class="" type="text" ng-model="clinic.HRID" name="HRID">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row margin-top-xl">
+      <div class="col-md-16">
+        <span class="dashboard__form--type" translate="clinic.personal-details"></span>
+      </div>
+
+      <div class="col-md-16 row margin-top">
+        <div class="col-md-7 row">
+          <div class="col-md-6 dashboard__form--label">
+            <span class="" translate="clinic.address"></span>
+          </div>
+          <div class="col-md-10 dashboard__form--input">
+            <input class="" type="text" ng-model="clinic.address" name="address" ng-maxlength="100">
+            <div ng-show="(form.address.$dirty && form.address.$invalid) || submitted">
+                <span class="has-error" ng-show="form.address.$error.maxlength">
+                  Address cannot be longer than 100 characters.
+                </span>
+              </div>
+          </div>
+        </div>
+        <div class="col-md-7 col-md-offset-2">
+          <div class="col-md-6 dashboard__form--label">
+            <span class="" translate="clinic.city"></span>
+          </div>
+          <div class="col-md-10 dashboard__form--input">
+            <input class="" type="text" ng-model="clinic.city" name="city" ng-maxlength=15>
+            <div ng-show="(form.city.$dirty && form.city.$invalid)">
+                <span class="has-error" ng-show="form.city.$error.maxlength" >
+                  City cannot be longer than 15 characters.
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-16 row margin-top">
+        <div class="col-md-7 row">
+          <div class="col-md-6 dashboard__form--label">
+            <span class="" translate="clinic.state"></span>
+          </div>
+          
+            <div class="custom-dropdown">
+              <select name="state"  ng-model="clinic.state" ng-options="state.name as state.name for state in states">
+                <option  selected="selected">Select a state</option>
+              </select>
+            </div>
+        </div>
+        <div class="col-md-7 col-md-offset-2">
+          <div class="col-md-6 dashboard__form--label">
+            <span class="" translate="clinic.zipcode"></span>
+          </div>
+          <div class="col-md-10 dashboard__form--input">
+            <input class="" type="text" name="zip" maxlength="5" ng-pattern="/^[0-9]{5}$/" ng-model="clinic.zipCode">
+            <div ng-show="(form.zip.$dirty && form.zip.$invalid) || submitted">
+              <span class="has-error" ng-show="form.zip.$error.pattern">
+                Zip Code is invalid.
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-16 row margin-top">
+        <div class="col-md-7 row">
+          <div class="col-md-6 dashboard__form--label">
+            <span class="" translate="clinic.clinic-phone"></span>
+          </div>
+          <div class="col-md-10 dashboard__form--input">
+            <input class="" type="text" name="phone" ng-pattern="/^[0-9]{10}$/" ng-model="clinic.phoneNumber">
+            <div ng-show="(form.phone.$dirty && form.phone.$invalid) || submitted">
+              <span class="has-error" ng-show="form.phone.$error.pattern">
+                Phone Number is invalid.
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-7 col-md-offset-2">
+          <div class="col-md-6 dashboard__form--label">
+            <span class="" translate="clinic.fax-number"></span>
+          </div>
+          <div class="col-md-10 dashboard__form--input">
+            <input class="" type="text" name="fax" ng-pattern="/^[0-9]{10}$/" ng-model="clinic.faxNumber">
+            <div ng-show="(form.fax.$dirty && form.fax.$invalid) || submitted">
+              <span class="has-error" ng-show="form.fax.$error.pattern">
+                Fax Number is invalid.
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-16 row margin-top" ng-show="clinicStatus.editMode">
+        <div class="col-md-7 row">
+          <div class="col-md-6 dashboard__form--label">
+            <span class="" >Clinic ID</span>
+          </div>
+          <div class="col-md-10 dashboard__form--input">
+            <span class="">{{clinic.clinicID}}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-16 row margin-top margin-bottom-extream">
+        <div class="col-md-4 col-md-offset-12">
+          <button type="submit" ng-click="formSubmit()" ng-show="clinicStatus.isCreate" class="hillrom-btn btn-submit" translate="clinic.submit-button-text">Submit</button>
+          <button type="button" ng-click="deleteClinic()" ng-show="!clinicStatus.isCreate" class="hillrom-btn btn-submit">Diassociate</button>
+          <button type="submit" ng-click="formSubmit()" ng-show="!clinicStatus.isCreate" class="hillrom-btn btn-submit">Update</button>
+        </div>    
+      </div>
+    </div>
+  </div>
 </div>
 </form>

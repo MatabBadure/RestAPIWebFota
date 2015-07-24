@@ -38,7 +38,7 @@ public class ClinicDTO {
 	
 	private List<Map<String, String>> childClinicList = new ArrayList<Map<String,String>>();
 	
-	private Boolean isParent;
+	private Boolean parent;
 
 	@Size(max = 50)
     private Map<String, Long> parentClinic = new HashMap<>();
@@ -49,7 +49,7 @@ public class ClinicDTO {
 
 	public ClinicDTO(String name, String address, Integer zipcode, String city,
 			String state, Long phoneNumber, Long faxNumber, Long clinicAdminId,
-			Boolean isParent, String hillromId) {
+			Boolean parent, String hillromId) {
 		super();
 		this.name = name;
 		this.address = address;
@@ -59,7 +59,7 @@ public class ClinicDTO {
 		this.phoneNumber = phoneNumber;
 		this.faxNumber = faxNumber;
 		this.clinicAdminId = clinicAdminId;
-		this.isParent = isParent;
+		this.parent = parent;
 		this.hillromId = hillromId;
 	}
 
@@ -143,12 +143,12 @@ public class ClinicDTO {
 		this.clinicAdminId = clinicAdminId;
 	}
 
-	public Boolean getIsParent() {
-		return isParent;
+	public Boolean getParent() {
+		return parent;
 	}
 
-	public void setIsParent(Boolean isParent) {
-		this.isParent = isParent;
+	public void setParent(Boolean parent) {
+		this.parent = parent;
 	}
 
 	public List<Map<String, String>> getChildClinicList() {

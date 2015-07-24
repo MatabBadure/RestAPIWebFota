@@ -50,7 +50,11 @@ import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 @Transactional
 public class UserService {
 
-    private final Logger log = LoggerFactory.getLogger(UserService.class);
+	private static final String DATEFORMAT_MMddyyyy = "MMddyyyy";
+
+	private static final int NO_OF_CHARACTERS_TO_BE_EXTRACTED = 4;
+
+	private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Inject
     private PasswordEncoder passwordEncoder;
@@ -84,6 +88,16 @@ public class UserService {
     
     @Inject
     private ApplicationEventPublisher eventPublisher;
+    
+    public String generateDefaultPassword(User patientUser) {
+		StringBuilder defaultPassword = new StringBuilder();
+		defaultPassword.append(patientUser.getZipcode());
+		// default password will have the first 4 letters from last name, if length of last name <= 4, use complete string
+		int endIndex = patientUser.getLastName().length() > NO_OF_CHARACTERS_TO_BE_EXTRACTED ? NO_OF_CHARACTERS_TO_BE_EXTRACTED : patientUser.getLastName().length() ; 
+		defaultPassword.append(patientUser.getLastName().substring(0, endIndex));
+		defaultPassword.append(patientUser.getDob().toString(DATEFORMAT_MMddyyyy));
+		return defaultPassword.toString();
+	}
 
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
@@ -355,6 +369,7 @@ public class UserService {
     		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
     		patientInfoRepository.save(patientInfo);
     		assignValuesToUserObj(userExtensionDTO, newUser);
+    		newUser.setPassword(passwordEncoder.encode(generateDefaultPassword((User)newUser)));
     		newUser.setActivated(true);
     		newUser.setDeleted(false);
     		if(AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {

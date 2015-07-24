@@ -3,27 +3,20 @@
 }
 
 html {
-	min-height: 100%;
-	height: 100%;
+	height: auto;
 	margin: 0;
 }
 
 body {
-	min-height: 100%;
-	height: 100%;
-	margin: 0;
+	font-size: $font-size-base;
+  height: auto;
+  clear: both;
 }
 
 .content-body {
 	background-color: inherit;
-	min-height: -o-calc(100% + 150px); /* opera */
-	min-height: -webkit-calc(100% + 150px); /* google, safari */
-	min-height: -moz-calc(100% + 150px);
-
-	height: -o-calc(100% + 150px); /* opera */
-	height: -webkit-calc(100% + 150px); /* google, safari */
-	height: -moz-calc(100% + 150px);
 	margin-top: 60px;
+	margin-bottom: 40px;
 }
 
 .clr {

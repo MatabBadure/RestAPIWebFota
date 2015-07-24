@@ -47,5 +47,38 @@ public class UserSearchRepository {
 	
 		return page;
 	}
+	
+	public Page<HcpVO> findHCPBy(String queryString,Pageable pageable){
+		
+		int firstResult = pageable.getPageNumber()*pageable.getOffset();
+		int maxResult = firstResult+pageable.getPageSize();
+		
+		String countSqlQuery = "select count(hcpUsers.id) from (select distinct(user.id)"
+				+ " FROM USER user join USER_EXTENSION userExt "
+				+ " join USER_AUTHORITY user_authority join CLINIC clinic "
+				+ " join CLINIC_USER_ASSOC clinic_user "
+				+ " where user.id = userExt.user_id and user_authority.user_id = user.id "
+				+ " and user_authority.authority_name = 'HCP'  and clinic_user.users_id = user.id "
+				+ " and clinic_user.clinics_id = clinic.id "
+				+ " and (lower(user.first_name) like lower(:queryString) or "
+				+ " lower(user.last_name) like lower(:queryString) or "
+				+ " lower(user.email) like lower(:queryString)) order by user.first_name,user.last_name,user.email) hcpUsers";
+		
+		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
+		countQuery.setParameter("queryString", queryString);
+		BigInteger count =  (BigInteger) countQuery.getSingleResult();
+		
+		Query query = entityManager.createNamedQuery("findHcpBy");
+		query.setFirstResult(firstResult);
+		query.setMaxResults(maxResult);
+		
+		query.setParameter("queryString", queryString);
+		
+		List<HcpVO> hcpUsers =  query.getResultList();
+	
+		Page<HcpVO> page = new PageImpl<HcpVO>(hcpUsers,null,count.intValue());
+	
+		return page;
+	}
 
 }

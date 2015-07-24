@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.repository.HcpVO;
 import com.hillrom.vest.repository.HillRomUserVO;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
@@ -174,6 +175,24 @@ public class UserExtensionResource {
         throws URISyntaxException {
     	String queryString = new StringBuilder("%").append(searchString).append("%").toString();
     	Page<HillRomUserVO> page = userSearchRepository.findHillRomTeamUsersBy(queryString,PaginationUtil.generatePageRequest(offset, limit));
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/user/search", offset, limit);
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+        
+    }
+    
+    /**
+     * GET  /user/search -> get all HillromTeamUser.
+     */
+    @RequestMapping(value = "/user/hcp/search",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> searchHcp(@RequestParam(required=true,value = "searchString")String searchString,
+    		@RequestParam(value = "page" , required = false) Integer offset,
+            @RequestParam(value = "per_page", required = false) Integer limit)
+        throws URISyntaxException {
+    	String queryString = new StringBuilder("%").append(searchString).append("%").toString();
+    	Page<HcpVO> page = userSearchRepository.findHCPBy(queryString,PaginationUtil.generatePageRequest(offset, limit));
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/userExtensions", offset, limit);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
         

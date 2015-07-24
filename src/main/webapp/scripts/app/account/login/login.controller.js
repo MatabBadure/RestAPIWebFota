@@ -74,11 +74,19 @@ angular.module('hillromvestApp')
         return false;
       }
       event.preventDefault();
+      //
+      if ($scope.user.password !== $scope.user.confirmPassword) {
+                $scope.doNotMatch = true;
+            } else {
+              $scope.doNotMatch = false;
+
+      //
       Auth.submitPassword({
         'email': $scope.user.email,
         'password': $scope.user.password,
         'answer': $scope.user.answer,
-        'questionId': $scope.user.question.id
+        'questionId': $scope.user.question.id,
+        'termsAndConditionsAccepted': $scope.user.tnc
       }).then(function(data) {
         Auth.logout();
         $state.go('home');
@@ -86,6 +94,7 @@ angular.module('hillromvestApp')
         Auth.logout();
         console.log('Error...!');
       });
+    }
     };
 
     $timeout(function() {
@@ -113,7 +122,7 @@ angular.module('hillromvestApp')
       }
     };
 
-    $scope.submitPassword = function(event) {
+/*    $scope.submitPassword = function(event) {
       event.preventDefault();
       Auth.submitPassword({
         email: $scope.user.email,
@@ -125,5 +134,5 @@ angular.module('hillromvestApp')
         Auth.logout();
         console.log('Error...!');
       });
-    };
+    };*/
   });

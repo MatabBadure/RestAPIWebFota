@@ -1,24 +1,23 @@
 <div class="container login">
     <div class="login--position">
-    <div class=" form__container__login login__container col-md-8 col-lg-8">
+  <!--   <div class=" form__container__login login__container col-md-8 col-lg-8">
       <div class="col-md-6 col-lg-6 ">
         <img src="assets/images/man.svg">
       </div>
       <div class=" col-md-10 col-lg-10 login__container__right-section">
         <form>
-         <!--  <div class="form-group"> -->
+        
             <p><strong>LOGIN TO YOUR ACCOUNT</strong></p>
-            <!-- <p id="error_msg">UserName & Password do not match.Please try again.</p> -->
+           
             <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter your Hill-Rom ID or Email-id">
-         <!--  </div> -->
-          <!-- <div class="form-group"> -->
+         
             <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-         <!--  </div> -->
+      
             <div class="col-md-8 col-lg-8 link" id="forgotpwd"><a href="#">Forgot Password?</a></div>
             <div class="col-md-8 col-lg-8 link"><a href="#" class="myButton">LOGIN</a></div>
         </form>
       </div>
-    </div>
+    </div> -->
 
     <div class="col-md-5 login__container__right-section">
 
@@ -74,7 +73,7 @@
         </div>
 
         <div class="login__container__right-section--form" ng-show="isFirstLogin">
-          <form class="form" role="form" name="confirmForm" ng-submit="submitPassword($event)">
+          <form class="form" role="form" name="confirmForm" ng-submit="submitPassword($event)" novalidate>
 
             <div class="form-group" ng-show="!isEmailExist">
               <label for="Email ID" translate="global.form.email">E-Mail</label>
@@ -153,6 +152,18 @@
                     </p>
                 </div>     
             </div> 
+
+            <div class="form-group">
+                       
+                        <input type="checkbox" name="tnc" ng-model="user.tnc" required>
+                        Agree to Terms and Conditions*
+                        <div ng-show="(confirmForm.tnc.$dirty && confirmForm.tnc.$invalid) || submitted">
+                            <p class="has-error"
+                               ng-show="confirmForm.tnc.$error.required">
+                                Please agree to Terms and Conditions.
+                            </p>
+                        </div>     
+                    </div> 
 
 
             <button type="submit" ng-click="submitConfirmForm()" class="login-button center-block">Submit</button>

@@ -5,17 +5,22 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.SQLDelete;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hillrom.vest.repository.HillRomUserVO;
 
 /**
  * A UserExtension.
@@ -24,6 +29,27 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "USER_EXTENSION")
 @PrimaryKeyJoinColumn(name="USER_ID",referencedColumnName="id")
 @SQLDelete(sql="UPDATE USER_EXTENSION SET is_deleted = 1 WHERE USER_ID = ?")
+@NamedNativeQuery(query="select distinct(user.id),user.first_name,user.last_name,user.email,user_authority.authority_name as name,user.is_deleted as isDeleted from  USER_EXTENSION userExt join USER user "
+		+ " join  USER_AUTHORITY user_authority "
+		+ " where user.id = userExt.user_id and user_authority.user_id = user.id "
+		+ " and user_authority.authority_name in ('ADMIN','ACCT_SERVICES','ASSOCIATES','HILLROM_ADMIN','CLINIC_ADMIN') "
+		+ " and (lower(user.first_name) like lower(:queryString) or "
+		+ " lower(user.last_name) like lower(:queryString) or "
+		+ " lower(user.email) like lower(:queryString)) order by user.first_name,user.last_name,user.email",
+		name="findHillRomTeamUserBy",
+		resultSetMapping="hillromTeamUser")
+@SqlResultSetMapping(name="hillromTeamUser", 
+classes={ 
+  @ConstructorResult(targetClass=HillRomUserVO.class, columns={
+      @ColumnResult(name="ID", type=Long.class),
+      @ColumnResult(name="FIRST_NAME", type=String.class),
+      @ColumnResult(name="LAST_NAME", type=String.class),
+      @ColumnResult(name="EMAIL", type=String.class),
+      @ColumnResult(name="NAME", type=String.class),
+      @ColumnResult(name="isDeleted", type=Boolean.class)
+  })
+}
+)
 public class UserExtension extends User implements Serializable {
 
     @Column(name = "speciality")

@@ -35,7 +35,7 @@ import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 @IntegrationTest
 @Transactional
 public class HealthCareProfessionalUserServiceTest {
-	
+
 	private static final String HILLROM_ID = "HR000026";
 	private static final String TITLE = "Mr";
 	private static final String FIRST_NAME = "Peter";
@@ -47,26 +47,26 @@ public class HealthCareProfessionalUserServiceTest {
 	private static final String ZIPCODE = "560009";
 	private static final String ROLE = AuthoritiesConstants.HCP;
 	private static final String BASE_URL = "http://localhost:8080";
-	
+
 	@Inject
 	private UserService userService;
-	
+
 	@Inject
 	private HCPClinicService hcpClinicService;
-	
+
 	@Inject
 	private ClinicService clinicService;
-	
+
 	@Inject
 	private UserRepository userRepository;
-	
+
 	@Inject
 	private ClinicRepository clinicRepository;
 
 	private UserExtensionDTO userExtensionDTO;
 	private ClinicDTO clinicDTO;
 	private Clinic clinic;
-	
+
 	@Before
     public void initTest() {
 		userExtensionDTO = new UserExtensionDTO();
@@ -81,7 +81,7 @@ public class HealthCareProfessionalUserServiceTest {
 		userExtensionDTO.setZipcode(Integer.parseInt(ZIPCODE));
 		userExtensionDTO.setRole(ROLE);
     }
-	
+
 	@Test
 	public void createHCPUserSuccessfully(){
 		JSONObject jsonObject = userService.createUser(userExtensionDTO, BASE_URL);
@@ -91,7 +91,7 @@ public class HealthCareProfessionalUserServiceTest {
         assertThat(newHCP.getEmail()).isNotNull();
         userRepository.delete(newHCP);
 	}
-	
+
 	@Test
 	public void updateHCPUserSuccessfully(){
 		JSONObject jsonObject = userService.createUser(userExtensionDTO, BASE_URL);
@@ -107,19 +107,19 @@ public class HealthCareProfessionalUserServiceTest {
         assertThat(updatedHCP.getEmail()).isNotNull();
         userRepository.delete(updatedHCP);
 	}
-	
+
 	@Test
 	public void dissociateClinicFromHCPUserSuccessfully(){
-		clinicDTO = new ClinicDTO("Fortis Hospital", "Bannerghatta Road", 560042, "Bangalore", "Karnataka", Long.parseLong("7896541230"), Long.parseLong("9874563210"), null, null);
+		clinicDTO = new ClinicDTO("Fortis Hospital", "Bannerghatta Road", 560042, "Bangalore", "Karnataka", Long.parseLong("7896541230"), Long.parseLong("9874563210"), null, true, null);
 	    JSONObject clinicJsonObject = clinicService.createClinic(clinicDTO);
 		clinic = (Clinic)clinicJsonObject.get("Clinic");
-		
+
 		List<Map<String, String>> clinicList = new ArrayList<Map<String, String>>();
 		Map<String, String> clinicId = new HashMap<String, String>();
 		clinicId.put("id", clinic.getId().toString());
 		clinicList.add(clinicId);
 		userExtensionDTO.setClinicList(clinicList);
-		
+
 		JSONObject jsonObject = userService.createUser(userExtensionDTO, BASE_URL);
 		UserExtension newHCP = (UserExtension)jsonObject.get("user");
 
@@ -134,5 +134,5 @@ public class HealthCareProfessionalUserServiceTest {
         userRepository.delete(dissociatedHCP);
         clinicRepository.delete(clinic);
 	}
-	
+
 }

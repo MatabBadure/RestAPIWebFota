@@ -1,13 +1,11 @@
 package com.hillrom.vest.service;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.hillrom.vest.domain.Clinic;
-import com.hillrom.vest.repository.ClinicRepository;
-import com.hillrom.vest.service.util.RandomUtil;
-import com.hillrom.vest.web.rest.dto.ClinicDTO;
+import javax.inject.Inject;
 
 import net.minidev.json.JSONObject;
 
@@ -16,7 +14,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
+import com.hillrom.vest.domain.Clinic;
+import com.hillrom.vest.repository.ClinicRepository;
+import com.hillrom.vest.service.util.RandomUtil;
+import com.hillrom.vest.web.rest.dto.ClinicDTO;
+
 
 /**
  * Service class for managing users.

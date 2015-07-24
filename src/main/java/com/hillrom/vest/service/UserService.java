@@ -77,9 +77,6 @@ public class UserService {
     private MailService mailService;
 
     @Inject
-    private UserLoginTokenService authTokenService;
-    
-    @Inject
     private UserSecurityQuestionService userSecurityQuestionService;
     
     @Inject
@@ -281,7 +278,7 @@ public class UserService {
     	if(userExtensionDTO.getEmail() != null) {
         	userRepository.findOneByEmail(userExtensionDTO.getEmail())
 			.map(user -> {
-				jsonObject.put("error", "e-mail address already in use");
+				jsonObject.put("ERROR", "e-mail address already in use");
     			return jsonObject;
     		});
     	}

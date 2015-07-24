@@ -13,16 +13,13 @@
     <!--
         Added the entity UserExtension.
     -->
-    <changeSet id="201507235427" author="jhipster">
-    	<addColumn tableName="CLINIC">
-        	<column name="clinic_admin_id" type="bigint" />
-        </addColumn>
-        
-        <addForeignKeyConstraint baseColumnNames="clinic_admin_id"
-                                 baseTableName="CLINIC"
-                                 constraintName="fk_clinic_admin_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="USER"/>
+    <changeSet id="20150724113127" author="jhipster">
+    	                                       
+          <createProcedure path="./../../sql/get_next_clinic_hillromid.sql"
+          procedureName="get_next_clinic_hillromid" relativeToChangelogFile="true"></createProcedure>
+          
+          <createProcedure path="./../../sql/get_next_patient_hillromid.sql"
+          procedureName="get_next_patient_hillromid" relativeToChangelogFile="true"></createProcedure>
     
     </changeSet>
 </databaseChangeLog>

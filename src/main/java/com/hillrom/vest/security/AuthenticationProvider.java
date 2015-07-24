@@ -27,12 +27,8 @@ import com.hillrom.vest.service.util.RandomUtil;
 
 public class AuthenticationProvider extends DaoAuthenticationProvider {
 
-	private static final String DATEFORMAT_MMddyyyy = "MMddyyyy";
-
 	private final Logger log = LoggerFactory.getLogger(AuthenticationProvider.class);
 	
-	private static final int NO_OF_CHARACTERS_TO_BE_EXTRACTED = 4;
-
     private PasswordEncoder passwordEncoder;
     
     @Inject
@@ -84,16 +80,6 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
         }
 		return user;
 	}
-
-	private String generateDefaultPassword(User patientUser) {
-		StringBuilder defaultPassword = new StringBuilder();
-		defaultPassword.append(patientUser.getZipcode());
-		// default password will have the first 4 letters from last name, if length of last name <= 4, use complete string
-		int endIndex = patientUser.getLastName().length() > NO_OF_CHARACTERS_TO_BE_EXTRACTED ? NO_OF_CHARACTERS_TO_BE_EXTRACTED : patientUser.getLastName().length() ; 
-		defaultPassword.append(patientUser.getLastName().substring(0, endIndex));
-		defaultPassword.append(patientUser.getDob().toString(DATEFORMAT_MMddyyyy));
-		return defaultPassword.toString();
-	}
 	
 	/**
 	 * Handles password verification 
@@ -112,12 +98,16 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
 	 */
 	private void processFirstTimeLogin(User user,String tokenPassword) {
 		if(null == user.getLastLoggedInAt()){
-			String defaultPassword = generateDefaultPassword(user);
+			String defaultPassword = userService.generateDefaultPassword(user);
 			if(defaultPassword.equals(tokenPassword)){
+				/* There could be possibility that password being NULL in User from DB, hence send the tokenPassword(user filled in login screen) in Exception Object
+				 * passing Null in Exception Object causes 500 error which breaks our flow
+				 */
+				String encodedPassword = passwordEncoder.encode(tokenPassword);
 				if(!RandomUtil.isValidEmail(user.getEmail()))
-					throw new EmailNotPresentForPatientException("Please Register with Email and Password to Login",prepareJSONForPatientUser(user.getEmail().toLowerCase(),user.getPassword()));
+					throw new EmailNotPresentForPatientException("Please Register with Email and Password to Login",prepareJSONForPatientUser(user.getEmail().toLowerCase(),encodedPassword));
 				else
-					throw new FirstLoginException("First Time Login, please reset your password",prepareJSONForPatientUser(user.getEmail().toLowerCase(),user.getPassword()));				
+					throw new FirstLoginException("First Time Login, please reset your password",prepareJSONForPatientUser(user.getEmail().toLowerCase(),encodedPassword));				
 			}else{
 				throw new BadCredentialsException("Invalid username/password");
 			}

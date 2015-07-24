@@ -40,6 +40,8 @@ $ship-cove-dark:				#6E90C2  !default;
 $nevada:								#5d6a7d !default;
 $bombay:								#aeb5be !default;
 
+//HillRom Popover
+$outer-space:						#273446 !default;
 
 //== Scaffolding
 //
@@ -543,7 +545,7 @@ $tooltip-arrow-color:         $tooltip-bg !default;
 //##
 
 //** Popover body background color
-$popover-bg:                          #fff !default;
+$popover-bg:                          $outer-space !default;
 //** Popover maximum width
 $popover-max-width:                   276px !default;
 //** Popover border color
@@ -557,7 +559,7 @@ $popover-title-bg:                    darken($popover-bg, 3%) !default;
 //** Popover arrow width
 $popover-arrow-width:                 10px !default;
 //** Popover arrow color
-$popover-arrow-color:                 #fff !default;
+$popover-arrow-color:                 $outer-space !default;
 
 //** Popover outer arrow width
 $popover-arrow-outer-width:           ($popover-arrow-width + 1) !default;

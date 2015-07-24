@@ -1,6 +1,8 @@
 package com.hillrom.vest.web.rest.dto;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.constraints.Size;
@@ -30,6 +32,13 @@ public class ClinicDTO {
 
 	@Size(max = 50)
     private String hillromId;
+	
+	@Size(max = 50)
+    private Long clinicAdminId;
+	
+	private List<Map<String, String>> childClinicList = new ArrayList<Map<String,String>>();
+	
+	private Boolean parent;
 
 	@Size(max = 50)
     private Map<String, Long> parentClinic = new HashMap<>();
@@ -39,8 +48,8 @@ public class ClinicDTO {
 	}
 
 	public ClinicDTO(String name, String address, Integer zipcode, String city,
-			String state, Long phoneNumber, Long faxNumber, String hillromId,
-			Map<String, Long> parentClinic) {
+			String state, Long phoneNumber, Long faxNumber, Long clinicAdminId,
+			Boolean parent, String hillromId) {
 		super();
 		this.name = name;
 		this.address = address;
@@ -49,8 +58,9 @@ public class ClinicDTO {
 		this.state = state;
 		this.phoneNumber = phoneNumber;
 		this.faxNumber = faxNumber;
+		this.clinicAdminId = clinicAdminId;
+		this.parent = parent;
 		this.hillromId = hillromId;
-		this.parentClinic = parentClinic;
 	}
 
 	public String getName() {
@@ -123,5 +133,29 @@ public class ClinicDTO {
 
 	public void setParentClinic(Map<String, Long> parentClinic) {
 		this.parentClinic = parentClinic;
+	}
+
+	public Long getClinicAdminId() {
+		return clinicAdminId;
+	}
+
+	public void setClinicAdminId(Long clinicAdminId) {
+		this.clinicAdminId = clinicAdminId;
+	}
+
+	public Boolean getParent() {
+		return parent;
+	}
+
+	public void setParent(Boolean parent) {
+		this.parent = parent;
+	}
+
+	public List<Map<String, String>> getChildClinicList() {
+		return childClinicList;
+	}
+
+	public void setChildClinicList(List<Map<String, String>> childClinicList) {
+		this.childClinicList = childClinicList;
 	}
 }

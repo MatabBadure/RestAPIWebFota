@@ -51,6 +51,33 @@ describe('Controllers Tests ', function () {
             expect($scope.success).toBe('OK');
         });
 
-       
+         it('Change password failure', function() {
+
+            $httpBackend.whenPOST('api/account/change_password').respond(400, {
+              status: 400
+            });
+
+            //WHEN
+            $scope.changePassword();
+            $httpBackend.flush();
+            //THEN
+            expect($scope.success).toBe(null);
+            expect($scope.error).toBe('ERROR');
+          });
+
+          it('Change password success', function() {
+
+            $httpBackend.whenPOST('api/account/change_password').respond(200, {
+              status: 200
+            });
+
+            //WHEN
+            $scope.changePassword();
+            $httpBackend.flush();
+
+            //THEN
+            expect($scope.success).toBe('OK');
+            expect($scope.error).toBe(null);
+          });
     });
 });

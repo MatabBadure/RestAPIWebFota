@@ -1,13 +1,13 @@
-<div class="col-md-16 dashboard-page">
-	<div class="col-md-4 dashboard-page__admin-nav">
-		<nav-bar></nav-bar>
+
+
+
+	<div ng-show="patientStatus.editMode || patientStatus.isCreate">
+		<patient patient-data="patient" patient-status="patientStatus" ></patient>
 	</div>
 
-	<div class="col-md-6 dashboard-page__form">
-		<patient></patient>
+			
+	<div ng-show="!patientStatus.editMode && !patientStatus.isCreate">
+		<patient-list on-select="selectedPatient(patient)" on-create="createPatient()"></patient-list>
 	</div>
 
-	<div class="col-md-6 dashboard-page__user-list">
-		<patient-list></patient-list>
-	</div>
-</div>
+		

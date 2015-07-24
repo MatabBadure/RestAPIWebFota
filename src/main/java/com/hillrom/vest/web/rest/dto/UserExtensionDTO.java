@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.Column;
 import javax.validation.constraints.Size;
 
 import org.joda.time.LocalDate;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.joda.time.format.DateTimeFormat;
 
 public class UserExtensionDTO extends UserDTO {
 
@@ -48,9 +47,7 @@ public class UserExtensionDTO extends UserDTO {
     @Size(min = 2, max = 100)
     private String hillromId;
     
-    @Column(name = "dob")
-    @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private LocalDate dob;
+    private String dob;
 
     public UserExtensionDTO() {
     }
@@ -169,11 +166,11 @@ public class UserExtensionDTO extends UserDTO {
 		this.hillromId = hillromId;
 	}
 
-	public LocalDate getDob() {
+	public String getDob() {
 		return dob;
 	}
 
-	public void setDob(LocalDate dob) {
+	public void setDob(String dob) {
 		this.dob = dob;
 	}
 

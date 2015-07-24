@@ -117,10 +117,11 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
 				/* There could be possibility that password being NULL in User from DB, hence send the tokenPassword(user filled in login screen) in Exception Object
 				 * passing Null in Exception Object causes 500 error which breaks our flow
 				 */
+				String encodedPassword = passwordEncoder.encode(tokenPassword);
 				if(!RandomUtil.isValidEmail(user.getEmail()))
-					throw new EmailNotPresentForPatientException("Please Register with Email and Password to Login",prepareJSONForPatientUser(user.getEmail().toLowerCase(),tokenPassword));
+					throw new EmailNotPresentForPatientException("Please Register with Email and Password to Login",prepareJSONForPatientUser(user.getEmail().toLowerCase(),encodedPassword));
 				else
-					throw new FirstLoginException("First Time Login, please reset your password",prepareJSONForPatientUser(user.getEmail().toLowerCase(),tokenPassword));				
+					throw new FirstLoginException("First Time Login, please reset your password",prepareJSONForPatientUser(user.getEmail().toLowerCase(),encodedPassword));				
 			}else{
 				throw new BadCredentialsException("Invalid username/password");
 			}

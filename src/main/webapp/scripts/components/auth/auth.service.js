@@ -141,6 +141,33 @@ angular.module('hillromvestApp')
                 }.bind(this));
                 return deferred.promise;
             },
+            
+            configurePassword : function(obj, callback){
+                var deferred = $q.defer();
+                var cb = callback || angular.noop;
+                AuthServerProvider.configurePassword(obj).then(function (data) {
+                    deferred.resolve(data);
+                    return cb(data);
+                }).catch(function (err) {
+                    this.logout();
+                    deferred.reject(err);
+                    return cb(err);
+                }.bind(this));
+                return deferred.promise;
+            },
+
+             getSecurityQuestions : function(callback){
+                var deferred = $q.defer();
+                var cb = callback || angular.noop;
+                AuthServerProvider.getSecurityQuestions().then(function (data) {
+                    deferred.resolve(data);
+                    return cb(data);
+                }).catch(function (err) {
+                    deferred.reject(err);
+                    return cb(err);
+                }.bind(this));
+                return deferred.promise;
+            },
 
 
             /*Temp Fix from  angular*/

@@ -3,9 +3,14 @@
 <form name="form" ng-submit="createPatient()" novalidate>
   <div class="navbar dashboard">
     <div class="container">
-      <div class="dashbord-nav__primary secondary-fix-navbar pull-left">
+      <div class="dashbord-nav__primary secondary-fix-navbar pull-left" ng-show="!patientStatus.editMode">
         <span class="dashbord-nav__primary--title" translate="patient.home.createLabel">Create Patient</span>
       </div>
+
+      <div class="dashbord-nav__primary secondary-fix-navbar pull-left" ng-show="patientStatus.editMode">
+        <span class="dashbord-nav__primary--title" >Edit Patient</span>
+      </div>
+
       <div class="dashbord-nav__secondary navbar-right">
         <span class="dashbord-nav__secondary--create-new" translate=""></span>
       </div>
@@ -23,7 +28,7 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" ng-model="patient.HRID" name="HRID" ng-readonly="patientStatus.editMode" required>
+              <input class="" type="text" ng-model="patient.hillromId" name="HRID" ng-readonly="patientStatus.editMode" required>
               <div ng-show="(form.HRID.$dirty && form.HRID.$invalid) || submitted">
                 <span class="has-error" ng-show="form.HRID.$error.required">
                   JDE/HR ID is required.
@@ -31,7 +36,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-7 col-md-offset-2">
+          <div class="col-md-7 col-md-offset-2" ng-if="patientStatus.editMode && patientStatus.role =='CLINIC_ADMIN'">
             <div class="col-md-6 dashboard__form--label">
               <span class="" translate="patient.mrn-id"></span>
               <span class=""></span>
@@ -57,9 +62,10 @@
             <div class="col-md-3 dashboard__form__input">
               <div class="custom-dropdown">
                 <select name="title" ng-readonly="validateADMINorASP()" ng-model="patient.title">
-                  <option selected translate="patient.title.mr"></option>
-                  <option translate="patient.title.mrs"></option>
-                  <option translate="patient.title.miss"></option>
+                  <option translate="patient.title.mr">Mr.</option>
+                  <option translate="patient.title.mrs">Mrs.</option>
+                  <option translate="patient.title.miss">Miss</option>
+                   <option value="" selected="selected">Title</option>
                 </select>
               </div>
             </div>
@@ -71,10 +77,10 @@
             </div>
             <div class="col-md-3 dashboard__form__input">
               <div class="custom-dropdown">
-                <select name="gender" ng-readonly="validateADMINorASP()" ng-model="patient.gender">
-                  <option selected translate="patient.gender.male"></option>
-                  <option translate="patient.gender.female"></option>
-                  <option translate="patient.gender.others"></option>
+                <select name="gender" ng-readonly="validateADMINorASP()" ng-model="gender">
+                  <option selected translate="patient.gender.male">Male</option>
+                  <option translate="patient.gender.female">Female</option>
+                  <option translate="patient.gender.others">Others</option>
                 </select>
               </div>
             </div>
@@ -85,9 +91,11 @@
               <span class="" translate="patient.primary-language"></span>
             </div>
             <div class="custom-dropdown">
-              <select name="language" ng-readonly="validateADMINorASP()" ng-model="patient.language" ng-options="language.name for language in languages">
-                <option  selected="selected">Select a language</option>
-              </select>
+              <select name="language" ng-readonly="validateADMINorASP()" ng-model="patient.language">
+                <option value="" selected="selected">Select a language</option>
+                <option >English</option>
+                <option >French</option>
+              </select> 
             </div>
             
           </div>
@@ -169,11 +177,14 @@
               <span class="">*</span>
             </div>
             <div class="col-md-6 dashboard__form--input">
-              <input type="text" name="dob" class="span2" value="" ng-model="patient.dob" ng-readonly="validateADMINorASP()" data-date-format="mm/dd/yy" id="dp2">
+              <input type="text" name="dob" class="span2" value="" ng-model="patient.formatedDOB" ng-readonly="validateADMINorASP()" data-date-format="mm/dd/yy" id="dp2" required>
               <span readonly class="dashboard__form--label-age">{{patient.age}}</span>
               <div ng-show="(form.dob.$dirty && form.dob.$invalid) || submitted">
                 <span class="has-error" ng-show="form.dob.$error.required">
                   Date of Birth is required.
+                </span>
+                <span class="has-error" ng-if="patient.age == 0">
+                  Date of Birth cannot be future.
                 </span>
               </div>
             </div>
@@ -217,13 +228,14 @@
             </div>
             <div class="custom-dropdown">
               <select name="state" ng-readonly="validateADMINorASP()" ng-model="patient.state" ng-options="state.name as state.name for state in states">
-                <option  selected="selected">Select a state</option>
+                <option  value="" selected="selected">Select a state</option>
               </select>
             </div>
             
             <div class="col-md-2">
               <div class="dashboard__form--label text-center">
-                <span class="" translate="patient.zipcode">*</span>
+                <span class="" translate="patient.zipcode"></span>
+                <span class="">*</span>
               </div>
 
             </div>

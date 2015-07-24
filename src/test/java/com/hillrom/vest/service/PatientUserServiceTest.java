@@ -2,21 +2,28 @@ package com.hillrom.vest.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.inject.Inject;
+
+import net.minidev.json.JSONObject;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.Application;
-import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
@@ -29,7 +36,10 @@ import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 @Transactional
 public class PatientUserServiceTest {
 	
-	private static final String HILLROM_ID = "HR000026";
+	private static final String PASSWORD = "admin";
+	private static final String USERNAME = "admin@localhost.com";
+	
+	private static final String HILLROM_ID = "HR0000"+Math.abs(Math.random()*100);
 	private static final String TITLE = "Mr";
 	private static final String FIRST_NAME = "Peter";
 	private static final String MIDDLE_NAME = "John";
@@ -37,6 +47,7 @@ public class PatientUserServiceTest {
 	private static final String GENDER = "male";
 	private static final String LANG_KEY = "en";
 	private static final String ZIPCODE = "560009";
+	private static final String DOB = "05/08/1990";
 	private static final String ROLE = AuthoritiesConstants.PATIENT;
 	
 	@Inject
@@ -59,6 +70,13 @@ public class PatientUserServiceTest {
 		userExtensionDTO.setLangKey(LANG_KEY);
 		userExtensionDTO.setZipcode(Integer.parseInt(ZIPCODE));
 		userExtensionDTO.setRole(ROLE);
+		userExtensionDTO.setDob(DOB);
+		
+		SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+		Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES));
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(USERNAME, PASSWORD, authorities));
+        SecurityContextHolder.setContext(securityContext);
     }
 	
 	@Test
@@ -83,4 +101,15 @@ public class PatientUserServiceTest {
         assertThat(updatedPatientUser.getEmail()).isNotNull();
         userRepository.delete(updatedPatientUser);
 	}
+	
+	@Test
+    public void assertThatPatientUserIsDeleted() {
+		UserExtension newPatientUser = userService.createPatientUser(userExtensionDTO);
+    	
+        JSONObject jsonObject = userService.deleteUser(newPatientUser.getId());
+        String message = (String) jsonObject.get("message");
+        
+        assertThat(message).isNotNull();
+        assertThat(message).isEqualToIgnoringCase("Patient User deleted successfully.");
+    }
 }

@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.inject.Inject;
+
 import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -22,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.PatientInfo;
@@ -49,10 +53,6 @@ import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 @Service
 @Transactional
 public class UserService {
-
-	private static final String DATEFORMAT_MMddyyyy = "MMddyyyy";
-
-	private static final int NO_OF_CHARACTERS_TO_BE_EXTRACTED = 4;
 
 	private final Logger log = LoggerFactory.getLogger(UserService.class);
 
@@ -93,9 +93,9 @@ public class UserService {
 		StringBuilder defaultPassword = new StringBuilder();
 		defaultPassword.append(patientUser.getZipcode());
 		// default password will have the first 4 letters from last name, if length of last name <= 4, use complete string
-		int endIndex = patientUser.getLastName().length() > NO_OF_CHARACTERS_TO_BE_EXTRACTED ? NO_OF_CHARACTERS_TO_BE_EXTRACTED : patientUser.getLastName().length() ; 
+		int endIndex = patientUser.getLastName().length() > Constants.NO_OF_CHARACTERS_TO_BE_EXTRACTED ? Constants.NO_OF_CHARACTERS_TO_BE_EXTRACTED : patientUser.getLastName().length() ; 
 		defaultPassword.append(patientUser.getLastName().substring(0, endIndex));
-		defaultPassword.append(patientUser.getDob().toString(DATEFORMAT_MMddyyyy));
+		defaultPassword.append(patientUser.getDob().toString(Constants.DATEFORMAT_MMddyyyy));
 		return defaultPassword.toString();
 	}
 

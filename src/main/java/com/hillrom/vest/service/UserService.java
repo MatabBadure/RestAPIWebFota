@@ -10,6 +10,8 @@ import javax.inject.Inject;
 import net.minidev.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -92,7 +94,6 @@ public class UserService {
             .map(user -> {
                 // activate given user for the registration key.
                 user.setActivated(true);
-                user.setActivationKey(null);
                 userRepository.save(user);
                 log.debug("Activated user: {}", user);
                 return user;
@@ -486,7 +487,7 @@ public class UserService {
 		if(userExtensionDTO.getGender() != null)
 			patientInfo.setGender(userExtensionDTO.getGender());
 		if(userExtensionDTO.getDob() != null)
-			patientInfo.setDob(userExtensionDTO.getDob());
+			patientInfo.setDob(LocalDate.parse(userExtensionDTO.getDob(), DateTimeFormat.forPattern("MM/dd/yyyy")));
 		if(userExtensionDTO.getLangKey() != null)
 			patientInfo.setLangKey(userExtensionDTO.getLangKey());
 		if(userExtensionDTO.getEmail() != null)
@@ -534,7 +535,7 @@ public class UserService {
 		if(userExtensionDTO.getNpiNumber() != null)
 			newUser.setNpiNumber(userExtensionDTO.getNpiNumber());
 		if(userExtensionDTO.getDob() != null)
-			newUser.setDob(userExtensionDTO.getDob());
+			newUser.setDob(LocalDate.parse(userExtensionDTO.getDob(), DateTimeFormat.forPattern("MM/dd/yyyy")));
 		newUser.setLangKey(userExtensionDTO.getLangKey());
 		// new user is not active
 		newUser.setActivated(false);
@@ -621,7 +622,6 @@ public class UserService {
     	String password = params.get("password");
     	String questionId = params.get("questionId");
     	String answer = params.get("answer");
-    	String authToken = params.get("x-auth-token");
     	String termsAndConditionsAccepted = params.get("termsAndConditionsAccepted");
     	
     	JSONObject errorsJsonObject = validateRequest(password, questionId,
@@ -657,7 +657,6 @@ public class UserService {
         	
         	log.debug("updateEmailOrPassword for User: {}", currentUser);
         	
-        	authTokenService.deleteToken(authToken); // Token must be deleted to avoid subsequent request
         }else{
         	errorsJsonObject.put("ERROR", "Invalid Security Question or Answer");
         	return errorsJsonObject;
@@ -762,5 +761,46 @@ public class UserService {
 		return jsonObject;
     }
 
+	public JSONObject updatePasswordSecurityQuestion(Map<String,String> params){
+		String requiredParams[] = {"key","password","questionId","answer","termsAndConditionsAccepted"};
+		JSONObject errorsJson = RequestUtil.checkRequiredParams(params, requiredParams);
+		if(errorsJson.containsKey("ERROR")){
+			return errorsJson;
+		}
+		
+		String password = params.get("password");
+		if(!checkPasswordLength(password)){
+			errorsJson.put("ERROR", "Incorrect Password");
+			return errorsJson;
+		}
+		
+		String key = params.get("key");
+		Optional<User> existingUser = userRepository.findOneByActivationKey(key);
+		User currentUser = null;
+		if(existingUser.isPresent()){
+			currentUser = existingUser.get();
+		}else{
+			errorsJson.put("ERROR", "Invalid Activation Key");
+			return errorsJson;
+		}
+		
+		Long qid = Long.parseLong(params.get("questionId"));
+		String answer = params.get("answer");
+		Optional<UserSecurityQuestion> opUserSecQ = userSecurityQuestionService.saveOrUpdate(currentUser.getId(), qid, answer);		
+		
+		if(opUserSecQ.isPresent()){
+			currentUser.setActivationKey(null);
+			currentUser.setLastLoggedInAt(DateTime.now());
+			currentUser.setLastModifiedDate(DateTime.now());
+			currentUser.setPassword(passwordEncoder.encode(params.get("password")));
+			currentUser.setTermsConditionAccepted(true);
+			currentUser.setTermsConditionAcceptedDate(DateTime.now());
+			userRepository.save(currentUser);
+		}else{
+			errorsJson.put("ERROR","Invalid Security Question or Answer");
+			return errorsJson;
+		}
+		return new JSONObject();
+	}
 }
 

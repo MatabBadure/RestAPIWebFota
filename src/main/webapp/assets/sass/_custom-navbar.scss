@@ -18,15 +18,15 @@ $header--background: $pickled-bluewood;
 	color: inherit;
 }
 
-.navbar-secondary .nav-pills > li {
+.navbar-secondary .navbar-right > li {
   min-width: 40px;
 }
 
-.navbar-secondary .nav-pills > li + li {
-  margin-left: 20px;
+.navbar-secondary .navbar-right > li {
+  padding: 0 20px;
 }
 
-.navbar-secondary .nav-pills li a {
+.navbar-secondary .navbar-right li a {
 	color: inherit;
 	padding: 19px 10px;
 	&:hover {
@@ -40,7 +40,7 @@ $header--background: $pickled-bluewood;
 		}
 	}
 }
-.navbar-secondary .nav-pills li:last-child a{
+.navbar-secondary .navbar-right li:last-child a{
 	color: inherit;
 	padding: 19px 0;
 	&:hover {
@@ -52,7 +52,7 @@ $header--background: $pickled-bluewood;
 	}
 }
 
-.navbar-secondary .nav-pills li a.active{
+.navbar-secondary .navbar-right li a.active{
 	background-color: inherit;
 	color: inherit;
 	box-shadow : 0 -3px 0 0 #ef7164 inset;

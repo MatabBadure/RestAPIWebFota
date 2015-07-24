@@ -3,24 +3,25 @@
 angular.module('hillromvestApp')
     .config(function ($stateProvider) {
         $stateProvider
-            .state('doctor', {
-                parent: 'entity',
-                url: '/doctor',
+            .state('authenticate', {
+                parent: 'account',
+                url: '/authenticate?key',
                 data: {
                     roles: [],
-                    pageTitle: 'doctor.title'
+                    pageTitle: 'authenticate.title'
                 },
                 views: {
                     'content@': {
-                        templateUrl: 'scripts/app/entities/doctors/doctors.html',
-                        controller: 'DoctorsController'
+                        templateUrl: 'scripts/app/account/authenticate/authenticate.html',
+                        controller: 'AuthenticateController'
                     }
                 },
                 resolve: {
                     translatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate, $translatePartialLoader) {
-                        $translatePartialLoader.addPart('doctor');
+                        $translatePartialLoader.addPart('authenticate');
                         return $translate.refresh();
                     }]
                 }
             });
     });
+

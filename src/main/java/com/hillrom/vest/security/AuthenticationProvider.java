@@ -115,7 +115,7 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
 			String defaultPassword = generateDefaultPassword(user);
 			if(defaultPassword.equals(tokenPassword)){
 				if(!RandomUtil.isValidEmail(user.getEmail()))
-					throw new EmailNotPresentForPatientException("Please Register with Email and Password to Login",prepareJSONForPatientUser(user.getEmail().toLowerCase(),user.getPassword()));
+					throw new EmailNotPresentForPatientException("Please Register with Email and Password to Login",prepareJSONForPatientUser(user.getEmail().toLowerCase(),tokenPassword));
 				else
 					throw new FirstLoginException("First Time Login, please reset your password",prepareJSONForPatientUser(user.getEmail().toLowerCase(),user.getPassword()));				
 			}else{

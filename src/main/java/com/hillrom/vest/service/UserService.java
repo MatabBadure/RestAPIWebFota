@@ -309,9 +309,6 @@ public class UserService {
                     .orElseGet(() -> {
                     	UserExtension user = createPatientUser(userExtensionDTO);
                 		if(user.getId() != null) {
-                			if(userExtensionDTO.getEmail() != null) {
-                				mailService.sendActivationEmail(user, baseUrl);
-                			}
 	                        jsonObject.put("message", "Patient User created successfully.");
 	                        jsonObject.put("user", user);
 	                        return jsonObject;
@@ -341,6 +338,9 @@ public class UserService {
     public UserExtension createHillromTeamUser(UserExtensionDTO userExtensionDTO) {
     	UserExtension newUser = new UserExtension();
 		assignValuesToUserObj(userExtensionDTO, newUser);
+		newUser.setActivated(false);
+		newUser.setDeleted(false);
+		newUser.setActivationKey(RandomUtil.generateActivationKey());
 		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
 		userExtensionRepository.save(newUser);
 		log.debug("Created Information for User: {}", newUser);
@@ -358,6 +358,8 @@ public class UserService {
     		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
     		patientInfoRepository.save(patientInfo);
     		assignValuesToUserObj(userExtensionDTO, newUser);
+    		newUser.setActivated(true);
+    		newUser.setDeleted(false);
     		if(AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
     			newUser.setEmail(userExtensionDTO.getHillromId());
     		}
@@ -376,6 +378,9 @@ public class UserService {
     public UserExtension createHCPUser(UserExtensionDTO userExtensionDTO) {
     	UserExtension newUser = new UserExtension();
 		assignValuesToUserObj(userExtensionDTO, newUser);
+		newUser.setActivated(false);
+		newUser.setDeleted(false);
+		newUser.setActivationKey(RandomUtil.generateActivationKey());
 		for(Map<String, String> clinicObj : userExtensionDTO.getClinicList()){
 			Clinic clinic = clinicRepository.getOne(Long.parseLong(clinicObj.get("id")));
 			newUser.getClinics().add(clinic);
@@ -537,13 +542,6 @@ public class UserService {
 		if(userExtensionDTO.getDob() != null)
 			newUser.setDob(LocalDate.parse(userExtensionDTO.getDob(), DateTimeFormat.forPattern("MM/dd/yyyy")));
 		newUser.setLangKey(userExtensionDTO.getLangKey());
-		// new user is not active
-		newUser.setActivated(false);
-		newUser.setDeleted(false);
-		// new user gets registration key
-		newUser.setActivationKey(RandomUtil.generateActivationKey());
-		if(userExtensionDTO.getRole() != null)
-			newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
 	}
 
     public Optional<User> findOneByEmail(String email) {

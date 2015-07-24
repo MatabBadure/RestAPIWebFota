@@ -1,6 +1,8 @@
 package com.hillrom.vest.repository;
 
-import javax.persistence.ColumnResult;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class HcpVO {
 
@@ -17,13 +19,13 @@ public class HcpVO {
 	private Long mobilePhone;
 	private String speciality;
 	private String state;
-	private String clinicName;
+	private List<Map<String,String>> clinics = new LinkedList<>();
 	private boolean isDeleted;
 	
 	public HcpVO(Long id, String firstName, String lastName, String email,boolean isDeleted,
 			Integer zipcode, String address, String city, String credentials,
 			Long faxNumber, Long primaryPhone, Long mobilePhone,
-			String speciality, String state, String clinicName) {
+			String speciality, String state) {
 		super();
 		this.id = id;
 		this.email = email;
@@ -39,7 +41,6 @@ public class HcpVO {
 		this.mobilePhone = mobilePhone;
 		this.speciality = speciality;
 		this.state = state;
-		this.clinicName = clinicName;
 	}
 	public Long getId() {
 		return id;
@@ -119,11 +120,11 @@ public class HcpVO {
 	public void setState(String state) {
 		this.state = state;
 	}
-	public String getClinicName() {
-		return clinicName;
+	public List<Map<String, String>> getClinics() {
+		return clinics;
 	}
-	public void setClinicName(String clinicName) {
-		this.clinicName = clinicName;
+	public void setClinics(List<Map<String, String>> clinicNames) {
+		this.clinics = clinicNames;
 	}
 	public boolean isDeleted() {
 		return isDeleted;

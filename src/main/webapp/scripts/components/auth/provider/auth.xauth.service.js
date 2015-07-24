@@ -43,6 +43,28 @@ angular.module('hillromvestApp')
                 });
             },
 
+            configurePassword: function (data) {
+                return $http.put('api/account/update_passwordsecurityquestion', data, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'  
+                    }
+                }).success(function (data, status, headers, config) {
+                    return {'response' : data, 'status' : status, 'headers' : headers, 'config' : config};
+                }).error(function (data, status, headers, config) {
+
+                });
+            },
+
+            getSecurityQuestions: function () {
+                return $http.get('api/securityQuestions')
+                .success(function (data, status, headers, config) {
+                    return {'response' : data, 'status' : status, 'headers' : headers, 'config' : config};
+                }).error(function (data, status, headers, config) {
+
+                });
+            },
+
             /*Temp Service Call From angular*/
             captcha: function (captchaData){
                 var data = {

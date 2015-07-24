@@ -10,7 +10,7 @@
       </div>
     </div>
     <div class="container dashboard__form">
-      
+
       <div class="row margin-top-xl">
         <div class="col-md-16">
           <span class="dashboard__form--type" translate="user.personal-details"></span>
@@ -24,9 +24,9 @@
             <div class="col-md-10 dashboard__form__input">
               <div class="custom-dropdown">
                 <select ng-model="user.title" name="title" ng-readonly="validateSuperAdmin()">
-                  <option selected translate="user.title.mr"></option>
-                  <option translate="user.title.mrs"></option>
-                  <option translate="user.title.miss"></option>
+                  <option selected translate="user.title.mr" value="Mr."></option>
+                  <option translate="user.title.mrs" value="Mrs."></option>
+                  <option translate="user.title.miss" value="Miss"></option>
                 </select>
               </div>
             </div>
@@ -40,9 +40,9 @@
               <input class="" type="text" readonly>
             </div>
           </div>
-          
+
         </div>
-          
+
         </div>
 
         <div class="col-md-16 row margin-top">
@@ -75,7 +75,7 @@
             </div>
             <div class="col-md-10 dashboard__form--input">
               <input class="" type="text" name="middleName" ng-model="user.middleName" ng-pattern="/^[a-zA-Z]+$/" ng-minlength=2 ng-maxlength=15 ng-readonly="validateSuperAdmin()">
-              <div ng-show="(form.middleName.$dirty && form.middleName.$invalid)"> 
+              <div ng-show="(form.middleName.$dirty && form.middleName.$invalid)">
                 <span class="has-error" ng-show="form.middleName.$error.pattern" >
                   Middle Name cannot have number.
                 </span>
@@ -149,9 +149,9 @@
             <div class="col-md-10 dashboard__form__input--role">
               <div class="custom-dropdown">
                 <select name="role" ng-model="user.role" ng-readonly="validateSuperAdmin()">
-                  <option selected translate="user.role.super-admin">Super Admin</option>
-                  <option translate="user.role.account-services">Account Services</option>
-                  <option translate="user.role.associates">Associates</option>
+                  <option selected translate="user.role.super-admin" value="ADMIN">Super Admin</option>
+                  <option translate="user.role.account-services" value="ACCT_SERVICES">Account Services</option>
+                  <option translate="user.role.associates" value="ASSOCIATES">Associates</option>
                 </select>
               </div>
             </div>
@@ -163,7 +163,7 @@
             <button class="hillrom-btn btn-submit" ng-show="userStatus.isCreate" ng-click="formSubmit()" translate="user.submit-button-text">Submit</button>
             <button class="hillrom-btn btn-submit" ng-click="deleteUser()" ng-show="!userStatus.isCreate">Delete</button>
             <button class="hillrom-btn btn-submit" ng-click="formSubmit()" ng-show="!userStatus.isCreate">Update</button>
-          </div>    
+          </div>
         </div>
       </div>
     </div>

@@ -172,7 +172,7 @@ public class UserExtensionResource {
     		@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit)
         throws URISyntaxException {
-    	String queryString = new StringBuilder("/'%").append(searchString).append("%'/").toString();
+    	String queryString = new StringBuilder("%").append(searchString).append("%").toString();
     	Page<HillRomUserVO> page = userSearchRepository.findHillRomTeamUsersBy(queryString,PaginationUtil.generatePageRequest(offset, limit));
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/userExtensions", offset, limit);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);

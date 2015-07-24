@@ -116,7 +116,7 @@ var usersList = [
 
 var clinicsList = [
   {
-    "id": 13,
+    "id": 14,
     "name": "Hill Rom",
     "address": "Neev",
     "zipcode": 56004,
@@ -126,50 +126,32 @@ var clinicsList = [
     "hillromId": 123,
     "state": "AL",
     "parent": true,
-
     "npiNumber": null,
     "deleted": false,
     "childClinics": [
       {
-        "id": 65,
-        "name": "abc"
+        "id": 65
       },
       {
-        "id": 66,
-        "name": "xyz"
-      },
-      {
-        "id": 67,
-        "name": "pqrs"
-      },
-      {
-        "id": 68,
-        "name": "qwerty"
+        "id": 66
       }
     ]
   },
   {
-    "id": 69,
-    "name": "Neevtech",
-    "parent": "Razorfish",
-    "address": "RazorFish",
-    "zipcode": 560048,
-    "city": "bangalore",
-    "state": "karnataka",
-    "phoneNumber": 9740932492,
-    "faxNumber": null,
-    "hillromId": null,
-    "parentClinic": null,
+    "id": 14,
+    "name": "Neev Rom",
+    "address": "Neev",
+    "zipcode": 56004,
+    "city": "Bangalore",
+    "phoneNumber": 9740353872,
+    "faxNumber": 9942354883,
+    "hillromId": 123,
+    "state": "AL",
+    "parent": false,
+
     "npiNumber": null,
-    "users": [],
-    "patients": [],
     "deleted": false,
-    "childClinics": [
-      {
-        "id": 70,
-        "name": "12345678"
-      }
-    ]
+    "parentClinic": {"name": "Hill Rom", "id": 13}
   }];
 
 var doctorsList = [

@@ -48,10 +48,18 @@ angular.module('hillromvestApp')
           if ($scope.form.$invalid) {
             return false;
           }
-
+          if ($scope.clinic.type === 'parent') {
+            $scope.clinic.parent = true;
+          } else {
+            $scope.clinic.parent = false;
+          }
+          if ($scope.clinic.parentClinic) {
+            delete $scope.clinic.parentClinic.name;
+          }
           if ($scope.clinicStatus.editMode) {
             // edit Clinic section
             var data = $scope.clinic;
+
             ClinicService.updateClinic(data).then(function(data) {
               $scope.clinicStatus.isMessage = true;
               $scope.clinicStatus.message = "Clinic updated successfully" + " with ID " + data.data.Clinic.id;
@@ -77,12 +85,11 @@ angular.module('hillromvestApp')
             }
             // create clinic section
             var data = $scope.clinic;
-            data.hillromId = null;
 
             ClinicService.createClinic(data).then(function(data) {
               $scope.clinicStatus.isMessage = true;
-              console.info(data);
               $scope.clinicStatus.message = "Clinic created successfully" + " with ID " + data.data.Clinic.id;
+              $scope.clinic = "";
             }).catch(function(response) {
               if (response.data.message !== undefined) {
                 $scope.clinicStatus.message = response.data.message;

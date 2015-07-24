@@ -4,6 +4,7 @@ var token = 'token',
   accountDetailsURL = 'api/account?cacheBuster=' + timeStamp,
   resetPassInitURL = 'api/account/reset_password/init?cacheBuster=' + timeStamp,
   recaptchaURL = 'api/recaptcha?cacheBuster=' + timeStamp,
+  securityQuestionsURL = 'api/securityQuestions?cacheBuster=' + timeStamp,
   responses = {
     'authenticate': {
       'success': {
@@ -28,5 +29,26 @@ var token = 'token',
       'success': {
 
       }
+    },
+    'securityQuestions': {
+      'success': {
+        [{
+          "id": 3,
+          "question": "In which city was your mother born"
+        }, {
+          "id": 5,
+          "question": "What is first name of your oldest cousin?"
+        }, {
+          "id": 4,
+          "question": "What was your kindergarten teacher's last name?"
+        }, {
+          "id": 1,
+          "question": "Your favorite pet's name"
+        }, {
+          "id": 2,
+          "question": "Your mother's maiden name"
+        }]
+      }
     }
-  };
+  }
+};

@@ -19,6 +19,7 @@
     <include file="classpath:config/liquibase/changelog/20150721015234_added_dob_to_User.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:config/liquibase/changelog/20150723115427_added_clinicadminid_to_clinic.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:config/liquibase/changelog/20150723115427_added_sequence_tables.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:config/liquibase/changelog/20150724113127_added_stored_procedures.xml" relativeToChangelogFile="false"/>
 	
     <!-- JHipster will add liquibase changelogs here -->
 </databaseChangeLog>

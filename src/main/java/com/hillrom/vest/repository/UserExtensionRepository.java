@@ -1,9 +1,8 @@
 package com.hillrom.vest.repository;
 
-import com.hillrom.vest.domain.UserExtension;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import com.hillrom.vest.domain.UserExtension;
 
 /**
  * Spring Data JPA repository for the UserExtension entity.

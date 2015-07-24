@@ -1,13 +1,22 @@
-<div class="login">
-  <div class="col-md-16 login__container">
-    <div class="col-md-11 login__container__left-section">
-      <div class="login__container__left-section--description">
-        <div class="login__container__left-section--description content">
-          The Vest Airway Clearance System, Model 105, is a designed to assist patients in the mobilization of retained secretions that, if not removed, may lead to increased rates of respiratory infaction, hospitalization and reduced lung function.
-        </div>
-        <div class="login__container__left-section--description image">
-          <img src="assets/images/heart.png">
-        </div>
+<div class="container login">
+    <div class="login--position">
+    <div class=" form__container__login login__container col-md-8 col-lg-8">
+      <div class="col-md-6 col-lg-6 ">
+        <img src="assets/images/man.svg">
+      </div>
+      <div class=" col-md-10 col-lg-10 login__container__right-section">
+        <form>
+         <!--  <div class="form-group"> -->
+            <p><strong>LOGIN TO YOUR ACCOUNT</strong></p>
+            <!-- <p id="error_msg">UserName & Password do not match.Please try again.</p> -->
+            <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter your Hill-Rom ID or Email-id">
+         <!--  </div> -->
+          <!-- <div class="form-group"> -->
+            <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+         <!--  </div> -->
+            <div class="col-md-8 col-lg-8 link" id="forgotpwd"><a href="#">Forgot Password?</a></div>
+            <div class="col-md-8 col-lg-8 link"><a href="#" class="myButton">LOGIN</a></div>
+        </form>
       </div>
     </div>
 
@@ -65,23 +74,90 @@
         </div>
 
         <div class="login__container__right-section--form" ng-show="isFirstLogin">
-          <form class="form" role="form" ng-submit="submitPassword($event)">
+          <form class="form" role="form" name="confirmForm" ng-submit="submitPassword($event)">
+
             <div class="form-group" ng-show="!isEmailExist">
               <label for="Email ID" translate="global.form.email">E-Mail</label>
-              <input type="text" class="form-control" id="" placeholder="{{'login.form.email.placeholder' | translate}}" ng-model="user.email">
+              <input type="email" class="form-control" name="email" placeholder="{{'login.form.email.placeholder' | translate}}" ng-model="user.email" ng-maxlength=100 required>
+                  <div ng-show="(confirmForm.email.$dirty && confirmForm.email.$invalid) || submitted" class="form-error">
+                      <span class="help-block" ng-show="confirmForm.email.$error.required">
+                        Your e-mail is required.
+                      </span>
+                      <span class="help-block" ng-show="confirmForm.email.$error.email">
+                        Your e-mail is invalid.
+                      </span>
+                      <span class="help-block" ng-show="confirmForm.email.$error.maxlength">
+                        Your e-mail cannot be longer than 100 characters.
+                      </span>
+                  </div>
             </div>
+
             <div class="form-group">
-              <label for="Password" >Password</label>
-              <input type="password" class="form-control" id="" placeholder="password" ng-model="user.password">
+              <label for="Password" >Password*</label>
+              <input type="password" name="password" class="form-control"  placeholder="password" ng-model="user.password" ng-minlength=8 ng-maxlength=50 required>
+                  <div ng-show="(confirmForm.password.$dirty && confirmForm.password.$invalid) || submitted">
+                      <span class="help-block"
+                         ng-show="confirmForm.password.$error.required">
+                          Your password is required.
+                      </span>
+                      <span class="help-block"
+                         ng-show="confirmForm.password.$error.minlength">
+                          Your password is required to be at least 8 characters.
+                      </span>
+                      <span class="help-block"
+                         ng-show="confirmForm.password.$error.maxlength">
+                          Your password cannot be longer than 50 characters.
+                      </span>
+                  </div>
             </div>
+
             <div class="form-group">
               <label for="Confirm Password" > Confirm Password</label>
-              <input type="password" class="form-control" id="" placeholder="confirm password" ng-model="user.confirmPassword">
+              <input type="password" class="form-control" name="confirmPassword" placeholder="confirm password" ng-model="user.confirmPassword" ng-minlength=8 ng-maxlength=50 required>
+                  <div ng-show="(confirmForm.confirmPassword.$dirty && confirmForm.confirmPassword.$invalid) || submitted">
+                      <span class="help-block"
+                         ng-show="confirmForm.confirmPassword.$error.required">
+                          Your confirmation password is required.
+                      </span>
+                      <span class="help-block"
+                         ng-show="confirmForm.confirmPassword.$error.minlength">
+                          Your confirmation password is required to be at least 8 characters.
+                      </span>
+                      <span class="help-block"
+                         ng-show="confirmForm.confirmPassword.$error.maxlength">
+                          Your confirmation password cannot be longer than 50 characters.
+                      </span>
+                  </div>
             </div>
-            <button type="submit" class="login-button center-block">Submit</button>
+
+            <div class="form-group">
+              <label>Choose security question*</label>
+              <select class="form-control" name="question" ng-model="user.question" required ng-options="question.question for question in questions">
+                <option value="">-- select a security question --</option>
+              </select>
+                 <div ng-show="(confirmForm.question.$dirty && confirmForm.question.$invalid) || submitted">
+                      <p class="help-block"
+                         ng-show="confirmForm.question.$error.required">
+                          Security question is required.
+                      </p>
+                  </div>     
+            </div> 
+
+            <div class="form-group">
+                <label>Answer security question*</label>
+                <input type="text" class="form-control" name="answer" ng-model="user.answer" required>
+                <div ng-show="(confirmForm.answer.$dirty && confirmForm.answer.$invalid) || submitted">
+                    <p class="help-block"
+                       ng-show="confirmForm.answer.$error.required">
+                        Answer is required.
+                    </p>
+                </div>     
+            </div> 
+
+
+            <button type="submit" ng-click="submitConfirmForm()" class="login-button center-block">Submit</button>
           </form>
         </div>
     </div>
-
   </div>
 </div>

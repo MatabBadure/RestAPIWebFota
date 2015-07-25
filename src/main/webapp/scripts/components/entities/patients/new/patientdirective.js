@@ -48,8 +48,8 @@ angular.module('hillromvestApp')
               var data = $scope.patient;
               data.dob = data.formatedDOB;
               data.role = 'PATIENT';
-              //delete data.formatedDOB;
-              UserService.editUser($scope.patient.PID,data).then(function (response) {
+             
+              UserService.editUser($scope.patient,data).then(function (response) {
                 if(response.status == '200')
                 {
                   $scope.patientStatus.isMessage = true;
@@ -67,7 +67,6 @@ angular.module('hillromvestApp')
               // create patient section
               var data = $scope.patient;
               data.role = 'PATIENT';
-              //delete data.formatedDOB;
               
               UserService.createUser(data).then(function (response) {
                 if(response.status == '201')

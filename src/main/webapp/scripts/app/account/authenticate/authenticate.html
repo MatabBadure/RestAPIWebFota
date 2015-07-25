@@ -1,29 +1,112 @@
-<div class="container login">
-    <div class="login--position">
+
+  <div class="container login">
+  <div class="login--position">
     <div class=" form__container__authenticate  col-md-8 col-lg-8">
       <div class="col-md-6 col-lg-6 ">
         <img src="assets/images/man.svg">
       </div>
-      <div class=" col-md-10 col-lg-10 login__container__right-section">
-        <form>
-          <p><strong>Security questions</strong></p>
-          <div class="dashboard__auth__form__input">
-            <div class="custom-dropdown--auth arrow__pos">
-              <select>
-                <option class="ng-scope" selected>Your faviroute Pet name</option>
-                <option class="ng-scope">Put json code</option>
-              </select>
+              <div class=" col-md-10 col-lg-10 login__container__right-section">
+                 <h1 >Authenticate </h1>
+                <div class="alert alert-danger has-error" ng-show="otherError">
+                  <p >Error occured!. Please try again</p>
+                </div>
+
+                <div class="alert alert-danger has-error" ng-show="alreadyActive">
+                  <p >User is already active and authenticated.</p>
+                </div>
+
+                <div class="alert alert-danger has-error" ng-show="questionsNotLoaded">
+                  <p >Security questions failed to load! Please try again</p>
+                </div>
+
+                <div class="alert alert-danger has-error" ng-show="doNotMatch">
+                  The password and its confirmation do not match!
+                </div>
+                <form ng-show="!success" name="form" role="form" novalidate ng-submit="authenticate()" show-validation>
+
+                  <div class="form-group">
+                    <label >Choose password*</label>
+                    <input type="password" class="form-control" name="password"
+                    ng-model="authenticate.password" ng-minlength=8 ng-maxlength=50 required>
+                    <div ng-show="(form.password.$dirty && form.password.$invalid) || submitted">
+                      <p class="has-error"
+                      ng-show="form.password.$error.required">
+                      Your password is required.
+                    </p>
+                    <p class="has-error"
+                    ng-show="form.password.$error.minlength">
+                    Your password is required to be at least 8 characters.
+                  </p>
+                  <p class="has-error"
+                  ng-show="form.password.$error.maxlength">
+                  Your password cannot be longer than 50 characters.
+                </p>
+              </div>
+              <password-strength-bar password-to-check="authenticate.password"></password-strength-bar>
+
             </div>
-          </div>
-          <input type="text" class="form-control"  placeholder="{{ 'authenticate.placeholder.answer' | translate }}">         
-          <div class="col-md-8 col-lg-8 link">
-            <a href="#" translate="authenticate.forgot-pwd-link"></a>
-          </div>
-          <div class="col-md-8 col-lg-8 link">
-            <a href="#" class="myButton">LOGIN</a>
-          </div>
+
+            <div class="form-group">
+              <label >Confirm password*</label>
+              <input type="password" class="form-control" name="confirmPassword" 
+              ng-model="authenticate.confirmPassword" ng-minlength=8 ng-maxlength=50 required>
+              <div ng-show="(form.confirmPassword.$dirty && form.confirmPassword.$invalid) || submitted ">
+                <p class="has-error"
+                ng-show="form.confirmPassword.$error.required">
+                Your password confirmation is required.
+              </p>
+              <p class="has-error"
+              ng-show="form.confirmPassword.$error.minlength">
+              Your password confirmation is required to be at least 5 characters.
+            </p>
+            <p class="has-error"
+            ng-show="form.confirmPassword.$error.maxlength">
+            Your password confirmation cannot be longer than 50 characters.
+          </p>
+        </div>     
+        </div> 
+
+        <div class="form-group">
+          <label>Choose security question*</label>
+          <select class="form-control" name="question" ng-model="authenticate.question" required ng-options="question.question for question in questions">
+            <option value="">-- select a security question --</option>
+          </select>
+
+
+          <div ng-show="(form.question.$dirty && form.question.$invalid) || submitted">
+            <p class="has-error"
+            ng-show="form.question.$error.required">
+            Security question is required.
+          </p>
+        </div>     
+        </div> 
+
+        <div class="form-group">
+          <label>Answer to security question*</label>
+          <input type="text" class="form-control" name="answer" ng-model="authenticate.answer" required>
+          <div ng-show="(form.answer.$dirty && form.answer.$invalid) || submitted">
+            <p class="has-error"
+            ng-show="form.answer.$error.required">
+            Answer is required.
+          </p>
+        </div>     
+        </div> 
+
+        <div class="form-group">
+
+          <input type="checkbox" name="tnc" ng-model="authenticate.tnc" required>
+          Agree to Terms and Conditions*
+          <div ng-show="(form.tnc.$dirty && form.tnc.$invalid) || submitted">
+            <p class="has-error"
+            ng-show="form.tnc.$error.required">
+            Please agree to Terms and Conditions.
+          </p>
+        </div>     
+        </div>         
+
+        <button type="submit" class="myButton" ng-click="formSubmit()">Reset Password</button>
         </form>
       </div>
     </div>
   </div>
-</div>
+  </div>

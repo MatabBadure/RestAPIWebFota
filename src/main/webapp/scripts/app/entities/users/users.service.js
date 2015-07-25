@@ -69,6 +69,28 @@ angular.module('hillromvestApp')
          .success(function (response) {
           return response;
         });
+      },
+
+      getPatientList : function(keyword){
+        return $http.get('api/patientInfos/search?searchString=' + keyword,  {
+          headers: {
+            'Content-Type' : 'application/json',
+            'x-auth-token' : token
+          }
+        }).success(function (response) {
+          return response;
+        });
+      },
+
+      getPatientInfo : function(keyword){
+        return $http.get('api/patientInfos/search?searchString=' + keyword,  {
+          headers: {
+            'Content-Type' : 'application/json',
+            'x-auth-token' : token
+          }
+        }).success(function (response) {
+          return response;
+        });
       }
     };
   });

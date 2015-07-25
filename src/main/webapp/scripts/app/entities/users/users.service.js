@@ -71,7 +71,7 @@ angular.module('hillromvestApp')
         });
       },
       getUsers : function(searchString, pageNo, offset){
-        return $http.get('api/users/search?searchString=' + searchString + '&pageNo=' + pageNo + '&offset=' + offset, {
+        return $http.get('api/user/search?searchString=' + searchString + '&pageNo=' + pageNo + '&offset=' + offset, {
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',

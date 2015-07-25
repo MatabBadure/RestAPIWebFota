@@ -58,12 +58,13 @@ angular.module('hillromvestApp')
         * @description
         * Function to Search User on entering text on the textfield.
         */
-        $scope.searchUsers = function () {
-          $scope.users = usersList;
+        $scope.searchUsers = function (pageNumber, offset) {
+          pageNumber = pageNumber || 1;
+          offset = offset || 10;
           UserService.getUsers($scope.searchItem, 1, 10).then(function (response) {
-            console.log('SUCCESS RESPONSE',response);
+            $scope.users = response.data;
           }).catch(function (response){
-            console.log('ERROR RESPONSE',response);
+
           });
         };
       }

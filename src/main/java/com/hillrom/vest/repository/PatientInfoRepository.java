@@ -18,8 +18,7 @@ public interface PatientInfoRepository extends JpaRepository<PatientInfo,Long> {
 	@Query("from PatientInfo where hillromId = ?1")
     Optional<PatientInfo> findOneByHillromId(String hillRomId);
 	
-	@Query("Select p from PatientInfo p inner join p.userPatientAssoc upa"
-			+ " left outer join p.clinicPatientAssoc cpa where  "
+	@Query("Select p from PatientInfo p where  "
 			+ " ( LOWER(p.firstName) like LOWER(:queryString) or "
 			+ " LOWER(p.lastName) like LOWER(:queryString) or "
 			+ " LOWER(p.email) like LOWER(:queryString) or "

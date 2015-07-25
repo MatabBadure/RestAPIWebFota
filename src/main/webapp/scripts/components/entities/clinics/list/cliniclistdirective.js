@@ -13,6 +13,16 @@ angular.module('hillromvestApp')
       var clinic = scope.clinic;
     },
     controller: function($scope) {
+
+      $scope.init = function () {
+        $scope.currentPageIndex = 1;
+        $scope.perPageCount = 10;
+        $scope.pageCount = 0;
+        $scope.total = 0;
+      };
+
+      $scope.init();
+
       $scope.clinics = [];
       $scope.selectClinic = function (clinic) {
         $scope.clinic = clinic;
@@ -21,10 +31,16 @@ angular.module('hillromvestApp')
         });
       };
 
-      $scope.searchClinics = function (pageNumber, offset) {
-        pageNumber = pageNumber || 1;
-        offset = offset || 10;
-        ClinicService.getClinics($scope.searchItem, pageNumber, offset).then(function (response) {
+      $scope.searchClinics = function (track) {
+        if (track !== undefined) {
+          if (track === "PREV" && $scope.currentPageIndex > 1) {
+            $scope.currentPageIndex--;
+          }
+          if (track === "NEXT") {
+            $scope.currentPageIndex++;
+          }
+        }
+        ClinicService.getClinics($scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
           $scope.clinics = response.data;
         }).catch(function (response) {
 

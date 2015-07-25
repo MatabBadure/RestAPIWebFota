@@ -28,5 +28,9 @@
 		<span>More</span><span>&gt;&gt;</span>
 	</div>
 </div>
-
+<div ng-show="pageCount > 1">
+    <button ng-click="searchClinics('PREV')" ng-disabled="!(currentPageIndex > 1)">Previous</button>
+    <span>{{currentPageIndex}}</span>
+    <button ng-click="searchClinics('NEXT')" ng-disabled="!(pageCount > currentPageIndex)">Next</button>
+</div>
 <button ng-click="createClinic()">Create Clinic</button>

@@ -71,8 +71,25 @@ angular.module('hillromvestApp')
         });
       },
       getUsers : function(searchString, pageNo, offset){
-        return $http.get('api/users/search?searchString=' + searchString + '&pageNo=' + pageNo + '&ofset=' + offset)
-         .success(function (response) {
+        return $http.get('api/users/search?searchString=' + searchString + '&pageNo=' + pageNo + '&offset=' + offset, {
+          headers: {
+            'Content-Type' : 'application/json',
+            'Accept' : 'application/json',
+            'x-auth-token' : token
+          }
+        }).success(function (response) {
+          return response;
+        });
+      },
+
+      getUser : function (id) {
+        return $http.get('api/user/' + id ,{
+          headers: {
+            'Content-Type' : 'application/json',
+            'Accept' : 'application/json',
+            'x-auth-token' : token
+          }
+        }).success(function (response) {
           return response;
         });
       }

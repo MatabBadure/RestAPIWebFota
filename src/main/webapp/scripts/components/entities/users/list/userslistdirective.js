@@ -28,9 +28,13 @@ angular.module('hillromvestApp')
         * Function to select the User from the List suggested on search
         */
         $scope.selectUser = function (user) {
-          $scope.user = user;
-          $scope.onSelect({
-            'user' : user
+          UserService.getUser(user.id).then(function (response){
+            $scope.user = response.data;
+            $scope.onSelect({
+              'user' : user
+            });
+          }).catch(function (response){
+
           });
         };
 

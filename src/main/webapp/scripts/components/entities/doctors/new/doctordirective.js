@@ -48,7 +48,7 @@ angular.module('hillromvestApp')
             // create doctor section
             var data = $scope.doctor;
             data.title = 'Dr';
-            data.role = 'DOCTOR';
+            data.role = 'HCP';
 
             UserService.createUser(data).then(function (response) {
               $scope.doctorStatus.isMessage = true;

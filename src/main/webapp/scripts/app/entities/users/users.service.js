@@ -71,24 +71,24 @@ angular.module('hillromvestApp')
         });
       },
 
-      // harcoded to be removed later
-      getPatientList : function(keyword,pageIndex,countPerPage){
-        return $http.get('api/patientInfos/search?searchString=' +
-         'r' + '&pageNo=' + pageIndex + '&offset=' + countPerPage,  {
+      getUsers : function(searchString, pageNo, offset){
+        return $http.get('api/user/search?searchString=' + searchString + '&pageNo=' + pageNo + '&offset=' + offset, {
           headers: {
             'Content-Type' : 'application/json',
+            'Accept' : 'application/json',
             'x-auth-token' : token
           }
-        }).success(function (data, status, headers, config) {
-           return {'response' : data, 'status' : status, 'headers' : headers, 'config' : config};
+        }).success(function (response) {
+          return response;
         });
       },
 
-
-      getPatientInfo : function(keyword){
-        return $http.get('api/patientInfos/search?searchString=' + keyword,  {
+      getUser : function (id) {
+        return $http.get('api/user/' + id ,{
           headers: {
             'Content-Type' : 'application/json',
+            'Accept' : 'application/json',
+
             'x-auth-token' : token
           }
         }).success(function (response) {

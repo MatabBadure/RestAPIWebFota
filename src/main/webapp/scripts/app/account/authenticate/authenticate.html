@@ -6,32 +6,22 @@
       </div>
       <div class=" col-md-10 col-lg-10 login__container__right-section">
         <form>
-         
-            <p><strong>Security questions</strong></p>
-
-           <!--  <div class="form-group ">               
-                <div class="selectContainer ">
-                    <select name="language" class="form-control glyphicon glyphicon-chevron-down">
-                        <option value="arabic">Your favourite pet's name</option>
-                        <option value="english">Your first car name</option>                        
-                    </select>
-                </div>
-            </div>  -->
-           
-            <div class="dashboard__auth__form__input">
-              <div class="custom-dropdown--auth arrow__pos">
-                <select>
-                <option class="ng-scope" translate="doctor.title.dr" selected="" value="">Dr</option>
-                <option class="ng-scope" translate="doctor.title.mr" value="">Mr.</option>
-                <option class="ng-scope" translate="doctor.title.mrs" value="">Mrs.</option>
-                <option class="ng-scope" translate="doctor.title.miss" value="">Miss</option>
-                </select>
-              </div>
+          <p><strong>Security questions</strong></p>
+          <div class="dashboard__auth__form__input">
+            <div class="custom-dropdown--auth arrow__pos">
+              <select>
+                <option class="ng-scope" selected>Your faviroute Pet name</option>
+                <option class="ng-scope">Put json code</option>
+              </select>
             </div>
-
-            <input type="text" class="form-control"  placeholder="Enter your answer ">         
-            <div class="col-md-8 col-lg-8 link" id="forgotpwd"><a href="#">Forgot Password?</a></div>
-            <div class="col-md-8 col-lg-8 link"><a href="#" class="myButton">LOGIN</a></div>
+          </div>
+          <input type="text" class="form-control"  placeholder="{{ 'authenticate.placeholder.answer' | translate }}">         
+          <div class="col-md-8 col-lg-8 link">
+            <a href="#" translate="authenticate.forgot-pwd-link"></a>
+          </div>
+          <div class="col-md-8 col-lg-8 link">
+            <a href="#" class="myButton">LOGIN</a>
+          </div>
         </form>
       </div>
     </div>

@@ -13,7 +13,7 @@
     </div>
   </div>
   <div class="dashboard-page__user-list__detailed__list">
-    <div ng-repeat="doctor in doctors | filter:searchItem">
+    <div ng-repeat="doctor in doctors ">
       <div ng-click="selectDoctor(doctor)" class="dashboard-page__user-list__detailed__list--details" >
         <span class="user-detail">
           {{doctor.name}} {{doctor.email}}
@@ -24,9 +24,17 @@
       </div>
     </div>
   </div>
+
+    <div ng-show="noMatchFound">oops! No Match found for searched keyword</div>
   <div class="dashboard-page__user-list__detailed__more-link" ng-if="doctors.length>0">
     <span>More</span><span>&gt;&gt;</span>
   </div>
+</div>
+
+<div ng-show="pageCount > 1">
+    <button ng-click="searchDoctors('PREV')" ng-disabled="!(currentPageIndex > 1)">Previous</button>
+    <span>{{currentPageIndex}}</span>
+    <button ng-click="searchDoctors('NEXT')" ng-disabled="!(pageCount > currentPageIndex)">Next</button>
 </div>
 
 <button ng-click="createDoctor()">Create Doctor</button>

@@ -14,7 +14,6 @@ angular.module('hillromvestApp')
           $scope.states = [];
           $scope.doctor.title = "Mr.";
           $scope.submitted = false;
-
           UserService.getState().then(function (response) {
             $scope.states = response.data.states;
           }).catch(function (response) {
@@ -81,5 +80,6 @@ angular.module('hillromvestApp')
           });
         };
       }
+
     };
   });

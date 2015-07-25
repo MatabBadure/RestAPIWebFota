@@ -71,9 +71,27 @@ angular.module('hillromvestApp')
         });
       },
 
-      getUser : function (userId) {
-        return $http.get('api/user/' + userId, {headers: { 'Content-Type' : 'application/json', 'Accept' : 'application/json', 'x-auth-token' : token } })
-        .success(function (response) {
+      getUsers : function(searchString, pageNo, offset){
+        return $http.get('api/user/search?searchString=' + searchString + '&pageNo=' + pageNo + '&offset=' + offset, {
+          headers: {
+            'Content-Type' : 'application/json',
+            'Accept' : 'application/json',
+            'x-auth-token' : token
+          }
+        }).success(function (response) {
+          return response;
+        });
+      },
+
+      getUser : function (id) {
+        return $http.get('api/user/' + id ,{
+          headers: {
+            'Content-Type' : 'application/json',
+            'Accept' : 'application/json',
+
+            'x-auth-token' : token
+          }
+        }).success(function (response) {
           return response;
         });
       }

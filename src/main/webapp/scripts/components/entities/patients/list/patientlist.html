@@ -3,7 +3,7 @@
   <div class="dashboard-page__user-list__detailed__list-form indent-form-top">
     <div class="col-md-12 dashboard-page__user-list__detailed__list-form--input-wrapper">
       <i class="glyphicon glyphicon-search"></i>
-      <input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" ng-model-options="{ debounce: 1000 }" ng-keyup="searchPatients()" autocomplete="off">
+      <input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" ng-model-options="{ debounce: 2000 }" ng-keyup="searchPatients()" autocomplete="off">
     </div>
     <div class="col-md-4 dashboard-page__user-list__detailed__list-form--sort-list">
       <div class="sort-link" ng-click="sortList()">
@@ -27,6 +27,14 @@
     <span>More</span><span>&gt;&gt;</span>
   </div>
 </div>
+
+<div ng-show="pageCount > 1">
+    <button ng-click="searchPatients('PREV')" ng-disabled="!(currentPageIndex > 1)">Previous</button>
+    <span>{{currentPageIndex}}</span>
+    <button ng-click="searchPatients('NEXT')" ng-disabled="!(pageCount > currentPageIndex)">Next</button>
+</div>
+
+
 
 <button ng-click="createPatient()" >Create Patient</button>
 

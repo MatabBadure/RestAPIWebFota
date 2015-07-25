@@ -15,14 +15,16 @@ angular.module('hillromvestApp')
 	    controller: function($scope) {
 	      
 
-	      var init = function(){
+	      $scope.init = function(){
 	      	$scope.patients =[];
 	      	$scope.patientInfo ={};
 	      	$scope.currentPageIndex = 1;
 	      	$scope.perPageCount = 10;
+	      	$scope.pageCount = 0;
+	      	$scope.total = 0;
 	      };
 
-	      init();
+	      $scope.init();
 
 	      $scope.selectPatient = function(patient) {
 	      	// REST Call to get patient details for patient ID
@@ -42,16 +44,18 @@ angular.module('hillromvestApp')
 
 	      $scope.searchPatients = function(track){
 	      	if(track!==undefined){
-	      		if(track === "prev" && $scope.currentPageIndex >1)
+	      		if(track === "PREV" && $scope.currentPageIndex >1)
 	      			$scope.currentPageIndex--;
-	      		if(track === "next")
+	      		if(track === "NEXT")
 	      			$scope.currentPageIndex++;
-	      	}else
-	      	//$scope.searchItem ="ravi";
-	      	UserService.getPatientList($scope.searchItem).then(function (response) {
-            $scope.patients = response.data;  
-          }).catch(function (response) {
-          	console.log("get Patient List failed!");
+	      	}
+	      	UserService.getPatientList($scope.searchItem,$scope.currentPageIndex,$scope.perPageCount)
+	      	.then(function (response, status, headers, config) {
+            	$scope.patients = response.data;
+            	$scope.total = response.headers()['x-total-count'];
+            	$scope.pageCount = Math.floor($scope.total / 10)+1;
+          		}).catch(function (response) {
+          		console.log("get Patient List failed!");
             /*$scope.isMessage = true;  
             if(response.data.message != undefined){
              $scope.patientStatus.message = response.data.message;

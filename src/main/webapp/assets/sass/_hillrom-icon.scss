@@ -1,16 +1,16 @@
 @font-face {
-	font-family: 'hill-rom';
-	src: url('fonts/hill-rom.eot');
-}
-@font-face {
-	font-family: 'hill-rom';
-	src: url(data:application/x-font-ttf;charset=utf-8;base64,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) format('truetype');
+	font-family: 'hillrom';
+	src:url('fonts/hillrom.eot?pcy3rd');
+	src:url('fonts/hillrom.eot?#iefixpcy3rd') format('embedded-opentype'),
+		url('fonts/hillrom.ttf?pcy3rd') format('truetype'),
+		url('fonts/hillrom.woff?pcy3rd') format('woff'),
+		url('fonts/hillrom.svg?pcy3rd#hillrom') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
 
-[class^="icon-"], [class*=" icon-"] {
-	font-family: 'hill-rom';
+.hillrom-icon {
+	font-family: 'hillrom';
 	speak: none;
 	font-style: normal;
 	font-weight: normal;
@@ -32,9 +32,52 @@
 .icon-doctor:before {
 	content: "\e602";
 }
-.icon-patient:before {
+.icon-logout:before {
 	content: "\e603";
 }
-.icon-user:before {
+.icon-lungs:before {
 	content: "\e604";
+}
+.icon-man:before {
+	content: "\e605";
+}
+.icon-man-with-circle .path1:before {
+	content: "\e606";
+	color: rgb(238, 113, 100);
+}
+.icon-man-with-circle .path2:before {
+	content: "\e607";
+	margin-left: -1em;
+	color: rgb(183, 83, 79);
+}
+.icon-man-with-circle .path3:before {
+	content: "\e608";
+	margin-left: -1em;
+	color: rgb(255, 255, 255);
+}
+.icon-patient:before {
+	content: "\e609";
+}
+.icon-pressure:before {
+	content: "\e60a";
+}
+.icon-tablet-with-circle .path1:before {
+	content: "\e60b";
+	color: rgb(126, 161, 212);
+}
+.icon-tablet-with-circle .path2:before {
+	content: "\e60c";
+	margin-left: -1em;
+	color: rgb(54, 105, 167);
+}
+.icon-tablet-with-circle .path3:before {
+	content: "\e60d";
+	margin-left: -1em;
+	color: rgb(255, 255, 255);
+}
+.icon-user:before {
+	content: "\e60e";
+}
+.icon-user-account:before {
+	content: "\e60f";
 }

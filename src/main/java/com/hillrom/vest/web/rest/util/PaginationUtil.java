@@ -22,7 +22,7 @@ public class PaginationUtil {
 
     public static final int MIN_OFFSET = 1;
 
-    public static final int DEFAULT_LIMIT = 20;
+    public static final int DEFAULT_LIMIT = 10;
 
     public static final int MAX_LIMIT = 100;
 

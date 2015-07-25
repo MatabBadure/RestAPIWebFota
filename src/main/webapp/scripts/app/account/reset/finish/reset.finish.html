@@ -14,6 +14,18 @@
             <div class="alert alert-danger" ng-show="error">
                 <p translate="reset.finish.messages.error">Your password couldn't be reset. Remember a password request is only valid for 24 hours.</p>
             </div>
+            
+            <div class="alert alert-danger" ng-show="otherError">
+                <p >Error occured!. Please try again</p>
+            </div>
+
+            <div class="alert alert-danger" ng-show="questionsNotLoaded">
+                <p >Security questions failed to load! Please try again</p>
+            </div>
+
+            <div class="alert alert-danger" ng-show="questionVerificationFailed">
+                <p >Security question and answer didn't match!. Please try again</p>
+            </div>
 
             <div class="alert alert-success" ng-show="success">
                 <p translate="reset.finish.messages.success"><strong>Your password has been reset.</strong> Please <a href="#/login">authenticate</a>.</p>
@@ -26,10 +38,10 @@
             <div ng-hide="keyMissing">
                 <form ng-show="!success" name="form" role="form" novalidate ng-submit="finishReset()" show-validation>
                     <div class="form-group">
-                        <label translate="global.form.newpassword">New password</label>
+                        <label translate="global.form.newpassword">New password*</label>
                         <input type="password" class="form-control" name="password" placeholder="{{'global.form.newpassword.placeholder' | translate}}"
                                ng-model="resetAccount.password" ng-minlength=8 ng-maxlength=50 required>
-                        <div ng-show="form.password.$dirty && form.password.$invalid">
+                        <div ng-show="(form.password.$dirty && form.password.$invalid) || submitted">
                             <p class="help-block"
                                ng-show="form.password.$error.required" translate="global.messages.validate.newpassword.required">
                                 Your password is required.
@@ -47,10 +59,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label translate="global.form.confirmpassword">New password confirmation</label>
+                        <label translate="global.form.confirmpassword">New password confirmation*</label>
                         <input type="password" class="form-control" name="confirmPassword" placeholder="{{'global.form.confirmpassword.placeholder' | translate}}"
-                               ng-model="confirmPassword" ng-minlength=8 ng-maxlength=50 required>
-                        <div ng-show="form.confirmPassword.$dirty && form.confirmPassword.$invalid">
+                               ng-model="resetAccount.confirmPassword" ng-minlength=8 ng-maxlength=50 required>
+                        <div ng-show="(form.confirmPassword.$dirty && form.confirmPassword.$invalid) || submitted ">
                             <p class="help-block"
                                ng-show="form.confirmPassword.$error.required" translate="global.messages.validate.confirmpassword.required">
                                 Your password confirmation is required.
@@ -63,10 +75,36 @@
                                ng-show="form.confirmPassword.$error.maxlength" translate="global.messages.validate.confirmpassword.maxlength">
                                 Your password confirmation cannot be longer than 50 characters.
                             </p>
-                        </div>
-                         
+                        </div>     
                     </div> 
-                    <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" translate="reset.finish.form.button">Reset Password</button>
+
+                    <div class="form-group">
+                        <label>Choose security question*</label>
+                        <select class="form-control" name="question" ng-model="resetAccount.question" required ng-options="question.question for question in questions">
+                          <option value="">-- select a security question --</option>
+                        </select>
+
+
+                        <div ng-show="(form.question.$dirty && form.question.$invalid) || submitted">
+                            <p class="help-block"
+                               ng-show="form.question.$error.required">
+                                Security question is required.
+                            </p>
+                        </div>     
+                    </div> 
+
+                    <div class="form-group">
+                        <label>Answer security question*</label>
+                        <input type="text" class="form-control" name="answer" ng-model="resetAccount.answer" required>
+                        <div ng-show="(form.answer.$dirty && form.answer.$invalid) || submitted">
+                            <p class="help-block"
+                               ng-show="form.answer.$error.required">
+                                Answer is required.
+                            </p>
+                        </div>     
+                    </div> 
+
+                    <button type="submit" ng-click="formSubmit()" class="btn btn-primary" translate="reset.finish.form.button">Reset Password</button>
                 </form>
             </div>
         </div>

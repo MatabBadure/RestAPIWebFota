@@ -4,6 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -105,4 +107,22 @@ public class PatientInfoResource {
         log.debug("REST request to delete PatientInfo : {}", id);
         patientInfoRepository.delete(id);
     }
+    
+    /**
+     * GET  /patientInfos -> get all the patientInfos.
+     */
+    @RequestMapping(value = "/patientInfos/search",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<List<PatientInfo>> search(@RequestParam(value = "searchString" , required = true) String searchString,
+    							  @RequestParam(value = "page" , required = false) Integer offset,
+                                  @RequestParam(value = "per_page", required = false) Integer limit)
+        throws URISyntaxException {
+   	 	String queryString = new StringBuilder().append("%").append(searchString).append("%").toString();
+        Page<PatientInfo> page = patientInfoRepository.findBy(queryString,PaginationUtil.generatePageRequest(offset, limit));
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/patientInfos", offset, limit);
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    }
+
 }

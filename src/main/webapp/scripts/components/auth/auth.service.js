@@ -118,9 +118,12 @@ angular.module('hillromvestApp')
             },
 
 
-            resetPasswordFinish: function(key, newPassword, callback) {
+            resetPasswordFinish: function(key, data, callback) {
                 var cb = callback || angular.noop;
-                var data = {"newPassword":newPassword};
+                var data = {"questionId":data.question.id,
+                            "answer": data.answer,
+                            "password":data.password
+                           };
                 return PasswordResetFinish.resetPassFinish(key).save(data, function () {
                     return cb();
                 }, function (err) {

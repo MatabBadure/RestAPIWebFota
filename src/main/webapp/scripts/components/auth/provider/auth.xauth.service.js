@@ -43,6 +43,7 @@ angular.module('hillromvestApp')
                 });
             },
 
+
             configurePassword: function (data) {
                 return $http.put('api/account/update_passwordsecurityquestion', data, {
                     headers: {

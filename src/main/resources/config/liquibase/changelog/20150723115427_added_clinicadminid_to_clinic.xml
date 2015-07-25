@@ -23,15 +23,6 @@
                                  constraintName="fk_clinic_admin_id"
                                  referencedColumnNames="id"
                                  referencedTableName="USER"/>
-                                 
-         <createProcedure path="./../../sql/create_patient_user.sql"
-          procedureName="create_patient_user" relativeToChangelogFile="true"></createProcedure>
-          
-          <createProcedure path="./../../sql/get_next_clinic_hillromid.sql"
-          procedureName="get_next_clinic_hillromid" relativeToChangelogFile="true"></createProcedure>
-          
-          <createProcedure path="./../../sql/get_next_patient_hillromid.sql"
-          procedureName="get_next_patient_hillromid" relativeToChangelogFile="true"></createProcedure>
     
     </changeSet>
 </databaseChangeLog>

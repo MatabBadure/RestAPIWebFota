@@ -18,5 +18,9 @@ public final class Constants {
     public static final String SPRING_PROFILE_HEROKU = "heroku";
 
     public static final String SYSTEM_ACCOUNT = "system";
+    
+    public static final String DATEFORMAT_MMddyyyy = "MMddyyyy";
+
+    public static final int NO_OF_CHARACTERS_TO_BE_EXTRACTED = 4;
 
 }

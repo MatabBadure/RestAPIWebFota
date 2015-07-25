@@ -24,8 +24,7 @@ angular.module('hillromvestApp')
         };
 
         $scope.validateSuperAdmin = function () {
-          //role will be replaced by super admin
-          if ($scope.userStatus.editMode && $scope.userStatus.role !== 'ADMIN') {
+          if ($scope.userStatus.editMode && $scope.userStatus.role !== roleEnum.ADMIN) {
             return true;
           }
         };

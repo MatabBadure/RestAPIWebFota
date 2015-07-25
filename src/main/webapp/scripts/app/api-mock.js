@@ -80,3 +80,13 @@ var doctorsList = [
   { 'name' : 'David Jones', 'email' : 'davijones@gmail.com', 'hospital' : 'abc hospital'}
 ];
 
+var roleEnum = {
+  ADMIN : 'ADMIN',
+  PATIENT : 'PATIENT',
+  HCP : 'HCP',
+  ACCT_SERVICES : 'ACCT_SERVICES',
+  ASSOCIATES : 'ASSOCIATES',
+  HILLROM_ADMIN : 'HILLROM_ADMIN',
+  CLINIC_ADMIN : 'CLINIC_ADMIN',
+  ANONYMOUS : 'ANONYMOUS'
+};

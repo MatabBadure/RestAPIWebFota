@@ -41,7 +41,7 @@ angular.module('hillromvestApp')
         * Function to Sort the List of Users
         */
         $scope.sortList = function () {
-          console.log('Todo Sort Functionality...!');
+          //Todo
         };
 
          $scope.createUser = function(){

@@ -22,6 +22,7 @@ angular.module('hillromvestApp')
 	      	$scope.perPageCount = 10;
 	      	$scope.pageCount = 0;
 	      	$scope.total = 0;
+	      	$scope.noMatchFound = false;
 	      };
 
 	      $scope.init();
@@ -55,7 +56,7 @@ angular.module('hillromvestApp')
             	$scope.total = response.headers()['x-total-count'];
             	$scope.pageCount = Math.floor($scope.total / 10)+1;
           		}).catch(function (response) {
-          		console.log("get Patient List failed!"); 
+          		$scope.noMatchFound = true;
          });
 	      
 	      } 

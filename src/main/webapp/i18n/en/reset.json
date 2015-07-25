@@ -6,10 +6,10 @@
                 "button": "Reset password"
             },
             "messages": {
-                "info": "Enter the registered e-mail address ",
+                "info": "Please enter the email address registered on your account ",
                 "success": "Check your e-mails for details on how to reset your password.",
-                "notfound": "<strong>E-Mail address isn't registered!</strong> Please check and try again"
-
+                "notfound": "<strong>E-Mail address isn't registered!</strong> Please check and try again",
+                "placeholder":"Enter your email address"   
             }
 
         },

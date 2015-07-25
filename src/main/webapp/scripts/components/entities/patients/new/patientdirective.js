@@ -31,6 +31,57 @@ angular.module('hillromvestApp')
 
         $scope.init();
 
+    $scope.createPatient = function () {
+      if($scope.form.$invalid){
+        return false;
+      }
+      if($scope.patientStatus.editMode){
+              // edit patient section
+
+              var data = $scope.patient;
+              data.dob = data.formatedDOB;
+              data.role = 'PATIENT';
+             
+              UserService.editUser($scope.patient,data).then(function (response) {
+                if(response.status == '200')
+                {
+                  $scope.patientStatus.isMessage = true;
+                  $scope.patientStatus.message = "Patient updated successfully";
+                }else{
+                  $scope.patientStatus.message = 'Error occured! Please try again';
+                }
+              }).catch(function (response) {
+                $scope.patientStatus.isMessage = true;
+                $scope.patientStatus.message = 'Error occured! Please try again';
+
+              });
+
+            }else{
+              // create patient section
+              var data = $scope.patient;
+              data.role = 'PATIENT';
+              
+              UserService.createUser(data).then(function (response) {
+                if(response.status == '201')
+                {
+                  $scope.patientStatus.isMessage = true;
+                  $scope.patientStatus.message = "Patient created successfully"+" with ID "+response.data.user.id;
+                }else{
+                  $scope.patientStatus.message = 'Error occured! Please try again';
+                }
+
+              }).catch(function (response) {
+                $scope.patientStatus.isMessage = true;
+                if(response.status == '400' && response.data.message == "HR Id already in use."){
+                  $scope.patientStatus.message = 'Patient ID ' + $scope.patient.HRID + " already in use.";
+                }
+                else{
+                  $scope.patientStatus.message = 'Error occured! Please try again';
+                }
+              });
+            };
+          }
+
         if ($scope.patientStatus.editMode) {
           var selectedDate = new Date($scope.patient.dob);
           $scope.patient.age = getAge(selectedDate);
@@ -40,53 +91,8 @@ angular.module('hillromvestApp')
             $scope.patientStatus.role != 'ADMIN' &&
             $scope.patientStatus.role != 'Account Services Professional') {
             return true;
+
           }
-        }
-
-        $scope.createPatient = function() {
-          if ($scope.form.$invalid) {
-            return false;
-          }
-          if ($scope.patientStatus.editMode) {
-            // edit patient section
-            var data = $scope.patient;
-            data.dob = data.formatedDOB;
-            data.role = 'PATIENT';
-            //delete data.formatedDOB;
-            UserService.editUser($scope.patient.PID, data).then(function(response) {
-              if (response.status == '200') {
-                $scope.patientStatus.isMessage = true;
-                $scope.patientStatus.message = "Patient updated successfully";
-              } else {
-                $scope.patientStatus.message = 'Error occured! Please try again';
-              }
-            }).catch(function(response) {
-              $scope.patientStatus.isMessage = true;
-              $scope.patientStatus.message = 'Error occured! Please try again';
-            });
-          } else {
-            // create patient section
-            var data = $scope.patient;
-            data.role = 'PATIENT';
-            //delete data.formatedDOB;
-
-            UserService.createUser(data).then(function(response) {
-              if (response.status == '201') {
-                $scope.patientStatus.isMessage = true;
-                $scope.patientStatus.message = "Patient created successfully" + " with ID " + response.data.user.id;
-              } else {
-                $scope.patientStatus.message = 'Error occured! Please try again';
-              }
-
-            }).catch(function(response) {
-              $scope.patientStatus.isMessage = true;
-              if (response.status == '400' && response.data.message == "HR Id already in use.") {
-                $scope.patientStatus.message = 'Patient ID ' + $scope.patient.HRID + " already in use.";
-              } else {
-                $scope.patientStatus.message = 'Error occured! Please try again';
-              }
-            });
-          };
         }
 
         $scope.deletePatient = function() {

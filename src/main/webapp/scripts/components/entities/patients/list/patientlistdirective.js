@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .directive('patientList', function () {
+  .directive('patientList', function (UserService,PatientService) {
 	    return {
 	      templateUrl: 'scripts/components/entities/patients/list/patientlist.html',
 	      restrict: 'E',
@@ -13,25 +13,55 @@ angular.module('hillromvestApp')
 	      var patient = scope.patient;
 	    },
 	    controller: function($scope) {
-	      $scope.patients =[];
+	      
+
+	      $scope.init = function(){
+	      	$scope.patients =[];
+	      	$scope.patientInfo ={};
+	      	$scope.currentPageIndex = 1;
+	      	$scope.perPageCount = 10;
+	      	$scope.pageCount = 0;
+	      	$scope.total = 0;
+	      	$scope.noMatchFound = false;
+	      };
+
+	      $scope.init();
 
 	      $scope.selectPatient = function(patient) {
-	        $scope.patient = patient;
-	        $scope.onSelect({'patient': patient});
+	      	PatientService.getPatientInfo(patient.id).then(function (response) {
+            $scope.patientInfo = response.data;  
+            $scope.patient = $scope.patientInfo;
+	        $scope.onSelect({'patient': $scope.patient});
+	          }).catch(function (response) {
+	          	console.log("get Patient Info failed!");
+	            
+	         });
+	        
 	      },
+
 	      $scope.createPatient = function(){
 	      	$scope.onCreate();
 	      },
 
-	      $scope.searchPatients = function(){
-	        $scope.patients = [{'PID':'43','hillromId':'15','gender':'Male','dob':'1990-05-08','firstName':'Johny','lastName':'Dep','name':'Johny Dep','email':'JohnyDep@gmail.com','hospital':'Appolo hospital'}
-	        ,{'PID':'21','hillromId':'16','dob':'1990-05-08','gender':'Male','name':'James williams','email':'JamesWilliams@gmail.com','hospital':'Manipal hospital'}
-	        ,{'PID':'21','hillromId':'17','dob':'1990-05-08','gender':'Male','name':'David Jones','email':'davijones@gmail.com','hospital':'abc hospital'}
-	        ,{'PID':'21','hillromId':'18','dob':'1990-05-08','gender':'Male','name':'William Davis','email':'williamdavis@gmail.com','hospital':'mno hospital'}
-	        ,{'PID':'21','hillromId':'19','dob':'1990-05-08','gender':'Male','name':'Joseph taylor','email':'josephtaylor@gmail.com','hospital':'xyz hospital'}
-	        ,{'PID':'21','hillromId':'20','dob':'1990-05-08','gender':'Male','name':'David Jones','email':'davijones@gmail.com','hospital':'abc hospital'}];
+	      $scope.searchPatients = function(track){
+	      	if(track!==undefined){
+	      		if(track === "PREV" && $scope.currentPageIndex >1)
+	      			$scope.currentPageIndex--;
+	      		if(track === "NEXT")
+	      			$scope.currentPageIndex++;
+	      	}
+	      	PatientService.getPatientList($scope.searchItem,$scope.currentPageIndex,$scope.perPageCount)
+	      	.then(function (response) {
+            	$scope.patients = response.data;
+            	$scope.total = response.headers()['x-total-count'];
+            	$scope.pageCount = Math.floor($scope.total / 10)+1;
+          		}).catch(function (response) {
+          		$scope.noMatchFound = true;
+         });
+	      
 	      } 
 	    }
+
     };
   });
 

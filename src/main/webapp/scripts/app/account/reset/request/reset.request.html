@@ -1,19 +1,63 @@
-<div class="container login">
+  <div class="container login">
     <div class="login--position">
-    <div class=" form__container__reset login__container col-md-8 col-lg-8">
-      <div class="col-md-4 col-lg-4 ">
-        <img src="assets/images/man.svg">
-      </div>
-      <div class=" col-md-10 col-lg-10 col-md-offset-2 col-lg-offset-2 login__container__right-section">
-        <form>
-         <!--  <div class="form-group"> -->
-            <h5 class="text-center" translate="reset.request.title"></h5>
-            <p class="text-center" translate="reset.request.messages.info"></p>
-            <!-- <p id="error_msg">UserName & Password do not match.Please try again.</p> -->
-            <input type="email" class="form-control" id="exampleInputEmail1"  placeholder="{{ 'reset.request.messages.placeholder' | translate }}">          
-            <div class="col-md-8 col-lg-8 link"><a href="#" class="btn-submit" translate="reset.request.form.button"></a></div>
-        </form>
-      </div>
-    </div>
-  </div>
+      <div class=" form_container login__container col-md-8 col-lg-8">
+        <div class="col-md-4 col-lg-4 ">
+          <img src="assets/images/man.svg">
+        </div>
+        <div class=" col-md-10 col-lg-10 col-md-offset-2 col-lg-offset-2 login__container__right-section">
+
+          <p><strong>FORGOT YOUR PASSWORD?</strong></p>
+          <p ng-show="!success">Please enter the email address registered on your account</p>
+
+          <div class="alert alert-danger text-center has-error" translate="reset.request.messages.notfound" ng-show="errorEmailNotExists">
+            <strong>E-Mail address isn't registered!</strong> Please check and try again.
+          </div>
+
+          <div class="alert alert-success " ng-show="success == 'OK'">
+            <p translate="reset.request.messages.success">Check your e-mails for details on how to reset your password.</p>
+          </div>
+          <form ng-show="!success" name="form" role="form" novalidate  show-validation>
+            <div class="form-group">
+              <input type="email" class="form-control" name="email" placeholder="{{'global.form.email.placeholder' | translate}}"
+              ng-model="resetAccount.email"  ng-maxlength=100 required>
+              <div ng-show="(form.email.$dirty && form.email.$invalid) || submitted">
+                <p class="has-error"
+                ng-show="form.email.$error.required" translate="global.messages.validate.email.required">
+                Your e-mail is required.
+              </p>
+              <p class="has-error"
+              ng-show="form.email.$error.email" translate="global.messages.validate.email.invalid">
+              Your e-mail is invalid.
+            </p>
+            <p class="has-error"
+            ng-show="form.email.$error.maxlength" translate="global.messages.validate.email.maxlength">
+            Your e-mail cannot be longer than 100 characters.
+          </p>
+        </div>
+
+      </div>     
+
+      <p class="help-block"
+      ng-show="captchaError">
+      Please verify again you are not a robot.
+    </p>
+    <div  ng-show="showCaptcha">
+     <div vc-recaptcha
+     theme="'light'"
+     key="siteKey"
+     on-create="setWidgetId(widgetId)"
+     on-success="setResponse(response)">
+   </div>
+
+ </div>
+ <div class="col-md-8 col-lg-8 link"><a translate="reset.request.form.button" ng-click="requestReset()" class="myButton">LOGIN</a></div>
+</form>
 </div>
+</div>
+</div>
+</div>
+
+
+
+
+

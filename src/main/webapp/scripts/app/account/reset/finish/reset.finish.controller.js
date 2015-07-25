@@ -23,11 +23,11 @@ angular.module('hillromvestApp')
             $scope.questionsNotLoaded = true;
         });
 
-        $scope.finishReset = function(event) {
+        $scope.finishReset = function() {
             if($scope.form.$invalid){
                 return false;
             }
-        	event.preventDefault();
+        	
         	 $scope.error = null;
             if ($scope.resetAccount.password !== $scope.resetAccount.confirmPassword) {
                 $scope.doNotMatch = 'ERROR';

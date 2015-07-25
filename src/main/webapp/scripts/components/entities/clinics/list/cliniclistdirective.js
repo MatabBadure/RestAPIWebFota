@@ -21,8 +21,14 @@ angular.module('hillromvestApp')
         });
       };
 
-      $scope.searchClinics = function () {
-        $scope.clinics = clinicsList;
+      $scope.searchClinics = function (pageNumber, offset) {
+        pageNumber = pageNumber || 1;
+        offset = offset || 10;
+        ClinicService.getClinics($scope.searchItem, pageNumber, offset).then(function (response) {
+          $scope.clinics = response.data;
+        }).catch(function (response) {
+
+        });
       };
 
       $scope.selectClinic = function(clinic) {

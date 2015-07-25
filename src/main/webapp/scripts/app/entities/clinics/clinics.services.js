@@ -41,8 +41,13 @@ angular.module('hillromvestApp')
       },
 
       getClinics : function (searchString, pageNo, offset) {
-        return $http.get('api/clinics/search?searchString=' + searchString + '&pageNo=' + pageNo + '&ofset=' + offset)
-         .success(function (response) {
+        return $http.get('api/clinics/search?searchString=' + searchString + '&pageNo=' + pageNo + '&offset=' + offset,{
+          headers: {
+            'Content-Type' : 'application/json',
+            'Accept' : 'application/json',
+            'x-auth-token' : token
+          }
+        }).success(function (response) {
           return response;
         });
       }

@@ -6,10 +6,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.inject.Inject;
+
 import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -20,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.PatientInfo;
@@ -48,7 +54,7 @@ import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 @Transactional
 public class UserService {
 
-    private final Logger log = LoggerFactory.getLogger(UserService.class);
+	private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Inject
     private PasswordEncoder passwordEncoder;
@@ -75,9 +81,6 @@ public class UserService {
     private MailService mailService;
 
     @Inject
-    private UserLoginTokenService authTokenService;
-    
-    @Inject
     private UserSecurityQuestionService userSecurityQuestionService;
     
     @Inject
@@ -85,6 +88,16 @@ public class UserService {
     
     @Inject
     private ApplicationEventPublisher eventPublisher;
+    
+    public String generateDefaultPassword(User patientUser) {
+		StringBuilder defaultPassword = new StringBuilder();
+		defaultPassword.append(patientUser.getZipcode());
+		// default password will have the first 4 letters from last name, if length of last name <= 4, use complete string
+		int endIndex = patientUser.getLastName().length() > Constants.NO_OF_CHARACTERS_TO_BE_EXTRACTED ? Constants.NO_OF_CHARACTERS_TO_BE_EXTRACTED : patientUser.getLastName().length() ; 
+		defaultPassword.append(patientUser.getLastName().substring(0, endIndex));
+		defaultPassword.append(patientUser.getDob().toString(Constants.DATEFORMAT_MMddyyyy));
+		return defaultPassword.toString();
+	}
 
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
@@ -92,7 +105,6 @@ public class UserService {
             .map(user -> {
                 // activate given user for the registration key.
                 user.setActivated(true);
-                user.setActivationKey(null);
                 userRepository.save(user);
                 log.debug("Activated user: {}", user);
                 return user;
@@ -278,11 +290,11 @@ public class UserService {
     public JSONObject createUser(UserExtensionDTO userExtensionDTO, String baseUrl){
     	JSONObject jsonObject = new JSONObject();
     	if(userExtensionDTO.getEmail() != null) {
-        	userRepository.findOneByEmail(userExtensionDTO.getEmail())
-			.map(user -> {
-				jsonObject.put("error", "e-mail address already in use");
+			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
+			if (existingUser.isPresent()) {
+				jsonObject.put("ERROR", "e-mail address already in use");
     			return jsonObject;
-    		});
+    		}
     	}
     	List<String> rolesAdminCanModerate = rolesAdminCanModerate();
     	if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())
@@ -308,9 +320,6 @@ public class UserService {
                     .orElseGet(() -> {
                     	UserExtension user = createPatientUser(userExtensionDTO);
                 		if(user.getId() != null) {
-                			if(userExtensionDTO.getEmail() != null) {
-                				mailService.sendActivationEmail(user, baseUrl);
-                			}
 	                        jsonObject.put("message", "Patient User created successfully.");
 	                        jsonObject.put("user", user);
 	                        return jsonObject;
@@ -340,6 +349,9 @@ public class UserService {
     public UserExtension createHillromTeamUser(UserExtensionDTO userExtensionDTO) {
     	UserExtension newUser = new UserExtension();
 		assignValuesToUserObj(userExtensionDTO, newUser);
+		newUser.setActivated(false);
+		newUser.setDeleted(false);
+		newUser.setActivationKey(RandomUtil.generateActivationKey());
 		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
 		userExtensionRepository.save(newUser);
 		log.debug("Created Information for User: {}", newUser);
@@ -357,6 +369,9 @@ public class UserService {
     		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
     		patientInfoRepository.save(patientInfo);
     		assignValuesToUserObj(userExtensionDTO, newUser);
+    		newUser.setPassword(passwordEncoder.encode(generateDefaultPassword((User)newUser)));
+    		newUser.setActivated(true);
+    		newUser.setDeleted(false);
     		if(AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
     			newUser.setEmail(userExtensionDTO.getHillromId());
     		}
@@ -375,6 +390,9 @@ public class UserService {
     public UserExtension createHCPUser(UserExtensionDTO userExtensionDTO) {
     	UserExtension newUser = new UserExtension();
 		assignValuesToUserObj(userExtensionDTO, newUser);
+		newUser.setActivated(false);
+		newUser.setDeleted(false);
+		newUser.setActivationKey(RandomUtil.generateActivationKey());
 		for(Map<String, String> clinicObj : userExtensionDTO.getClinicList()){
 			Clinic clinic = clinicRepository.getOne(Long.parseLong(clinicObj.get("id")));
 			newUser.getClinics().add(clinic);
@@ -486,7 +504,7 @@ public class UserService {
 		if(userExtensionDTO.getGender() != null)
 			patientInfo.setGender(userExtensionDTO.getGender());
 		if(userExtensionDTO.getDob() != null)
-			patientInfo.setDob(userExtensionDTO.getDob());
+			patientInfo.setDob(LocalDate.parse(userExtensionDTO.getDob(), DateTimeFormat.forPattern("MM/dd/yyyy")));
 		if(userExtensionDTO.getLangKey() != null)
 			patientInfo.setLangKey(userExtensionDTO.getLangKey());
 		if(userExtensionDTO.getEmail() != null)
@@ -534,15 +552,8 @@ public class UserService {
 		if(userExtensionDTO.getNpiNumber() != null)
 			newUser.setNpiNumber(userExtensionDTO.getNpiNumber());
 		if(userExtensionDTO.getDob() != null)
-			newUser.setDob(userExtensionDTO.getDob());
+			newUser.setDob(LocalDate.parse(userExtensionDTO.getDob(), DateTimeFormat.forPattern("MM/dd/yyyy")));
 		newUser.setLangKey(userExtensionDTO.getLangKey());
-		// new user is not active
-		newUser.setActivated(false);
-		newUser.setDeleted(false);
-		// new user gets registration key
-		newUser.setActivationKey(RandomUtil.generateActivationKey());
-		if(userExtensionDTO.getRole() != null)
-			newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
 	}
 
     public Optional<User> findOneByEmail(String email) {
@@ -621,7 +632,6 @@ public class UserService {
     	String password = params.get("password");
     	String questionId = params.get("questionId");
     	String answer = params.get("answer");
-    	String authToken = params.get("x-auth-token");
     	String termsAndConditionsAccepted = params.get("termsAndConditionsAccepted");
     	
     	JSONObject errorsJsonObject = validateRequest(password, questionId,
@@ -657,7 +667,6 @@ public class UserService {
         	
         	log.debug("updateEmailOrPassword for User: {}", currentUser);
         	
-        	authTokenService.deleteToken(authToken); // Token must be deleted to avoid subsequent request
         }else{
         	errorsJsonObject.put("ERROR", "Invalid Security Question or Answer");
         	return errorsJsonObject;
@@ -762,5 +771,46 @@ public class UserService {
 		return jsonObject;
     }
 
+	public JSONObject updatePasswordSecurityQuestion(Map<String,String> params){
+		String requiredParams[] = {"key","password","questionId","answer","termsAndConditionsAccepted"};
+		JSONObject errorsJson = RequestUtil.checkRequiredParams(params, requiredParams);
+		if(errorsJson.containsKey("ERROR")){
+			return errorsJson;
+		}
+		
+		String password = params.get("password");
+		if(!checkPasswordLength(password)){
+			errorsJson.put("ERROR", "Incorrect Password");
+			return errorsJson;
+		}
+		
+		String key = params.get("key");
+		Optional<User> existingUser = userRepository.findOneByActivationKey(key);
+		User currentUser = null;
+		if(existingUser.isPresent()){
+			currentUser = existingUser.get();
+		}else{
+			errorsJson.put("ERROR", "Invalid Activation Key");
+			return errorsJson;
+		}
+		
+		Long qid = Long.parseLong(params.get("questionId"));
+		String answer = params.get("answer");
+		Optional<UserSecurityQuestion> opUserSecQ = userSecurityQuestionService.saveOrUpdate(currentUser.getId(), qid, answer);		
+		
+		if(opUserSecQ.isPresent()){
+			currentUser.setActivationKey(null);
+			currentUser.setLastLoggedInAt(DateTime.now());
+			currentUser.setLastModifiedDate(DateTime.now());
+			currentUser.setPassword(passwordEncoder.encode(params.get("password")));
+			currentUser.setTermsConditionAccepted(true);
+			currentUser.setTermsConditionAcceptedDate(DateTime.now());
+			userRepository.save(currentUser);
+		}else{
+			errorsJson.put("ERROR","Invalid Security Question or Answer");
+			return errorsJson;
+		}
+		return new JSONObject();
+	}
 }
 

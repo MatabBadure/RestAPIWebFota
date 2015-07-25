@@ -1,13 +1,8 @@
-<div class="col-md-16 dashboard-page">
-	<div class="col-md-4 dashboard-page__admin-nav">
-		<nav-bar></nav-bar>
+	<div ng-show="doctorStatus.editMode || doctorStatus.isCreate">
+		<doctor doctor-data="doctor" doctor-status="doctorStatus" ></doctor>
 	</div>
 
-	<div class="col-md-6 dashboard-page__form margin-top-15">
-		<doctor doctor-data="doctor" doctor-status="doctorStatus"></doctor>
+			
+	<div ng-show="!doctorStatus.editMode && !doctorStatus.isCreate">
+		<doctor-list on-select="selectedDoctor(doctor)" on-create="createDoctor()"></doctor-list>
 	</div>
-	
-	<div class="col-md-6 dashboard-page__user-list">
-		<doctor-list on-select="selectedDoctor(doctor)"></doctor-list>
-	</div>
-</div>

@@ -22,11 +22,11 @@
         <!-- <div ng-show="{{ENV === 'dev'}}" class="development" ng-cloak=""></div> -->
         <div id="wrap">
             <div ui-view="navbar" ng-cloak=""></div>
-            <div class="content-body" ui-view="content"></div>             
-        </div>
-        <div class="footer navbar-fixed-bottom">
-            <div class="container text-center">
-                <span translate="footer">This is your footer</span>
+            <div class="content-body" ui-view="content"></div>
+            <div class="footer navbar-fixed-bottom">
+                <div class="container text-center">
+                    <span translate="footer">This is your footer</span>
+                </div>
             </div>
         </div>
         <!-- <div id="footer">
@@ -106,6 +106,8 @@
         <script src="scripts/app/account/account.js"></script>
         <script src="scripts/app/account/activate/activate.js"></script>
         <script src="scripts/app/account/activate/activate.controller.js"></script>
+        <script src="scripts/app/account/authenticate/authenticate.js"></script>
+        <script src="scripts/app/account/authenticate/authenticate.controller.js"></script>
         <script src="scripts/app/account/login/login.js"></script>
         <script src="scripts/app/account/login/login.controller.js"></script>
         <script src="scripts/app/account/logout/logout.js"></script>
@@ -142,6 +144,7 @@
         <script src="scripts/components/auth/provider/auth.xauth.service.js"></script>
     	<script src="https://www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit" async defer></script>
 
+
         <script src="scripts/app/entities/patientVestDeviceRawLog/patientVestDeviceRawLog.js"></script>
         <script src="scripts/app/entities/patientVestDeviceRawLog/patientVestDeviceRawLog.controller.js"></script>
         <script src="scripts/app/entities/patientVestDeviceRawLog/patientVestDeviceRawLog-detail.controller.js"></script>
@@ -171,7 +174,6 @@
         <script src="scripts/app/entities/doctors/doctors.controller.js"></script>
         <script src="scripts/components/entities/doctors/new/doctordirective.js"></script>
         <script src="scripts/components/entities/doctors/list/doctorslistdirective.js"></script>
-        <script src="scripts/app/entities/doctors/doctors.services.js"></script>
 
 
         <script src="scripts/app/entities/users/users.js"></script>

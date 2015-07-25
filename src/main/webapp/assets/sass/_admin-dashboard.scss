@@ -4,7 +4,6 @@
 }
 
 .dashboard {
-	left:0;
 	// position: fixed;
 	background-color: $seashell;
 	max-height: 40px;
@@ -63,44 +62,6 @@
   text-overflow: '';
 }
 
-.label-next input{
-	width: 100%;
-	color: $pickled-bluewood;
-	border: 1px solid $bombay;
-	padding-left: 10px;
-	font-weight: normal;
-}
-
-.hillrom-btn {
-	right: 40px;
-  position: absolute;
-  padding: 5px 24px;
-  border-radius: 3px;
-  text-transform: capitalize;
-  font-size: $font-size-small;
-  cursor: pointer;
-}
-
-.btn-submit {
-  border: 1px solid $terracotta;
-  background-color: $terracotta;
-  color: $body-bg;
-}
-
-.btn-submit-disable {
-  border: 1px solid $terracotta;
-  background-color: $terracotta;
-  color: $body-bg;
-}
-
-.has-error {
-	color: $terracotta;
-	font-size: $font-size-small;
-	font-weight: normal;
-	padding: 5px 0;
-}
-
-//.dashboard__form__input--role select {
 .dashboard__form__input--option select {
 	height: 30px;
 	width: 150px;
@@ -115,7 +76,7 @@
   text-overflow: '';
 }
 
-.label-next input{
+.label-next input {
 	width: 100%;
 	color: $pickled-bluewood;
 	border: 1px solid $bombay;
@@ -125,7 +86,6 @@
 
 .hillrom-btn {
 	right: 40px;
-  position: absolute;
   padding: 5px 24px;
   border-radius: 3px;
   text-transform: capitalize;
@@ -154,10 +114,6 @@
 
 .font-add-text {
 	font-weight: bold;
-}
-
-.margin-bottom-extream {
-	margin-bottom: 110px;
 }
 
 .checkbox-add span{
@@ -190,7 +146,7 @@
 //   white-space: nowrap;
 //   overflow:hidden;
 //   width:15px;
-//   height:15px;	
+//   height:15px;
 // }
 
 // input[type=checkbox]:checked {

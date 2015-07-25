@@ -17,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -63,6 +64,9 @@ public class Clinic implements Serializable {
 
     @Column(name = "hillrom_id")
     private String hillromId;
+    
+    @Column(name = "clinic_admin_id")
+    private Long clinicAdminId;
 
     @ManyToOne
     @JoinColumn(name="parent_clinic_id")
@@ -160,7 +164,15 @@ public class Clinic implements Serializable {
         this.hillromId = hillromId;
     }
 
-    public Clinic getParentClinic() {
+    public Long getClinicAdminId() {
+		return clinicAdminId;
+	}
+
+	public void setClinicAdminId(Long clinicAdminId) {
+		this.clinicAdminId = clinicAdminId;
+	}
+
+	public Clinic getParentClinic() {
 		return parentClinic;
 	}
 

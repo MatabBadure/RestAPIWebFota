@@ -1,0 +1,13 @@
+{
+    "authenticate": {
+        "title": "Authentication",
+        "messages": {
+            "success": "<strong>Your user has been activated.</strong> Please <a href=\"#/login\">authenticate</a>.",
+            "error": "<strong>Your user could not be activated.</strong> Please use the registration form to sign up."
+        },
+        "placeholder": {
+        	"answer": "Enter Your Answer"
+        },
+        "forgot-pwd-link": "Forgot Password?"
+    }
+}

@@ -118,9 +118,12 @@ angular.module('hillromvestApp')
             },
 
 
-            resetPasswordFinish: function(key, newPassword, callback) {
+            resetPasswordFinish: function(key, data, callback) {
                 var cb = callback || angular.noop;
-                var data = {"newPassword":newPassword};
+                var data = {"questionId":data.question.id,
+                            "answer": data.answer,
+                            "password":data.password
+                           };
                 return PasswordResetFinish.resetPassFinish(key).save(data, function () {
                     return cb();
                 }, function (err) {
@@ -136,6 +139,33 @@ angular.module('hillromvestApp')
                     return cb(data);
                 }).catch(function (err) {
                     this.logout();
+                    deferred.reject(err);
+                    return cb(err);
+                }.bind(this));
+                return deferred.promise;
+            },
+            
+            configurePassword : function(obj, callback){
+                var deferred = $q.defer();
+                var cb = callback || angular.noop;
+                AuthServerProvider.configurePassword(obj).then(function (data) {
+                    deferred.resolve(data);
+                    return cb(data);
+                }).catch(function (err) {
+                    this.logout();
+                    deferred.reject(err);
+                    return cb(err);
+                }.bind(this));
+                return deferred.promise;
+            },
+
+             getSecurityQuestions : function(callback){
+                var deferred = $q.defer();
+                var cb = callback || angular.noop;
+                AuthServerProvider.getSecurityQuestions().then(function (data) {
+                    deferred.resolve(data);
+                    return cb(data);
+                }).catch(function (err) {
                     deferred.reject(err);
                     return cb(err);
                 }.bind(this));

@@ -1,24 +1,22 @@
-      'use strict';
+'use strict';
 
-      angular.module('hillromvestApp')
-      .controller('UsersController', function ($scope) {
-        $scope.user = {};
+angular.module('hillromvestApp')
+  .controller('UsersController', function ($scope) {
+    $scope.user = {};
+    $scope.userStatus = {
+      'role': localStorage.getItem('role'),
+      'editMode': false,
+      'isCreate': false,
+      'isMessage': false
+    };
 
-        $scope.userStatus ={
-          'role':localStorage.getItem('role'),
-          'editMode':false,
-          'isCreate':false,
-          'isMessage':false
-        }; 
+    $scope.selectedUser = function (user) {
+      $scope.userStatus.isCreate = false;
+      $scope.userStatus.editMode = true;
+      $scope.user = user;
+    };
 
-        $scope.selectedUser = function (user) {
-         $scope.userStatus.isCreate = false;
-         $scope.userStatus.editMode = true;
-         $scope.user = user;
-       };
-
-       $scope.createUser = function(){
-        $scope.userStatus.isCreate = true;
-      }
-    });
-
+    $scope.createUser = function () {
+      $scope.userStatus.isCreate = true;
+    };
+  });

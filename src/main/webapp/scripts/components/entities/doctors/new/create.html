@@ -23,14 +23,30 @@
             <span class="" translate="doctor.clinic-name"></span>
             <span class="">*</span>
           </div>
-          <div class="col-md-10 dashboard__form--input">
-            <input class="" type="text" name="clinicName"  ng-model="doctor.clinic" required>
+          {{doctor.clinicList}}
+          <div class="col-md-10 dashboard__form--input" ng-repeat="clinic in doctor.clinicList">
+
+            <input class="" type="text" name="clinicName"  ng-model="clinic.name" required>
             <div ng-show="(form.clinicName.$dirty && form.clinicName.$invalid) || submitted" class="">
               <span class="has-error" ng-show="form.clinicName.$error.required">
                 Clinic Name is required.
               </span>
             </div>
           </div>
+
+<!--           <div class="dashboard-page__user-list__detailed__list">
+            <div ng-repeat="doctor in doctors | filter:clinic.name">
+              <div ng-click="selectDoctor(doctor)" class="dashboard-page__user-list__detailed__list--details" >
+                <span class="user-detail">
+                  {{doctor.name}} {{doctor.email}}
+                </span>
+                <span class="user-role">
+                  {{doctor.hospital}}
+                </span>
+              </div>
+            </div>
+          </div> -->
+
         </div>
         <div class="col-md-7 col-md-offset-2">
           <div class="col-md-6 dashboard__form--label">
@@ -51,7 +67,7 @@
           <div class="col-md-10 dashboard__form__input">
             <div class="custom-dropdown">
                 <select ng-model="doctor.title">
-                <option selected translate="doctor.title.dr">Dr.</option>
+                <option selected translate="doctor.title.dr">Dr</option>
                   <option translate="doctor.title.mr">Mr.</option>
                   <option translate="doctor.title.mrs">Mrs.</option>
                   <option translate="doctor.title.miss">Miss</option>
@@ -129,7 +145,7 @@
             <span class="" translate="doctor.npi-number"></span>
           </div>
           <div class="col-md-10 dashboard__form--input">
-            <input class="" type="text" name="npi" ng-pattern="/^[0-9]+$/" ng-model="doctor.npi">
+            <input class="" type="text" name="npi" ng-pattern="/^[0-9]+$/" ng-model="doctor.npiNumber">
               <div ng-show="form.npi.$dirty && form.npi.$invalid" class="">
                 <span class="has-error" ng-show="form.npi.$error.pattern">
                   NPI Number is invalid.
@@ -145,7 +161,7 @@
             <span class="" translate="doctor.specialty"></span>
           </div>
           <div class="col-md-10 dashboard__form--input">
-            <input class="" type="text" >
+            <input class="" type="text" ng-model="doctor.speciality">
           </div>
         </div>
         <div class="col-md-7 col-md-offset-2">
@@ -153,7 +169,7 @@
             <span class="" translate="doctor.credentials"></span>
           </div>
           <div class="col-md-10 dashboard__form--input">
-            <input class="" type="text" >
+            <input class="" type="text" ng-model="doctor.credentials">
           </div>
         </div>
       </div>
@@ -275,7 +291,7 @@
             <span class="" translate="doctor.zipcode"></span>
           </div>
           <div class="col-md-10 dashboard__form--input">
-            <input class="" type="text" name="zip" ng-pattern="/^[0-9]{5}$/" ng-model="doctor.zipCode">
+            <input class="" type="text" name="zip" ng-pattern="/^[0-9]{5}$/" ng-model="doctor.zipcode">
               <div ng-show="form.zip.$dirty && form.zip.$invalid" class="">
                 <span class="has-error" ng-show="form.zip.$error.pattern">
                   Zip Code is invalid.

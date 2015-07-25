@@ -1,11 +1,12 @@
 var usersList = [
   {
+    'id': 12,
     'title' : 'Mr.',
     'firstName' : 'John',
-    'lastName' : 'Smith',
+    'lastName' : 'Ceena',
     'middleName' : 'MiddleName',
-    'email' : 'email',
-    'role' : {'key' : 'SUPER_ADMIN', 'value' : 'Super Admin'}
+    'email' : 'syedmohammed+222@neevtech.com',
+    'role' : 'ADMIN'
   }, {
     'title' : 'Mr.',
     'firstName' : 'James',
@@ -13,105 +14,21 @@ var usersList = [
     'middleName' : 'MiddleName',
     'email' : 'email',
     'role' : {'key' : 'ACCT_SERVICES', 'value' : 'Account Service'}
-  }, {
-    'title' : 'Mr.',
-    'firstName' : 'David',
-    'lastName' : 'Jones',
-    'middleName' : 'MiddleName',
-    'email' : 'email',
-    'role' : {'key' : 'ASSOCIATES', 'value' : 'Associates'}
-  }, {
-    'title' : 'Mr.',
-    'firstName' : 'William',
-    'lastName' : 'Davis',
-    'middleName' : 'MiddleName',
-    'email' : 'email',
-    'role' : {'key' : 'CLINIC_ADMIN', 'value' : 'Clinic Admin'}
-  }, {
-    'title' : 'Mr.',
-    'firstName' : 'Joseph',
-    'lastName' : 'Taylor',
-    'middleName' : 'MiddleName',
-    'email' : 'email',
-    'role' : {'key' : 'ACCT_SERVICES', 'value' : 'Acct Services'}
-  }, {
-    'title' : 'Mr.',
-    'firstName' : 'William',
-    'lastName' : 'Davis',
-    'middleName' : 'MiddleName',
-    'email' : 'email',
-    'role' : {'key' : 'SUPER_ADMIN', 'value' : 'Super Admin'}
-  }, {
-    'title' : 'Mr.',
-    'firstName' : 'William',
-    'lastName' : 'Davis',
-    'middleName' : 'MiddleName',
-    'email' : 'email',
-    'role' : {'key' : 'SUPER_ADMIN', 'value' : 'Super Admin'}
-  }, {
-    'title' : 'Mr.',
-    'firstName' : 'William',
-    'lastName' : 'Davis',
-    'middleName' : 'MiddleName',
-    'email' : 'email',
-    'role' : {'key' : 'SUPER_ADMIN', 'value' : 'Super Admin'}
-  }, {
-    'title' : 'Mr.',
-    'firstName' : 'William',
-    'lastName' : 'Davis',
-    'middleName' : 'MiddleName',
-    'email' : 'email',
-    'role' : {'key' : 'SUPER_ADMIN', 'value' : 'Super Admin'}
-  }, {
-    'title' : 'Mr.',
-    'firstName' : 'William',
-    'lastName' : 'Davis',
-    'middleName' : 'MiddleName',
-    'email' : 'email',
-    'role' : {'key' : 'SUPER_ADMIN', 'value' : 'Super Admin'}
-  }, {
-    'title' : 'Mr.',
-    'firstName' : 'William',
-    'lastName' : 'Davis',
-    'middleName' : 'MiddleName',
-    'email' : 'email',
-    'role' : {'key' : 'SUPER_ADMIN', 'value' : 'Super Admin'}
-  }, {
-    'title' : 'Mr.',
-    'firstName' : 'William',
-    'lastName' : 'Davis',
-    'middleName' : 'MiddleName',
-    'email' : 'email',
-    'role' : {'key' : 'SUPER_ADMIN', 'value' : 'Super Admin'}
-  }, {
-    'title' : 'Mr.',
-    'firstName' : 'William',
-    'lastName' : 'Davis',
-    'middleName' : 'MiddleName',
-    'email' : 'email',
-    'role' : {'key' : 'SUPER_ADMIN', 'value' : 'Super Admin'}
-  }, {
-    'title' : 'Mr.',
-    'firstName' : 'William',
-    'lastName' : 'Davis',
-    'middleName' : 'MiddleName',
-    'email' : 'email',
-    'role' : {'key' : 'SUPER_ADMIN', 'value' : 'Super Admin'}
-  }, {
-    'title' : 'Mr.',
-    'firstName' : 'William',
-    'lastName' : 'Davis',
-    'middleName' : 'MiddleName',
-    'email' : 'email',
-    'role' : {'key' : 'SUPER_ADMIN', 'value' : 'Super Admin'}
-  }, {
-    'title' : 'Mr.',
-    'firstName' : 'William',
-    'lastName' : 'Davis',
-    'middleName' : 'MiddleName',
-    'email' : 'email',
-    'role' : {'key' : 'SUPER_ADMIN', 'value' : 'Super Admin'}
-  }];
+  },
+  {
+    'hillromId': 'HR000028',
+    'title': 'Mr.',
+    'firstName': 'Peter',
+    'middleName': 'Smith',
+    'lastName': 'Parker',
+    'gender': 'male',
+    'langKey': 'en',
+    'zipcode': '560009',
+    'city': 'Bangalore',
+    'dob': '08/06/1992',
+    'role': 'PATIENT'
+  }
+];
 
 
 var clinicsList = [
@@ -161,5 +78,18 @@ var doctorsList = [
   { 'name' : 'William Davis', 'email' : 'williamdavis@gmail.com', 'hospital' : 'mno hospital'},
   { 'name' : 'Joseph taylor', 'email' : 'josephtaylor@gmail.com', 'hospital' : 'xyz hospital'},
   { 'name' : 'David Jones', 'email' : 'davijones@gmail.com', 'hospital' : 'abc hospital'},
-  { 'id' : 28, 'name' : 'DoctorName', 'email' : 'syedmohammed+122@neevtech.com', 'hospital' : 'Appolo hospital'}
+  { 'id' : 28, 'name' : 'DoctorName', 'email' : 'syedmohammed+122@neevtech.com', 'hospital' : 'Appolo hospital'},
+  { 'id': 66, 'title': 'Dr', 'firstName': 'Syed', 'middleName': 'Mohammad', 'lastName': 'Ali', 'email': 'syedmohammed+004@neevtech.com', 'gender': null, 'zipcode': null, 'activated': false, 'langKey': 'en', 'resetKey': null, 'resetDate': null, 'termsConditionAccepted' : false, 'termsConditionAcceptedDate': null, 'deleted': false, 'lastLoggedInAt': null, 'dob': null, 'speciality': null, 'credentials': null, 'primaryPhone' : 1234567890, 'mobilePhone' : 1234567890, 'faxNumber': 1234567890, 'address': 'Address', 'city': 'Bangalore', 'state': 'AK', 'npiNumber': null
+  }
 ];
+
+var roleEnum = {
+  ADMIN : 'ADMIN',
+  PATIENT : 'PATIENT',
+  HCP : 'HCP',
+  ACCT_SERVICES : 'ACCT_SERVICES',
+  ASSOCIATES : 'ASSOCIATES',
+  HILLROM_ADMIN : 'HILLROM_ADMIN',
+  CLINIC_ADMIN : 'CLINIC_ADMIN',
+  ANONYMOUS : 'ANONYMOUS'
+};

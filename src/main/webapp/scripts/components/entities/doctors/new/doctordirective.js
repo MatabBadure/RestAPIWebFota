@@ -18,7 +18,7 @@ angular.module('hillromvestApp')
           UserService.getState().then(function (response) {
             $scope.states = response.data.states;
           }).catch(function (response) {
-            console.log("getState call failed!");
+
           });
           $scope.formSubmit = function () {
             $scope.submitted = true;
@@ -32,11 +32,12 @@ angular.module('hillromvestApp')
             return false;
           }
           if ($scope.doctorStatus.editMode) {
-            //Edit doctor section
+            // $scope.doctor.clinicList = [ { 'id' : 1} ];
             UserService.editUser($scope.doctor).then(function (response) {
               $scope.doctorStatus.isMessage = true;
               $scope.doctorStatus.message = response.data.message;
-            }).cathc(function (response) {
+              $scope.doctor = " ";
+            }).catch(function (response) {
               $scope.doctorStatus.isMessage = true;
               if (response.data.message !== undefined) {
                 $scope.doctorStatus.message = response.data.message;
@@ -53,6 +54,7 @@ angular.module('hillromvestApp')
             UserService.createUser(data).then(function (response) {
               $scope.doctorStatus.isMessage = true;
               $scope.doctorStatus.message = "Doctor created successfully" + " with ID " + response.data.user.id;
+              $scope.doctor = " ";
             }).catch(function (response) {
               $scope.doctorStatus.isMessage = true;
               if (response.data.message !== undefined) {
@@ -62,14 +64,13 @@ angular.module('hillromvestApp')
               }
             });
           }
-
         };
 
         $scope.deleteDoctor = function () {
-          $scope.doctor.id = 1;
           UserService.deleteUser($scope.doctor.id).then(function (response) {
             $scope.doctorStatus.isMessage = true;
             $scope.doctorStatus.message = response.data.message;
+            $scope.doctor = " ";
           }).catch(function (response) {
             $scope.doctorStatus.isMessage = true;
             if (response.data.message !== undefined) {

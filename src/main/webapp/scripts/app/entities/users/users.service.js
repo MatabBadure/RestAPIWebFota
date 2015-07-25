@@ -1,9 +1,21 @@
 'use strict';
-
+/**
+ * @ngdoc service
+ * @name UserService
+ * @description
+ *
+ */
 angular.module('hillromvestApp')
-  .factory('UserService', function ($http,localStorageService) {
+  .factory('UserService', function ($http, localStorageService) {
     var token = localStorage.getItem('token');
     return {
+
+      /**
+      * @ngdoc method
+      * @name createUser
+      * @description
+      *
+      */
       createUser: function (data) {
         return $http.post('api/user', data, {
           headers: {
@@ -15,9 +27,15 @@ angular.module('hillromvestApp')
           return response;
         });
       },
-      deleteUser : function(id){
-        id=16;
-        return $http.delete('api/user/'+id, {
+
+      /**
+      * @ngdoc method
+      * @name deleteUser
+      * @description
+      *
+      */
+      deleteUser : function (id) {
+        return $http.delete('api/user/' + id, {
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
@@ -28,8 +46,14 @@ angular.module('hillromvestApp')
         });
       },
 
-      editUser : function(id,data){
-        return $http.put('api/user/'+id,data, {
+      /**
+      * @ngdoc method
+      * @name editUser
+      * @description
+      *
+      */
+      editUser : function (data) {
+        return $http.put('api/user/' + data.id, data, {
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
@@ -39,9 +63,17 @@ angular.module('hillromvestApp')
           return response;
         });
       },
-      getState : function(){
+
+      getState : function () {
          return $http.get('scripts/components/entities/patients/new/state.json')
          .success(function (response) {
+          return response;
+        });
+      },
+
+      getUser : function (userId) {
+        return $http.get('api/user/' + userId, {headers: { 'Content-Type' : 'application/json', 'Accept' : 'application/json', 'x-auth-token' : token } })
+        .success(function (response) {
           return response;
         });
       }

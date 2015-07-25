@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.inject.Inject;
+
 import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -22,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.PatientInfo;
@@ -50,7 +54,7 @@ import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 @Transactional
 public class UserService {
 
-    private final Logger log = LoggerFactory.getLogger(UserService.class);
+	private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Inject
     private PasswordEncoder passwordEncoder;
@@ -84,6 +88,16 @@ public class UserService {
     
     @Inject
     private ApplicationEventPublisher eventPublisher;
+    
+    public String generateDefaultPassword(User patientUser) {
+		StringBuilder defaultPassword = new StringBuilder();
+		defaultPassword.append(patientUser.getZipcode());
+		// default password will have the first 4 letters from last name, if length of last name <= 4, use complete string
+		int endIndex = patientUser.getLastName().length() > Constants.NO_OF_CHARACTERS_TO_BE_EXTRACTED ? Constants.NO_OF_CHARACTERS_TO_BE_EXTRACTED : patientUser.getLastName().length() ; 
+		defaultPassword.append(patientUser.getLastName().substring(0, endIndex));
+		defaultPassword.append(patientUser.getDob().toString(Constants.DATEFORMAT_MMddyyyy));
+		return defaultPassword.toString();
+	}
 
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
@@ -276,11 +290,11 @@ public class UserService {
     public JSONObject createUser(UserExtensionDTO userExtensionDTO, String baseUrl){
     	JSONObject jsonObject = new JSONObject();
     	if(userExtensionDTO.getEmail() != null) {
-        	userRepository.findOneByEmail(userExtensionDTO.getEmail())
-			.map(user -> {
+			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
+			if (existingUser.isPresent()) {
 				jsonObject.put("ERROR", "e-mail address already in use");
     			return jsonObject;
-    		});
+    		}
     	}
     	List<String> rolesAdminCanModerate = rolesAdminCanModerate();
     	if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())
@@ -355,6 +369,7 @@ public class UserService {
     		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
     		patientInfoRepository.save(patientInfo);
     		assignValuesToUserObj(userExtensionDTO, newUser);
+    		newUser.setPassword(passwordEncoder.encode(generateDefaultPassword((User)newUser)));
     		newUser.setActivated(true);
     		newUser.setDeleted(false);
     		if(AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {

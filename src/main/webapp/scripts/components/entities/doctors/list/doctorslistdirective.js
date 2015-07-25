@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-.directive('doctorList', function () {
+.directive('doctorList', function (UserService) {
   return {
     templateUrl: 'scripts/components/entities/doctors/list/list.html',
     restrict: 'E',
@@ -17,7 +17,15 @@ angular.module('hillromvestApp')
 
       $scope.selectDoctor = function(doctor) {
         $scope.doctor = doctor;
-        $scope.onSelect({'doctor': doctor});
+        console.info(doctor.id);
+        UserService.getUser(doctor.id).then(function (response) {
+          response.data.clinicList = [ { 'id': 1, 'name': 'Name1'}, { 'id': 2, 'name': 'Name2'}];
+          console.log('Complete Object: ', $scope.doctor);
+          $scope.doctor = response.data;
+          $scope.onSelect({'doctor': doctor});
+        }).catch(function (response) {
+
+        });
       };
 
        $scope.createDoctor = function(){

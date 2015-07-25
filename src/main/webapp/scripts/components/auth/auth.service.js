@@ -172,19 +172,6 @@ angular.module('hillromvestApp')
                 return deferred.promise;
             },
 
-            getSecurityQuestions : function(callback){
-                var deferred = $q.defer();
-                var cb = callback || angular.noop;
-                AuthServerProvider.getSecurityQuestions().then(function (data) {
-                    deferred.resolve(data);
-                    return cb(data);
-                }).catch(function (err) {
-                    deferred.reject(err);
-                    return cb(err);
-                }.bind(this));
-                return deferred.promise;
-            },
-
 
             /*Temp Fix from  angular*/
             captcha: function(captchaData, callback){

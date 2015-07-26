@@ -1,11 +1,11 @@
-<div class="navbar dashboard">
-    <div class="container dashbord-nav">
+<div class="navbar dashboard dashbord-nav">
+    <div class="container">
       <div class="dashbord-nav__primary pull-left">
-        <span class="dashbord-nav__primary--title" translate="patient.home.createLabel">Manage Patient</span>
+        <span class="dashbord-nav__primary--title" translate="patient.home.manageLabel">Manage Patient</span>
       </div>
 
-      <div class="dashbord-nav__secondary create-user navbar-right" ng-show="" ng-click="createPatient()">
-        <span class="dashbord-nav__secondary--create-new" translate="patient.home.manageLabel"></span>
+      <div class="dashbord-nav__secondary create-user navbar-right" ng-click="createPatient()">
+        <span class="dashbord-nav__secondary--create-new" translate="patient.home.createNewLabel"></span>
         <span class="glyphicon glyphicon-plus"></span>
       </div>
     </div>
@@ -14,7 +14,7 @@
     <div class="container dashboard__manage-view margin-top-xl">
       <div class="row dashboard__manage-view--search">
         <div class="col-md-14 reset-padding-right">
-          <input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" ng-model-options="{ debounce: 1000 }" ng-keyup="searchPatients()" autocomplete="off" placeholder="{{patient.placeholder.search}}">
+          <input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" ng-model-options="{ debounce: 1000 }" ng-keyup="searchPatients()" autocomplete="off" placeholder="{{patient.placeholder.search}}" />
           <span class="search-icon glyphicon glyphicon-search"></span>
         </div>
         <div class="col-md-2 reset-padding-left">
@@ -410,3 +410,44 @@
     </div>
   </div>
 </div>
+
+<div class="user-help">
+  <div class="container">
+    <div class="row user-help--container">
+      <div class="col-md-8 user-help-devider">
+        <div class="col-md-4 help-icon">
+          <span class="hillrom-icon icon-lungs"></span>
+        </div>
+        <div class="col-md-12 user-help__desc">
+            <span class="user-help__desc--heading">Ideal HMR Reading</span>
+            <p class="user-help__desc--content">
+                A Lower range peak flow meter is for small children, and a standard range peak flow meter is for older children, teenagers and adults.
+            </p>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <div class="col-md-4 help-icon">
+          <span class="hillrom-icon icon-lungs"></span>
+        </div>
+        <div class="col-md-12">
+            <span class="user-help__desc--heading">Ideal HMR Reading</span>
+            <p class="user-help__desc--content">
+                A Lower range peak flow meter is for small children, and a standard range peak flow meter is for older children, teenagers and adults.
+            </p>
+        </div>
+      </div>
+      <span class="user-help--close glyphicon glyphicon-remove"></span>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    $(".user-help--close").click(function(){
+      $(".user-help").animate({ height: '0px' }, 1000, function() {
+        $(".user-help").hide();
+      });
+    });
+  });
+</script>

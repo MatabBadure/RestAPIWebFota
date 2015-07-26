@@ -69,7 +69,7 @@ public class UserExtensionResource {
         log.debug("REST request to save User : {}", userExtensionDTO);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         JSONObject jsonObject = userService.createUser(userExtensionDTO, baseUrl);
-        if (jsonObject.containsKey("error")) {
+        if (jsonObject.containsKey("ERROR")) {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);

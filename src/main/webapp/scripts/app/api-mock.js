@@ -77,7 +77,10 @@ var doctorsList = [
   { 'name' : 'David Jones', 'email' : 'davijones@gmail.com', 'hospital' : 'abc hospital'},
   { 'name' : 'William Davis', 'email' : 'williamdavis@gmail.com', 'hospital' : 'mno hospital'},
   { 'name' : 'Joseph taylor', 'email' : 'josephtaylor@gmail.com', 'hospital' : 'xyz hospital'},
-  { 'name' : 'David Jones', 'email' : 'davijones@gmail.com', 'hospital' : 'abc hospital'}
+  { 'name' : 'David Jones', 'email' : 'davijones@gmail.com', 'hospital' : 'abc hospital'},
+  { 'id' : 28, 'name' : 'DoctorName', 'email' : 'syedmohammed+122@neevtech.com', 'hospital' : 'Appolo hospital'},
+  { 'id': 66, 'title': 'Dr', 'firstName': 'Syed', 'middleName': 'Mohammad', 'lastName': 'Ali', 'email': 'syedmohammed+004@neevtech.com', 'gender': null, 'zipcode': null, 'activated': false, 'langKey': 'en', 'resetKey': null, 'resetDate': null, 'termsConditionAccepted' : false, 'termsConditionAcceptedDate': null, 'deleted': false, 'lastLoggedInAt': null, 'dob': null, 'speciality': null, 'credentials': null, 'primaryPhone' : 1234567890, 'mobilePhone' : 1234567890, 'faxNumber': 1234567890, 'address': 'Address', 'city': 'Bangalore', 'state': 'AK', 'npiNumber': null
+  }
 ];
 
 var roleEnum = {

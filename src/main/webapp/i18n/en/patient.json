@@ -3,7 +3,8 @@
         "home": {
             "title": "Patient",
             "createLabel": "Create Patient",
-            "createOrEditLabel": "Create or edit a Patient"
+            "createOrEditLabel": "Create or edit a Patient",
+            "manageLabel": "Manage Patient"
         },
         "delete": {
             "question": "Are you sure you want to delete Patient {{ id }}?"
@@ -32,6 +33,9 @@
                     "male":   "M",
                     "female": "F",
                     "others": "O"
+        },
+        "search": {
+            "new": "Newly Created"
         },
         "primary-language": "Primary Language",
         "first-name": "First Name",

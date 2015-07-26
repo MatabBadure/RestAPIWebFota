@@ -1,15 +1,17 @@
-.secondary-fix-navbar{
-	top: 60px;
-  border-width: 0 0 0px;
-}
-
 .dashboard {
 	// position: fixed;
 	background-color: $seashell;
-	max-height: 40px;
-	min-height: 40px;
 	color: $pickled-bluewood;
 	font-weight: bold;
+}
+
+.dashboard--content {
+	background-color: $body-bg;
+}
+
+.dashbord-nav {
+	max-height: 40px;
+	min-height: 40px;
 }
 
 .dashbord-nav__primary {
@@ -20,7 +22,7 @@
 	line-height: 38px;
 }
 
-.dashbord-nav__secondary{
+.dashbord-nav__secondary {
 	min-height: inherit;
 }
 
@@ -134,27 +136,161 @@
   line-height: 30px;
   font-weight: normal;
 }
-// input[type=checkbox]{
-// 	padding-left:5px;
-//   padding-right:5px;
-//   border-radius:0;
 
-//   -webkit-appearance:button;
+.dashboard__manage-view--search {
+	margin-bottom: 30px;
+}
 
-//   border: 1px solid red;
-//   color:#FFF;
-//   white-space: nowrap;
-//   overflow:hidden;
-//   width:15px;
-//   height:15px;
-// }
+.dashboard__manage-view--search input {
+	height: 30px;
+	color: $pickled-bluewood;
+	border: 1px solid $bombay;
+	padding-left: 10px;
+	font-weight: normal;
+	border-radius: 0;
+}
 
-// input[type=checkbox]:checked {
-//     background-color:#000;
-//     border-left-color:#06F;
-//     border-right-color:#06F;
-// }
+.dashboard__manage-view--search select {
+	height: 30px;
+	width: 100%;
+	font-weight: normal;
+	color: $body-bg;
+	border: 1px solid $nevada;
+	background-color: $nevada;
+	padding-left: 5px;
+	-webkit-appearance: none;
+  -moz-appearance: none;
+  text-indent: 1px;
+  text-overflow: '';
+}
 
-// input[type=checkbox]:hover {
-//     box-shadow:0px 0px 10px #1300ff;
-// }
+.search-dropdown:before {
+  content:'\e600';
+  font-family:"hillrom";
+  color: $body-bg;
+  padding: 0;
+  font-size: 10px;
+  position: absolute;
+  top: 8px; 
+  right: 20px; 
+  z-index: 1;
+  z-index: 1 \0;
+}
+
+.search-icon {
+	position: absolute;
+  right: 0;
+  padding: 7px 10px;
+}
+
+.dashboard__manage-view--list {
+	border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+  margin-top: 10px;
+}
+
+.dashboard__manage-view--list .user-name {
+	font-size: $font-size-base;
+	color: $pickled-bluewood;
+	display: block;
+	font-weight: 700;
+}
+
+.dashboard__manage-view--list .user-email {
+	font-size: $font-size-small;
+	color: $bombay;
+	display: block;
+	font-weight: 400;
+}
+
+.dashboard__manage-view--list .user-home-no, 
+.dashboard__manage-view--list .user-address, 
+.dashboard__manage-view--list .clinic-name {
+	font-size: $font-size-small;
+	color: $celeste;
+	display: block;
+	font-weight: 400;
+}
+
+.dashboard__manage-view--list .hcp-name {
+	font-size: $font-size-small;
+	color: $nevada;
+	font-weight: 600;
+	display: block;
+}
+
+.dashboard__manage-view--list .clinic-name {
+	font-size: $font-size-small;
+	color: $celeste;
+	display: block;
+}
+
+.dashboard__manage-view--list .hr-id {
+	font-size: $font-size-small;
+	color: $charcoal;
+	font-weight: 600;
+}
+
+.dashboard__manage-view--list .user-lungs, 
+.dashboard__manage-view--list .user-pressure {
+	font-size: 30px;
+	text-align: center;
+	color: $alto;
+}
+
+.dashboard__manage-view--list .active, 
+.dashboard__manage-view--list .active {
+	color: $terracotta;
+}
+
+.dashboard__manage-view--list .inactive, 
+.dashboard__manage-view--list .inactive {
+	color: $Parsley;
+}
+
+.dashboard__manage-view--list .progress-input {
+	font-size: $font-size-small;
+	color: $charcoal;
+	font-weight: 700;
+	text-align: center;
+}
+
+.dashboard__manage-view--list .progress {
+  height: 5px;
+  margin-bottom: 0;
+  background-color: #f5f5f5;
+}
+
+.dashboard__manage-view--list .center-text {
+	  padding: 5px 0;
+}
+
+.dashboard__manage-view--pagination {
+	margin-top: 10px;
+	margin-bottom: 60px !important;
+}
+
+.dashboard__manage-view--pagination .record-found {
+	font-size: $font-size-small;
+	color: $charcoal;
+	font-weight: 600;
+	padding-right: 5px;
+}
+
+.dashboard__manage-view--pagination .navigaion-link, 
+.dashboard__manage-view--pagination .navigaion-no {
+	font-size: $font-size-small;
+	color: $nevada;
+	font-weight: 400;
+}
+
+.dashboard__manage-view--pagination .navigaion-no {
+	padding: 0 5px;
+}
+
+.dashboard__manage-view--pagination .inactive {
+	font-size: $font-size-small;
+	color: $celeste;
+	font-weight: 400;
+	cursor: default;
+}

@@ -3,6 +3,7 @@
         "home": {
             "title": "Patient",
             "createLabel": "Create Patient",
+            "createNewLabel": "Create New",
             "createOrEditLabel": "Create or edit a Patient",
             "manageLabel": "Manage Patient"
         },
@@ -36,6 +37,9 @@
         },
         "search": {
             "new": "Newly Created"
+        },
+        "placeholder": {
+            "search": "Search with Name, Hill-Rom ID or Email"
         },
         "primary-language": "Primary Language",
         "first-name": "First Name",

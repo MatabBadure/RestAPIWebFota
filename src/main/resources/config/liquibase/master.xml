@@ -1,3 +1,4 @@
+<include file="classpath:config/liquibase/changelog/20150726140341_added_entity_PATIENT_VEST_DEVICE_RAW_LOGS.xml" relativeToChangelogFile="false"/>
 <?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"

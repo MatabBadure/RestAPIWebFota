@@ -75,7 +75,8 @@ angular.module('hillromvestApp')
                 $scope.currentPageIndex++;
               }
             }
-            UserService.getUsers($scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function(response) {
+            var url = 'api/user/search?searchString=';
+            UserService.getUsers(url, $scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function(response) {
               $scope.users = response.data;
             }).catch(function(response) {
 

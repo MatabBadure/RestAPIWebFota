@@ -64,15 +64,15 @@ angular.module('hillromvestApp')
         });
       },
 
-      getState : function(){
+      getState : function () {
          return $http.get('scripts/components/entities/patients/new/state.json')
          .success(function (response) {
           return response;
         });
       },
 
-      getUsers : function(searchString, pageNo, offset){
-        return $http.get('api/user/search?searchString=' + searchString + '&pageNo=' + pageNo + '&offset=' + offset, {
+      getUsers : function (url, searchString, pageNo, offset) {
+        return $http.get(url + searchString + '&pageNo=' + pageNo + '&offset=' + offset, {
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',

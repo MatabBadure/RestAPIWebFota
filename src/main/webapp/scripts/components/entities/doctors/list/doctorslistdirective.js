@@ -12,28 +12,57 @@ angular.module('hillromvestApp')
     link: function(scope, element, attrs) {
       var doctor = scope.doctor;
     },
-    controller: function($scope) {
+    controller: function($scope, $timeout) {
       $scope.doctors =[];
+
+      var timer=false;
+      $scope.$watch('searchItem', function(){
+        if(timer){
+          $timeout.cancel(timer)
+        }
+        timer= $timeout(function(){
+          UserService.getUsers($scope.searchItem, 1, 10).then(function(response) {
+            $scope.doctors = response.data;
+          }).catch(function(response) {
+
+          });
+        },1000)
+      });
+
 
       $scope.selectDoctor = function(doctor) {
         $scope.doctor = doctor;
-        console.info(doctor.id);
-        UserService.getUser(doctor.id).then(function (response) {
-          response.data.clinicList = [ { 'id': 1, 'name': 'Name1'}, { 'id': 2, 'name': 'Name2'}];
-          console.log('Complete Object: ', $scope.doctor);
-          $scope.doctor = response.data;
-          $scope.onSelect({'doctor': doctor});
-        }).catch(function (response) {
+        $scope.onSelect({'doctor': doctor});
+        //Todo:
+        // UserService.getUser(doctor.id).then(function (response) {
+        //   response.data.clinicList = [ { 'id': 1, 'name': 'Name1'}, { 'id': 2, 'name': 'Name2'}];
+        //   console.log('Complete Object: ', $scope.doctor);
+        //   $scope.doctor = response.data;
+        //   $scope.onSelect({'doctor': doctor});
+        // }).catch(function (response) {
 
-        });
+        // });
       };
 
        $scope.createDoctor = function(){
           $scope.onCreate();
         };
 
-      $scope.searchDoctors = function () {
-        $scope.doctors = doctorsList;
+      $scope.searchDoctors = function(track) {
+        if (track !== undefined) {
+          if (track === "PREV" && $scope.currentPageIndex > 1) {
+            $scope.currentPageIndex--;
+          }
+          if (track === "NEXT") {
+            $scope.currentPageIndex++;
+          }
+        }
+        var url = 'api/user/hcp/search?searchString=';
+        UserService.getUsers(url, $scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function(response) {
+          $scope.doctors = response.data;
+        }).catch(function(response) {
+
+        });
       };
     }
   };

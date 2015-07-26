@@ -20,9 +20,10 @@ angular.module('hillromvestApp')
           }).catch(function (response) {
 
           });
-          $scope.formSubmit = function () {
-            $scope.submitted = true;
-          };
+        };
+
+        $scope.formSubmit = function () {
+          $scope.submitted = true;
         };
 
         $scope.init();

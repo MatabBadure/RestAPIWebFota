@@ -23,30 +23,17 @@
             <span class="" translate="doctor.clinic-name"></span>
             <span class="">*</span>
           </div>
-          {{doctor.clinicList}}
-          <div class="col-md-10 dashboard__form--input" ng-repeat="clinic in doctor.clinicList">
 
-            <input class="" type="text" name="clinicName"  ng-model="clinic.name" required>
-            <div ng-show="(form.clinicName.$dirty && form.clinicName.$invalid) || submitted" class="">
-              <span class="has-error" ng-show="form.clinicName.$error.required">
-                Clinic Name is required.
-              </span>
-            </div>
-          </div>
-
-<!--           <div class="dashboard-page__user-list__detailed__list">
-            <div ng-repeat="doctor in doctors | filter:clinic.name">
-              <div ng-click="selectDoctor(doctor)" class="dashboard-page__user-list__detailed__list--details" >
-                <span class="user-detail">
-                  {{doctor.name}} {{doctor.email}}
-                </span>
-                <span class="user-role">
-                  {{doctor.hospital}}
+          <div class="col-md-10 dashboard__form--input">
+            <div ng-repeat="clinic in doctor.clinics" style = "padding-top: 10px">
+              <input class="" type="text" name="clinicName"  ng-model="clinic.name"  required>
+              <div ng-show="(form.clinicName.$dirty && form.clinicName.$invalid) || submitted" class="">
+                <span class="has-error" ng-show="form.clinicName.$error.required">
+                  Clinic Name is required.
                 </span>
               </div>
             </div>
-          </div> -->
-
+          </div>
         </div>
         <div class="col-md-7 col-md-offset-2">
           <div class="col-md-6 dashboard__form--label">

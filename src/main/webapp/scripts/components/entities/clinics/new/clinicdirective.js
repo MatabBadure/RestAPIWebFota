@@ -19,7 +19,7 @@ angular.module('hillromvestApp')
           UserService.getState().then(function(response) {
             $scope.states = response.data.states;
           }).catch(function(response) {
-            console.log("getState call failed!");
+
           });
         };
 

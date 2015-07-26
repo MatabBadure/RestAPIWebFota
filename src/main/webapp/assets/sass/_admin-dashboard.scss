@@ -294,3 +294,44 @@
 	font-weight: 400;
 	cursor: default;
 }
+
+.user-help {
+	background-color: $seashell;
+	position: relative;
+	clear: both;
+}
+
+.user-help--container {
+	position: relative;
+	padding: 20px 0;
+}
+
+.help-icon {
+	span {
+		font-size: 100px;
+	}
+}
+
+.user-help__desc--heading {
+	font-size: $font-size-base;
+	color: $pickled-bluewood;
+	display: block;
+	font-weight: 700;
+}
+
+.user-help__desc--content {
+	font-size: $font-size-small;
+	color: $trolley-grey;
+	font-weight: 400;
+}
+
+.user-help--close {
+	position: absolute;
+	right: 0;
+  top: 5px;
+  cursor: pointer;
+}
+
+.user-help-devider {
+	border-right: 1px solid $alto-solid;
+}

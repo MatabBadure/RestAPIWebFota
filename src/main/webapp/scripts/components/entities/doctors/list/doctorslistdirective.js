@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-.directive('doctorList', function (UserService,DoctorService) {
+.directive('doctorList', function (UserService) {
   return {
     templateUrl: 'scripts/components/entities/doctors/list/list.html',
     restrict: 'E',
@@ -33,7 +33,8 @@ angular.module('hillromvestApp')
           $timeout.cancel(timer)
         }
         timer= $timeout(function(){
-          UserService.getUsers($scope.searchItem, 1, 10).then(function(response) {
+        var url = 'api/user/hcp/search?searchString=';
+          UserService.getUsers(url, $scope.searchItem, 1, 10).then(function(response) {
             $scope.doctors = response.data;
           }).catch(function(response) {
 
@@ -71,7 +72,7 @@ angular.module('hillromvestApp')
           }
         }
         var url = 'api/user/hcp/search?searchString=';
-        UserService.getUsers(url, $scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function(response) {
+        UserService.getUsers(url, $scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
           $scope.doctors = response.data;
           $scope.total = response.headers()['x-total-count'];
           $scope.pageCount = Math.floor($scope.total / 10)+1;

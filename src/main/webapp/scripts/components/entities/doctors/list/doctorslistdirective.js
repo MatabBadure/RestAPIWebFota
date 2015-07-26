@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-.directive('doctorList', function (UserService) {
+.directive('doctorList', function (UserService,DoctorService) {
   return {
     templateUrl: 'scripts/components/entities/doctors/list/list.html',
     restrict: 'E',
@@ -12,8 +12,20 @@ angular.module('hillromvestApp')
     link: function(scope, element, attrs) {
       var doctor = scope.doctor;
     },
+
     controller: function($scope, $timeout) {
-      $scope.doctors =[];
+
+      $scope.init = function () {
+        $scope.doctors =[];
+        $scope.doctorInfo ={};
+        $scope.currentPageIndex = 1;
+        $scope.perPageCount = 10;
+        $scope.pageCount = 0;
+        $scope.total = 0;
+        $scope.noMatchFound = false;
+      };
+
+      $scope.init();
 
       var timer=false;
       $scope.$watch('searchItem', function(){
@@ -31,6 +43,7 @@ angular.module('hillromvestApp')
 
 
       $scope.selectDoctor = function(doctor) {
+
         $scope.doctor = doctor;
         $scope.onSelect({'doctor': doctor});
         //Todo:
@@ -60,6 +73,13 @@ angular.module('hillromvestApp')
         var url = 'api/user/hcp/search?searchString=';
         UserService.getUsers(url, $scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function(response) {
           $scope.doctors = response.data;
+          $scope.total = response.headers()['x-total-count'];
+          $scope.pageCount = Math.floor($scope.total / 10)+1;
+          if($scope.total == 0){
+            $scope.noMatchFound = true;
+          }else{
+            $scope.noMatchFound = false;
+          }
         }).catch(function(response) {
 
         });

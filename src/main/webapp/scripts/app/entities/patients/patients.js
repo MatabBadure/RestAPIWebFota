@@ -7,7 +7,7 @@ angular.module('hillromvestApp')
                 parent: 'entity',
                 url: '/patient',
                 data: {
-                    roles: [],
+                    roles: ['ADMIN'],
                     pageTitle: 'patient.title'
                 },
                 views: {
@@ -20,7 +20,12 @@ angular.module('hillromvestApp')
                     translatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate, $translatePartialLoader) {
                         $translatePartialLoader.addPart('patient');
                         return $translate.refresh();
-                    }]
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                          return Auth.authorize(false);
+                        }
+                      ]
                 }
             });
     });

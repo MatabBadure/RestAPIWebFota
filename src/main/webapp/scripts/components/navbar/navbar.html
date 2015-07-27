@@ -9,7 +9,7 @@
       </button>
       <a class="navbar-brand" href="#/"><img class="hillrom_logo" src="assets/images/logo-HillRom.png" alt="HillRom Logo"></a>
     </div>
-    <div class="collapse navbar-collapse navbar-secondary" id="navbar-collapse" ng-switch="isAuthenticated()">
+    <div class="collapse navbar-collapse navbar-secondary" id="navbar-collapse" ng-if="isAuthenticated">
       <ul class="nav navbar-nav navbar-right">
         <li >
           <a ng-class="{ active: isActive('patient')}" ng-href="#/patient">
@@ -32,7 +32,9 @@
           </a>
         </li>
         <li class="header-popover">
-          <a href="javascript:void(0)" class="popover-link" data-toggle="popover" data-placement="bottom" title="" data-content="<div><span class='hillrom-icon icon-user-account'></span><span>Account</span></div><div><span class='hillrom-icon icon-logout'></span><span>Logout</span></div>">
+          <a href="javascript:void(0)" class="popover-link" data-toggle="popover" data-placement="bottom" title="" data-content="
+          <div><span class='hillrom-icon icon-user-account'></span><span>Account</span></div>
+          <div><span class='hillrom-icon icon-logout'></span><span ng-click='logout()'>Logout</span></div>">
             <span class="padding-right">Jose Rubert</span>
             <span class="hillrom-icon icon-arrow-down"></span>
           </a>

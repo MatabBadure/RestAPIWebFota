@@ -197,4 +197,21 @@ public class UserExtensionResource {
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
         
     }
+    
+    /**
+     * GET  /user/:id/hcp -> get the "id" HCP user.
+     */
+    @RequestMapping(value = "/user/{id}/hcp",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<JSONObject> getHCPUser(@PathVariable Long id) {
+        log.debug("REST request to get UserExtension : {}", id);
+        JSONObject jsonObject = userService.getHCPUser(id);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
 }

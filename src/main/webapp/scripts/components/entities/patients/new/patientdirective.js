@@ -102,9 +102,9 @@ angular.module('hillromvestApp')
             $scope.patientStatus.message = response.data.message;
           }).catch(function(response) {
             $scope.isMessage = true;
-            if (response.data.message != undefined) {
+            if (response.data.message !== undefined) {
               $scope.patientStatus.message = response.data.message;
-            }else if(response.data.ERROR != undefined){
+            }else if(response.data.ERROR !== undefined){
                $scope.patientStatus.message = response.data.ERROR;
             } else {
               $scope.patientStatus.message = 'Error occured! Please try again';

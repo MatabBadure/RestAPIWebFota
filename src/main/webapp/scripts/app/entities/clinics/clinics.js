@@ -7,7 +7,7 @@ angular.module('hillromvestApp')
                 parent: 'entity',
                 url: '/clinic',
                 data: {
-                    roles: [],
+                    roles: ['ADMIN'],
                     pageTitle: 'clinic.title'
                 },
                 views: {
@@ -21,6 +21,7 @@ angular.module('hillromvestApp')
                         $translatePartialLoader.addPart('clinic');
                         return $translate.refresh();
                     }]
+
                 }
             });
     });

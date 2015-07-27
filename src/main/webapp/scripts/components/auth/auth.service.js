@@ -29,6 +29,19 @@ angular.module('hillromvestApp')
                 return deferred.promise;
             },
 
+            signOut: function (newPassword, callback) {
+                var cb = callback || angular.noop;
+                var deferred = $q.defer();
+                AuthServerProvider.signOut().then(function (data) {
+                    deferred.resolve(data);
+                    return cb(data);
+                }).catch(function (err) {
+                    deferred.reject(err);
+                    return cb(err);
+                });
+                return deferred.promise;
+            },
+
             logout: function () {
                 AuthServerProvider.logout();
                 Principal.authenticate(null);
@@ -53,6 +66,10 @@ angular.module('hillromvestApp')
                                 // now, send them to the signin state so they can log in
                                 $state.go('login');
                             }
+                        }
+
+                        if(isAuthenticated && $rootScope.toState.url == "/login"){
+                            $state.go('patient');
                         }
                     });
             },

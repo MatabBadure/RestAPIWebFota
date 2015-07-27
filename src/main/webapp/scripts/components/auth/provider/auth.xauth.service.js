@@ -17,6 +17,15 @@ angular.module('hillromvestApp')
                     return {'response': data, 'status': status, 'headers' : headers, 'config' : config};
                 });
             },
+            signOut: function() {
+                return $http.post('/api/logout',{}, {
+                    headers: {
+                        'x-auth-token': localStorage.getItem('token')
+                    }
+                }).success(function (data, status, headers, config) {
+                    return {'response': data, 'status': status, 'headers' : headers, 'config' : config};
+                });
+            },
             logout: function() {
                 //Stateless API : No server logout
                 localStorageService.clearAll();

@@ -1,246 +1,3 @@
-<!-- <span ng-show="doctorStatus.isMessage">{{doctorStatus.message}}</span>
-
-<form  name="form" class="dashboard-page__form--new" ng-submit="createDoctor()" novalidate>
-  <div class="dashboard-page__form--new_user-type">Create Doctor</div>
-
-  <div class="col-md-16 indent-form-top">
-    <div class="col-md-6">
-      <label for="exampleInputEmail1">Clinic Name *</label>
-    </div>
-    <div class="col-md-10">
-      <input type="text" class="form-control" name="clinicName"  ng-model="doctor.clinic" required>
-      <div ng-show="(form.clinicName.$dirty && form.clinicName.$invalid) || submitted" class="form-error">
-        <span class="" ng-show="form.clinicName.$error.required">
-          Clinic Name is required.
-        </span>
-      </div>
-    </div>
-  </div>
-
-<div class="col-md-16 indent-form-top">
-  <div class="col-md-6">
-    <label for="exampleInputEmail1"></label>
-  </div>
-  <div class="col-md-10 dashboard-page__form--new_checkbox">
-    <input class="float-left" type="checkbox" value=""><span class="float-left">Add Another Clinic</span>
-  </div>
-</div>
-
-<div class="col-md-16 indent-form-top">
-  <div class="col-md-6">
-    <label for="exampleInputEmail1">Title</label>
-  </div>
-  <div class="col-md-10  dashboard-page__form--new_spec-title">
-    <input type="text" class="form-control"  value="Dr." readonly>
-  </div>
-</div>
-
-<div class="col-md-16 indent-form-top">
-  <div class="col-md-6">
-    <label for="exampleInputEmail1">First Name*</label>
-  </div>
-  <div class="col-md-10">
-    <input type="text" class="form-control" name="firstName"  ng-model="doctor.firstName" ng-minlength=3 ng-maxlength=50 ng-pattern="/^[a-zA-Z]+$/" required>
-    <div ng-show="(form.firstName.$dirty && form.firstName.$invalid) || submitted" class="form-error">
-      <span class="help-block" ng-show="form.firstName.$error.required">
-        First Name is required.
-      </span>
-      <span class="help-block" ng-show="form.firstName.$error.pattern" >
-        First Name cannot have number.
-      </span>
-      <span class="help-block" ng-show="form.firstName.$error.minlength" >
-        First Name is required to be at least 3 character.
-      </span>
-      <span class="help-block" ng-show="form.firstName.$error.maxlength" >
-        First Name cannot be longer than 50 characters.
-      </span>
-    </div>
-  </div>
-</div>
-
-<div class="col-md-16 indent-form-top">
-  <div class="col-md-6">
-    <label for="exampleInputEmail1">Middle Name</label>
-  </div>
-  <div class="col-md-10">
-    <input type="text" class="form-control"  name="middleName" ng-model="doctor.middleName" ng-pattern="/^[a-zA-Z]+$/">
-    <div ng-show="(form.middleName.$dirty && form.middleName.$invalid)" class="form-error"> 
-      <span class="help-block" ng-show="form.middleName.$error.pattern" >
-        Middle Name cannot have number.
-      </span>
-    </div>
-  </div>
-</div>
-
-
-
-<div class="col-md-16 indent-form-top">
-  <div class="col-md-6">
-    <label for="exampleInputEmail1">Last Name*</label>
-  </div>
-  <div class="col-md-10">
-    <input type="text" class="form-control" name="lastName" ng-pattern="/^[a-zA-Z]+$/" ng-model="doctor.lastName" ng-minlength=3 ng-maxlength=50 required>
-    <div ng-show="(form.lastName.$dirty && form.lastName.$invalid) || submitted" class="form-error">
-      <span class="help-block" ng-show="form.lastName.$error.required">
-        Last Name is required.
-      </span>
-       <span class="help-block" ng-show="form.lastName.$error.pattern" >
-        Last Name cannot have number.
-      </span>
-      <span class="help-block" ng-show="form.lastName.$error.minlength" >
-        Last Name is required to be at least 3 character.
-      </span>
-      <span class="help-block" ng-show="form.lastName.$error.maxlength" >
-        Last Name cannot be longer than 50 characters.
-      </span>
-    </div>
-  </div>
-</div>
-
-<div class="col-md-16 indent-form-top">
-  <div class="col-md-6">
-    <label for="exampleInputEmail1">Speciality</label>
-  </div>
-  <div class="col-md-10">
-    <input type="text" class="form-control"  ng-model="doctor.speciality">
-  </div>
-</div>
-
-<div class="col-md-16 indent-form-top">
-  <div class="col-md-6">
-    <label for="exampleInputEmail1">Credentials</label>
-  </div>
-  <div class="col-md-10">
-    <input type="text" class="form-control"  ng-model="doctor.credentials">
-  </div>
-</div>
-
-<div class="col-md-16 indent-form-top">
-  <div class="col-md-6">
-    <label for="exampleInputEmail1">Email *</label>
-  </div>
-  <div class="col-md-10">
-    <input type="email" class="form-control" name="email"  ng-model="doctor.email"  ng-maxlength=100 required>
-    <div ng-show="(form.email.$dirty && form.email.$invalid) || submitted" class="form-error">
-      <span class="help-block" ng-show="form.email.$error.required">
-      Your e-mail is required.
-      </span>
-      <span class="help-block" ng-show="form.email.$error.email">
-        Your e-mail is invalid.
-      </span>
-      <span class="help-block" ng-show="form.email.$error.maxlength">
-        Your e-mail cannot be longer than 100 characters.
-      </span>
-    </div>
-  </div>
-</div>
-
-<div class="col-md-16 indent-form-top">
-  <div class="col-md-6">
-    <label for="exampleInputEmail1">Primary Phone</label>
-  </div>
-  <div class="col-md-10">
-    <input type="text" class="form-control age" name="phone" maxlength="10" ng-pattern="/^[0-9]{10}$/" ng-model="doctor.primaryPhone">
-    <div ng-show="form.phone.$dirty && form.phone.$invalid" class="form-error">
-      <span class="help-block" ng-show="form.phone.$error.pattern">
-        Primary Phone is invalid.
-      </span>
-    </div>
-  </div>
-</div>
-
-<div class="col-md-16 indent-form-top">
-  <div class="col-md-6">
-    <label for="exampleInputEmail1">Mobile Phone</label>
-  </div>
-  <div class="col-md-10">
-    <input type="text" class="form-control age" name="mobile" maxlength="10" ng-pattern="/^[0-9]{10}$/" ng-model="doctor.mobilePhone">
-    <div ng-show="form.mobile.$dirty && form.mobile.$invalid" class="form-error">
-      <span class="help-block" ng-show="form.mobile.$error.pattern">
-        Mobile Phone is invalid.
-      </span>
-    </div>
-  </div>
-</div>
-
-<div class="col-md-16 indent-form-top">
-  <div class="col-md-6">
-    <label for="exampleInputEmail1">Fax Number</label>
-  </div>
-  <div class="col-md-10">
-    <input type="text" class="form-control age" name="fax" maxlength="10" ng-pattern="/^[0-9]{10}$/" ng-model="doctor.faxNumber">
-    <div ng-show="form.fax.$dirty && form.fax.$invalid" class="form-error">
-      <span class="help-block" ng-show="form.fax.$error.pattern">
-        Fax Number is invalid.
-      </span>
-    </div>
-  </div>
-</div>
-
-<div class="col-md-16 indent-form-top">
-  <div class="col-md-6">
-    <label for="exampleInputEmail1">Address</label>
-  </div>
-  <div class="col-md-10">
-    <input type="text" class="form-control"  ng-model="doctor.address">
-  </div>
-</div>
-
-<div class="col-md-16 indent-form-top">
-  <div class="col-md-6">
-    <label for="exampleInputEmail1">Zip Code</label>
-  </div>
-  <div class="col-md-10">
-    <input type="text" class="form-control age" name="zip" maxlength="6" ng-pattern="/^[0-9]{6}$/" ng-model="doctor.zipCode">
-    <div ng-show="form.zip.$dirty && form.zip.$invalid" class="form-error">
-      <span class="help-block" ng-show="form.zip.$error.pattern">
-        Zip Code is invalid.
-      </span>
-    </div>
-  </div>
-</div>
-
-<div class="col-md-16 indent-form-top">
-  <div class="col-md-6">
-    <label for="exampleInputEmail1">City</label>
-  </div>
-  <div class="col-md-10">
-    <input type="text" class="form-control"  ng-model="doctor.city">
-  </div>
-</div>
-
-<div class="col-md-16 indent-form-top">
-  <div class="col-md-6">
-    <label for="exampleInputEmail1">State</label>
-  </div>
-  <div class="col-md-10 dashboard-page__form--new_calendar">
-    <input type="text" class="form-control"  ng-model="doctor.state">
-  </div>
-</div>
-
-<div class="col-md-16 dashboard-page__form--new_form-submit" ng-show="doctorStatus.isCreate">
-  <button type="submit" ng-click="submitted=true" class="dashboard-page__form--new_form-submit--button">Submit</button>
-</div>
-
-<div class="col-md-16 dashboard-page__form--new_form-submit">
-  <div class="col-md-6"></div>
-  <div class="col-md-10" ng-show="!doctorStatus.isCreate">
-    <button type="button" class="dashboard-page__form--new_form-submit--button" ng-click="deleteDoctor()">Disassociate</button>
-    <button type="button" ng-disabled="true" class="dashboard-page__form--new_form-submit--button">Edit</button>
-  </div>
-</div>
-</form> -->
-
-
-
-
-
-
-
-
-
-
-
 <span ng-show="doctorStatus.isMessage">{{doctorStatus.message}}</span>
 <form  name="form" class="dashboard-page__form--new" ng-submit="createDoctor()" novalidate>
 <div class="navbar dashboard">
@@ -252,6 +9,8 @@
       <span class="dashbord-nav__secondary--create-new" translate=""></span>
     </div>
   </div>
+</div>
+<div>
   <div class="container dashboard__form">
     <div class="row margin-top-xl">
       <div class="col-md-16">
@@ -264,13 +23,22 @@
             <span class="" translate="doctor.clinic-name"></span>
             <span class="">*</span>
           </div>
+
           <div class="col-md-10 dashboard__form--input">
-            <input class="" type="text" name="clinicName"  ng-model="doctor.clinic" required>
-            <div ng-show="(form.clinicName.$dirty && form.clinicName.$invalid) || submitted" class="">
-              <span class="has-error" ng-show="form.clinicName.$error.required">
-                Clinic Name is required.
-              </span>
-            </div> 
+            <div ng-repeat="clinic in doctor.clinics" style = "padding-top: 10px" ng-if="doctorStatus.editMode">
+              <input class="" type="text" name="clinicName"  ng-model="clinic.name"  required>
+              <div ng-show="(form.clinicName.$dirty && form.clinicName.$invalid) || submitted" class="">
+                <span class="has-error" ng-show="form.clinicName.$error.required">
+                  Clinic Name is required.
+                </span>
+              </div>
+            </div>
+              <input class="" type="text" name="clinicName"  ng-model="clinic.name"  required ng-if="!doctorStatus.editMode">
+              <div ng-show="(form.clinicName.$dirty && form.clinicName.$invalid) || submitted" class="">
+                <span class="has-error" ng-show="form.clinicName.$error.required">
+                  Clinic Name is required.
+                </span>
+              </div>
           </div>
         </div>
         <div class="col-md-7 col-md-offset-2">
@@ -292,7 +60,7 @@
           <div class="col-md-10 dashboard__form__input">
             <div class="custom-dropdown">
                 <select ng-model="doctor.title">
-                <option selected translate="doctor.title.dr">Dr.</option>
+                <option selected translate="doctor.title.dr">Dr</option>
                   <option translate="doctor.title.mr">Mr.</option>
                   <option translate="doctor.title.mrs">Mrs.</option>
                   <option translate="doctor.title.miss">Miss</option>
@@ -332,7 +100,7 @@
           </div>
           <div class="col-md-10 dashboard__form--input">
             <input class="" type="text" name="middleName" ng-model="doctor.middleName" ng-pattern="/^[a-zA-Z]+$/">
-              <div ng-show="(form.middleName.$dirty && form.middleName.$invalid)" class=""> 
+              <div ng-show="(form.middleName.$dirty && form.middleName.$invalid)" class="">
                 <span class="has-error" ng-show="form.middleName.$error.pattern">
                   Middle Name cannot have number.
                 </span>
@@ -370,7 +138,7 @@
             <span class="" translate="doctor.npi-number"></span>
           </div>
           <div class="col-md-10 dashboard__form--input">
-            <input class="" type="text" name="npi" ng-pattern="/^[0-9]+$/" ng-model="doctor.npi">
+            <input class="" type="text" name="npi" ng-pattern="/^[0-9]+$/" ng-model="doctor.npiNumber">
               <div ng-show="form.npi.$dirty && form.npi.$invalid" class="">
                 <span class="has-error" ng-show="form.npi.$error.pattern">
                   NPI Number is invalid.
@@ -386,7 +154,7 @@
             <span class="" translate="doctor.specialty"></span>
           </div>
           <div class="col-md-10 dashboard__form--input">
-            <input class="" type="text" >
+            <input class="" type="text" ng-model="doctor.speciality">
           </div>
         </div>
         <div class="col-md-7 col-md-offset-2">
@@ -394,7 +162,7 @@
             <span class="" translate="doctor.credentials"></span>
           </div>
           <div class="col-md-10 dashboard__form--input">
-            <input class="" type="text" >
+            <input class="" type="text" ng-model="doctor.credentials">
           </div>
         </div>
       </div>
@@ -504,7 +272,7 @@
           <div class="col-md-6 dashboard__form--label">
             <span class="" translate="doctor.state"></span>
           </div>
-          
+
           <div class="custom-dropdown">
               <select name="state" ng-model="doctor.state" ng-options="state.name as state.name for state in states">
                 <option  value="" selected="selected">Select a state</option>
@@ -516,7 +284,7 @@
             <span class="" translate="doctor.zipcode"></span>
           </div>
           <div class="col-md-10 dashboard__form--input">
-            <input class="" type="text" name="zip" ng-pattern="/^[0-9]{5}$/" ng-model="doctor.zipCode">
+            <input class="" type="text" name="zip" ng-pattern="/^[0-9]{5}$/" ng-model="doctor.zipcode">
               <div ng-show="form.zip.$dirty && form.zip.$invalid" class="">
                 <span class="has-error" ng-show="form.zip.$error.pattern">
                   Zip Code is invalid.
@@ -530,8 +298,8 @@
         <div class="col-md-4 col-md-offset-12">
           <button type="submit" ng-click="formSubmit()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit" >Submit</button>
           <button type="button" ng-click="deleteDoctor()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit">Diassociate</button>
-          <button type="submit" ng-click="formSubmit()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit">Update</button> 
-        </div>    
+          <button type="submit" ng-click="formSubmit()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit">Update</button>
+        </div>
       </div>
     </div>
   </div>

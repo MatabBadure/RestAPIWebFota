@@ -179,8 +179,10 @@
 
 .search-icon {
 	position: absolute;
-  right: 0;
-  padding: 7px 10px;
+  right: 5px;
+  padding: 0;
+  top: 5px;
+  font-size: 20px;
 }
 
 .dashboard__manage-view--list {
@@ -308,7 +310,14 @@
 
 .help-icon {
 	span {
-		font-size: 100px;
+		font-size: 115px;
+		line-height: 0.5;
+	}
+	.icon-man-with-circle {
+		color: $terracotta;
+	}
+	.icon-tablet-with-circle {
+		color: $blue-portage-light;
 	}
 }
 
@@ -327,8 +336,9 @@
 
 .user-help--close {
 	position: absolute;
-	right: 0;
+	right: 10px;
   top: 5px;
+  font-size: 10px;
   cursor: pointer;
 }
 

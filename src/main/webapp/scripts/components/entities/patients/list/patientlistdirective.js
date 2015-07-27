@@ -49,6 +49,8 @@ angular.module('hillromvestApp')
 	      			$scope.currentPageIndex--;
 	      		if(track === "NEXT")
 	      			$scope.currentPageIndex++;
+	      	}else{
+	      		$scope.currentPageIndex = 1;
 	      	}
 	      	PatientService.getPatientList($scope.searchItem,$scope.currentPageIndex,$scope.perPageCount)
 	      	.then(function (response) {

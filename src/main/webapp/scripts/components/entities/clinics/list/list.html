@@ -1,36 +1,124 @@
-<div class="dashboard-page__user-list__detailed">
-	<div class="dashboard-page__user-list__detailed--list-type">Recently Created Clinics</div>
-	<div class="dashboard-page__user-list__detailed__list-form indent-form-top">
-		<div class="col-md-12 dashboard-page__user-list__detailed__list-form--input-wrapper">
-			<i class="glyphicon glyphicon-search"></i>
-			<input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" ng-model-options="{ debounce: 1000 }" ng-keyup="searchClinics(searchItem)" autocomplete="off">
-		</div>
-		<div class="col-md-4 dashboard-page__user-list__detailed__list-form--sort-list">
-			<div class="sort-link" ng-click="sortList()">
-				<span class="sort-link--text">Sort</span><span class="glyphicon glyphicon-sort class="sort-link--text""></span>
-			</div>
 
-		</div>
-	</div>
-	<div class="dashboard-page__user-list__detailed__list">
-		<div ng-repeat="clinic in clinics | filter:searchItem">
-			<div ng-click="selectClinic(clinic)" class="dashboard-page__user-list__detailed__list--details" >
-				<span class="user-detail">
-					{{clinic.name}}
-				</span>
-				<span class="user-role">
-					{{clinic.city}}
-				</span>
-			</div>
-		</div>
-	</div>
-	<div class="dashboard-page__user-list__detailed__more-link" ng-if="clinics.length>0">
-		<span>More</span><span>&gt;&gt;</span>
-	</div>
+<div class="navbar dashboard dashbord-nav">
+    <div class="container">
+      <div class="dashbord-nav__primary pull-left">
+        <span class="dashbord-nav__primary--title">Manage Clinics</span>
+      </div>
+
+      <div class="dashbord-nav__secondary create-user navbar-right" ng-click="createClinic()">
+        <span class="dashbord-nav__secondary--create-new">Create New</span>
+        <span class="glyphicon glyphicon-plus"></span>
+      </div>
+    </div>
+  </div>
+  <div class="dashboard dashboard--content">
+    <div class="container dashboard__manage-view margin-top-xl">
+      <div class="row dashboard__manage-view--search">
+        <div class="col-md-14 reset-padding-right">
+          <input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" ng-keyup="searchClinics()" autocomplete="off" placeholder="{{patient.placeholder.search}}" />
+          <span class="search-icon glyphicon glyphicon-search"></span>
+        </div>
+        <div class="col-md-2 reset-padding-left">
+          <div class="search-dropdown">
+            <select name="search">
+              <option  selected>Newly Created</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+       <div class="dashboard__manage-view--list" ng-repeat="clinic in clinics">
+         <div ng-click="selectClinic(clinic)">
+          <div class="col-md-3 reset-padding-left">
+            <span class="user-name">{{clinic.name}}</span>
+            
+          </div>
+          <div class="col-md-4">
+            <span class="user-home-no"></span>
+            <span class="user-address">{{clinic.address}}</span>
+          </div>
+          <div class="col-md-4">
+            <span class="hcp-name"></span>
+            <span class="clinic-name"></span>
+          </div>
+          <div class="col-md-5 reset-padding-right">
+            <div class="row">
+              <div class="col-md-7 center-text">
+                <!-- <span class="hr-id">{{patient.hillromId}}</span> -->
+              </div>
+              <div class="col-md-3">
+                <span class="hillrom-icon icon-lungs user-lungs"></span>
+              </div>
+              <div class="col-md-3">
+                <div class="progress-input">90%</div>
+                <div class="progress">
+                  <div class="progress-bar" role="progressbar" aria-valuenow="90"
+                  aria-valuemin="0" aria-valuemax="100" ng-style="{width: '90'+'%'}">
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 reset-padding-right text-center">
+                <span class="hillrom-icon icon-pressure user-pressure"></span>
+              </div>
+            </div>
+          </div>
+          <div class="clr"></div>
+         </div>
+       </div>
+
+      <div class="dashboard__manage-view--pagination" ng-show="pageCount > 1">
+        <div class="col-md-16 reset-padding-right">
+          <div class="navbar-right">
+            <span class="record-found">{{total}} Clinics</span>
+            <span class="record-found">Found</span>
+            <span class="navigaion-link cursor-pointer" ng-class="{ 'inactive': !(currentPageIndex > 1) }" ng-click="searchClinics('PREV')">Previous</span>
+            <span class="navigaion-no">{{currentPageIndex}}</span>
+            <span class="navigaion-link cursor-pointer" ng-class="{ 'inactive': !(pageCount > currentPageIndex) }" ng-click="searchClinics('NEXT')">Next</span>
+          </div>
+          <div class="clr"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-<div ng-show="pageCount > 1">
-    <button ng-click="searchClinics('PREV')" ng-disabled="!(currentPageIndex > 1)">Previous</button>
-    <span>{{currentPageIndex}}</span>
-    <button ng-click="searchClinics('NEXT')" ng-disabled="!(pageCount > currentPageIndex)">Next</button>
+
+<div class="user-help">
+  <div class="container">
+    <div class="row user-help--container">
+      <div class="col-md-8 user-help-devider">
+        <div class="col-md-4 help-icon">
+          <span class="hillrom-icon icon-lungs"></span>
+        </div>
+        <div class="col-md-12 user-help__desc">
+            <span class="user-help__desc--heading">Ideal HMR Reading</span>
+            <p class="user-help__desc--content">
+                A Lower range peak flow meter is for small children, and a standard range peak flow meter is for older children, teenagers and adults.
+            </p>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <div class="col-md-4 help-icon">
+          <span class="hillrom-icon icon-lungs"></span>
+        </div>
+        <div class="col-md-12">
+            <span class="user-help__desc--heading">Ideal HMR Reading</span>
+            <p class="user-help__desc--content">
+                A Lower range peak flow meter is for small children, and a standard range peak flow meter is for older children, teenagers and adults.
+            </p>
+        </div>
+      </div>
+      <span class="user-help--close glyphicon glyphicon-remove"></span>
+    </div>
+  </div>
 </div>
-<button ng-click="createClinic()">Create Clinic</button>
+
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    $(".user-help--close").click(function(){
+      $(".user-help").animate({ height: '0px' }, 1000, function() {
+        $(".user-help").hide();
+      });
+    });
+  });
+</script>

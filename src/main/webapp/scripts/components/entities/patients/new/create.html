@@ -3,7 +3,7 @@
     <div class="navbar dashboard">
       <div class="container">
         <div class="dashbord-nav__primary secondary-fix-navbar pull-left" ng-show="!patientStatus.editMode">
-          <span class="dashbord-nav__primary--title" translate="patient.home.createLabel">Create Patient</span>
+          <span class="dashbord-nav__primary--title" translate="patient.home.createLabel">Edit Patient</span>
         </div>
 
         <div class="dashbord-nav__secondary navbar-right">
@@ -74,7 +74,7 @@
               </div>
               <div class="col-md-3 dashboard__form__input">
                 <div class="custom-dropdown">
-                  <select name="gender" ng-readonly="validateADMINorASP()" ng-model="gender">
+                  <select name="gender" ng-readonly="validateADMINorASP()" ng-model="patient.gender">
                     <option selected translate="patient.gender.male">Male</option>
                     <option translate="patient.gender.female">Female</option>
                     <option translate="patient.gender.others">Others</option>

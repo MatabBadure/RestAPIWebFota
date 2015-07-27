@@ -12,7 +12,7 @@ angular.module('hillromvestApp')
 
         $scope.init = function () {
           $scope.states = [];
-          $scope.doctor.title = "Mr.";
+          $scope.doctor.titles = ["Dr"];
           $scope.submitted = false;
           UserService.getState().then(function (response) {
             $scope.states = response.data.states;

@@ -304,8 +304,10 @@
 
 .user-help {
 	background-color: $seashell;
-	position: relative;
-	clear: both;
+	position: fixed;
+  right: 0;
+  left: 0;
+  bottom: 40px;
 }
 
 .user-help--container {

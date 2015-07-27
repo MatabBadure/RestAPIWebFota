@@ -21,8 +21,8 @@
         <form ng-show="!success" name="form" role="form" novalidate ng-submit="authenticate()" show-validation>
           <div class="form-group">
             <label >Choose password*</label>
-            <input type="password" class="form-control" name="password"
-            ng-model="authenticate.password" ng-minlength=8 ng-maxlength=50 required>
+            <input type="password" class="form-control" name="password" id="passwordBox"
+            ng-model="authenticate.password" ng-minlength=8 ng-maxlength=50 ng-keyup="passwordStrength()" required>
             <div ng-show="(form.password.$dirty && form.password.$invalid) || submitted">
               <p class="has-error"
                 ng-show="form.password.$error.required">
@@ -37,62 +37,66 @@
                 Your password cannot be longer than 50 characters.
               </p>
             </div>
-          <password-strength-bar password-to-check="authenticate.password"></password-strength-bar>
-        </div>
-        <div class="form-group">
-          <label >Confirm password*</label>
-          <input type="password" class="form-control" name="confirmPassword"
-          ng-model="authenticate.confirmPassword" ng-minlength=8 ng-maxlength=50 required>
-          <div ng-show="(form.confirmPassword.$dirty && form.confirmPassword.$invalid) || submitted ">
-            <p class="has-error"
-              ng-show="form.confirmPassword.$error.required">
-              Your password confirmation is required.
-            </p>
-            <p class="has-error"
-              ng-show="form.confirmPassword.$error.minlength">
-              Your password confirmation is required to be at least 5 characters.
-            </p>
-            <p class="has-error"
-              ng-show="form.confirmPassword.$error.maxlength">
-              Your password confirmation cannot be longer than 50 characters.
-            </p>
+            <div class="CommonWidth" id="passwordStrengthContainer">
+            </div>
+            <div class="CommonWidth">
+              <span id="status">&nbsp</span>
+            </div>
           </div>
-        </div>
-        <div class="form-group">
-          <label>Choose security question*</label>
-          <select class="form-control" name="question" ng-model="authenticate.question" required ng-options="question.question for question in questions">
-            <option value="">-- select a security question --</option>
-          </select>
-          <div ng-show="(form.question.$dirty && form.question.$invalid) || submitted">
-            <p class="has-error"
-              ng-show="form.question.$error.required">
-              Security question is required.
-            </p>
+          <div class="form-group">
+            <label >Confirm password*</label>
+            <input type="password" class="form-control" name="confirmPassword"
+            ng-model="authenticate.confirmPassword" ng-minlength=8 ng-maxlength=50 required>
+            <div ng-show="(form.confirmPassword.$dirty && form.confirmPassword.$invalid) || submitted ">
+              <p class="has-error"
+                ng-show="form.confirmPassword.$error.required">
+                Your password confirmation is required.
+              </p>
+              <p class="has-error"
+                ng-show="form.confirmPassword.$error.minlength">
+                Your password confirmation is required to be at least 5 characters.
+              </p>
+              <p class="has-error"
+                ng-show="form.confirmPassword.$error.maxlength">
+                Your password confirmation cannot be longer than 50 characters.
+              </p>
+            </div>
           </div>
-        </div>
-        <div class="form-group">
-          <label>Answer to security question*</label>
-          <input type="text" class="form-control" name="answer" ng-model="authenticate.answer" required>
-          <div ng-show="(form.answer.$dirty && form.answer.$invalid) || submitted">
-            <p class="has-error"
-              ng-show="form.answer.$error.required">
-              Answer is required.
-            </p>
+          <div class="form-group">
+            <label>Choose security question*</label>
+            <select class="form-control" name="question" ng-model="authenticate.question" required ng-options="question.question for question in questions">
+              <option value="">-- select a security question --</option>
+            </select>
+            <div ng-show="(form.question.$dirty && form.question.$invalid) || submitted">
+              <p class="has-error"
+                ng-show="form.question.$error.required">
+                Security question is required.
+              </p>
+            </div>
           </div>
-        </div>
-        <div class="form-group">
-          <input type="checkbox" name="tnc" ng-model="authenticate.tnc" required>
-          Agree to Terms and Conditions*
-          <div ng-show="(form.tnc.$dirty && form.tnc.$invalid) || submitted">
-            <p class="has-error"
-              ng-show="form.tnc.$error.required">
-              Please agree to Terms and Conditions.
-            </p>
+          <div class="form-group">
+            <label>Answer to security question*</label>
+            <input type="text" class="form-control" name="answer" ng-model="authenticate.answer" required>
+            <div ng-show="(form.answer.$dirty && form.answer.$invalid) || submitted">
+              <p class="has-error"
+                ng-show="form.answer.$error.required">
+                Answer is required.
+              </p>
+            </div>
           </div>
-        </div>
-        <button type="submit" class="myButton" ng-click="formSubmit()">Reset Password</button>
-      </form>
+          <div class="form-group">
+            <input type="checkbox" name="tnc" ng-model="authenticate.tnc" required>
+            Agree to Terms and Conditions*
+            <div ng-show="(form.tnc.$dirty && form.tnc.$invalid) || submitted">
+              <p class="has-error"
+                ng-show="form.tnc.$error.required">
+                Please agree to Terms and Conditions.
+              </p>
+            </div>
+          </div>
+          <button type="submit" class="myButton" ng-click="formSubmit()">Reset Password</button>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 </div>

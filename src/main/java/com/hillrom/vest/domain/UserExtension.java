@@ -34,14 +34,14 @@ import com.hillrom.vest.repository.HillRomUserVO;
 @PrimaryKeyJoinColumn(name = "USER_ID", referencedColumnName = "id")
 @SQLDelete(sql = "UPDATE USER_EXTENSION SET is_deleted = 1 WHERE USER_ID = ?")
 @NamedNativeQueries({
-		@NamedNativeQuery(query = "select distinct(user.id),user.first_name,user.last_name,user.email,user_authority.authority_name as name,user.is_deleted as isDeleted from  USER_EXTENSION userExt join USER user "
+		@NamedNativeQuery(query = "select distinct(user.id),user.first_name as firstName,user.last_name as lastName,user.email,user_authority.authority_name as name,user.is_deleted as isDeleted from  USER_EXTENSION userExt join USER user "
 				+ " join  USER_AUTHORITY user_authority "
 				+ " where user.id = userExt.user_id and user_authority.user_id = user.id "
 				+ " and user_authority.authority_name in ('ADMIN','ACCT_SERVICES','ASSOCIATES','HILLROM_ADMIN','CLINIC_ADMIN') "
 				+ " and (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or "
-				+ " lower(user.email) like lower(:queryString)) order by user.first_name,user.last_name,user.email", name = "findHillRomTeamUserBy", resultSetMapping = "hillromTeamUsers"),
-		@NamedNativeQuery(name = "findHcpBy", query = "select distinct(user.id),user.email,user.first_name,user.last_name,user.is_deleted as isDeleted,user.zipcode,"
+				+ " lower(user.email) like lower(:queryString)) ", name = "findHillRomTeamUserBy", resultSetMapping = "hillromTeamUsers"),
+		@NamedNativeQuery(name = "findHcpBy", query = "select distinct(user.id),user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted,user.zipcode,"
 				+ " userExt.address,userExt.city,userExt.credentials,userExt.fax_number,userExt.primary_phone,userExt.mobile_phone,userExt.speciality,userExt.state,clinic.id as clinicId,clinic.name as clinicName "
 				+ " FROM USER user join USER_EXTENSION userExt "
 				+ " join USER_AUTHORITY user_authority join CLINIC clinic "
@@ -51,12 +51,12 @@ import com.hillrom.vest.repository.HillRomUserVO;
 				+ " and clinic_user.clinics_id = clinic.id "
 				+ " and (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or "
-				+ " lower(user.email) like lower(:queryString))  order by user.first_name,user.last_name,user.email") })
+				+ " lower(user.email) like lower(:queryString)) ") })
 @SqlResultSetMappings({ 
 @SqlResultSetMapping(name = "hillromTeamUsers", classes = { @ConstructorResult(targetClass = HillRomUserVO.class, columns = {
 		@ColumnResult(name = "ID", type = Long.class),
-		@ColumnResult(name = "FIRST_NAME", type = String.class),
-		@ColumnResult(name = "LAST_NAME", type = String.class),
+		@ColumnResult(name = "firstNAME", type = String.class),
+		@ColumnResult(name = "lastNAME", type = String.class),
 		@ColumnResult(name = "EMAIL", type = String.class),
 		@ColumnResult(name = "NAME", type = String.class),
 		@ColumnResult(name = "isDeleted", type = Boolean.class) }) }) })

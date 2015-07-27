@@ -1,6 +1,7 @@
 package com.hillrom.vest.web.rest;
 
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -171,10 +172,14 @@ public class UserExtensionResource {
     @Timed
     public ResponseEntity<List<HillRomUserVO>> search(@RequestParam(required=true,value = "searchString")String searchString,
     		@RequestParam(value = "page" , required = false) Integer offset,
-            @RequestParam(value = "per_page", required = false) Integer limit)
+            @RequestParam(value = "per_page", required = false) Integer limit,
+            @RequestParam(value = "sort_by", required = false) String sortBy,
+            @RequestParam(value = "asc",required = false) Boolean isAscending)
         throws URISyntaxException {
     	String queryString = new StringBuilder("%").append(searchString).append("%").toString();
-    	Page<HillRomUserVO> page = userSearchRepository.findHillRomTeamUsersBy(queryString,PaginationUtil.generatePageRequest(offset, limit));
+    	Map<String,Boolean> sortOrder = new HashMap<>();
+    	sortOrder.put(sortBy, isAscending);
+    	Page<HillRomUserVO> page = userSearchRepository.findHillRomTeamUsersBy(queryString,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/user/search", offset, limit);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
         
@@ -189,11 +194,15 @@ public class UserExtensionResource {
     @Timed
     public ResponseEntity<?> searchHcp(@RequestParam(required=true,value = "searchString")String searchString,
     		@RequestParam(value = "page" , required = false) Integer offset,
-            @RequestParam(value = "per_page", required = false) Integer limit)
+            @RequestParam(value = "per_page", required = false) Integer limit,
+            @RequestParam(value = "sort_by", required = false) String sortBy,
+            @RequestParam(value = "asc",required = false) Boolean isAscending)
         throws URISyntaxException {
     	String queryString = new StringBuilder("%").append(searchString).append("%").toString();
-    	Page<HcpVO> page = userSearchRepository.findHCPBy(queryString,PaginationUtil.generatePageRequest(offset, limit));
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/userExtensions", offset, limit);
+    	Map<String,Boolean> sortOrder = new HashMap<>();
+    	sortOrder.put(sortBy, isAscending);
+    	Page<HcpVO> page = userSearchRepository.findHCPBy(queryString,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/user/hcp/search", offset, limit);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
         
     }

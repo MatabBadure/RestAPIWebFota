@@ -38,3 +38,40 @@ angular.module('hillromvestApp')
             }
         };
     });
+
+
+angular.module('hillromvestApp')
+  .directive('navigationBar', function (Auth, Principal, $state, Account) {
+    return {
+      templateUrl: 'scripts/components/navbar/navbar.html',
+      restrict: 'E',
+
+      controller: function ($scope) {
+        Account.get().$promise
+            .then(function (account) {
+                $scope.isAuthenticated = true;
+                
+            })
+            .catch(function() {
+                $scope.isAuthenticated = false;
+            });
+
+        $scope.logout = function(){
+            Auth.signOut().then(function(data) {
+              Auth.logout();
+               Account.get().$promise
+                    .then(function (account) {
+                        $scope.isAuthenticated = true;
+                        
+                    })
+                    .catch(function() {
+                        $scope.isAuthenticated = false;
+                        $state.go('login');
+                    });
+              
+            }).catch(function(err) {
+            });
+        }
+      }
+    };
+  });

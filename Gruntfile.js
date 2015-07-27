@@ -357,7 +357,8 @@ module.exports = function (grunt) {
         'clean:server',
         'wiredep:test',
         'ngconstant:dev',
-        'karma'
+        'karma',
+        'sass:dev'
     ]);
 
     grunt.registerTask('build', [
@@ -376,7 +377,8 @@ module.exports = function (grunt) {
         'uglify',
         'rev',
         'usemin',
-        'htmlmin'
+        'htmlmin',
+        'sass:dev'
     ]);
 
 	grunt.registerTask('appendSkipBower', 'Force skip of bower for Gradle', function () {

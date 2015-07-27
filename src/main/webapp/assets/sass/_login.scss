@@ -73,6 +73,12 @@
   opacity: 0.6;
 }
 
+.login-form{
+  input {
+    margin: 0;
+  }
+}
+
 #error_msg{
   color: red;
   margin-bottom: -8%;

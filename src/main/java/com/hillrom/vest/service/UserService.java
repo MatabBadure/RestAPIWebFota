@@ -812,5 +812,18 @@ public class UserService {
 		}
 		return new JSONObject();
 	}
+	
+	public JSONObject getHCPUser(Long id){
+		JSONObject jsonObject = new JSONObject();
+		UserExtension hcpUser = userExtensionRepository.findOne(id);
+		if(hcpUser.getId() != null) {
+			jsonObject.put("message", "HealthCare Professional fetched successfully.");
+		    jsonObject.put("user", hcpUser);
+		    jsonObject.put("clinics", hcpUser.getClinics());
+		} else {
+			jsonObject.put("ERROR", "Unable to fetch HealthCare Professional.");
+		}	
+		return jsonObject;
+	 }
 }
 

@@ -27,18 +27,22 @@ angular.module('hillromvestApp')
 
       $scope.init();
 
-      var timer=false;
-      $scope.$watch('searchItem', function(){
-        if(timer){
+      var timer = false;
+      $scope.$watch('searchItem', function () {
+        if (timer) {
           $timeout.cancel(timer)
         }
-        timer= $timeout(function(){
-        var url = 'api/user/hcp/search?searchString=';
-          UserService.getUsers(url, $scope.searchItem, 1, 10).then(function(response) {
-            $scope.doctors = response.data;
-          }).catch(function(response) {
+        timer = $timeout(function () {
+          if ($scope.searchItem) {
+            var url = 'api/user/hcp/search?searchString=';
+            UserService.getUsers(url, $scope.searchItem, 1, 10).then(function(response) {
+              $scope.doctors = response.data;
+            }).catch(function(response) {
 
-          });
+            });
+          } else {
+            $scope.doctors = [];
+          }
         },1000)
       });
 

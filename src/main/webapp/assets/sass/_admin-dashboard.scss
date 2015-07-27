@@ -14,7 +14,7 @@
 	min-height: 40px;
 }
 
-.dashbord-nav__primary {
+.dashbord-nav__primary .dashbord-nav__secondary {
 	min-height: inherit;
 }
 
@@ -23,11 +23,16 @@
 }
 
 .dashbord-nav__secondary {
-	min-height: inherit;
+	display: table;
+	span {
+		line-height: 38px;
+		display: table-cell;
+		vertical-align: middle;
+	}
 }
 
-.dashbord-nav__secondary--create-new {
-	line-height: 38px;
+.create-user .hillrom-icon {
+	font-weight: 700;
 }
 
 // .dashboard__form {

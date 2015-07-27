@@ -25,7 +25,7 @@
           </div>
 
           <div class="col-md-10 dashboard__form--input">
-            <div ng-repeat="clinic in doctor.clinics" style = "padding-top: 10px">
+            <div ng-repeat="clinic in doctor.clinics" style = "padding-top: 10px" ng-if="doctorStatus.editMode">
               <input class="" type="text" name="clinicName"  ng-model="clinic.name"  required>
               <div ng-show="(form.clinicName.$dirty && form.clinicName.$invalid) || submitted" class="">
                 <span class="has-error" ng-show="form.clinicName.$error.required">
@@ -33,6 +33,12 @@
                 </span>
               </div>
             </div>
+              <input class="" type="text" name="clinicName"  ng-model="clinic.name"  required ng-if="!doctorStatus.editMode">
+              <div ng-show="(form.clinicName.$dirty && form.clinicName.$invalid) || submitted" class="">
+                <span class="has-error" ng-show="form.clinicName.$error.required">
+                  Clinic Name is required.
+                </span>
+              </div>
           </div>
         </div>
         <div class="col-md-7 col-md-offset-2">

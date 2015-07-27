@@ -28,9 +28,13 @@ angular.module('hillromvestApp')
 		$scope.patientStatus.editMode = true;
 		$scope.patientStatus.isCreate = false;
 		$scope.patient = patient;
-		$scope.patient.age = $scope.getAge(new Date($scope.patient.dob))
-		var dateArr = $scope.patient.dob.split('-');
-		$scope.patient.formatedDOB = dateArr[1]+"/"+dateArr[2]+"/"+dateArr[0];
+		if(patient.dob != null){
+			$scope.patient.age = $scope.getAge(new Date($scope.patient.dob))
+			var dateArr = $scope.patient.dob.split('-');
+			$scope.patient.formatedDOB = dateArr[1]+"/"+dateArr[2]+"/"+dateArr[0];
+		}
+		$scope.patient.zipcode = $scope.patient.zipCode;
+		
 	};
 
 	$scope.createPatient = function(){

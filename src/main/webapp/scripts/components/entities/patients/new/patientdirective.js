@@ -22,6 +22,7 @@ angular.module('hillromvestApp')
           }, {
             "name": "French"
           }];
+          $scope.patient.gender = "Male";
           UserService.getState().then(function(response) {
             $scope.states = response.data.states;
           }).catch(function(response) {
@@ -103,6 +104,8 @@ angular.module('hillromvestApp')
             $scope.isMessage = true;
             if (response.data.message != undefined) {
               $scope.patientStatus.message = response.data.message;
+            }else if(response.data.ERROR != undefined){
+               $scope.patientStatus.message = response.data.ERROR;
             } else {
               $scope.patientStatus.message = 'Error occured! Please try again';
             }

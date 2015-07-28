@@ -20,9 +20,9 @@ angular.module('hillromvestApp')
         $scope.pageCount = 0;
         $scope.total = 0;
         $scope.clinics = [];
+        $scope.searchClinics();
       };
 
-      $scope.init();
 
       var timer = false;
       $scope.$watch('searchItem', function () {
@@ -31,11 +31,7 @@ angular.module('hillromvestApp')
         }
         timer= $timeout(function () {
           if ($scope.searchItem) {
-            ClinicService.getClinics($scope.searchItem, 1, 10).then(function (response) {
-            $scope.clinics = response.data;
-          }).catch(function (response) {
-
-          });
+            $scope.searchClinics();
           } else {
             $scope.clinics = [];
           }
@@ -60,6 +56,8 @@ angular.module('hillromvestApp')
         }
         ClinicService.getClinics($scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
           $scope.clinics = response.data;
+          $scope.total = response.headers()['x-total-count'];
+          $scope.pageCount = Math.ceil($scope.total / 10);
         }).catch(function (response) {
 
         });
@@ -78,6 +76,8 @@ angular.module('hillromvestApp')
       $scope.createClinic = function(){
           $scope.onCreate();
       };
+
+      $scope.init();
     }
   }
 });

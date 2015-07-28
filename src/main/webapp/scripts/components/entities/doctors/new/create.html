@@ -59,8 +59,10 @@
             </div>
             <div class="col-md-10 dashboard__form__input">
               <div class="custom-dropdown">
-                  <select ng-model="doctor.title" disabled="disabled" ng-repeat="title in doctor.titles">
-                  <option selected="true" translate="doctor.title.dr"></option> 
+                  <select ng-model="doctor.title">
+                  <option translate="doctor.title.mr"></option>
+                  <option translate="doctor.title.mrs"></option>
+                  <option translate="doctor.title.ms"></option>
                   </select>
                 </div>
             </div>
@@ -293,10 +295,10 @@
         </div>
 
         <div class="col-md-16 row margin-top margin-bottom-extream">
-          <div class="col-md-4 col-md-offset-12">
-            <button type="submit" ng-click="formSubmit()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit" >Submit</button>
-            <button type="button" ng-click="deleteDoctor()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit">Diassociate</button>
-            <button type="submit" ng-click="formSubmit()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit">Update</button>
+          <div class="row padding-right-xl">
+            <button type="submit" ng-click="formSubmit()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" >Submit</button>
+            <button type="button" ng-click="deleteDoctor()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Diassociate</button>
+            <button type="submit" ng-click="formSubmit()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Update</button>
           </div>
         </div>
       </div>

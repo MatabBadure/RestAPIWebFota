@@ -52,10 +52,11 @@
           Account.get().$promise
           .then(function (account) {
             $scope.isAuthenticated = true;
-            
+
           })
           .catch(function() {
             $scope.isAuthenticated = false;
+            $state.go('login');
           });
         }
         $scope.signOut();
@@ -63,7 +64,7 @@
           Auth.signOut().then(function(data) {
             Auth.logout();
             $scope.signOut();
-          }).catch(function(err) {
+          }).catch(function(err) {  
           });
         }
       }

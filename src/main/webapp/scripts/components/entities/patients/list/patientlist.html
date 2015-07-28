@@ -4,7 +4,7 @@
         <span class="dashbord-nav__primary--title" translate="patient.home.manageLabel">Manage Patient</span>
       </div>
 
-      <div class="dashbord-nav__secondary create-user navbar-right" ng-click="createPatient()">
+      <div class="dashbord-nav__secondary create-user navbar-right cursor-pointer" ng-click="createPatient()">
         <span class="" translate="patient.home.createNewLabel"></span>
         <span class="hillrom-icon icon-plus-icon"></span>
       </div>
@@ -14,7 +14,7 @@
     <div class="container dashboard__manage-view margin-top-xl">
       <div class="row dashboard__manage-view--search">
         <div class="col-md-14 reset-padding-right">
-          <input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" autocomplete="off" placeholder="{{patient.placeholder.search}}" />
+          <input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" autocomplete="off" placeholder="{{'patient.placeholder.search' | translate}}">
           <span class="search-icon hillrom-icon icon-search-icon"></span>
         </div>
         <div class="col-md-2 reset-padding-left">

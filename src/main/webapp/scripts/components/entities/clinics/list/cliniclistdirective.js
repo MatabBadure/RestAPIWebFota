@@ -20,9 +20,9 @@ angular.module('hillromvestApp')
         $scope.pageCount = 0;
         $scope.total = 0;
         $scope.clinics = [];
+        $scope.searchClinics(undefined);
       };
 
-      $scope.init();
 
       var timer = false;
       $scope.$watch('searchItem', function () {
@@ -78,6 +78,8 @@ angular.module('hillromvestApp')
       $scope.createClinic = function(){
           $scope.onCreate();
       };
+
+      $scope.init();
     }
   }
 });

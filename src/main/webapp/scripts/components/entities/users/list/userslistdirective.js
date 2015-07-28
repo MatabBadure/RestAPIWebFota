@@ -25,9 +25,9 @@ angular.module('hillromvestApp')
           $scope.perPageCount = 10;
           $scope.pageCount = 0;
           $scope.total = 0;
+          $scope.searchUsers();
         };
 
-        $scope.init();
 
         var timer = false;
         $scope.$watch('searchItem', function () {
@@ -77,31 +77,33 @@ angular.module('hillromvestApp')
         };
 
         $scope.createUser = function() {
-            $scope.onCreate();
-          },
+          $scope.onCreate();
+        };
 
-          /**
-           * @ngdoc function
-           * @name sortList
-           * @description
-           * Function to Search User on entering text on the textfield.
-           */
-          $scope.searchUsers = function(track) {
-            if (track !== undefined) {
-              if (track === "PREV" && $scope.currentPageIndex > 1) {
-                $scope.currentPageIndex--;
-              }
-              if (track === "NEXT") {
-                $scope.currentPageIndex++;
-              }
+        /**
+         * @ngdoc function
+         * @name sortList
+         * @description
+         * Function to Search User on entering text on the textfield.
+         */
+        $scope.searchUsers = function(track) {
+          if (track !== undefined) {
+            if (track === "PREV" && $scope.currentPageIndex > 1) {
+              $scope.currentPageIndex--;
             }
-            var url = 'api/user/search?searchString=';
-            UserService.getUsers(url, $scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function(response) {
-              $scope.users = response.data;
-            }).catch(function(response) {
+            if (track === "NEXT") {
+              $scope.currentPageIndex++;
+            }
+          }
+          var url = 'api/user/search?searchString=';
+          UserService.getUsers(url, $scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function(response) {
+            $scope.users = response.data;
+          }).catch(function(response) {
 
-            });
-          };
+          });
+        };
+
+        $scope.init();
       }
     };
   });

@@ -23,9 +23,9 @@ angular.module('hillromvestApp')
         $scope.pageCount = 0;
         $scope.total = 0;
         $scope.noMatchFound = false;
+        $scope.searchDoctors();
       };
 
-      $scope.init();
 
       var timer = false;
       $scope.$watch('searchItem', function () {
@@ -89,6 +89,8 @@ angular.module('hillromvestApp')
 
         });
       };
+
+      $scope.init();
     }
   };
 });

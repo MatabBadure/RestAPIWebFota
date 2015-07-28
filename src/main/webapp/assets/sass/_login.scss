@@ -22,10 +22,10 @@
 
 .login__container{
   height: 100%;
-  padding: 0 15px;
+  //padding: 0 15px;
   display: table;
   vertical-align: middle;
-  //position: absolute;
+  position: absolute;
   //margin: 13% 0;
 }
 
@@ -73,13 +73,19 @@
   opacity: 0.6;
 }
 
+.login-form{
+  input {
+    margin: 0;
+  }
+}
+
 #error_msg{
   color: red;
   margin-bottom: -8%;
 }
 .form__container__login{
   background-color: rgba(255,255,255,0.7);
-  padding: 5% 0;
+  padding: 5% 15px;
   img{
     height: 200px;
     display: block;

@@ -12,9 +12,10 @@
 .dashbord-nav {
 	max-height: 40px;
 	min-height: 40px;
+	margin-bottom: 0;
 }
 
-.dashbord-nav__primary {
+.dashbord-nav__primary .dashbord-nav__secondary {
 	min-height: inherit;
 }
 
@@ -23,11 +24,16 @@
 }
 
 .dashbord-nav__secondary {
-	min-height: inherit;
+	display: table;
+	span {
+		line-height: 38px;
+		display: table-cell;
+		vertical-align: middle;
+	}
 }
 
-.dashbord-nav__secondary--create-new {
-	line-height: 38px;
+.create-user .hillrom-icon {
+	font-weight: 700;
 }
 
 // .dashboard__form {
@@ -179,8 +185,10 @@
 
 .search-icon {
 	position: absolute;
-  right: 0;
-  padding: 7px 10px;
+  right: 5px;
+  padding: 0;
+  top: 5px;
+  font-size: 20px;
 }
 
 .dashboard__manage-view--list {
@@ -297,8 +305,10 @@
 
 .user-help {
 	background-color: $seashell;
-	position: relative;
-	clear: both;
+	position: fixed;
+  right: 0;
+  left: 0;
+  bottom: 40px;
 }
 
 .user-help--container {
@@ -308,7 +318,14 @@
 
 .help-icon {
 	span {
-		font-size: 100px;
+		font-size: 115px;
+		line-height: 0.5;
+	}
+	.icon-man-with-circle {
+		color: $terracotta;
+	}
+	.icon-tablet-with-circle {
+		color: $blue-portage-light;
 	}
 }
 
@@ -327,8 +344,9 @@
 
 .user-help--close {
 	position: absolute;
-	right: 0;
+	right: 10px;
   top: 5px;
+  font-size: 10px;
   cursor: pointer;
 }
 

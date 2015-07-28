@@ -23,6 +23,14 @@ body {
 	clear: both;
 }
 
+.float-right {
+	float: right !important;
+}
+
+.float-left {
+	float: left !important;
+}
+
 .padding-left {
 	padding-left: 10px;
 }
@@ -37,6 +45,14 @@ body {
 
 .padding-right-ls {
 	padding-right: 20px;
+}
+
+.padding-bottom-ls {
+	padding-bottom: 20px;
+}
+
+.padding-right-xl {
+	padding-right: 40px;
 }
 
 .margin-top-xl {

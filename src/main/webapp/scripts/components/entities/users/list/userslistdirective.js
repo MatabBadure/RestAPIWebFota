@@ -18,16 +18,32 @@ angular.module('hillromvestApp')
       link: function(scope) {
         var user = scope.user;
       },
-      controller: function($scope) {
+      controller: function($scope, $timeout) {
         $scope.init = function() {
           $scope.users = [];
           $scope.currentPageIndex = 1;
           $scope.perPageCount = 10;
           $scope.pageCount = 0;
           $scope.total = 0;
+          $scope.searchUsers();
         };
 
-        $scope.init();
+
+        var timer = false;
+        $scope.$watch('searchItem', function () {
+          if (timer) {
+            $timeout.cancel(timer)
+          }
+          timer= $timeout(function () {
+            if ($scope.searchItem) {
+              var url = 'api/user/search?searchString=';
+              $scope.searchUsers();
+            } else {
+              $scope.users = [];
+            }
+
+          },1000)
+        });
 
         /**
          * @ngdoc function
@@ -57,31 +73,35 @@ angular.module('hillromvestApp')
         };
 
         $scope.createUser = function() {
-            $scope.onCreate();
-          },
+          $scope.onCreate();
+        };
 
-          /**
-           * @ngdoc function
-           * @name sortList
-           * @description
-           * Function to Search User on entering text on the textfield.
-           */
-          $scope.searchUsers = function(track) {
-            if (track !== undefined) {
-              if (track === "PREV" && $scope.currentPageIndex > 1) {
-                $scope.currentPageIndex--;
-              }
-              if (track === "NEXT") {
-                $scope.currentPageIndex++;
-              }
+        /**
+         * @ngdoc function
+         * @name sortList
+         * @description
+         * Function to Search User on entering text on the textfield.
+         */
+        $scope.searchUsers = function(track) {
+          if (track !== undefined) {
+            if (track === "PREV" && $scope.currentPageIndex > 1) {
+              $scope.currentPageIndex--;
             }
-            var url = 'api/user/search?searchString=';
-            UserService.getUsers(url, $scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function(response) {
-              $scope.users = response.data;
-            }).catch(function(response) {
+            if (track === "NEXT") {
+              $scope.currentPageIndex++;
+            }
+          }
+          var url = 'api/user/search?searchString=';
+          UserService.getUsers(url, $scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function(response) {
+            $scope.users = response.data;
+            $scope.total = response.headers()['x-total-count'];
+            $scope.pageCount = Math.ceil($scope.total / 10);
+          }).catch(function(response) {
 
-            });
-          };
+          });
+        };
+
+        $scope.init();
       }
     };
   });

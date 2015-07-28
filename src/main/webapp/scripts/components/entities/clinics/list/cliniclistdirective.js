@@ -12,18 +12,32 @@ angular.module('hillromvestApp')
     link: function(scope) {
       var clinic = scope.clinic;
     },
-    controller: function($scope) {
+    controller: function($scope, $timeout) {
 
       $scope.init = function () {
         $scope.currentPageIndex = 1;
         $scope.perPageCount = 10;
         $scope.pageCount = 0;
         $scope.total = 0;
+        $scope.clinics = [];
+        $scope.searchClinics();
       };
 
-      $scope.init();
 
-      $scope.clinics = [];
+      var timer = false;
+      $scope.$watch('searchItem', function () {
+        if(timer){
+          $timeout.cancel(timer)
+        }
+        timer= $timeout(function () {
+          if ($scope.searchItem) {
+            $scope.searchClinics();
+          } else {
+            $scope.clinics = [];
+          }
+        },1000)
+      });
+
       $scope.selectClinic = function (clinic) {
         $scope.clinic = clinic;
         $scope.onSelect({
@@ -42,6 +56,8 @@ angular.module('hillromvestApp')
         }
         ClinicService.getClinics($scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
           $scope.clinics = response.data;
+          $scope.total = response.headers()['x-total-count'];
+          $scope.pageCount = Math.ceil($scope.total / 10);
         }).catch(function (response) {
 
         });
@@ -60,6 +76,8 @@ angular.module('hillromvestApp')
       $scope.createClinic = function(){
           $scope.onCreate();
       };
+
+      $scope.init();
     }
   }
 });

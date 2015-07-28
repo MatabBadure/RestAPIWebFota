@@ -1,6 +1,5 @@
 'use strict';
 
 angular.module('hillromvestApp')
-    .controller('LogoutController', function (Auth) {
-        Auth.logout();
+    .controller('LogoutController', function ($scope, Auth, $state, Principal) {
     });

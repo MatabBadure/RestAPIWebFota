@@ -73,7 +73,7 @@ angular.module('hillromvestApp')
             .then(function(response) {
               $scope.patients = response.data;
               $scope.total = response.headers()['x-total-count'];
-              $scope.pageCount = Math.floor($scope.total / 10) + 1;
+              $scope.pageCount = Math.ceil($scope.total / 10);
             }).catch(function(response) {
               $scope.noMatchFound = true;
             });

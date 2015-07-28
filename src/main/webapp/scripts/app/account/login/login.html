@@ -27,10 +27,14 @@
 
             <div class="form-group">
 
-              <input type="password" class="form-control" id="password" name="password" placeholder="{{'login.form.password.placeholder' | translate}}" ng-model="password" required>
+              <input type="password" class="form-control" id="password" name="password" placeholder="{{'login.form.password.placeholder' | translate}}" ng-model="password" ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
               <div class="form-error" ng-show="(form.password.$dirty && form.password.$invalid) || loginSubmitted">
                 <span class="has-error" ng-show="form.password.$error.required">
                   password is required.
+                </span>
+                <span class="has-error"
+                   ng-show="form.password.$error.pattern" >
+                    password is invalid.
                 </span>
               </div>
             </div>

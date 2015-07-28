@@ -8,6 +8,6 @@ import java.util.List;
 /**
  * Spring Data JPA repository for the PATIENT_VEST_DEVICE_RAW_LOGS entity.
  */
-public interface PATIENT_VEST_DEVICE_RAW_LOGSRepository extends JpaRepository<PATIENT_VEST_DEVICE_RAW_LOGS,Long> {
+public interface PatientVestDeviceRawLogsRepository extends JpaRepository<PATIENT_VEST_DEVICE_RAW_LOGS,Long> {
 
 }

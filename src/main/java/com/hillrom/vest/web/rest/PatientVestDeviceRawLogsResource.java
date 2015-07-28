@@ -25,9 +25,9 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api")
-public class PATIENT_VEST_DEVICE_RAW_LOGSResource {
+public class PatientVestDeviceRawLogsResource {
 
-    private final Logger log = LoggerFactory.getLogger(PATIENT_VEST_DEVICE_RAW_LOGSResource.class);
+    private final Logger log = LoggerFactory.getLogger(PatientVestDeviceRawLogsResource.class);
 
     @Inject
     private PATIENT_VEST_DEVICE_RAW_LOGSRepository pATIENT_VEST_DEVICE_RAW_LOGSRepository;

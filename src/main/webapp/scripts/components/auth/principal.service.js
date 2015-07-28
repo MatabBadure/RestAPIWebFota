@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-    .factory('Principal', function Principal($q, Account) {
+    .factory('Principal', function Principal($q, $rootScope, Account) {
         var _identity,
             _authenticated = false;
 
@@ -56,11 +56,13 @@ angular.module('hillromvestApp')
                     .then(function (account) {
                         _identity = account.data;
                         _authenticated = true;
+                        $rootScope.isAuthenticated = true;
                         deferred.resolve(_identity);
                     })
                     .catch(function() {
                         _identity = null;
                         _authenticated = false;
+                        $rootScope.isAuthenticated = false;
                         deferred.resolve(_identity);
                     });
                 return deferred.promise;

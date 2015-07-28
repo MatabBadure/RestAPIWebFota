@@ -22,7 +22,7 @@
           <div class="form-group">
             <label >Choose password*</label>
             <input type="password" class="form-control" name="password" id="passwordBox"
-            ng-model="authenticate.password" ng-minlength=8 ng-maxlength=50 ng-keyup="passwordStrength()" required>
+            ng-model="authenticate.password" ng-minlength=8 ng-maxlength=50 ng-keyup="passwordStrength()" ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
             <div ng-show="(form.password.$dirty && form.password.$invalid) || submitted">
               <p class="has-error"
                 ng-show="form.password.$error.required">
@@ -36,6 +36,10 @@
                 ng-show="form.password.$error.maxlength">
                 Your password cannot be longer than 50 characters.
               </p>
+              <p class="has-error"
+                 ng-show="form.password.$error.pattern" >
+                  Your password is invalid.
+              </p>
             </div>
             <div class="CommonWidth" id="passwordStrengthContainer">
             </div>
@@ -46,7 +50,7 @@
           <div class="form-group">
             <label >Confirm password*</label>
             <input type="password" class="form-control" name="confirmPassword"
-            ng-model="authenticate.confirmPassword" ng-minlength=8 ng-maxlength=50 required>
+            ng-model="authenticate.confirmPassword" ng-minlength=8 ng-maxlength=50 ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
             <div ng-show="(form.confirmPassword.$dirty && form.confirmPassword.$invalid) || submitted ">
               <p class="has-error"
                 ng-show="form.confirmPassword.$error.required">
@@ -54,11 +58,15 @@
               </p>
               <p class="has-error"
                 ng-show="form.confirmPassword.$error.minlength">
-                Your password confirmation is required to be at least 5 characters.
+                Your password confirmation is required to be at least 8 characters.
               </p>
               <p class="has-error"
                 ng-show="form.confirmPassword.$error.maxlength">
                 Your password confirmation cannot be longer than 50 characters.
+              </p>
+              <p class="has-error"
+                 ng-show="form.confirmPassword.$error.pattern" >
+                  Your password is invalid.
               </p>
             </div>
           </div>

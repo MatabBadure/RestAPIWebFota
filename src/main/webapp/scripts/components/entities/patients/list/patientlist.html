@@ -65,14 +65,16 @@
          </div>
        </div>
 
-      <div class="dashboard__manage-view--pagination" ng-show="pageCount > 1">
+      <div class="dashboard__manage-view--pagination">
         <div class="col-md-16 reset-padding-right">
           <div class="navbar-right">
             <span class="record-found">{{total}} Patients</span>
             <span class="record-found">Found</span>
-            <span class="navigaion-link cursor-pointer" ng-class="{ 'inactive': !(currentPageIndex > 1) }" ng-click="searchPatients('PREV')">Previous</span>
-            <span class="navigaion-no">{{currentPageIndex}}</span>
-            <span class="navigaion-link cursor-pointer" ng-class="{ 'inactive': !(pageCount > currentPageIndex) }" ng-click="searchPatients('NEXT')">Next</span>
+            <span ng-show="pageCount > 1">
+              <span class="navigaion-link cursor-pointer" ng-class="{ 'inactive': !(currentPageIndex > 1) }" ng-click="searchPatients('PREV')">Previous</span>
+              <span class="navigaion-no">{{currentPageIndex}}</span>
+              <span class="navigaion-link cursor-pointer" ng-class="{ 'inactive': !(pageCount > currentPageIndex) }" ng-click="searchPatients('NEXT')">Next</span>
+            </span>
           </div>
           <div class="clr"></div>
         </div>

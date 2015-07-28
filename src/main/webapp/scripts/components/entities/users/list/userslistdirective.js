@@ -94,6 +94,8 @@ angular.module('hillromvestApp')
           var url = 'api/user/search?searchString=';
           UserService.getUsers(url, $scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function(response) {
             $scope.users = response.data;
+            $scope.total = response.headers()['x-total-count'];
+            $scope.pageCount = Math.ceil($scope.total / 10);
           }).catch(function(response) {
 
           });

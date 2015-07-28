@@ -75,7 +75,7 @@ angular.module('hillromvestApp')
         UserService.getUsers(url, $scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
           $scope.doctors = response.data;
           $scope.total = response.headers()['x-total-count'];
-          $scope.pageCount = Math.floor($scope.total / 10)+1;
+          $scope.pageCount = Math.ceil($scope.total / 10);
           if($scope.total == 0){
             $scope.noMatchFound = true;
           }else{

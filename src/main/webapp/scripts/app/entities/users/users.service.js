@@ -73,7 +73,7 @@ angular.module('hillromvestApp')
 
       getUsers : function (url, searchString, pageNo, offset) {
         if (searchString === undefined) { searchString = '';}
-        return $http.get(url + searchString + '&pageNo=' + pageNo + '&offset=' + offset, {
+        return $http.get(url + searchString + '&page=' + pageNo + '&offset=' + offset, {
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',

@@ -42,7 +42,7 @@ angular.module('hillromvestApp')
 
       getClinics : function (searchString, pageNo, offset) {
         if (searchString === undefined) { searchString = '';}
-        return $http.get('api/clinics/search?searchString=' + searchString + '&pageNo=' + pageNo + '&offset=' + offset,{
+        return $http.get('api/clinics/search?searchString=' + searchString + '&page=' + pageNo + '&offset=' + offset,{
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',

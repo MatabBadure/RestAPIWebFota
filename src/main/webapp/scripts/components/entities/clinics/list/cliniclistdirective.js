@@ -56,6 +56,8 @@ angular.module('hillromvestApp')
         }
         ClinicService.getClinics($scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
           $scope.clinics = response.data;
+          $scope.total = response.headers()['x-total-count'];
+          $scope.pageCount = Math.ceil($scope.total / 10);
         }).catch(function (response) {
 
         });

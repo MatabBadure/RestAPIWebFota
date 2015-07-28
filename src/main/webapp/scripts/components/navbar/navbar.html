@@ -45,7 +45,8 @@
 </nav>
 <script>
 $(document).ready(function(){
-  $('.popover-link').popover({ html : true});
-  $('[data-toggle="popover"]').popover();   
+  setTimeout(function(){
+    $('[data-toggle="popover"]').popover({ html : true});
+  }, 2000);
 });
 </script>

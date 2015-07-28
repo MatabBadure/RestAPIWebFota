@@ -178,7 +178,10 @@ public class UserExtensionResource {
         throws URISyntaxException {
     	String queryString = new StringBuilder("%").append(searchString).append("%").toString();
     	Map<String,Boolean> sortOrder = new HashMap<>();
-    	sortOrder.put(sortBy, isAscending);
+    	if(sortBy != null) {
+    		isAscending =  (isAscending != null)?  isAscending : true;
+    		sortOrder.put(sortBy, isAscending);
+    	}
     	Page<HillRomUserVO> page = userSearchRepository.findHillRomTeamUsersBy(queryString,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/user/search", offset, limit);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
@@ -200,7 +203,10 @@ public class UserExtensionResource {
         throws URISyntaxException {
     	String queryString = new StringBuilder("%").append(searchString).append("%").toString();
     	Map<String,Boolean> sortOrder = new HashMap<>();
-    	sortOrder.put(sortBy, isAscending);
+    	if(sortBy != null) {
+    		isAscending =  (isAscending != null) ?  isAscending : true;
+    		sortOrder.put(sortBy, isAscending);
+    	}
     	Page<HcpVO> page = userSearchRepository.findHCPBy(queryString,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/user/hcp/search", offset, limit);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);

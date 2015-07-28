@@ -54,11 +54,11 @@ import com.hillrom.vest.repository.HillRomUserVO;
 				+ " lower(user.email) like lower(:queryString)) ") })
 @SqlResultSetMappings({ 
 @SqlResultSetMapping(name = "hillromTeamUsers", classes = { @ConstructorResult(targetClass = HillRomUserVO.class, columns = {
-		@ColumnResult(name = "ID", type = Long.class),
-		@ColumnResult(name = "firstNAME", type = String.class),
-		@ColumnResult(name = "lastNAME", type = String.class),
-		@ColumnResult(name = "EMAIL", type = String.class),
-		@ColumnResult(name = "NAME", type = String.class),
+		@ColumnResult(name = "id", type = Long.class),
+		@ColumnResult(name = "firstName", type = String.class),
+		@ColumnResult(name = "lastName", type = String.class),
+		@ColumnResult(name = "email", type = String.class),
+		@ColumnResult(name = "name", type = String.class),
 		@ColumnResult(name = "isDeleted", type = Boolean.class) }) }) })
 public class UserExtension extends User implements Serializable {
 

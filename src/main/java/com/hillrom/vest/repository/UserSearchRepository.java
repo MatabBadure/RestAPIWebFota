@@ -1,6 +1,7 @@
 package com.hillrom.vest.repository;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,9 +48,21 @@ public class UserSearchRepository {
 		
 		query.setParameter("queryString", queryString);
 		
-		List<HillRomUserVO> hillromUsers =  query.getResultList();
-	
-		Page<HillRomUserVO> page = new PageImpl<HillRomUserVO>(hillromUsers,null,count.intValue());
+		List<HillRomUserVO> hrUsersList = new ArrayList<>();
+		List<Object[]> results = query.getResultList(); 
+		results.stream().forEach((record) -> {
+	        Long id = ((BigInteger) record[0]).longValue();
+	        String firstName = (String) record[1];
+	        String lastName = (String) record[2];
+	        String email = (String) record[3];
+	        String role = (String) record[4];
+	        Boolean isDeleted = (Boolean) record[5];
+	        
+	        HillRomUserVO hrUserVO = new HillRomUserVO(id, firstName, lastName, email, role, isDeleted);
+	        hrUsersList.add(hrUserVO);
+		});
+		
+		Page<HillRomUserVO> page = new PageImpl<HillRomUserVO>(hrUsersList,null,count.intValue());
 	
 		return page;
 	}
@@ -80,6 +93,8 @@ public class UserSearchRepository {
 		query.setMaxResults(maxResult);
 		
 		query.setParameter("queryString", queryString);
+		
+		List<HcpVO> hcpUsers = new ArrayList<>();
 		
 		Map<Long,HcpVO> hcpUsersMap = new HashMap<>();
 		List<Object[]> results = query.getResultList(); 
@@ -114,12 +129,12 @@ public class UserSearchRepository {
 	        	hcpVO.getClinics().add(clinicMap);
 	        	hcpUsersMap.put(id, hcpVO);
 	        }else{
+	        	hcpUsers.remove(hcpVO);
 	        	hcpVO.getClinics().add(clinicMap);
 	        }
+	        hcpUsers.add(hcpVO);
 		});
 		
-		List<HcpVO> hcpUsers =  new LinkedList<>(hcpUsersMap.values());
-	
 		Page<HcpVO> page = new PageImpl<HcpVO>(hcpUsers,null,count.intValue());
 	
 		return page;

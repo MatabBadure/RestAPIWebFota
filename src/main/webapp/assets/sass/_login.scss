@@ -1,65 +1,55 @@
-.login{   
-  background: url("../images/Hill-Rombackground.jpg") no-repeat scroll center center / cover rgba(0, 0, 0, 0);
+.login {   
+  background: url("../images/Hill-Rombackground.jpg") no-repeat 0 0;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   display: table;
-  height: 100%;
+  height: calc(100% - 100px);
   position: absolute;
   width: 100%;
   //position: relative;
 }
 
-.login--position{
-  left: 25%;
-  position: relative;
-  top: 100px;
+.login .login--position {
+  width: 60%;
+  margin: 10% auto;
 }
 
-.login__cover{
+.login__cover {
   margin: 13% 0;
 }
 
-.login__container{
-  height: 100%;
-  //padding: 0 15px;
-  display: table;
-  vertical-align: middle;
-  position: absolute;
-  //margin: 13% 0;
-}
-
-.login__container__left-section{
+.login__container__left-section {
   height: 100%;
   display: table;
 }
 
-.login__container__left-section--description{
-  //display: table-cell;
+.login__container__left-section--description {
   vertical-align: middle;
-  &.content{
+  &.content {
     float: left;
     width: 70%;
     padding-top: 11%;
   }
-  &.image{
+
+  &.image {
     padding: 20px 0;
     border-right: 1px solid;
     padding-right: 75px;
   }
 }
 
-.login__container__right-section{
+.login__container__right-section {
   height: 100%;
   display: table;
 }
 
-.login__container__right-section--form{
+.login__container__right-section--form {
   display: table-cell;
   vertical-align: middle;
 }
 
-.login .login-button{
+.login .login-button {
   color: #FFF;
   border: none;
   padding: 3px 30px;
@@ -73,46 +63,48 @@
   opacity: 0.6;
 }
 
-.login-form{
+.login-form {
   input {
-    margin: 0;
+    margin: 0 !important;
   }
 }
 
-#error_msg{
+#error_msg {
   color: red;
   margin-bottom: -8%;
 }
-.form__container__login{
+
+.form__container__login {
   background-color: rgba(255,255,255,0.7);
-  padding: 5% 15px;
-  img{
+  padding: 20px;
+  // padding: 5% 15px;
+  img {
     height: 200px;
     display: block;
     margin: 0 auto;
   }
 
-  input{
+  input {
     margin: 8% 0;
     border-radius: 0;
     border: 1px solid #CECEF6;
   }
 
-  p{
+  p {
     text-align: center;
     color: #5858FA;
   }
   
-  a{
+  a {
     font-weight: 100;
     color: #ffffff;
   }
 
-  .link{
+  .link {
     display: inline-block;
   }
 
-  #forgotpwd a{
+  #forgotpwd a {
     color: #585858;
   }
 }
@@ -132,9 +124,7 @@
   text-shadow:0px 1px 0px #b23e35;
   float: right;
 }
-// .myButton:hover {
-//   background-color:#eb675e;
-// }
+
 .myButton:active {
   position:relative;
   top:1px;

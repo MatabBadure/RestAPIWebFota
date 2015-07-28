@@ -3,10 +3,8 @@ package com.hillrom.vest.domain;
 import java.io.Serializable;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -27,21 +25,9 @@ public class PatientVestDeviceRawLog implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    @NotNull
-    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-    @JsonSerialize(using = CustomDateTimeSerializer.class)
-    @JsonDeserialize(using = CustomDateTimeDeserializer.class)
-    @Column(name = "hub_receive_time", nullable = false)
-    private DateTime hubReceiveTime;
-
-    @NotNull
-    @Column(name = "device_address", nullable = false)
-    private String deviceAddress;
-
+	@EmbeddedId
+	private PatientVestDeviceRawLogPK id; 
+	
     @Column(name = "device_model_type")
     private String deviceModelType;
 
@@ -66,8 +52,12 @@ public class PatientVestDeviceRawLog implements Serializable {
     @Column(name = "timezone")
     private String timezone;
 
-    @Column(name = "sp_receive_time")
-    private String spReceiveTime;
+    @NotNull
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @JsonSerialize(using = CustomDateTimeSerializer.class)
+    @JsonDeserialize(using = CustomDateTimeDeserializer.class)
+    @Column(name = "sp_receive_time", nullable = false)
+    private DateTime spReceiveTime;
 
     @Column(name = "hub_receive_time_offset")
     private Integer hubReceiveTimeOffset;
@@ -80,31 +70,15 @@ public class PatientVestDeviceRawLog implements Serializable {
 
     @Column(name = "raw_message")
     private String rawMessage;
-
-    public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public DateTime getHubReceiveTime() {
-		return hubReceiveTime;
-	}
-
-	public void setHubReceiveTime(DateTime hubReceiveTime) {
-		this.hubReceiveTime = hubReceiveTime;
-	}
-
-	public String getDeviceAddress() {
-		return deviceAddress;
-	}
-
-	public void setDeviceAddress(String deviceAddress) {
-		this.deviceAddress = deviceAddress;
-	}
-
+    
+    public PatientVestDeviceRawLogPK getId() {
+    	return id;
+    }
+    
+    public void setId(PatientVestDeviceRawLogPK id) {
+    	this.id = id;
+    }
+    
 	public String getDeviceModelType() {
 		return deviceModelType;
 	}
@@ -168,12 +142,14 @@ public class PatientVestDeviceRawLog implements Serializable {
 	public void setTimezone(String timezone) {
 		this.timezone = timezone;
 	}
+	
 
-	public String getSpReceiveTime() {
+
+	public DateTime getSpReceiveTime() {
 		return spReceiveTime;
 	}
 
-	public void setSpReceiveTime(String spReceiveTime) {
+	public void setSpReceiveTime(DateTime spReceiveTime) {
 		this.spReceiveTime = spReceiveTime;
 	}
 
@@ -238,8 +214,8 @@ public class PatientVestDeviceRawLog implements Serializable {
     public String toString() {
         return "PatientVestDeviceRawLogs{" +
                 "id=" + id +
-                ", hub_receive_time='" + hubReceiveTime + "'" +
-                ", device_address='" + deviceAddress + "'" +
+                ", hub_receive_time='" + id.getHubReceiveTime() + "'" +
+                ", device_address='" + id.getDeviceAddress() + "'" +
                 ", device_model_type='" + deviceModelType + "'" +
                 ", device_data='" + deviceData + "'" +
                 ", device_serial_number='" + deviceSerialNumber + "'" +

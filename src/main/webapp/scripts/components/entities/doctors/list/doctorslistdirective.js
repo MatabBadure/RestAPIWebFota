@@ -35,11 +35,7 @@ angular.module('hillromvestApp')
         timer = $timeout(function () {
           if ($scope.searchItem) {
             var url = 'api/user/hcp/search?searchString=';
-            UserService.getUsers(url, $scope.searchItem, 1, 10).then(function(response) {
-              $scope.doctors = response.data;
-            }).catch(function(response) {
-
-            });
+            $scope.searchDoctors();
           } else {
             $scope.doctors = [];
           }

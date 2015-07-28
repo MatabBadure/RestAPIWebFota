@@ -24,11 +24,9 @@
         "emr-id":   "EMR-ID",
         "mrn-id": "MRN-ID",
         "title": {
-                    "name": "Title",
-                    "dr":   "Dr", 
                     "mr":   "Mr.",
                     "mrs": "Mrs.",
-                    "miss": "Miss"
+                    "ms": "Ms."
         },
         "gender": {
                     "name": "Gender",

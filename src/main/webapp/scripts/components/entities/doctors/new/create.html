@@ -59,8 +59,10 @@
             </div>
             <div class="col-md-10 dashboard__form__input">
               <div class="custom-dropdown">
-                  <select ng-model="doctor.title" disabled="disabled" ng-repeat="title in doctor.titles">
-                  <option selected="true" translate="doctor.title.dr"></option> 
+                  <select ng-model="doctor.title">
+                  <option translate="doctor.title.mr"></option>
+                  <option translate="doctor.title.mrs"></option>
+                  <option translate="doctor.title.ms"></option>
                   </select>
                 </div>
             </div>

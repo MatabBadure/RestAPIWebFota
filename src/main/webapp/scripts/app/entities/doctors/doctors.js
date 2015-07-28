@@ -7,7 +7,7 @@ angular.module('hillromvestApp')
                 parent: 'entity',
                 url: '/doctor',
                 data: {
-                    roles: [],
+                    roles: ['ADMIN'],
                     pageTitle: 'doctor.title'
                 },
                 views: {

@@ -18,7 +18,7 @@ angular.module('hillromvestApp')
       link: function(scope) {
         var user = scope.user;
       },
-      controller: function($scope) {
+      controller: function($scope, $timeout) {
         $scope.init = function() {
           $scope.users = [];
           $scope.currentPageIndex = 1;
@@ -28,6 +28,26 @@ angular.module('hillromvestApp')
         };
 
         $scope.init();
+
+        var timer = false;
+        $scope.$watch('searchItem', function () {
+          if (timer) {
+            $timeout.cancel(timer)
+          }
+          timer= $timeout(function () {
+            if ($scope.searchItem) {
+              var url = 'api/user/search?searchString=';
+              UserService.getUsers(url, $scope.searchItem, 1, 10).then(function (response) {
+                $scope.users = response.data;
+              }).catch(function (response) {
+
+              });
+            } else {
+              $scope.users = [];
+            }
+
+          },1000)
+        });
 
         /**
          * @ngdoc function

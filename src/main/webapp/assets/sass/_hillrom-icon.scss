@@ -1,10 +1,10 @@
 @font-face {
 	font-family: 'hillrom';
-	src:url('fonts/hillrom.eot?pcy3rd');
-	src:url('fonts/hillrom.eot?#iefixpcy3rd') format('embedded-opentype'),
-		url('fonts/hillrom.ttf?pcy3rd') format('truetype'),
-		url('fonts/hillrom.woff?pcy3rd') format('woff'),
-		url('fonts/hillrom.svg?pcy3rd#hillrom') format('svg');
+	src:url('fonts/hillrom.eot?-bnxh4m');
+	src:url('fonts/hillrom.eot?#iefix-bnxh4m') format('embedded-opentype'),
+		url('fonts/hillrom.ttf?-bnxh4m') format('truetype'),
+		url('fonts/hillrom.woff?-bnxh4m') format('woff'),
+		url('fonts/hillrom.svg?-bnxh4m#hillrom') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -23,6 +23,12 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
+.icon-plus-icon:before {
+	content: "\e60c";
+}
+.icon-search-icon:before {
+	content: "\e60d";
+}
 .icon-arrow-down:before {
 	content: "\e600";
 }
@@ -41,19 +47,8 @@
 .icon-man:before {
 	content: "\e605";
 }
-.icon-man-with-circle .path1:before {
+.icon-man-with-circle:before {
 	content: "\e606";
-	color: rgb(238, 113, 100);
-}
-.icon-man-with-circle .path2:before {
-	content: "\e607";
-	margin-left: -1em;
-	color: rgb(183, 83, 79);
-}
-.icon-man-with-circle .path3:before {
-	content: "\e608";
-	margin-left: -1em;
-	color: rgb(255, 255, 255);
 }
 .icon-patient:before {
 	content: "\e609";
@@ -61,19 +56,8 @@
 .icon-pressure:before {
 	content: "\e60a";
 }
-.icon-tablet-with-circle .path1:before {
+.icon-tablet-with-circle:before {
 	content: "\e60b";
-	color: rgb(126, 161, 212);
-}
-.icon-tablet-with-circle .path2:before {
-	content: "\e60c";
-	margin-left: -1em;
-	color: rgb(54, 105, 167);
-}
-.icon-tablet-with-circle .path3:before {
-	content: "\e60d";
-	margin-left: -1em;
-	color: rgb(255, 255, 255);
 }
 .icon-user:before {
 	content: "\e60e";

@@ -57,8 +57,12 @@ angular.module('hillromvestApp')
           if (track !== undefined) {
             if (track === "PREV" && $scope.currentPageIndex > 1)
               $scope.currentPageIndex--;
-            if (track === "NEXT")
+            if (track === "NEXT" && $scope.currentPageIndex < $scope.pageCount)
+            {
               $scope.currentPageIndex++;
+            }else{
+              return false;
+            }
           } else {
             $scope.currentPageIndex = 1;
           }

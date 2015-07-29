@@ -13,8 +13,13 @@
   <form  name="form" class="dashboard-page__form--new" ng-submit="createDoctor()" novalidate>
     <div class="container dashboard__form">
       <div class="row margin-top-xl">
-        <div class="col-md-16">
-          <span class="dashboard__form--type" translate="doctor.general-details"></span>
+        <div class="col-md-16 row">
+          <div class="col-md-12">
+            <span class="dashboard__form--type" translate="doctor.general-details"></span>
+          </div>
+          <div class="col-md-4 user-required">
+            <span translate="doctor.required-field"></span> 
+          </div>
         </div>
 
         <div class="col-md-16 row margin-top">

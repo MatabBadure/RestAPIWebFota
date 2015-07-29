@@ -57,6 +57,7 @@
         "user": "user",
         "doctors": "Doctors",
         "parent": "parent",
-        "submit-button-text": "submit"
+        "submit-button-text": "submit",
+        "cancel-button-text": "cancel"
     }
 }

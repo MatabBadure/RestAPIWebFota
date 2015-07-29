@@ -36,9 +36,13 @@
 	font-weight: 700;
 }
 
-// .dashboard__form {
-// 	margin-top: 40px;
-// }
+.user-required {
+	color: $bombay;
+  font-size: 12px;
+  font-weight: 700;
+  padding-right: 40px;
+  text-align: right;
+}
 
 .dashboard__form--label {
 	line-height: 30px;

@@ -16,6 +16,9 @@
             "parent-clinic": "Parent Clinic",
             "satellite-clinic": "Satellite Clinic"
         },
+        "placeholder": {
+            "search": "Search with Name, Hill-Rom ID or Email"
+        },
         "select-parent": "Select Parent Clinic",
         "general-details": "General Details",
         "clinic-name": "Clinic Name",

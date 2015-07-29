@@ -72,6 +72,7 @@ angular.module('hillromvestApp')
       $scope.logout = function(){
         Auth.signOut().then(function(data) {
           Auth.logout();
+          localStorage.clear();
           $scope.signOut();
         }).catch(function(err) {
         });

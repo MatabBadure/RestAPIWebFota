@@ -23,6 +23,7 @@ angular.module('hillromvestApp')
         $scope.pageCount = 0;
         $scope.total = 0;
         $scope.noMatchFound = false;
+        $scope.sortOption = "";
         $scope.searchDoctors();
       };
 
@@ -72,7 +73,7 @@ angular.module('hillromvestApp')
           }
         }
         var url = 'api/user/hcp/search?searchString=';
-        UserService.getUsers(url, $scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
+        UserService.getUsers(url, $scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
           $scope.doctors = response.data;
           $scope.total = response.headers()['x-total-count'];
           $scope.pageCount = Math.ceil($scope.total / 10);

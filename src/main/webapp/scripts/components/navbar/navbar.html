@@ -32,22 +32,10 @@
           </a>
         </li>
         <li class="header-popover">
-          <a href="javascript:void(0)" class="popover-link" ns-popover ns-popover-trigger="click" ns-popover-placement="bottom" ns-popover-template="popover">
-            <span class="padding-right">Jose Rubert</span>
-            <span class="hillrom-icon icon-arrow-down"></span>
-          </a>
+          <a href="javascript:void(0)" class="popover-link" custom-popover data-placement="bottom" popover-html="<div><span class='hillrom-icon icon-user-account'></span><span>Account</span></div><div ng-click='logout()'><span class='hillrom-icon icon-logout'></span><span>Logout</span></div>">
+           </a>
         </li>
       </ul>
     </div>
   </div>
 </nav>
-<script>
-$(document).ready(function(){
-  setTimeout(function(){
-    $('[data-toggle="popover"]').popover({ html : true});
-  }, 2000);
-});
-</script>
-<script type="text/ng-template" id="popover">
-  <div><span class='hillrom-icon icon-user-account'></span><span>Account</span></div><div ng-click='logout()'><span class='hillrom-icon icon-logout'></span><span>Logout</span></div>
-</script>

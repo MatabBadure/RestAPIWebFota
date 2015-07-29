@@ -25,6 +25,7 @@ angular.module('hillromvestApp')
           $scope.perPageCount = 10;
           $scope.pageCount = 0;
           $scope.total = 0;
+          $scope.sortOption ="";
           $scope.searchUsers();
         };
 
@@ -62,16 +63,6 @@ angular.module('hillromvestApp')
           });
         };
 
-        /**
-         * @ngdoc function
-         * @name sortList
-         * @description
-         * Function to Sort the List of Users
-         */
-        $scope.sortList = function() {
-          //Todo
-        };
-
         $scope.createUser = function() {
           $scope.onCreate();
         };
@@ -92,8 +83,8 @@ angular.module('hillromvestApp')
             }
           }
           var url = 'api/user/search?searchString=';
-          UserService.getUsers(url, $scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function(response) {
-            $scope.users = response.data;
+          UserService.getUsers(url, $scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function(response) {
+            $scope.users = response.data; 
             $scope.total = response.headers()['x-total-count'];
             $scope.pageCount = Math.ceil($scope.total / 10);
           }).catch(function(response) {

@@ -1,173 +1,168 @@
-  <div class="container login">
-    <div class="login--position">
-      <div class=" form__container__login login__container col-md-8 col-lg-8" >
-        <div class="col-md-6 col-lg-6 ">
-          <img src="assets/images/man.svg">
-        </div>
+<div class="container login">
+  <div class="login--position">
+    <div class="form__container__login login__container">
+      <div class="col-md-6">
+        <img src="assets/images/man.svg">
+        <div class="clr"></div>
+      </div>
 
-            <!-- normal login -->
-        <div class=" col-md-10 col-lg-10 login__container__right-section" ng-show="showLogin">
-          <form class="login-form" role="form" name="form" novalidate>
-            <p><strong>LOGIN TO YOUR ACCOUNT</strong></p>
-            <div class="alert alert-danger has-error" ng-show="authenticationError" translate="login.messages.error.authentication">
-              <strong>Authentication failed!</strong> Please check your credentials and try again.
+      <!-- normal login -->
+      <div class=" col-md-10 col-lg-10 login__container__right-section" ng-show="showLogin">
+        <form class="login-form" role="form" name="form" novalidate>
+          <p><strong>LOGIN TO YOUR ACCOUNT</strong></p>
+          <div class="alert alert-danger has-error" ng-show="authenticationError" translate="login.messages.error.authentication">
+            <strong>Authentication failed!</strong> Please check your credentials and try again.
+          </div>
+
+          <div class="text-center indent-bottom-5 has-error" ng-show="firstTimeAccessFailed" >Authentication failed!
+          </div> 
+
+          <div class="text-center indent-bottom-5 has-error" ng-show="otherError">
+            Error occured!
+          </div> 
+
+          <div class="form-group">
+            <input type="text" class="form-control" id="username" name="username" placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="username" required>
+            <div class="form-error" ng-show="(form.username.$dirty && form.username.$invalid) || loginSubmitted">
+              <span class="has-error" ng-show="form.username.$error.required ">
+                Your Username is required.
+              </span>
             </div>
-            <div class="text-center indent-bottom-5 has-error" ng-show="firstTimeAccessFailed" >Authentication failed!</div> 
+          </div>
 
-            <div class="text-center indent-bottom-5 has-error" ng-show="otherError">Error occured!</div> 
-
-            <div class="form-group">
-              <input type="text" class="form-control" id="username" name="username" placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="username" required>
-              <div class="form-error" ng-show="(form.username.$dirty && form.username.$invalid) || loginSubmitted">
-                <span class="has-error" ng-show="form.username.$error.required ">
-                  Your Username is required.
-                </span>
-              </div>
+          <div class="form-group">
+            <input type="password" class="form-control" id="password" name="password" placeholder="{{'login.form.password.placeholder' | translate}}" ng-model="password"
+            ng-minlength=8 ng-maxlength=50 ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
+            <div class="form-error" ng-show="(form.password.$dirty && form.password.$invalid) || loginSubmitted">
+              <span class="has-error"
+                 ng-show="form.password.$error.required">
+                  password is required.
+              </span>
+              <span class="has-error"
+                 ng-show="form.password.$error.minlength">
+                   password is required to be at least 8 characters.
+              </span>
+              <span class="has-error"
+                 ng-show="form.password.$error.maxlength" >
+                   password cannot be longer than 50 characters.
+              </span>
+              <span class="has-error"
+                 ng-show="form.password.$error.pattern" >
+                   password is invalid.
+              </span> 
             </div>
+          </div>
 
-            <div class="form-group">
-                <input type="password" class="form-control" id="password" name="password" placeholder="{{'login.form.password.placeholder' | translate}}" ng-model="password" ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" ng-minlength=8 ng-maxlength=50 required>
-                <div class="form-error" ng-show="(form.password.$dirty && form.password.$invalid) || loginSubmitted">
-                  <span class="has-error" ng-show="form.password.$error.required">
-                    password is required.
-                  </span>
-                  <span class="has-error"
-                    ng-show="form.password.$error.pattern" >
-                    password is invalid.
-                  </span>
-                  <span class="has-error"
-                    ng-show="form.password.$error.minlength">
-                    Your password is required to be at least 8 characters.
-                  </span>
-                  <span class="has-error"
-                    ng-show="confirmForm.password.$error.maxlength">
-                    Your password cannot be longer than 50 characters.
-                  </span>
-                 </div>
-              </div>
+          <p class="help-block" ng-show="captchaError">Please verify again you are not a robot.</p>
 
-              <p class="help-block" ng-show="captchaError">Please verify again you are not a robot.</p>
-
-              <div  ng-show="showCaptcha">
-                <div vc-recaptcha
-                  theme="'light'"
-                  key="siteKey"
-                  on-create="setWidgetId(widgetId)"
-                  on-success="setResponse(response)">
-                </div>
-              </div>
-
-              <div class="col-md-8 col-lg-8 link" id="forgotpwd"><a href="#/reset/request">Forgot Password?</a></div>
-              <div class="col-md-8 col-lg-8 link"><a ng-click="login($event)" class="myButton" translate="login.form.button">LOGIN</a></div>
-          </form>
-        </div>
-        <!-- normal login end-->
-
-        <!-- first time login -->
-        <div class=" col-md-10 col-lg-10 login__container__right-section" ng-show="isFirstLogin">
-          <form class="form" role="form" name="confirmForm" ng-submit="submitPassword($event)" novalidate>
-            <div class="form-group" ng-show="!isEmailExist">
-              <label for="Email ID" translate="global.form.email">E-Mail</label>
-              <input type="email" class="form-control" name="email" placeholder="{{'login.form.email.placeholder' | translate}}" ng-model="user.email" ng-maxlength=100 required>
-              <div ng-show="(confirmForm.email.$dirty && confirmForm.email.$invalid) || submitted" class="form-error">
-                <span class="has-error" ng-show="confirmForm.email.$error.required">
-                  Your e-mail is required.
-                </span>
-                <span class="has-error" ng-show="confirmForm.email.$error.email">
-                  Your e-mail is invalid.
-                </span>
-                <span class="has-error" ng-show="confirmForm.email.$error.maxlength">
-                  Your e-mail cannot be longer than 100 characters.
-                </span>
-              </div>
+          <div  ng-show="showCaptcha">
+            <div vc-recaptcha theme="'light'" key="siteKey" on-create="setWidgetId(widgetId)" on-success="setResponse(response)">
             </div>
+          </div>
 
-            <div class="form-group">
-              <label for="Password" >Password*</label>
-              <input type="password" name="password" class="form-control"  placeholder="password" ng-model="user.password" ng-minlength=8 ng-maxlength=50 ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
-              <div ng-show="(confirmForm.password.$dirty && confirmForm.password.$invalid) || submitted">
-                  <span class="has-error"
-                    ng-show="confirmForm.password.$error.required">
-                    Your password is required.
-                  </span>
-                  <span class="has-error"
-                    ng-show="confirmForm.password.$error.minlength">
-                    Your password is required to be at least 8 characters.
-                  </span>
-                  <span class="has-error"
-                    ng-show="confirmForm.password.$error.maxlength">
-                    Your password cannot be longer than 50 characters.
-                  </span>
-                  <span class="has-error"
-                    ng-show="form.password.$error.pattern" >
-                    password is invalid.
-                  </span>
-                </div>
-              <password-strength-bar password-to-check="user.password"></password-strength-bar>
+          <div class="col-md-8 col-lg-8 link" id="forgotpwd">
+            <a href="#/reset/request">Forgot Password?</a>
+          </div>
+
+          <div class="col-md-8 col-lg-8 link">
+            <a ng-click="login($event)" class="myButton" translate="login.form.button">LOGIN</a>
+          </div>
+        </form>
+        <div class="clr"></div>
+      </div>
+      <!-- normal login end-->
+
+      <!-- first time login -->
+      <div class=" col-md-10 col-lg-10 login__container__right-section" ng-show="isFirstLogin">
+        <form class="form" role="form" name="confirmForm" ng-submit="submitPassword($event)" novalidate>
+          <div class="form-group" ng-show="!isEmailExist">
+            <label for="Email ID" translate="global.form.email">E-Mail</label>
+            <input type="email" class="form-control" name="email" placeholder="{{'login.form.email.placeholder' | translate}}" ng-model="user.email" ng-maxlength=100 required>
+            <div ng-show="(confirmForm.email.$dirty && confirmForm.email.$invalid) || submitted" class="form-error">
+              <span class="has-error" ng-show="confirmForm.email.$error.required">
+                 e-mail is required.
+              </span>
+              <span class="has-error" ng-show="confirmForm.email.$error.email">
+                 e-mail is invalid.
+              </span>
+              <span class="has-error" ng-show="confirmForm.email.$error.maxlength">
+                 e-mail cannot be longer than 100 characters.
+              </span>
             </div>
+          </div>
 
-            <div class="form-group">
-              <label for="Confirm Password" > Confirm Password</label>
-              <input type="password" class="form-control" name="confirmPassword" placeholder="confirm password" ng-model="user.confirmPassword" ng-minlength=8 ng-maxlength=50 ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" ng-minlength=8 ng-maxlength=50 required>
-              <div ng-show="(confirmForm.confirmPassword.$dirty && confirmForm.confirmPassword.$invalid) || submitted">
-                <span class="has-error"
-                  ng-show="confirmForm.confirmPassword.$error.required">
-                  Your confirmation password is required.
-                </span>
-                <span class="has-error"
-                  ng-show="confirmForm.confirmPassword.$error.minlength">
-                  Your confirmation password is required to be at least 8 characters.
-                </span>
-                <span class="has-error"
-                  ng-show="confirmForm.confirmPassword.$error.maxlength">
-                  Your confirmation password cannot be longer than 50 characters.
-                </span>
-                <span class="has-error"
-                  ng-show="form.password.$error.pattern" >
-                  password is invalid.
-                </span>
-              </div>
+          <div class="form-group">
+            <label for="Password" >Password*</label>
+            <input type="password" name="password" class="form-control"  placeholder="password" ng-model="user.password" ng-minlength=8 ng-maxlength=50 ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
+            <div ng-show="(confirmForm.password.$dirty && confirmForm.password.$invalid) || submitted">
+              <span class="has-error" ng-show="confirmForm.password.$error.required">
+                 password is required.
+              </span>
+              <span class="has-error" ng-show="confirmForm.password.$error.minlength">
+                 password is required to be at least 8 characters.
+              </span>
+              <span class="has-error" ng-show="confirmForm.password.$error.maxlength">
+                 password cannot be longer than 50 characters.
+              </span>
             </div>
+            <password-strength-bar password-to-check="user.password"></password-strength-bar>
+          </div>
 
-            <div class="form-group">
-                <label>Choose security question*</label>
-                <select class="form-control" name="question" ng-model="user.question" required ng-options="question.question for question in questions">
-                  <option value="">-- select a security question --</option>
-                </select>
-                <div ng-show="(confirmForm.question.$dirty && confirmForm.question.$invalid) || submitted">
-                  <p class="has-error"
-                    ng-show="confirmForm.question.$error.required">
-                    Security question is required.
-                  </p>
-                </div>     
-            </div> 
+          <div class="form-group">
+            <label for="Confirm Password" > Confirm Password</label>
+            <input type="password" class="form-control" name="confirmPassword" placeholder="confirm password" ng-model="user.confirmPassword" ng-minlength=8 ng-maxlength=50 ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
+            <div ng-show="(confirmForm.confirmPassword.$dirty && confirmForm.confirmPassword.$invalid) || submitted">
+              <span class="has-error" ng-show="confirmForm.confirmPassword.$error.required">
+                 confirmation password is required.
+              </span>
+              <span class="has-error" ng-show="confirmForm.confirmPassword.$error.minlength">
+                 confirmation password is required to be at least 8 characters.
+              </span>
+              <span class="has-error" ng-show="confirmForm.confirmPassword.$error.maxlength">
+                 confirmation password cannot be longer than 50 characters.
+              </span>
+            </div>
+          </div>
 
-            <div class="form-group">
-              <label>Answer security question*</label>
-              <input type="text" class="form-control" name="answer" ng-model="user.answer" required>
-              <div ng-show="(confirmForm.answer.$dirty && confirmForm.answer.$invalid) || submitted">
-                <p class="has-error"
-                  ng-show="confirmForm.answer.$error.required">
-                  Answer is required.
-                </p>
-              </div>     
-            </div> 
+          <div class="form-group">
+            <label>Choose security question*</label>
+            <select class="form-control" name="question" ng-model="user.question" required ng-options="question.question for question in questions">
+              <option value="">-- select a security question --</option>
+            </select>
+            <div ng-show="(confirmForm.question.$dirty && confirmForm.question.$invalid) || submitted">
+              <p class="has-error" ng-show="confirmForm.question.$error.required">
+                Security question is required.
+              </p>
+            </div>     
+          </div> 
 
-            <div class="form-group">
-              <input type="checkbox" name="tnc" ng-model="user.tnc" required>
-              Agree to Terms and Conditions*
-              <div ng-show="(confirmForm.tnc.$dirty && confirmForm.tnc.$invalid) || submitted">
-                <p class="has-error"
-                  ng-show="confirmForm.tnc.$error.required">
-                  Please agree to Terms and Conditions.
-                </p>
-              </div>     
-            </div> 
-            <button type="submit" ng-click="submitConfirmForm()" class="login-button center-block">Submit</button>
-          </form>
-        </div>
-<!-- first time login end -->
-      </div> 
+          <div class="form-group">
+            <label>Answer security question*</label>
+            <input type="text" class="form-control" name="answer" ng-model="user.answer" required>
+            <div ng-show="(confirmForm.answer.$dirty && confirmForm.answer.$invalid) || submitted">
+              <p class="has-error" ng-show="confirmForm.answer.$error.required">
+                Answer is required.
+              </p>
+            </div>     
+          </div> 
+
+          <div class="form-group">
+            <input type="checkbox" name="tnc" ng-model="user.tnc" required>
+            Agree to Terms and Conditions*
+            <div ng-show="(confirmForm.tnc.$dirty && confirmForm.tnc.$invalid) || submitted">
+              <p class="has-error" ng-show="confirmForm.tnc.$error.required">
+                Please agree to Terms and Conditions.
+              </p>
+            </div>     
+          </div> 
+
+          <button type="submit" ng-click="submitConfirmForm()" class="login-button center-block">Submit</button>
+        </form>
+      </div>
+      <div class="clr"></div>
+      <!-- first time login end -->
     </div> 
-  </div>
-
+    <div class="clr"></div>
+  </div> 
+  <div class="clr"></div>
+</div>

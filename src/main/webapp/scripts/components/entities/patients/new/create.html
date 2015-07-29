@@ -30,7 +30,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-7 col-md-offset-2" ng-if="patientStatus.editMode && patientStatus.role =='CLINIC_ADMIN'">
+          <div class="col-md-7 row col-md-offset-2" ng-if="patientStatus.editMode && patientStatus.role =='CLINIC_ADMIN'">
             <div class="col-md-6 dashboard__form--label">
               <span class="" translate="patient.mrn-id"></span>
               <span class=""></span>
@@ -65,7 +65,7 @@
             </div>
           </div>
 
-          <div class="col-md-7 col-md-offset-2">
+          <div class="col-md-7 row col-md-offset-2">
             <div class="col-md-6 dashboard__form--label">
               <span class="" translate="patient.primary-language"></span>
             </div>
@@ -75,7 +75,7 @@
                   <option value="" selected="selected">Select a language</option>
                   <option >English</option>
                   <option >French</option>
-                </select> 
+                </select>
               </div>
           </div>
           </div>
@@ -105,7 +105,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-7 col-md-offset-2">
+          <div class="col-md-7 row col-md-offset-2">
             <div class="col-md-6 dashboard__form--label">
               <span class="" translate="patient.middle-name"></span>
             </div>
@@ -151,7 +151,7 @@
             </div>
           </div>
 
-          <div class="col-md-7 col-md-offset-2">
+          <div class="col-md-7 row col-md-offset-2">
             <div class="col-md-6 dashboard__form--label">
               <span class="" translate="patient.date-of-birth"></span>
               <span class="">*</span>
@@ -187,7 +187,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-7 col-md-offset-2">
+          <div class="col-md-7 row col-md-offset-2">
             <div class="col-md-6 dashboard__form--label">
               <span class="" translate="patient.address"></span>
             </div>
@@ -216,7 +216,7 @@
               </div>
             </div>
         </div>
-        <div class="col-md-7 col-md-offset-2">
+        <div class="col-md-7 row col-md-offset-2">
           <div class="col-md-6 dashboard__form--label">
             <span class="" translate="patient.state"></span>
           </div>
@@ -226,7 +226,7 @@
                 <option  value="" selected="selected">Select a state</option>
               </select>
             </div>
-          </div>  
+          </div>
         </div>
       </div>
 
@@ -248,7 +248,7 @@
               </div>
             </div>
         </div>
-        <div class="col-md-7 col-md-offset-2">
+        <div class="col-md-7 row col-md-offset-2">
           <div class="col-md-6 dashboard__form--label">
             <span class="" translate="patient.email"></span>
             <span class=""></span>
@@ -266,15 +266,52 @@
           </div>
         </div>
       </div>
+
+      <div class="col-md-16 row margin-top">
+          <div class="col-md-7 row">
+            <div class="col-md-6 dashboard__form--label">
+              <span class="" translate="patient.mobile-number"></span>
+              <span class=""></span>
+            </div>
+            <div class="col-md-10 dashboard__form--input">
+              <input type="text" class="form-control" name="mobilePhone" ng-readonly="validateADMINorASP()" maxlength="10" ng-pattern="/^[0-9]{10}$/" ng-model="patient.mobilePhone" >
+               <div ng-show="(form.mobilePhone.$dirty && form.mobilePhone.$invalid) || submitted">
+                <span class="has-error" ng-show="form.mobilePhone.$error.pattern">
+                  Mobile number is invalid.
+                </span>
+                <span class="has-error" ng-show="form.mobilePhone.$error.maxlength">
+                  Mobile number is invalid.
+                </span>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-7 row col-md-offset-2">
+          <div class="col-md-6 dashboard__form--label">
+            <span class="" translate="patient.home-phone-number"></span>
+            <span class=""></span>
+          </div>
+          <div class="col-md-10 dashboard__form--input">
+            <input type="text" class="form-control" name="primaryPhone"  ng-readonly="validateADMINorASP()" ng-model="patient.primaryPhone" maxlength=10 ng-pattern="/^[0-9]{10}$/">
+            <div ng-show="(form.primaryPhone.$dirty && form.primaryPhone.$invalid) || submitted">
+              <span class="has-error" ng-show="form.primaryPhone.$error.pattern">
+                Home phone number is invalid.
+              </span>
+              <span class="has-error" ng-show="form.primaryPhone.$error.maxlength">
+                Home phone number is invalid.
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
 
-    <div class="col-md-16 row margin-top margin-bottom-extreem">
-      <div class="col-md-4 col-md-offset-12">
-        <button type="submit" ng-click="formSubmit()" ng-show="patientStatus.isCreate" class="hillrom-btn btn-submit" translate="patient.submit-button-text">Submit</button>
-        <button type="button" ng-click="deletePatient()" ng-show="!patientStatus.isCreate" class="hillrom-btn btn-submit">Diassociate</button>
-        <button type="submit" ng-click="formSubmit()" ng-show="!patientStatus.isCreate" class="hillrom-btn btn-submit">Update</button>
-      </div>   
+    <div class="col-md-16 row margin-top">
+      <div class="row padding-right-xl">
+        <button type="submit" ng-click="formSubmit()" ng-show="patientStatus.isCreate" class="hillrom-btn btn-submit float-right" translate="patient.submit-button-text">Submit</button>
+        <button type="button" ng-click="deletePatient()" ng-show="!patientStatus.isCreate" class="hillrom-btn btn-submit float-right">Diassociate</button>
+        <button type="submit" ng-click="formSubmit()" ng-show="!patientStatus.isCreate" class="hillrom-btn btn-submit float-right">Update</button>
+      </div>
     </div>
     </div>
   </form>

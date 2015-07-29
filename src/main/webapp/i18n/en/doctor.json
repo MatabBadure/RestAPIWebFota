@@ -3,7 +3,9 @@
         "home": {
             "title": "doctor",
             "createLabel": "Create doctor",
-            "createOrEditLabel": "Create or edit a Doctor"
+            "createNewLabel": "Create New",
+            "createOrEditLabel": "Create or edit a Doctor",
+            "manageLabel": "Manage Doctor"
         },
         "delete": {
             "question": "Are you sure you want to delete Doctor {{ id }}?"
@@ -22,17 +24,18 @@
         "emr-id":   "EMR-ID",
         "mrn-id": "MRN-ID",
         "title": {
-                    "name": "Title",
-                    "dr":   "Dr", 
                     "mr":   "Mr.",
                     "mrs": "Mrs.",
-                    "miss": "Miss"
+                    "ms": "Ms."
         },
         "gender": {
                     "name": "Gender",
                     "male":   "M",
                     "female": "F",
                     "others": "O"
+        },
+        "placeholder": {
+            "search": "Search with Name, Hill-Rom ID or Email"
         },
         "npi-number": "NPI Number",
         "first-name": "First Name",

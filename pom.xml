@@ -390,6 +390,10 @@
 			<artifactId>testng</artifactId>
 			<version>6.8.8</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-client</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<resources>

@@ -18,17 +18,17 @@
 			<column name="sequence_number" type="integer">
 				<constraints nullable="false" />
 			</column>
+			<column name="event_id" type="varchar(255)" />
 			<column name="patient_id" type="bigint" />
 			<column name="serial_number" type="varchar(255)" />
 			<column name="bluetooth_id" type="varchar(255)" />
 			<column name="hub_id" type="varchar(255)" />
-			<column name="event_id" type="varchar(255)" />
 			<column name="hmr" type="decimal" />
-			<column name="frequency" type="decimal" />
-			<column name="pressure" type="decimal" />
-			<column name="duration" type="decimal" />
+			<column name="frequency" type="integer" />
+			<column name="pressure" type="integer" />
+			<column name="duration" type="integer" />
 		</createTable>
-		<addPrimaryKey columnNames="timestamp, sequence_number"
+		<addPrimaryKey columnNames="timestamp, sequence_number,event_id"
             constraintName="pk_patient_vest_device_data"
             tableName="PATIENT_VEST_DEVICE_DATA"/>
         <addForeignKeyConstraint baseColumnNames="patient_id"

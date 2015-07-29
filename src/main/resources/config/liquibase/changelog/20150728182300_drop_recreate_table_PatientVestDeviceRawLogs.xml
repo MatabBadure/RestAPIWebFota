@@ -31,7 +31,7 @@
 			<column name="hub_receive_time_offset" type="integer" />
 			<column name="cuc_version" type="varchar(255)" />
 			<column name="customer_id" type="varchar(255)" />
-			<column name="raw_message" type="varchar(255)" />
+			<column name="raw_message" type="text" />
 		</createTable>
 		<addPrimaryKey columnNames="hub_receive_time, device_address"
             constraintName="pk_patient_vest_device_raw_logs"

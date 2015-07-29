@@ -10,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 @IdClass(PatientVestDeviceDataPK.class)
@@ -19,11 +20,16 @@ public class PatientVestDeviceData implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@Id
+	@Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	private DateTime timestamp;
 	@Id
 	@Column(name = "sequence_number")
 	private Integer sequenceNumber;
 
+	@Id
+	@Column(name="event_id")
+	private String eventId;
+	
 	@Column(name = "serial_number")
 	private String serialNumber;
 	
@@ -33,8 +39,6 @@ public class PatientVestDeviceData implements Serializable {
 	@Column(name="hub_id")
 	private String hubId;
 	
-	@Column(name="event_id")
-	private String eventId;
 	
 	private Double hmr;
 	
@@ -136,10 +140,12 @@ public class PatientVestDeviceData implements Serializable {
 		this.patient = patient;
 	}
 
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((eventId == null) ? 0 : eventId.hashCode());
 		result = prime * result
 				+ ((sequenceNumber == null) ? 0 : sequenceNumber.hashCode());
 		result = prime * result
@@ -156,6 +162,11 @@ public class PatientVestDeviceData implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		PatientVestDeviceData other = (PatientVestDeviceData) obj;
+		if (eventId == null) {
+			if (other.eventId != null)
+				return false;
+		} else if (!eventId.equals(other.eventId))
+			return false;
 		if (sequenceNumber == null) {
 			if (other.sequenceNumber != null)
 				return false;

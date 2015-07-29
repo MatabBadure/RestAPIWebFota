@@ -2,32 +2,17 @@ package com.hillrom.vest.domain;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.hillrom.vest.domain.util.CustomDateTimeDeserializer;
-import com.hillrom.vest.domain.util.CustomDateTimeSerializer;
 
-@Embeddable
 public class PatientVestDeviceRawLogPK implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@NotNull
-    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-    @JsonSerialize(using = CustomDateTimeSerializer.class)
-    @JsonDeserialize(using = CustomDateTimeDeserializer.class)
-    @Column(name = "hub_receive_time", nullable = false)
     private DateTime hubReceiveTime;
 
-    @NotNull
-    @Column(name = "device_address", nullable = false)
     private String deviceAddress;
 
 	public DateTime getHubReceiveTime() {
@@ -35,7 +20,7 @@ public class PatientVestDeviceRawLogPK implements Serializable {
 	}
 
 	public void setHubReceiveTime(DateTime hubReceiveTime) {
-		this.hubReceiveTime = hubReceiveTime;
+		this.hubReceiveTime = new DateTime(hubReceiveTime.getMillis());
 	}
 
 	public String getDeviceAddress() {

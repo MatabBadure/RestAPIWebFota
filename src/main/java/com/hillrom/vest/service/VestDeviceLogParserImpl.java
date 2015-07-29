@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.joda.time.DateTime;
+import org.springframework.stereotype.Component;
 
 import com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants;
 import com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants;
@@ -16,6 +17,7 @@ import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.domain.PatientVestDeviceRawLogPK;
 import com.hillrom.vest.service.util.ParserUtil;
 
+@Component
 public class VestDeviceLogParserImpl implements DeviceLogParser {
 
 	private static final String YYYY_MMM_DD_HH_MM_SS = "yyyy-MMM-dd hh:mm:ss";
@@ -30,14 +32,11 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 		String sp_timestamp = ParserUtil.getValueFromMessage(base64String,
 				PatientVestDeviceRawLogModelConstants.SP_RECEIVE_TIME);
 
-		PatientVestDeviceRawLogPK deviceRawLogPK = new PatientVestDeviceRawLogPK();
-		deviceRawLogPK.setDeviceAddress(ParserUtil.getValueFromMessage(
+		PatientVestDeviceRawLog patientVestDeviceRawLog = createPatientVestDeviceRawLog(base64String);
+		patientVestDeviceRawLog.setDeviceAddress(ParserUtil.getValueFromMessage(
 				base64String,
 				PatientVestDeviceRawLogModelConstants.DEVICE_ADDRESS));
-		deviceRawLogPK.setHubReceiveTime(getTimeStamp(hub_timestamp));
-
-		PatientVestDeviceRawLog patientVestDeviceRawLog = createPatientVestDeviceRawLog(base64String);
-		patientVestDeviceRawLog.setId(deviceRawLogPK);
+		patientVestDeviceRawLog.setHubReceiveTime(getTimeStamp(hub_timestamp));
 		patientVestDeviceRawLog.setSpReceiveTime(getTimeStamp(sp_timestamp));
 		return patientVestDeviceRawLog;
 	}

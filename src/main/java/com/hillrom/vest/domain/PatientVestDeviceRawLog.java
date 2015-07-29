@@ -3,8 +3,9 @@ package com.hillrom.vest.domain;
 import java.io.Serializable;
 
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -19,15 +20,24 @@ import com.hillrom.vest.domain.util.CustomDateTimeSerializer;
 /**
  * A PATIENT_VEST_DEVICE_RAW_LOGS.
  */
+@IdClass(PatientVestDeviceRawLogPK.class)
 @Entity
 @Table(name = "PATIENT_VEST_DEVICE_RAW_LOGS")
 public class PatientVestDeviceRawLog implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@EmbeddedId
-	private PatientVestDeviceRawLogPK id; 
-	
+	@NotNull
+    @Id
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @Column(name = "hub_receive_time", nullable = false)
+    private DateTime hubReceiveTime;
+
+    @NotNull
+    @Id
+    @Column(name = "device_address", nullable = false)
+    private String deviceAddress;
+
     @Column(name = "device_model_type")
     private String deviceModelType;
 
@@ -68,14 +78,23 @@ public class PatientVestDeviceRawLog implements Serializable {
     @Column(name = "raw_message")
     private String rawMessage;
     
-    public PatientVestDeviceRawLogPK getId() {
-    	return id;
-    }
     
-    public void setId(PatientVestDeviceRawLogPK id) {
-    	this.id = id;
-    }
-    
+	public DateTime getHubReceiveTime() {
+		return hubReceiveTime;
+	}
+
+	public void setHubReceiveTime(DateTime hubReceiveTime) {
+		this.hubReceiveTime = hubReceiveTime;
+	}
+
+	public String getDeviceAddress() {
+		return deviceAddress;
+	}
+
+	public void setDeviceAddress(String deviceAddress) {
+		this.deviceAddress = deviceAddress;
+	}
+
 	public String getDeviceModelType() {
 		return deviceModelType;
 	}
@@ -178,7 +197,10 @@ public class PatientVestDeviceRawLog implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result
+				+ ((deviceAddress == null) ? 0 : deviceAddress.hashCode());
+		result = prime * result
+				+ ((hubReceiveTime == null) ? 0 : hubReceiveTime.hashCode());
 		return result;
 	}
 
@@ -191,32 +213,32 @@ public class PatientVestDeviceRawLog implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		PatientVestDeviceRawLog other = (PatientVestDeviceRawLog) obj;
-		if (id == null) {
-			if (other.id != null)
+		if (deviceAddress == null) {
+			if (other.deviceAddress != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!deviceAddress.equals(other.deviceAddress))
+			return false;
+		if (hubReceiveTime == null) {
+			if (other.hubReceiveTime != null)
+				return false;
+		} else if (!hubReceiveTime.equals(other.hubReceiveTime))
 			return false;
 		return true;
 	}
 
 	@Override
-    public String toString() {
-        return "PatientVestDeviceRawLogs{" +
-                "id=" + id +
-                ", hub_receive_time='" + id.getHubReceiveTime() + "'" +
-                ", device_address='" + id.getDeviceAddress() + "'" +
-                ", device_model_type='" + deviceModelType + "'" +
-                ", device_data='" + deviceData + "'" +
-                ", device_serial_number='" + deviceSerialNumber + "'" +
-                ", device_type='" + deviceType + "'" +
-                ", hub_id='" + hubId + "'" +
-                ", air_interface_type='" + airInterfaceType + "'" +
-                ", customer_name='" + customerName + "'" +
-                ", timezone='" + timezone + "'" +
-                ", sp_receive_time='" + spReceiveTime + "'" +
-                ", cuc_version='" + cucVersion + "'" +
-                ", customer_id='" + customerId + "'" +
-                ", raw_message='" + rawMessage + "'" +
-                '}';
-    }
+	public String toString() {
+		return "PatientVestDeviceRawLog [hubReceiveTime=" + hubReceiveTime
+				+ ", deviceAddress=" + deviceAddress + ", deviceModelType="
+				+ deviceModelType + ", deviceData=" + deviceData
+				+ ", deviceSerialNumber=" + deviceSerialNumber
+				+ ", deviceType=" + deviceType + ", hubId=" + hubId
+				+ ", airInterfaceType=" + airInterfaceType + ", customerName="
+				+ customerName + ", timezone=" + timezone + ", spReceiveTime="
+				+ spReceiveTime + ", cucVersion=" + cucVersion
+				+ ", customerId=" + customerId + ", rawMessage=" + rawMessage
+				+ "]";
+	}
+
+	
 }

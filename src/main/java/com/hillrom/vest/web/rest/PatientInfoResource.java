@@ -18,7 +18,9 @@ import javax.inject.Inject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -117,10 +119,17 @@ public class PatientInfoResource {
     @Timed
     public ResponseEntity<List<PatientInfo>> search(@RequestParam(value = "searchString" , required = true) String searchString,
     							  @RequestParam(value = "page" , required = false) Integer offset,
-                                  @RequestParam(value = "per_page", required = false) Integer limit)
+                                  @RequestParam(value = "per_page", required = false) Integer limit,
+                                  @RequestParam(value = "sort_by", required = false) String sortBy,
+                                  @RequestParam(value = "asc",required = false) Boolean isAscending)
         throws URISyntaxException {
    	 	String queryString = new StringBuilder().append("%").append(searchString).append("%").toString();
-        Page<PatientInfo> page = patientInfoRepository.findBy(queryString,PaginationUtil.generatePageRequest(offset, limit));
+	   	Map<String,Boolean> sortOrder = new HashMap<>();
+	   	if(sortBy != null  && !sortBy.equals("")) {
+	 		isAscending =  (isAscending != null)?  isAscending : true;
+	 		sortOrder.put(sortBy, isAscending);
+	 	}
+        Page<PatientInfo> page = patientInfoRepository.findBy(queryString,PaginationUtil.generatePageRequest(offset, limit, sortOrder));
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/patientInfos", offset, limit);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

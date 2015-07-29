@@ -27,14 +27,14 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class PatientVestDeviceRawLogResource {
 
-    private final Logger log = LoggerFactory.getLogger(PatientVestDeviceRawLogResource.class);
+/*    private final Logger log = LoggerFactory.getLogger(PatientVestDeviceRawLogResource.class);
 
     @Inject
     private PatientVestDeviceRawLogRepository patientVestDeviceRawLogsRepository;
 
-    /**
+    *//**
      * POST  /patientVestDeviceRawLogs -> Create a new patientVestDeviceRawLogs.
-     */
+     *//*
     @RequestMapping(value = "/patientVestDeviceRawLogs",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -48,9 +48,9 @@ public class PatientVestDeviceRawLogResource {
         return ResponseEntity.created(new URI("/api/patientVestDeviceRawLogs/" + patientVestDeviceRawLogs.getId())).build();
     }
 
-    /**
+    *//**
      * PUT  /patientVestDeviceRawLogs -> Updates an existing PatientVestDeviceRawLogs.
-     */
+     *//*
     @RequestMapping(value = "/patientVestDeviceRawLogs",
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
@@ -64,9 +64,9 @@ public class PatientVestDeviceRawLogResource {
         return ResponseEntity.ok().build();
     }
 
-    /**
+    *//**
      * GET  /patientVestDeviceRawLogs -> get all the patientVestDeviceRawLogs.
-     */
+     *//*
     @RequestMapping(value = "/patientVestDeviceRawLogs",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -79,9 +79,9 @@ public class PatientVestDeviceRawLogResource {
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
-    /**
+    *//**
      * GET  /patientVestDeviceRawLogs/:id -> get the "id" patientVestDeviceRawLogs.
-     */
+     *//*
     @RequestMapping(value = "/patientVestDeviceRawLogs/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -95,9 +95,9 @@ public class PatientVestDeviceRawLogResource {
             .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    /**
+    *//**
      * DELETE  /patientVestDeviceRawLogs/:id -> delete the "id" patientVestDeviceRawLogs.
-     */
+     *//*
     @RequestMapping(value = "/patientVestDeviceRawLogs/{id}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -105,5 +105,5 @@ public class PatientVestDeviceRawLogResource {
     public void delete(@PathVariable Long id) {
         log.debug("REST request to delete PatientVestDeviceRawLogs : {}", id);
         patientVestDeviceRawLogsRepository.delete(id);
-    }
+    }*/
 }

@@ -78,7 +78,13 @@ public class PatientVestDeviceRawLogPK implements Serializable {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "PatientVestDeviceRawLogPK [hubReceiveTime=" + hubReceiveTime
+				+ ", deviceAddress=" + deviceAddress + "]";
+	}
     
-    
+	
 
 }

@@ -59,9 +59,6 @@ public class PatientVestDeviceRawLog implements Serializable {
     @Column(name = "sp_receive_time", nullable = false)
     private DateTime spReceiveTime;
 
-    @Column(name = "hub_receive_time_offset")
-    private Integer hubReceiveTimeOffset;
-
     @Column(name = "cuc_version")
     private String cucVersion;
 
@@ -153,14 +150,6 @@ public class PatientVestDeviceRawLog implements Serializable {
 		this.spReceiveTime = spReceiveTime;
 	}
 
-	public Integer getHubReceiveTimeOffset() {
-		return hubReceiveTimeOffset;
-	}
-
-	public void setHubReceiveTimeOffset(Integer hubReceiveTimeOffset) {
-		this.hubReceiveTimeOffset = hubReceiveTimeOffset;
-	}
-
 	public String getCucVersion() {
 		return cucVersion;
 	}
@@ -225,7 +214,6 @@ public class PatientVestDeviceRawLog implements Serializable {
                 ", customer_name='" + customerName + "'" +
                 ", timezone='" + timezone + "'" +
                 ", sp_receive_time='" + spReceiveTime + "'" +
-                ", hub_receive_time_offset='" + hubReceiveTimeOffset + "'" +
                 ", cuc_version='" + cucVersion + "'" +
                 ", customer_id='" + customerId + "'" +
                 ", raw_message='" + rawMessage + "'" +

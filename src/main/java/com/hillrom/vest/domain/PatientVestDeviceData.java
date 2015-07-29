@@ -38,11 +38,11 @@ public class PatientVestDeviceData implements Serializable {
 	
 	private Double hmr;
 	
-	private Double frequency;
+	private Integer frequency;
 	
-	private Double pressure;
+	private Integer pressure;
 	
-	private Double duration;
+	private Integer duration;
 
 	@ManyToOne(optional=false,targetEntity=PatientInfo.class)
 	@JoinColumn(name="patient_id",referencedColumnName="id")
@@ -103,31 +103,31 @@ public class PatientVestDeviceData implements Serializable {
 	public void setHmr(Double hmr) {
 		this.hmr = hmr;
 	}
-
-	public Double getFrequency() {
+	
+	public Integer getFrequency() {
 		return frequency;
 	}
 
-	public void setFrequency(Double frequency) {
+	public void setFrequency(Integer frequency) {
 		this.frequency = frequency;
 	}
 
-	public Double getPressure() {
+	public Integer getPressure() {
 		return pressure;
 	}
 
-	public void setPressure(Double pressure) {
+	public void setPressure(Integer pressure) {
 		this.pressure = pressure;
 	}
 
-	public Double getDuration() {
+	public Integer getDuration() {
 		return duration;
 	}
 
-	public void setDuration(Double duration) {
+	public void setDuration(Integer duration) {
 		this.duration = duration;
 	}
-	
+
 	public PatientInfo getPatient() {
 		return patient;
 	}
@@ -171,7 +171,7 @@ public class PatientVestDeviceData implements Serializable {
 
 	@Override
 	public String toString() {
-		return "PatientVestDeviceData [timestamp=" + timestamp
+		return "\nPatientVestDeviceData [timestamp=" + timestamp
 				+ ", sequenceNumber=" + sequenceNumber + ", serialNumber="
 				+ serialNumber + ", bluetoothId=" + bluetoothId + ", hubId="
 				+ hubId + ", eventId=" + eventId + ", hmr=" + hmr

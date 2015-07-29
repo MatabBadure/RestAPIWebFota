@@ -37,13 +37,7 @@ angular.module('hillromvestApp')
             $timeout.cancel(timer)
           }
           timer= $timeout(function () {
-            if ($scope.searchItem) {
-              var url = 'api/user/search?searchString=';
               $scope.searchUsers();
-            } else {
-              $scope.users = [];
-            }
-
           },1000)
         });
 

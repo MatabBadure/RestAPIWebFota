@@ -34,13 +34,8 @@ angular.module('hillromvestApp')
         if (timer) {
           $timeout.cancel(timer)
         }
-        timer = $timeout(function () {
-          if ($scope.searchItem) {
-            var url = 'api/user/hcp/search?searchString=';
+        timer = $timeout(function () {     
             $scope.searchDoctors();
-          } else {
-            $scope.doctors = [];
-          }
         },1000)
       });
 

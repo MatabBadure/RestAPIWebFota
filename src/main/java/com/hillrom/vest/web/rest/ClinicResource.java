@@ -1,7 +1,9 @@
 package com.hillrom.vest.web.rest;
 
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.security.RolesAllowed;
@@ -141,9 +143,16 @@ public class ClinicResource {
     @Timed
     public ResponseEntity<List<Clinic>> search(@RequestParam(value = "searchString")String searchString,
     		@RequestParam(value = "page" , required = false) Integer offset,
-            @RequestParam(value = "per_page", required = false) Integer limit) throws URISyntaxException {
+            @RequestParam(value = "per_page", required = false) Integer limit,
+            @RequestParam(value = "sort_by", required = false) String sortBy,
+            @RequestParam(value = "asc",required = false) Boolean isAscending) throws URISyntaxException {
     	 String queryString = new StringBuilder().append("%").append(searchString).append("%").toString();
-    	 Page<Clinic> page = clinicRepository.findBy(queryString,PaginationUtil.generatePageRequest(offset, limit));
+    	 Map<String,Boolean> sortOrder = new HashMap<>();
+    	 if(sortBy != null  && !sortBy.equals("")) {
+    		 isAscending =  (isAscending != null)?  isAscending : true;
+    		 sortOrder.put(sortBy, isAscending);
+    	 }
+    	 Page<Clinic> page = clinicRepository.findBy(queryString,PaginationUtil.generatePageRequest(offset, limit, sortOrder));
          HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/clinics/search", offset, limit);
          return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

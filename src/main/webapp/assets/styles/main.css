@@ -5018,8 +5018,8 @@ select[multiple].input-lg,
 }
 @font-face {
   font-family: 'hillrom';
-  src: url("fonts/hillrom.eot?pcy3rd");
-  src: url("fonts/hillrom.eot?#iefixpcy3rd") format("embedded-opentype"), url("fonts/hillrom.ttf?pcy3rd") format("truetype"), url("fonts/hillrom.woff?pcy3rd") format("woff"), url("fonts/hillrom.svg?pcy3rd#hillrom") format("svg");
+  src: url("fonts/hillrom.eot?-bnxh4m");
+  src: url("fonts/hillrom.eot?#iefix-bnxh4m") format("embedded-opentype"), url("fonts/hillrom.ttf?-bnxh4m") format("truetype"), url("fonts/hillrom.woff?-bnxh4m") format("woff"), url("fonts/hillrom.svg?-bnxh4m#hillrom") format("svg");
   font-weight: normal;
   font-style: normal;
 }
@@ -5034,6 +5034,14 @@ select[multiple].input-lg,
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-plus-icon:before {
+  content: "\e60c";
+}
+
+.icon-search-icon:before {
+  content: "\e60d";
 }
 
 .icon-arrow-down:before {
@@ -5060,21 +5068,8 @@ select[multiple].input-lg,
   content: "\e605";
 }
 
-.icon-man-with-circle .path1:before {
+.icon-man-with-circle:before {
   content: "\e606";
-  color: #ee7164;
-}
-
-.icon-man-with-circle .path2:before {
-  content: "\e607";
-  margin-left: -1em;
-  color: #b7534f;
-}
-
-.icon-man-with-circle .path3:before {
-  content: "\e608";
-  margin-left: -1em;
-  color: white;
 }
 
 .icon-patient:before {
@@ -5085,21 +5080,8 @@ select[multiple].input-lg,
   content: "\e60a";
 }
 
-.icon-tablet-with-circle .path1:before {
+.icon-tablet-with-circle:before {
   content: "\e60b";
-  color: #7ea1d4;
-}
-
-.icon-tablet-with-circle .path2:before {
-  content: "\e60c";
-  margin-left: -1em;
-  color: #3669a7;
-}
-
-.icon-tablet-with-circle .path3:before {
-  content: "\e60d";
-  margin-left: -1em;
-  color: white;
 }
 
 .icon-user:before {
@@ -5413,6 +5395,14 @@ body {
   clear: both;
 }
 
+.float-right {
+  float: right !important;
+}
+
+.float-left {
+  float: left !important;
+}
+
 .padding-left {
   padding-left: 10px;
 }
@@ -5427,6 +5417,14 @@ body {
 
 .padding-right-ls {
   padding-right: 20px;
+}
+
+.padding-bottom-ls {
+  padding-bottom: 20px;
+}
+
+.padding-right-xl {
+  padding-right: 40px;
 }
 
 .margin-top-xl {
@@ -5593,31 +5591,23 @@ body {
 }
 
 .login {
-  background: url("../images/Hill-Rombackground.jpg") no-repeat scroll center center/cover transparent;
+  background: url("../images/Hill-Rombackground.jpg") no-repeat 0 0;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   display: table;
-  height: 100%;
+  height: calc(100% - 100px);
   position: absolute;
   width: 100%;
 }
 
-.login--position {
-  left: 25%;
-  position: relative;
-  top: 100px;
+.login .login--position {
+  width: 60%;
+  margin: 10% auto;
 }
 
 .login__cover {
   margin: 13% 0;
-}
-
-.login__container {
-  height: 100%;
-  padding: 0 15px;
-  display: table;
-  vertical-align: middle;
 }
 
 .login__container__left-section {
@@ -5663,6 +5653,10 @@ body {
   opacity: 0.6;
 }
 
+.login-form input {
+  margin: 0 !important;
+}
+
 #error_msg {
   color: red;
   margin-bottom: -8%;
@@ -5670,7 +5664,7 @@ body {
 
 .form__container__login {
   background-color: rgba(255, 255, 255, 0.7);
-  padding: 5% 0;
+  padding: 20px;
 }
 .form__container__login img {
   height: 200px;
@@ -5718,85 +5712,9 @@ body {
   top: 1px;
 }
 
-.login {
-  background: url("../images/Hill-Rombackground.jpg") no-repeat scroll center center/cover transparent;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  display: table;
-  height: 100%;
-  position: absolute;
-  width: 100%;
-}
-
-.login--position {
-  left: 25%;
-  position: relative;
-  top: 100px;
-}
-
-.login__cover {
-  margin: 13% 0;
-}
-
-.login__container {
-  height: 100%;
-  padding: 0 15px;
-  display: table;
-  vertical-align: middle;
-}
-
-.login__container__left-section {
-  height: 100%;
-  display: table;
-}
-
-.login__container__left-section--description {
-  vertical-align: middle;
-}
-.login__container__left-section--description.content {
-  float: left;
-  width: 70%;
-  padding-top: 11%;
-}
-.login__container__left-section--description.image {
-  padding: 20px 0;
-  border-right: 1px solid;
-  padding-right: 75px;
-}
-
-.login__container__right-section {
-  height: 100%;
-  display: table;
-}
-
-.login__container__right-section--form {
-  display: table-cell;
-  vertical-align: middle;
-}
-
-.login .login-button {
-  color: #FFF;
-  border: none;
-  padding: 3px 30px;
-  background-color: #9A9A9A;
-  border-radius: 4px;
-  text-transform: uppercase;
-}
-
-.login input::-webkit-input-placeholder {
-  color: #A7A7A7;
-  opacity: 0.6;
-}
-
-#error_msg {
-  color: red;
-  margin-bottom: -8%;
-}
-
 .form__container__reset {
   background-color: rgba(255, 255, 255, 0.7);
-  padding: 5% 3%;
+  padding: 5% 15px;
 }
 .form__container__reset img {
   height: 200px;
@@ -5823,27 +5741,6 @@ body {
   color: #585858;
 }
 
-.myButton {
-  background-color: #e4685d;
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
-  border-radius: 4px;
-  display: inline-block;
-  cursor: pointer;
-  color: #ffffff;
-  font-family: Arial;
-  font-size: 15px;
-  padding: 2px 35px;
-  text-decoration: none;
-  text-shadow: 0px 1px 0px #b23e35;
-  float: right;
-}
-
-.myButton:active {
-  position: relative;
-  top: 1px;
-}
-
 .dashboard {
   background-color: #f1f1f1;
   color: #34455C;
@@ -5857,9 +5754,10 @@ body {
 .dashbord-nav {
   max-height: 40px;
   min-height: 40px;
+  margin-bottom: 0;
 }
 
-.dashbord-nav__primary {
+.dashbord-nav__primary .dashbord-nav__secondary {
   min-height: inherit;
 }
 
@@ -5868,11 +5766,16 @@ body {
 }
 
 .dashbord-nav__secondary {
-  min-height: inherit;
+  display: table;
+}
+.dashbord-nav__secondary span {
+  line-height: 38px;
+  display: table-cell;
+  vertical-align: middle;
 }
 
-.dashbord-nav__secondary--create-new {
-  line-height: 38px;
+.create-user .hillrom-icon {
+  font-weight: 700;
 }
 
 .dashboard__form--label {
@@ -6018,8 +5921,10 @@ body {
 
 .search-icon {
   position: absolute;
-  right: 0;
-  padding: 7px 10px;
+  right: 5px;
+  padding: 0;
+  top: 5px;
+  font-size: 20px;
 }
 
 .dashboard__manage-view--list {
@@ -6136,8 +6041,10 @@ body {
 
 .user-help {
   background-color: #f1f1f1;
-  position: relative;
-  clear: both;
+  position: fixed;
+  right: 0;
+  left: 0;
+  bottom: 40px;
 }
 
 .user-help--container {
@@ -6146,7 +6053,14 @@ body {
 }
 
 .help-icon span {
-  font-size: 100px;
+  font-size: 115px;
+  line-height: 0.5;
+}
+.help-icon .icon-man-with-circle {
+  color: #ef7164;
+}
+.help-icon .icon-tablet-with-circle {
+  color: #83ACE9;
 }
 
 .user-help__desc--heading {
@@ -6164,8 +6078,9 @@ body {
 
 .user-help--close {
   position: absolute;
-  right: 0;
+  right: 10px;
   top: 5px;
+  font-size: 10px;
   cursor: pointer;
 }
 
@@ -6180,82 +6095,6 @@ body {
   font-size: 12px;
   color: #aeb5be;
   position: fixed;
-}
-
-.login {
-  background: url("../images/Hill-Rombackground.jpg") no-repeat scroll center center/cover transparent;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  display: table;
-  height: 100%;
-  position: absolute;
-  width: 100%;
-}
-
-.login--position {
-  left: 25%;
-  position: relative;
-  top: 100px;
-}
-
-.login__cover {
-  margin: 13% 0;
-}
-
-.login__container {
-  height: 100%;
-  padding: 0 15px;
-  display: table;
-  vertical-align: middle;
-}
-
-.login__container__left-section {
-  height: 100%;
-  display: table;
-}
-
-.login__container__left-section--description {
-  vertical-align: middle;
-}
-.login__container__left-section--description.content {
-  float: left;
-  width: 70%;
-  padding-top: 11%;
-}
-.login__container__left-section--description.image {
-  padding: 20px 0;
-  border-right: 1px solid;
-  padding-right: 75px;
-}
-
-.login__container__right-section {
-  height: 100%;
-  display: table;
-}
-
-.login__container__right-section--form {
-  display: table-cell;
-  vertical-align: middle;
-}
-
-.login .login-button {
-  color: #FFF;
-  border: none;
-  padding: 3px 30px;
-  background-color: #9A9A9A;
-  border-radius: 4px;
-  text-transform: uppercase;
-}
-
-.login input::-webkit-input-placeholder {
-  color: #A7A7A7;
-  opacity: 0.6;
-}
-
-#error_msg {
-  color: red;
-  margin-bottom: -8%;
 }
 
 .form__container__authenticate {
@@ -6282,27 +6121,6 @@ body {
 }
 .form__container__authenticate #forgotpwd a {
   color: #585858;
-}
-
-.myButton {
-  background-color: #e4685d;
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
-  border-radius: 4px;
-  display: inline-block;
-  cursor: pointer;
-  color: #ffffff;
-  font-family: Arial;
-  font-size: 15px;
-  padding: 2px 35px;
-  text-decoration: none;
-  text-shadow: 0px 1px 0px #b23e35;
-  float: right;
-}
-
-.myButton:active {
-  position: relative;
-  top: 1px;
 }
 
 .dashboard__auth__form__input {
@@ -6350,6 +6168,13 @@ body {
   -moz-appearance: none;
   text-indent: 1px;
   text-overflow: '';
+}
+
+#passwordStrengthContainer {
+  width: 100%;
+  background-color: #BDBDBD;
+  height: 10px;
+  transition-duration: 0.5s;
 }
 
 /*# sourceMappingURL=main.css.map */

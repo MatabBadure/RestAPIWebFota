@@ -178,7 +178,7 @@ public class UserExtensionResource {
         throws URISyntaxException {
     	String queryString = new StringBuilder("%").append(searchString).append("%").toString();
     	Map<String,Boolean> sortOrder = new HashMap<>();
-    	if(sortBy != null) {
+    	if(sortBy != null  && !sortBy.equals("")) {
     		isAscending =  (isAscending != null)?  isAscending : true;
     		sortOrder.put(sortBy, isAscending);
     	}
@@ -203,7 +203,7 @@ public class UserExtensionResource {
         throws URISyntaxException {
     	String queryString = new StringBuilder("%").append(searchString).append("%").toString();
     	Map<String,Boolean> sortOrder = new HashMap<>();
-    	if(sortBy != null) {
+    	if(sortBy != null  && !sortBy.equals("")) {
     		isAscending =  (isAscending != null) ?  isAscending : true;
     		sortOrder.put(sortBy, isAscending);
     	}

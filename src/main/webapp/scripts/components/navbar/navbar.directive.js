@@ -65,7 +65,7 @@ angular.module('hillromvestApp')
         Auth.signOut().then(function(data) {
           Auth.logout();
           $scope.signOut();
-        }).catch(function(err) {  
+        }).catch(function(err) {
         });
       }
     }
@@ -73,17 +73,20 @@ angular.module('hillromvestApp')
 });
 
 angular.module('hillromvestApp')
-.directive('customPopover', function () {
-  return {
-    restrict: 'A',
-    template: '<span class="padding-right">Jose Rubert</span><span class="hillrom-icon icon-arrow-down"></span>',
-    link: function (scope, el, attrs) {
-      $(el).popover({
-          trigger: 'click',
-          html: true,
-          content: attrs.popoverHtml,
-          placement: attrs.popoverPlacement
-      });
+.directive('navbarPopover', function(Auth, $state, Account, $compile) {
+    return {
+        restrict: 'A',
+        template: "<span id='pop-over-link' class='padding-right'>Jose Rubert</span><span class='hillrom-icon icon-arrow-down'></span>" +
+                  "<span style='display:none' id='pop-over-content'><div><span class='hillrom-icon icon-user-account'></span><span>Account</span></div><div ng-click='logout()'><span class='hillrom-icon icon-logout'></span><span>Logout </span></div></span>",
+        link: function(scope, elements, attrs) {
+            $("#pop-over-link").popover({
+                'placement': 'bottom',
+                'trigger': 'click',
+                'html': true,
+                'content': function() {
+                    return $compile($("#pop-over-content").html())(scope);
+                }
+            });
+        }  
     }
-  };
 });

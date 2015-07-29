@@ -19,6 +19,14 @@ body {
 	margin-bottom: 40px;
 }
 
+a:focus {
+	outline:none;
+}
+
+a::-moz-focus-inner {
+	border:0;
+}
+
 .clr {
 	clear: both;
 }

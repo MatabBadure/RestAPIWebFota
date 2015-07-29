@@ -10,7 +10,7 @@ angular.module('hillromvestApp')
         $scope.doNotMatch = false;
         $scope.alreadyActive = false;
         $scope.authenticate = {};
-        
+
         $scope.formSubmit = function(){
              $scope.submitted  = true;
         }
@@ -21,7 +21,7 @@ angular.module('hillromvestApp')
             $scope.questionsNotLoaded = true;
         });
 
-        $scope.authenticate = function() {
+        $scope.authenticate = function(event) {
         	event.preventDefault();
         	 $scope.error = null;
             if ($scope.authenticate.password !== $scope.authenticate.confirmPassword) {
@@ -64,25 +64,25 @@ angular.module('hillromvestApp')
             if(!x || $scope.div(x) === "")
             {
                 $scope.div(y).style.width = 0 + "%";
-                $scope.div(z).innerHTML = "&nbsp:";                
+                $scope.div(z).innerHTML = "&nbsp:";
                 return false;
             }
             var paswd = $scope.div(x);
             var stren = $scope.div(y);
             var stats = $scope.div(z);
             var years = 0;
-           
+
             var regex = [
                 /^[a-zA-Z]+$/g,
-                /^[a-zA-Z0-9]+$/g,               
+                /^[a-zA-Z0-9]+$/g,
                 /^[a-zA-Z0-9\ \~\!\@\#\$\%\^\&\*\(\)]+$/g,
             ];
-            
+
             var count = [42,52,63,74];
             var color = ["red","gold","lime","darkgreen"];
             var value = ["weak","Good","Strong","Very Strong"];
             var index = 0;
-            
+
             for(index=0; index<regex.length; index++){
                 if(index > regex.length){
                     break;
@@ -93,32 +93,32 @@ angular.module('hillromvestApp')
                 else{
                     continue;
                 }
-                
+
             }
-            
+
             years = $scope.compute_strength(count[index],(paswd.value).length);
-            
+
             if(years>= 1000){
                 stren.style.width = "100%";
                 stren.style.background = color[3];
                 stats.innerHTML = value[3];
-                stats.style.color =  color[3];                 
+                stats.style.color =  color[3];
             }else if(years>=100 && years<1000){
                 stren.style.width = "75%";
                 stren.style.background = color[2];
-                stats.innerHTML = value[2]; 
-                stats.style.color = color[2];               
+                stats.innerHTML = value[2];
+                stats.style.color = color[2];
             }
             else if(years>=10 && years<100){
                 stren.style.width = "50%";
                 stren.style.background = color[1];
-                stats.innerHTML = value[1];  
-                 stats.style.color = color[1];          
+                stats.innerHTML = value[1];
+                 stats.style.color = color[1];
             }else{
                 stren.style.width = "25%";
                 stren.style.background = color[0];
                 stats.innerHTML = value[0];
-                stats.style.color = color[0];                
+                stats.style.color = color[0];
             }
             return false;
         };
@@ -130,7 +130,7 @@ angular.module('hillromvestApp')
             var secondsInAYear = 31557600;
             var permutateRepeat = (Math.pow(x,y) - (x*$scope.factorial(y) - 1));
             var countManyYears = Math.floor(permutateRepeat/(1000000*secondsInAYear));
-            
+
             return countManyYears;
         };
 
@@ -138,14 +138,14 @@ angular.module('hillromvestApp')
             if(x<0){
                 return false;
             }
-            
+
             if(x == 0 ){
                 return 1;
             }
-            
+
             x = Math.floor(x);
             return (x*$scope.factorial(x-1));
-                
+
         };
 
 });

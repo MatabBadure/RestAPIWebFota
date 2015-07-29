@@ -18,7 +18,7 @@
         <div class="alert alert-danger has-error" ng-show="doNotMatch">
           The password and its confirmation do not match!
         </div>
-        <form ng-show="!success" name="form" role="form" novalidate ng-submit="authenticate()" show-validation>
+        <form ng-show="!success" name="form" role="form" novalidate ng-submit="authenticate($event)" show-validation>
           <div class="form-group">
             <label >Choose password*</label>
             <input type="password" class="form-control" name="password" id="passwordBox"
@@ -101,7 +101,7 @@
                 Please agree to Terms and Conditions.
               </p>
             </div>
-          </div> 
+          </div>
           <button type="submit" class="myButton" ng-click="formSubmit()">Reset Password</button>
         </form>
       </div>

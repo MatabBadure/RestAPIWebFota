@@ -51,6 +51,7 @@ angular.module('hillromvestApp')
                 }else{
                   $scope.patientStatus.message = 'Error occured! Please try again';
                 }
+                $scope.reset();
               }).catch(function (response) {
                 $scope.patientStatus.isMessage = true;
                 $scope.patientStatus.message = 'Error occured! Please try again';
@@ -72,6 +73,7 @@ angular.module('hillromvestApp')
                 }else{
                   $scope.patientStatus.message = 'Error occured! Please try again';
                 }
+                $scope.reset();
 
               }).catch(function (response) {
                 $scope.patientStatus.isMessage = true;
@@ -102,8 +104,9 @@ angular.module('hillromvestApp')
           UserService.deleteUser($scope.patient.id).then(function(response) {
             $scope.patientStatus.isMessage = true;
             $scope.patientStatus.message = response.data.message;
+            $scope.reset();
           }).catch(function(response) {
-            $scope.isMessage = true;
+            $scope.patientStatus.isMessage = true;
             if (response.data.message !== undefined) {
               $scope.patientStatus.message = response.data.message;
             }else if(response.data.ERROR !== undefined){
@@ -116,6 +119,14 @@ angular.module('hillromvestApp')
         $scope.cancel = function(){
           $scope.patientStatus.editMode = false;
           $scope.patientStatus.isCreate = false;
+        };
+
+        $scope.reset = function(){
+          $scope.patientStatus.editMode = false;
+          $scope.patientStatus.isCreate = false;
+          $scope.submitted = false;
+          $scope.patient = {};
+          $scope.form.$setPristine();
         }
 
         $scope.getAge = function(selectedDate) {

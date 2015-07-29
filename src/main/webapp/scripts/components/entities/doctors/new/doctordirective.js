@@ -48,13 +48,14 @@ angular.module('hillromvestApp')
           } else {
             // create doctor section
             var data = $scope.doctor;
-            data.title = 'Dr';
             data.role = 'HCP';
 
             UserService.createUser(data).then(function (response) {
               $scope.doctorStatus.isMessage = true;
               $scope.doctorStatus.message = "Doctor created successfully" + " with ID " + response.data.user.id;
               $scope.doctor = " ";
+              $scope.doctorStatus.editMode = false;
+              $scope.doctorStatus.isCreate = false;
             }).catch(function (response) {
               $scope.doctorStatus.isMessage = true;
               if (response.data.message !== undefined) {

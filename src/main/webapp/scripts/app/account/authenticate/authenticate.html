@@ -1,6 +1,6 @@
 <div class="container login">
   <div class="login--position">
-    <div class=" form__container__authenticate  col-md-16 col-lg-16">
+    <div class=" form__container__login  col-md-16 col-lg-16">
       <div class="col-md-6 col-lg-6 ">
         <img src="assets/images/man.svg">
       </div>
@@ -24,10 +24,10 @@
             <input type="password" class="form-control" name="password" id="passwordBox"
             ng-model="authenticate.password" ng-minlength=8 ng-maxlength=50 ng-keyup="passwordStrength()" ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
             <div ng-show="(form.password.$dirty && form.password.$invalid) || submitted">
-              <p class="has-error"
+              <h1 class="has-error"
                 ng-show="form.password.$error.required">
                 Your password is required.
-              </p>
+              </h1>
               <p class="has-error"
                 ng-show="form.password.$error.minlength">
                 Your password is required to be at least 8 characters.

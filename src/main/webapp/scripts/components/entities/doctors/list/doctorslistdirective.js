@@ -7,7 +7,8 @@ angular.module('hillromvestApp')
     restrict: 'E',
     scope: {
       onSelect: '&',
-      onCreate: '&'
+      onCreate: '&',
+      doctorStatus: '=doctorStatus'
     },
     link: function(scope, element, attrs) {
       var doctor = scope.doctor;

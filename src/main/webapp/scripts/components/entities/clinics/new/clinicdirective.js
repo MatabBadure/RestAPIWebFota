@@ -117,6 +117,10 @@ angular.module('hillromvestApp')
             $scope.clinicStatus.isMessage = true;
           });
         };
+        $scope.cancel = function(){
+          $scope.clinicStatus.editMode = false;
+          $scope.clinicStatus.isCreate = false;
+        }
 
         $scope.getParentClinic = function() {
           $scope.clinics = clinicsList;

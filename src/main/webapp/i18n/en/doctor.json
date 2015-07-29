@@ -1,5 +1,6 @@
 {
     "doctor" : {
+        "required-field":"* Required Fields",
         "home": {
             "title": "doctor",
             "createLabel": "Create doctor",
@@ -24,6 +25,7 @@
         "emr-id":   "EMR-ID",
         "mrn-id": "MRN-ID",
         "title": {
+                    "name": "Title",
                     "mr":   "Mr.",
                     "mrs": "Mrs.",
                     "ms": "Ms."

@@ -113,6 +113,10 @@ angular.module('hillromvestApp')
             }
           });
         };
+        $scope.cancel = function(){
+          $scope.patientStatus.editMode = false;
+          $scope.patientStatus.isCreate = false;
+        }
 
         $scope.getAge = function(selectedDate) {
           var currentDate = new Date();

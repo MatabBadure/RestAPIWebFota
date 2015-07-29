@@ -81,6 +81,10 @@ angular.module('hillromvestApp')
             }
           });
         };
+        $scope.cancel = function(){
+          $scope.doctorStatus.editMode = false;
+          $scope.doctorStatus.isCreate = false;
+        }
       }
     };
   });

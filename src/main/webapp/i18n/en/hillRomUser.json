@@ -54,6 +54,7 @@
         "parentClinicId": "ParentClinicId",
         "npiNumber": "NpiNumber",
         "parent": "parent",
-        "submit-button-text": "submit"
+        "submit-button-text": "submit",
+        "required-field": "* Required Fields"
     }
 }

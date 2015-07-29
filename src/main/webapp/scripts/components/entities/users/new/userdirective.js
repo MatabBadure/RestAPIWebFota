@@ -95,6 +95,11 @@ angular.module('hillromvestApp')
           });
         };
 
+        $scope.cancel = function(){
+           $scope.userStatus.isCreate = false;
+           $scope.userStatus.editMode = false;
+        }
+
         /**
          * @ngdoc function
          * @name editUser

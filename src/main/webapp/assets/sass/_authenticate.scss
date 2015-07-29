@@ -8,7 +8,6 @@
 	}
 
 	input {
-		margin: 8% 0;
 		border-radius: 0;
 		border: 1px solid #CECEF6;
 	}
@@ -81,4 +80,40 @@
 	background-color: #BDBDBD;
 	height: 10px;
 	transition-duration: 0.5s;
+}
+
+
+.form__container__authenticate {
+  background-color: rgba(255,255,255,0.7);
+  padding: 10% 5%;
+  // padding: 5% 15px;
+  img {
+    height: 200px;
+    display: block;
+    margin: 0 auto;
+  }
+
+  input {
+    margin: 8% 0;
+    border-radius: 0;
+    border: 1px solid #CECEF6;
+  }
+
+  p {
+    text-align: center;
+    color: #5858FA;
+  }
+  
+  a {
+    font-weight: 100;
+    color: #ffffff;
+  }
+
+  .link {
+    display: inline-block;
+  }
+
+  #forgotpwd a {
+    color: #585858;
+  }
 }

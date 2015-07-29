@@ -7,7 +7,8 @@ angular.module('hillromvestApp')
     restrict: 'E',
     scope: {
       onSelect: '&',
-      onCreate: '&'
+      onCreate: '&',
+      clinicStatus: '=clinicStatus'
     },
     link: function(scope) {
       var clinic = scope.clinic;
@@ -20,6 +21,7 @@ angular.module('hillromvestApp')
         $scope.pageCount = 0;
         $scope.total = 0;
         $scope.clinics = [];
+        $scope.sortOption ="";
         $scope.searchClinics();
       };
 
@@ -54,7 +56,7 @@ angular.module('hillromvestApp')
             $scope.currentPageIndex++;
           }
         }
-        ClinicService.getClinics($scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
+        ClinicService.getClinics($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
           $scope.clinics = response.data;
           $scope.total = response.headers()['x-total-count'];
           $scope.pageCount = Math.ceil($scope.total / 10);

@@ -90,6 +90,8 @@ angular.module('hillromvestApp')
               $scope.clinicStatus.isMessage = true;
               $scope.clinicStatus.message = "Clinic created successfully" + " with ID " + data.data.Clinic.id;
               $scope.clinic = "";
+              $scope.clinicStatus.editMode = false;
+              $scope.clinicStatus.isCreate = false;
             }).catch(function(response) {
               if (response.data.message !== undefined) {
                 $scope.clinicStatus.message = response.data.message;

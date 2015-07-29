@@ -7,7 +7,8 @@ angular.module('hillromvestApp')
       restrict: 'E',
       scope: {
         onSelect: '&',
-        onCreate: '&'
+        onCreate: '&',
+        patientStatus: '=patientStatus'
       },
       link: function(scope, element, attrs) {
         var patient = scope.patient;
@@ -22,9 +23,9 @@ angular.module('hillromvestApp')
           $scope.pageCount = 0;
           $scope.total = 0;
           $scope.noMatchFound = false;
+          $scope.sortOption ="";
+          $scope.searchPatients();
         };
-
-        $scope.init();
 
         var timer = false;
         $scope.$watch('searchItem', function() {
@@ -33,11 +34,7 @@ angular.module('hillromvestApp')
           }
           timer = $timeout(function() {
             if ($scope.searchItem) {
-              PatientService.getPatientList($scope.searchItem, 1, 10).then(function(response) {
-                $scope.patients = response.data;
-              }).catch(function(response) {
-
-              });
+              $scope.searchPatients();
             } else {
               $scope.patients = [];
             }
@@ -69,7 +66,8 @@ angular.module('hillromvestApp')
           } else {
             $scope.currentPageIndex = 1;
           }
-          PatientService.getPatientList($scope.searchItem, $scope.currentPageIndex, $scope.perPageCount)
+          var url = 'api/patientInfos/search?searchString=';
+          UserService.getUsers(url,$scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount)
             .then(function(response) {
               $scope.patients = response.data;
               $scope.total = response.headers()['x-total-count'];
@@ -78,6 +76,7 @@ angular.module('hillromvestApp')
               $scope.noMatchFound = true;
             });
         }
+        $scope.init();
       }
     };
   });

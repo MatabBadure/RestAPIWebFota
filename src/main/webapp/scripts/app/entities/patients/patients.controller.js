@@ -22,7 +22,8 @@ angular.module('hillromvestApp')
 		'role':localStorage.getItem('role'),
 		'editMode':false,
 		'isCreate':false,
-		'isMessage':false
+		'isMessage':false,
+		'message': ''
 	};
 	$scope.selectedPatient = function(patient) {
 		$scope.patientStatus.editMode = true;
@@ -34,7 +35,7 @@ angular.module('hillromvestApp')
 			$scope.patient.formatedDOB = dateArr[1]+"/"+dateArr[2]+"/"+dateArr[0];
 		}
 		$scope.patient.zipcode = $scope.patient.zipCode;
-		
+
 	};
 
 	$scope.createPatient = function(){

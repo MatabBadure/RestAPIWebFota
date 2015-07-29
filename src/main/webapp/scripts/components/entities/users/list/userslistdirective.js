@@ -13,7 +13,8 @@ angular.module('hillromvestApp')
       restrict: 'E',
       scope: {
         onSelect: '&',
-        onCreate: '&'
+        onCreate: '&',
+        userStatus: '=userStatus'
       },
       link: function(scope) {
         var user = scope.user;

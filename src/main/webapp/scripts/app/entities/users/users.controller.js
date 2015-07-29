@@ -18,5 +18,6 @@ angular.module('hillromvestApp')
 
     $scope.createUser = function () {
       $scope.userStatus.isCreate = true;
+      $scope.userStatus.isMessage = false;
     };
   });

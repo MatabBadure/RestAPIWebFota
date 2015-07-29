@@ -1,3 +1,4 @@
+
 <div class="navbar dashboard dashbord-nav">
     <div class="container">
       <div class="dashbord-nav__primary pull-left">
@@ -9,6 +10,7 @@
         <span class="hillrom-icon icon-plus-icon"></span>
       </div>
     </div>
+    <span ng-show="userStatus.isMessage">{{userStatus.message}}</span>
   </div>
   <div class="dashboard dashboard--content">
     <div class="container dashboard__manage-view margin-top-xl">

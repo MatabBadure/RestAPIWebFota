@@ -42,7 +42,7 @@ angular.module('hillromvestApp')
               var data = $scope.patient;
               data.dob = data.formatedDOB;
               data.role = 'PATIENT';
-             
+
               UserService.editUser($scope.patient,data).then(function (response) {
                 if(response.status == '200')
                 {
@@ -61,12 +61,14 @@ angular.module('hillromvestApp')
               // create patient section
               var data = $scope.patient;
               data.role = 'PATIENT';
-              
+
               UserService.createUser(data).then(function (response) {
                 if(response.status == '201')
                 {
                   $scope.patientStatus.isMessage = true;
                   $scope.patientStatus.message = "Patient created successfully"+" with ID "+response.data.user.id;
+                  $scope.patientStatus.editMode = false;
+                  $scope.patientStatus.isCreate = false;
                 }else{
                   $scope.patientStatus.message = 'Error occured! Please try again';
                 }

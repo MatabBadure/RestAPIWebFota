@@ -6,5 +6,5 @@
 
 			
 	<div ng-show="!userStatus.editMode && !userStatus.isCreate">
-		<user-list on-select="selectedUser(user)" on-create="createUser()"></user-list>
+		<user-list on-select="selectedUser(user)" on-create="createUser()" user-status="userStatus"></user-list>
 	</div>

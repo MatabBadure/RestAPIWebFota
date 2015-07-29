@@ -22,40 +22,38 @@
               ng-model="resetAccount.email"  ng-maxlength=100 required>
               <div ng-show="(form.email.$dirty && form.email.$invalid) || submitted">
                 <p class="has-error"
-                ng-show="form.email.$error.required" translate="global.messages.validate.email.required">
-                Your e-mail is required.
-              </p>
-              <p class="has-error"
-              ng-show="form.email.$error.email" translate="global.messages.validate.email.invalid">
-              Your e-mail is invalid.
+                  ng-show="form.email.$error.required" translate="global.messages.validate.email.required">
+                  Your e-mail is required.
+                </p>
+                <p class="has-error"
+                  ng-show="form.email.$error.email" translate="global.messages.validate.email.invalid">
+                  Your e-mail is invalid.
+                </p>
+                <p class="has-error"
+                  ng-show="form.email.$error.maxlength" translate="global.messages.validate.email.maxlength">
+                  Your e-mail cannot be longer than 100 characters.
+                </p>
+              </div>
+            </div>     
+
+            <p class="help-block"
+              ng-show="captchaError">
+              Please verify again you are not a robot.
             </p>
-            <p class="has-error"
-            ng-show="form.email.$error.maxlength" translate="global.messages.validate.email.maxlength">
-            Your e-mail cannot be longer than 100 characters.
-          </p>
+            <div  ng-show="showCaptcha">
+             <div vc-recaptcha
+               theme="'light'"
+               key="siteKey"
+               on-create="setWidgetId(widgetId)"
+               on-success="setResponse(response)">
+             </div>
+            </div>
+             <div class="col-md-8 col-lg-8 link"><a translate="reset.request.form.button" ng-click="requestReset()" class="myButton">LOGIN</a></div>
+          </form>
         </div>
-
-      </div>     
-
-      <p class="help-block"
-      ng-show="captchaError">
-      Please verify again you are not a robot.
-    </p>
-    <div  ng-show="showCaptcha">
-     <div vc-recaptcha
-     theme="'light'"
-     key="siteKey"
-     on-create="setWidgetId(widgetId)"
-     on-success="setResponse(response)">
-   </div>
-
- </div>
- <div class="col-md-8 col-lg-8 link"><a translate="reset.request.form.button" ng-click="requestReset()" class="myButton">LOGIN</a></div>
-</form>
-</div>
-</div>
-</div>
-</div>
+      </div>
+    </div>
+  </div>
 
 
 

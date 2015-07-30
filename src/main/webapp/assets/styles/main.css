@@ -6154,6 +6154,17 @@ a::-moz-focus-inner {
   border-right: 1px solid #dbdbdb;
 }
 
+.multi-clinic {
+  position: relative;
+}
+.multi-clinic span {
+  position: absolute;
+  padding: 5px;
+  cursor: pointer;
+  right: 0;
+  top: 4px;
+}
+
 .footer {
   min-height: 40px;
   background-color: #34455C;

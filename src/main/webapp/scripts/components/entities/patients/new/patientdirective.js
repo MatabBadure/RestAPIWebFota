@@ -140,20 +140,20 @@ angular.module('hillromvestApp')
         $scope.getAge = function(selectedDate) {
           var currentDate = new Date();
           var selectedDate = selectedDate;
-          var diff = currentDate - selectedDate;
-          var years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+          var years = currentDate.getFullYear() - selectedDate.getFullYear();
           var age = 0;
-          age = parseInt(parseInt(years) + 1);
-          if (diff < 0) {
+          age = years;
+          if(years == 0){
+            age = 1;
+          }
+          if (years < 0) {
             age = 0;
           };
           return age;
         }
-        angular.element("#dp2").datepicker({
-          maxDate: new Date
-        });
-        angular.element('#dp2').on('changeDate', function(ev) {
-          var selectedDate = new Date($(this).val());
+
+        angular.element('#dp2').datepicker().on('changeDate', function(ev) {
+          var selectedDate = angular.element('#dp2').datepicker("getDate");
           $scope.patient.dob = selectedDate.getMonth() + "/" + selectedDate.getDate() + "/" + selectedDate.getFullYear();
           var age = $scope.getAge(selectedDate);
           angular.element('.age').val(age);

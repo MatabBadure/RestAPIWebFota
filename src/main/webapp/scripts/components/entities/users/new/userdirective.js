@@ -99,8 +99,7 @@ angular.module('hillromvestApp')
         };
 
         $scope.cancel = function(){
-           $scope.userStatus.isCreate = false;
-           $scope.userStatus.editMode = false;
+          $scope.reset();
         };
 
         $scope.reset = function(){

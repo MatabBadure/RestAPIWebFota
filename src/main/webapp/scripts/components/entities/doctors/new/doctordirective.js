@@ -112,13 +112,11 @@ angular.module('hillromvestApp')
             }
           });
         };
-        $scope.cancel = function(){
-          $scope.doctorStatus.editMode = false;
-          $scope.doctorStatus.isCreate = false;
+        $scope.cancel = function () {
           $scope.reset();
         };
 
-        $scope.reset = function(){
+        $scope.reset = function () {
           $scope.doctorStatus.editMode = false;
           $scope.doctorStatus.isCreate = false;
           $scope.submitted = false;

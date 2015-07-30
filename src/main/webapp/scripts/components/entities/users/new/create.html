@@ -1,4 +1,4 @@
-<span ng-show="userStatus.isMessage">{{userStatus.message}}</span>
+
 <div class="navbar dashboard dashbord-nav">
   <div class="container">
     <div class="dashbord-nav__primary secondary-fix-navbar pull-left">
@@ -8,6 +8,7 @@
       <span class="dashbord-nav__secondary--create-new" translate=""></span>
     </div>
   </div>
+  <span ng-show="userStatus.isMessage">{{userStatus.message}}</span>
 </div>
 <div class="dashboard dashboard--content padding-bottom-ls">
   <form name="form" ng-submit="createUser()" novalidate>

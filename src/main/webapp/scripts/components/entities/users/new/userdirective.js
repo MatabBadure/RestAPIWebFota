@@ -49,6 +49,8 @@ angular.module('hillromvestApp')
               $scope.userStatus.isMessage = true;
               if (response.data.message !== undefined) {
                 $scope.userStatus.message = response.data.message;
+              }else if(response.data.ERROR !== undefined){
+                $scope.userStatus.message = response.data.ERROR;
               } else {
                 $scope.userStatus.message = 'Error occured! Please try again';
               }
@@ -61,9 +63,11 @@ angular.module('hillromvestApp')
                $scope.reset();
 
             }).catch(function (response) {
-              $scope.isMessage = true;
+              $scope.userStatus.isMessage = true;
               if (response.data.message !== undefined) {
                 $scope.userStatus.message = response.data.message;
+              }else if(response.data.ERROR !== undefined){
+                $scope.userStatus.message = response.data.ERROR;
               } else {
                 $scope.userStatus.message = 'Error occured! Please try again';
               }
@@ -86,8 +90,10 @@ angular.module('hillromvestApp')
             $scope.userStatus.isMessage = true;
             if (response.data.message !== undefined) {
               $scope.userStatus.message = response.data.message;
-            } else {
-              $scope.userStatus.message = 'Error occured! Please try again';
+            }else if(response.data.ERROR !== undefined){
+              $scope.userStatus.message = response.data.ERROR;
+            }else {
+            $scope.userStatus.message = 'Error occured! Please try again';
             }
           });
         };

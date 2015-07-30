@@ -61,8 +61,10 @@ angular.module('hillromvestApp')
               $scope.reset();
             }).catch(function (response) {
               $scope.doctorStatus.isMessage = true;
-              if (response.data.message !== undefined) {
-                $scope.doctorStatus.message = response.data.message;
+             if (response.data.message !== undefined) {
+              $scope.doctorStatus.message = response.data.message;
+              }else if(response.data.ERROR !== undefined){
+                $scope.doctorStatus.message = response.data.ERROR;
               } else {
                 $scope.doctorStatus.message = 'Error occured! Please try again';
               }
@@ -77,9 +79,10 @@ angular.module('hillromvestApp')
               $scope.doctorStatus.message = "Doctor created successfully" + " with ID " + response.data.user.id;
               $scope.reset();
             }).catch(function (response) {
-              $scope.doctorStatus.isMessage = true;
               if (response.data.message !== undefined) {
-                $scope.doctorStatus.message = response.data.message;
+              $scope.doctorStatus.message = response.data.message;
+              }else if(response.data.ERROR !== undefined){
+                $scope.doctorStatus.message = response.data.ERROR;
               } else {
                 $scope.doctorStatus.message = 'Error occured! Please try again';
               }
@@ -95,7 +98,9 @@ angular.module('hillromvestApp')
           }).catch(function (response) {
             $scope.doctorStatus.isMessage = true;
             if (response.data.message !== undefined) {
-              $scope.doctorStatus.message = response.data.message;
+            $scope.doctorStatus.message = response.data.message;
+            }else if(response.data.ERROR !== undefined){
+              $scope.doctorStatus.message = response.data.ERROR;
             } else {
               $scope.doctorStatus.message = 'Error occured! Please try again';
             }

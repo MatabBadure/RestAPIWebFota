@@ -72,7 +72,7 @@ angular.module('hillromvestApp')
         }
       }
       else{
-        $scope.otherError = true;
+       $scope.authenticationError = true;
       }
     });
   };

@@ -134,3 +134,14 @@ a::-moz-focus-inner {
 .cursor-pointer {
 	cursor: pointer;
 }
+
+.form-control::-moz-placeholder {
+  color: $alto;
+  opacity: 1;
+}
+.form-control:-ms-input-placeholder {
+  color: $alto;
+}
+.form-control::-webkit-input-placeholder {
+  color: $alto;
+}

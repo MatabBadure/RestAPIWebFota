@@ -5508,6 +5508,19 @@ a::-moz-focus-inner {
   cursor: pointer;
 }
 
+.form-control::-moz-placeholder {
+  color: #D6DADE;
+  opacity: 1;
+}
+
+.form-control:-ms-input-placeholder {
+  color: #D6DADE;
+}
+
+.form-control::-webkit-input-placeholder {
+  color: #D6DADE;
+}
+
 .navbar-default {
   background-color: #34455C;
   color: #aeb5be;

@@ -1,27 +1,41 @@
 package com.hillrom.vest.domain;
 
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.Type;
+import org.joda.time.DateTime;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.util.CustomDateTimeDeserializer;
 import com.hillrom.vest.domain.util.CustomDateTimeSerializer;
-import org.hibernate.annotations.Type;
-import org.joda.time.DateTime;
-
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Objects;
-
 
 /**
- * A PatientVestDeviceRawLog.
+ * A PATIENT_VEST_DEVICE_RAW_LOGS.
  */
+@IdClass(PatientVestDeviceRawLogPK.class)
 @Entity
-@Table(name = "PATIENTVESTDEVICERAWLOG")
+@Table(name = "PATIENT_VEST_DEVICE_RAW_LOGS")
 public class PatientVestDeviceRawLog implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+
+	@NotNull
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @Column(name = "hub_receive_time", nullable = false)
+    private Long hubReceiveTime;
+
+    @NotNull
+    @Id
+    @Column(name = "device_address", nullable = false)
+    private String deviceAddress;
 
     @Column(name = "device_model_type")
     private String deviceModelType;
@@ -29,8 +43,8 @@ public class PatientVestDeviceRawLog implements Serializable {
     @Column(name = "device_data")
     private String deviceData;
 
-    @Column(name = "device_serial_no")
-    private String deviceSerialNo;
+    @Column(name = "device_serial_number")
+    private String deviceSerialNumber;
 
     @Column(name = "device_type")
     private String deviceType;
@@ -44,26 +58,12 @@ public class PatientVestDeviceRawLog implements Serializable {
     @Column(name = "customer_name")
     private String customerName;
 
-    @Column(name = "time_zone")
-    private String timeZone;
+    @Column(name = "timezone")
+    private String timezone;
 
-    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-    @JsonSerialize(using = CustomDateTimeSerializer.class)
-    @JsonDeserialize(using = CustomDateTimeDeserializer.class)
-    @Column(name = "sp_receive_time")
-    private DateTime spReceiveTime;
-
-    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-    @JsonSerialize(using = CustomDateTimeSerializer.class)
-    @JsonDeserialize(using = CustomDateTimeDeserializer.class)
-    @Column(name = "hub_receive_time")
-    private DateTime hubReceiveTime;
-
-    @Column(name = "device_address")
-    private String deviceAddress;
-
-    @Column(name = "hub_receive_time_offset")
-    private Integer hubReceiveTimeOffset;
+    @NotNull
+    @Column(name = "sp_receive_time", nullable = false)
+    private Long spReceiveTime;
 
     @Column(name = "cuc_version")
     private String cucVersion;
@@ -74,186 +74,164 @@ public class PatientVestDeviceRawLog implements Serializable {
     @Column(name = "raw_message")
     private String rawMessage;
 
-    @Column(name = "raw_hexa_data")
-    private String rawHexaData;
+	public Long getHubReceiveTime() {
+		return hubReceiveTime;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public void setHubReceiveTime(Long hubReceiveTime) {
+		this.hubReceiveTime = hubReceiveTime;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public String getDeviceAddress() {
+		return deviceAddress;
+	}
 
-    public String getDeviceModelType() {
-        return deviceModelType;
-    }
+	public void setDeviceAddress(String deviceAddress) {
+		this.deviceAddress = deviceAddress;
+	}
 
-    public void setDeviceModelType(String deviceModelType) {
-        this.deviceModelType = deviceModelType;
-    }
+	public String getDeviceModelType() {
+		return deviceModelType;
+	}
 
-    public String getDeviceData() {
-        return deviceData;
-    }
+	public void setDeviceModelType(String deviceModelType) {
+		this.deviceModelType = deviceModelType;
+	}
 
-    public void setDeviceData(String deviceData) {
-        this.deviceData = deviceData;
-    }
+	public String getDeviceData() {
+		return deviceData;
+	}
 
-    public String getDeviceSerialNo() {
-        return deviceSerialNo;
-    }
+	public void setDeviceData(String deviceData) {
+		this.deviceData = deviceData;
+	}
 
-    public void setDeviceSerialNo(String deviceSerialNo) {
-        this.deviceSerialNo = deviceSerialNo;
-    }
+	public String getDeviceSerialNumber() {
+		return deviceSerialNumber;
+	}
 
-    public String getDeviceType() {
-        return deviceType;
-    }
+	public void setDeviceSerialNumber(String deviceSerialNumber) {
+		this.deviceSerialNumber = deviceSerialNumber;
+	}
 
-    public void setDeviceType(String deviceType) {
-        this.deviceType = deviceType;
-    }
+	public String getDeviceType() {
+		return deviceType;
+	}
 
-    public String getHubId() {
-        return hubId;
-    }
+	public void setDeviceType(String deviceType) {
+		this.deviceType = deviceType;
+	}
 
-    public void setHubId(String hubId) {
-        this.hubId = hubId;
-    }
+	public String getHubId() {
+		return hubId;
+	}
 
-    public String getAirInterfaceType() {
-        return airInterfaceType;
-    }
+	public void setHubId(String hubId) {
+		this.hubId = hubId;
+	}
 
-    public void setAirInterfaceType(String airInterfaceType) {
-        this.airInterfaceType = airInterfaceType;
-    }
+	public String getAirInterfaceType() {
+		return airInterfaceType;
+	}
 
-    public String getCustomerName() {
-        return customerName;
-    }
+	public void setAirInterfaceType(String airInterfaceType) {
+		this.airInterfaceType = airInterfaceType;
+	}
 
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
-    }
+	public String getCustomerName() {
+		return customerName;
+	}
 
-    public String getTimeZone() {
-        return timeZone;
-    }
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
 
-    public void setTimeZone(String timeZone) {
-        this.timeZone = timeZone;
-    }
+	public String getTimezone() {
+		return timezone;
+	}
 
-    public DateTime getSpReceiveTime() {
-        return spReceiveTime;
-    }
+	public void setTimezone(String timezone) {
+		this.timezone = timezone;
+	}
 
-    public void setSpReceiveTime(DateTime spReceiveTime) {
-        this.spReceiveTime = spReceiveTime;
-    }
+	public Long getSpReceiveTime() {
+		return spReceiveTime;
+	}
 
-    public DateTime getHubReceiveTime() {
-        return hubReceiveTime;
-    }
+	public void setSpReceiveTime(Long spReceiveTime) {
+		this.spReceiveTime = spReceiveTime;
+	}
 
-    public void setHubReceiveTime(DateTime hubReceiveTime) {
-        this.hubReceiveTime = hubReceiveTime;
-    }
+	public String getCucVersion() {
+		return cucVersion;
+	}
 
-    public String getDeviceAddress() {
-        return deviceAddress;
-    }
+	public void setCucVersion(String cucVersion) {
+		this.cucVersion = cucVersion;
+	}
 
-    public void setDeviceAddress(String deviceAddress) {
-        this.deviceAddress = deviceAddress;
-    }
+	public String getCustomerId() {
+		return customerId;
+	}
 
-    public Integer getHubReceiveTimeOffset() {
-        return hubReceiveTimeOffset;
-    }
+	public void setCustomerId(String customerId) {
+		this.customerId = customerId;
+	}
 
-    public void setHubReceiveTimeOffset(Integer hubReceiveTimeOffset) {
-        this.hubReceiveTimeOffset = hubReceiveTimeOffset;
-    }
+	public String getRawMessage() {
+		return rawMessage;
+	}
 
-    public String getCucVersion() {
-        return cucVersion;
-    }
+	public void setRawMessage(String rawMessage) {
+		this.rawMessage = rawMessage;
+	}
 
-    public void setCucVersion(String cucVersion) {
-        this.cucVersion = cucVersion;
-    }
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((deviceAddress == null) ? 0 : deviceAddress.hashCode());
+		result = prime * result
+				+ ((hubReceiveTime == null) ? 0 : hubReceiveTime.hashCode());
+		return result;
+	}
 
-    public String getCustomerId() {
-        return customerId;
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PatientVestDeviceRawLog other = (PatientVestDeviceRawLog) obj;
+		if (deviceAddress == null) {
+			if (other.deviceAddress != null)
+				return false;
+		} else if (!deviceAddress.equals(other.deviceAddress))
+			return false;
+		if (hubReceiveTime == null) {
+			if (other.hubReceiveTime != null)
+				return false;
+		} else if (!hubReceiveTime.equals(other.hubReceiveTime))
+			return false;
+		return true;
+	}
 
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
-    }
+	@Override
+	public String toString() {
+		return "PatientVestDeviceRawLog [hubReceiveTime=" + hubReceiveTime
+				+ ", deviceAddress=" + deviceAddress + ", deviceModelType="
+				+ deviceModelType + ", deviceData=" + deviceData
+				+ ", deviceSerialNumber=" + deviceSerialNumber
+				+ ", deviceType=" + deviceType + ", hubId=" + hubId
+				+ ", airInterfaceType=" + airInterfaceType + ", customerName="
+				+ customerName + ", timezone=" + timezone + ", spReceiveTime="
+				+ spReceiveTime + ", cucVersion=" + cucVersion
+				+ ", customerId=" + customerId + ", rawMessage=" + rawMessage
+				+ "]";
+	}
 
-    public String getRawMessage() {
-        return rawMessage;
-    }
-
-    public void setRawMessage(String rawMessage) {
-        this.rawMessage = rawMessage;
-    }
-
-    public String getRawHexaData() {
-        return rawHexaData;
-    }
-
-    public void setRawHexaData(String rawHexaData) {
-        this.rawHexaData = rawHexaData;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        PatientVestDeviceRawLog patientVestDeviceRawLog = (PatientVestDeviceRawLog) o;
-
-        if ( ! Objects.equals(id, patientVestDeviceRawLog.id)) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
-
-    @Override
-    public String toString() {
-        return "PatientVestDeviceRawLog{" +
-                "id=" + id +
-                ", deviceModelType='" + deviceModelType + "'" +
-                ", deviceData='" + deviceData + "'" +
-                ", deviceSerialNo='" + deviceSerialNo + "'" +
-                ", deviceType='" + deviceType + "'" +
-                ", hubId='" + hubId + "'" +
-                ", airInterfaceType='" + airInterfaceType + "'" +
-                ", customerName='" + customerName + "'" +
-                ", timeZone='" + timeZone + "'" +
-                ", spReceiveTime='" + spReceiveTime + "'" +
-                ", hubReceiveTime='" + hubReceiveTime + "'" +
-                ", deviceAddress='" + deviceAddress + "'" +
-                ", hubReceiveTimeOffset='" + hubReceiveTimeOffset + "'" +
-                ", cucVersion='" + cucVersion + "'" +
-                ", customerId='" + customerId + "'" +
-                ", rawMessage='" + rawMessage + "'" +
-                ", rawHexaData='" + rawHexaData + "'" +
-                '}';
-    }
+	
 }

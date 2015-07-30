@@ -14,58 +14,59 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * REST controller for managing PatientVestDeviceRawLog.
+ * REST controller for managing PatientVestDeviceRawLogs.
  */
 @RestController
 @RequestMapping("/api")
 public class PatientVestDeviceRawLogResource {
 
-    private final Logger log = LoggerFactory.getLogger(PatientVestDeviceRawLogResource.class);
+/*    private final Logger log = LoggerFactory.getLogger(PatientVestDeviceRawLogResource.class);
 
     @Inject
-    private PatientVestDeviceRawLogRepository patientVestDeviceRawLogRepository;
+    private PatientVestDeviceRawLogRepository patientVestDeviceRawLogsRepository;
 
-    /**
-     * POST  /patientVestDeviceRawLogs -> Create a new patientVestDeviceRawLog.
-     */
+    *//**
+     * POST  /patientVestDeviceRawLogs -> Create a new patientVestDeviceRawLogs.
+     *//*
     @RequestMapping(value = "/patientVestDeviceRawLogs",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Void> create(@RequestBody PatientVestDeviceRawLog patientVestDeviceRawLog) throws URISyntaxException {
-        log.debug("REST request to save PatientVestDeviceRawLog : {}", patientVestDeviceRawLog);
-        if (patientVestDeviceRawLog.getId() != null) {
-            return ResponseEntity.badRequest().header("Failure", "A new patientVestDeviceRawLog cannot already have an ID").build();
+    public ResponseEntity<Void> create(@Valid @RequestBody PatientVestDeviceRawLog patientVestDeviceRawLogs) throws URISyntaxException {
+        log.debug("REST request to save PATIENT_VEST_DEVICE_RAW_LOGS : {}", patientVestDeviceRawLogs);
+        if (patientVestDeviceRawLogs.getId() != null) {
+            return ResponseEntity.badRequest().header("Failure", "A new pATIENT_VEST_DEVICE_RAW_LOGS cannot already have an ID").build();
         }
-        patientVestDeviceRawLogRepository.save(patientVestDeviceRawLog);
-        return ResponseEntity.created(new URI("/api/patientVestDeviceRawLogs/" + patientVestDeviceRawLog.getId())).build();
+        patientVestDeviceRawLogsRepository.save(patientVestDeviceRawLogs);
+        return ResponseEntity.created(new URI("/api/patientVestDeviceRawLogs/" + patientVestDeviceRawLogs.getId())).build();
     }
 
-    /**
-     * PUT  /patientVestDeviceRawLogs -> Updates an existing patientVestDeviceRawLog.
-     */
+    *//**
+     * PUT  /patientVestDeviceRawLogs -> Updates an existing PatientVestDeviceRawLogs.
+     *//*
     @RequestMapping(value = "/patientVestDeviceRawLogs",
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Void> update(@RequestBody PatientVestDeviceRawLog patientVestDeviceRawLog) throws URISyntaxException {
-        log.debug("REST request to update PatientVestDeviceRawLog : {}", patientVestDeviceRawLog);
-        if (patientVestDeviceRawLog.getId() == null) {
-            return create(patientVestDeviceRawLog);
+    public ResponseEntity<Void> update(@Valid @RequestBody PatientVestDeviceRawLog patientVestDeviceRawLogs) throws URISyntaxException {
+        log.debug("REST request to update PatientVestDeviceRawLogs : {}", patientVestDeviceRawLogs);
+        if (patientVestDeviceRawLogs.getId() == null) {
+            return create(patientVestDeviceRawLogs);
         }
-        patientVestDeviceRawLogRepository.save(patientVestDeviceRawLog);
+        patientVestDeviceRawLogsRepository.save(patientVestDeviceRawLogs);
         return ResponseEntity.ok().build();
     }
 
-    /**
+    *//**
      * GET  /patientVestDeviceRawLogs -> get all the patientVestDeviceRawLogs.
-     */
+     *//*
     @RequestMapping(value = "/patientVestDeviceRawLogs",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -73,36 +74,36 @@ public class PatientVestDeviceRawLogResource {
     public ResponseEntity<List<PatientVestDeviceRawLog>> getAll(@RequestParam(value = "page" , required = false) Integer offset,
                                   @RequestParam(value = "per_page", required = false) Integer limit)
         throws URISyntaxException {
-        Page<PatientVestDeviceRawLog> page = patientVestDeviceRawLogRepository.findAll(PaginationUtil.generatePageRequest(offset, limit));
+        Page<PatientVestDeviceRawLog> page = patientVestDeviceRawLogsRepository.findAll(PaginationUtil.generatePageRequest(offset, limit));
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/patientVestDeviceRawLogs", offset, limit);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
-    /**
-     * GET  /patientVestDeviceRawLogs/:id -> get the "id" patientVestDeviceRawLog.
-     */
+    *//**
+     * GET  /patientVestDeviceRawLogs/:id -> get the "id" patientVestDeviceRawLogs.
+     *//*
     @RequestMapping(value = "/patientVestDeviceRawLogs/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<PatientVestDeviceRawLog> get(@PathVariable Long id) {
-        log.debug("REST request to get PatientVestDeviceRawLog : {}", id);
-        return Optional.ofNullable(patientVestDeviceRawLogRepository.findOne(id))
-            .map(patientVestDeviceRawLog -> new ResponseEntity<>(
-                patientVestDeviceRawLog,
+        log.debug("REST request to get PatientVestDeviceRawLogs : {}", id);
+        return Optional.ofNullable(patientVestDeviceRawLogsRepository.findOne(id))
+            .map(pATIENT_VEST_DEVICE_RAW_LOGS -> new ResponseEntity<>(
+                pATIENT_VEST_DEVICE_RAW_LOGS,
                 HttpStatus.OK))
             .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    /**
-     * DELETE  /patientVestDeviceRawLogs/:id -> delete the "id" patientVestDeviceRawLog.
-     */
+    *//**
+     * DELETE  /patientVestDeviceRawLogs/:id -> delete the "id" patientVestDeviceRawLogs.
+     *//*
     @RequestMapping(value = "/patientVestDeviceRawLogs/{id}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public void delete(@PathVariable Long id) {
-        log.debug("REST request to delete PatientVestDeviceRawLog : {}", id);
-        patientVestDeviceRawLogRepository.delete(id);
-    }
+        log.debug("REST request to delete PatientVestDeviceRawLogs : {}", id);
+        patientVestDeviceRawLogsRepository.delete(id);
+    }*/
 }

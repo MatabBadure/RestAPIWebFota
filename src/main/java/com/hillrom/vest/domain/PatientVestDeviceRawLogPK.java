@@ -2,25 +2,21 @@ package com.hillrom.vest.domain;
 
 import java.io.Serializable;
 
-import javax.persistence.Embeddable;
-
-import org.joda.time.DateTime;
-
 
 public class PatientVestDeviceRawLogPK implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-    private DateTime hubReceiveTime;
+    private Long hubReceiveTime;
 
     private String deviceAddress;
 
-	public DateTime getHubReceiveTime() {
+	public Long getHubReceiveTime() {
 		return hubReceiveTime;
 	}
 
-	public void setHubReceiveTime(DateTime hubReceiveTime) {
-		this.hubReceiveTime = new DateTime(hubReceiveTime.getMillis());
+	public void setHubReceiveTime(Long hubReceiveTime) {
+		this.hubReceiveTime = hubReceiveTime;
 	}
 
 	public String getDeviceAddress() {

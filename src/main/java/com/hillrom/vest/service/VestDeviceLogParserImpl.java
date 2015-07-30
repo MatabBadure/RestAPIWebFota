@@ -14,7 +14,6 @@ import com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants;
 import com.hillrom.vest.config.VestDeviceRawLogOffsetConstants;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
-import com.hillrom.vest.domain.PatientVestDeviceRawLogPK;
 import com.hillrom.vest.service.util.ParserUtil;
 
 @Component
@@ -36,8 +35,8 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 		patientVestDeviceRawLog.setDeviceAddress(ParserUtil.getValueFromMessage(
 				base64String,
 				PatientVestDeviceRawLogModelConstants.DEVICE_ADDRESS));
-		patientVestDeviceRawLog.setHubReceiveTime(getTimeStamp(hub_timestamp));
-		patientVestDeviceRawLog.setSpReceiveTime(getTimeStamp(sp_timestamp));
+		patientVestDeviceRawLog.setHubReceiveTime(getTimeStamp(hub_timestamp).getMillis());
+		patientVestDeviceRawLog.setSpReceiveTime(getTimeStamp(sp_timestamp).getMillis());
 		return patientVestDeviceRawLog;
 	}
 
@@ -125,7 +124,7 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 		patientVestDeviceData.setFrequency(getPatientVestDeviceDataFrequency(base16String));
 		patientVestDeviceData.setDuration(getPatientVestDeviceDataDuration(base16String));
 		patientVestDeviceData.setEventId(getPatientVestDeviceEventCode(base16String));
-		patientVestDeviceData.setTimestamp(getPatientVestDeviceDataTimeStamp(base16String));
+		patientVestDeviceData.setTimestamp(getPatientVestDeviceDataTimeStamp(base16String).getMillis());
 		return patientVestDeviceData;
 	}
 

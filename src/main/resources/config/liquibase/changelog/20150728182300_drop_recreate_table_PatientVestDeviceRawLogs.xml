@@ -13,7 +13,7 @@
 	<changeSet id="20150728182300" author="jhipster">
 		<dropTable tableName="PATIENT_VEST_DEVICE_RAW_LOGS" />
 		<createTable tableName="PATIENT_VEST_DEVICE_RAW_LOGS">
-			<column name="hub_receive_time" type="timestamp">
+			<column name="hub_receive_time" type="bigint">
 				<constraints nullable="false" />
 			</column>
 			<column name="device_address" type="varchar(255)">
@@ -27,7 +27,7 @@
 			<column name="air_interface_type" type="varchar(255)" />
 			<column name="customer_name" type="varchar(255)" />
 			<column name="timezone" type="varchar(255)" />
-			<column name="sp_receive_time" type="timestamp" />
+			<column name="sp_receive_time" type="bigint" />
 			<column name="hub_receive_time_offset" type="integer" />
 			<column name="cuc_version" type="varchar(255)" />
 			<column name="customer_id" type="varchar(255)" />

@@ -10,9 +10,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Type;
-import org.joda.time.DateTime;
-
 @IdClass(PatientVestDeviceDataPK.class)
 @Entity
 @Table(name = "PATIENT_VEST_DEVICE_DATA")
@@ -20,8 +17,7 @@ public class PatientVestDeviceData implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@Id
-	@Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-	private DateTime timestamp;
+	private Long timestamp;
 	@Id
 	@Column(name = "sequence_number")
 	private Integer sequenceNumber;
@@ -51,12 +47,12 @@ public class PatientVestDeviceData implements Serializable {
 	@ManyToOne(optional=false,targetEntity=PatientInfo.class)
 	@JoinColumn(name="patient_id",referencedColumnName="id")
 	private PatientInfo patient;
-	
-	public DateTime getTimestamp() {
+
+	public Long getTimestamp() {
 		return timestamp;
 	}
 
-	public void setTimestamp(DateTime timestamp) {
+	public void setTimestamp(Long timestamp) {
 		this.timestamp = timestamp;
 	}
 

@@ -12,7 +12,7 @@
 	<!-- Added the entity UserExtension. -->
 	<changeSet id="20150728231200" author="jhipster">
 		<createTable tableName="PATIENT_VEST_DEVICE_DATA">
-			<column name="timestamp" type="timestamp">
+			<column name="timestamp" type="bigint">
 				<constraints nullable="false" />
 			</column>
 			<column name="sequence_number" type="integer">

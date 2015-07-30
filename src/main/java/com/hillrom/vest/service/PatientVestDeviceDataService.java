@@ -50,11 +50,9 @@ public class PatientVestDeviceDataService {
 		List<PatientVestDeviceData> recordsToBeInserted = null;
 		
 		if(patientFromDB.isPresent()){
-			System.out.println("**************** Patient exists filtering records");
 			patientInfo = patientFromDB.get();
 			recordsToBeInserted = filterNewRecords(patientFromDB.get(),deviceRawLog,patientVestDeviceRecords);
 		}else{
-			System.out.println("**************** Patient NOT FOUND inserting records");
 			patientInfo = new PatientInfo();
 			patientInfo.setBluetoothId(deviceAddress);
 			patientInfo.setHubId(deviceRawLog.getHubId());
@@ -68,10 +66,11 @@ public class PatientVestDeviceDataService {
 			recordsToBeInserted = patientVestDeviceRecords;
 		}
 		
-		System.out.println("******************* recordsToBeInserted : "+recordsToBeInserted);
 		
 		if(recordsToBeInserted.size() > 0){			
-			deviceDataRepository.save(recordsToBeInserted);
+			recordsToBeInserted.forEach(record -> {
+				deviceDataRepository.save(record);
+			});
 		}
 		deviceRawLogRepository.save(deviceRawLog);
 		return patientVestDeviceRecords;
@@ -82,13 +81,12 @@ public class PatientVestDeviceDataService {
 		Page<PatientVestDeviceData> latestVestDeviceDataForPatientInDB = deviceDataRepository
 				.findLatest(patientInfo.getId(),pageable);
 		List<PatientVestDeviceData> latestVestDeviceDataRecords = latestVestDeviceDataForPatientInDB.getContent();
-		System.out.println("****** latestVestDeviceDataRecords : "+latestVestDeviceDataRecords);
 		if(latestVestDeviceDataRecords.size() > 0){
 			PatientVestDeviceData latestDeviceData = latestVestDeviceDataRecords.get(0); 
 			patientVestDeviceRecords
 					.stream()
-					.filter(record -> record.getTimestamp().isAfter(latestDeviceData
-							.getTimestamp())).forEach(deviceData -> {
+					.filter(record -> record.getTimestamp() > latestDeviceData
+							.getTimestamp()).forEach(deviceData -> {
 								deviceData.setHubId(deviceRawLog.getHubId());
 								deviceData.setSerialNumber(deviceRawLog.getDeviceSerialNumber());
 								deviceData.setPatient(patientInfo);

@@ -29,9 +29,8 @@ public class PatientVestDeviceRawLog implements Serializable {
 
 	@NotNull
     @Id
-    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "hub_receive_time", nullable = false)
-    private DateTime hubReceiveTime;
+    private Long hubReceiveTime;
 
     @NotNull
     @Id
@@ -63,11 +62,8 @@ public class PatientVestDeviceRawLog implements Serializable {
     private String timezone;
 
     @NotNull
-    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-    @JsonSerialize(using = CustomDateTimeSerializer.class)
-    @JsonDeserialize(using = CustomDateTimeDeserializer.class)
     @Column(name = "sp_receive_time", nullable = false)
-    private DateTime spReceiveTime;
+    private Long spReceiveTime;
 
     @Column(name = "cuc_version")
     private String cucVersion;
@@ -77,13 +73,12 @@ public class PatientVestDeviceRawLog implements Serializable {
 
     @Column(name = "raw_message")
     private String rawMessage;
-    
-    
-	public DateTime getHubReceiveTime() {
+
+	public Long getHubReceiveTime() {
 		return hubReceiveTime;
 	}
 
-	public void setHubReceiveTime(DateTime hubReceiveTime) {
+	public void setHubReceiveTime(Long hubReceiveTime) {
 		this.hubReceiveTime = hubReceiveTime;
 	}
 
@@ -158,14 +153,12 @@ public class PatientVestDeviceRawLog implements Serializable {
 	public void setTimezone(String timezone) {
 		this.timezone = timezone;
 	}
-	
 
-
-	public DateTime getSpReceiveTime() {
+	public Long getSpReceiveTime() {
 		return spReceiveTime;
 	}
 
-	public void setSpReceiveTime(DateTime spReceiveTime) {
+	public void setSpReceiveTime(Long spReceiveTime) {
 		this.spReceiveTime = spReceiveTime;
 	}
 

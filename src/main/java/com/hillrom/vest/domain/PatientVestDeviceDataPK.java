@@ -2,20 +2,18 @@ package com.hillrom.vest.domain;
 
 import java.io.Serializable;
 
-import org.joda.time.DateTime;
-
 public class PatientVestDeviceDataPK implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private DateTime timestamp;
+	private Long timestamp;
 	private Integer sequenceNumber;
 	private String eventId;
 
-	public DateTime getTimestamp() {
+	public Long getTimestamp() {
 		return timestamp;
 	}
 
-	public void setTimestamp(DateTime timestamp) {
+	public void setTimestamp(Long timestamp) {
 		this.timestamp = timestamp;
 	}
 

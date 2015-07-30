@@ -5633,6 +5633,10 @@ a::-moz-focus-inner {
   height: calc(100% - 100px);
   position: absolute;
   width: 100%;
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  -webkit-transform: translate3d(0, 0, 0);
 }
 
 .login .login--position {
@@ -5788,6 +5792,10 @@ a::-moz-focus-inner {
 }
 .form__container__reset #forgotpwd a {
   color: #585858;
+}
+
+.reset-form .form-group {
+  height: 50px;
 }
 
 .dashboard {

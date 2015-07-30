@@ -109,6 +109,7 @@ angular.module('hillromvestApp')
         $scope.cancel = function(){
           $scope.doctorStatus.editMode = false;
           $scope.doctorStatus.isCreate = false;
+          $scope.reset();
         };
 
         $scope.reset = function(){
@@ -116,6 +117,8 @@ angular.module('hillromvestApp')
           $scope.doctorStatus.isCreate = false;
           $scope.submitted = false;
           $scope.doctor = {};
+          $scope.doctor.clinics = [];
+          $scope.doctor.clinics.push({'name': '', 'id' : ''});
           $scope.form.$setPristine();
         }
       }

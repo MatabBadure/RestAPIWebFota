@@ -18,7 +18,7 @@
             <span class="dashboard__form--type" translate="doctor.general-details"></span>
           </div>
           <div class="col-md-4 user-required">
-            <span translate="doctor.required-field"></span> 
+            <span translate="doctor.required-field"></span>
           </div>
         </div>
 
@@ -38,11 +38,25 @@
                   </span>
                 </div>
               </div>
-                <input class="" type="text" name="clinicName"  ng-model="clinic.name"  required ng-if="!doctorStatus.editMode">
-                <div ng-show="(form.clinicName.$dirty && form.clinicName.$invalid) || submitted" class="">
-                  <span class="has-error" ng-show="form.clinicName.$error.required">
-                    Clinic Name is required.
-                  </span>
+                <div class="margin-bottom-sm" ng-repeat="clinic in doctor.clinics">
+                  <input class="" type="text" name="clinicName"  ng-model="clinic.name"  required ng-if="!doctorStatus.editMode" ng-keyup="getClinics()">
+                  <div ng-show="(form.clinicName.$dirty && form.clinicName.$invalid) || submitted" class="">
+                    <span class="has-error" ng-show="form.clinicName.$error.required">
+                      Clinic Name is required.
+                    </span>
+                  </div>
+                </div>
+                <div class="dashboard-page__user-list__detailed__list">
+                  <div ng-repeat="clinic in clinics | filter:clinic.name">
+                    <div ng-click="selectClinic(clinic, $index)" class="dashboard-page__user-list__detailed__list--details">
+                      <span class="user-detail">
+                        {{clinic.name}}
+                      </span>
+                      <span class="user-role">
+                        {{clinic.city}}
+                      </span>
+                    </div>
+                  </div>
                 </div>
             </div>
           </div>
@@ -51,8 +65,9 @@
               <span class="dashboard__form--type font-add-text" translate="doctor.add-clinic"></span>
             </div>
             <div class="col-md-10 checkbox-add">
-              <input type="checkbox" name="isCreate" ng-model="doctor.addClinic">
-              <span translate="doctor.create-caregiver"></span>
+              <!-- <input type="checkbox" name="isCreate" ng-model="doctor.addClinic" ng-change="addClinic(doctor.addClinic)"> -->
+              <button type="button" ng-click="addClinic()" class="hillrom-btn btn-submit float-right">Add Clinic</button>
+              <!-- <span translate="doctor.create-caregiver"></span> -->
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 'use strict';
 angular.module('hillromvestApp')
-  .directive('doctor', function (UserService) {
+  .directive('doctor', function (UserService, ClinicService) {
     return {
       templateUrl: 'scripts/components/entities/doctors/new/create.html',
       restrict: 'E',
@@ -8,11 +8,12 @@ angular.module('hillromvestApp')
         doctor: '=doctorData',
         doctorStatus: '=doctorStatus'
       },
-      controller: function ($scope) {
+      controller: function ($scope, $timeout) {
 
         $scope.init = function () {
           $scope.states = [];
           $scope.doctor.titles = ["Dr"];
+          $scope.doctor.clinics = [{'name':'', 'id' : '' }];
           $scope.submitted = false;
           UserService.getState().then(function (response) {
             $scope.states = response.data.states;
@@ -21,11 +22,32 @@ angular.module('hillromvestApp')
           });
         };
 
+        $scope.getClinics = function () {
+          var timer = false;
+          timer = $timeout(function () {
+            ClinicService.getAllClinics().then(function (response) {
+              $scope.clinics = response.data;
+            }).catch(function (response) {
+
+            });
+          },1000)
+        };
+
+        $scope.selectClinic = function(clinic, index) {
+          $scope.doctor.clinics[index].name = clinic.name;
+          $scope.doctor.clinics[index].id = clinic.id;
+          $scope.clinics = [];
+        };
+
         $scope.formSubmit = function () {
           $scope.submitted = true;
         };
 
         $scope.init();
+
+        $scope.addClinic = function () {
+          $scope.doctor.clinics.push({'name':'', 'id': '' });
+        };
 
         $scope.createDoctor = function () {
           if ($scope.form.$invalid) {

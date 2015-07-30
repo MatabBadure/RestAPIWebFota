@@ -143,9 +143,11 @@ a::-moz-focus-inner {
   color: $alto;
   opacity: 1;
 }
+
 .form-control:-ms-input-placeholder {
   color: $alto;
 }
+
 .form-control::-webkit-input-placeholder {
   color: $alto;
 }

@@ -16,7 +16,7 @@
           <div class="alert alert-success " ng-show="success == 'OK'">
             <p translate="reset.request.messages.success">Check your e-mails for details on how to reset your password.</p>
           </div>
-          <form ng-show="!success" name="form" role="form" novalidate  show-validation>
+          <form class="reset-form" ng-show="!success" name="form" role="form" novalidate  show-validation>
             <div class="form-group">
               <input type="email" class="form-control" name="email" placeholder="{{'global.form.email.placeholder' | translate}}"
               ng-model="resetAccount.email"  ng-maxlength=100 required>
@@ -48,7 +48,7 @@
                on-success="setResponse(response)">
              </div>
             </div>
-             <div class="col-md-8 col-lg-8 link"><a translate="reset.request.form.button" ng-click="requestReset()" class="myButton">LOGIN</a></div>
+             <div class="col-md-8 col-lg-8 link reset-padding-right"><a translate="reset.request.form.button" ng-click="requestReset()" class="myButton">LOGIN</a></div>
           </form>
         </div>
       </div>

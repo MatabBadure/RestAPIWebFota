@@ -1,18 +1,23 @@
 <span ng-show="clinicStatus.isMessage">{{clinicStatus.message}}</span>
-<form name="form" ng-submit="createClinic()" novalidate>
-  <div class="navbar dashboard">
-    <div class="container">
-      <div class="dashbord-nav__primary secondary-fix-navbar pull-left">
-        <span class="dashbord-nav__primary--title" translate="clinic.home.createLabel">Create Clinic</span>
-      </div>
-      <div class="dashbord-nav__secondary navbar-right">
-        <span class="dashbord-nav__secondary--create-new" translate=""></span>
-      </div>
+<div class="navbar dashboard dashbord-nav">
+  <div class="container">
+    <div class="dashbord-nav__primary pull-left">
+      <span class="dashbord-nav__primary--title" translate="clinic.home.createLabel">Create Clinic</span>
     </div>
+    <div class="dashbord-nav__secondary navbar-right">
+      <span class="dashbord-nav__secondary--create-new" translate=""></span>
+    </div>
+  </div>
+</div>
+<div class="dashboard dashboard--content padding-bottom-ls">  
+  <form name="form" ng-submit="createClinic()" novalidate>
     <div class="container dashboard__form">
       <div class="row margin-top-xl">
-        <div class="col-md-16">
+        <div class="col-md-12">
           <span class="dashboard__form--type" translate="clinic.general-details"></span>
+        </div>
+        <div class="col-md-4 user-required">
+            <span translate="clinic.required-field"></span> 
         </div>
         <div class="col-md-16 row margin-top">
           <div class="col-md-7 row">
@@ -29,7 +34,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-7 col-md-offset-2" ng-if="clinic.type === 'child'">
+          <div class="col-md-7 row col-md-offset-2" ng-if="clinic.type === 'child'">
             <div class="col-md-6 dashboard__form--label">
               <span class="dashboard__form--type" translate="clinic.select-parent"></span>
               <span class="">*</span>
@@ -40,11 +45,11 @@
                 <div ng-repeat="clinic in clinics | filter:clinic.parentClinic.name">
                   <div ng-click="selectClinic(clinic)" class="dashboard-page__user-list__detailed__list--details">
                     <span class="user-detail">
-                    {{clinic.name}}
-                  </span>
+                      {{clinic.name}}
+                    </span>
                     <span class="user-role">
-                    {{clinic.city}}
-                  </span>
+                      {{clinic.city}}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -71,7 +76,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-7 col-md-offset-2">
+          <div class="col-md-7 row col-md-offset-2">
             <div class="col-md-6 dashboard__form--label">
               <span class="dashboard__form--type" translate="clinic.hr-id"></span>
             </div>
@@ -99,7 +104,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-7 col-md-offset-2">
+          <div class="col-md-7 row col-md-offset-2">
             <div class="col-md-6 dashboard__form--label">
               <span class="" translate="clinic.city"></span>
             </div>
@@ -118,13 +123,15 @@
             <div class="col-md-6 dashboard__form--label">
               <span class="" translate="clinic.state"></span>
             </div>
-            <div class="custom-dropdown">
-              <select name="state" ng-model="clinic.state" ng-options="state.name as state.name for state in states">
-                <option selected="selected">Select a state</option>
-              </select>
+            <div class="col-md-6 dashboard__form__input--option">
+              <div class="custom-dropdown">
+                <select name="state" ng-model="clinic.state" ng-options="state.name as state.name for state in states">
+                  <option selected="selected">Select a state</option>
+                </select>
+              </div>
             </div>
           </div>
-          <div class="col-md-7 col-md-offset-2">
+          <div class="col-md-7 row col-md-offset-2">
             <div class="col-md-6 dashboard__form--label">
               <span class="" translate="clinic.zipcode"></span>
             </div>
@@ -132,8 +139,8 @@
               <input class="" type="text" name="zip" maxlength="5" ng-pattern="/^[0-9]{5}$/" ng-model="clinic.zipcode">
               <div ng-show="(form.zip.$dirty && form.zip.$invalid) || submitted">
                 <span class="has-error" ng-show="form.zip.$error.pattern">
-                Zip Code is invalid.
-              </span>
+                  Zip Code is invalid.
+                </span>
               </div>
             </div>
           </div>
@@ -147,12 +154,12 @@
               <input class="" type="text" name="phone" ng-pattern="/^[0-9]{10}$/" ng-model="clinic.phoneNumber">
               <div ng-show="(form.phone.$dirty && form.phone.$invalid) || submitted">
                 <span class="has-error" ng-show="form.phone.$error.pattern">
-                Phone Number is invalid.
-              </span>
+                  Phone Number is invalid.
+                </span>
               </div>
             </div>
           </div>
-          <div class="col-md-7 col-md-offset-2">
+          <div class="col-md-7 row col-md-offset-2">
             <div class="col-md-6 dashboard__form--label">
               <span class="" translate="clinic.fax-number"></span>
             </div>
@@ -160,8 +167,8 @@
               <input class="" type="text" name="fax" ng-pattern="/^[0-9]{10}$/" ng-model="clinic.faxNumber">
               <div ng-show="(form.fax.$dirty && form.fax.$invalid) || submitted">
                 <span class="has-error" ng-show="form.fax.$error.pattern">
-                Fax Number is invalid.
-              </span>
+                  Fax Number is invalid.
+                </span>
               </div>
             </div>
           </div>
@@ -177,13 +184,15 @@
           </div>
         </div>
         <div class="col-md-16 row margin-top margin-bottom-extream">
-          <div class="col-md-4 col-md-offset-12">
-            <button type="submit" ng-show="clinicStatus.isCreate" class="hillrom-btn btn-submit" translate="clinic.submit-button-text">Submit</button>
-            <button type="button" ng-click="deleteClinic()" ng-show="!clinicStatus.isCreate" class="hillrom-btn btn-submit">Diassociate</button>
-            <button type="submit" ng-click="formSubmit()" ng-show="!clinicStatus.isCreate" class="hillrom-btn btn-submit">Update</button>
+          <div class="row padding-right-xl">
+            <button type="submit" ng-show="clinicStatus.isCreate" class="hillrom-btn btn-submit float-right" translate="clinic.submit-button-text">Submit</button>
+            <button type="button" ng-click="cancel()" ng-show="clinicStatus.isCreate" class="hillrom-btn btn-submit float-right" >Cancel</button>
+            <button type="button" ng-click="deleteClinic()" ng-show="!clinicStatus.isCreate" class="hillrom-btn btn-submit float-right">Diassociate</button>
+
+            <button type="submit" ng-click="formSubmit()" ng-show="!clinicStatus.isCreate" class="hillrom-btn btn-submit float-right">Update</button>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</form>
+  </form>
+</div>

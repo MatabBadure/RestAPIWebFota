@@ -1,12 +1,16 @@
 package com.hillrom.vest.web.rest.util;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpHeaders;
-
-import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * Utility class for handling pagination.
@@ -36,6 +40,25 @@ public class PaginationUtil {
         return new PageRequest(offset - 1, limit);
     }
 
+    public static Pageable generatePageRequest(Integer offset, Integer limit, Map<String, Boolean> sortOrder) {
+        if (offset == null || offset < MIN_OFFSET) {
+            offset = DEFAULT_OFFSET;
+        }
+        if (limit == null || limit > MAX_LIMIT) {
+            limit = DEFAULT_LIMIT;
+        }
+        Sort sort = null;
+        if(sortOrder.keySet().size() > 0) {
+        	String sortingKey = (String)sortOrder.keySet().toArray()[0];
+        	if(sortOrder.get(sortingKey)) {
+        		sort = new Sort(new Order(Direction.ASC, sortingKey));
+        	} else {
+        		sort = new Sort(new Order(Direction.DESC, sortingKey));
+        	}
+        }
+        return new PageRequest(offset - 1, limit, sort);
+    }
+    
     public static HttpHeaders generatePaginationHttpHeaders(Page page, String baseUrl, Integer offset, Integer limit)
         throws URISyntaxException {
 

@@ -281,9 +281,8 @@ public class UserService {
     private List<String> rolesAdminCanModerate() {
 		List<String> rolesAdminCanModerate = new ArrayList<String>();
     	rolesAdminCanModerate.add(AuthoritiesConstants.ACCT_SERVICES);
-    	rolesAdminCanModerate.add(AuthoritiesConstants.CLINIC_ADMIN);
     	rolesAdminCanModerate.add(AuthoritiesConstants.ASSOCIATES);
-    	rolesAdminCanModerate.add(AuthoritiesConstants.HILLROM_ADMIN);
+    	rolesAdminCanModerate.add(AuthoritiesConstants.ADMIN);
 		return rolesAdminCanModerate;
 	}
     
@@ -756,10 +755,9 @@ public class UserService {
 					jsonObject.put("ERROR", "Unable to delete User.");
 				}
 			} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))
-					&& (existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.HILLROM_ADMIN))
+					&& (existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.ADMIN))
 							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.ACCT_SERVICES))
-							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.ASSOCIATES))
-							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.CLINIC_ADMIN)))) {
+							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.ASSOCIATES)))) {
 				userExtensionRepository.delete(existingUser);
 				jsonObject.put("message", "User deleted successfully.");
 			} else {

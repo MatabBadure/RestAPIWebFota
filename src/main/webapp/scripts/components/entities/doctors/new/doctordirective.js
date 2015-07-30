@@ -36,7 +36,7 @@ angular.module('hillromvestApp')
             UserService.editUser($scope.doctor).then(function (response) {
               $scope.doctorStatus.isMessage = true;
               $scope.doctorStatus.message = response.data.message;
-              $scope.doctor = " ";
+              $scope.reset();
             }).catch(function (response) {
               $scope.doctorStatus.isMessage = true;
               if (response.data.message !== undefined) {
@@ -48,13 +48,12 @@ angular.module('hillromvestApp')
           } else {
             // create doctor section
             var data = $scope.doctor;
-            data.title = 'Dr';
             data.role = 'HCP';
 
             UserService.createUser(data).then(function (response) {
               $scope.doctorStatus.isMessage = true;
               $scope.doctorStatus.message = "Doctor created successfully" + " with ID " + response.data.user.id;
-              $scope.doctor = " ";
+              $scope.reset();
             }).catch(function (response) {
               $scope.doctorStatus.isMessage = true;
               if (response.data.message !== undefined) {
@@ -70,7 +69,7 @@ angular.module('hillromvestApp')
           UserService.deleteUser($scope.doctor.id).then(function (response) {
             $scope.doctorStatus.isMessage = true;
             $scope.doctorStatus.message = response.data.message;
-            $scope.doctor = " ";
+            $scope.reset();
           }).catch(function (response) {
             $scope.doctorStatus.isMessage = true;
             if (response.data.message !== undefined) {
@@ -80,6 +79,18 @@ angular.module('hillromvestApp')
             }
           });
         };
+        $scope.cancel = function(){
+          $scope.doctorStatus.editMode = false;
+          $scope.doctorStatus.isCreate = false;
+        };
+
+        $scope.reset = function(){
+          $scope.doctorStatus.editMode = false;
+          $scope.doctorStatus.isCreate = false;
+          $scope.submitted = false;
+          $scope.doctor = {};
+          $scope.form.$setPristine();
+        }
       }
     };
   });

@@ -1,13 +1,13 @@
-
+<span ng-show="doctorStatus.isMessage">{{doctorStatus.message}}</span>
 <div class="navbar dashboard dashbord-nav">
     <div class="container">
       <div class="dashbord-nav__primary pull-left">
-        <span class="dashbord-nav__primary--title" >Manage Doctors</span>
+        <span class="dashbord-nav__primary--title" translate="doctor.home.manageLabel">Manage Doctors</span>
       </div>
 
-      <div class="dashbord-nav__secondary create-user navbar-right" ng-click="createDoctor()">
-        <span class="dashbord-nav__secondary--create-new">Create New</span>
-        <span class="glyphicon glyphicon-plus"></span>
+      <div class="dashbord-nav__secondary create-user navbar-right cursor-pointer" ng-click="createDoctor()">
+        <span class="" translate="doctor.home.createNewLabel">Create New</span>
+        <span class="hillrom-icon icon-plus-icon"></span>
       </div>
     </div>
   </div>
@@ -15,13 +15,16 @@
     <div class="container dashboard__manage-view margin-top-xl">
       <div class="row dashboard__manage-view--search">
         <div class="col-md-14 reset-padding-right">
-          <input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" autocomplete="off" placeholder="{{patient.placeholder.search}}" />
-          <span class="search-icon glyphicon glyphicon-search"></span>
+          <input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" autocomplete="off" placeholder="{{'doctor.placeholder.search' | translate}}">
+          <span class="search-icon hillrom-icon icon-search-icon"></span>
         </div>
         <div class="col-md-2 reset-padding-left">
           <div class="search-dropdown">
-            <select name="search">
-              <option selected>Newly Created</option>
+            <select name="search" ng-model="sortOption" ng-change="searchDoctors()">
+              <option value="" selected>Newly Created</option>
+              <option value="email">Email</option>
+              <option value="first_name">First Name</option>
+              <option value="last_name">Last Name</option>
             </select>
           </div>
         </div>
@@ -66,14 +69,16 @@
          </div>
        </div>
 
-      <div class="dashboard__manage-view--pagination" ng-show="pageCount > 1">
+      <div class="dashboard__manage-view--pagination">
         <div class="col-md-16 reset-padding-right">
           <div class="navbar-right">
             <span class="record-found">{{total}} Doctors</span>
             <span class="record-found">Found</span>
-            <span class="navigaion-link cursor-pointer" ng-class="{ 'inactive': !(currentPageIndex > 1) }" ng-click="searchDoctors('PREV')">Previous</span>
-            <span class="navigaion-no">{{currentPageIndex}}</span>
-            <span class="navigaion-link cursor-pointer" ng-class="{ 'inactive': !(pageCount > currentPageIndex) }" ng-click="searchDoctors('NEXT')">Next</span>
+            <span ng-show="pageCount > 1">
+              <span class="navigaion-link cursor-pointer" ng-class="{ 'inactive': !(currentPageIndex > 1) }" ng-click="searchDoctors('PREV')">Previous</span>
+              <span class="navigaion-no">{{currentPageIndex}}</span>
+              <span class="navigaion-link cursor-pointer" ng-class="{ 'inactive': !(pageCount > currentPageIndex) }" ng-click="searchDoctors('NEXT')">Next</span>
+            </span>
           </div>
           <div class="clr"></div>
         </div>
@@ -87,7 +92,7 @@
     <div class="row user-help--container">
       <div class="col-md-8 user-help-devider">
         <div class="col-md-4 help-icon">
-          <span class="hillrom-icon icon-lungs"></span>
+          <span class="hillrom-icon icon-man-with-circle"></span>
         </div>
         <div class="col-md-12 user-help__desc">
             <span class="user-help__desc--heading">Ideal HMR Reading</span>
@@ -98,7 +103,7 @@
       </div>
       <div class="col-md-8">
         <div class="col-md-4 help-icon">
-          <span class="hillrom-icon icon-lungs"></span>
+          <span class="hillrom-icon icon-tablet-with-circle"></span>
         </div>
         <div class="col-md-12">
             <span class="user-help__desc--heading">Ideal HMR Reading</span>

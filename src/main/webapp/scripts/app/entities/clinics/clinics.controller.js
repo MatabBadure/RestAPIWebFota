@@ -8,7 +8,8 @@
             'role':localStorage.getItem('role'),
             'editMode':false,
             'isCreate':false,
-            'isMessage':false
+            'isMessage':false,
+            'message': ''
         }
         $scope.selectedClinic = function(clinic) {
             $scope.clinicStatus.editMode = true;
@@ -17,6 +18,7 @@
         };
         $scope.createClinic = function(){
             $scope.clinicStatus.isCreate = true;
+            $scope.clinicStatus.isMessage = false;
         }
 
     });

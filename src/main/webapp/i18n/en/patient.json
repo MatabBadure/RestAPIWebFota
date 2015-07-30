@@ -13,7 +13,8 @@
         "detail": {
             "title": "Patient"
         },
-        "general-details":  "General Details",
+        "required-field" : "* Required Field",
+        "general-details":  "Patient Identifiers",
         "personal-details": "Personal Details",
         "health-details":   "Health Details",
         "clinic": "Clinic",
@@ -52,7 +53,8 @@
         "email": "Email",
         "state": "State",
         "phone-number": "Phone No",
-        "mobile-number": "Mobile No",
+        "mobile-number": "Mobile No.",
+        "home-phone-number": "Home Phone No.",
         "faxNumber": "FaxNumber",
         "hillromId": "HillromId",
         "parentClinicId": "ParentClinicId",
@@ -60,6 +62,7 @@
         "user": "user",
         "patients": "patients",
         "parent": "parent",
-        "submit-button-text": "submit"
+        "submit-button-text": "submit",
+        "cancel-button-text": "cancel"
     }
 }

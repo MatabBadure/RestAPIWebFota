@@ -19,6 +19,7 @@ angular.module('hillromvestApp')
       controller: function ($scope) {
 
         $scope.submitted = false;
+        $scope.user.role = "ADMIN";
         $scope.formSubmit = function () {
           $scope.submitted = true;
         };
@@ -41,29 +42,30 @@ angular.module('hillromvestApp')
           }
           if ($scope.userStatus.editMode) {
             UserService.editUser($scope.user).then(function (response) {
-              $scope.isMessage = true;
-              $scope.message = response.data.message;
-              $scope.user = " ";
+              $scope.userStatus.isMessage = true;
+              $scope.userStatus.message = response.data.message;
+               $scope.reset();
             }).catch(function (response) {
-              $scope.isMessage = true;
+              $scope.userStatus.isMessage = true;
               if (response.data.message !== undefined) {
-                $scope.message = response.data.message;
+                $scope.userStatus.message = response.data.message;
               } else {
-                $scope.message = 'Error occured! Please try again';
+                $scope.userStatus.message = 'Error occured! Please try again';
               }
             });
           } else {
             var data = $scope.user;
             UserService.createUser(data).then(function (response) {
-              $scope.isMessage = true;
-              $scope.message = 'User created successfully' + ' with ID ' + response.data.user.id;
-              $scope.user = " ";
+              $scope.userStatus.isMessage = true;
+              $scope.userStatus.message = 'User created successfully' + ' with ID ' + response.data.user.id;
+               $scope.reset();
+
             }).catch(function (response) {
               $scope.isMessage = true;
               if (response.data.message !== undefined) {
-                $scope.message = response.data.message;
+                $scope.userStatus.message = response.data.message;
               } else {
-                $scope.message = 'Error occured! Please try again';
+                $scope.userStatus.message = 'Error occured! Please try again';
               }
             });
           }
@@ -77,17 +79,31 @@ angular.module('hillromvestApp')
          */
         $scope.deleteUser = function () {
           UserService.deleteUser($scope.user.id).then(function (response) {
-            $scope.isMessage = true;
-            $scope.message = response.data.message;
+            $scope.userStatus.isMessage = true;
+            $scope.userStatus.message = response.data.message;
+            $scope.reset();
           }).catch(function (response) {
-            $scope.isMessage = true;
+            $scope.userStatus.isMessage = true;
             if (response.data.message !== undefined) {
-              $scope.message = response.data.message;
+              $scope.userStatus.message = response.data.message;
             } else {
-              $scope.message = 'Error occured! Please try again';
+              $scope.userStatus.message = 'Error occured! Please try again';
             }
           });
         };
+
+        $scope.cancel = function(){
+           $scope.userStatus.isCreate = false;
+           $scope.userStatus.editMode = false;
+        };
+
+        $scope.reset = function(){
+          $scope.user = {};
+          $scope.userStatus.isCreate = false;
+          $scope.userStatus.editMode = false;
+          $scope.form.$setPristine();
+          $scope.submitted = false;
+        }
 
         /**
          * @ngdoc function
@@ -97,14 +113,14 @@ angular.module('hillromvestApp')
          */
         $scope.editUser = function () {
           UserService.editUser($scope.user).then(function (response) {
-            $scope.isMessage = true;
-            $scope.message = response.data.message;
+            $scope.userStatus.isMessage = true;
+            $scope.userStatus.message = response.data.message;
           }).catch(function (response) {
-            $scope.isMessage = true;
+            $scope.userStatus.isMessage = true;
             if (response.data.message !== undefined) {
-              $scope.message = response.data.message;
+              $scope.userStatus.message = response.data.message;
             } else {
-              $scope.message = 'Error occured! Please try again';
+              $scope.userStatus.message = 'Error occured! Please try again';
             }
           });
         };

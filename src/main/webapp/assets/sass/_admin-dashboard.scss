@@ -12,6 +12,7 @@
 .dashbord-nav {
 	max-height: 40px;
 	min-height: 40px;
+	margin-bottom: 0;
 }
 
 .dashbord-nav__primary .dashbord-nav__secondary {
@@ -35,9 +36,13 @@
 	font-weight: 700;
 }
 
-// .dashboard__form {
-// 	margin-top: 40px;
-// }
+.user-required {
+	color: $bombay;
+  font-size: 12px;
+  font-weight: 700;
+  padding-right: 40px;
+  text-align: right;
+}
 
 .dashboard__form--label {
 	line-height: 30px;
@@ -104,6 +109,7 @@
   border: 1px solid $terracotta;
   background-color: $terracotta;
   color: $body-bg;
+  margin-left: 10px;
 }
 
 .btn-submit-disable {
@@ -176,7 +182,7 @@
   padding: 0;
   font-size: 10px;
   position: absolute;
-  top: 8px; 
+  top: 8px !important; 
   right: 20px; 
   z-index: 1;
   z-index: 1 \0;

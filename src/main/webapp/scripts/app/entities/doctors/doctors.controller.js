@@ -3,13 +3,14 @@
 angular.module('hillromvestApp')
 .controller('DoctorsController', function ($rootScope, $scope, $state, $timeout, Auth) {
 	$scope.doctor ={};
-	$scope.doctorStatus = 
+	$scope.doctorStatus =
 	{
 		'role':localStorage.getItem('role'),
 		'editMode':false,
 		'isCreate':false,
-		'isMessage':false
-	};  	
+		'isMessage':false,
+		'message': ''
+	};
 	$scope.selectedDoctor = function(doctor) {
 		$scope.doctorStatus.editMode = true;
 		$scope.doctorStatus.isCreate = false;
@@ -17,5 +18,6 @@ angular.module('hillromvestApp')
 	};
 	$scope.createDoctor = function(){
 		$scope.doctorStatus.isCreate = true;
+		$scope.doctorStatus.isMessage = false;
 	}
 });

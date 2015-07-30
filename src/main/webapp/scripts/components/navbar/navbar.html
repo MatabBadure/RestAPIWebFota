@@ -1,5 +1,5 @@
 <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-  <div class="container">
+  <div class="container" ng-switch="$root.isAuthenticated">
     <div class="navbar-header navbar-primary">
       <button data-target="#navbar-collapse" data-toggle="collapse" class="navbar-toggle" type="button">
         <span class="sr-only">Toggle navigation</span>
@@ -7,9 +7,9 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#/"><img class="hillrom_logo" src="assets/images/logo-HillRom.png" alt="HillRom Logo"></a>
+      <a class="navbar-brand" href="#/login"><img class="hillrom_logo" src="assets/images/logo-HillRom.png" alt="HillRom Logo"></a>
     </div>
-    <div class="collapse navbar-collapse navbar-secondary" id="navbar-collapse" ng-if="isAuthenticated">
+    <div class="collapse navbar-collapse navbar-secondary" id="navbar-collapse" ng-switch-when=true>
       <ul class="nav navbar-nav navbar-right">
         <li >
           <a ng-class="{ active: isActive('patient')}" ng-href="#/patient">
@@ -32,21 +32,9 @@
           </a>
         </li>
         <li class="header-popover">
-          <a href="javascript:void(0)" class="popover-link" data-toggle="popover" data-placement="bottom" title="" data-content="
-          <div><span class='hillrom-icon icon-user-account'></span><span>Account</span></div>
-          <div><span class='hillrom-icon icon-logout'></span><span ng-click='logout()'>Logout</span></div>">
-            <span class="padding-right">Jose Rubert</span>
-            <span class="hillrom-icon icon-arrow-down"></span>
-          </a>
+           <a href="javascript:void(0)" class="popover-link" navbar-popover></a>
         </li>
       </ul>
     </div>
   </div>
 </nav>
-<script>
-$(document).ready(function(){
-  setTimeout(function(){
-    $('[data-toggle="popover"]').popover({ html : true});
-  }, 2000);
-});
-</script>

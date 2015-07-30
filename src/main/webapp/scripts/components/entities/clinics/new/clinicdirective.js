@@ -64,7 +64,7 @@ angular.module('hillromvestApp')
               $scope.clinicStatus.isMessage = true;
               $scope.clinicStatus.message = "Clinic updated successfully" + " with ID " + data.data.Clinic.id;
               $scope.init();
-              $scope.form.$setPristine();
+              $scope.reset();
             }).catch(function(response) {
               if (response.data.message !== undefined) {
                 $scope.clinicStatus.message = response.data.message;
@@ -89,7 +89,7 @@ angular.module('hillromvestApp')
             ClinicService.createClinic(data).then(function(data) {
               $scope.clinicStatus.isMessage = true;
               $scope.clinicStatus.message = "Clinic created successfully" + " with ID " + data.data.Clinic.id;
-              $scope.clinic = "";
+              $scope.reset();
             }).catch(function(response) {
               if (response.data.message !== undefined) {
                 $scope.clinicStatus.message = response.data.message;
@@ -106,6 +106,7 @@ angular.module('hillromvestApp')
           ClinicService.deleteClinic($scope.clinic.id).then(function(data) {
             $scope.clinicStatus.isMessage = true;
             $scope.clinicStatus.message = data.data.message;
+            $scope.reset();
           }).catch(function(response) {
             if (response.data.message !== undefined) {
               $scope.clinicStatus.message = data.data.message;
@@ -115,6 +116,18 @@ angular.module('hillromvestApp')
             $scope.clinicStatus.isMessage = true;
           });
         };
+        $scope.cancel = function(){
+          $scope.clinicStatus.editMode = false;
+          $scope.clinicStatus.isCreate = false;
+        };
+
+        $scope.reset = function(){
+          $scope.clinicStatus.editMode = false;
+          $scope.clinicStatus.isCreate = false;
+          $scope.submitted = false;
+          $scope.clinic = {};
+          $scope.form.$setPristine();
+        }
 
         $scope.getParentClinic = function() {
           $scope.clinics = clinicsList;

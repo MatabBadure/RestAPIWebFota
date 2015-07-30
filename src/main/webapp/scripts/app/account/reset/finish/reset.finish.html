@@ -41,7 +41,7 @@
                         <div class="form-group">
                             <label translate="global.form.newpassword">New password*</label>
                             <input type="password" class="form-control" name="password" placeholder="{{'global.form.newpassword.placeholder' | translate}}"
-                                   ng-model="resetAccount.password" ng-minlength=8 ng-maxlength=50 required>
+                                   ng-model="resetAccount.password" ng-minlength=8 ng-maxlength=50 ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
                             <div ng-show="(form.password.$dirty && form.password.$invalid) || submitted">
                                 <p class="has-error"
                                    ng-show="form.password.$error.required" translate="global.messages.validate.newpassword.required">
@@ -55,6 +55,10 @@
                                    ng-show="form.password.$error.maxlength" translate="global.messages.validate.newpassword.maxlength">
                                     Your password cannot be longer than 50 characters.
                                 </p>
+                                <p class="has-error"
+                                   ng-show="form.password.$error.pattern" >
+                                    Your password is invalid.
+                                </p> 
                             </div>
                             <password-strength-bar password-to-check="resetAccount.password"></password-strength-bar>
                         </div>
@@ -62,7 +66,7 @@
                         <div class="form-group">
                             <label translate="global.form.confirmpassword">New password confirmation*</label>
                             <input type="password" class="form-control" name="confirmPassword" placeholder="{{'global.form.confirmpassword.placeholder' | translate}}"
-                                   ng-model="resetAccount.confirmPassword" ng-minlength=8 ng-maxlength=50 required>
+                                   ng-model="resetAccount.confirmPassword" ng-minlength=8 ng-maxlength=50 ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
                             <div ng-show="(form.confirmPassword.$dirty && form.confirmPassword.$invalid) || submitted ">
                                 <p class="has-error"
                                    ng-show="form.confirmPassword.$error.required" translate="global.messages.validate.confirmpassword.required">
@@ -70,11 +74,15 @@
                                 </p>
                                 <p class="has-error"
                                    ng-show="form.confirmPassword.$error.minlength" translate="global.messages.validate.confirmpassword.minlength">
-                                    Your password confirmation is required to be at least 5 characters.
+                                    Your password confirmation is required to be at least 8 characters.
                                 </p>
                                 <p class="has-error"
                                    ng-show="form.confirmPassword.$error.maxlength" translate="global.messages.validate.confirmpassword.maxlength">
                                     Your password confirmation cannot be longer than 50 characters.
+                                </p>
+                                <p class="has-error"
+                                   ng-show="form.confirmPassword.$error.pattern" >
+                                    Your password is invalid.
                                 </p>
                             </div>     
                         </div> 

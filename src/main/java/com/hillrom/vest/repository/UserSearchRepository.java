@@ -1,6 +1,7 @@
 package com.hillrom.vest.repository;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,6 +11,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.hibernate.SQLQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -18,10 +20,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class UserSearchRepository {
 	
+	private static final String ORDER_BY_CLAUSE_START = " order by ";
 	@Inject
 	private EntityManager entityManager;
 	
-	public Page<HillRomUserVO> findHillRomTeamUsersBy(String queryString,Pageable pageable){
+	public Page<HillRomUserVO> findHillRomTeamUsersBy(String queryString,Pageable pageable,Map<String,Boolean> sortOrder){
 	
 		int firstResult = pageable.getPageNumber()*pageable.getOffset();
 		int maxResult = firstResult+pageable.getPageSize();
@@ -38,20 +41,33 @@ public class UserSearchRepository {
 		countQuery.setParameter("queryString", queryString);
 		BigInteger count =  (BigInteger) countQuery.getSingleResult();
 		
-		Query query = entityManager.createNamedQuery("findHillRomTeamUserBy");
+		Query query = getNamedQueryOrderedBy("findHillRomTeamUserBy", sortOrder);
+	
 		query.setFirstResult(firstResult);
 		query.setMaxResults(maxResult);
 		
 		query.setParameter("queryString", queryString);
 		
-		List<HillRomUserVO> hillromUsers =  query.getResultList();
-	
-		Page<HillRomUserVO> page = new PageImpl<HillRomUserVO>(hillromUsers,null,count.intValue());
+		List<HillRomUserVO> hrUsersList = new ArrayList<>();
+		List<Object[]> results = query.getResultList(); 
+		results.stream().forEach((record) -> {
+	        Long id = ((BigInteger) record[0]).longValue();
+	        String firstName = (String) record[1];
+	        String lastName = (String) record[2];
+	        String email = (String) record[3];
+	        String role = (String) record[4];
+	        Boolean isDeleted = (Boolean) record[5];
+	        
+	        HillRomUserVO hrUserVO = new HillRomUserVO(id, firstName, lastName, email, role, isDeleted);
+	        hrUsersList.add(hrUserVO);
+		});
+		
+		Page<HillRomUserVO> page = new PageImpl<HillRomUserVO>(hrUsersList,null,count.intValue());
 	
 		return page;
 	}
 	
-	public Page<HcpVO> findHCPBy(String queryString,Pageable pageable){
+	public Page<HcpVO> findHCPBy(String queryString,Pageable pageable,Map<String,Boolean> sortOrder){
 		
 		int firstResult = pageable.getPageNumber()*pageable.getOffset();
 		int maxResult = firstResult+pageable.getPageSize();
@@ -72,11 +88,13 @@ public class UserSearchRepository {
 		countQuery.setParameter("queryString", queryString);
 		BigInteger count =  (BigInteger) countQuery.getSingleResult();
 		
-		Query query = entityManager.createNamedQuery("findHcpBy");
+		Query query = getNamedQueryOrderedBy("findHcpBy", sortOrder);
 		query.setFirstResult(firstResult);
 		query.setMaxResults(maxResult);
 		
 		query.setParameter("queryString", queryString);
+		
+		List<HcpVO> hcpUsers = new ArrayList<>();
 		
 		Map<Long,HcpVO> hcpUsersMap = new HashMap<>();
 		List<Object[]> results = query.getResultList(); 
@@ -111,15 +129,52 @@ public class UserSearchRepository {
 	        	hcpVO.getClinics().add(clinicMap);
 	        	hcpUsersMap.put(id, hcpVO);
 	        }else{
+	        	hcpUsers.remove(hcpVO);
 	        	hcpVO.getClinics().add(clinicMap);
 	        }
+	        hcpUsers.add(hcpVO);
 		});
 		
-		List<HcpVO> hcpUsers =  new LinkedList<>(hcpUsersMap.values());
-	
 		Page<HcpVO> page = new PageImpl<HcpVO>(hcpUsers,null,count.intValue());
 	
 		return page;
+	}
+	
+	private String getNamedQueryString(String queryName) {
+	    Query tmpQuery = entityManager.createNamedQuery(queryName);
+	    SQLQuery sqlQuery = tmpQuery.unwrap(SQLQuery.class);
+	    String queryString = sqlQuery.getQueryString();
+	    return queryString;
+	}
+
+
+	private Query getNamedQueryOrderedBy(String queryName, Map<String, Boolean> columnNames){
+
+	    StringBuilder sb = new StringBuilder();
+	    // Append order by only if there is any sort request.
+	    if(columnNames.keySet().size() > 0){
+	    	sb.append(ORDER_BY_CLAUSE_START);	    	
+	    }
+
+	    int limit = columnNames.size();
+	    int i = 0;
+	    for (String columnName: columnNames.keySet()) {
+	        sb.append(columnName);
+
+	        if (columnNames.get(columnName))
+	            sb.append(" ASC");
+	        else
+	            sb.append(" DESC");
+
+	        if (i != (limit - 1)) {
+	            sb.append(", ");
+	        }
+	    }
+	    Query jpaQuery = entityManager.createNativeQuery( getNamedQueryString(queryName)
+	                + sb.toString() 
+	                );
+	    System.out.println("jpaQuery : "+jpaQuery);
+	    return jpaQuery;
 	}
 
 }

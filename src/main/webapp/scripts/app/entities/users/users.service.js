@@ -71,8 +71,10 @@ angular.module('hillromvestApp')
         });
       },
 
-      getUsers : function (url, searchString, pageNo, offset) {
-        return $http.get(url + searchString + '&pageNo=' + pageNo + '&offset=' + offset, {
+      getUsers : function (url, searchString, sortOption, pageNo, offset) {
+        if (searchString === undefined) { searchString = '';}
+
+        return $http.get(url + searchString + '&page=' + pageNo + '&offset=' + offset + '&sort_by=' + sortOption + '&asc=' + true, {
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',

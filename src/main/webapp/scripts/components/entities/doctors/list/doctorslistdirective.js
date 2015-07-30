@@ -7,7 +7,8 @@ angular.module('hillromvestApp')
     restrict: 'E',
     scope: {
       onSelect: '&',
-      onCreate: '&'
+      onCreate: '&',
+      doctorStatus: '=doctorStatus'
     },
     link: function(scope, element, attrs) {
       var doctor = scope.doctor;
@@ -23,26 +24,18 @@ angular.module('hillromvestApp')
         $scope.pageCount = 0;
         $scope.total = 0;
         $scope.noMatchFound = false;
+        $scope.sortOption = "";
+        $scope.searchDoctors();
       };
 
-      $scope.init();
 
       var timer = false;
       $scope.$watch('searchItem', function () {
         if (timer) {
           $timeout.cancel(timer)
         }
-        timer = $timeout(function () {
-          if ($scope.searchItem) {
-            var url = 'api/user/hcp/search?searchString=';
-            UserService.getUsers(url, $scope.searchItem, 1, 10).then(function(response) {
-              $scope.doctors = response.data;
-            }).catch(function(response) {
-
-            });
-          } else {
-            $scope.doctors = [];
-          }
+        timer = $timeout(function () {     
+            $scope.searchDoctors();
         },1000)
       });
 
@@ -71,15 +64,18 @@ angular.module('hillromvestApp')
           if (track === "PREV" && $scope.currentPageIndex > 1) {
             $scope.currentPageIndex--;
           }
-          if (track === "NEXT") {
-            $scope.currentPageIndex++;
-          }
+          if (track === "NEXT" && $scope.currentPageIndex < $scope.pageCount)
+            {
+              $scope.currentPageIndex++;
+            }else{
+              return false;
+            }
         }
         var url = 'api/user/hcp/search?searchString=';
-        UserService.getUsers(url, $scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
+        UserService.getUsers(url, $scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
           $scope.doctors = response.data;
           $scope.total = response.headers()['x-total-count'];
-          $scope.pageCount = Math.floor($scope.total / 10)+1;
+          $scope.pageCount = Math.ceil($scope.total / 10);
           if($scope.total == 0){
             $scope.noMatchFound = true;
           }else{
@@ -89,6 +85,8 @@ angular.module('hillromvestApp')
 
         });
       };
+
+      $scope.init();
     }
   };
 });

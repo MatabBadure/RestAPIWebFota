@@ -741,7 +741,6 @@ public class UserService {
     	JSONObject jsonObject = new JSONObject();
     	UserExtension existingUser = userExtensionRepository.findOne(id);
 		if(existingUser.getId() != null) {
-			System.out.println("authorities :" +SecurityContextHolder.getContext().getAuthentication().getAuthorities());
 			if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))) {
 				if(existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.PATIENT))) {
 					userExtensionRepository.delete(existingUser);

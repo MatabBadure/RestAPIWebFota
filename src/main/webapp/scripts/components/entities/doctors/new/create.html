@@ -33,40 +33,26 @@
             <div class="col-md-10 dashboard__form--input">
               <div ng-repeat="clinic in doctor.clinics" style = "padding-top: 10px" ng-if="doctorStatus.editMode">
                 <input class="" type="text" name="clinicName"  ng-model="clinic.name"  required>
-                <span ng-click="removeClinic($index)">Remove</span>
+                <span ng-click="removeClinic($index)" class="glyphicon glyphicon-remove"></span>
                 <div ng-show="(form.clinicName.$dirty && form.clinicName.$invalid) || submitted" class="">
                   <span class="has-error" ng-show="form.clinicName.$error.required">
                     Clinic Name is required.
                   </span>
                 </div>
               </div>
-                <div class="margin-bottom-sm" ng-repeat="clinic in doctor.clinics">
-                  <ng-form name="innerForm">
-                    <div class="multi-clinic">
-                      <!-- <input class="" type="text" name="clinicName"  ng-model="clinic.name"  required ng-if="!doctorStatus.editMode" ng-keyup="getClinics()"> -->
-                      <input type="text" ng-model="clinic.name" name="clinicName" bs-options="state.name for state in testStates" placeholder="Enter state" bs-typeahead required>
-
-                      <span ng-click="removeClinic($index)" ng-if="$index !== 0" class="glyphicon glyphicon-remove"></span>
-                    </div>
-                    <div ng-show="(innerForm.clinicName.$dirty && innerForm.clinicName.$invalid) || submitted" class="">
-                      <span class="has-error" ng-show="form.clinicName.$error.required">
-                        Clinic Name is required.
-                      </span>
-                    </div>
-                  </ng-form>
-                </div>
-                <!-- <div class="dashboard-page__user-list__detailed__list">
-                  <div ng-repeat="clinic in clinics | filter:clinic.name">
-                    <div ng-click="selectClinic(clinic, $index)" class="dashboard-page__user-list__detailed__list--details">
-                      <span class="user-detail">
-                        {{clinic.name}}
-                      </span>
-                      <span class="user-role">
-                        {{clinic.city}}
-                      </span>
-                    </div>
+              <div class="margin-bottom-sm" ng-repeat="clinic in doctor.clinics">
+                <ng-form name="childForm">
+                  <div class="multi-clinic">
+                    <input type="text" ng-model="clinic.name" name="clinicName" bs-options="state.name for state in testStates" placeholder="Enter state" bs-typeahead required>
+                    <span ng-click="removeClinic($index)" ng-if="$index !== 0" class="glyphicon glyphicon-remove"></span>
                   </div>
-                </div> -->
+                  <div ng-show="(childForm.clinicName.$dirty && childForm.clinicName.$invalid) || submitted" class="">
+                    <span class="has-error" ng-show="childForm.clinicName.$invalid">
+                      Clinic Name is required.
+                    </span>
+                  </div>
+                </ng-form>
+              </div>
             </div>
           </div>
           <div class="col-md-7 col-md-offset-2">

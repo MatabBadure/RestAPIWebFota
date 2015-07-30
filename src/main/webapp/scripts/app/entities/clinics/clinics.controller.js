@@ -18,6 +18,7 @@
         };
         $scope.createClinic = function(){
             $scope.clinicStatus.isCreate = true;
+            $scope.clinicStatus.isMessage = false;
         }
 
     });

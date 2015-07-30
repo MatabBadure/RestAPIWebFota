@@ -18,5 +18,6 @@ angular.module('hillromvestApp')
 	};
 	$scope.createDoctor = function(){
 		$scope.doctorStatus.isCreate = true;
+		$scope.doctorStatus.isMessage = false;
 	}
 });

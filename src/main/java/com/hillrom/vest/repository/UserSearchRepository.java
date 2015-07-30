@@ -3,7 +3,6 @@ package com.hillrom.vest.repository;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +10,6 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.hibernate.SQLQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -29,24 +27,25 @@ public class UserSearchRepository {
 		int firstResult = pageable.getPageNumber()*pageable.getOffset();
 		int maxResult = firstResult+pageable.getPageSize();
 		
-		String countSqlQuery = "select count(hillromUsers.id) from (select distinct(user.id),user.first_name,user.last_name,user.email,user_authority.authority_name as name,user.is_deleted as isDeleted from  USER_EXTENSION userExt join USER user "
-				+ " join  USER_AUTHORITY user_authority "
-				+ " where user.id = userExt.user_id and user_authority.user_id = user.id "
-				+ " and user_authority.authority_name in ('ADMIN','ACCT_SERVICES','ASSOCIATES','HILLROM_ADMIN','CLINIC_ADMIN') "
-				+ " and (lower(user.first_name) like lower(:queryString) or "
+		String findHillromTeamUserQuery = "select distinct(user.id),user.first_name as firstName,user.last_name as lastName,user.email,"
+				+ " user_authority.authority_name as name,user.is_deleted as isDeleted "
+				+ " from  USER_EXTENSION userExt join USER user on user.id = userExt.user_id and user.activated = 1 and "
+				+ " (lower(user.first_name) like lower(:queryString') or "
 				+ " lower(user.last_name) like lower(:queryString) or "
-				+ " lower(user.email) like lower(:queryString)) order by user.first_name,user.last_name,user.email ) hillromUsers";
+				+ " lower(user.email) like lower(:queryString)) "
+				+ " join  USER_AUTHORITY user_authority on user_authority.user_id = user.id "
+				+ " and  user_authority.authority_name in ('ADMIN','ACCT_SERVICES','ASSOCIATES','HILLROM_ADMIN','CLINIC_ADMIN')";
+		
+		findHillromTeamUserQuery = findHillromTeamUserQuery.replaceAll(":queryString", queryString);
+		String countSqlQuery = "select count(hillromUsers.id) from ("+findHillromTeamUserQuery+") hillromUsers";
 		
 		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
-		countQuery.setParameter("queryString", queryString);
 		BigInteger count =  (BigInteger) countQuery.getSingleResult();
 		
-		Query query = getNamedQueryOrderedBy("findHillRomTeamUserBy", sortOrder);
+		Query query = getOrderedByQuery(findHillromTeamUserQuery, sortOrder);
 	
 		query.setFirstResult(firstResult);
 		query.setMaxResults(maxResult);
-		
-		query.setParameter("queryString", queryString);
 		
 		List<HillRomUserVO> hrUsersList = new ArrayList<>();
 		List<Object[]> results = query.getResultList(); 
@@ -72,23 +71,24 @@ public class UserSearchRepository {
 		int firstResult = pageable.getPageNumber()*pageable.getOffset();
 		int maxResult = firstResult+pageable.getPageSize();
 		
-		String countSqlQuery = "select count(hcpUsers.id) from (select distinct(user.id),user.email,user.first_name,user.last_name,user.is_deleted as isDeleted,user.zipcode,"
-				+ " userExt.address,userExt.city,userExt.credentials,userExt.fax_number,userExt.primary_phone,userExt.mobile_phone,userExt.speciality,userExt.state,clinic.id as clinicId,clinic.name as clinicName "
-				+ " FROM USER user join USER_EXTENSION userExt "
-				+ " join USER_AUTHORITY user_authority join CLINIC clinic "
-				+ " join CLINIC_USER_ASSOC clinic_user "
-				+ " where user.id = userExt.user_id and user_authority.user_id = user.id "
-				+ " and user_authority.authority_name = 'HCP'  and clinic_user.users_id = user.id "
-				+ " and clinic_user.clinics_id = clinic.id "
-				+ " and (lower(user.first_name) like lower(:queryString) or "
-				+ " lower(user.last_name) like lower(:queryString) or "
-				+ " lower(user.email) like lower(:queryString)) group by user.id order by user.first_name,user.last_name,user.email) hcpUsers";
+		String findHcpQuery = "select distinct(user.id),user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted,"
+				+ " user.zipcode,userExt.address,userExt.city,userExt.credentials,userExt.fax_number,userExt.primary_phone,"
+				+ " userExt.mobile_phone,userExt.speciality,userExt.state,clinic.id as clinicId,clinic.name as clinicName "
+				+ " FROM USER user join USER_EXTENSION userExt on user.id = userExt.user_id and user.activated = 1 "
+				+ " and (lower(user.first_name) like lower(:queryString) or  lower(user.last_name) like lower(:queryString) or  lower(user.email) like lower(:queryString)) "
+				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = 'HCP' "
+				+ " left outer join `hillromvest-dev`.CLINIC_USER_ASSOC user_clinic on user_clinic.users_id = user.id "
+				+ " left outer join `hillromvest-dev`.CLINIC clinic on user_clinic.clinics_id = clinic.id ";
+		
+		findHcpQuery = findHcpQuery.replaceAll(":queryString", queryString);
+		
+		String countSqlQuery = "select count(hcpUsers.id) from ("+findHcpQuery+"group by user.id ) hcpUsers";
 		
 		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
-		countQuery.setParameter("queryString", queryString);
 		BigInteger count =  (BigInteger) countQuery.getSingleResult();
+
 		
-		Query query = getNamedQueryOrderedBy("findHcpBy", sortOrder);
+		Query query = getOrderedByQuery(findHcpQuery, sortOrder);
 		query.setFirstResult(firstResult);
 		query.setMaxResults(maxResult);
 		
@@ -98,6 +98,7 @@ public class UserSearchRepository {
 		
 		Map<Long,HcpVO> hcpUsersMap = new HashMap<>();
 		List<Object[]> results = query.getResultList(); 
+		
 		results.stream().forEach((record) -> {
 	        Long id = ((BigInteger) record[0]).longValue();
 	        String email = (String) record[1];
@@ -139,16 +140,8 @@ public class UserSearchRepository {
 	
 		return page;
 	}
-	
-	private String getNamedQueryString(String queryName) {
-	    Query tmpQuery = entityManager.createNamedQuery(queryName);
-	    SQLQuery sqlQuery = tmpQuery.unwrap(SQLQuery.class);
-	    String queryString = sqlQuery.getQueryString();
-	    return queryString;
-	}
 
-
-	private Query getNamedQueryOrderedBy(String queryName, Map<String, Boolean> columnNames){
+	private Query getOrderedByQuery(String queryString, Map<String, Boolean> columnNames){
 
 	    StringBuilder sb = new StringBuilder();
 	    // Append order by only if there is any sort request.
@@ -170,10 +163,7 @@ public class UserSearchRepository {
 	            sb.append(", ");
 	        }
 	    }
-	    Query jpaQuery = entityManager.createNativeQuery( getNamedQueryString(queryName)
-	                + sb.toString() 
-	                );
-	    System.out.println("jpaQuery : "+jpaQuery);
+	    Query jpaQuery = entityManager.createNativeQuery(queryString+ sb.toString());
 	    return jpaQuery;
 	}
 

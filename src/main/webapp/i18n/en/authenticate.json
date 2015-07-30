@@ -8,6 +8,11 @@
         "placeholder": {
         	"answer": "Enter Your Answer"
         },
-        "forgot-pwd-link": "Forgot Password?"
+        "forgot-pwd-link": "Forgot Password?",
+        "placeholder": {
+            "password": "New Password",
+            "confirm-password": "Re-Enter New Password",
+            "security-answer": "Enter Your Answer"
+        }
     }
 }

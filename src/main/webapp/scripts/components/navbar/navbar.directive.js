@@ -85,7 +85,7 @@ angular.module('hillromvestApp')
 .directive('navbarPopover', function(Auth, $state, Account, $compile) {
     return {
         restrict: 'A',
-        template: "<span id='pop-over-link' class='padding-right'>Jose Rubert</span><span class='hillrom-icon icon-arrow-down'></span>" +
+        template: "<span id='pop-over-link' class='padding-right'>{{username}}</span><span class='hillrom-icon icon-arrow-down'></span>" +
                   "<span style='display:none' id='pop-over-content'><div><span class='hillrom-icon icon-user-account'></span><span>Account</span></div><div ng-click='logout()'><span class='hillrom-icon icon-logout'></span><span>Logout </span></div></span>",
         link: function(scope, elements, attrs) {
             $("#pop-over-link").popover({
@@ -96,6 +96,9 @@ angular.module('hillromvestApp')
                     return $compile($("#pop-over-content").html())(scope);
                 }
             });
-        }  
+        },
+        controller: function ($scope) {
+          $scope.username = localStorage.getItem('userFirstName');
+        }
     }
 });

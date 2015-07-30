@@ -19,7 +19,7 @@
           <span class="dashboard__form--type" translate="user.personal-details"></span>
         </div>
         <div class="col-md-4 user-required">
-          <span translate="user.required-field"></span> 
+          <span translate="user.required-field"></span>
         </div>
 
         <div class="col-md-16 row margin-top">
@@ -49,7 +49,7 @@
 
         </div>
 
-        
+
 
         <div class="col-md-16 row margin-top">
           <div class="col-md-7 row">
@@ -168,7 +168,7 @@
         <div class="col-md-16 row margin-top margin-bottom-extreem">
           <div class="row padding-right-xl">
             <button class="hillrom-btn btn-submit float-right" ng-show="userStatus.isCreate" ng-click="formSubmit()" translate="user.submit-button-text">Submit</button>
-            <button type="button" ng-click="cancel()" ng-show="userStatus.isCreate" class="hillrom-btn btn-submit float-right" >Cancel</button>
+            <button type="reset" ng-click="cancel()" ng-show="userStatus.isCreate" class="hillrom-btn btn-submit float-right" >Cancel</button>
             <button class="hillrom-btn btn-submit float-right" ng-click="deleteUser()" ng-show="!userStatus.isCreate">Delete</button>
             <button class="hillrom-btn btn-submit float-right" ng-click="formSubmit()" ng-show="!userStatus.isCreate">Update</button>
           </div>

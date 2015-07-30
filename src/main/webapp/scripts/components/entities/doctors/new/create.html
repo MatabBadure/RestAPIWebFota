@@ -322,7 +322,7 @@
         <div class="col-md-16 row margin-top margin-bottom-extream">
           <div class="row padding-right-xl">
             <button type="submit" ng-click="formSubmit()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" >Submit</button>
-            <button type="button" ng-click="cancel()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" >Cancel</button>
+            <button type="reset" ng-click="cancel()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" >Cancel</button>
             <button type="button" ng-click="deleteDoctor()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Diassociate</button>
             <button type="submit" ng-click="formSubmit()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Update</button>
           </div>

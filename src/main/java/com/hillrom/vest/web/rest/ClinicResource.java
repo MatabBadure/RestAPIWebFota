@@ -97,7 +97,7 @@ public class ClinicResource {
     @Timed
     public ResponseEntity<List<Clinic>> getAll(@RequestParam(value = "page" , required = false) Integer offset,
                                   @RequestParam(value = "per_page", required = false) Integer limit,
-                                  @RequestParam(value = "filter") String filter)
+                                  @RequestParam(value = "filter",required = false) String filter)
         throws URISyntaxException {
     	PredicateBuilder<Clinic> clinicPredicatebuilder = new PredicateBuilder<Clinic>(Clinic.class,"clinic");
         if (filter != null) {

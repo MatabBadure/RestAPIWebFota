@@ -3,6 +3,7 @@ package com.hillrom.vest.repository;
 import org.apache.commons.lang.StringUtils;
 
 import com.mysema.query.types.expr.BooleanExpression;
+import com.mysema.query.types.path.BooleanPath;
 import com.mysema.query.types.path.NumberPath;
 import com.mysema.query.types.path.PathBuilder;
 import com.mysema.query.types.path.StringPath;
@@ -33,8 +34,13 @@ public class Predicate<T> {
             else if (criteria.getOperation().equalsIgnoreCase("<")) {
                 return path.loe(value);
             }
-        } 
-        else {
+        } else if("true".equalsIgnoreCase(criteria.getValue().toString()) || "false".equalsIgnoreCase(criteria.getValue().toString())){
+        	BooleanPath path = entityPath.getBoolean(criteria.getKey());
+        	if("true".equalsIgnoreCase(criteria.getValue().toString()))
+        		return path.isTrue();
+        	else
+        		return path.isFalse();
+        } else {
             StringPath path = entityPath.getString(criteria.getKey());
             if (criteria.getOperation().equalsIgnoreCase(":")) {
                 return path.containsIgnoreCase(criteria.getValue().toString());

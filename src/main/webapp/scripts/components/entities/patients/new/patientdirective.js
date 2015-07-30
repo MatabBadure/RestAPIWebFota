@@ -54,7 +54,13 @@ angular.module('hillromvestApp')
                 $scope.reset();
               }).catch(function (response) {
                 $scope.patientStatus.isMessage = true;
-                $scope.patientStatus.message = 'Error occured! Please try again';
+                if (response.data.message !== undefined) {
+                $scope.patientStatus.message = response.data.message;
+                }else if(response.data.ERROR !== undefined){
+                  $scope.patientStatus.message = response.data.ERROR;
+                } else {
+                  $scope.patientStatus.message = 'Error occured! Please try again';
+                }
 
               });
 
@@ -80,7 +86,9 @@ angular.module('hillromvestApp')
                 if(response.status == '400' && response.data.message == "HR Id already in use."){
                   $scope.patientStatus.message = 'Patient ID ' + $scope.patient.HRID + " already in use.";
                 }
-                else{
+                else if(response.data.ERROR !== undefined){
+                  $scope.patientStatus.message = response.data.ERROR;
+                }else {
                   $scope.patientStatus.message = 'Error occured! Please try again';
                 }
               });
@@ -134,8 +142,8 @@ angular.module('hillromvestApp')
           var selectedDate = selectedDate;
           var diff = currentDate - selectedDate;
           var years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
-          var age;
-          age = years + 1;
+          var age = 0;
+          age = parseInt(parseInt(years) + 1);
           if (diff < 0) {
             age = 0;
           };

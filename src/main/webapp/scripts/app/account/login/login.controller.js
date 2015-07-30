@@ -46,6 +46,7 @@ angular.module('hillromvestApp')
     }).then(function(data) {
       if (data.status === 200) {
         localStorage.removeItem('loginCount');
+        localStorage.setItem('userFirstName', data.data.user.firstName);
         $state.go('patient');
       }
     }).catch(function(data) {
@@ -71,7 +72,7 @@ angular.module('hillromvestApp')
         }
       }
       else{
-        $scope.otherError = true;
+       $scope.authenticationError = true;
       }
     });
   };

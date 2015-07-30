@@ -2,6 +2,7 @@ package com.hillrom.vest.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -65,12 +66,9 @@ public class PatientVestDeviceDataService {
 			});
 			recordsToBeInserted = patientVestDeviceRecords;
 		}
-		
-		
+
 		if(recordsToBeInserted.size() > 0){			
-			recordsToBeInserted.forEach(record -> {
-				deviceDataRepository.save(record);
-			});
+			deviceDataRepository.save(recordsToBeInserted);
 		}
 		deviceRawLogRepository.save(deviceRawLog);
 		return patientVestDeviceRecords;
@@ -83,15 +81,18 @@ public class PatientVestDeviceDataService {
 		List<PatientVestDeviceData> latestVestDeviceDataRecords = latestVestDeviceDataForPatientInDB.getContent();
 		if(latestVestDeviceDataRecords.size() > 0){
 			PatientVestDeviceData latestDeviceData = latestVestDeviceDataRecords.get(0); 
-			patientVestDeviceRecords
+			// Removing Duplicate Records
+			patientVestDeviceRecords = patientVestDeviceRecords
 					.stream()
 					.filter(record -> record.getTimestamp() > latestDeviceData
-							.getTimestamp()).forEach(deviceData -> {
-								deviceData.setHubId(deviceRawLog.getHubId());
-								deviceData.setSerialNumber(deviceRawLog.getDeviceSerialNumber());
-								deviceData.setPatient(patientInfo);
-								deviceData.setBluetoothId(deviceRawLog.getDeviceAddress());
-							});
+							.getTimestamp()).collect(Collectors.toList());
+			//Updating the new records with required fields
+			patientVestDeviceRecords.forEach(deviceData -> {
+				deviceData.setHubId(deviceRawLog.getHubId());
+				deviceData.setSerialNumber(deviceRawLog.getDeviceSerialNumber());
+				deviceData.setPatient(patientInfo);
+				deviceData.setBluetoothId(deviceRawLog.getDeviceAddress());
+			});
 		}
 		return patientVestDeviceRecords;
 	}

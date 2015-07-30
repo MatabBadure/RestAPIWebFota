@@ -41,8 +41,10 @@
                 </div>
               </div>
                 <div class="margin-bottom-sm" ng-repeat="clinic in doctor.clinics">
-                  <input class="" type="text" name="clinicName"  ng-model="clinic.name"  required ng-if="!doctorStatus.editMode" ng-keyup="getClinics()">
-                  <span ng-click="removeClinic($index)" ng-if="$index !== 0">Remove</span>
+                <div class="multi-clinic">
+                    <input class="" type="text" name="clinicName"  ng-model="clinic.name"  required ng-if="!doctorStatus.editMode" ng-keyup="getClinics()">
+                    <span ng-click="removeClinic($index)" ng-if="$index !== 0" class="glyphicon glyphicon-remove"></span>
+                </div>
                   <div ng-show="(form.clinicName.$dirty && form.clinicName.$invalid) || submitted" class="">
                     <span class="has-error" ng-show="form.clinicName.$error.required">
                       Clinic Name is required.

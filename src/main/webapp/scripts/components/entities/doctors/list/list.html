@@ -31,8 +31,7 @@
         </div>
       </div>
 
-       <div class="dashboard__manage-view--list" ng-repeat="doctor in doctors">
-         <div ng-click="selectDoctor(doctor)">
+       <div class="dashboard__manage-view--list" ng-repeat="doctor in doctors" ng-click="selectDoctor(doctor)">
           <div class="col-md-3 reset-padding-left">
             <span class="user-name">{{doctor.lastName}} {{doctor.firstName}}</span>
             <span class="user-email">{{doctor.email}}</span>
@@ -67,7 +66,6 @@
             </div>
           </div>
           <div class="clr"></div>
-         </div>
        </div>
 
       <div class="dashboard__manage-view--pagination">

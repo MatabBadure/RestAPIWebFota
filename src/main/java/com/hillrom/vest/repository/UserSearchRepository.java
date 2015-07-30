@@ -30,7 +30,7 @@ public class UserSearchRepository {
 		String findHillromTeamUserQuery = "select distinct(user.id),user.first_name as firstName,user.last_name as lastName,user.email,"
 				+ " user_authority.authority_name as name,user.is_deleted as isDeleted "
 				+ " from  USER_EXTENSION userExt join USER user on user.id = userExt.user_id and user.activated = 1 and "
-				+ " (lower(user.first_name) like lower(:queryString') or "
+				+ " (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or "
 				+ " lower(user.email) like lower(:queryString)) "
 				+ " join  USER_AUTHORITY user_authority on user_authority.user_id = user.id "
@@ -77,8 +77,8 @@ public class UserSearchRepository {
 				+ " FROM USER user join USER_EXTENSION userExt on user.id = userExt.user_id and user.activated = 1 "
 				+ " and (lower(user.first_name) like lower(:queryString) or  lower(user.last_name) like lower(:queryString) or  lower(user.email) like lower(:queryString)) "
 				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = 'HCP' "
-				+ " left outer join `hillromvest-dev`.CLINIC_USER_ASSOC user_clinic on user_clinic.users_id = user.id "
-				+ " left outer join `hillromvest-dev`.CLINIC clinic on user_clinic.clinics_id = clinic.id ";
+				+ " left outer join CLINIC_USER_ASSOC user_clinic on user_clinic.users_id = user.id "
+				+ " left outer join CLINIC clinic on user_clinic.clinics_id = clinic.id ";
 		
 		findHcpQuery = findHcpQuery.replaceAll(":queryString", queryString);
 		
@@ -91,8 +91,6 @@ public class UserSearchRepository {
 		Query query = getOrderedByQuery(findHcpQuery, sortOrder);
 		query.setFirstResult(firstResult);
 		query.setMaxResults(maxResult);
-		
-		query.setParameter("queryString", queryString);
 		
 		List<HcpVO> hcpUsers = new ArrayList<>();
 		
@@ -120,18 +118,23 @@ public class UserSearchRepository {
 	        HcpVO hcpVO = hcpUsersMap.get(id);
 	        
 	        Map<String,String> clinicMap = new HashMap<>();
-	        clinicMap.put("id", clinicId.toString());
-	        clinicMap.put("name", clinicName);
+	        if(null != clinicId){	        	
+	        	clinicMap.put("id", clinicId.toString());
+	        	clinicMap.put("name", clinicName);
+	        }
 	        if(hcpVO == null){
 	        	hcpVO = new HcpVO(id, firstName, lastName, email, 
 		        		isDeleted, zipcode, address,city, credentials, faxNumber,
 		        		primaryPhone, mobilePhone, speciality, state);
-	        	
-	        	hcpVO.getClinics().add(clinicMap);
+	        	if(clinicMap.keySet().size() > 0){	        		
+	        		hcpVO.getClinics().add(clinicMap);
+	        	}
 	        	hcpUsersMap.put(id, hcpVO);
 	        }else{
 	        	hcpUsers.remove(hcpVO);
-	        	hcpVO.getClinics().add(clinicMap);
+	        	if(clinicMap.keySet().size() > 0){	        		
+	        		hcpVO.getClinics().add(clinicMap);
+	        	}
 	        }
 	        hcpUsers.add(hcpVO);
 		});

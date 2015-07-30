@@ -5994,8 +5994,11 @@ a::-moz-focus-inner {
 
 .dashboard__manage-view--list {
   border-bottom: 1px solid #ccc;
-  padding-bottom: 10px;
-  margin-top: 10px;
+  padding-top: 10px;
+  cursor: pointer;
+}
+.dashboard__manage-view--list:hover {
+  background-color: #f1f1f1;
 }
 
 .dashboard__manage-view--list .user-name {

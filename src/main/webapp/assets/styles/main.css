@@ -5633,6 +5633,10 @@ a::-moz-focus-inner {
   height: calc(100% - 100px);
   position: absolute;
   width: 100%;
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  -webkit-transform: translate3d(0, 0, 0);
 }
 
 .login .login--position {
@@ -5790,6 +5794,10 @@ a::-moz-focus-inner {
   color: #585858;
 }
 
+.reset-form .form-group {
+  height: 50px;
+}
+
 .dashboard {
   background-color: #f1f1f1;
   color: #34455C;
@@ -5831,7 +5839,6 @@ a::-moz-focus-inner {
   color: #aeb5be;
   font-size: 12px;
   font-weight: 700;
-  padding-right: 40px;
   text-align: right;
 }
 
@@ -6214,7 +6221,7 @@ a::-moz-focus-inner {
 
 .custom-dropdown--auth:before {
   color: #34455C;
-  content: "εÿÇ";
+  content: "";
   font-family: "hill-rom";
   font-size: 10px;
   padding: 0;

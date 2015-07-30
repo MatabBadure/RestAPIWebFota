@@ -9,7 +9,7 @@
       <!-- normal login -->
       <div class=" col-md-10 col-lg-10 login__container__right-section" ng-show="showLogin">
         <form class="login-form" role="form" name="form" novalidate>
-          <p><strong>LOGIN TO YOUR ACCOUNT</strong></p>
+        <div class="auth-heading">LOGIN TO YOUR ACCOUNT</div>
           <div class="alert alert-danger has-error" ng-show="authenticationError" translate="login.messages.error.authentication">
             <strong>Authentication failed!</strong> Please check your credentials and try again.
           </div>
@@ -44,11 +44,11 @@
             </div>
           </div>
 
-          <div class="col-md-8 col-lg-8 link" id="forgotpwd">
-            <a href="#/reset/request">Forgot Password?</a>
+          <div class="col-md-8 col-lg-8 link margin-top" id="forgotpwd">
+            <a class="text-small" href="#/reset/request">Forgot Password?</a>
           </div>
 
-          <div class="col-md-8 col-lg-8 link">
+          <div class="col-md-8 col-lg-8 link margin-top">
             <a ng-click="login($event)" class="myButton" translate="login.form.button">LOGIN</a>
           </div>
         </form>

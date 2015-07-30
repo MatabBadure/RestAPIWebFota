@@ -5439,6 +5439,10 @@ a::-moz-focus-inner {
   margin-top: 40px;
 }
 
+.margin-bottom-sm {
+  margin-bottom: 10px;
+}
+
 .margin-bottom-xl {
   margin-bottom: 40px;
 }
@@ -5684,6 +5688,9 @@ a::-moz-focus-inner {
   opacity: 0.6;
 }
 
+.login-form .form-group {
+  height: 50px;
+}
 .login-form input {
   margin: 0 !important;
 }
@@ -5747,6 +5754,12 @@ a::-moz-focus-inner {
   color: #34455C;
   font-size: 12px;
   font-weight: 400;
+}
+
+.text-small {
+  font-size: 12px;
+  font-weight: 400;
+  color: #34455C;
 }
 
 .form__container__reset {

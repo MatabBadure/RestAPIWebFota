@@ -93,6 +93,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/securityQuestions").permitAll()
             .antMatchers("/api/account/update_passwordsecurityquestion").permitAll()
             .antMatchers("/api/receiveData").permitAll()
+            .antMatchers("/api/patient/{id}/vestdevicedata").permitAll()
             .antMatchers("/api/logs/**").hasAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/api/**").authenticated()
             .antMatchers("/api/account/**").authenticated()

@@ -2,7 +2,7 @@
 
 angular.module('hillromvestApp', ['LocalStorageModule', 'tmh.dynamicLocale', 'pascalprecht.translate',
 
-    'ngResource', 'ui.router', 'ngCookies', 'ngCacheBuster', 'infinite-scroll', 'vcRecaptcha'])
+    'ngResource', 'ui.router', 'ngCookies', 'ngCacheBuster', 'infinite-scroll', 'vcRecaptcha', 'mgcrea.ngStrap'])
 
 
     .run(function ($rootScope, $location, $window, $http, $state, $translate, Language, Auth, Principal, ENV, VERSION) {

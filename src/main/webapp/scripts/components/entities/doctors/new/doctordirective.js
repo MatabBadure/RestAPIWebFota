@@ -9,7 +9,6 @@ angular.module('hillromvestApp')
         doctorStatus: '=doctorStatus'
       },
       controller: function ($scope, $timeout) {
-
         $scope.init = function () {
           $scope.states = [];
           $scope.doctor.titles = ["Dr"];
@@ -20,6 +19,16 @@ angular.module('hillromvestApp')
           }).catch(function (response) {
 
           });
+
+
+
+          $scope.testStates = [{"id":1,"name":"Appolo","address":null,"zipcode":null,"city":null,"state":"IA","phoneNumber":null,"faxNumber"
+:null,"hillromId":null,"clinicAdminId":null,"parentClinic":null,"deleted":true,"parent":false},{"id"
+:47,"name":"Clinic001","address":null,"zipcode":null,"city":null,"state":null,"phoneNumber":null,"faxNumber"
+:null,"hillromId":null,"clinicAdminId":null,"parentClinic":null,"deleted":false,"parent":true},{"id"
+:48,"name":"SatelliteClinic","address":null,"zipcode":null,"city":null,"state":null,"phoneNumber":null
+,"faxNumber":null,"hillromId":null,"clinicAdminId":null,"parentClinic":null,"deleted":false,"parent"
+:false}];
         };
 
         $scope.getClinics = function () {

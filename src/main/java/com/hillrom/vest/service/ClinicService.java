@@ -79,15 +79,19 @@ public class ClinicService {
 	        		clinicRepository.save(childClinic);
 	        		clinic.getChildClinics().remove(childClinic);
 	        	}
-        	} else if(clinicDTO.getParentClinic().get("id") != null && id != clinicDTO.getParentClinic().get("id")) {
-        		Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
-       			parentClinic.setParent(true);
-       			clinicRepository.save(parentClinic);
-       			clinic.setParentClinic(parentClinic);
+        	} else if(clinicDTO.getParentClinic().size() != 0 && clinicDTO.getParentClinic().get("id") != null) {
+        		if(id != clinicDTO.getParentClinic().get("id")) {
+        			Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
+        			parentClinic.setParent(true);
+        			clinicRepository.save(parentClinic);
+        			clinic.setParentClinic(parentClinic);       			
+        		} else {
+        			jsonObject.put("ERROR", "Clinic can't be parent of his own.");
+        			return jsonObject;
+        		} 
         	} else {
-        		jsonObject.put("ERROR", "Clinic can't be parent of his own.");
-        		return jsonObject;
-        	}
+       			clinicRepository.save(clinic);
+        	} 
     		clinicRepository.save(clinic);
         	jsonObject.put("message", "Clinic updated successfully.");
             jsonObject.put("Clinic", clinic);

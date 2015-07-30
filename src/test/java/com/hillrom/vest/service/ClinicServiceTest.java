@@ -1,4 +1,4 @@
-/*package com.hillrom.vest.service;
+package com.hillrom.vest.service;
 
 import com.hillrom.vest.Application;
 import com.hillrom.vest.domain.Clinic;
@@ -17,11 +17,11 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import javax.inject.Inject;
 import static org.assertj.core.api.Assertions.*;
 
-*//**
+/**
  * Test class for the UserResource REST controller.
  *
  * @see UserService
- *//*
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
@@ -60,10 +60,11 @@ public class ClinicServiceTest {
 
     @Test
     public void assertThatClinicIsUpdated() {
-    	
-    	clinicRepository.saveAndFlush(clinic);
+    	JSONObject jsonObject = clinicService.createClinic(clinicDTO);
+    	Clinic newClinic = (Clinic)jsonObject.get("Clinic");
+
     	clinicDTO.setName("Fortis Hospital - Main");
-    	JSONObject jsonObject = clinicService.updateClinic(clinic.getId(), clinicDTO);
+    	jsonObject = clinicService.updateClinic(newClinic.getId(), clinicDTO);
     	clinic = (Clinic)jsonObject.get("Clinic");
         
         assertThat(clinic.isDeleted()).isFalse();
@@ -88,7 +89,7 @@ public class ClinicServiceTest {
     
     @Test
     public void assertThatClinicIsDeletedFailure() {
-    	clinicDTO.setHillromId("HR000028");
+    	clinicDTO.setClinicAdminId(3L);
     	JSONObject jsonObject = clinicService.createClinic(clinicDTO);
     	Clinic newClinic = (Clinic)jsonObject.get("Clinic");
     	
@@ -102,4 +103,3 @@ public class ClinicServiceTest {
     }
     
 }
-*/

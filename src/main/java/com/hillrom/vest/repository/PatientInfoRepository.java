@@ -25,4 +25,7 @@ public interface PatientInfoRepository extends JpaRepository<PatientInfo,Long> {
 			+ " LOWER(p.hillromId) like LOWER(:queryString) )"
 			+ " order by firstName,lastName,email ")
 	Page<PatientInfo> findBy(@Param("queryString")String searchString,Pageable pageable);
+	
+	@Query("from PatientInfo where bluetoothId = ?1")
+	Optional<PatientInfo> findByBluetoothId(String serialNumber);
 }

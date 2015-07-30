@@ -4,9 +4,8 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -21,24 +20,20 @@ import com.hillrom.vest.domain.util.CustomDateTimeSerializer;
 /**
  * A PATIENT_VEST_DEVICE_RAW_LOGS.
  */
+@IdClass(PatientVestDeviceRawLogPK.class)
 @Entity
 @Table(name = "PATIENT_VEST_DEVICE_RAW_LOGS")
 public class PatientVestDeviceRawLog implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    @NotNull
-    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-    @JsonSerialize(using = CustomDateTimeSerializer.class)
-    @JsonDeserialize(using = CustomDateTimeDeserializer.class)
+	@NotNull
+    @Id
     @Column(name = "hub_receive_time", nullable = false)
-    private DateTime hubReceiveTime;
+    private Long hubReceiveTime;
 
     @NotNull
+    @Id
     @Column(name = "device_address", nullable = false)
     private String deviceAddress;
 
@@ -66,11 +61,9 @@ public class PatientVestDeviceRawLog implements Serializable {
     @Column(name = "timezone")
     private String timezone;
 
-    @Column(name = "sp_receive_time")
-    private String spReceiveTime;
-
-    @Column(name = "hub_receive_time_offset")
-    private Integer hubReceiveTimeOffset;
+    @NotNull
+    @Column(name = "sp_receive_time", nullable = false)
+    private Long spReceiveTime;
 
     @Column(name = "cuc_version")
     private String cucVersion;
@@ -81,19 +74,11 @@ public class PatientVestDeviceRawLog implements Serializable {
     @Column(name = "raw_message")
     private String rawMessage;
 
-    public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public DateTime getHubReceiveTime() {
+	public Long getHubReceiveTime() {
 		return hubReceiveTime;
 	}
 
-	public void setHubReceiveTime(DateTime hubReceiveTime) {
+	public void setHubReceiveTime(Long hubReceiveTime) {
 		this.hubReceiveTime = hubReceiveTime;
 	}
 
@@ -169,20 +154,12 @@ public class PatientVestDeviceRawLog implements Serializable {
 		this.timezone = timezone;
 	}
 
-	public String getSpReceiveTime() {
+	public Long getSpReceiveTime() {
 		return spReceiveTime;
 	}
 
-	public void setSpReceiveTime(String spReceiveTime) {
+	public void setSpReceiveTime(Long spReceiveTime) {
 		this.spReceiveTime = spReceiveTime;
-	}
-
-	public Integer getHubReceiveTimeOffset() {
-		return hubReceiveTimeOffset;
-	}
-
-	public void setHubReceiveTimeOffset(Integer hubReceiveTimeOffset) {
-		this.hubReceiveTimeOffset = hubReceiveTimeOffset;
 	}
 
 	public String getCucVersion() {
@@ -213,7 +190,10 @@ public class PatientVestDeviceRawLog implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result
+				+ ((deviceAddress == null) ? 0 : deviceAddress.hashCode());
+		result = prime * result
+				+ ((hubReceiveTime == null) ? 0 : hubReceiveTime.hashCode());
 		return result;
 	}
 
@@ -226,33 +206,32 @@ public class PatientVestDeviceRawLog implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		PatientVestDeviceRawLog other = (PatientVestDeviceRawLog) obj;
-		if (id == null) {
-			if (other.id != null)
+		if (deviceAddress == null) {
+			if (other.deviceAddress != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!deviceAddress.equals(other.deviceAddress))
+			return false;
+		if (hubReceiveTime == null) {
+			if (other.hubReceiveTime != null)
+				return false;
+		} else if (!hubReceiveTime.equals(other.hubReceiveTime))
 			return false;
 		return true;
 	}
 
 	@Override
-    public String toString() {
-        return "PatientVestDeviceRawLogs{" +
-                "id=" + id +
-                ", hub_receive_time='" + hubReceiveTime + "'" +
-                ", device_address='" + deviceAddress + "'" +
-                ", device_model_type='" + deviceModelType + "'" +
-                ", device_data='" + deviceData + "'" +
-                ", device_serial_number='" + deviceSerialNumber + "'" +
-                ", device_type='" + deviceType + "'" +
-                ", hub_id='" + hubId + "'" +
-                ", air_interface_type='" + airInterfaceType + "'" +
-                ", customer_name='" + customerName + "'" +
-                ", timezone='" + timezone + "'" +
-                ", sp_receive_time='" + spReceiveTime + "'" +
-                ", hub_receive_time_offset='" + hubReceiveTimeOffset + "'" +
-                ", cuc_version='" + cucVersion + "'" +
-                ", customer_id='" + customerId + "'" +
-                ", raw_message='" + rawMessage + "'" +
-                '}';
-    }
+	public String toString() {
+		return "PatientVestDeviceRawLog [hubReceiveTime=" + hubReceiveTime
+				+ ", deviceAddress=" + deviceAddress + ", deviceModelType="
+				+ deviceModelType + ", deviceData=" + deviceData
+				+ ", deviceSerialNumber=" + deviceSerialNumber
+				+ ", deviceType=" + deviceType + ", hubId=" + hubId
+				+ ", airInterfaceType=" + airInterfaceType + ", customerName="
+				+ customerName + ", timezone=" + timezone + ", spReceiveTime="
+				+ spReceiveTime + ", cucVersion=" + cucVersion
+				+ ", customerId=" + customerId + ", rawMessage=" + rawMessage
+				+ "]";
+	}
+
+	
 }

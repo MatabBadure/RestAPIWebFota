@@ -17,10 +17,6 @@
           <div class="text-center indent-bottom-5 has-error" ng-show="firstTimeAccessFailed" >Authentication failed!
           </div> 
 
-          <div class="text-center indent-bottom-5 has-error" ng-show="otherError">
-            Error occured!
-          </div> 
-
           <div class="form-group">
             <input type="text" class="form-control" id="username" name="username" placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="username" required>
             <div class="form-error" ng-show="(form.username.$dirty && form.username.$invalid) || loginSubmitted">
@@ -32,24 +28,12 @@
 
           <div class="form-group">
             <input type="password" class="form-control" id="password" name="password" placeholder="{{'login.form.password.placeholder' | translate}}" ng-model="password"
-            ng-minlength=8 ng-maxlength=50 ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
+              required>
             <div class="form-error" ng-show="(form.password.$dirty && form.password.$invalid) || loginSubmitted">
               <span class="has-error"
                  ng-show="form.password.$error.required">
                   password is required.
               </span>
-              <span class="has-error"
-                 ng-show="form.password.$error.minlength">
-                   password is required to be at least 8 characters.
-              </span>
-              <span class="has-error"
-                 ng-show="form.password.$error.maxlength" >
-                   password cannot be longer than 50 characters.
-              </span>
-              <span class="has-error"
-                 ng-show="form.password.$error.pattern" >
-                   password is invalid.
-              </span> 
             </div>
           </div>
 

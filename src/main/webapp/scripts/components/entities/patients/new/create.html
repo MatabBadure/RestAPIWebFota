@@ -1,10 +1,11 @@
-<span ng-show="patientStatus.isMessage">{{patientStatus.message}}</span>
+
 <div class="navbar dashboard dashbord-nav">
   <div class="container">
     <div class="dashbord-nav__primary pull-left" ng-show="!patientStatus.editMode">
       <span class="dashbord-nav__primary--title" translate="patient.home.createLabel">Edit Patient</span>
     </div>
   </div>
+  <span ng-show="patientStatus.isMessage">{{patientStatus.message}}</span>
 </div>
 
 <div class="dashboard dashboard--content padding-bottom-ls">

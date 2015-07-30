@@ -33,6 +33,12 @@ angular.module('hillromvestApp')
           },1000)
         };
 
+        $scope.removeClinic = function(index) {
+          var tmpList = angular.copy($scope.doctor.clinics);
+          tmpList.splice(index, 1);
+          $scope.doctor.clinics = tmpList;
+        };
+
         $scope.selectClinic = function(clinic, index) {
           $scope.doctor.clinics[index].name = clinic.name;
           $scope.doctor.clinics[index].id = clinic.id;

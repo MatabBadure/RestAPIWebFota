@@ -326,7 +326,7 @@
           <div class="row padding-right-xl">
             <button type="submit" ng-click="formSubmit()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" >Submit</button>
             <button type="button" ng-click="cancel()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" >Cancel</button>
-            <button type="button" ng-click="deleteDoctor()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Diassociate</button>
+            <button type="button" ng-click="open()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Diassociate</button>
             <button type="submit" ng-click="formSubmit()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Update</button>
           </div>
         </div>
@@ -334,3 +334,23 @@
     </div>
   </form>
 </div>
+
+
+
+<div ng-if="showModal" class="modal" id="sg-modal" tabIndex="-1" role="dialog" aria-labelledby="sgModalLabel" aria-hidden="true">
+  <div class="modal__dialog">
+    <div class="modal__content">
+      <header class="modal__header">
+        <button type="button" class="modal__close" data-dismiss="modal" ng-click="close()">&times;</button>
+         Are you sure you want to Disassociate the doctor ?
+      </header>
+      <div class="modal__body">
+      <div>If you disassociate the doctor,you will no longer be able to view their information</div>
+        <buton ng-click="deleteDoctor()">ok</buton> <buton data-dismiss="modal" ng-click="close()">cancel</buton>
+      </div>
+      <footer class="modal__footer">
+      </footer>
+    </div>
+  </div>
+</div>
+

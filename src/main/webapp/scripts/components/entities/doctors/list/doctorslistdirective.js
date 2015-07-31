@@ -25,6 +25,7 @@ angular.module('hillromvestApp')
         $scope.total = 0;
         $scope.noMatchFound = false;
         $scope.sortOption = "";
+        $scope.showModal = false;
         $scope.searchDoctors();
       };
 
@@ -64,7 +65,7 @@ angular.module('hillromvestApp')
           if (track === "PREV" && $scope.currentPageIndex > 1) {
             $scope.currentPageIndex--;
           }
-          if (track === "NEXT" && $scope.currentPageIndex < $scope.pageCount)
+          else if (track === "NEXT" && $scope.currentPageIndex < $scope.pageCount)
             {
               $scope.currentPageIndex++;
             }else{

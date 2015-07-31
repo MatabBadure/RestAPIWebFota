@@ -13,6 +13,14 @@ angular.module('hillromvestApp')
 
       controller: function($scope) {
 
+         $scope.open = function () {
+          $scope.showModal = true;
+        };
+        
+        $scope.close = function () {
+          $scope.showModal = false;
+        };
+
         $scope.init = function() {
           $scope.clinic = {};
           $scope.clinic.type = 'parent';
@@ -102,12 +110,13 @@ angular.module('hillromvestApp')
         };
 
         $scope.deleteClinic = function() {
-          $scope.clinic.id = 1;
           ClinicService.deleteClinic($scope.clinic.id).then(function(data) {
+             $scope.showModal = false;
             $scope.clinicStatus.isMessage = true;
             $scope.clinicStatus.message = data.data.message;
             $scope.reset();
           }).catch(function(response) {
+             $scope.showModal = false;
             if (response.data.message !== undefined) {
               $scope.clinicStatus.message = data.data.message;
             } else {

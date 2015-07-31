@@ -18,6 +18,14 @@ angular.module('hillromvestApp')
       },
       controller: function ($scope) {
 
+         $scope.open = function () {
+          $scope.showModal = true;
+        };
+        
+        $scope.close = function () {
+          $scope.showModal = false;
+        };
+
         $scope.submitted = false;
         $scope.user.role = "ADMIN";
         $scope.formSubmit = function () {
@@ -83,10 +91,12 @@ angular.module('hillromvestApp')
          */
         $scope.deleteUser = function () {
           UserService.deleteUser($scope.user.id).then(function (response) {
+            $scope.showModal = false;
             $scope.userStatus.isMessage = true;
             $scope.userStatus.message = response.data.message;
             $scope.reset();
           }).catch(function (response) {
+            $scope.showModal = false;
             $scope.userStatus.isMessage = true;
             if (response.data.message !== undefined) {
               $scope.userStatus.message = response.data.message;

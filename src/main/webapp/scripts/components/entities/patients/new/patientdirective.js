@@ -175,8 +175,7 @@ angular.module('hillromvestApp')
           });
         };
         $scope.cancel = function(){
-          $scope.patientStatus.editMode = false;
-          $scope.patientStatus.isCreate = false;
+          $scope.reset();
         };
 
         $scope.reset = function(){

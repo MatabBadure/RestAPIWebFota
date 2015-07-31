@@ -28,7 +28,7 @@ angular.module('hillromvestApp')
            return {'response' : data, 'status' : status, 'headers' : headers, 'config' : config};
         });
       },
-
+      
       /**
       * @ngdoc method
       * @name editUser
@@ -36,7 +36,7 @@ angular.module('hillromvestApp')
       *
       */
       getPatientInfo : function(id){
-        return $http.get('api/patientInfos/' + id,  {
+        return $http.get('api/user/' + id,  {
           headers: {
             'Content-Type' : 'application/json',
             'x-auth-token' : token
@@ -44,6 +44,18 @@ angular.module('hillromvestApp')
         }).success(function (response) {
           return response;
         });
-      }
+      },
+
+      editPatient : function (id) {
+        return $http.put('api/patientInfos/' + id,  {
+          headers: {
+            'Content-Type' : 'application/json',
+            'Accept' : 'application/json',
+            'x-auth-token' : token
+          }
+        }).success(function (response) {
+          return response;
+        });
+      },
     };
   });

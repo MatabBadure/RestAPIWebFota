@@ -16,7 +16,7 @@ angular.module('hillromvestApp')
         isCreate: '=isCreate',
         userStatus: '=userStatus'
       },
-      controller: function ($scope) {
+      controller: function ($scope, noty) {
 
         $scope.submitted = false;
         $scope.user.role = "ADMIN";

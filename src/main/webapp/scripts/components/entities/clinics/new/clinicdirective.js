@@ -11,7 +11,7 @@ angular.module('hillromvestApp')
       },
 
 
-      controller: function($scope) {
+      controller: function($scope, noty) {
 
         $scope.init = function() {
           $scope.clinic = {};

@@ -198,9 +198,10 @@
 .dashboard__manage-view--list {
 	border-bottom: 1px solid #ccc;
   padding-top: 10px;
+  padding-bottom: 10px;
   cursor: pointer;
   &:hover {
-  	background-color: $seashell; 
+  	background-color: $seashell;
   }
 }
 
@@ -372,10 +373,52 @@
   }
 }
 
-.multi-clinic {
-  ul {
-    width: 100%;
-    margin-top: -1px;
-    border-radius: 0;
-  }
+.modal {
+	background: rgba(0, 0, 0, 0.7) none repeat scroll 0 0;
+}
+
+.modal__header {
+	background-color: #34455c;
+	color: white;
+	padding: 10px 20px;
+	margin-bottom: 0;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	text-transform: none;
+}
+
+.modal__content {
+	padding: 0;
+	-webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.modal__close {
+	background: transparent none repeat scroll 0 0;
+	border: 0 none;
+	color: white;
+	cursor: pointer;
+	display: inline-block;
+	float: right;
+	font-size: 24px;
+	font-weight: 100;
+	line-height: 1;
+	margin: -2px 0 0;
+	padding: 0;
+}
+
+.modal__body {
+	padding: 20px;
+	background-color: $body-bg;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+.modal--message {
+	color: $nevada;
+}
+
+.modal--custom-btn {
+	padding-top: 30px;
 }

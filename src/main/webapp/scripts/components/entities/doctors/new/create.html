@@ -293,22 +293,22 @@
   </form>
 </div>
 
-
-
 <div ng-if="showModal" class="modal" id="sg-modal" tabIndex="-1" role="dialog" aria-labelledby="sgModalLabel" aria-hidden="true">
   <div class="modal__dialog">
     <div class="modal__content">
       <header class="modal__header">
         <button type="button" class="modal__close" data-dismiss="modal" ng-click="close()">&times;</button>
-         Are you sure you want to Disassociate the doctor ?
+         Are you sure you want to Disassociate the Doctor ?
       </header>
       <div class="modal__body">
-      <div>If you disassociate the doctor,you will no longer be able to view their information</div>
-        <buton ng-click="deleteDoctor()">ok</buton> <buton data-dismiss="modal" ng-click="close()">cancel</buton>
+         <div class="modal--message">If you disassociate the doctor,you will no longer be able to view their information</div>
+         <div class="row modal--custom-btn">
+          <buton class="hillrom-btn btn-submit float-right" ng-click="deleteDoctor()">Yes</buton> 
+          <buton class="hillrom-btn btn-submit float-right" data-dismiss="modal" ng-click="close()">No</buton> 
+         </div>
       </div>
       <footer class="modal__footer">
       </footer>
     </div>
   </div>
 </div>
-

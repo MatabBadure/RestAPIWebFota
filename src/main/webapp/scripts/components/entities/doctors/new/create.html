@@ -30,13 +30,13 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <tags-input ng-model="doctor.clinics" display-property="name" min-tags="1" name="clinics">
+              <tags-input ng-model="doctor.clinics" display-property="name" min-tags="1" name="clinicAutoComplete">
                 <auto-complete source="clinics" display-property="name" min-length="1"></auto-complete>
               </tags-input>
             </div>
-            <div ng-show="(form.clinics.$dirty && form.clinics.$error && form.clinics.$error.minTags)" class="">
+            <div ng-show="(form.clinicAutoComplete.$dirty && form.clinicAutoComplete.$error && form.clinicAutoComplete.$error.minTags) && submitted">
               <span class="has-error">
-                min tags required
+                Clinic is Required
               </span>
             </div>
           </div>

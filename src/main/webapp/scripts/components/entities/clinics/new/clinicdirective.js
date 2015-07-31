@@ -63,6 +63,11 @@ angular.module('hillromvestApp')
             ClinicService.updateClinic(data).then(function(data) {
               $scope.clinicStatus.isMessage = true;
               $scope.clinicStatus.message = "Clinic updated successfully" + " with ID " + data.data.Clinic.id;
+              noty.showNoty({
+                text: $scope.clinicStatus.message,
+                ttl: 5000,
+                type: "success"
+              });
               $scope.init();
               $scope.reset();
             }).catch(function(response) {
@@ -72,6 +77,11 @@ angular.module('hillromvestApp')
                 $scope.clinicStatus.message = 'Error occurred! Please try again';
               }
               $scope.clinicStatus.isMessage = true;
+              noty.showNoty({
+                text: $scope.clinicStatus.message,
+                ttl: 5000,
+                type: "warning"
+              });
             });
           } else {
             if ($scope.clinic.type === 'parent' && $scope.clinic.parentClinic) {
@@ -88,7 +98,12 @@ angular.module('hillromvestApp')
 
             ClinicService.createClinic(data).then(function(data) {
               $scope.clinicStatus.isMessage = true;
-              $scope.clinicStatus.message = "Clinic created successfully" + " with ID " + data.data.Clinic.id;
+              $scope.clinicStatus.message = "Clinic created successfully";
+              noty.showNoty({
+                text: $scope.clinicStatus.message,
+                ttl: 5000,
+                type: "success"
+              });
               $scope.reset();
             }).catch(function(response) {
               if (response.data.message !== undefined) {
@@ -97,6 +112,11 @@ angular.module('hillromvestApp')
                 $scope.clinicStatus.message = 'Error occured! Please try again';
               }
               $scope.clinicStatus.isMessage = true;
+              noty.showNoty({
+                text: $scope.clinicStatus.message,
+                ttl: 5000,
+                type: "warning"
+              });
             });
           }
         };
@@ -106,6 +126,11 @@ angular.module('hillromvestApp')
           ClinicService.deleteClinic($scope.clinic.id).then(function(data) {
             $scope.clinicStatus.isMessage = true;
             $scope.clinicStatus.message = data.data.message;
+            noty.showNoty({
+              text: $scope.clinicStatus.message,
+              ttl: 5000,
+              type: "success"
+            });
             $scope.reset();
           }).catch(function(response) {
             if (response.data.message !== undefined) {
@@ -114,6 +139,11 @@ angular.module('hillromvestApp')
               $scope.clinicStatus.message = 'Error occured! Please try again';
             }
             $scope.clinicStatus.isMessage = true;
+            noty.showNoty({
+              text: $scope.clinicStatus.message,
+              ttl: 5000,
+              type: "warning"
+            });
           });
         };
         $scope.cancel = function(){

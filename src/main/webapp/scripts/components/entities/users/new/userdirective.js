@@ -52,7 +52,12 @@ angular.module('hillromvestApp')
             UserService.editUser($scope.user).then(function (response) {
               $scope.userStatus.isMessage = true;
               $scope.userStatus.message = response.data.message;
-               $scope.reset();
+              noty.showNoty({
+                text: $scope.userStatus.message,
+                ttl: 5000,
+                type: "success"
+              });
+              $scope.reset();
             }).catch(function (response) {
               $scope.userStatus.isMessage = true;
               if (response.data.message !== undefined) {
@@ -62,13 +67,23 @@ angular.module('hillromvestApp')
               } else {
                 $scope.userStatus.message = 'Error occured! Please try again';
               }
+              noty.showNoty({
+                text: $scope.userStatus.message,
+                ttl: 5000,
+                type: "warning"
+              });
             });
           } else {
             var data = $scope.user;
             UserService.createUser(data).then(function (response) {
               $scope.userStatus.isMessage = true;
-              $scope.userStatus.message = 'User created successfully' + ' with ID ' + response.data.user.id;
-               $scope.reset();
+              $scope.userStatus.message = 'User created successfully';
+              noty.showNoty({
+                text: $scope.userStatus.message,
+                ttl: 5000,
+                type: "success"
+              });
+              $scope.reset();
 
             }).catch(function (response) {
               $scope.userStatus.isMessage = true;
@@ -78,6 +93,11 @@ angular.module('hillromvestApp')
                 $scope.userStatus.message = response.data.ERROR;
               } else {
                 $scope.userStatus.message = 'Error occured! Please try again';
+                noty.showNoty({
+                  text: $scope.userStatus.message,
+                  ttl: 5000,
+                  type: "warning"
+                });
               }
             });
           }
@@ -94,6 +114,11 @@ angular.module('hillromvestApp')
             $scope.showModal = false;
             $scope.userStatus.isMessage = true;
             $scope.userStatus.message = response.data.message;
+            noty.showNoty({
+              text: $scope.userStatus.message,
+              ttl: 5000,
+              type: "success"
+            });
             $scope.reset();
           }).catch(function (response) {
             $scope.showModal = false;
@@ -105,6 +130,11 @@ angular.module('hillromvestApp')
             }else {
             $scope.userStatus.message = 'Error occured! Please try again';
             }
+            noty.showNoty({
+              text: $scope.userStatus.message,
+              ttl: 5000,
+              type: "warning"
+            });
           });
         };
 
@@ -131,6 +161,11 @@ angular.module('hillromvestApp')
           UserService.editUser($scope.user).then(function (response) {
             $scope.userStatus.isMessage = true;
             $scope.userStatus.message = response.data.message;
+            noty.showNoty({
+              text: $scope.userStatus.message,
+              ttl: 5000,
+              type: "success"
+            });
           }).catch(function (response) {
             $scope.userStatus.isMessage = true;
             if (response.data.message !== undefined) {
@@ -138,6 +173,11 @@ angular.module('hillromvestApp')
             } else {
               $scope.userStatus.message = 'Error occured! Please try again';
             }
+            noty.showNoty({
+              text: $scope.userStatus.message,
+              ttl: 5000,
+              type: "warning"
+            });
           });
         };
       }

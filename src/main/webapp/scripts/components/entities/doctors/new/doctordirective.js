@@ -72,6 +72,11 @@ angular.module('hillromvestApp')
             UserService.editUser($scope.doctor).then(function (response) {
               $scope.doctorStatus.isMessage = true;
               $scope.doctorStatus.message = response.data.message;
+              noty.showNoty({
+                text: $scope.doctorStatus.message,
+                ttl: 5000,
+                type: "success"
+              });
               $scope.reset();
             }).catch(function (response) {
               $scope.doctorStatus.isMessage = true;
@@ -82,6 +87,11 @@ angular.module('hillromvestApp')
               } else {
                 $scope.doctorStatus.message = 'Error occured! Please try again';
               }
+              noty.showNoty({
+                text: $scope.doctorStatus.message,
+                ttl: 5000,
+                type: "warning"
+              });
             });
           } else {
             // create doctor section
@@ -90,7 +100,13 @@ angular.module('hillromvestApp')
 
             UserService.createUser(data).then(function (response) {
               $scope.doctorStatus.isMessage = true;
-              $scope.doctorStatus.message = "Doctor created successfully" + " with ID " + response.data.user.id;
+              // $scope.doctorStatus.message = "Doctor created successfully" + " with ID " + response.data.user.id;
+              $scope.doctorStatus.message = "Doctor created successfully";
+              noty.showNoty({
+                text: $scope.doctorStatus.message,
+                ttl: 5000,
+                type: "success"
+              });
               $scope.reset();
             }).catch(function (response) {
               if (response.data.message !== undefined) {
@@ -100,6 +116,11 @@ angular.module('hillromvestApp')
               } else {
                 $scope.doctorStatus.message = 'Error occured! Please try again';
               }
+              noty.showNoty({
+                text: $scope.doctorStatus.message,
+                ttl: 5000,
+                type: "warning"
+              });
             });
           }
         };
@@ -109,6 +130,12 @@ angular.module('hillromvestApp')
             $scope.showModal = false;
             $scope.doctorStatus.isMessage = true;
             $scope.doctorStatus.message = response.data.message;
+            noty.showNoty({
+              text: $scope.doctorStatus.message,
+              ttl: 5000,
+              type: "success"
+            });
+
             $scope.reset();
           }).catch(function (response) {
             $scope.showModal = false;
@@ -120,6 +147,12 @@ angular.module('hillromvestApp')
             } else {
               $scope.doctorStatus.message = 'Error occured! Please try again';
             }
+
+            noty.showNoty({
+              text: $scope.doctorStatus.message,
+              ttl: 5000,
+              type: "warning"
+            });
           });
         };
         $scope.cancel = function(){

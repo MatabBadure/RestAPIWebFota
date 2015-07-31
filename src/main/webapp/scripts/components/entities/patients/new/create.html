@@ -34,7 +34,7 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" ng-model="patient.hillromId" name="HRID" ng-readonly="patientStatus.editMode" required>
+              <input class="" type="text" ng-model="patient.hillromId" name="HRID" ng-if="!patientStatus.editMode" required>
               <div ng-show="(form.HRID.$dirty && form.HRID.$invalid) || submitted">
                 <span class="has-error" ng-show="form.HRID.$error.required">
                   JDE/HR ID is required.

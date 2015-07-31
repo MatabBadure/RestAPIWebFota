@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
 import com.hillrom.vest.domain.Clinic;
@@ -13,7 +14,7 @@ import com.hillrom.vest.domain.Clinic;
 /**
  * Spring Data JPA repository for the Clinic entity.
  */
-public interface ClinicRepository extends JpaRepository<Clinic,Long> {
+public interface ClinicRepository extends JpaRepository<Clinic,Long> , QueryDslPredicateExecutor<Clinic> {
 	
 	@Query("from Clinic clinic where  "
 			+ "LOWER(clinic.name) like LOWER(:queryString) or "

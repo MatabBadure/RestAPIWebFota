@@ -1,13 +1,15 @@
 <div class="navbar dashboard dashbord-nav">
   <div class="container">
-    <div class="dashbord-nav__primary pull-left">
+    <div class="dashbord-nav__primary pull-left" ng-show="doctorStatus.isCreate">
       <span class="dashbord-nav__primary--title" translate="doctor.home.createLabel">Create Doctor</span>
+    </div>
+    <div class="dashbord-nav__primary pull-left" ng-show="!doctorStatus.isCreate">
+      <span class="dashbord-nav__primary--title" translate="doctor.home.updateLabel">Update Doctor</span>
     </div>
     <div class="dashbord-nav__secondary navbar-right">
       <span class="dashbord-nav__secondary--create-new" translate=""></span>
     </div>
   </div>
-  <span ng-show="doctorStatus.isMessage">{{doctorStatus.message}}</span>
 </div>
 <div class="dashboard dashboard--content padding-bottom-ls">
   <form name="form" class="dashboard-page__form--new" ng-submit="createDoctor()" novalidate>
@@ -277,15 +279,35 @@
             </div>
           </div>
         </div>
-        <div class="col-md-16 row margin-top margin-bottom-extream">
+        <div class="col-md-16 row margin-top">
           <div class="row padding-right-xl">
-            <button type="submit" ng-click="formSubmit()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Submit</button>
-            <button type="reset" ng-click="cancel()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Cancel</button>
-            <button type="button" ng-click="deleteDoctor()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Diassociate</button>
+            <button type="submit" ng-click="formSubmit()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" >Submit</button>
+            <button type="reset" ng-click="cancel()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" >Cancel</button>
             <button type="submit" ng-click="formSubmit()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Update</button>
+            <button type="button" ng-click="open()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Diassociate</button>
           </div>
         </div>
       </div>
     </div>
   </form>
 </div>
+
+
+
+<div ng-if="showModal" class="modal" id="sg-modal" tabIndex="-1" role="dialog" aria-labelledby="sgModalLabel" aria-hidden="true">
+  <div class="modal__dialog">
+    <div class="modal__content">
+      <header class="modal__header">
+        <button type="button" class="modal__close" data-dismiss="modal" ng-click="close()">&times;</button>
+         Are you sure you want to Disassociate the doctor ?
+      </header>
+      <div class="modal__body">
+      <div>If you disassociate the doctor,you will no longer be able to view their information</div>
+        <buton ng-click="deleteDoctor()">ok</buton> <buton data-dismiss="modal" ng-click="close()">cancel</buton>
+      </div>
+      <footer class="modal__footer">
+      </footer>
+    </div>
+  </div>
+</div>
+

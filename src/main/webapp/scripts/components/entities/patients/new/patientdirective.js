@@ -9,7 +9,16 @@ angular.module('hillromvestApp')
         patient: '=patientData',
         patientStatus: '=patientStatus'
       },
-      controller: function($scope) {
+
+      controller: function($scope, noty) {
+
+        $scope.open = function () {
+          $scope.showModal = true;
+        };
+        
+        $scope.close = function () {
+          $scope.showModal = false;
+        };
         $scope.submitted = false;
         $scope.formSubmit = function() {
           $scope.submitted = true;
@@ -33,6 +42,7 @@ angular.module('hillromvestApp')
         $scope.init();
 
     $scope.createPatient = function () {
+
       if($scope.form.$invalid){
         return false;
       }
@@ -48,8 +58,18 @@ angular.module('hillromvestApp')
                 {
                   $scope.patientStatus.isMessage = true;
                   $scope.patientStatus.message = "Patient updated successfully";
+                  noty.showNoty({
+                    text: $scope.patientStatus.message,
+                    ttl: 5000,
+                    type: "success"
+                  });
                 }else{
                   $scope.patientStatus.message = 'Error occured! Please try again';
+                  noty.showNoty({
+                    text: $scope.patientStatus.message,
+                    ttl: 5000,
+                    type: "warning"
+                  });
                 }
                 $scope.reset();
               }).catch(function (response) {
@@ -61,7 +81,11 @@ angular.module('hillromvestApp')
                 } else {
                   $scope.patientStatus.message = 'Error occured! Please try again';
                 }
-
+                noty.showNoty({
+                  text: $scope.patientStatus.message,
+                  ttl: 5000,
+                  type: "warning"
+                });
               });
 
             }else{
@@ -73,7 +97,14 @@ angular.module('hillromvestApp')
                 if(response.status == '201')
                 {
                   $scope.patientStatus.isMessage = true;
-                  $scope.patientStatus.message = "Patient created successfully"+" with ID "+response.data.user.id;
+                  // $scope.patientStatus.message = "Patient created successfully"+" with ID "+response.data.user.id;
+                  $scope.patientStatus.message = "Patient created successfully";
+                  noty.showNoty({
+                    text: $scope.patientStatus.message,
+                    ttl: 5000,
+                    type: "success"
+                  })
+
                   $scope.patientStatus.editMode = false;
                   $scope.patientStatus.isCreate = false;
                 }else{
@@ -91,6 +122,13 @@ angular.module('hillromvestApp')
                 }else {
                   $scope.patientStatus.message = 'Error occured! Please try again';
                 }
+
+                noty.showNoty({
+                  text: $scope.patientStatus.message,
+                  ttl: 5000,
+                  type: "warning"
+                })
+
               });
             };
           }
@@ -110,11 +148,18 @@ angular.module('hillromvestApp')
 
         $scope.deletePatient = function() {
           UserService.deleteUser($scope.patient.id).then(function(response) {
+            $scope.showModal = false;
             $scope.patientStatus.isMessage = true;
             $scope.patientStatus.message = response.data.message;
+            noty.showNoty({
+              text: $scope.patientStatus.message,
+              ttl: 5000,
+              type: "success"
+            });
             $scope.reset();
           }).catch(function(response) {
             $scope.patientStatus.isMessage = true;
+            $scope.showModal = false;
             if (response.data.message !== undefined) {
               $scope.patientStatus.message = response.data.message;
             }else if(response.data.ERROR !== undefined){
@@ -122,6 +167,11 @@ angular.module('hillromvestApp')
             } else {
               $scope.patientStatus.message = 'Error occured! Please try again';
             }
+            noty.showNoty({
+              text: $scope.patientStatus.message,
+              ttl: 5000,
+              type: "warning"
+            });
           });
         };
         $scope.cancel = function(){
@@ -140,12 +190,13 @@ angular.module('hillromvestApp')
           var currentDate = new Date();
           var selectedDate = selectedDate;
           var years = currentDate.getFullYear() - selectedDate.getFullYear();
+          var diff = currentDate.getTime() - selectedDate.getTime();
           var age = 0;
           age = years;
           if(years == 0){
             age = 1;
           }
-          if (years < 0) {
+          if (diff < 0) {
             age = 0;
           };
           return age;
@@ -167,3 +218,20 @@ angular.module('hillromvestApp')
       }
     };
   });
+
+
+var ModalInstanceCtrl = function ($scope, $modalInstance, items, selected) {
+
+  $scope.items = items;
+  $scope.selected = {
+    item: selected || items[0]
+  };
+
+  $scope.ok = function () {
+    $modalInstance.close($scope.selected.item);
+  };
+
+  $scope.cancel = function () {
+    $modalInstance.dismiss('cancel');
+  };
+};

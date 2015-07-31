@@ -3,7 +3,8 @@
         "home": {
             "title": "Hill-Rom User",
             "createLabel": "Create Hill-Rom User",
-            "createOrEditLabel": "Create or edit a user"
+            "createOrEditLabel": "Create or edit a user",
+            "updateLabel":"Update Hill-Rom User"
         },
         "delete": {
             "question": "Are you sure you want to delete user {{ id }}?"

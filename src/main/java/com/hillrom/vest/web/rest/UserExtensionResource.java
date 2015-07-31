@@ -89,7 +89,7 @@ public class UserExtensionResource {
         log.debug("REST request to update User : {}", userExtensionDTO);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         JSONObject jsonObject = userService.updateUser(id, userExtensionDTO, baseUrl);
-        if (jsonObject.containsKey("error")) {
+        if (jsonObject.containsKey("ERROR")) {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
@@ -176,7 +176,7 @@ public class UserExtensionResource {
             @RequestParam(value = "sort_by", required = false) String sortBy,
             @RequestParam(value = "asc",required = false) Boolean isAscending)
         throws URISyntaxException {
-    	String queryString = new StringBuilder("%").append(searchString).append("%").toString();
+    	String queryString = new StringBuilder("'%").append(searchString).append("%'").toString();
     	Map<String,Boolean> sortOrder = new HashMap<>();
     	if(sortBy != null  && !sortBy.equals("")) {
     		isAscending =  (isAscending != null)?  isAscending : true;
@@ -201,7 +201,7 @@ public class UserExtensionResource {
             @RequestParam(value = "sort_by", required = false) String sortBy,
             @RequestParam(value = "asc",required = false) Boolean isAscending)
         throws URISyntaxException {
-    	String queryString = new StringBuilder("%").append(searchString).append("%").toString();
+    	String queryString = new StringBuilder("'%").append(searchString).append("%'").toString();
     	Map<String,Boolean> sortOrder = new HashMap<>();
     	if(sortBy != null  && !sortBy.equals("")) {
     		isAscending =  (isAscending != null) ?  isAscending : true;

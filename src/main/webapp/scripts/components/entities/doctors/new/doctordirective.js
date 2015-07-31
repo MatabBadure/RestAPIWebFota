@@ -8,8 +8,17 @@ angular.module('hillromvestApp')
         doctor: '=doctorData',
         doctorStatus: '=doctorStatus'
       },
-      controller: function($scope, $timeout) {
-        $scope.init = function() {
+      controller: function ($scope, $timeout, noty) {
+
+        $scope.open = function () {
+          $scope.showModal = true;
+        };
+
+        $scope.close = function () {
+          $scope.showModal = false;
+        };
+
+        $scope.init = function () {
           $scope.states = [];
           $scope.doctor.titles = ["Dr"];
           $scope.submitted = false;
@@ -68,6 +77,11 @@ angular.module('hillromvestApp')
             UserService.editUser($scope.doctor).then(function(response) {
               $scope.doctorStatus.isMessage = true;
               $scope.doctorStatus.message = response.data.message;
+              noty.showNoty({
+                text: $scope.doctorStatus.message,
+                ttl: 5000,
+                type: "success"
+              });
               $scope.reset();
             }).catch(function(response) {
               $scope.doctorStatus.isMessage = true;
@@ -78,6 +92,11 @@ angular.module('hillromvestApp')
               } else {
                 $scope.doctorStatus.message = 'Error occured! Please try again';
               }
+              noty.showNoty({
+                text: $scope.doctorStatus.message,
+                ttl: 5000,
+                type: "warning"
+              });
             });
           } else {
             // create doctor section
@@ -94,7 +113,13 @@ angular.module('hillromvestApp')
             console.log('data Object: ', data);
             UserService.createUser(data).then(function(response) {
               $scope.doctorStatus.isMessage = true;
-              $scope.doctorStatus.message = "Doctor created successfully" + " with ID " + response.data.user.id;
+              // $scope.doctorStatus.message = "Doctor created successfully" + " with ID " + response.data.user.id;
+              $scope.doctorStatus.message = "Doctor created successfully";
+              noty.showNoty({
+                text: $scope.doctorStatus.message,
+                ttl: 5000,
+                type: "success"
+              });
               $scope.reset();
             }).catch(function(response) {
               if (response.data.message !== undefined) {
@@ -104,16 +129,29 @@ angular.module('hillromvestApp')
               } else {
                 $scope.doctorStatus.message = 'Error occured! Please try again';
               }
+              noty.showNoty({
+                text: $scope.doctorStatus.message,
+                ttl: 5000,
+                type: "warning"
+              });
             });
           }
         };
 
-        $scope.deleteDoctor = function() {
-          UserService.deleteUser($scope.doctor.id).then(function(response) {
+
+        $scope.deleteDoctor = function () {
+          UserService.deleteUser($scope.doctor.id).then(function (response) {
+            $scope.showModal = false;
             $scope.doctorStatus.isMessage = true;
             $scope.doctorStatus.message = response.data.message;
+            noty.showNoty({
+              text: $scope.doctorStatus.message,
+              ttl: 5000,
+              type: "success"
+            });
             $scope.reset();
-          }).catch(function(response) {
+          }).catch(function (response) {
+            $scope.showModal = false;
             $scope.doctorStatus.isMessage = true;
             if (response.data.message !== undefined) {
               $scope.doctorStatus.message = response.data.message;
@@ -122,6 +160,12 @@ angular.module('hillromvestApp')
             } else {
               $scope.doctorStatus.message = 'Error occured! Please try again';
             }
+
+            noty.showNoty({
+              text: $scope.doctorStatus.message,
+              ttl: 5000,
+              type: "warning"
+            });
           });
         };
         $scope.cancel = function() {

@@ -8,7 +8,7 @@ angular.module('hillromvestApp')
         doctor: '=doctorData',
         doctorStatus: '=doctorStatus'
       },
-      controller: function ($scope, $timeout) {
+      controller: function ($scope, $timeout, noty) {
 
         $scope.init = function () {
           $scope.states = [];

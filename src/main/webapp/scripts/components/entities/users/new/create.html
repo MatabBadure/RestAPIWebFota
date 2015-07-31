@@ -8,7 +8,6 @@
       <span class="dashbord-nav__secondary--create-new" translate=""></span>
     </div>
   </div>
-  <span ng-show="userStatus.isMessage">{{userStatus.message}}</span>
 </div>
 <div class="dashboard dashboard--content padding-bottom-ls">
   <form name="form" ng-submit="createUser()" novalidate>
@@ -167,12 +166,12 @@
           </div>
         </div>
 
-        <div class="col-md-16 row margin-top margin-bottom-extreem">
+        <div class="col-md-16 row margin-top">
           <div class="row padding-right-xl">
             <button class="hillrom-btn btn-submit float-right" ng-show="userStatus.isCreate" ng-click="formSubmit()" translate="user.submit-button-text">Submit</button>
             <button type="button" ng-click="cancel()" ng-show="userStatus.isCreate" class="hillrom-btn btn-submit float-right" >Cancel</button>
-            <button class="hillrom-btn btn-submit float-right" ng-click="deleteUser()" ng-show="!userStatus.isCreate">Delete</button>
             <button class="hillrom-btn btn-submit float-right" ng-click="formSubmit()" ng-show="!userStatus.isCreate">Update</button>
+            <button class="hillrom-btn btn-submit float-right" ng-click="deleteUser()" ng-show="!userStatus.isCreate">Delete</button>
           </div>
         </div>
       </div>

@@ -8,7 +8,6 @@
       <span class="dashbord-nav__secondary--create-new" translate=""></span>
     </div>
   </div>
-  <span ng-show="doctorStatus.isMessage">{{doctorStatus.message}}</span>
 </div>
 <div class="dashboard dashboard--content padding-bottom-ls">
   <form  name="form" class="dashboard-page__form--new" ng-submit="createDoctor()" novalidate>
@@ -319,12 +318,12 @@
           </div>
         </div>
 
-        <div class="col-md-16 row margin-top margin-bottom-extream">
+        <div class="col-md-16 row margin-top">
           <div class="row padding-right-xl">
             <button type="submit" ng-click="formSubmit()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" >Submit</button>
             <button type="button" ng-click="cancel()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" >Cancel</button>
-            <button type="button" ng-click="deleteDoctor()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Diassociate</button>
             <button type="submit" ng-click="formSubmit()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Update</button>
+            <button type="button" ng-click="deleteDoctor()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Diassociate</button>
           </div>
         </div>
       </div>

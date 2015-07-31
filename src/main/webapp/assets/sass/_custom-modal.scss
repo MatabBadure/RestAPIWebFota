@@ -1,0 +1,99 @@
+.modal {
+  position: fixed;
+  text-align: left;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 6;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 26px 20px 26px;
+  outline: 0; 
+}
+    .modal__dialog {
+      width: auto;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -webkit-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%); }
+    .modal__content {
+      position: relative;
+      width: 450px;
+      background: #f2f2f2;
+      background-clip: padding-box;
+      padding: 20px 26px 42px 26px;
+      outline: 0;
+      max-width: 512px;
+      box-shadow: rgba(0, 0, 0, 0.2) 0 0 10px; }
+    .modal__body .question {
+      margin-bottom: 30px; }
+    .modal__body label {
+      font-weight: bold;
+      margin: 0;
+      padding: 0; }
+    .modal__body select {
+      font-weight: 300;
+      line-height: inherit;
+      margin: 0;
+      padding: 0;
+      padding-left: 0.8em;
+      text-transform: lowercase; }
+    .modal__body .form__clear--row {
+      margin: 1.1875em 0; }
+    .modal__body .form__clear--button {
+      margin-top: 1.25em; }
+    .modal__body .form__clear--select {
+      position: absolute;
+      right: 35px; }
+    .modal__header {
+      border-bottom: 1px solid #e5e3e2;
+      text-transform: lowercase;
+      font-size: 16px;
+      font-family: "museo-slab", "Perspective Sans", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+      margin-bottom: 14px;
+      padding-bottom: 4px; }
+      .modal__header i {
+        color: #9b9b9b;
+        font-size: 40px;
+        margin-right: 0.2em;
+        vertical-align: middle; }
+    .modal__footer {
+      border: 0;
+      text-transform: lowercase; }
+      .modal__footer a {
+        text-decoration: underline;
+        color: #333; }
+        .modal__footer a:hover, .modal__footer a:focus {
+          color: #1a1a1a; }
+    .modal__title {
+      font-size: 16px;
+      line-height: 1;
+      margin: 0; }
+    .modal__close {
+      float: right;
+      line-height: 1;
+      font-size: 35px;
+      font-weight: 100;
+      cursor: pointer;
+      background: transparent;
+      border: 0 none;
+      display: inline-block;
+      color: #333;
+      margin: 0 0 0 0;
+      padding: 0; }
+      .modal__close:hover, .modal__close:focus {
+        outline: 0;
+        border: 0 none;
+        color: #1a1a1a; }
+    .modal .buttons {
+      margin-top: 20px; }
+    .modal .button {
+      padding: 5px 26px;
+      background: #858585;
+      text-transform: lowercase;
+      margin-right: 1em;
+      font-weight: 400; }
+      .modal .button:focus, .modal .button:hover {
+        background: #6c6c6c; }

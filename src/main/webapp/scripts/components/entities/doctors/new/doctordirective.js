@@ -1,6 +1,6 @@
 'use strict';
 angular.module('hillromvestApp')
-  .directive('doctor', function (UserService, ClinicService) {
+  .directive('doctor', function(UserService, ClinicService) {
     return {
       templateUrl: 'scripts/components/entities/doctors/new/create.html',
       restrict: 'E',
@@ -8,38 +8,27 @@ angular.module('hillromvestApp')
         doctor: '=doctorData',
         doctorStatus: '=doctorStatus'
       },
-      controller: function ($scope, $timeout) {
-        $scope.init = function () {
+      controller: function($scope, $timeout) {
+        $scope.init = function() {
           $scope.states = [];
           $scope.doctor.titles = ["Dr"];
-          $scope.doctor.clinics = [{'name':'', 'id' : '' }];
           $scope.submitted = false;
-          UserService.getState().then(function (response) {
+          UserService.getState().then(function(response) {
             $scope.states = response.data.states;
-          }).catch(function (response) {
-
+          }).catch(function(response) {
           });
-
-
-
-          $scope.testStates = [{"id":1,"name":"Appolo","address":null,"zipcode":null,"city":null,"state":"IA","phoneNumber":null,"faxNumber"
-:null,"hillromId":null,"clinicAdminId":null,"parentClinic":null,"deleted":true,"parent":false},{"id"
-:47,"name":"Clinic001","address":null,"zipcode":null,"city":null,"state":null,"phoneNumber":null,"faxNumber"
-:null,"hillromId":null,"clinicAdminId":null,"parentClinic":null,"deleted":false,"parent":true},{"id"
-:48,"name":"SatelliteClinic","address":null,"zipcode":null,"city":null,"state":null,"phoneNumber":null
-,"faxNumber":null,"hillromId":null,"clinicAdminId":null,"parentClinic":null,"deleted":false,"parent"
-:false}];
+          $scope.getClinics();
         };
 
-        $scope.getClinics = function () {
+        $scope.getClinics = function() {
           var timer = false;
-          timer = $timeout(function () {
-            ClinicService.getAllClinics().then(function (response) {
+          timer = $timeout(function() {
+            ClinicService.getAllClinics().then(function(response) {
               $scope.clinics = response.data;
-            }).catch(function (response) {
+            }).catch(function(response) {
 
             });
-          },1000)
+          }, 1000)
         };
 
         $scope.removeClinic = function(index) {
@@ -54,31 +43,37 @@ angular.module('hillromvestApp')
           $scope.clinics = [];
         };
 
-        $scope.formSubmit = function () {
+        $scope.formSubmit = function() {
           $scope.submitted = true;
         };
 
         $scope.init();
 
-        $scope.addClinic = function () {
-          $scope.doctor.clinics.push({'name':'', 'id': '' });
-        };
 
-        $scope.createDoctor = function () {
+        $scope.createDoctor = function() {
           if ($scope.form.$invalid) {
             return false;
           }
+
           if ($scope.doctorStatus.editMode) {
-            // $scope.doctor.clinicList = [ { 'id' : 1} ];
-            UserService.editUser($scope.doctor).then(function (response) {
+
+
+            $scope.doctor.clinicList = [];
+            for (var i = 0; i < $scope.doctor.clinics.length; i++) {
+              $scope.doctor.clinicList.push({
+                'id': $scope.doctor.clinics[i].id
+              });
+            }
+            $scope.doctor.role = 'HCP';
+            UserService.editUser($scope.doctor).then(function(response) {
               $scope.doctorStatus.isMessage = true;
               $scope.doctorStatus.message = response.data.message;
               $scope.reset();
-            }).catch(function (response) {
+            }).catch(function(response) {
               $scope.doctorStatus.isMessage = true;
-             if (response.data.message !== undefined) {
-              $scope.doctorStatus.message = response.data.message;
-              }else if(response.data.ERROR !== undefined){
+              if (response.data.message !== undefined) {
+                $scope.doctorStatus.message = response.data.message;
+              } else if (response.data.ERROR !== undefined) {
                 $scope.doctorStatus.message = response.data.ERROR;
               } else {
                 $scope.doctorStatus.message = 'Error occured! Please try again';
@@ -86,17 +81,25 @@ angular.module('hillromvestApp')
             });
           } else {
             // create doctor section
+            $scope.doctor.clinicList = [];
+            for (var i = 0; i < $scope.doctor.clinics.length; i++) {
+              $scope.doctor.clinicList.push({
+                'id': $scope.doctor.clinics[i].id
+              });
+            }
+
+
             var data = $scope.doctor;
             data.role = 'HCP';
-
-            UserService.createUser(data).then(function (response) {
+            console.log('data Object: ', data);
+            UserService.createUser(data).then(function(response) {
               $scope.doctorStatus.isMessage = true;
               $scope.doctorStatus.message = "Doctor created successfully" + " with ID " + response.data.user.id;
               $scope.reset();
-            }).catch(function (response) {
+            }).catch(function(response) {
               if (response.data.message !== undefined) {
-              $scope.doctorStatus.message = response.data.message;
-              }else if(response.data.ERROR !== undefined){
+                $scope.doctorStatus.message = response.data.message;
+              } else if (response.data.ERROR !== undefined) {
                 $scope.doctorStatus.message = response.data.ERROR;
               } else {
                 $scope.doctorStatus.message = 'Error occured! Please try again';
@@ -105,33 +108,32 @@ angular.module('hillromvestApp')
           }
         };
 
-        $scope.deleteDoctor = function () {
-          UserService.deleteUser($scope.doctor.id).then(function (response) {
+        $scope.deleteDoctor = function() {
+          UserService.deleteUser($scope.doctor.id).then(function(response) {
             $scope.doctorStatus.isMessage = true;
             $scope.doctorStatus.message = response.data.message;
             $scope.reset();
-          }).catch(function (response) {
+          }).catch(function(response) {
             $scope.doctorStatus.isMessage = true;
             if (response.data.message !== undefined) {
-            $scope.doctorStatus.message = response.data.message;
-            }else if(response.data.ERROR !== undefined){
+              $scope.doctorStatus.message = response.data.message;
+            } else if (response.data.ERROR !== undefined) {
               $scope.doctorStatus.message = response.data.ERROR;
             } else {
               $scope.doctorStatus.message = 'Error occured! Please try again';
             }
           });
         };
-        $scope.cancel = function () {
+        $scope.cancel = function() {
           $scope.reset();
         };
 
-        $scope.reset = function () {
+        $scope.reset = function() {
           $scope.doctorStatus.editMode = false;
           $scope.doctorStatus.isCreate = false;
           $scope.submitted = false;
           $scope.doctor = {};
           $scope.doctor.clinics = [];
-          $scope.doctor.clinics.push({'name': '', 'id' : ''});
           $scope.form.$setPristine();
         }
       }

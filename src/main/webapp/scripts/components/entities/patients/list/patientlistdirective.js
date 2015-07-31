@@ -67,7 +67,7 @@ angular.module('hillromvestApp')
           } else {
             $scope.currentPageIndex = 1;
           }
-          var url = 'api/patientInfos/search?searchString=';
+          var url = 'api/user/patient/search?searchString=';
           UserService.getUsers(url,$scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount)
             .then(function(response) {
               $scope.patients = response.data;

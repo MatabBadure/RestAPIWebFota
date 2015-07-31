@@ -166,6 +166,10 @@ a::-moz-focus-inner {
 	border-radius: 4px;
 }
 
+.noty-top {
+    top: 70px;
+}
+
 .noty-div .success {
 	background-image: none;
 	background-color: $light-green-success;

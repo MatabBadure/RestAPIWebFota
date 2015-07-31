@@ -77,7 +77,7 @@ angular.module('hillromvestApp')
                   $scope.patientStatus.message = "Patient created successfully";
                   noty.showNoty({
                     text: $scope.patientStatus.message,
-                    ttl: 1000000,
+                    ttl: 5000,
                     type: "success"
                   })
 
@@ -101,7 +101,7 @@ angular.module('hillromvestApp')
 
                 noty.showNoty({
                   text: $scope.patientStatus.message,
-                  ttl: 1000000,
+                  ttl: 5000,
                   type: "warning"
                 })
 

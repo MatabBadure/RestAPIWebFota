@@ -73,8 +73,8 @@ angular.module('hillromvestApp')
                 if(response.status == '201')
                 {
                   $scope.patientStatus.isMessage = true;
-                  $scope.patientStatus.message = "Patient created successfully"+" with ID "+response.data.user.id;
-
+                  // $scope.patientStatus.message = "Patient created successfully"+" with ID "+response.data.user.id;
+                  $scope.patientStatus.message = "Patient created successfully";
                   noty.showNoty({
                     text: $scope.patientStatus.message,
                     ttl: 1000000,

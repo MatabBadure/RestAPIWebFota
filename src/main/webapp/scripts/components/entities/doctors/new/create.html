@@ -33,16 +33,17 @@
               <tags-input ng-model="doctor.clinics" display-property="name" min-tags="1" name="clinicAutoComplete">
                 <auto-complete source="clinics" display-property="name" min-length="1"></auto-complete>
               </tags-input>
+              <!-- <div ng-show="form.clinicAutoComplete.$dirty && form.clinicAutoComplete.$error.minTags">
+                <span class="has-error">
+                  Clinic is Required
+                </span>
+              </div> -->
             </div>
-            <div ng-show="(form.clinicAutoComplete.$dirty && form.clinicAutoComplete.$error && form.clinicAutoComplete.$error.minTags) && submitted">
-              <span class="has-error">
-                Clinic is Required
-              </span>
-            </div>
+
           </div>
           <div class="col-md-7 col-md-offset-2">
             <div class="col-md-6 dashboard__form--label">
-              <span class="dashboard__form--type font-add-text" translate="doctor.add-clinic"></span>
+              <!-- <span class="dashboard__form--type font-add-text" translate="doctor.add-clinic"></span> -->
             </div>
           </div>
         </div>

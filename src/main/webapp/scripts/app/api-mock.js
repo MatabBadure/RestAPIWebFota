@@ -71,17 +71,7 @@ var clinicsList = [
     "parentClinic": {"name": "Hill Rom", "id": 13}
   }];
 
-var doctorsList = [
-  { 'firstName' : 'Johny', 'lastName' : 'Dep', 'name' : 'Johny Dep', 'email' : 'JohnyDep@gmail.com', 'hospital' : 'Appolo hospital'},
-  { 'name' : 'James williams', 'email' : 'JamesWilliams@gmail.com', 'hospital' : 'Manipal hospital'},
-  { 'name' : 'David Jones', 'email' : 'davijones@gmail.com', 'hospital' : 'abc hospital'},
-  { 'name' : 'William Davis', 'email' : 'williamdavis@gmail.com', 'hospital' : 'mno hospital'},
-  { 'name' : 'Joseph taylor', 'email' : 'josephtaylor@gmail.com', 'hospital' : 'xyz hospital'},
-  { 'name' : 'David Jones', 'email' : 'davijones@gmail.com', 'hospital' : 'abc hospital'},
-  { 'id' : 28, 'name' : 'DoctorName', 'email' : 'syedmohammed+122@neevtech.com', 'hospital' : 'Appolo hospital'},
-  { 'id': 66, 'title': 'Dr', 'firstName': 'Syed', 'middleName': 'Mohammad', 'lastName': 'Ali', 'email': 'syedmohammed+004@neevtech.com', 'gender': null, 'zipcode': null, 'activated': false, 'langKey': 'en', 'resetKey': null, 'resetDate': null, 'termsConditionAccepted' : false, 'termsConditionAcceptedDate': null, 'deleted': false, 'lastLoggedInAt': null, 'dob': null, 'speciality': null, 'credentials': null, 'primaryPhone' : 1234567890, 'mobilePhone' : 1234567890, 'faxNumber': 1234567890, 'address': 'Address', 'city': 'Bangalore', 'state': 'AK', 'npiNumber': null
-  }
-];
+
 
 var roleEnum = {
   ADMIN : 'ADMIN',
@@ -93,3 +83,54 @@ var roleEnum = {
   CLINIC_ADMIN : 'CLINIC_ADMIN',
   ANONYMOUS : 'ANONYMOUS'
 };
+
+var doctorsList = [
+    {
+        "id": 55,
+        "email": "rishabhjain+HCP1@neevtech.com",
+        "firstName": "Manipal",
+        "lastName": "Ayer",
+        "zipcode": 560009,
+        "address": "Old Airport Road",
+        "city": "Bangalore",
+        "credentials": "Manipal Hospitals",
+        "faxNumber": null,
+        "primaryPhone": null,
+        "mobilePhone": null,
+        "speciality": "Manipal Hospitals",
+        "state": "Karnataka",
+        "clinics": [
+            {
+                "name": "Manipal Hospitals-main",
+                "id": "1"
+            }
+        ],
+        "deleted": false
+    },
+    {
+        "id": 56,
+        "email": "rishabhjain+HCP2@neevtech.com",
+        "firstName": "Manipal",
+        "lastName": "Ayer",
+        "zipcode": 560009,
+        "address": "Old Airport Road",
+        "city": "Bangalore",
+        "credentials": "Manipal Hospitals",
+        "faxNumber": null,
+        "primaryPhone": null,
+        "mobilePhone": null,
+        "speciality": "Manipal Hospitals",
+        "state": "Karnataka",
+        "clinics": [
+            {
+                "name": "Manipal Hospitals-child",
+                "id": "2"
+            },
+            {
+                "name": "Manipal Hospitals-child2",
+                "id": "3"
+            }
+        ],
+        "deleted": false
+    }
+]

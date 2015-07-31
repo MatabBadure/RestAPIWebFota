@@ -1,8 +1,11 @@
 
 <div class="navbar dashboard dashbord-nav">
   <div class="container">
-    <div class="dashbord-nav__primary pull-left">
+    <div class="dashbord-nav__primary pull-left" ng-show="doctorStatus.isCreate">
       <span class="dashbord-nav__primary--title" translate="doctor.home.createLabel">Create Doctor</span>
+    </div>
+    <div class="dashbord-nav__primary pull-left" ng-show="!doctorStatus.isCreate">
+      <span class="dashbord-nav__primary--title" translate="doctor.home.updateLabel">Update Doctor</span>
     </div>
     <div class="dashbord-nav__secondary navbar-right">
       <span class="dashbord-nav__secondary--create-new" translate=""></span>

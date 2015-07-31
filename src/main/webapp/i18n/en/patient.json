@@ -5,7 +5,8 @@
             "createLabel": "Create Patient",
             "createNewLabel": "Create New",
             "createOrEditLabel": "Create or edit a Patient",
-            "manageLabel": "Manage Patient"
+            "manageLabel": "Manage Patient",
+            "updateLabel":"Update Patient"
         },
         "delete": {
             "question": "Are you sure you want to delete Patient {{ id }}?"

@@ -32,39 +32,19 @@
       </div>
 
        <div class="dashboard__manage-view--list" ng-repeat="user in users">
-         <div ng-click="selectUser(user)">
+         <div ng-class="{ inactive: 'user.deleted === true'}" ng-click="selectUser(user)">
           <div class="col-md-3 reset-padding-left">
             <span class="user-name">{{user.lastName}} {{user.firstName}}</span>
             <span class="user-email">{{user.email}}</span>
           </div>
           <div class="col-md-4">
-            <span class="user-home-no"></span>
-            <span class="user-address">{{user.address}}</span>
+            <span class="user-address">{{user.role}}</span>
           </div>
           <div class="col-md-4">
-            <span class="hcp-name"></span>
-            <span class="clinic-name"></span>
+            <span class="clinic-name">{{user.id}}</span>
           </div>
           <div class="col-md-5 reset-padding-right">
-            <div class="row">
-              <div class="col-md-7 center-text">
-                <span class="hr-id">{{user.hillromId}}</span>
-              </div>
-              <div class="col-md-3">
-                <span class="hillrom-icon icon-lungs user-lungs"></span>
-              </div>
-              <div class="col-md-3">
-                <div class="progress-input">90%</div>
-                <div class="progress">
-                  <div class="progress-bar" role="progressbar" aria-valuenow="90"
-                  aria-valuemin="0" aria-valuemax="100" ng-style="{width: '90'+'%'}">
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-3 reset-padding-right text-center">
-                <span class="hillrom-icon icon-pressure user-pressure"></span>
-              </div>
-            </div>
+             <span class="clinic-name">{{user.employeeId}}</span>
           </div>
           <div class="clr"></div>
          </div>

@@ -1,8 +1,11 @@
 
 <div class="navbar dashboard dashbord-nav">
   <div class="container">
-    <div class="dashbord-nav__primary pull-left" ng-show="!patientStatus.editMode">
-      <span class="dashbord-nav__primary--title" translate="patient.home.createLabel">Edit Patient</span>
+    <div class="dashbord-nav__primary pull-left" ng-show="!patientStatus.isCreate">
+      <span class="dashbord-nav__primary--title" translate="patient.home.updateLabel">Update Patient</span>
+    </div>
+    <div class="dashbord-nav__primary pull-left" ng-show="patientStatus.isCreate">
+      <span class="dashbord-nav__primary--title" translate="patient.home.createLabel">Create Patient</span>
     </div>
   </div>
   <span ng-show="patientStatus.isMessage">{{patientStatus.message}}</span>
@@ -95,7 +98,7 @@
             </div>
             <div class="col-md-10 dashboard__form--input">
               <input class="" type="text" name="firstName" ng-model="patient.firstName" ng-readonly="validateADMINorASP()" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-zA-Z]+$/" required>
-              <div ng-show="(form.firstName.$dirty && form.firstName.$invalid) || submitted">
+              <div ng-show="submitted">
                 <span class="has-error" ng-show="form.firstName.$error.required">
                   First Name is required.
                 </span>
@@ -323,4 +326,5 @@
     </div>
   </form>
 </div>
-
+     
+     <button class="btn btn-default" data-template="scripts/components/entities/patients/new/deleteModal.html" bs-modal="modal">New Customer</button>

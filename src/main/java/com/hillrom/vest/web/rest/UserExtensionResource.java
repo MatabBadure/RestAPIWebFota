@@ -89,7 +89,7 @@ public class UserExtensionResource {
         log.debug("REST request to update User : {}", userExtensionDTO);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         JSONObject jsonObject = userService.updateUser(id, userExtensionDTO, baseUrl);
-        if (jsonObject.containsKey("error")) {
+        if (jsonObject.containsKey("ERROR")) {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);

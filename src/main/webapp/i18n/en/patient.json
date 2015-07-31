@@ -64,6 +64,7 @@
         "patients": "patients",
         "parent": "parent",
         "submit-button-text": "submit",
-        "cancel-button-text": "cancel"
+        "cancel-button-text": "cancel",
+        "back-button-text": "back"
     }
 }

@@ -7,8 +7,8 @@
     <div class="dashbord-nav__primary pull-left" ng-show="!doctorStatus.isCreate">
       <span class="dashbord-nav__primary--title" translate="doctor.home.updateLabel">Update Doctor</span>
     </div>
-    <div class="dashbord-nav__secondary navbar-right">
-      <span class="dashbord-nav__secondary--create-new" translate=""></span>
+    <div class="dashbord-nav__secondary create-user navbar-right cursor-pointer" ng-show="!doctorStatus.isCreate" ng-click="cancel()">
+      <span class="" translate="doctor.back-button-text"></span>
     </div>
   </div>
 </div>

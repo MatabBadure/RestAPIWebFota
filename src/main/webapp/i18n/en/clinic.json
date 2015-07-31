@@ -4,7 +4,8 @@
         "home": {
             "title": "Clinics",
             "createLabel": "Create Clinic",
-            "createOrEditLabel": "Create or edit a Clinic"
+            "createOrEditLabel": "Create or edit a Clinic",
+            "updateLabel":"Update Clinic"
         },
         "delete": {
             "question": "Are you sure you want to delete Clinic {{ id }}?"

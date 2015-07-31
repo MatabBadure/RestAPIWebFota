@@ -27,6 +27,7 @@ angular.module('hillromvestApp')
           $scope.pageCount = 0;
           $scope.total = 0;
           $scope.sortOption ="";
+          $scope.showModal = false;
           $scope.searchUsers();
         };
 
@@ -73,7 +74,7 @@ angular.module('hillromvestApp')
             if (track === "PREV" && $scope.currentPageIndex > 1) {
               $scope.currentPageIndex--;
             }
-            if (track === "NEXT" && $scope.currentPageIndex < $scope.pageCount)
+            else if (track === "NEXT" && $scope.currentPageIndex < $scope.pageCount)
             {
               $scope.currentPageIndex++;
             }else{

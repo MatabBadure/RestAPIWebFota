@@ -33,15 +33,14 @@
        <div class="dashboard__manage-view--list" ng-repeat="patient in patients" ng-click="selectPatient(patient)">
           <div class="col-md-3 reset-padding-left">
             <span class="user-name">{{patient.lastName}} {{patient.firstName}}</span>
-            <span class="user-email">{{patient.email}}</span>
+            <span class="user-email">{{patient.dob}}</span>
           </div>
           <div class="col-md-4">
-            <span class="user-home-no"></span>
-            <span class="user-address">{{patient.address}}</span>
+            <span>{{patient.langKey}}</span>
           </div>
           <div class="col-md-4">
-            <span class="hcp-name"></span>
-            <span class="clinic-name"></span>
+            <span class="user-home-no">{{patient.city}} </span>
+            <span class="user-address">{{patient.state}}</span>
           </div>
           <div class="col-md-5 reset-padding-right">
             <div class="row">

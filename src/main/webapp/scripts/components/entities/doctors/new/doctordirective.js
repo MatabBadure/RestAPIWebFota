@@ -10,6 +10,14 @@ angular.module('hillromvestApp')
       },
       controller: function ($scope, $timeout, noty) {
 
+        $scope.open = function () {
+          $scope.showModal = true;
+        };
+        
+        $scope.close = function () {
+          $scope.showModal = false;
+        };
+
         $scope.init = function () {
           $scope.states = [];
           $scope.doctor.titles = ["Dr"];
@@ -119,6 +127,7 @@ angular.module('hillromvestApp')
 
         $scope.deleteDoctor = function () {
           UserService.deleteUser($scope.doctor.id).then(function (response) {
+            $scope.showModal = false;
             $scope.doctorStatus.isMessage = true;
             $scope.doctorStatus.message = response.data.message;
             noty.showNoty({
@@ -129,6 +138,7 @@ angular.module('hillromvestApp')
 
             $scope.reset();
           }).catch(function (response) {
+            $scope.showModal = false;
             $scope.doctorStatus.isMessage = true;
             if (response.data.message !== undefined) {
             $scope.doctorStatus.message = response.data.message;

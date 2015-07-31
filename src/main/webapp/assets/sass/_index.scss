@@ -151,3 +151,33 @@ a::-moz-focus-inner {
 .form-control::-webkit-input-placeholder {
   color: $alto;
 }
+
+.noty-div {
+	float: none;
+	width: 100%;
+	left: 0;
+	padding-left: 10px;
+}
+
+.noty-div .noty-item {
+	width: 100%;
+	left: 0;
+	border: none;
+	border-radius: 4px;
+}
+
+.noty-div .success {
+	background-image: none;
+	background-color: $light-green-success;
+	height: 35px;
+  line-height: 26px;
+}
+
+.noty-div .warning {
+	background-image: none;
+	background-color: $wewak-error;
+	background-color: $baby-pink;
+  color: $well-read;
+  height: 35px;
+  line-height: 26px;
+}

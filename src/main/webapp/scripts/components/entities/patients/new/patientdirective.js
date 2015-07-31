@@ -9,7 +9,7 @@ angular.module('hillromvestApp')
         patient: '=patientData',
         patientStatus: '=patientStatus'
       },
-      controller: function($scope) {
+      controller: function($scope, noty) {
         $scope.submitted = false;
         $scope.formSubmit = function() {
           $scope.submitted = true;
@@ -74,6 +74,13 @@ angular.module('hillromvestApp')
                 {
                   $scope.patientStatus.isMessage = true;
                   $scope.patientStatus.message = "Patient created successfully"+" with ID "+response.data.user.id;
+
+                  noty.showNoty({
+                    text: $scope.patientStatus.message,
+                    ttl: 1000000,
+                    type: "success"
+                  })
+
                   $scope.patientStatus.editMode = false;
                   $scope.patientStatus.isCreate = false;
                 }else{
@@ -91,6 +98,13 @@ angular.module('hillromvestApp')
                 }else {
                   $scope.patientStatus.message = 'Error occured! Please try again';
                 }
+
+                noty.showNoty({
+                  text: $scope.patientStatus.message,
+                  ttl: 1000000,
+                  type: "warning"
+                })
+
               });
             };
           }

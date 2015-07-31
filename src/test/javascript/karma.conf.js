@@ -40,6 +40,8 @@ module.exports = function (config) {
             'main/webapp/bower_components/angular-cache-buster/angular-cache-buster.js',
             'main/webapp/bower_components/ngInfiniteScroll/build/ng-infinite-scroll.js',
             'main/webapp/bower_components/bootstrap-sass-datepicker/js/bootstrap-sass-datepicker.js',
+            'main/webapp/bower_components/angular-animate/angular-animate.js',
+            'main/webapp/bower_components/angular-notys/angular-notys.js',
             'main/webapp/bower_components/angular-mocks/angular-mocks.js',
             // endbower
             'main/webapp/bower_components/angular-recaptcha/release/angular-recaptcha.js',

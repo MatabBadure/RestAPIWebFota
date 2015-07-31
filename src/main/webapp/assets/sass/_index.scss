@@ -120,7 +120,7 @@ a::-moz-focus-inner {
   position: absolute;
   top: 7px;
   right: 8px;
-  z-index: 1;
+  z-index: -1;
 }
 
 .custom-dropdown {

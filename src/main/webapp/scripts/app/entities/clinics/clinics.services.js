@@ -53,8 +53,9 @@ angular.module('hillromvestApp')
         });
       },
 
-      getAllClinics : function () {
-        return $http.get('/api/clinics', {
+      getAllClinics : function (url) {
+        var url = url || '/api/clinics';
+        return $http.get(url, {
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',

@@ -26,13 +26,13 @@ angular.module('hillromvestApp')
             $scope.states = response.data.states;
           }).catch(function(response) {
           });
-          $scope.getClinics();
+          $scope.getParentClinics();
         };
 
-        $scope.getClinics = function() {
+        $scope.getParentClinics = function() {
           var timer = false;
           timer = $timeout(function() {
-            ClinicService.getAllClinics().then(function(response) {
+            ClinicService.getAllClinics('/api/clinics?filter=parent:true').then(function(response) {
               $scope.clinics = response.data;
             }).catch(function(response) {
 

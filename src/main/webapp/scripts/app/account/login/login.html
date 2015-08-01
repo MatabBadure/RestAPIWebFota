@@ -21,7 +21,7 @@
             <input type="text" class="form-control" id="username" name="username" placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="username" required>
             <div class="form-error" ng-show="(form.username.$dirty && form.username.$invalid) || loginSubmitted">
               <span class="has-error" ng-show="form.username.$error.required ">
-                Your Username is required.
+                Username required.
               </span>
             </div>
           </div>
@@ -32,7 +32,7 @@
             <div class="form-error" ng-show="(form.password.$dirty && form.password.$invalid) || loginSubmitted">
               <span class="has-error"
                  ng-show="form.password.$error.required">
-                  password is required.
+                  Password required.
               </span>
             </div>
           </div>
@@ -64,14 +64,15 @@
             <input type="email" class="form-control" name="email" placeholder="{{'login.form.email.placeholder' | translate}}" ng-model="user.email" ng-maxlength=100 required>
             <div ng-show="(confirmForm.email.$dirty && confirmForm.email.$invalid) || submitted" class="form-error">
               <span class="has-error" ng-show="confirmForm.email.$error.required">
-                 e-mail is required.
+                 E-mail required.
               </span>
               <span class="has-error" ng-show="confirmForm.email.$error.email">
-                 e-mail is invalid.
+                Invalid e-mail.
               </span>
               <span class="has-error" ng-show="confirmForm.email.$error.maxlength">
-                 e-mail cannot be longer than 100 characters.
+                 E-mail cannot be longer than 100 characters.
               </span>
+
             </div>
           </div>
 
@@ -80,13 +81,16 @@
             <input type="password" name="password" class="form-control"  placeholder="password" ng-model="user.password" ng-minlength=8 ng-maxlength=50 ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
             <div ng-show="(confirmForm.password.$dirty && confirmForm.password.$invalid) || submitted">
               <span class="has-error" ng-show="confirmForm.password.$error.required">
-                 password is required.
+                 Password required.
               </span>
               <span class="has-error" ng-show="confirmForm.password.$error.minlength">
-                 password is required to be at least 8 characters.
+                 Password required to be at least 8 characters.
               </span>
               <span class="has-error" ng-show="confirmForm.password.$error.maxlength">
-                 password cannot be longer than 50 characters.
+                 Password cannot be longer than 50 characters.
+              </span>
+              <span class="has-error" ng-show="confirmForm.password.$error.pattern" >
+                  Password complexity criteria not met.
               </span>
             </div>
             <password-strength-bar password-to-check="user.password"></password-strength-bar>
@@ -97,13 +101,16 @@
             <input type="password" class="form-control" name="confirmPassword" placeholder="confirm password" ng-model="user.confirmPassword" ng-minlength=8 ng-maxlength=50 ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
             <div ng-show="(confirmForm.confirmPassword.$dirty && confirmForm.confirmPassword.$invalid) || submitted">
               <span class="has-error" ng-show="confirmForm.confirmPassword.$error.required">
-                 confirmation password is required.
+                Password required.
               </span>
               <span class="has-error" ng-show="confirmForm.confirmPassword.$error.minlength">
-                 confirmation password is required to be at least 8 characters.
+                Password required to be at least 8 characters.
               </span>
               <span class="has-error" ng-show="confirmForm.confirmPassword.$error.maxlength">
-                 confirmation password cannot be longer than 50 characters.
+                Password cannot be longer than 50 characters.
+              </span>
+               <span class="has-error" ng-show="confirmForm.confirmPassword.$error.pattern" >
+                Password complexity criteria not met.
               </span>
             </div>
           </div>
@@ -115,7 +122,7 @@
             </select>
             <div ng-show="(confirmForm.question.$dirty && confirmForm.question.$invalid) || submitted">
               <p class="has-error" ng-show="confirmForm.question.$error.required">
-                Security question is required.
+                Security question required.
               </p>
             </div>     
           </div> 
@@ -125,7 +132,7 @@
             <input type="text" class="form-control" name="answer" ng-model="user.answer" required>
             <div ng-show="(confirmForm.answer.$dirty && confirmForm.answer.$invalid) || submitted">
               <p class="has-error" ng-show="confirmForm.answer.$error.required">
-                Answer is required.
+                Answer required.
               </p>
             </div>     
           </div> 

@@ -68,7 +68,6 @@ angular.module('hillromvestApp')
           $state.go('login');
         });
       }
-      $scope.signOut();
       $scope.logout = function(){
         Auth.signOut().then(function(data) {
           Auth.logout();

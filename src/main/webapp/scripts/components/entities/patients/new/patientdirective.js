@@ -50,7 +50,6 @@ angular.module('hillromvestApp')
               // edit patient section
 
               var data = $scope.patient;
-              data.dob = data.formatedDOB;
               data.role = 'PATIENT';
 
               UserService.editUser($scope.patient,data).then(function (response) {
@@ -204,7 +203,13 @@ angular.module('hillromvestApp')
 
         angular.element('#dp2').datepicker().on('changeDate', function(ev) {
           var selectedDate = angular.element('#dp2').datepicker("getDate");
-          $scope.patient.dob = selectedDate.getMonth() + "/" + selectedDate.getDate() + "/" + selectedDate.getFullYear();
+          var _month = (selectedDate.getMonth()+1).toString();
+          _month = _month.length > 1 ? _month : '0' + _month;
+          var _day = (selectedDate.getDate()).toString();
+          _day = _day.length > 1 ? _day : '0' + _day;
+          var _year = (selectedDate.getFullYear()).toString();
+          var dob = _month+"/"+_day+"/"+_year;
+          $scope.patient.dob = dob;
           var age = $scope.getAge(selectedDate);
           angular.element('.age').val(age);
           $scope.patient.age = age;
@@ -214,7 +219,6 @@ angular.module('hillromvestApp')
           angular.element("#dp2").datepicker('hide');
           $scope.$digest();
         });
-
       }
     };
   });

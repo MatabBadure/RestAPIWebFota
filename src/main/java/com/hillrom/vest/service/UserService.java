@@ -1,6 +1,7 @@
 package com.hillrom.vest.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -740,23 +741,29 @@ public class UserService {
 	public JSONObject deleteUser(Long id) {
     	JSONObject jsonObject = new JSONObject();
     	UserExtension existingUser = userExtensionRepository.findOne(id);
+    	List<Authority> authorities  = authorityRepository.findAll();
+    	Map<String,Authority> authorityMap = new HashMap<>();
+    	authorities.stream().forEach(authority -> {
+    		authorityMap.put(authority.getName(), authority);
+    	});
 		if(existingUser.getId() != null) {
 			if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))) {
-				if(existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.PATIENT))) {
+				if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 					userExtensionRepository.delete(existingUser);
 					jsonObject.put("message", "Patient User deleted successfully.");
 					//TO-DO CareGiver deactivate Stuff
-				} else if((existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.HCP))
-							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.CLINIC_ADMIN)))) {
+				} else if((existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN)))) {
 					userExtensionRepository.delete(existingUser);
 					jsonObject.put("message", "User deleted successfully.");
 				} else {
 					jsonObject.put("ERROR", "Unable to delete User.");
 				}
 			} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))
-					&& (existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.ADMIN))
-							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.ACCT_SERVICES))
-							|| existingUser.getAuthorities().contains(authorityRepository.findOne(AuthoritiesConstants.ASSOCIATES)))) {
+					&& (existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ADMIN))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ACCT_SERVICES))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT)))) {
 				userExtensionRepository.delete(existingUser);
 				jsonObject.put("message", "User deleted successfully.");
 			} else {

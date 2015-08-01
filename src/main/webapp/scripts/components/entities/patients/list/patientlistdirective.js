@@ -71,6 +71,12 @@ angular.module('hillromvestApp')
           UserService.getUsers(url,$scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount)
             .then(function(response) {
               $scope.patients = response.data;
+              var patientCount = $scope.patients.length;
+              for (var i = 0 ; i < patientCount ; i++) {
+                var _date = new Date($scope.patients[i].dob);
+                var dob = _date.getMonth()+1+"/"+_date.getDate()+"/"+_date.getFullYear();
+                $scope.patients[i].dob = dob;
+              }
               $scope.total = response.headers()['x-total-count'];
               $scope.pageCount = Math.ceil($scope.total / 10);
             }).catch(function(response) {

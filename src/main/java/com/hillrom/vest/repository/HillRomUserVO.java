@@ -11,9 +11,9 @@ public class HillRomUserVO {
 	private String role;
 	private boolean isDeleted;
 	private DateTime createdAt;
-	
+	private boolean isActivated;
 	public HillRomUserVO(Long id, String firstName, String lastName,
-			String email, String role,boolean isDeleted,DateTime createdAt) {
+			String email, String role,boolean isDeleted,DateTime createdAt,boolean isActivated) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
@@ -22,6 +22,7 @@ public class HillRomUserVO {
 		this.role = role;
 		this.isDeleted = isDeleted;
 		this.createdAt = createdAt;
+		this.isActivated = isActivated;
 	}
 	public Long getId() {
 		return id;
@@ -64,6 +65,12 @@ public class HillRomUserVO {
 	}
 	public void setCreatedAt(DateTime createdAt) {
 		this.createdAt = createdAt;
+	}
+	public boolean isActivated() {
+		return isActivated;
+	}
+	public void setActivated(boolean isActivated) {
+		this.isActivated = isActivated;
 	}
 	
 	

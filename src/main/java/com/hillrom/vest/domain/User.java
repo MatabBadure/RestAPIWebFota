@@ -15,9 +15,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.NamedNativeQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -135,10 +133,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
     @Column(name = "dob")
     private LocalDate dob;
-
-    @Column(name="created_at")
-    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-    private DateTime createdAt;
     
     public Long getId() {
         return id;
@@ -307,14 +301,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	public void setDob(LocalDate dob) {
 		this.dob = dob;
-	}
-
-	public DateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(DateTime createdAt) {
-		this.createdAt = createdAt;
 	}
 
 	@Override

@@ -25,11 +25,12 @@ public class HcpVO {
 	private List<Map<String,String>> clinics = new LinkedList<>();
 	private boolean isDeleted;
 	private DateTime createdAt;
+	private boolean isActivated;
 	
 	public HcpVO(Long id, String firstName, String lastName, String email,boolean isDeleted,
 			Integer zipcode, String address, String city, String credentials,
 			BigInteger faxNumber, BigInteger primaryPhone, BigInteger mobilePhone,
-			String speciality, String state,DateTime createdAt) {
+			String speciality, String state,DateTime createdAt,boolean isActivated) {
 		super();
 		this.id = id;
 		this.email = email;
@@ -46,6 +47,7 @@ public class HcpVO {
 		this.speciality = speciality;
 		this.state = state;
 		this.createdAt = createdAt;
+		this.isActivated = isActivated;
 	}
 	public Long getId() {
 		return id;
@@ -143,6 +145,12 @@ public class HcpVO {
 	}
 	public void setCreatedAt(DateTime createdAt) {
 		this.createdAt = createdAt;
+	}
+	public boolean isActivated() {
+		return isActivated;
+	}
+	public void setActivated(boolean isActivated) {
+		this.isActivated = isActivated;
 	}
 	
 	

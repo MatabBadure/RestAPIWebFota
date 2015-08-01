@@ -24,11 +24,12 @@ public class PatientUserVO {
 	private String title;
 	private String hillromId;
 	private DateTime createdAt;
+	private Boolean isActivated;
 	
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
 			String city, Date dob, String gender, String title,
-			String hillromId,DateTime createdAt) {
+			String hillromId,DateTime createdAt,Boolean isActivated) {
 		super();
 		this.id = id;
 		this.email = email;
@@ -43,6 +44,7 @@ public class PatientUserVO {
 		this.title = title;
 		this.hillromId = hillromId;
 		this.createdAt = createdAt;
+		this.isActivated = isActivated;
 	}
 	public Long getId() {
 		return id;
@@ -121,6 +123,12 @@ public class PatientUserVO {
 	}
 	public void setCreatedAt(DateTime createdAt) {
 		this.createdAt = createdAt;
+	}
+	public Boolean getIsActivated() {
+		return isActivated;
+	}
+	public void setIsActivated(Boolean isActivated) {
+		this.isActivated = isActivated;
 	}
 	
 	

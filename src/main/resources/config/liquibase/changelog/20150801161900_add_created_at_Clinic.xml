@@ -13,10 +13,10 @@
     <!--
         Added the entity UserExtension.
     -->
-    <changeSet id="20150801135600" author="jhipster">
-    	<addColumn tableName="USER">
-        	<column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+    <changeSet id="20150801135900" author="jhipster">
+    	<addColumn tableName="CLINIC">
+        	<column name="created_date" type="timestamp" defaultValueComputed="${now}"/>
         </addColumn>
-	
+    
     </changeSet>
 </databaseChangeLog>

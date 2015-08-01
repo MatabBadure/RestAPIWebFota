@@ -93,7 +93,7 @@ public class Clinic implements Serializable {
     @Column(name="is_parent", nullable = false)
     private boolean parent = false;
 
-    @Column(name="created_at")
+    @Column(name="created_date")
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime createdAt;
     

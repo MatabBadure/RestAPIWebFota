@@ -192,7 +192,7 @@
         <div class="col-md-16 row margin-top">
           <div class="row padding-right-xl">
             <button type="submit" ng-show="clinicStatus.isCreate" class="hillrom-btn btn-submit float-right" translate="clinic.submit-button-text">Submit</button>
-            <button type="button" ng-click="cancel()" ng-show="clinicStatus.isCreate" class="hillrom-btn btn-submit float-right" >Cancel</button>
+            <button type="reset" ng-click="cancel()" ng-show="clinicStatus.isCreate" class="hillrom-btn btn-submit float-right" >Cancel</button>
             <button type="submit" ng-click="formSubmit()" ng-show="!clinicStatus.isCreate" class="hillrom-btn btn-submit float-right">Update</button>
             <button type="button" ng-click="open()" ng-show="!clinicStatus.isCreate" class="hillrom-btn btn-submit float-right">Diassociate</button>
           </div>

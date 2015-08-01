@@ -19,7 +19,7 @@
             <span class="dashboard__form--type" translate="patient.general-details"></span>
           </div>
           <div class="col-md-4 row user-required">
-            <span translate="patient.required-field"></span> 
+            <span translate="patient.required-field"></span>
           </div>
         </div>
 
@@ -30,7 +30,7 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" ng-model="patient.hillromId" name="HRID" ng-readonly="patientStatus.editMode" required>
+              <input class="" type="text" ng-model="patient.hillromId" name="HRID" ng-if="!patientStatus.editMode" required>
               <div ng-show="(form.HRID.$dirty && form.HRID.$invalid) || submitted">
                 <span class="has-error" ng-show="form.HRID.$error.required">
                   JDE/HR ID is required.
@@ -317,7 +317,7 @@
     <div class="col-md-16 row margin-top">
       <div class="row padding-right-xl">
         <button type="submit" ng-click="formSubmit()" ng-show="patientStatus.isCreate" class="hillrom-btn btn-submit float-right" translate="patient.submit-button-text">Submit</button>
-        <button type="button" ng-click="cancel()" ng-show="patientStatus.isCreate" class="hillrom-btn btn-submit float-right" translate="patient.cancel-button-text">Cancel</button>
+        <button type="reset" ng-click="cancel()" ng-show="patientStatus.isCreate" class="hillrom-btn btn-submit float-right" translate="patient.cancel-button-text">Cancel</button>
         <button type="submit" ng-click="formSubmit()" ng-show="!patientStatus.isCreate" class="hillrom-btn btn-submit float-right">Update</button>
         <button type="button" ng-click="open()" ng-show="!patientStatus.isCreate" class="hillrom-btn btn-submit float-right">Diassociate</button>
       </div>

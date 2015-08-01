@@ -153,8 +153,7 @@ angular.module('hillromvestApp')
         };
 
         $scope.cancel = function(){
-          $scope.clinicStatus.editMode = false;
-          $scope.clinicStatus.isCreate = false;
+          $scope.reset();
         };
 
         $scope.reset = function(){

@@ -30,7 +30,7 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <tags-input ng-model="doctor.clinics" display-property="name" min-tags="1" name="clinicAutoComplete">
+              <tags-input key-property="id" ng-model="doctor.clinics" display-property="name" min-tags="1" name="clinicAutoComplete">
                 <auto-complete source="clinics" display-property="name" min-length="1"></auto-complete>
               </tags-input>
               <!-- <div ng-show="form.clinicAutoComplete.$dirty && form.clinicAutoComplete.$error.minTags">
@@ -271,7 +271,7 @@
               <span class="" translate="doctor.zipcode"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" name="zip" validate-on-blur ng-pattern="/^[0-9]{5}$/" ng-model="doctor.zipcode">
+              <input class="" type="text" name="zip" maxlength="5" validate-on-blur ng-pattern="/^[0-9]{5}$/" ng-model="doctor.zipcode">
               <div ng-show="form.zip.$showValidationMessage && form.zip.$invalid" class="">
                 <span class="has-error" ng-show="form.zip.$error.pattern">
                     Zip Code is invalid.

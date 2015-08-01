@@ -139,7 +139,7 @@ public class UserExtensionResource {
         log.debug("REST request to delete UserExtension : {}", id);
         JSONObject jsonObject = userService.deleteUser(id);
         if (jsonObject.containsKey("ERROR")) {
-        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
         } else {
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         }

@@ -15,7 +15,7 @@
 </div>
 
 <div class="dashboard dashboard--content padding-bottom-ls">
-  <form name="form" ng-submit="createPatient()" novalidate>
+  <form name="form" ng-submit="createPatient()" novalidate autocomplete="off">
     <div class="container dashboard__form">
       <div class="row margin-top-xl">
         <div class="col-md-16 row">
@@ -329,7 +329,7 @@
     </div>
   </form>
 </div>
-     
+
 <div ng-if="showModal" class="modal" id="sg-modal" tabIndex="-1" role="dialog" aria-labelledby="sgModalLabel" aria-hidden="true">
   <div class="modal__dialog">
     <div class="modal__content">
@@ -340,8 +340,8 @@
       <div class="modal__body">
          <div class="modal--message">If you disassociate the patient,you will no longer be able to view their information</div>
          <div class="row modal--custom-btn">
-          <buton class="hillrom-btn btn-submit float-right" ng-click="deletePatient()">Yes</buton> 
-          <buton class="hillrom-btn btn-submit float-right" data-dismiss="modal" ng-click="close()">No</buton> 
+          <buton class="hillrom-btn btn-submit float-right" ng-click="deletePatient()">Yes</buton>
+          <buton class="hillrom-btn btn-submit float-right" data-dismiss="modal" ng-click="close()">No</buton>
          </div>
       </div>
       <footer class="modal__footer">

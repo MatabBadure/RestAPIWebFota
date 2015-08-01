@@ -6394,6 +6394,26 @@ a::-moz-focus-inner {
   padding-top: 30px;
 }
 
+.parent-list {
+  position: relative;
+}
+
+.dashboard-page__user-list--parent-list {
+  border: 1px solid #aeb5be;
+  position: absolute;
+  z-index: 999;
+  width: calc(100% - 20px);
+  font-weight: normal;
+}
+.dashboard-page__user-list--parent-list .parent-detail {
+  background-color: #f1f1f1;
+  padding-left: 7px;
+}
+.dashboard-page__user-list--parent-list .parent-detail:hover {
+  background-color: #D6DADE;
+  cursor: pointer;
+}
+
 .footer {
   min-height: 40px;
   background-color: #34455C;

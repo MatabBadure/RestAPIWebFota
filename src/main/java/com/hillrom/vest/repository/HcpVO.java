@@ -1,5 +1,6 @@
 package com.hillrom.vest.repository;
 
+import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -14,9 +15,9 @@ public class HcpVO {
 	private String address;
 	private String city;
 	private String credentials;
-	private Long faxNumber;
-	private Long primaryPhone;
-	private Long mobilePhone;
+	private BigInteger faxNumber;
+	private BigInteger primaryPhone;
+	private BigInteger mobilePhone;
 	private String speciality;
 	private String state;
 	private List<Map<String,String>> clinics = new LinkedList<>();
@@ -24,7 +25,7 @@ public class HcpVO {
 	
 	public HcpVO(Long id, String firstName, String lastName, String email,boolean isDeleted,
 			Integer zipcode, String address, String city, String credentials,
-			Long faxNumber, Long primaryPhone, Long mobilePhone,
+			BigInteger faxNumber, BigInteger primaryPhone, BigInteger mobilePhone,
 			String speciality, String state) {
 		super();
 		this.id = id;
@@ -90,22 +91,23 @@ public class HcpVO {
 	public void setCredentials(String credentials) {
 		this.credentials = credentials;
 	}
-	public Long getFaxNumber() {
+	
+	public BigInteger getFaxNumber() {
 		return faxNumber;
 	}
-	public void setFaxNumber(Long faxNumber) {
+	public void setFaxNumber(BigInteger faxNumber) {
 		this.faxNumber = faxNumber;
 	}
-	public Long getPrimaryPhone() {
+	public BigInteger getPrimaryPhone() {
 		return primaryPhone;
 	}
-	public void setPrimaryPhone(Long primaryPhone) {
+	public void setPrimaryPhone(BigInteger primaryPhone) {
 		this.primaryPhone = primaryPhone;
 	}
-	public Long getMobilePhone() {
+	public BigInteger getMobilePhone() {
 		return mobilePhone;
 	}
-	public void setMobilePhone(Long mobilePhone) {
+	public void setMobilePhone(BigInteger mobilePhone) {
 		this.mobilePhone = mobilePhone;
 	}
 	public String getSpeciality() {

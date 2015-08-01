@@ -2,6 +2,7 @@ package com.hillrom.vest.repository;
 
 import java.math.BigInteger;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -13,7 +14,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +35,7 @@ public class UserSearchRepository {
 		int maxResult = firstResult + pageable.getPageSize();
 
 		String findHillromTeamUserQuery = "select distinct(user.id),user.first_name as firstName,user.last_name as lastName,user.email,"
-				+ " user_authority.authority_name as name,user.is_deleted as isDeleted "
+				+ " user_authority.authority_name as name,user.is_deleted as isDeleted,user.created_at as createdAt "
 				+ " from  USER_EXTENSION userExt join USER user on user.id = userExt.user_id and user.activated = 1 and "
 				+ " (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or "
@@ -66,9 +66,11 @@ public class UserSearchRepository {
 					String email = (String) record[3];
 					String role = (String) record[4];
 					Boolean isDeleted = (Boolean) record[5];
-
+					Timestamp createdAt = (Timestamp) record[6];
+					DateTime createdAtDatetime = new DateTime(createdAt);
+					
 					HillRomUserVO hrUserVO = new HillRomUserVO(id, firstName,
-							lastName, email, role, isDeleted);
+							lastName, email, role, isDeleted,createdAtDatetime);
 					hrUsersList.add(hrUserVO);
 				});
 
@@ -86,12 +88,12 @@ public class UserSearchRepository {
 
 		String findHcpQuery = "select distinct(user.id),user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted,"
 				+ " user.zipcode,userExt.address,userExt.city,userExt.credentials,userExt.fax_number,userExt.primary_phone,"
-				+ " userExt.mobile_phone,userExt.speciality,userExt.state,clinic.id as clinicId,clinic.name as clinicName "
+				+ " userExt.mobile_phone,userExt.speciality,userExt.state,clinic.id as clinicId,clinic.name as clinicName,user.created_at as createdAt "
 				+ " FROM USER user join USER_EXTENSION userExt on user.id = userExt.user_id and user.activated = 1 "
 				+ " and (lower(user.first_name) like lower(:queryString) or  lower(user.last_name) like lower(:queryString) or  lower(user.email) like lower(:queryString)) "
 				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = 'HCP' "
 				+ " left outer join CLINIC_USER_ASSOC user_clinic on user_clinic.users_id = user.id "
-				+ " left outer join CLINIC clinic on user_clinic.clinics_id = clinic.id ";
+				+ " left outer join CLINIC clinic on user_clinic.clinics_id = clinic.id and user_clinic.users_id = user.id ";
 
 		findHcpQuery = findHcpQuery.replaceAll(":queryString", queryString);
 
@@ -129,7 +131,8 @@ public class UserSearchRepository {
 					String state = (String) record[13];
 					BigInteger clinicId = (BigInteger) record[14];
 					String clinicName = (String) record[15];
-
+					Timestamp createdAt = (Timestamp) record[16];
+					DateTime createdAtDatetime = new DateTime(createdAt);
 					HcpVO hcpVO = hcpUsersMap.get(id);
 
 					Map<String, String> clinicMap = new HashMap<>();
@@ -141,7 +144,7 @@ public class UserSearchRepository {
 						hcpVO = new HcpVO(id, firstName, lastName, email,
 								isDeleted, zipcode, address, city, credentials,
 								faxNumber, primaryPhone, mobilePhone,
-								speciality, state);
+								speciality, state,createdAtDatetime);
 						if (clinicMap.keySet().size() > 0) {
 							hcpVO.getClinics().add(clinicMap);
 						}
@@ -167,7 +170,7 @@ public class UserSearchRepository {
 		int maxResult = firstResult + pageable.getPageSize();
 
 		String findPatientUserQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName,"
-				+ " user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,user.title,patInfo.hillrom_id "
+				+ " user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,user.title,patInfo.hillrom_id,user.created_at as createdAt "
 				+ " from USER user join USER_AUTHORITY user_authority on user_authority.user_id = user.id "
 				+ " and user_authority.authority_name = 'PATIENT' and user.activated = 1"
 				+ " and (lower(user.first_name) like lower(:queryString) or "
@@ -207,6 +210,8 @@ public class UserSearchRepository {
 					String gender = (String) record[9];
 					String title = (String) record[10];
 					String hillromId = (String) record[11];
+					Timestamp createdAt = (Timestamp) record[12];
+					DateTime createdAtDatetime = new DateTime(createdAt);
 					
 					java.util.Date dobLocalDate = null;
 					if(null !=dob){
@@ -214,7 +219,7 @@ public class UserSearchRepository {
 					}
 					patientUsers.add(new PatientUserVO(id, email, firstName,
 							lastName, isDeleted, zipcode, address, city, dobLocalDate,
-							gender, title, hillromId));
+							gender, title, hillromId,createdAtDatetime));
 				});
 
 		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());

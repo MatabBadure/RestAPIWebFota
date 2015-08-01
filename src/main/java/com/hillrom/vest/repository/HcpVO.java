@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.joda.time.DateTime;
+
 public class HcpVO {
 
 	private Long id;
@@ -22,11 +24,12 @@ public class HcpVO {
 	private String state;
 	private List<Map<String,String>> clinics = new LinkedList<>();
 	private boolean isDeleted;
+	private DateTime createdAt;
 	
 	public HcpVO(Long id, String firstName, String lastName, String email,boolean isDeleted,
 			Integer zipcode, String address, String city, String credentials,
 			BigInteger faxNumber, BigInteger primaryPhone, BigInteger mobilePhone,
-			String speciality, String state) {
+			String speciality, String state,DateTime createdAt) {
 		super();
 		this.id = id;
 		this.email = email;
@@ -42,6 +45,7 @@ public class HcpVO {
 		this.mobilePhone = mobilePhone;
 		this.speciality = speciality;
 		this.state = state;
+		this.createdAt = createdAt;
 	}
 	public Long getId() {
 		return id;
@@ -133,6 +137,12 @@ public class HcpVO {
 	}
 	public void setDeleted(boolean isDeleted) {
 		this.isDeleted = isDeleted;
+	}
+	public DateTime getCreatedAt() {
+		return createdAt;
+	}
+	public void setCreatedAt(DateTime createdAt) {
+		this.createdAt = createdAt;
 	}
 	
 	

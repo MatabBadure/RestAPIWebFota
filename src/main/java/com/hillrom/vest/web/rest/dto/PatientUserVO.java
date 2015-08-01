@@ -2,6 +2,8 @@ package com.hillrom.vest.web.rest.dto;
 
 import java.util.Date;
 
+import org.joda.time.DateTime;
+
 
 
 public class PatientUserVO {
@@ -21,12 +23,12 @@ public class PatientUserVO {
 	private String gender;
 	private String title;
 	private String hillromId;
-	
+	private DateTime createdAt;
 	
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
 			String city, Date dob, String gender, String title,
-			String hillromId) {
+			String hillromId,DateTime createdAt) {
 		super();
 		this.id = id;
 		this.email = email;
@@ -40,6 +42,7 @@ public class PatientUserVO {
 		this.gender = gender;
 		this.title = title;
 		this.hillromId = hillromId;
+		this.createdAt = createdAt;
 	}
 	public Long getId() {
 		return id;
@@ -112,6 +115,12 @@ public class PatientUserVO {
 	}
 	public void setHillromId(String hillromId) {
 		this.hillromId = hillromId;
+	}
+	public DateTime getCreatedAt() {
+		return createdAt;
+	}
+	public void setCreatedAt(DateTime createdAt) {
+		this.createdAt = createdAt;
 	}
 	
 	

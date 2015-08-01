@@ -136,6 +136,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "dob")
     private LocalDate dob;
 
+    @Column(name="created_at")
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime createdAt;
     
     public Long getId() {
         return id;
@@ -304,6 +307,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	public void setDob(LocalDate dob) {
 		this.dob = dob;
+	}
+
+	public DateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(DateTime createdAt) {
+		this.createdAt = createdAt;
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -45,6 +46,7 @@ import com.hillrom.vest.security.OnCredentialsChangeEvent;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.service.util.RequestUtil;
+import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 
@@ -829,5 +831,26 @@ public class UserService {
 		}	
 		return jsonObject;
 	 }
+	
+	public Optional<PatientUserVO> getPatientUser(Long id){
+		UserExtension user = userExtensionRepository.findOne(id);
+		if(null == user)
+			return Optional.empty();
+		Set<UserPatientAssoc> associations = user.getUserPatientAssoc();
+		List<UserPatientAssoc> listOfassociations = null;
+		if (associations.size() > 0) {
+			listOfassociations = associations
+					.stream()
+					.filter(assoc -> "SELF".equalsIgnoreCase(assoc
+							.getRelationshipLabel()))
+					.collect(Collectors.toList());
+		}
+		if(listOfassociations.isEmpty()){
+			return Optional.of(new PatientUserVO(user,null));
+		}
+		UserPatientAssoc selfAssociation = listOfassociations.get(0);
+		PatientInfo patientInfo = selfAssociation != null ? selfAssociation.getPatient() : null;
+		return Optional.of(new PatientUserVO(user,patientInfo));
+	}
 }
 

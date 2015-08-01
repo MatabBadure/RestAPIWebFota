@@ -185,3 +185,13 @@ a::-moz-focus-inner {
   height: 35px;
   line-height: 26px;
 }
+
+#loading-bar .bar {
+	background: $terracotta;
+	height: 4px;
+}
+
+#loading-bar-spinner .spinner-icon {
+	border-top-color:  $terracotta;
+  border-left-color: $terracotta;
+}

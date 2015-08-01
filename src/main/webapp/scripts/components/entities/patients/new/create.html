@@ -34,8 +34,8 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" ng-model="patient.hillromId" name="HRID" ng-if="!patientStatus.editMode" required>
-              <div ng-show="(form.HRID.$dirty && form.HRID.$invalid) || submitted">
+              <input class="" type="text" validate-on-blur ng-model="patient.hillromId" name="HRID" ng-if="!patientStatus.editMode" required>
+              <div ng-show="(form.HRID.$showValidationMessage && form.HRID.$invalid) || submitted">
                 <span class="has-error" ng-show="form.HRID.$error.required">
                   JDE/HR ID is required.
                 </span>
@@ -100,8 +100,8 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" name="firstName" ng-model="patient.firstName" ng-readonly="validateADMINorASP()" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-zA-Z]+$/" required>
-              <div ng-show="submitted">
+              <input class="" type="text" validate-on-blur name="firstName" ng-model="patient.firstName" ng-readonly="validateADMINorASP()" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-z A-Z]+$/" required>
+              <div ng-show="(form.firstName.$showValidationMessage && form.firstName.$invalid) ||submitted">
                 <span class="has-error" ng-show="form.firstName.$error.required">
                   First Name is required.
                 </span>
@@ -122,8 +122,8 @@
               <span class="" translate="patient.middle-name"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" ng-readonly="validateADMINorASP()" name="middleName" ng-model="patient.middleName" ng-pattern="/^[a-zA-Z]+$/" ng-minlength=2 ng-maxlength=15>
-              <div ng-show="(form.middleName.$dirty && form.middleName.$invalid)">
+              <input class="" type="text" validate-on-blur ng-readonly="validateADMINorASP()" name="middleName" ng-model="patient.middleName" ng-pattern="/^[a-z A-Z]+$/" ng-minlength=2 ng-maxlength=15>
+              <div ng-show="(form.middleName.$showValidationMessage && form.middleName.$invalid)">
                 <span class="has-error" ng-show="form.middleName.$error.pattern" >
                   Middle Name cannot have number.
                 </span>
@@ -145,8 +145,8 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" name="lastName" ng-model="patient.lastName" ng-readonly="validateADMINorASP()" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-zA-Z]+$/" required>
-              <div ng-show="(form.lastName.$dirty && form.lastName.$invalid) || submitted">
+              <input class="" type="text" validate-on-blur name="lastName" ng-model="patient.lastName" ng-readonly="validateADMINorASP()" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-z A-Z]+$/" required>
+              <div ng-show="(form.lastName.$showValidationMessage && form.lastName.$invalid) || submitted">
                 <span class="has-error" ng-show="form.lastName.$error.required">
                   Last Name is required.
                 </span>
@@ -169,9 +169,9 @@
               <span class="">*</span>
             </div>
             <div class="col-md-6 dashboard__form--input">
-              <input type="text" name="dob" class="span2" value="" ng-model="patient.formatedDOB" ng-readonly="validateADMINorASP()" data-date-format="mm/dd/yy" id="dp2" required>
+              <input type="text" name="dob" validate-on-blur class="span2" value="" ng-model="patient.formatedDOB" ng-readonly="validateADMINorASP()" data-date-format="mm/dd/yy" id="dp2" required>
               <span readonly class="dashboard__form--label-age">{{patient.age}}</span>
-              <div ng-show="(form.dob.$dirty && form.dob.$invalid) || submitted">
+              <div ng-show="(form.dob.$showValidationMessage && form.dob.$invalid) || submitted">
                 <span class="has-error" ng-show="form.dob.$error.required">
                   Date of Birth is required.
                 </span>
@@ -204,8 +204,8 @@
               <span class="" translate="patient.address"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" ng-model="patient.address" name="address" ng-readonly="validateADMINorASP()" ng-maxlength=100>
-              <div ng-show="(form.address.$dirty && form.address.$invalid)">
+              <input class="" type="text" validate-on-blur ng-model="patient.address" name="address" ng-readonly="validateADMINorASP()" ng-maxlength=100>
+              <div ng-show="(form.address.$showValidationMessage && form.address.$invalid)">
                 <span class="has-error" ng-show="form.address.$error.maxlength" >
                   Address cannot be longer than 100 characters.
                 </span>
@@ -220,8 +220,8 @@
               <span class="" translate="patient.city"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" ng-model="patient.city" name="city" ng-readonly="validateADMINorASP()" ng-maxlength=15>
-              <div ng-show="(form.city.$dirty && form.city.$invalid)">
+              <input class="" type="text" validate-on-blur ng-model="patient.city" name="city" ng-readonly="validateADMINorASP()" ng-maxlength=15>
+              <div ng-show="(form.city.$showValidationMessage && form.city.$invalid)">
                 <span class="has-error" ng-show="form.city.$error.maxlength" >
                   City cannot be longer than 15 characters.
                 </span>
@@ -249,8 +249,8 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input type="text" class="form-control" name="zip" ng-readonly="validateADMINorASP()" maxlength="5" ng-pattern="/^[0-9]{5}$/" ng-model="patient.zipcode" required>
-               <div ng-show="(form.zip.$dirty && form.zip.$invalid) || submitted">
+              <input type="text" validate-on-blur class="form-control" name="zip" ng-readonly="validateADMINorASP()" maxlength="5" ng-pattern="/^[0-9]{5}$/" ng-model="patient.zipcode" required>
+               <div ng-show="(form.zip.$showValidationMessage && form.zip.$invalid) || submitted">
                 <span class="has-error" ng-show="form.zip.$error.pattern">
                   Zip Code is invalid.
                 </span>
@@ -266,13 +266,13 @@
             <span class=""></span>
           </div>
           <div class="col-md-10 dashboard__form--input">
-            <input type="email" class="form-control" name="email"  ng-readonly="validateADMINorASP()" ng-model="patient.email" ng-maxlength=100>
-            <div ng-show="(form.email.$dirty && form.email.$invalid) || submitted">
+            <input type="email" class="form-control" validate-on-blur name="email"  ng-readonly="validateADMINorASP()" ng-model="patient.email" ng-maxlength=100>
+            <div ng-show="(form.email.$showValidationMessage && form.email.$invalid) || submitted">
               <span class="has-error" ng-show="form.email.$error.email">
-                Your e-mail is invalid.
+                E-mail is invalid.
               </span>
               <span class="has-error" ng-show="form.email.$error.maxlength">
-                Your e-mail cannot be longer than 100 characters.
+                E-mail cannot be longer than 100 characters.
               </span>
             </div>
           </div>
@@ -286,8 +286,8 @@
               <span class=""></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input type="text" class="form-control" name="mobilePhone" ng-readonly="validateADMINorASP()" maxlength="10" ng-pattern="/^[0-9]{10}$/" ng-model="patient.mobilePhone" >
-               <div ng-show="(form.mobilePhone.$dirty && form.mobilePhone.$invalid) || submitted">
+              <input type="text" validate-on-blur class="form-control" name="mobilePhone" ng-readonly="validateADMINorASP()" maxlength="10" ng-pattern="/^[0-9]{10}$/" ng-model="patient.mobilePhone" >
+               <div ng-show="(form.mobilePhone.$showValidationMessage && form.mobilePhone.$invalid) || submitted">
                 <span class="has-error" ng-show="form.mobilePhone.$error.pattern">
                   Mobile number is invalid.
                 </span>
@@ -303,8 +303,8 @@
             <span class=""></span>
           </div>
           <div class="col-md-10 dashboard__form--input">
-            <input type="text" class="form-control" name="primaryPhone"  ng-readonly="validateADMINorASP()" ng-model="patient.primaryPhone" maxlength=10 ng-pattern="/^[0-9]{10}$/">
-            <div ng-show="(form.primaryPhone.$dirty && form.primaryPhone.$invalid) || submitted">
+            <input type="text" class="form-control" validate-on-blur  name="primaryPhone"  ng-readonly="validateADMINorASP()" ng-model="patient.primaryPhone" maxlength=10 ng-pattern="/^[0-9]{10}$/">
+            <div ng-show="(form.primaryPhone.$showValidationMessage && form.primaryPhone.$invalid) || submitted">
               <span class="has-error" ng-show="form.primaryPhone.$error.pattern">
                 Home phone number is invalid.
               </span>

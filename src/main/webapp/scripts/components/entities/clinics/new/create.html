@@ -46,7 +46,7 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input parent-list">
-              <input class="" type="text" name="parentClinicName" ng-model="clinic.parentClinic.name" required ng-keyup="getParentClinic()">
+              <input class="" type="text" name="parentClinicName" validate-on-blur ng-model="clinic.parentClinic.name" required ng-keyup="getParentClinic()">
               <div class="dashboard-page__user-list--parent-list" ng-show="clinic.parentClinic.name.length > 0 && form.parentClinicName.$dirty">
                 <div class="parent-detail" ng-repeat="clinic in clinics | filter:clinic.parentClinic.name">
                   <div ng-click="selectClinic(clinic)" class="dashboard-page__user-list__detailed__list--details">
@@ -59,7 +59,7 @@
                   </div>
                 </div>
               </div>
-              <div ng-show="(form.parentClinicName.$dirty && form.parentClinicName.$invalid) || submitted">
+              <div ng-show="(form.parentClinicName.$showValidationMessage && form.parentClinicName.$invalid) || submitted">
                 <span class="has-error" ng-show="form.parentClinicName.$error.required">
                   Parent Clinic Name is required.
                 </span>
@@ -74,8 +74,8 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" ng-model="clinic.name" name="name" required>
-              <div ng-show="(form.name.$dirty && form.name.$invalid) || submitted">
+              <input class="" type="text" validate-on-blur ng-model="clinic.name" name="name" required>
+              <div ng-show="(form.name.$showValidationMessage && form.name.$invalid) || submitted">
                 <span class="has-error" ng-show="form.name.$error.required">
                   Clinic Name is required.
                 </span>
@@ -102,8 +102,8 @@
               <span class="" translate="clinic.address"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" ng-model="clinic.address" name="address" ng-maxlength="100">
-              <div ng-show="(form.address.$dirty && form.address.$invalid) || submitted">
+              <input class="" type="text" validate-on-blur ng-model="clinic.address" name="address" ng-maxlength="100">
+              <div ng-show="(form.address.$showValidationMessage && form.address.$invalid) || submitted">
                 <span class="has-error" ng-show="form.address.$error.maxlength">
                   Address cannot be longer than 100 characters.
                 </span>
@@ -115,8 +115,8 @@
               <span class="" translate="clinic.city"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" ng-model="clinic.city" name="city" ng-maxlength=15>
-              <div ng-show="(form.city.$dirty && form.city.$invalid)">
+              <input class="" type="text" ng-model="clinic.city" validate-on-blur name="city" ng-maxlength=15>
+              <div ng-show="(form.city.$showValidationMessage && form.city.$invalid)">
                 <span class="has-error" ng-show="form.city.$error.maxlength">
                   City cannot be longer than 15 characters.
                 </span>
@@ -142,8 +142,8 @@
               <span class="" translate="clinic.zipcode"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" name="zip" maxlength="5" ng-pattern="/^[0-9]{5}$/" ng-model="clinic.zipcode">
-              <div ng-show="(form.zip.$dirty && form.zip.$invalid) || submitted">
+              <input class="" type="text" validate-on-blur name="zip" maxlength="5" ng-pattern="/^[0-9]{5}$/" ng-model="clinic.zipcode">
+              <div ng-show="(form.zip.$showValidationMessage && form.zip.$invalid) || submitted">
                 <span class="has-error" ng-show="form.zip.$error.pattern">
                   Zip Code is invalid.
                 </span>
@@ -157,8 +157,8 @@
               <span class="" translate="clinic.clinic-phone"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" name="phone" ng-pattern="/^[0-9]{10}$/" ng-model="clinic.phoneNumber">
-              <div ng-show="(form.phone.$dirty && form.phone.$invalid) || submitted">
+              <input class="" type="text" name="phone" validate-on-blur ng-pattern="/^[0-9]{10}$/" ng-model="clinic.phoneNumber">
+              <div ng-show="(form.phone.$showValidationMessage && form.phone.$invalid) || submitted">
                 <span class="has-error" ng-show="form.phone.$error.pattern">
                   Phone Number is invalid.
                 </span>
@@ -170,8 +170,8 @@
               <span class="" translate="clinic.fax-number"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" name="fax" ng-pattern="/^[0-9]{10}$/" ng-model="clinic.faxNumber">
-              <div ng-show="(form.fax.$dirty && form.fax.$invalid) || submitted">
+              <input class="" type="text" name="fax" validate-on-blur ng-pattern="/^[0-9]{10}$/" ng-model="clinic.faxNumber">
+              <div ng-show="(form.fax.$showValidationMessage && form.fax.$invalid) || submitted">
                 <span class="has-error" ng-show="form.fax.$error.pattern">
                   Fax Number is invalid.
                 </span>
@@ -191,7 +191,7 @@
         </div>
         <div class="col-md-16 row margin-top">
           <div class="row padding-right-xl">
-            <button type="submit" ng-show="clinicStatus.isCreate" class="hillrom-btn btn-submit float-right" translate="clinic.submit-button-text">Submit</button>
+            <button type="submit" ng-click="formSubmit()" ng-show="clinicStatus.isCreate" class="hillrom-btn btn-submit float-right" translate="clinic.submit-button-text">Submit</button>
             <button type="reset" ng-click="cancel()" ng-show="clinicStatus.isCreate" class="hillrom-btn btn-submit float-right" >Cancel</button>
             <button type="submit" ng-click="formSubmit()" ng-show="!clinicStatus.isCreate" class="hillrom-btn btn-submit float-right">Update</button>
             <button type="button" ng-click="open()" ng-show="!clinicStatus.isCreate" class="hillrom-btn btn-submit float-right">Diassociate</button>

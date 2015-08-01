@@ -2,9 +2,12 @@ package com.hillrom.vest.web.rest.dto;
 
 import java.util.Date;
 
+import org.joda.time.DateTime;
+
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.service.util.RandomUtil;
+
 
 public class PatientUserVO {
 	/**
@@ -29,11 +32,13 @@ public class PatientUserVO {
 	private String state;
 	private Long mobilePhone;
 	private Long primaryPhone;
+	private DateTime createdAt;
+	private Boolean isActivated;
 	
 	public PatientUserVO(Long id, String email, String firstName,
-			String lastName, Boolean isDeleted, Integer zipcode,
-			String address, String city, Date dob, String gender, String title,
-			String hillromId) {
+			String lastName, Boolean isDeleted, Integer zipcode, String address,
+			String city, Date dob, String gender, String title,
+			String hillromId,DateTime createdAt,Boolean isActivated) {
 		super();
 		this.id = id;
 		this.email = email;
@@ -47,6 +52,8 @@ public class PatientUserVO {
 		this.gender = gender;
 		this.title = title;
 		this.hillromId = hillromId;
+		this.createdAt = createdAt;
+		this.isActivated = isActivated;
 	}
 
 	public PatientUserVO(UserExtension user, PatientInfo patientInfo) {
@@ -167,6 +174,19 @@ public class PatientUserVO {
 	public void setHillromId(String hillromId) {
 		this.hillromId = hillromId;
 	}
+	
+	public DateTime getCreatedAt() {
+		return createdAt;
+	}
+	public void setCreatedAt(DateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+	public Boolean getIsActivated() {
+		return isActivated;
+	}
+	public void setIsActivated(Boolean isActivated) {
+		this.isActivated = isActivated;
+	}
 
 	public String getLangKey() {
 		return langKey;
@@ -206,7 +226,6 @@ public class PatientUserVO {
 
 	public void setPrimaryPhone(Long primaryPhone) {
 		this.primaryPhone = primaryPhone;
-	}
-
+	}	
 	
 }

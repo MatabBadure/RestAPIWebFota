@@ -8,7 +8,7 @@
 
       <!-- normal login -->
       <div class=" col-md-10 col-lg-10 login__container__right-section" ng-show="showLogin">
-        <form class="login-form" role="form" name="form" ng-submit="login($event)" novalidate>
+        <form class="login-form" role="form" name="form" ng-submit="login($event)" novalidate autocomplete="off">
         <div class="auth-heading">LOGIN TO YOUR ACCOUNT</div>
           <div class="alert alert-danger has-error" ng-show="authenticationError" translate="login.messages.error.authentication">
             <strong>Authentication failed!</strong> Please check your credentials and try again.
@@ -58,7 +58,7 @@
 
       <!-- first time login -->
       <div class=" col-md-10 col-lg-10 login__container__right-section" ng-show="isFirstLogin">
-        <form class="form" role="form" name="confirmForm" ng-submit="submitPassword($event)" novalidate>
+        <form class="form" role="form" name="confirmForm" ng-submit="submitPassword($event)" novalidate autocomplete="off">
           <div class="form-group" ng-show="!isEmailExist">
             <label for="Email ID" translate="global.form.email">E-Mail</label>
             <input type="email" class="form-control" name="email" placeholder="{{'login.form.email.placeholder' | translate}}" ng-model="user.email" ng-maxlength=100 required value="">

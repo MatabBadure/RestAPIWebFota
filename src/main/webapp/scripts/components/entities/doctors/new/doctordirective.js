@@ -6,6 +6,7 @@ angular.module('hillromvestApp')
       restrict: 'E',
       scope: {
         doctor: '=doctorData',
+        onSuccess: '&',
         doctorStatus: '=doctorStatus'
       },
       controller: function ($scope, $timeout, noty) {
@@ -178,6 +179,7 @@ angular.module('hillromvestApp')
           $scope.doctor = {};
           $scope.doctor.clinics = [];
           $scope.form.$setPristine();
+          $scope.onSuccess();
         }
       }
     };

@@ -43,6 +43,11 @@ angular.module('hillromvestApp')
 	$scope.createPatient = function(){
 		$scope.patientStatus.isCreate = true;
 		$scope.patientStatus.isMessage = false;
-	}
+	};
+
+  $scope.onSuccess = function () {
+    $scope.$broadcast('resetList', {
+    });
+  };
 
 });

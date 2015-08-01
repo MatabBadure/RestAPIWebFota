@@ -15,7 +15,7 @@
           </div>
 
           <div class="text-center indent-bottom-5 has-error" ng-show="firstTimeAccessFailed" >Authentication failed!
-          </div> 
+          </div>
 
           <div class="form-group">
             <input type="text" class="form-control" id="username" name="username" placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="username" required>
@@ -61,7 +61,7 @@
         <form class="form" role="form" name="confirmForm" ng-submit="submitPassword($event)" novalidate>
           <div class="form-group" ng-show="!isEmailExist">
             <label for="Email ID" translate="global.form.email">E-Mail</label>
-            <input type="email" class="form-control" name="email" placeholder="{{'login.form.email.placeholder' | translate}}" ng-model="user.email" ng-maxlength=100 required>
+            <input type="email" class="form-control" name="email" placeholder="{{'login.form.email.placeholder' | translate}}" ng-model="user.email" ng-maxlength=100 required value="">
             <div ng-show="(confirmForm.email.$dirty && confirmForm.email.$invalid) || submitted" class="form-error">
               <span class="has-error" ng-show="confirmForm.email.$error.required">
                  e-mail is required.
@@ -77,7 +77,7 @@
 
           <div class="form-group">
             <label for="Password" >Password*</label>
-            <input type="password" name="password" class="form-control"  placeholder="password" ng-model="user.password" ng-minlength=8 ng-maxlength=50 ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
+            <input type="password" name="password" class="form-control"  placeholder="password" ng-model="user.password" ng-minlength=8 ng-maxlength=50 ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required value="">
             <div ng-show="(confirmForm.password.$dirty && confirmForm.password.$invalid) || submitted">
               <span class="has-error" ng-show="confirmForm.password.$error.required">
                  password is required.
@@ -117,8 +117,8 @@
               <p class="has-error" ng-show="confirmForm.question.$error.required">
                 Security question is required.
               </p>
-            </div>     
-          </div> 
+            </div>
+          </div>
 
           <div class="form-group">
             <label>Answer security question*</label>
@@ -127,8 +127,8 @@
               <p class="has-error" ng-show="confirmForm.answer.$error.required">
                 Answer is required.
               </p>
-            </div>     
-          </div> 
+            </div>
+          </div>
 
           <div class="form-group">
             <input type="checkbox" name="tnc" ng-model="user.tnc" required>
@@ -137,16 +137,16 @@
               <p class="has-error" ng-show="confirmForm.tnc.$error.required">
                 Please agree to Terms and Conditions.
               </p>
-            </div>     
-          </div> 
+            </div>
+          </div>
 
           <button type="submit" ng-click="submitConfirmForm()" class="login-button center-block">Submit</button>
         </form>
       </div>
       <div class="clr"></div>
       <!-- first time login end -->
-    </div> 
+    </div>
     <div class="clr"></div>
-  </div> 
+  </div>
   <div class="clr"></div>
 </div>

@@ -12,6 +12,9 @@ angular.module('hillromvestApp')
       },
       link: function(scope, element, attrs) {
         var patient = scope.patient;
+        scope.$on('resetList', function () {
+          scope.searchPatients();
+        })
       },
       controller: function($scope, $timeout) {
 
@@ -27,6 +30,7 @@ angular.module('hillromvestApp')
           $scope.showModal = false;
           $scope.searchPatients();
         };
+
 
         var timer = false;
         $scope.$watch('searchItem', function() {

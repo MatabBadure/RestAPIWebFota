@@ -12,7 +12,7 @@
   </div>
 </div>
 <div class="dashboard dashboard--content padding-bottom-ls">
-  <form name="form" class="dashboard-page__form--new" ng-submit="createDoctor()" novalidate>
+  <form name="form" class="dashboard-page__form--new" ng-submit="createDoctor()" novalidate autocomplete="off">
     <div class="container dashboard__form">
       <div class="row margin-top-xl">
         <div class="col-md-16 row">
@@ -55,9 +55,9 @@
             <div class="col-md-10 dashboard__form__input">
               <div class="custom-dropdown">
                 <select ng-model="doctor.title">
-                  <option translate="doctor.title.mr"></option>
-                  <option translate="doctor.title.mrs"></option>
-                  <option translate="doctor.title.ms"></option>
+                  <option translate="doctor.title.mr">Mr.</option>
+                  <option translate="doctor.title.mrs">Mrs.</option>
+                  <option translate="doctor.title.ms">Ms.</option>
                 </select>
               </div>
             </div>
@@ -303,8 +303,8 @@
       <div class="modal__body">
          <div class="modal--message">If you disassociate the doctor,you will no longer be able to view their information</div>
          <div class="row modal--custom-btn">
-          <buton class="hillrom-btn btn-submit float-right" ng-click="deleteDoctor()">Yes</buton> 
-          <buton class="hillrom-btn btn-submit float-right" data-dismiss="modal" ng-click="close()">No</buton> 
+          <buton class="hillrom-btn btn-submit float-right" ng-click="deleteDoctor()">Yes</buton>
+          <buton class="hillrom-btn btn-submit float-right" data-dismiss="modal" ng-click="close()">No</buton>
          </div>
       </div>
       <footer class="modal__footer">

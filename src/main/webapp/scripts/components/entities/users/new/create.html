@@ -14,7 +14,7 @@
   </div>
 </div>
 <div class="dashboard dashboard--content padding-bottom-ls">
-  <form name="form" ng-submit="createUser()" novalidate>
+  <form name="form" ng-submit="createUser()" novalidate autocomplete="off">
     <div class="container dashboard__form">
 
       <div class="row margin-top-xl">
@@ -193,8 +193,8 @@
       <div class="modal__body">
          <div class="modal--message">If you disassociate the user,you will no longer be able to view their information</div>
          <div class="row modal--custom-btn">
-          <buton class="hillrom-btn btn-submit float-right" ng-click="deleteUser()">Yes</buton> 
-          <buton class="hillrom-btn btn-submit float-right" data-dismiss="modal" ng-click="close()">No</buton> 
+          <buton class="hillrom-btn btn-submit float-right" ng-click="deleteUser()">Yes</buton>
+          <buton class="hillrom-btn btn-submit float-right" data-dismiss="modal" ng-click="close()">No</buton>
          </div>
       </div>
       <footer class="modal__footer">

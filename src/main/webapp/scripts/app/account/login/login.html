@@ -8,14 +8,14 @@
 
       <!-- normal login -->
       <div class=" col-md-10 col-lg-10 login__container__right-section" ng-show="showLogin">
-        <form class="login-form" role="form" name="form" ng-submit="login($event)" novalidate>
+        <form class="login-form" role="form" name="form" ng-submit="login($event)" novalidate autocomplete="off">
         <div class="auth-heading">LOGIN TO YOUR ACCOUNT</div>
           <div class="alert alert-danger has-error" ng-show="authenticationError" translate="login.messages.error.authentication">
             <strong>Authentication failed!</strong> Please check your credentials and try again.
           </div>
 
           <div class="text-center indent-bottom-5 has-error" ng-show="firstTimeAccessFailed" >Authentication failed!
-          </div> 
+          </div>
 
           <div class="form-group">
             <input type="text" class="form-control" id="username" name="username" placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="username" required>
@@ -58,10 +58,10 @@
 
       <!-- first time login -->
       <div class=" col-md-10 col-lg-10 login__container__right-section" ng-show="isFirstLogin">
-        <form class="form" role="form" name="confirmForm" ng-submit="submitPassword($event)" novalidate>
+        <form class="form" role="form" name="confirmForm" ng-submit="submitPassword($event)" novalidate autocomplete="off">
           <div class="form-group" ng-show="!isEmailExist">
             <label for="Email ID" translate="global.form.email">E-Mail</label>
-            <input type="email" class="form-control" name="email" placeholder="{{'login.form.email.placeholder' | translate}}" ng-model="user.email" ng-maxlength=100 required>
+            <input type="email" class="form-control" name="email" placeholder="{{'login.form.email.placeholder' | translate}}" ng-model="user.email" ng-maxlength=100 required value="">
             <div ng-show="(confirmForm.email.$dirty && confirmForm.email.$invalid) || submitted" class="form-error">
               <span class="has-error" ng-show="confirmForm.email.$error.required">
                  E-mail required.
@@ -78,7 +78,7 @@
 
           <div class="form-group">
             <label for="Password" >Password*</label>
-            <input type="password" name="password" class="form-control"  placeholder="password" ng-model="user.password" ng-minlength=8 ng-maxlength=50 ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
+            <input type="password" name="password" class="form-control"  placeholder="password" ng-model="user.password" ng-minlength=8 ng-maxlength=50 ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required value="">
             <div ng-show="(confirmForm.password.$dirty && confirmForm.password.$invalid) || submitted">
               <span class="has-error" ng-show="confirmForm.password.$error.required">
                  Password required.
@@ -124,8 +124,8 @@
               <p class="has-error" ng-show="confirmForm.question.$error.required">
                 Security question required.
               </p>
-            </div>     
-          </div> 
+            </div>
+          </div>
 
           <div class="form-group">
             <label>Answer security question*</label>
@@ -134,8 +134,8 @@
               <p class="has-error" ng-show="confirmForm.answer.$error.required">
                 Answer required.
               </p>
-            </div>     
-          </div> 
+            </div>
+          </div>
 
           <div class="form-group">
             <input type="checkbox" name="tnc" ng-model="user.tnc" required>
@@ -144,16 +144,16 @@
               <p class="has-error" ng-show="confirmForm.tnc.$error.required">
                 Please agree to Terms and Conditions.
               </p>
-            </div>     
-          </div> 
+            </div>
+          </div>
 
           <button type="submit" ng-click="submitConfirmForm()" class="login-button center-block">Submit</button>
         </form>
       </div>
       <div class="clr"></div>
       <!-- first time login end -->
-    </div> 
+    </div>
     <div class="clr"></div>
-  </div> 
+  </div>
   <div class="clr"></div>
 </div>

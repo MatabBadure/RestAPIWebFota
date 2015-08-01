@@ -12,6 +12,9 @@ angular.module('hillromvestApp')
     },
     link: function(scope) {
       var clinic = scope.clinic;
+      scope.$on('resetList', function () {
+        scope.searchClinics();
+      })
     },
     controller: function($scope, $timeout) {
 

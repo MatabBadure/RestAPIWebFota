@@ -18,6 +18,9 @@ angular.module('hillromvestApp')
       },
       link: function(scope) {
         var user = scope.user;
+        scope.$on('resetList', function () {
+          scope.searchUsers();
+        })
       },
       controller: function($scope, $timeout) {
         $scope.init = function() {
@@ -79,11 +82,11 @@ angular.module('hillromvestApp')
               $scope.currentPageIndex++;
             }else{
               return false;
-            } 
+            }
           }
           var url = 'api/user/search?searchString=';
           UserService.getUsers(url, $scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function(response) {
-            $scope.users = response.data; 
+            $scope.users = response.data;
             $scope.total = response.headers()['x-total-count'];
             $scope.pageCount = Math.ceil($scope.total / 10);
           }).catch(function(response) {

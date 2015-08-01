@@ -19,7 +19,11 @@
         $scope.createClinic = function(){
             $scope.clinicStatus.isCreate = true;
             $scope.clinicStatus.isMessage = false;
-        }
+        };
+
+        $scope.onSuccess = function () {
+            $scope.$broadcast('resetList', {});
+        };
 
     });
 

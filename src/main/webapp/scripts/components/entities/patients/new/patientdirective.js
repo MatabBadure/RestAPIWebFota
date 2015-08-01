@@ -7,6 +7,7 @@ angular.module('hillromvestApp')
       restrict: 'E',
       scope: {
         patient: '=patientData',
+        onSuccess: '&',
         patientStatus: '=patientStatus'
       },
 
@@ -15,7 +16,7 @@ angular.module('hillromvestApp')
         $scope.open = function () {
           $scope.showModal = true;
         };
-        
+
         $scope.close = function () {
           $scope.showModal = false;
         };
@@ -183,6 +184,7 @@ angular.module('hillromvestApp')
           $scope.submitted = false;
           $scope.patient = {};
           $scope.form.$setPristine();
+          $scope.onSuccess();
         }
 
         $scope.getAge = function(selectedDate) {

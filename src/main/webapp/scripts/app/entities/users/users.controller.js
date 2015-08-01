@@ -20,4 +20,8 @@ angular.module('hillromvestApp')
       $scope.userStatus.isCreate = true;
       $scope.userStatus.isMessage = false;
     };
+
+    $scope.onSuccess = function () {
+      $scope.$broadcast('resetList', {});
+    };
   });

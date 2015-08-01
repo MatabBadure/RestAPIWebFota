@@ -60,7 +60,7 @@
     <div class=" col-md-10 col-lg-10 login__container__right-section" ng-show="isFirstLogin">
       <form class="login-auth-form" role="form" name="confirmForm" ng-submit="submitPassword($event)" novalidate autocomplete="off" show-validation>
         <div class="form-group" ng-show="!isEmailExist">
-          <input type="email" class="form-control" name="email" placeholder="{{'login.form.email.placeholder' | translate}}" ng-model="user.email" ng-maxlength=100 required value="">
+          <input type="email" class="form-control" name="email" placeholder="Enter Email" ng-model="user.email" ng-maxlength=100 required value="">
           <div ng-show="(confirmForm.email.$dirty && confirmForm.email.$invalid) || submitted" class="form-error">
             <span class="login-has-error" ng-show="confirmForm.email.$error.required">
              E-mail required.
@@ -77,7 +77,7 @@
 
      <div class="form-group">
       <input type="password" class="form-control" name="password" id="passwordBox"
-      ng-model="user.password" ng-minlength=8 ng-maxlength=50 ng-keyup="passwordStrength()" ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required placeholder="{{'user.placeholder.password' | translate}}">
+      ng-model="user.password" ng-minlength=8 ng-maxlength=50 ng-keyup="passwordStrength()" ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required placeholder="New Password">
       <div ng-show="(confirmForm.password.$dirty && confirmForm.password.$invalid) || submitted">
         <span class="login-has-error" ng-show="confirmForm.password.$error.required">
          Password required.
@@ -100,7 +100,7 @@
   </div>
   <div class="form-group">
     <input type="password" class="form-control" name="confirmPassword"
-    ng-model="user.confirmPassword" ng-minlength=8 ng-maxlength=50 ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required placeholder="{{'user.placeholder.confirm-password' | translate}}">
+    ng-model="user.confirmPassword" ng-minlength=8 ng-maxlength=50 ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required placeholder="Enter New Password">
     <div ng-show="(confirmForm.confirmPassword.$dirty && confirmForm.confirmPassword.$invalid) || submitted">
       <span class="login-has-error" ng-show="confirmForm.confirmPassword.$error.required">
         Password required.
@@ -132,7 +132,7 @@
     </div>
   </div>
   <div class="form-group">
-    <input type="text" class="form-control" name="answer" ng-model="user.answer" required placeholder="{{'user.placeholder.security-answer' | translate}}">
+    <input type="text" class="form-control" name="answer" ng-model="user.answer" required placeholder="Enter Your Answer">
     <div ng-show="(confirmForm.answer.$dirty && confirmForm.answer.$invalid) || submitted">
       <span class="login-has-error" ng-show="confirmForm.answer.$error.required">
         Answer required.

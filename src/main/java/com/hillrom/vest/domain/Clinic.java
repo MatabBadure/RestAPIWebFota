@@ -17,11 +17,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Type;
+import org.joda.time.DateTime;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -92,6 +93,10 @@ public class Clinic implements Serializable {
     @Column(name="is_parent", nullable = false)
     private boolean parent = false;
 
+    @Column(name="created_date")
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime createdAt;
+    
     public Long getId() {
         return id;
     }
@@ -218,6 +223,14 @@ public class Clinic implements Serializable {
 
 	public void setClinicPatientAssoc(Set<ClinicPatientAssoc> clinicPatientAssoc) {
 		this.clinicPatientAssoc = clinicPatientAssoc;
+	}
+
+	public DateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(DateTime createdAt) {
+		this.createdAt = createdAt;
 	}
 
 	@Override

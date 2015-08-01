@@ -63,6 +63,18 @@ angular.module('hillromvestApp')
         }).success(function (response) {
           return response;
         });
+      },
+
+      getClinic : function (id) {
+        return $http.get('/api/clinics/'+id, {
+          headers: {
+            'Content-Type' : 'application/json',
+            'Accept' : 'application/json',
+            'x-auth-token' : token
+          }
+        }).success(function (response) {
+          return response;
+        });
       }
     };
   });

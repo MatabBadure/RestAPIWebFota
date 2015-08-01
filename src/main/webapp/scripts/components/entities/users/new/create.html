@@ -4,11 +4,12 @@
     <div class="dashbord-nav__primary secondary-fix-navbar pull-left" ng-show="userStatus.isCreate">
       <span class="dashbord-nav__primary--title" translate="user.home.createLabel">Create Hill-Rom User</span>
     </div>
-    <div class="dashbord-nav__primary secondary-fix-navbar pull-left" ng-show="!userStatus.isCreate">
+    <div class="dashbord-nav__primary pull-left" ng-show="!userStatus.isCreate">
       <span class="dashbord-nav__primary--title" translate="user.home.updateLabel">Update Hill-Rom User</span>
     </div>
-    <div class="dashbord-nav__secondary navbar-right">
-      <span class="dashbord-nav__secondary--create-new" translate=""></span>
+
+    <div class="dashbord-nav__secondary create-user navbar-right cursor-pointer" ng-show="!userStatus.isCreate" ng-click="cancel()">
+      <span class="">Back</span>
     </div>
   </div>
 </div>

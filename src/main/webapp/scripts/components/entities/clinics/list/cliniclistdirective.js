@@ -32,17 +32,10 @@ angular.module('hillromvestApp')
         if(timer){
           $timeout.cancel(timer)
         }
-        timer= $timeout(function () { 
+        timer= $timeout(function () {
             $scope.searchClinics();
         },1000)
       });
-
-      $scope.selectClinic = function (clinic) {
-        $scope.clinic = clinic;
-        $scope.onSelect({
-          'clinic': clinic
-        });
-      };
 
       $scope.searchClinics = function (track) {
         if (track !== undefined) {
@@ -67,6 +60,15 @@ angular.module('hillromvestApp')
 
       $scope.selectClinic = function(clinic) {
         $scope.clinic = clinic;
+        ClinicService.getClinic(clinic.id).then(function (response) {
+          console.log(response);
+          $scope.onSelect({
+            'clinic': clinic
+          });
+        }).catch(function (response) {
+
+        });
+
         if (clinic.parent) {
           $scope.clinic.type = 'parent';
         } else {

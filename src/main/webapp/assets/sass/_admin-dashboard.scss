@@ -32,6 +32,10 @@
 	}
 }
 
+.create-user {
+	padding-right: 10px;
+}
+
 .create-user .hillrom-icon {
 	font-weight: 700;
 }
@@ -421,4 +425,24 @@
 
 .modal--custom-btn {
 	padding-top: 30px;
+}
+
+.parent-list {
+  position: relative;
+}
+
+.dashboard-page__user-list--parent-list {
+  border: 1px solid $bombay;
+  position: absolute;
+  z-index: 999;
+  width: calc(100% - 20px);
+  font-weight: normal;
+  .parent-detail {
+    background-color: $seashell;
+    padding-left: 7px;
+    &:hover {
+      background-color: $alto;
+      cursor: pointer;
+    }
+  }
 }

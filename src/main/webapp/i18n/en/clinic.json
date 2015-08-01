@@ -21,7 +21,7 @@
         "placeholder": {
             "search": "Search with Name, Hill-Rom ID or Email"
         },
-        "select-parent": "Select Parent Clinic",
+        "select-parent": "Parent Clinic",
         "general-details": "General Details",
         "clinic-name": "Clinic Name",
         "hr-id": "HR-ID",
@@ -40,6 +40,7 @@
         "patients": "patients",
         "parent": "parent",
         "submit-button-text": "submit",
-        "required-field": "* Required Fields"
+        "required-field": "* Required Fields",
+        "back-button-text": "back"
     }
 }

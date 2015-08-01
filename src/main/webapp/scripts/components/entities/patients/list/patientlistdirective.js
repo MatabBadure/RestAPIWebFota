@@ -74,7 +74,13 @@ angular.module('hillromvestApp')
               var patientCount = $scope.patients.length;
               for (var i = 0 ; i < patientCount ; i++) {
                 var _date = new Date($scope.patients[i].dob);
-                var dob = _date.getMonth()+1+"/"+_date.getDate()+"/"+_date.getFullYear();
+                var _month = (_date.getMonth()+1).toString();
+                _month = _month.length > 1 ? _month : '0' + _month;
+                var _day = (_date.getDate()).toString();
+                _day = _day.length > 1 ? _day : '0' + _day;
+                var _year = (_date.getFullYear()).toString();
+                _year = _year.slice(-2);
+                var dob = _month+"/"+_day+"/"+_year;
                 $scope.patients[i].dob = dob;
               }
               $scope.total = response.headers()['x-total-count'];

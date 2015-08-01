@@ -14,8 +14,7 @@ public final class RandomUtil {
 
     private static final int DEF_COUNT = 20;
     
-    private static String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
-    		+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+    private static String EMAIL_PATTERN = "^(.+)@(.+)$";
     
     private static String HILLROM_ID_PATTERN = "[A-Z]{3,3}_[A-Z]{2,2}:[A-Z]{2,2}:"
     		+ "[0-9]{2,2}:[0-9]{2,2}:[0-9]{2,2}:[0-9]{2,2}:[0-9]{2,2}:[A-Z]{1}[0-9]{1}";//PAT_ID:BT:00:06:66:08:54:B6

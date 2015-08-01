@@ -5509,8 +5509,16 @@ select[multiple].input-lg,
 }
 
 @font-face {
-  font-family: "MyriadRegular";
+  font-family: "MyriadProRegular";
   src: url("fonts/MyriadPro-Regular.otf");
+}
+@font-face {
+  font-family: "MyriadProSemiboldMac";
+  src: url("fonts/MyriadPro-Semibold.otf");
+}
+@font-face {
+  font-family: "MyriadProbold";
+  src: url("fonts/MyriadPro-Bold.otf");
 }
 .container-top-indent {
   height: inherit;

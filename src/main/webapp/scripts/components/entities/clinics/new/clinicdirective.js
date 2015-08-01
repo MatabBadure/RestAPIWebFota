@@ -7,6 +7,7 @@ angular.module('hillromvestApp')
       restrict: 'E',
       scope: {
         clinic: '=clinicData',
+        onSuccess: '&',
         clinicStatus: '=clinicStatus'
       },
 
@@ -162,6 +163,7 @@ angular.module('hillromvestApp')
           $scope.submitted = false;
           $scope.clinic = {};
           $scope.form.$setPristine();
+          $scope.onSuccess();
         };
 
 

@@ -14,6 +14,7 @@ angular.module('hillromvestApp')
       scope: {
         user: '=userData',
         isCreate: '=isCreate',
+        onSuccess: '&',
         userStatus: '=userStatus'
       },
       controller: function ($scope, noty) {
@@ -21,7 +22,7 @@ angular.module('hillromvestApp')
          $scope.open = function () {
           $scope.showModal = true;
         };
-        
+
         $scope.close = function () {
           $scope.showModal = false;
         };

@@ -31,47 +31,6 @@ var usersList = [
 ];
 
 
-var clinicsList = [
-  {
-    "id": 14,
-    "name": "Hill Rom",
-    "address": "Neev",
-    "zipcode": 56004,
-    "city": "Bangalore",
-    "phoneNumber": 9740353872,
-    "faxNumber": 9942354883,
-    "hillromId": 123,
-    "state": "AL",
-    "parent": true,
-    "npiNumber": null,
-    "deleted": false,
-    "childClinics": [
-      {
-        "id": 65
-      },
-      {
-        "id": 66
-      }
-    ]
-  },
-  {
-    "id": 14,
-    "name": "Neev Rom",
-    "address": "Neev",
-    "zipcode": 56004,
-    "city": "Bangalore",
-    "phoneNumber": 9740353872,
-    "faxNumber": 9942354883,
-    "hillromId": 123,
-    "state": "AL",
-    "parent": false,
-
-    "npiNumber": null,
-    "deleted": false,
-    "parentClinic": {"name": "Hill Rom", "id": 13}
-  }];
-
-
 
 var roleEnum = {
   ADMIN : 'ADMIN',

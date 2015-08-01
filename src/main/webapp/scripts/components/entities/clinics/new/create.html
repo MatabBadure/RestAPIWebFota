@@ -45,10 +45,10 @@
               <span class="dashboard__form--type" translate="clinic.select-parent"></span>
               <span class="">*</span>
             </div>
-            <div class="col-md-10 dashboard__form--input">
+            <div class="col-md-10 dashboard__form--input parent-list">
               <input class="" type="text" name="parentClinicName" ng-model="clinic.parentClinic.name" required ng-keyup="getParentClinic()">
-              <div class="dashboard-page__user-list__detailed__list">
-                <div ng-repeat="clinic in clinics | filter:clinic.parentClinic.name">
+              <div class="dashboard-page__user-list--parent-list" ng-show="clinic.parentClinic.name.length > 0 && form.parentClinicName.$dirty">
+                <div class="parent-detail" ng-repeat="clinic in clinics | filter:clinic.parentClinic.name">
                   <div ng-click="selectClinic(clinic)" class="dashboard-page__user-list__detailed__list--details">
                     <span class="user-detail">
                       {{clinic.name}}
@@ -212,8 +212,8 @@
       <div class="modal__body">
          <div class="modal--message">If you disassociate the clinic,you will no longer be able to view their information</div>
          <div class="row modal--custom-btn">
-          <buton class="hillrom-btn btn-submit float-right" ng-click="deleteClinic()">Yes</buton> 
-          <buton class="hillrom-btn btn-submit float-right" data-dismiss="modal" ng-click="close()">No</buton> 
+          <buton class="hillrom-btn btn-submit float-right" ng-click="deleteClinic()">Yes</buton>
+          <buton class="hillrom-btn btn-submit float-right" data-dismiss="modal" ng-click="close()">No</buton>
          </div>
       </div>
       <footer class="modal__footer">

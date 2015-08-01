@@ -16,7 +16,7 @@ angular.module('hillromvestApp')
          $scope.open = function () {
           $scope.showModal = true;
         };
-        
+
         $scope.close = function () {
           $scope.showModal = false;
         };
@@ -29,9 +29,10 @@ angular.module('hillromvestApp')
           }).catch(function(response) {
 
           });
+          $scope.getParentClinic();
         };
 
-        $scope.init();
+
 
         $scope.newChildClinic = function() {
           $scope.clinic.childClinics.push({
@@ -44,7 +45,7 @@ angular.module('hillromvestApp')
         };
 
         $scope.submitted = false;
-        $scope.formSubmit = function() {
+          $scope.formSubmit = function() {
           $scope.submitted = true;
         };
 
@@ -95,11 +96,6 @@ angular.module('hillromvestApp')
             if ($scope.clinic.type === 'parent' && $scope.clinic.parentClinic) {
               delete $scope.clinic.parentClinic;
             } else {
-              for (var i = 0; i < clinicsList.length; i++) {
-                if ($scope.clinic.parentClinic && clinicsList[i].name === $scope.clinic.parentClinic.name) {
-                  $scope.clinic.parentClinic.id = clinicsList[i].id;
-                }
-              }
             }
             // create clinic section
             var data = $scope.clinic;
@@ -155,6 +151,7 @@ angular.module('hillromvestApp')
             });
           });
         };
+
         $scope.cancel = function(){
           $scope.reset();
         };
@@ -165,20 +162,29 @@ angular.module('hillromvestApp')
           $scope.submitted = false;
           $scope.clinic = {};
           $scope.form.$setPristine();
-        }
-
-        $scope.getParentClinic = function() {
-          $scope.clinics = clinicsList;
         };
+
+
 
         $scope.selectClinic = function(clinic) {
           $scope.clinic.parentClinic.name = clinic.name;
+          $scope.clinic.parentClinic.id = clinic.id;
           $scope.clinics = [];
         };
 
         $scope.removeParent = function() {
           $scope.clinic.parentClinic = null;
         };
+
+        $scope.getParentClinic = function() {
+          ClinicService.getAllClinics().then(function (response) {
+            $scope.clinics = response.data;
+          }).catch(function (response) {
+
+          });
+        };
+
+        $scope.init();
       }
     };
   });

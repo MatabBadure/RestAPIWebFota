@@ -35,7 +35,7 @@ angular.module('hillromvestApp')
         if (timer) {
           $timeout.cancel(timer)
         }
-        timer = $timeout(function () {     
+        timer = $timeout(function () {
             $scope.searchDoctors();
         },1000)
       });
@@ -85,7 +85,6 @@ angular.module('hillromvestApp')
         }).catch(function(response) {
 
         });
-
       };
 
       $scope.init();

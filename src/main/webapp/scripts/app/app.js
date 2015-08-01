@@ -1,7 +1,19 @@
 'use strict';
 
-angular.module('hillromvestApp', ['LocalStorageModule', 'tmh.dynamicLocale', 'pascalprecht.translate',
-  'ngResource', 'ui.router', 'ngCookies', 'ngCacheBuster', 'infinite-scroll', 'vcRecaptcha', 'ngTagsInput', 'angular-noty'])
+angular.module('hillromvestApp', 
+  ['LocalStorageModule', 
+   'tmh.dynamicLocale', 
+   'pascalprecht.translate',
+   'ngResource', 
+   'ui.router', 
+   'ngCookies', 
+   'ngCacheBuster', 
+   'infinite-scroll', 
+   'vcRecaptcha', 
+   'ngTagsInput', 
+   'angular-noty',
+   'angular-loading-bar'
+   ])
 .run(function($rootScope, $location, $window, $http, $state, $translate, Language, Auth, Principal, ENV, VERSION) {
     $rootScope.ENV = ENV;
     $rootScope.VERSION = VERSION;

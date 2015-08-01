@@ -6003,6 +6003,10 @@ a::-moz-focus-inner {
   vertical-align: middle;
 }
 
+.create-user {
+  padding-right: 10px;
+}
+
 .create-user .hillrom-icon {
   font-weight: 700;
 }

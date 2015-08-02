@@ -118,7 +118,6 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 			int sequenceNumber) {
 		PatientVestDeviceData patientVestDeviceData = new PatientVestDeviceData();
 		patientVestDeviceData.setSequenceNumber(sequenceNumber);
-		patientVestDeviceData.setBluetoothId(getPatientVestDeviceDataBluetoothId(base16String));
 		patientVestDeviceData.setHmr(getPatientVestDeviceDataHMR(base16String));
 		patientVestDeviceData.setPressure(getPatientVestDeviceDataPressure(base16String));
 		patientVestDeviceData.setFrequency(getPatientVestDeviceDataFrequency(base16String));
@@ -167,7 +166,7 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 		return (double) (hmrHourReadingLong * 60 + hmrMinutesReadingLong) / 60;
 	}
 
-	private String getPatientVestDeviceDataBluetoothId(String base16String) {
+	/*private String getPatientVestDeviceDataBluetoothId(String base16String) {
 		String bluetoothId = ParserUtil.getFieldByStartAndEndOffset(
 				base16String,
 				VestDeviceRawLogOffsetConstants.BT_ADDR_START_OFFSET,
@@ -180,7 +179,7 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 			btAddressBuilder.append(":");
 		}
 		return btAddressBuilder.toString();
-	}
+	}*/
 
 	private String getPatientVestDeviceEventCode(String base16String) {
 		String eventCodeString = ParserUtil.getFieldByStartAndEndOffset(

@@ -1,18 +1,17 @@
 package com.hillrom.vest.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-
+import com.hillrom.vest.config.Constants;
+import com.hillrom.vest.domain.*;
+import com.hillrom.vest.repository.*;
+import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.security.OnCredentialsChangeEvent;
+import com.hillrom.vest.security.SecurityUtils;
+import com.hillrom.vest.service.util.RandomUtil;
+import com.hillrom.vest.service.util.RequestUtil;
+import com.hillrom.vest.web.rest.dto.PatientUserVO;
+import com.hillrom.vest.web.rest.dto.UserDTO;
+import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import net.minidev.json.JSONObject;
-
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -27,28 +26,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hillrom.vest.config.Constants;
-import com.hillrom.vest.domain.Authority;
-import com.hillrom.vest.domain.Clinic;
-import com.hillrom.vest.domain.PatientInfo;
-import com.hillrom.vest.domain.User;
-import com.hillrom.vest.domain.UserExtension;
-import com.hillrom.vest.domain.UserPatientAssoc;
-import com.hillrom.vest.domain.UserSecurityQuestion;
-import com.hillrom.vest.repository.AuthorityRepository;
-import com.hillrom.vest.repository.ClinicRepository;
-import com.hillrom.vest.repository.PatientInfoRepository;
-import com.hillrom.vest.repository.UserExtensionRepository;
-import com.hillrom.vest.repository.UserPatientRepository;
-import com.hillrom.vest.repository.UserRepository;
-import com.hillrom.vest.security.AuthoritiesConstants;
-import com.hillrom.vest.security.OnCredentialsChangeEvent;
-import com.hillrom.vest.security.SecurityUtils;
-import com.hillrom.vest.service.util.RandomUtil;
-import com.hillrom.vest.service.util.RequestUtil;
-import com.hillrom.vest.web.rest.dto.PatientUserVO;
-import com.hillrom.vest.web.rest.dto.UserDTO;
-import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
+import javax.inject.Inject;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Service class for managing users.
@@ -749,7 +729,7 @@ public class UserService {
     		authorityMap.put(authority.getName(), authority);
     	});
 		if(existingUser.getId() != null) {
-			if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))) {
+				if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))) {
 				if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 					userExtensionRepository.delete(existingUser);
 					jsonObject.put("message", "Patient User deleted successfully.");
@@ -765,7 +745,9 @@ public class UserService {
 					&& (existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ADMIN))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ACCT_SERVICES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
-							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT)))) {
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN)))) {
 				userExtensionRepository.delete(existingUser);
 				jsonObject.put("message", "User deleted successfully.");
 			} else {

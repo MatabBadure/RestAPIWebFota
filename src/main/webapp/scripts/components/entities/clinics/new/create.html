@@ -33,7 +33,7 @@
             </div>
             <div class="col-md-10 dashboard__form__input--option">
               <div class="custom-dropdown">
-                <select name="type" ng-model="clinic.type">
+                <select name="type" ng-model="clinic.type" ng-disabled="clinicStatus.editMode">
                   <option selected translate="clinic.clinic-option.parent-clinic" value="parent"></option>
                   <option translate="clinic.clinic-option.satellite-clinic" value="child"></option>
                 </select>
@@ -48,7 +48,7 @@
             <div class="col-md-10 dashboard__form--input parent-list">
               <input class="" type="text" name="parentClinicName" validate-on-blur ng-model="clinic.parentClinic.name" required ng-keyup="getParentClinic()">
               <div class="dashboard-page__user-list--parent-list" ng-show="clinic.parentClinic.name.length > 0 && form.parentClinicName.$dirty">
-                <div class="parent-detail" ng-repeat="clinic in clinics | filter:clinic.parentClinic.name">
+                <div class="parent-detail" ng-repeat="clinic in clinics | filter:{name:clinic.parentClinic.name}">
                   <div ng-click="selectClinic(clinic)" class="dashboard-page__user-list__detailed__list--details">
                     <span class="user-detail">
                       {{clinic.name}}

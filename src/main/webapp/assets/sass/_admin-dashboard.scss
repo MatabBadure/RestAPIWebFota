@@ -258,9 +258,14 @@
 	color: $alto;
 }
 
-.dashboard__manage-view--list .active,
 .dashboard__manage-view--list .active {
 	color: $terracotta;
+}
+
+.dashboard__manage-view {
+  .inactive {
+    background-color: $seashell;
+  }
 }
 
 .dashboard__manage-view--list .inactive,

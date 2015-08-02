@@ -9,3 +9,13 @@ angular.module('hillromvestApp')
     }
   };
 }]);
+angular.module('hillromvestApp')
+.filter("patientStatus", [function() {
+   return function(input) {
+    if(input === true){
+    	return "Inactive";
+    }else {
+    	return "Active";
+    }
+  };
+}]);

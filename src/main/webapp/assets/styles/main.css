@@ -6147,6 +6147,19 @@ a::-moz-focus-inner {
   margin-bottom: 30px;
 }
 
+.dashboard__manage-view--search .fuid-search-box {
+  display: inline-block;
+  position: relative;
+  width: calc(100% - 120px);
+}
+
+.dashboard__manage-view--search .fixed-filter-box {
+  display: inline-block;
+  float: right;
+  position: relative;
+  width: 120px;
+}
+
 .dashboard__manage-view--search input {
   height: 30px;
   color: #34455C;
@@ -6178,9 +6191,10 @@ a::-moz-focus-inner {
   font-size: 10px;
   position: absolute;
   top: 8px !important;
-  right: 20px;
+  right: 9px;
   z-index: 1;
   z-index: 1 \0;
+  pointer-events: none;
 }
 
 .search-icon {

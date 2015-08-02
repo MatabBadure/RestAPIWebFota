@@ -14,11 +14,11 @@
   <div class="dashboard dashboard--content">
     <div class="container dashboard__manage-view margin-top-xl">
       <div class="row dashboard__manage-view--search">
-        <div class="col-md-14 reset-padding-right">
+        <div class="fuid-search-box reset-padding-right">
           <input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" autocomplete="off" placeholder="{{'patient.placeholder.search' | translate}}">
           <span class="search-icon hillrom-icon icon-search-icon"></span>
         </div>
-        <div class="col-md-2 reset-padding-left">
+        <div class="fixed-filter-box reset-padding-left">
           <div class="search-dropdown">
             <select name="search" ng-model="sortOption" ng-change="searchPatients()">
               <option value="" selected>Newly Created</option>

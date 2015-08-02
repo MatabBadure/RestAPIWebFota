@@ -11,11 +11,11 @@ angular.module('hillromvestApp')
       clinicStatus: '=clinicStatus'
     },
     link: function(scope) {
-      var clinic = scope.clinic;
       scope.$on('resetList', function () {
-        scope.searchClinics();
-      })
+        scope.init();
+      });
     },
+
     controller: function($scope, $timeout) {
 
       $scope.init = function () {
@@ -63,19 +63,18 @@ angular.module('hillromvestApp')
       $scope.selectClinic = function(clinic) {
         $scope.clinic = clinic;
         ClinicService.getClinic(clinic.id).then(function (response) {
+          $scope.clinic = response.data;
+          if (clinic.parentClinic) {
+            $scope.clinic.type = 'child';
+          } else {
+            $scope.clinic.type = 'parent';
+          }
           $scope.onSelect({
-            'clinic': clinic
+            'clinic': $scope.clinic
           });
         }).catch(function (response) {
 
         });
-
-        if (clinic.parent) {
-          $scope.clinic.type = 'parent';
-        } else {
-          $scope.clinic.type = 'child';
-        }
-        $scope.onSelect({'clinic': clinic});
       };
 
       $scope.createClinic = function(){

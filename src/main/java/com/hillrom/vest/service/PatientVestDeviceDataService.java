@@ -2,12 +2,9 @@ package com.hillrom.vest.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +14,6 @@ import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
-import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 @Service
 @Transactional
@@ -44,56 +40,43 @@ public class PatientVestDeviceDataService {
 		
 		String deviceAddress = deviceRawLog.getDeviceAddress();
 
-		Optional<PatientInfo> patientFromDB = patientInfoRepository
-				.findByBluetoothId(deviceAddress);
+		PatientInfo patientInfo = createPatientInfoIfNotExists(deviceRawLog,
+				deviceAddress);
+		assignDefaultValuesToVestDeviceData(deviceRawLog,
+				patientVestDeviceRecords, patientInfo);
 
-		PatientInfo patientInfo = null;
-		List<PatientVestDeviceData> recordsToBeInserted = null;
-		
-		if(patientFromDB.isPresent()){
-			patientInfo = patientFromDB.get();
-			recordsToBeInserted = filterNewRecords(patientFromDB.get(),deviceRawLog,patientVestDeviceRecords);
-		}else{
-			patientInfo = new PatientInfo();
-			patientInfo.setBluetoothId(deviceAddress);
-			patientInfo.setHubId(deviceRawLog.getHubId());
-			PatientInfo newPatientInfo = patientInfoRepository.save(patientInfo);
-			patientVestDeviceRecords.stream().forEach(deviceData -> {
-				deviceData.setHubId(deviceRawLog.getHubId());
-				deviceData.setSerialNumber(deviceRawLog.getDeviceSerialNumber());
-				deviceData.setPatient(newPatientInfo);
-				deviceData.setBluetoothId(deviceRawLog.getDeviceAddress());
-			});
-			recordsToBeInserted = patientVestDeviceRecords;
-		}
-
-		if(recordsToBeInserted.size() > 0){			
-			deviceDataRepository.save(recordsToBeInserted);
-		}
+		deviceDataRepository.save(patientVestDeviceRecords);
 		deviceRawLogRepository.save(deviceRawLog);
 		return patientVestDeviceRecords;
 	}
 
-	private List<PatientVestDeviceData> filterNewRecords(PatientInfo patientInfo,PatientVestDeviceRawLog deviceRawLog,List<PatientVestDeviceData> patientVestDeviceRecords){
-		Pageable pageable = PaginationUtil.generatePageRequest(1, 1);
-		Page<PatientVestDeviceData> latestVestDeviceDataForPatientInDB = deviceDataRepository
-				.findLatest(patientInfo.getId(),pageable);
-		List<PatientVestDeviceData> latestVestDeviceDataRecords = latestVestDeviceDataForPatientInDB.getContent();
-		if(latestVestDeviceDataRecords.size() > 0){
-			PatientVestDeviceData latestDeviceData = latestVestDeviceDataRecords.get(0); 
-			// Removing Duplicate Records
-			patientVestDeviceRecords = patientVestDeviceRecords
-					.stream()
-					.filter(record -> record.getTimestamp() > latestDeviceData
-							.getTimestamp()).collect(Collectors.toList());
-			//Updating the new records with required fields
-			patientVestDeviceRecords.forEach(deviceData -> {
-				deviceData.setHubId(deviceRawLog.getHubId());
-				deviceData.setSerialNumber(deviceRawLog.getDeviceSerialNumber());
-				deviceData.setPatient(patientInfo);
-				deviceData.setBluetoothId(deviceRawLog.getDeviceAddress());
-			});
+	private PatientInfo createPatientInfoIfNotExists(
+			PatientVestDeviceRawLog deviceRawLog, String deviceAddress) {
+		Optional<PatientInfo> patientFromDB = patientInfoRepository
+				.findByBluetoothId(deviceAddress);
+
+		PatientInfo patientInfo = null;
+		
+		if(patientFromDB.isPresent()){
+			patientInfo = patientFromDB.get();
+		}else{
+			patientInfo = new PatientInfo();
+			patientInfo.setBluetoothId(deviceAddress);
+			patientInfo.setHubId(deviceRawLog.getHubId());
+			patientInfo = patientInfoRepository.save(patientInfo);
 		}
-		return patientVestDeviceRecords;
+		return patientInfo;
+	}
+
+	private void assignDefaultValuesToVestDeviceData(
+			PatientVestDeviceRawLog deviceRawLog,
+			List<PatientVestDeviceData> patientVestDeviceRecords,
+			PatientInfo newPatientInfo) {
+		patientVestDeviceRecords.stream().forEach(deviceData -> {
+			deviceData.setHubId(deviceRawLog.getHubId());
+			deviceData.setSerialNumber(deviceRawLog.getDeviceSerialNumber());
+			deviceData.setPatient(newPatientInfo);
+			deviceData.setBluetoothId(deviceRawLog.getDeviceAddress());
+		});
 	}
 }

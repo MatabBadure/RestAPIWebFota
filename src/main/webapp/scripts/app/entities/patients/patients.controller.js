@@ -1,8 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .controller('PatientsController', function($scope, localStorageService) {
-
+  .controller('PatientsController', function($scope, localStorageService, $filter) {
     $scope.getAge = function(selectedDate) {
       var currentDate = new Date();
       var selectedDate = selectedDate;
@@ -17,6 +16,7 @@ angular.module('hillromvestApp')
       };
       return age;
     }
+
     $scope.patient = {};
 
     $scope.patientStatus = {
@@ -26,6 +26,7 @@ angular.module('hillromvestApp')
       'isMessage': false,
       'message': ''
     };
+
     $scope.selectedPatient = function(patient) {
       $scope.patientStatus.editMode = true;
       $scope.patientStatus.isCreate = false;
@@ -42,8 +43,7 @@ angular.module('hillromvestApp')
         $scope.patient.dob = dob;
         $scope.patient.formatedDOB = _month + "/" + _day + "/" + _year.slice(-2);
       }
-      patient.language = patient.langKey;
-
+      $scope.patient.language = $filter('languageFromKey')(patient.langKey);
     };
 
     $scope.createPatient = function() {

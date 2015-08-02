@@ -8,8 +8,8 @@
       <span class="dashbord-nav__primary--title" translate="patient.home.createLabel">Create Patient</span>
     </div>
 
-    <div class="dashbord-nav__secondary create-user navbar-right cursor-pointer" ng-show="!patientStatus.isCreate" ng-click="cancel()">
-      <span class="" translate="patient.back-button-text"></span>
+    <div class="dashbord-nav__secondary create-user navbar-right cursor-pointer" ng-click="cancel()">
+      <span class="" translate="patient.back-button-text">Back</span>
     </div>
   </div>
 </div>
@@ -245,8 +245,9 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input type="text" validate-on-blur class="form-control" name="zip" ng-readonly="validateADMINorASP()" maxlength="5" ng-pattern="/^[0-9]{5}$/" ng-model="patient.zipcode" required>
+              <input type="text" validate-on-blur class="form-control" name="zip" ng-readonly="validateADMINorASP()" maxlength="5" ng-pattern="/^(?=.*[1-9].*)[0-9]{5}$/" ng-model="patient.zipcode" required>
                <div ng-show="(form.zip.$dirty && form.zip.$showValidationMessage && form.zip.$invalid) || submitted">
+
                 <span class="has-error" ng-show="form.zip.$error.pattern">
                   Zip Code is invalid.
                 </span>

@@ -5509,16 +5509,8 @@ select[multiple].input-lg,
 }
 
 @font-face {
-  font-family: "MyriadProRegular";
+  font-family: "MyriadRegular";
   src: url("fonts/MyriadPro-Regular.otf");
-}
-@font-face {
-  font-family: "MyriadProSemiboldMac";
-  src: url("fonts/MyriadPro-Semibold.otf");
-}
-@font-face {
-  font-family: "MyriadProbold";
-  src: url("fonts/MyriadPro-Bold.otf");
 }
 .container-top-indent {
   height: inherit;
@@ -6159,19 +6151,6 @@ a::-moz-focus-inner {
   margin-bottom: 30px;
 }
 
-.dashboard__manage-view--search .fuid-search-box {
-  display: inline-block;
-  position: relative;
-  width: calc(100% - 120px);
-}
-
-.dashboard__manage-view--search .fixed-filter-box {
-  display: inline-block;
-  float: right;
-  position: relative;
-  width: 120px;
-}
-
 .dashboard__manage-view--search input {
   height: 30px;
   color: #34455C;
@@ -6203,10 +6182,9 @@ a::-moz-focus-inner {
   font-size: 10px;
   position: absolute;
   top: 8px !important;
-  right: 9px;
+  right: 20px;
   z-index: 1;
   z-index: 1 \0;
-  pointer-events: none;
 }
 
 .search-icon {
@@ -6276,12 +6254,9 @@ a::-moz-focus-inner {
   color: #D6DADE;
 }
 
+.dashboard__manage-view--list .active,
 .dashboard__manage-view--list .active {
   color: #ef7164;
-}
-
-.dashboard__manage-view .inactive {
-  background-color: #f1f1f1;
 }
 
 .dashboard__manage-view--list .inactive,
@@ -6464,10 +6439,6 @@ a::-moz-focus-inner {
 .dashboard-page__user-list--parent-list .parent-detail:hover {
   background-color: #D6DADE;
   cursor: pointer;
-}
-
-.parent-clinic {
-  color: #ef7164;
 }
 
 .footer {

@@ -47,9 +47,9 @@ angular.module('hillromvestApp')
           $scope.doctor = doctor;
           var url = '/api/user/' + doctor.id + '/hcp';
           UserService.getUser(doctor.id, url).then(function(response) {
-            $scope.doctor = response.data;
+            $scope.doctor = response.data.user;
             $scope.onSelect({
-              'doctor': doctor
+              'doctor': $scope.doctor
             });
           }).catch(function(response) {});
         };

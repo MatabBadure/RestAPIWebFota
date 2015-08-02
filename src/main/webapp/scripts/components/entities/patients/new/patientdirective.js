@@ -203,7 +203,10 @@ angular.module('hillromvestApp')
           return age;
         }
 
-        angular.element('#dp2').datepicker().on('changeDate', function(ev) {
+        angular.element('#dp2').datepicker({
+          endDate: '+0d',
+          autoclose: true}).
+          on('changeDate', function(ev) {
           var selectedDate = angular.element('#dp2').datepicker("getDate");
           var _month = (selectedDate.getMonth()+1).toString();
           _month = _month.length > 1 ? _month : '0' + _month;

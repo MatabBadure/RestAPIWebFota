@@ -1,5 +1,5 @@
 <div class="container login">
-  <div class="login--position">
+  <div class="login--position" ng-show="showLogin">
     <div class="form__container__login login__container">
       <div class="col-md-6">
         <img src="assets/images/man.svg">
@@ -7,7 +7,7 @@
       </div>
 
       <!-- normal login -->
-      <div class=" col-md-10 col-lg-10 login__container__right-section" ng-show="showLogin">
+      <div class=" col-md-10 col-lg-10 login__container__right-section">
         <form class="login-form" role="form" name="form" ng-submit="login($event)" novalidate autocomplete="off">
           <div class="auth-heading">LOGIN TO YOUR ACCOUNT</div>
           <div class="alert alert-danger login-has-error" ng-show="authenticationError" translate="login.messages.error.authentication">
@@ -54,12 +54,25 @@
       <div class="clr"></div>
     </div>
     <!-- normal login end-->
+<div class="clr"></div>
+<!-- first time login end -->
+</div>
+<div class="clr"></div>
+</div>
 
+
+
+<div class="reset--position"  ng-show="isFirstLogin">
+    <div class="form__container__login login__container">
+      <div class="col-md-6 img-man">
+        <img src="assets/images/man.svg">
+        <div class="clr"></div>
+      </div>
     <!-- first time login -->
-    <div class=" col-md-10 col-lg-10 login__container__right-section" ng-show="isFirstLogin">
-      <span ng-if="message">{{message}}</span>
+    <div class=" col-md-10 col-lg-10 login__container__right-section">
+    <span ng-if="message">{{message}}</span>
       <form class="login-auth-form" role="form" name="confirmForm" ng-submit="submitPassword($event)" novalidate autocomplete="off" show-validation>
-        <div class="form-group" ng-show="!isEmailExist">
+        <div class="form-group email" ng-show="!isEmailExist">
           <input type="email" class="form-control" validate-on-blur name="email" placeholder="Enter Email" ng-model="user.email" ng-maxlength=100 required value="">
           <div ng-show="(confirmForm.email.$showValidationMessage && confirmForm.email.$invalid) || submitted" class="form-error">
             <span class="login-has-error" ng-show="confirmForm.email.$error.required">

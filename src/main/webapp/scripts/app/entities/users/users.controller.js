@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .controller('UsersController', function ($scope) {
+  .controller('UsersController', function($scope) {
     $scope.user = {};
     $scope.userStatus = {
       'role': localStorage.getItem('role'),
@@ -10,18 +10,21 @@ angular.module('hillromvestApp')
       'isMessage': false
     };
 
-    $scope.selectedUser = function (user) {
+    $scope.selectedUser = function(user) {
       $scope.userStatus.isCreate = false;
       $scope.userStatus.editMode = true;
       $scope.user = user;
     };
 
-    $scope.createUser = function () {
+    $scope.createUser = function() {
       $scope.userStatus.isCreate = true;
       $scope.userStatus.isMessage = false;
+      $scope.user = {
+        title: 'Mr.'
+      };
     };
 
-    $scope.onSuccess = function () {
+    $scope.onSuccess = function() {
       $scope.$broadcast('resetList', {});
     };
   });

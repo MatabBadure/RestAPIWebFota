@@ -12,7 +12,7 @@ angular.module('hillromvestApp')
     },
     link: function(scope) {
       scope.$on('resetList', function () {
-        scope.init();
+        scope.searchClinics();
       });
     },
 

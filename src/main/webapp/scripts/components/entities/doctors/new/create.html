@@ -54,10 +54,7 @@
             </div>
             <div class="col-md-10 dashboard__form__input">
               <div class="custom-dropdown">
-                <select ng-model="doctor.title">
-                  <option translate="doctor.title.mr">Mr.</option>
-                  <option translate="doctor.title.mrs">Mrs.</option>
-                  <option translate="doctor.title.ms">Ms.</option>
+                <select ng-model="doctor.title" ng-options="option for option in ['Mr.', 'Mrs.', 'Ms.']" ng-selected="{{option === doctor.title}}">
                 </select>
               </div>
             </div>

@@ -34,7 +34,7 @@
             </div>
             <div class="col-md-10 dashboard__form__input">
               <div class="custom-dropdown">
-                <select ng-model="user.title" name="title" ng-readonly="validateSuperAdmin()">
+                <select ng-model="user.title" name="title" ng-readonly="validateSuperAdmin()" ng-options="option for option in ['Mr.', 'Mrs.', 'Ms.']" ng-selected="{{option === user.title}}">
                   <option selected translate="user.title.mr" value="Mr."></option>
                   <option translate="user.title.mrs" value="Mrs."></option>
                   <option translate="user.title.miss" value="Miss"></option>

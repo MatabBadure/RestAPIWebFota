@@ -67,11 +67,7 @@
             </div>
             <div class="col-md-10 dashboard__form__input">
               <div class="custom-dropdown">
-                <select name="title" ng-readonly="validateADMINorASP()" ng-model="patient.title">
-                  <option translate="patient.title.mr">Mr.</option>
-                  <option translate="patient.title.mrs">Mrs.</option>
-                  <option translate="patient.title.miss">Miss</option>
-                  <option value="" selected="selected">Title</option>
+                <select name="title" ng-readonly="validateADMINorASP()" ng-model="patient.title" ng-options="option for option in ['Mr.', 'Mrs.', 'Ms.']" ng-selected="{{option === patient.title}}">
                 </select>
               </div>
             </div>

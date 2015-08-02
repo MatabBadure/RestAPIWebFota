@@ -6,7 +6,7 @@
  *
  */
 angular.module('hillromvestApp')
-  .factory('UserService', function($http, localStorageService) {
+  .factory('UserService', function($http, localStorageService, headerService) {
     return {
 
       /**
@@ -17,11 +17,7 @@ angular.module('hillromvestApp')
        */
       createUser: function(data) {
         return $http.post('api/user', data, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'x-auth-token': localStorage.getItem('token')
-          }
+          headers: headerService.getHeader()
         }).success(function(response) {
           return response;
         });
@@ -35,11 +31,7 @@ angular.module('hillromvestApp')
        */
       deleteUser: function(id) {
         return $http.delete('api/user/' + id, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'x-auth-token': localStorage.getItem('token')
-          }
+          headers: headerService.getHeader()
         }).success(function(response) {
           return response;
         });
@@ -53,11 +45,7 @@ angular.module('hillromvestApp')
        */
       editUser: function(data) {
         return $http.put('api/user/' + data.id, data, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'x-auth-token': localStorage.getItem('token')
-          }
+          headers: headerService.getHeader()
         }).success(function(response) {
           return response;
         });
@@ -83,11 +71,7 @@ angular.module('hillromvestApp')
         };
 
         return $http.get(url + searchString + '&page=' + pageNo + '&per_page=' + offset + '&sort_by=' + sortOption + '&asc=' + sortOrder, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'x-auth-token': localStorage.getItem('token')
-          }
+          headers: headerService.getHeader()
         }).success(function(response) {
           return response;
         });
@@ -96,12 +80,7 @@ angular.module('hillromvestApp')
       getUser: function(id, url) {
         var url = url || ('api/user/' + id);
         return $http.get(url, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-
-            'x-auth-token': localStorage.getItem('token')
-          }
+          headers: headerService.getHeader()
         }).success(function(response) {
           return response;
         });

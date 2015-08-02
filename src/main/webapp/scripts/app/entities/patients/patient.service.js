@@ -6,9 +6,8 @@
  *
  */
 angular.module('hillromvestApp')
-  .factory('PatientService', function ($http, localStorageService) {
+  .factory('PatientService', function ($http, localStorageService, headerService) {
     return {
-
 
       /**
       * @ngdoc method
@@ -19,10 +18,7 @@ angular.module('hillromvestApp')
       getPatientList : function(keyword,pageIndex,countPerPage){
         return $http.get('api/patientInfos/search?searchString=' +
          keyword + '&page=' + pageIndex + '&per_page=' + countPerPage,  {
-          headers: {
-            'Content-Type' : 'application/json',
-            'x-auth-token' : localStorage.getItem('token')
-          }
+          headers: headerService.getHeader()
         }).success(function (data, status, headers, config) {
            return {'response' : data, 'status' : status, 'headers' : headers, 'config' : config};
         });
@@ -36,10 +32,7 @@ angular.module('hillromvestApp')
       */
       getPatientInfo : function(id){
         return $http.get('api/user/' + id + '/patient',  {
-          headers: {
-            'Content-Type' : 'application/json',
-            'x-auth-token' : localStorage.getItem('token')
-          }
+          headers: headerService.getHeader()
         }).success(function (response) {
           return response;
         });
@@ -47,11 +40,7 @@ angular.module('hillromvestApp')
 
       editPatient : function (id) {
         return $http.put('api/patientInfos/' + id,  {
-          headers: {
-            'Content-Type' : 'application/json',
-            'Accept' : 'application/json',
-            'x-auth-token' : localStorage.getItem('token')
-          }
+          headers: headerService.getHeader()
         }).success(function (response) {
           return response;
         });

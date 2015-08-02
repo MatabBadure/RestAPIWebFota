@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-.controller('PatientsController', function ($scope,localStorageService) {
+.controller('PatientsController', function ($scope,localStorageService,$filter) {
 
 	$scope.getAge = function(selectedDate){
 		var currentDate = new Date();
@@ -43,8 +43,7 @@ angular.module('hillromvestApp')
 			$scope.patient.dob = dob;
 			$scope.patient.formatedDOB = _month+"/"+_day+"/"+_year.slice(-2);
 		}
-		patient.language = patient.langKey;
-
+		$scope.patient.language = $filter('languageFromKey')(patient.langKey);
 	};
 
 	$scope.createPatient = function(){

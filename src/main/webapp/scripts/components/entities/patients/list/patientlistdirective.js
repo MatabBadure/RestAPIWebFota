@@ -28,7 +28,6 @@ angular.module('hillromvestApp')
           $scope.noMatchFound = false;
           $scope.sortOption ="";
           $scope.showModal = false;
-          $scope.searchPatients();
         };
 
 
@@ -49,9 +48,7 @@ angular.module('hillromvestApp')
             $scope.onSelect({
               'patient': $scope.patient
             });
-          }).catch(function(response) {
-            //console.log("get Patient Info failed!");
-          });
+          }).catch(function(response) { });
         };
 
         $scope.createPatient = function() {

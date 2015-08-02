@@ -29,7 +29,6 @@ angular.module('hillromvestApp')
           $scope.noMatchFound = false;
           $scope.sortOption = "";
           $scope.showModal = false;
-          $scope.searchDoctors();
         };
 
 

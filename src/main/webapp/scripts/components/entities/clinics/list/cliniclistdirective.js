@@ -26,7 +26,6 @@ angular.module('hillromvestApp')
         $scope.clinics = [];
         $scope.sortOption ="";
         $scope.showModal = false;
-        $scope.searchClinics();
       };
 
 
@@ -64,7 +63,6 @@ angular.module('hillromvestApp')
       $scope.selectClinic = function(clinic) {
         $scope.clinic = clinic;
         ClinicService.getClinic(clinic.id).then(function (response) {
-          console.log(response);
           $scope.onSelect({
             'clinic': clinic
           });

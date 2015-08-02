@@ -32,7 +32,7 @@
       <div class="dashboard__manage-view--list" ng-repeat="clinic in clinics" ng-class="{ 'inactive': clinic.deleted }">
         <div  ng-click="clinic.deleted || selectClinic(clinic)">
           <div class="col-md-3 reset-padding-left">
-            <span ng-class="{ parentClinic: 'clinic.parent === true'}" class="user-name">{{clinic.name}} {{clinic.id}}</span>
+            <span class="user-name">{{clinic.name}} {{clinic.id}} <sup class="parent-clinic" ng-if="clinic.parent">P</sup></span>
           </div>
           <div class="col-md-4">
             <span class="user-home-no">{{clinic.city}} {{clinic.state}}</span>

@@ -6250,9 +6250,12 @@ a::-moz-focus-inner {
   color: #D6DADE;
 }
 
-.dashboard__manage-view--list .active,
 .dashboard__manage-view--list .active {
   color: #ef7164;
+}
+
+.dashboard__manage-view .inactive {
+  background-color: #f1f1f1;
 }
 
 .dashboard__manage-view--list .inactive,
@@ -6435,6 +6438,10 @@ a::-moz-focus-inner {
 .dashboard-page__user-list--parent-list .parent-detail:hover {
   background-color: #D6DADE;
   cursor: pointer;
+}
+
+.parent-clinic {
+  color: #ef7164;
 }
 
 .footer {

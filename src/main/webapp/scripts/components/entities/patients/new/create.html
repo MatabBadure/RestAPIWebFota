@@ -35,7 +35,7 @@
             </div>
             <div class="col-md-10 dashboard__form--input">
               <input class="" type="text" validate-on-blur ng-model="patient.hillromId" name="HRID" ng-readonly="patientStatus.editMode" required>
-              <div ng-show="(form.HRID.$showValidationMessage && form.HRID.$invalid) || submitted">
+              <div ng-show="(form.HRID.$dirty && form.HRID.$showValidationMessage && form.HRID.$invalid) || submitted">
                 <span class="has-error" ng-show="form.HRID.$error.required">
                   JDE/HR ID is required.
                 </span>
@@ -67,11 +67,7 @@
             </div>
             <div class="col-md-10 dashboard__form__input">
               <div class="custom-dropdown">
-                <select name="title" ng-readonly="validateADMINorASP()" ng-model="patient.title">
-                  <option translate="patient.title.mr">Mr.</option>
-                  <option translate="patient.title.mrs">Mrs.</option>
-                  <option translate="patient.title.miss">Miss</option>
-                  <option value="" selected="selected">Title</option>
+                <select name="title" ng-readonly="validateADMINorASP()" ng-model="patient.title" ng-options="option for option in ['Mr.', 'Mrs.', 'Ms.']" ng-selected="{{option === patient.title}}">
                 </select>
               </div>
             </div>
@@ -101,7 +97,7 @@
             </div>
             <div class="col-md-10 dashboard__form--input">
               <input class="" type="text" validate-on-blur name="firstName" ng-model="patient.firstName" ng-readonly="validateADMINorASP()" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-z A-Z]+$/" required>
-              <div ng-show="(form.firstName.$showValidationMessage && form.firstName.$invalid) ||submitted">
+              <div ng-show="(form.firstName.$dirty && form.firstName.$showValidationMessage && form.firstName.$invalid) ||submitted">
                 <span class="has-error" ng-show="form.firstName.$error.required">
                   First Name is required.
                 </span>
@@ -146,7 +142,7 @@
             </div>
             <div class="col-md-10 dashboard__form--input">
               <input class="" type="text" validate-on-blur name="lastName" ng-model="patient.lastName" ng-readonly="validateADMINorASP()" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-z A-Z]+$/" required>
-              <div ng-show="(form.lastName.$showValidationMessage && form.lastName.$invalid) || submitted">
+              <div ng-show="(form.lastName.$dirty && form.lastName.$showValidationMessage && form.lastName.$invalid) || submitted">
                 <span class="has-error" ng-show="form.lastName.$error.required">
                   Last Name is required.
                 </span>
@@ -171,7 +167,7 @@
             <div class="col-md-6 dashboard__form--input">
               <input type="text" name="dob" validate-on-blur class="span2" value="" ng-model="patient.formatedDOB" ng-readonly="validateADMINorASP()" data-date-format="mm/dd/yy" id="dp2" required>
               <span readonly class="dashboard__form--label-age">{{patient.age}}</span>
-              <div ng-show="(form.dob.$showValidationMessage && form.dob.$invalid) || submitted">
+              <div ng-show="(form.dob.$dirty && form.dob.$showValidationMessage && form.dob.$invalid) || submitted">
                 <span class="has-error" ng-show="form.dob.$error.required">
                   Date of Birth is required.
                 </span>
@@ -250,7 +246,7 @@
             </div>
             <div class="col-md-10 dashboard__form--input">
               <input type="text" validate-on-blur class="form-control" name="zip" ng-readonly="validateADMINorASP()" maxlength="5" ng-pattern="/^[0-9]{5}$/" ng-model="patient.zipcode" required>
-               <div ng-show="(form.zip.$showValidationMessage && form.zip.$invalid) || submitted">
+               <div ng-show="(form.zip.$dirty && form.zip.$showValidationMessage && form.zip.$invalid) || submitted">
                 <span class="has-error" ng-show="form.zip.$error.pattern">
                   Zip Code is invalid.
                 </span>

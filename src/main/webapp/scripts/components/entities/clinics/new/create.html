@@ -60,7 +60,7 @@
                   </div>
                 </div>
               </div>
-              <div ng-show="(form.parentClinicName.$showValidationMessage && form.parentClinicName.$invalid) || submitted">
+              <div ng-show="(form.parentClinicName.$dirty && form.parentClinicName.$showValidationMessage && form.parentClinicName.$invalid) || submitted">
                 <span class="has-error" ng-show="form.parentClinicName.$error.required">
                   Parent Clinic Name is required.
                 </span>
@@ -76,7 +76,7 @@
             </div>
             <div class="col-md-10 dashboard__form--input">
               <input class="" type="text" validate-on-blur ng-model="clinic.name" name="name" required>
-              <div ng-show="(form.name.$showValidationMessage && form.name.$invalid) || submitted">
+              <div ng-show="(form.name.$dirty && form.name.$showValidationMessage && form.name.$invalid) || submitted">
                 <span class="has-error" ng-show="form.name.$error.required">
                   Clinic Name is required.
                 </span>

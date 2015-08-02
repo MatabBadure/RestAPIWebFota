@@ -31,7 +31,6 @@ angular.module('hillromvestApp')
           $scope.total = 0;
           $scope.sortOption ="";
           $scope.showModal = false;
-          $scope.searchUsers();
         };
 
 

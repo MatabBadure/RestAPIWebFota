@@ -30,14 +30,14 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <tags-input key-property="id" ng-model="doctor.clinics" display-property="name" min-tags="1" name="clinicAutoComplete">
+              <tags-input key-property="id" ng-model="doctor.clinics" display-property="name" min-tags="1" name="clinicAutoComplete" placeholder=".">
                 <auto-complete source="clinics" display-property="name" min-length="1"></auto-complete>
               </tags-input>
-              <!-- <div ng-show="form.clinicAutoComplete.$dirty && form.clinicAutoComplete.$error.minTags">
+              <div ng-show="form.clinicAutoComplete.$error.minTags && submitted">
                 <span class="has-error">
                   Clinic is Required
                 </span>
-              </div> -->
+              </div>
             </div>
 
           </div>
@@ -54,10 +54,7 @@
             </div>
             <div class="col-md-10 dashboard__form__input">
               <div class="custom-dropdown">
-                <select ng-model="doctor.title">
-                  <option translate="doctor.title.mr">Mr.</option>
-                  <option translate="doctor.title.mrs">Mrs.</option>
-                  <option translate="doctor.title.ms">Ms.</option>
+                <select ng-model="doctor.title" ng-options="option for option in ['Mr.', 'Mrs.', 'Ms.']" ng-selected="{{option === doctor.title}}">
                 </select>
               </div>
             </div>
@@ -71,7 +68,7 @@
             </div>
             <div class="col-md-10 dashboard__form--input">
               <input class="" type="text" name="firstName" validate-on-blur ng-model="doctor.firstName" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-z A-Z]+$/" required>
-              <div ng-show="(form.firstName.$showValidationMessage && form.firstName.$invalid) || submitted" class="">
+              <div ng-show="(form.firstName.$dirty && form.firstName.$showValidationMessage && form.firstName.$invalid) || submitted" class="">
                 <span class="has-error" ng-show="form.firstName.$error.required">
                     First Name is required.
                   </span>
@@ -109,7 +106,7 @@
             </div>
             <div class="col-md-10 dashboard__form--input">
               <input class="" type="text" name="lastName" validate-on-blur ng-model="doctor.lastName" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-z A-Z]+$/" required>
-              <div ng-show="(form.lastName.$showValidationMessage && form.lastName.$invalid) || submitted" class="">
+              <div ng-show="(form.lastName.$dirty && form.lastName.$showValidationMessage && form.lastName.$invalid) || submitted" class="">
                 <span class="has-error" ng-show="form.lastName.$error.required">
                     Last Name is required.
                   </span>
@@ -170,7 +167,7 @@
             </div>
             <div class="col-md-10 dashboard__form--input">
               <input class="" type="email" name="email" validate-on-blur ng-model="doctor.email" ng-maxlength=100 required>
-              <div ng-show="(form.email.$showValidationMessage && form.email.$invalid) || submitted" class="">
+              <div ng-show="(form.email.$dirty && form.email.$showValidationMessage && form.email.$invalid) || submitted" class="">
                 <span class="has-error" ng-show="form.email.$error.required">
                    E-mail is required.
                   </span>

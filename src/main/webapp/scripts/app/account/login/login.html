@@ -57,6 +57,7 @@
 
     <!-- first time login -->
     <div class=" col-md-10 col-lg-10 login__container__right-section" ng-show="isFirstLogin">
+      <span ng-if="message">{{message}}</span>
       <form class="login-auth-form" role="form" name="confirmForm" ng-submit="submitPassword($event)" novalidate autocomplete="off" show-validation>
         <div class="form-group" ng-show="!isEmailExist">
           <input type="email" class="form-control" validate-on-blur name="email" placeholder="Enter Email" ng-model="user.email" ng-maxlength=100 required value="">

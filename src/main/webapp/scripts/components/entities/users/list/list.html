@@ -31,7 +31,7 @@
       </div>
     </div>
      <div class="dashboard__manage-view--list" ng-repeat="user in users">
-       <div ng-class="{ inactive: 'user.deleted === true'}" ng-click="selectUser(user)">
+      <div ng-class="{ 'inactive': user.deleted }" ng-click="user.deleted || selectUser(user)">
         <div class="col-md-3 reset-padding-left">
           <span class="user-name">{{user.lastName}} {{user.firstName}}</span>
           <span class="user-email">{{user.email}}</span>

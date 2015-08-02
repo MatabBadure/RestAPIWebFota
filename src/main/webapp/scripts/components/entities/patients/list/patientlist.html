@@ -30,7 +30,7 @@
         </div>
       </div>
 
-       <div class="dashboard__manage-view--list" ng-repeat="patient in patients" ng-click="selectPatient(patient)" ng-readonly="true">
+       <div class="dashboard__manage-view--list" ng-repeat="patient in patients" ng-click="patient.isDeleted || selectPatient(patient)" ng-readonly="true" ng-class="{ 'inactive': patient.isDeleted }">
           <div class="col-md-3 reset-padding-left">
             <span class="user-name">{{patient.lastName}} {{patient.firstName}}</span>
             <span class="user-email">{{patient.dob}}</span>

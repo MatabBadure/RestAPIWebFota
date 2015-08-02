@@ -169,14 +169,13 @@
             </div>
           </div>
         </div>
-
-        <div class="col-md-16 row margin-top">
-          <div class="row padding-right-xl">
-            <button class="hillrom-btn btn-submit float-right" ng-show="userStatus.isCreate" ng-click="formSubmit()" translate="user.submit-button-text">Submit</button>
-            <button type="reset" ng-click="cancel()" ng-show="userStatus.isCreate" class="hillrom-btn btn-submit float-right" >Cancel</button>
-            <button class="hillrom-btn btn-submit float-right" ng-click="formSubmit()" ng-show="!userStatus.isCreate">Update</button>
-            <button class="hillrom-btn btn-submit float-right" ng-click="open()" ng-show="!userStatus.isCreate">Disassociate</button>
-          </div>
+      </div>
+      <div class="col-md-16 row margin-top">
+        <div class="row padding-right-xl">
+          <button class="hillrom-btn btn-submit float-right" ng-show="userStatus.isCreate" ng-click="formSubmit()" translate="user.submit-button-text">Submit</button>
+          <button type="reset" ng-click="cancel()" ng-show="userStatus.isCreate" class="hillrom-btn btn-submit float-right" >Cancel</button>
+          <button class="hillrom-btn btn-submit float-right" ng-click="formSubmit()" ng-show="!userStatus.isCreate">Update</button>
+          <button class="hillrom-btn btn-submit float-right" ng-click="open()" ng-show="!userStatus.isCreate">Disassociate</button>
         </div>
       </div>
     </div>

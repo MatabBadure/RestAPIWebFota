@@ -36,7 +36,7 @@ angular.module('hillromvestApp')
       *
       */
       getPatientInfo : function(id){
-        return $http.get('api/user/' + id,  {
+        return $http.get('api/user/' + id + '/patient',  {
           headers: {
             'Content-Type' : 'application/json',
             'x-auth-token' : token

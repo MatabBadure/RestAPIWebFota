@@ -48,7 +48,7 @@
               <span class="" >User ID</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" readonly>
+              <input class="" type="text" readonly ng-model="user.id">
             </div>
           </div>
 
@@ -63,8 +63,8 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" name="firstName"  ng-model="user.firstName" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-zA-Z]+$/" ng-readonly="validateSuperAdmin()" required>
-              <div ng-show="(form.firstName.$dirty && form.firstName.$invalid) || submitted">
+              <input class="" type="text" name="firstName" validate-on-blur ng-model="user.firstName" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-z A-Z]+$/" ng-readonly="validateSuperAdmin()" required>
+              <div ng-show="(form.firstName.$showValidationMessage && form.firstName.$invalid) || submitted">
                 <span class="has-error" ng-show="form.firstName.$error.required">
                   First Name is required.
                 </span>
@@ -85,8 +85,8 @@
               <span class="" translate="user.middle-name"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" name="middleName" ng-model="user.middleName" ng-pattern="/^[a-zA-Z]+$/" ng-minlength=2 ng-maxlength=15 ng-readonly="validateSuperAdmin()">
-              <div ng-show="(form.middleName.$dirty && form.middleName.$invalid)">
+              <input class="" type="text" name="middleName" validate-on-blur ng-model="user.middleName" ng-pattern="/^[a-z A-Z]+$/" ng-minlength=2 ng-maxlength=15 ng-readonly="validateSuperAdmin()">
+              <div ng-show="(form.middleName.$showValidationMessage && form.middleName.$invalid)">
                 <span class="has-error" ng-show="form.middleName.$error.pattern" >
                   Middle Name cannot have number.
                 </span>
@@ -108,8 +108,8 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" name="lastName" ng-pattern="/^[a-zA-Z]+$/" ng-model="user.lastName" ng-minlength=2 ng-maxlength=15 ng-readonly="validateSuperAdmin()" required>
-              <div ng-show="(form.lastName.$dirty && form.lastName.$invalid) || submitted">
+              <input class="" type="text" name="lastName" validate-on-blur ng-pattern="/^[a-z A-Z]+$/" ng-model="user.lastName" ng-minlength=2 ng-maxlength=15 ng-readonly="validateSuperAdmin()" required>
+              <div ng-show="(form.lastName.$showValidationMessage && form.lastName.$invalid) || submitted">
                 <span class="has-error" ng-show="form.lastName.$error.required">
                   Last Name is required.
                 </span>
@@ -142,13 +142,13 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="email" name="email" ng-model="user.email" ng-maxlength=100 ng-readonly="validateSuperAdmin()">
-              <div ng-show="(form.email.$dirty && form.email.$invalid) || submitted">
+              <input class="" type="email" name="email" validate-on-blur ng-model="user.email" ng-maxlength=100 ng-readonly="validateSuperAdmin()">
+              <div ng-show="(form.email.$showValidationMessage && form.email.$invalid) || submitted">
                 <span class="has-error" ng-show="form.email.$error.email">
-                  Your e-mail is invalid.
+                   E-mail is invalid.
                 </span>
                 <span class="has-error" ng-show="form.email.$error.maxlength">
-                  Your e-mail cannot be longer than 100 characters.
+                  E-mail cannot be longer than 100 characters.
                 </span>
               </div>
             </div>

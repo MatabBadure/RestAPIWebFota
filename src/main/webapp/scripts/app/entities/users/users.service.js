@@ -72,9 +72,17 @@ angular.module('hillromvestApp')
       },
 
       getUsers : function (url, searchString, sortOption, pageNo, offset) {
+        var sortOrder;
         if (searchString === undefined) { searchString = '';}
+        if (sortOption === "") 
+          { 
+            sortOption = "createdAt";
+            sortOrder = false;
+          }else{
+            sortOrder = true;
+          };
 
-        return $http.get(url + searchString + '&page=' + pageNo + '&per_page=' + offset + '&sort_by=' + sortOption + '&asc=' + true, {
+        return $http.get(url + searchString + '&page=' + pageNo + '&per_page=' + offset + '&sort_by=' + sortOption + '&asc=' + sortOrder, {
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',

@@ -42,7 +42,15 @@ angular.module('hillromvestApp')
 
       getClinics : function (searchString,sortOption, pageNo, offset) {
         if (searchString === undefined) { searchString = '';}
-        return $http.get('api/clinics/search?searchString=' + searchString + '&page=' + pageNo + '&per_page=' + offset + '&sort_by=' + sortOption + '&asc=' + true,{
+        var sortOrder;
+        if (sortOption === "") 
+          { 
+            sortOption = "createdAt";
+            sortOrder = false;
+          }else{
+            sortOrder = true;
+          };
+        return $http.get('api/clinics/search?searchString=' + searchString + '&page=' + pageNo + '&per_page=' + offset + '&sort_by=' + sortOption + '&asc=' + sortOrder,{
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',

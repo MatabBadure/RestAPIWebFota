@@ -30,7 +30,7 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <tags-input ng-model="doctor.clinics" display-property="name" min-tags="1" name="clinicAutoComplete">
+              <tags-input key-property="id" ng-model="doctor.clinics" display-property="name" min-tags="1" name="clinicAutoComplete">
                 <auto-complete source="clinics" display-property="name" min-length="1"></auto-complete>
               </tags-input>
               <!-- <div ng-show="form.clinicAutoComplete.$dirty && form.clinicAutoComplete.$error.minTags">
@@ -70,8 +70,8 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" name="firstName" ng-model="doctor.firstName" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-zA-Z]+$/" required>
-              <div ng-show="(form.firstName.$dirty && form.firstName.$invalid) || submitted" class="">
+              <input class="" type="text" name="firstName" validate-on-blur ng-model="doctor.firstName" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-z A-Z]+$/" required>
+              <div ng-show="(form.firstName.$showValidationMessage && form.firstName.$invalid) || submitted" class="">
                 <span class="has-error" ng-show="form.firstName.$error.required">
                     First Name is required.
                   </span>
@@ -92,8 +92,8 @@
               <span class="" translate="doctor.middle-name"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" name="middleName" ng-model="doctor.middleName" ng-pattern="/^[a-zA-Z]+$/">
-              <div ng-show="(form.middleName.$dirty && form.middleName.$invalid)" class="">
+              <input class="" type="text" name="middleName" validate-on-blur ng-model="doctor.middleName" ng-pattern="/^[a-z A-Z]+$/">
+              <div ng-show="(form.middleName.$showValidationMessage && form.middleName.$invalid)" class="">
                 <span class="has-error" ng-show="form.middleName.$error.pattern">
                     Middle Name cannot have number.
                   </span>
@@ -108,8 +108,8 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" name="lastName" ng-model="doctor.lastName" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-zA-Z]+$/" required>
-              <div ng-show="(form.lastName.$dirty && form.lastName.$invalid) || submitted" class="">
+              <input class="" type="text" name="lastName" validate-on-blur ng-model="doctor.lastName" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-z A-Z]+$/" required>
+              <div ng-show="(form.lastName.$showValidationMessage && form.lastName.$invalid) || submitted" class="">
                 <span class="has-error" ng-show="form.lastName.$error.required">
                     Last Name is required.
                   </span>
@@ -130,8 +130,8 @@
               <span class="" translate="doctor.npi-number"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" name="npi" ng-pattern="/^[0-9]+$/" ng-model="doctor.npiNumber">
-              <div ng-show="form.npi.$dirty && form.npi.$invalid" class="">
+              <input class="" type="text" name="npi" validate-on-blur ng-pattern="/^[0-9]+$/" ng-model="doctor.npiNumber">
+              <div ng-show="form.npi.$showValidationMessage && form.npi.$invalid" class="">
                 <span class="has-error" ng-show="form.npi.$error.pattern">
                     NPI Number is invalid.
                   </span>
@@ -169,16 +169,16 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="email" name="email" ng-model="doctor.email" ng-maxlength=100 required>
-              <div ng-show="(form.email.$dirty && form.email.$invalid) || submitted" class="">
+              <input class="" type="email" name="email" validate-on-blur ng-model="doctor.email" ng-maxlength=100 required>
+              <div ng-show="(form.email.$showValidationMessage && form.email.$invalid) || submitted" class="">
                 <span class="has-error" ng-show="form.email.$error.required">
-                  Your e-mail is required.
+                   E-mail is required.
                   </span>
                 <span class="has-error" ng-show="form.email.$error.email">
-                    Your e-mail is invalid.
+                     E-mail is invalid.
                   </span>
                 <span class="has-error" ng-show="form.email.$error.maxlength">
-                    Your e-mail cannot be longer than 100 characters.
+                     E-mail cannot be longer than 100 characters.
                   </span>
               </div>
             </div>
@@ -188,8 +188,8 @@
               <span class="" translate="doctor.primary-phone"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" name="primaryPhone" maxlength="10" ng-pattern="/^[0-9]{10}$/" ng-model="doctor.primaryPhone">
-              <div ng-show="form.primaryPhone.$dirty && form.primaryPhone.$invalid" class="">
+              <input class="" type="text" name="primaryPhone" validate-on-blur maxlength="10" ng-pattern="/^[0-9]{10}$/" ng-model="doctor.primaryPhone">
+              <div ng-show="form.primaryPhone.$showValidationMessage && form.primaryPhone.$invalid" class="">
                 <span class="has-error" ng-show="form.primaryPhone.$error.pattern">
                     Primary Phone is invalid.
                   </span>
@@ -203,8 +203,8 @@
               <span class="" translate="doctor.mobile-number"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" name="mobilePhone" maxlength="10" ng-pattern="/^[0-9]{10}$/" ng-model="doctor.mobilePhone">
-              <div ng-show="form.mobilePhone.$dirty && form.mobilePhone.$invalid" class="">
+              <input class="" type="text" name="mobilePhone" validate-on-blur maxlength="10" ng-pattern="/^[0-9]{10}$/" ng-model="doctor.mobilePhone">
+              <div ng-show="form.mobilePhone.$showValidationMessage && form.mobilePhone.$invalid" class="">
                 <span class="has-error" ng-show="form.mobilePhone.$error.pattern">
                     Mobile Phone is invalid.
                   </span>
@@ -216,8 +216,8 @@
               <span class="" translate="doctor.fax-number"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" name="faxNumber" maxlength="10" ng-pattern="/^[0-9]{10}$/" ng-model="doctor.faxNumber">
-              <div ng-show="form.faxNumber.$dirty && form.faxNumber.$invalid" class="">
+              <input class="" type="text" name="faxNumber" validate-on-blur maxlength="10" ng-pattern="/^[0-9]{10}$/" ng-model="doctor.faxNumber">
+              <div ng-show="form.faxNumber.$showValidationMessage && form.faxNumber.$invalid" class="">
                 <span class="has-error" ng-show="form.faxNumber.$error.pattern">
                     Fax Number is invalid.
                   </span>
@@ -231,10 +231,10 @@
               <span class="" translate="doctor.address"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" ng-model="doctor.address" name="address" ng-maxlength="100">
-              <div ng-show="(form.address.$dirty && form.address.$invalid)" class="">
+              <input class="" type="text" ng-model="doctor.address" validate-on-blur name="address" ng-maxlength="100">
+              <div ng-show="(form.address.$showValidationMessage && form.address.$invalid)" class="">
                 <span class="has-error" ng-show="form.address.$error.maxlength">
-                    City cannot be longer than 100 characters.
+                    Address cannot be longer than 100 characters.
                   </span>
               </div>
             </div>
@@ -244,8 +244,8 @@
               <span class="" translate="doctor.city"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" ng-model="doctor.city" name="city" ng-maxlength="15">
-              <div ng-show="(form.city.$dirty && form.city.$invalid)" class="">
+              <input class="" type="text" ng-model="doctor.city" validate-on-blur name="city" ng-maxlength="15">
+              <div ng-show="(form.city.$showValidationMessage && form.city.$invalid)" class="">
                 <span class="has-error" ng-show="form.city.$error.maxlength">
                     City cannot be longer than 15 characters.
                   </span>
@@ -271,8 +271,8 @@
               <span class="" translate="doctor.zipcode"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" name="zip" ng-pattern="/^[0-9]{5}$/" ng-model="doctor.zipcode">
-              <div ng-show="form.zip.$dirty && form.zip.$invalid" class="">
+              <input class="" type="text" name="zip" maxlength="5" validate-on-blur ng-pattern="/^[0-9]{5}$/" ng-model="doctor.zipcode">
+              <div ng-show="form.zip.$showValidationMessage && form.zip.$invalid" class="">
                 <span class="has-error" ng-show="form.zip.$error.pattern">
                     Zip Code is invalid.
                   </span>

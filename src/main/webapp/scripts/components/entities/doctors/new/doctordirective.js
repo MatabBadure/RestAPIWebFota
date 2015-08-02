@@ -111,6 +111,7 @@ angular.module('hillromvestApp')
             var data = $scope.doctor;
             data.role = 'HCP';
             console.log('data Object: ', data);
+            delete data.clinics;
             UserService.createUser(data).then(function(response) {
               $scope.doctorStatus.isMessage = true;
               // $scope.doctorStatus.message = "Doctor created successfully" + " with ID " + response.data.user.id;

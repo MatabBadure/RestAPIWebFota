@@ -18,8 +18,8 @@
           </div>
 
           <div class="form-group">
-            <input type="text" class="form-control" id="username" name="username" placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="username" required>
-            <div class="form-error" ng-show="(form.username.$dirty && form.username.$invalid) || loginSubmitted">
+            <input type="text" class="form-control" validate-on-blur id="username" name="username" placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="username" required>
+            <div class="form-error" ng-show="(form.username.$showValidationMessage && form.username.$invalid) || loginSubmitted">
               <span class="login-has-error" ng-show="form.username.$error.required ">
                 Username required.
               </span>
@@ -27,9 +27,9 @@
           </div>
 
           <div class="form-group">
-            <input type="password" class="form-control" id="password" name="password" placeholder="{{'login.form.password.placeholder' | translate}}" ng-model="password"
+            <input type="password" class="form-control" validate-on-blur id="password" name="password" placeholder="{{'login.form.password.placeholder' | translate}}" ng-model="password"
             required>
-            <div class="form-error" ng-show="(form.password.$dirty && form.password.$invalid) || loginSubmitted">
+            <div class="form-error" ng-show="(form.password.$showValidationMessage && form.password.$invalid) || loginSubmitted">
               <span class="login-has-error"
               ng-show="form.password.$error.required">
               Password required.
@@ -47,7 +47,6 @@
         <div class="col-md-8 col-lg-8 link margin-top" id="forgotpwd">
           <a class="text-small" href="#/reset/request">Forgot Password?</a>
         </div>
-
         <div class="col-md-8 col-lg-8 link margin-top">
           <button type="submit" class="myButton" translate="login.form.button">LOGIN</button>
         </div>
@@ -60,8 +59,8 @@
     <div class=" col-md-10 col-lg-10 login__container__right-section" ng-show="isFirstLogin">
       <form class="login-auth-form" role="form" name="confirmForm" ng-submit="submitPassword($event)" novalidate autocomplete="off" show-validation>
         <div class="form-group" ng-show="!isEmailExist">
-          <input type="email" class="form-control" name="email" placeholder="Enter Email" ng-model="user.email" ng-maxlength=100 required value="">
-          <div ng-show="(confirmForm.email.$dirty && confirmForm.email.$invalid) || submitted" class="form-error">
+          <input type="email" class="form-control" validate-on-blur name="email" placeholder="Enter Email" ng-model="user.email" ng-maxlength=100 required value="">
+          <div ng-show="(confirmForm.email.$showValidationMessage && confirmForm.email.$invalid) || submitted" class="form-error">
             <span class="login-has-error" ng-show="confirmForm.email.$error.required">
              E-mail required.
            </span>
@@ -76,9 +75,9 @@
      </div>
 
      <div class="form-group">
-      <input type="password" class="form-control" name="password" id="passwordBox"
+      <input type="password" class="form-control" validate-on-blur name="password" id="passwordBox"
       ng-model="user.password" ng-minlength=8 ng-maxlength=50 ng-keyup="passwordStrength()" ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required placeholder="New Password">
-      <div ng-show="(confirmForm.password.$dirty && confirmForm.password.$invalid) || submitted">
+      <div ng-show="(confirmForm.password.$showValidationMessage && confirmForm.password.$invalid) || submitted">
         <span class="login-has-error" ng-show="confirmForm.password.$error.required">
          Password required.
        </span>
@@ -99,9 +98,9 @@
     </div>
   </div>
   <div class="form-group">
-    <input type="password" class="form-control" name="confirmPassword"
+    <input type="password" class="form-control" validate-on-blur name="confirmPassword"
     ng-model="user.confirmPassword" ng-minlength=8 ng-maxlength=50 ng-pattern="/^(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required placeholder="Enter New Password">
-    <div ng-show="(confirmForm.confirmPassword.$dirty && confirmForm.confirmPassword.$invalid) || submitted">
+    <div ng-show="(confirmForm.confirmPassword.$showValidationMessage && confirmForm.confirmPassword.$invalid) || submitted">
       <span class="login-has-error" ng-show="confirmForm.confirmPassword.$error.required">
         Password required.
       </span>
@@ -120,20 +119,20 @@
     <div class="auth-heading">security question</div>
     <div class="auth-select">
       <div class="custom-dropdown">
-        <select class="form-control" name="question" ng-model="user.question" required ng-options="question.question for question in questions">
+        <select class="form-control" name="question" validate-on-blur ng-model="user.question" required ng-options="question.question for question in questions">
           <option value="">-- select a security question --</option>
         </select>
       </div>
     </div>
-    <div ng-show="(confirmForm.question.$dirty && confirmForm.question.$invalid) || submitted">
+    <div ng-show="(confirmForm.question.$showValidationMessage && confirmForm.question.$invalid) || submitted">
       <span class="login-has-error" ng-show="confirmForm.question.$error.required">
         Security question required.
       </span>
     </div>
   </div>
   <div class="form-group">
-    <input type="text" class="form-control" name="answer" ng-model="user.answer" required placeholder="Enter Your Answer">
-    <div ng-show="(confirmForm.answer.$dirty && confirmForm.answer.$invalid) || submitted">
+    <input type="text" class="form-control" name="answer" validate-on-blur ng-model="user.answer" required placeholder="Enter Your Answer">
+    <div ng-show="(confirmForm.answer.$showValidationMessage && confirmForm.answer.$invalid) || submitted">
       <span class="login-has-error" ng-show="confirmForm.answer.$error.required">
         Answer required.
       </span>

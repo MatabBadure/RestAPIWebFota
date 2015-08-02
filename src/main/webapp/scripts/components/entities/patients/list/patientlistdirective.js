@@ -50,7 +50,7 @@ angular.module('hillromvestApp')
               'patient': $scope.patient
             });
           }).catch(function(response) {
-            console.log("get Patient Info failed!");
+            //console.log("get Patient Info failed!");
           });
         };
 

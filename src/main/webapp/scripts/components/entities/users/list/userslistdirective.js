@@ -55,7 +55,7 @@ angular.module('hillromvestApp')
           UserService.getUser(user.id).then(function(response) {
             $scope.user = response.data;
             $scope.onSelect({
-              'user': user
+              'user': $scope.user
             });
           }).catch(function(response) {
 

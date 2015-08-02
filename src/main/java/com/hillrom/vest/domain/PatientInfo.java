@@ -2,16 +2,17 @@ package com.hillrom.vest.domain;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedStoredProcedureQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureParameter;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
@@ -30,11 +31,14 @@ import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
  */
 @Entity
 @Table(name = "PATIENT_INFO")
+@NamedStoredProcedureQuery(name = "PatientInfo.id", procedureName = "get_next_patient_hillromid", parameters = {
+		@StoredProcedureParameter(mode = ParameterMode.IN, name = "hillrom_id", type = String.class),
+		@StoredProcedureParameter(mode = ParameterMode.OUT, name = "hillrom_id", type = String.class) })
 public class PatientInfo implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @GeneratedValue
+    private String id;
 
     @Column(name = "hillrom_id")
     private String hillromId;
@@ -105,15 +109,15 @@ public class PatientInfo implements Serializable {
     @JsonIgnore
     private Set<UserPatientAssoc> userPatientAssoc = new HashSet<>();
 
-    public Long getId() {
-        return id;
-    }
+    public String getId() {
+		return id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public String getHillromId() {
+	public String getHillromId() {
         return hillromId;
     }
 
@@ -280,29 +284,33 @@ public class PatientInfo implements Serializable {
 	public void setUserPatientAssoc(Set<UserPatientAssoc> userPatientAssoc) {
 		this.userPatientAssoc = userPatientAssoc;
 	}
+	
+    @Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
 
 	@Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PatientInfo other = (PatientInfo) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
 
-        PatientInfo patientInfo = (PatientInfo) o;
-
-        if ( ! Objects.equals(id, patientInfo.id)) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
-
-    @Override
+	@Override
     public String toString() {
         return "PatientInfo{" +
                 "id=" + id +

@@ -61,6 +61,8 @@ public class PatientVestDeviceDataService {
 			patientInfo = patientFromDB.get();
 		}else{
 			patientInfo = new PatientInfo();
+			// Assigns the next hillromId for the patient
+			patientInfo.setId(patientInfoRepository.id("hillrom_id","hillrom_id"));
 			patientInfo.setBluetoothId(deviceAddress);
 			patientInfo.setHubId(deviceRawLog.getHubId());
 			patientInfo = patientInfoRepository.save(patientInfo);

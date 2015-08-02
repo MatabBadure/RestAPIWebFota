@@ -1,2 +1,2 @@
-id;PASSWORD;first_name;last_name;email;activated;lang_key;created_by;is_deleted
-1;$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC;Administrator;Administrator;admin@localhost.com;true;en;system;false
+id,PASSWORD,first_name,last_name,email,activated,lang_key,created_by,is_deleted,last_loggedin_at
+1,$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC,Administrator,Administrator,admin@localhost.com,true,en,system,false,02/08/15

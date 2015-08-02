@@ -35,6 +35,8 @@ public class ClinicService {
     public JSONObject createClinic(ClinicDTO clinicDTO) {
     	JSONObject jsonObject = new JSONObject();
     	Clinic newClinic = new Clinic();
+    	// Assigns the next clinic HillromId from Stored Procedure
+    	newClinic.setId(clinicRepository.id("id"));
     	if(clinicDTO.getParent()) {
     		newClinic.setParent(clinicDTO.getParent());
     	}
@@ -56,7 +58,7 @@ public class ClinicService {
         }
     }
 
-    public JSONObject updateClinic(Long id, ClinicDTO clinicDTO) {
+    public JSONObject updateClinic(String id, ClinicDTO clinicDTO) {
     	JSONObject jsonObject = new JSONObject();
     	Clinic clinic = clinicRepository.getOne(id);
         if(clinic == null) {
@@ -74,7 +76,7 @@ public class ClinicService {
 	        	}
 	        	List<String> clinicsToBeRemoved = RandomUtil.getDifference(existingChildClinicIds, newChildClinicIds);
 	        	for(String clinicId : clinicsToBeRemoved) {
-	        		Clinic childClinic = clinicRepository.getOne(Long.parseLong(clinicId));
+	        		Clinic childClinic = clinicRepository.getOne(clinicId);
 	        		childClinic.setParentClinic(null);
 	        		clinicRepository.save(childClinic);
 	        		clinic.getChildClinics().remove(childClinic);
@@ -104,7 +106,7 @@ public class ClinicService {
     	return jsonObject;
     }
     
-    public JSONObject deleteClinic(Long id) {
+    public JSONObject deleteClinic(String id) {
     	JSONObject jsonObject = new JSONObject();
     	Clinic existingClinic = clinicRepository.findOne(id);
 		if(existingClinic != null) {

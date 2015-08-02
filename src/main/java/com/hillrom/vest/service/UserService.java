@@ -369,6 +369,8 @@ public class UserService {
     	})
     	.orElseGet(() -> {
     		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
+    		//Assigns Next Patient HillromId from Stored Procedure
+    		//patientInfo.setId(patientInfoRepository.id("hillrom_id","hillrom_id"));
     		patientInfoRepository.save(patientInfo);
     		assignValuesToUserObj(userExtensionDTO, newUser);
     		newUser.setPassword(passwordEncoder.encode(generateDefaultPassword((User)newUser)));
@@ -396,7 +398,7 @@ public class UserService {
 		newUser.setDeleted(false);
 		newUser.setActivationKey(RandomUtil.generateActivationKey());
 		for(Map<String, String> clinicObj : userExtensionDTO.getClinicList()){
-			Clinic clinic = clinicRepository.getOne(Long.parseLong(clinicObj.get("id")));
+			Clinic clinic = clinicRepository.getOne(clinicObj.get("id"));
 			newUser.getClinics().add(clinic);
 		}
 		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));

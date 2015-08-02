@@ -1,14 +1,13 @@
 'use strict';
 angular.module('hillromvestApp')
   .factory('ClinicService', function ($http,localStorageService) {
-	var token = localStorage.getItem('token');
     return {
       createClinic: function (data) {
         return $http.post('api/clinics', data, {
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
-            'x-auth-token' : token
+            'x-auth-token' : localStorage.getItem('token')
           }
         }).success(function (response) {
           return response;
@@ -20,7 +19,7 @@ angular.module('hillromvestApp')
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
-            'x-auth-token' : token
+            'x-auth-token' : localStorage.getItem('token')
           }
         }).success(function (response) {
           return response;
@@ -33,7 +32,7 @@ angular.module('hillromvestApp')
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
-            'x-auth-token' : token
+            'x-auth-token' : localStorage.getItem('token')
           }
         }).success(function (response) {
           return response;
@@ -43,8 +42,8 @@ angular.module('hillromvestApp')
       getClinics : function (searchString,sortOption, pageNo, offset) {
         if (searchString === undefined) { searchString = '';}
         var sortOrder;
-        if (sortOption === "") 
-          { 
+        if (sortOption === "")
+          {
             sortOption = "createdAt";
             sortOrder = false;
           }else{
@@ -54,7 +53,7 @@ angular.module('hillromvestApp')
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
-            'x-auth-token' : token
+            'x-auth-token' : localStorage.getItem('token')
           }
         }).success(function (response) {
           return response;
@@ -67,7 +66,7 @@ angular.module('hillromvestApp')
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
-            'x-auth-token' : token
+            'x-auth-token' : localStorage.getItem('token')
           }
         }).success(function (response) {
           return response;
@@ -79,7 +78,7 @@ angular.module('hillromvestApp')
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
-            'x-auth-token' : token
+            'x-auth-token' : localStorage.getItem('token')
           }
         }).success(function (response) {
           return response;

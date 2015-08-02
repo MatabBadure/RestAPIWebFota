@@ -7,7 +7,6 @@
  */
 angular.module('hillromvestApp')
   .factory('UserService', function ($http, localStorageService) {
-    var token = localStorage.getItem('token');
     return {
 
       /**
@@ -21,7 +20,7 @@ angular.module('hillromvestApp')
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
-            'x-auth-token' : token
+            'x-auth-token' : localStorage.getItem('token')
           }
         }).success(function (response) {
           return response;
@@ -39,7 +38,7 @@ angular.module('hillromvestApp')
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
-            'x-auth-token' : token
+            'x-auth-token' : localStorage.getItem('token')
           }
         }).success(function (response) {
           return response;
@@ -57,7 +56,7 @@ angular.module('hillromvestApp')
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
-            'x-auth-token' : token
+            'x-auth-token' : localStorage.getItem('token')
           }
         }).success(function (response) {
           return response;
@@ -74,8 +73,8 @@ angular.module('hillromvestApp')
       getUsers : function (url, searchString, sortOption, pageNo, offset) {
         var sortOrder;
         if (searchString === undefined) { searchString = '';}
-        if (sortOption === "") 
-          { 
+        if (sortOption === "")
+          {
             sortOption = "createdAt";
             sortOrder = false;
           }else{
@@ -86,7 +85,7 @@ angular.module('hillromvestApp')
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
-            'x-auth-token' : token
+            'x-auth-token' : localStorage.getItem('token')
           }
         }).success(function (response) {
           return response;
@@ -99,7 +98,7 @@ angular.module('hillromvestApp')
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
 
-            'x-auth-token' : token
+            'x-auth-token' : localStorage.getItem('token')
           }
         }).success(function (response) {
           return response;

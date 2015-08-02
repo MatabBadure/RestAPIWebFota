@@ -7,7 +7,6 @@
  */
 angular.module('hillromvestApp')
   .factory('PatientService', function ($http, localStorageService) {
-    var token = localStorage.getItem('token');
     return {
 
 
@@ -22,13 +21,13 @@ angular.module('hillromvestApp')
          keyword + '&page=' + pageIndex + '&per_page=' + countPerPage,  {
           headers: {
             'Content-Type' : 'application/json',
-            'x-auth-token' : token
+            'x-auth-token' : localStorage.getItem('token')
           }
         }).success(function (data, status, headers, config) {
            return {'response' : data, 'status' : status, 'headers' : headers, 'config' : config};
         });
       },
-      
+
       /**
       * @ngdoc method
       * @name editUser
@@ -39,7 +38,7 @@ angular.module('hillromvestApp')
         return $http.get('api/user/' + id + '/patient',  {
           headers: {
             'Content-Type' : 'application/json',
-            'x-auth-token' : token
+            'x-auth-token' : localStorage.getItem('token')
           }
         }).success(function (response) {
           return response;
@@ -51,7 +50,7 @@ angular.module('hillromvestApp')
           headers: {
             'Content-Type' : 'application/json',
             'Accept' : 'application/json',
-            'x-auth-token' : token
+            'x-auth-token' : localStorage.getItem('token')
           }
         }).success(function (response) {
           return response;

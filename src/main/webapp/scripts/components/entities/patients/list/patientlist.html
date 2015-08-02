@@ -36,7 +36,7 @@
             <span class="user-email">{{patient.dob}}</span>
           </div>
           <div class="col-md-4">
-            <span>{{patient.isDeleted | patientStatus}}</span>
+            <span>{{patient.isDeleted ? "Inactive" : "Active"}}</span>
           </div>
           <div class="col-md-4">
             <span class="user-home-no">{{patient.city}} </span>

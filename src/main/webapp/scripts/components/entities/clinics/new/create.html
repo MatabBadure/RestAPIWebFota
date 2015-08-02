@@ -142,7 +142,7 @@
               <span class="" translate="clinic.zipcode"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" validate-on-blur name="zip" maxlength="5" ng-pattern="/^[0-9]{5}$/" ng-model="clinic.zipcode">
+              <input class="" type="text" validate-on-blur name="zip" maxlength="5" ng-pattern="/^(?=.*[1-9].*)[0-9]{5}$/" ng-model="clinic.zipcode">
               <div ng-show="(form.zip.$showValidationMessage && form.zip.$invalid) || submitted">
                 <span class="has-error" ng-show="form.zip.$error.pattern">
                   Zip Code is invalid.

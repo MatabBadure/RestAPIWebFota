@@ -43,6 +43,7 @@ angular.module('hillromvestApp')
             },
 
             logout: function () {
+                localStorage.clear();
                 AuthServerProvider.logout();
                 Principal.authenticate(null);
             },
@@ -161,7 +162,7 @@ angular.module('hillromvestApp')
                 }.bind(this));
                 return deferred.promise;
             },
-            
+
             configurePassword : function(obj, callback){
                 var deferred = $q.defer();
                 var cb = callback || angular.noop;

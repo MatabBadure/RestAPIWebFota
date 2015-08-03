@@ -12,10 +12,10 @@ angular.module('hillromvestApp')
     },
     link: function(scope) {
       scope.$on('resetList', function () {
-        scope.init();
+        scope.searchClinics();
       });
     },
-    
+
     controller: function($scope, $timeout) {
 
       $scope.init = function () {
@@ -26,7 +26,6 @@ angular.module('hillromvestApp')
         $scope.clinics = [];
         $scope.sortOption ="";
         $scope.showModal = false;
-        $scope.searchClinics();
       };
 
 

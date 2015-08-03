@@ -5509,16 +5509,8 @@ select[multiple].input-lg,
 }
 
 @font-face {
-  font-family: "MyriadProRegular";
+  font-family: "MyriadRegular";
   src: url("fonts/MyriadPro-Regular.otf");
-}
-@font-face {
-  font-family: "MyriadProSemiboldMac";
-  src: url("fonts/MyriadPro-Semibold.otf");
-}
-@font-face {
-  font-family: "MyriadProbold";
-  src: url("fonts/MyriadPro-Bold.otf");
 }
 .container-top-indent {
   height: inherit;
@@ -5839,6 +5831,15 @@ a::-moz-focus-inner {
   margin: 10% auto;
 }
 
+.reset--position {
+  width: 50%;
+  margin: 5% auto;
+}
+
+.login-auth-form .email {
+  height: 50px;
+}
+
 .login__cover {
   margin: 13% 0;
 }
@@ -5901,12 +5902,15 @@ a::-moz-focus-inner {
 
 .form__container__login {
   background-color: rgba(255, 255, 255, 0.7);
-  padding: 10% 5%;
+  padding: 20px;
 }
 .form__container__login img {
   height: 200px;
   display: block;
   margin: 0 auto;
+}
+.form__container__login .img-man {
+  padding-top: 10%;
 }
 .form__container__login input {
   border-radius: 0;

@@ -6,8 +6,8 @@
     <div class="dashbord-nav__primary pull-left" ng-show="!doctorStatus.isCreate">
       <span class="dashbord-nav__primary--title" translate="doctor.home.updateLabel">Update Doctor</span>
     </div>
-    <div class="dashbord-nav__secondary create-user navbar-right cursor-pointer" ng-show="!doctorStatus.isCreate" ng-click="cancel()">
-      <span class="" translate="doctor.back-button-text"></span>
+    <div class="dashbord-nav__secondary create-user navbar-right cursor-pointer" ng-click="cancel()">
+      <span class="" translate="doctor.back-button-text">Back</span>
     </div>
   </div>
 </div>
@@ -30,14 +30,14 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <tags-input key-property="id" ng-model="doctor.clinics" display-property="name" min-tags="1" name="clinicAutoComplete">
+              <tags-input key-property="id" ng-model="doctor.clinics" display-property="name" min-tags="1" name="clinicAutoComplete" placeholder=".">
                 <auto-complete source="clinics" display-property="name" min-length="1"></auto-complete>
               </tags-input>
-              <!-- <div ng-show="form.clinicAutoComplete.$dirty && form.clinicAutoComplete.$error.minTags">
+              <div ng-show="form.clinicAutoComplete.$error.minTags && submitted">
                 <span class="has-error">
                   Clinic is Required
                 </span>
-              </div> -->
+              </div>
             </div>
 
           </div>
@@ -54,10 +54,7 @@
             </div>
             <div class="col-md-10 dashboard__form__input">
               <div class="custom-dropdown">
-                <select ng-model="doctor.title">
-                  <option translate="doctor.title.mr">Mr.</option>
-                  <option translate="doctor.title.mrs">Mrs.</option>
-                  <option translate="doctor.title.ms">Ms.</option>
+                <select ng-model="doctor.title" ng-options="option for option in ['Mr.', 'Mrs.', 'Ms.']" ng-selected="{{option === doctor.title}}">
                 </select>
               </div>
             </div>
@@ -71,7 +68,7 @@
             </div>
             <div class="col-md-10 dashboard__form--input">
               <input class="" type="text" name="firstName" validate-on-blur ng-model="doctor.firstName" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-z A-Z]+$/" required>
-              <div ng-show="(form.firstName.$showValidationMessage && form.firstName.$invalid) || submitted" class="">
+              <div ng-show="(form.firstName.$dirty && form.firstName.$showValidationMessage && form.firstName.$invalid) || submitted" class="">
                 <span class="has-error" ng-show="form.firstName.$error.required">
                     First Name is required.
                   </span>
@@ -109,7 +106,7 @@
             </div>
             <div class="col-md-10 dashboard__form--input">
               <input class="" type="text" name="lastName" validate-on-blur ng-model="doctor.lastName" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-z A-Z]+$/" required>
-              <div ng-show="(form.lastName.$showValidationMessage && form.lastName.$invalid) || submitted" class="">
+              <div ng-show="(form.lastName.$dirty && form.lastName.$showValidationMessage && form.lastName.$invalid) || submitted" class="">
                 <span class="has-error" ng-show="form.lastName.$error.required">
                     Last Name is required.
                   </span>
@@ -170,7 +167,7 @@
             </div>
             <div class="col-md-10 dashboard__form--input">
               <input class="" type="email" name="email" validate-on-blur ng-model="doctor.email" ng-maxlength=100 required>
-              <div ng-show="(form.email.$showValidationMessage && form.email.$invalid) || submitted" class="">
+              <div ng-show="(form.email.$dirty && form.email.$showValidationMessage && form.email.$invalid) || submitted" class="">
                 <span class="has-error" ng-show="form.email.$error.required">
                    E-mail is required.
                   </span>
@@ -271,7 +268,7 @@
               <span class="" translate="doctor.zipcode"></span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <input class="" type="text" name="zip" maxlength="5" validate-on-blur ng-pattern="/^[0-9]{5}$/" ng-model="doctor.zipcode">
+              <input class="" type="text" name="zip" maxlength="5" validate-on-blur ng-pattern="/^(?=.*[1-9].*)[0-9]{5}$/" ng-model="doctor.zipcode">
               <div ng-show="form.zip.$showValidationMessage && form.zip.$invalid" class="">
                 <span class="has-error" ng-show="form.zip.$error.pattern">
                     Zip Code is invalid.
@@ -280,13 +277,13 @@
             </div>
           </div>
         </div>
-        <div class="col-md-16 row margin-top">
-          <div class="row padding-right-xl">
-            <button type="submit" ng-click="formSubmit()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" >Submit</button>
-            <button type="reset" ng-click="cancel()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" >Cancel</button>
-            <button type="submit" ng-click="formSubmit()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Update</button>
-            <button type="button" ng-click="open()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Diassociate</button>
-          </div>
+      </div>
+      <div class="col-md-16 row margin-top">
+        <div class="row padding-right-xl">
+          <button type="submit" ng-click="formSubmit()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" >Submit</button>
+          <button type="reset" ng-click="cancel()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" >Cancel</button>
+          <button type="submit" ng-click="formSubmit()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Update</button>
+          <button type="button" ng-click="open()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Diassociate</button>
         </div>
       </div>
     </div>

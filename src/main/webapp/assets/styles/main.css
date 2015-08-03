@@ -6279,7 +6279,7 @@ a::-moz-focus-inner {
 }
 
 .dashboard__manage-view .inactive {
-  background-color: #f1f1f1;
+  background-color: #dddddd;
 }
 
 .dashboard__manage-view--list .inactive,

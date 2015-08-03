@@ -16,23 +16,22 @@
 <div class="dashboard dashboard--content padding-bottom-ls">
   <form name="form" ng-submit="createUser()" novalidate autocomplete="off">
     <div class="container dashboard__form">
-
-      <div class="row margin-top-xl">
-        <div class="col-md-16 row">
-          <div class="col-md-12 row">
+      <div class="margin-top-xl">
+        <div class="col-md-16 reset-padding">
+          <div class="col-md-12 reset-padding">
            <span class="dashboard__form--type" translate="user.personal-details"></span>
           </div>
-          <div class="col-md-4 row user-required">
+          <div class="col-md-4 reset-padding user-required">
             <span translate="user.required-field"></span>
           </div>
         </div>
 
-        <div class="col-md-16 row margin-top">
-          <div class="col-md-7 row">
-            <div class="col-md-6 dashboard__form--label">
+        <div class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
               <span class="" translate="user.title.name"></span>
             </div>
-            <div class="col-md-10 dashboard__form__input">
+            <div class="col-md-10 dashboard__form__input reset-padding selected-box-container">
               <div class="custom-dropdown">
                 <select ng-model="user.title" name="title" ng-readonly="validateSuperAdmin()" ng-options="option for option in ['Mr.', 'Mrs.', 'Ms.']" ng-selected="{{option === user.title}}">
                   <option selected translate="user.title.mr" value="Mr."></option>
@@ -43,24 +42,24 @@
             </div>
           </div>
 
-          <div class="col-md-7 row col-md-offset-2" ng-show="userStatus.editMode">
-            <div class="col-md-6 dashboard__form--label">
+          <div class="col-md-7 reset-padding col-md-offset-2" ng-show="userStatus.editMode">
+            <div class="col-md-6 dashboard__form--label reset-padding">
               <span class="" >User ID</span>
             </div>
-            <div class="col-md-10 dashboard__form--input">
+            <div class="col-md-10 dashboard__form--input reset-padding">
               <input class="" type="text" readonly ng-model="user.id">
             </div>
           </div>
 
         </div>
 
-        <div class="col-md-16 row margin-top">
-          <div class="col-md-7 row">
-            <div class="col-md-6 dashboard__form--label">
+        <div class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
               <span class="" translate="user.first-name"></span>
               <span class="">*</span>
             </div>
-            <div class="col-md-10 dashboard__form--input">
+            <div class="col-md-10 dashboard__form--input reset-padding">
               <input class="" type="text" name="firstName" validate-on-blur ng-model="user.firstName" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-z A-Z]+$/" ng-readonly="validateSuperAdmin()" required>
               <div ng-show="(form.firstName.$dirty && form.firstName.$showValidationMessage && form.firstName.$invalid) || submitted">
                 <span class="has-error" ng-show="form.firstName.$error.required">
@@ -78,11 +77,11 @@
               </div>
             </div>
           </div>
-          <div class="col-md-7 row col-md-offset-2">
-            <div class="col-md-6 dashboard__form--label">
+          <div class="col-md-7 reset-padding col-md-offset-2">
+            <div class="col-md-6 dashboard__form--label reset-padding">
               <span class="" translate="user.middle-name"></span>
             </div>
-            <div class="col-md-10 dashboard__form--input">
+            <div class="col-md-10 dashboard__form--input reset-padding">
               <input class="" type="text" name="middleName" validate-on-blur ng-model="user.middleName" ng-pattern="/^[a-z A-Z]+$/" ng-minlength=2 ng-maxlength=15 ng-readonly="validateSuperAdmin()">
               <div ng-show="(form.middleName.$dirty && form.middleName.$showValidationMessage && form.middleName.$invalid)">
                 <span class="has-error" ng-show="form.middleName.$error.pattern" >
@@ -99,13 +98,13 @@
           </div>
         </div>
 
-        <div class="col-md-16 row margin-top">
-          <div class="col-md-7 row">
-            <div class="col-md-6 dashboard__form--label">
+        <div class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
               <span class="" translate="user.last-name"></span>
               <span class="">*</span>
             </div>
-            <div class="col-md-10 dashboard__form--input">
+            <div class="col-md-10 dashboard__form--input reset-padding">
               <input class="" type="text" name="lastName" validate-on-blur ng-pattern="/^[a-z A-Z]+$/" ng-model="user.lastName" ng-minlength=2 ng-maxlength=15 ng-readonly="validateSuperAdmin()" required>
               <div ng-show="(form.lastName.$dirty && form.lastName.$showValidationMessage && form.lastName.$invalid) || submitted">
                 <span class="has-error" ng-show="form.lastName.$error.required">
@@ -123,23 +122,23 @@
               </div>
             </div>
           </div>
-          <div class="col-md-7 row col-md-offset-2">
-            <div class="col-md-6 dashboard__form--label">
+          <div class="col-md-7 reset-padding col-md-offset-2">
+            <div class="col-md-6 dashboard__form--label reset-padding">
               <span class="" translate="user.employee-id"></span>
             </div>
-            <div class="col-md-10 dashboard__form--input">
+            <div class="col-md-10 dashboard__form--input reset-padding">
               <input class="" type="text" name="employeeID" ng-model="user.employeeID" ng-readonly="validateSuperAdmin()">
             </div>
           </div>
         </div>
 
-        <div class="col-md-16 row margin-top">
-          <div class="col-md-7 row">
-            <div class="col-md-6 dashboard__form--label">
+        <div class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
               <span class="" translate="user.email"></span>
               <span class="">*</span>
             </div>
-            <div class="col-md-10 dashboard__form--input">
+            <div class="col-md-10 dashboard__form--input reset-padding">
               <input class="" type="email" name="email" validate-on-blur ng-model="user.email" ng-maxlength=100 ng-readonly="validateSuperAdmin()" required>
               <div ng-show="(form.email.$dirty && form.email.$showValidationMessage && form.email.$invalid) || submitted">
                 <span class="has-error" ng-show="form.email.$error.required">
@@ -154,12 +153,12 @@
               </div>
             </div>
           </div>
-          <div class="col-md-7 row col-md-offset-2">
-            <div class="col-md-6 dashboard__form--label">
+          <div class="col-md-7 reset-padding col-md-offset-2">
+            <div class="col-md-6 dashboard__form--label reset-padding">
               <span class="" translate="user.role-text"></span>
                <span class="">*</span>
             </div>
-            <div class="col-md-10 dashboard__form__input--option">
+            <div class="col-md-10 dashboard__form__input--option reset-padding">
               <div class="custom-dropdown">
                 <select name="role" validate-on-blur ng-model="user.role" ng-readonly="validateSuperAdmin()" required>
                   <option selected value="" translate="user.role.default">Select a Role</option>
@@ -176,13 +175,15 @@
             </div>
           </div>
         </div>
+        <div class="clr"></div>
       </div>
-      <div class="col-md-16 row margin-top">
-        <div class="row padding-right-xl">
+      <div class="col-md-16 reset-padding margin-top">
+        <div class="">
           <button type="submit" class="hillrom-btn btn-submit float-right" ng-show="userStatus.isCreate" ng-click="formSubmit()" translate="user.submit-button-text">Submit</button>
           <button type="reset" ng-click="cancel()" ng-show="userStatus.isCreate" class="hillrom-btn btn-submit float-right" >Cancel</button>
           <button type="submit" class="hillrom-btn btn-submit float-right" ng-click="formSubmit()" ng-show="!userStatus.isCreate">Update</button>
           <button type="button" class="hillrom-btn btn-submit float-right" ng-click="open()" ng-show="!userStatus.isCreate">Disassociate</button>
+          <div class="clr"></div>
         </div>
       </div>
     </div>

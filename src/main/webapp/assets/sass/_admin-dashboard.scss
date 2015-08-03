@@ -394,6 +394,10 @@
   }
 }
 
+.selected-box-container {
+	height: 30px;
+}
+
 .modal {
 	background: rgba(0, 0, 0, 0.7) none repeat scroll 0 0;
 }
@@ -452,7 +456,7 @@
   border: 1px solid $bombay;
   position: absolute;
   z-index: 999;
-  width: calc(100% - 20px);
+  width: 100%;
   font-weight: normal;
   .parent-detail {
     background-color: $seashell;

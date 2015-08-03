@@ -89,7 +89,7 @@ angular.module('hillromvestApp')
               });
               $scope.init();
               $scope.reset();
-              
+
             }).catch(function(response) {
               if (response.data.message !== undefined) {
                 $scope.clinicStatus.message = response.data.message;
@@ -104,7 +104,7 @@ angular.module('hillromvestApp')
                 ttl: 5000,
                 type: "warning"
               });
-              
+
             });
           } else {
             if ($scope.clinic.type === 'parent' && $scope.clinic.parentClinic) {
@@ -158,9 +158,9 @@ angular.module('hillromvestApp')
           }).catch(function(response) {
              $scope.showModal = false;
             if (response.data.message !== undefined) {
-              $scope.clinicStatus.message = data.data.message;
+              $scope.clinicStatus.message = response.data.message;
             } else if(response.data.ERROR !== undefined){
-              $scope.clinicStatus.message = data.data.ERROR;
+              $scope.clinicStatus.message = response.data.ERROR;
             } else {
               $scope.clinicStatus.message = 'Error occured! Please try again';
             }

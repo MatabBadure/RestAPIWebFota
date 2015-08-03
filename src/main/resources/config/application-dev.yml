@@ -12,7 +12,7 @@ spring:
         url: jdbc:mysql://hillrom.ckyg8erbez54.us-west-2.rds.amazonaws.com:3306/hillromvest-dev
         databaseName:
         serverName:
-        username: hillrom
+        username: root
         password: Hillrom@123
         cachePrepStmts: true
         prepStmtCacheSize: 250

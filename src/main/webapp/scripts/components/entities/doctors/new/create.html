@@ -30,8 +30,8 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input">
-              <tags-input key-property="id" ng-model="doctor.clinics" display-property="name" min-tags="1" name="clinicAutoComplete" placeholder=".">
-                <auto-complete source="clinics" display-property="name" min-length="1"></auto-complete>
+              <tags-input key-property="id" ng-model="doctor.clinics" display-property="name" min-tags="1" name="clinicAutoComplete">
+                <auto-complete source="clinics" display-property="nameAndCity" min-length="1"></auto-complete>
               </tags-input>
               <div ng-show="form.clinicAutoComplete.$error.minTags && submitted">
                 <span class="has-error">

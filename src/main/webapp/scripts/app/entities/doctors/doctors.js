@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-    .config(function ($stateProvider) {
+    .config(function ($stateProvider, tagsInputConfigProvider) {
         $stateProvider
             .state('doctor', {
                 parent: 'entity',
@@ -23,4 +23,8 @@ angular.module('hillromvestApp')
                     }]
                 }
             });
+
+        tagsInputConfigProvider.setDefaults('tagsInput', {
+            placeholder: ''
+        });
     });

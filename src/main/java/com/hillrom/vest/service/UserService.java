@@ -388,8 +388,8 @@ public class UserService {
     public JSONObject updateUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl){
     	JSONObject jsonObject = new JSONObject();
         if(userExtensionDTO.getEmail() != null) {
-    		Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
-			if(existingUser.isPresent() && existingUser.get().getId() != id) {
+			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
+			if(existingUser.isPresent() && !existingUser.get().getId().equals(id)) {
 				jsonObject.put("ERROR", "e-mail address already in use");
 				return jsonObject;
 			}

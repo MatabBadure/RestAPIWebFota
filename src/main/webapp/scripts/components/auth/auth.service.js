@@ -8,13 +8,9 @@ angular.module('hillromvestApp')
                 var deferred = $q.defer();
 
                 AuthServerProvider.login(credentials).then(function (data) {
-                    // retrieve the logged account information
-                    // localStorage.setItem('token',);
                 	localStorage.setItem('token', data.data.id);
                     Principal.identity(true).then(function(account) {
 
-                        // After the login the language will be changed to
-                        // the language selected by the user during his registration
                         localStorage.setItem('role', account.roles[0]);
                         $translate.use(account.langKey);
                         $translate.refresh();
@@ -22,7 +18,7 @@ angular.module('hillromvestApp')
                     });
                     return cb(data);
                 }).catch(function (err) {
-                    this.logout();
+                    localStorage.removeItem('token');
                     deferred.reject(err);
                     return cb(err);
                 }.bind(this));

@@ -12,6 +12,7 @@ angular.module('hillromvestApp')
   $scope.questionVerificationFailed =false;
   $scope.submitted  = false;
   $scope.otherError = false;
+  $scope.message = "";
   $timeout(function (){angular.element('[ng-model="resetAccount.password"]').focus();});
   $scope.formSubmit = function(){
    $scope.submitted  = true;
@@ -24,31 +25,29 @@ angular.module('hillromvestApp')
 });
 
 $scope.finishReset = function() {
-  if($scope.form.$invalid){
-    return false;
+    if($scope.form.$invalid){
+      return false;
+    }
+    
+    $scope.error = null;
+    if ($scope.resetAccount.password !== $scope.resetAccount.confirmPassword) {
+      $scope.doNotMatch = 'ERROR';
+      $scope.message = "The password and its confirmation do not match!";
+    } else {
+     $scope.doNotMatch = null;
+     Auth.resetPasswordFinish($stateParams.key,$scope.resetAccount).then(function () {
+      $scope.success = 'OK';
+      localStorage.setItem('resetFinishCount',0);
+      $state.go('home');
+    }).catch(function (response) {
+      $scope.success = null;
+      if(response.status === 400 && response.data.ERROR !== undefined){
+        $scope.message = response.data.ERROR;
+      }else{
+        $scope.message = "Error occured";
+      }
+    });
   }
-  
-  $scope.error = null;
-  if ($scope.resetAccount.password !== $scope.resetAccount.confirmPassword) {
-    $scope.doNotMatch = 'ERROR';
-  } else {
-   $scope.doNotMatch = null;
-   Auth.resetPasswordFinish($stateParams.key,$scope.resetAccount).then(function () {
-    $scope.success = 'OK';
-    localStorage.setItem('resetFinishCount',0);
-    $state.go('home');
-  }).catch(function (response) {
-    $scope.success = null;
-
-    if(response.status === 400 && response.data.ERROR === 'Invalid Reset Key'){
-     $scope.error = true;
-   }else if(response.status === 400 && response.data.ERROR === 'Incorrect Security Question or Password'){
-    $scope.questionVerificationFailed = true;
-  }else{
-   $scope.otherError = true;
- }
-});
-}
 };
 
 $scope.passwordStrength = function(){

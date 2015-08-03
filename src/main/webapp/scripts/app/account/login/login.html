@@ -10,8 +10,8 @@
       <div class=" col-md-10 col-lg-10 login__container__right-section">
         <form class="login-form" role="form" name="form" ng-submit="login($event)" novalidate autocomplete="off">
           <div class="auth-heading">LOGIN TO YOUR ACCOUNT</div>
-          <div class="alert alert-danger login-has-error" ng-show="authenticationError" translate="login.messages.error.authentication">
-            <strong>Authentication failed!</strong> Please check your credentials and try again.
+          <div class="alert alert-danger login-has-error" ng-show="authenticationError">
+            <span>{{message}}</span>
           </div>
 
           <div class="text-center indent-bottom-5 login-has-error" ng-show="firstTimeAccessFailed" >Authentication failed!

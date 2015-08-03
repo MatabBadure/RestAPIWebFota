@@ -9,29 +9,17 @@
         <div class="alert alert-danger login-has-error" translate="reset.finish.messages.keymissing" ng-show="keyMissing">
                 <p>The password reset key is missing.</p>
             </div>
-
-            <div class="alert alert-danger login-has-error" ng-show="error">
-                <p translate="reset.finish.messages.error">Your password couldn't be reset. Remember a password request is only valid for 24 hours.</p>
-            </div>
             
-            <div class="alert alert-danger login-has-error" ng-show="otherError">
-                <p >Error occured!. Please try again</p>
+            <div class="alert alert-danger login-has-error">
+                <p >{{message}}</p>
             </div>
 
             <div class="alert alert-danger login-has-error" ng-show="questionsNotLoaded">
                 <p >Security questions failed to load! Please try again</p>
             </div>
 
-            <div class="alert alert-danger login-has-error" ng-show="questionVerificationFailed">
-                <p >Security question and answer didn't match!. Please try again</p>
-            </div>
-
             <div class="alert alert-success" ng-show="success">
                 <p translate="reset.finish.messages.success"><strong>Your password has been reset.</strong> Please <a href="#/login">authenticate</a>.</p>
-            </div>
-
-            <div class="alert alert-danger login-has-error" ng-show="doNotMatch" translate="global.messages.error.dontmatch">
-                The password and its confirmation do not match!
             </div>
         <form class="login-auth-form" ng-show="!success" name="form" role="form" novalidate ng-submit="finishReset()" show-validation>
           <div class="form-group">

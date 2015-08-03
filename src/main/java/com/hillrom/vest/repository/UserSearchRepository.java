@@ -166,9 +166,6 @@ public class UserSearchRepository {
 	public Page<PatientUserVO> findPatientBy(String queryString,
 			Pageable pageable, Map<String, Boolean> sortOrder) {
 
-		int firstResult = pageable.getPageNumber() * pageable.getOffset();
-		int maxResult = firstResult + pageable.getPageSize();
-
 		String findPatientUserQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName,"
 				+ " user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,user.title,patInfo.hillrom_id,user.created_date as createdAt,user.activated as isActivated "
 				+ " from USER user join USER_AUTHORITY user_authority on user_authority.user_id = user.id "
@@ -189,9 +186,8 @@ public class UserSearchRepository {
 		BigInteger count = (BigInteger) countQuery.getSingleResult();
 
 		Query query = getOrderedByQuery(findPatientUserQuery, sortOrder);
-		query.setFirstResult(firstResult);
-		query.setMaxResults(maxResult);
-
+		setPaginationParams(pageable, query);
+		
 		List<PatientUserVO> patientUsers = new LinkedList<>();
 
 		List<Object[]> results = query.getResultList();

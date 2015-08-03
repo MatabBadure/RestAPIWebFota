@@ -42,10 +42,10 @@ public class Clinic implements Serializable {
     private String state;
 
     @Column(name = "phone_number")
-    private Long phoneNumber;
+    private String phoneNumber;
 
     @Column(name = "fax_number")
-    private Long faxNumber;
+    private String faxNumber;
 
     @Column(name = "hillrom_id")
     private String hillromId;
@@ -129,19 +129,19 @@ public class Clinic implements Serializable {
         this.state = state;
     }
 
-    public Long getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(Long phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
-    public Long getFaxNumber() {
+    public String getFaxNumber() {
         return faxNumber;
     }
 
-    public void setFaxNumber(Long faxNumber) {
+    public void setFaxNumber(String faxNumber) {
         this.faxNumber = faxNumber;
     }
 

@@ -31,9 +31,6 @@ public class UserSearchRepository {
 	public Page<HillRomUserVO> findHillRomTeamUsersBy(String queryString,
 			Pageable pageable, Map<String, Boolean> sortOrder) {
 
-		int firstResult = pageable.getPageNumber() * pageable.getOffset();
-		int maxResult = firstResult + pageable.getPageSize();
-
 		String findHillromTeamUserQuery = "select distinct(user.id),user.first_name as firstName,user.last_name as lastName,user.email,"
 				+ " user_authority.authority_name as name,user.is_deleted as isDeleted,user.created_date as createdAt,user.activated as isActivated "
 				+ " from  USER_EXTENSION userExt join USER user on user.id = userExt.user_id and "
@@ -52,9 +49,7 @@ public class UserSearchRepository {
 		BigInteger count = (BigInteger) countQuery.getSingleResult();
 
 		Query query = getOrderedByQuery(findHillromTeamUserQuery, sortOrder);
-
-		query.setFirstResult(firstResult);
-		query.setMaxResults(maxResult);
+		setPaginationParams(pageable, query);
 
 		List<HillRomUserVO> hrUsersList = new ArrayList<>();
 		List<Object[]> results = query.getResultList();
@@ -81,12 +76,16 @@ public class UserSearchRepository {
 		return page;
 	}
 
+	private void setPaginationParams(Pageable pageable, Query query) {
+		int firstResult = pageable.getPageNumber() * pageable.getOffset();
+		int maxResult = pageable.getPageSize();
+		query.setFirstResult(firstResult);
+		query.setMaxResults(maxResult);
+	}
+
 	public Page<HcpVO> findHCPBy(String queryString, Pageable pageable,
 			Map<String, Boolean> sortOrder) {
-
-		int firstResult = pageable.getPageNumber() * pageable.getOffset();
-		int maxResult = firstResult + pageable.getPageSize();
-
+		
 		String findHcpQuery = "select distinct(user.id),user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted,"
 				+ " user.zipcode,userExt.address,userExt.city,userExt.credentials,userExt.fax_number,userExt.primary_phone,"
 				+ " userExt.mobile_phone,userExt.speciality,userExt.state,clinic.id as clinicId,clinic.name as clinicName,user.created_date as createdAt,user.activated isActivated "
@@ -105,9 +104,8 @@ public class UserSearchRepository {
 		BigInteger count = (BigInteger) countQuery.getSingleResult();
 
 		Query query = getOrderedByQuery(findHcpQuery, sortOrder);
-		query.setFirstResult(firstResult);
-		query.setMaxResults(maxResult);
-
+		setPaginationParams(pageable, query);
+		
 		List<HcpVO> hcpUsers = new ArrayList<>();
 
 		Map<Long, HcpVO> hcpUsersMap = new HashMap<>();
@@ -242,7 +240,7 @@ public class UserSearchRepository {
 		int limit = columnNames.size();
 		int i = 0;
 		for (String columnName : columnNames.keySet()) {
-			sb.append(columnName);
+			sb.append("lower(").append(columnName).append(")");
 
 			if (columnNames.get(columnName))
 				sb.append(" ASC");

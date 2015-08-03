@@ -2,13 +2,9 @@ package com.hillrom.vest.repository;
 
 import java.util.Optional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 
 import com.hillrom.vest.domain.PatientInfo;
 
@@ -28,5 +24,5 @@ public interface PatientInfoRepository extends JpaRepository<PatientInfo,String>
 	 * @return String hillromId
 	 */
 	@Procedure(name="PatientInfo.id")
-	String id(String inputParamhillromId,String outParamhillromId);
+	String id();
 }

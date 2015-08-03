@@ -130,7 +130,7 @@ public class UserSearchRepository {
 					BigInteger mobilePhone = (BigInteger) record[11];
 					String speciality = (String) record[12];
 					String state = (String) record[13];
-					BigInteger clinicId = (BigInteger) record[14];
+					String clinicId = (String) record[14];
 					String clinicName = (String) record[15];
 					Timestamp createdAt = (Timestamp) record[16];
 					DateTime createdAtDatetime = new DateTime(createdAt);
@@ -139,7 +139,7 @@ public class UserSearchRepository {
 
 					Map<String, String> clinicMap = new HashMap<>();
 					if (null != clinicId) {
-						clinicMap.put("id", clinicId.toString());
+						clinicMap.put("id", clinicId);
 						clinicMap.put("name", clinicName);
 					}
 					if (hcpVO == null) {

@@ -34,5 +34,5 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 	 * @return String hillromId
 	 */
 	@Procedure(procedureName="get_next_clinic_hillromid")
-	String id(String hillromId);    
+	String id();    
 }

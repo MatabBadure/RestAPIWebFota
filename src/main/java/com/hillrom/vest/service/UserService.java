@@ -370,7 +370,7 @@ public class UserService {
     	.orElseGet(() -> {
     		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
     		//Assigns Next Patient HillromId from Stored Procedure
-    		//patientInfo.setId(patientInfoRepository.id("hillrom_id","hillrom_id"));
+    		patientInfo.setId(patientInfoRepository.id());
     		patientInfoRepository.save(patientInfo);
     		assignValuesToUserObj(userExtensionDTO, newUser);
     		newUser.setPassword(passwordEncoder.encode(generateDefaultPassword((User)newUser)));

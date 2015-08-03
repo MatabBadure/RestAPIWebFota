@@ -36,7 +36,7 @@ public class ClinicService {
     	JSONObject jsonObject = new JSONObject();
     	Clinic newClinic = new Clinic();
     	// Assigns the next clinic HillromId from Stored Procedure
-    	newClinic.setId(clinicRepository.id("id"));
+    	newClinic.setId(clinicRepository.id());
     	if(clinicDTO.getParent()) {
     		newClinic.setParent(clinicDTO.getParent());
     	}

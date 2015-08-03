@@ -71,6 +71,9 @@ public class UserService {
     
     @Inject
     private ApplicationEventPublisher eventPublisher;
+
+    @Inject
+    private HillromIdGenerator hillromIdGenerator;
     
     public String generateDefaultPassword(User patientUser) {
 		StringBuilder defaultPassword = new StringBuilder();
@@ -350,7 +353,9 @@ public class UserService {
     	.orElseGet(() -> {
     		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
     		//Assigns Next Patient HillromId from Stored Procedure
-    		patientInfo.setId(patientInfoRepository.id());
+    		patientInfo.setId(hillromIdGenerator.getNextPatientHillromId());
+    		/*String id = storedProcedureTest.getNextPatientHillromId();
+    		patientInfo.setId(id);*/
     		patientInfoRepository.save(patientInfo);
     		assignValuesToUserObj(userExtensionDTO, newUser);
     		newUser.setPassword(passwordEncoder.encode(generateDefaultPassword((User)newUser)));

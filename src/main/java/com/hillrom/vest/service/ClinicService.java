@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.repository.ClinicRepository;
+import com.hillrom.vest.repository.HillromIdGenerator;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 
@@ -31,12 +32,15 @@ public class ClinicService {
 
     @Inject
     private ClinicRepository clinicRepository;
+    
+    @Inject
+    private HillromIdGenerator hillromIdGenerator;
 
     public JSONObject createClinic(ClinicDTO clinicDTO) {
     	JSONObject jsonObject = new JSONObject();
     	Clinic newClinic = new Clinic();
     	// Assigns the next clinic HillromId from Stored Procedure
-    	newClinic.setId(clinicRepository.id());
+    	newClinic.setId(hillromIdGenerator.getNextClinicHillromId());
     	if(clinicDTO.getParent()) {
     		newClinic.setParent(clinicDTO.getParent());
     	}

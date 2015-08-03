@@ -34,6 +34,13 @@ angular.module('hillromvestApp')
           timer = $timeout(function() {
             ClinicService.getAllClinics('/api/clinics?filter=parent:true').then(function(response) {
               $scope.clinics = response.data;
+               for(var i=0 ; i < $scope.clinics.length ; i++) {
+                if($scope.clinics[i].city) {
+                  $scope.clinics[i].nameAndCity = $scope.clinics[i].name + "," +$scope.clinics[i].city;
+                } else {
+                  $scope.clinics[i].nameAndCity = $scope.clinics[i].name;
+                }
+              }
             }).catch(function(response) {
 
             });
@@ -65,8 +72,6 @@ angular.module('hillromvestApp')
           }
 
           if ($scope.doctorStatus.editMode) {
-
-
             $scope.doctor.clinicList = [];
             for (var i = 0; i < $scope.doctor.clinics.length; i++) {
               $scope.doctor.clinicList.push({
@@ -106,14 +111,10 @@ angular.module('hillromvestApp')
                 'id': $scope.doctor.clinics[i].id
               });
             }
-
-
             var data = $scope.doctor;
             data.role = 'HCP';
-            delete data.clinics;
             UserService.createUser(data).then(function(response) {
               $scope.doctorStatus.isMessage = true;
-              // $scope.doctorStatus.message = "Doctor created successfully" + " with ID " + response.data.user.id;
               $scope.doctorStatus.message = "Doctor created successfully";
               noty.showNoty({
                 text: $scope.doctorStatus.message,

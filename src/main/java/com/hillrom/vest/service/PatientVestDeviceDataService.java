@@ -32,22 +32,31 @@ public class PatientVestDeviceDataService {
 	private PatientInfoRepository patientInfoRepository;
 
 	public List<PatientVestDeviceData> save(final String rawData) {
-		PatientVestDeviceRawLog deviceRawLog = deviceLogParser
-				.parseBase64StringToPatientVestDeviceRawLog(rawData);
-		List<PatientVestDeviceData> patientVestDeviceRecords = deviceLogParser
-				.parseBase64StringToPatientVestDeviceLogEntry(deviceRawLog
-						.getDeviceData());
-		
-		String deviceAddress = deviceRawLog.getDeviceAddress();
+		PatientVestDeviceRawLog deviceRawLog = null;
+		List<PatientVestDeviceData> patientVestDeviceRecords = null;
+		try {
+			deviceRawLog = deviceLogParser
+					.parseBase64StringToPatientVestDeviceRawLog(rawData);
+			
+			deviceRawLogRepository.save(deviceRawLog);
 
-		PatientInfo patientInfo = createPatientInfoIfNotExists(deviceRawLog,
-				deviceAddress);
-		assignDefaultValuesToVestDeviceData(deviceRawLog,
-				patientVestDeviceRecords, patientInfo);
+			patientVestDeviceRecords = deviceLogParser
+					.parseBase64StringToPatientVestDeviceLogEntry(deviceRawLog
+							.getDeviceData());
+			
+			String deviceAddress = deviceRawLog.getDeviceAddress();
 
-		deviceDataRepository.save(patientVestDeviceRecords);
-		deviceRawLogRepository.save(deviceRawLog);
+			PatientInfo patientInfo = createPatientInfoIfNotExists(deviceRawLog,
+					deviceAddress);
+			assignDefaultValuesToVestDeviceData(deviceRawLog,
+					patientVestDeviceRecords, patientInfo);
+
+			deviceDataRepository.save(patientVestDeviceRecords);
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
 		return patientVestDeviceRecords;
+		
 	}
 
 	private PatientInfo createPatientInfoIfNotExists(

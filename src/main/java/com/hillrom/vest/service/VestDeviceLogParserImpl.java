@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants;
 import com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants;
-import com.hillrom.vest.config.VestDeviceRawLogOffsetConstants;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.service.util.ParserUtil;
@@ -19,6 +18,7 @@ import com.hillrom.vest.service.util.ParserUtil;
 @Component
 public class VestDeviceLogParserImpl implements DeviceLogParser {
 
+	private static final String EXPECTED_STRING = "24454F50F0F0F0F0";
 	private static final String YYYY_MMM_DD_HH_MM_SS = "yyyy-MMM-dd hh:mm:ss";
 	private static final int RECORD_SIZE = 16;
 
@@ -96,6 +96,10 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 		String base16String = ParserUtil.convertToBase16String(base64String);
 		if (base16String.length() <= 16)
 			return patientVestDeviceRecords;
+		base16String.substring(base16String.length()-16);
+	
+		if(!base16String.toUpperCase().trim().equals(EXPECTED_STRING))
+			throw new IllegalArgumentException("Could not parse data, Request contains Partial Data");
 
 		int logcount = 1;
 		int start;
@@ -163,23 +167,8 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 						VestDeviceLogEntryOffsetConstants.HMR_MINUTE_START_OFFSET,
 						VestDeviceLogEntryOffsetConstants.HMR_MINUTE_END_OFFSET);
 		Long hmrMinutesReadingLong = ParserUtil.convertHexStringToLong(hmrMinutesReadingString);
-		return (double) (hmrHourReadingLong * 60 + hmrMinutesReadingLong) / 60;
+		return (double) (hmrHourReadingLong * 60*60 + hmrMinutesReadingLong * 60);
 	}
-
-	/*private String getPatientVestDeviceDataBluetoothId(String base16String) {
-		String bluetoothId = ParserUtil.getFieldByStartAndEndOffset(
-				base16String,
-				VestDeviceRawLogOffsetConstants.BT_ADDR_START_OFFSET,
-				VestDeviceRawLogOffsetConstants.BT_ADDR_END_OFFSET);
-		
-		StringBuilder btAddressBuilder = new StringBuilder();
-		
-		for(int i =0 ;i <bluetoothId.length();i+=2){
-			btAddressBuilder.append(bluetoothId.substring(i,i+2));
-			btAddressBuilder.append(":");
-		}
-		return btAddressBuilder.toString();
-	}*/
 
 	private String getPatientVestDeviceEventCode(String base16String) {
 		String eventCodeString = ParserUtil.getFieldByStartAndEndOffset(

@@ -345,17 +345,18 @@ public class UserService {
     
     public UserExtension createPatientUser(UserExtensionDTO userExtensionDTO) {
     	UserExtension newUser = new UserExtension();
-    	PatientInfo patientInfo = new PatientInfo();
     	patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId())
     	.map(patient -> {
     		return newUser;
     	})
     	.orElseGet(() -> {
+    		PatientInfo patientInfo = new PatientInfo();
     		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
     		//Assigns Next Patient HillromId from Stored Procedure
-    		patientInfo.setId(hillromIdGenerator.getNextPatientHillromId());
+    		//patientInfo.setId(hillromIdGenerator.getNextPatientHillromId());
     		/*String id = storedProcedureTest.getNextPatientHillromId();
     		patientInfo.setId(id);*/
+    		patientInfo.setId(patientInfoRepository.id());
     		patientInfoRepository.save(patientInfo);
     		assignValuesToUserObj(userExtensionDTO, newUser);
     		newUser.setPassword(passwordEncoder.encode(generateDefaultPassword((User)newUser)));

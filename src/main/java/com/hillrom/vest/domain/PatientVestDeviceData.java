@@ -1,6 +1,7 @@
 package com.hillrom.vest.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -95,7 +96,7 @@ public class PatientVestDeviceData implements Serializable {
 	public void setEventId(String eventId) {
 		this.eventId = eventId;
 	}
-
+	
 	public Double getHmr() {
 		return hmr;
 	}
@@ -103,7 +104,7 @@ public class PatientVestDeviceData implements Serializable {
 	public void setHmr(Double hmr) {
 		this.hmr = hmr;
 	}
-	
+
 	public Integer getFrequency() {
 		return frequency;
 	}

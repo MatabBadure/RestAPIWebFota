@@ -6,6 +6,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import net.minidev.json.JSONObject;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -36,14 +38,21 @@ public class PatientVestDeviceDataResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> receiveData(HttpServletRequest request){
-		List<PatientVestDeviceData> deviceData =deviceDataService.save(request.getQueryString());
+		List<PatientVestDeviceData> deviceData = null;
+		try{			
+			deviceData = deviceDataService.save(request.getQueryString());
+		}catch(Exception e){
+			JSONObject error = new JSONObject();
+			error.put("message", e.getMessage());
+			return new ResponseEntity(error,HttpStatus.PARTIAL_CONTENT);
+		}
 		return new ResponseEntity(deviceData,HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(value = "/patient/{id}/vestdevicedata",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<PatientVestDeviceData>> findByPatientId(@PathVariable Long id,
+	public ResponseEntity<List<PatientVestDeviceData>> findByPatientId(@PathVariable String id,
 			@RequestParam(value="page",required=false)Integer pageNo,
 			@RequestParam(value="per_page",required=false)Integer per_page) throws URISyntaxException{
 		Page<PatientVestDeviceData> page = deviceDataRepository.findLatest(id,PaginationUtil.generatePageRequest(pageNo, per_page));

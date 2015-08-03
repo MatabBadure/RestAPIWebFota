@@ -25,5 +25,6 @@
     <include file="classpath:config/liquibase/changelog/20150728182300_drop_recreate_table_PatientVestDeviceRawLogs.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150728231200_create_table_PatientVestDeviceData.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150801161900_add_created_at_Clinic.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150803201900_update_phone_number_datatype.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
 

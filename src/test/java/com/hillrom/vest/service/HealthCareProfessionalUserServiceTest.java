@@ -110,7 +110,7 @@ public class HealthCareProfessionalUserServiceTest {
 
 	@Test
 	public void dissociateClinicFromHCPUserSuccessfully(){
-		clinicDTO = new ClinicDTO("Fortis Hospital", "Bannerghatta Road", 560042, "Bangalore", "Karnataka", Long.parseLong("7896541230"), Long.parseLong("9874563210"), null, true, null);
+		clinicDTO = new ClinicDTO("Fortis Hospital", "Bannerghatta Road", 560042, "Bangalore", "Karnataka", "7896541230", "9874563210", null, true, null);
 	    JSONObject clinicJsonObject = clinicService.createClinic(clinicDTO);
 		clinic = (Clinic)clinicJsonObject.get("Clinic");
 

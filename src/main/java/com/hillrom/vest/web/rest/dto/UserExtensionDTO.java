@@ -18,13 +18,13 @@ public class UserExtensionDTO extends UserDTO {
     private String credentials;
 
     @Size(min = 5, max = 100)
-    private Long primaryPhone;
+    private String primaryPhone;
 
     @Size(min = 2, max = 100)
-    private Long mobilePhone;
+    private String mobilePhone;
 
     @Size(min = 2, max = 100)
-    private Long faxNumber;
+    private String faxNumber;
     
     @Size(min = 2, max = 100)
     private String address;
@@ -53,7 +53,7 @@ public class UserExtensionDTO extends UserDTO {
     }
 
 	public UserExtensionDTO(String speciality, String credentials,
-			Long primaryPhone, Long mobilePhone, Long faxNumber,
+			String primaryPhone, String mobilePhone, String faxNumber,
 			String address, String city, String state, String npiNumber,
 			String role, List<Map<String, String>> clinicList) {
 		super();
@@ -86,27 +86,27 @@ public class UserExtensionDTO extends UserDTO {
 		this.credentials = credentials;
 	}
 
-	public Long getPrimaryPhone() {
+	public String getPrimaryPhone() {
 		return primaryPhone;
 	}
 
-	public void setPrimaryPhone(Long primaryPhone) {
+	public void setPrimaryPhone(String primaryPhone) {
 		this.primaryPhone = primaryPhone;
 	}
 
-	public Long getMobilePhone() {
+	public String getMobilePhone() {
 		return mobilePhone;
 	}
 
-	public void setMobilePhone(Long mobilePhone) {
+	public void setMobilePhone(String mobilePhone) {
 		this.mobilePhone = mobilePhone;
 	}
 
-	public Long getFaxNumber() {
+	public String getFaxNumber() {
 		return faxNumber;
 	}
 
-	public void setFaxNumber(Long faxNumber) {
+	public void setFaxNumber(String faxNumber) {
 		this.faxNumber = faxNumber;
 	}
 

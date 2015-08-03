@@ -316,7 +316,6 @@ public class UserService {
                 mailService.sendActivationEmail(user, baseUrl);
                 jsonObject.put("message", "HealthCare Professional created successfully.");
                 jsonObject.put("user", user);
-                jsonObject.put("clinics", user.getClinics());
                 return jsonObject;
         	} else {
     			jsonObject.put("ERROR", "Unable to create HealthCare Professional.");
@@ -807,7 +806,6 @@ public class UserService {
 		if(hcpUser.getId() != null) {
 			jsonObject.put("message", "HealthCare Professional fetched successfully.");
 		    jsonObject.put("user", hcpUser);
-		    jsonObject.put("clinics", hcpUser.getClinics());
 		} else {
 			jsonObject.put("ERROR", "Unable to fetch HealthCare Professional.");
 		}	

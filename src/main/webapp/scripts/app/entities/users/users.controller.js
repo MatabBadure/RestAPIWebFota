@@ -20,8 +20,8 @@ angular.module('hillromvestApp')
       $scope.userStatus.isCreate = true;
       $scope.userStatus.isMessage = false;
       $scope.user = {
-        title: 'Mr.',
-        role: 'ADMIN'
+        title: hillRomUser.title,
+        role: hillRomUser.role
       };
 
     };

@@ -41,7 +41,7 @@ public class ClinicDTO {
 	private Boolean parent;
 
 	@Size(max = 50)
-    private Map<String, Long> parentClinic = new HashMap<>();
+    private Map<String, String> parentClinic = new HashMap<>();
 
 	public ClinicDTO() {
 		super();
@@ -127,11 +127,11 @@ public class ClinicDTO {
 		this.hillromId = hillromId;
 	}
 
-	public Map<String, Long> getParentClinic() {
+	public Map<String, String> getParentClinic() {
 		return parentClinic;
 	}
 
-	public void setParentClinic(Map<String, Long> parentClinic) {
+	public void setParentClinic(Map<String, String> parentClinic) {
 		this.parentClinic = parentClinic;
 	}
 

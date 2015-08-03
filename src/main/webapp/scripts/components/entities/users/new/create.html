@@ -160,11 +160,17 @@
             </div>
             <div class="col-md-10 dashboard__form__input--option reset-padding">
               <div class="custom-dropdown">
-                <select name="role" ng-model="user.role" ng-readonly="validateSuperAdmin()">
-                  <option selected translate="user.role.super-admin" value="ADMIN">Super Admin</option>
+                <select name="role" validate-on-blur ng-model="user.role" ng-readonly="validateSuperAdmin()" required>
+                  <option selected value="" translate="user.role.default">Select a Role</option>
+                  <option translate="user.role.super-admin" value="ADMIN">Super Admin</option>
                   <option translate="user.role.account-services" value="ACCT_SERVICES">Account Services</option>
                   <option translate="user.role.associates" value="ASSOCIATES">Associates</option>
                 </select>
+                <div ng-show="(form.role.$dirty && form.role.$showValidationMessage && form.role.$invalid) || submitted">
+                  <span class="has-error" ng-show="form.role.$error.required">
+                     Role is required.
+                  </span>
+                </div>
               </div>
             </div>
           </div>

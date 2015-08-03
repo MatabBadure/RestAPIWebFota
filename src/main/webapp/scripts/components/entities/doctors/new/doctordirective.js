@@ -32,11 +32,16 @@ angular.module('hillromvestApp')
         $scope.getParentClinics = function() {
           var timer = false;
           timer = $timeout(function() {
-            ClinicService.getAllClinics('/api/clinics?filter=parent:true').then(function(response) {
+            ClinicService.getAllClinics('/api/clinics?filter=deleted:false').then(function(response) {
               $scope.clinics = response.data;
-            }).catch(function(response) {
-
-            });
+              angular.forEach($scope.clinics, function(clinic) {
+                if(clinic.city) {
+                  clinic.nameAndCity = clinic.name + "," + clinic.city;
+                } else {
+                  clinic.nameAndCity = clinic.name;
+                }
+              });
+            }).catch(function(response) {});
           }, 1000)
         };
 
@@ -63,16 +68,11 @@ angular.module('hillromvestApp')
           if ($scope.form.$invalid) {
             return false;
           }
-
+          $scope.doctor.clinicList = [];
+          angular.forEach($scope.doctor.clinics, function(clinic){
+            $scope.doctor.clinicList.push({'id': clinic.id});
+          });
           if ($scope.doctorStatus.editMode) {
-
-
-            $scope.doctor.clinicList = [];
-            for (var i = 0; i < $scope.doctor.clinics.length; i++) {
-              $scope.doctor.clinicList.push({
-                'id': $scope.doctor.clinics[i].id
-              });
-            }
             $scope.doctor.role = 'HCP';
             UserService.editUser($scope.doctor).then(function(response) {
               $scope.doctorStatus.isMessage = true;
@@ -99,21 +99,10 @@ angular.module('hillromvestApp')
               });
             });
           } else {
-            // create doctor section
-            $scope.doctor.clinicList = [];
-            for (var i = 0; i < $scope.doctor.clinics.length; i++) {
-              $scope.doctor.clinicList.push({
-                'id': $scope.doctor.clinics[i].id
-              });
-            }
-
-
             var data = $scope.doctor;
             data.role = 'HCP';
-            delete data.clinics;
             UserService.createUser(data).then(function(response) {
               $scope.doctorStatus.isMessage = true;
-              // $scope.doctorStatus.message = "Doctor created successfully" + " with ID " + response.data.user.id;
               $scope.doctorStatus.message = "Doctor created successfully";
               noty.showNoty({
                 text: $scope.doctorStatus.message,

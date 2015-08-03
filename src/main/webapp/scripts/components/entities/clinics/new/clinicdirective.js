@@ -77,7 +77,7 @@ angular.module('hillromvestApp')
               delete data.parentClinic;
               data.parentClinic ={};
               data.parentClinic.id = id;
-              //$scope.clinic.parentClinic.name = name;
+              $scope.clinic.parentClinic.name = name;
             }
             ClinicService.updateClinic(data).then(function(data) {
               $scope.clinicStatus.isMessage = true;
@@ -109,15 +109,8 @@ angular.module('hillromvestApp')
           } else {
             if ($scope.clinic.type === 'parent' && $scope.clinic.parentClinic) {
               delete $scope.clinic.parentClinic;
-            } else {
             }
-            // create clinic section
-            var data = $scope.clinic;
-             if (data.parentClinic) {
-               delete data.parentClinic.name;
-               //$scope.clinic.parentClinic.name = data.parentClinic.name;
-            }
-            ClinicService.createClinic(data).then(function(data) {
+            ClinicService.createClinic($scope.clinic).then(function(data) {
               $scope.clinicStatus.isMessage = true;
               $scope.clinicStatus.message = "Clinic created successfully";
               noty.showNoty({
@@ -129,9 +122,9 @@ angular.module('hillromvestApp')
             }).catch(function(response) {
               if (response.data.message !== undefined) {
                 $scope.clinicStatus.message = response.data.message;
-              }else if(response.data.ERROR !== undefined){
-              $scope.clinicStatus.message = data.data.ERROR;
-              }else {
+              } else if(response.data.ERROR !== undefined) {
+                $scope.clinicStatus.message = response.data.ERROR;
+              } else {
                 $scope.clinicStatus.message = 'Error occured! Please try again';
               }
               $scope.clinicStatus.isMessage = true;

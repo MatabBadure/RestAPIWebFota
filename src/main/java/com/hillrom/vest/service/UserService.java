@@ -316,7 +316,6 @@ public class UserService {
                 mailService.sendActivationEmail(user, baseUrl);
                 jsonObject.put("message", "HealthCare Professional created successfully.");
                 jsonObject.put("user", user);
-                jsonObject.put("clinics", user.getClinics());
                 return jsonObject;
         	} else {
     			jsonObject.put("ERROR", "Unable to create HealthCare Professional.");
@@ -354,7 +353,7 @@ public class UserService {
     		newUser.setPassword(passwordEncoder.encode(generateDefaultPassword((User)newUser)));
     		newUser.setActivated(true);
     		newUser.setDeleted(false);
-    		if(AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
+    		if(newUser.getEmail() == null && AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
     			newUser.setEmail(userExtensionDTO.getHillromId());
     		}
     		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
@@ -468,6 +467,24 @@ public class UserService {
     public UserExtension updateHCPUser(Long id, UserExtensionDTO userExtensionDTO) {
     	UserExtension hcpUser = userExtensionRepository.findOne(id);
 		assignValuesToUserObj(userExtensionDTO, hcpUser);
+		List<String> existingClinicIds = new ArrayList<String>();
+		List<String> newClinicIds = new ArrayList<String>();
+		for(Clinic clinic : hcpUser.getClinics()) {
+			existingClinicIds.add(clinic.getId().toString());
+		}
+		for(Map<String, String> childClinic : userExtensionDTO.getClinicList()) {
+			newClinicIds.add(childClinic.get("id"));
+		}
+		List<String> clinicsToBeAdded = RandomUtil.getDifference(newClinicIds, existingClinicIds);
+		List<String> clinicsToBeRemoved = RandomUtil.getDifference(existingClinicIds, newClinicIds);
+		for(String clinicId : clinicsToBeRemoved) {
+			Clinic clinic = clinicRepository.getOne(Long.parseLong(clinicId));
+			hcpUser.getClinics().remove(clinic);
+		}
+		for(String clinicId : clinicsToBeAdded) {
+			Clinic clinic = clinicRepository.getOne(Long.parseLong(clinicId));
+			hcpUser.getClinics().add(clinic);
+		}		
 		userExtensionRepository.save(hcpUser);
 		log.debug("Updated Information for HealthCare Proffessional: {}", hcpUser);
 		return hcpUser;
@@ -731,12 +748,14 @@ public class UserService {
 		if(existingUser.getId() != null) {
 				if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))) {
 				if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
-					userExtensionRepository.delete(existingUser);
+					existingUser.setDeleted(true);
+					userExtensionRepository.save(existingUser);
 					jsonObject.put("message", "Patient User deleted successfully.");
 					//TO-DO CareGiver deactivate Stuff
 				} else if((existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN)))) {
-					userExtensionRepository.delete(existingUser);
+					existingUser.setDeleted(true);
+					userExtensionRepository.save(existingUser);
 					jsonObject.put("message", "User deleted successfully.");
 				} else {
 					jsonObject.put("ERROR", "Unable to delete User.");
@@ -748,7 +767,8 @@ public class UserService {
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN)))) {
-				userExtensionRepository.delete(existingUser);
+				existingUser.setDeleted(true);
+				userExtensionRepository.save(existingUser);
 				jsonObject.put("message", "User deleted successfully.");
 			} else {
 				jsonObject.put("ERROR", "Unable to delete User.");
@@ -807,7 +827,6 @@ public class UserService {
 		if(hcpUser.getId() != null) {
 			jsonObject.put("message", "HealthCare Professional fetched successfully.");
 		    jsonObject.put("user", hcpUser);
-		    jsonObject.put("clinics", hcpUser.getClinics());
 		} else {
 			jsonObject.put("ERROR", "Unable to fetch HealthCare Professional.");
 		}	

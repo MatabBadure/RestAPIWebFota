@@ -44,12 +44,14 @@ angular.module('hillromvestApp')
           if (track === "PREV" && $scope.currentPageIndex > 1) {
             $scope.currentPageIndex--;
           }
-          else if (track === "NEXT" && $scope.currentPageIndex < $scope.pageCount)
-            {
+          else if (track === "NEXT" && $scope.currentPageIndex < $scope.pageCount){
               $scope.currentPageIndex++;
-            }else{
+          }
+          else{
               return false;
-            }
+          }
+        }else {
+            $scope.currentPageIndex = 1;
         }
         ClinicService.getClinics($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
           $scope.clinics = response.data;

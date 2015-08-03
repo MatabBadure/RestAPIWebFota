@@ -3,6 +3,7 @@ package com.hillrom.vest.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
@@ -11,6 +12,7 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.J
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -20,6 +22,8 @@ import java.util.*;
 @Entity
 @Table(name = "CLINIC")
 @SQLDelete(sql="UPDATE CLINIC SET is_deleted = 1 WHERE id = ?")
+@NamedStoredProcedureQuery(name = "Clinic.id", procedureName = "get_next_clinic_hillromid", parameters = {
+		@StoredProcedureParameter(mode = ParameterMode.OUT, name = "hillrom_id", type = String.class) })
 public class Clinic implements Serializable {
 
     @Id

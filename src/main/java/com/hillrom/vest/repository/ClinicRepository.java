@@ -2,6 +2,8 @@ package com.hillrom.vest.repository;
 
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,6 +35,7 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 	 * This returns hillromId of the patient from stored procedure.
 	 * @return String hillromId
 	 */
-	@Procedure(procedureName="get_next_clinic_hillromid")
+	@Procedure(name="Clinic.id")
+	@Transactional
 	String id();    
 }

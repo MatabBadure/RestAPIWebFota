@@ -31,7 +31,14 @@
 				<constraints nullable="false" />
 			</column>
 			<column name="is_parent" type="boolean" valueBoolean="false"/>
+			<column name="clinic_admin_id" type="bigint" />
 			<column name="created_date" type="timestamp" defaultValueComputed="${now}"/>
         </createTable>        
+        
+        <addForeignKeyConstraint baseColumnNames="clinic_admin_id"
+                                 baseTableName="CLINIC"
+                                 constraintName="fk_clinic_admin_user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="USER"/>
     </changeSet>
 </databaseChangeLog>

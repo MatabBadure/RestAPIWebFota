@@ -92,7 +92,7 @@ public class UserResource {
 		Map<String, Boolean> sortOrder = new HashMap<>();
 		if (sortBy != null && !sortBy.equals("")) {
 			isAscending = (isAscending != null) ? isAscending : true;
-			sortOrder.put(sortBy, isAscending);
+			sortOrder.put("user." + sortBy, isAscending);
 		}
 		Page<PatientUserVO> page = userSearchRepository.findPatientBy(
 				queryString, PaginationUtil.generatePageRequest(offset, limit),

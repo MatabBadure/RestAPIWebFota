@@ -17,9 +17,9 @@ public class HcpVO {
 	private String address;
 	private String city;
 	private String credentials;
-	private BigInteger faxNumber;
-	private BigInteger primaryPhone;
-	private BigInteger mobilePhone;
+	private String faxNumber;
+	private String primaryPhone;
+	private String mobilePhone;
 	private String speciality;
 	private String state;
 	private List<Map<String,String>> clinics = new LinkedList<>();
@@ -29,7 +29,7 @@ public class HcpVO {
 	
 	public HcpVO(Long id, String firstName, String lastName, String email,boolean isDeleted,
 			Integer zipcode, String address, String city, String credentials,
-			BigInteger faxNumber, BigInteger primaryPhone, BigInteger mobilePhone,
+			String faxNumber, String primaryPhone, String mobilePhone,
 			String speciality, String state,DateTime createdAt,boolean isActivated) {
 		super();
 		this.id = id;
@@ -98,22 +98,22 @@ public class HcpVO {
 		this.credentials = credentials;
 	}
 	
-	public BigInteger getFaxNumber() {
+	public String getFaxNumber() {
 		return faxNumber;
 	}
-	public void setFaxNumber(BigInteger faxNumber) {
+	public void setFaxNumber(String faxNumber) {
 		this.faxNumber = faxNumber;
 	}
-	public BigInteger getPrimaryPhone() {
+	public String getPrimaryPhone() {
 		return primaryPhone;
 	}
-	public void setPrimaryPhone(BigInteger primaryPhone) {
+	public void setPrimaryPhone(String primaryPhone) {
 		this.primaryPhone = primaryPhone;
 	}
-	public BigInteger getMobilePhone() {
+	public String getMobilePhone() {
 		return mobilePhone;
 	}
-	public void setMobilePhone(BigInteger mobilePhone) {
+	public void setMobilePhone(String mobilePhone) {
 		this.mobilePhone = mobilePhone;
 	}
 	public String getSpeciality() {

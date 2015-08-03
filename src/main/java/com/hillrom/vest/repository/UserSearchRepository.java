@@ -123,9 +123,9 @@ public class UserSearchRepository {
 					String city = (String) record[7];
 					String credentials = (String) record[8];
 					
-					BigInteger faxNumber =  (BigInteger) record[9]; 
-					BigInteger primaryPhone = (BigInteger) record[10];
-					BigInteger mobilePhone = (BigInteger) record[11];
+					String faxNumber =  (String) record[9]; 
+					String primaryPhone = (String) record[10];
+					String mobilePhone = (String) record[11];
 					String speciality = (String) record[12];
 					String state = (String) record[13];
 					BigInteger clinicId = (BigInteger) record[14];

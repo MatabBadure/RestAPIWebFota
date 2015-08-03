@@ -48,8 +48,6 @@ angular.module('hillromvestApp')
           var url = '/api/user/' + doctor.id + '/hcp';
           UserService.getUser(doctor.id, url).then(function(response) {
             $scope.doctor = response.data.user;
-            //Todo : Clinics should come in user from backend
-            $scope.doctor.clinics = response.data.clinics;
             $scope.onSelect({
               'doctor': $scope.doctor
             });

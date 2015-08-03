@@ -24,6 +24,9 @@
                 "keymissing": "The reset key is missing.",
                 "error": "Your password couldn't be reset. Remember a password request is only valid for 24 hours."
             }
+        },
+        "placeholder": {
+            "security-answer": "Enter Your Answer"
         }
     }
 

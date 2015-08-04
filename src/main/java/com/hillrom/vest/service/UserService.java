@@ -444,6 +444,8 @@ public class UserService {
     public UserExtension updateHillromTeamUser(Long id, UserExtensionDTO userExtensionDTO) {
     	UserExtension user = userExtensionRepository.findOne(id);
 		assignValuesToUserObj(userExtensionDTO, user);
+		// clearing existing roles for the user
+		user.getAuthorities().clear();
 		user.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
 		userExtensionRepository.save(user);
 		log.debug("Updated Information for Hillrom User: {}", user);

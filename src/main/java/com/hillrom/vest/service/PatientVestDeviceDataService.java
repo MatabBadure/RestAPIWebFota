@@ -14,9 +14,10 @@ import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
+import com.hillrom.vest.service.util.RequestUtil;
 
 @Service
-@Transactional
+@Transactional(noRollbackFor=RuntimeException.class)
 public class PatientVestDeviceDataService {
 
 	@Inject
@@ -38,8 +39,6 @@ public class PatientVestDeviceDataService {
 			deviceRawLog = deviceLogParser
 					.parseBase64StringToPatientVestDeviceRawLog(rawData);
 			
-			deviceRawLogRepository.save(deviceRawLog);
-			
 			patientVestDeviceRecords = deviceLogParser
 					.parseBase64StringToPatientVestDeviceLogEntry(deviceRawLog
 							.getDeviceData());
@@ -54,9 +53,10 @@ public class PatientVestDeviceDataService {
 			deviceDataRepository.save(patientVestDeviceRecords);
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
+		}finally{
+			deviceRawLogRepository.save(deviceRawLog);
 		}
 		return patientVestDeviceRecords;
-		
 	}
 
 	private PatientInfo createPatientInfoIfNotExists(

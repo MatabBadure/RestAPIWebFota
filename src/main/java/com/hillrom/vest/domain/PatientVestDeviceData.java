@@ -49,6 +49,8 @@ public class PatientVestDeviceData implements Serializable {
 	@JoinColumn(name="patient_id",referencedColumnName="id")
 	private PatientInfo patient;
 
+	private Integer checksum;
+	
 	public Long getTimestamp() {
 		return timestamp;
 	}
@@ -137,7 +139,14 @@ public class PatientVestDeviceData implements Serializable {
 		this.patient = patient;
 	}
 
-	
+	public Integer getChecksum() {
+		return checksum;
+	}
+
+	public void setChecksum(Integer checksum) {
+		this.checksum = checksum;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -179,14 +188,13 @@ public class PatientVestDeviceData implements Serializable {
 
 	@Override
 	public String toString() {
-		return "\nPatientVestDeviceData [timestamp=" + timestamp
-				+ ", sequenceNumber=" + sequenceNumber + ", serialNumber="
-				+ serialNumber + ", bluetoothId=" + bluetoothId + ", hubId="
-				+ hubId + ", eventId=" + eventId + ", hmr=" + hmr
+		return "PatientVestDeviceData [timestamp=" + timestamp
+				+ ", sequenceNumber=" + sequenceNumber + ", eventId=" + eventId
+				+ ", serialNumber=" + serialNumber + ", bluetoothId="
+				+ bluetoothId + ", hubId=" + hubId + ", hmr=" + hmr
 				+ ", frequency=" + frequency + ", pressure=" + pressure
-				+ ", duration=" + duration + "]";
-	}
-	
-	
+				+ ", duration=" + duration + ", patient=" + patient
+				+ ", checksum=" + checksum + "]";
+	}	
 
 }

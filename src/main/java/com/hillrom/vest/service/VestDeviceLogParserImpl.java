@@ -88,6 +88,11 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 				rawMessage, PatientVestDeviceRawLogModelConstants.HUB_ID));
 		patientVestDeviceRawLog.setTimezone(ParserUtil.getValueFromMessage(
 				rawMessage, PatientVestDeviceRawLogModelConstants.TIMEZONE));
+		patientVestDeviceRawLog
+				.setHubReceiveTimeOffset(ParserUtil
+						.getValueFromMessage(
+								rawMessage,
+								PatientVestDeviceRawLogModelConstants.HUB_RECEIVE_TIME_OFFSET));
 		return patientVestDeviceRawLog;
 	}
 
@@ -139,6 +144,7 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 				.setEventId(getPatientVestDeviceEventCode(base16String));
 		patientVestDeviceData.setTimestamp(getPatientVestDeviceDataTimeStamp(
 				base16String).getMillis());
+		patientVestDeviceData.setChecksum(getPatientVestDeviceDataChecksum(base16String));
 		return patientVestDeviceData;
 	}
 
@@ -235,6 +241,14 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 		return timestamp;
 	}
 
+	private int getPatientVestDeviceDataChecksum(String base16String){
+		String checksumString = ParserUtil.getFieldByStartAndEndOffset(
+				base16String,
+				VestDeviceLogEntryOffsetConstants.CHECKSUM_START_OFFSET,
+				VestDeviceLogEntryOffsetConstants.CHECKSUM_END_OFFSET);
+		return ParserUtil.convertHexStringToInteger(checksumString);
+	}
+	
 	private String getEventString(int eventCode) {
 
 		String eventString;

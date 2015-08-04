@@ -27,6 +27,7 @@
 			<column name="frequency" type="integer" />
 			<column name="pressure" type="integer" />
 			<column name="duration" type="integer" />
+			<column name="checksum" type="integer" />
 		</createTable>
 		<addPrimaryKey columnNames="timestamp, sequence_number,event_id"
             constraintName="pk_patient_vest_device_data"

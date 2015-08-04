@@ -46,7 +46,7 @@ angular.module('hillromvestApp')
       },
 
       getAllClinics: function(url) {
-        var url = url || '/api/clinics';
+        var url = url || '/api/clinics?page=1&per_page=100&filter=deleted:false,parent:true';
         return $http.get(url, {
           headers: headerService.getHeader()
         }).success(function(response) {

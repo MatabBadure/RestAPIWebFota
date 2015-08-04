@@ -37,7 +37,8 @@
         "role": {
             "super-admin": "Super Admin",
             "account-services": "Account Services",
-            "associates":"Associates"
+            "associates":"Associates",
+            "default" : "Select a role"
         },
         "first-name": "First Name",
         "middle-name": "Middle Name",

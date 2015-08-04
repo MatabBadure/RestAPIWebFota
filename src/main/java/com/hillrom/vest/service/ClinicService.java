@@ -45,7 +45,7 @@ public class ClinicService {
     		newClinic.setParent(clinicDTO.getParent());
     	}
     	if(clinicDTO.getParentClinic().get("id") != null) {
-    		Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
+    		Clinic parentClinic = clinicRepository.getOne(Long.parseLong(clinicDTO.getParentClinic().get("id")));
    			parentClinic.setParent(true);
    			clinicRepository.save(parentClinic);
    			newClinic.setParentClinic(parentClinic);
@@ -86,8 +86,8 @@ public class ClinicService {
 	        		clinic.getChildClinics().remove(childClinic);
 	        	}
         	} else if(clinicDTO.getParentClinic().size() != 0 && clinicDTO.getParentClinic().get("id") != null) {
-        		if(id != clinicDTO.getParentClinic().get("id")) {
-        			Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
+        		if(id != Long.parseLong(clinicDTO.getParentClinic().get("id"))) {
+        			Clinic parentClinic = clinicRepository.getOne(Long.parseLong(clinicDTO.getParentClinic().get("id")));
         			parentClinic.setParent(true);
         			clinicRepository.save(parentClinic);
         			clinic.setParentClinic(parentClinic);       			

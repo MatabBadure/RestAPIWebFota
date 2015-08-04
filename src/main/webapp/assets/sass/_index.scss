@@ -1,18 +1,3 @@
-@font-face {
-    font-family: "MyriadProRegular";
-    src: url("fonts/MyriadPro-Regular.otf");
-}
-
-@font-face {
-    font-family: "MyriadProSemiboldMac";
-    src: url("fonts/MyriadPro-Semibold.otf");
-}
-
-@font-face {
-    font-family: "MyriadProbold";
-    src: url("fonts/MyriadPro-Bold.otf");
-}
-
 .container-top-indent {
 	height: inherit;
 }
@@ -23,7 +8,7 @@ html {
 }
 
 body {
-	font-family: MyriadRegular;
+	font-family: 'MyriadWebPro';
 	font-size: $font-size-base;
   height: auto;
   clear: both;
@@ -125,6 +110,7 @@ a::-moz-focus-inner {
 
 .custom-dropdown > select {
   -moz-appearance: none;
+  border: 0;
 }
 
 .custom-dropdown:before {

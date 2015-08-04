@@ -118,13 +118,14 @@ public class UserExtensionResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<UserExtension> get(@PathVariable Long id) {
+    public ResponseEntity<JSONObject> get(@PathVariable Long id) {
         log.debug("REST request to get UserExtension : {}", id);
-        return Optional.ofNullable(userExtensionRepository.findOne(id))
-            .map(userExtension -> new ResponseEntity<>(
-                userExtension,
-                HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        JSONObject jsonObject = userService.getUser(id);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
     }
 
     /**

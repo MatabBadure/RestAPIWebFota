@@ -21,6 +21,7 @@ import javax.validation.constraints.Size;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.boon.json.annotations.JsonProperty;
+import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
@@ -108,8 +109,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "terms_condition_accepted_date", nullable = true)
     private DateTime termsConditionAcceptedDate = null;
 
-    @JsonIgnore
-    @ManyToMany
+    @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(
             name = "USER_AUTHORITY",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},

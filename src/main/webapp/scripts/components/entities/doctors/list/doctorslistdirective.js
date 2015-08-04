@@ -48,8 +48,6 @@ angular.module('hillromvestApp')
           var url = '/api/user/' + doctor.id + '/hcp';
           UserService.getUser(doctor.id, url).then(function(response) {
             $scope.doctor = response.data.user;
-            //Todo : Clinics should come in user from backend
-            $scope.doctor.clinics = response.data.clinics;
             $scope.onSelect({
               'doctor': $scope.doctor
             });
@@ -69,6 +67,8 @@ angular.module('hillromvestApp')
             } else {
               return false;
             }
+          }else {
+            $scope.currentPageIndex = 1;
           }
           var url = 'api/user/hcp/search?searchString=';
           UserService.getUsers(url, $scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function(response) {

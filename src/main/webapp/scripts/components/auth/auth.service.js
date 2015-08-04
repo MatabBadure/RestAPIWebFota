@@ -1,20 +1,16 @@
 'use strict';
 
 angular.module('hillromvestApp')
-    .factory('Auth', function Auth($rootScope, $state, $q, $translate, Principal, AuthServerProvider, Account, Register, Activate, Password, PasswordResetInit, PasswordResetFinish) {
+    .factory('Auth', function Auth($rootScope, $state, $q, $translate, Principal, AuthServerProvider, Account, Register, Activate, Password, PasswordResetInit, PasswordResetFinish, StorageService) {
         return {
             login: function (credentials, callback) {
                 var cb = callback || angular.noop;
                 var deferred = $q.defer();
 
                 AuthServerProvider.login(credentials).then(function (data) {
-                    // retrieve the logged account information
-                    // localStorage.setItem('token',);
                 	localStorage.setItem('token', data.data.id);
                     Principal.identity(true).then(function(account) {
 
-                        // After the login the language will be changed to
-                        // the language selected by the user during his registration
                         localStorage.setItem('role', account.roles[0]);
                         $translate.use(account.langKey);
                         $translate.refresh();
@@ -22,7 +18,7 @@ angular.module('hillromvestApp')
                     });
                     return cb(data);
                 }).catch(function (err) {
-                    this.logout();
+                    StorageService.remove('token');
                     deferred.reject(err);
                     return cb(err);
                 }.bind(this));

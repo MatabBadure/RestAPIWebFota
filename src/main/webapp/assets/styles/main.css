@@ -5017,6 +5017,12 @@ select[multiple].input-lg,
   }
 }
 @font-face {
+  font-family: 'MyriadWebPro';
+  src: url("myriad/MyriadWebPro.eot?#iefix") format("embedded-opentype"), url("myriad/MyriadWebPro.woff") format("woff"), url("MyriadWebPro.ttf") format("truetype"), url("MyriadWebPro.svg#MyriadWebPro") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
   font-family: 'hillrom';
   src: url("fonts/hillrom.eot?-bnxh4m");
   src: url("fonts/hillrom.eot?#iefix-bnxh4m") format("embedded-opentype"), url("fonts/hillrom.ttf?-bnxh4m") format("truetype"), url("fonts/hillrom.woff?-bnxh4m") format("woff"), url("fonts/hillrom.svg?-bnxh4m#hillrom") format("svg");
@@ -5508,10 +5514,6 @@ select[multiple].input-lg,
   background: #6c6c6c;
 }
 
-@font-face {
-  font-family: "MyriadRegular";
-  src: url("fonts/MyriadPro-Regular.otf");
-}
 .container-top-indent {
   height: inherit;
 }
@@ -5522,7 +5524,7 @@ html {
 }
 
 body {
-  font-family: MyriadRegular;
+  font-family: 'MyriadWebPro';
   font-size: 14px;
   height: auto;
   clear: both;
@@ -5624,6 +5626,7 @@ a::-moz-focus-inner {
 
 .custom-dropdown > select {
   -moz-appearance: none;
+  border: 0;
 }
 
 .custom-dropdown:before {
@@ -6030,10 +6033,6 @@ a::-moz-focus-inner {
   vertical-align: middle;
 }
 
-.create-user {
-  padding-right: 10px;
-}
-
 .create-user .hillrom-icon {
   font-weight: 700;
 }
@@ -6058,6 +6057,7 @@ a::-moz-focus-inner {
   border: 1px solid #aeb5be;
   padding-left: 10px;
   font-weight: normal;
+  border-radius: 0;
 }
 
 .dashboard__form__input select {
@@ -6076,7 +6076,7 @@ a::-moz-focus-inner {
 
 .dashboard__form__input--option select {
   height: 30px;
-  width: 150px;
+  width: 160px;
   font-weight: normal;
   color: #34455C;
   border: 1px solid #aeb5be;
@@ -6138,7 +6138,7 @@ a::-moz-focus-inner {
 
 .dashboard__form--label-age {
   position: absolute;
-  right: 10px;
+  right: 0;
   border: 1px solid #aeb5be;
   top: 0;
   height: 30px;
@@ -6149,6 +6149,19 @@ a::-moz-focus-inner {
 
 .dashboard__manage-view--search {
   margin-bottom: 30px;
+}
+
+.dashboard__manage-view--search .fuid-search-box {
+  display: inline-block;
+  position: relative;
+  width: calc(100% - 145px);
+}
+
+.dashboard__manage-view--search .fixed-filter-box {
+  display: inline-block;
+  float: right;
+  position: relative;
+  width: 145px;
 }
 
 .dashboard__manage-view--search input {
@@ -6182,9 +6195,10 @@ a::-moz-focus-inner {
   font-size: 10px;
   position: absolute;
   top: 8px !important;
-  right: 20px;
+  right: 9px;
   z-index: 1;
   z-index: 1 \0;
+  pointer-events: none;
 }
 
 .search-icon {
@@ -6254,9 +6268,12 @@ a::-moz-focus-inner {
   color: #D6DADE;
 }
 
-.dashboard__manage-view--list .active,
 .dashboard__manage-view--list .active {
   color: #ef7164;
+}
+
+.dashboard__manage-view .inactive {
+  opacity: 0.6;
 }
 
 .dashboard__manage-view--list .inactive,
@@ -6371,6 +6388,10 @@ a::-moz-focus-inner {
   top: 4px;
 }
 
+.selected-box-container {
+  height: 30px;
+}
+
 .modal {
   background: rgba(0, 0, 0, 0.7) none repeat scroll 0 0;
 }
@@ -6429,7 +6450,7 @@ a::-moz-focus-inner {
   border: 1px solid #aeb5be;
   position: absolute;
   z-index: 999;
-  width: calc(100% - 20px);
+  width: 100%;
   font-weight: normal;
 }
 .dashboard-page__user-list--parent-list .parent-detail {
@@ -6439,6 +6460,10 @@ a::-moz-focus-inner {
 .dashboard-page__user-list--parent-list .parent-detail:hover {
   background-color: #D6DADE;
   cursor: pointer;
+}
+
+.parent-clinic {
+  color: #ef7164;
 }
 
 .footer {

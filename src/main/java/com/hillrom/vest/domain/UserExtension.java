@@ -16,8 +16,6 @@ import javax.persistence.Table;
 import org.hibernate.annotations.SQLDelete;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  * A UserExtension.
  */
@@ -34,13 +32,13 @@ public class UserExtension extends User implements Serializable {
 	private String credentials;
 
 	@Column(name = "primary_phone")
-	private Long primaryPhone;
+	private String primaryPhone;
 
 	@Column(name = "mobile_phone")
-	private Long mobilePhone;
+	private String mobilePhone;
 
 	@Column(name = "fax_number")
-	private Long faxNumber;
+	private String faxNumber;
 
 	@Column(name = "address")
 	private String address;
@@ -54,7 +52,6 @@ public class UserExtension extends User implements Serializable {
 	@Column(name = "npi_number")
 	private String npiNumber;
 
-	@JsonIgnore
 	@ManyToMany
 	@JoinTable(name = "CLINIC_USER_ASSOC", joinColumns = { @JoinColumn(name = "users_id", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "clinics_id", referencedColumnName = "id") })
 	@JsonManagedReference
@@ -79,27 +76,27 @@ public class UserExtension extends User implements Serializable {
 		this.credentials = credentials;
 	}
 
-	public Long getPrimaryPhone() {
+	public String getPrimaryPhone() {
 		return primaryPhone;
 	}
 
-	public void setPrimaryPhone(Long primaryPhone) {
+	public void setPrimaryPhone(String primaryPhone) {
 		this.primaryPhone = primaryPhone;
 	}
 
-	public Long getMobilePhone() {
+	public String getMobilePhone() {
 		return mobilePhone;
 	}
 
-	public void setMobilePhone(Long mobilePhone) {
+	public void setMobilePhone(String mobilePhone) {
 		this.mobilePhone = mobilePhone;
 	}
 
-	public Long getFaxNumber() {
+	public String getFaxNumber() {
 		return faxNumber;
 	}
 
-	public void setFaxNumber(Long faxNumber) {
+	public void setFaxNumber(String faxNumber) {
 		this.faxNumber = faxNumber;
 	}
 

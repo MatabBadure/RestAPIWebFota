@@ -30,8 +30,8 @@ public class PatientUserVO {
 	private String langKey;
 	private String middleName;
 	private String state;
-	private Long mobilePhone;
-	private Long primaryPhone;
+	private String mobilePhone;
+	private String primaryPhone;
 	private DateTime createdAt;
 	private Boolean isActivated;
 	
@@ -212,19 +212,19 @@ public class PatientUserVO {
 		this.state = state;
 	}
 
-	public Long getMobilePhone() {
+	public String getMobilePhone() {
 		return mobilePhone;
 	}
 
-	public void setMobilePhone(Long mobilePhone) {
+	public void setMobilePhone(String mobilePhone) {
 		this.mobilePhone = mobilePhone;
 	}
 
-	public Long getPrimaryPhone() {
+	public String getPrimaryPhone() {
 		return primaryPhone;
 	}
 
-	public void setPrimaryPhone(Long primaryPhone) {
+	public void setPrimaryPhone(String primaryPhone) {
 		this.primaryPhone = primaryPhone;
 	}	
 	

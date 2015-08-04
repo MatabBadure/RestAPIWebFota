@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-    .factory('Auth', function Auth($rootScope, $state, $q, $translate, Principal, AuthServerProvider, Account, Register, Activate, Password, PasswordResetInit, PasswordResetFinish) {
+    .factory('Auth', function Auth($rootScope, $state, $q, $translate, Principal, AuthServerProvider, Account, Register, Activate, Password, PasswordResetInit, PasswordResetFinish, StorageService) {
         return {
             login: function (credentials, callback) {
                 var cb = callback || angular.noop;
@@ -18,7 +18,7 @@ angular.module('hillromvestApp')
                     });
                     return cb(data);
                 }).catch(function (err) {
-                    localStorage.removeItem('token');
+                    StorageService.remove('token');
                     deferred.reject(err);
                     return cb(err);
                 }.bind(this));

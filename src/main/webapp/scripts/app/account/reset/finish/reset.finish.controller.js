@@ -32,7 +32,7 @@ $scope.finishReset = function() {
     $scope.error = null;
     if ($scope.resetAccount.password !== $scope.resetAccount.confirmPassword) {
       $scope.doNotMatch = 'ERROR';
-      $scope.message = "The password and its confirmation do not match!";
+      $scope.message = reset.finish.passwordNotMatched;
     } else {
      $scope.doNotMatch = null;
      Auth.resetPasswordFinish($stateParams.key,$scope.resetAccount).then(function () {
@@ -44,7 +44,7 @@ $scope.finishReset = function() {
       if(response.status === 400 && response.data.ERROR !== undefined){
         $scope.message = response.data.ERROR;
       }else{
-        $scope.message = "Error occured";
+        $scope.message = reset.finish.otherError;
       }
     });
   }

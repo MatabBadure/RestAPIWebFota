@@ -50,6 +50,10 @@ angular.module('hillromvestApp')
             return false;
           }
           if ($scope.userStatus.editMode) {
+            //will be removed when we support multiple role
+            if($scope.user.authorities){
+              delete $scope.user.authorities;
+            }
             UserService.editUser($scope.user).then(function (response) {
               $scope.userStatus.isMessage = true;
               $scope.userStatus.message = response.data.message;

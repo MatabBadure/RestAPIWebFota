@@ -39,7 +39,7 @@ public class PatientVestDeviceDataService {
 					.parseBase64StringToPatientVestDeviceRawLog(rawData);
 			
 			deviceRawLogRepository.save(deviceRawLog);
-
+			
 			patientVestDeviceRecords = deviceLogParser
 					.parseBase64StringToPatientVestDeviceLogEntry(deviceRawLog
 							.getDeviceData());

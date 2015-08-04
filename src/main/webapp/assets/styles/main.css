@@ -5813,6 +5813,10 @@ a::-moz-focus-inner {
   padding: 0 10px;
 }
 
+.popover-link {
+  cursor: default;
+}
+
 .login {
   background: url("../images/login-bg.svg") no-repeat scroll center center/cover transparent;
   -webkit-background-size: cover;
@@ -6464,6 +6468,10 @@ a::-moz-focus-inner {
 
 .parent-clinic {
   color: #ef7164;
+}
+
+tags-input.ng-invalid .tags {
+  box-shadow: none;
 }
 
 .footer {

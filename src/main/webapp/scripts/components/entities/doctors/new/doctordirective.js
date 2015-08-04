@@ -37,7 +37,7 @@ angular.module('hillromvestApp')
         $scope.getParentClinics = function() {
           var timer = false;
           timer = $timeout(function() {
-            ClinicService.getAllClinics('/api/clinics?filter=deleted:false').then(function(response) {
+            ClinicService.getAllClinics('/api/clinics?per_page=100&filter=deleted:false').then(function(response) {
               $scope.clinics = response.data;
               angular.forEach($scope.clinics, function(clinic) {
                 if(clinic.city) {

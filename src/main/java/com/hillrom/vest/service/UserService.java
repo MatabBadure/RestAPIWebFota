@@ -11,7 +11,9 @@ import com.hillrom.vest.service.util.RequestUtil;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
+
 import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,6 +39,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class UserService {
+
+	private static final String RELATION_LABEL_SELF = "SELF";
 
 	private final Logger log = LoggerFactory.getLogger(UserService.class);
 
@@ -375,18 +380,29 @@ public class UserService {
 				authorityRepository.findOne(userExtensionDTO.getRole()));
 		newUser = userExtensionRepository.save(newUser);
 		log.debug("Created Information for Patient User: {}", newUser);
-		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo,
-				newUser, AuthoritiesConstants.PATIENT, "SELF");
-		userPatientAssoc = userPatientRepository.save(userPatientAssoc);
-		log.debug("Created Information for userPatientAssoc: {}",
-				userPatientAssoc);
-		newUser.getUserPatientAssoc().add(userPatientAssoc);
+		
+		UserPatientAssoc userPatientAssoc = createUserPatientAssociation(
+				newUser, patientInfo);
+		
+		
 		patientInfo.getUserPatientAssoc().add(userPatientAssoc);
 		patientInfoRepository.save(patientInfo);
 		log.debug("Updated Information for Patient User: {}", patientInfo);
+		
+		newUser.getUserPatientAssoc().add(userPatientAssoc);
 		userExtensionRepository.save(newUser);
 		log.debug("Updated Information for Patient User: {}", newUser);
 		return newUser;
+	}
+
+	public UserPatientAssoc createUserPatientAssociation(UserExtension newUser,
+			PatientInfo patientInfo) {
+		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo,
+				newUser, AuthoritiesConstants.PATIENT, RELATION_LABEL_SELF);
+		userPatientAssoc = userPatientRepository.save(userPatientAssoc);
+		log.debug("Created Information for userPatientAssoc: {}",
+				userPatientAssoc);
+		return userPatientAssoc;
 	}
     
     public UserExtension createHCPUser(UserExtensionDTO userExtensionDTO) {
@@ -498,12 +514,14 @@ public class UserService {
 		}
 		List<String> clinicsToBeAdded = RandomUtil.getDifference(newClinicIds, existingClinicIds);
 		List<String> clinicsToBeRemoved = RandomUtil.getDifference(existingClinicIds, newClinicIds);
+		// TODO : to be re-factored with clinicRepository.findAll(clinicsToBeRemoved)
 		for(String clinicId : clinicsToBeRemoved) {
-			Clinic clinic = clinicRepository.getOne(Long.parseLong(clinicId));
+			Clinic clinic = clinicRepository.getOne(clinicId);
 			hcpUser.getClinics().remove(clinic);
 		}
+		// TODO : to be re-factored with clinicRepository.findAll(clinicsToBeAdded)
 		for(String clinicId : clinicsToBeAdded) {
-			Clinic clinic = clinicRepository.getOne(Long.parseLong(clinicId));
+			Clinic clinic = clinicRepository.getOne(clinicId);
 			hcpUser.getClinics().add(clinic);
 		}		
 		userExtensionRepository.save(hcpUser);
@@ -537,6 +555,10 @@ public class UserService {
 			patientInfo.setCity(userExtensionDTO.getCity());
 		if(userExtensionDTO.getState() != null)
 			patientInfo.setState(userExtensionDTO.getState());
+		if(userExtensionDTO.getPrimaryPhone() != null)
+			patientInfo.setPrimaryPhone(userExtensionDTO.getPrimaryPhone());
+		if(userExtensionDTO.getMobilePhone() != null)
+			patientInfo.setMobilePhone(userExtensionDTO.getMobilePhone());
 		patientInfo.setWebLoginCreated(true);
 	}
     
@@ -607,7 +629,7 @@ public class UserService {
 		newUser.setPassword(encodedPassword);
 		User persistedUser = userRepository.save(newUser);
 
-		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.PATIENT, "SELF");
+		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.PATIENT, RELATION_LABEL_SELF);
 		userPatientRepository.save(userPatientAssoc);
 		newUser.getUserPatientAssoc().add(userPatientAssoc);
 		patientInfo.getUserPatientAssoc().add(userPatientAssoc);
@@ -865,7 +887,7 @@ public class UserService {
 		if (associations.size() > 0) {
 			listOfassociations = associations
 					.stream()
-					.filter(assoc -> "SELF".equalsIgnoreCase(assoc
+					.filter(assoc -> RELATION_LABEL_SELF.equalsIgnoreCase(assoc
 							.getRelationshipLabel()))
 					.collect(Collectors.toList());
 		}

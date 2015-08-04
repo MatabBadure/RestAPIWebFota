@@ -108,6 +108,12 @@ public class PatientInfo implements Serializable {
     @OneToMany(mappedBy = "patient",fetch=FetchType.LAZY)
     @JsonIgnore
     private Set<UserPatientAssoc> userPatientAssoc = new HashSet<>();
+    
+	@Column(name = "primary_phone")
+	private String primaryPhone;
+
+	@Column(name = "mobile_phone")
+	private String mobilePhone;
 
     public String getId() {
 		return id;
@@ -284,7 +290,23 @@ public class PatientInfo implements Serializable {
 	public void setUserPatientAssoc(Set<UserPatientAssoc> userPatientAssoc) {
 		this.userPatientAssoc = userPatientAssoc;
 	}
-	
+
+	public String getPrimaryPhone() {
+		return primaryPhone;
+	}
+
+	public void setPrimaryPhone(String primaryPhone) {
+		this.primaryPhone = primaryPhone;
+	}
+
+	public String getMobilePhone() {
+		return mobilePhone;
+	}
+
+	public void setMobilePhone(String mobilePhone) {
+		this.mobilePhone = mobilePhone;
+	}
+
 	@Override
     public boolean equals(Object o) {
         if (this == o) {

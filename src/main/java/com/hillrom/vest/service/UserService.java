@@ -345,35 +345,48 @@ public class UserService {
     
     public UserExtension createPatientUser(UserExtensionDTO userExtensionDTO) {
     	UserExtension newUser = new UserExtension();
-    	patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId())
-    	.map(patient -> {
+    	Optional<PatientInfo> existingPatientInfoFromDB =patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId());
+    	if(existingPatientInfoFromDB.isPresent())
     		return newUser;
-    	})
-    	.orElseGet(() -> {
-    		PatientInfo patientInfo = new PatientInfo();
-    		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
-    		//Assigns Next Patient HillromId from Stored Procedure
-    		//patientInfo.setId(hillromIdGenerator.getNextPatientHillromId());
-    		/*String id = storedProcedureTest.getNextPatientHillromId();
-    		patientInfo.setId(id);*/
-    		patientInfo.setId(patientInfoRepository.id());
-    		patientInfoRepository.save(patientInfo);
-    		assignValuesToUserObj(userExtensionDTO, newUser);
-    		newUser.setPassword(passwordEncoder.encode(generateDefaultPassword((User)newUser)));
-    		newUser.setActivated(true);
-    		newUser.setDeleted(false);
-    		if(AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
-    			newUser.setEmail(userExtensionDTO.getHillromId());
-    		}
-    		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
-			userExtensionRepository.save(newUser);
-			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.PATIENT, "SELF");
-			userPatientRepository.save(userPatientAssoc);
-			newUser.getUserPatientAssoc().add(userPatientAssoc);
-			patientInfo.getUserPatientAssoc().add(userPatientAssoc);
-			log.debug("Created Information for Patient User: {}", newUser);
-			return newUser;
-    	});
+    	else 
+    		return populatePatientUserInDB(userExtensionDTO); 
+	}
+    
+    private UserExtension  populatePatientUserInDB(UserExtensionDTO userExtensionDTO){
+		UserExtension newUser = new UserExtension();
+		String patientInfoId = patientInfoRepository.id();
+		PatientInfo patientInfo = new PatientInfo();
+		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
+		
+		// Assigns Next Patient HillromId from Stored Procedure
+		patientInfo.setId(patientInfoId);
+		patientInfo = patientInfoRepository.save(patientInfo);
+		log.debug("Created Information for Patient : {}", patientInfo);
+		
+		assignValuesToUserObj(userExtensionDTO, newUser);
+		
+		newUser.setPassword(passwordEncoder
+				.encode(generateDefaultPassword((User) newUser)));
+		newUser.setActivated(true);
+		newUser.setDeleted(false);
+		if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
+			newUser.setEmail(userExtensionDTO.getHillromId());
+		}
+		newUser.getAuthorities().add(
+				authorityRepository.findOne(userExtensionDTO.getRole()));
+		newUser = userExtensionRepository.save(newUser);
+		log.debug("Created Information for Patient User: {}", newUser);
+		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo,
+				newUser, AuthoritiesConstants.PATIENT, "SELF");
+		userPatientAssoc = userPatientRepository.save(userPatientAssoc);
+		log.debug("Created Information for userPatientAssoc: {}",
+				userPatientAssoc);
+		newUser.getUserPatientAssoc().add(userPatientAssoc);
+		patientInfo.getUserPatientAssoc().add(userPatientAssoc);
+		patientInfoRepository.save(patientInfo);
+		log.debug("Updated Information for Patient User: {}", patientInfo);
+		userExtensionRepository.save(newUser);
+		log.debug("Updated Information for Patient User: {}", newUser);
 		return newUser;
 	}
     
@@ -543,6 +556,8 @@ public class UserService {
 			newUser.setNpiNumber(userExtensionDTO.getNpiNumber());
 		if(userExtensionDTO.getDob() != null)
 			newUser.setDob(LocalDate.parse(userExtensionDTO.getDob(), DateTimeFormat.forPattern("MM/dd/yyyy")));
+		if(userExtensionDTO.getGender() != null)
+			newUser.setGender(userExtensionDTO.getGender());
 		newUser.setLangKey(userExtensionDTO.getLangKey());
 	}
 

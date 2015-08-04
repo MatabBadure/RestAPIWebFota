@@ -17,6 +17,7 @@ angular.module('hillromvestApp')
     $scope.submitted = false;
     $scope.firstTimeAccessFailed = false;
     $scope.otherError = false;
+    $scope.message = "";
 
     $scope.setResponse = function(response) {
       $scope.response = response;
@@ -32,7 +33,7 @@ angular.module('hillromvestApp')
 
     $scope.init = function() {
       //Todo : needs to move into Utility Service
-      localStorage.clear();
+      localStorage.removeItem('token');
     };
 
     Auth.getSecurityQuestions().then(function(response) {
@@ -56,6 +57,7 @@ angular.module('hillromvestApp')
       }).catch(function(data) {
         if (data.status === 401) {
           if (!data.data.APP_CODE) {
+            $scope.message = data.data.Error;
             $scope.authenticationError = true;
             var loginCount = parseInt(localStorage.getItem('loginCount')) || 0;
             localStorage.setItem('loginCount', loginCount + 1);
@@ -76,6 +78,7 @@ angular.module('hillromvestApp')
           }
         } else {
           $scope.authenticationError = true;
+          $scope.message = "Authentication failed! Please check your credentials and try again."
         }
       });
     };

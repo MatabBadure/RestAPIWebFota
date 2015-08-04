@@ -72,7 +72,7 @@
     <div class=" col-md-10 col-lg-10 login__container__right-section">
     <span ng-if="message">{{message}}</span>
       <form class="login-auth-form" role="form" name="confirmForm" ng-submit="submitPassword($event)" novalidate autocomplete="off" show-validation>
-        <div class="form-group email" ng-show="!isEmailExist">
+        <div class="form-group email" ng-if="!isEmailExist">
           <input type="email" class="form-control" validate-on-blur name="email" placeholder="Enter Email" ng-model="user.email" ng-maxlength=100 required value="">
           <div ng-show="(confirmForm.email.$showValidationMessage && confirmForm.email.$invalid) || submitted" class="form-error">
             <span class="login-has-error" ng-show="confirmForm.email.$error.required">

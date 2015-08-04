@@ -353,7 +353,7 @@ public class UserService {
     		newUser.setPassword(passwordEncoder.encode(generateDefaultPassword((User)newUser)));
     		newUser.setActivated(true);
     		newUser.setDeleted(false);
-    		if(newUser.getEmail() == null && AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
+    		if(AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
     			newUser.setEmail(userExtensionDTO.getHillromId());
     		}
     		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));

@@ -15,6 +15,11 @@ angular.module('hillromvestApp')
           $scope.showModal = true;
         };
 
+        $scope.loadClinics = function($query) {
+          return $scope.clinics.filter(function (clinic){
+            return clinic.name.toLowerCase().indexOf($query.toLowerCase()) != -1;
+          });
+        };
         $scope.close = function () {
           $scope.showModal = false;
         };

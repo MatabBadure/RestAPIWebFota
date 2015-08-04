@@ -853,5 +853,17 @@ public class UserService {
 		PatientInfo patientInfo = selfAssociation != null ? selfAssociation.getPatient() : null;
 		return Optional.of(new PatientUserVO(user,patientInfo));
 	}
+	
+	public JSONObject getUser(Long id){
+		JSONObject jsonObject = new JSONObject();
+		User user = userRepository.findOne(id);
+		if(user.getId() != null) {
+			jsonObject.put("message", "User fetched successfully.");
+		    jsonObject.put("user", user);
+		} else {
+			jsonObject.put("ERROR", "Unable to fetch User.");
+		}	
+		return jsonObject;
+	 }
 }
 

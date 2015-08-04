@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -90,9 +91,12 @@ public class UserResource {
 		String queryString = new StringBuilder("'%").append(searchString)
 				.append("%'").toString();
 		Map<String, Boolean> sortOrder = new HashMap<>();
-		if (sortBy != null && !sortBy.equals("")) {
+		if (StringUtils.isNotBlank(sortBy)) {
 			isAscending = (isAscending != null) ? isAscending : true;
-			sortOrder.put("user." + sortBy, isAscending);
+			if(sortBy.equalsIgnoreCase("email"))
+				sortOrder.put("user." + sortBy, isAscending);
+			else	
+				sortOrder.put(sortBy, isAscending);
 		}
 		Page<PatientUserVO> page = userSearchRepository.findPatientBy(
 				queryString, PaginationUtil.generatePageRequest(offset, limit),

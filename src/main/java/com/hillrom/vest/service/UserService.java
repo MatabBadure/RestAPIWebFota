@@ -2,16 +2,20 @@ package com.hillrom.vest.service;
 
 import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.*;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.*;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.OnCredentialsChangeEvent;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.service.util.RequestUtil;
+import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
+
 import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -27,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -269,13 +274,11 @@ public class UserService {
 		return rolesAdminCanModerate;
 	}
     
-    public JSONObject createUser(UserExtensionDTO userExtensionDTO, String baseUrl){
-    	JSONObject jsonObject = new JSONObject();
-    	if(userExtensionDTO.getEmail() != null) {
+    public UserExtension createUser(UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException{
+		if(userExtensionDTO.getEmail() != null) {
 			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
 			if (existingUser.isPresent()) {
-				jsonObject.put("ERROR", "e-mail address already in use");
-    			return jsonObject;
+				throw new HillromException(ExceptionConstants.HR_501);
     		}
     	}
     	List<String> rolesAdminCanModerate = rolesAdminCanModerate();
@@ -286,67 +289,53 @@ public class UserService {
     			if(userExtensionDTO.getEmail() != null) {
     				mailService.sendActivationEmail(user, baseUrl);
     			}
-                jsonObject.put("message", "Hillrom User created successfully.");
-                jsonObject.put("user", user);
-                return jsonObject;
+                return user;
     		} else {
-    			jsonObject.put("ERROR", "Unable to create Hillrom User.");
-                return jsonObject;
+    			throw new HillromException(ExceptionConstants.HR_511);
     		}
     	} else if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
-        	return patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId())
-        			.map(user -> {
-        				jsonObject.put("ERROR", "HR Id already in use.");
-            			return jsonObject;
-            		})
-                    .orElseGet(() -> {
-                    	UserExtension user = createPatientUser(userExtensionDTO);
-                		if(user.getId() != null) {
-	                        jsonObject.put("message", "Patient User created successfully.");
-	                        jsonObject.put("user", user);
-	                        return jsonObject;
-                		} else {
-                			jsonObject.put("ERROR", "Unable to create Patient.");
-	                        return jsonObject;
-                		}
-                    });
+        	UserExtension user = createPatientUser(userExtensionDTO);
+    		if(user.getId() != null) {
+                return user;
+    		} else {
+    			throw new HillromException(ExceptionConstants.HR_521);
+    		}
         } else if (AuthoritiesConstants.HCP.equals(userExtensionDTO.getRole())) {
         	UserExtension user = createHCPUser(userExtensionDTO);
         	if(user.getId() != null) {
                 mailService.sendActivationEmail(user, baseUrl);
-                jsonObject.put("message", "HealthCare Professional created successfully.");
-                jsonObject.put("user", user);
-                return jsonObject;
+                return user;
         	} else {
-    			jsonObject.put("ERROR", "Unable to create HealthCare Professional.");
-                return jsonObject;
+        		throw new HillromException(ExceptionConstants.HR_531);
     		}
         } else {
-    		jsonObject.put("ERROR", "Incorrect data.");
-    		return jsonObject;
+        	throw new HillromException(ExceptionConstants.HR_502);
     	}
     }
 
-    public UserExtension createHillromTeamUser(UserExtensionDTO userExtensionDTO) {
+    public UserExtension createHillromTeamUser(UserExtensionDTO userExtensionDTO) throws HillromException {
     	UserExtension newUser = new UserExtension();
-		assignValuesToUserObj(userExtensionDTO, newUser);
-		newUser.setActivated(false);
-		newUser.setDeleted(false);
-		newUser.setActivationKey(RandomUtil.generateActivationKey());
-		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
-		userExtensionRepository.save(newUser);
-		log.debug("Created Information for User: {}", newUser);
-		return newUser;
+		try {
+	    	assignValuesToUserObj(userExtensionDTO, newUser);
+			newUser.setActivated(false);
+			newUser.setDeleted(false);
+			newUser.setActivationKey(RandomUtil.generateActivationKey());
+			newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
+			userExtensionRepository.save(newUser);
+			log.debug("Created Information for User: {}", newUser);
+			return newUser;
+	    } catch(Exception e){
+			throw new HillromException(ExceptionConstants.HR_501, e);
+		}
 	}
     
-    public UserExtension createPatientUser(UserExtensionDTO userExtensionDTO) {
+    public UserExtension createPatientUser(UserExtensionDTO userExtensionDTO) throws HillromException {
     	UserExtension newUser = new UserExtension();
     	PatientInfo patientInfo = new PatientInfo();
-    	patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId())
-    	.map(patient -> {
-    		return newUser;
-    	})
-    	.orElseGet(() -> {
+    	Optional<PatientInfo> existingPatient = patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId());
+    	if(existingPatient.isPresent()) {
+    		throw new HillromException(ExceptionConstants.HR_522);
+        } else {
     		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
     		patientInfoRepository.save(patientInfo);
     		assignValuesToUserObj(userExtensionDTO, newUser);
@@ -364,11 +353,10 @@ public class UserService {
 			patientInfo.getUserPatientAssoc().add(userPatientAssoc);
 			log.debug("Created Information for Patient User: {}", newUser);
 			return newUser;
-    	});
-		return newUser;
+    	}
 	}
     
-    public UserExtension createHCPUser(UserExtensionDTO userExtensionDTO) {
+    public UserExtension createHCPUser(UserExtensionDTO userExtensionDTO) throws HillromException {
     	UserExtension newUser = new UserExtension();
 		assignValuesToUserObj(userExtensionDTO, newUser);
 		newUser.setActivated(false);

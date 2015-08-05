@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.HcpVO;
 import com.hillrom.vest.repository.HillRomUserVO;
 import com.hillrom.vest.repository.UserExtensionRepository;
@@ -35,6 +36,7 @@ import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.HCPClinicService;
 import com.hillrom.vest.service.UserService;
+import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
@@ -69,12 +71,20 @@ public class UserExtensionResource {
     public ResponseEntity<JSONObject> create(@RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
         log.debug("REST request to save User : {}", userExtensionDTO);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-        JSONObject jsonObject = userService.createUser(userExtensionDTO, baseUrl);
-        if (jsonObject.containsKey("ERROR")) {
-        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-        } else {
-            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
-        }
+        JSONObject jsonObject = new JSONObject();
+		try {
+			UserExtension newUser = userService.createUser(userExtensionDTO, baseUrl);
+			if (newUser != null) {
+				jsonObject.put("message", MessageConstants.HR_201);
+				jsonObject.put("user", newUser);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        } else {
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+	        }
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
     }
 
     /**

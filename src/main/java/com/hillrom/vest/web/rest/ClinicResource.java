@@ -59,7 +59,7 @@ public class ClinicResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    @RolesAllowed(AuthoritiesConstants.ACCT_SERVICES)
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> create(@RequestBody ClinicDTO clinicDTO) {
         log.debug("REST request to save Clinic : {}", clinicDTO);
         JSONObject jsonObject = clinicService.createClinic(clinicDTO);
@@ -77,7 +77,7 @@ public class ClinicResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    @RolesAllowed(AuthoritiesConstants.ACCT_SERVICES)
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> update(@PathVariable Long id, @RequestBody ClinicDTO clinicDTO) {
         log.debug("REST request to update Clinic : {}", clinicDTO);
         JSONObject jsonObject = clinicService.updateClinic(id, clinicDTO);
@@ -136,7 +136,7 @@ public class ClinicResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    @RolesAllowed(AuthoritiesConstants.ACCT_SERVICES)
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> delete(@PathVariable Long id) {
     	log.debug("REST request to delete Clinic : {}", id);
     	JSONObject jsonObject = clinicService.deleteClinic(id);

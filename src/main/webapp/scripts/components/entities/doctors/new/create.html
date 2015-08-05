@@ -31,8 +31,15 @@
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
               <tags-input key-property="id" ng-model="doctor.clinics" display-property="name" min-tags="1" name="clinicAutoComplete">
-                <auto-complete source="clinics" display-property="nameAndCity" min-length="1"></auto-complete>
+                <auto-complete source="loadClinics($query)" load-on-focus="true" load-on-empty="true" min-length="1" template="my-custom-template"></auto-complete>
               </tags-input>
+              <script type="text/ng-template" id="my-custom-template">
+                <div>
+                  <span>{{data.name}}</span>
+                  <span>{{data.city}}</span>
+                </div>
+              </script>
+
               <div ng-show="form.clinicAutoComplete.$error.minTags && submitted">
                 <span class="has-error">
                   Clinic is Required

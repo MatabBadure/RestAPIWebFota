@@ -52,7 +52,7 @@ angular.module('hillromvestApp')
          */
         $scope.selectUser = function(user) {
           UserService.getUser(user.id).then(function(response) {
-            $scope.user = response.data;
+            $scope.user = response.data.user;
             $scope.user.role = $scope.user.authorities[0].name;
             $scope.onSelect({
               'user': $scope.user

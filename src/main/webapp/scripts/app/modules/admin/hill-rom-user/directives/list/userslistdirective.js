@@ -9,7 +9,7 @@
 angular.module('hillromvestApp')
   .directive('userList', function(UserService) {
     return {
-      templateUrl: 'scripts/components/entities/users/list/list.html',
+      templateUrl: 'scripts/app/modules/admin/hill-rom-user/directives/list/list.html',
       restrict: 'E',
       scope: {
         onSelect: '&',
@@ -22,7 +22,7 @@ angular.module('hillromvestApp')
           scope.searchUsers();
         })
       },
-      controller: function($scope, $timeout) {
+      controller: function($scope, $timeout, $state) {
         $scope.init = function() {
           $scope.users = [];
           $scope.currentPageIndex = 1;
@@ -51,19 +51,11 @@ angular.module('hillromvestApp')
          * Function to select the User from the List suggested on search
          */
         $scope.selectUser = function(user) {
-          UserService.getUser(user.id).then(function(response) {
-            $scope.user = response.data.user;
-            $scope.user.role = $scope.user.authorities[0].name;
-            $scope.onSelect({
-              'user': $scope.user
-            });
-          }).catch(function(response) {
-
-          });
+          $state.go('userEdit', { userId: user.id });
         };
 
         $scope.createUser = function() {
-          $scope.onCreate();
+          $state.go('userCreate');
         };
 
         /**

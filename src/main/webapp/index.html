@@ -11,7 +11,6 @@
         <!-- bower:css -->
         <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.min.css" />
         <link rel="stylesheet" href="bower_components/angular-notys/angular-notys.css" />
-        <link rel="stylesheet" href="bower_components/angular-loading-bar/src/loading-bar.css" />
         <!-- endbower -->
         <!-- endbuild -->
         <!-- build:css assets/styles/main.css -->
@@ -128,7 +127,13 @@
         <script src="scripts/components/language/language.service.js"></script>
         <script src="scripts/components/language/language.controller.js"></script>
         <script src="scripts/components/auth/provider/auth.xauth.service.js"></script>
-    	<script src="https://www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit" async defer></script>
+        <script src="https://www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit" async defer></script>
+
+        <script src="scripts/app/entities/patients/patients.js"></script>
+        <script src="scripts/app/entities/patients/patients.controller.js"></script>
+        <script src="scripts/components/entities/patients/new/patientdirective.js"></script>
+        <script src="scripts/components/entities/patients/list/patientlistdirective.js"></script>
+        <script src="scripts/app/entities/patients/patient.service.js"></script>
 
         <script src="scripts/app/entities/clinics/clinics.js"></script>
         <script src="scripts/app/entities/clinics/clinics.controller.js"></script>
@@ -141,11 +146,7 @@
         <script src="scripts/components/entities/doctors/new/doctordirective.js"></script>
         <script src="scripts/components/entities/doctors/list/doctorslistdirective.js"></script>
 
-        <script src="scripts/app/entities/users/users.js"></script>
-        <script src="scripts/app/entities/users/users.controller.js"></script>
-        <script src="scripts/app/entities/users/users.service.js"></script>
-        <script src="scripts/components/entities/users/new/userdirective.js"></script>
-        <script src="scripts/components/entities/users/list/userslistdirective.js"></script>
+        <script src="scripts/app/modules/admin/hill-rom-user/services/users.service.js"></script>
         <script src="scripts/components/util/commons.directive.js"></script>
         <script src="scripts/components/util/commons.filter.js"></script>
 
@@ -159,8 +160,9 @@
 
         <script src="scripts/app/modules/admin/patient/controllers/patients.controller.js"></script>
         <script src="scripts/app/modules/admin/patient/services/patient.service.js"></script>
-        <script src="scripts/app/modules/admin/patient/directives/create-edit/patientdirective.js"></script>
-        <script src="scripts/app/modules/admin/patient/directives/list/patientlistdirective.js"></script>
+        <script src="scripts/app/modules/admin/hill-rom-user/directives/list/userslistdirective.js"></script>
+         <script src="scripts/app/modules/admin/hill-rom-user/directives/create-edit/userdirective.js"></script>
+         <script src="scripts/app/modules/admin/hill-rom-user/controllers/users.controller.js"></script>
 
     <!-- endbuild -->
     </body>

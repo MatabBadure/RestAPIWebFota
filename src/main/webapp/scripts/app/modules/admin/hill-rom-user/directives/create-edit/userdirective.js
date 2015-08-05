@@ -9,7 +9,7 @@
 angular.module('hillromvestApp')
   .directive('user', function (UserService) {
     return {
-      templateUrl: 'scripts/components/entities/users/new/create.html',
+      templateUrl: 'scripts/app/modules/admin/hill-rom-user/directives/create-edit/create.html',
       restrict: 'E',
       scope: {
         user: '=userData',
@@ -17,7 +17,7 @@ angular.module('hillromvestApp')
         onSuccess: '&',
         userStatus: '=userStatus'
       },
-      controller: function ($scope, noty) {
+      controller: function ($scope, noty, $state) {
 
          $scope.open = function () {
           $scope.showModal = true;
@@ -28,7 +28,6 @@ angular.module('hillromvestApp')
         };
 
         $scope.submitted = false;
-        $scope.user.role = "ADMIN";
         $scope.formSubmit = function () {
           $scope.submitted = true;
         };
@@ -153,7 +152,8 @@ angular.module('hillromvestApp')
           $scope.userStatus.editMode = false;
           $scope.form.$setPristine();
           $scope.submitted = false;
-          $scope.onSuccess();
+          //$scope.onSuccess();
+          $state.go('userList');
         }
 
         /**

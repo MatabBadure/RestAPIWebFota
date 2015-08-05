@@ -66,7 +66,7 @@ angular.module('hillromvestApp')
                         }
 
                         if(isAuthenticated && $rootScope.toState.url == "/login"){
-                            $state.go('patient');
+                            $state.go('patientUser');
                         }
                     });
             },

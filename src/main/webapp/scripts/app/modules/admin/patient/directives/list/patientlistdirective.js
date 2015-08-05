@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .directive('patientList', function(UserService, patientService) {
+  .directive('patientList', function(UserService, patientService, $state) {
     return {
       templateUrl: 'scripts/app/modules/admin/patient/directives/list/patientlist.html',
       restrict: 'E',
@@ -42,17 +42,20 @@ angular.module('hillromvestApp')
         });
 
         $scope.selectPatient = function(patient) {
-          PatientService.getPatientInfo(patient.id).then(function(response) {
-            $scope.patientInfo = response.data;
-            $scope.patient = $scope.patientInfo;
-            $scope.onSelect({
-              'patient': $scope.patient
-            });
-          }).catch(function(response) { });
+          // patientService.getPatientInfo(patient.id).then(function(response) {
+          //   $scope.patientInfo = response.data;
+          //   $scope.patient = $scope.patientInfo;
+          //   $scope.onSelect({
+          //     'patient': $scope.patient
+          //   });
+          // }).catch(function(response) { });
+          $state.go('patientEdit', {
+            'patientId': patient.id
+          });
         };
 
         $scope.createPatient = function() {
-          $scope.onCreate();
+          $state.go('patientNew');
         };
 
         $scope.searchPatients = function(track) {

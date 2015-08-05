@@ -11,7 +11,7 @@ angular.module('hillromvestApp')
         patientStatus: '=patientStatus'
       },
 
-      controller: function($scope, noty) {
+      controller: function($scope, noty, $state) {
 
         $scope.open = function () {
           $scope.showModal = true;
@@ -63,6 +63,7 @@ angular.module('hillromvestApp')
                     ttl: 5000,
                     type: "success"
                   });
+
                 }else{
                   $scope.patientStatus.message = 'Error occured! Please try again';
                   noty.showNoty({
@@ -184,7 +185,7 @@ angular.module('hillromvestApp')
           $scope.submitted = false;
           $scope.patient = {};
           $scope.form.$setPristine();
-          $scope.onSuccess();
+          $state.go('patientUser');
         }
 
         $scope.getAge = function(selectedDate) {

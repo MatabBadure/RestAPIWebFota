@@ -171,4 +171,21 @@ public class ClinicResource {
          return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
     
+    /**
+     * GET  /clinics/:id/hcp -> get the hcp users for the clinic with id :id.
+     */
+    @RequestMapping(value = "/clinics/{id}/hcp",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<JSONObject> getHCPUsers(@PathVariable Long id) {
+        log.debug("REST request to get Clinic : {}", id);
+        JSONObject jsonObject = clinicService.getHCPUsers(id);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
 }

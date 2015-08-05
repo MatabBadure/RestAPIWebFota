@@ -8,6 +8,7 @@ import com.hillrom.vest.security.OnCredentialsChangeEvent;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.service.util.RequestUtil;
+import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
@@ -358,7 +359,7 @@ public class UserService {
     		}
     		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
 			userExtensionRepository.save(newUser);
-			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.PATIENT, "SELF");
+			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.PATIENT, RelationshipLabelConstants.SELF);
 			userPatientRepository.save(userPatientAssoc);
 			newUser.getUserPatientAssoc().add(userPatientAssoc);
 			patientInfo.getUserPatientAssoc().add(userPatientAssoc);
@@ -586,7 +587,7 @@ public class UserService {
 		newUser.setPassword(encodedPassword);
 		User persistedUser = userRepository.save(newUser);
 
-		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.PATIENT, "SELF");
+		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.PATIENT, RelationshipLabelConstants.SELF);
 		userPatientRepository.save(userPatientAssoc);
 		newUser.getUserPatientAssoc().add(userPatientAssoc);
 		patientInfo.getUserPatientAssoc().add(userPatientAssoc);
@@ -844,7 +845,7 @@ public class UserService {
 		if (associations.size() > 0) {
 			listOfassociations = associations
 					.stream()
-					.filter(assoc -> "SELF".equalsIgnoreCase(assoc
+					.filter(assoc -> RelationshipLabelConstants.SELF.equalsIgnoreCase(assoc
 							.getRelationshipLabel()))
 					.collect(Collectors.toList());
 		}

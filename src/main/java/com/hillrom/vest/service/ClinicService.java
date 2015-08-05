@@ -1,19 +1,14 @@
 package com.hillrom.vest.service;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import javax.inject.Inject;
-
 import net.minidev.json.JSONObject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.service.util.RandomUtil;
@@ -154,4 +149,17 @@ public class ClinicService {
 			clinic.setClinicAdminId(clinicDTO.getClinicAdminId());
 	}
 
+	public JSONObject getHCPUsers(Long id) {
+		JSONObject jsonObject = new JSONObject();
+    	Clinic clinic = clinicRepository.getOne(id);
+        if(clinic == null) {
+	      	jsonObject.put("ERROR", "No such clinic found.");
+        } else if(clinic.getId() != null) {
+        	jsonObject.put("message", "Associated HCPs fetched successfully.");
+        	jsonObject.put("hcpList", clinic.getUsers());
+        } else {
+	      	jsonObject.put("ERROR", "Unable to fetch associated HCPs.");
+        }
+        return jsonObject;
+    }
 }

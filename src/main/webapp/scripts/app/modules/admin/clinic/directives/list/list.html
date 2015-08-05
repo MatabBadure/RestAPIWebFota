@@ -1,0 +1,67 @@
+<div class="navbar dashboard dashbord-nav">
+  <div class="container">
+    <div class="dashbord-nav__primary pull-left">
+      <span class="dashbord-nav__primary--title">Manage Clinics</span>
+    </div>
+
+    <div class="dashbord-nav__secondary create-user navbar-right cursor-pointer" ng-click="createClinic()">
+      <span class="dashbord-nav__secondary--create-new">Create New</span>
+      <span class="hillrom-icon icon-plus-icon"></span>
+    </div>
+  </div>
+</div>
+
+  <div class="dashboard dashboard--content">
+    <div class="container dashboard__manage-view margin-top-xl">
+      <div class="dashboard__manage-view--search">
+        <div class="fuid-search-box reset-padding-right">
+          <input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" autocomplete="off" placeholder="{{'clinic.placeholder.search' | translate}}" >
+          <span class="search-icon hillrom-icon icon-search-icon"></span>
+        </div>
+        <div class="fixed-filter-box reset-padding-left">
+          <div class="search-dropdown">
+            <select name="search" ng-model="sortOption" ng-change="searchClinics()">
+              <option value="" selected>Newly Created</option>
+              <option value="name">Name</option>
+              <option value="state">State</option>
+              <option value="zipcode">Zip Code</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="dashboard__manage-view--list" ng-repeat="clinic in clinics" ng-class="{ 'inactive': clinic.deleted }">
+        <div  ng-click="clinic.deleted || selectClinic(clinic)">
+          <div class="col-md-3 reset-padding-left">
+            <span class="user-name">{{clinic.name}} <sup class="parent-clinic" ng-if="clinic.parent">P</sup></span>
+            <span class="user-home-no">{{clinic.hillromId}}</span>
+          </div>
+          <div class="col-md-4">
+            <span class="user-home-no">{{clinic.city}} {{clinic.state}}</span>
+            <span class="user-address">{{clinic.address}} {{clinic.zipcode}}</span>
+          </div>
+          <div class="col-md-4">
+            <span class="hcp-name">{{clinic.id}}</span>
+            <span class="clinic-name"></span>
+          </div>
+          <div class="col-md-5 reset-padding-right">
+            <span>{{clinic.phoneNumber}} {{clinic.faxNumber}}</span>
+          </div>
+          <div class="clr"></div>
+       </div>
+      </div>
+      <div class="dashboard__manage-view--pagination">
+        <div class="col-md-16 reset-padding-right">
+          <div class="navbar-right">
+            <span class="record-found">{{total}} Clinics</span>
+            <span class="record-found">Found</span>
+            <span ng-show="pageCount > 1">
+              <span class="navigaion-link cursor-pointer" ng-class="{ 'inactive': !(currentPageIndex > 1) }" ng-click="searchClinics('PREV')">Previous</span>
+              <span class="navigaion-no">{{currentPageIndex}}</span>
+              <span class="navigaion-link cursor-pointer" ng-class="{ 'inactive': !(pageCount > currentPageIndex) }" ng-click="searchClinics('NEXT')">Next</span>
+            </span>
+          </div>
+          <div class="clr"></div>
+        </div>
+      </div>
+  </div>
+</div>

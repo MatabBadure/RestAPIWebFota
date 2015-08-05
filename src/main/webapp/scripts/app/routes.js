@@ -118,6 +118,86 @@ angular.module('hillromvestApp')
           ]
         }
       })
+      .state('hcpUser', {
+        parent: 'admin',
+        url: '/hcp',
+        abstract: true,
+      })
+      .state('hcpList', {
+        parent: 'hcpUser',
+        url: '/list',
+        data: {
+          roles: ['ADMIN'],
+          pageTitle: 'patient.title'
+        },
+        views: {
+          'content@': {
+            templateUrl: 'scripts/app/modules/admin/hcp/views/list/view.html',
+            controller: 'DoctorsController'
+          }
+        },
+        resolve: {
+          translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+            $translatePartialLoader.addPart('doctor');
+            return $translate.refresh();
+          }],
+          authorize: ['Auth',
+            function(Auth) {
+              return Auth.authorize(false);
+            }
+          ]
+        }
+      })
+      .state('createHCP', {
+        parent: 'hcpUser',
+        url: '/new',
+        data: {
+          roles: ['ADMIN'],
+          pageTitle: 'patient.title'
+        },
+        views: {
+          'content@': {
+            templateUrl: 'scripts/app/modules/admin/hcp/views/create-edit/view.html',
+            controller: 'DoctorsController'
+          }
+        },
+        resolve: {
+          translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+            $translatePartialLoader.addPart('doctor');
+            return $translate.refresh();
+          }],
+          authorize: ['Auth',
+            function(Auth) {
+              return Auth.authorize(false);
+            }
+          ]
+        }
+      })
+      .state('editHCP', {
+        parent: 'hcpUser',
+        url: '/{doctorId}/edit',
+        data: {
+          roles: ['ADMIN'],
+          pageTitle: 'patient.title'
+        },
+        views: {
+          'content@': {
+            templateUrl: 'scripts/app/modules/admin/hcp/views/create-edit/view.html',
+            controller: 'DoctorsController'
+          }
+        },
+        resolve: {
+          translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+            $translatePartialLoader.addPart('doctor');
+            return $translate.refresh();
+          }],
+          authorize: ['Auth',
+            function(Auth) {
+              return Auth.authorize(false);
+            }
+          ]
+        }
+      })
     });
 /*
       .state('patient', {

@@ -3,7 +3,7 @@
 angular.module('hillromvestApp')
   .directive('doctorList', function(UserService) {
     return {
-      templateUrl: 'scripts/components/entities/doctors/list/list.html',
+      templateUrl: 'scripts/app/modules/admin/hcp/directives/list/list.html',
       restrict: 'E',
       scope: {
         onSelect: '&',
@@ -17,7 +17,7 @@ angular.module('hillromvestApp')
         })
       },
 
-      controller: function($scope, $timeout) {
+      controller: function($scope, $timeout, $state) {
 
         $scope.init = function() {
           $scope.doctors = [];
@@ -42,20 +42,14 @@ angular.module('hillromvestApp')
           }, 1000)
         });
 
-
         $scope.selectDoctor = function(doctor) {
-          $scope.doctor = doctor;
-          var url = '/api/user/' + doctor.id + '/hcp';
-          UserService.getUser(doctor.id, url).then(function(response) {
-            $scope.doctor = response.data.user;
-            $scope.onSelect({
-              'doctor': $scope.doctor
-            });
-          }).catch(function(response) {});
+          $state.go('editHCP',{
+            'doctorId': doctor.id
+          });
         };
 
         $scope.createDoctor = function() {
-          $scope.onCreate();
+          $state.go('createHCP');
         };
 
         $scope.searchDoctors = function(track) {

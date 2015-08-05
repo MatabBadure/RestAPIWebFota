@@ -13,7 +13,7 @@ angular.module('hillromvestApp')
                 url: '/patient',
                 abstract: true,
             })
-            .state('patientList', {
+            .state('patients', {
                 parent: 'patientUser',
                 url: '/list',
                 data: {

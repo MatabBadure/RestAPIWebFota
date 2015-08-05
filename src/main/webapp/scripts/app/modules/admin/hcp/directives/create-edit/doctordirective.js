@@ -1,15 +1,15 @@
 'use strict';
 angular.module('hillromvestApp')
-  .directive('doctor', function(UserService, ClinicService) {
+  .directive('doctor', function(UserService, clinicService) {
     return {
-      templateUrl: 'scripts/components/entities/doctors/new/create.html',
+      templateUrl: 'scripts/app/modules/admin/hcp/directives/create-edit/create.html',
       restrict: 'E',
       scope: {
         doctor: '=doctorData',
         onSuccess: '&',
         doctorStatus: '=doctorStatus'
       },
-      controller: function ($scope, $timeout, noty) {
+      controller: function ($scope, $timeout, noty, $state) {
 
         $scope.open = function () {
           $scope.showModal = true;
@@ -37,7 +37,7 @@ angular.module('hillromvestApp')
         $scope.getParentClinics = function() {
           var timer = false;
           timer = $timeout(function() {
-            ClinicService.getAllClinics('/api/clinics?per_page=100&filter=deleted:false').then(function(response) {
+            clinicService.getAllClinics('/api/clinics?per_page=100&filter=deleted:false').then(function(response) {
               $scope.clinics = response.data;
               angular.forEach($scope.clinics, function(clinic) {
                 if(clinic.city) {
@@ -173,7 +173,7 @@ angular.module('hillromvestApp')
           $scope.doctor = {};
           $scope.doctor.clinics = [];
           $scope.form.$setPristine();
-          $scope.onSuccess();
+          $state.go('hcpList');
         }
       }
     };

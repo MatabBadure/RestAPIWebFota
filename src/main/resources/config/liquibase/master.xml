@@ -34,5 +34,5 @@
     <include file="classpath:/config/liquibase/changelog/20150802160800_drop_create_USER_PATIENT_ASSOC.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150802164000_create_patient_vest_device_data.xml" relativeToChangelogFile="false"/>    
     <include file="classpath:/config/liquibase/changelog/20150802161700_alter_datatypes_PATIENT_VEST_DEVICE_RAW_LOGS.xml" relativeToChangelogFile="false"/>
-
+	<include file="classpath:/config/liquibase/changelog/20150805155400_create_badvestdevicedata.xml" relativeToChangelogFile="false"/>
  </databaseChangeLog>

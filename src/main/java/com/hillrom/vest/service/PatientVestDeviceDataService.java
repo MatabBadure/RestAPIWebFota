@@ -8,13 +8,14 @@ import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.vest.domain.BadVestDeviceData;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
+import com.hillrom.vest.repository.BadVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
-import com.hillrom.vest.service.util.RequestUtil;
 
 @Service
 @Transactional(noRollbackFor=RuntimeException.class)
@@ -31,6 +32,9 @@ public class PatientVestDeviceDataService {
 
 	@Inject
 	private PatientInfoRepository patientInfoRepository;
+	
+	@Inject
+	private BadVestDeviceDataRepository badVestDeviceDataRepository;
 
 	public List<PatientVestDeviceData> save(final String rawData) {
 		PatientVestDeviceRawLog deviceRawLog = null;
@@ -52,6 +56,7 @@ public class PatientVestDeviceDataService {
 
 			deviceDataRepository.save(patientVestDeviceRecords);
 		} catch (Exception e) {
+			badVestDeviceDataRepository.save(new BadVestDeviceData(rawData));
 			throw new RuntimeException(e.getMessage());
 		}finally{
 			deviceRawLogRepository.save(deviceRawLog);

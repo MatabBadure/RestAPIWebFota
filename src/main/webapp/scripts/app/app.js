@@ -1,16 +1,16 @@
 'use strict';
 
-angular.module('hillromvestApp', 
-  ['LocalStorageModule', 
-   'tmh.dynamicLocale', 
+angular.module('hillromvestApp',
+  ['LocalStorageModule',
+   'tmh.dynamicLocale',
    'pascalprecht.translate',
-   'ngResource', 
-   'ui.router', 
-   'ngCookies', 
-   'ngCacheBuster', 
-   'infinite-scroll', 
-   'vcRecaptcha', 
-   'ngTagsInput', 
+   'ngResource',
+   'ui.router',
+   'ngCookies',
+   'ngCacheBuster',
+   'infinite-scroll',
+   'vcRecaptcha',
+   'ngTagsInput',
    'angular-noty',
    'angular-loading-bar'
    ])

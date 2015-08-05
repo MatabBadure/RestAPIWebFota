@@ -1,0 +1,8 @@
+<div ng-show="patientStatus.editMode || patientStatus.isCreate">
+  <patient patient-data="patient" patient-status="patientStatus" on-success="onSuccess()"></patient>
+</div>
+
+
+<div ng-show="!patientStatus.editMode && !patientStatus.isCreate">
+  <patient-list on-select="selectedPatient(patient)" on-create="createPatient()" patient-status="patientStatus"></patient-list>
+</div>

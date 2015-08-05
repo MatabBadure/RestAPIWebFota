@@ -3,7 +3,7 @@
 angular.module('hillromvestApp')
   .directive('patientList', function(UserService, patientService) {
     return {
-      templateUrl: 'scripts/components/entities/patients/list/patientlist.html',
+      templateUrl: 'scripts/app/modules/admin/patient/directives/list/patientlist.html',
       restrict: 'E',
       scope: {
         onSelect: '&',

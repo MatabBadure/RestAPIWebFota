@@ -3,6 +3,10 @@
 angular.module('hillromvestApp')
     .config(function($stateProvider) {
         $stateProvider
+            .state('entity', {
+                abstract: true,
+                parent: 'site'
+              })
             .state('admin', {
                 parent: 'entity',
                 url: '/admin',
@@ -10,19 +14,64 @@ angular.module('hillromvestApp')
             })
             .state('patientUser', {
                 parent: 'admin',
-                url: '/patient',
-                abstract: true,
-            })
-            .state('patients', {
-                parent: 'patientUser',
-                url: '/list',
+                url: '/patients',
                 data: {
                     roles: ['ADMIN'],
                     pageTitle: 'patient.title'
                 },
                 views: {
                     'content@': {
-                        templateUrl: 'scripts/app/modules/admin/patient/views/view.html',
+                        templateUrl: 'scripts/app/modules/admin/patient/views/list/view.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+            .state('patientNew', {
+                parent: 'patientUser',
+                url: '/new',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/views/create-edit/view.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+            .state('patientEdit', {
+                parent: 'patientUser',
+                url: '/{patientId}',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/views/create-edit/view.html',
                         controller: 'patientsController'
                     }
                 },
@@ -40,12 +89,7 @@ angular.module('hillromvestApp')
             })
             .state('hillRomUser', {
                 parent: 'admin',
-                url: '/hillromuser',
-                abstract: true,
-            })
-            .state('userList', {
-                parent: 'hillRomUser',
-                url: '/list',
+                url: '/hillRomUsers',
                 data: {
                     roles: ['ADMIN'],
                     pageTitle: 'patient.title'
@@ -68,7 +112,7 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
-            .state('userCreate', {
+            .state('hillRomUserNew', {
                 parent: 'hillRomUser',
                 url: '/new',
                 data: {
@@ -93,9 +137,9 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
-            .state('userEdit', {
+            .state('hillRomUserEdit', {
                 parent: 'hillRomUser',
-                url: '/{userId}/edit',
+                url: '/{userId}',
                 data: {
                     roles: ['ADMIN'],
                     pageTitle: 'patient.title'
@@ -120,12 +164,7 @@ angular.module('hillromvestApp')
             })
             .state('hcpUser', {
                 parent: 'admin',
-                url: '/hcp',
-                abstract: true,
-            })
-            .state('hcpList', {
-                parent: 'hcpUser',
-                url: '/list',
+                url: '/hcpUsers',
                 data: {
                     roles: ['ADMIN'],
                     pageTitle: 'patient.title'
@@ -148,7 +187,7 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
-            .state('createHCP', {
+            .state('hcpNew', {
                 parent: 'hcpUser',
                 url: '/new',
                 data: {
@@ -173,9 +212,9 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
-            .state('editHCP', {
+            .state('hcpEdit', {
                 parent: 'hcpUser',
-                url: '/{doctorId}/edit',
+                url: '/{doctorId}',
                 data: {
                     roles: ['ADMIN'],
                     pageTitle: 'patient.title'

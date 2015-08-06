@@ -42,13 +42,6 @@ angular.module('hillromvestApp')
         });
 
         $scope.selectPatient = function(patient) {
-          // patientService.getPatientInfo(patient.id).then(function(response) {
-          //   $scope.patientInfo = response.data;
-          //   $scope.patient = $scope.patientInfo;
-          //   $scope.onSelect({
-          //     'patient': $scope.patient
-          //   });
-          // }).catch(function(response) { });
           $state.go('patientEdit', {
             'patientId': patient.id
           });

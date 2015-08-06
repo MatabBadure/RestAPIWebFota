@@ -13,9 +13,9 @@ angular.module('hillromvestApp')
 
     $scope.init = function(){
       var currentRoute = $state.current.name;
-      if ($state.current.name === 'editHCP') {
+      if ($state.current.name === 'hcpEdit') {
         $scope.getDoctorDetails($stateParams.doctorId, $scope.setEditMode);
-      } else if ($state.current.name === 'createHCP') {
+      } else if ($state.current.name === 'hcpNew') {
         $scope.createDoctor();
       }
     }

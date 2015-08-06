@@ -43,13 +43,13 @@ angular.module('hillromvestApp')
         });
 
         $scope.selectDoctor = function(doctor) {
-          $state.go('editHCP',{
+          $state.go('hcpEdit',{
             'doctorId': doctor.id
           });
         };
 
         $scope.createDoctor = function() {
-          $state.go('createHCP');
+          $state.go('hcpNew');
         };
 
         $scope.searchDoctors = function(track) {

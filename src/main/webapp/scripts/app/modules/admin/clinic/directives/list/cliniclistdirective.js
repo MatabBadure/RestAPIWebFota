@@ -19,7 +19,6 @@ angular.module('hillromvestApp')
     controller: function($scope, $timeout, $state, clinicService) {
 
       $scope.init = function () {
-        console.log('LOADING DIRECTIVE...!');
         $scope.currentPageIndex = 1;
         $scope.perPageCount = 10;
         $scope.pageCount = 0;

@@ -10,14 +10,8 @@ angular.module('hillromvestApp')
       'isMessage':false,
       'message': ''
     }
-    $scope.selectedClinic = function(clinic) {
-      // $scope.clinicStatus.editMode = true;
-      // $scope.clinicStatus.isCreate = false;
-      // $scope.clinic = clinic;
-    };
 
     $scope.init = function() {
-      console.log('Loading Controller...!');
       var currentRoute = $state.current.name;
       if ($state.current.name === 'clinicEdit') {
         $scope.getClinicDetails($stateParams.clinicId, $scope.setEditMode);
@@ -39,6 +33,11 @@ angular.module('hillromvestApp')
       $scope.clinicStatus.editMode = true;
       $scope.clinicStatus.isCreate = false;
       $scope.clinic = clinic;
+      if($scope.clinic.parent === true){
+        $scope.clinic.type = 'parent';
+      }else{
+        $scope.clinic.type = 'child';
+      }
     };
 
     $scope.createClinic = function(){

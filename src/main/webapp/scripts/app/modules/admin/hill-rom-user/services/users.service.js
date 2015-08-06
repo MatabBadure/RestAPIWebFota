@@ -52,7 +52,7 @@ angular.module('hillromvestApp')
       },
 
       getState: function() {
-        return $http.get('scripts/components/entities/patients/new/state.json')
+        return $http.get('scripts/app/modules/admin/hill-rom-user/services/state.json')
           .success(function(response) {
             return response;
           });

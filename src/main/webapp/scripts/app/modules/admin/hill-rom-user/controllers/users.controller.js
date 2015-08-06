@@ -12,9 +12,9 @@ angular.module('hillromvestApp')
 
     $scope.init = function() {
       var currentRoute = $state.current.name;
-      if ($state.current.name === 'userEdit') {
+      if ($state.current.name === 'hillRomUserEdit') {
         $scope.getUserDetails($stateParams.userId, $scope.setEditMode);
-      } else if ($state.current.name === 'userCreate') {
+      } else if ($state.current.name === 'hillRomUserNew') {
         $scope.createUser();
       }
     };

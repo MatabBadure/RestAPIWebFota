@@ -51,11 +51,11 @@ angular.module('hillromvestApp')
          * Function to select the User from the List suggested on search
          */
         $scope.selectUser = function(user) {
-          $state.go('userEdit', { userId: user.id });
+          $state.go('hillRomUserEdit', { userId: user.id });
         };
 
         $scope.createUser = function() {
-          $state.go('userCreate');
+          $state.go('hillRomUserNew');
         };
 
         /**

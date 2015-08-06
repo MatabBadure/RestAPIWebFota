@@ -173,7 +173,7 @@ angular.module('hillromvestApp')
           $scope.doctor = {};
           $scope.doctor.clinics = [];
           $scope.form.$setPristine();
-          $state.go('hcpList');
+          $state.go('hcpUser');
         }
       }
     };

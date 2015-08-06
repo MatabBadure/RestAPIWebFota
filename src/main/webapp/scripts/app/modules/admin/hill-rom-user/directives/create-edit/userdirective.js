@@ -152,8 +152,7 @@ angular.module('hillromvestApp')
           $scope.userStatus.editMode = false;
           $scope.form.$setPristine();
           $scope.submitted = false;
-          //$scope.onSuccess();
-          $state.go('userList');
+          $state.go('hillRomUser');
         }
 
         /**

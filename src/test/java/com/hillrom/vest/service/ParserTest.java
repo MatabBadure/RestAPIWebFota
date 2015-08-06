@@ -85,7 +85,7 @@ public class ParserTest {
 		expectedRecord2.setPressure(0);
 		expectedRecord2.setEventId(""+3);
 		expectedRecord2.setHmr(1080d);
-		expectedRecord2.setTimestamp(1416339103L);
+		expectedRecord2.setTimestamp(1416339103000L);
 		expectedRecord2.setSequenceNumber(2);
 		
 	

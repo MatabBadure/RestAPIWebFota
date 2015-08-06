@@ -11,7 +11,7 @@
 	<property name="autoIncrement" value="false" dbms="oracle" />
 	<!-- Added the entity UserExtension. -->
 	<changeSet id="20150805155400" author="jhipster">
-		<createTable tableName="BAD_VEST_DEVICE_DATA">
+		<createTable tableName="VEST_DEVICE_BAD_DATA">
 			<column name="id" type="bigint" autoIncrement="${autoIncrement}">
 				<constraints primaryKey="true" nullable="false" />
 			</column>

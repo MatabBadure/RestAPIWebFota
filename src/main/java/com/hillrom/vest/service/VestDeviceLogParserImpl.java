@@ -93,6 +93,7 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 						.getValueFromMessage(
 								rawMessage,
 								PatientVestDeviceRawLogModelConstants.HUB_RECEIVE_TIME_OFFSET));
+		
 		return patientVestDeviceRawLog;
 	}
 

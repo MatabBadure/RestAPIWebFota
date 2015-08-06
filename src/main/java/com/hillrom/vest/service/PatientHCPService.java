@@ -10,10 +10,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.hillrom.vest.domain.PatientInfo;
+import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
+import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
+import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 
@@ -32,11 +35,14 @@ public class PatientHCPService {
     @Inject
     private UserExtensionRepository userExtensionRepository;
     
+    @Inject
+    private UserRepository userRepository;
+    
     public JSONObject associateHCPToPatient(Long id, List<Map<String, String>> hcpList) {
     	JSONObject jsonObject = new JSONObject();
-    	UserExtension patientUser = userExtensionRepository.findOne(id);
+    	User patientUser = userRepository.findOne(id);
     	if(patientUser != null) {
-	    	PatientInfo patientInfo = new PatientInfo();
+	    	PatientInfo patientInfo = null;
 	     	for(UserPatientAssoc patientAssoc : patientUser.getUserPatientAssoc()){
 	    		if(RelationshipLabelConstants.SELF.equals(patientAssoc.getRelationshipLabel())){
 	    			patientInfo = patientAssoc.getPatient();
@@ -48,11 +54,11 @@ public class PatientHCPService {
 		    	for(Map<String, String> hcpId : hcpList) {
 		    		UserExtension hcpUser = userExtensionRepository.findOne(Long.parseLong(hcpId.get("id")));
 		    		if(hcpUser != null) {
-			    		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, hcpUser, AuthoritiesConstants.HCP, RelationshipLabelConstants.HCP);
+			    		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, hcpUser), AuthoritiesConstants.HCP, RelationshipLabelConstants.HCP);
 			    		hcpPatientAssocList.add(userPatientAssoc);
 			    		hcpUserList.add(hcpUser);
 		    		} else {
-		    			jsonObject.put("ERROR", "Invalit HCP id");
+		    			jsonObject.put("ERROR", "Invalid HCP id");
 		    			return jsonObject;
 		    		}
 		    	}

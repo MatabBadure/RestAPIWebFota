@@ -397,8 +397,7 @@ public class UserService {
 
 	public UserPatientAssoc createUserPatientAssociation(UserExtension newUser,
 			PatientInfo patientInfo) {
-		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo,
-				newUser, AuthoritiesConstants.PATIENT, RelationshipLabelConstants.SELF);
+		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, newUser), AuthoritiesConstants.PATIENT, RelationshipLabelConstants.SELF);
 		userPatientAssoc = userPatientRepository.save(userPatientAssoc);
 		log.debug("Created Information for userPatientAssoc: {}",
 				userPatientAssoc);
@@ -631,7 +630,7 @@ public class UserService {
 		newUser.setPassword(encodedPassword);
 		User persistedUser = userRepository.save(newUser);
 
-		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.PATIENT, RelationshipLabelConstants.SELF);
+		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, newUser), AuthoritiesConstants.PATIENT, RelationshipLabelConstants.SELF);
 		userPatientRepository.save(userPatientAssoc);
 		newUser.getUserPatientAssoc().add(userPatientAssoc);
 		patientInfo.getUserPatientAssoc().add(userPatientAssoc);

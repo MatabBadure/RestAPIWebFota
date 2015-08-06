@@ -1,17 +1,19 @@
 package com.hillrom.vest.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.inject.Inject;
 import net.minidev.json.JSONObject;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.hillrom.vest.domain.Clinic;
+import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
@@ -156,16 +158,23 @@ public class ClinicService {
 			clinic.setClinicAdminId(clinicDTO.getClinicAdminId());
 	}
 
-	public JSONObject getHCPUsers(String id) {
+	public JSONObject getHCPUsers(List<String> idList) {
 		JSONObject jsonObject = new JSONObject();
-    	Clinic clinic = clinicRepository.getOne(id);
-        if(clinic == null) {
-	      	jsonObject.put("ERROR", "No such clinic found.");
-        } else if(clinic.getId() != null) {
-        	jsonObject.put("message", "Associated HCPs fetched successfully.");
-        	jsonObject.put("hcpList", clinic.getUsers());
-        } else {
-	      	jsonObject.put("ERROR", "Unable to fetch associated HCPs.");
+		Set<UserExtension> hcpUserList = new HashSet<>();
+		for(String id : idList){
+	    	Clinic clinic = clinicRepository.getOne(id);
+	        if(clinic == null) {
+		      	jsonObject.put("ERROR", "Invalid clinic id found.");
+		      	return jsonObject;
+	        } else {
+	        	hcpUserList.addAll(clinic.getUsers());
+	        }
+		}
+		jsonObject.put("hcpUsers", hcpUserList);
+		if(hcpUserList.isEmpty()){
+			jsonObject.put("message", "No associated HCPs.");
+		} else {
+	      	jsonObject.put("message", "Associated HCPs fetched successfully.");
         }
         return jsonObject;
     }

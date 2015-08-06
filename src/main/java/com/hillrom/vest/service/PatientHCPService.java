@@ -1,6 +1,7 @@
 package com.hillrom.vest.service;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
@@ -51,8 +52,12 @@ public class PatientHCPService {
 	     	if(patientInfo != null){
 	     		List<UserPatientAssoc> hcpPatientAssocList = new ArrayList<>();
 	     		List<UserExtension> hcpUserList = new ArrayList<>();
-		    	for(Map<String, String> hcpId : hcpList) {
-		    		UserExtension hcpUser = userExtensionRepository.findOne(Long.parseLong(hcpId.get("id")));
+	     		List<Long> idList = new LinkedList<>();
+	     		for(Map<String, String> hcpId : hcpList) {
+	     			idList.add(Long.parseLong(hcpId.get("id")));
+	     		}
+	     		List<UserExtension> hcpUsers = userExtensionRepository.findAll(idList);
+		    	for(UserExtension hcpUser : hcpUsers) {
 		    		if(hcpUser != null) {
 			    		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, hcpUser), AuthoritiesConstants.HCP, RelationshipLabelConstants.HCP);
 			    		hcpPatientAssocList.add(userPatientAssoc);

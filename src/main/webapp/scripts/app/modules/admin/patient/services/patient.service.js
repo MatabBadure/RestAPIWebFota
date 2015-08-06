@@ -38,6 +38,12 @@ angular.module('hillromvestApp')
         });
       },
 
+      /**
+      * @ngdoc method
+      * @name editUser
+      * @description
+      *
+      */
       editPatient : function (id) {
         return $http.put('api/patientInfos/' + id,  {
           headers: headerService.getHeader()
@@ -45,5 +51,40 @@ angular.module('hillromvestApp')
           return response;
         });
       },
+
+      /**
+      * @ngdoc method
+      * @name editUser
+      * @description
+      *
+      */
+      associateHCPToPatient : function(data,id){
+        var url = 'api/patient/' + id + '/associatehcp';
+        return $http.put(url, data, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
+
+      getDoctorsLinkedToPatient : function(id){
+        var url = 'api/patient/' + id + '/hcp';
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
+      disassociateDoctorFromPatient : function(id){
+        var url = 'api/patient/' + id + '/hcp';
+        return $http.delete(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
     };
   });

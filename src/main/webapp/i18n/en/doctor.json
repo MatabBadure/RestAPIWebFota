@@ -62,6 +62,10 @@
         "parent": "parent",
         "submit-button-text": "submit",
         "cancel-button-text": "cancel",
-        "back-button-text": "Back"
+        "back-button-text": "Back",
+        "delete": {
+            "warning": "Are you sure you want to Deactivate the Doctor?",
+            "message": "If you deactivate the doctor, you will no longer be able to view the information."
+        }
     }
 }

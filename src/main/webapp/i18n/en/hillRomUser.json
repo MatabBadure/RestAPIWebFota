@@ -57,6 +57,10 @@
         "npiNumber": "NpiNumber",
         "parent": "parent",
         "submit-button-text": "submit",
-        "required-field": "* Required Fields"
+        "required-field": "* Required Fields",
+        "delete": {
+            "warning": "Are you sure you want to Deactivate the User?",
+            "message": "If you deactivate the hillrom user, you will no longer be able to view the information."
+        }
     }
 }

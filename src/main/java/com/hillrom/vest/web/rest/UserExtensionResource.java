@@ -252,4 +252,21 @@ public class UserExtensionResource {
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         }
     }
+    
+    /**
+     * GET  /patient/:id/hcp -> get the HCP users associated with patient user.
+     */
+    @RequestMapping(value = "/patient/{id}/hcp",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<JSONObject> getAssociatedHCPUserForPatient(@PathVariable Long id) {
+        log.debug("REST request to get Associated HCP users for Patient : {}", id);
+        JSONObject jsonObject = patientHCPService.getAssociatedHCPUserForPatient(id);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
 }

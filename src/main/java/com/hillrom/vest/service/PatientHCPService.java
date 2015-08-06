@@ -52,12 +52,8 @@ public class PatientHCPService {
 	     	if(patientInfo != null){
 	     		List<UserPatientAssoc> hcpPatientAssocList = new ArrayList<>();
 	     		List<UserExtension> hcpUserList = new ArrayList<>();
-	     		List<Long> idList = new LinkedList<>();
-	     		for(Map<String, String> hcpId : hcpList) {
-	     			idList.add(Long.parseLong(hcpId.get("id")));
-	     		}
-	     		List<UserExtension> hcpUsers = userExtensionRepository.findAll(idList);
-		    	for(UserExtension hcpUser : hcpUsers) {
+		    	for(Map<String, String> hcpId : hcpList) {
+		    		UserExtension hcpUser = userExtensionRepository.findOne(Long.parseLong(hcpId.get("id")));
 		    		if(hcpUser != null) {
 			    		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, hcpUser), AuthoritiesConstants.HCP, RelationshipLabelConstants.HCP);
 			    		hcpPatientAssocList.add(userPatientAssoc);
@@ -70,6 +66,34 @@ public class PatientHCPService {
 		    	userPatientRepository.save(hcpPatientAssocList);
 		    	jsonObject.put("message", "HCPs are associated with patient successfully.");
 		    	jsonObject.put("hcpList", hcpUserList);
+	     	} else {
+	     		jsonObject.put("ERROR", "No such patient exist");
+	     	}
+    	} else {
+     		jsonObject.put("ERROR", "No such user exist");
+     	}
+    	return jsonObject;
+    }
+    
+    public JSONObject getAssociatedHCPUserForPatient(Long id) {
+    	JSONObject jsonObject = new JSONObject();
+    	User patientUser = userRepository.findOne(id);
+    	if(patientUser != null) {
+    		PatientInfo patientInfo = null;
+	     	for(UserPatientAssoc patientAssoc : patientUser.getUserPatientAssoc()){
+	    		if(RelationshipLabelConstants.SELF.equals(patientAssoc.getRelationshipLabel())){
+	    			patientInfo = patientAssoc.getPatient();
+	    		}
+	    	}
+	     	if(patientInfo != null){
+		    	List<User> hcpUsers = new LinkedList<>();
+		     	for(UserPatientAssoc userPatientAssoc : patientInfo.getUserPatientAssoc()){
+		    		if(RelationshipLabelConstants.HCP.equals(userPatientAssoc.getRelationshipLabel())){
+		    			hcpUsers.add(userPatientAssoc.getUser());
+		    		}
+		    	}
+		    	jsonObject.put("message", "Associated HCPs with patient fetched successfully.");
+		    	jsonObject.put("hcpUsers", hcpUsers);
 	     	} else {
 	     		jsonObject.put("ERROR", "No such patient exist");
 	     	}

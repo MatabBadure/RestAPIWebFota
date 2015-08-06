@@ -11,7 +11,10 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedStoredProcedureQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureParameter;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
@@ -30,11 +33,12 @@ import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
  */
 @Entity
 @Table(name = "PATIENT_INFO")
+@NamedStoredProcedureQuery(name = "PatientInfo.id", procedureName = "get_next_patient_hillromid", parameters = {
+		@StoredProcedureParameter(mode = ParameterMode.OUT, name = "hillrom_id", type = String.class) })
 public class PatientInfo implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private String id;
 
     @Column(name = "hillrom_id")
     private String hillromId;
@@ -104,16 +108,22 @@ public class PatientInfo implements Serializable {
     @OneToMany(mappedBy = "patient",fetch=FetchType.LAZY)
     @JsonIgnore
     private Set<UserPatientAssoc> userPatientAssoc = new HashSet<>();
+    
+	@Column(name = "primary_phone")
+	private String primaryPhone;
 
-    public Long getId() {
-        return id;
-    }
+	@Column(name = "mobile_phone")
+	private String mobilePhone;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getId() {
+		return id;
+	}
 
-    public String getHillromId() {
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getHillromId() {
         return hillromId;
     }
 
@@ -281,6 +291,22 @@ public class PatientInfo implements Serializable {
 		this.userPatientAssoc = userPatientAssoc;
 	}
 
+	public String getPrimaryPhone() {
+		return primaryPhone;
+	}
+
+	public void setPrimaryPhone(String primaryPhone) {
+		this.primaryPhone = primaryPhone;
+	}
+
+	public String getMobilePhone() {
+		return mobilePhone;
+	}
+
+	public void setMobilePhone(String mobilePhone) {
+		this.mobilePhone = mobilePhone;
+	}
+
 	@Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -301,8 +327,7 @@ public class PatientInfo implements Serializable {
     public int hashCode() {
         return Objects.hashCode(id);
     }
-
-    @Override
+	@Override
     public String toString() {
         return "PatientInfo{" +
                 "id=" + id +

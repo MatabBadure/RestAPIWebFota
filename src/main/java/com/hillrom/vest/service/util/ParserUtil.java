@@ -30,7 +30,7 @@ public class ParserUtil {
 
 	public static String getFieldByStartAndEndOffset(String encodedString,int startOffset,int endOffset){
 		if(StringUtils.isNotBlank(encodedString)){
-			if(endOffset < encodedString.length())
+			if(endOffset <= encodedString.length())
 				return encodedString.substring(startOffset, endOffset);
 		}
 		return null;

@@ -74,6 +74,9 @@ public class PatientVestDeviceRawLog implements Serializable {
     @Column(name = "raw_message")
     private String rawMessage;
 
+    @Column(name="hub_receive_time_offset")
+    private String hubReceiveTimeOffset;
+    
 	public Long getHubReceiveTime() {
 		return hubReceiveTime;
 	}
@@ -184,6 +187,14 @@ public class PatientVestDeviceRawLog implements Serializable {
 
 	public void setRawMessage(String rawMessage) {
 		this.rawMessage = rawMessage;
+	}
+
+	public String getHubReceiveTimeOffset() {
+		return hubReceiveTimeOffset;
+	}
+
+	public void setHubReceiveTimeOffset(String hubReceiveTimeOffset) {
+		this.hubReceiveTimeOffset = hubReceiveTimeOffset;
 	}
 
 	@Override

@@ -78,7 +78,7 @@ public class ClinicResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
-    public ResponseEntity<JSONObject> update(@PathVariable Long id, @RequestBody ClinicDTO clinicDTO) {
+    public ResponseEntity<JSONObject> update(@PathVariable String id, @RequestBody ClinicDTO clinicDTO) {
         log.debug("REST request to update Clinic : {}", clinicDTO);
         JSONObject jsonObject = clinicService.updateClinic(id, clinicDTO);
         if (jsonObject.containsKey("ERROR")) {
@@ -120,7 +120,7 @@ public class ClinicResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Clinic> get(@PathVariable Long id) {
+    public ResponseEntity<Clinic> get(@PathVariable String id) {
         log.debug("REST request to get Clinic : {}", id);
         return Optional.ofNullable(clinicRepository.findOne(id))
             .map(clinic -> new ResponseEntity<>(
@@ -137,7 +137,7 @@ public class ClinicResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
-    public ResponseEntity<JSONObject> delete(@PathVariable Long id) {
+    public ResponseEntity<JSONObject> delete(@PathVariable String id) {
     	log.debug("REST request to delete Clinic : {}", id);
     	JSONObject jsonObject = clinicService.deleteClinic(id);
         if (jsonObject.containsKey("ERROR")) {
@@ -178,7 +178,7 @@ public class ClinicResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<JSONObject> getHCPUsers(@PathVariable Long id) {
+    public ResponseEntity<JSONObject> getHCPUsers(@PathVariable String id) {
         log.debug("REST request to get Clinic : {}", id);
         JSONObject jsonObject = clinicService.getHCPUsers(id);
         if (jsonObject.containsKey("ERROR")) {

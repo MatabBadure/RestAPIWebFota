@@ -25,7 +25,7 @@
         "general-details": "General Details",
         "clinic-name": "Clinic Name",
         "hr-id": "HR-ID",
-        "personal-details": "Personal Details",
+        "personal-details": "Clinic Details",
         "address": "Address",
         "zipcode": "Zip",
         "city": "City",
@@ -41,6 +41,10 @@
         "parent": "parent",
         "submit-button-text": "submit",
         "required-field": "* Required Fields",
-        "back-button-text": "Back"
+        "back-button-text": "Back",
+        "delete": {
+            "warning": "Are you sure you want to Deactivate the Clinic?",
+            "message": "If you deactivate the clinic, you will no longer be able to view the information."
+        }
     }
 }

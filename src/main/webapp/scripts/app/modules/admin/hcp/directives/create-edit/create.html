@@ -304,10 +304,10 @@
     <div class="modal__content">
       <header class="modal__header">
         <button type="button" class="modal__close" data-dismiss="modal" ng-click="close()">&times;</button>
-         Are you sure you want to Disassociate the Doctor ?
+         <p translate="doctor.delete.warning"></p>
       </header>
       <div class="modal__body">
-         <div class="modal--message">If you disassociate the doctor,you will no longer be able to view their information</div>
+         <div class="modal--message" translate="doctor.delete.message"></div>
          <div class="row modal--custom-btn">
           <buton class="hillrom-btn btn-submit float-right" ng-click="deleteDoctor()">Yes</buton>
           <buton class="hillrom-btn btn-submit float-right" data-dismiss="modal" ng-click="close()">No</buton>

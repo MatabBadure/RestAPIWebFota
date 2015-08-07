@@ -51,13 +51,11 @@ public class PatientHCPService {
 	    	}
 	     	if(patientInfo != null){
 	     		List<UserPatientAssoc> hcpPatientAssocList = new ArrayList<>();
-	     		List<UserExtension> hcpUserList = new ArrayList<>();
 		    	for(Map<String, String> hcpId : hcpList) {
 		    		UserExtension hcpUser = userExtensionRepository.findOne(Long.parseLong(hcpId.get("id")));
 		    		if(hcpUser != null) {
 			    		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, hcpUser), AuthoritiesConstants.HCP, RelationshipLabelConstants.HCP);
 			    		hcpPatientAssocList.add(userPatientAssoc);
-			    		hcpUserList.add(hcpUser);
 		    		} else {
 		    			jsonObject.put("ERROR", "Invalid HCP id");
 		    			return jsonObject;
@@ -65,7 +63,7 @@ public class PatientHCPService {
 		    	}
 		    	userPatientRepository.save(hcpPatientAssocList);
 		    	jsonObject.put("message", "HCPs are associated with patient successfully.");
-		    	jsonObject.put("hcpList", hcpUserList);
+		    	jsonObject.put("hcpUsers", getAssociatedHCPUserList(patientInfo));
 	     	} else {
 	     		jsonObject.put("ERROR", "No such patient exist");
 	     	}
@@ -86,12 +84,7 @@ public class PatientHCPService {
 	    		}
 	    	}
 	     	if(patientInfo != null){
-		    	List<User> hcpUsers = new LinkedList<>();
-		     	for(UserPatientAssoc userPatientAssoc : patientInfo.getUserPatientAssoc()){
-		    		if(RelationshipLabelConstants.HCP.equals(userPatientAssoc.getRelationshipLabel())){
-		    			hcpUsers.add(userPatientAssoc.getUser());
-		    		}
-		    	}
+		    	List<User> hcpUsers = getAssociatedHCPUserList(patientInfo);
 		    	jsonObject.put("message", "Associated HCPs with patient fetched successfully.");
 		    	jsonObject.put("hcpUsers", hcpUsers);
 	     	} else {
@@ -102,5 +95,15 @@ public class PatientHCPService {
      	}
     	return jsonObject;
     }
+
+	private List<User> getAssociatedHCPUserList(PatientInfo patientInfo) {
+		List<User> hcpUsers = new LinkedList<>();
+		for(UserPatientAssoc userPatientAssoc : patientInfo.getUserPatientAssoc()){
+			if(RelationshipLabelConstants.HCP.equals(userPatientAssoc.getRelationshipLabel())){
+				hcpUsers.add(userPatientAssoc.getUser());
+			}
+		}
+		return hcpUsers;
+	}
 }
 

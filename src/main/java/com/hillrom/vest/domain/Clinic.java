@@ -66,7 +66,7 @@ public class Clinic implements Serializable {
     @JsonBackReference
     private List<Clinic> childClinics = new ArrayList<Clinic>();
 
-    @OneToMany(mappedBy = "clinic",fetch=FetchType.LAZY)
+    @OneToMany(mappedBy = "clinicPatientAssocPK.clinic",fetch=FetchType.LAZY)
     @JsonIgnore
     private Set<ClinicPatientAssoc> clinicPatientAssoc = new HashSet<>();
     

@@ -101,7 +101,7 @@ public class PatientInfo implements Serializable {
     @Column(name = "web_login_created")
     private Boolean webLoginCreated;
 
-    @OneToMany(mappedBy = "patient",fetch=FetchType.LAZY)
+    @OneToMany(mappedBy = "clinicPatientAssocPK.patient",fetch=FetchType.LAZY)
     @JsonIgnore
     private Set<ClinicPatientAssoc> clinicPatientAssoc = new HashSet<>();
     

@@ -34,6 +34,7 @@ import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.HCPClinicService;
+import com.hillrom.vest.service.ClinicPatientService;
 import com.hillrom.vest.service.PatientHCPService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
@@ -59,6 +60,9 @@ public class UserExtensionResource {
     
     @Inject
     private PatientHCPService patientHCPService;
+    
+    @Inject
+    private ClinicPatientService clinicPatientService;
     
     @Inject
     private UserSearchRepository userSearchRepository;
@@ -244,7 +248,7 @@ public class UserExtensionResource {
     @Timed
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> associateHCPToPatient(@PathVariable Long id, @RequestBody List<Map<String, String>> hcpList) {
-        log.debug("REST request to dissociate clinic from HCP : {}", id);
+        log.debug("REST request to associate HCP users with Patient : {}", id);
         JSONObject jsonObject = patientHCPService.associateHCPToPatient(id, hcpList);
         if (jsonObject.containsKey("ERROR")) {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
@@ -260,9 +264,64 @@ public class UserExtensionResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> getAssociatedHCPUserForPatient(@PathVariable Long id) {
-        log.debug("REST request to get Associated HCP users for Patient : {}", id);
+        log.debug("REST request to get associated HCP users with Patient : {}", id);
         JSONObject jsonObject = patientHCPService.getAssociatedHCPUserForPatient(id);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * GET  /patient/:id/clinics -> get the clinics associated with patient user.
+     */
+    @RequestMapping(value = "/patient/{id}/clinics",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> getAssociatedClinicsForPatient(@PathVariable Long id) {
+        log.debug("REST request to get associated clinics with Patient : {}", id);
+        JSONObject jsonObject = clinicPatientService.getAssociatedClinicsForPatient(id);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * PUT  /patient/:id/associateclinics -> associate clinics to the "id" patient user.
+     */
+    @RequestMapping(value = "/patient/{id}/associateclinics",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> associateClinicsToPatient(@PathVariable Long id, @RequestBody List<Map<String, String>> clinicList) {
+        log.debug("REST request to associate clinic with Patient : {}", id);
+        JSONObject jsonObject = clinicPatientService.associateClinicsToPatient(id, clinicList);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * PUT  /patient/:id/dissociateclinics -> dissociate clinics to the "id" patient user.
+     */
+    @RequestMapping(value = "/patient/{id}/dissociateclinics",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> dissociateClinicsToPatient(@PathVariable Long id, @RequestBody List<Map<String, String>> clinicList) {
+        log.debug("REST request to dissociate clinic with Patient : {}", id);
+        JSONObject jsonObject = clinicPatientService.dissociateClinicsToPatient(id, clinicList);
         if (jsonObject.containsKey("ERROR")) {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {

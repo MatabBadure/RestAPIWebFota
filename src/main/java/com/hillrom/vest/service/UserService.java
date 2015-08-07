@@ -275,6 +275,7 @@ public class UserService {
     	rolesAdminCanModerate.add(AuthoritiesConstants.ACCT_SERVICES);
     	rolesAdminCanModerate.add(AuthoritiesConstants.ASSOCIATES);
     	rolesAdminCanModerate.add(AuthoritiesConstants.ADMIN);
+    	rolesAdminCanModerate.add(AuthoritiesConstants.CLINIC_ADMIN);
 		return rolesAdminCanModerate;
 	}
     

@@ -17,7 +17,7 @@ angular.module('hillromvestApp')
       },
 
 
-      controller: function($scope, noty, $state, $filter) {
+      controller: function($scope, notyService, $state, $filter) {
 
          $scope.open = function () {
           $scope.showModal = true;
@@ -63,7 +63,6 @@ angular.module('hillromvestApp')
             $scope.clinic.parent = false;
           }
           if ($scope.clinicStatus.editMode) {
-            // edit Clinic section
             var data = $scope.clinic;
             if (data.parentClinic) {
               var id = data.parentClinic.id;
@@ -73,62 +72,53 @@ angular.module('hillromvestApp')
               data.parentClinic.id = id;
               $scope.clinic.parentClinic.name = name;
             }
-            clinicService.updateClinic(data).then(function(data) {
-              $scope.clinicStatus.isMessage = true;
-              $scope.clinicStatus.message = "Clinic updated successfully" + " for ID " + data.data.Clinic.id;
-              noty.showNoty({
-                text: $scope.clinicStatus.message,
-                ttl: 5000,
-                type: "success"
-              });
-              $scope.init();
-              $scope.reset();
-
-            }).catch(function(response) {
-              if (response.data.message !== undefined) {
-                $scope.clinicStatus.message = response.data.message;
-              } else if(response.data.ERROR !== undefined){
-                $scope.clinicStatus.message = data.data.ERROR;
-              } else {
-                $scope.clinicStatus.message = 'Error occurred! Please try again';
-              }
-              $scope.clinicStatus.isMessage = true;
-              noty.showNoty({
-                text: $scope.clinicStatus.message,
-                ttl: 5000,
-                type: "warning"
-              });
-
-            });
+            $scope.editClinic(data);
           } else {
             if ($scope.clinic.type === 'parent' && $scope.clinic.parentClinic) {
               delete $scope.clinic.parentClinic;
             }
-            clinicService.createClinic($scope.clinic).then(function(data) {
-              $scope.clinicStatus.isMessage = true;
-              $scope.clinicStatus.message = "Clinic created successfully";
-              noty.showNoty({
-                text: $scope.clinicStatus.message,
-                ttl: 5000,
-                type: "success"
-              });
-              $scope.reset();
-            }).catch(function(response) {
-              if (response.data.message !== undefined) {
-                $scope.clinicStatus.message = response.data.message;
-              } else if(response.data.ERROR !== undefined) {
-                $scope.clinicStatus.message = response.data.ERROR;
-              } else {
-                $scope.clinicStatus.message = 'Error occured! Please try again';
-              }
-              $scope.clinicStatus.isMessage = true;
-              noty.showNoty({
-                text: $scope.clinicStatus.message,
-                ttl: 5000,
-                type: "warning"
-              });
-            });
+            $scope.newClinic($scope.clinic);
           }
+        };
+
+        $scope.editClinic = function(data){
+          clinicService.updateClinic(data).then(function(data) {
+            $scope.clinicStatus.isMessage = true;
+            $scope.clinicStatus.message = "Clinic updated successfully" + " for ID " + data.data.Clinic.id;
+            notyService.showMessage($scope.clinicStatus.message, 'success');
+            $scope.init();
+            $scope.reset();
+
+          }).catch(function(response) {
+            if (response.data.message !== undefined) {
+              $scope.clinicStatus.message = response.data.message;
+            } else if(response.data.ERROR !== undefined){
+              $scope.clinicStatus.message = data.data.ERROR;
+            } else {
+              $scope.clinicStatus.message = 'Error occurred! Please try again';
+            }
+            $scope.clinicStatus.isMessage = true;
+            notyService.showMessage($scope.clinicStatus.message, 'warning');
+          });
+        };
+
+        $scope.newClinic = function(data){
+          clinicService.createClinic(data).then(function(data) {
+            $scope.clinicStatus.isMessage = true;
+            $scope.clinicStatus.message = "Clinic created successfully";
+            notyService.showMessage($scope.clinicStatus.message, 'success');
+            $scope.reset();
+          }).catch(function(response) {
+            if (response.data.message !== undefined) {
+              $scope.clinicStatus.message = response.data.message;
+            } else if(response.data.ERROR !== undefined) {
+              $scope.clinicStatus.message = response.data.ERROR;
+            } else {
+              $scope.clinicStatus.message = 'Error occured! Please try again';
+            }
+            $scope.clinicStatus.isMessage = true;
+            notyService.showMessage($scope.clinicStatus.message, 'warning');
+          });
         };
 
         $scope.deleteClinic = function() {
@@ -136,11 +126,7 @@ angular.module('hillromvestApp')
             $scope.showModal = false;
             $scope.clinicStatus.isMessage = true;
             $scope.clinicStatus.message = data.data.message;
-            noty.showNoty({
-              text: $scope.clinicStatus.message,
-              ttl: 5000,
-              type: "success"
-            });
+            notyService.showMessage($scope.clinicStatus.message, 'success');
             $scope.reset();
           }).catch(function(response) {
              $scope.showModal = false;
@@ -152,11 +138,7 @@ angular.module('hillromvestApp')
               $scope.clinicStatus.message = 'Error occured! Please try again';
             }
             $scope.clinicStatus.isMessage = true;
-            noty.showNoty({
-              text: $scope.clinicStatus.message,
-              ttl: 5000,
-              type: "warning"
-            });
+            notyService.showMessage($scope.clinicStatus.message, 'warning');
           });
         };
 

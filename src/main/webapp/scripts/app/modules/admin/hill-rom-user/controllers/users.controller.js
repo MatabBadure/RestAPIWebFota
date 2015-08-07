@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .controller('UsersController', function($scope,UserService,$state,$stateParams) {
+  .controller('UsersController', function($scope, UserService, $state, $stateParams) {
     $scope.user = {};
     $scope.userStatus = {
       'role': localStorage.getItem('role'),
@@ -19,15 +19,16 @@ angular.module('hillromvestApp')
       }
     };
 
-      $scope.setEditMode = function(user) {
-        $scope.userStatus.editMode = true;
-        $scope.userStatus.isCreate = false;
-        $scope.user = user;
+    $scope.setEditMode = function(user) {
+      $scope.userStatus.editMode = true;
+      $scope.userStatus.isCreate = false;
+      $scope.user = user;
+    };
 
-      }
-      $scope.getUserDetails = function(userId, callback) {
+    $scope.getUserDetails = function(userId, callback) {
       UserService.getUser(userId).then(function(response) {
-        $scope.user = response.data;
+        response.data.user.role = response.data.user.authorities[0].name;
+        $scope.user = response.data.user;
         if (typeof callback === 'function') {
           callback($scope.user);
         }

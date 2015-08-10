@@ -1,8 +1,0 @@
-	<div ng-show="clinicStatus.editMode || clinicStatus.isCreate">
-		<clinic clinic-data="clinic" clinic-status="clinicStatus" on-success="onSuccess()"></clinic>
-	</div>
-
-
-	<div ng-show="!clinicStatus.editMode && !clinicStatus.isCreate">
-		<clinic-list on-select="selectedClinic(clinic)" on-create="createClinic()" clinic-status="clinicStatus"></clinic-list>
-	</div>

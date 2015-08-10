@@ -1,0 +1,351 @@
+
+<div class="navbar dashboard dashbord-nav">
+  <div class="container">
+    <div class="dashbord-nav__primary pull-left" ng-show="!patientStatus.isCreate">
+      <span class="dashbord-nav__primary--title" translate="patient.home.updateLabel">Update Patient</span>
+    </div>
+    <div class="dashbord-nav__primary pull-left" ng-show="patientStatus.isCreate">
+      <span class="dashbord-nav__primary--title" translate="patient.home.createLabel">Create Patient</span>
+    </div>
+
+    <div class="dashbord-nav__secondary create-user navbar-right cursor-pointer" ng-click="cancel()">
+      <span class="" translate="patient.back-button-text">Back</span>
+    </div>
+  </div>
+</div>
+
+<div class="dashboard dashboard--content padding-bottom-ls">
+  <form name="form" ng-submit="createPatient()" novalidate autocomplete="off">
+    <div class="container dashboard__form">
+      <div class="margin-top-xl">
+        <div class="col-md-16 reset-padding">
+          <div class="col-md-12 reset-padding">
+            <span class="dashboard__form--type" translate="patient.general-details"></span>
+          </div>
+          <div class="col-md-4 user-required reset-padding">
+            <span translate="patient.required-field"></span>
+          </div>
+        </div>
+
+        <div class="col-md-16 margin-top reset-padding">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.hill-rom-id"></span>
+              <span class="">*</span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input class="" type="text" validate-on-blur ng-model="patient.hillromId" name="HRID" ng-readonly="patientStatus.editMode" required>
+              <div ng-show="(form.HRID.$dirty && form.HRID.$showValidationMessage && form.HRID.$invalid) || submitted">
+                <span class="has-error" ng-show="form.HRID.$error.required">
+                  JDE/HR ID is required.
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-7 row col-md-offset-2" ng-if="patientStatus.editMode && patientStatus.role =='CLINIC_ADMIN'">
+            <div class="col-md-6 dashboard__form--label">
+              <span class="" translate="patient.mrn-id"></span>
+              <span class=""></span>
+            </div>
+            <div class="col-md-10 dashboard__form--input">
+              <input class="" type="text" ng-model="patient.MRNID" name="MRNID">
+            </div>
+          </div>
+        </div>
+        <div class="clr"></div>
+      </div>
+
+
+      <div class="margin-top-xl">
+        <div class="col-md-16 reset-padding">
+          <span class="dashboard__form--type" translate="patient.personal-details"></span>
+        </div>
+
+        <div class="col-md-16 margin-top reset-padding">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.title.name"></span>
+            </div>
+            <div class="col-md-10 dashboard__form__input reset-padding selected-box-container">
+              <div class="custom-dropdown">
+                <select name="title" ng-readonly="validateADMINorASP()" ng-model="patient.title" ng-options="option for option in ['Mr.', 'Mrs.', 'Ms.']" ng-selected="{{option === patient.title}}">
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-7 col-md-offset-2 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.primary-language"></span>
+            </div>
+            <div class="col-md-10 dashboard__form__input--option reset-padding selected-box-container">
+              <div class="custom-dropdown">
+                <select name="language" ng-readonly="validateADMINorASP()" ng-model="patient.langKey">
+                  <option value="" selected="selected">Select a language</option>
+                  <option value="en">English</option>
+                  <option value="fr">French</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.first-name"></span>
+              <span class="">*</span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input class="" type="text" validate-on-blur name="firstName" ng-model="patient.firstName" ng-readonly="validateADMINorASP()" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-z A-Z]+$/" required>
+              <div ng-show="(form.firstName.$dirty && form.firstName.$showValidationMessage && form.firstName.$invalid) ||submitted">
+                <span class="has-error" ng-show="form.firstName.$error.required">
+                  First Name is required.
+                </span>
+                <span class="has-error" ng-show="form.firstName.$error.pattern" >
+                  First Name cannot have number.
+                </span>
+                <span class="has-error" ng-show="form.firstName.$error.minlength" >
+                  First Name is required to be at least 2 character.
+                </span>
+                <span class="has-error" ng-show="form.firstName.$error.maxlength" >
+                  First Name cannot be longer than 15 characters.
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-7 reset-padding col-md-offset-2">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.middle-name"></span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input class="" type="text" validate-on-blur ng-readonly="validateADMINorASP()" name="middleName" ng-model="patient.middleName" ng-pattern="/^[a-z A-Z]+$/" ng-minlength=2 ng-maxlength=15>
+              <div ng-show="(form.middleName.$showValidationMessage && form.middleName.$invalid)">
+                <span class="has-error" ng-show="form.middleName.$error.pattern" >
+                  Middle Name cannot have number.
+                </span>
+                <span class="has-error" ng-show="form.middleName.$error.minlength" >
+                  Middle Name is required to be at least 2 character.
+                </span>
+                <span class="has-error" ng-show="form.middleName.$error.maxlength" >
+                  Middle Name cannot be longer than 15 characters.
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.last-name"></span>
+              <span class="">*</span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input class="" type="text" validate-on-blur name="lastName" ng-model="patient.lastName" ng-readonly="validateADMINorASP()" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-z A-Z]+$/" required>
+              <div ng-show="(form.lastName.$dirty && form.lastName.$showValidationMessage && form.lastName.$invalid) || submitted">
+                <span class="has-error" ng-show="form.lastName.$error.required">
+                  Last Name is required.
+                </span>
+                <span class="has-error" ng-show="form.lastName.$error.pattern" >
+                  Last Name cannot have number.
+                </span>
+                <span class="has-error" ng-show="form.lastName.$error.minlength" >
+                  Last Name is required to be at least 2 character.
+                </span>
+                <span class="has-error" ng-show="form.lastName.$error.maxlength" >
+                  Last Name cannot be longer than 15 characters.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-7 reset-padding col-md-offset-2">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.date-of-birth"></span>
+              <span class="">*</span>
+            </div>
+            <div class="col-md-6 dashboard__form--input reset-padding">
+              <input type="text" name="dob" validate-on-blur class="span2" value="" ng-model="patient.formatedDOB" ng-readonly="validateADMINorASP()" data-date-format="mm/dd/yy" id="dp2" required>
+              <span readonly class="dashboard__form--label-age">{{patient.age}}</span>
+              <div ng-show="(form.dob.$dirty && form.dob.$showValidationMessage && form.dob.$invalid) || submitted">
+                <span class="has-error" ng-show="form.dob.$error.required">
+                  Date of Birth is required.
+                </span>
+                <span class="has-error" ng-if="patient.age == 0">
+                  Date of Birth cannot be future.
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.gender.name"></span>
+              <span class=""></span>
+            </div>
+            <div class="col-md-10 dashboard__form__input reset-padding selected-box-container">
+              <div class="custom-dropdown">
+                <select name="gender" ng-readonly="validateADMINorASP()" ng-model="patient.gender">
+                  <option selected translate="patient.gender.male">Male</option>
+                  <option translate="patient.gender.female">Female</option>
+                  <option translate="patient.gender.others">Others</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-7 reset-padding col-md-offset-2">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.address"></span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input class="" type="text" validate-on-blur ng-model="patient.address" name="address" ng-readonly="validateADMINorASP()" ng-maxlength=100>
+              <div ng-show="(form.address.$showValidationMessage && form.address.$invalid)">
+                <span class="has-error" ng-show="form.address.$error.maxlength" >
+                  Address cannot be longer than 100 characters.
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.city"></span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input class="" type="text" validate-on-blur ng-model="patient.city" name="city" ng-readonly="validateADMINorASP()" ng-maxlength=15>
+              <div ng-show="(form.city.$showValidationMessage && form.city.$invalid)">
+                <span class="has-error" ng-show="form.city.$error.maxlength" >
+                  City cannot be longer than 15 characters.
+                </span>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-7 reset-padding col-md-offset-2">
+          <div class="col-md-6 dashboard__form--label reset-padding">
+            <span class="" translate="patient.state"></span>
+          </div>
+          <div class="col-md-10 dashboard__form__input--option reset-padding selected-box-container">
+            <div class="custom-dropdown">
+              <select name="state" ng-readonly="validateADMINorASP()" ng-model="patient.state" ng-options="state.name as state.name for state in states">
+                <option  value="" selected="selected">Select a state</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.zipcode"></span>
+              <span class="">*</span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input type="text" validate-on-blur class="form-control" name="zip" ng-readonly="validateADMINorASP()" maxlength="5" ng-pattern="/^(?=.*[1-9].*)[0-9]{5}$/" ng-model="patient.zipcode" required>
+               <div ng-show="(form.zip.$dirty && form.zip.$showValidationMessage && form.zip.$invalid) || submitted">
+
+                <span class="has-error" ng-show="form.zip.$error.pattern">
+                  Zip Code is invalid.
+                </span>
+                <span class="has-error" ng-show="form.zip.$error.required">
+                  Zip Code is required.
+                </span>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-7 reset-padding col-md-offset-2">
+          <div class="col-md-6 dashboard__form--label reset-padding">
+            <span class="" translate="patient.email"></span>
+            <span class=""></span>
+          </div>
+          <div class="col-md-10 dashboard__form--input reset-padding">
+            <input type="email" class="form-control" validate-on-blur name="email"  ng-readonly="validateADMINorASP()" ng-model="patient.email" ng-maxlength=100>
+            <div ng-show="(form.email.$showValidationMessage && form.email.$invalid) || submitted">
+              <span class="has-error" ng-show="form.email.$error.email">
+                E-mail is invalid.
+              </span>
+              <span class="has-error" ng-show="form.email.$error.maxlength">
+                E-mail cannot be longer than 100 characters.
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.mobile-number"></span>
+              <span class=""></span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input type="text" validate-on-blur class="form-control" name="mobilePhone" ng-readonly="validateADMINorASP()" maxlength="10" ng-pattern="/^[0-9]{10}$/" ng-model="patient.mobilePhone" >
+               <div ng-show="(form.mobilePhone.$showValidationMessage && form.mobilePhone.$invalid) || submitted">
+                <span class="has-error" ng-show="form.mobilePhone.$error.pattern">
+                  Mobile number is invalid.
+                </span>
+                <span class="has-error" ng-show="form.mobilePhone.$error.maxlength">
+                  Mobile number is invalid.
+                </span>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-7 reset-padding col-md-offset-2">
+          <div class="col-md-6 dashboard__form--label reset-padding">
+            <span class="" translate="patient.home-phone-number"></span>
+            <span class=""></span>
+          </div>
+          <div class="col-md-10 dashboard__form--input reset-padding">
+            <input type="text" class="form-control" validate-on-blur  name="primaryPhone"  ng-readonly="validateADMINorASP()" ng-model="patient.primaryPhone" maxlength=10 ng-pattern="/^[0-9]{10}$/">
+            <div ng-show="(form.primaryPhone.$showValidationMessage && form.primaryPhone.$invalid) || submitted">
+              <span class="has-error" ng-show="form.primaryPhone.$error.pattern">
+                Home phone number is invalid.
+              </span>
+              <span class="has-error" ng-show="form.primaryPhone.$error.maxlength">
+                Home phone number is invalid.
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="clr"></div>
+    </div>
+
+
+    <div class="col-md-16 margin-top reset-padding">
+      <div class="">
+        <button type="submit" ng-click="formSubmit()" ng-show="patientStatus.isCreate" class="hillrom-btn btn-submit float-right" translate="patient.submit-button-text">Submit</button>
+        <button type="reset" ng-click="cancel()" ng-show="patientStatus.isCreate" class="hillrom-btn btn-submit float-right" translate="patient.cancel-button-text">Cancel</button>
+        <button type="submit" ng-click="formSubmit()" ng-show="!patientStatus.isCreate" class="hillrom-btn btn-submit float-right">Update</button>
+        <button type="button" ng-click="open()" ng-show="!patientStatus.isCreate" class="hillrom-btn btn-submit float-right">Diassociate</button>
+        <div class="clr"></div>
+      </div>
+    </div>
+    </div>
+  </form>
+</div>
+
+<div ng-if="showModal" class="modal" id="sg-modal" tabIndex="-1" role="dialog" aria-labelledby="sgModalLabel" aria-hidden="true">
+  <div class="modal__dialog">
+    <div class="modal__content">
+      <header class="modal__header">
+        <button type="button" class="modal__close" data-dismiss="modal" ng-click="close()">&times;</button>
+         <p translate="patient.delete.warning"></p>
+      </header>
+      <div class="modal__body">
+         <div class="modal--message" translate="patient.delete.message"></div>
+         <div class="row modal--custom-btn">
+          <buton class="hillrom-btn btn-submit float-right" ng-click="deletePatient()">Yes</buton>
+          <buton class="hillrom-btn btn-submit float-right" data-dismiss="modal" ng-click="close()">No</buton>
+         </div>
+      </div>
+      <footer class="modal__footer">
+      </footer>
+    </div>
+  </div>
+</div>

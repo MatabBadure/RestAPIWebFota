@@ -8,6 +8,8 @@ import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -31,7 +33,8 @@ import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 public class PatientInfo implements Serializable {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @Column(name = "hillrom_id")
     private String hillromId;
@@ -101,22 +104,16 @@ public class PatientInfo implements Serializable {
     @OneToMany(mappedBy = "patient",fetch=FetchType.LAZY)
     @JsonIgnore
     private Set<UserPatientAssoc> userPatientAssoc = new HashSet<>();
-    
-	@Column(name = "primary_phone")
-	private String primaryPhone;
 
-	@Column(name = "mobile_phone")
-	private String mobilePhone;
+    public Long getId() {
+        return id;
+    }
 
-    public String getId() {
-		return id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getHillromId() {
+    public String getHillromId() {
         return hillromId;
     }
 
@@ -284,22 +281,6 @@ public class PatientInfo implements Serializable {
 		this.userPatientAssoc = userPatientAssoc;
 	}
 
-	public String getPrimaryPhone() {
-		return primaryPhone;
-	}
-
-	public void setPrimaryPhone(String primaryPhone) {
-		this.primaryPhone = primaryPhone;
-	}
-
-	public String getMobilePhone() {
-		return mobilePhone;
-	}
-
-	public void setMobilePhone(String mobilePhone) {
-		this.mobilePhone = mobilePhone;
-	}
-
 	@Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -320,7 +301,8 @@ public class PatientInfo implements Serializable {
     public int hashCode() {
         return Objects.hashCode(id);
     }
-	@Override
+
+    @Override
     public String toString() {
         return "PatientInfo{" +
                 "id=" + id +

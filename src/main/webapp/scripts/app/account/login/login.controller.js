@@ -52,7 +52,12 @@ angular.module('hillromvestApp')
         if (data.status === 200) {
           localStorage.removeItem('loginCount');
           localStorage.setItem('userFirstName', data.data.user.firstName);
-          $state.go('patient');
+          if(data.data.user.authorities[0].name === 'PATIENT'){
+            $state.go('patientclinic');
+          } else {
+            $state.go('patientUser');
+          }
+          
         }
       }).catch(function(data) {
         if (data.status === 401) {

@@ -126,7 +126,7 @@ public class ClinicDTO {
 	public void setHillromId(String hillromId) {
 		this.hillromId = hillromId;
 	}
-	
+
 	public Map<String, String> getParentClinic() {
 		return parentClinic;
 	}

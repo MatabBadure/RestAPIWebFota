@@ -153,13 +153,13 @@
 }
 
 .login-has-error {
-  color: $pickled-bluewood;
+  color: $terracotta;
   font-size: $font-size-small;
-  font-weight: 400;
+  font-weight: $font-weight-medium;
 }
 
 .text-small {
   font-size: $font-size-small;
-  font-weight: 400;
+  font-weight: $font-weight-medium;
   color: $pickled-bluewood;
 }

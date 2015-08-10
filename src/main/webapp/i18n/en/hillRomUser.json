@@ -40,6 +40,9 @@
             "associates":"Associates",
             "default" : "Select a role"
         },
+        "placeholder": {
+            "search": "Search with Name, Hill-Rom ID or Email"
+        },
         "first-name": "First Name",
         "middle-name": "Middle Name",
         "last-name": "Last Name",
@@ -57,6 +60,10 @@
         "npiNumber": "NpiNumber",
         "parent": "parent",
         "submit-button-text": "submit",
-        "required-field": "* Required Fields"
+        "required-field": "* Required Fields",
+        "delete": {
+            "warning": "Are you sure you want to Deactivate the User?",
+            "message": "If you deactivate the hillrom user, you will no longer be able to view the information."
+        }
     }
 }

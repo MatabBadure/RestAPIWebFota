@@ -57,7 +57,6 @@ public class ParserTest {
 		
 		
 		PatientVestDeviceData expectedRecord1 = new PatientVestDeviceData();
-		expectedRecord1.setChecksum(21);
 		expectedRecord1.setDuration(1);
 		expectedRecord1.setFrequency(5);
 		expectedRecord1.setPressure(1);
@@ -79,7 +78,6 @@ public class ParserTest {
 		expectedDeviceEntries.put(deviceDataPK1, expectedRecord1);
 		
 		PatientVestDeviceData expectedRecord2 = new PatientVestDeviceData();
-		expectedRecord2.setChecksum(24);
 		expectedRecord2.setDuration(0);
 		expectedRecord2.setFrequency(0);
 		expectedRecord2.setPressure(0);
@@ -118,7 +116,6 @@ public class ParserTest {
 			assertThat(expectedLogEntries.get(i).getDuration().equals(actualLogEntries.get(i).getDuration())).isTrue();
 			assertThat(expectedLogEntries.get(i).getFrequency().equals(actualLogEntries.get(i).getFrequency())).isTrue();
 			assertThat(expectedLogEntries.get(i).getPressure().equals(actualLogEntries.get(i).getPressure())).isTrue();
-			assertThat(expectedLogEntries.get(i).getChecksum().equals(actualLogEntries.get(i).getChecksum())).isTrue();
 			assertThat(expectedLogEntries.get(i).getHmr().equals(actualLogEntries.get(i).getHmr())).isTrue();
 			assertThat(expectedLogEntries.get(i).getTimestamp().equals(actualLogEntries.get(i).getTimestamp())).isTrue();
 			assertThat(expectedLogEntries.get(i).getSequenceNumber().equals(actualLogEntries.get(i).getSequenceNumber())).isTrue();

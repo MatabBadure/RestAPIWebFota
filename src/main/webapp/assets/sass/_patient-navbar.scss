@@ -1,6 +1,5 @@
 .patient-user {
-  // position: fixed;
-  background-color: #7ca3dc;
+  background-color: $cyan-blue-light;
   color: $pickled-bluewood;
   font-weight: bold;
   border: 0;
@@ -25,13 +24,13 @@
   padding-right: 100px;
 }
 
-.patient-user__navbar ul > li > a{
+.patient-user__navbar ul > li > a {
   padding: 10px 0;
   color: $body-bg;
   &:hover {
     background-color: inherit;
     color: inherit;
-    box-shadow : 0 -3px 0 0 #ef7164 inset;
+    box-shadow : 0 -3px 0 0 $sunshade inset;
     border-radius: 0;
     padding-bottom: 9px;
     span{
@@ -41,18 +40,10 @@
 }
 
 .patient-user__navbar ul > li > a.active {
-  background-color: #7ca3dc;
+  background-color: $cyan-blue-light;
   color: white;
   outline: 0;
-  box-shadow : 0 -3px 0 0 #ef7164 inset;
+  box-shadow : 0 -3px 0 0 $sunshade inset;
   border-radius: 0;
   padding-bottom: 9px;
-}
-
-.dashbord-nav__primary .dashbord-nav__secondary {
-  min-height: inherit;
-}
-
-.dashbord-nav__primary--title {
-  line-height: 38px;
 }

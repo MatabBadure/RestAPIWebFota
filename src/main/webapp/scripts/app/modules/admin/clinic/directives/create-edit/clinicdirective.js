@@ -152,7 +152,7 @@ angular.module('hillromvestApp')
           $scope.submitted = false;
           $scope.clinic = {};
           $scope.form.$setPristine();
-          $state.go('clinic');
+          $state.go('clinicUser');
         };
 
         $scope.selectClinic = function(clinic) {

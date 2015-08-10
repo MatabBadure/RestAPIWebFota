@@ -11,8 +11,8 @@ import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 @Entity
-@Table(name="BAD_VEST_DEVICE_DATA")
-public class BadVestDeviceData {
+@Table(name="VEST_DEVICE_BAD_DATA")
+public class VestDeviceBadData {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
@@ -25,7 +25,7 @@ public class BadVestDeviceData {
 	@Column(name="request_data")
 	private String requestData;
 	
-	public BadVestDeviceData(String requestData) {
+	public VestDeviceBadData(String requestData) {
 		super();
 		this.requestData = requestData;
 	}
@@ -48,7 +48,6 @@ public class BadVestDeviceData {
 		this.requestData = requestData;
 	}
 	
-	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -64,7 +63,7 @@ public class BadVestDeviceData {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		BadVestDeviceData other = (BadVestDeviceData) obj;
+		VestDeviceBadData other = (VestDeviceBadData) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

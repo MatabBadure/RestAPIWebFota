@@ -16,7 +16,7 @@ angular.module('hillromvestApp')
           scope.searchPatients();
         })
       },
-      controller: function($scope, $timeout) {
+      controller: function($scope, $timeout, dateService) {
 
         $scope.init = function() {
           $scope.patients = [];
@@ -53,19 +53,17 @@ angular.module('hillromvestApp')
 
         $scope.searchPatients = function(track) {
           if (track !== undefined) {
-            if (track === "PREV" && $scope.currentPageIndex > 1)
+            if (track === "PREV" && $scope.currentPageIndex > 1) {
               $scope.currentPageIndex--;
-            else if (track === "NEXT" && $scope.currentPageIndex < $scope.pageCount)
-            {
+            } else if (track === "NEXT" && $scope.currentPageIndex < $scope.pageCount) {
               $scope.currentPageIndex++;
-            }else{
+            } else {
               return false;
             }
           } else {
             $scope.currentPageIndex = 1;
           }
-          var url = 'api/user/patient/search?searchString=';
-          UserService.getUsers(url,$scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount)
+          patientService.getPatients($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount)
             .then(function(response) {
               $scope.patients = response.data;
               var patientCount = $scope.patients.length;

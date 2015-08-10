@@ -87,6 +87,31 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
+            .state('patientHcpAssociation', {
+                parent: 'patientUser',
+                url: '/{patientId}/hcp',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/views/hcp/view.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
             .state('hillRomUser', {
                 parent: 'admin',
                 url: '/hillRomUsers',
@@ -313,5 +338,36 @@ angular.module('hillromvestApp')
                       }
                   ]
               }
-            });
+            })
+
+            .state('patient', {
+                parent: 'entity',
+                url: '/patient',
+                abstract: true,
+            })
+            .state('patientclinic', {
+                parent: 'patient',
+                url: '/clinics',
+                data: {
+                    roles: ['PATIENT'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/patient/clinic/views/list/view.html',
+                        controller: 'patientClinicsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
 });

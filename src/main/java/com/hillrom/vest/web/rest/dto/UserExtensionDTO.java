@@ -48,6 +48,8 @@ public class UserExtensionDTO extends UserDTO {
     private String hillromId;
     
     private String dob;
+    
+    private String relationship;
 
     public UserExtensionDTO() {
     }
@@ -172,6 +174,14 @@ public class UserExtensionDTO extends UserDTO {
 
 	public void setDob(String dob) {
 		this.dob = dob;
+	}
+
+	public String getRelationship() {
+		return relationship;
+	}
+
+	public void setRelationship(String relationship) {
+		this.relationship = relationship;
 	}
 
 	@Override

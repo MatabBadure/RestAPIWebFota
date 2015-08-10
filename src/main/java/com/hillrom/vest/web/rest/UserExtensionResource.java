@@ -4,7 +4,6 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -326,6 +325,24 @@ public class UserExtensionResource {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+	/**
+     * POST  /patient/{id}/caregiver -> Create a caregiver for a patient with {id}. 
+     */
+    @RequestMapping(value = "/patient/{id}/caregiver",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    public ResponseEntity<JSONObject> createCareGiver(@PathVariable Long id, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
+        log.debug("REST request to save User : {}", userExtensionDTO);
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        JSONObject jsonObject = userService.createCaregiverUser(id, userExtensionDTO, baseUrl);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
         }
     }
 }

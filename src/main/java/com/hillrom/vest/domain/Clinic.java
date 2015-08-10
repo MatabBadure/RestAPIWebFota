@@ -1,8 +1,21 @@
 package com.hillrom.vest.domain;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
@@ -11,10 +24,8 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.J
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import javax.persistence.*;
-
-import java.io.Serializable;
-import java.util.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * A Clinic.
@@ -22,8 +33,6 @@ import java.util.*;
 @Entity
 @Table(name = "CLINIC")
 @SQLDelete(sql="UPDATE CLINIC SET is_deleted = 1 WHERE id = ?")
-@NamedStoredProcedureQuery(name = "Clinic.id", procedureName = "get_next_clinic_hillromid", parameters = {
-		@StoredProcedureParameter(mode = ParameterMode.OUT, name = "hillrom_id", type = String.class) })
 public class Clinic implements Serializable {
 
     @Id

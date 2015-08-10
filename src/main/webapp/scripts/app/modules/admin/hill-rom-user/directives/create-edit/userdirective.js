@@ -13,11 +13,11 @@ angular.module('hillromvestApp')
       restrict: 'E',
       scope: {
         user: '=userData',
-        isCreate: '=isCreate',
+        // isCreate: '=isCreate',
         onSuccess: '&',
         userStatus: '=userStatus'
       },
-      controller: function ($scope, noty, $state) {
+      controller: function ($scope, notyService, $state) {
 
          $scope.open = function () {
           $scope.showModal = true;
@@ -53,58 +53,48 @@ angular.module('hillromvestApp')
             if($scope.user.authorities){
               delete $scope.user.authorities;
             }
-            UserService.editUser($scope.user).then(function (response) {
-              $scope.userStatus.isMessage = true;
-              $scope.userStatus.message = response.data.message;
-              noty.showNoty({
-                text: $scope.userStatus.message,
-                ttl: 5000,
-                type: "success"
-              });
-              $scope.reset();
-            }).catch(function (response) {
-              $scope.userStatus.isMessage = true;
-              if (response.data.message !== undefined) {
-                $scope.userStatus.message = response.data.message;
-              }else if(response.data.ERROR !== undefined){
-                $scope.userStatus.message = response.data.ERROR;
-              } else {
-                $scope.userStatus.message = 'Error occured! Please try again';
-              }
-              noty.showNoty({
-                text: $scope.userStatus.message,
-                ttl: 5000,
-                type: "warning"
-              });
-            });
+            $scope.editUser($scope.user);
           } else {
-            var data = $scope.user;
-            UserService.createUser(data).then(function (response) {
-              $scope.userStatus.isMessage = true;
-              $scope.userStatus.message = 'User created successfully';
-              noty.showNoty({
-                text: $scope.userStatus.message,
-                ttl: 5000,
-                type: "success"
-              });
-              $scope.reset();
-
-            }).catch(function (response) {
-              $scope.userStatus.isMessage = true;
-              if (response.data.message !== undefined) {
-                $scope.userStatus.message = response.data.message;
-              }else if(response.data.ERROR !== undefined){
-                $scope.userStatus.message = response.data.ERROR;
-              } else {
-                $scope.userStatus.message = 'Error occured! Please try again';
-                noty.showNoty({
-                  text: $scope.userStatus.message,
-                  ttl: 5000,
-                  type: "warning"
-                });
-              }
-            });
+            $scope.newUser($scope.user);
           }
+        };
+
+        $scope.newUser = function(data) {
+          UserService.createUser(data).then(function (response) {
+            $scope.userStatus.isMessage = true;
+            $scope.userStatus.message = 'User created successfully';
+            notyService.showMessage($scope.userStatus.message, 'success');
+            $scope.reset();
+          }).catch(function (response) {
+            $scope.userStatus.isMessage = true;
+            if (response.data.message !== undefined) {
+              $scope.userStatus.message = response.data.message;
+            }else if(response.data.ERROR !== undefined){
+              $scope.userStatus.message = response.data.ERROR;
+            } else {
+              $scope.userStatus.message = 'Error occured! Please try again';
+              notyService.showMessage($scope.userStatus.message, 'warning');
+            }
+          });
+        };
+
+        $scope.editUser = function(data) {
+          UserService.editUser(data).then(function (response) {
+            $scope.userStatus.isMessage = true;
+            $scope.userStatus.message = response.data.message;
+            notyService.showMessage($scope.userStatus.message, 'success');
+            $scope.reset();
+          }).catch(function (response) {
+            $scope.userStatus.isMessage = true;
+            if (response.data.message !== undefined) {
+              $scope.userStatus.message = response.data.message;
+            }else if(response.data.ERROR !== undefined){
+              $scope.userStatus.message = response.data.ERROR;
+            } else {
+              $scope.userStatus.message = 'Error occured! Please try again';
+            }
+            notyService.showMessage($scope.userStatus.message, 'warning');
+          });
         };
 
         /**
@@ -118,27 +108,19 @@ angular.module('hillromvestApp')
             $scope.showModal = false;
             $scope.userStatus.isMessage = true;
             $scope.userStatus.message = response.data.message;
-            noty.showNoty({
-              text: $scope.userStatus.message,
-              ttl: 5000,
-              type: "success"
-            });
+            notyService.showMessage($scope.userStatus.message, 'success');
             $scope.reset();
           }).catch(function (response) {
             $scope.showModal = false;
             $scope.userStatus.isMessage = true;
-            if (response.data.message !== undefined) {
+            if(response.data.message !== undefined) {
               $scope.userStatus.message = response.data.message;
-            }else if(response.data.ERROR !== undefined){
+            } else if(response.data.ERROR !== undefined){
               $scope.userStatus.message = response.data.ERROR;
-            }else {
-            $scope.userStatus.message = 'Error occured! Please try again';
+            } else {
+              $scope.userStatus.message = 'Error occured! Please try again';
             }
-            noty.showNoty({
-              text: $scope.userStatus.message,
-              ttl: 5000,
-              type: "warning"
-            });
+            notyService.showMessage($scope.userStatus.message, 'warning');
           });
         };
 
@@ -154,36 +136,6 @@ angular.module('hillromvestApp')
           $scope.submitted = false;
           $state.go('hillRomUser');
         }
-
-        /**
-         * @ngdoc function
-         * @name editUser
-         * @description
-         * Function to Edit User
-         */
-        $scope.editUser = function () {
-          UserService.editUser($scope.user).then(function (response) {
-            $scope.userStatus.isMessage = true;
-            $scope.userStatus.message = response.data.message;
-            noty.showNoty({
-              text: $scope.userStatus.message,
-              ttl: 5000,
-              type: "success"
-            });
-          }).catch(function (response) {
-            $scope.userStatus.isMessage = true;
-            if (response.data.message !== undefined) {
-              $scope.userStatus.message = response.data.message;
-            } else {
-              $scope.userStatus.message = 'Error occured! Please try again';
-            }
-            noty.showNoty({
-              text: $scope.userStatus.message,
-              ttl: 5000,
-              type: "warning"
-            });
-          });
-        };
       }
     };
   });

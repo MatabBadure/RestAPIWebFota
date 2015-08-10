@@ -93,6 +93,7 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 						.getValueFromMessage(
 								rawMessage,
 								PatientVestDeviceRawLogModelConstants.HUB_RECEIVE_TIME_OFFSET));
+		
 		return patientVestDeviceRawLog;
 	}
 
@@ -181,8 +182,8 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 				.concat(ParserUtil
 						.getFieldByStartAndEndOffset(
 								base16String,
-								VestDeviceLogEntryOffsetConstants.HMR_HOUR_START_OFFSET,
-								VestDeviceLogEntryOffsetConstants.HMR_HOUR_END_OFFSET));
+								VestDeviceLogEntryOffsetConstants.HMR_HOUR_START_OFFSET1,
+								VestDeviceLogEntryOffsetConstants.HMR_HOUR_END_OFFSET1));
 		Long hmrHourReadingLong = ParserUtil
 				.convertHexStringToLong(hmrHourReadingString);
 		String hmrMinutesReadingString = ParserUtil

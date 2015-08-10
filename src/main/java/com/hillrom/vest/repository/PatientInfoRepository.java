@@ -25,6 +25,6 @@ public interface PatientInfoRepository extends JpaRepository<PatientInfo,String>
 	 * This returns hillromId of the patient from stored procedure.
 	 * @return String hillromId
 	 */
-	@Procedure(name="PatientInfo.id")
+	@Procedure(outputParameterName="hillrom_id",procedureName="get_next_patient_hillromid")
 	String id();
 }

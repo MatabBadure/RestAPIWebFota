@@ -1,7 +1,6 @@
 .dashboard {
 	// position: fixed;
-	background-color: $seashell;
-	color: $pickled-bluewood;
+	background-color: $iceberg;
 	font-weight: bold;
 }
 
@@ -13,6 +12,8 @@
 	max-height: 40px;
 	min-height: 40px;
 	margin-bottom: 0;
+  border-radius: 0;
+  color: $body-bg;
 }
 
 .dashbord-nav__primary .dashbord-nav__secondary {

@@ -1,0 +1,10 @@
+.admin-patient .patient-details {
+  text-align: right;
+  padding: 10px 0;
+}
+
+.admin-patient .patient-details--name {
+  color: $storm-dust;
+  font-size: $font-size-base;
+  font-weight: $font-weight-bold;
+}

@@ -6,6 +6,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import net.minidev.json.JSONObject;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.service.PatientVestDeviceDataService;
+import com.hillrom.vest.service.util.RequestUtil;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 @RestController
@@ -36,18 +39,44 @@ public class PatientVestDeviceDataResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> receiveData(HttpServletRequest request){
-		List<PatientVestDeviceData> deviceData =deviceDataService.save(request.getQueryString());
+		List<PatientVestDeviceData> deviceData = null;
+		String reqParams[] = new String[]{"device_model_type","device_data",
+        "device_serial_number","device_type","hub_id","air_interface_type",
+        "customer_name","cde_version","exporter_version","timezone","sp_receive_time",
+        "hub_receive_time","device_address","qcl_json_data","twonet_id","hub_receive_time_offset",
+        "cuc_version","customer_id"};
+		JSONObject jsonObject = RequestUtil.checkRequiredParamsInQueryString(request.getQueryString(), reqParams);
+		if(jsonObject.containsKey("ERROR")){
+			return new ResponseEntity(jsonObject,HttpStatus.BAD_REQUEST);
+		};
+		try{			
+			deviceData = deviceDataService.save(request.getQueryString());
+		}catch(Exception e){
+			JSONObject error = new JSONObject();
+			error.put("message", e.getMessage());
+			return new ResponseEntity(error,HttpStatus.PARTIAL_CONTENT);
+		}
 		return new ResponseEntity(deviceData,HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(value = "/patient/{id}/vestdevicedata",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<PatientVestDeviceData>> findByPatientId(@PathVariable Long id,
+	public ResponseEntity<List<PatientVestDeviceData>> findByPatientId(@PathVariable String id,
 			@RequestParam(value="page",required=false)Integer pageNo,
 			@RequestParam(value="per_page",required=false)Integer per_page) throws URISyntaxException{
 		Page<PatientVestDeviceData> page = deviceDataRepository.findLatest(id,PaginationUtil.generatePageRequest(pageNo, per_page));
 		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/patient/"+id+"/vestdevicedata", pageNo, per_page);
+		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/vestdevicedata",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<PatientVestDeviceData>> getAll(@RequestParam(value="page",required=false)Integer pageNo,
+			@RequestParam(value="per_page",required=false)Integer per_page) throws URISyntaxException{
+		Page<PatientVestDeviceData> page = deviceDataRepository.findAll(PaginationUtil.generatePageRequest(pageNo, per_page));
+		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/vestdevicedata", pageNo, per_page);
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
 	}
 }

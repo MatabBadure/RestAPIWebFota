@@ -3,6 +3,7 @@ package com.hillrom.vest.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
@@ -11,6 +12,7 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.J
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -20,11 +22,12 @@ import java.util.*;
 @Entity
 @Table(name = "CLINIC")
 @SQLDelete(sql="UPDATE CLINIC SET is_deleted = 1 WHERE id = ?")
+@NamedStoredProcedureQuery(name = "Clinic.id", procedureName = "get_next_clinic_hillromid", parameters = {
+		@StoredProcedureParameter(mode = ParameterMode.OUT, name = "hillrom_id", type = String.class) })
 public class Clinic implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private String id;
 
     @Column(name = "name")
     private String name;
@@ -80,16 +83,16 @@ public class Clinic implements Serializable {
     @Column(name="created_date", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP", insertable=false, updatable=false)
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime createdAt;
-    
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getId() {
+		return id;
+	}
 
-    public String getName() {
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getName() {
         return name;
     }
 
@@ -217,28 +220,32 @@ public class Clinic implements Serializable {
 		this.createdAt = createdAt;
 	}
 
+    @Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
 	@Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Clinic other = (Clinic) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
 
-        Clinic clinic = (Clinic) o;
-
-        if ( ! Objects.equals(id, clinic.id)) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
-
-    @Override
+	@Override
     public String toString() {
         return "Clinic{" +
                 "id=" + id +

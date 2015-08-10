@@ -89,7 +89,7 @@ public class PatientInfoResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<PatientInfo> get(@PathVariable Long id) {
+    public ResponseEntity<PatientInfo> get(@PathVariable String id) {
         log.debug("REST request to get PatientInfo : {}", id);
         return Optional.ofNullable(patientInfoRepository.findOne(id))
             .map(patientInfo -> new ResponseEntity<>(
@@ -105,33 +105,9 @@ public class PatientInfoResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable String id) {
         log.debug("REST request to delete PatientInfo : {}", id);
         patientInfoRepository.delete(id);
     }
     
-    /**
-     * GET  /patientInfos -> get all the patientInfos.
-     */
-    @RequestMapping(value = "/patientInfos/search",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<List<PatientInfo>> search(@RequestParam(value = "searchString" , required = true) String searchString,
-    							  @RequestParam(value = "page" , required = false) Integer offset,
-                                  @RequestParam(value = "per_page", required = false) Integer limit,
-                                  @RequestParam(value = "sort_by", required = false) String sortBy,
-                                  @RequestParam(value = "asc",required = false) Boolean isAscending)
-        throws URISyntaxException {
-   	 	String queryString = new StringBuilder().append("%").append(searchString).append("%").toString();
-	   	Map<String,Boolean> sortOrder = new HashMap<>();
-	   	if(sortBy != null  && !sortBy.equals("")) {
-	 		isAscending =  (isAscending != null)?  isAscending : true;
-	 		sortOrder.put(sortBy, isAscending);
-	 	}
-        Page<PatientInfo> page = patientInfoRepository.findBy(queryString,PaginationUtil.generatePageRequest(offset, limit, sortOrder));
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/patientInfos", offset, limit);
-        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
-    }
-
 }

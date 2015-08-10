@@ -1,11 +1,39 @@
-$header--background: $pickled-bluewood;
+$header--background: $body-bg;
+
+.navbar {
+	border: 0;
+}
+
 .navbar-default {
 	background-color: $header--background;
 	color: $bombay;
 	min-height: 60px;
+
 	.navbar-brand{
-		padding: 19px 10px;
+		padding: 18px 10px;
+		img {
+			height: 20px;
+    	width: 65px;
+		}
 	}
+
+	.navbar-brand__desc {
+		display: inline-block;
+		padding: 19px 10px;
+
+		&--text-primary {
+			color: $sunshade;	
+			padding: 0 5px;
+		}
+
+		&--text-secondary {
+			color: $silver-fade;
+		}
+	}
+}
+
+.navbar-default > .container > .navbar-primary {
+	width: 23%;
 }
 
 .navbar-default > .container, 
@@ -25,31 +53,44 @@ $header--background: $pickled-bluewood;
 
 .navbar-secondary .navbar-right > li {
   padding: 0 20px;
+  position: relative;
+}
+
+.navbar-secondary .navbar-right > li.icon-border:before {
+	border-right: 1px solid $storm-dust;
+  content: "";
+  height: 20px;
+  position: absolute;
+  right: 0;
+  top: 20px;
 }
 
 .navbar-secondary .navbar-right li a {
 	color: inherit;
 	padding: 19px 10px;
+	span {
+		color: $storm-dust;
+	}
 	&:hover {
 		background-color: inherit;
-		color: inherit;
-		box-shadow : 0 -3px 0 0 #ef7164 inset;
+		color: $lapis-lazuli;
+		box-shadow : 0 -3px 0 0 $sunshade inset;
 		border-radius: 0;
   	padding-bottom: 20px;
   	span{
-			color: white;
+			color: $lapis-lazuli;
 		}
 	}
 }
 .navbar-secondary .navbar-right li:last-child a {
-	color: inherit;
+	color: $storm-dust;
 	padding: 19px 0;
 	&:hover {
 		background-color: inherit;
 		color: inherit;
 		border-radius: 0;
   	padding-bottom: 20px;
-  	box-shadow : 0 0 0 0 #ef7164 inset;
+  	box-shadow : 0 0 0 0 $terracotta inset;
 	}
 }
 
@@ -57,11 +98,11 @@ $header--background: $pickled-bluewood;
 	background-color: inherit;
 	color: inherit;
 	outline: 0;
-	box-shadow : 0 -3px 0 0 #ef7164 inset;
+	box-shadow : 0 -3px 0 0 $sunshade inset;
 	border-radius: 0;
 	padding-bottom: 20px;
 	span{
-		color: white;
+		color: $lapis-lazuli;
 	}
 }
 

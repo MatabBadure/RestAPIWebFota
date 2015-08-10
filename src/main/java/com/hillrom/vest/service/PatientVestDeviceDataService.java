@@ -8,17 +8,15 @@ import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hillrom.vest.domain.BadVestDeviceData;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
-import com.hillrom.vest.repository.BadVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
 
 @Service
-@Transactional(noRollbackFor=RuntimeException.class)
+@Transactional
 public class PatientVestDeviceDataService {
 
 	@Inject
@@ -32,35 +30,23 @@ public class PatientVestDeviceDataService {
 
 	@Inject
 	private PatientInfoRepository patientInfoRepository;
-	
-	@Inject
-	private BadVestDeviceDataRepository badVestDeviceDataRepository;
 
 	public List<PatientVestDeviceData> save(final String rawData) {
-		PatientVestDeviceRawLog deviceRawLog = null;
-		List<PatientVestDeviceData> patientVestDeviceRecords = null;
-		try {
-			deviceRawLog = deviceLogParser
-					.parseBase64StringToPatientVestDeviceRawLog(rawData);
-			
-			patientVestDeviceRecords = deviceLogParser
-					.parseBase64StringToPatientVestDeviceLogEntry(deviceRawLog
-							.getDeviceData());
-			
-			String deviceAddress = deviceRawLog.getDeviceAddress();
+		PatientVestDeviceRawLog deviceRawLog = deviceLogParser
+				.parseBase64StringToPatientVestDeviceRawLog(rawData);
+		List<PatientVestDeviceData> patientVestDeviceRecords = deviceLogParser
+				.parseBase64StringToPatientVestDeviceLogEntry(deviceRawLog
+						.getDeviceData());
+		
+		String deviceAddress = deviceRawLog.getDeviceAddress();
 
-			PatientInfo patientInfo = createPatientInfoIfNotExists(deviceRawLog,
-					deviceAddress);
-			assignDefaultValuesToVestDeviceData(deviceRawLog,
-					patientVestDeviceRecords, patientInfo);
+		PatientInfo patientInfo = createPatientInfoIfNotExists(deviceRawLog,
+				deviceAddress);
+		assignDefaultValuesToVestDeviceData(deviceRawLog,
+				patientVestDeviceRecords, patientInfo);
 
-			deviceDataRepository.save(patientVestDeviceRecords);
-		} catch (Exception e) {
-			badVestDeviceDataRepository.save(new BadVestDeviceData(rawData));
-			throw new RuntimeException(e.getMessage());
-		}finally{
-			deviceRawLogRepository.save(deviceRawLog);
-		}
+		deviceDataRepository.save(patientVestDeviceRecords);
+		deviceRawLogRepository.save(deviceRawLog);
 		return patientVestDeviceRecords;
 	}
 
@@ -75,8 +61,6 @@ public class PatientVestDeviceDataService {
 			patientInfo = patientFromDB.get();
 		}else{
 			patientInfo = new PatientInfo();
-			// Assigns the next hillromId for the patient
-			patientInfo.setId(patientInfoRepository.id());
 			patientInfo.setBluetoothId(deviceAddress);
 			patientInfo.setHubId(deviceRawLog.getHubId());
 			patientInfo = patientInfoRepository.save(patientInfo);

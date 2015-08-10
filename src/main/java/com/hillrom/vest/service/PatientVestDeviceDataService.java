@@ -8,17 +8,17 @@ import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hillrom.vest.domain.BadVestDeviceData;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
-import com.hillrom.vest.repository.BadVestDeviceDataRepository;
+import com.hillrom.vest.domain.VestDeviceBadData;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
+import com.hillrom.vest.repository.VestDeviceBadDataRepository;
 
 @Service
-@Transactional(noRollbackFor=RuntimeException.class)
+@Transactional(noRollbackFor={RuntimeException.class})
 public class PatientVestDeviceDataService {
 
 	@Inject
@@ -34,7 +34,7 @@ public class PatientVestDeviceDataService {
 	private PatientInfoRepository patientInfoRepository;
 	
 	@Inject
-	private BadVestDeviceDataRepository badVestDeviceDataRepository;
+	private VestDeviceBadDataRepository vestDeviceBadDataRepository;
 
 	public List<PatientVestDeviceData> save(final String rawData) {
 		PatientVestDeviceRawLog deviceRawLog = null;
@@ -56,7 +56,7 @@ public class PatientVestDeviceDataService {
 
 			deviceDataRepository.save(patientVestDeviceRecords);
 		} catch (Exception e) {
-			badVestDeviceDataRepository.save(new BadVestDeviceData(rawData));
+			vestDeviceBadDataRepository.save(new VestDeviceBadData(rawData));
 			throw new RuntimeException(e.getMessage());
 		}finally{
 			deviceRawLogRepository.save(deviceRawLog);
@@ -79,6 +79,7 @@ public class PatientVestDeviceDataService {
 			patientInfo.setId(patientInfoRepository.id());
 			patientInfo.setBluetoothId(deviceAddress);
 			patientInfo.setHubId(deviceRawLog.getHubId());
+			patientInfo.setSerialNumber(deviceRawLog.getDeviceSerialNumber());
 			patientInfo = patientInfoRepository.save(patientInfo);
 		}
 		return patientInfo;
@@ -93,6 +94,7 @@ public class PatientVestDeviceDataService {
 			deviceData.setSerialNumber(deviceRawLog.getDeviceSerialNumber());
 			deviceData.setPatient(newPatientInfo);
 			deviceData.setBluetoothId(deviceRawLog.getDeviceAddress());
+//			deviceData.setSerialNumber(deviceRawLog.getDeviceSerialNumber());
 		});
 	}
 }

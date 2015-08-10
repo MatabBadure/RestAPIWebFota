@@ -8,13 +8,8 @@ import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.NamedStoredProcedureQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.ParameterMode;
-import javax.persistence.StoredProcedureParameter;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
@@ -33,8 +28,6 @@ import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
  */
 @Entity
 @Table(name = "PATIENT_INFO")
-@NamedStoredProcedureQuery(name = "PatientInfo.id", procedureName = "get_next_patient_hillromid", parameters = {
-		@StoredProcedureParameter(mode = ParameterMode.OUT, name = "hillrom_id", type = String.class) })
 public class PatientInfo implements Serializable {
 
     @Id

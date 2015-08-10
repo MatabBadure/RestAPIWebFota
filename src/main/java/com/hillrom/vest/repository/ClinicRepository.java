@@ -35,7 +35,7 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 	 * This returns hillromId of the patient from stored procedure.
 	 * @return String hillromId
 	 */
-	@Procedure(name="Clinic.id")
+	@Procedure(outputParameterName="hillrom_id",procedureName="get_next_clinic_hillromid")
 	@Transactional
 	String id();    
 }

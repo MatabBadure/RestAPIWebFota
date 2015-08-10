@@ -4,36 +4,30 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-
-import org.hibernate.annotations.Type;
-import org.joda.time.DateTime;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.hillrom.vest.domain.util.CustomDateTimeDeserializer;
-import com.hillrom.vest.domain.util.CustomDateTimeSerializer;
 
 /**
  * A PATIENT_VEST_DEVICE_RAW_LOGS.
  */
-@IdClass(PatientVestDeviceRawLogPK.class)
 @Entity
 @Table(name = "PATIENT_VEST_DEVICE_RAW_LOGS")
 public class PatientVestDeviceRawLog implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private Long id;
+	
 	@NotNull
-    @Id
     @Column(name = "hub_receive_time", nullable = false)
     private Long hubReceiveTime;
 
     @NotNull
-    @Id
     @Column(name = "device_address", nullable = false)
     private String deviceAddress;
 
@@ -201,10 +195,7 @@ public class PatientVestDeviceRawLog implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((deviceAddress == null) ? 0 : deviceAddress.hashCode());
-		result = prime * result
-				+ ((hubReceiveTime == null) ? 0 : hubReceiveTime.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
 
@@ -217,15 +208,10 @@ public class PatientVestDeviceRawLog implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		PatientVestDeviceRawLog other = (PatientVestDeviceRawLog) obj;
-		if (deviceAddress == null) {
-			if (other.deviceAddress != null)
+		if (id == null) {
+			if (other.id != null)
 				return false;
-		} else if (!deviceAddress.equals(other.deviceAddress))
-			return false;
-		if (hubReceiveTime == null) {
-			if (other.hubReceiveTime != null)
-				return false;
-		} else if (!hubReceiveTime.equals(other.hubReceiveTime))
+		} else if (!id.equals(other.id))
 			return false;
 		return true;
 	}

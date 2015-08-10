@@ -63,25 +63,27 @@ angular.module('hillromvestApp')
           } else {
             $scope.currentPageIndex = 1;
           }
-          var url = 'api/user/patient/search?searchString=';
-          UserService.getUsers(url,$scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount)
-          .then(function(response) {
-            $scope.patients = response.data;
-            var patientCount = $scope.patients.length;
-            for (var i = 0 ; i < patientCount ; i++) {
-              var _date = dateService.getDate($scope.patients[i].dob),
-               _month = dateService.getMonth(_date.getMonth()),
-               _day = dateService.getDay(_date.getDate()),
-               _year = dateService.getYear(_date.getFullYear()),
-               dob = _month+"/"+_day+"/"+_year;
-              $scope.patients[i].dob = dob;
-            }
-            $scope.total = response.headers()['x-total-count'];
-            $scope.pageCount = Math.ceil($scope.total / 10);
-          }).catch(function(response) {
-            $scope.noMatchFound = true;
-          });
-        };
+          patientService.getPatients($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount)
+            .then(function(response) {
+              $scope.patients = response.data;
+              var patientCount = $scope.patients.length;
+              for (var i = 0 ; i < patientCount ; i++) {
+                var _date = new Date($scope.patients[i].dob);
+                var _month = (_date.getMonth()+1).toString();
+                _month = _month.length > 1 ? _month : '0' + _month;
+                var _day = (_date.getDate()).toString();
+                _day = _day.length > 1 ? _day : '0' + _day;
+                var _year = (_date.getFullYear()).toString();
+                _year = _year.slice(-2);
+                var dob = _month+"/"+_day+"/"+_year;
+                $scope.patients[i].dob = dob;
+              }
+              $scope.total = response.headers()['x-total-count'];
+              $scope.pageCount = Math.ceil($scope.total / 10);
+            }).catch(function(response) {
+              $scope.noMatchFound = true;
+            });
+        }
         $scope.init();
       }
     };

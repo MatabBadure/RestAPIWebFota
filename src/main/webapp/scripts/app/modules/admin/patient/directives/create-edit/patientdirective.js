@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .directive('patient', function(UserService) {
+  .directive('patient', function (UserService, DoctorService, patientService) {
     return {
       templateUrl: 'scripts/app/modules/admin/patient/directives/create-edit/create.html',
       restrict: 'E',
@@ -11,7 +11,7 @@ angular.module('hillromvestApp')
         patientStatus: '=patientStatus'
       },
 
-      controller: function($scope, $state, notyService, dateService) {
+      controller: function ($scope, noty, $state, $timeout, $stateParams, notyService, dateService) {
 
         $scope.open = function () {
           $scope.showModal = true;
@@ -21,22 +21,26 @@ angular.module('hillromvestApp')
           $scope.showModal = false;
         };
         $scope.submitted = false;
-        $scope.formSubmit = function() {
+        $scope.formSubmit = function () {
           $scope.submitted = true;
         };
+        
+        $scope.viewHCP = function () {
+          $state.go('patientHcpAssociation',
+          {'patientId': $stateParams.patientId});
+        }
 
-        $scope.init = function() {
+        $scope.init = function () {
           $scope.states = [];
+          $scope.isAssociateDoctor = false;
           $scope.languages = [{
             "name": "English"
           }, {
             "name": "French"
           }];
           $scope.patient.gender = "Male";
-          UserService.getState().then(function(response) {
+          UserService.getState().then(function (response) {
             $scope.states = response.data.states;
-          }).catch(function(response) {
-
           });
         };
 
@@ -121,6 +125,10 @@ angular.module('hillromvestApp')
           }
         }
 
+        $scope.addHCP = function(){
+
+        }
+
         $scope.deletePatient = function() {
           UserService.deleteUser($scope.patient.id).then(function(response) {
             $scope.showModal = false;
@@ -179,20 +187,3 @@ angular.module('hillromvestApp')
       }
     };
   });
-
-
-var ModalInstanceCtrl = function ($scope, $modalInstance, items, selected) {
-
-  $scope.items = items;
-  $scope.selected = {
-    item: selected || items[0]
-  };
-
-  $scope.ok = function () {
-    $modalInstance.close($scope.selected.item);
-  };
-
-  $scope.cancel = function () {
-    $modalInstance.dismiss('cancel');
-  };
-};

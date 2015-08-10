@@ -43,6 +43,8 @@ public class UserService {
 	private static final String RELATION_LABEL_SELF = "SELF";
 
 	private final Logger log = LoggerFactory.getLogger(UserService.class);
+	
+	private static final String SELF = "SELF";
 
     @Inject
     private PasswordEncoder passwordEncoder;
@@ -912,5 +914,65 @@ public class UserService {
 		}	
 		return jsonObject;
 	 }
+	
+	public JSONObject createCaregiverUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl) {
+		JSONObject jsonObject = new JSONObject();
+    	if(userExtensionDTO.getEmail() != null) {
+			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
+			if (existingUser.isPresent()) {
+				jsonObject.put("ERROR", "e-mail address already in use");
+    			return jsonObject;
+    		}
+    	}
+    	if(AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())
+    			&& (SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))
+    				|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))
+    				|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.PATIENT)))) {
+    		UserExtension user = createCaregiver(id, userExtensionDTO);
+    		if(user.getId() != null) {
+    			if(userExtensionDTO.getEmail() != null) {
+    				mailService.sendActivationEmail(user, baseUrl);
+    			}
+                jsonObject.put("message", "Caregiver User created successfully.");
+                jsonObject.put("user", user);
+                return jsonObject;
+    		} else {
+    			jsonObject.put("ERROR", "Unable to create Caregiver User.");
+                return jsonObject;
+    		}
+    	} else {
+    		jsonObject.put("ERROR", "Invalid Data.");
+            return jsonObject;
+    	}
+	}
+	
+	public UserExtension createCaregiver(Long id, UserExtensionDTO userExtensionDTO) {
+    	UserExtension newUser = new UserExtension();
+    	UserExtension patientUser = userExtensionRepository.findOne(id);
+    	if(patientUser != null) {
+    		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
+    		if(patientInfo != null) {
+    			assignValuesToUserObj(userExtensionDTO, newUser);
+        		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
+    			userExtensionRepository.save(newUser);
+    			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.CARE_GIVER, userExtensionDTO.getRelationship());
+    			userPatientRepository.save(userPatientAssoc);
+    			newUser.getUserPatientAssoc().add(userPatientAssoc);
+    			patientInfo.getUserPatientAssoc().add(userPatientAssoc);
+    			log.debug("Created Information for Caregiver User: {}", newUser);
+    		}
+    	}
+    	return newUser;
+	}
+	
+	private PatientInfo getPatientInfoObjFromPatientUser(User patientUser) {
+		PatientInfo patientInfo = null;
+		for(UserPatientAssoc patientAssoc : patientUser.getUserPatientAssoc()){
+			if(SELF.equals(patientAssoc.getRelationshipLabel())){
+				patientInfo = patientAssoc.getPatient();
+			}
+		}
+		return patientInfo;
+	}
 }
 

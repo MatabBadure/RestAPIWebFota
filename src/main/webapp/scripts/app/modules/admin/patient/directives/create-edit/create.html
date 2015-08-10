@@ -11,47 +11,7 @@
         </div>
     </div>
 </div>
-
-<div>
-    <span>HCP section</span>
-    <div ng-repeat="doctor in doctorsLinkedToPatient">
-    <div><span>ID</span> <span>First Name</span> <span>Last Name</span> <span>Email</span> <span>Gender</span> </div>
-    <div><span>{{doctor.id}}</span>
-     <span>{{doctor.firstName}}</span>
-     <span>{{doctor.lastName}}</span>
-     <span>{{doctor.email}}</span>
-     <span>{{doctor.gender}}</span></div>
-    <button ng-click="disassociateDoctor($index)">Disassociate</button>
-    </div>
-    <button ng-click="associateDoctorOption()">Associate a HCP</button>
-    <div class="col-md-16 reset-padding margin-top" ng-show="isAssociateDoctor">
-        <form name="hcpForm" ng-submit="associateDoctor()" novalidate>
-            <div class="col-md-7 reset-padding">
-                <div class="col-md-6 dashboard__form--label reset-padding">
-                    <span class="" ></span>
-                    <span class="">Select HCP </span>
-                </div>
-                <div class="col-md-10 dashboard__form--input reset-padding">
-                    <tags-input key-property="id" ng-model="patient.doctors" display-property="firstName" min-tags="1" name="doctorAutoComplete">
-                        <auto-complete source="loadDoctors($query)" load-on-focus="true" load-on-empty="true" min-length="1" template="my-custom-template"></auto-complete>
-                    </tags-input>
-                    <script type="text/ng-template" id="my-custom-template">
-                        <div>
-                            <span>{{data.firstName}}</span>
-                            <span>{{data.lastName}}</span>
-                        </div>
-                    </script>
-                    <div ng-show="hcpForm.doctorAutoComplete.$error.minTags && hcpForm.$submitted">
-                        <span class="has-error">
-                          HCP is Required
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <button type="submit" ng-show="!patientStatus.isCreate" class="hillrom-btn btn-submit">Associate</button>
-        </form>
-    </div>
-</div>
+<a ng-click="viewHCP()">HCP Details</a>
     <div class="dashboard dashboard--content padding-bottom-ls">
         <form name="form" ng-submit="createPatient()" novalidate autocomplete="off">
             <div class="container dashboard__form">

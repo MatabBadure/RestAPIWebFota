@@ -6,7 +6,7 @@
  *
  */
 angular.module('hillromvestApp')
-  .factory('DoctorService', function ($http, localStorageService) {
+  .factory('DoctorService', function ($http, localStorageService, headerService) {
     var token = localStorage.getItem('token');
     return {
 
@@ -69,11 +69,7 @@ angular.module('hillromvestApp')
                 flag = true;
         });
         return $http.get(url , {
-          headers: {
-            'Content-Type' : 'application/json',
-            'Accept' : 'application/json',
-            'x-auth-token' : token
-          }
+          headers: headerService.getHeader()
         }).success(function (response) {
           return response;
         });

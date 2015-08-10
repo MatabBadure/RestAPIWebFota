@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .directive('patient', function(UserService, DoctorService, patientService) {
+  .directive('patient', function (UserService, DoctorService, patientService) {
     return {
       templateUrl: 'scripts/app/modules/admin/patient/directives/create-edit/create.html',
       restrict: 'E',
@@ -11,7 +11,7 @@ angular.module('hillromvestApp')
         patientStatus: '=patientStatus'
       },
 
-      controller: function($scope, noty, $state, $timeout) {
+      controller: function ($scope, noty, $state, $timeout, $stateParams) {
 
         $scope.open = function () {
           $scope.showModal = true;
@@ -21,11 +21,16 @@ angular.module('hillromvestApp')
           $scope.showModal = false;
         };
         $scope.submitted = false;
-        $scope.formSubmit = function() {
+        $scope.formSubmit = function () {
           $scope.submitted = true;
+        };
+
+        $scope.viewHCP = function () {
+          $state.go('patientHcpAssociation',
+          {'patientId': $stateParams.patientId});
         }
 
-        $scope.init = function() {
+        $scope.init = function () {
           $scope.states = [];
           $scope.isAssociateDoctor = false;
           $scope.languages = [{
@@ -34,123 +39,12 @@ angular.module('hillromvestApp')
             "name": "French"
           }];
           $scope.patient.gender = "Male";
-          UserService.getState().then(function(response) {
+          UserService.getState().then(function (response) {
             $scope.states = response.data.states;
-          }).catch(function(response) {
-
           });
-          /*Get List of HCP available in the clinic*/
-          $scope.getDoctors();
-          $scope.getDoctorsLinkedToPatient();
-        }
-
-        $scope.loadDoctors = function($query) {
-          return $scope.doctors.filter(function (doctor){
-            return doctor.firstName.toLowerCase().indexOf($query.toLowerCase()) != -1;
-          });
-        };
-
-        $scope.getDoctorsLinkedToPatient = function(){
-          $scope.doctorsLinkedToPatient = doctorsLinkedToPatient.hcpUsers;
-          /*patientService.getDoctorsLinkedToPatient($scope.patient.id).then(function(response) {
-              $scope.doctorsLinkedToPatient = response.data;
-            }).catch(function(response) {
-            });*/
-        };
-
-        $scope.getDoctors = function() {
-          var timer = false;
-          var filters = [{'id':1},{'id':2}];
-          timer = $timeout(function() {
-            $scope.doctors = doctorsAvailInClinic.hcpUsers;
-            /*DoctorService.getDoctorsInClinic(filters).then(function(response) {
-              $scope.doctors = response.data;
-            }).catch(function(response) {});*/
-          }, 1000)
         };
 
         $scope.init();
-
-        $scope.associateDoctorOption = function(){
-          $scope.isAssociateDoctor = true;
-        }
-
-        $scope.disassociateDoctor = function(index){
-          $scope.doctorsLinkedToPatient = doctorsLinkedToPatient.hcpUsers;
-          $scope.doctorsLinkedToPatient.splice(index, 1);;
-          patientService.disassociateDoctorFromPatient(id).then(function(response) {
-              if (response.status == '200')
-              {
-                $scope.patientStatus.isMessage = true;
-                $scope.patientStatus.message = response.data.message;
-                $scope.isAssociateDoctor = false;
-                //$scope.doctorsLinkedToPatient.delete({id : id });
-                noty.showNoty({
-                  text: $scope.patientStatus.message,
-                  ttl: 5000,
-                  type: "success"
-                });
-              } else{
-                $scope.patientStatus.message = response.data.message;
-                noty.showNoty({
-                  text: $scope.patientStatus.message,
-                  ttl: 5000,
-                  type: "warning"
-                });
-              }
-            }).catch(function(response) {
-                $scope.patientStatus.message = response.data.message;
-                noty.showNoty({
-                  text: $scope.patientStatus.message,
-                  ttl: 5000,
-                  type: "warning"
-                });
-            });
-        };
-
-        $scope.associateDoctor = function() {
-          if($scope.hcpForm.doctorAutoComplete.$error.minTags){
-            return false;
-          }
-          var data = [];
-          angular.forEach($scope.patient.doctors, function(doctor) {
-            data.push({'id':doctor.id});
-            $scope.doctorsLinkedToPatient.push(doctor);
-          });
-          patientService.associateHCPToPatient(data,$scope.patient.id).then(function(response){
-            if (response.status == '200')
-              {
-                $scope.patientStatus.isMessage = true;
-                $scope.patientStatus.message = response.data.message;
-                noty.showNoty({
-                  text: $scope.patientStatus.message,
-                  ttl: 5000,
-                  type: "success"
-                });
-              } else{
-                $scope.patientStatus.message = response.data.message;
-                noty.showNoty({
-                  text: $scope.patientStatus.message,
-                  ttl: 5000,
-                  type: "warning"
-                });
-              }
-          }).catch(function(response){
-            $scope.patientStatus.isMessage = true;
-            if (response.data.message !== undefined) {
-              $scope.patientStatus.message = response.data.message;
-            }else if(response.data.ERROR !== undefined){
-              $scope.patientStatus.message = response.data.ERROR;
-            } else {
-              $scope.patientStatus.message = 'Error occured! Please try again';
-            }
-            noty.showNoty({
-              text: $scope.patientStatus.message,
-              ttl: 5000,
-              type: "warning"
-            });
-          })
-        };
 
     $scope.createPatient = function () {
 
@@ -342,20 +236,3 @@ angular.module('hillromvestApp')
       }
     };
   });
-
-
-var ModalInstanceCtrl = function ($scope, $modalInstance, items, selected) {
-
-  $scope.items = items;
-  $scope.selected = {
-    item: selected || items[0]
-  };
-
-  $scope.ok = function () {
-    $modalInstance.close($scope.selected.item);
-  };
-
-  $scope.cancel = function () {
-    $modalInstance.dismiss('cancel');
-  };
-};

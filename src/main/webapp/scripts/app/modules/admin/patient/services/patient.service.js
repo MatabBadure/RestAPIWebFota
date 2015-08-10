@@ -1,8 +1,8 @@
 'use strict';
 /**
  * @ngdoc service
- * @name UserService
- * @description
+ * @name patientService
+ * @description A service that calls REST apis to perform operations related to patients.
  *
  */
 angular.module('hillromvestApp')
@@ -11,65 +11,38 @@ angular.module('hillromvestApp')
 
       /**
       * @ngdoc method
-      * @name editUser
-      * @description
+      * @name getPatients
+      * @description To get list of patients.
       *
       */
-      getPatientList : function(keyword,pageIndex,countPerPage){
-        return $http.get('api/patientInfos/search?searchString=' +
-         keyword + '&page=' + pageIndex + '&per_page=' + countPerPage,  {
+      getPatients: function(searchString, sortOption, pageNo, offset) {
+        var url = admin.patient.searchURL;
+        var sortOrder;
+        if (searchString === undefined) {
+          searchString = '';
+        }
+        if (sortOption === "") {
+          sortOption = "createdAt";
+          sortOrder = false;
+        } else {
+          sortOrder = true;
+        };
+        url = url + '?searchString=' + searchString + '&page=' + pageNo + '&per_page=' + offset + '&sort_by=' + sortOption + '&asc=' + sortOrder;
+        return $http.get(url, {
           headers: headerService.getHeader()
-        }).success(function (data, status, headers, config) {
-           return {'response' : data, 'status' : status, 'headers' : headers, 'config' : config};
+        }).success(function(response) {
+          return response;
         });
       },
 
       /**
       * @ngdoc method
-      * @name editUser
-      * @description
+      * @name getPatientInfo
+      * @description To get individual patient's information based on patient ID. 
       *
       */
       getPatientInfo : function(id){
-        return $http.get('api/user/' + id + '/patient',  {
-          headers: headerService.getHeader()
-        }).success(function (response) {
-          return response;
-        });
-      },
-
-      /**
-      * @ngdoc method
-      * @name editUser
-      * @description
-      *
-      */
-      editPatient : function (id) {
-        return $http.put('api/patientInfos/' + id,  {
-          headers: headerService.getHeader()
-        }).success(function (response) {
-          return response;
-        });
-      },
-
-      /**
-      * @ngdoc method
-      * @name editUser
-      * @description
-      *
-      */
-      associateHCPToPatient : function(data,id){
-        var url = 'api/patient/' + id + '/associatehcp';
-        return $http.put(url, data, {
-          headers: headerService.getHeader()
-        }).success(function (response) {
-          return response;
-        });
-      },
-
-
-      getDoctorsLinkedToPatient : function(id){
-        var url = 'api/patient/' + id + '/hcp';
+        var url = admin.hillRomUser.baseURL + '/' + id + '/patient';
         return $http.get(url, {
           headers: headerService.getHeader()
         }).success(function (response) {
@@ -77,14 +50,50 @@ angular.module('hillromvestApp')
         });
       },
 
-      disassociateDoctorFromPatient : function(id){
-        var url = 'api/patient/' + id + '/hcp';
-        return $http.delete(url, {
+      /**
+      * @ngdoc method
+      * @name associateHCPToPatient
+      * @description To associate HCP to patient.
+      *
+      */
+      associateHCPToPatient : function(data,id){
+        var url = admin.patient.baseURL + '/' + id + '/associatehcp';
+        return $http.put(url, data, {
           headers: headerService.getHeader()
         }).success(function (response) {
           return response;
         });
       },
+
+      /**
+      * @ngdoc method
+      * @name getDoctorsLinkedToPatient
+      * @description To get list of HCPs linked to patient.
+      *
+      */
+      getHCPsLinkedToPatient : function(id){
+        var url = admin.patient.baseURL + + '/' + id + '/hcp';
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
+      /**
+      * @ngdoc method
+      * @name disassociateDoctorFromPatient
+      * @description To disassciate a HCP from patient.
+      *
+      */
+      disassociateHCPFromPatient : function(id){
+        var url = admin.patient.baseURL + id + '/hcp';
+        return $http.delete(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      }
 
     };
   });

@@ -2,21 +2,22 @@
 /**
  * @ngdoc service
  * @name UserService
- * @description
+ * @description A service that makes ajax call to REST api to perform operations related to Hill-Rom-users.
  *
  */
 angular.module('hillromvestApp')
-  .factory('UserService', function($http, localStorageService, headerService) {
+  .factory('userService', function($http, localStorageService, headerService) {
     return {
 
       /**
        * @ngdoc method
        * @name createUser
-       * @description
+       * @description To create user.
        *
        */
       createUser: function(data) {
-        return $http.post('api/user', data, {
+        var url = admin.hillRomUser.baseURL;
+        return $http.post(url, data, {
           headers: headerService.getHeader()
         }).success(function(response) {
           return response;
@@ -26,11 +27,12 @@ angular.module('hillromvestApp')
       /**
        * @ngdoc method
        * @name deleteUser
-       * @description
+       * @description To delete user.
        *
        */
       deleteUser: function(id) {
-        return $http.delete('api/user/' + id, {
+        var url = admin.hillRomUser.baseURL;
+        return $http.delete(url + '/' + id, {
           headers: headerService.getHeader()
         }).success(function(response) {
           return response;
@@ -40,10 +42,11 @@ angular.module('hillromvestApp')
       /**
        * @ngdoc method
        * @name editUser
-       * @description
+       * @description To edit user
        *
        */
       editUser: function(data) {
+        var url = admin.hillRomUser.baseURL;
         return $http.put('api/user/' + data.id, data, {
           headers: headerService.getHeader()
         }).success(function(response) {
@@ -51,6 +54,12 @@ angular.module('hillromvestApp')
         });
       },
 
+      /**
+       * @ngdoc method
+       * @name getState
+       * @description To get list of states.
+       *
+       */
       getState: function() {
         return $http.get('scripts/app/modules/admin/hill-rom-user/services/state.json')
           .success(function(response) {
@@ -58,6 +67,12 @@ angular.module('hillromvestApp')
           });
       },
 
+      /**
+       * @ngdoc method
+       * @name getUsers
+       * @description To get list of users matching with search text and other parameter passed to REST api.
+       *
+       */
       getUsers: function(url, searchString, sortOption, pageNo, offset) {
         var sortOrder;
         if (searchString === undefined) {
@@ -77,6 +92,12 @@ angular.module('hillromvestApp')
         });
       },
 
+      /**
+       * @ngdoc method
+       * @name getUser
+       * @description To get complete information about a user based on user's ID.
+       *
+       */
       getUser: function(id, url) {
         var url = url || ('api/user/' + id);
         return $http.get(url, {
@@ -85,5 +106,6 @@ angular.module('hillromvestApp')
           return response;
         });
       }
+
     };
   });

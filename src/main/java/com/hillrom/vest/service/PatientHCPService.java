@@ -65,7 +65,7 @@ public class PatientHCPService {
 		    	}
 		    	userPatientRepository.save(hcpPatientAssocList);
 		    	jsonObject.put("message", "HCPs are associated with patient successfully.");
-		    	jsonObject.put("hcpList", hcpUserList);
+		    	jsonObject.put("hcpUsers", hcpUserList);
 	     	} else {
 	     		jsonObject.put("ERROR", "No such patient exist");
 	     	}

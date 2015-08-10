@@ -1,4 +1,4 @@
-CREATE PROCEDURE `get_next_patient_hillromid`(OUT hillrom_id varchar(15))
+CREATE DEFINER=`root`@`%` PROCEDURE `get_next_patient_hillromid`(INOUT hillrom_id varchar(15))
 BEGIN
 	declare patient_id varchar(6);
 	select id into patient_id from patient_id_sequence;

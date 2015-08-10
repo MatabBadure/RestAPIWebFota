@@ -8,6 +8,7 @@ import com.hillrom.vest.security.OnCredentialsChangeEvent;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.service.util.RequestUtil;
+import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
@@ -382,10 +383,9 @@ public class UserService {
 				authorityRepository.findOne(userExtensionDTO.getRole()));
 		newUser = userExtensionRepository.save(newUser);
 		log.debug("Created Information for Patient User: {}", newUser);
-		
+
 		UserPatientAssoc userPatientAssoc = createUserPatientAssociation(
 				newUser, patientInfo);
-		
 		
 		patientInfo.getUserPatientAssoc().add(userPatientAssoc);
 		patientInfoRepository.save(patientInfo);
@@ -399,8 +399,7 @@ public class UserService {
 
 	public UserPatientAssoc createUserPatientAssociation(UserExtension newUser,
 			PatientInfo patientInfo) {
-		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo,
-				newUser, AuthoritiesConstants.PATIENT, RELATION_LABEL_SELF);
+		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, newUser), AuthoritiesConstants.PATIENT, RelationshipLabelConstants.SELF);
 		userPatientAssoc = userPatientRepository.save(userPatientAssoc);
 		log.debug("Created Information for userPatientAssoc: {}",
 				userPatientAssoc);
@@ -633,7 +632,7 @@ public class UserService {
 		newUser.setPassword(encodedPassword);
 		User persistedUser = userRepository.save(newUser);
 
-		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.PATIENT, RELATION_LABEL_SELF);
+		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, newUser), AuthoritiesConstants.PATIENT, RelationshipLabelConstants.SELF);
 		userPatientRepository.save(userPatientAssoc);
 		newUser.getUserPatientAssoc().add(userPatientAssoc);
 		patientInfo.getUserPatientAssoc().add(userPatientAssoc);
@@ -891,7 +890,7 @@ public class UserService {
 		if (associations.size() > 0) {
 			listOfassociations = associations
 					.stream()
-					.filter(assoc -> RELATION_LABEL_SELF.equalsIgnoreCase(assoc
+					.filter(assoc -> RelationshipLabelConstants.SELF.equalsIgnoreCase(assoc
 							.getRelationshipLabel()))
 					.collect(Collectors.toList());
 		}
@@ -955,7 +954,7 @@ public class UserService {
     			assignValuesToUserObj(userExtensionDTO, newUser);
         		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
     			userExtensionRepository.save(newUser);
-    			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(patientInfo, newUser, AuthoritiesConstants.CARE_GIVER, userExtensionDTO.getRelationship());
+    			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, newUser), AuthoritiesConstants.CARE_GIVER, userExtensionDTO.getRelationship());
     			userPatientRepository.save(userPatientAssoc);
     			newUser.getUserPatientAssoc().add(userPatientAssoc);
     			patientInfo.getUserPatientAssoc().add(userPatientAssoc);

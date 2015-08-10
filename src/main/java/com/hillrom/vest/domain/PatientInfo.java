@@ -98,7 +98,7 @@ public class PatientInfo implements Serializable {
     @JsonIgnore
     private Set<ClinicPatientAssoc> clinicPatientAssoc = new HashSet<>();
     
-    @OneToMany(mappedBy = "patient",fetch=FetchType.LAZY)
+    @OneToMany(mappedBy = "userPatientAssocPK.patient",fetch=FetchType.LAZY)
     @JsonIgnore
     private Set<UserPatientAssoc> userPatientAssoc = new HashSet<>();
     

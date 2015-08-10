@@ -1,6 +1,7 @@
 package com.hillrom.vest.web.rest;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -169,6 +170,28 @@ public class ClinicResource {
     	 Page<Clinic> page = clinicRepository.findBy(queryString,PaginationUtil.generatePageRequest(offset, limit, sortOrder));
          HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/clinics/search", offset, limit);
          return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    }
+    
+    /**
+     * GET  /clinics/:id/hcp -> get the hcp users for the clinic with id :id.
+     */
+    @RequestMapping(value = "/clinics/hcp",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<JSONObject> getHCPUsers(@RequestParam(value = "filter",required = false) String filter) {
+        log.debug("REST request to get Clinic : {}", filter);
+        List<String> idList = new ArrayList<>();
+        String[] idSet = filter.split(",");
+        for(String id : idSet){
+        	idList.add(id.split(":")[1]);
+        }
+        JSONObject jsonObject = clinicService.getHCPUsers(idList);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
     }
     
 }

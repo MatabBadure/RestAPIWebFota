@@ -124,7 +124,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime lastLoggedInAt;
     
-    @OneToMany(mappedBy = "user",fetch=FetchType.LAZY)
+    @OneToMany(mappedBy = "userPatientAssocPK.user",fetch=FetchType.LAZY)
     @JsonIgnore
     private Set<UserPatientAssoc> userPatientAssoc = new HashSet<>();
     

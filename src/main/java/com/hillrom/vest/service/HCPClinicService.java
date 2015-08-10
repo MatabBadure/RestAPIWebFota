@@ -32,7 +32,7 @@ public class HCPClinicService {
     	JSONObject jsonObject = new JSONObject();
     	UserExtension hcpUser = userExtensionRepository.getOne(id);
     	for(Map<String, String> clinicId : clinicList) {
-    		Clinic clinic = clinicRepository.getOne(Long.parseLong(clinicId.get("id")));
+    		Clinic clinic = clinicRepository.getOne(clinicId.get("id"));
     		if(clinic.getUsers().contains(hcpUser)){
     			clinic.getUsers().remove(hcpUser);
     		}

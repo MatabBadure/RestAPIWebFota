@@ -15,5 +15,5 @@ public interface PatientVestDeviceDataRepository extends
 		JpaRepository<PatientVestDeviceData, PatientVestDeviceDataPK> {
 
 	@Query("Select pvdd from PatientVestDeviceData pvdd where patient.id = :patientId order by timestamp desc ")
-	public Page<PatientVestDeviceData> findLatest(@Param("patientId")Long patientId,Pageable pageable);
+	public Page<PatientVestDeviceData> findLatest(@Param("patientId")String patientId,Pageable pageable);
 }

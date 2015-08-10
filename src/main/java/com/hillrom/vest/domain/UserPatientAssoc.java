@@ -1,40 +1,32 @@
 package com.hillrom.vest.domain;
 
-
 import java.io.Serializable;
-import java.util.Objects;
 
-import javax.persistence.CascadeType;
+import javax.persistence.AssociationOverride;
+import javax.persistence.AssociationOverrides;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.SQLDelete;
 
 /**
  * A Clinic.
  */
 @Entity
 @Table(name = "USER_PATIENT_ASSOC")
-@SQLDelete(sql="UPDATE USER_PATIENT_ASSOC SET is_deleted = 1 WHERE id = ?")
+@AssociationOverrides({
+    @AssociationOverride(name = "userPatientAssocPK.user",
+        joinColumns = @JoinColumn(name = "USER_ID", referencedColumnName="id")),
+    @AssociationOverride(name = "userPatientAssocPK.patient",
+        joinColumns = @JoinColumn(name = "PATIENT_ID", referencedColumnName="id")) })
 public class UserPatientAssoc implements Serializable {
 
-	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+	private static final long serialVersionUID = 1L;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "PATIENT_ID") 
-    private PatientInfo patient;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "USER_ID") 
-    private User user;
+	@EmbeddedId
+	private UserPatientAssocPK userPatientAssocPK;
     
     @Column(name="user_role", nullable = false)
     private String userRole;
@@ -46,37 +38,36 @@ public class UserPatientAssoc implements Serializable {
 		super();
 	}
 
-	public UserPatientAssoc(PatientInfo patient, User user,
+	public UserPatientAssoc(UserPatientAssocPK userPatientAssocPK,
 			String userRole, String relationshipLabel) {
 		super();
-		this.patient = patient;
-		this.user = user;
+		this.userPatientAssocPK = userPatientAssocPK;
 		this.userRole = userRole;
 		this.relationshipLabel = relationshipLabel;
 	}
 
-	public Long getId() {
-        return id;
-    }
+	public UserPatientAssocPK getUserPatientAssocPK() {
+		return userPatientAssocPK;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+	public void setUserPatientAssocPK(UserPatientAssocPK userPatientAssocPK) {
+		this.userPatientAssocPK = userPatientAssocPK;
+	}
+	
 	public PatientInfo getPatient() {
-		return patient;
+		return getUserPatientAssocPK().getPatient();
 	}
 
 	public void setPatient(PatientInfo patient) {
-		this.patient = patient;
+		getUserPatientAssocPK().setPatient(patient);
 	}
 
 	public User getUser() {
-		return user;
+		return getUserPatientAssocPK().getUser();
 	}
 
 	public void setUser(User user) {
-		this.user = user;
+		getUserPatientAssocPK().setUser(user);
 	}
 
 	public String getUserRole() {
@@ -96,31 +87,54 @@ public class UserPatientAssoc implements Serializable {
 	}
 
 	@Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((relationshipLabel == null) ? 0 : relationshipLabel
+						.hashCode());
+		result = prime
+				* result
+				+ ((userPatientAssocPK == null) ? 0 : userPatientAssocPK
+						.hashCode());
+		result = prime * result
+				+ ((userRole == null) ? 0 : userRole.hashCode());
+		return result;
+	}
 
-        UserPatientAssoc clinicPatientAssoc = (UserPatientAssoc) o;
-
-        if ( ! Objects.equals(id, clinicPatientAssoc.id)) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UserPatientAssoc other = (UserPatientAssoc) obj;
+		if (relationshipLabel == null) {
+			if (other.relationshipLabel != null)
+				return false;
+		} else if (!relationshipLabel.equals(other.relationshipLabel))
+			return false;
+		if (userPatientAssocPK == null) {
+			if (other.userPatientAssocPK != null)
+				return false;
+		} else if (!userPatientAssocPK.equals(other.userPatientAssocPK))
+			return false;
+		if (userRole == null) {
+			if (other.userRole != null)
+				return false;
+		} else if (!userRole.equals(other.userRole))
+			return false;
+		return true;
+	}
 
 	@Override
 	public String toString() {
-		return "UserPatientAssoc [id=" + id + ", patient=" + patient
-				+ ", user=" + user + ", userRole=" + userRole
-				+ ", relationshipLabel=" + relationshipLabel + "]";
+		return "UserPatientAssoc [userPatientAssocPK=" + userPatientAssocPK
+				+ ", userRole=" + userRole + ", relationshipLabel="
+				+ relationshipLabel + "]";
 	}
 
 }

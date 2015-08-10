@@ -5747,6 +5747,10 @@ a::-moz-focus-inner {
   color: #C0C0C0;
 }
 
+.navbar-default > .container > .navbar-navbar-primary {
+  width: 23%;
+}
+
 .navbar-default > .container,
 .navbar-default > .container > .navbar-header,
 .navbar-default > .container > .navbar-header > .navbar-brand,
@@ -6509,6 +6513,56 @@ a::-moz-focus-inner {
 
 tags-input.ng-invalid .tags {
   box-shadow: none;
+}
+
+.patient-user {
+  background-color: #7ca3dc;
+  color: #34455C;
+  font-weight: bold;
+  border: 0;
+}
+
+.patient-user--content {
+  background-color: #fff;
+}
+
+.patient-user--nav {
+  max-height: 40px;
+  min-height: 40px;
+  margin-bottom: 0;
+}
+
+.patient-user__navbar {
+  padding-left: 0;
+  min-height: 40px;
+}
+
+.patient-user__navbar ul > li {
+  padding-right: 100px;
+}
+
+.patient-user__navbar ul > li > a {
+  padding: 10px 0;
+  color: #fff;
+}
+.patient-user__navbar ul > li > a:hover {
+  background-color: inherit;
+  color: inherit;
+  box-shadow: 0 -3px 0 0 #FF9829 inset;
+  border-radius: 0;
+  padding-bottom: 9px;
+}
+.patient-user__navbar ul > li > a:hover span {
+  color: white;
+}
+
+.patient-user__navbar ul > li > a.active {
+  background-color: #7ca3dc;
+  color: white;
+  outline: 0;
+  box-shadow: 0 -3px 0 0 #FF9829 inset;
+  border-radius: 0;
+  padding-bottom: 9px;
 }
 
 .footer {

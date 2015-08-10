@@ -32,6 +32,10 @@ $header--background: $body-bg;
 	}
 }
 
+.navbar-default > .container > .navbar-navbar-primary {
+	width: 23%;
+}
+
 .navbar-default > .container, 
 .navbar-default > .container > .navbar-header, 
 .navbar-default > .container > .navbar-header > .navbar-brand, 

@@ -2,14 +2,13 @@ package com.hillrom.vest.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
+import javax.inject.Inject;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,20 +22,32 @@ import com.hillrom.vest.Application;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceDataPK;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
-import com.hillrom.vest.service.util.ParserUtil;
+import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
+import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
 @IntegrationTest
 @Transactional
-public class ParserTest {
+public class PatientVestDeviceDataServiceTest {
 
-	PatientVestDeviceRawLog patientVestDeviceRawLog = null;
+	private static final String DEVICE_DATA_STRING = "JEkdAAZmYUwtATIuMDAoMDApAAA2LjE1AAAAEjYCAKokVgAAEQ4LEwEAKwEFAQEVJFYAABIOCxMBASsDAAAAGCRFT1Dw8PDw";
+
+	@Inject
+	PatientVestDeviceDataService pvddService;
+	
+	@Inject
+	PatientVestDeviceDataRepository pvddRepository;
+	
+	@Inject
+	PatientVestDeviceRawLogRepository pvdRawLogRepository;
+	
+	DeviceLogParser deviceLogParser = new VestDeviceLogParserImpl();
+	
 	List<PatientVestDeviceData> expectedLogEntries = new LinkedList<>();
 	List<PatientVestDeviceData> actualLogEntries = null;
-	
-	DeviceLogParser vestDeviceLogParser = null;
+
 	Map<String, String> testRawMessageKeyValues = new HashMap<>();
 	Map<PatientVestDeviceDataPK,PatientVestDeviceData> expectedDeviceEntries = new HashMap<>();
 	
@@ -45,15 +56,7 @@ public class ParserTest {
 	String expectedDeviceData = "";
 	
 	@Before
-	public void setup() {
-		vestDeviceLogParser = new VestDeviceLogParserImpl();
-		List<NameValuePair> params = URLEncodedUtils.parse(rawMessage,
-				Charset.defaultCharset());
-		params.forEach(nameValuePair -> {
-			testRawMessageKeyValues.put(nameValuePair.getName(), nameValuePair.getValue());
-		});
-		expectedDeviceData = testRawMessageKeyValues.get("device_data");
-		
+	public void setup() {		
 		
 		
 		PatientVestDeviceData expectedRecord1 = new PatientVestDeviceData();
@@ -85,7 +88,7 @@ public class ParserTest {
 		expectedRecord2.setPressure(0);
 		expectedRecord2.setEventId(""+3);
 		expectedRecord2.setHmr(1080d);
-		expectedRecord2.setTimestamp(1416339103000L);
+		expectedRecord2.setTimestamp(1416339103L);
 		expectedRecord2.setSequenceNumber(2);
 		
 	
@@ -95,22 +98,9 @@ public class ParserTest {
 	}
 
 	@Test
-	public void assertHexaConversionStringSuccess(){
-		String actualbase16String = ParserUtil.convertToBase16String(expectedDeviceData);
-		assertThat(expectedDeviceData);
-		assertThat(base16String.equals(actualbase16String)).isTrue();
-	}
-	
-	@Test
-	public void assertHexaConversionStringFailure(){
-		String base16String = ParserUtil.convertToBase16String(expectedDeviceData);
-		assertThat(expectedDeviceData);
-		assertThat(base16String.concat("1234").equals(expectedDeviceData)).isFalse();
-	}
-	
-	@Test
-	public void assertValidDeviceData(){
-		actualLogEntries = vestDeviceLogParser.parseBase64StringToPatientVestDeviceLogEntry(expectedDeviceData);
+	public void testSaveSuccessfully(){
+		actualLogEntries = pvddService.save(rawMessage);
+		PatientVestDeviceRawLog rawLog =  deviceLogParser.parseBase64StringToPatientVestDeviceRawLog(rawMessage);
 		assertThat(actualLogEntries);
 		for(int i = 0; i< actualLogEntries.size();i++){
 			assertThat(expectedLogEntries.get(i).getEventId());
@@ -123,6 +113,16 @@ public class ParserTest {
 			assertThat(expectedLogEntries.get(i).getTimestamp().equals(actualLogEntries.get(i).getTimestamp())).isTrue();
 			assertThat(expectedLogEntries.get(i).getSequenceNumber().equals(actualLogEntries.get(i).getSequenceNumber())).isTrue();
 		}
-	}
 
+		pvddRepository.delete(actualLogEntries);
+		pvdRawLogRepository.delete(rawLog);
+	}
+	
+	@Test(expected=RuntimeException.class)
+	public void testSaveFailure(){
+		actualLogEntries = pvddService.save(rawMessage.replaceAll(DEVICE_DATA_STRING, DEVICE_DATA_STRING+"12345"));
+		PatientVestDeviceRawLog rawLog =  deviceLogParser.parseBase64StringToPatientVestDeviceRawLog(rawMessage);
+		pvdRawLogRepository.delete(rawLog);
+	}
+	
 }

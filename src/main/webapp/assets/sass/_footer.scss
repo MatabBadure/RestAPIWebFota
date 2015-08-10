@@ -1,10 +1,11 @@
-$footer--background: $pickled-bluewood;
+$footer--background: $body-bg;
 
 .footer{
 	min-height: 40px;
 	background-color: $footer--background;
 	line-height: 40px;
 	font-size: $font-size-small;
-	color: $bombay;
+	color: $davys-grey;
 	position: fixed;
+  border-top: 2px solid $alto-solid;
 }

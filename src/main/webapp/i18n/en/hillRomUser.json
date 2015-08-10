@@ -40,6 +40,9 @@
             "associates":"Associates",
             "default" : "Select a role"
         },
+        "placeholder": {
+            "search": "Search with Name, Hill-Rom ID or Email"
+        },
         "first-name": "First Name",
         "middle-name": "Middle Name",
         "last-name": "Last Name",

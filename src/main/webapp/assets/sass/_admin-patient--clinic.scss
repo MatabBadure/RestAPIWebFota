@@ -1,10 +1,39 @@
 .admin-patient .patient-details {
   text-align: right;
   padding: 10px 0;
-}
-
-.admin-patient .patient-details--name {
-  color: $storm-dust;
   font-size: $font-size-base;
   font-weight: $font-weight-bold;
+  &--name {
+    color: $storm-dust;
+  }
+  &--hr-id {
+    color: $sunshade;
+  }
+}
+
+.admin-patient .patient-clinic {
+  margin-top: 20px;
+  padding: 10px 0;
+  &--title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    color: $pickled-bluewood;
+  }
+}
+
+.admin-patient .clinic-list {
+  padding: 0;
+  margin-top: 20px;
+}
+
+.admin-patient .clinic-list__detail {
+  padding: 0;
+  &--name {
+    color: $pickled-bluewood;
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+  }
+  &--email {
+    color: $regent-gray;
+  }
 }

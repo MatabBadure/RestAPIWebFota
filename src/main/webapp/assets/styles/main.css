@@ -5961,7 +5961,7 @@ a::-moz-focus-inner {
 }
 
 .login-has-error {
-  color: #34455C;
+  color: #ef7164;
   font-size: 12px;
   font-weight: 400;
 }

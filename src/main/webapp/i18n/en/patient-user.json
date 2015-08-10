@@ -1,0 +1,11 @@
+{
+    "patient" : {
+        "tab": {
+          "patient-overview": "Overview",
+          "patient-demographics": "Patient Demographics",
+          "clinic-info": "Clinic Information",
+          "protocol-device": "Protocol and Device",
+          "caregiver-info": "Caregiver Information"
+        }
+    }
+}

@@ -1,7 +1,6 @@
 package com.hillrom.vest.domain;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -49,8 +48,6 @@ public class PatientVestDeviceData implements Serializable {
 	@JoinColumn(name="patient_id",referencedColumnName="id")
 	private PatientInfo patient;
 
-	private Integer checksum;
-	
 	public Long getTimestamp() {
 		return timestamp;
 	}
@@ -98,7 +95,7 @@ public class PatientVestDeviceData implements Serializable {
 	public void setEventId(String eventId) {
 		this.eventId = eventId;
 	}
-	
+
 	public Double getHmr() {
 		return hmr;
 	}
@@ -106,7 +103,7 @@ public class PatientVestDeviceData implements Serializable {
 	public void setHmr(Double hmr) {
 		this.hmr = hmr;
 	}
-
+	
 	public Integer getFrequency() {
 		return frequency;
 	}
@@ -139,14 +136,7 @@ public class PatientVestDeviceData implements Serializable {
 		this.patient = patient;
 	}
 
-	public Integer getChecksum() {
-		return checksum;
-	}
-
-	public void setChecksum(Integer checksum) {
-		this.checksum = checksum;
-	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -188,13 +178,14 @@ public class PatientVestDeviceData implements Serializable {
 
 	@Override
 	public String toString() {
-		return "PatientVestDeviceData [timestamp=" + timestamp
-				+ ", sequenceNumber=" + sequenceNumber + ", eventId=" + eventId
-				+ ", serialNumber=" + serialNumber + ", bluetoothId="
-				+ bluetoothId + ", hubId=" + hubId + ", hmr=" + hmr
+		return "\nPatientVestDeviceData [timestamp=" + timestamp
+				+ ", sequenceNumber=" + sequenceNumber + ", serialNumber="
+				+ serialNumber + ", bluetoothId=" + bluetoothId + ", hubId="
+				+ hubId + ", eventId=" + eventId + ", hmr=" + hmr
 				+ ", frequency=" + frequency + ", pressure=" + pressure
-				+ ", duration=" + duration + ", patient=" + patient
-				+ ", checksum=" + checksum + "]";
-	}	
+				+ ", duration=" + duration + "]";
+	}
+	
+	
 
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants;
 import com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants;
+import com.hillrom.vest.config.VestDeviceRawLogOffsetConstants;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.service.util.ParserUtil;
@@ -18,7 +19,6 @@ import com.hillrom.vest.service.util.ParserUtil;
 @Component
 public class VestDeviceLogParserImpl implements DeviceLogParser {
 
-	private static final String EXPECTED_STRING = "24454F50F0F0F0F0";
 	private static final String YYYY_MMM_DD_HH_MM_SS = "yyyy-MMM-dd hh:mm:ss";
 	private static final int RECORD_SIZE = 16;
 
@@ -32,14 +32,11 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 				PatientVestDeviceRawLogModelConstants.SP_RECEIVE_TIME);
 
 		PatientVestDeviceRawLog patientVestDeviceRawLog = createPatientVestDeviceRawLog(base64String);
-		patientVestDeviceRawLog.setDeviceAddress(ParserUtil
-				.getValueFromMessage(base64String,
-						PatientVestDeviceRawLogModelConstants.DEVICE_ADDRESS));
-
-		patientVestDeviceRawLog.setHubReceiveTime(getTimeStamp(hub_timestamp)
-				.getMillis());
-		patientVestDeviceRawLog.setSpReceiveTime(getTimeStamp(sp_timestamp)
-				.getMillis());
+		patientVestDeviceRawLog.setDeviceAddress(ParserUtil.getValueFromMessage(
+				base64String,
+				PatientVestDeviceRawLogModelConstants.DEVICE_ADDRESS));
+		patientVestDeviceRawLog.setHubReceiveTime(getTimeStamp(hub_timestamp).getMillis());
+		patientVestDeviceRawLog.setSpReceiveTime(getTimeStamp(sp_timestamp).getMillis());
 		return patientVestDeviceRawLog;
 	}
 
@@ -47,10 +44,10 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 		SimpleDateFormat dateFormat = new SimpleDateFormat(YYYY_MMM_DD_HH_MM_SS);
 		try {
 			return new DateTime(dateFormat.parse(timestamp).getTime());
-		} catch (ParseException | RuntimeException e) {
-			throw new IllegalArgumentException(
-					"Could not parse data, Bad Content");
+		} catch (ParseException e) {
+			e.printStackTrace();
 		}
+		return null;
 	}
 
 	private PatientVestDeviceRawLog createPatientVestDeviceRawLog(
@@ -88,11 +85,6 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 				rawMessage, PatientVestDeviceRawLogModelConstants.HUB_ID));
 		patientVestDeviceRawLog.setTimezone(ParserUtil.getValueFromMessage(
 				rawMessage, PatientVestDeviceRawLogModelConstants.TIMEZONE));
-		patientVestDeviceRawLog
-				.setHubReceiveTimeOffset(ParserUtil
-						.getValueFromMessage(
-								rawMessage,
-								PatientVestDeviceRawLogModelConstants.HUB_RECEIVE_TIME_OFFSET));
 		return patientVestDeviceRawLog;
 	}
 
@@ -104,13 +96,6 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 		String base16String = ParserUtil.convertToBase16String(base64String);
 		if (base16String.length() <= 16)
 			return patientVestDeviceRecords;
-
-		// To validate bad data
-		String endTags = base16String.substring(base16String.length() - 16);
-
-		if (!EXPECTED_STRING.equals(endTags.toUpperCase().trim()))
-			throw new IllegalArgumentException(
-					"Could not parse data, Request contains Partial Data");
 
 		int logcount = 1;
 		int start;
@@ -134,17 +119,11 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 		PatientVestDeviceData patientVestDeviceData = new PatientVestDeviceData();
 		patientVestDeviceData.setSequenceNumber(sequenceNumber);
 		patientVestDeviceData.setHmr(getPatientVestDeviceDataHMR(base16String));
-		patientVestDeviceData
-				.setPressure(getPatientVestDeviceDataPressure(base16String));
-		patientVestDeviceData
-				.setFrequency(getPatientVestDeviceDataFrequency(base16String));
-		patientVestDeviceData
-				.setDuration(getPatientVestDeviceDataDuration(base16String));
-		patientVestDeviceData
-				.setEventId(getPatientVestDeviceEventCode(base16String));
-		patientVestDeviceData.setTimestamp(getPatientVestDeviceDataTimeStamp(
-				base16String).getMillis());
-		patientVestDeviceData.setChecksum(getPatientVestDeviceDataChecksum(base16String));
+		patientVestDeviceData.setPressure(getPatientVestDeviceDataPressure(base16String));
+		patientVestDeviceData.setFrequency(getPatientVestDeviceDataFrequency(base16String));
+		patientVestDeviceData.setDuration(getPatientVestDeviceDataDuration(base16String));
+		patientVestDeviceData.setEventId(getPatientVestDeviceEventCode(base16String));
+		patientVestDeviceData.setTimestamp(getPatientVestDeviceDataTimeStamp(base16String).getMillis());
 		return patientVestDeviceData;
 	}
 
@@ -177,31 +156,37 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 				base16String,
 				VestDeviceLogEntryOffsetConstants.HMR_HOUR_START_OFFSET,
 				VestDeviceLogEntryOffsetConstants.HMR_HOUR_END_OFFSET);
-		hmrHourReadingString = hmrHourReadingString
-				.concat(ParserUtil
-						.getFieldByStartAndEndOffset(
-								base16String,
-								VestDeviceLogEntryOffsetConstants.HMR_HOUR_START_OFFSET,
-								VestDeviceLogEntryOffsetConstants.HMR_HOUR_END_OFFSET));
-		Long hmrHourReadingLong = ParserUtil
-				.convertHexStringToLong(hmrHourReadingString);
+		Long hmrHourReadingLong = ParserUtil.convertHexStringToLong(hmrHourReadingString);
 		String hmrMinutesReadingString = ParserUtil
 				.getFieldByStartAndEndOffset(
 						base16String,
 						VestDeviceLogEntryOffsetConstants.HMR_MINUTE_START_OFFSET,
 						VestDeviceLogEntryOffsetConstants.HMR_MINUTE_END_OFFSET);
-		Long hmrMinutesReadingLong = ParserUtil
-				.convertHexStringToLong(hmrMinutesReadingString);
-		return (double) (hmrHourReadingLong * 60 * 60 + hmrMinutesReadingLong * 60);
+		Long hmrMinutesReadingLong = ParserUtil.convertHexStringToLong(hmrMinutesReadingString);
+		return (double) (hmrHourReadingLong * 60 + hmrMinutesReadingLong) / 60;
 	}
+
+	/*private String getPatientVestDeviceDataBluetoothId(String base16String) {
+		String bluetoothId = ParserUtil.getFieldByStartAndEndOffset(
+				base16String,
+				VestDeviceRawLogOffsetConstants.BT_ADDR_START_OFFSET,
+				VestDeviceRawLogOffsetConstants.BT_ADDR_END_OFFSET);
+		
+		StringBuilder btAddressBuilder = new StringBuilder();
+		
+		for(int i =0 ;i <bluetoothId.length();i+=2){
+			btAddressBuilder.append(bluetoothId.substring(i,i+2));
+			btAddressBuilder.append(":");
+		}
+		return btAddressBuilder.toString();
+	}*/
 
 	private String getPatientVestDeviceEventCode(String base16String) {
 		String eventCodeString = ParserUtil.getFieldByStartAndEndOffset(
 				base16String,
 				VestDeviceLogEntryOffsetConstants.EVENT_CODE_START_OFFSET,
 				VestDeviceLogEntryOffsetConstants.EVENT_CODE_END_OFFSET);
-		String eventCode = getEventString(ParserUtil
-				.convertHexStringToInteger(eventCodeString));
+		String eventCode = getEventString(ParserUtil.convertHexStringToInteger(eventCodeString));
 		return eventCode;
 	}
 
@@ -236,19 +221,12 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 				VestDeviceLogEntryOffsetConstants.SECOND_END_OFFSET);
 		int second = ParserUtil.convertHexStringToInteger(secondString);
 		Calendar calendar = Calendar.getInstance();
-		calendar.set(year, month-1, day, hour, minute, second);
-		DateTime timestamp = new DateTime(calendar.getTimeInMillis() / 1000);
+		calendar.set(year, month, day, hour, minute, second);
+		DateTime timestamp = new DateTime(calendar
+				.getTimeInMillis() / 1000);
 		return timestamp;
 	}
 
-	private int getPatientVestDeviceDataChecksum(String base16String){
-		String checksumString = ParserUtil.getFieldByStartAndEndOffset(
-				base16String,
-				VestDeviceLogEntryOffsetConstants.CHECKSUM_START_OFFSET,
-				VestDeviceLogEntryOffsetConstants.CHECKSUM_END_OFFSET);
-		return ParserUtil.convertHexStringToInteger(checksumString);
-	}
-	
 	private String getEventString(int eventCode) {
 
 		String eventString;

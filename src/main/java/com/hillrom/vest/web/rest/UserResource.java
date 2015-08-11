@@ -30,8 +30,8 @@ import com.hillrom.vest.domain.User;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
-import com.hillrom.vest.service.UserSecurityQuestionService;
 import com.hillrom.vest.service.UserService;
+import com.hillrom.vest.service.util.RequestUtil;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
@@ -118,11 +118,10 @@ public class UserResource {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 	
-	@RequestMapping(value="/user/{id}/changeSecurityQuestion",method=RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> updateSecurityQuestion(@PathVariable Long id,@RequestBody(required=true)Long questionId,
-			@RequestBody(required=true)String answer){
-		log.debug("REST request to update Security Question and Answer {}",id,questionId,answer);
-		JSONObject jsonObject = userService.updateSecurityQuestion(id,questionId,answer);
+	@RequestMapping(value="/user/{id}/changeSecurityQuestion",method=RequestMethod.PUT)
+	public ResponseEntity<?> updateSecurityQuestion(@PathVariable Long id,@RequestBody(required=true)Map<String,String> params){
+		log.debug("REST request to update Security Question and Answer {}",id,params);
+		JSONObject jsonObject = userService.updateSecurityQuestion(id,params);
 		if(jsonObject.containsKey("ERROR")){
 			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 		}

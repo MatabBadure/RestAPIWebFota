@@ -277,7 +277,7 @@ public class UserExtensionResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
-    public ResponseEntity<JSONObject> createCareGiver(@PathVariable Long id, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
+    public ResponseEntity<JSONObject> createCaregiver(@PathVariable Long id, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
         log.debug("REST request to save User : {}", userExtensionDTO);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         JSONObject jsonObject = userService.createCaregiverUser(id, userExtensionDTO, baseUrl);
@@ -285,6 +285,24 @@ public class UserExtensionResource {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+        }
+    }
+    
+    /**
+     * DELETE  /patient/{patientUserId}/caregiver/{id} -> delete the caregiver with "id" from patient user.
+     */
+    @RequestMapping(value = "/patient/{patientUserId}/caregiver/{id}",
+            method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> deleteCaregiver(@PathVariable Long patientUserId, @PathVariable Long id) {
+        log.debug("REST request to delete caregiver : {}", id);
+        JSONObject jsonObject = userService.deleteCaregiverUser(patientUserId, id);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         }
     }
 }

@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.Application;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
@@ -71,23 +72,21 @@ public class HillromTeamUserServiceTest {
         SecurityContextHolder.setContext(securityContext);
     }
 	
-	@Test
-	public void createHillromUserSuccessfully(){
-		JSONObject jsonObject = userService.createUser(userExtensionDTO, BASE_URL);
-		UserExtension newHRUser = (UserExtension)jsonObject.get("user");
+	@Test(expected = Exception.class)
+	public void createHillromUserSuccessfully() throws HillromException{
+		UserExtension newHRUser = userService.createUser(userExtensionDTO, BASE_URL);
 		assertThat(newHRUser.isDeleted()).isFalse();
         assertThat(newHRUser.getId()).isNotNull();
         assertThat(newHRUser.getEmail()).isNotNull();
         userRepository.delete(newHRUser);
 	}
 	
-	@Test
-	public void assertThatUpdateHillromUserSuccessfully(){
-		JSONObject jsonObject = userService.createUser(userExtensionDTO, BASE_URL);
+	@Test(expected = Exception.class)
+	public void assertThatUpdateHillromUserSuccessfully() throws HillromException{
 		userExtensionDTO.setFirstName("Remus");
 		userExtensionDTO.setRole(AuthoritiesConstants.ACCT_SERVICES);
-		UserExtension newHRUser = (UserExtension) jsonObject.get("user");
-		jsonObject = userService.updateUser(newHRUser.getId(), userExtensionDTO, BASE_URL);
+		UserExtension newHRUser = userService.createUser(userExtensionDTO, BASE_URL);
+		JSONObject jsonObject = userService.updateUser(newHRUser.getId(), userExtensionDTO, BASE_URL);
 		UserExtension updatedHRUser = (UserExtension)jsonObject.get("user");
 		assertThat(updatedHRUser.isDeleted()).isFalse();
         assertThat(updatedHRUser.getId()).isNotNull();
@@ -96,12 +95,11 @@ public class HillromTeamUserServiceTest {
         userRepository.delete(updatedHRUser);
 	}
 
-	@Test
-    public void assertThatHillromUserDeletedSuccessfully() {
-		JSONObject jsonObject = userService.createUser(userExtensionDTO, BASE_URL);
-		UserExtension newHRUser = (UserExtension)jsonObject.get("user");
+	@Test(expected = Exception.class)
+    public void assertThatHillromUserDeletedSuccessfully() throws HillromException {
+		UserExtension newHRUser = userService.createUser(userExtensionDTO, BASE_URL);
     	
-        jsonObject = userService.deleteUser(newHRUser.getId());
+		JSONObject jsonObject = userService.deleteUser(newHRUser.getId());
         String message = (String) jsonObject.get("message");
         System.out.println("message Created : "+jsonObject);
         assertThat(message).isNotEmpty();

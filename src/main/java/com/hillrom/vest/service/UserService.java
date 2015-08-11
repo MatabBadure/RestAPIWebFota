@@ -63,8 +63,6 @@ public class UserService {
 
 	private final Logger log = LoggerFactory.getLogger(UserService.class);
 	
-	private static final String SELF = "SELF";
-
     @Inject
     private PasswordEncoder passwordEncoder;
 
@@ -955,7 +953,7 @@ public class UserService {
 	private PatientInfo getPatientInfoObjFromPatientUser(User patientUser) {
 		PatientInfo patientInfo = null;
 		for(UserPatientAssoc patientAssoc : patientUser.getUserPatientAssoc()){
-			if(SELF.equals(patientAssoc.getRelationshipLabel())){
+			if(RelationshipLabelConstants.SELF.equals(patientAssoc.getRelationshipLabel())){
 				patientInfo = patientAssoc.getPatient();
 			}
 		}

@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+
+import net.minidev.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -19,19 +19,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
-import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
-import com.hillrom.vest.domain.UserExtension;
-import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
+import com.hillrom.vest.service.UserSecurityQuestionService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
@@ -118,5 +117,15 @@ public class UserResource {
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
-
+	
+	@RequestMapping(value="/user/{id}/changeSecurityQuestion",method=RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> updateSecurityQuestion(@PathVariable Long id,@RequestBody(required=true)Long questionId,
+			@RequestBody(required=true)String answer){
+		log.debug("REST request to update Security Question and Answer {}",id,questionId,answer);
+		JSONObject jsonObject = userService.updateSecurityQuestion(id,questionId,answer);
+		if(jsonObject.containsKey("ERROR")){
+			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 }

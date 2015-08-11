@@ -1002,5 +1002,19 @@ public class UserService {
 		}
 		return jsonObject;
     }
+
+	public JSONObject updateSecurityQuestion(Long id, Long questionId, String answer) {
+		User existingUser = userRepository.findOne(id);
+		JSONObject jsonObject = new JSONObject();
+		if(Objects.nonNull(existingUser)){
+			if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail()))
+				userSecurityQuestionService.saveOrUpdate(id, questionId, answer);
+			else
+				jsonObject.put("ERROR", "Forbidden");
+		}else{
+			jsonObject.put("ERROR", "User Doesn't exist");
+		}
+		return jsonObject;
+	}
 }
 

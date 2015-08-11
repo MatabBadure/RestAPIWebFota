@@ -21,13 +21,14 @@ import javax.validation.constraints.Size;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.boon.json.annotations.JsonProperty;
-import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
@@ -40,6 +41,7 @@ import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 @Table(name = "USER")
 @Inheritance(strategy = InheritanceType.JOINED)
 @SQLDelete(sql="UPDATE USER SET is_deleted = 1 WHERE id = ?")
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class,property= "id")
 public class User extends AbstractAuditingEntity implements Serializable {
 
     

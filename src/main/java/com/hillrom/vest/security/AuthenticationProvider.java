@@ -66,7 +66,7 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
 	 * @return User
 	 */
 	private User getUserByLogin(String login) {
-		Optional<User> userFromDatabase = userService.findOneByEmail(login);
+		Optional<User> userFromDatabase = userService.findOneByEmailOrHillromId(login);
         User user = null;
         if(userFromDatabase.isPresent()){
         	user = userFromDatabase.get();
@@ -105,7 +105,7 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
 				 */
 				String encodedPassword = passwordEncoder.encode(tokenPassword);
 				if(!RandomUtil.isValidEmail(user.getEmail()))
-					throw new EmailNotPresentForPatientException("Please Register with Email and Password to Login",prepareJSONForPatientUser(user.getEmail().toLowerCase(),encodedPassword));
+					throw new EmailNotPresentForPatientException("Please Register with Email and Password to Login",prepareJSONForPatientUser(user.getHillromId().toLowerCase(),encodedPassword));
 				else
 					throw new FirstLoginException("First Time Login, please reset your password",prepareJSONForPatientUser(user.getEmail().toLowerCase(),encodedPassword));				
 			}else{

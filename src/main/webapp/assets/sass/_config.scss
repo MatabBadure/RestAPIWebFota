@@ -57,6 +57,9 @@ $storm-dust:            #646568 !default;
 $iceberg:               #7CA3DC !default;
 $davys-grey:            #555555 !default;
 $regent-gray:           #858F9D !default;
+$tuna:                  #363A41 !default;
+$texas-rose:            #FFAD54 !default;
+
 
 //HillRom Popover
 $outer-space:						#273446 !default;
@@ -107,6 +110,7 @@ $font-size-h6:            ceil(($font-size-base * 0.85)) !default; // ~12px
 //font-weight
 $font-weight-medium:			400;
 $font-weight-bold:				700;
+$font-weight-semibold:    600;
 
 //** Unit-less `line-height` for use in components like buttons.
 $line-height-base:        1.5 !default; // 21/14

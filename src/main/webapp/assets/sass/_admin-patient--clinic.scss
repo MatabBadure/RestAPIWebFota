@@ -24,6 +24,7 @@
 .admin-patient .clinic-list {
   padding: 0;
   margin-top: 20px;
+  border-bottom: 1px solid $celeste;
 }
 
 .admin-patient .clinic-list__detail {
@@ -32,8 +33,56 @@
     color: $pickled-bluewood;
     font-size: $font-size-base;
     font-weight: $font-weight-bold;
+    display: block;
   }
   &--email {
     color: $regent-gray;
+    font-size: $font-size-small;
+    font-weight: $font-weight-medium;
+    display: block;
+  }
+}
+
+.admin-patient .clinic-list__address {
+  padding: 0;
+  font-size: $font-size-small;
+  font-weight: $font-weight-medium;
+  color: $regent-gray;
+  &--primary, &--secondary {
+    display: block;
+  }
+}
+
+.admin-patient .clinic-list__phone, .admin-patient .clinic-list__fax {
+  padding: 0;
+  color: $nevada;
+  font-size: $font-size-small;
+  font-weight: $font-weight-medium;
+}
+
+.admin-patient .clinic-list__hr-id {
+  padding: 0;
+  span {
+    color: $pickled-bluewood;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.admin-patient .clinic-list__delete {
+  text-align: center;
+  span {
+    cursor: pointer;
+  }
+}
+
+.admin-patient .clinic-link {
+  margin: 30px 0;
+  padding: 0;
+  input {
+    width: 80%;
+    padding-left: 10px;
+    outline: none;
+    height: 30px;
+    color: $pickled-bluewood;
   }
 }

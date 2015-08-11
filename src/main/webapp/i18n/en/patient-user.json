@@ -9,6 +9,13 @@
         },
         "clinic": {
           "title": "Clinic"
+        },
+        "phone": "Phone:",
+        "fax": "Fax:",
+        "hr-id": "ID",
+        "link-clinic": "Link Clinic",
+        "placeholder": {
+          "clinic-link": "Search Clinic here"
         }
     }
 }

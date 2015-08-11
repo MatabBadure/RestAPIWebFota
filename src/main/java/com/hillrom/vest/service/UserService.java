@@ -886,20 +886,7 @@ public class UserService {
 		UserExtension user = userExtensionRepository.findOne(id);
 		if(null == user)
 			return Optional.empty();
-		Set<UserPatientAssoc> associations = user.getUserPatientAssoc();
-		List<UserPatientAssoc> listOfassociations = null;
-		if (associations.size() > 0) {
-			listOfassociations = associations
-					.stream()
-					.filter(assoc -> RelationshipLabelConstants.SELF.equalsIgnoreCase(assoc
-							.getRelationshipLabel()))
-					.collect(Collectors.toList());
-		}
-		if(listOfassociations.isEmpty()){
-			return Optional.of(new PatientUserVO(user,null));
-		}
-		UserPatientAssoc selfAssociation = listOfassociations.get(0);
-		PatientInfo patientInfo = selfAssociation != null ? selfAssociation.getPatient() : null;
+		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
 		return Optional.of(new PatientUserVO(user,patientInfo));
 	}
 	

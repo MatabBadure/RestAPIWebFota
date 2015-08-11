@@ -1,17 +1,15 @@
 package com.hillrom.vest.service;
 
-import com.hillrom.vest.config.Constants;
-import com.hillrom.vest.domain.*;
-import com.hillrom.vest.repository.*;
-import com.hillrom.vest.security.AuthoritiesConstants;
-import com.hillrom.vest.security.OnCredentialsChangeEvent;
-import com.hillrom.vest.security.SecurityUtils;
-import com.hillrom.vest.service.util.RandomUtil;
-import com.hillrom.vest.service.util.RequestUtil;
-import com.hillrom.vest.util.RelationshipLabelConstants;
-import com.hillrom.vest.web.rest.dto.PatientUserVO;
-import com.hillrom.vest.web.rest.dto.UserDTO;
-import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.inject.Inject;
 
 import net.minidev.json.JSONObject;
 
@@ -29,10 +27,30 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-
-import java.util.*;
-import java.util.stream.Collectors;
+import com.hillrom.vest.config.Constants;
+import com.hillrom.vest.domain.Authority;
+import com.hillrom.vest.domain.Clinic;
+import com.hillrom.vest.domain.PatientInfo;
+import com.hillrom.vest.domain.User;
+import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.domain.UserPatientAssoc;
+import com.hillrom.vest.domain.UserPatientAssocPK;
+import com.hillrom.vest.domain.UserSecurityQuestion;
+import com.hillrom.vest.repository.AuthorityRepository;
+import com.hillrom.vest.repository.ClinicRepository;
+import com.hillrom.vest.repository.PatientInfoRepository;
+import com.hillrom.vest.repository.UserExtensionRepository;
+import com.hillrom.vest.repository.UserPatientRepository;
+import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.security.OnCredentialsChangeEvent;
+import com.hillrom.vest.security.SecurityUtils;
+import com.hillrom.vest.service.util.RandomUtil;
+import com.hillrom.vest.service.util.RequestUtil;
+import com.hillrom.vest.util.RelationshipLabelConstants;
+import com.hillrom.vest.web.rest.dto.PatientUserVO;
+import com.hillrom.vest.web.rest.dto.UserDTO;
+import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 
 /**
  * Service class for managing users.
@@ -40,8 +58,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class UserService {
-
-	private static final String RELATION_LABEL_SELF = "SELF";
 
 	private final Logger log = LoggerFactory.getLogger(UserService.class);
 	
@@ -80,9 +96,6 @@ public class UserService {
     @Inject
     private ApplicationEventPublisher eventPublisher;
 
-    @Inject
-    private HillromIdGenerator hillromIdGenerator;
-    
     public String generateDefaultPassword(User patientUser) {
 		StringBuilder defaultPassword = new StringBuilder();
 		defaultPassword.append(patientUser.getZipcode());
@@ -277,6 +290,7 @@ public class UserService {
     	rolesAdminCanModerate.add(AuthoritiesConstants.ACCT_SERVICES);
     	rolesAdminCanModerate.add(AuthoritiesConstants.ASSOCIATES);
     	rolesAdminCanModerate.add(AuthoritiesConstants.ADMIN);
+    	rolesAdminCanModerate.add(AuthoritiesConstants.CLINIC_ADMIN);
 		return rolesAdminCanModerate;
 	}
     
@@ -888,20 +902,7 @@ public class UserService {
 		UserExtension user = userExtensionRepository.findOne(id);
 		if(null == user)
 			return Optional.empty();
-		Set<UserPatientAssoc> associations = user.getUserPatientAssoc();
-		List<UserPatientAssoc> listOfassociations = null;
-		if (associations.size() > 0) {
-			listOfassociations = associations
-					.stream()
-					.filter(assoc -> RelationshipLabelConstants.SELF.equalsIgnoreCase(assoc
-							.getRelationshipLabel()))
-					.collect(Collectors.toList());
-		}
-		if(listOfassociations.isEmpty()){
-			return Optional.of(new PatientUserVO(user,null));
-		}
-		UserPatientAssoc selfAssociation = listOfassociations.get(0);
-		PatientInfo patientInfo = selfAssociation != null ? selfAssociation.getPatient() : null;
+		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
 		return Optional.of(new PatientUserVO(user,patientInfo));
 	}
 	
@@ -976,5 +977,33 @@ public class UserService {
 		}
 		return patientInfo;
 	}
+	
+	public JSONObject deleteCaregiverUser(Long patientUserId, Long caregiverId) {
+    	JSONObject jsonObject = new JSONObject();
+    	UserExtension caregiverUser = userExtensionRepository.findOne(caregiverId);
+    	if(caregiverUser.getId() != null) {
+    		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
+    		if(Objects.nonNull(patientUser)) {
+	    		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
+				if(caregiverUser.getUserPatientAssoc().size() == 1) {
+					caregiverUser.setDeleted(true);
+					userExtensionRepository.save(caregiverUser);
+				}
+				caregiverUser.getUserPatientAssoc().forEach(caregiverPatientAssoc -> {
+					if(Objects.nonNull(patientInfo) 
+							&& caregiverPatientAssoc.getUserPatientAssocPK().equals(
+									new UserPatientAssocPK(patientInfo, caregiverUser))) {
+						userPatientRepository.delete(caregiverPatientAssoc);
+					}
+				});
+				jsonObject.put("message", "Caregiver User deleted successfully.");
+    		} else {
+    			jsonObject.put("ERROR", "No such patient exists.");
+    		}
+		} else {
+			jsonObject.put("ERROR", "Unable to delete Caregiver User.");
+		}
+		return jsonObject;
+    }
 }
 

@@ -134,6 +134,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "dob")
     private LocalDate dob;
     
+    @Column(name="hillrom_id")
+    private String hillromId;
+    
     public Long getId() {
         return id;
     }
@@ -301,6 +304,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	public void setDob(LocalDate dob) {
 		this.dob = dob;
+	}
+
+	public String getHillromId() {
+		return hillromId;
+	}
+
+	public void setHillromId(String hillromId) {
+		this.hillromId = hillromId;
 	}
 
 	@Override

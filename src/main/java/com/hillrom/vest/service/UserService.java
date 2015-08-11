@@ -375,9 +375,8 @@ public class UserService {
 				.encode(generateDefaultPassword((User) newUser)));
 		newUser.setActivated(true);
 		newUser.setDeleted(false);
-		if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
-			newUser.setEmail(userExtensionDTO.getHillromId());
-		}
+		newUser.setHillromId(userExtensionDTO.getHillromId());
+	
 		newUser.getAuthorities().add(
 				authorityRepository.findOne(userExtensionDTO.getRole()));
 		newUser = userExtensionRepository.save(newUser);
@@ -606,6 +605,10 @@ public class UserService {
 		return userRepository.findOneByEmail(email);
 	}
 
+    public Optional<User> findOneByEmailOrHillromId(String login){
+    	return userRepository.findOneByEmailOrHillromId(login);
+    }
+    
 	public User createUserFromPatientInfo(PatientInfo patientInfo,String encodedPassword) {
 
 		String username = getUsernameAsEmailOrHillromIdFromPatientInfo(patientInfo);
@@ -686,7 +689,7 @@ public class UserService {
         if( null != errorsJsonObject.get("ERROR"))
         	return errorsJsonObject;
         
-        User currentUser = findOneByEmail(SecurityUtils.getCurrentLogin()).get();
+        User currentUser = findOneByEmailOrHillromId(SecurityUtils.getCurrentLogin()).get();
 
         errorsJsonObject = isUserExistsWithEmail(email, currentUser);
         

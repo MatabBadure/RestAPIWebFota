@@ -90,6 +90,7 @@
         <!-- build:js({.tmp,src/main/webapp}) scripts/app.js -->
         <script src="scripts/app/app.js"></script>
         <script src="scripts/app/app.constants.js"></script>
+        <script src="scripts/app/routes.js"></script>
         <script src="scripts/components/auth/auth.service.js"></script>
         <script src="scripts/components/auth/principal.service.js"></script>
         <script src="scripts/components/auth/authority.directive.js"></script>
@@ -98,15 +99,8 @@
         <script src="scripts/components/auth/services/password.service.js"></script>
         <script src="scripts/components/auth/services/register.service.js"></script>
         <script src="scripts/components/form/form.directive.js"></script>
-        <script src="scripts/components/form/pager.directive.js"></script>
-        <script src="scripts/components/form/pagination.directive.js"></script>
-        <script src="scripts/components/admin/audits.service.js"></script>
-        <script src="scripts/components/admin/logs.service.js"></script>
-        <script src="scripts/components/admin/configuration.service.js"></script>
-        <script src="scripts/components/admin/monitoring.service.js"></script>
         <script src="scripts/components/navbar/navbar.directive.js"></script>
         <script src="scripts/components/navbar/navbar.controller.js"></script>
-        <script src="scripts/components/user/user.service.js"></script>
         <script src="scripts/components/util/truncate.filter.js"></script>
         <script src="scripts/components/util/base64.service.js"></script>
         <script src="scripts/components/util/parse-links.service.js"></script>
@@ -123,73 +117,54 @@
         <script src="scripts/app/account/password/password.js"></script>
         <script src="scripts/app/account/password/password.controller.js"></script>
         <script src="scripts/app/account/password/password.directive.js"></script>
-        <script src="scripts/app/account/register/register.js"></script>
-        <script src="scripts/app/account/register/register.controller.js"></script>
-        <script src="scripts/app/account/settings/settings.js"></script>
-        <script src="scripts/app/account/settings/settings.controller.js"></script>
         <script src="scripts/app/account/reset/finish/reset.finish.controller.js"></script>
         <script src="scripts/app/account/reset/finish/reset.finish.js"></script>
         <script src="scripts/app/account/reset/request/reset.request.controller.js"></script>
         <script src="scripts/app/account/reset/request/reset.request.js"></script>
-        <script src="scripts/app/admin/admin.js"></script>
-        <script src="scripts/app/admin/audits/audits.js"></script>
-        <script src="scripts/app/admin/audits/audits.controller.js"></script>
-        <script src="scripts/app/admin/configuration/configuration.js"></script>
-        <script src="scripts/app/admin/configuration/configuration.controller.js"></script>
-        <script src="scripts/app/entities/entity.js"></script>
         <script src="scripts/app/error/error.js"></script>
         <script src="scripts/app/main/main.js"></script>
         <script src="scripts/app/main/main.controller.js"></script>
         <script src="scripts/components/language/language.service.js"></script>
         <script src="scripts/components/language/language.controller.js"></script>
         <script src="scripts/components/auth/provider/auth.xauth.service.js"></script>
-    	<script src="https://www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit" async defer></script>
+        <script src="https://www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit" async defer></script>
 
-
-        <script src="scripts/app/entities/patientInfo/patientInfo.js"></script>
-        <script src="scripts/app/entities/patientInfo/patientInfo.controller.js"></script>
-        <script src="scripts/app/entities/patientInfo/patientInfo-detail.controller.js"></script>
-        <script src="scripts/components/entities/patientInfo/patientInfo.service.js"></script>
-        <script src="scripts/app/entities/userLoginToken/userLoginToken.js"></script>
-        <script src="scripts/app/entities/userLoginToken/userLoginToken.controller.js"></script>
-        <script src="scripts/app/entities/userLoginToken/userLoginToken-detail.controller.js"></script>
-        <script src="scripts/components/entities/userLoginToken/userLoginToken.service.js"></script>
-
-        <script src="scripts/app/entities/patients/patients.js"></script>
-        <script src="scripts/app/entities/patients/patients.controller.js"></script>
-        <script src="scripts/components/entities/patients/new/patientdirective.js"></script>
-        <script src="scripts/components/entities/patients/list/patientlistdirective.js"></script>
-        <script src="scripts/app/entities/patients/patient.service.js"></script>
-
-        <script src="scripts/app/entities/clinics/clinics.js"></script>
-        <script src="scripts/app/entities/clinics/clinics.controller.js"></script>
-        <script src="scripts/components/entities/clinics/new/clinicdirective.js"></script>
-        <script src="scripts/components/entities/clinics/list/cliniclistdirective.js"></script>
-        <script src="scripts/components/entities/clinic/clinic.service.js"></script>
-        <script src="scripts/app/entities/clinics/clinics.services.js"></script>
-
-        <script src="scripts/app/entities/doctors/doctors.js"></script>
-        <script src="scripts/app/entities/doctors/doctors.controller.js"></script>
-        <script src="scripts/components/entities/doctors/new/doctordirective.js"></script>
-        <script src="scripts/components/entities/doctors/list/doctorslistdirective.js"></script>
-        <script src="scripts/app/entities/doctors/doctors.service.js"></script>
-
-        <script src="scripts/app/entities/users/users.js"></script>
-        <script src="scripts/app/entities/users/users.controller.js"></script>
-        <script src="scripts/app/entities/users/users.service.js"></script>
-        <script src="scripts/components/entities/users/new/userdirective.js"></script>
-        <script src="scripts/components/entities/users/list/userslistdirective.js"></script>
+        <script src="scripts/app/modules/admin/hill-rom-user/services/users.service.js"></script>
         <script src="scripts/components/util/commons.directive.js"></script>
         <script src="scripts/components/util/commons.filter.js"></script>
 
-        <script src="scripts/app/navbar/nav-bar.js"></script>
 
 
         <script src="scripts/app/api-mock.js"></script>
         <script src="scripts/app/globalconfig.js"></script>
         <script src="scripts/app/controller.constants.js"></script>
+        <script src="scripts/app/service.constants.js"></script>
         <script src="scripts/components/util/headers.service.js"></script>
 
+
+        <script src="scripts/app/modules/admin/patient/controllers/patients.controller.js"></script>
+        <script src="scripts/app/modules/admin/patient/services/patient.service.js"></script>
+        <script src="scripts/app/modules/admin/hill-rom-user/directives/list/userslistdirective.js"></script>
+         <script src="scripts/app/modules/admin/hill-rom-user/directives/create-edit/userdirective.js"></script>
+         <script src="scripts/app/modules/admin/hill-rom-user/controllers/users.controller.js"></script>
+         <script src="scripts/app/modules/admin/hcp/controllers/doctors.controller.js"></script>
+         <script src="scripts/app/modules/admin/hcp/directives/create-edit/doctordirective.js"></script>
+         <script src="scripts/app/modules/admin/hcp/directives/list/doctorslistdirective.js"></script>
+         <script src="scripts/app/modules/admin/hcp/services/doctors.service.js"></script>
+
+
+        <script src="scripts/app/modules/admin/clinic/controllers/clinics.controller.js"></script>
+        <script src="scripts/app/modules/admin/clinic/directives/create-edit/clinicdirective.js"></script>
+        <script src="scripts/app/modules/admin/clinic/directives/list/cliniclistdirective.js"></script>
+        <script src="scripts/app/modules/admin/clinic/services/clinics.service.js"></script>
+        <script src="scripts/app/modules/admin/patient/directives/create-edit/patientdirective.js"></script>
+        <script src="scripts/app/modules/admin/patient/directives/list/patientlistdirective.js"></script>
+        <script src="scripts/app/modules/admin/patient/directives/hcp-details/hcpDetails.js"></script>
+        <script src="scripts/components/util/noty.service.js"></script>
+        <script src="scripts/components/util/date.service.js"></script>
+        <script src="scripts/app/modules/patient/clinic/directives/list/cliniclist.directive.js"></script>
+        <script src="scripts/app/modules/patient/clinic/controller/patient.clinic.controller.js"></script>
+        <script src="scripts/app/modules/patient/navbar/navbar.directive.js"></script>
     <!-- endbuild -->
     </body>
 </html>

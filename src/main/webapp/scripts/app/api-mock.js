@@ -1,37 +1,3 @@
-var usersList = [
-  {
-    'id': 67,
-    'title' : 'Mr.',
-    'firstName' : 'John',
-    'lastName' : 'Ceena',
-    'middleName' : 'MiddleName',
-    'email' : 'syedmohammed+222@neevtech.com',
-    'role' : 'ADMIN'
-  }, {
-    'title' : 'Mr.',
-    'firstName' : 'James',
-    'lastName' : 'Williams',
-    'middleName' : 'MiddleName',
-    'email' : 'email',
-    'role' : {'key' : 'ACCT_SERVICES', 'value' : 'Account Service'}
-  },
-  {
-    'hillromId': 'HR000028',
-    'title': 'Mr.',
-    'firstName': 'Peter',
-    'middleName': 'Smith',
-    'lastName': 'Parker',
-    'gender': 'male',
-    'langKey': 'en',
-    'zipcode': '560009',
-    'city': 'Bangalore',
-    'dob': '08/06/1992',
-    'role': 'PATIENT'
-  }
-];
-
-
-
 var roleEnum = {
   ADMIN : 'ADMIN',
   PATIENT : 'PATIENT',
@@ -43,53 +9,236 @@ var roleEnum = {
   ANONYMOUS : 'ANONYMOUS'
 };
 
-var doctorsList = [
-    {
-        "id": 55,
-        "email": "rishabhjain+HCP1@neevtech.com",
-        "firstName": "Manipal",
-        "lastName": "Ayer",
-        "zipcode": 560009,
-        "address": "Old Airport Road",
-        "city": "Bangalore",
-        "credentials": "Manipal Hospitals",
-        "faxNumber": null,
-        "primaryPhone": null,
-        "mobilePhone": null,
-        "speciality": "Manipal Hospitals",
-        "state": "Karnataka",
-        "clinics": [
-            {
-                "name": "Manipal Hospitals-main",
-                "id": "1"
-            }
-        ],
-        "deleted": false
-    },
-    {
-        "id": 56,
-        "email": "rishabhjain+HCP2@neevtech.com",
-        "firstName": "Manipal",
-        "lastName": "Ayer",
-        "zipcode": 560009,
-        "address": "Old Airport Road",
-        "city": "Bangalore",
-        "credentials": "Manipal Hospitals",
-        "faxNumber": null,
-        "primaryPhone": null,
-        "mobilePhone": null,
-        "speciality": "Manipal Hospitals",
-        "state": "Karnataka",
-        "clinics": [
-            {
-                "name": "Manipal Hospitals-child",
-                "id": "2"
-            },
-            {
-                "name": "Manipal Hospitals-child2",
-                "id": "3"
-            }
-        ],
-        "deleted": false
-    }
-]
+var doctorsAvailInClinic = 
+	{
+    "hcpUsers": [
+        {
+	        "id": 101,
+	        "title": "Mr.",
+	        "firstName": "Rishabh",
+	        "middleName": "A",
+	        "lastName": "Jain",
+	        "email": "rishabhjain+acct5@neevtech.com",
+	        "gender": "M",
+	        "zipcode": 560042,
+	        "activated": false,
+	        "langKey": "en",
+	        "resetKey": null,
+	        "resetDate": null,
+	        "termsConditionAccepted": false,
+	        "termsConditionAcceptedDate": null,
+	        "deleted": false,
+	        "lastLoggedInAt": null,
+	        "dob": "1990-08-05",
+	        "speciality": "Cardeologist, Gynocologist",
+	        "credentials": "M.D., M.B.B.S.",
+	        "primaryPhone": "08098745632",
+	        "mobilePhone": "9874563210",
+	        "faxNumber": "08098745632",
+	        "address": "Old Airport Road",
+	        "city": "Bangalore",
+	        "state": "Karnataka",
+	        "npiNumber": null
+        },
+        {
+	        "id": 102,
+	        "title": "Mr.",
+	        "firstName": "Ravi",
+	        "middleName": "A",
+	        "lastName": "Ranjan",
+	        "email": "rishabhjain+acct5@neevtech.com",
+	        "gender": "M",
+	        "zipcode": 560042,
+	        "activated": false,
+	        "langKey": "en",
+	        "resetKey": null,
+	        "resetDate": null,
+	        "termsConditionAccepted": false,
+	        "termsConditionAcceptedDate": null,
+	        "deleted": false,
+	        "lastLoggedInAt": null,
+	        "dob": "1990-08-05",
+	        "speciality": "Cardeologist, Gynocologist",
+	        "credentials": "M.D., M.B.B.S.",
+	        "primaryPhone": "08098745632",
+	        "mobilePhone": "9874563210",
+	        "faxNumber": "08098745632",
+	        "address": "Old Airport Road",
+	        "city": "Bangalore",
+	        "state": "Karnataka",
+	        "npiNumber": null
+        },{
+	        "id": 103,
+	        "title": "Mr.",
+	        "firstName": "Mark",
+	        "middleName": "A",
+	        "lastName": "collenn",
+	        "email": "rishabhjain+acct5@neevtech.com",
+	        "gender": "M",
+	        "zipcode": 560042,
+	        "activated": false,
+	        "langKey": "en",
+	        "resetKey": null,
+	        "resetDate": null,
+	        "termsConditionAccepted": false,
+	        "termsConditionAcceptedDate": null,
+	        "deleted": false,
+	        "lastLoggedInAt": null,
+	        "dob": "1990-08-05",
+	        "speciality": "Cardeologist, Gynocologist",
+	        "credentials": "M.D., M.B.B.S.",
+	        "primaryPhone": "08098745632",
+	        "mobilePhone": "9874563210",
+	        "faxNumber": "08098745632",
+	        "address": "Old Airport Road",
+	        "city": "Bangalore",
+	        "state": "Karnataka",
+	        "npiNumber": null
+        },{
+	        "id": 104,
+	        "title": "Mr.",
+	        "firstName": "Steve",
+	        "middleName": "A",
+	        "lastName": "James",
+	        "email": "rishabhjain+acct5@neevtech.com",
+	        "gender": "M",
+	        "zipcode": 560042,
+	        "activated": false,
+	        "langKey": "en",
+	        "resetKey": null,
+	        "resetDate": null,
+	        "termsConditionAccepted": false,
+	        "termsConditionAcceptedDate": null,
+	        "deleted": false,
+	        "lastLoggedInAt": null,
+	        "dob": "1990-08-05",
+	        "speciality": "Cardeologist, Gynocologist",
+	        "credentials": "M.D., M.B.B.S.",
+	        "primaryPhone": "08098745632",
+	        "mobilePhone": "9874563210",
+	        "faxNumber": "08098745632",
+	        "address": "Old Airport Road",
+	        "city": "Bangalore",
+	        "state": "Karnataka",
+	        "npiNumber": null
+        }
+
+    ]
+  }
+
+var doctorsLinkedToPatient = 
+	{
+    "hcpUsers": [
+        {
+	        "id": 101,
+	        "title": "Mr.",
+	        "firstName": "Rishabh",
+	        "middleName": "A",
+	        "lastName": "Jain",
+	        "email": "rishabhjain+acct5@neevtech.com",
+	        "gender": "M",
+	        "zipcode": 560042,
+	        "activated": false,
+	        "langKey": "en",
+	        "resetKey": null,
+	        "resetDate": null,
+	        "termsConditionAccepted": false,
+	        "termsConditionAcceptedDate": null,
+	        "deleted": false,
+	        "lastLoggedInAt": null,
+	        "dob": "1990-08-05",
+	        "speciality": "Cardeologist, Gynocologist",
+	        "credentials": "M.D., M.B.B.S.",
+	        "primaryPhone": "08098745632",
+	        "mobilePhone": "9874563210",
+	        "faxNumber": "08098745632",
+	        "address": "Old Airport Road",
+	        "city": "Bangalore",
+	        "state": "Karnataka",
+	        "npiNumber": null
+        },
+        {
+	        "id": 102,
+	        "title": "Mr.",
+	        "firstName": "Ravi",
+	        "middleName": "A",
+	        "lastName": "Ranjan",
+	        "email": "rishabhjain+acct5@neevtech.com",
+	        "gender": "M",
+	        "zipcode": 560042,
+	        "activated": false,
+	        "langKey": "en",
+	        "resetKey": null,
+	        "resetDate": null,
+	        "termsConditionAccepted": false,
+	        "termsConditionAcceptedDate": null,
+	        "deleted": false,
+	        "lastLoggedInAt": null,
+	        "dob": "1990-08-05",
+	        "speciality": "Cardeologist, Gynocologist",
+	        "credentials": "M.D., M.B.B.S.",
+	        "primaryPhone": "08098745632",
+	        "mobilePhone": "9874563210",
+	        "faxNumber": "08098745632",
+	        "address": "Old Airport Road",
+	        "city": "Bangalore",
+	        "state": "Karnataka",
+	        "npiNumber": null
+        },{
+	        "id": 103,
+	        "title": "Mr.",
+	        "firstName": "Mark",
+	        "middleName": "A",
+	        "lastName": "collenn",
+	        "email": "rishabhjain+acct5@neevtech.com",
+	        "gender": "M",
+	        "zipcode": 560042,
+	        "activated": false,
+	        "langKey": "en",
+	        "resetKey": null,
+	        "resetDate": null,
+	        "termsConditionAccepted": false,
+	        "termsConditionAcceptedDate": null,
+	        "deleted": false,
+	        "lastLoggedInAt": null,
+	        "dob": "1990-08-05",
+	        "speciality": "Cardeologist, Gynocologist",
+	        "credentials": "M.D., M.B.B.S.",
+	        "primaryPhone": "08098745632",
+	        "mobilePhone": "9874563210",
+	        "faxNumber": "08098745632",
+	        "address": "Old Airport Road",
+	        "city": "Bangalore",
+	        "state": "Karnataka",
+	        "npiNumber": null
+        },{
+	        "id": 104,
+	        "title": "Mr.",
+	        "firstName": "Steve",
+	        "middleName": "A",
+	        "lastName": "James",
+	        "email": "rishabhjain+acct5@neevtech.com",
+	        "gender": "M",
+	        "zipcode": 560042,
+	        "activated": false,
+	        "langKey": "en",
+	        "resetKey": null,
+	        "resetDate": null,
+	        "termsConditionAccepted": false,
+	        "termsConditionAcceptedDate": null,
+	        "deleted": false,
+	        "lastLoggedInAt": null,
+	        "dob": "1990-08-05",
+	        "speciality": "Cardeologist, Gynocologist",
+	        "credentials": "M.D., M.B.B.S.",
+	        "primaryPhone": "08098745632",
+	        "mobilePhone": "9874563210",
+	        "faxNumber": "08098745632",
+	        "address": "Old Airport Road",
+	        "city": "Bangalore",
+	        "state": "Karnataka",
+	        "npiNumber": null
+        }
+
+    ]
+  }

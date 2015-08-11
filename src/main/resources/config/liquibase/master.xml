@@ -26,5 +26,14 @@
     <include file="classpath:/config/liquibase/changelog/20150728231200_create_table_PatientVestDeviceData.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150801161900_add_created_at_Clinic.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150803201900_update_phone_number_datatype.xml" relativeToChangelogFile="false"/>
-</databaseChangeLog>
-
+    <include file="classpath:/config/liquibase/changelog/20150802154000_drop_tables_patient_clinic_vestdevicedata_assoc.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150802154500_drop_create_PATIENT_INFO.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150802160200_drop_create_CLINIC.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150802155700_drop_recreate_CLINIC_PATIENT_ASSOC.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150802161000_drop_create_CLINIC_USER_ASSOC.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150802160800_drop_create_USER_PATIENT_ASSOC.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150802164000_create_patient_vest_device_data.xml" relativeToChangelogFile="false"/>    
+	<include file="classpath:/config/liquibase/changelog/20150805155400_create_vestdevicebaddata.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150806121100_drop_Create_Patient_Vest_Device_Raw_Logs.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150806112900_drop_recreate_USER_PATIENT_ASSOC.xml" relativeToChangelogFile="false"/>
+ </databaseChangeLog>

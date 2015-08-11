@@ -5,7 +5,8 @@ public class VestDeviceLogEntryOffsetConstants {
 	private VestDeviceLogEntryOffsetConstants(){
 		
 	}
-	
+	public static int HMR_HOUR_START_OFFSET1 = 4;//2(3-1)
+	public static int HMR_HOUR_END_OFFSET1 = 6;//2(3-1)+2*2
 	public static int HMR_HOUR_START_OFFSET = 6;//2(3-1)
 	public static int HMR_HOUR_END_OFFSET = 8;//2(3-1)+2*2
 	public static int HMR_MINUTE_START_OFFSET = 8;//2(5-1)

@@ -50,6 +50,12 @@ $alto:									#D6DADE !default;
 $trolley-grey:					#808080 !default;
 $alto-solid:						#dbdbdb !default;
 $gainsboro:							#dddddd !default;
+$sunshade:							#FF9829 !default;
+$silver-fade:           #C0C0C0 !default;
+$lapis-lazuli:          #276092 !default;
+$storm-dust:            #646568 !default;
+$iceberg:               #7CA3DC !default;
+$davys-grey:            #555555 !default;
 
 //HillRom Popover
 $outer-space:						#273446 !default;
@@ -96,6 +102,10 @@ $font-size-h3:            ceil(($font-size-base * 1.5)) !default; // ~21px
 $font-size-h4:            ceil(($font-size-base * 1.25)) !default; // ~18px
 $font-size-h5:            $font-size-base !default;
 $font-size-h6:            ceil(($font-size-base * 0.85)) !default; // ~12px
+
+//font-weight
+$font-weight-medium:			400;
+$font-weight-bold:				700;
 
 //** Unit-less `line-height` for use in components like buttons.
 $line-height-base:        1.5 !default; // 21/14

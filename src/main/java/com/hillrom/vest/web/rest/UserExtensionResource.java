@@ -4,7 +4,6 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -35,6 +34,7 @@ import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.HCPClinicService;
+import com.hillrom.vest.service.PatientHCPService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
@@ -57,6 +57,9 @@ public class UserExtensionResource {
 
     @Inject
     private HCPClinicService hcpClinicService;
+    
+    @Inject
+    private PatientHCPService patientHCPService;
     
     @Inject
     private UserSearchRepository userSearchRepository;
@@ -157,7 +160,7 @@ public class UserExtensionResource {
     }
     
     /**
-     * DELETE  /user/:id/dissociateclinic -> dissociate clinic from the "id" user.
+     * PUT  /user/:id/dissociateclinic -> dissociate clinic from the "id" user.
      */
     @RequestMapping(value = "/user/{id}/dissociateclinic",
             method = RequestMethod.PUT,
@@ -238,6 +241,60 @@ public class UserExtensionResource {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * PUT  /patient/:id/associatehcp -> associate hcp to the "id" patient user.
+     */
+    @RequestMapping(value = "/patient/{id}/associatehcp",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<JSONObject> associateHCPToPatient(@PathVariable Long id, @RequestBody List<Map<String, String>> hcpList) {
+        log.debug("REST request to dissociate clinic from HCP : {}", id);
+        JSONObject jsonObject = patientHCPService.associateHCPToPatient(id, hcpList);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * GET  /patient/:id/hcp -> get the HCP users associated with patient user.
+     */
+    @RequestMapping(value = "/patient/{id}/hcp",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<JSONObject> getAssociatedHCPUserForPatient(@PathVariable Long id) {
+        log.debug("REST request to get Associated HCP users for Patient : {}", id);
+        JSONObject jsonObject = patientHCPService.getAssociatedHCPUserForPatient(id);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * POST  /patient/{id}/caregiver -> Create a caregiver for a patient with {id}. 
+     */
+    @RequestMapping(value = "/patient/{id}/caregiver",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    public ResponseEntity<JSONObject> createCareGiver(@PathVariable Long id, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
+        log.debug("REST request to save User : {}", userExtensionDTO);
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        JSONObject jsonObject = userService.createCaregiverUser(id, userExtensionDTO, baseUrl);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
         }
     }
 }

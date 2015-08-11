@@ -1,7 +1,6 @@
 .dashboard {
 	// position: fixed;
-	background-color: $seashell;
-	color: $pickled-bluewood;
+	background-color: $iceberg;
 	font-weight: bold;
 }
 
@@ -13,6 +12,8 @@
 	max-height: 40px;
 	min-height: 40px;
 	margin-bottom: 0;
+  border-radius: 0;
+  color: $body-bg;
 }
 
 .dashbord-nav__primary .dashbord-nav__secondary {
@@ -33,13 +34,13 @@
 }
 
 .create-user .hillrom-icon {
-	font-weight: 700;
+	font-weight: $font-weight-bold;
 }
 
 .user-required {
 	color: $bombay;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: $font-weight-bold;
   text-align: right;
 }
 
@@ -225,14 +226,14 @@
 	font-size: $font-size-base;
 	color: $pickled-bluewood;
 	display: block;
-	font-weight: 700;
+	font-weight: $font-weight-bold;
 }
 
 .dashboard__manage-view--list .user-email {
 	font-size: $font-size-small;
 	color: $bombay;
 	display: block;
-	font-weight: 400;
+	font-weight: $font-weight-medium;
 }
 
 .dashboard__manage-view--list .user-home-no,
@@ -241,7 +242,7 @@
 	font-size: $font-size-small;
 	color: $celeste;
 	display: block;
-	font-weight: 400;
+	font-weight: $font-weight-medium;
 }
 
 .dashboard__manage-view--list .hcp-name {
@@ -288,7 +289,7 @@
 .dashboard__manage-view--list .progress-input {
 	font-size: $font-size-small;
 	color: $charcoal;
-	font-weight: 700;
+	font-weight: $font-weight-bold;
 	text-align: center;
 }
 
@@ -318,7 +319,7 @@
 .dashboard__manage-view--pagination .navigaion-no {
 	font-size: $font-size-small;
 	color: $nevada;
-	font-weight: 400;
+	font-weight: $font-weight-medium;
 }
 
 .dashboard__manage-view--pagination .navigaion-no {
@@ -328,7 +329,7 @@
 .dashboard__manage-view--pagination .inactive {
 	font-size: $font-size-small;
 	color: $celeste;
-	font-weight: 400;
+	font-weight: $font-weight-medium;
 	cursor: default;
 }
 
@@ -362,13 +363,13 @@
 	font-size: $font-size-base;
 	color: $pickled-bluewood;
 	display: block;
-	font-weight: 700;
+	font-weight: $font-weight-bold;
 }
 
 .user-help__desc--content {
 	font-size: $font-size-small;
 	color: $trolley-grey;
-	font-weight: 400;
+	font-weight: $font-weight-medium;
 }
 
 .user-help--close {

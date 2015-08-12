@@ -21,6 +21,8 @@ public final class AuthoritiesConstants {
     public static final String HILLROM_ADMIN = "HILLROM_ADMIN";
     
     public static final String CLINIC_ADMIN = "CLINIC_ADMIN";
+    
+    public static final String CARE_GIVER = "CARE_GIVER";
 
     public static final String ANONYMOUS = "ANONYMOUS";
 }

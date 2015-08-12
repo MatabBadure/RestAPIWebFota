@@ -34,7 +34,7 @@ public class UserDetailsService implements org.springframework.security.core.use
     public UserDetails loadUserByUsername(final String email) {
         log.debug("Authenticating {}", email);
         String lowercaseEmail = email.toLowerCase();
-        Optional<User> userFromDatabase =  userRepository.findOneByEmail(lowercaseEmail);
+        Optional<User> userFromDatabase =  userRepository.findOneByEmailOrHillromId(lowercaseEmail);
         return userFromDatabase.map(user -> {
             if (!user.getActivated()) {
                 throw new UserNotActivatedException("User " + lowercaseEmail + " was not activated");

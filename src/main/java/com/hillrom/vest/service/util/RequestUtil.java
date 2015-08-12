@@ -1,10 +1,17 @@
 package com.hillrom.vest.service.util;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.minidev.json.JSONObject;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 
 public class RequestUtil {
 
@@ -22,4 +29,19 @@ public class RequestUtil {
 		}
 		return jsonObject;
 	}
+	
+	public static JSONObject checkRequiredParamsInQueryString(String queryString,String requiredParams[]){
+		if(StringUtils.isNotBlank(queryString)){			
+			List<NameValuePair> params = URLEncodedUtils.parse(queryString, Charset.defaultCharset());
+			Map<String,String> parameterNameValueMap = new HashMap<>();
+			params.forEach(parameter -> {
+				parameterNameValueMap.put(parameter.getName(),parameter.getValue());
+			});
+			return checkRequiredParams(parameterNameValueMap, requiredParams);
+		}else{
+			JSONObject errorJson = new JSONObject();
+			errorJson.put("ERROR","Missing Params : "+String.join(",", requiredParams));
+			return errorJson;
+		}
+	} 
 }

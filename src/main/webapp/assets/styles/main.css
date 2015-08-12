@@ -6046,7 +6046,6 @@ a::-moz-focus-inner {
 
 .dashboard {
   background-color: #7CA3DC;
-  color: white;
   font-weight: bold;
 }
 
@@ -6059,6 +6058,7 @@ a::-moz-focus-inner {
   min-height: 40px;
   margin-bottom: 0;
   border-radius: 0;
+  color: #fff;
 }
 
 .dashbord-nav__primary .dashbord-nav__secondary {

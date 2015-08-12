@@ -9,7 +9,7 @@ angular.module('hillromvestApp')
         onSuccess: '&',
         doctorStatus: '=doctorStatus'
       },
-      controller: function ($scope, $timeout, noty, $state) {
+      controller: function ($scope, $timeout, notyService, $state) {
 
         $scope.open = function () {
           $scope.showModal = true;
@@ -79,70 +79,57 @@ angular.module('hillromvestApp')
           });
           if ($scope.doctorStatus.editMode) {
             $scope.doctor.role = 'HCP';
-            UserService.editUser($scope.doctor).then(function(response) {
-              $scope.doctorStatus.isMessage = true;
-              $scope.doctorStatus.message = response.data.message;
-              noty.showNoty({
-                text: $scope.doctorStatus.message,
-                ttl: 5000,
-                type: "success"
-              });
-              $scope.reset();
-            }).catch(function(response) {
-              $scope.doctorStatus.isMessage = true;
-              if (response.data.message !== undefined) {
-                $scope.doctorStatus.message = response.data.message;
-              } else if (response.data.ERROR !== undefined) {
-                $scope.doctorStatus.message = response.data.ERROR;
-              } else {
-                $scope.doctorStatus.message = 'Error occured! Please try again';
-              }
-              noty.showNoty({
-                text: $scope.doctorStatus.message,
-                ttl: 5000,
-                type: "warning"
-              });
-            });
+            $scope.editDoctor($scope.doctor);
           } else {
             var data = $scope.doctor;
             data.role = 'HCP';
-            UserService.createUser(data).then(function(response) {
-              $scope.doctorStatus.isMessage = true;
-              $scope.doctorStatus.message = "Doctor created successfully";
-              noty.showNoty({
-                text: $scope.doctorStatus.message,
-                ttl: 5000,
-                type: "success"
-              });
-              $scope.reset();
-            }).catch(function(response) {
-              if (response.data.message !== undefined) {
-                $scope.doctorStatus.message = response.data.message;
-              } else if (response.data.ERROR !== undefined) {
-                $scope.doctorStatus.message = response.data.ERROR;
-              } else {
-                $scope.doctorStatus.message = 'Error occured! Please try again';
-              }
-              noty.showNoty({
-                text: $scope.doctorStatus.message,
-                ttl: 5000,
-                type: "warning"
-              });
-            });
+            $scope.newDoctor(data);
           }
         };
 
+        $scope.editDoctor = function(data) {
+          UserService.editUser(data).then(function(response) {
+            $scope.doctorStatus.isMessage = true;
+            $scope.doctorStatus.message = response.data.message;
+            notyService.showMessage($scope.doctorStatus.message, 'success');
+            $scope.reset();
+          }).catch(function(response) {
+            $scope.doctorStatus.isMessage = true;
+            if (response.data.message !== undefined) {
+              $scope.doctorStatus.message = response.data.message;
+            } else if (response.data.ERROR !== undefined) {
+              $scope.doctorStatus.message = response.data.ERROR;
+            } else {
+              $scope.doctorStatus.message = 'Error occured! Please try again';
+            }
+            notyService.showMessage($scope.doctorStatus.message, 'warning');
+          });
+        };
+
+        $scope.newDoctor = function(data) {
+          UserService.createUser(data).then(function(response) {
+            $scope.doctorStatus.isMessage = true;
+            $scope.doctorStatus.message = "Doctor created successfully";
+            notyService.showMessage($scope.doctorStatus.message, 'success');
+            $scope.reset();
+          }).catch(function(response) {
+            if (response.data.message !== undefined) {
+              $scope.doctorStatus.message = response.data.message;
+            } else if (response.data.ERROR !== undefined) {
+              $scope.doctorStatus.message = response.data.ERROR;
+            } else {
+              $scope.doctorStatus.message = 'Error occured! Please try again';
+            }
+            notyService.showMessage($scope.doctorStatus.message, 'warning');
+          });
+        };
 
         $scope.deleteDoctor = function () {
           UserService.deleteUser($scope.doctor.id).then(function (response) {
             $scope.showModal = false;
             $scope.doctorStatus.isMessage = true;
             $scope.doctorStatus.message = response.data.message;
-            noty.showNoty({
-              text: $scope.doctorStatus.message,
-              ttl: 5000,
-              type: "success"
-            });
+            notyService.showMessage($scope.doctorStatus.message, 'success');
             $scope.reset();
           }).catch(function (response) {
             $scope.showModal = false;
@@ -154,12 +141,7 @@ angular.module('hillromvestApp')
             } else {
               $scope.doctorStatus.message = 'Error occured! Please try again';
             }
-
-            noty.showNoty({
-              text: $scope.doctorStatus.message,
-              ttl: 5000,
-              type: "warning"
-            });
+            notyService.showMessage($scope.doctorStatus.message, 'warning');
           });
         };
         $scope.cancel = function() {

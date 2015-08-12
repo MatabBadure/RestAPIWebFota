@@ -33,7 +33,6 @@ angular.module('hillromvestApp')
           $scope.showModal = false;
         };
 
-
         var timer = false;
         $scope.$watch('searchItem', function () {
           if (timer) {
@@ -68,14 +67,12 @@ angular.module('hillromvestApp')
           if (track !== undefined) {
             if (track === "PREV" && $scope.currentPageIndex > 1) {
               $scope.currentPageIndex--;
-            }
-            else if (track === "NEXT" && $scope.currentPageIndex < $scope.pageCount)
-            {
+            } else if (track === "NEXT" && $scope.currentPageIndex < $scope.pageCount) {
               $scope.currentPageIndex++;
-            }else{
+            } else {
               return false;
             }
-          }else {
+          } else {
             $scope.currentPageIndex = 1;
           }
           var url = 'api/user/search?searchString=';
@@ -83,9 +80,7 @@ angular.module('hillromvestApp')
             $scope.users = response.data;
             $scope.total = response.headers()['x-total-count'];
             $scope.pageCount = Math.ceil($scope.total / 10);
-          }).catch(function(response) {
-
-          });
+          }).catch(function(response) {});
         };
 
         $scope.init();

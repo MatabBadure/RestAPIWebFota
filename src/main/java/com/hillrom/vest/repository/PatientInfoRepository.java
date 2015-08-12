@@ -2,29 +2,29 @@ package com.hillrom.vest.repository;
 
 import java.util.Optional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import javax.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.query.Procedure;
 
 import com.hillrom.vest.domain.PatientInfo;
 
 /**
  * Spring Data JPA repository for the PatientInfo entity.
  */
-public interface PatientInfoRepository extends JpaRepository<PatientInfo,Long> {
+public interface PatientInfoRepository extends JpaRepository<PatientInfo,String> {
   
 	@Query("from PatientInfo where hillromId = ?1")
     Optional<PatientInfo> findOneByHillromId(String hillRomId);
-	
-	@Query("Select p from PatientInfo p where  "
-			+ " ( LOWER(p.firstName) like LOWER(:queryString) or "
-			+ " LOWER(p.lastName) like LOWER(:queryString) or "
-			+ " LOWER(p.email) like LOWER(:queryString) or "
-			+ " LOWER(p.hillromId) like LOWER(:queryString) )")
-	Page<PatientInfo> findBy(@Param("queryString")String searchString,Pageable pageable);
-	
+		
 	@Query("from PatientInfo where bluetoothId = ?1")
 	Optional<PatientInfo> findByBluetoothId(String serialNumber);
+	
+	/**
+	 * This returns hillromId of the patient from stored procedure.
+	 * @return String hillromId
+	 */
+	@Procedure(outputParameterName="hillrom_id",procedureName="get_next_patient_hillromid")
+	String id();
 }

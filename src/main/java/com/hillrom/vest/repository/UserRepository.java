@@ -26,4 +26,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Override
     void delete(User t);
 
+    @Query("from User user where LOWER(user.email) = ?1 or LOWER(user.hillromId) = ?1")
+	Optional<User> findOneByEmailOrHillromId(String login);
+
 }

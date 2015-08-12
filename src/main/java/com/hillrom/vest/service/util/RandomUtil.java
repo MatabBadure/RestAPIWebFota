@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Utility class for generating random Strings.
@@ -53,6 +54,8 @@ public final class RandomUtil {
    }
    
    public static boolean isValidEmail(String email){
+	   if(StringUtils.isBlank(email))
+		   return false;
 	   pattern = Pattern.compile(EMAIL_PATTERN);
 	   matcher = pattern.matcher(email);
 	   return matcher.matches();

@@ -31,6 +31,15 @@
           "min-per-tm": "Minutes per Treatment",
           "frequency": "Frequency",
           "min-minute-per-day": "Minimum minutes of use per day"
-        }
+        },
+        "overview": {
+          "hr-id": "Hillrom ID:",
+          "mrn": "MRN:",
+          "hcp": "HCP:",
+          "dob": "DOB:",
+          "email": "Email:",
+          "location": "Location:"
+        },
+        "disassociate-patient": "Disassociate"
     }
 }

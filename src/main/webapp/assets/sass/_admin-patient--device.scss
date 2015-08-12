@@ -1,0 +1,58 @@
+.admin-patient .patient-device,
+.admin-patient .patient-protocol {
+  margin-top: 20px;
+  padding: 10px 0;
+  &--title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    color: $pickled-bluewood;
+  }
+}
+
+.admin-patient .device-list,
+.admin-patient .protocol-list {
+  padding: 0;
+  margin-top: 20px;
+  div {
+    padding: 0;
+    span {
+      color: $pickled-bluewood;
+      font-size: $font-size-base;
+      font-weight: $font-weight-medium;
+    }
+  }
+  border-bottom: 1px solid $celeste;
+  padding-bottom: 10px;
+}
+
+.admin-patient .list-inactive {
+  div {
+    padding: 0;
+    span {
+      color: $silver-approx;
+    }
+  }
+}
+
+.admin-patient .device-list__lung,
+.admin-patient .protocol-list__lung {
+  position: relative;
+  .icon-lungs {
+    position: absolute;
+    font-size: 30px;
+    top: -5px;
+  }
+}
+
+.admin-patient .device-list__lung .active,
+.admin-patient .protocol-list__lung .active {
+  color: $fruit-salad;
+}
+
+.admin-patient .protocol-list .protocol-list__type {
+  font-weight: $font-weight-medium;
+}
+
+.protocol-list.inactive .protocol-list--text {
+  color: $silver-approx;
+}

@@ -1,5 +1,8 @@
 {
     "patient" : {
+        "home": {
+            "title": "Patient"
+        },
         "tab": {
           "patient-overview": "Overview",
           "patient-demographics": "Patient Demographics",
@@ -7,15 +10,27 @@
           "protocol-device": "Protocol and Device",
           "caregiver-info": "Caregiver Information"
         },
-        "clinic": {
-          "title": "Clinic"
-        },
+        "clinic-title": "Clinic",
+        "caregiver-title": "Caregivers",
+        "device-title": "Device Information",
+        "protocol-title": "Protocol",
         "phone": "Phone:",
         "fax": "Fax:",
         "hr-id": "ID",
         "link-clinic": "Link Clinic",
+        "link-caregiver": "Add Caregiver",
+        "link-device": "Add Device",
+        "link-protocol": "Add Protocol",
         "placeholder": {
-          "clinic-link": "Search Clinic here"
+          "clinic-link": "Search Clinic here",
+          "device-link": "Search Device here",
+          "protocol-link": "Search Protocol here"
+        },
+        "protocol": {
+          "tm-per-day": "Treatment per Day",
+          "min-per-tm": "Minutes per Treatment",
+          "frequency": "Frequency",
+          "min-minute-per-day": "Minimum minutes of use per day"
         }
     }
 }

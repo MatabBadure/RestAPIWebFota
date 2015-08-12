@@ -1,0 +1,133 @@
+<div class="container admin-patient">
+  <div class="col-md-16 margin-top">
+   <div class="patient-details">
+     <span class="patient-details--name">Williams James</span>
+     <span class="patient-details--hr-id">HR45321</span>
+   </div> 
+  </div>
+
+  <div class="col-md-16 patient-device">
+    <span class="patient-device--title" translate="patient.device-title"></span>
+  </div>
+
+  <div class="col-md-16 device-list">
+    <div class="col-md-3 device-list__serial">
+      <span>105DN00789645135</span>
+    </div>
+    <div class="col-md-2 device-list__bt-id">
+      <span>BT</span><span>2252471</span>
+    </div>
+    <div class="col-md-1 device-list__lung">
+      <span class="icon-lungs active"></span>
+    </div>
+    <div class="col-md-2 device-list__status">
+      <span class="clinic-list__fax--text">Active</span>
+    </div>
+    <div class="col-md-3 device-list__date">
+      <span>January 12, 2015</span>
+    </div>
+    <div class="col-md-4 device-list__days-status">
+      <span>68 days from purchase</span>
+    </div>
+    <div class="col-md-1 device-list__delete">
+      <span class="glyphicon glyphicon-trash"></span>
+    </div>
+  </div>
+
+  <div class="col-md-16 device-list list-inactive">
+    <div class="col-md-3 device-list__serial">
+      <span>105DN00789645135</span>
+    </div>
+    <div class="col-md-2 device-list__bt-id">
+      <span>BT</span><span>2252471</span>
+    </div>
+    <div class="col-md-1 device-list__lung">
+      <span class="icon-lungs inactive"></span>
+    </div>
+    <div class="col-md-2 device-list__status">
+      <span class="clinic-list__fax--text">Active</span>
+    </div>
+    <div class="col-md-3 device-list__date">
+      <span>January 12, 2015</span>
+    </div>
+    <div class="col-md-4 device-list__days-status">
+      <span>68 days from purchase</span>
+    </div>
+    <div class="col-md-1 device-list__delete">
+      <span class="glyphicon glyphicon-trash"></span>
+    </div>
+  </div>
+
+  <div class="col-md-16 reset-padding">
+    <div class="col-md-8 clinic-link">
+      <input class="" type="text" name="linkClinic" placeholder="{{'patient.placeholder.device-link' | translate}}">
+    </div>
+    <div class="col-md-8 clinic-link">
+      <buton class="hillrom-btn btn-primary float-right" ng-click="linkDevice()" translate="patient.link-device"></buton>
+    </div>
+  </div>
+
+
+  <div class="col-md-16 patient-protocol">
+    <span class="patient-protocol--title" translate="patient.protocol-title"></span>
+  </div>
+
+  <div class="col-md-16 protocol-list">
+    <div class="col-md-2 protocol-list__type">
+      <span>Custom</span>
+    </div>
+    <div class="col-md-3 protocol-list__treatment-day">
+      <span class="protocol-list__treatment-day--text" translate="patient.protocol.tm-per-day"></span>
+      <span class="protocol-list--value">2</span>
+    </div>
+    <div class="col-md-4 protocol-list__treatment-minute">
+      <span class="protocol-list__treatment-minute--text" translate="patient.protocol.min-per-tm"></span>
+      <span class="protocol-list--value">20</span>
+    </div>
+    <div class="col-md-2 protocol-list__freq">
+      <span class="protocol-list__freq--text" translate="patient.protocol.frequency"></span>
+      <span class="protocol-list--value">10-14</span>
+    </div>
+    <div class="col-md-4 protocol-list__use-day">
+      <span class="protocol-list__use-day--text" translate="patient.protocol.min-minute-per-day"></span>
+      <span class="protocol-list--value">10</span>
+    </div>
+    <div class="col-md-1 protocol-list__delete">
+      <span class="glyphicon glyphicon-trash"></span>
+    </div>
+  </div>
+
+  <div class="col-md-16 protocol-list inactive">
+    <div class="col-md-2 protocol-list__type">
+      <span class="protocol-list--text">Custom</span>
+    </div>
+    <div class="col-md-3 protocol-list__treatment-day">
+      <span class="protocol-list--text" translate="patient.protocol.tm-per-day"></span>
+      <span class="protocol-list--value">2</span>
+    </div>
+    <div class="col-md-4 protocol-list__treatment-minute">
+      <span class="protocol-list--text" translate="patient.protocol.min-per-tm"></span>
+      <span class="protocol-list--value">20</span>
+    </div>
+    <div class="col-md-2 protocol-list__freq">
+      <span class="protocol-list--text" translate="patient.protocol.frequency"></span>
+      <span class="protocol-list--value">10-14</span>
+    </div>
+    <div class="col-md-4 protocol-list__use-day">
+      <span class="protocol-list--text" translate="patient.protocol.min-minute-per-day"></span>
+      <span class="protocol-list--value">10</span>
+    </div>
+    <div class="col-md-1 protocol-list__delete">
+      <span class="glyphicon glyphicon-trash"></span>
+    </div>
+  </div>
+
+  <div class="col-md-16 reset-padding">
+    <div class="col-md-8 clinic-link">
+      <input class="" type="text" name="linkClinic" placeholder="{{'patient.placeholder.protocol-link' | translate}}">
+    </div>
+    <div class="col-md-8 clinic-link">
+      <buton class="hillrom-btn btn-primary float-right" ng-click="linkProtocol()" translate="patient.link-protocol"></buton>
+    </div>
+  </div>
+</div>

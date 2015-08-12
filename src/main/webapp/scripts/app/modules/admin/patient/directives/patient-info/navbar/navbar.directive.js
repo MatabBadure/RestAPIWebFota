@@ -3,7 +3,7 @@
 angular.module('hillromvestApp')
 .directive('patientNavbar', function() {
   return {
-      templateUrl: 'scripts/app/modules/patient/navbar/navbar.html',
+      templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/navbar/navbar.html',
       restrict: 'E',
       controller: function($scope, $location) {
         $scope.isActive = function(tab) {

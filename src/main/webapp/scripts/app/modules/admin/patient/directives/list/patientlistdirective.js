@@ -42,7 +42,7 @@ angular.module('hillromvestApp')
         });
 
         $scope.selectPatient = function(patient) {
-          $state.go('patientEdit', {
+          $state.go('patientView', {
             'patientId': patient.id
           });
         };

@@ -1,17 +1,4 @@
-.admin-patient .patient-details {
-  text-align: right;
-  padding: 10px 0;
-  font-size: $font-size-base;
-  font-weight: $font-weight-bold;
-  &--name {
-    color: $storm-dust;
-  }
-  &--hr-id {
-    color: $sunshade;
-  }
-}
-
-.admin-patient .patient-caregiver {
+.admin-user .patient-caregiver {
   margin-top: 20px;
   padding: 10px 0;
   &--title {
@@ -21,13 +8,13 @@
   }
 }
 
-.admin-patient .caregiver-list {
+.admin-user .caregiver-list {
   padding: 0;
   margin-top: 20px;
   border-bottom: 1px solid $celeste;
 }
 
-.admin-patient .caregiver-list__detail {
+.admin-user .caregiver-list__detail {
   padding: 0;
   &--name {
     color: $pickled-bluewood;
@@ -43,7 +30,7 @@
   }
 }
 
-.admin-patient .caregiver-list__address {
+.admin-user .caregiver-list__address {
   padding: 0;
   font-size: $font-size-small;
   font-weight: $font-weight-medium;
@@ -53,14 +40,14 @@
   }
 }
 
-.admin-patient .caregiver-list__phone, .admin-patient .caregiver-list__fax {
+.admin-user .caregiver-list__phone, .admin-user .caregiver-list__fax {
   padding: 0;
   color: $nevada;
   font-size: $font-size-small;
   font-weight: $font-weight-medium;
 }
 
-.admin-patient .caregiver-list__type {
+.admin-user .caregiver-list__type {
   padding: 0;
   span {
     color: $pickled-bluewood;
@@ -68,14 +55,14 @@
   }
 }
 
-.admin-patient .caregiver-list__delete {
+.admin-user .caregiver-list__delete {
   text-align: center;
   span {
     cursor: pointer;
   }
 }
 
-.admin-patient .caregiver-link {
+.admin-user .caregiver-link {
   margin: 30px 0;
   padding: 0;
   input {

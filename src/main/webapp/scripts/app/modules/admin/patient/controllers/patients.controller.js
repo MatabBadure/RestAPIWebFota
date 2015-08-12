@@ -27,8 +27,28 @@ angular.module('hillromvestApp')
       'message': ''
     };
 
+    $scope.isActive = function(tab) {
+      if ($scope.patientTab.indexOf(tab) !== -1) {
+        return true;
+      } else {
+        return false;
+      }
+    };
+
+    $scope.switchPatientTab = function(status){
+      $scope.patientTab = status;
+      $state.go(status, {'patientId': $stateParams.patientId});
+    };
+
+    $scope.initPatientOverview = function(){
+      $scope.patientTab = "patientEdit";
+    };
+
     $scope.init = function() {
       var currentRoute = $state.current.name;
+      if($state.current.name === 'patientUser'){
+        $scope.initPatientOverview();
+      }
       if ($state.current.name === 'patientEdit') {
         $scope.getPatiendDetails($stateParams.patientId, $scope.setEditMode);
       } else if ($state.current.name === 'patientNew') {
@@ -51,16 +71,6 @@ angular.module('hillromvestApp')
         var dob = _month + "/" + _day + "/" + _year;
         $scope.patient.dob = dob;
         $scope.patient.formatedDOB = _month + "/" + _day + "/" + _year.slice(-2);
-        // $scope.patient.age = $scope.getAge(new Date($scope.patient.dob))
-        // var dateArr = $scope.patient.dob.split('-');
-        // $scope.patient.formatedDOB = dateArr[1] + "/" + dateArr[2] + "/" + dateArr[0].slice(-2);
-        // var _month = dateArr[1];
-        // _month = _month.length > 1 ? _month : '0' + _month;
-        // var _day = dateArr[2];
-        // _day = _day.length > 1 ? _day : '0' + _day;
-        // var _year = dateArr[0];
-        // var dob = _month + "/" + _day + "/" + _year;
-        // $scope.patient.dob = dob;
       }
     };
 
@@ -72,25 +82,6 @@ angular.module('hillromvestApp')
           callback($scope.patient);
         }
       }).catch(function(response) {});
-    };
-
-    $scope.selectedPatient = function(patient) {
-      // $scope.patientStatus.editMode = true;
-      // $scope.patientStatus.isCreate = false;
-      // $scope.patient = patient;
-      // if (patient.dob !== null) {
-      //   $scope.patient.age = $scope.getAge(new Date($scope.patient.dob))
-      //   var _date = new Date($scope.patient.dob);
-      //   var _month = (_date.getMonth() + 1).toString();
-      //   _month = _month.length > 1 ? _month : '0' + _month;
-      //   var _day = (_date.getDate()).toString();
-      //   _day = _day.length > 1 ? _day : '0' + _day;
-      //   var _year = (_date.getFullYear()).toString();
-      //   var dob = _month + "/" + _day + "/" + _year;
-      //   $scope.patient.dob = dob;
-      //   $scope.patient.formatedDOB = _month + "/" + _day + "/" + _year.slice(-2);
-      // }
-      // $scope.patient.language = $filter('languageFromKey')(patient.langKey);
     };
 
     $scope.createPatient = function() {

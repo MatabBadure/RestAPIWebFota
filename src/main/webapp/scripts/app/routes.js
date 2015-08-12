@@ -87,10 +87,10 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
-            
-            .state('patientView', {
+
+            .state('patientClinics', {
                 parent: 'patientUser',
-                url: '/clinic-info',
+                url: '/{patientId}/clinic-info',
                 data: {
                     roles: ['ADMIN'],
                     pageTitle: 'patient.title'
@@ -98,6 +98,56 @@ angular.module('hillromvestApp')
                 views: {
                     'content@': {
                         templateUrl: 'scripts/app/modules/admin/patient/views/patient-view/view.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+            .state('patientProtocol', {
+                parent: 'patientUser',
+                url: '/{patientId}/protocol-device',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/device-protocol/list.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+            .state('patientCraegiver', {
+                parent: 'patientUser',
+                url: '/{patientId}/caregiver',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/caregiver/list.html',
                         controller: 'patientsController'
                     }
                 },

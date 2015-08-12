@@ -1,73 +1,70 @@
 package com.hillrom.vest.domain;
 
-
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
+import javax.persistence.AssociationOverride;
+import javax.persistence.AssociationOverrides;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.SQLDelete;
 
 /**
  * A Clinic.
  */
 @Entity
-@Table(name = "CLINIC_PATIENTS_ASSOC")
-@SQLDelete(sql="UPDATE CLINIC_PATIENTS_ASSOC SET is_deleted = 1 WHERE id = ?")
+@Table(name = "CLINIC_PATIENT_ASSOC")
+@AssociationOverrides({
+    @AssociationOverride(name = "clinicPatientAssocPK.clinic",
+        joinColumns = @JoinColumn(name = "CLINIC_ID", referencedColumnName="id")),
+    @AssociationOverride(name = "clinicPatientAssocPK.patient",
+        joinColumns = @JoinColumn(name = "PATIENT_ID", referencedColumnName="id")) })
 public class ClinicPatientAssoc implements Serializable {
 
-	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "PATIENT_ID") 
-    private PatientInfo patient;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "CLINIC_ID") 
-    private Clinic clinic;
+	@EmbeddedId
+	private ClinicPatientAssocPK clinicPatientAssocPK;
     
     @Column(name="mrn_id", nullable = false)
     private String mrnId;
     
-    @Column(name="is_deleted", nullable = false)
-    private boolean deleted = false;
+    @Column(name="notes")
+    private String notes;
+    
+	public ClinicPatientAssoc() {
+		super();
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public ClinicPatientAssoc(ClinicPatientAssocPK clinicPatientAssocPK,
+			String mrnId, String notes) {
+		super();
+		this.clinicPatientAssocPK = clinicPatientAssocPK;
+		this.mrnId = mrnId;
+		this.notes = notes;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public ClinicPatientAssocPK getClinicPatientAssocPK() {
+		return clinicPatientAssocPK;
+	}
+
+	public void setClinicPatientAssocPK(ClinicPatientAssocPK clinicPatientAssocPK) {
+		this.clinicPatientAssocPK = clinicPatientAssocPK;
+	}
 
 	public PatientInfo getPatient() {
-		return patient;
+		return getClinicPatientAssocPK().getPatient();
 	}
 
 	public void setPatient(PatientInfo patient) {
-		this.patient = patient;
+		getClinicPatientAssocPK().setPatient(patient);
 	}
 
 	public Clinic getClinic() {
-		return clinic;
+		return getClinicPatientAssocPK().getClinic();
 	}
 
 	public void setClinic(Clinic clinic) {
-		this.clinic = clinic;
+		getClinicPatientAssocPK().setClinic(clinic);
 	}
 
 	public String getMrnId() {
@@ -78,40 +75,52 @@ public class ClinicPatientAssoc implements Serializable {
 		this.mrnId = mrnId;
 	}
 
-	public boolean isDeleted() {
-		return deleted;
+	public String getNotes() {
+		return notes;
 	}
 
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
+	public void setNotes(String notes) {
+		this.notes = notes;
 	}
 
 	@Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((clinicPatientAssocPK == null) ? 0 : clinicPatientAssocPK
+						.hashCode());
+		result = prime * result + ((mrnId == null) ? 0 : mrnId.hashCode());
+		return result;
+	}
 
-        ClinicPatientAssoc clinicPatientAssoc = (ClinicPatientAssoc) o;
-
-        if ( ! Objects.equals(id, clinicPatientAssoc.id)) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ClinicPatientAssoc other = (ClinicPatientAssoc) obj;
+		if (clinicPatientAssocPK == null) {
+			if (other.clinicPatientAssocPK != null)
+				return false;
+		} else if (!clinicPatientAssocPK.equals(other.clinicPatientAssocPK))
+			return false;
+		if (mrnId == null) {
+			if (other.mrnId != null)
+				return false;
+		} else if (!mrnId.equals(other.mrnId))
+			return false;
+		return true;
+	}
 
 	@Override
 	public String toString() {
-		return "ClinicPatientAssoc [id=" + id + ", patient=" + patient
-				+ ", clinic=" + clinic + ", mrnId=" + mrnId + ", deleted="
-				+ deleted + "]";
+		return "ClinicPatientAssoc [clinicPatientAssocPK="
+				+ clinicPatientAssocPK + ", mrnId=" + mrnId + "]";
 	}
 
 }

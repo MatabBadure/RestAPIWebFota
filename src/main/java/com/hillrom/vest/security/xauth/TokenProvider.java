@@ -31,7 +31,7 @@ public class TokenProvider {
     public UserLoginToken createToken(UserDetails userDetails) {
         long expiresAt = System.currentTimeMillis()+ 1000L * tokenValidity;
         String token = userDetails.getUsername() + SEPERATOR + expiresAt + SEPERATOR + computeSignature(userDetails, expiresAt);
-        User user = userService.findOneByEmail(userDetails.getUsername()).get();
+        User user = userService.findOneByEmailOrHillromId(userDetails.getUsername()).get();
         UserLoginToken loginToken = new UserLoginToken();
         loginToken.setId(token);
         loginToken.setCreatedTime(new DateTime(expiresAt));

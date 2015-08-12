@@ -396,4 +396,29 @@ angular.module('hillromvestApp')
                 url: '/patient',
                 abstract: true,
             })
+            .state('patientclinic', {
+                parent: 'patient',
+                url: '/clinics',
+                data: {
+                    roles: ['PATIENT'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/patient/clinic/views/list/view.html',
+                        controller: 'patientClinicsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
 });

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+
+    <property name="autoIncrement" value="true" dbms="mysql,h2,postgresql"/>
+    <property name="autoIncrement" value="false" dbms="oracle"/>
+    <!--
+        Updated the entity USER_PATIENT_ASSOC.
+    -->
+    <changeSet id="20150806112900" author="jhipster">
+        <dropTable tableName="CLINIC_PATIENTS_ASSOC"/>
+        
+        <createTable tableName="CLINIC_PATIENT_ASSOC">
+			<column name="clinic_id" type="varchar(45)">
+				<constraints nullable="false" />
+			</column>
+			<column name="patient_id" type="varchar(45)">
+				<constraints nullable="false" />
+			</column>
+			<column name="mrn_id" type="varchar(45)"/>
+        	<column name="notes" type="varchar(45)"/>
+		</createTable>
+	
+		<addPrimaryKey columnNames="clinic_id,patient_id"
+            constraintName="pk_clinic_patient_assoc"
+            tableName="CLINIC_PATIENT_ASSOC"/>
+            
+        <addForeignKeyConstraint baseColumnNames="clinic_id"
+                                 baseTableName="CLINIC_PATIENT_ASSOC"
+                                 constraintName="fk_cpa_clinic_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="CLINIC"/>
+
+        <addForeignKeyConstraint baseColumnNames="patient_id"
+                                 baseTableName="CLINIC_PATIENT_ASSOC"
+                                 constraintName="fk_cpa_patients_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="PATIENT_INFO"/>
+
+    </changeSet>
+</databaseChangeLog>

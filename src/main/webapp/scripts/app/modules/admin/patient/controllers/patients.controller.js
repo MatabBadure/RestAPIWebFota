@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .controller('patientsController', function($scope, $filter, $state, $stateParams, patientService, dateService) {
+  .controller('patientsController', function($scope, $filter, $state, $stateParams, patientService, dateService,clinicService, $timeout) {
 
     $scope.patient = {};
 
@@ -19,6 +19,8 @@ angular.module('hillromvestApp')
         $scope.getPatiendDetails($stateParams.patientId, $scope.setEditMode);
       } else if ($state.current.name === 'patientNew') {
         $scope.createPatient();
+      }else if($state.current.name === 'patientEditClinics'){
+        $scope.initPatientClinics($stateParams.patientId);        
       }
     };
 
@@ -55,6 +57,76 @@ angular.module('hillromvestApp')
         title: 'Mr.'
       };
     };
+    
+    $scope.goToPatientClinics = function(){
+      alert("goToPatientClinics"+$stateParams.patientId);
+      $state.go('patientEditClinics',{'patientId': $stateParams.patientId});
 
-    $scope.init();
+    }
+    /** starts for patient clinics **/
+    $scope.getPatientClinicInfo = function(patientId){
+      $scope.associatedClinics = associatedClinics.clinics;      
+      /*$scope.availableClinicsForPatient($scope.associatedClinics);
+      patientService.getClinicsLinkedToPatient(patientId).then(function(response) {
+        $scope.associatedClinics = response.data;            
+      }).catch(function(response) {});*/
+    }
+    $scope.disassociateLinkedClinics = function(id, index){
+      $scope.associatedClinics.splice(index, 1);
+      // API returning error : unAuthorized
+     /* patientService.disassociateClinicsFromPatient(id).then(function(response) {
+        $scope.associatedClinics = response.data;        
+      }).catch(function(response) {});*/
+    }
+    $scope.availableClinicsForPatient = function(associatedClinics){          
+      clinicService.getClinics($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
+          $scope.clinics = response.data;
+          $scope.total = response.headers()['x-total-count'];
+          $scope.pageCount = Math.ceil($scope.total / 10);
+        }).catch(function (response) {
+
+        });
+    }
+    /*var timer = false;
+    $scope.$watch('searchItem', function () {
+      if(timer){
+        $timeout.cancel(timer)
+      }
+      timer= $timeout(function () {
+          $scope.searchClinics();
+      },1000)
+    });*/
+    $scope.searchClinics = function (track) {
+      if (track !== undefined) {
+        if (track === "PREV" && $scope.currentPageIndex > 1) {
+          $scope.currentPageIndex--;
+        }
+        else if (track === "NEXT" && $scope.currentPageIndex < $scope.pageCount){
+            $scope.currentPageIndex++;
+        }
+        else{
+            return false;
+        }
+      }else {
+          $scope.currentPageIndex = 1;
+      }
+      clinicService.getClinics($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
+        $scope.clinics = response.data;
+        $scope.total = response.headers()['x-total-count'];
+        $scope.pageCount = Math.ceil($scope.total / 10);
+      }).catch(function (response) {
+
+      });
+    };
+    $scope.initPatientClinics = function(patientId){
+      $scope.currentPageIndex = 1;
+      $scope.perPageCount = 10;
+      $scope.pageCount = 0;
+      $scope.total = 0;
+      $scope.clinics = [];
+      $scope.sortOption ="";
+      $scope.getPatientClinicInfo(patientId);
+    }
+
+    $scope.init();    
   });

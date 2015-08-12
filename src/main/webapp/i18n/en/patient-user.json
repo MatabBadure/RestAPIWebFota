@@ -26,6 +26,10 @@
           "device-link": "Search Device here",
           "protocol-link": "Search Protocol here"
         },
+        "device": {
+          "gen-details": "Add Device",
+          "serial-no": "Serial No."
+        },
         "protocol": {
           "tm-per-day": "Treatment per Day",
           "min-per-tm": "Minutes per Treatment",
@@ -47,7 +51,23 @@
         },
         "btn": {
           "update": "Update",
-          "cancel": "Cancel"
+          "cancel": "Cancel",
+          "save": "Save"
+        },
+        "caregiver": {
+          "gen-details": "Create Caregiver",
+          "title-name": "Title",
+          "first-name": "First Name",
+          "middle-name":"Middle Name",
+          "last-name": "Last Name",
+          "relationship": "Relationship",
+          "address": "Address",
+          "city": "City",
+          "state": "State",
+          "zipcode": "Zip",
+          "email": "Email",
+          "phone-no": "Phone No.",
+          "mobile-no": "Mobile No."
         }
     }
 }

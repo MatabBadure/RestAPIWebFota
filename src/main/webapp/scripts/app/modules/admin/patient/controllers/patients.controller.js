@@ -13,8 +13,28 @@ angular.module('hillromvestApp')
       'message': ''
     };
 
+    $scope.isActive = function(tab) {
+      if ($scope.patientTab.indexOf(tab) !== -1) {
+        return true;
+      } else {
+        return false;
+      }
+    };
+
+    $scope.switchPatientTab = function(status){
+      $scope.patientTab = status;
+      $state.go(status, {'patientId': $stateParams.patientId});
+    };
+
+    $scope.initPatientOverview = function(){
+      $scope.patientTab = "patientEdit";
+    };
+
     $scope.init = function() {
       var currentRoute = $state.current.name;
+      if($state.current.name === 'patientUser'){
+        $scope.initPatientOverview();
+      }
       if ($state.current.name === 'patientEdit') {
         $scope.getPatiendDetails($stateParams.patientId, $scope.setEditMode);
       } else if ($state.current.name === 'patientNew') {

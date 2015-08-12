@@ -3,27 +3,27 @@
     <div class="collapse navbar-collapse patient-user__navbar" id="navbar-collapse">
       <ul class="nav navbar-nav">
         <li >
-          <a ng-class="{active: isActive('overview')}" ng-href="#/overview">
+          <a ng-class="{active: isActive('patientEdit')}" ng-href="" ng-click="switchPatientTab('patientEdit')">
             <span class="" translate="patient.tab.patient-overview"></span>
           </a>
         </li>
         <li>
-          <a ng-class="{ active: isActive('doctor')}" ng-href="#/">
+          <a ng-class="{ active: isActive('patientDemographic')}" ng-href="" ng-click="switchPatientTab('patientDemographic')">
             <span class="" translate="patient.tab.patient-demographics"></span>
           </a>
         </li>
         <li>
-          <a ng-class="{ active: isActive('clinic-info')}" ng-href="#/admin/patients/clinic-info">
+          <a ng-class="{ active: isActive('patientClinics')}" ng-href="" ng-click="switchPatientTab('patientClinics')">
             <span class="" translate="patient.tab.clinic-info"></span>
           </a>
         </li>
         <li>
-          <a ng-class="{ active: isActive('user')}" ng-href="#">
+          <a ng-class="{ active: isActive('patientProtocol')}" ng-href="" ng-click="switchPatientTab('patientProtocol')">
             <span class="" translate="patient.tab.protocol-device"></span>
           </a>
         </li>
         <li>
-          <a ng-class="{ active: isActive('user')}" ng-href="#">
+          <a ng-class="{ active: isActive('patientCraegiver')}" ng-href="" ng-click="switchPatientTab('patientCraegiver')">
             <span class="" translate="patient.tab.caregiver-info"></span>
           </a>
         </li>

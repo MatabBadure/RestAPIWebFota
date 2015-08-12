@@ -34,7 +34,8 @@
           "tm-per-day": "Treatment per Day",
           "min-per-tm": "Minutes per Treatment",
           "frequency": "Frequency",
-          "min-minute-per-day": "Minimum minutes of use per day"
+          "min-minute-per-day": "Minimum minutes of use per day",
+          "gen-details": "Add Protocol"
         },
         "overview": {
           "hr-id": "Hillrom ID:",

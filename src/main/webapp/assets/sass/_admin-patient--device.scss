@@ -1,5 +1,5 @@
-.admin-patient .patient-device,
-.admin-patient .patient-protocol {
+.admin-user .patient-device,
+.admin-user .patient-protocol {
   margin-top: 20px;
   padding: 10px 0;
   &--title {
@@ -9,8 +9,8 @@
   }
 }
 
-.admin-patient .device-list,
-.admin-patient .protocol-list {
+.admin-user .device-list,
+.admin-user .protocol-list {
   padding: 0;
   margin-top: 20px;
   div {
@@ -25,7 +25,7 @@
   padding-bottom: 10px;
 }
 
-.admin-patient .list-inactive {
+.admin-user .list-inactive {
   div {
     padding: 0;
     span {
@@ -34,8 +34,8 @@
   }
 }
 
-.admin-patient .device-list__lung,
-.admin-patient .protocol-list__lung {
+.admin-user .device-list__lung,
+.admin-user .protocol-list__lung {
   position: relative;
   .icon-lungs {
     position: absolute;
@@ -44,12 +44,12 @@
   }
 }
 
-.admin-patient .device-list__lung .active,
-.admin-patient .protocol-list__lung .active {
+.admin-user .device-list__lung .active,
+.admin-user .protocol-list__lung .active {
   color: $fruit-salad;
 }
 
-.admin-patient .protocol-list .protocol-list__type {
+.admin-user .protocol-list .protocol-list__type {
   font-weight: $font-weight-medium;
 }
 

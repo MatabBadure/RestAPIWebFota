@@ -40,6 +40,14 @@
           "email": "Email:",
           "location": "Location:"
         },
-        "disassociate-patient": "Disassociate"
+        "disassociate-patient": "Disassociate",
+        "demo-graph": {
+          "identifier": "Patient Identifiers",
+          "personal-details": "Personal Details"
+        },
+        "btn": {
+          "update": "Update",
+          "cancel": "Cancel"
+        }
     }
 }

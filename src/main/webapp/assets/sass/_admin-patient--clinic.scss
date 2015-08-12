@@ -1,4 +1,4 @@
-.admin-patient .patient-details {
+.admin-user .user-gen-details {
   text-align: right;
   padding: 10px 0;
   font-size: $font-size-base;
@@ -11,7 +11,7 @@
   }
 }
 
-.admin-patient .patient-clinic {
+.admin-user .patient-clinic {
   margin-top: 20px;
   padding: 10px 0;
   &--title {
@@ -21,13 +21,13 @@
   }
 }
 
-.admin-patient .clinic-list {
+.admin-user .clinic-list {
   padding: 0;
   margin-top: 20px;
   border-bottom: 1px solid $celeste;
 }
 
-.admin-patient .clinic-list__detail {
+.admin-user .clinic-list__detail {
   padding: 0;
   &--name {
     color: $pickled-bluewood;
@@ -43,7 +43,7 @@
   }
 }
 
-.admin-patient .clinic-list__address {
+.admin-user .clinic-list__address {
   padding: 0;
   font-size: $font-size-small;
   font-weight: $font-weight-medium;
@@ -53,14 +53,14 @@
   }
 }
 
-.admin-patient .clinic-list__phone, .admin-patient .clinic-list__fax {
+.admin-user .clinic-list__phone, .admin-patient .clinic-list__fax {
   padding: 0;
   color: $nevada;
   font-size: $font-size-small;
   font-weight: $font-weight-medium;
 }
 
-.admin-patient .clinic-list__hr-id {
+.admin-user .clinic-list__hr-id {
   padding: 0;
   span {
     color: $pickled-bluewood;
@@ -68,14 +68,14 @@
   }
 }
 
-.admin-patient .clinic-list__delete {
+.admin-user .clinic-list__delete {
   text-align: center;
   span {
     cursor: pointer;
   }
 }
 
-.admin-patient .clinic-link {
+.admin-user .clinic-link {
   margin: 30px 0;
   padding: 0;
   input {

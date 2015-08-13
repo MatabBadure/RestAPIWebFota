@@ -15,10 +15,12 @@ import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.domain.UserPatientAssocPK;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 
 /**
@@ -39,8 +41,8 @@ public class PatientHCPService {
     @Inject
     private UserRepository userRepository;
     
-    public JSONObject associateHCPToPatient(Long id, List<Map<String, String>> hcpList) {
-    	JSONObject jsonObject = new JSONObject();
+    public List<User> associateHCPToPatient(Long id, List<Map<String, String>> hcpList) throws HillromException {
+    	List<User> users = new LinkedList<>();
     	User patientUser = userRepository.findOne(id);
     	if(patientUser != null) {
 	    	PatientInfo patientInfo = null;
@@ -57,25 +59,24 @@ public class PatientHCPService {
 			    		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, hcpUser), AuthoritiesConstants.HCP, RelationshipLabelConstants.HCP);
 			    		hcpPatientAssocList.add(userPatientAssoc);
 		    		} else {
-		    			jsonObject.put("ERROR", "Invalid HCP id");
-		    			return jsonObject;
+		    			throw new HillromException(ExceptionConstants.HR_532);//Invalid HCP id
 		    		}
 		    	}
 		    	userPatientRepository.save(hcpPatientAssocList);
-		    	jsonObject.put("message", "HCPs are associated with patient successfully.");
-		    	jsonObject.put("hcpUsers", getAssociatedHCPUserList(patientInfo));
+		    	
+		    	users = getAssociatedHCPUserList(patientInfo);
 	     	} else {
-	     		jsonObject.put("ERROR", "No such patient exist");
+	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
 	     	}
     	} else {
-     		jsonObject.put("ERROR", "No such user exist");
+    		throw new HillromException(ExceptionConstants.HR_512);//No such user exist
      	}
-    	return jsonObject;
+    	return users;
     }
     
-    public JSONObject getAssociatedHCPUserForPatient(Long id) {
-    	JSONObject jsonObject = new JSONObject();
+    public List<User> getAssociatedHCPUserForPatient(Long id) throws HillromException {
     	User patientUser = userRepository.findOne(id);
+    	List<User> hcpUsers = new LinkedList<>();
     	if(patientUser != null) {
     		PatientInfo patientInfo = null;
 	     	for(UserPatientAssoc patientAssoc : patientUser.getUserPatientAssoc()){
@@ -84,16 +85,14 @@ public class PatientHCPService {
 	    		}
 	    	}
 	     	if(patientInfo != null){
-		    	List<User> hcpUsers = getAssociatedHCPUserList(patientInfo);
-		    	jsonObject.put("message", "Associated HCPs with patient fetched successfully.");
-		    	jsonObject.put("hcpUsers", hcpUsers);
+		    	hcpUsers = getAssociatedHCPUserList(patientInfo);
 	     	} else {
-	     		jsonObject.put("ERROR", "No such patient exist");
+	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
 	     	}
     	} else {
-     		jsonObject.put("ERROR", "No such user exist");
+    		throw new HillromException(ExceptionConstants.HR_512);//No such user exist
      	}
-    	return jsonObject;
+    	return hcpUsers;
     }
 
 	private List<User> getAssociatedHCPUserList(PatientInfo patientInfo) {

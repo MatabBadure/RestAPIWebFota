@@ -123,8 +123,9 @@ public class UserService {
      * Completes the reset password flow
      * @param paramsMap
      * @return
+     * @throws HillromException 
      */
-    public JSONObject completePasswordReset(Map<String,String> paramsMap) {
+    public JSONObject completePasswordReset(Map<String,String> paramsMap) throws HillromException {
        log.debug("Reset user password for reset key {}", paramsMap);
    
        String requiredParams[] = {"password","questionId","answer"};
@@ -158,8 +159,7 @@ public class UserService {
            jsonObject.put("email", user.getEmail());
            return jsonObject;
        }else{
-    	   jsonObject.put("ERROR", "Invalid Reset Key");
-    	   return jsonObject;   
+    	   throw new HillromException(ExceptionConstants.HR_556);//Invalid Reset Key
        }
        
     }
@@ -170,16 +170,17 @@ public class UserService {
      * @param answer
      * @param user
      * @return
+     * @throws HillromException 
      */
 	private JSONObject canProceedPasswordReset(String questionId, String answer,
-			 User user) {
+			 User user) throws HillromException {
 		JSONObject jsonObject = new JSONObject();
 		DateTime oneDayAgo = DateTime.now().minusHours(24);
            if(user.getResetDate().isBefore(oneDayAgo.toInstant().getMillis())){
-        	   jsonObject.put("ERROR", "Reset Key Expired");
+        	   throw new HillromException(ExceptionConstants.HR_504);//Reset Key Expired
            }
            if(!verifySecurityQuestion(user,questionId,answer)){
-        	   jsonObject.put("ERROR", "Incorrect Security Question or Password");
+        	   throw new HillromException(ExceptionConstants.HR_505);//Incorrect Security Question or Password
            }
            return jsonObject;
 	}
@@ -243,10 +244,10 @@ public class UserService {
         });
     }
 
-    public JSONObject changePassword(String password) {
+    public JSONObject changePassword(String password) throws HillromException {
     	JSONObject jsonObject = new JSONObject();
     	if(!checkPasswordLength(password)){
-    		jsonObject.put("ERROR", "Incorrect password");
+    		throw new HillromException(ExceptionConstants.HR_506);//Incorrect password
     	}else{
     		
     		userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).ifPresent(u-> {
@@ -420,13 +421,11 @@ public class UserService {
 		return newUser;
 	}
     
-    public JSONObject updateUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl){
-    	JSONObject jsonObject = new JSONObject();
+    public UserExtension updateUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException{
         if(userExtensionDTO.getEmail() != null) {
 			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
 			if(existingUser.isPresent() && !existingUser.get().getId().equals(id)) {
-				jsonObject.put("ERROR", "e-mail address already in use");
-				return jsonObject;
+				throw new HillromException(ExceptionConstants.HR_501);//e-mail address already in use
 			}
     	}
         List<String> rolesAdminCanModerate = rolesAdminCanModerate();
@@ -437,12 +436,9 @@ public class UserService {
     			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
     				mailService.sendActivationEmail(user, baseUrl);
     			}
-                jsonObject.put("message", "Hillrom User updated successfully.");
-                jsonObject.put("user", user);
-                return jsonObject;
+                return user;
     		} else {
-    			jsonObject.put("ERROR", "Unable to update Hillrom User.");
-                return jsonObject;
+    			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
     		}
     	} else if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updatePatientUser(id, userExtensionDTO);
@@ -451,12 +447,9 @@ public class UserService {
     				mailService.sendActivationEmail(user, baseUrl);
     	    		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
     			}
-                jsonObject.put("message", "Patient User updated successfully.");
-                jsonObject.put("user", user);
-                return jsonObject;
+                return user;
     		} else {
-    			jsonObject.put("ERROR", "Unable to update Patient.");
-                return jsonObject;
+    			throw new HillromException(ExceptionConstants.HR_524);//Unable to update Patient.
     		}
         } else if (AuthoritiesConstants.HCP.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updateHCPUser(id, userExtensionDTO);
@@ -464,16 +457,12 @@ public class UserService {
     			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
     				mailService.sendActivationEmail(user, baseUrl);
     			}
-                jsonObject.put("message", "HealthCare Professional updated successfully.");
-                jsonObject.put("user", user);
-                return jsonObject;
+                return user;
     		} else {
-    			jsonObject.put("ERROR", "Unable to update HealthCare Professional.");
-                return jsonObject;
+    			throw new HillromException(ExceptionConstants.HR_531);//Unable to update HealthCare Professional.
     		}
         } else {
-    		jsonObject.put("ERROR", "Incorrect data.");
-    		return jsonObject;
+        	throw new HillromException(ExceptionConstants.HR_555);//Incorrect data
     	}
     }
     
@@ -675,7 +664,7 @@ public class UserService {
 		});
 	}
 	
-	public JSONObject updateEmailOrPassword(Map<String,String> params){
+	public JSONObject updateEmailOrPassword(Map<String,String> params) throws HillromException{
 		
 		String email = params.get("email");
     	String password = params.get("password");
@@ -717,8 +706,7 @@ public class UserService {
         	log.debug("updateEmailOrPassword for User: {}", currentUser);
         	
         }else{
-        	errorsJsonObject.put("ERROR", "Invalid Security Question or Answer");
-        	return errorsJsonObject;
+        	throw new HillromException(ExceptionConstants.HR_557);//Invalid Security Question or Answer")
         }
 		return new JSONObject();
 	}
@@ -728,18 +716,19 @@ public class UserService {
 	 * @param email
 	 * @param currentUser
 	 * @return
+	 * @throws HillromException 
 	 */
-	private JSONObject isUserExistsWithEmail(String email, User currentUser) {
+	private JSONObject isUserExistsWithEmail(String email, User currentUser) throws HillromException {
 		JSONObject jsonObject = new JSONObject();
 		if(!RandomUtil.isValidEmail(currentUser.getEmail()) && StringUtils.isBlank(email)){
-        	jsonObject.put("ERROR", "Required field Email is missing");
+			throw new HillromException(ExceptionConstants.HR_508);//Required field Email is missing
         }
         
         // Update Email for the firstTime Login , if not present
         if(StringUtils.isNotBlank(email)){
         	Optional<User> existingUser = findOneByEmail(email);
         	if(existingUser.isPresent()){
-            	jsonObject.put("ERROR", "Email Already registered, please choose another email");
+            	throw new HillromException(ExceptionConstants.HR_509);//Email Already registered, please choose another email
         	}
         }
         return jsonObject;
@@ -764,30 +753,28 @@ public class UserService {
 	 * @param questionId
 	 * @param answer
 	 * @return
+	 * @throws HillromException 
 	 */
 	private JSONObject validateRequest(String password,
-			String questionId, String answer,String termsAndConditionsAccepted) {
+		String questionId, String answer,String termsAndConditionsAccepted) throws HillromException {
 		JSONObject jsonObject = new JSONObject();
     	if(!StringUtils.isNotBlank(termsAndConditionsAccepted) || "false".equalsIgnoreCase(termsAndConditionsAccepted)){
-    		jsonObject.put("ERROR", "Please accept terms and conditions");
-    		return jsonObject;
+    		throw new HillromException(ExceptionConstants.HR_510);
+    		
     	}
     	if(StringUtils.isBlank(answer)){
-    		jsonObject.put("ERROR", "Required field Answer is missing");
-    		return jsonObject;
+    		throw new HillromException(ExceptionConstants.HR_503);//Required field Answer is missing"
     	}
     	if(StringUtils.isBlank(questionId) || !StringUtils.isNumeric(questionId)){
-    		jsonObject.put("ERROR", "Required field SecurityQuestion is missing");
-    		return jsonObject;
+    		throw new HillromException(ExceptionConstants.HR_507);//Required field SecurityQuestion is missing");
     	}
         if (!checkPasswordLength(password)) {
-        	jsonObject.put("ERROR", "Incorrect password");
-            return jsonObject;
+        	throw new HillromException(ExceptionConstants.HR_506);//Incorrect password
         }
 		return jsonObject;
 	}
 	
-	public JSONObject deleteUser(Long id) {
+	public JSONObject deleteUser(Long id) throws HillromException {
     	JSONObject jsonObject = new JSONObject();
     	UserExtension existingUser = userExtensionRepository.findOne(id);
     	List<Authority> authorities  = authorityRepository.findAll();
@@ -808,7 +795,7 @@ public class UserService {
 					userExtensionRepository.save(existingUser);
 					jsonObject.put("message", "User deleted successfully.");
 				} else {
-					jsonObject.put("ERROR", "Unable to delete User.");
+					throw new HillromException(ExceptionConstants.HR_513);//Unable to delete User
 				}
 			} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))
 					&& (existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ADMIN))
@@ -821,15 +808,15 @@ public class UserService {
 				userExtensionRepository.save(existingUser);
 				jsonObject.put("message", "User deleted successfully.");
 			} else {
-				jsonObject.put("ERROR", "Unable to delete User.");
+				throw new HillromException(ExceptionConstants.HR_513);//
 			}
 		} else {
-			jsonObject.put("ERROR", "Unable to delete User.");
+			throw new HillromException(ExceptionConstants.HR_513);//Unable to delete User
 		}
 		return jsonObject;
     }
 
-	public JSONObject updatePasswordSecurityQuestion(Map<String,String> params){
+	public JSONObject updatePasswordSecurityQuestion(Map<String,String> params) throws HillromException{
 		String requiredParams[] = {"key","password","questionId","answer","termsAndConditionsAccepted"};
 		JSONObject errorsJson = RequestUtil.checkRequiredParams(params, requiredParams);
 		if(errorsJson.containsKey("ERROR")){
@@ -838,8 +825,7 @@ public class UserService {
 		
 		String password = params.get("password");
 		if(!checkPasswordLength(password)){
-			errorsJson.put("ERROR", "Incorrect Password");
-			return errorsJson;
+			throw new HillromException(ExceptionConstants.HR_506);//Incorrect Password
 		}
 		
 		String key = params.get("key");
@@ -848,8 +834,7 @@ public class UserService {
 		if(existingUser.isPresent()){
 			currentUser = existingUser.get();
 		}else{
-			errorsJson.put("ERROR", "Invalid Activation Key");
-			return errorsJson;
+			throw new HillromException(ExceptionConstants.HR_553);//Invalid Activation Key
 		}
 		
 		Long qid = Long.parseLong(params.get("questionId"));
@@ -865,22 +850,19 @@ public class UserService {
 			currentUser.setTermsConditionAcceptedDate(DateTime.now());
 			userRepository.save(currentUser);
 		}else{
-			errorsJson.put("ERROR","Invalid Security Question or Answer");
-			return errorsJson;
+			throw new HillromException(ExceptionConstants.HR_557);//Invalid Security Question or Answer
+			
 		}
 		return new JSONObject();
 	}
 	
-	public JSONObject getHCPUser(Long id){
-		JSONObject jsonObject = new JSONObject();
+	public UserExtension getHCPUser(Long id) throws HillromException{
 		UserExtension hcpUser = userExtensionRepository.findOne(id);
 		if(hcpUser.getId() != null) {
-			jsonObject.put("message", "HealthCare Professional fetched successfully.");
-		    jsonObject.put("user", hcpUser);
 		} else {
-			jsonObject.put("ERROR", "Unable to fetch HealthCare Professional.");
+			throw new HillromException(ExceptionConstants.HR_533);//Unable to fetch HealthCare Professional.");
 		}	
-		return jsonObject;
+		return hcpUser;
 	 }
 	
 	public Optional<PatientUserVO> getPatientUser(Long id){
@@ -891,25 +873,21 @@ public class UserService {
 		return Optional.of(new PatientUserVO(user,patientInfo));
 	}
 	
-	public JSONObject getUser(Long id){
-		JSONObject jsonObject = new JSONObject();
+	public User getUser(Long id) throws HillromException{
 		User user = userRepository.findOne(id);
 		if(user.getId() != null) {
-			jsonObject.put("message", "User fetched successfully.");
-		    jsonObject.put("user", user);
+			return user;
 		} else {
-			jsonObject.put("ERROR", "Unable to fetch User.");
+			throw new HillromException(ExceptionConstants.HR_514);//Unable to fetch User
 		}	
-		return jsonObject;
+		
 	 }
 	
-	public JSONObject createCaregiverUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl) {
-		JSONObject jsonObject = new JSONObject();
+	public UserExtension createCaregiverUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException {
     	if(userExtensionDTO.getEmail() != null) {
 			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
 			if (existingUser.isPresent()) {
-				jsonObject.put("ERROR", "e-mail address already in use");
-    			return jsonObject;
+				throw new HillromException(ExceptionConstants.HR_501);//e-mail address already in use");
     		}
     	}
     	if(AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())
@@ -921,16 +899,12 @@ public class UserService {
     			if(userExtensionDTO.getEmail() != null) {
     				mailService.sendActivationEmail(user, baseUrl);
     			}
-                jsonObject.put("message", "Caregiver User created successfully.");
-                jsonObject.put("user", user);
-                return jsonObject;
+                return user;
     		} else {
-    			jsonObject.put("ERROR", "Unable to create Caregiver User.");
-                return jsonObject;
+    			throw new HillromException(ExceptionConstants.HR_515);//Unable to create Caregiver User
     		}
     	} else {
-    		jsonObject.put("ERROR", "Invalid Data.");
-            return jsonObject;
+    		throw new HillromException(ExceptionConstants.HR_554);//Invalid Data
     	}
 	}
 	
@@ -963,7 +937,7 @@ public class UserService {
 		return patientInfo;
 	}
 	
-	public JSONObject deleteCaregiverUser(Long patientUserId, Long caregiverId) {
+	public JSONObject deleteCaregiverUser(Long patientUserId, Long caregiverId) throws HillromException {
     	JSONObject jsonObject = new JSONObject();
     	UserExtension caregiverUser = userExtensionRepository.findOne(caregiverId);
     	if(caregiverUser.getId() != null) {
@@ -983,10 +957,10 @@ public class UserService {
 				});
 				jsonObject.put("message", "Caregiver User deleted successfully.");
     		} else {
-    			jsonObject.put("ERROR", "No such patient exists.");
+    			throw new HillromException(ExceptionConstants.HR_523);//No such patient exists
     		}
 		} else {
-			jsonObject.put("ERROR", "Unable to delete Caregiver User.");
+			throw new HillromException(ExceptionConstants.HR_516);//Unable to delete Caregiver User.");
 		}
 		return jsonObject;
     }

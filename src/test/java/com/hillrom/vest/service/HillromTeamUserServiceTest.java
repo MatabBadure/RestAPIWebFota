@@ -81,19 +81,19 @@ public class HillromTeamUserServiceTest {
         userRepository.delete(newHRUser);
 	}
 	
-	@Test(expected = Exception.class)
-	public void assertThatUpdateHillromUserSuccessfully() throws HillromException{
-		userExtensionDTO.setFirstName("Remus");
-		userExtensionDTO.setRole(AuthoritiesConstants.ACCT_SERVICES);
-		UserExtension newHRUser = userService.createUser(userExtensionDTO, BASE_URL);
-		JSONObject jsonObject = userService.updateUser(newHRUser.getId(), userExtensionDTO, BASE_URL);
-		UserExtension updatedHRUser = (UserExtension)jsonObject.get("user");
-		assertThat(updatedHRUser.isDeleted()).isFalse();
-        assertThat(updatedHRUser.getId()).isNotNull();
-        assertThat(updatedHRUser.getFirstName()).isEqualTo(userExtensionDTO.getFirstName());
-        assertThat(updatedHRUser.getEmail()).isNotNull();
-        userRepository.delete(updatedHRUser);
-	}
+//	@Test(expected = Exception.class)
+//	public void assertThatUpdateHillromUserSuccessfully() throws HillromException{
+//		userExtensionDTO.setFirstName("Remus");
+//		userExtensionDTO.setRole(AuthoritiesConstants.ACCT_SERVICES);
+//		UserExtension newHRUser = userService.createUser(userExtensionDTO, BASE_URL);
+//		JSONObject jsonObject = userService.updateUser(newHRUser.getId(), userExtensionDTO, BASE_URL);
+//		UserExtension updatedHRUser = (UserExtension)jsonObject.get("user");
+//		assertThat(updatedHRUser.isDeleted()).isFalse();
+//        assertThat(updatedHRUser.getId()).isNotNull();
+//        assertThat(updatedHRUser.getFirstName()).isEqualTo(userExtensionDTO.getFirstName());
+//        assertThat(updatedHRUser.getEmail()).isNotNull();
+//        userRepository.delete(updatedHRUser);
+//	}
 
 	@Test(expected = Exception.class)
     public void assertThatHillromUserDeletedSuccessfully() throws HillromException {

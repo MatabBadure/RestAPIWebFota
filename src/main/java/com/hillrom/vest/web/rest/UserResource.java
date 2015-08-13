@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 
 import net.minidev.json.JSONObject;
@@ -27,11 +28,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.User;
-import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
+import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.service.PatientProtocolService;
 import com.hillrom.vest.service.UserService;
-import com.hillrom.vest.service.util.RequestUtil;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
@@ -48,13 +49,13 @@ public class UserResource {
 	private UserRepository userRepository;
 	
 	@Inject
-	private UserExtensionRepository userExtensionRepository;
-
-	@Inject
 	private UserSearchRepository userSearchRepository;
 	
 	@Inject
 	private UserService userService;
+	
+	@Inject
+	private PatientProtocolService patientProtocolService;
 
 	/**
 	 * GET /users -> get all users.
@@ -127,4 +128,59 @@ public class UserResource {
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+	
+	/**
+     * PUT  /patient/:id/protocol -> add protocol with patient {id}.
+     */
+    @RequestMapping(value = "/patient/{id}/protocol",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> linkVestDeviceWithPatient(@PathVariable Long id, @RequestBody Map<String, String> protocolData) {
+    	log.debug("REST request to add protocol with patient user : {}", id);
+        JSONObject jsonObject = patientProtocolService.addProtocolToPatient(id, protocolData);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * GET  /patient/:id/protocol -> get protocols associated with patient {id}.
+     */
+    @RequestMapping(value = "/patient/{id}/protocol",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> getProtocolsAssociatedWithPatient(@PathVariable Long id) {
+    	log.debug("REST request to link vest device with patient user : {}", id);
+        JSONObject jsonObject = patientProtocolService.getProtocolsAssociatedWithPatient(id);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * DELETE  /patient/:id/protocol/:protocolId -> deactivate protocol with {protocolId} from patient {id}.
+     */
+    @RequestMapping(value = "/patient/{id}/protocol/{protocolId}",
+            method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> deactivateProtocolFromPatient(@PathVariable Long id, @PathVariable Long protocolId) {
+    	log.debug("REST request to deactivate protocol with id {} from patient user : {}", protocolId, id);
+        JSONObject jsonObject = patientProtocolService.deactivateProtocolFromPatient(id, protocolId);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+	
 }

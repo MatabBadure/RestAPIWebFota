@@ -2,6 +2,7 @@ package com.hillrom.vest.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -69,6 +70,11 @@ public class PatientVestDeviceService {
 		 		patientInfo.setSerialNumber(deviceData.get("serialNumber"));
 		 		patientInfo.setBluetoothId(deviceData.get("bluetoothId"));
 		 		patientInfoRepository.save(patientInfo);
+		 		Optional<PatientVestDeviceHistory> currentAssoc = patientVestDeviceRepository.findOneByPatientIdAndActiveStatus(patientInfo.getId(), true);
+		 		if(currentAssoc.isPresent()){
+	 				currentAssoc.get().setActive(false);
+	 				patientVestDeviceRepository.save(currentAssoc.get());
+		 		}
 		 		PatientVestDeviceHistory patientVestDeviceAssoc = new PatientVestDeviceHistory(
 		 				new PatientVestDevicePK(patientInfo, deviceData.get("serialNumber")), deviceData.get("bluetoothId"), deviceData.get("hubId"), true);
 		 		patientVestDeviceRepository.save(patientVestDeviceAssoc);

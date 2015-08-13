@@ -20,4 +20,7 @@ public interface PatientVestDeviceRepository extends
 	
 	@Query("from PatientVestDeviceHistory pvd where pvd.patientVestDevicePK.patient.id = ?1 and pvd.patientVestDevicePK.serialNumber = ?2")
 	Optional<PatientVestDeviceHistory> findOneByPatientIdAndSerialNumber(String patientId, String serialNumber);
+	
+	@Query("from PatientVestDeviceHistory pvd where pvd.patientVestDevicePK.patient.id = ?1 and pvd.active = ?2")
+	Optional<PatientVestDeviceHistory> findOneByPatientIdAndActiveStatus(String patientId, Boolean active);
 }

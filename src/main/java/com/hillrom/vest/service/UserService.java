@@ -968,7 +968,7 @@ public class UserService {
     	return newUser;
 	}
 	
-	private PatientInfo getPatientInfoObjFromPatientUser(User patientUser) {
+	public PatientInfo getPatientInfoObjFromPatientUser(User patientUser) {
 		PatientInfo patientInfo = null;
 		for(UserPatientAssoc patientAssoc : patientUser.getUserPatientAssoc()){
 			if(SELF.equals(patientAssoc.getRelationshipLabel())){

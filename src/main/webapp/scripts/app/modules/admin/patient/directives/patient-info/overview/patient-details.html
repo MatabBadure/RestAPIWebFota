@@ -6,27 +6,27 @@
       </div>
       <div class="patient-details">
         <span class="patient-details--key" translate="patient.overview.hr-id"></span>
-        <span class="patient-details--value">: {{patient.hillromId}}</span>
+        <span class="patient-details--value">{{patient.hillromId}}</span>
       </div>
       <div class="patient-details">
         <span class="patient-details--key" translate="patient.overview.mrn"></span>
-        <span class="patient-details--value">: {{patient.id}}*</span>
+        <span class="patient-details--value">{{patient.id}}*</span>
       </div>
       <div class="patient-details">
         <span class="patient-details--key" translate="patient.overview.hcp"></span>
-        <span class="patient-details--value">: Dr. Willie R. Allen</span>
+        <span class="patient-details--value">Dr. Willie R. Allen</span>
       </div>
       <div class="patient-details">
         <span class="patient-details--key" translate="patient.overview.dob"></span>
-        <span class="patient-details--value">: {{patient.dob}}</span>
+        <span class="patient-details--value">{{patient.dob}}</span>
       </div>
       <div class="patient-details">
         <span class="patient-details--key" translate="patient.overview.email"></span>
-        <span class="patient-details--value">: {{patient.email}}</span>
+        <span class="patient-details--value">{{patient.email}}</span>
       </div>
       <div class="patient-details reset-border">
         <span class="patient-details--key" translate="patient.overview.location"></span>
-        <span class="patient-details--value">: {{patient.city}}</span>
+        <span class="patient-details--value">{{patient.city}}</span>
       </div>
     </div>
     <div class="col-md-10 patient-overview--graph">
@@ -35,6 +35,6 @@
   </div>
 
   <div class="col-md-16 reset-padding delete-patient">
-    <buton class="hillrom-btn btn-primary float-right" ng-click="linkCaregiver()" translate="patient.disassociate-patient"></buton>
+    <buton class="hillrom-btn btn-primary float-right" ng-click="disassociatePatient()" translate="patient.disassociate-patient"></buton>
   </div>
 </div>

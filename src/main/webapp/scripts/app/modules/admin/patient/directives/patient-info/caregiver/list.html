@@ -13,26 +13,26 @@
 
   <div class="col-md-16 caregiver-list" ng-repeat="caregiver in caregivers track by $index">
     <div class="col-md-3 caregiver-list__detail">
-      <span class="caregiver-list__detail--name">Jorden M. Nicolas</span>
-      <span class="caregiver-list__detail--email">nicolasjm@gmail.com</span>
+      <span class="caregiver-list__detail--name">{{caregiver.firstName}}&nbsp;&nbsp; {{caregiver.middleName}}&nbsp;&nbsp; {{caregiver.lastName}}</span>
+      <span class="caregiver-list__detail--email">{{caregiver.email}}</span>
     </div>
     <div class="col-md-4 caregiver-list__address">
-      <span class="caregiver-list__address--primary">8244 Heather Lane, 2nd Avenue</span>
-      <span class="caregiver-list__address--secondary">Wantagh, New York</span>
+      <span class="caregiver-list__address--primary">{{caregiver.address}}</span>
+      <span class="caregiver-list__address--secondary">{{caregiver.city}}, {{caregiver.state}}</span>
     </div>
     <div class="col-md-3 caregiver-list__phone">
       <span class="caregiver-list__phone--text" translate="patient.phone"></span>
-      <span class="caregiver-list__phone--number">(123) 456 7890</span>
+      <span class="caregiver-list__phone--number">{{caregiver.primaryPhone}}</span>
     </div>
     <div class="col-md-3 caregiver-list__fax">
-      <span class="caregiver-list__fax--text" translate="patient.fax"></span>
-      <span class="caregiver-list__fax--number">(123) 456 7890</span>
+      <span class="caregiver-list__fax--text" translate="patient.mobile"></span>
+      <span class="caregiver-list__fax--number">{{caregiver.mobilePhone}}</span>
     </div>
     <div class="col-md-2 caregiver-list__type">
-      <span>HCP</span>
+      <span>{{caregiver.authorities.name}}</span>
     </div>
-    <div class="col-md-1 caregiver-list__delete">
-      <span class="glyphicon glyphicon-trash"></span>
+    <div class="col-md-1 caregiver-list__delete" ng-click="disassociateCaregiversFromPatient(caregiver.id, $index)">
+      <span class="glyphicon glyphicon-trash" style="cursor:pointer;"></span>
     </div>
   </div>
   <div class="col-md-16 reset-padding caregiver-link">

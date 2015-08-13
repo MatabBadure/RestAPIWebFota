@@ -105,7 +105,13 @@ angular.module('hillromvestApp')
         }).success(function(response) {
           return response;
         });
-      }
+      },
+      getRelationships: function() {
+        return $http.get('scripts/app/modules/admin/hill-rom-user/services/relationship.json')
+          .success(function(response) {
+            return response;
+          });
+      },
 
     };
   });

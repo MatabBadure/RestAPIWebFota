@@ -81,6 +81,8 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
         $scope.initpatientCraegiver($stateParams.patientId);
       } else if($state.current.name === 'patientProtocol'){
         $scope.initProtocolDevice($stateParams.patientId);
+      }else if(currentRoute === 'patientCraegiverAdd'){
+        $scope.initpatientCraegiverAdd($stateParams.patientId);
       }
 
     };
@@ -249,8 +251,7 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       });
     };*/
     /** start of caregiver tab for admin->patient **/
-    $scope.getCaregiversForPatient = function(patientId){
-      //$scope.caregivers = careGivers.caregivers;
+    $scope.getCaregiversForPatient = function(patientId){      
       patientService.getCaregiversLinkedToPatient(patientId).then(function(response){
         $scope.caregivers =  response.data.caregivers;
       }).catch(function(response){});
@@ -262,13 +263,22 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
         $scope.switchPatientTab('patientCraegiver');
       }).catch(function(response){});
     }
-    $scope.disassociateCaregiversFromPatient = function(patientId, caregiverId){      
-        patientService.associateCaregiversFromPatient(patientId, caregiverId).then(function(response){        
+    $scope.disassociateCaregiversFromPatient = function(caregiverId, index){      
+        patientService.disassociateCaregiversFromPatient($stateParams.patientId, caregiverId).then(function(response){ 
+        $scope.caregivers.splice(index, 1);      
       }).catch(function(response){});
     }
     $scope.initpatientCraegiver = function (patientId){
-      $scope.caregivers = [];
+      $scope.caregivers = [];      
       $scope.getCaregiversForPatient($stateParams.patientId);
+    }
+    $scope.initpatientCraegiverAdd = function(){
+      UserService.getState().then(function(response) {
+        $scope.states = response.data.states;
+      }).catch(function(response) {});
+      UserService.getRelationships().then(function(response) {
+        $scope.relationships = response.data.relationships;
+      }).catch(function(response) {});
     }
     $scope.linkCaregiver = function(){
       //$scope.associateCareGiver = "";

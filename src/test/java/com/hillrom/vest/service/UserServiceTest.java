@@ -238,4 +238,35 @@ public class UserServiceTest {
 	    JSONObject jsonObject = userService.changePassword("admin");
 	    assertThat(jsonObject.containsKey("ERROR")).isFalse();
 	}
+	
+	@Test
+    public void assertThatUserCanChangeSecurityQuestion() {
+
+        user.setActivated(true);        
+		user.setLastLoggedInAt(DateTime.now());
+        userRepository.save(user);
+        userSecurityQuestionService.saveOrUpdate(user.getId(), question.getId(), "test");
+        UserLoginToken authToken = authService.authenticate(USERNAME, PASSWORD);
+        Map<String,String> paramsMap = new HashMap<>();
+        paramsMap.put("answer", "test123");
+        paramsMap.put("questionId", question.getId().toString());
+        JSONObject jsonObject = userService.updateSecurityQuestion(user.getId(), paramsMap);
+        assertThat(jsonObject);
+        
+    }
+
+	@Test
+    public void assertThatUserCanNotChangeSecurityQuestion() {
+
+        user.setActivated(true);        
+		user.setLastLoggedInAt(DateTime.now());
+        userRepository.save(user);
+        userSecurityQuestionService.saveOrUpdate(user.getId(), question.getId(), "test");
+        UserLoginToken authToken = authService.authenticate(USERNAME, PASSWORD);
+        Map<String,String> paramsMap = new HashMap<>();
+        paramsMap.put("questionId", question.getId().toString());
+        JSONObject jsonObject = userService.updateSecurityQuestion(user.getId(), paramsMap);
+        assertThat(jsonObject.containsKey("ERROR")).isTrue();
+        
+    }
 }

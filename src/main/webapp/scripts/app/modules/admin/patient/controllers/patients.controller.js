@@ -154,7 +154,7 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
     $scope.selectClinicForPatient = function(clinic, index){
       patientService.associateClinicToPatient($stateParams.patientId, clinic).then(function(response) {
         $scope.associatedClinics = response.data.clinics; 
-        $scope.associatedClinics.splice(index,1);       
+        $scope.clinics.splice(index,1);       
       }).catch(function(response) {});
     }
     $scope.initPatientClinicsInfo = function(patientId){

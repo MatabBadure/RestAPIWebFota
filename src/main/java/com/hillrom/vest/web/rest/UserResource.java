@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 
 import net.minidev.json.JSONObject;
@@ -27,11 +28,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.User;
-import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
+import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.service.PatientVestDeviceService;
 import com.hillrom.vest.service.UserService;
-import com.hillrom.vest.service.util.RequestUtil;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
@@ -48,13 +49,13 @@ public class UserResource {
 	private UserRepository userRepository;
 	
 	@Inject
-	private UserExtensionRepository userExtensionRepository;
-
-	@Inject
 	private UserSearchRepository userSearchRepository;
 	
 	@Inject
 	private UserService userService;
+	
+	@Inject
+	private PatientVestDeviceService patientVestDeviceService;
 
 	/**
 	 * GET /users -> get all users.
@@ -117,6 +118,60 @@ public class UserResource {
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
+
+	/**
+     * PUT  /patient/:id/linkvestdevice -> link vest device with patient {id}.
+     */
+    @RequestMapping(value = "/patient/{id}/linkvestdevice",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> linkVestDeviceWithPatient(@PathVariable Long id, @RequestBody Map<String, String> deviceData) {
+    	log.debug("REST request to link vest device with patient user : {}", id);
+        JSONObject jsonObject = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * GET  /patient/:id/vestdevice -> get linked vest device with patient {id}.
+     */
+    @RequestMapping(value = "/patient/{id}/vestdevice",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> getLinkedVestDeviceWithPatient(@PathVariable Long id) {
+    	log.debug("REST request to link vest device with patient user : {}", id);
+        JSONObject jsonObject = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * DELETE  /patient/:id/deactivatevestdevice/:serialNumber -> deactivate vest device with {serialNumber} from patient {id}.
+     */
+    @RequestMapping(value = "/patient/{id}/deactivatevestdevice/{serialNumber}",
+            method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> deactivateVestDeviceFromPatient(@PathVariable Long id, @PathVariable String serialNumber) {
+    	log.debug("REST request to deactivate vest device with serial number {} from patient user : {}", serialNumber, id);
+        JSONObject jsonObject = patientVestDeviceService.deactivateVestDeviceFromPatient(id, serialNumber);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
 	
 	@RequestMapping(value="/user/{id}/changeSecurityQuestion",method=RequestMethod.PUT)
 	public ResponseEntity<?> updateSecurityQuestion(@PathVariable Long id,@RequestBody(required=true)Map<String,String> params){

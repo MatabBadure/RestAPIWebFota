@@ -11,3 +11,10 @@ var reset = {
 	}
 }
 
+var admin_cont = {
+	hcp : {
+		'credentialsList' : ['MD', 'RN', 'NP', 'RT', 'Other'],
+		'other' : 'Other'
+	}
+}
+

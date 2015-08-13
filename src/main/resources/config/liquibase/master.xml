@@ -39,4 +39,5 @@
 	<include file="classpath:/config/liquibase/changelog/20150807114100_drop_recreate_CLINIC_PATIENT_ASSOC.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150811124700_add_hillromId_to_user_table.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150812132000_create_table_patient_note.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150812191500_create_patient_vest_device_history.xml" relativeToChangelogFile="false"/>
  </databaseChangeLog>

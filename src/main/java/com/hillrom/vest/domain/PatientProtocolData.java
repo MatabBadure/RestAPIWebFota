@@ -2,13 +2,12 @@ package com.hillrom.vest.domain;
 
 import java.io.Serializable;
 
-import javax.persistence.AssociationOverride;
-import javax.persistence.AssociationOverrides;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.IdClass;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -16,15 +15,14 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "PATIENT_PROTOCOL_DATA")
-@AssociationOverrides({
-    @AssociationOverride(name = "patientProtocolDataPK.patient",
-        joinColumns = @JoinColumn(name = "PATIENT_ID", referencedColumnName="id")) })
 public class PatientProtocolData implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@EmbeddedId
-	private PatientProtocolDataPK patientProtocolDataPK;
+	@Id
+	@ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "PATIENT_ID", referencedColumnName="id") 
+    private PatientInfo patient;
 	
 	@Column(name = "treatments_per_day")
 	private int treatmentsPerDay;
@@ -38,53 +36,29 @@ public class PatientProtocolData implements Serializable {
 	@Column(name = "minimum_minutes_of_use_per_day")
 	private int minimumMinutesOfUsePerDay;
 	
-	@Column(name = "is_active")
-	private Boolean active = false;
-	
-	@Column(name = "type")
-	private String type;
-
 	public PatientProtocolData() {
 		super();
 	}
 
-	public PatientProtocolData(PatientProtocolDataPK patientProtocolDataPK,
+	public PatientProtocolData(PatientInfo patient,
 			int treatmentsPerDay, int minutesPerTreatment, String frequencies,
-			int minimumMinutesOfUsePerDay, Boolean active, String type) {
+			int minimumMinutesOfUsePerDay) {
 		super();
-		this.patientProtocolDataPK = patientProtocolDataPK;
+		this.patient = patient;
 		this.treatmentsPerDay = treatmentsPerDay;
 		this.minutesPerTreatment = minutesPerTreatment;
 		this.frequencies = frequencies;
 		this.minimumMinutesOfUsePerDay = minimumMinutesOfUsePerDay;
-		this.active = active;
-		this.type = type;
 	}
 
-	public PatientProtocolDataPK getPatientProtocolDataPK() {
-		return patientProtocolDataPK;
-	}
-
-	public void setPatientProtocolDataPK(PatientProtocolDataPK patientProtocolDataPK) {
-		this.patientProtocolDataPK = patientProtocolDataPK;
-	}
-	
 	public PatientInfo getPatient() {
-		return getPatientProtocolDataPK().getPatient();
+		return patient;
 	}
 
 	public void setPatient(PatientInfo patient) {
-		getPatientProtocolDataPK().setPatient(patient);
+		this.patient = patient;
 	}
-
-	public Long getId() {
-		return getPatientProtocolDataPK().getId();
-	}
-
-	public void setId(Long id) {
-		getPatientProtocolDataPK().setId(id);
-	}
-
+	
 	public int getTreatmentsPerDay() {
 		return treatmentsPerDay;
 	}
@@ -117,35 +91,15 @@ public class PatientProtocolData implements Serializable {
 		this.minimumMinutesOfUsePerDay = minimumMinutesOfUsePerDay;
 	}
 
-	public Boolean isActive() {
-		return active;
-	}
-
-	public void setActive(Boolean active) {
-		this.active = active;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((active == null) ? 0 : active.hashCode());
 		result = prime * result
 				+ ((frequencies == null) ? 0 : frequencies.hashCode());
 		result = prime * result + minimumMinutesOfUsePerDay;
 		result = prime * result + minutesPerTreatment;
-		result = prime
-				* result
-				+ ((patientProtocolDataPK == null) ? 0 : patientProtocolDataPK
-						.hashCode());
+		result = prime * result + ((patient == null) ? 0 : patient.hashCode());
 		result = prime * result + treatmentsPerDay;
 		return result;
 	}
@@ -159,11 +113,6 @@ public class PatientProtocolData implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		PatientProtocolData other = (PatientProtocolData) obj;
-		if (active == null) {
-			if (other.active != null)
-				return false;
-		} else if (!active.equals(other.active))
-			return false;
 		if (frequencies == null) {
 			if (other.frequencies != null)
 				return false;
@@ -173,10 +122,10 @@ public class PatientProtocolData implements Serializable {
 			return false;
 		if (minutesPerTreatment != other.minutesPerTreatment)
 			return false;
-		if (patientProtocolDataPK == null) {
-			if (other.patientProtocolDataPK != null)
+		if (patient == null) {
+			if (other.patient != null)
 				return false;
-		} else if (!patientProtocolDataPK.equals(other.patientProtocolDataPK))
+		} else if (!patient.equals(other.patient))
 			return false;
 		if (treatmentsPerDay != other.treatmentsPerDay)
 			return false;
@@ -185,12 +134,11 @@ public class PatientProtocolData implements Serializable {
 
 	@Override
 	public String toString() {
-		return "PatientProtocolData [patientProtocolDataPK="
-				+ patientProtocolDataPK + ", treatmentsPerDay="
-				+ treatmentsPerDay + ", minutesPerTreatment="
-				+ minutesPerTreatment + ", frequencies=" + frequencies
-				+ ", minimumMinutesOfUsePerDay=" + minimumMinutesOfUsePerDay
-				+ ", active=" + active + "]";
+		return "PatientProtocolData [patient=" + patient
+				+ ", treatmentsPerDay=" + treatmentsPerDay
+				+ ", minutesPerTreatment=" + minutesPerTreatment
+				+ ", frequencies=" + frequencies
+				+ ", minimumMinutesOfUsePerDay=" + minimumMinutesOfUsePerDay + "]";
 	}
 
 }

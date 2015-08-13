@@ -1,13 +1,11 @@
 package com.hillrom.vest.service;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
 
-import net.minidev.json.JSONObject;
-
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,12 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientProtocolData;
-import com.hillrom.vest.domain.PatientProtocolDataPK;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserPatientAssoc;
-import com.hillrom.vest.repository.PatientInfoRepository;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.PatientProtocolRepository;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.util.ExceptionConstants;
+import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 
 /**
@@ -38,55 +37,68 @@ public class PatientProtocolService {
     @Inject
     private PatientProtocolRepository patientProtocolRepository;
     
-    @Inject
-    private PatientInfoRepository patientInfoRepository;
-    
-    public JSONObject addProtocolToPatient(Long id, Map<String, String> protocolData) {
-    	JSONObject jsonObject = new JSONObject();
+    public PatientProtocolData addProtocolToPatient(Long id, Map<String, String> protocolData) throws HillromException {
     	User patientUser = userRepository.findOne(id);
 		if(patientUser != null) {
 			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
 		 	if(patientInfo != null){
-		 		Optional<PatientProtocolData> currentAssoc = patientProtocolRepository.findOneByPatientIdAndActiveStatus(patientInfo.getId(), true);
-		 		if(currentAssoc.isPresent()){
-	 				currentAssoc.get().setActive(false);
-	 				patientProtocolRepository.save(currentAssoc.get());
-		 		}
-		 		PatientProtocolData patientProtocolAssoc = new PatientProtocolData(new PatientProtocolDataPK(patientInfo), 
+		 		PatientProtocolData patientProtocolAssoc = new PatientProtocolData(patientInfo, 
 		 				Integer.parseInt(protocolData.get("treatmentsPerDay")), Integer.parseInt(protocolData.get("minutesPerTreatment")), 
-		 				protocolData.get("frequencies"), Integer.parseInt(protocolData.get("minimumMinutesOfUsePerDay")), true, protocolData.get("type"));
+		 				protocolData.get("frequencies"), Integer.parseInt(protocolData.get("minimumMinutesOfUsePerDay")));
 		 		patientProtocolRepository.save(patientProtocolAssoc);
-		 		jsonObject.put("message", "Custom protocol is created successfully.");
-		 		jsonObject.put("patient", patientProtocolAssoc);
+		 		return patientProtocolAssoc;
 		 	} else {
-		 		jsonObject.put("ERROR", "No such patient exist");
+		 		throw new HillromException(ExceptionConstants.HR_523);
 		 	}
 		} else {
-			jsonObject.put("ERROR", "No such user exist");
+			throw new HillromException(ExceptionConstants.HR_512);
 		}
-    	return jsonObject;
+    }
+    
+    public PatientProtocolData updateProtocolToPatient(Long id, Map<String, String> protocolData) throws HillromException {
+    	User patientUser = userRepository.findOne(id);
+		if(patientUser != null) {
+			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
+		 	if(patientInfo != null){
+		 		Optional<PatientProtocolData> currentAssoc = patientProtocolRepository.findOneByPatientId(patientInfo.getId());
+		 		if(currentAssoc.isPresent()){
+		 			assignValuesToPatientProtocolObj(protocolData, currentAssoc);
+	 				patientProtocolRepository.save(currentAssoc.get());
+		 		}
+		 		return currentAssoc.get();
+		 	} else {
+		 		throw new HillromException(ExceptionConstants.HR_523);
+		 	}
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);
+		}
     }
 
-    public JSONObject getProtocolsAssociatedWithPatient(Long id) {
-    	JSONObject jsonObject = new JSONObject();
+	private void assignValuesToPatientProtocolObj(
+			Map<String, String> protocolData,
+			Optional<PatientProtocolData> currentAssoc) {
+		if(StringUtils.isNoneEmpty(protocolData.get("treatmentsPerDay")))
+			currentAssoc.get().setTreatmentsPerDay(Integer.parseInt(protocolData.get("treatmentsPerDay")));
+		if(StringUtils.isNoneEmpty(protocolData.get("minutesPerTreatment")))
+			currentAssoc.get().setMinutesPerTreatment(Integer.parseInt(protocolData.get("minutesPerTreatment")));
+		if(StringUtils.isNoneEmpty(protocolData.get("frequencies")))
+			currentAssoc.get().setFrequencies(protocolData.get("frequencies"));
+		if(StringUtils.isNoneEmpty(protocolData.get("minimumMinutesOfUsePerDay")))
+			currentAssoc.get().setMinimumMinutesOfUsePerDay(Integer.parseInt(protocolData.get("minimumMinutesOfUsePerDay")));
+	}
+
+    public PatientProtocolData getProtocolsAssociatedWithPatient(Long id) throws HillromException {
     	User patientUser = userRepository.findOne(id);
     	if(patientUser != null) {
 	    	PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
 	     	if(patientInfo != null){
-	     		List<PatientProtocolData> protocolList = patientProtocolRepository.findByPatientId(patientInfo.getId());
-	     		if(protocolList.isEmpty()){
-	     			jsonObject.put("message", "No custom protocol found for patient.");
-	     		} else {
-	     			jsonObject.put("message", "Custom protocols for patient fetched successfully.");
-	     			jsonObject.put("protocolList", protocolList);
-	     		}
+	     		return patientProtocolRepository.findOneByPatientId(patientInfo.getId()).get();
 	     	} else {
-	     		jsonObject.put("ERROR", "No such patient exist");
-	     	}
-    	} else {
-     		jsonObject.put("ERROR", "No such user exist");
+	     		throw new HillromException(ExceptionConstants.HR_523);
+		 	}
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);
      	}
-    	return jsonObject;
     }
 
 	private PatientInfo getPatientInfoObjFromPatientUser(User patientUser) {
@@ -99,31 +111,24 @@ public class PatientProtocolService {
 		return patientInfo;
 	}
 	
-	public JSONObject deactivateProtocolFromPatient(Long id, Long protocolId) {
-    	JSONObject jsonObject = new JSONObject();
+	public String deactivateProtocolFromPatient(Long id) throws HillromException {
     	User patientUser = userRepository.findOne(id);
     	if(patientUser != null) {
 	    	PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
 	     	if(patientInfo != null){
-	     		Optional<PatientProtocolData> patientDeviceAssoc = patientProtocolRepository.findOneByPatientIdAndProtocolId(patientInfo.getId(), protocolId);
+	     		Optional<PatientProtocolData> patientDeviceAssoc = patientProtocolRepository.findOneByPatientId(patientInfo.getId());
 	     		if(patientDeviceAssoc.isPresent()){
-	     			if(patientDeviceAssoc.get().isActive()) {
-		     			patientDeviceAssoc.get().setActive(false);
-		     			patientProtocolRepository.delete(patientDeviceAssoc.get());
-		     			jsonObject.put("message", "Custom protocol for patient is deactivated successfully.");
-	     			} else {
-	     				jsonObject.put("ERROR", "Custom protocol is already in Inactive mode.");
-	     			}
+	     			patientProtocolRepository.delete(patientDeviceAssoc.get());
+	     			return MessageConstants.HR_244;
 	     		} else {
-	     			jsonObject.put("ERROR", "Invalid Protocol id.");
+	     			throw new HillromException(ExceptionConstants.HR_551);
 	     		}
 	     	} else {
-	     		jsonObject.put("ERROR", "No such patient exist");
-	     	}
-    	} else {
-     		jsonObject.put("ERROR", "No such user exist");
+	     		throw new HillromException(ExceptionConstants.HR_523);
+		 	}
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);
      	}
-    	return jsonObject;
     }
 }
 

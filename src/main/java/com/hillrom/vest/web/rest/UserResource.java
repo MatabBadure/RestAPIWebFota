@@ -4,6 +4,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.security.RolesAllowed;
@@ -27,12 +28,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
+import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.User;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.PatientProtocolService;
 import com.hillrom.vest.service.UserService;
+import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
@@ -130,25 +134,61 @@ public class UserResource {
 	}
 	
 	/**
-     * PUT  /patient/:id/protocol -> add protocol with patient {id}.
+     * POST  /patient/:id/protocol -> add protocol with patient {id}.
      */
     @RequestMapping(value = "/patient/{id}/protocol",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
-    public ResponseEntity<JSONObject> linkVestDeviceWithPatient(@PathVariable Long id, @RequestBody Map<String, String> protocolData) {
+    public ResponseEntity<JSONObject> addProtocolToPatient(@PathVariable Long id, @RequestBody Map<String, String> protocolData) {
     	log.debug("REST request to add protocol with patient user : {}", id);
-        JSONObject jsonObject = patientProtocolService.addProtocolToPatient(id, protocolData);
-        if (jsonObject.containsKey("ERROR")) {
-        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-        } else {
-            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
-        }
+    	JSONObject jsonObject = new JSONObject();
+    	try {
+	    	PatientProtocolData protocol = patientProtocolService.addProtocolToPatient(id, protocolData);
+	    	if (Objects.isNull(protocol)) {
+	        	jsonObject.put("message", MessageConstants.HR_245);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_241);
+	        	jsonObject.put("protocol", protocol);
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+	        }
+    	} catch(HillromException hre){
+    		jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+    	}
     }
     
     /**
-     * GET  /patient/:id/protocol -> get protocols associated with patient {id}.
+     * PUT  /patient/:id/protocol -> update protocol with patient {id}.
+     */
+    @RequestMapping(value = "/patient/{id}/protocol",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> updateProtocolToPatient(@PathVariable Long id, @RequestBody Map<String, String> protocolData) {
+    	log.debug("REST request to update protocol with patient user : {}", id);
+    	JSONObject jsonObject = new JSONObject();
+    	try {
+	    	PatientProtocolData protocol = patientProtocolService.updateProtocolToPatient(id, protocolData);
+	    	if (Objects.isNull(protocol)) {
+	        	jsonObject.put("message", MessageConstants.HR_245);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_242);
+	        	jsonObject.put("protocol", protocol);
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+    	} catch(HillromException hre){
+    		jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+    	}
+    }
+    
+    /**
+     * GET  /patient/:id/protocol -> get protocol for patient {id}.
      */
     @RequestMapping(value = "/patient/{id}/protocol",
             method = RequestMethod.GET,
@@ -156,31 +196,48 @@ public class UserResource {
     @Timed
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> getProtocolsAssociatedWithPatient(@PathVariable Long id) {
-    	log.debug("REST request to link vest device with patient user : {}", id);
-        JSONObject jsonObject = patientProtocolService.getProtocolsAssociatedWithPatient(id);
-        if (jsonObject.containsKey("ERROR")) {
-        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-        } else {
-            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
-        }
+    	log.debug("REST request to get protocol for patient user : {}", id);
+    	JSONObject jsonObject = new JSONObject();
+    	try {
+	    	PatientProtocolData protocol = patientProtocolService.getProtocolsAssociatedWithPatient(id);
+	        if (Objects.isNull(protocol)) {
+	        	jsonObject.put("message", MessageConstants.HR_245);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_243);
+	        	jsonObject.put("protocol", protocol);
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+    	} catch(HillromException hre){
+    		jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+    	}
     }
     
     /**
-     * DELETE  /patient/:id/protocol/:protocolId -> deactivate protocol with {protocolId} from patient {id}.
+     * DELETE  /patient/:id/protocol -> delete protocol for patient {id}.
      */
-    @RequestMapping(value = "/patient/{id}/protocol/{protocolId}",
+    @RequestMapping(value = "/patient/{id}/protocol",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
-    public ResponseEntity<JSONObject> deactivateProtocolFromPatient(@PathVariable Long id, @PathVariable Long protocolId) {
-    	log.debug("REST request to deactivate protocol with id {} from patient user : {}", protocolId, id);
-        JSONObject jsonObject = patientProtocolService.deactivateProtocolFromPatient(id, protocolId);
-        if (jsonObject.containsKey("ERROR")) {
-        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-        } else {
-            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
-        }
+    public ResponseEntity<JSONObject> deactivateProtocolFromPatient(@PathVariable Long id) {
+    	log.debug("REST request to delete protocol for patient user : {}", id);
+    	JSONObject jsonObject = new JSONObject();
+    	try {
+	    	String message = patientProtocolService.deactivateProtocolFromPatient(id);
+	        if (Objects.isNull(message)) {
+	        	jsonObject.put("message", MessageConstants.HR_245);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        } else {
+	        	jsonObject.put("message", message);
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+    	} catch(HillromException hre){
+    		jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+    	}
     }
 	
 }

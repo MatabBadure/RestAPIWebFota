@@ -154,4 +154,14 @@ public class UserResource {
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         }
     }
+	
+	@RequestMapping(value="/user/{id}/changeSecurityQuestion",method=RequestMethod.PUT)
+	public ResponseEntity<?> updateSecurityQuestion(@PathVariable Long id,@RequestBody(required=true)Map<String,String> params){
+		log.debug("REST request to update Security Question and Answer {}",id,params);
+		JSONObject jsonObject = userService.updateSecurityQuestion(id,params);
+		if(jsonObject.containsKey("ERROR")){
+			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 }

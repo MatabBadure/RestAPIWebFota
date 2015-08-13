@@ -6828,3 +6828,6 @@ tags-input.ng-invalid .tags {
 }
 
 /*# sourceMappingURL=main.css.map */
+.nav.navbar-nav li a{
+  cursor: pointer;
+}

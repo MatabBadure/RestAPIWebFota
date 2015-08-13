@@ -20,14 +20,25 @@ public class MessageConstants {
     public static final String HR_223 = "Clinic fetched successfully.";
     public static final String HR_224 = "Clinic deleted successfully.";
     
-    public static final String HR_231 = "Hiilrom User created successfully.";
-    public static final String HR_232 = "Hiilrom User updated successfully.";
-    public static final String HR_233 = "Hiilrom User fetched successfully.";
-    public static final String HR_234 = "Hiilrom User deleted successfully.";
+    public static final String HR_231 = "Hillrom User created successfully.";
+    public static final String HR_232 = "Hillrom User updated successfully.";
+    public static final String HR_233 = "Hillrom User fetched successfully.";
+    public static final String HR_234 = "Hillrom User deleted successfully.";
     
     public static final String HR_241 = "Protocol created successfully.";
     public static final String HR_242 = "Protocol updated successfully.";
     public static final String HR_243 = "Protocol fetched successfully.";
     public static final String HR_244 = "Protocol deleted successfully.";
     public static final String HR_245 = "No protocol found for patient.";
+    
+    public static final String HR_251 = "HCP User created successfully.";
+    public static final String HR_252 = "HCP User updated successfully.";
+    public static final String HR_253 = "HCP User fetched successfully.";
+    public static final String HR_254 = "HCP User deleted successfully.";
+    public static final String HR_255 = "HCPs are associated with patient successfully.";
+    
+    public static final String HR_261 = "Caregiver User created successfully.";
+    public static final String HR_262 = "Caregiver User updated successfully.";
+    public static final String HR_263 = "Caregiver User fetched successfully.";
+    public static final String HR_264 = "Caregiver User deleted successfully.";
 }

@@ -52,7 +52,18 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
     $scope.initpatientDemographic = function(){
       $scope.getPatiendDetails($stateParams.patientId, $scope.setEditMode);
     };
-    $scope.init = function() {  
+
+    $scope.initProtocolDevice = function(patientId){
+      console.log('initProtocolDevice Function', patientId);
+      // patientService.getDevices().then(function(response){
+      //   console.log(response.data);
+      //   $scope.devices = response.data;
+      // }).catch(function(response){});
+      // patientService.getProtocols().then(function(response){
+      // }).catch(function(){});
+    };
+
+    $scope.init = function() {      
       var currentRoute = $state.current.name;
       //in case the route is changed from other thatn switching tabs
       $scope.patientTab = currentRoute;      
@@ -68,7 +79,10 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
         $scope.initPatientClinicsInfo($stateParams.patientId);
       }else if(currentRoute === 'patientCraegiver'){
         $scope.initpatientCraegiver($stateParams.patientId);
+      } else if($state.current.name === 'patientProtocol'){
+        $scope.initProtocolDevice($stateParams.patientId);
       }
+
     };
 
     $scope.setEditMode = function(patient) {
@@ -156,8 +170,8 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
 
     $scope.selectClinicForPatient = function(clinic, index){
       patientService.associateClinicToPatient($stateParams.patientId, clinic).then(function(response) {
-        $scope.associatedClinics = response.data.clinics; 
-        $scope.clinics.splice(index,1);       
+        $scope.associatedClinics = response.data.clinics;
+        $scope.clinics.splice(index,1);
       }).catch(function(response) {});
     }
     $scope.initPatientClinicsInfo = function(patientId){
@@ -202,9 +216,24 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       });
     };
 
-    $scope.cancel = function() {
-      console.log('Cancel works...!');
-      console.log('$scope.patient :: ', $scope.patient);
+    $scope.devices = [
+      {
+        'id':'105DN00789645135',
+        'name':'BT2252471',
+        'status': 'Active',
+        'date': 'January 12, 2015',
+        'days': '68 days from purchase'
+      },
+      {
+        'id':'105DN00789645135',
+        'name':'BT2252471',
+        'status': 'inactive',
+        'date': 'January 12, 2015',
+        'days': '68 days from purchase'
+      }
+    ];
+    $scope.cancelProtocolDevice = function() {
+      $state.go('patientProtocol');
     };
 
     $scope.disassociatePatient =function(){
@@ -213,6 +242,7 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
         $state.go('patientUser');
       }).catch(function(response){});
     };
+
     /*$rootScope.selectPatientFromList = function(patient) {
       $state.go('patientOverview', {
         'patientId': patient.id
@@ -220,10 +250,10 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
     };*/
     /** start of caregiver tab for admin->patient **/
     $scope.getCaregiversForPatient = function(patientId){
-      $scope.caregivers = careGivers.caregivers;
-      /*patientService.getCaregiversLinkedToPatient(patientId).then(function(response){
+      //$scope.caregivers = careGivers.caregivers;
+      patientService.getCaregiversLinkedToPatient(patientId).then(function(response){
         $scope.caregivers =  response.data.caregivers;
-      }).catch(function(response){});*/
+      }).catch(function(response){});
     }
     $scope.associateCaregiverstoPatient = function(patientId, careGiver){   
         patientService.associateCaregiversFromPatient(patientId, careGiver).then(function(response){
@@ -254,5 +284,39 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       data.role = 'CARE_GIVER';
       $scope.associateCaregiverstoPatient($stateParams.patientId, data);      
     }
+
+    $scope.linkDevice = function(){
+      $state.go('patientAddDevice');
+    };
+
+    $scope.addDevice = function(){
+      console.log('It comses here...!');
+      // patientService.addDevice().then(function(response){
+
+      // }).catch(function(response){
+
+      // });
+    };
+
+    $scope.linkProtocol = function(){
+      $state.go('patientAddProtocol');
+    };
+
+    $scope.addProtocol = function(){
+      console.log('It comses here...!');
+      // patientService.addProtocol().then(function(response){
+
+      // }).catch(function(response){
+
+      // });
+    };
+    $scope.deleteDevice = function(device){
+      console.log(device);
+    };
+
+    $scope.deleteProtocol = function(device){
+      console.log(device);
+    };
+
     $scope.init();
   });

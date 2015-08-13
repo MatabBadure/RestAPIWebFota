@@ -22,5 +22,7 @@ public final class Constants {
     public static final String DATEFORMAT_MMddyyyy = "MMddyyyy";
 
     public static final int NO_OF_CHARACTERS_TO_BE_EXTRACTED = 4;
+    
+    public static final int MAX_NO_OF_CAREGIVERS_CAN_BE_ASSOCIATED = 5;
 
 }

@@ -3,6 +3,7 @@ package com.hillrom.vest.service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -918,40 +919,77 @@ public class UserService {
 		return jsonObject;
 	 }
 	
-	public JSONObject createCaregiverUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl) {
+	public JSONObject createCaregiverUser(Long patientUserId, UserExtensionDTO userExtensionDTO, String baseUrl) {
 		JSONObject jsonObject = new JSONObject();
-    	if(userExtensionDTO.getEmail() != null) {
+		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
+		if(patientUser != null) {
+			List<User> caregiversList = getListOfCaregiversAssociatedToPatientUser(patientUser);
+			if(caregiversList.size() >= Constants.MAX_NO_OF_CAREGIVERS_CAN_BE_ASSOCIATED) {
+				jsonObject.put("ERROR", "Reached maximum limit to associate caregiver.");
+                return jsonObject;
+			}
+		} else {
+			jsonObject.put("ERROR", "No such patient exists.");
+            return jsonObject;
+		}
+    	if(userExtensionDTO.getEmail() != null && AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())) {
 			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
-			if (existingUser.isPresent()) {
-				jsonObject.put("ERROR", "e-mail address already in use");
-    			return jsonObject;
-    		}
-    	}
-    	if(AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())
-    			&& (SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))
-    				|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))
-    				|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.PATIENT)))) {
-    		UserExtension user = createCaregiver(id, userExtensionDTO);
-    		if(user.getId() != null) {
-    			if(userExtensionDTO.getEmail() != null) {
-    				mailService.sendActivationEmail(user, baseUrl);
-    			}
-                jsonObject.put("message", "Caregiver User created successfully.");
-                jsonObject.put("user", user);
-                return jsonObject;
+			if (existingUser.isPresent()){
+				System.out.println("roles : "+existingUser.get().getAuthorities());
+				if(existingUser.get().getAuthorities().contains(new Authority(AuthoritiesConstants.CARE_GIVER)) 
+						|| existingUser.get().getAuthorities().contains(new Authority(AuthoritiesConstants.HCP))) {
+					User caregiverUser = associateExistingCaregiverUserWithPatient(patientUser, userExtensionDTO, existingUser);
+					if(Objects.nonNull(caregiverUser)){
+	    				mailService.sendActivationEmail(caregiverUser, baseUrl);
+		                jsonObject.put("message", "Caregiver User created successfully.");
+		                jsonObject.put("user", caregiverUser);
+		                return jsonObject;
+					} else {
+						jsonObject.put("ERROR", "Unable to create Caregiver User.");
+		                return jsonObject;
+					}
+				} else {
+					jsonObject.put("ERROR", "e-mail address already in use");
+	    			return jsonObject;
+				}
     		} else {
-    			jsonObject.put("ERROR", "Unable to create Caregiver User.");
-                return jsonObject;
+	    		UserExtension user = createCaregiver(patientUserId, userExtensionDTO);
+	    		if(user.getId() != null) {
+	    			if(userExtensionDTO.getEmail() != null) {
+	    				mailService.sendActivationEmail(user, baseUrl);
+	    			}
+	                jsonObject.put("message", "Caregiver User created successfully.");
+	                jsonObject.put("user", user);
+	                return jsonObject;
+	    		} else {
+	    			jsonObject.put("ERROR", "Unable to create Caregiver User.");
+	                return jsonObject;
+	    		}
     		}
     	} else {
     		jsonObject.put("ERROR", "Invalid Data.");
             return jsonObject;
     	}
 	}
+
+	private User associateExistingCaregiverUserWithPatient(UserExtension patientUser, UserExtensionDTO userExtensionDTO, Optional<User> existingUser) {
+		User caregiverUser = existingUser.get();
+		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
+		if(patientInfo != null) {
+			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, caregiverUser), AuthoritiesConstants.CARE_GIVER, userExtensionDTO.getRelationship());
+			userPatientRepository.save(userPatientAssoc);
+			caregiverUser.getUserPatientAssoc().add(userPatientAssoc);
+			patientInfo.getUserPatientAssoc().add(userPatientAssoc);
+			log.debug("Created Information for Caregiver User: {}", caregiverUser);
+			return caregiverUser;
+		} else {
+			return null;
+		}
+	}
 	
-	public UserExtension createCaregiver(Long id, UserExtensionDTO userExtensionDTO) {
+	public UserExtension createCaregiver(Long patientUserId, UserExtensionDTO userExtensionDTO) {
     	UserExtension newUser = new UserExtension();
-    	UserExtension patientUser = userExtensionRepository.findOne(id);
+    	UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
     	if(patientUser != null) {
     		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
     		if(patientInfo != null) {
@@ -968,7 +1006,7 @@ public class UserService {
     	return newUser;
 	}
 	
-	private PatientInfo getPatientInfoObjFromPatientUser(User patientUser) {
+	public PatientInfo getPatientInfoObjFromPatientUser(User patientUser) {
 		PatientInfo patientInfo = null;
 		for(UserPatientAssoc patientAssoc : patientUser.getUserPatientAssoc()){
 			if(SELF.equals(patientAssoc.getRelationshipLabel())){
@@ -1005,6 +1043,30 @@ public class UserService {
 		}
 		return jsonObject;
     }
+	
+	public JSONObject getCaregiversForPatient(Long patientUserId) {
+    	JSONObject jsonObject = new JSONObject();
+		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
+		if(Objects.nonNull(patientUser)) {
+    		List<User> caregiversList = getListOfCaregiversAssociatedToPatientUser(patientUser);
+			jsonObject.put("message", "Caregiver Users fetched successfully.");
+			jsonObject.put("caregivers", caregiversList);
+		} else {
+			jsonObject.put("ERROR", "No such patient exists.");
+		}
+		return jsonObject;
+    }
+	
+	private List<User> getListOfCaregiversAssociatedToPatientUser(UserExtension patientUser) {
+		List<User> caregiversList = new ArrayList<User>();
+		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
+		patientInfo.getUserPatientAssoc().forEach(userPatientassoc -> {
+			if(AuthoritiesConstants.CARE_GIVER.equals(userPatientassoc.getUserRole())) {
+				caregiversList.add(userPatientassoc.getUser());
+			}
+		});
+		return caregiversList;
+	}
 
 	public JSONObject updateSecurityQuestion(Long id, Map<String,String> params) {
 		User existingUser = userRepository.findOne(id);

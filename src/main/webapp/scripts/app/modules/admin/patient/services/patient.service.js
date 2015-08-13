@@ -94,6 +94,12 @@ angular.module('hillromvestApp')
           return response;
         });
       },
+      /**
+      * @ngdoc method
+      * @name getClinicsLinkedToPatient
+      * @description To get list of clinics associated to patient.
+      *
+      */
       getClinicsLinkedToPatient : function(id){
         var url = admin.patient.baseURL + id + '/clinics';
         return $http.get(url, {
@@ -102,7 +108,12 @@ angular.module('hillromvestApp')
           return response;
         });
       },
-
+      /**
+      * @ngdoc method
+      * @name disassociateClinicsFromPatient
+      * @description To remove clinic(s) associated to patient.
+      *
+      */
       disassociateClinicsFromPatient : function(id, data){
         var url = admin.patient.baseURL + id + '/dissociateclinics';
         return $http.put(url, data,{
@@ -111,7 +122,12 @@ angular.module('hillromvestApp')
           return response;
         });
       },
-
+      /**
+      * @ngdoc method
+      * @name disassociatePatient
+      * @description To remove patient.
+      *
+      */
       disassociatePatient : function(id){
         var url = admin.hillRomUser.baseURL + '/' + id;
         return $http.delete(url, {
@@ -120,7 +136,12 @@ angular.module('hillromvestApp')
           return response;
         });
       },
-
+      /**
+      * @ngdoc method
+      * @name associateClinicToPatient
+      * @description To add clinics to patient.
+      *
+      */
       associateClinicToPatient : function(id, data){
         var url = admin.patient.baseURL + id + '/associateclinics';
         return $http.put(url, data, {
@@ -129,7 +150,26 @@ angular.module('hillromvestApp')
           return response;
         });
       },
-
+      /**
+      * @ngdoc method
+      * @name getDevices
+      * @description To get devices associated to patient.
+      *
+      */
+      getDevices : function(id){
+        var url = admin.patient.baseURL + id + '/vestdevice';
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+      /**
+      * @ngdoc method
+      * @name getCaregiversLinkedToPatient
+      * @description To get caregivers associated to patient.
+      *
+      */
       getCaregiversLinkedToPatient : function(id){
         var url = admin.patient.baseURL + id + '/caregiver';
         return $http.get(url, {
@@ -138,7 +178,12 @@ angular.module('hillromvestApp')
           return response;
         });
       },
-
+      /**
+      * @ngdoc method
+      * @name disassociateCaregiversFromPatient
+      * @description To remove caregivers associated to patient.
+      *
+      */
       disassociateCaregiversFromPatient : function(patientId, caregiverId ){
         ///api/patient/:patientUserId/caregiver/:id
         var url = admin.patient.baseURL + patientId + '/caregiver/' + caregiverId;
@@ -148,7 +193,12 @@ angular.module('hillromvestApp')
           return response;
         });
       },
-
+      /**
+      * @ngdoc method
+      * @name disassociateCaregiversFromPatient
+      * @description To add caregivers associated to patient.
+      *
+      */
       associateCaregiversFromPatient : function(patientId, data){
         ///api/patient/:id/caregiver
         var url = admin.patient.baseURL + patientId + '/caregiver';

@@ -110,7 +110,7 @@
                   <option value="en">English</option>
                   <option value="fr">French</option>
                 </select> -->
-                <select name="relationship" ng-readonly="validateADMINorASP()" ng-model="associateCareGiver.relationship" ng-options="relationship.name as relationship.name for relationship in relationships">
+                <select name="relationship" ng-readonly="validateADMINorASP()" ng-model="associateCareGiver.relationship" ng-options="relationship.value as relationship.name for relationship in relationships">
               <option selected="selected">Select a state</option>
               </select>
               </div>

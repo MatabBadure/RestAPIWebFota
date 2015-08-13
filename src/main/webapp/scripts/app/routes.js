@@ -12,6 +12,11 @@ angular.module('hillromvestApp')
                 url: '/admin',
                 abstract: true,
             })
+            .state('patient-dash', {
+                parent: 'entity',
+                url: '/patient',
+                abstract: true,
+            })
             .state('patientUser', {
                 parent: 'admin',
                 url: '/patients',
@@ -370,4 +375,56 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
+            
+            .state('graphView', {
+                url: '/graphs',
+                data: {
+                    roles: [],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/patient/graph/views/HMR-graph.html',
+                        controller: 'graphController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+
+             .state('patientdashboard', {
+                parent: 'patient-dash',
+                url: '/dashboard',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/patient/graph/views/dashboard-landing.html',
+                        controller: 'graphController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+
 });

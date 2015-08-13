@@ -38,7 +38,7 @@ angular.module('hillromvestApp')
       /**
       * @ngdoc method
       * @name getPatientInfo
-      * @description To get individual patient's information based on patient ID. 
+      * @description To get individual patient's information based on patient ID.
       *
       */
       getPatientInfo : function(id){
@@ -72,7 +72,7 @@ angular.module('hillromvestApp')
       *
       */
       getHCPsLinkedToPatient : function(id){
-        var url = admin.patient.baseURL + + '/' + id + '/hcp';
+        var url = admin.patient.baseURL + '/' + id + '/hcp';
         return $http.get(url, {
           headers: headerService.getHeader()
         }).success(function (response) {
@@ -104,7 +104,6 @@ angular.module('hillromvestApp')
       },
 
       disassociateClinicsFromPatient : function(id, data){
-        //PUT /api/patient/12345678/dissociateclinics HTTP/1.1
         var url = admin.patient.baseURL + id + '/dissociateclinics';
         return $http.put(url, data,{
           headers: headerService.getHeader()
@@ -112,8 +111,17 @@ angular.module('hillromvestApp')
           return response;
         });
       },
+
+      disassociatePatient : function(id){
+        var url = admin.hillRomUser.baseURL + '/' + id;
+        return $http.delete(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
       associateClinicToPatient : function(id, data){
-        ///api/patient/{id}/associateclinics
         var url = admin.patient.baseURL + id + '/associateclinics';
         return $http.put(url, data, {
           headers: headerService.getHeader()
@@ -121,6 +129,5 @@ angular.module('hillromvestApp')
           return response;
         });
       }
-
     };
   });

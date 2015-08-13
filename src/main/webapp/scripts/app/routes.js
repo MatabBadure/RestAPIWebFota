@@ -97,13 +97,13 @@ angular.module('hillromvestApp')
                 },
                 views: {
                     'content@': {
-                        templateUrl: 'scripts/app/modules/admin/patient/views/patient-view/view.html',
+                        templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/overview/patient-details.html',//'scripts/app/modules/admin/patient/views/patient-view/view.html',
                         controller: 'patientsController'
                     }
                 },
                 resolve: {
                     translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
-                        $translatePartialLoader.addPart('patient');
+                        $translatePartialLoader.addPart('patient');$translatePartialLoader.addPart('patient-user');
                         return $translate.refresh();
                     }],
                     authorize: ['Auth',
@@ -447,5 +447,30 @@ angular.module('hillromvestApp')
                 parent: 'entity',
                 url: '/patient',
                 abstract: true,
+            })
+            .state('patientCraegiverAdd', {
+                parent: 'patientCraegiver',
+                url: '/{patientId}/caregiver-add',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/caregiver/create.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
             })
 });

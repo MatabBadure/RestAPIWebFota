@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('hillromvestApp').controller('patientsController', function($scope, $filter, $state, $stateParams, patientService, dateService, notyService, UserService, clinicService) {
+angular.module('hillromvestApp').controller('patientsController', function($scope, $filter, $state, $stateParams, patientService, dateService, notyService, UserService, clinicService,$rootScope) {
 
 
     $scope.patient = {};
@@ -52,19 +52,22 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
     $scope.initpatientDemographic = function(){
       $scope.getPatiendDetails($stateParams.patientId, $scope.setEditMode);
     };
-    $scope.init = function() {
-      $scope.patientTab = "patientOverview";
+    $scope.init = function() {  
       var currentRoute = $state.current.name;
-      if($state.current.name === 'patientOverview'){
+      //in case the route is changed from other thatn switching tabs
+      $scope.patientTab = currentRoute;      
+      if(currentRoute === 'patientOverview'){
         $scope.initPatientOverview();
-      }else if($state.current.name === 'patientDemographic'){
+      }else if(currentRoute === 'patientDemographic'){
         $scope.initpatientDemographic();
-      }else if ($state.current.name === 'patientEdit') {
+      }else if (currentRoute === 'patientEdit') {
         $scope.getPatiendDetails($stateParams.patientId, $scope.setEditMode);
-      } else if ($state.current.name === 'patientNew') {
+      } else if (currentRoute === 'patientNew') {
         $scope.createPatient();
-      }else if($state.current.name === 'patientClinics'){
+      }else if(currentRoute === 'patientClinics'){
         $scope.initPatientClinicsInfo($stateParams.patientId);
+      }else if(currentRoute === 'patientCraegiver'){
+        $scope.initpatientCraegiver($stateParams.patientId);
       }
     };
 
@@ -210,5 +213,46 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
         $state.go('patientUser');
       }).catch(function(response){});
     };
+    /*$rootScope.selectPatientFromList = function(patient) {
+      $state.go('patientOverview', {
+        'patientId': patient.id
+      });
+    };*/
+    /** start of caregiver tab for admin->patient **/
+    $scope.getCaregiversForPatient = function(patientId){
+      $scope.caregivers = careGivers.caregivers;
+      /*patientService.getCaregiversLinkedToPatient(patientId).then(function(response){
+        $scope.caregivers =  response.data.caregivers;
+      }).catch(function(response){});*/
+    }
+    $scope.associateCaregiverstoPatient = function(patientId, careGiver){   
+        patientService.associateCaregiversFromPatient(patientId, careGiver).then(function(response){
+        $scope.caregivers =  response.data.user;
+        $scope.associateCareGiver = [];$scope.associateCareGiver.length = 0;
+        $scope.switchPatientTab('patientCraegiver');
+      }).catch(function(response){});
+    }
+    $scope.disassociateCaregiversFromPatient = function(patientId, caregiverId){      
+        patientService.associateCaregiversFromPatient(patientId, caregiverId).then(function(response){        
+      }).catch(function(response){});
+    }
+    $scope.initpatientCraegiver = function (patientId){
+      $scope.caregivers = [];
+      $scope.getCaregiversForPatient($stateParams.patientId);
+    }
+    $scope.linkCaregiver = function(){
+      //$scope.associateCareGiver = "";
+      $state.go('patientCraegiverAdd', {'patientId': $stateParams.patientId});
+    }
+   
+    $scope.formSubmitCaregiver = function(){
+      $scope.submitted = true;
+      if($scope.form.$invalid){
+        return false;
+      }
+      var data = $scope.associateCareGiver;
+      data.role = 'CARE_GIVER';
+      $scope.associateCaregiverstoPatient($stateParams.patientId, data);      
+    }
     $scope.init();
   });

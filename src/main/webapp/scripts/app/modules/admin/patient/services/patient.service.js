@@ -128,6 +128,35 @@ angular.module('hillromvestApp')
         }).success(function (response) {
           return response;
         });
+      },
+
+      getCaregiversLinkedToPatient : function(id){
+        var url = admin.patient.baseURL + id + '/caregiver';
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
+      disassociateCaregiversFromPatient : function(patientId, caregiverId ){
+        ///api/patient/:patientUserId/caregiver/:id
+        var url = admin.patient.baseURL + patientId + '/caregiver/' + caregiverId;
+        return $http.delete(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
+      associateCaregiversFromPatient : function(patientId, data){
+        ///api/patient/:id/caregiver
+        var url = admin.patient.baseURL + patientId + '/caregiver';
+        return $http.post(url, data, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
       }
     };
   });

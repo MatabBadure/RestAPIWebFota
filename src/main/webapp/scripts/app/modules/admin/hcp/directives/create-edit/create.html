@@ -156,9 +156,37 @@
             <div class="col-md-6 dashboard__form--label reset-padding">
               <span class="" translate="doctor.credentials"></span>
             </div>
-            <div class="col-md-10 dashboard__form--input reset-padding">
+            <!-- <div class="col-md-10 dashboard__form--input reset-padding">
               <input class="" type="text" ng-model="doctor.credentials">
+            </div> -->
+            <div class="col-md-10 dashboard__form__input--option reset-padding selected-box-container">
+              <div class="custom-dropdown">
+                <select ng-model="doctor.credentials" validate-on-blur name="credential" ng-options="option for option in credentialsList" ng-selected="{{option === doctor.credentials}}" ng-change="checkCredential()"required>
+                <option value="" selected >Select a credential</option>
+                </select>
+                <div ng-show="(form.credential.$dirty && form.credential.$showValidationMessage && form.credential.$invalid) || submitted" class="">
+                    <span class="has-error" ng-show="form.credential.$error.required">
+                       Credential is required.
+                    </span>
+                </div>
+              </div>
             </div>
+          </div>
+
+        </div>
+        <div ng-if = "isOtherCredential" class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 col-md-offset-9 reset-padding">
+              <div class="col-md-6 dashboard__form--label reset-padding">
+                <span class=""></span>
+              </div>
+              <div class="col-md-10 dashboard__form--input reset-padding">
+                <input class="" type="text" name="otherCredential" ng-model="doctor.otherCredential" required>
+                <div ng-show="(form.otherCredential.$dirty && form.otherCredential.$invalid) || submitted" class="">
+                  <span class="has-error" ng-show="form.otherCredential.$error.required">
+                      Credential is required.
+                  </span>
+                </div>
+              </div>
           </div>
         </div>
         <div class="clr"></div>

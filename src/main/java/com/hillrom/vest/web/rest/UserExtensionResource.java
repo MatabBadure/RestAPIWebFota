@@ -353,10 +353,28 @@ public class UserExtensionResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> deleteCaregiver(@PathVariable Long patientUserId, @PathVariable Long id) {
         log.debug("REST request to delete caregiver : {}", id);
         JSONObject jsonObject = userService.deleteCaregiverUser(patientUserId, id);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * GET  /patient/{id}/caregiver -> get the list of caregivers associated with patient user {id}.
+     */
+    @RequestMapping(value = "/patient/{id}/caregiver",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    public ResponseEntity<JSONObject> getCaregiversForPatient(@PathVariable Long id) {
+        log.debug("REST request to delete caregiver : {}", id);
+        JSONObject jsonObject = userService.getCaregiversForPatient(id);
         if (jsonObject.containsKey("ERROR")) {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
         } else {

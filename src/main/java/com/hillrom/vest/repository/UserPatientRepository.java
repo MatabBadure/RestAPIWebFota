@@ -16,7 +16,7 @@ public interface UserPatientRepository extends
 	List<Optional<UserPatientAssoc>> findOneByUserId(Long userId);
 	
 	@Query("from UserPatientAssoc upa where upa.userPatientAssocPK.patient.id = ?1")
-	List<Optional<UserPatientAssoc>> findOneByPatientId(String patientId);
+	List<UserPatientAssoc> findOneByPatientId(String patientId);
 	
 	@Query("from UserPatientAssoc upa where upa.userPatientAssocPK.user.id = ?1 and upa.userPatientAssocPK.patient.id = ?2")
 	Optional<UserPatientAssoc> findOneByUserIdAndPatientId(Long userId,String patientId);

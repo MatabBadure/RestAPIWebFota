@@ -1067,5 +1067,27 @@ public class UserService {
 		});
 		return caregiversList;
 	}
+
+	public JSONObject updateSecurityQuestion(Long id, Map<String,String> params) {
+		User existingUser = userRepository.findOne(id);
+		JSONObject jsonObject = new JSONObject();
+		if(Objects.nonNull(existingUser)){
+			if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())){
+				jsonObject = RequestUtil.checkRequiredParams(params, new String[]{"questionId","answer"});
+				if(jsonObject.containsKey("ERROR")){
+					return jsonObject;
+				}
+				String questionId = params.get("questionId");
+				String answer = params.get("answer");
+				Long qid = Long.parseLong(questionId);
+				userSecurityQuestionService.saveOrUpdate(id, qid, answer);
+			}
+			else
+				jsonObject.put("ERROR", "Forbidden");
+		}else{
+			jsonObject.put("ERROR", "User Doesn't exist");
+		}
+		return jsonObject;
+	}
 }
 

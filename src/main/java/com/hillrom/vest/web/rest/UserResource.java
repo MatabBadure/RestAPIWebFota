@@ -154,6 +154,24 @@ public class UserResource {
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         }
     }
+    
+    /**
+     * DELETE  /patient/:id/deactivatevestdevice/:serialNumber -> deactivate vest device with {serialNumber} from patient {id}.
+     */
+    @RequestMapping(value = "/patient/{id}/deactivatevestdevice/{serialNumber}",
+            method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> deactivateVestDeviceFromPatient(@PathVariable Long id, @PathVariable String serialNumber) {
+    	log.debug("REST request to deactivate vest device with serial number {} from patient user : {}", serialNumber, id);
+        JSONObject jsonObject = patientVestDeviceService.deactivateVestDeviceFromPatient(id, serialNumber);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
 	
 	@RequestMapping(value="/user/{id}/changeSecurityQuestion",method=RequestMethod.PUT)
 	public ResponseEntity<?> updateSecurityQuestion(@PathVariable Long id,@RequestBody(required=true)Map<String,String> params){

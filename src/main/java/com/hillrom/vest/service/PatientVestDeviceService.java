@@ -119,5 +119,32 @@ public class PatientVestDeviceService {
 		}
 		return patientInfo;
 	}
+	
+	public JSONObject deactivateVestDeviceFromPatient(Long id, String serialNumber) {
+    	JSONObject jsonObject = new JSONObject();
+    	User patientUser = userRepository.findOne(id);
+    	if(patientUser != null) {
+	    	PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
+	     	if(patientInfo != null){
+	     		Optional<PatientVestDeviceHistory> patientDeviceAssoc = patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(patientInfo.getId(), serialNumber);
+	     		if(patientDeviceAssoc.isPresent()){
+	     			if(patientDeviceAssoc.get().isActive()) {
+		     			patientDeviceAssoc.get().setActive(false);
+		 				patientVestDeviceRepository.save(patientDeviceAssoc.get());
+		     			jsonObject.put("message", "Vest device for patient is deactivated successfully.");
+	     			} else {
+	     				jsonObject.put("ERROR", "Vest device is already in Inactive mode.");
+	     			}
+	     		} else {
+	     			jsonObject.put("ERROR", "Invalid Serial Number.");
+	     		}
+	     	} else {
+	     		jsonObject.put("ERROR", "No such patient exist");
+	     	}
+    	} else {
+     		jsonObject.put("ERROR", "No such user exist");
+     	}
+    	return jsonObject;
+    }
 }
 

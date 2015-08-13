@@ -29,7 +29,6 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
     };
 
     $scope.setOverviewMode = function(patient){
-      console.log(patient);
       $scope.patient = patient;
       if (patient.dob !== null) {
         $scope.patient.age = dateService.getAge(new Date($scope.patient.dob));
@@ -55,10 +54,18 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
 
     $scope.initProtocolDevice = function(patientId){
       console.log('initProtocolDevice Function', patientId);
-      // patientService.getDevices().then(function(response){
-      //   console.log(response.data);
-      //   $scope.devices = response.data;
-      // }).catch(function(response){});
+      patientService.getDevices(patientId).then(function(response){
+        angular.forEach(response.data.deviceList, function(device){
+          var _date = dateService.getDate(device.createdDate);
+          var _month = dateService.getMonth(_date.getMonth());
+          var _day = dateService.getDay(_date.getDate());
+          var _year = dateService.getYear(_date.getFullYear());
+          var date = _month + "/" + _day + "/" + _year;
+          device.createdDate = date;
+          device.days = dateService.getDays(_date);
+        });
+        $scope.devices = response.data.deviceList;
+      }).catch(function(response){});
       // patientService.getProtocols().then(function(response){
       // }).catch(function(){});
     };
@@ -213,22 +220,6 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       });
     };
 
-    $scope.devices = [
-      {
-        'id':'105DN00789645135',
-        'name':'BT2252471',
-        'status': 'Active',
-        'date': 'January 12, 2015',
-        'days': '68 days from purchase'
-      },
-      {
-        'id':'105DN00789645135',
-        'name':'BT2252471',
-        'status': 'inactive',
-        'date': 'January 12, 2015',
-        'days': '68 days from purchase'
-      }
-    ];
     $scope.cancelProtocolDevice = function() {
       $state.go('patientProtocol');
     };
@@ -245,12 +236,13 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
     };
 
     $scope.addDevice = function(){
-      console.log('It comses here...!');
-      // patientService.addDevice().then(function(response){
-
-      // }).catch(function(response){
-
-      // });
+      if($scope.addDeviceForm.$invalid){
+        return false;
+      }
+      patientService.addDevice( $stateParams.patientId, $scope.device).then(function(response){
+        console.log(response);
+        $state.go('patientProtocol');
+      }).catch(function(response){});
     };
 
     $scope.linkProtocol = function(){
@@ -258,19 +250,18 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
     };
 
     $scope.addProtocol = function(){
-      console.log('It comses here...!');
       // patientService.addProtocol().then(function(response){
-
-      // }).catch(function(response){
-
-      // });
+      // }).catch(function(response){});
     };
+
     $scope.deleteDevice = function(device){
-      console.log(device);
+      patientService.deleteDevice($stateParams.patientId, device).then(function(response){
+        device.active = false;
+      }).catch(function(response){});
     };
 
     $scope.deleteProtocol = function(device){
-      console.log(device);
     };
+
     $scope.init();
   });

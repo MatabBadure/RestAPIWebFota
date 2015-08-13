@@ -128,6 +128,15 @@ angular.module('hillromvestApp')
         }).success(function (response) {
           return response;
         });
+      },
+
+      getDevices : function(id){
+        var url = admin.patient.baseURL + id + '/vestdevice';
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
       }
     };
   });

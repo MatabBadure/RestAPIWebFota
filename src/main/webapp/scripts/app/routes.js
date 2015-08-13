@@ -190,6 +190,58 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
+
+            .state('patientAddDevice', {
+                parent: 'patientProtocol',
+                url: '/addDevice',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/device-protocol/add-device.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+            .state('patientAddProtocol', {
+                parent: 'patientProtocol',
+                url: '/addProtocol',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/device-protocol/add-protocol.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+
             .state('patientCraegiver', {
                 parent: 'patientUser',
                 url: '/{patientId}/caregiver',

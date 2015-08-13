@@ -4,37 +4,40 @@
    <div class="user-gen-details">
      <span class="user-gen-details--name">Williams James</span>
      <span class="user-gen-details--hr-id">HR45321</span>
-   </div> 
+   </div>
   </div>
 
   <div class="col-md-16 patient-device">
     <span class="patient-device--title" translate="patient.device-title"></span>
   </div>
 
-  <div class="col-md-16 device-list">
+  <div class="col-md-16 device-list" ng-repeat="device in devices">
     <div class="col-md-3 device-list__serial">
-      <span>105DN00789645135</span>
+      <span>{{device.id}}</span>
     </div>
     <div class="col-md-2 device-list__bt-id">
-      <span>BT</span><span>2252471</span>
+      <span>BT</span><span>{{device.name}}</span>
     </div>
-    <div class="col-md-1 device-list__lung">
+    <div class="col-md-1 device-list__lung" ng-if='device.status === "Active"'>
       <span class="icon-lungs active"></span>
     </div>
+    <div class="col-md-1 device-list__lung" ng-if='device.status === "inactive"'>
+      <span class="icon-lungs"></span>
+    </div>
     <div class="col-md-2 device-list__status">
-      <span class="clinic-list__fax--text">Active</span>
+      <span class="clinic-list__fax--text">{{device.status}}</span>
     </div>
     <div class="col-md-3 device-list__date">
-      <span>January 12, 2015</span>
+      <span>{{device.date}}</span>
     </div>
     <div class="col-md-4 device-list__days-status">
-      <span>68 days from purchase</span>
+      <span>{{device.days}}</span>
     </div>
-    <div class="col-md-1 device-list__delete">
-      <span class="glyphicon glyphicon-trash"></span>
+    <div class="col-md-1 device-list__delete" ng-if='device.status === "Active"'>
+      <span class="glyphicon glyphicon-trash" ng-click="deleteDevice(device)"></span>
     </div>
   </div>
-
+<!--
   <div class="col-md-16 device-list list-inactive">
     <div class="col-md-3 device-list__serial">
       <span>105DN00789645135</span>
@@ -57,7 +60,7 @@
     <div class="col-md-1 device-list__delete">
       <span class="glyphicon glyphicon-trash"></span>
     </div>
-  </div>
+  </div> -->
 
   <div class="col-md-16 reset-padding">
     <div class="col-md-8 clinic-link">

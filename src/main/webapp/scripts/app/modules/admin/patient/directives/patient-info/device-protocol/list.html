@@ -13,58 +13,34 @@
 
   <div class="col-md-16 device-list" ng-repeat="device in devices">
     <div class="col-md-3 device-list__serial">
-      <span>{{device.id}}</span>
+      <span>{{device.serialNumber}}</span>
     </div>
     <div class="col-md-2 device-list__bt-id">
-      <span>BT</span><span>{{device.name}}</span>
+      <span>{{device.bluetoothId}}</span>
     </div>
-    <div class="col-md-1 device-list__lung" ng-if='device.status === "Active"'>
+    <div class="col-md-1 device-list__lung" ng-if='device.active'>
       <span class="icon-lungs active"></span>
     </div>
-    <div class="col-md-1 device-list__lung" ng-if='device.status === "inactive"'>
+    <div class="col-md-1 device-list__lung" ng-if='!device.active'>
       <span class="icon-lungs"></span>
     </div>
     <div class="col-md-2 device-list__status">
-      <span class="clinic-list__fax--text">{{device.status}}</span>
+      <span class="clinic-list__fax--text">{{device.active}}</span>
     </div>
     <div class="col-md-3 device-list__date">
-      <span>{{device.date}}</span>
+      <span>{{device.createdDate}}</span>
     </div>
     <div class="col-md-4 device-list__days-status">
-      <span>{{device.days}}</span>
+      <span>{{device.days}} days from purchase</span>
     </div>
-    <div class="col-md-1 device-list__delete" ng-if='device.status === "Active"'>
+    <div class="col-md-1 device-list__delete" ng-if='device.active'>
       <span class="glyphicon glyphicon-trash" ng-click="deleteDevice(device)"></span>
     </div>
   </div>
-<!--
-  <div class="col-md-16 device-list list-inactive">
-    <div class="col-md-3 device-list__serial">
-      <span>105DN00789645135</span>
-    </div>
-    <div class="col-md-2 device-list__bt-id">
-      <span>BT</span><span>2252471</span>
-    </div>
-    <div class="col-md-1 device-list__lung">
-      <span class="icon-lungs inactive"></span>
-    </div>
-    <div class="col-md-2 device-list__status">
-      <span class="clinic-list__fax--text">Active</span>
-    </div>
-    <div class="col-md-3 device-list__date">
-      <span>January 12, 2015</span>
-    </div>
-    <div class="col-md-4 device-list__days-status">
-      <span>68 days from purchase</span>
-    </div>
-    <div class="col-md-1 device-list__delete">
-      <span class="glyphicon glyphicon-trash"></span>
-    </div>
-  </div> -->
 
   <div class="col-md-16 reset-padding">
     <div class="col-md-8 clinic-link">
-      <input class="" type="text" name="linkClinic" placeholder="{{'patient.placeholder.device-link' | translate}}">
+      <!-- <input class="" type="text" name="linkClinic" placeholder="{{'patient.placeholder.device-link' | translate}}"> -->
     </div>
     <div class="col-md-8 clinic-link">
       <buton class="hillrom-btn btn-primary float-right" ng-click="linkDevice()" translate="patient.link-device"></buton>
@@ -128,7 +104,7 @@
 
   <div class="col-md-16 reset-padding">
     <div class="col-md-8 clinic-link">
-      <input class="" type="text" name="linkClinic" placeholder="{{'patient.placeholder.protocol-link' | translate}}">
+      <!-- <input class="" type="text" name="linkClinic" placeholder="{{'patient.placeholder.protocol-link' | translate}}"> -->
     </div>
     <div class="col-md-8 clinic-link">
       <buton class="hillrom-btn btn-primary float-right" ng-click="linkProtocol()" translate="patient.link-protocol"></buton>

@@ -8,7 +8,7 @@
   </div>
 </div>
 <div class="dashboard dashboard--content padding-bottom-ls">
-  <form name="form" ng-submit="editPatient()" novalidate autocomplete="off">
+  <form name="addDeviceForm" ng-submit="editPatient()" novalidate autocomplete="off">
     <div class="container dashboard__form">
       <div>
         <div class="col-md-16 reset-padding">
@@ -30,7 +30,7 @@
         <div class="col-md-16 reset-padding margin-top">
           <div class="col-md-7 reset-padding">
             <div class="col-md-6 dashboard__form--label reset-padding">
-              <span class="" translate="patient.device.serial-no"></span>
+              <span class="" translate="patient.device.bluetoothId"></span>
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
@@ -42,10 +42,10 @@
         <div class="col-md-16 reset-padding margin-top">
           <div class="col-md-7 reset-padding">
             <div class="col-md-6 dashboard__form--label reset-padding">
-              <span class="" translate="patient.device.serial-no"></span>
+              <span class="" translate="patient.device.hubId"></span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" ng-model="device.hubId" required>
+              <input class="" type="text" ng-model="device.hubId">
             </div>
           </div>
         </div>

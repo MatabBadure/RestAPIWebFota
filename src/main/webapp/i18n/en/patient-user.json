@@ -29,7 +29,9 @@
         },
         "device": {
           "gen-details": "Add Device",
-          "serial-no": "Serial No."
+          "serial-no": "Serial No.",
+          "bluetoothId": "Bluetooth ID",
+          "hubId": "Hub ID"
         },
         "protocol": {
           "tm-per-day": "Treatment per Day",

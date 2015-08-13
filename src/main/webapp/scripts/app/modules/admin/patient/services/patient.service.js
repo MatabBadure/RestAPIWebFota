@@ -207,6 +207,24 @@ angular.module('hillromvestApp')
         }).success(function (response) {
           return response;
         });
+      },
+
+      addDevice : function(id, data){
+        var url = admin.patient.baseURL + id + '/linkvestdevice';
+        return $http.put(url, data, {
+          headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
+      },
+
+      deleteDevice : function(id, device){
+        var url = admin.patient.baseURL + id + '/deactivatevestdevice/'+device.serialNumber;
+        return $http.delete(url, {
+          headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
       }
     };
   });

@@ -2,8 +2,8 @@
 <div class="container admin-user">
   <div class="col-md-16 margin-top reset-padding">
    <div class="user-gen-details">
-     <span class="user-gen-details--name">Williams James</span>
-     <span class="user-gen-details--hr-id">HR45321</span>
+     <span class="user-gen-details--name">{{slectedPatient.id}}</span>
+     <span class="user-gen-details--hr-id">{{slectedPatient.hillromId}}</span>
    </div> 
   </div>
 </div>
@@ -224,13 +224,13 @@
           <div class="col-md-10 dashboard__form--input reset-padding">
             <input type="text" validate-on-blur class="form-control" name="primaryPhone" ng-readonly="validateADMINorASP()" maxlength="10" ng-pattern="/^[0-9]{10}$/" ng-model="associateCareGiver.mobilePhone" required>
              <div ng-show="(form.mobilePhone.$showValidationMessage && form.mobilePhone.$invalid) || submitted">
-              <span class="has-error" ng-show="form.mobilePhone.$error.required">
+              <span class="has-error" ng-show="form.primaryPhone.$error.required">
                 Home phone number is required.
               </span>
-              <span class="has-error" ng-show="form.mobilePhone.$error.pattern">
+              <span class="has-error" ng-show="form.primaryPhone.$error.pattern">
                 Home phone number is invalid.
               </span>
-              <span class="has-error" ng-show="form.mobilePhone.$error.maxlength">
+              <span class="has-error" ng-show="form.primaryPhone.$error.maxlength">
                 Home phone number is invalid.
               </span>
             </div>
@@ -247,10 +247,10 @@
             <div class="col-md-10 dashboard__form--input reset-padding">
               <input type="text" class="form-control" validate-on-blur  name="mobilePhone"  ng-readonly="validateADMINorASP()" ng-model="associateCareGiver.primaryPhone" maxlength=10 ng-pattern="/^[0-9]{10}$/">
               <div ng-show="(form.primaryPhone.$showValidationMessage && form.primaryPhone.$invalid) || submitted">        
-                <span class="has-error" ng-show="form.primaryPhone.$error.pattern">
+                <span class="has-error" ng-show="form.mobilePhone.$error.pattern">
                   Mobile number is invalid.
                 </span>
-                <span class="has-error" ng-show="form.primaryPhone.$error.maxlength">
+                <span class="has-error" ng-show="form.mobilePhone.$error.maxlength">
                   Mobile number is invalid.
                 </span>
               </div>

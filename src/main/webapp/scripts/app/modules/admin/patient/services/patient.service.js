@@ -225,6 +225,42 @@ angular.module('hillromvestApp')
         }).success(function(response){
           return response;
         });
+      },
+
+      getProtocol : function(id){
+        var url = admin.patient.baseURL + id + '/protocol';
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
+      addProtocol : function(id, data){
+        var url = admin.patient.baseURL + id + '/protocol';
+        return $http.post(url, data, {
+          headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
+      },
+
+      editProtocol : function(id, data){
+        var url = admin.patient.baseURL + id + '/protocol';
+        return $http.put(url, data, {
+          headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
+      },
+
+      deleteProtocol : function(id){
+        var url = admin.patient.baseURL + id + '/protocol';
+        return $http.delete(url, {
+          headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
       }
     };
   });

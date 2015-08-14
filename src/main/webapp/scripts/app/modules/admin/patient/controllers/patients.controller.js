@@ -49,6 +49,9 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
     };
 
     $scope.initpatientDemographic = function(){
+      UserService.getState().then(function(response) {
+       $scope.states = response.data.states;
+      }).catch(function(response) {});
       $scope.getPatiendDetails($stateParams.patientId, $scope.setEditMode);
     };
 
@@ -66,14 +69,15 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
         });
         $scope.devices = response.data.deviceList;
       }).catch(function(response){});
-      // patientService.getProtocols().then(function(response){
-      // }).catch(function(){});
+      patientService.getProtocol(patientId).then(function(response){
+        $scope.protocol = response.data.protocol;
+      }).catch(function(){});
     };
 
-    $scope.init = function() {      
+    $scope.init = function() {
       var currentRoute = $state.current.name;
       //in case the route is changed from other thatn switching tabs
-      $scope.patientTab = currentRoute;      
+      $scope.patientTab = currentRoute;
       if(currentRoute === 'patientOverview'){
         $scope.initPatientOverview();
       }else if(currentRoute === 'patientDemographic'){
@@ -143,6 +147,7 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       var data = [{"id": id}];
       patientService.disassociateClinicsFromPatient($stateParams.patientId, data).then(function(response) {
         $scope.associatedClinics = response.data.clinics;
+        $scope.clinics = []; $scope.clinics.length = 0;
       }).catch(function(response) {});
     }
 
@@ -178,9 +183,10 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
     };
 
     $scope.selectClinicForPatient = function(clinic, index){
-      patientService.associateClinicToPatient($stateParams.patientId, clinic).then(function(response) {
+      var data = [{"id": clinic.id, "mrnId": null, "notes": null}]
+      patientService.associateClinicToPatient($stateParams.patientId, data).then(function(response) {
         $scope.associatedClinics = response.data.clinics;
-        $scope.clinics.splice(index,1);
+        $scope.clinics = []; $scope.clinics.length = 0;
       }).catch(function(response) {});
     }
     $scope.initPatientClinicsInfo = function(patientId){
@@ -242,25 +248,25 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       });
     };*/
     /** start of caregiver tab for admin->patient **/
-    $scope.getCaregiversForPatient = function(patientId){      
+    $scope.getCaregiversForPatient = function(patientId){
       patientService.getCaregiversLinkedToPatient(patientId).then(function(response){
         $scope.caregivers =  response.data.caregivers;
       }).catch(function(response){});
     }
-    $scope.associateCaregiverstoPatient = function(patientId, careGiver){   
+    $scope.associateCaregiverstoPatient = function(patientId, careGiver){
         patientService.associateCaregiversFromPatient(patientId, careGiver).then(function(response){
         $scope.caregivers =  response.data.user;
         $scope.associateCareGiver = [];$scope.associateCareGiver.length = 0;
         $scope.switchPatientTab('patientCraegiver');
       }).catch(function(response){});
     }
-    $scope.disassociateCaregiversFromPatient = function(caregiverId, index){      
-        patientService.disassociateCaregiversFromPatient($stateParams.patientId, caregiverId).then(function(response){ 
-        $scope.caregivers.splice(index, 1);      
+    $scope.disassociateCaregiversFromPatient = function(caregiverId, index){
+        patientService.disassociateCaregiversFromPatient($stateParams.patientId, caregiverId).then(function(response){
+        $scope.caregivers.splice(index, 1);
       }).catch(function(response){});
     }
     $scope.initpatientCraegiver = function (patientId){
-      $scope.caregivers = [];      
+      $scope.caregivers = [];
       $scope.getCaregiversForPatient($stateParams.patientId);
     }
     $scope.initpatientCraegiverAdd = function(){
@@ -275,7 +281,7 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       //$scope.associateCareGiver = "";
       $state.go('patientCraegiverAdd', {'patientId': $stateParams.patientId});
     }
-   
+
     $scope.formSubmitCaregiver = function(){
       $scope.submitted = true;
       if($scope.form.$invalid){
@@ -283,7 +289,7 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       }
       var data = $scope.associateCareGiver;
       data.role = 'CARE_GIVER';
-      $scope.associateCaregiverstoPatient($stateParams.patientId, data);      
+      $scope.associateCaregiverstoPatient($stateParams.patientId, data);
     }
 
     $scope.linkDevice = function(){
@@ -295,7 +301,6 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
         return false;
       }
       patientService.addDevice( $stateParams.patientId, $scope.device).then(function(response){
-        console.log(response);
         $state.go('patientProtocol');
       }).catch(function(response){});
     };
@@ -305,8 +310,12 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
     };
 
     $scope.addProtocol = function(){
-      // patientService.addProtocol().then(function(response){
-      // }).catch(function(response){});
+      if($scope.addProtocolForm.$invalid){
+        return false;
+      }
+      patientService.addProtocol().then(function(response){
+        $state.go('patientProtocol');
+      }).catch(function(response){});
     };
 
     $scope.deleteDevice = function(device){
@@ -315,7 +324,9 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       }).catch(function(response){});
     };
 
-    $scope.deleteProtocol = function(device){
+    $scope.deleteProtocol = function(){
+      patientService.deleteProtocol($stateParams.patientId).then(function(response){
+      }).catch(function(response){});
     };
 
     $scope.init();

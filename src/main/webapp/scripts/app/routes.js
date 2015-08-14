@@ -129,7 +129,7 @@ angular.module('hillromvestApp')
                 },
                 resolve: {
                     translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
-                        $translatePartialLoader.addPart('patient');
+                        $translatePartialLoader.addPart('patient');$translatePartialLoader.addPart('patient-user');
                         return $translate.refresh();
                     }],
                     authorize: ['Auth',
@@ -502,7 +502,7 @@ angular.module('hillromvestApp')
             })
             .state('patientCraegiverAdd', {
                 parent: 'patientCraegiver',
-                url: '/{patientId}/caregiver-add',
+                url: '/caregiver-add',
                 data: {
                     roles: ['ADMIN'],
                     pageTitle: 'patient.title'

@@ -8,7 +8,7 @@
   </div>
 </div>
 <div class="dashboard dashboard--content padding-bottom-ls">
-  <form name="form" ng-submit="editPatient()" novalidate autocomplete="off">
+  <form name="addProtocolForm" ng-submit="editPatient()" novalidate autocomplete="off">
     <div class="container dashboard__form">
       <div>
         <div class="col-md-16 reset-padding">
@@ -60,7 +60,7 @@
 
     <div class="col-md-16 margin-top reset-padding">
       <div class="">
-        <buton type="submit" class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="formSubmit()" ng-show="!patientStatus.isCreate" translate="patient.btn.save">Save</buton>
+        <buton type="submit" class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="addProtocol()" ng-show="!patientStatus.isCreate" translate="patient.btn.save">Save</buton>
         <buton type="submit" class="hillrom-btn btn-secondary float-right" ng-click="cancelProtocolDevice()" ng-show="!patientStatus.isCreate" translate="patient.btn.cancel">cancel</buton>
         <div class="clr"></div>
       </div>

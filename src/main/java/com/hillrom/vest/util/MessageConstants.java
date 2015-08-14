@@ -22,6 +22,12 @@ public class MessageConstants {
     
     
     public static final String HR_231 = "HCPs are associated with patient successfully.";
+    public static final String HR_232 = "HCP is dissociated with Clinics successfully.";
+    public static final String HR_233 = "Clinics are associated with patient successfully.";
+    public static final String HR_234 = "Clinics are disassociated with patient successfully.";
+    public static final String HR_235 = "Associated clinics with patient fetched successfully.";
+    public static final String HR_236 = "Associated HCPs with patient fetched successfully.";
+    
     
     public static final String HR_241 = "Clinic created successfully.";
     public static final String HR_242 = "Clinic updated successfully.";

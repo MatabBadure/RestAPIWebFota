@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
+import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.exceptionhandler.HillromException;
@@ -204,8 +205,11 @@ public class UserExtensionResource {
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> dissociateClinicFromHCP(@PathVariable Long id, @RequestBody List<Map<String, String>> clinicList) {
         log.debug("REST request to dissociate clinic from HCP : {}", id);
-        JSONObject jsonObject = hcpClinicService.dissociateClinicFromHCP(id, clinicList);
+        JSONObject jsonObject = new JSONObject();
+        UserExtension hcpUser = hcpClinicService.dissociateClinicFromHCP(id, clinicList);
         if (jsonObject.containsKey("message")) {
+        	jsonObject.put("message", MessageConstants.HR_232);
+        	jsonObject.put("HCPUser", hcpUser);
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         } else {
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
@@ -335,7 +339,7 @@ public class UserExtensionResource {
 	        if (jsonObject.containsKey("ERROR")) {
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
-	        	jsonObject.put("message", "Associated HCPs with patient fetched successfully.");
+	        	jsonObject.put("message", MessageConstants.HR_236);
 		    	jsonObject.put("hcpUsers", hcpUsers);
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }
@@ -356,11 +360,14 @@ public class UserExtensionResource {
     public ResponseEntity<JSONObject> getAssociatedClinicsForPatient(@PathVariable Long id) {
         log.debug("REST request to get associated clinics with Patient : {}", id);
         JSONObject jsonObject = new JSONObject();
+        List<Clinic> clinics;
 		try {
-			jsonObject = clinicPatientService.getAssociatedClinicsForPatient(id);
+			clinics = clinicPatientService.getAssociatedClinicsForPatient(id);
 			if (jsonObject.containsKey("ERROR")) {
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_235);
+		    	jsonObject.put("clinics", clinics);
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }
 		} catch (HillromException e) {
@@ -382,10 +389,12 @@ public class UserExtensionResource {
         log.debug("REST request to associate clinic with Patient : {}", id);
         JSONObject jsonObject = new JSONObject();
 		try {
-			jsonObject = clinicPatientService.associateClinicsToPatient(id, clinicList);
+			List<Clinic> clinics = clinicPatientService.associateClinicsToPatient(id, clinicList);
 			 if (jsonObject.containsKey("ERROR")) {
 		        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 		        } else {
+		        	jsonObject.put("message", MessageConstants.HR_233);
+			    	jsonObject.put("clinics", clinics);
 		            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		        }
 		} catch (HillromException e) {
@@ -406,11 +415,14 @@ public class UserExtensionResource {
     public ResponseEntity<JSONObject> dissociateClinicsToPatient(@PathVariable Long id, @RequestBody List<Map<String, String>> clinicList) {
         log.debug("REST request to dissociate clinic with Patient : {}", id);
         JSONObject jsonObject = new JSONObject();
+        List<Clinic> clinics;
 		try {
-			jsonObject = clinicPatientService.dissociateClinicsToPatient(id, clinicList);
+			clinics = clinicPatientService.dissociateClinicsToPatient(id, clinicList);
 			if (jsonObject.containsKey("ERROR")) {
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
+	        	jsonObject.put("message",MessageConstants.HR_234);
+		    	jsonObject.put("clinics", clinics);
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }
 		} catch (HillromException e) {

@@ -28,8 +28,7 @@ public class HCPClinicService {
     @Inject
     private UserExtensionRepository userExtensionRepository;
     
-    public JSONObject dissociateClinicFromHCP(Long id, List<Map<String, String>> clinicList) {
-    	JSONObject jsonObject = new JSONObject();
+    public UserExtension dissociateClinicFromHCP(Long id, List<Map<String, String>> clinicList) {
     	UserExtension hcpUser = userExtensionRepository.getOne(id);
     	for(Map<String, String> clinicId : clinicList) {
     		Clinic clinic = clinicRepository.getOne(clinicId.get("id"));
@@ -41,9 +40,7 @@ public class HCPClinicService {
     			hcpUser.getClinics().remove(clinic);
     		}
     	}
-    	jsonObject.put("message", "HCP is dissociated with Clinics successfully.");
-    	jsonObject.put("HCPUser", hcpUser);
-    	return jsonObject;
+    	return hcpUser;
     }
 }
 

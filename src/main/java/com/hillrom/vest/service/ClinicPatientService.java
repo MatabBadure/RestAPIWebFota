@@ -55,9 +55,9 @@ public class ClinicPatientService {
     @Inject
     private PatientInfoRepository patientInfoRepository;
     
-    public JSONObject associateClinicsToPatient(Long id, List<Map<String, String>> clinicList) throws HillromException {
-    	JSONObject jsonObject = new JSONObject();
+    public List<Clinic> associateClinicsToPatient(Long id, List<Map<String, String>> clinicList) throws HillromException {
     	User patientUser = userRepository.findOne(id);
+    	List<Clinic> clinics;
     	if(patientUser != null) {
 	    	PatientInfo patientInfo = getPatientInfoObjeFromPatientUser(patientUser);
 	     	if(patientInfo != null){
@@ -66,33 +66,32 @@ public class ClinicPatientService {
 	     		getAssocObjLists(clinicList, patientInfo, clinicPatientAssocList, userPatientAssocList);
 		    	clinicPatientRepository.save(clinicPatientAssocList);
 		    	userPatientRepository.save(userPatientAssocList);
-		    	jsonObject.put("message", "Clinics are associated with patient successfully.");
-		    	jsonObject.put("clinics", getAssociatedClinicsList(patientInfo));
+		    	clinics = getAssociatedClinicsList(patientInfo);
+		    	
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
 	     	}
     	} else {
     		throw new HillromException(ExceptionConstants.HR_512);//No such user exist
      	}
-    	return jsonObject;
+    	return clinics;
     }
     
-    public JSONObject getAssociatedClinicsForPatient(Long id) throws HillromException {
+    public List<Clinic> getAssociatedClinicsForPatient(Long id) throws HillromException {
     	JSONObject jsonObject = new JSONObject();
     	User patientUser = userRepository.findOne(id);
+    	List<Clinic> clinics;
     	if(patientUser != null) {
     		PatientInfo patientInfo = getPatientInfoObjeFromPatientUser(patientUser);
 	     	if(patientInfo != null){
-		    	List<Clinic> clinics = getAssociatedClinicsList(patientInfo);
-		    	jsonObject.put("message", "Associated clinics with patient fetched successfully.");
-		    	jsonObject.put("clinics", clinics);
+	     		clinics = getAssociatedClinicsList(patientInfo);
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
 	     	}
     	} else {
     		throw new HillromException(ExceptionConstants.HR_512);//No such user exist
      	}
-    	return jsonObject;
+    	return clinics;
     }
 
 	private List<Clinic> getAssociatedClinicsList(PatientInfo patientInfo) {
@@ -104,9 +103,9 @@ public class ClinicPatientService {
 		return clinics;
 	}
 	
-    public JSONObject dissociateClinicsToPatient(Long id, List<Map<String, String>> clinicList) throws HillromException {
-    	JSONObject jsonObject = new JSONObject();
+    public List<Clinic> dissociateClinicsToPatient(Long id, List<Map<String, String>> clinicList) throws HillromException {
     	User patientUser = userRepository.findOne(id);
+    	List<Clinic> clinics;
     	if(patientUser != null) {
 	    	PatientInfo patientInfo = getPatientInfoObjeFromPatientUser(patientUser);
 	     	if(patientInfo != null){
@@ -115,15 +114,14 @@ public class ClinicPatientService {
 		    	getAssocObjLists(clinicList, patientInfo, clinicPatientAssocList, userPatientAssocList);
 		    	if (userPatientAssocList.size() > 0) userPatientRepository.delete(userPatientAssocList);
 		    	if (clinicPatientAssocList.size() > 0) clinicPatientRepository.delete(clinicPatientAssocList);
-		    	jsonObject.put("message", "Clinics are associated with patient successfully.");
-		    	jsonObject.put("clinics", getAssociatedClinicsList(patientInfo));
+		    	clinics = getAssociatedClinicsList(patientInfo);
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
 	     	}
     	} else {
     		throw new HillromException(ExceptionConstants.HR_512);//No such user exist
      	}
-    	return jsonObject;
+    	return clinics;
     }
 
 	private PatientInfo getPatientInfoObjeFromPatientUser(User patientUser) {

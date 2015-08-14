@@ -270,6 +270,15 @@ angular.module('hillromvestApp')
         }).success(function(response){
           return response;
         });
+      },
+      getCaregiverById : function(patientId, caregiverId ){
+        ///api/patient/:patientUserId/caregiver/:id
+        var url = admin.patient.baseURL + patientId + '/caregiver/'+caregiverId;
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
       }
     };
   });

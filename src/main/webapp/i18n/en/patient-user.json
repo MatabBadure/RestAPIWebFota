@@ -57,7 +57,8 @@
         "btn": {
           "update": "Update",
           "cancel": "Cancel",
-          "save": "Save"
+          "save": "Save",
+          "update": "update"
         },
         "caregiver": {
           "gen-details": "Create Caregiver",

@@ -391,10 +391,28 @@ public class UserExtensionResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
-    public ResponseEntity<JSONObject> createCaregiver(@PathVariable Long patientUserId, @PathVariable Long caregiverUserId, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
-        log.debug("REST request to save User : {}", userExtensionDTO);
+    public ResponseEntity<JSONObject> updateCaregiver(@PathVariable Long patientUserId, @PathVariable Long caregiverUserId, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
+        log.debug("REST request to update caregiver User : {}", userExtensionDTO);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         JSONObject jsonObject = userService.updateCaregiverUser(patientUserId, caregiverUserId, userExtensionDTO, baseUrl);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+        }
+    }
+    
+    /**
+     * GET  /patient/{patientUserId}/caregiver/{caregiverUserId} -> GET a caregiver {caregiverUserId} for a patient with {patientUserId}. 
+     */
+    @RequestMapping(value = "/patient/{patientUserId}/caregiver/{caregiverUserId}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    public ResponseEntity<JSONObject> getCaregiver(@PathVariable Long patientUserId, @PathVariable Long caregiverUserId) {
+        log.debug("REST request to get caregiver User : {}", caregiverUserId);
+        JSONObject jsonObject = userService.getCaregiverUser(patientUserId, caregiverUserId);
         if (jsonObject.containsKey("ERROR")) {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {

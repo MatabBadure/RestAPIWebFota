@@ -31,13 +31,14 @@
       <span class="caregiver-list__fax--number">{{caregiver.user.mobilePhone}}</span>
     </div>
     <div class="col-md-2 caregiver-list__type">
-      <span>{{caregiver.user.relationships}}</span>
+      <span>{{caregiver.relationshipLabel}}</span>
     </div>
     <!-- <div class="col-md-1 caregiver-list__edit" ng-click="editCaregiver(caregiver.user.id, $index)">
       <span class="glyphicon glyphicon-trash" style="cursor:pointer;"></span>
-    </div> -->
-    <div class="col-md-1 caregiver-list__delete" ng-click="disassociateCaregiversFromPatient(caregiver.user.id, $index)">
-      <span class="glyphicon glyphicon-trash" style="cursor:pointer;"></span>
+    </div> --><!-- <div><a href="" ng-click="editCaregiver(caregiver.user.id, $index)">edit</a></div> -->
+    <div class="col-md-1 caregiver-list__delete" >    
+      <span class="glyphicon glyphicon-pencil" style="cursor:pointer;" ng-click="goToCaregiverEdit(caregiver.user.id)"></span>
+      <span class="glyphicon glyphicon-trash" style="cursor:pointer;" ng-click="disassociateCaregiversFromPatient(caregiver.user.id, $index)"></span>
     </div>
   </div>
   <div class="col-md-16 reset-padding caregiver-link">

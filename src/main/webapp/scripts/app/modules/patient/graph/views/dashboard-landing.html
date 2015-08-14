@@ -1,0 +1,41 @@
+		<patient-navbar></patient-navbar>
+		<div>
+			<div style="height: 100px;">Note section</div>
+			<div>Notification section</div>
+		</div>
+		<div>
+			<div style="height: 100px;">
+				<span ng-click="HMRGraph()">HMR Data</span>
+				<span ng-click="complianceGraph()">Compliance</span>
+			</div>
+			<div>
+				<span ng-click="hmrDailyChart()">Daily</span>
+				<span ng-click="hmrWeeklyChart()">Weekly</span>
+				<span ng-click="hmrMonthlyChart()">Monthly</span>
+				<span ng-click="hmrYearlyChart()">Yearly</span>
+				<span>Datepicker</span>
+			</div>
+		</div>
+ 		<!-- <nvd3 options="options" data="data"></nvd3> -->
+
+	 		<nvd3-line-chart
+	    	  data="graphData"
+	        id="HMRGraph"
+	        width="1250"
+	        height="350"
+	        showXAxis="true"
+	        showYAxis="true"
+	        legends="true"
+	        interactive="true"
+	        tooltips="true"
+	        isArea="true"
+	        interpolate="step"
+	        objectEquality="true"
+	        yAxisLabel="Minutes"
+          margin="{left:100,top:20,bottom:20,right:10}"
+	        xAxisTickFormat="xAxisTickFormatFunction()"
+	        xAxisTickValues="xAxisTickValuesFunction()"
+	        tooltipcontent="toolTipContentFunction()">
+	    </nvd3-line-chart>
+
+    

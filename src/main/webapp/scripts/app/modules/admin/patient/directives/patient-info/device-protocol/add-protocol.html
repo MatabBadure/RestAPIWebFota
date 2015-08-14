@@ -22,7 +22,7 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" required>
+              <input class="" type="text" ng-model= "protocol.treatmentsPerDay"required>
             </div>
           </div>
           <div class="col-md-7 reset-padding col-md-offset-2">
@@ -30,7 +30,7 @@
               <span class="" translate="patient.protocol.min-per-tm"></span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" required>
+              <input class="" type="text" ng-model="protocol.minutesPerTreatment" required>
             </div>
           </div>
         </div>
@@ -42,7 +42,7 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" required>
+              <input class="" type="text" ng-model="protocol.frequencies" required>
             </div>
           </div>
           <div class="col-md-7 reset-padding col-md-offset-2">
@@ -50,7 +50,7 @@
               <span class="" translate="patient.protocol.min-minute-per-day"></span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" required>
+              <input class="" type="text" ng-model="protocol.minimumMinutesOfUsePerDay" required>
             </div>
           </div>
         </div>
@@ -60,7 +60,8 @@
 
     <div class="col-md-16 margin-top reset-padding">
       <div class="">
-        <buton type="submit" class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="addProtocol()" ng-show="!patientStatus.isCreate" translate="patient.btn.save">Save</buton>
+        <buton ng-if="!protocol" type="submit" class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="addProtocol()" ng-show="!patientStatus.isCreate" translate="patient.btn.save">Save</buton>
+        <buton ng-if="protocol" type="submit" class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="updateProtocol()" ng-show="!patientStatus.isCreate" translate="patient.btn.update">Update</buton>
         <buton type="submit" class="hillrom-btn btn-secondary float-right" ng-click="cancelProtocolDevice()" ng-show="!patientStatus.isCreate" translate="patient.btn.cancel">cancel</buton>
         <div class="clr"></div>
       </div>

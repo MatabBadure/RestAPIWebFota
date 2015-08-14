@@ -219,6 +219,7 @@ angular.module('hillromvestApp')
             .state('patientAddProtocol', {
                 parent: 'patientProtocol',
                 url: '/addProtocol',
+                params: {protocol: null},
                 data: {
                     roles: ['ADMIN'],
                     pageTitle: 'patient.title'

@@ -53,7 +53,8 @@ angular.module('hillromvestApp')
           localStorage.removeItem('loginCount');
           localStorage.setItem('userFirstName', data.data.user.firstName);
           if(data.data.user.authorities[0].name === 'PATIENT'){
-            $state.go('patientclinic');
+            localStorage.setItem('patientID', data.data.user.id);
+            $state.go('patientdashboard');
           } else {
             $state.go('patientUser');
           }

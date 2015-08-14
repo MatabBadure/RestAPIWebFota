@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -1128,5 +1129,30 @@ public class UserService {
     	}
     	return null;
 	}
+	
+	public JSONObject getCaregiverUser(Long patientUserId, Long caregiverUserId) {
+    	JSONObject jsonObject = new JSONObject();
+		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
+		if(Objects.nonNull(patientUser)) {
+			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
+    		if(patientInfo != null) {
+    			List<UserPatientAssoc> caregiverAssocList = getListOfCaregiversAssociatedToPatientUser(patientUser);
+    			List<UserPatientAssoc> filteredCaregiverAssocList =  caregiverAssocList.parallelStream()
+    					.filter(caregiverAssoc -> caregiverUserId.equals(caregiverAssoc.getUser().getId()))
+    					.collect(Collectors.toList());
+	    		if(filteredCaregiverAssocList.isEmpty()){
+	    			jsonObject.put("message", ExceptionConstants.HR_564);
+	    		} else {
+	    			jsonObject.put("message", MessageConstants.HR_263);
+	    			jsonObject.put("caregivers", filteredCaregiverAssocList.get(0));
+	    		}
+    		} else {
+    			jsonObject.put("ERROR", ExceptionConstants.HR_523);
+    		}
+		} else {
+			jsonObject.put("ERROR", ExceptionConstants.HR_512);
+		}
+		return jsonObject;
+    }
 }
 

@@ -2,14 +2,11 @@
 
 angular.module('hillromvestApp')
 .controller('graphController', function($scope) {
-    $scope.exampleData = [
+
+    $scope.graphData = [
       {
-          "key": "Series 1",
+          "key": "Weekly",
             "values": [ [ 1025409600000 , 0] , [ 1028088000000 , 6.3382185140371] , [ 1030766400000 , 5.9507873460847] , [ 1033358400000 , 11.569146943813] , [ 1036040400000 , 5.4767332317425] , [ 1038632400000 , 0.50794682203014] , [ 1041310800000 , 5.5310285460542] ]
-     },
-      {
-          "key": "Series 2",
-            "values": [ [ 1025409600000 , 1] , [ 1028088000000 , 3.3382185140371] , [ 1030766400000 , 4.9507873460847] , [ 1033358400000 , 12.569146943813] , [ 1036040400000 , 6.4767332317425] , [ 1038632400000 , 1.50794682203014] , [ 1041310800000 , 5.5310285460542] ]
      }
        ];
     $scope.toolTipContentFunction = function(){
@@ -22,15 +19,39 @@ angular.module('hillromvestApp')
 
     $scope.xAxisTickFormatFunction = function(){
     return function(d){
-      return d3.time.format('%x')(new Date(d));
+      var weekNumber = d3.time.format('%a')(new Date(d));
+        return weekNumber;
       }
     }
 
+    $scope.xAxisTickValuesFunction = function(){
+                return function(d){
+                    var tickVals = [];
+                    var values = d[0].values;
+                    for(var i in values){
+                            tickVals.push(values[i][0]);
+                    }
+                    console.log('xAxisTickValuesFunction', d);
+                    return tickVals;
+                };
+            };
+
     $scope.$on('elementClick.directive', function(angularEvent, event){
       console.log(event);
+      $scope.createGraphData();
+      $scope.$digest();
     });
 
-  $scope.options = {
+    $scope.createGraphData = function() {
+      $scope.graphData = [
+      {
+          "key": "Monthly",
+            "values": [ [ 1025409600000 , 10] , [ 1028088000000 , 20] , [ 1030766400000 , 30] , [ 1033358400000 , 40] , [ 1036040400000 , 50] , [ 1038632400000 , 60] , [ 1041310800000 , 70] ]
+     }
+       ];
+    };
+
+  /*$scope.options = {
             chart: {
                 type: 'stackedAreaChart',
                 height: 300,
@@ -99,5 +120,5 @@ angular.module('hillromvestApp')
                 "key" : "South America" ,
                 "values" : [ [ 1438300800000 , 10.174315530051] , [ 1440979200000 , 0.631084213898] , [ 1443571200000 , 5.366462219461] ]
             }
-        ]
+        ]*/
 });

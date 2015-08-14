@@ -17,18 +17,23 @@
 			</div>
 		</div>
  		<!-- <nvd3 options="options" data="data"></nvd3> -->
- 		<nvd3-line-chart
-    	data="exampleData"
-        id="interpolateExampleBasis"
-        width="550"
-        height="350"
-        showXAxis="true"
-        showYAxis="true"
-        legends="true"
-        interactive="true"
-        tooltips="true"
-        xAxisTickFormat="xAxisTickFormatFunction()">
-        <svg></svg>
-    </nvd3-line-chart>
 
+	 		<nvd3-line-chart
+	    	  data="graphData"
+	        id="interpolateExampleBasis"
+	        width="550"
+	        height="350"
+	        showXAxis="true"
+	        showYAxis="true"
+	        legends="true"
+	        interactive="true"
+	        tooltips="true"
+	        isArea="true"
+	        interpolate="step"
+	        showLegend="true"
+	        objectEquality="true"
+	        xAxisTickFormat="xAxisTickFormatFunction()"
+	        xAxisTickValues="xAxisTickValuesFunction()">
+	    </nvd3-line-chart>
 
+    

@@ -198,6 +198,7 @@ angular.module('hillromvestApp')
             .state('patientAddDevice', {
                 parent: 'patientProtocol',
                 url: '/addDevice',
+                params:{device: null},
                 data: {
                     roles: ['ADMIN'],
                     pageTitle: 'patient.title'
@@ -555,7 +556,7 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
-            
+
             .state('graphView', {
                 url: '/graphs',
                 data: {

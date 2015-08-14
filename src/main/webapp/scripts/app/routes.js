@@ -246,7 +246,8 @@ angular.module('hillromvestApp')
                 },
                 views: {
                     'content@': {
-                        templateUrl: 'scripts/app/modules/admin/hcp/views/create-edit/view.html',
+                        // templateUrl: 'scripts/app/modules/admin/hcp/views/create-edit/view.html',
+                        templateUrl: 'scripts/app/modules/admin/hcp/directives/hcp-info/overview/overview.html',
                         controller: 'DoctorsController'
                     }
                 },

@@ -58,47 +58,22 @@
     </div>
     <div class="col-md-3 protocol-list__treatment-day">
       <span class="protocol-list__treatment-day--text" translate="patient.protocol.tm-per-day"></span>
-      <span class="protocol-list--value">2</span>
+      <span class="protocol-list--value">2 {{protocol.treatmentsPerDay}}</span>
     </div>
     <div class="col-md-4 protocol-list__treatment-minute">
       <span class="protocol-list__treatment-minute--text" translate="patient.protocol.min-per-tm"></span>
-      <span class="protocol-list--value">20</span>
+      <span class="protocol-list--value">20 {{protocol.minutesPerTreatment}}</span>
     </div>
     <div class="col-md-2 protocol-list__freq">
       <span class="protocol-list__freq--text" translate="patient.protocol.frequency"></span>
-      <span class="protocol-list--value">10-14</span>
+      <span class="protocol-list--value">10-14 {{protocol.frequencies}}</span>
     </div>
     <div class="col-md-4 protocol-list__use-day">
       <span class="protocol-list__use-day--text" translate="patient.protocol.min-minute-per-day"></span>
-      <span class="protocol-list--value">10</span>
+      <span class="protocol-list--value">10 {{protocol.minimumMinutesOfUsePerDay}}</span>
     </div>
     <div class="col-md-1 protocol-list__delete">
-      <span class="glyphicon glyphicon-trash"></span>
-    </div>
-  </div>
-
-  <div class="col-md-16 protocol-list inactive">
-    <div class="col-md-2 protocol-list__type">
-      <span class="protocol-list--text">Custom</span>
-    </div>
-    <div class="col-md-3 protocol-list__treatment-day">
-      <span class="protocol-list--text" translate="patient.protocol.tm-per-day"></span>
-      <span class="protocol-list--value">2</span>
-    </div>
-    <div class="col-md-4 protocol-list__treatment-minute">
-      <span class="protocol-list--text" translate="patient.protocol.min-per-tm"></span>
-      <span class="protocol-list--value">20</span>
-    </div>
-    <div class="col-md-2 protocol-list__freq">
-      <span class="protocol-list--text" translate="patient.protocol.frequency"></span>
-      <span class="protocol-list--value">10-14</span>
-    </div>
-    <div class="col-md-4 protocol-list__use-day">
-      <span class="protocol-list--text" translate="patient.protocol.min-minute-per-day"></span>
-      <span class="protocol-list--value">10</span>
-    </div>
-    <div class="col-md-1 protocol-list__delete">
-      <span class="glyphicon glyphicon-trash"></span>
+      <span class="glyphicon glyphicon-trash" ng-click="deleteProtocol()"></span>
     </div>
   </div>
 

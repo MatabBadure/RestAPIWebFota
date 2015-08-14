@@ -191,7 +191,7 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       }else {
           $scope.currentPageIndex = 1;
       }
-      if($scope.searchItem && $scope.searchItem.length > 0){alert($scope.searchItem);
+      if($scope.searchItem && $scope.searchItem.length > 0){
         clinicService.getClinics($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
           $scope.clinics = []; $scope.clinics.length = 0;
           $scope.clinics = response.data;

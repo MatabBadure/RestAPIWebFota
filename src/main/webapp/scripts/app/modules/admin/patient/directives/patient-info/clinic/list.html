@@ -38,7 +38,7 @@
   </div>
   <div class="col-md-16 reset-padding">
     <div class="col-md-8 clinic-link">
-      <input class="" type="text" name="linkClinic" placeholder="{{'patient.placeholder.clinic-link' | translate}}" ng-model="searchItem" ng-keydown="searchClinics();">
+      <input class="" type="text" name="linkClinic" placeholder="{{'patient.placeholder.clinic-link' | translate}}" ng-model="searchItem" ng-keyup="searchClinics();">
       <div class="">
       <div class="parent-detail" ng-repeat="clinic in clinics track by $index">
         <div class="" ng-click="selectClinicForPatient(clinic, $index)">

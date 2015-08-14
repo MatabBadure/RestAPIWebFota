@@ -25,7 +25,7 @@ public class ClinicPatientAssoc implements Serializable {
 	@EmbeddedId
 	private ClinicPatientAssocPK clinicPatientAssocPK;
     
-    @Column(name="mrn_id", nullable = false)
+    @Column(name="mrn_id")
     private String mrnId;
     
     @Column(name="notes")

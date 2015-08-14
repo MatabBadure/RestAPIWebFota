@@ -74,6 +74,9 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       }).catch(function(){});
     };
 
+    $scope.initPatientAddProtocol = function(){
+      $scope.protocol = $stateParams.protocol;
+    };
     $scope.init = function() {
       var currentRoute = $state.current.name;
       //in case the route is changed from other thatn switching tabs
@@ -96,6 +99,8 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
         $scope.initpatientCraegiverAdd($stateParams.patientId);
       }else if(currentRoute === 'patientCraegiverEdit'){
         $scope.initpatientCraegiverEdit($stateParams.patientId);
+      }else if(currentRoute === 'patientAddProtocol'){
+        $scope.initPatientAddProtocol();
       }
 
     };
@@ -325,7 +330,7 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       if($scope.addProtocolForm.$invalid){
         return false;
       }
-      patientService.addProtocol().then(function(response){
+      patientService.addProtocol($stateParams.patientId, $scope.protocol).then(function(response){
         $state.go('patientProtocol');
       }).catch(function(response){});
     };
@@ -344,7 +349,6 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
     $scope.initpatientCraegiverEdit = function(careGiverId){
       $scope.careGiverStatus = "edit";
       $scope.editCaregiver(careGiverId);
-      
     }
 
     $scope.editCaregiver = function(careGiverId){
@@ -385,5 +389,20 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       $state.go('patientCraegiverEdit', {'caregiverId': careGiverId}); 
     }
 
+    $scope.openEditProtocol = function(){
+      $state.go('patientAddProtocol',{protocol: $scope.protocol});
+    };
+
+    $scope.updateProtocol = function(){
+      if($scope.protocol.id){
+        delete $scope.protocol.id;
+      }
+      if($scope.protocol.patient){
+        delete $scope.protocol.patient;
+      }
+      patientService.editProtocol($stateParams.patientId, $scope.protocol).then(function(response){
+        $state.go('patientProtocol');
+      }).catch(function(response){});
+    }
     $scope.init();
   });

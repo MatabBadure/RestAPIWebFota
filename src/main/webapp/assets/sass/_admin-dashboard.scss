@@ -50,6 +50,12 @@
 	font-weight: normal;
 }
 
+.dashboard__form--label-val {
+  line-height: 30px;
+  color: $regent-gray;
+  font-weight: normal;
+}
+
 .dashboard__form--input input {
 	height: 30px;
 	//width: 270px;

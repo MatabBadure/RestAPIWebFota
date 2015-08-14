@@ -11,7 +11,7 @@
     <span class="patient-protocol--title" translate="patient.protocol-title"></span>
   </div>
 
-  <div class="col-md-16 protocol-list">
+  <div class="col-md-16 protocol-list" ng-if="protocol">
     <div class="col-md-3 protocol-list__treatment-day">
       <span class="protocol-list__treatment-day--text" translate="patient.protocol.tm-per-day"></span>
       <span class="protocol-list--value"> {{protocol.treatmentsPerDay}}</span>
@@ -49,27 +49,29 @@
     <span class="patient-device--title" translate="patient.device-title"></span>
   </div>
 
-  <div class="col-md-16 device-list" ng-repeat="device in devices">
+  <div class="col-md-16 device-list" ng-repeat="device in devices" ng-class="{'list-inactive': !device.active}">
     <div class="col-md-3 device-list__serial">
-      <span>1034242342344431 {{device.serialNumber}}</span>
+      <span>{{device.serialNumber}}</span>
     </div>
     <div class="col-md-2 device-list__bt-id">
-      <span>BT 3234334 {{device.bluetoothId}}</span>
+      <span>{{device.bluetoothId}}</span>
     </div>
     <div class="col-md-1 device-list__device">
       <span class="icon-lungs active"></span>
     </div>
     <div class="col-md-2 device-list__status">
-      <span class="device--list__status--text">Active {{device.active}}</span>
+      <span ng-if="device.active" class="device--list__status--text">Active</span>
+      <span ng-if="!device.active" class="device--list__status--text">Inactive</span>
     </div>
     <div class="col-md-6 device-list__date">
-      <span>January 12, 2015 {{device.createdDate}}</span><span> - Active/Inactive date</span>
+      <span>{{device.createdDate}}</span><span ng-if="device.active"> - Active date</span>
+      <span ng-if="!device.active"> - Inactive date</span>
     </div>
     <div class="col-md-1 device-list__edit text-center">
-      <span class="glyphicon glyphicon-pencil cursor-pointer" ng-click="editDevice(device)"></span>
+      <span ng-if="device.active" class="glyphicon glyphicon-pencil cursor-pointer" ng-click="openEditDevice(device)"></span>
     </div>
     <div class="col-md-1 device-list__delete text-center">
-      <span class="glyphicon glyphicon-trash cursor-pointer" ng-click="deleteDevice(device)"></span>
+      <span ng-if="device.active" class="glyphicon glyphicon-trash cursor-pointer" ng-click="deleteDevice(device)"></span>
     </div>
   </div>
 

@@ -57,7 +57,9 @@
     <div class="col-md-16 margin-top reset-padding">
       <div class="col-md-7 reset-padding">
       <div class="">
-        <buton type="submit" class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="addDevice()" ng-show="!patientStatus.isCreate" translate="patient.btn.save">Save</buton>
+        <buton type="submit" ng-if="!device.edit" class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="addDevice()" ng-show="!patientStatus.isCreate" translate="patient.btn.save">Save</buton>
+        <buton type="submit" ng-if="device.edit" class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="updateDevice()" ng-show="!patientStatus.isCreate" translate="patient.btn.update">Update</buton>
+
         <buton type="submit" class="hillrom-btn btn-secondary float-right" ng-click="cancelProtocolDevice()" ng-show="!patientStatus.isCreate" translate="patient.btn.cancel">cancel</buton>
         <div class="clr"></div>
       </div>

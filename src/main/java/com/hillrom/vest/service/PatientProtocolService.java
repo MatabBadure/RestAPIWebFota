@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.User;
@@ -43,8 +44,8 @@ public class PatientProtocolService {
 			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
 		 	if(patientInfo != null){
 		 		PatientProtocolData patientProtocolAssoc = new PatientProtocolData(patientInfo, 
-		 				Integer.parseInt(protocolData.get("treatmentsPerDay")), Integer.parseInt(protocolData.get("minutesPerTreatment")), 
-		 				protocolData.get("frequencies"), Integer.parseInt(protocolData.get("minimumMinutesOfUsePerDay")));
+		 				Integer.parseInt(protocolData.get(Constants.TREATMENTS_PER_DAY)), Integer.parseInt(protocolData.get(Constants.MINUTES_PER_TREATMENT)), 
+		 				protocolData.get(Constants.FREQUENCIES), Integer.parseInt(protocolData.get(Constants.MIN_MINUTES_PER_DAY)));
 		 		patientProtocolRepository.save(patientProtocolAssoc);
 		 		return patientProtocolAssoc;
 		 	} else {
@@ -77,14 +78,14 @@ public class PatientProtocolService {
 	private void assignValuesToPatientProtocolObj(
 			Map<String, String> protocolData,
 			Optional<PatientProtocolData> currentAssoc) {
-		if(StringUtils.isNoneEmpty(protocolData.get("treatmentsPerDay")))
-			currentAssoc.get().setTreatmentsPerDay(Integer.parseInt(protocolData.get("treatmentsPerDay")));
-		if(StringUtils.isNoneEmpty(protocolData.get("minutesPerTreatment")))
-			currentAssoc.get().setMinutesPerTreatment(Integer.parseInt(protocolData.get("minutesPerTreatment")));
-		if(StringUtils.isNoneEmpty(protocolData.get("frequencies")))
-			currentAssoc.get().setFrequencies(protocolData.get("frequencies"));
-		if(StringUtils.isNoneEmpty(protocolData.get("minimumMinutesOfUsePerDay")))
-			currentAssoc.get().setMinimumMinutesOfUsePerDay(Integer.parseInt(protocolData.get("minimumMinutesOfUsePerDay")));
+		if(StringUtils.isNoneEmpty(protocolData.get(Constants.TREATMENTS_PER_DAY)))
+			currentAssoc.get().setTreatmentsPerDay(Integer.parseInt(protocolData.get(Constants.TREATMENTS_PER_DAY)));
+		if(StringUtils.isNoneEmpty(protocolData.get(Constants.MINUTES_PER_TREATMENT)))
+			currentAssoc.get().setMinutesPerTreatment(Integer.parseInt(protocolData.get(Constants.MINUTES_PER_TREATMENT)));
+		if(StringUtils.isNoneEmpty(protocolData.get(Constants.FREQUENCIES)))
+			currentAssoc.get().setFrequencies(protocolData.get(Constants.FREQUENCIES));
+		if(StringUtils.isNoneEmpty(protocolData.get(Constants.MIN_MINUTES_PER_DAY)))
+			currentAssoc.get().setMinimumMinutesOfUsePerDay(Integer.parseInt(protocolData.get(Constants.MIN_MINUTES_PER_DAY)));
 	}
 
     public PatientProtocolData getProtocolsAssociatedWithPatient(Long id) throws HillromException {

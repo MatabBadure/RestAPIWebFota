@@ -24,5 +24,13 @@ public final class Constants {
     public static final int NO_OF_CHARACTERS_TO_BE_EXTRACTED = 4;
     
     public static final int MAX_NO_OF_CAREGIVERS = 5;
+    
+    public static final String TREATMENTS_PER_DAY = "treatmentsPerDay";
+    
+    public static final String MINUTES_PER_TREATMENT = "minutesPerTreatment";
+    
+    public static final String FREQUENCIES = "frequencies";
+    
+    public static final String MIN_MINUTES_PER_DAY = "minimumMinutesOfUsePerDay";
 
 }

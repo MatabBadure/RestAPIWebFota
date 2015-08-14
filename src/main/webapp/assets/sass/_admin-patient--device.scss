@@ -56,3 +56,7 @@
 .protocol-list.inactive .protocol-list--text {
   color: $silver-approx;
 }
+
+.admin-user .protocol-list .protocol-list--value {
+  font-weight: $font-weight-bold;
+}

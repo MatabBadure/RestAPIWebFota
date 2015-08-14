@@ -261,6 +261,15 @@ angular.module('hillromvestApp')
         }).success(function(response){
           return response;
         });
+      },
+      updateCaregiver : function(patientId, caregiverId , data){
+        ///api/patient/:patientUserId/caregiver/:id
+        var url = admin.patient.baseURL + patientId + '/caregiver/'+caregiverId;
+        return $http.put(url, data, {
+          headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
       }
     };
   });

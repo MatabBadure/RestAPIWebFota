@@ -527,7 +527,7 @@ angular.module('hillromvestApp')
             })
             .state('patientCraegiverEdit', {
                 parent: 'patientCraegiver',
-                url: '/{caregiverId}/caregiver-add',
+                url: '/{caregiverId}/caregiver-edit',
                 data: {
                     roles: ['ADMIN'],
                     pageTitle: 'patient.title'

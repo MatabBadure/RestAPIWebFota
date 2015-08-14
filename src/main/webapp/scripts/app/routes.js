@@ -12,9 +12,8 @@ angular.module('hillromvestApp')
                 url: '/admin',
                 abstract: true,
             })
-            .state('patient-dash', {
+            .state('patient-dashboard', {
                 parent: 'entity',
-                url: '/patient',
                 abstract: true,
             })
             .state('patientUser', {
@@ -402,8 +401,8 @@ angular.module('hillromvestApp')
             })
 
              .state('patientdashboard', {
-                parent: 'patient-dash',
-                url: '/dashboard',
+                parent: 'patient-dashboard',
+                url: '/patient-dashboard',
                 data: {
                     roles: ['ADMIN'],
                     pageTitle: 'patient.title'

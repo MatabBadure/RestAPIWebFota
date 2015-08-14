@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -28,6 +29,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.HcpVO;
 import com.hillrom.vest.repository.HillRomUserVO;
@@ -38,6 +40,7 @@ import com.hillrom.vest.service.ClinicPatientService;
 import com.hillrom.vest.service.HCPClinicService;
 import com.hillrom.vest.service.PatientHCPService;
 import com.hillrom.vest.service.UserService;
+import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
@@ -208,7 +211,7 @@ public class UserExtensionResource {
         JSONObject jsonObject = new JSONObject();
         UserExtension hcpUser = hcpClinicService.dissociateClinicFromHCP(id, clinicList);
         if (jsonObject.containsKey("message")) {
-        	jsonObject.put("message", MessageConstants.HR_232);
+        	jsonObject.put("message", MessageConstants.HR_272);
         	jsonObject.put("HCPUser", hcpUser);
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         } else {
@@ -282,7 +285,7 @@ public class UserExtensionResource {
 			if (jsonObject.containsKey("ERROR")) {
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
-	        	jsonObject.put("message", MessageConstants.HR_222);//"HealthCare Professional fetched successfully."
+	        	jsonObject.put("message", MessageConstants.HR_253);
 	            jsonObject.put("user", hcpUser);
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }
@@ -311,7 +314,7 @@ public class UserExtensionResource {
 	        if (jsonObject.containsKey("ERROR")) {
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
-	        	jsonObject.put("message", MessageConstants.HR_231);//HCPs are associated with patient successfully.
+	        	jsonObject.put("message", MessageConstants.HR_271);
 		    	jsonObject.put("hcpUsers", users);
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }
@@ -339,7 +342,7 @@ public class UserExtensionResource {
 	        if (jsonObject.containsKey("ERROR")) {
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
-	        	jsonObject.put("message", MessageConstants.HR_236);
+	        	jsonObject.put("message", MessageConstants.HR_276);
 		    	jsonObject.put("hcpUsers", hcpUsers);
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }
@@ -366,7 +369,7 @@ public class UserExtensionResource {
 			if (jsonObject.containsKey("ERROR")) {
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
-	        	jsonObject.put("message", MessageConstants.HR_235);
+	        	jsonObject.put("message", MessageConstants.HR_275);
 		    	jsonObject.put("clinics", clinics);
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }
@@ -393,7 +396,7 @@ public class UserExtensionResource {
 			 if (jsonObject.containsKey("ERROR")) {
 		        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 		        } else {
-		        	jsonObject.put("message", MessageConstants.HR_233);
+		        	jsonObject.put("message", MessageConstants.HR_273);
 			    	jsonObject.put("clinics", clinics);
 		            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		        }
@@ -421,7 +424,7 @@ public class UserExtensionResource {
 			if (jsonObject.containsKey("ERROR")) {
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
-	        	jsonObject.put("message",MessageConstants.HR_234);
+	        	jsonObject.put("message",MessageConstants.HR_274);
 		    	jsonObject.put("clinics", clinics);
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }
@@ -431,6 +434,7 @@ public class UserExtensionResource {
 		}
      
     }
+    
 	/**
      * POST  /patient/{id}/caregiver -> Create a caregiver for a patient with {id}. 
      */
@@ -443,15 +447,16 @@ public class UserExtensionResource {
         log.debug("REST request to save User : {}", userExtensionDTO);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         JSONObject jsonObject = new JSONObject();
-        UserExtension userExtension;
+        UserPatientAssoc caregiverAssoc;
         
 		try {
-			userExtension = userService.createCaregiverUser(id, userExtensionDTO, baseUrl);
-			if (jsonObject.containsKey("ERROR")) {
+			caregiverAssoc = userService.createCaregiverUser(id, userExtensionDTO, baseUrl);
+			if (Objects.nonNull(caregiverAssoc)) {
+				jsonObject.put("ERROR", ExceptionConstants.HR_561);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
-	        	jsonObject.put("message", MessageConstants.HR_201);
-                jsonObject.put("user", userExtension);
+	        	jsonObject.put("message", MessageConstants.HR_261);
+                jsonObject.put("caregiver", caregiverAssoc);
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
 	        }
 		} catch (HillromException e) {
@@ -467,7 +472,7 @@ public class UserExtensionResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> deleteCaregiver(@PathVariable Long patientUserId, @PathVariable Long id) {
         log.debug("REST request to delete caregiver : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -483,5 +488,42 @@ public class UserExtensionResource {
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 		}
         
+    }
+    
+    /**
+     * GET  /patient/{id}/caregiver -> get the list of caregivers associated with patient user {id}.
+     */
+    @RequestMapping(value = "/patient/{id}/caregiver",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    public ResponseEntity<JSONObject> getCaregiversForPatient(@PathVariable Long id) {
+        log.debug("REST request to delete caregiver : {}", id);
+        JSONObject jsonObject = userService.getCaregiversForPatient(id);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * PUT  /patient/{patientUserId}/caregiver/{caregiverUserId} -> update a caregiver {caregiverUserId} for a patient with {patientUserId}. 
+     */
+    @RequestMapping(value = "/patient/{patientUserId}/caregiver/{caregiverUserId}",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    public ResponseEntity<JSONObject> createCaregiver(@PathVariable Long patientUserId, @PathVariable Long caregiverUserId, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
+        log.debug("REST request to save User : {}", userExtensionDTO);
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        JSONObject jsonObject = userService.updateCaregiverUser(patientUserId, caregiverUserId, userExtensionDTO, baseUrl);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+        }
     }
 }

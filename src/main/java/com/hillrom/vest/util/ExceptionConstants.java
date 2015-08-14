@@ -54,4 +54,13 @@ public class ExceptionConstants {
     public static final String HR_555 = "Incorrect Data";
     public static final String HR_556 = "Invalid Reset Key";
     public static final String HR_557 = "Invalid Security Question or Answer";//Is it same as HR_505?
+    
+    // Protocol
+    public static final String HR_551 = "No protocol found for patient.";
+    public static final String HR_552 = "Unable to create protocol for patient.";
+    
+    //Caregiver user
+    public static final String HR_561 = "Unable to create Caregiver.";
+    public static final String HR_562 = "Unable to update Caregiver.";
+    public static final String HR_563 = "Reached maximum limit to associate caregiver.";
 }

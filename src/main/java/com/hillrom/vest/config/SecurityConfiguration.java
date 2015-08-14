@@ -2,8 +2,12 @@ package com.hillrom.vest.config;
 
 import javax.inject.Inject;
 
+import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.expression.SecurityExpressionHandler;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -98,6 +102,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/logs/**").hasAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/api/**").authenticated()
             .antMatchers("/api/account/**").authenticated()
+            .antMatchers("/api/notes/**").authenticated()
+            .antMatchers("/api/users/{id}/notes/**").authenticated()
+            .antMatchers("/api/patients/{id}/notes/**").authenticated()
             .antMatchers("/metrics/**").hasAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/health/**").hasAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/trace/**").hasAuthority(AuthoritiesConstants.ADMIN)
@@ -113,8 +120,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/clinics/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES)
             .antMatchers("/api/hillromteamuser/**").hasAnyAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/protected/**").authenticated()
+            .antMatchers("/api/user/{id}/changeSecurityQuestion").authenticated()
             .antMatchers("/api/user/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES)
             .antMatchers("/api/patient/**").hasAnyAuthority(AuthoritiesConstants.ADMIN)
+            
         .and()
             .apply(securityConfigurerAdapter());
 
@@ -131,8 +140,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     
     @Bean
     public ExceptionTranslationFilter exceptionTranslationFilter() {
-    RestExceptionTranslationFilter exceptionTranslationFilter = new  RestExceptionTranslationFilter(authenticationEntryPoint);
-    exceptionTranslationFilter.afterPropertiesSet();
-    return exceptionTranslationFilter;
+	    RestExceptionTranslationFilter exceptionTranslationFilter = new  RestExceptionTranslationFilter(authenticationEntryPoint);
+	    exceptionTranslationFilter.afterPropertiesSet();
+	    return exceptionTranslationFilter;
     }
 }

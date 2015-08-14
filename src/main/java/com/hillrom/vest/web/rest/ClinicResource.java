@@ -75,7 +75,7 @@ public class ClinicResource {
         if (jsonObject.containsKey("ERROR")) {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {
-        	jsonObject.put("message", MessageConstants.HR_241);
+        	jsonObject.put("message", MessageConstants.HR_221);
             jsonObject.put("Clinic", clinic);
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
         }

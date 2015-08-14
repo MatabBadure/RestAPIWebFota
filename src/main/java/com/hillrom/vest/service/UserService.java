@@ -49,6 +49,7 @@ import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.service.util.RequestUtil;
 import com.hillrom.vest.util.ExceptionConstants;
+import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
@@ -883,34 +884,66 @@ public class UserService {
 		
 	 }
 	
-	public UserExtension createCaregiverUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException {
-    	if(userExtensionDTO.getEmail() != null) {
+	public UserPatientAssoc createCaregiverUser(Long patientUserId, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException {
+		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
+		if(patientUser != null) {
+			List<UserPatientAssoc> caregiverAssocList = getListOfCaregiversAssociatedToPatientUser(patientUser);
+			if(caregiverAssocList.size() >= Constants.MAX_NO_OF_CAREGIVERS) {
+				throw new HillromException(ExceptionConstants.HR_563);
+			}
+		} else {
+			throw new HillromException(ExceptionConstants.HR_523);
+		}
+    	if(userExtensionDTO.getEmail() != null && AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())) {
 			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
-			if (existingUser.isPresent()) {
-				throw new HillromException(ExceptionConstants.HR_501);//e-mail address already in use");
-    		}
-    	}
-    	if(AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())
-    			&& (SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))
-    				|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))
-    				|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.PATIENT)))) {
-    		UserExtension user = createCaregiver(id, userExtensionDTO);
-    		if(user.getId() != null) {
-    			if(userExtensionDTO.getEmail() != null) {
-    				mailService.sendActivationEmail(user, baseUrl);
-    			}
-                return user;
+			if (existingUser.isPresent()){
+				System.out.println("roles : "+existingUser.get().getAuthorities());
+				if(existingUser.get().getAuthorities().contains(new Authority(AuthoritiesConstants.CARE_GIVER)) 
+						|| existingUser.get().getAuthorities().contains(new Authority(AuthoritiesConstants.HCP))) {
+					UserPatientAssoc caregiverAssoc = associateExistingCaregiverUserWithPatient(patientUser, userExtensionDTO, existingUser);
+					if(Objects.nonNull(caregiverAssoc)){
+	    				mailService.sendActivationEmail(caregiverAssoc.getUser(), baseUrl);
+		                return caregiverAssoc;
+					} else {
+						throw new HillromException(ExceptionConstants.HR_561);
+					}
+				} else {
+					throw new HillromException(ExceptionConstants.HR_501);
+				}
     		} else {
-    			throw new HillromException(ExceptionConstants.HR_515);//Unable to create Caregiver User
+    			UserPatientAssoc caregiverAssoc = createCaregiver(patientUserId, userExtensionDTO);
+	    		if(caregiverAssoc.getUser().getId() != null) {
+	    			if(userExtensionDTO.getEmail() != null) {
+	    				mailService.sendActivationEmail(caregiverAssoc.getUser(), baseUrl);
+	    			}
+	                return caregiverAssoc;
+	    		} else {
+	    			throw new HillromException(ExceptionConstants.HR_561);
+	    		}
     		}
     	} else {
-    		throw new HillromException(ExceptionConstants.HR_554);//Invalid Data
+    		throw new HillromException(ExceptionConstants.HR_554);
     	}
 	}
+
+	private UserPatientAssoc associateExistingCaregiverUserWithPatient(UserExtension patientUser, UserExtensionDTO userExtensionDTO, Optional<User> existingUser) {
+		User caregiverUser = existingUser.get();
+		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
+		if(patientInfo != null) {
+			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, caregiverUser), AuthoritiesConstants.CARE_GIVER, userExtensionDTO.getRelationship());
+			userPatientRepository.saveAndFlush(userPatientAssoc);
+			caregiverUser.getUserPatientAssoc().add(userPatientAssoc);
+			patientInfo.getUserPatientAssoc().add(userPatientAssoc);
+			log.debug("Created Information for Caregiver User: {}", caregiverUser);
+			return userPatientAssoc;
+		} else {
+			return null;
+		}
+	}
 	
-	public UserExtension createCaregiver(Long id, UserExtensionDTO userExtensionDTO) {
+	public UserPatientAssoc createCaregiver(Long patientUserId, UserExtensionDTO userExtensionDTO) {
     	UserExtension newUser = new UserExtension();
-    	UserExtension patientUser = userExtensionRepository.findOne(id);
+    	UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
     	if(patientUser != null) {
     		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
     		if(patientInfo != null) {
@@ -918,16 +951,17 @@ public class UserService {
         		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
     			userExtensionRepository.save(newUser);
     			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, newUser), AuthoritiesConstants.CARE_GIVER, userExtensionDTO.getRelationship());
-    			userPatientRepository.save(userPatientAssoc);
+    			userPatientRepository.saveAndFlush(userPatientAssoc);
     			newUser.getUserPatientAssoc().add(userPatientAssoc);
     			patientInfo.getUserPatientAssoc().add(userPatientAssoc);
     			log.debug("Created Information for Caregiver User: {}", newUser);
+    			return userPatientAssoc;
     		}
     	}
-    	return newUser;
+    	return null;
 	}
 	
-	private PatientInfo getPatientInfoObjFromPatientUser(User patientUser) {
+	public PatientInfo getPatientInfoObjFromPatientUser(User patientUser) {
 		PatientInfo patientInfo = null;
 		for(UserPatientAssoc patientAssoc : patientUser.getUserPatientAssoc()){
 			if(RelationshipLabelConstants.SELF.equals(patientAssoc.getRelationshipLabel())){
@@ -964,5 +998,88 @@ public class UserService {
 		}
 		return jsonObject;
     }
+	
+	public JSONObject getCaregiversForPatient(Long patientUserId) {
+    	JSONObject jsonObject = new JSONObject();
+		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
+		if(Objects.nonNull(patientUser)) {
+    		List<UserPatientAssoc> caregiverAssocList = getListOfCaregiversAssociatedToPatientUser(patientUser);
+			jsonObject.put("message", MessageConstants.HR_263);
+			jsonObject.put("caregivers", caregiverAssocList);
+		} else {
+			jsonObject.put("ERROR", ExceptionConstants.HR_523);
+		}
+		return jsonObject;
+    }
+	
+	private List<UserPatientAssoc> getListOfCaregiversAssociatedToPatientUser(UserExtension patientUser) {
+		List<UserPatientAssoc> caregiverAssocList = new ArrayList<>();
+		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
+		patientInfo.getUserPatientAssoc().forEach(userPatientassoc -> {
+			if(AuthoritiesConstants.CARE_GIVER.equals(userPatientassoc.getUserRole())) {
+				caregiverAssocList.add(userPatientassoc);
+			}
+		});
+		return caregiverAssocList;
+	}
+
+	public JSONObject updateSecurityQuestion(Long id, Map<String,String> params) {
+		User existingUser = userRepository.findOne(id);
+		JSONObject jsonObject = new JSONObject();
+		if(Objects.nonNull(existingUser)){
+			if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())){
+				jsonObject = RequestUtil.checkRequiredParams(params, new String[]{"questionId","answer"});
+				if(jsonObject.containsKey("ERROR")){
+					return jsonObject;
+				}
+				String questionId = params.get("questionId");
+				String answer = params.get("answer");
+				Long qid = Long.parseLong(questionId);
+				userSecurityQuestionService.saveOrUpdate(id, qid, answer);
+			}
+			else
+				jsonObject.put("ERROR", "Forbidden");
+		}else{
+			jsonObject.put("ERROR", "User Doesn't exist");
+		}
+		return jsonObject;
+	}
+	
+	public JSONObject updateCaregiverUser(Long patientUserId, Long caregiverUserId, UserExtensionDTO userExtensionDTO, String baseUrl) {
+		JSONObject jsonObject = new JSONObject();
+		if (AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())) {
+			UserPatientAssoc caregiverAssoc = updateCaregiver(patientUserId, caregiverUserId, userExtensionDTO);
+			if(Objects.nonNull(caregiverAssoc) && Objects.nonNull(caregiverAssoc.getUser().getId())) {
+				if(userExtensionDTO.getEmail() != null) {
+					mailService.sendActivationEmail(caregiverAssoc.getUser(), baseUrl);
+				}
+	            jsonObject.put("message", MessageConstants.HR_262);
+	            jsonObject.put("caregiver", caregiverAssoc);
+			} else {
+				jsonObject.put("ERROR", ExceptionConstants.HR_562);
+			}
+		} else {
+			jsonObject.put("ERROR", ExceptionConstants.HR_555);
+		}
+		return jsonObject;
+	}
+	
+	public UserPatientAssoc updateCaregiver(Long patientUserId, Long caregiverUserId, UserExtensionDTO userExtensionDTO) {
+    	UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
+    	UserExtension caregiverUser = userExtensionRepository.findOne(caregiverUserId);
+    	if(Objects.nonNull(patientUser) && Objects.nonNull(caregiverUser)) {
+    		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
+    		if(patientInfo != null) {
+    			assignValuesToUserObj(userExtensionDTO, caregiverUser);
+    			caregiverUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
+    			userExtensionRepository.save(caregiverUser);
+    			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, caregiverUser), AuthoritiesConstants.CARE_GIVER, userExtensionDTO.getRelationship());
+    			userPatientRepository.saveAndFlush(userPatientAssoc);
+    			log.debug("Updated Information for Caregiver User: {}", caregiverUser);
+    			return userPatientAssoc;
+    		}
+    	}
+    	return null;
+	}
 }
 

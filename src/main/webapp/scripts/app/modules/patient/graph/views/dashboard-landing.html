@@ -9,10 +9,10 @@
 				<span ng-click="complianceGraph()">Compliance</span>
 			</div>
 			<div>
-				<span ng-click="dailyWiseChart()">Daily</span>
-				<span ng-click="weeklyWiseChart()">Weekly</span>
-				<span ng-click="monthlyWiseChart()">Monthly</span>
-				<span ng-click="yearlyWiseChart()">Yearly</span>
+				<span ng-click="hmrDailyChart()">Daily</span>
+				<span ng-click="hmrWeeklyChart()">Weekly</span>
+				<span ng-click="hmrMonthlyChart()">Monthly</span>
+				<span ng-click="hmrYearlyChart()">Yearly</span>
 				<span>Datepicker</span>
 			</div>
 		</div>
@@ -20,8 +20,8 @@
 
 	 		<nvd3-line-chart
 	    	  data="graphData"
-	        id="interpolateExampleBasis"
-	        width="550"
+	        id="HMRGraph"
+	        width="1250"
 	        height="350"
 	        showXAxis="true"
 	        showYAxis="true"
@@ -30,10 +30,12 @@
 	        tooltips="true"
 	        isArea="true"
 	        interpolate="step"
-	        showLegend="true"
 	        objectEquality="true"
+	        yAxisLabel="Minutes"
+          margin="{left:100,top:20,bottom:20,right:10}"
 	        xAxisTickFormat="xAxisTickFormatFunction()"
-	        xAxisTickValues="xAxisTickValuesFunction()">
+	        xAxisTickValues="xAxisTickValuesFunction()"
+	        tooltipcontent="toolTipContentFunction()">
 	    </nvd3-line-chart>
 
     

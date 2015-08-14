@@ -60,4 +60,6 @@ public class ExceptionConstants {
     
     //Caregiver user
     public static final String HR_561 = "Unable to create Caregiver.";
+    public static final String HR_562 = "Unable to update Caregiver.";
+    public static final String HR_563 = "Reached maximum limit to associate caregiver.";
 }

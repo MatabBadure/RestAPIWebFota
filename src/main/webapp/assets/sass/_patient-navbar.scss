@@ -27,6 +27,7 @@
 .patient-user__navbar ul > li > a {
   padding: 10px 0;
   color: $body-bg;
+  cursor: pointer;
   &:hover {
     background-color: inherit;
     color: inherit;

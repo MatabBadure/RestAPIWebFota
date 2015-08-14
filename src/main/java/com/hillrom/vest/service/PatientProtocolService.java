@@ -93,7 +93,12 @@ public class PatientProtocolService {
     	if(patientUser != null) {
 	    	PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
 	     	if(patientInfo != null){
-	     		return patientProtocolRepository.findOneByPatientId(patientInfo.getId()).get();
+	     		Optional<PatientProtocolData> protocolAssoc = patientProtocolRepository.findOneByPatientId(patientInfo.getId());
+	     		if(protocolAssoc.isPresent()){
+	     			return protocolAssoc.get();
+	     		} else {
+	     			return null;
+	     		}
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);
 		 	}

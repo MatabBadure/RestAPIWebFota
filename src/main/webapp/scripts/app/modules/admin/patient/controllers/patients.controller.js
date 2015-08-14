@@ -179,21 +179,26 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       }else {
           $scope.currentPageIndex = 1;
       }
-      clinicService.getClinics($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
-        $scope.clinics = []; $scope.clinics.length = 0;
-        $scope.clinics = response.data;
-        for(var i=0; i < $scope.associatedClinics.length; i++){
-          for(var j=0; j <  $scope.clinics.length; j++ ){
-            if($scope.associatedClinics[i].id == $scope.clinics[j].id){
-              $scope.clinics.splice(j, 1);
+      if($scope.searchItem && $scope.searchItem.length > 0){alert($scope.searchItem);
+        clinicService.getClinics($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
+          $scope.clinics = []; $scope.clinics.length = 0;
+          $scope.clinics = response.data;
+          for(var i=0; i < $scope.associatedClinics.length; i++){
+            for(var j=0; j <  $scope.clinics.length; j++ ){
+              if($scope.associatedClinics[i].id == $scope.clinics[j].id){
+                $scope.clinics.splice(j, 1);
+              }
             }
           }
-        }
-        $scope.total = response.headers()['x-total-count'];
-        $scope.pageCount = Math.ceil($scope.total / 10);
-      }).catch(function (response) {
+          $scope.total = response.headers()['x-total-count'];
+          $scope.pageCount = Math.ceil($scope.total / 10);
+        }).catch(function (response) {
 
-      });
+        });
+      }else {
+        $scope.clinics = []; $scope.clinics.length = 0;
+        $scope.searchItem = "";
+      }
     };
 
     $scope.selectClinicForPatient = function(clinic, index){
@@ -284,6 +289,7 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       $scope.getCaregiversForPatient($stateParams.patientId);
     }
     $scope.initpatientCraegiverAdd = function(){
+      $scope.careGiverStatus = "new";
       UserService.getState().then(function(response) {
         $scope.states = response.data.states;
       }).catch(function(response) {});
@@ -302,8 +308,12 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
         return false;
       }
       var data = $scope.associateCareGiver;
-      data.role = 'CARE_GIVER';
-      $scope.associateCaregiverstoPatient($stateParams.patientId, data);
+      data.role = 'CARE_GIVER';      
+      if($scope.careGiverStatus === "new"){
+        $scope.associateCaregiverstoPatient($stateParams.patientId, data);
+      }else if($scope.careGiverStatus === "edit"){
+        $scope.updateCaregiver($stateParams.patientId, $stateParams.caregiverId , data);
+      }
     }
 
     $scope.linkDevice = function(){
@@ -348,15 +358,46 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
     };
 
     $scope.initpatientCraegiverEdit = function(careGiverId){
+      $scope.careGiverStatus = "edit";
       $scope.editCaregiver(careGiverId);
     }
 
     $scope.editCaregiver = function(careGiverId){
+        UserService.getState().then(function(response) {
+          $scope.states = response.data.states;
+        }).catch(function(response) {});
+        UserService.getRelationships().then(function(response) {
+          $scope.relationships = response.data.relationships;
+        }).catch(function(response) {});
         var caregiverId = $stateParams.caregiverId;
-        $scope.associateCareGiver = caregiver.caregiver;
+        $scope.associateCareGiver = caregiver.caregiver.user;        
         /*patientService.getCaregiverById(caregiverId).then(function(response){
 
         }).catch(function(response){});*/
+    }
+    $scope.updateCaregiver = function(patientId, caregiverId , careGiver){
+      var tempCaregiver = {};
+      tempCaregiver.title = careGiver.title;
+      tempCaregiver.firstName = careGiver.firstName;
+      tempCaregiver.middleName = careGiver.middleName;
+      tempCaregiver.lastName = careGiver.lastName;
+      tempCaregiver.email = careGiver.email;
+      tempCaregiver.address = careGiver.address;
+      tempCaregiver.zipcode = careGiver.zipcode;
+      tempCaregiver.city = careGiver.city;
+      tempCaregiver.state = careGiver.state;
+      tempCaregiver.relationship = careGiver.relationship;
+      tempCaregiver.primaryPhone = careGiver.primaryPhone;
+      tempCaregiver.mobilePhone = careGiver.mobilePhone;
+      tempCaregiver.role = careGiver.role;
+
+      patientService.updateCaregiver(patientId,caregiverId, tempCaregiver).then(function(response){        
+        $scope.associateCareGiver = [];$scope.associateCareGiver.length = 0;
+        $scope.switchPatientTab('patientCraegiver');
+      }).catch(function(response){});
+    }
+    $scope.goToCaregiverEdit = function(careGiverId){
+      $state.go('patientCraegiverEdit', {'caregiverId': careGiverId}); 
     }
 
     $scope.openEditProtocol = function(){

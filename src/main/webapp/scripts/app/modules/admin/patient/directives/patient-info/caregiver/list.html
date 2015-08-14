@@ -17,10 +17,10 @@
       <span class="caregiver-list__detail--email">{{caregiver.user.email}}</span>
     </div>
     <div class="col-md-4 caregiver-list__address">
-      <span class="caregiver-list__address--primary" ng-if="caregiver.address">{{caregiver.user.address}}</span>
-      <span class="caregiver-list__address--secondary" ng-if="caregiver.city">{{caregiver.user.city}}
-      <span ng-if="caregiver.city && caregiver.state">,</span>
-      <span ng-if="caregiver.state">{{caregiver.user.state}} </span></span>
+      <span class="caregiver-list__address--primary" ng-if="caregiver.user.address">{{caregiver.user.address}}</span>
+      <span class="caregiver-list__address--secondary" ng-if="caregiver.user.city">{{caregiver.user.city}}
+      <span ng-if="caregiver.user.city && caregiver.user.state">,</span>
+      <span ng-if="caregiver.user.state">{{caregiver.user.state}} </span></span>
     </div>
     <div class="col-md-3 caregiver-list__phone">
       <span class="caregiver-list__phone--text" translate="patient.phone"></span>

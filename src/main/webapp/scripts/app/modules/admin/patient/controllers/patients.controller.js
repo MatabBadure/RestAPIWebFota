@@ -40,11 +40,23 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
         $scope.patient.dob = dob;
         $scope.patient.formatedDOB = _month + "/" + _day + "/" + _year.slice(-2);
       }
+      patientService.getHCPsLinkedToPatient($scope.patient.id).then(function(response){
+        var hcpUsers = '';
+        angular.forEach(response.data.hcpUsers, function(hcpUser){
+          if(hcpUsers){
+            hcpUsers = hcpUsers + ', ';
+          } if(hcpUser.title){
+            hcpUsers = hcpUsers + hcpUser.title + ' ' +hcpUser.firstName + ' ' + hcpUser.lastName;
+          }else{
+            hcpUsers = hcpUsers + hcpUser.firstName + ' ' + hcpUser.lastName;
+          }
+        });
+        $scope.patient.hcpUSers = hcpUsers;
+      }).catch(function(response){});
     };
 
     $scope.initPatientOverview = function(){
       $scope.patientTab = "patientEdit";
-      console.log('Coming Here : ', $stateParams.patientId);
       $scope.getPatiendDetails($stateParams.patientId, $scope.setOverviewMode);
     };
 
@@ -308,7 +320,7 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
         return false;
       }
       var data = $scope.associateCareGiver;
-      data.role = 'CARE_GIVER';      
+      data.role = 'CARE_GIVER';
       if($scope.careGiverStatus === "new"){
         $scope.associateCaregiverstoPatient($stateParams.patientId, data);
       }else if($scope.careGiverStatus === "edit"){
@@ -370,7 +382,7 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
           $scope.relationships = response.data.relationships;
         }).catch(function(response) {});
         var caregiverId = $stateParams.caregiverId;
-        $scope.associateCareGiver = caregiver.caregiver.user;        
+        $scope.associateCareGiver = caregiver.caregiver.user;
         /*patientService.getCaregiverById(caregiverId).then(function(response){
 
         }).catch(function(response){});*/
@@ -391,13 +403,13 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       tempCaregiver.mobilePhone = careGiver.mobilePhone;
       tempCaregiver.role = careGiver.role;
 
-      patientService.updateCaregiver(patientId,caregiverId, tempCaregiver).then(function(response){        
+      patientService.updateCaregiver(patientId,caregiverId, tempCaregiver).then(function(response){
         $scope.associateCareGiver = [];$scope.associateCareGiver.length = 0;
         $scope.switchPatientTab('patientCraegiver');
       }).catch(function(response){});
     }
     $scope.goToCaregiverEdit = function(careGiverId){
-      $state.go('patientCraegiverEdit', {'caregiverId': careGiverId}); 
+      $state.go('patientCraegiverEdit', {'caregiverId': careGiverId});
     }
 
     $scope.openEditProtocol = function(){

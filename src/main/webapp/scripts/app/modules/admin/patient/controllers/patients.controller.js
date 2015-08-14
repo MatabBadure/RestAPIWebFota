@@ -49,6 +49,9 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
     };
 
     $scope.initpatientDemographic = function(){
+      UserService.getState().then(function(response) {
+       $scope.states = response.data.states;
+      }).catch(function(response) {});
       $scope.getPatiendDetails($stateParams.patientId, $scope.setEditMode);
     };
 

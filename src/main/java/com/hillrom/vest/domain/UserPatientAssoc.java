@@ -7,9 +7,10 @@ import javax.persistence.AssociationOverrides;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * A Clinic.
@@ -26,6 +27,7 @@ public class UserPatientAssoc implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@EmbeddedId
+	@JsonIgnore
 	private UserPatientAssocPK userPatientAssocPK;
     
     @Column(name="user_role", nullable = false)

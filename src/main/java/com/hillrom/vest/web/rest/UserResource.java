@@ -2,6 +2,7 @@ package com.hillrom.vest.web.rest;
 
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.PatientProtocolData;
+import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.UserRepository;
@@ -138,7 +140,13 @@ public class UserResource {
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> linkVestDeviceWithPatient(@PathVariable Long id, @RequestBody Map<String, String> deviceData) {
     	log.debug("REST request to link vest device with patient user : {}", id);
-        JSONObject jsonObject = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
+        JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
+		} catch (HillromException e) {
+			jsonObject.put("ERROR",e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
         if (jsonObject.containsKey("ERROR")) {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {
@@ -156,10 +164,24 @@ public class UserResource {
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> getLinkedVestDeviceWithPatient(@PathVariable Long id) {
     	log.debug("REST request to link vest device with patient user : {}", id);
-        JSONObject jsonObject = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
+    	List<PatientVestDeviceHistory> deviceList = new LinkedList<>();
+    	JSONObject jsonObject = new JSONObject();
+		try {
+			deviceList = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
+		} catch (HillromException e) {
+			jsonObject.put("ERROR",e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
+    	
         if (jsonObject.containsKey("ERROR")) {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {
+        	if(deviceList.isEmpty()){
+     			jsonObject.put("message",MessageConstants.HR_281); //No device linked with patient.
+     		} else {
+     			jsonObject.put("message", MessageConstants.HR_282);//Vest devices linked with patient fetched successfully.
+     			jsonObject.put("deviceList", deviceList);
+     		}
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         }
     }
@@ -174,10 +196,17 @@ public class UserResource {
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> deactivateVestDeviceFromPatient(@PathVariable Long id, @PathVariable String serialNumber) {
     	log.debug("REST request to deactivate vest device with serial number {} from patient user : {}", serialNumber, id);
-        JSONObject jsonObject = patientVestDeviceService.deactivateVestDeviceFromPatient(id, serialNumber);
+    	JSONObject jsonObject = new JSONObject();
+    	try {
+			patientVestDeviceService.deactivateVestDeviceFromPatient(id, serialNumber);
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
         if (jsonObject.containsKey("ERROR")) {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {
+        	jsonObject.put("message", MessageConstants.HR_280);
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         }
     }
@@ -185,7 +214,13 @@ public class UserResource {
 	@RequestMapping(value="/user/{id}/changeSecurityQuestion",method=RequestMethod.PUT)
 	public ResponseEntity<?> updateSecurityQuestion(@PathVariable Long id,@RequestBody(required=true)Map<String,String> params){
 		log.debug("REST request to update Security Question and Answer {}",id,params);
-		JSONObject jsonObject = userService.updateSecurityQuestion(id,params);
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject = userService.updateSecurityQuestion(id,params);
+		} catch (HillromException e) {
+			jsonObject.put("ERROR",e.getMessage());
+			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+		}
 		if(jsonObject.containsKey("ERROR")){
 			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 		}

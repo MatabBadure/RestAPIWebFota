@@ -3,6 +3,7 @@ package com.hillrom.vest.service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -999,17 +1000,16 @@ public class UserService {
 		return jsonObject;
     }
 	
-	public JSONObject getCaregiversForPatient(Long patientUserId) {
-    	JSONObject jsonObject = new JSONObject();
+	public List<UserPatientAssoc> getCaregiversForPatient(Long patientUserId) throws HillromException {
+    	List<UserPatientAssoc> caregiverAssocList = new LinkedList<>();
 		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
 		if(Objects.nonNull(patientUser)) {
-    		List<UserPatientAssoc> caregiverAssocList = getListOfCaregiversAssociatedToPatientUser(patientUser);
-			jsonObject.put("message", MessageConstants.HR_263);
-			jsonObject.put("caregivers", caregiverAssocList);
+    		caregiverAssocList = getListOfCaregiversAssociatedToPatientUser(patientUser);
+			
 		} else {
-			jsonObject.put("ERROR", ExceptionConstants.HR_523);
+			throw new HillromException(ExceptionConstants.HR_523);
 		}
-		return jsonObject;
+		return caregiverAssocList;
     }
 	
 	private List<UserPatientAssoc> getListOfCaregiversAssociatedToPatientUser(UserExtension patientUser) {
@@ -1023,7 +1023,7 @@ public class UserService {
 		return caregiverAssocList;
 	}
 
-	public JSONObject updateSecurityQuestion(Long id, Map<String,String> params) {
+	public JSONObject updateSecurityQuestion(Long id, Map<String,String> params) throws HillromException {
 		User existingUser = userRepository.findOne(id);
 		JSONObject jsonObject = new JSONObject();
 		if(Objects.nonNull(existingUser)){
@@ -1038,30 +1038,28 @@ public class UserService {
 				userSecurityQuestionService.saveOrUpdate(id, qid, answer);
 			}
 			else
-				jsonObject.put("ERROR", "Forbidden");
+				throw new HillromException(ExceptionConstants.HR_558);//Forbidden
 		}else{
-			jsonObject.put("ERROR", "User Doesn't exist");
+			throw new HillromException(ExceptionConstants.HR_512);//User Doesn't exist
 		}
 		return jsonObject;
 	}
 	
-	public JSONObject updateCaregiverUser(Long patientUserId, Long caregiverUserId, UserExtensionDTO userExtensionDTO, String baseUrl) {
-		JSONObject jsonObject = new JSONObject();
+	public UserPatientAssoc updateCaregiverUser(Long patientUserId, Long caregiverUserId, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException {
+		UserPatientAssoc caregiverAssoc = new UserPatientAssoc();
 		if (AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())) {
-			UserPatientAssoc caregiverAssoc = updateCaregiver(patientUserId, caregiverUserId, userExtensionDTO);
+			caregiverAssoc = updateCaregiver(patientUserId, caregiverUserId, userExtensionDTO);
 			if(Objects.nonNull(caregiverAssoc) && Objects.nonNull(caregiverAssoc.getUser().getId())) {
 				if(userExtensionDTO.getEmail() != null) {
 					mailService.sendActivationEmail(caregiverAssoc.getUser(), baseUrl);
 				}
-	            jsonObject.put("message", MessageConstants.HR_262);
-	            jsonObject.put("caregiver", caregiverAssoc);
 			} else {
-				jsonObject.put("ERROR", ExceptionConstants.HR_562);
+				throw new HillromException(ExceptionConstants.HR_562);
 			}
 		} else {
-			jsonObject.put("ERROR", ExceptionConstants.HR_555);
+			throw new HillromException(ExceptionConstants.HR_555);
 		}
-		return jsonObject;
+		return caregiverAssoc;
 	}
 	
 	public UserPatientAssoc updateCaregiver(Long patientUserId, Long caregiverUserId, UserExtensionDTO userExtensionDTO) {

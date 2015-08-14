@@ -94,6 +94,8 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
         $scope.initProtocolDevice($stateParams.patientId);
       }else if(currentRoute === 'patientCraegiverAdd'){
         $scope.initpatientCraegiverAdd($stateParams.patientId);
+      }else if(currentRoute === 'patientCraegiverEdit'){
+        $scope.initpatientCraegiverEdit($stateParams.patientId);
       }
 
     };
@@ -328,6 +330,19 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       patientService.deleteProtocol($stateParams.patientId).then(function(response){
       }).catch(function(response){});
     };
+
+    $scope.initpatientCraegiverEdit = function(careGiverId){
+      $scope.editCaregiver(careGiverId);
+      
+    }
+
+    $scope.editCaregiver = function(careGiverId){
+        var caregiverId = $stateParams.caregiverId;
+        $scope.associateCareGiver = caregiver.caregiver;
+        /*patientService.getCaregiverById(caregiverId).then(function(response){
+
+        }).catch(function(response){});*/
+    }
 
     $scope.init();
   });

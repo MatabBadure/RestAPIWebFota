@@ -502,7 +502,7 @@ angular.module('hillromvestApp')
             })
             .state('patientCraegiverAdd', {
                 parent: 'patientCraegiver',
-                url: '/{patientId}/caregiver-add',
+                url: '/caregiver-add',
                 data: {
                     roles: ['ADMIN'],
                     pageTitle: 'patient.title'

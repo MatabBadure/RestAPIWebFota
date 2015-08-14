@@ -147,6 +147,7 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       var data = [{"id": id}];
       patientService.disassociateClinicsFromPatient($stateParams.patientId, data).then(function(response) {
         $scope.associatedClinics = response.data.clinics;
+        $scope.clinics = []; $scope.clinics.length = 0;
       }).catch(function(response) {});
     }
 
@@ -182,9 +183,10 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
     };
 
     $scope.selectClinicForPatient = function(clinic, index){
-      patientService.associateClinicToPatient($stateParams.patientId, clinic).then(function(response) {
+      var data = [{"id": clinic.id, "mrnId": null, "notes": null}]
+      patientService.associateClinicToPatient($stateParams.patientId, data).then(function(response) {
         $scope.associatedClinics = response.data.clinics;
-        $scope.clinics.splice(index,1);
+        $scope.clinics = []; $scope.clinics.length = 0;
       }).catch(function(response) {});
     }
     $scope.initPatientClinicsInfo = function(patientId){

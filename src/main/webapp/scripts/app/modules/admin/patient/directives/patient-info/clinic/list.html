@@ -7,7 +7,7 @@
    </div> 
   </div>
   <div class="col-md-16 patient-clinic">
-    <span class="patient-clinic--title" translate="patient.clinic-title"></span>
+    <span class="patient-clinic--title" translate="patient.clinic-title" ng-model="searchItem" ng-click="searchClinics();"></span>
   </div>
   <div class="col-md-16 clinic-list" ng-repeat="aClinic in associatedClinics track by $index">
     <div class="col-md-3 clinic-list__detail">
@@ -40,7 +40,7 @@
     </div>
     <div class="dashboard-page__user-list--parent-list" >
       <div class="parent-detail" ng-repeat="clinic in clinics track by $index">
-        <div ng-click="selectClinicForPatient(clinics, $index)" class="dashboard-page__user-list__detailed__list--details">
+        <div ng-click="selectClinicForPatient(clinic, $index)" class="dashboard-page__user-list__detailed__list--details">
           <span class="user-name">{{clinic.name}} <sup class="parent-clinic" ng-if="clinic.parent">P</sup></span>   
         </div>
       </div>

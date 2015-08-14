@@ -49,6 +49,7 @@
           "location": "Location:"
         },
         "disassociate-patient": "Disassociate",
+        "edit-patient": "Edit",
         "demo-graph": {
           "identifier": "Patient Identifiers",
           "personal-details": "Personal Details"
@@ -72,6 +73,17 @@
           "email": "Email",
           "phone-no": "Phone No.",
           "mobile-no": "Mobile No."
+        },
+        "sum": {
+          "titlename": "Summary",
+          "ather-level": "Adherence level",
+          "avr-dur-cough-pause": "Average duration of cough pause",
+          "avr-no-cough-pause-trt": "Average number of cough pauses per treatment",
+          "avr-trt-day": "Average treatment/day",
+          "avr-cough-pause-day": "Average cough pause per day",
+          "avr-pressure-trt": "Average pressure/treatment",
+          "last-3-days-hmr": "Last 3 days HMR run rate",
+          "avr-freq-trt": "Average frequency/treatment"
         }
     }
 }

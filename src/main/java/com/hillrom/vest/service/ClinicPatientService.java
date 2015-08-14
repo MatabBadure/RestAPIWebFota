@@ -148,11 +148,6 @@ public class ClinicPatientService {
 					UserPatientAssoc clinicAdminPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, clinicAdminUser), AuthoritiesConstants.CLINIC_ADMIN, RelationshipLabelConstants.CLINIC_ADMIN);
 					userPatientAssocList.add(clinicAdminPatientAssoc);
 				}
-				// TODO for HCP Login
-				/*for(User hcpUser : clinic.getUsers()) {
-		    		UserPatientAssoc hcpUserPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, hcpUser), AuthoritiesConstants.HCP, RelationshipLabelConstants.HCP);
-		    		userPatientAssocList.add(hcpUserPatientAssoc);
-				}*/
 			}
 		}
 	}

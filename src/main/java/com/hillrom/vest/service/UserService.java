@@ -1144,7 +1144,7 @@ public class UserService {
 	    			jsonObject.put("message", ExceptionConstants.HR_564);
 	    		} else {
 	    			jsonObject.put("message", MessageConstants.HR_263);
-	    			jsonObject.put("caregivers", filteredCaregiverAssocList.get(0));
+	    			jsonObject.put("caregiver", filteredCaregiverAssocList.get(0));
 	    		}
     		} else {
     			jsonObject.put("ERROR", ExceptionConstants.HR_523);

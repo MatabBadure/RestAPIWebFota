@@ -26,7 +26,9 @@ angular.module('hillromvestApp')
 
         $scope.init = function () {
           $scope.states = [];
+          $scope.credentialsList = admin_cont.hcp.credentialsList;
           $scope.submitted = false;
+          $scope.isOtherCredential = false;
           UserService.getState().then(function(response) {
             $scope.states = response.data.states;
           }).catch(function(response) {
@@ -68,11 +70,24 @@ angular.module('hillromvestApp')
 
         $scope.init();
 
+        $scope.checkCredential = function() {
+          if ($scope.doctor.credentials === admin_cont.hcp.other) {
+            $scope.isOtherCredential = true;
+          }else {
+            $scope.doctor.otherCredential = '';
+            $scope.isOtherCredential = false;
+          }
+        }
+
 
         $scope.createDoctor = function() {
           if ($scope.form.$invalid) {
             return false;
           }
+          if( $scope.isOtherCredential ) {
+            $scope.doctor.credentials = $scope.doctor.otherCredential;
+          }
+
           $scope.doctor.clinicList = [];
           angular.forEach($scope.doctor.clinics, function(clinic){
             $scope.doctor.clinicList.push({'id': clinic.id});

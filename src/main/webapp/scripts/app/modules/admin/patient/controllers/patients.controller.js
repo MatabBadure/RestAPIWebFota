@@ -24,7 +24,6 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
 
     $scope.switchPatientTab = function(status){
       $scope.patientTab = status;
-      console.log(status);
       $state.go(status, {'patientId': $stateParams.patientId});
     };
 
@@ -67,8 +66,11 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       $scope.getPatiendDetails($stateParams.patientId, $scope.setEditMode);
     };
 
+    $scope.openEditDetail = function(){
+      $state.go('patientDemographicEdit', {'patientId': $stateParams.patientId});
+    };
+
     $scope.initProtocolDevice = function(patientId){
-      console.log('initProtocolDevice Function', patientId);
       patientService.getDevices(patientId).then(function(response){
         angular.forEach(response.data.deviceList, function(device){
           var _date = dateService.getDate(device.createdDate);
@@ -120,6 +122,8 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
         $scope.initPatientAddProtocol();
       }else if(currentRoute === 'patientAddDevice'){
         $scope.initPatientAddDevice();
+      }else if(currentRoute === 'patientDemographicEdit'){
+        $scope.initpatientDemographic();
       }
 
     };
@@ -245,6 +249,7 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
           $scope.patientStatus.isMessage = true;
           $scope.patientStatus.message = "Patient updated successfully";
           notyService.showMessage($scope.patientStatus.message, 'success');
+          $state.go('patientDemographic', {'patientId': $stateParams.patientId});
         } else {
           $scope.patientStatus.message = 'Error occured! Please try again';
           notyService.showMessage($scope.patientStatus.message, 'warning');

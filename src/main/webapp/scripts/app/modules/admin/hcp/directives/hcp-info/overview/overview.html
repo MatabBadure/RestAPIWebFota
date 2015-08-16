@@ -1,1 +1,108 @@
 <hcp-navbar></hcp-navbar>
+
+<div class="container admin-user">
+  <div class="col-md-16 admin-views">
+    <span class="admin-views--title">
+      Dr. Willie R. Allen
+    </span>
+  </div>
+
+  <div class="col-md-16 user-detail-info">
+    <div class="col-md-5 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="doctor.credentials"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value">ASRT</span>
+    </div>
+    <div class="col-md-6 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="doctor.npiNumber"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value">1023547612</span>
+    </div>
+    <div class="col-md-5 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="doctor.clinic-name"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value">Lakeland Community Hospital</span>
+    </div>
+
+    <div class="col-md-5 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="doctor.city"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value">New York</span>
+    </div>
+    <div class="col-md-6 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="doctor.state"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value">NY</span>
+    </div>
+    <div class="col-md-5 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="doctor.status"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value">Active</span>
+    </div>
+  </div>
+</div>
+
+<div class="container admin-user">
+  <div class="col-md-16 admin-views">
+    <span class="admin-views" translate="patient.clinic-assos"></span>
+  </div>
+</div>
+
+<div class="dashboard dashboard--content">
+  <div class="container dashboard__manage-view margin-top-xl">
+    <div class="dashboard__manage-view--search">
+      <div class="fuid-search-box reset-padding-right">
+        <input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" autocomplete="off" placeholder="{{'doctor.placeholder.search' | translate}}">
+        <span class="search-icon hillrom-icon icon-search-icon"></span>
+      </div>
+      <div class="fixed-filter-box reset-padding-left">
+        <div class="search-dropdown">
+          <select name="search" ng-model="sortOption" ng-change="searchDoctors()">
+            <option value="" selected>Newly Created</option>
+            <option value="email">Email</option>
+            <option value="firstName">First Name</option>
+            <option value="lastName">Last Name</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container admin-user">
+  <div class="col-md-16 detail-list">
+    <div class="col-md-4 detail-list--title">
+      <span>Lakeland Community Hospital</span>
+    </div>
+    <div class="col-md-2 detail-list--desc">
+      <span>8244 Heather Lane</span>
+    </div>
+    <div class="col-md-2 detail-list--desc">
+      <span>New York</span>
+    </div>
+    <div class="col-md-1 detail-list--desc">
+      <span>NY</span>
+    </div>
+    <div class="col-md-2 detail-list--desc">
+      <span>209-236-9080</span>
+    </div>
+    <div class="col-md-1 detail-list--desc">
+      <span>Parent</span>
+    </div>
+    <div class="col-md-2 detail-list--desc">
+      <span>HR 123456</span>
+    </div>
+    <div class="col-md-1 detail-list--desc">
+      <div class="icon-font text-right">
+        <span class="icon-lungs"></span>
+      </div>
+    </div>
+    <div class="col-md-1 detail-list--desc text-right">
+        <input type="checkbox" />
+    </div>
+  </div>
+
+  <div class="col-md-16 reset-padding margin-bottom-xl">
+    <buton class="hillrom-btn btn-inactive float-right" ng-click="linkClinic()" translate="patient.link-clinic"></buton>
+  </div>
+</div>

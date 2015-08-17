@@ -67,6 +67,16 @@
 	border-radius: 0;
 }
 
+.dashboard__form--input textarea {
+  width: 100%;
+  resize: none;
+  color: $pickled-bluewood;
+  border: 1px solid $bombay;
+  padding-left: 10px;
+  font-weight: normal;
+  border-radius: 0;
+}
+
 .dashboard__form__input select {
 	height: 30px;
 	width: 70px;

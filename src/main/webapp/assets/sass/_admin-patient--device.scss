@@ -57,6 +57,10 @@
   color: $silver-approx;
 }
 
-.admin-user .protocol-list .protocol-list--value {
+.admin-user .protocol-list .protocol-list__type span {
   font-weight: $font-weight-bold;
+}
+
+.admin-user .protocol-list .protocol-list--value {
+  font-weight: $font-weight-medium;
 }

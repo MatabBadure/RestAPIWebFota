@@ -22,6 +22,7 @@
         "link-caregiver": "Add Caregiver",
         "link-device": "Add Device",
         "link-protocol": "Add Protocol",
+        "notes": "Notes",
         "placeholder": {
           "clinic-link": "Search Clinic here",
           "device-link": "Search Device here",

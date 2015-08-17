@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+
 import javax.inject.Inject;
+
 import net.minidev.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
@@ -13,12 +16,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
+import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 
 
@@ -101,8 +106,7 @@ public class ClinicService {
     	return clinic;
     }
     
-    public JSONObject deleteClinic(String id) throws HillromException {
-    	JSONObject jsonObject = new JSONObject();
+    public String deleteClinic(String id) throws HillromException {
     	Clinic existingClinic = clinicRepository.findOne(id);
 		if(existingClinic != null) {
 			if(existingClinic.getClinicAdminId() != null) {
@@ -118,12 +122,11 @@ public class ClinicService {
 					existingClinic.setParent(false);
 				}
 				clinicRepository.delete(existingClinic);
-				jsonObject.put("message", "Clinic deleted successfully.");
+				return MessageConstants.HR_224;
 			}
 		} else {
 			throw new HillromException(ExceptionConstants.HR_544);
 		}
-		return jsonObject;
     }
 
 	/**
@@ -155,7 +158,7 @@ public class ClinicService {
 		Set<UserExtension> hcpUserList = new HashSet<>();
 		for(String id : idList){
 	    	Clinic clinic = clinicRepository.getOne(id);
-	        if(clinic == null) {
+	        if(Objects.isNull(clinic)) {
 	        	throw new HillromException(ExceptionConstants.HR_547);//Invalid clinic id found
 	        } else {
 	        	hcpUserList.addAll(clinic.getUsers());

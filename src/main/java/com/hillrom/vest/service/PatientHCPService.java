@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Inject;
-import net.minidev.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
@@ -63,7 +65,6 @@ public class PatientHCPService {
 		    		}
 		    	}
 		    	userPatientRepository.save(hcpPatientAssocList);
-		    	
 		    	users = getAssociatedHCPUserList(patientInfo);
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
@@ -76,7 +77,6 @@ public class PatientHCPService {
     
     public List<User> getAssociatedHCPUserForPatient(Long id) throws HillromException {
     	User patientUser = userRepository.findOne(id);
-    	List<User> hcpUsers = new LinkedList<>();
     	if(patientUser != null) {
     		PatientInfo patientInfo = null;
 	     	for(UserPatientAssoc patientAssoc : patientUser.getUserPatientAssoc()){
@@ -85,14 +85,13 @@ public class PatientHCPService {
 	    		}
 	    	}
 	     	if(patientInfo != null){
-		    	hcpUsers = getAssociatedHCPUserList(patientInfo);
+		    	return getAssociatedHCPUserList(patientInfo);
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
 	     	}
     	} else {
     		throw new HillromException(ExceptionConstants.HR_512);//No such user exist
      	}
-    	return hcpUsers;
     }
 
 	private List<User> getAssociatedHCPUserList(PatientInfo patientInfo) {

@@ -252,7 +252,6 @@ public class UserService {
     	if(!checkPasswordLength(password)){
     		throw new HillromException(ExceptionConstants.HR_506);//Incorrect password
     	}else{
-    		
     		userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).ifPresent(u-> {
     			String encryptedPassword = passwordEncoder.encode(password);
     			u.setPassword(encryptedPassword);
@@ -790,13 +789,13 @@ public class UserService {
 				if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 					existingUser.setDeleted(true);
 					userExtensionRepository.save(existingUser);
-					jsonObject.put("message", "Patient User deleted successfully.");
+					jsonObject.put("message", MessageConstants.HR_214);
 					//TO-DO CareGiver deactivate Stuff
 				} else if((existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN)))) {
 					existingUser.setDeleted(true);
 					userExtensionRepository.save(existingUser);
-					jsonObject.put("message", "User deleted successfully.");
+					jsonObject.put("message", MessageConstants.HR_204);
 				} else {
 					throw new HillromException(ExceptionConstants.HR_513);//Unable to delete User
 				}
@@ -809,7 +808,7 @@ public class UserService {
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN)))) {
 				existingUser.setDeleted(true);
 				userExtensionRepository.save(existingUser);
-				jsonObject.put("message", "User deleted successfully.");
+				jsonObject.put("message", MessageConstants.HR_204);
 			} else {
 				throw new HillromException(ExceptionConstants.HR_513);//
 			}
@@ -991,7 +990,7 @@ public class UserService {
 						userPatientRepository.delete(caregiverPatientAssoc);
 					}
 				});
-				jsonObject.put("message", "Caregiver User deleted successfully.");
+				jsonObject.put("message", MessageConstants.HR_264);
     		} else {
     			throw new HillromException(ExceptionConstants.HR_523);//No such patient exists
     		}

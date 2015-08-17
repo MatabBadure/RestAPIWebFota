@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -15,6 +16,7 @@ import javax.inject.Inject;
 
 import net.minidev.json.JSONObject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -37,6 +39,7 @@ import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.PredicateBuilder;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.ClinicService;
+import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
@@ -68,17 +71,16 @@ public class ClinicResource {
     public ResponseEntity<JSONObject> create(@RequestBody ClinicDTO clinicDTO) {
         log.debug("REST request to save Clinic : {}", clinicDTO);
         JSONObject jsonObject = new JSONObject();
-        Clinic clinic;
 		try {
-			clinic = clinicService.createClinic(clinicDTO);
-		
-        if (jsonObject.containsKey("ERROR")) {
-        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-        } else {
-        	jsonObject.put("message", MessageConstants.HR_221);
-            jsonObject.put("Clinic", clinic);
-            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
-        }
+			Clinic clinic = clinicService.createClinic(clinicDTO);
+	        if (Objects.isNull(clinic)) {
+	        	jsonObject.put("ERROR", ExceptionConstants.HR_541);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_221);
+	            jsonObject.put("Clinic", clinic);
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+	        }
 		} catch (HillromException e) {
 			jsonObject.put("ERROR", e.getMessage());
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
@@ -96,20 +98,18 @@ public class ClinicResource {
     public ResponseEntity<JSONObject> update(@PathVariable String id, @RequestBody ClinicDTO clinicDTO) {
         log.debug("REST request to update Clinic : {}", clinicDTO);
         JSONObject jsonObject = new JSONObject();
-        Clinic clinic;
-        
 		try {
-			clinic = clinicService.updateClinic(id, clinicDTO);
-		
-	        if (jsonObject.containsKey("ERROR")) {
+			Clinic clinic = clinicService.updateClinic(id, clinicDTO);
+	        if (Objects.isNull(clinic)) {
+	        	jsonObject.put("ERROR", ExceptionConstants.HR_543);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
-	        	jsonObject.put("message", "Clinic updated successfully.");
+	        	jsonObject.put("message", MessageConstants.HR_222);
 	            jsonObject.put("Clinic", clinic);
 	            if(clinicDTO.getParent()) {
 	            	jsonObject.put("ChildClinic", clinic.getChildClinics());
 	            }
-	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }
 		} catch (HillromException e) {
 			jsonObject.put("ERROR", e.getMessage());
@@ -170,13 +170,14 @@ public class ClinicResource {
     	log.debug("REST request to delete Clinic : {}", id);
     	JSONObject jsonObject = new JSONObject();
 		try {
-			jsonObject = clinicService.deleteClinic(id);
-		
-        if (jsonObject.containsKey("ERROR")) {
-        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-        } else {
-            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
-        }
+			String message = clinicService.deleteClinic(id);
+	        if (StringUtils.isBlank(message)) {
+	        	jsonObject.put("ERROR", ExceptionConstants.HR_549);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        } else {
+	        	jsonObject.put("message", message);
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
         } catch (HillromException e) {
         	jsonObject.put("ERROR", e.getMessage());
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
@@ -184,7 +185,7 @@ public class ClinicResource {
     }
     
     /**
-     * GET  /clinics -> search clinis.
+     * GET  /clinics -> search clinics.
      * @throws URISyntaxException 
      */
     @RequestMapping(value = "/clinics/search",
@@ -215,7 +216,7 @@ public class ClinicResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<JSONObject> getHCPUsers(@RequestParam(value = "filter",required = false) String filter) {
-        log.debug("REST request to get Clinic : {}", filter);
+        log.debug("REST request to get HCPs associated with Clinic : {}", filter);
         List<String> idList = new ArrayList<>();
         String[] idSet = filter.split(",");
         for(String id : idSet){
@@ -230,9 +231,9 @@ public class ClinicResource {
 	        } else {
 	        	jsonObject.put("hcpUsers", hcpUserList);
 	    		if(hcpUserList.isEmpty()){
-	    			jsonObject.put("message", "No associated HCPs.");
+	    			jsonObject.put("message", MessageConstants.HR_277);
 	    		} else {
-	    	      	jsonObject.put("message", "Associated HCPs fetched successfully.");
+	    	      	jsonObject.put("message", MessageConstants.HR_278);
 	            }
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }

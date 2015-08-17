@@ -48,6 +48,7 @@ public class ExceptionConstants {
     public static final String HR_546 = "Unable to delete Clinic. Healthcare Professionals are associated with it";
     public static final String HR_547 = "Invalid clinic id found";
     public static final String HR_548 = "No such clinic found";// Is it same as HR_544
+    public static final String HR_549 = "Unable to delete Clinic.";
     
     public static final String HR_553 = "Invalid Activation Key";
     public static final String HR_554 = "Invalid Data";
@@ -69,4 +70,5 @@ public class ExceptionConstants {
     
     public static final String HR_570 = "Vest device is already in Inactive mode.";
     public static final String HR_571 = "Invalid Serial Number.";
+    public static final String HR_572 = "This Vest device is already linked to patient.";
 }

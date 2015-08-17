@@ -23,6 +23,7 @@ import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.util.ExceptionConstants;
+import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 
 /**
@@ -54,7 +55,7 @@ public class PatientVestDeviceService {
     		if(activeDevice != null){
     			
     			alreadyLinkedPatientuser = (User) activeDevice.getPatient().getUserPatientAssoc().stream().filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel()));
-    			jsonObject.put("ERROR", "This Vest device is already linked to patient.");
+    			jsonObject.put("ERROR", ExceptionConstants.HR_572);
     			jsonObject.put("user", alreadyLinkedPatientuser);
     			return jsonObject;
     		} else {
@@ -81,7 +82,7 @@ public class PatientVestDeviceService {
 		 		PatientVestDeviceHistory patientVestDeviceAssoc = new PatientVestDeviceHistory(
 		 				new PatientVestDevicePK(patientInfo, deviceData.get("serialNumber")), deviceData.get("bluetoothId"), deviceData.get("hubId"), true);
 		 		patientVestDeviceRepository.save(patientVestDeviceAssoc);
-		 		jsonObject.put("message", "Vest device is linked successfully.");
+		 		jsonObject.put("message", MessageConstants.HR_282);
 		 		jsonObject.put("patient", patientInfo);
 		 	} else {
 		 		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist

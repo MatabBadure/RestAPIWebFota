@@ -7,8 +7,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import net.minidev.json.JSONObject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -57,7 +55,7 @@ public class ClinicPatientService {
     
     public List<Clinic> associateClinicsToPatient(Long id, List<Map<String, String>> clinicList) throws HillromException {
     	User patientUser = userRepository.findOne(id);
-    	List<Clinic> clinics;
+    	
     	if(patientUser != null) {
 	    	PatientInfo patientInfo = getPatientInfoObjeFromPatientUser(patientUser);
 	     	if(patientInfo != null){
@@ -66,32 +64,28 @@ public class ClinicPatientService {
 	     		getAssocObjLists(clinicList, patientInfo, clinicPatientAssocList, userPatientAssocList);
 		    	clinicPatientRepository.save(clinicPatientAssocList);
 		    	userPatientRepository.save(userPatientAssocList);
-		    	clinics = getAssociatedClinicsList(patientInfo);
-		    	
+		    	return getAssociatedClinicsList(patientInfo);
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
 	     	}
     	} else {
     		throw new HillromException(ExceptionConstants.HR_512);//No such user exist
      	}
-    	return clinics;
+    	
     }
     
     public List<Clinic> getAssociatedClinicsForPatient(Long id) throws HillromException {
-    	JSONObject jsonObject = new JSONObject();
     	User patientUser = userRepository.findOne(id);
-    	List<Clinic> clinics;
     	if(patientUser != null) {
     		PatientInfo patientInfo = getPatientInfoObjeFromPatientUser(patientUser);
 	     	if(patientInfo != null){
-	     		clinics = getAssociatedClinicsList(patientInfo);
+	     		return getAssociatedClinicsList(patientInfo);
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
 	     	}
     	} else {
     		throw new HillromException(ExceptionConstants.HR_512);//No such user exist
      	}
-    	return clinics;
     }
 
 	private List<Clinic> getAssociatedClinicsList(PatientInfo patientInfo) {
@@ -105,7 +99,6 @@ public class ClinicPatientService {
 	
     public List<Clinic> dissociateClinicsToPatient(Long id, List<Map<String, String>> clinicList) throws HillromException {
     	User patientUser = userRepository.findOne(id);
-    	List<Clinic> clinics;
     	if(patientUser != null) {
 	    	PatientInfo patientInfo = getPatientInfoObjeFromPatientUser(patientUser);
 	     	if(patientInfo != null){
@@ -114,14 +107,13 @@ public class ClinicPatientService {
 		    	getAssocObjLists(clinicList, patientInfo, clinicPatientAssocList, userPatientAssocList);
 		    	if (userPatientAssocList.size() > 0) userPatientRepository.delete(userPatientAssocList);
 		    	if (clinicPatientAssocList.size() > 0) clinicPatientRepository.delete(clinicPatientAssocList);
-		    	clinics = getAssociatedClinicsList(patientInfo);
+		    	return getAssociatedClinicsList(patientInfo);
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
 	     	}
     	} else {
     		throw new HillromException(ExceptionConstants.HR_512);//No such user exist
      	}
-    	return clinics;
     }
 
 	private PatientInfo getPatientInfoObjeFromPatientUser(User patientUser) {

@@ -2,7 +2,7 @@
 <div class="container admin-user">
   <div class="col-md-16 margin-top">
    <div class="user-gen-details">
-     <span class="user-gen-details--name">{{slectedPatient.firstName}} {{slectedPatient.lastName}}</span>
+     <span class="user-gen-details--name">{{slectedPatient.firstName}} {{slectedPatient.lastName}}&nbsp;&nbsp;</span>
      <span class="user-gen-details--hr-id">{{slectedPatient.hillromId}}</span>
    </div>
   </div>
@@ -11,7 +11,7 @@
     <span class="patient-caregiver--title" translate="patient.caregiver-title"></span>
   </div>
 
-  <div class="col-md-16 caregiver-list" ng-repeat="caregiver in caregivers track by $index">
+  <div class="col-md-16 caregiver-list" ng-repeat="caregiver in caregivers track by $index" ng-if="caregiver.user.activated"> 
     <div class="col-md-3 caregiver-list__detail">
       <span class="caregiver-list__detail--name">{{caregiver.user.firstName}}&nbsp;&nbsp; {{caregiver.user.middleName}}&nbsp;&nbsp; {{caregiver.user.lastName}}</span>
       <span class="caregiver-list__detail--email">{{caregiver.user.email}}</span>

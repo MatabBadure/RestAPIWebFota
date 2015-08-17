@@ -231,13 +231,33 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
       $scope.pageCount = 0;
       $scope.total = 0;
       $scope.clinics = [];
-      $scope.sortOption ="";
+      $scope.sortOption = "";
+      $scope.searchItem = "";
       $scope.associatedClinics = [];
       $scope.getPatientById(patientId);
       $scope.getPatientClinicInfo(patientId);
+      $scope.getClinics();
 
     }
 
+    $scope.getClinics = function(){
+      clinicService.getClinics($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
+          $scope.clinics = []; $scope.clinics.length = 0;
+          $scope.clinics = response.data;
+          for(var i=0; i < $scope.associatedClinics.length; i++){
+            for(var j=0; j <  $scope.clinics.length; j++ ){
+              if($scope.associatedClinics[i].id == $scope.clinics[j].id){
+                $scope.clinics.splice(j, 1);
+              }
+            }
+          }
+          $scope.total = response.headers()['x-total-count'];
+          $scope.pageCount = Math.ceil($scope.total / 10);
+        }).catch(function (response) {
+
+        });
+    }
+   
     $scope.formSubmit = function(){
       $scope.submitted = true;
       if($scope.form.$invalid){

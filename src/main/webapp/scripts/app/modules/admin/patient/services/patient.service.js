@@ -72,7 +72,7 @@ angular.module('hillromvestApp')
       *
       */
       getHCPsLinkedToPatient : function(id){
-        var url = admin.patient.baseURL + '/' + id + '/hcp';
+        var url = admin.patient.baseURL + id + '/hcp';
         return $http.get(url, {
           headers: headerService.getHeader()
         }).success(function (response) {

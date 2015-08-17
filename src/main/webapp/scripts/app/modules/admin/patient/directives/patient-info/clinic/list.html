@@ -1,12 +1,12 @@
 
 
-<patient-navbar></patient-navbar>
+<admin-patient-navbar></admin-patient-navbar>
 <div class="container admin-user">
   <div class="col-md-16 margin-top">
    <div class="user-gen-details">
      <span class="user-gen-details--name">Williams James</span>
      <span class="user-gen-details--hr-id">HR45321</span>
-   </div> 
+   </div>
   </div>
   <!-- <div class="col-md-16 patient-clinic">
     <span class="patient-clinic--title" translate="patient.clinic-title" ng-model="searchItem" ng-keydown="searchClinics();"></span>
@@ -42,12 +42,12 @@
       <div class="">
       <div class="parent-detail" ng-repeat="clinic in clinics track by $index">
         <div class="" ng-click="selectClinicForPatient(clinic, $index)">
-          <span class="user-name">{{clinic.name}} <sup class="parent-clinic" ng-if="clinic.parent">P</sup></span>   
+          <span class="user-name">{{clinic.name}} <sup class="parent-clinic" ng-if="clinic.parent">P</sup></span>
         </div>
       </div>
     </div>
     </div>
-    
+
     <div class="col-md-8 clinic-link">
       <buton class="hillrom-btn btn-primary float-right" ng-click="linkClinic()" translate="patient.link-clinic"></buton>
     </div>

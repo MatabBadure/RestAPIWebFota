@@ -27,15 +27,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.HcpVO;
 import com.hillrom.vest.repository.HillRomUserVO;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
-import com.hillrom.vest.service.HCPClinicService;
 import com.hillrom.vest.service.ClinicPatientService;
+import com.hillrom.vest.service.HCPClinicService;
 import com.hillrom.vest.service.PatientHCPService;
+import com.hillrom.vest.service.RelationshipLabelService;
 import com.hillrom.vest.service.UserService;
+import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
@@ -65,6 +68,10 @@ public class UserExtensionResource {
     
     @Inject
     private UserSearchRepository userSearchRepository;
+    
+    @Inject
+    private RelationshipLabelService relationshipLabelService;
+    
     /**
      * POST  /user -> Create a new User.
      */
@@ -398,7 +405,7 @@ public class UserExtensionResource {
         if (jsonObject.containsKey("ERROR")) {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {
-            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         }
     }
     
@@ -416,7 +423,29 @@ public class UserExtensionResource {
         if (jsonObject.containsKey("ERROR")) {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {
-            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * GET  /patient/relationships -> GET list of relationships of caregivers with a patient. 
+     */
+    @RequestMapping(value = "/patient/relationships",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    public ResponseEntity<JSONObject> getRelationshipLabels() {
+        log.debug("REST request to get list of relationships of caregivers with a patient User");
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	List<String> relationshipLabels = relationshipLabelService.getRelationshipLabels();
+        	jsonObject.put("message", MessageConstants.HR_265);
+        	jsonObject.put("relationshipLabels", relationshipLabels);
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
 }

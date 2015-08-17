@@ -1,10 +1,10 @@
-<patient-navbar></patient-navbar>
+<admin-patient-navbar></admin-patient-navbar>
 <div class="container admin-user">
   <div class="col-md-16 margin-top reset-padding">
    <div class="user-gen-details">
      <span class="user-gen-details--name">{{slectedPatient.id}}</span>
      <span class="user-gen-details--hr-id">{{slectedPatient.hillromId}}</span>
-   </div> 
+   </div>
   </div>
 </div>
 <div class="dashboard dashboard--content padding-bottom-ls">
@@ -189,7 +189,7 @@
 
                 <span class="has-error" ng-show="form.zip.$error.pattern">
                   Zip Code is invalid.
-                </span>                
+                </span>
               </div>
             </div>
         </div>
@@ -246,7 +246,7 @@
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
               <input type="text" class="form-control" validate-on-blur  name="mobilePhone"  ng-readonly="validateADMINorASP()" ng-model="associateCareGiver.primaryPhone" maxlength=10 ng-pattern="/^[0-9]{10}$/">
-              <div ng-show="(form.primaryPhone.$showValidationMessage && form.primaryPhone.$invalid) || submitted">        
+              <div ng-show="(form.primaryPhone.$showValidationMessage && form.primaryPhone.$invalid) || submitted">
                 <span class="has-error" ng-show="form.mobilePhone.$error.pattern">
                   Mobile number is invalid.
                 </span>

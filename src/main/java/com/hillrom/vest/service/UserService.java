@@ -1019,6 +1019,16 @@ public class UserService {
 		return patientInfo;
 	}
 	
+	public User getUserObjFromPatientInfo(PatientInfo patientInfo) {
+		User patientUser = null;
+		for(UserPatientAssoc patientAssoc : patientInfo.getUserPatientAssoc()){
+			if(SELF.equals(patientAssoc.getRelationshipLabel())){
+				patientUser = patientAssoc.getUser();
+			}
+		}
+		return patientUser;
+	}
+	
 	public JSONObject deleteCaregiverUser(Long patientUserId, Long caregiverId) {
     	JSONObject jsonObject = new JSONObject();
     	UserExtension caregiverUser = userExtensionRepository.findOne(caregiverId);

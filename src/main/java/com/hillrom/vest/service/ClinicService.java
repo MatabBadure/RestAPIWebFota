@@ -5,7 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.inject.Inject;
+
 import net.minidev.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
@@ -13,10 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.service.util.RandomUtil;
+import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 
 
@@ -31,6 +36,9 @@ public class ClinicService {
 
     @Inject
     private ClinicRepository clinicRepository;
+    
+    @Inject
+    private UserService userService;
 
     public JSONObject createClinic(ClinicDTO clinicDTO) {
     	JSONObject jsonObject = new JSONObject();
@@ -178,5 +186,20 @@ public class ClinicService {
 	      	jsonObject.put("message", "Associated HCPs fetched successfully.");
         }
         return jsonObject;
+    }
+	
+	public Set<UserExtension> getAssociatedPatientUsers(List<String> idList) throws HillromException {
+		Set<UserExtension> patientUserList = new HashSet<>();
+		for(String id : idList){
+	    	Clinic clinic = clinicRepository.getOne(id);
+	        if(clinic == null) {
+	        	throw new HillromException(ExceptionConstants.HR_547);
+	        } else {
+	        	clinic.getClinicPatientAssoc().forEach(clinicPatientAssoc -> {
+	        		patientUserList.add((UserExtension) userService.getUserObjFromPatientInfo(clinicPatientAssoc.getPatient()));
+	        	});
+	        }
+		}
+		return patientUserList;
     }
 }

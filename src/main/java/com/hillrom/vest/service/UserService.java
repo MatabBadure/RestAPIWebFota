@@ -996,6 +996,9 @@ public class UserService {
     		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
     		if(patientInfo != null) {
     			assignValuesToUserObj(userExtensionDTO, newUser);
+    			newUser.setActivated(false);
+    			newUser.setDeleted(false);
+    			newUser.setActivationKey(RandomUtil.generateActivationKey());
         		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
     			userExtensionRepository.save(newUser);
     			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, newUser), AuthoritiesConstants.CARE_GIVER, userExtensionDTO.getRelationship());

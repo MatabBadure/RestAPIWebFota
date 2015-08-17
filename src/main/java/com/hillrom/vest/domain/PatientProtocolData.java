@@ -1,16 +1,12 @@
 package com.hillrom.vest.domain;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -22,7 +18,7 @@ import org.hibernate.annotations.SQLDelete;
 @Entity
 @Table(name = "PATIENT_PROTOCOL_DATA")
 @SQLDelete(sql="UPDATE PATIENT_PROTOCOL  SET is_deleted = 1 where id = ?")
-public class PatientProtocolData implements Serializable {
+public class PatientProtocolData extends AbstractAuditingEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -30,6 +26,7 @@ public class PatientProtocolData implements Serializable {
 	@Column(name = "id")
 	private String id;
 	
+	@Column(name = "type")
 	@Size(min=6,max=7)
 	private String type;
 	
@@ -42,48 +39,56 @@ public class PatientProtocolData implements Serializable {
 	private User patientUser;
 	
 	@Column(name = "treatments_per_day")
-	@Size(min=0,max=9)
 	private int treatmentsPerDay;
 	
 	@Column(name = "min_minutes_per_treatment")
-	@Size(min=0,max=60)
 	private int minMinutesPerTreatment;
 	
 	@Column(name = "max_minutes_per_treatment")
-	@Size(min=0,max=60)
 	private int maxMinutesPerTreatment;
 	
 	@Column(name = "treatment_label")
 	private String treatmentLabel;
 	
 	@Column(name = "min_frequency")
-	@Size(min=5,max=20)
 	private Integer minFrequency;
 	
 	@Column(name = "max_frequency")
-	@Size(min=5,max=20)
 	private Integer maxFrequency;
 	
 	@Column(name = "min_pressure")
-	@Size(min=1,max=10)
 	private Integer minPressure;
 	
 	@Column(name = "max_pressure")
-	@Size(min=1,max=10)
 	private Integer maxPressure;
 	
 	@Column(name = "is_deleted")
-	private boolean isDeleted;
+	private boolean deleted = false;
 	
-	@ManyToOne(cascade={CascadeType.ALL})
-    @JoinColumn(name="protocol_id")
-    private PatientProtocolData protocol;
+    @Column(name="protocol_key")
+    private String protocolKey;
  
-    @OneToMany(mappedBy="protocol")
-    private Set<PatientProtocolData> customProtocolEntries = new HashSet<>();  
-	
 	public PatientProtocolData() {
 		super();
+	}
+
+	public PatientProtocolData(String type, PatientInfo patient,
+			User patientUser, int treatmentsPerDay, int minMinutesPerTreatment,
+			int maxMinutesPerTreatment, String treatmentLabel,
+			Integer minFrequency, Integer maxFrequency, Integer minPressure,
+			Integer maxPressure) {
+		super();
+		this.type = type;
+		this.patient = patient;
+		this.patientUser = patientUser;
+		this.treatmentsPerDay = treatmentsPerDay;
+		this.minMinutesPerTreatment = minMinutesPerTreatment;
+		this.maxMinutesPerTreatment = maxMinutesPerTreatment;
+		this.treatmentLabel = treatmentLabel;
+		this.minFrequency = minFrequency;
+		this.maxFrequency = maxFrequency;
+		this.minPressure = minPressure;
+		this.maxPressure = maxPressure;
 	}
 
 	public String getId() {
@@ -185,28 +190,19 @@ public class PatientProtocolData implements Serializable {
 	}
 
 	public boolean isDeleted() {
-		return isDeleted;
+		return deleted;
 	}
 
-	public void setDeleted(boolean isDeleted) {
-		this.isDeleted = isDeleted;
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 
-	public PatientProtocolData getProtocol() {
-		return protocol;
+	public String getProtocolKey() {
+		return protocolKey;
 	}
 
-	public void setProtocol(PatientProtocolData protocol) {
-		this.protocol = protocol;
-	}
-
-	public Set<PatientProtocolData> getCustomProtocolEntries() {
-		return customProtocolEntries;
-	}
-
-	public void setCustomProtocolEntries(
-			Set<PatientProtocolData> customProtocolEntries) {
-		this.customProtocolEntries = customProtocolEntries;
+	public void setProtocolKey(String protocolKey) {
+		this.protocolKey = protocolKey;
 	}
 
 	@Override
@@ -217,7 +213,7 @@ public class PatientProtocolData implements Serializable {
 		result = prime * result
 				+ ((patientUser == null) ? 0 : patientUser.hashCode());
 		result = prime * result
-				+ ((protocol == null) ? 0 : protocol.hashCode());
+				+ ((protocolKey == null) ? 0 : protocolKey.hashCode());
 		result = prime * result
 				+ ((treatmentLabel == null) ? 0 : treatmentLabel.hashCode());
 		result = prime * result + treatmentsPerDay;
@@ -240,10 +236,10 @@ public class PatientProtocolData implements Serializable {
 				return false;
 		} else if (!patientUser.equals(other.patientUser))
 			return false;
-		if (protocol == null) {
-			if (other.protocol != null)
+		if (protocolKey == null) {
+			if (other.protocolKey != null)
 				return false;
-		} else if (!protocol.equals(other.protocol))
+		} else if (!protocolKey.equals(other.protocolKey))
 			return false;
 		if (treatmentLabel == null) {
 			if (other.treatmentLabel != null)
@@ -262,9 +258,8 @@ public class PatientProtocolData implements Serializable {
 				+ minMinutesPerTreatment + ", treatmentLabel=" + treatmentLabel
 				+ ", minFrequency=" + minFrequency + ", maxFrequency="
 				+ maxFrequency + ", minPressure=" + minPressure
-				+ ", maxPressure=" + maxPressure + ", isDeleted=" + isDeleted
-				+ ", protocol=" + protocol + ", customProtocolEntries="
-				+ customProtocolEntries + "]";
+				+ ", maxPressure=" + maxPressure + ", deleted=" + deleted
+				+ ", protocolKey=" + protocolKey + "]";
 	}
 
 	

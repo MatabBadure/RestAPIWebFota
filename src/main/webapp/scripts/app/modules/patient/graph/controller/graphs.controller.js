@@ -2,6 +2,44 @@
 
 angular.module('hillromvestApp')
 .controller('graphController', function($scope, $state) {
+  /*---Simple pye chart JS-----*/
+    $scope.percent1 = 30;
+    $scope.percent2 = 75;
+    $scope.percent3 = 24;
+    $scope.adherence = {
+        animate:{
+            duration:3000,
+            enabled:true
+        },
+        barColor:'#ffc31c',
+        trackColor: '#ccc',
+        scaleColor: false,
+        lineWidth:12,
+        lineCap:'circle'
+    };
+    $scope.hmr = {
+        animate:{
+            duration:3000,
+            enabled:true
+        },
+        barColor:'#7e2253',
+        trackColor: '#ccc',
+        scaleColor: false,
+        lineWidth:12,
+        lineCap:'circle'
+    };
+  $scope.missedtherapy = {
+          animate:{
+              duration:3000,
+              enabled:true
+          },
+          barColor:'#ea766b',
+          trackColor: '#ccc',
+          scaleColor: false,
+          lineWidth:12,
+          lineCap:'circle'
+      };
+ /*---Simple pye chart JS END-----*/
 
     $scope.init = function() {
       var currentRoute = $state.current.name;

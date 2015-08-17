@@ -15,6 +15,7 @@ import com.hillrom.vest.domain.User;
 
 public class PatientVestDeviceTherapyUtil {
 
+	private static final String EVENT_CODE_DELIMITER = ":";
 	private static final String EVENT_CODE_NORMAL_INCOMPLETE = "4";
 	private static final String EVENT_CODE_PROGRAM_INCOMPLETE = "17";
 	private static final String EVENT_CODE_RAMP_INCOMPLETE = "26";
@@ -40,31 +41,7 @@ public class PatientVestDeviceTherapyUtil {
 	
 	public static List<TherapySession> prepareTherapySessionFromDeviceData(List<PatientVestDeviceData> deviceData){
 		List<TherapySession> therapySessions = new LinkedList<>();
-		User patientUser = deviceData.get(0).getPatientUser();
-		PatientInfo patient = deviceData.get(0).getPatient();
-		Map<Long,List<PatientVestDeviceData>> sessionEntries = groupEventsToPrepareTherapySession(deviceData);
-		for(Long timestamp : sessionEntries.keySet()){
-			List<PatientVestDeviceData> deviceEventRecords = sessionEntries.get(timestamp);
-			Map<String,Integer> metricsMap = getTherapyMetricsMap(deviceEventRecords);
-			TherapySession therapySession = new TherapySession();
-			therapySession.setDate(new DateTime(timestamp));
-			therapySession.setFrequency(metricsMap.get(FREQUENCY));
-			therapySession.setPressure(metricsMap.get(PRESSURE));
-			therapySession.setDurationInSeconds(metricsMap.get(DURATION).longValue());
-			therapySession.setNormalCaughPauses(metricsMap.get(NORMAL_COUGH_PAUSES));
-			therapySession.setProgrammedCaughPauses(metricsMap.get(PROGRAMMED_COUGH_PAUSES));
-			therapySession.setCaughPauseDuration(metricsMap.get(CAUGH_PAUSE_DURATION));
-			therapySession.setHmr(deviceEventRecords.get(deviceEventRecords.size()-1).getHmr());
-			String sessionType = SESSION_TYPE_NORMAL;
-			if(deviceEventRecords.get(0).getEventId().contains(SESSION_TYPE_PROGRAM))
-				sessionType = SESSION_TYPE_PROGRAM;
-			therapySession.setSessionType(sessionType);
-			therapySession.setStartTime(new DateTime(deviceEventRecords.get(0).getTimestamp()));
-			therapySession.setEndTime(new DateTime(deviceEventRecords.get(deviceEventRecords.size()-1).getTimestamp()));
-			therapySession.setPatientInfo(patient);
-			therapySession.setPatientUser(patientUser);
-			therapySessions.add(therapySession);
-		}
+		therapySessions = groupEventsToPrepareTherapySession(deviceData);
 		return groupTherapySessionsByDay(therapySessions);
 	}
 
@@ -89,34 +66,66 @@ public class PatientVestDeviceTherapyUtil {
 		return metricsMap;
 	}
 
-	public static Map<Long,List<PatientVestDeviceData>> groupEventsToPrepareTherapySession(
+	public static List<TherapySession> groupEventsToPrepareTherapySession(
 			List<PatientVestDeviceData> deviceData) {
-		Map<Long,List<PatientVestDeviceData>> sessionData = new HashMap<>();
+		List<TherapySession> therapySessions = new LinkedList<TherapySession>();
 		for(int i = 0; i < deviceData.size() ; i++){
 			PatientVestDeviceData vestDeviceData = deviceData.get(i);
+			String eventCode = vestDeviceData.getEventId().split(EVENT_CODE_DELIMITER)[0];
 			List<PatientVestDeviceData> groupEntries = new LinkedList<>();
-			if(vestDeviceData.getEventId().startsWith(EVENT_CODE_NORMAL_START) ||
-			   vestDeviceData.getEventId().startsWith(EVENT_CODE_PROGRAM_START) || 
-			   vestDeviceData.getEventId().startsWith(EVENT_CODE_RAMP_STARTED)
+			if(EVENT_CODE_NORMAL_START.equals(eventCode) ||
+			   EVENT_CODE_PROGRAM_START.equals(eventCode) || 
+			   EVENT_CODE_RAMP_STARTED.equals(eventCode)
 			   ){
 				groupEntries.add(vestDeviceData);
 				for(int j = i+1; j < deviceData.size() ; j++){
 					PatientVestDeviceData nextEventEntry = deviceData.get(j);
+					String nextEventCode = nextEventEntry.getEventId().split(EVENT_CODE_DELIMITER)[0];
 					groupEntries.add(nextEventEntry);
-					if(nextEventEntry.getEventId().startsWith(EVENT_CODE_COMPLETED) ||
-					   nextEventEntry.getEventId().startsWith(EVENT_CODE_PROGRAM_COMPLETED) ||
-					   nextEventEntry.getEventId().startsWith(EVENT_CODE_NORMAL_INCOMPLETE) ||
-					   nextEventEntry.getEventId().startsWith(EVENT_CODE_PROGRAM_INCOMPLETE) ||
-					   nextEventEntry.getEventId().startsWith(EVENT_CODE_RAMP_COMPLETED) ||
-					   nextEventEntry.getEventId().startsWith(EVENT_CODE_RAMP_INCOMPLETE)
+					if(EVENT_CODE_COMPLETED.equals(nextEventCode) ||
+					   EVENT_CODE_PROGRAM_COMPLETED.equals(nextEventCode) ||
+					   EVENT_CODE_NORMAL_INCOMPLETE.equals(nextEventCode) ||
+					   EVENT_CODE_PROGRAM_INCOMPLETE.equals(nextEventCode) ||
+					   EVENT_CODE_RAMP_COMPLETED.equals(nextEventCode) ||
+					   EVENT_CODE_RAMP_INCOMPLETE.equals(nextEventCode)
 							){
-						sessionData.put(vestDeviceData.getTimestamp(), groupEntries);
+						TherapySession therapySession = assignTherapyMatrics(groupEntries);
+						therapySessions.add(therapySession);
 						break;
 					}
 				}
 			}
 		}
-		return sessionData;
+		return therapySessions;
+	}
+
+	public static TherapySession assignTherapyMatrics(
+			List<PatientVestDeviceData> groupEntries) {
+		Long timestamp = groupEntries.get(0).getTimestamp();
+		User patientUser = groupEntries.get(0).getPatientUser();
+		PatientInfo patient = groupEntries.get(0).getPatient();
+		Map<String,Integer> metricsMap = getTherapyMetricsMap(groupEntries);
+		TherapySession therapySession = new TherapySession();
+		therapySession.setDate(new DateTime(timestamp));
+		therapySession.setFrequency(metricsMap.get(FREQUENCY));
+		therapySession.setPressure(metricsMap.get(PRESSURE));
+		therapySession.setDurationInSeconds(metricsMap.get(DURATION).longValue());
+		therapySession.setNormalCaughPauses(metricsMap.get(NORMAL_COUGH_PAUSES));
+		therapySession.setProgrammedCaughPauses(metricsMap.get(PROGRAMMED_COUGH_PAUSES));
+		therapySession.setCaughPauseDuration(metricsMap.get(CAUGH_PAUSE_DURATION));
+		
+		int size = groupEntries.size();
+		therapySession.setHmr(groupEntries.get(size-1).getHmr());
+		String sessionType = SESSION_TYPE_NORMAL;
+		if(groupEntries.get(0).getEventId().contains(SESSION_TYPE_PROGRAM))
+			sessionType = SESSION_TYPE_PROGRAM;
+		therapySession.setSessionType(sessionType);
+		therapySession.setStartTime(new DateTime(groupEntries.get(0).getTimestamp()));
+		therapySession.setEndTime(new DateTime(groupEntries.get(size-1).getTimestamp()));
+		therapySession.setPatientInfo(patient);
+		therapySession.setPatientUser(patientUser);
+		
+		return therapySession;
 	}
 	
 	public static List<TherapySession> groupTherapySessionsByDay(List<TherapySession> therapySessions){
@@ -133,7 +142,6 @@ public class PatientVestDeviceTherapyUtil {
 				
 			}
 		}
-		System.out.println("***** updatedTherapySessions : "+updatedTherapySessions);
 		return updatedTherapySessions;
 	}
 	

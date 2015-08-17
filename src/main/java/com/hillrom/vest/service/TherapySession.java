@@ -9,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 import com.hillrom.vest.domain.PatientInfo;
@@ -30,6 +31,7 @@ public class TherapySession {
 	@JoinColumn(name="user_id",referencedColumnName="id")
 	private User patientUser;
 	
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	private DateTime date;
 	
 	@Column(name="session_no")
@@ -39,9 +41,11 @@ public class TherapySession {
 	private String sessionType;
 	
 	@Column(name="start_time")
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	private DateTime startTime;
 	
 	@Column(name="end_time")
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	private DateTime endTime;
 	
 	@Column(name="frequency")
@@ -187,7 +191,7 @@ public class TherapySession {
 
 	@Override
 	public String toString() {
-		return "TherapySession [id=" + id + ", date=" + date
+		return "TherapySession [id=" + id + ", date=" + date.getMillis()
 				+ ", sessionNo=" + sessionNo + ", sessionType=" + sessionType
 				+ ", startTime=" + startTime + ", endTime=" + endTime
 				+ ", frequency=" + frequency + ", pressure=" + pressure

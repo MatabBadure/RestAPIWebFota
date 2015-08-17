@@ -22,8 +22,9 @@
 			<column name="user_id" type="bigint">
 				<constraints nullable="false"/>
 			</column>
-			<column name="timestamp" type="timestamp" />
+			<column name="date" type="timestamp" />
 			<column name="session_type" type="varchar(50)" />
+			<column name="session_no" type="integer" />
 			<column name="start_time" type="timestamp" />
 			<column name="end_time" type="timestamp" />
 			<column name="frequency" type="decimal" />

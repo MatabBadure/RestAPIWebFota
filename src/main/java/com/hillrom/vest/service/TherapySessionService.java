@@ -23,11 +23,22 @@ public class TherapySessionService {
 		List<TherapySession> existingTherapySessions =  therapySessionRepository.findByPatientUserId(patientUser.getId());
 		// Removing existing therapySessions from DB
 		if(existingTherapySessions.size() > 0){
+			TherapySession latestThreapySession = existingTherapySessions.get(0);
 			Iterator<TherapySession> tpsIterator = therapySessions.iterator();
 			while(tpsIterator.hasNext()){
 				TherapySession tps = tpsIterator.next();
-				if(tps.getDate().isBefore(existingTherapySessions.get(0).getDate())){
+				// Remove previous therapy Sessions
+				int tpsDayOfYear = tps.getDate().getDayOfYear();
+				int latestTpsDayOfYear = latestThreapySession.getDate().getDayOfYear();
+				if(tpsDayOfYear < latestTpsDayOfYear){
 					tpsIterator.remove();
+					//Remove previous therapySessions of the same day.
+				} else {
+					Integer tpsSessionNo = tps.getSessionNo();
+					Integer latestTpsSessionNo = latestThreapySession.getSessionNo();
+					if(tpsDayOfYear == latestTpsDayOfYear && tpsSessionNo <= latestTpsSessionNo){
+						tpsIterator.remove();
+					}
 				}
 			}
 		}

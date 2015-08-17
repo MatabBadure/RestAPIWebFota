@@ -1,9 +1,8 @@
 package com.hillrom.vest.service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -66,10 +65,10 @@ public class PatientVestDeviceDataService {
 					.parseBase64StringToPatientVestDeviceLogEntry(deviceRawLog
 							.getDeviceData());
 			
-			String deviceAddress = deviceRawLog.getDeviceAddress();
+			String deviceSerialNumber = deviceRawLog.getDeviceSerialNumber();
 
 			UserPatientAssoc userPatientAssoc = createPatientUserIfNotExists(deviceRawLog,
-					deviceAddress);
+					deviceSerialNumber);
 			assignDefaultValuesToVestDeviceData(deviceRawLog,
 					patientVestDeviceRecords, userPatientAssoc);
 			List<TherapySession> therapySessions = PatientVestDeviceTherapyUtil
@@ -88,25 +87,25 @@ public class PatientVestDeviceDataService {
 	}
 
 	private UserPatientAssoc createPatientUserIfNotExists(
-			PatientVestDeviceRawLog deviceRawLog, String deviceAddress) {
+			PatientVestDeviceRawLog deviceRawLog, String deviceSerialNumber) {
 		Optional<PatientInfo> patientFromDB = patientInfoRepository
-				.findOneBySerialNumber(deviceAddress);
+				.findOneBySerialNumber(deviceSerialNumber);
 
 		PatientInfo patientInfo = null;
 		
 		if(patientFromDB.isPresent()){
 			patientInfo = patientFromDB.get();
 			List<UserPatientAssoc> associations = userPatientRepository.findOneByPatientId(patientInfo.getId());
-			UserPatientAssoc userPatientAssoc = (UserPatientAssoc) associations.stream().filter(assoc -> 
+			List<UserPatientAssoc> userPatientAssociations =  associations.stream().filter(assoc -> 
 				RelationshipLabelConstants.SELF.equalsIgnoreCase(assoc.getRelationshipLabel())
-			);
-			return userPatientAssoc;
+			).collect(Collectors.toList());
+			return userPatientAssociations.get(0);
 		}else{
 			patientInfo = new PatientInfo();
 			// Assigns the next hillromId for the patient
 			String hillromId = patientInfoRepository.id();
 			patientInfo.setId(hillromId);
-			patientInfo.setBluetoothId(deviceAddress);
+			patientInfo.setBluetoothId(deviceRawLog.getDeviceAddress());
 			patientInfo.setHubId(deviceRawLog.getHubId());
 			patientInfo.setSerialNumber(deviceRawLog.getDeviceSerialNumber());
 			patientInfo = patientInfoRepository.save(patientInfo);

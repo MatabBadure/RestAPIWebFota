@@ -26,5 +26,6 @@ public interface PatientInfoRepository extends JpaRepository<PatientInfo,String>
 	@Procedure(outputParameterName="hillrom_id",procedureName="get_next_patient_hillromid")
 	String id();
 
+	@Query("from PatientInfo where serialNumber = ?1")
 	Optional<PatientInfo> findOneBySerialNumber(String deviceAddress);
 }

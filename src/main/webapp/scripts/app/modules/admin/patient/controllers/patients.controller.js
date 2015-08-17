@@ -312,16 +312,16 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
     $scope.initpatientCraegiverAdd = function(){
       $scope.getPatientById($stateParams.patientId);
       $scope.careGiverStatus = "new";
+      $scope.associateCareGiver = {};
       UserService.getState().then(function(response) {
         $scope.states = response.data.states;
       }).catch(function(response) {});
-      UserService.getRelationships().then(function(response) {
-        $scope.relationships = response.data.relationshipLabels;//response.data.relationships;
-       // alert(JSON.stringify($scope.relationships));
+      UserService.getRelationships().then(function(response) {        
+        $scope.relationships = response.data.relationshipLabels;
+        $scope.associateCareGiver.relationship = $scope.relationships[0];       
       }).catch(function(response) {});
     }
-    $scope.linkCaregiver = function(){
-      //$scope.associateCareGiver = "";
+    $scope.linkCaregiver = function(){      
       $state.go('patientCraegiverAdd', {'patientId': $stateParams.patientId});
     }
 
@@ -391,14 +391,12 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
           $scope.states = response.data.states;
         }).catch(function(response) {});
         UserService.getRelationships().then(function(response) {
-          $scope.relationships = response.data.relationships;
+          $scope.relationships = response.data.relationshipLabels;
         }).catch(function(response) {});
-        var caregiverId = $stateParams.caregiverId;
-        //$scope.associateCareGiver = caregiver.caregiver.user;        
+        var caregiverId = $stateParams.caregiverId;          
         patientService.getCaregiverById($stateParams.patientId, caregiverId).then(function(response){
           $scope.associateCareGiver = response.data.caregiver.user;
-          //$scope.associateCareGiver.relationship = $scope.associateCareGiver.relationshipLabel;  
-          //$scope.associateCareGiver.state = {"name": ""+$scope.associateCareGiver.state};  alert(JSON.stringify($scope.associateCareGiver.state));      
+          $scope.associateCareGiver.relationship = response.data.caregiver.relationshipLabel;          
         }).catch(function(response){});
     }
     $scope.updateCaregiver = function(patientId, caregiverId , careGiver){

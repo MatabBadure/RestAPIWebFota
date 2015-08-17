@@ -316,7 +316,8 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
         $scope.states = response.data.states;
       }).catch(function(response) {});
       UserService.getRelationships().then(function(response) {
-        $scope.relationships = response.data.relationships;
+        $scope.relationships = response.data.relationshipLabels;//response.data.relationships;
+       // alert(JSON.stringify($scope.relationships));
       }).catch(function(response) {});
     }
     $scope.linkCaregiver = function(){

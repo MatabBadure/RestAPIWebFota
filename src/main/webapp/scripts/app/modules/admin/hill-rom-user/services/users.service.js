@@ -107,10 +107,17 @@ angular.module('hillromvestApp')
         });
       },
       getRelationships: function() {
-        return $http.get('scripts/app/modules/admin/hill-rom-user/services/relationship.json')
+        ///api/patient/relationships
+        var url = admin.patient.baseURL + 'relationships';
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function(response) {
+          return response;
+        });
+        /*return $http.get('scripts/app/modules/admin/hill-rom-user/services/relationship.json')
           .success(function(response) {
             return response;
-          });
+          });*/
       },
 
     };

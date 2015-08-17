@@ -497,6 +497,7 @@ tags-input.ng-invalid .tags {
 
 .admin-user .detail-list {
   padding: 0;
+  padding-top: 10px;
   border-bottom: 1px solid $bombay;
   margin-bottom: 10px;
 }
@@ -527,5 +528,25 @@ tags-input.ng-invalid .tags {
 .admin-user .detail-list--desc .icon-font .icon-lungs {
   position: absolute;
   font-size: $font-size-icon;
-  top: -5px;
+  top: -7px;
+  right: 0;
+}
+
+.admin-user .detail-list__thead {
+  padding: 0;
+}
+
+.admin-user .detail-list__thead .detail-list__thead--desc {
+  padding: 0;
+  color: $cyan-blue-light;
+}
+
+.sort-icon {
+  display: inline-block;
+  cursor: pointer;
+  span {
+    display: block;
+    font-size: 8px;
+    color: $cyan-blue-light;
+  }
 }

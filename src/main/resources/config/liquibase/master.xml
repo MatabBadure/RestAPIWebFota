@@ -41,4 +41,5 @@
     <include file="classpath:/config/liquibase/changelog/20150812132000_create_table_patient_note.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150812191500_create_patient_vest_device_history.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150813185000_create_patient_protocol_data_table.xml" relativeToChangelogFile="false"/>
+    <!-- <include file="classpath:/config/liquibase/changelog/20150814182800_create_patient_vest_therapy_data.xml" relativeToChangelogFile="false"/> -->
  </databaseChangeLog>

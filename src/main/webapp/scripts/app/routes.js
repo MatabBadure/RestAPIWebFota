@@ -300,7 +300,7 @@ angular.module('hillromvestApp')
               },
               views: {
                   'content@': {
-                      templateUrl: 'scripts/app/modules/admin/clinic/views/list/view.html',
+                      templateUrl: 'scripts/app/modules/admin/clinic/directives/list/list.html',
                       controller: 'clinicsController'
                   }
               },
@@ -326,7 +326,7 @@ angular.module('hillromvestApp')
               },
               views: {
                   'content@': {
-                      templateUrl: 'scripts/app/modules/admin/clinic/views/create-edit/view.html',
+                      templateUrl: 'scripts/app/modules/admin/clinic/directives/create-edit/create.html',
                       controller: 'clinicsController'
                   }
               },
@@ -352,7 +352,7 @@ angular.module('hillromvestApp')
               },
               views: {
                   'content@': {
-                      templateUrl: 'scripts/app/modules/admin/clinic/views/create-edit/view.html',
+                      templateUrl: 'scripts/app/modules/admin/clinic/directives/create-edit/create.html',
                       controller: 'clinicsController'
                   }
               },
@@ -449,6 +449,31 @@ angular.module('hillromvestApp')
                         }
                     ]
                 }
+            })
+            .state('clinicProfile', {
+              parent: 'clinicUser',
+              url: '/{clinicId}/clinic-info',
+              data: {
+                  roles: ['ADMIN'],
+                  pageTitle: 'clinic.title'
+              },
+              views: {
+                  'content@': {
+                      templateUrl: 'scripts/app/modules/admin/clinic/directives/clinic-profile/profile.html',
+                      controller: 'clinicsController'
+                  }
+              },
+              resolve: {
+                  translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                      $translatePartialLoader.addPart('clinic');
+                      return $translate.refresh();
+                  }],
+                  authorize: ['Auth',
+                      function(Auth) {
+                          return Auth.authorize(false);
+                      }
+                  ]
+              }
             })
 
 });

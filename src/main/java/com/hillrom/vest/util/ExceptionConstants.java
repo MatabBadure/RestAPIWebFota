@@ -64,6 +64,8 @@ public class ExceptionConstants {
     public static final String HR_561 = "Unable to create Caregiver.";
     public static final String HR_562 = "Unable to update Caregiver.";
     public static final String HR_563 = "Reached maximum limit to associate caregiver.";
+    public static final String HR_564 = "No such caregiver found";
+    public static final String HR_565 = "No Relationship labels found.";
     
     public static final String HR_570 = "Vest device is already in Inactive mode.";
     public static final String HR_571 = "Invalid Serial Number.";

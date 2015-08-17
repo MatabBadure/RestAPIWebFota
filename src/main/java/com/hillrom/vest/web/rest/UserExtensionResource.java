@@ -39,6 +39,7 @@ import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.ClinicPatientService;
 import com.hillrom.vest.service.HCPClinicService;
 import com.hillrom.vest.service.PatientHCPService;
+import com.hillrom.vest.service.RelationshipLabelService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -73,6 +74,10 @@ public class UserExtensionResource {
     
     @Inject
     private UserSearchRepository userSearchRepository;
+    
+    @Inject
+    private RelationshipLabelService relationshipLabelService;
+    
     /**
      * POST  /user -> Create a new User.
      */
@@ -525,8 +530,8 @@ public class UserExtensionResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
-    public ResponseEntity<JSONObject> createCaregiver(@PathVariable Long patientUserId, @PathVariable Long caregiverUserId, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
-        log.debug("REST request to save User : {}", userExtensionDTO);
+    public ResponseEntity<JSONObject> updateCaregiver(@PathVariable Long patientUserId, @PathVariable Long caregiverUserId, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
+        log.debug("REST request to update caregiver User : {}", userExtensionDTO);
         JSONObject jsonObject = new JSONObject();
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         try {
@@ -540,7 +545,47 @@ public class UserExtensionResource {
         if (jsonObject.containsKey("ERROR")) {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {
-            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * GET  /patient/{patientUserId}/caregiver/{caregiverUserId} -> GET a caregiver {caregiverUserId} for a patient with {patientUserId}. 
+     */
+    @RequestMapping(value = "/patient/{patientUserId}/caregiver/{caregiverUserId}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    public ResponseEntity<JSONObject> getCaregiver(@PathVariable Long patientUserId, @PathVariable Long caregiverUserId) {
+        log.debug("REST request to get caregiver User : {}", caregiverUserId);
+        JSONObject jsonObject = userService.getCaregiverUser(patientUserId, caregiverUserId);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * GET  /patient/relationships -> GET list of relationships of caregivers with a patient. 
+     */
+    @RequestMapping(value = "/patient/relationships",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    public ResponseEntity<JSONObject> getRelationshipLabels() {
+        log.debug("REST request to get list of relationships of caregivers with a patient User");
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	List<String> relationshipLabels = relationshipLabelService.getRelationshipLabels();
+        	jsonObject.put("message", MessageConstants.HR_265);
+        	jsonObject.put("relationshipLabels", relationshipLabels);
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
 }

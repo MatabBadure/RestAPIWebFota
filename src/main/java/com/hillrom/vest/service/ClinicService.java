@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+
 import javax.inject.Inject;
+
 import net.minidev.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
@@ -13,10 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.service.util.RandomUtil;
+import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 
 
@@ -178,5 +184,23 @@ public class ClinicService {
 	      	jsonObject.put("message", "Associated HCPs fetched successfully.");
         }
         return jsonObject;
+    }
+	
+	public Clinic getClinicInfo(String clinicId) throws HillromException {
+		Clinic clinic = clinicRepository.findOne(clinicId);
+        if(Objects.isNull(clinic)) {
+	      	throw new HillromException(ExceptionConstants.HR_548);
+        } else {
+        	return clinic;
+        }
+    }
+	
+	public List<Clinic> getChildClinics(String clinicId) throws HillromException {
+		Clinic clinic = clinicRepository.findOne(clinicId);
+        if(Objects.isNull(clinic)) {
+	      	throw new HillromException(ExceptionConstants.HR_548);
+        } else {
+        	return clinic.getChildClinics();
+        }
     }
 }

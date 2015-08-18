@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,10 +31,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.Clinic;
+import com.hillrom.vest.domain.PatientProtocolData;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.PredicateBuilder;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.ClinicService;
+import com.hillrom.vest.util.ExceptionConstants;
+import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 import com.mysema.query.types.expr.BooleanExpression;
@@ -121,13 +126,25 @@ public class ClinicResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Clinic> get(@PathVariable String id) {
+    public ResponseEntity<JSONObject> get(@PathVariable String id) {
         log.debug("REST request to get Clinic : {}", id);
-        return Optional.ofNullable(clinicRepository.findOne(id))
-            .map(clinic -> new ResponseEntity<>(
-                clinic,
-                HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        JSONObject jsonObject = new JSONObject();
+        try {
+    		Clinic clinic = clinicService.getClinicInfo(id);
+	    	if (Objects.isNull(clinic)) {
+	        	jsonObject.put("ERROR", ExceptionConstants.HR_548);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_223);
+	        	jsonObject.put("clinic", clinic);
+	        	if(clinic.isParent())
+	        		jsonObject.put("childClinics", clinicService.getChildClinics(id));
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+    	} catch(HillromException hre){
+    		jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+    	}
     }
 
     /**

@@ -57,7 +57,7 @@ angular.module('hillromvestApp')
         title: 'Mr.'
       };
     };
-    
+
     $scope.goToPatientClinics = function(){      
       $state.go('patientEditClinics',{'patientId': $stateParams.patientId});
 

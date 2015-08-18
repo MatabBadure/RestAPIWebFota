@@ -64,3 +64,15 @@
 .admin-user .protocol-list .protocol-list--value {
   font-weight: $font-weight-medium;
 }
+
+.protocol-point {
+  margin-top: 20px;
+}
+
+.add-new-point {
+  font-size: 14px;
+  font-weight: normal;
+  cursor: pointer;
+  border-bottom: 1px solid #363A41;
+  color: #363A41;
+}

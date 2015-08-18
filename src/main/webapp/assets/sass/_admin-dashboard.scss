@@ -509,3 +509,10 @@
 tags-input.ng-invalid .tags {
     box-shadow: none;
 }
+
+.radio-box-text {
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  color: $nevada;
+  padding-right: 10px;
+}

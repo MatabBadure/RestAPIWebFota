@@ -36,9 +36,12 @@
         },
         "protocol": {
           "tm-per-day": "Treatment per Day",
-          "min-per-tm": "Minutes per Treatment",
-          "frequency": "Frequency",
-          "min-minute-per-day": "Minimum minutes of use per day",
+          "min-minutes-per-tm": "Min Minutes/Treatment",
+          "max-minutes-per-tm": "Max Minutes/Treatment",
+          "min-frequency": "Min Frequency",
+          "max-frequency": "Max Frequency",
+          "min-pressure": "Min Pressure",
+          "max-pressure": "Max Pressure",
           "gen-details": "Add Protocol"
         },
         "overview": {

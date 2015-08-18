@@ -1,11 +1,20 @@
 'use strict';
 
-angular.module('hillromvestApp').controller('patientsController', function($scope, $filter, $state, $stateParams, patientService, dateService, notyService, UserService, clinicService,$rootScope) {
+angular.module('hillromvestApp')
+.filter('range', function() {
+  return function(val, range) {
+    range = parseInt(range);
+    for (var i=0; i<range; i++)
+      val.push(i);
+    return val;
+  };
+})
+.controller('patientsController', function($scope, $filter, $state, $stateParams, patientService, dateService, notyService, UserService, clinicService,$rootScope) {
 
 
     $scope.patient = {};
     $scope.patientTab = "";
-
+    $scope.newProtocolPoint = 1;
     $scope.patientStatus = {
       'role': localStorage.getItem('role'),
       'editMode': false,
@@ -489,5 +498,10 @@ angular.module('hillromvestApp').controller('patientsController', function($scop
         $state.go('patientProtocol');
       }).catch(function(response){});
     };
+
+    $scope.addNewProtocolPoint = function (){
+      $scope.newProtocolPoint += 1;
+    }
+
     $scope.init();
   });

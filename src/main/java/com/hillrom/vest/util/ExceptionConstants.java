@@ -58,8 +58,10 @@ public class ExceptionConstants {
     public static final String HR_558 = "Forbidden";//Is it same as HR_505?
     
     // Protocol
-    public static final String HR_551 = "No protocol found for patient.";
-    public static final String HR_552 = "Unable to create protocol for patient.";
+    public static final String HR_551 = "No such protocol found for patient.";
+    public static final String HR_552 = "Treatments/day should be in between 1 & 7. (both inclusive).";
+    public static final String HR_559 = "Unable to create protocol.";
+    public static final String HR_560 = "Unable to update protocol.";
     
     //Caregiver user
     public static final String HR_561 = "Unable to create Caregiver.";

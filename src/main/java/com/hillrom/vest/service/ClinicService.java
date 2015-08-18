@@ -38,6 +38,9 @@ public class ClinicService {
 
     @Inject
     private ClinicRepository clinicRepository;
+    
+    @Inject
+    private UserService userService;
 
     public Clinic createClinic(ClinicDTO clinicDTO) throws HillromException {
     	Clinic newClinic = new Clinic();
@@ -62,7 +65,6 @@ public class ClinicService {
     }
 
     public Clinic updateClinic(String id, ClinicDTO clinicDTO) throws HillromException {
-    	JSONObject jsonObject = new JSONObject();
     	Clinic clinic = clinicRepository.getOne(id);
         if(clinic == null) {
         	throw new HillromException(ExceptionConstants.HR_548);//No such clinic found
@@ -165,5 +167,38 @@ public class ClinicService {
 	        }
 		}
         return hcpUserList;
+    }
+	
+	public Set<UserExtension> getAssociatedPatientUsers(List<String> idList) throws HillromException {
+		Set<UserExtension> patientUserList = new HashSet<>();
+		for(String id : idList){
+	    	Clinic clinic = clinicRepository.getOne(id);
+	        if(clinic == null) {
+	        	throw new HillromException(ExceptionConstants.HR_547);
+	        } else {
+	        	clinic.getClinicPatientAssoc().forEach(clinicPatientAssoc -> {
+	        		patientUserList.add((UserExtension) userService.getUserObjFromPatientInfo(clinicPatientAssoc.getPatient()));
+	        	});
+	        }
+		}
+		return patientUserList;
+	}
+	
+	public Clinic getClinicInfo(String clinicId) throws HillromException {
+		Clinic clinic = clinicRepository.findOne(clinicId);
+        if(Objects.isNull(clinic)) {
+	      	throw new HillromException(ExceptionConstants.HR_548);
+        } else {
+        	return clinic;
+        }
+    }
+	
+	public List<Clinic> getChildClinics(String clinicId) throws HillromException {
+		Clinic clinic = clinicRepository.findOne(clinicId);
+        if(Objects.isNull(clinic)) {
+	      	throw new HillromException(ExceptionConstants.HR_548);
+        } else {
+        	return clinic.getChildClinics();
+        }
     }
 }

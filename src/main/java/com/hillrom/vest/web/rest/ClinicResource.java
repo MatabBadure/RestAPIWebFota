@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -149,13 +148,25 @@ public class ClinicResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Clinic> get(@PathVariable String id) {
+    public ResponseEntity<JSONObject> get(@PathVariable String id) {
         log.debug("REST request to get Clinic : {}", id);
-        return Optional.ofNullable(clinicRepository.findOne(id))
-            .map(clinic -> new ResponseEntity<>(
-                clinic,
-                HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        JSONObject jsonObject = new JSONObject();
+        try {
+    		Clinic clinic = clinicService.getClinicInfo(id);
+	    	if (Objects.isNull(clinic)) {
+	        	jsonObject.put("ERROR", ExceptionConstants.HR_548);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_223);
+	        	jsonObject.put("clinic", clinic);
+	        	if(clinic.isParent())
+	        		jsonObject.put("childClinics", clinicService.getChildClinics(id));
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+    	} catch(HillromException hre){
+    		jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+    	}
     }
 
     /**
@@ -209,7 +220,7 @@ public class ClinicResource {
     }
     
     /**
-     * GET  /clinics/:id/hcp -> get the hcp users for the clinic with id :id.
+     * GET  /clinics/hcp -> get the hcp users for the clinic.
      */
     @RequestMapping(value = "/clinics/hcp",
             method = RequestMethod.GET,
@@ -242,6 +253,37 @@ public class ClinicResource {
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 		}
         
+    }
+    
+    /**
+     * GET  /clinics/patients -> get the patient users for the clinic.
+     */
+    @RequestMapping(value = "/clinics/patients",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<JSONObject> getAssociatedPatientUsers(@RequestParam(value = "filter",required = false) String filter) {
+        log.debug("REST request to get Clinic : {}", filter);
+        List<String> idList = new ArrayList<>();
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	String[] idSet = filter.split(",");
+            for(String id : idSet){
+            	idList.add(id.split(":")[1]);
+            }
+        	Set<UserExtension> patientUserList = clinicService.getAssociatedPatientUsers(idList);
+	        if(patientUserList.isEmpty()){
+				jsonObject.put("message", MessageConstants.HR_279);
+				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+			} else {
+		      	jsonObject.put("message", MessageConstants.HR_280);
+		      	jsonObject.put("patientUsers", patientUserList);
+		      	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+        } catch(HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
     }
     
 }

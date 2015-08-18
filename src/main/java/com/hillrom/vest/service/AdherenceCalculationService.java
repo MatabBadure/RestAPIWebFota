@@ -18,7 +18,7 @@ public class AdherenceCalculationService {
 	@Inject
 	private PatientProtocolService protocolService;
 	
-	public List<PatientCompliance> getComplainceScoreByTherapySessions(List<TherapySession> therapySessions) throws HillromException{
+/*	public List<PatientCompliance> getComplainceScoreByTherapySessions(List<TherapySession> therapySessions) throws HillromException{
 		Long patientUserId = therapySessions.get(0).getPatientUser().getId();
 		PatientProtocolData protocolData =  protocolService.getProtocolsAssociatedWithPatient(patientUserId);
 		
@@ -50,7 +50,7 @@ public class AdherenceCalculationService {
 			
 		}  
 		return null;
-	}
+	}*/
 	
 	
 	

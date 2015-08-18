@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -201,5 +202,23 @@ public class ClinicService {
 	        }
 		}
 		return patientUserList;
+	}
+	
+	public Clinic getClinicInfo(String clinicId) throws HillromException {
+		Clinic clinic = clinicRepository.findOne(clinicId);
+        if(Objects.isNull(clinic)) {
+	      	throw new HillromException(ExceptionConstants.HR_548);
+        } else {
+        	return clinic;
+        }
+    }
+	
+	public List<Clinic> getChildClinics(String clinicId) throws HillromException {
+		Clinic clinic = clinicRepository.findOne(clinicId);
+        if(Objects.isNull(clinic)) {
+	      	throw new HillromException(ExceptionConstants.HR_548);
+        } else {
+        	return clinic.getChildClinics();
+        }
     }
 }

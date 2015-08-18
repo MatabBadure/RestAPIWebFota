@@ -1,0 +1,78 @@
+.admin-user .patient-device,
+.admin-user .patient-protocol {
+  margin-top: 20px;
+  padding: 10px 0;
+  &--title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    color: $pickled-bluewood;
+  }
+}
+
+.admin-user .device-list,
+.admin-user .protocol-list {
+  padding: 0;
+  margin-top: 20px;
+  div {
+    padding: 0;
+    span {
+      color: $pickled-bluewood;
+      font-size: $font-size-base;
+      font-weight: $font-weight-medium;
+    }
+  }
+  border-bottom: 1px solid $celeste;
+  padding-bottom: 10px;
+}
+
+.admin-user .list-inactive {
+  div {
+    padding: 0;
+    span {
+      color: $silver-approx;
+    }
+  }
+}
+
+.admin-user .device-list__lung,
+.admin-user .protocol-list__lung {
+  position: relative;
+  .icon-lungs {
+    position: absolute;
+    font-size: 30px;
+    top: -5px;
+  }
+}
+
+.admin-user .device-list__lung .active,
+.admin-user .protocol-list__lung .active {
+  color: $fruit-salad;
+}
+
+.admin-user .protocol-list .protocol-list__type {
+  font-weight: $font-weight-medium;
+}
+
+.protocol-list.inactive .protocol-list--text {
+  color: $silver-approx;
+}
+
+.admin-user .protocol-list .protocol-list__type span {
+  font-weight: $font-weight-bold;
+}
+
+.admin-user .protocol-list .protocol-list--value {
+  font-weight: $font-weight-medium;
+}
+
+.protocol-point {
+  margin-top: 20px;
+}
+
+.add-new-point {
+  font-size: 14px;
+  font-weight: normal;
+  cursor: pointer;
+  border-bottom: 1px solid #363A41;
+  color: #363A41;
+}

@@ -141,6 +141,213 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
+            .state('patientOverview', {
+                parent: 'patientUser',
+                url: '/{patientId}/overview',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/overview/patient-details.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient');$translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+
+            .state('patientDemographic', {
+                parent: 'patientUser',
+                url: '/{patientId}/demographic',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/patient-demographics/detail.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient');$translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+
+            .state('patientDemographicEdit', {
+                parent: 'patientUser',
+                url: '/{patientId}/demographicedit',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/patient-demographics/edit.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient');$translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+
+            .state('patientClinics', {
+                parent: 'patientUser',
+                url: '/{patientId}/clinic-info',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/clinic/list.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+            .state('patientProtocol', {
+                parent: 'patientUser',
+                url: '/{patientId}/protocol-device',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/device-protocol/list.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+
+            .state('patientAddDevice', {
+                parent: 'patientProtocol',
+                url: '/addDevice',
+                params:{device: null},
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/device-protocol/add-device.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+            .state('patientAddProtocol', {
+                parent: 'patientProtocol',
+                url: '/addProtocol',
+                params: {protocol: null},
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/device-protocol/add-protocol.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+
+            .state('patientCraegiver', {
+                parent: 'patientUser',
+                url: '/{patientId}/caregiver',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/caregiver/list.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
             .state('hillRomUser', {
                 parent: 'admin',
                 url: '/hillRomUsers',
@@ -374,17 +581,17 @@ angular.module('hillromvestApp')
                 url: '/patient',
                 abstract: true,
             })
-            .state('patientclinic', {
-                parent: 'patient',
-                url: '/clinics',
+            .state('patientCraegiverAdd', {
+                parent: 'patientCraegiver',
+                url: '/caregiver-add',
                 data: {
-                    roles: ['PATIENT'],
+                    roles: ['ADMIN'],
                     pageTitle: 'patient.title'
                 },
                 views: {
                     'content@': {
-                        templateUrl: 'scripts/app/modules/patient/clinic/views/list/view.html',
-                        controller: 'patientClinicsController'
+                        templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/caregiver/create.html',
+                        controller: 'patientsController'
                     }
                 },
                 resolve: {
@@ -399,7 +606,32 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
-            
+            .state('patientCraegiverEdit', {
+                parent: 'patientCraegiver',
+                url: '/{caregiverId}/caregiver-edit',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/caregiver/create.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+
             .state('graphView', {
                 url: '/graphs',
                 data: {

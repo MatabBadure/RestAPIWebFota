@@ -1,0 +1,132 @@
+<admin-patient-navbar></admin-patient-navbar>
+<div class="container admin-user">
+  <div class="col-md-16 margin-top reset-padding">
+   <div class="user-gen-details">
+     <span class="user-gen-details--name">Williams James</span>
+     <span class="user-gen-details--hr-id">HR45321</span>
+   </div>
+  </div>
+</div>
+<div class="container admin-user">
+  <div class="col-md-16 margin-top reset-padding">
+    <div class="form-group">
+      <span>
+        <label>
+          <input type="radio" name="protocolType" ng-model="">
+          <span class="radio-box-text">Custom</span>
+        </label>
+      </span>
+      <span>
+            <input type="radio" name="protocolType" ng-model="">
+            <span class="radio-box-text">Default</span>
+        </label>
+      </span>
+    </div>
+  </div>
+</div>
+
+<div class="dashboard dashboard--content padding-bottom-ls">
+  <form name="addProtocolForm" ng-submit="editPatient()" novalidate autocomplete="off">
+    <div class="container dashboard__form">
+      <div>
+        <div class="col-md-16 reset-padding">
+          <span class="dashboard__form--type" translate="patient.protocol.gen-details"></span>
+        </div>
+
+        <div class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.protocol.tm-per-day"></span>
+              <span class="">*</span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input class="" type="text" ng-model= "protocol.treatmentsPerDay" required>
+            </div>
+          </div>
+        </div>
+        <div class="clr"></div>
+      </div>
+      <div class="protocol-point" ng-repeat="n in [] | range:newProtocolPoint">
+        <div class="col-md-16 reset-padding">
+          <span class="dashboard__form--type">Point {{n+1}}</span>
+        </div>
+
+        <div class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.protocol.min-minutes-per-tm"></span>
+              <span class="">*</span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input class="" type="text" ng-model="protocol.minMinutesPerTreatment" required>
+            </div>
+          </div>
+          <div class="col-md-7 reset-padding col-md-offset-2">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.protocol.max-minutes-per-tm"></span>
+              <span class="">*</span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input class="" type="text" ng-model="protocol.maxMinutesPerTreatment" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.protocol.min-frequency"></span>
+              <span class="">*</span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input class="" type="text" ng-model="protocol.minFrequency" required>
+            </div>
+          </div>
+          <div class="col-md-7 reset-padding col-md-offset-2">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.protocol.max-frequency"></span>
+              <span class="">*</span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input class="" type="text" ng-model="protocol.maxFrequency" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.protocol.min-pressure"></span>
+              <span class="">*</span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input class="" type="text" ng-model="protocol.minPressure" required>
+            </div>
+          </div>
+          <div class="col-md-7 reset-padding col-md-offset-2">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.protocol.max-pressure"></span>
+              <span class="">*</span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input class="" type="text" ng-model="protocol.maxPressure" required>
+            </div>
+          </div>
+        </div>
+      <div class="clr"></div>
+    </div>
+
+    <div class="col-md-16 margin-top reset-padding">
+    <span class="add-new-point" ng-click="(newProtocolPoint ===7)||addNewProtocolPoint()">Add New Point</span>
+    </div>
+    <div class="col-md-16 margin-top reset-padding">
+      <div class="">
+        <buton ng-if="!protocol.edit" type="submit" class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="addProtocol()" ng-show="!patientStatus.isCreate" translate="patient.btn.save">Save</buton>
+        <buton ng-if="protocol.edit" type="submit" class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="updateProtocol()" ng-show="!patientStatus.isCreate" translate="patient.btn.update">Update</buton>
+        <buton type="submit" class="hillrom-btn btn-secondary float-right" ng-click="cancelProtocolDevice()" ng-show="!patientStatus.isCreate" translate="patient.btn.cancel">cancel</buton>
+        <div class="clr"></div>
+      </div>
+    </div>
+    </div>
+  </form>
+</div>

@@ -50,6 +50,12 @@
 	font-weight: normal;
 }
 
+.dashboard__form--label-val {
+  line-height: 30px;
+  color: $regent-gray;
+  font-weight: normal;
+}
+
 .dashboard__form--input input {
 	height: 30px;
 	//width: 270px;
@@ -59,6 +65,16 @@
 	padding-left: 10px;
 	font-weight: normal;
 	border-radius: 0;
+}
+
+.dashboard__form--input textarea {
+  width: 100%;
+  resize: none;
+  color: $pickled-bluewood;
+  border: 1px solid $bombay;
+  padding-left: 10px;
+  font-weight: normal;
+  border-radius: 0;
 }
 
 .dashboard__form__input select {
@@ -98,8 +114,7 @@
 }
 
 .hillrom-btn {
-	right: 40px;
-  padding: 5px 24px;
+  padding: 5px 10px;
   border-radius: 3px;
   text-transform: capitalize;
   font-size: $font-size-small;
@@ -111,6 +126,24 @@
   background-color: $terracotta;
   color: $body-bg;
   margin-left: 10px;
+}
+
+.btn-primary {
+  border: 1px solid $sunshade;
+  background-color: $sunshade;
+  color: $tuna;
+}
+
+.btn-secondary {
+  border: 1px solid $texas-rose;
+  background-color: $texas-rose;
+  color: $tuna;
+}
+
+.btn-inactive {
+  border: 1px solid $gainsboro;
+  background-color: $gainsboro;
+  color: $body-bg;
 }
 
 .btn-submit-disable {
@@ -475,4 +508,11 @@
 
 tags-input.ng-invalid .tags {
     box-shadow: none;
+}
+
+.radio-box-text {
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  color: $nevada;
+  padding-right: 10px;
 }

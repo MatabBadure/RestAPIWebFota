@@ -1,4 +1,4 @@
-package com.hillrom.vest.service;
+package com.hillrom.vest.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,9 +11,13 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
-import com.hillrom.vest.domain.PatientInfo;
-import com.hillrom.vest.domain.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
+import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 
 @Entity
 @Table(name="PATIENT_VEST_THERAPY_DATA")
@@ -23,16 +27,20 @@ public class TherapySession {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	
+	@JsonIgnore
 	@ManyToOne(optional=false,targetEntity=PatientInfo.class)
 	@JoinColumn(name="patient_id",referencedColumnName="id")
 	private PatientInfo patientInfo;
 	
+	@JsonIgnore
 	@ManyToOne(optional=false,targetEntity=User.class)
 	@JoinColumn(name="user_id",referencedColumnName="id")
 	private User patientUser;
 	
-    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-	private DateTime date;
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
+	@JsonSerialize(using = CustomLocalDateSerializer.class)
+    @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
+	private LocalDate date;
 	
 	@Column(name="session_no")
 	private Integer sessionNo;
@@ -54,8 +62,8 @@ public class TherapySession {
 	@Column(name="pressure")
 	private Integer pressure;
 	
-	@Column(name="duration_in_seconds")
-	private Long durationInSeconds;
+	@Column(name="duration_in_minutes")
+	private Long durationInMinutes;
 	
 	@Column(name="programmed_caugh_pauses")
 	private Integer programmedCaughPauses;
@@ -93,11 +101,11 @@ public class TherapySession {
 		this.patientUser = patientUser;
 	}
 
-	public DateTime getDate() {
+	public LocalDate getDate() {
 		return date;
 	}
 
-	public void setDate(DateTime date) {
+	public void setDate(LocalDate date) {
 		this.date = date;
 	}
 
@@ -149,12 +157,12 @@ public class TherapySession {
 		this.pressure = pressure;
 	}
 
-	public Long getDurationInSeconds() {
-		return durationInSeconds;
+	public Long getDurationInMinutes() {
+		return durationInMinutes;
 	}
 
-	public void setDurationInSeconds(Long durationInSeconds) {
-		this.durationInSeconds = durationInSeconds;
+	public void setDurationInMinutes(Long durationInSeconds) {
+		this.durationInMinutes = durationInSeconds;
 	}
 
 	public Integer getProgrammedCaughPauses() {
@@ -191,11 +199,11 @@ public class TherapySession {
 
 	@Override
 	public String toString() {
-		return "TherapySession [id=" + id + ", date=" + date.getMillis()
+		return "TherapySession [id=" + id + ", date=" + date
 				+ ", sessionNo=" + sessionNo + ", sessionType=" + sessionType
 				+ ", startTime=" + startTime + ", endTime=" + endTime
 				+ ", frequency=" + frequency + ", pressure=" + pressure
-				+ ", durationInSeconds=" + durationInSeconds
+				+ ", durationInSeconds=" + durationInMinutes
 				+ ", programmedCaughPauses=" + programmedCaughPauses
 				+ ", normalCaughPauses=" + normalCaughPauses
 				+ ", caughPauseDuration=" + caughPauseDuration 
@@ -207,6 +215,18 @@ public class TherapySession {
 	}
 	
 	public long getDurationLongValue(){
-		return this.durationInSeconds.longValue();
+		return this.durationInMinutes.longValue();
+	}
+	
+	public int getWeekOfTheMonth(){
+		return this.date.getWeekyear();
+	}
+	
+	public int getMonthOfTheYear(){
+		return this.date.getMonthOfYear();
+	}
+	
+	public int getYear(){
+		return this.date.getYear();
 	}
 }

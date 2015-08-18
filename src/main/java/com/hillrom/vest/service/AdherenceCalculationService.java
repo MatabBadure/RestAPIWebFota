@@ -10,6 +10,7 @@ import javax.inject.Inject;
 
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientProtocolData;
+import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.exceptionhandler.HillromException;
 
 public class AdherenceCalculationService {
@@ -38,12 +39,12 @@ public class AdherenceCalculationService {
 
 	private PatientCompliance calculateCompliancePerDay(
 			List<TherapySession> therapySessionsPerDay, Integer day,PatientProtocolData protocolData) {
-		long totalDuration = therapySessionsPerDay.stream().collect(Collectors.summingLong(TherapySession::getDurationInSeconds));
+		long totalDuration = therapySessionsPerDay.stream().collect(Collectors.summingLong(TherapySession::getDurationInMinutes));
 		double weightedAvgFrequency = 0.0;
 		double weightedAvgPressure = 0.0;
 		for(TherapySession therapySession : therapySessionsPerDay){
-			weightedAvgFrequency += (therapySession.getDurationInSeconds()/totalDuration)*therapySession.getFrequency();
-			weightedAvgPressure += (therapySession.getDurationInSeconds()/totalDuration)*therapySession.getPressure();
+			weightedAvgFrequency += (therapySession.getDurationInMinutes()/totalDuration)*therapySession.getFrequency();
+			weightedAvgPressure += (therapySession.getDurationInMinutes()/totalDuration)*therapySession.getPressure();
 		}
 		if(protocolData.getMinimumMinutesOfUsePerDay() > totalDuration){
 			

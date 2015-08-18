@@ -1,5 +1,6 @@
-package com.hillrom.vest.service;
+package com.hillrom.vest.service.util;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -8,9 +9,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientVestDeviceData;
+import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
 
 public class PatientVestDeviceTherapyUtil {
@@ -106,10 +109,10 @@ public class PatientVestDeviceTherapyUtil {
 		PatientInfo patient = groupEntries.get(0).getPatient();
 		Map<String,Integer> metricsMap = getTherapyMetricsMap(groupEntries);
 		TherapySession therapySession = new TherapySession();
-		therapySession.setDate(new DateTime(timestamp));
+		therapySession.setDate(LocalDate.fromDateFields(new Date(timestamp)));
 		therapySession.setFrequency(metricsMap.get(FREQUENCY));
 		therapySession.setPressure(metricsMap.get(PRESSURE));
-		therapySession.setDurationInSeconds(metricsMap.get(DURATION).longValue());
+		therapySession.setDurationInMinutes(metricsMap.get(DURATION).longValue());
 		therapySession.setNormalCaughPauses(metricsMap.get(NORMAL_COUGH_PAUSES));
 		therapySession.setProgrammedCaughPauses(metricsMap.get(PROGRAMMED_COUGH_PAUSES));
 		therapySession.setCaughPauseDuration(metricsMap.get(CAUGH_PAUSE_DURATION));

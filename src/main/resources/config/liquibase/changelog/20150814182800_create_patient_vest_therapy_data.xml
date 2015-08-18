@@ -22,14 +22,14 @@
 			<column name="user_id" type="bigint">
 				<constraints nullable="false"/>
 			</column>
-			<column name="date" type="timestamp" />
+			<column name="date" type="date" />
 			<column name="session_type" type="varchar(50)" />
 			<column name="session_no" type="integer" />
 			<column name="start_time" type="timestamp" />
 			<column name="end_time" type="timestamp" />
 			<column name="frequency" type="decimal" />
 			<column name="pressure" type="decimal" />
-			<column name="duration_in_seconds" type="bigint"/>
+			<column name="duration_in_minutes" type="bigint"/>
 			<column name="programmed_caugh_pauses" type="integer"/>
 			<column name="normal_caugh_pauses" type="integer"/>
 			<column name="caugh_pause_duration" type="integer"/>

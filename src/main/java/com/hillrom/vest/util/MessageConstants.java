@@ -41,4 +41,8 @@ public class MessageConstants {
     public static final String HR_262 = "Caregiver User updated successfully.";
     public static final String HR_263 = "Caregiver User fetched successfully.";
     public static final String HR_264 = "Caregiver User deleted successfully.";
+    public static final String HR_265 = "Relationship labels fetched successfully.";
+    
+    public static final String HR_279 = "No Associated Patients with clinic.";
+    public static final String HR_280 = "Associated Patients with clinic fetched successfully.";
 }

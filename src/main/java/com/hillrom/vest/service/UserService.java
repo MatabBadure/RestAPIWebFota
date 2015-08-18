@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -995,6 +996,9 @@ public class UserService {
     		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
     		if(patientInfo != null) {
     			assignValuesToUserObj(userExtensionDTO, newUser);
+    			newUser.setActivated(false);
+    			newUser.setDeleted(false);
+    			newUser.setActivationKey(RandomUtil.generateActivationKey());
         		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
     			userExtensionRepository.save(newUser);
     			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, newUser), AuthoritiesConstants.CARE_GIVER, userExtensionDTO.getRelationship());
@@ -1016,6 +1020,16 @@ public class UserService {
 			}
 		}
 		return patientInfo;
+	}
+	
+	public User getUserObjFromPatientInfo(PatientInfo patientInfo) {
+		User patientUser = null;
+		for(UserPatientAssoc patientAssoc : patientInfo.getUserPatientAssoc()){
+			if(SELF.equals(patientAssoc.getRelationshipLabel())){
+				patientUser = patientAssoc.getUser();
+			}
+		}
+		return patientUser;
 	}
 	
 	public JSONObject deleteCaregiverUser(Long patientUserId, Long caregiverId) {
@@ -1128,5 +1142,30 @@ public class UserService {
     	}
     	return null;
 	}
+	
+	public JSONObject getCaregiverUser(Long patientUserId, Long caregiverUserId) {
+    	JSONObject jsonObject = new JSONObject();
+		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
+		if(Objects.nonNull(patientUser)) {
+			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
+    		if(patientInfo != null) {
+    			List<UserPatientAssoc> caregiverAssocList = getListOfCaregiversAssociatedToPatientUser(patientUser);
+    			List<UserPatientAssoc> filteredCaregiverAssocList =  caregiverAssocList.parallelStream()
+    					.filter(caregiverAssoc -> caregiverUserId.equals(caregiverAssoc.getUser().getId()))
+    					.collect(Collectors.toList());
+	    		if(filteredCaregiverAssocList.isEmpty()){
+	    			jsonObject.put("message", ExceptionConstants.HR_564);
+	    		} else {
+	    			jsonObject.put("message", MessageConstants.HR_263);
+	    			jsonObject.put("caregiver", filteredCaregiverAssocList.get(0));
+	    		}
+    		} else {
+    			jsonObject.put("ERROR", ExceptionConstants.HR_523);
+    		}
+		} else {
+			jsonObject.put("ERROR", ExceptionConstants.HR_512);
+		}
+		return jsonObject;
+    }
 }
 

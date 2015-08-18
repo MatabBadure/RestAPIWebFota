@@ -2,68 +2,120 @@ package com.hillrom.vest.domain;
 
 import java.io.Serializable;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
+
+import org.hibernate.annotations.SQLDelete;
 
 /**
  * A PATIENT_PROTOCOL_DATA.
  */
 @Entity
 @Table(name = "PATIENT_PROTOCOL_DATA")
-public class PatientProtocolData implements Serializable {
+@SQLDelete(sql="UPDATE PATIENT_PROTOCOL  SET is_deleted = 1 where id = ?")
+public class PatientProtocolData extends AbstractAuditingEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	private String id;
 	
-	@OneToOne
+	@Column(name = "type")
+	@Size(min=6,max=7)
+	private String type;
+	
+	@ManyToOne
     @JoinColumn(name = "PATIENT_ID") 
     private PatientInfo patient;
+	
+	@ManyToOne
+    @JoinColumn(name = "USER_ID")
+	private User patientUser;
 	
 	@Column(name = "treatments_per_day")
 	private int treatmentsPerDay;
 	
-	@Column(name = "minutes_per_treatment")
-	private int minutesPerTreatment;
+	@Column(name = "min_minutes_per_treatment")
+	private int minMinutesPerTreatment;
 	
-	@Column(name = "frequencies")
-	private String frequencies;
+	@Column(name = "max_minutes_per_treatment")
+	private int maxMinutesPerTreatment;
 	
-	@Column(name = "minimum_minutes_of_use_per_day")
-	private int minimumMinutesOfUsePerDay;
+	@Column(name = "treatment_label")
+	private String treatmentLabel;
 	
+	@Column(name = "min_frequency")
+	private Integer minFrequency;
+	
+	@Column(name = "max_frequency")
+	private Integer maxFrequency;
+	
+	@Column(name = "min_pressure")
+	private Integer minPressure;
+	
+	@Column(name = "max_pressure")
+	private Integer maxPressure;
+	
+	@Column(name = "is_deleted")
+	private boolean deleted = false;
+	
+    @Column(name="protocol_key")
+    private String protocolKey;
+ 
 	public PatientProtocolData() {
 		super();
 	}
 
-	public PatientProtocolData(PatientInfo patient,
-			int treatmentsPerDay, int minutesPerTreatment, String frequencies,
-			int minimumMinutesOfUsePerDay) {
+	public PatientProtocolData(String type, PatientInfo patient,
+			User patientUser, int treatmentsPerDay, int minMinutesPerTreatment,
+			int maxMinutesPerTreatment, String treatmentLabel,
+			Integer minFrequency, Integer maxFrequency, Integer minPressure,
+			Integer maxPressure) {
 		super();
+		this.type = type;
 		this.patient = patient;
+		this.patientUser = patientUser;
 		this.treatmentsPerDay = treatmentsPerDay;
-		this.minutesPerTreatment = minutesPerTreatment;
-		this.frequencies = frequencies;
-		this.minimumMinutesOfUsePerDay = minimumMinutesOfUsePerDay;
+		this.minMinutesPerTreatment = minMinutesPerTreatment;
+		this.maxMinutesPerTreatment = maxMinutesPerTreatment;
+		this.treatmentLabel = treatmentLabel;
+		this.minFrequency = minFrequency;
+		this.maxFrequency = maxFrequency;
+		this.minPressure = minPressure;
+		this.maxPressure = maxPressure;
 	}
 
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public int getMaxMinutesPerTreatment() {
+		return maxMinutesPerTreatment;
+	}
+
+
+	public void setMaxMinutesPerTreatment(int maxMinutesPerTreatment) {
+		this.maxMinutesPerTreatment = maxMinutesPerTreatment;
+	}
+
 
 	public PatientInfo getPatient() {
 		return patient;
@@ -72,7 +124,15 @@ public class PatientProtocolData implements Serializable {
 	public void setPatient(PatientInfo patient) {
 		this.patient = patient;
 	}
-	
+
+	public User getPatientUser() {
+		return patientUser;
+	}
+
+	public void setPatientUser(User patientUser) {
+		this.patientUser = patientUser;
+	}
+
 	public int getTreatmentsPerDay() {
 		return treatmentsPerDay;
 	}
@@ -81,40 +141,81 @@ public class PatientProtocolData implements Serializable {
 		this.treatmentsPerDay = treatmentsPerDay;
 	}
 
-	public int getMinutesPerTreatment() {
-		return minutesPerTreatment;
+	public int getMinMinutesPerTreatment() {
+		return minMinutesPerTreatment;
 	}
 
-	public void setMinutesPerTreatment(int minutesPerTreatment) {
-		this.minutesPerTreatment = minutesPerTreatment;
+	public void setMinMinutesPerTreatment(int minMinutesPerTreatment) {
+		this.minMinutesPerTreatment = minMinutesPerTreatment;
 	}
 
-	public String getFrequencies() {
-		return frequencies;
+	public String getTreatmentLabel() {
+		return treatmentLabel;
 	}
 
-	public void setFrequencies(String frequencies) {
-		this.frequencies = frequencies;
+	public void setTreatmentLabel(String treatmentLabel) {
+		this.treatmentLabel = treatmentLabel;
 	}
 
-	public int getMinimumMinutesOfUsePerDay() {
-		return minimumMinutesOfUsePerDay;
+	public Integer getMinFrequency() {
+		return minFrequency;
 	}
 
-	public void setMinimumMinutesOfUsePerDay(int minimumMinutesOfUsePerDay) {
-		this.minimumMinutesOfUsePerDay = minimumMinutesOfUsePerDay;
+	public void setMinFrequency(Integer minFrequency) {
+		this.minFrequency = minFrequency;
+	}
+
+	public Integer getMaxFrequency() {
+		return maxFrequency;
+	}
+
+	public void setMaxFrequency(Integer maxFrequency) {
+		this.maxFrequency = maxFrequency;
+	}
+
+	public Integer getMinPressure() {
+		return minPressure;
+	}
+
+	public void setMinPressure(Integer minPressure) {
+		this.minPressure = minPressure;
+	}
+
+	public Integer getMaxPressure() {
+		return maxPressure;
+	}
+
+	public void setMaxPressure(Integer maxPressure) {
+		this.maxPressure = maxPressure;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
+
+	public String getProtocolKey() {
+		return protocolKey;
+	}
+
+	public void setProtocolKey(String protocolKey) {
+		this.protocolKey = protocolKey;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + minMinutesPerTreatment;
 		result = prime * result
-				+ ((frequencies == null) ? 0 : frequencies.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + minimumMinutesOfUsePerDay;
-		result = prime * result + minutesPerTreatment;
-		result = prime * result + ((patient == null) ? 0 : patient.hashCode());
+				+ ((patientUser == null) ? 0 : patientUser.hashCode());
+		result = prime * result
+				+ ((protocolKey == null) ? 0 : protocolKey.hashCode());
+		result = prime * result
+				+ ((treatmentLabel == null) ? 0 : treatmentLabel.hashCode());
 		result = prime * result + treatmentsPerDay;
 		return result;
 	}
@@ -128,24 +229,22 @@ public class PatientProtocolData implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		PatientProtocolData other = (PatientProtocolData) obj;
-		if (frequencies == null) {
-			if (other.frequencies != null)
+		if (minMinutesPerTreatment != other.minMinutesPerTreatment)
+			return false;
+		if (patientUser == null) {
+			if (other.patientUser != null)
 				return false;
-		} else if (!frequencies.equals(other.frequencies))
+		} else if (!patientUser.equals(other.patientUser))
 			return false;
-		if (id == null) {
-			if (other.id != null)
+		if (protocolKey == null) {
+			if (other.protocolKey != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!protocolKey.equals(other.protocolKey))
 			return false;
-		if (minimumMinutesOfUsePerDay != other.minimumMinutesOfUsePerDay)
-			return false;
-		if (minutesPerTreatment != other.minutesPerTreatment)
-			return false;
-		if (patient == null) {
-			if (other.patient != null)
+		if (treatmentLabel == null) {
+			if (other.treatmentLabel != null)
 				return false;
-		} else if (!patient.equals(other.patient))
+		} else if (!treatmentLabel.equals(other.treatmentLabel))
 			return false;
 		if (treatmentsPerDay != other.treatmentsPerDay)
 			return false;
@@ -154,12 +253,14 @@ public class PatientProtocolData implements Serializable {
 
 	@Override
 	public String toString() {
-		return "PatientProtocolData [id=" + id + ", patient=" + patient
-				+ ", treatmentsPerDay=" + treatmentsPerDay
-				+ ", minutesPerTreatment=" + minutesPerTreatment
-				+ ", frequencies=" + frequencies
-				+ ", minimumMinutesOfUsePerDay=" + minimumMinutesOfUsePerDay
-				+ "]";
+		return "PatientProtocolData [id=" + id + ", treatmentsPerDay="
+				+ treatmentsPerDay + ", minMinutesPerTreatment="
+				+ minMinutesPerTreatment + ", treatmentLabel=" + treatmentLabel
+				+ ", minFrequency=" + minFrequency + ", maxFrequency="
+				+ maxFrequency + ", minPressure=" + minPressure
+				+ ", maxPressure=" + maxPressure + ", deleted=" + deleted
+				+ ", protocolKey=" + protocolKey + "]";
 	}
 
+	
 }

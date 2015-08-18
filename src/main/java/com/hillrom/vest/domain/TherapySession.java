@@ -218,15 +218,15 @@ public class TherapySession {
 		return this.durationInMinutes.longValue();
 	}
 	
-	public int getWeekOfTheMonth(){
+	public int getDayOfTheWeek(){
+		return this.date.getDayOfWeek();
+	}
+	
+	public int getWeekOfYear(){
 		return this.date.getWeekyear();
 	}
 	
 	public int getMonthOfTheYear(){
 		return this.date.getMonthOfYear();
-	}
-	
-	public int getYear(){
-		return this.date.getYear();
 	}
 }

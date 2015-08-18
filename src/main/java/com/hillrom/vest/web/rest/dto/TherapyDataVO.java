@@ -17,6 +17,8 @@ public class TherapyDataVO{
 	private DateTime start;
 	private DateTime end;
 	private int coughPauseDuration;
+	private int duration;
+	
 	public DateTime getTimestamp() {
 		return timestamp;
 	}
@@ -83,7 +85,13 @@ public class TherapyDataVO{
 	public void setCoughPauseDuration(int coughPauseDuration) {
 		this.coughPauseDuration = coughPauseDuration;
 	}
-
+	public int getDuration() {
+		return duration;
+	}
+	public void setDuration(int duration) {
+		this.duration = duration;
+	}
+	
 
 
 }

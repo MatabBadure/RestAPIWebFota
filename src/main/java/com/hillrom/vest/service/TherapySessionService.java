@@ -62,13 +62,13 @@ public class TherapySessionService {
 						LocalDate.fromDateFields(new Date(fromTimestamp)),
 						LocalDate.fromDateFields(new Date(toTimestamp)));
 		if(GROUP_BY_WEEKLY.equalsIgnoreCase(groupBy)){
-			Map<Integer,List<TherapySession>> groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getWeekOfTheMonth));
+			Map<Integer,List<TherapySession>> groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getDayOfTheWeek));
 			return (List<TherapyDataVO>) calculateWeightedAvgs(groupedSessions); 
 		}else if(GROUP_BY_MONTHLY.equals(groupBy)){
-			Map<Integer,List<TherapySession>> groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getMonthOfTheYear));
+			Map<Integer,List<TherapySession>> groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getWeekOfYear));
 			return (List<TherapyDataVO>) calculateWeightedAvgs(groupedSessions);
 		}else if(GROUP_BY_YEARLY.equals(groupBy)){
-			Map<Integer,List<TherapySession>> groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getYear));
+			Map<Integer,List<TherapySession>> groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getMonthOfTheYear));
 			return (List<TherapyDataVO>) calculateWeightedAvgs(groupedSessions);
 		}
 		return null;
@@ -87,7 +87,7 @@ public class TherapySessionService {
 			DateTime start = sessions.get(0).getStartTime();
 			DateTime end = sessions.get(sessions.size()-1).getEndTime();
 			TherapyDataVO vo = new TherapyDataVO();
-			long totalDuration = sessions.stream().collect(Collectors.summingLong(TherapySession::getDurationInMinutes));
+			Long totalDuration = sessions.stream().collect(Collectors.summingLong(TherapySession::getDurationInMinutes));
 			double weightedAvgFrequency = 0.0d,weightedAvgPressure = 0.0d;
 			int coughPauses = 0,programmedCoughPauses = 0,normalCoughPauses = 0,coughPauseDuration = 0;
 			int treatmentsPerDay = 0;
@@ -110,6 +110,7 @@ public class TherapySessionService {
 			vo.setEnd(end);
 			vo.setTimestamp(start.toDateTime());
 			vo.setTreatmentsPerDay(treatmentsPerDay);
+			vo.setDuration(totalDuration.intValue());
 			processedData.add(vo);
 		}
 		return processedData;

@@ -140,7 +140,7 @@ angular.module('hillromvestApp')
           return response;
         });
       },
-      =======
+
       /**
       * @ngdoc method
       * @name disassociatePatient
@@ -227,7 +227,7 @@ angular.module('hillromvestApp')
           return response;
         });
       },
-      
+
       addDevice : function(id, data){
         var url = admin.patient.baseURL + id + '/linkvestdevice';
         return $http.put(url, data, {

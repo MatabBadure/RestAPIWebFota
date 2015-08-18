@@ -29,7 +29,7 @@
           </div>
         </div>
       </div>
-      <div class="dashboard__manage-view--list" ng-repeat="clinic in clinics" ng-class="{ 'inactive': clinic.deleted }">
+      <div class="dashboard__manage-view--list" ng-repeat="clinic in clinics | filter: {name: searchItem}"  ng-class="{ 'inactive': clinic.deleted }">
         <div  ng-click="clinic.deleted || selectClinic(clinic)">
           <div class="col-md-3 reset-padding-left">
             <span class="user-name">{{clinic.name}} <sup class="parent-clinic" ng-if="clinic.parent">P</sup></span>

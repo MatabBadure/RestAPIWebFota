@@ -2,6 +2,17 @@
 
 angular.module('hillromvestApp')
 .controller('graphController', function($scope, $state) {
+
+  /*-----Date picker for dashboard----*/
+/* $scope.date = {
+  startDate: '08/12/2015', 
+  endDate: '08/18/2015',
+  opens: 'center',
+  parentEl: '#dp3',
+};*/
+console.log("from and To dates :"+$scope.dates);
+  /*-----Date picker for dashboard----*/
+
   /*---Simple pye chart JS-----*/
     $scope.percent1 = 30;
     $scope.percent2 = 75;
@@ -78,6 +89,7 @@ angular.module('hillromvestApp')
     }
 
     $scope.xAxisTickValuesFunction = function(){
+      
     return function(d){
         var tickVals = [];
         var values = d[0].values;
@@ -111,6 +123,7 @@ angular.module('hillromvestApp')
       }
       $scope.xAxisTickFormatFunction();
       $scope.toolTipContentFunction();
+      d3.select("g.nv-y.nv-axis").select("text.nv-axislabel").attr({y:"-3em"});
     }
     // Yearly chart
     $scope.hmrYearlyChart = function() {
@@ -128,6 +141,8 @@ angular.module('hillromvestApp')
       }
       $scope.xAxisTickFormatFunction();
       $scope.toolTipContentFunction();
+      d3.select("g.nv-y.nv-axis").select("text.nv-axislabel").attr({y:"-3em"});
+
     }
     // Monthly chart
     $scope.hmrMonthlyChart = function() {
@@ -145,6 +160,8 @@ angular.module('hillromvestApp')
       }
       $scope.xAxisTickFormatFunction();
       $scope.toolTipContentFunction();
+      d3.select("g.nv-y.nv-axis").select("text.nv-axislabel").attr({y:"-3em"});
+
     }
 
     $scope.init();

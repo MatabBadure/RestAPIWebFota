@@ -48,6 +48,10 @@ module.exports = function (config) {
             'main/webapp/bower_components/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.js',
             'main/webapp/bower_components/requirejs/require.js',
             'main/webapp/bower_components/jquery.easy-pie-chart/dist/jquery.easypiechart.js',
+            'main/webapp/bower_components/bootstrap/dist/js/bootstrap.js',
+            'main/webapp/bower_components/moment/moment.js',
+            'main/webapp/bower_components/bootstrap-daterangepicker/daterangepicker.js',
+            'main/webapp/bower_components/angular-daterangepicker/js/angular-daterangepicker.js',
             'main/webapp/bower_components/angular-mocks/angular-mocks.js',
             'main/webapp/bower_components/angular-loading-bar/build/loading-bar.js',
             // endbower

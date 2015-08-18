@@ -14,7 +14,8 @@ angular.module('hillromvestApp',
    'angular-noty',
    'angular-loading-bar',
    'nvd3ChartDirectives',
-   'easypiechart'
+   'easypiechart',
+   'daterangepicker'
    ])
 .run(function($rootScope, $location, $window, $http, $state, $translate, Language, Auth, Principal, ENV, VERSION) {
     $rootScope.ENV = ENV;

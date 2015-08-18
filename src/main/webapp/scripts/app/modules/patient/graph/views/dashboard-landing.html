@@ -64,7 +64,7 @@
 							<li role="presentation" class=""><a href="" ng-click="hmrWeeklyChart()">Week</a></li>
 							<li role="presentation" class=""><a href="" ng-click="hmrMonthlyChart()">Month</a></li>
 							<li role="presentation" class=""><a href="" ng-click="hmrYearlyChart()">Year</a></li>
-							<li role="presentation" class=""><a href="">Date</a></li>
+							<li role="presentation" class="" id="dp3"><a href="" date-range-picker class="date-picker" ng-model="dates" parentEl="#dp3" options="{'opens': 'left', 'parentEl': '#dp3'}">Date</a></li>
 						</ul>
 					</div>
 					<!-- <div>
@@ -85,18 +85,18 @@
 				<nvd3-line-chart
 				data="graphData"
 				id="HMRGraph"
+				class="dashboard_line_graph"
 				width="1250"
 				height="350"
-				showXAxis="true"
+				showXAxis="false"
 				showYAxis="true"
 				legends="true"
 				interactive="true"
 				tooltips="true"
 				isArea="true"
-				interpolate="step"
+				interpolate="step-after"
 				objectEquality="true"
 				yAxisLabel="Minutes"
-				margin="{left:100,top:20,bottom:20,right:10}"
 				xAxisTickFormat="xAxisTickFormatFunction()"
 				xAxisTickValues="xAxisTickValuesFunction()"
 				tooltipcontent="toolTipContentFunction()">

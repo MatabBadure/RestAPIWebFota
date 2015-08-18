@@ -14,7 +14,7 @@ angular.module('hillromvestApp')
     $scope.init = function() {
       var currentRoute = $state.current.name;     
       if (currentRoute === 'clinicEdit') {
-        $scope.initClnicEdit($stateParams.clinicId, $scope.setEditMode);
+        $scope.initClinicEdit($stateParams.clinicId, $scope.setEditMode);
         //$scope.getClinicDetails($stateParams.clinicId, $scope.setEditMode);
       } else if (currentRoute === 'clinicNew') {
         $scope.initCreateClinic();
@@ -80,6 +80,9 @@ angular.module('hillromvestApp')
         }else{
           $scope.clinic.status = "Active";
         }
+        /*if(){
+
+        }*/
       }).catch(function(response) {});
     }
 
@@ -300,5 +303,14 @@ angular.module('hillromvestApp')
       $scope.clinicStatus.isMessage = false;
     };
 */
+    /* clinic profile view*/
+    $scope.getHCPs = function(clinicId){      
+      var clinicIds = [];
+      clinicIds.push(clinicId);
+      $state.go('hcpUser', {
+        'clinicIds': clinicIds
+      });
+    }
+    /* clinic profile view*/
     $scope.init();
   });

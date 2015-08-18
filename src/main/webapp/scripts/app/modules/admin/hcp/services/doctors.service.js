@@ -60,11 +60,12 @@ angular.module('hillromvestApp')
         var url = 'api/clinics/hcp';
         url = url + '?filter=';
         var flag = false;
-        angular.forEach(filterArray, function(filter) {
+        angular.forEach(filterArray, function(filter, index) {
+
                 if (flag === true){
-                  url = url + ',id:' + filter.id;
+                  url = url + ',id:' + filterArray[index];
                 } else{
-                  url = url + 'id:' + filter.id;
+                  url = url + 'id:' + filterArray[index];
                 }
                 flag = true;
         });

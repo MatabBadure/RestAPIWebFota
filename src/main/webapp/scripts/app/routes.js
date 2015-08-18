@@ -218,7 +218,7 @@ angular.module('hillromvestApp')
             })
             .state('hcpUser', {
                 parent: 'admin',
-                url: '/hcpUsers',
+                url: '/hcpUsers?clinicIds',
                 data: {
                     roles: ['ADMIN'],
                     pageTitle: 'patient.title'
@@ -475,5 +475,5 @@ angular.module('hillromvestApp')
                   ]
               }
             })
-
+            
 });

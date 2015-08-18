@@ -27,28 +27,28 @@
     <div class="col-md-4 user-detail-info__data">
       <span class="user-detail-info__data--key" translate="clinic.phoneNumber"></span>
       <span class="user-detail-info__data--key">:</span>
-      <span class="user-detail-info__data--value">209-263-9080</span>
+      <span class="user-detail-info__data--value">{{clinic.phoneNumber}}</span>
     </div>
     <div class="col-md-4 user-detail-info__data">
       <span class="user-detail-info__data--key" translate="clinic.address"></span>
       <span class="user-detail-info__data--key">:</span>
-      <span class="user-detail-info__data--value">8244 Heather Lane</span>
+      <span class="user-detail-info__data--value">{{clinic.address}}</span>
     </div>
     <div class="col-md-4 user-detail-info__data">
       <span class="user-detail-info__data--key" translate="clinic.city"></span>
       <span class="user-detail-info__data--key">:</span>
-      <span class="user-detail-info__data--value">New York</span>
+      <span class="user-detail-info__data--value">{{clinic.city}}</span>
     </div>
     <div class="col-md-4 user-detail-info__data">
       <span class="user-detail-info__data--key" translate="clinic.state"></span>
       <span class="user-detail-info__data--key">:</span>
-      <span class="user-detail-info__data--value">NY</span>
+      <span class="user-detail-info__data--value">{{clinic.state}}</span>
     </div>
   </div>
 
-  <div class="col-md-16 reset-padding margin-top">
-    <buton class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="linkClinic()" translate="clinic-view-assoc-patients"></buton>
-    <buton class="hillrom-btn btn-secondary float-right" ng-click="linkClinic()" translate="clinic-view-assoc-hcps"></buton>
+  <div class="col-md-16 reset-padding margin-top" ng-if="clinic.id">
+    <buton class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="getPatients(clinic.id)" translate="clinic-view-assoc-patients"></buton>
+    <buton class="hillrom-btn btn-secondary float-right" ng-click="getHCPs(clinic.id)" translate="clinic-view-assoc-hcps"></buton>
   </div>
 </div>
 
@@ -79,7 +79,7 @@
   </div>
 </div>
 
-<div class="container admin-user">
+<div class="container admin-user" ng-if="clinic.parent">
 <div class="col-md-16 detail-list__thead">
     <div class="col-md-3 detail-list__thead--desc">
       <span>Clinic Name</span>
@@ -139,7 +139,7 @@
     </div>
   </div>
 
-  <div class="col-md-16 detail-list">
+  <div class="col-md-16 detail-list" >
     <div class="col-md-3 detail-list--title">
       <span>Lakeland Community Hospital</span>
     </div>

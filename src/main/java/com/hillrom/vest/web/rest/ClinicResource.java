@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,10 +31,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.Clinic;
+import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.PredicateBuilder;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.ClinicService;
+import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 import com.mysema.query.types.expr.BooleanExpression;
@@ -173,7 +177,7 @@ public class ClinicResource {
     }
     
     /**
-     * GET  /clinics/:id/hcp -> get the hcp users for the clinic with id :id.
+     * GET  /clinics/hcp -> get the hcp users for the clinic.
      */
     @RequestMapping(value = "/clinics/hcp",
             method = RequestMethod.GET,
@@ -191,6 +195,37 @@ public class ClinicResource {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         } else {
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * GET  /clinics/patients -> get the patient users for the clinic.
+     */
+    @RequestMapping(value = "/clinics/patients",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<JSONObject> getAssociatedPatientUsers(@RequestParam(value = "filter",required = false) String filter) {
+        log.debug("REST request to get Clinic : {}", filter);
+        List<String> idList = new ArrayList<>();
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	String[] idSet = filter.split(",");
+            for(String id : idSet){
+            	idList.add(id.split(":")[1]);
+            }
+        	Set<UserExtension> patientUserList = clinicService.getAssociatedPatientUsers(idList);
+	        if(patientUserList.isEmpty()){
+				jsonObject.put("message", MessageConstants.HR_279);
+				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+			} else {
+		      	jsonObject.put("message", MessageConstants.HR_280);
+		      	jsonObject.put("patientUsers", patientUserList);
+		      	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+        } catch(HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
     

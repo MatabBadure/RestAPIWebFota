@@ -784,7 +784,7 @@ public class UserService {
     	authorities.stream().forEach(authority -> {
     		authorityMap.put(authority.getName(), authority);
     	});
-		if(existingUser.getId() != null) {
+		if(Objects.nonNull(existingUser)) {
 				if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))) {
 				if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 					existingUser.setDeleted(true);
@@ -810,10 +810,10 @@ public class UserService {
 				userExtensionRepository.save(existingUser);
 				jsonObject.put("message", MessageConstants.HR_204);
 			} else {
-				throw new HillromException(ExceptionConstants.HR_513);//
+				throw new HillromException(ExceptionConstants.HR_513);//Unable to delete User
 			}
 		} else {
-			throw new HillromException(ExceptionConstants.HR_513);//Unable to delete User
+			throw new HillromException(ExceptionConstants.HR_512);//No such user exist
 		}
 		return jsonObject;
     }
@@ -877,10 +877,10 @@ public class UserService {
 	
 	public User getUser(Long id) throws HillromException{
 		User user = userRepository.findOne(id);
-		if(user.getId() != null) {
+		if(Objects.nonNull(user)) {
 			return user;
 		} else {
-			throw new HillromException(ExceptionConstants.HR_514);//Unable to fetch User
+			throw new HillromException(ExceptionConstants.HR_512);//No such user exist
 		}	
 		
 	 }
@@ -985,8 +985,7 @@ public class UserService {
 		return patientUser;
 	}
 	
-	public JSONObject deleteCaregiverUser(Long patientUserId, Long caregiverId) throws HillromException {
-    	JSONObject jsonObject = new JSONObject();
+	public String deleteCaregiverUser(Long patientUserId, Long caregiverId) throws HillromException {
     	UserExtension caregiverUser = userExtensionRepository.findOne(caregiverId);
     	if(caregiverUser.getId() != null) {
     		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
@@ -1003,14 +1002,13 @@ public class UserService {
 						userPatientRepository.delete(caregiverPatientAssoc);
 					}
 				});
-				jsonObject.put("message", MessageConstants.HR_264);
+				return MessageConstants.HR_264;
     		} else {
     			throw new HillromException(ExceptionConstants.HR_523);//No such patient exists
     		}
 		} else {
 			throw new HillromException(ExceptionConstants.HR_516);//Unable to delete Caregiver User.");
 		}
-		return jsonObject;
     }
 	
 	public List<UserPatientAssoc> getCaregiversForPatient(Long patientUserId) throws HillromException {
@@ -1093,7 +1091,7 @@ public class UserService {
     	return null;
 	}
 	
-	public JSONObject getCaregiverUser(Long patientUserId, Long caregiverUserId) {
+	public UserPatientAssoc getCaregiverUser(Long patientUserId, Long caregiverUserId) throws HillromException {
     	JSONObject jsonObject = new JSONObject();
 		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
 		if(Objects.nonNull(patientUser)) {
@@ -1104,18 +1102,17 @@ public class UserService {
     					.filter(caregiverAssoc -> caregiverUserId.equals(caregiverAssoc.getUser().getId()))
     					.collect(Collectors.toList());
 	    		if(filteredCaregiverAssocList.isEmpty()){
-	    			jsonObject.put("message", ExceptionConstants.HR_564);
+	    			throw new HillromException(ExceptionConstants.HR_564);
 	    		} else {
 	    			jsonObject.put("message", MessageConstants.HR_263);
-	    			jsonObject.put("caregiver", filteredCaregiverAssocList.get(0));
+	    			return filteredCaregiverAssocList.get(0);
 	    		}
     		} else {
-    			jsonObject.put("ERROR", ExceptionConstants.HR_523);
+    			throw new HillromException(ExceptionConstants.HR_523);
     		}
 		} else {
-			jsonObject.put("ERROR", ExceptionConstants.HR_512);
+			throw new HillromException(ExceptionConstants.HR_512);
 		}
-		return jsonObject;
     }
 }
 

@@ -44,29 +44,25 @@ public class PatientVestDeviceService {
     @Inject
     private PatientInfoRepository patientInfoRepository;
     
-    public JSONObject linkVestDeviceWithPatient(Long id, Map<String, String> deviceData) throws HillromException {
-    	JSONObject jsonObject = new JSONObject();
+    public Object linkVestDeviceWithPatient(Long id, Map<String, String> deviceData) throws HillromException {
     	User alreadyLinkedPatientuser = new User();
     	List<PatientVestDeviceHistory> assocList = patientVestDeviceRepository.findBySerialNumber(deviceData.get("serialNumber"));
+    	PatientVestDeviceHistory patientVestDeviceAssoc = new PatientVestDeviceHistory();
     	if(assocList.isEmpty()) {
-    		assignDeviceToPatient(id, deviceData, jsonObject);
+    		patientVestDeviceAssoc = assignDeviceToPatient(id, deviceData);
     	} else {
     		PatientVestDeviceHistory activeDevice = (PatientVestDeviceHistory) assocList.stream().filter(patientDevice -> patientDevice.isActive());
     		if(activeDevice != null){
-    			
     			alreadyLinkedPatientuser = (User) activeDevice.getPatient().getUserPatientAssoc().stream().filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel()));
-    			jsonObject.put("ERROR", ExceptionConstants.HR_572);
-    			jsonObject.put("user", alreadyLinkedPatientuser);
-    			return jsonObject;
+    			return alreadyLinkedPatientuser;
     		} else {
-    			assignDeviceToPatient(id, deviceData, jsonObject);
+    			patientVestDeviceAssoc = assignDeviceToPatient(id, deviceData);
     		}
     	}
-    	return jsonObject;
+    	return patientVestDeviceAssoc;
     }
 
-	private void assignDeviceToPatient(Long id, Map<String, String> deviceData,
-			JSONObject jsonObject) throws HillromException {
+	private PatientVestDeviceHistory assignDeviceToPatient(Long id, Map<String, String> deviceData) throws HillromException {
 		User patientUser = userRepository.findOne(id);
 		if(patientUser != null) {
 			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
@@ -82,8 +78,7 @@ public class PatientVestDeviceService {
 		 		PatientVestDeviceHistory patientVestDeviceAssoc = new PatientVestDeviceHistory(
 		 				new PatientVestDevicePK(patientInfo, deviceData.get("serialNumber")), deviceData.get("bluetoothId"), deviceData.get("hubId"), true);
 		 		patientVestDeviceRepository.save(patientVestDeviceAssoc);
-		 		jsonObject.put("message", MessageConstants.HR_282);
-		 		jsonObject.put("patient", patientInfo);
+		 		return patientVestDeviceAssoc;
 		 	} else {
 		 		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
 		 	}
@@ -93,7 +88,6 @@ public class PatientVestDeviceService {
 	}
     
     public List<PatientVestDeviceHistory> getLinkedVestDeviceWithPatient(Long id) throws HillromException {
-    	JSONObject jsonObject = new JSONObject();
     	List<PatientVestDeviceHistory> deviceList;
     	User patientUser = userRepository.findOne(id);
     	if(patientUser != null) {
@@ -119,8 +113,7 @@ public class PatientVestDeviceService {
 		return patientInfo;
 	}
 	
-	public void deactivateVestDeviceFromPatient(Long id, String serialNumber) throws HillromException {
-    	JSONObject jsonObject = new JSONObject();
+	public String deactivateVestDeviceFromPatient(Long id, String serialNumber) throws HillromException {
     	User patientUser = userRepository.findOne(id);
     	if(patientUser != null) {
 	    	PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
@@ -130,6 +123,7 @@ public class PatientVestDeviceService {
 	     			if(patientDeviceAssoc.get().isActive()) {
 		     			patientDeviceAssoc.get().setActive(false);
 		 				patientVestDeviceRepository.save(patientDeviceAssoc.get());
+		 				return MessageConstants.HR_283;
 	     			} else {
 	     				throw new HillromException(ExceptionConstants.HR_570);//Vest device is already in Inactive mode
 	     			}

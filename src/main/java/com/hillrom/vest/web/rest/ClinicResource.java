@@ -234,20 +234,14 @@ public class ClinicResource {
         	idList.add(id.split(":")[1]);
         }
         JSONObject jsonObject = new JSONObject();
-        Set<UserExtension> hcpUserList;
 		try {
-			hcpUserList = clinicService.getHCPUsers(idList);
-			if (jsonObject.containsKey("ERROR")) {
-	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-	        } else {
-	        	jsonObject.put("hcpUsers", hcpUserList);
-	    		if(hcpUserList.isEmpty()){
-	    			jsonObject.put("message", MessageConstants.HR_277);
-	    		} else {
-	    	      	jsonObject.put("message", MessageConstants.HR_278);
-	            }
-	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
-	        }
+			Set<UserExtension> hcpUserList = clinicService.getHCPUsers(idList);
+	        jsonObject.put("hcpUsers", hcpUserList);
+    		if(hcpUserList.isEmpty()) 
+    			jsonObject.put("message", MessageConstants.HR_277);
+    		else 
+    			jsonObject.put("message", MessageConstants.HR_278);
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {
 			jsonObject.put("ERROR", e.getMessage());
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);

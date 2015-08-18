@@ -143,16 +143,20 @@ public class UserResource {
     	log.debug("REST request to link vest device with patient user : {}", id);
         JSONObject jsonObject = new JSONObject();
 		try {
-			jsonObject = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
+			Object responseObj = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
+			if (responseObj instanceof User) {
+				jsonObject.put("ERROR", ExceptionConstants.HR_572);
+				jsonObject.put("user", (User) responseObj);
+				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+			} else {
+				jsonObject.put("message", MessageConstants.HR_282);
+				jsonObject.put("user", (PatientVestDeviceHistory) responseObj);
+				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+			}
 		} catch (HillromException e) {
 			jsonObject.put("ERROR",e.getMessage());
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 		}
-        if (jsonObject.containsKey("ERROR")) {
-        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-        } else {
-            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
-        }
     }
     
     /**
@@ -165,26 +169,21 @@ public class UserResource {
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> getLinkedVestDeviceWithPatient(@PathVariable Long id) {
     	log.debug("REST request to link vest device with patient user : {}", id);
-    	List<PatientVestDeviceHistory> deviceList = new LinkedList<>();
     	JSONObject jsonObject = new JSONObject();
 		try {
-			deviceList = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
+			List<PatientVestDeviceHistory> deviceList = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
+			if(deviceList.isEmpty()){
+     			jsonObject.put("message",MessageConstants.HR_281); //No device linked with patient.
+     			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+     		} else {
+     			jsonObject.put("message", MessageConstants.HR_282);//Vest devices linked with patient fetched successfully.
+     			jsonObject.put("deviceList", deviceList);
+     			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+     		}
 		} catch (HillromException e) {
 			jsonObject.put("ERROR",e.getMessage());
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 		}
-    	
-        if (jsonObject.containsKey("ERROR")) {
-        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-        } else {
-        	if(deviceList.isEmpty()){
-     			jsonObject.put("message",MessageConstants.HR_281); //No device linked with patient.
-     		} else {
-     			jsonObject.put("message", MessageConstants.HR_282);//Vest devices linked with patient fetched successfully.
-     			jsonObject.put("deviceList", deviceList);
-     		}
-            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
-        }
     }
     
     /**
@@ -199,17 +198,18 @@ public class UserResource {
     	log.debug("REST request to deactivate vest device with serial number {} from patient user : {}", serialNumber, id);
     	JSONObject jsonObject = new JSONObject();
     	try {
-			patientVestDeviceService.deactivateVestDeviceFromPatient(id, serialNumber);
+			String message = patientVestDeviceService.deactivateVestDeviceFromPatient(id, serialNumber);
+			if (StringUtils.isBlank(message)) {
+				jsonObject.put("ERROR", ExceptionConstants.HR_573);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        } else {
+	        	jsonObject.put("message", message);
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
 		} catch (HillromException e) {
 			jsonObject.put("ERROR", e.getMessage());
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 		}
-        if (jsonObject.containsKey("ERROR")) {
-        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-        } else {
-        	jsonObject.put("message", MessageConstants.HR_283);
-            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
-        }
     }
 	
 	@RequestMapping(value="/user/{id}/changeSecurityQuestion",method=RequestMethod.PUT)

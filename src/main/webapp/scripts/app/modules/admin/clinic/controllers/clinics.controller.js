@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .controller('clinicsController', function ($rootScope, $scope, $state, $stateParams, $timeout, Auth, clinicService, UserService) {
+  .controller('clinicsController', function ($rootScope, $scope, $state, $stateParams, $timeout, Auth, clinicService, UserService, notyService) {
     $scope.clinic = {};
     $scope.clinicStatus = {
       'role':localStorage.getItem('role'),
@@ -44,7 +44,15 @@ angular.module('hillromvestApp')
       UserService.getState().then(function(response) {
         $scope.states = response.data.states;
       }).catch(function(response) {});
-      $scope.getParentClinic();
+      if($stateParams.parentId){
+        $scope.clinicStatus.createSatellite = true;
+        $scope.clinic.type = "child";        
+        clinicService.getClinic($stateParams.parentId).then(function(response) {  
+        $scope.clinic.parentClinic = response.data.clinic;        
+      }).catch(function(response) {});
+      }else{
+        $scope.getParentClinic();
+      }      
     }
 
     $scope.initClinicEdit = function(clinicId){
@@ -55,7 +63,7 @@ angular.module('hillromvestApp')
         $scope.states = response.data.states;
       }).catch(function(response) {});
       clinicService.getClinic(clinicId).then(function(response) {
-        $scope.clinic = response.data;  
+        $scope.clinic = response.data.clinic;  
         if($scope.clinic.parent){
           $scope.clinic.type = "parent";
         }else{
@@ -69,7 +77,8 @@ angular.module('hillromvestApp')
       $scope.clinicStatus.editMode = true;
       $scope.clinicStatus.isCreate = false;     
       clinicService.getClinic(clinicId).then(function(response) {
-        $scope.clinic = response.data; 
+        $scope.clinic = response.data.clinic; 
+        $scope.childClinics = response.data.childClinics; 
         if($scope.clinic.parent){
           $scope.clinic.type = "parent";
         }else{
@@ -186,14 +195,17 @@ angular.module('hillromvestApp')
       }
     };
 
-    $scope.editClinic = function(data){
-      clinicService.updateClinic(data).then(function(data) {
+    $scope.editClinic = function(clinic){
+      clinicService.updateClinic(clinic).then(function(data) {
         $scope.clinicStatus.isMessage = true;
-        $scope.clinicStatus.message = "Clinic updated successfully" + " for ID " + data.data.Clinic.id;
+        $scope.clinicStatus.message = "Clinic updated successfully";
         notyService.showMessage($scope.clinicStatus.message, 'success');
-        /*$scope.init();*/
+        $scope.selectClinic(clinic);
+        //$scope.clinicStatus.message = "Clinic updated successfully" + " for ID " + data.data.Clinic.id;
+        
+        /*/*$scope.init();
         $scope.reset();
-        $state.go('clinicUser');
+        $state.go('clinicUser');*/
       }).catch(function(response) {
         if (response.data.message !== undefined) {
           $scope.clinicStatus.message = response.data.message;
@@ -207,18 +219,21 @@ angular.module('hillromvestApp')
       });
     };
 
-    $scope.newClinic = function(data){
-      clinicService.createClinic(data).then(function(data) {
+    $scope.newClinic = function(clinic){
+      clinicService.createClinic(clinic).then(function(data) {
         $scope.clinicStatus.isMessage = true;
         $scope.clinicStatus.message = "Clinic created successfully";
         notyService.showMessage($scope.clinicStatus.message, 'success');
-        $scope.reset();
-        $state.go('clinicUser');
+        if($scope.clinicStatus.createSatellite){
+          $scope.selectClinic(data.data.Clinic.parentClinic);
+        }else if($scope.clinicStatus.isCreate){
+          $state.go('clinicUser');
+        }        
       }).catch(function(response) {
-        if (response.data.message !== undefined) {
-          $scope.clinicStatus.message = response.data.message;
-        } else if(response.data.ERROR !== undefined) {
-          $scope.clinicStatus.message = response.data.ERROR;
+        if (response.message !== undefined) {
+          $scope.clinicStatus.message = response.message;
+        } else if(response.ERROR !== undefined) {
+          $scope.clinicStatus.message = response.ERROR;
         } else {
           $scope.clinicStatus.message = 'Error occured! Please try again';
         }
@@ -309,6 +324,26 @@ angular.module('hillromvestApp')
       clinicIds.push(clinicId);
       $state.go('hcpUser', {
         'clinicIds': clinicIds
+      });
+    }
+
+    $scope.getPatients = function(clinicId){
+      var clinicIds = [];
+      clinicIds.push(clinicId);
+      $state.go('patientUser', {
+        'clinicIds': clinicIds
+      });
+    }
+
+    $scope.createSatellite = function(parentId){            
+      $state.go('clinicNew', {
+        'parentId': parentId
+      });
+    }
+
+    $scope.goToEditClinic = function(clinicId){      
+      $state.go('clinicEdit', {
+        'clinicId': clinicId
       });
     }
     /* clinic profile view*/

@@ -112,6 +112,26 @@ angular.module('hillromvestApp')
         }).success(function (response) {
           return response;
         });
+      },
+
+      getPatientsInClinic : function(filterArray) {
+        var url = '/api/clinics/patients';
+        url = url + '?filter=';
+        var flag = false;
+        angular.forEach(filterArray, function(filter, index) {
+
+                if (flag === true){
+                  url = url + ',id:' + filterArray[index];
+                } else{
+                  url = url + 'id:' + filterArray[index];
+                }
+                flag = true;
+        });
+        return $http.get(url , {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
       }
 
     };

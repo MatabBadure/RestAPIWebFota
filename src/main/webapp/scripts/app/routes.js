@@ -18,7 +18,7 @@ angular.module('hillromvestApp')
             })
             .state('patientUser', {
                 parent: 'admin',
-                url: '/patients',
+                url: '/patients?clinicIds',
                 data: {
                     roles: ['ADMIN'],
                     pageTitle: 'patient.title'
@@ -319,7 +319,7 @@ angular.module('hillromvestApp')
 
             .state('clinicNew', {
               parent: 'clinicUser',
-              url: '/new',
+              url: '/new?parentId',
               data: {
                   roles: ['ADMIN'],
                   pageTitle: 'clinic.title'

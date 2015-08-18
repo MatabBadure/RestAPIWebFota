@@ -39,9 +39,12 @@
         "user": "user",
         "patients": "patients",
         "parent": "parent",
-        "submit-button-text": "submit",
         "required-field": "* Required Fields",
         "back-button-text": "Back",
+        "submit-button-text": "submit",
+        "cancel-button-text": "cancel",
+        "deactivate-button-text": "Deactivate",
+        "update-button-text": "Update",
         "delete": {
             "warning": "Are you sure you want to Deactivate the Clinic?",
             "message": "If you deactivate the clinic, you will no longer be able to view the information."

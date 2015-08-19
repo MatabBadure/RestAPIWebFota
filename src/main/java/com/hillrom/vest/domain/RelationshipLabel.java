@@ -14,8 +14,8 @@ import javax.validation.constraints.Size;
  * An authority (a security role) used by Spring Security.
  */
 @Entity
-@Table(name = "AUTHORITY")
-public class Authority implements Serializable {
+@Table(name = "RELATIONSHIP_LABEL")
+public class RelationshipLabel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -25,11 +25,11 @@ public class Authority implements Serializable {
     @Column(length = 50)
     private String name;
 
-    public Authority() {
+    public RelationshipLabel() {
 		super();
 	}
 
-	public Authority(String name) {
+	public RelationshipLabel(String name) {
 		super();
 		this.name = name;
 	}
@@ -51,7 +51,7 @@ public class Authority implements Serializable {
             return false;
         }
 
-        Authority authority = (Authority) o;
+        RelationshipLabel authority = (RelationshipLabel) o;
 
         if (name != null ? !name.equals(authority.name) : authority.name != null) {
             return false;
@@ -67,7 +67,7 @@ public class Authority implements Serializable {
 
     @Override
     public String toString() {
-        return "Authority{" +
+        return "RelationshipLabel{" +
                 "name='" + name + '\'' +
                 "}";
     }

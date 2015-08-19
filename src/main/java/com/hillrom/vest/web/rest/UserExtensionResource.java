@@ -27,15 +27,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.HcpVO;
 import com.hillrom.vest.repository.HillRomUserVO;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
-import com.hillrom.vest.service.HCPClinicService;
 import com.hillrom.vest.service.ClinicPatientService;
+import com.hillrom.vest.service.HCPClinicService;
 import com.hillrom.vest.service.PatientHCPService;
+import com.hillrom.vest.service.RelationshipLabelService;
 import com.hillrom.vest.service.UserService;
+import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
@@ -65,6 +68,10 @@ public class UserExtensionResource {
     
     @Inject
     private UserSearchRepository userSearchRepository;
+    
+    @Inject
+    private RelationshipLabelService relationshipLabelService;
+    
     /**
      * POST  /user -> Create a new User.
      */
@@ -327,6 +334,7 @@ public class UserExtensionResource {
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         }
     }
+    
 	/**
      * POST  /patient/{id}/caregiver -> Create a caregiver for a patient with {id}. 
      */
@@ -353,7 +361,7 @@ public class UserExtensionResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> deleteCaregiver(@PathVariable Long patientUserId, @PathVariable Long id) {
         log.debug("REST request to delete caregiver : {}", id);
         JSONObject jsonObject = userService.deleteCaregiverUser(patientUserId, id);
@@ -361,6 +369,83 @@ public class UserExtensionResource {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
         } else {
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * GET  /patient/{id}/caregiver -> get the list of caregivers associated with patient user {id}.
+     */
+    @RequestMapping(value = "/patient/{id}/caregiver",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    public ResponseEntity<JSONObject> getCaregiversForPatient(@PathVariable Long id) {
+        log.debug("REST request to delete caregiver : {}", id);
+        JSONObject jsonObject = userService.getCaregiversForPatient(id);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * PUT  /patient/{patientUserId}/caregiver/{caregiverUserId} -> update a caregiver {caregiverUserId} for a patient with {patientUserId}. 
+     */
+    @RequestMapping(value = "/patient/{patientUserId}/caregiver/{caregiverUserId}",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    public ResponseEntity<JSONObject> updateCaregiver(@PathVariable Long patientUserId, @PathVariable Long caregiverUserId, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
+        log.debug("REST request to update caregiver User : {}", userExtensionDTO);
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        JSONObject jsonObject = userService.updateCaregiverUser(patientUserId, caregiverUserId, userExtensionDTO, baseUrl);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * GET  /patient/{patientUserId}/caregiver/{caregiverUserId} -> GET a caregiver {caregiverUserId} for a patient with {patientUserId}. 
+     */
+    @RequestMapping(value = "/patient/{patientUserId}/caregiver/{caregiverUserId}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    public ResponseEntity<JSONObject> getCaregiver(@PathVariable Long patientUserId, @PathVariable Long caregiverUserId) {
+        log.debug("REST request to get caregiver User : {}", caregiverUserId);
+        JSONObject jsonObject = userService.getCaregiverUser(patientUserId, caregiverUserId);
+        if (jsonObject.containsKey("ERROR")) {
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        }
+    }
+    
+    /**
+     * GET  /patient/relationships -> GET list of relationships of caregivers with a patient. 
+     */
+    @RequestMapping(value = "/patient/relationships",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    public ResponseEntity<JSONObject> getRelationshipLabels() {
+        log.debug("REST request to get list of relationships of caregivers with a patient User");
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	List<String> relationshipLabels = relationshipLabelService.getRelationshipLabels();
+        	jsonObject.put("message", MessageConstants.HR_265);
+        	jsonObject.put("relationshipLabels", relationshipLabels);
+            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
 }

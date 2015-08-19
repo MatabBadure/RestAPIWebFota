@@ -38,4 +38,14 @@
     <include file="classpath:/config/liquibase/changelog/20150806112900_drop_recreate_USER_PATIENT_ASSOC.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20150807114100_drop_recreate_CLINIC_PATIENT_ASSOC.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150811124700_add_hillromId_to_user_table.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150812132000_create_table_patient_note.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150812191500_create_patient_vest_device_history.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150813185000_create_patient_protocol_data_table.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150814104700_update_phone_number_datatype.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150814182700_add_relationship_label_table.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150817151300_added_protocol_sequence_id_table.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150817141000_added_get_next_protocol_hillromid_stored_procedure.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150817195000_drop_recreate_patient_protocol_data_table.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150814182800_create_patient_vest_therapy_data.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150817183800_add_userid_to_patient_vest_device_data_table.xml" relativeToChangelogFile="false"/>
  </databaseChangeLog>

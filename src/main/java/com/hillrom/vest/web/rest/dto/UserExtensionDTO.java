@@ -6,9 +6,6 @@ import java.util.Map;
 
 import javax.validation.constraints.Size;
 
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-
 public class UserExtensionDTO extends UserDTO {
 
     @Size(max = 50)

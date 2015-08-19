@@ -22,6 +22,9 @@
 				background-color: $table-bg;
 				color: $pre-bg;
 			}
+			&:focus{
+				background-color: $table-bg;
+			}
 			
 		}
 
@@ -189,5 +192,80 @@
 	color: $gray-dark;
 	.date{
 		padding: 10px 10px;
+	}
+}
+
+/* Dash Doard Note section css */
+.patient_dashdoard_btns{
+	.hillrom-btn{
+		background-color: $sunshade;
+		border: solid 1px $sunshade;
+		color: $gray-dark;
+	}
+}
+.add_note_container{
+	display: block;
+	border: $border_default;
+	clear: left;
+	float: left;
+	width: 100%;
+	min-height: 100px;
+	margin: 30px 0px;
+		.note_header{
+			border-bottom: $border_default;
+			display: inline-block;
+			width: 100%;
+			padding: 5px 0px;
+		}
+}
+.note_header_left{
+	.note{
+		color: $iceberg;
+		font-size: 14px;
+	}
+	.can_do{
+		color: $gray-light;
+		font-size: 12px;
+	}
+}
+.note_header_right{
+	.cross_icon{
+		font-size: 14px;
+		font-weight: lighter;
+		color: $gray-light;
+		text-decoration: none;
+		padding: 0px 10px;
+	}
+}
+.notes_content{
+	.notes_row{
+		border-bottom: $border_default;
+		padding: 10px 0px;
+	}
+}
+.edit_delete{
+	.icon{
+		display: inline-block;
+		height: 20px;
+		width: 20px;
+		border: solid 1px #ccc;
+		&.edit{
+			margin-right: 10px;
+		}
+	}
+}
+.add_note_container{
+	.patient_dashdoard_btns{
+		display: inline-block;
+		width: 100%;
+		margin: 8px 0px 0px;
+		padding: 0px 10px;
+	}
+	.view_all_btn{
+		padding: 5px 5px;
+		cursor: pointer;
+		&:hover{
+			color: $gray-dark;
+		}
 	}
 }

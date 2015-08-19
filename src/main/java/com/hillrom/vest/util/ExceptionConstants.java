@@ -67,4 +67,6 @@ public class ExceptionConstants {
     public static final String HR_563 = "Reached maximum limit to associate caregiver.";
     public static final String HR_564 = "No such caregiver found";
     public static final String HR_565 = "No Relationship labels found.";
+    
+    public static final String HR_571 = "No Patient Associated with HCP.";
 }

@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import net.minidev.json.JSONObject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
+import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.HcpVO;
@@ -443,6 +445,34 @@ public class UserExtensionResource {
         	jsonObject.put("message", MessageConstants.HR_265);
         	jsonObject.put("relationshipLabels", relationshipLabels);
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    /**
+     * GET  /hcp/:id/patients -> get the patient users associated with hcp user.
+     */
+    @RequestMapping(value = "/hcp/{id}/patients",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<JSONObject> getAssociatedPatientUsersForHCP(@PathVariable Long id, @RequestParam(value = "filterByClinic",required = false) String filterByClinic) {
+        log.debug("REST request to get associated HCP users with Patient : {}", id);
+        JSONObject jsonObject = new JSONObject();
+        try {
+	        if(StringUtils.isBlank(filterByClinic))
+	        	filterByClinic = Constants.ALL;
+	        List<Map<String,Object>> patientList= patientHCPService.getAssociatedPatientUsersForHCP(id, filterByClinic);
+	        if (patientList.isEmpty()) {
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_281);
+	        	jsonObject.put("patientList", patientList);
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
         } catch (HillromException hre){
         	jsonObject.put("ERROR", hre.getMessage());
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);

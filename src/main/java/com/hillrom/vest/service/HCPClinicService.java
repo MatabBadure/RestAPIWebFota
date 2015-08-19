@@ -2,6 +2,8 @@ package com.hillrom.vest.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -12,8 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
+import com.hillrom.vest.util.ExceptionConstants;
 
 /**
  * Service class for managing users.
@@ -43,6 +47,15 @@ public class HCPClinicService {
     		}
     	}
     	return hcpUser;
+    }
+    
+    public Set<Clinic> getAssociatedClinicsForHCP(Long id) throws HillromException {
+		UserExtension hcpUser = userExtensionRepository.findOne(id);
+	    if(Objects.isNull(hcpUser)){
+	    	throw new HillromException(ExceptionConstants.HR_512);
+	    } else {
+	    	return hcpUser.getClinics();
+	    }
     }
 }
 

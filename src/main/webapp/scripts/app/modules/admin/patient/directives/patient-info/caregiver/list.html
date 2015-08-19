@@ -1,0 +1,47 @@
+<admin-patient-navbar></admin-patient-navbar>
+<div class="container admin-user">
+  <div class="col-md-16 margin-top">
+   <div class="user-gen-details">
+     <span class="user-gen-details--name">{{slectedPatient.firstName}} {{slectedPatient.lastName}}&nbsp;&nbsp;</span>
+     <span class="user-gen-details--hr-id">{{slectedPatient.hillromId}}</span>
+   </div>
+  </div>
+
+  <div class="col-md-16 patient-caregiver">
+    <span class="patient-caregiver--title" translate="patient.caregiver-title"></span>
+  </div>
+
+  <div class="col-md-16 caregiver-list" ng-repeat="caregiver in caregivers track by $index" ng-if="caregiver.user.activated"> 
+    <div class="col-md-3 caregiver-list__detail">
+      <span class="caregiver-list__detail--name">{{caregiver.user.firstName}}&nbsp;&nbsp; {{caregiver.user.middleName}}&nbsp;&nbsp; {{caregiver.user.lastName}}</span>
+      <span class="caregiver-list__detail--email">{{caregiver.user.email}}</span>
+    </div>
+    <div class="col-md-4 caregiver-list__address">
+      <span class="caregiver-list__address--primary" ng-if="caregiver.user.address">{{caregiver.user.address}}</span>
+      <span class="caregiver-list__address--secondary" ng-if="caregiver.user.city">{{caregiver.user.city}}
+      <span ng-if="caregiver.user.city && caregiver.user.state">,</span>
+      <span ng-if="caregiver.user.state">{{caregiver.user.state}} </span></span>
+    </div>
+    <div class="col-md-3 caregiver-list__phone">
+      <span class="caregiver-list__phone--text" translate="patient.phone"></span>
+      <span class="caregiver-list__phone--number">{{caregiver.user.primaryPhone}}</span>
+    </div>
+    <div class="col-md-3 caregiver-list__fax">
+      <span class="caregiver-list__fax--text" translate="patient.mobile"></span>
+      <span class="caregiver-list__fax--number">{{caregiver.user.mobilePhone}}</span>
+    </div>
+    <div class="col-md-2 caregiver-list__type">
+      <span>{{caregiver.relationshipLabel}}</span>
+    </div>
+    <!-- <div class="col-md-1 caregiver-list__edit" ng-click="editCaregiver(caregiver.user.id, $index)">
+      <span class="glyphicon glyphicon-trash" style="cursor:pointer;"></span>
+    </div> --><!-- <div><a href="" ng-click="editCaregiver(caregiver.user.id, $index)">edit</a></div> -->
+    <div class="col-md-1 caregiver-list__delete" >
+      <span class="glyphicon glyphicon-pencil" style="cursor:pointer;" ng-click="goToCaregiverEdit(caregiver.user.id)"></span>
+      <span class="glyphicon glyphicon-trash" style="cursor:pointer;" ng-click="disassociateCaregiversFromPatient(caregiver.user.id, $index)"></span>
+    </div>
+  </div>
+  <div class="col-md-16 reset-padding caregiver-link">
+      <buton class="hillrom-btn btn-primary float-right" ng-click="linkCaregiver()" translate="patient.link-caregiver"></buton>
+  </div>
+</div>

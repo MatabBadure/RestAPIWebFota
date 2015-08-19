@@ -60,6 +60,9 @@
         "npiNumber": "NpiNumber",
         "parent": "parent",
         "submit-button-text": "submit",
+        "cancel-button-text": "cancel",
+        "deactivate-button-text": "Deactivate",
+        "update-button-text": "Update",
         "required-field": "* Required Fields",
         "delete": {
             "warning": "Are you sure you want to Deactivate the User?",

@@ -60,4 +60,6 @@ public class MessageConstants {
     
     public static final String HR_284 = "No Associated HCPs with Patient.";
     public static final String HR_285 = "No Associated clinics with Patient.";
+    public static final String HR_291 = "Associated Patients with HCP fetched successfully.";
+    public static final String HR_292 = "Associated Clinics with HCP fetched successfully.";
 }

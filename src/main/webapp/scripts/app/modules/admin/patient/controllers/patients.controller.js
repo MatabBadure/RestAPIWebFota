@@ -79,6 +79,17 @@ angular.module('hillromvestApp')
       $state.go('patientDemographicEdit', {'patientId': $stateParams.patientId});
     };
 
+    $scope.getProtocols = function(patientId){
+      patientService.getProtocol(patientId).then(function(response){
+        $scope.protocols = response.data.protocol;
+        angular.forEach($scope.protocols, function(protocol){
+          if(!protocol.deleted){
+            $scope.addProtocol = false;
+          }
+        });
+      }).catch(function(){});
+    };
+
     $scope.initProtocolDevice = function(patientId){
       patientService.getDevices(patientId).then(function(response){
         angular.forEach(response.data.deviceList, function(device){
@@ -92,13 +103,26 @@ angular.module('hillromvestApp')
         });
         $scope.devices = response.data.deviceList;
       }).catch(function(response){});
-      patientService.getProtocol(patientId).then(function(response){
-        $scope.protocol = response.data.protocol;
-      }).catch(function(){});
+      $scope.getProtocols(patientId);
     };
 
     $scope.initPatientAddProtocol = function(){
       $scope.protocol = $stateParams.protocol;
+      if(!$scope.protocol){
+        $scope.protocol = {};
+        $scope.protocol.type = 'Normal';
+        $scope.protocol.protocolEntries = [{}];
+      } else {
+        var protocolEntrie = {
+          'minMinutesPerTreatment': $scope.protocol.minMinutesPerTreatment,
+          'maxMinutesPerTreatment': $scope.protocol.maxMinutesPerTreatment,
+          'minFrequency': $scope.protocol.minFrequency,
+          'maxFrequency': $scope.protocol.maxFrequency,
+          'minPressure': $scope.protocol.minPressure,
+          'maxPressure': $scope.protocol.maxPressure
+        };
+        $scope.protocol.protocolEntries = [protocolEntrie];
+      }
     };
 
     $scope.initPatientAddDevice = function(){
@@ -266,7 +290,7 @@ angular.module('hillromvestApp')
 
         });
     }
-   
+
     $scope.formSubmit = function(){
       $scope.submitted = true;
       if($scope.form.$invalid){
@@ -324,7 +348,7 @@ angular.module('hillromvestApp')
         $scope.caregivers =  response.data.user;
         $scope.associateCareGiver = [];$scope.associateCareGiver.length = 0;
         $scope.switchPatientTab('patientCraegiver');
-      }).catch(function(response){       
+      }).catch(function(response){
         notyService.showMessage(response.data.ERROR,'warning' );
       });
     }
@@ -345,12 +369,12 @@ angular.module('hillromvestApp')
       UserService.getState().then(function(response) {
         $scope.states = response.data.states;
       }).catch(function(response) {});
-      UserService.getRelationships().then(function(response) {        
+      UserService.getRelationships().then(function(response) {
         $scope.relationships = response.data.relationshipLabels;
-        $scope.associateCareGiver.relationship = $scope.relationships[0];       
+        $scope.associateCareGiver.relationship = $scope.relationships[0];
       }).catch(function(response) {});
     }
-    $scope.linkCaregiver = function(){      
+    $scope.linkCaregiver = function(){
       $state.go('patientCraegiverAdd', {'patientId': $stateParams.patientId});
     }
 
@@ -389,6 +413,11 @@ angular.module('hillromvestApp')
       if($scope.addProtocolForm.$invalid){
         return false;
       }
+      if($scope.protocol.type === 'Custom'){
+        angular.forEach($scope.protocol.protocolEntries, function(protocol, index){
+          protocol.treatmentLabel = 'point'+ (index + 1);
+        })
+      }
       patientService.addProtocol($stateParams.patientId, $scope.protocol).then(function(response){
         $state.go('patientProtocol');
       }).catch(function(response){});
@@ -403,9 +432,9 @@ angular.module('hillromvestApp')
       }).catch(function(response){});
     };
 
-    $scope.deleteProtocol = function(){
-      patientService.deleteProtocol($stateParams.patientId).then(function(response){
-        $scope.protocol = "";
+    $scope.deleteProtocol = function(id){
+      patientService.deleteProtocol($stateParams.patientId, id).then(function(response){
+        $scope.getProtocols();
       }).catch(function(response){});
     };
 
@@ -422,10 +451,10 @@ angular.module('hillromvestApp')
         UserService.getRelationships().then(function(response) {
           $scope.relationships = response.data.relationshipLabels;
         }).catch(function(response) {});
-        var caregiverId = $stateParams.caregiverId;          
+        var caregiverId = $stateParams.caregiverId;
         patientService.getCaregiverById($stateParams.patientId, caregiverId).then(function(response){
           $scope.associateCareGiver = response.data.caregiver.user;
-          $scope.associateCareGiver.relationship = response.data.caregiver.relationshipLabel;          
+          $scope.associateCareGiver.relationship = response.data.caregiver.relationshipLabel;
         }).catch(function(response){});
     }
     $scope.updateCaregiver = function(patientId, caregiverId , careGiver){
@@ -453,10 +482,11 @@ angular.module('hillromvestApp')
       $state.go('patientCraegiverEdit', {'caregiverId': careGiverId});
     }
 
-    $scope.openEditProtocol = function(){
-      if(!$scope.protocol){
+    $scope.openEditProtocol = function(protocol){
+      if(!protocol){
         return false;
       }
+      $scope.protocol = protocol;
       $scope.protocol.edit = true;
       $state.go('patientAddProtocol',{protocol: $scope.protocol});
     };
@@ -479,7 +509,8 @@ angular.module('hillromvestApp')
       if($scope.protocol.edit){
         delete $scope.protocol.edit;
       }
-      patientService.editProtocol($stateParams.patientId, $scope.protocol).then(function(response){
+      var data = [$scope.protocol];
+      patientService.editProtocol($stateParams.patientId, data).then(function(response){
         $state.go('patientProtocol');
       }).catch(function(response){});
     };
@@ -501,7 +532,12 @@ angular.module('hillromvestApp')
 
     $scope.addNewProtocolPoint = function (){
       $scope.newProtocolPoint += 1;
+      $scope.protocol.protocolEntries.push({});
     }
+
+    $scope.switchtoNormal = function(){
+      $scope.protocol.protocolEntries.splice(1);
+    };
 
     $scope.init();
   });

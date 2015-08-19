@@ -254,8 +254,8 @@ angular.module('hillromvestApp')
         });
       },
 
-      deleteProtocol : function(id){
-        var url = admin.patient.baseURL + id + '/protocol';
+      deleteProtocol : function(id, protocolId){
+        var url = admin.patient.baseURL + id + '/protocol/' + protocolId;
         return $http.delete(url, {
           headers: headerService.getHeader()
         }).success(function(response){

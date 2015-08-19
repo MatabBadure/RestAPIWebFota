@@ -36,12 +36,12 @@
     </div>
   </div> -->
 
-  <div class="col-md-16 protocol-list" >
+  <div class="col-md-16 protocol-list" ng-repeat="protocol in protocols">
     <div class="col-md-3 protocol-list__type">
-      <span> custom{{protocol.protocolType}}</span>
+      <span> {{protocol.type}}</span>
     </div>
     <div class="col-md-3 protocol-list__treatment-day">
-      <span class="protocol-list--value"> 25{{protocol.treatmentsPerDay}}</span>
+      <span class="protocol-list--value"> {{protocol.treatmentsPerDay}}</span>
     </div>
     <div class="col-md-4 protocol-list__strt-date">
       <span class="protocol-list--value"> 12 January, 2015{{protocol.startDate}}</span>
@@ -50,10 +50,10 @@
       <span class="protocol-list--value"> 22 January, 2015{{protocol.endDate}}</span>
     </div>
     <div class="col-md-1 protocol-list__edit icons text-center">
-      <span class="glyphicon glyphicon glyphicon-pencil" ng-click="openEditProtocol()"></span>
+      <span ng-if="!protocol.deleted" class="glyphicon glyphicon glyphicon-pencil" ng-click="openEditProtocol(protocol)"></span>
     </div>
     <div class="col-md-1 protocol-list__delete text-center">
-      <span class="glyphicon glyphicon-trash" ng-click="deleteProtocol()"></span>
+      <span ng-if="!protocol.deleted" class="glyphicon glyphicon-trash" ng-click="deleteProtocol(protocol.id)"></span>
     </div>
   </div>
 
@@ -61,8 +61,8 @@
     <div class="col-md-8 clinic-link">
     </div>
     <div class="col-md-8 clinic-link">
-      <buton ng-show="!protocol" class="hillrom-btn btn-primary float-right" ng-click="linkProtocol()" translate="patient.link-protocol"></buton>
-      <buton ng-show="protocol" class="hillrom-btn btn-inactive float-right" translate="patient.link-protocol"></buton>
+      <buton ng-show="addProtocol" class="hillrom-btn btn-primary float-right" ng-click="linkProtocol()" translate="patient.link-protocol"></buton>
+      <buton ng-show="!addProtocol" class="hillrom-btn btn-inactive float-right" translate="patient.link-protocol"></buton>
     </div>
   </div>
 

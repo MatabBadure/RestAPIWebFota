@@ -63,7 +63,7 @@ import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 public class UserService {
 
 	private final Logger log = LoggerFactory.getLogger(UserService.class);
-	
+
     @Inject
     private PasswordEncoder passwordEncoder;
 

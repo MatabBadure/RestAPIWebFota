@@ -82,6 +82,7 @@ angular.module('hillromvestApp')
     $scope.getProtocols = function(patientId){
       patientService.getProtocol(patientId).then(function(response){
         $scope.protocols = response.data.protocol;
+        $scope.addProtocol = true;
         angular.forEach($scope.protocols, function(protocol){
           if(!protocol.deleted){
             $scope.addProtocol = false;
@@ -113,15 +114,9 @@ angular.module('hillromvestApp')
         $scope.protocol.type = 'Normal';
         $scope.protocol.protocolEntries = [{}];
       } else {
-        var protocolEntrie = {
-          'minMinutesPerTreatment': $scope.protocol.minMinutesPerTreatment,
-          'maxMinutesPerTreatment': $scope.protocol.maxMinutesPerTreatment,
-          'minFrequency': $scope.protocol.minFrequency,
-          'maxFrequency': $scope.protocol.maxFrequency,
-          'minPressure': $scope.protocol.minPressure,
-          'maxPressure': $scope.protocol.maxPressure
-        };
-        $scope.protocol.protocolEntries = [protocolEntrie];
+        $scope.protocol.type = $scope.protocol.protocol[0].type;
+        $scope.protocol.treatmentsPerDay = $scope.protocol.protocol[0].treatmentsPerDay;
+        $scope.protocol.protocolEntries = $scope.protocol.protocol;
       }
     };
 
@@ -434,7 +429,7 @@ angular.module('hillromvestApp')
 
     $scope.deleteProtocol = function(id){
       patientService.deleteProtocol($stateParams.patientId, id).then(function(response){
-        $scope.getProtocols();
+        $scope.getProtocols($stateParams.patientId);
       }).catch(function(response){});
     };
 
@@ -487,8 +482,11 @@ angular.module('hillromvestApp')
         return false;
       }
       $scope.protocol = protocol;
-      $scope.protocol.edit = true;
-      $state.go('patientAddProtocol',{protocol: $scope.protocol});
+      patientService.getProtocolById($stateParams.patientId, protocol.id).then(function(response){
+        $scope.protocol = response.data;
+        $scope.protocol.edit = true;
+        $state.go('patientAddProtocol',{protocol: $scope.protocol});
+      }).catch(function(response){});
     };
 
     $scope.openEditDevice = function(device){
@@ -509,7 +507,7 @@ angular.module('hillromvestApp')
       if($scope.protocol.edit){
         delete $scope.protocol.edit;
       }
-      var data = [$scope.protocol];
+      var data = $scope.protocol.protocol;
       patientService.editProtocol($stateParams.patientId, data).then(function(response){
         $state.go('patientProtocol');
       }).catch(function(response){});

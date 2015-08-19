@@ -279,6 +279,14 @@ angular.module('hillromvestApp')
         }).success(function(response){
           return response;
         });
+      },
+      getProtocolById : function(patientId, protocolId){
+        var url = admin.patient.baseURL + patientId + '/protocol/'+protocolId;
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
       }
     };
   });

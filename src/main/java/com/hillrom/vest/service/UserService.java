@@ -63,8 +63,6 @@ import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 public class UserService {
 
 	private final Logger log = LoggerFactory.getLogger(UserService.class);
-	
-	private static final String SELF = "SELF";
 
     @Inject
     private PasswordEncoder passwordEncoder;
@@ -1015,7 +1013,7 @@ public class UserService {
 	public PatientInfo getPatientInfoObjFromPatientUser(User patientUser) {
 		PatientInfo patientInfo = null;
 		for(UserPatientAssoc patientAssoc : patientUser.getUserPatientAssoc()){
-			if(SELF.equals(patientAssoc.getRelationshipLabel())){
+			if(RelationshipLabelConstants.SELF.equals(patientAssoc.getRelationshipLabel())){
 				patientInfo = patientAssoc.getPatient();
 			}
 		}
@@ -1025,7 +1023,7 @@ public class UserService {
 	public User getUserObjFromPatientInfo(PatientInfo patientInfo) {
 		User patientUser = null;
 		for(UserPatientAssoc patientAssoc : patientInfo.getUserPatientAssoc()){
-			if(SELF.equals(patientAssoc.getRelationshipLabel())){
+			if(RelationshipLabelConstants.SELF.equals(patientAssoc.getRelationshipLabel())){
 				patientUser = patientAssoc.getUser();
 			}
 		}

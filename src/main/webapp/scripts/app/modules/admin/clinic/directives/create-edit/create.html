@@ -159,7 +159,7 @@
               <span class="" translate="clinic.clinic-phone"></span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" name="phone" maxlength="10" validate-on-blur ng-pattern="/^[0-9]{10}$/" ng-model="clinic.phoneNumber">
+              <input class="" type="text" name="phone" validate-on-blur ng-model="clinic.phoneNumber" mask="(999)-999-9999">
               <div ng-show="(form.phone.$showValidationMessage && form.phone.$invalid) || submitted">
                 <span class="has-error" ng-show="form.phone.$error.pattern">
                   Phone Number is invalid.
@@ -172,7 +172,7 @@
               <span class="" translate="clinic.fax-number"></span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" name="fax" maxlength="10" validate-on-blur ng-pattern="/^[0-9]{10}$/" ng-model="clinic.faxNumber">
+              <input class="" type="text" name="fax" validate-on-blur ng-model="clinic.faxNumber" mask="(999)-999-9999">
               <div ng-show="(form.fax.$showValidationMessage && form.fax.$invalid) || submitted">
                 <span class="has-error" ng-show="form.fax.$error.pattern">
                   Fax Number is invalid.

@@ -4,6 +4,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.config.Constants;
+import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.HcpVO;
@@ -40,6 +42,7 @@ import com.hillrom.vest.service.HCPClinicService;
 import com.hillrom.vest.service.PatientHCPService;
 import com.hillrom.vest.service.RelationshipLabelService;
 import com.hillrom.vest.service.UserService;
+import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
@@ -460,17 +463,45 @@ public class UserExtensionResource {
     @Timed
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> getAssociatedPatientUsersForHCP(@PathVariable Long id, @RequestParam(value = "filterByClinic",required = false) String filterByClinic) {
-        log.debug("REST request to get associated HCP users with Patient : {}", id);
+        log.debug("REST request to get associated patient users with HCP : {}", id);
         JSONObject jsonObject = new JSONObject();
         try {
 	        if(StringUtils.isBlank(filterByClinic))
 	        	filterByClinic = Constants.ALL;
 	        List<Map<String,Object>> patientList= patientHCPService.getAssociatedPatientUsersForHCP(id, filterByClinic);
 	        if (patientList.isEmpty()) {
+	        	jsonObject.put("ERROR", ExceptionConstants.HR_571);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_281);
 	        	jsonObject.put("patientList", patientList);
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    /**
+     * GET  /hcp/:id/clinics -> get the clinics associated with hcp user.
+     */
+    @RequestMapping(value = "/hcp/{id}/clinics",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<JSONObject> getAssociatedClinicsForHCP(@PathVariable Long id) {
+        log.debug("REST request to get associated clinics with HCP : {}", id);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	Set<Clinic> clinics= hcpClinicService.getAssociatedClinicsForHCP(id);
+	        if (clinics.isEmpty()) {
+	        	jsonObject.put("ERROR", ExceptionConstants.HR_572);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_282);
+	        	jsonObject.put("clinics", clinics);
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }
         } catch (HillromException hre){

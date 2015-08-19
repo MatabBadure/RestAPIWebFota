@@ -69,4 +69,6 @@ public class ExceptionConstants {
     public static final String HR_565 = "No Relationship labels found.";
     
     public static final String HR_571 = "No Patient Associated with HCP.";
+    public static final String HR_572 = "No Clinics Associated with HCP.";
+    
 }

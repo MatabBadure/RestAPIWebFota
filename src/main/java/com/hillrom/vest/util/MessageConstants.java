@@ -46,4 +46,5 @@ public class MessageConstants {
     public static final String HR_279 = "No Associated Patients with clinic.";
     public static final String HR_280 = "Associated Patients with clinic fetched successfully.";
     public static final String HR_281 = "Associated Patients with HCP fetched successfully.";
+    public static final String HR_282 = "Associated Clinics with HCP fetched successfully.";
 }

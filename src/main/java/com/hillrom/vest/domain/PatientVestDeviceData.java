@@ -51,6 +51,10 @@ public class PatientVestDeviceData implements Serializable {
 
 	private Integer checksum;
 	
+	@ManyToOne(optional=false,targetEntity=User.class)
+	@JoinColumn(name="user_id",referencedColumnName="id")
+	private User patientUser;
+	
 	public Long getTimestamp() {
 		return timestamp;
 	}
@@ -145,6 +149,14 @@ public class PatientVestDeviceData implements Serializable {
 
 	public void setChecksum(Integer checksum) {
 		this.checksum = checksum;
+	}
+
+	public User getPatientUser() {
+		return patientUser;
+	}
+
+	public void setPatientUser(User patientUser) {
+		this.patientUser = patientUser;
 	}
 
 	@Override

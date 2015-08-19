@@ -46,5 +46,6 @@
     <include file="classpath:/config/liquibase/changelog/20150817151300_added_protocol_sequence_id_table.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150817141000_added_get_next_protocol_hillromid_stored_procedure.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150817195000_drop_recreate_patient_protocol_data_table.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150814182800_create_patient_vest_therapy_data.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150817183800_add_userid_to_patient_vest_device_data_table.xml" relativeToChangelogFile="false"/>
  </databaseChangeLog>
- 

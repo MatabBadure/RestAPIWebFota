@@ -12,13 +12,14 @@
     <div class="form-group">
       <span>
         <label>
-          <input type="radio" name="protocolType" ng-model="">
-          <span class="radio-box-text">Custom</span>
+          <input type="radio" name="protocolType" ng-model="protocol.type" value="Normal" ng-disabled="protocol.edit" ng-change="switchtoNormal()">
+          <span class="radio-box-text">Normal</span>
         </label>
       </span>
       <span>
-            <input type="radio" name="protocolType" ng-model="">
-            <span class="radio-box-text">Default</span>
+        <label>
+          <input type="radio" name="protocolType" ng-model="protocol.type" value="Custom" ng-disabled="protocol.edit">
+          <span class="radio-box-text">Custom</span>
         </label>
       </span>
     </div>
@@ -46,9 +47,9 @@
         </div>
         <div class="clr"></div>
       </div>
-      <div class="protocol-point" ng-repeat="n in [] | range:newProtocolPoint">
+      <div class="protocol-point" ng-repeat="proto in protocol.protocolEntries track by $index">
         <div class="col-md-16 reset-padding">
-          <span class="dashboard__form--type">Point {{n+1}}</span>
+          <span ng-if="protocol.type === 'Custom'" class="dashboard__form--type">Point {{$index + 1}}</span>
         </div>
 
         <div class="col-md-16 reset-padding margin-top">
@@ -58,7 +59,7 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" ng-model="protocol.minMinutesPerTreatment" required>
+              <input class="" type="text" ng-model="proto.minMinutesPerTreatment" required>
             </div>
           </div>
           <div class="col-md-7 reset-padding col-md-offset-2">
@@ -67,7 +68,7 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" ng-model="protocol.maxMinutesPerTreatment" required>
+              <input class="" type="text" ng-model="proto.maxMinutesPerTreatment" required>
             </div>
           </div>
         </div>
@@ -79,7 +80,7 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" ng-model="protocol.minFrequency" required>
+              <input class="" type="text" ng-model="proto.minFrequency" required>
             </div>
           </div>
           <div class="col-md-7 reset-padding col-md-offset-2">
@@ -88,7 +89,7 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" ng-model="protocol.maxFrequency" required>
+              <input class="" type="text" ng-model="proto.maxFrequency" required>
             </div>
           </div>
         </div>
@@ -100,7 +101,7 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" ng-model="protocol.minPressure" required>
+              <input class="" type="text" ng-model="proto.minPressure" required>
             </div>
           </div>
           <div class="col-md-7 reset-padding col-md-offset-2">
@@ -109,7 +110,7 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" ng-model="protocol.maxPressure" required>
+              <input class="" type="text" ng-model="proto.maxPressure" required>
             </div>
           </div>
         </div>
@@ -117,12 +118,12 @@
     </div>
 
     <div class="col-md-16 margin-top reset-padding">
-    <span class="add-new-point" ng-click="(newProtocolPoint ===7)||addNewProtocolPoint()">Add New Point</span>
+    <span class="add-new-point" ng-if="protocol.type === 'Custom'" ng-click="(newProtocolPoint ===7)||addNewProtocolPoint()">Add New Point</span>
     </div>
     <div class="col-md-16 margin-top reset-padding">
       <div class="">
         <buton ng-if="!protocol.edit" type="submit" class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="addProtocol()" ng-show="!patientStatus.isCreate" translate="patient.btn.save">Save</buton>
-        <buton ng-if="protocol.edit" type="submit" class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="updateProtocol()" ng-show="!patientStatus.isCreate" translate="patient.btn.update">Update</buton>
+        <buton ng-if="protocol.edit" type="submit" class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="updateProtocol()" ng-show="!patientStatus.isCreate" >Update</buton>
         <buton type="submit" class="hillrom-btn btn-secondary float-right" ng-click="cancelProtocolDevice()" ng-show="!patientStatus.isCreate" translate="patient.btn.cancel">cancel</buton>
         <div class="clr"></div>
       </div>

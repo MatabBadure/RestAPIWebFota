@@ -89,6 +89,24 @@
   text-overflow: '';
 }
 
+.dashboard__form__input--sec-option .custom-dropdown {
+  width: 100%;
+}
+
+.dashboard__form__input--sec-option .custom-dropdown .security-select {
+  height: 30px;
+  width: 100%;
+  font-weight: normal;
+  color: $pickled-bluewood;
+  border: 1px solid $bombay;
+  background-color: inherit;
+  padding-left: 5px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-indent: 1px;
+  text-overflow: '';
+}
+
 .label-next input {
 	width: 100%;
 	color: $pickled-bluewood;

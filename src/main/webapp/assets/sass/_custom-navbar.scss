@@ -115,13 +115,17 @@ $header--background: $body-bg;
 		left: 89%;
 	}
 
+	.popover.bottom > .arrow:after {
+		border-bottom-color: $kashmir-blue;
+	}
+
 	.popover {
 		border-radius: 0;
 		right: -13px;
     width: 170px;
     left: unset !important;
-		background-color: $waikawa-gray;
-		border: 1px solid $pickled-bluewood;
+		background-color: $kashmir-blue;
+		border: 1px solid $blue-bayoux;
 	}
 
 	.popover-content {
@@ -161,4 +165,12 @@ $header--background: $body-bg;
 
 .popover-link {
 	cursor: default;
+}
+
+.navbar-secondary .navbar-right li a:hover span {
+    color: $bombay;
+}
+
+.navbar-secondary .navbar-right li a:hover #pop-over-link, #icon-arrow {
+	color: $storm-dust;
 }

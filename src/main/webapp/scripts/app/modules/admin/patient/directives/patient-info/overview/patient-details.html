@@ -1,0 +1,104 @@
+<admin-patient-navbar></admin-patient-navbar>
+<div class="container">
+  <div class="col-md-16 patient-overview">
+    <div class="col-md-5 patient-overview--desc">
+      <div class="patient-name">
+        <span>{{patient.firstName}} {{patient.lastName}}</span>
+      </div>
+      <div class="patient-details">
+        <span class="patient-details--key" translate="patient.overview.hr-id"></span>
+        <span class="patient-details--value">{{patient.hillromId}}</span>
+      </div>
+      <div class="patient-details">
+        <span class="patient-details--key" translate="patient.overview.mrn"></span>
+        <span class="patient-details--value">{{patient.id}}*</span>
+      </div>
+      <div class="patient-details">
+        <span class="patient-details--key" translate="patient.overview.hcp"></span>
+        <span class="patient-details--value">{{patient.hcpUSers}}</span>
+      </div>
+      <div class="patient-details">
+        <span class="patient-details--key" translate="patient.overview.dob"></span>
+        <span class="patient-details--value">{{patient.dob}}</span>
+      </div>
+      <div class="patient-details">
+        <span class="patient-details--key" translate="patient.overview.email"></span>
+        <span class="patient-details--value">{{patient.email}}</span>
+      </div>
+      <div class="patient-details reset-border">
+        <span class="patient-details--key" translate="patient.overview.location"></span>
+        <span class="patient-details--value">{{patient.city}}</span>
+      </div>
+    </div>
+    <div class="col-md-10 patient-overview--graph">
+
+    </div>
+  </div>
+
+  <div class="col-md-16 reset-padding patient-summary">
+    <span translate="patient.sum.titlename">Summary</span>
+  </div>
+
+  <div class="col-md-16 patient-detailed-overview">
+    <div class="col-md-5 patient-detailed-overview--key">
+      <span translate="patient.sum.ather-level"></span>
+    </div>
+    <div class="col-md-1 patient-detailed-overview--value">
+      <span>63</span>
+    </div>
+    <div class="col-md-5 patient-detailed-overview--key">
+      <span translate="patient.sum.avr-dur-cough-pause"></span>
+    </div>
+    <div class="col-md-1 patient-detailed-overview--value">
+      <span>63</span>
+    </div>
+    <div class="col-md-3 patient-detailed-overview--key">
+      <span translate="patient.sum.avr-trt-day"></span>
+    </div>
+    <div class="col-md-1 patient-detailed-overview--value text-right">
+      <span>63</span>
+    </div>
+  </div>
+
+  <div class="col-md-16 patient-detailed-overview">
+    <div class="col-md-5 patient-detailed-overview--key">
+      <span translate="patient.sum.avr-no-cough-pause-trt">Average cough pauses per treatment</span>
+    </div>
+    <div class="col-md-1 patient-detailed-overview--value">
+      <span>63</span>
+    </div>
+    <div class="col-md-5 patient-detailed-overview--key">
+      <span translate="patient.sum.avr-cough-pause-day">Average duration of cough pause</span>
+    </div>
+    <div class="col-md-1 patient-detailed-overview--value">
+      <span>63</span>
+    </div>
+    <div class="col-md-3 patient-detailed-overview--key">
+      <span translate="patient.sum.avr-pressure-trt"></span>
+    </div>
+    <div class="col-md-1 patient-detailed-overview--value text-right">
+      <span>63</span>
+    </div>
+  </div>
+
+  <div class="col-md-16 patient-detailed-overview">
+    <div class="col-md-5 patient-detailed-overview--key">
+      <span translate="patient.sum.last-3-days-hmr"></span>
+    </div>
+    <div class="col-md-1 patient-detailed-overview--value">
+      <span>63</span>
+    </div>
+    <div class="col-md-5 patient-detailed-overview--key">
+      <span translate="patient.sum.avr-freq-trt"></span>
+    </div>
+    <div class="col-md-1 patient-detailed-overview--value">
+      <span>63</span>
+    </div>
+  </div>
+
+  <div class="col-md-16 reset-padding delete-patient">
+    <buton class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="editPatient()" translate="patient.edit-patient"></buton>
+
+    <buton class="hillrom-btn btn-secondary float-right" ng-click="disassociatePatient()" translate="patient.disassociate-patient"></buton>
+  </div>
+</div>

@@ -12,51 +12,55 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Type;
 import org.joda.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
 import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 
 @Entity
-@Table(name="PATIENT_COMPLIANCE")
-public class PatientCompliance {
+@Table(name="NOTIFICATION")
+public class Notification {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	
-	@Column(name="compliance_score")
-	private Integer score;
+	@Column(name="notification_type")
+	private String notificationType;
 	
 	@Column
 	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
 	@JsonSerialize(using = CustomLocalDateSerializer.class)
     @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
 	private LocalDate date;
-	
-	@ManyToOne(optional=false,targetEntity=PatientInfo.class)
-	@JoinColumn(name="patient_id",referencedColumnName="id")
-	private PatientInfo patient;
-	
+
+	@JsonIgnore
 	@ManyToOne(optional=false,targetEntity=User.class)
 	@JoinColumn(name="user_id",referencedColumnName="id")
 	private User patientUser;
 	
-	@Column(name="hmr_run_rate")
-	private Integer hmrRunRate;
+	@JsonIgnore
+	@ManyToOne(optional=false,targetEntity=PatientInfo.class)
+	@JoinColumn(name="patient_id",referencedColumnName="id")
+	private PatientInfo patient;
+	
+	@Column(name="is_acknowledged")
+	private boolean isAcknowledged;
 
-	public PatientCompliance() {
+	
+	public Notification() {
 		super();
 	}
 
-	public PatientCompliance(Integer score, LocalDate date,
-			PatientInfo patient, User patientUser,Integer hmrRunRate) {
+	public Notification(String notificationType, LocalDate date,
+			User patientUser, PatientInfo patient, boolean isAcknowledged) {
 		super();
-		this.score = score;
+		this.notificationType = notificationType;
 		this.date = date;
-		this.patient = patient;
 		this.patientUser = patientUser;
-		this.hmrRunRate = hmrRunRate;
+		this.patient = patient;
+		this.isAcknowledged = isAcknowledged;
 	}
 
 	public Long getId() {
@@ -67,12 +71,12 @@ public class PatientCompliance {
 		this.id = id;
 	}
 
-	public Integer getScore() {
-		return score;
+	public String getNotificationType() {
+		return notificationType;
 	}
 
-	public void setScore(Integer score) {
-		this.score = score;
+	public void setNotificationType(String notificationType) {
+		this.notificationType = notificationType;
 	}
 
 	public LocalDate getDate() {
@@ -83,14 +87,6 @@ public class PatientCompliance {
 		this.date = date;
 	}
 
-	public PatientInfo getPatient() {
-		return patient;
-	}
-
-	public void setPatient(PatientInfo patient) {
-		this.patient = patient;
-	}
-
 	public User getPatientUser() {
 		return patientUser;
 	}
@@ -99,12 +95,20 @@ public class PatientCompliance {
 		this.patientUser = patientUser;
 	}
 
-	public Integer getHmrRunRate() {
-		return hmrRunRate;
+	public PatientInfo getPatient() {
+		return patient;
 	}
 
-	public void setHmrRunRate(Integer hmrRunRate) {
-		this.hmrRunRate = hmrRunRate;
+	public void setPatient(PatientInfo patient) {
+		this.patient = patient;
+	}
+
+	public boolean isAcknowledged() {
+		return isAcknowledged;
+	}
+
+	public void setAcknowledged(boolean isAcknowledged) {
+		this.isAcknowledged = isAcknowledged;
 	}
 
 	@Override
@@ -123,7 +127,7 @@ public class PatientCompliance {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PatientCompliance other = (PatientCompliance) obj;
+		Notification other = (Notification) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -134,9 +138,10 @@ public class PatientCompliance {
 
 	@Override
 	public String toString() {
-		return "PatientCompliance [id=" + id + ", score=" + score + ", date="
-				+ date + ", hmrRunRate=" + hmrRunRate + "]";
+		return "Notification [id=" + id + ", notificationType="
+				+ notificationType + ", date=" + date + ", isAcknowledged="
+				+ isAcknowledged + "]";
 	}
-	
+
 	
 }

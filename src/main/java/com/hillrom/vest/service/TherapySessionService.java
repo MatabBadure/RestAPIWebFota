@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -14,8 +16,12 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 
+import com.hillrom.vest.domain.PatientCompliance;
+import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
+import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 
@@ -26,34 +32,60 @@ public class TherapySessionService {
 	private static final String GROUP_BY_YEARLY = "yearly";
 	private static final String GROUP_BY_MONTHLY = "monthly";
 	private static final String GROUP_BY_WEEKLY = "weekly";
+	
 	@Inject
 	private TherapySessionRepository therapySessionRepository;
 	
-	public List<TherapySession> saveOrUpdate(List<TherapySession> therapySessions){
+	@Inject
+	private AdherenceCalculationService adherenceCalculationService;
+	
+	@Inject
+	private PatientComplianceRepository complianceRepository;
+	
+	public List<TherapySession> saveOrUpdate(List<TherapySession> therapySessions) throws HillromException{
 		User patientUser = therapySessions.get(0).getPatientUser();
-		List<TherapySession> existingTherapySessions =  therapySessionRepository.findByPatientUserId(patientUser.getId());
+		removeExistingTherapySessions(therapySessions, patientUser);
+		Map<Integer, List<TherapySession>> groupedTherapySessions = therapySessions
+				.stream()
+				.collect(
+						Collectors
+								.groupingBy(TherapySession::getTherapyDayOfTheYear));
+		
+		SortedSet<Integer> daysInSortOrder = new TreeSet<>(groupedTherapySessions.keySet());
+		for(Integer day : daysInSortOrder){
+			List<TherapySession> therapySessionsPerDay = groupedTherapySessions.get(day);
+			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId());
+			PatientCompliance compliance =  adherenceCalculationService.calculateCompliancePerDay(therapySessionsPerDay,protocol);
+			complianceRepository.save(compliance);
+			therapySessionRepository.save(therapySessionsPerDay);
+		}
+		return therapySessions;
+	}
+
+	public void removeExistingTherapySessions(
+			List<TherapySession> therapySessions, User patientUser) {
+		List<TherapySession> existingTherapySessions =  therapySessionRepository.findByPatientUserIdOrderByEndTimeDesc(patientUser.getId());
 		// Removing existing therapySessions from DB
 		if(existingTherapySessions.size() > 0){
-			TherapySession latestThreapySession = existingTherapySessions.get(0);
+			TherapySession latestThreapySessionFromDB = existingTherapySessions.get(0);
 			Iterator<TherapySession> tpsIterator = therapySessions.iterator();
 			while(tpsIterator.hasNext()){
 				TherapySession tps = tpsIterator.next();
 				// Remove previous therapy Sessions
 				int tpsDayOfYear = tps.getDate().getDayOfYear();
-				int latestTpsDayOfYear = latestThreapySession.getDate().getDayOfYear();
+				int latestTpsDayOfYear = latestThreapySessionFromDB.getDate().getDayOfYear();
 				if(tpsDayOfYear < latestTpsDayOfYear){
 					tpsIterator.remove();
 					//Remove previous therapySessions of the same day.
 				} else {
-					Integer tpsSessionNo = tps.getSessionNo();
-					Integer latestTpsSessionNo = latestThreapySession.getSessionNo();
-					if(tpsDayOfYear == latestTpsDayOfYear && tpsSessionNo <= latestTpsSessionNo){
+					DateTime tpsStartTime = tps.getStartTime();
+					DateTime latestTpsEndTimeFromDB = latestThreapySessionFromDB.getEndTime();
+					if(tpsDayOfYear == latestTpsDayOfYear && tpsStartTime.isBefore(latestTpsEndTimeFromDB)){
 						tpsIterator.remove();
 					}
 				}
 			}
 		}
-		return therapySessionRepository.save(therapySessions);
 	}
 	
 	public List<TherapyDataVO> findByPatientUserIdAndDateRange(Long id,Long fromTimestamp,Long toTimestamp,String groupBy){

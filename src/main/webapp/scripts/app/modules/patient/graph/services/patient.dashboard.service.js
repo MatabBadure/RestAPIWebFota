@@ -16,13 +16,24 @@ angular.module('hillromvestApp')
       *
       */
       getHMRGraphPoints: function(id, fromTimeStamp, toTimeStamp, groupBy, date) {
-        var url = admin.hillRomUser.baseURL;
+        var url = patient.graph.baseURL;
         url  = url + '/' + id + '/therapyData';
         if ( fromTimeStamp !== undefined && toTimeStamp !== undefined && groupBy !== undefined) {
           url = url + '?from=' + fromTimeStamp + '&to=' + toTimeStamp + '&groupBy=' + groupBy;
         } else if(date !== undefined){
           url = url + '?date=' + date;
         }
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function(response) {
+          return response;
+        });
+      },
+
+      getHMRBarGraphPoints: function(id, date) {
+        var url = patient.graph.baseURL;
+        url  = url + '/' + id + '/therapyData';
+        url = url + '?date=' + date;
         return $http.get(url, {
           headers: headerService.getHeader()
         }).success(function(response) {

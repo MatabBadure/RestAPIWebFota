@@ -8,20 +8,22 @@ angular.module('hillromvestApp')
       $scope.hmrLineGraph = true;
       $scope.hmrBarGraph = false;
       $scope.hmrGraph = true;
-      $scope.format = 'monthly';
+      $scope.format = 'weekly';
       $scope.compliance = {};
       $scope.compliance.pressure = true;
       $scope.compliance.duration = true;
       $scope.compliance.frequency = false;
-      $scope.fromTimeStamp = dateService.getnDaysBackTimeStamp();
-      $scope.toTimeStamp = Date.now();
+      $scope.toTimeStamp = 1422729000000;
+      $scope.timeStamp = 1420050600000;
+      //$scope.fromTimeStamp = dateService.getnDaysBackTimeStamp(7);
+      //$scope.patientId = StorageService.get('patientID');
+      $scope.fromTimeStamp = 1420050600000;
+      $scope.patientId = 160;
       $scope.handlelegends();
-      $scope.groupBy = 'weekly'
+      $scope.groupBy = 'monthly'
       if ($state.current.name === 'patientdashboard') {
         $scope.weeklyChart();
       }
-      $scope.patientId = StorageService.get('patientID') || 5 ;
-
     };
 
     $scope.xAxisTickFormatFunction = function(format){
@@ -49,13 +51,13 @@ angular.module('hillromvestApp')
       return function(key, x, y, e, graph) {
         var toolTip = '';
         angular.forEach(data, function(value) {
-          if(value.timeStamp === e.point[0]){
+          if(value.timestamp === e.point[0]){
               toolTip =
-                '<h6>' + dateService.getDateFromTimeStamp(value.timeStamp) + '</h6>' +
+                '<h6>' + dateService.getDateFromTimeStamp(value.timestamp) + '</h6>' +
                 '<p> Treatment/Day ' + value.treatmentsPerDay + '</p>' +
                 '<p> Frequency ' + value.weightedAvgFrequency + '</p>' +
                 '<p> Pressure ' + value.weightedAvgPressure + '</p>' +
-                '<p> Caugh Pauses ' + value.normalCaughPauses + '</p>';
+                '<p> Caugh Pauses ' + value.normalCoughPauses + '</p>';
           }
         });
       return toolTip;   
@@ -72,7 +74,7 @@ angular.module('hillromvestApp')
                 '<p> Treatment/Day ' + value.therapyData.treatmentsPerDay + '</p>' +
                 '<p> Frequency ' + value.therapyData.weightedAvgFrequency + '</p>' +
                 '<p> Pressure ' + value.therapyData.weightedAvgPressure + '</p>' +
-                '<p> Caugh Pauses ' + value.therapyData.normalCaughPauses + '</p>';
+                '<p> Caugh Pauses ' + value.therapyData.normalCoughPauses + '</p>';
           }
         });
       return toolTip;   
@@ -86,7 +88,6 @@ angular.module('hillromvestApp')
         for(var i in values){
           tickVals.push(values[i][0]);
         }
-        console.log('xAxisTickValuesFunction', d);
         return tickVals;
       };
     };
@@ -102,18 +103,22 @@ angular.module('hillromvestApp')
     };
 
     $scope.getNonDayHMRGraphData = function() {
-      $scope.completeGraphData = HMRWeeklyGraphData;
-      $scope.graphData = graphUtil.convertIntoHMRLineGraph($scope.completeGraphData);
+      /*$scope.completeGraphData = HMRWeeklyGraphData;
+      $scope.graphData = graphUtil.convertIntoHMRLineGraph($scope.completeGraphData);*/
       patientDashBoardService.getHMRGraphPoints($scope.patientId, $scope.fromTimeStamp, $scope.toTimeStamp, $scope.groupBy).then(function(response){
         //Will get response data from real time API once api is ready
+        $scope.completeGraphData = response.data;
+        $scope.graphData = graphUtil.convertIntoHMRLineGraph($scope.completeGraphData);
       }).catch(function(response) {});
     };
 
     $scope.getDayHMRGraphData = function() {
-      $scope.completeGraphData = HMRDayGraphData;
-      $scope.graphData = graphUtil.convertIntoHMRBarGraph($scope.completeGraphData);
-      patientDashBoardService.getHMRGraphPoints($scope.patientId, $scope.timeStamp).then(function(response){
+     /* $scope.completeGraphData = HMRDayGraphData;
+      $scope.graphData = graphUtil.convertIntoHMRBarGraph($scope.completeGraphData);*/
+      patientDashBoardService.getHMRBarGraphPoints($scope.patientId, $scope.timeStamp).then(function(response){
         //Will get response data from real time API once api is ready
+        $scope.completeGraphData = response.data;
+        $scope.graphData = graphUtil.convertIntoHMRBarGraph($scope.completeGraphData);
       }).catch(function(response) {});
     };
 

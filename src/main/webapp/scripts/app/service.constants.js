@@ -12,5 +12,8 @@ var admin = {
 var patient = {
 	notification : {
 		updateNotificationStatus : 'api/notifications'
+	},
+	graph : {
+		baseURL : 'api/users'
 	}
 }

@@ -34,7 +34,7 @@ angular.module('hillromvestApp')
         return (year).toString();
       },
       getnDaysBackTimeStamp:function(n) {
-        return new Date().getTime - (1000*60*60*24*n);
+        return new Date().getTime() - (1000*60*60*24*n);
       },
       getWeekOfMonth: function(d) {
         var d = new Date(d);

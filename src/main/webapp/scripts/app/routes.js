@@ -404,7 +404,7 @@ angular.module('hillromvestApp')
                 parent: 'patient-dashboard',
                 url: '/patient-dashboard',
                 data: {
-                    roles: ['ADMIN'],
+                    roles: ['PATIENT'],
                     pageTitle: 'patient.title'
                 },
                 views: {

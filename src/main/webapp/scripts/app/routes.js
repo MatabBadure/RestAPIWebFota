@@ -527,6 +527,58 @@ angular.module('hillromvestApp')
               }
             })
 
+            .state('clinicAssociatedHCP', {
+              parent: 'clinicEdit',
+              url: '/associatedHCP',
+              data: {
+                  roles: ['ADMIN'],
+                  pageTitle: 'clinic.title'
+              },
+              views: {
+                  'content@': {
+                      templateUrl: 'scripts/app/modules/admin/clinic/directives/clinic-info/hcp/associatedhcp.html',
+                      controller: 'clinicsController'
+                  }
+              },
+              resolve: {
+                  translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                      $translatePartialLoader.addPart('clinic');
+                      return $translate.refresh();
+                  }],
+                  authorize: ['Auth',
+                      function(Auth) {
+                          return Auth.authorize(false);
+                      }
+                  ]
+              }
+            })
+
+            .state('clinicAssociatedPatients', {
+              parent: 'clinicEdit',
+              url: '/associatedPatients',
+              data: {
+                  roles: ['ADMIN'],
+                  pageTitle: 'clinic.title'
+              },
+              views: {
+                  'content@': {
+                      templateUrl: 'scripts/app/modules/admin/clinic/directives/clinic-info/patients/associatedpatients.html',
+                      controller: 'clinicsController'
+                  }
+              },
+              resolve: {
+                  translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                      $translatePartialLoader.addPart('clinic');
+                      return $translate.refresh();
+                  }],
+                  authorize: ['Auth',
+                      function(Auth) {
+                          return Auth.authorize(false);
+                      }
+                  ]
+              }
+            })
+
             .state('patient', {
                 parent: 'entity',
                 url: '/patient',

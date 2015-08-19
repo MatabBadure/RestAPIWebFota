@@ -3,7 +3,7 @@
 <div class="container admin-user">
   <div class="col-md-16 admin-views">
     <span class="admin-views--title">
-      Dr. Willie R. Allen
+      {{doctor.title}} {{doctor.firstName}} {{doctor.middleName}} {{doctor.lastName}}
     </span>
   </div>
 
@@ -11,33 +11,34 @@
     <div class="col-md-5 user-detail-info__data">
       <span class="user-detail-info__data--key" translate="doctor.credentials"></span>
       <span class="user-detail-info__data--key">:</span>
-      <span class="user-detail-info__data--value">ASRT</span>
+      <span class="user-detail-info__data--value">{{doctor.credentials}}</span>
     </div>
     <div class="col-md-6 user-detail-info__data">
       <span class="user-detail-info__data--key" translate="doctor.npiNumber"></span>
       <span class="user-detail-info__data--key">:</span>
-      <span class="user-detail-info__data--value">1023547612</span>
+      <span class="user-detail-info__data--value">{{doctor.npiNumber}}</span>
     </div>
     <div class="col-md-5 user-detail-info__data">
       <span class="user-detail-info__data--key" translate="doctor.clinic-name"></span>
       <span class="user-detail-info__data--key">:</span>
-      <span class="user-detail-info__data--value">Lakeland Community Hospital</span>
+      <span class="user-detail-info__data--value">{{doctor.clinics[0].name}}</span>
     </div>
 
     <div class="col-md-5 user-detail-info__data">
       <span class="user-detail-info__data--key" translate="doctor.city"></span>
       <span class="user-detail-info__data--key">:</span>
-      <span class="user-detail-info__data--value">New York</span>
+      <span class="user-detail-info__data--value">{{doctor.city}}</span>
     </div>
     <div class="col-md-6 user-detail-info__data">
       <span class="user-detail-info__data--key" translate="doctor.state"></span>
       <span class="user-detail-info__data--key">:</span>
-      <span class="user-detail-info__data--value">NY</span>
+      <span class="user-detail-info__data--value">{{doctor.state}}</span>
     </div>
     <div class="col-md-5 user-detail-info__data">
       <span class="user-detail-info__data--key" translate="doctor.status"></span>
       <span class="user-detail-info__data--key">:</span>
-      <span class="user-detail-info__data--value">Active</span>
+      <span ng-if="doctor.activated" class="user-detail-info__data--value">Active</span>
+      <span ng-if="!doctor.activated" class="user-detail-info__data--value">Inactive</span>
     </div>
   </div>
 </div>
@@ -48,7 +49,7 @@
   </div>
 </div>
 
-<div class="dashboard dashboard--content">
+<!-- <div class="dashboard dashboard--content">
   <div class="container dashboard__manage-view margin-top-xl">
     <div class="dashboard__manage-view--search">
       <div class="fuid-search-box reset-padding-right">
@@ -67,30 +68,31 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->
 
-<div class="container admin-user">
+<div class="container admin-user" ng-repeat="clinic in doctor.clinics">
   <div class="col-md-16 detail-list">
     <div class="col-md-4 detail-list--title">
-      <span>Lakeland Community Hospital</span>
+      <span>{{clinic.name}}</span>
     </div>
     <div class="col-md-2 detail-list--desc">
-      <span>8244 Heather Lane</span>
+      <span>{{clinic.addredd}}</span>
     </div>
     <div class="col-md-2 detail-list--desc">
-      <span>New York</span>
+      <span>{{clinic.city}}</span>
     </div>
     <div class="col-md-1 detail-list--desc">
-      <span>NY</span>
+      <span>{{clinic.state}}</span>
     </div>
     <div class="col-md-2 detail-list--desc">
-      <span>209-236-9080</span>
+      <span>{{clinic.phoneNumber}}</span>
     </div>
     <div class="col-md-1 detail-list--desc">
-      <span>Parent</span>
+      <span ng-if="clinic.parent">Parent</span>
+      <span ng-if="!clinic.parent">Sattelite</span>
     </div>
     <div class="col-md-2 detail-list--desc">
-      <span>HR 123456</span>
+      <span>{{clinic.hillromId}}</span>
     </div>
     <div class="col-md-1 detail-list--desc">
       <div class="icon-font text-right">
@@ -98,11 +100,11 @@
       </div>
     </div>
     <div class="col-md-1 detail-list--desc text-right">
-        <input type="checkbox" />
+        <input ng-if="doctor.clinics.length > 1" type="checkbox" ng-model="clinic.selected" ng-change="selectClinic(clinic)"/>
     </div>
   </div>
 
   <div class="col-md-16 reset-padding margin-bottom-xl">
-    <buton class="hillrom-btn btn-inactive float-right" ng-click="linkClinic()" translate="patient.link-clinic"></buton>
+    <buton class="hillrom-btn btn-inactive float-right" ng-click="viewAssociatedPatients()" translate="patient.link-clinic"></buton>
   </div>
 </div>

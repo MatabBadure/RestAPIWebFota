@@ -52,6 +52,6 @@
         "view-assoc-patients": "View Associate Patients",
         "view-assoc-hcps": "View Associate HCPs",
         "assoc-clinic": "Associate Clinic",
-        "add-satellite-clinic"
+        "add-satellite-clinic":"Add Satellite Clinic"
     }
 }

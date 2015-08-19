@@ -38,7 +38,7 @@ angular.module('hillromvestApp')
       /**
       * @ngdoc method
       * @name getPatientInfo
-      * @description To get individual patient's information based on patient ID. 
+      * @description To get individual patient's information based on patient ID.
       *
       */
       getPatientInfo : function(id){
@@ -93,7 +93,15 @@ angular.module('hillromvestApp')
         }).success(function (response) {
           return response;
         });
-      }
+      },
 
+      getPatientsAssociatedToClinics : function(ids){
+        var url = 'api/clinics/patients?filter=id:'+ids;
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      }
     };
   });

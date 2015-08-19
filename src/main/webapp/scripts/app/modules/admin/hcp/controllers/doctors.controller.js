@@ -13,12 +13,13 @@ angular.module('hillromvestApp')
 
     $scope.init = function(){
       var currentRoute = $state.current.name;
-      if ($state.current.name === 'hcpEdit') {
+      if ($state.current.name === 'hcpProfile') {
         $scope.getDoctorDetails($stateParams.doctorId, $scope.setEditMode);
       } else if ($state.current.name === 'hcpNew') {
         $scope.createDoctor();
       }
-    }
+    };
+
     $scope.selectedDoctor = function(doctor) {
       $scope.doctorStatus.editMode = true;
       $scope.doctorStatus.isCreate = false;
@@ -48,6 +49,25 @@ angular.module('hillromvestApp')
       $scope.doctor = {
         title: 'Mr.'
       };
+    };
+
+    $scope.selectClinic = function(clinic){
+      console.log(clinic.selected);
+      if(clinic.selected){
+      } else {
+      }
+    };
+
+    $scope.viewAssociatedPatients = function(){
+      if($scope.doctor.clinics.length === 1){
+        var ids = $scope.doctor.clinics[0].id;
+        localStorage.setItem('ids', ids)
+        $state.go('associatedPatients');
+      } else {
+        console.log('Returning False...!')
+        return false;
+      }
+
     };
 
     $scope.onSuccess = function() {

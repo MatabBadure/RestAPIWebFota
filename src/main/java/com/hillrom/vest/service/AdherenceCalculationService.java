@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 
@@ -121,51 +122,64 @@ public class AdherenceCalculationService {
 				existingCompliance.setScore(currentScore);
 				return existingCompliance;
 			}
-			
-			// Custom Protocol, Min/Max Duration calculation is done
-			int minHMRReading = Objects.nonNull(protocolConstant
-					.getMinDuration()) ? protocolConstant.getMinDuration()
-					: protocolConstant.getTreatmentsPerDay()
-							* protocolConstant.getMinMinutesPerTreatment();
-					
-			int maxHMRReading = Objects.nonNull(protocolConstant
-					.getMaxDuration()) ? protocolConstant.getMaxDuration()
-					:protocolConstant.getTreatmentsPerDay() * protocolConstant.getMaxMinutesPerTreatment();
-					
-			if(protocolConstant.getMinFrequency() > actualMetrics.get("weightedAvgFrequency") 
-					|| protocolConstant.getMaxFrequency() < actualMetrics.get("weightedAvgFrequency")){
+		
+			if(isSettingsDeviated(protocolConstant, actualMetrics)){
 				currentScore -= 1;
-				notificationType = NotificationTypeConstants.SETTINGS_DEVIATION;
-			}else if(protocolConstant.getMinPressure() < actualMetrics.get("weightedAvgPressure") ||
-					protocolConstant.getMaxPressure() < actualMetrics.get("weightedAvgPressure")){
-				currentScore -= 1;
-				notificationType = NotificationTypeConstants.SETTINGS_DEVIATION;
-			}else if(minHMRReading > actualMetrics.get("totalDuration") ||
-					maxHMRReading < actualMetrics.get("totalDuration")){
+				notificationType = NotificationTypeConstants.SETTINGS_DEVIATION;				
+			}				
+			if(isHMRComplianceViolated(protocolConstant, actualMetrics)){
 				currentScore -= 2;
-				notificationType = NotificationTypeConstants.HMR_NON_COMPLIANCE;
-			}else if(protocolConstant.getTreatmentsPerDay() < actualMetrics.get("treatmentsPerDay")){
-				currentScore -= 2;
-				notificationType = NotificationTypeConstants.HMR_NON_COMPLIANCE;
-			}else{
-				if(currentScore < 100)
-					currentScore += 1;
+				if(StringUtils.isBlank(notificationType))
+					notificationType = NotificationTypeConstants.HMR_NON_COMPLIANCE;
+				else
+					notificationType = NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION;
 			}
+			if(previousScore == currentScore && currentScore != 100)
+					currentScore += 1;
+			
 			existingCompliance.setScore(currentScore);
 			existingCompliance.setHmrRunRate(actualMetrics.get("totalDuration").intValue());
 			
 			// Point has been deducted due to Protocol violation
 			if(previousScore > currentScore){
-				Notification notification = new Notification();
-				notification.setNotificationType(notificationType);
-				notification.setPatient(patient);
-				notification.setPatientUser(patientUser);
-				notification.setAcknowledged(false);
+				Notification notification = new Notification(notificationType,LocalDate.now(),patientUser,patient,false);
 				notificationRepository.save(notification);
 			}
 			
 			return existingCompliance;
 		}
+	}
+
+	public boolean isHMRComplianceViolated(ProtocolConstants protocolConstant,
+			Map<String, Double> actualMetrics) {
+		// Custom Protocol, Min/Max Duration calculation is done
+		int minHMRReading = Objects.nonNull(protocolConstant
+				.getMinDuration()) ? protocolConstant.getMinDuration()
+				: protocolConstant.getTreatmentsPerDay()
+						* protocolConstant.getMinMinutesPerTreatment();
+				
+		int maxHMRReading = Objects.nonNull(protocolConstant
+				.getMaxDuration()) ? protocolConstant.getMaxDuration()
+				:protocolConstant.getTreatmentsPerDay() * protocolConstant.getMaxMinutesPerTreatment();
+		if(minHMRReading > actualMetrics.get("totalDuration") ||
+				maxHMRReading < actualMetrics.get("totalDuration")){
+			return true;
+		}else if(protocolConstant.getTreatmentsPerDay() < actualMetrics.get("treatmentsPerDay")){
+			return true;
+		}
+		return false;
+	}
+
+	public boolean isSettingsDeviated(ProtocolConstants protocolConstant,
+			Map<String, Double> actualMetrics) {
+		if(protocolConstant.getMinFrequency() > actualMetrics.get("weightedAvgFrequency") 
+				|| (protocolConstant.getMaxFrequency()*0.85) > actualMetrics.get("weightedAvgFrequency")){
+			return true;
+		}else if(protocolConstant.getMinPressure() < actualMetrics.get("weightedAvgPressure") ||
+				(protocolConstant.getMaxPressure()*0.85) > actualMetrics.get("weightedAvgPressure")){
+			return true;
+		}
+		return false;
 	}
 
 	public Map<String,Double> actualTherapyMetricsPerDay(

@@ -28,20 +28,8 @@
 			<column name="max_pressure" type="integer" />
 		</createTable>
 		
-<!-- 		<loadData encoding="UTF-8" file="config/liquibase/protocol_constants.csv"
-			separator=";" tableName="PROTOCOL_CONSTANTS">
-			<column name="treatments_per_day" type="integer" />
-			
-			<column name="min_minutes_per_treatment" type="integer" />
-			<column name="max_minutes_per_treatment" type="integer" />
-			
-			<column name="min_frequency" type="integer" />
-			<column name="max_frequency" type="integer" />
-			
-			<column name="min_pressure" type="integer" />
-			<column name="max_pressure" type="integer" />
-		</loadData>
- -->		
+		<loadData encoding="UTF-8" file="config/liquibase/protocol_constants.csv"
+			 tableName="PROTOCOL_CONSTANTS"/>		
 			
 	</changeSet>
 </databaseChangeLog>

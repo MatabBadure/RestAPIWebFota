@@ -8,3 +8,9 @@ var admin = {
 		baseURL : 'api/user'
 	}
 }
+
+var patient = {
+	notification : {
+		updateNotificationStatus : 'api/notifications'
+	}
+}

@@ -5,22 +5,37 @@
 		</div>
 		<div>
 			<div style="height: 100px;">
-				<span ng-click="HMRGraph()">HMR Data</span>
-				<span ng-click="complianceGraph()">Compliance</span>
+				<span ng-click="showHmrGraph()">HMR Data</span>
+				<span ng-click="showComplianceGraph()">Compliance</span>
 			</div>
 			<div>
-				<span ng-click="hmrDailyChart()">Daily</span>
-				<span ng-click="hmrWeeklyChart()">Weekly</span>
-				<span ng-click="hmrMonthlyChart()">Monthly</span>
-				<span ng-click="hmrYearlyChart()">Yearly</span>
+				<span ng-click="dayChart()" ng-hide="complianceGraph">Daily</span>
+				<span ng-click="weeklyChart()">Weekly</span>
+				<span ng-click="monthlyChart()">Monthly</span>
+				<span ng-click="yearlyChart()">Yearly</span>
 				<span>Datepicker</span>
 			</div>
 		</div>
- 		<!-- <nvd3 options="options" data="data"></nvd3> -->
-
+		<style>
+		text {
+		font: 12px sans-serif;
+		}
+		svg {
+		display: block;
+		}
+		html, body, #complianceGraph, svg {
+		margin: 0px;
+		padding: 0px;
+		height: 100%;
+		width: 100%;
+		}
+}
+		</style>
+	<div ng-if="hmrGraph">
+		<div ng-if="hmrLineGraph">
 	 		<nvd3-line-chart
 	    	  data="graphData"
-	        id="HMRGraph"
+	        id="HMRLineGraph"
 	        width="1250"
 	        height="350"
 	        showXAxis="true"
@@ -30,12 +45,45 @@
 	        tooltips="true"
 	        isArea="true"
 	        interpolate="step"
-	        objectEquality="true"
 	        yAxisLabel="Minutes"
           margin="{left:100,top:20,bottom:20,right:10}"
-	        xAxisTickFormat="xAxisTickFormatFunction()"
+	        xAxisTickFormat="xAxisTickFormatFunction(format)"
 	        xAxisTickValues="xAxisTickValuesFunction()"
-	        tooltipcontent="toolTipContentFunction()">
+	        tooltipcontent="toolTipContentFunction(completeGraphData)">
 	    </nvd3-line-chart>
+	  </div>
+	  <div ng-if="hmrBarGraph">
+		 	<nvd3-multi-bar-chart
+		    	data="graphData"
+	        id="hmrBarGraph"
+	        width="1250"
+	        height="300"
+	        showXAxis="true"
+	        showYAxis="true"
+	        interactive="true"
+	        tooltips="true"
+	        isArea="true"
+	        yAxisLabel="Minutes"
+	        margin="{left:100,top:20,bottom:20,right:10}"
+	        xAxisTickFormat="xAxisTickFormatFunction(format)"
+	        xAxisTickValues="xAxisTickValuesFunction()"
+	        tooltipcontent="toolTipContentFunction(completeGraphData)">
+		  </nvd3-multi-bar-chart>
+	  </div>
+	</div>
+
+	  <div ng-if="complianceGraph">
+	  	<div>
+	  		 <input type="checkbox" name="pressure" ng-disabled="pressureIsDisabled" ng-model="compliance.pressure" ng-change="reCreateComplianceGraph()">
+	  		 <span>pressure</span>
+	  		 <input type="checkbox" name="frequency" ng-disabled="frequencyIsDisabled" ng-model="compliance.frequency" ng-change="reCreateComplianceGraph()">
+	  		 <span>Frequency</span>
+	  		 <input type="checkbox" name="duration" ng-disabled="durationIsDisabled" ng-model="compliance.duration" ng-change="reCreateComplianceGraph()">
+	  		 <span>Duration</span>
+	  	</div>
+	  	<div id="complianceGraph">
+      	<svg style="height:350px"> </svg>
+    	</div>
+	  </div>
 
     

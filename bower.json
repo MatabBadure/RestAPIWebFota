@@ -34,7 +34,8 @@
     "angular-mocks": "1.4.0",
     "angular-scenario": "1.4.0",
     "angular-loading-bar": "~0.8.0",
-    "jquery.easy-pie-chart": "~2.1.6"
+    "jquery.easy-pie-chart": "~2.1.6",
+    "angular-mask": "~3.0.12"
   },
   "resolutions": {
     "angular": "1.4.0",

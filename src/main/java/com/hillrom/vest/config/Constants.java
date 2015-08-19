@@ -32,5 +32,9 @@ public final class Constants {
     public static final String FREQUENCIES = "frequencies";
     
     public static final String MIN_MINUTES_PER_DAY = "minimumMinutesOfUsePerDay";
+    
+    public static final String CUSTOM_PROTOCOL = "Custom";
+    
+    public static final String NORMAL_PROTOCOL = "Normal";
 
 }

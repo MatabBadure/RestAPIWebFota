@@ -1,0 +1,70 @@
+<admin-patient-navbar></admin-patient-navbar>
+<div class="container admin-user">
+  <div class="col-md-16 margin-top reset-padding">
+   <div class="user-gen-details">
+     <span class="user-gen-details--name">Williams James</span>
+     <span class="user-gen-details--hr-id">HR45321</span>
+   </div>
+  </div>
+</div>
+<div class="dashboard dashboard--content padding-bottom-ls">
+  <form name="addDeviceForm" ng-submit="editPatient()" novalidate autocomplete="off">
+    <div class="container dashboard__form">
+      <div>
+        <div class="col-md-16 reset-padding">
+          <span class="dashboard__form--type" translate="patient.device.gen-details"></span>
+        </div>
+
+        <div class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.device.serial-no"></span>
+              <span class="">*</span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input class="" type="text" ng-model="device.serialNumber" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.device.bluetoothId"></span>
+              <span class="">*</span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input class="" type="text" ng-model="device.bluetoothId" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="patient.device.hubId"></span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input class="" type="text" ng-model="device.hubId">
+            </div>
+          </div>
+        </div>
+
+      <div class="clr"></div>
+    </div>
+
+
+    <div class="col-md-16 margin-top reset-padding">
+      <div class="col-md-7 reset-padding">
+      <div class="">
+        <buton type="submit" ng-if="!device.edit" class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="addDevice()" ng-show="!patientStatus.isCreate" translate="patient.btn.save">Save</buton>
+        <buton type="submit" ng-if="device.edit" class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="updateDevice()" ng-show="!patientStatus.isCreate" translate="patient.btn.update">Update</buton>
+
+        <buton type="submit" class="hillrom-btn btn-secondary float-right" ng-click="cancelProtocolDevice()" ng-show="!patientStatus.isCreate" translate="patient.btn.cancel">cancel</buton>
+        <div class="clr"></div>
+      </div>
+      </div>
+    </div>
+    </div>
+  </form>
+</div>

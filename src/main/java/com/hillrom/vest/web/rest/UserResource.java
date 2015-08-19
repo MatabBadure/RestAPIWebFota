@@ -36,6 +36,7 @@ import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.PatientProtocolService;
 import com.hillrom.vest.service.PatientVestDeviceService;
+import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -67,6 +68,8 @@ public class UserResource {
 	@Inject
 	private PatientProtocolService patientProtocolService;
 
+	@Inject
+	private TherapySessionService therapySessionService;
 	/**
 	 * GET /users -> get all users.
 	 */
@@ -326,5 +329,19 @@ public class UserResource {
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
     	}
     }
-	
+
+    @RequestMapping(value = "/users/{id}/therapyData",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> findByPatientUserIdAndDate(@PathVariable Long id,
+    		@RequestParam(required=false)Long from,
+    		@RequestParam(required=false)Long to,
+    		@RequestParam(required=false)String groupBy,
+    		@RequestParam(required=false)Long date){
+    	if(Objects.nonNull(date)){
+    		return new ResponseEntity(therapySessionService.findByPatientUserIdAndDate(id, date),HttpStatus.OK);
+    	}else{
+    		return new ResponseEntity<>(therapySessionService.findByPatientUserIdAndDateRange(id, from, to, groupBy), HttpStatus.OK);
+    	}
+    }
 }

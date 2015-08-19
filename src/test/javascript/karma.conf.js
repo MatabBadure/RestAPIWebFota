@@ -43,8 +43,12 @@ module.exports = function (config) {
             'main/webapp/bower_components/ng-tags-input/ng-tags-input.min.js',
             'main/webapp/bower_components/angular-animate/angular-animate.js',
             'main/webapp/bower_components/angular-notys/angular-notys.js',
+            'main/webapp/bower_components/d3/d3.js',
+            'main/webapp/bower_components/nvd3/nv.d3.js',
+            'main/webapp/bower_components/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.js',
             'main/webapp/bower_components/angular-mocks/angular-mocks.js',
             'main/webapp/bower_components/angular-loading-bar/build/loading-bar.js',
+            'main/webapp/bower_components/angular-mask/dist/ngMask.js',
             // endbower
             'main/webapp/bower_components/angular-recaptcha/release/angular-recaptcha.js',
             'main/webapp/scripts/app/app.js',

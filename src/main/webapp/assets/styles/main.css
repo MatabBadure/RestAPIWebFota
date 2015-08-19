@@ -6142,8 +6142,7 @@ a::-moz-focus-inner {
 }
 
 .hillrom-btn {
-  right: 40px;
-  padding: 5px 24px;
+  padding: 5px 10px;
   border-radius: 3px;
   text-transform: capitalize;
   font-size: 12px;
@@ -6155,6 +6154,24 @@ a::-moz-focus-inner {
   background-color: #ef7164;
   color: #fff;
   margin-left: 10px;
+}
+
+.btn-primary {
+  border: 1px solid #FF9829;
+  background-color: #FF9829;
+  color: #363A41;
+}
+
+.btn-secondary {
+  border: 1px solid #FFAD54;
+  background-color: #FFAD54;
+  color: #363A41;
+}
+
+.btn-inactive {
+  border: 1px solid #dddddd;
+  background-color: #dddddd;
+  color: #363A41;
 }
 
 .btn-submit-disable {
@@ -6563,6 +6580,95 @@ tags-input.ng-invalid .tags {
   box-shadow: 0 -3px 0 0 #FF9829 inset;
   border-radius: 0;
   padding-bottom: 9px;
+}
+
+.admin-patient .patient-details {
+  text-align: right;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+.admin-patient .patient-details--name {
+  color: #646568;
+}
+.admin-patient .patient-details--hr-id {
+  color: #FF9829;
+}
+
+.admin-patient .patient-clinic {
+  margin-top: 20px;
+  padding: 10px 0;
+}
+.admin-patient .patient-clinic--title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #34455C;
+}
+
+.admin-patient .clinic-list {
+  padding: 0;
+  margin-top: 20px;
+  border-bottom: 1px solid #cccccc;
+}
+
+.admin-patient .clinic-list__detail {
+  padding: 0;
+}
+.admin-patient .clinic-list__detail--name {
+  color: #34455C;
+  font-size: 14px;
+  font-weight: 700;
+  display: block;
+}
+.admin-patient .clinic-list__detail--email {
+  color: #858F9D;
+  font-size: 12px;
+  font-weight: 400;
+  display: block;
+}
+
+.admin-patient .clinic-list__address {
+  padding: 0;
+  font-size: 12px;
+  font-weight: 400;
+  color: #858F9D;
+}
+.admin-patient .clinic-list__address--primary, .admin-patient .clinic-list__address--secondary {
+  display: block;
+}
+
+.admin-patient .clinic-list__phone, .admin-patient .clinic-list__fax {
+  padding: 0;
+  color: #5d6a7d;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.admin-patient .clinic-list__hr-id {
+  padding: 0;
+}
+.admin-patient .clinic-list__hr-id span {
+  color: #34455C;
+  font-weight: 600;
+}
+
+.admin-patient .clinic-list__delete {
+  text-align: center;
+}
+.admin-patient .clinic-list__delete span {
+  cursor: pointer;
+}
+
+.admin-patient .clinic-link {
+  margin: 30px 0;
+  padding: 0;
+}
+.admin-patient .clinic-link input {
+  width: 80%;
+  padding-left: 10px;
+  outline: none;
+  height: 30px;
+  color: #34455C;
 }
 
 .footer {
@@ -7010,3 +7116,6 @@ tags-input.ng-invalid .tags {
 }
 
 /*# sourceMappingURL=main.css.map */
+.nav.navbar-nav li a{
+  cursor: pointer;
+}

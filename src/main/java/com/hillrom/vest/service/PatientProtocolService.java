@@ -23,6 +23,7 @@ import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.ProtocolDTO;
+import com.hillrom.vest.web.rest.dto.ProtocolEntryDTO;
 
 /**
  * Service class for managing users.
@@ -49,17 +50,24 @@ public class PatientProtocolService {
 		if(patientUser != null) {
 			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
 		 	if(patientInfo != null){
-		 		List<PatientProtocolData> protocolList = new LinkedList<>();
-		 		protocolDTO.getProtocolEntries().forEach(protocolEntry -> {
+		 		String protocolKey = patientProtocolRepository.id();
+		 	    List<PatientProtocolData> protocolList = new LinkedList<>();
+		 	    Boolean isFirstPoint = true;
+		 		for(ProtocolEntryDTO protocolEntry : protocolDTO.getProtocolEntries()){
 		 			PatientProtocolData patientProtocolAssoc = new PatientProtocolData(protocolDTO.getType(), patientInfo, patientUser,
 		 					protocolDTO.getTreatmentsPerDay(), protocolEntry.getMinMinutesPerTreatment(), protocolEntry.getMaxMinutesPerTreatment(),
 		 					protocolEntry.getTreatmentLabel(), protocolEntry.getMinFrequency(), protocolEntry.getMaxFrequency(), protocolEntry.getMinPressure(),
 		 					protocolEntry.getMaxPressure());
-		 			patientProtocolAssoc.setId(patientProtocolRepository.id());
-		 			patientProtocolAssoc.setProtocolKey(patientProtocolAssoc.getId());
-		 			patientProtocolRepository.saveAndFlush(patientProtocolAssoc);
+		 			if(isFirstPoint) {
+		 				patientProtocolAssoc.setId(protocolKey);
+		 				isFirstPoint = false;
+		 			} else {
+		 				patientProtocolAssoc.setId(patientProtocolRepository.id());
+		 			}
+		 			patientProtocolAssoc.setProtocolKey(protocolKey);
 		 			protocolList.add(patientProtocolAssoc);
-		 		});
+		 		}
+		 		patientProtocolRepository.save(protocolList);
 		 		return protocolList;
 		 	} else {
 		 		throw new HillromException(ExceptionConstants.HR_523);
@@ -75,13 +83,27 @@ public class PatientProtocolService {
 			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
 		 	if(patientInfo != null){
 		 		List<PatientProtocolData> protocolList = new LinkedList<>();
+		 		int treatmentsPerDay = ppdList.get(0).getTreatmentsPerDay();
+		 		String type = ppdList.get(0).getType();
+		 		String protocolKey = ppdList.get(0).getProtocolKey();
 		 		ppdList.forEach(ppd -> {
-		 			PatientProtocolData currentPPD = patientProtocolRepository.findOne(ppd.getId());
-			 		if(Objects.nonNull(currentPPD)){
-			 			assignValuesToPatientProtocolObj(ppd, currentPPD);
-		 				patientProtocolRepository.saveAndFlush(currentPPD);
-		 				protocolList.add(currentPPD);
-			 		}
+		 			if(Objects.nonNull(ppd.getId())){
+			 			PatientProtocolData currentPPD = patientProtocolRepository.findOne(ppd.getId());
+				 		if(Objects.nonNull(currentPPD)){
+				 			assignValuesToPatientProtocolObj(ppd, currentPPD);
+			 				patientProtocolRepository.saveAndFlush(currentPPD);
+			 				protocolList.add(currentPPD);
+				 		}
+		 			} else {
+		 				PatientProtocolData patientProtocolAssoc = new PatientProtocolData(type, patientInfo, patientUser,
+		 						treatmentsPerDay, ppd.getMinMinutesPerTreatment(), ppd.getMaxMinutesPerTreatment(),
+		 						ppd.getTreatmentLabel(), ppd.getMinFrequency(), ppd.getMaxFrequency(), ppd.getMinPressure(),
+		 						ppd.getMaxPressure());
+			 			patientProtocolAssoc.setId(patientProtocolRepository.id());
+			 			patientProtocolAssoc.setProtocolKey(protocolKey);
+			 			patientProtocolRepository.saveAndFlush(patientProtocolAssoc);
+			 			protocolList.add(patientProtocolAssoc);
+		 			}
 		 		});
 		 		return protocolList;
 		 	} else {

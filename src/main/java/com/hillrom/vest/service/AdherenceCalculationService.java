@@ -201,6 +201,4 @@ public class AdherenceCalculationService {
 		return actualMetrics;
 	}
 	
-	
-	
 }

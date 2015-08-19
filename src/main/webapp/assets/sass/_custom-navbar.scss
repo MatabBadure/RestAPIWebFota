@@ -116,8 +116,12 @@ $header--background: $body-bg;
 	}
 
 	.popover {
-		left: -55px !important;
 		border-radius: 0;
+		right: -13px;
+    width: 170px;
+    left: unset !important;
+		background-color: $waikawa-gray;
+		border: 1px solid $pickled-bluewood;
 	}
 
 	.popover-content {
@@ -138,9 +142,21 @@ $header--background: $body-bg;
 			span {
 				display: block;
 				padding: 0 10px;
+				color: $bombay;
+			}
+			&:hover {
+				color: $bombay;
 			}
 		}
 	}
+}
+
+.header-popover .popover-link .popover * {
+	color: $bombay;
+}
+
+.header-popover .popover-link .popover .popover-content div:hover span {
+	color: $bombay;
 }
 
 .popover-link {

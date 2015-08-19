@@ -1,0 +1,23 @@
+<div class="navbar patient-user patient-user--nav">
+  <div class="container">
+    <div class="collapse navbar-collapse patient-user__navbar" id="navbar-collapse">
+      <ul class="nav navbar-nav">
+        <li >
+          <a ng-class="{active: isActive('profile')}" ng-href="" ng-click="switchPatientTab('patientOverview')">
+            <span class="" translate="profile.tabs.profile-details"></span>
+          </a>
+        </li>
+        <li>
+          <a ng-class="{ active: isActive('updatePassword')}" ng-href="" ng-click="switchPatientTab('patientDemographic')">
+            <span class="" translate="profile.tabs.update-password"></span>
+          </a>
+        </li>
+        <li>
+          <a ng-class="{ active: isActive('settings')}" ng-href="" ng-click="switchPatientTab('patientClinics')">
+            <span class="" translate="profile.tabs.setting"></span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

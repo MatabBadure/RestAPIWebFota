@@ -1,0 +1,12 @@
+{
+  "profile" : {
+    "home": {
+      "title": "Profile"
+    },
+    "tabs": {
+      "profile-details": "Profile Details",
+      "update-password": "Update Password",
+      "setting": "Settings"
+    }
+  }
+}

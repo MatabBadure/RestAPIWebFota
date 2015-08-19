@@ -3,6 +3,56 @@
 angular.module('hillromvestApp')
 .controller('graphController', function($scope, $state, patientDashBoardService, StorageService, dateService, graphUtil) {
     var chart;
+
+
+  /*-----Date picker for dashboard----*/
+/* $scope.date = {
+  startDate: '08/12/2015', 
+  endDate: '08/18/2015',
+  opens: 'center',
+  parentEl: '#dp3',
+};*/
+console.log("from and To dates :"+$scope.dates);
+  /*-----Date picker for dashboard----*/
+
+  /*---Simple pye chart JS-----*/
+    $scope.percent1 = 30;
+    $scope.percent2 = 75;
+    $scope.percent3 = 24;
+    $scope.adherence = {
+        animate:{
+            duration:3000,
+            enabled:true
+        },
+        barColor:'#ffc31c',
+        trackColor: '#ccc',
+        scaleColor: false,
+        lineWidth:12,
+        lineCap:'circle'
+    };
+    $scope.hmr = {
+        animate:{
+            duration:3000,
+            enabled:true
+        },
+        barColor:'#7e2253',
+        trackColor: '#ccc',
+        scaleColor: false,
+        lineWidth:12,
+        lineCap:'circle'
+    };
+  $scope.missedtherapy = {
+          animate:{
+              duration:3000,
+              enabled:true
+          },
+          barColor:'#ea766b',
+          trackColor: '#ccc',
+          scaleColor: false,
+          lineWidth:12,
+          lineCap:'circle'
+      };
+ /*---Simple pye chart JS END-----*/
     $scope.init = function() {
       $scope.complianceToggle = false;
       $scope.hmrLineGraph = true;
@@ -82,6 +132,7 @@ angular.module('hillromvestApp')
     }
 
     $scope.xAxisTickValuesFunction = function(){
+      
     return function(d){
         var tickVals = [];
         var values = d[0].values;
@@ -142,6 +193,16 @@ angular.module('hillromvestApp')
         $scope.createComplianceGraphData();
         $scope.drawComplianceGraph();
       }
+/*      ];
+      $scope.xAxisTickValuesFunction();
+      $scope.xAxisTickFormatFunction = function(){
+      return function(d){
+        return d3.time.format('%a')(new Date(d));
+        }
+      }
+      $scope.xAxisTickFormatFunction();
+      $scope.toolTipContentFunction();
+      d3.select("g.nv-y.nv-axis").select("text.nv-axislabel").attr({y:"-3em"});*/
     }
     // Yearly chart
     $scope.yearlyChart = function() {
@@ -155,6 +216,9 @@ angular.module('hillromvestApp')
           $scope.createComplianceGraphData();
           $scope.drawComplianceGraph();
       }
+/*      $scope.xAxisTickFormatFunction();
+      $scope.toolTipContentFunction();
+      d3.select("g.nv-y.nv-axis").select("text.nv-axislabel").attr({y:"-3em"});*/
     }
    
     // Monthly chart

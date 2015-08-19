@@ -429,7 +429,32 @@ angular.module('hillromvestApp')
                 parent: 'patient-dashboard',
                 url: '/patient-dashboard',
                 data: {
-                    roles: ['ADMIN'],
+                    roles: ['ADMIN','PATIENT'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/patient/graph/views/dashboard-landing.html',
+                        controller: 'graphController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+            .state('patientdashboardCaregiver', {
+                parent: 'patient-dashboard',
+                url: '/caregiver',
+                data: {
+                    roles: ['ADMIN','PATIENT'],
                     pageTitle: 'patient.title'
                 },
                 views: {

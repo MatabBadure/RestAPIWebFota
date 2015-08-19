@@ -1,0 +1,64 @@
+.dashboard_line_graph {
+
+	 .nv-groups {
+
+	 	.nv-point{
+	 		stroke-opacity: 1!important;
+		    stroke-width: 5px!important;
+		    fill-opacity: 1!important;
+	 	}
+	}
+	.nv-lineChart{
+		g{
+			rect{
+				fill: #E5EFF9;
+				opacity: 1 !important;
+			}
+		}
+	}
+	.nv-axis{
+			path{
+				stroke: #ccc;
+			}
+		} 
+}
+
+/* Over write date picker style*/
+.daterangepicker{
+	&.dropdown-menu{
+	width: 490px;
+}
+		.ranges{
+			display: none !important;
+		}
+	} 
+	.table-condensed{
+		thead{
+			tr{
+				background-color: $iceberg;
+				color: #fff;
+			&:not(:first-child){
+				background-color: transparent;
+				color: $gray-dark;
+			}
+			}
+		}
+		th{
+		&.available{
+			&:hover{
+				background: transparent !important;
+			}
+			}
+		}
+
+	}
+	.glyphicon-arrow-left{
+		&:before{
+			content: '\003c';
+		}
+	}
+	.glyphicon-arrow-right{
+		&:before{
+			content: '\003e';
+		}
+	}

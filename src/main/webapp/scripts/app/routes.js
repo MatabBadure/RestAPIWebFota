@@ -710,6 +710,58 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
+
+            .state('profile', {
+                parent: 'admin',
+                url: '/profile',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/profile/navbar/navbar.html',
+                        controller: 'graphController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('profile');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+            .state('profilePassword', {
+                parent: 'profile',
+                url: '/password',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/profile/views/profile/password.html',
+                        controller: 'graphController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+
             .state('clinicProfile', {
               parent: 'clinicUser',
               url: '/{clinicId}/clinic-info',
@@ -735,5 +787,4 @@ angular.module('hillromvestApp')
                   ]
               }
             })
-            
 });

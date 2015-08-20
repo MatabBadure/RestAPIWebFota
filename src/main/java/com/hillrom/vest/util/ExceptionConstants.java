@@ -87,7 +87,7 @@ public class ExceptionConstants {
     public static final String HR_583 = "Unable to associate HCP with clinic.";
     
     // Notifications
-    public static final String HR_591 = "NO such Notification found";
+    public static final String HR_591 = "No such Notification found";
     
     //General 4** Exceptions
     public static final String HR_403 = "Permission Denied";

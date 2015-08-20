@@ -100,10 +100,10 @@
           </div>
           <div class="col-md-7 reset-padding col-md-offset-2">
             <div class="col-md-6 dashboard__form--label reset-padding">
-              <span class="" translate="profile.employee-id"></span>
+              <span class="" translate="profile.mobile-no"></span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" name="employeeID" ng-model="user.employeeID" ng-readonly="validateSuperAdmin()">
+              <input class="" type="text" name="employeeID" ng-model="user.employeeID" ng-readonly="validateSuperAdmin()" mask="(999) 999-9999">
             </div>
           </div>
         </div>
@@ -136,7 +136,7 @@
             </div>
             <div class="col-md-10 dashboard__form__input--option reset-padding">
               <div class="custom-dropdown">
-                <select name="role" validate-on-blur ng-model="profile.role" ng-readonly="validateSuperAdmin()" required>
+                <select name="role" validate-on-blur ng-model="profile.role" ng-readonly="validateSuperAdmin()" required disabled>
                   <option selected value="" translate="profile.role.default">Select a Role</option>
                   <option translate="profile.role.super-admin" value="ADMIN">Super Admin</option>
                   <option translate="profile.role.account-services" value="ACCT_SERVICES">Account Services</option>

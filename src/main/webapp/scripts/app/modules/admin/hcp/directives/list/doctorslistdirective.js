@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .directive('doctorList', function(UserService, $state) {
+  .directive('doctorList', function(UserService, $state, $stateParams) {
     return {
       templateUrl: 'scripts/app/modules/admin/hcp/directives/list/list.html',
       restrict: 'E',
@@ -50,7 +50,7 @@ angular.module('hillromvestApp')
         });
 
         $scope.selectDoctor = function(doctor) {
-          $state.go('hcpEdit',{
+          $state.go('hcpProfile',{
             'doctorId': doctor.id
           });
         };

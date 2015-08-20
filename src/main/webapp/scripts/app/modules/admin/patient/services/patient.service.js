@@ -95,6 +95,15 @@ angular.module('hillromvestApp')
         });
       },
 
+      getPatientsAssociatedToClinics : function(ids){
+        var url = 'api/clinics/patients?filter=id:'+ids;
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
+      },
+
       /**
       * @ngdoc method
       * @name getClinicsLinkedToPatient

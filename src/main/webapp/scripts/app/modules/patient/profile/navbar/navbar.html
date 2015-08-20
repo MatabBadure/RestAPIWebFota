@@ -34,7 +34,7 @@
             </div>
             <div class="col-md-10 dashboard__form__input reset-padding selected-box-container">
               <div class="custom-dropdown">
-                <select ng-model="profile.title" name="title" ng-readonly="validateSuperAdmin()" ng-options="option for option in ['Mr.', 'Mrs.', 'Ms.']" ng-selected="{{option === user.title}}">
+                <select ng-model="profile.title" name="title" ng-readonly="validateSuperAdmin()" ng-options="option for option in ['Mr.', 'Mrs.', 'Ms.']" ng-selected="{{option === user.title}}" disabled>
                   <option selected translate="user.title.mr" value="Mr."></option>
                   <option translate="profile.title.mrs" value="Mrs."></option>
                   <option translate="profile.title.miss" value="Miss"></option>
@@ -42,16 +42,6 @@
               </div>
             </div>
           </div>
-
-          <div class="col-md-7 reset-padding col-md-offset-2" ng-show="userStatus.editMode">
-            <div class="col-md-6 dashboard__form--label reset-padding">
-              <span class="" >User ID</span>
-            </div>
-            <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" readonly ng-model="user.id">
-            </div>
-          </div>
-
         </div>
 
         <div class="col-md-16 reset-padding margin-top">
@@ -61,7 +51,7 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" name="firstName" validate-on-blur ng-model="user.firstName" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-z A-Z]+$/" ng-readonly="validateSuperAdmin()" required>
+              <input class="" type="text" name="firstName" validate-on-blur ng-model="user.firstName" ng-minlength=2 ng-maxlength=15 ng-pattern="/^[a-z A-Z]+$/" required readonly>
               <div ng-show="(form.firstName.$dirty && form.firstName.$showValidationMessage && form.firstName.$invalid) || submitted">
                 <span class="has-error" ng-show="form.firstName.$error.required">
                   First Name is required.
@@ -83,7 +73,7 @@
               <span class="" translate="profile.middle-name"></span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" name="middleName" validate-on-blur ng-model="user.middleName" ng-pattern="/^[a-z A-Z]+$/" ng-minlength=2 ng-maxlength=15 ng-readonly="validateSuperAdmin()">
+              <input class="" type="text" name="middleName" validate-on-blur ng-model="user.middleName" ng-pattern="/^[a-z A-Z]+$/" ng-minlength=2 ng-maxlength=15 readonly>
               <div ng-show="(form.middleName.$dirty && form.middleName.$showValidationMessage && form.middleName.$invalid)">
                 <span class="has-error" ng-show="form.middleName.$error.pattern" >
                   Middle Name cannot have number.
@@ -106,7 +96,7 @@
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" name="lastName" validate-on-blur ng-pattern="/^[a-z A-Z]+$/" ng-model="user.lastName" ng-minlength=2 ng-maxlength=15 ng-readonly="validateSuperAdmin()" required>
+              <input class="" type="text" name="lastName" validate-on-blur ng-pattern="/^[a-z A-Z]+$/" ng-model="user.lastName" ng-minlength=2 ng-maxlength=15 required readonly>
               <div ng-show="(form.lastName.$dirty && form.lastName.$showValidationMessage && form.lastName.$invalid) || submitted">
                 <span class="has-error" ng-show="form.lastName.$error.required">
                   Last Name is required.
@@ -128,7 +118,7 @@
               <span class="" translate="profile.mobile-no"></span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" name="employeeID" ng-model="user.employeeID" ng-readonly="validateSuperAdmin()" mask="(999) 999-9999">
+              <input class="" type="text" name="mobileNo" ng-model="user.mobileNo" ng-readonly="validateSuperAdmin()" mask="(999) 999-9999">
             </div>
           </div>
         </div>

@@ -509,4 +509,58 @@ public class UserExtensionResource {
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
+    
+    /**
+     * PUT  /clinic/:id/associatehcp -> associate hcp to the "id" clinic.
+     */
+    @RequestMapping(value = "/clinic/{id}/associatehcp",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<JSONObject> associateHCPToClinic(@PathVariable String id, @RequestBody List<Map<String, String>> hcpList) {
+        log.debug("REST request to associate HCP users with clinic : {}", id);
+        JSONObject jsonObject = new JSONObject();
+        try {
+	        Set<UserExtension> hcpUsers = hcpClinicService.associateHCPToClinic(id, hcpList);
+	        if (hcpUsers.isEmpty()) {
+	        	jsonObject.put("ERROR", ExceptionConstants.HR_573);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_283);
+	        	jsonObject.put("hcpUsers", hcpUsers);
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    /**
+     * GET  /user/all -> get the hcps.
+     */
+    @RequestMapping(value = "/user/all",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<JSONObject> getAssociatedClinicsForHCP(@RequestParam(value = "role",required = false) String role) {
+        log.debug("REST request to get all users with role : {}", role);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	List<UserExtension> users= userService.getAllUsersBy(role);
+	        if (users.isEmpty()) {
+	        	jsonObject.put("ERROR", ExceptionConstants.HR_518);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_205);
+	        	jsonObject.put("users", users);
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

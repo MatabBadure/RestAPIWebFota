@@ -26,6 +26,7 @@ public class ExceptionConstants {
     public static final String HR_515 = "Unable to create Caregiver User";
     public static final String HR_516 = "Unable to delete Caregiver User";
     public static final String HR_517 = "Unable to Update Hillrom User";
+    public static final String HR_518 = "Unable to fetch Users";
     
     // Patient User
     public static final String HR_521 = "Unable to create Patient.";
@@ -70,5 +71,6 @@ public class ExceptionConstants {
     
     public static final String HR_571 = "No Patient Associated with HCP.";
     public static final String HR_572 = "No Clinics Associated with HCP.";
+    public static final String HR_573 = "Unable to associate HCP with clinic.";
     
 }

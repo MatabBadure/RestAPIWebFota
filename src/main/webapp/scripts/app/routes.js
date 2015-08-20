@@ -663,7 +663,7 @@ angular.module('hillromvestApp')
                 parent: 'patient-dashboard',
                 url: '/patient-dashboard',
                 data: {
-                    roles: ['ADMIN'],
+                    roles: ['PATIENT'],
                     pageTitle: 'patient.title'
                 },
                 views: {
@@ -684,6 +684,33 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
+            
+            .state('patientProfile', {
+                parent: 'patient-dashboard',
+                url: '/myProfile',
+                data: {
+                    roles: ['PATIENT'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/patient/profile/navbar/navbar.html',
+                        controller: 'graphController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient-user');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+
             .state('clinicProfile', {
               parent: 'clinicUser',
               url: '/{clinicId}/clinic-info',

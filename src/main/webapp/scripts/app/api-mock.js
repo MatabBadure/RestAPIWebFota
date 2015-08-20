@@ -242,6 +242,7 @@ var doctorsLinkedToPatient =
 
     ]
   }
+
 var associatedClinics = 
 {
     "clinics": [
@@ -338,7 +339,54 @@ var associatedClinics =
             "deleted": false,
             "parent": false,
             "createdAt": 1438688532000
-        }
+        },
+        {
+            "id": "HR2015000004",
+            "name": "LifeLine Hospitals Main",
+            "address": "Sector-58",
+            "zipcode": 23651,
+            "city": "Noida",
+            "state": "UT",
+            "phoneNumber": "2242313112",
+            "faxNumber": "1131313131",
+            "hillromId": "HR2015000132",
+            "clinicAdminId": 9,
+            "parentClinic": null,
+            "deleted": true,
+            "parent": true,
+            "createdAt": 1438688454000
+        },
+        {
+            "id": "HR2015000005",
+            "name": "LifeLine Hospitals Child",
+            "address": "Sector 78",
+            "zipcode": 65412,
+            "city": "Gurgaon",
+            "state": "UT",
+            "phoneNumber": "2143464311",
+            "faxNumber": "3134648431",
+            "hillromId": "HR201500123",
+            "clinicAdminId": 9,
+            "parentClinic": {
+                "id": "HR2015000000",
+                "name": "LifeLine Hospitals Main",
+                "address": "Sector-58",
+                "zipcode": 23651,
+                "city": "Noida",
+                "state": "UT",
+                "phoneNumber": "2242313112",
+                "faxNumber": "1131313131",
+                "hillromId": "HR2015000132",
+                "clinicAdminId": 9,
+                "parentClinic": null,
+                "deleted": true,
+                "parent": true,
+                "createdAt": 1438688454000
+            },
+            "deleted": false,
+            "parent": false,
+            "createdAt": 1438688532000
+        },
     ],
     "message": "Associated clinics with patient fetched successfully."
 }

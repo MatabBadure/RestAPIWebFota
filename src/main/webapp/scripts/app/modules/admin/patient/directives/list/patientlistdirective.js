@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .directive('patientList', function(UserService, patientService, $state) {
+  .directive('patientList', function(UserService, patientService, $state, $stateParams, notyService) {
     return {
       templateUrl: 'scripts/app/modules/admin/patient/directives/list/patientlist.html',
       restrict: 'E',
@@ -12,9 +12,11 @@ angular.module('hillromvestApp')
       },
       link: function(scope, element, attrs) {
         var patient = scope.patient;
+        if($state.current.name === "patientUser" && !$stateParams.clinicIds){
         scope.$on('resetList', function () {
           scope.searchPatients();
         })
+      }
       },
       controller: function($scope, $timeout, dateService) {
 
@@ -28,17 +30,22 @@ angular.module('hillromvestApp')
           $scope.noMatchFound = false;
           $scope.sortOption ="";
           $scope.showModal = false;
+          if($stateParams.clinicIds){                      
+            $scope.getAssociatedPatientsToClinic($stateParams.clinicIds);
+          }
         };
 
 
         var timer = false;
         $scope.$watch('searchItem', function() {
-          if (timer) {
-            $timeout.cancel(timer)
+          if($state.current.name === "patientUser" && !$stateParams.clinicIds){
+            if (timer) {
+              $timeout.cancel(timer)
+            }
+            timer = $timeout(function() {
+                $scope.searchPatients();
+            }, 1000);
           }
-          timer = $timeout(function() {
-              $scope.searchPatients();
-          }, 1000);
         });
 
         $scope.selectPatient = function(patient) {
@@ -83,6 +90,22 @@ angular.module('hillromvestApp')
             }).catch(function(response) {
               $scope.noMatchFound = true;
             });
+        }
+
+        $scope.getAssociatedPatientsToClinic = function(clinicIds){
+          var clinicIdsArr = "";
+            if(clinicIds.indexOf(",") > -1){
+              clinicIdsArr = clinicIds.split(","); 
+            }else{
+              clinicIdsArr = [];
+              clinicIdsArr.push(clinicIds);
+            }                     
+          patientService.getPatientsInClinic(clinicIdsArr).then(function (response) {
+            $scope.patients = response.data.patientUsers; 
+            if($scope.patients == 'undefined' || !$scope.patients || ($scope.patients && $scope.patients.length <= 0)){
+              notyService.showMessage(response.data.message, 'warning');
+            }        
+          }).catch(function (response) {});
         }
         $scope.init();
       }

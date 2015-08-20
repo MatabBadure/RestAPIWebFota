@@ -1,4 +1,4 @@
-'use strict';
+/*'use strict';
 
 angular.module('hillromvestApp')
   .directive('clinic', function(clinicService, UserService) {
@@ -174,4 +174,4 @@ angular.module('hillromvestApp')
         $scope.init();
       }
     };
-  });
+  });*/

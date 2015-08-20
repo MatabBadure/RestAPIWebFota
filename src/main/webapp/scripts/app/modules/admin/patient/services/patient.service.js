@@ -72,7 +72,7 @@ angular.module('hillromvestApp')
       *
       */
       getHCPsLinkedToPatient : function(id){
-        var url = admin.patient.baseURL + + '/' + id + '/hcp';
+        var url = admin.patient.baseURL + id + '/hcp';
         return $http.get(url, {
           headers: headerService.getHeader()
         }).success(function (response) {
@@ -99,7 +99,234 @@ angular.module('hillromvestApp')
         var url = 'api/clinics/patients?filter=id:'+ids;
         return $http.get(url, {
           headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
+      },
+
+      /**
+      * @ngdoc method
+      * @name getClinicsLinkedToPatient
+      * @description To get list of clinics associated to patient.
+      *
+      */
+      getClinicsLinkedToPatient : function(id){
+        var url = admin.patient.baseURL + id + '/clinics';
+        return $http.get(url, {
+          headers: headerService.getHeader()
         }).success(function (response) {
+          return response;
+        });
+      },
+
+      /**
+      * @ngdoc method
+      * @name disassociateClinicsFromPatient
+      * @description To remove clinic(s) associated to patient.
+      *
+      */
+      disassociateClinicsFromPatient : function(id, data){
+        var url = admin.patient.baseURL + id + '/dissociateclinics';
+        return $http.put(url, data,{
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
+      disassociateClinicsFromPatient : function(id){
+        //PUT /api/patient/12345678/dissociateclinics HTTP/1.1
+        var url = admin.patient.baseURL + id + '/dissociateclinics';
+        return $http.put(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
+      getPatientsInClinic : function(filterArray) {
+        var url = '/api/clinics/patients';
+        url = url + '?filter=';
+        var flag = false;
+        angular.forEach(filterArray, function(filter, index) {
+
+                if (flag === true){
+                  url = url + ',id:' + filterArray[index];
+                } else{
+                  url = url + 'id:' + filterArray[index];
+                }
+                flag = true;
+        });
+        return $http.get(url , {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
+      /**
+      * @ngdoc method
+      * @name disassociatePatient
+      * @description To remove patient.
+      *
+      */
+      disassociatePatient : function(id){
+        var url = admin.hillRomUser.baseURL + '/' + id;
+        return $http.delete(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+      /**
+      * @ngdoc method
+      * @name associateClinicToPatient
+      * @description To add clinics to patient.
+      *
+      */
+      associateClinicToPatient : function(id, data){
+        var url = admin.patient.baseURL + id + '/associateclinics';
+        return $http.put(url, data, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+      /**
+      * @ngdoc method
+      * @name getDevices
+      * @description To get devices associated to patient.
+      *
+      */
+      getDevices : function(id){
+        var url = admin.patient.baseURL + id + '/vestdevice';
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+      /**
+      * @ngdoc method
+      * @name getCaregiversLinkedToPatient
+      * @description To get caregivers associated to patient.
+      *
+      */
+      getCaregiversLinkedToPatient : function(id){
+        var url = admin.patient.baseURL + id + '/caregiver';
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+      /**
+      * @ngdoc method
+      * @name disassociateCaregiversFromPatient
+      * @description To remove caregivers associated to patient.
+      *
+      */
+      disassociateCaregiversFromPatient : function(patientId, caregiverId ){
+        ///api/patient/:patientUserId/caregiver/:id
+        var url = admin.patient.baseURL + patientId + '/caregiver/' + caregiverId;
+        return $http.delete(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+      /**
+      * @ngdoc method
+      * @name disassociateCaregiversFromPatient
+      * @description To add caregivers associated to patient.
+      *
+      */
+      associateCaregiversFromPatient : function(patientId, data){
+        ///api/patient/:id/caregiver
+        var url = admin.patient.baseURL + patientId + '/caregiver';
+        return $http.post(url, data, {
+          headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
+      },
+
+      addDevice : function(id, data){
+        var url = admin.patient.baseURL + id + '/linkvestdevice';
+        return $http.put(url, data, {
+          headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
+      },
+
+      deleteDevice : function(id, device){
+        var url = admin.patient.baseURL + id + '/deactivatevestdevice/'+device.serialNumber;
+        return $http.delete(url, {
+          headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
+      },
+
+      getProtocol : function(id){
+        var url = admin.patient.baseURL + id + '/protocol';
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
+      addProtocol : function(id, data){
+        var url = admin.patient.baseURL + id + '/protocol';
+        return $http.post(url, data, {
+          headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
+      },
+
+      editProtocol : function(id, data){
+        var url = admin.patient.baseURL + id + '/protocol';
+        return $http.put(url, data, {
+          headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
+      },
+
+      deleteProtocol : function(id, protocolId){
+        var url = admin.patient.baseURL + id + '/protocol/' + protocolId;
+        return $http.delete(url, {
+          headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
+      },
+      updateCaregiver : function(patientId, caregiverId , data){
+        ///api/patient/:patientUserId/caregiver/:id
+        var url = admin.patient.baseURL + patientId + '/caregiver/'+caregiverId;
+        return $http.put(url, data, {
+          headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
+      },
+      getCaregiverById : function(patientId, caregiverId ){
+        ///api/patient/:patientUserId/caregiver/:id
+        var url = admin.patient.baseURL + patientId + '/caregiver/'+caregiverId;
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
+      },
+      getProtocolById : function(patientId, protocolId){
+        var url = admin.patient.baseURL + patientId + '/protocol/'+protocolId;
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function(response){
           return response;
         });
       }

@@ -242,3 +242,292 @@ var doctorsLinkedToPatient =
 
     ]
   }
+
+var associatedClinics = 
+{
+    "clinics": [
+        {
+            "id": "HR2015000000",
+            "name": "LifeLine Hospitals Main",
+            "address": "Sector-58",
+            "zipcode": 23651,
+            "city": "Noida",
+            "state": "UT",
+            "phoneNumber": "2242313112",
+            "faxNumber": "1131313131",
+            "hillromId": "HR2015000132",
+            "clinicAdminId": 9,
+            "parentClinic": null,
+            "deleted": true,
+            "parent": true,
+            "createdAt": 1438688454000
+        },
+        {
+            "id": "HR2015000001",
+            "name": "LifeLine Hospitals Child",
+            "address": "Sector 78",
+            "zipcode": 65412,
+            "city": "Gurgaon",
+            "state": "UT",
+            "phoneNumber": "2143464311",
+            "faxNumber": "3134648431",
+            "hillromId": "HR201500123",
+            "clinicAdminId": 9,
+            "parentClinic": {
+                "id": "HR2015000000",
+                "name": "LifeLine Hospitals Main",
+                "address": "Sector-58",
+                "zipcode": 23651,
+                "city": "Noida",
+                "state": "UT",
+                "phoneNumber": "2242313112",
+                "faxNumber": "1131313131",
+                "hillromId": "HR2015000132",
+                "clinicAdminId": 9,
+                "parentClinic": null,
+                "deleted": true,
+                "parent": true,
+                "createdAt": 1438688454000
+            },
+            "deleted": false,
+            "parent": false,
+            "createdAt": 1438688532000
+        },
+        {
+            "id": "HR2015000002",
+            "name": "LifeLine Hospitals Main",
+            "address": "Sector-58",
+            "zipcode": 23651,
+            "city": "Noida",
+            "state": "UT",
+            "phoneNumber": "2242313112",
+            "faxNumber": "1131313131",
+            "hillromId": "HR2015000132",
+            "clinicAdminId": 9,
+            "parentClinic": null,
+            "deleted": true,
+            "parent": true,
+            "createdAt": 1438688454000
+        },
+        {
+            "id": "HR2015000003",
+            "name": "LifeLine Hospitals Child",
+            "address": "Sector 78",
+            "zipcode": 65412,
+            "city": "Gurgaon",
+            "state": "UT",
+            "phoneNumber": "2143464311",
+            "faxNumber": "3134648431",
+            "hillromId": "HR201500123",
+            "clinicAdminId": 9,
+            "parentClinic": {
+                "id": "HR2015000000",
+                "name": "LifeLine Hospitals Main",
+                "address": "Sector-58",
+                "zipcode": 23651,
+                "city": "Noida",
+                "state": "UT",
+                "phoneNumber": "2242313112",
+                "faxNumber": "1131313131",
+                "hillromId": "HR2015000132",
+                "clinicAdminId": 9,
+                "parentClinic": null,
+                "deleted": true,
+                "parent": true,
+                "createdAt": 1438688454000
+            },
+            "deleted": false,
+            "parent": false,
+            "createdAt": 1438688532000
+        },
+        {
+            "id": "HR2015000004",
+            "name": "LifeLine Hospitals Main",
+            "address": "Sector-58",
+            "zipcode": 23651,
+            "city": "Noida",
+            "state": "UT",
+            "phoneNumber": "2242313112",
+            "faxNumber": "1131313131",
+            "hillromId": "HR2015000132",
+            "clinicAdminId": 9,
+            "parentClinic": null,
+            "deleted": true,
+            "parent": true,
+            "createdAt": 1438688454000
+        },
+        {
+            "id": "HR2015000005",
+            "name": "LifeLine Hospitals Child",
+            "address": "Sector 78",
+            "zipcode": 65412,
+            "city": "Gurgaon",
+            "state": "UT",
+            "phoneNumber": "2143464311",
+            "faxNumber": "3134648431",
+            "hillromId": "HR201500123",
+            "clinicAdminId": 9,
+            "parentClinic": {
+                "id": "HR2015000000",
+                "name": "LifeLine Hospitals Main",
+                "address": "Sector-58",
+                "zipcode": 23651,
+                "city": "Noida",
+                "state": "UT",
+                "phoneNumber": "2242313112",
+                "faxNumber": "1131313131",
+                "hillromId": "HR2015000132",
+                "clinicAdminId": 9,
+                "parentClinic": null,
+                "deleted": true,
+                "parent": true,
+                "createdAt": 1438688454000
+            },
+            "deleted": false,
+            "parent": false,
+            "createdAt": 1438688532000
+        },
+    ],
+    "message": "Associated clinics with patient fetched successfully."
+}
+var careGivers = {
+    "caregivers": [
+        {
+            "id": 16,
+            "title": "Mr.",
+            "firstName": "Nagendra",
+            "middleName": "",
+            "lastName": "Nag",
+            "email": "rishabhjain+CG_hcp@neevtech.com",
+            "gender": null,
+            "zipcode": 56236,
+            "activated": true,
+            "langKey": "en",
+            "resetKey": "66945600887392212927",
+            "resetDate": 1438577209000,
+            "termsConditionAccepted": true,
+            "termsConditionAcceptedDate": 1438576050000,
+            "authorities": [
+                {
+                    "name": "HCP"
+                }
+            ],
+            "deleted": true,
+            "lastLoggedInAt": 1438576050000,
+            "dob": null,
+            "hillromId": null,
+            "speciality": "Optho",
+            "credentials": "123456",
+            "primaryPhone": "7654123002",
+            "mobilePhone": "8657416856",
+            "faxNumber": "6498562305",
+            "address": "Dickenson Road",
+            "city": "Blr",
+            "state": "AL",
+            "npiNumber": "986532",
+            "clinics": []
+        },
+        {
+            "id": 16,
+            "title": "Mr.",
+            "firstName": "Nagendra",
+            "middleName": "",
+            "lastName": "Nag",
+            "email": "rishabhjain+CG_hcp@neevtech.com",
+            "gender": null,
+            "zipcode": 56236,
+            "activated": true,
+            "langKey": "en",
+            "resetKey": "66945600887392212927",
+            "resetDate": 1438577209000,
+            "termsConditionAccepted": true,
+            "termsConditionAcceptedDate": 1438576050000,
+            "authorities": [
+                {
+                    "name": "HCP"
+                }
+            ],
+            "deleted": true,
+            "lastLoggedInAt": 1438576050000,
+            "dob": null,
+            "hillromId": null,
+            "speciality": "Optho",
+            "credentials": "123456",
+            "primaryPhone": "7654123002",
+            "mobilePhone": "8657416856",
+            "faxNumber": "6498562305",
+            "address": "Dickenson Road",
+            "city": "Blr",
+            "state": "AL",
+            "npiNumber": "986532",
+            "clinics": []
+        }
+    ],
+    "message": "Caregiver Users fetched successfully."
+}
+var caregiver = {
+    "caregiver": {
+        "userRole": "CARE_GIVER",
+        "relationshipLabel": "PARENT",
+        "patient": {
+            "id": "HR2015000001",
+            "hillromId": "HR000121",
+            "hubId": null,
+            "serialNumber": "105DN00789649137",
+            "bluetoothId": "BT 2552472",
+            "title": "Ms.",
+            "firstName": "Hermione",
+            "middleName": null,
+            "lastName": "Grenger",
+            "dob": "1990-06-30",
+            "email": "hermione@test.com",
+            "gender": "Female",
+            "langKey": "fr",
+            "address": null,
+            "zipcode": 12365,
+            "city": null,
+            "state": "AZ",
+            "expired": false,
+            "expiredDate": null,
+            "webLoginCreated": true,
+            "primaryPhone": "2452345614",
+            "mobilePhone": "1534646123"
+        },
+        "user": {
+            "id": 17,
+            "title": "Dr",
+            "firstName": "Manipal",
+            "middleName": "Hompi",
+            "lastName": "Ayer",
+            "email": "rishabhjain+CG_hcp3@neevtech.com",
+            "gender": null,
+            "zipcode": 560009,
+            "activated": false,
+            "langKey": "en",
+            "resetKey": null,
+            "resetDate": null,
+            "termsConditionAccepted": false,
+            "termsConditionAcceptedDate": null,
+            "authorities": [
+                {
+                    "name": "CARE_GIVER"
+                }
+            ],
+            "deleted": false,
+            "lastLoggedInAt": null,
+            "dob": null,
+            "hillromId": null,
+            "speciality": null,
+            "credentials": null,
+            "primaryPhone": null,
+            "mobilePhone": null,
+            "faxNumber": null,
+            "address": "Old Airport Road",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "npiNumber": null,
+            "clinics": null
+        }
+    },
+    "message": "Caregiver User fetched successfully."
+}

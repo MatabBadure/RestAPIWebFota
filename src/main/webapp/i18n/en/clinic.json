@@ -39,9 +39,12 @@
         "user": "user",
         "patients": "patients",
         "parent": "parent",
-        "submit-button-text": "submit",
         "required-field": "* Required Fields",
         "back-button-text": "Back",
+        "submit-button-text": "submit",
+        "cancel-button-text": "cancel",
+        "deactivate-button-text": "Deactivate",
+        "update-button-text": "Update",
         "delete": {
             "warning": "Are you sure you want to Deactivate the Clinic?",
             "message": "If you deactivate the clinic, you will no longer be able to view the information."
@@ -51,7 +54,14 @@
         "status": "Status",
         "view-assoc-patients": "View Associate Patients",
         "view-assoc-hcps": "View Associate HCPs",
-        "assoc-clinic": "Associate Clinic",
-        "add-satellite-clinic":"Add Satellite Clinic"
+        "phoneNumber": "Phone number",
+        "address": "Address",
+        "city": "City",
+        "state": "State",
+        "clinic-view-assoc-patients": "View Associated Patients",
+        "clinic-view-assoc-hcps": "View Associated HCPs",
+        "clinic-edit": "Edit Clinic",
+        "assoc-clinic": "Associated Clinics",
+        "add-satellite-clinic": "Add Satellite Clinic"
     }
 }

@@ -3,11 +3,11 @@
         "required-field":"* Required Fields",
         "home": {
             "title": "doctor",
-            "createLabel": "Create doctor",
+            "createLabel": "Create HCP",
             "createNewLabel": "Create New",
             "createOrEditLabel": "Create or edit a Doctor",
-            "manageLabel": "Manage Doctor",
-            "updateLabel": "Update Doctor"
+            "manageLabel": "Manage HCP",
+            "updateLabel": "Update HCP"
         },
         "delete": {
             "question": "Are you sure you want to delete Doctor {{ id }}?"
@@ -63,6 +63,8 @@
         "parent": "parent",
         "submit-button-text": "submit",
         "cancel-button-text": "cancel",
+        "deactivate-button-text": "Deactivate",
+        "update-button-text": "Update",
         "back-button-text": "Back",
         "delete": {
             "warning": "Are you sure you want to Deactivate the Doctor?",

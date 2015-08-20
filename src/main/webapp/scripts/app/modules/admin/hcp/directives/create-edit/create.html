@@ -1,10 +1,10 @@
 <div class="navbar dashboard dashbord-nav">
   <div class="container">
     <div class="dashbord-nav__primary pull-left" ng-show="doctorStatus.isCreate">
-      <span class="dashbord-nav__primary--title" translate="doctor.home.createLabel">Create Doctor</span>
+      <span class="dashbord-nav__primary--title" translate="doctor.home.createLabel">Create HCP</span>
     </div>
     <div class="dashbord-nav__primary pull-left" ng-show="!doctorStatus.isCreate">
-      <span class="dashbord-nav__primary--title" translate="doctor.home.updateLabel">Update Doctor</span>
+      <span class="dashbord-nav__primary--title" translate="doctor.home.updateLabel">Update HCP</span>
     </div>
     <div class="dashbord-nav__secondary create-user navbar-right cursor-pointer" ng-click="cancel()">
       <span class="" translate="doctor.back-button-text">Back</span>
@@ -221,7 +221,7 @@
               <span class="" translate="doctor.primary-phone"></span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" name="primaryPhone" validate-on-blur maxlength="10" ng-pattern="/^[0-9]{10}$/" ng-model="doctor.primaryPhone">
+              <input class="" type="text" name="primaryPhone" validate-on-blur ng-model="doctor.primaryPhone" mask="(999)-999-9999">
               <div ng-show="form.primaryPhone.$showValidationMessage && form.primaryPhone.$invalid" class="">
                 <span class="has-error" ng-show="form.primaryPhone.$error.pattern">
                     Primary Phone is invalid.
@@ -236,7 +236,7 @@
               <span class="" translate="doctor.mobile-number"></span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" name="mobilePhone" validate-on-blur maxlength="10" ng-pattern="/^[0-9]{10}$/" ng-model="doctor.mobilePhone">
+              <input class="" type="text" name="mobilePhone" validate-on-blur ng-model="doctor.mobilePhone" mask="(999)-999-9999">
               <div ng-show="form.mobilePhone.$showValidationMessage && form.mobilePhone.$invalid" class="">
                 <span class="has-error" ng-show="form.mobilePhone.$error.pattern">
                     Mobile Phone is invalid.
@@ -249,7 +249,7 @@
               <span class="" translate="doctor.fax-number"></span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="text" name="faxNumber" validate-on-blur maxlength="10" ng-pattern="/^[0-9]{10}$/" ng-model="doctor.faxNumber">
+              <input class="" type="text" name="faxNumber" validate-on-blur ng-model="doctor.faxNumber" mask="(999)-999-9999">
               <div ng-show="form.faxNumber.$showValidationMessage && form.faxNumber.$invalid" class="">
                 <span class="has-error" ng-show="form.faxNumber.$error.pattern">
                     Fax Number is invalid.
@@ -265,7 +265,7 @@
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
               <input class="" type="text" ng-model="doctor.address" validate-on-blur name="address" ng-maxlength="100">
-              <div ng-show="(form.address.$showValidationMessage && form.address.$invalid)" class="">
+              <div ng-show="(form.address.$showValidationMessage && form.address.$invalid)">
                 <span class="has-error" ng-show="form.address.$error.maxlength">
                     Address cannot be longer than 100 characters.
                   </span>
@@ -300,7 +300,7 @@
             </div>
           </div>
           <div class="col-md-7 col-md-offset-2 reset-padding">
-            <div class="col-md-6 dashboard__form--label">
+            <div class="col-md-6 dashboard__form--label reset-padding">
               <span class="" translate="doctor.zipcode"></span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
@@ -316,10 +316,10 @@
       </div>
       <div class="col-md-16 reset-padding margin-top">
         <div class="">
-          <button type="submit" ng-click="formSubmit()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" >Submit</button>
-          <button type="reset" ng-click="cancel()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" >Cancel</button>
-          <button type="submit" ng-click="formSubmit()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Update</button>
-          <button type="button" ng-click="open()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right">Diassociate</button>
+          <button type="submit" ng-click="formSubmit()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" translate="doctor.submit-button-text">Submit</button>
+          <button type="reset" ng-click="cancel()" ng-show="doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" translate="doctor.cancel-button-text">Cancel</button>
+          <button type="submit" ng-click="formSubmit()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" translate="doctor.update-button-text">Update</button>
+          <button type="button" ng-click="open()" ng-show="!doctorStatus.isCreate" class="hillrom-btn btn-submit float-right" translate="doctor.deactivate-button-text">Deactivate</button>
           <div class="clr"></div>
         </div>
       </div>

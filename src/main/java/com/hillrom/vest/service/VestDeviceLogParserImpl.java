@@ -238,7 +238,7 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 		int second = ParserUtil.convertHexStringToInteger(secondString);
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(year, month-1, day, hour, minute, second);
-		DateTime timestamp = new DateTime(calendar.getTimeInMillis() / 1000);
+		DateTime timestamp = new DateTime(calendar.getTimeInMillis());
 		return timestamp;
 	}
 

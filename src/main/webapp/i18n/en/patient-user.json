@@ -1,11 +1,94 @@
 {
     "patient" : {
+        "home": {
+            "title": "Patient"
+        },
         "tab": {
           "patient-overview": "Overview",
           "patient-demographics": "Patient Demographics",
           "clinic-info": "Clinic Information",
           "protocol-device": "Protocol and Device",
           "caregiver-info": "Caregiver Information"
+        },
+        "clinic-title": "Clinic",
+        "caregiver-title": "Caregivers",
+        "device-title": "Device Information",
+        "protocol-title": "Protocol",
+        "phone": "Phone:",
+        "mobile": "Mobile:",
+        "fax": "Fax:",
+        "hr-id": "ID",
+        "link-clinic": "Link Clinic",
+        "link-caregiver": "Add Caregiver",
+        "link-device": "Add Device",
+        "link-protocol": "Add Protocol",
+        "notes": "Notes",
+        "placeholder": {
+          "clinic-link": "Search Clinic here",
+          "device-link": "Search Device here",
+          "protocol-link": "Search Protocol here"
+        },
+        "device": {
+          "gen-details": "Add Device",
+          "serial-no": "Serial No.",
+          "bluetoothId": "Bluetooth ID",
+          "hubId": "Hub ID"
+        },
+        "protocol": {
+          "tm-per-day": "Treatment per Day",
+          "min-minutes-per-tm": "Min Minutes/Treatment",
+          "max-minutes-per-tm": "Max Minutes/Treatment",
+          "min-frequency": "Min Frequency",
+          "max-frequency": "Max Frequency",
+          "min-pressure": "Min Pressure",
+          "max-pressure": "Max Pressure",
+          "gen-details": "Add Protocol"
+        },
+        "overview": {
+          "hr-id": "Hillrom ID:",
+          "mrn": "MRN:",
+          "hcp": "HCP:",
+          "dob": "DOB:",
+          "email": "Email:",
+          "location": "Location:"
+        },
+        "disassociate-patient": "Disassociate",
+        "edit-patient": "Edit",
+        "demo-graph": {
+          "identifier": "Patient Identifiers",
+          "personal-details": "Personal Details"
+        },
+        "btn": {
+          "update": "Update",
+          "cancel": "Cancel",
+          "save": "Save",
+          "update": "update"
+        },
+        "caregiver": {
+          "gen-details": "Create Caregiver",
+          "title-name": "Title",
+          "first-name": "First Name",
+          "middle-name":"Middle Name",
+          "last-name": "Last Name",
+          "relationship": "Relationship",
+          "address": "Address",
+          "city": "City",
+          "state": "State",
+          "zipcode": "Zip",
+          "email": "Email",
+          "phone-no": "Phone No.",
+          "mobile-no": "Mobile No."
+        },
+        "sum": {
+          "titlename": "Summary",
+          "ather-level": "Adherence level",
+          "avr-dur-cough-pause": "Average duration of cough pause",
+          "avr-no-cough-pause-trt": "Average number of cough pauses per treatment",
+          "avr-trt-day": "Average treatment/day",
+          "avr-cough-pause-day": "Average cough pause per day",
+          "avr-pressure-trt": "Average pressure/treatment",
+          "last-3-days-hmr": "Last 3 days HMR run rate",
+          "avr-freq-trt": "Average frequency/treatment"
         }
     }
 }

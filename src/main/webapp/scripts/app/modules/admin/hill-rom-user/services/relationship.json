@@ -1,0 +1,25 @@
+ {
+ 	"relationships": [
+ 			{
+	            "name": "Caregiver", "value":"CARE_GIVER"
+	        },
+	        {
+	            "name": "Guardian", "value":"GUARDIAN"
+	        },
+	        {
+	            "name": "Health Care Professional", "value":"HCP"
+	        },
+	        {
+	            "name": "Parent", "value":"PARENT"
+	        },
+	        {
+	            "name": "Partner", "value":"PARTNER"
+	        },
+	        {
+	            "name": "Sibling", "value":"SIBLING"
+	        },
+	        {
+	            "name": "Spouse", "value":"SPOUSE"
+	        }
+        ]
+ }

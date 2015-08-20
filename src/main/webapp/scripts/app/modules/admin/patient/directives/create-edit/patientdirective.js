@@ -24,11 +24,6 @@ angular.module('hillromvestApp')
         $scope.formSubmit = function () {
           $scope.submitted = true;
         };
-        
-        $scope.viewHCP = function () {
-          $state.go('patientHcpAssociation',
-          {'patientId': $stateParams.patientId});
-        }
 
         $scope.init = function () {
           $scope.states = [];

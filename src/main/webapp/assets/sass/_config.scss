@@ -110,8 +110,8 @@ $font-size-h6:            ceil(($font-size-base * 0.85)) !default; // ~12px
 $font-size-icon:          30px !default;
 
 //font-weight
-$font-weight-medium:      400;
-$font-weight-bold:        700;
+$font-weight-medium:			400;
+$font-weight-bold:				700;
 $font-weight-semibold:    600;
 
 //** Unit-less `line-height` for use in components like buttons.
@@ -900,3 +900,6 @@ $page-header-border-color:    $gray-lighter !default;
 $dl-horizontal-offset:        $component-offset-horizontal !default;
 //** Horizontal line color.
 $hr-border:                   $gray-lighter !default;
+//**base padding link.
+$base_padding: 10px 15px;
+$border_default: solid 1px $gainsboro !default;             

@@ -12,7 +12,7 @@ angular.module('hillromvestApp')
     }
     /*check the state from the route*/
     $scope.init = function() {
-      var currentRoute = $state.current.name;     
+      var currentRoute = $state.current.name;
       if (currentRoute === 'clinicEdit') {
         $scope.initClinicEdit($stateParams.clinicId, $scope.setEditMode);
         //$scope.getClinicDetails($stateParams.clinicId, $scope.setEditMode);
@@ -22,9 +22,27 @@ angular.module('hillromvestApp')
         $scope.initClinicList();
       } else if (currentRoute === 'clinicProfile'){
         $scope.initClinicProfile($stateParams.clinicId);
+      } else if(currentRoute === 'clinicAssociatedPatients'){
+        $scope.initClinicAssoctPatients($stateParams.clinicId);
+      } else if(currentRoute === 'clinicAssociatedHCP'){
+        $scope.initClinicAssoctHCPs($stateParams.clinicId);
       }
     };
-    
+
+    $scope.initClinicAssoctPatients = function(clinicId){
+      $scope.isAssociatePatient = false;
+      clinicService.getClinicAssoctPatients(clinicId).then(function(response){
+        $scope.associatedPatients = response.data.patientUsers;
+      }).catch(function(response){});
+      clinicService.getPatients().then(function(response){
+        $scope.patients = response.data.users;
+      }).catch(function(response){});
+    };
+
+    $scope.initClinicAssoctHCPs = function(clinicId){
+
+    };
+
     $scope.initClinicList = function(){
       $scope.currentPageIndex = 1;
       $scope.perPageCount = "";
@@ -34,7 +52,7 @@ angular.module('hillromvestApp')
       $scope.sortOption ="";
       $scope.showModal = false;
       //$scope.searchClinics();
-    }    
+    };
 
     $scope.initCreateClinic = function(){
       $scope.states = [];
@@ -47,14 +65,14 @@ angular.module('hillromvestApp')
       }).catch(function(response) {});
       if($stateParams.parentId){
         $scope.clinicStatus.createSatellite = true;
-        $scope.clinic.type = "child";        
-        clinicService.getClinic($stateParams.parentId).then(function(response) {  
-        $scope.clinic.parentClinic = response.data.clinic;        
+        $scope.clinic.type = "child";
+        clinicService.getClinic($stateParams.parentId).then(function(response) {
+        $scope.clinic.parentClinic = response.data.clinic;
       }).catch(function(response) {});
       }else{
         $scope.getParentClinic();
-      }      
-    }
+      }
+    };
 
     $scope.initClinicEdit = function(clinicId){
       $scope.states = [];
@@ -64,22 +82,22 @@ angular.module('hillromvestApp')
         $scope.states = response.data.states;
       }).catch(function(response) {});
       clinicService.getClinic(clinicId).then(function(response) {
-        $scope.clinic = response.data.clinic;  
+        $scope.clinic = response.data.clinic;
         if($scope.clinic.parent){
           $scope.clinic.type = "parent";
         }else{
            $scope.clinic.type = "child";
         }
       }).catch(function(response) {});
-    }
+    };
 
     $scope.initClinicProfile = function(clinicId){
       $scope.states = [];
       $scope.clinicStatus.editMode = true;
-      $scope.clinicStatus.isCreate = false;     
+      $scope.clinicStatus.isCreate = false;
       clinicService.getClinic(clinicId).then(function(response) {
-        $scope.clinic = response.data.clinic; 
-        $scope.childClinics = response.data.childClinics; 
+        $scope.clinic = response.data.clinic;
+        $scope.childClinics = response.data.childClinics;
         if($scope.clinic.parent){
           $scope.clinic.type = "parent";
         }else{
@@ -94,7 +112,7 @@ angular.module('hillromvestApp')
 
         }*/
       }).catch(function(response) {});
-    }
+    };
 
     /* init clinic list*/
 
@@ -167,7 +185,7 @@ angular.module('hillromvestApp')
     $scope.formSubmit = function() {
       $scope.submitted = true;
     };
-    
+
     $scope.formSubmitClinic = function() {
       if ($scope.form.$invalid) {
         return false;
@@ -203,7 +221,7 @@ angular.module('hillromvestApp')
         notyService.showMessage($scope.clinicStatus.message, 'success');
         $scope.selectClinic(clinic);
         //$scope.clinicStatus.message = "Clinic updated successfully" + " for ID " + data.data.Clinic.id;
-        
+
         /*/*$scope.init();
         $scope.reset();
         $state.go('clinicUser');*/
@@ -229,7 +247,7 @@ angular.module('hillromvestApp')
           $scope.selectClinic(data.data.Clinic.parentClinic);
         }else if($scope.clinicStatus.isCreate){
           $state.go('clinicUser');
-        }        
+        }
       }).catch(function(response) {
         if (response.message !== undefined) {
           $scope.clinicStatus.message = response.message;
@@ -320,7 +338,7 @@ angular.module('hillromvestApp')
     };
 */
     /* clinic profile view*/
-    $scope.getHCPs = function(clinicId){      
+    $scope.getHCPs = function(clinicId){
       var clinicIds = [];
       clinicIds.push(clinicId);
       $state.go('hcpUser', {
@@ -329,24 +347,42 @@ angular.module('hillromvestApp')
     }
 
     $scope.getPatients = function(clinicId){
-      var clinicIds = [];
-      clinicIds.push(clinicId);
-      $state.go('patientUser', {
-        'clinicIds': clinicIds
+      $state.go('clinicAssociatedPatients',{
+        'clinicId': clinicId
       });
     }
 
-    $scope.createSatellite = function(parentId){            
+    $scope.createSatellite = function(parentId){
       $state.go('clinicNew', {
         'parentId': parentId
       });
     }
 
-    $scope.goToEditClinic = function(clinicId){      
+    $scope.goToEditClinic = function(clinicId){
       $state.go('clinicEdit', {
         'clinicId': clinicId
       });
-    }
+    };
+
+    $scope.disassociatePatient = function(patientId){
+      var data = [{'id': $stateParams.clinicId}];
+      clinicService.disassociatePatient(patientId, data).then(function(response){
+        $scope.initClinicAssoctPatients($stateParams.clinicId);
+      }).catch(function(response){});
+    };
+
+    $scope.linkPatient = function(){
+      $scope.isAssociatePatient = true;
+    };
+
+    $scope.selectPatient =function(patient, index){
+      $scope.searchPatient = "";
+      var data = [{'id': $stateParams.clinicId}];
+      clinicService.associatePatient(patient.id, data).then(function(response){
+        $scope.initClinicAssoctPatients($stateParams.clinicId);
+      }).catch(function(response){});
+    };
+
     /* clinic profile view*/
     $scope.init();
   });

@@ -1,5 +1,6 @@
 'use strict';
 
+
 angular.module('hillromvestApp')
 .filter('range', function() {
   return function(val, range) {
@@ -9,9 +10,7 @@ angular.module('hillromvestApp')
     return val;
   };
 })
-.controller('patientsController', function($scope, $filter, $state, $stateParams, patientService, dateService, notyService, UserService, clinicService,$rootScope) {
-
-
+.controller('patientsController', function($scope, $filter, $state, $stateParams, patientService, dateService, notyService, UserService, clinicService,$rootScope,$timeout) {
     $scope.patient = {};
     $scope.patientTab = "";
     $scope.newProtocolPoint = 1;
@@ -136,6 +135,8 @@ angular.module('hillromvestApp')
         $scope.getPatiendDetails($stateParams.patientId, $scope.setEditMode);
       } else if (currentRoute === 'patientNew') {
         $scope.createPatient();
+      }else if($state.current.name === 'patientEditClinics'){
+        $scope.initPatientClinics($stateParams.patientId);        
       }else if(currentRoute === 'patientClinics'){
         $scope.initPatientClinicsInfo($stateParams.patientId);
       }else if(currentRoute === 'patientCraegiver'){
@@ -190,6 +191,42 @@ angular.module('hillromvestApp')
       };
     };
 
+    $scope.goToPatientClinics = function(){      
+      $state.go('patientEditClinics',{'patientId': $stateParams.patientId});
+    }
+    /** starts for patient clinics **/
+    $scope.getPatientClinicInfo = function(patientId){
+      $scope.associatedClinics = associatedClinics.clinics;      
+      /*$scope.availableClinicsForPatient($scope.associatedClinics);
+      patientService.getClinicsLinkedToPatient(patientId).then(function(response) {
+        $scope.associatedClinics = response.data;            
+      }).catch(function(response) {});*/
+    }
+    $scope.disassociateLinkedClinics = function(id, index){
+      $scope.associatedClinics.splice(index, 1);
+      // API returning error : unAuthorized
+     /* patientService.disassociateClinicsFromPatient(id).then(function(response) {
+        $scope.associatedClinics = response.data;        
+      }).catch(function(response) {});*/
+    }
+    $scope.availableClinicsForPatient = function(associatedClinics){          
+      clinicService.getClinics($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
+          $scope.clinics = response.data;
+          $scope.total = response.headers()['x-total-count'];
+          $scope.pageCount = Math.ceil($scope.total / 10);
+        }).catch(function (response) {
+
+        });
+    }
+    /*var timer = false;
+    $scope.$watch('searchItem', function () {
+      if(timer){
+        $timeout.cancel(timer)
+      }
+      timer= $timeout(function () {
+          $scope.searchClinics();
+      },1000)
+    });*/
 
     /** starts for patient clinics **/
     $scope.getPatientClinicInfo = function(patientId){
@@ -223,6 +260,15 @@ angular.module('hillromvestApp')
       }else {
           $scope.currentPageIndex = 1;
       }
+      clinicService.getClinics($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
+        $scope.clinics = response.data;
+        $scope.total = response.headers()['x-total-count'];
+        $scope.pageCount = Math.ceil($scope.total / 10);
+      }).catch(function (response) {
+
+      });
+    };
+    $scope.initPatientClinics = function(patientId){
       if($scope.searchItem && $scope.searchItem.length > 0){
         clinicService.getClinics($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
           $scope.clinics = []; $scope.clinics.length = 0;
@@ -252,10 +298,11 @@ angular.module('hillromvestApp')
         $scope.clinics = []; $scope.clinics.length = 0;
       }).catch(function(response) {});
     }
-    $scope.initPatientClinicsInfo = function(patientId){
+
+    $scope.initPatientClinicsInfo = function(patientId){      
       $scope.patientTab = "patientClinics";
       $scope.currentPageIndex = 1;
-      $scope.perPageCount = 10;
+      $scope.perPageCount = 90;
       $scope.pageCount = 0;
       $scope.total = 0;
       $scope.clinics = [];
@@ -265,7 +312,6 @@ angular.module('hillromvestApp')
       $scope.getPatientById(patientId);
       $scope.getPatientClinicInfo(patientId);
       $scope.getClinics();
-
     }
 
     $scope.getClinics = function(){

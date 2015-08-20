@@ -94,6 +94,7 @@ angular.module('hillromvestApp')
           return response;
         });
       },
+
       /**
       * @ngdoc method
       * @name getClinicsLinkedToPatient
@@ -108,6 +109,7 @@ angular.module('hillromvestApp')
           return response;
         });
       },
+
       /**
       * @ngdoc method
       * @name disassociateClinicsFromPatient
@@ -122,6 +124,37 @@ angular.module('hillromvestApp')
           return response;
         });
       },
+
+      disassociateClinicsFromPatient : function(id){
+        //PUT /api/patient/12345678/dissociateclinics HTTP/1.1
+        var url = admin.patient.baseURL + id + '/dissociateclinics';
+        return $http.put(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
+      getPatientsInClinic : function(filterArray) {
+        var url = '/api/clinics/patients';
+        url = url + '?filter=';
+        var flag = false;
+        angular.forEach(filterArray, function(filter, index) {
+
+                if (flag === true){
+                  url = url + ',id:' + filterArray[index];
+                } else{
+                  url = url + 'id:' + filterArray[index];
+                }
+                flag = true;
+        });
+        return $http.get(url , {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
       /**
       * @ngdoc method
       * @name disassociatePatient
@@ -204,7 +237,7 @@ angular.module('hillromvestApp')
         var url = admin.patient.baseURL + patientId + '/caregiver';
         return $http.post(url, data, {
           headers: headerService.getHeader()
-        }).success(function (response) {
+        }).success(function(response){
           return response;
         });
       },

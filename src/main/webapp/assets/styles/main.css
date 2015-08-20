@@ -5024,8 +5024,8 @@ select[multiple].input-lg,
 }
 @font-face {
   font-family: 'hillrom';
-  src: url("fonts/hillrom.eot?8w13jo");
-  src: url("fonts/hillrom.eot?#iefix8w13jo") format("embedded-opentype"), url("fonts/hillrom.ttf?8w13jo") format("truetype"), url("fonts/hillrom.woff?8w13jo") format("woff"), url("fonts/hillrom.svg?8w13jo#hillrom") format("svg");
+  src: url("fonts/hillrom.eot?-b2hjav");
+  src: url("fonts/hillrom.eot?#iefix-b2hjav") format("embedded-opentype"), url("fonts/hillrom.ttf?-b2hjav") format("truetype"), url("fonts/hillrom.woff?-b2hjav") format("woff"), url("fonts/hillrom.svg?-b2hjav#hillrom") format("svg");
   font-weight: normal;
   font-style: normal;
 }
@@ -5040,6 +5040,22 @@ select[multiple].input-lg,
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-adherence:before {
+  content: "\e608";
+}
+
+.icon-delete-icon:before {
+  content: "\e610";
+}
+
+.icon-man-running:before {
+  content: "\e656";
+}
+
+.icon-notification-bell:before {
+  content: "\e657";
 }
 
 .icon-hill-rom-logo:before {
@@ -5616,6 +5632,10 @@ a::-moz-focus-inner {
   margin-left: -10px !important;
 }
 
+.btn-margin-left {
+  margin-left: 10px;
+}
+
 .margin-top {
   margin-top: 20px;
 }
@@ -5710,13 +5730,17 @@ a::-moz-focus-inner {
 }
 
 #loading-bar .bar {
-  background: #ef7164;
+  background: #FF9829;
   height: 4px;
 }
 
 #loading-bar-spinner .spinner-icon {
-  border-top-color: #ef7164;
-  border-left-color: #ef7164;
+  border-top-color: #FF9829;
+  border-left-color: #FF9829;
+}
+
+.text-right {
+  text-align: right;
 }
 
 .navbar {
@@ -6095,9 +6119,25 @@ a::-moz-focus-inner {
   font-weight: normal;
 }
 
+.dashboard__form--label-val {
+  line-height: 30px;
+  color: #858F9D;
+  font-weight: normal;
+}
+
 .dashboard__form--input input {
   height: 30px;
   width: 100%;
+  color: #34455C;
+  border: 1px solid #aeb5be;
+  padding-left: 10px;
+  font-weight: normal;
+  border-radius: 0;
+}
+
+.dashboard__form--input textarea {
+  width: 100%;
+  resize: none;
   color: #34455C;
   border: 1px solid #aeb5be;
   padding-left: 10px;
@@ -6171,7 +6211,7 @@ a::-moz-focus-inner {
 .btn-inactive {
   border: 1px solid #dddddd;
   background-color: #dddddd;
-  color: #363A41;
+  color: #fff;
 }
 
 .btn-submit-disable {
@@ -6532,6 +6572,13 @@ tags-input.ng-invalid .tags {
   box-shadow: none;
 }
 
+.radio-box-text {
+  font-size: 14px;
+  font-weight: 400;
+  color: #5d6a7d;
+  padding-right: 10px;
+}
+
 .patient-user {
   background-color: #7ca3dc;
   color: #34455C;
@@ -6561,6 +6608,7 @@ tags-input.ng-invalid .tags {
 .patient-user__navbar ul > li > a {
   padding: 10px 0;
   color: #fff;
+  cursor: pointer;
 }
 .patient-user__navbar ul > li > a:hover {
   background-color: inherit;
@@ -6582,93 +6630,320 @@ tags-input.ng-invalid .tags {
   padding-bottom: 9px;
 }
 
-.admin-patient .patient-details {
+.patient-overview {
+  padding: 0;
+  margin-top: 30px;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+.patient-overview--desc {
+  padding: 0;
+  padding-right: 10px;
+  border-right: 1px solid #dbdbdb;
+}
+
+.patient-name span {
+  font-size: 14px;
+  font-weight: 700;
+  color: #34455C;
+}
+
+.patient-details {
+  padding: 10px 0;
+  border-bottom: 1px solid #dbdbdb;
+}
+.patient-details--key {
+  color: #858F9D;
+}
+.patient-details--value {
+  color: #34455C;
+  padding-left: 5px;
+}
+
+.reset-border {
+  border-bottom: none;
+}
+
+.patient-overview--graph {
+  padding: 0;
+}
+
+.delete-patient {
+  margin: 30px 0;
+  padding: 0;
+}
+
+.patient-summary {
+  padding: 0;
+  margin-top: 20px;
+  border-bottom: 1px solid #dbdbdb;
+}
+.patient-summary span {
+  font-size: 14px;
+  font-weight: 700;
+  color: #34455C;
+}
+
+.patient-detailed-overview {
+  padding: 10px 0 0 0;
+}
+.patient-detailed-overview--key {
+  padding: 0;
+}
+.patient-detailed-overview--key span {
+  color: #858F9D;
+}
+.patient-detailed-overview--value {
+  padding: 0;
+}
+.patient-detailed-overview--value span {
+  color: #34455C;
+}
+
+.admin-user .user-gen-details {
   text-align: right;
   padding: 10px 0;
   font-size: 14px;
   font-weight: 700;
 }
-.admin-patient .patient-details--name {
+.admin-user .user-gen-details--name {
   color: #646568;
 }
-.admin-patient .patient-details--hr-id {
+.admin-user .user-gen-details--hr-id {
   color: #FF9829;
 }
 
-.admin-patient .patient-clinic {
+.admin-user .patient-clinic {
   margin-top: 20px;
   padding: 10px 0;
 }
-.admin-patient .patient-clinic--title {
+.admin-user .patient-clinic--title {
   font-size: 14px;
   font-weight: 700;
   color: #34455C;
 }
 
-.admin-patient .clinic-list {
+.admin-user .clinic-list {
   padding: 0;
   margin-top: 20px;
   border-bottom: 1px solid #cccccc;
 }
 
-.admin-patient .clinic-list__detail {
+.admin-user .clinic-list__detail {
   padding: 0;
 }
-.admin-patient .clinic-list__detail--name {
+.admin-user .clinic-list__detail--name {
   color: #34455C;
   font-size: 14px;
   font-weight: 700;
   display: block;
 }
-.admin-patient .clinic-list__detail--email {
+.admin-user .clinic-list__detail--email {
   color: #858F9D;
   font-size: 12px;
   font-weight: 400;
   display: block;
 }
 
-.admin-patient .clinic-list__address {
+.admin-user .clinic-list__address {
   padding: 0;
   font-size: 12px;
   font-weight: 400;
   color: #858F9D;
 }
-.admin-patient .clinic-list__address--primary, .admin-patient .clinic-list__address--secondary {
+.admin-user .clinic-list__address--primary, .admin-user .clinic-list__address--secondary {
   display: block;
 }
 
-.admin-patient .clinic-list__phone, .admin-patient .clinic-list__fax {
+.admin-user .clinic-list__phone, .admin-patient .clinic-list__fax {
   padding: 0;
   color: #5d6a7d;
   font-size: 12px;
   font-weight: 400;
 }
 
-.admin-patient .clinic-list__hr-id {
+.admin-user .clinic-list__hr-id {
   padding: 0;
 }
-.admin-patient .clinic-list__hr-id span {
+.admin-user .clinic-list__hr-id span {
   color: #34455C;
   font-weight: 600;
 }
 
-.admin-patient .clinic-list__delete {
+.admin-user .clinic-list__delete {
   text-align: center;
 }
-.admin-patient .clinic-list__delete span {
+.admin-user .clinic-list__delete span {
   cursor: pointer;
 }
 
-.admin-patient .clinic-link {
+.admin-user .clinic-link {
   margin: 30px 0;
   padding: 0;
 }
-.admin-patient .clinic-link input {
+.admin-user .clinic-link input {
   width: 80%;
   padding-left: 10px;
   outline: none;
   height: 30px;
   color: #34455C;
+}
+
+.admin-user .patient-caregiver {
+  margin-top: 20px;
+  padding: 10px 0;
+}
+.admin-user .patient-caregiver--title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #34455C;
+}
+
+.admin-user .caregiver-list {
+  padding: 0;
+  margin-top: 20px;
+  border-bottom: 1px solid #cccccc;
+}
+
+.admin-user .caregiver-list__detail {
+  padding: 0;
+}
+.admin-user .caregiver-list__detail--name {
+  color: #34455C;
+  font-size: 14px;
+  font-weight: 700;
+  display: block;
+}
+.admin-user .caregiver-list__detail--email {
+  color: #858F9D;
+  font-size: 12px;
+  font-weight: 400;
+  display: block;
+}
+
+.admin-user .caregiver-list__address {
+  padding: 0;
+  font-size: 12px;
+  font-weight: 400;
+  color: #858F9D;
+}
+.admin-user .caregiver-list__address--primary, .admin-user .caregiver-list__address--secondary {
+  display: block;
+}
+
+.admin-user .caregiver-list__phone, .admin-user .caregiver-list__fax {
+  padding: 0;
+  color: #5d6a7d;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.admin-user .caregiver-list__type {
+  padding: 0;
+}
+.admin-user .caregiver-list__type span {
+  color: #34455C;
+  font-weight: 600;
+}
+
+.admin-user .caregiver-list__delete {
+  text-align: center;
+}
+.admin-user .caregiver-list__delete span {
+  cursor: pointer;
+}
+
+.admin-user .caregiver-link {
+  margin: 30px 0;
+  padding: 0;
+}
+.admin-user .caregiver-link input {
+  width: 80%;
+  padding-left: 10px;
+  outline: none;
+  height: 30px;
+  color: #34455C;
+}
+
+.admin-user .patient-device,
+.admin-user .patient-protocol {
+  margin-top: 20px;
+  padding: 10px 0;
+}
+.admin-user .patient-device--title,
+.admin-user .patient-protocol--title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #34455C;
+}
+
+.admin-user .device-list,
+.admin-user .protocol-list {
+  padding: 0;
+  margin-top: 20px;
+  border-bottom: 1px solid #cccccc;
+  padding-bottom: 10px;
+}
+.admin-user .device-list div,
+.admin-user .protocol-list div {
+  padding: 0;
+}
+.admin-user .device-list div span,
+.admin-user .protocol-list div span {
+  color: #34455C;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.admin-user .list-inactive div {
+  padding: 0;
+}
+.admin-user .list-inactive div span {
+  color: #C1C1C1;
+}
+
+.admin-user .device-list__lung,
+.admin-user .protocol-list__lung {
+  position: relative;
+}
+.admin-user .device-list__lung .icon-lungs,
+.admin-user .protocol-list__lung .icon-lungs {
+  position: absolute;
+  font-size: 30px;
+  top: -5px;
+}
+
+.admin-user .device-list__lung .active,
+.admin-user .protocol-list__lung .active {
+  color: #5C9B52;
+}
+
+.admin-user .protocol-list .protocol-list__type {
+  font-weight: 400;
+}
+
+.protocol-list.inactive .protocol-list--text {
+  color: #C1C1C1;
+}
+
+.admin-user .protocol-list .protocol-list__type span {
+  font-weight: 700;
+}
+
+.admin-user .protocol-list .protocol-list--value {
+  font-weight: 400;
+}
+
+.protocol-point {
+  margin-top: 20px;
+}
+
+.add-new-point {
+  font-size: 14px;
+  font-weight: normal;
+  cursor: pointer;
+  border-bottom: 1px solid #363A41;
+  color: #363A41;
 }
 
 .footer {
@@ -6729,7 +7004,7 @@ tags-input.ng-invalid .tags {
 
 .custom-dropdown--auth:before {
   color: #34455C;
-  content: "εÿÇ";
+  content: "";
   font-family: "hill-rom";
   font-size: 10px;
   padding: 0;
@@ -6883,14 +7158,14 @@ tags-input.ng-invalid .tags {
   position: relative;
 }
 .stats_chart_container .col-3 .chart_inner_icon {
-  display: inline-block;
-  font-size: 85px;
-  height: 60px;
-  left: 12px;
-  position: absolute;
-  top: 10px;
-  width: 60px;
   color: #ccc;
+  display: inline-block;
+  font-size: 54px;
+  height: 60px;
+  left: 27px;
+  position: absolute;
+  top: 26px;
+  width: 60px;
 }
 .stats_chart_container .pie_chart {
   float: left;
@@ -7052,9 +7327,7 @@ tags-input.ng-invalid .tags {
 
 .edit_delete .icon {
   display: inline-block;
-  height: 20px;
-  width: 20px;
-  border: solid 1px #ccc;
+  cursor: pointer;
 }
 .edit_delete .icon.edit {
   margin-right: 10px;
@@ -7071,6 +7344,19 @@ tags-input.ng-invalid .tags {
   cursor: pointer;
 }
 .add_note_container .view_all_btn:hover {
+  color: #333333;
+}
+
+.note_edit_container {
+  padding: 15px 0px;
+}
+.note_edit_container .date_input {
+  width: 100%;
+}
+.note_edit_container .edit_delete .save {
+  background-color: #FF9829;
+  border: solid 1px #FF9829;
+  margin-right: 15px;
   color: #333333;
 }
 
@@ -7116,6 +7402,3 @@ tags-input.ng-invalid .tags {
 }
 
 /*# sourceMappingURL=main.css.map */
-.nav.navbar-nav li a{
-  cursor: pointer;
-}

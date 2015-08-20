@@ -1,10 +1,10 @@
 @font-face {
 	font-family: 'hillrom';
-	src:url('fonts/hillrom.eot?8w13jo');
-	src:url('fonts/hillrom.eot?#iefix8w13jo') format('embedded-opentype'),
-		url('fonts/hillrom.ttf?8w13jo') format('truetype'),
-		url('fonts/hillrom.woff?8w13jo') format('woff'),
-		url('fonts/hillrom.svg?8w13jo#hillrom') format('svg');
+	src:url('fonts/hillrom.eot?-b2hjav');
+	src:url('fonts/hillrom.eot?#iefix-b2hjav') format('embedded-opentype'),
+		url('fonts/hillrom.ttf?-b2hjav') format('truetype'),
+		url('fonts/hillrom.woff?-b2hjav') format('woff'),
+		url('fonts/hillrom.svg?-b2hjav#hillrom') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -23,6 +23,18 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
+.icon-adherence:before {
+	content: "\e608";
+}
+.icon-delete-icon:before {
+	content: "\e610";
+}
+.icon-man-running:before {
+	content: "\e656";
+}
+.icon-notification-bell:before {
+	content: "\e657";
+}
 .icon-hill-rom-logo:before {
 	content: "\e607";
 }

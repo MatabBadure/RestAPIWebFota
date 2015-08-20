@@ -30,7 +30,7 @@
         "zipcode": "Zip",
         "city": "City",
         "state": "State",
-        "phoneNumber": "PhoneNumber",
+        "phoneNumber": "Phone Number",
         "fax-number": "Clinic Fax Number",
         "clinic-phone": "Clinic Phone Number",
         "hillromId": "HillromId",
@@ -48,6 +48,20 @@
         "delete": {
             "warning": "Are you sure you want to Deactivate the Clinic?",
             "message": "If you deactivate the clinic, you will no longer be able to view the information."
-        }
+        },
+        "hillRom-id": "Hill-Rom ID",
+        "type": "Type",
+        "status": "Status",
+        "view-assoc-patients": "View Associate Patients",
+        "view-assoc-hcps": "View Associate HCPs",
+        "phoneNumber": "Phone number",
+        "address": "Address",
+        "city": "City",
+        "state": "State",
+        "clinic-view-assoc-patients": "View Associated Patients",
+        "clinic-view-assoc-hcps": "View Associated HCPs",
+        "clinic-edit": "Edit Clinic",
+        "assoc-clinic": "Associated Clinics",
+        "add-satellite-clinic": "Add Satellite Clinic"
     }
 }

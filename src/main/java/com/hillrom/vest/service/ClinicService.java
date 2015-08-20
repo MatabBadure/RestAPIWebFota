@@ -23,6 +23,7 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
+import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 
 
@@ -41,8 +42,7 @@ public class ClinicService {
     @Inject
     private UserService userService;
 
-    public JSONObject createClinic(ClinicDTO clinicDTO) {
-    	JSONObject jsonObject = new JSONObject();
+    public Clinic createClinic(ClinicDTO clinicDTO) throws HillromException {
     	Clinic newClinic = new Clinic();
     	// Assigns the next clinic HillromId from Stored Procedure
     	newClinic.setId(clinicRepository.id());
@@ -58,20 +58,16 @@ public class ClinicService {
     	assignUpdatedValues(clinicDTO, newClinic);
 		clinicRepository.save(newClinic);
         if(StringUtils.isNotBlank(newClinic.getId())) {
-        	jsonObject.put("message", "Clinic created successfully.");
-            jsonObject.put("Clinic", newClinic);
-            return jsonObject;
+            return newClinic;
         } else {
-	      	jsonObject.put("ERROR", "Unable to create Clinic.");
-	        return jsonObject;
+        	throw new HillromException(ExceptionConstants.HR_541);
         }
     }
 
-    public JSONObject updateClinic(String id, ClinicDTO clinicDTO) {
-    	JSONObject jsonObject = new JSONObject();
+    public Clinic updateClinic(String id, ClinicDTO clinicDTO) throws HillromException {
     	Clinic clinic = clinicRepository.getOne(id);
         if(clinic == null) {
-	      	jsonObject.put("ERROR", "No such clinic found.");
+        	throw new HillromException(ExceptionConstants.HR_548);//No such clinic found
         } else if(StringUtils.isNotBlank(clinic.getId())) {
         	assignUpdatedValues(clinicDTO, clinic);
         	if(clinicDTO.getParent()) {
@@ -100,32 +96,25 @@ public class ClinicService {
         			clinicRepository.save(parentClinic);
         			clinic.setParentClinic(parentClinic);       			
         		} else {
-        			jsonObject.put("ERROR", "Clinic can't be parent of his own.");
-        			return jsonObject;
+        			throw new HillromException(ExceptionConstants.HR_542);
         		} 
         	} else {
        			clinicRepository.save(clinic);
         	} 
     		clinicRepository.save(clinic);
-        	jsonObject.put("message", "Clinic updated successfully.");
-            jsonObject.put("Clinic", clinic);
-            if(clinicDTO.getParent()) {
-            	jsonObject.put("ChildClinic", clinic.getChildClinics());
-            }
         } else {
-	      	jsonObject.put("ERROR", "Unable to update Clinic.");
+	      	throw new HillromException(ExceptionConstants.HR_543);
         }
-    	return jsonObject;
+    	return clinic;
     }
     
-    public JSONObject deleteClinic(String id) {
-    	JSONObject jsonObject = new JSONObject();
+    public String deleteClinic(String id) throws HillromException {
     	Clinic existingClinic = clinicRepository.findOne(id);
 		if(existingClinic != null) {
 			if(existingClinic.getClinicAdminId() != null) {
-				jsonObject.put("ERROR", "Unable to delete Clinic. Clinic admin exists.");
+				throw new HillromException(ExceptionConstants.HR_545);//Unable to delete Clinic. Clinic admin exists
 			} else if(existingClinic.getUsers().size() > 0) {
-				jsonObject.put("ERROR", "Unable to delete Clinic. Healthcare Professionals are associated with it.");
+				throw new HillromException(ExceptionConstants.HR_546);//Unable to delete Clinic. Healthcare Professionals are associated with it
 			} else {
 				if(existingClinic.isParent()) {
 					existingClinic.getChildClinics().forEach(childClinic -> {
@@ -135,12 +124,11 @@ public class ClinicService {
 					existingClinic.setParent(false);
 				}
 				clinicRepository.delete(existingClinic);
-				jsonObject.put("message", "Clinic deleted successfully.");
+				return MessageConstants.HR_224;
 			}
 		} else {
-			jsonObject.put("ERROR", "No such clinic exists.");
+			throw new HillromException(ExceptionConstants.HR_544);
 		}
-		return jsonObject;
     }
 
 	/**
@@ -168,25 +156,17 @@ public class ClinicService {
 			clinic.setClinicAdminId(clinicDTO.getClinicAdminId());
 	}
 
-	public JSONObject getHCPUsers(List<String> idList) {
-		JSONObject jsonObject = new JSONObject();
+	public Set<UserExtension> getHCPUsers(List<String> idList) throws HillromException {
 		Set<UserExtension> hcpUserList = new HashSet<>();
 		for(String id : idList){
 	    	Clinic clinic = clinicRepository.getOne(id);
-	        if(clinic == null) {
-		      	jsonObject.put("ERROR", "Invalid clinic id found.");
-		      	return jsonObject;
+	        if(Objects.isNull(clinic)) {
+	        	throw new HillromException(ExceptionConstants.HR_547);//Invalid clinic id found
 	        } else {
 	        	hcpUserList.addAll(clinic.getUsers());
 	        }
 		}
-		jsonObject.put("hcpUsers", hcpUserList);
-		if(hcpUserList.isEmpty()){
-			jsonObject.put("message", "No associated HCPs.");
-		} else {
-	      	jsonObject.put("message", "Associated HCPs fetched successfully.");
-        }
-        return jsonObject;
+        return hcpUserList;
     }
 	
 	public Set<UserExtension> getAssociatedPatientUsers(List<String> idList) throws HillromException {

@@ -1,4 +1,4 @@
-'use strict';
+/*'use strict';
 
 angular.module('hillromvestApp')
 .directive('clinicList', function() {
@@ -76,3 +76,4 @@ angular.module('hillromvestApp')
     }
   }
 });
+*/

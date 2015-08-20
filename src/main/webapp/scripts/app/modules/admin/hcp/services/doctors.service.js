@@ -10,16 +10,13 @@ angular.module('hillromvestApp')
     var token = localStorage.getItem('token');
     return {
 
-      
-
-     
       /**
       * @ngdoc method
       * @name editUser
       * @description
       *
       */
-      
+
       getDoctorsList : function(searchString, pageNo, offset){
         return $http.get('api/user/hcp/search?searchString=' + searchString + '&page=' + pageNo + '&per_page=' + offset, {
           headers: {
@@ -69,6 +66,27 @@ angular.module('hillromvestApp')
                 }
                 flag = true;
         });
+        return $http.get(url , {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
+      getPatientsAssociatedToHCP: function(doctorId, clinicId){
+        var url="/api/hcp/"+doctorId+"/patients?filterByClinic=";
+        if(clinicId != null){
+          url = url + ""+clinicId;
+        }
+        return $http.get(url , {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
+      getClinicsAssociatedToHCP : function(doctorId){
+        var url ='/api/hcp/'+doctorId+'/clinics';
         return $http.get(url , {
           headers: headerService.getHeader()
         }).success(function (response) {

@@ -45,16 +45,16 @@ public class PatientHCPService {
 
     @Inject
     private UserPatientRepository userPatientRepository;
-    
+
     @Inject
     private UserExtensionRepository userExtensionRepository;
-    
+
     @Inject
     private UserRepository userRepository;
 
     @Inject
     private UserService userService;
-    
+
     public List<User> associateHCPToPatient(Long id, List<Map<String, String>> hcpList) throws HillromException {
     	List<User> users = new LinkedList<>();
     	User patientUser = userRepository.findOne(id);
@@ -86,7 +86,7 @@ public class PatientHCPService {
      	}
     	return users;
     }
-    
+
     public List<User> getAssociatedHCPUserForPatient(Long id) throws HillromException {
     	User patientUser = userRepository.findOne(id);
     	if(patientUser != null) {
@@ -115,7 +115,7 @@ public class PatientHCPService {
 		}
 		return hcpUsers;
 	}
-	
+
 	public List<Map<String,Object>> getAssociatedPatientUsersForHCP(Long id, String filterByClinicId) throws HillromException {
     	UserExtension hcpUser = userExtensionRepository.findOne(id);
     	if(hcpUser != null) {
@@ -152,7 +152,7 @@ public class PatientHCPService {
 	     		});
 		    	return responseList;
 	     	} else {
-	     		throw new HillromException(ExceptionConstants.HR_571);
+	     		throw new HillromException(ExceptionConstants.HR_581);
 	     	}
     	} else {
     		throw new HillromException(ExceptionConstants.HR_512);

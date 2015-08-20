@@ -3,6 +3,7 @@ package com.hillrom.vest.service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -37,6 +38,7 @@ import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.domain.UserSecurityQuestion;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.AuthorityRepository;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
@@ -1165,5 +1167,17 @@ public class UserService {
 		}
 		return jsonObject;
     }
+	
+	public List<UserExtension> getAllUsersBy(String role) throws HillromException{
+		List<UserExtension> users = userExtensionRepository.findByActiveStatus();
+		List<UserExtension> filteredUsers = new LinkedList<>();
+		if(users.isEmpty()) {
+			throw new HillromException(ExceptionConstants.HR_518);
+		} else {
+			Authority authority = new Authority(role);
+			filteredUsers = users.stream().filter(user -> user.getAuthorities().contains(authority)).collect(Collectors.toList());
+		    return filteredUsers;
+		}	
+	 }
 }
 

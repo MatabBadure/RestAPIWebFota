@@ -536,4 +536,31 @@ public class UserExtensionResource {
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
+    
+    /**
+     * GET  /user/all -> get the hcps.
+     */
+    @RequestMapping(value = "/user/all",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<JSONObject> getAssociatedClinicsForHCP(@RequestParam(value = "role",required = false) String role) {
+        log.debug("REST request to get all users with role : {}", role);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	List<UserExtension> users= userService.getAllUsersBy(role);
+	        if (users.isEmpty()) {
+	        	jsonObject.put("ERROR", ExceptionConstants.HR_518);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_205);
+	        	jsonObject.put("users", users);
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

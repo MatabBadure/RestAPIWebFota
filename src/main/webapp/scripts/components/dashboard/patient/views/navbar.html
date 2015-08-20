@@ -1,17 +1,11 @@
 <div class="navbar patient-user patient-user--nav">
   <div class="container">
-    <div class="collapse navbar-collapse patient-user__navbar" id="navbar-collapse">
-      <ul class="nav navbar-nav">
-        <li >
-          <a ng-class="{active: isActive('overview')}" ng-href="#/patient/caregiver">
-            <span class="">caregiver</span>
-          </a>
-        </li>
-        <li >
-          <a ng-class="{active: isActive('overview')}" ng-href="#/caregiver">
-            <span class="">caregiver</span>
-          </a>
-        </li>
+    <div class="collapse navbar-collapse " id="navbar-collapse">
+      <span class="brand_name">My Dashboard</span>
+      <ul class="nav nav-pills pull-right patient_dash_right_nav">
+          <li role="presentation" class=""><a href="#">Caregiver</a></li>
+          <li role="presentation" class=""><a href="#">Export Data</a></li>
+          <li role="presentation" class=""><a href="#">Add Note</a></li>
       </ul>
     </div>
   </div>

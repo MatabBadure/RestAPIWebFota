@@ -6142,8 +6142,7 @@ a::-moz-focus-inner {
 }
 
 .hillrom-btn {
-  right: 40px;
-  padding: 5px 24px;
+  padding: 5px 10px;
   border-radius: 3px;
   text-transform: capitalize;
   font-size: 12px;
@@ -6155,6 +6154,24 @@ a::-moz-focus-inner {
   background-color: #ef7164;
   color: #fff;
   margin-left: 10px;
+}
+
+.btn-primary {
+  border: 1px solid #FF9829;
+  background-color: #FF9829;
+  color: #363A41;
+}
+
+.btn-secondary {
+  border: 1px solid #FFAD54;
+  background-color: #FFAD54;
+  color: #363A41;
+}
+
+.btn-inactive {
+  border: 1px solid #dddddd;
+  background-color: #dddddd;
+  color: #363A41;
 }
 
 .btn-submit-disable {
@@ -6565,6 +6582,95 @@ tags-input.ng-invalid .tags {
   padding-bottom: 9px;
 }
 
+.admin-patient .patient-details {
+  text-align: right;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+.admin-patient .patient-details--name {
+  color: #646568;
+}
+.admin-patient .patient-details--hr-id {
+  color: #FF9829;
+}
+
+.admin-patient .patient-clinic {
+  margin-top: 20px;
+  padding: 10px 0;
+}
+.admin-patient .patient-clinic--title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #34455C;
+}
+
+.admin-patient .clinic-list {
+  padding: 0;
+  margin-top: 20px;
+  border-bottom: 1px solid #cccccc;
+}
+
+.admin-patient .clinic-list__detail {
+  padding: 0;
+}
+.admin-patient .clinic-list__detail--name {
+  color: #34455C;
+  font-size: 14px;
+  font-weight: 700;
+  display: block;
+}
+.admin-patient .clinic-list__detail--email {
+  color: #858F9D;
+  font-size: 12px;
+  font-weight: 400;
+  display: block;
+}
+
+.admin-patient .clinic-list__address {
+  padding: 0;
+  font-size: 12px;
+  font-weight: 400;
+  color: #858F9D;
+}
+.admin-patient .clinic-list__address--primary, .admin-patient .clinic-list__address--secondary {
+  display: block;
+}
+
+.admin-patient .clinic-list__phone, .admin-patient .clinic-list__fax {
+  padding: 0;
+  color: #5d6a7d;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.admin-patient .clinic-list__hr-id {
+  padding: 0;
+}
+.admin-patient .clinic-list__hr-id span {
+  color: #34455C;
+  font-weight: 600;
+}
+
+.admin-patient .clinic-list__delete {
+  text-align: center;
+}
+.admin-patient .clinic-list__delete span {
+  cursor: pointer;
+}
+
+.admin-patient .clinic-link {
+  margin: 30px 0;
+  padding: 0;
+}
+.admin-patient .clinic-link input {
+  width: 80%;
+  padding-left: 10px;
+  outline: none;
+  height: 30px;
+  color: #34455C;
+}
+
 .footer {
   min-height: 40px;
   background-color: #fff;
@@ -6623,7 +6729,7 @@ tags-input.ng-invalid .tags {
 
 .custom-dropdown--auth:before {
   color: #34455C;
-  content: "";
+  content: "εÿÇ";
   font-family: "hill-rom";
   font-size: 10px;
   padding: 0;
@@ -6721,4 +6827,295 @@ tags-input.ng-invalid .tags {
   width: 100%;
 }
 
+.read_more {
+  color: #FF9829;
+}
+
+/* ----Left Navbar CSS ----*/
+.brand_name {
+  color: #fff;
+  padding: 10px 15px;
+  display: inline-block;
+  padding-left: 0px;
+}
+
+/* ----Right Navbar CSS ----*/
+.patient_dash_right_nav li:last-child {
+  padding-right: 0px;
+}
+.patient_dash_right_nav li a {
+  color: #fff;
+  border-radius: 0;
+  font-weight: normal;
+}
+.patient_dash_right_nav li a:hover {
+  background-color: transparent;
+  color: #f5f5f5;
+}
+.patient_dash_right_nav li a:focus {
+  background-color: transparent;
+}
+
+/*----- Stats Chart CSS -----*/
+.patient_wrapper {
+  margin-top: 25px;
+}
+
+.stats_chart_section .stats_header {
+  border-bottom: solid 1px #dddddd;
+}
+.stats_chart_section .stats_header h4 {
+  color: #333333;
+  margin: 0px 0px;
+  line-height: 25px;
+}
+
+.stats_chart_container {
+  clear: left;
+  display: inline-block;
+  margin: 25px 0;
+  width: 100%;
+}
+.stats_chart_container .col-3 {
+  width: 33.3333%;
+  display: inline-block;
+  float: left;
+  position: relative;
+}
+.stats_chart_container .col-3 .chart_inner_icon {
+  display: inline-block;
+  font-size: 85px;
+  height: 60px;
+  left: 12px;
+  position: absolute;
+  top: 10px;
+  width: 60px;
+  color: #ccc;
+}
+.stats_chart_container .pie_chart {
+  float: left;
+}
+
+.stats_chart_content {
+  display: inline-block;
+  margin: 30px 0 0 15px;
+}
+.stats_chart_content.score {
+  color: #FFC31C;
+}
+.stats_chart_content.hmr {
+  color: #7E2253;
+}
+.stats_chart_content.missed {
+  color: #EA766B;
+}
+.stats_chart_content .percent {
+  font-size: 30px;
+  font-weight: bold;
+  line-height: 30px;
+  margin: 0;
+}
+
+/* Notification Section CSS */
+.dashboard_noti_section .header_noti h4 {
+  margin: 0px 0px;
+  color: #555555;
+  margin: 0px 0px;
+  line-height: 25px;
+}
+
+.notification_container ul {
+  padding: 0px;
+  margin: 0;
+}
+.notification_container ul li {
+  list-style-type: none;
+  padding: 12px 0px;
+  padding-left: 60px;
+  border-bottom: solid 1px #dddddd;
+  color: #555555;
+  position: relative;
+}
+.notification_container ul li:hover {
+  background-color: #F2EFEF;
+}
+.notification_container ul li .dsh_icon {
+  border: solid 1px #dddddd;
+  border-radius: 50%;
+  color: #7DDBFA;
+  font-size: 42px;
+  height: 43px;
+  left: 3px;
+  line-height: 38px;
+  position: absolute;
+  top: 14px;
+  width: 43px;
+}
+.notification_container ul .read_more {
+  text-decoration: underline;
+}
+.notification_container ul .read_more:hover {
+  color: #FF9829;
+}
+
+/* -----BarChart Style ------*/
+.bar_graph_header {
+  border-bottom: solid 1px #dddddd;
+  display: inline-block;
+  width: 100%;
+}
+
+.left_header_barchart ul li a {
+  padding: 2px 0px;
+  color: #777777;
+  margin: 10px 20px 0px 0px;
+  border-radius: 0px;
+  border-bottom: solid 2px #fff;
+  font-size: 16px;
+}
+.left_header_barchart ul li a:hover {
+  background-color: transparent;
+}
+.left_header_barchart ul li a:focus {
+  background-color: transparent;
+  color: #333333;
+  border-bottom: solid 2px #FF9829;
+}
+
+.right_header_barchart ul li a {
+  padding: 2px 0px;
+  color: #7CA3DC;
+  margin: 10px 0px 0px 20px;
+  border-radius: 0px;
+  border-bottom: solid 2px #fff;
+  font-size: 14px;
+}
+.right_header_barchart ul li a:hover {
+  background-color: transparent;
+}
+.right_header_barchart ul li a:focus {
+  background-color: transparent;
+  color: #333333;
+}
+
+.week_date_container {
+  color: #333333;
+}
+.week_date_container .date {
+  padding: 10px 10px;
+}
+
+/* Dash Doard Note section css */
+.patient_dashdoard_btns .hillrom-btn {
+  background-color: #FF9829;
+  border: solid 1px #FF9829;
+  color: #333333;
+}
+
+.add_note_container {
+  display: block;
+  border: solid 1px #dddddd;
+  clear: left;
+  float: left;
+  width: 100%;
+  min-height: 100px;
+  margin: 30px 0px;
+}
+.add_note_container .note_header {
+  border-bottom: solid 1px #dddddd;
+  display: inline-block;
+  width: 100%;
+  padding: 5px 0px;
+}
+
+.note_header_left .note {
+  color: #7CA3DC;
+  font-size: 14px;
+}
+.note_header_left .can_do {
+  color: #777777;
+  font-size: 12px;
+}
+
+.note_header_right .cross_icon {
+  font-size: 14px;
+  font-weight: lighter;
+  color: #777777;
+  text-decoration: none;
+  padding: 0px 10px;
+}
+
+.notes_content .notes_row {
+  border-bottom: solid 1px #dddddd;
+  padding: 10px 0px;
+}
+
+.edit_delete .icon {
+  display: inline-block;
+  height: 20px;
+  width: 20px;
+  border: solid 1px #ccc;
+}
+.edit_delete .icon.edit {
+  margin-right: 10px;
+}
+
+.add_note_container .patient_dashdoard_btns {
+  display: inline-block;
+  width: 100%;
+  margin: 8px 0px 0px;
+  padding: 0px 10px;
+}
+.add_note_container .view_all_btn {
+  padding: 5px 5px;
+  cursor: pointer;
+}
+.add_note_container .view_all_btn:hover {
+  color: #333333;
+}
+
+.dashboard_line_graph .nv-groups .nv-point {
+  stroke-opacity: 1 !important;
+  stroke-width: 5px !important;
+  fill-opacity: 1 !important;
+}
+.dashboard_line_graph .nv-lineChart g rect {
+  fill: #E5EFF9;
+  opacity: 1 !important;
+}
+.dashboard_line_graph .nv-axis path {
+  stroke: #ccc;
+}
+
+/* Over write date picker style*/
+.daterangepicker.dropdown-menu {
+  width: 490px;
+}
+.daterangepicker .ranges {
+  display: none !important;
+}
+
+.table-condensed thead tr {
+  background-color: #7CA3DC;
+  color: #fff;
+}
+.table-condensed thead tr:not(:first-child) {
+  background-color: transparent;
+  color: #333333;
+}
+.table-condensed th.available:hover {
+  background: transparent !important;
+}
+
+.glyphicon-arrow-left:before {
+  content: '\003c';
+}
+
+.glyphicon-arrow-right:before {
+  content: '\003e';
+}
+
 /*# sourceMappingURL=main.css.map */
+.nav.navbar-nav li a{
+  cursor: pointer;
+}

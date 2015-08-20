@@ -13,8 +13,10 @@ angular.module('hillromvestApp',
    'ngTagsInput',
    'angular-noty',
    'angular-loading-bar',
-   'nvd3ChartDirectives'/*,
-   'ngMask'*/
+   'nvd3ChartDirectives',
+   'easypiechart',
+   'daterangepicker',
+   'ngMask'
    ])
 .run(function($rootScope, $location, $window, $http, $state, $translate, Language, Auth, Principal, ENV, VERSION) {
     $rootScope.ENV = ENV;

@@ -226,11 +226,6 @@ angular.module('hillromvestApp')
         $scope.clinicStatus.message = "Clinic updated successfully";
         notyService.showMessage($scope.clinicStatus.message, 'success');
         $scope.selectClinic(clinic);
-        //$scope.clinicStatus.message = "Clinic updated successfully" + " for ID " + data.data.Clinic.id;
-
-        /*/*$scope.init();
-        $scope.reset();
-        $state.go('clinicUser');*/
       }).catch(function(response) {
         if (response.data.message !== undefined) {
           $scope.clinicStatus.message = response.data.message;
@@ -346,7 +341,10 @@ angular.module('hillromvestApp')
       var data = [{'id': $stateParams.clinicId}];
       clinicService.disassociatePatient(patientId, data).then(function(response){
         $scope.initClinicAssoctPatients($stateParams.clinicId);
-      }).catch(function(response){});
+        notyService.showMessage(response.data.message, 'success');
+      }).catch(function(response){
+        notyService.showMessage(response.data.message, 'warning');
+      });
     };
 
     $scope.linkPatient = function(){
@@ -362,15 +360,20 @@ angular.module('hillromvestApp')
       var data = [{'id': $stateParams.clinicId}];
       clinicService.associatePatient(patient.id, data).then(function(response){
         $scope.initClinicAssoctPatients($stateParams.clinicId);
-      }).catch(function(response){});
+        notyService.showMessage(response.data.message, 'success');
+      }).catch(function(response){
+        notyService.showMessage(response.data.message, 'warning');
+      });
     };
 
     $scope.disassociateHCP = function(hcpId){
-      console.log('hcpId :: ', hcpId);
       var data = [{'id': $stateParams.clinicId}];
       clinicService.disassociateHCP(hcpId, data).then(function(response){
         $scope.initClinicAssoctHCPs($stateParams.clinicId);
-      }).catch(function(response){});
+        notyService.showMessage(response.data.message, 'success');
+      }).catch(function(response){
+        notyService.showMessage(response.data.message, 'warning');
+      });
     };
 
     $scope.selectHCP = function(hcp, index){
@@ -378,9 +381,11 @@ angular.module('hillromvestApp')
       var data = [{'id': hcp.id}];
       clinicService.associateHcp($stateParams.clinicId, data).then(function(response){
         $scope.initClinicAssoctHCPs($stateParams.clinicId);
-      }).catch(function(response){});
+        notyService.showMessage(response.data.message, 'success');
+      }).catch(function(response){
+        notyService.showMessage(response.data.message, 'warning');
+      });
     };
 
-    /* clinic profile view*/
     $scope.init();
   });

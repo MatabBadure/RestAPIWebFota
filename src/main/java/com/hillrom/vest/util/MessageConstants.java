@@ -36,7 +36,7 @@ public class MessageConstants {
     public static final String HR_252 = "HCP User updated successfully.";
     public static final String HR_253 = "HCP User fetched successfully.";
     public static final String HR_254 = "HCP User deleted successfully.";
-    public static final String HR_255 = "HCPs are associated with patient successfully.";
+    public static final String HR_255 = "HCP associated with patient successfully.";
     
     public static final String HR_261 = "Caregiver User created successfully.";
     public static final String HR_262 = "Caregiver User updated successfully.";
@@ -44,10 +44,10 @@ public class MessageConstants {
     public static final String HR_264 = "Caregiver User deleted successfully.";
     public static final String HR_265 = "Relationship labels fetched successfully.";
     
-    public static final String HR_271 = "HCPs are associated with patient successfully.";
-    public static final String HR_272 = "HCP is dissociated with Clinics successfully.";
-    public static final String HR_273 = "Clinics are associated with patient successfully.";
-    public static final String HR_274 = "Clinics are disassociated with patient successfully.";
+    public static final String HR_271 = "HCP associated with patient successfully.";
+    public static final String HR_272 = "HCP is dissociated from Clinic successfully.";
+    public static final String HR_273 = "Clinic associated with patient successfully.";
+    public static final String HR_274 = "Clinic disassociated from patient successfully.";
     public static final String HR_275 = "Associated clinics with patient fetched successfully.";
     public static final String HR_276 = "Associated HCPs with patient fetched successfully.";
     public static final String HR_277 = "No Associated HCPs with clinic.";
@@ -59,9 +59,9 @@ public class MessageConstants {
     public static final String HR_282 = "Vest devices linked with patient fetched successfully.";
     public static final String HR_283 = "Vest device for patient is deactivated successfully.";
     
-    public static final String HR_284 = "No Associated HCPs with Patient.";
-    public static final String HR_285 = "No Associated clinics with Patient.";
-    public static final String HR_291 = "Associated Patients with HCP fetched successfully.";
-    public static final String HR_292 = "Associated Clinics with HCP fetched successfully.";
-    public static final String HR_293 = "HCPs are associated with clinic successfully.";
+    public static final String HR_284 = "No HCP associated with Patient.";
+    public static final String HR_285 = "No clinic associated  with Patient.";
+    public static final String HR_291 = "Patients associated with HCP fetched successfully.";
+    public static final String HR_292 = "Clinics associated with HCP fetched successfully.";
+    public static final String HR_293 = "HCP associated with clinic successfully.";
 }

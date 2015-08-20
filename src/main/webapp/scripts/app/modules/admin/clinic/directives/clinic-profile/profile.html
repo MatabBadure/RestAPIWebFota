@@ -1,4 +1,4 @@
-<hcp-navbar></hcp-navbar>
+<clinic-navbar></clinic-navbar>
 
 <div class="container admin-user">
   <div class="col-md-16 admin-views">
@@ -46,7 +46,7 @@
     </div>
   </div>
 
-  <div class="col-md-16 reset-padding margin-top" ng-if="clinic.id">    
+  <div class="col-md-16 reset-padding margin-top" ng-if="clinic.id">
     <buton class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="getPatients(clinic.id)" translate="clinic.clinic-view-assoc-patients"></buton>
     <buton class="hillrom-btn btn-secondary float-right" ng-click="getHCPs(clinic.id)" translate="clinic.clinic-view-assoc-hcps"></buton>
     <buton class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="goToEditClinic(clinic.id)" translate="clinic.clinic-edit"></buton>
@@ -162,7 +162,7 @@
     </div>
     <div class="col-md-2 detail-list--desc">
       <span>{{childClinic.hillromId}}</span>
-    </div>    
+    </div>
     <div class="col-md-1 detail-list--desc">
       <div class="icon-font text-right">
         <span class="icon-lungs" ng-if="childClinic.deleted"></span>

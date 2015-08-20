@@ -1,6 +1,5 @@
 package com.hillrom.vest.service;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -15,14 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.UserExtension;
-import com.hillrom.vest.domain.UserPatientAssoc;
-import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
-import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.util.ExceptionConstants;
-import com.hillrom.vest.util.RelationshipLabelConstants;
 
 /**
  * Service class for managing users.
@@ -50,6 +45,7 @@ public class HCPClinicService {
     		if(hcpUser.getClinics().contains(clinic)){
     			hcpUser.getClinics().remove(clinic);
     		}
+    		userExtensionRepository.saveAndFlush(hcpUser);
     	}
     	return hcpUser;
     }

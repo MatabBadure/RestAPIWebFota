@@ -23,4 +23,6 @@ public interface PatientProtocolRepository extends
 	 */
 	@Procedure(outputParameterName="hillrom_id",procedureName="get_next_protocol_hillromid")
 	String id();
+	
+	List<PatientProtocolData> findByPatientUserIdAndDeleted(Long patientId,boolean deleted);
 }

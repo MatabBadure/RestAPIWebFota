@@ -1,6 +1,7 @@
 package com.hillrom.vest.service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -88,22 +89,20 @@ public class TherapySessionService {
 		}
 	}
 	
-	public List<TherapyDataVO> findByPatientUserIdAndDateRange(Long id,Long fromTimestamp,Long toTimestamp,String groupBy){
+	public List<TherapyDataVO> findByPatientUserIdAndDateRange(Long patientUserId,Long fromTimestamp,Long toTimestamp,String groupBy){
 		List<TherapySession> sessions = therapySessionRepository
-				.findByPatientUserIdAndDateRange(id,
+				.findByPatientUserIdAndDateRange(patientUserId,
 						LocalDate.fromDateFields(new Date(fromTimestamp)),
 						LocalDate.fromDateFields(new Date(toTimestamp)));
+		Map<Integer,List<TherapySession>> groupedSessions = new HashMap<>();
 		if(GROUP_BY_WEEKLY.equalsIgnoreCase(groupBy)){
-			Map<Integer,List<TherapySession>> groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getDayOfTheWeek));
-			return (List<TherapyDataVO>) calculateWeightedAvgs(groupedSessions); 
+			groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getDayOfTheWeek));
 		}else if(GROUP_BY_MONTHLY.equals(groupBy)){
-			Map<Integer,List<TherapySession>> groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getWeekOfYear));
-			return (List<TherapyDataVO>) calculateWeightedAvgs(groupedSessions);
+			groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getWeekOfYear));
 		}else if(GROUP_BY_YEARLY.equals(groupBy)){
-			Map<Integer,List<TherapySession>> groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getMonthOfTheYear));
-			return (List<TherapyDataVO>) calculateWeightedAvgs(groupedSessions);
+			groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getMonthOfTheYear));
 		}
-		return null;
+		return calculateWeightedAvgs(groupedSessions);
 	}
 
 	public List<TherapySession> findByPatientUserIdAndDate(Long id,Long timestamp){
@@ -113,11 +112,14 @@ public class TherapySessionService {
 	private List<TherapyDataVO> calculateWeightedAvgs(
 			Map<Integer, List<TherapySession>> groupedSessions) {
 		List<TherapyDataVO> processedData = new LinkedList<>();
-		
+
 		for(Integer key : groupedSessions.keySet()){
 			List<TherapySession> sessions = groupedSessions.get(key);
+			int size = sessions.size();
+			int seconds = 60;
 			DateTime start = sessions.get(0).getStartTime();
-			DateTime end = sessions.get(sessions.size()-1).getEndTime();
+			DateTime end = sessions.get(size-1).getEndTime();
+			Double hmr = sessions.get(size-1).getHmr()/seconds;
 			TherapyDataVO vo = new TherapyDataVO();
 			Long totalDuration = sessions.stream().collect(Collectors.summingLong(TherapySession::getDurationInMinutes));
 			double weightedAvgFrequency = 0.0d,weightedAvgPressure = 0.0d;
@@ -143,6 +145,7 @@ public class TherapySessionService {
 			vo.setTimestamp(start.toDateTime());
 			vo.setTreatmentsPerDay(treatmentsPerDay);
 			vo.setDuration(totalDuration.intValue());
+			vo.setHmr(hmr);
 			processedData.add(vo);
 		}
 		return processedData;

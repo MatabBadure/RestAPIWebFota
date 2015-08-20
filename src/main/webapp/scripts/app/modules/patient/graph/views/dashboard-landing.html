@@ -12,7 +12,7 @@
 										<h4 class="percent">30</h4>
 										<p class="descrip">Adherence Score</p>
 									</div>
-									<div class="chart_inner_icon icon-lungs"></div>
+									<div class="chart_inner_icon icon-adherence"></div>
 								</div>
 								<div class="col-3">
 									<div class="pie_chart"  easypiechart options="hmr" percent="percent2"></div>
@@ -20,7 +20,7 @@
 										<h4 class="percent">75</h4>
 										<p class="descrip">HMR Runrate</p>
 									</div>
-									<div class="chart_inner_icon icon-lungs"></div>
+									<div class="chart_inner_icon icon-man-running"></div>
 								</div>
 								<div class="col-3">
 									<div class="pie_chart"  easypiechart options="missedtherapy" percent="percent3"></div>
@@ -121,8 +121,8 @@
  						<div class="col-md-16 notes_row">
  							<div class="notes_row_wrapper">
  								<div class="col-md-2 date_col"><span>08/12/2015</span></div>
-	 							<div class="col-md-11 description">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text </div>
-	 							<div class="col-md-3 edit_delete">
+	 							<div class="col-md-12 description">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text </div>
+	 							<div class="col-md-2 edit_delete">
 	 								<div class="pull-right">
 	 									<span class="edit icon"></span>
 	 									<span class="delete icon"></span>
@@ -133,17 +133,30 @@
  						<div class="col-md-16 notes_row">
  							<div class="notes_row_wrapper">
  								<div class="col-md-2 date_col"><span>08/12/2015</span></div>
-	 							<div class="col-md-11 description">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text </div>
-	 							<div class="col-md-3 edit_delete">
+	 							<div class="col-md-12 description">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text </div>
+	 							<div class="col-md-2 edit_delete">
 	 								<div class="pull-right">
-	 									<span class="edit icon"></span>
-	 									<span class="delete icon"></span>
+	 									<span class="edit icon icon-plus-icon"></span>
+	 									<span class="delete icon icon-delete-icon"></span>
 	 								</div>
 	 							</div>
  							</div>
  						</div>
 	 				</div>
-
+	 				<div class="col-md-16 note_edit_container">
+						<div class="col-md-2 date_col"><input class="date_input" type="text" validate-on-blur value="" ng-model="patient.formatedDOB" ng-readonly="validateADMINorASP()" data-date-format="mm/dd/yy" id="edit_date"></div>
+						<div class="col-md-12 description">
+							<div class="form-group">
+							  <textarea class="form-control custom_textarea" rows="1" id="comment"></textarea>
+							</div>
+						</div>
+						<div class="col-md-2 edit_delete">
+							<div class="pull-right">
+			 					<span class="float-right view_all_btn">X</span>
+								<button class="hillrom-btn btn-submit float-right save">save</button>
+							</div>
+						</div>
+	 				</div>
 	 				<div class="btn_group patient_dashdoard_btns">
 			 			<button class="hillrom-btn btn-submit float-right">Add Note</button>
 			 			<span class="float-right view_all_btn">View All</span>

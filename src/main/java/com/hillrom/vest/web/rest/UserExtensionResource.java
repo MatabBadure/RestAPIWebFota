@@ -213,7 +213,7 @@ public class UserExtensionResource {
         log.debug("REST request to dissociate clinic from HCP : {}", id);
         JSONObject jsonObject = new JSONObject();
         UserExtension hcpUser = hcpClinicService.dissociateClinicFromHCP(id, clinicList);
-        if (jsonObject.containsKey("message")) {
+        if (Objects.nonNull(hcpUser)) {
         	jsonObject.put("message", MessageConstants.HR_272);
         	jsonObject.put("HCPUser", hcpUser);
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
@@ -280,10 +280,9 @@ public class UserExtensionResource {
     public ResponseEntity<JSONObject> getHCPUser(@PathVariable Long id) {
         log.debug("REST request to get UserExtension : {}", id);
         JSONObject jsonObject = new JSONObject();
-        UserExtension hcpUser;
 		try {
-			hcpUser = userService.getHCPUser(id);
-			if (jsonObject.containsKey("ERROR")) {
+			UserExtension hcpUser = userService.getHCPUser(id);
+			if (Objects.isNull(hcpUser)) {
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_253);
@@ -418,7 +417,7 @@ public class UserExtensionResource {
         JSONObject jsonObject = new JSONObject();
 		try {
 			List<Clinic> clinics = clinicPatientService.dissociateClinicsToPatient(id, clinicList);
-			if (jsonObject.containsKey("ERROR")) {
+			if (clinics.isEmpty()) {
 				jsonObject.put("message", ExceptionConstants.HR_536);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
@@ -447,7 +446,7 @@ public class UserExtensionResource {
         JSONObject jsonObject = new JSONObject();
 		try {
 			UserPatientAssoc caregiverAssoc = userService.createCaregiverUser(id, userExtensionDTO, baseUrl);
-			if (Objects.nonNull(caregiverAssoc)) {
+			if (Objects.isNull(caregiverAssoc)) {
 				jsonObject.put("ERROR", ExceptionConstants.HR_561);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
@@ -530,7 +529,7 @@ public class UserExtensionResource {
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         try {
 			UserPatientAssoc caregiverAssoc = userService.updateCaregiverUser(patientUserId, caregiverUserId, userExtensionDTO, baseUrl);
-			if (Objects.nonNull(caregiverAssoc)) {
+			if (Objects.isNull(caregiverAssoc)) {
 				jsonObject.put("ERROR", ExceptionConstants.HR_562);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {

@@ -417,14 +417,11 @@ public class UserExtensionResource {
         JSONObject jsonObject = new JSONObject();
 		try {
 			List<Clinic> clinics = clinicPatientService.dissociateClinicsToPatient(id, clinicList);
-			if (clinics.isEmpty()) {
-				jsonObject.put("message", ExceptionConstants.HR_536);
-	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-	        } else {
-	        	jsonObject.put("message",MessageConstants.HR_274);
-		    	jsonObject.put("clinics", clinics);
-	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
-	        }
+			if (!clinics.isEmpty()) {
+				jsonObject.put("clinics", clinics);
+			}
+			jsonObject.put("message", MessageConstants.HR_274);
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {
 			jsonObject.put("ERROR", e.getMessage());
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);

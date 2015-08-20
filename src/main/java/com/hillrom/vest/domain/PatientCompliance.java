@@ -12,6 +12,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Type;
 import org.joda.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
@@ -34,10 +35,12 @@ public class PatientCompliance {
     @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
 	private LocalDate date;
 	
+	@JsonIgnore
 	@ManyToOne(optional=false,targetEntity=PatientInfo.class)
 	@JoinColumn(name="patient_id",referencedColumnName="id")
 	private PatientInfo patient;
 	
+	@JsonIgnore
 	@ManyToOne(optional=false,targetEntity=User.class)
 	@JoinColumn(name="user_id",referencedColumnName="id")
 	private User patientUser;

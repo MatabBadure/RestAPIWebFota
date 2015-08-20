@@ -1,6 +1,5 @@
 {
     "clinic" : {
-
         "home": {
             "title": "Clinics",
             "createLabel": "Create Clinic",
@@ -66,6 +65,9 @@
         "assoc-clinic": "Associated Clinics",
         "add-satellite-clinic": "Add Satellite Clinic",
         "link-hcp": "Link HCP",
-        "link-patient": "Link Patient"
+        "link-patient": "Link Patient",
+        "tab": {
+            "clinic-overview": "Clinic Profile"
+        }
     }
 }

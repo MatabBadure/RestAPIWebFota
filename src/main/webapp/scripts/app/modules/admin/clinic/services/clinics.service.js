@@ -91,6 +91,38 @@ angular.module('hillromvestApp')
         }).success(function(response) {
           return response;
         });
+      },
+
+      getClinicAssoctHCPs: function(clinicId){
+        return $http.get('/api/clinics/hcp?filter=id:' + clinicId, {
+          headers: headerService.getHeader()
+        }).success(function(response) {
+          return response;
+        });
+      },
+
+      disassociateHCP: function(hcpId, data){
+        return $http.put('/api/user/'+hcpId+'/dissociateclinic', data, {
+          headers: headerService.getHeader()
+        }).success(function(response) {
+          return response;
+        });
+      },
+
+      associateHcp: function(clinicId, data){
+        return $http.put('/api/clinics/'+clinicId+'/associatehcp', data, {
+          headers: headerService.getHeader()
+        }).success(function(response) {
+          return response;
+        });
+      },
+
+      getHCPs: function(){
+        return $http.get('/api/user/all?role=HCP', {
+          headers: headerService.getHeader()
+        }).success(function(response) {
+          return response;
+        });
       }
     };
   });

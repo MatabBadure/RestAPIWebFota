@@ -44,9 +44,24 @@ public class MessageConstants {
     public static final String HR_264 = "Caregiver User deleted successfully.";
     public static final String HR_265 = "Relationship labels fetched successfully.";
     
+    public static final String HR_271 = "HCPs are associated with patient successfully.";
+    public static final String HR_272 = "HCP is dissociated with Clinics successfully.";
+    public static final String HR_273 = "Clinics are associated with patient successfully.";
+    public static final String HR_274 = "Clinics are disassociated with patient successfully.";
+    public static final String HR_275 = "Associated clinics with patient fetched successfully.";
+    public static final String HR_276 = "Associated HCPs with patient fetched successfully.";
+    public static final String HR_277 = "No Associated HCPs with clinic.";
+    public static final String HR_278 = "Associated HCPs with clinic fetched successfully.";
     public static final String HR_279 = "No Associated Patients with clinic.";
     public static final String HR_280 = "Associated Patients with clinic fetched successfully.";
-    public static final String HR_281 = "Associated Patients with HCP fetched successfully.";
-    public static final String HR_282 = "Associated Clinics with HCP fetched successfully.";
-    public static final String HR_283 = "HCPs are associated with clinic successfully.";
+    
+    public static final String HR_281 = "No device linked with patient.";
+    public static final String HR_282 = "Vest devices linked with patient fetched successfully.";
+    public static final String HR_283 = "Vest device for patient is deactivated successfully.";
+    
+    public static final String HR_284 = "No Associated HCPs with Patient.";
+    public static final String HR_285 = "No Associated clinics with Patient.";
+    public static final String HR_291 = "Associated Patients with HCP fetched successfully.";
+    public static final String HR_292 = "Associated Clinics with HCP fetched successfully.";
+    public static final String HR_293 = "HCPs are associated with clinic successfully.";
 }

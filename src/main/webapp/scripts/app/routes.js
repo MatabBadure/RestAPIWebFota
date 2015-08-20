@@ -41,6 +41,31 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
+            .state('associatedPatients', {
+                parent: 'admin',
+                url: '/patients',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/views/list/view.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
             .state('patientNew', {
                 parent: 'patientUser',
                 url: '/new',
@@ -91,6 +116,7 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
+
             .state('patientEditClinics', {
                 parent: 'patientUser',
                 url: '/{patientId}/pclinics',
@@ -141,6 +167,7 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
+
             .state('patientOverview', {
                 parent: 'patientUser',
                 url: '/{patientId}/overview',
@@ -473,7 +500,7 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
-            .state('hcpEdit', {
+            .state('hcpProfile', {
                 parent: 'hcpUser',
                 url: '/{doctorId}',
                 data: {
@@ -482,7 +509,8 @@ angular.module('hillromvestApp')
                 },
                 views: {
                     'content@': {
-                        templateUrl: 'scripts/app/modules/admin/hcp/views/create-edit/view.html',
+                        // templateUrl: 'scripts/app/modules/admin/hcp/views/create-edit/view.html',
+                        templateUrl: 'scripts/app/modules/admin/hcp/directives/hcp-info/overview/overview.html',
                         controller: 'DoctorsController'
                     }
                 },

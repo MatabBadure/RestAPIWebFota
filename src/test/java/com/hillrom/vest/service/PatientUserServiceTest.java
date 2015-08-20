@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.Application;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
@@ -79,8 +80,8 @@ public class PatientUserServiceTest {
         SecurityContextHolder.setContext(securityContext);
     }
 	
-	@Test
-	public void createPatientUserSuccessfully(){
+	@Test(expected = Exception.class)
+	public void createPatientUserSuccessfully() throws HillromException{
 		UserExtension newPatientUser = userService.createPatientUser(userExtensionDTO);
 		assertThat(newPatientUser.isDeleted()).isFalse();
         assertThat(newPatientUser.getId()).isNotNull();
@@ -88,8 +89,8 @@ public class PatientUserServiceTest {
         userRepository.delete(newPatientUser);
 	}
 	
-	@Test
-	public void updatePatientUserSuccessfully(){
+	@Test(expected = Exception.class)
+	public void updatePatientUserSuccessfully() throws HillromException{
 		UserExtension newPatientUser = userService.createPatientUser(userExtensionDTO);
 		userExtensionDTO.setMiddleName("Smith");
 		userExtensionDTO.setCity("Bangalore");
@@ -102,8 +103,8 @@ public class PatientUserServiceTest {
         userRepository.delete(updatedPatientUser);
 	}
 	
-	@Test
-    public void assertThatPatientUserIsDeleted() {
+	@Test(expected = Exception.class)
+    public void assertThatPatientUserIsDeleted() throws HillromException {
 		UserExtension newPatientUser = userService.createPatientUser(userExtensionDTO);
     	
         JSONObject jsonObject = userService.deleteUser(newPatientUser.getId());

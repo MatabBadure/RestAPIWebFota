@@ -52,8 +52,8 @@
       <div class="dashboard__manage-view--pagination">
         <div class="col-md-16 reset-padding-right">
           <div class="navbar-right">
-            <span class="record-found">{{total}} Clinics</span>
-            <span class="record-found">Found</span>
+            <span class="record-found" ng-if="clinics.length > 0">{{clinics.length}} Clinics</span>
+            <span class="record-found" ng-if="clinics.length > 0">Found</span>
             <span ng-show="pageCount > 1">
               <span class="navigaion-link cursor-pointer" ng-class="{ 'inactive': !(currentPageIndex > 1) }" ng-click="searchClinics('PREV')">Previous</span>
               <span class="navigaion-no">{{currentPageIndex}}</span>

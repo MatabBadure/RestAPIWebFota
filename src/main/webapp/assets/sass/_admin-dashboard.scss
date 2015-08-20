@@ -525,6 +525,80 @@ tags-input.ng-invalid .tags {
     box-shadow: none;
 }
 
+.user-detail-info {
+  padding: 0;
+  border: 1px solid $celeste;
+}
+
+.user-detail-info__data {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  &--key {
+    color: #858f9d;
+  }
+  &--value {
+    color: #34455c;
+    font-weight: bold;
+    font-size: 12px;
+  }
+}
+
+.admin-user .detail-list {
+  padding: 0;
+  padding-top: 10px;
+  border-bottom: 1px solid $bombay;
+  margin-bottom: 10px;
+}
+
+.admin-user .detail-list--title {
+  padding: 0;
+  span {
+    font-weight: $font-weight-medium;
+    font-size: $font-size-base;
+    color: $pickled-bluewood;
+  }
+}
+
+.admin-user .detail-list--desc {
+  padding: 0;
+  span {
+    font-weight: $font-weight-medium;
+    font-size: $font-size-small;
+    color: $nevada;
+  }
+}
+
+.admin-user .detail-list--desc .icon-font {
+  position: relative;
+  clear: both;
+}
+
+.admin-user .detail-list--desc .icon-font .icon-lungs {
+  position: absolute;
+  font-size: $font-size-icon;
+  top: -7px;
+  right: 0;
+}
+
+.admin-user .detail-list__thead {
+  padding: 0;
+}
+
+.admin-user .detail-list__thead .detail-list__thead--desc {
+  padding: 0;
+  color: $cyan-blue-light;
+}
+
+.sort-icon {
+  display: inline-block;
+  cursor: pointer;
+  span {
+    display: block;
+    font-size: 8px;
+    color: $cyan-blue-light;
+  }
+ }
+  
 .radio-box-text {
   font-size: $font-size-base;
   font-weight: $font-weight-medium;

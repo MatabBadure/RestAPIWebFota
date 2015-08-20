@@ -1,5 +1,6 @@
 'use strict';
 
+
 angular.module('hillromvestApp')
 .filter('range', function() {
   return function(val, range) {
@@ -192,7 +193,6 @@ angular.module('hillromvestApp')
 
     $scope.goToPatientClinics = function(){      
       $state.go('patientEditClinics',{'patientId': $stateParams.patientId});
-
     }
     /** starts for patient clinics **/
     $scope.getPatientClinicInfo = function(patientId){
@@ -260,6 +260,15 @@ angular.module('hillromvestApp')
       }else {
           $scope.currentPageIndex = 1;
       }
+      clinicService.getClinics($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
+        $scope.clinics = response.data;
+        $scope.total = response.headers()['x-total-count'];
+        $scope.pageCount = Math.ceil($scope.total / 10);
+      }).catch(function (response) {
+
+      });
+    };
+    $scope.initPatientClinics = function(patientId){
       if($scope.searchItem && $scope.searchItem.length > 0){
         clinicService.getClinics($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
           $scope.clinics = []; $scope.clinics.length = 0;
@@ -303,7 +312,6 @@ angular.module('hillromvestApp')
       $scope.getPatientById(patientId);
       $scope.getPatientClinicInfo(patientId);
       $scope.getClinics();
-
     }
 
     $scope.getClinics = function(){

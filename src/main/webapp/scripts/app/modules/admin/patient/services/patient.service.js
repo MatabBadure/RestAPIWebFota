@@ -95,6 +95,15 @@ angular.module('hillromvestApp')
         });
       },
 
+      getPatientsAssociatedToClinics : function(ids){
+        var url = 'api/clinics/patients?filter=id:'+ids;
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function(response){
+          return response;
+        });
+      },
+
       /**
       * @ngdoc method
       * @name getClinicsLinkedToPatient
@@ -110,6 +119,20 @@ angular.module('hillromvestApp')
         });
       },
 
+      /**
+      * @ngdoc method
+      * @name disassociateClinicsFromPatient
+      * @description To remove clinic(s) associated to patient.
+      *
+      */
+      disassociateClinicsFromPatient : function(id, data){
+        var url = admin.patient.baseURL + id + '/dissociateclinics';
+        return $http.put(url, data,{
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
 
       disassociateClinicsFromPatient : function(id){
         //PUT /api/patient/12345678/dissociateclinics HTTP/1.1

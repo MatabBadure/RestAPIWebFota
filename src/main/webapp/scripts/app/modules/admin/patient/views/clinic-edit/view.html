@@ -1,0 +1,34 @@
+<div class="navbar dashboard dashbord-nav">
+    <div class="container">
+        <div class="dashbord-nav__primary pull-left" ng-show="!patientStatus.isCreate">
+            <span class="dashbord-nav__primary--title" translate="patient.home.updateLabel">Update Patient</span>
+        </div>
+        <div class="dashbord-nav__primary pull-left" ng-show="patientStatus.isCreate">
+            <span class="dashbord-nav__primary--title" translate="patient.home.createLabel">Create Patient</span>
+        </div>
+        <div class="dashbord-nav__primary pull-left" ng-show="!patientStatus.isCreate">
+            <span class="dashbord-nav__primary--title" translate="patient.home.createLabel">&nbsp;&nbsp;&nbsp;&nbsp;Clinics</span>
+        </div>
+        <div class="dashbord-nav__secondary create-user navbar-right cursor-pointer" ng-click="cancel()">
+            <span class="" translate="patient.back-button-text">Back</span>
+        </div>
+    </div>
+</div>
+<div class="dashboard__manage-view--list" ng-repeat="aClinic in associatedClinics track by $index" >
+	<span>&nbsp;&nbsp;&nbsp;&nbsp;{{aClinic.id}}</span><span>&nbsp;&nbsp;&nbsp;&nbsp;{{aClinic.name}}</span><a href=""  ng-click="disassociateLinkedClinics(aClinic.id, $index)"><span>&nbsp;&nbsp;&nbsp;&nbsp;Remove</span></a>
+</div>
+Available Clinics :
+
+<!-- if parent Clinic is there for the patient -->
+<!-- <div class="fuid-search-box reset-padding-right">
+  <input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" autocomplete="off" ng-click="searchClinics();">
+  <span class="search-icon hillrom-icon icon-search-icon"></span>
+</div>
+<div class="dashboard__manage-view--list" ng-repeat="clinic in clinics" ng-class="{ 'inactive': clinic.deleted }">
+<div  ng-click="clinic.deleted || selectClinic(clinic)">
+  <div class="col-md-3 reset-padding-left">
+    <span class="user-name">{{clinic.name}} <sup class="parent-clinic" ng-if="clinic.parent">P</sup></span>    
+  </div>  
+  <div class="clr"></div>
+</div>
+</div> -->

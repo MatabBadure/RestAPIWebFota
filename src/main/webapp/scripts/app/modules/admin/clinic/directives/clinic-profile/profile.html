@@ -1,0 +1,178 @@
+<clinic-navbar></clinic-navbar>
+
+<div class="container admin-user">
+  <div class="col-md-16 admin-views">
+    <span class="admin-views--title">
+      {{clinic.name}}
+    </span>
+  </div>
+
+  <div class="col-md-16 user-detail-info">
+    <div class="col-md-4 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="clinic.hillRom-id"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value">{{clinic.hillromId}}</span>
+    </div>
+    <div class="col-md-4 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="clinic.type"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value">{{clinic.type}}</span>
+    </div>
+    <div class="col-md-4 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="clinic.status"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value">{{clinic.status}}</span>
+    </div>
+
+    <div class="col-md-4 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="clinic.phoneNumber"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value">{{clinic.phoneNumber}}</span>
+    </div>
+    <div class="col-md-4 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="clinic.address"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value">{{clinic.address}}</span>
+    </div>
+    <div class="col-md-4 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="clinic.city"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value">{{clinic.city}}</span>
+    </div>
+    <div class="col-md-4 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="clinic.state"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value">{{clinic.state}}</span>
+    </div>
+  </div>
+
+  <div class="col-md-16 reset-padding margin-top" ng-if="clinic.id">
+    <buton class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="getPatients(clinic.id)" translate="clinic.clinic-view-assoc-patients"></buton>
+    <buton class="hillrom-btn btn-secondary float-right" ng-click="getHCPs(clinic.id)" translate="clinic.clinic-view-assoc-hcps"></buton>
+    <buton class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="goToEditClinic(clinic.id)" translate="clinic.clinic-edit"></buton>
+  </div>
+</div>
+
+<div class="container admin-user" ng-if="clinic.parent">
+  <div class="col-md-16 admin-views">
+    <span class="admin-views" translate="clinic.assoc-clinic"></span>
+  </div>
+</div>
+
+<!-- <div class="dashboard dashboard--content">
+  <div class="container dashboard__manage-view margin-top-xl">
+    <div class="dashboard__manage-view--search">
+      <div class="fuid-search-box reset-padding-right">
+        <input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" autocomplete="off" placeholder="{{'doctor.placeholder.search' | translate}}">
+        <span class="search-icon hillrom-icon icon-search-icon"></span>
+      </div>
+      <div class="fixed-filter-box reset-padding-left">
+        <div class="search-dropdown">
+          <select name="search" ng-model="sortOption" ng-change="searchDoctors()">
+            <option value="" selected>Newly Created</option>
+            <option value="email">Email</option>
+            <option value="firstName">First Name</option>
+            <option value="lastName">Last Name</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<div class="container admin-user" ng-if="clinic.parent">
+<div class="col-md-16 detail-list__thead" ng-if="childClinics.length > 0">
+    <div class="col-md-3 detail-list__thead--desc">
+      <span>Clinic Name</span>
+      <div class="sort-icon">
+        <span class="glyphicon glyphicon-chevron-up"></span>
+        <span class="glyphicon glyphicon-chevron-down"></span>
+      </div>
+    </div>
+    <div class="col-md-2 detail-list__thead--desc">
+      <span>Address</span>
+      <div class="sort-icon">
+        <span class="glyphicon glyphicon-chevron-up"></span>
+        <span class="glyphicon glyphicon-chevron-down"></span>
+      </div>
+    </div>
+    <div class="col-md-2 detail-list__thead--desc">
+      <span>City</span>
+      <div class="sort-icon">
+        <span class="glyphicon glyphicon-chevron-up"></span>
+        <span class="glyphicon glyphicon-chevron-down"></span>
+      </div>
+    </div>
+    <div class="col-md-2 detail-list__thead--desc">
+      <span>State</span>
+      <div class="sort-icon">
+        <span class="glyphicon glyphicon-chevron-up"></span>
+        <span class="glyphicon glyphicon-chevron-down"></span>
+      </div>
+    </div>
+    <div class="col-md-2 detail-list__thead--desc">
+      <span>Phone Number</span>
+      <div class="sort-icon">
+        <span class="glyphicon glyphicon-chevron-up"></span>
+        <span class="glyphicon glyphicon-chevron-down"></span>
+      </div>
+    </div>
+    <div class="col-md-2 detail-list__thead--desc">
+      <span>Type</span>
+      <div class="sort-icon">
+        <span class="glyphicon glyphicon-chevron-up"></span>
+        <span class="glyphicon glyphicon-chevron-down"></span>
+      </div>
+    </div>
+    <div class="col-md-2 detail-list__thead--desc">
+      <span>Hill-Rom ID</span>
+      <div class="sort-icon">
+        <span class="glyphicon glyphicon-chevron-up"></span>
+        <span class="glyphicon glyphicon-chevron-down"></span>
+      </div>
+    </div>
+    <div class="col-md-1 detail-list__thead--desc text-right">
+      <span>status</span>
+      <div class="sort-icon">
+        <span class="glyphicon glyphicon-chevron-up"></span>
+        <span class="glyphicon glyphicon-chevron-down"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-16 detail-list" ng-repeat="childClinic in childClinics">
+    <div class="col-md-3 detail-list--title">
+      <span>{{childClinic.name}}</span>
+    </div>
+    <div class="col-md-2 detail-list--desc">
+      <span>{{childClinic.address}}</span>
+    </div>
+    <div class="col-md-2 detail-list--desc">
+      <span>{{childClinic.city}}</span>
+    </div>
+    <div class="col-md-2 detail-list--desc">
+      <span>{{childClinic.state}}</span>
+    </div>
+    <div class="col-md-2 detail-list--desc">
+      <span>{{childClinic.phoneNumber}}</span>
+    </div>
+    <div class="col-md-2 detail-list--desc">
+      <span ng-if="childClinic.parent">Parent</span>
+      <span ng-if="!childClinic.parent">Satellite</span>
+    </div>
+    <div class="col-md-2 detail-list--desc">
+      <span>{{childClinic.hillromId}}</span>
+    </div>
+    <div class="col-md-1 detail-list--desc">
+      <div class="icon-font text-right">
+        <span class="icon-lungs" ng-if="childClinic.deleted"></span>
+        <span class="icon-lungs" ng-if="!childClinic.deleted"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-16 reset-padding margin-bottom-xl" ng-if="clinic.id">
+    <buton class="hillrom-btn btn-primary float-right" ng-click="createSatellite(clinic.id)" translate="clinic.add-satellite-clinic"></buton>
+  </div>
+</div>
+

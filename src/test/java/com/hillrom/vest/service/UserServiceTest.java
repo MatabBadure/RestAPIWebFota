@@ -1,4 +1,4 @@
-package com.hillrom.vest.service;
+/*package com.hillrom.vest.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,11 +30,11 @@ import com.hillrom.vest.repository.SecurityQuestionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.RandomUtil;
 
-/**
+*//**
  * Test class for the UserResource REST controller.
  *
  * @see UserService
- */
+ *//*
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
@@ -270,3 +270,4 @@ public class UserServiceTest {
         
     }
 }
+*/

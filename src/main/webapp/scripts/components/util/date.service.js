@@ -40,88 +40,97 @@ angular.module('hillromvestApp')
         var d = new Date(d);
         var date = d.getDate();
         var day = d.getDay();
-        var weekOfMonth = Math.ceil((date - 1 - day) / 7);
+        var weekOfMonth = Math.ceil((date - 1 - day) / 7) === -0 ? 0 : Math.ceil((date - 1 - day) / 7);
         return weekOfMonth;
       },
       getDateFromTimeStamp: function(data) {
         var date = new Date(data);
         return this.getDay(date.getDate()) + '/' + this.getMonth(date.getMonth(date)) + '/' + this.getYear(date.getFullYear(date))
       },
+      getDateDiffIndays: function(fromTimeStamp,toTimeStamp) {
+        return Math.floor((toTimeStamp - fromTimeStamp)/(1000*60*60*24));
+      },
+      getTimeStampForTimeSlot: function(date,timeSlot) {
+        return this.getStartTimeStampOfDay(new Date(date).getTime()) + (((timeSlot*4)-1)*60*60*1000);
+      },
+      getStartTimeStampOfDay: function(timeStamp) {
+        return timeStamp - (5.5*60*60*1000);
+      },
       getTimeIntervalFromTimeStamp: function(data) {
         var date = new Date(data);
         var hours = this.getDay(date.getHours().toString());
         switch(hours) {
           case '00':
-              return '12 PM - 2 AM';
+              return 'Midnight - 4 AM';
               break;
           case '01':
-              return '12 AM - 2 AM';
+              return 'Midnight - 4 AM';
               break;
           case '02':
-              return '2 AM - 4 AM';
+              return 'Midnight - 4 AM';
               break;
           case '03':
-              return '2 AM - 4 AM';
+              return 'Midnight - 4 AM';
               break;
           case '04':
-              return '4 AM - 6 AM';
+              return '4 AM - 8 AM';
               break;
           case '05':
-              return '4 AM - 6 AM';
+              return '4 AM - 8 AM';
               break;
           case '06':
-              return '6 AM - 8 AM';
+              return '4 AM - 8 AM';
               break;
           case '07':
-              return '6 AM - 8 AM';
+              return '4 AM - 8 AM';
               break;
           case '08':
-              return '8 AM - 10 AM';
+              return '8 AM - 12 PM';
               break;
           case '09':
-              return '8 AM - 10 AM';
+              return '8 AM - 12 PM';
               break;
           case '10':
-              return '10 AM - 12 AM';
+              return '8 AM - 12 PM';
               break;
           case '11':
-              return '10 AM - 12 AM';
+              return '8 AM - 12 PM';
               break;
           case '12':
-              return '12 AM - 2 PM';
+              return '12 PM - 4 PM';
               break;
           case '13':
-              return '12 AM - 2 PM';
+              return '12 PM - 4 PM';
               break;
           case '14':
-              return '2 PM - 4 PM';
+              return '12 PM - 4 PM';
               break;
           case '15':
-              return '2 PM - 4 PM';
+              return '12 PM - 4 PM';
               break;
           case '16':
-              return '4 PM - 6 PM';
+              return '4 PM - 8 PM';
               break;
           case '17':
-              return '4 PM - 6 PM';
+              return '4 PM - 8 PM';
               break;
           case '18':
-              return '6 PM - 8 PM';
+              return '4 PM - 8 PM';
               break;
           case '19':
-              return '6 PM - 8 PM';
+              return '4 PM - 8 PM';
               break;
           case '20':
-              return '8 PM - 10 PM';
+              return '8 PM - Midnight';
               break;
           case '21':
-              return '8 PM - 10 PM';
+              return '8 PM - Midnight';
               break;
           case '22':
-              return '10 PM - 12 PM';
+              return '8 PM - Midnight';
               break;
           case '23':
-              return '10 PM - 12 PM';
+              return '8 PM - Midnight';
               break;
           default:
               break;

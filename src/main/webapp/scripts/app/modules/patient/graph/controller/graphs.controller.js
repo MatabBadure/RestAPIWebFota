@@ -4,18 +4,63 @@ angular.module('hillromvestApp')
 .controller('graphController', function($scope, $state, patientDashBoardService, StorageService, dateService, graphUtil) {
     var chart;
 
+    $scope.init = function() {
+      $scope.hmrLineGraph = true;
+      $scope.hmrBarGraph = false;
+      $scope.hmrGraph = true;
+      $scope.format = 'weekly';
+      $scope.compliance = {};
+      $scope.compliance.pressure = true;
+      $scope.compliance.duration = true;
+      $scope.compliance.frequency = false;
+      $scope.toTimeStamp = new Date().getTime();
+      //$scope.patientId = StorageService.get('patientID');
+      $scope.fromTimeStamp = dateService.getnDaysBackTimeStamp(7);
+      $scope.fromDate = dateService.getDateFromTimeStamp($scope.fromTimeStamp);
+      $scope.toDate = dateService.getDateFromTimeStamp($scope.toTimeStamp);
+      $scope.patientId = 160;
+      $scope.handlelegends();
+      if ($state.current.name === 'patientdashboard') {
+        $scope.weeklyChart();
+      }
+    };
 
-  /*-----Date picker for dashboard----*/
-/* $scope.date = {
-  startDate: '08/12/2015', 
-  endDate: '08/18/2015',
-  opens: 'center',
-  parentEl: '#dp3',
-};*/
-console.log("from and To dates :"+$scope.dates);
-  /*-----Date picker for dashboard----*/
+    $scope.calculateDateFromPicker = function(picker) {
+      $scope.fromTimeStamp = new Date(picker.startDate._d).getTime();
+      $scope.toTimeStamp = new Date(picker.endDate._d).getTime();
+      $scope.fromDate = dateService.getDateFromTimeStamp($scope.fromTimeStamp);
+      $scope.toDate = dateService.getDateFromTimeStamp($scope.toTimeStamp);
+    };
 
-  /*---Simple pye chart JS-----*/
+    $scope.removeGraph = function() {
+      d3.select('svg').selectAll("*").remove();
+    }
+    $scope.drawGraph = function() {
+      var days = dateService.getDateDiffIndays($scope.fromTimeStamp,$scope.toTimeStamp);
+      if(days === 0){
+        $scope.format = 'dayWise';
+        $scope.hmrLineGraph = false;
+        $scope.hmrBarGraph = true;
+        $scope.getDayHMRGraphData();
+      } else if(days <= 7){
+        $scope.weeklyChart($scope.fromTimeStamp);
+      } else if ( days > 7 && days < 36 ) {
+        $scope.monthlyChart($scope.fromTimeStamp);
+      } else if ( days >= 36) {
+         $scope.yearlyChart($scope.fromTimeStamp);
+      }
+    };
+
+    $scope.opts = {
+      eventHandlers: {'hide.daterangepicker': function(ev, picker) {
+        $scope.calculateDateFromPicker(picker);
+        $scope.drawGraph();
+        }
+      }
+    }
+
+$scope.dates = {startDate: null, endDate: null};
+
     $scope.percent1 = 30;
     $scope.percent2 = 75;
     $scope.percent3 = 24;
@@ -52,29 +97,6 @@ console.log("from and To dates :"+$scope.dates);
           lineWidth:12,
           lineCap:'circle'
       };
- /*---Simple pye chart JS END-----*/
-    $scope.init = function() {
-      $scope.complianceToggle = false;
-      $scope.hmrLineGraph = true;
-      $scope.hmrBarGraph = false;
-      $scope.hmrGraph = true;
-      $scope.format = 'weekly';
-      $scope.compliance = {};
-      $scope.compliance.pressure = true;
-      $scope.compliance.duration = true;
-      $scope.compliance.frequency = false;
-      $scope.toTimeStamp = 1422729000000;
-      $scope.timeStamp = 1420050600000;
-      //$scope.fromTimeStamp = dateService.getnDaysBackTimeStamp(7);
-      //$scope.patientId = StorageService.get('patientID');
-      $scope.fromTimeStamp = 1420050600000;
-      $scope.patientId = 160;
-      $scope.handlelegends();
-      $scope.groupBy = 'monthly'
-      if ($state.current.name === 'patientdashboard') {
-        $scope.weeklyChart();
-      }
-    };
 
     $scope.xAxisTickFormatFunction = function(format){
       return function(d){
@@ -95,12 +117,12 @@ console.log("from and To dates :"+$scope.dates);
               break;
         }
     }
-  }
+  };
 
-    $scope.toolTipContentFunction = function(data){
+    $scope.toolTipContentFunction = function(){
       return function(key, x, y, e, graph) {
         var toolTip = '';
-        angular.forEach(data, function(value) {
+        angular.forEach($scope.completeGraphData, function(value) {
           if(value.timestamp === e.point[0]){
               toolTip =
                 '<h6>' + dateService.getDateFromTimeStamp(value.timestamp) + '</h6>' +
@@ -108,6 +130,22 @@ console.log("from and To dates :"+$scope.dates);
                 '<p> Frequency ' + value.weightedAvgFrequency + '</p>' +
                 '<p> Pressure ' + value.weightedAvgPressure + '</p>' +
                 '<p> Caugh Pauses ' + value.normalCoughPauses + '</p>';
+          }
+        });
+      return toolTip;   
+      }
+    }
+
+    $scope.toolTipContentBarChart = function(){
+      return function(key, x, y, e, graph) {
+        var toolTip = '';
+        angular.forEach($scope.completeGraphData, function(value) {
+          if(value.startTime === e.point[0]){
+              toolTip =
+                '<h6>' + dateService.getDateFromTimeStamp(value.startTime) + '</h6>' +
+                '<p> Frequency ' + value.frequency + '</p>' +
+                '<p> Pressure ' + value.pressure + '</p>' +
+                '<p> Cough Pauses ' + (value.normalCaughPauses + value.programmedCaughPauses) + '</p>';
           }
         });
       return toolTip;   
@@ -159,18 +197,31 @@ console.log("from and To dates :"+$scope.dates);
       patientDashBoardService.getHMRGraphPoints($scope.patientId, $scope.fromTimeStamp, $scope.toTimeStamp, $scope.groupBy).then(function(response){
         //Will get response data from real time API once api is ready
         $scope.completeGraphData = response.data;
-        $scope.graphData = graphUtil.convertIntoHMRLineGraph($scope.completeGraphData);
-      }).catch(function(response) {});
+        if($scope.completeGraphData === []){
+          $scope.graphData = [];
+        } else {
+          $scope.graphData = graphUtil.convertIntoHMRLineGraph($scope.completeGraphData);
+        }
+      }).catch(function(response) {
+        $scope.graphData = [];
+      });
     };
 
     $scope.getDayHMRGraphData = function() {
      /* $scope.completeGraphData = HMRDayGraphData;
       $scope.graphData = graphUtil.convertIntoHMRBarGraph($scope.completeGraphData);*/
-      patientDashBoardService.getHMRBarGraphPoints($scope.patientId, $scope.timeStamp).then(function(response){
+      patientDashBoardService.getHMRBarGraphPoints($scope.patientId, $scope.fromTimeStamp).then(function(response){
         //Will get response data from real time API once api is ready
         $scope.completeGraphData = response.data;
-        $scope.graphData = graphUtil.convertIntoHMRBarGraph($scope.completeGraphData);
-      }).catch(function(response) {});
+        if($scope.completeGraphData === []){
+           $scope.graphData = [];
+         } else {
+          $scope.completeGraphData = graphUtil.formatDayWiseDate($scope.completeGraphData);
+           $scope.graphData = graphUtil.convertIntoHMRBarGraph($scope.completeGraphData);
+         }
+      }).catch(function(response) {
+        $scope.graphData = [];
+      });
     };
 
     $scope.getComplianceGraphData = function() {
@@ -181,9 +232,20 @@ console.log("from and To dates :"+$scope.dates);
       }).catch(function(response) {});*/
     };
 
+    $scope.calculateTimeDuration = function(durationInDays) {
+      $scope.toTimeStamp = new Date().getTime();
+      $scope.toDate = dateService.getDateFromTimeStamp($scope.toTimeStamp);
+      $scope.fromTimeStamp = dateService.getnDaysBackTimeStamp(durationInDays);;
+      $scope.fromDate = dateService.getDateFromTimeStamp($scope.fromTimeStamp);
+    }
+
     // Weekly chart
-    $scope.weeklyChart = function() {
-      $scope.format = 'weekly';
+    $scope.weeklyChart = function(datePicker) {
+      $scope.removeGraph();
+      if(datePicker === undefined){
+        $scope.calculateTimeDuration(7);
+      }
+      $scope.format = $scope.groupBy = 'weekly';
       if($scope.hmrGraph) {
         $scope.hmrLineGraph = true;
         $scope.hmrBarGraph = false;
@@ -193,20 +255,14 @@ console.log("from and To dates :"+$scope.dates);
         $scope.createComplianceGraphData();
         $scope.drawComplianceGraph();
       }
-/*      ];
-      $scope.xAxisTickValuesFunction();
-      $scope.xAxisTickFormatFunction = function(){
-      return function(d){
-        return d3.time.format('%a')(new Date(d));
-        }
-      }
-      $scope.xAxisTickFormatFunction();
-      $scope.toolTipContentFunction();
-      d3.select("g.nv-y.nv-axis").select("text.nv-axislabel").attr({y:"-3em"});*/
     }
     // Yearly chart
-    $scope.yearlyChart = function() {
-       $scope.format = 'yearly';
+    $scope.yearlyChart = function(datePicker) {
+      $scope.removeGraph();
+       if(datePicker === undefined){
+        $scope.calculateTimeDuration(365);
+      }
+       $scope.format = $scope.groupBy = 'yearly';
         if($scope.hmrGraph) {
           $scope.hmrLineGraph = true;
           $scope.hmrBarGraph = false;
@@ -216,14 +272,15 @@ console.log("from and To dates :"+$scope.dates);
           $scope.createComplianceGraphData();
           $scope.drawComplianceGraph();
       }
-/*      $scope.xAxisTickFormatFunction();
-      $scope.toolTipContentFunction();
-      d3.select("g.nv-y.nv-axis").select("text.nv-axislabel").attr({y:"-3em"});*/
     }
    
     // Monthly chart
-    $scope.monthlyChart = function() {
-      $scope.format = 'monthly';
+    $scope.monthlyChart = function(datePicker) {
+      $scope.removeGraph();
+      if(datePicker === undefined){
+        $scope.calculateTimeDuration(30);
+      }
+      $scope.format = $scope.groupBy = 'monthly';
       if($scope.hmrGraph) {
         $scope.hmrLineGraph = true;
         $scope.hmrBarGraph = false;
@@ -236,10 +293,15 @@ console.log("from and To dates :"+$scope.dates);
     }
     //hmrDayChart
     $scope.dayChart = function() {
+      $scope.removeGraph();
        if($scope.hmrGraph) {
         $scope.format = 'dayWise';
         $scope.hmrLineGraph = false;
         $scope.hmrBarGraph = true;
+        $scope.fromTimeStamp = new Date().getTime();
+        $scope.fromDate = dateService.getDateFromTimeStamp($scope.fromTimeStamp);
+        $scope.toTimeStamp = $scope.fromTimeStamp;
+        $scope.toDate = $scope.fromDate
         $scope.getDayHMRGraphData();
       }
     }
@@ -247,6 +309,9 @@ console.log("from and To dates :"+$scope.dates);
     $scope.showComplianceGraph = function() {
       $scope.complianceGraph = true;
       $scope.hmrGraph = false;
+      if($scope.fromTimeStamp === $scope.toTimeStamp){
+        $scope.calculateGraphDuration(7);
+      }
       $scope.getComplianceGraphData();
       $scope.createComplianceGraphData();
       $scope.drawComplianceGraph();

@@ -64,7 +64,7 @@
 							<li role="presentation" class=""><a href="" ng-click="weeklyChart()">Week</a></li>
 							<li role="presentation" class=""><a href="" ng-click="monthlyChart()">Month</a></li>
 							<li role="presentation" class=""><a href="" ng-click="yearlyChart()">Year</a></li>
-							<li role="presentation" class="" id="dp3"><a href="" date-range-picker class="date-picker" ng-model="dates" parentEl="#dp3" options="{'opens': 'left', 'parentEl': '#dp3'}">Date</a></li>
+							<li role="presentation" class="" id="dp3"><a href="" date-range-picker class="date-picker" ng-model="dates" parentEl="#dp3" options="opts" >Date</a></li>
 						</ul>
 					</div>
 					<!-- <div>
@@ -76,7 +76,10 @@
 					</div>-->	
 				</div>
 				<div class="pull-right week_date_container">
-					<span class="date">08/09/2015</span> - <span class="date">08/15/2015</span>
+					<span ng-if="fromDate !== toDate"> 
+							<span class="date">{{fromDate}}</span> - <span class="date">{{toDate}}</span>
+					</span>
+					<span ng-if="fromDate === toDate" class="date">{{fromDate}}<span>
 				</div>	
 			</div>
 		</div>
@@ -113,7 +116,10 @@
           margin="{left:100,top:20,bottom:20,right:10}"
 	        xAxisTickFormat="xAxisTickFormatFunction(format)"
 	        xAxisTickValues="xAxisTickValuesFunction()"
-	        tooltipcontent="toolTipContentFunction(completeGraphData)">
+	        noData="No Data Found!"
+	        objectEquality="true"
+	        tooltipcontent="toolTipContentFunction()">
+	        <svg></svg>
 	    </nvd3-line-chart>
 	  </div>
 	  <div ng-if="hmrBarGraph">
@@ -131,7 +137,10 @@
 	        margin="{left:100,top:20,bottom:20,right:10}"
 	        xAxisTickFormat="xAxisTickFormatFunction(format)"
 	        xAxisTickValues="xAxisTickValuesFunction()"
-	        tooltipcontent="toolTipContentFunction(completeGraphData)">
+	        noData="No Data Found!"
+	        objectEquality="true"
+	        tooltipcontent="toolTipContentBarChart()">
+	        <svg></svg>
 		  </nvd3-multi-bar-chart>
 	  </div>
 	</div>
@@ -150,28 +159,6 @@
     	</div>
 	  </div>
  		<!-- <nvd3 options="options" data="data"></nvd3> -->
-
-	 		<div class="col-md-16">
-				<nvd3-line-chart
-				data="graphData"
-				id="HMRGraph"
-				class="dashboard_line_graph"
-				width="1250"
-				height="350"
-				showXAxis="false"
-				showYAxis="true"
-				legends="true"
-				interactive="true"
-				tooltips="true"
-				isArea="true"
-				interpolate="step-after"
-				objectEquality="true"
-				yAxisLabel="Minutes"
-				xAxisTickFormat="xAxisTickFormatFunction()"
-				xAxisTickValues="xAxisTickValuesFunction()"
-				tooltipcontent="toolTipContentFunction()">
-				</nvd3-line-chart>
-	 		</div>
 
 		</div>
 

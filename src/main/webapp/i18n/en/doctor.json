@@ -38,7 +38,8 @@
                     "others": "O"
         },
         "placeholder": {
-            "search": "Search with Name, Hill-Rom ID or Email"
+            "search": "Search with Name, Hill-Rom ID or Email",
+            "patient-search": "Search Patients here"
         },
         "npi-number": "NPI Number",
         "first-name": "First Name",
@@ -68,6 +69,7 @@
         "delete": {
             "warning": "Are you sure you want to Deactivate the Doctor?",
             "message": "If you deactivate the doctor, you will no longer be able to view the information."
-        }
+        },
+        "link-patient": "Link Patient"
     }
 }

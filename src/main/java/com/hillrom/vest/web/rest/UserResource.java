@@ -1,6 +1,8 @@
 package com.hillrom.vest.web.rest;
 
 import java.net.URISyntaxException;
+import java.security.acl.NotOwnerException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,9 +15,11 @@ import javax.inject.Inject;
 import net.minidev.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,12 +32,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
+import com.hillrom.vest.domain.Notification;
+import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientProtocolData;
+import com.hillrom.vest.domain.ProtocolConstants;
+import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.NotificationRepository;
+import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.security.SecurityUtils;
+import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.PatientProtocolService;
 import com.hillrom.vest.service.PatientVestDeviceService;
 import com.hillrom.vest.service.TherapySessionService;
@@ -42,6 +54,7 @@ import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.ProtocolDTO;
+import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 /**
@@ -70,6 +83,16 @@ public class UserResource {
 
 	@Inject
 	private TherapySessionService therapySessionService;
+	
+	@Inject
+	private AdherenceCalculationService adherenceCalculationService;
+	
+	@Inject
+	private PatientComplianceRepository complianceRepository;
+	
+	@Inject
+	private NotificationRepository notificationRepository;
+
 	/**
 	 * GET /users -> get all users.
 	 */
@@ -329,19 +352,99 @@ public class UserResource {
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
     	}
     }
-
+    
+    
     @RequestMapping(value = "/users/{id}/therapyData",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> findByPatientUserIdAndDate(@PathVariable Long id,
+    public ResponseEntity<JSONObject> getTherapyByPatientUserIdAndDate(@PathVariable Long id,
     		@RequestParam(required=false)Long from,
     		@RequestParam(required=false)Long to,
     		@RequestParam(required=false)String groupBy,
     		@RequestParam(required=false)Long date){
+    	JSONObject jsonObject = new JSONObject();
     	if(Objects.nonNull(date)){
-    		return new ResponseEntity(therapySessionService.findByPatientUserIdAndDate(id, date),HttpStatus.OK);
+    		List<TherapySession> therapySessions = therapySessionService.findByPatientUserIdAndDate(id, date);
+    		if(therapySessions.size() > 0){
+    			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(id);
+    			jsonObject.put("recommended", protocol);
+    			jsonObject.put("actual", therapySessions);
+    		}
+    		return new ResponseEntity<>(jsonObject,HttpStatus.OK);
+    	}else if(Objects.nonNull(from) && Objects.nonNull(to) && Objects.nonNull(groupBy) ){
+    		List<TherapyDataVO> therapyData = therapySessionService.findByPatientUserIdAndDateRange(id, from, to, groupBy);
+    		if(therapyData.size() > 0){
+    			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(id);
+    			jsonObject.put("recommended", protocol);
+    			jsonObject.put("actual", therapyData);
+    		}
+    		return new ResponseEntity<>(jsonObject,HttpStatus.OK);
     	}else{
-    		return new ResponseEntity<>(therapySessionService.findByPatientUserIdAndDateRange(id, from, to, groupBy), HttpStatus.OK);
+    		jsonObject.put("ERROR", "Required Params missing : [date or from&to&groupBy]");
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
     	}
     }
+    
+    @RequestMapping(value = "/users/{id}/compliance",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PatientCompliance> getComplianceScoreByPatientUserIdAndDate(@PathVariable Long id,
+    		@RequestParam(value="date",required=false)Long timestamp){
+    	LocalDate date = null;
+    	if(Objects.isNull(timestamp)){
+    		date = LocalDate.now();
+    	}else{
+    		date = LocalDate.fromDateFields(new Date(timestamp));
+    	}
+    	PatientCompliance compliance = complianceRepository.findByPatientUserIdAndDate(id, date);
+    	if(Objects.nonNull(compliance))
+    		return new ResponseEntity<>(compliance,HttpStatus.OK);
+    	else
+    		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @RequestMapping(value = "/users/{id}/notifications",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Notification>> getNotificationsByPatientUserId(@PathVariable Long id,
+    		@RequestParam(value="date",required=false)Long timestamp, 
+    		@RequestParam(value = "page" , required = false) Integer offset,
+            @RequestParam(value = "per_page", required = false) Integer limit) throws URISyntaxException{
+    	LocalDate date = null;
+    	if(Objects.isNull(timestamp)){
+    		date = LocalDate.now();
+    	}else{
+    		date = LocalDate.fromDateFields(new Date(timestamp));
+    	}
+    	Pageable pageable = PaginationUtil.generatePageRequest(offset, limit);
+    	Page<Notification> page = notificationRepository.findByPatientUserIdAndDateAndIsAcknowledged(id, date, false, pageable);
+    	HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/users/"+id+"/notifications", offset, limit);
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    }
+    
+    @RequestMapping(value = "/users/{userId}/notifications/{id}",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JSONObject> acknowledgeNotification(@PathVariable Long userId,
+    		@PathVariable Long id,@RequestBody(required=true)Map<String,String> params){
+    	JSONObject json = new JSONObject();
+    	Optional<Notification> notificationFromDB = Optional.of(notificationRepository.findOne(id));
+	    	if(notificationFromDB.isPresent()){
+	    		Notification notification = notificationFromDB.get();
+	    		if(notification.getPatientUser().getId().equals(userId) 
+	    				&& notification.getPatientUser().getEmail().equalsIgnoreCase(SecurityUtils.getCurrentLogin())){
+	    			boolean isAcknowledged  = "TRUE".equalsIgnoreCase(params.get("isAcknowledged")) ? true : false;
+	    			notification.setAcknowledged(isAcknowledged);
+	    			notificationRepository.save(notification);
+	    			json.put("notification", notification);
+	    			return new ResponseEntity<>(json,HttpStatus.OK);
+	    		}else{
+	    			json.put("ERROR", ExceptionConstants.HR_403);
+	    			return new ResponseEntity<>(json,HttpStatus.FORBIDDEN);
+	    		}
+	    	}else{
+	    		json.put("ERROR", ExceptionConstants.HR_573);
+	    		return new ResponseEntity<>(json,HttpStatus.NOT_FOUND);
+	    	}    
+    	} 
 }

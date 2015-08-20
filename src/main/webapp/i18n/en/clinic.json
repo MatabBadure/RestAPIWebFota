@@ -19,7 +19,9 @@
             "satellite-clinic": "Satellite Clinic"
         },
         "placeholder": {
-            "search": "Search with Name, Hill-Rom ID or Email"
+            "search": "Search with Name, Hill-Rom ID or Email",
+            "hcp-search": "Search HCP here",
+            "patient-search": "Search Patients here"
         },
         "select-parent": "Parent Clinic",
         "general-details": "General Details",
@@ -60,6 +62,8 @@
         "clinic-view-assoc-hcps": "View Associated HCPs",
         "clinic-edit": "Edit Clinic",
         "assoc-clinic": "Associated Clinics",
-        "add-satellite-clinic": "Add Satellite Clinic"
+        "add-satellite-clinic": "Add Satellite Clinic",
+        "link-hcp": "Link HCP",
+        "link-patient": "Link Patient"
     }
 }

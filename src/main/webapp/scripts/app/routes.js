@@ -41,6 +41,31 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
+            .state('associatedPatients', {
+                parent: 'admin',
+                url: '/patients',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/patient/views/list/view.html',
+                        controller: 'patientsController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('patient');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
             .state('patientNew', {
                 parent: 'patientUser',
                 url: '/new',
@@ -475,7 +500,7 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
-            .state('hcpEdit', {
+            .state('hcpProfile', {
                 parent: 'hcpUser',
                 url: '/{doctorId}',
                 data: {
@@ -484,7 +509,8 @@ angular.module('hillromvestApp')
                 },
                 views: {
                     'content@': {
-                        templateUrl: 'scripts/app/modules/admin/hcp/views/create-edit/view.html',
+                        // templateUrl: 'scripts/app/modules/admin/hcp/views/create-edit/view.html',
+                        templateUrl: 'scripts/app/modules/admin/hcp/directives/hcp-info/overview/overview.html',
                         controller: 'DoctorsController'
                     }
                 },
@@ -684,7 +710,7 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
-            
+
             .state('patientProfile', {
                 parent: 'patient-dashboard',
                 url: '/myProfile',
@@ -695,6 +721,57 @@ angular.module('hillromvestApp')
                 views: {
                     'content@': {
                         templateUrl: 'scripts/app/modules/patient/profile/navbar/navbar.html',
+                        controller: 'graphController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('profile');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+
+            .state('profile', {
+                parent: 'admin',
+                url: '/profile',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/profile/navbar/navbar.html',
+                        controller: 'graphController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('profile');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+            .state('profilePassword', {
+                parent: 'profile',
+                url: '/password',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/profile/views/profile/password.html',
                         controller: 'graphController'
                     }
                 },
@@ -736,5 +813,4 @@ angular.module('hillromvestApp')
                   ]
               }
             })
-            
 });

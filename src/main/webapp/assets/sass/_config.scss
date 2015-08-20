@@ -24,38 +24,40 @@ $brand-warning:         #f0ad4e !default;
 $brand-danger:          #d9534f !default;
 
 //HillRom Primary Colours
-$cyan-blue-light:				#7ca3dc  !default;
+$cyan-blue-light:       #7ca3dc  !default;
 
 //HillRom Secondary Colours
-$terracotta:						#ef7164  !default;
-$seashell:							#f1f1f1  !default;
-$light-green-success:		#90ee90  !default;
-$wewak-error:						#F0AAAA  !default;
+$terracotta:            #ef7164  !default;
+$seashell:              #f1f1f1  !default;
+$light-green-success:   #90ee90  !default;
+$wewak-error:           #F0AAAA  !default;
 $baby-pink:             #F5C6C6  !default;
-$well-read:							#BE3936  !default;
+$well-read:             #BE3936  !default;
 
 //HillRom Primary Colour Shades
-$waikawa-gray:					#58749C  !default;
-$pickled-bluewood:			#34455C  !default;
-$blue-portage-light:		#83ACE9  !default;
-$ship-cove-dark:				#6E90C2  !default;
+$waikawa-gray:          #58749C  !default;
+$pickled-bluewood:      #34455C  !default;
+$blue-portage-light:    #83ACE9  !default;
+$ship-cove-dark:        #6E90C2  !default;
 
 //HillRom Font Colours
-$nevada:								#5d6a7d !default;
-$bombay:								#aeb5be !default;
-$celeste:								#cccccc !default;
-$charcoal:							#343F4B !default;
-$Parsley:								#13521e !default;
-$alto:									#D6DADE !default;
-$trolley-grey:					#808080 !default;
-$alto-solid:						#dbdbdb !default;
-$gainsboro:							#dddddd !default;
-$sunshade:							#FF9829 !default;
+$nevada:                #5d6a7d !default;
+$bombay:                #aeb5be !default;
+$celeste:               #cccccc !default;
+$charcoal:              #343F4B !default;
+$Parsley:               #13521e !default;
+$alto:                  #D6DADE !default;
+$trolley-grey:          #808080 !default;
+$alto-solid:            #dbdbdb !default;
+$gainsboro:             #dddddd !default;
+$sunshade:              #FF9829 !default;
 $silver-fade:           #C0C0C0 !default;
 $lapis-lazuli:          #276092 !default;
 $storm-dust:            #646568 !default;
 $iceberg:               #7CA3DC !default;
 $davys-grey:            #555555 !default;
+$kashmir-blue:          #567196 !default;
+$blue-bayoux:           #475D7B !default;
 $regent-gray:           #858F9D !default;
 $tuna:                  #363A41 !default;
 $texas-rose:            #FFAD54 !default;
@@ -63,7 +65,7 @@ $fruit-salad:           #5C9B52 !default;
 $silver-approx:         #C1C1C1 !default;
 
 //HillRom Popover
-$outer-space:						#273446 !default;
+$outer-space:           #273446 !default;
 
 //== Scaffolding
 //
@@ -107,6 +109,7 @@ $font-size-h3:            ceil(($font-size-base * 1.5)) !default; // ~21px
 $font-size-h4:            ceil(($font-size-base * 1.25)) !default; // ~18px
 $font-size-h5:            $font-size-base !default;
 $font-size-h6:            ceil(($font-size-base * 0.85)) !default; // ~12px
+$font-size-icon:          30px !default;
 
 //font-weight
 $font-weight-medium:			400;

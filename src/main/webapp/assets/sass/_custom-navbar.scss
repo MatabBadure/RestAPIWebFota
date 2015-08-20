@@ -115,9 +115,17 @@ $header--background: $body-bg;
 		left: 89%;
 	}
 
+	.popover.bottom > .arrow:after {
+		border-bottom-color: $kashmir-blue;
+	}
+
 	.popover {
-		left: -55px !important;
 		border-radius: 0;
+		right: -13px;
+    width: 170px;
+    left: unset !important;
+		background-color: $kashmir-blue;
+		border: 1px solid $blue-bayoux;
 	}
 
 	.popover-content {
@@ -138,11 +146,31 @@ $header--background: $body-bg;
 			span {
 				display: block;
 				padding: 0 10px;
+				color: $bombay;
+			}
+			&:hover {
+				color: $bombay;
 			}
 		}
 	}
 }
 
+.header-popover .popover-link .popover * {
+	color: $bombay;
+}
+
+.header-popover .popover-link .popover .popover-content div:hover span {
+	color: $bombay;
+}
+
 .popover-link {
 	cursor: default;
+}
+
+.navbar-secondary .navbar-right li a:hover span {
+    color: $bombay;
+}
+
+.navbar-secondary .navbar-right li a:hover #pop-over-link, #icon-arrow {
+	color: $storm-dust;
 }

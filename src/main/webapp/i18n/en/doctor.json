@@ -51,12 +51,13 @@
         "zipcode": "Zip",
         "email": "Email",
         "state": "State",
+        "status": "Status",
         "primary-phone": "Primary Phone",
         "mobile-number": "Mobile Number",
         "fax-number": "Fax Number",
         "hillromId": "HillromId",
         "parentClinicId": "ParentClinicId",
-        "npiNumber": "NpiNumber",
+        "npiNumber": "NPI Number",
         "user": "user",
         "doctors": "Doctors",
         "parent": "parent",
@@ -68,6 +69,10 @@
         "delete": {
             "warning": "Are you sure you want to Deactivate the Doctor?",
             "message": "If you deactivate the doctor, you will no longer be able to view the information."
-        }
+        },
+        "tab": {
+            "hcp-overview": "HCP Profile"
+        },
+        "clinic-assos": "Clinic Assosiation"
     }
 }

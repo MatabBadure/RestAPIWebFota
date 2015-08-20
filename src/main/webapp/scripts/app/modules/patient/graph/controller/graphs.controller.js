@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-.controller('graphController', function($scope, $state) {
+.controller('graphController', function($scope, $state, patientService, UserService, $stateParams, dateService) {
 
   /*-----Date picker for dashboard----*/
 /* $scope.date = {
@@ -10,6 +10,7 @@ angular.module('hillromvestApp')
   opens: 'center',
   parentEl: '#dp3',
 };*/
+/*if($scope.dates && $scope.dates != 'undefined')
 console.log("from and To dates :"+$scope.dates);
   /*-----Date picker for dashboard----*/
 
@@ -51,11 +52,34 @@ console.log("from and To dates :"+$scope.dates);
           lineCap:'circle'
       };
  /*---Simple pye chart JS END-----*/
+    $scope.isActive = function(tab) {
+      if ($scope.patientTab.indexOf(tab) !== -1) {
+        return true;
+      } else {
+        return false;
+      }
+    };
+
+    $scope.switchPatientTab = function(status){
+      $scope.patientTab = status;
+      $state.go(status);
+    };
 
     $scope.init = function() {
+      $scope.getPatientById(localStorage.getItem('patientID'));
       var currentRoute = $state.current.name;
       if ($state.current.name === 'patientdashboard') {
         $scope.hmrWeeklyChart();
+      }else if(currentRoute === 'patientdashboardCaregiver'){
+        $scope.initPatientCaregiver();
+      }else if(currentRoute === 'patientdashboardCaregiverAdd'){
+        $scope.initpatientCraegiverAdd();
+      }else if(currentRoute === 'patientdashboardCaregiverEdit'){
+        $scope.initpatientCaregiverEdit();
+      }else if(currentRoute === 'patientdashboardDeviceProtocol'){
+        $scope.initPatientDeviceProtocol();
+      }else if(currentRoute === 'patientdashboardClinicHCP'){
+        $scope.initPatientClinicHCPs();
       }
       $scope.hmrGraphData = [
       {
@@ -67,7 +91,7 @@ console.log("from and To dates :"+$scope.dates);
            [ 1028088000000 , [ {'name':'Treatment/Day','value' :21}, {'name':'Frequency', 'value': 28 }, {'name':'pressure', 'value': 10 }, {'name':'Caugh Pauses','value': 39 }]] ,
            [ 1028088000000 , [ {'name':'Treatment/Day','value' :21}, {'name':'Frequency', 'value': 28 }, {'name':'pressure', 'value': 10 }, {'name':'Caugh Pauses','value': 39 }]]  ]
          }
-    ]
+    ]    
     };
 
     
@@ -162,6 +186,158 @@ console.log("from and To dates :"+$scope.dates);
       $scope.toolTipContentFunction();
       d3.select("g.nv-y.nv-axis").select("text.nv-axislabel").attr({y:"-3em"});
 
+    }
+    /*this should initiate the list of caregivers associated to the patient*/
+    $scope.initPatientCaregiver = function(){
+      $scope.caregivers = [];      
+      $scope.getCaregiversForPatient(localStorage.getItem('patientID'));
+    }
+
+    $scope.getPatientById = function(patientId){
+      patientService.getPatientInfo(patientId).then(function(response){
+        $scope.slectedPatient = response.data;
+      }).catch(function(response){});
+    }
+
+    $scope.getCaregiversForPatient = function(patientId){
+      patientService.getCaregiversLinkedToPatient(patientId).then(function(response){
+        $scope.caregivers =  response.data.caregivers;
+      }).catch(function(response){});
+    }
+
+    $scope.linkCaregiver = function(){
+      $state.go('patientdashboardCaregiverAdd', {'patientId': localStorage.getItem('patientID')});
+    }
+
+    $scope.initpatientCraegiverAdd = function(){
+      $scope.getPatientById(localStorage.getItem('patientID'));
+      $scope.careGiverStatus = "new";
+      $scope.associateCareGiver = {};
+      UserService.getState().then(function(response) {
+        $scope.states = response.data.states;        
+      }).catch(function(response) {});
+      UserService.getRelationships().then(function(response) {
+        $scope.relationships = response.data.relationshipLabels;
+        $scope.associateCareGiver.relationship = $scope.relationships[0];
+      }).catch(function(response) {});
+    }
+
+    $scope.formSubmitCaregiver = function(){
+      $scope.submitted = true;
+      if($scope.form.$invalid){
+        return false;
+      }
+      var data = $scope.associateCareGiver;
+      data.role = 'CARE_GIVER';
+      if($scope.careGiverStatus === "new"){
+        $scope.associateCaregiverstoPatient(localStorage.getItem('patientID'), data);
+      }else if($scope.careGiverStatus === "edit"){
+        $scope.updateCaregiver(localStorage.getItem('patientID'), $stateParams.caregiverId , data);
+      }
+    }
+
+    $scope.associateCaregiverstoPatient = function(patientId, careGiver){
+        patientService.associateCaregiversFromPatient(patientId, careGiver).then(function(response){
+        $scope.caregivers =  response.data.user;
+        $scope.associateCareGiver = [];$scope.associateCareGiver.length = 0;
+        $scope.switchPatientTab('patientdashboardCaregiver');
+      }).catch(function(response){
+        notyService.showMessage(response.data.ERROR,'warning' );
+      });
+    }
+
+    $scope.goToCaregiverEdit = function(careGiverId){
+      $state.go('patientdashboardCaregiverEdit', {'caregiverId': careGiverId});
+    }
+
+    $scope.disassociateCaregiver = function(caregiverId, index){
+        patientService.disassociateCaregiversFromPatient(localStorage.getItem('patientID'), caregiverId).then(function(response){
+        $scope.caregivers.splice(index, 1);
+      }).catch(function(response){});
+    }
+
+    $scope.initpatientCaregiverEdit = function(caregiverId){
+      $scope.careGiverStatus = "edit";
+      $scope.getPatientById(localStorage.getItem('patientID'));
+      $scope.editCaregiver(caregiverId);
+    }
+
+    $scope.editCaregiver = function(careGiverId){
+        UserService.getState().then(function(response) {
+          $scope.states = response.data.states;
+        }).catch(function(response) {});
+        UserService.getRelationships().then(function(response) {
+          $scope.relationships = response.data.relationshipLabels;
+        }).catch(function(response) {});
+        var caregiverId = $stateParams.caregiverId;
+        patientService.getCaregiverById(localStorage.getItem('patientID'), caregiverId).then(function(response){
+          $scope.associateCareGiver = response.data.caregiver.user;
+          $scope.associateCareGiver.relationship = response.data.caregiver.relationshipLabel;
+        }).catch(function(response){});
+    }
+
+    $scope.updateCaregiver = function(patientId, caregiverId , careGiver){
+      var tempCaregiver = {};
+      tempCaregiver.title = careGiver.title;
+      tempCaregiver.firstName = careGiver.firstName;
+      tempCaregiver.middleName = careGiver.middleName;
+      tempCaregiver.lastName = careGiver.lastName;
+      tempCaregiver.email = careGiver.email;
+      tempCaregiver.address = careGiver.address;
+      tempCaregiver.zipcode = careGiver.zipcode;
+      tempCaregiver.city = careGiver.city;
+      tempCaregiver.state = careGiver.state;
+      tempCaregiver.relationship = careGiver.relationship;
+      tempCaregiver.primaryPhone = careGiver.primaryPhone;
+      tempCaregiver.mobilePhone = careGiver.mobilePhone;
+      tempCaregiver.role = careGiver.role;
+
+      patientService.updateCaregiver(patientId,caregiverId, tempCaregiver).then(function(response){
+        $scope.associateCareGiver = [];$scope.associateCareGiver.length = 0;
+        $scope.switchPatientTab('patientdashboardCaregiver');
+      }).catch(function(response){});
+    }
+    $scope.initPatientDeviceProtocol = function(){     
+      patientService.getDevices(localStorage.getItem('patientID')).then(function(response){
+        angular.forEach(response.data.deviceList, function(device){
+          var _date = dateService.getDate(device.createdDate);
+          var _month = dateService.getMonth(_date.getMonth());
+          var _day = dateService.getDay(_date.getDate());
+          var _year = dateService.getYear(_date.getFullYear());
+          var date = _month + "/" + _day + "/" + _year;
+          device.createdDate = date;
+          device.days = dateService.getDays(_date);
+        });
+        $scope.devices = response.data.deviceList;
+      }).catch(function(response){});
+      $scope.getProtocols(localStorage.getItem('patientID'));    
+    }
+    $scope.getProtocols = function(patientId){
+      patientService.getProtocol(patientId).then(function(response){
+        $scope.protocols = response.data.protocol;
+        $scope.addProtocol = true;
+        angular.forEach($scope.protocols, function(protocol){
+          if(!protocol.deleted){
+            $scope.addProtocol = false;
+          }
+        });
+      }).catch(function(){});
+    };
+
+    $scope.initPatientClinicHCPs = function(){
+      $scope.getClinicsOfPatient();
+      $scope.getHCPsOfPatient();
+    }
+    $scope.getClinicsOfPatient = function(){
+      patientService.getClinicsLinkedToPatient(localStorage.getItem('patientID')).then(function(response){
+        $scope.clinics = response.data.clinics;                
+      }).catch(function(){});
+    }
+    
+    $scope.getHCPsOfPatient = function(){
+      patientService.getHCPsLinkedToPatient(localStorage.getItem('patientID')).then(function(response){
+        $scope.hcps = response.data.hcpUsers;                
+      }).catch(function(){});
     }
 
     $scope.init();

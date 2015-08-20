@@ -13,9 +13,9 @@ angular.module('hillromvestApp')
                 abstract: true,
             })
             .state('patient-dashboard', {
-                parent: 'entity',
-                abstract: true,
+                parent: 'entity',                
                 url:'/patient',
+                abstract: true,
             })
             .state('patientUser', {
                 parent: 'admin',

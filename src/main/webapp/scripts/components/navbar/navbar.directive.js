@@ -101,3 +101,42 @@ angular.module('hillromvestApp')
         }
     }
 });
+
+angular.module('hillromvestApp')
+.directive('navigationBarPatient', function (Auth, Principal, $state, Account, $location) {
+  return {
+    templateUrl: 'scripts/components/navbar/navbarpatientuser.html',
+    restrict: 'E',
+
+    controller: function ($scope) {
+      $scope.isActive = function(tab) {
+        var path = $location.path();
+        if (path.indexOf(tab) !== -1) {
+          return true;
+        } else {
+          return false;
+        }
+      };
+
+      $scope.signOut = function(){
+        Account.get().$promise
+        .then(function (account) {
+          $scope.isAuthenticated = true;
+
+        })
+        .catch(function() {
+          $scope.isAuthenticated = false;
+          $state.go('login');
+        });
+      }
+      $scope.logout = function(){
+        Auth.signOut().then(function(data) {
+          Auth.logout();
+          localStorage.clear();
+          $scope.signOut();
+        }).catch(function(err) {
+        });
+      }
+    }
+  };
+});

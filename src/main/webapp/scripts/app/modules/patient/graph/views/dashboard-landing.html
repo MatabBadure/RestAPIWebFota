@@ -136,7 +136,7 @@
 	        yAxisLabel="Minutes"
 	        margin="{left:100,top:20,bottom:20,right:10}"
 	        xAxisTickFormat="xAxisTickFormatFunction(format)"
-	        xAxisTickValues="xAxisTickValuesFunction()"
+	        xAxisTickValues="xAxisTickValuesBarChart()"
 	        noData="No Data Found!"
 	        objectEquality="true"
 	        tooltipcontent="toolTipContentBarChart()">
@@ -147,12 +147,8 @@
 
 	  <div ng-if="complianceGraph">
 	  	<div>
-	  		 <input type="checkbox" name="pressure" ng-disabled="pressureIsDisabled" ng-model="compliance.pressure" ng-change="reCreateComplianceGraph()">
-	  		 <span>pressure</span>
-	  		 <input type="checkbox" name="frequency" ng-disabled="frequencyIsDisabled" ng-model="compliance.frequency" ng-change="reCreateComplianceGraph()">
-	  		 <span>Frequency</span>
-	  		 <input type="checkbox" name="duration" ng-disabled="durationIsDisabled" ng-model="compliance.duration" ng-change="reCreateComplianceGraph()">
-	  		 <span>Duration</span>
+	  		 <input type="radio" name="secondaryYaxis" ng-model="compliance.secondaryYaxis" value='pressure' ng-change="reCreateComplianceGraph()">Pressure
+				 <input type="radio" name="secondaryYaxis" ng-model="compliance.secondaryYaxis" value='frequency' ng-change="reCreateComplianceGraph()">Frequency
 	  	</div>
 	  	<div id="complianceGraph">
       	<svg style="height:350px"> </svg>

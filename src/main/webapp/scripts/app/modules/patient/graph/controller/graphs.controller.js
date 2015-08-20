@@ -14,12 +14,12 @@ angular.module('hillromvestApp')
       $scope.compliance.duration = true;
       $scope.compliance.frequency = false;
       $scope.toTimeStamp = new Date().getTime();
+      $scope.compliance.secondaryYaxis = 'frequency';
       //$scope.patientId = StorageService.get('patientID');
       $scope.fromTimeStamp = dateService.getnDaysBackTimeStamp(7);
       $scope.fromDate = dateService.getDateFromTimeStamp($scope.fromTimeStamp);
       $scope.toDate = dateService.getDateFromTimeStamp($scope.toTimeStamp);
       $scope.patientId = 160;
-      $scope.handlelegends();
       if ($state.current.name === 'patientdashboard') {
         $scope.weeklyChart();
       }
@@ -156,13 +156,13 @@ $scope.dates = {startDate: null, endDate: null};
       return function(key, x, y, e, graph) {
         var toolTip = '';
         angular.forEach(data, function(value) {
-          if(value.date === e.point.x){
+          if(value.start === e.point.x){
               toolTip =
-                '<h6>' + dateService.getDateFromTimeStamp(value.date) + '</h6>' +
-                '<p> Treatment/Day ' + value.therapyData.treatmentsPerDay + '</p>' +
-                '<p> Frequency ' + value.therapyData.weightedAvgFrequency + '</p>' +
-                '<p> Pressure ' + value.therapyData.weightedAvgPressure + '</p>' +
-                '<p> Caugh Pauses ' + value.therapyData.normalCoughPauses + '</p>';
+                '<h6>' + dateService.getDateFromTimeStamp(value.start) + '</h6>' +
+                '<p> Treatment/Day ' + value.treatmentsPerDay + '</p>' +
+                '<p> Frequency ' + value.weightedAvgFrequency + '</p>' +
+                '<p> Pressure ' + value.weightedAvgPressure + '</p>' +
+                '<p> Caugh Pauses ' + value.normalCoughPauses + '</p>';
           }
         });
       return toolTip;   
@@ -172,6 +172,17 @@ $scope.dates = {startDate: null, endDate: null};
     $scope.xAxisTickValuesFunction = function(){
       
     return function(d){
+        var tickVals = [];
+        var values = d[0].values;
+        for(var i in values){
+          tickVals.push(values[i][0]);
+        }
+        return tickVals;
+      };
+    };
+
+    $scope.xAxisTickValuesBarChart = function() {
+      return function(d){
         var tickVals = [];
         var values = d[0].values;
         for(var i in values){
@@ -225,11 +236,19 @@ $scope.dates = {startDate: null, endDate: null};
     };
 
     $scope.getComplianceGraphData = function() {
-      $scope.completeComplianceData = complianceGraphData;
-      $scope.completecomplianceGraphData = graphUtil.convertIntoComplianceGraph($scope.completeComplianceData);
-     /* patientDashBoardService.getComplianceGraphPoints($scope.patientId, $scope.fromTimeStamp, $scope.toTimeStamp, $scope.groupBy).then(function(response){
+      patientDashBoardService.getHMRGraphPoints($scope.patientId, $scope.fromTimeStamp, $scope.toTimeStamp, $scope.groupBy).then(function(response){
         //Will get response data from real time API once api is ready
-      }).catch(function(response) {});*/
+        $scope.completeComplianceData = response.data;
+        if($scope.completeComplianceData.length === 0){
+          $scope.complianceGraphData = [];
+        } else {
+          $scope.completecomplianceGraphData = graphUtil.convertIntoComplianceGraph($scope.completeComplianceData);
+          $scope.createComplianceGraphData();
+          $scope.drawComplianceGraph();
+        }
+      }).catch(function(response) {
+        $scope.complianceGraphData = [];
+      });
     };
 
     $scope.calculateTimeDuration = function(durationInDays) {
@@ -252,8 +271,6 @@ $scope.dates = {startDate: null, endDate: null};
         $scope.getNonDayHMRGraphData();
       } else if ($scope.complianceGraph) {
         $scope.getComplianceGraphData();
-        $scope.createComplianceGraphData();
-        $scope.drawComplianceGraph();
       }
     }
     // Yearly chart
@@ -269,8 +286,6 @@ $scope.dates = {startDate: null, endDate: null};
           $scope.getNonDayHMRGraphData();
       } else if ($scope.complianceGraph) {
           $scope.getComplianceGraphData();
-          $scope.createComplianceGraphData();
-          $scope.drawComplianceGraph();
       }
     }
    
@@ -287,8 +302,6 @@ $scope.dates = {startDate: null, endDate: null};
         $scope.getNonDayHMRGraphData();
       } else if ($scope.complianceGraph) {
         $scope.getComplianceGraphData();
-        $scope.createComplianceGraphData();
-        $scope.drawComplianceGraph();
       }
     }
     //hmrDayChart
@@ -313,25 +326,22 @@ $scope.dates = {startDate: null, endDate: null};
         $scope.calculateGraphDuration(7);
       }
       $scope.getComplianceGraphData();
-      $scope.createComplianceGraphData();
-      $scope.drawComplianceGraph();
   };
 
   $scope.createComplianceGraphData = function() {
     delete $scope.complianceGraphData ;
     $scope.complianceGraphData = [];
-    var count = 1;
     angular.forEach($scope.completecomplianceGraphData, function(value) {
-          if(value.key.indexOf("pressure") >= 0 && $scope.compliance.pressure){
-            value.yAxis = count++;
+          if(value.key.indexOf("pressure") >= 0 && $scope.compliance.secondaryYaxis === 'pressure'){
+            value.yAxis = 2
             $scope.complianceGraphData.push(value);
           }
-          if(value.key.indexOf("duration") >= 0 && $scope.compliance.duration){
-            value.yAxis = count++;
+          if(value.key.indexOf("duration") >= 0){
+            value.yAxis = 1
             $scope.complianceGraphData.push(value);
           }
-          if(value.key.indexOf("frequency") >= 0  && $scope.compliance.frequency){
-            value.yAxis = count++;
+          if(value.key.indexOf("frequency") >= 0  && $scope.compliance.secondaryYaxis === 'frequency'){
+            value.yAxis = 2
             $scope.complianceGraphData.push(value);
           }
     });
@@ -350,40 +360,9 @@ $scope.dates = {startDate: null, endDate: null};
           }
     });
   }
-  $scope.handlelegends = function() {
-    var count = 0 ;
-    if($scope.compliance.pressure === true ){
-      count++;
-    }
-    if($scope.compliance.duration === true ){
-      count++;
-    }
-    if($scope.compliance.frequency === true ){
-      count++;
-    }
-    if(count === 2 ) {
-      if($scope.compliance.pressure === false ){
-        $scope.pressureIsDisabled = true;
-      }
-      if($scope.compliance.frequency === false ){
-        $scope.frequencyIsDisabled = true;
-      }
-      if($scope.compliance.duration === false ){
-        $scope.durationIsDisabled = true;
-      }
-    } else if(count < 2 ) {
-       $scope.pressureIsDisabled = false;
-       $scope.frequencyIsDisabled = false;
-       $scope.durationIsDisabled = false;
-    }
-  }
-  $scope.reDrawCompliancegraph = function() {
-
-  };
 
   $scope.reCreateComplianceGraph = function() {
-    $scope.handlelegends();
-    $scope.complianceToggle = !$scope.complianceToggle;
+    console.log('selected choice:' + $scope.compliance.secondaryYaxis);
     $scope.createComplianceGraphData();
     $scope.drawComplianceGraph();
   };
@@ -410,6 +389,7 @@ $scope.dates = {startDate: null, endDate: null};
       chart = nv.models.multiChart()
       .margin({top: 30, right: 100, bottom: 50, left: 100})
       .color(d3.scale.category10().range());
+     // chart.noData("Nothing to see here.");
       chart.tooltipContent($scope.toolTipContentForCompliance($scope.completeComplianceData));
       chart.xAxis.tickFormat(function(d) {
         switch($scope.format) {

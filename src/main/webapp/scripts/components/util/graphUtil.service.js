@@ -114,14 +114,14 @@ angular.module('hillromvestApp')
           var pressurePoint = {};
           var durationPoint = {};
           var frequencyPoint = {};
-          pressurePoint.x = value.date;
-          pressurePoint.y = value.therapyData.weightedAvgPressure
+          pressurePoint.x = value.start;
+          pressurePoint.y = value.weightedAvgPressure;
           pressureValues.push(pressurePoint);
-          durationPoint.x = value.date;
-          durationPoint.y = Math.floor(value.therapyData.secondsSpentInTreatment/(60))
+          durationPoint.x = value.start;
+          durationPoint.y = value.duration;
           durationValues.push(durationPoint);
-          frequencyPoint.x = value.date;
-          frequencyPoint.y = value.therapyData.weightedAvgFrequency
+          frequencyPoint.x = value.start;
+          frequencyPoint.y = value.weightedAvgFrequency;
           frequencyValues.push(frequencyPoint);
         });
         pressureObject.values = pressureValues;

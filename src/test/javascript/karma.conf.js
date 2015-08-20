@@ -54,6 +54,7 @@ module.exports = function (config) {
             'main/webapp/bower_components/angular-daterangepicker/js/angular-daterangepicker.js',
             'main/webapp/bower_components/angular-mocks/angular-mocks.js',
             'main/webapp/bower_components/angular-loading-bar/build/loading-bar.js',
+            'main/webapp/bower_components/angular-mask/dist/ngMask.js',
             // endbower
             'main/webapp/bower_components/angular-recaptcha/release/angular-recaptcha.js',
             'main/webapp/scripts/app/app.js',

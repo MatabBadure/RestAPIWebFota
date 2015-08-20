@@ -96,6 +96,10 @@ a::-moz-focus-inner {
 	margin-left: -10px !important;
 }
 
+.btn-margin-left {
+  margin-left: 10px;
+}
+
 .margin-top {
 	margin-top: 20px;
 }
@@ -137,6 +141,7 @@ a::-moz-focus-inner {
 .vertical-middle {
 	vertical-align: middle;
 }
+
 .cursor-pointer {
 	cursor: pointer;
 }
@@ -189,11 +194,15 @@ a::-moz-focus-inner {
 }
 
 #loading-bar .bar {
-	background: $terracotta;
+	background: $sunshade;
 	height: 4px;
 }
 
 #loading-bar-spinner .spinner-icon {
-	border-top-color:  $terracotta;
-  border-left-color: $terracotta;
+	border-top-color:  $sunshade;
+  border-left-color: $sunshade;
+}
+
+.text-right {
+  text-align: right;
 }

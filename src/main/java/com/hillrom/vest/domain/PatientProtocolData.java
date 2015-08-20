@@ -12,6 +12,8 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.SQLDelete;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * A PATIENT_PROTOCOL_DATA.
  */
@@ -32,10 +34,12 @@ public class PatientProtocolData extends AbstractAuditingEntity implements Seria
 	
 	@ManyToOne
     @JoinColumn(name = "PATIENT_ID") 
+	@JsonIgnore
     private PatientInfo patient;
 	
 	@ManyToOne
     @JoinColumn(name = "USER_ID")
+	@JsonIgnore
 	private User patientUser;
 	
 	@Column(name = "treatments_per_day")

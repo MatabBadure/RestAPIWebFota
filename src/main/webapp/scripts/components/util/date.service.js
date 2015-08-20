@@ -135,6 +135,12 @@ angular.module('hillromvestApp')
           default:
               break;
         }
+      getDays: function(date){
+        var oneDay = 24*60*60*1000;
+        var currentDate = new Date();
+        var diffDays = Math.floor((currentDate.getTime() - date.getTime())/oneDay);
+        console.log(diffDays);
+        return diffDays;
       }
       
     };

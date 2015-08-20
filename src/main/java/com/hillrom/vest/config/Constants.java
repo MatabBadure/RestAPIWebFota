@@ -37,4 +37,6 @@ public final class Constants {
     
     public static final String NORMAL_PROTOCOL = "Normal";
 
+    public static final String ALL = "All";
+
 }

@@ -511,9 +511,9 @@ public class UserExtensionResource {
     }
     
     /**
-     * PUT  /clinic/:id/associatehcp -> associate hcp to the "id" clinic.
+     * PUT  /clinics/:id/associatehcp -> associate hcp to the "id" clinic.
      */
-    @RequestMapping(value = "/clinic/{id}/associatehcp",
+    @RequestMapping(value = "/clinics/{id}/associatehcp",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed

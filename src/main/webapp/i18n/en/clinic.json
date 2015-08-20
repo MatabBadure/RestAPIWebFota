@@ -48,6 +48,18 @@
         "delete": {
             "warning": "Are you sure you want to Deactivate the Clinic?",
             "message": "If you deactivate the clinic, you will no longer be able to view the information."
-        }
+        },
+        "hillRom-id": "Hill-Rom ID",
+        "type": "Type",
+        "status": "Status" ,
+        "phoneNumber": "Phone number",
+        "address": "Address",
+        "city": "City",
+        "state": "State",
+        "clinic-view-assoc-patients": "View Associated Patients",
+        "clinic-view-assoc-hcps": "View Associated HCPs",
+        "clinic-edit": "Edit Clinic",
+        "assoc-clinic": "Associated Clinics",
+        "add-satellite-clinic": "Add Satellite Clinic"
     }
 }

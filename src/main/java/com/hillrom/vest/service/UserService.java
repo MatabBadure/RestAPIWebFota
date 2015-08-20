@@ -65,7 +65,7 @@ import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 public class UserService {
 
 	private final Logger log = LoggerFactory.getLogger(UserService.class);
-	
+
     @Inject
     private PasswordEncoder passwordEncoder;
 
@@ -1114,5 +1114,17 @@ public class UserService {
 			throw new HillromException(ExceptionConstants.HR_512);
 		}
     }
+	
+	public List<UserExtension> getAllUsersBy(String role) throws HillromException{
+		List<UserExtension> users = userExtensionRepository.findByActiveStatus();
+		List<UserExtension> filteredUsers = new LinkedList<>();
+		if(users.isEmpty()) {
+			throw new HillromException(ExceptionConstants.HR_519);
+		} else {
+			Authority authority = new Authority(role);
+			filteredUsers = users.stream().filter(user -> user.getAuthorities().contains(authority)).collect(Collectors.toList());
+		    return filteredUsers;
+		}	
+	 }
 }
 

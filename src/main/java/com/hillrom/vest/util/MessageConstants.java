@@ -9,6 +9,7 @@ public class MessageConstants {
     public static final String HR_202 = "User updated successfully.";
     public static final String HR_203 = "User fetched successfully.";
     public static final String HR_204 = "User deleted successfully.";
+    public static final String HR_205 = "Users deleted successfully.";
     
     public static final String HR_211 = "Patient User created successfully.";
     public static final String HR_212 = "Patient User updated successfully.";
@@ -62,4 +63,5 @@ public class MessageConstants {
     public static final String HR_285 = "No Associated clinics with Patient.";
     public static final String HR_291 = "Associated Patients with HCP fetched successfully.";
     public static final String HR_292 = "Associated Clinics with HCP fetched successfully.";
+    public static final String HR_293 = "HCPs are associated with clinic successfully.";
 }

@@ -70,5 +70,6 @@ public class ExceptionConstants {
     
     public static final String HR_571 = "No Patient Associated with HCP.";
     public static final String HR_572 = "No Clinics Associated with HCP.";
+    public static final String HR_573 = "Unable to associate HCP with clinic.";
     
 }

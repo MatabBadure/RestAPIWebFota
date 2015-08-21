@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-.controller('graphController', function($scope, $state, patientDashBoardService, StorageService, dateService, graphUtil, patientService, UserService, $stateParams, dateService, notyService) {
+.controller('graphController', function($scope, $state, patientDashBoardService, StorageService, dateService, graphUtil, patientService, UserService, $stateParams, notyService) {
     var chart;
     $scope.init = function() {
       $scope.hmrLineGraph = true;
@@ -28,10 +28,8 @@ angular.module('hillromvestApp')
       //$scope.patientId = StorageService.get('patientID');
       $scope.fromTimeStamp = dateService.getnDaysBackTimeStamp(7);
       $scope.fromDate = dateService.getDateFromTimeStamp($scope.fromTimeStamp);
-      $scope.toDate = dateService.getDateFromTimeStamp($scope.toTimeStamp);
-      if ($state.current.name === 'patientdashboard') {
-        $scope.weeklyChart();
-      }$scope.getPatientById(localStorage.getItem('patientID'));
+      $scope.toDate = dateService.getDateFromTimeStamp($scope.toTimeStamp);   
+      $scope.getPatientById(localStorage.getItem('patientID'));
       var currentRoute = $state.current.name;
       if ($state.current.name === 'patientdashboard') {
         $scope.initPatientDashboard();        
@@ -47,6 +45,29 @@ angular.module('hillromvestApp')
         $scope.initPatientClinicHCPs();
       }
     };
+
+    angular.element('#edit_date').datepicker({    
+          endDate: '+0d',   
+          autoclose: true}).    
+          on('changeDate', function(ev) {   
+          var selectedDate = angular.element('#edit_date').datepicker("getDate");   
+          var _month = (selectedDate.getMonth()+1).toString();    
+          _month = _month.length > 1 ? _month : '0' + _month;   
+          var _day = (selectedDate.getDate()).toString();   
+          _day = _day.length > 1 ? _day : '0' + _day;   
+          var _year = (selectedDate.getFullYear()).toString();    
+          var dob = _month+"/"+_day+"/"+_year;    
+          $scope.patient.dob = dob;   
+          var age = dateService.getAge(selectedDate);   
+          angular.element('.age').val(age);   
+          $scope.patient.age = age;   
+          if (age === 0) {    
+            $scope.form.$invalid = true;    
+          }   
+          angular.element("#edit_date").datepicker('hide');   
+          $scope.$digest();   
+        });   
+    console.log("from and To dates :"+$scope.dates);
   /*-----Date picker for dashboard----*/
 /* $scope.date = {
   startDate: '08/12/2015', 
@@ -220,7 +241,7 @@ console.log("from and To dates :"+$scope.dates);
         });
       return toolTip;   
       }
-    }
+    };
 
     $scope.toolTipContentBarChart = function(){
       return function(key, x, y, e, graph) {
@@ -236,7 +257,7 @@ console.log("from and To dates :"+$scope.dates);
         });
       return toolTip;   
       }
-    }
+    };
 
     $scope.toolTipContentForCompliance = function(data){
       return function(key, x, y, e, graph) {
@@ -253,7 +274,7 @@ console.log("from and To dates :"+$scope.dates);
         });
       return toolTip;   
       }
-    }
+    };
 
     $scope.xAxisTickValuesFunction = function(){
       
@@ -344,7 +365,7 @@ console.log("from and To dates :"+$scope.dates);
       $scope.toDate = dateService.getDateFromTimeStamp($scope.toTimeStamp);
       $scope.fromTimeStamp = dateService.getnDaysBackTimeStamp(durationInDays);;
       $scope.fromDate = dateService.getDateFromTimeStamp($scope.fromTimeStamp);
-    }
+    };
 
     // Weekly chart
     $scope.weeklyChart = function(datePicker) {
@@ -360,7 +381,7 @@ console.log("from and To dates :"+$scope.dates);
       } else if ($scope.complianceGraph) {
         $scope.getComplianceGraphData();
       }
-    }
+    };
 
     // Yearly chart
     $scope.yearlyChart = function(datePicker) {
@@ -376,7 +397,7 @@ console.log("from and To dates :"+$scope.dates);
       } else if ($scope.complianceGraph) {
           $scope.getComplianceGraphData();
       }
-    }
+    };
    
     // Monthly chart
     $scope.monthlyChart = function(datePicker) {
@@ -392,7 +413,7 @@ console.log("from and To dates :"+$scope.dates);
       } else if ($scope.complianceGraph) {
         $scope.getComplianceGraphData();
       }
-    }
+    };
     //hmrDayChart
     $scope.dayChart = function() {
       $scope.removeGraph();
@@ -437,7 +458,7 @@ console.log("from and To dates :"+$scope.dates);
     });
     console.log('compliance graph data!')
     console.log($scope.complianceGraphData)
-  }
+  };
 
   $scope.putComplianceGraphLabel = function(chart) {
     var data =  $scope.complianceGraphData
@@ -449,7 +470,7 @@ console.log("from and To dates :"+$scope.dates);
             chart.yAxis2.axisLabel(value.key);
           }
     });
-  }
+  };
 
   $scope.reCreateComplianceGraph = function() {
     console.log('selected choice:' + $scope.compliance.secondaryYaxis);
@@ -471,7 +492,7 @@ console.log("from and To dates :"+$scope.dates);
           default:
               break;
         }
-  }
+  };
 
   $scope.drawComplianceGraph = function() {
     d3.select('#complianceGraph svg').selectAll("*").remove();
@@ -714,6 +735,7 @@ console.log("from and To dates :"+$scope.dates);
     };
 
     $scope.openAddNote = function(){
+      $scope.textNote = "";
       $scope.addNote = true;
       //$("#noteText").css("display", "block");
     };

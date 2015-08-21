@@ -1,7 +1,6 @@
 package com.hillrom.vest.service;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -14,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 
+import com.hillrom.vest.config.AdherenceScoreConstants;
 import com.hillrom.vest.config.NotificationTypeConstants;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
@@ -22,7 +22,6 @@ import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
-import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.ProtocolConstantsRepository;
@@ -31,8 +30,6 @@ import com.hillrom.vest.repository.TherapySessionRepository;
 @Service
 @Transactional
 public class AdherenceCalculationService {
-
-	private static final int DEFAULT_COMPLIANCE_SCORE = 100;
 
 	@Inject
 	private PatientProtocolService protocolService;
@@ -48,26 +45,6 @@ public class AdherenceCalculationService {
 	
 	@Inject
 	private NotificationRepository notificationRepository;
-	
-	public List<PatientCompliance> getComplainceScoreByTherapySessions(List<TherapySession> therapySessions) throws HillromException{
-		Long patientUserId = therapySessions.get(0).getPatientUser().getId();
-		
-		ProtocolConstants protocolConstants = getProtocolByPatientUserId(patientUserId);
-		
-		Map<Integer,List<TherapySession>> groupByTherapyDate = therapySessions.stream()
-		        .collect(Collectors.groupingBy(TherapySession::getTherapyDayOfTheYear));
-		
-		Map<Integer,PatientCompliance> patientCompliance = new HashMap<>();
-		
-		Iterator<Integer> days = groupByTherapyDate.keySet().iterator();
-		while(days.hasNext()){
-			Integer day = days.next();
-			List<TherapySession> therapySessionsPerDay = groupByTherapyDate.get(day);
-			PatientCompliance calculatedPatientCompliance = calculateCompliancePerDay(therapySessionsPerDay,protocolConstants);
-			patientCompliance.put(day, calculatedPatientCompliance);
-		}
-		return null;
-	}
 
 	public ProtocolConstants getProtocolByPatientUserId(
 			Long patientUserId) {
@@ -102,51 +79,58 @@ public class AdherenceCalculationService {
 		User patientUser = therapySessionsPerDay.get(0).getPatientUser();
 		PatientInfo patient = therapySessionsPerDay.get(0).getPatientInfo();
 		Long patientUserId = patientUser.getId();
-		LocalDate current = therapySessionsPerDay.get(0).getDate();
-		List<TherapySession> existingTherapySessions = therapySessionRepository.findByPatientUserIdAndDateRange(patientUserId, current.minusDays(3),current);
-		PatientCompliance existingCompliance = patientComplianceRepository.findTop1ByPatientUserIdOrderByDateDesc(patientUserId);
-		Integer currentScore = Objects.nonNull(existingCompliance) ? existingCompliance.getScore() : DEFAULT_COMPLIANCE_SCORE;
-		Integer previousScore = currentScore;
+		LocalDate currentTherapyDate = therapySessionsPerDay.get(0).getDate();
+		List<TherapySession> latest3TherapySessions = therapySessionRepository.findByPatientUserIdAndDateRange(patientUserId, currentTherapyDate.minusDays(3),currentTherapyDate);
+		PatientCompliance latestCompliance = patientComplianceRepository.findTop1ByPatientUserIdOrderByDateDesc(patientUserId);
+		int currentScore = Objects.nonNull(latestCompliance) ? latestCompliance.getScore() : AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
+		int previousScore = currentScore;
 		String notificationType = "";
-		Map<String,Double> actualMetrics = actualTherapyMetricsPerDay(existingTherapySessions);
+		Map<String,Double> actualMetrics = actualTherapyMetricsPerDay(latest3TherapySessions);
 		
 		// First Time received Data,hence compliance will be 100.
-		if(existingTherapySessions.isEmpty() || Objects.isNull(existingCompliance)){
-			return new PatientCompliance(currentScore, LocalDate.now(), patient, patientUser,actualMetrics.get("totalDuration").intValue());
+		if(latest3TherapySessions.isEmpty() || Objects.isNull(latestCompliance)){
+			return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,actualMetrics.get("totalDuration").intValue());
 		}else{ 
 			// Default 2 points get deducted by assuming data not received for the day, hence add 2 points
-			currentScore = currentScore.equals(DEFAULT_COMPLIANCE_SCORE) ? DEFAULT_COMPLIANCE_SCORE : currentScore + 2;
+			currentScore = currentScore == AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE ? AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE : currentScore + 2;
 			TherapySession firstTherapySessionToPatient = therapySessionRepository.findTop1ByPatientUserIdOrderByDateAsc(patientUserId);
 			// First 3 days No Notifications, hence compliance doesn't change
-			if(current.minusDays(3).isBefore(firstTherapySessionToPatient.getDate()) || current.minusDays(3).equals((firstTherapySessionToPatient.getDate()))){
-				existingCompliance.setScore(currentScore);
-				return existingCompliance;
+			if(currentTherapyDate.minusDays(3).isBefore(firstTherapySessionToPatient.getDate())){
+				if(latestCompliance.getDate().isBefore(currentTherapyDate)){
+					return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,actualMetrics.get("totalDuration").intValue());
+				}
+				latestCompliance.setScore(currentScore);
+				return latestCompliance;
 			}
 		
 			if(isSettingsDeviated(protocolConstant, actualMetrics)){
-				currentScore -= 1;
+				currentScore -= AdherenceScoreConstants.SETTING_DEVIATION_POINTS;
 				notificationType = NotificationTypeConstants.SETTINGS_DEVIATION;				
 			}				
 			if(isHMRComplianceViolated(protocolConstant, actualMetrics)){
-				currentScore -= 2;
+				currentScore -= AdherenceScoreConstants.HMR_NON_COMPLIANCE_POINTS;
 				if(StringUtils.isBlank(notificationType))
 					notificationType = NotificationTypeConstants.HMR_NON_COMPLIANCE;
 				else
 					notificationType = NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION;
 			}
-			if(previousScore == currentScore && currentScore != 100)
-					currentScore += 1;
 			
-			existingCompliance.setScore(currentScore);
-			existingCompliance.setHmrRunRate(actualMetrics.get("totalDuration").intValue());
+			if(previousScore == currentScore && currentScore != AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE)
+					currentScore += 1;
 			
 			// Point has been deducted due to Protocol violation
 			if(previousScore > currentScore){
-				Notification notification = new Notification(notificationType,LocalDate.now(),patientUser,patient,false);
+				Notification notification = new Notification(notificationType,currentTherapyDate,patientUser,patient,false);
 				notificationRepository.save(notification);
 			}
 			
-			return existingCompliance;
+			if(latestCompliance.getDate().isBefore(currentTherapyDate)){
+				return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,actualMetrics.get("totalDuration").intValue());
+			}
+			
+			latestCompliance.setScore(currentScore);
+			latestCompliance.setHmrRunRate(actualMetrics.get("totalDuration").intValue());
+			return latestCompliance;
 		}
 	}
 

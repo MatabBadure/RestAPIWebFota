@@ -7,10 +7,10 @@ angular.module('hillromvestApp')
         var pointSet = [];
         var graphData = {};
         var graphDataList =[];
-        angular.forEach(data, function(value) {
+        angular.forEach(data.actual, function(value) {
           var point = [];
           point.push(value.timestamp);
-          point.push(Math.floor(value.duration));
+          point.push(Math.floor(value.hmr));
           pointSet.push(point);
         });
         graphData["values"] = pointSet;
@@ -25,7 +25,7 @@ angular.module('hillromvestApp')
         angular.forEach(data, function(value) {
           var point = [];
           point.push(value.startTime);
-          point.push(Math.floor(Math.floor(value.hmr/60)));
+          point.push(value.hmr);
           pointSet.push(point);
         });
         graphData["values"] = pointSet;

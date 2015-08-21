@@ -64,6 +64,24 @@ angular.module('hillromvestApp')
         });
       },
 
+
+      /**
+      * @ngdoc method
+      * @name getMissedTherapy
+      * @description To get missed therapy for defined time duration.
+      *
+      */
+      //The service will be changed based on the url and parameters
+      getHMRrunAndScoreRate: function(id, timeStamp) {
+        var url = patient.graph.baseURL;
+        url  = url + '/' + id + '/compliance?date=' + timeStamp;
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function(response) {
+          return response;
+        });
+      },
+
       /**
       * @ngdoc method
       * @name getcomplianceGraphPoints

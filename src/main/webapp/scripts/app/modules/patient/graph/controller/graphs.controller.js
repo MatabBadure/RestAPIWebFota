@@ -9,17 +9,27 @@ angular.module('hillromvestApp')
       $scope.hmrBarGraph = false;
       $scope.hmrGraph = true;
       $scope.format = 'weekly';
+      $scope.patientId = 160;
       $scope.compliance = {};
       $scope.compliance.pressure = true;
       $scope.compliance.duration = true;
       $scope.compliance.frequency = false;
       $scope.toTimeStamp = new Date().getTime();
       $scope.compliance.secondaryYaxis = 'frequency';
+      $scope.hmrRunRate = 0;
+      $scope.adherenceScore = 0;
+      $scope.missedtherapyDays = 0;
+      $scope.minFrequency = 0;
+      $scope.maxFrequency = 0;
+      $scope.minPressure = 0;
+      $scope.maxPressure = 0;
+      $scope.minDuration = 0;
+      $scope.maxDuration = 0;
+      $scope.getHmrRunRateAndScore();
       //$scope.patientId = StorageService.get('patientID');
       $scope.fromTimeStamp = dateService.getnDaysBackTimeStamp(7);
       $scope.fromDate = dateService.getDateFromTimeStamp($scope.fromTimeStamp);
       $scope.toDate = dateService.getDateFromTimeStamp($scope.toTimeStamp);
-      $scope.patientId = 160;
       if ($state.current.name === 'patientdashboard') {
         $scope.weeklyChart();
       }
@@ -53,7 +63,7 @@ angular.element('#edit_date').datepicker({
           angular.element("#edit_date").datepicker('hide');
           $scope.$digest();
         });
-console.log("from and To dates :"+$scope.dates);
+    console.log("from and To dates :"+$scope.dates);
   /*-----Date picker for dashboard----*/
 
     $scope.calculateDateFromPicker = function(picker) {
@@ -73,7 +83,7 @@ console.log("from and To dates :"+$scope.dates);
         $scope.hmrLineGraph = false;
         $scope.hmrBarGraph = true;
         $scope.getDayHMRGraphData();
-      } else if(days <= 7){
+      } else if(days <= 7) {
         $scope.weeklyChart($scope.fromTimeStamp);
       } else if ( days > 7 && days < 36 ) {
         $scope.monthlyChart($scope.fromTimeStamp);
@@ -90,11 +100,19 @@ console.log("from and To dates :"+$scope.dates);
       }
     }
 
-$scope.dates = {startDate: null, endDate: null};
+  $scope.dates = {startDate: null, endDate: null};
+    
+    $scope.getHmrRunRateAndScore = function() {
+      patientDashBoardService.getHMRrunAndScoreRate($scope.patientId, $scope.toTimeStamp).then(function(response){
+        //Will get response data from real time API once api is ready
+        if(response.status === 200 ){
+          $scope.hmrRunRate = response.data.hmrRunRate;
+          $scope.adherenceScore = response.data.score;
+        }
+      }).catch(function(response) {
+      });
+    }
 
-    $scope.percent1 = 30;
-    $scope.percent2 = 75;
-    $scope.percent3 = 24;
     $scope.adherence = {
         animate:{
             duration:3000,
@@ -133,7 +151,7 @@ $scope.dates = {startDate: null, endDate: null};
       return function(d){
         switch(format) {
           case "weekly":
-              return d3.time.format('%a')(new Date(d));
+              return d3.time.format('%A')(new Date(d));
               break;
           case "dayWise":
               return dateService.getTimeIntervalFromTimeStamp(d);
@@ -153,14 +171,14 @@ $scope.dates = {startDate: null, endDate: null};
     $scope.toolTipContentFunction = function(){
       return function(key, x, y, e, graph) {
         var toolTip = '';
-        angular.forEach($scope.completeGraphData, function(value) {
+        angular.forEach($scope.completeGraphData.actual, function(value) {
           if(value.timestamp === e.point[0]){
               toolTip =
                 '<h6>' + dateService.getDateFromTimeStamp(value.timestamp) + '</h6>' +
                 '<p> Treatment/Day ' + value.treatmentsPerDay + '</p>' +
                 '<p> Frequency ' + value.weightedAvgFrequency + '</p>' +
                 '<p> Pressure ' + value.weightedAvgPressure + '</p>' +
-                '<p> Caugh Pauses ' + value.normalCoughPauses + '</p>';
+                '<p> Cough Pauses ' + value.normalCoughPauses + '</p>';
           }
         });
       return toolTip;   
@@ -234,12 +252,10 @@ $scope.dates = {startDate: null, endDate: null};
     };
 
     $scope.getNonDayHMRGraphData = function() {
-      /*$scope.completeGraphData = HMRWeeklyGraphData;
-      $scope.graphData = graphUtil.convertIntoHMRLineGraph($scope.completeGraphData);*/
       patientDashBoardService.getHMRGraphPoints($scope.patientId, $scope.fromTimeStamp, $scope.toTimeStamp, $scope.groupBy).then(function(response){
         //Will get response data from real time API once api is ready
         $scope.completeGraphData = response.data;
-        if($scope.completeGraphData === []){
+        if($scope.completeGraphData.actual === undefined){
           $scope.graphData = [];
         } else {
           $scope.graphData = graphUtil.convertIntoHMRLineGraph($scope.completeGraphData);
@@ -250,15 +266,12 @@ $scope.dates = {startDate: null, endDate: null};
     };
 
     $scope.getDayHMRGraphData = function() {
-     /* $scope.completeGraphData = HMRDayGraphData;
-      $scope.graphData = graphUtil.convertIntoHMRBarGraph($scope.completeGraphData);*/
       patientDashBoardService.getHMRBarGraphPoints($scope.patientId, $scope.fromTimeStamp).then(function(response){
-        //Will get response data from real time API once api is ready
         $scope.completeGraphData = response.data;
-        if($scope.completeGraphData === []){
+        if($scope.completeGraphData.actual === undefined){
            $scope.graphData = [];
          } else {
-          $scope.completeGraphData = graphUtil.formatDayWiseDate($scope.completeGraphData);
+          $scope.completeGraphData = graphUtil.formatDayWiseDate($scope.completeGraphData.actual);
            $scope.graphData = graphUtil.convertIntoHMRBarGraph($scope.completeGraphData);
          }
       }).catch(function(response) {
@@ -270,10 +283,17 @@ $scope.dates = {startDate: null, endDate: null};
       patientDashBoardService.getHMRGraphPoints($scope.patientId, $scope.fromTimeStamp, $scope.toTimeStamp, $scope.groupBy).then(function(response){
         //Will get response data from real time API once api is ready
         $scope.completeComplianceData = response.data;
-        if($scope.completeComplianceData.length === 0){
+        if($scope.completeComplianceData.actual === undefined){
           $scope.complianceGraphData = [];
         } else {
-          $scope.completecomplianceGraphData = graphUtil.convertIntoComplianceGraph($scope.completeComplianceData);
+          //recommended values
+          $scope.minFrequency = $scope.completeComplianceData.recommended.minFrequency;
+          $scope.maxFrequency = $scope.completeComplianceData.recommended.maxFrequency;
+          $scope.minPressure = $scope.completeComplianceData.recommended.minPressure;
+          $scope.maxPressure = $scope.completeComplianceData.recommended.maxPressure;
+          $scope.minDuration = $scope.completeComplianceData.recommended.minMinutesPerTreatment * $scope.completeComplianceData.recommended.treatmentsPerDay;
+          $scope.maxDuration = $scope.completeComplianceData.recommended.maxMinutesPerTreatment * $scope.completeComplianceData.recommended.treatmentsPerDay;
+          $scope.completecomplianceGraphData = graphUtil.convertIntoComplianceGraph($scope.completeComplianceData.actual);
           $scope.createComplianceGraphData();
           $scope.drawComplianceGraph();
         }
@@ -354,7 +374,7 @@ $scope.dates = {startDate: null, endDate: null};
       $scope.complianceGraph = true;
       $scope.hmrGraph = false;
       if($scope.fromTimeStamp === $scope.toTimeStamp){
-        $scope.calculateGraphDuration(7);
+        $scope.calculateTimeDuration(7);
       }
       $scope.getComplianceGraphData();
   };
@@ -401,7 +421,7 @@ $scope.dates = {startDate: null, endDate: null};
   $scope.formatXtickForCompliance = function(format,d){
         switch(format) {
           case "weekly":
-              return d3.time.format('%a')(new Date(d));
+              return d3.time.format('%A')(new Date(d));
               break;
           case "monthly":
               return 'week ' + dateService.getWeekOfMonth(d);
@@ -421,11 +441,11 @@ $scope.dates = {startDate: null, endDate: null};
       .margin({top: 30, right: 100, bottom: 50, left: 100})
       .color(d3.scale.category10().range());
      // chart.noData("Nothing to see here.");
-      chart.tooltipContent($scope.toolTipContentForCompliance($scope.completeComplianceData));
+      chart.tooltipContent($scope.toolTipContentForCompliance($scope.completeComplianceData.actual));
       chart.xAxis.tickFormat(function(d) {
         switch($scope.format) {
           case "weekly":
-              return d3.time.format('%a')(new Date(d));
+              return d3.time.format('%A')(new Date(d));
               break;
           case "monthly":
               return 'week ' + dateService.getWeekOfMonth(d);

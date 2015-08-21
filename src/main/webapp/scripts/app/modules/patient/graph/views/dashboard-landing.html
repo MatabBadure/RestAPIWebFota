@@ -7,25 +7,25 @@
 							<div class="stats_header"><h4>Statistics</h4></div>
 							<div class="stats_chart_container">
 								<div class="col-3">
-									<div class="pie_chart" easypiechart options="adherence" percent="percent1"></div>
+									<div class="pie_chart" easypiechart options="adherence" percent="adherenceScore"></div>
 									<div class="stats_chart_content score">
-										<h4 class="percent">30</h4>
+										<h4 class="percent">{{adherenceScore}}</h4>
 										<p class="descrip">Adherence Score</p>
 									</div>
 									<div class="chart_inner_icon icon-adherence"></div>
 								</div>
 								<div class="col-3">
-									<div class="pie_chart"  easypiechart options="hmr" percent="percent2"></div>
+									<div class="pie_chart"  easypiechart options="hmr" percent="hmrRunRate"></div>
 									<div class="stats_chart_content hmr">
-										<h4 class="percent">75</h4>
+										<h4 class="percent">{{hmrRunRate}}</h4>
 										<p class="descrip">HMR Runrate</p>
 									</div>
 									<div class="chart_inner_icon icon-man-running"></div>
 								</div>
 								<div class="col-3">
-									<div class="pie_chart"  easypiechart options="missedtherapy" percent="percent3"></div>
+									<div class="pie_chart"  easypiechart options="missedtherapy" percent="missedtherapyDays"></div>
 									<div class="stats_chart_content missed">
-										<h4 class="percent">24</h4>
+										<h4 class="percent">{{missedtherapyDays}}</h4>
 										<p class="descrip">Missed Therapy Days</p>
 									</div>
 									<div class="chart_inner_icon icon-lungs"></div>
@@ -213,8 +213,6 @@
 			 			<button class="hillrom-btn btn-submit float-right">Add Note</button>
 			 			<span class="float-right view_all_btn">View All</span>
 	 				</div>
->>>>>>> refs/remotes/origin/dev
-
 	 			</div>
 	 		</div>
 		</div>

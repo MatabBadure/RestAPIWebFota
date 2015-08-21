@@ -156,9 +156,11 @@ public class TherapySessionService {
 		if(Objects.nonNull(latestTherapySession)){
 			LocalDate today = LocalDate.now();
 			int days = 0;
-			if(Objects.isNull(latestTherapySession.getDate()))
+			LocalDate latestSessionDate = latestTherapySession.getDate();
+			if(Objects.isNull(latestSessionDate))
 				return 0;
-			while(today.isAfter(latestTherapySession.getDate())){
+			while(today.isAfter(latestSessionDate)){
+				latestSessionDate = latestSessionDate.plusDays(1);
 				++days;
 			}
 			return days;

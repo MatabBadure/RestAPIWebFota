@@ -443,19 +443,23 @@ angular.element('#edit_date').datepicker({
      // chart.noData("Nothing to see here.");
       chart.tooltipContent($scope.toolTipContentForCompliance($scope.completeComplianceData.actual));
       chart.xAxis.tickFormat(function(d) {
-        switch($scope.format) {
-          case "weekly":
-              return d3.time.format('%A')(new Date(d));
-              break;
-          case "monthly":
-              return 'week ' + dateService.getWeekOfMonth(d);
-              break;
-          case "yearly":
-              return d3.time.format('%B')(new Date(d));
-              break;
-          default:
-              break;
-        }
+        angular.forEach($scope.completeComplianceData.actual, function(value) {
+          if(value.timestamp === d){
+             switch($scope.format) {
+              case "weekly":
+                  return d3.time.format('%A')(new Date(d));
+                  break;
+              case "monthly":
+                  return 'week ' + dateService.getWeekOfMonth(d);
+                  break;
+              case "yearly":
+                  return d3.time.format('%B')(new Date(d));
+                  break;
+              default:
+                  break;
+            }
+          }
+        });
       });
       chart.yAxis1.tickFormat(d3.format(',.0f'));
       chart.yAxis2.tickFormat(d3.format(',.0f'));

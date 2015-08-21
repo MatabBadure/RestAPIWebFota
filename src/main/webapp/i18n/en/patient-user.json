@@ -109,7 +109,9 @@
       "npiNumber": "NpiNumber",
       "user": "user",
       "patients": "patients",
-      "parent": "parent"
+      "parent": "parent",
+      "type": "Type",
+      "status": "Status"
     },
     "hcp":{
       "name": "Name",

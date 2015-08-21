@@ -117,26 +117,6 @@ angular.module('hillromvestApp')
           return false;
         }
       };
-
-      $scope.signOut = function(){
-        Account.get().$promise
-        .then(function (account) {
-          $scope.isAuthenticated = true;
-
-        })
-        .catch(function() {
-          $scope.isAuthenticated = false;
-          $state.go('login');
-        });
-      }
-      $scope.logout = function(){
-        Auth.signOut().then(function(data) {
-          Auth.logout();
-          localStorage.clear();
-          $scope.signOut();
-        }).catch(function(err) {
-        });
-      }
     }
   };
 });

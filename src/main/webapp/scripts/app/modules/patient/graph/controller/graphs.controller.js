@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-.controller('graphController', function($scope, $state, patientService, UserService, $stateParams, dateService) {
+.controller('graphController', function($scope, $state, patientService, UserService, $stateParams, dateService, notyService) {
 
   /*-----Date picker for dashboard----*/
 /* $scope.date = {
@@ -69,7 +69,7 @@ console.log("from and To dates :"+$scope.dates);
       $scope.getPatientById(localStorage.getItem('patientID'));
       var currentRoute = $state.current.name;
       if ($state.current.name === 'patientdashboard') {
-        $scope.hmrWeeklyChart();
+        $scope.initPatientDashboard();        
       }else if(currentRoute === 'patientdashboardCaregiver'){
         $scope.initPatientCaregiver();
       }else if(currentRoute === 'patientdashboardCaregiverAdd'){
@@ -148,7 +148,7 @@ console.log("from and To dates :"+$scope.dates);
       $scope.xAxisTickFormatFunction();
       $scope.toolTipContentFunction();
       d3.select("g.nv-y.nv-axis").select("text.nv-axislabel").attr({y:"-3em"});
-    }
+    };
     // Yearly chart
     $scope.hmrYearlyChart = function() {
       $scope.graphData = [
@@ -167,7 +167,7 @@ console.log("from and To dates :"+$scope.dates);
       $scope.toolTipContentFunction();
       d3.select("g.nv-y.nv-axis").select("text.nv-axislabel").attr({y:"-3em"});
 
-    }
+    };
     // Monthly chart
     $scope.hmrMonthlyChart = function() {
       $scope.graphData = [
@@ -186,28 +186,28 @@ console.log("from and To dates :"+$scope.dates);
       $scope.toolTipContentFunction();
       d3.select("g.nv-y.nv-axis").select("text.nv-axislabel").attr({y:"-3em"});
 
-    }
+    };
     /*this should initiate the list of caregivers associated to the patient*/
     $scope.initPatientCaregiver = function(){
       $scope.caregivers = [];      
       $scope.getCaregiversForPatient(localStorage.getItem('patientID'));
-    }
+    };
 
     $scope.getPatientById = function(patientId){
       patientService.getPatientInfo(patientId).then(function(response){
         $scope.slectedPatient = response.data;
       }).catch(function(response){});
-    }
+    };
 
     $scope.getCaregiversForPatient = function(patientId){
       patientService.getCaregiversLinkedToPatient(patientId).then(function(response){
         $scope.caregivers =  response.data.caregivers;
       }).catch(function(response){});
-    }
+    };
 
     $scope.linkCaregiver = function(){
       $state.go('patientdashboardCaregiverAdd', {'patientId': localStorage.getItem('patientID')});
-    }
+    };
 
     $scope.initpatientCraegiverAdd = function(){
       $scope.getPatientById(localStorage.getItem('patientID'));
@@ -220,7 +220,7 @@ console.log("from and To dates :"+$scope.dates);
         $scope.relationships = response.data.relationshipLabels;
         $scope.associateCareGiver.relationship = $scope.relationships[0];
       }).catch(function(response) {});
-    }
+    };
 
     $scope.formSubmitCaregiver = function(){
       $scope.submitted = true;
@@ -234,7 +234,7 @@ console.log("from and To dates :"+$scope.dates);
       }else if($scope.careGiverStatus === "edit"){
         $scope.updateCaregiver(localStorage.getItem('patientID'), $stateParams.caregiverId , data);
       }
-    }
+    };
 
     $scope.associateCaregiverstoPatient = function(patientId, careGiver){
         patientService.associateCaregiversFromPatient(patientId, careGiver).then(function(response){
@@ -244,23 +244,23 @@ console.log("from and To dates :"+$scope.dates);
       }).catch(function(response){
         notyService.showMessage(response.data.ERROR,'warning' );
       });
-    }
+    };
 
     $scope.goToCaregiverEdit = function(careGiverId){
       $state.go('patientdashboardCaregiverEdit', {'caregiverId': careGiverId});
-    }
+    };
 
     $scope.disassociateCaregiver = function(caregiverId, index){
         patientService.disassociateCaregiversFromPatient(localStorage.getItem('patientID'), caregiverId).then(function(response){
         $scope.caregivers.splice(index, 1);
       }).catch(function(response){});
-    }
+    };
 
     $scope.initpatientCaregiverEdit = function(caregiverId){
       $scope.careGiverStatus = "edit";
       $scope.getPatientById(localStorage.getItem('patientID'));
       $scope.editCaregiver(caregiverId);
-    }
+    };
 
     $scope.editCaregiver = function(careGiverId){
         UserService.getState().then(function(response) {
@@ -274,7 +274,7 @@ console.log("from and To dates :"+$scope.dates);
           $scope.associateCareGiver = response.data.caregiver.user;
           $scope.associateCareGiver.relationship = response.data.caregiver.relationshipLabel;
         }).catch(function(response){});
-    }
+    };
 
     $scope.updateCaregiver = function(patientId, caregiverId , careGiver){
       var tempCaregiver = {};
@@ -296,7 +296,8 @@ console.log("from and To dates :"+$scope.dates);
         $scope.associateCareGiver = [];$scope.associateCareGiver.length = 0;
         $scope.switchPatientTab('patientdashboardCaregiver');
       }).catch(function(response){});
-    }
+    };
+
     $scope.initPatientDeviceProtocol = function(){     
       patientService.getDevices(localStorage.getItem('patientID')).then(function(response){
         angular.forEach(response.data.deviceList, function(device){
@@ -311,7 +312,8 @@ console.log("from and To dates :"+$scope.dates);
         $scope.devices = response.data.deviceList;
       }).catch(function(response){});
       $scope.getProtocols(localStorage.getItem('patientID'));    
-    }
+    };
+
     $scope.getProtocols = function(patientId){
       patientService.getProtocol(patientId).then(function(response){
         $scope.protocols = response.data.protocol;
@@ -327,18 +329,94 @@ console.log("from and To dates :"+$scope.dates);
     $scope.initPatientClinicHCPs = function(){
       $scope.getClinicsOfPatient();
       $scope.getHCPsOfPatient();
-    }
+    };
+
     $scope.getClinicsOfPatient = function(){
       patientService.getClinicsLinkedToPatient(localStorage.getItem('patientID')).then(function(response){
         $scope.clinics = response.data.clinics;                
       }).catch(function(){});
-    }
+    };
     
     $scope.getHCPsOfPatient = function(){
       patientService.getHCPsLinkedToPatient(localStorage.getItem('patientID')).then(function(response){
         $scope.hcps = response.data.hcpUsers;                
       }).catch(function(){});
-    }
+    };
+
+    $scope.getNotes = function(){
+      var date = '2015-08-21';
+      UserService.getNotesOfUser(localStorage.getItem('patientID'), date).then(function(response){
+        $scope.notes = response.data;               
+      }).catch(function(){});
+    };
+
+    $scope.updateNote = function(){
+      if($scope.editedNoteText && $scope.editedNoteText.length > 0){
+        var data = {};
+        data.noteText = $scope.editedNoteText;
+        UserService.updateNote(localStorage.getItem('patientID'), '2015-08-21', data).then(function(response){
+          $scope.notes = response.data; alert("update : "+JSON.stringify($scope.notes));               
+        }).catch(function(){
+          $scope.errorMsg = "Some internal error occurred. Please try after sometime.";
+          notyService.showMessage($scope.errorMsg,'warning' );
+          $scope.cancelEditNote();
+        });
+      }else{
+        $scope.noteError = "Please add some text.";
+      }
+    };
+
+    $scope.createNote = function(){     
+        if($scope.textNote && $scope.textNote.length > 0){
+          var data = {};
+          data.noteText = $scope.textNote;
+          data.userId = localStorage.getItem('patientID');
+          UserService.createNote(localStorage.getItem('patientID'), data).then(function(response){
+          $scope.addNote = false;
+          $scope.textNote = "";     
+          $scope.getNotes();
+        }).catch(function(){});
+      }else{
+        $scope.noteTextError = "Please add some text.";
+        return false;
+      }
+      
+    };
+
+    $scope.deleteNote = function(noteId){
+      UserService.deleteNote(noteId).then(function(response){
+      $scope.notes = "";
+      //$scope.notes.length = 0;                   
+      }).catch(function(){});
+    };
+
+    $scope.openAddNote = function(){
+      $scope.addNote = true;
+      //$("#noteText").css("display", "block");
+    };
+
+    $scope.cancelAddNote = function(){
+      $scope.addNote = false;
+      //$("#noteText").css("display", "block");
+    };
+
+    $scope.initPatientDashboard = function(){
+      $scope.editNote = false;
+      $scope.textNote = "";
+      $scope.hmrWeeklyChart();
+      $scope.getNotes();
+    };
+
+    $scope.openEditNote = function(){
+      $scope.editNote = true;
+      $scope.editedNoteText = $scope.notes.note;
+    };
+
+    $scope.cancelEditNote = function(){
+      $scope.editNote = false;
+    };
+
+
 
     $scope.init();
 

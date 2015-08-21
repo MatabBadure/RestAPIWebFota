@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
-import com.gemstone.gemfire.internal.tools.gfsh.app.commands.get;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
@@ -33,6 +33,7 @@ import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.MailService;
 import com.hillrom.vest.service.UserLoginTokenService;
 import com.hillrom.vest.service.UserService;
+import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 
 
@@ -261,6 +262,29 @@ public class AccountResource {
 			errorsJsonObject.put("ERROR", e.getMessage());
 			return ResponseEntity.badRequest().body(errorsJsonObject);
 		}
-    	
+    }
+    
+    /**
+     * PUT  /user/{id}/update_password -> update the current user's password
+     */
+    @RequestMapping(value = "/user/{id}/update_password",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<JSONObject> updatePassword(@PathVariable Long id, @RequestBody Map<String, String> passwordList) {
+        JSONObject jsonObject = new JSONObject();
+		try {
+			String message = userService.updatePassword(id, passwordList);
+			if(StringUtils.isBlank(message)){
+				jsonObject.put("ERROR", ExceptionConstants.HR_596);
+	        	return ResponseEntity.badRequest().body(jsonObject);
+	        }
+			jsonObject.put("message", message);
+	        return ResponseEntity.ok().body(jsonObject);
+		} catch (HillromException e) {
+			jsonObject.put("ERROR",e.getMessage()); 
+			return ResponseEntity.badRequest().body(jsonObject);
+		}
+        
     }
 }

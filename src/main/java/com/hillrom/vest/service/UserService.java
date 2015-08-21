@@ -264,6 +264,28 @@ public class UserService {
     	return jsonObject;
     }
     
+    public String updatePassword(Long id, Map<String, String> passwordList) throws HillromException {
+    	Optional<User> user = userRepository.findOneByEmail(SecurityUtils.getCurrentLogin());
+    	if(user.isPresent()){
+			String encryptedNewPassword = passwordEncoder.encode(passwordList.get("newPassword"));
+			if(passwordEncoder.matches(passwordList.get("password"), user.get().getPassword())) {
+				if(!checkPasswordLength(passwordList.get("newPassword"))){
+		    		throw new HillromException(ExceptionConstants.HR_598);
+		    	}else{
+		    		user.get().setPassword(encryptedNewPassword);
+	    			userRepository.save(user.get());
+	    			eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.get().getId()));
+	    			log.debug("Changed password for User: {}", user.get());
+	    			return MessageConstants.HR_294;
+		    	}
+			} else {
+				throw new HillromException(ExceptionConstants.HR_597);
+			}
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);
+		}
+    }
+    
     @Transactional(readOnly = true)
     public User getUserWithAuthorities() {
         User currentUser = userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).get();

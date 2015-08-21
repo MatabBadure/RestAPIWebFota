@@ -11,3 +11,12 @@ var admin = {
 		patients : 'api/patients'
 	}
 }
+
+var patient = {
+	notification : {
+		updateNotificationStatus : 'api/notifications'
+	},
+	graph : {
+		baseURL : 'api/users'
+	}
+}

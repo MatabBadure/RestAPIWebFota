@@ -203,5 +203,9 @@ public class PatientProtocolService {
 			throw new HillromException(ExceptionConstants.HR_512);
      	}
     }
+	
+	public List<PatientProtocolData> findOneByPatientUserIdAndStatus(Long PatientUserId,boolean isDeleted){
+		return patientProtocolRepository.findByPatientUserIdAndDeleted(PatientUserId, isDeleted);
+	} 
 }
 

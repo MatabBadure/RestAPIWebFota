@@ -1,0 +1,135 @@
+<hcp-navbar></hcp-navbar>
+
+<div class="container admin-user">
+  <div class="col-md-16 admin-views">
+    <span class="admin-views--title">
+      {{doctor.title}} {{doctor.firstName}} {{doctor.middleName}} {{doctor.lastName}}
+    </span>
+  </div>
+
+  <div class="col-md-16 user-detail-info">
+    <div class="col-md-5 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="doctor.credentials"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value">{{doctor.credentials}}</span>
+    </div>
+    <div class="col-md-6 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="doctor.npiNumber"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value">{{doctor.npiNumber}}</span>
+    </div>
+    <!-- <div class="col-md-5 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="doctor.clinic-name"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value" ng-repeat="clinic in doctor.clinics">{{clinic.name}}</span>
+    </div> -->
+    <div class="col-md-5 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="doctor.speciality"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value">{{doctor.speciality}}</span>
+    </div>
+
+    <div class="col-md-5 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="doctor.city"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value">{{doctor.city}}</span>
+    </div>
+    <div class="col-md-6 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="doctor.state"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value">{{doctor.state}}</span>
+    </div>
+    <div class="col-md-5 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="doctor.status"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span ng-if="doctor.activated" class="user-detail-info__data--value">Active</span>
+      <span ng-if="!doctor.activated" class="user-detail-info__data--value">Inactive</span>
+    </div>
+    <div class="col-md-5 user-detail-info__data">
+      <span class="user-detail-info__data--key" translate="doctor.clinic-name"></span>
+      <span class="user-detail-info__data--key">:</span>
+      <span class="user-detail-info__data--value" ng-repeat="clinic in doctor.clinics">{{clinic.name}}</br></span>
+    </div>
+  </div>
+</div>
+
+
+<div class="container admin-user">
+  <div class="col-md-16 admin-views">
+    <span class="admin-views" translate="patient.clinic-assos"></span>
+  </div>
+</div>
+
+<div class="dashboard dashboard--content">
+  <div class="container dashboard__manage-view margin-top-xl">
+    <div class="dashboard__manage-view--search">
+      <div class="fuid-search-box reset-padding-right">
+        <input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" autocomplete="off" placeholder="{{'doctor.placeholder.search' | translate}}">
+        <span class="search-icon hillrom-icon icon-search-icon"></span>
+      </div>
+      <div class="fixed-filter-box reset-padding-left">
+        <div class="search-dropdown">
+          <select ng-model="sortOption" ng-change="getPatientsByClinic()">
+              <option ng-selected="{{hcpClinic.clinicId == sortOption}}"
+                      ng-repeat="hcpClinic in clinicList"
+                      value="{{hcpClinic.clinicId}}">
+                {{hcpClinic.name}}
+              </option>
+          </select>
+          <!-- <select name="search" ng-model="sortOption" ng-change="searchDoctors()">
+            <option value="" selected>All</option>
+            <option value="email">Clinics</option>
+          </select> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container admin-user">
+  <div class="col-md-16 detail-list">
+    <div class="col-md-4 detail-list--title">
+      <span>Name </span>
+    </div>
+    <div class="col-md-2 detail-list--desc">
+      <span>HillromId</span>
+    </div>
+    <div class="col-md-2 detail-list--desc">
+      <span>City</span>
+    </div>
+    <div class="col-md-1 detail-list--desc">
+      <span>State</span>
+    </div>
+    <div class="col-md-2 detail-list--desc">
+      <span>Phone</span>
+    </div>
+    <div class="col-md-2 detail-list--desc">
+      <span>Transmission</span>
+    </div>
+  </div>
+  <div class="col-md-16 detail-list"  ng-repeat="patient in patients">
+    <div class="col-md-4 detail-list--title">
+      <span>{{patient.patientUser.firstName}} &nbsp;{{patient.patientUser.middleName}} &nbsp;{{patient.patientUser.lastName}} </span>
+      <br><span class="user-email">{{patient.patientUser.dob}}</span>
+    </div>
+    <div class="col-md-2 detail-list--desc">
+      <span>{{patient.patientUser.hillromId}}</span>
+    </div>
+    <div class="col-md-2 detail-list--desc">
+      <span>{{patient.patientUser.city}}</span>
+    </div>
+    <div class="col-md-1 detail-list--desc">
+      <span>{{patient.patientUser.state}}</span>
+    </div>
+    <div class="col-md-2 detail-list--desc">
+      <span>{{patient.patientUser.primaryPhone}}</span>
+    </div>
+    <div class="col-md-2 detail-list--desc">
+      <span></span>
+    </div>
+  </div>
+
+  <div class="col-md-16 reset-padding margin-bottom-xl">
+    <!-- <buton class="hillrom-btn btn-inactive float-right" ng-click="viewAssociatedPatients()" translate="patient.link-clinic"></buton> -->
+  </div>
+</div>

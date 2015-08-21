@@ -1,10 +1,14 @@
 package com.hillrom.vest.service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -14,8 +18,12 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 
+import com.hillrom.vest.domain.PatientCompliance;
+import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
+import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 
@@ -26,52 +34,75 @@ public class TherapySessionService {
 	private static final String GROUP_BY_YEARLY = "yearly";
 	private static final String GROUP_BY_MONTHLY = "monthly";
 	private static final String GROUP_BY_WEEKLY = "weekly";
+	
 	@Inject
 	private TherapySessionRepository therapySessionRepository;
 	
-	public List<TherapySession> saveOrUpdate(List<TherapySession> therapySessions){
+	@Inject
+	private AdherenceCalculationService adherenceCalculationService;
+	
+	@Inject
+	private PatientComplianceRepository complianceRepository;
+	
+	public List<TherapySession> saveOrUpdate(List<TherapySession> therapySessions) throws HillromException{
 		User patientUser = therapySessions.get(0).getPatientUser();
-		List<TherapySession> existingTherapySessions =  therapySessionRepository.findByPatientUserId(patientUser.getId());
+		removeExistingTherapySessions(therapySessions, patientUser);
+		Map<Integer, List<TherapySession>> groupedTherapySessions = therapySessions
+				.stream()
+				.collect(
+						Collectors
+								.groupingBy(TherapySession::getTherapyDayOfTheYear));
+		
+		SortedSet<Integer> daysInSortOrder = new TreeSet<>(groupedTherapySessions.keySet());
+		for(Integer day : daysInSortOrder){
+			List<TherapySession> therapySessionsPerDay = groupedTherapySessions.get(day);
+			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId());
+			PatientCompliance compliance =  adherenceCalculationService.calculateCompliancePerDay(therapySessionsPerDay,protocol);
+			complianceRepository.save(compliance);
+			therapySessionRepository.save(therapySessionsPerDay);
+		}
+		return therapySessions;
+	}
+
+	public void removeExistingTherapySessions(
+			List<TherapySession> therapySessions, User patientUser) {
+		TherapySession latestTherapySession =  therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(patientUser.getId());
 		// Removing existing therapySessions from DB
-		if(existingTherapySessions.size() > 0){
-			TherapySession latestThreapySession = existingTherapySessions.get(0);
+		if(Objects.nonNull(latestTherapySession)){
 			Iterator<TherapySession> tpsIterator = therapySessions.iterator();
 			while(tpsIterator.hasNext()){
 				TherapySession tps = tpsIterator.next();
 				// Remove previous therapy Sessions
 				int tpsDayOfYear = tps.getDate().getDayOfYear();
-				int latestTpsDayOfYear = latestThreapySession.getDate().getDayOfYear();
+				int latestTpsDayOfYear = latestTherapySession.getDate().getDayOfYear();
 				if(tpsDayOfYear < latestTpsDayOfYear){
 					tpsIterator.remove();
 					//Remove previous therapySessions of the same day.
 				} else {
-					Integer tpsSessionNo = tps.getSessionNo();
-					Integer latestTpsSessionNo = latestThreapySession.getSessionNo();
-					if(tpsDayOfYear == latestTpsDayOfYear && tpsSessionNo <= latestTpsSessionNo){
+					DateTime tpsStartTime = tps.getStartTime();
+					DateTime latestTpsEndTimeFromDB = latestTherapySession.getEndTime();
+					if(tpsDayOfYear == latestTpsDayOfYear && tpsStartTime.isBefore(latestTpsEndTimeFromDB)){
 						tpsIterator.remove();
 					}
 				}
 			}
 		}
-		return therapySessionRepository.save(therapySessions);
 	}
 	
-	public List<TherapyDataVO> findByPatientUserIdAndDateRange(Long id,Long fromTimestamp,Long toTimestamp,String groupBy){
+	public List<TherapyDataVO> findByPatientUserIdAndDateRange(Long patientUserId,Long fromTimestamp,Long toTimestamp,String groupBy){
 		List<TherapySession> sessions = therapySessionRepository
-				.findByPatientUserIdAndDateRange(id,
+				.findByPatientUserIdAndDateRange(patientUserId,
 						LocalDate.fromDateFields(new Date(fromTimestamp)),
 						LocalDate.fromDateFields(new Date(toTimestamp)));
+		Map<Integer,List<TherapySession>> groupedSessions = new HashMap<>();
 		if(GROUP_BY_WEEKLY.equalsIgnoreCase(groupBy)){
-			Map<Integer,List<TherapySession>> groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getDayOfTheWeek));
-			return (List<TherapyDataVO>) calculateWeightedAvgs(groupedSessions); 
+			groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getDayOfTheWeek));
 		}else if(GROUP_BY_MONTHLY.equals(groupBy)){
-			Map<Integer,List<TherapySession>> groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getWeekOfYear));
-			return (List<TherapyDataVO>) calculateWeightedAvgs(groupedSessions);
+			groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getWeekOfYear));
 		}else if(GROUP_BY_YEARLY.equals(groupBy)){
-			Map<Integer,List<TherapySession>> groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getMonthOfTheYear));
-			return (List<TherapyDataVO>) calculateWeightedAvgs(groupedSessions);
+			groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getMonthOfTheYear));
 		}
-		return null;
+		return calculateWeightedAvgs(groupedSessions);
 	}
 
 	public List<TherapySession> findByPatientUserIdAndDate(Long id,Long timestamp){
@@ -81,11 +112,14 @@ public class TherapySessionService {
 	private List<TherapyDataVO> calculateWeightedAvgs(
 			Map<Integer, List<TherapySession>> groupedSessions) {
 		List<TherapyDataVO> processedData = new LinkedList<>();
-		
+
 		for(Integer key : groupedSessions.keySet()){
 			List<TherapySession> sessions = groupedSessions.get(key);
+			int size = sessions.size();
+			int seconds = 60;
 			DateTime start = sessions.get(0).getStartTime();
-			DateTime end = sessions.get(sessions.size()-1).getEndTime();
+			DateTime end = sessions.get(size-1).getEndTime();
+			Double hmr = sessions.get(size-1).getHmr()/seconds;
 			TherapyDataVO vo = new TherapyDataVO();
 			Long totalDuration = sessions.stream().collect(Collectors.summingLong(TherapySession::getDurationInMinutes));
 			double weightedAvgFrequency = 0.0d,weightedAvgPressure = 0.0d;
@@ -111,8 +145,26 @@ public class TherapySessionService {
 			vo.setTimestamp(start.toDateTime());
 			vo.setTreatmentsPerDay(treatmentsPerDay);
 			vo.setDuration(totalDuration.intValue());
+			vo.setHmr(hmr);
 			processedData.add(vo);
 		}
 		return processedData;
+	}
+	
+	public int getMissedTherapyCountByPatientUserId(Long id){
+		TherapySession latestTherapySession = therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(id);
+		if(Objects.nonNull(latestTherapySession)){
+			LocalDate today = LocalDate.now();
+			int days = 0;
+			LocalDate latestSessionDate = latestTherapySession.getDate();
+			if(Objects.isNull(latestSessionDate))
+				return 0;
+			while(today.isAfter(latestSessionDate)){
+				latestSessionDate = latestSessionDate.plusDays(1);
+				++days;
+			}
+			return days;
+		}
+		return 0;
 	}
 }

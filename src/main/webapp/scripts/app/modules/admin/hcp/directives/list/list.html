@@ -2,7 +2,7 @@
 <div class="navbar dashboard dashbord-nav">
     <div class="container">
       <div class="dashbord-nav__primary pull-left">
-        <span class="dashbord-nav__primary--title" translate="doctor.home.manageLabel">Manage Doctors</span>
+        <span class="dashbord-nav__primary--title" translate="doctor.home.manageLabel">Manage HCP</span>
       </div>
 
       <div class="dashbord-nav__secondary create-user navbar-right cursor-pointer" ng-click="createDoctor()">
@@ -45,7 +45,7 @@
           </div>
           <div class="col-md-5 reset-padding-right">
             <span >{{doctor.primaryPhone}}</span>
-            <span >{{doctor.speciality}} {{doctor.credentials}}</span> 
+            <span >{{doctor.speciality}} {{doctor.credentials}}</span>
           </div>
           <div class="clr"></div>
        </div>
@@ -53,8 +53,8 @@
       <div class="dashboard__manage-view--pagination">
         <div class="col-md-16 reset-padding-right">
           <div class="navbar-right">
-            <span class="record-found">{{total}} Doctors</span>
-            <span class="record-found">Found</span>
+            <span class="record-found" ng-if="doctors.length > 0">{{doctors.length}} Doctors</span>
+            <span class="record-found" ng-if="doctors.length > 0">Found</span>
             <span ng-show="pageCount > 1">
               <span class="navigaion-link cursor-pointer" ng-class="{ 'inactive': !(currentPageIndex > 1) }" ng-click="searchDoctors('PREV')">Previous</span>
               <span class="navigaion-no">{{currentPageIndex}}</span>

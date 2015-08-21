@@ -24,8 +24,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
+import com.gemstone.gemfire.internal.tools.gfsh.app.commands.get;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.User;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.MailService;
@@ -160,11 +162,18 @@ public class AccountResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<JSONObject> changePassword(@RequestBody String password) {
-        JSONObject jsonObject = userService.changePassword(password);
-        if(jsonObject.containsKey("ERROR")){
-        	return ResponseEntity.badRequest().body(jsonObject);
-        }
-        return ResponseEntity.ok().body(jsonObject);
+        JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject = userService.changePassword(password);
+			if(jsonObject.containsKey("ERROR")){
+	        	return ResponseEntity.badRequest().body(jsonObject);
+	        }
+	        return ResponseEntity.ok().body(jsonObject);
+		} catch (HillromException e) {
+			jsonObject.put("ERROR",e.getMessage()); 
+			return ResponseEntity.badRequest().body(jsonObject);
+		}
+        
     }
 
     @RequestMapping(value = "/account/reset_password/init",
@@ -193,12 +202,19 @@ public class AccountResource {
     @Timed
     public ResponseEntity<JSONObject> finishPasswordReset(@RequestParam(value = "key") String key, @RequestBody(required=true) Map<String,String> body) {
         body.put("key", key);
-        JSONObject jsonObject = userService.completePasswordReset(body);
-        if(jsonObject.containsKey("ERROR")){
-        	return ResponseEntity.badRequest().body(jsonObject);
-        }else{
-        	return ResponseEntity.ok().body(jsonObject);
-        }
+        JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject = userService.completePasswordReset(body);
+			if(jsonObject.containsKey("ERROR")){
+	        	return ResponseEntity.badRequest().body(jsonObject);
+	        }else{
+	        	return ResponseEntity.ok().body(jsonObject);
+	        }
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return ResponseEntity.badRequest().body(jsonObject);
+		}
+        
     }
 
     private boolean checkPasswordLength(String password) {
@@ -214,10 +230,17 @@ public class AccountResource {
     @Timed
     public ResponseEntity<JSONObject> updateEmailOrPassword(@RequestBody(required=true) Map<String,String> params,@RequestHeader(value="x-auth-token",required=true)String authToken) {
     	params.put("x-auth-token", authToken);
-    	JSONObject errorsJsonObject = userService.updateEmailOrPassword(params);
-    	if(null != errorsJsonObject.get("ERROR"))
-    		return ResponseEntity.badRequest().body(errorsJsonObject);
-        return new ResponseEntity<>(HttpStatus.OK);
+    	JSONObject errorsJsonObject = new JSONObject();
+		try {
+			errorsJsonObject = userService.updateEmailOrPassword(params);
+			if(null != errorsJsonObject.get("ERROR"))
+	    		return ResponseEntity.badRequest().body(errorsJsonObject);
+	        return new ResponseEntity<>(HttpStatus.OK);
+		} catch (HillromException e) {
+			errorsJsonObject.put("ERROR", e.getMessage());			
+			return ResponseEntity.badRequest().body(errorsJsonObject);
+		}
+    	
     }
     
     /**
@@ -228,9 +251,16 @@ public class AccountResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<JSONObject> updatePasswordSecurityQuestion(@RequestBody(required=true) Map<String,String> params) {
-    	JSONObject errorsJsonObject = userService.updatePasswordSecurityQuestion(params);
-    	if(null != errorsJsonObject.get("ERROR"))
-    		return ResponseEntity.badRequest().body(errorsJsonObject);
-        return new ResponseEntity<>(HttpStatus.OK);
+    	JSONObject errorsJsonObject = new JSONObject();
+		try {
+			errorsJsonObject = userService.updatePasswordSecurityQuestion(params);
+			if(null != errorsJsonObject.get("ERROR"))
+	    		return ResponseEntity.badRequest().body(errorsJsonObject);
+	        return new ResponseEntity<>(HttpStatus.OK);
+		} catch (HillromException e) {
+			errorsJsonObject.put("ERROR", e.getMessage());
+			return ResponseEntity.badRequest().body(errorsJsonObject);
+		}
+    	
     }
 }

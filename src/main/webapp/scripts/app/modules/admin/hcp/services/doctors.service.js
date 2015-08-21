@@ -10,16 +10,13 @@ angular.module('hillromvestApp')
     var token = localStorage.getItem('token');
     return {
 
-      
-
-     
       /**
       * @ngdoc method
       * @name editUser
       * @description
       *
       */
-      
+
       getDoctorsList : function(searchString, pageNo, offset){
         return $http.get('api/user/hcp/search?searchString=' + searchString + '&page=' + pageNo + '&per_page=' + offset, {
           headers: {
@@ -60,14 +57,36 @@ angular.module('hillromvestApp')
         var url = 'api/clinics/hcp';
         url = url + '?filter=';
         var flag = false;
-        angular.forEach(filterArray, function(filter) {
+        angular.forEach(filterArray, function(filter, index) {
+
                 if (flag === true){
-                  url = url + ',id:' + filter.id;
+                  url = url + ',id:' + filterArray[index];
                 } else{
-                  url = url + 'id:' + filter.id;
+                  url = url + 'id:' + filterArray[index];
                 }
                 flag = true;
         });
+        return $http.get(url , {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
+      getPatientsAssociatedToHCP: function(doctorId, clinicId){
+        var url="/api/hcp/"+doctorId+"/patients?filterByClinic=";
+        if(clinicId != null){
+          url = url + ""+clinicId;
+        }
+        return $http.get(url , {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
+      getClinicsAssociatedToHCP : function(doctorId){
+        var url ='/api/hcp/'+doctorId+'/clinics';
         return $http.get(url , {
           headers: headerService.getHeader()
         }).success(function (response) {

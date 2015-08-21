@@ -8,25 +8,25 @@
 							<div class="stats_header"><h4>Statistics</h4></div>
 							<div class="stats_chart_container">
 								<div class="col-3">
-									<div class="pie_chart" easypiechart options="adherence" percent="percent1"></div>
+									<div class="pie_chart" easypiechart options="adherence" percent="adherenceScore"></div>
 									<div class="stats_chart_content score">
-										<h4 class="percent">30</h4>
+										<h4 class="percent">{{adherenceScore}}</h4>
 										<p class="descrip">Adherence Score</p>
 									</div>
-									<div class="chart_inner_icon icon-lungs"></div>
+									<div class="chart_inner_icon icon-adherence"></div>
 								</div>
 								<div class="col-3">
-									<div class="pie_chart"  easypiechart options="hmr" percent="percent2"></div>
+									<div class="pie_chart"  easypiechart options="hmr" percent="hmrRunRate"></div>
 									<div class="stats_chart_content hmr">
-										<h4 class="percent">75</h4>
+										<h4 class="percent">{{hmrRunRate}}</h4>
 										<p class="descrip">HMR Runrate</p>
 									</div>
-									<div class="chart_inner_icon icon-lungs"></div>
+									<div class="chart_inner_icon icon-man-running"></div>
 								</div>
 								<div class="col-3">
-									<div class="pie_chart"  easypiechart options="missedtherapy" percent="percent3"></div>
+									<div class="pie_chart"  easypiechart options="missedtherapy" percent="missedtherapyDays"></div>
 									<div class="stats_chart_content missed">
-										<h4 class="percent">24</h4>
+										<h4 class="percent">{{missedtherapyDays}}</h4>
 										<p class="descrip">Missed Therapy Days</p>
 									</div>
 									<div class="chart_inner_icon icon-lungs"></div>
@@ -52,8 +52,8 @@
 					<div class="col-md-5 left_header_barchart">
 						<div class="row">
 							<ul class="nav nav-pills">
-							<li><a href="" ng-click="HMRGraph()">HMR Data</a></li>
-							<li><a href="" ng-click="complianceGraph()">Compliance</a></li>
+							<li><a href="" ng-click="showHmrGraph()">HMR Data</a></li>
+							<li><a href="" ng-click="showComplianceGraph()">Compliance</a></li>
 						</ul>
 						<!-- <span ng-click="HMRGraph()">HMR Data</span>
 						<span ng-click="complianceGraph()">Compliance</span> -->
@@ -61,11 +61,11 @@
 					</div>
 					<div class="col-md-11 right_header_barchart">
 						<ul class="nav nav-pills pull-right ">
-							<li role="presentation" class=""><a href="" ng-click="hmrDailyChart()">Day</a></li>
-							<li role="presentation" class=""><a href="" ng-click="hmrWeeklyChart()">Week</a></li>
-							<li role="presentation" class=""><a href="" ng-click="hmrMonthlyChart()">Month</a></li>
-							<li role="presentation" class=""><a href="" ng-click="hmrYearlyChart()">Year</a></li>
-							<li role="presentation" class="" id="dp3"><a href="" date-range-picker class="date-picker" ng-model="dates" parentEl="#dp3" options="{'opens': 'left', 'parentEl': '#dp3'}">Date</a></li>
+							<li role="presentation" class=""><a href="" ng-hide="complianceGraph" ng-click="dayChart()">Day</a></li>
+							<li role="presentation" class=""><a href="" ng-click="weeklyChart()">Week</a></li>
+							<li role="presentation" class=""><a href="" ng-click="monthlyChart()">Month</a></li>
+							<li role="presentation" class=""><a href="" ng-click="yearlyChart()">Year</a></li>
+							<li role="presentation" class="" id="dp3"><a href="" date-range-picker class="date-picker" ng-model="dates" parentEl="#dp3" options="opts" >Date</a></li>
 						</ul>
 					</div>
 					<!-- <div>
@@ -77,32 +77,84 @@
 					</div>-->	
 				</div>
 				<div class="pull-right week_date_container">
-					<span class="date">08/09/2015</span> - <span class="date">08/15/2015</span>
+					<span ng-if="fromDate !== toDate"> 
+							<span class="date">{{fromDate}}</span> - <span class="date">{{toDate}}</span>
+					</span>
+					<span ng-if="fromDate === toDate" class="date">{{fromDate}}<span>
 				</div>	
 			</div>
+		</div>
+		<style>
+		text {
+		font: 12px sans-serif;
+		}
+		svg {
+		display: block;
+		}
+		html, body, #complianceGraph, svg {
+		margin: 0px;
+		padding: 0px;
+		height: 100%;
+		width: 100%;
+		}
+}
+		</style>
+	<div ng-if="hmrGraph">
+		<div ng-if="hmrLineGraph">
+	 		<nvd3-line-chart
+	    	  data="graphData"
+	        id="HMRLineGraph"
+	        width="1250"
+	        height="350"
+	        showXAxis="true"
+	        showYAxis="true"
+	        legends="true"
+	        interactive="true"
+	        tooltips="true"
+	        isArea="true"
+	        interpolate="step-before"
+	        yAxisLabel="Minutes"
+          margin="{left:100,top:20,bottom:20,right:10}"
+	        xAxisTickFormat="xAxisTickFormatFunction(format)"
+	        xAxisTickValues="xAxisTickValuesFunction()"
+	        noData="No Data Found!"
+	        objectEquality="true"
+	        tooltipcontent="toolTipContentFunction()">
+	        <svg></svg>
+	    </nvd3-line-chart>
+	  </div>
+	  <div ng-if="hmrBarGraph">
+		 	<nvd3-multi-bar-chart
+		    	data="graphData"
+	        id="hmrBarGraph"
+	        width="1250"
+	        height="300"
+	        showXAxis="true"
+	        showYAxis="true"
+	        interactive="true"
+	        tooltips="true"
+	        isArea="true"
+	        yAxisLabel="Minutes"
+	        margin="{left:100,top:20,bottom:20,right:10}"
+	        xAxisTickFormat="xAxisTickFormatFunction(format)"
+	        xAxisTickValues="xAxisTickValuesBarChart()"
+	        noData="No Data Found!"
+	        objectEquality="true"
+	        tooltipcontent="toolTipContentBarChart()">
+	        <svg></svg>
+		  </nvd3-multi-bar-chart>
+	  </div>
+	</div>
+	  <div ng-if="complianceGraph">
+	  	<div>
+	  		 <input type="radio" name="secondaryYaxis" ng-model="compliance.secondaryYaxis" value='pressure' ng-change="reCreateComplianceGraph()">Pressure
+				 <input type="radio" name="secondaryYaxis" ng-model="compliance.secondaryYaxis" value='frequency' ng-change="reCreateComplianceGraph()">Frequency
+	  	</div>
+	  	<div id="complianceGraph">
+      	<svg style="height:350px"> </svg>
+    	</div>
+	  </div>
  		<!-- <nvd3 options="options" data="data"></nvd3> -->
-
-	 		<div class="col-md-16">
-				<nvd3-line-chart
-				data="graphData"
-				id="HMRGraph"
-				class="dashboard_line_graph"
-				width="1250"
-				height="350"
-				showXAxis="false"
-				showYAxis="true"
-				legends="true"
-				interactive="true"
-				tooltips="true"
-				isArea="true"
-				interpolate="step-after"
-				objectEquality="true"
-				yAxisLabel="Minutes"
-				xAxisTickFormat="xAxisTickFormatFunction()"
-				xAxisTickValues="xAxisTickValuesFunction()"
-				tooltipcontent="toolTipContentFunction()">
-				</nvd3-line-chart>
-	 		</div>
 	 		<div class="col-md-16">
 	 		<div class="btn_group patient_dashdoard_btns">
 	 			<button class="hillrom-btn btn-submit float-right">Note</button>
@@ -133,14 +185,15 @@
 	 								<div class="pull-right" ng-show="!editNote">
 	 									<span class="edit icon" styel="cursor:pointer;" ng-click="openEditNote();">Edit</span>
 	 									<span class="delete icon" styel="cursor:pointer;" ng-click="deleteNote(notes.id);">Delete</span>
+
 	 								</div>
 	 							</div>
  							</div>
  						</div> 									
 	 				</div>
 
-	 				<div class="btn_group patient_dashdoard_btns">
-	 					<!-- Adding area to add note-->
+	 				<!-- <div class="btn_group patient_dashdoard_btns">
+	 					
  						<div class="col-md-16 notes_row" id="noteText"  ng-show="notes.length <= 0 && addNote">
  							<form name="form" ng-submit="createNote();">
  							<div class="notes_row_wrapper">
@@ -158,18 +211,42 @@
 	 								<div class="pull-right">
 	 									<input type="submit" id="addNode" value="Save" />
 	 									<input type="button" id="cancel" value="Cancel" ng-click="cancelAddNote();" />
-	 									<!-- <span class="save icon" ng-click="createNote();" style="cursor:pointer;" >Save</span>
-	 									<span class="delete icon" style="cursor:pointer;">Cancel</span> -->
+	 									
 	 								</div>
 	 							</div>
  							</div>
  							</form>
  						</div>
- 						<!-- Adding area to add note-->
+ 				
 			 			<button class="hillrom-btn btn-submit float-right" ng-click="openAddNote();" ng-show="notes.length <= 0">Add Note</button>
+
+	 				</div> -->
+	 				<div class="col-md-16 note_edit_container" ng-show="notes.length <= 0 && addNote">
+	 					<form name="form" ng-submit="createNote();">
+						<div class="col-md-2 date_col">
+						<input class="date_input" type="text" validate-on-blur value="" ng-model="patient.formatedDOB" ng-readonly="validateADMINorASP()" data-date-format="mm/dd/yy" id="edit_date"></div>
+						<div class="col-md-12 description">
+							<div class="form-group">
+							  <textarea class="form-control custom_textarea" rows="1" id="comment" ng-model="textNote"></textarea>
+							</div>
+							<div>
+								<span class="has-error" ng-if="noteTextError">
+				                  {{noteTextError}}
+				                </span>
+							</div>
+						</div>
+						<div class="col-md-2 edit_delete">
+							<div class="pull-right">
+			 					<span class="float-right view_all_btn" ng-click="cancelAddNote();">X</span>
+								<button class="hillrom-btn btn-submit float-right save">save</button>
+							</div>
+						</div>
+						</form>
+	 				</div>
+	 				<div class="btn_group patient_dashdoard_btns">
+			 			<button class="hillrom-btn btn-submit float-right" ng-click="openAddNote();">Add Note</button>
 			 			<span class="float-right view_all_btn">View All</span>
 	 				</div>
-
 	 			</div>
 	 		</div>
 		</div>

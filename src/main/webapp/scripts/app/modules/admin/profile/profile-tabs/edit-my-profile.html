@@ -1,5 +1,6 @@
+<admin-profile-navbar></admin-profile-navbar>
 <div class="dashboard dashboard--content padding-bottom-ls">
-  <form name="form" ng-submit="createUser()" novalidate autocomplete="off">
+  <form name="form" ng-submit="updateProfile()" novalidate autocomplete="off">
     <div class="container dashboard__form">
       <div class="margin-top-xl">
         <div class="col-md-16 reset-padding margin-top">
@@ -9,10 +10,10 @@
             </div>
             <div class="col-md-10 dashboard__form__input reset-padding selected-box-container">
               <div class="custom-dropdown">
-                <select ng-model="profile.title" name="title" ng-readonly="validateSuperAdmin()" ng-options="option for option in ['Mr.', 'Mrs.', 'Ms.']" ng-selected="{{option === user.title}}">
-                  <option selected translate="user.title.mr" value="Mr."></option>
+                <select ng-model="user.title" name="title" ng-readonly="validateSuperAdmin()" ng-options="option for option in ['Mr.', 'Mrs.', 'Ms.']" ng-selected="{{option === user.title}}">
+                  <!-- <option selected translate="user.title.mr" value="Mr."></option>
                   <option translate="profile.title.mrs" value="Mrs."></option>
-                  <option translate="profile.title.miss" value="Miss"></option>
+                  <option translate="profile.title.miss" value="Miss"></option> -->
                 </select>
               </div>
             </div>
@@ -136,7 +137,7 @@
             </div>
             <div class="col-md-10 dashboard__form__input--option reset-padding">
               <div class="custom-dropdown">
-                <select name="role" validate-on-blur ng-model="profile.role" ng-readonly="validateSuperAdmin()" required>
+                <select name="role" validate-on-blur ng-model="user.authorities[0].name" ng-readonly="validateSuperAdmin()" required>
                   <option selected value="" translate="profile.role.default">Select a Role</option>
                   <option translate="profile.role.super-admin" value="ADMIN">Super Admin</option>
                   <option translate="profile.role.account-services" value="ACCT_SERVICES">Account Services</option>
@@ -171,7 +172,7 @@
       </div>
       <div class="col-md-16 reset-padding margin-top">
         <div class="">
-        <button type="submit" class="hillrom-btn btn-submit float-right" ng-click="formSubmit()" ng-show="!userStatus.isCreate" translate="profile.update-button-text">Update</button>
+        <button type="submit" class="hillrom-btn btn-submit float-right" ng-show="!userStatus.isCreate" translate="profile.update-button-text">Update</button>
           <button type="reset" ng-click="cancel()" ng-show="!userStatus.isCreate" class="hillrom-btn btn-submit float-right" translate="profile.cancel-button-text">Cancel</button>
           <div class="clr"></div>
         </div>

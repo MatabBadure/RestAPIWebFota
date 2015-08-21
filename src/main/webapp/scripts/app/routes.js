@@ -789,7 +789,7 @@ angular.module('hillromvestApp')
                 }
             })
 
-            .state('profile', {
+            .state('adminProfile', {
                 parent: 'admin',
                 url: '/profile',
                 data: {
@@ -798,8 +798,8 @@ angular.module('hillromvestApp')
                 },
                 views: {
                     'content@': {
-                        templateUrl: 'scripts/app/modules/admin/profile/navbar/navbar.html',
-                        controller: 'graphController'
+                        templateUrl: 'scripts/app/modules/admin/profile/profile-tabs/my-profile.html',
+                        controller: 'adminProfileController'
                     }
                 },
                 resolve: {
@@ -814,6 +814,49 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
+
+            .state('editAdminProfile', {
+                parent: 'adminProfile',
+                url: '/{adminId}',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/profile/profile-tabs/edit-my-profile.html',
+                        controller: 'adminProfileController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('profile');
+                        return $translate.refresh();
+                    }]
+                }
+            })
+
+            .state('adminUpdatePassword', {
+                parent: 'adminProfile',
+                url: '/updatepassword',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/profile/profile-tabs/update-password.html',
+                        controller: 'adminProfileController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('profile');
+                        return $translate.refresh();
+                    }]
+                }
+            })
+
             .state('profilePassword', {
                 parent: 'profile',
                 url: '/password',

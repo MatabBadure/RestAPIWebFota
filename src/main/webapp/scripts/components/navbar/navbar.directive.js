@@ -79,7 +79,7 @@ angular.module('hillromvestApp')
       };
 
       $scope.account = function(){
-        $state.go('profile');
+        $state.go('adminProfile');
       };
     }
   };

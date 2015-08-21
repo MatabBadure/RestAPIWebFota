@@ -445,7 +445,7 @@ public class UserService {
     	} else if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updatePatientUser(id, userExtensionDTO);
     		if(user.getId() != null) {
-    			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
+    			if(StringUtils.isNoneEmpty(userExtensionDTO.getEmail()) && !user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
     				mailService.sendActivationEmail(user, baseUrl);
     	    		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
     			}

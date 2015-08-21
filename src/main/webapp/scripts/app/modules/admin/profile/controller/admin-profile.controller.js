@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .controller('adminProfileController', function ($rootScope, $scope, $state, $stateParams, $location, notyService, UserService) {
+  .controller('adminProfileController', function ($rootScope, $scope, $state, $stateParams, $location, notyService, UserService, Password, Auth) {
 
 
     $scope.isActive = function(tab) {
@@ -26,11 +26,8 @@ angular.module('hillromvestApp')
     };
 
     $scope.editMode = function(){
-      $state.go('editAdminProfile', {'adminId': 10});
+      $state.go('editAdminProfile');
     };
-
-    // $scope.getAdminDetails = function(){
-    // };
 
     $scope.switchProfileTab = function(status){
       $state.go(status);
@@ -42,6 +39,19 @@ angular.module('hillromvestApp')
         $state.go('adminProfile');
       }).catch(function(response){
         notyService.showMessage(response.data.message, 'warning');
+      });
+    };
+
+    $scope.updatePassword = function(){
+      var data = {
+        'password': $scope.profile.password,
+        'newPassword': $scope.profile.newPassword
+      };
+      Password.updatePassword(localStorage.getItem('userId'), data).then(function(response){
+        $state.go('login');
+        notyService.showMessage(response.data.message, 'success');
+      }).catch(function(response){
+        notyService.showMessage(response.data.error, 'warning');
       });
     };
 

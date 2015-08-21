@@ -817,7 +817,7 @@ angular.module('hillromvestApp')
 
             .state('editAdminProfile', {
                 parent: 'adminProfile',
-                url: '/{adminId}',
+                url: '/update',
                 data: {
                     roles: ['ADMIN'],
                     pageTitle: 'patient.title'

@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -65,22 +66,21 @@ public class TherapySessionService {
 
 	public void removeExistingTherapySessions(
 			List<TherapySession> therapySessions, User patientUser) {
-		List<TherapySession> existingTherapySessions =  therapySessionRepository.findByPatientUserIdOrderByEndTimeDesc(patientUser.getId());
+		TherapySession latestTherapySession =  therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(patientUser.getId());
 		// Removing existing therapySessions from DB
-		if(existingTherapySessions.size() > 0){
-			TherapySession latestThreapySessionFromDB = existingTherapySessions.get(0);
+		if(Objects.nonNull(latestTherapySession)){
 			Iterator<TherapySession> tpsIterator = therapySessions.iterator();
 			while(tpsIterator.hasNext()){
 				TherapySession tps = tpsIterator.next();
 				// Remove previous therapy Sessions
 				int tpsDayOfYear = tps.getDate().getDayOfYear();
-				int latestTpsDayOfYear = latestThreapySessionFromDB.getDate().getDayOfYear();
+				int latestTpsDayOfYear = latestTherapySession.getDate().getDayOfYear();
 				if(tpsDayOfYear < latestTpsDayOfYear){
 					tpsIterator.remove();
 					//Remove previous therapySessions of the same day.
 				} else {
 					DateTime tpsStartTime = tps.getStartTime();
-					DateTime latestTpsEndTimeFromDB = latestThreapySessionFromDB.getEndTime();
+					DateTime latestTpsEndTimeFromDB = latestTherapySession.getEndTime();
 					if(tpsDayOfYear == latestTpsDayOfYear && tpsStartTime.isBefore(latestTpsEndTimeFromDB)){
 						tpsIterator.remove();
 					}
@@ -149,5 +149,20 @@ public class TherapySessionService {
 			processedData.add(vo);
 		}
 		return processedData;
+	}
+	
+	public int getMissedTherapyCountByPatientUserId(Long id){
+		TherapySession latestTherapySession = therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(id);
+		if(Objects.nonNull(latestTherapySession)){
+			LocalDate today = LocalDate.now();
+			int days = 0;
+			if(Objects.isNull(latestTherapySession.getDate()))
+				return 0;
+			while(today.isAfter(latestTherapySession.getDate())){
+				++days;
+			}
+			return days;
+		}
+		return 0;
 	}
 }

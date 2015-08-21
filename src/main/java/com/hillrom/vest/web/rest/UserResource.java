@@ -483,5 +483,14 @@ public class UserResource {
 	    		json.put("ERROR", ExceptionConstants.HR_591);
 	    		return new ResponseEntity<>(json,HttpStatus.NOT_FOUND);
 	    	}    
-    	} 
+    	}
+    
+    @RequestMapping(value = "/users/{id}/missedTherapyCount",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JSONObject> getMissedTherapyCount(@PathVariable Long id){
+    	JSONObject json = new JSONObject();
+    	json.put("count",therapySessionService.getMissedTherapyCountByPatientUserId(id));
+    	return new ResponseEntity<JSONObject>(json, HttpStatus.OK);
+    }
 }

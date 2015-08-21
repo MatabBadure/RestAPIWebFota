@@ -11,7 +11,7 @@ import com.hillrom.vest.domain.TherapySession;
 public interface TherapySessionRepository extends
 		JpaRepository<TherapySession, Long> {
 
-	public List<TherapySession> findByPatientUserIdOrderByEndTimeDesc(Long id);
+	public TherapySession findTop1ByPatientUserIdOrderByEndTimeDesc(Long id);
 
 	@Query("from TherapySession tps where tps.patientUser.id =?1 and tps.date between ?2 and ?3")
 	public List<TherapySession> findByPatientUserIdAndDateRange(Long id, LocalDate fromTimestamp,

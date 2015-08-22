@@ -51,4 +51,5 @@
     <include file="classpath:/config/liquibase/changelog/20150819143900_create_notification.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150819150000_create_table_patient_compliance.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150819153500_create_protocol_constants.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150821151100_add_is_deleted_to_patient_note.xml" relativeToChangelogFile="false"/>
  </databaseChangeLog>

@@ -36,6 +36,30 @@ angular.module('hillromvestApp')
         return range;
       }
 
+      this.getYaxisRangeComplianceGraph = function(data) {
+          var range = {};
+          var durationSet = [];
+          var frequencySet = [];
+          var pressureSet = [];
+          angular.forEach(data.actual, function(value) {
+              durationSet.push(value.duration);
+              pressureSet.push(value.weightedAvgPressure);
+              frequencySet.push(value.weightedAvgFrequency);
+          });
+          var maxDuration = arrayMax(durationSet);
+          var maxRecommendedDuration = data.recommended.maxMinutesPerTreatment * data.recommended.treatmentsPerDay;
+          maxDuration = (maxDuration > maxRecommendedDuration) ? maxDuration : maxRecommendedDuration;
+          range.maxDuration = maxDuration;
+          
+          var maxPressure = arrayMax(pressureSet);
+          maxPressure = (maxPressure > data.recommended.maxPressure) ? maxPressure : data.recommended.maxPressure;
+          range.maxPressure = maxPressure;
+          var maxFrequency = arrayMax(frequencySet);
+          maxFrequency = (maxFrequency > data.recommended.maxFrequency) ? maxFrequency : data.recommended.maxFrequency;
+          range.maxFrequency = maxFrequency;
+          return range;
+      }
+
       this.convertIntoHMRBarGraph = function(data) {
         var pointSet = [];
         var graphData = {};

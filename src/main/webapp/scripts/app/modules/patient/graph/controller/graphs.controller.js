@@ -23,7 +23,10 @@ angular.module('hillromvestApp')
       $scope.maxPressure = 0;
       $scope.minDuration = 0;
       $scope.maxDuration = 0;
-      $scope.yAxisRange = {};
+      $scope.yAxisRangeForHMRLine = {};
+      $scope.yAxisRangeForCompliance = {};
+      $scope.yAxis1Min = 0;
+      $scope.yAxis2Min = 0;
       $scope.getHmrRunRateAndScore();
       //$scope.patientId = StorageService.get('patientID');
       $scope.fromTimeStamp = dateService.getnDaysBackTimeStamp(7);
@@ -261,7 +264,7 @@ angular.element('#edit_date').datepicker({
         if($scope.completeGraphData.actual === undefined){
           $scope.graphData = [];
         } else {
-          $scope.yAxisRange = graphUtil.getYaxisRangeLineGraph($scope.completeGraphData);
+          $scope.yAxisRangeForHMRLine = graphUtil.getYaxisRangeLineGraph($scope.completeGraphData);
           $scope.completeGraphData = graphUtil.sortGraphData($scope.completeGraphData);
           $scope.graphData = graphUtil.convertIntoHMRLineGraph($scope.completeGraphData);
           console.log(JSON.stringify($scope.graphData));
@@ -306,9 +309,11 @@ angular.element('#edit_date').datepicker({
           if($scope.completeComplianceData.actual.length > 1){
             $scope.completeComplianceData = graphUtil.sortGraphData($scope.completeComplianceData);  
           }
+          $scope.yAxisRangeForCompliance = graphUtil.getYaxisRangeComplianceGraph($scope.completeComplianceData);
           $scope.completeComplianceData = graphUtil.getCompleteGraphData($scope.completeComplianceData,$scope.format,$scope.fromTimeStamp,$scope.toTimeStamp);
           $scope.completecomplianceGraphData = graphUtil.sortGraphData($scope.completeComplianceData);
           $scope.completecomplianceGraphData = graphUtil.convertIntoComplianceGraph($scope.completeComplianceData.actual);
+          $scope.yAxis1Max = $scope.yAxisRangeForCompliance.maxDuration;
           $scope.createComplianceGraphData();
           $scope.drawComplianceGraph();
         }
@@ -400,6 +405,7 @@ angular.element('#edit_date').datepicker({
     angular.forEach($scope.completecomplianceGraphData, function(value) {
           if(value.key.indexOf("pressure") >= 0 && $scope.compliance.secondaryYaxis === 'pressure'){
             value.yAxis = 2
+            $scope.yAxis2Max = $scope.yAxisRangeForCompliance.maxPressure;
             $scope.complianceGraphData.push(value);
           }
           if(value.key.indexOf("duration") >= 0){
@@ -408,6 +414,7 @@ angular.element('#edit_date').datepicker({
           }
           if(value.key.indexOf("frequency") >= 0  && $scope.compliance.secondaryYaxis === 'frequency'){
             value.yAxis = 2
+            $scope.yAxis2Max = $scope.yAxisRangeForCompliance.maxFrequency;
             $scope.complianceGraphData.push(value);
           }
     });
@@ -553,6 +560,10 @@ angular.element('#edit_date').datepicker({
         });
       chart.yAxis1.tickFormat(d3.format(',.0f'));
       chart.yAxis2.tickFormat(d3.format(',.0f'));
+      //chart.yAxis1.scale().domain([$scope.yAxis1Min, $scope.yAxis1Max]);
+      //chart.yAxis1.scale().domain([$scope.yAxis2Min, $scope.yAxis2Max]);
+      chart.yDomain1([$scope.yAxis1Min,$scope.yAxis1Max]);
+      chart.yDomain2([$scope.yAxis2Min,$scope.yAxis2Max]); 
       //$scope.putComplianceGraphLabel(chart);
       var data =  $scope.complianceGraphData
          angular.forEach(data, function(value) {
@@ -566,7 +577,7 @@ angular.element('#edit_date').datepicker({
         d3.select('#complianceGraph svg')
       .datum($scope.complianceGraphData)
       .transition().duration(500).call(chart);
-      var circle = d3.select('svg').selectAll("circle")
+      /*var circle = d3.select('svg').selectAll("circle")
       if(d3.select('svg').selectAll("circle").length !== 0){
         //d3.select('svg').selectAll("circle")[0][0].classList.push('custom-class');
             console.log(circle);
@@ -581,8 +592,87 @@ angular.element('#edit_date').datepicker({
           .attr("r", size);
       }
         drawCircle(3.6, 126.45, 5);
-        drawCircle(300, 400, 15);
-        d3.select('#complianceGraph svg').selectAll('.y1.axis').selectAll('.nvd3.nv-wrap.nv-axis').append('g').attr('class','tick').attr('transform','translate(0,200)').append('text').text('20');
+        drawCircle(300, 400, 15);*/
+
+        var y1AxisMark = d3.select('#complianceGraph svg').selectAll('.y1.axis').selectAll('.nvd3.nv-wrap.nv-axis');
+        var y2AxisMark = d3.select('#complianceGraph svg').selectAll('.y2.axis').selectAll('.nvd3.nv-wrap.nv-axis');
+        var y1AxisMinMax = d3.select('#complianceGraph svg').selectAll('.y1.axis').selectAll('.nvd3.nv-wrap.nv-axis').select('.nv-axisMaxMin').attr("transform");
+        var y2AxisMinMax = d3.select('#complianceGraph svg').selectAll('.y2.axis').selectAll('.nvd3.nv-wrap.nv-axis').select('.nv-axisMaxMin').attr("transform");
+        var maxTransform = parseInt(y1AxisMinMax.split(',')[1].replace(y1AxisMinMax,')',''));
+        $scope.y1AxisTransformRate = parseInt(y1AxisMinMax.split(',')[1].replace(y1AxisMinMax,')',''))/($scope.yAxis1Max - $scope.yAxis1Min);
+        $scope.y2AxisTransformRate = parseInt(y2AxisMinMax.split(',')[1].replace(y2AxisMinMax,')',''))/($scope.yAxis2Max - $scope.yAxis2Min);
+        var y1LineLength = d3.select('#complianceGraph svg').selectAll('.y1.axis').selectAll('.nvd3.nv-wrap.nv-axis').selectAll('line').attr('x2');
+        var y2LineLength = d3.select('#complianceGraph svg').selectAll('.y2.axis').selectAll('.nvd3.nv-wrap.nv-axis').selectAll('line').attr('x2');
+        if($scope.compliance.secondaryYaxis === 'frequency') {
+          $scope.yAxis2MaxMark = $scope.maxFrequency;
+          $scope.yAxis2MinMark = $scope.minFrequency;
+        } else if($scope.compliance.secondaryYaxis === 'pressure'){
+          $scope.yAxis2MaxMark = $scope.maxPressure;
+          $scope.yAxis2MinMark = $scope.minPressure;
+        }
+        $scope.yAxis1MaxMark = $scope.maxDuration;
+        $scope.yAxis1MinMark = $scope.minDuration;
+
+        var y1AxisMinTransform = maxTransform - parseInt($scope.y1AxisTransformRate * $scope.yAxis1MinMark);
+        var y1AxisMaxTransform = maxTransform - parseInt($scope.y1AxisTransformRate * $scope.yAxis1MaxMark);
+        var y2AxisMinTransform = maxTransform - parseInt($scope.y2AxisTransformRate * $scope.yAxis2MinMark);
+        var y2AxisMaxTransform = maxTransform - parseInt($scope.y2AxisTransformRate * $scope.yAxis2MaxMark);
+
+        y1AxisMark.append('g').
+        attr('class','minRecommendedLevel').
+        attr('transform','translate(0, '+ y1AxisMinTransform + ')').
+        append('text').
+        text($scope.yAxis1MinMark).
+        //attr('text-anchor'.'end').
+        style('fill','red');
+
+        y1AxisMark.select('.minRecommendedLevel').
+        append('line').
+        attr('x2',y1LineLength).
+        attr('y2','0').
+        style('stroke','red');
+
+        y1AxisMark.append('g').
+        attr('class','maxRecommendedLevel').
+        attr('transform','translate(0,'+ y1AxisMaxTransform + ')').
+        append('text').
+        text($scope.yAxis1MaxMark).
+        //attr('text-anchor'.'end').
+        style('fill','green');
+
+        y1AxisMark.select('.maxRecommendedLevel').
+        append('line').
+        attr('x2',y1LineLength).
+        attr('y2','0').
+        style('stroke','green');
+
+        y2AxisMark.append('g').
+        attr('class','minRecommendedLevel').
+        attr('transform','translate(0,'+ y2AxisMinTransform + ')').
+        append('text').
+        text($scope.yAxis2MinMark).
+        style('fill','red');
+
+        y2AxisMark.select('.minRecommendedLevel').
+        append('line').
+        attr('x2',y2LineLength).
+        attr('y2','0').
+        style('stroke','red');
+
+        y2AxisMark.append('g').
+        attr('class','maxRecommendedLevel').
+        attr('transform','translate(0,'+ y2AxisMaxTransform + ')').
+        append('text').
+        text($scope.yAxis2MaxMark).
+        style('fill','green');
+
+        y2AxisMark.select('.maxRecommendedLevel').
+        append('line').
+        attr('x2',y2LineLength).
+        attr('y2','0').
+        style('stroke','green');
+
+        //d3.select('#complianceGraph svg').selectAll('.y1.axis').selectAll('.nvd3.nv-wrap.nv-axis').append('g').attr('class','tick').attr('transform','translate(0,200)').append('text').text('20');
       return chart;
     });
   } 

@@ -13,4 +13,6 @@ public interface NotificationRepository extends
 	
 	@Query("from Notifications nfs where nfs.patientUser.id = ?1 and nfs.date < ?2 and nfs.isAcknowledged = ?3")
 	Page<Notification> findByPatientUserIdAndDateAndIsAcknowledged(Long patientUserId, LocalDate date, boolean isAcknowledged,Pageable pageable);
+	
+	Notification findByPatientUserIdAndDate(Long patientUserId, LocalDate date);
 }

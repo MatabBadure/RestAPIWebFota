@@ -1,6 +1,8 @@
 package com.hillrom.vest.service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -11,6 +13,7 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.LocalDate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.config.AdherenceScoreConstants;
@@ -120,8 +123,15 @@ public class AdherenceCalculationService {
 			
 			// Point has been deducted due to Protocol violation
 			if(previousScore > currentScore){
-				Notification notification = new Notification(notificationType,currentTherapyDate,patientUser,patient,false);
-				notificationRepository.save(notification);
+				Notification existingNotificationofTheDay = notificationRepository.findByPatientUserIdAndDate(patientUserId, currentTherapyDate);
+				// Update missed therapy notification if exists for the day
+				if(Objects.nonNull(existingNotificationofTheDay)){
+					existingNotificationofTheDay.setNotificationType(notificationType);
+					notificationRepository.save(existingNotificationofTheDay);
+				}else{
+					Notification notification = new Notification(notificationType,currentTherapyDate,patientUser,patient,false);
+					notificationRepository.save(notification);
+				}
 			}
 			
 			if(latestCompliance.getDate().isBefore(currentTherapyDate)){
@@ -182,7 +192,34 @@ public class AdherenceCalculationService {
 		actualMetrics.put("weightedAvgPressure", weightedAvgPressure);
 		actualMetrics.put("totalDuration", totalDuration);
 		actualMetrics.put("treatmentsPerDay", treatmentsPerDay);
+		processMissedTherapySessions();
 		return actualMetrics;
 	}
+
 	
+	public void processMissedTherapySessions(){
+		System.out.println("**** processMissedTherapySessions "+LocalDateTime.now());
+		List<PatientCompliance> patientComplianceList = patientComplianceRepository.findAllGroupByPatientUserIdOrderByDateDesc();
+		List<Long> patientUserIds = new LinkedList<>();
+		LocalDate today = LocalDate.now();
+		patientComplianceList.forEach(compliance -> {			
+			patientUserIds.add(compliance.getPatientUser().getId());
+			compliance.setDate(today);
+			compliance.setId(null);
+			compliance.setScore(compliance.getScore()-AdherenceScoreConstants.MISSED_THERAPY_POINTS);
+		});
+		List<TherapySession> latestTherapySessions = therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(patientUserIds);
+		List<Notification> notifications = new LinkedList<>();
+		LocalDate threeDaysAgo = today.minusDays(3);
+		latestTherapySessions.forEach(latestTherapySession -> {
+			if(threeDaysAgo.equals(latestTherapySession.getDate())){
+				notifications.add(new Notification(NotificationTypeConstants.MISSED_THERAPY, today, latestTherapySession.getPatientUser(), latestTherapySession.getPatientInfo(), false));
+			}
+		});
+		System.out.println("***** notifications : "+notifications);
+		System.out.println("***** patientComplianceList : "+patientComplianceList);
+		
+		/*notificationRepository.save(notifications);
+		patientComplianceRepository.save(patientComplianceList);*/
+	}
 }

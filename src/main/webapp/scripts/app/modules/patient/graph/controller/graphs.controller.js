@@ -2,8 +2,6 @@
 
 angular.module('hillromvestApp')
 .controller('graphController', function($scope, $state, patientDashBoardService, StorageService, dateService, graphUtil) {
-    var chart;
-
     $scope.init = function() {
       $scope.hmrLineGraph = true;
       $scope.hmrBarGraph = false;
@@ -25,6 +23,7 @@ angular.module('hillromvestApp')
       $scope.maxPressure = 0;
       $scope.minDuration = 0;
       $scope.maxDuration = 0;
+      $scope.yAxisRange = {};
       $scope.getHmrRunRateAndScore();
       //$scope.patientId = StorageService.get('patientID');
       $scope.fromTimeStamp = dateService.getnDaysBackTimeStamp(7);
@@ -149,7 +148,8 @@ angular.element('#edit_date').datepicker({
 
     $scope.xAxisTickFormatFunction = function(format){
       return function(d){
-        switch(format) {
+        return "abc"
+        /*switch(format) {
           case "weekly":
               return d3.time.format('%A')(new Date(d));
               break;
@@ -164,7 +164,7 @@ angular.element('#edit_date').datepicker({
               break;
           default:
               break;
-        }
+        }*/
     }
   };
 
@@ -189,7 +189,7 @@ angular.element('#edit_date').datepicker({
       return function(key, x, y, e, graph) {
         var toolTip = '';
         angular.forEach($scope.completeGraphData, function(value) {
-          if(value.startTime === e.point[0]){
+          if(value.startTime === e.point[0] && value.hmr !== 0 ){
               toolTip =
                 '<h6>' + dateService.getDateFromTimeStamp(value.startTime) + '</h6>' +
                 '<p> Frequency ' + value.frequency + '</p>' +
@@ -205,7 +205,7 @@ angular.element('#edit_date').datepicker({
       return function(key, x, y, e, graph) {
         var toolTip = '';
         angular.forEach(data, function(value) {
-          if(value.start === e.point.x){
+          if(value.start === e.point.timeStamp){
               toolTip =
                 '<h6>' + dateService.getDateFromTimeStamp(value.start) + '</h6>' +
                 '<p> Treatment/Day ' + value.treatmentsPerDay + '</p>' +
@@ -219,15 +219,17 @@ angular.element('#edit_date').datepicker({
     }
 
     $scope.xAxisTickValuesFunction = function(){
-      
     return function(d){
         var tickVals = [];
-        var values = d[0].values;
+        tickVals.push(d);
+        return tickVals;
+       /* var values = d[0].values;
         for(var i in values){
           tickVals.push(values[i][0]);
         }
         return tickVals;
-      };
+      };*/
+    };
     };
 
     $scope.xAxisTickValuesBarChart = function() {
@@ -249,6 +251,7 @@ angular.element('#edit_date').datepicker({
     $scope.showHmrGraph = function() {
       $scope.complianceGraph = false;
       $scope.hmrGraph = true;
+      $scope.removeGraph();
     };
 
     $scope.getNonDayHMRGraphData = function() {
@@ -258,11 +261,16 @@ angular.element('#edit_date').datepicker({
         if($scope.completeGraphData.actual === undefined){
           $scope.graphData = [];
         } else {
+          $scope.yAxisRange = graphUtil.getYaxisRangeLineGraph($scope.completeGraphData);
+          $scope.completeGraphData = graphUtil.sortGraphData($scope.completeGraphData);
           $scope.graphData = graphUtil.convertIntoHMRLineGraph($scope.completeGraphData);
+          console.log(JSON.stringify($scope.graphData));
+          $scope.graphData = [{"values":[[1,29567],[2,29567],]}]
         }
       }).catch(function(response) {
         $scope.graphData = [];
       });
+
     };
 
     $scope.getDayHMRGraphData = function() {
@@ -272,14 +280,16 @@ angular.element('#edit_date').datepicker({
            $scope.graphData = [];
          } else {
           $scope.completeGraphData = graphUtil.formatDayWiseDate($scope.completeGraphData.actual);
-           $scope.graphData = graphUtil.convertIntoHMRBarGraph($scope.completeGraphData);
+          $scope.graphData = graphUtil.convertIntoHMRBarGraph($scope.completeGraphData);
+          console.log(JSON.stringify($scope.graphData));
+          $scope.graphData = [{"values":[[1420061400000,null],[1420075800000,null],[1420090200000,28987],[1420104600000,28997],[1420119000000,null],[1420133400000,null]]}]
          }
       }).catch(function(response) {
         $scope.graphData = [];
       });
     };
 
-    $scope.getComplianceGraphData = function() {
+    $scope.getComplianceGraphData = function(format) {
       patientDashBoardService.getHMRGraphPoints($scope.patientId, $scope.fromTimeStamp, $scope.toTimeStamp, $scope.groupBy).then(function(response){
         //Will get response data from real time API once api is ready
         $scope.completeComplianceData = response.data;
@@ -293,6 +303,11 @@ angular.element('#edit_date').datepicker({
           $scope.maxPressure = $scope.completeComplianceData.recommended.maxPressure;
           $scope.minDuration = $scope.completeComplianceData.recommended.minMinutesPerTreatment * $scope.completeComplianceData.recommended.treatmentsPerDay;
           $scope.maxDuration = $scope.completeComplianceData.recommended.maxMinutesPerTreatment * $scope.completeComplianceData.recommended.treatmentsPerDay;
+          if($scope.completeComplianceData.actual.length > 1){
+            $scope.completeComplianceData = graphUtil.sortGraphData($scope.completeComplianceData);  
+          }
+          $scope.completeComplianceData = graphUtil.getCompleteGraphData($scope.completeComplianceData,$scope.format,$scope.fromTimeStamp,$scope.toTimeStamp);
+          $scope.completecomplianceGraphData = graphUtil.sortGraphData($scope.completeComplianceData);
           $scope.completecomplianceGraphData = graphUtil.convertIntoComplianceGraph($scope.completeComplianceData.actual);
           $scope.createComplianceGraphData();
           $scope.drawComplianceGraph();
@@ -398,8 +413,60 @@ angular.element('#edit_date').datepicker({
     });
     console.log('compliance graph data!')
     console.log($scope.complianceGraphData)
+    console.log(JSON.stringify($scope.complianceGraphData))
+    console.log($scope.complianceGraphData)
+    console.log(JSON.stringify($scope.complianceGraphData))
+  /*  $scope.complianceGraphData = [
+    {   
+        "key": "duration",
+        "values": [
+           
+            {
+                "x": 3,
+                "y": 46
+            },
+            {
+                "x": 4,
+                "y": 46
+            },
+            {
+                "x": 5,
+                "y": 36
+            },
+            {
+                "x": 6,
+                "y": 36
+            },
+        ],
+        "type": "area",
+        "yAxis": 1
+    },
+    {
+        "key": "frequency",
+        "values": [
+            
+            {
+                "x": 3,
+                "y": 79
+            },
+            {
+                "x": 4,
+                "y": 66
+            },
+            {
+                "x": 5,
+                "y": 51
+            },
+            {
+                "x": 6,
+                "y": 51
+            }
+        ],
+        "type": "area",
+        "yAxis": 2
+    }
+];*/
   }
-
   $scope.putComplianceGraphLabel = function(chart) {
     var data =  $scope.complianceGraphData
      angular.forEach(data, function(value) {
@@ -432,44 +499,93 @@ angular.element('#edit_date').datepicker({
           default:
               break;
         }
-  }
+  };
 
   $scope.drawComplianceGraph = function() {
     d3.select('#complianceGraph svg').selectAll("*").remove();
       nv.addGraph(function() {
-      chart = nv.models.multiChart()
+      var chart = nv.models.multiChart()
       .margin({top: 30, right: 100, bottom: 50, left: 100})
       .color(d3.scale.category10().range());
      // chart.noData("Nothing to see here.");
       chart.tooltipContent($scope.toolTipContentForCompliance($scope.completeComplianceData.actual));
+      //this function to put x-axis labels
       chart.xAxis.tickFormat(function(d) {
-        angular.forEach($scope.completeComplianceData.actual, function(value) {
-          if(value.timestamp === d){
-             switch($scope.format) {
-              case "weekly":
-                  return d3.time.format('%A')(new Date(d));
+          if(d % 1 === 0) {
+            var timeStamp = $scope.completecomplianceGraphData[0].values[d-1].timeStamp;
+            switch($scope.format) {
+                case "weekly":
+                    return d3.time.format('%A')(new Date(timeStamp));
+                    break;
+                case "monthly":
+                    return 'week ' + dateService.getWeekOfMonth(timeStamp);
+                    break;
+                case "yearly":
+                    return d3.time.format('%B')(new Date(timeStamp));
+                    break;
+                default:
+                    break;
+            }
+          }
+          
+          /*switch(d) {
+              case 1:
+                  return "Monday";
                   break;
-              case "monthly":
-                  return 'week ' + dateService.getWeekOfMonth(d);
+              case 2:
+                  return "Tuesday";
                   break;
-              case "yearly":
-                  return d3.time.format('%B')(new Date(d));
+              case 3:
+                  return "Wednesday";
+                  break;
+              case 4:
+                  return "Thursday";
+                  break;
+              case 5:
+                  return "FriDay";
+                  break;
+              case 6:
+                  return "Saturday";
                   break;
               default:
                   break;
-            }
-          }
+          }*/
         });
-      });
       chart.yAxis1.tickFormat(d3.format(',.0f'));
       chart.yAxis2.tickFormat(d3.format(',.0f'));
-      $scope.putComplianceGraphLabel(chart);
+      //$scope.putComplianceGraphLabel(chart);
+      var data =  $scope.complianceGraphData
+         angular.forEach(data, function(value) {
+              if(value.yAxis === 1){
+                chart.yAxis1.axisLabel(value.key);
+              }
+               if(value.yAxis === 2){
+                chart.yAxis2.axisLabel(value.key);
+              }
+        });
         d3.select('#complianceGraph svg')
       .datum($scope.complianceGraphData)
       .transition().duration(500).call(chart);
+      var circle = d3.select('svg').selectAll("circle")
+      if(d3.select('svg').selectAll("circle").length !== 0){
+        //d3.select('svg').selectAll("circle")[0][0].classList.push('custom-class');
+            console.log(circle);
+      }
+      var svg = d3.select('#complianceGraph svg');
+      function drawCircle(x, y, size) {
+        console.log('Drawing circle at', x, y, size);
+        svg.append("circle")
+          .style("fill", "red")
+          .attr("cx", x)
+          .attr("cy", y)
+          .attr("r", size);
+      }
+        drawCircle(3.6, 126.45, 5);
+        drawCircle(300, 400, 15);
+        d3.select('#complianceGraph svg').selectAll('.y1.axis').selectAll('.nvd3.nv-wrap.nv-axis').append('g').attr('class','tick').attr('transform','translate(0,200)').append('text').text('20');
       return chart;
     });
-  }
+  } 
     $scope.init();
 });
 

@@ -18,6 +18,24 @@ angular.module('hillromvestApp')
       return graphDataList;
       }
 
+      var arrayMax = Function.prototype.apply.bind(Math.max, null);
+      var arrayMin = Function.prototype.apply.bind(Math.min, null);
+
+      this.getYaxisRangeLineGraph = function(data) {
+        var range = {};
+        var hmrSet = [];
+        angular.forEach(data.actual, function(value) {
+          hmrSet.push(value.hmr);
+        });
+        var max = arrayMax(hmrSet);
+        var min = arrayMin(hmrSet);
+        range.max = max + (max-min);
+        if(min !== 0 && min > (max-min)){
+          range.min = min;  
+        }
+        return range;
+      }
+
       this.convertIntoHMRBarGraph = function(data) {
         var pointSet = [];
         var graphData = {};
@@ -25,7 +43,7 @@ angular.module('hillromvestApp')
         angular.forEach(data, function(value) {
           var point = [];
           point.push(value.startTime);
-          point.push(value.hmr);
+          point.push(Math.floor(value.hmr/60));
           pointSet.push(point);
         });
         graphData["values"] = pointSet;
@@ -42,6 +60,62 @@ angular.module('hillromvestApp')
         if(value.hmr > data.hmr){
           data.hmr = value.hmr;
         }
+      }
+
+      var resetDataPoint = function(data){
+        data.frequency = 0;
+        data.pressure = 0;
+        data.durationInMinutes = 0;
+        data.programmedCaughPauses = 0;
+        data.normalCaughPauses = 0;
+        data.caughPauseDuration = 0;
+        data.duration = 0;
+        data.treatmentsPerDay = 0;
+        data.weightedAvgFrequency = 0;
+        data.weightedAvgPressure = 0;
+        return data;
+      }
+
+      this.getCompleteGraphData = function(data,format,fromTimeStamp,toTimeStamp) {
+        var dataPoint = {};
+        var clonedData = JSON.parse(JSON.stringify(data));
+        switch(format){
+          case 'weekly':
+            var daysList = dateService.getListOfDaysInTimeStamp(fromTimeStamp,toTimeStamp);
+            daysList = dateService.sortTimeStamp(daysList,'DESC');
+            var missedTherapyList = daysList;
+            break;
+          case 'monthly':
+            var weeksList = dateService.getListOfWeeksInTimeStamp(fromTimeStamp,toTimeStamp);
+            weeksList = dateService.sortTimeStamp(weeksList,'DESC');
+            var missedTherapyList = weeksList;
+            break;
+          case 'yearly':
+            var monthsList = dateService.getListOfMonthsInTimeStamp(fromTimeStamp,toTimeStamp);
+            monthsList = dateService.sortTimeStamp(monthsList,'DESC');
+            var missedTherapyList = monthsList;
+            break;
+        }
+        angular.forEach(missedTherapyList, function(timeStamp){
+              var count = 0;
+              angular.forEach(clonedData.actual, function(value){
+                if(dateService.getDateFromTimeStamp(value.timestamp) === dateService.getDateFromTimeStamp(timeStamp)){
+                   count = count+1;
+                   if(clonedData.actual.length > 1){
+                      clonedData.actual.splice(clonedData.actual.indexOf(value),1)
+                   }
+                }
+                dataPoint = JSON.parse(JSON.stringify(value));
+              });
+              if(count === 0){
+                dataPoint = resetDataPoint(dataPoint);
+                dataPoint.timestamp = timeStamp;
+                dataPoint.start = timeStamp;
+                dataPoint.end = timeStamp;
+                data.actual.push(dataPoint);
+              }
+        });
+        return data;
       }
 
       this.formatDayWiseDate = function(data) {
@@ -87,19 +161,56 @@ angular.module('hillromvestApp')
               break;
           }
         });
-        if(data1.startTime !== undefined)
+        if(data1.startTime !== undefined){
           list.push(data1);
-        if(data2.startTime !== undefined)
+        } else {
+          data1.startTime = dateService.getTimeStampForTimeSlot(data[0].date,1);
+          list.push(data1);
+        }
+        if(data2.startTime !== undefined){
           list.push(data2);
-        if(data3.startTime !== undefined)
+        } else {
+          data2.startTime = dateService.getTimeStampForTimeSlot(data[0].date,2);
+          list.push(data2);
+        }
+        if(data3.startTime !== undefined){
           list.push(data3);
-        if(data4.startTime !== undefined)
+        } else {
+          data3.startTime = dateService.getTimeStampForTimeSlot(data[0].date,3);
+          list.push(data3);
+        }
+        if(data4.startTime !== undefined){
           list.push(data4);
-        if(data5.startTime !== undefined)
+        } else {
+          data4.startTime = dateService.getTimeStampForTimeSlot(data[0].date,4);
+          list.push(data4);
+        }
+        if(data5.startTime !== undefined){
           list.push(data5);
-        if(data6.startTime !== undefined)
+        } else {
+          data5.startTime = dateService.getTimeStampForTimeSlot(data[0].date,5);
+          list.push(data5);
+        }
+        if(data6.startTime !== undefined){
           list.push(data6);
+        } else {
+          data6.startTime = dateService.getTimeStampForTimeSlot(data[0].date,6);
+          list.push(data6);
+        }
         return list;
+      }
+
+      this.sortGraphData = function(data) {
+        for(var i = 0; i < data.actual.length; i++){
+         for(var j = 0; j < data.actual.length; j++){
+            if(data.actual[i].timestamp < data.actual[j].timestamp){
+              var k = data.actual[i];
+              data.actual[i] = data.actual[j];
+              data.actual[j] = k;
+            }
+          }
+        }
+        return data;
       }
 
       this.convertIntoComplianceGraph = function(data) {
@@ -110,17 +221,22 @@ angular.module('hillromvestApp')
         var pressureObject = {};
         var frequencyObject = {};
         var durationObject = {};
+        var count = 0;
         angular.forEach(data, function(value) {
+          count = count + 1;
           var pressurePoint = {};
           var durationPoint = {};
           var frequencyPoint = {};
-          pressurePoint.x = value.start;
+          pressurePoint.x = count;
+          pressurePoint.timeStamp = value.start;
           pressurePoint.y = value.weightedAvgPressure;
           pressureValues.push(pressurePoint);
-          durationPoint.x = value.start;
+          durationPoint.x = count;
+          durationPoint.timeStamp = value.start;
           durationPoint.y = value.duration;
           durationValues.push(durationPoint);
-          frequencyPoint.x = value.start;
+          frequencyPoint.x = count;
+          frequencyPoint.timeStamp = value.start;
           frequencyPoint.y = value.weightedAvgFrequency;
           frequencyValues.push(frequencyPoint);
         });

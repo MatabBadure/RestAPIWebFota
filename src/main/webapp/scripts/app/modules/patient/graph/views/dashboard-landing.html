@@ -111,13 +111,14 @@
 	        interactive="true"
 	        tooltips="true"
 	        isArea="true"
-	        interpolate="step-before"
+	        interpolate="step-after" 
 	        yAxisLabel="Minutes"
           margin="{left:100,top:20,bottom:20,right:10}"
 	        xAxisTickFormat="xAxisTickFormatFunction(format)"
 	        xAxisTickValues="xAxisTickValuesFunction()"
 	        noData="No Data Found!"
 	        objectEquality="true"
+	        forcey="[yAxisRange.min,yAxisRange.max]"
 	        tooltipcontent="toolTipContentFunction()">
 	        <svg></svg>
 	    </nvd3-line-chart>
@@ -139,6 +140,7 @@
 	        xAxisTickValues="xAxisTickValuesBarChart()"
 	        noData="No Data Found!"
 	        objectEquality="true"
+	        forcey="[28982,29002]"
 	        tooltipcontent="toolTipContentBarChart()">
 	        <svg></svg>
 		  </nvd3-multi-bar-chart>

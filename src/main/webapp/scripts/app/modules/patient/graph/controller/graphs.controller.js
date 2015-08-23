@@ -36,13 +36,6 @@ angular.module('hillromvestApp')
         $scope.weeklyChart();
       }
     };
-  /*-----Date picker for dashboard----*/
-/* $scope.date = {
-  startDate: '08/12/2015', 
-  endDate: '08/18/2015',
-  opens: 'center',
-  parentEl: '#dp3',
-};*/
 
 angular.element('#edit_date').datepicker({
           endDate: '+0d',
@@ -84,6 +77,7 @@ angular.element('#edit_date').datepicker({
         $scope.format = 'dayWise';
         $scope.hmrLineGraph = false;
         $scope.hmrBarGraph = true;
+        $scope.removeGraph();
         $scope.getDayHMRGraphData();
       } else if(days <= 7) {
         $scope.weeklyChart($scope.fromTimeStamp);
@@ -429,58 +423,6 @@ angular.element('#edit_date').datepicker({
     console.log('compliance graph data!')
     console.log($scope.complianceGraphData)
     console.log(JSON.stringify($scope.complianceGraphData))
-    console.log($scope.complianceGraphData)
-    console.log(JSON.stringify($scope.complianceGraphData))
-  /*  $scope.complianceGraphData = [
-    {   
-        "key": "duration",
-        "values": [
-           
-            {
-                "x": 3,
-                "y": 46
-            },
-            {
-                "x": 4,
-                "y": 46
-            },
-            {
-                "x": 5,
-                "y": 36
-            },
-            {
-                "x": 6,
-                "y": 36
-            },
-        ],
-        "type": "area",
-        "yAxis": 1
-    },
-    {
-        "key": "frequency",
-        "values": [
-            
-            {
-                "x": 3,
-                "y": 79
-            },
-            {
-                "x": 4,
-                "y": 66
-            },
-            {
-                "x": 5,
-                "y": 51
-            },
-            {
-                "x": 6,
-                "y": 51
-            }
-        ],
-        "type": "area",
-        "yAxis": 2
-    }
-];*/
   }
   $scope.putComplianceGraphLabel = function(chart) {
     var data =  $scope.complianceGraphData
@@ -542,34 +484,9 @@ angular.element('#edit_date').datepicker({
                     break;
             }
           }
-          
-          /*switch(d) {
-              case 1:
-                  return "Monday";
-                  break;
-              case 2:
-                  return "Tuesday";
-                  break;
-              case 3:
-                  return "Wednesday";
-                  break;
-              case 4:
-                  return "Thursday";
-                  break;
-              case 5:
-                  return "FriDay";
-                  break;
-              case 6:
-                  return "Saturday";
-                  break;
-              default:
-                  break;
-          }*/
         });
       chart.yAxis1.tickFormat(d3.format('d'));
       chart.yAxis2.tickFormat(d3.format('d'));
-      //chart.yAxis1.scale().domain([$scope.yAxis1Min, $scope.yAxis1Max]);
-      //chart.yAxis1.scale().domain([$scope.yAxis2Min, $scope.yAxis2Max]);
       chart.yDomain1([$scope.yAxis1Min,$scope.yAxis1Max]);
       chart.yDomain2([$scope.yAxis2Min,$scope.yAxis2Max]); 
       //$scope.putComplianceGraphLabel(chart);
@@ -585,22 +502,6 @@ angular.element('#edit_date').datepicker({
         d3.select('#complianceGraph svg')
       .datum($scope.complianceGraphData)
       .transition().duration(500).call(chart);
-      /*var circle = d3.select('svg').selectAll("circle")
-      if(d3.select('svg').selectAll("circle").length !== 0){
-        //d3.select('svg').selectAll("circle")[0][0].classList.push('custom-class');
-            console.log(circle);
-      }
-      var svg = d3.select('#complianceGraph svg');
-      function drawCircle(x, y, size) {
-        console.log('Drawing circle at', x, y, size);
-        svg.append("circle")
-          .style("fill", "red")
-          .attr("cx", x)
-          .attr("cy", y)
-          .attr("r", size);
-      }
-        drawCircle(3.6, 126.45, 5);
-        drawCircle(300, 400, 15);*/
 
         var y1AxisMark = d3.select('#complianceGraph svg').selectAll('.y1.axis').selectAll('.nvd3.nv-wrap.nv-axis');
         var y2AxisMark = d3.select('#complianceGraph svg').selectAll('.y2.axis').selectAll('.nvd3.nv-wrap.nv-axis');
@@ -679,8 +580,6 @@ angular.element('#edit_date').datepicker({
         attr('x2',y2LineLength).
         attr('y2','0').
         style('stroke','green');
-
-        //d3.select('#complianceGraph svg').selectAll('.y1.axis').selectAll('.nvd3.nv-wrap.nv-axis').append('g').attr('class','tick').attr('transform','translate(0,200)').append('text').text('20');
       return chart;
     });
   } 

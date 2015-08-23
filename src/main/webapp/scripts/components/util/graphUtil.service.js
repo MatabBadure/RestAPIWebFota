@@ -31,10 +31,27 @@ angular.module('hillromvestApp')
         var min = arrayMin(hmrSet);
         range.max = max + (max-min);
         if(min !== 0 && min > (max-min)){
-          range.min = min;  
+          range.min = min - (max-min);  
         }
         return range;
       }
+
+      this.getYaxisRangeBarGraph = function(data) {
+        var range = {};
+        var hmrSet = [];
+        angular.forEach(data, function(value) {
+          if(value.hmr !== 'null')
+           hmrSet.push(value.hmr);
+        });
+        var max = arrayMax(hmrSet);
+        var min = arrayMin(hmrSet);
+        range.max = Math.floor((max + (max-min))/60);
+        if(min !== 0 && min > (max-min)){
+          range.min = Math.floor((min - (max-min))/60);  
+        }
+        return range;
+      }
+
 
       this.getYaxisRangeComplianceGraph = function(data) {
           var range = {};
@@ -50,7 +67,7 @@ angular.module('hillromvestApp')
           var maxRecommendedDuration = data.recommended.maxMinutesPerTreatment * data.recommended.treatmentsPerDay;
           maxDuration = (maxDuration > maxRecommendedDuration) ? maxDuration : maxRecommendedDuration;
           range.maxDuration = maxDuration;
-          
+
           var maxPressure = arrayMax(pressureSet);
           maxPressure = (maxPressure > data.recommended.maxPressure) ? maxPressure : data.recommended.maxPressure;
           range.maxPressure = maxPressure;
@@ -81,7 +98,7 @@ angular.module('hillromvestApp')
         data.programmedCaughPauses = data.programmedCaughPauses + value.programmedCaughPauses;
         data.normalCaughPauses = data.normalCaughPauses + value.normalCaughPauses;
         data.caughPauseDuration = data.caughPauseDuration + value.caughPauseDuration;
-        if(value.hmr > data.hmr){
+        if(value.hmr > data.hmr || data.hmr === 'null'){
           data.hmr = value.hmr;
         }
       }
@@ -145,17 +162,12 @@ angular.module('hillromvestApp')
       this.formatDayWiseDate = function(data) {
         var list = [];
         var data1 = {frequency : 0, pressure : 0, durationInMinutes : 0, programmedCaughPauses : 0, 
-                      normalCaughPauses : 0, caughPauseDuration : 0, hmr : 0};
-        var data2 = {frequency : 0, pressure : 0, durationInMinutes : 0, programmedCaughPauses : 0, 
-                    normalCaughPauses : 0, caughPauseDuration : 0, hmr : 0};
-        var data3 = {frequency : 0, pressure : 0, durationInMinutes : 0, programmedCaughPauses : 0, 
-                    normalCaughPauses : 0, caughPauseDuration : 0, hmr : 0};
-        var data4 = {frequency : 0, pressure : 0, durationInMinutes : 0, programmedCaughPauses : 0, 
-                    normalCaughPauses : 0, caughPauseDuration : 0, hmr : 0};
-        var data5 = {frequency : 0, pressure : 0, durationInMinutes : 0, programmedCaughPauses : 0, 
-                    normalCaughPauses : 0, caughPauseDuration : 0, hmr : 0};
-        var data6 = {frequency : 0, pressure : 0, durationInMinutes : 0, programmedCaughPauses : 0, 
-                      normalCaughPauses : 0, caughPauseDuration : 0, hmr : 0};
+                      normalCaughPauses : 0, caughPauseDuration : 0, hmr : 'null'};
+        var data2 = JSON.parse(JSON.stringify(data1));
+        var data3 = JSON.parse(JSON.stringify(data1));
+        var data4 = JSON.parse(JSON.stringify(data1));
+        var data5 = JSON.parse(JSON.stringify(data1));
+        var data6 = JSON.parse(JSON.stringify(data1));
         angular.forEach(data, function(value) {
           var timeSlot = dateService.getTimeIntervalFromTimeStamp(value.startTime);
           switch(timeSlot){
@@ -225,6 +237,9 @@ angular.module('hillromvestApp')
       }
 
       this.sortGraphData = function(data) {
+        if(data.actual.length < 2){
+          return data;
+        }
         for(var i = 0; i < data.actual.length; i++){
          for(var j = 0; j < data.actual.length; j++){
             if(data.actual[i].timestamp < data.actual[j].timestamp){

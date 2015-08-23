@@ -125,7 +125,7 @@
 	  </div>
 	  <div ng-if="hmrBarGraph">
 		 	<nvd3-multi-bar-chart
-		    	data="graphData"
+		    	data="hmrBarGraphData"
 	        id="hmrBarGraph"
 	        width="1250"
 	        height="300"
@@ -140,7 +140,7 @@
 	        xAxisTickValues="xAxisTickValuesBarChart()"
 	        noData="No Data Found!"
 	        objectEquality="true"
-	        forcey="[28982,29002]"
+	        forcey="[yAxisRangeForHMRBar.min,yAxisRangeForHMRBar.max]"
 	        tooltipcontent="toolTipContentBarChart()">
 	        <svg></svg>
 		  </nvd3-multi-bar-chart>

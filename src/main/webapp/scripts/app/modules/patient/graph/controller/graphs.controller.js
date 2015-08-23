@@ -76,7 +76,7 @@ angular.element('#edit_date').datepicker({
     };
 
     $scope.removeGraph = function() {
-      d3.select('svg').selectAll("*").remove();
+      d3.selectAll('svg').selectAll("*").remove();
     }
     $scope.drawGraph = function() {
       var days = dateService.getDateDiffIndays($scope.fromTimeStamp,$scope.toTimeStamp);
@@ -95,7 +95,7 @@ angular.element('#edit_date').datepicker({
     };
 
     $scope.opts = {
-      eventHandlers: {'hide.daterangepicker': function(ev, picker) {
+      eventHandlers: {'apply.daterangepicker': function(ev, picker) {
         $scope.calculateDateFromPicker(picker);
         $scope.drawGraph();
         }
@@ -151,8 +151,7 @@ angular.element('#edit_date').datepicker({
 
     $scope.xAxisTickFormatFunction = function(format){
       return function(d){
-        return "abc"
-        /*switch(format) {
+        switch(format) {
           case "weekly":
               return d3.time.format('%A')(new Date(d));
               break;
@@ -167,7 +166,7 @@ angular.element('#edit_date').datepicker({
               break;
           default:
               break;
-        }*/
+        }
     }
   };
 
@@ -224,16 +223,24 @@ angular.element('#edit_date').datepicker({
     $scope.xAxisTickValuesFunction = function(){
     return function(d){
         var tickVals = [];
-        tickVals.push(d);
-        return tickVals;
-       /* var values = d[0].values;
+        var values = d[0].values;
         for(var i in values){
           tickVals.push(values[i][0]);
         }
         return tickVals;
-      };*/
+      };
     };
-    };
+
+    $scope.yAxisFormatFunction = function() {
+      return function(d) {
+        var tickVals = [];
+        var values = d[0].values;
+        for(var i in values){
+          tickVals.push(values[i][0]);
+        }
+        return tickVals;
+      };
+    }
 
     $scope.xAxisTickValuesBarChart = function() {
       return function(d){
@@ -266,29 +273,32 @@ angular.element('#edit_date').datepicker({
         } else {
           $scope.yAxisRangeForHMRLine = graphUtil.getYaxisRangeLineGraph($scope.completeGraphData);
           $scope.completeGraphData = graphUtil.sortGraphData($scope.completeGraphData);
+          $scope.completeGraphData = graphUtil.getCompleteGraphData($scope.completeGraphData,$scope.format,$scope.fromTimeStamp,$scope.toTimeStamp);
           $scope.graphData = graphUtil.convertIntoHMRLineGraph($scope.completeGraphData);
-          console.log(JSON.stringify($scope.graphData));
-          $scope.graphData = [{"values":[[1,29567],[2,29567],]}]
+          console.log('HMR Non-Day graph data : ' + JSON.stringify($scope.graphData));
+          console.log($scope.yAxisRangeForHMRLine);
+          //$scope.graphData = [{"values":[[1,29567],[2,29567],]}]
         }
       }).catch(function(response) {
         $scope.graphData = [];
       });
-
     };
 
     $scope.getDayHMRGraphData = function() {
       patientDashBoardService.getHMRBarGraphPoints($scope.patientId, $scope.fromTimeStamp).then(function(response){
         $scope.completeGraphData = response.data;
         if($scope.completeGraphData.actual === undefined){
-           $scope.graphData = [];
+           $scope.hmrBarGraphData = [];
          } else {
           $scope.completeGraphData = graphUtil.formatDayWiseDate($scope.completeGraphData.actual);
-          $scope.graphData = graphUtil.convertIntoHMRBarGraph($scope.completeGraphData);
-          console.log(JSON.stringify($scope.graphData));
-          $scope.graphData = [{"values":[[1420061400000,null],[1420075800000,null],[1420090200000,28987],[1420104600000,28997],[1420119000000,null],[1420133400000,null]]}]
+          $scope.yAxisRangeForHMRBar = graphUtil.getYaxisRangeBarGraph($scope.completeGraphData);
+          $scope.hmrBarGraphData = graphUtil.convertIntoHMRBarGraph($scope.completeGraphData);
+          console.log('HMR Day graph data' + JSON.stringify($scope.hmrBarGraphData));
+          console.log($scope.yAxisRangeForHMRBar);
+          //$scope.hmrBarGraphData = [{"values":[[1420061400000,null],[1420075800000,null],[1420090200000,28987],[1420104600000,28997],[1420119000000,null],[1420133400000,null]]}]
          }
       }).catch(function(response) {
-        $scope.graphData = [];
+        $scope.hmrBarGraphData = [];
       });
     };
 
@@ -306,9 +316,7 @@ angular.element('#edit_date').datepicker({
           $scope.maxPressure = $scope.completeComplianceData.recommended.maxPressure;
           $scope.minDuration = $scope.completeComplianceData.recommended.minMinutesPerTreatment * $scope.completeComplianceData.recommended.treatmentsPerDay;
           $scope.maxDuration = $scope.completeComplianceData.recommended.maxMinutesPerTreatment * $scope.completeComplianceData.recommended.treatmentsPerDay;
-          if($scope.completeComplianceData.actual.length > 1){
-            $scope.completeComplianceData = graphUtil.sortGraphData($scope.completeComplianceData);  
-          }
+          $scope.completeComplianceData = graphUtil.sortGraphData($scope.completeComplianceData);  
           $scope.yAxisRangeForCompliance = graphUtil.getYaxisRangeComplianceGraph($scope.completeComplianceData);
           $scope.completeComplianceData = graphUtil.getCompleteGraphData($scope.completeComplianceData,$scope.format,$scope.fromTimeStamp,$scope.toTimeStamp);
           $scope.completecomplianceGraphData = graphUtil.sortGraphData($scope.completeComplianceData);
@@ -558,8 +566,8 @@ angular.element('#edit_date').datepicker({
                   break;
           }*/
         });
-      chart.yAxis1.tickFormat(d3.format(',.0f'));
-      chart.yAxis2.tickFormat(d3.format(',.0f'));
+      chart.yAxis1.tickFormat(d3.format('d'));
+      chart.yAxis2.tickFormat(d3.format('d'));
       //chart.yAxis1.scale().domain([$scope.yAxis1Min, $scope.yAxis1Max]);
       //chart.yAxis1.scale().domain([$scope.yAxis2Min, $scope.yAxis2Max]);
       chart.yDomain1([$scope.yAxis1Min,$scope.yAxis1Max]);

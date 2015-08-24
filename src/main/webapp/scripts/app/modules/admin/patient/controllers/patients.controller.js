@@ -352,6 +352,10 @@ angular.module('hillromvestApp')
       $state.go('patientProtocol');
     };
 
+    $scope.cancelEditDemographics = function(){
+      $state.go('patientDemographic', {'patientId': $stateParams.patientId});
+    };
+
     $scope.disassociatePatient =function(){
       patientService.disassociatePatient($scope.patient.id).then(function(response){
         notyService.showMessage(response.data.message, 'success');

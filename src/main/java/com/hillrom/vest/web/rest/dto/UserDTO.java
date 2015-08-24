@@ -9,8 +9,9 @@ import org.hibernate.validator.constraints.Email;
 
 public class UserDTO {
 
-    public static final int PASSWORD_MIN_LENGTH = 5;
+    public static final int PASSWORD_MIN_LENGTH = 8;
     public static final int PASSWORD_MAX_LENGTH = 100;
+    public static final String PASSWORD_PATTERN  = "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{"+PASSWORD_MIN_LENGTH+","+PASSWORD_MAX_LENGTH+"})";
 
     @NotNull
     @Size(min = PASSWORD_MIN_LENGTH, max = PASSWORD_MAX_LENGTH)

@@ -13,6 +13,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -27,6 +29,7 @@ import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
  * A PatientInfo.
  */
 @Entity
+@Audited
 @Table(name = "PATIENT_INFO")
 public class PatientInfo implements Serializable {
 
@@ -94,10 +97,12 @@ public class PatientInfo implements Serializable {
     @Column(name = "web_login_created")
     private Boolean webLoginCreated;
 
+    @NotAudited
     @OneToMany(mappedBy = "clinicPatientAssocPK.patient",fetch=FetchType.LAZY)
     @JsonIgnore
     private Set<ClinicPatientAssoc> clinicPatientAssoc = new HashSet<>();
     
+    @NotAudited
     @OneToMany(mappedBy = "userPatientAssocPK.patient",fetch=FetchType.LAZY)
     @JsonIgnore
     private Set<UserPatientAssoc> userPatientAssoc = new HashSet<>();

@@ -10,10 +10,13 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
+import org.hibernate.envers.Audited;
+
 /**
  * A Clinic.
  */
 @Entity
+@Audited
 @Table(name = "CLINIC_PATIENT_ASSOC")
 @AssociationOverrides({
     @AssociationOverride(name = "clinicPatientAssocPK.clinic",

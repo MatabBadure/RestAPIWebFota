@@ -435,7 +435,7 @@ public class UserService {
         		&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
         	UserExtension user = updateHillromTeamUser(id, userExtensionDTO);
     		if(user.getId() != null) {
-    			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && !user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
     				mailService.sendActivationEmail(user, baseUrl);
     			}
                 return user;
@@ -445,7 +445,7 @@ public class UserService {
     	} else if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updatePatientUser(id, userExtensionDTO);
     		if(user.getId() != null) {
-    			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && !user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
     				mailService.sendActivationEmail(user, baseUrl);
     	    		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
     			}
@@ -456,7 +456,7 @@ public class UserService {
         } else if (AuthoritiesConstants.HCP.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updateHCPUser(id, userExtensionDTO);
     		if(user.getId() != null) {
-    			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && !user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
     				mailService.sendActivationEmail(user, baseUrl);
     			}
                 return user;

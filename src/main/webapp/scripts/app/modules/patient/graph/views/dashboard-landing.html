@@ -1,3 +1,20 @@
+		
+		<style>
+			text {
+				font: 12px sans-serif;
+			}
+			svg {
+				display: block;
+			}
+			html, body, #complianceGraph, svg {
+				margin: 0px;
+				padding: 0px;
+				height: 100%;
+				width: 100%;
+			}
+		}
+		</style>
+
 		<patient-navbar></patient-navbar>
 		<div class="container patient_wrapper">
 			<div class="col-md-16">
@@ -51,11 +68,9 @@
 					<div class="col-md-5 left_header_barchart">
 						<div class="row">
 							<ul class="nav nav-pills">
-							<li><a href="" ng-click="showHmrGraph()">HMR Data</a></li>
-							<li><a href="" ng-click="showComplianceGraph()">Compliance</a></li>
-						</ul>
-						<!-- <span ng-click="HMRGraph()">HMR Data</span>
-						<span ng-click="complianceGraph()">Compliance</span> -->
+								<li><a href="" ng-click="showHmrGraph()">HMR Data</a></li>
+								<li><a href="" ng-click="showComplianceGraph()">Compliance</a></li>
+							</ul>
 						</div>
 					</div>
 					<div class="col-md-11 right_header_barchart">
@@ -67,99 +82,80 @@
 							<li role="presentation" class="" id="dp3"><a href="" date-range-picker class="date-picker" ng-model="dates" parentEl="#dp3" options="opts" >Date</a></li>
 						</ul>
 					</div>
-					<!-- <div>
-						<span ng-click="hmrDailyChart()">Daily</span>
-						<span ng-click="hmrWeeklyChart()">Weekly</span>
-						<span ng-click="hmrMonthlyChart()">Monthly</span>
-						<span ng-click="hmrYearlyChart()">Yearly</span>
-						<span>Datepicker</span>
-					</div>-->	
 				</div>
 				<div class="pull-right week_date_container">
 					<span ng-if="fromDate !== toDate"> 
-							<span class="date">{{fromDate}}</span> - <span class="date">{{toDate}}</span>
+						<span class="date">{{fromDate}}</span> - <span class="date">{{toDate}}</span>
 					</span>
 					<span ng-if="fromDate === toDate" class="date">{{fromDate}}<span>
 				</div>	
 			</div>
-		</div>
-		<style>
-		text {
-		font: 12px sans-serif;
-		}
-		svg {
-		display: block;
-		}
-		html, body, #complianceGraph, svg {
-		margin: 0px;
-		padding: 0px;
-		height: 100%;
-		width: 100%;
-		}
-}
-		</style>
-	<div ng-if="hmrGraph">
-		<div ng-if="hmrLineGraph">
-	 		<nvd3-line-chart
-	    	  data="graphData"
-	        id="HMRLineGraph"
-	        width="1250"
-	        height="350"
-	        showXAxis="true"
-	        showYAxis="true"
-	        legends="true"
-	        interactive="true"
-	        tooltips="true"
-	        isArea="true"
-	        interpolate="step-before"
-	        yAxisLabel="Minutes"
-          margin="{left:100,top:20,bottom:20,right:10}"
-	        xAxisTickFormat="xAxisTickFormatFunction(format)"
-	        xAxisTickValues="xAxisTickValuesFunction()"
-	        noData="No Data Found!"
-	        objectEquality="true"
-	        tooltipcontent="toolTipContentFunction()">
-	        <svg></svg>
-	    </nvd3-line-chart>
-	  </div>
-	  <div ng-if="hmrBarGraph">
-		 	<nvd3-multi-bar-chart
-		    	data="graphData"
-	        id="hmrBarGraph"
-	        width="1250"
-	        height="300"
-	        showXAxis="true"
-	        showYAxis="true"
-	        interactive="true"
-	        tooltips="true"
-	        isArea="true"
-	        yAxisLabel="Minutes"
-	        margin="{left:100,top:20,bottom:20,right:10}"
-	        xAxisTickFormat="xAxisTickFormatFunction(format)"
-	        xAxisTickValues="xAxisTickValuesFunction()"
-	        noData="No Data Found!"
-	        objectEquality="true"
-	        tooltipcontent="toolTipContentBarChart()">
-	        <svg></svg>
-		  </nvd3-multi-bar-chart>
-	  </div>
+			<div class="col-md-16 dashboard_line_graph">
+				<div ng-if="hmrGraph">
+					<div ng-if="hmrLineGraph">
+						<nvd3-line-chart
+						data="graphData"
+						id="HMRLineGraph"
+						width="1250"
+						height="350"
+						showXAxis="true"
+						showYAxis="true"
+						legends="true"
+						interactive="true"
+						tooltips="true"
+						isArea="true"
+						interpolate="step-before"
+						yAxisLabel="Minutes"
+						xAxisTickFormat="xAxisTickFormatFunction(format)"
+						xAxisTickValues="xAxisTickValuesFunction()"
+						noData="No Data Found!"
+						objectEquality="true"
+						tooltipcontent="toolTipContentFunction()">
+						<svg style="height:350px"></svg>
+						</nvd3-line-chart>
+					</div>
+					<div ng-if="hmrBarGraph">
+						<nvd3-multi-bar-chart
+							data="graphData"
+							id="hmrBarGraph"
+							width="1250"
+							height="300"
+							showXAxis="true"
+							showYAxis="true"
+							interactive="true"
+							tooltips="true"
+							isArea="true"
+							yAxisLabel="Minutes"
+							xAxisTickFormat="xAxisTickFormatFunction(format)"
+							xAxisTickValues="xAxisTickValuesFunction()"
+							noData="No Data Found!"
+							objectEquality="true"
+							tooltipcontent="toolTipContentBarChart()">
+							<svg style="height:350px"></svg>
+						</nvd3-multi-bar-chart>
+					</div>
+				</div>
+
+				<div ng-if="complianceGraph">
+					<div>
+						<input type="checkbox" name="pressure" ng-disabled="pressureIsDisabled" ng-model="compliance.pressure" ng-change="reCreateComplianceGraph()">
+						<span>pressure</span>
+						<input type="checkbox" name="frequency" ng-disabled="frequencyIsDisabled" ng-model="compliance.frequency" ng-change="reCreateComplianceGraph()">
+						<span>Frequency</span>
+						<input type="checkbox" name="duration" ng-disabled="durationIsDisabled" ng-model="compliance.duration" ng-change="reCreateComplianceGraph()">
+						<span>Duration</span>
+					</div>
+					<div id="complianceGraph">
+						<svg style="height:350px"> </svg>
+					</div>
+				</div>
+			</div>
+
 	</div>
 
-	  <div ng-if="complianceGraph">
-	  	<div>
-	  		 <input type="checkbox" name="pressure" ng-disabled="pressureIsDisabled" ng-model="compliance.pressure" ng-change="reCreateComplianceGraph()">
-	  		 <span>pressure</span>
-	  		 <input type="checkbox" name="frequency" ng-disabled="frequencyIsDisabled" ng-model="compliance.frequency" ng-change="reCreateComplianceGraph()">
-	  		 <span>Frequency</span>
-	  		 <input type="checkbox" name="duration" ng-disabled="durationIsDisabled" ng-model="compliance.duration" ng-change="reCreateComplianceGraph()">
-	  		 <span>Duration</span>
-	  	</div>
-	  	<div id="complianceGraph">
-      	<svg style="height:350px"> </svg>
-    	</div>
-	  </div>
- 		<!-- <nvd3 options="options" data="data"></nvd3> -->
 
-		</div>
+	<!-- <nvd3 options="options" data="data"></nvd3> -->
 
-    
+</div>
+
+

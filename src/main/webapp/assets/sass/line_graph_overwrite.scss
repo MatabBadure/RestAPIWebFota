@@ -22,7 +22,78 @@
 			}
 		} 
 }
+.nvtooltip{
+		&:before { 
+		    content: "";
+		    display: block;
+		    position: absolute;
+		    bottom: -11px;
+		    left: 40%;
+		    width: 0; 
+			height: 0; 
+			border-left: 10px solid transparent;
+			border-right: 10px solid transparent;
+			
+			border-top: 10px solid #ccc;
 
+ 		}
+ 		&:after { 
+		    content: "";
+		    display: block;
+		    position: absolute;
+		    bottom: -9px;
+		    left: 40.5%;
+		    width: 0; 
+			height: 0; 
+			border-left: 9px solid transparent;
+			border-right: 9px solid transparent;
+			
+			border-top: 9px solid #fff;
+
+ 		}
+	}
+	.nvtooltip{
+		padding: 0px 15px 10px 15px;
+		min-width: 150px;
+		border-radius: 3px;
+		p{
+			padding: 0px 0px;
+			margin: 0px 0px;
+			text-align: left;
+		}
+		h6{
+			margin: 5px 0px;
+			padding: 0px 0px;
+			line-height: 20px;
+			font-weight: bold;
+			color: $gray-dark;
+			font-size: 12px;
+			border-bottom: solid 1px #ccc;
+		}
+		.graph_ul{
+			padding-left: 0px;
+			margin-left: 0px;
+			li{
+				list-style-type: none;
+				.value{
+					color: $gray-dark;
+				}
+			}
+		}
+	}
+.nvd3{
+	&.nv-scatter{
+		&.nv-single-point{
+			.nv-groups{
+				.nv-point{
+					stroke-opacity: 1!important;
+				    stroke-width: 5px!important;
+				    fill-opacity: 1!important;
+				}
+			}
+		}
+	}
+}
 /* Over write date picker style*/
 .daterangepicker{
 	&.dropdown-menu{

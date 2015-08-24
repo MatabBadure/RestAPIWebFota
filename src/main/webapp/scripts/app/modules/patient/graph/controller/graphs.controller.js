@@ -146,6 +146,15 @@ $scope.dates = {startDate: null, endDate: null};
                 '<p> Frequency ' + value.frequency + '</p>' +
                 '<p> Pressure ' + value.pressure + '</p>' +
                 '<p> Cough Pauses ' + (value.normalCaughPauses + value.programmedCaughPauses) + '</p>';
+
+
+
+                '<ul class="graph_ul">' +
+                  '<li><span class="pull-left">' + 'Frequency' + '</span><span class="pull-right value">' + value.frequency + '</span></li>' +
+                  '<li><span class="pull-left">' + 'Pressure' +'</span><span class="pull-right value">' + value.pressure +'</span></li>' +
+                  '<li><span class="pull-left">' + 'Cough Pauses' +'</span><span class="pull-right value">' + (value.normalCaughPauses + value.programmedCaughPauses) +'</span></li>' +
+                '</ul>';
+
           }
         });
       return toolTip;   
@@ -159,10 +168,12 @@ $scope.dates = {startDate: null, endDate: null};
           if(value.date === e.point.x){
               toolTip =
                 '<h6>' + dateService.getDateFromTimeStamp(value.date) + '</h6>' +
-                '<p> Treatment/Day ' + value.therapyData.treatmentsPerDay + '</p>' +
-                '<p> Frequency ' + value.therapyData.weightedAvgFrequency + '</p>' +
-                '<p> Pressure ' + value.therapyData.weightedAvgPressure + '</p>' +
-                '<p> Caugh Pauses ' + value.therapyData.normalCoughPauses + '</p>';
+                '<ul class="graph_ul">' +
+                  '<li><span class="pull-left">' + 'Treatment/Day' + '</span><span class="pull-right value">' + value.therapyData.treatmentsPerDay + '</span></li>' +
+                  '<li><span class="pull-left">' + 'Frequency' +'</span><span class="pull-right value">' + value.therapyData.weightedAvgFrequency +'</span></li>' +
+                  '<li><span class="pull-left">' + 'Pressure' +'</span><span class="pull-right value">' + value.therapyData.weightedAvgPressure +'</span></li>' +
+                  '<li><span class="pull-left">' + 'Cough Pauses' +'</span><span class="pull-right value">' + value.therapyData.normalCoughPauses +'</span></li>' +
+                '</ul>';
           }
         });
       return toolTip;   
@@ -408,7 +419,7 @@ $scope.dates = {startDate: null, endDate: null};
     d3.select('#complianceGraph svg').selectAll("*").remove();
       nv.addGraph(function() {
       chart = nv.models.multiChart()
-      .margin({top: 30, right: 100, bottom: 50, left: 100})
+      //.margin({top: 30, right: 100, bottom: 50, left: 100})
       .color(d3.scale.category10().range());
       chart.tooltipContent($scope.toolTipContentForCompliance($scope.completeComplianceData));
       chart.xAxis.tickFormat(function(d) {
@@ -432,6 +443,34 @@ $scope.dates = {startDate: null, endDate: null};
         d3.select('#complianceGraph svg')
       .datum($scope.complianceGraphData)
       .transition().duration(500).call(chart);
+
+       //var date_now = (new Date()).getTime();
+
+        // If we want a fixed position
+        // var date_now = (new Date("2015/03/18")).getTime();
+
+        // Get position of now date on xAxis thanks to scale func
+        //var date_now_xposition = chart.xAxis.scale()(date_now);
+
+        // When nvd3 draw chart it append a rectangle of the inner
+        // size of our chart (without label axis or title)
+        // let's get it to know height and width of our rectangle
+        //var rect_background = document.getElementsByClassName("nv-stackedarea")[0].firstChild.firstChild;
+
+        // draw a background rectangle to indicate the future
+        // Here we will append new rectangle to ".nv-groups"
+        // this allow to avoid to break nvd3 hover fearure on chart
+        //var back_height = d3.select('#complianceGraph svg .x .nv-wrap').
+        d3.select('#complianceGraph svg .x .nv-wrap g').append("rect")
+          .attr("x", 0) // start rectangle on the good position
+          .attr("y", -  270) // no vertical translate
+          .attr("width", 93 +"%") // correct size
+          .attr("height", 270+"px") // full height
+          .attr("fill", "rgba(66,139,202, 0.2)"); // transparency color to see grid
+
+        //nv.utils.windowResize(chart.update);
+
+
       return chart;
     });
   }

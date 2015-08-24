@@ -456,7 +456,10 @@ angular.module('hillromvestApp')
       }
       patientService.deleteDevice($stateParams.patientId, device).then(function(response){
         device.active = false;
-      }).catch(function(response){});
+        notyService.showMessage(response.data.message, 'success');
+      }).catch(function(response){
+        notyService.showMessage(response.data.message, 'warning');
+      });
     };
 
     $scope.deleteProtocol = function(id){

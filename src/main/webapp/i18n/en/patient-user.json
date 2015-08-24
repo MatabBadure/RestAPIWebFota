@@ -89,6 +89,14 @@
           "avr-pressure-trt": "Average pressure/treatment",
           "last-3-days-hmr": "Last 3 days HMR run rate",
           "avr-freq-trt": "Average frequency/treatment"
+        },
+        "delete-protocol": {
+            "warning": "Are you sure you want to Delete the Protocol?",
+            "message": "If you delete the protocol, you will no longer be able to view the information."
+        },
+        "delete-device": {
+            "warning": "Are you sure you want to Delete the Device?",
+            "message": "If you delete the Device, you will no longer be able to view the information."
         }
     }
 }

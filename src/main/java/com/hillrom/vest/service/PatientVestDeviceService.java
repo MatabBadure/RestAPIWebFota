@@ -98,11 +98,6 @@ public class PatientVestDeviceService {
 	 		patientInfo.setSerialNumber(deviceData.get("serialNumber").toString());
 	 		patientInfo.setBluetoothId(deviceData.get("bluetoothId").toString());
 	 		patientInfoRepository.save(patientInfo);
-	 		Optional<PatientVestDeviceHistory> currentAssoc = patientVestDeviceRepository.findOneByPatientIdAndActiveStatus(patientInfo.getId(), true);
-	 		if(currentAssoc.isPresent()){
- 				currentAssoc.get().setActive(false);
- 				patientVestDeviceRepository.save(currentAssoc.get());
-	 		}
 	 		String hubId = Objects.nonNull(deviceData.get("hubId")) ? deviceData.get("hubId").toString() : null;
 	 		activeDevice.setSerialNumber(deviceData.get("serialNumber").toString());
 	 		activeDevice.setBluetoothId(deviceData.get("bluetoothId").toString());

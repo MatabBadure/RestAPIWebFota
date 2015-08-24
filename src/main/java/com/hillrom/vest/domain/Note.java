@@ -9,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -21,6 +22,7 @@ import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 
 @Entity
 @Table(name = "PATIENT_NOTE")
+@SQLDelete(sql="Update PATIENT_NOTE SET is_deleted = 1 where id = ?")
 public class Note {
 
 	@Id
@@ -31,7 +33,7 @@ public class Note {
 	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
 	@JsonSerialize(using = CustomLocalDateSerializer.class)
 	@JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
-	private LocalDate createdOn = LocalDate.now();
+	private LocalDate createdOn;
 
 	@JsonIgnore
 	@ManyToOne(optional = false, targetEntity = User.class)
@@ -49,6 +51,9 @@ public class Note {
 	@Column(name="modified_at")
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	private DateTime modifiedAt = DateTime.now();
+	
+	@Column(name="is_deleted")
+	private boolean isDeleted;
 
 	public Long getId() {
 		return id;

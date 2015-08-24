@@ -162,10 +162,10 @@ public class AccountResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<JSONObject> changePassword(@RequestBody String password) {
+    public ResponseEntity<JSONObject> changePassword(@RequestBody Map<String, String> body) {
         JSONObject jsonObject = new JSONObject();
 		try {
-			jsonObject = userService.changePassword(password);
+			jsonObject = userService.changePassword(body.get("password"));
 			if(jsonObject.containsKey("ERROR")){
 	        	return ResponseEntity.badRequest().body(jsonObject);
 	        }

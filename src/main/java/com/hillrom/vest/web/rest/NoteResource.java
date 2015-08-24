@@ -1,5 +1,6 @@
 package com.hillrom.vest.web.rest;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
@@ -7,6 +8,8 @@ import javax.inject.Inject;
 
 import net.minidev.json.JSONObject;
 
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.SQLDelete;
 import org.joda.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -40,6 +43,8 @@ public class NoteResource {
 		String noteText = paramsMap.get("noteText");
 		String userId = paramsMap.get("userId");
 		String patientId = paramsMap.get("patientId");
+		String timestamp = paramsMap.get("date");
+		LocalDate date = StringUtils.isNumeric(timestamp)? LocalDate.fromDateFields(new Date(Long.parseLong(timestamp))) : LocalDate.now();
 		Note note = null;
 	
 		if(Objects.isNull(noteText)){
@@ -47,9 +52,9 @@ public class NoteResource {
 			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 		}
 		if(Objects.nonNull(userId)){
-			note = noteService.saveOrUpdateNoteByUserId(Long.parseLong(userId), noteText);
+			note = noteService.saveOrUpdateNoteByUserId(Long.parseLong(userId), noteText,date);
 		}else if(Objects.nonNull(patientId)){
-			note = noteService.saveOrUpdateNoteByPatientId(patientId, noteText);
+			note = noteService.saveOrUpdateNoteByPatientId(patientId, noteText,date);
 		}else{
 			jsonObject.put("ERROR", "Required Param missing [noteText,patientId/userId]");
 			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
@@ -62,8 +67,8 @@ public class NoteResource {
 	
 	@RequestMapping(value="/users/{userId}/notes",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> findByPatientId(@PathVariable("userId") Long userId,
-			@RequestParam("date") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date){
-		Note note = noteService.findOneByUserIdAndDate(userId, date);
+			@RequestParam(value="date",required=true) Long timestamp){
+		Note note = noteService.findOneByUserIdAndDate(userId, LocalDate.fromDateFields(new Date(timestamp)));
 		if(Objects.nonNull(note)){
 			return new ResponseEntity<>(note, HttpStatus.OK);
 		}
@@ -72,8 +77,8 @@ public class NoteResource {
 	
 	@RequestMapping(value="/patients/{patientId}/notes",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> findByUserId(@PathVariable("patientId") String patientId,
-			@RequestParam("date") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date){
-		Note note = noteService.findOneByPatientIdAndDate(patientId,date);
+			@RequestParam(value="date",required=true) Long timestamp){
+		Note note = noteService.findOneByPatientIdAndDate(patientId,LocalDate.fromDateFields(new Date(timestamp)));
 		if(Objects.nonNull(note)){
 			return new ResponseEntity<>(note, HttpStatus.OK);
 		}

@@ -28,7 +28,7 @@
       <span ng-if="!protocol.deleted" class="glyphicon glyphicon glyphicon-pencil" ng-click="openEditProtocol(protocol)"></span>
     </div>
     <div class="col-md-1 protocol-list__delete text-center">
-      <span ng-if="!protocol.deleted" class="glyphicon glyphicon-trash" ng-click="deleteProtocol(protocol.id)"></span>
+      <span ng-if="!protocol.deleted" class="glyphicon glyphicon-trash" ng-click="deleteProtocolModel(protocol.id)"></span>
     </div>
   </div>
 
@@ -67,7 +67,7 @@
       <span ng-if="device.active" class="glyphicon glyphicon-pencil cursor-pointer" ng-click="openEditDevice(device)"></span>
     </div>
     <div class="col-md-1 device-list__delete text-center">
-      <span ng-if="device.active" class="glyphicon glyphicon-trash cursor-pointer" ng-click="deleteDevice(device)"></span>
+      <span ng-if="device.active" class="glyphicon glyphicon-trash cursor-pointer" ng-click="deleteDeviceModel(device)"></span>
     </div>
   </div>
 
@@ -84,14 +84,14 @@
   <div class="modal__dialog">
     <div class="modal__content">
       <header class="modal__header">
-        <button type="button" class="modal__close" data-dismiss="modal" ng-click="close()">&times;</button>
+        <button type="button" class="modal__close" data-dismiss="modal" ng-click="cancelProtocolModel()">&times;</button>
          <p translate="patient.delete-protocol.warning"></p>
       </header>
       <div class="modal__body">
          <div class="modal--message" translate="patient.delete-protocol.message"></div>
          <div class="row modal--custom-btn">
-          <buton class="hillrom-btn btn-submit float-right" ng-click="deletePatient()">Yes</buton>
-          <buton class="hillrom-btn btn-submit float-right" data-dismiss="modal" ng-click="close()">No</buton>
+          <buton class="hillrom-btn btn-submit float-right" ng-click="deleteProtocol()">Yes</buton>
+          <buton class="hillrom-btn btn-submit float-right" data-dismiss="modal" ng-click="cancelProtocolModel()">No</buton>
          </div>
       </div>
       <footer class="modal__footer">
@@ -104,14 +104,14 @@
   <div class="modal__dialog">
     <div class="modal__content">
       <header class="modal__header">
-        <button type="button" class="modal__close" data-dismiss="modal" ng-click="close()">&times;</button>
+        <button type="button" class="modal__close" data-dismiss="modal" ng-click="cancelDeviceModel()">&times;</button>
          <p translate="patient.delete-device.warning"></p>
       </header>
       <div class="modal__body">
          <div class="modal--message" translate="patient.delete-device.message"></div>
          <div class="row modal--custom-btn">
-          <buton class="hillrom-btn btn-submit float-right" ng-click="deletePatient()">Yes</buton>
-          <buton class="hillrom-btn btn-submit float-right" data-dismiss="modal" ng-click="close()">No</buton>
+          <buton class="hillrom-btn btn-submit float-right" ng-click="deleteDevice()">Yes</buton>
+          <buton class="hillrom-btn btn-submit float-right" data-dismiss="modal" ng-click="cancelDeviceModel()">No</buton>
          </div>
       </div>
       <footer class="modal__footer">

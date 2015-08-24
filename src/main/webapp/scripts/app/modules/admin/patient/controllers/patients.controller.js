@@ -360,6 +360,15 @@ angular.module('hillromvestApp')
       $state.go('patientDemographic', {'patientId': $stateParams.patientId});
     };
 
+
+    $scope.cancelDeviceModel = function(){
+      $scope.showModalDevice = false;
+    };
+
+    $scope.cancelProtocolModel = function(){
+      $scope.showModalProtocol = false;
+    };
+
     $scope.disassociatePatient =function(){
       patientService.disassociatePatient($scope.patient.id).then(function(response){
         notyService.showMessage(response.data.message, 'success');
@@ -458,20 +467,30 @@ angular.module('hillromvestApp')
       }).catch(function(response){});
     };
 
-    $scope.deleteDevice = function(device){
-      if(!device.active){
-        return false;
-      }
-      patientService.deleteDevice($stateParams.patientId, device).then(function(response){
-        device.active = false;
+    $scope.deleteDevice = function(){
+      $scope.showModalDevice = false;
+      patientService.deleteDevice($stateParams.patientId, $scope.deviceToDelete).then(function(response){
+        $scope.deviceToDelete.active = false;
         notyService.showMessage(response.data.message, 'success');
       }).catch(function(response){
         notyService.showMessage(response.data.message, 'warning');
       });
     };
 
+    $scope.deleteProtocolModel = function(protocolId){
+      $scope.toDeleteProtocolId = protocolId;
+      $scope.showModalProtocol = true;
+    };
+
+    $scope.deleteDeviceModel = function(device){
+      $scope.deviceToDelete = device;
+      $scope.showModalDevice = true;
+    };
+
     $scope.deleteProtocol = function(id){
-      patientService.deleteProtocol($stateParams.patientId, id).then(function(response){
+      $scope.showModalProtocol = false;
+      patientService.deleteProtocol($stateParams.patientId, $scope.toDeleteProtocolId).then(function(response){
+        notyService.showMessage(response.data.message, 'success');
         $scope.getProtocols($stateParams.patientId);
       }).catch(function(response){});
     };

@@ -175,36 +175,6 @@ console.log("from and To dates :"+$scope.dates);
       $state.go(status);
     };
 
-    /*$scope.init = function() {
-      $scope.getPatientById(localStorage.getItem('patientID'));
-      var currentRoute = $state.current.name;
-      if ($state.current.name === 'patientdashboard') {
-        $scope.initPatientDashboard();        
-      }else if(currentRoute === 'patientdashboardCaregiver'){
-        $scope.initPatientCaregiver();
-      }else if(currentRoute === 'patientdashboardCaregiverAdd'){
-        $scope.initpatientCraegiverAdd();
-      }else if(currentRoute === 'patientdashboardCaregiverEdit'){
-        $scope.initpatientCaregiverEdit();
-      }else if(currentRoute === 'patientdashboardDeviceProtocol'){
-        $scope.initPatientDeviceProtocol();
-      }else if(currentRoute === 'patientdashboardClinicHCP'){
-        $scope.initPatientClinicHCPs();
-      }
-      $scope.hmrGraphData = [
-      {
-          "key": "weekly",
-          "values": [ [ 1025409600000 , [ {'Treatment/Day' : 21 }, {'Frequency' : 28 }, {'pressure' : 10 }, {'Caugh Pauses' : 39 }] ] ,
-           [ 1028088000000 , [ {'name':'Treatment/Day','value' :21}, {'name':'Frequency', 'value': 28 }, {'name':'pressure', 'value': 10 }, {'name':'Caugh Pauses','value': 39 }]] ,
-           [ 1028088000000 , [ {'name':'Treatment/Day','value' :21}, {'name':'Frequency', 'value': 28 }, {'name':'pressure', 'value': 10 }, {'name':'Caugh Pauses','value': 39 }]] ,
-           [ 1028088000000 , [ {'name':'Treatment/Day','value' :21}, {'name':'Frequency', 'value': 28 }, {'name':'pressure', 'value': 10 }, {'name':'Caugh Pauses','value': 39 }]] ,
-           [ 1028088000000 , [ {'name':'Treatment/Day','value' :21}, {'name':'Frequency', 'value': 28 }, {'name':'pressure', 'value': 10 }, {'name':'Caugh Pauses','value': 39 }]] ,
-           [ 1028088000000 , [ {'name':'Treatment/Day','value' :21}, {'name':'Frequency', 'value': 28 }, {'name':'pressure', 'value': 10 }, {'name':'Caugh Pauses','value': 39 }]]  ]
-         }
-    ]    
-    };*/
-
-
     $scope.xAxisTickFormatFunction = function(format){
       return function(d){
         switch(format) {
@@ -769,10 +739,13 @@ console.log("from and To dates :"+$scope.dates);
           var notificationType = notification.notificationType; 
           if(notificationType.indexOf("HMR_NON_COMPLIANCE AND SETTINGS_DEVIATION") > -1){
             $scope.patientNotifications[index].message = apiresponse.HMR_NON_COMPLIANCE_AND_SETTINGS_DEVIATION;
+            $scope.patientNotifications[index].class = "icon-lungs";
           }else if(notificationType.indexOf("HMR_NON_COMPLIANCE") > -1){
              $scope.patientNotifications[index].message = apiresponse.HMR_NON_COMPLIANCE;
+             $scope.patientNotifications[index].class = "icon-lungs";
           }else if(notificationType.indexOf("MISSED_THERAPY") > -1){
              $scope.patientNotifications[index].message = apiresponse.MISSED_THERAPY ;
+             $scope.patientNotifications[index].class = "icon-lungs";
           }
         });
       }).catch(function(){});

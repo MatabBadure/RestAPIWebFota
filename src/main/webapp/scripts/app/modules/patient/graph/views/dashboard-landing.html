@@ -40,7 +40,7 @@
 							<div class="notification_container">
 								<ul>
 									<li ng-repeat="notification in patientNotifications | limitTo:2">
-										<span class="dsh_icon"></span>
+										<span class="dsh_icon {{notification.class}}"></span>
 										{{notification.message}}
 										<span ng-show="notification.message"><a href="" class="read_more">more</a></span>
 									</li>

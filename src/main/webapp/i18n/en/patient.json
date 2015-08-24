@@ -25,6 +25,7 @@
         "hill-rom-id":  "Hill-Rom ID",
         "emr-id":   "EMR-ID",
         "mrn-id": "MRN-ID",
+        "adherence": "Adherence",
         "title": {
                     "name": "Title",
                     "mr":   "Mr.",
@@ -43,6 +44,7 @@
         "placeholder": {
             "search": "Search with Name, Hill-Rom ID or Email"
         },
+        "patient-name": "Patient Name",
         "primary-language": "Primary Language",
         "first-name": "First Name",
         "middle-name": "Middle Name",
@@ -53,6 +55,9 @@
         "zipcode": "Zip",
         "email": "Email",
         "state": "State",
+        "transmission": "Transmission",
+        "status": "Status",
+        "clinic-name": "Clinic Name",
         "phone-number": "Phone No",
         "mobile-number": "Mobile No.",
         "home-phone-number": "Home Phone No.",

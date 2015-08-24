@@ -9,11 +9,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-
-import net.minidev.json.JSONObject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -56,6 +56,8 @@ import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
+
+import net.minidev.json.JSONObject;
 
 /**
  * Service class for managing users.
@@ -142,7 +144,7 @@ public class UserService {
        String answer = paramsMap.get("answer");
        
        JSONObject jsonObject = new JSONObject();
-       if (!checkPasswordLength(newPassword)) {
+       if (!checkPasswordConstraints(newPassword)) {
     	   jsonObject.put("message", "Incorrect password");
     	   return jsonObject;
        }
@@ -200,6 +202,14 @@ public class UserService {
         return (!StringUtils.isEmpty(password) && password.length() >= UserDTO.PASSWORD_MIN_LENGTH && password.length() <= UserDTO.PASSWORD_MAX_LENGTH);
     }
     
+    private boolean checkPasswordConstraints(String password) {
+    	Pattern pattern = Pattern.compile(UserDTO.PASSWORD_PATTERN);
+   	  	Matcher matcher = pattern.matcher(password);
+   	  	boolean isValid = matcher.matches();
+   	  	log.debug("Password : {}, Valid : {}", password,isValid);
+        return isValid;
+    }
+    
     public Optional<User> requestPasswordReset(String mail) {
        return userRepository.findOneByEmail(mail)
            .filter(user -> user.getActivated() == true)
@@ -249,7 +259,7 @@ public class UserService {
 
     public JSONObject changePassword(String password) throws HillromException {
     	JSONObject jsonObject = new JSONObject();
-    	if(!checkPasswordLength(password)){
+    	if(!checkPasswordConstraints(password)){
     		throw new HillromException(ExceptionConstants.HR_506);//Incorrect password
     	}else{
     		userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).ifPresent(u-> {
@@ -435,7 +445,7 @@ public class UserService {
         		&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
         	UserExtension user = updateHillromTeamUser(id, userExtensionDTO);
     		if(user.getId() != null) {
-    			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && !user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
     				mailService.sendActivationEmail(user, baseUrl);
     			}
                 return user;
@@ -445,7 +455,7 @@ public class UserService {
     	} else if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updatePatientUser(id, userExtensionDTO);
     		if(user.getId() != null) {
-    			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && !user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
     				mailService.sendActivationEmail(user, baseUrl);
     	    		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
     			}
@@ -456,7 +466,7 @@ public class UserService {
         } else if (AuthoritiesConstants.HCP.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updateHCPUser(id, userExtensionDTO);
     		if(user.getId() != null) {
-    			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && !user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
     				mailService.sendActivationEmail(user, baseUrl);
     			}
                 return user;
@@ -770,7 +780,7 @@ public class UserService {
     	if(StringUtils.isBlank(questionId) || !StringUtils.isNumeric(questionId)){
     		throw new HillromException(ExceptionConstants.HR_507);//Required field SecurityQuestion is missing");
     	}
-        if (!checkPasswordLength(password)) {
+        if (!checkPasswordConstraints(password)) {
         	throw new HillromException(ExceptionConstants.HR_506);//Incorrect password
         }
 		return jsonObject;
@@ -826,7 +836,7 @@ public class UserService {
 		}
 		
 		String password = params.get("password");
-		if(!checkPasswordLength(password)){
+		if(!checkPasswordConstraints(password)){
 			throw new HillromException(ExceptionConstants.HR_506);//Incorrect Password
 		}
 		

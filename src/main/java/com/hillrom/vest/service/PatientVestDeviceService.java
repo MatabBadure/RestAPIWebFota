@@ -71,17 +71,18 @@ public class PatientVestDeviceService {
 		if(patientUser != null) {
 			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
 		 	if(patientInfo != null){
-		 		patientInfo.setSerialNumber(deviceData.get("serialNumber").toString());
-		 		patientInfo.setBluetoothId(deviceData.get("bluetoothId").toString());
+		 		patientInfo.setSerialNumber(Objects.nonNull(deviceData.get("serialNumber")) ? deviceData.get("serialNumber").toString() : null);
+		 		patientInfo.setBluetoothId(Objects.nonNull(deviceData.get("bluetoothId")) ? deviceData.get("bluetoothId").toString() : null);
 		 		patientInfoRepository.save(patientInfo);
 		 		Optional<PatientVestDeviceHistory> currentAssoc = patientVestDeviceRepository.findOneByPatientIdAndActiveStatus(patientInfo.getId(), true);
 		 		if(currentAssoc.isPresent()){
 	 				currentAssoc.get().setActive(false);
 	 				patientVestDeviceRepository.save(currentAssoc.get());
 		 		}
-		 		String hubId = Objects.nonNull(deviceData.get("hubId")) ? deviceData.get("hubId").toString() : null;
 		 		PatientVestDeviceHistory patientVestDeviceAssoc = new PatientVestDeviceHistory(
-		 				new PatientVestDevicePK(patientInfo, deviceData.get("serialNumber").toString()), deviceData.get("bluetoothId").toString(), hubId, true);
+		 				new PatientVestDevicePK(patientInfo, Objects.nonNull(deviceData.get("serialNumber")) ? deviceData.get("serialNumber").toString() : null), 
+		 				Objects.nonNull(deviceData.get("bluetoothId")) ? deviceData.get("bluetoothId").toString() : null, 
+		 				Objects.nonNull(deviceData.get("hubId")) ? deviceData.get("hubId").toString() : null, true);
 		 		patientVestDeviceRepository.saveAndFlush(patientVestDeviceAssoc);
 		 		return patientVestDeviceAssoc;
 		 	} else {
@@ -95,13 +96,12 @@ public class PatientVestDeviceService {
 	private PatientVestDeviceHistory updateDeviceDetailsForPatient(PatientVestDeviceHistory activeDevice, Map<String, Object> deviceData) throws HillromException {
 		PatientInfo patientInfo = activeDevice.getPatient();
 	 	if(patientInfo != null){
-	 		patientInfo.setSerialNumber(deviceData.get("serialNumber").toString());
-	 		patientInfo.setBluetoothId(deviceData.get("bluetoothId").toString());
+	 		patientInfo.setSerialNumber(Objects.nonNull(deviceData.get("serialNumber")) ? deviceData.get("serialNumber").toString() : null);
+	 		patientInfo.setBluetoothId(Objects.nonNull(deviceData.get("bluetoothId")) ? deviceData.get("bluetoothId").toString() : null);
 	 		patientInfoRepository.save(patientInfo);
-	 		String hubId = Objects.nonNull(deviceData.get("hubId")) ? deviceData.get("hubId").toString() : null;
-	 		activeDevice.setSerialNumber(deviceData.get("serialNumber").toString());
-	 		activeDevice.setBluetoothId(deviceData.get("bluetoothId").toString());
-	 		activeDevice.setHubId(hubId);
+	 		activeDevice.setSerialNumber(Objects.nonNull(deviceData.get("serialNumber")) ? deviceData.get("serialNumber").toString() : null);
+	 		activeDevice.setBluetoothId(Objects.nonNull(deviceData.get("bluetoothId")) ? deviceData.get("bluetoothId").toString() : null);
+	 		activeDevice.setHubId(Objects.nonNull(deviceData.get("hubId")) ? deviceData.get("hubId").toString() : null);
 	 		patientVestDeviceRepository.saveAndFlush(activeDevice);
 	 		return activeDevice;
 	 	} else {

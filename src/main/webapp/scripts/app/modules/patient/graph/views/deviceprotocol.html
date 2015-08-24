@@ -1,0 +1,59 @@
+<navigation-bar-patient></navigation-bar-patient>
+<patient-navbar></patient-navbar>
+<div class="container admin-user">
+ 
+  <div class="col-md-16 patient-protocol">
+    <span class="patient-protocol--title" translate="patient.protocol-title"></span>
+  </div>
+
+  <div class="col-md-16 protocol-list" ng-repeat="protocol in protocols">
+    <div class="col-md-3 protocol-list__type">
+      <span> {{protocol.type}}</span>
+    </div>
+    <div class="col-md-3 protocol-list__treatment-day">
+      <span class="protocol-list--value"> {{protocol.treatmentsPerDay}}</span>
+    </div>
+    <div class="col-md-4 protocol-list__strt-date">
+      <span class="protocol-list--value"> 12 January, 2015{{protocol.startDate}}</span>
+    </div>
+    <div class="col-md-4 protocol-list__end-date">
+      <span class="protocol-list--value"> 22 January, 2015{{protocol.endDate}}</span>
+    </div>   
+  </div>
+
+  <div class="col-md-16 reset-padding">
+    <div class="col-md-8 clinic-link">
+    </div>
+    <div class="col-md-8 clinic-link">     
+    </div>
+  </div>
+
+  <div class="col-md-16 patient-device">
+    <span class="patient-device--title" translate="patient.device-title"></span>
+  </div>
+
+  <div class="col-md-16 device-list" ng-repeat="device in devices" ng-class="{'list-inactive': !device.active}">
+    <div class="col-md-3 device-list__serial">
+      <span>{{device.serialNumber}}</span>
+    </div>
+    <div class="col-md-2 device-list__bt-id">
+      <span>{{device.bluetoothId}}</span>
+    </div>
+    <div class="col-md-1 device-list__device">
+      <span class="icon-lungs active"></span>
+    </div>
+    <div class="col-md-2 device-list__status">
+      <span ng-if="device.active" class="device--list__status--text">Active</span>
+      <span ng-if="!device.active" class="device--list__status--text">Inactive</span>
+    </div>
+    <div class="col-md-6 device-list__date">
+      <span>{{device.createdDate}}</span><span ng-if="device.active"> - Active date</span>
+      <span ng-if="!device.active"> - Inactive date</span>
+    </div>   
+  </div>
+
+  <div class="col-md-16 reset-padding">
+    <div class="col-md-8 clinic-link">
+    </div>   
+  </div>
+</div>

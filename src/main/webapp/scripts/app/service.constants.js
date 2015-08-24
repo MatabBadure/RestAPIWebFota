@@ -5,7 +5,10 @@ var admin = {
   	searchURL : 'api/user/patient/search'
 	},
 	hillRomUser : {
-		baseURL : 'api/user'
+		baseURL : 'api/user',
+		users : 'api/users',
+		notes : 'api/notes',
+		patients : 'api/patients'
 	}
 }
 

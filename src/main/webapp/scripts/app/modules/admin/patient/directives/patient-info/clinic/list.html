@@ -38,14 +38,14 @@
   </div>
   <div class="col-md-16 reset-padding">
     <div class="col-md-8 clinic-link">
-      <input class="" type="text" name="linkClinic" placeholder="{{'patient.placeholder.clinic-link' | translate}}" ng-model="searchItem" load-on-focus="true" load-on-empty="false"> 
-      <div class=""> 
-      <div class="parent-detail" ng-repeat="clinic in clinics | filter: {name: searchItem}" ng-if="searchItem.length > 0">
-        <div class="" ng-click="selectClinicForPatient(clinic, $index)">
-          <span class="user-name">{{clinic.name}} <sup class="parent-clinic" ng-if="clinic.parent">P</sup></span>
+      <input class="" type="text" name="linkClinic" placeholder="{{'patient.placeholder.clinic-link' | translate}}" ng-model="searchItem" load-on-focus="true" load-on-empty="false" ng-show="searchClinicText">
+      <div class="">
+        <div class="parent-detail" ng-repeat="clinic in clinics | filter: {name: searchItem}" ng-if="searchItem.length > 0 && searchClinicText">
+          <div class="" ng-click="selectClinicForPatient(clinic, $index)">
+            <span class="user-name">{{clinic.name}} <sup class="parent-clinic" ng-if="clinic.parent">P</sup></span>
+          </div>
         </div>
-      </div>      
-    </div>
+      </div>
     </div>
 
     <div class="col-md-8 clinic-link">

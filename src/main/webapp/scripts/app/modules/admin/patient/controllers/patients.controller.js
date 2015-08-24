@@ -441,6 +441,7 @@ angular.module('hillromvestApp')
     };
 
     $scope.addDevice = function(){
+      $scope.submitted = true;
       if($scope.addDeviceForm.$invalid){
         return false;
       }
@@ -454,6 +455,7 @@ angular.module('hillromvestApp')
     };
 
     $scope.addProtocol = function(){
+      $scope.submitted = true;
       if($scope.addProtocolForm.$invalid){
         return false;
       }

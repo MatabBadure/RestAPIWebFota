@@ -750,6 +750,7 @@ console.log("from and To dates :"+$scope.dates);
       $scope.textNote = "";
       $scope.weeklyChart();
       $scope.getNotes();
+      $scope.getPatientNotification();
     };
 
     $scope.openEditNote = function(){
@@ -761,6 +762,21 @@ console.log("from and To dates :"+$scope.dates);
       $scope.editNote = false;
     };
 
+    $scope.getPatientNotification = function(){
+      UserService.getPatientNotification(localStorage.getItem("patientID"), new Date().getTime()).then(function(response){                  
+        $scope.patientNotifications = response.data;//notifications;//response.data;
+        angular.forEach($scope.patientNotifications, function(notification, index) {
+          var notificationType = notification.notificationType; 
+          if(notificationType.indexOf("HMR_NON_COMPLIANCE AND SETTINGS_DEVIATION") > -1){
+            $scope.patientNotifications[index].message = apiresponse.HMR_NON_COMPLIANCE_AND_SETTINGS_DEVIATION;
+          }else if(notificationType.indexOf("HMR_NON_COMPLIANCE") > -1){
+             $scope.patientNotifications[index].message = apiresponse.HMR_NON_COMPLIANCE;
+          }else if(notificationType.indexOf("MISSED_THERAPY") > -1){
+             $scope.patientNotifications[index].message = apiresponse.MISSED_THERAPY ;
+          }
+        });
+      }).catch(function(){});
+    }
     $scope.init();
 });
 

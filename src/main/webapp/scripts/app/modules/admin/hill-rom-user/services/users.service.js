@@ -173,6 +173,17 @@ angular.module('hillromvestApp')
         }).success(function(response) {
           return response;
         });
+      },
+
+      getPatientNotification : function(userId, timestamp){
+        //api/users/:id/notifications?date=:timestamp
+        var url = admin.hillRomUser.users+'/'+userId+'/notifications?date='+timestamp;        
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function(response) {
+          return response;
+        });
+
       }
 
 

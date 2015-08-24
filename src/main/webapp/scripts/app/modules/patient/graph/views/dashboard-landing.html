@@ -35,12 +35,17 @@
 						</div>
 					</div>
 					<div class="col-md-4">
-						<div class="dashboard_noti_section">
+						<div class="dashboard_noti_section" ng-show="patientNotifications.length >= 1">
 							<div class="header_noti"><h4>Notification</h4></div>
 							<div class="notification_container">
 								<ul>
-									<li><span class="dsh_icon"></span>Your recommended compliance the therapy is low <span><a href="" class="read_more">more</a></span></li>
-									<li><span class="dsh_icon icon-lungs"></span>Your recommended compliance the therapy is low <span><a href="" class="read_more">more</a></span></li>
+									<li ng-repeat="notification in patientNotifications | limitTo:2">
+										<span class="dsh_icon"></span>
+										{{notification.message}}
+										<span ng-show="notification.message"><a href="" class="read_more">more</a></span>
+									</li>
+									<!-- <li><span class="dsh_icon"></span>Your recommended compliance the therapy is low <span><a href="" class="read_more">more</a></span></li>
+									<li><span class="dsh_icon icon-lungs"></span>Your recommended compliance the therapy is low <span><a href="" class="read_more">more</a></span></li> -->
 								</ul>
 							</div>
 						</div>

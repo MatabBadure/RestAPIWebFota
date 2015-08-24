@@ -279,7 +279,7 @@
             <div class="col-md-10 dashboard__form--input reset-padding">
               <input type="text" validate-on-blur class="form-control" name="mobilePhone" ng-readonly="validateADMINorASP()" ng-model="patient.mobilePhone" mask="(999)-999-9999">
                <div ng-show="(form.mobilePhone.$showValidationMessage && form.mobilePhone.$invalid) || submitted">
-                <span class="has-error" ng-show="form.mobilePhone.$error.maxlength">
+                <span class="has-error" ng-show="form.mobilePhone.$invalid">
                   Mobile number is invalid.
                 </span>
               </div>
@@ -293,10 +293,7 @@
           <div class="col-md-10 dashboard__form--input reset-padding">
             <input type="text" class="form-control" validate-on-blur  name="primaryPhone"  ng-readonly="validateADMINorASP()" ng-model="patient.primaryPhone" mask="(999)-999-9999">
             <div ng-show="(form.primaryPhone.$showValidationMessage && form.primaryPhone.$invalid) || submitted">
-              <span class="has-error" ng-show="form.primaryPhone.$error.pattern">
-                Home phone number is invalid.
-              </span>
-              <span class="has-error" ng-show="form.primaryPhone.$error.maxlength">
+              <span class="has-error" ng-show="form.primaryPhone.$invalid">
                 Home phone number is invalid.
               </span>
             </div>

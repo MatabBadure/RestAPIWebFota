@@ -57,28 +57,28 @@
         <div class="clr"></div>
       </div>
 
-      <div class="dashboard__manage-view--list">
+      <div class="dashboard__manage-view--list" ng-repeat="patient in patients" ng-click="patient.isDeleted || selectPatient(patient)" ng-readonly="true" ng-class="{ 'inactive': patient.isDeleted }">
           <div class="col-md-2 reset-padding">
-            <span class="main-prim-info">Shakya Avnesh</span>
-            <span class="main-secon-info">08/18/1989</span>
+            <span class="main-prim-info">{{patient.lastName}} {{patient.firstName}}</span>
+            <span class="main-secon-info">{{patient.dob}}</span>
           </div>
           <div class="col-md-2 reset-padding centered">
-            <span class="impo-highlight">HR 12345</span>
+            <span class="impo-highlight">{{patient.hillromId}}</span>
           </div>
           <div class="col-md-3 reset-padding centered">
-            <span class="short-info">avnesh@neevtech.com</span>
+            <span class="short-info"></span>
           </div>
 
           <div class="col-md-2 reset-padding centered">
-            <span class="short-info">Mangalore, Karnataka</span>
+            <span class="short-info"></span>
           </div>
 
           <div class="col-md-2 reset-padding centered">
-            <span class="short-info">08/18/1989</span>
+            <span class="short-info"></span>
           </div>
 
           <div class="col-md-3 reset-padding centered">
-            <span class="short-info">Manipal Hospital, NY</span>
+            <span class="short-info"></span>
           </div>
 
           <div class="col-md-1 reset-padding">
@@ -89,7 +89,7 @@
           </div>
 
           <div class="col-md-1 reset-padding-left centered text-right">
-            <span class="short-info">100</span>
+            <span class="short-info"></span>
           </div>
 
           <div class="clr"></div>

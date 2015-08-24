@@ -19,6 +19,8 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 import org.joda.time.DateTime;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -31,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * A Clinic.
  */
 @Entity
+@Audited
 @Table(name = "CLINIC")
 @SQLDelete(sql="UPDATE CLINIC SET is_deleted = 1 WHERE id = ?")
 public class Clinic implements Serializable {
@@ -65,20 +68,24 @@ public class Clinic implements Serializable {
     @Column(name = "clinic_admin_id")
     private Long clinicAdminId;
 
+    @NotAudited
     @ManyToOne
     @JoinColumn(name="parent_clinic_id")
     @JsonManagedReference
     private Clinic parentClinic;
  
+    @NotAudited
     @OneToMany(mappedBy="parentClinic")
     @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id")
     @JsonBackReference
     private List<Clinic> childClinics = new ArrayList<Clinic>();
 
+    @NotAudited
     @OneToMany(mappedBy = "clinicPatientAssocPK.clinic",fetch=FetchType.LAZY)
     @JsonIgnore
     private Set<ClinicPatientAssoc> clinicPatientAssoc = new HashSet<>();
     
+    @NotAudited
     @ManyToMany(mappedBy="clinics")
     @JsonBackReference
     private Set<UserExtension> users = new HashSet<>();

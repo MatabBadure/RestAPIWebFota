@@ -114,7 +114,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "terms_condition_accepted_date", nullable = true)
     private DateTime termsConditionAcceptedDate = null;
 
-    @NotAudited
+    @Audited
     @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(
             name = "USER_AUTHORITY",

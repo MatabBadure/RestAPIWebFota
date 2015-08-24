@@ -85,7 +85,6 @@ public class Clinic implements Serializable {
     @JsonIgnore
     private Set<ClinicPatientAssoc> clinicPatientAssoc = new HashSet<>();
     
-    @NotAudited
     @ManyToMany(mappedBy="clinics")
     @JsonBackReference
     private Set<UserExtension> users = new HashSet<>();

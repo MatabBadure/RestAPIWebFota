@@ -790,3 +790,13 @@ tags-input.ng-invalid .tags {
   top: 5px;
   right: 50%;
 }
+
+.admin-user .admin-views {
+  margin-top: 20px;
+  padding: 10px 0;
+  &--title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    color: $pickled-bluewood;
+  }
+}

@@ -56,12 +56,12 @@
 
 <div class="container admin-user">
   <div class="col-md-16 admin-views">
-    <span class="admin-views" translate="patient.clinic-assos"></span>
+    <span class="admin-views--title" translate="doctor.clinic-assoc"></span>
   </div>
 </div>
 
 <div class="dashboard dashboard--content">
-  <div class="container dashboard__manage-view margin-top-xl">
+  <div class="container dashboard__manage-view margin-top">
     <div class="dashboard__manage-view--search">
       <div class="fuid-search-box reset-padding-right">
         <input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" autocomplete="off" placeholder="{{'doctor.placeholder.search' | translate}}">
@@ -85,6 +85,49 @@
     </div>
   </div>
 </div>
+<!-- Added Updated Patiet List from Manage Patient Screen -->
+<!-- <div class="dashboard dashboard--content">
+  <div class="container dashboard__manage-view margin-top-xl">
+    <div class="dashboard__manage-view--list">
+      <div class="col-md-3 reset-padding">
+        <span class="main-prim-info">{{patient.patientUser.firstName}} &nbsp;{{patient.patientUser.middleName}} &nbsp;{{patient.patientUser.lastName}}</span>
+        <span class="main-secon-info">{{patient.patientUser.dob}}</span>
+      </div>
+      <div class="col-md-2 reset-padding centered">
+        <span class="impo-highlight">{{patient.patientUser.hillromId}}</span>
+      </div>
+      <div class="col-md-3 reset-padding centered">
+        <span class="short-info">avnesh@neevtech.com</span>
+      </div>
+
+      <div class="col-md-2 reset-padding centered">
+        <span class="short-info">{{patient.patientUser.city}}, {{patient.patientUser.state}}</span>
+      </div>
+
+      <div class="col-md-2 reset-padding centered">
+        <span class="short-info"></span>
+      </div>
+
+      <div class="col-md-2 reset-padding centered">
+        <span class="short-info">{{patient.patientUser.primaryPhone}}</span>
+      </div>
+
+      <div class="col-md-1 reset-padding">
+      <div class="icon-font">
+        <span class="icon-lungs"></span>
+      </div>
+      <div class="clr"></div>
+      </div>
+
+      <div class="col-md-1 reset-padding-left centered text-right">
+        <span class="short-info"></span>
+      </div>
+      <div class="clr"></div>
+    </div>
+  </div>
+</div> -->
+
+
 
 <div class="container admin-user">
   <div class="col-md-16 detail-list">

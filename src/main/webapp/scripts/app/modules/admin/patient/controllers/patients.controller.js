@@ -68,6 +68,7 @@ angular.module('hillromvestApp')
     };
 
     $scope.initpatientDemographic = function(){
+      $scope.getPatientById($stateParams.patientId);
       UserService.getState().then(function(response) {
        $scope.states = response.data.states;
       }).catch(function(response) {});
@@ -91,6 +92,7 @@ angular.module('hillromvestApp')
     };
 
     $scope.initProtocolDevice = function(patientId){
+      $scope.getPatientById(patientId);
       patientService.getDevices(patientId).then(function(response){
         angular.forEach(response.data.deviceList, function(device){
           var _date = dateService.getDate(device.createdDate);
@@ -107,6 +109,7 @@ angular.module('hillromvestApp')
     };
 
     $scope.initPatientAddProtocol = function(){
+      $scope.getPatientById($stateParams.patientId);
       $scope.protocol = $stateParams.protocol;
       if(!$scope.protocol){
         $scope.protocol = {};
@@ -120,6 +123,7 @@ angular.module('hillromvestApp')
     };
 
     $scope.initPatientAddDevice = function(){
+      $scope.getPatientById($stateParams.patientId);
       $scope.device = $stateParams.device;
     };
 

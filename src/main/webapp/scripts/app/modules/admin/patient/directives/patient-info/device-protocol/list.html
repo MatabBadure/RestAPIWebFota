@@ -36,7 +36,7 @@
     </div>
   </div> -->
 
-  <div class="col-md-16 protocol-list" ng-repeat="protocol in protocols">
+  <div class="col-md-16 protocol-list" ng-repeat="protocol in protocols" ng-class="{'list-inactive':protocol.deleted}">
     <div class="col-md-3 protocol-list__type">
       <span> {{protocol.type}}</span>
     </div>

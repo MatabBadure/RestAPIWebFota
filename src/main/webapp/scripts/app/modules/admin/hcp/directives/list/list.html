@@ -30,8 +30,65 @@
         </div>
       </div>
 
+      <div class="dashboard__manage-view--header">
+        <div class="col-md-3 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="doctor.hcp-name">HCP Name</span>
+        </div>
+        <div class="col-md-2 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="doctor.credentials">Credentials</span>
+        </div>
+        <div class="col-md-2 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="doctor.npiNumber">NPI Number</span>
+        </div>
+        <div class="col-md-4 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="doctor.clinic-name">Clinic Name</span>
+        </div>
+        <div class="col-md-2 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="doctor.city">City</span>
+        </div>
+        <div class="col-md-2 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" translate="doctor.state">state</span>
+        </div>
+        <div class="col-md-1 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="doctor.status">Status</span>
+        </div>
+        <div class="clr"></div>
+      </div>
 
-       <div class="dashboard__manage-view--list" ng-repeat="doctor in doctors" ng-click="doctor.deleted || selectDoctor(doctor)" ng-class="{ 'inactive': doctor.deleted }">
+      <div class="dashboard__manage-view--list" ng-repeat="doctor in doctors" ng-click="doctor.deleted || selectDoctor(doctor)" ng-class="{ 'inactive': doctor.deleted }">
+          <div class="col-md-3 reset-padding centered">
+            <span class="main-prim-info">{{doctor.lastName}} {{doctor.firstName}}</span>
+          </div>
+          <div class="col-md-2 reset-padding centered">
+            <span class="impo-highlight">ASRT</span>
+          </div>
+          <div class="col-md-2 reset-padding centered">
+            <span class="short-info">1030121212</span>
+          </div>
+
+          <div class="col-md-4 reset-padding centered">
+            <span class="short-info" ng-repeat ="clinic in doctor.clinics">{{clinic.name}}</span>
+          </div>
+
+          <div class="col-md-2 reset-padding centered">
+            <span class="short-info">{{doctor.city}}</span>
+          </div>
+
+          <div class="col-md-2 reset-padding centered">
+            <span class="short-info">{{doctor.state}}</span>
+          </div>
+
+          <div class="col-md-1 reset-padding">
+          <div class="icon-font">
+            <span class="icon-lungs"></span>
+          </div>
+          <div class="clr"></div>
+          </div>
+
+          <div class="clr"></div>
+       </div>
+
+      <!--  <div class="dashboard__manage-view--list" ng-repeat="doctor in doctors" ng-click="doctor.deleted || selectDoctor(doctor)" ng-class="{ 'inactive': doctor.deleted }">
           <div class="col-md-3 reset-padding-left">
             <span class="user-name">{{doctor.lastName}} {{doctor.firstName}}</span>
             <span class="user-email">{{doctor.email}} {{doctor.id}}</span>
@@ -48,7 +105,7 @@
             <span >{{doctor.speciality}} {{doctor.credentials}}</span>
           </div>
           <div class="clr"></div>
-       </div>
+       </div> -->
 
       <div class="dashboard__manage-view--pagination">
         <div class="col-md-16 reset-padding-right">

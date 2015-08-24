@@ -23,6 +23,7 @@
         "add-clinic": "Add Another Clinic",
         "create-caregiver": "Yes",
         "clinic-name":  "Clinic Name",
+        "hcp-name": "HCP Name",
         "emr-id":   "EMR-ID",
         "mrn-id": "MRN-ID",
         "title": {

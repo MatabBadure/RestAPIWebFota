@@ -90,5 +90,36 @@
           "last-3-days-hmr": "Last 3 days HMR run rate",
           "avr-freq-trt": "Average frequency/treatment"
         }
+    },
+    "clinic" : {
+      "name": "Name",
+      "hillromid": "Hill-rom ID",
+      "clinic-name": "Clinic Name",
+      "hr-id": "HR-ID",
+      "personal-details": "Clinic Details",
+      "address": "Address",
+      "zipcode": "Zip",
+      "city": "City",
+      "state": "State",
+      "phoneNumber": "PhoneNumber",
+      "fax-number": "Clinic Fax Number",
+      "clinic-phone": "Clinic Phone Number",
+      "hillromId": "HillromId",
+      "parentClinicId": "ParentClinicId",
+      "npiNumber": "NpiNumber",
+      "user": "user",
+      "patients": "patients",
+      "parent": "parent",
+      "type": "Type",
+      "status": "Status"
+    },
+    "hcp":{
+      "name": "Name",
+      "credentials": "Credentials",
+      "clinic-name": "Clinic name",
+      "npinumber": "NPI number",      
+      "city": "City",
+      "state": "State",
+      "status": "Status"
     }
 }

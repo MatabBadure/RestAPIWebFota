@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -22,8 +24,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -58,8 +58,6 @@ import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
-
-import net.minidev.json.JSONObject;
 
 /**
  * Service class for managing users.
@@ -1138,27 +1136,18 @@ public class UserService {
 		    return filteredUsers;
 		}	
 	 }
-	public User setHRMNotificationSetting(Long id, Map<String,Boolean> paramsMap) throws HillromException{
-		User user = userRepository.findOne(id);
-    	if(user!=null){
-    		if(user.getId().equals(id) 
-    				&& SecurityUtils.getCurrentLogin().equalsIgnoreCase(user.getEmail())){
-    			user.setHMRNotification(paramsMap.get("isHMRNotification"));
-    			user.setAcceptHMRNotification(paramsMap.get("isAcceptHMRNotification"));
-    			user.setAcceptHMRSetting(paramsMap.get("isAcceptHMRSetting"));
-    			userRepository.save(user);
-    			return user;
-    		}else{
-    			throw new HillromException(ExceptionConstants.HR_403);
-    		}
-    	}else{
-    		throw new HillromException(ExceptionConstants.HR_512);
-    	}    
-		
-		
-		
-		
-	}
 	
+	public User setHRMNotificationSetting(Long id, Map<String, Boolean> paramsMap) throws HillromException {
+		User user = userRepository.findOne(id);
+		if (user != null) {
+			user.setHMRNotification(paramsMap.get("isHMRNotification"));
+			user.setAcceptHMRNotification(paramsMap.get("isAcceptHMRNotification"));
+			user.setAcceptHMRSetting(paramsMap.get("isAcceptHMRSetting"));
+			userRepository.save(user);
+			return user;
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);
+		}
+	}
 }
 

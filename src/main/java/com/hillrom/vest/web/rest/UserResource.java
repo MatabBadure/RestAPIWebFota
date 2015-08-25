@@ -490,6 +490,7 @@ public class UserResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @RolesAllowed({AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> updateHRMNotification(@PathVariable Long id, @RequestBody Map<String, Boolean> paramsMap) {
     	JSONObject json = new JSONObject();
     	try {

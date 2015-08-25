@@ -50,10 +50,10 @@ public class NoteService {
 		return null;
 	}
 	
-	public Note saveOrUpdateNoteByUserId(Long userId,String note){
+	public Note saveOrUpdateNoteByUserId(Long userId,String note,LocalDate date){
 		if(StringUtils.isBlank(note))
 			return null;
-		Note existingNote = findOneByUserIdAndDate(userId,LocalDate.now());
+		Note existingNote = findOneByUserIdAndDate(userId,date);
 		if(Objects.isNull(existingNote)){
 			existingNote = new Note();
 			User patientUser = userRepository.findOne(userId);
@@ -63,6 +63,7 @@ public class NoteService {
 			existingNote.setPatient(patient);
 			existingNote.setPatientUser(patientUser);
 			existingNote.setNote(note);
+			existingNote.setCreatedOn(date);
 			noteRepository.save(existingNote);
 		}else{
 			existingNote.setNote(note);
@@ -71,10 +72,10 @@ public class NoteService {
 		return existingNote;
 	}
 	
-	public Note saveOrUpdateNoteByPatientId(String patientId,String note){
+	public Note saveOrUpdateNoteByPatientId(String patientId,String note,LocalDate date){
 		if(StringUtils.isBlank(note))
 			return null;
-		Note existingNote = findOneByPatientIdAndDate(patientId,LocalDate.now());
+		Note existingNote = findOneByPatientIdAndDate(patientId,date);
 		if(Objects.isNull(existingNote)){
 			existingNote = new Note();
 			List<UserPatientAssoc> associations = userPatientRepository.findOneByPatientId(patientId);
@@ -85,6 +86,7 @@ public class NoteService {
 				existingNote.setPatient(userPatientAssoc.getPatient());
 				existingNote.setPatientUser(userPatientAssoc.getUser());
 				existingNote.setNote(note);
+				existingNote.setCreatedOn(date);
 				noteRepository.save(existingNote);
 			}
 		}else{

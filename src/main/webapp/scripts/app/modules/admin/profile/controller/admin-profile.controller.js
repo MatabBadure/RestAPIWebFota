@@ -43,6 +43,10 @@ angular.module('hillromvestApp')
     };
 
     $scope.updatePassword = function(){
+      $scope.submitted = true;
+      if($scope.form.$invalid){
+        return false;
+      }
       var data = {
         'password': $scope.profile.password,
         'newPassword': $scope.profile.newPassword

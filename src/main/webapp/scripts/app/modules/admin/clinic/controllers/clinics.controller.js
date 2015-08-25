@@ -284,7 +284,13 @@ angular.module('hillromvestApp')
     };
 
     $scope.cancel = function(){
-      $state.go('clinicUser');
+      if($stateParams.parentId){
+        $state.go('clinicProfile', {
+          'clinicId': $stateParams.parentId
+        });
+      } else {
+        $state.go('clinicUser');
+      }
     };
 
     $scope.reset = function(){

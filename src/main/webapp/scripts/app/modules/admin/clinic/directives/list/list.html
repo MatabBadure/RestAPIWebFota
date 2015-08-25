@@ -29,7 +29,73 @@
           </div>
         </div>
       </div>
+
+      <div class="dashboard__manage-view--header">
+        <div class="col-md-4 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="clinic.clinic-name"></span>
+        </div>
+        <div class="col-md-3 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="clinic.address"></span>
+        </div>
+        <div class="col-md-2 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="clinic.city"></span>
+        </div>
+        <div class="col-md-1 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="clinic.state"></span>
+        </div>
+        <div class="col-md-2 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="clinic.phoneNumber"></span>
+        </div>
+        <div class="col-md-1 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="clinic.type"></span>
+        </div>
+        <div class="col-md-2 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" translate="clinic.hillRom-id"></span>
+        </div>
+        <div class="col-md-1 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="clinic.status"></span>
+        </div>
+        <div class="clr"></div>
+      </div>
+
       <div class="dashboard__manage-view--list" ng-repeat="clinic in clinics | filter: {name: searchItem}"  ng-class="{ 'inactive': clinic.deleted }">
+          <div class="col-md-4 reset-padding centered">
+            <span class="main-prim-info">{{clinic.name}}</span>
+          </div>
+          <div class="col-md-3 reset-padding centered">
+            <span class="short-info">{{clinic.address}}</span>
+          </div>
+          <div class="col-md-2 reset-padding centered">
+            <span class="short-info">{{clinic.city}}</span>
+          </div>
+
+          <div class="col-md-1 reset-padding centered">
+            <span class="short-info">{{clinic.state}}</span>
+          </div>
+
+          <div class="col-md-2 reset-padding centered">
+            <span class="short-info">{{clinic.phoneNumber}}</span>
+          </div>
+
+          <div class="col-md-1 reset-padding centered">
+            <span class="short-info">{{clinic.type}}</span>
+          </div>
+
+          <div class="col-md-2 reset-padding centered">
+            <span class="impo-highlight">{{clinic.hillromId}}</span>
+          </div>
+
+          <div class="col-md-1 reset-padding">
+          <div class="icon-font">
+            <span class="icon-lungs"></span>
+          </div>
+          <div class="clr"></div>
+          </div>
+
+          <div class="clr"></div>
+       </div>
+
+      <!-- <div class="dashboard__manage-view--list" ng-repeat="clinic in clinics | filter: {name: searchItem}"  ng-class="{ 'inactive': clinic.deleted }">
         <div  ng-click="clinic.deleted || selectClinic(clinic)">
           <div class="col-md-3 reset-padding-left">
             <span class="user-name">{{clinic.name}} <sup class="parent-clinic" ng-if="clinic.parent">P</sup></span>
@@ -48,7 +114,8 @@
           </div>
           <div class="clr"></div>
        </div>
-      </div>
+      </div> -->
+
       <div class="dashboard__manage-view--pagination">
         <div class="col-md-16 reset-padding-right">
           <div class="navbar-right">

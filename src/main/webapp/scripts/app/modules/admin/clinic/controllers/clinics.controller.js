@@ -57,6 +57,10 @@ angular.module('hillromvestApp')
       $scope.clinics = [];
       $scope.sortOption ="";
       $scope.showModal = false;
+
+      $scope.sortIconDefault = true;
+      $scope.sortIconUp = false;
+      $scope.sortIconDown = false;
       //$scope.searchClinics();
     };
 
@@ -385,6 +389,24 @@ angular.module('hillromvestApp')
       }).catch(function(response){
         notyService.showMessage(response.data.message, 'warning');
       });
+    };
+
+    $scope.sortType = function(){
+      if($scope.sortIconDefault){
+        $scope.sortIconDefault = false;
+        $scope.sortIconUp = false;
+        $scope.sortIconDown = true;
+      }
+      else if($scope.sortIconDown){
+        $scope.sortIconDefault = false;
+        $scope.sortIconDown = false;
+        $scope.sortIconUp = true;
+      }
+      else if($scope.sortIconUp){
+        $scope.sortIconDefault = false;
+        $scope.sortIconUp = false;
+        $scope.sortIconDown = true;
+      }
     };
 
     $scope.init();

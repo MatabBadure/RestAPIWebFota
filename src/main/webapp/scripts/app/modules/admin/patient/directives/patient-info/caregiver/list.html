@@ -11,7 +11,7 @@
     <span class="patient-caregiver--title" translate="patient.caregiver-title"></span>
   </div>
 
-  <div class="col-md-16 caregiver-list" ng-repeat="caregiver in caregivers track by $index" ng-if="caregiver.user.activated"> 
+  <div class="col-md-16 caregiver-list" ng-repeat="caregiver in caregivers track by $index" ng-if="!caregiver.user.deleted">
     <div class="col-md-3 caregiver-list__detail">
       <span class="caregiver-list__detail--name">{{caregiver.user.firstName}}&nbsp;&nbsp; {{caregiver.user.middleName}}&nbsp;&nbsp; {{caregiver.user.lastName}}</span>
       <span class="caregiver-list__detail--email">{{caregiver.user.email}}</span>

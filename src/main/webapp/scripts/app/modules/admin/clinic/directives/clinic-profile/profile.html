@@ -48,13 +48,13 @@
 
   <div class="col-md-16 reset-padding margin-top" ng-if="clinic.id">
     <buton class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="getPatients(clinic.id)" translate="clinic.clinic-view-assoc-patients"></buton>
-    <buton class="hillrom-btn btn-secondary float-right" ng-click="getHCPs(clinic.id)" translate="clinic.clinic-view-assoc-hcps"></buton>
-    <buton class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="goToEditClinic(clinic.id)" translate="clinic.clinic-edit"></buton>
+    <buton class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="getHCPs(clinic.id)" translate="clinic.clinic-view-assoc-hcps"></buton>
+    <buton class="hillrom-btn btn-secondary float-right btn-margin-left" ng-click="goToEditClinic(clinic.id)" translate="clinic.clinic-edit"></buton>
   </div>
 </div>
 
-<div class="container admin-user" ng-if="clinic.parent">
-  <div class="col-md-16 admin-views">
+<div class="container admin-user margin-top-xl" ng-if="clinic.parent">
+  <div class="col-md-16 reset-padding admin-views--title">
     <span class="admin-views" translate="clinic.assoc-clinic"></span>
   </div>
 </div>
@@ -80,8 +80,8 @@
   </div>
 </div> -->
 
-<div class="container admin-user" ng-if="clinic.parent">
-<div class="col-md-16 detail-list__thead" ng-if="childClinics.length > 0">
+<div class="container admin-user margin-top" ng-if="clinic.parent">
+<!-- <div class="col-md-16 detail-list__thead" ng-if="childClinics.length > 0">
     <div class="col-md-3 detail-list__thead--desc">
       <span>Clinic Name</span>
       <div class="sort-icon">
@@ -138,7 +138,7 @@
         <span class="glyphicon glyphicon-chevron-down"></span>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <div class="col-md-16 detail-list" ng-repeat="childClinic in childClinics">
     <div class="col-md-3 detail-list--title">

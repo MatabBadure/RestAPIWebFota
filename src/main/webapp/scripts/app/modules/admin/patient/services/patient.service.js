@@ -134,16 +134,6 @@ angular.module('hillromvestApp')
         });
       },
 
-      disassociateClinicsFromPatient : function(id){
-        //PUT /api/patient/12345678/dissociateclinics HTTP/1.1
-        var url = admin.patient.baseURL + id + '/dissociateclinics';
-        return $http.put(url, {
-          headers: headerService.getHeader()
-        }).success(function (response) {
-          return response;
-        });
-      },
-
       getPatientsInClinic : function(filterArray) {
         var url = '/api/clinics/patients';
         url = url + '?filter=';

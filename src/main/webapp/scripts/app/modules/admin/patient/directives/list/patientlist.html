@@ -29,40 +29,69 @@
           </div>
         </div>
       </div>
+      <div class="dashboard__manage-view--header">
+        <div class="col-md-2 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="patient.patient-name">Patient Name</span>
+        </div>
+        <div class="col-md-2 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="patient.hill-rom-id">Hill-Rom ID</span>
+        </div>
+        <div class="col-md-3 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="patient.email">Email</span>
+        </div>
+        <div class="col-md-2 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="patient.address">Address</span>
+        </div>
+        <div class="col-md-2 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="patient.transmission">Transmission</span>
+        </div>
+        <div class="col-md-3 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" translate="patient.clinic-name">Clinic Name</span>
+        </div>
+        <div class="col-md-1 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="patient.status">Status</span>
+        </div>
+        <div class="col-md-1 header--type">
+          <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="patient.adherence">Adherence</span>
+        </div>
+        <div class="clr"></div>
+      </div>
 
-       <div class="dashboard__manage-view--list" ng-repeat="patient in patients" ng-click="patient.isDeleted || selectPatient(patient)" ng-readonly="true" ng-class="{ 'inactive': patient.isDeleted }">
-          <div class="col-md-3 reset-padding-left">
-            <span class="user-name">{{patient.lastName}} {{patient.firstName}}</span>
-            <span class="user-email">{{patient.dob}}</span>
+      <div class="dashboard__manage-view--list" ng-repeat="patient in patients" ng-click="patient.isDeleted || selectPatient(patient)" ng-readonly="true" ng-class="{ 'inactive': patient.isDeleted }">
+          <div class="col-md-2 reset-padding">
+            <span class="main-prim-info">{{patient.lastName}} {{patient.firstName}}</span>
+            <span class="main-secon-info">{{patient.dob}}</span>
           </div>
-          <div class="col-md-4">
-            <span>{{patient.isDeleted ? "Inactive" : "Active"}}</span>
+          <div class="col-md-2 reset-padding centered">
+            <span class="impo-highlight">{{patient.hillromId}}</span>
           </div>
-          <div class="col-md-4">
-            <span class="user-home-no">{{patient.city}} </span>
-            <span class="user-address">{{patient.state}}</span>
+          <div class="col-md-3 reset-padding centered">
+            <span class="short-info"></span>
           </div>
-          <div class="col-md-5 reset-padding-right">
-            <div class="row">
-              <div class="col-md-7 center-text">
-                <span class="hr-id">{{patient.hillromId}}</span>
-              </div>
-              <div class="col-md-3">
-                <span class="hillrom-icon icon-lungs user-lungs"></span>
-              </div>
-              <div class="col-md-3">
-                <div class="progress-input">90%</div>
-                <div class="progress">
-                  <div class="progress-bar" role="progressbar" aria-valuenow="90"
-                  aria-valuemin="0" aria-valuemax="100" ng-style="{width: '90'+'%'}">
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-3 reset-padding-right text-center">
-                <span class="hillrom-icon icon-pressure user-pressure"></span>
-              </div>
-            </div>
+
+          <div class="col-md-2 reset-padding centered">
+            <span class="short-info"></span>
           </div>
+
+          <div class="col-md-2 reset-padding centered">
+            <span class="short-info"></span>
+          </div>
+
+          <div class="col-md-3 reset-padding centered">
+            <span class="short-info"></span>
+          </div>
+
+          <div class="col-md-1 reset-padding">
+          <div class="icon-font">
+            <span class="icon-lungs"></span>
+          </div>
+          <div class="clr"></div>
+          </div>
+
+          <div class="col-md-1 reset-padding-left centered text-right">
+            <span class="short-info"></span>
+          </div>
+
           <div class="clr"></div>
        </div>
 

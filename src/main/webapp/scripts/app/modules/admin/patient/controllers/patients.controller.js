@@ -68,6 +68,7 @@ angular.module('hillromvestApp')
     };
 
     $scope.initpatientDemographic = function(){
+      $scope.getPatientById($stateParams.patientId);
       UserService.getState().then(function(response) {
        $scope.states = response.data.states;
       }).catch(function(response) {});
@@ -91,6 +92,7 @@ angular.module('hillromvestApp')
     };
 
     $scope.initProtocolDevice = function(patientId){
+      $scope.getPatientById(patientId);
       patientService.getDevices(patientId).then(function(response){
         angular.forEach(response.data.deviceList, function(device){
           var _date = dateService.getDate(device.createdDate);
@@ -107,6 +109,7 @@ angular.module('hillromvestApp')
     };
 
     $scope.initPatientAddProtocol = function(){
+      $scope.getPatientById($stateParams.patientId);
       $scope.protocol = $stateParams.protocol;
       if(!$scope.protocol){
         $scope.protocol = {};
@@ -120,6 +123,7 @@ angular.module('hillromvestApp')
     };
 
     $scope.initPatientAddDevice = function(){
+      $scope.getPatientById($stateParams.patientId);
       $scope.device = $stateParams.device;
     };
 
@@ -136,7 +140,7 @@ angular.module('hillromvestApp')
       } else if (currentRoute === 'patientNew') {
         $scope.createPatient();
       }else if($state.current.name === 'patientEditClinics'){
-        $scope.initPatientClinics($stateParams.patientId);        
+        $scope.initPatientClinics($stateParams.patientId);
       }else if(currentRoute === 'patientClinics'){
         $scope.initPatientClinicsInfo($stateParams.patientId);
       }else if(currentRoute === 'patientCraegiver'){
@@ -191,25 +195,18 @@ angular.module('hillromvestApp')
       };
     };
 
-    $scope.goToPatientClinics = function(){      
+    $scope.goToPatientClinics = function(){
       $state.go('patientEditClinics',{'patientId': $stateParams.patientId});
     }
     /** starts for patient clinics **/
     $scope.getPatientClinicInfo = function(patientId){
-      $scope.associatedClinics = associatedClinics.clinics;      
+      $scope.associatedClinics = associatedClinics.clinics;
       /*$scope.availableClinicsForPatient($scope.associatedClinics);
       patientService.getClinicsLinkedToPatient(patientId).then(function(response) {
-        $scope.associatedClinics = response.data;            
+        $scope.associatedClinics = response.data;
       }).catch(function(response) {});*/
     }
-    $scope.disassociateLinkedClinics = function(id, index){
-      $scope.associatedClinics.splice(index, 1);
-      // API returning error : unAuthorized
-     /* patientService.disassociateClinicsFromPatient(id).then(function(response) {
-        $scope.associatedClinics = response.data;        
-      }).catch(function(response) {});*/
-    }
-    $scope.availableClinicsForPatient = function(associatedClinics){          
+    $scope.availableClinicsForPatient = function(associatedClinics){
       clinicService.getClinics($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
           $scope.clinics = response.data;
           $scope.total = response.headers()['x-total-count'];
@@ -218,33 +215,24 @@ angular.module('hillromvestApp')
 
         });
     }
-    /*var timer = false;
-    $scope.$watch('searchItem', function () {
-      if(timer){
-        $timeout.cancel(timer)
-      }
-      timer= $timeout(function () {
-          $scope.searchClinics();
-      },1000)
-    });*/
 
     /** starts for patient clinics **/
     $scope.getPatientClinicInfo = function(patientId){
-      //$scope.associatedClinics = associatedClinics.clinics;
-      //$scope.availableClinicsForPatient($scope.associatedClinics);
       $scope.associatedClinics =[]; $scope.associatedClinics.length = 0;
       patientService.getClinicsLinkedToPatient(patientId).then(function(response) {
         $scope.associatedClinics = response.data.clinics;
       }).catch(function(response) {});
-    }
+    };
 
     $scope.disassociateLinkedClinics = function(id, index){
       var data = [{"id": id}];
       patientService.disassociateClinicsFromPatient($stateParams.patientId, data).then(function(response) {
         $scope.associatedClinics = response.data.clinics;
-        $scope.clinics = []; $scope.clinics.length = 0;
-      }).catch(function(response) {});
-    }
+        notyService.showMessage(response.data.message, 'success');
+      }).catch(function(response) {
+        notyService.showMessage(response.data.message, 'warning');
+      });
+    };
 
     $scope.searchClinics = function (track) {
       if (track !== undefined) {
@@ -268,6 +256,7 @@ angular.module('hillromvestApp')
 
       });
     };
+
     $scope.initPatientClinics = function(patientId){
       if($scope.searchItem && $scope.searchItem.length > 0){
         clinicService.getClinics($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
@@ -293,13 +282,13 @@ angular.module('hillromvestApp')
 
     $scope.selectClinicForPatient = function(clinic, index){
       var data = [{"id": clinic.id, "mrnId": null, "notes": null}]
+      $scope.searchItem = "";
       patientService.associateClinicToPatient($stateParams.patientId, data).then(function(response) {
         $scope.associatedClinics = response.data.clinics;
-        $scope.clinics = []; $scope.clinics.length = 0;
       }).catch(function(response) {});
-    }
+    };
 
-    $scope.initPatientClinicsInfo = function(patientId){      
+    $scope.initPatientClinicsInfo = function(patientId){
       $scope.patientTab = "patientClinics";
       $scope.currentPageIndex = 1;
       $scope.perPageCount = 90;
@@ -308,6 +297,7 @@ angular.module('hillromvestApp')
       $scope.clinics = [];
       $scope.sortOption = "";
       $scope.searchItem = "";
+      $scope.searchClinicText = false;
       $scope.associatedClinics = [];
       $scope.getPatientById(patientId);
       $scope.getPatientClinicInfo(patientId);
@@ -366,6 +356,19 @@ angular.module('hillromvestApp')
       $state.go('patientProtocol');
     };
 
+    $scope.cancelEditDemographics = function(){
+      $state.go('patientDemographic', {'patientId': $stateParams.patientId});
+    };
+
+
+    $scope.cancelDeviceModel = function(){
+      $scope.showModalDevice = false;
+    };
+
+    $scope.cancelProtocolModel = function(){
+      $scope.showModalProtocol = false;
+    };
+
     $scope.disassociatePatient =function(){
       patientService.disassociatePatient($scope.patient.id).then(function(response){
         notyService.showMessage(response.data.message, 'success');
@@ -373,17 +376,13 @@ angular.module('hillromvestApp')
       }).catch(function(response){});
     };
 
-    /*$rootScope.selectPatientFromList = function(patient) {
-      $state.go('patientOverview', {
-        'patientId': patient.id
-      });
-    };*/
     /** start of caregiver tab for admin->patient **/
     $scope.getCaregiversForPatient = function(patientId){
       patientService.getCaregiversLinkedToPatient(patientId).then(function(response){
         $scope.caregivers =  response.data.caregivers;
       }).catch(function(response){});
-    }
+    };
+
     $scope.associateCaregiverstoPatient = function(patientId, careGiver){
         patientService.associateCaregiversFromPatient(patientId, careGiver).then(function(response){
         $scope.caregivers =  response.data.user;
@@ -392,17 +391,20 @@ angular.module('hillromvestApp')
       }).catch(function(response){
         notyService.showMessage(response.data.ERROR,'warning' );
       });
-    }
+    };
+
     $scope.disassociateCaregiversFromPatient = function(caregiverId, index){
         patientService.disassociateCaregiversFromPatient($stateParams.patientId, caregiverId).then(function(response){
         $scope.caregivers.splice(index, 1);
       }).catch(function(response){});
-    }
+    };
+
     $scope.initpatientCraegiver = function (patientId){
       $scope.caregivers = [];
       $scope.getPatientById(patientId);
       $scope.getCaregiversForPatient($stateParams.patientId);
-    }
+    };
+
     $scope.initpatientCraegiverAdd = function(){
       $scope.getPatientById($stateParams.patientId);
       $scope.careGiverStatus = "new";
@@ -414,10 +416,11 @@ angular.module('hillromvestApp')
         $scope.relationships = response.data.relationshipLabels;
         $scope.associateCareGiver.relationship = $scope.relationships[0];
       }).catch(function(response) {});
-    }
+    };
+
     $scope.linkCaregiver = function(){
       $state.go('patientCraegiverAdd', {'patientId': $stateParams.patientId});
-    }
+    };
 
     $scope.formSubmitCaregiver = function(){
       $scope.submitted = true;
@@ -431,13 +434,14 @@ angular.module('hillromvestApp')
       }else if($scope.careGiverStatus === "edit"){
         $scope.updateCaregiver($stateParams.patientId, $stateParams.caregiverId , data);
       }
-    }
+    };
 
     $scope.linkDevice = function(){
       $state.go('patientAddDevice');
     };
 
     $scope.addDevice = function(){
+      $scope.submitted = true;
       if($scope.addDeviceForm.$invalid){
         return false;
       }
@@ -451,6 +455,7 @@ angular.module('hillromvestApp')
     };
 
     $scope.addProtocol = function(){
+      $scope.submitted = true;
       if($scope.addProtocolForm.$invalid){
         return false;
       }
@@ -464,17 +469,30 @@ angular.module('hillromvestApp')
       }).catch(function(response){});
     };
 
-    $scope.deleteDevice = function(device){
-      if(!device.active){
-        return false;
-      }
-      patientService.deleteDevice($stateParams.patientId, device).then(function(response){
-        device.active = false;
-      }).catch(function(response){});
+    $scope.deleteDevice = function(){
+      $scope.showModalDevice = false;
+      patientService.deleteDevice($stateParams.patientId, $scope.deviceToDelete).then(function(response){
+        $scope.deviceToDelete.active = false;
+        notyService.showMessage(response.data.message, 'success');
+      }).catch(function(response){
+        notyService.showMessage(response.data.message, 'warning');
+      });
+    };
+
+    $scope.deleteProtocolModel = function(protocolId){
+      $scope.toDeleteProtocolId = protocolId;
+      $scope.showModalProtocol = true;
+    };
+
+    $scope.deleteDeviceModel = function(device){
+      $scope.deviceToDelete = device;
+      $scope.showModalDevice = true;
     };
 
     $scope.deleteProtocol = function(id){
-      patientService.deleteProtocol($stateParams.patientId, id).then(function(response){
+      $scope.showModalProtocol = false;
+      patientService.deleteProtocol($stateParams.patientId, $scope.toDeleteProtocolId).then(function(response){
+        notyService.showMessage(response.data.message, 'success');
         $scope.getProtocols($stateParams.patientId);
       }).catch(function(response){});
     };
@@ -483,7 +501,7 @@ angular.module('hillromvestApp')
       $scope.careGiverStatus = "edit";
       $scope.getPatientById($stateParams.patientId);
       $scope.editCaregiver(careGiverId);
-    }
+    };
 
     $scope.editCaregiver = function(careGiverId){
         UserService.getState().then(function(response) {
@@ -497,7 +515,8 @@ angular.module('hillromvestApp')
           $scope.associateCareGiver = response.data.caregiver.user;
           $scope.associateCareGiver.relationship = response.data.caregiver.relationshipLabel;
         }).catch(function(response){});
-    }
+    };
+
     $scope.updateCaregiver = function(patientId, caregiverId , careGiver){
       var tempCaregiver = {};
       tempCaregiver.title = careGiver.title;
@@ -518,10 +537,11 @@ angular.module('hillromvestApp')
         $scope.associateCareGiver = [];$scope.associateCareGiver.length = 0;
         $scope.switchPatientTab('patientCraegiver');
       }).catch(function(response){});
-    }
+    };
+
     $scope.goToCaregiverEdit = function(careGiverId){
       $state.go('patientCraegiverEdit', {'caregiverId': careGiverId});
-    }
+    };
 
     $scope.openEditProtocol = function(protocol){
       if(!protocol){
@@ -563,7 +583,7 @@ angular.module('hillromvestApp')
       patientService.getPatientInfo(patientid).then(function(response){
         $scope.slectedPatient = response.data;
       }).catch(function(response){});
-    }
+    };
 
     $scope.updateDevice = function(){
       if($scope.device.edit){
@@ -577,10 +597,14 @@ angular.module('hillromvestApp')
     $scope.addNewProtocolPoint = function (){
       $scope.newProtocolPoint += 1;
       $scope.protocol.protocolEntries.push({});
-    }
+    };
 
     $scope.switchtoNormal = function(){
       $scope.protocol.protocolEntries.splice(1);
+    };
+
+    $scope.linkClinic = function(){
+      $scope.searchClinicText = true;
     };
 
     $scope.init();

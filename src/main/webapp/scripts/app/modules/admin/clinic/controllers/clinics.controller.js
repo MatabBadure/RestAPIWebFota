@@ -97,6 +97,7 @@ angular.module('hillromvestApp')
       }).catch(function(response) {});
       clinicService.getClinic(clinicId).then(function(response) {
         $scope.clinic = response.data.clinic;
+        $scope.slectedClinic = response.data.clinic;
         if($scope.clinic.parent){
           $scope.clinic.type = "parent";
         }else{

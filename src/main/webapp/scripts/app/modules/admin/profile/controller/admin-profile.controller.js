@@ -48,8 +48,9 @@ angular.module('hillromvestApp')
         'newPassword': $scope.profile.newPassword
       };
       Password.updatePassword(localStorage.getItem('userId'), data).then(function(response){
-        $state.go('login');
+        Auth.logout();
         notyService.showMessage(response.data.message, 'success');
+        $state.go('login');
       }).catch(function(response){
         notyService.showMessage(response.data.error, 'warning');
       });

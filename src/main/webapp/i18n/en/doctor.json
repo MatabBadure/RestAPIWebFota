@@ -66,6 +66,7 @@
         "deactivate-button-text": "Deactivate",
         "update-button-text": "Update",
         "back-button-text": "Back",
+        "edit-button-text": "Edit",
         "delete": {
             "warning": "Are you sure you want to Deactivate the Doctor?",
             "message": "If you deactivate the doctor, you will no longer be able to view the information."

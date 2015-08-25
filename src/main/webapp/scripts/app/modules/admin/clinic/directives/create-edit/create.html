@@ -1,4 +1,3 @@
-
 <div class="navbar dashboard dashbord-nav">
   <div class="container">
     <div class="dashbord-nav__primary pull-left" ng-show="clinicStatus.isCreate">
@@ -10,6 +9,15 @@
     <div class="dashbord-nav__secondary create-user navbar-right cursor-pointer" ng-click="cancel()">
       <span class="" translate="clinic.back-button-text">Back</span>
     </div>
+  </div>
+</div>
+
+<div class="container admin-user">
+  <div class="col-md-16 margin-top reset-padding">
+   <div class="user-gen-details">
+     <span class="user-gen-details--name">Avnesh Shakya{{slectedClinic.firstName}} {{slectedClinic.lastName}}</span>
+     <span class="user-gen-details--hr-id">12345{{slectedClinic.hillromId}}</span>
+   </div>
   </div>
 </div>
 

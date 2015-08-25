@@ -486,33 +486,19 @@ public class UserResource {
     /**
      * PUT  /user/:id/notifications -> update HRM notification setting for user  {id}.
      */
-    @RequestMapping(value = "/user/{id}/notificationsetting",
+    @RequestMapping(value = "/users/{id}/notificationsetting",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
-    public ResponseEntity<JSONObject> updateHRMNotification(@PathVariable Long id, @RequestBody Map<String, Boolean> notifData) {
-    	Optional<User> userFromDB = Optional.of(userRepository.findOne(id));
+    public ResponseEntity<JSONObject> updateHRMNotification(@PathVariable Long id, @RequestBody Map<String, Boolean> paramsMap) {
     	JSONObject json = new JSONObject();
-    	if(userFromDB.isPresent()){
-    		User user = userFromDB.get();
-    		if(user.getId().equals(id) 
-    				&& SecurityUtils.getCurrentLogin().equalsIgnoreCase(user.getEmail())){
-    			user.setHMRNotification(notifData.get("isHMRNotification"));
-    			user.setAcceptHMRNotification(notifData.get("isAcceptHMRNotification"));
-    			user.setAcceptHMRSetting(notifData.get("isAcceptHMRSetting"));
-    			userRepository.save(user);
-    			json.put("user", user);
-    			return new ResponseEntity<>(json,HttpStatus.OK);
-    		}else{
-    			json.put("ERROR", ExceptionConstants.HR_403);
-    			return new ResponseEntity<>(json,HttpStatus.FORBIDDEN);
-    		}
-    	}else{
-    		json.put("ERROR", ExceptionConstants.HR_512);
-    		return new ResponseEntity<>(json,HttpStatus.NOT_FOUND);
-    	}    
-		
+    	try {
+			json.put("user", userService.setHRMNotificationSetting(id, paramsMap));
+			return new ResponseEntity<>(json,HttpStatus.OK);
+		} catch (HillromException e) {
+			json.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(json,HttpStatus.NOT_FOUND);
+		}
     }
     
     @RequestMapping(value = "/users/{id}/missedTherapyCount",

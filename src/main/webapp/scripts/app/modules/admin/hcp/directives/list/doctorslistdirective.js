@@ -31,6 +31,9 @@ angular.module('hillromvestApp')
           $scope.noMatchFound = false;
           $scope.sortOption = "";
           $scope.showModal = false;
+          $scope.sortIconDefault = true;
+          $scope.sortIconUp = false;
+          $scope.sortIconDown = false;
           if($stateParams.clinicIds){                      
             $scope.getAssociatedHCPsToClinic($stateParams.clinicIds);
           }
@@ -99,7 +102,26 @@ angular.module('hillromvestApp')
               notyService.showMessage(response.data.message, 'warning');
             }        
           }).catch(function (response) {});
-        }
+        };
+
+        $scope.sortType = function(){
+          console.log('hello');
+          if($scope.sortIconDefault){
+            $scope.sortIconDefault = false;
+            $scope.sortIconUp = false;
+            $scope.sortIconDown = true;
+          }
+          else if($scope.sortIconDown){
+            $scope.sortIconDefault = false;
+            $scope.sortIconDown = false;
+            $scope.sortIconUp = true;
+          }
+          else if($scope.sortIconUp){
+            $scope.sortIconDefault = false;
+            $scope.sortIconUp = false;
+            $scope.sortIconDown = true;
+          }
+        };
 
         $scope.init();
       }

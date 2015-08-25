@@ -1,17 +1,12 @@
-<admin-patient-navbar></admin-patient-navbar>
-<div class="container admin-user">
-  <div class="col-md-16 margin-top">
-   <div class="user-gen-details">
-     <span class="user-gen-details--name">{{slectedPatient.firstName}} {{slectedPatient.lastName}}&nbsp;&nbsp;</span>
-     <span class="user-gen-details--hr-id">{{slectedPatient.hillromId}}</span>
-   </div>
-  </div>
+<navigation-bar-patient></navigation-bar-patient>
+<patient-navbar></patient-navbar>
+<div class="container admin-user">  
 
   <div class="col-md-16 patient-caregiver">
     <span class="patient-caregiver--title" translate="patient.caregiver-title"></span>
   </div>
 
-  <div class="col-md-16 caregiver-list" ng-repeat="caregiver in caregivers track by $index" ng-if="!caregiver.user.deleted">
+  <div class="col-md-16 caregiver-list" ng-repeat="caregiver in caregivers track by $index" ng-if="!caregiver.user.activated"> 
     <div class="col-md-3 caregiver-list__detail">
       <span class="caregiver-list__detail--name">{{caregiver.user.firstName}}&nbsp;&nbsp; {{caregiver.user.middleName}}&nbsp;&nbsp; {{caregiver.user.lastName}}</span>
       <span class="caregiver-list__detail--email">{{caregiver.user.email}}</span>
@@ -38,7 +33,7 @@
     </div> --><!-- <div><a href="" ng-click="editCaregiver(caregiver.user.id, $index)">edit</a></div> -->
     <div class="col-md-1 caregiver-list__delete" >
       <span class="glyphicon glyphicon-pencil" style="cursor:pointer;" ng-click="goToCaregiverEdit(caregiver.user.id)"></span>
-      <span class="glyphicon glyphicon-trash" style="cursor:pointer;" ng-click="disassociateCaregiversFromPatient(caregiver.user.id, $index)"></span>
+      <span class="glyphicon glyphicon-trash" style="cursor:pointer;" ng-click="disassociateCaregiver(caregiver.user.id, $index)"></span>
     </div>
   </div>
   <div class="col-md-16 reset-padding caregiver-link">

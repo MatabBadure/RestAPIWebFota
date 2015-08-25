@@ -119,6 +119,62 @@ angular.module('hillromvestApp')
             return response;
           });*/
       },
+      getNotesOfUser: function(id, date) {
+        ///api/users/{id}/notes?date=:date
+        var url = admin.hillRomUser.baseURL + id +'/notes?date=';
+        if( date!= null && date.length > 0){
+          url = url+date;
+        }        
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function(response) {
+          return response;
+        });
+      }, 
+
+      getNotesOfUser: function(id, date) {
+        ///api/users/{id}/notes?date=:date
+        var url = admin.hillRomUser.users + '/' + id +'/notes?date=';
+        if( date!= null && date.length > 0){
+          url = url+date;
+        }        
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function(response) {
+          return response;
+        });
+      }, 
+
+      createNote: function(id, data){
+        var url = admin.hillRomUser.notes;
+        return $http.post(url, data, {
+          headers: headerService.getHeader()
+        }).success(function(response) {
+          return response;
+        });
+      },
+
+      deleteNote: function(noteId){
+        var url = admin.hillRomUser.notes+'/'+noteId;
+        return $http.delete(url, {
+          headers: headerService.getHeader()
+        }).success(function(response) {
+          return response;
+        });
+      },
+
+      updateNote: function(noteId, date, data){        
+        var url = admin.hillRomUser.patients+'/'+noteId+'/notes?date=';
+        if(date != null && date.length > 0){
+          url = url+date;
+        }
+        return $http.put(url, data, {
+          headers: headerService.getHeader()
+        }).success(function(response) {
+          return response;
+        });
+      }
+
 
     };
   });

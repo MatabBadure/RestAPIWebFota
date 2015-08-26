@@ -50,6 +50,7 @@ angular.module('hillromvestApp')
           console.log(response);
         }).catch(function(response){});
       }
+      $scope.user.role = $scope.user.authorities[0].name;
       UserService.editUser($scope.user).then(function(response){
         notyService.showMessage(response.data.message, 'success');
         $state.go('adminProfile');

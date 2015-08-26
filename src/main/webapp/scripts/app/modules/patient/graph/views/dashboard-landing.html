@@ -167,8 +167,8 @@
 	 			<button class="hillrom-btn btn-submit float-right">Export Data</button>
 	 		</div>
 	 		</div>
-	 		<div class="col-md-16">
-	 			<div class="add_note_container">
+	 		<div class="col-md-16" id="add_note_container">
+	 			<div class="add_note_container" ng-show="showNotes">
 	 				<div class="note_header">
 	 					<div class="col-md-14 note_header_left">
 	 						<span class="note">Note</span>
@@ -197,36 +197,7 @@
  							</div>
  						</div> 									
 	 				</div>
-
-	 				<!-- <div class="btn_group patient_dashdoard_btns">
-	 					
- 						<div class="col-md-16 notes_row" id="noteText"  ng-show="notes.length <= 0 && addNote">
- 							<form name="form" ng-submit="createNote();">
- 							<div class="notes_row_wrapper">
- 								<div class="col-md-2 date_col"><span>Date</span></div>
-	 							<div class="col-md-11 description">
-	 								<textarea  ng-model="textNote">
-	 								</textarea>
-	 							</div>
- 								<div>
-					                <span class="has-error" ng-if="noteTextError">
-					                  {{noteTextError}}
-					                </span>
-				                </div>
-	 							<div class="col-md-3 edit_delete">
-	 								<div class="pull-right">
-	 									<input type="submit" id="addNode" value="Save" />
-	 									<input type="button" id="cancel" value="Cancel" ng-click="cancelAddNote();" />
-	 									
-	 								</div>
-	 							</div>
- 							</div>
- 							</form>
- 						</div>
- 				
-			 			<button class="hillrom-btn btn-submit float-right" ng-click="openAddNote();" ng-show="notes.length <= 0">Add Note</button>
-
-	 				</div> -->
+	 				
 	 				<div class="col-md-16 note_edit_container" ng-show="notes.length <= 0 && addNote">
 	 					<form name="form" ng-submit="createNote();">
 						<div class="col-md-2 date_col">

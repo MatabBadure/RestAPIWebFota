@@ -134,10 +134,10 @@ angular.module('hillromvestApp')
 
       getNotesOfUser: function(id, date) {
         ///api/users/{id}/notes?date=:date
-        var url = admin.hillRomUser.users + '/' + id +'/notes?date=';
-        if( date!= null && date.length > 0){
+        var url = admin.hillRomUser.users + '/' + id +'/notes?date='+date;
+        /*if( date!= null && date.length > 0){
           url = url+date;
-        }        
+        }    */    
         return $http.get(url, {
           headers: headerService.getHeader()
         }).success(function(response) {
@@ -164,10 +164,7 @@ angular.module('hillromvestApp')
       },
 
       updateNote: function(noteId, date, data){        
-        var url = admin.hillRomUser.patients+'/'+noteId+'/notes?date=';
-        if(date != null && date.length > 0){
-          url = url+date;
-        }
+        var url = admin.hillRomUser.notes+'/'+noteId;
         return $http.put(url, data, {
           headers: headerService.getHeader()
         }).success(function(response) {

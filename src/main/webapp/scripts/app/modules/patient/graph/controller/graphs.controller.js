@@ -35,6 +35,7 @@ angular.module('hillromvestApp')
       $scope.toDate = dateService.getDateFromTimeStamp($scope.toTimeStamp);   
       $scope.getPatientById(localStorage.getItem('patientID'));
       var currentRoute = $state.current.name;
+      $scope.patientTab = currentRoute;
       if ($state.current.name === 'patientdashboard') {
         $scope.initPatientDashboard();        
       }else if(currentRoute === 'patientdashboardCaregiver'){
@@ -159,7 +160,8 @@ angular.module('hillromvestApp')
       };
 
  /*---Simple pye chart JS END-----*/
-    $scope.isActive = function(tab) {
+    $scope.isActivePatientTab = function(tab) {
+      console.log('hello there' + $scope.patientTab.indexOf(tab));
       if ($scope.patientTab.indexOf(tab) !== -1) {
         return true;
       } else {

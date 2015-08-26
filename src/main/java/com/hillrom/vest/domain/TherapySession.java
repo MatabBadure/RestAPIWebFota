@@ -223,7 +223,7 @@ public class TherapySession {
 	}
 	
 	public int getWeekOfYear(){
-		return this.date.getWeekyear();
+		return this.date.getWeekOfWeekyear();
 	}
 	
 	public int getMonthOfTheYear(){

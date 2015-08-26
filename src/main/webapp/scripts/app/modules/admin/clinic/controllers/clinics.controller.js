@@ -29,6 +29,12 @@ angular.module('hillromvestApp')
       }
     };
 
+    $scope.getClinicById = function(clinicId){
+      clinicService.getClinic(clinicId).then(function(response){
+        $scope.clinic = response.data.clinic;
+      }).catch(function(response){});
+    };
+
     $scope.initClinicAssoctPatients = function(clinicId){
       $scope.isAssociatePatient = false;
       clinicService.getClinicAssoctPatients(clinicId).then(function(response){
@@ -37,6 +43,7 @@ angular.module('hillromvestApp')
       clinicService.getPatients().then(function(response){
         $scope.patients = response.data.users;
       }).catch(function(response){});
+      $scope.getClinicById(clinicId);
     };
 
     $scope.initClinicAssoctHCPs = function(clinicId){
@@ -47,6 +54,7 @@ angular.module('hillromvestApp')
       clinicService.getHCPs().then(function(response){
         $scope.hcps = response.data.users;
       }).catch(function(response){});
+      $scope.getClinicById(clinicId);
     };
 
     $scope.initClinicList = function(){
@@ -57,6 +65,10 @@ angular.module('hillromvestApp')
       $scope.clinics = [];
       $scope.sortOption ="";
       $scope.showModal = false;
+
+      $scope.sortIconDefault = true;
+      $scope.sortIconUp = false;
+      $scope.sortIconDown = false;
       //$scope.searchClinics();
     };
 
@@ -89,6 +101,7 @@ angular.module('hillromvestApp')
       }).catch(function(response) {});
       clinicService.getClinic(clinicId).then(function(response) {
         $scope.clinic = response.data.clinic;
+        $scope.slectedClinic = response.data.clinic;
         if($scope.clinic.parent){
           $scope.clinic.type = "parent";
         }else{
@@ -284,7 +297,13 @@ angular.module('hillromvestApp')
     };
 
     $scope.cancel = function(){
-      $state.go('clinicUser');
+      if($stateParams.parentId){
+        $state.go('clinicProfile', {
+          'clinicId': $stateParams.parentId
+        });
+      } else {
+        $state.go('clinicUser');
+      }
     };
 
     $scope.reset = function(){
@@ -385,6 +404,24 @@ angular.module('hillromvestApp')
       }).catch(function(response){
         notyService.showMessage(response.data.message, 'warning');
       });
+    };
+
+    $scope.sortType = function(){
+      if($scope.sortIconDefault){
+        $scope.sortIconDefault = false;
+        $scope.sortIconUp = false;
+        $scope.sortIconDown = true;
+      }
+      else if($scope.sortIconDown){
+        $scope.sortIconDefault = false;
+        $scope.sortIconDown = false;
+        $scope.sortIconUp = true;
+      }
+      else if($scope.sortIconUp){
+        $scope.sortIconDefault = false;
+        $scope.sortIconUp = false;
+        $scope.sortIconDown = true;
+      }
     };
 
     $scope.init();

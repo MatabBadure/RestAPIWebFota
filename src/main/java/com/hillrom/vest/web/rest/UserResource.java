@@ -167,7 +167,7 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
-    public ResponseEntity<JSONObject> linkVestDeviceWithPatient(@PathVariable Long id, @RequestBody Map<String, String> deviceData) {
+    public ResponseEntity<JSONObject> linkVestDeviceWithPatient(@PathVariable Long id, @RequestBody Map<String, Object> deviceData) {
     	log.debug("REST request to link vest device with patient user : {}", id);
         JSONObject jsonObject = new JSONObject();
 		try {
@@ -202,12 +202,11 @@ public class UserResource {
 			List<PatientVestDeviceHistory> deviceList = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
 			if(deviceList.isEmpty()){
      			jsonObject.put("message",MessageConstants.HR_281); //No device linked with patient.
-     			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
      		} else {
      			jsonObject.put("message", MessageConstants.HR_282);//Vest devices linked with patient fetched successfully.
      			jsonObject.put("deviceList", deviceList);
-     			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
      		}
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {
 			jsonObject.put("ERROR",e.getMessage());
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
@@ -297,7 +296,7 @@ public class UserResource {
     	try {
     		List<PatientProtocolData> protocolList = patientProtocolService.updateProtocolToPatient(id, ppdList);
 	    	if (protocolList.isEmpty()) {
-	        	jsonObject.put("message", ExceptionConstants.HR_560);
+	        	jsonObject.put("ERROR", ExceptionConstants.HR_560);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_242);
@@ -325,12 +324,11 @@ public class UserResource {
     		List<PatientProtocolData> protocolList = patientProtocolService.getAllProtocolsAssociatedWithPatient(id);
     		if (protocolList.isEmpty()) {
 	        	jsonObject.put("message", MessageConstants.HR_245);
-	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_243);
 	        	jsonObject.put("protocol", protocolList);
-	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
     	} catch(HillromException hre){
     		jsonObject.put("ERROR", hre.getMessage());
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
@@ -484,6 +482,25 @@ public class UserResource {
 	    		return new ResponseEntity<>(json,HttpStatus.NOT_FOUND);
 	    	}    
     	}
+    
+    /**
+     * PUT  /user/:id/notifications -> update HRM notification setting for user  {id}.
+     */
+    @RequestMapping(value = "/users/{id}/notificationsetting",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.PATIENT})
+    public ResponseEntity<JSONObject> updateHRMNotification(@PathVariable Long id, @RequestBody Map<String, Boolean> paramsMap) {
+    	JSONObject json = new JSONObject();
+    	try {
+			json.put("user", userService.setHRMNotificationSetting(id, paramsMap));
+			return new ResponseEntity<>(json,HttpStatus.OK);
+		} catch (HillromException e) {
+			json.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(json,HttpStatus.NOT_FOUND);
+		}
+    }
     
     @RequestMapping(value = "/users/{id}/missedTherapyCount",
             method = RequestMethod.GET,

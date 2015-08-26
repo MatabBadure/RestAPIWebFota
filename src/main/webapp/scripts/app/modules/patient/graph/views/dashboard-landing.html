@@ -117,20 +117,21 @@
 	        interactive="true"
 	        tooltips="true"
 	        isArea="true"
-	        interpolate="step-before"
+	        interpolate="step-after" 
 	        yAxisLabel="Minutes"
           margin="{left:100,top:20,bottom:20,right:10}"
 	        xAxisTickFormat="xAxisTickFormatFunction(format)"
 	        xAxisTickValues="xAxisTickValuesFunction()"
 	        noData="No Data Found!"
 	        objectEquality="true"
+	        forcey="[yAxisRangeForHMRLine.min,yAxisRangeForHMRLine.max]"
 	        tooltipcontent="toolTipContentFunction()">
 	        <svg></svg>
 	    </nvd3-line-chart>
 	  </div>
 	  <div ng-if="hmrBarGraph">
 		 	<nvd3-multi-bar-chart
-		    	data="graphData"
+		    	data="hmrBarGraphData"
 	        id="hmrBarGraph"
 	        width="1250"
 	        height="300"

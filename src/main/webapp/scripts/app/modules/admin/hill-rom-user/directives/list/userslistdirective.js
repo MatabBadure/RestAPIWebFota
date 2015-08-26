@@ -31,6 +31,9 @@ angular.module('hillromvestApp')
           $scope.total = 0;
           $scope.sortOption ="";
           $scope.showModal = false;
+          $scope.sortIconDefault = true;
+          $scope.sortIconUp = false;
+          $scope.sortIconDown = false;
         };
 
         var timer = false;
@@ -81,6 +84,25 @@ angular.module('hillromvestApp')
             $scope.total = response.headers()['x-total-count'];
             $scope.pageCount = Math.ceil($scope.total / 10);
           }).catch(function(response) {});
+        };
+
+        $scope.sortType = function(){
+          console.log('hello');
+          if($scope.sortIconDefault){
+            $scope.sortIconDefault = false;
+            $scope.sortIconUp = false;
+            $scope.sortIconDown = true;
+          }
+          else if($scope.sortIconDown){
+            $scope.sortIconDefault = false;
+            $scope.sortIconDown = false;
+            $scope.sortIconUp = true;
+          }
+          else if($scope.sortIconUp){
+            $scope.sortIconDefault = false;
+            $scope.sortIconUp = false;
+            $scope.sortIconDown = true;
+          }
         };
 
         $scope.init();

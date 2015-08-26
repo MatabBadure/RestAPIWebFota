@@ -19,6 +19,7 @@
         "user": "Hill-Rom User",
         "add-clinic": "Add Another Clinic",
         "create-caregiver": "Yes",
+        "user-name": "User Name",
         "clinic-name":  "Clinic Name",
         "title": {
                     "name": "Title",
@@ -34,6 +35,7 @@
                     "others": "O"
         },
         "role-text":"Select Role",
+        "role-field": "Role",
         "role": {
             "super-admin": "Super Admin",
             "account-services": "Account Services",
@@ -55,7 +57,7 @@
         "primary-phone": "Primary Phone",
         "mobile-number": "Mobile Number",
         "fax-number": "Fax Number",
-        "hillromId": "HillromId",
+        "hillromId": "Hill-Rom ID",
         "parentClinicId": "ParentClinicId",
         "npiNumber": "NpiNumber",
         "parent": "parent",

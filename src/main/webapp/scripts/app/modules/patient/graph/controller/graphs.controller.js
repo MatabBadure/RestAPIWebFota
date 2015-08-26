@@ -24,6 +24,10 @@ angular.module('hillromvestApp')
       $scope.maxPressure = 0;
       $scope.minDuration = 0;
       $scope.maxDuration = 0;
+      $scope.yAxisRangeForHMRLine = {};
+      $scope.yAxisRangeForCompliance = {};
+      $scope.yAxis1Min = 0;
+      $scope.yAxis2Min = 0;
       $scope.getHmrRunRateAndScore();
       //$scope.patientId = StorageService.get('patientID');
       $scope.fromTimeStamp = dateService.getnDaysBackTimeStamp(7);
@@ -31,6 +35,7 @@ angular.module('hillromvestApp')
       $scope.toDate = dateService.getDateFromTimeStamp($scope.toTimeStamp);   
       $scope.getPatientById(localStorage.getItem('patientID'));
       var currentRoute = $state.current.name;
+      $scope.showNotes = false;
       if ($state.current.name === 'patientdashboard') {
         $scope.initPatientDashboard();        
       }else if(currentRoute === 'patientdashboardCaregiver'){
@@ -45,6 +50,7 @@ angular.module('hillromvestApp')
         $scope.initPatientClinicHCPs();
       }
     };
+
 
     angular.element('#edit_date').datepicker({    
           endDate: '+0d',   
@@ -67,16 +73,7 @@ angular.module('hillromvestApp')
           angular.element("#edit_date").datepicker('hide');   
           $scope.$digest();   
         });   
-    console.log("from and To dates :"+$scope.dates);
-  /*-----Date picker for dashboard----*/
-/* $scope.date = {
-  startDate: '08/12/2015', 
-  endDate: '08/18/2015',
-  opens: 'center',
-  parentEl: '#dp3',
-};*/
-/*if($scope.dates && $scope.dates != 'undefined')
-console.log("from and To dates :"+$scope.dates);
+    
 
   /*-----Date picker for dashboard----*/
 
@@ -88,7 +85,7 @@ console.log("from and To dates :"+$scope.dates);
     };
 
     $scope.removeGraph = function() {
-      d3.select('svg').selectAll("*").remove();
+      d3.selectAll('svg').selectAll("*").remove();
     }
     $scope.drawGraph = function() {
       var days = dateService.getDateDiffIndays($scope.fromTimeStamp,$scope.toTimeStamp);
@@ -96,6 +93,7 @@ console.log("from and To dates :"+$scope.dates);
         $scope.format = 'dayWise';
         $scope.hmrLineGraph = false;
         $scope.hmrBarGraph = true;
+        $scope.removeGraph();
         $scope.getDayHMRGraphData();
       } else if(days <= 7) {
         $scope.weeklyChart($scope.fromTimeStamp);
@@ -107,7 +105,7 @@ console.log("from and To dates :"+$scope.dates);
     };
 
     $scope.opts = {
-      eventHandlers: {'hide.daterangepicker': function(ev, picker) {
+      eventHandlers: {'apply.daterangepicker': function(ev, picker) {
         $scope.calculateDateFromPicker(picker);
         $scope.drawGraph();
         }
@@ -217,7 +215,7 @@ console.log("from and To dates :"+$scope.dates);
       return function(key, x, y, e, graph) {
         var toolTip = '';
         angular.forEach($scope.completeGraphData, function(value) {
-          if(value.startTime === e.point[0]){
+          if(value.startTime === e.point[0] && value.hmr !== 0 ){
               toolTip =
                 '<h6>' + dateService.getDateFromTimeStamp(value.startTime) + '</h6>' +
                 '<p> Frequency ' + value.frequency + '</p>' +
@@ -233,7 +231,7 @@ console.log("from and To dates :"+$scope.dates);
       return function(key, x, y, e, graph) {
         var toolTip = '';
         angular.forEach(data, function(value) {
-          if(value.start === e.point.x){
+          if(value.start === e.point.timeStamp){
               toolTip =
                 '<h6>' + dateService.getDateFromTimeStamp(value.start) + '</h6>' +
                 '<p> Treatment/Day ' + value.treatmentsPerDay + '</p>' +
@@ -247,7 +245,6 @@ console.log("from and To dates :"+$scope.dates);
     };
 
     $scope.xAxisTickValuesFunction = function(){
-      
     return function(d){
         var tickVals = [];
         var values = d[0].values;
@@ -257,6 +254,17 @@ console.log("from and To dates :"+$scope.dates);
         return tickVals;
       };
     };
+
+    $scope.yAxisFormatFunction = function() {
+      return function(d) {
+        var tickVals = [];
+        var values = d[0].values;
+        for(var i in values){
+          tickVals.push(values[i][0]);
+        }
+        return tickVals;
+      };
+    }
 
     $scope.xAxisTickValuesBarChart = function() {
       return function(d){
@@ -277,6 +285,7 @@ console.log("from and To dates :"+$scope.dates);
     $scope.showHmrGraph = function() {
       $scope.complianceGraph = false;
       $scope.hmrGraph = true;
+      $scope.removeGraph();
     };
 
     $scope.getNonDayHMRGraphData = function() {
@@ -286,7 +295,13 @@ console.log("from and To dates :"+$scope.dates);
         if($scope.completeGraphData.actual === undefined){
           $scope.graphData = [];
         } else {
+          $scope.yAxisRangeForHMRLine = graphUtil.getYaxisRangeLineGraph($scope.completeGraphData);
+          $scope.completeGraphData = graphUtil.sortGraphData($scope.completeGraphData);
+          $scope.completeGraphData = graphUtil.getCompleteGraphData($scope.completeGraphData,$scope.format,$scope.fromTimeStamp,$scope.toTimeStamp);
           $scope.graphData = graphUtil.convertIntoHMRLineGraph($scope.completeGraphData);
+          console.log('HMR Non-Day graph data : ' + JSON.stringify($scope.graphData));
+          console.log($scope.yAxisRangeForHMRLine);
+          //$scope.graphData = [{"values":[[1,29567],[2,29567],]}]
         }
       }).catch(function(response) {
         $scope.graphData = [];
@@ -297,17 +312,21 @@ console.log("from and To dates :"+$scope.dates);
       patientDashBoardService.getHMRBarGraphPoints($scope.patientId, $scope.fromTimeStamp).then(function(response){
         $scope.completeGraphData = response.data;
         if($scope.completeGraphData.actual === undefined){
-           $scope.graphData = [];
+           $scope.hmrBarGraphData = [];
          } else {
           $scope.completeGraphData = graphUtil.formatDayWiseDate($scope.completeGraphData.actual);
-           $scope.graphData = graphUtil.convertIntoHMRBarGraph($scope.completeGraphData);
+          $scope.yAxisRangeForHMRBar = graphUtil.getYaxisRangeBarGraph($scope.completeGraphData);
+          $scope.hmrBarGraphData = graphUtil.convertIntoHMRBarGraph($scope.completeGraphData);
+          console.log('HMR Day graph data' + JSON.stringify($scope.hmrBarGraphData));
+          console.log($scope.yAxisRangeForHMRBar);
+          //$scope.hmrBarGraphData = [{"values":[[1420061400000,null],[1420075800000,null],[1420090200000,28987],[1420104600000,28997],[1420119000000,null],[1420133400000,null]]}]
          }
       }).catch(function(response) {
-        $scope.graphData = [];
+        $scope.hmrBarGraphData = [];
       });
     };
 
-    $scope.getComplianceGraphData = function() {
+    $scope.getComplianceGraphData = function(format) {
       patientDashBoardService.getHMRGraphPoints($scope.patientId, $scope.fromTimeStamp, $scope.toTimeStamp, $scope.groupBy).then(function(response){
         //Will get response data from real time API once api is ready
         $scope.completeComplianceData = response.data;
@@ -321,7 +340,12 @@ console.log("from and To dates :"+$scope.dates);
           $scope.maxPressure = $scope.completeComplianceData.recommended.maxPressure;
           $scope.minDuration = $scope.completeComplianceData.recommended.minMinutesPerTreatment * $scope.completeComplianceData.recommended.treatmentsPerDay;
           $scope.maxDuration = $scope.completeComplianceData.recommended.maxMinutesPerTreatment * $scope.completeComplianceData.recommended.treatmentsPerDay;
+          $scope.completeComplianceData = graphUtil.sortGraphData($scope.completeComplianceData);  
+          $scope.yAxisRangeForCompliance = graphUtil.getYaxisRangeComplianceGraph($scope.completeComplianceData);
+          $scope.completeComplianceData = graphUtil.getCompleteGraphData($scope.completeComplianceData,$scope.format,$scope.fromTimeStamp,$scope.toTimeStamp);
+          $scope.completecomplianceGraphData = graphUtil.sortGraphData($scope.completeComplianceData);
           $scope.completecomplianceGraphData = graphUtil.convertIntoComplianceGraph($scope.completeComplianceData.actual);
+          $scope.yAxis1Max = $scope.yAxisRangeForCompliance.maxDuration;
           $scope.createComplianceGraphData();
           $scope.drawComplianceGraph();
         }
@@ -415,6 +439,7 @@ console.log("from and To dates :"+$scope.dates);
     angular.forEach($scope.completecomplianceGraphData, function(value) {
           if(value.key.indexOf("pressure") >= 0 && $scope.compliance.secondaryYaxis === 'pressure'){
             value.yAxis = 2
+            $scope.yAxis2Max = $scope.yAxisRangeForCompliance.maxPressure;
             $scope.complianceGraphData.push(value);
           }
           if(value.key.indexOf("duration") >= 0){
@@ -423,11 +448,10 @@ console.log("from and To dates :"+$scope.dates);
           }
           if(value.key.indexOf("frequency") >= 0  && $scope.compliance.secondaryYaxis === 'frequency'){
             value.yAxis = 2
+            $scope.yAxis2Max = $scope.yAxisRangeForCompliance.maxFrequency;
             $scope.complianceGraphData.push(value);
           }
     });
-    console.log('compliance graph data!')
-    console.log($scope.complianceGraphData)
   };
 
   $scope.putComplianceGraphLabel = function(chart) {
@@ -467,36 +491,125 @@ console.log("from and To dates :"+$scope.dates);
   $scope.drawComplianceGraph = function() {
     d3.select('#complianceGraph svg').selectAll("*").remove();
       nv.addGraph(function() {
-      chart = nv.models.multiChart()
+      var chart = nv.models.multiChart()
       .margin({top: 30, right: 100, bottom: 50, left: 100})
       .color(d3.scale.category10().range());
      // chart.noData("Nothing to see here.");
       chart.tooltipContent($scope.toolTipContentForCompliance($scope.completeComplianceData.actual));
+      //this function to put x-axis labels
       chart.xAxis.tickFormat(function(d) {
-        angular.forEach($scope.completeComplianceData.actual, function(value) {
-          if(value.timestamp === d){
-             switch($scope.format) {
-              case "weekly":
-                  return d3.time.format('%A')(new Date(d));
-                  break;
-              case "monthly":
-                  return 'week ' + dateService.getWeekOfMonth(d);
-                  break;
-              case "yearly":
-                  return d3.time.format('%B')(new Date(d));
-                  break;
-              default:
-                  break;
+          if(d % 1 === 0) {
+            var timeStamp = $scope.completecomplianceGraphData[0].values[d-1].timeStamp;
+            switch($scope.format) {
+                case "weekly":
+                    return d3.time.format('%A')(new Date(timeStamp));
+                    break;
+                case "monthly":
+                    return 'week ' + dateService.getWeekOfMonth(timeStamp);
+                    break;
+                case "yearly":
+                    return d3.time.format('%B')(new Date(timeStamp));
+                    break;
+                default:
+                    break;
             }
           }
         });
-      });
-      chart.yAxis1.tickFormat(d3.format(',.0f'));
-      chart.yAxis2.tickFormat(d3.format(',.0f'));
-      $scope.putComplianceGraphLabel(chart);
+      chart.yAxis1.tickFormat(d3.format('d'));
+      chart.yAxis2.tickFormat(d3.format('d'));
+      chart.yDomain1([$scope.yAxis1Min,$scope.yAxis1Max]);
+      chart.yDomain2([$scope.yAxis2Min,$scope.yAxis2Max]); 
+      //$scope.putComplianceGraphLabel(chart);
+      var data =  $scope.complianceGraphData
+         angular.forEach(data, function(value) {
+              if(value.yAxis === 1){
+                chart.yAxis1.axisLabel(value.key);
+              }
+               if(value.yAxis === 2){
+                chart.yAxis2.axisLabel(value.key);
+              }
+        });
         d3.select('#complianceGraph svg')
       .datum($scope.complianceGraphData)
       .transition().duration(500).call(chart);
+
+        var y1AxisMark = d3.select('#complianceGraph svg').selectAll('.y1.axis').selectAll('.nvd3.nv-wrap.nv-axis');
+        var y2AxisMark = d3.select('#complianceGraph svg').selectAll('.y2.axis').selectAll('.nvd3.nv-wrap.nv-axis');
+        var y1AxisMinMax = d3.select('#complianceGraph svg').selectAll('.y1.axis').selectAll('.nvd3.nv-wrap.nv-axis').select('.nv-axisMaxMin').attr("transform");
+        var y2AxisMinMax = d3.select('#complianceGraph svg').selectAll('.y2.axis').selectAll('.nvd3.nv-wrap.nv-axis').select('.nv-axisMaxMin').attr("transform");
+        var maxTransform = parseInt(y1AxisMinMax.split(',')[1].replace(y1AxisMinMax,')',''));
+        $scope.y1AxisTransformRate = parseInt(y1AxisMinMax.split(',')[1].replace(y1AxisMinMax,')',''))/($scope.yAxis1Max - $scope.yAxis1Min);
+        $scope.y2AxisTransformRate = parseInt(y2AxisMinMax.split(',')[1].replace(y2AxisMinMax,')',''))/($scope.yAxis2Max - $scope.yAxis2Min);
+        var y1LineLength = d3.select('#complianceGraph svg').selectAll('.y1.axis').selectAll('.nvd3.nv-wrap.nv-axis').selectAll('line').attr('x2');
+        var y2LineLength = d3.select('#complianceGraph svg').selectAll('.y2.axis').selectAll('.nvd3.nv-wrap.nv-axis').selectAll('line').attr('x2');
+        if($scope.compliance.secondaryYaxis === 'frequency') {
+          $scope.yAxis2MaxMark = $scope.maxFrequency;
+          $scope.yAxis2MinMark = $scope.minFrequency;
+        } else if($scope.compliance.secondaryYaxis === 'pressure'){
+          $scope.yAxis2MaxMark = $scope.maxPressure;
+          $scope.yAxis2MinMark = $scope.minPressure;
+        }
+        $scope.yAxis1MaxMark = $scope.maxDuration;
+        $scope.yAxis1MinMark = $scope.minDuration;
+
+        var y1AxisMinTransform = maxTransform - parseInt($scope.y1AxisTransformRate * $scope.yAxis1MinMark);
+        var y1AxisMaxTransform = maxTransform - parseInt($scope.y1AxisTransformRate * $scope.yAxis1MaxMark);
+        var y2AxisMinTransform = maxTransform - parseInt($scope.y2AxisTransformRate * $scope.yAxis2MinMark);
+        var y2AxisMaxTransform = maxTransform - parseInt($scope.y2AxisTransformRate * $scope.yAxis2MaxMark);
+
+        y1AxisMark.append('g').
+        attr('class','minRecommendedLevel').
+        attr('transform','translate(0, '+ y1AxisMinTransform + ')').
+        append('text').
+        text($scope.yAxis1MinMark).
+        //attr('text-anchor'.'end').
+        style('fill','red');
+
+        y1AxisMark.select('.minRecommendedLevel').
+        append('line').
+        attr('x2',y1LineLength).
+        attr('y2','0').
+        style('stroke','red');
+
+        y1AxisMark.append('g').
+        attr('class','maxRecommendedLevel').
+        attr('transform','translate(0,'+ y1AxisMaxTransform + ')').
+        append('text').
+        text($scope.yAxis1MaxMark).
+        //attr('text-anchor'.'end').
+        style('fill','green');
+
+        y1AxisMark.select('.maxRecommendedLevel').
+        append('line').
+        attr('x2',y1LineLength).
+        attr('y2','0').
+        style('stroke','green');
+
+        y2AxisMark.append('g').
+        attr('class','minRecommendedLevel').
+        attr('transform','translate(0,'+ y2AxisMinTransform + ')').
+        append('text').
+        text($scope.yAxis2MinMark).
+        style('fill','red');
+
+        y2AxisMark.select('.minRecommendedLevel').
+        append('line').
+        attr('x2',y2LineLength).
+        attr('y2','0').
+        style('stroke','red');
+
+        y2AxisMark.append('g').
+        attr('class','maxRecommendedLevel').
+        attr('transform','translate(0,'+ y2AxisMaxTransform + ')').
+        append('text').
+        text($scope.yAxis2MaxMark).
+        style('fill','green');
+
+        y2AxisMark.select('.maxRecommendedLevel').
+        append('line').
+        attr('x2',y2LineLength).
+        attr('y2','0').
+        style('stroke','green');
       return chart;
     });
   };
@@ -657,19 +770,24 @@ console.log("from and To dates :"+$scope.dates);
       }).catch(function(){});
     };
 
-    $scope.getNotes = function(){
-      var date = '2015-08-21';
+    $scope.getNotes = function(){      
+      var date = new Date().getTime();      
       UserService.getNotesOfUser(localStorage.getItem('patientID'), date).then(function(response){
-        $scope.notes = response.data;               
-      }).catch(function(){});
+        $scope.showNotes = true; 
+        $scope.notes = response.data;          
+        scrollPageToTop("add_note_container");        
+      }).catch(function(){
+        $scope.notes = "";    
+      });
     };
 
     $scope.updateNote = function(){
       if($scope.editedNoteText && $scope.editedNoteText.length > 0){
         var data = {};
         data.noteText = $scope.editedNoteText;
-        UserService.updateNote(localStorage.getItem('patientID'), '2015-08-21', data).then(function(response){
-          $scope.notes = response.data; alert("update : "+JSON.stringify($scope.notes));               
+        UserService.updateNote($scope.notes.id, new Date().getTime(), data).then(function(response){
+          $scope.notes = response.data; 
+          $scope.editNote = false;            
         }).catch(function(){
           $scope.errorMsg = "Some internal error occurred. Please try after sometime.";
           notyService.showMessage($scope.errorMsg,'warning' );
@@ -750,6 +868,13 @@ console.log("from and To dates :"+$scope.dates);
         });
       }).catch(function(){});
     }
+
+    function scrollPageToTop(divId){
+      $('html, body').animate({
+          scrollTop: $("#"+divId).offset().top
+      }, 2000);
+    }
+
     $scope.init();
 });
 

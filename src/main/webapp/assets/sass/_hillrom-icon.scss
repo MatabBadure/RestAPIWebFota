@@ -1,10 +1,10 @@
 @font-face {
 	font-family: 'hillrom';
-	src:url('fonts/hillrom.eot?-b2hjav');
-	src:url('fonts/hillrom.eot?#iefix-b2hjav') format('embedded-opentype'),
-		url('fonts/hillrom.ttf?-b2hjav') format('truetype'),
-		url('fonts/hillrom.woff?-b2hjav') format('woff'),
-		url('fonts/hillrom.svg?-b2hjav#hillrom') format('svg');
+	src:url('fonts/hillrom.eot?9cgafe');
+	src:url('fonts/hillrom.eot?#iefix9cgafe') format('embedded-opentype'),
+		url('fonts/hillrom.ttf?9cgafe') format('truetype'),
+		url('fonts/hillrom.woff?9cgafe') format('woff'),
+		url('fonts/hillrom.svg?9cgafe#hillrom') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -23,6 +23,15 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
+.icon-sort-down:before {
+	content: "\e611";
+}
+.icon-sort-up:before {
+	content: "\e612";
+}
+.icon-sort-whole:before {
+	content: "\e613";
+}
 .icon-adherence:before {
 	content: "\e608";
 }

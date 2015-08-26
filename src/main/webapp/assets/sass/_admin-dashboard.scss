@@ -344,12 +344,13 @@
 .dashboard__manage-view {
   .inactive {
     opacity: 0.6;
+    cursor: default;
   }
 }
 
-.dashboard__manage-view--list .inactive,
 .dashboard__manage-view--list .inactive {
 	color: $Parsley;
+  cursor: default;
 }
 
 .dashboard__manage-view--list .progress-input {
@@ -695,4 +696,108 @@ tags-input.ng-invalid .tags {
 
 .dashboard__manage-view--list .icon-font .icon-lungs.inactive {
   color: $sunshade;
+}
+
+.dashboard__manage-view--header {
+  border-bottom: 1px solid #ccc;
+  padding: 5px 0;
+}
+
+.dashboard__manage-view--header .header--type {
+  padding: 0;
+  color: $cyan-blue-light;
+  font-size: $font-size-small;
+}
+
+.dashboard__manage-view--header .header--type .sort-icon--default:after {
+  font-family: 'hillrom';
+  content: "\e613";
+  font-size: 10px;
+  padding-left: 5px;
+  cursor: pointer;
+  position: absolute;
+}
+
+.dashboard__manage-view--header .header--type .sort-icon-down:after {
+  font-family: 'hillrom';
+  content: "\e611";
+  font-size: 10px;
+  padding-left: 5px;
+  cursor: pointer;
+  position: absolute;
+  top: 3px;
+}
+
+.dashboard__manage-view--header .header--type .sort-icon-up:after {
+  font-family: 'hillrom';
+  content: "\e612";
+  font-size: 10px;
+  padding-left: 5px;
+  cursor: pointer;
+  position: absolute;
+}
+
+.dashboard__manage-view--list .centered {
+  height: 39px;
+  line-height: 39px;
+}
+
+.dashboard__manage-view--list .main-prim-info {
+  font-size: $font-size-base;
+  color: $pickled-bluewood;
+  display: block;
+  font-weight: $font-weight-bold;
+}
+
+.dashboard__manage-view--list .main-secon-info {
+  font-size: $font-size-small;
+  color: $bombay;
+  display: block;
+  font-weight: $font-weight-medium;
+}
+
+.dashboard__manage-view--list .impo-highlight {
+  font-size: $font-size-small;
+  color: $charcoal;
+  font-weight: $font-weight-semibold;
+}
+
+.dashboard__manage-view--list .short-info {
+  font-size: $font-size-small;
+  color: $regent-gray;
+  font-weight: $font-weight-medium;
+}
+
+.dashboard__manage-view--list .desc-prim-info {
+  font-size: $font-size-small;
+  color: $nevada;
+  font-weight: $font-weight-semibold;
+  display: block;
+}
+
+.dashboard__manage-view--list .desc-sec-info {
+  font-size: $font-size-small;
+  color: $celeste;
+  display: block;
+}
+
+.dashboard__manage-view--list .icon-font {
+  position: relative;
+}
+
+.dashboard__manage-view--list .icon-font .icon-lungs {
+  position: absolute;
+  font-size: $font-size-icon;
+  top: 5px;
+  right: 50%;
+}
+
+.admin-user .admin-views {
+  margin-top: 20px;
+  padding: 10px 0;
+  &--title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    color: $pickled-bluewood;
+  }
 }

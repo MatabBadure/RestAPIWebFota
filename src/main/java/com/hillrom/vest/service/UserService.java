@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -56,8 +58,6 @@ import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
-
-import net.minidev.json.JSONObject;
 
 /**
  * Service class for managing users.
@@ -445,7 +445,7 @@ public class UserService {
         		&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
         	UserExtension user = updateHillromTeamUser(id, userExtensionDTO);
     		if(user.getId() != null) {
-    			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && !user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
     				mailService.sendActivationEmail(user, baseUrl);
     			}
                 return user;
@@ -455,7 +455,7 @@ public class UserService {
     	} else if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updatePatientUser(id, userExtensionDTO);
     		if(user.getId() != null) {
-    			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && !user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
     				mailService.sendActivationEmail(user, baseUrl);
     	    		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
     			}
@@ -466,7 +466,7 @@ public class UserService {
         } else if (AuthoritiesConstants.HCP.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updateHCPUser(id, userExtensionDTO);
     		if(user.getId() != null) {
-    			if(!user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && !user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
     				mailService.sendActivationEmail(user, baseUrl);
     			}
                 return user;
@@ -1136,5 +1136,18 @@ public class UserService {
 		    return filteredUsers;
 		}	
 	 }
+	
+	public User setHRMNotificationSetting(Long id, Map<String, Boolean> paramsMap) throws HillromException {
+		User user = userRepository.findOne(id);
+		if (user != null) {
+			user.setHMRNotification(paramsMap.get("isHMRNotification"));
+			user.setAcceptHMRNotification(paramsMap.get("isAcceptHMRNotification"));
+			user.setAcceptHMRSetting(paramsMap.get("isAcceptHMRSetting"));
+			userRepository.save(user);
+			return user;
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);
+		}
+	}
 }
 

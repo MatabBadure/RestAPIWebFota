@@ -23,6 +23,7 @@
         "add-clinic": "Add Another Clinic",
         "create-caregiver": "Yes",
         "clinic-name":  "Clinic Name",
+        "hcp-name": "HCP Name",
         "emr-id":   "EMR-ID",
         "mrn-id": "MRN-ID",
         "title": {
@@ -66,6 +67,7 @@
         "deactivate-button-text": "Deactivate",
         "update-button-text": "Update",
         "back-button-text": "Back",
+        "edit-button-text": "Edit",
         "delete": {
             "warning": "Are you sure you want to Deactivate the Doctor?",
             "message": "If you deactivate the doctor, you will no longer be able to view the information."
@@ -73,6 +75,6 @@
         "tab": {
             "hcp-overview": "HCP Profile"
         },
-        "clinic-assos": "Clinic Assosiation"
+        "patient-assoc": "Patient Association"
     }
 }

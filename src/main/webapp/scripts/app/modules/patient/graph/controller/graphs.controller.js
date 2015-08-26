@@ -775,7 +775,7 @@ angular.module('hillromvestApp')
       UserService.getNotesOfUser(localStorage.getItem('patientID'), date).then(function(response){
         $scope.showNotes = true; 
         $scope.notes = response.data;          
-        scrollPageToTop("add_note_container");        
+        //scrollPageToTop("add_note_container");        
       }).catch(function(){
         $scope.notes = "";    
       });

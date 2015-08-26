@@ -4,7 +4,7 @@ angular.module('hillromvestApp')
     .service('graphUtil', function (dateService) {
       
       this.convertIntoHMRLineGraph = function(data) {
-        var pointSet = [];
+        /*var pointSet = [];
         var graphData = {};
         var graphDataList =[];
         angular.forEach(data.actual, function(value) {
@@ -15,6 +15,23 @@ angular.module('hillromvestApp')
         });
         graphData["values"] = pointSet;
         graphDataList.push(graphData);
+      return graphDataList;*/
+        var graphDataList =[];
+        var values = [];
+        var object = {};
+        var count = 0;
+        angular.forEach(data, function(value) {
+          count = count + 1;
+          var point = {};
+          point.x = count;
+          point.y = value.hmr;
+          point.timeStamp = value.timestamp;
+          values.push(point);
+        });
+        object.values = values;
+        object.area = true;
+        // color can be added to customize graph color  "color": "#7777ff"
+        graphDataList.push(object);
       return graphDataList;
       }
 

@@ -100,8 +100,8 @@
 }
 		</style>
 	<div ng-if="hmrGraph">
-		<div ng-if="hmrLineGraph">
-	 		<nvd3-line-chart
+		<div id="hmrLineGraph" ng-if="hmrLineGraph">
+	 		<!-- <nvd3-line-chart
 	    	  data="graphData"
 	        id="HMRLineGraph"
 	        width="1250"
@@ -122,7 +122,8 @@
 	        forcey="[yAxisRangeForHMRLine.min,yAxisRangeForHMRLine.max]"
 	        tooltipcontent="toolTipContentFunction()">
 	        <svg></svg>
-	    </nvd3-line-chart>
+	    </nvd3-line-chart> -->
+	    <svg style="height:350px"> </svg>
 	  </div>
 	  <div ng-if="hmrBarGraph">
 		 	<nvd3-multi-bar-chart

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-  .controller('adminProfileController', function ($rootScope, $scope, $state, $stateParams, $location, notyService, UserService, Password, Auth) {
+  .controller('adminProfileController', function ($rootScope, $scope, $state, $stateParams, $location, notyService, UserService, Password, Auth, AuthServerProvider) {
 
 
     $scope.isActive = function(tab) {
@@ -16,6 +16,9 @@ angular.module('hillromvestApp')
     $scope.initProfile = function(adminId){
       UserService.getUser(adminId).then(function(response){
         $scope.user = response.data.user;
+      }).catch(function(response){});
+      AuthServerProvider.getSecurityQuestions().then(function(response){
+        $scope.questions = response.data
       }).catch(function(response){});
     };
 
@@ -34,11 +37,28 @@ angular.module('hillromvestApp')
     };
 
     $scope.updateProfile = function(){
+      $scope.submitted = true;
+      if($scope.form.$invalid){
+        return false;
+      }
+      if($scope.resetAccount){
+        var data = {
+          "questionId": $scope.resetAccount.question.id,
+          "answer": $scope.resetAccount.answer
+        };
+        AuthServerProvider.changeSecurityQuestion(data, $scope.user.id).then(function(response){
+          console.log(response);
+        }).catch(function(response){});
+      }
       UserService.editUser($scope.user).then(function(response){
         notyService.showMessage(response.data.message, 'success');
         $state.go('adminProfile');
       }).catch(function(response){
-        notyService.showMessage(response.data.message, 'warning');
+        if(response.data.message){
+          notyService.showMessage(response.data.message, 'warning');
+        } else if(response.data.ERROR){
+          notyService.showMessage(response.data.ERROR, 'warning');
+        }
       });
     };
 

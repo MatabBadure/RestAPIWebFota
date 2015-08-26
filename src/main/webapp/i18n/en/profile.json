@@ -29,6 +29,7 @@
     "cur-pswd": "Current Password",
     "new-pswd": "New Password",
     "confirm-pswd": "Confirm Password",
-    "mobile-no": "Mobile"
+    "mobile-no": "Mobile",
+    "security-ans": "Answer"
   }
 }

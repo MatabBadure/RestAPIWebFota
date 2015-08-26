@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-    .factory('Password', function ($http,localStorageService) {
+    .factory('Password', function ($http,localStorageService, headerService) {
         /*return $resource('api/account/change_password', {}, {
             headers: {
                         'Content-Type': 'application/json',
@@ -11,7 +11,7 @@ angular.module('hillromvestApp')
         });*/
     return {
             changePassword: function(data) {
-                
+
                 return $http.post('api/account/change_password', data, {
                     headers: {
                         "Content-Type": "application/json",
@@ -22,6 +22,14 @@ angular.module('hillromvestApp')
                     return {'response': data, 'status': status, 'headers' : headers, 'config' : config};
                 });
             },
+
+            updatePassword: function(id, data){
+                return $http.put('/api/user/'+id+'/update_password', data, {
+                    headers: headerService.getHeader()
+                }).success(function (data, status, headers, config) {
+                    return {'response': data, 'status': status, 'headers' : headers, 'config' : config};
+                });
+            }
         }
     });
 
@@ -39,6 +47,6 @@ angular.module('hillromvestApp')
         		return  $resource('api/account/reset_password/finish?key='+key, {}, {
                 });
         	}
-        	
+
         }
     });

@@ -47,8 +47,13 @@ angular.module('hillromvestApp')
           "answer": $scope.resetAccount.answer
         };
         AuthServerProvider.changeSecurityQuestion(data, $scope.user.id).then(function(response){
-          console.log(response);
-        }).catch(function(response){});
+        }).catch(function(response){
+          if(response.data.message){
+            notyService.showMessage(response.data.message, 'warning');
+          } else if(response.data.ERROR){
+            notyService.showMessage(response.data.ERROR, 'warning');
+          }
+        });
       }
       $scope.user.role = $scope.user.authorities[0].name;
       UserService.editUser($scope.user).then(function(response){

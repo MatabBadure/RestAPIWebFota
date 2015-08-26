@@ -1,7 +1,7 @@
 <navigation-bar-patient></navigation-bar-patient>
 <patient-profile-navbar></patient-profile-navbar> 
 <div class="dashboard dashboard--content padding-bottom-ls">
-  <form name="form" ng-submit="createUser()" novalidate autocomplete="off">
+  <form name="form" ng-submit="updateProfile()" novalidate autocomplete="off">
     <div class="container dashboard__form">
       <div class="margin-top-xl">
         <div class="col-md-16 reset-padding margin-top">
@@ -119,8 +119,8 @@
             </div>
             <div class="col-md-10 dashboard__form__input--option reset-padding">
               <div class="custom-dropdown">
-                <select name="role" validate-on-blur ng-model="userRole" ng-readonly="validateSuperAdmin()" ng-selected="{{option === userRole}}" required disabled>
-                  <option selected value="" translate="profile.role.default">{{userRole}}</option>                  
+                <select name="role" validate-on-blur ng-model="editPatientProfile.authorities[0].name" ng-readonly="validateSuperAdmin()"  required disabled>
+                  <option>{{editPatientProfile.authorities[0].name}}</option>                  
                 </select>
                 <div ng-show="(form.role.$dirty && form.role.$showValidationMessage && form.role.$invalid) || submitted">
                   <span class="has-error" ng-show="form.role.$error.required">
@@ -140,30 +140,30 @@
             </div>
             <div class="col-md-10 dashboard__form__input--sec-option reset-padding">
               <div class="custom-dropdown">
-                <select class="security-select" name="question" validate-on-blur  ng-model="resetAccount.question" required ng-options="question.question for question in questions">
+            <!--     <select class="security-select" name="question" validate-on-blur  ng-model="resetAccount.question" required ng-options="question.question for question in questions">
+                  <option value="">-- select a security question --</option>
+                </select> -->
+                <select class="security-select" name="question" validate-on-blur  ng-model="resetAccount.question" ng-options="question.question for question in questions">
                   <option value="">-- select a security question --</option>
                 </select>
             </div>
             </div>
           </div>
         </div>
-        <div class="col-md-16 reset-padding margin-top">
+        <div class="col-md-16 reset-padding margin-top" ng-if="resetAccount.question">
           <div class="col-md-7 reset-padding">
             <div class="col-md-6 dashboard__form--label reset-padding">
               <span class="" translate="profile.security-ans"></span>
               <span class="">*</span>
             </div>
             <div class="col-md-10 dashboard__form--input reset-padding">
-              <input class="" type="email" name="email" validate-on-blur ng-model="user.email" ng-maxlength=100 ng-readonly="validateSuperAdmin()" required>
-              <div ng-show="(form.email.$dirty && form.email.$showValidationMessage && form.email.$invalid) || submitted">
-                <span class="has-error" ng-show="form.email.$error.required">
-                   E-mail is required.
+              <input class="" type="text" name="answer" validate-on-blur ng-model="resetAccount.answer" ng-maxlength=100 ng-readonly="validateSuperAdmin()" required>
+              <div ng-show="(form.answer.$dirty && form.answer.$showValidationMessage && form.answer.$invalid) || submitted">
+                <span class="has-error" ng-show="form.answer.$error.required">
+                   Answer is required.
                 </span>
-                <span class="has-error" ng-show="form.email.$error.email">
-                   E-mail is invalid.
-                </span>
-                <span class="has-error" ng-show="form.email.$error.maxlength">
-                  E-mail cannot be longer than 100 characters.
+                <span class="has-error" ng-show="form.answer.$error.maxlength">
+                  Answer cannot be longer than 100 characters.
                 </span>
               </div>
             </div>
@@ -173,7 +173,7 @@
       </div>
       <div class="col-md-16 reset-padding margin-top">
         <div class="">
-        <button type="submit" class="hillrom-btn btn-submit float-right" ng-click="formSubmit()" ng-show="!userStatus.isCreate" translate="profile.update-button-text" ng-click="updateProfile();">Update</button>
+        <button type="submit" class="hillrom-btn btn-submit float-right" ng-click="formSubmit()" ng-show="!userStatus.isCreate" translate="profile.update-button-text" >Update</button>
           <button type="reset" ng-click="cancelEditProfile()" ng-show="!userStatus.isCreate" class="hillrom-btn btn-submit float-right" translate="profile.cancel-button-text">Cancel</button>
           <div class="clr"></div>
         </div>

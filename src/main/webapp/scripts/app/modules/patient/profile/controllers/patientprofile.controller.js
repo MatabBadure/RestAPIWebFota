@@ -1,22 +1,19 @@
 'use strict';
 
-angular.module('hillromvestApp').controller('patientprofileController', function ($scope, $state, $stateParams, notyService, patientService) {
+angular.module('hillromvestApp').controller('patientprofileController', function ($scope, $state, $stateParams, notyService, patientService, UserService, AuthServerProvider) {
 	$scope.init = function(){
 		var currentRoute = $state.current.name;	
 		$scope.profileTab = currentRoute;	
-		$scope.userRole = localStorage.getItem('role');
-		patientService.getPatientInfo(localStorage.getItem('patientID')).then(function(response){
-			$scope.patientView = response.data;			
-			if (currentRoute === 'patientProfile') {
-				$scope.initProfileView();        
-			}else if(currentRoute === 'patientProfileEdit'){
-				$scope.initProfileEdit();
-			}else if(currentRoute === 'patientResetPassword'){
-				$scope.initResetPassword();
-			}else if(currentRoute === 'patientSettings'){// html is not available for this template
-				$scope.initPatientSettings();
-			}
-		}).catch(function(response){});
+		$scope.userRole = localStorage.getItem('role');			
+		if (currentRoute === 'patientProfile') {
+			$scope.initProfileView();        
+		}else if(currentRoute === 'patientProfileEdit'){
+			$scope.initProfileEdit();
+		}else if(currentRoute === 'patientResetPassword'){
+			$scope.initResetPassword();
+		}else if(currentRoute === 'patientSettings'){
+			$scope.initPatientSettings();
+		}
 		
 	};
 
@@ -40,8 +37,12 @@ angular.module('hillromvestApp').controller('patientprofileController', function
     };
 
 	$scope.initProfileView = function(){
-		/*$scope.userRole = localStorage.getItem('role');
-		$scope.getPatientById(localStorage.getItem('patientID'));*/
+		UserService.getUser(localStorage.getItem('patientID')).then(function(response){
+			$scope.patientView = response.data.user;
+		}).catch(function(response){});
+		AuthServerProvider.getSecurityQuestions().then(function(response){
+			$scope.questions = response.data
+		}).catch(function(response){});		
 	};
 
 	$scope.openEditDetail = function(){
@@ -49,17 +50,51 @@ angular.module('hillromvestApp').controller('patientprofileController', function
 	};
 
 	$scope.initProfileEdit = function(){
-		$scope.editPatientProfile = $scope.patientView;
+		UserService.getUser(localStorage.getItem('patientID')).then(function(response){
+			$scope.editPatientProfile = response.data.user;
+		}).catch(function(response){});
+		AuthServerProvider.getSecurityQuestions().then(function(response){
+			$scope.questions = response.data
+		}).catch(function(response){});		
 	};
 
 	$scope.cancelEditProfile = function(){
 		$state.go("patientProfile");
 		$scope.editPatientProfile = "";
-	};
+	};	
 
 	$scope.updateProfile = function(){
-
-	};
+      $scope.submitted = true;
+      if($scope.form.$invalid){
+        return false;
+      }
+      if($scope.resetAccount){
+        var data = {
+          "questionId": $scope.resetAccount.question.id,
+          "answer": $scope.resetAccount.answer
+        };
+        AuthServerProvider.changeSecurityQuestion(data, $scope.editPatientProfile.id).then(function(response){
+        }).catch(function(response){
+          if(response.data.message){
+            notyService.showMessage(response.data.message, 'warning');
+          } else if(response.data.ERROR){
+            notyService.showMessage(response.data.ERROR, 'warning');
+          }
+        });
+      }
+      $scope.editPatientProfile.role = $scope.editPatientProfile.authorities[0].name;
+      $scope.editPatientProfile.dob = null;
+      UserService.editUser($scope.editPatientProfile).then(function(response){
+        notyService.showMessage(response.data.message, 'success');
+        $state.go('patientProfile');
+      }).catch(function(response){
+        if(response.data.message){
+          notyService.showMessage(response.data.message, 'warning');
+        } else if(response.data.ERROR){
+          notyService.showMessage(response.data.ERROR, 'warning');
+        }
+      });
+    };
 
 	$scope.init();
     

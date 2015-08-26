@@ -341,6 +341,14 @@ public class UserService {
         	} else {
         		throw new HillromException(ExceptionConstants.HR_531);
     		}
+        } else if (AuthoritiesConstants.CLINIC_ADMIN.equals(userExtensionDTO.getRole())) {
+        	UserExtension user = createClinicAdminUser(userExtensionDTO);
+        	if(user.getId() != null) {
+                mailService.sendActivationEmail(user, baseUrl);
+                return user;
+        	} else {
+        		throw new HillromException(ExceptionConstants.HR_537);
+    		}
         } else {
         	throw new HillromException(ExceptionConstants.HR_502);
     	}
@@ -418,6 +426,22 @@ public class UserService {
 	}
     
     public UserExtension createHCPUser(UserExtensionDTO userExtensionDTO) throws HillromException {
+    	UserExtension newUser = new UserExtension();
+		assignValuesToUserObj(userExtensionDTO, newUser);
+		newUser.setActivated(false);
+		newUser.setDeleted(false);
+		newUser.setActivationKey(RandomUtil.generateActivationKey());
+		for(Map<String, String> clinicObj : userExtensionDTO.getClinicList()){
+			Clinic clinic = clinicRepository.getOne(clinicObj.get("id"));
+			newUser.getClinics().add(clinic);
+		}
+		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
+		userExtensionRepository.save(newUser);
+		log.debug("Created Information for User: {}", newUser);
+		return newUser;
+	}
+    
+    public UserExtension createClinicAdminUser(UserExtensionDTO userExtensionDTO) throws HillromException {
     	UserExtension newUser = new UserExtension();
 		assignValuesToUserObj(userExtensionDTO, newUser);
 		newUser.setActivated(false);

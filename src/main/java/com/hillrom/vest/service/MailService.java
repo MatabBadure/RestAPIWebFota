@@ -1,6 +1,8 @@
 package com.hillrom.vest.service;
 
+import com.hillrom.vest.config.NotificationTypeConstants;
 import com.hillrom.vest.domain.User;
+
 import org.apache.commons.lang.CharEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,7 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.mail.internet.MimeMessage;
+
 import java.util.Locale;
 
 /**
@@ -94,5 +97,24 @@ public class MailService {
         String content = templateEngine.process("passwordResetEmail", context);
         String subject = messageSource.getMessage("email.reset.title", null, locale);
         sendEmail(user.getEmail(), subject, content, false, true);
+    }
+    
+    public void sendNotificationMail(User user,String notificationType){
+       log.debug("Sending password reset e-mail to '{}'", user.getEmail());
+       Context context = new Context();
+       context.setVariable("user", user);
+       String content = "";
+       String subject = "";
+       if(NotificationTypeConstants.MISSED_THERAPY.equalsIgnoreCase(notificationType)){
+    	   content = templateEngine.process("missedTherapyNotification", context);
+           subject = messageSource.getMessage("email.therapynotification.title", null, null);
+       }else if(NotificationTypeConstants.HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType)){
+    	   content = templateEngine.process("hmrComplianceNotification", context);
+           subject = messageSource.getMessage("email.hmrnotification.title", null, null);
+       }else {
+    	   content = templateEngine.process("settingsNotification", context);
+           subject = messageSource.getMessage("email.settingsnotification.title", null, null);
+       }
+       sendEmail(user.getEmail(), subject, content, false, true);
     }
 }

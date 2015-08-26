@@ -10,7 +10,7 @@
 								<div class="col-3">
 									<div class="pie_chart" easypiechart options="adherence" percent="adherenceScore"></div>
 									<div class="stats_chart_content score">
-										<h4 class="percent">{{adherenceScore}}</h4>
+										<h4 class="percent" ng-bind="adherenceScore"></h4>
 										<p class="descrip">Adherence Score</p>
 									</div>
 									<div class="chart_inner_icon icon-adherence"></div>
@@ -18,7 +18,7 @@
 								<div class="col-3">
 									<div class="pie_chart"  easypiechart options="hmr" percent="hmrRunRate"></div>
 									<div class="stats_chart_content hmr">
-										<h4 class="percent">{{hmrRunRate}}</h4>
+										<h4 class="percent" ng-bind="hmrRunRate"></h4>
 										<p class="descrip">HMR Runrate</p>
 									</div>
 									<div class="chart_inner_icon icon-man-running"></div>
@@ -26,7 +26,7 @@
 								<div class="col-3">
 									<div class="pie_chart"  easypiechart options="missedtherapy" percent="missedtherapyDays"></div>
 									<div class="stats_chart_content missed">
-										<h4 class="percent">{{missedtherapyDays}}</h4>
+										<h4 class="percent" ng-bind="missedtherapyDays"></h4>
 										<p class="descrip">Missed Therapy Days</p>
 									</div>
 									<div class="chart_inner_icon icon-lungs"></div>
@@ -179,7 +179,7 @@
 	 				<div class="notes_content" ng-show="notes.note.length > 0">
  						<div class="col-md-16 notes_row">
  							<div class="notes_row_wrapper">
- 								<div class="col-md-2 date_col"><span>08/12/2015</span></div>
+ 								<div class="col-md-2 date_col"><span ng-bind="notes.createdOn"></span></div>
 	 							<div class="col-md-11 description" ng-show="!editNote">{{notes.note}}</div>
 	 							<form ng-show="editNote" ng-submit="updateNote();">
 	 								<input type="text" ng-model="editedNoteText">

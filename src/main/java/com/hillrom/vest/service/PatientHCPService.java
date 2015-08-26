@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import net.minidev.json.JSONObject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,6 +30,7 @@ import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.util.ExceptionConstants;
+import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 
 /**
@@ -59,12 +58,7 @@ public class PatientHCPService {
     	List<User> users = new LinkedList<>();
     	User patientUser = userRepository.findOne(id);
     	if(patientUser != null) {
-	    	PatientInfo patientInfo = null;
-	     	for(UserPatientAssoc patientAssoc : patientUser.getUserPatientAssoc()){
-	    		if(RelationshipLabelConstants.SELF.equals(patientAssoc.getRelationshipLabel())){
-	    			patientInfo = patientAssoc.getPatient();
-	    		}
-	    	}
+	    	PatientInfo patientInfo = getPatientInfoObjeFromPatientUser(patientUser);
 	     	if(patientInfo != null){
 	     		List<UserPatientAssoc> hcpPatientAssocList = new ArrayList<>();
 		    	for(Map<String, String> hcpId : hcpList) {
@@ -77,6 +71,7 @@ public class PatientHCPService {
 		    		}
 		    	}
 		    	userPatientRepository.save(hcpPatientAssocList);
+		    	userPatientRepository.flush();
 		    	users = getAssociatedHCPUserList(patientInfo);
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
@@ -90,12 +85,7 @@ public class PatientHCPService {
     public List<User> getAssociatedHCPUserForPatient(Long id) throws HillromException {
     	User patientUser = userRepository.findOne(id);
     	if(patientUser != null) {
-    		PatientInfo patientInfo = null;
-	     	for(UserPatientAssoc patientAssoc : patientUser.getUserPatientAssoc()){
-	    		if(RelationshipLabelConstants.SELF.equals(patientAssoc.getRelationshipLabel())){
-	    			patientInfo = patientAssoc.getPatient();
-	    		}
-	    	}
+    		PatientInfo patientInfo = getPatientInfoObjeFromPatientUser(patientUser);
 	     	if(patientInfo != null){
 		    	return getAssociatedHCPUserList(patientInfo);
 	     	} else {
@@ -158,5 +148,40 @@ public class PatientHCPService {
     		throw new HillromException(ExceptionConstants.HR_512);
      	}
     }
+	
+	public String dissociateHCPFromPatient(Long id, List<Map<String, String>> hcpList) throws HillromException {
+    	User patientUser = userRepository.findOne(id);
+    	if(patientUser != null) {
+	    	PatientInfo patientInfo = getPatientInfoObjeFromPatientUser(patientUser);
+	     	if(patientInfo != null){
+	     		List<UserPatientAssoc> hcpPatientAssocList = new ArrayList<>();
+		    	for(Map<String, String> hcpId : hcpList) {
+		    		UserExtension hcpUser = userExtensionRepository.findOne(Long.parseLong(hcpId.get("id")));
+		    		if(hcpUser != null) {
+			    		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, hcpUser), AuthoritiesConstants.HCP, RelationshipLabelConstants.HCP);
+			    		hcpPatientAssocList.add(userPatientAssoc);
+		    		} else {
+		    			throw new HillromException(ExceptionConstants.HR_532);//Invalid HCP id
+		    		}
+		    	}
+		    	userPatientRepository.delete(hcpPatientAssocList);
+		    	return MessageConstants.HR_256;
+	     	} else {
+	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
+	     	}
+    	} else {
+    		throw new HillromException(ExceptionConstants.HR_512);//No such user exist
+     	}
+    }
+	
+	private PatientInfo getPatientInfoObjeFromPatientUser(User patientUser) {
+		PatientInfo patientInfo = null;
+		for(UserPatientAssoc patientAssoc : patientUser.getUserPatientAssoc()){
+			if(RelationshipLabelConstants.SELF.equals(patientAssoc.getRelationshipLabel())){
+				patientInfo = patientAssoc.getPatient();
+			}
+		}
+		return patientInfo;
+	}
 }
 

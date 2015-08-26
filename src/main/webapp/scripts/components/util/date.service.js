@@ -57,7 +57,7 @@ angular.module('hillromvestApp')
         return this.getDay(date.getDate()) + '/' + this.getMonth(date.getMonth(date)) + '/' + this.getYear(date.getFullYear(date))
       },
       getDateDiffIndays: function(fromTimeStamp,toTimeStamp) {
-        return Math.floor((toTimeStamp - fromTimeStamp)/(1000*60*60*24));
+        return Math.ceil((toTimeStamp - fromTimeStamp)/(1000*60*60*24));
       },
       getTimeStampForTimeSlot: function(date,timeSlot) {
         return this.getStartTimeStampOfDay(new Date(date).getTime()) + (((timeSlot*4)-1)*60*60*1000);

@@ -115,7 +115,6 @@ angular.module('hillromvestApp')
     
     $scope.getHmrRunRateAndScore = function() {
       patientDashBoardService.getHMRrunAndScoreRate($scope.patientId, $scope.toTimeStamp).then(function(response){
-        //Will get response data from real time API once api is ready
         if(response.status === 200 ){
           $scope.hmrRunRate = response.data.hmrRunRate;
           $scope.adherenceScore = response.data.score;
@@ -171,35 +170,6 @@ angular.module('hillromvestApp')
       $scope.patientTab = status;
       $state.go(status);
     };
-
-    /*$scope.init = function() {
-      $scope.getPatientById(localStorage.getItem('patientID'));
-      var currentRoute = $state.current.name;
-      if ($state.current.name === 'patientdashboard') {
-        $scope.initPatientDashboard();        
-      }else if(currentRoute === 'patientdashboardCaregiver'){
-        $scope.initPatientCaregiver();
-      }else if(currentRoute === 'patientdashboardCaregiverAdd'){
-        $scope.initpatientCraegiverAdd();
-      }else if(currentRoute === 'patientdashboardCaregiverEdit'){
-        $scope.initpatientCaregiverEdit();
-      }else if(currentRoute === 'patientdashboardDeviceProtocol'){
-        $scope.initPatientDeviceProtocol();
-      }else if(currentRoute === 'patientdashboardClinicHCP'){
-        $scope.initPatientClinicHCPs();
-      }
-      $scope.hmrGraphData = [
-      {
-          "key": "weekly",
-          "values": [ [ 1025409600000 , [ {'Treatment/Day' : 21 }, {'Frequency' : 28 }, {'pressure' : 10 }, {'Caugh Pauses' : 39 }] ] ,
-           [ 1028088000000 , [ {'name':'Treatment/Day','value' :21}, {'name':'Frequency', 'value': 28 }, {'name':'pressure', 'value': 10 }, {'name':'Caugh Pauses','value': 39 }]] ,
-           [ 1028088000000 , [ {'name':'Treatment/Day','value' :21}, {'name':'Frequency', 'value': 28 }, {'name':'pressure', 'value': 10 }, {'name':'Caugh Pauses','value': 39 }]] ,
-           [ 1028088000000 , [ {'name':'Treatment/Day','value' :21}, {'name':'Frequency', 'value': 28 }, {'name':'pressure', 'value': 10 }, {'name':'Caugh Pauses','value': 39 }]] ,
-           [ 1028088000000 , [ {'name':'Treatment/Day','value' :21}, {'name':'Frequency', 'value': 28 }, {'name':'pressure', 'value': 10 }, {'name':'Caugh Pauses','value': 39 }]] ,
-           [ 1028088000000 , [ {'name':'Treatment/Day','value' :21}, {'name':'Frequency', 'value': 28 }, {'name':'pressure', 'value': 10 }, {'name':'Caugh Pauses','value': 39 }]]  ]
-         }
-    ]    
-    };*/
 
 
     $scope.xAxisTickFormatFunction = function(format){
@@ -325,8 +295,8 @@ angular.module('hillromvestApp')
           $scope.graphData = [];
         } else {
           $scope.yAxisRangeForHMRLine = graphUtil.getYaxisRangeLineGraph($scope.completeGraphData);
-          $scope.completeGraphData = graphUtil.sortGraphData($scope.completeGraphData);
-          $scope.completeGraphData = graphUtil.getCompleteGraphData($scope.completeGraphData,$scope.format,$scope.fromTimeStamp,$scope.toTimeStamp);
+          //$scope.completeGraphData = graphUtil.sortGraphData($scope.completeGraphData);
+          //$scope.completeGraphData = graphUtil.getCompleteGraphData($scope.completeGraphData,$scope.format,$scope.fromTimeStamp,$scope.toTimeStamp);
           $scope.graphData = graphUtil.convertIntoHMRLineGraph($scope.completeGraphData);
           console.log('HMR Non-Day graph data : ' + JSON.stringify($scope.graphData));
           console.log($scope.yAxisRangeForHMRLine);
@@ -359,6 +329,7 @@ angular.module('hillromvestApp')
       patientDashBoardService.getHMRGraphPoints($scope.patientId, $scope.fromTimeStamp, $scope.toTimeStamp, $scope.groupBy).then(function(response){
         //Will get response data from real time API once api is ready
         $scope.completeComplianceData = response.data;
+        console.log("server response" + JSON.stringify($scope.completeComplianceData));
         if($scope.completeComplianceData.actual === undefined){
           $scope.complianceGraphData = [];
         } else {
@@ -369,11 +340,13 @@ angular.module('hillromvestApp')
           $scope.maxPressure = $scope.completeComplianceData.recommended.maxPressure;
           $scope.minDuration = $scope.completeComplianceData.recommended.minMinutesPerTreatment * $scope.completeComplianceData.recommended.treatmentsPerDay;
           $scope.maxDuration = $scope.completeComplianceData.recommended.maxMinutesPerTreatment * $scope.completeComplianceData.recommended.treatmentsPerDay;
-          $scope.completeComplianceData = graphUtil.sortGraphData($scope.completeComplianceData);  
+          //$scope.completeComplianceData = graphUtil.sortGraphData($scope.completeComplianceData);  
           $scope.yAxisRangeForCompliance = graphUtil.getYaxisRangeComplianceGraph($scope.completeComplianceData);
-          $scope.completeComplianceData = graphUtil.getCompleteGraphData($scope.completeComplianceData,$scope.format,$scope.fromTimeStamp,$scope.toTimeStamp);
-          $scope.completecomplianceGraphData = graphUtil.sortGraphData($scope.completeComplianceData);
-          $scope.completecomplianceGraphData = graphUtil.convertIntoComplianceGraph($scope.completeComplianceData.actual);
+          console.log("recommended setting value : " + JSON.stringify($scope.yAxisRangeForCompliance));
+          //$scope.completeComplianceData = graphUtil.getCompleteGraphData($scope.completeComplianceData,$scope.format,$scope.fromTimeStamp,$scope.toTimeStamp);
+          //$scope.completecomplianceGraphData = graphUtil.sortGraphData($scope.completeComplianceData);
+          //console.log(JSON.stringify($scope.completeComplianceData));
+          $scope.completecomplianceGraphData = graphUtil.convertIntoComplianceGraph($scope.completeComplianceData.actual);          
           $scope.yAxis1Max = $scope.yAxisRangeForCompliance.maxDuration;
           $scope.createComplianceGraphData();
           $scope.drawComplianceGraph();
@@ -481,6 +454,7 @@ angular.module('hillromvestApp')
             $scope.complianceGraphData.push(value);
           }
     });
+    console.log(JSON.stringify($scope.complianceGraphData));
   };
 
   $scope.putComplianceGraphLabel = function(chart) {
@@ -590,55 +564,59 @@ angular.module('hillromvestApp')
         attr('class','minRecommendedLevel').
         attr('transform','translate(0, '+ y1AxisMinTransform + ')').
         append('text').
-        text($scope.yAxis1MinMark).
+        //text($scope.yAxis1MinMark).
+        text('MIN').
         //attr('text-anchor'.'end').
         style('fill','red');
 
-        y1AxisMark.select('.minRecommendedLevel').
+/*        y1AxisMark.select('.minRecommendedLevel').
         append('line').
         attr('x2',y1LineLength).
         attr('y2','0').
-        style('stroke','red');
+        style('stroke','red');*/
 
         y1AxisMark.append('g').
         attr('class','maxRecommendedLevel').
         attr('transform','translate(0,'+ y1AxisMaxTransform + ')').
         append('text').
-        text($scope.yAxis1MaxMark).
+        //text($scope.yAxis1MaxMark).
+        text('MAX').
         //attr('text-anchor'.'end').
         style('fill','green');
 
-        y1AxisMark.select('.maxRecommendedLevel').
+       /* y1AxisMark.select('.maxRecommendedLevel').
         append('line').
         attr('x2',y1LineLength).
         attr('y2','0').
-        style('stroke','green');
+        style('stroke','green');*/
 
         y2AxisMark.append('g').
         attr('class','minRecommendedLevel').
         attr('transform','translate(0,'+ y2AxisMinTransform + ')').
         append('text').
-        text($scope.yAxis2MinMark).
+        //text($scope.yAxis2MinMark).
+        text('MIN').
         style('fill','red');
 
-        y2AxisMark.select('.minRecommendedLevel').
+        /*y2AxisMark.select('.minRecommendedLevel').
         append('line').
         attr('x2',y2LineLength).
         attr('y2','0').
-        style('stroke','red');
+        style('stroke','red');*/
 
         y2AxisMark.append('g').
         attr('class','maxRecommendedLevel').
         attr('transform','translate(0,'+ y2AxisMaxTransform + ')').
         append('text').
-        text($scope.yAxis2MaxMark).
+        //text($scope.yAxis2MaxMark).
+        text('MAX').
         style('fill','green');
 
-        y2AxisMark.select('.maxRecommendedLevel').
+        /*y2AxisMark.select('.maxRecommendedLevel').
         append('line').
         attr('x2',y2LineLength).
         attr('y2','0').
-        style('stroke','green');
+        style('stroke','green');*/
       return chart;
     });
   };

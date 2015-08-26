@@ -13,6 +13,7 @@ angular.module('hillromvestApp')
       $scope.compliance.pressure = true;
       $scope.compliance.duration = true;
       $scope.compliance.frequency = false;
+      $scope.handlelegends();
       $scope.toTimeStamp = new Date().getTime();
       $scope.compliance.secondaryYaxis = 'frequency';
       $scope.hmrRunRate = 0;
@@ -84,6 +85,7 @@ angular.module('hillromvestApp')
     };
 
     $scope.removeGraph = function() {
+      d3.selectAll('#complianceGraph svg').selectAll("*").remove();
       d3.selectAll('svg').selectAll("*").remove();
     }
     $scope.drawGraph = function() {
@@ -96,9 +98,9 @@ angular.module('hillromvestApp')
         $scope.getDayHMRGraphData();
       } else if(days <= 7) {
         $scope.weeklyChart($scope.fromTimeStamp);
-      } else if ( days > 7 && days < 36 ) {
+      } else if ( days > 7 && days <= 30 ) {
         $scope.monthlyChart($scope.fromTimeStamp);
-      } else if ( days >= 36) {
+      } else if ( days > 30) {
          $scope.yearlyChart($scope.fromTimeStamp);
       }
     };
@@ -307,6 +309,42 @@ angular.module('hillromvestApp')
       });
     };
 
+    $scope.reCreateComplianceGraph = function() {
+      $scope.removeGraph();
+
+      $scope.handlelegends();
+      $scope.createComplianceGraphData();
+      $scope.drawComplianceGraph();
+    };
+
+    $scope.handlelegends = function() {
+      var count = 0 ;
+      if($scope.compliance.pressure === true ){
+        count++;
+      }
+      if($scope.compliance.duration === true ){
+        count++;
+      }
+      if($scope.compliance.frequency === true ){
+        count++;
+      }
+      if(count === 2 ) {
+        if($scope.compliance.pressure === false ){
+          $scope.pressureIsDisabled = true;
+        }
+        if($scope.compliance.frequency === false ){
+          $scope.frequencyIsDisabled = true;
+        }
+        if($scope.compliance.duration === false ){
+          $scope.durationIsDisabled = true;
+        }
+      } else if(count < 2 ) {
+         $scope.pressureIsDisabled = false;
+         $scope.frequencyIsDisabled = false;
+         $scope.durationIsDisabled = false;
+      }
+    }
+
     $scope.getDayHMRGraphData = function() {
       patientDashBoardService.getHMRBarGraphPoints($scope.patientId, $scope.fromTimeStamp).then(function(response){
         $scope.completeGraphData = response.data;
@@ -438,21 +476,25 @@ angular.module('hillromvestApp')
   $scope.createComplianceGraphData = function() {
     delete $scope.complianceGraphData ;
     $scope.complianceGraphData = [];
+    var count = 0;
     angular.forEach($scope.completecomplianceGraphData, function(value) {
-          if(value.key.indexOf("pressure") >= 0 && $scope.compliance.secondaryYaxis === 'pressure'){
-            value.yAxis = 2
-            $scope.yAxis2Max = $scope.yAxisRangeForCompliance.maxPressure;
-            $scope.complianceGraphData.push(value);
-          }
-          if(value.key.indexOf("duration") >= 0){
-            value.yAxis = 1
-            $scope.complianceGraphData.push(value);
-          }
-          if(value.key.indexOf("frequency") >= 0  && $scope.compliance.secondaryYaxis === 'frequency'){
-            value.yAxis = 2
-            $scope.yAxis2Max = $scope.yAxisRangeForCompliance.maxFrequency;
-            $scope.complianceGraphData.push(value);
-          }
+      if(value.key.indexOf("pressure") >= 0 && $scope.compliance.pressure === true){
+        value.yAxis = ++count;
+        value.color = 'rgb(255, 127, 14)';
+        $scope.yAxis2Max = $scope.yAxisRangeForCompliance.maxPressure;
+        $scope.complianceGraphData.push(value);
+      }
+      if(value.key.indexOf("duration") >= 0 && $scope.compliance.duration === true){
+        value.yAxis = ++count;
+        value.color = 'rgb(31, 119, 180)';
+        $scope.complianceGraphData.push(value);
+      }
+      if(value.key.indexOf("frequency") >= 0  && $scope.compliance.frequency === true){
+        value.yAxis = ++count;
+        value.color = 'rgb(55, 163, 180)';
+        $scope.yAxis2Max = $scope.yAxisRangeForCompliance.maxFrequency;
+        $scope.complianceGraphData.push(value);
+      }
     });
     console.log(JSON.stringify($scope.complianceGraphData));
   };
@@ -469,26 +511,26 @@ angular.module('hillromvestApp')
     });
   };
 
-  $scope.reCreateComplianceGraph = function() {
+ /* $scope.reCreateComplianceGraph = function() {
     console.log('selected choice:' + $scope.compliance.secondaryYaxis);
     $scope.createComplianceGraphData();
     $scope.drawComplianceGraph();
-  };
+  };*/
 
   $scope.formatXtickForCompliance = function(format,d){
-        switch(format) {
-          case "weekly":
-              return d3.time.format('%A')(new Date(d));
-              break;
-          case "monthly":
-              return 'week ' + dateService.getWeekOfMonth(d);
-              break;
-          case "yearly":
-              return d3.time.format('%B')(new Date(d));
-              break;
-          default:
-              break;
-        }
+    switch(format) {
+      case "weekly":
+          return d3.time.format('%A')(new Date(d));
+          break;
+      case "monthly":
+          return 'week ' + dateService.getWeekOfMonth(d);
+          break;
+      case "yearly":
+          return d3.time.format('%B')(new Date(d));
+          break;
+      default:
+          break;
+    }
   };
 
   $scope.drawComplianceGraph = function() {
@@ -496,6 +538,7 @@ angular.module('hillromvestApp')
       nv.addGraph(function() {
       var chart = nv.models.multiChart()
       .margin({top: 30, right: 100, bottom: 50, left: 100})
+      .showLegend(false)
       .color(d3.scale.category10().range());
      // chart.noData("Nothing to see here.");
       chart.tooltipContent($scope.toolTipContentForCompliance($scope.completeComplianceData.actual));

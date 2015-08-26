@@ -13,7 +13,7 @@ angular.module('hillromvestApp')
                 abstract: true,
             })
             .state('patient-dashboard', {
-                parent: 'entity',                
+                parent: 'entity',
                 url:'/patient',
                 abstract: true,
             })
@@ -963,7 +963,7 @@ angular.module('hillromvestApp')
             })
 
             .state('adminUpdatePassword', {
-                parent: 'adminProfile',
+                parent: 'admin',
                 url: '/updatepassword',
                 data: {
                     roles: ['ADMIN'],

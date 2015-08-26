@@ -67,4 +67,5 @@ public class MessageConstants {
     public static final String HR_293 = "HCP associated with clinic successfully.";
     
     public static final String HR_294 = "Password updated successfully.";
+    public static final String HR_295 = "Security question updated successfully.";
 }

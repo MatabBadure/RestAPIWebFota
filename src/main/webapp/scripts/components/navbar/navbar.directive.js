@@ -47,7 +47,7 @@ angular.module('hillromvestApp')
     templateUrl: 'scripts/components/navbar/navbar.html',
     restrict: 'E',
 
-    controller: function ($scope) {
+    controller: function ($scope, $state) {
       $scope.isActive = function(tab) {
         var path = $location.path();
         if (path.indexOf(tab) !== -1) {
@@ -67,7 +67,7 @@ angular.module('hillromvestApp')
           $scope.isAuthenticated = false;
           $state.go('login');
         });
-      }
+      };
 
       $scope.logout = function(){
         Auth.signOut().then(function(data) {
@@ -76,14 +76,16 @@ angular.module('hillromvestApp')
           $scope.signOut();
         }).catch(function(err) {
         });
-      }
+      };
 
       $scope.account = function(){
-        var userRole = localStorage.getItem('role');        
-        if(userRole === "PATIENT"){
+        var userRole = localStorage.getItem('role');   
+        if(userRole === "ADMIN"){
+          $state.go('adminProfile');
+        }else if(userRole === "PATIENT"){
           $state.go("patientProfile");
         }
-      }
+      };
 
       $scope.goToHomePage = function(){
         var userRole = localStorage.getItem('role'); 
@@ -92,7 +94,8 @@ angular.module('hillromvestApp')
         }else if(userRole === "PATIENT"){
           $state.go("patientdashboard");
         }
-      }
+      };
+
     }
   };
 });

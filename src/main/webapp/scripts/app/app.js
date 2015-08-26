@@ -16,7 +16,8 @@ angular.module('hillromvestApp',
    'nvd3ChartDirectives',
    'easypiechart',
    'daterangepicker',
-   'ngMask'
+   'ngMask',
+   'validation.match'
    ])
 .run(function($rootScope, $location, $window, $http, $state, $translate, Language, Auth, Principal, ENV, VERSION) {
     $rootScope.ENV = ENV;

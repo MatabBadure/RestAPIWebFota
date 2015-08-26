@@ -132,7 +132,7 @@
           </div>
         </div>
 
-        <div class="col-md-16 reset-padding margin-top">
+        <div class="col-md-16 reset-padding margin-top-xl">
           <div class="col-md-7 reset-padding">
             <div class="col-md-6 dashboard__form--label reset-padding">
               <span class="" translate="profile.security-ques"></span>
@@ -144,6 +144,28 @@
                   <option value="">-- select a security question --</option>
                 </select>
             </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-16 reset-padding margin-top">
+          <div class="col-md-7 reset-padding">
+            <div class="col-md-6 dashboard__form--label reset-padding">
+              <span class="" translate="profile.security-ans"></span>
+              <span class="">*</span>
+            </div>
+            <div class="col-md-10 dashboard__form--input reset-padding">
+              <input class="" type="email" name="email" validate-on-blur ng-model="user.email" ng-maxlength=100 ng-readonly="validateSuperAdmin()" required>
+              <div ng-show="(form.email.$dirty && form.email.$showValidationMessage && form.email.$invalid) || submitted">
+                <span class="has-error" ng-show="form.email.$error.required">
+                   E-mail is required.
+                </span>
+                <span class="has-error" ng-show="form.email.$error.email">
+                   E-mail is invalid.
+                </span>
+                <span class="has-error" ng-show="form.email.$error.maxlength">
+                  E-mail cannot be longer than 100 characters.
+                </span>
+              </div>
             </div>
           </div>
         </div>

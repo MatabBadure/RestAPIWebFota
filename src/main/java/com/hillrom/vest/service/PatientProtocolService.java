@@ -138,7 +138,7 @@ public class PatientProtocolService {
     	if(patientUser != null) {
 	    	PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
 	     	if(patientInfo != null){
-	     		List<PatientProtocolData> protocolAssocList = patientProtocolRepository.findByPatientId(patientInfo.getId());
+	     		List<PatientProtocolData> protocolAssocList = patientProtocolRepository.findByPatientIdAndActiveStatus(patientInfo.getId());
 	     		if(protocolAssocList.isEmpty()){
 	     			return new LinkedList<PatientProtocolData>();
 	     		} else {

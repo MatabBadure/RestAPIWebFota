@@ -483,6 +483,25 @@ public class UserResource {
 	    	}    
     	}
     
+    /**
+     * PUT  /user/:id/notifications -> update HRM notification setting for user  {id}.
+     */
+    @RequestMapping(value = "/users/{id}/notificationsetting",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.PATIENT})
+    public ResponseEntity<JSONObject> updateHRMNotification(@PathVariable Long id, @RequestBody Map<String, Boolean> paramsMap) {
+    	JSONObject json = new JSONObject();
+    	try {
+			json.put("user", userService.setHRMNotificationSetting(id, paramsMap));
+			return new ResponseEntity<>(json,HttpStatus.OK);
+		} catch (HillromException e) {
+			json.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(json,HttpStatus.NOT_FOUND);
+		}
+    }
+    
     @RequestMapping(value = "/users/{id}/missedTherapyCount",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)

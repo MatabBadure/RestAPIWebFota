@@ -139,6 +139,15 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name="hillrom_id")
     private String hillromId;
     
+    @Column(name="hmr_notification")
+    private boolean HMRNotification = false;
+
+	@Column(name="accept_hmr_notification")
+    private boolean acceptHMRNotification = false;
+    
+    @Column(name="accept_hmr_setting")
+    private boolean acceptHMRSetting = false;
+    
     public Long getId() {
         return id;
     }
@@ -314,6 +323,30 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	public void setHillromId(String hillromId) {
 		this.hillromId = hillromId;
+	}
+	
+    public boolean isHMRNotification() {
+		return HMRNotification;
+	}
+
+	public void setHMRNotification(boolean hMRNotification) {
+		HMRNotification = hMRNotification;
+	}
+
+	public boolean isAcceptHMRNotification() {
+		return acceptHMRNotification;
+	}
+
+	public void setAcceptHMRNotification(boolean acceptHMRNotification) {
+		this.acceptHMRNotification = acceptHMRNotification;
+	}
+
+	public boolean isAcceptHMRSetting() {
+		return acceptHMRSetting;
+	}
+
+	public void setAcceptHMRSetting(boolean acceptHMRSetting) {
+		this.acceptHMRSetting = acceptHMRSetting;
 	}
 
 	@Override

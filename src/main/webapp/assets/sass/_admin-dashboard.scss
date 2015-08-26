@@ -344,12 +344,13 @@
 .dashboard__manage-view {
   .inactive {
     opacity: 0.6;
+    cursor: default;
   }
 }
 
-.dashboard__manage-view--list .inactive,
 .dashboard__manage-view--list .inactive {
 	color: $Parsley;
+  cursor: default;
 }
 
 .dashboard__manage-view--list .progress-input {

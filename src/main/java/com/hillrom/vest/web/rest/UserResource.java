@@ -1,7 +1,9 @@
 package com.hillrom.vest.web.rest;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
-import java.security.acl.NotOwnerException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -12,6 +14,8 @@ import java.util.Optional;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import net.minidev.json.JSONObject;
 
@@ -32,15 +36,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import au.com.bytecode.opencsv.CSVWriter;
+
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientProtocolData;
-
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.TherapySession;
-
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.NotificationRepository;
@@ -510,4 +514,23 @@ public class UserResource {
     	json.put("count",therapySessionService.getMissedTherapyCountByPatientUserId(id));
     	return new ResponseEntity<JSONObject>(json, HttpStatus.OK);
     }
+    
+/*    @RequestMapping(value = "/users/{id}/exportData",
+            method = RequestMethod.GET,
+            produces = "text/csv")
+    public void exportData(@PathVariable Long id,HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException, IOException{
+    	System.out.println("exportData ******************");
+    	String filename = "test";
+    	response.setHeader("Content-Disposition", "attachment; filename=" + filename + ".csv");
+        response.setContentType("text/csv");
+        OutputStreamWriter osw = new OutputStreamWriter(response.getOutputStream(), "UTF-8");
+
+        List<String[]> result = new LinkedList<>();
+        result.add(new String[]{"name","data"});
+        CSVWriter csvWriter = new CSVWriter(osw, ',');
+        csvWriter.writeAll(result);
+        csvWriter.flush();
+        csvWriter.close();
+    }
+*/
 }

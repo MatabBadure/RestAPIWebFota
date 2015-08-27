@@ -82,6 +82,9 @@ angular.module('hillromvestApp')
       $scope.toTimeStamp = new Date(picker.endDate._d).getTime();
       $scope.fromDate = dateService.getDateFromTimeStamp($scope.fromTimeStamp);
       $scope.toDate = dateService.getDateFromTimeStamp($scope.toTimeStamp);
+      if ($scope.fromDate === $scope.toDate ) {
+        $scope.fromTimeStamp = $scope.toTimeStamp;
+      }
     };
 
     $scope.removeGraph = function() {

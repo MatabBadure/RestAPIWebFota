@@ -160,6 +160,9 @@
 				}
 				&:focus{
 					background-color: transparent;
+				}
+				&.active{
+					background-color: transparent;
 					color: $gray-dark;
 					border-bottom: solid 2px $sunshade;
 				}
@@ -181,6 +184,9 @@
 					background-color: transparent;
 				}
 				&:focus{
+					background-color: transparent;
+				}
+				&.active{
 					background-color: transparent;
 					color: $gray-dark;
 				}

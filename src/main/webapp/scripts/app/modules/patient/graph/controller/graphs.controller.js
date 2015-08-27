@@ -90,8 +90,24 @@ angular.module('hillromvestApp')
 
     $scope.removeGraph = function() {
       d3.selectAll('#complianceGraph svg').selectAll("*").remove();
+      d3.selectAll('#HMRLineGraph svg').selectAll("*").remove();
       d3.selectAll('svg').selectAll("*").remove();
     }
+
+    $scope.hmrBarSetMinMax = function() {
+      var values = [];
+      values.push($scope.yAxisRangeForHMRBar.min);
+      values.push($scope.yAxisRangeForHMRBar.max);
+      return values;
+    }
+
+    $scope.hmrLineSetMinMax = function() {
+      var values = [];
+      values.push($scope.yAxisRangeForHMRLine.min);
+      values.push($scope.yAxisRangeForHMRLine.max);
+      return values;
+    }
+
     $scope.drawGraph = function() {
       var days = dateService.getDateDiffIndays($scope.fromTimeStamp,$scope.toTimeStamp);
       if(days === 0){

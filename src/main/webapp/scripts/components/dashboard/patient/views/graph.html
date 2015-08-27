@@ -116,8 +116,8 @@
 	        xAxisTickFormat="xAxisTickFormatFunction(format)"
 	        xAxisTickValues="xAxisTickValuesFunction()"
 	        noData="No Data Found!"
+	        setminmax="hmrLineSetMinMax()"
 	        objectEquality="true"
-	        forcey="[yAxisRangeForHMRLine.min,yAxisRangeForHMRLine.max]"
 	        tooltipcontent="toolTipContentFunction()">
 	        <svg></svg>
 	    </nvd3-line-chart>
@@ -133,6 +133,7 @@
 	        interactive="true"
 	        tooltips="true"
 	        isArea="true"
+	        setminmax="hmrBarSetMinMax()"
 	        yAxisLabel="Minutes"
 	        margin="{left:100,top:20,bottom:20,right:10}"
 	        xAxisTickFormat="xAxisTickFormatFunction(format)"

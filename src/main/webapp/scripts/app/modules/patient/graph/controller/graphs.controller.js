@@ -323,7 +323,6 @@ angular.module('hillromvestApp')
           $scope.graphData = graphUtil.convertIntoHMRLineGraph($scope.completeGraphData);
           console.log('HMR Non-Day graph data : ' + JSON.stringify($scope.graphData));
           console.log($scope.yAxisRangeForHMRLine);
-          //$scope.graphData = [{"values":[[1,29567],[2,29567],]}]
         }
       }).catch(function(response) {
         $scope.graphData = [];
@@ -386,7 +385,6 @@ angular.module('hillromvestApp')
 
     $scope.getComplianceGraphData = function(format) {
       patientDashBoardService.getHMRGraphPoints($scope.patientId, $scope.fromTimeStamp, $scope.toTimeStamp, $scope.groupBy).then(function(response){
-        //Will get response data from real time API once api is ready
         $scope.completeComplianceData = response.data;
         console.log("server response" + JSON.stringify($scope.completeComplianceData));
         if($scope.completeComplianceData.actual === undefined){
@@ -532,12 +530,6 @@ angular.module('hillromvestApp')
     });
   };
 
- /* $scope.reCreateComplianceGraph = function() {
-    console.log('selected choice:' + $scope.compliance.secondaryYaxis);
-    $scope.createComplianceGraphData();
-    $scope.drawComplianceGraph();
-  };*/
-
   $scope.formatXtickForCompliance = function(format,d){
     switch(format) {
       case "weekly":
@@ -586,7 +578,6 @@ angular.module('hillromvestApp')
       chart.yAxis2.tickFormat(d3.format('d'));
       chart.yDomain1([$scope.yAxis1Min,$scope.yAxis1Max]);
       chart.yDomain2([$scope.yAxis2Min,$scope.yAxis2Max]); 
-      //$scope.putComplianceGraphLabel(chart);
       var data =  $scope.complianceGraphData
          angular.forEach(data, function(value) {
               if(value.yAxis === 1){
@@ -628,59 +619,29 @@ angular.module('hillromvestApp')
         attr('class','minRecommendedLevel').
         attr('transform','translate(0, '+ y1AxisMinTransform + ')').
         append('text').
-        //text($scope.yAxis1MinMark).
         text('MIN').
-        //attr('text-anchor'.'end').
         style('fill','red');
-
-/*        y1AxisMark.select('.minRecommendedLevel').
-        append('line').
-        attr('x2',y1LineLength).
-        attr('y2','0').
-        style('stroke','red');*/
 
         y1AxisMark.append('g').
         attr('class','maxRecommendedLevel').
         attr('transform','translate(0,'+ y1AxisMaxTransform + ')').
         append('text').
-        //text($scope.yAxis1MaxMark).
         text('MAX').
-        //attr('text-anchor'.'end').
         style('fill','green');
-
-       /* y1AxisMark.select('.maxRecommendedLevel').
-        append('line').
-        attr('x2',y1LineLength).
-        attr('y2','0').
-        style('stroke','green');*/
 
         y2AxisMark.append('g').
         attr('class','minRecommendedLevel').
         attr('transform','translate(0,'+ y2AxisMinTransform + ')').
         append('text').
-        //text($scope.yAxis2MinMark).
         text('MIN').
         style('fill','red');
-
-        /*y2AxisMark.select('.minRecommendedLevel').
-        append('line').
-        attr('x2',y2LineLength).
-        attr('y2','0').
-        style('stroke','red');*/
 
         y2AxisMark.append('g').
         attr('class','maxRecommendedLevel').
         attr('transform','translate(0,'+ y2AxisMaxTransform + ')').
         append('text').
-        //text($scope.yAxis2MaxMark).
         text('MAX').
         style('fill','green');
-
-        /*y2AxisMark.select('.maxRecommendedLevel').
-        append('line').
-        attr('x2',y2LineLength).
-        attr('y2','0').
-        style('stroke','green');*/
       return chart;
     });
   };

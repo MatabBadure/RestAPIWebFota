@@ -235,7 +235,17 @@ angular.module('hillromvestApp')
     };
 
     $scope.disassociateLinkedHCPs = function(id){
-      console.log('Todo REST API and Its Intigration...!');
+      var data = [{"id": id}];
+      patientService.disassociateHCPFromPatient($stateParams.patientId, data).then(function(response) {
+        $scope.getAssociatedHCPs($stateParams.patientId);
+        notyService.showMessage(response.data.message, 'success');
+      }).catch(function(response) {
+        if(response.data.message){
+          notyService.showMessage(response.data.message, 'warning');
+        } else if(response.data.ERROR){
+          notyService.showMessage(response.data.ERROR, 'warning');
+        }
+      });
     };
 
     $scope.searchClinics = function (track) {

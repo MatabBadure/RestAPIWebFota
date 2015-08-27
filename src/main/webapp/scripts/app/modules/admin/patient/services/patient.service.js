@@ -95,9 +95,9 @@ angular.module('hillromvestApp')
       * @description To disassciate a HCP from patient.
       *
       */
-      disassociateHCPFromPatient : function(id){
-        var url = admin.patient.baseURL + id + '/hcp';
-        return $http.delete(url, {
+      disassociateHCPFromPatient : function(id, data){
+        var url = admin.patient.baseURL + id + '/dissociatehcp';
+        return $http.put(url, data, {
           headers: headerService.getHeader()
         }).success(function (response) {
           return response;

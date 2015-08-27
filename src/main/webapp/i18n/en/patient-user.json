@@ -29,7 +29,8 @@
         "placeholder": {
           "clinic-link": "Search Clinic here",
           "device-link": "Search Device here",
-          "protocol-link": "Search Protocol here"
+          "protocol-link": "Search Protocol here",
+          "hcp-link": "Search HCP here"
         },
         "device": {
           "gen-details": "Add Device",

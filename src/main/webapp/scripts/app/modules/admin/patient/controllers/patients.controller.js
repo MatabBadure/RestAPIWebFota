@@ -10,7 +10,7 @@ angular.module('hillromvestApp')
     return val;
   };
 })
-.controller('patientsController', function($scope, $filter, $state, $stateParams, patientService, dateService, notyService, UserService, clinicService,$rootScope,$timeout) {
+.controller('patientsController', function($scope, $filter, $state, $stateParams, patientService, dateService, notyService, UserService, DoctorService, clinicService,$rootScope,$timeout) {
     $scope.patient = {};
     $scope.patientTab = "";
     $scope.newProtocolPoint = 1;
@@ -234,6 +234,10 @@ angular.module('hillromvestApp')
       });
     };
 
+    $scope.disassociateLinkedHCPs = function(id){
+      console.log('Todo REST API and Its Intigration...!');
+    };
+
     $scope.searchClinics = function (track) {
       if (track !== undefined) {
         if (track === "PREV" && $scope.currentPageIndex > 1) {
@@ -302,7 +306,36 @@ angular.module('hillromvestApp')
       $scope.getPatientById(patientId);
       $scope.getPatientClinicInfo(patientId);
       $scope.getClinics();
-    }
+      $scope.getAssociatedHCPs(patientId);
+      $scope.getHCPs();
+    };
+
+    $scope.getAssociatedHCPs = function(patientId){
+      patientService.getAssociateHCPToPatient(patientId).then(function(response){
+        $scope.associatedHCPs = response.data.hcpUsers
+      }).catch(function(response){});
+    };
+
+    $scope.selectHcpForPatient = function(hcp){
+      var data = [{'id': hcp.id}];
+      $scope.searchHcp = "";
+      patientService.associateHCPToPatient(data, $stateParams.patientId).then(function(response){
+        notyService.showMessage(response.data.message, 'success');
+        $scope.getAssociatedHCPs($stateParams.patientId);
+      }).catch(function(response){
+        if(response.data.message){
+          notyService.showMessage(response.data.message, 'warning');
+        } else if(response.data.ERROR){
+          notyService.showMessage(response.data.ERROR, 'warning');
+        }
+      });
+    };
+
+    $scope.getHCPs = function(){
+      DoctorService.getDoctorsList($scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function(response){
+        $scope.hcps = response.data;
+      }).catch(function(response){});
+    };
 
     $scope.getClinics = function(){
       clinicService.getClinics($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
@@ -605,6 +638,10 @@ angular.module('hillromvestApp')
 
     $scope.linkClinic = function(){
       $scope.searchClinicText = true;
+    };
+
+    $scope.linkHCP = function(){
+      $scope.searchHCPText = true;
     };
 
     $scope.init();

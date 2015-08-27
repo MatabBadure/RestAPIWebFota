@@ -65,6 +65,15 @@ angular.module('hillromvestApp')
         });
       },
 
+      getAssociateHCPToPatient : function(id){
+        var url = admin.patient.baseURL + id + '/hcp';
+        return $http.get(url, {
+          headers: headerService.getHeader()
+        }).success(function (response) {
+          return response;
+        });
+      },
+
       /**
       * @ngdoc method
       * @name getDoctorsLinkedToPatient

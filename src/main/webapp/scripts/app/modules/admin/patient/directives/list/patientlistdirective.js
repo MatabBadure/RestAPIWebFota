@@ -76,7 +76,6 @@ angular.module('hillromvestApp')
           patientService.getPatients($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount)
             .then(function(response) {
               $scope.patients = response.data;
-              console.log($scope.patients);
               var patientCount = $scope.patients.length;
               for (var i = 0 ; i < patientCount ; i++) {
                 var _date = new Date($scope.patients[i].dob);

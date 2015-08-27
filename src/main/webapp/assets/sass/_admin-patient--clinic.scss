@@ -22,8 +22,8 @@
 }
 
 .admin-user .clinic-list {
-  padding: 0;
-  margin-top: 20px;
+  padding: 10px 0;
+  margin-top: 10px;
   border-bottom: 1px solid $celeste;
 }
 
@@ -53,7 +53,7 @@
   }
 }
 
-.admin-user .clinic-list__phone, .admin-patient .clinic-list__fax {
+.admin-user .clinic-list__phone, .admin-user .clinic-list__fax {
   padding: 0;
   color: $nevada;
   font-size: $font-size-small;

@@ -14,6 +14,8 @@
         "caregiver-title": "Caregivers",
         "device-title": "Device Information",
         "protocol-title": "Protocol",
+        "clinic-title": "Clinic",
+        "hcp-title": "HCP",
         "phone": "Phone:",
         "mobile": "Mobile:",
         "fax": "Fax:",
@@ -22,6 +24,7 @@
         "link-caregiver": "Add Caregiver",
         "link-device": "Add Device",
         "link-protocol": "Add Protocol",
+        "link-hcp": "Link HCP",
         "notes": "Notes",
         "placeholder": {
           "clinic-link": "Search Clinic here",

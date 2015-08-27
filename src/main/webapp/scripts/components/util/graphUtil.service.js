@@ -267,15 +267,15 @@ angular.module('hillromvestApp')
           var durationPoint = {};
           var frequencyPoint = {};
           pressurePoint.x = count;
-          pressurePoint.timeStamp = value.start;
+          pressurePoint.timeStamp = value.timestamp;
           pressurePoint.y = value.weightedAvgPressure;
           pressureValues.push(pressurePoint);
           durationPoint.x = count;
-          durationPoint.timeStamp = value.start;
+          durationPoint.timeStamp = value.timestamp;
           durationPoint.y = value.duration;
           durationValues.push(durationPoint);
           frequencyPoint.x = count;
-          frequencyPoint.timeStamp = value.start;
+          frequencyPoint.timeStamp = value.timestamp;
           frequencyPoint.y = value.weightedAvgFrequency;
           frequencyValues.push(frequencyPoint);
         });

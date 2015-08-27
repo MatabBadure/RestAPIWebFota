@@ -45,19 +45,22 @@ angular.module('hillromvestApp')
         return day
       },
       getWeekOfMonth: function(d) {
-        var dayCount = this.getDayOfYear(d);
+        /*var dayCount = this.getDayOfYear(d);
         var d = new Date(d);
         var date = d.getDate();
         var day = d.getDay();
-        var weekOfMonth = Math.ceil((dayCount) / 7);
-        return weekOfMonth;
+        var weekOfMonth = Math.ceil((dayCount) / 7);*/
+        var date = new Date(d);
+        var firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+        return Math.ceil((date.getDate() + firstDay)/7);
+        return new Date(d).getMonthWeek;
       },
       getDateFromTimeStamp: function(data) {
         var date = new Date(data);
         return this.getDay(date.getDate()) + '/' + this.getMonth(date.getMonth(date)) + '/' + this.getYear(date.getFullYear(date))
       },
       getDateDiffIndays: function(fromTimeStamp,toTimeStamp) {
-        return Math.floor((toTimeStamp - fromTimeStamp)/(1000*60*60*24));
+        return Math.ceil((toTimeStamp - fromTimeStamp)/(1000*60*60*24));
       },
       getTimeStampForTimeSlot: function(date,timeSlot) {
         return this.getStartTimeStampOfDay(new Date(date).getTime()) + (((timeSlot*4)-1)*60*60*1000);

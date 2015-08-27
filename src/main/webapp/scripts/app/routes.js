@@ -1034,4 +1034,23 @@ angular.module('hillromvestApp')
                   ]
               }
             })
+
+            .state('pageUnderConstruction', {
+                parent: 'site',
+                url: '/pageconstruction',
+                data: {
+                    roles: []
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/dummyPages/view.html'
+                    }
+                },
+                resolve: {
+                    mainTranslatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate,$translatePartialLoader) {
+                        $translatePartialLoader.addPart('error');
+                        return $translate.refresh();
+                    }]
+                }
+            });
 });

@@ -33,3 +33,11 @@ angular.module('hillromvestApp')
       restrict: 'E'
     }
   });
+
+angular.module('hillromvestApp')
+  .directive('patientGraph', function() {
+    return {
+        templateUrl: 'scripts/components/dashboard/patient/views/graph.html',
+        restrict: 'E',
+      }
+  });

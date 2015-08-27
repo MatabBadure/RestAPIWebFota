@@ -37,6 +37,7 @@ public class MessageConstants {
     public static final String HR_253 = "HCP User fetched successfully.";
     public static final String HR_254 = "HCP User deleted successfully.";
     public static final String HR_255 = "HCP associated with patient successfully.";
+    public static final String HR_256 = "HCP disassociated from patient successfully.";
     
     public static final String HR_261 = "Caregiver User created successfully.";
     public static final String HR_262 = "Caregiver User updated successfully.";

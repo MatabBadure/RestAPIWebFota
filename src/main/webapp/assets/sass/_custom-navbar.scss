@@ -112,7 +112,7 @@ $header--background: $body-bg;
 	}
 
 	.popover.bottom > .arrow {
-		left: 89%;
+		left: 89% !important;
 	}
 
 	.popover.bottom > .arrow:after {

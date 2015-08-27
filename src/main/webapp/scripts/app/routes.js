@@ -179,7 +179,7 @@ angular.module('hillromvestApp')
                 views: {
                     'content@': {
                         templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/overview/patient-details.html',
-                        controller: 'patientsController'
+                        controller: 'graphController'
                     }
                 },
                 resolve: {

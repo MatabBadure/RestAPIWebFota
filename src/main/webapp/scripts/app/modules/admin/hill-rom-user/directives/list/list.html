@@ -30,7 +30,51 @@
         </div>
       </div>
     </div>
-     <div class="dashboard__manage-view--list" ng-repeat="user in users">
+
+    <div class="dashboard__manage-view--header">
+      <div class="col-md-3 header--type">
+        <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="user.user-name"></span>
+      </div>
+      <div class="col-md-3 header--type">
+        <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="user.role-field"></span>
+      </div>
+      <div class="col-md-3 header--type">
+        <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="user.hillromId"></span>
+      </div>
+      <div class="col-md-4 header--type">
+        <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="user.email"></span>
+      </div>
+      <div class="col-md-3 header--type">
+        <span ng-class="{'sort-icon--default' : sortIconDefault, 'sort-icon-down' : sortIconDown, 'sort-icon-up': sortIconUp}" ng-click="sortType()" translate="user.mobile-number"></span>
+      </div>
+      <div class="clr"></div>
+    </div>
+
+    <div class="dashboard__manage-view--list" ng-repeat="user in users" ng-class="{ 'inactive': user.deleted }" ng-click="user.deleted || selectUser(user)">
+      <div class="col-md-3 reset-padding centered">
+        <span class="main-prim-info">{{user.lastName}} {{user.firstName}}</span>
+      </div>
+      <div class="col-md-3 reset-padding centered">
+        <span class="impo-highlight">{{user.role}}</span>
+      </div>
+      <div class="col-md-3 reset-padding centered">
+        <span class="impo-highlight">{{user.id}}</span>
+      </div>
+
+      <div class="col-md-4 reset-padding centered">
+        <span class="short-info">{{user.email}}</span>
+      </div>
+
+      <div class="col-md-3 reset-padding centered">
+        <span class="short-info">123-234-2741{{user.phoneNumber}}</span>
+      </div>
+
+      <div class="clr"></div>
+    </div>
+
+
+
+     <!-- <div class="dashboard__manage-view--list" ng-repeat="user in users">
       <div ng-class="{ 'inactive': user.deleted }" ng-click="user.deleted || selectUser(user)">
         <div class="col-md-3 reset-padding-left">
           <span class="user-name">{{user.lastName}} {{user.firstName}}</span>
@@ -47,7 +91,8 @@
         </div>
         <div class="clr"></div>
      </div>
-    </div>
+    </div> -->
+    
     <div class="dashboard__manage-view--pagination">
       <div class="col-md-16 reset-padding-right">
         <div class="navbar-right">

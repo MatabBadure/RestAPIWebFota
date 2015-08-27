@@ -22,4 +22,7 @@ public interface TherapySessionRepository extends
 			LocalDate dateTime);
 	
 	public TherapySession findTop1ByPatientUserIdOrderByDateAsc(Long id);
+	
+	public List<TherapySession> findTop1ByPatientUserIdOrderByEndTimeDesc(List<Long> ids);
+	
 }

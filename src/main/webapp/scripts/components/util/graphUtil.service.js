@@ -29,9 +29,9 @@ angular.module('hillromvestApp')
         });
         var max = arrayMax(hmrSet);
         var min = arrayMin(hmrSet);
-        range.max = max + (max-min);
+        range.max = Math.ceil((max + (max-min))/10) * 10;
         if(min !== 0 && min > (max-min)){
-          range.min = min - (max-min);  
+          range.min = Math.floor((min - ((max-min)/2))/10) * 10;  
         }
         return range;
       }
@@ -45,9 +45,9 @@ angular.module('hillromvestApp')
         });
         var max = arrayMax(hmrSet);
         var min = arrayMin(hmrSet);
-        range.max = Math.floor((max + (max-min))/60);
+        range.max = Math.ceil(Math.floor(max/60)/10) * 10;
         if(min !== 0 && min > (max-min)){
-          range.min = Math.floor((min - (max-min))/60);  
+          range.min = Math.floor(Math.floor((min - ((max-min)/2))/60)/10) * 10;  
         }
         return range;
       }
@@ -267,15 +267,15 @@ angular.module('hillromvestApp')
           var durationPoint = {};
           var frequencyPoint = {};
           pressurePoint.x = count;
-          pressurePoint.timeStamp = value.start;
+          pressurePoint.timeStamp = value.timestamp;
           pressurePoint.y = value.weightedAvgPressure;
           pressureValues.push(pressurePoint);
           durationPoint.x = count;
-          durationPoint.timeStamp = value.start;
+          durationPoint.timeStamp = value.timestamp;
           durationPoint.y = value.duration;
           durationValues.push(durationPoint);
           frequencyPoint.x = count;
-          frequencyPoint.timeStamp = value.start;
+          frequencyPoint.timeStamp = value.timestamp;
           frequencyPoint.y = value.weightedAvgFrequency;
           frequencyValues.push(frequencyPoint);
         });

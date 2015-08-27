@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -57,8 +59,6 @@ import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 
-import net.minidev.json.JSONObject;
-
 /**
  * Service class for managing users.
  */
@@ -73,31 +73,31 @@ public class UserService {
 
     @Inject
     private UserRepository userRepository;
-    
+
     @Inject
     private UserExtensionRepository userExtensionRepository;
 
     @Inject
     private AuthorityRepository authorityRepository;
-    
+
     @Inject
     private UserPatientRepository userPatientRepository;
-    
+
     @Inject
     private PatientInfoRepository patientInfoRepository;
-    
+
     @Inject
     private PatientInfoService patientInfoService;
-    
+
     @Inject
     private MailService mailService;
 
     @Inject
     private UserSecurityQuestionService userSecurityQuestionService;
-    
+
     @Inject
 	private ClinicRepository clinicRepository;
-    
+
     @Inject
     private ApplicationEventPublisher eventPublisher;
 
@@ -105,7 +105,7 @@ public class UserService {
 		StringBuilder defaultPassword = new StringBuilder();
 		defaultPassword.append(patientUser.getZipcode());
 		// default password will have the first 4 letters from last name, if length of last name <= 4, use complete string
-		int endIndex = patientUser.getLastName().length() > Constants.NO_OF_CHARACTERS_TO_BE_EXTRACTED ? Constants.NO_OF_CHARACTERS_TO_BE_EXTRACTED : patientUser.getLastName().length() ; 
+		int endIndex = patientUser.getLastName().length() > Constants.NO_OF_CHARACTERS_TO_BE_EXTRACTED ? Constants.NO_OF_CHARACTERS_TO_BE_EXTRACTED : patientUser.getLastName().length() ;
 		defaultPassword.append(patientUser.getLastName().substring(0, endIndex));
 		defaultPassword.append(patientUser.getDob().toString(Constants.DATEFORMAT_MMddyyyy));
 		return defaultPassword.toString();
@@ -128,27 +128,27 @@ public class UserService {
      * Completes the reset password flow
      * @param paramsMap
      * @return
-     * @throws HillromException 
+     * @throws HillromException
      */
     public JSONObject completePasswordReset(Map<String,String> paramsMap) throws HillromException {
        log.debug("Reset user password for reset key {}", paramsMap);
-   
+
        String requiredParams[] = {"password","questionId","answer"};
        JSONObject errorJSON =  RequestUtil.checkRequiredParams(paramsMap,requiredParams);
        if(null != errorJSON.get("ERROR"))
     	   return errorJSON;
-       
+
        String key = paramsMap.get("key");
        String newPassword = paramsMap.get("password");
        String questionId = paramsMap.get("questionId");
        String answer = paramsMap.get("answer");
-       
+
        JSONObject jsonObject = new JSONObject();
        if (!checkPasswordConstraints(newPassword)) {
     	   jsonObject.put("message", "Incorrect password");
     	   return jsonObject;
        }
-       
+
        Optional<User> opUser = userRepository.findOneByResetKey(key);
        if(opUser.isPresent()){
     	   User user = opUser.get();
@@ -166,16 +166,16 @@ public class UserService {
        }else{
     	   throw new HillromException(ExceptionConstants.HR_556);//Invalid Reset Key
        }
-       
+
     }
 
     /**
-     * Verifies whether Token expired or the security question answer matches 
+     * Verifies whether Token expired or the security question answer matches
      * @param questionId
      * @param answer
      * @param user
      * @return
-     * @throws HillromException 
+     * @throws HillromException
      */
 	private JSONObject canProceedPasswordReset(String questionId, String answer,
 			 User user) throws HillromException {
@@ -197,11 +197,11 @@ public class UserService {
     	}
     	return false;
     }
-    
+
     private boolean checkPasswordLength(String password) {
         return (!StringUtils.isEmpty(password) && password.length() >= UserDTO.PASSWORD_MIN_LENGTH && password.length() <= UserDTO.PASSWORD_MAX_LENGTH);
     }
-    
+
     private boolean checkPasswordConstraints(String password) {
     	Pattern pattern = Pattern.compile(UserDTO.PASSWORD_PATTERN);
    	  	Matcher matcher = pattern.matcher(password);
@@ -209,7 +209,7 @@ public class UserService {
    	  	log.debug("Password : {}, Valid : {}", password,isValid);
         return isValid;
     }
-    
+
     public Optional<User> requestPasswordReset(String mail) {
        return userRepository.findOneByEmail(mail)
            .filter(user -> user.getActivated() == true)
@@ -269,11 +269,33 @@ public class UserService {
     			userRepository.save(u);
     			eventPublisher.publishEvent(new OnCredentialsChangeEvent(u.getId()));
     			log.debug("Changed password for User: {}", u);
-    		});    		
+    		});
     	}
     	return jsonObject;
     }
-    
+
+    public String updatePassword(Long id, Map<String, String> passwordList) throws HillromException {
+    	Optional<User> user = userRepository.findOneByEmail(SecurityUtils.getCurrentLogin());
+    	if(user.isPresent()){
+			String encryptedNewPassword = passwordEncoder.encode(passwordList.get("newPassword"));
+			if(passwordEncoder.matches(passwordList.get("password"), user.get().getPassword())) {
+				if(!checkPasswordLength(passwordList.get("newPassword"))){
+		    		throw new HillromException(ExceptionConstants.HR_598);
+		    	}else{
+		    		user.get().setPassword(encryptedNewPassword);
+	    			userRepository.save(user.get());
+	    			eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.get().getId()));
+	    			log.debug("Changed password for User: {}", user.get());
+	    			return MessageConstants.HR_294;
+		    	}
+			} else {
+				throw new HillromException(ExceptionConstants.HR_597);
+			}
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);
+		}
+    }
+
     @Transactional(readOnly = true)
     public User getUserWithAuthorities() {
         User currentUser = userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).get();
@@ -297,7 +319,7 @@ public class UserService {
             userRepository.delete(user);
         }
     }
-    
+
     private List<String> rolesAdminCanModerate() {
 		List<String> rolesAdminCanModerate = new ArrayList<String>();
     	rolesAdminCanModerate.add(AuthoritiesConstants.ACCT_SERVICES);
@@ -306,7 +328,7 @@ public class UserService {
     	rolesAdminCanModerate.add(AuthoritiesConstants.CLINIC_ADMIN);
 		return rolesAdminCanModerate;
 	}
-    
+
     public UserExtension createUser(UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException{
 		if(userExtensionDTO.getEmail() != null) {
 			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
@@ -361,35 +383,35 @@ public class UserService {
 			throw new HillromException(ExceptionConstants.HR_501, e);
 		}
 	}
-    
+
     public UserExtension createPatientUser(UserExtensionDTO userExtensionDTO) throws HillromException {
     	UserExtension newUser = new UserExtension();
     	Optional<PatientInfo> existingPatientInfoFromDB = patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId());
     	if(existingPatientInfoFromDB.isPresent())
     		return newUser;
-    	else 
-    		return populatePatientUserInDB(userExtensionDTO); 
+    	else
+    		return populatePatientUserInDB(userExtensionDTO);
 	}
-    
+
     private UserExtension  populatePatientUserInDB(UserExtensionDTO userExtensionDTO){
 		UserExtension newUser = new UserExtension();
 		String patientInfoId = patientInfoRepository.id();
 		PatientInfo patientInfo = new PatientInfo();
 		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
-		
+
 		// Assigns Next Patient HillromId from Stored Procedure
 		patientInfo.setId(patientInfoId);
 		patientInfo = patientInfoRepository.save(patientInfo);
 		log.debug("Created Information for Patient : {}", patientInfo);
-		
+
 		assignValuesToUserObj(userExtensionDTO, newUser);
-		
+
 		newUser.setPassword(passwordEncoder
 				.encode(generateDefaultPassword((User) newUser)));
 		newUser.setActivated(true);
 		newUser.setDeleted(false);
 		newUser.setHillromId(userExtensionDTO.getHillromId());
-	
+
 		newUser.getAuthorities().add(
 				authorityRepository.findOne(userExtensionDTO.getRole()));
 		newUser = userExtensionRepository.save(newUser);
@@ -397,11 +419,11 @@ public class UserService {
 
 		UserPatientAssoc userPatientAssoc = createUserPatientAssociation(
 				newUser, patientInfo);
-		
+
 		patientInfo.getUserPatientAssoc().add(userPatientAssoc);
 		patientInfoRepository.save(patientInfo);
 		log.debug("Updated Information for Patient User: {}", patientInfo);
-		
+
 		newUser.getUserPatientAssoc().add(userPatientAssoc);
 		userExtensionRepository.save(newUser);
 		log.debug("Updated Information for Patient User: {}", newUser);
@@ -416,7 +438,7 @@ public class UserService {
 				userPatientAssoc);
 		return userPatientAssoc;
 	}
-    
+
     public UserExtension createHCPUser(UserExtensionDTO userExtensionDTO) throws HillromException {
     	UserExtension newUser = new UserExtension();
 		assignValuesToUserObj(userExtensionDTO, newUser);
@@ -432,7 +454,7 @@ public class UserService {
 		log.debug("Created Information for User: {}", newUser);
 		return newUser;
 	}
-    
+
     public UserExtension updateUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException{
         if(userExtensionDTO.getEmail() != null) {
 			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
@@ -477,7 +499,7 @@ public class UserService {
         	throw new HillromException(ExceptionConstants.HR_555);//Incorrect data
     	}
     }
-    
+
     public UserExtension updateHillromTeamUser(Long id, UserExtensionDTO userExtensionDTO) {
     	UserExtension user = userExtensionRepository.findOne(id);
 		assignValuesToUserObj(userExtensionDTO, user);
@@ -488,7 +510,7 @@ public class UserService {
 		log.debug("Updated Information for Hillrom User: {}", user);
 		return user;
 	}
-    
+
     public UserExtension updatePatientUser(Long id, UserExtensionDTO userExtensionDTO) {
     	UserExtension user = userExtensionRepository.findOne(id);
     	patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId())
@@ -502,7 +524,7 @@ public class UserService {
     	});
 		return user;
 	}
-    
+
     public UserExtension updateHCPUser(Long id, UserExtensionDTO userExtensionDTO) {
     	UserExtension hcpUser = userExtensionRepository.findOne(id);
 		assignValuesToUserObj(userExtensionDTO, hcpUser);
@@ -525,7 +547,7 @@ public class UserService {
 		for(String clinicId : clinicsToBeAdded) {
 			Clinic clinic = clinicRepository.getOne(clinicId);
 			hcpUser.getClinics().add(clinic);
-		}		
+		}
 		userExtensionRepository.save(hcpUser);
 		log.debug("Updated Information for HealthCare Proffessional: {}", hcpUser);
 		return hcpUser;
@@ -563,7 +585,7 @@ public class UserService {
 			patientInfo.setMobilePhone(userExtensionDTO.getMobilePhone());
 		patientInfo.setWebLoginCreated(true);
 	}
-    
+
 	private void assignValuesToUserObj(UserExtensionDTO userExtensionDTO, UserExtension newUser) {
 		if(userExtensionDTO.getTitle() != null)
 			newUser.setTitle(userExtensionDTO.getTitle());
@@ -609,7 +631,7 @@ public class UserService {
     public Optional<User> findOneByEmailOrHillromId(String login){
     	return userRepository.findOneByEmailOrHillromId(login);
     }
-    
+
 	public User createUserFromPatientInfo(PatientInfo patientInfo,String encodedPassword) {
 
 		String username = getUsernameAsEmailOrHillromIdFromPatientInfo(patientInfo);
@@ -619,16 +641,16 @@ public class UserService {
 		if(existingUser.isPresent()){
 			return existingUser.get();
 		}
-		
+
 		User newUser = new User();
 		newUser.setActivated(true);
 		newUser.setDeleted(false);
-		
+
 		Authority patientAuthority = authorityRepository.findOne(AuthoritiesConstants.PATIENT);
 		newUser.getAuthorities().add(patientAuthority);
-		
+
 		newUser.setCreatedDate(new DateTime());
-		
+
 		newUser.setEmail(username.toLowerCase());
 		newUser.setFirstName(patientInfo.getFirstName());
 		newUser.setLastName(patientInfo.getLastName());
@@ -639,12 +661,12 @@ public class UserService {
 		userPatientRepository.save(userPatientAssoc);
 		newUser.getUserPatientAssoc().add(userPatientAssoc);
 		patientInfo.getUserPatientAssoc().add(userPatientAssoc);
-		
+
 		newUser.setId(persistedUser.getId());
 		// Update WebLoginCreated to be true  and user patient association
 		updateWebLoginStatusAndUserPatientAssoc(patientInfo, persistedUser);
 		return newUser;
-		
+
 	}
 
 	/**
@@ -661,7 +683,7 @@ public class UserService {
 			username = patientInfo.getHillromId();
 		}
 		return username;
-	}	
+	}
 
 	/**
 	 * @param patientInfo
@@ -675,37 +697,37 @@ public class UserService {
 			return patientUser;
 		});
 	}
-	
+
 	public JSONObject updateEmailOrPassword(Map<String,String> params) throws HillromException{
-		
+
 		String email = params.get("email");
     	String password = params.get("password");
     	String questionId = params.get("questionId");
     	String answer = params.get("answer");
     	String termsAndConditionsAccepted = params.get("termsAndConditionsAccepted");
-    	
+
     	JSONObject errorsJsonObject = validateRequest(password, questionId,
 				answer,termsAndConditionsAccepted);
-        
+
         if( null != errorsJsonObject.get("ERROR"))
         	return errorsJsonObject;
-        
+
         User currentUser = findOneByEmailOrHillromId(SecurityUtils.getCurrentLogin()).get();
 
         errorsJsonObject = isUserExistsWithEmail(email, currentUser);
-        
+
         if(null != errorsJsonObject.get("ERROR")){
         	return errorsJsonObject;
         }
-        
+
         if(null!= email)
         	currentUser.setEmail(email);
-        
+
         Long qid = Long.parseLong(questionId);
         Optional<UserSecurityQuestion> opUserSecQ = userSecurityQuestionService.saveOrUpdate(currentUser.getId(), qid, answer);
-        
+
         if(opUserSecQ.isPresent()){
-        	
+
         	currentUser.setPassword(passwordEncoder.encode(password));
         	currentUser.setLastLoggedInAt(DateTime.now());
         	currentUser.setTermsConditionAccepted(true);
@@ -714,9 +736,9 @@ public class UserService {
     		eventPublisher.publishEvent(new OnCredentialsChangeEvent(currentUser.getId()));
         	// update email in patientInfo, if the User is Patient
         	updatePatientEmailIfNotPresent(email);
-        	
+
         	log.debug("updateEmailOrPassword for User: {}", currentUser);
-        	
+
         }else{
         	throw new HillromException(ExceptionConstants.HR_557);//Invalid Security Question or Answer")
         }
@@ -728,14 +750,14 @@ public class UserService {
 	 * @param email
 	 * @param currentUser
 	 * @return
-	 * @throws HillromException 
+	 * @throws HillromException
 	 */
 	private JSONObject isUserExistsWithEmail(String email, User currentUser) throws HillromException {
 		JSONObject jsonObject = new JSONObject();
 		if(!RandomUtil.isValidEmail(currentUser.getEmail()) && StringUtils.isBlank(email)){
 			throw new HillromException(ExceptionConstants.HR_508);//Required field Email is missing
         }
-        
+
         // Update Email for the firstTime Login , if not present
         if(StringUtils.isNotBlank(email)){
         	Optional<User> existingUser = findOneByEmail(email);
@@ -753,7 +775,7 @@ public class UserService {
 	private void updatePatientEmailIfNotPresent(String email) {
 		if(null != email){
         	patientInfoService.findOneByHillromId(SecurityUtils.getCurrentLogin()).ifPresent(patient -> {
-        		patient.setEmail(email);        		
+        		patient.setEmail(email);
         		patientInfoService.update(patient);
         	});
         }
@@ -765,14 +787,14 @@ public class UserService {
 	 * @param questionId
 	 * @param answer
 	 * @return
-	 * @throws HillromException 
+	 * @throws HillromException
 	 */
 	private JSONObject validateRequest(String password,
 		String questionId, String answer,String termsAndConditionsAccepted) throws HillromException {
 		JSONObject jsonObject = new JSONObject();
     	if(!StringUtils.isNotBlank(termsAndConditionsAccepted) || "false".equalsIgnoreCase(termsAndConditionsAccepted)){
     		throw new HillromException(ExceptionConstants.HR_510);
-    		
+
     	}
     	if(StringUtils.isBlank(answer)){
     		throw new HillromException(ExceptionConstants.HR_503);//Required field Answer is missing"
@@ -785,7 +807,7 @@ public class UserService {
         }
 		return jsonObject;
 	}
-	
+
 	public JSONObject deleteUser(Long id) throws HillromException {
     	JSONObject jsonObject = new JSONObject();
     	UserExtension existingUser = userExtensionRepository.findOne(id);
@@ -834,12 +856,12 @@ public class UserService {
 		if(errorsJson.containsKey("ERROR")){
 			return errorsJson;
 		}
-		
+
 		String password = params.get("password");
 		if(!checkPasswordConstraints(password)){
 			throw new HillromException(ExceptionConstants.HR_506);//Incorrect Password
 		}
-		
+
 		String key = params.get("key");
 		Optional<User> existingUser = userRepository.findOneByActivationKey(key);
 		User currentUser = null;
@@ -848,11 +870,11 @@ public class UserService {
 		}else{
 			throw new HillromException(ExceptionConstants.HR_553);//Invalid Activation Key
 		}
-		
+
 		Long qid = Long.parseLong(params.get("questionId"));
 		String answer = params.get("answer");
-		Optional<UserSecurityQuestion> opUserSecQ = userSecurityQuestionService.saveOrUpdate(currentUser.getId(), qid, answer);		
-		
+		Optional<UserSecurityQuestion> opUserSecQ = userSecurityQuestionService.saveOrUpdate(currentUser.getId(), qid, answer);
+
 		if(opUserSecQ.isPresent()){
 			currentUser.setActivationKey(null);
 			currentUser.setLastLoggedInAt(DateTime.now());
@@ -863,20 +885,20 @@ public class UserService {
 			userRepository.save(currentUser);
 		}else{
 			throw new HillromException(ExceptionConstants.HR_557);//Invalid Security Question or Answer
-			
+
 		}
 		return new JSONObject();
 	}
-	
+
 	public UserExtension getHCPUser(Long id) throws HillromException{
 		UserExtension hcpUser = userExtensionRepository.findOne(id);
 		if(hcpUser.getId() != null) {
 		} else {
 			throw new HillromException(ExceptionConstants.HR_533);//Unable to fetch HealthCare Professional.");
-		}	
+		}
 		return hcpUser;
 	 }
-	
+
 	public Optional<PatientUserVO> getPatientUser(Long id){
 		UserExtension user = userExtensionRepository.findOne(id);
 		if(null == user)
@@ -884,17 +906,17 @@ public class UserService {
 		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
 		return Optional.of(new PatientUserVO(user,patientInfo));
 	}
-	
+
 	public User getUser(Long id) throws HillromException{
 		User user = userRepository.findOne(id);
 		if(Objects.nonNull(user)) {
 			return user;
 		} else {
 			throw new HillromException(ExceptionConstants.HR_512);//No such user exist
-		}	
-		
+		}
+
 	 }
-	
+
 	public UserPatientAssoc createCaregiverUser(Long patientUserId, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException {
 		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
 		if(patientUser != null) {
@@ -909,7 +931,7 @@ public class UserService {
 			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
 			if (existingUser.isPresent()){
 				System.out.println("roles : "+existingUser.get().getAuthorities());
-				if(existingUser.get().getAuthorities().contains(new Authority(AuthoritiesConstants.CARE_GIVER)) 
+				if(existingUser.get().getAuthorities().contains(new Authority(AuthoritiesConstants.CARE_GIVER))
 						|| existingUser.get().getAuthorities().contains(new Authority(AuthoritiesConstants.HCP))) {
 					UserPatientAssoc caregiverAssoc = associateExistingCaregiverUserWithPatient(patientUser, userExtensionDTO, existingUser);
 					if(Objects.nonNull(caregiverAssoc)){
@@ -951,7 +973,7 @@ public class UserService {
 			return null;
 		}
 	}
-	
+
 	public UserPatientAssoc createCaregiver(Long patientUserId, UserExtensionDTO userExtensionDTO) {
     	UserExtension newUser = new UserExtension();
     	UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
@@ -974,7 +996,7 @@ public class UserService {
     	}
     	return null;
 	}
-	
+
 	public PatientInfo getPatientInfoObjFromPatientUser(User patientUser) {
 		PatientInfo patientInfo = null;
 		for(UserPatientAssoc patientAssoc : patientUser.getUserPatientAssoc()){
@@ -984,7 +1006,7 @@ public class UserService {
 		}
 		return patientInfo;
 	}
-	
+
 	public User getUserObjFromPatientInfo(PatientInfo patientInfo) {
 		User patientUser = null;
 		for(UserPatientAssoc patientAssoc : patientInfo.getUserPatientAssoc()){
@@ -994,7 +1016,7 @@ public class UserService {
 		}
 		return patientUser;
 	}
-	
+
 	public String deleteCaregiverUser(Long patientUserId, Long caregiverId) throws HillromException {
     	UserExtension caregiverUser = userExtensionRepository.findOne(caregiverId);
     	if(caregiverUser.getId() != null) {
@@ -1006,7 +1028,7 @@ public class UserService {
 					userExtensionRepository.save(caregiverUser);
 				}
 				caregiverUser.getUserPatientAssoc().forEach(caregiverPatientAssoc -> {
-					if(Objects.nonNull(patientInfo) 
+					if(Objects.nonNull(patientInfo)
 							&& caregiverPatientAssoc.getUserPatientAssocPK().equals(
 									new UserPatientAssocPK(patientInfo, caregiverUser))) {
 						userPatientRepository.delete(caregiverPatientAssoc);
@@ -1020,19 +1042,19 @@ public class UserService {
 			throw new HillromException(ExceptionConstants.HR_516);//Unable to delete Caregiver User.");
 		}
     }
-	
+
 	public List<UserPatientAssoc> getCaregiversForPatient(Long patientUserId) throws HillromException {
     	List<UserPatientAssoc> caregiverAssocList = new LinkedList<>();
 		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
 		if(Objects.nonNull(patientUser)) {
     		caregiverAssocList = getListOfCaregiversAssociatedToPatientUser(patientUser);
-			
+
 		} else {
 			throw new HillromException(ExceptionConstants.HR_523);
 		}
 		return caregiverAssocList;
     }
-	
+
 	private List<UserPatientAssoc> getListOfCaregiversAssociatedToPatientUser(UserExtension patientUser) {
 		List<UserPatientAssoc> caregiverAssocList = new ArrayList<>();
 		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
@@ -1065,7 +1087,7 @@ public class UserService {
 		}
 		return jsonObject;
 	}
-	
+
 	public UserPatientAssoc updateCaregiverUser(Long patientUserId, Long caregiverUserId, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException {
 		UserPatientAssoc caregiverAssoc = new UserPatientAssoc();
 		if (AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())) {
@@ -1082,7 +1104,7 @@ public class UserService {
 		}
 		return caregiverAssoc;
 	}
-	
+
 	public UserPatientAssoc updateCaregiver(Long patientUserId, Long caregiverUserId, UserExtensionDTO userExtensionDTO) {
     	UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
     	UserExtension caregiverUser = userExtensionRepository.findOne(caregiverUserId);
@@ -1100,7 +1122,7 @@ public class UserService {
     	}
     	return null;
 	}
-	
+
 	public UserPatientAssoc getCaregiverUser(Long patientUserId, Long caregiverUserId) throws HillromException {
     	JSONObject jsonObject = new JSONObject();
 		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
@@ -1124,7 +1146,7 @@ public class UserService {
 			throw new HillromException(ExceptionConstants.HR_512);
 		}
     }
-	
+
 	public List<UserExtension> getAllUsersBy(String role) throws HillromException{
 		List<UserExtension> users = userExtensionRepository.findByActiveStatus();
 		List<UserExtension> filteredUsers = new LinkedList<>();
@@ -1134,7 +1156,20 @@ public class UserService {
 			Authority authority = new Authority(role);
 			filteredUsers = users.stream().filter(user -> user.getAuthorities().contains(authority)).collect(Collectors.toList());
 		    return filteredUsers;
-		}	
+		}
 	 }
+	
+	public User setHRMNotificationSetting(Long id, Map<String, Boolean> paramsMap) throws HillromException {
+		User user = userRepository.findOne(id);
+		if (user != null) {
+			user.setHMRNotification(paramsMap.get("isHMRNotification"));
+			user.setAcceptHMRNotification(paramsMap.get("isAcceptHMRNotification"));
+			user.setAcceptHMRSetting(paramsMap.get("isAcceptHMRSetting"));
+			userRepository.save(user);
+			return user;
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);
+		}
+	}
 }
 

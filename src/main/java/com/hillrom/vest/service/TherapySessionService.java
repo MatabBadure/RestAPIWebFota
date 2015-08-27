@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -25,6 +26,7 @@ import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
+import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 
 @Service
@@ -90,10 +92,10 @@ public class TherapySessionService {
 	}
 	
 	public List<TherapyDataVO> findByPatientUserIdAndDateRange(Long patientUserId,Long fromTimestamp,Long toTimestamp,String groupBy){
+		LocalDate from = LocalDate.fromDateFields(new Date(fromTimestamp));
+		LocalDate to = LocalDate.fromDateFields(new Date(toTimestamp));
 		List<TherapySession> sessions = therapySessionRepository
-				.findByPatientUserIdAndDateRange(patientUserId,
-						LocalDate.fromDateFields(new Date(fromTimestamp)),
-						LocalDate.fromDateFields(new Date(toTimestamp)));
+				.findByPatientUserIdAndDateRange(patientUserId,from,to);
 		Map<Integer,List<TherapySession>> groupedSessions = new HashMap<>();
 		if(GROUP_BY_WEEKLY.equalsIgnoreCase(groupBy)){
 			groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getDayOfTheWeek));
@@ -102,16 +104,74 @@ public class TherapySessionService {
 		}else if(GROUP_BY_YEARLY.equals(groupBy)){
 			groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getMonthOfTheYear));
 		}
-		return calculateWeightedAvgs(groupedSessions);
+		Map<Integer,TherapyDataVO> calculatedData =  calculateWeightedAvgs(groupedSessions);
+		if(calculatedData.isEmpty())
+			return new LinkedList<>();
+		return formatResponse(calculatedData,from,to,groupBy);
+	}
+
+	private List<TherapyDataVO> formatResponse(
+			Map<Integer, TherapyDataVO> calculatedData, LocalDate from,
+			LocalDate to, String groupBy) {
+		Map<Integer,TherapyDataVO>  dummyData = new HashMap<>();
+		if(GROUP_BY_WEEKLY.equalsIgnoreCase(groupBy)){
+			prepareDummyTherapyDataByWeek(from, to, dummyData);
+		}else if(GROUP_BY_MONTHLY.equalsIgnoreCase(groupBy)){
+			prepareDummyTherapyDataByMonth(from, to, dummyData);
+		}else{
+			prepareDummyTherapyDataByYear(from,to,dummyData);
+		}
+		
+		for(Integer key: calculatedData.keySet()){
+			dummyData.put(key, calculatedData.get(key));
+		}
+		
+		return new LinkedList<>(dummyData.values());
+	}
+
+	private void prepareDummyTherapyDataByYear(LocalDate from, LocalDate to,
+			Map<Integer, TherapyDataVO> dummyData) {
+		List<LocalDate> dates = DateUtil.getAllLocalDatesBetweenDates(from, to);
+		Map<Integer, List<LocalDate>> groupByWeek = DateUtil.groupListOfLocalDatesByWeekOfWeekyear(dates);
+		for(Integer weekNo : groupByWeek.keySet()){
+			LocalDate startDateOfWeek = groupByWeek.get(weekNo).get(0);
+			dummyData.put(weekNo, createTherapyDataWithTimeStamp(startDateOfWeek));	
+		}
+	}
+	
+	private void prepareDummyTherapyDataByMonth(LocalDate from, LocalDate to,
+			Map<Integer, TherapyDataVO> dummyData) {
+		List<LocalDate> dates = DateUtil.getAllLocalDatesBetweenDates(from, to);
+		Map<Integer, List<LocalDate>> groupByMonth = DateUtil.groupListOfLocalDatesByMonthOfYear(dates);
+		for(Integer monthNo : groupByMonth.keySet()){
+			LocalDate startDateOfMonth = groupByMonth.get(monthNo).get(0);
+			dummyData.put(monthNo, createTherapyDataWithTimeStamp(startDateOfMonth));	
+		}		
+	}
+
+	private void prepareDummyTherapyDataByWeek(LocalDate from, LocalDate to,
+			Map<Integer, TherapyDataVO> dummyData) {
+		LocalDate startDate = from; 
+		while(startDate.isBefore(to)){
+			dummyData.put(startDate.getDayOfWeek(), createTherapyDataWithTimeStamp(startDate));
+			startDate = startDate.plusDays(1);
+		}
+	}
+
+	private TherapyDataVO createTherapyDataWithTimeStamp(LocalDate from) {
+			TherapyDataVO therapy = new TherapyDataVO();
+			therapy.setMissedTherapy(true);
+			therapy.setTimestamp(from.toDateTimeAtCurrentTime());
+			return therapy; 
 	}
 
 	public List<TherapySession> findByPatientUserIdAndDate(Long id,Long timestamp){
 		return  therapySessionRepository.findByPatientUserIdAndDate(id,LocalDate.fromDateFields(new Date(timestamp)));
 	}
 	
-	private List<TherapyDataVO> calculateWeightedAvgs(
+	private Map<Integer,TherapyDataVO> calculateWeightedAvgs(
 			Map<Integer, List<TherapySession>> groupedSessions) {
-		List<TherapyDataVO> processedData = new LinkedList<>();
+		Map<Integer,TherapyDataVO> processedData = new HashMap<>();
 
 		for(Integer key : groupedSessions.keySet()){
 			List<TherapySession> sessions = groupedSessions.get(key);
@@ -146,10 +206,11 @@ public class TherapySessionService {
 			vo.setTreatmentsPerDay(treatmentsPerDay);
 			vo.setDuration(totalDuration.intValue());
 			vo.setHmr(hmr);
-			processedData.add(vo);
+			processedData.put(key, vo);
 		}
 		return processedData;
 	}
+	
 	
 	public int getMissedTherapyCountByPatientUserId(Long id){
 		TherapySession latestTherapySession = therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(id);

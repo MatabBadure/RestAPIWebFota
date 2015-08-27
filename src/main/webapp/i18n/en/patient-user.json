@@ -100,6 +100,14 @@
         "delete-device": {
             "warning": "Are you sure you want to Delete the Device?",
             "message": "If you delete the Device, you will no longer be able to view the information."
+        },
+        "profile": {
+          "tabs": {
+            "mydashboard": "My Dashboard",
+            "caregiver": "Caregiver",
+            "device-protocol": "Device and Protocol",
+            "clinic-hcp": "Clinic and HCP"
+          }
         }
     },
     "clinic" : {

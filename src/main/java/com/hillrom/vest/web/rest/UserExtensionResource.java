@@ -694,4 +694,26 @@ public class UserExtensionResource {
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
+    
+    /**
+     * PUT  /patient/:id/dissociatehcp -> dissociate hcp from the "id" patient user.
+     */
+    @RequestMapping(value = "/patient/{id}/dissociatehcp",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> dissociateHCPToPatient(@PathVariable Long id, @RequestBody List<Map<String, String>> hcpList) {
+        log.debug("REST request to dissociate hcp from Patient : {}", id);
+        JSONObject jsonObject = new JSONObject();
+		try {
+			String message = patientHCPService.dissociateHCPFromPatient(id, hcpList);
+			jsonObject.put("message", message);
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
+     
+    }
 }

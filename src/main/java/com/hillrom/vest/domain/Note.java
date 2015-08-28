@@ -71,6 +71,14 @@ public class Note {
 		this.createdOn = createdOn;
 	}
 
+	public boolean isDeleted() {
+		return isDeleted;
+	}
+
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
+
 	public User getPatientUser() {
 		return patientUser;
 	}

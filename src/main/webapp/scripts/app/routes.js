@@ -179,7 +179,7 @@ angular.module('hillromvestApp')
                 views: {
                     'content@': {
                         templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/overview/patient-details.html',
-                        controller: 'patientsController'
+                        controller: 'graphController'
                     }
                 },
                 resolve: {
@@ -1084,5 +1084,22 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
-
+            .state('pageUnderConstruction', {
+                parent: 'site',
+                url: '/pageconstruction',
+                data: {
+                    roles: []
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/dummyPages/view.html'
+                    }
+                },
+                resolve: {
+                    mainTranslatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate,$translatePartialLoader) {
+                        $translatePartialLoader.addPart('error');
+                        return $translate.refresh();
+                    }]
+                }
+            });
 });

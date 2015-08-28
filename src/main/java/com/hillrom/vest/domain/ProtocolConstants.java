@@ -42,6 +42,18 @@ public class ProtocolConstants {
 
 	@Transient
 	private Integer maxDuration;
+	
+	public ProtocolConstants(Integer maxFrequency, Integer minFrequency,
+			Integer maxPressure, Integer minPressure, Integer treatmentsPerDay,
+			Integer minDuration, Integer maxDuration) {
+		this.maxFrequency = maxFrequency;
+		this.minFrequency = minFrequency;
+		this.maxPressure = maxPressure;
+		this.minPressure = minPressure;
+		this.treatmentsPerDay = treatmentsPerDay;
+		this.minDuration = minDuration;
+		this.maxDuration = maxDuration;
+	}
 
 	public Long getId() {
 		return id;

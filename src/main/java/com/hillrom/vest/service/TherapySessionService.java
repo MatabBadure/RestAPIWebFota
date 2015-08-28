@@ -125,14 +125,33 @@ public class TherapySessionService {
 		for(Integer key: calculatedData.keySet()){
 			dummyData.put(key, calculatedData.get(key));
 		}
-		
-		return new LinkedList<>(dummyData.values());
+		List<TherapyDataVO> result = new LinkedList<>(dummyData.values());
+		assignHMRForMissedTherapyFromExistingTherapy(result);
+		return result;
+	}
+
+	public void assignHMRForMissedTherapyFromExistingTherapy(
+			List<TherapyDataVO> result) {
+		for(int i = 0;i < result.size();i++){
+			TherapyDataVO therapyDataVO = result.get(i);
+			if(!therapyDataVO.isMissedTherapy()){
+				for(int j = i+1;j<result.size();j++){
+					TherapyDataVO nextTherapyDataVO = result.get(j);
+					if(nextTherapyDataVO.isMissedTherapy() && therapyDataVO.getTimestamp().isBefore(nextTherapyDataVO.getTimestamp())){
+						nextTherapyDataVO.setHmr(therapyDataVO.getHmr());
+						result.set(j, nextTherapyDataVO);
+					}else{
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	private void prepareDummyTherapyDataByYear(LocalDate from, LocalDate to,
 			Map<Integer, TherapyDataVO> dummyData) {
 		List<LocalDate> dates = DateUtil.getAllLocalDatesBetweenDates(from, to);
-		Map<Integer, List<LocalDate>> groupByWeek = DateUtil.groupListOfLocalDatesByWeekOfWeekyear(dates);
+		Map<Integer, List<LocalDate>> groupByWeek = DateUtil.groupListOfLocalDatesByMonthOfYear(dates);
 		for(Integer weekNo : groupByWeek.keySet()){
 			LocalDate startDateOfWeek = groupByWeek.get(weekNo).get(0);
 			dummyData.put(weekNo, createTherapyDataWithTimeStamp(startDateOfWeek));	
@@ -142,7 +161,7 @@ public class TherapySessionService {
 	private void prepareDummyTherapyDataByMonth(LocalDate from, LocalDate to,
 			Map<Integer, TherapyDataVO> dummyData) {
 		List<LocalDate> dates = DateUtil.getAllLocalDatesBetweenDates(from, to);
-		Map<Integer, List<LocalDate>> groupByMonth = DateUtil.groupListOfLocalDatesByMonthOfYear(dates);
+		Map<Integer, List<LocalDate>> groupByMonth = DateUtil.groupListOfLocalDatesByWeekOfWeekyear(dates);
 		for(Integer monthNo : groupByMonth.keySet()){
 			LocalDate startDateOfMonth = groupByMonth.get(monthNo).get(0);
 			dummyData.put(monthNo, createTherapyDataWithTimeStamp(startDateOfMonth));	

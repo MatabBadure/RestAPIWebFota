@@ -352,15 +352,25 @@
 				</div>
 			</div>
 			<div ng-if="complianceGraph">
-				<div>
-					<input type="checkbox" name="pressure" ng-disabled="pressureIsDisabled" ng-model="compliance.pressure" ng-change="reCreateComplianceGraph()">
-	  		 <span>pressure</span>
-	  		 <input type="checkbox" name="frequency" ng-disabled="frequencyIsDisabled" ng-model="compliance.frequency" ng-change="reCreateComplianceGraph()">
-	  		 <span>Frequency</span>
-	  		 <input type="checkbox" name="duration" ng-disabled="durationIsDisabled" ng-model="compliance.duration" ng-change="reCreateComplianceGraph()">
-	  		 <span>Duration</span>
+				<div class="col-md-16">
+					<div class="pull-right wrapper_custom_check">
+						<form action="#">
+							<div class="custom_check_container">
+								<input id="pressure" class="check" type="checkbox" name="pressure" ng-disabled="pressureIsDisabled" ng-model="compliance.pressure" ng-change="reCreateComplianceGraph()">
+			  		 			<label class="check_label sky_blue" for="pressure">Pressure</label>
+							</div>
+				  		 	<div class="custom_check_container">
+				  		 		<input id="frequency" class="check" type="checkbox" name="frequency" ng-disabled="frequencyIsDisabled" ng-model="compliance.frequency" ng-change="reCreateComplianceGraph()">
+				  		 		<label class="check_label sky_blue" for="frequency" >Frequency</label>
+				  		 	</div>
+				  		 	<div class="custom_check_container">
+				  		 		<input id="duration" class="check" type="checkbox" name="duration" ng-disabled="durationIsDisabled" ng-model="compliance.duration" ng-change="reCreateComplianceGraph()">
+				  		 		<label class="check_label sunshade" for="duration">Duration</label>
+				  		 	</div>
+			  		 	</form>
+					</div>
 				</div>
-				<div id="complianceGraph" class="complianceGraph">
+				<div id="complianceGraph" class="complianceGraph col-md-16">
 					<svg style="height:350px"> </svg>
 				</div>
 			</div>

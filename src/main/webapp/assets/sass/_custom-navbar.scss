@@ -86,6 +86,11 @@ $header--background: $body-bg;
 		}
 	}
 }
+
+.navbar-secondary .navbar-right li:last-child {
+	padding-right: 0;
+}
+
 .navbar-secondary .navbar-right li:last-child a {
 	color: $storm-dust;
 	padding: 19px 0;

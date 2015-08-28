@@ -47,6 +47,10 @@ $header--background: $body-bg;
 	color: inherit;
 }
 
+.navbar-nav.navbar-right:last-child {
+	margin-right: 0;
+}
+
 .navbar-secondary .navbar-right > li {
   min-width: 40px;
 }

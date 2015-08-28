@@ -4,7 +4,7 @@
         "home": {
             "title": "doctor",
             "createLabel": "Create HCP",
-            "createNewLabel": "Create New",
+            "createNewLabel": "Create New HCP",
             "createOrEditLabel": "Create or edit a Doctor",
             "manageLabel": "Manage HCP",
             "updateLabel": "Update HCP"
@@ -39,7 +39,7 @@
                     "others": "O"
         },
         "placeholder": {
-            "search": "Search with Name, Hill-Rom ID or Email"
+            "search": "Search with Name or Email"
         },
         "npi-number": "NPI Number",
         "first-name": "First Name",
@@ -75,6 +75,11 @@
         "tab": {
             "hcp-overview": "HCP Profile"
         },
-        "patient-assoc": "Patient Association"
+        "patient-assoc": "Patient Association",
+        "filter": {
+            "active": "Active",
+            "inactive": "Inactive",
+            "all": "All"
+        }
     }
 }

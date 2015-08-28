@@ -30,7 +30,12 @@
 		line-height: 38px;
 		display: table-cell;
 		vertical-align: middle;
+    padding-right: 7px;
 	}
+}
+
+.create-user{
+  position: relative;
 }
 
 .create-user .hillrom-icon {
@@ -839,4 +844,12 @@ tags-input.ng-invalid .tags {
     font-weight: $font-weight-medium;
     display: block;
   }
+}
+
+.add-new:before {
+  font-size: 10px;
+  padding-left: 5px;
+  top: -2px;
+  position: absolute;
+  right: 0;
 }

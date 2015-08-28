@@ -1,7 +1,7 @@
 package com.hillrom.vest.domain;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +10,10 @@ import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import org.joda.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @IdClass(PatientVestDeviceDataPK.class)
 @Entity
@@ -45,12 +49,14 @@ public class PatientVestDeviceData implements Serializable {
 	
 	private Integer duration;
 
+	@JsonIgnore
 	@ManyToOne(optional=false,targetEntity=PatientInfo.class)
 	@JoinColumn(name="patient_id",referencedColumnName="id")
 	private PatientInfo patient;
 
 	private Integer checksum;
 	
+	@JsonIgnore
 	@ManyToOne(optional=false,targetEntity=User.class)
 	@JoinColumn(name="user_id",referencedColumnName="id")
 	private User patientUser;
@@ -209,4 +215,13 @@ public class PatientVestDeviceData implements Serializable {
 				+ ", checksum=" + checksum + "]";
 	}	
 
+	@JsonIgnore
+	public LocalDate getDate(){
+		return LocalDate.fromDateFields(new Date(this.timestamp));
+	}
+	
+	@JsonIgnore
+	public double getHmrInMinutes(){
+		return this.hmr/60;
+	}
 }

@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -109,7 +108,15 @@ public class TherapySessionService {
 			return new LinkedList<>();
 		return formatResponse(calculatedData,from,to,groupBy);
 	}
-
+	
+	/**
+	 *  Add dummy data for missing therapy days/weeks/months
+	 * @param calculatedData
+	 * @param from
+	 * @param to
+	 * @param groupBy
+	 * @return
+	 */
 	private List<TherapyDataVO> formatResponse(
 			Map<Integer, TherapyDataVO> calculatedData, LocalDate from,
 			LocalDate to, String groupBy) {
@@ -130,7 +137,11 @@ public class TherapySessionService {
 		return result;
 	}
 
-	public void assignHMRForMissedTherapyFromExistingTherapy(
+	/**
+	 * Assign HMR of existing therapy to Missing Therapy to support step graph
+	 * @param result
+	 */
+	private void assignHMRForMissedTherapyFromExistingTherapy(
 			List<TherapyDataVO> result) {
 		for(int i = 0;i < result.size();i++){
 			TherapyDataVO therapyDataVO = result.get(i);
@@ -148,6 +159,12 @@ public class TherapySessionService {
 		}
 	}
 
+	/**
+	 * prepare dummy therapy data for the year
+	 * @param from
+	 * @param to
+	 * @param dummyData
+	 */
 	private void prepareDummyTherapyDataByYear(LocalDate from, LocalDate to,
 			Map<Integer, TherapyDataVO> dummyData) {
 		List<LocalDate> dates = DateUtil.getAllLocalDatesBetweenDates(from, to);
@@ -158,6 +175,12 @@ public class TherapySessionService {
 		}
 	}
 	
+	/**
+	 * prepare dummy therapy data for the month 
+	 * @param from
+	 * @param to
+	 * @param dummyData
+	 */
 	private void prepareDummyTherapyDataByMonth(LocalDate from, LocalDate to,
 			Map<Integer, TherapyDataVO> dummyData) {
 		List<LocalDate> dates = DateUtil.getAllLocalDatesBetweenDates(from, to);
@@ -168,6 +191,12 @@ public class TherapySessionService {
 		}		
 	}
 
+	/**
+	 * prepare dummy therapy data for the week
+	 * @param from
+	 * @param to
+	 * @param dummyData
+	 */
 	private void prepareDummyTherapyDataByWeek(LocalDate from, LocalDate to,
 			Map<Integer, TherapyDataVO> dummyData) {
 		LocalDate startDate = from; 
@@ -177,6 +206,11 @@ public class TherapySessionService {
 		}
 	}
 
+	/**
+	 * create Dummy therapy data object for missing therapy
+	 * @param from
+	 * @return
+	 */
 	private TherapyDataVO createTherapyDataWithTimeStamp(LocalDate from) {
 			TherapyDataVO therapy = new TherapyDataVO();
 			therapy.setMissedTherapy(true);

@@ -1,5 +1,6 @@
 package com.hillrom.vest.service;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -106,7 +107,9 @@ public class TherapySessionService {
 		Map<Integer,TherapyDataVO> calculatedData =  calculateWeightedAvgs(groupedSessions);
 		if(calculatedData.isEmpty())
 			return new LinkedList<>();
-		return formatResponse(calculatedData,from,to,groupBy);
+		List<TherapyDataVO> results = formatResponse(calculatedData,from,to,groupBy);
+		Collections.sort(results);
+		return results;
 	}
 	
 	/**

@@ -4,7 +4,7 @@ import org.joda.time.DateTime;
 
 import com.hillrom.vest.domain.Note;
 
-public class TherapyDataVO {
+public class TherapyDataVO implements Comparable<TherapyDataVO> {
 
 	private DateTime timestamp;
 	private int treatmentsPerDay;
@@ -145,6 +145,11 @@ public class TherapyDataVO {
 				+ ", coughPauseDuration=" + coughPauseDuration + ", duration="
 				+ duration + ", hmr=" + hmr + ", missedTherapy="
 				+ missedTherapy + "]";
+	}
+
+	@Override
+	public int compareTo(TherapyDataVO o) {
+		return this.getTimestamp().compareTo(o.getTimestamp());
 	}
 
 	

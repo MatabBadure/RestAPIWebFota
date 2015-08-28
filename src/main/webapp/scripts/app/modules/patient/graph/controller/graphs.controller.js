@@ -176,7 +176,7 @@ angular.module('hillromvestApp')
 
     $scope.switchPatientTab = function(status){
       $scope.patientTab = status;
-      $state.go(status);
+      $state.go(status, {'patientId': $stateParams.patientId});
     };
 
     $scope.xAxisTickFormatFunction = function(format){

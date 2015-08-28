@@ -160,6 +160,9 @@
 				}
 				&:focus{
 					background-color: transparent;
+				}
+				&.active{
+					background-color: transparent;
 					color: $gray-dark;
 					border-bottom: solid 2px $sunshade;
 				}
@@ -181,6 +184,9 @@
 					background-color: transparent;
 				}
 				&:focus{
+					background-color: transparent;
+				}
+				&.active{
 					background-color: transparent;
 					color: $gray-dark;
 				}
@@ -282,3 +288,68 @@
 		}
 	}
 }
+
+/* Custom check Style */
+.wrapper_custom_check{
+	margin: 20px 0 0;
+	.custom_check_container{
+		float: left;
+		display: inline-block;
+		margin-right: 25px;
+		&:last-child{
+			margin-right: 0px;
+		}
+		.check{
+			opacity: 0;
+			&:checked + .check_label{
+				color: $gray-dark;
+				&.sky_blue{
+					&:after{
+						background-color: $iceberg;
+						border: $btn-default-bg;
+					}
+				}
+				&.sunshade{
+					&:after{
+						background-color: $sunshade;
+						border: $btn-default-bg;
+					}
+				}
+			}
+		}
+		.check_label{
+			position: relative;
+			font-weight: normal;
+			&:after{
+				border: 1px solid $gray-light;
+				background-color: transparent;
+			    border-radius: 50%;
+			    content: "";
+			    cursor: pointer !important;
+			    display: inline-block;
+			    height: 15px;
+			    left: -20px;
+			    position: absolute;
+			    top: 2px;
+			    width: 15px;
+			}
+		}
+	}
+}
+
+
+/* &.sky_blue{
+				&:after{
+					background-color: $iceberg;
+					border: $btn-default-bg;
+				}
+			}
+			&.sunshade{
+				&:after{
+					background-color: $sunshade;
+					border: $btn-default-bg;
+				}
+			}
+ */
+
+/* Custom check Style END*/ 

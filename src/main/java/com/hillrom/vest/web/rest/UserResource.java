@@ -1,12 +1,30 @@
 package com.hillrom.vest.web.rest;
 
+import static com.hillrom.vest.config.Constants.CAUGH_PAUSE_DURATION;
+import static com.hillrom.vest.config.Constants.COUGH_PAUSE_DURATION;
+import static com.hillrom.vest.config.Constants.DAILY_TREATMENT_NUMBER;
+import static com.hillrom.vest.config.Constants.DATE;
+import static com.hillrom.vest.config.Constants.DURATION_IN_MINUTES;
+import static com.hillrom.vest.config.Constants.END_TIME;
+import static com.hillrom.vest.config.Constants.FINISH;
+import static com.hillrom.vest.config.Constants.FREQUENCY;
+import static com.hillrom.vest.config.Constants.MINUTES;
+import static com.hillrom.vest.config.Constants.NORMAL_CAUGH_PAUSES;
+import static com.hillrom.vest.config.Constants.NORMAL_COUGH_PAUSES;
+import static com.hillrom.vest.config.Constants.PRESSURE;
+import static com.hillrom.vest.config.Constants.PROGRAMMED_CAUGH_PAUSES;
+import static com.hillrom.vest.config.Constants.PROGRAMMED_COUGH_PAUSES;
+import static com.hillrom.vest.config.Constants.SESSION_NO;
+import static com.hillrom.vest.config.Constants.SESSION_TYPE;
+import static com.hillrom.vest.config.Constants.SESSION_TYPE2;
+import static com.hillrom.vest.config.Constants.START;
+import static com.hillrom.vest.config.Constants.START_TIME;
+
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -14,7 +32,6 @@ import java.util.Optional;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.minidev.json.JSONObject;
@@ -35,8 +52,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import au.com.bytecode.opencsv.CSVWriter;
+import org.supercsv.cellprocessor.ParseInt;
+import org.supercsv.cellprocessor.ParseLong;
+import org.supercsv.cellprocessor.constraint.NotNull;
+import org.supercsv.cellprocessor.ift.CellProcessor;
+import org.supercsv.cellprocessor.joda.FmtDateTime;
+import org.supercsv.cellprocessor.joda.FmtLocalDate;
+import org.supercsv.io.CsvBeanWriter;
+import org.supercsv.io.ICsvBeanWriter;
+import org.supercsv.prefs.CsvPreference;
 
 import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.Notification;
@@ -49,6 +73,7 @@ import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
+import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
@@ -101,6 +126,8 @@ public class UserResource {
 	@Inject
 	private NotificationRepository notificationRepository;
 
+	@Inject
+	private TherapySessionRepository therapySessionRepository;
 	/**
 	 * GET /users -> get all users.
 	 */
@@ -515,22 +542,73 @@ public class UserResource {
     	return new ResponseEntity<JSONObject>(json, HttpStatus.OK);
     }
     
-/*    @RequestMapping(value = "/users/{id}/exportData",
+    @RequestMapping(value = "/users/{id}/exportTherapyData",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<TherapySession>> exportTherapyData(@PathVariable Long id,
+    		@RequestParam(value="from",required=true)Long fromTimeStamp,
+    		@RequestParam(value="to",required=false)Long toTimeStamp){
+    	LocalDate to = Objects.nonNull(toTimeStamp) ? LocalDate.fromDateFields(new Date(toTimeStamp)) : LocalDate.now();
+    	List<TherapySession> therapySessions = therapySessionRepository.findByPatientUserIdAndDateRange(id, LocalDate.fromDateFields(new Date(fromTimeStamp)), to);
+    	return new ResponseEntity<>(therapySessions,HttpStatus.OK);
+    }
+    
+    @RequestMapping(value = "/users/{id}/exportTherapyDataCSV",
             method = RequestMethod.GET,
             produces = "text/csv")
-    public void exportData(@PathVariable Long id,HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException, IOException{
-    	System.out.println("exportData ******************");
-    	String filename = "test";
-    	response.setHeader("Content-Disposition", "attachment; filename=" + filename + ".csv");
-        response.setContentType("text/csv");
-        OutputStreamWriter osw = new OutputStreamWriter(response.getOutputStream(), "UTF-8");
+    public void exportTherapyDataCSV(@PathVariable Long id,
+    		@RequestParam(value="from",required=true)Long fromTimeStamp,
+    		@RequestParam(value="to",required=false)Long toTimeStamp,
+    		HttpServletResponse response) throws UnsupportedEncodingException, IOException{
+    	LocalDate to = Objects.nonNull(toTimeStamp) ? LocalDate.fromDateFields(new Date(toTimeStamp)) : LocalDate.now();
+    	List<TherapySession> therapySessions = therapySessionRepository.findByPatientUserIdAndDateRange(id, LocalDate.fromDateFields(new Date(fromTimeStamp)), to);
 
-        List<String[]> result = new LinkedList<>();
-        result.add(new String[]{"name","data"});
-        CSVWriter csvWriter = new CSVWriter(osw, ',');
-        csvWriter.writeAll(result);
-        csvWriter.flush();
-        csvWriter.close();
+    	ICsvBeanWriter beanWriter = null;
+    	CellProcessor[] processors = new CellProcessor[] {
+    			new FmtLocalDate("MM/dd/yyyy"), // ISBN
+    	        new NotNull(), // treatmentsPerDay
+    	        new NotNull(), // sessionType
+    	        new FmtDateTime("HH:MM a"), // Start Time
+    	        new FmtDateTime("HH:MM a"), // End Time
+    	        new ParseInt(), // frequency
+    	        new ParseInt(), // pressure
+    	        new ParseLong(), // duration in minutes
+    	        new ParseInt(), // programmed cough pauses
+    	        new ParseInt(), // normal cough pauses
+    	        new ParseInt() // cough pause duration
+    	};
+    	try {
+            beanWriter = new CsvBeanWriter(response.getWriter(),
+                    CsvPreference.STANDARD_PREFERENCE);
+			String[] header = { DATE, DAILY_TREATMENT_NUMBER, SESSION_TYPE,
+					START, FINISH, FREQUENCY, PRESSURE, MINUTES,
+					PROGRAMMED_COUGH_PAUSES, NORMAL_COUGH_PAUSES,
+					COUGH_PAUSE_DURATION };
+			String[] headerMapping = { DATE, SESSION_NO, SESSION_TYPE2,
+					START_TIME, END_TIME, FREQUENCY, PRESSURE,
+					DURATION_IN_MINUTES, PROGRAMMED_CAUGH_PAUSES,
+					NORMAL_CAUGH_PAUSES, CAUGH_PAUSE_DURATION };
+
+            if(therapySessions.size() > 0 ){
+            	beanWriter.writeHeader(header);
+                
+                for (TherapySession session : therapySessions) {
+                    beanWriter.write(session, headerMapping,processors);
+                }
+            }else{
+            	response.setStatus(204);
+            }
+        } catch (IOException ex) {
+        	response.setStatus(500);
+        } finally {
+            if (beanWriter != null) {
+                try {
+                    beanWriter.close();
+                } catch (IOException ex) {
+                	response.setStatus(500);
+                }
+            }
+        }
     }
-*/
+
 }

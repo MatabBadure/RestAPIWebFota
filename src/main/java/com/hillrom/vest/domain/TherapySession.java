@@ -23,6 +23,7 @@ import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 @Table(name="PATIENT_VEST_THERAPY_DATA")
 public class TherapySession {
 	
+	@JsonIgnore
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
@@ -210,22 +211,27 @@ public class TherapySession {
 				+ ", hmr= "+hmr	+ "]";
 	}
 	
+	@JsonIgnore
 	public int getTherapyDayOfTheYear(){
 		return this.date.getDayOfYear();
 	}
 	
+	@JsonIgnore
 	public long getDurationLongValue(){
 		return this.durationInMinutes.longValue();
 	}
 	
+	@JsonIgnore
 	public int getDayOfTheWeek(){
 		return this.date.getDayOfWeek();
 	}
 	
+	@JsonIgnore
 	public int getWeekOfYear(){
 		return this.date.getWeekyear();
 	}
 	
+	@JsonIgnore
 	public int getMonthOfTheYear(){
 		return this.date.getMonthOfYear();
 	}

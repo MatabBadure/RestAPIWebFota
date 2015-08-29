@@ -47,8 +47,8 @@
   </div>
 
   <div class="col-md-16 reset-padding margin-top" ng-if="clinic.id">
-    <buton class="hillrom-btn btn-primary float-right btn-margin-left" translate="clinic.clinic-deactivate"></buton>
-    <buton class="hillrom-btn btn-secondary float-right btn-margin-left" ng-click="goToEditClinic(clinic.id)" translate="clinic.clinic-edit"></buton>
+    <buton class="hillrom-btn btn-primary float-right btn-margin-left" ng-click="deactivateClinicModal(clinic)" translate="clinic.clinic-deactivate"></buton>
+    <buton class="hillrom-btn btn-secondary float-right btn-margin-left" ng-click="switchTab('clinicEdit')" translate="clinic.clinic-edit"></buton>
   </div>
 </div>
 
@@ -58,87 +58,7 @@
   </div>
 </div>
 
-<!-- <div class="dashboard dashboard--content">
-  <div class="container dashboard__manage-view margin-top-xl">
-    <div class="dashboard__manage-view--search">
-      <div class="fuid-search-box reset-padding-right">
-        <input type="text" class="form-control" id="searchListParam" name="userName" ng-model="searchItem" autocomplete="off" placeholder="{{'doctor.placeholder.search' | translate}}">
-        <span class="search-icon hillrom-icon icon-search-icon"></span>
-      </div>
-      <div class="fixed-filter-box reset-padding-left">
-        <div class="search-dropdown">
-          <select name="search" ng-model="sortOption" ng-change="searchDoctors()">
-            <option value="" selected>Newly Created</option>
-            <option value="email">Email</option>
-            <option value="firstName">First Name</option>
-            <option value="lastName">Last Name</option>
-          </select>
-        </div>
-      </div>
-    </div>
-  </div>
-</div> -->
-
 <div class="container admin-user margin-top" ng-if="clinic.parent">
-<!-- <div class="col-md-16 detail-list__thead" ng-if="childClinics.length > 0">
-    <div class="col-md-3 detail-list__thead--desc">
-      <span>Clinic Name</span>
-      <div class="sort-icon">
-        <span class="glyphicon glyphicon-chevron-up"></span>
-        <span class="glyphicon glyphicon-chevron-down"></span>
-      </div>
-    </div>
-    <div class="col-md-2 detail-list__thead--desc">
-      <span>Address</span>
-      <div class="sort-icon">
-        <span class="glyphicon glyphicon-chevron-up"></span>
-        <span class="glyphicon glyphicon-chevron-down"></span>
-      </div>
-    </div>
-    <div class="col-md-2 detail-list__thead--desc">
-      <span>City</span>
-      <div class="sort-icon">
-        <span class="glyphicon glyphicon-chevron-up"></span>
-        <span class="glyphicon glyphicon-chevron-down"></span>
-      </div>
-    </div>
-    <div class="col-md-2 detail-list__thead--desc">
-      <span>State</span>
-      <div class="sort-icon">
-        <span class="glyphicon glyphicon-chevron-up"></span>
-        <span class="glyphicon glyphicon-chevron-down"></span>
-      </div>
-    </div>
-    <div class="col-md-2 detail-list__thead--desc">
-      <span>Phone Number</span>
-      <div class="sort-icon">
-        <span class="glyphicon glyphicon-chevron-up"></span>
-        <span class="glyphicon glyphicon-chevron-down"></span>
-      </div>
-    </div>
-    <div class="col-md-2 detail-list__thead--desc">
-      <span>Type</span>
-      <div class="sort-icon">
-        <span class="glyphicon glyphicon-chevron-up"></span>
-        <span class="glyphicon glyphicon-chevron-down"></span>
-      </div>
-    </div>
-    <div class="col-md-2 detail-list__thead--desc">
-      <span>Hill-Rom ID</span>
-      <div class="sort-icon">
-        <span class="glyphicon glyphicon-chevron-up"></span>
-        <span class="glyphicon glyphicon-chevron-down"></span>
-      </div>
-    </div>
-    <div class="col-md-1 detail-list__thead--desc text-right">
-      <span>status</span>
-      <div class="sort-icon">
-        <span class="glyphicon glyphicon-chevron-up"></span>
-        <span class="glyphicon glyphicon-chevron-down"></span>
-      </div>
-    </div>
-  </div> -->
-
   <div class="col-md-16 detail-list" ng-repeat="childClinic in childClinics">
     <div class="col-md-3 detail-list--title">
       <span>{{childClinic.name}}</span>
@@ -175,3 +95,22 @@
   </div>
 </div>
 
+<div ng-if="showModalClinic" class="modal" id="sg-modal" tabIndex="-1" role="dialog" aria-labelledby="sgModalLabel" aria-hidden="true">
+  <div class="modal__dialog">
+    <div class="modal__content">
+      <header class="modal__header">
+        <button type="button" class="modal__close" data-dismiss="modal" ng-click="closeModalClinic()">&times;</button>
+         <p translate="clinic.delete.warning"></p>
+      </header>
+      <div class="modal__body">
+         <div class="modal--message" translate="clinic.delete.message"></div>
+         <div class="row modal--custom-btn">
+          <buton class="hillrom-btn btn-submit float-right" ng-click="deactivateClinic(clinicToDeactivate.id)">Yes</buton>
+          <buton class="hillrom-btn btn-submit float-right" data-dismiss="modal" ng-click="closeModalClinic()">No</buton>
+         </div>
+      </div>
+      <footer class="modal__footer">
+      </footer>
+    </div>
+  </div>
+</div>

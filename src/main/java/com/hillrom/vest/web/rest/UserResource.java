@@ -41,7 +41,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientProtocolData;
-import com.hillrom.vest.domain.PatientVestDeviceData;
+
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.TherapySession;
@@ -67,7 +67,7 @@ import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.ProtocolDTO;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
-
+import com.hillrom.vest.domain.PatientVestDeviceData;
 /**
  * REST controller for managing users.
  */
@@ -251,20 +251,22 @@ public class UserResource {
 		}
     }
 	
-	@RequestMapping(value="/user/{id}/changeSecurityQuestion",method=RequestMethod.PUT)
-	public ResponseEntity<?> updateSecurityQuestion(@PathVariable Long id,@RequestBody(required=true)Map<String,String> params){
+	@RequestMapping(value="/user/{id}/changeSecurityQuestion",method=RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<JSONObject> updateSecurityQuestion(@PathVariable Long id,@RequestBody(required=true)Map<String,String> params){
 		log.debug("REST request to update Security Question and Answer {}",id,params);
 		JSONObject jsonObject = new JSONObject();
 		try {
 			jsonObject = userService.updateSecurityQuestion(id,params);
+			jsonObject.put("message", MessageConstants.HR_295);
 		} catch (HillromException e) {
 			jsonObject.put("ERROR",e.getMessage());
-			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.BAD_REQUEST);
 		}
 		if(jsonObject.containsKey("ERROR")){
-			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<>(HttpStatus.OK);
+		return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.OK);
 	}
 	
 	/**

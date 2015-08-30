@@ -228,7 +228,7 @@ public class TherapySession {
 	
 	@JsonIgnore
 	public int getWeekOfYear(){
-		return this.date.getWeekyear();
+		return this.date.getWeekOfWeekyear();
 	}
 	
 	@JsonIgnore

@@ -25,4 +25,7 @@ public interface PatientProtocolRepository extends
 	String id();
 	
 	List<PatientProtocolData> findByPatientUserIdAndDeleted(Long patientId,boolean deleted);
+	
+	@Query("from PatientProtocolData ppd where ppd.patient.id = ?1 and ppd.deleted = false group by ppd.protocolKey")
+	List<PatientProtocolData> findByPatientIdAndActiveStatus(String patientId);
 }

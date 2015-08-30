@@ -14,6 +14,8 @@ angular.module('hillromvestApp')
             return false;
           }
         };
+        /**/
+      
       }
     }
 });
@@ -32,4 +34,12 @@ angular.module('hillromvestApp')
       templateUrl: 'scripts/components/dashboard/patient/views/createEditCaregiver.html',
       restrict: 'E'
     }
+  });
+
+angular.module('hillromvestApp')
+  .directive('patientGraph', function() {
+    return {
+        templateUrl: 'scripts/components/dashboard/patient/views/graph.html',
+        restrict: 'E',
+      }
   });

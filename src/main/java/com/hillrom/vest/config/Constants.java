@@ -76,5 +76,31 @@ public final class Constants {
 	public static final String DAILY_TREATMENT_NUMBER = "Daily Treatment Number";
 
 	public static final String DATE = "Date";
+	
+	public static final String HMR_IN_MINUTES = "hmrInMinutes";
+
+	public static final String DURATION = "duration";
+
+	public static final String HUB_ID = "hubId";
+
+	public static final String BLUETOOTH_ID = "bluetoothId";
+
+	public static final String SERIAL_NUMBER = "serialNumber";
+
+	public static final String EVENT_ID = "eventId";
+
+	public static final String SEQUENCE_NUMBER = "sequenceNumber";
+
+	public static final String HMR = "hmr";
+
+	public static final String HUB_ADDRESS = "Hub Id";
+
+	public static final String DEVICE_ADDRESS = "Device Address";
+
+	public static final String SERIAL_NO = "Serial Number";
+
+	public static final String SEQUENCE_NO = "Sequence No";
+
+	public static final String EVENT = "Event";
 
 }

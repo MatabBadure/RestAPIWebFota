@@ -62,12 +62,16 @@
         "clinic-view-assoc-patients": "View Associated Patients",
         "clinic-view-assoc-hcps": "View Associated HCPs",
         "clinic-edit": "Edit Clinic",
+        "clinic-deactivate": "Deactivate",
         "assoc-clinic": "Associated Clinics",
         "add-satellite-clinic": "Add Satellite Clinic",
         "link-hcp": "Link HCP",
         "link-patient": "Link Patient",
         "tab": {
-            "clinic-overview": "Clinic Profile"
+            "clinic-overview": "Clinic Profile",
+            "assoc-hcp": "Associated HCPs",
+            "assoc-patients": "Associated Patients",
+            "clinic-admin": "Clinic Admin"
         }
     }
 }

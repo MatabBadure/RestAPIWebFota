@@ -21,16 +21,21 @@
 }
 
 .dashbord-nav__primary--title {
-	line-height: 38px;
+	line-height: 42px;
 }
 
 .dashbord-nav__secondary {
 	display: table;
 	span {
-		line-height: 38px;
+		line-height: 42px;
 		display: table-cell;
 		vertical-align: middle;
+    padding-right: 7px;
 	}
+}
+
+.create-user{
+  position: relative;
 }
 
 .create-user .hillrom-icon {
@@ -259,8 +264,7 @@
 	position: absolute;
   right: 5px;
   padding: 0;
-  top: 5px;
-  font-size: 20px;
+  top: 8px;
 }
 
 .dashboard__manage-view--list {
@@ -839,4 +843,12 @@ tags-input.ng-invalid .tags {
     font-weight: $font-weight-medium;
     display: block;
   }
+}
+
+.add-new:before {
+  font-size: 10px;
+  padding-left: 5px;
+  top: -2px;
+  position: absolute;
+  right: 0;
 }

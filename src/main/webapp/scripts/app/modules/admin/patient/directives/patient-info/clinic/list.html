@@ -1,5 +1,3 @@
-
-
 <admin-patient-navbar></admin-patient-navbar>
 <div class="container admin-user">
   <div class="col-md-16 margin-top">
@@ -36,7 +34,7 @@
       <span ng-bind="aClinic.hillromId"></span>
     </div>
     <div class="col-md-1 clinic-list__delete">
-      <span class="glyphicon glyphicon-trash" ng-click="disassociateLinkedClinics(aClinic.id, $index)"></span>
+      <span class="glyphicon glyphicon-trash" ng-click="deleteClinicModel(aClinic)"></span>
     </div>
   </div>
   <div class="col-md-16 reset-padding">
@@ -82,7 +80,7 @@
       <span ng-bind="hcp.hillromId"></span>
     </div>
     <div class="col-md-1 clinic-list__delete">
-      <span class="glyphicon glyphicon-trash" ng-click="disassociateLinkedHCPs(hcp.id)"></span>
+      <span class="glyphicon glyphicon-trash" ng-click="deleteHCPModel(hcp)"></span>
     </div>
   </div>
   <div class="col-md-16 reset-padding">
@@ -99,6 +97,46 @@
 
     <div class="col-md-8 clinic-link">
       <buton class="hillrom-btn btn-primary float-right" ng-click="linkHCP()" translate="patient.link-hcp"></buton>
+    </div>
+  </div>
+</div>
+
+<div ng-if="showModalClinic" class="modal" id="sg-modal" tabIndex="-1" role="dialog" aria-labelledby="sgModalLabel" aria-hidden="true">
+  <div class="modal__dialog">
+    <div class="modal__content">
+      <header class="modal__header">
+        <button type="button" class="modal__close" data-dismiss="modal" ng-click="cancelClinicModel()">&times;</button>
+         <p translate="patient.delete-clinic-info.warning"></p>
+      </header>
+      <div class="modal__body">
+         <div class="modal--message" translate="patient.delete-clinic-info.message"></div>
+         <div class="row modal--custom-btn">
+          <buton class="hillrom-btn btn-submit float-right" ng-click="disassociateLinkedClinics(clinicToDelete.id)">Yes</buton>
+          <buton class="hillrom-btn btn-submit float-right" data-dismiss="modal" ng-click="cancelClinicModel()">No</buton>
+         </div>
+      </div>
+      <footer class="modal__footer">
+      </footer>
+    </div>
+  </div>
+</div>
+
+<div ng-if="showModalHCP" class="modal" id="sg-modal" tabIndex="-1" role="dialog" aria-labelledby="sgModalLabel" aria-hidden="true">
+  <div class="modal__dialog">
+    <div class="modal__content">
+      <header class="modal__header">
+        <button type="button" class="modal__close" data-dismiss="modal" ng-click="cancelHCPModel()">&times;</button>
+         <p translate="patient.delete-hcp-info.warning"></p>
+      </header>
+      <div class="modal__body">
+         <div class="modal--message" translate="patient.delete-hcp-info.message"></div>
+         <div class="row modal--custom-btn">
+          <buton class="hillrom-btn btn-submit float-right" ng-click="disassociateLinkedHCPs(deviceToDelete.id)">Yes</buton>
+          <buton class="hillrom-btn btn-submit float-right" data-dismiss="modal" ng-click="cancelHCPModel()">No</buton>
+         </div>
+      </div>
+      <footer class="modal__footer">
+      </footer>
     </div>
   </div>
 </div>

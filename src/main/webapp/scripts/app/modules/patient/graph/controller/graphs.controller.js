@@ -36,6 +36,7 @@ angular.module('hillromvestApp')
       $scope.toDate = dateService.getDateFromTimeStamp($scope.toTimeStamp);   
       $scope.getPatientById(localStorage.getItem('patientID'));
       var currentRoute = $state.current.name;
+      $scope.showNotes = false;
       $scope.patientTab = currentRoute;
       if ($state.current.name === 'patientdashboard') {
         $scope.initPatientDashboard();        
@@ -194,7 +195,6 @@ angular.module('hillromvestApp')
       $scope.patientTab = status;
       $state.go(status, {'patientId': $stateParams.patientId});
     };
-
 
     $scope.xAxisTickFormatFunction = function(format){
       return function(d){
@@ -860,19 +860,24 @@ angular.module('hillromvestApp')
       }).catch(function(){});
     };
 
-    $scope.getNotes = function(){
-      var date = '2015-08-21';
+    $scope.getNotes = function(){      
+      var date = new Date().getTime();      
       UserService.getNotesOfUser(localStorage.getItem('patientID'), date).then(function(response){
-        $scope.notes = response.data;               
-      }).catch(function(){});
+        $scope.showNotes = true; 
+        $scope.notes = response.data;          
+        //scrollPageToTop("add_note_container");        
+      }).catch(function(){
+        $scope.notes = "";    
+      });
     };
 
     $scope.updateNote = function(){
       if($scope.editedNoteText && $scope.editedNoteText.length > 0){
         var data = {};
         data.noteText = $scope.editedNoteText;
-        UserService.updateNote(localStorage.getItem('patientID'), '2015-08-21', data).then(function(response){
-          $scope.notes = response.data; alert("update : "+JSON.stringify($scope.notes));               
+        UserService.updateNote($scope.notes.id, new Date().getTime(), data).then(function(response){
+          $scope.notes = response.data; 
+          $scope.editNote = false;            
         }).catch(function(){
           $scope.errorMsg = "Some internal error occurred. Please try after sometime.";
           notyService.showMessage($scope.errorMsg,'warning' );
@@ -923,6 +928,7 @@ angular.module('hillromvestApp')
       $scope.textNote = "";
       $scope.weeklyChart();
       $scope.getNotes();
+      $scope.getPatientNotification();
     };
 
     $scope.openEditNote = function(){
@@ -933,6 +939,32 @@ angular.module('hillromvestApp')
     $scope.cancelEditNote = function(){
       $scope.editNote = false;
     };
+
+    $scope.getPatientNotification = function(){
+      UserService.getPatientNotification(localStorage.getItem("patientID"), new Date().getTime()).then(function(response){                  
+        $scope.patientNotifications = response.data;//notifications;//response.data;
+        angular.forEach($scope.patientNotifications, function(notification, index) {
+          var notificationType = notification.notificationType; 
+          if(notificationType.indexOf("HMR_NON_COMPLIANCE AND SETTINGS_DEVIATION") > -1){
+            $scope.patientNotifications[index].message = apiresponse.HMR_NON_COMPLIANCE_AND_SETTINGS_DEVIATION;
+            $scope.patientNotifications[index].class = "icon-lungs";
+          }else if(notificationType.indexOf("HMR_NON_COMPLIANCE") > -1){
+             $scope.patientNotifications[index].message = apiresponse.HMR_NON_COMPLIANCE;
+             $scope.patientNotifications[index].class = "icon-lungs";
+          }else if(notificationType.indexOf("MISSED_THERAPY") > -1){
+             $scope.patientNotifications[index].message = apiresponse.MISSED_THERAPY ;
+             $scope.patientNotifications[index].class = "icon-lungs";
+          }
+        });
+      }).catch(function(){});
+    }
+
+    function scrollPageToTop(divId){
+      $('html, body').animate({
+          scrollTop: $("#"+divId).offset().top
+      }, 2000);
+    }
+
     $scope.init();
 });
 

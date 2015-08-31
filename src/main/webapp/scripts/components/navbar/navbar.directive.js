@@ -79,8 +79,23 @@ angular.module('hillromvestApp')
       };
 
       $scope.account = function(){
-        $state.go('adminProfile');
+        var userRole = localStorage.getItem('role');   
+        if(userRole === "ADMIN"){
+          $state.go('adminProfile');
+        }else if(userRole === "PATIENT"){
+          $state.go("patientProfile");
+        }
       };
+
+      $scope.goToHomePage = function(){
+        var userRole = localStorage.getItem('role'); 
+        if(userRole === "ADMIN"){
+          $state.go("patientUser");
+        }else if(userRole === "PATIENT"){
+          $state.go("patientdashboard");
+        }
+      };
+
     }
   };
 });

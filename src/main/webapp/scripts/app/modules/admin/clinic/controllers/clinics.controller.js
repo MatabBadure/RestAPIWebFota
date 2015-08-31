@@ -252,6 +252,30 @@ angular.module('hillromvestApp')
       });
     };
 
+    $scope.deactivateClinicModal = function(clininc){
+      $scope.clinicToDeactivate = clininc;
+      $scope.showModalClinic = true;
+    };
+
+    $scope.closeModalClinic = function(){
+      delete $scope.clinicToDeactivate;
+      $scope.showModalClinic = false;
+    };
+
+    $scope.deactivateClinic = function(clinicId){
+      $scope.closeModalClinic();
+      clinicService.deleteClinic(clinicId).then(function(response){
+        $state.go('clinicUser');
+        notyService.showMessage(response.data.message,'success');
+      }).catch(function(response){
+        if(response.data.message){
+          notyService.showMessage(response.data.message,'warning');
+        } else if(response.data.ERROR){
+          notyService.showMessage(response.data.ERROR,'warning');
+        }
+      });
+    };
+
     $scope.newClinic = function(clinic){
       clinicService.createClinic(clinic).then(function(data) {
         $scope.clinicStatus.isMessage = true;
@@ -331,28 +355,21 @@ angular.module('hillromvestApp')
       }).catch(function (response) {});
     };
 
-    /* clinic profile view*/
-    $scope.getHCPs = function(clinicId){
-      $state.go('clinicAssociatedHCP', {
-        'clinicId': clinicId
-      });
-    }
-
-    $scope.getPatients = function(clinicId){
-      $state.go('clinicAssociatedPatients',{
-        'clinicId': clinicId
-      });
-    }
-
     $scope.createSatellite = function(parentId){
       $state.go('clinicNew', {
         'parentId': parentId
       });
-    }
+    };
 
     $scope.goToEditClinic = function(clinicId){
       $state.go('clinicEdit', {
         'clinicId': clinicId
+      });
+    };
+
+    $scope.switchTab = function(state){
+      $state.go(state, {
+        'clinicId': $stateParams.clinicId
       });
     };
 

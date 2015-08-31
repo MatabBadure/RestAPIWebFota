@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('hillromvestApp')
-.controller('graphController', function($scope, $state, patientDashBoardService, StorageService, dateService, graphUtil, patientService, UserService, $stateParams, notyService) {
+.controller('graphController', function($scope, $state, patientDashBoardService, StorageService, dateService, graphUtil, patientService, UserService, $stateParams, notyService, $timeout) {
     var chart;
     $scope.init = function() {
       $scope.hmrLineGraph = true;
@@ -91,8 +91,24 @@ angular.module('hillromvestApp')
 
     $scope.removeGraph = function() {
       d3.selectAll('#complianceGraph svg').selectAll("*").remove();
+      d3.selectAll('#HMRLineGraph svg').selectAll("*").remove();
       d3.selectAll('svg').selectAll("*").remove();
     }
+
+    $scope.hmrBarSetMinMax = function() {
+      var values = [];
+      values.push($scope.yAxisRangeForHMRBar.min);
+      values.push($scope.yAxisRangeForHMRBar.max);
+      return values;
+    }
+
+    $scope.hmrLineSetMinMax = function() {
+      var values = [];
+      values.push($scope.yAxisRangeForHMRLine.min);
+      values.push($scope.yAxisRangeForHMRLine.max);
+      return values;
+    }
+
     $scope.drawGraph = function() {
       var days = dateService.getDateDiffIndays($scope.fromTimeStamp,$scope.toTimeStamp);
       if(days === 0){
@@ -115,7 +131,8 @@ angular.module('hillromvestApp')
         $scope.calculateDateFromPicker(picker);
         $scope.drawGraph();
         }
-      }
+      },
+      opens: 'left'
     }
 
   $scope.dates = {startDate: null, endDate: null};
@@ -207,10 +224,20 @@ angular.module('hillromvestApp')
           if(value.timestamp === e.point[0]){
               toolTip =
                 '<h6>' + dateService.getDateFromTimeStamp(value.timestamp) + '</h6>' +
-                '<p> Treatment/Day ' + value.treatmentsPerDay + '</p>' +
+                /*'<p> Treatment/Day ' + value.treatmentsPerDay + '</p>' +
                 '<p> Frequency ' + value.weightedAvgFrequency + '</p>' +
                 '<p> Pressure ' + value.weightedAvgPressure + '</p>' +
-                '<p> Cough Pauses ' + value.normalCoughPauses + '</p>';
+                '<p> Cough Pauses ' + value.normalCoughPauses + '</p>';*/
+
+
+
+
+                '<ul class="graph_ul">' +
+                  '<li><span class="pull-left">' + 'Treatment/Day ' +'</span><span class="pull-right value">' + value.treatmentsPerDay +'</span></li>' +
+                  '<li><span class="pull-left">' + 'Frequency' + '</span><span class="pull-right value">' + value.weightedAvgFrequency  + '</span></li>' +
+                  '<li><span class="pull-left">' + 'Pressure' +'</span><span class="pull-right value">' + value.weightedAvgPressure  +'</span></li>' +
+                  '<li><span class="pull-left">' + 'Cough Pauses' +'</span><span class="pull-right value">' + value.normalCoughPauses +'</span></li>' +
+                '</ul>';
           }
         });
       return toolTip;   
@@ -224,9 +251,15 @@ angular.module('hillromvestApp')
           if(value.startTime === e.point[0] && value.hmr !== 0 ){
               toolTip =
                 '<h6>' + dateService.getDateFromTimeStamp(value.startTime) + '</h6>' +
-                '<p> Frequency ' + value.frequency + '</p>' +
+                /*'<p> Frequency ' + value.frequency + '</p>' +
                 '<p> Pressure ' + value.pressure + '</p>' +
-                '<p> Cough Pauses ' + (value.normalCaughPauses + value.programmedCaughPauses) + '</p>';
+                '<p> Cough Pauses ' + (value.normalCaughPauses + value.programmedCaughPauses) + '</p>';*/
+
+                '<ul class="graph_ul">' +
+                  '<li><span class="pull-left">' + 'Frequency' + '</span><span class="pull-right value">' + value.frequency  + '</span></li>' +
+                  '<li><span class="pull-left">' + 'Pressure' +'</span><span class="pull-right value">' + value.pressure +'</span></li>' +
+                  '<li><span class="pull-left">' + 'Cough Pauses' +'</span><span class="pull-right value">' + (value.normalCaughPauses + value.programmedCaughPauses) +'</span></li>' +
+                '</ul>';
           }
         });
       return toolTip;   
@@ -240,10 +273,18 @@ angular.module('hillromvestApp')
           if(value.start === e.point.timeStamp){
               toolTip =
                 '<h6>' + dateService.getDateFromTimeStamp(value.start) + '</h6>' +
-                '<p> Treatment/Day ' + value.treatmentsPerDay + '</p>' +
+                /*'<p> Treatment/Day ' + value.treatmentsPerDay + '</p>' +
                 '<p> Frequency ' + value.weightedAvgFrequency + '</p>' +
                 '<p> Pressure ' + value.weightedAvgPressure + '</p>' +
                 '<p> Caugh Pauses ' + value.normalCoughPauses + '</p>';
+*/
+
+                '<ul class="graph_ul">' +
+                  '<li><span class="pull-left">' + 'Treatment/Day' + '</span><span class="pull-right value">' + value.treatmentsPerDay + '</span></li>' +
+                  '<li><span class="pull-left">' + 'Frequency' +'</span><span class="pull-right value">' + value.weightedAvgFrequency +'</span></li>' +
+                  '<li><span class="pull-left">' + 'Pressure' +'</span><span class="pull-right value">' + value.weightedAvgPressure +'</span></li>' +
+                  '<li><span class="pull-left">' + 'Cough Pauses' +'</span><span class="pull-right value">' + value.normalCoughPauses +'</span></li>' +
+                '</ul>';
           }
         });
       return toolTip;   
@@ -307,7 +348,6 @@ angular.module('hillromvestApp')
           $scope.graphData = graphUtil.convertIntoHMRLineGraph($scope.completeGraphData);
           console.log('HMR Non-Day graph data : ' + JSON.stringify($scope.graphData));
           console.log($scope.yAxisRangeForHMRLine);
-          //$scope.graphData = [{"values":[[1,29567],[2,29567],]}]
         }
       }).catch(function(response) {
         $scope.graphData = [];
@@ -361,6 +401,28 @@ angular.module('hillromvestApp')
           $scope.hmrBarGraphData = graphUtil.convertIntoHMRBarGraph($scope.completeGraphData);
           console.log('HMR Day graph data' + JSON.stringify($scope.hmrBarGraphData));
           console.log($scope.yAxisRangeForHMRBar);
+
+          $scope.customizationForBarGraph = function() {
+
+           d3.select('#hmrBarGraph svg').selectAll('rect.nv-bar')
+              .attr("x", 40)
+              .attr("width", 70);
+          };
+
+          var barCount= d3.select('#hmrBarGraph svg').selectAll('.nv-group .nv-bar')[0].length;
+          var count = 5;
+          $scope.waitFunction = function waitHandler() {
+             barCount = d3.select('#hmrBarGraph svg').selectAll('.nv-group .nv-bar')[0].length;
+            if(barCount > 0 || count === 0 ) {
+              $scope.customizationForBarGraph();
+              return false;
+            } else {
+              count --;
+            }
+            $timeout(waitHandler, 1000);
+          }
+          $scope.waitFunction();
+
           //$scope.hmrBarGraphData = [{"values":[[1420061400000,null],[1420075800000,null],[1420090200000,28987],[1420104600000,28997],[1420119000000,null],[1420133400000,null]]}]
          }
       }).catch(function(response) {
@@ -370,7 +432,6 @@ angular.module('hillromvestApp')
 
     $scope.getComplianceGraphData = function(format) {
       patientDashBoardService.getHMRGraphPoints($scope.patientId, $scope.fromTimeStamp, $scope.toTimeStamp, $scope.groupBy).then(function(response){
-        //Will get response data from real time API once api is ready
         $scope.completeComplianceData = response.data;
         console.log("server response" + JSON.stringify($scope.completeComplianceData));
         if($scope.completeComplianceData.actual === undefined){
@@ -516,12 +577,6 @@ angular.module('hillromvestApp')
     });
   };
 
- /* $scope.reCreateComplianceGraph = function() {
-    console.log('selected choice:' + $scope.compliance.secondaryYaxis);
-    $scope.createComplianceGraphData();
-    $scope.drawComplianceGraph();
-  };*/
-
   $scope.formatXtickForCompliance = function(format,d){
     switch(format) {
       case "weekly":
@@ -570,7 +625,6 @@ angular.module('hillromvestApp')
       chart.yAxis2.tickFormat(d3.format('d'));
       chart.yDomain1([$scope.yAxis1Min,$scope.yAxis1Max]);
       chart.yDomain2([$scope.yAxis2Min,$scope.yAxis2Max]); 
-      //$scope.putComplianceGraphLabel(chart);
       var data =  $scope.complianceGraphData
          angular.forEach(data, function(value) {
               if(value.yAxis === 1){
@@ -580,9 +634,19 @@ angular.module('hillromvestApp')
                 chart.yAxis2.axisLabel(value.key);
               }
         });
+
         d3.select('#complianceGraph svg')
       .datum($scope.complianceGraphData)
       .transition().duration(500).call(chart);
+
+      var bgHeight = d3.select('#complianceGraph svg').selectAll('.x .tick line').attr("y2");;
+         var bgWidth = d3.select('#complianceGraph svg ').selectAll('.y1 .tick line').attr("x2");
+         d3.select('#complianceGraph svg .nv-axis g').append('rect')
+                  .attr("height", Math.abs(bgHeight))
+                  .attr("width", bgWidth)
+                  .attr("x" , 0)
+                  .attr("y" , bgHeight)
+                  .attr("class" , "svg_bg");
 
         var y1AxisMark = d3.select('#complianceGraph svg').selectAll('.y1.axis').selectAll('.nvd3.nv-wrap.nv-axis');
         var y2AxisMark = d3.select('#complianceGraph svg').selectAll('.y2.axis').selectAll('.nvd3.nv-wrap.nv-axis');
@@ -612,62 +676,33 @@ angular.module('hillromvestApp')
         attr('class','minRecommendedLevel').
         attr('transform','translate(0, '+ y1AxisMinTransform + ')').
         append('text').
-        //text($scope.yAxis1MinMark).
         text('MIN').
-        //attr('text-anchor'.'end').
         style('fill','red');
-
-/*        y1AxisMark.select('.minRecommendedLevel').
-        append('line').
-        attr('x2',y1LineLength).
-        attr('y2','0').
-        style('stroke','red');*/
 
         y1AxisMark.append('g').
         attr('class','maxRecommendedLevel').
         attr('transform','translate(0,'+ y1AxisMaxTransform + ')').
         append('text').
-        //text($scope.yAxis1MaxMark).
         text('MAX').
-        //attr('text-anchor'.'end').
         style('fill','green');
-
-       /* y1AxisMark.select('.maxRecommendedLevel').
-        append('line').
-        attr('x2',y1LineLength).
-        attr('y2','0').
-        style('stroke','green');*/
 
         y2AxisMark.append('g').
         attr('class','minRecommendedLevel').
         attr('transform','translate(0,'+ y2AxisMinTransform + ')').
         append('text').
-        //text($scope.yAxis2MinMark).
         text('MIN').
         style('fill','red');
-
-        /*y2AxisMark.select('.minRecommendedLevel').
-        append('line').
-        attr('x2',y2LineLength).
-        attr('y2','0').
-        style('stroke','red');*/
 
         y2AxisMark.append('g').
         attr('class','maxRecommendedLevel').
         attr('transform','translate(0,'+ y2AxisMaxTransform + ')').
         append('text').
-        //text($scope.yAxis2MaxMark).
         text('MAX').
         style('fill','green');
-
-        /*y2AxisMark.select('.maxRecommendedLevel').
-        append('line').
-        attr('x2',y2LineLength).
-        attr('y2','0').
-        style('stroke','green');*/
       return chart;
     });
   };
+
 
     /*this should initiate the list of caregivers associated to the patient*/
     $scope.initPatientCaregiver = function(){

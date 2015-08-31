@@ -102,6 +102,14 @@
             "warning": "Are you sure you want to Delete the Device?",
             "message": "If you delete the Device, you will no longer be able to view the information."
         },
+        "delete-clinic-info": {
+            "warning": "Are you sure you want to Delete the Clinic?",
+            "message": "If you delete the Clinic, you will no longer be able to view the information."
+        },
+        "delete-hcp-info": {
+            "warning": "Are you sure you want to Delete the HCP?",
+            "message": "If you delete the HCP, you will no longer be able to view the information."
+        },
         "profile": {
           "tabs": {
             "mydashboard": "My Dashboard",

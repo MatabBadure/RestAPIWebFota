@@ -70,6 +70,7 @@ public class NoteService {
 			noteRepository.save(existingNote);
 		}else{
 			existingNote.setNote(note);
+			existingNote.setDeleted(false);
 			noteRepository.save(existingNote);
 		}
 		return existingNote;
@@ -94,6 +95,7 @@ public class NoteService {
 			}
 		}else{
 			existingNote.setNote(note);
+			existingNote.setDeleted(false);
 			noteRepository.save(existingNote);
 		}
 		return existingNote;

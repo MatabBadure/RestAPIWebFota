@@ -325,7 +325,6 @@ public class UserService {
     	rolesAdminCanModerate.add(AuthoritiesConstants.ACCT_SERVICES);
     	rolesAdminCanModerate.add(AuthoritiesConstants.ASSOCIATES);
     	rolesAdminCanModerate.add(AuthoritiesConstants.ADMIN);
-    	rolesAdminCanModerate.add(AuthoritiesConstants.CLINIC_ADMIN);
 		return rolesAdminCanModerate;
 	}
 
@@ -363,6 +362,14 @@ public class UserService {
         	} else {
         		throw new HillromException(ExceptionConstants.HR_531);
     		}
+        } else if (AuthoritiesConstants.CLINIC_ADMIN.equals(userExtensionDTO.getRole())) {
+        	UserExtension user = createClinicAdminUser(userExtensionDTO);
+        	if(user.getId() != null) {
+                mailService.sendActivationEmail(user, baseUrl);
+                return user;
+        	} else {
+        		throw new HillromException(ExceptionConstants.HR_574);
+        	}
         } else {
         	throw new HillromException(ExceptionConstants.HR_502);
     	}
@@ -454,6 +461,31 @@ public class UserService {
 		log.debug("Created Information for User: {}", newUser);
 		return newUser;
 	}
+    
+    public UserExtension createClinicAdminUser(UserExtensionDTO userExtensionDTO) throws HillromException {
+    	UserExtension newUser = new UserExtension();
+		assignValuesToUserObj(userExtensionDTO, newUser);
+		newUser.setActivated(false);
+		newUser.setDeleted(false);
+		newUser.setActivationKey(RandomUtil.generateActivationKey());
+		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
+		userExtensionRepository.saveAndFlush(newUser);
+		if(newUser.getId() != null) {
+			List<Clinic> clinicList = new LinkedList<>();
+			for(Map<String, String> clinicObj : userExtensionDTO.getClinicList()){
+				Clinic clinic = clinicRepository.getOne(clinicObj.get("id"));
+				clinic.setClinicAdminId(newUser.getId());
+				System.out.println("Clinic : "+clinic);
+				clinicList.add(clinic);
+			}
+			System.out.println("List : "+clinicList);
+			clinicRepository.save(clinicList);
+			log.debug("Created Information for User: {}", newUser);
+			return newUser;
+		} else {
+			throw new HillromException(ExceptionConstants.HR_574);
+		}
+	}
 
     public UserExtension updateUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException{
         if(userExtensionDTO.getEmail() != null) {
@@ -494,6 +526,16 @@ public class UserService {
                 return user;
     		} else {
     			throw new HillromException(ExceptionConstants.HR_531);//Unable to update HealthCare Professional.
+    		}
+        } else if (AuthoritiesConstants.CLINIC_ADMIN.equals(userExtensionDTO.getRole())) {
+           	UserExtension user = updateClinicAdminUser(id, userExtensionDTO);
+    		if(user.getId() != null) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && !user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
+    				mailService.sendActivationEmail(user, baseUrl);
+    			}
+                return user;
+    		} else {
+    			throw new HillromException(ExceptionConstants.HR_575);//Unable to update Clinic Admin.
     		}
         } else {
         	throw new HillromException(ExceptionConstants.HR_555);//Incorrect data
@@ -551,6 +593,14 @@ public class UserService {
 		userExtensionRepository.save(hcpUser);
 		log.debug("Updated Information for HealthCare Proffessional: {}", hcpUser);
 		return hcpUser;
+	}
+    
+    public UserExtension updateClinicAdminUser(Long id, UserExtensionDTO userExtensionDTO) {
+    	UserExtension clinicAdminUser = userExtensionRepository.findOne(id);
+		assignValuesToUserObj(userExtensionDTO, clinicAdminUser);
+		userExtensionRepository.saveAndFlush(clinicAdminUser);
+		log.debug("Updated Information for Clinic Admin User : {}", clinicAdminUser);
+		return clinicAdminUser;
 	}
 
 	private void assignValuesToPatientInfoObj(UserExtensionDTO userExtensionDTO, PatientInfo patientInfo) {

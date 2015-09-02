@@ -81,6 +81,8 @@ public class ExceptionConstants {
     public static final String HR_571 = "Invalid Serial Number.";
     public static final String HR_572 = "This Vest device is already linked to patient.";
     public static final String HR_573 = "Unable to deactivate vest device from patient.";
+    public static final String HR_574 = "Unable to create clinic admin.";
+    public static final String HR_575 = "Unable to update clinic admin.";
     
     public static final String HR_581 = "No Patient Associated with HCP.";
     public static final String HR_582 = "No Clinics Associated with HCP.";

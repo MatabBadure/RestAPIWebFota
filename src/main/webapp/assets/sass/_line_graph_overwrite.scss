@@ -55,6 +55,13 @@
 		fill: #e5eff9;
 	}
 }
+
+
+.missed_therapy_node{
+	fill: red;
+  stroke: red;
+}
+
 /* Grapg ToolTip style */
 .nvtooltip{
 		&:before { 

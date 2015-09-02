@@ -37,7 +37,7 @@ spring:
     thymeleaf:
         mode: XHTML
         cache: true
-
+	check-template-location: false
 metrics:
     jmx.enabled: true
     spark:

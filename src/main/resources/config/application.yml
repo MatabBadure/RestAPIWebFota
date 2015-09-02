@@ -29,10 +29,3 @@ authentication:
         secret: myXAuthSecret
         # Token is valid 30 minutes
         tokenValidityInSeconds: 1800
-
-swagger:
-    title: HillRomVest API
-    description: HillRomVest applications and beyond!
-    contact:
-    license: Restricted license
-    licenseUrl:

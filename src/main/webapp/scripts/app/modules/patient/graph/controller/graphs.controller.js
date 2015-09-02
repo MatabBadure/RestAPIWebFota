@@ -356,7 +356,6 @@ angular.module('hillromvestApp')
 
     $scope.reCreateComplianceGraph = function() {
       $scope.removeGraph();
-
       $scope.handlelegends();
       $scope.createComplianceGraphData();
       $scope.drawComplianceGraph();
@@ -376,18 +375,37 @@ angular.module('hillromvestApp')
       if(count === 2 ) {
         if($scope.compliance.pressure === false ){
           $scope.pressureIsDisabled = true;
+          $scope.frequencyIsDisabled = false;
+          $scope.durationIsDisabled = false;
         }
         if($scope.compliance.frequency === false ){
+          $scope.pressureIsDisabled = false;
           $scope.frequencyIsDisabled = true;
+          $scope.durationIsDisabled = false;
         }
         if($scope.compliance.duration === false ){
+          $scope.pressureIsDisabled = false;
+          $scope.frequencyIsDisabled = false;
           $scope.durationIsDisabled = true;
         }
-      } else if(count < 2 ) {
-         $scope.pressureIsDisabled = false;
-         $scope.frequencyIsDisabled = false;
-         $scope.durationIsDisabled = false;
+      } else if(count === 1 ) {
+        if($scope.compliance.pressure === true ){
+          $scope.pressureIsDisabled = true;
+          $scope.frequencyIsDisabled = false;
+          $scope.durationIsDisabled = false;
+        }
+        if($scope.compliance.frequency === true ){
+          $scope.pressureIsDisabled = false;
+          $scope.frequencyIsDisabled = true;
+          $scope.durationIsDisabled = false;
+        }
+        if($scope.compliance.duration === true ){
+          $scope.pressureIsDisabled = false;
+          $scope.frequencyIsDisabled = false;
+          $scope.durationIsDisabled = true;
+        }
       }
+
     }
 
     $scope.getDayHMRGraphData = function() {
@@ -547,22 +565,39 @@ angular.module('hillromvestApp')
       if(value.key.indexOf("pressure") >= 0 && $scope.compliance.pressure === true){
         value.yAxis = ++count;
         value.color = 'rgb(255, 127, 14)';
-        $scope.yAxis2Max = $scope.yAxisRangeForCompliance.maxPressure;
+        if(count === 1){
+          $scope.yAxis1Max = $scope.yAxisRangeForCompliance.maxPressure;
+        } else if(count === 2){
+          $scope.yAxis2Max = $scope.yAxisRangeForCompliance.maxPressure;
+        }
         $scope.complianceGraphData.push(value);
       }
       if(value.key.indexOf("duration") >= 0 && $scope.compliance.duration === true){
         value.yAxis = ++count;
         value.color = 'rgb(31, 119, 180)';
+        if(count === 1){
+          $scope.yAxis1Max = $scope.yAxisRangeForCompliance.maxDuration;
+        } else if(count === 2){
+          $scope.yAxis2Max = $scope.yAxisRangeForCompliance.maxDuration;
+        }
         $scope.complianceGraphData.push(value);
       }
       if(value.key.indexOf("frequency") >= 0  && $scope.compliance.frequency === true){
         value.yAxis = ++count;
         value.color = 'rgb(55, 163, 180)';
-        $scope.yAxis2Max = $scope.yAxisRangeForCompliance.maxFrequency;
+        if(count === 1){
+          $scope.yAxis1Max = $scope.yAxisRangeForCompliance.maxFrequency;
+        } else if(count === 2){
+          $scope.yAxis2Max = $scope.yAxisRangeForCompliance.maxFrequency;
+        }
         $scope.complianceGraphData.push(value);
       }
     });
-    console.log(JSON.stringify($scope.complianceGraphData));
+    if( $scope.compliance.frequency === false && $scope.compliance.duration === false && $scope.compliance.pressure === false){
+      $scope.yAxis1Max = 0;
+      $scope.yAxis2Max = 0;
+    }
+    console.log('Data for compliance graph : ' + JSON.stringify($scope.complianceGraphData));
   };
 
   $scope.putComplianceGraphLabel = function(chart) {
@@ -625,7 +660,7 @@ angular.module('hillromvestApp')
       chart.yAxis2.tickFormat(d3.format('d'));
       chart.yDomain1([$scope.yAxis1Min,$scope.yAxis1Max]);
       chart.yDomain2([$scope.yAxis2Min,$scope.yAxis2Max]); 
-      var data =  $scope.complianceGraphData
+      var data =  $scope.complianceGraphData;
          angular.forEach(data, function(value) {
               if(value.yAxis === 1){
                 chart.yAxis1.axisLabel(value.key);
@@ -639,7 +674,10 @@ angular.module('hillromvestApp')
       .datum($scope.complianceGraphData)
       .transition().duration(500).call(chart);
 
-      var bgHeight = d3.select('#complianceGraph svg').selectAll('.x .tick line').attr("y2");;
+        if( $scope.compliance.frequency === false && $scope.compliance.duration === false && $scope.compliance.pressure === false){
+
+        } else {
+         var bgHeight = d3.select('#complianceGraph svg').selectAll('.x .tick line').attr("y2");;
          var bgWidth = d3.select('#complianceGraph svg ').selectAll('.y1 .tick line').attr("x2");
          d3.select('#complianceGraph svg .nv-axis g').append('rect')
                   .attr("height", Math.abs(bgHeight))
@@ -699,6 +737,7 @@ angular.module('hillromvestApp')
         append('text').
         text('MAX').
         style('fill','green');
+      }
       return chart;
     });
   };

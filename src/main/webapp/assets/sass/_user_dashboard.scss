@@ -303,18 +303,25 @@
 			opacity: 0;
 			&:checked + .check_label{
 				color: $gray-dark;
-				&.sky_blue{
+				&.pressure_legend{
 					&:after{
-						background-color: $iceberg;
+						background-color: rgb(255, 127, 14);
 						border: $btn-default-bg;
 					}
 				}
-				&.sunshade{
+				&.frequency_legend{
 					&:after{
-						background-color: $sunshade;
+						background-color: rgb(55, 163, 180);
 						border: $btn-default-bg;
 					}
 				}
+				&.duration_legend{
+					&:after{
+						background-color: rgb(31, 119, 180);
+						border: $btn-default-bg;
+					}
+				}
+
 			}
 		}
 		.check_label{

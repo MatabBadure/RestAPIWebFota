@@ -128,15 +128,15 @@
 						<form action="#">
 							<div class="custom_check_container">
 								<input id="pressure" class="check" type="checkbox" name="pressure" ng-disabled="pressureIsDisabled" ng-model="compliance.pressure" ng-change="reCreateComplianceGraph()">
-			  		 			<label class="check_label sky_blue" for="pressure">Pressure</label>
+			  		 			<label class="check_label pressure_legend" for="pressure">Pressure</label>
 							</div>
 				  		 	<div class="custom_check_container">
 				  		 		<input id="frequency" class="check" type="checkbox" name="frequency" ng-disabled="frequencyIsDisabled" ng-model="compliance.frequency" ng-change="reCreateComplianceGraph()">
-				  		 		<label class="check_label sky_blue" for="frequency" >Frequency</label>
+				  		 		<label class="check_label frequency_legend" for="frequency" >Frequency</label>
 				  		 	</div>
 				  		 	<div class="custom_check_container">
 				  		 		<input id="duration" class="check" type="checkbox" name="duration" ng-disabled="durationIsDisabled" ng-model="compliance.duration" ng-change="reCreateComplianceGraph()">
-				  		 		<label class="check_label sunshade" for="duration">Duration</label>
+				  		 		<label class="check_label duration_legend" for="duration">Duration</label>
 				  		 	</div>
 			  		 	</form>
 					</div>

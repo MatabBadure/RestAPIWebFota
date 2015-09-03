@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 
@@ -271,16 +272,11 @@ public class TherapySessionService {
 	public int getMissedTherapyCountByPatientUserId(Long id){
 		TherapySession latestTherapySession = therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(id);
 		if(Objects.nonNull(latestTherapySession)){
-			LocalDate today = LocalDate.now();
-			int days = 0;
-			LocalDate latestSessionDate = latestTherapySession.getDate();
+			DateTime today = DateTime.now();
+			DateTime latestSessionDate = new DateTime(latestTherapySession.getDate().toDateTime(org.joda.time.LocalTime.MIDNIGHT));
 			if(Objects.isNull(latestSessionDate))
 				return 0;
-			while(today.isAfter(latestSessionDate)){
-				latestSessionDate = latestSessionDate.plusDays(1);
-				++days;
-			}
-			return days;
+			return Days.daysBetween(latestSessionDate, today.toInstant()).getDays();
 		}
 		return 0;
 	}

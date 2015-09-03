@@ -8,6 +8,8 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.LocalDate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +45,7 @@ public class NoteService {
 		return null;
 	}
 	
+	
 	public Note findOneByPatientIdAndDate(String patientId,LocalDate date){
 		Optional<Note> note =  noteRepository.findOneByPatientIdAndCreatedOn(patientId,date);
 		if(note.isPresent())
@@ -67,6 +70,7 @@ public class NoteService {
 			noteRepository.save(existingNote);
 		}else{
 			existingNote.setNote(note);
+			existingNote.setDeleted(false);
 			noteRepository.save(existingNote);
 		}
 		return existingNote;
@@ -91,6 +95,7 @@ public class NoteService {
 			}
 		}else{
 			existingNote.setNote(note);
+			existingNote.setDeleted(false);
 			noteRepository.save(existingNote);
 		}
 		return existingNote;
@@ -108,4 +113,9 @@ public class NoteService {
 	public void deleteNote(Long id){
 		noteRepository.delete(id);
 	}
+	
+	public Page<Note> findByUserIdAndDateRange(Long userId,LocalDate from,LocalDate to,Pageable pageable){
+		Page<Note> notes = noteRepository.findByPatientUserIdAndCreatedOnBetweenOrderByCreatedOnDesc(userId,from,to,pageable);
+		return notes;
+	} 
 }

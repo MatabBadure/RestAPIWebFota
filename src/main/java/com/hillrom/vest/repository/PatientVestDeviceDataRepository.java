@@ -1,5 +1,7 @@
 package com.hillrom.vest.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +18,6 @@ public interface PatientVestDeviceDataRepository extends
 
 	@Query("Select pvdd from PatientVestDeviceData pvdd where patient.id = :patientId order by timestamp desc ")
 	public Page<PatientVestDeviceData> findLatest(@Param("patientId")String patientId,Pageable pageable);
+	
+	public List<PatientVestDeviceData> findByPatientUserIdAndTimestampBetween(Long id,Long from,Long to);
 }

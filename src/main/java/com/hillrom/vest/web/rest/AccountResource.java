@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,8 +24,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.codahale.metrics.annotation.Timed;
-import com.gemstone.gemfire.internal.tools.gfsh.app.commands.get;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
@@ -33,6 +32,7 @@ import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.MailService;
 import com.hillrom.vest.service.UserLoginTokenService;
 import com.hillrom.vest.service.UserService;
+import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 
 
@@ -63,7 +63,7 @@ public class AccountResource {
     @RequestMapping(value = "/register",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<?> registerAccount(@Valid @RequestBody UserDTO userDTO, HttpServletRequest request) {
         return userRepository.findOneByEmail(userDTO.getEmail())
                 .map(user -> new ResponseEntity<>("e-mail address already in use", HttpStatus.BAD_REQUEST))
@@ -88,7 +88,7 @@ public class AccountResource {
     @RequestMapping(value = "/activate",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<String> activateAccount(@RequestParam(value = "key") String key) {
         return Optional.ofNullable(userService.activateRegistration(key))
             .map(user -> new ResponseEntity<String>(HttpStatus.OK))
@@ -101,7 +101,7 @@ public class AccountResource {
     @RequestMapping(value = "/authenticate",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public String isAuthenticated(HttpServletRequest request) {
         log.debug("REST request to check if the current user is authenticated");
         return request.getRemoteUser();
@@ -113,7 +113,7 @@ public class AccountResource {
     @RequestMapping(value = "/account",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<UserDTO> getAccount() {
         return Optional.ofNullable(userService.getUserWithAuthorities())
             .map(user -> {
@@ -141,7 +141,7 @@ public class AccountResource {
     @RequestMapping(value = "/account",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<String> saveAccount(@RequestBody UserDTO userDTO) {
         return userRepository
             .findOneByEmail(userDTO.getEmail())
@@ -160,7 +160,7 @@ public class AccountResource {
     @RequestMapping(value = "/account/change_password",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> changePassword(@RequestBody Map<String, String> body) {
         JSONObject jsonObject = new JSONObject();
 		try {
@@ -179,7 +179,7 @@ public class AccountResource {
     @RequestMapping(value = "/account/reset_password/init",
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> requestPasswordReset(@RequestBody Map<String, String> body, HttpServletRequest request) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("message", "e-mail address not registered");
@@ -199,7 +199,7 @@ public class AccountResource {
     @RequestMapping(value = "/account/reset_password/finish",
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> finishPasswordReset(@RequestParam(value = "key") String key, @RequestBody(required=true) Map<String,String> body) {
         body.put("key", key);
         JSONObject jsonObject = new JSONObject();
@@ -227,7 +227,7 @@ public class AccountResource {
     @RequestMapping(value = "/account/update_emailpassword",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> updateEmailOrPassword(@RequestBody(required=true) Map<String,String> params,@RequestHeader(value="x-auth-token",required=true)String authToken) {
     	params.put("x-auth-token", authToken);
     	JSONObject errorsJsonObject = new JSONObject();
@@ -249,7 +249,7 @@ public class AccountResource {
     @RequestMapping(value = "/account/update_passwordsecurityquestion",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> updatePasswordSecurityQuestion(@RequestBody(required=true) Map<String,String> params) {
     	JSONObject errorsJsonObject = new JSONObject();
 		try {
@@ -261,6 +261,29 @@ public class AccountResource {
 			errorsJsonObject.put("ERROR", e.getMessage());
 			return ResponseEntity.badRequest().body(errorsJsonObject);
 		}
-    	
+    }
+    
+    /**
+     * PUT  /user/{id}/update_password -> update the current user's password
+     */
+    @RequestMapping(value = "/user/{id}/update_password",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    public ResponseEntity<JSONObject> updatePassword(@PathVariable Long id, @RequestBody Map<String, String> passwordList) {
+        JSONObject jsonObject = new JSONObject();
+		try {
+			String message = userService.updatePassword(id, passwordList);
+			if(StringUtils.isBlank(message)){
+				jsonObject.put("ERROR", ExceptionConstants.HR_596);
+	        	return ResponseEntity.badRequest().body(jsonObject);
+	        }
+			jsonObject.put("message", message);
+	        return ResponseEntity.ok().body(jsonObject);
+		} catch (HillromException e) {
+			jsonObject.put("ERROR",e.getMessage()); 
+			return ResponseEntity.badRequest().body(jsonObject);
+		}
+        
     }
 }

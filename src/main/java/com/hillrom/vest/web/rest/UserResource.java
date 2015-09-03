@@ -1,10 +1,10 @@
 package com.hillrom.vest.web.rest;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
-import java.security.acl.NotOwnerException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 
 import net.minidev.json.JSONObject;
 
@@ -31,20 +32,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.supercsv.cellprocessor.ift.CellProcessor;
+import org.supercsv.io.CsvBeanWriter;
+import org.supercsv.io.ICsvBeanWriter;
+import org.supercsv.prefs.CsvPreference;
 
-import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientProtocolData;
-
+import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.TherapySession;
-
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
+import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
+import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
@@ -54,13 +59,13 @@ import com.hillrom.vest.service.PatientProtocolService;
 import com.hillrom.vest.service.PatientVestDeviceService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.UserService;
+import com.hillrom.vest.service.util.CsvUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.ProtocolDTO;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
-
 /**
  * REST controller for managing users.
  */
@@ -97,11 +102,16 @@ public class UserResource {
 	@Inject
 	private NotificationRepository notificationRepository;
 
+	@Inject
+	private TherapySessionRepository therapySessionRepository;
+
+	@Inject
+	private PatientVestDeviceDataRepository deviceDataRepository;
 	/**
 	 * GET /users -> get all users.
 	 */
 	@RequestMapping(value = "/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
+	
 	public List<User> getAll() {
 		log.debug("REST request to get all Users");
 		return userRepository.findAll();
@@ -111,7 +121,7 @@ public class UserResource {
 	 * GET /users/:login -> get the "login" user.
 	 */
 	@RequestMapping(value = "/users/{email}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
+	
 	ResponseEntity<User> getUser(@PathVariable String email) {
 		log.debug("REST request to get User : {}", email);
 		return userRepository.findOneByEmail(email)
@@ -120,7 +130,7 @@ public class UserResource {
 	}
 
 	@RequestMapping(value = "/user/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
+	
 	public ResponseEntity<?> searchHcp(
 			@RequestParam(required = true, value = "searchString") String searchString,
 			@RequestParam(value = "page", required = false) Integer offset,
@@ -148,7 +158,7 @@ public class UserResource {
 	}
 
 	@RequestMapping(value = "/user/{id}/patient", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
+	
 	public ResponseEntity<PatientUserVO> getPatientUser(@PathVariable Long id) {
 		log.debug("REST request to get PatientUser : {}", id);
 		Optional<PatientUserVO> patientUser = userService.getPatientUser(id);
@@ -165,7 +175,7 @@ public class UserResource {
     @RequestMapping(value = "/patient/{id}/linkvestdevice",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> linkVestDeviceWithPatient(@PathVariable Long id, @RequestBody Map<String, Object> deviceData) {
     	log.debug("REST request to link vest device with patient user : {}", id);
@@ -193,7 +203,7 @@ public class UserResource {
     @RequestMapping(value = "/patient/{id}/vestdevice",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> getLinkedVestDeviceWithPatient(@PathVariable Long id) {
     	log.debug("REST request to link vest device with patient user : {}", id);
@@ -219,7 +229,7 @@ public class UserResource {
     @RequestMapping(value = "/patient/{id}/deactivatevestdevice/{serialNumber}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> deactivateVestDeviceFromPatient(@PathVariable Long id, @PathVariable String serialNumber) {
     	log.debug("REST request to deactivate vest device with serial number {} from patient user : {}", serialNumber, id);
@@ -239,20 +249,22 @@ public class UserResource {
 		}
     }
 	
-	@RequestMapping(value="/user/{id}/changeSecurityQuestion",method=RequestMethod.PUT)
-	public ResponseEntity<?> updateSecurityQuestion(@PathVariable Long id,@RequestBody(required=true)Map<String,String> params){
+	@RequestMapping(value="/user/{id}/changeSecurityQuestion",method=RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<JSONObject> updateSecurityQuestion(@PathVariable Long id,@RequestBody(required=true)Map<String,String> params){
 		log.debug("REST request to update Security Question and Answer {}",id,params);
 		JSONObject jsonObject = new JSONObject();
 		try {
 			jsonObject = userService.updateSecurityQuestion(id,params);
+			jsonObject.put("message", MessageConstants.HR_295);
 		} catch (HillromException e) {
 			jsonObject.put("ERROR",e.getMessage());
-			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.BAD_REQUEST);
 		}
 		if(jsonObject.containsKey("ERROR")){
-			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<>(HttpStatus.OK);
+		return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.OK);
 	}
 	
 	/**
@@ -261,7 +273,7 @@ public class UserResource {
     @RequestMapping(value = "/patient/{id}/protocol",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> addProtocolToPatient(@PathVariable Long id, @RequestBody ProtocolDTO protocolDTO) {
     	log.debug("REST request to add protocol with patient user : {}", id);
@@ -288,7 +300,7 @@ public class UserResource {
     @RequestMapping(value = "/patient/{id}/protocol",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> updateProtocolToPatient(@PathVariable Long id, @RequestBody List<PatientProtocolData> ppdList) {
     	log.debug("REST request to update protocol with patient user : {}", id);
@@ -315,7 +327,7 @@ public class UserResource {
     @RequestMapping(value = "/patient/{id}/protocol",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> getAllProtocolsAssociatedWithPatient(@PathVariable Long id) {
     	log.debug("REST request to get protocol for patient user : {}", id);
@@ -341,7 +353,7 @@ public class UserResource {
     @RequestMapping(value = "/patient/{id}/protocol/{protocolId}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> getProtocolDetails(@PathVariable Long id, @PathVariable String protocolId) {
     	log.debug("REST request to get protocol details with {} for patient user : {}", protocolId, id);
@@ -368,7 +380,7 @@ public class UserResource {
     @RequestMapping(value = "/patient/{id}/protocol/{protocolId}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> deleteProtocolForPatient(@PathVariable Long id, @PathVariable String protocolId) {
     	log.debug("REST request to delete protocol for patient user : {}", id);
@@ -489,7 +501,7 @@ public class UserResource {
     @RequestMapping(value = "/users/{id}/notificationsetting",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> updateHRMNotification(@PathVariable Long id, @RequestBody Map<String, Boolean> paramsMap) {
     	JSONObject json = new JSONObject();
@@ -510,4 +522,102 @@ public class UserResource {
     	json.put("count",therapySessionService.getMissedTherapyCountByPatientUserId(id));
     	return new ResponseEntity<JSONObject>(json, HttpStatus.OK);
     }
+    
+    @RequestMapping(value = "/users/{id}/exportTherapyData",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<TherapySession>> exportTherapyData(@PathVariable Long id,
+    		@RequestParam(value="from",required=true)Long fromTimeStamp,
+    		@RequestParam(value="to",required=false)Long toTimeStamp){
+    	LocalDate to = Objects.nonNull(toTimeStamp) ? LocalDate.fromDateFields(new Date(toTimeStamp)) : LocalDate.now();
+    	List<TherapySession> therapySessions = therapySessionRepository.findByPatientUserIdAndDateRange(id, LocalDate.fromDateFields(new Date(fromTimeStamp)), to);
+    	return new ResponseEntity<>(therapySessions,HttpStatus.OK);
+    }
+    
+    @RequestMapping(value = "/users/{id}/exportTherapyDataCSV",
+            method = RequestMethod.GET,
+            produces = "text/csv")
+    public void exportTherapyDataCSV(@PathVariable Long id,
+    		@RequestParam(value="from",required=true)Long fromTimeStamp,
+    		@RequestParam(value="to",required=false)Long toTimeStamp,
+    		HttpServletResponse response) throws UnsupportedEncodingException, IOException{
+    	LocalDate to = Objects.nonNull(toTimeStamp) ? LocalDate.fromDateFields(new Date(toTimeStamp)) : LocalDate.now();
+    	List<TherapySession> therapySessions = therapySessionRepository.findByPatientUserIdAndDateRange(id, LocalDate.fromDateFields(new Date(fromTimeStamp)), to);
+    	ICsvBeanWriter beanWriter = null;
+    	CellProcessor[] processors = CsvUtil.getCellProcessorForTherapySessionData();
+    	try {
+            beanWriter = new CsvBeanWriter(response.getWriter(),
+                    CsvPreference.STANDARD_PREFERENCE);
+			String[] header = CsvUtil.getHeaderValuesForTherapySessionCSV();
+			String[] headerMapping = CsvUtil.getHeaderMappingForTherapySessionData();
+            if(therapySessions.size() > 0 ){
+            	beanWriter.writeHeader(header);
+                for (TherapySession session : therapySessions) {
+                    beanWriter.write(session, headerMapping,processors);
+                }
+            }else{
+            	response.setStatus(204);
+            }
+        } catch (Exception ex) {
+        	response.setStatus(500);
+        } finally {
+            if (beanWriter != null) {
+                try {
+                    beanWriter.close();
+                } catch (IOException ex) {
+                	response.setStatus(500);
+                }
+            }
+        }
+    }
+
+    @RequestMapping(value = "/users/{id}/exportVestDeviceData",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> exportVestDeviceData(
+			@PathVariable Long id,
+			@RequestParam(value="from",required=true)Long from,
+			@RequestParam(value="to",required=false)Long to) {
+		to = Objects.nonNull(to)?to:new Date().getTime();
+		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, from, to);
+		return new ResponseEntity<>(vestDeviceData,HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/users/{id}/exportVestDeviceDataCSV",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+	public void exportVestDeviceDataCSV(
+			@PathVariable Long id,
+			@RequestParam(value="from",required=true)Long from,
+			@RequestParam(value="to",required=false)Long to,
+			HttpServletResponse response) {
+		to = Objects.nonNull(to)?to:new Date().getTime();
+		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, from, to);
+		ICsvBeanWriter beanWriter = null;
+    	CellProcessor[] processors = CsvUtil.getCellProcessorForVestDeviceData();
+    	try {
+            beanWriter = new CsvBeanWriter(response.getWriter(),
+                    CsvPreference.STANDARD_PREFERENCE);
+			String[] header = CsvUtil.getHeaderValuesForVestDeviceDataCSV();
+			String[] headerMapping = CsvUtil.getHeaderMappingForVestDeviceData();
+            if(vestDeviceData.size() > 0 ){
+            	beanWriter.writeHeader(header);
+                for (PatientVestDeviceData deviceData : vestDeviceData) {
+                    beanWriter.write(deviceData, headerMapping,processors);
+                }
+            }else{
+            	response.setStatus(204);
+            }
+        } catch (Exception ex) {
+        	response.setStatus(500);
+        } finally {
+            if (beanWriter != null) {
+                try {
+                    beanWriter.close();
+                } catch (IOException ex) {
+                	response.setStatus(500);
+                }
+            }
+        }
+	}
 }

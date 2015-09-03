@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
@@ -44,7 +43,7 @@ public class PatientInfoResource {
     @RequestMapping(value = "/patientInfos",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<Void> create(@RequestBody PatientInfo patientInfo) throws URISyntaxException {
         log.debug("REST request to save PatientInfo : {}", patientInfo);
         if (patientInfo.getId() != null) {
@@ -60,7 +59,7 @@ public class PatientInfoResource {
     @RequestMapping(value = "/patientInfos",
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<Void> update(@RequestBody PatientInfo patientInfo) throws URISyntaxException {
         log.debug("REST request to update PatientInfo : {}", patientInfo);
         if (patientInfo.getId() == null) {
@@ -76,7 +75,7 @@ public class PatientInfoResource {
     @RequestMapping(value = "/patientInfos",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<List<PatientInfo>> getAll(@RequestParam(value = "page" , required = false) Integer offset,
                                   @RequestParam(value = "per_page", required = false) Integer limit)
         throws URISyntaxException {
@@ -91,7 +90,7 @@ public class PatientInfoResource {
     @RequestMapping(value = "/patientInfos/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<PatientInfo> get(@PathVariable String id) {
         log.debug("REST request to get PatientInfo : {}", id);
         return Optional.ofNullable(patientInfoRepository.findOne(id))
@@ -107,7 +106,7 @@ public class PatientInfoResource {
     @RequestMapping(value = "/patientInfos/{id}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public void delete(@PathVariable String id) {
         log.debug("REST request to delete PatientInfo : {}", id);
         patientInfoRepository.delete(id);

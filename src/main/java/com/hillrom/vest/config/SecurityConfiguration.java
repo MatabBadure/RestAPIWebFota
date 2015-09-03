@@ -68,7 +68,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/bower_components/**")
             .antMatchers("/i18n/**")
             .antMatchers("/assets/**")
-            .antMatchers("/swagger-ui/**")
             .antMatchers("/test/**");
     }
 
@@ -99,6 +98,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/receiveData").permitAll()
             .antMatchers("/api/patient/{id}/vestdevicedata").permitAll()
             .antMatchers("/api/vestdevicedata").permitAll()
+            .antMatchers("/api/users/{id}/exportVestDeviceData").authenticated()
+            .antMatchers("/api/users/{id}/exportVestDeviceDataCSV").authenticated()
+            .antMatchers("/api/users/{id}/exportTherapyData").authenticated()
+            .antMatchers("/api/users/{id}/exportTherapyDataCSV").authenticated()
             .antMatchers("/api/users/{id}/therapyData").authenticated()
             .antMatchers("/api/logs/**").hasAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/api/**").authenticated()

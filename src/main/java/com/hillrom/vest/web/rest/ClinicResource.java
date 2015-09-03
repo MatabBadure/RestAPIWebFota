@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.exceptionhandler.HillromException;
@@ -65,7 +64,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> create(@RequestBody ClinicDTO clinicDTO) {
         log.debug("REST request to save Clinic : {}", clinicDTO);
@@ -92,7 +91,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics/{id}",
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> update(@PathVariable String id, @RequestBody ClinicDTO clinicDTO) {
         log.debug("REST request to update Clinic : {}", clinicDTO);
@@ -122,7 +121,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<List<Clinic>> getAll(@RequestParam(value = "page" , required = false) Integer offset,
                                   @RequestParam(value = "per_page", required = false) Integer limit,
                                   @RequestParam(value = "filter",required = false) String filter)
@@ -147,7 +146,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> get(@PathVariable String id) {
         log.debug("REST request to get Clinic : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -175,7 +174,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics/{id}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> delete(@PathVariable String id) {
     	log.debug("REST request to delete Clinic : {}", id);
@@ -202,7 +201,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics/search",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<List<Clinic>> search(@RequestParam(value = "searchString")String searchString,
     		@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
@@ -225,7 +224,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics/hcp",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> getHCPUsers(@RequestParam(value = "filter",required = false) String filter) {
         log.debug("REST request to get HCPs associated with Clinic : {}", filter);
         List<String> idList = new ArrayList<>();
@@ -255,7 +254,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics/patients",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> getAssociatedPatientUsers(@RequestParam(value = "filter",required = false) String filter) {
         log.debug("REST request to get Clinic : {}", filter);
         List<String> idList = new ArrayList<>();

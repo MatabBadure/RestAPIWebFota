@@ -46,6 +46,9 @@ public class ExceptionConstants {
     // Clinic Admin User
     public static final String HR_537 = "Unable to create Clinic Admin User";
     public static final String HR_538 = "Invalid Clinic Admin id";
+    public static final String HR_539 = "Clinic already associated with Clinic Admin.";
+    public static final String HR_540 = "Unable to associate Clinic Admin.";
+    public static final String HR_550 = "Unable to dissociate Clinic Admin.";
     
     //Clinic
     public static final String HR_541 = "Unable to create Clinic";

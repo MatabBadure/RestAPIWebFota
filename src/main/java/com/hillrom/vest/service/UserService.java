@@ -997,6 +997,8 @@ public class UserService {
 			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, caregiverUser), AuthoritiesConstants.CARE_GIVER, userExtensionDTO.getRelationship());
 			userPatientRepository.saveAndFlush(userPatientAssoc);
 			caregiverUser.getUserPatientAssoc().add(userPatientAssoc);
+			caregiverUser.setDeleted(false);
+			userRepository.saveAndFlush(caregiverUser);
 			patientInfo.getUserPatientAssoc().add(userPatientAssoc);
 			log.debug("Created Information for Caregiver User: {}", caregiverUser);
 			return userPatientAssoc;

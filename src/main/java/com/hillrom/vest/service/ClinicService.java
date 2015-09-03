@@ -210,12 +210,16 @@ public class ClinicService {
         if(Objects.isNull(clinic)) {
 	      	throw new HillromException(ExceptionConstants.HR_548);
         } else {
+        	if(Objects.nonNull(clinic.getClinicAdminId())){
         	User clinicAdminUser = userRepository.findOne(clinic.getClinicAdminId());
-			if(Objects.nonNull(clinicAdminUser)) {
-				return clinicAdminUser;
-			} else {
-				throw new HillromException(ExceptionConstants.HR_576);
-			}
+				if(Objects.nonNull(clinicAdminUser)) {
+					return clinicAdminUser;
+				} else {
+					throw new HillromException(ExceptionConstants.HR_576);
+				}
+        	} else {
+        		return null;
+        	}
         }
     }
 	
@@ -233,5 +237,35 @@ public class ClinicService {
 			});
 			return clinicAdminList;
 		}
+    }
+	
+	public User associateClinicAdmin(String clinicId, Map<String,String> clinicAdminId) throws HillromException {
+		Clinic clinic = clinicRepository.findOne(clinicId);
+        if(Objects.isNull(clinic)) {
+	      	throw new HillromException(ExceptionConstants.HR_548);
+        } else {
+        	if(Objects.isNull(clinic.getClinicAdminId())){
+        		clinic.setClinicAdminId(Long.parseLong(clinicAdminId.get("id")));
+        		clinicRepository.saveAndFlush(clinic);
+        		return userRepository.findOne(clinic.getClinicAdminId());
+        	} else {
+        		throw new HillromException(ExceptionConstants.HR_539);
+        	}
+        }
+    }
+	
+	public String dissociateClinicAdmin(String clinicId, Map<String,String> clinicAdminId) throws HillromException {
+		Clinic clinic = clinicRepository.findOne(clinicId);
+        if(Objects.isNull(clinic)) {
+	      	throw new HillromException(ExceptionConstants.HR_548);
+        } else {
+        	if(Objects.nonNull(clinic.getClinicAdminId()) && clinic.getClinicAdminId().equals(Long.parseLong(clinicAdminId.get("id")))){
+        		clinic.setClinicAdminId(null);
+            	clinicRepository.saveAndFlush(clinic);
+        		return MessageConstants.HR_289;
+        	} else {
+        		throw new HillromException(ExceptionConstants.HR_538);
+        	}
+        }
     }
 }

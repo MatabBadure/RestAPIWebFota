@@ -331,4 +331,55 @@ public class ClinicResource {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
+    
+    /**
+     * PUT  /clinics/:id/associateclinicadmin -> associate clinic admin to the clinic.
+     */
+    @RequestMapping(value = "/clinics/{id}/associateclinicadmin",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> associateClinicAdmin(@PathVariable String id, @RequestBody Map<String, String> clinicAdminId) {
+        log.debug("REST request to associate clinic admin with clinic : {}", id);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	User clinicAdminUser = clinicService.associateClinicAdmin(id, clinicAdminId);
+	        if(Objects.isNull(clinicAdminUser)){
+				jsonObject.put("ERROR", ExceptionConstants.HR_540);
+				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+			} else {
+		      	jsonObject.put("message", MessageConstants.HR_288);
+		      	jsonObject.put("clinicAdmin", clinicAdminUser);
+		      	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+        } catch(HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    /**
+     * PUT  /clinics/:id/dissociateclinicadmin -> dissociate clinic admin to the clinic.
+     */
+    @RequestMapping(value = "/clinics/{id}/dissociateclinicadmin",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> dissociateClinicAdmin(@PathVariable String id, @RequestBody Map<String, String> clinicAdminId) {
+        log.debug("REST request to dissociate clinic admin with clinic : {}", id);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	String message = clinicService.dissociateClinicAdmin(id, clinicAdminId);
+	        if(StringUtils.isBlank(message)){
+				jsonObject.put("ERROR", ExceptionConstants.HR_550);
+				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+			} else {
+		      	jsonObject.put("message", message);
+		      	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+        } catch(HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

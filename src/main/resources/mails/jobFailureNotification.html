@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title th:text="#{email.activation.title}">Hillrom activation</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    </head>
+    <body>
+        <p th:text="#{email.notification.greeting('Team')}">
+            Dear
+        </p>
+        <br/>
+        <p th:text="#{email.jobfailure.message(${jobName})}"></p>
+        <br/>
+        <p th:text="#{email.jobfailure.stackTrace(${stackTrace})}"></p>
+        <br/><br/>
+        <p th:text="#{email.jobfailure.investigate}"></p>
+        <br/>
+        <p>
+            <span th:text="#{email.activation.text2}">Regards, </span>
+            <br/>
+            <em th:text="#{email.signature}">JHipster.</em>
+        </p>
+    </body>
+</html>

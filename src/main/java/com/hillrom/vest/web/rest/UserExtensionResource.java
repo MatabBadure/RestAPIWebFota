@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.User;
@@ -86,7 +85,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/user",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> create(@RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
         log.debug("REST request to save User : {}", userExtensionDTO);
@@ -113,7 +112,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/user/{id}",
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> update(@PathVariable Long id, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
         log.debug("REST request to update User : {}", userExtensionDTO);
@@ -141,7 +140,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/user",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<List<UserExtension>> getAll(@RequestParam(value = "page" , required = false) Integer offset,
                                   @RequestParam(value = "per_page", required = false) Integer limit)
         throws URISyntaxException {
@@ -156,7 +155,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/user/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> get(@PathVariable Long id) {
         log.debug("REST request to get UserExtension : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -182,7 +181,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/user/{id}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> delete(@PathVariable Long id) {
         log.debug("REST request to delete UserExtension : {}", id);
@@ -207,7 +206,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/user/{id}/dissociateclinic",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> dissociateClinicFromHCP(@PathVariable Long id, @RequestBody List<Map<String, String>> clinicList) {
         log.debug("REST request to dissociate clinic from HCP : {}", id);
@@ -228,7 +227,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/user/search",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<List<HillRomUserVO>> search(@RequestParam(required=true,value = "searchString")String searchString,
     		@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
@@ -252,7 +251,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/user/hcp/search",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<?> searchHcp(@RequestParam(required=true,value = "searchString")String searchString,
     		@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
@@ -276,7 +275,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/user/{id}/hcp",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> getHCPUser(@PathVariable Long id) {
         log.debug("REST request to get UserExtension : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -302,7 +301,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/patient/{id}/associatehcp",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> associateHCPToPatient(@PathVariable Long id, @RequestBody List<Map<String, String>> hcpList) {
         log.debug("REST request to associate HCP users with Patient : {}", id);
@@ -329,7 +328,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/patient/{id}/hcp",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> getAssociatedHCPUserForPatient(@PathVariable Long id) {
         log.debug("REST request to get associated HCP users with Patient : {}", id);
@@ -355,7 +354,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/patient/{id}/clinics",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> getAssociatedClinicsForPatient(@PathVariable Long id) {
         log.debug("REST request to get associated clinics with Patient : {}", id);
@@ -382,7 +381,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/patient/{id}/associateclinics",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> associateClinicsToPatient(@PathVariable Long id, @RequestBody List<Map<String, String>> clinicList) {
         log.debug("REST request to associate clinic with Patient : {}", id);
@@ -409,7 +408,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/patient/{id}/dissociateclinics",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> dissociateClinicsToPatient(@PathVariable Long id, @RequestBody List<Map<String, String>> clinicList) {
         log.debug("REST request to dissociate clinic with Patient : {}", id);
@@ -434,7 +433,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/patient/{id}/caregiver",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> createCaregiver(@PathVariable Long id, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
         log.debug("REST request to save User : {}", userExtensionDTO);
@@ -462,7 +461,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/patient/{patientUserId}/caregiver/{id}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> deleteCaregiver(@PathVariable Long patientUserId, @PathVariable Long id) {
         log.debug("REST request to delete caregiver : {}", id);
@@ -490,7 +489,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/patient/{id}/caregiver",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> getCaregiversForPatient(@PathVariable Long id) {
         log.debug("REST request to delete caregiver : {}", id);
@@ -516,7 +515,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/patient/{patientUserId}/caregiver/{caregiverUserId}",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> updateCaregiver(@PathVariable Long patientUserId, @PathVariable Long caregiverUserId, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
         log.debug("REST request to update caregiver User : {}", userExtensionDTO);
@@ -544,7 +543,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/patient/{patientUserId}/caregiver/{caregiverUserId}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> getCaregiver(@PathVariable Long patientUserId, @PathVariable Long caregiverUserId) {
         log.debug("REST request to get caregiver User : {}", caregiverUserId);
@@ -571,7 +570,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/patient/relationships",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> getRelationshipLabels() {
         log.debug("REST request to get list of relationships of caregivers with a patient User");
@@ -593,7 +592,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/hcp/{id}/patients",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> getAssociatedPatientUsersForHCP(@PathVariable Long id, @RequestParam(value = "filterByClinic",required = false) String filterByClinic) {
         log.debug("REST request to get associated patient users with HCP : {}", id);
@@ -621,7 +620,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/hcp/{id}/clinics",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> getAssociatedClinicsForHCP(@PathVariable Long id) {
         log.debug("REST request to get associated clinics with HCP : {}", id);
@@ -647,7 +646,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/clinics/{id}/associatehcp",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> associateHCPToClinic(@PathVariable String id, @RequestBody List<Map<String, String>> hcpList) {
         log.debug("REST request to associate HCP users with clinic : {}", id);
@@ -674,7 +673,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/user/all",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> getAllUsersByRole(@RequestParam(value = "role",required = false) String role) {
         log.debug("REST request to get all users with role : {}", role);
@@ -701,7 +700,7 @@ public class UserExtensionResource {
     @RequestMapping(value = "/patient/{id}/dissociatehcp",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> dissociateHCPToPatient(@PathVariable Long id, @RequestBody List<Map<String, String>> hcpList) {
         log.debug("REST request to dissociate hcp from Patient : {}", id);

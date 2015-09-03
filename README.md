@@ -10,21 +10,15 @@ Tech-Stack
 
     - JDK 1.8 
     - SpringBoot 
-    - Angular.js 1.3 
     - Oracle 
     - Spring Security (token based security). 
-    - Grunt
 
 Tools Used
 ----------
-    - Apache tomcat 7
+    - Apache tomcat 8
     - Eclipse / Spring tool suite
     - Maven 3
-    - Bower
-    - Node .10 or higher
-    - Grunt
     - SQL Developer
-    - yeoman generator
 
 Setup
 -----
@@ -33,11 +27,6 @@ Setup
  2. Install Java from the Oracle website.
  3. Install Maven (recommended). 
  4. Install Git from git-scm.com. 
- 5. Install Node.js from the Node.js website. This will also install npm, which is the node package manager we are using in the next commands.
- 6. Install Yeoman: npm install -g yo
- 7. Install Bower: npm install -g bower
- 8. Install Grunt with npm install -g grunt-cli 
- 9. Install JHipster: npm install -g generator-jhipster
 
 Configuring Eclipse
 -------------------

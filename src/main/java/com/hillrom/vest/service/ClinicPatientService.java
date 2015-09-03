@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -137,8 +138,10 @@ public class ClinicPatientService {
 				clinicPatientAssocList.add(clinicPatientAssoc);
 				if (clinic.getClinicAdminId() != null) {
 					User clinicAdminUser = userRepository.findOne(clinic.getClinicAdminId());
-					UserPatientAssoc clinicAdminPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, clinicAdminUser), AuthoritiesConstants.CLINIC_ADMIN, RelationshipLabelConstants.CLINIC_ADMIN);
-					userPatientAssocList.add(clinicAdminPatientAssoc);
+					if(Objects.nonNull(clinicAdminUser)) {
+						UserPatientAssoc clinicAdminPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, clinicAdminUser), AuthoritiesConstants.CLINIC_ADMIN, RelationshipLabelConstants.CLINIC_ADMIN);
+						userPatientAssocList.add(clinicAdminPatientAssoc);
+					}
 				}
 			}
 		}

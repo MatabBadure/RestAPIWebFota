@@ -9,8 +9,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import net.minidev.json.JSONObject;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.Clinic;
+import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
+import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -41,6 +41,9 @@ public class ClinicService {
     
     @Inject
     private UserService userService;
+    
+    @Inject
+    private UserRepository userRepository;
 
     public Clinic createClinic(ClinicDTO clinicDTO) throws HillromException {
     	Clinic newClinic = new Clinic();
@@ -199,6 +202,70 @@ public class ClinicService {
 	      	throw new HillromException(ExceptionConstants.HR_548);
         } else {
         	return clinic.getChildClinics();
+        }
+    }
+	
+	public User getClinicAdmin(String clinicId) throws HillromException {
+		Clinic clinic = clinicRepository.findOne(clinicId);
+        if(Objects.isNull(clinic)) {
+	      	throw new HillromException(ExceptionConstants.HR_548);
+        } else {
+        	if(Objects.nonNull(clinic.getClinicAdminId())){
+        	User clinicAdminUser = userRepository.findOne(clinic.getClinicAdminId());
+				if(Objects.nonNull(clinicAdminUser)) {
+					return clinicAdminUser;
+				} else {
+					throw new HillromException(ExceptionConstants.HR_576);
+				}
+        	} else {
+        		return null;
+        	}
+        }
+    }
+	
+	public Set<User> getAllClinicAdmins() throws HillromException {
+		List<Clinic> clinicList = clinicRepository.findAllWithClinicAdmins();
+		if(clinicList.isEmpty()) {
+			throw new HillromException(ExceptionConstants.HR_548);
+		} else {
+			Set<User> clinicAdminList = new HashSet<>();
+			clinicList.forEach(clinic -> {
+				if(Objects.nonNull(clinic.getClinicAdminId())) {
+					User clinicAdminUser = userRepository.findOne(clinic.getClinicAdminId());
+					clinicAdminList.add(clinicAdminUser);
+				}
+			});
+			return clinicAdminList;
+		}
+    }
+	
+	public User associateClinicAdmin(String clinicId, Map<String,String> clinicAdminId) throws HillromException {
+		Clinic clinic = clinicRepository.findOne(clinicId);
+        if(Objects.isNull(clinic)) {
+	      	throw new HillromException(ExceptionConstants.HR_548);
+        } else {
+        	if(Objects.isNull(clinic.getClinicAdminId())){
+        		clinic.setClinicAdminId(Long.parseLong(clinicAdminId.get("id")));
+        		clinicRepository.saveAndFlush(clinic);
+        		return userRepository.findOne(clinic.getClinicAdminId());
+        	} else {
+        		throw new HillromException(ExceptionConstants.HR_539);
+        	}
+        }
+    }
+	
+	public String dissociateClinicAdmin(String clinicId, Map<String,String> clinicAdminId) throws HillromException {
+		Clinic clinic = clinicRepository.findOne(clinicId);
+        if(Objects.isNull(clinic)) {
+	      	throw new HillromException(ExceptionConstants.HR_548);
+        } else {
+        	if(Objects.nonNull(clinic.getClinicAdminId()) && clinic.getClinicAdminId().equals(Long.parseLong(clinicAdminId.get("id")))){
+        		clinic.setClinicAdminId(null);
+            	clinicRepository.saveAndFlush(clinic);
+        		return MessageConstants.HR_289;
+        	} else {
+        		throw new HillromException(ExceptionConstants.HR_538);
+        	}
         }
     }
 }

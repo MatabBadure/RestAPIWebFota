@@ -368,8 +368,8 @@ public class UserService {
                 mailService.sendActivationEmail(user, baseUrl);
                 return user;
         	} else {
-        		throw new HillromException(ExceptionConstants.HR_574);
-        	}
+        		throw new HillromException(ExceptionConstants.HR_537);
+    		}
         } else {
         	throw new HillromException(ExceptionConstants.HR_502);
     	}
@@ -475,10 +475,8 @@ public class UserService {
 			for(Map<String, String> clinicObj : userExtensionDTO.getClinicList()){
 				Clinic clinic = clinicRepository.getOne(clinicObj.get("id"));
 				clinic.setClinicAdminId(newUser.getId());
-				System.out.println("Clinic : "+clinic);
 				clinicList.add(clinic);
 			}
-			System.out.println("List : "+clinicList);
 			clinicRepository.save(clinicList);
 			log.debug("Created Information for User: {}", newUser);
 			return newUser;
@@ -486,7 +484,7 @@ public class UserService {
 			throw new HillromException(ExceptionConstants.HR_574);
 		}
 	}
-
+    
     public UserExtension updateUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException{
         if(userExtensionDTO.getEmail() != null) {
 			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
@@ -1016,6 +1014,8 @@ public class UserService {
 			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, caregiverUser), AuthoritiesConstants.CARE_GIVER, userExtensionDTO.getRelationship());
 			userPatientRepository.saveAndFlush(userPatientAssoc);
 			caregiverUser.getUserPatientAssoc().add(userPatientAssoc);
+			caregiverUser.setDeleted(false);
+			userRepository.saveAndFlush(caregiverUser);
 			patientInfo.getUserPatientAssoc().add(userPatientAssoc);
 			log.debug("Created Information for Caregiver User: {}", caregiverUser);
 			return userPatientAssoc;

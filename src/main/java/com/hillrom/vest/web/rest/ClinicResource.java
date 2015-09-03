@@ -13,8 +13,6 @@ import java.util.regex.Pattern;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 
-import net.minidev.json.JSONObject;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +28,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.Clinic;
+import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
@@ -43,6 +41,8 @@ import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 import com.mysema.query.types.expr.BooleanExpression;
+
+import net.minidev.json.JSONObject;
 
 /**
  * REST controller for managing Clinic.
@@ -65,7 +65,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> create(@RequestBody ClinicDTO clinicDTO) {
         log.debug("REST request to save Clinic : {}", clinicDTO);
@@ -92,7 +92,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics/{id}",
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> update(@PathVariable String id, @RequestBody ClinicDTO clinicDTO) {
         log.debug("REST request to update Clinic : {}", clinicDTO);
@@ -122,7 +122,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<List<Clinic>> getAll(@RequestParam(value = "page" , required = false) Integer offset,
                                   @RequestParam(value = "per_page", required = false) Integer limit,
                                   @RequestParam(value = "filter",required = false) String filter)
@@ -147,7 +147,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> get(@PathVariable String id) {
         log.debug("REST request to get Clinic : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -175,7 +175,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics/{id}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> delete(@PathVariable String id) {
     	log.debug("REST request to delete Clinic : {}", id);
@@ -202,7 +202,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics/search",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<List<Clinic>> search(@RequestParam(value = "searchString")String searchString,
     		@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
@@ -225,7 +225,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics/hcp",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> getHCPUsers(@RequestParam(value = "filter",required = false) String filter) {
         log.debug("REST request to get HCPs associated with Clinic : {}", filter);
         List<String> idList = new ArrayList<>();
@@ -255,7 +255,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics/patients",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> getAssociatedPatientUsers(@RequestParam(value = "filter",required = false) String filter) {
         log.debug("REST request to get Clinic : {}", filter);
         List<String> idList = new ArrayList<>();
@@ -280,4 +280,106 @@ public class ClinicResource {
         }
     }
     
+    /**
+     * GET  /clinics/:id/clinicadmin -> get the clinic admin for the clinic.
+     */
+    @RequestMapping(value = "/clinics/{id}/clinicadmin",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> getClinicAdmin(@PathVariable String id) {
+        log.debug("REST request to get Clinic admin: {}", id);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	User clinicAdminUser = clinicService.getClinicAdmin(id);
+	        if(Objects.isNull(clinicAdminUser)){
+				jsonObject.put("message", MessageConstants.HR_286);
+				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+			} else {
+		      	jsonObject.put("message", MessageConstants.HR_287);
+		      	jsonObject.put("clinicAdmin", clinicAdminUser);
+		      	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+        } catch(HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    /**
+     * GET  /clinics/clinicadmins -> get all the clinic admin for the clinic.
+     */
+    @RequestMapping(value = "/clinics/clinicadmins",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> getAllClinicAdmins() {
+        log.debug("REST request to get all clinic admins: {}");
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	Set<User> clinicAdminList = clinicService.getAllClinicAdmins();
+	        if(clinicAdminList.isEmpty()){
+				jsonObject.put("message", MessageConstants.HR_286);
+				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+			} else {
+		      	jsonObject.put("message", MessageConstants.HR_287);
+		      	jsonObject.put("clinicAdminList", clinicAdminList);
+		      	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+        } catch(HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    /**
+     * PUT  /clinics/:id/associateclinicadmin -> associate clinic admin to the clinic.
+     */
+    @RequestMapping(value = "/clinics/{id}/associateclinicadmin",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> associateClinicAdmin(@PathVariable String id, @RequestBody Map<String, String> clinicAdminId) {
+        log.debug("REST request to associate clinic admin with clinic : {}", id);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	User clinicAdminUser = clinicService.associateClinicAdmin(id, clinicAdminId);
+	        if(Objects.isNull(clinicAdminUser)){
+				jsonObject.put("ERROR", ExceptionConstants.HR_540);
+				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+			} else {
+		      	jsonObject.put("message", MessageConstants.HR_288);
+		      	jsonObject.put("clinicAdmin", clinicAdminUser);
+		      	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+        } catch(HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    /**
+     * PUT  /clinics/:id/dissociateclinicadmin -> dissociate clinic admin to the clinic.
+     */
+    @RequestMapping(value = "/clinics/{id}/dissociateclinicadmin",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> dissociateClinicAdmin(@PathVariable String id, @RequestBody Map<String, String> clinicAdminId) {
+        log.debug("REST request to dissociate clinic admin with clinic : {}", id);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	String message = clinicService.dissociateClinicAdmin(id, clinicAdminId);
+	        if(StringUtils.isBlank(message)){
+				jsonObject.put("ERROR", ExceptionConstants.HR_550);
+				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+			} else {
+		      	jsonObject.put("message", message);
+		      	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+        } catch(HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

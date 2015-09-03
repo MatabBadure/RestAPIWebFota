@@ -10,7 +10,7 @@ angular.module('hillromvestApp')
     return val;
   };
 })
-.controller('patientsController', function($scope, $filter, $state, $stateParams, patientService, dateService, notyService, UserService, clinicService,$rootScope,$timeout) {
+.controller('patientsController', function($scope, $filter, $state, $stateParams, patientService, dateService, notyService, UserService, DoctorService, clinicService,$rootScope,$timeout) {
     $scope.patient = {};
     $scope.patientTab = "";
     $scope.newProtocolPoint = 1;
@@ -224,13 +224,29 @@ angular.module('hillromvestApp')
       }).catch(function(response) {});
     };
 
-    $scope.disassociateLinkedClinics = function(id, index){
+    $scope.disassociateLinkedClinics = function(id){
+      $scope.showModalClinic = false;
       var data = [{"id": id}];
       patientService.disassociateClinicsFromPatient($stateParams.patientId, data).then(function(response) {
         $scope.associatedClinics = response.data.clinics;
         notyService.showMessage(response.data.message, 'success');
       }).catch(function(response) {
         notyService.showMessage(response.data.message, 'warning');
+      });
+    };
+
+    $scope.disassociateLinkedHCPs = function(id){
+      $scope.showModalHCP = false;
+      var data = [{"id": id}];
+      patientService.disassociateHCPFromPatient($stateParams.patientId, data).then(function(response) {
+        $scope.getAssociatedHCPs($stateParams.patientId);
+        notyService.showMessage(response.data.message, 'success');
+      }).catch(function(response) {
+        if(response.data.message){
+          notyService.showMessage(response.data.message, 'warning');
+        } else if(response.data.ERROR){
+          notyService.showMessage(response.data.ERROR, 'warning');
+        }
       });
     };
 
@@ -302,7 +318,36 @@ angular.module('hillromvestApp')
       $scope.getPatientById(patientId);
       $scope.getPatientClinicInfo(patientId);
       $scope.getClinics();
-    }
+      $scope.getAssociatedHCPs(patientId);
+      $scope.getHCPs();
+    };
+
+    $scope.getAssociatedHCPs = function(patientId){
+      patientService.getAssociateHCPToPatient(patientId).then(function(response){
+        $scope.associatedHCPs = response.data.hcpUsers
+      }).catch(function(response){});
+    };
+
+    $scope.selectHcpForPatient = function(hcp){
+      var data = [{'id': hcp.id}];
+      $scope.searchHcp = "";
+      patientService.associateHCPToPatient(data, $stateParams.patientId).then(function(response){
+        notyService.showMessage(response.data.message, 'success');
+        $scope.getAssociatedHCPs($stateParams.patientId);
+      }).catch(function(response){
+        if(response.data.message){
+          notyService.showMessage(response.data.message, 'warning');
+        } else if(response.data.ERROR){
+          notyService.showMessage(response.data.ERROR, 'warning');
+        }
+      });
+    };
+
+    $scope.getHCPs = function(){
+      DoctorService.getDoctorsList($scope.searchItem, $scope.currentPageIndex, $scope.perPageCount).then(function(response){
+        $scope.hcps = response.data;
+      }).catch(function(response){});
+    };
 
     $scope.getClinics = function(){
       clinicService.getClinics($scope.searchItem, $scope.sortOption, $scope.currentPageIndex, $scope.perPageCount).then(function (response) {
@@ -367,6 +412,14 @@ angular.module('hillromvestApp')
 
     $scope.cancelProtocolModel = function(){
       $scope.showModalProtocol = false;
+    };
+
+    $scope.cancelHCPModel = function(){
+      $scope.showModalHCP = false;
+    };
+
+    $scope.cancelClinicModel = function(){
+      $scope.showModalClinic = false;
     };
 
     $scope.disassociatePatient =function(){
@@ -489,6 +542,16 @@ angular.module('hillromvestApp')
       $scope.showModalDevice = true;
     };
 
+    $scope.deleteClinicModel = function(clinic){
+      $scope.clinicToDelete = clinic;
+      $scope.showModalClinic = true;
+    };
+
+    $scope.deleteHCPModel = function(hcp){
+      $scope.deviceToDelete = hcp;
+      $scope.showModalHCP = true;
+    };
+
     $scope.deleteProtocol = function(id){
       $scope.showModalProtocol = false;
       patientService.deleteProtocol($stateParams.patientId, $scope.toDeleteProtocolId).then(function(response){
@@ -605,6 +668,10 @@ angular.module('hillromvestApp')
 
     $scope.linkClinic = function(){
       $scope.searchClinicText = true;
+    };
+
+    $scope.linkHCP = function(){
+      $scope.searchHCPText = true;
     };
 
     $scope.init();

@@ -844,3 +844,12 @@ var caregiver = {
     },
     "message": "Caregiver User fetched successfully."
 }
+
+var notifications = [
+        {
+            "id": 1,
+            "notificationType": "HMR_NON_COMPLIANCE AND SETTINGS_DEVIATION",
+            "date": "2015-08-19",
+            "acknowledged": false
+        }
+    ]

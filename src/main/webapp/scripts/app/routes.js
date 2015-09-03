@@ -13,7 +13,7 @@ angular.module('hillromvestApp')
                 abstract: true,
             })
             .state('patient-dashboard', {
-                parent: 'entity',                
+                parent: 'entity',
                 url:'/patient',
                 abstract: true,
             })
@@ -179,7 +179,7 @@ angular.module('hillromvestApp')
                 views: {
                     'content@': {
                         templateUrl: 'scripts/app/modules/admin/patient/directives/patient-info/overview/patient-details.html',
-                        controller: 'patientsController'
+                        controller: 'graphController'
                     }
                 },
                 resolve: {
@@ -891,15 +891,15 @@ angular.module('hillromvestApp')
 
             .state('patientProfile', {
                 parent: 'patient-dashboard',
-                url: '/myProfile',
+                url: '/p-profile',
                 data: {
                     roles: ['PATIENT'],
                     pageTitle: 'patient.title'
                 },
                 views: {
                     'content@': {
-                        templateUrl: 'scripts/app/modules/patient/profile/navbar/navbar.html',
-                        controller: 'graphController'
+                        templateUrl: 'scripts/app/modules/patient/profile/profile-tabs/my-profile.html',
+                        controller: 'patientprofileController'
                     }
                 },
                 resolve: {
@@ -915,7 +915,7 @@ angular.module('hillromvestApp')
                 }
             })
 
-            .state('profile', {
+            .state('adminProfile', {
                 parent: 'admin',
                 url: '/profile',
                 data: {
@@ -924,8 +924,8 @@ angular.module('hillromvestApp')
                 },
                 views: {
                     'content@': {
-                        templateUrl: 'scripts/app/modules/admin/profile/navbar/navbar.html',
-                        controller: 'graphController'
+                        templateUrl: 'scripts/app/modules/admin/profile/profile-tabs/my-profile.html',
+                        controller: 'adminProfileController'
                     }
                 },
                 resolve: {
@@ -940,6 +940,49 @@ angular.module('hillromvestApp')
                     ]
                 }
             })
+
+            .state('editAdminProfile', {
+                parent: 'adminProfile',
+                url: '/update',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/profile/profile-tabs/edit-my-profile.html',
+                        controller: 'adminProfileController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('profile');
+                        return $translate.refresh();
+                    }]
+                }
+            })
+
+            .state('adminUpdatePassword', {
+                parent: 'admin',
+                url: '/updatepassword',
+                data: {
+                    roles: ['ADMIN'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/admin/profile/profile-tabs/update-password.html',
+                        controller: 'adminProfileController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('profile');
+                        return $translate.refresh();
+                    }]
+                }
+            })
+
             .state('profilePassword', {
                 parent: 'profile',
                 url: '/password',
@@ -991,4 +1034,72 @@ angular.module('hillromvestApp')
                   ]
               }
             })
+            .state('patientProfileEdit', {
+                parent: 'patient-dashboard',
+                url: '/p-profile-edit',
+                data: {
+                    roles: ['PATIENT'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/patient/profile/profile-tabs/edit-my-profile.html',
+                        controller: 'patientprofileController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('profile');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+            .state('patientResetPassword', {
+                parent: 'patient-dashboard',
+                url: '/p-reset',
+                data: {
+                    roles: ['PATIENT'],
+                    pageTitle: 'patient.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/patient/profile/profile-tabs/update-password.html',
+                        controller: 'patientprofileController'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('profile');
+                        return $translate.refresh();
+                    }],
+                    authorize: ['Auth',
+                        function(Auth) {
+                            return Auth.authorize(false);
+                        }
+                    ]
+                }
+            })
+            .state('pageUnderConstruction', {
+                parent: 'site',
+                url: '/pageconstruction',
+                data: {
+                    roles: []
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'scripts/app/modules/dummyPages/view.html'
+                    }
+                },
+                resolve: {
+                    mainTranslatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate,$translatePartialLoader) {
+                        $translatePartialLoader.addPart('error');
+                        return $translate.refresh();
+                    }]
+                }
+            });
 });

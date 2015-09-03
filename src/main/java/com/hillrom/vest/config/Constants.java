@@ -39,4 +39,68 @@ public final class Constants {
 
     public static final String ALL = "All";
 
+	public static final String PROGRAMMED_CAUGH_PAUSES = "ProgrammedCaughPauses";
+
+	public static final String DURATION_IN_MINUTES = "DurationInMinutes";
+
+	public static final String END_TIME = "EndTime";
+
+	public static final String START_TIME = "StartTime";
+
+	public static final String SESSION_TYPE2 = "SessionType";
+
+	public static final String SESSION_NO = "SessionNo";
+
+	public static final String NORMAL_CAUGH_PAUSES = "NormalCaughPauses";
+
+	public static final String CAUGH_PAUSE_DURATION = "CaughPauseDuration";
+
+	public static final String NORMAL_COUGH_PAUSES = "Normal Cough Pauses";
+
+	public static final String COUGH_PAUSE_DURATION = "Cough Pause Duration";
+
+	public static final String PROGRAMMED_COUGH_PAUSES = "Programmed Cough Pauses";
+
+	public static final String MINUTES = "Minutes";
+
+	public static final String PRESSURE = "Pressure";
+
+	public static final String FREQUENCY = "Frequency";
+
+	public static final String FINISH = "Finish";
+
+	public static final String START = "Start";
+
+	public static final String SESSION_TYPE = "Session Type";
+
+	public static final String DAILY_TREATMENT_NUMBER = "Daily Treatment Number";
+
+	public static final String DATE = "Date";
+	
+	public static final String HMR_IN_MINUTES = "hmrInMinutes";
+
+	public static final String DURATION = "duration";
+
+	public static final String HUB_ID = "hubId";
+
+	public static final String BLUETOOTH_ID = "bluetoothId";
+
+	public static final String SERIAL_NUMBER = "serialNumber";
+
+	public static final String EVENT_ID = "eventId";
+
+	public static final String SEQUENCE_NUMBER = "sequenceNumber";
+
+	public static final String HMR = "hmr";
+
+	public static final String HUB_ADDRESS = "Hub Id";
+
+	public static final String DEVICE_ADDRESS = "Device Address";
+
+	public static final String SERIAL_NO = "Serial Number";
+
+	public static final String SEQUENCE_NO = "Sequence No";
+
+	public static final String EVENT = "Event";
+
 }

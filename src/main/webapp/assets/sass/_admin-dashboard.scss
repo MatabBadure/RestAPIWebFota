@@ -21,16 +21,21 @@
 }
 
 .dashbord-nav__primary--title {
-	line-height: 38px;
+	line-height: 42px;
 }
 
 .dashbord-nav__secondary {
 	display: table;
 	span {
-		line-height: 38px;
+		line-height: 42px;
 		display: table-cell;
 		vertical-align: middle;
+    padding-right: 7px;
 	}
+}
+
+.create-user{
+  position: relative;
 }
 
 .create-user .hillrom-icon {
@@ -259,8 +264,7 @@
 	position: absolute;
   right: 5px;
   padding: 0;
-  top: 5px;
-  font-size: 20px;
+  top: 8px;
 }
 
 .dashboard__manage-view--list {
@@ -471,7 +475,7 @@
 }
 
 .modal__header {
-	background-color: #34455c;
+	background-color: $pickled-bluewood;
 	color: white;
 	padding: 10px 20px;
 	margin-bottom: 0;
@@ -800,4 +804,51 @@ tags-input.ng-invalid .tags {
     font-weight: $font-weight-bold;
     color: $pickled-bluewood;
   }
+}
+
+.clinic-hcp .dashboard__manage-view--list {
+  cursor: default;
+  &:hover {
+    background-color: inherit;
+  }
+}
+
+.admin-user .content-header {
+  margin-top: 20px;
+  padding: 10px 0;
+  &--title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    color: $pickled-bluewood;
+  }
+}
+
+.admin-user .content-list {
+  padding: 0;
+  margin-top: 20px;
+  border-bottom: 1px solid $celeste;
+}
+
+.admin-user .content-list__detail {
+  padding: 0;
+  &--name {
+    color: $cyan-blue-light;
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    display: block;
+  }
+  &--email {
+    color: $regent-gray;
+    font-size: $font-size-small;
+    font-weight: $font-weight-medium;
+    display: block;
+  }
+}
+
+.add-new:before {
+  font-size: 10px;
+  padding-left: 5px;
+  top: -2px;
+  position: absolute;
+  right: 0;
 }

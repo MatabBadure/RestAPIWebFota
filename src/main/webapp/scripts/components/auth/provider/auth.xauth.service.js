@@ -57,7 +57,21 @@ angular.module('hillromvestApp')
                 return $http.put('api/account/update_passwordsecurityquestion', data, {
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'  
+                        'Accept': 'application/json'
+                    }
+                }).success(function (data, status, headers, config) {
+                    return {'response' : data, 'status' : status, 'headers' : headers, 'config' : config};
+                }).error(function (data, status, headers, config) {
+
+                });
+            },
+
+            changeSecurityQuestion: function(data, id){
+                return $http.put('/api/user/'+id+'/changeSecurityQuestion', data, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'x-auth-token': localStorage.getItem('token')
                     }
                 }).success(function (data, status, headers, config) {
                     return {'response' : data, 'status' : status, 'headers' : headers, 'config' : config};

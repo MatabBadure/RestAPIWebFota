@@ -1,5 +1,7 @@
 package com.hillrom.vest.service;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -226,25 +228,35 @@ public class AdherenceCalculationService {
 	 */
 	@Scheduled(cron="0 0 * * * *")
 	public void processMissedTherapySessions(){
-		List<PatientCompliance> patientComplianceList = patientComplianceRepository.findAllGroupByPatientUserIdOrderByDateDesc();
-		List<Long> patientUserIds = new LinkedList<>();
-		DateTime today = DateTime.now();
-		patientComplianceList.forEach(compliance -> {			
-			patientUserIds.add(compliance.getPatientUser().getId());
-			compliance.setDate(today.toLocalDate());
-			compliance.setId(null);
-			if(compliance.getScore() > 0)
-				compliance.setScore(compliance.getScore()- MISSED_THERAPY_POINTS);
-		});
-		List<TherapySession> latestTherapySessions = therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(patientUserIds);
-		List<Notification> notifications = new LinkedList<>();
-		latestTherapySessions.forEach(latestTherapySession -> {
-			if(Days.daysBetween(new DateTime(latestTherapySession.getDate()), today).getDays()%3 == 0){
-				notifications.add(new Notification( MISSED_THERAPY, today.toLocalDate(), latestTherapySession.getPatientUser(), latestTherapySession.getPatientInfo(), false));
-			}
-		});
-		notificationRepository.save(notifications);
-		patientComplianceRepository.save(patientComplianceList);
+		try{
+			List<PatientCompliance> patientComplianceList = patientComplianceRepository.findAllGroupByPatientUserIdOrderByDateDesc();
+			List<Long> patientUserIds = new LinkedList<>();
+			DateTime today = DateTime.now();
+			patientComplianceList.forEach(compliance -> {			
+				patientUserIds.add(compliance.getPatientUser().getId());
+				compliance.setDate(today.toLocalDate());
+				compliance.setId(null);
+				compliance.setHmrRunRate(compliance.getHmrRunRate());
+				if(compliance.getScore() > 0)
+					compliance.setScore(compliance.getScore()- MISSED_THERAPY_POINTS);
+			});
+			List<TherapySession> latestTherapySessions = therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(patientUserIds);
+			List<Notification> notifications = new LinkedList<>();
+			latestTherapySessions.forEach(latestTherapySession -> {
+				DateTime therapySessionDateTime = new DateTime(latestTherapySession.getDate().toDateTime(org.joda.time.LocalTime.MIDNIGHT));
+				int missedTherapyDays = Days.daysBetween(therapySessionDateTime, today).getDays();
+				if( missedTherapyDays > 0 && missedTherapyDays %3 == 0){
+					notifications.add(new Notification(MISSED_THERAPY, today.toLocalDate(), latestTherapySession.getPatientUser(), latestTherapySession.getPatientInfo(), false));
+				}
+			});
+			notificationRepository.save(notifications);
+			patientComplianceRepository.save(patientComplianceList);
+		}catch(Exception ex){
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter( writer );
+			ex.printStackTrace( printWriter );
+			mailService.sendJobFailureNotification("processMissedTherapySessions",writer.toString());
+		}
 	}
 	
 	/**
@@ -254,12 +266,20 @@ public class AdherenceCalculationService {
 	public void sendNotificationMail(){
 		LocalDate today = LocalDate.now();
 		List<Notification> notifications = notificationRepository.findByDate(today);
-		notifications.forEach(notification -> {
-			User patientUser = notification.getPatientUser();
-			if(Objects.nonNull(patientUser.getEmail())){
-				mailService.sendNotificationMail(patientUser,notification.getNotificationType());
-			}
-		});
+		try{
+			notifications.forEach(notification -> {
+				User patientUser = notification.getPatientUser();
+				if(Objects.nonNull(patientUser.getEmail())){
+					mailService.sendNotificationMail(patientUser,notification.getNotificationType());
+				}
+			});
+		}catch(Exception ex){
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter( writer );
+			ex.printStackTrace( printWriter );
+			mailService.sendJobFailureNotification("sendNotificationMail",writer.toString());
+		}
+		
 	}
 	
 }

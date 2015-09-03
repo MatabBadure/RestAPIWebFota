@@ -56,9 +56,10 @@ angular.module('hillromvestApp')
             localStorage.setItem('patientID', data.data.user.id);
             $state.go('patientdashboard');
           } else {
+            localStorage.setItem('userId', data.data.user.id);
             $state.go('patientUser');
           }
-          
+
         }
       }).catch(function(data) {
         if (data.status === 401) {

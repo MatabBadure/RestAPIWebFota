@@ -270,6 +270,17 @@
             <artifactId>json-smart</artifactId>
             <version>1.0.9</version>
         </dependency>
+        <!-- Super CSV library for csv download -->
+        <dependency>
+            <groupId>net.sf.supercsv</groupId>
+            <artifactId>super-csv</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.supercsv</groupId>
+            <artifactId>super-csv-joda</artifactId>
+            <version>2.3.1</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-client</artifactId>
@@ -449,7 +460,7 @@
         <finalName>hillromvest</finalName>
         <pluginManagement>
             <plugins>
-                <!--  Added APT Annotation Processing Tool, for Restful Search -->
+                <!-- Added APT Annotation Processing Tool, for Restful Search -->
                 <plugin>
                     <groupId>com.mysema.maven</groupId>
                     <artifactId>apt-maven-plugin</artifactId>

@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('hillromvestApp')
-.directive('adminProfileNavbar', function() {
+.directive('patientProfileNavbar', function() {
   return {
-      templateUrl: 'scripts/app/modules/admin/profile/navbar/navbar.html',
+      templateUrl: 'scripts/app/modules/patient/profile/navbar/navbar.html',
       restrict: 'E',
       controller: function ($scope, $location) {
         $scope.isActive = function(tab) {

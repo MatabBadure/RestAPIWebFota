@@ -9,8 +9,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import net.minidev.json.JSONObject;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.Clinic;
+import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
+import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -41,6 +41,9 @@ public class ClinicService {
     
     @Inject
     private UserService userService;
+    
+    @Inject
+    private UserRepository userRepository;
 
     public Clinic createClinic(ClinicDTO clinicDTO) throws HillromException {
     	Clinic newClinic = new Clinic();
@@ -111,7 +114,7 @@ public class ClinicService {
     public String deleteClinic(String id) throws HillromException {
     	Clinic existingClinic = clinicRepository.findOne(id);
 		if(existingClinic != null) {
-			if(existingClinic.getClinicAdminId() != null) {
+			if(existingClinic.getclinicAdminUser() != null) {
 				throw new HillromException(ExceptionConstants.HR_545);//Unable to delete Clinic. Clinic admin exists
 			} else if(existingClinic.getUsers().size() > 0) {
 				throw new HillromException(ExceptionConstants.HR_546);//Unable to delete Clinic. Healthcare Professionals are associated with it
@@ -152,8 +155,10 @@ public class ClinicService {
 			clinic.setFaxNumber(clinicDTO.getFaxNumber());
 		if (clinicDTO.getHillromId() != null)
 			clinic.setHillromId(clinicDTO.getHillromId());
-		if (clinicDTO.getClinicAdminId() != null)
-			clinic.setClinicAdminId(clinicDTO.getClinicAdminId());
+		if (clinicDTO.getClinicAdminId() != null) {
+			User clinicAdminUser = userRepository.findOne(clinicDTO.getClinicAdminId());
+			clinic.setclinicAdminUser(clinicAdminUser);
+		}
 	}
 
 	public Set<UserExtension> getHCPUsers(List<String> idList) throws HillromException {
@@ -200,5 +205,29 @@ public class ClinicService {
         } else {
         	return clinic.getChildClinics();
         }
+    }
+	
+	public User getClinicAdmin(String clinicId) throws HillromException {
+		Clinic clinic = clinicRepository.findOne(clinicId);
+        if(Objects.isNull(clinic)) {
+	      	throw new HillromException(ExceptionConstants.HR_548);
+        } else {
+        	return clinic.getclinicAdminUser();
+        }
+    }
+	
+	public Set<User> getAllClinicAdmins() throws HillromException {
+		List<Clinic> clinicList = clinicRepository.findAll();
+		if(clinicList.isEmpty()) {
+			throw new HillromException(ExceptionConstants.HR_548);
+		} else {
+			Set<User> clinicAdminList = new HashSet<>();
+			clinicList.forEach(clinic -> {
+				if(Objects.nonNull(clinic.getclinicAdminUser())) {
+					clinicAdminList.add(clinic.getclinicAdminUser());
+				}
+			});
+			return clinicAdminList;
+		}
     }
 }

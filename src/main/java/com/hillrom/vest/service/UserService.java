@@ -469,14 +469,21 @@ public class UserService {
 		newUser.setActivated(false);
 		newUser.setDeleted(false);
 		newUser.setActivationKey(RandomUtil.generateActivationKey());
-		for(Map<String, String> clinicObj : userExtensionDTO.getClinicList()){
-			Clinic clinic = clinicRepository.getOne(clinicObj.get("id"));
-			newUser.getClinics().add(clinic);
-		}
 		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
-		userExtensionRepository.save(newUser);
-		log.debug("Created Information for User: {}", newUser);
-		return newUser;
+		userExtensionRepository.saveAndFlush(newUser);
+		if(newUser.getId() != null) {
+			List<Clinic> clinicList = new LinkedList<>();
+			for(Map<String, String> clinicObj : userExtensionDTO.getClinicList()){
+				Clinic clinic = clinicRepository.getOne(clinicObj.get("id"));
+				clinic.setclinicAdminUser(newUser);
+				clinicList.add(clinic);
+			}
+			clinicRepository.save(clinicList);
+			log.debug("Created Information for User: {}", newUser);
+			return newUser;
+		} else {
+			throw new HillromException(ExceptionConstants.HR_574);
+		}
 	}
     
     public UserExtension updateUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException{

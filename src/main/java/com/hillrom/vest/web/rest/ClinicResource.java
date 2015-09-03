@@ -13,8 +13,6 @@ import java.util.regex.Pattern;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 
-import net.minidev.json.JSONObject;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.domain.Clinic;
+import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
@@ -42,6 +41,8 @@ import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 import com.mysema.query.types.expr.BooleanExpression;
+
+import net.minidev.json.JSONObject;
 
 /**
  * REST controller for managing Clinic.
@@ -279,4 +280,55 @@ public class ClinicResource {
         }
     }
     
+    /**
+     * GET  /clinics/:id/clinicadmin -> get the clinic admin for the clinic.
+     */
+    @RequestMapping(value = "/clinics/{id}/clinicadmin",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> getClinicAdmin(@PathVariable String id) {
+        log.debug("REST request to get Clinic admin: {}", id);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	User clinicAdminUser = clinicService.getClinicAdmin(id);
+	        if(Objects.isNull(clinicAdminUser)){
+				jsonObject.put("message", MessageConstants.HR_286);
+				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+			} else {
+		      	jsonObject.put("message", MessageConstants.HR_287);
+		      	jsonObject.put("clinicAdmin", clinicAdminUser);
+		      	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+        } catch(HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    /**
+     * GET  /clinics/clinicadmins -> get all the clinic admin for the clinic.
+     */
+    @RequestMapping(value = "/clinics/clinicadmins",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> getAllClinicAdmins() {
+        log.debug("REST request to get all clinic admins: {}");
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	Set<User> clinicAdminList = clinicService.getAllClinicAdmins();
+	        if(clinicAdminList.isEmpty()){
+				jsonObject.put("message", MessageConstants.HR_286);
+				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+			} else {
+		      	jsonObject.put("message", MessageConstants.HR_287);
+		      	jsonObject.put("clinicAdminList", clinicAdminList);
+		      	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+        } catch(HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

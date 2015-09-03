@@ -55,7 +55,7 @@ public class ExceptionConstants {
     public static final String HR_545 = "Unable to delete Clinic. Clinic admin exists";
     public static final String HR_546 = "Unable to delete Clinic. Healthcare Professionals are associated with it";
     public static final String HR_547 = "Invalid clinic id found";
-    public static final String HR_548 = "No such clinic found";// Is it same as HR_544
+    public static final String HR_548 = "No clinic found";// Is it same as HR_544
     public static final String HR_549 = "Unable to delete Clinic.";
     
     public static final String HR_553 = "Invalid Activation Key";
@@ -85,6 +85,8 @@ public class ExceptionConstants {
     public static final String HR_571 = "Invalid Serial Number.";
     public static final String HR_572 = "This Vest device is already linked to patient.";
     public static final String HR_573 = "Unable to deactivate vest device from patient.";
+    public static final String HR_574 = "Unable to create clinic admin.";
+    public static final String HR_575 = "Unable to update clinic admin.";
     
     public static final String HR_581 = "No Patient Associated with HCP.";
     public static final String HR_582 = "No Clinics Associated with HCP.";

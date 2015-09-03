@@ -551,13 +551,12 @@ public class UserExtensionResource {
 		try {
 			UserPatientAssoc caregiverAssoc = userService.getCaregiverUser(patientUserId, caregiverUserId);
 			if (Objects.isNull(caregiverAssoc)) {
-				jsonObject.put("ERROR", ExceptionConstants.HR_568);
-	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+				jsonObject.put("ERROR", ExceptionConstants.HR_564);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_263);
 				jsonObject.put("caregiver", caregiverAssoc);
-	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {
 			jsonObject.put("ERROR", e.getMessage());
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
@@ -602,7 +601,7 @@ public class UserExtensionResource {
 	        	filterByClinic = Constants.ALL;
 	        List<Map<String,Object>> patientList= patientHCPService.getAssociatedPatientUsersForHCP(id, filterByClinic);
 	        if (patientList.isEmpty()) {
-	        	jsonObject.put("ERROR", ExceptionConstants.HR_581);
+	        	jsonObject.put("message", ExceptionConstants.HR_581);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_291);
 	        	jsonObject.put("patientList", patientList);
@@ -628,7 +627,7 @@ public class UserExtensionResource {
         try {
         	Set<Clinic> clinics= hcpClinicService.getAssociatedClinicsForHCP(id);
 	        if (clinics.isEmpty()) {
-	        	jsonObject.put("ERROR", ExceptionConstants.HR_582);
+	        	jsonObject.put("message", ExceptionConstants.HR_582);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_292);
 	        	jsonObject.put("clinics", clinics);
@@ -682,7 +681,7 @@ public class UserExtensionResource {
         	List<UserExtension> users= userService.getAllUsersBy(role);
 	        if (users.isEmpty()) {
 	        	jsonObject.put("ERROR", ExceptionConstants.HR_519);
-	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_205);
 	        	jsonObject.put("users", users);

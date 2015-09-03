@@ -75,7 +75,7 @@ public class ExceptionConstants {
     public static final String HR_561 = "Unable to create Caregiver.";
     public static final String HR_562 = "Unable to update Caregiver.";
     public static final String HR_563 = "Reached maximum limit to associate caregiver.";
-    public static final String HR_564 = "No such caregiver found";
+    public static final String HR_564 = "No caregiver found";
     public static final String HR_565 = "No Relationship labels found.";
     public static final String HR_566 = "Unable to delete Caregiver.";
     public static final String HR_567 = "Unable to fetch Caregivers.";
@@ -87,6 +87,7 @@ public class ExceptionConstants {
     public static final String HR_573 = "Unable to deactivate vest device from patient.";
     public static final String HR_574 = "Unable to create clinic admin.";
     public static final String HR_575 = "Unable to update clinic admin.";
+    public static final String HR_576 = "Unable to get clinic admin.";
     
     public static final String HR_581 = "No Patient Associated with HCP.";
     public static final String HR_582 = "No Clinics Associated with HCP.";

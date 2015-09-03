@@ -114,7 +114,7 @@ public class ClinicService {
     public String deleteClinic(String id) throws HillromException {
     	Clinic existingClinic = clinicRepository.findOne(id);
 		if(existingClinic != null) {
-			if(existingClinic.getclinicAdminUser() != null) {
+			if(existingClinic.getClinicAdminId() != null) {
 				throw new HillromException(ExceptionConstants.HR_545);//Unable to delete Clinic. Clinic admin exists
 			} else if(existingClinic.getUsers().size() > 0) {
 				throw new HillromException(ExceptionConstants.HR_546);//Unable to delete Clinic. Healthcare Professionals are associated with it
@@ -155,10 +155,8 @@ public class ClinicService {
 			clinic.setFaxNumber(clinicDTO.getFaxNumber());
 		if (clinicDTO.getHillromId() != null)
 			clinic.setHillromId(clinicDTO.getHillromId());
-		if (clinicDTO.getClinicAdminId() != null) {
-			User clinicAdminUser = userRepository.findOne(clinicDTO.getClinicAdminId());
-			clinic.setclinicAdminUser(clinicAdminUser);
-		}
+		if (clinicDTO.getClinicAdminId() != null)
+			clinic.setClinicAdminId(clinicDTO.getClinicAdminId());
 	}
 
 	public Set<UserExtension> getHCPUsers(List<String> idList) throws HillromException {
@@ -212,19 +210,25 @@ public class ClinicService {
         if(Objects.isNull(clinic)) {
 	      	throw new HillromException(ExceptionConstants.HR_548);
         } else {
-        	return clinic.getclinicAdminUser();
+        	User clinicAdminUser = userRepository.findOne(clinic.getClinicAdminId());
+			if(Objects.nonNull(clinicAdminUser)) {
+				return clinicAdminUser;
+			} else {
+				throw new HillromException(ExceptionConstants.HR_576);
+			}
         }
     }
 	
 	public Set<User> getAllClinicAdmins() throws HillromException {
-		List<Clinic> clinicList = clinicRepository.findAll();
+		List<Clinic> clinicList = clinicRepository.findAllWithClinicAdmins();
 		if(clinicList.isEmpty()) {
 			throw new HillromException(ExceptionConstants.HR_548);
 		} else {
 			Set<User> clinicAdminList = new HashSet<>();
 			clinicList.forEach(clinic -> {
-				if(Objects.nonNull(clinic.getclinicAdminUser())) {
-					clinicAdminList.add(clinic.getclinicAdminUser());
+				if(Objects.nonNull(clinic.getClinicAdminId())) {
+					User clinicAdminUser = userRepository.findOne(clinic.getClinicAdminId());
+					clinicAdminList.add(clinicAdminUser);
 				}
 			});
 			return clinicAdminList;

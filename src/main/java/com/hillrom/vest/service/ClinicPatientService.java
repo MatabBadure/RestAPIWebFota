@@ -136,8 +136,8 @@ public class ClinicPatientService {
 			if(clinic != null) {
 				ClinicPatientAssoc clinicPatientAssoc = new ClinicPatientAssoc(new ClinicPatientAssocPK(patientInfo, clinic), clinicAssocDetails.get("mrnId"), clinicAssocDetails.get("notes"));
 				clinicPatientAssocList.add(clinicPatientAssoc);
-				if (clinic.getclinicAdminUser() != null) {
-					User clinicAdminUser = clinic.getclinicAdminUser();
+				if (clinic.getClinicAdminId() != null) {
+					User clinicAdminUser = userRepository.findOne(clinic.getClinicAdminId());
 					if(Objects.nonNull(clinicAdminUser)) {
 						UserPatientAssoc clinicAdminPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, clinicAdminUser), AuthoritiesConstants.CLINIC_ADMIN, RelationshipLabelConstants.CLINIC_ADMIN);
 						userPatientAssocList.add(clinicAdminPatientAssoc);

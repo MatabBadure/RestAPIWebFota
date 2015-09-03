@@ -475,7 +475,7 @@ public class UserService {
 			List<Clinic> clinicList = new LinkedList<>();
 			for(Map<String, String> clinicObj : userExtensionDTO.getClinicList()){
 				Clinic clinic = clinicRepository.getOne(clinicObj.get("id"));
-				clinic.setclinicAdminUser(newUser);
+				clinic.setClinicAdminId(newUser.getId());
 				clinicList.add(clinic);
 			}
 			clinicRepository.save(clinicList);

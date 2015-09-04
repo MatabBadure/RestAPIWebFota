@@ -1,5 +1,6 @@
 package com.hillrom.vest.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -37,5 +38,8 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 	 */
 	@Procedure(outputParameterName="hillrom_id",procedureName="get_next_clinic_hillromid")
 	@Transactional
-	String id();    
+	String id();
+
+	@Query("from Clinic clinic where clinic.clinicAdminId IS NOT NULL")
+	List<Clinic> findAllWithClinicAdmins();
 }

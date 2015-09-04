@@ -363,6 +363,14 @@ public class UserService {
         	} else {
         		throw new HillromException(ExceptionConstants.HR_531);
     		}
+        } else if (AuthoritiesConstants.CLINIC_ADMIN.equals(userExtensionDTO.getRole())) {
+        	UserExtension user = createClinicAdminUser(userExtensionDTO);
+        	if(user.getId() != null) {
+                mailService.sendActivationEmail(user, baseUrl);
+                return user;
+        	} else {
+        		throw new HillromException(ExceptionConstants.HR_537);
+    		}
         } else {
         	throw new HillromException(ExceptionConstants.HR_502);
     	}
@@ -454,7 +462,30 @@ public class UserService {
 		log.debug("Created Information for User: {}", newUser);
 		return newUser;
 	}
-
+    
+    public UserExtension createClinicAdminUser(UserExtensionDTO userExtensionDTO) throws HillromException {
+    	UserExtension newUser = new UserExtension();
+		assignValuesToUserObj(userExtensionDTO, newUser);
+		newUser.setActivated(false);
+		newUser.setDeleted(false);
+		newUser.setActivationKey(RandomUtil.generateActivationKey());
+		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
+		userExtensionRepository.saveAndFlush(newUser);
+		if(newUser.getId() != null) {
+			List<Clinic> clinicList = new LinkedList<>();
+			for(Map<String, String> clinicObj : userExtensionDTO.getClinicList()){
+				Clinic clinic = clinicRepository.getOne(clinicObj.get("id"));
+				clinic.setClinicAdminId(newUser.getId());
+				clinicList.add(clinic);
+			}
+			clinicRepository.save(clinicList);
+			log.debug("Created Information for User: {}", newUser);
+			return newUser;
+		} else {
+			throw new HillromException(ExceptionConstants.HR_574);
+		}
+	}
+    
     public UserExtension updateUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException{
         if(userExtensionDTO.getEmail() != null) {
 			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
@@ -966,6 +997,8 @@ public class UserService {
 			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, caregiverUser), AuthoritiesConstants.CARE_GIVER, userExtensionDTO.getRelationship());
 			userPatientRepository.saveAndFlush(userPatientAssoc);
 			caregiverUser.getUserPatientAssoc().add(userPatientAssoc);
+			caregiverUser.setDeleted(false);
+			userRepository.saveAndFlush(caregiverUser);
 			patientInfo.getUserPatientAssoc().add(userPatientAssoc);
 			log.debug("Created Information for Caregiver User: {}", caregiverUser);
 			return userPatientAssoc;

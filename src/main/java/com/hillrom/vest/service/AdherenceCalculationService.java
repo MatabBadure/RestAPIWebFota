@@ -57,6 +57,9 @@ public class AdherenceCalculationService {
 	
 	@Inject
 	private NotificationService notificationService;
+	
+	@Inject
+	private PatientComplianceService complianceService;
 
 	/**
 	 * Get Protocol Constants by loading Protocol data
@@ -131,7 +134,7 @@ public class AdherenceCalculationService {
 					notificationType =  SETTINGS_DEVIATION;
 			}
 			
-			if(previousScore == currentScore){
+			if(previousScore < currentScore){
 				notificationService.deleteNotification(patientUserId,currentTherapyDate);
 				currentScore = currentScore !=  DEFAULT_COMPLIANCE_SCORE ? currentScore + 1 : DEFAULT_COMPLIANCE_SCORE;
 			}
@@ -241,16 +244,17 @@ public class AdherenceCalculationService {
 					compliance.setScore(compliance.getScore()- MISSED_THERAPY_POINTS);
 			});
 			List<TherapySession> latestTherapySessions = therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(patientUserIds);
-			List<Notification> notifications = new LinkedList<>();
 			latestTherapySessions.forEach(latestTherapySession -> {
 				DateTime therapySessionDateTime = new DateTime(latestTherapySession.getDate().toDateTime(org.joda.time.LocalTime.MIDNIGHT));
 				int missedTherapyDays = Days.daysBetween(therapySessionDateTime, today).getDays();
 				if( missedTherapyDays > 0 && missedTherapyDays %3 == 0){
-					notifications.add(new Notification(MISSED_THERAPY, today.toLocalDate(), latestTherapySession.getPatientUser(), latestTherapySession.getPatientInfo(), false));
+					notificationService.createOrUpdateNotification(latestTherapySession.getPatientUser(), latestTherapySession.getPatientInfo(), latestTherapySession.getPatientUser().getId(),
+							today.toLocalDate(), MISSED_THERAPY,false);
 				}
 			});
-			notificationRepository.save(notifications);
-			patientComplianceRepository.save(patientComplianceList);
+			patientComplianceList.parallelStream().forEach(patientCompliance -> {
+				complianceService.createOrUpdate(patientCompliance);
+			});
 		}catch(Exception ex){
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter( writer );

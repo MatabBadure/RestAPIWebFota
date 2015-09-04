@@ -273,7 +273,7 @@ public class TherapySessionService {
 		TherapySession latestTherapySession = therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(id);
 		if(Objects.nonNull(latestTherapySession)){
 			DateTime today = DateTime.now();
-			DateTime latestSessionDate = new DateTime(latestTherapySession.getDate());
+			DateTime latestSessionDate = new DateTime(latestTherapySession.getDate().toDateTime(org.joda.time.LocalTime.MIDNIGHT));
 			if(Objects.isNull(latestSessionDate))
 				return 0;
 			return Days.daysBetween(latestSessionDate, today).getDays();

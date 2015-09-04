@@ -54,6 +54,11 @@ public class ProtocolConstants {
 		this.minDuration = minDuration;
 		this.maxDuration = maxDuration;
 	}
+	
+	public ProtocolConstants() {
+		super();
+	}
+
 
 	public Long getId() {
 		return id;

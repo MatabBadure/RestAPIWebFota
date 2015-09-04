@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.UserLoginToken;
 import com.hillrom.vest.service.AuthenticationService;
 
@@ -24,7 +23,7 @@ public class UserXAuthTokenController {
 
     @RequestMapping(value = "/authenticate",
             method = RequestMethod.POST)
-    @Timed
+    
     public UserLoginToken authorize(@RequestBody(required=true) Map<String,String> credentialsMap) {
     	String username = credentialsMap.get("username");
     	String password = credentialsMap.get("password"); 

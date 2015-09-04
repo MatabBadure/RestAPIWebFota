@@ -37,11 +37,10 @@ import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.io.ICsvBeanWriter;
 import org.supercsv.prefs.CsvPreference;
 
-import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientProtocolData;
-
+import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.TherapySession;
@@ -67,7 +66,6 @@ import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.ProtocolDTO;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
-import com.hillrom.vest.domain.PatientVestDeviceData;
 /**
  * REST controller for managing users.
  */
@@ -113,7 +111,7 @@ public class UserResource {
 	 * GET /users -> get all users.
 	 */
 	@RequestMapping(value = "/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
+	
 	public List<User> getAll() {
 		log.debug("REST request to get all Users");
 		return userRepository.findAll();
@@ -123,7 +121,7 @@ public class UserResource {
 	 * GET /users/:login -> get the "login" user.
 	 */
 	@RequestMapping(value = "/users/{email}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
+	
 	ResponseEntity<User> getUser(@PathVariable String email) {
 		log.debug("REST request to get User : {}", email);
 		return userRepository.findOneByEmail(email)
@@ -132,7 +130,7 @@ public class UserResource {
 	}
 
 	@RequestMapping(value = "/user/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
+	
 	public ResponseEntity<?> searchHcp(
 			@RequestParam(required = true, value = "searchString") String searchString,
 			@RequestParam(value = "page", required = false) Integer offset,
@@ -160,7 +158,7 @@ public class UserResource {
 	}
 
 	@RequestMapping(value = "/user/{id}/patient", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Timed
+	
 	public ResponseEntity<PatientUserVO> getPatientUser(@PathVariable Long id) {
 		log.debug("REST request to get PatientUser : {}", id);
 		Optional<PatientUserVO> patientUser = userService.getPatientUser(id);
@@ -177,7 +175,7 @@ public class UserResource {
     @RequestMapping(value = "/patient/{id}/linkvestdevice",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> linkVestDeviceWithPatient(@PathVariable Long id, @RequestBody Map<String, Object> deviceData) {
     	log.debug("REST request to link vest device with patient user : {}", id);
@@ -205,7 +203,7 @@ public class UserResource {
     @RequestMapping(value = "/patient/{id}/vestdevice",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> getLinkedVestDeviceWithPatient(@PathVariable Long id) {
     	log.debug("REST request to link vest device with patient user : {}", id);
@@ -231,7 +229,7 @@ public class UserResource {
     @RequestMapping(value = "/patient/{id}/deactivatevestdevice/{serialNumber}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> deactivateVestDeviceFromPatient(@PathVariable Long id, @PathVariable String serialNumber) {
     	log.debug("REST request to deactivate vest device with serial number {} from patient user : {}", serialNumber, id);
@@ -275,7 +273,7 @@ public class UserResource {
     @RequestMapping(value = "/patient/{id}/protocol",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> addProtocolToPatient(@PathVariable Long id, @RequestBody ProtocolDTO protocolDTO) {
     	log.debug("REST request to add protocol with patient user : {}", id);
@@ -302,7 +300,7 @@ public class UserResource {
     @RequestMapping(value = "/patient/{id}/protocol",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> updateProtocolToPatient(@PathVariable Long id, @RequestBody List<PatientProtocolData> ppdList) {
     	log.debug("REST request to update protocol with patient user : {}", id);
@@ -329,7 +327,7 @@ public class UserResource {
     @RequestMapping(value = "/patient/{id}/protocol",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> getAllProtocolsAssociatedWithPatient(@PathVariable Long id) {
     	log.debug("REST request to get protocol for patient user : {}", id);
@@ -355,7 +353,7 @@ public class UserResource {
     @RequestMapping(value = "/patient/{id}/protocol/{protocolId}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> getProtocolDetails(@PathVariable Long id, @PathVariable String protocolId) {
     	log.debug("REST request to get protocol details with {} for patient user : {}", protocolId, id);
@@ -382,7 +380,7 @@ public class UserResource {
     @RequestMapping(value = "/patient/{id}/protocol/{protocolId}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> deleteProtocolForPatient(@PathVariable Long id, @PathVariable String protocolId) {
     	log.debug("REST request to delete protocol for patient user : {}", id);
@@ -503,7 +501,7 @@ public class UserResource {
     @RequestMapping(value = "/users/{id}/notificationsetting",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     @RolesAllowed({AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> updateHRMNotification(@PathVariable Long id, @RequestBody Map<String, Boolean> paramsMap) {
     	JSONObject json = new JSONObject();

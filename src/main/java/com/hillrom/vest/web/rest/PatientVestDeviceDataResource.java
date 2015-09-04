@@ -1,14 +1,10 @@
 package com.hillrom.vest.web.rest;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import net.minidev.json.JSONObject;
 
@@ -17,20 +13,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.supercsv.cellprocessor.ift.CellProcessor;
-import org.supercsv.io.CsvBeanWriter;
-import org.supercsv.io.ICsvBeanWriter;
-import org.supercsv.prefs.CsvPreference;
 
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.service.PatientVestDeviceDataService;
-import com.hillrom.vest.service.util.CsvUtil;
 import com.hillrom.vest.service.util.RequestUtil;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 

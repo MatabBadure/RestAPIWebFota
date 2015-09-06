@@ -1,21 +1,26 @@
 package com.hillrom.vest.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
-import com.hillrom.vest.domain.UserLoginToken;
-import com.hillrom.vest.repository.UserLoginTokenRepository;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
+import com.hillrom.vest.domain.UserLoginToken;
+import com.hillrom.vest.repository.UserLoginTokenRepository;
 
 /**
  * REST controller for managing UserLoginToken.
@@ -35,7 +40,7 @@ public class UserLoginTokenResource {
     @RequestMapping(value = "/userLoginTokens",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<Void> create(@Valid @RequestBody UserLoginToken userLoginToken) throws URISyntaxException {
         log.debug("REST request to save UserLoginToken : {}", userLoginToken);
         if (userLoginToken.getId() != null) {
@@ -51,7 +56,7 @@ public class UserLoginTokenResource {
     @RequestMapping(value = "/userLoginTokens",
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<Void> update(@Valid @RequestBody UserLoginToken userLoginToken) throws URISyntaxException {
         log.debug("REST request to update UserLoginToken : {}", userLoginToken);
         if (userLoginToken.getId() == null) {
@@ -67,7 +72,7 @@ public class UserLoginTokenResource {
     @RequestMapping(value = "/userLoginTokens",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public List<UserLoginToken> getAll() {
         log.debug("REST request to get all UserLoginTokens");
         return userLoginTokenRepository.findAll();
@@ -79,7 +84,7 @@ public class UserLoginTokenResource {
     @RequestMapping(value = "/userLoginTokens/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<UserLoginToken> get(@PathVariable String id) {
         log.debug("REST request to get UserLoginToken : {}", id);
         return Optional.ofNullable(userLoginTokenRepository.findOne(id))
@@ -95,7 +100,7 @@ public class UserLoginTokenResource {
     @RequestMapping(value = "/userLoginTokens/{id}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public void delete(@PathVariable String id) {
         log.debug("REST request to delete UserLoginToken : {}", id);
         userLoginTokenRepository.delete(id);

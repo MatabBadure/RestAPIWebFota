@@ -12,9 +12,9 @@
 	<!-- Added hmr notification to User table. -->
 	<changeSet author="jhipster" id="add_hmr_notification_to_user">
 		<addColumn tableName="USER">
-        	<column name="hmr_notification" type="boolean"/>
-        	<column name="accept_hmr_notification" type="boolean"/>
-        	<column name="accept_hmr_setting" type="boolean"/>
+        	<column name="hmr_notification" type="boolean" defaultValueBoolean="false"/>
+        	<column name="accept_hmr_notification" type="boolean" defaultValueBoolean="false"/>
+        	<column name="accept_hmr_setting" type="boolean" defaultValueBoolean="false"/>
         </addColumn>
 	</changeSet>
 </databaseChangeLog>

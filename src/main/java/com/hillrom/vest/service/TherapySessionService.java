@@ -276,7 +276,7 @@ public class TherapySessionService {
 			DateTime latestSessionDate = DateUtil.convertLocalDateToDateTime(latestTherapySession.getDate());
 			if(Objects.isNull(latestSessionDate))
 				return 0;
-			return Days.daysBetween(latestSessionDate, today).getDays();
+			return Days.daysBetween(latestSessionDate, today.toInstant()).getDays();
 		}
 		return 0;
 	}

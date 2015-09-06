@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.codahale.metrics.annotation.Timed;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
@@ -64,7 +63,7 @@ public class AccountResource {
     @RequestMapping(value = "/register",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<?> registerAccount(@Valid @RequestBody UserDTO userDTO, HttpServletRequest request) {
         return userRepository.findOneByEmail(userDTO.getEmail())
                 .map(user -> new ResponseEntity<>("e-mail address already in use", HttpStatus.BAD_REQUEST))
@@ -89,7 +88,7 @@ public class AccountResource {
     @RequestMapping(value = "/activate",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<String> activateAccount(@RequestParam(value = "key") String key) {
         return Optional.ofNullable(userService.activateRegistration(key))
             .map(user -> new ResponseEntity<String>(HttpStatus.OK))
@@ -102,7 +101,7 @@ public class AccountResource {
     @RequestMapping(value = "/authenticate",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public String isAuthenticated(HttpServletRequest request) {
         log.debug("REST request to check if the current user is authenticated");
         return request.getRemoteUser();
@@ -114,7 +113,7 @@ public class AccountResource {
     @RequestMapping(value = "/account",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<UserDTO> getAccount() {
         return Optional.ofNullable(userService.getUserWithAuthorities())
             .map(user -> {
@@ -142,7 +141,7 @@ public class AccountResource {
     @RequestMapping(value = "/account",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<String> saveAccount(@RequestBody UserDTO userDTO) {
         return userRepository
             .findOneByEmail(userDTO.getEmail())
@@ -161,7 +160,7 @@ public class AccountResource {
     @RequestMapping(value = "/account/change_password",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> changePassword(@RequestBody Map<String, String> body) {
         JSONObject jsonObject = new JSONObject();
 		try {
@@ -180,7 +179,7 @@ public class AccountResource {
     @RequestMapping(value = "/account/reset_password/init",
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> requestPasswordReset(@RequestBody Map<String, String> body, HttpServletRequest request) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("message", "e-mail address not registered");
@@ -200,7 +199,7 @@ public class AccountResource {
     @RequestMapping(value = "/account/reset_password/finish",
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> finishPasswordReset(@RequestParam(value = "key") String key, @RequestBody(required=true) Map<String,String> body) {
         body.put("key", key);
         JSONObject jsonObject = new JSONObject();
@@ -228,7 +227,7 @@ public class AccountResource {
     @RequestMapping(value = "/account/update_emailpassword",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> updateEmailOrPassword(@RequestBody(required=true) Map<String,String> params,@RequestHeader(value="x-auth-token",required=true)String authToken) {
     	params.put("x-auth-token", authToken);
     	JSONObject errorsJsonObject = new JSONObject();
@@ -250,7 +249,7 @@ public class AccountResource {
     @RequestMapping(value = "/account/update_passwordsecurityquestion",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> updatePasswordSecurityQuestion(@RequestBody(required=true) Map<String,String> params) {
     	JSONObject errorsJsonObject = new JSONObject();
 		try {
@@ -270,7 +269,7 @@ public class AccountResource {
     @RequestMapping(value = "/user/{id}/update_password",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
+    
     public ResponseEntity<JSONObject> updatePassword(@PathVariable Long id, @RequestBody Map<String, String> passwordList) {
         JSONObject jsonObject = new JSONObject();
 		try {

@@ -268,7 +268,7 @@ public class AdherenceCalculationService {
 	/**
 	 * Runs every 3pm , sends the notifications to Patient User.
 	 */
-	@Scheduled(cron="0 15 * * * *")
+	@Scheduled(cron="0 0 15 * * *")
 	public void sendNotificationMail(){
 		LocalDate today = LocalDate.now();
 		List<Notification> notifications = notificationRepository.findByDate(today);

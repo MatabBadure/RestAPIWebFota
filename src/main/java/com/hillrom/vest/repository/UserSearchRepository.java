@@ -86,7 +86,7 @@ public class UserSearchRepository {
 	public Page<HcpVO> findHCPBy(String queryString, Pageable pageable,
 			Map<String, Boolean> sortOrder) {
 		
-		String findHcpQuery = "select distinct(user.id),user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted,"
+		String findHcpQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted,"
 				+ " user.zipcode,userExt.address,userExt.city,userExt.credentials,userExt.fax_number,userExt.primary_phone,"
 				+ " userExt.mobile_phone,userExt.speciality,userExt.state,clinic.id as clinicId,clinic.name as clinicName,user.created_date as createdAt,user.activated isActivated "
 				+ " FROM USER user join USER_EXTENSION userExt on user.id = userExt.user_id "
@@ -97,14 +97,14 @@ public class UserSearchRepository {
 
 		findHcpQuery = findHcpQuery.replaceAll(":queryString", queryString);
 
-		String countSqlQuery = "select count(hcpUsers.id) from ("
-				+ findHcpQuery + "group by user.id ) hcpUsers";
+		String countSqlQuery = "select count(distinct hcpUsers.id) from ("
+				+ findHcpQuery + " ) hcpUsers";
 
 		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
 		BigInteger count = (BigInteger) countQuery.getSingleResult();
 
 		Query query = getOrderedByQuery(findHcpQuery, sortOrder);
-		setPaginationParams(pageable, query);
+		//setPaginationParams(pageable, query);
 		
 		List<HcpVO> hcpUsers = new ArrayList<>();
 

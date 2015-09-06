@@ -454,17 +454,15 @@ public class UserResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Notification>> getNotificationsByPatientUserId(@PathVariable Long id,
-    		@RequestParam(value="date",required=false)Long timestamp, 
+    		@RequestParam(value="from",required=false)Long from,
+    		@RequestParam(value="to",required=false)Long to,
     		@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit) throws URISyntaxException{
-    	LocalDate date = null;
-    	if(Objects.isNull(timestamp)){
-    		date = LocalDate.now();
-    	}else{
-    		date = LocalDate.fromDateFields(new Date(timestamp));
-    	}
+    	
+    	LocalDate fromDate = Objects.isNull(from) ? LocalDate.now().minusDays(1) : LocalDate.fromDateFields(new Date(from));
+    	LocalDate toDate = Objects.isNull(to) ? LocalDate.now() : LocalDate.fromDateFields(new Date(to));
     	Pageable pageable = PaginationUtil.generatePageRequest(offset, limit);
-    	Page<Notification> page = notificationRepository.findByPatientUserIdAndDateAndIsAcknowledged(id, date, false, pageable);
+    	Page<Notification> page = notificationRepository.findByPatientUserIdAndDateBetweenAndIsAcknowledged(id, fromDate,toDate,false, pageable);
     	HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/users/"+id+"/notifications", offset, limit);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

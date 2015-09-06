@@ -15,6 +15,11 @@ public interface PatientComplianceRepository extends
 	
 	PatientCompliance findByPatientUserIdAndDate(Long patientUSerId,LocalDate date);
 	
-	@Query("select NEW com.hillrom.vest.domain.PatientCompliance(pc.score,max(pc.date),pc.patient,pc.patientUser,pc.hmrRunRate) from PatientCompliance pc group by pc.patientUser.id")
+	@Query(nativeQuery=true,value="SELECT t1.* FROM PATIENT_COMPLIANCE t1 "
+			+ " INNER JOIN (SELECT user_id, MAX(date) as maxDate "
+			+ " FROM PATIENT_COMPLIANCE "
+			+ " GROUP BY user_id) t2 "
+			+ " ON t1.user_id=t2.user_id and t1.date = t2.maxDate "
+			)
 	List<PatientCompliance> findAllGroupByPatientUserIdOrderByDateDesc();
 }

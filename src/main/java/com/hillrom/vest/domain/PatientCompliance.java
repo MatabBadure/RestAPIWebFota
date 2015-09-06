@@ -62,6 +62,14 @@ public class PatientCompliance {
 		this.hmrRunRate = hmrRunRate;
 	}
 
+	public PatientCompliance(LocalDate date,
+			PatientInfo patient, User patientUser,Integer hmrRunRate) {
+		this.date = date;
+		this.patient = patient;
+		this.patientUser = patientUser;
+		this.hmrRunRate = hmrRunRate;
+	}
+
 	public Long getId() {
 		return id;
 	}

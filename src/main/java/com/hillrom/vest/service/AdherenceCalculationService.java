@@ -222,26 +222,25 @@ public class AdherenceCalculationService {
 		actualMetrics.put("weightedAvgPressure", weightedAvgPressure);
 		actualMetrics.put("totalDuration", totalDuration);
 		actualMetrics.put("treatmentsPerDay", treatmentsPerDay);
-		processMissedTherapySessions();
 		return actualMetrics;
 	}
 
 	/**
 	 * Runs every midnight deducts the compliance score by 2 assuming therapy hasn't been done for today
 	 */
-	@Scheduled(cron="0 0 * * * *")
+	@Scheduled(cron="0 0 0 * * *")
 	public void processMissedTherapySessions(){
 		try{
 			List<PatientCompliance> patientComplianceList = patientComplianceRepository.findAllGroupByPatientUserIdOrderByDateDesc();
+			List<PatientCompliance> newComplianceList = new LinkedList<>();
 			List<Long> patientUserIds = new LinkedList<>();
 			DateTime today = DateTime.now();
 			patientComplianceList.forEach(compliance -> {			
 				patientUserIds.add(compliance.getPatientUser().getId());
-				compliance.setDate(today.toLocalDate());
-				compliance.setId(null);
-				compliance.setHmrRunRate(compliance.getHmrRunRate());
+				PatientCompliance newCompliance = new PatientCompliance(today.toLocalDate(),compliance.getPatient(),compliance.getPatientUser(),compliance.getHmrRunRate());
 				if(compliance.getScore() > 0)
-					compliance.setScore(compliance.getScore()- MISSED_THERAPY_POINTS);
+					newCompliance.setScore(compliance.getScore()- MISSED_THERAPY_POINTS);
+				newComplianceList.add(newCompliance);
 			});
 			List<TherapySession> latestTherapySessions = therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(patientUserIds);
 			latestTherapySessions.forEach(latestTherapySession -> {
@@ -252,7 +251,7 @@ public class AdherenceCalculationService {
 							today.toLocalDate(), MISSED_THERAPY,false);
 				}
 			});
-			patientComplianceList.parallelStream().forEach(patientCompliance -> {
+			newComplianceList.parallelStream().forEach(patientCompliance -> {
 				complianceService.createOrUpdate(patientCompliance);
 			});
 		}catch(Exception ex){

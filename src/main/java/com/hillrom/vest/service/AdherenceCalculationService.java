@@ -1,5 +1,9 @@
 package com.hillrom.vest.service;
 
+import static com.hillrom.vest.config.AdherenceScoreConstants.*;
+import static com.hillrom.vest.config.NotificationTypeConstants.*;
+import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.*;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -19,8 +23,6 @@ import org.joda.time.LocalDate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import static com.hillrom.vest.config.AdherenceScoreConstants.*;
-import static com.hillrom.vest.config.NotificationTypeConstants.*;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
@@ -32,6 +34,8 @@ import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.ProtocolConstantsRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
+import com.hillrom.vest.service.util.DateUtil;
+
 
 @Service
 @Transactional
@@ -92,6 +96,7 @@ public class AdherenceCalculationService {
 	 * @param protocolConstant
 	 * @return
 	 */
+	// TODO : to be re-factored, will be taken care while integrating the Protocol changes
 	public PatientCompliance calculateCompliancePerDay(
 			List<TherapySession> therapySessionsPerDay,ProtocolConstants protocolConstant) {
 		User patientUser = therapySessionsPerDay.get(0).getPatientUser();
@@ -194,9 +199,6 @@ public class AdherenceCalculationService {
 		if(protocolConstant.getMinFrequency() > actualMetrics.get("weightedAvgFrequency") 
 				|| (protocolConstant.getMaxFrequency()*0.85) > actualMetrics.get("weightedAvgFrequency")){
 			return true;
-		}else if(protocolConstant.getMinPressure() < actualMetrics.get("weightedAvgPressure") ||
-				(protocolConstant.getMaxPressure()*0.85) > actualMetrics.get("weightedAvgPressure")){
-			return true;
 		}
 		return false;
 	}
@@ -213,8 +215,9 @@ public class AdherenceCalculationService {
 		double weightedAvgPressure = 0.0;
 		double treatmentsPerDay = 0.0;
 		for(TherapySession therapySession : therapySessionsPerDay){
-			weightedAvgFrequency += (double)(therapySession.getDurationInMinutes()*therapySession.getFrequency()/totalDuration);
-			weightedAvgPressure += (double)(therapySession.getDurationInMinutes()*therapySession.getPressure()/totalDuration);
+			Long durationInMinutes = therapySession.getDurationInMinutes();
+			weightedAvgFrequency += calculateWeightedAvg(totalDuration,durationInMinutes,therapySession.getFrequency());
+			weightedAvgPressure += calculateWeightedAvg(totalDuration,durationInMinutes,therapySession.getPressure());
 			++treatmentsPerDay;
 		}
 		Map<String,Double> actualMetrics = new HashMap<>();
@@ -244,7 +247,7 @@ public class AdherenceCalculationService {
 			});
 			List<TherapySession> latestTherapySessions = therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(patientUserIds);
 			latestTherapySessions.forEach(latestTherapySession -> {
-				DateTime therapySessionDateTime = new DateTime(latestTherapySession.getDate().toDateTime(org.joda.time.LocalTime.MIDNIGHT));
+				DateTime therapySessionDateTime = DateUtil.convertLocalDateToDateTime(latestTherapySession.getDate());
 				int missedTherapyDays = Days.daysBetween(therapySessionDateTime, today).getDays();
 				if( missedTherapyDays > 0 && missedTherapyDays %3 == 0){
 					notificationService.createOrUpdateNotification(latestTherapySession.getPatientUser(), latestTherapySession.getPatientInfo(), latestTherapySession.getPatientUser().getId(),
@@ -273,7 +276,11 @@ public class AdherenceCalculationService {
 			notifications.forEach(notification -> {
 				User patientUser = notification.getPatientUser();
 				if(Objects.nonNull(patientUser.getEmail())){
-					mailService.sendNotificationMail(patientUser,notification.getNotificationType());
+					// integrated Accepting mail notifications
+					String notificationType = notification.getNotificationType();
+					if(isPatientUserAcceptNotification(patientUser,
+							notificationType))
+					mailService.sendNotificationMail(patientUser,notificationType);
 				}
 			});
 		}catch(Exception ex){
@@ -283,6 +290,14 @@ public class AdherenceCalculationService {
 			mailService.sendJobFailureNotification("sendNotificationMail",writer.toString());
 		}
 		
+	}
+
+	private boolean isPatientUserAcceptNotification(User patientUser,
+			String notificationType) {
+		// TODO: rename the columns and member variables next sprint
+		return (patientUser.isAcceptHMRNotification() && HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType)) || 
+				(patientUser.isAcceptHMRSetting() && SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)) ||
+				(patientUser.isHMRNotification() && MISSED_THERAPY.equalsIgnoreCase(notificationType));
 	}
 	
 }

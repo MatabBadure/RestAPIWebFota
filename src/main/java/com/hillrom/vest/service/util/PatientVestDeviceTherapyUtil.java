@@ -147,5 +147,9 @@ public class PatientVestDeviceTherapyUtil {
 		}
 		return updatedTherapySessions;
 	}
-	
+
+	public static double calculateWeightedAvg(double totalDuration,Long durationInMinutes,
+			Integer frequency) {
+		return (double)durationInMinutes*frequency/totalDuration;
+	}
 }

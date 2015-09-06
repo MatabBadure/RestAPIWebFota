@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 public class DateUtil {
@@ -49,5 +50,15 @@ public class DateUtil {
 			List<LocalDate> dates) {
 		Map<Integer,List<LocalDate>> groupByWeek = dates.stream().collect(Collectors.groupingBy(LocalDate :: getMonthOfYear));
 		return groupByWeek;
+	}
+	
+	/**
+	 * Converts LocalDate to DateTime
+	 * @param date
+	 * @return
+	 */
+	public static DateTime convertLocalDateToDateTime(
+			LocalDate date) {
+		return new DateTime(date.toDateTime(org.joda.time.LocalTime.MIDNIGHT));
 	}
 }

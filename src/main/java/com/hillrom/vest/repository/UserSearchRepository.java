@@ -104,14 +104,13 @@ public class UserSearchRepository {
 		BigInteger count = (BigInteger) countQuery.getSingleResult();
 
 		Query query = getOrderedByQuery(findHcpQuery, sortOrder);
-		//setPaginationParams(pageable, query);
 		
 		List<HcpVO> hcpUsers = new ArrayList<>();
 
 		Map<Long, HcpVO> hcpUsersMap = new HashMap<>();
 		List<Object[]> results = query.getResultList();
 
-		results.stream().forEach(
+		results.forEach(
 				(record) -> {
 					Long id = ((BigInteger) record[0]).longValue();
 					String email = (String) record[1];
@@ -157,8 +156,14 @@ public class UserSearchRepository {
 					}
 					hcpUsers.add(hcpVO);
 				});
-
-		Page<HcpVO> page = new PageImpl<HcpVO>(hcpUsers, null, count.intValue());
+		int firstResult = pageable.getOffset();
+		int maxResults = firstResult + pageable.getPageSize();
+		List<HcpVO> hcpUsersSubList = new ArrayList<>();
+		if(firstResult < hcpUsers.size()){
+			maxResults = maxResults > hcpUsers.size() ? hcpUsers.size() : maxResults ;  
+			hcpUsersSubList = hcpUsers.subList(firstResult,maxResults);
+		}
+		Page<HcpVO> page = new PageImpl<HcpVO>(hcpUsersSubList, null, count.intValue());
 
 		return page;
 	}

@@ -119,8 +119,6 @@ public class PatientHCPService {
 	     		List<Map<String,Object>> responseList = new LinkedList<Map<String,Object>>();
 	     		patientList.forEach(patientInfo -> {
 	     			Map<String, Object> entity = new HashMap<>();
-	     			entity.put("patientInfo", patientInfo);
-	     			entity.put("patientUser", userService.getUserObjFromPatientInfo(patientInfo));
 	     			Set<ClinicPatientAssoc> filteredList = new HashSet<>();
 	     			if(!Constants.ALL.equals(filterByClinicId)) {
 	     				if(!patientInfo.getClinicPatientAssoc().isEmpty()) {
@@ -137,8 +135,12 @@ public class PatientHCPService {
 	     			filteredList.forEach(cpa -> {
 	     				clinics.add(cpa.getClinic());
 	     			});
-	     			entity.put("clinics", clinics);
-	     			responseList.add(entity);
+	     			if(!clinics.isEmpty()) {
+	     				entity.put("patientInfo", patientInfo);
+		     			entity.put("patientUser", userService.getUserObjFromPatientInfo(patientInfo));
+		     			entity.put("clinics", clinics);
+		     			responseList.add(entity);
+	     			}
 	     		});
 		    	return responseList;
 	     	} else {

@@ -525,6 +525,16 @@ public class UserService {
     		} else {
     			throw new HillromException(ExceptionConstants.HR_531);//Unable to update HealthCare Professional.
     		}
+        } else if (AuthoritiesConstants.CLINIC_ADMIN.equals(userExtensionDTO.getRole())) {
+           	UserExtension user = updateClinicAdminUser(id, userExtensionDTO);
+    		if(user.getId() != null) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && !user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
+    				mailService.sendActivationEmail(user, baseUrl);
+    			}
+                return user;
+    		} else {
+    			throw new HillromException(ExceptionConstants.HR_575);//Unable to update Clinic Admin.
+    		}
         } else {
         	throw new HillromException(ExceptionConstants.HR_555);//Incorrect data
     	}
@@ -581,6 +591,14 @@ public class UserService {
 		userExtensionRepository.save(hcpUser);
 		log.debug("Updated Information for HealthCare Proffessional: {}", hcpUser);
 		return hcpUser;
+	}
+    
+    public UserExtension updateClinicAdminUser(Long id, UserExtensionDTO userExtensionDTO) {
+    	UserExtension clinicAdminUser = userExtensionRepository.findOne(id);
+		assignValuesToUserObj(userExtensionDTO, clinicAdminUser);
+		userExtensionRepository.saveAndFlush(clinicAdminUser);
+		log.debug("Updated Information for Clinic Admin User : {}", clinicAdminUser);
+		return clinicAdminUser;
 	}
 
 	private void assignValuesToPatientInfoObj(UserExtensionDTO userExtensionDTO, PatientInfo patientInfo) {

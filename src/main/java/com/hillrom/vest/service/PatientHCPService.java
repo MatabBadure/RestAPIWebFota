@@ -135,7 +135,14 @@ public class PatientHCPService {
 	     			filteredList.forEach(cpa -> {
 	     				clinics.add(cpa.getClinic());
 	     			});
-	     			if(!clinics.isEmpty()) {
+	     			if(!Constants.ALL.equals(filterByClinicId)) {
+		     			if(!clinics.isEmpty()) {
+		     				entity.put("patientInfo", patientInfo);
+			     			entity.put("patientUser", userService.getUserObjFromPatientInfo(patientInfo));
+			     			entity.put("clinics", clinics);
+			     			responseList.add(entity);
+		     			}
+	     			} else {
 	     				entity.put("patientInfo", patientInfo);
 		     			entity.put("patientUser", userService.getUserObjFromPatientInfo(patientInfo));
 		     			entity.put("clinics", clinics);

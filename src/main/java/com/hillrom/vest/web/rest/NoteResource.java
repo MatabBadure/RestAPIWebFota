@@ -122,11 +122,12 @@ public class NoteResource {
     public ResponseEntity<List<Note>> getNotificationsByPatientUserId(@RequestParam(value="from",required=true)Long fromTimestamp,
     		@RequestParam(value="to",required=true)Long toTimestamp,
     		@RequestParam(value="userId",required=true)Long userId,
+    		@RequestParam(value="deleted",required=false)boolean isDeleted,
     		@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit) throws URISyntaxException{
     	
     	Pageable pageable = PaginationUtil.generatePageRequest(offset, limit);
-    	Page<Note> page = noteService.findByUserIdAndDateRange(userId, LocalDate.fromDateFields(new Date(fromTimestamp)), LocalDate.fromDateFields(new Date(toTimestamp)), pageable);
+    	Page<Note> page = noteService.findByUserIdAndDateRange(userId, LocalDate.fromDateFields(new Date(fromTimestamp)), LocalDate.fromDateFields(new Date(toTimestamp)),isDeleted, pageable);
     	HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/notes", offset, limit);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

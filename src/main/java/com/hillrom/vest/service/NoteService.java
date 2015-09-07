@@ -114,8 +114,8 @@ public class NoteService {
 		noteRepository.delete(id);
 	}
 	
-	public Page<Note> findByUserIdAndDateRange(Long userId,LocalDate from,LocalDate to,Pageable pageable){
-		Page<Note> notes = noteRepository.findByPatientUserIdAndCreatedOnBetweenOrderByCreatedOnDesc(userId,from,to,pageable);
+	public Page<Note> findByUserIdAndDateRange(Long userId,LocalDate from,LocalDate to,Boolean isDeleted,Pageable pageable){
+		Page<Note> notes = noteRepository.findByPatientUserIdAndCreatedOnBetweenAndDeletedOrderByCreatedOnDesc(userId,from,to,isDeleted,pageable);
 		return notes;
 	} 
 }

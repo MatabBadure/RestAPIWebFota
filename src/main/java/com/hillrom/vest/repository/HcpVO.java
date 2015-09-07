@@ -26,11 +26,12 @@ public class HcpVO {
 	private boolean isDeleted;
 	private DateTime createdAt;
 	private boolean isActivated;
+	private String npiNumber;
 	
 	public HcpVO(Long id, String firstName, String lastName, String email,boolean isDeleted,
 			Integer zipcode, String address, String city, String credentials,
 			String faxNumber, String primaryPhone, String mobilePhone,
-			String speciality, String state,DateTime createdAt,boolean isActivated) {
+			String speciality, String state,DateTime createdAt,boolean isActivated,String npiNumber) {
 		super();
 		this.id = id;
 		this.email = email;
@@ -48,7 +49,9 @@ public class HcpVO {
 		this.state = state;
 		this.createdAt = createdAt;
 		this.isActivated = isActivated;
+		this.npiNumber = npiNumber;
 	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -151,6 +154,14 @@ public class HcpVO {
 	}
 	public void setActivated(boolean isActivated) {
 		this.isActivated = isActivated;
+	}
+
+	public String getNpiNumber() {
+		return npiNumber;
+	}
+
+	public void setNpiNumber(String npiNumber) {
+		this.npiNumber = npiNumber;
 	}
 	
 	

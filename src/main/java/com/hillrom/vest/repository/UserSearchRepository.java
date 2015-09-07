@@ -88,7 +88,7 @@ public class UserSearchRepository {
 		
 		String findHcpQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted,"
 				+ " user.zipcode,userExt.address,userExt.city,userExt.credentials,userExt.fax_number,userExt.primary_phone,"
-				+ " userExt.mobile_phone,userExt.speciality,userExt.state,clinic.id as clinicId,clinic.name as clinicName,user.created_date as createdAt,user.activated isActivated "
+				+ " userExt.mobile_phone,userExt.speciality,userExt.state,clinic.id as clinicId,clinic.name as clinicName,user.created_date as createdAt,user.activated isActivated,userExt.npi_number as npiNumber "
 				+ " FROM USER user join USER_EXTENSION userExt on user.id = userExt.user_id "
 				+ " and (lower(user.first_name) like lower(:queryString) or  lower(user.last_name) like lower(:queryString) or  lower(user.email) like lower(:queryString)) "
 				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = 'HCP' "
@@ -132,6 +132,7 @@ public class UserSearchRepository {
 					Timestamp createdAt = (Timestamp) record[16];
 					DateTime createdAtDatetime = new DateTime(createdAt);
 					Boolean isActivated = (Boolean) record[17];
+					String npiNumber = (String)record[18];
 					HcpVO hcpVO = hcpUsersMap.get(id);
 
 					Map<String, String> clinicMap = new HashMap<>();
@@ -143,7 +144,7 @@ public class UserSearchRepository {
 						hcpVO = new HcpVO(id, firstName, lastName, email,
 								isDeleted, zipcode, address, city, credentials,
 								faxNumber, primaryPhone, mobilePhone,
-								speciality, state,createdAtDatetime,isActivated);
+								speciality, state,createdAtDatetime,isActivated,npiNumber);
 						if (clinicMap.keySet().size() > 0) {
 							hcpVO.getClinics().add(clinicMap);
 						}

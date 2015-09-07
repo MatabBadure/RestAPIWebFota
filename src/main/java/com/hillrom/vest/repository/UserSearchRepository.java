@@ -86,7 +86,7 @@ public class UserSearchRepository {
 	public Page<HcpVO> findHCPBy(String queryString, Pageable pageable,
 			Map<String, Boolean> sortOrder) {
 		
-		String findHcpQuery = "select distinct(user.id),user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted,"
+		String findHcpQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted,"
 				+ " user.zipcode,userExt.address,userExt.city,userExt.credentials,userExt.fax_number,userExt.primary_phone,"
 				+ " userExt.mobile_phone,userExt.speciality,userExt.state,clinic.id as clinicId,clinic.name as clinicName,user.created_date as createdAt,user.activated isActivated "
 				+ " FROM USER user join USER_EXTENSION userExt on user.id = userExt.user_id "
@@ -97,21 +97,20 @@ public class UserSearchRepository {
 
 		findHcpQuery = findHcpQuery.replaceAll(":queryString", queryString);
 
-		String countSqlQuery = "select count(hcpUsers.id) from ("
-				+ findHcpQuery + "group by user.id ) hcpUsers";
+		String countSqlQuery = "select count(distinct hcpUsers.id) from ("
+				+ findHcpQuery + " ) hcpUsers";
 
 		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
 		BigInteger count = (BigInteger) countQuery.getSingleResult();
 
 		Query query = getOrderedByQuery(findHcpQuery, sortOrder);
-		setPaginationParams(pageable, query);
 		
 		List<HcpVO> hcpUsers = new ArrayList<>();
 
 		Map<Long, HcpVO> hcpUsersMap = new HashMap<>();
 		List<Object[]> results = query.getResultList();
 
-		results.stream().forEach(
+		results.forEach(
 				(record) -> {
 					Long id = ((BigInteger) record[0]).longValue();
 					String email = (String) record[1];
@@ -157,8 +156,14 @@ public class UserSearchRepository {
 					}
 					hcpUsers.add(hcpVO);
 				});
-
-		Page<HcpVO> page = new PageImpl<HcpVO>(hcpUsers, null, count.intValue());
+		int firstResult = pageable.getOffset();
+		int maxResults = firstResult + pageable.getPageSize();
+		List<HcpVO> hcpUsersSubList = new ArrayList<>();
+		if(firstResult < hcpUsers.size()){
+			maxResults = maxResults > hcpUsers.size() ? hcpUsers.size() : maxResults ;  
+			hcpUsersSubList = hcpUsers.subList(firstResult,maxResults);
+		}
+		Page<HcpVO> page = new PageImpl<HcpVO>(hcpUsersSubList, null, count.intValue());
 
 		return page;
 	}

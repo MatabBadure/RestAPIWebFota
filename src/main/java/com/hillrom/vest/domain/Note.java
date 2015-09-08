@@ -53,7 +53,7 @@ public class Note {
 	private DateTime modifiedAt = DateTime.now();
 	
 	@Column(name="is_deleted")
-	private boolean isDeleted;
+	private boolean deleted;
 
 	public Long getId() {
 		return id;
@@ -72,11 +72,11 @@ public class Note {
 	}
 
 	public boolean isDeleted() {
-		return isDeleted;
+		return deleted;
 	}
 
 	public void setDeleted(boolean isDeleted) {
-		this.isDeleted = isDeleted;
+		this.deleted = isDeleted;
 	}
 
 	public User getPatientUser() {

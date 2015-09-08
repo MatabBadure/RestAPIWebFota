@@ -1,24 +1,98 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <title th:text="#{email.activation.title}">Hillrom activation</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    </head>
-    <body>
-        <p th:text="#{email.activation.greeting(${user.email})}">
-            Dear
-        </p>
-        <p th:text="#{email.activation.text1}">
-            Your Hillrom account has been created, please click on the URL below to activate it:
-        </p>
-        <p>
-            <a th:href="@{|${baseUrl}/#/activate?key=${user.activationKey}|}"
-               th:text="|${user.email}|">Activation Link</a>
-        </p>
-        <p>
-            <span th:text="#{email.activation.text2}">Regards, </span>
-            <br/>
-            <em th:text="#{email.signature}">JHipster.</em>
-        </p>
-    </body>
+<html>
+	<head>
+		<title th:text="#{email.activation.title}">Hillrom Activation</title>
+	</head>	
+<body>
+	<div
+		style="border: 2px solid #7BA4DA; margin: 0 auto; max-width: 590px; padding-left: 10px; padding-right: 10px">
+		<table style="height: 100%; width: 100%;">
+			<tr>
+				<td><a> <img style="height: 30px; width: 100px;"
+						src="logo-HillRom.png" th:src="#{url.logo.hillrom}"></img></a>
+
+					<div
+						style="font-size: 14px; font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; display: inline-block; vertical-align: 8px; padding-top: 25px; padding-right: 50px; padding-bottom: 25px; padding-left: 20px;">
+						<span style="color: #FF9829">VisiView<sup>TM</sup></span> <span
+							style="color: #C0C0C0">Health Portal</span>
+					</div></td>
+			</tr>
+			<tr>
+				<td>
+					<table
+						style="height: 100%; width: 100%; background-color: #7BA4DA;">
+						<tr>
+							<td height="80px" width="90%" style="background-color: #7BA4DA;">
+								<p
+									style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 25px; padding-left: 35px; font-weight: bold; margin: 15px 0px 1px;">
+									Your Account is Activated</p>
+								<p style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: black; font-size: 20px; padding-left: 35px; font-weight: 600; margin: 5px 0px 10px;">
+									</p>
+							</td>
+							<td style="border-radius: 150px 0px 0px 150px; background-color: #ffffff;" height="80px" width="80px">
+								<img style="height : 90px; width:150px; padding-left: 5px; " src="thumb.svg" th:src="#{url.logo.activation}"></img>
+							</td>
+						</tr>
+					</table>
+			</td>
+			</tr>
+			<tr>
+				<td>
+					<p
+						style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: black; font-size: 14px;"
+						th:text="#{email.reset.greeting(${user.firstName})}">Dear</p>
+					<p
+						style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: black; font-size: 14px;"
+						th:text="#{email.activation.text1}">
+			            Your Hillrom account has been created, please click on the URL below to activate it:
+			        	</p>
+         			<a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: black; font-size: 14px;"
+						th:href="@{|${baseUrl}/#/activate?key=${user.activationKey}|}"
+	               		th:text="|${user.email}|">Click Here</a>
+	               		<p
+						style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: black; font-size: 14px;"
+						th:text="#{email.reset.text3}"></p>
+				</td>
+			</tr>
+			<tr bgcolor="#7BA4DA">
+				<td>
+					<table>
+						<tr>
+							<td>
+								<nav>
+									<a
+										style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 11.5px; border-right: 1px solid #fff; padding-left: 15px; padding-right: 5px; font-weight: 500;"
+										href="/contact-us/" th:href="#{url.nav.contactus}">Contact
+										Us</a> <a
+										style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 11.5px; border-right: 1px solid #fff; padding-right: 5px; font-weight: 500;"
+										href="/contact-us/" th:href="#{url.nav.privacypolicy}">Privacy
+										Policy</a> <a
+										style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 11.5px; border-right: 1px solid #fff; padding-right: 5px; font-weight: 500;"
+										href="/contact-us/" th:href="#{url.nav.termsofuse}">Terms
+										of Use</a> <a
+										style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 11.5px; border-right: 1px solid #fff; padding-right: 5px; font-weight: 500;"
+										href="/contact-us/"
+										th:href="#{url.nav.HIPPANoticeofPrivacyPractices}">HIPPA
+										Notice of Privacy Practices</a> <a
+										style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 11.5px; padding-right: 5px; font-weight: 500;"
+										href="contact-us" th:href="#{url.nav.HillRomRespiratoryCare}">Hill-Rom
+										Respiratory Care</a>
+								</nav>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<div
+									style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 11.5px; font-weight: 500;">
+									<p align="center" th:text="#{copyright.text}">Copyright (c)
+										Hillrom 2014. All Rights Reserved.</p>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
 </html>

@@ -669,6 +669,8 @@ public class UserService {
 			newUser.setDob(LocalDate.parse(userExtensionDTO.getDob(), DateTimeFormat.forPattern("MM/dd/yyyy")));
 		if(userExtensionDTO.getGender() != null)
 			newUser.setGender(userExtensionDTO.getGender());
+		if(userExtensionDTO.getHillromId() != null)
+			newUser.setHillromId(userExtensionDTO.getHillromId());
 		newUser.setLangKey(userExtensionDTO.getLangKey());
 	}
 

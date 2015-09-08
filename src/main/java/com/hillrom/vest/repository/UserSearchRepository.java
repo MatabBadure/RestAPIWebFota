@@ -38,7 +38,7 @@ public class UserSearchRepository {
 				+ " lower(user.last_name) like lower(:queryString) or "
 				+ " lower(user.email) like lower(:queryString)) "
 				+ " join  USER_AUTHORITY user_authority on user_authority.user_id = user.id "
-				+ " and  user_authority.authority_name in ('ADMIN','ACCT_SERVICES','ASSOCIATES','HILLROM_ADMIN','CLINIC_ADMIN')";
+				+ " and  user_authority.authority_name in ('ADMIN','ACCT_SERVICES','ASSOCIATES','HILLROM_ADMIN')";
 
 		findHillromTeamUserQuery = findHillromTeamUserQuery.replaceAll(
 				":queryString", queryString);

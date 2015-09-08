@@ -338,6 +338,12 @@ public class UserService {
     	List<String> rolesAdminCanModerate = rolesAdminCanModerate();
     	if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())
     			&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
+    		if(userExtensionDTO.getHillromId() != null) {
+    			Optional<User> existingUser = userRepository.findOneByHillromId(userExtensionDTO.getHillromId());
+    			if (existingUser.isPresent()) {
+    				throw new HillromException(ExceptionConstants.HR_522);
+        		}
+        	}
     		UserExtension user = createHillromTeamUser(userExtensionDTO);
     		if(user.getId() != null) {
     			if(userExtensionDTO.getEmail() != null) {
@@ -495,6 +501,12 @@ public class UserService {
         List<String> rolesAdminCanModerate = rolesAdminCanModerate();
         if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())
         		&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
+        	if(userExtensionDTO.getHillromId() != null) {
+    			Optional<User> existingUser = userRepository.findOneByHillromId(userExtensionDTO.getHillromId());
+    			if (existingUser.isPresent() && !existingUser.get().getId().equals(id)) {
+    				throw new HillromException(ExceptionConstants.HR_522);
+        		}
+        	}
         	UserExtension user = updateHillromTeamUser(id, userExtensionDTO);
     		if(user.getId() != null) {
     			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && !user.getEmail().equals(userExtensionDTO.getEmail()) && !user.getActivated()) {
@@ -669,6 +681,8 @@ public class UserService {
 			newUser.setDob(LocalDate.parse(userExtensionDTO.getDob(), DateTimeFormat.forPattern("MM/dd/yyyy")));
 		if(userExtensionDTO.getGender() != null)
 			newUser.setGender(userExtensionDTO.getGender());
+		if(userExtensionDTO.getHillromId() != null)
+			newUser.setHillromId(userExtensionDTO.getHillromId());
 		newUser.setLangKey(userExtensionDTO.getLangKey());
 	}
 

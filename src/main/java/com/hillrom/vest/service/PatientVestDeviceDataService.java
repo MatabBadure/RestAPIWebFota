@@ -1,6 +1,8 @@
 package com.hillrom.vest.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -24,6 +26,7 @@ import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.VestDeviceBadDataRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.service.util.ParserUtil;
 import com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 
@@ -56,7 +59,7 @@ public class PatientVestDeviceDataService {
 	@Inject
 	private VestDeviceBadDataRepository vestDeviceBadDataRepository;
 
-	public List<PatientVestDeviceData> save(final String rawData) {
+	public List<PatientVestDeviceData> save(final Map<String,String> rawData) {
 		PatientVestDeviceRawLog deviceRawLog = null;
 		List<PatientVestDeviceData> patientVestDeviceRecords = null;
 		try {
@@ -80,10 +83,12 @@ public class PatientVestDeviceDataService {
 			
 			deviceDataRepository.save(patientVestDeviceRecords);
 		} catch (Exception e) {
-			vestDeviceBadDataRepository.save(new VestDeviceBadData(rawData));
+			vestDeviceBadDataRepository.save(new VestDeviceBadData(ParserUtil.prepareRawMessage(rawData)));
 			throw new RuntimeException(e.getMessage());
 		}finally{
-			deviceRawLogRepository.save(deviceRawLog);
+			if(Objects.nonNull(deviceRawLog)){
+				deviceRawLogRepository.save(deviceRawLog);
+			}
 		}
 		return patientVestDeviceRecords;
 	}

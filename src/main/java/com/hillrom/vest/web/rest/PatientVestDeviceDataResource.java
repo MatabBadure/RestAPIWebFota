@@ -2,9 +2,9 @@ package com.hillrom.vest.web.rest;
 
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 
 import net.minidev.json.JSONObject;
 
@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,19 +38,19 @@ public class PatientVestDeviceDataResource {
 	@RequestMapping(value = "/receiveData",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> receiveData(HttpServletRequest request){
+	public ResponseEntity<?> receiveData(@RequestBody(required=true)Map<String,String> deviceLog){
 		List<PatientVestDeviceData> deviceData = null;
 		String reqParams[] = new String[]{"device_model_type","device_data",
         "device_serial_number","device_type","hub_id","air_interface_type",
         "customer_name","cde_version","exporter_version","timezone","sp_receive_time",
         "hub_receive_time","device_address","qcl_json_data","twonet_id","hub_receive_time_offset",
         "cuc_version","customer_id"};
-		JSONObject jsonObject = RequestUtil.checkRequiredParamsInQueryString(request.getQueryString(), reqParams);
+		JSONObject jsonObject = RequestUtil.checkRequiredParams(deviceLog, reqParams);
 		if(jsonObject.containsKey("ERROR")){
 			return new ResponseEntity(jsonObject,HttpStatus.BAD_REQUEST);
 		};
 		try{			
-			deviceData = deviceDataService.save(request.getQueryString());
+			deviceData = deviceDataService.save(deviceLog);
 		}catch(Exception e){
 			JSONObject error = new JSONObject();
 			error.put("message", e.getMessage());

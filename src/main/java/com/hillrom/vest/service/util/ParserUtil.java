@@ -1,7 +1,9 @@
 package com.hillrom.vest.service.util;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -17,15 +19,13 @@ public class ParserUtil {
 		
 	}
 	
-	public static String getValueFromMessage(String message, String key) {
-
-		List<NameValuePair> params = URLEncodedUtils.parse(message, Charset.defaultCharset());
-		for (NameValuePair nameValuePair : params) {
-			if (nameValuePair.getName().toString().equals(key)) {
-				return nameValuePair.getValue();
-			}
+	public static Map<String,String> getDecodedParamsMapFromEncodedString(String message) {
+		List<NameValuePair> nameValuePairs =  URLEncodedUtils.parse(message, Charset.defaultCharset());
+		Map<String,String> decodedParamsMap = new HashMap<>();
+		for(NameValuePair nvp : nameValuePairs){
+			decodedParamsMap.put(nvp.getName(),nvp.getValue());
 		}
-		return null;
+		return decodedParamsMap;
 	}
 
 	public static String getFieldByStartAndEndOffset(String encodedString,int startOffset,int endOffset){
@@ -48,5 +48,18 @@ public class ParserUtil {
 	
 	public static Long convertHexStringToLong(String hexString){
 		return Long.parseLong(hexString, 16);
-	} 
+	}
+	
+	public static String prepareRawMessage(Map<String,String> deviceRawLogData){
+		StringBuilder builder = new StringBuilder();
+		int i = 0;
+		for(String key : deviceRawLogData.keySet()){
+			builder.append(key).append("=").append(deviceRawLogData.get(key));
+			++i;
+			if( i < deviceRawLogData.size()){
+				builder.append("&");
+			}
+		}
+		return builder.toString();
+	}
 }

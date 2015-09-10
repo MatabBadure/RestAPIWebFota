@@ -138,6 +138,9 @@ public class UserResource {
 			@RequestParam(value = "sort_by", required = false) String sortBy,
 			@RequestParam(value = "asc", required = false) Boolean isAscending)
 			throws URISyntaxException {
+		if(searchString.endsWith("_")){
+ 		   searchString = searchString.replace("_", "\\\\_");
+		}
 		String queryString = new StringBuilder("'%").append(searchString)
 				.append("%'").toString();
 		Map<String, Boolean> sortOrder = new HashMap<>();

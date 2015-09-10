@@ -99,7 +99,7 @@ public class PatientHCPService {
 	private List<User> getAssociatedHCPUserList(PatientInfo patientInfo) {
 		List<User> hcpUsers = new LinkedList<>();
 		for(UserPatientAssoc userPatientAssoc : patientInfo.getUserPatientAssoc()){
-			if(RelationshipLabelConstants.HCP.equals(userPatientAssoc.getRelationshipLabel())){
+			if(AuthoritiesConstants.HCP.equals(userPatientAssoc.getUserRole())){
 				hcpUsers.add(userPatientAssoc.getUser());
 			}
 		}

@@ -94,7 +94,7 @@ public class PatientUserServiceTest {
 		UserExtension newPatientUser = userService.createPatientUser(userExtensionDTO);
 		userExtensionDTO.setMiddleName("Smith");
 		userExtensionDTO.setCity("Bangalore");
-		UserExtension updatedPatientUser = userService.updatePatientUser(newPatientUser.getId(), userExtensionDTO);
+		UserExtension updatedPatientUser = userService.updatePatientUser(newPatientUser, userExtensionDTO);
 		assertThat(updatedPatientUser.isDeleted()).isFalse();
         assertThat(updatedPatientUser.getId()).isNotNull();
         assertThat(updatedPatientUser.getMiddleName()).isEqualTo(userExtensionDTO.getMiddleName());

@@ -174,12 +174,13 @@ public class UserSearchRepository {
 			Pageable pageable, Map<String, Boolean> sortOrder) {
 
 		String findPatientUserQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName,"
-				+ " user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,user.title,patInfo.hillrom_id,user.created_date as createdAt,user.activated as isActivated "
+				+ " user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,user.title,user.hillrom_id,user.created_date as createdAt,user.activated as isActivated "
 				+ " from USER user join USER_AUTHORITY user_authority on user_authority.user_id = user.id "
 				+ " and user_authority.authority_name = 'PATIENT' and user.activated = 1"
 				+ " and (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or  "
-				+ " lower(user.email) like lower(:queryString)) "
+				+ " lower(user.email) like lower(:queryString) or "
+				+ " lower(user.hillrom_id) like lower(:queryString)) "
 				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = 'SELF' "
 				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id ";
 

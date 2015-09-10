@@ -78,7 +78,8 @@ public class UserSearchRepository {
 	}
 
 	private void setPaginationParams(Pageable pageable, Query query) {
-		int firstResult = pageable.getPageNumber() * pageable.getOffset();
+		
+		int firstResult = pageable.getOffset();
 		int maxResult = pageable.getPageSize();
 		query.setFirstResult(firstResult);
 		query.setMaxResults(maxResult);

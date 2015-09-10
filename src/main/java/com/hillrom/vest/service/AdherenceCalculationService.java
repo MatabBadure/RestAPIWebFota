@@ -245,7 +245,7 @@ public class AdherenceCalculationService {
 					newCompliance.setScore(compliance.getScore()- MISSED_THERAPY_POINTS);
 				newComplianceList.add(newCompliance);
 			});
-			List<TherapySession> latestTherapySessions = therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(patientUserIds);
+			List<TherapySession> latestTherapySessions = therapySessionRepository.findTop1ByPatientUserIdInOrderByEndTimeDesc(patientUserIds);
 			latestTherapySessions.forEach(latestTherapySession -> {
 				DateTime therapySessionDateTime = DateUtil.convertLocalDateToDateTime(latestTherapySession.getDate());
 				int missedTherapyDays = Days.daysBetween(therapySessionDateTime, today).getDays();

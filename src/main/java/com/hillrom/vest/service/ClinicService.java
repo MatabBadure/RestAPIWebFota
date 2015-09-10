@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -47,6 +48,12 @@ public class ClinicService {
 
     public Clinic createClinic(ClinicDTO clinicDTO) throws HillromException {
     	Clinic newClinic = new Clinic();
+    	if(Objects.nonNull(clinicDTO.getHillromId())) {
+			Optional<Clinic> existingClinic = clinicRepository.findOneByHillromId(clinicDTO.getHillromId());
+			if (existingClinic.isPresent()) {
+				throw new HillromException(ExceptionConstants.HR_522);
+    		}
+    	}
     	// Assigns the next clinic HillromId from Stored Procedure
     	newClinic.setId(clinicRepository.id());
     	if(clinicDTO.getParent()) {
@@ -69,9 +76,15 @@ public class ClinicService {
 
     public Clinic updateClinic(String id, ClinicDTO clinicDTO) throws HillromException {
     	Clinic clinic = clinicRepository.getOne(id);
-        if(clinic == null) {
+        if(Objects.isNull(clinic)) {
         	throw new HillromException(ExceptionConstants.HR_548);//No such clinic found
         } else if(StringUtils.isNotBlank(clinic.getId())) {
+        	if(Objects.nonNull(clinicDTO.getHillromId())) {
+    			Optional<Clinic> existingClinic = clinicRepository.findOneByHillromId(clinicDTO.getHillromId());
+    			if (existingClinic.isPresent() && !existingClinic.get().getId().equals(id)) {
+    				throw new HillromException(ExceptionConstants.HR_522);
+        		}
+        	}
         	assignUpdatedValues(clinicDTO, clinic);
         	if(clinicDTO.getParent()) {
 	        	List<String> existingChildClinicIds = new ArrayList<String>();

@@ -14,6 +14,7 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
 import com.hillrom.vest.domain.Clinic;
+import com.hillrom.vest.domain.User;
 
 /**
  * Spring Data JPA repository for the Clinic entity.
@@ -42,4 +43,7 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 
 	@Query("from Clinic clinic where clinic.clinicAdminId IS NOT NULL")
 	List<Clinic> findAllWithClinicAdmins();
+	
+	@Query("from Clinic clinic where LOWER(clinic.hillromId) = ?1")
+    Optional<Clinic> findOneByHillromId(String hillromId);
 }

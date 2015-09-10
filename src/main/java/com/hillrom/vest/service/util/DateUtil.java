@@ -3,10 +3,17 @@ package com.hillrom.vest.service.util;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.util.ExceptionConstants;
+import static  com.hillrom.vest.config.Constants.*;
 
 public class DateUtil {
 
@@ -60,5 +67,16 @@ public class DateUtil {
 	public static DateTime convertLocalDateToDateTime(
 			LocalDate date) {
 		return new DateTime(date.toDateTime(org.joda.time.LocalTime.MIDNIGHT));
+	}
+	
+	public static LocalDate parseStringToLocalDate(String dateString, String dateFormat) throws HillromException{
+		dateFormat = Objects.nonNull(dateFormat) ? dateFormat : YYYY_MM_DD; 
+		final DateTimeFormatter dtf = DateTimeFormat.forPattern(dateFormat);
+		try{
+			return dtf.parseLocalDate(dateString);
+		}catch(Exception ex){
+			throw new HillromException(ExceptionConstants.HR_600.concat(dateFormat), ex);
+		}
+    	
 	}
 }

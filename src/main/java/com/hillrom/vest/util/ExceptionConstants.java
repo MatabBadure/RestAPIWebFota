@@ -105,5 +105,7 @@ public class ExceptionConstants {
     //General 4** Exceptions
     public static final String HR_403 = "Permission Denied";
     
+    // DateFormat Exception
+    public static final String HR_600 = "Invalid DateFormat, expected is : "; 
     
 }

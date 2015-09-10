@@ -103,4 +103,5 @@ public final class Constants {
 
 	public static final String EVENT = "Event";
 
+	public static final String YYYY_MM_DD = "yyyy-MM-dd";
 }

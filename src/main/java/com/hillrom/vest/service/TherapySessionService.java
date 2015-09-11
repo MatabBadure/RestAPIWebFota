@@ -25,7 +25,6 @@ import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
-import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
@@ -45,7 +44,7 @@ public class TherapySessionService {
 	private AdherenceCalculationService adherenceCalculationService;
 	
 	@Inject
-	private PatientComplianceRepository complianceRepository;
+	private PatientComplianceService complianceService;
 	
 	public List<TherapySession> saveOrUpdate(List<TherapySession> therapySessions) throws HillromException{
 		User patientUser = therapySessions.get(0).getPatientUser();
@@ -61,7 +60,7 @@ public class TherapySessionService {
 			List<TherapySession> therapySessionsPerDay = groupedTherapySessions.get(day);
 			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId());
 			PatientCompliance compliance =  adherenceCalculationService.calculateCompliancePerDay(therapySessionsPerDay,protocol);
-			complianceRepository.save(compliance);
+			complianceService.createOrUpdate(compliance);
 			therapySessionRepository.save(therapySessionsPerDay);
 		}
 		return therapySessions;

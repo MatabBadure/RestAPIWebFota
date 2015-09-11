@@ -1,6 +1,7 @@
 package com.hillrom.vest.service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -83,7 +84,9 @@ public class PatientVestDeviceDataService {
 			vestDeviceBadDataRepository.save(new VestDeviceBadData(rawData));
 			throw new RuntimeException(e.getMessage());
 		}finally{
-			deviceRawLogRepository.save(deviceRawLog);
+			if(Objects.nonNull(deviceRawLog)){				
+				deviceRawLogRepository.save(deviceRawLog);
+			}
 		}
 		return patientVestDeviceRecords;
 	}
@@ -110,12 +113,17 @@ public class PatientVestDeviceDataService {
 			patientInfo.setBluetoothId(deviceRawLog.getDeviceAddress());
 			patientInfo.setHubId(deviceRawLog.getHubId());
 			patientInfo.setSerialNumber(deviceRawLog.getDeviceSerialNumber());
+			String customerName = deviceRawLog.getCustomerName();
+			setNameToPatient(patientInfo, customerName);
 			patientInfo = patientInfoRepository.save(patientInfo);
 			
 			UserExtension userExtension = new UserExtension();
 			userExtension.setHillromId(hillromId);
 			userExtension.setActivated(true);
 			userExtension.setDeleted(false);
+			userExtension.setFirstName(patientInfo.getFirstName());
+			userExtension.setLastName(patientInfo.getLastName());
+			userExtension.setMiddleName(patientInfo.getMiddleName());
 			userExtensionRepository.save(userExtension);
 			
 			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(
@@ -134,6 +142,25 @@ public class PatientVestDeviceDataService {
 		}
 	}
 
+	private void setNameToPatient(PatientInfo patientInfo,String customerName){
+		String names[] = customerName.split(" ");
+		if(names.length == 2){
+			assignNameToPatient(patientInfo,names[1],names[0],null);
+		}
+		if(names.length == 3){
+			assignNameToPatient(patientInfo,names[2],names[1],names[0]);
+		}
+		if(names.length == 1){
+			assignNameToPatient(patientInfo,names[0],null,null);
+		}
+	}
+	
+	private void assignNameToPatient(PatientInfo patientInfo,String firstName,String lastName,String middleName){
+		patientInfo.setFirstName(firstName);
+		patientInfo.setLastName(lastName);
+		patientInfo.setMiddleName(middleName);
+	}
+	
 	private void assignDefaultValuesToVestDeviceData(
 			PatientVestDeviceRawLog deviceRawLog,
 			List<PatientVestDeviceData> patientVestDeviceRecords,

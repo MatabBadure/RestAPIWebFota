@@ -11,18 +11,18 @@ import com.hillrom.vest.domain.TherapySession;
 public interface TherapySessionRepository extends
 		JpaRepository<TherapySession, Long> {
 
-	public TherapySession findTop1ByPatientUserIdOrderByEndTimeDesc(Long id);
+	public TherapySession findTop1ByPatientUserIdOrderByEndTimeDesc(Long patientUserId);
 
 	@Query("from TherapySession tps where tps.patientUser.id =?1 and tps.date between ?2 and ?3")
-	public List<TherapySession> findByPatientUserIdAndDateRange(Long id, LocalDate fromTimestamp,
+	public List<TherapySession> findByPatientUserIdAndDateRange(Long patientUserId, LocalDate fromTimestamp,
 			LocalDate toTimestamp);
 
 	@Query("from TherapySession tps where tps.patientUser.id =?1 and tps.date = ?2")
-	public List<TherapySession> findByPatientUserIdAndDate(Long id,
+	public List<TherapySession> findByPatientUserIdAndDate(Long patientUserId,
 			LocalDate dateTime);
 	
-	public TherapySession findTop1ByPatientUserIdOrderByDateAsc(Long id);
+	public TherapySession findTop1ByPatientUserIdOrderByDateAsc(Long patientUserId);
 	
-	public List<TherapySession> findTop1ByPatientUserIdOrderByEndTimeDesc(List<Long> ids);
+	public List<TherapySession> findTop1ByPatientUserIdInOrderByEndTimeDesc(List<Long> patientUserIds);
 	
 }

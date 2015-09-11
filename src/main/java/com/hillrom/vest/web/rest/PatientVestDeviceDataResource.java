@@ -2,6 +2,7 @@ package com.hillrom.vest.web.rest;
 
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -36,20 +37,33 @@ public class PatientVestDeviceDataResource {
 	
 	@RequestMapping(value = "/receiveData",
             method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> receiveData(HttpServletRequest request){
 		List<PatientVestDeviceData> deviceData = null;
+		Map<String,String[]> paramsMap = request.getParameterMap();
+		int i = 0;
+		StringBuilder builder = new StringBuilder();
+		for(String key : paramsMap.keySet()){
+			String[]  values = paramsMap.get(key);
+			String value = values.length > 0 ? values[0] : "";
+			builder.append(key).append("=").append(value);
+			++i;
+			if( i < paramsMap.size()){
+				builder.append("&");
+			}
+		}
+		String rawMessage = builder.toString();
 		String reqParams[] = new String[]{"device_model_type","device_data",
         "device_serial_number","device_type","hub_id","air_interface_type",
         "customer_name","cde_version","exporter_version","timezone","sp_receive_time",
-        "hub_receive_time","device_address","qcl_json_data","twonet_id","hub_receive_time_offset",
-        "cuc_version","customer_id"};
-		JSONObject jsonObject = RequestUtil.checkRequiredParamsInQueryString(request.getQueryString(), reqParams);
+        "hub_receive_time","device_address","twonet_id","hub_receive_time_offset","cuc_version","customer_id"};
+		JSONObject jsonObject = RequestUtil.checkRequiredParamsInQueryString(rawMessage, reqParams);
 		if(jsonObject.containsKey("ERROR")){
 			return new ResponseEntity(jsonObject,HttpStatus.BAD_REQUEST);
 		};
 		try{			
-			deviceData = deviceDataService.save(request.getQueryString());
+			deviceData = deviceDataService.save(rawMessage);
 		}catch(Exception e){
 			JSONObject error = new JSONObject();
 			error.put("message", e.getMessage());

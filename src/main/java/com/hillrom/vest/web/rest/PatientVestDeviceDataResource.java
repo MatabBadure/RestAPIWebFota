@@ -46,7 +46,7 @@ public class PatientVestDeviceDataResource {
 		StringBuilder builder = new StringBuilder();
 		for(String key : paramsMap.keySet()){
 			String[]  values = paramsMap.get(key);
-			String value = values.length > 0 ? values[0] : null;
+			String value = values.length > 0 ? values[0] : "";
 			builder.append(key).append("=").append(value);
 			++i;
 			if( i < paramsMap.size()){

@@ -626,7 +626,7 @@
             </build>
             <properties>
                 <!-- log configuration -->
-                <logback.loglevel>ERROR</logback.loglevel>
+                <logback.loglevel>DEBUG</logback.loglevel>
             </properties>
             <dependencies>
                 <dependency>

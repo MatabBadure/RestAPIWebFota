@@ -32,11 +32,12 @@ public class RequestUtil {
 	
 	public static JSONObject checkRequiredParamsInQueryString(String queryString,String requiredParams[]){
 		if(StringUtils.isNotBlank(queryString)){			
-			List<NameValuePair> params = URLEncodedUtils.parse(queryString, Charset.defaultCharset());
 			Map<String,String> parameterNameValueMap = new HashMap<>();
-			params.forEach(parameter -> {
-				parameterNameValueMap.put(parameter.getName(),parameter.getValue());
-			});
+			String nameValues[] = queryString.split("&");
+			for(String nameValue : nameValues){
+				String keyValues[] = nameValue.split("=");
+				parameterNameValueMap.put(keyValues[0],keyValues[1]);
+			}
 			return checkRequiredParams(parameterNameValueMap, requiredParams);
 		}else{
 			JSONObject errorJson = new JSONObject();

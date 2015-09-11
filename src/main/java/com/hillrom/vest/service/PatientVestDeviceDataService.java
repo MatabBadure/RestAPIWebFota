@@ -1,6 +1,7 @@
 package com.hillrom.vest.service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -83,7 +84,9 @@ public class PatientVestDeviceDataService {
 			vestDeviceBadDataRepository.save(new VestDeviceBadData(rawData));
 			throw new RuntimeException(e.getMessage());
 		}finally{
-			deviceRawLogRepository.save(deviceRawLog);
+			if(Objects.nonNull(deviceRawLog)){				
+				deviceRawLogRepository.save(deviceRawLog);
+			}
 		}
 		return patientVestDeviceRecords;
 	}

@@ -23,6 +23,6 @@ public interface TherapySessionRepository extends
 	
 	public TherapySession findTop1ByPatientUserIdOrderByDateAsc(Long id);
 	
-	public List<TherapySession> findTop1ByPatientUserIdOrderByEndTimeDesc(List<Long> ids);
+	public List<TherapySession> findTop1ByPatientUserIdInOrderByEndTimeDesc(List<Long> ids);
 	
 }

@@ -9,11 +9,11 @@ spring:
         active: qa
     datasource:
         dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
-        url: jdbc:mysql://localhost:3306/hillromvest_qa
+        url: jdbc:mysql://hillromvestqa.ckyg8erbez54.us-west-2.rds.amazonaws.com:3306/hillromvest_qa
         databaseName:
         serverName:
         username: root
-        password: root
+        password: Hillrom123
         cachePrepStmts: true
         prepStmtCacheSize: 250
         prepStmtCacheSqlLimit: 2048

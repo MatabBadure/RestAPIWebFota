@@ -608,9 +608,9 @@
                 </dependency>
             </dependencies>
         </profile>
-        <!--  staging Profile -->
+        <!--  uat Profile -->
         <profile>
-            <id>staging</id>
+            <id>uat</id>
             <build>
             	<plugins>
                     <plugin>
@@ -618,7 +618,7 @@
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
                             <arguments>
-                                <argument>--spring.profiles.active=staging</argument>
+                                <argument>--spring.profiles.active=uat</argument>
                             </arguments>
                         </configuration>
                     </plugin>

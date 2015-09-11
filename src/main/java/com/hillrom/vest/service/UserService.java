@@ -555,6 +555,7 @@ public class UserService {
 
 	private void sendEmailNotification(String baseUrl, UserExtension user) {
 		user.setActivationKey(RandomUtil.generateActivationKey());
+		user.setActivated(false);
 		userRepository.saveAndFlush(user);
 		mailService.sendActivationEmail(user, baseUrl);
 		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
@@ -899,8 +900,14 @@ public class UserService {
 				if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 					deletePatientUser(existingUser);
 					jsonObject.put("message", MessageConstants.HR_214);
-				} else if((existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ADMIN))
-							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ACCT_SERVICES))
+				} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ADMIN))) {
+					if(SecurityUtils.getCurrentLogin().equals(existingUser.getEmail())) {
+						throw new HillromException(ExceptionConstants.HR_520);
+					}
+					existingUser.setDeleted(true);
+					userExtensionRepository.save(existingUser);
+					jsonObject.put("message", MessageConstants.HR_204);
+				} else if((existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ACCT_SERVICES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))

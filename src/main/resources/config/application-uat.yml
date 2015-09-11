@@ -2,14 +2,14 @@ server:
     port: 8080
 
 liquibase:
-    context: dev
+    context: uat
 
 spring:
     profiles:
-        active: dev
+        active: uat
     datasource:
         dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
-        url: jdbc:mysql://hillromvest.ckyg8erbez54.us-west-2.rds.amazonaws.com:3306/hillromvest_dev
+        url: jdbc:mysql://hillromvestuat.ckyg8erbez54.us-west-2.rds.amazonaws.com:3306/hillromvest_uat
         databaseName:
         serverName:
         username: root

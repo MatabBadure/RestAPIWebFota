@@ -9,7 +9,7 @@ spring:
         active: uat
     datasource:
         dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
-        url: jdbc:mysql://hillromvestuat.ckyg8erbez54.us-west-2.rds.amazonaws.com:3306/hillromvest_uat
+        url: jdbc:mysql://hillromvest.ckyg8erbez54.us-west-2.rds.amazonaws.com:3306/hillromvest_uat
         databaseName:
         serverName:
         username: root

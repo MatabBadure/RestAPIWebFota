@@ -152,4 +152,12 @@ public class PatientVestDeviceTherapyUtil {
 			Integer frequency) {
 		return (double)durationInMinutes*frequency/totalDuration;
 	}
+	
+	public static int calculateCumulativeDuration(List<TherapySession> therapySessions){
+		return therapySessions.stream().collect(Collectors.summingLong(TherapySession::getDurationInMinutes)).intValue();
+	}
+	
+	public static int calculateHMRRunRatePerDays(List<TherapySession> therapySessions,int days){
+		return calculateCumulativeDuration(therapySessions)/days;
+	}
 }

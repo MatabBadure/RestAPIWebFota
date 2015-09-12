@@ -175,7 +175,7 @@ public class UserSearchRepository {
 			Pageable pageable, Map<String, Boolean> sortOrder) {
 
 		String findPatientUserQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName,"
-				+ " user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,user.title,user.hillrom_id,user.created_date as createdAt,user.activated as isActivated "
+				+ " user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,user.title,user.hillrom_id,user.created_date as createdAt,user.activated as isActivated, patInfo.state as state "
 				+ " from USER user join USER_AUTHORITY user_authority on user_authority.user_id = user.id "
 				+ " and user_authority.authority_name = 'PATIENT' and user.activated = 1"
 				+ " and (lower(user.first_name) like lower(:queryString) or "
@@ -218,6 +218,7 @@ public class UserSearchRepository {
 					Timestamp createdAt = (Timestamp) record[12];
 					Boolean isActivated = (Boolean) record[13];
 					DateTime createdAtDatetime = new DateTime(createdAt);
+					String state = (String) record[14];
 					
 					java.util.Date dobLocalDate = null;
 					if(null !=dob){
@@ -225,7 +226,7 @@ public class UserSearchRepository {
 					}
 					patientUsers.add(new PatientUserVO(id, email, firstName,
 							lastName, isDeleted, zipcode, address, city, dobLocalDate,
-							gender, title, hillromId,createdAtDatetime,isActivated));
+							gender, title, hillromId,createdAtDatetime,isActivated,state));
 				});
 
 		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());

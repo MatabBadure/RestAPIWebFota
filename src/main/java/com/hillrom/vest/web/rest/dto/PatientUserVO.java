@@ -38,7 +38,7 @@ public class PatientUserVO {
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
 			String city, Date dob, String gender, String title,
-			String hillromId,DateTime createdAt,Boolean isActivated) {
+			String hillromId,DateTime createdAt,Boolean isActivated, String state) {
 		super();
 		this.id = id;
 		this.email = email;
@@ -54,6 +54,7 @@ public class PatientUserVO {
 		this.hillromId = hillromId;
 		this.createdAt = createdAt;
 		this.isActivated = isActivated;
+		this.state = state;
 	}
 
 	public PatientUserVO(UserExtension user, PatientInfo patientInfo) {

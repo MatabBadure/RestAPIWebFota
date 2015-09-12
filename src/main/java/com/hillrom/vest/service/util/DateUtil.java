@@ -7,13 +7,16 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.util.ExceptionConstants;
+
 import static  com.hillrom.vest.config.Constants.*;
+import static com.hillrom.vest.service.util.DateUtil.convertLocalDateToDateTime;
 
 public class DateUtil {
 
@@ -78,5 +81,37 @@ public class DateUtil {
 			throw new HillromException(ExceptionConstants.HR_600.concat(dateFormat), ex);
 		}
     	
+	}
+	
+	
+	/** Get Date by Plus or Minus Days
+	 * @param days
+	 * @return
+	 */
+	public static LocalDate getPlusOrMinusTodayLocalDate(int days){
+		LocalDate today = LocalDate.now();
+		if(days > 0){
+			return today.plusDays(days);
+		}else{
+			return today.minusDays(Math.abs(days));
+		}
+	}
+	
+	/**
+	 * Returns today in LocalDate
+	 * @return 
+	 */
+	public static LocalDate getTodayLocalDate(){
+		return LocalDate.now();
+	}
+	
+	/**
+	 * Return days difference between two Local Dates
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public static int getDaysCountBetweenLocalDates(LocalDate from,LocalDate to){
+		return Days.daysBetween(convertLocalDateToDateTime(from), convertLocalDateToDateTime(to)).getDays();
 	}
 }

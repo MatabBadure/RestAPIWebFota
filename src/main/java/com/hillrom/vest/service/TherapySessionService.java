@@ -75,15 +75,13 @@ public class TherapySessionService {
 			while(tpsIterator.hasNext()){
 				TherapySession tps = tpsIterator.next();
 				// Remove previous therapy Sessions
-				int tpsDayOfYear = tps.getDate().getDayOfYear();
-				int latestTpsDayOfYear = latestTherapySession.getDate().getDayOfYear();
-				if(tpsDayOfYear < latestTpsDayOfYear){
+				if(tps.getDate().isBefore(latestTherapySession.getDate())){
 					tpsIterator.remove();
 					//Remove previous therapySessions of the same day.
 				} else {
 					DateTime tpsStartTime = tps.getStartTime();
 					DateTime latestTpsEndTimeFromDB = latestTherapySession.getEndTime();
-					if(tpsDayOfYear == latestTpsDayOfYear && tpsStartTime.isBefore(latestTpsEndTimeFromDB)){
+					if(tps.getDate().equals(latestTherapySession.getDate()) && tpsStartTime.isBefore(latestTpsEndTimeFromDB)){
 						tpsIterator.remove();
 					}
 				}

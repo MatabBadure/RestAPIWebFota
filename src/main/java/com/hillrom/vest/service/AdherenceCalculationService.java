@@ -1,16 +1,28 @@
 package com.hillrom.vest.service;
 
-import static com.hillrom.vest.config.AdherenceScoreConstants.*;
-import static com.hillrom.vest.config.NotificationTypeConstants.*;
-import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.*;
+import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
+import static com.hillrom.vest.config.AdherenceScoreConstants.HMR_NON_COMPLIANCE_POINTS;
+import static com.hillrom.vest.config.AdherenceScoreConstants.MISSED_THERAPY_POINTS;
+import static com.hillrom.vest.config.AdherenceScoreConstants.SETTING_DEVIATION_POINTS;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE;
+import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
+import static com.hillrom.vest.service.util.DateUtil.convertLocalDateToDateTime;
+import static com.hillrom.vest.service.util.DateUtil.getDaysCountBetweenLocalDates;
+import static com.hillrom.vest.service.util.DateUtil.getPlusOrMinusTodayLocalDate;
+import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateCumulativeDuration;
+import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateHMRRunRatePerDays;
+import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -34,7 +46,6 @@ import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.ProtocolConstantsRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
-import com.hillrom.vest.service.util.DateUtil;
 
 
 @Service
@@ -64,6 +75,9 @@ public class AdherenceCalculationService {
 	
 	@Inject
 	private PatientComplianceService complianceService;
+	
+	@Inject
+	private TherapySessionService therapySessionService;
 
 	/**
 	 * Get Protocol Constants by loading Protocol data
@@ -210,7 +224,7 @@ public class AdherenceCalculationService {
 	 */
 	public Map<String,Double> actualTherapyMetricsPerDay(
 			List<TherapySession> therapySessionsPerDay) {
-		double totalDuration = (double) therapySessionsPerDay.stream().collect(Collectors.summingLong(TherapySession::getDurationInMinutes));
+		double totalDuration = calculateCumulativeDuration(therapySessionsPerDay);
 		double weightedAvgFrequency = 0.0;
 		double weightedAvgPressure = 0.0;
 		double treatmentsPerDay = 0.0;
@@ -247,14 +261,18 @@ public class AdherenceCalculationService {
 			});
 			List<TherapySession> latestTherapySessions = therapySessionRepository.findTop1ByPatientUserIdInOrderByEndTimeDesc(patientUserIds);
 			latestTherapySessions.forEach(latestTherapySession -> {
-				DateTime therapySessionDateTime = DateUtil.convertLocalDateToDateTime(latestTherapySession.getDate());
+				DateTime therapySessionDateTime = convertLocalDateToDateTime(latestTherapySession.getDate());
 				int missedTherapyDays = Days.daysBetween(therapySessionDateTime, today).getDays();
 				if( missedTherapyDays > 0 && missedTherapyDays %3 == 0){
 					notificationService.createOrUpdateNotification(latestTherapySession.getPatientUser(), latestTherapySession.getPatientInfo(), latestTherapySession.getPatientUser().getId(),
 							today.toLocalDate(), MISSED_THERAPY,false);
 				}
 			});
+			Map<Long,Integer> hmrRunRateMap = calculateHMRRunRateForPatientUsers(patientUserIds,getPlusOrMinusTodayLocalDate(-3),getPlusOrMinusTodayLocalDate(-1));
 			newComplianceList.parallelStream().forEach(patientCompliance -> {
+				Integer hmrRunRate = hmrRunRateMap.get(patientCompliance.getPatientUser().getId());
+				hmrRunRate = Objects.nonNull(hmrRunRate)? hmrRunRate : 0;
+				patientCompliance.setHmrRunRate(hmrRunRate);
 				complianceService.createOrUpdate(patientCompliance);
 			});
 		}catch(Exception ex){
@@ -263,6 +281,23 @@ public class AdherenceCalculationService {
 			ex.printStackTrace( printWriter );
 			mailService.sendJobFailureNotification("processMissedTherapySessions",writer.toString());
 		}
+	}
+	
+	/**
+	 * Calculate HMRRunRate For PatientUsers
+	 * @param patientUserIds
+	 * @return
+	 */
+	public Map<Long,Integer> calculateHMRRunRateForPatientUsers(List<Long> patientUserIds,LocalDate from,LocalDate to){
+		Map<Long,Integer> patientUserHMRRunrateMap = new HashMap<>();
+		List<TherapySession> therapySessions = therapySessionRepository.findByDateBetweenAndPatientUserIdIn(from, to, patientUserIds);
+		Map<User,List<TherapySession>> therapySessionsPerPatient = therapySessions.stream().collect(Collectors.groupingBy(TherapySession::getPatientUser));
+		int days = getDaysCountBetweenLocalDates(from, to);
+		for(User patientUser : therapySessionsPerPatient.keySet()){
+			List<TherapySession> sessions = therapySessionsPerPatient.get(patientUser);
+			patientUserHMRRunrateMap.put(patientUser.getId(), calculateHMRRunRatePerDays(sessions,days));
+		}
+		return patientUserHMRRunrateMap;
 	}
 	
 	/**

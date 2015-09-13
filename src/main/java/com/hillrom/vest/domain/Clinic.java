@@ -71,8 +71,7 @@ public class Clinic implements Serializable {
     private Clinic parentClinic;
  
     @OneToMany(mappedBy="parentClinic")
-    @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id")
-    @JsonBackReference
+    @JsonIgnore
     private List<Clinic> childClinics = new ArrayList<Clinic>();
 
     @OneToMany(mappedBy = "clinicPatientAssocPK.clinic",fetch=FetchType.LAZY)

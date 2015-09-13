@@ -55,6 +55,7 @@ import com.hillrom.vest.service.util.RequestUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
+import com.hillrom.vest.web.rest.dto.CareGiverVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
@@ -1141,16 +1142,17 @@ public class UserService {
 		}
     }
 
-	public List<UserPatientAssoc> getCaregiversForPatient(Long patientUserId) throws HillromException {
-    	List<UserPatientAssoc> caregiverAssocList = new LinkedList<>();
+	public List<CareGiverVO> getCaregiversForPatient(Long patientUserId) throws HillromException {
+    	List<CareGiverVO> caregiverList = new LinkedList<>();
 		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
 		if(Objects.nonNull(patientUser)) {
-    		caregiverAssocList = getListOfCaregiversAssociatedToPatientUser(patientUser);
-
+    		for(UserPatientAssoc upAssoc: getListOfCaregiversAssociatedToPatientUser(patientUser)){
+    			caregiverList.add(new CareGiverVO(upAssoc.getUserRole(), upAssoc.getRelationshipLabel(), upAssoc.getUser()));
+    		}
 		} else {
 			throw new HillromException(ExceptionConstants.HR_523);
 		}
-		return caregiverAssocList;
+		return caregiverList;
     }
 
 	private List<UserPatientAssoc> getListOfCaregiversAssociatedToPatientUser(UserExtension patientUser) {

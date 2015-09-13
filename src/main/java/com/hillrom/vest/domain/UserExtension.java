@@ -6,7 +6,6 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -14,7 +13,8 @@ import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.SQLDelete;
-import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * A UserExtension.
@@ -54,7 +54,7 @@ public class UserExtension extends User implements Serializable {
 
 	@ManyToMany
 	@JoinTable(name = "CLINIC_USER_ASSOC", joinColumns = { @JoinColumn(name = "users_id", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "clinics_id", referencedColumnName = "id") })
-	@JsonManagedReference
+	@JsonIgnore
 	private Set<Clinic> clinics = new HashSet<>();
 
 	@Column(name = "is_deleted", nullable = false)

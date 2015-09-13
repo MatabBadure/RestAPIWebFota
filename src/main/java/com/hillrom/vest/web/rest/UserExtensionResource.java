@@ -46,6 +46,8 @@ import com.hillrom.vest.service.RelationshipLabelService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
+import com.hillrom.vest.web.rest.dto.CareGiverVO;
+import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
@@ -366,7 +368,7 @@ public class UserExtensionResource {
         log.debug("REST request to get associated clinics with Patient : {}", id);
         JSONObject jsonObject = new JSONObject();
 		try {
-			List<Clinic> clinics = clinicPatientService.getAssociatedClinicsForPatient(id);
+			List<ClinicVO> clinics = clinicPatientService.getAssociatedClinicsForPatient(id);
 			if (clinics.isEmpty()) {
 				jsonObject.put("message", MessageConstants.HR_285);
 	        } else {
@@ -501,12 +503,12 @@ public class UserExtensionResource {
         log.debug("REST request to delete caregiver : {}", id);
         JSONObject jsonObject = new JSONObject();
 		try {
-			List<UserPatientAssoc> caregiverAssocList = userService.getCaregiversForPatient(id);
-			if (caregiverAssocList.isEmpty()) {
+			List<CareGiverVO> caregiverList = userService.getCaregiversForPatient(id);
+			if (caregiverList.isEmpty()) {
 				jsonObject.put("message", MessageConstants.HR_266);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_263);
-				jsonObject.put("caregivers", caregiverAssocList);
+				jsonObject.put("caregivers", caregiverList);
 	        }
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {
@@ -627,21 +629,21 @@ public class UserExtensionResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
-    public ResponseEntity<JSONObject> getAssociatedClinicsForHCP(@PathVariable Long id) {
+    public ResponseEntity<?> getAssociatedClinicsForHCP(@PathVariable Long id) {
         log.debug("REST request to get associated clinics with HCP : {}", id);
         JSONObject jsonObject = new JSONObject();
         try {
-        	Set<Clinic> clinics= hcpClinicService.getAssociatedClinicsForHCP(id);
+        	Set<ClinicVO> clinics= hcpClinicService.getAssociatedClinicsForHCP(id);
 	        if (clinics.isEmpty()) {
 	        	jsonObject.put("message", ExceptionConstants.HR_582);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_292);
 	        	jsonObject.put("clinics", clinics);
 	        }
-	        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
         } catch (HillromException hre){
         	jsonObject.put("ERROR", hre.getMessage());
-    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+    		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
     

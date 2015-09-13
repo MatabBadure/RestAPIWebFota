@@ -29,6 +29,8 @@ import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
+import com.hillrom.vest.web.rest.dto.ClinicVO;
+import com.hillrom.vest.web.rest.util.ClinicVOBuilder;
 
 /**
  * Service class for managing users.
@@ -75,12 +77,17 @@ public class ClinicPatientService {
     	
     }
     
-    public List<Clinic> getAssociatedClinicsForPatient(Long id) throws HillromException {
+    public List<ClinicVO> getAssociatedClinicsForPatient(Long id) throws HillromException {
     	User patientUser = userRepository.findOne(id);
     	if(patientUser != null) {
     		PatientInfo patientInfo = getPatientInfoObjeFromPatientUser(patientUser);
 	     	if(patientInfo != null){
-	     		return getAssociatedClinicsList(patientInfo);
+	     		List<Clinic> associatedClinics =  getAssociatedClinicsList(patientInfo);
+	     		List<ClinicVO> clinics = new LinkedList<>();
+	     		for(Clinic clinic : associatedClinics){
+		    		clinics.add(ClinicVOBuilder.build(clinic));
+		    	}
+	     		return clinics;
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
 	     	}

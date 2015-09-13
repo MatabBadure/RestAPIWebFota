@@ -27,7 +27,6 @@ public class UserPatientAssoc implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@EmbeddedId
-	@JsonIgnore
 	private UserPatientAssocPK userPatientAssocPK;
     
     @Column(name="user_role", nullable = false)
@@ -134,8 +133,7 @@ public class UserPatientAssoc implements Serializable {
 
 	@Override
 	public String toString() {
-		return "UserPatientAssoc [userPatientAssocPK=" + userPatientAssocPK
-				+ ", userRole=" + userRole + ", relationshipLabel="
+		return "UserPatientAssoc ["+"userRole=" + userRole + ", relationshipLabel="
 				+ relationshipLabel + "]";
 	}
 

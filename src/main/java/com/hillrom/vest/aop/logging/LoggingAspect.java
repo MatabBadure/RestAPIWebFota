@@ -1,6 +1,7 @@
 package com.hillrom.vest.aop.logging;
 
 import com.hillrom.vest.config.Constants;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -12,7 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 
 import javax.inject.Inject;
+
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Aspect for logging execution of service and repository Spring components.
@@ -49,7 +52,7 @@ public class LoggingAspect {
             Object result = joinPoint.proceed();
             if (log.isDebugEnabled()) {
                 log.debug("Exit: {}.{}() with result = {}", joinPoint.getSignature().getDeclaringTypeName(),
-                        joinPoint.getSignature().getName(), result);
+                        joinPoint.getSignature().getName(), Objects.nonNull(result)?result.getClass():result);
             }
             return result;
         } catch (IllegalArgumentException e) {

@@ -8,12 +8,15 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Embeddable
 public class UserPatientAssocPK implements Serializable {
 
 	private static final long serialVersionUID = 1L;
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "PATIENT_ID", referencedColumnName="id") 
+    @JoinColumn(name = "PATIENT_ID", referencedColumnName="id")
+    @JsonIgnore
     private PatientInfo patient;
 
     @ManyToOne(cascade = CascadeType.ALL)

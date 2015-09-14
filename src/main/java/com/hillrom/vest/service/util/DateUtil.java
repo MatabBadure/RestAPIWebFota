@@ -33,7 +33,7 @@ public class DateUtil {
 	public static List<LocalDate> getAllLocalDatesBetweenDates(LocalDate from, LocalDate to) {
 		LocalDate startDate = from;
 		List<LocalDate> dates = new LinkedList<>();
-		while(startDate.isBefore(to)){
+		while(startDate.isBefore(to) || startDate.equals(to)){
 			dates.add(startDate);
 			startDate = startDate.plusDays(1);
 		}
@@ -114,4 +114,13 @@ public class DateUtil {
 	public static int getDaysCountBetweenLocalDates(LocalDate from,LocalDate to){
 		return Days.daysBetween(convertLocalDateToDateTime(from), convertLocalDateToDateTime(to)).getDays();
 	}
+	
+	/**
+	 * Return LocalDates group by Day Of Week
+	 * @param dates
+	 * @return
+	 */
+	public static Map<Integer,List<LocalDate>> groupListOfLocalDatesByDayOfWeek(List<LocalDate> dates){
+		return  dates.stream().collect(Collectors.groupingBy(LocalDate :: getDayOfWeek));
+	} 
 }

@@ -1,0 +1,21 @@
+Approaches tried:
+
+1. Debug the issue found like it's happening thru SLF4J 
+2. Tried to Escape Logging, later found it's happening while preparing JSON Response (Tried various permutations and combinations of JSON annotations)
+3. Tried to Keep VO Object which could be intermediate between Actual Clinic From DB and The Response being sent (supports to only parent clinics doesn't work)
+4. Tried to turn off AOP pointcut for the specific flow
+5. Tried to turn on OpenInView Filter in Application.yml -> it wasn't connecting to Dev DB itself,Server hangs @ executing the Liquibase step.
+6. Tried adding @Proxy(lazy=false) to User and Clinic classes -- No effect
+7. Tried @PersistenceContext(type = PersistenceContextType.EXTENDED) Added on DatabaseConfiguration.java -> No effect
+8. Assuming that there is only one change between DEV Profile and an other Profile , did the change required in LoggingAspect.java but of no effect.
+9. Tried various combination of JSON Annotations but didn't work.(Added @JsonIgnore on clinics of User class, @JsonIgnore on childClinics,users and @JsonIdentifyInfo on clinic with Object processor id on Clinic class) 
+10.Tried FetchType = EAGER was breaking with XAuthTokenFilter with an Exception: Can't assign Long to com.hillrom.vest.domain.User (Couldn't debug properly due to fitering flow)
+
+I might have missed any silly thing while trying these approaches or there could be a simple fix to resolve this which i didn't figure out.
+
+It could be of great help if any of you could fix the issue.
+
+References:
+http://www.javacodegeeks.com/2011/01/10-tips-proper-application-logging.html
+http://javarevisited.blogspot.in/2014/04/orghibernatelazyinitializationException-Could-not-initialize-proxy-no-session-hibernate-java.html
+

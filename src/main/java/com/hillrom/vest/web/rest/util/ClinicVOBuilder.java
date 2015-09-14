@@ -24,4 +24,12 @@ public class ClinicVOBuilder {
 		}
 		return clinicVo;
 	}
+
+	public static ClinicVO buildWithChildClinics(Clinic clinic){
+		ClinicVO clinicVO = build(clinic);
+		clinic.getChildClinics().forEach(childClinic -> {
+			clinicVO.getChildClinicVOs().add(build(childClinic));
+		});
+		return clinicVO;
+	}
 }

@@ -26,6 +26,8 @@ import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
+import com.hillrom.vest.web.rest.dto.ClinicVO;
+import com.hillrom.vest.web.rest.util.ClinicVOBuilder;
 
 
 /**
@@ -74,7 +76,7 @@ public class ClinicService {
         }
     }
 
-    public Clinic updateClinic(String id, ClinicDTO clinicDTO) throws HillromException {
+    public ClinicVO updateClinic(String id, ClinicDTO clinicDTO) throws HillromException {
     	Clinic clinic = clinicRepository.getOne(id);
         if(Objects.isNull(clinic)) {
         	throw new HillromException(ExceptionConstants.HR_548);//No such clinic found
@@ -121,7 +123,7 @@ public class ClinicService {
         } else {
 	      	throw new HillromException(ExceptionConstants.HR_543);
         }
-    	return clinic;
+    	return ClinicVOBuilder.buildWithChildClinics(clinic);
     }
     
     public String deleteClinic(String id) throws HillromException {
@@ -208,6 +210,10 @@ public class ClinicService {
         	return clinic;
         }
     }
+	
+	public ClinicVO getClinicWithChildClinics(String clinicId) throws HillromException{
+		return ClinicVOBuilder.buildWithChildClinics(getClinicInfo(clinicId));
+	}
 	
 	public List<Clinic> getChildClinics(String clinicId) throws HillromException {
 		Clinic clinic = clinicRepository.findOne(clinicId);

@@ -13,6 +13,8 @@ import java.util.regex.Pattern;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 
+import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,10 +41,9 @@ import com.hillrom.vest.service.ClinicService;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
+import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 import com.mysema.query.types.expr.BooleanExpression;
-
-import net.minidev.json.JSONObject;
 
 /**
  * REST controller for managing Clinic.
@@ -98,15 +99,15 @@ public class ClinicResource {
         log.debug("REST request to update Clinic : {}", clinicDTO);
         JSONObject jsonObject = new JSONObject();
 		try {
-			Clinic clinic = clinicService.updateClinic(id, clinicDTO);
-	        if (Objects.isNull(clinic)) {
+			ClinicVO clinicVO = clinicService.updateClinic(id, clinicDTO);
+	        if (Objects.isNull(clinicVO)) {
 	        	jsonObject.put("ERROR", ExceptionConstants.HR_543);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_222);
-	            jsonObject.put("Clinic", clinic);
+	            jsonObject.put("Clinic", clinicVO);
 	            if(clinicDTO.getParent()) {
-	            	jsonObject.put("ChildClinic", clinic.getChildClinics());
+	            	jsonObject.put("ChildClinic", clinicVO.getChildClinicVOs());
 	            }
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }
@@ -152,15 +153,15 @@ public class ClinicResource {
         log.debug("REST request to get Clinic : {}", id);
         JSONObject jsonObject = new JSONObject();
         try {
-    		Clinic clinic = clinicService.getClinicInfo(id);
-	    	if (Objects.isNull(clinic)) {
+    		ClinicVO clinicVO = clinicService.getClinicWithChildClinics(id);
+	    	if (Objects.isNull(clinicVO)) {
 	        	jsonObject.put("ERROR", ExceptionConstants.HR_548);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_223);
-	        	jsonObject.put("clinic", clinic);
-	        	if(clinic.isParent())
-	        		jsonObject.put("childClinics", clinicService.getChildClinics(id));
+	        	jsonObject.put("clinic", clinicVO);
+	        	if(clinicVO.isParent())
+	        		jsonObject.put("childClinics", clinicVO.getChildClinicVOs());
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }
     	} catch(HillromException hre){

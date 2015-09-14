@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class ClinicVO implements Serializable {
 
     private String id;
@@ -35,7 +37,8 @@ public class ClinicVO implements Serializable {
     private boolean parent = false;
 
     private DateTime createdAt;
-    
+
+    @JsonIgnore
     private List<ClinicVO> childClinicVOs = new LinkedList<>();
 
     public ClinicVO(String id,String name, String address, Integer zipcode, String city,

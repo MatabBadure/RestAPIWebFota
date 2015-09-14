@@ -1,5 +1,12 @@
 package com.hillrom.vest.repository;
 
+import static com.hillrom.vest.security.AuthoritiesConstants.ACCT_SERVICES;
+import static com.hillrom.vest.security.AuthoritiesConstants.ADMIN;
+import static com.hillrom.vest.security.AuthoritiesConstants.ASSOCIATES;
+import static com.hillrom.vest.security.AuthoritiesConstants.HILLROM_ADMIN;
+import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
+import static com.hillrom.vest.util.RelationshipLabelConstants.SELF;
+
 import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -19,6 +26,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 
 @Repository
@@ -38,7 +46,7 @@ public class UserSearchRepository {
 				+ " lower(user.last_name) like lower(:queryString) or "
 				+ " lower(user.email) like lower(:queryString) or lower(user.hillrom_id) like lower(:queryString)) "
 				+ " join  USER_AUTHORITY user_authority on user_authority.user_id = user.id "
-				+ " and  user_authority.authority_name in ('ADMIN','ACCT_SERVICES','ASSOCIATES','HILLROM_ADMIN')";
+				+ " and  user_authority.authority_name in ('"+ADMIN+"','"+ACCT_SERVICES+"','"+ASSOCIATES+"','"+HILLROM_ADMIN+"')";
 
 		findHillromTeamUserQuery = findHillromTeamUserQuery.replaceAll(
 				":queryString", queryString);
@@ -93,7 +101,7 @@ public class UserSearchRepository {
 				+ " userExt.mobile_phone,userExt.speciality,userExt.state,clinic.id as clinicId,clinic.name as clinicName,user.created_date as createdAt,user.activated isActivated,userExt.npi_number as npiNumber "
 				+ " FROM USER user join USER_EXTENSION userExt on user.id = userExt.user_id "
 				+ " and (lower(user.first_name) like lower(:queryString) or  lower(user.last_name) like lower(:queryString) or  lower(user.email) like lower(:queryString)) "
-				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = 'HCP' "
+				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = '"+AuthoritiesConstants.HCP+"'"
 				+ " left outer join CLINIC_USER_ASSOC user_clinic on user_clinic.users_id = user.id "
 				+ " left outer join CLINIC clinic on user_clinic.clinics_id = clinic.id and user_clinic.users_id = user.id ";
 
@@ -177,12 +185,12 @@ public class UserSearchRepository {
 		String findPatientUserQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName,"
 				+ " user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,user.title,user.hillrom_id,user.created_date as createdAt,user.activated as isActivated, patInfo.state as state "
 				+ " from USER user join USER_AUTHORITY user_authority on user_authority.user_id = user.id "
-				+ " and user_authority.authority_name = 'PATIENT' and user.activated = 1"
+				+ " and user_authority.authority_name = '"+PATIENT+"'"
 				+ " and (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or  "
 				+ " lower(user.email) like lower(:queryString) or "
 				+ " lower(user.hillrom_id) like lower(:queryString)) "
-				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = 'SELF' "
+				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"'"
 				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id ";
 
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString",

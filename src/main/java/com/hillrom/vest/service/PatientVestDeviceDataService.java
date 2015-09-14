@@ -1,5 +1,6 @@
 package com.hillrom.vest.service;
 
+import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -18,6 +19,7 @@ import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.domain.VestDeviceBadData;
+import com.hillrom.vest.repository.AuthorityRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
@@ -53,6 +55,8 @@ public class PatientVestDeviceDataService {
 	@Inject
 	private TherapySessionService therapySessionService;
 	
+	@Inject
+	private AuthorityRepository authorityRepository;
 	
 	@Inject
 	private VestDeviceBadDataRepository vestDeviceBadDataRepository;
@@ -110,6 +114,7 @@ public class PatientVestDeviceDataService {
 			// Assigns the next hillromId for the patient
 			String hillromId = patientInfoRepository.id();
 			patientInfo.setId(hillromId);
+			patientInfo.setHillromId(hillromId);
 			patientInfo.setBluetoothId(deviceRawLog.getDeviceAddress());
 			patientInfo.setHubId(deviceRawLog.getHubId());
 			patientInfo.setSerialNumber(deviceRawLog.getDeviceSerialNumber());
@@ -124,6 +129,7 @@ public class PatientVestDeviceDataService {
 			userExtension.setFirstName(patientInfo.getFirstName());
 			userExtension.setLastName(patientInfo.getLastName());
 			userExtension.setMiddleName(patientInfo.getMiddleName());
+			userExtension.getAuthorities().add(authorityRepository.findOne(PATIENT));
 			userExtensionRepository.save(userExtension);
 			
 			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(

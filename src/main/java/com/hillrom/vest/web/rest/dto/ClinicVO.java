@@ -1,16 +1,12 @@
 package com.hillrom.vest.web.rest.dto;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.joda.time.DateTime;
 
-import com.hillrom.vest.domain.Clinic;
-import com.hillrom.vest.domain.ClinicPatientAssoc;
-import com.hillrom.vest.domain.UserExtension;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class ClinicVO implements Serializable {
 
@@ -41,6 +37,9 @@ public class ClinicVO implements Serializable {
     private boolean parent = false;
 
     private DateTime createdAt;
+
+    @JsonIgnore
+    private List<ClinicVO> childClinicVOs = new LinkedList<>();
 
     public ClinicVO(String id,String name, String address, Integer zipcode, String city,
 			String state, String phoneNumber, String faxNumber, Long clinicAdminId,
@@ -173,4 +172,13 @@ public class ClinicVO implements Serializable {
 		this.createdAt = createdAt;
 	}
 
+	public List<ClinicVO> getChildClinicVOs() {
+		return childClinicVOs;
+	}
+
+	public void setChildClinicVOs(List<ClinicVO> childClinicVOs) {
+		this.childClinicVOs = childClinicVOs;
+	}
+
+	
 }

@@ -89,9 +89,7 @@ public class TherapySessionService {
 		}
 	}
 	
-	public List<TherapyDataVO> findByPatientUserIdAndDateRange(Long patientUserId,Long fromTimestamp,Long toTimestamp,String groupBy){
-		LocalDate from = LocalDate.fromDateFields(new Date(fromTimestamp));
-		LocalDate to = LocalDate.fromDateFields(new Date(toTimestamp));
+	public List<TherapyDataVO> findByPatientUserIdAndDateRange(Long patientUserId,LocalDate from,LocalDate to,String groupBy){
 		List<TherapySession> sessions = therapySessionRepository
 				.findByPatientUserIdAndDateRange(patientUserId,from,to);
 		Map<Integer,List<TherapySession>> groupedSessions = new HashMap<>();
@@ -200,10 +198,10 @@ public class TherapySessionService {
 	 */
 	private void prepareDummyTherapyDataByWeek(LocalDate from, LocalDate to,
 			Map<Integer, TherapyDataVO> dummyData) {
-		LocalDate startDate = from; 
-		while(startDate.isBefore(to)){
-			dummyData.put(startDate.getDayOfWeek(), createTherapyDataWithTimeStamp(startDate));
-			startDate = startDate.plusDays(1);
+		List<LocalDate> dates = DateUtil.getAllLocalDatesBetweenDates(from, to);
+		Map<Integer, List<LocalDate>> groupByDayOfWeek = DateUtil.groupListOfLocalDatesByDayOfWeek(dates);
+		for(Integer dayOfWeek : groupByDayOfWeek.keySet()){
+			dummyData.put(dayOfWeek, createTherapyDataWithTimeStamp(groupByDayOfWeek.get(dayOfWeek).get(0)));
 		}
 	}
 
@@ -219,8 +217,8 @@ public class TherapySessionService {
 			return therapy; 
 	}
 
-	public List<TherapySession> findByPatientUserIdAndDate(Long id,Long timestamp){
-		return  therapySessionRepository.findByPatientUserIdAndDate(id,LocalDate.fromDateFields(new Date(timestamp)));
+	public List<TherapySession> findByPatientUserIdAndDate(Long id,LocalDate date){
+		return  therapySessionRepository.findByPatientUserIdAndDate(id,date);
 	}
 	
 	private Map<Integer,TherapyDataVO> calculateWeightedAvgs(

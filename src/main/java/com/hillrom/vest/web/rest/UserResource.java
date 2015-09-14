@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -408,10 +409,10 @@ public class UserResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JSONObject> getTherapyByPatientUserIdAndDate(@PathVariable Long id,
-    		@RequestParam(required=false)Long from,
-    		@RequestParam(required=false)Long to,
+    		@RequestParam(value="from",required=false)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+    		@RequestParam(value="to",required=false)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
     		@RequestParam(required=false)String groupBy,
-    		@RequestParam(required=false)Long date){
+    		@RequestParam(value="date",required=false)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date){
     	JSONObject jsonObject = new JSONObject();
     	if(Objects.nonNull(date)){
     		List<TherapySession> therapySessions = therapySessionService.findByPatientUserIdAndDate(id, date);

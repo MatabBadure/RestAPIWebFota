@@ -1,16 +1,22 @@
 package com.hillrom.vest.service;
 
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE;
+import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,16 +25,20 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.ClinicPatientAssoc;
+import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientInfo;
+import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
@@ -53,6 +63,15 @@ public class PatientHCPService {
 
     @Inject
     private UserService userService;
+    
+    @Inject
+    private ClinicService clinicService;
+
+    @Inject
+    private NotificationRepository notificationRepository;
+    
+    @Inject
+    private TherapySessionService therapySessionService;
 
     public List<User> associateHCPToPatient(Long id, List<Map<String, String>> hcpList) throws HillromException {
     	List<User> users = new LinkedList<>();
@@ -191,6 +210,44 @@ public class PatientHCPService {
 			}
 		}
 		return patientInfo;
+	}
+	
+	public Map<String, Integer> getTodaysPatientStatisticsForClinicAssociatedWithHCP(Long hcpId, String clinicId, LocalDate date) throws HillromException{
+		Map<String, Integer> statistics = new HashMap();
+		List<String> clinicList = new LinkedList<>();
+		clinicList.add(clinicId);
+		Set<UserExtension> patientUsers = clinicService.getAssociatedPatientUsers(clinicList);
+		if(patientUsers.isEmpty()) {
+			throw new HillromException(MessageConstants.HR_279);
+		} else {
+			int patientsWithNoEventRecorded = 0;
+			List<Long> patientUserIds = new LinkedList<>();
+			patientUsers.forEach(patientUser -> {
+				patientUserIds.add(patientUser.getId());
+			});
+			Map<String,List<Notification>> statisticsData = getNotificationsGroupByType(patientUserIds, false, date);
+			Map<Long,List<TherapySession>> therapySessions = therapySessionService.getTherapySessionsGroupByPatientUserId(patientUserIds);
+			List<Long> patientIdsWithEvent = new LinkedList(therapySessions.keySet());
+			patientsWithNoEventRecorded = RandomUtil.getDifference(patientUserIds, patientIdsWithEvent).size();
+			if(Objects.nonNull(statisticsData.get(MISSED_THERAPY)))
+				statistics.put("patientsWithMissedTherapy", statisticsData.get(MISSED_THERAPY).size());
+			if(Objects.nonNull(statisticsData.get(HMR_NON_COMPLIANCE)))
+				statistics.put("patientsWithHmrNonCompliance", statisticsData.get(HMR_NON_COMPLIANCE).size());
+			if(Objects.nonNull(statisticsData.get(SETTINGS_DEVIATION)))
+				statistics.put("patientsWithSettingDeviation", statisticsData.get(SETTINGS_DEVIATION).size());
+			statistics.put("patientsWithNoEventRecorded", patientsWithNoEventRecorded);
+		}
+		return statistics;
+	}
+	
+	public Map<String,List<Notification>> getNotificationsGroupByType(List<Long> patientUserIds,boolean isAcknowledged,LocalDate date){
+		List<Notification> notifications = notificationRepository.findByDateAndIsAcknowledgedAndPatientUserIdIn(date, isAcknowledged, patientUserIds);
+		return notifications.stream().collect(Collectors.groupingBy(Notification::getNotificationType));
+	}
+	
+	public Map<String,List<Notification>> getNotificationsFilterByType(List<Long> patientUserIds,boolean isAcknowledged,LocalDate date, String type){
+		List<Notification> notifications = notificationRepository.findByDateAndIsAcknowledgedAndNotificationTypeAndPatientUserIdIn(date, isAcknowledged, type, patientUserIds);
+		return notifications.stream().collect(Collectors.groupingBy(Notification::getNotificationType));
 	}
 }
 

@@ -14,8 +14,6 @@ import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
-import net.minidev.json.JSONObject;
-
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -56,6 +54,7 @@ import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.AdherenceCalculationService;
+import com.hillrom.vest.service.PatientHCPService;
 import com.hillrom.vest.service.PatientProtocolService;
 import com.hillrom.vest.service.PatientVestDeviceService;
 import com.hillrom.vest.service.TherapySessionService;
@@ -67,6 +66,8 @@ import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.ProtocolDTO;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
+
+import net.minidev.json.JSONObject;
 /**
  * REST controller for managing users.
  */
@@ -108,6 +109,10 @@ public class UserResource {
 
 	@Inject
 	private PatientVestDeviceDataRepository deviceDataRepository;
+	
+	@Inject
+    private PatientHCPService patientHCPService;
+	
 	/**
 	 * GET /users -> get all users.
 	 */
@@ -622,4 +627,31 @@ public class UserResource {
             }
         }
 	}
+	
+	/**
+     * GET  /users/:hcpId/clinics/:clinicId/statistics -> get the patient statistics for clinic associated with hcp user.
+     */
+    @RequestMapping(value = "/users/{hcpId}/clinics/{clinicId}/statistics",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP})
+    public ResponseEntity<?> getPatientStatisticsForClinicAssociatedWithHCP(@PathVariable Long hcpId, @PathVariable String clinicId) {
+        log.debug("REST request to get patient statistics for clinic {} associated with HCP : {}", clinicId, hcpId);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	LocalDate date = LocalDate.now();
+        	Map<String, Integer> statitics = patientHCPService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(hcpId, clinicId, date);
+	        if (statitics.isEmpty()) {
+	        	jsonObject.put("message", ExceptionConstants.HR_584);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_297);
+	        	jsonObject.put("statitics", statitics);
+	        }
+	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

@@ -1,7 +1,6 @@
 package com.hillrom.vest.service;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -274,6 +273,11 @@ public class TherapySessionService {
 			return Days.daysBetween(latestSessionDate, today.toInstant()).getDays();
 		}
 		return 0;
+	}
+	
+	public Map<Long,List<TherapySession>> getTherapySessionsGroupByPatientUserId(List<Long> patientUserIds){
+		List<TherapySession> therapySessions = therapySessionRepository.findTop1ByPatientUserIdInOrderByEndTimeDesc(patientUserIds);
+		return therapySessions.stream().collect(Collectors.groupingBy(TherapySession::getTherapySessionByPatientUserId));
 	}
 
 }

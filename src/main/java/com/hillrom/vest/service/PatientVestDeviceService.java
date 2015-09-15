@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -52,7 +53,7 @@ public class PatientVestDeviceService {
     		patientVestDeviceAssoc = assignDeviceToPatient(id, deviceData);
     	} else {
     		PatientVestDeviceHistory activeDevice = (PatientVestDeviceHistory) assocList.stream().filter(patientDevice -> patientDevice.isActive()).collect(Collectors.toList()).get(0);
-    		if(activeDevice != null){
+    		if(Objects.nonNull(activeDevice)){
     			alreadyLinkedPatientuser = (User) activeDevice.getPatient().getUserPatientAssoc().stream().filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser();
     			if(alreadyLinkedPatientuser.getId().equals(id)){
     				patientVestDeviceAssoc = updateDeviceDetailsForPatient(activeDevice, deviceData);
@@ -68,11 +69,13 @@ public class PatientVestDeviceService {
 
 	private PatientVestDeviceHistory assignDeviceToPatient(Long id, Map<String, Object> deviceData) throws HillromException {
 		User patientUser = userRepository.findOne(id);
-		if(patientUser != null) {
+		if(Objects.nonNull(patientUser)) {
 			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
-		 	if(patientInfo != null){
+		 	if(Objects.nonNull(patientInfo)){
 		 		patientInfo.setSerialNumber(Objects.nonNull(deviceData.get("serialNumber")) ? deviceData.get("serialNumber").toString() : null);
 		 		patientInfo.setBluetoothId(Objects.nonNull(deviceData.get("bluetoothId")) ? deviceData.get("bluetoothId").toString() : null);
+		 		patientInfo.setHubId(Objects.nonNull(deviceData.get("hubId")) ? deviceData.get("hubId").toString() : null);
+		 		patientInfo.setDeviceAssocDate(DateTime.now());
 		 		patientInfoRepository.save(patientInfo);
 		 		Optional<PatientVestDeviceHistory> currentAssoc = patientVestDeviceRepository.findOneByPatientIdAndActiveStatus(patientInfo.getId(), true);
 		 		if(currentAssoc.isPresent()){
@@ -95,9 +98,10 @@ public class PatientVestDeviceService {
 	
 	private PatientVestDeviceHistory updateDeviceDetailsForPatient(PatientVestDeviceHistory activeDevice, Map<String, Object> deviceData) throws HillromException {
 		PatientInfo patientInfo = activeDevice.getPatient();
-	 	if(patientInfo != null){
+	 	if(Objects.nonNull(patientInfo)){
 	 		patientInfo.setSerialNumber(Objects.nonNull(deviceData.get("serialNumber")) ? deviceData.get("serialNumber").toString() : null);
 	 		patientInfo.setBluetoothId(Objects.nonNull(deviceData.get("bluetoothId")) ? deviceData.get("bluetoothId").toString() : null);
+	 		patientInfo.setHubId(Objects.nonNull(deviceData.get("hubId")) ? deviceData.get("hubId").toString() : null);
 	 		patientInfoRepository.save(patientInfo);
 	 		activeDevice.setSerialNumber(Objects.nonNull(deviceData.get("serialNumber")) ? deviceData.get("serialNumber").toString() : null);
 	 		activeDevice.setBluetoothId(Objects.nonNull(deviceData.get("bluetoothId")) ? deviceData.get("bluetoothId").toString() : null);
@@ -112,10 +116,14 @@ public class PatientVestDeviceService {
     public List<PatientVestDeviceHistory> getLinkedVestDeviceWithPatient(Long id) throws HillromException {
     	List<PatientVestDeviceHistory> deviceList;
     	User patientUser = userRepository.findOne(id);
-    	if(patientUser != null) {
+    	if(Objects.nonNull(patientUser)) {
 	    	PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
-	     	if(patientInfo != null){
+	     	if(Objects.nonNull(patientInfo)){
 	     		deviceList = patientVestDeviceRepository.findByPatientId(patientInfo.getId());
+	     		PatientVestDeviceHistory activeDevice = new PatientVestDeviceHistory(new PatientVestDevicePK(patientInfo, patientInfo.getSerialNumber()),
+	     				patientInfo.getBluetoothId(), patientInfo.getHubId(), true);
+	     		activeDevice.setCreatedDate(patientInfo.getDeviceAssocDate());
+	     		deviceList.add(activeDevice);
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
 	     	}

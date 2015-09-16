@@ -1,6 +1,6 @@
 DROP PROCEDURE IF EXISTS `update_patient_device_info`;
 DELIMITER $$
-CREATE PROCEDURE `update_patient_device_info`(
+CREATE DEFINER=`root`@`%` PROCEDURE `update_patient_device_info`(
     IN patient_id varchar(50), 
     IN pat_hub_id varchar(50), 
     IN pat_device_serial_number varchar(50), 

@@ -287,4 +287,13 @@ public class ClinicService {
         	}
         }
     }
+	
+	public int getAssociatedPatientUsersCountWithClinic(String clinicId) throws HillromException {
+    	Clinic clinic = clinicRepository.getOne(clinicId);
+        if(Objects.isNull(clinic)) {
+        	throw new HillromException(ExceptionConstants.HR_547);
+        } else {
+        	return clinic.getClinicPatientAssoc().size();
+        }
+	}
 }

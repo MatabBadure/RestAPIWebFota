@@ -235,4 +235,9 @@ public class TherapySession {
 	public int getMonthOfTheYear(){
 		return this.date.getMonthOfYear();
 	}
+	
+	@JsonIgnore
+	public Long getTherapySessionByPatientUserId() {
+		return patientUser.getId();
+	}
 }

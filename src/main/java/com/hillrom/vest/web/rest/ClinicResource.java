@@ -13,8 +13,6 @@ import java.util.regex.Pattern;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 
-import net.minidev.json.JSONObject;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +42,8 @@ import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 import com.mysema.query.types.expr.BooleanExpression;
+
+import net.minidev.json.JSONObject;
 
 /**
  * REST controller for managing Clinic.
@@ -378,6 +378,27 @@ public class ClinicResource {
 		      	jsonObject.put("message", message);
 		      	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }
+        } catch(HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    /**
+     * GET  /clinics/:clinicId/patientcount -> get the patient users count for the clinic.
+     */
+    @RequestMapping(value = "/clinics/{clinicId}/patientcount",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<JSONObject> getAssociatedPatientUsersCount(@PathVariable String clinicId) {
+        log.debug("REST request to get patient count for Clinic : {}", clinicId);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	int patientCount = clinicService.getAssociatedPatientUsersCountWithClinic(clinicId);
+	      	jsonObject.put("message", MessageConstants.HR_296);
+	      	jsonObject.put("patientCount", patientCount);
+	      	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         } catch(HillromException hre){
         	jsonObject.put("ERROR", hre.getMessage());
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);

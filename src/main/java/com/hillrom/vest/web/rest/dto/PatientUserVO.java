@@ -34,6 +34,8 @@ public class PatientUserVO {
 	private String primaryPhone;
 	private DateTime createdAt;
 	private Boolean isActivated;
+	private int adherence;
+	private Date lastTransmissionDate;
 	
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
@@ -70,6 +72,8 @@ public class PatientUserVO {
 		this.middleName = user.getMiddleName();
 		this.mobilePhone = user.getMobilePhone();
 		this.primaryPhone = user.getPrimaryPhone();
+		this.createdAt = user.getCreatedDate();
+		this.isActivated = user.getActivated();
 		if(null != patientInfo){			
 			this.state = patientInfo.getState();
 			this.hillromId = patientInfo.getHillromId();
@@ -227,6 +231,22 @@ public class PatientUserVO {
 
 	public void setPrimaryPhone(String primaryPhone) {
 		this.primaryPhone = primaryPhone;
+	}
+
+	public int getAdherence() {
+		return adherence;
+	}
+
+	public void setAdherence(int adherence) {
+		this.adherence = adherence;
+	}
+
+	public Date getLastTransmissionDate() {
+		return lastTransmissionDate;
+	}
+
+	public void setLastTransmissionDate(Date lastTransmissionDate) {
+		this.lastTransmissionDate = lastTransmissionDate;
 	}	
 	
 }

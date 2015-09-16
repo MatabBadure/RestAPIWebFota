@@ -104,4 +104,12 @@ public final class Constants {
 	public static final String EVENT = "Event";
 
 	public static final String YYYY_MM_DD = "yyyy-MM-dd";
+	
+	public static final String NON_HMR_COMPLIANCE = "non_hmr_compliance";
+
+	public static final String MISSED_THERAPY = "missed_therapy";
+
+	public static final String SETTING_DEVIATION = "setting_deviation";
+
+	public static final String NO_EVENT = "no_event";
 }

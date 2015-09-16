@@ -255,9 +255,6 @@ public class AdherenceCalculationService {
 			List<PatientCompliance> newComplianceList = new LinkedList<>();
 			List<Long> patientUserIds = new LinkedList<>();
 			DateTime today = DateTime.now();
-			if(patientComplianceList.size() > 0){
-				
-			}
 			patientComplianceList.forEach(compliance -> {			
 				patientUserIds.add(compliance.getPatientUser().getId());
 				PatientCompliance newCompliance = new PatientCompliance(today.toLocalDate(),compliance.getPatient(),compliance.getPatientUser(),compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1);

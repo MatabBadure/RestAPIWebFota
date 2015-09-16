@@ -258,8 +258,9 @@ public class AdherenceCalculationService {
 			patientComplianceList.forEach(compliance -> {			
 				patientUserIds.add(compliance.getPatientUser().getId());
 				PatientCompliance newCompliance = new PatientCompliance(today.toLocalDate(),compliance.getPatient(),compliance.getPatientUser(),compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1);
-				if(compliance.getScore() > 0)
-					newCompliance.setScore(compliance.getScore()- MISSED_THERAPY_POINTS);
+				int score = Objects.isNull(compliance.getScore()) ? 0 : compliance.getScore(); 
+				if(score > 0)
+					newCompliance.setScore(score- MISSED_THERAPY_POINTS);
 				int missedTherapyCount = compliance.getMissedTherapyCount();
 				if(missedTherapyCount > 0 && missedTherapyCount % 3 == 0){
 					notificationService.createOrUpdateNotification(compliance.getPatientUser(), compliance.getPatient(), compliance.getPatientUser().getId(),

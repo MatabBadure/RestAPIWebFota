@@ -97,6 +97,7 @@ public class ExceptionConstants {
     public static final String HR_582 = "No Clinics Associated with HCP.";
     public static final String HR_583 = "Unable to associate HCP with clinic.";
     public static final String HR_584 = "No statistics found.";
+    public static final String HR_585 = "No such patients found.";
     
     // Notifications
     public static final String HR_591 = "No such Notification found";

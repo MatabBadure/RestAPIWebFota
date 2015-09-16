@@ -35,12 +35,10 @@ public class PatientCompliance {
     @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
 	private LocalDate date;
 	
-	@JsonIgnore
 	@ManyToOne(optional=false,targetEntity=PatientInfo.class)
 	@JoinColumn(name="patient_id",referencedColumnName="id")
 	private PatientInfo patient;
 	
-	@JsonIgnore
 	@ManyToOne(optional=false,targetEntity=User.class)
 	@JoinColumn(name="user_id",referencedColumnName="id")
 	private User patientUser;

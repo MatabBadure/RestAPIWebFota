@@ -1,16 +1,11 @@
 package com.hillrom.vest.service;
 
-import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE;
-import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
-import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -25,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.ClinicPatientAssoc;
-import com.hillrom.vest.domain.Notification;
+import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
@@ -33,7 +28,6 @@ import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.exceptionhandler.HillromException;
-import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
@@ -43,6 +37,7 @@ import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
+import com.hillrom.vest.web.rest.dto.PatientUserVO;
 
 /**
  * Service class for managing users.
@@ -213,7 +208,7 @@ public class PatientHCPService {
 		return patientInfo;
 	}
 	
-	public Map<String, Integer> getTodaysPatientStatisticsForClinicAssociatedWithHCP(Long hcpId, String clinicId, LocalDate date) throws HillromException{
+	public Map<String, Integer> getTodaysPatientStatisticsForClinicAssociatedWithHCP(Long userId, String clinicId, LocalDate date) throws HillromException{
 		Map<String, Integer> statistics = new HashMap();
 		List<String> clinicList = new LinkedList<>();
 		clinicList.add(clinicId);
@@ -226,15 +221,66 @@ public class PatientHCPService {
 			patientUsers.forEach(patientUser -> {
 				patientUserIds.add(patientUser.getId());
 			});
-			Map<Long,List<TherapySession>> therapySessions = therapySessionService.getTherapySessionsGroupByPatientUserId(patientUserIds);
-			List<Long> patientIdsWithEvent = new LinkedList(therapySessions.keySet());
-			patientsWithNoEventRecorded = RandomUtil.getDifference(patientUserIds, patientIdsWithEvent).size();
+			patientsWithNoEventRecorded = getPatientsListWithNoEventRecorded(patientUserIds).size();
 			statistics.put("patientsWithHmrNonCompliance", patientComplianceRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, patientUserIds).size());
 			statistics.put("patientsWithSettingDeviation", patientComplianceRepository.findByDateAndIsSettingsDeviatedAndPatientUserIdIn(date, true, patientUserIds).size());
 			statistics.put("patientsWithMissedTherapy", patientComplianceRepository.findByDateAndMissedTherapyCountGreaterThanAndPatientUserIdIn(date, 0, patientUserIds).size());
 			statistics.put("patientsWithNoEventRecorded", patientsWithNoEventRecorded);
 		}
 		return statistics;
+	}
+
+	private List<Long> getPatientsListWithNoEventRecorded(List<Long> patientUserIds) {
+		Map<Long,List<TherapySession>> therapySessions = therapySessionService.getTherapySessionsGroupByPatientUserId(patientUserIds);
+		List<Long> patientIdsWithEvent = new LinkedList(therapySessions.keySet());
+		return RandomUtil.getDifference(patientUserIds, patientIdsWithEvent);
+	}
+	
+	public List<PatientCompliance> getPatientListFilterByMetricForClinicAssociated(Long userId, String clinicId, LocalDate date, String filterBy) throws HillromException{
+		List<String> clinicList = new LinkedList<>();
+		clinicList.add(clinicId);
+		Set<UserExtension> patientUsers = clinicService.getAssociatedPatientUsers(clinicList);
+		if(patientUsers.isEmpty()) {
+			throw new HillromException(MessageConstants.HR_279);
+		} else {
+			List<Long> patientUserIds = new LinkedList<>();
+			patientUsers.forEach(patientUser -> {
+				patientUserIds.add(patientUser.getId());
+			});
+			if(Constants.MISSED_THERAPY.equals(filterBy)){
+				return patientComplianceRepository.findByDateAndMissedTherapyCountGreaterThanAndPatientUserIdIn(date, 0, patientUserIds);
+			} else if(Constants.NON_HMR_COMPLIANCE.equals(filterBy)){
+				return patientComplianceRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, patientUserIds);
+			} else if(Constants.SETTING_DEVIATION.equals(filterBy)){
+				return patientComplianceRepository.findByDateAndIsSettingsDeviatedAndPatientUserIdIn(date, true, patientUserIds);
+			} else {
+				throw new HillromException(ExceptionConstants.HR_554);
+			}
+		}
+	}
+	
+	public List<PatientUserVO> getPatientsWithNoEventsForClinicAssociated(Long userId, String clinicId, LocalDate date) throws HillromException{
+		List<PatientUserVO> patientList = new LinkedList<>();
+		List<String> clinicList = new LinkedList<>();
+		clinicList.add(clinicId);
+		Set<UserExtension> patientUsers = clinicService.getAssociatedPatientUsers(clinicList);
+		if(patientUsers.isEmpty()) {
+			throw new HillromException(MessageConstants.HR_279);
+		} else {
+			List<Long> patientUserIds = new LinkedList<>();
+			patientUsers.forEach(patientUser -> {
+				patientUserIds.add(patientUser.getId());
+			});
+			List<Long> pList = getPatientsListWithNoEventRecorded(patientUserIds);
+			System.out.println("pList : "+pList);
+			List<User> patientUserList = userRepository.findAll(pList);
+			patientUserList.forEach(user -> {
+				PatientUserVO patientUserVO = new PatientUserVO((UserExtension) user, userService.getPatientInfoObjFromPatientUser(user));
+				patientUserVO.setAdherence(0);
+				patientList.add(patientUserVO);
+			});
+		}
+		return patientList;
 	}
 }
 

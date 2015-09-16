@@ -629,24 +629,79 @@ public class UserResource {
 	}
 	
 	/**
-     * GET  /users/:hcpId/clinics/:clinicId/statistics -> get the patient statistics for clinic associated with hcp user.
+     * GET  /users/:userId/clinics/:clinicId/statistics -> get the patient statistics for clinic associated with user.
      */
-    @RequestMapping(value = "/users/{hcpId}/clinics/{clinicId}/statistics",
+    @RequestMapping(value = "/users/{userId}/clinics/{clinicId}/statistics",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP})
-    public ResponseEntity<?> getPatientStatisticsForClinicAssociatedWithHCP(@PathVariable Long hcpId, @PathVariable String clinicId) {
-        log.debug("REST request to get patient statistics for clinic {} associated with HCP : {}", clinicId, hcpId);
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<?> getPatientStatisticsForClinicAssociated(@PathVariable Long userId, @PathVariable String clinicId) {
+        log.debug("REST request to get patient statistics for clinic {} associated with User : {}", clinicId, userId);
         JSONObject jsonObject = new JSONObject();
         try {
         	LocalDate date = LocalDate.now();
-        	Map<String, Integer> statitics = patientHCPService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(hcpId, clinicId, date);
+        	Map<String, Integer> statitics = patientHCPService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(userId, clinicId, date);
 	        if (statitics.isEmpty()) {
 	        	jsonObject.put("message", ExceptionConstants.HR_584);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_297);
 	        	jsonObject.put("statitics", statitics);
+	        }
+	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    /**
+     * GET  /users/:userId/clinics/:clinicId/patients -> get the patient list filter by metric type for clinic associated with user.
+     */
+    @RequestMapping(value = "/users/{userId}/clinics/{clinicId}/patients",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<?> getPatientsFilterByMetricTypeForClinicAssociated(@PathVariable Long userId, @PathVariable String clinicId,
+    		@RequestParam(value = "filterBy",required = false) String filterBy) {
+        log.debug("REST request to get patient list filter by metric type for clinic {} associated with User : {}", clinicId, userId);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	LocalDate date = LocalDate.now();
+        	List<PatientCompliance> patientList = patientHCPService.getPatientListFilterByMetricForClinicAssociated(userId, clinicId, date, filterBy);
+	        if (patientList.isEmpty()) {
+	        	jsonObject.put("message", ExceptionConstants.HR_585);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_213);
+	        	jsonObject.put("patientList", patientList);
+	        }
+	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    /**
+     * GET  /users/:userId/clinics/:clinicId/patients/noevents -> get the patient list with no events for clinic associated with user.
+     */
+    @RequestMapping(value = "/users/{userId}/clinics/{clinicId}/patients/noevents",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<?> getPatientsWithNoEventsForClinicAssociated(@PathVariable Long userId, @PathVariable String clinicId) {
+        log.debug("REST request to get patient list with no event for clinic {} associated with User : {}", clinicId, userId);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	LocalDate date = LocalDate.now();
+        	List<PatientUserVO> patientList = patientHCPService.getPatientsWithNoEventsForClinicAssociated(userId, clinicId, date);
+	        if (patientList.isEmpty()) {
+	        	jsonObject.put("message", ExceptionConstants.HR_585);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_213);
+	        	jsonObject.put("patientList", patientList);
 	        }
 	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
         } catch (HillromException hre){

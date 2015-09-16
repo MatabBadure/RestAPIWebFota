@@ -107,6 +107,9 @@ public class PatientInfo implements Serializable {
 
 	@Column(name = "mobile_phone")
 	private String mobilePhone;
+	
+	@Column(name = "device_assoc_date")
+    private DateTime deviceAssocDate;
 
     public String getId() {
 		return id;
@@ -298,6 +301,14 @@ public class PatientInfo implements Serializable {
 
 	public void setMobilePhone(String mobilePhone) {
 		this.mobilePhone = mobilePhone;
+	}
+
+	public DateTime getDeviceAssocDate() {
+		return deviceAssocDate;
+	}
+
+	public void setDeviceAssocDate(DateTime deviceAssocDate) {
+		this.deviceAssocDate = deviceAssocDate;
 	}
 
 	@Override

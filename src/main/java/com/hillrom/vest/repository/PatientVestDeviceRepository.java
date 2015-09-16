@@ -12,7 +12,7 @@ import com.hillrom.vest.domain.PatientVestDevicePK;
 public interface PatientVestDeviceRepository extends
 		JpaRepository<PatientVestDeviceHistory, PatientVestDevicePK> {
 
-	@Query("from PatientVestDeviceHistory pvd where pvd.patientVestDevicePK.patient.id = ?1")
+	@Query("from PatientVestDeviceHistory pvd where pvd.patientVestDevicePK.patient.id = ?1 and pvd.active = false")
 	List<PatientVestDeviceHistory> findByPatientId(String patientId);
 	
 	@Query("from PatientVestDeviceHistory pvd where pvd.patientVestDevicePK.serialNumber = ?1")

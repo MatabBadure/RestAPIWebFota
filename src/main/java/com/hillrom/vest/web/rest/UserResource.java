@@ -213,7 +213,7 @@ public class UserResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> getLinkedVestDeviceWithPatient(@PathVariable Long id) {
     	log.debug("REST request to link vest device with patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();

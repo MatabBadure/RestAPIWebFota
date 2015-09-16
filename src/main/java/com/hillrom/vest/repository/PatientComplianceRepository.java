@@ -22,4 +22,10 @@ public interface PatientComplianceRepository extends
 			+ " ON t1.user_id=t2.user_id and t1.date = t2.maxDate "
 			)
 	List<PatientCompliance> findAllGroupByPatientUserIdOrderByDateDesc();
+	
+	List<PatientCompliance> findByDateAndIsSettingsDeviatedAndPatientUserIdIn(LocalDate date,Boolean isSettingsDeviated,List<Long> patientUserIds);
+	
+	List<PatientCompliance> findByDateAndIsHmrCompliantAndPatientUserIdIn(LocalDate date,Boolean isHmrCompliant,List<Long> patientUserIds);
+	
+	List<PatientCompliance> findByDateAndMissedTherapyCountGreaterThanAndPatientUserIdIn(LocalDate date,int missedTherapyCount,List<Long> patientUserIds);
 }

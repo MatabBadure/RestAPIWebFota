@@ -34,6 +34,7 @@ import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.NotificationRepository;
+import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
@@ -68,7 +69,7 @@ public class PatientHCPService {
     private ClinicService clinicService;
 
     @Inject
-    private NotificationRepository notificationRepository;
+    private PatientComplianceRepository patientComplianceRepository;
     
     @Inject
     private TherapySessionService therapySessionService;
@@ -225,29 +226,15 @@ public class PatientHCPService {
 			patientUsers.forEach(patientUser -> {
 				patientUserIds.add(patientUser.getId());
 			});
-			Map<String,List<Notification>> statisticsData = getNotificationsGroupByType(patientUserIds, false, date);
 			Map<Long,List<TherapySession>> therapySessions = therapySessionService.getTherapySessionsGroupByPatientUserId(patientUserIds);
 			List<Long> patientIdsWithEvent = new LinkedList(therapySessions.keySet());
 			patientsWithNoEventRecorded = RandomUtil.getDifference(patientUserIds, patientIdsWithEvent).size();
-			if(Objects.nonNull(statisticsData.get(MISSED_THERAPY)))
-				statistics.put("patientsWithMissedTherapy", statisticsData.get(MISSED_THERAPY).size());
-			if(Objects.nonNull(statisticsData.get(HMR_NON_COMPLIANCE)))
-				statistics.put("patientsWithHmrNonCompliance", statisticsData.get(HMR_NON_COMPLIANCE).size());
-			if(Objects.nonNull(statisticsData.get(SETTINGS_DEVIATION)))
-				statistics.put("patientsWithSettingDeviation", statisticsData.get(SETTINGS_DEVIATION).size());
+			statistics.put("patientsWithHmrNonCompliance", patientComplianceRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, patientUserIds).size());
+			statistics.put("patientsWithSettingDeviation", patientComplianceRepository.findByDateAndIsSettingsDeviatedAndPatientUserIdIn(date, true, patientUserIds).size());
+			statistics.put("patientsWithMissedTherapy", patientComplianceRepository.findByDateAndMissedTherapyCountGreaterThanAndPatientUserIdIn(date, 0, patientUserIds).size());
 			statistics.put("patientsWithNoEventRecorded", patientsWithNoEventRecorded);
 		}
 		return statistics;
-	}
-	
-	public Map<String,List<Notification>> getNotificationsGroupByType(List<Long> patientUserIds,boolean isAcknowledged,LocalDate date){
-		List<Notification> notifications = notificationRepository.findByDateAndIsAcknowledgedAndPatientUserIdIn(date, isAcknowledged, patientUserIds);
-		return notifications.stream().collect(Collectors.groupingBy(Notification::getNotificationType));
-	}
-	
-	public Map<String,List<Notification>> getNotificationsFilterByType(List<Long> patientUserIds,boolean isAcknowledged,LocalDate date, String type){
-		List<Notification> notifications = notificationRepository.findByDateAndIsAcknowledgedAndNotificationTypeAndPatientUserIdIn(date, isAcknowledged, type, patientUserIds);
-		return notifications.stream().collect(Collectors.groupingBy(Notification::getNotificationType));
 	}
 }
 

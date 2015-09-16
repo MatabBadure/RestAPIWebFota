@@ -47,27 +47,41 @@ public class PatientCompliance {
 	
 	@Column(name="hmr_run_rate")
 	private Integer hmrRunRate;
+	
+	@Column(name="is_settings_deviated")
+	private boolean isSettingsDeviated = false;
+	
+	@Column(name="is_hmr_compliant")
+	private boolean isHmrCompliant = false;
+	
+	@Column(name="missed_therapy_count")
+	private int missedTherapyCount;
 
 	public PatientCompliance() {
 		super();
 	}
 
 	public PatientCompliance(Integer score, LocalDate date,
-			PatientInfo patient, User patientUser,Integer hmrRunRate) {
+			PatientInfo patient, User patientUser,Integer hmrRunRate,Boolean isHMRCompliant,
+			Boolean isSettingsDeviated) {
 		super();
 		this.score = score;
 		this.date = date;
 		this.patient = patient;
 		this.patientUser = patientUser;
 		this.hmrRunRate = hmrRunRate;
+		this.isHmrCompliant = isHMRCompliant;
+		this.isSettingsDeviated = isSettingsDeviated;
+		this.missedTherapyCount = 0;
 	}
 
 	public PatientCompliance(LocalDate date,
-			PatientInfo patient, User patientUser,Integer hmrRunRate) {
+			PatientInfo patient, User patientUser,Integer hmrRunRate,Integer missedTherapyCount) {
 		this.date = date;
 		this.patient = patient;
 		this.patientUser = patientUser;
 		this.hmrRunRate = hmrRunRate;
+		this.missedTherapyCount = missedTherapyCount;
 	}
 
 	public Long getId() {
@@ -116,6 +130,30 @@ public class PatientCompliance {
 
 	public void setHmrRunRate(Integer hmrRunRate) {
 		this.hmrRunRate = hmrRunRate;
+	}
+
+	public boolean isSettingsDeviated() {
+		return isSettingsDeviated;
+	}
+
+	public void setSettingsDeviated(boolean isSettingsDeviated) {
+		this.isSettingsDeviated = isSettingsDeviated;
+	}
+
+	public boolean isHmrCompliant() {
+		return isHmrCompliant;
+	}
+
+	public void setHmrCompliant(boolean isHmrCompliant) {
+		this.isHmrCompliant = isHmrCompliant;
+	}
+
+	public int getMissedTherapyCount() {
+		return missedTherapyCount;
+	}
+
+	public void setMissedTherapyCount(int missedTherapyCount) {
+		this.missedTherapyCount = missedTherapyCount;
 	}
 
 	@Override

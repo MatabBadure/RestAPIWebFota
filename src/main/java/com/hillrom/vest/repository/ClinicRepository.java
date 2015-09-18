@@ -46,4 +46,7 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 	
 	@Query("from Clinic clinic where LOWER(clinic.hillromId) = ?1")
     Optional<Clinic> findOneByHillromId(String hillromId);
+	
+	@Query("from Clinic clinic where clinic.clinicAdminId = ?1")
+    List<Clinic> findByClinicAdminId(Long clinicAdminId);
 }

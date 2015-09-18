@@ -11,8 +11,6 @@ import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
-import net.minidev.json.JSONObject;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +38,7 @@ import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.ClinicPatientService;
+import com.hillrom.vest.service.ClinicService;
 import com.hillrom.vest.service.HCPClinicService;
 import com.hillrom.vest.service.PatientHCPService;
 import com.hillrom.vest.service.RelationshipLabelService;
@@ -50,6 +49,8 @@ import com.hillrom.vest.web.rest.dto.CareGiverVO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
+
+import net.minidev.json.JSONObject;
 
 /**
  * REST controller for managing user.
@@ -80,6 +81,9 @@ public class UserExtensionResource {
     
     @Inject
     private RelationshipLabelService relationshipLabelService;
+    
+    @Inject
+    private ClinicService clinicService;
     
     /**
      * POST  /user -> Create a new User.
@@ -628,7 +632,7 @@ public class UserExtensionResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN, AuthoritiesConstants.HCP})
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP})
     public ResponseEntity<?> getAssociatedClinicsForHCP(@PathVariable Long id) {
         log.debug("REST request to get associated clinics with HCP : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -721,5 +725,31 @@ public class UserExtensionResource {
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 		}
      
+    }
+    
+    /**
+     * GET  /user/:id/clinics -> get the clinics associated with clinic admin user.
+     */
+    @RequestMapping(value = "/user/{id}/clinics",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<?> getAssociatedClinicsForClinicAdmin(@PathVariable Long id) {
+        log.debug("REST request to get associated clinics with HCP : {}", id);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	Set<ClinicVO> clinics= clinicService.getAssociatedClinicsForClinicAdmin(id);
+	        if (clinics.isEmpty()) {
+	        	jsonObject.put("message", ExceptionConstants.HR_586);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_298);
+	        	jsonObject.put("clinics", clinics);
+	        }
+	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
     }
 }

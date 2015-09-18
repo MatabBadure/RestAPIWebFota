@@ -40,7 +40,7 @@ public class UserSearchRepository {
 			Pageable pageable, Map<String, Boolean> sortOrder) {
 
 		String findHillromTeamUserQuery = "select distinct(user.id),user.first_name as firstName,user.last_name as lastName,user.email,"
-				+ " user_authority.authority_name as name,user.is_deleted as isDeleted,user.created_date as createdAt,user.activated as isActivated,user.hillrom_id as hillromId "
+				+ " user_authority.authority_name as name,user.is_deleted as isDeleted,user.created_date as createdAt,user.activated as isActivated,user.hillrom_id as hillromId, userExt.mobile_phone as mobilePhone "
 				+ " from  USER_EXTENSION userExt join USER user on user.id = userExt.user_id and "
 				+ " (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or "
@@ -73,9 +73,10 @@ public class UserSearchRepository {
 					Boolean isActivated = (Boolean) record[7];
 					String hillromId = (String)record[8];
 					DateTime createdAtDatetime = new DateTime(createdAt);
+					String mobilePhone = (String) record[9];
 					
 					HillRomUserVO hrUserVO = new HillRomUserVO(id, firstName,
-							lastName, email, role, isDeleted,createdAtDatetime,isActivated,hillromId);
+							lastName, email, role, isDeleted,createdAtDatetime,isActivated,hillromId, mobilePhone);
 					hrUsersList.add(hrUserVO);
 				});
 

@@ -39,18 +39,6 @@ public class PatientVestDeviceDataResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> receiveData(@RequestBody(required=true)String rawMessage){
 		List<PatientVestDeviceData> deviceData = null;
-		/*Map<String,String[]> paramsMap = request.getParameterMap();
-		int i = 0;
-		StringBuilder builder = new StringBuilder();
-		for(String key : paramsMap.keySet()){
-			String[]  values = paramsMap.get(key);
-			String value = values.length > 0 ? values[0] : "";
-			builder.append(key).append("=").append(value);
-			++i;
-			if( i < paramsMap.size()){
-				builder.append("&");
-			}
-		}*/
 		rawMessage = rawMessage.replaceAll("\n", "").replaceAll(" ","");
 		String reqParams[] = new String[]{"device_model_type","device_data",
         "device_serial_number","device_type","hub_id","air_interface_type",

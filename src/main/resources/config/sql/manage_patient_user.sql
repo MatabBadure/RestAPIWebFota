@@ -1,7 +1,7 @@
 DROP PROCEDURE IF EXISTS `manage_patient_user`;
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `manage_patient_user`(
-	IN operation_type_indicator INT,
+CREATE DEFINER=`root`@`%` PROCEDURE `manage_patient_user`(
+	IN operation_type_indicator VARCHAR(10),
     IN hr_id varchar(15),
 	IN pat_hub_id varchar(50),
 	IN pat_bluetooth_id varchar(50),
@@ -44,7 +44,7 @@ BEGIN
     SET encrypted_password = get_encripted_password(pat_zipcode,pat_last_name,pat_dob);
 -- Creare patient user when operation_type_indicator 0,
 	
-	IF operation_type_indicator = 0 THEN
+	IF operation_type_indicator = 'CREATE' THEN
     
 		SELECT `serial_number` INTO temp_serial_number FROM `PATIENT_INFO` WHERE `serial_number` = pat_device_serial_number;
         
@@ -89,7 +89,7 @@ BEGIN
 		SET return_patient_id = @gen_patient_id;
 	-- Update Patient user
     
-	ELSEIF operation_type_indicator = 1 THEN 
+	ELSEIF operation_type_indicator = 'UPDATE' THEN 
     
 		SELECT `id` INTO return_patient_id FROM `PATIENT_INFO` WHERE `serial_number` = pat_device_serial_number;
 		SELECT `user_id` INTO return_user_id FROM `USER_PATIENT_ASSOC` WHERE `patient_id`= return_patient_id AND `user_role`= 'PATIENT';
@@ -148,7 +148,7 @@ BEGIN
         */
 		COMMIT;
         
-	ELSEIF operation_type_indicator = 2 THEN 
+	ELSEIF operation_type_indicator = 'DELETE' THEN 
     
 		SELECT `id` INTO return_patient_id FROM `PATIENT_INFO` WHERE `serial_number` = pat_device_serial_number;
 		SELECT `user_id` INTO return_user_id FROM `USER_PATIENT_ASSOC` WHERE `patient_id`= return_patient_id;
@@ -162,7 +162,7 @@ BEGIN
 		COMMIT;
 		END IF;
 	ELSE
-		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Only 0, 1 and 2 are supported as opperation type ID';
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Only CREATE, UPDATE and DELETE are supported as opperation type ID';
     END IF;
 END$$
 DELIMITER ;

@@ -1,35 +1,34 @@
-DROP PROCEDURE IF EXISTS `manage_patient_user`;
 DELIMITER $$
-CREATE DEFINER=`root`@`%` PROCEDURE `manage_patient_user`(
+CREATE PROCEDURE `manage_patient_user`(
 	IN operation_type_indicator VARCHAR(10),
-    IN hr_id varchar(15),
-	IN pat_hub_id varchar(50),
-	IN pat_bluetooth_id varchar(50),
-    IN pat_device_serial_number varchar(10), 
-    IN pat_title varchar(50),
-    IN pat_first_name varchar(50),
-    IN pat_middle_name varchar(50),
-    IN pat_last_name varchar(50),
+    IN hr_id varchar(255),
+	IN pat_hub_id varchar(255),
+	IN pat_bluetooth_id varchar(255),
+    IN pat_device_serial_number varchar(255), 
+    IN pat_title varchar(255),
+    IN pat_first_name varchar(255),
+    IN pat_middle_name varchar(255),
+    IN pat_last_name varchar(255),
 	IN pat_dob date,
-    IN pat_email varchar(50),
-    IN pat_zipcode varchar(10),
+    IN pat_email varchar(255),
+    IN pat_zipcode varchar(11),
     IN pat_primary_phone varchar(20),
     IN pat_mobile_phone varchar(20),
-    IN pat_gender varchar(5),
+    IN pat_gender varchar(10),
     IN pat_lang_key varchar(10),
-	IN pat_address varchar(100),
-    IN pat_city varchar(50),
-    IN pat_state varchar(10),
-    OUT return_patient_id varchar(50),
-    OUT return_user_id varchar(50)
+	IN pat_address varchar(255),
+    IN pat_city varchar(255),
+    IN pat_state varchar(255),
+    OUT return_patient_id varchar(255),
+    OUT return_user_id varchar(255)
 )
 BEGIN
 
     DECLARE created_by varchar(255);
-    DECLARE today_date datetime;
-    DECLARE encrypted_password varchar(225);
-    DECLARE gen_patient_id varchar(50);
-    DECLARE temp_serial_number VARCHAR(10);
+    DECLARE created_date datetime;
+    DECLARE encrypted_password varchar(60);
+    DECLARE gen_patient_id varchar(255);
+    DECLARE temp_serial_number VARCHAR(255);
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
 	BEGIN
 		ROLLBACK;
@@ -40,8 +39,7 @@ BEGIN
 
   -- This is a block of final values that are used in the procedure.
 	SET created_by = 'system';
-	SET today_date = now();
-    SET encrypted_password = get_encripted_password(pat_zipcode,pat_last_name,pat_dob);
+    SET encrypted_password = get_encrypted_password(pat_zipcode,pat_last_name,pat_dob);
 -- Creare patient user when operation_type_indicator 0,
 	
 	IF operation_type_indicator = 'CREATE' THEN
@@ -62,7 +60,9 @@ BEGIN
 		VALUES
 		(@gen_patient_id, hr_id, pat_hub_id, pat_device_serial_number, pat_bluetooth_id, pat_title, pat_first_name, pat_middle_name,
 			pat_last_name, pat_dob, pat_email, pat_zipcode,0, pat_primary_phone, pat_mobile_phone, pat_gender, pat_lang_key, 0, NULL, pat_address, pat_city, pat_state);
-		SET today_date = now();
+		
+        SET created_date = now();
+        
 		INSERT INTO `USER`(
 		`email`, `PASSWORD`, `title`, `first_name`, `middle_name`, `last_name`, `activated`, `lang_key`, `activation_key`, `reset_key`, 
 		`created_by`, `created_date`, `reset_date`, `last_loggedin_at`, `last_modified_by`, 
@@ -70,8 +70,8 @@ BEGIN
 		`terms_condition_accepted_date`, `dob`, `hillrom_id`,`hmr_notification`,`accept_hmr_notification`,`accept_hmr_setting`)
 		VALUES(
 		pat_email, encrypted_password, pat_title, pat_first_name, pat_middle_name, pat_last_name, 0, pat_lang_key,NULL, NULL,
-		created_by, today_date, NULL, NULL, created_by, 
-		today_date, 0, pat_gender, pat_zipcode,0,
+		created_by, created_date, NULL, NULL, created_by, 
+		created_date, 0, pat_gender, pat_zipcode,0,
 		NULL, pat_dob, hr_id,NULL,0,0);
 		 
 		SELECT id INTO return_user_id FROM `user` WHERE email = pat_email;
@@ -138,14 +138,7 @@ BEGIN
 			`city` = pat_address,
 			`state` = pat_state 
             WHERE `user_id` = return_user_id;
-                  
-		/*UPDATE `USER_PATIENT_ASSOC` SET 
-			`user_role`='PATIENT', `relation_label`='SELF' 
-            WHERE `user_id` = return_user_id AND  `patient_id`= return_patient_id;
-        
-        UPDATE `USER_AUTHORITY`  SET `authority_name` ='PATIENT'
-			WHERE `user_id` = return_user_id;
-        */
+            
 		COMMIT;
         
 	ELSEIF operation_type_indicator = 'DELETE' THEN 

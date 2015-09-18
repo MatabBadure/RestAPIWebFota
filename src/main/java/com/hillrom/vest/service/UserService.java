@@ -587,26 +587,6 @@ public class UserService {
 
     public UserExtension updateHCPUser(UserExtension hcpUser, UserExtensionDTO userExtensionDTO) {
 		assignValuesToUserObj(userExtensionDTO, hcpUser);
-		List<String> existingClinicIds = new ArrayList<String>();
-		List<String> newClinicIds = new ArrayList<String>();
-		for(Clinic clinic : hcpUser.getClinics()) {
-			existingClinicIds.add(clinic.getId().toString());
-		}
-		for(Map<String, String> childClinic : userExtensionDTO.getClinicList()) {
-			newClinicIds.add(childClinic.get("id"));
-		}
-		List<String> clinicsToBeAdded = RandomUtil.getDifference(newClinicIds, existingClinicIds);
-		List<String> clinicsToBeRemoved = RandomUtil.getDifference(existingClinicIds, newClinicIds);
-		// TODO : to be re-factored with clinicRepository.findAll(clinicsToBeRemoved)
-		for(String clinicId : clinicsToBeRemoved) {
-			Clinic clinic = clinicRepository.getOne(clinicId);
-			hcpUser.getClinics().remove(clinic);
-		}
-		// TODO : to be re-factored with clinicRepository.findAll(clinicsToBeAdded)
-		for(String clinicId : clinicsToBeAdded) {
-			Clinic clinic = clinicRepository.getOne(clinicId);
-			hcpUser.getClinics().add(clinic);
-		}
 		userExtensionRepository.save(hcpUser);
 		log.debug("Updated Information for HealthCare Proffessional: {}", hcpUser);
 		return hcpUser;

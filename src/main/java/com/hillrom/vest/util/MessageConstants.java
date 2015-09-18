@@ -76,4 +76,5 @@ public class MessageConstants {
     public static final String HR_295 = "Security question updated successfully.";
     public static final String HR_296 = "Associated Patient's count with clinic fetched successfully.";
     public static final String HR_297 = "Statistics fetched successfully.";
+    public static final String HR_298 = "Clinics associated with Clinic Admin fetched successfully.";
 }

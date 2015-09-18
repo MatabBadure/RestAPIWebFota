@@ -21,6 +21,7 @@ import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
+import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
@@ -47,6 +48,9 @@ public class ClinicService {
     
     @Inject
     private UserRepository userRepository;
+    
+    @Inject
+    private UserExtensionRepository userExtensionRepository;
 
     public Clinic createClinic(ClinicDTO clinicDTO) throws HillromException {
     	Clinic newClinic = new Clinic();
@@ -296,4 +300,17 @@ public class ClinicService {
         	return clinic.getClinicPatientAssoc().size();
         }
 	}
+	
+	public Set<ClinicVO> getAssociatedClinicsForClinicAdmin(Long clinicAdminId) throws HillromException {
+		UserExtension clinicAdminUser = userExtensionRepository.findOne(clinicAdminId);
+		Set<ClinicVO> clinics = new HashSet<>();
+	    if(Objects.isNull(clinicAdminUser)){
+	    	throw new HillromException(ExceptionConstants.HR_512);
+	    } else {
+	    	for(Clinic clinic : clinicRepository.findByClinicAdminId(clinicAdminUser.getId())){
+	    		clinics.add(ClinicVOBuilder.build(clinic));
+	    	}
+	    	return clinics;
+	    }
+    }
 }

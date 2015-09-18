@@ -120,10 +120,12 @@ public class PatientVestDeviceService {
 	    	PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
 	     	if(Objects.nonNull(patientInfo)){
 	     		deviceList = patientVestDeviceRepository.findByPatientId(patientInfo.getId());
-	     		PatientVestDeviceHistory activeDevice = new PatientVestDeviceHistory(new PatientVestDevicePK(patientInfo, patientInfo.getSerialNumber()),
-	     				patientInfo.getBluetoothId(), patientInfo.getHubId(), true);
-	     		activeDevice.setCreatedDate(patientInfo.getDeviceAssocDate());
-	     		deviceList.add(activeDevice);
+	     		if(Objects.nonNull(patientInfo.getSerialNumber())){
+		     		PatientVestDeviceHistory activeDevice = new PatientVestDeviceHistory(new PatientVestDevicePK(patientInfo, patientInfo.getSerialNumber()),
+		     				patientInfo.getBluetoothId(), patientInfo.getHubId(), true);
+		     		activeDevice.setCreatedDate(patientInfo.getDeviceAssocDate());
+		     		deviceList.add(activeDevice);
+	     		}
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
 	     	}

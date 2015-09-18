@@ -108,6 +108,7 @@ public class PatientInfo implements Serializable {
 	@Column(name = "mobile_phone")
 	private String mobilePhone;
 	
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	@Column(name = "device_assoc_date")
     private DateTime deviceAssocDate;
 

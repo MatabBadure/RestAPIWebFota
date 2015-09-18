@@ -13,9 +13,10 @@ public class HillRomUserVO {
 	private DateTime createdAt;
 	private boolean isActivated;
 	private String hillromId;
+	private String mobilePhone;
 	
 	public HillRomUserVO(Long id, String firstName, String lastName,
-			String email, String role,boolean isDeleted,DateTime createdAt,boolean isActivated,String hillromId) {
+			String email, String role,boolean isDeleted,DateTime createdAt,boolean isActivated,String hillromId, String mobilePhone) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
@@ -26,6 +27,7 @@ public class HillRomUserVO {
 		this.createdAt = createdAt;
 		this.isActivated = isActivated;
 		this.hillromId = hillromId;
+		this.mobilePhone = mobilePhone;
 	}
 	
 	public Long getId() {
@@ -83,6 +85,14 @@ public class HillRomUserVO {
 
 	public void setHillromId(String hillromId) {
 		this.hillromId = hillromId;
+	}
+
+	public String getMobilePhone() {
+		return mobilePhone;
+	}
+
+	public void setMobilePhone(String mobilePhone) {
+		this.mobilePhone = mobilePhone;
 	}
 	
 	

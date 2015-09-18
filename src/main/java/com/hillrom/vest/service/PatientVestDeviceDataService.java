@@ -1,6 +1,7 @@
 package com.hillrom.vest.service;
 
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.PatientInfo;
+import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.domain.TherapySession;
@@ -21,6 +23,7 @@ import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.domain.VestDeviceBadData;
 import com.hillrom.vest.repository.AuthorityRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
+import com.hillrom.vest.repository.PatientNoEventsRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
@@ -61,6 +64,9 @@ public class PatientVestDeviceDataService {
 	@Inject
 	private VestDeviceBadDataRepository vestDeviceBadDataRepository;
 
+	@Inject
+	private PatientNoEventService noEventService;
+	
 	public List<PatientVestDeviceData> save(final String rawData) {
 		PatientVestDeviceRawLog deviceRawLog = null;
 		List<PatientVestDeviceData> patientVestDeviceRecords = null;
@@ -144,6 +150,7 @@ public class PatientVestDeviceDataService {
 			
 			userExtensionRepository.save(userExtension);
 			patientInfoRepository.save(patientInfo);
+			noEventService.createIfNotExists(new PatientNoEvent(null, patientInfo, userExtension));
 			return userPatientAssoc;
 		}
 	}

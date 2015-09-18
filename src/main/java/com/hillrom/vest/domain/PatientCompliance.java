@@ -57,6 +57,12 @@ public class PatientCompliance {
 	@Column(name="missed_therapy_count")
 	private int missedTherapyCount;
 
+	@Column(name="last_therapy_session_date")
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
+	@JsonSerialize(using = CustomLocalDateSerializer.class)
+    @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
+	private LocalDate latestTherapyDate;
+	
 	public PatientCompliance() {
 		super();
 	}
@@ -73,15 +79,17 @@ public class PatientCompliance {
 		this.isHmrCompliant = isHMRCompliant;
 		this.isSettingsDeviated = isSettingsDeviated;
 		this.missedTherapyCount = 0;
+		this.latestTherapyDate = date;
 	}
 
 	public PatientCompliance(LocalDate date,
-			PatientInfo patient, User patientUser,Integer hmrRunRate,Integer missedTherapyCount) {
+			PatientInfo patient, User patientUser,Integer hmrRunRate,Integer missedTherapyCount,LocalDate lastTherapySessionDate) {
 		this.date = date;
 		this.patient = patient;
 		this.patientUser = patientUser;
 		this.hmrRunRate = hmrRunRate;
 		this.missedTherapyCount = missedTherapyCount;
+		this.latestTherapyDate = lastTherapySessionDate;
 	}
 
 	public Long getId() {
@@ -156,6 +164,29 @@ public class PatientCompliance {
 		this.missedTherapyCount = missedTherapyCount;
 	}
 
+	public LocalDate getLatestTherapyDate() {
+		return latestTherapyDate;
+	}
+
+	public void setLatestTherapyDate(LocalDate latestTherapyDate) {
+		this.latestTherapyDate = latestTherapyDate;
+	}
+
+	@JsonIgnore
+	public int getDayOfTheWeek(){
+		return this.date.getDayOfWeek();
+	}
+	
+	@JsonIgnore
+	public int getWeekOfWeekyear(){
+		return this.date.getWeekOfWeekyear();
+	}
+	
+	@JsonIgnore
+	public int getMonthOfTheYear(){
+		return this.date.getMonthOfYear();
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -186,6 +217,5 @@ public class PatientCompliance {
 		return "PatientCompliance [id=" + id + ", score=" + score + ", date="
 				+ date + ", hmrRunRate=" + hmrRunRate + "]";
 	}
-	
-	
+
 }

@@ -78,6 +78,8 @@ public class AdherenceCalculationService {
 	
 	@Inject
 	private TherapySessionService therapySessionService;
+	
+	private PatientNoEventService noEventService;
 
 	/**
 	 * Get Protocol Constants by loading Protocol data
@@ -257,7 +259,7 @@ public class AdherenceCalculationService {
 			DateTime today = DateTime.now();
 			patientComplianceList.forEach(compliance -> {			
 				patientUserIds.add(compliance.getPatientUser().getId());
-				PatientCompliance newCompliance = new PatientCompliance(today.toLocalDate(),compliance.getPatient(),compliance.getPatientUser(),compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1);
+				PatientCompliance newCompliance = new PatientCompliance(today.toLocalDate(),compliance.getPatient(),compliance.getPatientUser(),compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1,compliance.getDate());
 				int score = Objects.isNull(compliance.getScore()) ? 0 : compliance.getScore(); 
 				if(score > 0)
 					newCompliance.setScore(score- MISSED_THERAPY_POINTS);

@@ -55,4 +55,5 @@
     <include file="classpath:/config/liquibase/changelog/20150825124604_add_HRM_notification_columns.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20150915174604_add_device_assoc_date_patientinfo.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150915170900_add_extra_columns_to_Patient_Compliance.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150916160900_added_lasttherapysession_column.xml"  relativeToChangelogFile="false"/>
  </databaseChangeLog>

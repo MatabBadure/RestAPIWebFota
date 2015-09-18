@@ -147,7 +147,7 @@ BEGIN
 		SELECT `user_id` INTO return_user_id FROM `USER_PATIENT_ASSOC` WHERE `patient_id`= return_patient_id;
         
         IF (return_user_id IS NULL) THEN 
-			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Pateint with given device serial number does not exists';
+			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Pateint with given device serial number does not exist';
         ELSE
         START TRANSACTION;
 			UPDATE `USER` SET `is_deleted` = 1 WHERE `id` = return_user_id;

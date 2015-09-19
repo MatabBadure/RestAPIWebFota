@@ -28,4 +28,6 @@ public interface PatientComplianceRepository extends
 	List<PatientCompliance> findByDateAndIsHmrCompliantAndPatientUserIdIn(LocalDate date,Boolean isHmrCompliant,List<Long> patientUserIds);
 	
 	List<PatientCompliance> findByDateAndMissedTherapyCountGreaterThanAndPatientUserIdIn(LocalDate date,int missedTherapyCount,List<Long> patientUserIds);
+	
+	List<PatientCompliance> findByDateBetweenAndPatientUserIdIn(LocalDate from,LocalDate to,List<Long> patientUserIds);
 }

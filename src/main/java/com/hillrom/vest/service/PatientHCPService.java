@@ -1,12 +1,18 @@
 package com.hillrom.vest.service;
 
+import static com.hillrom.vest.config.Constants.GROUP_BY_MONTHLY;
+import static com.hillrom.vest.config.Constants.GROUP_BY_YEARLY;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -22,6 +28,7 @@ import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.ClinicPatientAssoc;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
+import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
@@ -29,15 +36,18 @@ import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.PatientComplianceRepository;
+import com.hillrom.vest.repository.PatientNoEventsRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
+import com.hillrom.vest.web.rest.dto.StatisticsVO;
 
 /**
  * Service class for managing users.
@@ -68,6 +78,9 @@ public class PatientHCPService {
     
     @Inject
     private TherapySessionService therapySessionService;
+    
+    @Inject
+    private PatientNoEventsRepository noEventsRepository;
 
     public List<User> associateHCPToPatient(Long id, List<Map<String, String>> hcpList) throws HillromException {
     	List<User> users = new LinkedList<>();
@@ -208,8 +221,8 @@ public class PatientHCPService {
 		return patientInfo;
 	}
 	
-	public Map<String, Integer> getTodaysPatientStatisticsForClinicAssociatedWithHCP(Long userId, String clinicId, LocalDate date) throws HillromException{
-		Map<String, Integer> statistics = new HashMap();
+	public Map<String, Object> getTodaysPatientStatisticsForClinicAssociatedWithHCP(Long userId, String clinicId, LocalDate date) throws HillromException{
+		Map<String, Object> statistics = new HashMap();
 		List<String> clinicList = new LinkedList<>();
 		clinicList.add(clinicId);
 		Set<UserExtension> patientUsers = clinicService.getAssociatedPatientUsers(clinicList);
@@ -226,6 +239,8 @@ public class PatientHCPService {
 			statistics.put("patientsWithSettingDeviation", patientComplianceRepository.findByDateAndIsSettingsDeviatedAndPatientUserIdIn(date, true, patientUserIds).size());
 			statistics.put("patientsWithMissedTherapy", patientComplianceRepository.findByDateAndMissedTherapyCountGreaterThanAndPatientUserIdIn(date, 0, patientUserIds).size());
 			statistics.put("patientsWithNoEventRecorded", patientsWithNoEventRecorded);
+			statistics.put("date", date.toString());
+			statistics.put("totalPatientCount", patientUsers.size());
 		}
 		return statistics;
 	}
@@ -281,6 +296,157 @@ public class PatientHCPService {
 			});
 		}
 		return patientList;
+	}
+	
+	public Collection<StatisticsVO> getCumulativePatientStatisticsForClinicAssociatedWithHCP(Long hcpId, String clinicId, LocalDate from,LocalDate to,String groupBy) throws HillromException{
+		List<String> clinicList = new LinkedList<>();
+		clinicList.add(clinicId);
+		Set<UserExtension> patientUsers = clinicService.getAssociatedPatientUsers(clinicList);
+		if(patientUsers.isEmpty()) {
+			throw new HillromException(MessageConstants.HR_279);
+		} else {
+			List<Long> patientUserIds = new LinkedList<>();
+			patientUsers.forEach(patientUser -> {
+				if(!patientUser.isDeleted() && patientUser.getActivated()){ // Excluding deleted/inactive users
+					patientUserIds.add(patientUser.getId());
+				}
+			});
+			if(GROUP_BY_MONTHLY.equalsIgnoreCase(groupBy) || GROUP_BY_YEARLY.equalsIgnoreCase(groupBy))
+				return getPatientCumulativeStatisticsGroupByMonthOrYear(from, to, groupBy,patientUserIds);
+			else
+				return getPatienCumulativeStatisticsGroupByWeek(from, to, patientUserIds);
+		}
+	}
+
+	public Collection<StatisticsVO> getPatienCumulativeStatisticsGroupByWeek(LocalDate from, LocalDate to,
+			List<Long> patientUserIds){
+		Map<LocalDate, StatisticsVO> statisticsMap = new TreeMap<>();
+		List<PatientCompliance> complianceList = patientComplianceRepository.findByDateBetweenAndPatientUserIdIn(from, to, patientUserIds);
+		Map<LocalDate,Integer> datePatientNoEventCountMap = getPatientsWithNoEventsGroupByWeekly(from,to,patientUserIds);
+		List<LocalDate> requestedDates = DateUtil.getAllLocalDatesBetweenDates(from, to);
+		for(LocalDate date : requestedDates){
+			int noEventCount = Objects.nonNull(datePatientNoEventCountMap.get(date)) ? datePatientNoEventCountMap.get(date) : 0 ;
+			int hmrNonCompliantCount = 0, settingsDeviatedCount = 0,missedTherapyCount = 0;
+			for(int i = 0;i<complianceList.size();i++){
+				PatientCompliance compliance = complianceList.get(i);
+				if(date.equals(compliance.getDate())){
+					if(!compliance.isHmrCompliant())
+						hmrNonCompliantCount++;
+					if(!compliance.isSettingsDeviated())
+						settingsDeviatedCount++;
+					if(compliance.getMissedTherapyCount() > 0 && compliance.getMissedTherapyCount() % 3 == 0)
+						missedTherapyCount++;
+				}
+			}
+			StatisticsVO statisticsVO = new StatisticsVO(missedTherapyCount, hmrNonCompliantCount, settingsDeviatedCount, noEventCount,
+					date,date);
+			statisticsMap.put(date, statisticsVO);
+		}
+		return statisticsMap.values();
+	}
+	
+	public Collection<StatisticsVO> getPatientCumulativeStatisticsGroupByMonthOrYear(LocalDate from, LocalDate to,
+			String groupBy,List<Long> patientUserIds){
+		Map<Integer, StatisticsVO> statisticsMap = new TreeMap<>();
+		Map<Long, List<PatientCompliance>> compliancePerPatientMap = getComplianceGroupByPatientUserId(from, to, patientUserIds);
+		Map<Integer,Integer> patientWithNoEventsMap = getPatientsWithNoEventsGroupByMonthOrYear(from,to,groupBy,patientUserIds);
+		Map<Integer,List<LocalDate>> datesMap = DateUtil.prepareDateRangeGroupByMap(from,to,groupBy);
+		for(Integer weekOrMonth: datesMap.keySet()){
+			int hmrNonCompliantCount = 0, settingsDeviatedCount = 0,missedTherapyCount = 0;
+			int noEventCount = Objects.nonNull(patientWithNoEventsMap.get(weekOrMonth)) ? patientWithNoEventsMap.get(weekOrMonth) : 0;
+			List<LocalDate> datesUnderTheMonthOrYear = datesMap.get(weekOrMonth);
+			for(Long patientUserId : compliancePerPatientMap.keySet()){
+				List<PatientCompliance>  complianceListPerPatient = compliancePerPatientMap.get(patientUserId);
+				for(int i = 0;i<complianceListPerPatient.size();i++){
+					PatientCompliance compliancePerDay = complianceListPerPatient.get(i);
+					if(!compliancePerDay.isHmrCompliant()){
+						hmrNonCompliantCount++;
+						break;
+					}
+					if(!compliancePerDay.isSettingsDeviated()){
+						settingsDeviatedCount++;
+						break;
+					}
+					if(compliancePerDay.getMissedTherapyCount() > 0 && compliancePerDay.getMissedTherapyCount() % 3 == 0){
+						missedTherapyCount++;
+						break;
+					}
+				}
+			}
+			StatisticsVO statisticsVO = new StatisticsVO(missedTherapyCount, hmrNonCompliantCount, settingsDeviatedCount, noEventCount,
+					datesUnderTheMonthOrYear.get(0),datesUnderTheMonthOrYear.get(datesUnderTheMonthOrYear.size()-1));
+			statisticsMap.put(weekOrMonth, statisticsVO);
+		}
+		return statisticsMap.values();
+	}
+	
+	public Map<Long, List<PatientCompliance>> getComplianceGroupByPatientUserId(
+			LocalDate from, LocalDate to, List<Long> patientUserIds) {
+		List<PatientCompliance> complianceList = patientComplianceRepository.findByDateBetweenAndPatientUserIdIn(from, to, patientUserIds);
+		Map<Long,List<PatientCompliance>> complianceGroupByPatient = new HashMap<>();
+		for(PatientCompliance compliance : complianceList){
+			Long patientUserId = compliance.getPatientUser().getId();
+			List<PatientCompliance> compliances = complianceGroupByPatient.get(compliance.getPatientUser().getId());
+			if(Objects.isNull(compliances))
+				compliances = new LinkedList<>();
+			compliances.add(compliance);
+			complianceGroupByPatient.put(patientUserId, compliances);
+		}
+		return complianceGroupByPatient;
+	}
+	
+	public Map<LocalDate,Integer> getPatientsWithNoEventsGroupByWeekly(LocalDate from,LocalDate to,List<Long> patientUserIds) {
+		List<PatientNoEvent> patients = noEventsRepository.findByUserCreatedDateBeforeAndPatientUserIdIn(to.plusDays(1),patientUserIds);
+		Map<LocalDate,Integer> patientWithNoEventsMap = new HashMap<>(); 
+		int count = 0;
+		List<LocalDate> requestedDates = DateUtil.getAllLocalDatesBetweenDates(from, to);
+		for(int i = 0;i<patients.size();i++){
+			PatientNoEvent patientNoEvent = patients.get(i);
+			LocalDate firstTransmissionDate = patientNoEvent.getFirstTransmissionDate();
+			LocalDate userCreatedDate = patientNoEvent.getUserCreatedDate();
+			for(int j = 0;j<requestedDates.size();j++){
+				LocalDate requestedDate = requestedDates.get(j);
+				count = Objects.nonNull(patientWithNoEventsMap.get(requestedDate))? patientWithNoEventsMap.get(requestedDate):0;
+				if(requestedDate.isAfter(userCreatedDate)){
+					if(Objects.isNull(firstTransmissionDate)){
+						patientWithNoEventsMap.put(requestedDate,++count);
+					}else if(requestedDate.isBefore(firstTransmissionDate)){
+						patientWithNoEventsMap.put(requestedDate,++count);
+					}
+				}
+			}
+		}
+		return patientWithNoEventsMap;
+	}
+	
+	public Map<Integer,Integer> getPatientsWithNoEventsGroupByMonthOrYear(LocalDate from,LocalDate to,String groupBy,List<Long> patientUserIds) {
+		List<PatientNoEvent> patients = noEventsRepository.findByUserCreatedDateBeforeAndPatientUserIdIn(to.plusDays(1),patientUserIds);
+		Map<Integer,Integer> patientWithNoEventsMap = new HashMap<>(); 
+		List<LocalDate> requestedDates = DateUtil.getAllLocalDatesBetweenDates(from, to);
+		Map<Integer,List<LocalDate>> datesGroupByDuration = new HashMap<>();
+		if(GROUP_BY_MONTHLY.equalsIgnoreCase(groupBy)){
+			datesGroupByDuration = requestedDates.stream().collect(Collectors.groupingBy(LocalDate :: getWeekOfWeekyear));
+		}else{
+			datesGroupByDuration = requestedDates.stream().collect(Collectors.groupingBy(LocalDate :: getMonthOfYear));
+		}
+		for(Integer day: datesGroupByDuration.keySet()){
+			List<LocalDate> datesPerWeek = datesGroupByDuration.get(day);
+			LocalDate maxDateInDuration = datesPerWeek.get(datesPerWeek.size()-1);
+			for(int i = 0;i<patients.size();i++){
+				PatientNoEvent patientNoEvent = patients.get(i);
+				LocalDate firstTransmissionDate = patientNoEvent.getFirstTransmissionDate();
+				LocalDate userCreatedDate = patientNoEvent.getUserCreatedDate();
+				int count = Objects.nonNull(patientWithNoEventsMap.get(day))? patientWithNoEventsMap.get(day):0;
+				if(maxDateInDuration.isAfter(userCreatedDate)){
+					if(Objects.isNull(firstTransmissionDate)){
+						patientWithNoEventsMap.put(day,++count);
+					}else if(maxDateInDuration.isBefore(firstTransmissionDate)){
+						patientWithNoEventsMap.put(day,++count);
+					}
+				}
+			}
+		}
+		return patientWithNoEventsMap;
 	}
 }
 

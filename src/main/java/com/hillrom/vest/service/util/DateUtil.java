@@ -1,5 +1,6 @@
 package com.hillrom.vest.service.util;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -122,5 +123,25 @@ public class DateUtil {
 	 */
 	public static Map<Integer,List<LocalDate>> groupListOfLocalDatesByDayOfWeek(List<LocalDate> dates){
 		return  dates.stream().collect(Collectors.groupingBy(LocalDate :: getDayOfWeek));
+	}
+	
+	/**
+	 * Return Map groupby Dates
+	 * @param from
+	 * @param to
+	 * @param groupBy
+	 * @return
+	 */
+	public static Map<Integer,List<LocalDate>> prepareDateRangeGroupByMap(LocalDate from,LocalDate to,String groupBy){
+		List<LocalDate> requestedDates  = DateUtil.getAllLocalDatesBetweenDates(from, to);
+		Map<Integer,List<LocalDate>> groupedDates = new HashMap<>();
+		if(GROUP_BY_WEEKLY.equalsIgnoreCase(groupBy)){
+			groupedDates = requestedDates.stream().collect(Collectors.groupingBy(LocalDate :: getDayOfWeek));
+		}else if(GROUP_BY_MONTHLY.equalsIgnoreCase(groupBy)){
+			groupedDates = requestedDates.stream().collect(Collectors.groupingBy(LocalDate :: getWeekOfWeekyear));
+		}else {
+			groupedDates =  requestedDates.stream().collect(Collectors.groupingBy(LocalDate :: getMonthOfYear));
+		}
+		return groupedDates;
 	} 
 }

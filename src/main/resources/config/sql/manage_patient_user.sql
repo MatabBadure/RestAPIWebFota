@@ -66,12 +66,12 @@ BEGIN
 		INSERT INTO `USER`(
 		`email`, `PASSWORD`, `title`, `first_name`, `middle_name`, `last_name`, `activated`, `lang_key`, `activation_key`, `reset_key`, 
 		`created_by`, `created_date`, `reset_date`, `last_loggedin_at`, `last_modified_by`, 
-		`last_modified_date`, `is_deleted`, `gender`, `zipcode`, `terms_condition_accepted`, 
+		`last_modified_date`, `is_deleted`, `gender`, `zipcode`, `terms_condition_accepted`,`primary_phone`, `mobile_phone`,
 		`terms_condition_accepted_date`, `dob`, `hillrom_id`,`hmr_notification`,`accept_hmr_notification`,`accept_hmr_setting`)
 		VALUES(
 		pat_email, encrypted_password, pat_title, pat_first_name, pat_middle_name, pat_last_name, 0, pat_lang_key,NULL, NULL,
 		created_by, created_date, NULL, NULL, created_by, 
-		created_date, 0, pat_gender, pat_zipcode,0,
+		created_date, 0, pat_gender, pat_zipcode,0,pat_primary_phone, pat_mobile_phone,
 		NULL, pat_dob, hr_id,NULL,0,0);
 		 
 		SELECT id INTO return_user_id FROM `USER` WHERE email = pat_email;
@@ -120,6 +120,7 @@ BEGIN
 		WHERE `serial_number`= pat_device_serial_number;
 		
 		UPDATE `USER` SET
+			`hillrom_id` = hr_id,
 			`email` = pat_email,
 			`title` = pat_title,
 			`first_name` = pat_first_name,
@@ -136,7 +137,9 @@ BEGIN
 		UPDATE `USER_EXTENSION` SET 
 			`address` = pat_address ,
 			`city` = pat_address,
-			`state` = pat_state 
+			`state` = pat_state ,
+			`primary_phone` = pat_primary_phone,
+            `mobile_phone`= pat_mobile_phone
             WHERE `user_id` = return_user_id;
             
 		COMMIT;

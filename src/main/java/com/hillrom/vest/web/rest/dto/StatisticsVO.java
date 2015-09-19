@@ -1,11 +1,7 @@
 package com.hillrom.vest.web.rest.dto;
 
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
-import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 
 public class StatisticsVO {
 
@@ -14,13 +10,9 @@ public class StatisticsVO {
 	private int settingDeviation;
 	private int noEvent;
 
-	@JsonSerialize(using = CustomLocalDateSerializer.class)
-    @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
-	private LocalDate startTimestamp;
+	private DateTime startTimestamp;
 	
-	@JsonSerialize(using = CustomLocalDateSerializer.class)
-    @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
-	private LocalDate endTimestamp;
+	private DateTime endTimestamp;
 
 	public StatisticsVO(int missedTherapy, int nonCompliance,
 			int settingDeviation, int noEvent, LocalDate startTimestamp,LocalDate endTimestamp) {
@@ -29,8 +21,8 @@ public class StatisticsVO {
 		this.nonCompliance = nonCompliance;
 		this.settingDeviation = settingDeviation;
 		this.noEvent = noEvent;
-		this.startTimestamp = startTimestamp;
-		this.endTimestamp = endTimestamp;
+		this.startTimestamp = startTimestamp.toDateTimeAtCurrentTime();
+		this.endTimestamp = endTimestamp.toDateTimeAtCurrentTime();
 	}
 
 	public StatisticsVO() {
@@ -69,20 +61,21 @@ public class StatisticsVO {
 		this.noEvent = noEvent;
 	}
 
-	public LocalDate getStartTimestamp() {
+	public DateTime getStartTimestamp() {
 		return startTimestamp;
 	}
 
-	public void setStartTimestamp(LocalDate startTimestamp) {
+	public void setStartTimestamp(DateTime startTimestamp) {
 		this.startTimestamp = startTimestamp;
 	}
 
-	public LocalDate getEndTimestamp() {
+	public DateTime getEndTimestamp() {
 		return endTimestamp;
 	}
 
-	public void setEndTimestamp(LocalDate endTimestamp) {
+	public void setEndTimestamp(DateTime endTimestamp) {
 		this.endTimestamp = endTimestamp;
 	}
 
+	
 }

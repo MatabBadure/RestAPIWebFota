@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
+import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.TherapySession;
@@ -78,6 +79,8 @@ public class AdherenceCalculationService {
 	
 	@Inject
 	private TherapySessionService therapySessionService;
+	
+	private PatientNoEventService noEventService;
 
 	/**
 	 * Get Protocol Constants by loading Protocol data
@@ -127,6 +130,7 @@ public class AdherenceCalculationService {
 		
 		// First Time received Data,hence compliance will be 100.
 		if(latest3TherapySessions.isEmpty() || Objects.isNull(latestCompliance)){
+			noEventService.updatePatientFirstTransmittedDate(patientUserId,currentTherapyDate);
 			return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,actualMetrics.get("totalDuration").intValue(),false,false);
 		}else{ 
 			// Default 2 points get deducted by assuming data not received for the day, hence add 2 points
@@ -257,7 +261,7 @@ public class AdherenceCalculationService {
 			DateTime today = DateTime.now();
 			patientComplianceList.forEach(compliance -> {			
 				patientUserIds.add(compliance.getPatientUser().getId());
-				PatientCompliance newCompliance = new PatientCompliance(today.toLocalDate(),compliance.getPatient(),compliance.getPatientUser(),compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1);
+				PatientCompliance newCompliance = new PatientCompliance(today.toLocalDate(),compliance.getPatient(),compliance.getPatientUser(),compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1,compliance.getDate());
 				int score = Objects.isNull(compliance.getScore()) ? 0 : compliance.getScore(); 
 				if(score > 0)
 					newCompliance.setScore(score- MISSED_THERAPY_POINTS);

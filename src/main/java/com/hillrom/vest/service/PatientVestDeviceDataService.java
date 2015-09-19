@@ -1,6 +1,7 @@
 package com.hillrom.vest.service;
 
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -8,10 +9,12 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.PatientInfo;
+import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.domain.TherapySession;
@@ -61,6 +64,9 @@ public class PatientVestDeviceDataService {
 	@Inject
 	private VestDeviceBadDataRepository vestDeviceBadDataRepository;
 
+	@Inject
+	private PatientNoEventService noEventService;
+	
 	public List<PatientVestDeviceData> save(final String rawData) {
 		PatientVestDeviceRawLog deviceRawLog = null;
 		List<PatientVestDeviceData> patientVestDeviceRecords = null;
@@ -144,6 +150,8 @@ public class PatientVestDeviceDataService {
 			
 			userExtensionRepository.save(userExtension);
 			patientInfoRepository.save(patientInfo);
+			LocalDate createdOrTransmittedDate = userExtension.getCreatedDate().toLocalDate();
+			noEventService.createIfNotExists(new PatientNoEvent(createdOrTransmittedDate,createdOrTransmittedDate, patientInfo, userExtension));
 			return userPatientAssoc;
 		}
 	}

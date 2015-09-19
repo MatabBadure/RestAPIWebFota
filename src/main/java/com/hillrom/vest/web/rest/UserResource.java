@@ -3,6 +3,7 @@ package com.hillrom.vest.web.rest;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,8 @@ import java.util.Optional;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+
+import net.minidev.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.LocalDate;
@@ -64,10 +67,9 @@ import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.ProtocolDTO;
+import com.hillrom.vest.web.rest.dto.StatisticsVO;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
-
-import net.minidev.json.JSONObject;
 /**
  * REST controller for managing users.
  */
@@ -702,6 +704,35 @@ public class UserResource {
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_213);
 	        	jsonObject.put("patientList", patientList);
+	        }
+	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * GET  /users/:hcpId/clinics/:clinicId/cumulativeStatistics -> get the patient statistics for clinic associated with hcp user.
+     */
+    @RequestMapping(value = "/users/{hcpId}/clinics/{clinicId}/cumulativeStatistics",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP})
+    public ResponseEntity<?> getPatientsCumulativeStatisticsForClinicAssociatedWithHCP(@PathVariable Long hcpId, @PathVariable String clinicId,
+    		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
+    		@RequestParam(required=true)String groupBy) {
+        log.debug("REST request to get patients cumulative statistics for clinic {} associated with HCP : {}", clinicId, hcpId,from,to,groupBy);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	Collection<StatisticsVO> statiticsCollection = patientHCPService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to,groupBy);
+	        if (statiticsCollection.isEmpty()) {
+	        	jsonObject.put("message", ExceptionConstants.HR_584);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_297);
+	        	jsonObject.put("cumulativeStatitics", statiticsCollection);
 	        }
 	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
         } catch (HillromException hre){

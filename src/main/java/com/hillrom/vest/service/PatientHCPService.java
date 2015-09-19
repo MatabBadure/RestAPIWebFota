@@ -344,7 +344,7 @@ public class PatientHCPService {
 	}
 	
 	public Map<LocalDate,Integer> getPatientsWithNoEventsGroupByWeekly(LocalDate from,LocalDate to,List<Long> patientUserIds) {
-		List<PatientNoEvent> patients = noEventsRepository.findByUserCreatedDateBeforeAndPatientUserIdIn(to,patientUserIds);
+		List<PatientNoEvent> patients = noEventsRepository.findByUserCreatedDateBeforeAndPatientUserIdIn(to.plusDays(1),patientUserIds);
 		Map<LocalDate,Integer> patientWithNoEventsMap = new HashMap<>(); 
 		int count = 0;
 		List<LocalDate> requestedDates = DateUtil.getAllLocalDatesBetweenDates(from, to);
@@ -368,7 +368,7 @@ public class PatientHCPService {
 	}
 	
 	public Map<Integer,Integer> getPatientsWithNoEventsGroupByMonthOrYear(LocalDate from,LocalDate to,String groupBy,List<Long> patientUserIds) {
-		List<PatientNoEvent> patients = noEventsRepository.findByUserCreatedDateBeforeAndPatientUserIdIn(to,patientUserIds);
+		List<PatientNoEvent> patients = noEventsRepository.findByUserCreatedDateBeforeAndPatientUserIdIn(to.plusDays(1),patientUserIds);
 		Map<Integer,Integer> patientWithNoEventsMap = new HashMap<>(); 
 		List<LocalDate> requestedDates = DateUtil.getAllLocalDatesBetweenDates(from, to);
 		Map<Integer,List<LocalDate>> datesGroupByDuration = new HashMap<>();

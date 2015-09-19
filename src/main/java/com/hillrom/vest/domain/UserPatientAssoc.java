@@ -10,12 +10,15 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
+import org.hibernate.envers.Audited;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * A Clinic.
  */
 @Entity
+@Audited
 @Table(name = "USER_PATIENT_ASSOC")
 @AssociationOverrides({
     @AssociationOverride(name = "userPatientAssocPK.user",

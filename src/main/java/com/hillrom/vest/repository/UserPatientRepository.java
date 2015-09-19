@@ -20,4 +20,7 @@ public interface UserPatientRepository extends
 	
 	@Query("from UserPatientAssoc upa where upa.userPatientAssocPK.user.id = ?1 and upa.userPatientAssocPK.patient.id = ?2")
 	Optional<UserPatientAssoc> findOneByUserIdAndPatientId(Long userId,String patientId);
+	
+	@Query("from UserPatientAssoc upa where upa.userPatientAssocPK.user.id = ?1 and upa.userRole = ?2")
+	List<UserPatientAssoc> findByUserIdAndUserRole(Long userId, String userRole);
 }

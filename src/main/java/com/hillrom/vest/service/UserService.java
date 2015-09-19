@@ -1251,5 +1251,16 @@ public class UserService {
 			throw new HillromException(ExceptionConstants.HR_512);
 		}
 	}
+	
+	public List<UserPatientAssoc> getAssociatedPatientsForCaregiver(Long caregiverId) throws HillromException {
+    	List<UserPatientAssoc> patientAssocList = new LinkedList<>();
+		UserExtension caregiverUser = userExtensionRepository.findOne(caregiverId);
+		if(Objects.nonNull(caregiverUser)) {
+    		patientAssocList = userPatientRepository.findByUserIdAndUserRole(caregiverUser.getId(), AuthoritiesConstants.CARE_GIVER);
+		} else {
+			throw new HillromException(ExceptionConstants.HR_523);
+		}
+		return patientAssocList;
+    }
 }
 

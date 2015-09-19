@@ -736,7 +736,7 @@ public class UserExtensionResource {
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<?> getAssociatedClinicsForClinicAdmin(@PathVariable Long id) {
-        log.debug("REST request to get associated clinics with HCP : {}", id);
+        log.debug("REST request to get associated clinics with clinic admin user : {}", id);
         JSONObject jsonObject = new JSONObject();
         try {
         	Set<ClinicVO> clinics= clinicService.getAssociatedClinicsForClinicAdmin(id);
@@ -745,6 +745,32 @@ public class UserExtensionResource {
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_298);
 	        	jsonObject.put("clinics", clinics);
+	        }
+	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    /**
+     * GET  /user/:id/patients -> get the patients associated with caregiver user.
+     */
+    @RequestMapping(value = "/user/{id}/patients",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CARE_GIVER})
+    public ResponseEntity<?> getAssociatedPatientsForCaregiver(@PathVariable Long id) {
+        log.debug("REST request to get associated patients with caregiver : {}", id);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	List<UserPatientAssoc> userPatientAssocs= userService.getAssociatedPatientsForCaregiver(id);
+	        if (userPatientAssocs.isEmpty()) {
+	        	jsonObject.put("message", ExceptionConstants.HR_587);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_299);
+	        	jsonObject.put("patients", userPatientAssocs);
 	        }
 	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
         } catch (HillromException hre){

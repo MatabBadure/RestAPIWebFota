@@ -221,8 +221,8 @@ public class PatientHCPService {
 		return patientInfo;
 	}
 	
-	public Map<String, Integer> getTodaysPatientStatisticsForClinicAssociatedWithHCP(Long userId, String clinicId, LocalDate date) throws HillromException{
-		Map<String, Integer> statistics = new HashMap();
+	public Map<String, Object> getTodaysPatientStatisticsForClinicAssociatedWithHCP(Long userId, String clinicId, LocalDate date) throws HillromException{
+		Map<String, Object> statistics = new HashMap();
 		List<String> clinicList = new LinkedList<>();
 		clinicList.add(clinicId);
 		Set<UserExtension> patientUsers = clinicService.getAssociatedPatientUsers(clinicList);
@@ -239,6 +239,8 @@ public class PatientHCPService {
 			statistics.put("patientsWithSettingDeviation", patientComplianceRepository.findByDateAndIsSettingsDeviatedAndPatientUserIdIn(date, true, patientUserIds).size());
 			statistics.put("patientsWithMissedTherapy", patientComplianceRepository.findByDateAndMissedTherapyCountGreaterThanAndPatientUserIdIn(date, 0, patientUserIds).size());
 			statistics.put("patientsWithNoEventRecorded", patientsWithNoEventRecorded);
+			statistics.put("date", date.toString());
+			statistics.put("totalPatientCount", patientUsers.size());
 		}
 		return statistics;
 	}

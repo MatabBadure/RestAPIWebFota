@@ -643,7 +643,7 @@ public class UserResource {
         JSONObject jsonObject = new JSONObject();
         try {
         	LocalDate date = LocalDate.now();
-        	Map<String, Integer> statitics = patientHCPService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(userId, clinicId, date);
+        	Map<String, Object> statitics = patientHCPService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(userId, clinicId, date);
 	        if (statitics.isEmpty()) {
 	        	jsonObject.put("message", ExceptionConstants.HR_584);
 	        } else {

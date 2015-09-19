@@ -534,22 +534,20 @@ public class UserResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TherapySession>> exportTherapyData(@PathVariable Long id,
-    		@RequestParam(value="from",required=true)Long fromTimeStamp,
-    		@RequestParam(value="to",required=false)Long toTimeStamp){
-    	LocalDate to = Objects.nonNull(toTimeStamp) ? LocalDate.fromDateFields(new Date(toTimeStamp)) : LocalDate.now();
-    	List<TherapySession> therapySessions = therapySessionRepository.findByPatientUserIdAndDateRange(id, LocalDate.fromDateFields(new Date(fromTimeStamp)), to);
+    		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to){
+    	List<TherapySession> therapySessions = therapySessionRepository.findByPatientUserIdAndDateRange(id, from, to);
     	return new ResponseEntity<>(therapySessions,HttpStatus.OK);
     }
     
     @RequestMapping(value = "/users/{id}/exportTherapyDataCSV",
             method = RequestMethod.GET,
-            produces = "text/csv")
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public void exportTherapyDataCSV(@PathVariable Long id,
-    		@RequestParam(value="from",required=true)Long fromTimeStamp,
-    		@RequestParam(value="to",required=false)Long toTimeStamp,
+    		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
     		HttpServletResponse response) throws UnsupportedEncodingException, IOException{
-    	LocalDate to = Objects.nonNull(toTimeStamp) ? LocalDate.fromDateFields(new Date(toTimeStamp)) : LocalDate.now();
-    	List<TherapySession> therapySessions = therapySessionRepository.findByPatientUserIdAndDateRange(id, LocalDate.fromDateFields(new Date(fromTimeStamp)), to);
+    	List<TherapySession> therapySessions = therapySessionRepository.findByPatientUserIdAndDateRange(id, from, to);
     	ICsvBeanWriter beanWriter = null;
     	CellProcessor[] processors = CsvUtil.getCellProcessorForTherapySessionData();
     	try {

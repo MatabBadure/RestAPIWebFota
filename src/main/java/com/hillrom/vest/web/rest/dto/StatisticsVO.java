@@ -2,13 +2,24 @@ package com.hillrom.vest.web.rest.dto;
 
 import org.joda.time.LocalDate;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
+import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
+
 public class StatisticsVO {
 
 	private int missedTherapy;
 	private int nonCompliance;
 	private int settingDeviation;
 	private int noEvent;
+
+	@JsonSerialize(using = CustomLocalDateSerializer.class)
+    @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
 	private LocalDate startTimestamp;
+	
+	@JsonSerialize(using = CustomLocalDateSerializer.class)
+    @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
 	private LocalDate endTimestamp;
 
 	public StatisticsVO(int missedTherapy, int nonCompliance,

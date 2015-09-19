@@ -186,7 +186,7 @@ public class PatientCompliance {
 	public int getMonthOfTheYear(){
 		return this.date.getMonthOfYear();
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

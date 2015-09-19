@@ -50,9 +50,10 @@ public class PatientNoEvent {
 		super();
 	}
 
-	public PatientNoEvent(LocalDate firstTransmissionDate, PatientInfo patient,
+	public PatientNoEvent(LocalDate userCreatedDate,LocalDate firstTransmissionDate, PatientInfo patient,
 			User patientUser) {
 		super();
+		this.userCreatedDate = userCreatedDate;
 		this.firstTransmissionDate = firstTransmissionDate;
 		this.patient = patient;
 		this.patientUser = patientUser;

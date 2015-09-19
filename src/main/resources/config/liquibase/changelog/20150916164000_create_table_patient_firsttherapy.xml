@@ -17,7 +17,7 @@
 				<constraints primaryKey="true" nullable="false" />
 			</column>
 			<column name="first_transmission_date" type="date" />
-			
+			<column name="user_created_date" type="date" />
 			<column name="patient_id" type="varchar(255)" />
 			<column name="user_id" type="bigint(20)" />
 		</createTable>

@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +24,6 @@ import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.domain.VestDeviceBadData;
 import com.hillrom.vest.repository.AuthorityRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
-import com.hillrom.vest.repository.PatientNoEventsRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
@@ -150,7 +150,8 @@ public class PatientVestDeviceDataService {
 			
 			userExtensionRepository.save(userExtension);
 			patientInfoRepository.save(patientInfo);
-			noEventService.createIfNotExists(new PatientNoEvent(null, patientInfo, userExtension));
+			LocalDate createdOrTransmittedDate = userExtension.getCreatedDate().toLocalDate();
+			noEventService.createIfNotExists(new PatientNoEvent(createdOrTransmittedDate,createdOrTransmittedDate, patientInfo, userExtension));
 			return userPatientAssoc;
 		}
 	}

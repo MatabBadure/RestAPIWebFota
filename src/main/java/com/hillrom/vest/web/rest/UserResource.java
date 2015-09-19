@@ -660,7 +660,7 @@ public class UserResource {
 	/**
      * GET  /users/:hcpId/clinics/:clinicId/cumulativeStatistics -> get the patient statistics for clinic associated with hcp user.
      */
-    @RequestMapping(value = "/users/{hcpId}/clinics/{clinicId}/statistics",
+    @RequestMapping(value = "/users/{hcpId}/clinics/{clinicId}/cumulativeStatistics",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
@@ -677,7 +677,7 @@ public class UserResource {
 	        	jsonObject.put("message", ExceptionConstants.HR_584);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_297);
-	        	jsonObject.put("statitics", statiticsCollection);
+	        	jsonObject.put("cumulativeStatitics", statiticsCollection);
 	        }
 	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
         } catch (HillromException hre){

@@ -1,3 +1,4 @@
+DROP PROCEDURE IF EXISTS  `manage_patient_user`;
 DELIMITER $$
 CREATE PROCEDURE `manage_patient_user`(
 	IN operation_type_indicator VARCHAR(10),
@@ -29,18 +30,16 @@ BEGIN
     DECLARE encrypted_password varchar(60);
     DECLARE gen_patient_id varchar(255);
     DECLARE temp_serial_number VARCHAR(255);
+    
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
 	BEGIN
 		ROLLBACK;
         RESIGNAL;
     END;
 		 
-    
-
-  -- This is a block of final values that are used in the procedure.
 	SET created_by = 'system';
-    SET encrypted_password = encrypt(CONCAT(CAST(pat_zipcode AS CHAR),SUBSTRING(pat_last_name,1,4),CAST(DATE_FORMAT(pat_dob,'%d%m%Y') AS CHAR)));
--- Creare patient user when operation_type_indicator 0,
+    SET encrypted_password = encrypt(CONCAT(CAST(pat_zipcode AS CHAR),SUBSTRING(pat_last_name,1,4),CAST(DATE_FORMAT(pat_dob,'%m%d%Y') AS CHAR)));
+-- Creare patient user when operation_type_indicator CREATE,
 	
 	IF operation_type_indicator = 'CREATE' THEN
     
@@ -66,21 +65,21 @@ BEGIN
 		INSERT INTO `USER`(
 		`email`, `PASSWORD`, `title`, `first_name`, `middle_name`, `last_name`, `activated`, `lang_key`, `activation_key`, `reset_key`, 
 		`created_by`, `created_date`, `reset_date`, `last_loggedin_at`, `last_modified_by`, 
-		`last_modified_date`, `is_deleted`, `gender`, `zipcode`, `terms_condition_accepted`,`primary_phone`, `mobile_phone`,
+		`last_modified_date`, `is_deleted`, `gender`, `zipcode`, `terms_condition_accepted`,
 		`terms_condition_accepted_date`, `dob`, `hillrom_id`,`hmr_notification`,`accept_hmr_notification`,`accept_hmr_setting`)
 		VALUES(
 		pat_email, encrypted_password, pat_title, pat_first_name, pat_middle_name, pat_last_name, 0, pat_lang_key,NULL, NULL,
 		created_by, created_date, NULL, NULL, created_by, 
-		created_date, 0, pat_gender, pat_zipcode,0,pat_primary_phone, pat_mobile_phone,
+		created_date, 0, pat_gender, pat_zipcode,0,
 		NULL, pat_dob, hr_id,NULL,0,0);
 		 
 		SELECT id INTO return_user_id FROM `USER` WHERE email = pat_email;
 		
-		INSERT INTO `USER_EXTENSION` (`user_id`,`address`,`city`,`state`,`is_deleted`)
-		VALUES (return_user_id, pat_address, pat_city, pat_state,0);
+		INSERT INTO `USER_EXTENSION` (`user_id`,`primary_phone`, `mobile_phone`,`address`,`city`,`state`,`is_deleted`)
+		VALUES (return_user_id, pat_primary_phone, pat_mobile_phone, pat_address, pat_city, pat_state,0);
 		
 		INSERT INTO `USER_PATIENT_ASSOC` (`user_id`,  `patient_id`, `user_role`, `relation_label`)
-		VALUES(return_user_id,@gen_patient_id,'PATIENT','SELF');
+		VALUES(return_user_id,@gen_patient_id,'PATIENT','Self');
         
         INSERT INTO `USER_AUTHORITY` (`user_id`,  `authority_name`)
 		VALUES(return_user_id,'PATIENT');
@@ -137,7 +136,7 @@ BEGIN
 		UPDATE `USER_EXTENSION` SET 
 			`address` = pat_address ,
 			`city` = pat_address,
-			`state` = pat_state ,
+			`state` = pat_state,
 			`primary_phone` = pat_primary_phone,
             `mobile_phone`= pat_mobile_phone
             WHERE `user_id` = return_user_id;

@@ -39,7 +39,7 @@ BEGIN
 
   -- This is a block of final values that are used in the procedure.
 	SET created_by = 'system';
-    SET encrypted_password = get_encrypted_password(pat_zipcode,pat_last_name,pat_dob);
+    SET encrypted_password = encrypt(CONCAT(CAST(pat_zipcode AS CHAR),SUBSTRING(pat_last_name,1,4),CAST(DATE_FORMAT(pat_dob,'%d%m%Y') AS CHAR)));
 -- Creare patient user when operation_type_indicator 0,
 	
 	IF operation_type_indicator = 'CREATE' THEN
@@ -74,7 +74,7 @@ BEGIN
 		created_date, 0, pat_gender, pat_zipcode,0,
 		NULL, pat_dob, hr_id,NULL,0,0);
 		 
-		SELECT id INTO return_user_id FROM `user` WHERE email = pat_email;
+		SELECT id INTO return_user_id FROM `USER` WHERE email = pat_email;
 		
 		INSERT INTO `USER_EXTENSION` (`user_id`,`address`,`city`,`state`,`is_deleted`)
 		VALUES (return_user_id, pat_address, pat_city, pat_state,0);
@@ -147,7 +147,7 @@ BEGIN
 		SELECT `user_id` INTO return_user_id FROM `USER_PATIENT_ASSOC` WHERE `patient_id`= return_patient_id;
         
         IF (return_user_id IS NULL) THEN 
-			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Pateint with given device serial number does not exist';
+			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Pateint with given device serial number does not exists';
         ELSE
         START TRANSACTION;
 			UPDATE `USER` SET `is_deleted` = 1 WHERE `id` = return_user_id;

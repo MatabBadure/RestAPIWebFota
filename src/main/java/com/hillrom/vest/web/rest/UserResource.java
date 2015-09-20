@@ -69,6 +69,7 @@ import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.ProtocolDTO;
 import com.hillrom.vest.web.rest.dto.StatisticsVO;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
+import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 /**
  * REST controller for managing users.
@@ -738,4 +739,34 @@ public class UserResource {
     		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
+    
+    /**
+     * GET  /users/:hcpId/clinics/:clinicId/cumulativeStatistics -> get the patient statistics for clinic associated with hcp user.
+     */
+    @RequestMapping(value = "/users/{hcpId}/clinics/{clinicId}/treatmentStatistics",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP})
+    public ResponseEntity<?> getPatientsTreatmentStatisticsForClinicAssociatedWithHCP(@PathVariable Long hcpId, @PathVariable String clinicId,
+    		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
+    		@RequestParam(required=true)String groupBy) {
+        log.debug("REST request to get patients treatement statistics for clinic {} associated with HCP : {}", clinicId, hcpId,from,to,groupBy);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	Collection<TreatmentStatisticsVO> statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to,groupBy);
+	        if (statiticsCollection.isEmpty()) {
+	        	jsonObject.put("message", ExceptionConstants.HR_584);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_297);
+	        	jsonObject.put("treatmentStatitics", statiticsCollection);
+	        }
+	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }

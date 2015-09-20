@@ -48,6 +48,7 @@ import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.StatisticsVO;
+import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
 
 /**
  * Service class for managing users.
@@ -447,6 +448,25 @@ public class PatientHCPService {
 			}
 		}
 		return patientWithNoEventsMap;
+	}
+
+	public Collection<TreatmentStatisticsVO> getTreatmentStatisticsForClinicAssociatedWithHCP(
+			Long hcpId, String clinicId, LocalDate from, LocalDate to,
+			String groupBy) throws HillromException {
+		List<String> clinicList = new LinkedList<>();
+		clinicList.add(clinicId);
+		Set<UserExtension> patientUsers = clinicService.getAssociatedPatientUsers(clinicList);
+		if(patientUsers.isEmpty()) {
+			throw new HillromException(MessageConstants.HR_279);
+		} else {
+			List<Long> patientUserIds = new LinkedList<>();
+			patientUsers.forEach(patientUser -> {
+				if(!patientUser.isDeleted() && patientUser.getActivated()){ // Excluding deleted/inactive users
+					patientUserIds.add(patientUser.getId());
+				}
+			});
+			return therapySessionService.getTreatmentStatisticsByPatientUserIdsAndDuration(patientUserIds,from,to,groupBy);
+		}
 	}
 }
 

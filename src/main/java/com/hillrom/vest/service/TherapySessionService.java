@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -48,15 +49,15 @@ public class TherapySessionService {
 	public List<TherapySession> saveOrUpdate(List<TherapySession> therapySessions) throws HillromException{
 		User patientUser = therapySessions.get(0).getPatientUser();
 		removeExistingTherapySessions(therapySessions, patientUser);
-		Map<Integer, List<TherapySession>> groupedTherapySessions = therapySessions
+		Map<LocalDate, List<TherapySession>> groupedTherapySessions = therapySessions
 				.stream()
 				.collect(
 						Collectors
-								.groupingBy(TherapySession::getTherapyDayOfTheYear));
+								.groupingBy(TherapySession::getDate));
 		
-		SortedSet<Integer> daysInSortOrder = new TreeSet<>(groupedTherapySessions.keySet());
-		for(Integer day : daysInSortOrder){
-			List<TherapySession> therapySessionsPerDay = groupedTherapySessions.get(day);
+		SortedSet<LocalDate> daysInSortOrder = new TreeSet<>(groupedTherapySessions.keySet());
+		for(LocalDate date : daysInSortOrder){
+			List<TherapySession> therapySessionsPerDay = groupedTherapySessions.get(date);
 			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId());
 			PatientCompliance compliance =  adherenceCalculationService.calculateCompliancePerDay(therapySessionsPerDay,protocol);
 			complianceService.createOrUpdate(compliance);
@@ -92,19 +93,51 @@ public class TherapySessionService {
 		List<TherapySession> sessions = therapySessionRepository
 				.findByPatientUserIdAndDateRange(patientUserId,from,to);
 		Map<Integer,List<TherapySession>> groupedSessions = new HashMap<>();
-		if(GROUP_BY_WEEKLY.equalsIgnoreCase(groupBy)){
-			groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getDayOfTheWeek));
-		}else if(GROUP_BY_MONTHLY.equals(groupBy)){
+		if(GROUP_BY_MONTHLY.equals(groupBy)){
 			groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getWeekOfYear));
 		}else if(GROUP_BY_YEARLY.equals(groupBy)){
 			groupedSessions = sessions.stream().collect(Collectors.groupingBy(TherapySession :: getMonthOfTheYear));
 		}
-		Map<Integer,TherapyDataVO> calculatedData =  calculateWeightedAvgs(groupedSessions);
-		if(calculatedData.isEmpty())
+		if(sessions.size() > 0){
+			List<TherapyDataVO> results = new LinkedList<>();
+			if(GROUP_BY_WEEKLY.equalsIgnoreCase(groupBy)){
+				Map<LocalDate,List<TherapySession>> tpsGroupByDate = groupTherapySessionsByDate(sessions);
+				Map<LocalDate,TherapyDataVO> calculatedData = calculateWeightedAvgsForWeek(tpsGroupByDate);
+				results = formatResponsePerWeek(calculatedData, from, to);
+			}else{
+				Map<Integer,TherapyDataVO> calculatedData =  calculateWeightedAvgs(groupedSessions);
+				results = formatResponsePerMonthOrYear(calculatedData,from,to,groupBy);
+			}
+			Collections.sort(results);
+			return results;
+		}else{
 			return new LinkedList<>();
-		List<TherapyDataVO> results = formatResponse(calculatedData,from,to,groupBy);
-		Collections.sort(results);
-		return results;
+		}
+	}
+	
+	public Map<LocalDate,List<TherapySession>> groupTherapySessionsByDate(List<TherapySession> therapySessions){
+		return therapySessions.stream().collect(Collectors.groupingBy(TherapySession :: getDate));
+	}
+	
+	public Map<LocalDate,TherapyDataVO> calculateWeightedAvgsForWeek(Map<LocalDate,List<TherapySession>> tpsGroupedByDate){
+		Map<LocalDate,TherapyDataVO> dateWeightedAvgMap = new TreeMap<>();
+		for(LocalDate  date : tpsGroupedByDate.keySet()){
+			dateWeightedAvgMap.put(date, calculateWeightedAvgForSessions(tpsGroupedByDate.get(date)));
+		}
+		return dateWeightedAvgMap;
+	}
+	
+	private List<TherapyDataVO> formatResponsePerWeek(
+			Map<LocalDate, TherapyDataVO> calculatedData, LocalDate from,
+			LocalDate to) {
+		Map<LocalDate,TherapyDataVO>  dummyData = new TreeMap<>();
+		prepareDummyTherapyDataByWeek(from, to, dummyData);
+		for(LocalDate date: calculatedData.keySet()){
+			dummyData.put(date, calculatedData.get(date));
+		}
+		List<TherapyDataVO> result = new LinkedList<>(dummyData.values());
+		assignHMRForMissedTherapyFromExistingTherapy(result);
+		return result;
 	}
 	
 	/**
@@ -115,13 +148,11 @@ public class TherapySessionService {
 	 * @param groupBy
 	 * @return
 	 */
-	private List<TherapyDataVO> formatResponse(
+	private List<TherapyDataVO> formatResponsePerMonthOrYear(
 			Map<Integer, TherapyDataVO> calculatedData, LocalDate from,
 			LocalDate to, String groupBy) {
-		Map<Integer,TherapyDataVO>  dummyData = new HashMap<>();
-		if(GROUP_BY_WEEKLY.equalsIgnoreCase(groupBy)){
-			prepareDummyTherapyDataByWeek(from, to, dummyData);
-		}else if(GROUP_BY_MONTHLY.equalsIgnoreCase(groupBy)){
+		Map<Integer,TherapyDataVO>  dummyData = new TreeMap<>();
+		if(GROUP_BY_MONTHLY.equalsIgnoreCase(groupBy)){
 			prepareDummyTherapyDataByMonth(from, to, dummyData);
 		}else{
 			prepareDummyTherapyDataByYear(from,to,dummyData);
@@ -196,11 +227,10 @@ public class TherapySessionService {
 	 * @param dummyData
 	 */
 	private void prepareDummyTherapyDataByWeek(LocalDate from, LocalDate to,
-			Map<Integer, TherapyDataVO> dummyData) {
+			Map<LocalDate, TherapyDataVO> dummyData) {
 		List<LocalDate> dates = DateUtil.getAllLocalDatesBetweenDates(from, to);
-		Map<Integer, List<LocalDate>> groupByDayOfWeek = DateUtil.groupListOfLocalDatesByDayOfWeek(dates);
-		for(Integer dayOfWeek : groupByDayOfWeek.keySet()){
-			dummyData.put(dayOfWeek, createTherapyDataWithTimeStamp(groupByDayOfWeek.get(dayOfWeek).get(0)));
+		for(LocalDate date : dates){
+			dummyData.put(date, createTherapyDataWithTimeStamp(date));
 		}
 	}
 
@@ -226,40 +256,36 @@ public class TherapySessionService {
 
 		for(Integer key : groupedSessions.keySet()){
 			List<TherapySession> sessions = groupedSessions.get(key);
-			int size = sessions.size();
-			int seconds = 60;
-			DateTime start = sessions.get(0).getStartTime();
-			DateTime end = sessions.get(size-1).getEndTime();
-			Double hmr = sessions.get(size-1).getHmr()/seconds;
-			TherapyDataVO vo = new TherapyDataVO();
-			Long totalDuration = sessions.stream().collect(Collectors.summingLong(TherapySession::getDurationInMinutes));
-			double weightedAvgFrequency = 0.0d,weightedAvgPressure = 0.0d;
-			int coughPauses = 0,programmedCoughPauses = 0,normalCoughPauses = 0,coughPauseDuration = 0;
-			int treatmentsPerDay = 0;
-			for(TherapySession therapySession : sessions){
-				weightedAvgFrequency += (double)((therapySession.getDurationInMinutes()*therapySession.getFrequency())/totalDuration);
-				weightedAvgPressure += (double)((therapySession.getDurationInMinutes()*therapySession.getPressure())/totalDuration);
-				coughPauses += therapySession.getNormalCaughPauses()+therapySession.getProgrammedCaughPauses();
-				normalCoughPauses += therapySession.getNormalCaughPauses();
-				programmedCoughPauses += therapySession.getProgrammedCaughPauses();
-				coughPauseDuration += therapySession.getCaughPauseDuration();
-				++treatmentsPerDay;
-			}
-			vo.setWeightedAvgFrequency(weightedAvgFrequency);
-			vo.setWeightedAvgPressure(weightedAvgPressure);
-			vo.setCoughPauses(coughPauses);
-			vo.setNormalCoughPauses(normalCoughPauses);
-			vo.setProgrammedCoughPauses(programmedCoughPauses);
-			vo.setCoughPauseDuration(coughPauseDuration);
-			vo.setStart(start);
-			vo.setEnd(end);
-			vo.setTimestamp(start.toDateTime());
-			vo.setTreatmentsPerDay(treatmentsPerDay);
-			vo.setDuration(totalDuration.intValue());
-			vo.setHmr(hmr);
+			TherapyDataVO vo = calculateWeightedAvgForSessions(sessions);
 			processedData.put(key, vo);
 		}
 		return processedData;
+	}
+
+	private TherapyDataVO calculateWeightedAvgForSessions(
+			List<TherapySession> sessions) {
+		int size = sessions.size();
+		int seconds = 60;
+		DateTime start = sessions.get(0).getStartTime();
+		DateTime end = sessions.get(size-1).getEndTime();
+		double hmr = sessions.get(size-1).getHmr()/seconds;
+		Long totalDuration = sessions.stream().collect(Collectors.summingLong(TherapySession::getDurationInMinutes));
+		double weightedAvgFrequency = 0.0d,weightedAvgPressure = 0.0d;
+		int coughPauses = 0,programmedCoughPauses = 0,normalCoughPauses = 0,coughPauseDuration = 0;
+		int treatmentsPerDay = 0;
+		for(TherapySession therapySession : sessions){
+			weightedAvgFrequency += (double)((therapySession.getDurationInMinutes()*therapySession.getFrequency())/totalDuration);
+			weightedAvgPressure += (double)((therapySession.getDurationInMinutes()*therapySession.getPressure())/totalDuration);
+			coughPauses += therapySession.getNormalCaughPauses()+therapySession.getProgrammedCaughPauses();
+			normalCoughPauses += therapySession.getNormalCaughPauses();
+			programmedCoughPauses += therapySession.getProgrammedCaughPauses();
+			coughPauseDuration += therapySession.getCaughPauseDuration();
+			++treatmentsPerDay;
+		}
+		TherapyDataVO vo = new TherapyDataVO(start.toDateTime(),treatmentsPerDay,weightedAvgFrequency,weightedAvgPressure,
+				programmedCoughPauses,normalCoughPauses,coughPauses,
+				null,start,end,coughPauseDuration,totalDuration.intValue(),hmr,false);
+		return vo;
 	}
 	
 	

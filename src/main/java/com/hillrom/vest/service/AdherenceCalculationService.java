@@ -80,6 +80,7 @@ public class AdherenceCalculationService {
 	@Inject
 	private TherapySessionService therapySessionService;
 	
+	@Inject
 	private PatientNoEventService noEventService;
 
 	/**

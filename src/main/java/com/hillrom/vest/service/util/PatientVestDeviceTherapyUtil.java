@@ -133,9 +133,9 @@ public class PatientVestDeviceTherapyUtil {
 	
 	public static List<TherapySession> groupTherapySessionsByDay(List<TherapySession> therapySessions){
 		List<TherapySession> updatedTherapySessions = new LinkedList<>();
-		Map<Integer,List<TherapySession>> groupByTherapyDate = therapySessions.stream()
-		        .collect(Collectors.groupingBy(TherapySession::getTherapyDayOfTheYear));
-		Iterator<Integer> keySetItr = groupByTherapyDate.keySet().iterator();
+		Map<LocalDate,List<TherapySession>> groupByTherapyDate = therapySessions.stream()
+		        .collect(Collectors.groupingBy(TherapySession::getDate));
+		Iterator<LocalDate> keySetItr = groupByTherapyDate.keySet().iterator();
 		while(keySetItr.hasNext()){
 			List<TherapySession> groupedTherapySessions = groupByTherapyDate.get(keySetItr.next());
 			for(int i =0 ; i<groupedTherapySessions.size();i++){

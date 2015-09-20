@@ -21,6 +21,34 @@ public class TherapyDataVO implements Comparable<TherapyDataVO> {
 	private double hmr;
 	private boolean missedTherapy;
 
+	public TherapyDataVO(DateTime timestamp, int treatmentsPerDay,
+			double weightedAvgFrequency, double weightedAvgPressure,
+			int programmedCoughPauses, int normalCoughPauses, int coughPauses,
+			Note note, DateTime start, DateTime end, int coughPauseDuration,
+			int duration, double hmr, boolean missedTherapy) {
+		super();
+		this.timestamp = timestamp;
+		this.treatmentsPerDay = treatmentsPerDay;
+		this.weightedAvgFrequency = weightedAvgFrequency;
+		this.weightedAvgPressure = weightedAvgPressure;
+		this.programmedCoughPauses = programmedCoughPauses;
+		this.normalCoughPauses = normalCoughPauses;
+		this.coughPauses = coughPauses;
+		this.note = note;
+		this.start = start;
+		this.end = end;
+		this.coughPauseDuration = coughPauseDuration;
+		this.duration = duration;
+		this.hmr = hmr;
+		this.missedTherapy = missedTherapy;
+	}
+
+	
+	public TherapyDataVO() {
+		super();
+	}
+
+
 	public DateTime getTimestamp() {
 		return timestamp;
 	}

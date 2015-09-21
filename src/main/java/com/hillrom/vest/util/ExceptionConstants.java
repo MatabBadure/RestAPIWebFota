@@ -100,6 +100,7 @@ public class ExceptionConstants {
     public static final String HR_585 = "No such patients found.";
     public static final String HR_586 = "No Clinics Associated with Clinic Admin.";
     public static final String HR_587 = "No patient Associated with Caregiver.";
+    public static final String HR_588 = "No HCP Associated with Patient.";
     
     // Notifications
     public static final String HR_591 = "No such Notification found";

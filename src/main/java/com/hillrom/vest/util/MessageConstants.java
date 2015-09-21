@@ -68,6 +68,7 @@ public class MessageConstants {
     public static final String HR_288 = "Clinic admin associated successfully.";
     public static final String HR_289 = "Clinic admin dissociated successfully.";
     
+    public static final String HR_290 = "HCP associated with Patient fetched successfully.";
     public static final String HR_291 = "Patients associated with HCP fetched successfully.";
     public static final String HR_292 = "Clinics associated with HCP fetched successfully.";
     public static final String HR_293 = "HCP associated with clinic successfully.";

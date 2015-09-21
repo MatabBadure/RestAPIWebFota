@@ -468,5 +468,39 @@ public class PatientHCPService {
 			return therapySessionService.getTreatmentStatisticsByPatientUserIdsAndDuration(patientUserIds,from,to,groupBy);
 		}
 	}
+	
+	public Set<UserExtension> getAssociatedHCPUsersForPatient(Long patientId, String filterByClinicId) throws HillromException {
+    	UserExtension patientUser = userExtensionRepository.findOne(patientId);
+    	if(Objects.nonNull(patientUser)) {
+    		PatientInfo patientInfo = getPatientInfoObjeFromPatientUser(patientUser);
+    		if(Objects.nonNull(patientInfo)){
+    			List<UserExtension> hcpList = new LinkedList<>();
+    	     	for(UserPatientAssoc patientAssoc : patientInfo.getUserPatientAssoc()){
+    	    		if(AuthoritiesConstants.HCP.equals(patientAssoc.getUserRole())){
+    	    			hcpList.add((UserExtension)patientAssoc.getUser());
+    	    		}
+    	    	}
+    	     	if(!hcpList.isEmpty()){
+    	     		Set<UserExtension> filteredList = new HashSet<>();
+    	     		hcpList.forEach(hcpUser -> {
+	     				if(!hcpUser.getClinics().isEmpty()) {
+		     				hcpUser.getClinics().forEach(clinic -> {
+		     					if(clinic.getId().equals(filterByClinicId)){
+		     						filteredList.add(hcpUser);
+		     					}
+		     				});
+		     			}
+    	     		});
+    		    	return filteredList;
+    	     	} else {
+    	     		throw new HillromException(ExceptionConstants.HR_588);
+    	     	}
+    		} else {
+    			throw new HillromException(ExceptionConstants.HR_523);
+    		}
+    	} else {
+    		throw new HillromException(ExceptionConstants.HR_512);
+     	}
+    }
 }
 

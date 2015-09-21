@@ -102,7 +102,6 @@ BEGIN
 			`hub_id` = pat_hub_id,
             `hillrom_id` = hr_id,
 			`bluetooth_id` = pat_bluetooth_id,
-            `hillrom_id` = hr_id,
 			`title` = pat_title,
 			`first_name` = pat_first_name,
 			`middle_name` = pat_middle_name,

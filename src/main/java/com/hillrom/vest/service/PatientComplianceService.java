@@ -1,5 +1,6 @@
 package com.hillrom.vest.service;
 
+import java.util.List;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -35,5 +36,9 @@ public class PatientComplianceService {
 			complianceRepository.save(compliance);
 		}
 		return compliance;
+	}
+	
+	public PatientCompliance findTop1ByDateBeforeAndPatientUserId(LocalDate date,Long patientUserId){
+		return complianceRepository.findTop1ByDateBeforeAndPatientUserIdOrderByDateDesc(date, patientUserId);
 	}
 }

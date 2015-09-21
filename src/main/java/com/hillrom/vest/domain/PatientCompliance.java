@@ -61,13 +61,15 @@ public class PatientCompliance {
     @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
 	private LocalDate latestTherapyDate;
 	
+	private Double hmr;
+	
 	public PatientCompliance() {
 		super();
 	}
 
 	public PatientCompliance(Integer score, LocalDate date,
 			PatientInfo patient, User patientUser,Integer hmrRunRate,Boolean isHMRCompliant,
-			Boolean isSettingsDeviated) {
+			Boolean isSettingsDeviated,double hmr) {
 		super();
 		this.score = score;
 		this.date = date;
@@ -78,16 +80,19 @@ public class PatientCompliance {
 		this.isSettingsDeviated = isSettingsDeviated;
 		this.missedTherapyCount = 0;
 		this.latestTherapyDate = date;
+		this.hmr = hmr;
 	}
 
 	public PatientCompliance(LocalDate date,
-			PatientInfo patient, User patientUser,Integer hmrRunRate,Integer missedTherapyCount,LocalDate lastTherapySessionDate) {
+			PatientInfo patient, User patientUser,Integer hmrRunRate,Integer missedTherapyCount,
+			LocalDate lastTherapySessionDate,double hmr) {
 		this.date = date;
 		this.patient = patient;
 		this.patientUser = patientUser;
 		this.hmrRunRate = hmrRunRate;
 		this.missedTherapyCount = missedTherapyCount;
 		this.latestTherapyDate = lastTherapySessionDate;
+		this.hmr = hmr;
 	}
 
 	public Long getId() {
@@ -184,7 +189,15 @@ public class PatientCompliance {
 	public int getMonthOfTheYear(){
 		return this.date.getMonthOfYear();
 	}
-	
+
+	public Double getHmr() {
+		return hmr;
+	}
+
+	public void setHmr(Double hmr) {
+		this.hmr = hmr;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -100,6 +100,7 @@ BEGIN
 		START TRANSACTION;
 		UPDATE `PATIENT_INFO`   SET
 			`hub_id` = pat_hub_id,
+            `hillrom_id` = hr_id,
 			`bluetooth_id` = pat_bluetooth_id,
             `hillrom_id` = hr_id,
 			`title` = pat_title,

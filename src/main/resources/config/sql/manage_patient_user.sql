@@ -71,7 +71,7 @@ BEGIN
 		pat_email, encrypted_password, pat_title, pat_first_name, pat_middle_name, pat_last_name, 0, pat_lang_key,NULL, NULL,
 		created_by, created_date, NULL, NULL, created_by, 
 		created_date, 0, pat_gender, pat_zipcode,0,
-		NULL, pat_dob, hr_id,NULL,0,0);
+		NULL, pat_dob, hr_id,0,0,0);
 		 
 		SELECT id INTO return_user_id FROM `USER` WHERE email = pat_email;
 		

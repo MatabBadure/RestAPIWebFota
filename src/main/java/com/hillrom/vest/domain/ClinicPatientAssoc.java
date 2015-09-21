@@ -20,7 +20,7 @@ import javax.persistence.Table;
         joinColumns = @JoinColumn(name = "CLINIC_ID", referencedColumnName="id")),
     @AssociationOverride(name = "clinicPatientAssocPK.patient",
         joinColumns = @JoinColumn(name = "PATIENT_ID", referencedColumnName="id")) })
-public class ClinicPatientAssoc implements Serializable {
+public class ClinicPatientAssoc extends AbstractAuditingEntity implements Serializable {
 
 	@EmbeddedId
 	private ClinicPatientAssocPK clinicPatientAssocPK;

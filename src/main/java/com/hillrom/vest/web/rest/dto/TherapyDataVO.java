@@ -1,15 +1,18 @@
 package com.hillrom.vest.web.rest.dto;
 
+import java.io.Serializable;
+
 import org.joda.time.DateTime;
 
 import com.hillrom.vest.domain.Note;
 
-public class TherapyDataVO implements Comparable<TherapyDataVO> {
+public class TherapyDataVO implements Serializable {
 
 	private DateTime timestamp;
 	private int treatmentsPerDay;
-	private double weightedAvgFrequency;
-	private double weightedAvgPressure;
+	private int sessionNo;
+	private int frequency;
+	private int pressure;
 	private int programmedCoughPauses;
 	private int normalCoughPauses;
 	private int coughPauses;
@@ -19,7 +22,32 @@ public class TherapyDataVO implements Comparable<TherapyDataVO> {
 	private int coughPauseDuration;
 	private int duration;
 	private double hmr;
-	private boolean missedTherapy;
+
+	public TherapyDataVO(DateTime timestamp, int treatmentsPerDay,int sessionNo,
+			int frequency, int pressure, int programmedCoughPauses,
+			int normalCoughPauses, int coughPauses, Note note, DateTime start,
+			DateTime end, int coughPauseDuration, int duration, double hmr) {
+		super();
+		this.timestamp = timestamp;
+		this.treatmentsPerDay = treatmentsPerDay;
+		this.sessionNo = sessionNo;
+		this.sessionNo = sessionNo;
+		this.frequency = frequency;
+		this.pressure = pressure;
+		this.programmedCoughPauses = programmedCoughPauses;
+		this.normalCoughPauses = normalCoughPauses;
+		this.coughPauses = coughPauses;
+		this.note = note;
+		this.start = start;
+		this.end = end;
+		this.coughPauseDuration = coughPauseDuration;
+		this.duration = duration;
+		this.hmr = hmr;
+	}
+
+	public TherapyDataVO() {
+		super();
+	}
 
 	public DateTime getTimestamp() {
 		return timestamp;
@@ -37,20 +65,28 @@ public class TherapyDataVO implements Comparable<TherapyDataVO> {
 		this.treatmentsPerDay = treatmentsPerDay;
 	}
 
-	public double getWeightedAvgFrequency() {
-		return weightedAvgFrequency;
+	public int getSessionNo() {
+		return sessionNo;
 	}
 
-	public void setWeightedAvgFrequency(double weightedAvgFrequency) {
-		this.weightedAvgFrequency = weightedAvgFrequency;
+	public void setSessionNo(int sessionNo) {
+		this.sessionNo = sessionNo;
 	}
 
-	public double getWeightedAvgPressure() {
-		return weightedAvgPressure;
+	public int getFrequency() {
+		return frequency;
 	}
 
-	public void setWeightedAvgPressure(double weightedAvgPressure) {
-		this.weightedAvgPressure = weightedAvgPressure;
+	public void setFrequency(int frequency) {
+		this.frequency = frequency;
+	}
+
+	public int getPressure() {
+		return pressure;
+	}
+
+	public void setPressure(int pressure) {
+		this.pressure = pressure;
 	}
 
 	public int getProgrammedCoughPauses() {
@@ -125,32 +161,15 @@ public class TherapyDataVO implements Comparable<TherapyDataVO> {
 		this.hmr = hmr;
 	}
 
-	public boolean isMissedTherapy() {
-		return missedTherapy;
-	}
-
-	public void setMissedTherapy(boolean missedTherapy) {
-		this.missedTherapy = missedTherapy;
-	}
-
 	@Override
 	public String toString() {
-		return "TherapyDataVO [timestamp=" + timestamp + ", treatmentsPerDay="
-				+ treatmentsPerDay + ", weightedAvgFrequency="
-				+ weightedAvgFrequency + ", weightedAvgPressure="
-				+ weightedAvgPressure + ", programmedCoughPauses="
-				+ programmedCoughPauses + ", normalCoughPauses="
-				+ normalCoughPauses + ", coughPauses=" + coughPauses
-				+ ", note=" + note + ", start=" + start + ", end=" + end
-				+ ", coughPauseDuration=" + coughPauseDuration + ", duration="
-				+ duration + ", hmr=" + hmr + ", missedTherapy="
-				+ missedTherapy + "]";
+		return "TherapyDataVO [timestamp=" + timestamp + ", treatmentsPerDay="+treatmentsPerDay
+				+ "sessionNo="+ sessionNo + ", frequency=" + frequency + ", pressure="
+				+ pressure + ", programmedCoughPauses=" + programmedCoughPauses
+				+ ", normalCoughPauses=" + normalCoughPauses + ", coughPauses="
+				+ coughPauses + ", note=" + note + ", start=" + start
+				+ ", end=" + end + ", coughPauseDuration=" + coughPauseDuration
+				+ ", duration=" + duration + ", hmr=" + hmr + "]";
 	}
 
-	@Override
-	public int compareTo(TherapyDataVO o) {
-		return this.getTimestamp().compareTo(o.getTimestamp());
-	}
-
-	
 }

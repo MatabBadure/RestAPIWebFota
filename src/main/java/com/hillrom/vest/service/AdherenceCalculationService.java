@@ -80,6 +80,7 @@ public class AdherenceCalculationService {
 	@Inject
 	private TherapySessionService therapySessionService;
 	
+	@Inject
 	private PatientNoEventService noEventService;
 
 	/**
@@ -127,11 +128,12 @@ public class AdherenceCalculationService {
 		int previousScore = currentScore;
 		String notificationType = "";
 		Map<String,Double> actualMetrics = actualTherapyMetricsPerDay(latest3TherapySessions);
-		
+		double latestHmr = therapySessionsPerDay.get(therapySessionsPerDay.size()-1).getHmr();
 		// First Time received Data,hence compliance will be 100.
 		if(latest3TherapySessions.isEmpty() || Objects.isNull(latestCompliance)){
 			noEventService.updatePatientFirstTransmittedDate(patientUserId,currentTherapyDate);
-			return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,actualMetrics.get("totalDuration").intValue(),false,false);
+			return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,
+					actualMetrics.get("totalDuration").intValue(),false,false,latestHmr);
 		}else{ 
 			// Default 2 points get deducted by assuming data not received for the day, hence add 2 points
 			currentScore = currentScore ==  DEFAULT_COMPLIANCE_SCORE ?  DEFAULT_COMPLIANCE_SCORE : currentScore + 2;
@@ -139,7 +141,8 @@ public class AdherenceCalculationService {
 			// First 3 days No Notifications, hence compliance doesn't change
 			if(threeDaysAgo.isBefore(firstTherapySessionToPatient.getDate())){
 				if(latestCompliance.getDate().isBefore(currentTherapyDate)){
-					return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,actualMetrics.get("totalDuration").intValue(),false,false);
+					return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,
+							actualMetrics.get("totalDuration").intValue(),false,false,latestHmr);
 				}
 				latestCompliance.setScore(currentScore);
 				return latestCompliance;
@@ -174,7 +177,8 @@ public class AdherenceCalculationService {
 			// Compliance Score is non-negative
 			currentScore = currentScore > 0? currentScore : 0; 
 			if(latestCompliance.getDate().isBefore(currentTherapyDate)){
-				return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,actualMetrics.get("totalDuration").intValue(),isHMRCompliant,isSettingsDeviated);
+				return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,
+						actualMetrics.get("totalDuration").intValue(),isHMRCompliant,isSettingsDeviated,latestHmr);
 			}
 			
 			latestCompliance.setScore(currentScore);
@@ -261,7 +265,8 @@ public class AdherenceCalculationService {
 			DateTime today = DateTime.now();
 			patientComplianceList.forEach(compliance -> {			
 				patientUserIds.add(compliance.getPatientUser().getId());
-				PatientCompliance newCompliance = new PatientCompliance(today.toLocalDate(),compliance.getPatient(),compliance.getPatientUser(),compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1,compliance.getDate());
+				PatientCompliance newCompliance = new PatientCompliance(today.toLocalDate(),compliance.getPatient(),compliance.getPatientUser(),
+						compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1,compliance.getDate(),compliance.getHmr());
 				int score = Objects.isNull(compliance.getScore()) ? 0 : compliance.getScore(); 
 				if(score > 0)
 					newCompliance.setScore(score- MISSED_THERAPY_POINTS);

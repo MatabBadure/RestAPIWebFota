@@ -146,7 +146,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private boolean nonHMRNotification = false;
     
     @Column(name="setting_deviation_notification")
-    private boolean settingDeviationNotification = false;
+    private boolean  settingDeviationNotification = false;
     
     public Long getId() {
         return id;

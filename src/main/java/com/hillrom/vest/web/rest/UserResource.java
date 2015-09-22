@@ -420,7 +420,6 @@ public class UserResource {
     public ResponseEntity<JSONObject> getTherapyByPatientUserIdAndDate(@PathVariable Long id,
     		@RequestParam(value="from",required=false)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
     		@RequestParam(value="to",required=false)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
-    		@RequestParam(required=false)String groupBy,
     		@RequestParam(value="date",required=false)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date){
     	JSONObject jsonObject = new JSONObject();
     	if(Objects.nonNull(date)){
@@ -431,8 +430,8 @@ public class UserResource {
     			jsonObject.put("actual", therapySessions);
     		}
     		return new ResponseEntity<>(jsonObject,HttpStatus.OK);
-    	}else if(Objects.nonNull(from) && Objects.nonNull(to) && Objects.nonNull(groupBy) ){
-    		List<TherapyDataVO> therapyData = therapySessionService.findByPatientUserIdAndDateRange(id, from, to, groupBy);
+    	}else if(Objects.nonNull(from) && Objects.nonNull(to) ){
+    		List<TherapyDataVO> therapyData = therapySessionService.findByPatientUserIdAndDateRange(id, from, to);
     		if(therapyData.size() > 0){
     			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(id);
     			jsonObject.put("recommended", protocol);
@@ -440,7 +439,7 @@ public class UserResource {
     		}
     		return new ResponseEntity<>(jsonObject,HttpStatus.OK);
     	}else{
-    		jsonObject.put("ERROR", "Required Params missing : [date or from&to&groupBy]");
+    		jsonObject.put("ERROR", "Required Params missing : [date or from&to]");
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
     	}
     }
@@ -722,12 +721,11 @@ public class UserResource {
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP})
     public ResponseEntity<?> getPatientsCumulativeStatisticsForClinicAssociatedWithHCP(@PathVariable Long hcpId, @PathVariable String clinicId,
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
-    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
-    		@RequestParam(required=true)String groupBy) {
-        log.debug("REST request to get patients cumulative statistics for clinic {} associated with HCP : {}", clinicId, hcpId,from,to,groupBy);
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
+        log.debug("REST request to get patients cumulative statistics for clinic {} associated with HCP : {}", clinicId, hcpId,from,to);
         JSONObject jsonObject = new JSONObject();
         try {
-        	Collection<StatisticsVO> statiticsCollection = patientHCPService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to,groupBy);
+        	Collection<StatisticsVO> statiticsCollection = patientHCPService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
 	        if (statiticsCollection.isEmpty()) {
 	        	jsonObject.put("message", ExceptionConstants.HR_584);
 	        } else {
@@ -751,12 +749,11 @@ public class UserResource {
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP})
     public ResponseEntity<?> getPatientsTreatmentStatisticsForClinicAssociatedWithHCP(@PathVariable Long hcpId, @PathVariable String clinicId,
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
-    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
-    		@RequestParam(required=true)String groupBy) {
-        log.debug("REST request to get patients treatement statistics for clinic {} associated with HCP : {}", clinicId, hcpId,from,to,groupBy);
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
+        log.debug("REST request to get patients treatement statistics for clinic {} associated with HCP : {}", clinicId, hcpId,from,to);
         JSONObject jsonObject = new JSONObject();
         try {
-        	Collection<TreatmentStatisticsVO> statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to,groupBy);
+        	Collection<TreatmentStatisticsVO> statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
 	        if (statiticsCollection.isEmpty()) {
 	        	jsonObject.put("message", ExceptionConstants.HR_584);
 	        } else {

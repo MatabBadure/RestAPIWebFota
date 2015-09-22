@@ -1,7 +1,10 @@
 package com.hillrom.vest.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -19,10 +22,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -191,15 +196,27 @@ public class ClinicService {
         return hcpUserList;
     }
 	
-	public Set<UserExtension> getAssociatedPatientUsers(List<String> idList) throws HillromException {
-		Set<UserExtension> patientUserList = new HashSet<>();
+	public List<Map<String,Object>> getAssociatedPatientUsers(List<String> idList) throws HillromException {
+		List<Map<String,Object>> patientUserList = new LinkedList<>();
 		for(String id : idList){
 	    	Clinic clinic = clinicRepository.getOne(id);
-	        if(clinic == null) {
+	        if(Objects.isNull(clinic)) {
 	        	throw new HillromException(ExceptionConstants.HR_547);
 	        } else {
 	        	clinic.getClinicPatientAssoc().forEach(clinicPatientAssoc -> {
-	        		patientUserList.add((UserExtension) userService.getUserObjFromPatientInfo(clinicPatientAssoc.getPatient()));
+	        		Map<String, Object> patientMap = new HashMap<>();
+	        		patientMap.put("patient", (UserExtension) userService.getUserObjFromPatientInfo(clinicPatientAssoc.getPatient()));
+	        		List<UserPatientAssoc> hcpAssocList = new LinkedList<>();
+	    	     	for(UserPatientAssoc patientAssoc : clinicPatientAssoc.getPatient().getUserPatientAssoc()){
+	    	    		if(AuthoritiesConstants.HCP.equals(patientAssoc.getUserRole())){
+	    	    			hcpAssocList.add(patientAssoc);
+	    	    		}
+	    	    	}
+	    	     	Collections.sort(hcpAssocList);
+	    	     	if(!hcpAssocList.isEmpty())
+	    	     		patientMap.put("hcp",hcpAssocList.get(0).getUser());
+	    	     	else patientMap.put("hcp",null);
+	    	     	patientUserList.add(patientMap);
 	        	});
 	        }
 		}

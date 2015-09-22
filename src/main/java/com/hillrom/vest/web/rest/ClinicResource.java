@@ -266,7 +266,7 @@ public class ClinicResource {
             for(String id : idSet){
             	idList.add(id.split(":")[1]);
             }
-        	Set<UserExtension> patientUserList = clinicService.getAssociatedPatientUsers(idList);
+            List<Map<String,Object>> patientUserList = clinicService.getAssociatedPatientUsers(idList);
 	        if(patientUserList.isEmpty()){
 				jsonObject.put("message", MessageConstants.HR_279);
 				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);

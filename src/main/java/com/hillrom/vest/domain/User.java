@@ -139,14 +139,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name="hillrom_id")
     private String hillromId;
     
-    @Column(name="hmr_notification")
-    private boolean HMRNotification = false;
+    @Column(name="missed_therapy_notification")
+    private boolean missedTherapyNotification = false;
 
-	@Column(name="accept_hmr_notification")
-    private boolean acceptHMRNotification = false;
+	@Column(name="non_hmr_notification")
+    private boolean nonHMRNotification = false;
     
-    @Column(name="accept_hmr_setting")
-    private boolean acceptHMRSetting = false;
+    @Column(name="setting_deviation_notification")
+    private boolean settingDeviationNotification = false;
     
     public Long getId() {
         return id;
@@ -325,28 +325,28 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.hillromId = hillromId;
 	}
 	
-    public boolean isHMRNotification() {
-		return HMRNotification;
+	public boolean isMissedTherapyNotification() {
+		return missedTherapyNotification;
 	}
 
-	public void setHMRNotification(boolean hMRNotification) {
-		HMRNotification = hMRNotification;
+	public void setMissedTherapyNotification(boolean missedTherapyNotification) {
+		this.missedTherapyNotification = missedTherapyNotification;
 	}
 
-	public boolean isAcceptHMRNotification() {
-		return acceptHMRNotification;
+	public boolean isNonHMRNotification() {
+		return nonHMRNotification;
 	}
 
-	public void setAcceptHMRNotification(boolean acceptHMRNotification) {
-		this.acceptHMRNotification = acceptHMRNotification;
+	public void setNonHMRNotification(boolean nonHMRNotification) {
+		this.nonHMRNotification = nonHMRNotification;
 	}
 
-	public boolean isAcceptHMRSetting() {
-		return acceptHMRSetting;
+	public boolean isSettingDeviationNotification() {
+		return settingDeviationNotification;
 	}
 
-	public void setAcceptHMRSetting(boolean acceptHMRSetting) {
-		this.acceptHMRSetting = acceptHMRSetting;
+	public void setSettingDeviationNotification(boolean settingDeviationNotification) {
+		this.settingDeviationNotification = settingDeviationNotification;
 	}
 
 	@Override

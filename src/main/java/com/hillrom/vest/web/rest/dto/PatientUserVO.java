@@ -37,6 +37,8 @@ public class PatientUserVO {
 	private int adherence;
 	private Date lastTransmissionDate;
 	
+	private UserExtension hcp;
+	
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
 			String city, Date dob, String gender, String title,
@@ -247,6 +249,14 @@ public class PatientUserVO {
 
 	public void setLastTransmissionDate(Date lastTransmissionDate) {
 		this.lastTransmissionDate = lastTransmissionDate;
+	}
+
+	public UserExtension getHcp() {
+		return hcp;
+	}
+
+	public void setHcp(UserExtension hcp) {
+		this.hcp = hcp;
 	}	
 	
 }

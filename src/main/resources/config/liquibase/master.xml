@@ -57,4 +57,6 @@
     <include file="classpath:/config/liquibase/changelog/20150915170900_add_extra_columns_to_Patient_Compliance.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150916160900_added_lasttherapysession_column.xml"  relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150916164000_create_table_patient_firsttherapy.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150921195050_Add_Auditing_Field_To_Assocs.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150922120050_UpdateUserColumnsForNotifications.xml" relativeToChangelogFile="false"/>
  </databaseChangeLog>

@@ -10,6 +10,8 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
+import org.springframework.boot.actuate.audit.listener.AuditApplicationEvent;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -22,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
         joinColumns = @JoinColumn(name = "USER_ID", referencedColumnName="id")),
     @AssociationOverride(name = "userPatientAssocPK.patient",
         joinColumns = @JoinColumn(name = "PATIENT_ID", referencedColumnName="id")) })
-public class UserPatientAssoc implements Serializable {
+public class UserPatientAssoc extends AbstractAuditingEntity implements Serializable,Comparable<UserPatientAssoc> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -137,4 +139,10 @@ public class UserPatientAssoc implements Serializable {
 				+ relationshipLabel + "]";
 	}
 
+	@Override
+	public int compareTo(UserPatientAssoc upa) {
+		return this.getCreatedDate().compareTo(upa.getCreatedDate());
+	}
+
+	
 }

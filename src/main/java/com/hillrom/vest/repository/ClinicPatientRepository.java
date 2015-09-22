@@ -20,4 +20,7 @@ public interface ClinicPatientRepository extends
 	
 	@Query("from ClinicPatientAssoc cpa where cpa.clinicPatientAssocPK.clinic.id = ?1 and cpa.clinicPatientAssocPK.patient.id = ?2")
 	Optional<ClinicPatientAssoc> findOneByClinicIdAndPatientId(String clinicId,String patientId);
+	
+	@Query("from ClinicPatientAssoc cpa where cpa.mrnId = ?1")
+	List<ClinicPatientAssoc> findByMRNId(String mrnId);
 }

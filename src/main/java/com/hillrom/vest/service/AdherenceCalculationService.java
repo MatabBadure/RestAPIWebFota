@@ -334,9 +334,9 @@ public class AdherenceCalculationService {
 	private boolean isPatientUserAcceptNotification(User patientUser,
 			String notificationType) {
 		// TODO: rename the columns and member variables next sprint
-		return (patientUser.isAcceptHMRNotification() && HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType)) || 
-				(patientUser.isAcceptHMRSetting() && SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)) ||
-				(patientUser.isHMRNotification() && MISSED_THERAPY.equalsIgnoreCase(notificationType));
+		return (patientUser.isNonHMRNotification() && HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType)) || 
+				(patientUser.isSettingDeviationNotification() && SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)) ||
+				(patientUser.isMissedTherapyNotification() && MISSED_THERAPY.equalsIgnoreCase(notificationType));
 	}
 	
 }

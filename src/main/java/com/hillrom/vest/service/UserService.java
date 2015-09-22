@@ -15,8 +15,6 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import net.minidev.json.JSONObject;
-
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -34,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.Clinic;
+import com.hillrom.vest.domain.ClinicPatientAssoc;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.User;
@@ -43,6 +42,7 @@ import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.domain.UserSecurityQuestion;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.AuthorityRepository;
+import com.hillrom.vest.repository.ClinicPatientRepository;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
@@ -60,6 +60,8 @@ import com.hillrom.vest.web.rest.dto.CareGiverVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
+
+import net.minidev.json.JSONObject;
 
 /**
  * Service class for managing users.
@@ -105,6 +107,9 @@ public class UserService {
     
     @Inject
     private PatientNoEventService noEventService;
+    
+    @Inject
+	private ClinicPatientRepository clinicPatientRepository;
 
     public String generateDefaultPassword(User patientUser) {
 		StringBuilder defaultPassword = new StringBuilder();
@@ -584,6 +589,14 @@ public class UserService {
     		patientInfoRepository.save(patient);
     		assignValuesToUserObj(userExtensionDTO, user);
 			userExtensionRepository.save(user);
+			if(!userExtensionDTO.getClinicMRNId().isEmpty()){
+				Optional<ClinicPatientAssoc> clinicPatientAssoc = clinicPatientRepository.findOneByClinicIdAndPatientId(
+						userExtensionDTO.getClinicMRNId().get("clinicId"), patient.getId());
+				if(clinicPatientAssoc.isPresent()){
+					clinicPatientAssoc.get().setMrnId(userExtensionDTO.getClinicMRNId().get("mrnId"));
+					clinicPatientRepository.saveAndFlush(clinicPatientAssoc.get());
+				}
+			}
 			log.debug("Updated Information for Patient User: {}", user);
     		return user;
     	});
@@ -1247,9 +1260,9 @@ public class UserService {
 	public User setHRMNotificationSetting(Long id, Map<String, Boolean> paramsMap) throws HillromException {
 		User user = userRepository.findOne(id);
 		if (user != null) {
-			user.setHMRNotification(paramsMap.get("isHMRNotification"));
-			user.setAcceptHMRNotification(paramsMap.get("isAcceptHMRNotification"));
-			user.setAcceptHMRSetting(paramsMap.get("isAcceptHMRSetting"));
+			user.setMissedTherapyNotification(paramsMap.get("isMissedTherapyNotification"));
+			user.setNonHMRNotification(paramsMap.get("isNonHMRNotification"));
+			user.setSettingDeviationNotification(paramsMap.get("isSettingDeviationNotification"));
 			userRepository.save(user);
 			return user;
 		} else {

@@ -90,7 +90,7 @@ public class TherapySessionService {
 		}
 	}
 	
-	public List<TherapyDataVO> findByPatientUserIdAndDateRange(Long patientUserId,LocalDate from,LocalDate to,String groupBy){
+	public List<TherapyDataVO> findByPatientUserIdAndDateRange(Long patientUserId,LocalDate from,LocalDate to){
 		List<TherapySession> sessions = therapySessionRepository
 				.findByPatientUserIdAndDateRange(patientUserId,from,to);
 		List<TherapyDataVO> results = new LinkedList<>();
@@ -141,68 +141,25 @@ public class TherapySessionService {
 
 	public Collection<TreatmentStatisticsVO> getTreatmentStatisticsByPatientUserIdsAndDuration(
 			List<Long> patientUserIds,
-			LocalDate from,LocalDate to, String groupBy) {
-		
+			LocalDate from,LocalDate to) {
 		List<TherapySession> therapySessions = therapySessionRepository.findByDateBetweenAndPatientUserIdIn(from, to, patientUserIds);
 		Map<LocalDate,List<TherapySession>> tpsGroupedByDate = therapySessions.stream().collect(Collectors.groupingBy(TherapySession :: getDate));
-
-		List<LocalDate> requestedDates = DateUtil.getAllLocalDatesBetweenDates(from, to);
-		
-		if(GROUP_BY_WEEKLY.equalsIgnoreCase(groupBy))
-			return calculateAvgTreatmentStatisticsForWeek(patientUserIds, tpsGroupedByDate, requestedDates);
-		else
-			return calculateAvgTreatmentStatisticsForMonthOrYear(patientUserIds, therapySessions, requestedDates, groupBy);
-		
+			return getAvgTreatmentStatisticsForTherapiesGroupedByDate(patientUserIds, tpsGroupedByDate);
 	}
 
-	public Collection<TreatmentStatisticsVO> calculateAvgTreatmentStatisticsForWeek(List<Long> patientUserIds,
-			Map<LocalDate, List<TherapySession>> tpsGroupedByDate,
-			List<LocalDate> requestedDates) {
+	public Collection<TreatmentStatisticsVO> getAvgTreatmentStatisticsForTherapiesGroupedByDate(List<Long> patientUserIds,
+			Map<LocalDate, List<TherapySession>> tpsGroupedByDate) {
 		Map<LocalDate, TreatmentStatisticsVO> statisticsMap = new TreeMap<>();
 		TreatmentStatisticsVO statisticsVO;
-		for(LocalDate requestedDate : requestedDates){
-			List<TherapySession> tpsOnDate = tpsGroupedByDate.get(requestedDate);
-			if(Objects.nonNull(tpsOnDate)){
-				statisticsVO = calculateAvgTreatmentStatistics(patientUserIds,
+		for(LocalDate date : tpsGroupedByDate.keySet()){
+			List<TherapySession> tpsOnDate = tpsGroupedByDate.get(date);
+			statisticsVO = calculateAvgTreatmentStatistics(patientUserIds,
 						tpsOnDate);
-			}else{
-				statisticsVO = new TreatmentStatisticsVO(requestedDate, requestedDate);
-			}
-			statisticsMap.put(requestedDate, statisticsVO);
+			statisticsMap.put(date, statisticsVO);
 		}
 		return statisticsMap.values();
 	}
 	
-	public Collection<TreatmentStatisticsVO> calculateAvgTreatmentStatisticsForMonthOrYear(List<Long> patientUserIds,
-			List<TherapySession> therapySessions,
-			List<LocalDate> requestedDates,String groupBy) {
-		Map<LocalDate, TreatmentStatisticsVO> statisticsMap = new TreeMap<>();
-		Map<Integer,List<LocalDate>> datesGroupedByDuration = new HashMap<>();
-		Map<Integer,List<TherapySession>> tpsGroupedOnDuration = new HashMap<>();
-		if(GROUP_BY_MONTHLY.equalsIgnoreCase(groupBy)){
-			datesGroupedByDuration = requestedDates.stream().collect(Collectors.groupingBy(LocalDate :: getWeekOfWeekyear));
-			tpsGroupedOnDuration = therapySessions.stream().collect(Collectors.groupingBy(TherapySession :: getWeekOfYear));
-		}else if(GROUP_BY_YEARLY.equalsIgnoreCase(groupBy)){
-			datesGroupedByDuration = requestedDates.stream().collect(Collectors.groupingBy(LocalDate :: getMonthOfYear));
-			tpsGroupedOnDuration = therapySessions.stream().collect(Collectors.groupingBy(TherapySession :: getMonthOfTheYear));
-		}
-		TreatmentStatisticsVO statisticsVO;
-		for(Integer day: datesGroupedByDuration.keySet()){
-			List<TherapySession> tpsInDuration = tpsGroupedOnDuration.get(day);
-			List<LocalDate> datesInDuration = datesGroupedByDuration.get(day);
-			LocalDate startDate = datesInDuration.get(0);
-			LocalDate endDate = datesInDuration.get(datesInDuration.size()-1);
-			if(Objects.nonNull(tpsInDuration)){
-				statisticsVO = calculateAvgTreatmentStatistics(patientUserIds,
-						tpsInDuration);
-			}else{
-				statisticsVO = new TreatmentStatisticsVO(startDate, endDate);
-			}
-			statisticsMap.put(endDate, statisticsVO);
-		}
-		return statisticsMap.values();
-	}
-
 	public TreatmentStatisticsVO calculateAvgTreatmentStatistics(
 			List<Long> patientUserIds, List<TherapySession> tpsInDuration) {
 		TreatmentStatisticsVO statisticsVO;

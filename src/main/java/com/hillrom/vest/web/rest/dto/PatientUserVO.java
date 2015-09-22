@@ -1,6 +1,8 @@
 package com.hillrom.vest.web.rest.dto;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.joda.time.DateTime;
 
@@ -38,6 +40,8 @@ public class PatientUserVO {
 	private Date lastTransmissionDate;
 	
 	private UserExtension hcp;
+	
+	private Map<String,Object> clinicMRNId = new HashMap<>();
 	
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
@@ -257,6 +261,14 @@ public class PatientUserVO {
 
 	public void setHcp(UserExtension hcp) {
 		this.hcp = hcp;
+	}
+
+	public Map<String, Object> getClinicMRNId() {
+		return clinicMRNId;
+	}
+
+	public void setClinicMRNId(Map<String, Object> clinicMRNId) {
+		this.clinicMRNId = clinicMRNId;
 	}	
 	
 }

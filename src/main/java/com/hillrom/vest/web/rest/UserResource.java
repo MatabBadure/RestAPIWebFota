@@ -770,4 +770,28 @@ public class UserResource {
         }
     }
 
+    /**
+     * GET  /patient/:patientUserId/clinic/:clinicId/mrnId -> get the patient user with clinic mrn id.
+     */
+    @RequestMapping(value = "/patient/{patientUserId}/clinic/{clinicId}/mrnId", 
+    		method = RequestMethod.GET, 
+    		produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
+	public ResponseEntity<JSONObject> getPatientUserWithMRNId(@PathVariable Long patientUserId,@PathVariable String clinicId) {
+		log.debug("REST request to get patient user with clinic mrn id : {}", patientUserId);
+		JSONObject jsonObject = new JSONObject();
+        try {
+			PatientUserVO patientUser = userService.getPatientUserWithMRNId(patientUserId,clinicId);
+			if (Objects.isNull(patientUser)) {
+	        	jsonObject.put("message", ExceptionConstants.HR_585);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_213);
+	        	jsonObject.put("patientUser", patientUser);
+	        }
+	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+	}
 }

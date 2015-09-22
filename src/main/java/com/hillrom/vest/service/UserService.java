@@ -530,6 +530,20 @@ public class UserService {
     			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
     		}
     	} else if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
+    		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(existingUser);
+    		if(Objects.nonNull(patientInfo)){
+	    		if(!userExtensionDTO.getClinicMRNId().isEmpty()){
+					List<ClinicPatientAssoc> existingClinics = clinicPatientRepository.findByMRNId(userExtensionDTO.getClinicMRNId().get("mrnId"));
+					if(!existingClinics.isEmpty()){
+						for(ClinicPatientAssoc clinicPatientAssoc : existingClinics) {
+							if(clinicPatientAssoc.getClinic().getId().equals(userExtensionDTO.getClinicMRNId().get("clinicId")) 
+									&& !clinicPatientAssoc.getPatient().getId().equals(patientInfo.getId())){
+								throw new HillromException(ExceptionConstants.HR_599);
+							}
+						}
+					}
+	    		}
+    		}
            	UserExtension user = updatePatientUser(existingUser, userExtensionDTO);
     		if(user.getId() != null) {
     			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && !userExtensionDTO.getEmail().equals(currentEmail)) {
@@ -1280,5 +1294,28 @@ public class UserService {
 		}
 		return patientAssocList;
     }
+
+	public PatientUserVO getPatientUserWithMRNId(Long patientUserId, String clinicId) throws HillromException{
+		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
+		if(Objects.nonNull(patientUser)) {
+			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
+    		if(patientInfo != null) {
+				Optional<ClinicPatientAssoc> clinicPatientAssoc = clinicPatientRepository.findOneByClinicIdAndPatientId(
+						clinicId, patientInfo.getId());
+				PatientUserVO patientUserVO = new PatientUserVO(patientUser, patientInfo);
+				if(clinicPatientAssoc.isPresent()){
+					Map<String,Object> clinicMRNId = new HashMap<>();
+					clinicMRNId.put("clinic", clinicPatientAssoc.get().getClinic());
+					clinicMRNId.put("mrnId", clinicPatientAssoc.get().getMrnId());
+					patientUserVO.setClinicMRNId(clinicMRNId);
+				}
+				return patientUserVO;
+    		} else {
+    			throw new HillromException(ExceptionConstants.HR_523);
+    		}
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);
+		}
+	}
 }
 

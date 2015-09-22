@@ -101,6 +101,7 @@ public class ExceptionConstants {
     public static final String HR_586 = "No Clinics Associated with Clinic Admin.";
     public static final String HR_587 = "No patient Associated with Caregiver.";
     public static final String HR_588 = "No HCP Associated with Patient.";
+    public static final String HR_599 = "MRN Id already in use with this clinic.";
     
     // Notifications
     public static final String HR_591 = "No such Notification found";

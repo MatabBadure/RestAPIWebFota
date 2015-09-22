@@ -1,6 +1,7 @@
 package com.hillrom.vest.web.rest.dto;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +48,8 @@ public class UserExtensionDTO extends UserDTO {
     private String dob;
     
     private String relationship;
+    
+    private Map<String,String> clinicMRNId = new HashMap<>();
 
     public UserExtensionDTO() {
     }
@@ -179,6 +182,14 @@ public class UserExtensionDTO extends UserDTO {
 
 	public void setRelationship(String relationship) {
 		this.relationship = relationship;
+	}
+
+	public Map<String, String> getClinicMRNId() {
+		return clinicMRNId;
+	}
+
+	public void setClinicMRNId(Map<String, String> clinicMRNId) {
+		this.clinicMRNId = clinicMRNId;
 	}
 
 	@Override

@@ -671,12 +671,12 @@ public class UserResource {
         JSONObject jsonObject = new JSONObject();
         try {
         	LocalDate date = LocalDate.now();
-        	List<PatientComplianceVO> patientList = patientHCPService.getPatientListFilterByMetricForClinicAssociated(userId, clinicId, date, filterBy);
-	        if (patientList.isEmpty()) {
+        	List<PatientComplianceVO> patientUsers = patientHCPService.getPatientListFilterByMetricForClinicAssociated(userId, clinicId, date, filterBy);
+	        if (patientUsers.isEmpty()) {
 	        	jsonObject.put("message", ExceptionConstants.HR_585);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_213);
-	        	jsonObject.put("patientList", patientList);
+	        	jsonObject.put("patientUsers", patientUsers);
 	        }
 	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
         } catch (HillromException hre){
@@ -698,12 +698,12 @@ public class UserResource {
         JSONObject jsonObject = new JSONObject();
         try {
         	LocalDate date = LocalDate.now();
-        	List<PatientUserVO> patientList = patientHCPService.getPatientsWithNoEventsForClinicAssociated(userId, clinicId, date);
-	        if (patientList.isEmpty()) {
+        	List<PatientUserVO> patientUsers = patientHCPService.getPatientsWithNoEventsForClinicAssociated(userId, clinicId, date);
+	        if (patientUsers.isEmpty()) {
 	        	jsonObject.put("message", ExceptionConstants.HR_585);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_213);
-	        	jsonObject.put("patientList", patientList);
+	        	jsonObject.put("patientUsers", patientUsers);
 	        }
 	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
         } catch (HillromException hre){

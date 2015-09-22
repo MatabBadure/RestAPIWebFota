@@ -778,4 +778,32 @@ public class UserExtensionResource {
     		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
+    
+    /**
+     * GET  /patient/:id/hcp -> get the hcp users associated with patient filter by Clinic.
+     */
+    @RequestMapping(value = "/patient/{id}/filteredhcp",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<JSONObject> getAssociatedHCPUsersForPatient(@PathVariable Long id, @RequestParam(value = "filterByClinic",required = false) String filterByClinic) {
+        log.debug("REST request to get the hcp users associated with patient filter by Clinic : {}", id);
+        JSONObject jsonObject = new JSONObject();
+        try {
+	        if(StringUtils.isBlank(filterByClinic))
+	        	filterByClinic = Constants.ALL;
+	        Set<UserExtension> hcpList= patientHCPService.getAssociatedHCPUsersForPatient(id, filterByClinic);
+	        if (hcpList.isEmpty()) {
+	        	jsonObject.put("message", ExceptionConstants.HR_588);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_290);
+	        	jsonObject.put("hcpList", hcpList);
+	        }
+	        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

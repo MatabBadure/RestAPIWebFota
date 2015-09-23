@@ -43,6 +43,8 @@ public class PatientUserVO {
 	
 	private Map<String,Object> clinicMRNId = new HashMap<>();
 	
+	private String mrnId;
+	
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
 			String city, Date dob, String gender, String title,
@@ -269,6 +271,14 @@ public class PatientUserVO {
 
 	public void setClinicMRNId(Map<String, Object> clinicMRNId) {
 		this.clinicMRNId = clinicMRNId;
+	}
+
+	public String getMrnId() {
+		return mrnId;
+	}
+
+	public void setMrnId(String mrnId) {
+		this.mrnId = mrnId;
 	}	
 	
 }

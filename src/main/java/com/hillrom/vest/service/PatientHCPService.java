@@ -2,6 +2,7 @@ package com.hillrom.vest.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -454,6 +455,33 @@ public class PatientHCPService {
     		} else {
     			throw new HillromException(ExceptionConstants.HR_523);
     		}
+    	} else {
+    		throw new HillromException(ExceptionConstants.HR_512);
+     	}
+    }
+	
+	public List<PatientUserVO> getAssociatedPatientsForHCPasCaregiver(Long hcpId) throws HillromException {
+    	UserExtension hcpUser = userExtensionRepository.findOne(hcpId);
+    	if(Objects.nonNull(hcpUser)) {
+			List<PatientUserVO> patientVOList = new LinkedList<>();
+	     	for(UserPatientAssoc patientAssoc : hcpUser.getUserPatientAssoc()){
+	    		if(AuthoritiesConstants.CARE_GIVER.equals(patientAssoc.getUserRole())){
+	    			User patientUser = userService.getUserObjFromPatientInfo(patientAssoc.getPatient());
+	    			PatientUserVO patientUserVO = new PatientUserVO((UserExtension)patientUser, patientAssoc.getPatient());
+	    			List<UserPatientAssoc> hcpAssocList = new LinkedList<>();
+	    			for(UserPatientAssoc userPatientAssoc : patientAssoc.getPatient().getUserPatientAssoc()){
+	    	    		if(AuthoritiesConstants.HCP.equals(userPatientAssoc.getUserRole())){
+	    	    			hcpAssocList.add(patientAssoc);
+	    	    		}
+	    	    	}
+	    	     	Collections.sort(hcpAssocList);
+	    	     	if(!hcpAssocList.isEmpty())
+	    	     		patientUserVO.setHcp((UserExtension)hcpAssocList.get(0).getUser());
+	    	     	else patientUserVO.setHcp(null);
+	    			patientVOList.add(patientUserVO);
+	    		}
+	    	}
+	     	return patientVOList;
     	} else {
     		throw new HillromException(ExceptionConstants.HR_512);
      	}

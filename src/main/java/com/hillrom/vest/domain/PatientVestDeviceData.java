@@ -23,17 +23,19 @@ public class PatientVestDeviceData implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
 	private Long timestamp;
-	@Id
+
 	@Column(name = "sequence_number")
 	private Integer sequenceNumber;
 
 	@Id
 	@Column(name="event_id")
 	private String eventId;
-	
+
+	@Id
 	@Column(name = "serial_number")
 	private String serialNumber;
 	
+	@Id
 	@Column(name = "bluetooth_id")
 	private String bluetoothId;
 	
@@ -165,13 +167,16 @@ public class PatientVestDeviceData implements Serializable {
 		this.patientUser = patientUser;
 	}
 
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result
+				+ ((bluetoothId == null) ? 0 : bluetoothId.hashCode());
 		result = prime * result + ((eventId == null) ? 0 : eventId.hashCode());
 		result = prime * result
-				+ ((sequenceNumber == null) ? 0 : sequenceNumber.hashCode());
+				+ ((serialNumber == null) ? 0 : serialNumber.hashCode());
 		result = prime * result
 				+ ((timestamp == null) ? 0 : timestamp.hashCode());
 		return result;
@@ -186,15 +191,20 @@ public class PatientVestDeviceData implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		PatientVestDeviceData other = (PatientVestDeviceData) obj;
+		if (bluetoothId == null) {
+			if (other.bluetoothId != null)
+				return false;
+		} else if (!bluetoothId.equals(other.bluetoothId))
+			return false;
 		if (eventId == null) {
 			if (other.eventId != null)
 				return false;
 		} else if (!eventId.equals(other.eventId))
 			return false;
-		if (sequenceNumber == null) {
-			if (other.sequenceNumber != null)
+		if (serialNumber == null) {
+			if (other.serialNumber != null)
 				return false;
-		} else if (!sequenceNumber.equals(other.sequenceNumber))
+		} else if (!serialNumber.equals(other.serialNumber))
 			return false;
 		if (timestamp == null) {
 			if (other.timestamp != null)

@@ -47,6 +47,7 @@ import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.CareGiverVO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
+import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
@@ -799,6 +800,32 @@ public class UserExtensionResource {
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_290);
 	        	jsonObject.put("hcpList", hcpList);
+	        }
+	        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    /**
+     * GET  /hcp/caregiver/:id/patients -> get the patients associated with HCP as caregiver
+     */
+    @RequestMapping(value = "/hcp/caregiver/{id}/patients",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP})
+    public ResponseEntity<JSONObject> getAssociatedPatientsForHCPasCaregiver(@PathVariable Long id) {
+        log.debug("REST request to get the patients associated with HCP as caregiver : {}", id);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	List<PatientUserVO> patientList = patientHCPService.getAssociatedPatientsForHCPasCaregiver(id);
+	        if (patientList.isEmpty()) {
+	        	jsonObject.put("message", ExceptionConstants.HR_589);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_300);
+	        	jsonObject.put("patientUsers", patientList);
 	        }
 	        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         } catch (HillromException hre){

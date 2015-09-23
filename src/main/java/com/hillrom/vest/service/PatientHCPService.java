@@ -1,8 +1,5 @@
 package com.hillrom.vest.service;
 
-import static com.hillrom.vest.config.Constants.GROUP_BY_MONTHLY;
-import static com.hillrom.vest.config.Constants.GROUP_BY_YEARLY;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -35,6 +33,7 @@ import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.ClinicPatientRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PatientNoEventsRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
@@ -83,6 +82,9 @@ public class PatientHCPService {
     
     @Inject
     private PatientNoEventsRepository noEventsRepository;
+    
+    @Inject
+    private ClinicPatientRepository clinicPatientRepository;
 
     public List<User> associateHCPToPatient(Long id, List<Map<String, String>> hcpList) throws HillromException {
     	List<User> users = new LinkedList<>();
@@ -276,11 +278,15 @@ public class PatientHCPService {
 				throw new HillromException(ExceptionConstants.HR_554);
 			}
 			for(PatientCompliance pCompliance : patientCompliances) {
+				PatientComplianceVO complianceVO = new PatientComplianceVO();
+				complianceVO.setPatientComp(pCompliance);
 				for(Map<String,Object> patientUser : patientUsers) {
 					if(pCompliance.getPatientUser().getId().equals(((UserExtension)patientUser.get("patient")).getId())){
-						patientComplianceVOList.add(new PatientComplianceVO(pCompliance, (UserExtension)patientUser.get("hcp")));
+						complianceVO.setHcp((UserExtension)patientUser.get("hcp"));
+						complianceVO.setMrnId((String)patientUser.get("mrnId"));
 					}
 				}
+				patientComplianceVOList.add(complianceVO);
 			}
 			return patientComplianceVOList;
 		}
@@ -303,9 +309,11 @@ public class PatientHCPService {
 			for(User patientUser : patientUserList) {
 				for(Map<String,Object> pUser : patientUsers) {
 					if(patientUser.getId().equals(((UserExtension)pUser.get("patient")).getId())){
-						PatientUserVO patientUserVO = new PatientUserVO((UserExtension) patientUser, userService.getPatientInfoObjFromPatientUser(patientUser));
+						PatientInfo patientInfo = userService.getPatientInfoObjFromPatientUser(patientUser);
+						PatientUserVO patientUserVO = new PatientUserVO((UserExtension) patientUser, patientInfo);
 						patientUserVO.setAdherence(0);
 						patientUserVO.setHcp((UserExtension)pUser.get("hcp"));
+						patientUserVO.setMrnId((String)pUser.get("mrnId"));
 						patientList.add(patientUserVO);
 					}
 				}

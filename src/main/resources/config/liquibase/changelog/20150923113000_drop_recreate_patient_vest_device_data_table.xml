@@ -31,7 +31,7 @@
 			<column name="checksum" type="integer" />
 			<column name="user_id" type="bigint"/>
 		</createTable>
-		<addPrimaryKey columnNames="timestamp,serial_number,bluetooth_id,event_id"
+		<addPrimaryKey columnNames="bluetooth_id,timestamp,event_id"
             constraintName="pk_patient_vest_device_data"
             tableName="PATIENT_VEST_DEVICE_DATA"/>
         <addForeignKeyConstraint baseColumnNames="patient_id"

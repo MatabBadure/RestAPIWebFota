@@ -115,7 +115,7 @@ public class UserSecurityQuestionServiceTest {
         user.setLangKey("en");
         user.setActivationKey(null);
         user.setLastLoggedInAt(DateTime.now());
-		Authority authority = authorityRepository.findOne(AuthoritiesConstants.ADMIN);
+		Authority authority = authorityRepository.findOne(AuthoritiesConstants.SUPER_ADMIN);
         user.getAuthorities().add(authority);
         
         return userRepository.save(user);

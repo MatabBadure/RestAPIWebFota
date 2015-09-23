@@ -1,9 +1,8 @@
 package com.hillrom.vest.repository;
 
-import static com.hillrom.vest.security.AuthoritiesConstants.ACCT_SERVICES;
-import static com.hillrom.vest.security.AuthoritiesConstants.ADMIN;
+import static com.hillrom.vest.security.AuthoritiesConstants.RC_ADMIN;
+import static com.hillrom.vest.security.AuthoritiesConstants.SUPER_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.ASSOCIATES;
-import static com.hillrom.vest.security.AuthoritiesConstants.HILLROM_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 import static com.hillrom.vest.util.RelationshipLabelConstants.SELF;
 
@@ -46,7 +45,7 @@ public class UserSearchRepository {
 				+ " lower(user.last_name) like lower(:queryString) or "
 				+ " lower(user.email) like lower(:queryString) or lower(user.hillrom_id) like lower(:queryString)) "
 				+ " join  USER_AUTHORITY user_authority on user_authority.user_id = user.id "
-				+ " and  user_authority.authority_name in ('"+ADMIN+"','"+ACCT_SERVICES+"','"+ASSOCIATES+"','"+HILLROM_ADMIN+"')";
+				+ " and  user_authority.authority_name in ('"+SUPER_ADMIN+"','"+RC_ADMIN+"','"+ASSOCIATES+"')";
 
 		findHillromTeamUserQuery = findHillromTeamUserQuery.replaceAll(
 				":queryString", queryString);

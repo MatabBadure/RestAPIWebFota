@@ -399,7 +399,7 @@ public class UserExtensionResource {
         log.debug("REST request to associate clinic with Patient : {}", id);
         JSONObject jsonObject = new JSONObject();
 		try {
-			List<Clinic> clinics = clinicPatientService.associateClinicsToPatient(id, clinicList);
+			List<ClinicVO> clinics = clinicPatientService.associateClinicsToPatient(id, clinicList);
 			if (clinics.isEmpty()) {
 				jsonObject.put("message", ExceptionConstants.HR_535);
 		       	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
@@ -426,7 +426,7 @@ public class UserExtensionResource {
         log.debug("REST request to dissociate clinic with Patient : {}", id);
         JSONObject jsonObject = new JSONObject();
 		try {
-			List<Clinic> clinics = clinicPatientService.dissociateClinicsToPatient(id, clinicList);
+			List<ClinicVO> clinics = clinicPatientService.dissociateClinicsToPatient(id, clinicList);
 			if (!clinics.isEmpty()) {
 				jsonObject.put("clinics", clinics);
 			}

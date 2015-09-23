@@ -27,6 +27,7 @@ import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
@@ -56,7 +57,7 @@ public class ClinicPatientService {
     @Inject
     private PatientInfoRepository patientInfoRepository;
     
-    public List<Clinic> associateClinicsToPatient(Long id, List<Map<String, String>> clinicList) throws HillromException {
+    public List<ClinicVO> associateClinicsToPatient(Long id, List<Map<String, String>> clinicList) throws HillromException {
     	User patientUser = userRepository.findOne(id);
     	
     	if(patientUser != null) {
@@ -65,9 +66,12 @@ public class ClinicPatientService {
 	     		List<ClinicPatientAssoc> clinicPatientAssocList = new ArrayList<>();
 	     		List<UserPatientAssoc> userPatientAssocList = new ArrayList<>();
 	     		getAssocObjLists(clinicList, patientInfo, clinicPatientAssocList, userPatientAssocList);
-		    	clinicPatientRepository.save(clinicPatientAssocList);
-		    	userPatientRepository.save(userPatientAssocList);
-		    	return getAssociatedClinicsList(patientInfo);
+		    	clinicPatientAssocList =  clinicPatientRepository.save(clinicPatientAssocList);
+		    	userPatientAssocList = userPatientRepository.save(userPatientAssocList);
+		    	patientInfo.getClinicPatientAssoc().addAll(clinicPatientAssocList);
+		    	patientInfo.getUserPatientAssoc().addAll(userPatientAssocList);
+		    	patientInfoRepository.save(patientInfo);
+		    	return getClinicVOList(patientInfo);
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
 	     	}
@@ -82,12 +86,7 @@ public class ClinicPatientService {
     	if(patientUser != null) {
     		PatientInfo patientInfo = getPatientInfoObjeFromPatientUser(patientUser);
 	     	if(patientInfo != null){
-	     		List<Clinic> associatedClinics =  getAssociatedClinicsList(patientInfo);
-	     		List<ClinicVO> clinics = new LinkedList<>();
-	     		for(Clinic clinic : associatedClinics){
-		    		clinics.add(ClinicVOBuilder.build(clinic));
-		    	}
-	     		return clinics;
+	     		return getClinicVOList(patientInfo);
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
 	     	}
@@ -96,8 +95,16 @@ public class ClinicPatientService {
      	}
     }
 
+	private List<ClinicVO> getClinicVOList(PatientInfo patientInfo) {
+		List<Clinic> associatedClinics =  getAssociatedClinicsList(patientInfo);
+		List<ClinicVO> clinics = new LinkedList<>();
+		for(Clinic clinic : associatedClinics){
+			clinics.add(ClinicVOBuilder.build(clinic));
+		}
+		return clinics;
+	}
+
 	private List<Clinic> getAssociatedClinicsList(PatientInfo patientInfo) {
-		patientInfoRepository.saveAndFlush(patientInfo);
 		List<Clinic> clinics = new LinkedList<>();
 		for(ClinicPatientAssoc clinicPatientAssoc : patientInfo.getClinicPatientAssoc()){
 			clinics.add(clinicPatientAssoc.getClinic());
@@ -105,7 +112,7 @@ public class ClinicPatientService {
 		return clinics;
 	}
 	
-    public List<Clinic> dissociateClinicsToPatient(Long id, List<Map<String, String>> clinicList) throws HillromException {
+    public List<ClinicVO> dissociateClinicsToPatient(Long id, List<Map<String, String>> clinicList) throws HillromException {
     	User patientUser = userRepository.findOne(id);
     	if(patientUser != null) {
 	    	PatientInfo patientInfo = getPatientInfoObjeFromPatientUser(patientUser);
@@ -115,7 +122,7 @@ public class ClinicPatientService {
 		    	getAssocObjLists(clinicList, patientInfo, clinicPatientAssocList, userPatientAssocList);
 		    	if (userPatientAssocList.size() > 0) userPatientRepository.delete(userPatientAssocList);
 		    	if (clinicPatientAssocList.size() > 0) clinicPatientRepository.delete(clinicPatientAssocList);
-		    	return getAssociatedClinicsList(patientInfo);
+		    	return getClinicVOList(patientInfo);
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
 	     	}
@@ -147,6 +154,7 @@ public class ClinicPatientService {
 					User clinicAdminUser = userRepository.findOne(clinic.getClinicAdminId());
 					if(Objects.nonNull(clinicAdminUser)) {
 						UserPatientAssoc clinicAdminPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, clinicAdminUser), AuthoritiesConstants.CLINIC_ADMIN, RelationshipLabelConstants.CLINIC_ADMIN);
+						clinicAdminPatientAssoc.setCreatedBy(SecurityUtils.getCurrentLogin());
 						userPatientAssocList.add(clinicAdminPatientAssoc);
 					}
 				}

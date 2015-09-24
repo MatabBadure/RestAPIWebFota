@@ -196,7 +196,7 @@ public class UserResource {
 				queryString,id, PaginationUtil.generatePageRequest(offset, limit),
 				sortOrder);
 		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
-				page, "/user/patient/search", offset, limit);
+				page, "/user/hcp/{id}/patient/search", offset, limit);
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
 
 	}
@@ -227,7 +227,7 @@ public class UserResource {
 				queryString,clinicId, PaginationUtil.generatePageRequest(offset, limit),
 				sortOrder);
 		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
-				page, "/user/patient/search", offset, limit);
+				page, "/user/clinic/{clinicId}/patient/search", offset, limit);
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
 
 	}

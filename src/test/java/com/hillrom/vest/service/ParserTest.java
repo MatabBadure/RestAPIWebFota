@@ -32,7 +32,7 @@ import com.hillrom.vest.service.util.ParserUtil;
 @Transactional
 public class ParserTest {
 
-	PatientVestDeviceRawLog patientVestDeviceRawLog = null;
+	/*PatientVestDeviceRawLog patientVestDeviceRawLog = null;
 	List<PatientVestDeviceData> expectedLogEntries = new LinkedList<>();
 	List<PatientVestDeviceData> actualLogEntries = null;
 	
@@ -124,5 +124,5 @@ public class ParserTest {
 			assertThat(expectedLogEntries.get(i).getSequenceNumber().equals(actualLogEntries.get(i).getSequenceNumber())).isTrue();
 		}
 	}
-
+*/
 }

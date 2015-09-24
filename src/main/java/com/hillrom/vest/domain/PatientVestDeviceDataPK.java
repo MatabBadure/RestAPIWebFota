@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class PatientVestDeviceDataPK implements Serializable {
 
+	private static final long serialVersionUID = 1L;
 	private Long timestamp;
 	private String bluetoothId;
 	private String eventId;

@@ -206,6 +206,7 @@ public class ClinicService {
 	        	clinic.getClinicPatientAssoc().forEach(clinicPatientAssoc -> {
 	        		Map<String, Object> patientMap = new HashMap<>();
 	        		patientMap.put("patient", (UserExtension) userService.getUserObjFromPatientInfo(clinicPatientAssoc.getPatient()));
+	        		patientMap.put("mrnId", clinicPatientAssoc.getMrnId());
 	        		List<UserPatientAssoc> hcpAssocList = new LinkedList<>();
 	    	     	for(UserPatientAssoc patientAssoc : clinicPatientAssoc.getPatient().getUserPatientAssoc()){
 	    	    		if(AuthoritiesConstants.HCP.equals(patientAssoc.getUserRole())){

@@ -31,7 +31,6 @@ public class PatientVestDeviceData implements Serializable {
 	@Column(name="event_id")
 	private String eventId;
 
-	@Id
 	@Column(name = "serial_number")
 	private String serialNumber;
 	
@@ -165,53 +164,6 @@ public class PatientVestDeviceData implements Serializable {
 
 	public void setPatientUser(User patientUser) {
 		this.patientUser = patientUser;
-	}
-
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((bluetoothId == null) ? 0 : bluetoothId.hashCode());
-		result = prime * result + ((eventId == null) ? 0 : eventId.hashCode());
-		result = prime * result
-				+ ((serialNumber == null) ? 0 : serialNumber.hashCode());
-		result = prime * result
-				+ ((timestamp == null) ? 0 : timestamp.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		PatientVestDeviceData other = (PatientVestDeviceData) obj;
-		if (bluetoothId == null) {
-			if (other.bluetoothId != null)
-				return false;
-		} else if (!bluetoothId.equals(other.bluetoothId))
-			return false;
-		if (eventId == null) {
-			if (other.eventId != null)
-				return false;
-		} else if (!eventId.equals(other.eventId))
-			return false;
-		if (serialNumber == null) {
-			if (other.serialNumber != null)
-				return false;
-		} else if (!serialNumber.equals(other.serialNumber))
-			return false;
-		if (timestamp == null) {
-			if (other.timestamp != null)
-				return false;
-		} else if (!timestamp.equals(other.timestamp))
-			return false;
-		return true;
 	}
 
 	@Override

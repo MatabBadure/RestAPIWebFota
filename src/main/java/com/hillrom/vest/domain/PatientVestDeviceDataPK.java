@@ -4,49 +4,54 @@ import java.io.Serializable;
 
 public class PatientVestDeviceDataPK implements Serializable {
 
-	private static final long serialVersionUID = 1L;
 	private Long timestamp;
-	private String serialNumber;
 	private String bluetoothId;
 	private String eventId;
 
-	public Long getTimestamp() {
-		return timestamp;
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((bluetoothId == null) ? 0 : bluetoothId.hashCode());
+		result = prime * result + ((eventId == null) ? 0 : eventId.hashCode());
+		result = prime * result
+				+ ((timestamp == null) ? 0 : timestamp.hashCode());
+		return result;
 	}
 
-	public void setTimestamp(Long timestamp) {
-		this.timestamp = timestamp;
-	}
-
-	public String getBluetoothId() {
-		return bluetoothId;
-	}
-
-	public void setBluetoothId(String bluetoothId) {
-		this.bluetoothId = bluetoothId;
-	}
-
-	public String getSerialNumber() {
-		return serialNumber;
-	}
-
-	public void setSerialNumber(String serialNumber) {
-		this.serialNumber = serialNumber;
-	}
-
-	public String getEventId() {
-		return eventId;
-	}
-
-	public void setEventId(String eventId) {
-		this.eventId = eventId;
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PatientVestDeviceDataPK other = (PatientVestDeviceDataPK) obj;
+		if (bluetoothId == null) {
+			if (other.bluetoothId != null)
+				return false;
+		} else if (!bluetoothId.equals(other.bluetoothId))
+			return false;
+		if (eventId == null) {
+			if (other.eventId != null)
+				return false;
+		} else if (!eventId.equals(other.eventId))
+			return false;
+		if (timestamp == null) {
+			if (other.timestamp != null)
+				return false;
+		} else if (!timestamp.equals(other.timestamp))
+			return false;
+		return true;
 	}
 
 	@Override
 	public String toString() {
 		return "PatientVestDeviceDataPK [timestamp=" + timestamp
-				+ ", bluetoothId=" + bluetoothId + ", serialNumber="
-				+ serialNumber + ", eventId=" + eventId + "]";
+				+ ", bluetoothId=" + bluetoothId + ", eventId=" + eventId + "]";
 	}
+
 	
 }

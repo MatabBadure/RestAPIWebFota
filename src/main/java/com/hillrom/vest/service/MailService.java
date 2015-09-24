@@ -1,7 +1,12 @@
 package com.hillrom.vest.service;
 
-import com.hillrom.vest.config.NotificationTypeConstants;
-import com.hillrom.vest.domain.User;
+import java.time.LocalDate;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang.CharEncoding;
 import org.slf4j.Logger;
@@ -15,11 +20,11 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.mail.internet.MimeMessage;
-
-import java.util.Locale;
+import com.hillrom.vest.config.NotificationTypeConstants;
+import com.hillrom.vest.domain.Clinic;
+import com.hillrom.vest.domain.User;
+import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.service.util.DateUtil;
 
 /**
  * Service for sending e-mails.
@@ -70,6 +75,7 @@ public class MailService {
             message.setText(content, isHtml);
             javaMailSender.send(mimeMessage);
             log.debug("Sent e-mail to User '{}'", to);
+            System.out.println("message :::: "+message);
         } catch (Exception e) {
             log.warn("E-mail could not be sent to user '{}', exception is: {}", to, e.getMessage());
         }
@@ -130,4 +136,19 @@ public class MailService {
         subject = messageSource.getMessage("email.jobfailure.subject", null, null);
         sendEmail(recipients.split(","), subject, content, false, true);
      }
+    
+    public void sendNotificationMailToHCPAndClinicAdmin(User user,Map<Clinic,Map<String,Object>> statistics){
+    	log.debug("Sending password reset e-mail to '{}'", user.getEmail());
+        Context context = new Context();
+        context.setVariable("user", user);
+        context.setVariable("clinicStatisticsMap",statistics);
+        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now(), "MMM dd,yyyy"));
+        String content = "";
+        String subject = "";
+
+        content = templateEngine.process("statisticsNotificationMail", context);
+        subject = messageSource.getMessage("email.statisticsnotification.subject", null, null);
+        
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
 }

@@ -49,4 +49,7 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 	
 	@Query("from Clinic clinic where clinic.clinicAdminId = ?1")
     List<Clinic> findByClinicAdminId(Long clinicAdminId);
+
+	@Query("from Clinic clinic where clinic.deleted = ?1 and clinic.clinicPatientAssoc IS NOT EMPTY and clinic.users IS NOT EMPTY or clinic.clinicAdminId IS NOT NULL")
+	List<Clinic> findByDeletedAndClinicPatientAssocIsNotEmpty(boolean isDeleted);
 }

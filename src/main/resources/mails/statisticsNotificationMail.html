@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title th:text="#{email.statisticsnotification.title}">Hillrom Notification</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    </head>
+    <body>
+        <p th:text="!${user.firstName} ? #{email.notification.greeting('User')}">
+        </p>
+        <p th:text="${user.firstName} ? #{email.notification.greeting(${user.lastName}+' '+${user.firstName})}">
+        </p>
+		<p th:text="#{email.statisticsnotification.message(${today})}"></p>
+		<div>
+			<div th:each="clinicStatistics : ${clinicStatisticsMap}">
+			<div>
+				<div th:text="${clinicStatistics.key.name}"></div>
+				<hr/>
+				<div th:if="${user.missedTherapyNotification}" th:text="#{email.statisticsnotification.missedtherapy(${clinicStatistics.value.patientsWithMissedTherapy})}"></div>
+				<div th:if="${user.nonHMRNotification}" th:text="#{email.statisticsnotification.hmrNonCompliance(${clinicStatistics.value.patientsWithHmrNonCompliance})}"></div>
+				<div th:if="${user.settingDeviationNotification}" th:text="#{email.statisticsnotification.settingsDeviation(${clinicStatistics.value.patientsWithSettingDeviation})}"></div>
+			</div>
+			</div>
+			<a href="dev.hillromvest.com/#/login">click here to login</a>
+		</div>
+
+        <p>
+            <span th:text="#{email.notification.regards}">Regards, </span>
+            <br/>
+            <em th:text="#{email.signature}">JHipster.</em>
+        </p>
+    </body>
+</html>

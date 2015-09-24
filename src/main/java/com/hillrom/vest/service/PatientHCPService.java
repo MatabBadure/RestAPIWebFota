@@ -223,7 +223,7 @@ public class PatientHCPService {
 		return patientInfo;
 	}
 	
-	public Map<String, Object> getTodaysPatientStatisticsForClinicAssociatedWithHCP(Long userId, String clinicId, LocalDate date) throws HillromException{
+	public Map<String, Object> getTodaysPatientStatisticsForClinicAssociatedWithHCP(String clinicId, LocalDate date) throws HillromException{
 		Map<String, Object> statistics = new HashMap();
 		List<String> clinicList = new LinkedList<>();
 		clinicList.add(clinicId);
@@ -239,7 +239,7 @@ public class PatientHCPService {
 			patientsWithNoEventRecorded = getPatientsListWithNoEventRecorded(patientUserIds).size();
 			statistics.put("patientsWithHmrNonCompliance", patientComplianceRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, patientUserIds).size());
 			statistics.put("patientsWithSettingDeviation", patientComplianceRepository.findByDateAndIsSettingsDeviatedAndPatientUserIdIn(date, true, patientUserIds).size());
-			statistics.put("patientsWithMissedTherapy", patientComplianceRepository.findByDateAndMissedTherapyCountGreaterThanAndPatientUserIdIn(date, 0, patientUserIds).size());
+			statistics.put("patientsWithMissedTherapy", patientComplianceRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date,patientUserIds).size());
 			statistics.put("patientsWithNoEventRecorded", patientsWithNoEventRecorded);
 			statistics.put("date", date.toString());
 			statistics.put("totalPatientCount", patientUsers.size());
@@ -267,7 +267,7 @@ public class PatientHCPService {
 			});
 			List<PatientCompliance> patientCompliances = new LinkedList<>();
 			if(Constants.MISSED_THERAPY.equals(filterBy)){
-				patientCompliances = patientComplianceRepository.findByDateAndMissedTherapyCountGreaterThanAndPatientUserIdIn(date, 0, patientUserIds);
+				patientCompliances = patientComplianceRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date,patientUserIds);
 			} else if(Constants.NON_HMR_COMPLIANCE.equals(filterBy)){
 				patientCompliances = patientComplianceRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, patientUserIds);
 			} else if(Constants.SETTING_DEVIATION.equals(filterBy)){

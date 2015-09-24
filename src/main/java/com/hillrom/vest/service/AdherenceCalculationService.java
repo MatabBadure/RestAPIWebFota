@@ -7,7 +7,6 @@ import static com.hillrom.vest.config.AdherenceScoreConstants.SETTING_DEVIATION_
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE;
 import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
-import static com.hillrom.vest.service.util.DateUtil.convertLocalDateToDateTime;
 import static com.hillrom.vest.service.util.DateUtil.getDaysCountBetweenLocalDates;
 import static com.hillrom.vest.service.util.DateUtil.getPlusOrMinusTodayLocalDate;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateCumulativeDuration;
@@ -16,13 +15,13 @@ import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calcula
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collector;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -30,23 +29,25 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
-import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
+import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.ProtocolConstantsRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
+import com.hillrom.vest.repository.UserRepository;
 
 
 @Service
@@ -82,7 +83,16 @@ public class AdherenceCalculationService {
 	
 	@Inject
 	private PatientNoEventService noEventService;
+	
+	@Inject
+	private ClinicService clinicService;
+	
+	@Inject
+	private PatientHCPService patientHCPService;
 
+	@Inject
+	private UserRepository userRepository;
+	
 	/**
 	 * Get Protocol Constants by loading Protocol data
 	 * @param patientUserId
@@ -313,7 +323,7 @@ public class AdherenceCalculationService {
 	 * Runs every 3pm , sends the notifications to Patient User.
 	 */
 	@Scheduled(cron="0 0 15 * * *")
-	public void sendNotificationMail(){
+	public void processPatientNotifications(){
 		LocalDate today = LocalDate.now();
 		List<Notification> notifications = notificationRepository.findByDate(today);
 		try{
@@ -333,9 +343,8 @@ public class AdherenceCalculationService {
 			ex.printStackTrace( printWriter );
 			mailService.sendJobFailureNotification("sendNotificationMail",writer.toString());
 		}
-		
 	}
-
+	
 	private boolean isPatientUserAcceptNotification(User patientUser,
 			String notificationType) {
 		// TODO: rename the columns and member variables next sprint
@@ -343,5 +352,106 @@ public class AdherenceCalculationService {
 				(patientUser.isSettingDeviationNotification() && SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)) ||
 				(patientUser.isMissedTherapyNotification() && MISSED_THERAPY.equalsIgnoreCase(notificationType));
 	}
+
+	/**
+	 * Runs every 3pm , sends the statistics notifications to Clinic Admin and HCP.
+	 * @throws HillromException 
+	 */
+	@Scheduled(cron="0 0/1 * * * *")
+	public void processHcpClinicAdminNotifications() throws HillromException{
+		try{
+			Map<User,Map<Clinic,Map<String,Object>>> userClinicStatsMap = getUserClinicStatisticsMap();
+			for(User user : userClinicStatsMap.keySet()){
+				Map<Clinic,Map<String,Object>> statistics = userClinicStatsMap.get(user);
+				mailService.sendNotificationMailToHCPAndClinicAdmin(user, statistics);
+			}
+		}catch(Exception ex){
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter( writer );
+			ex.printStackTrace( printWriter );
+			mailService.sendJobFailureNotification("sendNotificationMail",writer.toString());
+		}
+	}
+
+	public Map<User,Map<Clinic,Map<String,Object>>> getUserClinicStatisticsMap() throws HillromException {
+		LocalDate today = LocalDate.now();
+		List<Clinic> clinics = clinicService.getActiveClinicsWithPatients(false);
+		Map<String,Clinic> clinicMap = new HashMap<>();
+		for(Clinic clinic : clinics){
+			clinicMap.put(clinic.getId(),clinic);
+		}
+		Map<String,Set<UserExtension>> clinicHcpMap = filterHcpsAcceptNotification(clinics);
+		Map<String,User> clinicAdminMap = filterAdminUsersAcceptNotification(clinics);
+		Map<User,Map<Clinic,Map<String,Object>>> userClinicStatsMap = new HashMap<>();
+		for(Clinic clinic : clinics){
+			String clinicId = clinic.getId();
+			Set<UserExtension> hcpUsers = clinicHcpMap.get(clinicId);
+			User clinicAdminUser = clinicAdminMap.get(clinicId);
+			Map<String,Object> statistics = patientHCPService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(clinicId, today);
+			if(Objects.nonNull(hcpUsers)){
+				for(User hcpUser : hcpUsers){
+					Map<Clinic,Map<String,Object>> clinicStats = userClinicStatsMap.get(hcpUser);
+					if(Objects.isNull(clinicStats))
+						clinicStats = new HashMap<>();
+					clinicStats.put(clinicMap.get(clinicId), statistics);
+					userClinicStatsMap.put(hcpUser, clinicStats);
+				}
+			}
+			if(Objects.nonNull(clinicAdminUser)){
+				Map<Clinic,Map<String,Object>> clinicStats = userClinicStatsMap.get(clinicAdminUser);
+				if(Objects.isNull(clinicStats))
+					clinicStats = new HashMap<>();
+				clinicStats.put(clinicMap.get(clinicId), statistics);
+				userClinicStatsMap.put(clinicAdminUser, clinicStats);
+			}
+		}
+		return userClinicStatsMap;
+	}
+
+	private boolean isUserAcceptMailNotification(User hcpUser) {
+		return Objects.nonNull(hcpUser.getEmail()) && (hcpUser.isMissedTherapyNotification() 
+				|| hcpUser.isNonHMRNotification() || hcpUser.isSettingDeviationNotification());
+	}
 	
+	private Map<String,Set<UserExtension>> filterHcpsAcceptNotification(List<Clinic> clinics){
+		Map<String,Set<UserExtension>> clinicHcpMap = new HashMap<>();
+		for(Clinic clinic : clinics){
+			Set<UserExtension> hcpUsers = clinic.getUsers();
+			if(hcpUsers.size() > 0){
+				Iterator<UserExtension> hcpUserIterator = hcpUsers.iterator();
+				while(hcpUserIterator.hasNext()){
+					UserExtension hcp = hcpUserIterator.next();
+					if(!isUserAcceptMailNotification(hcp)){
+						hcpUserIterator.remove();
+					}
+				}
+				clinicHcpMap.put(clinic.getId(), clinic.getUsers());
+			}
+				
+		}
+        return clinicHcpMap;
+	}
+	
+	private Map<String,User> filterAdminUsersAcceptNotification(List<Clinic> clinics){
+		List<Long> clinicAdminIds = new LinkedList<>();
+		for(Clinic clinic : clinics){
+			if(Objects.nonNull(clinic.getClinicAdminId()))
+				clinicAdminIds.add(clinic.getClinicAdminId());
+		}
+		List<User> adminUsers = userRepository.findAll(clinicAdminIds);
+		Map<Long,User> idUserMap = new HashMap<>();
+		for(User adminUser: adminUsers){
+			if(isUserAcceptMailNotification(adminUser)){
+				idUserMap.put(adminUser.getId(), adminUser);
+			}
+		}
+		Map<String,User> clinicAdminMap = new HashMap<>();
+		for(Clinic clinic : clinics){
+			User adminUser = idUserMap.get(clinic.getClinicAdminId());
+			if(Objects.nonNull(clinic.getClinicAdminId()) && Objects.nonNull(adminUser))
+				clinicAdminMap.put(clinic.getId(), adminUser);
+		}
+        return clinicAdminMap;
+	}
+
 }

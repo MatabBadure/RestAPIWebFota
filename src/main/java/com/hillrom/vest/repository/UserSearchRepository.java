@@ -190,6 +190,9 @@ public class UserSearchRepository {
 				+ " and (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or  "
 				+ " lower(user.email) like lower(:queryString) or "
+				+ " lower(CONCAT(user.first_name,' ',user.last_name)) like lower(:queryString) or"
+				+ " lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) or"
+				+ " lower(CONCAT(user.last_name,user.first_name)) like lower(:queryString) or"
 				+ " lower(user.hillrom_id) like lower(:queryString)) "
 				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"'"
 				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id ";

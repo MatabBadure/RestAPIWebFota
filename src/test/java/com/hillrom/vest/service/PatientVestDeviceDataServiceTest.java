@@ -32,7 +32,7 @@ import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
 @Transactional
 public class PatientVestDeviceDataServiceTest {
 
-	private static final String DEVICE_DATA_STRING = "JEkdAAZmYUwtATIuMDAoMDApAAA2LjE1AAAAEjYCAKokVgAAEQ4LEwEAKwEFAQEVJFYAABIOCxMBASsDAAAAGCRFT1Dw8PDw";
+/*	private static final String DEVICE_DATA_STRING = "JEkdAAZmYUwtATIuMDAoMDApAAA2LjE1AAAAEjYCAKokVgAAEQ4LEwEAKwEFAQEVJFYAABIOCxMBASsDAAAAGCRFT1Dw8PDw";
 
 	@Inject
 	PatientVestDeviceDataService pvddService;
@@ -124,5 +124,5 @@ public class PatientVestDeviceDataServiceTest {
 		PatientVestDeviceRawLog rawLog =  deviceLogParser.parseBase64StringToPatientVestDeviceRawLog(rawMessage);
 		pvdRawLogRepository.delete(rawLog);
 	}
-	
+*/	
 }

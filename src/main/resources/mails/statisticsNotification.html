@@ -20,7 +20,7 @@
 				<div th:if="${user.settingDeviationNotification}" th:text="#{email.statisticsnotification.settingsDeviation(${clinicStatistics.value.patientsWithSettingDeviation})}"></div>
 			</div>
 			</div>
-			<a href="dev.hillromvest.com/#/login">click here to login</a>
+			<a th:href="@{|${notificationUrl}/#/login|}">click here to view details</a>
 		</div>
 
         <p>

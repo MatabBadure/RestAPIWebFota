@@ -7,6 +7,7 @@ import static com.hillrom.vest.config.AdherenceScoreConstants.SETTING_DEVIATION_
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE;
 import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION;
 import static com.hillrom.vest.service.util.DateUtil.getDaysCountBetweenLocalDates;
 import static com.hillrom.vest.service.util.DateUtil.getPlusOrMinusTodayLocalDate;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateCumulativeDuration;
@@ -158,19 +159,19 @@ public class AdherenceCalculationService {
 				return latestCompliance;
 			}
 		
-			boolean isHMRCompliant = isHMRComplianceViolated(protocolConstant, actualMetrics);
+			boolean isHMRComplianceViolated = isHMRComplianceViolated(protocolConstant, actualMetrics);
 			boolean isSettingsDeviated = isSettingsDeviated(protocolConstant, actualMetrics);
 			
 			if(isSettingsDeviated(protocolConstant, actualMetrics)){
 				currentScore -=  SETTING_DEVIATION_POINTS;
 				notificationType =  SETTINGS_DEVIATION;				
 			}				
-			if(isHMRCompliant){
+			if(isHMRComplianceViolated){
 				currentScore -=  HMR_NON_COMPLIANCE_POINTS;
 				if(StringUtils.isBlank(notificationType))
 					notificationType =  HMR_NON_COMPLIANCE;
 				else
-					notificationType =  SETTINGS_DEVIATION;
+					notificationType =  HMR_AND_SETTINGS_DEVIATION;
 			}
 			
 			if(previousScore < currentScore){
@@ -188,7 +189,7 @@ public class AdherenceCalculationService {
 			currentScore = currentScore > 0? currentScore : 0; 
 			if(latestCompliance.getDate().isBefore(currentTherapyDate)){
 				return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,
-						actualMetrics.get("totalDuration").intValue(),isHMRCompliant,isSettingsDeviated,latestHmr);
+						actualMetrics.get("totalDuration").intValue(),isHMRComplianceViolated,isSettingsDeviated,latestHmr);
 			}
 			
 			latestCompliance.setScore(currentScore);
@@ -232,7 +233,8 @@ public class AdherenceCalculationService {
 	public boolean isSettingsDeviated(ProtocolConstants protocolConstant,
 			Map<String, Double> actualMetrics) {
 		if(protocolConstant.getMinFrequency() > actualMetrics.get("weightedAvgFrequency") 
-				|| (protocolConstant.getMaxFrequency()*0.85) > actualMetrics.get("weightedAvgFrequency")){
+				|| (protocolConstant.getMaxFrequency()*0.85) > actualMetrics.get("weightedAvgFrequency")
+				|| (protocolConstant.getMaxFrequency()*1.15) < actualMetrics.get("weightedAvgFrequency")){
 			return true;
 		}
 		return false;
@@ -334,23 +336,24 @@ public class AdherenceCalculationService {
 					String notificationType = notification.getNotificationType();
 					if(isPatientUserAcceptNotification(patientUser,
 							notificationType))
-					mailService.sendNotificationMail(patientUser,notificationType);
+					mailService.sendNotificationMailToPatient(patientUser,notificationType);
 				}
 			});
 		}catch(Exception ex){
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter( writer );
 			ex.printStackTrace( printWriter );
-			mailService.sendJobFailureNotification("sendNotificationMail",writer.toString());
+			mailService.sendJobFailureNotification("processPatientNotifications",writer.toString());
 		}
 	}
 	
 	private boolean isPatientUserAcceptNotification(User patientUser,
 			String notificationType) {
-		// TODO: rename the columns and member variables next sprint
 		return (patientUser.isNonHMRNotification() && HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType)) || 
 				(patientUser.isSettingDeviationNotification() && SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)) ||
-				(patientUser.isMissedTherapyNotification() && MISSED_THERAPY.equalsIgnoreCase(notificationType));
+				(patientUser.isMissedTherapyNotification() && MISSED_THERAPY.equalsIgnoreCase(notificationType) ||
+				(HMR_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) && 
+						(patientUser.isNonHMRNotification() || patientUser.isSettingDeviationNotification())));
 	}
 
 	/**
@@ -369,7 +372,7 @@ public class AdherenceCalculationService {
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter( writer );
 			ex.printStackTrace( printWriter );
-			mailService.sendJobFailureNotification("sendNotificationMail",writer.toString());
+			mailService.sendJobFailureNotification("processHcpClinicAdminNotifications",writer.toString());
 		}
 	}
 

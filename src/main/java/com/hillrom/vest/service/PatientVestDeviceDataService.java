@@ -84,14 +84,12 @@ public class PatientVestDeviceDataService {
 					deviceSerialNumber);
 			assignDefaultValuesToVestDeviceData(deviceRawLog,
 					patientVestDeviceRecords, userPatientAssoc);
-			
-			deviceDataRepository.save(patientVestDeviceRecords);
-
 			List<TherapySession> therapySessions = PatientVestDeviceTherapyUtil
 					.prepareTherapySessionFromDeviceData(patientVestDeviceRecords);
 			
 			therapySessions = therapySessionService.saveOrUpdate(therapySessions);
 			
+			deviceDataRepository.save(patientVestDeviceRecords);
 		} catch (Exception e) {
 			vestDeviceBadDataRepository.save(new VestDeviceBadData(rawData));
 			throw new RuntimeException(e.getMessage());

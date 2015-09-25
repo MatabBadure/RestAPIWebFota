@@ -174,6 +174,7 @@ public class UserResource {
 	
 	public ResponseEntity<?> searchPatientAssociatedToHcp(@PathVariable Long id,
 			@RequestParam(required = true, value = "searchString") String searchString,
+			@RequestParam(value = "clinicId") String clinicId,
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,
@@ -193,10 +194,10 @@ public class UserResource {
 				sortOrder.put(sortBy, isAscending);
 		}
 		Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientToHCPBy(
-				queryString,id, PaginationUtil.generatePageRequest(offset, limit),
+				queryString, id, clinicId, PaginationUtil.generatePageRequest(offset, limit),
 				sortOrder);
 		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
-				page, "/user/hcp/{id}/patient/search", offset, limit);
+				page, "/user/hcp/"+id+"/patient/search", offset, limit);
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
 
 	}
@@ -227,7 +228,7 @@ public class UserResource {
 				queryString,clinicId, PaginationUtil.generatePageRequest(offset, limit),
 				sortOrder);
 		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
-				page, "/user/clinic/{clinicId}/patient/search", offset, limit);
+				page, "/user/clinic/"+clinicId+"/patient/search", offset, limit);
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
 
 	}

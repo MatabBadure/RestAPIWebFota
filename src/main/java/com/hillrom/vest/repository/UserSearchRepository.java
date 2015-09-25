@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -251,7 +252,7 @@ public class UserSearchRepository {
 		return page;
 	}
 	
-	public Page<PatientUserVO> findAssociatedPatientToHCPBy(String queryString, Long hcpUserID,
+	public Page<PatientUserVO> findAssociatedPatientToHCPBy(String queryString, Long hcpUserID, String clinicId,
 			Pageable pageable, Map<String, Boolean> sortOrder) {
 
 		String findPatientUserQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as"
@@ -267,14 +268,22 @@ public class UserSearchRepository {
 				+ "lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) or "
 				+ "lower(user.hillrom_id) like lower(:queryString)) "
 				+ "join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = 'SELF' "
-				+ "join PATIENT_INFO patInfo on upa.patient_id = patInfo.id join USER_PATIENT_ASSOC upa_hcp "
-				+ "on patInfo.id = upa_hcp.patient_id where upa_hcp.user_id = :hcpUserID ";
+				+ "join PATIENT_INFO patInfo on upa.patient_id = patInfo.id join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id"
+				+ ":clinicSearch"
+				+ " where upa_hcp.user_id = :hcpUserID ";
 
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString",
 				queryString);
 		
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":hcpUserID",
 				hcpUserID.toString());
+		
+		if(!StringUtils.isEmpty(clinicId))
+			findPatientUserQuery = findPatientUserQuery.replaceAll(":clinicSearch",
+					" join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id and patient_clinic.clinic_id = '"+clinicId+"'" );
+		else
+			findPatientUserQuery = findPatientUserQuery.replaceAll(":clinicSearch","");
+			
 		String countSqlQuery = "select count(patientUsers.id) from ("
 				+ findPatientUserQuery + " ) patientUsers";
 

@@ -3,6 +3,7 @@ package com.hillrom.vest.web.rest.dto;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.joda.time.DateTime;
 
@@ -48,6 +49,29 @@ public class PatientUserVO {
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
 			String city, Date dob, String gender, String title,
+			String hillromId,DateTime createdAt,Boolean isActivated, String state,int adherence, Date lastTransmissionDate) {
+		super();
+		this.id = id;
+		this.email = email;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.isDeleted = isDeleted;
+		this.zipcode = zipcode;
+		this.address = address;
+		this.city = city;
+		this.dob = dob;
+		this.gender = gender;
+		this.title = title;
+		this.hillromId = hillromId;
+		this.createdAt = createdAt;
+		this.isActivated = isActivated;
+		this.state = state;
+		this.adherence = adherence;
+		this.lastTransmissionDate= lastTransmissionDate;
+				}
+	public PatientUserVO(Long id, String email, String firstName,
+			String lastName, Boolean isDeleted, Integer zipcode, String address,
+			String city, Date dob, String gender, String title,
 			String hillromId,DateTime createdAt,Boolean isActivated, String state) {
 		super();
 		this.id = id;
@@ -65,7 +89,7 @@ public class PatientUserVO {
 		this.createdAt = createdAt;
 		this.isActivated = isActivated;
 		this.state = state;
-	}
+				}
 
 	public PatientUserVO(UserExtension user, PatientInfo patientInfo) {
 		this.id = user.getId();

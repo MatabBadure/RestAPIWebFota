@@ -174,6 +174,7 @@ public class UserResource {
 	
 	public ResponseEntity<?> searchPatientAssociatedToHcp(@PathVariable Long id,
 			@RequestParam(required = true, value = "searchString") String searchString,
+			@RequestParam(value = "clinicId") String clinicId,
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,
@@ -193,10 +194,41 @@ public class UserResource {
 				sortOrder.put(sortBy, isAscending);
 		}
 		Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientToHCPBy(
-				queryString,id, PaginationUtil.generatePageRequest(offset, limit),
+				queryString, id, clinicId, PaginationUtil.generatePageRequest(offset, limit),
 				sortOrder);
 		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
-				page, "/user/patient/search", offset, limit);
+				page, "/user/hcp/"+id+"/patient/search", offset, limit);
+		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+
+	}
+
+   @RequestMapping(value = "/user/clinic/{clinicId}/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	
+	public ResponseEntity<?> searchPatientAssociatedToClinic(@PathVariable String clinicId,
+			@RequestParam(required = true, value = "searchString") String searchString,
+			@RequestParam(value = "page", required = false) Integer offset,
+			@RequestParam(value = "per_page", required = false) Integer limit,
+			@RequestParam(value = "sort_by", required = false) String sortBy,
+			@RequestParam(value = "asc", required = false) Boolean isAscending)
+			throws URISyntaxException {
+		if(searchString.endsWith("_")){
+		   searchString = searchString.replace("_", "\\\\_");
+		}
+		String queryString = new StringBuilder("'%").append(searchString)
+				.append("%'").toString();
+		Map<String, Boolean> sortOrder = new HashMap<>();
+		if (StringUtils.isNotBlank(sortBy)) {
+			isAscending = (isAscending != null) ? isAscending : true;
+			if(sortBy.equalsIgnoreCase("email"))
+				sortOrder.put("user." + sortBy, isAscending);
+			else	
+				sortOrder.put(sortBy, isAscending);
+		}
+		Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientsToClinicBy(
+				queryString,clinicId, PaginationUtil.generatePageRequest(offset, limit),
+				sortOrder);
+		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
+				page, "/user/clinic/"+clinicId+"/patient/search", offset, limit);
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
 
 	}

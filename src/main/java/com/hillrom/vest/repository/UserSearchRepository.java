@@ -338,7 +338,7 @@ public class UserSearchRepository {
 				+ " firstName,user.last_name as lastName, user.is_deleted as isDeleted,"
 				+ "user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,"
 				+ "user.title,user.hillrom_id,user.created_date as createdAt,"
-				+ "user.activated as isActivated, patInfo.state ,pc.last_therapy_session_date as last_date, compliance_score from USER user"
+				+ "user.activated as isActivated, patInfo.state , compliance_score, pc.last_therapy_session_date as last_date from USER user"
 				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id  "
 				+ "and user_authority.authority_name = '"+PATIENT+"' and "
 				+ "(lower(user.first_name) like lower(:queryString) or  "
@@ -351,7 +351,7 @@ public class UserSearchRepository {
 				+ "join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 				+ "join CLINIC_PATIENT_ASSOC patient_clinic on "
 				+ "patient_clinic.patient_id = patInfo.id and patient_clinic.clinic_id = ':clinicId'"
-				+ "left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate();";       
+				+ "left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate()";       
 
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString",
 				queryString);
@@ -389,7 +389,7 @@ public class UserSearchRepository {
 					Boolean isActivated = (Boolean) record[13];
 					DateTime createdAtDatetime = new DateTime(createdAt);
 					String state = (String) record[14];
-					int adherence = (Integer)record[15];
+					Integer adherence = (Integer)record[15];
 					Date lastTransmissionDate = (Date) record[16];
 					
 					java.util.Date dobLocalDate = null;
@@ -397,13 +397,15 @@ public class UserSearchRepository {
 						dobLocalDate = new java.util.Date(dob.getTime());
 					}
 					java.util.Date localLastTransmissionDate = null;
+					
 					if(Objects.nonNull(lastTransmissionDate)){
 						localLastTransmissionDate =lastTransmissionDate;
 						
 					}
 					patientUsers.add(new PatientUserVO(id, email, firstName,
 							lastName, isDeleted, zipcode, address, city, dobLocalDate,
-							gender, title, hillromId,createdAtDatetime,isActivated,state,adherence,localLastTransmissionDate));
+							gender, title, hillromId,createdAtDatetime,isActivated,state,
+							Objects.nonNull(adherence) ? adherence : 0,localLastTransmissionDate));
 				});
 
 		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());

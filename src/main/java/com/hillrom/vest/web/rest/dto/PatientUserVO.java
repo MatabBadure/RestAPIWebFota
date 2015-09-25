@@ -2,6 +2,8 @@ package com.hillrom.vest.web.rest.dto;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -39,7 +41,9 @@ public class PatientUserVO {
 	private Boolean isActivated;
 	private int adherence;
 	private Date lastTransmissionDate;
+	private List<Map<String,String>> clinics = new LinkedList<>();
 	
+
 	private UserExtension hcp;
 	
 	private Map<String,Object> clinicMRNId = new HashMap<>();
@@ -304,5 +308,12 @@ public class PatientUserVO {
 	public void setMrnId(String mrnId) {
 		this.mrnId = mrnId;
 	}	
+	
+	public List<Map<String, String>> getClinics() {
+		return clinics;
+	}
+	public void setClinics(List<Map<String, String>> clinicNames) {
+		this.clinics = clinicNames;
+	}
 	
 }

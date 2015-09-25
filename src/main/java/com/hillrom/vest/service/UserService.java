@@ -1226,8 +1226,10 @@ public class UserService {
     			assignValuesToUserObj(userExtensionDTO, caregiverUser);
     			caregiverUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
     			userExtensionRepository.save(caregiverUser);
-    			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, caregiverUser), AuthoritiesConstants.CARE_GIVER, userExtensionDTO.getRelationship());
-    			userPatientRepository.saveAndFlush(userPatientAssoc);
+    			UserPatientAssoc userPatientAssoc = userPatientRepository.findOne(new UserPatientAssocPK(patientInfo, caregiverUser));;
+    			userPatientAssoc.setRelationshipLabel(userExtensionDTO.getRelationship());
+    			userPatientAssoc.setUserRole(AuthoritiesConstants.CARE_GIVER);
+    			userPatientRepository.save(userPatientAssoc);
     			log.debug("Updated Information for Caregiver User: {}", caregiverUser);
     			return userPatientAssoc;
     		}

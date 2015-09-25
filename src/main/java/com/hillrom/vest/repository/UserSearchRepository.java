@@ -196,7 +196,7 @@ public class UserSearchRepository {
 
 		String findPatientUserQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName,"
 				+ " user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,user.title,user.hillrom_id,user.created_date as createdAt,user.activated as isActivated, patInfo.state as state "
-				+ " ,clinic.id as clinic_id, clinic.name from USER user join USER_AUTHORITY user_authority on user_authority.user_id = user.id "
+				+ " ,clinic.id as clinic_id, clinic.name as clinicName from USER user join USER_AUTHORITY user_authority on user_authority.user_id = user.id "
 				+ " and user_authority.authority_name = '"+PATIENT+"'"
 				+ " and (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or  "
@@ -218,7 +218,7 @@ public class UserSearchRepository {
 		BigInteger count = (BigInteger) countQuery.getSingleResult();
 
 		Query query = getOrderedByQuery(findPatientUserQuery, sortOrder);
-		setPaginationParams(pageable, query);
+		//setPaginationParams(pageable, query);
 		
 		List<PatientUserVO> patientUsers = new LinkedList<>();
 
@@ -274,8 +274,15 @@ public class UserSearchRepository {
 					patientUsers.add(patientUserVO);
 					}
 				});
+		int firstResult = pageable.getOffset();
+		int maxResults = firstResult + pageable.getPageSize();
+		List<PatientUserVO> patientUserSubList = new ArrayList<>();
+		if(firstResult < patientUsers.size()){
+			maxResults = maxResults > patientUsers.size() ? patientUsers.size() : maxResults ;  
+			patientUserSubList = patientUsers.subList(firstResult,maxResults);
+		}
 
-		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());
+		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUserSubList, null, count.intValue());
 
 		return page;
 	}

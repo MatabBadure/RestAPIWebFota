@@ -208,58 +208,36 @@ public class UserSearchRepository {
 				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"'"
 				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id  left outer join CLINIC_PATIENT_ASSOC user_clinic on user_clinic.patient_id = patInfo.id"
 				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate() "
-				+ " :joinPatientNoEventTable"
 				+" left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and user_clinic.patient_id = patInfo.id ";
 		
 		
+		
+		
+		StringBuilder filterQuery = new StringBuilder();
+		
 		if(StringUtils.isNotEmpty(filter)){
-			
+
 			Map<String,String> filterMap = getSearchParams(filter);
 			
-			StringBuilder whereClause =new StringBuilder(" where ");
-			Set<String> filterMapKey = filterMap.keySet();
 			
-			int i = 0;
-			boolean hasNoEventCheck = false;
-			if(filterMapKey.contains("isNoEvent")){
-				findPatientUserQuery = findPatientUserQuery.replaceAll(":joinPatientNoEventTable"," join PATIENT_NO_EVENT  pne on user.id = pne.user_id "); 
-				hasNoEventCheck = true;
-				filterMapKey.remove("isNoEvent");
-			}
-			else
-				findPatientUserQuery = findPatientUserQuery.replaceAll(":joinPatientNoEventTable"," "); 
 			
-			Map<String,String> columnNameParameterMap = new HashMap<>();
-			columnNameParameterMap.put("isDeleted", "user.is_deleted");
-			columnNameParameterMap.put("isSettingsDeviated","pc.is_settings_deviated");
-			columnNameParameterMap.put("isHMRNonCompliant","pc.is_hmr_compliant");
-			columnNameParameterMap.put("isSettingsDeviated","pc.is_settings_deviated");
-			columnNameParameterMap.put("isNoEvent","pne.first_transmission_date");
-			
-			int size = filterMapKey.size();
-			
-			for(String key : filterMapKey){
-				whereClause.append(columnNameParameterMap.get(key)+" = "+filterMap.get(key));
-				if(i<size-1){
-					whereClause.append(" and ");
-				}
-				i++;
-			}
-			
-			if(hasNoEventCheck)
-				if(i>0)
-					whereClause.append(" and pne.first_transmission_date is null");
+			if(Objects.nonNull(filterMap.get("isDeleted"))){
+				filterQuery.append("select * from (");
+				filterQuery.append(findPatientUserQuery);
+				
+				if("1".equals(filterMap.get("isDeleted")))
+					filterQuery.append(") as search_table where isDeleted in (1)");
+				else if("0".equals(filterMap.get("isDeleted")))
+					filterQuery.append(")  as search_table where isDeleted in (0)");
 				else
-					whereClause.append(" pne.first_transmission_date is null");
-			
-				findPatientUserQuery = findPatientUserQuery+whereClause.toString();
+					filterQuery.append(") as search_table where isDeleted in (0,1)");
 			}
-		else
-			findPatientUserQuery = findPatientUserQuery.replaceAll(":joinPatientNoEventTable"," "); 
-			
-			findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString",
-					queryString);
+			findPatientUserQuery = filterQuery.toString();
+		}
 		
+		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString",
+					queryString);
+		System.out.println(findPatientUserQuery);
 		String countSqlQuery = "select count(patientUsers.id) from ("
 				+ findPatientUserQuery + " ) patientUsers";
 

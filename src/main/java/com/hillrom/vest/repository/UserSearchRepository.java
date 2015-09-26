@@ -152,8 +152,11 @@ public class UserSearchRepository {
 					DateTime createdAtDatetime = new DateTime(createdAt);
 					Boolean isActivated = (Boolean) record[17];
 					String npiNumber = (String)record[18];
+					
+					
 					HcpVO hcpVO = hcpUsersMap.get(id);
 
+					
 					Map<String, String> clinicMap = new HashMap<>();
 					if (null != clinicId) {
 						clinicMap.put("id", clinicId);
@@ -193,7 +196,7 @@ public class UserSearchRepository {
 
 		String findPatientUserQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName,"
 				+ " user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,user.title,user.hillrom_id,user.created_date as createdAt,user.activated as isActivated, patInfo.state as state "
-				+ " from USER user join USER_AUTHORITY user_authority on user_authority.user_id = user.id "
+				+ " ,clinic.id as clinic_id, clinic.name as clinicName from USER user join USER_AUTHORITY user_authority on user_authority.user_id = user.id "
 				+ " and user_authority.authority_name = '"+PATIENT+"'"
 				+ " and (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or  "
@@ -202,7 +205,8 @@ public class UserSearchRepository {
 				+ " lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) or"
 				+ " lower(user.hillrom_id) like lower(:queryString)) "
 				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"'"
-				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id ";
+				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id  left outer join CLINIC_PATIENT_ASSOC user_clinic on user_clinic.patient_id = patInfo.id"
+				+" left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and user_clinic.patient_id = patInfo.id ";
 
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString",
 				queryString);
@@ -214,11 +218,12 @@ public class UserSearchRepository {
 		BigInteger count = (BigInteger) countQuery.getSingleResult();
 
 		Query query = getOrderedByQuery(findPatientUserQuery, sortOrder);
-		setPaginationParams(pageable, query);
+		//setPaginationParams(pageable, query);
 		
 		List<PatientUserVO> patientUsers = new LinkedList<>();
 
 		List<Object[]> results = query.getResultList();
+		Map<Long, PatientUserVO> patientUsersMap = new HashMap<>();
 
 		results.stream().forEach(
 				(record) -> {
@@ -238,17 +243,46 @@ public class UserSearchRepository {
 					Boolean isActivated = (Boolean) record[13];
 					DateTime createdAtDatetime = new DateTime(createdAt);
 					String state = (String) record[14];
+					String clinicId = (String) record[15];
+					String clinicName = (String) record[16];
 					
+					
+					PatientUserVO patientUserVO = patientUsersMap.get(id);
 					java.util.Date dobLocalDate = null;
 					if(null !=dob){
 						dobLocalDate = new java.util.Date(dob.getTime());
+					
+					Map<String, String> clinicMap = new HashMap<>();
+					if (null != clinicId) {
+						clinicMap.put("id", clinicId);
+						clinicMap.put("name", clinicName);
 					}
-					patientUsers.add(new PatientUserVO(id, email, firstName,
-							lastName, isDeleted, zipcode, address, city, dobLocalDate,
-							gender, title, hillromId,createdAtDatetime,isActivated,state));
+					if (patientUserVO == null) {
+						patientUserVO = new PatientUserVO(id, email, firstName,
+								lastName, isDeleted, zipcode, address, city, dobLocalDate,
+								gender, title, hillromId,createdAtDatetime,isActivated,state);
+						if (clinicMap.keySet().size() > 0) {
+							patientUserVO.getClinics().add(clinicMap);
+						}
+						patientUsersMap.put(id, patientUserVO);
+					} else {
+						patientUsers.remove(patientUserVO);
+						if (clinicMap.keySet().size() > 0) {
+							patientUserVO.getClinics().add(clinicMap);
+						}
+					}
+					patientUsers.add(patientUserVO);
+					}
 				});
+		int firstResult = pageable.getOffset();
+		int maxResults = firstResult + pageable.getPageSize();
+		List<PatientUserVO> patientUserSubList = new ArrayList<>();
+		if(firstResult < patientUsers.size()){
+			maxResults = maxResults > patientUsers.size() ? patientUsers.size() : maxResults ;  
+			patientUserSubList = patientUsers.subList(firstResult,maxResults);
+		}
 
-		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());
+		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUserSubList, null, count.intValue());
 
 		return page;
 	}

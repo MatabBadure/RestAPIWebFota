@@ -133,7 +133,7 @@ public class AdherenceCalculationService {
 		if(latest3TherapySessions.isEmpty() || Objects.isNull(latestCompliance)){
 			noEventService.updatePatientFirstTransmittedDate(patientUserId,currentTherapyDate);
 			return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,
-					actualMetrics.get("totalDuration").intValue(),false,false,latestHmr);
+					actualMetrics.get("totalDuration").intValue(),true,false,latestHmr);
 		}else{ 
 			// Default 2 points get deducted by assuming data not received for the day, hence add 2 points
 			currentScore = currentScore ==  DEFAULT_COMPLIANCE_SCORE ?  DEFAULT_COMPLIANCE_SCORE : currentScore + 2;
@@ -142,20 +142,20 @@ public class AdherenceCalculationService {
 			if(threeDaysAgo.isBefore(firstTherapySessionToPatient.getDate())){
 				if(latestCompliance.getDate().isBefore(currentTherapyDate)){
 					return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,
-							actualMetrics.get("totalDuration").intValue(),false,false,latestHmr);
+							actualMetrics.get("totalDuration").intValue(),true,false,latestHmr);
 				}
 				latestCompliance.setScore(currentScore);
 				return latestCompliance;
 			}
 		
-			boolean isHMRCompliant = isHMRComplianceViolated(protocolConstant, actualMetrics);
+			boolean isHMRCompliant = isHMRCompliant(protocolConstant, actualMetrics);
 			boolean isSettingsDeviated = isSettingsDeviated(protocolConstant, actualMetrics);
 			
 			if(isSettingsDeviated(protocolConstant, actualMetrics)){
 				currentScore -=  SETTING_DEVIATION_POINTS;
 				notificationType =  SETTINGS_DEVIATION;				
 			}				
-			if(isHMRCompliant){
+			if(!isHMRCompliant){
 				currentScore -=  HMR_NON_COMPLIANCE_POINTS;
 				if(StringUtils.isBlank(notificationType))
 					notificationType =  HMR_NON_COMPLIANCE;
@@ -178,7 +178,7 @@ public class AdherenceCalculationService {
 			currentScore = currentScore > 0? currentScore : 0; 
 			if(latestCompliance.getDate().isBefore(currentTherapyDate)){
 				return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,
-						actualMetrics.get("totalDuration").intValue(),isHMRCompliant,isSettingsDeviated,latestHmr);
+						actualMetrics.get("totalDuration").intValue(),!(isHMRCompliant),isSettingsDeviated,latestHmr);
 			}
 			
 			latestCompliance.setScore(currentScore);
@@ -193,7 +193,7 @@ public class AdherenceCalculationService {
 	 * @param actualMetrics
 	 * @return
 	 */
-	public boolean isHMRComplianceViolated(ProtocolConstants protocolConstant,
+	public boolean isHMRCompliant(ProtocolConstants protocolConstant,
 			Map<String, Double> actualMetrics) {
 		// Custom Protocol, Min/Max Duration calculation is done
 		int minHMRReading = Objects.nonNull(protocolConstant
@@ -206,11 +206,11 @@ public class AdherenceCalculationService {
 				:protocolConstant.getTreatmentsPerDay() * protocolConstant.getMaxMinutesPerTreatment();
 		if(minHMRReading > actualMetrics.get("totalDuration") ||
 				maxHMRReading < actualMetrics.get("totalDuration")){
-			return true;
+			return false;
 		}else if(protocolConstant.getTreatmentsPerDay() < actualMetrics.get("treatmentsPerDay")){
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 	}
 
 	/**
@@ -222,7 +222,8 @@ public class AdherenceCalculationService {
 	public boolean isSettingsDeviated(ProtocolConstants protocolConstant,
 			Map<String, Double> actualMetrics) {
 		if(protocolConstant.getMinFrequency() > actualMetrics.get("weightedAvgFrequency") 
-				|| (protocolConstant.getMaxFrequency()*0.85) > actualMetrics.get("weightedAvgFrequency")){
+				|| (protocolConstant.getMaxFrequency()*0.85) > actualMetrics.get("weightedAvgFrequency")
+				|| (protocolConstant.getMaxFrequency()*1.15) < actualMetrics.get("weightedAvgFrequency")){
 			return true;
 		}
 		return false;

@@ -210,19 +210,16 @@ public class UserSearchRepository {
 				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate() "
 				+" left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and user_clinic.patient_id = patInfo.id ";
 		
-		
-		
-		
 		StringBuilder filterQuery = new StringBuilder();
 		
 		if(StringUtils.isNotEmpty(filter)){
 
 			Map<String,String> filterMap = getSearchParams(filter);
 			
-			
+			filterQuery.append("select * from (");
 			
 			if(Objects.nonNull(filterMap.get("isDeleted"))){
-				filterQuery.append("select * from (");
+				
 				filterQuery.append(findPatientUserQuery);
 				
 				if("1".equals(filterMap.get("isDeleted")))
@@ -231,6 +228,17 @@ public class UserSearchRepository {
 					filterQuery.append(")  as search_table where isDeleted in (0)");
 				else
 					filterQuery.append(") as search_table where isDeleted in (0,1)");
+			}
+			else{
+				filterQuery.append(findPatientUserQuery);
+				filterQuery.append(") as search_table where isDeleted in (0,1)");
+			}
+			
+			if(Objects.nonNull(filterMap.get("isNoEvent")) && "1".equals(filterMap.get("isNoEvent"))){
+				
+				filterQuery.append("and exists (SELECT PATIENT_NO_EVENT.id FROM PATIENT_NO_EVENT "
+						+ "WHERE PATIENT_NO_EVENT.id = search_table.id AND "
+						+ "PATIENT_NO_EVENT.first_transmission_date is null LIMIT 1)");
 			}
 			findPatientUserQuery = filterQuery.toString();
 		}

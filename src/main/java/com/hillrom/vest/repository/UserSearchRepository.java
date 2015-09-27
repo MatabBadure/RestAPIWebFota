@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -190,13 +191,13 @@ public class UserSearchRepository {
 
 		return page;
 	}
-
-	public Page<PatientUserVO> findPatientBy(String queryString,
+//Patient Search
+	public Page<PatientUserVO> findPatientBy(String queryString, String filter,
 			Pageable pageable, Map<String, Boolean> sortOrder) {
-
+				
 		String findPatientUserQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName,"
 				+ " user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,user.title,user.hillrom_id,user.created_date as createdAt,user.activated as isActivated, patInfo.state as state "
-				+ " ,clinic.id as clinic_id, clinic.name as clinicName from USER user join USER_AUTHORITY user_authority on user_authority.user_id = user.id "
+				+ " ,clinic.id as clinic_id, clinic.name as clinicName,pc.compliance_score adherence, pc.last_therapy_session_date as last_date from USER user join USER_AUTHORITY user_authority on user_authority.user_id = user.id "
 				+ " and user_authority.authority_name = '"+PATIENT+"'"
 				+ " and (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or  "
@@ -206,11 +207,45 @@ public class UserSearchRepository {
 				+ " lower(user.hillrom_id) like lower(:queryString)) "
 				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"'"
 				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id  left outer join CLINIC_PATIENT_ASSOC user_clinic on user_clinic.patient_id = patInfo.id"
+				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate() "
 				+" left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and user_clinic.patient_id = patInfo.id ";
+		
+		StringBuilder filterQuery = new StringBuilder();
+		
+		if(StringUtils.isNotEmpty(filter)){
 
+			Map<String,String> filterMap = getSearchParams(filter);
+			
+			filterQuery.append("select * from (");
+			
+			if(Objects.nonNull(filterMap.get("isDeleted"))){
+				
+				filterQuery.append(findPatientUserQuery);
+				
+				if("1".equals(filterMap.get("isDeleted")))
+					filterQuery.append(") as search_table where isDeleted in (1)");
+				else if("0".equals(filterMap.get("isDeleted")))
+					filterQuery.append(")  as search_table where isDeleted in (0)");
+				else
+					filterQuery.append(") as search_table where isDeleted in (0,1)");
+			}
+			else{
+				filterQuery.append(findPatientUserQuery);
+				filterQuery.append(") as search_table where isDeleted in (0,1)");
+			}
+			
+			if(Objects.nonNull(filterMap.get("isNoEvent")) && "1".equals(filterMap.get("isNoEvent"))){
+				
+				filterQuery.append("and exists (SELECT PATIENT_NO_EVENT.id FROM PATIENT_NO_EVENT "
+						+ "WHERE PATIENT_NO_EVENT.id = search_table.id AND "
+						+ "PATIENT_NO_EVENT.first_transmission_date is null LIMIT 1)");
+			}
+			findPatientUserQuery = filterQuery.toString();
+		}
+		
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString",
-				queryString);
-
+					queryString);
+		System.out.println(findPatientUserQuery);
 		String countSqlQuery = "select count(patientUsers.id) from ("
 				+ findPatientUserQuery + " ) patientUsers";
 
@@ -245,6 +280,15 @@ public class UserSearchRepository {
 					String state = (String) record[14];
 					String clinicId = (String) record[15];
 					String clinicName = (String) record[16];
+					Integer adherence = (Integer) record[17];
+					Date lastTransmissionDate = (Date) record[18];
+					
+					java.util.Date localLastTransmissionDate = null;
+					
+					if(Objects.nonNull(lastTransmissionDate)){
+						localLastTransmissionDate =lastTransmissionDate;
+						
+					}
 					
 					
 					PatientUserVO patientUserVO = patientUsersMap.get(id);
@@ -260,7 +304,8 @@ public class UserSearchRepository {
 					if (patientUserVO == null) {
 						patientUserVO = new PatientUserVO(id, email, firstName,
 								lastName, isDeleted, zipcode, address, city, dobLocalDate,
-								gender, title, hillromId,createdAtDatetime,isActivated,state);
+								gender, title, hillromId,createdAtDatetime,isActivated,state,
+								Objects.nonNull(adherence) ? adherence : 0,localLastTransmissionDate);
 						if (clinicMap.keySet().size() > 0) {
 							patientUserVO.getClinics().add(clinicMap);
 						}
@@ -473,5 +518,21 @@ public class UserSearchRepository {
 		Query jpaQuery = entityManager.createNativeQuery(queryString
 				+ sb.toString());
 		return jpaQuery;
+	}
+	
+	private Map<String,String> getSearchParams(String filterString){
+		
+		Map<String,String> filterMap = new HashMap<>();
+		
+		String[] filters = filterString.split(";");
+		for(String filter : filters){
+			
+			String[] pair = filter.split(":");
+			if(pair.length>1)
+			if(!StringUtils.isEmpty(pair[1]))
+				filterMap.put(pair[0],pair[1]);
+		}
+		return filterMap;
+		
 	}
 }

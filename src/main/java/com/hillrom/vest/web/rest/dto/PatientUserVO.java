@@ -2,7 +2,10 @@ package com.hillrom.vest.web.rest.dto;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.joda.time.DateTime;
 
@@ -38,11 +41,38 @@ public class PatientUserVO {
 	private Boolean isActivated;
 	private int adherence;
 	private Date lastTransmissionDate;
+	private List<Map<String,String>> clinics = new LinkedList<>();
 	
+
 	private UserExtension hcp;
 	
 	private Map<String,Object> clinicMRNId = new HashMap<>();
 	
+	private String mrnId;
+	
+	public PatientUserVO(Long id, String email, String firstName,
+			String lastName, Boolean isDeleted, Integer zipcode, String address,
+			String city, Date dob, String gender, String title,
+			String hillromId,DateTime createdAt,Boolean isActivated, String state,int adherence, Date lastTransmissionDate) {
+		super();
+		this.id = id;
+		this.email = email;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.isDeleted = isDeleted;
+		this.zipcode = zipcode;
+		this.address = address;
+		this.city = city;
+		this.dob = dob;
+		this.gender = gender;
+		this.title = title;
+		this.hillromId = hillromId;
+		this.createdAt = createdAt;
+		this.isActivated = isActivated;
+		this.state = state;
+		this.adherence = adherence;
+		this.lastTransmissionDate= lastTransmissionDate;
+				}
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
 			String city, Date dob, String gender, String title,
@@ -63,7 +93,7 @@ public class PatientUserVO {
 		this.createdAt = createdAt;
 		this.isActivated = isActivated;
 		this.state = state;
-	}
+				}
 
 	public PatientUserVO(UserExtension user, PatientInfo patientInfo) {
 		this.id = user.getId();
@@ -269,6 +299,21 @@ public class PatientUserVO {
 
 	public void setClinicMRNId(Map<String, Object> clinicMRNId) {
 		this.clinicMRNId = clinicMRNId;
+	}
+
+	public String getMrnId() {
+		return mrnId;
+	}
+
+	public void setMrnId(String mrnId) {
+		this.mrnId = mrnId;
 	}	
+	
+	public List<Map<String, String>> getClinics() {
+		return clinics;
+	}
+	public void setClinics(List<Map<String, String>> clinicNames) {
+		this.clinics = clinicNames;
+	}
 	
 }

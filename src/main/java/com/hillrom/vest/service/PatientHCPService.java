@@ -1,16 +1,15 @@
 package com.hillrom.vest.service;
 
-import static com.hillrom.vest.config.Constants.GROUP_BY_MONTHLY;
-import static com.hillrom.vest.config.Constants.GROUP_BY_YEARLY;
-
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -35,6 +34,7 @@ import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.ClinicPatientRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PatientNoEventsRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
@@ -83,6 +83,9 @@ public class PatientHCPService {
     
     @Inject
     private PatientNoEventsRepository noEventsRepository;
+    
+    @Inject
+    private ClinicPatientRepository clinicPatientRepository;
 
     public List<User> associateHCPToPatient(Long id, List<Map<String, String>> hcpList) throws HillromException {
     	List<User> users = new LinkedList<>();
@@ -232,19 +235,28 @@ public class PatientHCPService {
 			throw new HillromException(MessageConstants.HR_279);
 		} else {
 			int patientsWithNoEventRecorded = 0;
-			List<Long> patientUserIds = new LinkedList<>();
-			patientUsers.forEach(patientUser -> {
-				patientUserIds.add(((UserExtension)patientUser.get("patient")).getId());
-			});
+			List<Long> patientUserIds = filterActivePatientIds(patientUsers);
 			patientsWithNoEventRecorded = getPatientsListWithNoEventRecorded(patientUserIds).size();
 			statistics.put("patientsWithHmrNonCompliance", patientComplianceRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, patientUserIds).size());
 			statistics.put("patientsWithSettingDeviation", patientComplianceRepository.findByDateAndIsSettingsDeviatedAndPatientUserIdIn(date, true, patientUserIds).size());
-			statistics.put("patientsWithMissedTherapy", patientComplianceRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date,patientUserIds).size());
+			statistics.put("patientsWithMissedTherapy", patientComplianceRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date, patientUserIds).size());
 			statistics.put("patientsWithNoEventRecorded", patientsWithNoEventRecorded);
 			statistics.put("date", date.toString());
 			statistics.put("totalPatientCount", patientUsers.size());
 		}
 		return statistics;
+	}
+
+	private List<Long> filterActivePatientIds(
+			List<Map<String, Object>> patientUsers) {
+		List<Long> patientUserIds = new LinkedList<>();
+		patientUsers.forEach(patientUser -> {
+			UserExtension patient = (UserExtension)patientUser.get("patient");
+			if(patient.getActivated() && !patient.isDeleted()){
+				patientUserIds.add(((UserExtension)patientUser.get("patient")).getId());
+			}
+		});
+		return patientUserIds;
 	}
 
 	private List<Long> getPatientsListWithNoEventRecorded(List<Long> patientUserIds) {
@@ -261,13 +273,10 @@ public class PatientHCPService {
 		if(patientUsers.isEmpty()) {
 			throw new HillromException(MessageConstants.HR_279);
 		} else {
-			List<Long> patientUserIds = new LinkedList<>();
-			patientUsers.forEach(patientUser -> {
-				patientUserIds.add(((UserExtension)patientUser.get("patient")).getId());
-			});
+			List<Long> patientUserIds = filterActivePatientIds(patientUsers);
 			List<PatientCompliance> patientCompliances = new LinkedList<>();
 			if(Constants.MISSED_THERAPY.equals(filterBy)){
-				patientCompliances = patientComplianceRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date,patientUserIds);
+				patientCompliances = patientComplianceRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date, patientUserIds);
 			} else if(Constants.NON_HMR_COMPLIANCE.equals(filterBy)){
 				patientCompliances = patientComplianceRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, patientUserIds);
 			} else if(Constants.SETTING_DEVIATION.equals(filterBy)){
@@ -276,11 +285,15 @@ public class PatientHCPService {
 				throw new HillromException(ExceptionConstants.HR_554);
 			}
 			for(PatientCompliance pCompliance : patientCompliances) {
+				PatientComplianceVO complianceVO = new PatientComplianceVO();
+				complianceVO.setPatientComp(pCompliance);
 				for(Map<String,Object> patientUser : patientUsers) {
 					if(pCompliance.getPatientUser().getId().equals(((UserExtension)patientUser.get("patient")).getId())){
-						patientComplianceVOList.add(new PatientComplianceVO(pCompliance, (UserExtension)patientUser.get("hcp")));
+						complianceVO.setHcp((UserExtension)patientUser.get("hcp"));
+						complianceVO.setMrnId((String)patientUser.get("mrnId"));
 					}
 				}
+				patientComplianceVOList.add(complianceVO);
 			}
 			return patientComplianceVOList;
 		}
@@ -294,18 +307,17 @@ public class PatientHCPService {
 		if(patientUsers.isEmpty()) {
 			throw new HillromException(MessageConstants.HR_279);
 		} else {
-			List<Long> patientUserIds = new LinkedList<>();
-			patientUsers.forEach(patientUser -> {
-				patientUserIds.add(((UserExtension)patientUser.get("patient")).getId());
-			});
+			List<Long> patientUserIds = filterActivePatientIds(patientUsers);
 			List<Long> pList = getPatientsListWithNoEventRecorded(patientUserIds);
 			List<User> patientUserList = userRepository.findAll(pList);
 			for(User patientUser : patientUserList) {
 				for(Map<String,Object> pUser : patientUsers) {
 					if(patientUser.getId().equals(((UserExtension)pUser.get("patient")).getId())){
-						PatientUserVO patientUserVO = new PatientUserVO((UserExtension) patientUser, userService.getPatientInfoObjFromPatientUser(patientUser));
+						PatientInfo patientInfo = userService.getPatientInfoObjFromPatientUser(patientUser);
+						PatientUserVO patientUserVO = new PatientUserVO((UserExtension) patientUser, patientInfo);
 						patientUserVO.setAdherence(0);
 						patientUserVO.setHcp((UserExtension)pUser.get("hcp"));
+						patientUserVO.setMrnId((String)pUser.get("mrnId"));
 						patientList.add(patientUserVO);
 					}
 				}
@@ -322,12 +334,7 @@ public class PatientHCPService {
 		if(patientUsers.isEmpty()) {
 			throw new HillromException(MessageConstants.HR_279);
 		} else {
-			List<Long> patientUserIds = new LinkedList<>();
-			patientUsers.forEach(patientUser -> {
-				if(!((UserExtension)patientUser.get("patient")).isDeleted() && ((UserExtension)patientUser.get("patient")).getActivated()){ // Excluding deleted/inactive users
-					patientUserIds.add(((UserExtension)patientUser.get("patient")).getId());
-				}
-			});
+			List<Long> patientUserIds = filterActivePatientIds(patientUsers);
 			return getPatienCumulativeStatistics(from, to, patientUserIds);
 		}
 	}
@@ -346,7 +353,7 @@ public class PatientHCPService {
 				if(date.equals(compliance.getDate())){
 					if(!compliance.isHmrCompliant())
 						hmrNonCompliantCount++;
-					if(!compliance.isSettingsDeviated())
+					if(compliance.isSettingsDeviated())
 						settingsDeviatedCount++;
 					if(compliance.getMissedTherapyCount() > 0 && compliance.getMissedTherapyCount() % 3 == 0)
 						missedTherapyCount++;
@@ -407,12 +414,7 @@ public class PatientHCPService {
 		if(patientUsers.isEmpty()) {
 			throw new HillromException(MessageConstants.HR_279);
 		} else {
-			List<Long> patientUserIds = new LinkedList<>();
-			patientUsers.forEach(patientUser -> {
-				if(!((UserExtension)patientUser.get("patient")).isDeleted() && ((UserExtension)patientUser.get("patient")).getActivated()){ // Excluding deleted/inactive users
-					patientUserIds.add(((UserExtension)patientUser.get("patient")).getId());
-				}
-			});
+			List<Long> patientUserIds = filterActivePatientIds(patientUsers);
 			return therapySessionService.getTreatmentStatisticsByPatientUserIdsAndDuration(patientUserIds,from,to);
 		}
 	}
@@ -446,6 +448,33 @@ public class PatientHCPService {
     		} else {
     			throw new HillromException(ExceptionConstants.HR_523);
     		}
+    	} else {
+    		throw new HillromException(ExceptionConstants.HR_512);
+     	}
+    }
+	
+	public List<PatientUserVO> getAssociatedPatientsForHCPasCaregiver(Long hcpId) throws HillromException {
+    	UserExtension hcpUser = userExtensionRepository.findOne(hcpId);
+    	if(Objects.nonNull(hcpUser)) {
+			List<PatientUserVO> patientVOList = new LinkedList<>();
+	     	for(UserPatientAssoc patientAssoc : hcpUser.getUserPatientAssoc()){
+	    		if(AuthoritiesConstants.CARE_GIVER.equals(patientAssoc.getUserRole())){
+	    			User patientUser = userService.getUserObjFromPatientInfo(patientAssoc.getPatient());
+	    			PatientUserVO patientUserVO = new PatientUserVO((UserExtension)patientUser, patientAssoc.getPatient());
+	    			List<UserPatientAssoc> hcpAssocList = new LinkedList<>();
+	    			for(UserPatientAssoc userPatientAssoc : patientAssoc.getPatient().getUserPatientAssoc()){
+	    	    		if(AuthoritiesConstants.HCP.equals(userPatientAssoc.getUserRole())){
+	    	    			hcpAssocList.add(patientAssoc);
+	    	    		}
+	    	    	}
+	    	     	Collections.sort(hcpAssocList);
+	    	     	if(!hcpAssocList.isEmpty())
+	    	     		patientUserVO.setHcp((UserExtension)hcpAssocList.get(0).getUser());
+	    	     	else patientUserVO.setHcp(null);
+	    			patientVOList.add(patientUserVO);
+	    		}
+	    	}
+	     	return patientVOList;
     	} else {
     		throw new HillromException(ExceptionConstants.HR_512);
      	}

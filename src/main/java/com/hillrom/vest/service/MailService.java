@@ -140,7 +140,7 @@ public class MailService {
         sendEmail(recipients.split(","), subject, content, false, true);
      }
     
-    public void sendNotificationMailToHCPAndClinicAdmin(User user,Map<Clinic,Map<String,Object>> statistics){
+    public void sendNotificationMailToHCPAndClinicAdmin(User user,Map<String,Map<String,Integer>> statistics){
     	log.debug("Sending password reset e-mail to '{}'", user.getEmail());
         Context context = new Context();
         context.setVariable("user", user);

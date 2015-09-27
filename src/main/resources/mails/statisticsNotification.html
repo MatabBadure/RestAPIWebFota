@@ -13,7 +13,7 @@
 		<div>
 			<div th:each="clinicStatistics : ${clinicStatisticsMap}">
 			<div>
-				<div th:text="${clinicStatistics.key.name}"></div>
+				<div th:text="${clinicStatistics.key}"></div>
 				<hr/>
 				<div th:if="${user.missedTherapyNotification}" th:text="#{email.statisticsnotification.missedtherapy(${clinicStatistics.value.patientsWithMissedTherapy})}"></div>
 				<div th:if="${user.nonHMRNotification}" th:text="#{email.statisticsnotification.hmrNonCompliance(${clinicStatistics.value.patientsWithHmrNonCompliance})}"></div>

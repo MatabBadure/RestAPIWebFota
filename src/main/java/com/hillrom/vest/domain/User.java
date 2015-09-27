@@ -147,8 +147,25 @@ public class User extends AbstractAuditingEntity implements Serializable {
     
     @Column(name="setting_deviation_notification")
     private boolean  settingDeviationNotification = false;
-    
-    public Long getId() {
+
+    public User() {
+		super();
+	}
+
+	public User(String firstName, String lastName, String email,
+			boolean missedTherapyNotification, boolean nonHMRNotification,
+			boolean settingDeviationNotification) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.missedTherapyNotification = missedTherapyNotification;
+		this.nonHMRNotification = nonHMRNotification;
+		this.settingDeviationNotification = settingDeviationNotification;
+	}
+
+
+	public Long getId() {
         return id;
     }
 

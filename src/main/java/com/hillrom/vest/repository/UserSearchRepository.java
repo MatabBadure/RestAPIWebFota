@@ -259,7 +259,7 @@ public class UserSearchRepository {
 				if("1".equals(filterMap.get("isMissedTherapy")))
 					filterQuery.append(" and (isMissedTherapy > 0 && isMissedTherapy %3 = 0) ");
 				else if("0".equals(filterMap.get("isMissedTherapy")))
-					filterQuery.append(" and (isMissedTherapy %3 <> 0");
+					filterQuery.append(" and (isMissedTherapy %3 <> 0)");
 			}
 			
 			if(Objects.nonNull(filterMap.get("isNoEvent")) && "1".equals(filterMap.get("isNoEvent"))){

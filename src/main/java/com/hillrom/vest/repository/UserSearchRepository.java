@@ -215,7 +215,7 @@ public class UserSearchRepository {
 		
 		StringBuilder filterQuery = new StringBuilder();
 		
-		if(StringUtils.isNotEmpty(filter)){
+		if(StringUtils.isNotEmpty(filter) && !"all".equalsIgnoreCase(filter)){
 
 			Map<String,String> filterMap = getSearchParams(filter);
 			
@@ -273,6 +273,8 @@ public class UserSearchRepository {
 		
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString",
 					queryString);
+		
+		System.out.println(findPatientUserQuery);
 		String countSqlQuery = "select count(patientUsers.id) from ("
 				+ findPatientUserQuery + " ) patientUsers";
 

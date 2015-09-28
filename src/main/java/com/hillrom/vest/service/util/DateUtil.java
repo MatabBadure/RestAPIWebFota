@@ -143,5 +143,16 @@ public class DateUtil {
 			groupedDates =  requestedDates.stream().collect(Collectors.groupingBy(LocalDate :: getMonthOfYear));
 		}
 		return groupedDates;
-	} 
+	}
+	
+	/**
+	 * convertLocalDateToStringFromat
+	 * @param date
+	 * @param format
+	 * @return
+	 */
+	public static String convertLocalDateToStringFromat(LocalDate date,String format){
+		DateTimeFormatter formatter = DateTimeFormat.forPattern(format);
+		return date.toString(formatter);
+	}
 }

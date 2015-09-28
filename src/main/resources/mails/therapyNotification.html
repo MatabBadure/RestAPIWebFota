@@ -9,10 +9,13 @@
         </p>
         <p th:text="${user.firstName} ? #{email.notification.greeting(${user.firstName}+' '+${user.lastName})}">
         </p>
-      
-        <p th:text="#{email.therapynotification.message}">
-            You have 3 missed Therapy days. Daily therapy is advisable for you to stay fit and healthy.
-        </p>
+		<br/>      
+	    <p th:if="${isMissedTherapyNotification}" th:text="#{email.therapynotification.message}"></p>
+		<p th:if="${isHmrNonComplianceNotification}" th:text="#{email.hmrnotification.message}"></p>
+		<p th:if="${isSettingsDeviatedNotification}" th:text="#{email.settingsnotification.message}"></p>
+        <p th:if="${isHMRNonComplianceAndSettingsNotification}" th:text="#{email.hmrandsettingsnotification.message}"></p>
+        <br/>
+        <a th:href="@{|${notificationUrl}/#/login|}">click here to view details</a>
         <p>
             <span th:text="#{email.notification.regards}">Regards, </span>
             <br/>

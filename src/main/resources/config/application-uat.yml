@@ -40,4 +40,6 @@ spring:
         check-template-location: false
     recaptcha:
         recaptchaPrivateKey: 6LcXjQkTAAAAACiA7rx7o7wlifQ7n3VQ_It-sncc
-
+    notification:
+        hcpOrClinicAdminDashboardUrl: http://uat.hillromvest.com
+        patientDashboardUrl: http://uat.hillromvest.com

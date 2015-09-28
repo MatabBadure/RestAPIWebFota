@@ -451,8 +451,6 @@ public class UserSearchRepository {
 			findPatientUserQuery = findPatientUserQuery.replaceAll(":clinicSearch","");
 			
 		
-		System.out.println(findPatientUserQuery);
-		
 		String countSqlQuery = "select count(patientUsers.id) from ("
 				+ findPatientUserQuery + " ) patientUsers";
 

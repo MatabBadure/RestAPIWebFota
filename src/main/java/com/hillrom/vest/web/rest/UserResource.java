@@ -171,7 +171,7 @@ public class UserResource {
 
 	}
 	
-   @RequestMapping(value = "/user/{id}/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+   @RequestMapping(value = "/user/hcp/{id}/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	
 	public ResponseEntity<?> searchPatientAssociatedToHcp(@PathVariable Long id,
 			@RequestParam(required = true, value = "searchString") String searchString,

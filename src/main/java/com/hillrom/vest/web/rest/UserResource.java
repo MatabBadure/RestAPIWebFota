@@ -171,11 +171,12 @@ public class UserResource {
 
 	}
 	
-   @RequestMapping(value = "/user/hcp/{id}/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+   @RequestMapping(value = "/user/{id}/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	
 	public ResponseEntity<?> searchPatientAssociatedToHcp(@PathVariable Long id,
 			@RequestParam(required = true, value = "searchString") String searchString,
 			@RequestParam(value = "clinicId") String clinicId,
+			@RequestParam(value = "filter") String filter,
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,
@@ -195,7 +196,7 @@ public class UserResource {
 				sortOrder.put(sortBy, isAscending);
 		}
 		Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientToHCPBy(
-				queryString, id, clinicId, PaginationUtil.generatePageRequest(offset, limit),
+				queryString, id, clinicId, filter, PaginationUtil.generatePageRequest(offset, limit),
 				sortOrder);
 		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
 				page, "/user/hcp/"+id+"/patient/search", offset, limit);

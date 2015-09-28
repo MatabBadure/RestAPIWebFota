@@ -364,7 +364,7 @@ public class AdherenceCalculationService {
 	 * Runs every 3pm , sends the statistics notifications to Clinic Admin and HCP.
 	 * @throws HillromException 
 	 */
-	@Scheduled(cron="0 0/1 * * * * ")
+	@Scheduled(cron="0 0 15 * * * ")
 	public void processHcpClinicAdminNotifications() throws HillromException{
 		try{
 			List<ClinicStatsNotificationVO> statsNotificationVOs = getPatientStatsWithHcpAndClinicAdminAssociation();

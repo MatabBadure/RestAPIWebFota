@@ -1,5 +1,8 @@
 package com.hillrom.vest.web.rest;
 
+import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
+import static com.hillrom.vest.security.AuthoritiesConstants.CLINIC_ADMIN;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -140,7 +143,7 @@ public class UserResource {
 	}
 
 	@RequestMapping(value = "/user/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	
+	@RolesAllowed({HCP,CLINIC_ADMIN})
 	public ResponseEntity<?> searchHcp(
 			@RequestParam(required = true, value = "searchString") String searchString,
 			@RequestParam(required = false, value = "filter") String filter,

@@ -364,24 +364,18 @@ public class AdherenceCalculationService {
 	 * Runs every 3pm , sends the statistics notifications to Clinic Admin and HCP.
 	 * @throws HillromException 
 	 */
-	@Scheduled(cron="0 0 15 * * * ")
+	@Scheduled(cron="0 0/1 * * * * ")
 	public void processHcpClinicAdminNotifications() throws HillromException{
 		try{
 			List<ClinicStatsNotificationVO> statsNotificationVOs = getPatientStatsWithHcpAndClinicAdminAssociation();
-			Map<BigInteger, User> idUserMap = getHcpIdUserMapFromPatientStats(statsNotificationVOs);
+			Map<BigInteger, User> idUserMap = getIdUserMapFromPatientStats(statsNotificationVOs);
 			Map<String, String> clinicIdNameMap = getClinicIdNameMapFromPatientStats(statsNotificationVOs);
 			Map<BigInteger, Map<String, Map<String, Integer>>> adminClinicStats = getPatientStatsWithClinicAdminClinicAssociation(statsNotificationVOs);
 			Map<BigInteger, Map<String, Map<String, Integer>>> hcpClinicStats = getPatientStatsWithHcpClinicAssociation(statsNotificationVOs);
 
-			List<Long> adminIds = new LinkedList<>();
-			adminClinicStats.keySet().forEach(
-					adminId -> adminIds.add(adminId.longValue()));
-			getClinicAdminIdUserMap(idUserMap, adminIds);
-			Map<User, Map<String, Map<String, Integer>>> hcpClinicStatsMap = new HashMap<>();
-			hcpClinicStatsMap = getProcessedUserClinicStatsMap(idUserMap,
+			Map<User, Map<String, Map<String, Integer>>> hcpClinicStatsMap = getProcessedUserClinicStatsMap(idUserMap,
 					clinicIdNameMap, hcpClinicStats);
-			Map<User, Map<String, Map<String, Integer>>> adminClinicStatsMap = new HashMap<>();
-			adminClinicStatsMap = getProcessedUserClinicStatsMap(idUserMap,
+			Map<User, Map<String, Map<String, Integer>>> adminClinicStatsMap = getProcessedUserClinicStatsMap(idUserMap,
 					clinicIdNameMap, adminClinicStats);
 			for(User hcpUser : hcpClinicStatsMap.keySet()){
 				mailService.sendNotificationMailToHCPAndClinicAdmin(hcpUser, hcpClinicStatsMap.get(hcpUser));
@@ -427,16 +421,6 @@ public class AdherenceCalculationService {
 		return userClinicStatsMap;
 	}
 
-	private void getClinicAdminIdUserMap(Map<BigInteger, User> idUserMap,
-			List<Long> adminIds) {
-		List<User> clinicAdmins =  userRepository.findAll(adminIds);
-		for(User adminUser: clinicAdmins){
-			if(isUserAcceptMailNotification(adminUser)){
-				idUserMap.put(BigInteger.valueOf(adminUser.getId()), adminUser);
-			}
-		}
-	}
-
 	private Map<BigInteger, Map<String, Map<String, Integer>>> getPatientStatsWithHcpClinicAssociation(
 			List<ClinicStatsNotificationVO> statsNotificationVOs) {
 		Map<BigInteger,List<ClinicStatsNotificationVO>> hcpClinicStatsMap = statsNotificationVOs.stream()
@@ -465,14 +449,20 @@ public class AdherenceCalculationService {
 		return clinicIdNameMap;
 	}
 
-	private Map<BigInteger, User> getHcpIdUserMapFromPatientStats(
+	private Map<BigInteger, User> getIdUserMapFromPatientStats(
 			List<ClinicStatsNotificationVO> statsNotificationVOs) {
 		Map<BigInteger,User> idUserMap = new HashMap<>();
 		for(ClinicStatsNotificationVO statsNotificationVO : statsNotificationVOs){
 			idUserMap.put(statsNotificationVO.getHcpId(),new User(statsNotificationVO.getHcpFirstname(),
-					statsNotificationVO.getHcpLastname(),statsNotificationVO.getEmail(),
+					statsNotificationVO.getHcpLastname(),statsNotificationVO.getHcpEmail(),
 					statsNotificationVO.isHcpAcceptTherapyNotification(),statsNotificationVO.isHcpAcceptHMRNotification()
 					,statsNotificationVO.isHcpAcceptSettingsNotification()));
+			if(Objects.nonNull(statsNotificationVO.getClinicAdminId())){
+				idUserMap.put(statsNotificationVO.getClinicAdminId(),new User(statsNotificationVO.getCaFirstname(),
+						statsNotificationVO.getCaLastname(),statsNotificationVO.getCaEmail(),
+						statsNotificationVO.isCAAcceptTherapyNotification(),statsNotificationVO.isCAAcceptHMRNotification()
+						,statsNotificationVO.isCAAcceptSettingsNotification()));
+			}
 			
 		}
 		return idUserMap;
@@ -484,8 +474,10 @@ public class AdherenceCalculationService {
 		for(Object[] result : results){
 			statsNotificationVOs.add(new ClinicStatsNotificationVO((BigInteger)result[0], (String)result[1], (String)result[2],
 					(BigInteger)result[3],(BigInteger)result[4], (String)result[5], (String)result[6],(String)result[7],
-					(String)result[8],(BigInteger)result[9],(Integer)result[10], (Boolean)result[11],
-					(Boolean)result[12], (Boolean)result[13], (Boolean)result[14], (Boolean)result[15],(String)result[16]));
+					(BigInteger)result[8],(Integer)result[9], (Boolean)result[10],
+					(Boolean)result[11], (Boolean)result[12], (Boolean)result[13], (Boolean)result[14],
+					(String)result[15],(String)result[16],(Integer)result[17], (Integer)result[18], (Integer)result[19],
+					(String)result[20]));
 		}
 		return statsNotificationVOs;
 	}

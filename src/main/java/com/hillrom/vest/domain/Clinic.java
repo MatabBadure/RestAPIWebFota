@@ -33,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "CLINIC")
 @SQLDelete(sql="UPDATE CLINIC SET is_deleted = 1 WHERE id = ?")
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class,property= "@id,@name")
 public class Clinic implements Serializable {
 
     @Id

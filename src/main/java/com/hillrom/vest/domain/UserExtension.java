@@ -15,6 +15,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.SQLDelete;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 /**
  * A UserExtension.
@@ -54,7 +55,7 @@ public class UserExtension extends User implements Serializable {
 
 	@ManyToMany
 	@JoinTable(name = "CLINIC_USER_ASSOC", joinColumns = { @JoinColumn(name = "users_id", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "clinics_id", referencedColumnName = "id") })
-	@JsonIgnore
+	@JsonManagedReference
 	private Set<Clinic> clinics = new HashSet<>();
 
 	@Column(name = "is_deleted", nullable = false)

@@ -11,6 +11,8 @@ import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.config.Constants;
-import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
@@ -47,11 +48,10 @@ import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.CareGiverVO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
+import com.hillrom.vest.web.rest.dto.HcpClinicsVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
-
-import net.minidev.json.JSONObject;
 
 /**
  * REST controller for managing user.
@@ -347,12 +347,11 @@ public class UserExtensionResource {
         log.debug("REST request to get associated HCP users with Patient : {}", id);
         JSONObject jsonObject = new JSONObject();
 		try {
-			List<User> hcpUsers = patientHCPService.getAssociatedHCPUserForPatient(id);
+			List<HcpClinicsVO> hcpUsers = patientHCPService.getAssociatedHCPUserForPatient(id);
 	        if (hcpUsers.isEmpty()) {
 	        	jsonObject.put("message", MessageConstants.HR_284);
 	        } else {
-	        	jsonObject.put("message", MessageConstants.HR_276);
-		    	jsonObject.put("hcpUsers", hcpUsers);
+	        	jsonObject.put("hcpUsers", hcpUsers);
 	        }
 	        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         } catch (HillromException e) {

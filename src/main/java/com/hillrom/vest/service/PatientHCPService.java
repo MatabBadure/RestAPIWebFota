@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -46,6 +45,7 @@ import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
+import com.hillrom.vest.web.rest.dto.HcpClinicsVO;
 import com.hillrom.vest.web.rest.dto.PatientComplianceVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.StatisticsVO;
@@ -115,12 +115,12 @@ public class PatientHCPService {
     	return users;
     }
 
-    public List<User> getAssociatedHCPUserForPatient(Long id) throws HillromException {
-    	User patientUser = userRepository.findOne(id);
-    	if(patientUser != null) {
+    public List<HcpClinicsVO> getAssociatedHCPUserForPatient(Long id) throws HillromException {
+    	UserExtension patientUser = userExtensionRepository.findOne(id);
+    	if(Objects.nonNull(patientUser)) {
     		PatientInfo patientInfo = getPatientInfoObjeFromPatientUser(patientUser);
-	     	if(patientInfo != null){
-		    	return getAssociatedHCPUserList(patientInfo);
+	     	if(Objects.nonNull(patientInfo)){
+		    	return getHCPUsersAssociatedWithPatient(patientInfo);
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
 	     	}
@@ -129,11 +129,23 @@ public class PatientHCPService {
      	}
     }
 
+	private List<HcpClinicsVO> getHCPUsersAssociatedWithPatient(PatientInfo patientInfo) {
+		List<HcpClinicsVO> hcpUsers = new LinkedList<>();
+		for(UserPatientAssoc userPatientAssoc : patientInfo.getUserPatientAssoc()){
+			if(AuthoritiesConstants.HCP.equals(userPatientAssoc.getUserRole())){
+				UserExtension hcp = (UserExtension)userPatientAssoc.getUser();
+				hcpUsers.add(new HcpClinicsVO(hcp,hcp.getClinics()));
+			}
+		}
+		return hcpUsers;
+	}
+
 	private List<User> getAssociatedHCPUserList(PatientInfo patientInfo) {
 		List<User> hcpUsers = new LinkedList<>();
 		for(UserPatientAssoc userPatientAssoc : patientInfo.getUserPatientAssoc()){
 			if(AuthoritiesConstants.HCP.equals(userPatientAssoc.getUserRole())){
 				hcpUsers.add(userPatientAssoc.getUser());
+				
 			}
 		}
 		return hcpUsers;

@@ -47,13 +47,15 @@ public class PatientUserVO {
 	private UserExtension hcp;
 	
 	private Map<String,Object> clinicMRNId = new HashMap<>();
-	
+	private String clinicNamesCSV;
+	private String hcpNamesCSV;
 	private String mrnId;
 	
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
 			String city, Date dob, String gender, String title,
-			String hillromId,DateTime createdAt,Boolean isActivated, String state,int adherence, Date lastTransmissionDate) {
+			String hillromId,DateTime createdAt,Boolean isActivated, String state,int adherence, 
+			Date lastTransmissionDate) {
 		super();
 		this.id = id;
 		this.email = email;
@@ -315,5 +317,18 @@ public class PatientUserVO {
 	public void setClinics(List<Map<String, String>> clinicNames) {
 		this.clinics = clinicNames;
 	}
+	public String getClinicNamesCSV() {
+		return clinicNamesCSV;
+	}
+	public void setClinicNamesCSV(String clinicNamesCSV) {
+		this.clinicNamesCSV = clinicNamesCSV;
+	}
+	public String getHcpNamesCSV() {
+		return hcpNamesCSV;
+	}
+	public void setHcpNamesCSV(String hcpNamesCSV) {
+		this.hcpNamesCSV = hcpNamesCSV;
+	}
+
 	
 }

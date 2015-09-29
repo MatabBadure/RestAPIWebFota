@@ -39,7 +39,7 @@ public class UserSearchRepository {
 	@Inject
 	private EntityManager entityManager;
 
-	public Page<HillRomUserVO> findHillRomTeamUsersBy(String queryString,
+	public Page<HillRomUserVO> findHillRomTeamUsersBy(String queryString,String filter,
 			Pageable pageable, Map<String, Boolean> sortOrder) {
 
 		String findHillromTeamUserQuery = "select distinct(user.id),user.first_name as firstName,user.last_name as lastName,user.email,"
@@ -53,6 +53,28 @@ public class UserSearchRepository {
 				+ " join  USER_AUTHORITY user_authority on user_authority.user_id = user.id "
 				+ " and  user_authority.authority_name in ('"+ADMIN+"','"+ACCT_SERVICES+"','"+ASSOCIATES+"','"+HILLROM_ADMIN+"')";
 
+		StringBuilder filterQuery = new StringBuilder();
+		
+		if(StringUtils.isNotEmpty(filter) && !"all".equalsIgnoreCase(filter)){
+		
+			Map<String,String> filterMap = getSearchParams(filter);
+			
+			filterQuery.append("select * from (");
+			
+			if(Objects.nonNull(filterMap.get("isDeleted"))){
+			filterQuery.append(findHillromTeamUserQuery);
+				
+				if("1".equals(filterMap.get("isDeleted")))
+					filterQuery.append(") as search_table where isDeleted in (1)");
+				else if("0".equals(filterMap.get("isDeleted")))
+					filterQuery.append(")  as search_table where isDeleted in (0)");
+			}
+			else{
+				filterQuery.append(findHillromTeamUserQuery);
+				filterQuery.append(") as search_table where isDeleted in (0,1)");
+			}
+			findHillromTeamUserQuery = filterQuery.toString();
+		}
 		findHillromTeamUserQuery = findHillromTeamUserQuery.replaceAll(
 				":queryString", queryString);
 		String countSqlQuery = "select count(hillromUsers.id) from ("
@@ -99,7 +121,7 @@ public class UserSearchRepository {
 		query.setMaxResults(maxResult);
 	}
 
-	public Page<HcpVO> findHCPBy(String queryString, Pageable pageable,
+	public Page<HcpVO> findHCPBy(String queryString, String filter, Pageable pageable,
 			Map<String, Boolean> sortOrder) {
 		
 		String findHcpQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted,"
@@ -115,6 +137,30 @@ public class UserSearchRepository {
 				+ " left outer join CLINIC_USER_ASSOC user_clinic on user_clinic.users_id = user.id "
 				+ " left outer join CLINIC clinic on user_clinic.clinics_id = clinic.id and user_clinic.users_id = user.id ";
 
+		StringBuilder filterQuery = new StringBuilder();
+	
+		if(StringUtils.isNotEmpty(filter) && !"all".equalsIgnoreCase(filter)){
+		
+			Map<String,String> filterMap = getSearchParams(filter);
+			
+			filterQuery.append("select * from (");
+			
+			if(Objects.nonNull(filterMap.get("isDeleted"))){
+			filterQuery.append(findHcpQuery);
+				
+				if("1".equals(filterMap.get("isDeleted")))
+					filterQuery.append(") as search_table where isDeleted in (1)");
+				else if("0".equals(filterMap.get("isDeleted")))
+					filterQuery.append(")  as search_table where isDeleted in (0)");
+			}
+			else{
+				filterQuery.append(findHcpQuery);
+				filterQuery.append(") as search_table where isDeleted in (0,1)");
+			}
+			
+			findHcpQuery = filterQuery.toString();
+		}
+			
 		findHcpQuery = findHcpQuery.replaceAll(":queryString", queryString);
 
 		String countSqlQuery = "select count(distinct hcpUsers.id) from ("

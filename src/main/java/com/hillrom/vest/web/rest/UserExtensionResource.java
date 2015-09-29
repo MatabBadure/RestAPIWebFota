@@ -236,6 +236,7 @@ public class UserExtensionResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     public ResponseEntity<List<HillRomUserVO>> search(@RequestParam(required=true,value = "searchString")String searchString,
+    		@RequestParam(required=false, value = "filter")String filter,
     		@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
             @RequestParam(value = "sort_by", required = false) String sortBy,
@@ -250,7 +251,7 @@ public class UserExtensionResource {
     		isAscending =  (isAscending != null)?  isAscending : true;
     		sortOrder.put(sortBy, isAscending);
     	}
-    	Page<HillRomUserVO> page = userSearchRepository.findHillRomTeamUsersBy(queryString,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+    	Page<HillRomUserVO> page = userSearchRepository.findHillRomTeamUsersBy(queryString,filter,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/user/search", offset, limit);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -263,6 +264,7 @@ public class UserExtensionResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     public ResponseEntity<?> searchHcp(@RequestParam(required=true,value = "searchString")String searchString,
+    		@RequestParam(required=false,value = "searchString")String filter,
     		@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
             @RequestParam(value = "sort_by", required = false) String sortBy,
@@ -277,7 +279,7 @@ public class UserExtensionResource {
     		isAscending =  (isAscending != null) ?  isAscending : true;
     		sortOrder.put(sortBy, isAscending);
     	}
-    	Page<HcpVO> page = userSearchRepository.findHCPBy(queryString,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+    	Page<HcpVO> page = userSearchRepository.findHCPBy(queryString,filter,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/user/hcp/search", offset, limit);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

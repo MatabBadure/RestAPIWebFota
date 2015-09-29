@@ -331,4 +331,10 @@ public class ClinicService {
 	    	return clinics;
 	    }
     }
+
+	public List<Clinic> getActiveClinicsWithPatients(boolean isDeleted) {
+		List<Clinic> clinics = clinicRepository.findByDeletedAndClinicPatientAssocIsNotEmpty(isDeleted);
+		return clinics;
+	}
+	
 }

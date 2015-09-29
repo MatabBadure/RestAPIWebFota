@@ -1071,12 +1071,19 @@ public class UserService {
 	private UserPatientAssoc associateExistingCaregiverUserWithPatient(UserExtension patientUser, UserExtensionDTO userExtensionDTO, Optional<User> existingUser) {
 		User caregiverUser = existingUser.get();
 		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
-		if(patientInfo != null) {
-			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, caregiverUser), AuthoritiesConstants.CARE_GIVER, userExtensionDTO.getRelationship());
-			userPatientRepository.saveAndFlush(userPatientAssoc);
+		UserPatientAssocPK userPatientAssocPK = new UserPatientAssocPK(patientInfo, caregiverUser);
+		if(Objects.nonNull(patientInfo)) {
+			UserPatientAssoc userPatientAssoc = userPatientRepository.findOne(userPatientAssocPK);
+			if(Objects.nonNull(userPatientAssoc)){
+				userPatientAssoc.setUserRole(AuthoritiesConstants.CARE_GIVER);
+				userPatientAssoc.setRelationshipLabel(userExtensionDTO.getRelationship());
+			}else{
+				userPatientAssoc = new UserPatientAssoc(userPatientAssocPK, AuthoritiesConstants.CARE_GIVER, userExtensionDTO.getRelationship());
+			}
+			userPatientRepository.save(userPatientAssoc);
 			caregiverUser.getUserPatientAssoc().add(userPatientAssoc);
 			caregiverUser.setDeleted(false);
-			userRepository.saveAndFlush(caregiverUser);
+			userRepository.save(caregiverUser);
 			patientInfo.getUserPatientAssoc().add(userPatientAssoc);
 			log.debug("Created Information for Caregiver User: {}", caregiverUser);
 			return userPatientAssoc;

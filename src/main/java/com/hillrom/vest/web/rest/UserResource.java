@@ -176,7 +176,7 @@ public class UserResource {
 	public ResponseEntity<?> searchPatientAssociatedToHcp(@PathVariable Long id,
 			@RequestParam(required = true, value = "searchString") String searchString,
 			@RequestParam(required = false, value = "clinicId") String clinicId,
-			@RequestParam(value = "filter") String filter,
+			@RequestParam(required = false, value = "filter") String filter,
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,

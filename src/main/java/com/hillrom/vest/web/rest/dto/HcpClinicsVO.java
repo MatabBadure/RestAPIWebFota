@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.web.rest.util.ClinicVOBuilder;
 
 public class HcpClinicsVO implements Serializable{
 
@@ -62,7 +63,7 @@ public class HcpClinicsVO implements Serializable{
     
     private String npiNumber;
     
-    private Set<Clinic> clinics = new HashSet<>();
+    private Set<ClinicVO> clinics = new HashSet<>();
     
     private String hillromId;
     
@@ -81,7 +82,10 @@ public class HcpClinicsVO implements Serializable{
 	public HcpClinicsVO(UserExtension hcp, Set<Clinic> clinicsHcpAssociated) {
 		super();
 		this.hcpUsers = hcp;
-		this.clinics = clinicsHcpAssociated;
+		Set<Clinic> associatedClinics = clinicsHcpAssociated;
+		for(Clinic clinic: associatedClinics){
+			this.clinics.add(ClinicVOBuilder.build(clinic));
+		}
 		build(hcp);
 	}
 	
@@ -307,12 +311,12 @@ public class HcpClinicsVO implements Serializable{
 	public void setNpiNumber(String npiNumber) {
 		this.npiNumber = npiNumber;
 	}
-
-	public Set<Clinic> getClinics() {
+	
+	public Set<ClinicVO> getClinics() {
 		return clinics;
 	}
 
-	public void setClinics(Set<Clinic> clinics) {
+	public void setClinics(Set<ClinicVO> clinics) {
 		this.clinics = clinics;
 	}
 

@@ -205,6 +205,7 @@ public class ClinicResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     public ResponseEntity<List<Clinic>> search(@RequestParam(value = "searchString")String searchString,
+    		@RequestParam(value = "isDeleted", required = false)String isDeleted,
     		@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
             @RequestParam(value = "sort_by", required = false) String sortBy,
@@ -215,7 +216,18 @@ public class ClinicResource {
     		 isAscending =  (isAscending != null)?  isAscending : true;
     		 sortOrder.put(sortBy, isAscending);
     	 }
-    	 Page<Clinic> page = clinicRepository.findBy(queryString,PaginationUtil.generatePageRequest(offset, limit, sortOrder));
+    	 List<Boolean> isDel = new ArrayList<Boolean>();
+    	 if("All".equalsIgnoreCase(isDeleted) || StringUtils.isEmpty(isDeleted)){
+     		isDel.add(true);
+     		isDel.add(false);
+     	 }
+     	 if("1".equalsIgnoreCase(isDeleted)){
+      		isDel.add(true);
+      	 }
+     	 if("0".equalsIgnoreCase(isDeleted)){
+       		isDel.add(false);
+       	 }
+    	 Page<Clinic> page = clinicRepository.findBy(queryString,isDel,PaginationUtil.generatePageRequest(offset, limit, sortOrder));
          HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/clinics/search", offset, limit);
          return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

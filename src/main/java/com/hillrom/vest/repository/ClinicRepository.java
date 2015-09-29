@@ -25,12 +25,14 @@ import com.hillrom.vest.web.rest.dto.ClinicStatsNotificationVO;
  */
 public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDslPredicateExecutor<Clinic> {
 	
-	@Query("from Clinic clinic where  "
-			+ "LOWER(clinic.name) like LOWER(:queryString) or "
-			+ "LOWER(clinic.hillromId) like LOWER(:queryString) or "
-			+ "LOWER(clinic.zipcode) like LOWER(:queryString) or "
-			+ "LOWER(clinic.state) like LOWER(:queryString) ")
-	Page<Clinic> findBy(@Param("queryString") String queryString,Pageable pageable); 
+	 @Query("from Clinic clinic where  "
+				+ "( LOWER(clinic.name) like LOWER(:queryString) or "
+				+ "LOWER(clinic.hillromId) like LOWER(:queryString) or "
+				+ "LOWER(clinic.zipcode) like LOWER(:queryString) or "
+				+ "LOWER(clinic.state) like LOWER(:queryString)) and "
+				+ "clinic.deleted in (:isDeleted)")
+	Page<Clinic> findBy(@Param("queryString") String queryString,
+			@Param("isDeleted")List<Boolean> isDeleted,Pageable pageable); 
 
     Optional<Clinic> findOneByName(String name);
     

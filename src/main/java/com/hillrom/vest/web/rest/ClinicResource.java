@@ -205,7 +205,7 @@ public class ClinicResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     public ResponseEntity<List<Clinic>> search(@RequestParam(value = "searchString")String searchString,
-    		@RequestParam(value = "isDeleted", required = false)String isDeleted,
+    		@RequestParam(value = "filter", required = false)String filter,
     		@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
             @RequestParam(value = "sort_by", required = false) String sortBy,
@@ -216,6 +216,9 @@ public class ClinicResource {
     		 isAscending =  (isAscending != null)?  isAscending : true;
     		 sortOrder.put(sortBy, isAscending);
     	 }
+    	 
+    	 String isDeleted= getIsDeleteParam(filter);
+    	 
     	 List<Boolean> isDel = new ArrayList<Boolean>();
     	 if("All".equalsIgnoreCase(isDeleted) || StringUtils.isEmpty(isDeleted)){
      		isDel.add(true);
@@ -416,4 +419,19 @@ public class ClinicResource {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
+
+
+	private String getIsDeleteParam(String filter){
+		if(StringUtils.isEmpty(filter))
+			return "";
+		String isDelete;
+		String[] filters = filter.split(":");
+		if(filters.length>1)
+			isDelete = filters[1];
+		else
+			isDelete="";
+		
+		return isDelete;
+	}
+
 }

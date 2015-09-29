@@ -226,7 +226,7 @@ public class UserSearchRepository {
 				+ " left outer join CLINIC_USER_ASSOC user_clinic on user_clinic.users_id = huser.id "
 				+ " left outer join CLINIC clinic on user_clinic.clinics_id = clinic.id and user_clinic.users_id = huser.id "
 				+ " left outer join PATIENT_COMPLIANCE pc on huser.id = pc.user_id AND pc.date=curdate() "
-				+ " group by clinic.id) as associated_hcp) where associated_patient.pclinicid = associated_hcp.hclinicid";
+				+ " group by clinic.id) as associated_hcp) where associated_patient.pclinicid = associated_hcp.hclinicid ";
 		
 		String findPatientUserQuery = query1;
 		if(SecurityUtils.isUserInRole(HCP) || SecurityUtils.isUserInRole(CLINIC_ADMIN))
@@ -239,10 +239,10 @@ public class UserSearchRepository {
 			Map<String,String> filterMap = getSearchParams(filter);
 			
 			filterQuery.append("select * from (");
-			filterQuery.append(findPatientUserQuery);
 			
 			if(Objects.nonNull(filterMap.get("isDeleted"))){
 				
+				filterQuery.append(findPatientUserQuery);
 				if("1".equals(filterMap.get("isDeleted")))
 					filterQuery.append(") as search_table where isDeleted in (1)");
 				else if("0".equals(filterMap.get("isDeleted")))

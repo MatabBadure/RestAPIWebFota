@@ -220,9 +220,10 @@ public class UserSearchRepository {
 			Map<String,String> filterMap = getSearchParams(filter);
 			
 			filterQuery.append("select * from (");
-			filterQuery.append(findPatientUserQuery);
+			
 			
 			if(Objects.nonNull(filterMap.get("isDeleted"))){
+				filterQuery.append(findPatientUserQuery);
 				
 				if("1".equals(filterMap.get("isDeleted")))
 					filterQuery.append(") as search_table where isDeleted in (1)");
@@ -390,9 +391,9 @@ public class UserSearchRepository {
 			Map<String,String> filterMap = getSearchParams(filter);
 			
 			filterQuery.append("select * from (");
-			filterQuery.append(findPatientUserQuery);
 			
 			if(Objects.nonNull(filterMap.get("isDeleted"))){
+				filterQuery.append(findPatientUserQuery);
 				
 				if("1".equals(filterMap.get("isDeleted")))
 					filterQuery.append(") as search_table where isDeleted in (1)");
@@ -512,14 +513,16 @@ public class UserSearchRepository {
 		return page;
 	}
 	
-	public Page<PatientUserVO> findAssociatedPatientsToClinicBy(String queryString, String clinicID,
+	public Page<PatientUserVO> findAssociatedPatientsToClinicBy(String queryString, String clinicID, String filter,
 			Pageable pageable, Map<String, Boolean> sortOrder) {
 
 		String findPatientUserQuery = "select user.id,user.email,user.first_name as"
 				+ " firstName,user.last_name as lastName, user.is_deleted as isDeleted,"
 				+ "user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,"
 				+ "user.title,user.hillrom_id,user.created_date as createdAt,"
-				+ "user.activated as isActivated, patInfo.state , compliance_score, pc.last_therapy_session_date as last_date from USER user"
+				+ "user.activated as isActivated, patInfo.state , compliance_score, pc.last_therapy_session_date as last_date, "
+				+ "pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,pc.missed_therapy_count as isMissedTherapy "
+				+ "from USER user"
 				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id  "
 				+ "and user_authority.authority_name = '"+PATIENT+"' and "
 				+ "(lower(user.first_name) like lower(:queryString) or  "
@@ -532,7 +535,67 @@ public class UserSearchRepository {
 				+ "join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 				+ "join CLINIC_PATIENT_ASSOC patient_clinic on "
 				+ "patient_clinic.patient_id = patInfo.id and patient_clinic.clinic_id = ':clinicId'"
-				+ "left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate()";       
+				+ "left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate()";
+		
+		StringBuilder filterQuery = new StringBuilder();
+		
+		if(StringUtils.isNotEmpty(filter) && !"all".equalsIgnoreCase(filter)){
+
+			Map<String,String> filterMap = getSearchParams(filter);
+			
+			filterQuery.append("select * from (");
+			
+			
+			if(Objects.nonNull(filterMap.get("isDeleted"))){
+				filterQuery.append(findPatientUserQuery);
+				
+				if("1".equals(filterMap.get("isDeleted")))
+					filterQuery.append(") as search_table where isDeleted in (1)");
+				else if("0".equals(filterMap.get("isDeleted")))
+					filterQuery.append(")  as search_table where isDeleted in (0)");
+				else
+					filterQuery.append(") as search_table where isDeleted in (0,1)");
+			}
+			else{
+				filterQuery.append(findPatientUserQuery);
+				filterQuery.append(") as search_table where isDeleted in (0,1)");
+			}
+			
+			if(Objects.nonNull(filterMap.get("isHMRNonCompliant"))){
+				
+				
+				if("1".equals(filterMap.get("isHMRNonCompliant")))
+					filterQuery.append(" and isHMRNonCompliant = 1 ");
+				else if("0".equals(filterMap.get("isHMRNonCompliant")))
+					filterQuery.append(" and isHMRNonCompliant = 0 ");
+			}
+			
+			if(Objects.nonNull(filterMap.get("isSettingsDeviated"))){
+				
+				
+				if("1".equals(filterMap.get("isSettingsDeviated")))
+					filterQuery.append(" and isSettingsDeviated = 1 ");
+				else if("0".equals(filterMap.get("isSettingsDeviated")))
+					filterQuery.append(" and isSettingsDeviated = 0 ");
+			}
+			
+			if(Objects.nonNull(filterMap.get("isMissedTherapy"))){
+				
+				if("1".equals(filterMap.get("isMissedTherapy")))
+					filterQuery.append(" and (isMissedTherapy > 0 && isMissedTherapy %3 = 0) ");
+				else if("0".equals(filterMap.get("isMissedTherapy")))
+					filterQuery.append(" and (isMissedTherapy %3 <> 0)");
+			}
+			
+			if(Objects.nonNull(filterMap.get("isNoEvent")) && "1".equals(filterMap.get("isNoEvent"))){
+				
+				filterQuery.append(" and exists (SELECT PATIENT_NO_EVENT.id FROM PATIENT_NO_EVENT "
+						+ "WHERE PATIENT_NO_EVENT.id = search_table.id AND "
+						+ "PATIENT_NO_EVENT.first_transmission_date is null LIMIT 1)");
+			}
+			findPatientUserQuery = filterQuery.toString();
+		}
+
 
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString",
 				queryString);
@@ -638,6 +701,5 @@ public class UserSearchRepository {
 				filterMap.put(pair[0],pair[1]);
 		}
 		return filterMap;
-		
 	}
 }

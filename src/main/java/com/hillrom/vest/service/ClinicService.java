@@ -27,12 +27,14 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
+import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.util.ClinicVOBuilder;
 
 
@@ -56,6 +58,10 @@ public class ClinicService {
     
     @Inject
     private UserExtensionRepository userExtensionRepository;
+    
+    @Inject
+    private UserSearchRepository userSearchRepository;
+    
 
     public Clinic createClinic(ClinicDTO clinicDTO) throws HillromException {
     	Clinic newClinic = new Clinic();
@@ -221,6 +227,11 @@ public class ClinicService {
 	        	});
 	        }
 		}
+		return patientUserList;
+	}
+	
+	public List<PatientUserVO> getNotAssociatedPatientUsers(String ClinicId, String searchString) throws HillromException {
+		List<PatientUserVO> patientUserList = userSearchRepository.findPatientNotAssociatedToClinic(ClinicId,searchString);
 		return patientUserList;
 	}
 	

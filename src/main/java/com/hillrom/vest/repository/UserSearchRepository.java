@@ -753,6 +753,52 @@ public class UserSearchRepository {
 		return jpaQuery;
 	}
 	
+	//Patient Search which are not associated with the clinic
+	
+		public List<PatientUserVO> findPatientNotAssociatedToClinic(String clinicId, String searchString) {
+
+			String findPatientUserQuery = "select * from ( select user.id as patient_id,user.email as pemail,user.first_name as pfirstName,"
+					+ "user.last_name as plastName, user.is_deleted as isDeleted,user.zipcode as pzipcode,"
+					+ "patInfo.address paddress,patInfo.city as pcity,user.dob as pdob,user.gender as pgender,"
+					+ "user.title as ptitle,user.hillrom_id as phillrom_id,user.created_date as createdAt,"
+					+ "user.activated as isActivated, patInfo.state as state,pc.compliance_score as pcompliance_score, "
+					+ "pc.last_therapy_session_date as last_date , user_clinic.mrn_id as mrnid,"
+					+ "clinic.id as pclinicid, GROUP_CONCAT(clinic.name) as clinicName from USER user "
+					+"join USER_AUTHORITY user_authority on user_authority.user_id = user.id  and user_authority.authority_name = 'PATIENT' and "
+					+ "(lower(user.first_name) like lower(:searchString) or  lower(user.last_name) like lower(:searchString) or   "
+					+ "lower(CONCAT(user.first_name,' ',user.last_name)) like lower(:searchString) or "
+					+ "lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:searchString)  )"  
+					+"join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = 'Self' "
+					+"join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
+					+"left outer join CLINIC_PATIENT_ASSOC user_clinic on "
+					+"user_clinic.patient_id = patInfo.id "
+					+"left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate()  "
+					+"left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and user_clinic.patient_id = patInfo.id "
+					+" where clinic.id <> ':clinicId' or clinic.id IS NULL "
+					+"group by user.id ) as tble where patient_id not in ( select user.id as patient_id  from USER user "
+					+"join USER_PATIENT_ASSOC  upa on user.id = upa.user_id  and upa.relation_label = 'Self' "
+					+"join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
+					+"join CLINIC_PATIENT_ASSOC user_clinic on user_clinic.patient_id = patInfo.id "
+					+"left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and user_clinic.patient_id = patInfo.id "
+					+"where clinic.id = ':clinicId')";
+
+			if(StringUtils.isEmpty(searchString))
+				findPatientUserQuery = findPatientUserQuery.replaceAll(":searchString","");
+			else
+				findPatientUserQuery = findPatientUserQuery.replaceAll(":searchString", searchString);
+			
+			findPatientUserQuery = findPatientUserQuery.replaceAll(":clinicId", clinicId);
+
+			Query patientQuery = entityManager.createNativeQuery(findPatientUserQuery);
+
+			
+			List<Object[]> results = patientQuery.getResultList();
+
+			List<PatientUserVO> patientUsers =  extractPatientSearchResultsToVO(results);
+			return patientUsers;
+		}
+
+	
 	
 	private Map<String,String> getSearchParams(String filterString){
 		

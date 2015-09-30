@@ -246,9 +246,10 @@ public class PatientHCPService {
 		if(patientUsers.isEmpty()) {
 			throw new HillromException(MessageConstants.HR_279);
 		} else {
-			int patientsWithNoEventRecorded = 0;
+			
 			List<Long> patientUserIds = filterActivePatientIds(patientUsers);
-			patientsWithNoEventRecorded = getPatientsListWithNoEventRecorded(patientUserIds).size();
+			Map<LocalDate,Integer> datePatientNoEventCountMap = getPatientsWithNoEvents(date,date,patientUserIds);
+			int patientsWithNoEventRecorded = Objects.nonNull(datePatientNoEventCountMap.get(date))? datePatientNoEventCountMap.get(date):0;
 			statistics.put("patientsWithHmrNonCompliance", patientComplianceRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, patientUserIds).size());
 			statistics.put("patientsWithSettingDeviation", patientComplianceRepository.findByDateAndIsSettingsDeviatedAndPatientUserIdIn(date, true, patientUserIds).size());
 			statistics.put("patientsWithMissedTherapy", patientComplianceRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date, patientUserIds).size());
@@ -272,9 +273,19 @@ public class PatientHCPService {
 	}
 
 	private List<Long> getPatientsListWithNoEventRecorded(List<Long> patientUserIds) {
-		Map<Long,List<TherapySession>> therapySessions = therapySessionService.getTherapySessionsGroupByPatientUserId(patientUserIds);
-		List<Long> patientIdsWithEvent = new LinkedList(therapySessions.keySet());
-		return RandomUtil.getDifference(patientUserIds, patientIdsWithEvent);
+		List<PatientNoEvent> allPatients = noEventsRepository
+				.findByUserCreatedDateBeforeAndPatientUserIdIn(LocalDate.now()
+						.plusDays(1), patientUserIds);
+		List<PatientNoEvent> patientsWithNoEvent = allPatients
+				.stream()
+				.filter(patient -> Objects.isNull(patient
+						.getFirstTransmissionDate()))
+				.collect(Collectors.toList());
+		List<Long> patientWithNoEventIds = new LinkedList<>();
+		for (PatientNoEvent noEventPatient : patientsWithNoEvent) {
+			patientWithNoEventIds.add(noEventPatient.getPatientUser().getId());
+		}
+		return patientWithNoEventIds;
 	}
 	
 	public List<PatientComplianceVO> getPatientListFilterByMetricForClinicAssociated(Long userId, String clinicId, LocalDate date, String filterBy) throws HillromException{

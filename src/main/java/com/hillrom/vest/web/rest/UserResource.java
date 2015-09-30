@@ -860,4 +860,38 @@ public class UserResource {
     		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
         }
 	}
+    
+    @RequestMapping(value = "/user/clinicadmin/{id}/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
+	public ResponseEntity<?> searchPatientAssociatedToClinicAdmin(@PathVariable Long id,
+			@RequestParam(required = true, value = "searchString") String searchString,
+			@RequestParam(required = false, value = "clinicId") String clinicId,
+			@RequestParam(required = false, value = "filter") String filter,
+			@RequestParam(value = "page", required = false) Integer offset,
+			@RequestParam(value = "per_page", required = false) Integer limit,
+			@RequestParam(value = "sort_by", required = false) String sortBy,
+			@RequestParam(value = "asc", required = false) Boolean isAscending)
+			throws URISyntaxException {
+		if(searchString.endsWith("_")){
+ 		   searchString = searchString.replace("_", "\\\\_");
+		}
+		String queryString = new StringBuilder("'%").append(searchString)
+				.append("%'").toString();
+		Map<String, Boolean> sortOrder = new HashMap<>();
+		if (StringUtils.isNotBlank(sortBy)) {
+			isAscending = (isAscending != null) ? isAscending : true;
+			if(sortBy.equalsIgnoreCase("email"))
+				sortOrder.put("user." + sortBy, isAscending);
+			else	
+				sortOrder.put(sortBy, isAscending);
+		}
+		Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientToClinicAdminBy(
+				queryString, id, clinicId, filter, PaginationUtil.generatePageRequest(offset, limit),
+				sortOrder);
+		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
+				page, "/user/clinicadmin/"+id+"/patient/search", offset, limit);
+		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+
+	}
+
 }

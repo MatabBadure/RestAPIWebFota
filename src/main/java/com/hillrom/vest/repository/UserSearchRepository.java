@@ -764,7 +764,7 @@ public class UserSearchRepository {
 					+"group by user.id";
 
 			if(StringUtils.isEmpty(searchString))
-				findPatientUserQuery = findPatientUserQuery.replaceAll(":searchString"," ");
+				findPatientUserQuery = findPatientUserQuery.replaceAll(":searchString","");
 			else
 				findPatientUserQuery = findPatientUserQuery.replaceAll(":searchString", searchString);
 			

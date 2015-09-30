@@ -243,7 +243,7 @@ public class UserSearchRepository {
 	public Page<PatientUserVO> findPatientBy(String queryString, String filter,
 			Pageable pageable, Map<String, Boolean> sortOrder) {
 		
-		String query1 ="select patient_id as id,pemail,pfirstName,plastName, isDeleted,pzipcode,paddress,pcity,pdob,pgender,ptitle,phillrom_id,createdAt,isActivated, state , adherence,last_date,mrnid,hName,clinicName,isHMRNonCompliant,isSettingsDeviated,isMissedTherapy  from ((select user.id as patient_id,user.email as pemail,user.first_name as pfirstName,user.last_name as plastName, user.is_deleted as isDeleted, user.zipcode as pzipcode,patInfo.address paddress,patInfo.city as pcity,user.dob as pdob,user.gender as pgender,user.title as ptitle,  user.hillrom_id as phillrom_id,user.created_date as createdAt,user.activated as isActivated, patInfo.state as state ,  user_clinic.mrn_id as mrnid, clinic.id as pclinicid, GROUP_CONCAT(clinic.name) as clinicName,pc.compliance_score as adherence,  pc.last_therapy_session_date as last_date,pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,"
+		String query1 ="select patient_id as id,pemail,pfirstName,plastName, isDeleted,pzipcode,paddress,pcity,pdob,pgender,ptitle,phillrom_id,createdAt,isActivated, state , adherence,last_date,mrnid,hName,clinicName,isHMRNonCompliant,isSettingsDeviated,isMissedTherapy  from (select user.id as patient_id,user.email as pemail,user.first_name as pfirstName,user.last_name as plastName, user.is_deleted as isDeleted, user.zipcode as pzipcode,patInfo.address paddress,patInfo.city as pcity,user.dob as pdob,user.gender as pgender,user.title as ptitle,  user.hillrom_id as phillrom_id,user.created_date as createdAt,user.activated as isActivated, patInfo.state as state ,  user_clinic.mrn_id as mrnid, clinic.id as pclinicid, GROUP_CONCAT(clinic.name) as clinicName,pc.compliance_score as adherence,  pc.last_therapy_session_date as last_date,pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,"
 				+ " pc.missed_therapy_count as isMissedTherapy from USER user join USER_PATIENT_ASSOC  upa on user.id = upa.user_id "
 				+ " and upa.relation_label = '"+SELF+"' join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 				+ " left outer join CLINIC_PATIENT_ASSOC user_clinic on user_clinic.patient_id = patInfo.id "
@@ -251,28 +251,33 @@ public class UserSearchRepository {
 				+ " and (lower(user.first_name) like lower(:queryString) or  lower(user.last_name) like lower(:queryString) or "
 				+ " lower(user.email) like lower(:queryString) or "
 				+ " lower(CONCAT(user.first_name,' ',user.last_name)) like lower(:queryString) or "
-				+ " lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) or "
-				+ " lower(user.hillrom_id) like lower(:queryString) or"
-				+ " ((lower(IFNULL(patInfo.city,'')) like lower(:queryString)) or "
-				+ " (lower(IFNULL(patInfo.state,'')) like lower(:queryString))) )";
+				+ " lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) or ";
+		
+		String hrIdSearch = " lower(user.hillrom_id) like lower(:queryString) or ";
+		
+		String query2 =	 " ((lower(IFNULL(patInfo.city,'')) like lower(:queryString)) or "
+						+" (lower(IFNULL(patInfo.state,'')) like lower(:queryString))) )";
 
 		// This is applicable only when search is performed by HCP or CLINIC_ADMIN
 		String mrnIdSearch = " or (lower(IFNULL(user_clinic.mrn_id,0)) like lower(:queryString) ) ) ";
 		
-		String query2 = " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate() "
+		String query3 = " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate() "
 				+ " left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and  user_clinic.patient_id = patInfo.id "
-				+ " group by user.id) as associated_patient, (select  GROUP_CONCAT(huser.last_name ,' ',huser.first_name ) as hName, "
+				+ " group by user.id) as associated_patient left outer join (select  GROUP_CONCAT(huser.last_name ,' ',huser.first_name ) as hName, "
 				+ " clinic.id as hclinicid from USER huser join USER_AUTHORITY user_authorityh on user_authorityh.user_id = huser.id "
 				+ " and user_authorityh.authority_name = '"+HCP+"' "
 				+ " left outer join CLINIC_USER_ASSOC user_clinic on user_clinic.users_id = huser.id "
 				+ " left outer join CLINIC clinic on user_clinic.clinics_id = clinic.id and user_clinic.users_id = huser.id "
 				+ " left outer join PATIENT_COMPLIANCE pc on huser.id = pc.user_id AND pc.date=curdate() "
-				+ " group by clinic.id) as associated_hcp) where associated_patient.pclinicid = associated_hcp.hclinicid ";
+				+ " group by clinic.id) as associated_hcp  on associated_patient.pclinicid = associated_hcp.hclinicid ";
 		
 		String findPatientUserQuery = query1;
+		// HCP , CLINIC_ADMIN can search on MRNID not HRID
 		if(SecurityUtils.isUserInRole(HCP) || SecurityUtils.isUserInRole(CLINIC_ADMIN))
-			findPatientUserQuery = findPatientUserQuery.substring(0, findPatientUserQuery.lastIndexOf(")")).concat(mrnIdSearch);
-		findPatientUserQuery += query2;
+			findPatientUserQuery = findPatientUserQuery.concat(query2).substring(0, findPatientUserQuery.lastIndexOf(")")).concat(mrnIdSearch);
+		else // Admin can search on HRID not MRNID
+			findPatientUserQuery += hrIdSearch + query2;
+		findPatientUserQuery += query3;
 		
 		findPatientUserQuery = applyFiltersToQuery(filter,
 				findPatientUserQuery);
@@ -377,9 +382,9 @@ public class UserSearchRepository {
 				
 				
 				if("1".equals(filterMap.get("isHMRNonCompliant")))
-					filterQuery.append(" and isHMRNonCompliant = 1 ");
-				else if("0".equals(filterMap.get("isHMRNonCompliant")))
 					filterQuery.append(" and isHMRNonCompliant = 0 ");
+				else if("0".equals(filterMap.get("isHMRNonCompliant")))
+					filterQuery.append(" and isHMRNonCompliant = 1 ");
 			}
 			
 			if(Objects.nonNull(filterMap.get("isSettingsDeviated"))){
@@ -402,7 +407,7 @@ public class UserSearchRepository {
 			if(Objects.nonNull(filterMap.get("isNoEvent")) && "1".equals(filterMap.get("isNoEvent"))){
 				
 				filterQuery.append("and exists (SELECT PATIENT_NO_EVENT.id FROM PATIENT_NO_EVENT "
-						+ "WHERE PATIENT_NO_EVENT.id = search_table.id AND "
+						+ "WHERE PATIENT_NO_EVENT.user_id = search_table.id AND "
 						+ "PATIENT_NO_EVENT.first_transmission_date is null LIMIT 1)");
 			}
 			query = filterQuery.toString();

@@ -217,7 +217,8 @@ public class ClinicResource {
     		 sortOrder.put(sortBy, isAscending);
     	 }
     	 
-    	 String isDeleted= getIsDeleteParam(filter);
+    	 Map<String,String> paramsMap = getSearchParams(filter);
+    	 String isDeleted = paramsMap.get("isDeleted");
     	 
     	 List<Boolean> isDel = new ArrayList<Boolean>();
     	 if("All".equalsIgnoreCase(isDeleted) || StringUtils.isEmpty(isDeleted)){
@@ -419,19 +420,22 @@ public class ClinicResource {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
-
-
-	private String getIsDeleteParam(String filter){
-		if(StringUtils.isEmpty(filter))
-			return "";
-		String isDelete;
-		String[] filters = filter.split(":");
-		if(filters.length>1)
-			isDelete = filters[1];
-		else
-			isDelete="";
+	
+	private Map<String,String> getSearchParams(String filterString){
 		
-		return isDelete;
+		Map<String,String> filterMap = new HashMap<>();
+		if(StringUtils.isEmpty(filterString))
+			return filterMap;
+		
+		String[] filters = filterString.split(";");
+		for(String filter : filters){
+			
+			String[] pair = filter.split(":");
+			if(pair.length>1)
+			if(!StringUtils.isEmpty(pair[1]))
+				filterMap.put(pair[0],pair[1]);
+		}
+		return filterMap;
 	}
 
 }

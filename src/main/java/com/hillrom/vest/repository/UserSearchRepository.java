@@ -740,6 +740,9 @@ public class UserSearchRepository {
 		
 		Map<String,String> filterMap = new HashMap<>();
 		
+		if(StringUtils.isEmpty(filterString))
+		return filterMap;
+		
 		String[] filters = filterString.split(";");
 		for(String filter : filters){
 			

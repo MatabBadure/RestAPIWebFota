@@ -279,10 +279,15 @@ public class AdherenceCalculationService {
 			List<PatientCompliance> newComplianceList = new LinkedList<>();
 			List<Long> patientUserIds = new LinkedList<>();
 			DateTime today = DateTime.now();
-			patientComplianceList.forEach(compliance -> {			
-				patientUserIds.add(compliance.getPatientUser().getId());
-				PatientCompliance newCompliance = new PatientCompliance(today.toLocalDate(),compliance.getPatient(),compliance.getPatientUser(),
-						compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1,compliance.getDate(),compliance.getHmr());
+			for(PatientCompliance compliance : patientComplianceList){
+				PatientCompliance newCompliance = new PatientCompliance(
+						today.toLocalDate(),
+						compliance.getPatient(),
+						compliance.getPatientUser(),
+						compliance.getHmrRunRate(),
+						compliance.getMissedTherapyCount()+1,
+						compliance.getLatestTherapyDate(),
+						Objects.nonNull(compliance.getHmr())?compliance.getHmr():0.0d);
 				int score = Objects.isNull(compliance.getScore()) ? 0 : compliance.getScore(); 
 				if(score > 0)
 					newCompliance.setScore(score- MISSED_THERAPY_POINTS);
@@ -292,7 +297,7 @@ public class AdherenceCalculationService {
 							today.toLocalDate(), MISSED_THERAPY,false);
 				}
 				newComplianceList.add(newCompliance);
-			});
+			}
 			Map<Long,Integer> hmrRunRateMap = calculateHMRRunRateForPatientUsers(patientUserIds,getPlusOrMinusTodayLocalDate(-3),getPlusOrMinusTodayLocalDate(-1));
 			newComplianceList.parallelStream().forEach(patientCompliance -> {
 				Integer hmrRunRate = hmrRunRateMap.get(patientCompliance.getPatientUser().getId());

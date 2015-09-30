@@ -62,19 +62,7 @@ public class UserSearchRepository {
 			Map<String,String> filterMap = getSearchParams(filter);
 			
 			filterQuery.append("select * from (");
-			
-			if(Objects.nonNull(filterMap.get("isDeleted"))){
-			filterQuery.append(findHillromTeamUserQuery);
-				
-				if("1".equals(filterMap.get("isDeleted")))
-					filterQuery.append(") as search_table where isDeleted in (1)");
-				else if("0".equals(filterMap.get("isDeleted")))
-					filterQuery.append(")  as search_table where isDeleted in (0)");
-			}
-			else{
-				filterQuery.append(findHillromTeamUserQuery);
-				filterQuery.append(") as search_table where isDeleted in (0,1)");
-			}
+			applyIsDeletedFilter(findHillromTeamUserQuery, filterQuery, filterMap);
 			findHillromTeamUserQuery = filterQuery.toString();
 		}
 		findHillromTeamUserQuery = findHillromTeamUserQuery.replaceAll(
@@ -147,18 +135,7 @@ public class UserSearchRepository {
 			
 			filterQuery.append("select * from (");
 			
-			if(Objects.nonNull(filterMap.get("isDeleted"))){
-			filterQuery.append(findHcpQuery);
-				
-				if("1".equals(filterMap.get("isDeleted")))
-					filterQuery.append(") as search_table where isDeleted in (1)");
-				else if("0".equals(filterMap.get("isDeleted")))
-					filterQuery.append(")  as search_table where isDeleted in (0)");
-			}
-			else{
-				filterQuery.append(findHcpQuery);
-				filterQuery.append(") as search_table where isDeleted in (0,1)");
-			}
+			applyIsDeletedFilter(findHcpQuery, filterQuery, filterMap);
 			
 			findHcpQuery = filterQuery.toString();
 		}
@@ -364,56 +341,13 @@ public class UserSearchRepository {
 			
 			filterQuery.append("select * from (");
 
-			if(Objects.nonNull(filterMap.get("isDeleted"))){
-				filterQuery.append(query);
-				if("1".equals(filterMap.get("isDeleted")))
-					filterQuery.append(") as search_table where isDeleted in (1)");
-				else if("0".equals(filterMap.get("isDeleted")))
-					filterQuery.append(")  as search_table where isDeleted in (0)");
-				else
-					filterQuery.append(") as search_table where isDeleted in (0,1)");
-			}
-			else{
-				filterQuery.append(query);
-				filterQuery.append(") as search_table where isDeleted in (0,1)");
-			}
-			
-			if(Objects.nonNull(filterMap.get("isHMRNonCompliant"))){
-				
-				
-				if("1".equals(filterMap.get("isHMRNonCompliant")))
-					filterQuery.append(" and isHMRNonCompliant = 0 ");
-				else if("0".equals(filterMap.get("isHMRNonCompliant")))
-					filterQuery.append(" and isHMRNonCompliant = 1 ");
-			}
-			
-			if(Objects.nonNull(filterMap.get("isSettingsDeviated"))){
-				
-				
-				if("1".equals(filterMap.get("isSettingsDeviated")))
-					filterQuery.append(" and isSettingsDeviated = 1 ");
-				else if("0".equals(filterMap.get("isSettingsDeviated")))
-					filterQuery.append(" and isSettingsDeviated = 0 ");
-			}
-			
-			if(Objects.nonNull(filterMap.get("isMissedTherapy"))){
-				
-				if("1".equals(filterMap.get("isMissedTherapy")))
-					filterQuery.append(" and (isMissedTherapy > 0 && isMissedTherapy %3 = 0) ");
-				else if("0".equals(filterMap.get("isMissedTherapy")))
-					filterQuery.append(" and (isMissedTherapy %3 <> 0)");
-			}
-			
-			if(Objects.nonNull(filterMap.get("isNoEvent")) && "1".equals(filterMap.get("isNoEvent"))){
-				
-				filterQuery.append("and exists (SELECT PATIENT_NO_EVENT.id FROM PATIENT_NO_EVENT "
-						+ "WHERE PATIENT_NO_EVENT.user_id = search_table.id AND "
-						+ "PATIENT_NO_EVENT.first_transmission_date is null LIMIT 1)");
-			}
+			applyQueryFilters(query, filterQuery, filterMap);
 			query = filterQuery.toString();
 		}
 		return query;
 	}
+
+
 	
 	public Page<PatientUserVO> findAssociatedPatientToHCPBy(String queryString, Long hcpUserID, String clinicId, String filter,
 			Pageable pageable, Map<String, Boolean> sortOrder) {
@@ -445,53 +379,8 @@ public class UserSearchRepository {
 			
 			filterQuery.append("select * from (");
 			
-			if(Objects.nonNull(filterMap.get("isDeleted"))){
-				filterQuery.append(findPatientUserQuery);
-				
-				if("1".equals(filterMap.get("isDeleted")))
-					filterQuery.append(") as search_table where isDeleted in (1)");
-				else if("0".equals(filterMap.get("isDeleted")))
-					filterQuery.append(")  as search_table where isDeleted in (0)");
-				else
-					filterQuery.append(") as search_table where isDeleted in (0,1)");
-			}
-			else{
-				filterQuery.append(findPatientUserQuery);
-				filterQuery.append(") as search_table where isDeleted in (0,1)");
-			}
-			
-			if(Objects.nonNull(filterMap.get("isHMRNonCompliant"))){
-				
-				
-				if("1".equals(filterMap.get("isHMRNonCompliant")))
-					filterQuery.append(" and isHMRNonCompliant = 1 ");
-				else if("0".equals(filterMap.get("isHMRNonCompliant")))
-					filterQuery.append(" and isHMRNonCompliant = 0 ");
-			}
-			
-			if(Objects.nonNull(filterMap.get("isSettingsDeviated"))){
-				
-				
-				if("1".equals(filterMap.get("isSettingsDeviated")))
-					filterQuery.append(" and isSettingsDeviated = 1 ");
-				else if("0".equals(filterMap.get("isSettingsDeviated")))
-					filterQuery.append(" and isSettingsDeviated = 0 ");
-			}
-			
-			if(Objects.nonNull(filterMap.get("isMissedTherapy"))){
-				
-				if("1".equals(filterMap.get("isMissedTherapy")))
-					filterQuery.append(" and (isMissedTherapy > 0 && isMissedTherapy %3 = 0) ");
-				else if("0".equals(filterMap.get("isMissedTherapy")))
-					filterQuery.append(" and (isMissedTherapy %3 <> 0)");
-			}
-			
-			if(Objects.nonNull(filterMap.get("isNoEvent")) && "1".equals(filterMap.get("isNoEvent"))){
-				
-				filterQuery.append("and exists (SELECT PATIENT_NO_EVENT.id FROM PATIENT_NO_EVENT "
-						+ "WHERE PATIENT_NO_EVENT.id = search_table.id AND "
-						+ "PATIENT_NO_EVENT.first_transmission_date is null LIMIT 1)");
-			}
+			applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
+
 			findPatientUserQuery = filterQuery.toString();
 		}
 
@@ -511,8 +400,6 @@ public class UserSearchRepository {
 		String countSqlQuery = "select count(patientUsers.id) from ("
 				+ findPatientUserQuery + " ) patientUsers";
 		
-		System.out.println(findPatientUserQuery);
-
 		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
 		BigInteger count = (BigInteger) countQuery.getSingleResult();
 
@@ -599,53 +486,8 @@ public class UserSearchRepository {
 			filterQuery.append("select * from (");
 			
 			
-			if(Objects.nonNull(filterMap.get("isDeleted"))){
-				filterQuery.append(findPatientUserQuery);
-				
-				if("1".equals(filterMap.get("isDeleted")))
-					filterQuery.append(") as search_table where isDeleted in (1)");
-				else if("0".equals(filterMap.get("isDeleted")))
-					filterQuery.append(")  as search_table where isDeleted in (0)");
-				else
-					filterQuery.append(") as search_table where isDeleted in (0,1)");
-			}
-			else{
-				filterQuery.append(findPatientUserQuery);
-				filterQuery.append(") as search_table where isDeleted in (0,1)");
-			}
+			applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
 			
-			if(Objects.nonNull(filterMap.get("isHMRNonCompliant"))){
-				
-				
-				if("1".equals(filterMap.get("isHMRNonCompliant")))
-					filterQuery.append(" and isHMRNonCompliant = 1 ");
-				else if("0".equals(filterMap.get("isHMRNonCompliant")))
-					filterQuery.append(" and isHMRNonCompliant = 0 ");
-			}
-			
-			if(Objects.nonNull(filterMap.get("isSettingsDeviated"))){
-				
-				
-				if("1".equals(filterMap.get("isSettingsDeviated")))
-					filterQuery.append(" and isSettingsDeviated = 1 ");
-				else if("0".equals(filterMap.get("isSettingsDeviated")))
-					filterQuery.append(" and isSettingsDeviated = 0 ");
-			}
-			
-			if(Objects.nonNull(filterMap.get("isMissedTherapy"))){
-				
-				if("1".equals(filterMap.get("isMissedTherapy")))
-					filterQuery.append(" and (isMissedTherapy > 0 && isMissedTherapy %3 = 0) ");
-				else if("0".equals(filterMap.get("isMissedTherapy")))
-					filterQuery.append(" and (isMissedTherapy %3 <> 0)");
-			}
-			
-			if(Objects.nonNull(filterMap.get("isNoEvent")) && "1".equals(filterMap.get("isNoEvent"))){
-				
-				filterQuery.append(" and exists (SELECT PATIENT_NO_EVENT.id FROM PATIENT_NO_EVENT "
-						+ "WHERE PATIENT_NO_EVENT.id = search_table.id AND "
-						+ "PATIENT_NO_EVENT.first_transmission_date is null LIMIT 1)");
-			}
 			findPatientUserQuery = filterQuery.toString();
 		}
 
@@ -708,6 +550,77 @@ public class UserSearchRepository {
 		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());
 
 		return page;
+	}
+	
+	private void applyQueryFilters(String query, StringBuilder filterQuery, Map<String, String> filterMap) {
+		applyIsDeletedFilter(query, filterQuery, filterMap);
+		
+		applyIsHMRNonCompliantFilter(filterQuery, filterMap);
+		
+		applyIsSettingsDeviatedFilter(filterQuery, filterMap);
+		
+		applyIsMissedTherapyFilter(filterQuery, filterMap);
+		
+		applyIsNoEventFilter(filterQuery, filterMap);
+	}
+
+	private void applyIsNoEventFilter(StringBuilder filterQuery, Map<String, String> filterMap) {
+		if(Objects.nonNull(filterMap.get("isNoEvent")) && "1".equals(filterMap.get("isNoEvent"))){
+			
+			filterQuery.append("and exists (SELECT PATIENT_NO_EVENT.id FROM PATIENT_NO_EVENT "
+					+ "WHERE PATIENT_NO_EVENT.user_id = search_table.id AND "
+					+ "PATIENT_NO_EVENT.first_transmission_date is null LIMIT 1)");
+		}
+	}
+
+	private void applyIsMissedTherapyFilter(StringBuilder filterQuery, Map<String, String> filterMap) {
+		if(Objects.nonNull(filterMap.get("isMissedTherapy"))){
+			
+			if("1".equals(filterMap.get("isMissedTherapy")))
+				filterQuery.append(" and (isMissedTherapy > 0 && isMissedTherapy %3 = 0) ");
+			else if("0".equals(filterMap.get("isMissedTherapy")))
+				filterQuery.append(" and (isMissedTherapy %3 <> 0)");
+		}
+	}
+
+	private void applyIsSettingsDeviatedFilter(StringBuilder filterQuery, Map<String, String> filterMap) {
+		if(Objects.nonNull(filterMap.get("isSettingsDeviated"))){
+			
+			
+			if("1".equals(filterMap.get("isSettingsDeviated")))
+				filterQuery.append(" and isSettingsDeviated = 1 ");
+			else if("0".equals(filterMap.get("isSettingsDeviated")))
+				filterQuery.append(" and isSettingsDeviated = 0 ");
+		}
+	}
+
+	private void applyIsHMRNonCompliantFilter(StringBuilder filterQuery, Map<String, String> filterMap) {
+		if(Objects.nonNull(filterMap.get("isHMRNonCompliant"))){
+			
+			
+			if("1".equals(filterMap.get("isHMRNonCompliant")))
+				filterQuery.append(" and isHMRNonCompliant = 0 ");
+			else if("0".equals(filterMap.get("isHMRNonCompliant")))
+				filterQuery.append(" and isHMRNonCompliant = 1 ");
+		}
+	}
+
+	private void applyIsDeletedFilter(String query, StringBuilder filterQuery,
+			Map<String, String> filterMap) {
+		if(Objects.nonNull(filterMap.get("isDeleted"))){
+			filterQuery.append(query);
+			
+			if("1".equals(filterMap.get("isDeleted")))
+				filterQuery.append(") as search_table where isDeleted in (1)");
+			else if("0".equals(filterMap.get("isDeleted")))
+				filterQuery.append(")  as search_table where isDeleted in (0)");
+			else
+				filterQuery.append(") as search_table where isDeleted in (0,1)");
+		}
+		else{
+			filterQuery.append(query);
+			filterQuery.append(") as search_table where isDeleted in (0,1)");
+		}
 	}
 
 	private Query getOrderedByQuery(String queryString,

@@ -310,10 +310,10 @@ public class ClinicResource {
         try {
             List<PatientUserVO> patientUserList = clinicService.getNotAssociatedPatientUsers(clinicId, queryString);
 	        if(patientUserList.isEmpty()){
-				jsonObject.put("message", MessageConstants.HR_279);
+				jsonObject.put("message", MessageConstants.HR_302);
 				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 			} else {
-		      	jsonObject.put("message", MessageConstants.HR_280);
+		      	jsonObject.put("message", MessageConstants.HR_301);
 		      	jsonObject.put("patientUsers", patientUserList);
 		      	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }

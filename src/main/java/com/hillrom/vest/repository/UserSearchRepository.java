@@ -302,9 +302,9 @@ public class UserSearchRepository {
 					String state = (String) record[14];
 					Integer adherence = (Integer) record[15];
 					Date lastTransmissionDate = (Date) record[16];
-					String mrnId = (String) record[17];
+					String clinicNamesCSV = (String) record[17];
 					String hcpNamesCSV = (String) record[18];
-					String clinicNamesCSV = (String) record[19];
+					String mrnId = (String) record[19];
 					
 					java.util.Date localLastTransmissionDate = null;
 					
@@ -426,9 +426,24 @@ public class UserSearchRepository {
 				+ " user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,"
 				+ " user.gender,user.title,user.hillrom_id,user.created_date as createdAt,"
 				+ " user.activated as isActivated, patInfo.state as state, pc.compliance_score adherence,"
-				+ " pc.last_therapy_session_date as last_date, pc.is_hmr_compliant "
-				+ " as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,"
-				+ " pc.missed_therapy_count as isMissedTherapy, ' ' as clinicname, ' ' as hcpname from USER user"
+				+ " pc.last_therapy_session_date as last_date,"
+				+ " (select  GROUP_CONCAT(clinicc.name)"
+				+ " from USER userc "
+				+ " left outer join USER_AUTHORITY user_authorityc on user_authorityc.user_id = userc.id  "
+				+ "and user_authorityc.authority_name = 'PATIENT' "
+				+ " join USER_PATIENT_ASSOC  upac on userc.id = upac.user_id and upac.relation_label = 'Self' "
+				+ " left outer join PATIENT_INFO patInfoc on upac.patient_id = patInfoc.id "
+				+ " left outer join CLINIC_PATIENT_ASSOC user_clinicc on user_clinicc.patient_id = patInfoc.id  "
+				+ " left outer join CLINIC clinicc on user_clinicc.clinic_id = clinicc.id and user_clinicc.patient_id = patInfoc.id "
+				+ " where upac.user_id = user.id "
+				+ " group by patInfoc.id) as clinicname, (select  GROUP_CONCAT(userh.first_name, userh.last_name) "
+				+ " from USER userh "
+				+ " left outer join USER_AUTHORITY user_authorityh on user_authorityh.user_id = userh.id  and user_authorityh.authority_name = 'HCP' " 
+				+ " join USER_PATIENT_ASSOC  upah on userh.id = upah.user_id and upah.relation_label = 'HCP' "
+				+ " left outer join PATIENT_INFO patInfoh on upah.patient_id = patInfoh.id "
+				+ " where patInfo.id = patInfoh.id"
+				+ " group by patInfoh.id) as hcpname, pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy"
+				+ " from USER user"
 				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id"
 				+ " and user_authority.authority_name = '"+PATIENT+"'and (lower(user.first_name) "
 				+ " like lower(:queryString) or lower(user.last_name) like lower(:queryString) "

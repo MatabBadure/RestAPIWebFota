@@ -665,7 +665,9 @@ public class UserSearchRepository {
 	public Page<PatientUserVO> findAssociatedPatientToHCPAndClinicBy(String queryString, Long hcpUserID, String clinicId, String filter,
 			Pageable pageable, Map<String, Boolean> sortOrder) {
 
-		String findPatientUserQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as"
+		String findPatientUserQuery;
+		
+		String query1= "select user.id,user.email,user.first_name as firstName,user.last_name as"
 				+ " lastName, user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,"
 				+ "user.title,user.hillrom_id,user.created_date as createdAt,"
 				+ "user.activated as isActivated, patInfo.state as state, pc.compliance_score adherence, pc.last_therapy_session_date as last_date, "
@@ -680,9 +682,16 @@ public class UserSearchRepository {
 				+ "lower(user.hillrom_id) like lower(:queryString)) "
 				+ "join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"' "
 				+ "join PATIENT_INFO patInfo on upa.patient_id = patInfo.id join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id "
-				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate()"
-				+ ":clinicSearch"
-				+ " where upa_hcp.user_id = :hcpUserID ";
+				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate() ";
+		String query2 = " where upa_hcp.user_id = :hcpUserID ";
+		
+		if(!StringUtils.isEmpty(clinicId)){
+			findPatientUserQuery = query1+
+					" join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id and patient_clinic.clinic_id = '"+clinicId+"' "+
+					query2;
+		}
+		else 
+			findPatientUserQuery=query1+query2;
 		
 		StringBuilder filterQuery = new StringBuilder();
 	
@@ -704,9 +713,9 @@ public class UserSearchRepository {
 				hcpUserID.toString());
 		
 		if(!StringUtils.isEmpty(clinicId)){
-			findPatientUserQuery = findPatientUserQuery.concat(" and pclinicid = '"+clinicId+"'");
+			findPatientUserQuery = findPatientUserQuery.replaceAll(":clinicSearch",
+					" join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id and patient_clinic.clinic_id = '"+clinicId+"'" );
 		}
-		
 		String countSqlQuery = "select count(patientUsers.id) from ("
 				+ findPatientUserQuery + " ) patientUsers";
 		

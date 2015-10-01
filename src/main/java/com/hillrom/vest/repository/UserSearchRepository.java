@@ -488,7 +488,7 @@ public class UserSearchRepository {
 				+ " join USER_PATIENT_ASSOC  upah on userh.id = upah.user_id and upah.relation_label = 'HCP' "
 				+ " left outer join PATIENT_INFO patInfoh on upah.patient_id = patInfoh.id "
 				+ " where patInfo.id = patInfoh.id"
-				+ " group by patInfoh.id) as hcpname, pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy"
+				+ " group by patInfoh.id) as hcpname, patient_clinic.mrn_id as mrnid, pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy"
 				+ " from USER user"
 				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id"
 				+ " and user_authority.authority_name = '"+PATIENT+"'and (lower(user.first_name) "
@@ -500,7 +500,7 @@ public class UserSearchRepository {
 				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id" 
 				+" join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id  "
 				+" left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate()  "
-				+" join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id  ";
+				+" join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id and lower(IFNULL(patient_clinic.mrn_id,0)) like lower('%%') ";
 				
 				String query2 = " where upa_hcp.user_id = :hcpUserID "
 						+ " group by user.id ";
@@ -544,7 +544,54 @@ public class UserSearchRepository {
 		
 		List<Object[]> results = query.getResultList();
 
-		List<PatientUserVO> patientUsers = extractPatientSearchResultsToVO(results);
+		List<PatientUserVO> patientUsers = new LinkedList<>();
+		results.stream().forEach(
+				(record) -> {
+					Long id = ((BigInteger) record[0]).longValue();
+					String email = (String) record[1];
+					String firstName = (String) record[2];
+					String lastName = (String) record[3];
+					Boolean isDeleted = (Boolean) record[4];
+					Integer zipcode = (Integer) record[5];
+					String address = (String) record[6];
+					String city = (String) record[7];
+					Date dob = (Date) record[8];
+					String gender = (String) record[9];
+					String title = (String) record[10];
+					String hillromId = (String) record[11];
+					Timestamp createdAt = (Timestamp) record[12];
+					Boolean isActivated = (Boolean) record[13];
+					DateTime createdAtDatetime = new DateTime(createdAt);
+					String state = (String) record[14];
+					Integer adherence = (Integer) record[15];
+					Date lastTransmissionDate = (Date) record[16];
+					String mrnId = (String) record[17];
+					String hcpNamesCSV = (String) record[18];
+					String clinicNamesCSV = (String) record[19];
+					
+					
+					java.util.Date localLastTransmissionDate = null;
+					
+					if(Objects.nonNull(lastTransmissionDate)){
+						localLastTransmissionDate =lastTransmissionDate;
+						
+					}
+					
+					java.util.Date dobLocalDate = null;
+					if(null !=dob){
+						dobLocalDate = new java.util.Date(dob.getTime());
+					}
+
+					PatientUserVO patientUserVO = new PatientUserVO(id, email, firstName,
+							lastName, isDeleted, zipcode, address, city, dobLocalDate,
+							gender, title, hillromId,createdAtDatetime,isActivated,state,
+							Objects.nonNull(adherence) ? adherence : 0,localLastTransmissionDate);
+					//mrnId,hcpNamesCSV,clinicNamesCSV
+					patientUserVO.setMrnId(mrnId);
+					patientUserVO.setHcpNamesCSV(hcpNamesCSV);
+					patientUserVO.setClinicNamesCSV(clinicNamesCSV);
+					patientUsers.add(patientUserVO);
+				});
 
 		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());
 

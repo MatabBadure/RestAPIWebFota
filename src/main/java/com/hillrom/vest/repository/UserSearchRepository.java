@@ -422,24 +422,24 @@ public class UserSearchRepository {
 	public Page<PatientUserVO> findAssociatedPatientToHCPBy(String queryString, Long hcpUserID, String clinicId, String filter,
 			Pageable pageable, Map<String, Boolean> sortOrder) {
 
-		String findPatientUserQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName, "
-				+ "user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,"
-				+ "user.gender,user.title,user.hillrom_id,user.created_date as createdAt,"
-				+ "user.activated as isActivated, patInfo.state as state, pc.compliance_score adherence,"
+		String findPatientUserQuery = " select user.id,user.email,user.first_name as firstName,user.last_name as lastName, "
+				+ " user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,"
+				+ " user.gender,user.title,user.hillrom_id,user.created_date as createdAt,"
+				+ " user.activated as isActivated, patInfo.state as state, pc.compliance_score adherence,"
 				+ " pc.last_therapy_session_date as last_date, pc.is_hmr_compliant "
 				+ " as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,"
 				+ " pc.missed_therapy_count as isMissedTherapy, ' ' as clinicname, ' ' as hcpname from USER user"
 				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id"
-				+ " and user_authority.authority_name = 'PATIENT'and (lower(user.first_name) "
+				+ " and user_authority.authority_name = '"+PATIENT+"'and (lower(user.first_name) "
 				+ " like lower(:queryString) or lower(user.last_name) like lower(:queryString) "
 				+ " or lower(user.email) like lower(:queryString) or lower(CONCAT(user.first_name,' ',user.last_name)) "
 				+ " like lower(:queryString) or lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) "
 				+ " or lower(user.hillrom_id) like lower(:queryString))"
-				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = 'Self'  "
+				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"'  "
 				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id" 
 				+" join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id  "
-				+ "left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate()  "
-				+ "join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id  ";
+				+" left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate()  "
+				+" join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id  ";
 				
 				String query2 = " where upa_hcp.user_id = :hcpUserID "
 						+ " group by user.id ";

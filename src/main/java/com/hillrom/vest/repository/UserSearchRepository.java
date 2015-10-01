@@ -273,8 +273,54 @@ public class UserSearchRepository {
 		
 		List<Object[]> results = query.getResultList();
 
-		List<PatientUserVO> patientUsers =  extractPatientSearchResultsToVO(results);
+		List<PatientUserVO> patientUsers = new LinkedList<>();
+		
+		results.stream().forEach(
+				(record) -> {
+					Long id = ((BigInteger) record[0]).longValue();
+					String email = (String) record[1];
+					String firstName = (String) record[2];
+					String lastName = (String) record[3];
+					Boolean isDeleted = (Boolean) record[4];
+					Integer zipcode = (Integer) record[5];
+					String address = (String) record[6];
+					String city = (String) record[7];
+					Date dob = (Date) record[8];
+					String gender = (String) record[9];
+					String title = (String) record[10];
+					String hillromId = (String) record[11];
+					Timestamp createdAt = (Timestamp) record[12];
+					Boolean isActivated = (Boolean) record[13];
+					DateTime createdAtDatetime = new DateTime(createdAt);
+					String state = (String) record[14];
+					Integer adherence = (Integer) record[15];
+					Date lastTransmissionDate = (Date) record[16];
+					String mrnId = (String) record[17];
+					String hcpNamesCSV = (String) record[18];
+					String clinicNamesCSV = (String) record[19];
+					
+					java.util.Date localLastTransmissionDate = null;
+					
+					if(Objects.nonNull(lastTransmissionDate)){
+						localLastTransmissionDate =lastTransmissionDate;
+						
+					}
+					
+					java.util.Date dobLocalDate = null;
+					if(null !=dob){
+						dobLocalDate = new java.util.Date(dob.getTime());
+					}
 
+					PatientUserVO patientUserVO = new PatientUserVO(id, email, firstName,
+							lastName, isDeleted, zipcode, address, city, dobLocalDate,
+							gender, title, hillromId,createdAtDatetime,isActivated,state,
+							Objects.nonNull(adherence) ? adherence : 0,localLastTransmissionDate);
+					//mrnId,hcpNamesCSV,clinicNamesCSV
+					patientUserVO.setMrnId(mrnId);
+					patientUserVO.setHcpNamesCSV(hcpNamesCSV);
+					patientUserVO.setClinicNamesCSV(clinicNamesCSV);
+					patientUsers.add(patientUserVO);
+				});
 		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());
 
 		return page;

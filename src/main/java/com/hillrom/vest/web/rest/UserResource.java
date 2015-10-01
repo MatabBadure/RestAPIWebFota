@@ -207,7 +207,7 @@ public class UserResource {
 
 	}
    //For Patients associated with HCP in Admin
-   @RequestMapping(value = "/user/hcp/{id}/patients/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+   @RequestMapping(value = "/user/hcp/{id}/patient/clinicinfo/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	
 	public ResponseEntity<?> searchPatientAssociatedToHcpByClinic(@PathVariable Long id,
 			@RequestParam(required = true, value = "searchString") String searchString,

@@ -52,9 +52,10 @@ public class PatientVestDeviceTherapyUtil {
 			List<PatientVestDeviceData> deviceEventRecords) {
 		Map<String,Integer> metricsMap = new HashMap<>();
 		int frequency = 0, pressure = 0, duration = 0, normalCoughPauses = 0, programmedCoughPauses = 0, caughPauseDuration = 0;
+		int totalDuration = deviceEventRecords.stream().collect(Collectors.summingInt(PatientVestDeviceData::getDuration));
 		for(PatientVestDeviceData deviceEventRecord : deviceEventRecords){
-			frequency += deviceEventRecord.getFrequency();
-			pressure += deviceEventRecord.getPressure();
+			frequency += calculateWeightedAvg( totalDuration,deviceEventRecord.getFrequency().longValue(),deviceEventRecord.getDuration());
+			pressure += calculateWeightedAvg(totalDuration,deviceEventRecord.getPressure().longValue(),deviceEventRecord.getDuration());
 			duration += deviceEventRecord.getDuration();
 			if(deviceEventRecord.getEventId().startsWith(EVENT_CODE_COUGH_PAUSE)){
 				caughPauseDuration += deviceEventRecord.getDuration();

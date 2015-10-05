@@ -67,7 +67,7 @@ public class HillromTeamUserServiceTest {
 		
 		SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 		Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN));
+        authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.SUPER_ADMIN));
         securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(USERNAME, PASSWORD, authorities));
         SecurityContextHolder.setContext(securityContext);
     }

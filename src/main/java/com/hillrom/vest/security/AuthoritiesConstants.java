@@ -8,17 +8,15 @@ public final class AuthoritiesConstants {
     private AuthoritiesConstants() {
     }
 
-    public static final String ADMIN = "ADMIN";
+    public static final String SUPER_ADMIN = "SUPER_ADMIN";
 
     public static final String PATIENT = "PATIENT";
     
     public static final String HCP = "HCP";
     
-    public static final String ACCT_SERVICES = "ACCT_SERVICES";
+    public static final String RC_ADMIN = "RC_ADMIN";
     
     public static final String ASSOCIATES = "ASSOCIATES";
-    
-    public static final String HILLROM_ADMIN = "HILLROM_ADMIN";
     
     public static final String CLINIC_ADMIN = "CLINIC_ADMIN";
     

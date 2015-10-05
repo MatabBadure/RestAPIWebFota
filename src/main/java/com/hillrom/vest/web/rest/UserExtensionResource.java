@@ -952,7 +952,7 @@ public class UserExtensionResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.HCP})
     public ResponseEntity<JSONObject> getAssociatedPatientsForHCPasCaregiver(@PathVariable Long id) {
         log.debug("REST request to get the patients associated with HCP as caregiver : {}", id);
         JSONObject jsonObject = new JSONObject();

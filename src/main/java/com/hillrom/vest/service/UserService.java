@@ -1019,7 +1019,22 @@ public class UserService {
 		if(null == user)
 			return Optional.empty();
 		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
-		return Optional.of(new PatientUserVO(user,patientInfo));
+		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patientInfo.getId());
+		PatientUserVO patientUserVO =  new PatientUserVO(user,patientInfo);
+		String mrnId;
+		java.util.Iterator<ClinicPatientAssoc> cpaIterator = clinicPatientAssocList.iterator();
+		while(cpaIterator.hasNext()){
+			ClinicPatientAssoc clinicPatientAssoc  = cpaIterator.next();
+			if(Objects.nonNull(clinicPatientAssoc)){
+				Map<String,Object> clinicMRNId = new HashMap<>();
+				clinicMRNId.put("clinic", clinicPatientAssoc.getClinic());
+				clinicMRNId.put("mrnId", clinicPatientAssoc.getMrnId());
+				mrnId = clinicPatientAssoc.getMrnId(); 
+				patientUserVO.setMrnId(mrnId);
+				patientUserVO.setClinicMRNId(clinicMRNId);
+			}
+		}
+		return Optional.of(patientUserVO);
 	}
 
 	public User getUser(Long id) throws HillromException{

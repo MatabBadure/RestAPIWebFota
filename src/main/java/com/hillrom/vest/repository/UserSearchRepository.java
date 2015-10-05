@@ -348,9 +348,9 @@ public class UserSearchRepository {
 					String state = (String) record[14];
 					Integer adherence = (Integer) record[15];
 					Date lastTransmissionDate = (Date) record[16];
-					String clinicNamesCSV = (String) record[17];
+					String mrnId = (String) record[17];
 					String hcpNamesCSV = (String) record[18];
-					String mrnId = (String) record[19];
+					String clinicNamesCSV = (String) record[19];
 					
 					java.util.Date localLastTransmissionDate = null;
 					

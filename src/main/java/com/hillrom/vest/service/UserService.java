@@ -661,6 +661,11 @@ public class UserService {
 			patientInfo.setPrimaryPhone(userExtensionDTO.getPrimaryPhone());
 		if(userExtensionDTO.getMobilePhone() != null)
 			patientInfo.setMobilePhone(userExtensionDTO.getMobilePhone());
+		if(userExtensionDTO.isExpired()==true){
+		
+			patientInfo.setExpired(userExtensionDTO.isExpired());
+			patientInfo.setExpiredDate(new DateTime());
+		}
 		patientInfo.setWebLoginCreated(true);
 	}
 

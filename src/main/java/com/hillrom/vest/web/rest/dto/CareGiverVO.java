@@ -9,12 +9,32 @@ public class CareGiverVO implements Serializable{
 	private String userRole;
 	private String relationshipLabel;
 	private User user;
+	private Long userId;
+	private String patientId;
 
-	public CareGiverVO(String userRole, String relationshipLabel, User user) {
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	public String getPatientId() {
+		return patientId;
+	}
+
+	public void setPatientId(String patientId) {
+		this.patientId = patientId;
+	}
+
+	public CareGiverVO(String userRole, String relationshipLabel, User user,Long userId, String patientId) {
 		super();
 		this.userRole = userRole;
 		this.relationshipLabel = relationshipLabel;
 		this.user = user;
+		this.userId = userId;
+		this.patientId = patientId;
 	}
 	
 	public String getUserRole() {

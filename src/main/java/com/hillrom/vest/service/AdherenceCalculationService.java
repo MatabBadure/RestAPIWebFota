@@ -280,6 +280,7 @@ public class AdherenceCalculationService {
 			List<Long> patientUserIds = new LinkedList<>();
 			DateTime today = DateTime.now();
 			for(PatientCompliance compliance : patientComplianceList){
+				patientUserIds.add(compliance.getPatientUser().getId());
 				PatientCompliance newCompliance = new PatientCompliance(
 						today.toLocalDate(),
 						compliance.getPatient(),

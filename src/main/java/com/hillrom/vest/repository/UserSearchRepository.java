@@ -502,18 +502,16 @@ public class UserSearchRepository {
 				+" left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate()  "
 				+" join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id and lower(IFNULL(patient_clinic.mrn_id,0)) like lower('%%') ";
 				
-				String query2 = " where upa_hcp.user_id = :hcpUserID "
-						+ " group by user.id ";
+				String query2 = " where upa_hcp.user_id = :hcpUserID ";
+				String query3 =	" group by user.id ";
 				if(!StringUtils.isEmpty(clinicId)){
-					findPatientUserQuery = findPatientUserQuery+
-							" and patient_clinic.clinic_id  = '"+clinicId+"' "+
-							query2;
+					findPatientUserQuery = findPatientUserQuery + query2 + 
+							" or patient_clinic.clinic_id  = '"+clinicId+"' "+
+							query3;
 				}
 				else 
-					findPatientUserQuery=findPatientUserQuery+query2;
-				
-				//System.out.println(findPatientUserQuery);
-		
+					findPatientUserQuery=findPatientUserQuery+query2+query3;
+
 		StringBuilder filterQuery = new StringBuilder();
 	
 		if(StringUtils.isNotEmpty(filter) && !"all".equalsIgnoreCase(filter)){

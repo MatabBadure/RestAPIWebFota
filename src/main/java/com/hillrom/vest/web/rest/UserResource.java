@@ -896,7 +896,7 @@ public class UserResource {
 	}
     
     @RequestMapping(value = "/user/clinicadmin/{id}/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
 	public ResponseEntity<?> searchPatientAssociatedToClinicAdmin(@PathVariable Long id,
 			@RequestParam(required = true, value = "searchString") String searchString,
 			@RequestParam(required = false, value = "clinicId") String clinicId,

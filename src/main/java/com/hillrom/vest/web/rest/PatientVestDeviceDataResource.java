@@ -40,10 +40,8 @@ public class PatientVestDeviceDataResource {
 	public ResponseEntity<?> receiveData(@RequestBody(required=true)String rawMessage){
 		List<PatientVestDeviceData> deviceData = null;
 		rawMessage = rawMessage.replaceAll("\n", "").replaceAll(" ","");
-		String reqParams[] = new String[]{"device_model_type","device_data",
-        "device_serial_number","device_type","hub_id","air_interface_type",
-        "customer_name","cde_version","exporter_version","timezone","sp_receive_time",
-        "hub_receive_time","device_address","twonet_id","hub_receive_time_offset","cuc_version","customer_id"};
+		String reqParams[] = new String[]{"device_data",
+        "device_serial_number","hub_id","hub_receive_time","device_address"};
 		JSONObject jsonObject = RequestUtil.checkRequiredParamsInQueryString(rawMessage, reqParams);
 		if(jsonObject.containsKey("ERROR")){
 			return new ResponseEntity(jsonObject,HttpStatus.BAD_REQUEST);

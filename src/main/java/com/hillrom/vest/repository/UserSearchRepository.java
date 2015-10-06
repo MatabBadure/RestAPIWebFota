@@ -392,78 +392,6 @@ public class UserSearchRepository {
 		}
 		return query;
 	}
-
-	
-/*	public Page<PatientUserVO> findAssociatedPatientToHCPBy(String queryString, Long hcpUserID, String clinicId, String filter,
-			Pageable pageable, Map<String, Boolean> sortOrder) {
-
-		String findPatientUserQuery = "select patient_id as id,pemail,pfirstName,plastName, isDeleted,pzipcode,paddress,pcity,pdob,pgender,ptitle,phillrom_id,createdAt,isActivated, state  , pcompliance_score,last_date,mrnid,hlastName,clinicName,hcp_id,pclinicid,isSettingsDeviated,isHMRNonCompliant,isMissedTherapy from "
-				+ " (select user.id as patient_id,user.email as pemail,user.first_name as pfirstName,user.last_name as plastName, user.is_deleted as isDeleted,user.zipcode as pzipcode,patInfo.address paddress,patInfo.city as pcity,user.dob as pdob,user.gender as pgender,user.title as ptitle,user.hillrom_id as phillrom_id,user.created_date as createdAt,user.activated as isActivated, patInfo.state as state  , user_clinic.mrn_id as mrnid, clinic.id as pclinicid, clinic.name as clinicName,pc.compliance_score as pcompliance_score, pc.last_therapy_session_date as last_date, "
-				+ " pc.is_settings_deviated as isSettingsDeviated ,pc.is_hmr_compliant as isHMRNonCompliant,pc.missed_therapy_count as isMissedTherapy "
-				+ " from USER user left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id  and user_authority.authority_name = '"+PATIENT+"' "
-				+ " and (lower(user.first_name) like lower(:queryString) or "
-				+ " lower(user.last_name) like lower(:queryString) or   "
-				+ " lower(user.email) like lower(:queryString) or  "
-				+ " lower(CONCAT(user.first_name,' ',user.last_name)) like lower(:queryString) or "
-				+ " lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) or "
-				+ " lower(user.hillrom_id) like lower(:queryString) )  join USER_PATIENT_ASSOC  upa on user.id = upa.user_id "
-				+ " and upa.relation_label = '"+SELF+"' join PATIENT_INFO patInfo on upa.patient_id = patInfo.id  and "
-				+ " ((lower(IFNULL(patInfo.city,'')) like lower(:queryString)) or (lower(IFNULL(patInfo.state,'')) like lower(:queryString))) "
-				+ " left outer join CLINIC_PATIENT_ASSOC user_clinic on user_clinic.patient_id = patInfo.id and "
-				+ " lower(IFNULL(user_clinic.mrn_id,0)) like lower(:queryString) "
-				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate() "
-				+ " left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and user_clinic.patient_id = patInfo.id "
-				+ " ) as associated_patient "
-				+ " left outer join (select  huser.id as hcp_id, concat( huser.last_name,' ',huser.first_name ) as hlastName "
-				+ " , clinic.id as hclinicid from USER huser "
-				+ " join USER_AUTHORITY user_authorityh on user_authorityh.user_id = huser.id and user_authorityh.authority_name = '"+HCP+"' "
-				+ " left outer join CLINIC_USER_ASSOC user_clinic on user_clinic.users_id = huser.id "
-				+ " left outer join CLINIC clinic on user_clinic.clinics_id = clinic.id and user_clinic.users_id = huser.id "
-				+ " left outer join PATIENT_COMPLIANCE pc on huser.id = pc.user_id AND pc.date=curdate()"
-				+ " ) as associated_hcp on associated_patient.pclinicid = associated_hcp.hclinicid "
-				+ " where lower(IFNULL(hcp_id,0))= :hcpUserID ";
-		
-		StringBuilder filterQuery = new StringBuilder();
-	
-		if(StringUtils.isNotEmpty(filter) && !"all".equalsIgnoreCase(filter)){
-
-			Map<String,String> filterMap = getSearchParams(filter);
-			
-			filterQuery.append("select * from (");
-			
-			applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
-
-			findPatientUserQuery = filterQuery.toString();
-		}
-
-		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString",
-				queryString);
-		
-		findPatientUserQuery = findPatientUserQuery.replaceAll(":hcpUserID",
-				hcpUserID.toString());
-		
-		if(!StringUtils.isEmpty(clinicId)){
-			findPatientUserQuery = findPatientUserQuery.concat(" and pclinicid = '"+clinicId+"'");
-		}
-		
-		String countSqlQuery = "select count(patientUsers.id) from ("
-				+ findPatientUserQuery + " ) patientUsers";
-		
-		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
-		BigInteger count = (BigInteger) countQuery.getSingleResult();
-
-		Query query = getOrderedByQuery(findPatientUserQuery, sortOrder);
-		setPaginationParams(pageable, query);
-		
-		List<Object[]> results = query.getResultList();
-
-		List<PatientUserVO> patientUsers = extractPatientSearchResultsToVO(results);
-
-		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());
-
-		return page;
-	}
-	*/
 	
 	public Page<PatientUserVO> findAssociatedPatientToHCPBy(String queryString, Long hcpUserID, String clinicId, String filter,
 			Pageable pageable, Map<String, Boolean> sortOrder) {
@@ -489,7 +417,7 @@ public class UserSearchRepository {
 				+ " left outer join PATIENT_INFO patInfoh on upah.patient_id = patInfoh.id "
 				+ " where patInfo.id = patInfoh.id"
 				+ " group by patInfoh.id) as hcpname, patient_clinic.mrn_id as mrnid, pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy"
-				+ " from USER user"
+				+ " , patient_clinic.clinic_id as pclinic from USER user"
 				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id"
 				+ " and user_authority.authority_name = '"+PATIENT+"'and (lower(user.first_name) "
 				+ " like lower(:queryString) or lower(user.last_name) like lower(:queryString) "
@@ -498,23 +426,15 @@ public class UserSearchRepository {
 				+ " or lower(user.hillrom_id) like lower(:queryString))"
 				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"'  "
 				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id" 
-				+" join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id  "
+				+" left outer join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id  "
 				+" left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate()  "
-				+" join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id and lower(IFNULL(patient_clinic.mrn_id,0)) like lower('%%') ";
-				
-				String query2 = " where upa_hcp.user_id = :hcpUserID ";
-				String query3 =	" group by user.id ";
-				if(!StringUtils.isEmpty(clinicId)){
-					findPatientUserQuery = findPatientUserQuery + query2 + 
-							" or patient_clinic.clinic_id  = '"+clinicId+"' "+
-							query3;
-				}
-				else 
-					findPatientUserQuery=findPatientUserQuery+query2+query3;
+				+" left outer join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id and lower(IFNULL(patient_clinic.mrn_id,0)) like lower('%%') "
+				+" where upa_hcp.user_id = :hcpUserID "
+				+" group by user.id ";
 
 		StringBuilder filterQuery = new StringBuilder();
 	
-		if(StringUtils.isNotEmpty(filter) && !"all".equalsIgnoreCase(filter)){
+		//if(StringUtils.isNotEmpty(filter) && !"all".equalsIgnoreCase(filter)){
 
 			Map<String,String> filterMap = getSearchParams(filter);
 			
@@ -523,13 +443,21 @@ public class UserSearchRepository {
 			applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
 
 			findPatientUserQuery = filterQuery.toString();
-		}
+		//}
 
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString",
 				queryString);
 		
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":hcpUserID",
 				hcpUserID.toString());
+		
+		
+		if("others".equalsIgnoreCase(clinicId))
+			findPatientUserQuery+=" and pclinic is not null";
+		
+		else if(StringUtils.isNotEmpty(clinicId))
+			findPatientUserQuery+=" and pclinic = "+clinicId;
+
 		
 		String countSqlQuery = "select count(patientUsers.id) from ("
 				+ findPatientUserQuery + " ) patientUsers";

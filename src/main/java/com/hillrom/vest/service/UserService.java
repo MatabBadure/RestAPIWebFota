@@ -470,6 +470,10 @@ public class UserService {
 		newUser.setDeleted(false);
 		newUser.setActivationKey(RandomUtil.generateActivationKey());
 		for(Map<String, String> clinicObj : userExtensionDTO.getClinicList()){
+			
+			if(Objects.isNull(clinicObj.get("id")))
+					throw new  HillromException(ExceptionConstants.HR_544);
+			
 			Clinic clinic = clinicRepository.getOne(clinicObj.get("id"));
 			newUser.getClinics().add(clinic);
 		}

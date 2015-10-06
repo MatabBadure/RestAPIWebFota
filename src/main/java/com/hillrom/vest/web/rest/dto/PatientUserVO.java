@@ -50,6 +50,7 @@ public class PatientUserVO {
 	private String clinicNamesCSV;
 	private String hcpNamesCSV;
 	private String mrnId;
+	private boolean isExpired;
 	
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
@@ -112,12 +113,14 @@ public class PatientUserVO {
 		this.primaryPhone = user.getPrimaryPhone();
 		this.createdAt = user.getCreatedDate();
 		this.isActivated = user.getActivated();
+		
 		if(null != patientInfo){			
 			this.state = patientInfo.getState();
 			this.hillromId = patientInfo.getHillromId();
 			this.gender = patientInfo.getGender();
 			this.city = patientInfo.getCity();
 			this.address = patientInfo.getAddress();
+			this.isExpired=patientInfo.getExpired();
 		}
 		
 	}
@@ -328,6 +331,13 @@ public class PatientUserVO {
 	}
 	public void setHcpNamesCSV(String hcpNamesCSV) {
 		this.hcpNamesCSV = hcpNamesCSV;
+	}
+	
+	public boolean isExpired() {
+		return isExpired;
+	}
+	public void setExpired(boolean isExpired) {
+		this.isExpired = isExpired;
 	}
 
 	

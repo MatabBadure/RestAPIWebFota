@@ -647,7 +647,7 @@ public class UserService {
     public UserExtension updateCareGiverUser(UserExtension caregiverUser, UserExtensionDTO userExtensionDTO) {
 		assignValuesToUserObj(userExtensionDTO, caregiverUser);
 		userExtensionRepository.saveAndFlush(caregiverUser);
-		log.debug("Updated Information for Clinic Admin User : {}", caregiverUser);
+		log.debug("Updated Information for Care Giver User : {}", caregiverUser);
 		return caregiverUser;
 	}
 

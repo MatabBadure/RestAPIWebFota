@@ -23,4 +23,7 @@ public interface UserPatientRepository extends
 	
 	@Query("from UserPatientAssoc upa where upa.userPatientAssocPK.user.id = ?1 and upa.userRole = ?2")
 	List<UserPatientAssoc> findByUserIdAndUserRole(Long userId, String userRole);
+	
+	@Query("from UserPatientAssoc upa where upa.userPatientAssocPK.patient.id = ?1 and upa.userRole = ?2")
+	List<UserPatientAssoc> findByPatientIdAndUserRole(String patientId, String userRole);
 }

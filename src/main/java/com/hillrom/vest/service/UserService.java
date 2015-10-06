@@ -1190,7 +1190,7 @@ public class UserService {
 		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
 		if(Objects.nonNull(patientUser)) {
     		for(UserPatientAssoc upAssoc: getListOfCaregiversAssociatedToPatientUser(patientUser)){
-    			caregiverList.add(new CareGiverVO(upAssoc.getUserRole(), upAssoc.getRelationshipLabel(), upAssoc.getUser()));
+    			caregiverList.add(new CareGiverVO(upAssoc.getUserRole(), upAssoc.getRelationshipLabel(), upAssoc.getUser(),upAssoc.getUser().getId(),upAssoc.getPatient().getId()));
     		}
 		} else {
 			throw new HillromException(ExceptionConstants.HR_523);
@@ -1317,15 +1317,38 @@ public class UserService {
 		}
 	}
 	
-	public List<UserPatientAssoc> getAssociatedPatientsForCaregiver(Long caregiverId) throws HillromException {
+	public List<CareGiverVO> getAssociatedPatientsForCaregiver(Long caregiverId) throws HillromException {
     	List<UserPatientAssoc> patientAssocList = new LinkedList<>();
 		UserExtension caregiverUser = userExtensionRepository.findOne(caregiverId);
+
+		List<CareGiverVO> caregiverList = new LinkedList<>();
 		if(Objects.nonNull(caregiverUser)) {
     		patientAssocList = userPatientRepository.findByUserIdAndUserRole(caregiverUser.getId(), AuthoritiesConstants.CARE_GIVER);
+    		if(patientAssocList != null){
+    			
+    			for(UserPatientAssoc userPatientAssoc : patientAssocList){
+    				List<UserPatientAssoc> patientAssocHRIDList = new LinkedList<>();	
+    				CareGiverVO careGiverVO = new CareGiverVO(userPatientAssoc.getUserRole(), userPatientAssoc.getRelationshipLabel(), userPatientAssoc.getUser(),userPatientAssoc.getUser().getId(),userPatientAssoc.getPatient().getId());
+    				
+    				patientAssocHRIDList = userPatientRepository.findByPatientIdAndUserRole(userPatientAssoc.getPatient().getId(),AuthoritiesConstants.PATIENT);
+    				
+    				if(patientAssocHRIDList != null){
+    	    			for(UserPatientAssoc userPatientAssocHRID : patientAssocHRIDList){
+    	    				if(userPatientAssoc.getUser().getId().equals(caregiverId)){
+    	    					
+    	    					System.out.println("PatientId before : " +userPatientAssoc.getPatient().getId());
+    	    					careGiverVO.setUserId(userPatientAssocHRID.getUser().getId());
+    	    	   				caregiverList.add(careGiverVO);
+    	    					System.out.println("PatientId after : " +careGiverVO.getUser().getId().toString());
+    	    				}
+    	    			}
+    	    		}
+    			}
+    		}
 		} else {
 			throw new HillromException(ExceptionConstants.HR_523);
 		}
-		return patientAssocList;
+		return caregiverList;
     }
 
 	public PatientUserVO getPatientUserWithMRNId(Long patientUserId, String clinicId) throws HillromException{

@@ -767,7 +767,7 @@ public class UserExtensionResource {
         log.debug("REST request to get associated patients with caregiver : {}", id);
         JSONObject jsonObject = new JSONObject();
         try {
-        	List<UserPatientAssoc> userPatientAssocs= userService.getAssociatedPatientsForCaregiver(id);
+        	List<CareGiverVO> userPatientAssocs = userService.getAssociatedPatientsForCaregiver(id);
 	        if (userPatientAssocs.isEmpty()) {
 	        	jsonObject.put("message", ExceptionConstants.HR_587);
 	        } else {

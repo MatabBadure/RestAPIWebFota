@@ -577,6 +577,16 @@ public class UserService {
     		} else {
     			throw new HillromException(ExceptionConstants.HR_575);//Unable to update Clinic Admin.
     		}
+        } if (AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())) {
+           	UserExtension user = updateClinicAdminUser(existingUser, userExtensionDTO);
+    		if(user.getId() != null) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
+    				sendEmailNotification(baseUrl, user);
+    			}
+                return user;
+    		} else {
+    			throw new HillromException(ExceptionConstants.HR_577);//Unable to update Clinic Admin.
+    		}
         } else {
         	throw new HillromException(ExceptionConstants.HR_555);//Incorrect data
     	}
@@ -633,6 +643,12 @@ public class UserService {
 		userExtensionRepository.saveAndFlush(clinicAdminUser);
 		log.debug("Updated Information for Clinic Admin User : {}", clinicAdminUser);
 		return clinicAdminUser;
+	}
+    public UserExtension updateCareGiverUser(UserExtension caregiverUser, UserExtensionDTO userExtensionDTO) {
+		assignValuesToUserObj(userExtensionDTO, caregiverUser);
+		userExtensionRepository.saveAndFlush(caregiverUser);
+		log.debug("Updated Information for Clinic Admin User : {}", caregiverUser);
+		return caregiverUser;
 	}
 
 	private void assignValuesToPatientInfoObj(UserExtensionDTO userExtensionDTO, PatientInfo patientInfo) {

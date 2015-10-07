@@ -585,7 +585,7 @@ public class UserService {
     			}
                 return user;
     		} else {
-    			throw new HillromException(ExceptionConstants.HR_577);//Unable to update Clinic Admin.
+    			throw new HillromException(ExceptionConstants.HR_577);//Unable to update Care Giver.
     		}
         } else {
         	throw new HillromException(ExceptionConstants.HR_555);//Incorrect data

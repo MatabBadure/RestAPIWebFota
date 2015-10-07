@@ -578,7 +578,7 @@ public class UserService {
     			throw new HillromException(ExceptionConstants.HR_575);//Unable to update Clinic Admin.
     		}
         } if (AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())) {
-           	UserExtension user = updateClinicAdminUser(existingUser, userExtensionDTO);
+           	UserExtension user = updateCareGiverUser(existingUser, userExtensionDTO);
     		if(user.getId() != null) {
     			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
     				sendEmailNotification(baseUrl, user);

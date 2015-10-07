@@ -767,12 +767,13 @@ public class UserExtensionResource {
         log.debug("REST request to get associated patients with caregiver : {}", id);
         JSONObject jsonObject = new JSONObject();
         try {
-        	List<CareGiverVO> userPatientAssocs = userService.getAssociatedPatientsForCaregiver(id);
+        	Map<String, List<CareGiverVO>> userPatientAssocs = userService.getAssociatedPatientsForCaregiver(id);
 	        if (userPatientAssocs.isEmpty()) {
 	        	jsonObject.put("message", ExceptionConstants.HR_587);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_299);
-	        	jsonObject.put("patients", userPatientAssocs);
+	        	jsonObject.put("caregivers", userPatientAssocs.get("caregivers"));
+	        	jsonObject.put("patients", userPatientAssocs.get("patients"));
 	        }
 	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
         } catch (HillromException hre){

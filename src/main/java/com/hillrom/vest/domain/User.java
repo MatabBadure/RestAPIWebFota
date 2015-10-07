@@ -148,7 +148,11 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name="setting_deviation_notification")
     private boolean  settingDeviationNotification = false;
 
-    public User() {
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @Column(name = "activation_link_sent_date", nullable = true)
+    private DateTime activationLinkSentDate = null;
+    
+	public User() {
 		super();
 	}
 
@@ -364,6 +368,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	public void setSettingDeviationNotification(boolean settingDeviationNotification) {
 		this.settingDeviationNotification = settingDeviationNotification;
+	}
+
+    public DateTime getActivationLinkSentDate() {
+		return activationLinkSentDate;
+	}
+
+	public void setActivationLinkSentDate(DateTime activationLinkSentDate) {
+		this.activationLinkSentDate = activationLinkSentDate;
 	}
 
 	@Override

@@ -121,16 +121,19 @@ public class UserService {
 		return defaultPassword.toString();
 	}
 
-    public Optional<User> activateRegistration(String key) {
+    public Optional<User> activateRegistration(String key) throws HillromException {
         log.debug("Activating user for activation key {}", key);
-        userRepository.findOneByActivationKey(key)
-            .map(user -> {
-                // activate given user for the registration key.
-                user.setActivated(true);
-                userRepository.save(user);
-                log.debug("Activated user: {}", user);
-                return user;
-            });
+        Optional<User> optionalExistingUser = userRepository.findOneByActivationKey(key);
+           if(optionalExistingUser.isPresent()) {
+            	DateTime twoDaysAgo = DateTime.now().minusHours(48);
+                if(optionalExistingUser.get().getResetDate().isBefore(twoDaysAgo.toInstant().getMillis()))
+             	   throw new HillromException(ExceptionConstants.HR_592);//Activation Link Expired
+        		// activate given user for the registration key.
+                optionalExistingUser.get().setActivated(true);
+        		userRepository.save(optionalExistingUser.get());
+        		log.debug("Activated user: {}", optionalExistingUser.get());
+        		return optionalExistingUser;
+            }
         return Optional.empty();
     }
 
@@ -248,6 +251,7 @@ public class UserService {
         newUser.setActivated(false);
         // new user gets registration key
         newUser.setActivationKey(RandomUtil.generateActivationKey());
+        newUser.setActivationLinkSentDate(DateTime.now());
         authorities.add(authority);
         newUser.setAuthorities(authorities);
         userRepository.save(newUser);

@@ -106,6 +106,7 @@ public class ExceptionConstants {
     
     // Notifications
     public static final String HR_591 = "No such Notification found";
+    public static final String HR_592 = "Activation link expired.";
     public static final String HR_596 = "Unable to update password";
     public static final String HR_597 = "Password do not match with old password.";
     public static final String HR_598 = "Incorrect new password";

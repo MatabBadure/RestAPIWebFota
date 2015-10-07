@@ -1,6 +1,7 @@
 package com.hillrom.vest.service;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -85,6 +86,22 @@ public class HCPClinicService {
     	} else {
      		throw new HillromException(ExceptionConstants.HR_544);
      	}
+    }
+    
+	 //Get Clinic Ids Associated with HCP Users Flattened
+    public String getFlattenedAssociatedClinicsIdForHCP(Long id) throws HillromException {
+		UserExtension hcpUser = userExtensionRepository.findOne(id);
+		StringBuilder clinicIdsString = new StringBuilder();
+	    if(Objects.isNull(hcpUser)){
+	    	throw new HillromException(ExceptionConstants.HR_512);
+	    } else {
+	    	for(Clinic clinic : hcpUser.getClinics()){
+	    		clinicIdsString.append("'");
+	    		clinicIdsString.append(clinic.getId());
+	    		clinicIdsString.append("',");
+	    	}
+	    	return clinicIdsString.deleteCharAt(clinicIdsString.lastIndexOf(",")).toString();
+	    }
     }
 }
 

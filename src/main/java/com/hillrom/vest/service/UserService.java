@@ -1031,7 +1031,7 @@ public class UserService {
 			ClinicPatientAssoc clinicPatientAssoc  = cpaIterator.next();
 			if(Objects.nonNull(clinicPatientAssoc)){
 				Map<String,Object> clinicMRNId = new HashMap<>();
-				clinicMRNId.put("clinic", clinicPatientAssoc.getClinic());
+				clinicMRNId.put("clinicId", clinicPatientAssoc.getClinic().getId());
 				clinicMRNId.put("mrnId", clinicPatientAssoc.getMrnId());
 				mrnId = clinicPatientAssoc.getMrnId(); 
 				patientUserVO.setMrnId(mrnId);

@@ -444,19 +444,16 @@ public class UserSearchRepository {
 				
 				String query2 = " where upa_hcp.user_id = :hcpUserID ";
 				String query3 =	" group by user.id ";
-				if(StringUtils.isEmpty(clinicId) |"all".equalsIgnoreCase(clinicId)){
-					findPatientUserQuery = findPatientUserQuery + query2 + 
-							" or patient_clinic.clinic_id  in ("+hcpClinicService.getFlattenedAssociatedClinicsIdForHCP(hcpUserID)+" ) "+
-							query3;
-				}
-				else 
-					if("others".equalsIgnoreCase(clinicId)){
-						findPatientUserQuery=findPatientUserQuery+query2+query3;
-					}
-					else
-						
-						findPatientUserQuery = findPatientUserQuery + 
-								" where patient_clinic.clinic_id  ='"+ clinicId +"'"+query3;
+		if (StringUtils.isEmpty(clinicId) | "all".equalsIgnoreCase(clinicId)) {
+			findPatientUserQuery = findPatientUserQuery + query2 + " or patient_clinic.clinic_id  in ("
+					+ hcpClinicService.getFlattenedAssociatedClinicsIdForHCP(hcpUserID) + " ) " + query3;
+		} else if ("others".equalsIgnoreCase(clinicId)) {
+			findPatientUserQuery = findPatientUserQuery + query2 + " and patient_clinic.clinic_id not in ("
+					+ hcpClinicService.getFlattenedAssociatedClinicsIdForHCP(hcpUserID) + ")" +
+			query3;
+		} else
+			findPatientUserQuery = findPatientUserQuery + " where patient_clinic.clinic_id  ='" + clinicId + "'"
+					+ query3;
 				
 		StringBuilder filterQuery = new StringBuilder();
 	

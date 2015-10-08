@@ -1247,6 +1247,25 @@ public class UserService {
 		}
 		return caregiverAssoc;
 	}
+	
+	public UserExtension updateCaregiverUser(Long caregiverUserId, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException {
+		UserExtension caregiverUser = userExtensionRepository.findOne(caregiverUserId);
+		if (AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())) {
+			assignValuesToUserObj(userExtensionDTO, caregiverUser);
+			userExtensionRepository.saveAndFlush(caregiverUser);
+			if(Objects.nonNull(caregiverUser) ) {
+				if(userExtensionDTO.getEmail() != null) {
+					mailService.sendActivationEmail(caregiverUser, baseUrl);
+				}
+			} else {
+				throw new HillromException(ExceptionConstants.HR_562);
+			}
+		} else {
+			throw new HillromException(ExceptionConstants.HR_555);
+		}
+		return caregiverUser;
+
+	}	
 
 	public UserPatientAssoc updateCaregiver(Long patientUserId, Long caregiverUserId, UserExtensionDTO userExtensionDTO) {
     	UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
@@ -1267,6 +1286,7 @@ public class UserService {
     	}
     	return null;
 	}
+	
 
 	public UserPatientAssoc getCaregiverUser(Long patientUserId, Long caregiverUserId) throws HillromException {
     	JSONObject jsonObject = new JSONObject();
@@ -1287,6 +1307,18 @@ public class UserService {
     		} else {
     			throw new HillromException(ExceptionConstants.HR_523);
     		}
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);
+		}
+    }
+	
+	
+	public UserExtension getCaregiverUser(Long caregiverUserId) throws HillromException {
+    	JSONObject jsonObject = new JSONObject();
+		UserExtension caregiverUser = userExtensionRepository.findOne(caregiverUserId);
+		if(Objects.nonNull(caregiverUser)) {
+			jsonObject.put("message", MessageConstants.HR_263);
+			return caregiverUser;
 		} else {
 			throw new HillromException(ExceptionConstants.HR_512);
 		}

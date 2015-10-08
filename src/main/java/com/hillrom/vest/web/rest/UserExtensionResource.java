@@ -551,6 +551,38 @@ public class UserExtensionResource {
 		}
     }
     
+    
+    /**
+     * PUT  /caregiver/{caregiverUserId} -> update a caregiver {caregiverUserId}. 
+     */
+    @RequestMapping(value = "/caregiver/{caregiverUserId}",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    public ResponseEntity<JSONObject> updateCaregiver( @PathVariable Long caregiverUserId, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
+        
+        log.debug("REST request to update User : {}", userExtensionDTO);
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        JSONObject jsonObject = new JSONObject();
+		try {
+			UserExtension userExtension = userService.updateCaregiverUser(caregiverUserId, userExtensionDTO, baseUrl);
+			if (Objects.isNull(userExtension)) {
+				jsonObject.put("ERROR", ExceptionConstants.HR_562);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        } else {
+	            jsonObject.put("message", MessageConstants.HR_262);
+                jsonObject.put("user", userExtension);
+                return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+		}       
+        
+        
+    }    
+    
     /**
      * GET  /patient/{patientUserId}/caregiver/{caregiverUserId} -> GET a caregiver {caregiverUserId} for a patient with {patientUserId}. 
      */
@@ -569,6 +601,32 @@ public class UserExtensionResource {
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_263);
 				jsonObject.put("caregiver", caregiverAssoc);
+	        }
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
+    }
+    
+    /**
+     * GET  /caregiver/{caregiverUserId} -> GET a caregiver {caregiverUserId} . 
+     */
+    @RequestMapping(value = "/caregiver/{caregiverUserId}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    public ResponseEntity<JSONObject> getCaregiver(@PathVariable Long caregiverUserId) {
+        log.debug("REST request to get caregiver User : {}", caregiverUserId);
+        JSONObject jsonObject = new JSONObject();
+		try {
+			UserExtension caregiverUser = userService.getCaregiverUser(caregiverUserId);
+			if (Objects.isNull(caregiverUser)) {
+				jsonObject.put("ERROR", ExceptionConstants.HR_564);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_263);
+				jsonObject.put("caregiver", caregiverUser);
 	        }
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {

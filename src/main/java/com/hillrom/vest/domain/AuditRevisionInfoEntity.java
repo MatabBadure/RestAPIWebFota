@@ -11,7 +11,7 @@ import com.hillrom.vest.service.AuditRevisionListener;
 @Entity
 @Table(name = "AUDIT_REVISION_INFO")
 @RevisionEntity(AuditRevisionListener.class)
-public class AuditRevisionInfo extends DefaultRevisionEntity {
+public class AuditRevisionInfoEntity extends DefaultRevisionEntity {
 
 	/**
 	 * 

@@ -121,17 +121,20 @@ public class UserService {
 		return defaultPassword.toString();
 	}
 
-    public Optional<User> activateRegistration(String key) {
+    public Optional<User> activateRegistration(String key) throws HillromException {
         log.debug("Activating user for activation key {}", key);
-        userRepository.findOneByActivationKey(key)
-            .map(user -> {
-                // activate given user for the registration key.
-                user.setActivated(true);
-                userRepository.save(user);
-                log.debug("Activated user: {}", user);
-                return user;
-            });
-        return Optional.empty();
+        Optional<User> optionalExistingUser = userRepository.findOneByActivationKey(key);
+           if(optionalExistingUser.isPresent()) {
+            	DateTime twoDaysAgo = DateTime.now().minusHours(48);
+                if(optionalExistingUser.get().getActivationLinkSentDate().isBefore(twoDaysAgo.toInstant().getMillis()))
+             	   throw new HillromException(ExceptionConstants.HR_592);//Activation Link Expired
+        		// activate given user for the registration key.
+                optionalExistingUser.get().setActivated(true);
+        		userRepository.save(optionalExistingUser.get());
+        		log.debug("Activated user: {}", optionalExistingUser.get());
+        		return optionalExistingUser;
+            }
+        throw new HillromException(ExceptionConstants.HR_601);//Invalid Activation Key;
     }
 
     /**
@@ -248,6 +251,7 @@ public class UserService {
         newUser.setActivated(false);
         // new user gets registration key
         newUser.setActivationKey(RandomUtil.generateActivationKey());
+        newUser.setActivationLinkSentDate(DateTime.now());
         authorities.add(authority);
         newUser.setAuthorities(authorities);
         userRepository.save(newUser);
@@ -311,23 +315,6 @@ public class UserService {
         User currentUser = userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).get();
         currentUser.getAuthorities().size(); // eagerly load the association
         return currentUser;
-    }
-
-    /**
-     * Not activated users should be automatically deleted after 3 days.
-     * <p/>
-     * <p>
-     * This is scheduled to get fired everyday, at 01:00 (am).
-     * </p>
-     */
-    @Scheduled(cron = "0 0 1 * * ?")
-    public void removeNotActivatedUsers() {
-        DateTime now = new DateTime();
-        List<User> users = userRepository.findAllByActivatedIsFalseAndCreatedDateBefore(now.minusDays(3));
-        for (User user : users) {
-            log.debug("Deleting not activated user {}", user.getEmail());
-            userRepository.delete(user);
-        }
     }
 
     private List<String> rolesAdminCanModerate() {
@@ -395,10 +382,7 @@ public class UserService {
     	UserExtension newUser = new UserExtension();
 		try {
 	    	assignValuesToUserObj(userExtensionDTO, newUser);
-			newUser.setActivated(false);
-			newUser.setDeleted(false);
-			newUser.setActivationKey(RandomUtil.generateActivationKey());
-			newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
+			assignStatusAndRoleAndActivationKey(userExtensionDTO, newUser);
 			userExtensionRepository.save(newUser);
 			log.debug("Created Information for User: {}", newUser);
 			return newUser;
@@ -466,9 +450,7 @@ public class UserService {
     public UserExtension createHCPUser(UserExtensionDTO userExtensionDTO) throws HillromException {
     	UserExtension newUser = new UserExtension();
 		assignValuesToUserObj(userExtensionDTO, newUser);
-		newUser.setActivated(false);
-		newUser.setDeleted(false);
-		newUser.setActivationKey(RandomUtil.generateActivationKey());
+		assignStatusAndRoleAndActivationKey(userExtensionDTO, newUser);
 		for(Map<String, String> clinicObj : userExtensionDTO.getClinicList()){
 			
 			if(Objects.isNull(clinicObj.get("id")))
@@ -477,7 +459,6 @@ public class UserService {
 			Clinic clinic = clinicRepository.getOne(clinicObj.get("id"));
 			newUser.getClinics().add(clinic);
 		}
-		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
 		userExtensionRepository.save(newUser);
 		log.debug("Created Information for User: {}", newUser);
 		return newUser;
@@ -486,10 +467,7 @@ public class UserService {
     public UserExtension createClinicAdminUser(UserExtensionDTO userExtensionDTO) throws HillromException {
     	UserExtension newUser = new UserExtension();
 		assignValuesToUserObj(userExtensionDTO, newUser);
-		newUser.setActivated(false);
-		newUser.setDeleted(false);
-		newUser.setActivationKey(RandomUtil.generateActivationKey());
-		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
+		assignStatusAndRoleAndActivationKey(userExtensionDTO, newUser);
 		userExtensionRepository.saveAndFlush(newUser);
 		if(newUser.getId() != null) {
 			List<Clinic> clinicList = new LinkedList<>();
@@ -504,6 +482,15 @@ public class UserService {
 		} else {
 			throw new HillromException(ExceptionConstants.HR_574);
 		}
+	}
+
+	private void assignStatusAndRoleAndActivationKey(
+			UserExtensionDTO userExtensionDTO, UserExtension newUser) {
+		newUser.setActivated(false);
+		newUser.setDeleted(false);
+		newUser.setActivationKey(RandomUtil.generateActivationKey());
+		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
+		newUser.setActivationLinkSentDate(DateTime.now());
 	}
     
     public UserExtension updateUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException{
@@ -595,6 +582,7 @@ public class UserService {
 	private void sendEmailNotification(String baseUrl, UserExtension user) {
 		user.setActivationKey(RandomUtil.generateActivationKey());
 		user.setActivated(false);
+		user.setActivationLinkSentDate(DateTime.now());
 		userRepository.saveAndFlush(user);
 		mailService.sendActivationEmail(user, baseUrl);
 		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));

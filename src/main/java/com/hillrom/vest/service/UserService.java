@@ -126,7 +126,7 @@ public class UserService {
         Optional<User> optionalExistingUser = userRepository.findOneByActivationKey(key);
            if(optionalExistingUser.isPresent()) {
             	DateTime twoDaysAgo = DateTime.now().minusHours(48);
-                if(optionalExistingUser.get().getResetDate().isBefore(twoDaysAgo.toInstant().getMillis()))
+                if(optionalExistingUser.get().getActivationLinkSentDate().isBefore(twoDaysAgo.toInstant().getMillis()))
              	   throw new HillromException(ExceptionConstants.HR_592);//Activation Link Expired
         		// activate given user for the registration key.
                 optionalExistingUser.get().setActivated(true);
@@ -134,7 +134,7 @@ public class UserService {
         		log.debug("Activated user: {}", optionalExistingUser.get());
         		return optionalExistingUser;
             }
-        return Optional.empty();
+        throw new HillromException(ExceptionConstants.HR_601);//Invalid Activation Key;
     }
 
     /**

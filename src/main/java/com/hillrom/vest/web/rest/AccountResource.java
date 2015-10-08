@@ -99,10 +99,8 @@ public class AccountResource {
 //        
         JSONObject jsonObject = new JSONObject();
 		try {
-			return Optional.ofNullable(userService.activateRegistration(key))
-		            .map(user -> new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK))
-		            .orElse(new ResponseEntity<JSONObject>(jsonObject, HttpStatus.INTERNAL_SERVER_ERROR));
-	        
+			Optional<User> activatedUser = userService.activateRegistration(key);
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {
 			jsonObject.put("ERROR", e.getMessage());
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);

@@ -116,5 +116,6 @@ public class ExceptionConstants {
     
     // DateFormat Exception
     public static final String HR_600 = "Invalid DateFormat, expected is : "; 
-    
+
+    public static final String HR_601 = "Invalid Activation Key"; 
 }

@@ -257,7 +257,7 @@ public class UserExtensionResource {
     }
     
     /**
-     * GET  /user/search -> get all HillromTeamUser.
+     * GET  /user/hcp/search -> get all HillromTeamUser.
      */
     @RequestMapping(value = "/user/hcp/search",
             method = RequestMethod.GET,
@@ -284,6 +284,37 @@ public class UserExtensionResource {
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
     
+    
+    /**
+     * GET  user/clinicadmin/{id}/hcp/search -> search HCP associated with Clinic Admin
+     */
+    @RequestMapping(value = "user/clinicadmin/{id}/hcp/search",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    public ResponseEntity<?> searchHcpForClinicAdmin(
+    		@PathVariable Long id,
+    		@RequestParam(required=true,value = "searchString")String searchString,
+    		@RequestParam(required=false,value = "filter") String filter,
+    		@RequestParam(value = "clinicId" , required = false) String clincId,
+    		@RequestParam(value = "page" , required = false) Integer offset,
+            @RequestParam(value = "per_page", required = false) Integer limit,
+            @RequestParam(value = "sort_by", required = false) String sortBy,
+            @RequestParam(value = "asc",required = false) Boolean isAscending)
+        throws URISyntaxException {
+    	if(searchString.endsWith("_")){
+    		   searchString = searchString.replace("_", "\\\\_");
+    	}
+    	String queryString = new StringBuilder("'%").append(searchString).append("%'").toString();
+    	Map<String,Boolean> sortOrder = new HashMap<>();
+    	if(sortBy != null  && !sortBy.equals("")) {
+    		isAscending =  (isAscending != null) ?  isAscending : true;
+    		sortOrder.put(sortBy, isAscending);
+    	}
+    	Page<HcpVO> page = userSearchRepository.findHCPByClinicAdmin(id,clincId,queryString,filter,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "user/clinicadmin/"+id+"/hcp/search", offset, limit);
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    }
     /**
      * GET  /user/:id/hcp -> get the "id" HCP user.
      */

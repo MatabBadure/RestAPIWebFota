@@ -123,8 +123,8 @@ public class UserSearchRepository {
 			Map<String, Boolean> sortOrder) {
 		
 		String findHcpQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted,"
-				+ " user.zipcode,userExt.address,userExt.city,userExt.credentials,userExt.fax_number,userExt.primary_phone,"
-				+ " userExt.mobile_phone,userExt.speciality,userExt.state,clinic.id as clinicId,clinic.name as clinicName,user.created_date as createdAt,user.activated isActivated,userExt.npi_number as npiNumber "
+				+ " user.zipcode,userExt.address,userExt.city as hcity,userExt.credentials,userExt.fax_number,userExt.primary_phone,"
+				+ " userExt.mobile_phone,userExt.speciality,userExt.state as hstate,clinic.id as clinicId,clinic.name as clinicName,user.created_date as createdAt,user.activated isActivated,userExt.npi_number as npiNumber "
 				+ " FROM USER user join USER_EXTENSION userExt on user.id = userExt.user_id "
 				+ " and (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or "
@@ -157,6 +157,125 @@ public class UserSearchRepository {
 		BigInteger count = (BigInteger) countQuery.getSingleResult();
 
 		Query query = getOrderedByQuery(findHcpQuery, sortOrder);
+		
+		List<HcpVO> hcpUsers = new ArrayList<>();
+
+		Map<Long, HcpVO> hcpUsersMap = new HashMap<>();
+		List<Object[]> results = query.getResultList();
+
+		results.forEach(
+				(record) -> {
+					Long id = ((BigInteger) record[0]).longValue();
+					String email = (String) record[1];
+					String firstName = (String) record[2];
+					String lastName = (String) record[3];
+					Boolean isDeleted = (Boolean) record[4];
+					Integer zipcode = (Integer) record[5];
+					String address = (String) record[6];
+					String city = (String) record[7];
+					String credentials = (String) record[8];
+					
+					String faxNumber =  (String) record[9]; 
+					String primaryPhone = (String) record[10];
+					String mobilePhone = (String) record[11];
+					String speciality = (String) record[12];
+					String state = (String) record[13];
+					String clinicId = (String) record[14];
+					String clinicName = (String) record[15];
+					Timestamp createdAt = (Timestamp) record[16];
+					DateTime createdAtDatetime = new DateTime(createdAt);
+					Boolean isActivated = (Boolean) record[17];
+					String npiNumber = (String)record[18];
+					
+					
+					HcpVO hcpVO = hcpUsersMap.get(id);
+
+					
+					Map<String, String> clinicMap = new HashMap<>();
+					if (null != clinicId) {
+						clinicMap.put("id", clinicId);
+						clinicMap.put("name", clinicName);
+					}
+					if (hcpVO == null) {
+						hcpVO = new HcpVO(id, firstName, lastName, email,
+								isDeleted, zipcode, address, city, credentials,
+								faxNumber, primaryPhone, mobilePhone,
+								speciality, state,createdAtDatetime,isActivated,npiNumber);
+						if (clinicMap.keySet().size() > 0) {
+							hcpVO.getClinics().add(clinicMap);
+						}
+						hcpUsersMap.put(id, hcpVO);
+					} else {
+						hcpUsers.remove(hcpVO);
+						if (clinicMap.keySet().size() > 0) {
+							hcpVO.getClinics().add(clinicMap);
+						}
+					}
+					hcpUsers.add(hcpVO);
+				});
+		int firstResult = pageable.getOffset();
+		int maxResults = firstResult + pageable.getPageSize();
+		List<HcpVO> hcpUsersSubList = new ArrayList<>();
+		if(firstResult < hcpUsers.size()){
+			maxResults = maxResults > hcpUsers.size() ? hcpUsers.size() : maxResults ;  
+			hcpUsersSubList = hcpUsers.subList(firstResult,maxResults);
+		}
+		Page<HcpVO> page = new PageImpl<HcpVO>(hcpUsersSubList, null, count.intValue());
+
+		return page;
+	}
+	
+	
+	//Search HCPs for Clinic Admin and clinic Id, used in Clinic Admin Dash board.
+	public Page<HcpVO> findHCPByClinicAdmin(Long clinicAdminId, String paramClinicId, String queryString, String filter, Pageable pageable,
+			Map<String, Boolean> sortOrder) {
+		
+		String findHcpByClinicAdminQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted,"
+				+ " user.zipcode,userExt.address,userExt.city,userExt.credentials,userExt.fax_number,userExt.primary_phone,"
+				+ " userExt.mobile_phone,userExt.speciality,userExt.state,clinic.id as clinicId,clinic.name as clinicName,user.created_date as createdAt,user.activated isActivated,userExt.npi_number as npiNumber "
+				+ " FROM USER user join USER_EXTENSION userExt on user.id = userExt.user_id "
+				+ " and (lower(user.first_name) like lower(:queryString) or "
+				+ " lower(user.last_name) like lower(:queryString) or "
+				+ " lower(CONCAT(user.first_name,' ',user.last_name)) like lower(:queryString) or"
+				+ " lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) or"
+				+ " lower(user.email) like lower(:queryString)) "
+				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = '"+AuthoritiesConstants.HCP+"'"
+				+ " left outer join CLINIC_USER_ASSOC user_clinic on user_clinic.users_id = user.id "
+				+ " left outer join CLINIC clinic on user_clinic.clinics_id = clinic.id and user_clinic.users_id = user.id "
+				+ " where clinic.clinic_admin_id = :clinicAdminId ";
+		
+		String clinicFilterQuery = " and clinic.id = ':clinicId'";
+		
+		
+		findHcpByClinicAdminQuery = findHcpByClinicAdminQuery.replaceAll(":clinicAdminId", Long.toString(clinicAdminId));
+		
+		if(StringUtils.isNotEmpty(paramClinicId)){
+			findHcpByClinicAdminQuery+=clinicFilterQuery;
+			findHcpByClinicAdminQuery = findHcpByClinicAdminQuery.replaceAll(":clinicId", paramClinicId);
+		}
+
+		StringBuilder filterQuery = new StringBuilder();
+	
+		if(StringUtils.isNotEmpty(filter) && !"all".equalsIgnoreCase(filter)){
+		
+			Map<String,String> filterMap = getSearchParams(filter);
+			
+			filterQuery.append("select * from (");
+			
+			applyIsDeletedFilter(findHcpByClinicAdminQuery, filterQuery, filterMap);
+			
+			findHcpByClinicAdminQuery = filterQuery.toString();
+		}
+			
+		findHcpByClinicAdminQuery = findHcpByClinicAdminQuery.replaceAll(":queryString", queryString);
+
+		String countSqlQuery = "select count(distinct hcpUsers.id) from ("
+				+ findHcpByClinicAdminQuery + " ) hcpUsers";
+
+		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
+		BigInteger count = (BigInteger) countQuery.getSingleResult();
+
+		Query query = getOrderedByQuery(findHcpByClinicAdminQuery, sortOrder);
 		
 		List<HcpVO> hcpUsers = new ArrayList<>();
 

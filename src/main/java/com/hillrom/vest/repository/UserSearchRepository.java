@@ -231,8 +231,8 @@ public class UserSearchRepository {
 			Map<String, Boolean> sortOrder) {
 		
 		String findHcpByClinicAdminQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted,"
-				+ " user.zipcode,userExt.address,userExt.city,userExt.credentials,userExt.fax_number,userExt.primary_phone,"
-				+ " userExt.mobile_phone,userExt.speciality,userExt.state,clinic.id as clinicId,clinic.name as clinicName,user.created_date as createdAt,user.activated isActivated,userExt.npi_number as npiNumber "
+				+ " user.zipcode,userExt.address,userExt.city as hcity,userExt.credentials,userExt.fax_number,userExt.primary_phone,"
+				+ " userExt.mobile_phone,userExt.speciality,userExt.state as hstate,clinic.id as clinicId,clinic.name as clinicName,user.created_date as createdAt,user.activated isActivated,userExt.npi_number as npiNumber "
 				+ " FROM USER user join USER_EXTENSION userExt on user.id = userExt.user_id "
 				+ " and (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or "

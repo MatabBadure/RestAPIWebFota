@@ -548,7 +548,7 @@ public class UserSearchRepository {
 				+ " pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,"
 				+ " pc.missed_therapy_count as isMissedTherapy"
 				+ " from USER user"
-				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id"
+				+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id"
 				+ " and user_authority.authority_name = '"+PATIENT+"'and (lower(user.first_name) "
 				+ " like lower(:queryString) or lower(user.last_name) like lower(:queryString) "
 				+ " or lower(user.email) like lower(:queryString) or lower(CONCAT(user.first_name,' ',user.last_name)) "

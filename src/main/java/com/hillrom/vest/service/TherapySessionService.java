@@ -1,10 +1,6 @@
 package com.hillrom.vest.service;
 
-import static com.hillrom.vest.config.Constants.GROUP_BY_YEARLY;
-import static com.hillrom.vest.config.Constants.GROUP_BY_MONTHLY;
-import static com.hillrom.vest.config.Constants.GROUP_BY_WEEKLY;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,7 +36,7 @@ public class TherapySessionService {
 	
 	@Inject
 	private TherapySessionRepository therapySessionRepository;
-	
+
 	@Inject
 	private AdherenceCalculationService adherenceCalculationService;
 	

@@ -26,6 +26,7 @@ import com.hillrom.vest.repository.AuthorityRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
+import com.hillrom.vest.repository.TempPatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.VestDeviceBadDataRepository;
@@ -43,6 +44,9 @@ public class PatientVestDeviceDataService {
 	@Inject
 	private PatientVestDeviceDataRepository deviceDataRepository;
 
+	@Inject
+	private TempPatientVestDeviceDataRepository tempPatientdeviceDataRepository;
+	
 	@Inject
 	private PatientVestDeviceRawLogRepository deviceRawLogRepository;
 

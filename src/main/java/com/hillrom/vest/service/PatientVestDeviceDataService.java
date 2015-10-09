@@ -17,6 +17,7 @@ import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
+import com.hillrom.vest.domain.TempPatientVestDeviceData;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
@@ -106,6 +107,38 @@ public class PatientVestDeviceDataService {
 		}
 		return patientVestDeviceRecords;
 	}
+	
+	public List<TempPatientVestDeviceData> saveToTemp(final String rawData) {
+		PatientVestDeviceRawLog deviceRawLog = null;
+		List<TempPatientVestDeviceData> patientVestDeviceRecords = null;
+		try {
+			deviceRawLog = deviceLogParser
+					.parseBase64StringToPatientVestDeviceRawLog(rawData);
+			
+			patientVestDeviceRecords = deviceLogParser
+					.parseBase64StringToPatientVestDeviceLogEntryForTemp(deviceRawLog
+							.getDeviceData());
+			
+			String deviceSerialNumber = deviceRawLog.getDeviceSerialNumber();
+			
+
+			UserPatientAssoc userPatientAssoc = createPatientUserIfNotExists(deviceRawLog,
+					deviceSerialNumber);
+			assignDefaultValuesToVestDeviceDataTemp(deviceRawLog,
+					patientVestDeviceRecords, userPatientAssoc);
+			
+			tempPatientdeviceDataRepository.save(patientVestDeviceRecords);
+
+		} catch (Exception e) {
+			vestDeviceBadDataRepository.save(new VestDeviceBadData(rawData));
+			throw new RuntimeException(e.getMessage());
+		}finally{
+			if(Objects.nonNull(deviceRawLog)){				
+				deviceRawLogRepository.save(deviceRawLog);
+			}
+		}
+		return patientVestDeviceRecords;
+	}
 
 	private UserPatientAssoc createPatientUserIfNotExists(
 			PatientVestDeviceRawLog deviceRawLog, String deviceSerialNumber) {
@@ -184,6 +217,19 @@ public class PatientVestDeviceDataService {
 	private void assignDefaultValuesToVestDeviceData(
 			PatientVestDeviceRawLog deviceRawLog,
 			List<PatientVestDeviceData> patientVestDeviceRecords,
+			UserPatientAssoc userPatientAssoc) {
+		patientVestDeviceRecords.stream().forEach(deviceData -> {
+			deviceData.setHubId(deviceRawLog.getHubId());
+			deviceData.setSerialNumber(deviceRawLog.getDeviceSerialNumber());
+			deviceData.setPatient(userPatientAssoc.getPatient());
+			deviceData.setPatientUser(userPatientAssoc.getUser());
+			deviceData.setBluetoothId(deviceRawLog.getDeviceAddress());
+		});
+	}
+	
+	private void assignDefaultValuesToVestDeviceDataTemp(
+			PatientVestDeviceRawLog deviceRawLog,
+			List<TempPatientVestDeviceData> patientVestDeviceRecords,
 			UserPatientAssoc userPatientAssoc) {
 		patientVestDeviceRecords.stream().forEach(deviceData -> {
 			deviceData.setHubId(deviceRawLog.getHubId());

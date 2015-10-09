@@ -122,18 +122,6 @@ public class TherapySessionService {
 		return  therapySessionRepository.findByPatientUserIdAndDate(id,date);
 	}	
 	
-	public int getMissedTherapyCountByPatientUserId(Long id){
-		TherapySession latestTherapySession = therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(id);
-		if(Objects.nonNull(latestTherapySession)){
-			DateTime today = DateTime.now();
-			DateTime latestSessionDate = DateUtil.convertLocalDateToDateTime(latestTherapySession.getDate());
-			if(Objects.isNull(latestSessionDate))
-				return 0;
-			return Days.daysBetween(latestSessionDate, today.toInstant()).getDays();
-		}
-		return 0;
-	}
-	
 	public Map<Long,List<TherapySession>> getTherapySessionsGroupByPatientUserId(List<Long> patientUserIds){
 		List<TherapySession> therapySessions = therapySessionRepository.findTop1ByPatientUserIdInOrderByEndTimeDesc(patientUserIds);
 		return therapySessions.stream().collect(Collectors.groupingBy(TherapySession::getTherapySessionByPatientUserId));

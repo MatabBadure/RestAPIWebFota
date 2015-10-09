@@ -850,7 +850,7 @@ public class UserSearchRepository {
 				+ " and upah.relation_label = '"+HCP+"'  left outer join PATIENT_INFO patInfoh on upah.patient_id = patInfoh.id "
 				+ " where patInfo.id = patInfoh.id group by patInfoh.id) as hcpname,patient_clinic.mrn_id as mrnid, pc.is_hmr_compliant as isHMRNonCompliant,"
 				+ " pc.is_settings_deviated as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy from USER user "
-				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = '"+PATIENT+"'"
+				+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = '"+PATIENT+"'"
 				+ " and (lower(user.first_name)  like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString)  or "
 				+ " lower(user.email) like lower(:queryString) or "

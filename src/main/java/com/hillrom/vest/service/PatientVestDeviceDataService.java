@@ -2,6 +2,7 @@ package com.hillrom.vest.service;
 
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.boon.core.Sys;
 import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.domain.VestDeviceBadData;
 import com.hillrom.vest.repository.AuthorityRepository;
+import com.hillrom.vest.repository.PatientDeviceDataTempRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
@@ -34,9 +37,10 @@ import com.hillrom.vest.repository.VestDeviceBadDataRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil;
 import com.hillrom.vest.util.RelationshipLabelConstants;
+import com.hillrom.vest.web.rest.dto.PatientVestDeviceDataVO;
 
 @Service
-@Transactional(noRollbackFor={RuntimeException.class})
+@Transactional(noRollbackFor = { RuntimeException.class })
 public class PatientVestDeviceDataService {
 
 	@Inject
@@ -47,114 +51,104 @@ public class PatientVestDeviceDataService {
 
 	@Inject
 	private TempPatientVestDeviceDataRepository tempPatientdeviceDataRepository;
-	
+
 	@Inject
 	private PatientVestDeviceRawLogRepository deviceRawLogRepository;
 
 	@Inject
 	private PatientInfoRepository patientInfoRepository;
-	
+
 	@Inject
 	private UserExtensionRepository userExtensionRepository;
-	
+
 	@Inject
 	private UserPatientRepository userPatientRepository;
-	
+
 	@Inject
 	private TherapySessionService therapySessionService;
-	
+
 	@Inject
 	private AuthorityRepository authorityRepository;
-	
+
 	@Inject
 	private VestDeviceBadDataRepository vestDeviceBadDataRepository;
 
 	@Inject
+	private PatientDeviceDataTempRepository patientDeviceDataTempRepository;
+
+	@Inject
 	private PatientNoEventService noEventService;
-	
+
 	public List<PatientVestDeviceData> save(final String rawData) {
 		PatientVestDeviceRawLog deviceRawLog = null;
 		List<PatientVestDeviceData> patientVestDeviceRecords = null;
 		try {
-			deviceRawLog = deviceLogParser
-					.parseBase64StringToPatientVestDeviceRawLog(rawData);
-			
+			deviceRawLog = deviceLogParser.parseBase64StringToPatientVestDeviceRawLog(rawData);
+
 			patientVestDeviceRecords = deviceLogParser
-					.parseBase64StringToPatientVestDeviceLogEntry(deviceRawLog
-							.getDeviceData());
-			
+					.parseBase64StringToPatientVestDeviceLogEntry(deviceRawLog.getDeviceData());
+
 			String deviceSerialNumber = deviceRawLog.getDeviceSerialNumber();
 
-			UserPatientAssoc userPatientAssoc = createPatientUserIfNotExists(deviceRawLog,
-					deviceSerialNumber);
-			assignDefaultValuesToVestDeviceData(deviceRawLog,
-					patientVestDeviceRecords, userPatientAssoc);
-			
+			UserPatientAssoc userPatientAssoc = createPatientUserIfNotExists(deviceRawLog, deviceSerialNumber);
+			assignDefaultValuesToVestDeviceData(deviceRawLog, patientVestDeviceRecords, userPatientAssoc);
+
 			deviceDataRepository.save(patientVestDeviceRecords);
 
 			List<TherapySession> therapySessions = PatientVestDeviceTherapyUtil
 					.prepareTherapySessionFromDeviceData(patientVestDeviceRecords);
-			
+
 			therapySessions = therapySessionService.saveOrUpdate(therapySessions);
-			
+
 		} catch (Exception e) {
 			vestDeviceBadDataRepository.save(new VestDeviceBadData(rawData));
 			throw new RuntimeException(e.getMessage());
-		}finally{
-			if(Objects.nonNull(deviceRawLog)){				
+		} finally {
+			if (Objects.nonNull(deviceRawLog)) {
 				deviceRawLogRepository.save(deviceRawLog);
 			}
 		}
 		return patientVestDeviceRecords;
 	}
-	
-	public List<TempPatientVestDeviceData> saveToTemp(final String rawData) {
+
+	public List<PatientVestDeviceData> saveToTemp(final String rawData) {
 		PatientVestDeviceRawLog deviceRawLog = null;
-		List<TempPatientVestDeviceData> patientVestDeviceRecords = null;
-		try {
-			deviceRawLog = deviceLogParser
-					.parseBase64StringToPatientVestDeviceRawLog(rawData);
-			
-			patientVestDeviceRecords = deviceLogParser
-					.parseBase64StringToPatientVestDeviceLogEntryForTemp(deviceRawLog
-							.getDeviceData());
-			
+		List<TempPatientVestDeviceData> tempPatientVestDeviceRecords = null;
+			deviceRawLog = deviceLogParser.parseBase64StringToPatientVestDeviceRawLog(rawData);
+
+			tempPatientVestDeviceRecords = deviceLogParser
+					.parseBase64StringToPatientVestDeviceLogEntryForTemp(deviceRawLog.getDeviceData());
+
 			String deviceSerialNumber = deviceRawLog.getDeviceSerialNumber();
-			
 
-			UserPatientAssoc userPatientAssoc = createPatientUserIfNotExists(deviceRawLog,
-					deviceSerialNumber);
-			assignDefaultValuesToVestDeviceDataTemp(deviceRawLog,
-					patientVestDeviceRecords, userPatientAssoc);
-			
-			tempPatientdeviceDataRepository.save(patientVestDeviceRecords);
+			UserPatientAssoc userPatientAssoc = createPatientUserIfNotExists(deviceRawLog, deviceSerialNumber);
+			assignDefaultValuesToVestDeviceDataTemp(deviceRawLog, tempPatientVestDeviceRecords, userPatientAssoc);
 
-		} catch (Exception e) {
-			vestDeviceBadDataRepository.save(new VestDeviceBadData(rawData));
-			throw new RuntimeException(e.getMessage());
-		}finally{
-			if(Objects.nonNull(deviceRawLog)){				
-				deviceRawLogRepository.save(deviceRawLog);
-			}
-		}
+			tempPatientdeviceDataRepository.save(tempPatientVestDeviceRecords);
+
+			List<PatientVestDeviceDataVO> deviceDataVOs = patientDeviceDataTempRepository.getPatientDeviceDataDelta();
+			List<PatientVestDeviceData> patientVestDeviceRecords = convertToPatientVestDeviceData(deviceDataVOs,
+					userPatientAssoc);
+
+			deviceDataRepository.save(patientVestDeviceRecords);
+
 		return patientVestDeviceRecords;
 	}
 
-	private UserPatientAssoc createPatientUserIfNotExists(
-			PatientVestDeviceRawLog deviceRawLog, String deviceSerialNumber) {
-		Optional<PatientInfo> patientFromDB = patientInfoRepository
-				.findOneBySerialNumber(deviceSerialNumber);
+	private UserPatientAssoc createPatientUserIfNotExists(PatientVestDeviceRawLog deviceRawLog,
+			String deviceSerialNumber) {
+		Optional<PatientInfo> patientFromDB = patientInfoRepository.findOneBySerialNumber(deviceSerialNumber);
 
 		PatientInfo patientInfo = null;
-		
-		if(patientFromDB.isPresent()){
+
+		if (patientFromDB.isPresent()) {
 			patientInfo = patientFromDB.get();
 			List<UserPatientAssoc> associations = userPatientRepository.findOneByPatientId(patientInfo.getId());
-			List<UserPatientAssoc> userPatientAssociations =  associations.stream().filter(assoc -> 
-				RelationshipLabelConstants.SELF.equalsIgnoreCase(assoc.getRelationshipLabel())
-			).collect(Collectors.toList());
+			List<UserPatientAssoc> userPatientAssociations = associations.stream()
+					.filter(assoc -> RelationshipLabelConstants.SELF.equalsIgnoreCase(assoc.getRelationshipLabel()))
+					.collect(Collectors.toList());
 			return userPatientAssociations.get(0);
-		}else{
+		} else {
 			patientInfo = new PatientInfo();
 			// Assigns the next hillromId for the patient
 			String hillromId = patientInfoRepository.id();
@@ -166,7 +160,7 @@ public class PatientVestDeviceDataService {
 			String customerName = deviceRawLog.getCustomerName();
 			setNameToPatient(patientInfo, customerName);
 			patientInfo = patientInfoRepository.save(patientInfo);
-			
+
 			UserExtension userExtension = new UserExtension();
 			userExtension.setHillromId(hillromId);
 			userExtension.setActivated(true);
@@ -176,48 +170,45 @@ public class PatientVestDeviceDataService {
 			userExtension.setMiddleName(patientInfo.getMiddleName());
 			userExtension.getAuthorities().add(authorityRepository.findOne(PATIENT));
 			userExtensionRepository.save(userExtension);
-			
-			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(
-					new UserPatientAssocPK(patientInfo, userExtension),
-					AuthoritiesConstants.PATIENT,
-					RelationshipLabelConstants.SELF);
-			
+
+			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, userExtension),
+					AuthoritiesConstants.PATIENT, RelationshipLabelConstants.SELF);
+
 			userPatientRepository.save(userPatientAssoc);
-			
+
 			userExtension.getUserPatientAssoc().add(userPatientAssoc);
 			patientInfo.getUserPatientAssoc().add(userPatientAssoc);
-			
+
 			userExtensionRepository.save(userExtension);
 			patientInfoRepository.save(patientInfo);
 			LocalDate createdOrTransmittedDate = userExtension.getCreatedDate().toLocalDate();
-			noEventService.createIfNotExists(new PatientNoEvent(createdOrTransmittedDate,createdOrTransmittedDate, patientInfo, userExtension));
+			noEventService.createIfNotExists(
+					new PatientNoEvent(createdOrTransmittedDate, createdOrTransmittedDate, patientInfo, userExtension));
 			return userPatientAssoc;
 		}
 	}
 
-	private void setNameToPatient(PatientInfo patientInfo,String customerName){
+	private void setNameToPatient(PatientInfo patientInfo, String customerName) {
 		String names[] = customerName.split(" ");
-		if(names.length == 2){
-			assignNameToPatient(patientInfo,names[1],names[0],null);
+		if (names.length == 2) {
+			assignNameToPatient(patientInfo, names[1], names[0], null);
 		}
-		if(names.length == 3){
-			assignNameToPatient(patientInfo,names[2],names[1],names[0]);
+		if (names.length == 3) {
+			assignNameToPatient(patientInfo, names[2], names[1], names[0]);
 		}
-		if(names.length == 1){
-			assignNameToPatient(patientInfo,names[0],null,null);
+		if (names.length == 1) {
+			assignNameToPatient(patientInfo, names[0], null, null);
 		}
 	}
-	
-	private void assignNameToPatient(PatientInfo patientInfo,String firstName,String lastName,String middleName){
+
+	private void assignNameToPatient(PatientInfo patientInfo, String firstName, String lastName, String middleName) {
 		patientInfo.setFirstName(firstName);
 		patientInfo.setLastName(lastName);
 		patientInfo.setMiddleName(middleName);
 	}
-	
-	private void assignDefaultValuesToVestDeviceData(
-			PatientVestDeviceRawLog deviceRawLog,
-			List<PatientVestDeviceData> patientVestDeviceRecords,
-			UserPatientAssoc userPatientAssoc) {
+
+	private void assignDefaultValuesToVestDeviceData(PatientVestDeviceRawLog deviceRawLog,
+			List<PatientVestDeviceData> patientVestDeviceRecords, UserPatientAssoc userPatientAssoc) {
 		patientVestDeviceRecords.stream().forEach(deviceData -> {
 			deviceData.setHubId(deviceRawLog.getHubId());
 			deviceData.setSerialNumber(deviceRawLog.getDeviceSerialNumber());
@@ -226,11 +217,9 @@ public class PatientVestDeviceDataService {
 			deviceData.setBluetoothId(deviceRawLog.getDeviceAddress());
 		});
 	}
-	
-	private void assignDefaultValuesToVestDeviceDataTemp(
-			PatientVestDeviceRawLog deviceRawLog,
-			List<TempPatientVestDeviceData> patientVestDeviceRecords,
-			UserPatientAssoc userPatientAssoc) {
+
+	private void assignDefaultValuesToVestDeviceDataTemp(PatientVestDeviceRawLog deviceRawLog,
+			List<TempPatientVestDeviceData> patientVestDeviceRecords, UserPatientAssoc userPatientAssoc) {
 		patientVestDeviceRecords.stream().forEach(deviceData -> {
 			deviceData.setHubId(deviceRawLog.getHubId());
 			deviceData.setSerialNumber(deviceRawLog.getDeviceSerialNumber());
@@ -239,4 +228,33 @@ public class PatientVestDeviceDataService {
 			deviceData.setBluetoothId(deviceRawLog.getDeviceAddress());
 		});
 	}
+
+	private List<PatientVestDeviceData> convertToPatientVestDeviceData(List<PatientVestDeviceDataVO> deviceDataVOs,
+			UserPatientAssoc userPatientAssoc) {
+
+		List<PatientVestDeviceData> vestDeviceDatas = new ArrayList<>();
+		PatientVestDeviceData patientVestDeviceData;
+
+		for (PatientVestDeviceDataVO dataVO : deviceDataVOs) {
+			patientVestDeviceData = new PatientVestDeviceData();
+
+			patientVestDeviceData.setBluetoothId(dataVO.getBluetoothId());
+			patientVestDeviceData.setChecksum(dataVO.getChecksum());
+			patientVestDeviceData.setDuration(dataVO.getDuration());
+			patientVestDeviceData.setEventId(dataVO.getEventId());
+			patientVestDeviceData.setFrequency(dataVO.getFrequency());
+			patientVestDeviceData.setHmr(dataVO.getHmr());
+			patientVestDeviceData.setHubId(dataVO.getHubId());
+			patientVestDeviceData.setPatient(userPatientAssoc.getPatient());
+			patientVestDeviceData.setPatientUser(userPatientAssoc.getUser());
+			patientVestDeviceData.setPressure(dataVO.getPressure());
+			patientVestDeviceData.setSequenceNumber(dataVO.getSequenceNumber());
+			patientVestDeviceData.setTimestamp(dataVO.getTimestamp());
+
+			vestDeviceDatas.add(patientVestDeviceData);
+		}
+		return vestDeviceDatas;
+
+	}
+
 }

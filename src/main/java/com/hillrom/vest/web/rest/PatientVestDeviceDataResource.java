@@ -39,7 +39,7 @@ public class PatientVestDeviceDataResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> receiveData(@RequestBody(required=true)String rawMessage){
-		List<TempPatientVestDeviceData> deviceData = null;
+		List<PatientVestDeviceData> deviceData = null;
 		rawMessage = rawMessage.replaceAll("\n", "").replaceAll(" ","");
 		String reqParams[] = new String[]{"device_data",
         "device_serial_number","hub_id","hub_receive_time","device_address"};

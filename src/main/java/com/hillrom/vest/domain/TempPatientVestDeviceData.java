@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @IdClass(PatientVestDeviceDataPK.class)
 @Entity
-@Table(name = "PATIENT_VEST_DEVICE_DATA")
+@Table(name = "PATIENT_VEST_DEVICE_DATA_TEMP")
 public class TempPatientVestDeviceData implements Serializable {
 
 	private static final long serialVersionUID = 1L;

@@ -36,4 +36,8 @@ public class PatientNoEventService {
 		}
 		return patientNoEvent;
 	}
+	
+	public PatientNoEvent findByPatientUserId(Long patientUserId){
+		return noEventsRepository.findByPatientUserId(patientUserId);
+	}
 }

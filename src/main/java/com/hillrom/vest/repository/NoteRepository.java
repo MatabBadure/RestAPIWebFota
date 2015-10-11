@@ -1,5 +1,6 @@
 package com.hillrom.vest.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.joda.time.LocalDate;
@@ -19,4 +20,6 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
 	Optional<Note> findOneByPatientUserIdAndCreatedOn(Long userId,LocalDate date);
 	
 	Page<Note> findByPatientUserIdAndCreatedOnBetweenAndDeletedOrderByCreatedOnDesc(Long userId,LocalDate from,LocalDate to,Boolean isDeleted,Pageable pageable);
+	
+	List<Note> findByPatientUserIdAndCreatedOnBetweenAndDeletedOrderByCreatedOnAsc(Long userId,LocalDate from,LocalDate to,Boolean isDeleted);
 }

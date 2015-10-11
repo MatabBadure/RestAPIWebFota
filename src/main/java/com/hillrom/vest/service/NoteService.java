@@ -1,8 +1,10 @@
 package com.hillrom.vest.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import javax.inject.Inject;
 
@@ -117,5 +119,14 @@ public class NoteService {
 	public Page<Note> findByUserIdAndDateRange(Long userId,LocalDate from,LocalDate to,Boolean isDeleted,Pageable pageable){
 		Page<Note> notes = noteRepository.findByPatientUserIdAndCreatedOnBetweenAndDeletedOrderByCreatedOnDesc(userId,from,to,isDeleted,pageable);
 		return notes;
-	} 
+	}
+	
+	public Map<LocalDate,Note> findByPatientUserIdAndCreatedOnBetweenGroupByCreatedOn(Long patientUserId,LocalDate from,LocalDate to,Boolean isDeleted){
+		List<Note> notes = noteRepository.findByPatientUserIdAndCreatedOnBetweenAndDeletedOrderByCreatedOnAsc(patientUserId, from, to, false);
+		Map<LocalDate,Note> dateNotesMap = new TreeMap<>();
+		for(Note note : notes){
+			dateNotesMap.put(note.getCreatedOn(), note);
+		}
+		return dateNotesMap;
+	}
 }

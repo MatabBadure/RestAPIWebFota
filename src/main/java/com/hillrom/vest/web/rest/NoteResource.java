@@ -68,9 +68,22 @@ public class NoteResource {
 			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 		}
 		if(Objects.nonNull(userId)){
-			note = noteService.saveOrUpdateNoteByUserId(Long.parseLong(userId), noteText,date);
+			try {
+				note = noteService.saveOrUpdateNoteByUserId(Long.parseLong(userId), noteText,date);
+			} catch (NumberFormatException e) {
+				jsonObject.put("ERROR", "Number Format Exception");
+				return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+			} catch (HillromException e) {
+				jsonObject.put("ERROR", e.getMessage());
+				return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+			}
 		}else if(Objects.nonNull(patientId)){
-			note = noteService.saveOrUpdateNoteByPatientId(patientId, noteText,date);
+			try {
+				note = noteService.saveOrUpdateNoteByPatientId(patientId, noteText,date);
+			} catch (HillromException e) {
+				jsonObject.put("ERROR",e.getMessage());
+				return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+			}
 		}else{
 			jsonObject.put("ERROR", "Required Param missing [noteText,patientId/userId]");
 			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);

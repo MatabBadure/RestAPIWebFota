@@ -6,11 +6,15 @@ import java.util.Objects;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.domain.PatientCompliance;
+import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.repository.PatientComplianceRepository;
+import com.hillrom.vest.service.util.DateUtil;
 
 @Service
 @Transactional
@@ -40,5 +44,13 @@ public class PatientComplianceService {
 	
 	public PatientCompliance findTop1ByDateBeforeAndPatientUserId(LocalDate date,Long patientUserId){
 		return complianceRepository.findTop1ByDateBeforeAndPatientUserIdOrderByDateDesc(date, patientUserId);
+	}
+	
+	public int getMissedTherapyCountByPatientUserId(Long patientUSerId){
+		PatientCompliance existingCompliance = complianceRepository.findByPatientUserIdAndDate(patientUSerId,LocalDate.now());
+		if (Objects.nonNull(existingCompliance))
+			return existingCompliance.getMissedTherapyCount();
+		else
+			return 0;
 	}
 }

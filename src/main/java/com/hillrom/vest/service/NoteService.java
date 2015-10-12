@@ -68,7 +68,7 @@ public class NoteService {
 		
 		PatientNoEvent patientNoEvent = patientNoEventService.findByPatientUserId(userId);
 		
-		if(Objects.nonNull(patientNoEvent))
+		if(Objects.isNull(patientNoEvent))
 			throw new HillromException(ExceptionConstants.HR_585);
 		if(Objects.isNull(patientNoEvent.getFirstTransmissionDate()) ||  date.isBefore(patientNoEvent.getFirstTransmissionDate()))
 			throw new HillromException(ExceptionConstants.HR_701);

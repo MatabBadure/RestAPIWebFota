@@ -3,6 +3,7 @@ package com.hillrom.vest.service;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -10,10 +11,13 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import org.boon.core.Sys;
 import org.joda.time.LocalDate;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
@@ -26,11 +30,11 @@ import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.domain.VestDeviceBadData;
 import com.hillrom.vest.repository.AuthorityRepository;
-import com.hillrom.vest.repository.PatientDeviceDataTempRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
 import com.hillrom.vest.repository.TempPatientVestDeviceDataRepository;
+import com.hillrom.vest.repository.TempRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.VestDeviceBadDataRepository;
@@ -40,7 +44,6 @@ import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.PatientVestDeviceDataVO;
 
 @Service
-@Transactional(noRollbackFor = { RuntimeException.class })
 public class PatientVestDeviceDataService {
 
 	@Inject
@@ -74,11 +77,17 @@ public class PatientVestDeviceDataService {
 	private VestDeviceBadDataRepository vestDeviceBadDataRepository;
 
 	@Inject
-	private PatientDeviceDataTempRepository patientDeviceDataTempRepository;
+	private TempRepository patientDeviceDataTempRepository;
 
 	@Inject
 	private PatientNoEventService noEventService;
 
+	@Inject
+	private JobLauncher jobLauncher;
+	
+	@Inject
+	private ApplicationContext applicationContext;
+	
 	public List<PatientVestDeviceData> save(final String rawData) {
 		PatientVestDeviceRawLog deviceRawLog = null;
 		List<PatientVestDeviceData> patientVestDeviceRecords = null;
@@ -111,7 +120,7 @@ public class PatientVestDeviceDataService {
 		return patientVestDeviceRecords;
 	}
 
-	public List<PatientVestDeviceData> saveToTemp(final String rawData) {
+	public List<PatientVestDeviceData> saveToTemp(final String rawData) throws Exception {
 		PatientVestDeviceRawLog deviceRawLog = null;
 		List<TempPatientVestDeviceData> tempPatientVestDeviceRecords = null;
 			deviceRawLog = deviceLogParser.parseBase64StringToPatientVestDeviceRawLog(rawData);
@@ -124,15 +133,20 @@ public class PatientVestDeviceDataService {
 			UserPatientAssoc userPatientAssoc = createPatientUserIfNotExists(deviceRawLog, deviceSerialNumber);
 			assignDefaultValuesToVestDeviceDataTemp(deviceRawLog, tempPatientVestDeviceRecords, userPatientAssoc);
 
-			tempPatientdeviceDataRepository.save(tempPatientVestDeviceRecords);
+			Job addNewPodcastJob = applicationContext.getBean("processTherapySessionsAndCompliance", Job.class);
+			JobParameters jobParameters = new JobParametersBuilder()
+    		.addLong("TIME", System.currentTimeMillis())
+    		.toJobParameters();
+			jobLauncher.run(addNewPodcastJob, jobParameters);
+			//tempPatientdeviceDataRepository.save(tempPatientVestDeviceRecords);
 
-			List<PatientVestDeviceDataVO> deviceDataVOs = patientDeviceDataTempRepository.getPatientDeviceDataDelta();
+			/*List<PatientVestDeviceDataVO> deviceDataVOs = patientDeviceDataTempRepository.getPatientDeviceDataDelta();
 			List<PatientVestDeviceData> patientVestDeviceRecords = convertToPatientVestDeviceData(deviceDataVOs,
 					userPatientAssoc);
 
 			deviceDataRepository.save(patientVestDeviceRecords);
-
-		return patientVestDeviceRecords;
+*/
+		return new LinkedList<>();
 	}
 
 	private UserPatientAssoc createPatientUserIfNotExists(PatientVestDeviceRawLog deviceRawLog,

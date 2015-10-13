@@ -622,7 +622,7 @@ public class UserSearchRepository {
 			Pageable pageable, Map<String, Boolean> sortOrder) throws HillromException {
 
 		String findPatientUserQuery = " select user.id,user.email,user.first_name as firstName,user.last_name as lastName, "
-				+ " user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,"
+				+ " user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob as patientDoB,"
 				+ " user.gender,user.title,user.hillrom_id,user.created_date as createdAt,"
 				+ " user.activated as isActivated, patInfo.state as state, pc.compliance_score adherence,"
 				+ " pc.last_therapy_session_date as last_date,"

@@ -17,11 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.PatientInfo;
+import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserPatientAssoc;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.NoteRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 
 @Service
@@ -40,6 +43,9 @@ public class NoteService {
 	@Inject
 	private UserPatientRepository userPatientRepository;
 	
+	@Inject
+	private PatientNoEventService patientNoEventService;
+	
 	public Note findOneByUserIdAndDate(Long userId,LocalDate date){
 		Optional<Note> note =  noteRepository.findOneByPatientUserIdAndCreatedOn(userId, date);
 		if(note.isPresent())
@@ -55,9 +61,18 @@ public class NoteService {
 		return null;
 	}
 	
-	public Note saveOrUpdateNoteByUserId(Long userId,String note,LocalDate date){
+	public Note saveOrUpdateNoteByUserId(Long userId,String note,LocalDate date) throws HillromException{
 		if(StringUtils.isBlank(note))
 			return null;
+		
+		
+		PatientNoEvent patientNoEvent = patientNoEventService.findByPatientUserId(userId);
+		
+		if(Objects.isNull(patientNoEvent))
+			throw new HillromException(ExceptionConstants.HR_585);
+		if(Objects.isNull(patientNoEvent.getFirstTransmissionDate()) ||  date.isBefore(patientNoEvent.getFirstTransmissionDate()))
+			throw new HillromException(ExceptionConstants.HR_701);
+			
 		Note existingNote = findOneByUserIdAndDate(userId,date);
 		if(Objects.isNull(existingNote)){
 			existingNote = new Note();
@@ -78,7 +93,12 @@ public class NoteService {
 		return existingNote;
 	}
 	
-	public Note saveOrUpdateNoteByPatientId(String patientId,String note,LocalDate date){
+	public Note saveOrUpdateNoteByPatientId(String patientId,String note,LocalDate date) throws HillromException{
+		PatientNoEvent patientNoEvent = patientNoEventService.findByPatientId(patientId);
+		if(Objects.nonNull(patientNoEvent))
+			throw new HillromException(ExceptionConstants.HR_585);
+		if(Objects.isNull(patientNoEvent.getFirstTransmissionDate()) ||  date.isBefore(patientNoEvent.getFirstTransmissionDate()))
+			throw new HillromException(ExceptionConstants.HR_701);
 		if(StringUtils.isBlank(note))
 			return null;
 		Note existingNote = findOneByPatientIdAndDate(patientId,date);

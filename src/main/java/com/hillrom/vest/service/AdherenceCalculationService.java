@@ -293,7 +293,7 @@ public class AdherenceCalculationService {
 				if(score > 0)
 					newCompliance.setScore(score- MISSED_THERAPY_POINTS);
 				int missedTherapyCount = compliance.getMissedTherapyCount();
-				if(missedTherapyCount > 0 && missedTherapyCount % 3 == 0){
+				if(missedTherapyCount >= 3 ){
 					notificationService.createOrUpdateNotification(compliance.getPatientUser(), compliance.getPatient(), compliance.getPatientUser().getId(),
 							today.toLocalDate(), MISSED_THERAPY,false);
 				}

@@ -1,6 +1,5 @@
 package com.hillrom.vest.repository;
 
-import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +29,8 @@ public class HcpVO {
 	
 	public HcpVO(Long id, String firstName, String lastName, String email,boolean isDeleted,
 			Integer zipcode, String address, String city, String credentials,
-			String faxNumber, String primaryPhone, String mobilePhone,
-			String speciality, String state,DateTime createdAt,boolean isActivated,String npiNumber) {
+			String faxNumber, String primaryPhone, String mobilePhone, String speciality, 
+			String state,DateTime createdAt,boolean isActivated,String npiNumber) {
 		super();
 		this.id = id;
 		this.email = email;

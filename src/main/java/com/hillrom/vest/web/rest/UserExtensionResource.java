@@ -596,7 +596,7 @@ public class UserExtensionResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN, AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> updateCaregiver( @PathVariable Long caregiverUserId, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
         
         log.debug("REST request to update User : {}", userExtensionDTO);
@@ -653,7 +653,7 @@ public class UserExtensionResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN, AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> getCaregiver(@PathVariable Long caregiverUserId) {
         log.debug("REST request to get caregiver User : {}", caregiverUserId);
         JSONObject jsonObject = new JSONObject();

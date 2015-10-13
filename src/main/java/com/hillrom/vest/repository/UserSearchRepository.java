@@ -656,18 +656,20 @@ public class UserSearchRepository {
 				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id" 
 				+" join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id  "
 				+" left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate()  "
-				+" join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id and "
+				+" left outer join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id and "
 				+ " lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString) ";
 				
 				String query2 = " where upa_hcp.user_id = :hcpUserID ";
 				String query3 =	" group by user.id ";
+				
+				String associatedClinicList = hcpClinicService.getFlattenedAssociatedClinicsIdForHCP(hcpUserID);
+				
+				String filterByAssociatedClinicList = StringUtils.isEmpty(associatedClinicList)?"": " or patient_clinic.clinic_id  in ("
+						+ associatedClinicList + " ) ";
 		if (StringUtils.isEmpty(clinicId) | "all".equalsIgnoreCase(clinicId)) {
-			findPatientUserQuery = findPatientUserQuery + query2 + " or patient_clinic.clinic_id  in ("
-					+ hcpClinicService.getFlattenedAssociatedClinicsIdForHCP(hcpUserID) + " ) " + query3;
+			findPatientUserQuery = findPatientUserQuery + query2 + filterByAssociatedClinicList + query3;
 		} else if ("others".equalsIgnoreCase(clinicId)) {
-			findPatientUserQuery = findPatientUserQuery + query2 + " and patient_clinic.clinic_id not in ("
-					+ hcpClinicService.getFlattenedAssociatedClinicsIdForHCP(hcpUserID) + ")" +
-			query3;
+			findPatientUserQuery = findPatientUserQuery + query2 + query3;
 		} else
 			findPatientUserQuery = findPatientUserQuery + " where patient_clinic.clinic_id  ='" + clinicId + "'"
 					+ query3;

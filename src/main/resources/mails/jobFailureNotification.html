@@ -9,6 +9,8 @@
             Dear
         </p>
         <br/>
+        <p th:text="#{email.jobfailure.env(${environment})}"></p>
+        <br/>
         <p th:text="#{email.jobfailure.message(${jobName})}"></p>
         <br/>
         <p th:text="#{email.jobfailure.stackTrace(${stackTrace})}"></p>

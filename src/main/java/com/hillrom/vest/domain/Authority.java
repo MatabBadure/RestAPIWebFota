@@ -10,10 +10,13 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.envers.Audited;
+
 /**
  * An authority (a security role) used by Spring Security.
  */
 @Entity
+@Audited
 @Table(name = "AUTHORITY")
 public class Authority implements Serializable {
 

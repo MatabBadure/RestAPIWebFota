@@ -1,7 +1,11 @@
 package com.hillrom.vest.service;
+import static com.hillrom.vest.config.NotificationTypeConstants.*;
+import java.util.Locale;
+import java.util.Map;
 
-import com.hillrom.vest.config.NotificationTypeConstants;
-import com.hillrom.vest.domain.User;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang.CharEncoding;
 import org.slf4j.Logger;
@@ -15,11 +19,9 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.mail.internet.MimeMessage;
-
-import java.util.Locale;
+import com.hillrom.vest.domain.Clinic;
+import com.hillrom.vest.domain.User;
+import com.hillrom.vest.service.util.DateUtil;
 
 /**
  * Service for sending e-mails.
@@ -49,10 +51,19 @@ public class MailService {
      * System default email address that sends the e-mails.
      */
     private String from;
-
+    
+    /**
+     * Url to be sent in mail notification(stats for Clinic Admin/Hcp) Link
+     */
+    private String hcpOrClinicAdminDashboardUrl;
+    
+    private String patientDashboardUrl;
+    
     @PostConstruct
     public void init() {
         this.from = env.getProperty("mail.from");
+        this.hcpOrClinicAdminDashboardUrl = env.getProperty("spring.notification.hcpOrClinicAdminDashboardUrl");
+        this.patientDashboardUrl = env.getProperty("spring.notification.patientDashboardUrl");
     }
 
     @Async
@@ -99,22 +110,19 @@ public class MailService {
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
     
-    public void sendNotificationMail(User user,String notificationType){
+    public void sendNotificationMailToPatient(User user,String notificationType){
        log.debug("Sending password reset e-mail to '{}'", user.getEmail());
        Context context = new Context();
        context.setVariable("user", user);
+       context.setVariable("isMissedTherapyNotification", MISSED_THERAPY.equalsIgnoreCase(notificationType));
+       context.setVariable("isHmrNonComplianceNotification", HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType));
+       context.setVariable("isSettingsDeviatedNotification",SETTINGS_DEVIATION.equalsIgnoreCase(notificationType));
+       context.setVariable("isHMRNonComplianceAndSettingsNotification", HMR_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType));
+       context.setVariable("notificationUrl", patientDashboardUrl);
        String content = "";
        String subject = "";
-       if(NotificationTypeConstants.MISSED_THERAPY.equalsIgnoreCase(notificationType)){
-    	   content = templateEngine.process("missedTherapyNotification", context);
-           subject = messageSource.getMessage("email.therapynotification.title", null, null);
-       }else if(NotificationTypeConstants.HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType)){
-    	   content = templateEngine.process("hmrComplianceNotification", context);
-           subject = messageSource.getMessage("email.hmrnotification.title", null, null);
-       }else {
-    	   content = templateEngine.process("settingsNotification", context);
-           subject = messageSource.getMessage("email.settingsnotification.title", null, null);
-       }
+	   content = templateEngine.process("therapyNotification", context);
+       subject = messageSource.getMessage("email.therapynotification.title", null, null);
        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
     
@@ -122,6 +130,7 @@ public class MailService {
     	String recipients = env.getProperty("mail.to");
         log.debug("Sending password reset e-mail to '{}'", recipients);
         Context context = new Context();
+        context.setVariable("environment", env.getProperty("spring.profiles.active"));
         context.setVariable("jobName", jobName);
         context.setVariable("stackTrace", stackTrace);
         String content = "";
@@ -130,4 +139,20 @@ public class MailService {
         subject = messageSource.getMessage("email.jobfailure.subject", null, null);
         sendEmail(recipients.split(","), subject, content, false, true);
      }
+    
+    public void sendNotificationMailToHCPAndClinicAdmin(User user,Map<String,Map<String,Integer>> statistics){
+    	log.debug("Sending password reset e-mail to '{}'", user.getEmail());
+        Context context = new Context();
+        context.setVariable("user", user);
+        context.setVariable("clinicStatisticsMap",statistics);
+        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now(), "MMM dd,yyyy"));
+        context.setVariable("notificationUrl", hcpOrClinicAdminDashboardUrl);
+        String content = "";
+        String subject = "";
+
+        content = templateEngine.process("statisticsNotification", context);
+        subject = messageSource.getMessage("email.statisticsnotification.subject", null, null);
+        
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
 }

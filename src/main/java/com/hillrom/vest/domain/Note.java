@@ -2,6 +2,7 @@ package com.hillrom.vest.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,6 +18,8 @@ import org.joda.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.joda.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.joda.ser.LocalDateTimeSerializer;
 import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
 import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 
@@ -32,16 +35,16 @@ public class Note {
 	@Column(name = "created_on")
 	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
 	@JsonSerialize(using = CustomLocalDateSerializer.class)
-	@JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
+    @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
 	private LocalDate createdOn;
 
 	@JsonIgnore
-	@ManyToOne(optional = false, targetEntity = User.class)
+	@ManyToOne(optional = false, targetEntity = User.class,fetch=FetchType.LAZY)
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
 	private User patientUser;
 	
 	@JsonIgnore
-	@ManyToOne(optional = false, targetEntity = PatientInfo.class)
+	@ManyToOne(optional = false, targetEntity = PatientInfo.class,fetch=FetchType.LAZY)
 	@JoinColumn(name = "patient_id", referencedColumnName = "id")
 	private PatientInfo patient;
 

@@ -23,6 +23,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.boon.json.annotations.JsonProperty;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -38,6 +40,7 @@ import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
  * A user.
  */
 @Entity
+@Audited
 @Table(name = "USER")
 @Inheritance(strategy = InheritanceType.JOINED)
 @SQLDelete(sql="UPDATE USER SET is_deleted = 1 WHERE id = ?")
@@ -111,6 +114,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "terms_condition_accepted_date", nullable = true)
     private DateTime termsConditionAcceptedDate = null;
 
+    @Audited
     @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(
             name = "USER_AUTHORITY",
@@ -126,6 +130,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime lastLoggedInAt;
     
+    @NotAudited
     @OneToMany(mappedBy = "userPatientAssocPK.user",fetch=FetchType.LAZY)
     @JsonIgnore
     private Set<UserPatientAssoc> userPatientAssoc = new HashSet<>();
@@ -147,8 +152,29 @@ public class User extends AbstractAuditingEntity implements Serializable {
     
     @Column(name="setting_deviation_notification")
     private boolean  settingDeviationNotification = false;
+
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @Column(name = "activation_link_sent_date", nullable = true)
+    private DateTime activationLinkSentDate = null;
     
-    public Long getId() {
+	public User() {
+		super();
+	}
+
+	public User(String firstName, String lastName, String email,
+			boolean missedTherapyNotification, boolean nonHMRNotification,
+			boolean settingDeviationNotification) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.missedTherapyNotification = missedTherapyNotification;
+		this.nonHMRNotification = nonHMRNotification;
+		this.settingDeviationNotification = settingDeviationNotification;
+	}
+
+
+	public Long getId() {
         return id;
     }
 
@@ -347,6 +373,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	public void setSettingDeviationNotification(boolean settingDeviationNotification) {
 		this.settingDeviationNotification = settingDeviationNotification;
+	}
+
+    public DateTime getActivationLinkSentDate() {
+		return activationLinkSentDate;
+	}
+
+	public void setActivationLinkSentDate(DateTime activationLinkSentDate) {
+		this.activationLinkSentDate = activationLinkSentDate;
 	}
 
 	@Override

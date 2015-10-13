@@ -92,6 +92,7 @@ public class ExceptionConstants {
     public static final String HR_574 = "Unable to create clinic admin.";
     public static final String HR_575 = "Unable to update clinic admin.";
     public static final String HR_576 = "Unable to get clinic admin.";
+    public static final String HR_577 = "Unable to update Caregiver User.";
     
     public static final String HR_581 = "No Patient Associated with HCP.";
     public static final String HR_582 = "No Clinics Associated with HCP.";
@@ -101,10 +102,12 @@ public class ExceptionConstants {
     public static final String HR_586 = "No Clinics Associated with Clinic Admin.";
     public static final String HR_587 = "No patient Associated with Caregiver.";
     public static final String HR_588 = "No HCP Associated with Patient.";
+    public static final String HR_589 = "No patient associated with HCP as caregiver.";
     public static final String HR_599 = "MRN Id already in use with this clinic.";
     
     // Notifications
     public static final String HR_591 = "No such Notification found";
+    public static final String HR_592 = "Activation link expired.";
     public static final String HR_596 = "Unable to update password";
     public static final String HR_597 = "Password do not match with old password.";
     public static final String HR_598 = "Incorrect new password";
@@ -114,5 +117,10 @@ public class ExceptionConstants {
     
     // DateFormat Exception
     public static final String HR_600 = "Invalid DateFormat, expected is : "; 
+
+    public static final String HR_601 = "Invalid Activation Key"; 
     
+    public static final String HR_701 = "Note date cannot be before first  transmission date."; 
+    
+    public static final String HR_702 = "First transmission date does not exist."; 
 }

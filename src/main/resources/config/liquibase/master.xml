@@ -59,4 +59,7 @@
     <include file="classpath:/config/liquibase/changelog/20150916164000_create_table_patient_firsttherapy.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150921195050_Add_Auditing_Field_To_Assocs.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20150922120050_UpdateUserColumnsForNotifications.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20150923113000_drop_recreate_patient_vest_device_data_table.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20151007143700_added_activation_link_sent_date_column.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/201510081330_alter_datatype_activation_key_sent_date.xml" relativeToChangelogFile="false"/>
  </databaseChangeLog>

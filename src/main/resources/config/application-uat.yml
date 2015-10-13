@@ -20,13 +20,13 @@ spring:
         useServerPrepStmts: true
 
     jpa:
-        database-platform: org.hibernate.dialect.MySQLInnoDBDialect
+        database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
         database: MYSQL
         openInView: false
         show_sql: true
         generate-ddl: false
         hibernate:
-            ddl-auto: none
+            ddl-auto: update
             naming-strategy: org.hibernate.cfg.EJB3NamingStrategy
         properties:
             hibernate.cache.use_second_level_cache: false
@@ -40,4 +40,6 @@ spring:
         check-template-location: false
     recaptcha:
         recaptchaPrivateKey: 6LcXjQkTAAAAACiA7rx7o7wlifQ7n3VQ_It-sncc
-
+    notification:
+        hcpOrClinicAdminDashboardUrl: http://uat.hillromvest.com
+        patientDashboardUrl: http://uat.hillromvest.com

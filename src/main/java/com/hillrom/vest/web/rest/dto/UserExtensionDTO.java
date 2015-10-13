@@ -50,6 +50,8 @@ public class UserExtensionDTO extends UserDTO {
     private String relationship;
     
     private Map<String,String> clinicMRNId = new HashMap<>();
+    
+    private boolean expired;
 
     public UserExtensionDTO() {
     }
@@ -190,6 +192,14 @@ public class UserExtensionDTO extends UserDTO {
 
 	public void setClinicMRNId(Map<String, String> clinicMRNId) {
 		this.clinicMRNId = clinicMRNId;
+	}
+
+	public boolean isExpired() {
+		return expired;
+	}
+
+	public void setExpired(boolean expired) {
+		this.expired = expired;
 	}
 
 	@Override

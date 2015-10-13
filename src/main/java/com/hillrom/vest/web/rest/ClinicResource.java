@@ -40,6 +40,7 @@ import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
+import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 import com.mysema.query.types.expr.BooleanExpression;
 
@@ -205,6 +206,7 @@ public class ClinicResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     public ResponseEntity<List<Clinic>> search(@RequestParam(value = "searchString")String searchString,
+    		@RequestParam(value = "filter", required = false)String filter,
     		@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
             @RequestParam(value = "sort_by", required = false) String sortBy,
@@ -215,7 +217,22 @@ public class ClinicResource {
     		 isAscending =  (isAscending != null)?  isAscending : true;
     		 sortOrder.put(sortBy, isAscending);
     	 }
-    	 Page<Clinic> page = clinicRepository.findBy(queryString,PaginationUtil.generatePageRequest(offset, limit, sortOrder));
+    	 
+    	 Map<String,String> paramsMap = getSearchParams(filter);
+    	 String isDeleted = paramsMap.get("isDeleted");
+    	 
+    	 List<Boolean> isDel = new ArrayList<Boolean>();
+    	 if("All".equalsIgnoreCase(isDeleted) || StringUtils.isEmpty(isDeleted)){
+     		isDel.add(true);
+     		isDel.add(false);
+     	 }
+     	 if("1".equalsIgnoreCase(isDeleted)){
+      		isDel.add(true);
+      	 }
+     	 if("0".equalsIgnoreCase(isDeleted)){
+       		isDel.add(false);
+       	 }
+    	 Page<Clinic> page = clinicRepository.findBy(queryString,isDel,PaginationUtil.generatePageRequest(offset, limit, sortOrder));
          HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/clinics/search", offset, limit);
          return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -281,6 +298,30 @@ public class ClinicResource {
         }
     }
     
+    @RequestMapping(value = "/clinics/{clinicId}/notAssociatedPatients",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    public ResponseEntity<JSONObject> getNotAssociatedPatientUsers(@PathVariable String clinicId,
+    		@RequestParam(value = "searchString",required = false) String searchString) {
+        log.debug("REST request to get patients not associated with Clinic : {}", searchString);
+        JSONObject jsonObject = new JSONObject();
+        String queryString = new StringBuilder().append("'%").append(searchString).append("%'").toString();
+        try {
+            List<PatientUserVO> patientUserList = clinicService.getNotAssociatedPatientUsers(clinicId, queryString);
+	        if(patientUserList.isEmpty()){
+				jsonObject.put("message", MessageConstants.HR_302);
+				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+			} else {
+		      	jsonObject.put("message", MessageConstants.HR_301);
+		      	jsonObject.put("patientUsers", patientUserList);
+		      	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+        } catch(HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
     /**
      * GET  /clinics/:id/clinicadmin -> get the clinic admin for the clinic.
      */
@@ -404,4 +445,22 @@ public class ClinicResource {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
+	
+	private Map<String,String> getSearchParams(String filterString){
+		
+		Map<String,String> filterMap = new HashMap<>();
+		if(StringUtils.isEmpty(filterString))
+			return filterMap;
+		
+		String[] filters = filterString.split(";");
+		for(String filter : filters){
+			
+			String[] pair = filter.split(":");
+			if(pair.length>1)
+			if(!StringUtils.isEmpty(pair[1]))
+				filterMap.put(pair[0],pair[1]);
+		}
+		return filterMap;
+	}
+
 }

@@ -960,17 +960,15 @@ public class UserExtensionResource {
         }
     }
     
-    @RequestMapping(value = "/patient/{patientId}/firsttrasmissiondate",
+    @RequestMapping(value = "/patient/{patientUserId}/firsttrasmissiondate",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JSONObject> getfirstTransmissionDateForPatient(@PathVariable String patientId) {
-        log.debug("REST request to get last transmission date for the patient : {}", patientId);
+    public ResponseEntity<JSONObject> getfirstTransmissionDateForPatient(@PathVariable Long patientUserId) {
+        log.debug("REST request to get last transmission date for the patient : {}", patientUserId);
         JSONObject jsonObject = new JSONObject();
         LocalDate firstTransmissionDate;
         try {
-        	firstTransmissionDate  = patientNoEventService.getPatientFirstTransmittedDate(patientId);
-        	
-
+        	firstTransmissionDate  = patientNoEventService.getPatientFirstTransmittedDate(patientUserId);
         	jsonObject.put("firstTransmissionDate",
         			Objects.nonNull(firstTransmissionDate)?firstTransmissionDate.toString():null);
         	

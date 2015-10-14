@@ -13,6 +13,9 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.hillrom.vest.domain.PatientVestDeviceData;
 
@@ -51,5 +54,4 @@ public class ProcessTherapySessionsAndComplianceScore {
     public ItemWriter<List<PatientVestDeviceData>> patientVestDeviceDataWriter() {
     	return new PatientVestDeviceDataWriter();
     }
-	
 }

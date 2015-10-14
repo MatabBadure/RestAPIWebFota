@@ -20,6 +20,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.context.ApplicationContext;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.domain.PatientInfo;
@@ -123,7 +124,8 @@ public class PatientVestDeviceDataService {
 		return patientVestDeviceRecords;
 	}
 
-	public List<PatientVestDeviceData> saveToTemp(final String rawData) throws Exception {
+	@Async
+	public void saveToTemp(final String rawData) throws Exception {
 		PatientVestDeviceRawLog deviceRawLog = null;
 		List<TempPatientVestDeviceData> tempPatientVestDeviceRecords = null;
 			deviceRawLog = deviceLogParser.parseBase64StringToPatientVestDeviceRawLog(rawData);
@@ -140,7 +142,6 @@ public class PatientVestDeviceDataService {
 			Job addNewPodcastJob = applicationContext.getBean("processTherapySessionsAndCompliance", Job.class);
 			JobParameters jobParameters = new JobParametersBuilder()
     		.addLong("TIME", System.currentTimeMillis())
-    		.addString("rawData", rawData)
     		.toJobParameters();
 			jobLauncher.run(addNewPodcastJob, jobParameters);
 			//tempPatientdeviceDataRepository.save(tempPatientVestDeviceRecords);
@@ -151,7 +152,6 @@ public class PatientVestDeviceDataService {
 
 			deviceDataRepository.save(patientVestDeviceRecords);
 */
-		return new LinkedList<>();
 	}
 
 	private UserPatientAssoc createPatientUserIfNotExists(PatientVestDeviceRawLog deviceRawLog,

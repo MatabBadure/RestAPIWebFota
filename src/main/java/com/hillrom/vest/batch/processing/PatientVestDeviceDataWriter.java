@@ -8,6 +8,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.scheduling.annotation.Async;
 
 import com.hillrom.vest.batch.util.BatchUtil;
 import com.hillrom.vest.domain.PatientVestDeviceData;
@@ -21,6 +22,7 @@ public class PatientVestDeviceDataWriter implements ItemWriter<List<PatientVestD
 	private PatientVestDeviceDataRepository deviceDataRepository;
 	
 	@Override
+	@Async
 	public void write(List<? extends List<PatientVestDeviceData>> vestDeviceData)
 			throws Exception {
 		if(vestDeviceData.size() > 0){

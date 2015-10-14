@@ -50,7 +50,7 @@ public class PatientVestDeviceDataResource {
 			return new ResponseEntity(jsonObject,HttpStatus.BAD_REQUEST);
 		};
 		try{			
-			deviceData = deviceDataService.saveToTemp(rawMessage);
+			deviceDataService.saveToTemp(rawMessage);
 		}catch(Exception e){
 			JSONObject error = new JSONObject();
 			error.put("message", e.getMessage());

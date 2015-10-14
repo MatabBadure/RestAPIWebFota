@@ -36,7 +36,6 @@ public class PatientVestDeviceDataDeltaReader implements
 	@Inject
 	private PatientInfoRepository patientInfoRepository;
 	
-	
 	@Override
 	public List<PatientVestDeviceData> read() throws Exception,
 			UnexpectedInputException, ParseException,
@@ -47,8 +46,6 @@ public class PatientVestDeviceDataDeltaReader implements
 		if(Objects.nonNull(deviceDataDelta) && deviceDataDelta.size() > 0){
 			Long userId = deviceDataDelta.get(0).getUserId();
 			String patientId = deviceDataDelta.get(0).getPatientId();
-			System.out.println("In the Reader");
-			System.out.println("Process ID :: "+ManagementFactory.getRuntimeMXBean().getName());
 			patient = patientInfoRepository.findOne(patientId);
 			patientUser = userRepository.findOne(userId); 
 		}

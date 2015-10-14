@@ -36,7 +36,7 @@ public class ProcessTherapySessionsAndComplianceScore {
 	@Bean
 	public Step getPatientVestDeviceDataDelta(){
 		return stepBuilders.get("getPatientVestDeviceDataDelta")
-				.<List<PatientVestDeviceData>,List<PatientVestDeviceData>>chunk(1023)
+				.<List<PatientVestDeviceData>,List<PatientVestDeviceData>>chunk(512)
 				.reader(patientVestDeviceDataDeltaReader())
 				.writer(patientVestDeviceDataWriter())
 				.build();

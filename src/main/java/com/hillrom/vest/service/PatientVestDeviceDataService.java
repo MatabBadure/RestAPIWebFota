@@ -3,8 +3,10 @@ package com.hillrom.vest.service;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -13,6 +15,7 @@ import javax.inject.Inject;
 
 import org.joda.time.LocalDate;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -132,10 +135,12 @@ public class PatientVestDeviceDataService {
 
 			UserPatientAssoc userPatientAssoc = createPatientUserIfNotExists(deviceRawLog, deviceSerialNumber);
 			assignDefaultValuesToVestDeviceDataTemp(deviceRawLog, tempPatientVestDeviceRecords, userPatientAssoc);
+			tempPatientdeviceDataRepository.save(tempPatientVestDeviceRecords);
 
 			Job addNewPodcastJob = applicationContext.getBean("processTherapySessionsAndCompliance", Job.class);
 			JobParameters jobParameters = new JobParametersBuilder()
     		.addLong("TIME", System.currentTimeMillis())
+    		.addString("rawData", rawData)
     		.toJobParameters();
 			jobLauncher.run(addNewPodcastJob, jobParameters);
 			//tempPatientdeviceDataRepository.save(tempPatientVestDeviceRecords);

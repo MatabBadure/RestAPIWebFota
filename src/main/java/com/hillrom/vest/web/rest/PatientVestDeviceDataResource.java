@@ -1,5 +1,6 @@
 package com.hillrom.vest.web.rest;
 
+import java.lang.management.ManagementFactory;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hillrom.vest.batch.util.BatchUtil;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.TempPatientVestDeviceData;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;

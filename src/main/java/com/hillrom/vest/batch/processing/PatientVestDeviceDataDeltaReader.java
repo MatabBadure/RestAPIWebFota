@@ -1,11 +1,15 @@
 package com.hillrom.vest.batch.processing;
 
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import javax.inject.Inject;
 
+import org.neo4j.cypher.internal.helpers.Converge.iterateUntilConverged;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
@@ -18,6 +22,7 @@ import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.TempRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.web.rest.dto.PatientVestDeviceDataVO;
+import com.hillrom.vest.batch.util.BatchUtil;
 
 public class PatientVestDeviceDataDeltaReader implements
 		ItemReader<List<PatientVestDeviceData>> {
@@ -31,6 +36,7 @@ public class PatientVestDeviceDataDeltaReader implements
 	@Inject
 	private PatientInfoRepository patientInfoRepository;
 	
+	
 	@Override
 	public List<PatientVestDeviceData> read() throws Exception,
 			UnexpectedInputException, ParseException,
@@ -41,10 +47,16 @@ public class PatientVestDeviceDataDeltaReader implements
 		if(Objects.nonNull(deviceDataDelta) && deviceDataDelta.size() > 0){
 			Long userId = deviceDataDelta.get(0).getUserId();
 			String patientId = deviceDataDelta.get(0).getPatientId();
+			System.out.println("In the Reader");
+			System.out.println("Process ID :: "+ManagementFactory.getRuntimeMXBean().getName());
 			patient = patientInfoRepository.findOne(patientId);
 			patientUser = userRepository.findOne(userId); 
 		}
-		
+		else
+			return null;
+		if(BatchUtil.flag)
+			return null;
+
 		return convertVOToPatientVestDeviceData(deviceDataDelta, patientUser,
 				patient);
 	}
@@ -73,7 +85,7 @@ public class PatientVestDeviceDataDeltaReader implements
 
 			vestDeviceDatas.add(patientVestDeviceData);
 		}
-		
+		BatchUtil.flag = true;
 		return vestDeviceDatas;
 	}
 

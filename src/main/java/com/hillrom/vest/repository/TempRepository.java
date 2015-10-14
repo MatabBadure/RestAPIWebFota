@@ -62,6 +62,9 @@ public class TempRepository {
 							new PatientVestDeviceDataVO(timestamp,sequence_number,event_id,patient_id,serial_number,
 									bluetooth_id,hub_id,hmr,frequency,pressure,duration,checksum,userId));
 				});
+		if(results.isEmpty())
+			return null;
+		
 		return patientVestDeviceDataVOList;
 	}
 

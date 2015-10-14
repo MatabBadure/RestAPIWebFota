@@ -9,6 +9,7 @@ import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemWriter;
 
+import com.hillrom.vest.batch.util.BatchUtil;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 
@@ -25,12 +26,14 @@ public class PatientVestDeviceDataWriter implements ItemWriter<List<PatientVestD
 		if(vestDeviceData.size() > 0){
 			for(List<PatientVestDeviceData> devData : vestDeviceData){
 				for(PatientVestDeviceData deviceEvent: devData){
-					deviceDataRepository.save(deviceEvent);
+					deviceDataRepository.saveAndFlush(deviceEvent);
 				}
 			}
 		}
-		ExecutionContext stepContext = this.stepExecution.getExecutionContext();
-        stepContext.put("deviceData", vestDeviceData);
+		BatchUtil.flag = false;
+		
+//		ExecutionContext stepContext = this.stepExecution.getExecutionContext();
+//        stepContext.put("deviceData", vestDeviceData);
 	}
 
 	@BeforeStep

@@ -47,10 +47,9 @@ public class PatientNoEventService {
 		return noEventsRepository.findByPatientId(patientId);
 	}
 	
-	public LocalDate getPatientFirstTransmittedDate(String patientId) throws HillromException{
-		PatientNoEvent patientNoEvent = noEventsRepository.findByPatientId(patientId);
+	public LocalDate getPatientFirstTransmittedDate(Long patientUserId) throws HillromException{
+		PatientNoEvent patientNoEvent = noEventsRepository.findByPatientUserId(patientUserId);
 		if(Objects.nonNull(patientNoEvent)){
-			
 			return patientNoEvent.getFirstTransmissionDate();
 		}
 		else 

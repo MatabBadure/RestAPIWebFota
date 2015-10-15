@@ -290,6 +290,35 @@ public class UserExtensionResource {
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
     
+    /**
+     * GET  /user/hcpbypatientclinics/search -> // Get all HCPs associated with Clinics of a Patient.
+     */
+    @RequestMapping(value = "/patient/{patientId}/hcpbypatientclinics/search",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    public ResponseEntity<?> searchAssociatedHcp(@PathVariable String patientId,
+    		@RequestParam(required=true,value = "searchString")String searchString,
+    		@RequestParam(required=false,value = "filter")String filter,
+    		@RequestParam(value = "page" , required = false) Integer offset,
+            @RequestParam(value = "per_page", required = false) Integer limit,
+            @RequestParam(value = "sort_by", required = false) String sortBy,
+            @RequestParam(value = "asc",required = false) Boolean isAscending)
+        throws URISyntaxException {
+    	if(searchString.endsWith("_")){
+    		   searchString = searchString.replace("_", "\\\\_");
+    	}
+    	String queryString = new StringBuilder("'%").append(searchString).append("%'").toString();
+    	Map<String,Boolean> sortOrder = new HashMap<>();
+    	if(sortBy != null  && !sortBy.equals("")) {
+    		isAscending =  (isAscending != null) ?  isAscending : true;
+    		sortOrder.put(sortBy, isAscending);
+    	}
+    	Page<HcpVO> page = userSearchRepository.findHCPByPatientClinics(queryString,filter,patientId,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/patient/"+patientId+"/hcpbypatientclinics/search", offset, limit);
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    }
+    
     
     /**
      * GET  user/clinicadmin/{id}/hcp/search -> search HCP associated with Clinic Admin
@@ -931,17 +960,15 @@ public class UserExtensionResource {
         }
     }
     
-    @RequestMapping(value = "/patient/{patientId}/firsttrasmissiondate",
+    @RequestMapping(value = "/patient/{patientUserId}/firsttrasmissiondate",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JSONObject> getfirstTransmissionDateForPatient(@PathVariable String patientId) {
-        log.debug("REST request to get last transmission date for the patient : {}", patientId);
+    public ResponseEntity<JSONObject> getfirstTransmissionDateForPatient(@PathVariable Long patientUserId) {
+        log.debug("REST request to get last transmission date for the patient : {}", patientUserId);
         JSONObject jsonObject = new JSONObject();
         LocalDate firstTransmissionDate;
         try {
-        	firstTransmissionDate  = patientNoEventService.getPatientFirstTransmittedDate(patientId);
-        	
-
+        	firstTransmissionDate  = patientNoEventService.getPatientFirstTransmittedDate(patientUserId);
         	jsonObject.put("firstTransmissionDate",
         			Objects.nonNull(firstTransmissionDate)?firstTransmissionDate.toString():null);
         	

@@ -34,6 +34,9 @@ public class ClinicPatientAssoc extends AbstractAuditingEntity implements Serial
     @Column(name="notes")
     private String notes;
     
+    @Column(name="is_active")
+    private Boolean isActive = true;
+    
 	public ClinicPatientAssoc() {
 		super();
 	}
@@ -84,6 +87,14 @@ public class ClinicPatientAssoc extends AbstractAuditingEntity implements Serial
 
 	public void setNotes(String notes) {
 		this.notes = notes;
+	}
+
+	public Boolean getActive() {
+		return isActive;
+	}
+
+	public void setActive(Boolean isActive) {
+		this.isActive = isActive;
 	}
 
 	@Override

@@ -120,4 +120,10 @@ public final class Constants {
 	public static final String GROUP_BY_MONTHLY = "monthly";
 	
 	public static final String GROUP_BY_WEEKLY = "weekly";
+	
+	public static final String ACTIVE = "active";
+	
+	public static final String INACTIVE = "inactive";
+	
+	public static final String EXPIRED = "expired";
 }

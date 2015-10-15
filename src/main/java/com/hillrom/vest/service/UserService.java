@@ -600,18 +600,31 @@ public class UserService {
     public UserExtension updatePatientUser(UserExtension user, UserExtensionDTO userExtensionDTO) {
     	patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId())
     	.map(patient -> {
-    		assignValuesToPatientInfoObj(userExtensionDTO, patient);
-    		patientInfoRepository.save(patient);
-    		assignValuesToUserObj(userExtensionDTO, user);
-			userExtensionRepository.save(user);
+    		if(Objects.nonNull(userExtensionDTO.isExpired())){
+    			patient.setExpired(userExtensionDTO.isExpired());
+    			user.setExpired(userExtensionDTO.isExpired());
+    		}
 			if(!userExtensionDTO.getClinicMRNId().isEmpty()){
 				Optional<ClinicPatientAssoc> clinicPatientAssoc = clinicPatientRepository.findOneByClinicIdAndPatientId(
 						userExtensionDTO.getClinicMRNId().get("clinicId"), patient.getId());
 				if(clinicPatientAssoc.isPresent()){
 					clinicPatientAssoc.get().setMrnId(userExtensionDTO.getClinicMRNId().get("mrnId"));
+					if(Constants.ACTIVE.equalsIgnoreCase(userExtensionDTO.getClinicMRNId().get("status"))){
+						clinicPatientAssoc.get().setActive(true);
+					} else if(Constants.INACTIVE.equalsIgnoreCase(userExtensionDTO.getClinicMRNId().get("status"))){
+						clinicPatientAssoc.get().setActive(false);
+					} else if(Constants.EXPIRED.equalsIgnoreCase(userExtensionDTO.getClinicMRNId().get("status"))){
+						clinicPatientAssoc.get().setActive(false);
+						patient.setExpired(true);
+						user.setExpired(true);
+					} 
 					clinicPatientRepository.saveAndFlush(clinicPatientAssoc.get());
 				}
 			}
+			assignValuesToPatientInfoObj(userExtensionDTO, patient);
+    		patientInfoRepository.save(patient);
+    		assignValuesToUserObj(userExtensionDTO, user);
+			userExtensionRepository.save(user);
 			log.debug("Updated Information for Patient User: {}", user);
     		return user;
     	});
@@ -1402,6 +1415,13 @@ public class UserService {
 					Map<String,Object> clinicMRNId = new HashMap<>();
 					clinicMRNId.put("clinic", clinicPatientAssoc.get().getClinic());
 					clinicMRNId.put("mrnId", clinicPatientAssoc.get().getMrnId());
+					if(patientUserVO.isExpired()){
+						clinicMRNId.put("status", Constants.EXPIRED);
+					} else if(clinicPatientAssoc.get().getActive()){
+						clinicMRNId.put("status", Constants.ACTIVE);
+					} else {
+						clinicMRNId.put("status", Constants.INACTIVE);
+					}
 					patientUserVO.setClinicMRNId(clinicMRNId);
 				}
 				return patientUserVO;

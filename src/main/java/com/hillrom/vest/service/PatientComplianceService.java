@@ -54,18 +54,11 @@ public class PatientComplianceService {
 		return existingComplainceMap;
 	}
 	
-	/*public SortedMap<LocalDate,PatientCompliance> createOrUpdate(SortedMap<LocalDate,PatientCompliance> complianceMap){
+	public SortedMap<LocalDate,PatientCompliance> createOrUpdate(SortedMap<LocalDate,PatientCompliance> complianceMap){
 		if(complianceMap.size() > 0){
-			LocalDate from = complianceMap.firstKey();
-			LocalDate to = complianceMap.lastKey();
-			Long patientUserId = complianceMap.get(from).getPatientUser().getId();
-			List<Long> patientUserIds = new LinkedList<>();
-			patientUserIds.add(patientUserId);
-			List<PatientCompliance> complianceList = complianceRepository.findByDateBetweenAndPatientUserIdIn(from, to, patientUserIds);
-			for(PatientCompliance compliance : complianceList){
-				
-			}
+			List<PatientCompliance> complianceList = new LinkedList<>(complianceMap.values());
+			complianceRepository.save(complianceList);
 		}
 		return complianceMap;
-	}*/
+	}
 }

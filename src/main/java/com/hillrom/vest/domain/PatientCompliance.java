@@ -244,7 +244,13 @@ public class PatientCompliance {
 	@Override
 	public String toString() {
 		return "PatientCompliance [id=" + id + ", score=" + score + ", date="
-				+ date + ", hmrRunRate=" + hmrRunRate + "]";
+				+ date + ", hmrRunRate=" + hmrRunRate
+				+ ", isSettingsDeviated=" + isSettingsDeviated
+				+ ", isHmrCompliant=" + isHmrCompliant
+				+ ", missedTherapyCount=" + missedTherapyCount
+				+ ", latestTherapyDate=" + latestTherapyDate + ", hmr=" + hmr
+				+ "]";
 	}
 
+	
 }

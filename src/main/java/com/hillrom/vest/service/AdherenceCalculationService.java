@@ -143,7 +143,7 @@ public class AdherenceCalculationService {
 		int currentScore = Objects.nonNull(latestCompliance) ? latestCompliance.getScore() : DEFAULT_COMPLIANCE_SCORE;
 		int previousScore = currentScore;
 		String notificationType = "";
-		Map<String,Double> actualMetrics = actualTherapyMetricsPerDay(latest3TherapySessions);
+		Map<String,Double> actualMetrics = calculateTherapyMetricsPer3Days(latest3TherapySessions);
 		double latestHmr = therapySessionsPerDay.get(therapySessionsPerDay.size()-1).getHmr();
 		// First Time received Data,hence compliance will be 100.
 		if(latest3TherapySessions.isEmpty() || Objects.isNull(latestCompliance)){

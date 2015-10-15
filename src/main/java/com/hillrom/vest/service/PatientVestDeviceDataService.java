@@ -1,6 +1,7 @@
 package com.hillrom.vest.service;
 
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
+import static com.hillrom.vest.config.AdherenceScoreConstants.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -12,13 +13,11 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 import org.joda.time.LocalDate;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientVestDeviceData;
@@ -87,6 +86,9 @@ public class PatientVestDeviceDataService {
 	
 	@Inject
 	private ApplicationContext applicationContext;
+
+	@Inject
+	private PatientComplianceService complianceService;
 	
 	public List<PatientVestDeviceData> save(final String rawData) {
 		PatientVestDeviceRawLog deviceRawLog = null;
@@ -133,19 +135,22 @@ public class PatientVestDeviceDataService {
 			UserPatientAssoc userPatientAssoc = createPatientUserIfNotExists(deviceRawLog, deviceSerialNumber);
 			assignDefaultValuesToVestDeviceDataTemp(deviceRawLog, tempPatientVestDeviceRecords, userPatientAssoc);
 
-			Job addNewPodcastJob = applicationContext.getBean("processTherapySessionsAndCompliance", Job.class);
+/*			Job addNewPodcastJob = applicationContext.getBean("processTherapySessionsAndCompliance", Job.class);
 			JobParameters jobParameters = new JobParametersBuilder()
     		.addLong("TIME", System.currentTimeMillis())
     		.toJobParameters();
-			jobLauncher.run(addNewPodcastJob, jobParameters);
-			//tempPatientdeviceDataRepository.save(tempPatientVestDeviceRecords);
+			jobLauncher.run(addNewPodcastJob, jobParameters);*/
+			tempPatientdeviceDataRepository.save(tempPatientVestDeviceRecords);
 
-			/*List<PatientVestDeviceDataVO> deviceDataVOs = patientDeviceDataTempRepository.getPatientDeviceDataDelta();
+			List<PatientVestDeviceDataVO> deviceDataVOs = patientDeviceDataTempRepository.getPatientDeviceDataDelta();
 			List<PatientVestDeviceData> patientVestDeviceRecords = convertToPatientVestDeviceData(deviceDataVOs,
 					userPatientAssoc);
+			List<TherapySession> therapySessions = PatientVestDeviceTherapyUtil
+					.prepareTherapySessionFromDeviceData(patientVestDeviceRecords);
 
+			therapySessions = therapySessionService.saveOrUpdate(therapySessions);
 			deviceDataRepository.save(patientVestDeviceRecords);
-*/
+
 		return new LinkedList<>();
 	}
 
@@ -198,6 +203,12 @@ public class PatientVestDeviceDataService {
 			LocalDate createdOrTransmittedDate = userExtension.getCreatedDate().toLocalDate();
 			noEventService.createIfNotExists(
 					new PatientNoEvent(createdOrTransmittedDate, createdOrTransmittedDate, patientInfo, userExtension));
+			PatientCompliance compliance = new PatientCompliance();
+			compliance.setPatient(patientInfo);
+			compliance.setPatientUser(userExtension);
+			compliance.setDate(userExtension.getCreatedDate().toLocalDate());
+			compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
+			complianceService.createOrUpdate(compliance);
 			return userPatientAssoc;
 		}
 	}

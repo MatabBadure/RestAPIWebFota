@@ -1,14 +1,15 @@
 package com.hillrom.vest.service;
 
+import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.SortedSet;
+import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -20,10 +21,13 @@ import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.domain.PatientCompliance;
+import com.hillrom.vest.domain.PatientInfo;
+import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.PatientNoEventsRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
@@ -43,22 +47,33 @@ public class TherapySessionService {
 	@Inject
 	private PatientComplianceService complianceService;
 	
+	@Inject
+	private PatientNoEventsRepository patientNoEventRepository;
+	
 	public List<TherapySession> saveOrUpdate(List<TherapySession> therapySessions) throws HillromException{
-		User patientUser = therapySessions.get(0).getPatientUser();
-		removeExistingTherapySessions(therapySessions, patientUser);
-		Map<LocalDate, List<TherapySession>> groupedTherapySessions = therapySessions
-				.stream()
-				.collect(
-						Collectors
-								.groupingBy(TherapySession::getDate));
-		
-		SortedSet<LocalDate> daysInSortOrder = new TreeSet<>(groupedTherapySessions.keySet());
-		for(LocalDate date : daysInSortOrder){
-			List<TherapySession> therapySessionsPerDay = groupedTherapySessions.get(date);
+		if(therapySessions.size() > 0){			
+			User patientUser = therapySessions.get(0).getPatientUser();
+			PatientInfo patient = therapySessions.get(0).getPatientInfo();
+			// removeExistingTherapySessions(therapySessions, patientUser);
+			Map<LocalDate, List<TherapySession>> groupedTherapySessions = therapySessions
+					.stream()
+					.collect(
+							Collectors
+							.groupingBy(TherapySession::getDate));
+			
+			SortedMap<LocalDate,List<TherapySession>> receivedTherapySessionMap = new TreeMap<>(groupedTherapySessions);
 			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId());
-			PatientCompliance compliance =  adherenceCalculationService.calculateCompliancePerDay(therapySessionsPerDay,protocol);
-			complianceService.createOrUpdate(compliance);
+			PatientNoEvent patientNoEvent = patientNoEventRepository.findByPatientUserId(patientUser.getId());
+			SortedMap<LocalDate,List<TherapySession>> existingTherapySessionMap = getAllTherapySessionsMapByPatientUserId(patientUser.getId());
+			SortedMap<LocalDate,PatientCompliance> existingComplianceMap = complianceService.getPatientComplainceMapByPatientUserId(patientUser.getId());
+			adherenceCalculationService.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
+					receivedTherapySessionMap, existingComplianceMap,protocol);
+			/*for(LocalDate date : receivedTherapySessionMap.keySet()){
+			List<TherapySession> therapySessionsPerDay = groupedTherapySessions.get(date);
+			adherenceCalculationService.calculateCompliancePerDay(therapySessionsPerDay,protocol);
+			//complianceService.createOrUpdate(compliance);
 			therapySessionRepository.save(therapySessionsPerDay);
+		}*/
 		}
 		return therapySessions;
 	}
@@ -109,7 +124,7 @@ public class TherapySessionService {
 			return results;
 	}
 	
-	public Map<LocalDate,List<TherapySession>> groupTherapySessionsByDate(List<TherapySession> therapySessions){
+	public SortedMap<LocalDate,List<TherapySession>> groupTherapySessionsByDate(List<TherapySession> therapySessions){
 		return new TreeMap<>(therapySessions.stream().collect(Collectors.groupingBy(TherapySession :: getDate)));
 	}
 	
@@ -173,4 +188,8 @@ public class TherapySessionService {
 		return statisticsVO;
 	}
 	
+	public SortedMap<LocalDate,List<TherapySession>> getAllTherapySessionsMapByPatientUserId(Long patientUserId){
+		List<TherapySession> therapySessions =  therapySessionRepository.findByPatientUserId(patientUserId);
+		return groupTherapySessionsByDate(therapySessions);
+	}
 }

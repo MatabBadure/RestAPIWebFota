@@ -157,6 +157,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "activation_link_sent_date", nullable = true)
     private DateTime activationLinkSentDate = null;
     
+    @Column(name = "expired")
+    private Boolean expired = false;
+    
 	public User() {
 		super();
 	}
@@ -381,6 +384,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	public void setActivationLinkSentDate(DateTime activationLinkSentDate) {
 		this.activationLinkSentDate = activationLinkSentDate;
+	}
+
+	public Boolean getExpired() {
+		return expired;
+	}
+
+	public void setExpired(Boolean expired) {
+		this.expired = expired;
 	}
 
 	@Override

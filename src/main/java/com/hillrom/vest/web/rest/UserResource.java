@@ -177,7 +177,7 @@ public class UserResource {
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
 
 	}
-	
+	//Patients in HCP Dashboard
    @RequestMapping(value = "/user/hcp/{id}/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	
 	public ResponseEntity<?> searchPatientAssociatedToHcp(@PathVariable Long id,

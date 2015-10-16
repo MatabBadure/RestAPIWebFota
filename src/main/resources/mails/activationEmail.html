@@ -1,24 +1,59 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <title th:text="#{email.activation.title}">Hillrom activation</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    </head>
-    <body>
-        <p th:text="#{email.activation.greeting(${user.email})}">
-            Dear
-        </p>
-        <p th:text="#{email.activation.text1}">
-            Your Hillrom account has been created, please click on the URL below to activate it:
-        </p>
-        <p>
-            <a th:href="@{|${baseUrl}/#/authenticate?key=${user.activationKey}|}"
-               th:text="|${user.email}|">Activation Link</a>
-        </p>
-        <p>
-            <span th:text="#{email.activation.text2}">Regards, </span>
-            <br/>
-            <em th:text="#{email.signature}">JHipster.</em>
-        </p>
-    </body>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+<div style="width: 590px; border: solid 1px #7BA4DA; min-height: 350px; margin: 0 auto; font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; padding: 10px 15px;">
+	<div style="width: 100%;display: inline-block;">
+		<div style="">
+			<img src="logo-HillRom.png" style="height: 30px; width: 100px;float: left;">
+			<span style="margin: 6px 0px 0px 5px; display: inline-block; font-size: 14px;">VisiView<sup>TM</sup> <span>Health Portal</span></span>
+		</div>
+
+	</div>
+	<div style="background-color: #7BA4DA;height: 92px;margin: 20px 0px;">
+		<h3 style="color: #fff;margin: 32px 0px 0px 25px;display: inline-block;">Your Account is Activated !</h3>
+		<img src="activation.png" style="float: right;">
+	</div>
+	<div style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif;">
+		<div>
+			<h4 style="font-size: 14px;" th:text="#{email.reset.greeting(${user.firstName})}">Dear&nbsp;<span>Jose</span></h4>
+			<p style="font-size: 14px;">Congratulation !</p>
+		</div>
+		<div>
+			<p style="font-size: 14px; ">Your Hillrom account has been created, please click on the URL below to activate it:</p>
+		</div>
+		<div style="margin: 40px 0px;">
+			<a style="font-size: 14px;" th:href="@{|${baseUrl}/#/activate?key=${user.activationKey}|}" th:text="|${user.email}|">http://dev.hillromvest.com/#/admin/patients/137/overview</a>
+		</div>
+		<div style="">
+			<p style="font-size: 14px;">If you have experience any problems or have questions, please contact <br />
+			Hill-Rom Respiratory Care Customer Support at 800-426-4224.
+			</p>
+		</div>
+		<div style="margin: 40px 0px;">
+			<h4 style="font-size: 14px; margin-bottom: 0px;">Regards,</h4>
+			<p style="margin-top: 5px; font-size: 14px;">Your HILL-Rom Respiratory Care Team</p>
+		</div>
+		<div style="margin: 50px 0px;">
+			<p style="font-size: 12px;">*** PLRASE DO NOT REPLY TO THIS EMAIL, IF YOU NEED TO CONTACT HILL-ROM, PLEASE CALL 800-426-4224<br/>
+			OR VISIT OUR WEBSITE AT HTTP://RESPIRATORYCAREHILL-ROM.COM/. ANY REPLIES TO THIS EMAIL WILL NOT<br/>
+			BE RECEIVED BY HILL-ROM.*** 
+			</p>
+		</div>
+
+	</div>
+	<div style="background-color: #7BA4DA;padding: 15px 0px;clear: left;display: inline-block;width: 100%; text-align: center;">
+		<ul style="padding:0px 0px; margin: 0px 0px;display: inline-block;">
+			<li style="list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; border-right: 1px solid #fff; padding-left: 15px; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/contactus" th:href="@{|${baseUrl}/#/contactus|}">Contact Us</a> </li>
+			<li style="list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; border-right: 1px solid #fff; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/privacyPolicy" th:href="@{|${baseUrl}/#/privacyPolicy|}">Privacy Policy</a></li>
+			<li style="list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; border-right: 1px solid #fff; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/termsOfUse" th:href="@{|${baseUrl}/#/termsOfUse|}">Terms of Use</a></li>
+			<li style="list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; border-right: 1px solid #fff; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/privacyPractices" th:href="@{|${baseUrl}/#/privacyPractices|}">HIPPA Notice of Privacy Practices</a></li>
+			<li style="list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/careSite" th:href="@{|${baseUrl}/#/careSite|}">Hill-Rom Respiratory Care</a></li>
+		</ul>
+		<p style="font-size: 10px; color: #fff;">Copyright Hill-Rom 2015. All Right Reserved.</p>
+	</div>
+</div>
+</body>
+>>>>>>> stash
 </html>

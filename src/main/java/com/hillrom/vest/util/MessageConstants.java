@@ -45,6 +45,7 @@ public class MessageConstants {
     public static final String HR_264 = "Caregiver User deleted successfully.";
     public static final String HR_265 = "Relationship labels fetched successfully.";
     public static final String HR_266 = "No Caregiver found for patient.";
+    public static final String HR_267 = "No active patient found.";
     
     public static final String HR_271 = "HCP associated with patient successfully.";
     public static final String HR_272 = "HCP is dissociated from Clinic successfully.";

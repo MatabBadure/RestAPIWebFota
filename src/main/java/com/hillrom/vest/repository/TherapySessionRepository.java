@@ -27,4 +27,6 @@ public interface TherapySessionRepository extends
 
 	public List<TherapySession> findByDateBetweenAndPatientUserIdIn(LocalDate fromTimestamp,
 			LocalDate toTimestamp,List<Long> patientUserIds);
+	
+	public List<TherapySession> findByPatientUserId(Long patientUserId);
 }

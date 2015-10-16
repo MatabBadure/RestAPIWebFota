@@ -1,5 +1,6 @@
 package com.hillrom.vest.service;
 
+import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientVestDeviceData;
@@ -76,6 +78,9 @@ public class PatientVestDeviceDataService {
 	
 	@Inject
 	private ApplicationContext applicationContext;
+
+	@Inject
+	private PatientComplianceService complianceService;
 	
 	public List<PatientVestDeviceData> save(final String rawData) {
 		PatientVestDeviceRawLog deviceRawLog = null;
@@ -168,6 +173,12 @@ public class PatientVestDeviceDataService {
 			LocalDate createdOrTransmittedDate = userExtension.getCreatedDate().toLocalDate();
 			noEventService.createIfNotExists(
 					new PatientNoEvent(createdOrTransmittedDate, createdOrTransmittedDate, patientInfo, userExtension));
+			PatientCompliance compliance = new PatientCompliance();
+			compliance.setPatient(patientInfo);
+			compliance.setPatientUser(userExtension);
+			compliance.setDate(userExtension.getCreatedDate().toLocalDate());
+			compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
+			complianceService.createOrUpdate(compliance);
 			return userPatientAssoc;
 		}
 	}

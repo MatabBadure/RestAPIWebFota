@@ -1,7 +1,10 @@
 package com.hillrom.vest.service;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -40,5 +43,22 @@ public class PatientComplianceService {
 	
 	public PatientCompliance findTop1ByDateBeforeAndPatientUserId(LocalDate date,Long patientUserId){
 		return complianceRepository.findTop1ByDateBeforeAndPatientUserIdOrderByDateDesc(date, patientUserId);
+	}
+	
+	public SortedMap<LocalDate,PatientCompliance> getPatientComplainceMapByPatientUserId(Long patientUserId){
+		List<PatientCompliance> complianceList = complianceRepository.findByPatientUserId(patientUserId);
+		SortedMap<LocalDate,PatientCompliance> existingComplainceMap = new TreeMap<>(); 
+		for(PatientCompliance compliance : complianceList){
+			existingComplainceMap.put(compliance.getDate(),compliance);
+		}
+		return existingComplainceMap;
+	}
+	
+	public SortedMap<LocalDate,PatientCompliance> createOrUpdate(SortedMap<LocalDate,PatientCompliance> complianceMap){
+		if(complianceMap.size() > 0){
+			List<PatientCompliance> complianceList = new LinkedList<>(complianceMap.values());
+			complianceRepository.save(complianceList);
+		}
+		return complianceMap;
 	}
 }

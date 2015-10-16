@@ -23,6 +23,7 @@ import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.domain.TempPatientVestDeviceData;
+import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
@@ -37,6 +38,8 @@ import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.DeviceLogParser;
 import com.hillrom.vest.service.PatientNoEventService;
+import com.hillrom.vest.service.TherapySessionService;
+import com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.PatientVestDeviceDataVO;
 
@@ -69,6 +72,9 @@ public class PatientVestDeviceDataDeltaReader implements
 	
 	@Inject
 	private PatientNoEventService noEventService;	
+	
+	@Inject
+	private TherapySessionService therapySessionService;
 	
 	String patientDeviceRawData;
 	
@@ -114,8 +120,13 @@ public class PatientVestDeviceDataDeltaReader implements
 		if(BatchUtil.flag)
 			return null;
 
-		return convertVOToPatientVestDeviceData(deviceDataDelta, patientUser,
+		List<PatientVestDeviceData> patientVestDeviceRecords =  convertVOToPatientVestDeviceData(deviceDataDelta, patientUser,
 				patient);
+		List<TherapySession> therapySessions = PatientVestDeviceTherapyUtil
+				.prepareTherapySessionFromDeviceData(patientVestDeviceRecords);
+
+		therapySessionService.saveOrUpdate(therapySessions);
+		return patientVestDeviceRecords;
 	}
 	
 	private List<PatientVestDeviceData> convertVOToPatientVestDeviceData(

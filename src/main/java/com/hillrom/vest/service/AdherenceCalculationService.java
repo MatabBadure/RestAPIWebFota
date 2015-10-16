@@ -543,13 +543,11 @@ public class AdherenceCalculationService {
 			ProtocolConstants protocolConstant){
 		for(LocalDate currentTherapySessionDate : receivedTherapySessionsMap.keySet()){
 			List<TherapySession> receivedTherapySessions = receivedTherapySessionsMap.get(currentTherapySessionDate);
-			double latestHmr = 0.0d;
 			LocalDate firstTransmittedDate = null;
 			LocalDate latestTherapyDate = null;
 			PatientInfo patient = null;
 			User patientUser = null;
 			if(receivedTherapySessions.size() > 0){
-				latestHmr = receivedTherapySessions.get(receivedTherapySessions.size()-1).getHmr();
 				patient = receivedTherapySessions.get(0).getPatientInfo();
 				patientUser = receivedTherapySessions.get(0).getPatientUser();
 				
@@ -562,38 +560,28 @@ public class AdherenceCalculationService {
 			int totalDuration = calculateCumulativeDuration(receivedTherapySessions);		
 			// Existing User First Time Transmission Data OR New User First Time Transmission Data
 			if(existingTherapySessionMap.isEmpty()){
-				noEventService.updatePatientFirstTransmittedDate(patientUser.getId(), currentTherapySessionDate);
-				PatientCompliance currentCompliance = new PatientCompliance(DEFAULT_COMPLIANCE_SCORE, currentTherapySessionDate,
-						patient, patientUser,totalDuration/3,true,false,latestHmr);
-				existingComplianceMap.put(currentTherapySessionDate, currentCompliance);
-				calculateAdherenceScoreForTheDuration(patientUser,patient,firstTransmittedDate,
-						currentTherapySessionDate,protocolConstant,existingComplianceMap,
-						existingTherapySessionMap,receivedTherapySessionsMap);
+				handleFirstTimeTransmit(existingTherapySessionMap,
+						receivedTherapySessionsMap, existingComplianceMap,
+						protocolConstant, currentTherapySessionDate,
+						firstTransmittedDate, patient, patientUser,
+						totalDuration);
 			}else{ // User Transmitting data in Subsequent requests
 				// data is sent in sorted order
 				latestTherapyDate = existingTherapySessionMap.lastKey();
 				if (Objects.nonNull(firstTransmittedDate) && Objects.nonNull(currentTherapySessionDate)
 						&& firstTransmittedDate.isBefore(currentTherapySessionDate)){
 					// Data sent in sorted order
-					if(latestTherapyDate.isBefore(currentTherapySessionDate)){
-						calculateAdherenceScoreForTheDuration(patientUser,patient,firstTransmittedDate,
-								currentTherapySessionDate,protocolConstant,existingComplianceMap,
-								existingTherapySessionMap,receivedTherapySessionsMap);
-					}else{
-						calculateAdherenceScoreForTheDuration(patientUser,patient,firstTransmittedDate,
-								currentTherapySessionDate,protocolConstant,existingComplianceMap,
-								existingTherapySessionMap,receivedTherapySessionsMap);
-					} 
-				}else{
-					// Older data sent
-					firstTransmittedDate = currentTherapySessionDate;
-					noEventService.updatePatientFirstTransmittedDate(patientUser.getId(), currentTherapySessionDate);
-					PatientCompliance currentCompliance = new PatientCompliance(DEFAULT_COMPLIANCE_SCORE, currentTherapySessionDate,
-							patient, patientUser,totalDuration/3,true,false,latestHmr);
-					existingComplianceMap.put(currentTherapySessionDate, currentCompliance);
 					calculateAdherenceScoreForTheDuration(patientUser,patient,firstTransmittedDate,
 							currentTherapySessionDate,protocolConstant,existingComplianceMap,
 							existingTherapySessionMap,receivedTherapySessionsMap);
+				}else{
+					// Older data sent
+					firstTransmittedDate = currentTherapySessionDate;
+					handleFirstTimeTransmit(existingTherapySessionMap,
+							receivedTherapySessionsMap, existingComplianceMap,
+							protocolConstant, currentTherapySessionDate,
+							firstTransmittedDate, patient, patientUser,
+							totalDuration);
 				}
 			}
 			// Save or update all compliance
@@ -601,6 +589,29 @@ public class AdherenceCalculationService {
 				complianceService.createOrUpdate(existingComplianceMap.get(date));
 			}
  		}
+		List<TherapySession> newTherapySessions = new LinkedList<>();
+		for(LocalDate date : receivedTherapySessionsMap.keySet()){
+			List<TherapySession> sessionsTobeSaved = receivedTherapySessionsMap.get(date);
+			newTherapySessions.addAll(sessionsTobeSaved);
+		}
+		therapySessionRepository.save(newTherapySessions);
+	}
+
+	private void handleFirstTimeTransmit(
+			SortedMap<LocalDate, List<TherapySession>> existingTherapySessionMap,
+			SortedMap<LocalDate, List<TherapySession>> receivedTherapySessionsMap,
+			SortedMap<LocalDate, PatientCompliance> existingComplianceMap,
+			ProtocolConstants protocolConstant,
+			LocalDate currentTherapySessionDate,
+			LocalDate firstTransmittedDate, PatientInfo patient,
+			User patientUser, int totalDuration) {
+		noEventService.updatePatientFirstTransmittedDate(patientUser.getId(), currentTherapySessionDate);
+		PatientCompliance currentCompliance = new PatientCompliance(DEFAULT_COMPLIANCE_SCORE, currentTherapySessionDate,
+				patient, patientUser,totalDuration/3,true,false,0d);
+		existingComplianceMap.put(currentTherapySessionDate, currentCompliance);
+		calculateAdherenceScoreForTheDuration(patientUser,patient,firstTransmittedDate,
+				currentTherapySessionDate,protocolConstant,existingComplianceMap,
+				existingTherapySessionMap,receivedTherapySessionsMap);
 	}
 
 	private void calculateAdherenceScoreForTheDuration(
@@ -614,6 +625,10 @@ public class AdherenceCalculationService {
 			SortedMap<LocalDate, List<TherapySession>> receivedTherapySessionsMap) {
 		
 		LocalDate latestComplianceDate = existingComplianceMap.lastKey();
+		// If Data is received on this day, add it to existingTherapySessions
+		List<TherapySession> sessionsTobeSaved = receivedTherapySessionsMap.get(currentTherapyDate);
+		existingTherapySessionMap.put(currentTherapyDate, sessionsTobeSaved);
+		
 		List<LocalDate> allDates = new LinkedList<>();
 		// Older Data has been sent, hence recalculate compliance till date
 		if(currentTherapyDate.isBefore(latestComplianceDate))
@@ -630,28 +645,17 @@ public class AdherenceCalculationService {
 			List<TherapySession> latest3DaysTherapySessions = prepareTherapySessionsForLast3days(date,
 					existingTherapySessionMap,receivedTherapySessionsMap);
 			Map<String,Double> therapyMetrics = calculateTherapyMetricsPer3Days(latest3DaysTherapySessions);
-			double hmr = 0;
+			
+			double hmr = getLatestHMR(existingTherapySessionMap, date,
+					latest3DaysTherapySessions);
 			int hmrRunrate = 0;
-			if(latest3DaysTherapySessions.size() > 0){
-				hmr = latest3DaysTherapySessions.get(latest3DaysTherapySessions.size()-1).getHmr();
-			}else{
-				if(existingTherapySessionMap.size() > 0){
-					SortedMap<LocalDate,List<TherapySession>> previousTherapySessionMap = existingTherapySessionMap.headMap(date);
-					if(previousTherapySessionMap.size() > 0){
-						List<TherapySession> mostRecentTherapySessions = previousTherapySessionMap.get(previousTherapySessionMap.lastKey());
-						hmr = mostRecentTherapySessions.get(mostRecentTherapySessions.size()-1).getHmr();
-					}
-				} 	
-			}
 			if(Objects.nonNull(therapyMetrics.get("totalDuration"))){
 				hmrRunrate = therapyMetrics.get("totalDuration").intValue();
 			}
-			SortedMap<LocalDate,List<TherapySession>> headMap = existingTherapySessionMap.headMap(date);
-			LocalDate lastTransmissionDate = date;
-			if(headMap.size()>0)
-				lastTransmissionDate = headMap.lastKey();
+			LocalDate lastTransmissionDate = getLatestTransmissionDate(
+					existingTherapySessionMap, date);
 			int missedTherapyCount = 0;
-			if(daysBetween == 0){ // for first 3 days no deductions
+			if(daysBetween == 0){ // first transmit
 				PatientCompliance compliance = existingComplianceMap.get(date);
 				if(Objects.nonNull(compliance)){
 					compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
@@ -667,25 +671,56 @@ public class AdherenceCalculationService {
 				existingComplianceMap.put(date, compliance);
 			}else{
 				PatientCompliance compliance = existingComplianceMap.get(date);
-				if(headMap.size() > 0){
-					missedTherapyCount = DateUtil.getDaysCountBetweenLocalDates(lastTransmissionDate, date);
-				}
+				missedTherapyCount = DateUtil.getDaysCountBetweenLocalDates(lastTransmissionDate, date);
 				if(Objects.isNull(compliance)){
 					SortedMap<LocalDate,PatientCompliance> previousComplianceMap = existingComplianceMap.headMap(date);
 					PatientCompliance latestcompliance = previousComplianceMap.get(previousComplianceMap.lastKey());
 					compliance = buildPatientCompliance(date, latestcompliance,missedTherapyCount);
 				}
+				compliance.setMissedTherapyCount(missedTherapyCount);
+				compliance.setLatestTherapyDate(lastTransmissionDate);
+				compliance.setHmr(hmr);
+				compliance.setHmrRunRate(hmrRunrate);
 				processCompliance(compliance, therapyMetrics, existingComplianceMap,
 						existingTherapySessionMap, receivedTherapySessionsMap, protocolConstant);
 			}
 		}
-		List<TherapySession> newTherapySessions = new LinkedList<>();
-		for(LocalDate date : receivedTherapySessionsMap.keySet()){
-			List<TherapySession> sessionsTobeSaved = receivedTherapySessionsMap.get(date);
-			existingTherapySessionMap.put(date, sessionsTobeSaved);
-			newTherapySessions.addAll(sessionsTobeSaved);
+	}
+
+	private LocalDate getLatestTransmissionDate(
+			SortedMap<LocalDate, List<TherapySession>> existingTherapySessionMap,
+			LocalDate date) {
+		LocalDate lastTransmissionDate = date;
+		// Get Latest TransmissionDate, if data has not been transmitted for the day get mostRecent date
+		if(Objects.isNull(existingTherapySessionMap.get(date))){
+			SortedMap<LocalDate,List<TherapySession>> mostRecentTherapySessionMap = existingTherapySessionMap.headMap(date);
+			if(mostRecentTherapySessionMap.size()>0)
+				lastTransmissionDate = mostRecentTherapySessionMap.lastKey();
 		}
-		therapySessionRepository.save(newTherapySessions);
+		return lastTransmissionDate;
+	}
+
+	private double getLatestHMR(
+			SortedMap<LocalDate, List<TherapySession>> existingTherapySessionMap,
+			LocalDate date, List<TherapySession> latest3DaysTherapySessions) {
+		double hmr = 0;
+		if(latest3DaysTherapySessions.size() > 0){
+			hmr = latest3DaysTherapySessions.get(latest3DaysTherapySessions.size()-1).getHmr();
+		}else{
+			if(existingTherapySessionMap.size() > 0){
+				List<TherapySession> therapySessionsForDate = existingTherapySessionMap.get(date);
+				if(Objects.nonNull(therapySessionsForDate)&& therapySessionsForDate.size() > 0){
+					hmr = therapySessionsForDate.get(therapySessionsForDate.size()-1).getHmr();
+				}else{
+					SortedMap<LocalDate,List<TherapySession>> previousTherapySessionMap = existingTherapySessionMap.headMap(date);
+					if(previousTherapySessionMap.size() > 0){
+						List<TherapySession> mostRecentTherapySessions = previousTherapySessionMap.get(previousTherapySessionMap.lastKey());
+						hmr = mostRecentTherapySessions.get(mostRecentTherapySessions.size()-1).getHmr();
+					}
+				}
+			} 	
+		}
+		return hmr;
 	}
 
 	private PatientCompliance buildPatientCompliance(LocalDate date,
@@ -705,7 +740,7 @@ public class AdherenceCalculationService {
 	}
 
 	public void processCompliance(PatientCompliance latestCompliance,Map<String,Double> metricsMap,
-			Map<LocalDate,PatientCompliance> complianceMap,
+			SortedMap<LocalDate,PatientCompliance> complianceMap,
 			SortedMap<LocalDate, List<TherapySession>> existingTherapySessionMap,
 			SortedMap<LocalDate, List<TherapySession>> receivedTherapySessionsMap,
 			ProtocolConstants protocolConstant){
@@ -727,7 +762,7 @@ public class AdherenceCalculationService {
 			if(Objects.nonNull(receivedTherapySessionsMap.get(latestCompliance.getDate()))){
 				currentScore = currentScore <= DEFAULT_COMPLIANCE_SCORE - 2 ? currentScore + 2 : currentScore;
 			}else{// deduct if therapy has been MISSED
-				currentScore = currentScore >= 2 ? currentScore - 2 :currentScore;
+				currentScore = currentScore - 2 >= 0 ? currentScore - 2 :currentScore;
 			}
 		}
 		
@@ -764,14 +799,6 @@ public class AdherenceCalculationService {
 		if(Objects.nonNull(metricsMap.get("totalDuration")))
 			latestCompliance.setHmrRunRate(metricsMap.get("totalDuration").intValue());
 		complianceMap.put(latestCompliance.getDate(), latestCompliance);
-		
-		List<TherapySession> newTherapySessions = new LinkedList<>();
-		for(LocalDate date : receivedTherapySessionsMap.keySet()){
-			List<TherapySession> sessionsTobeSaved = receivedTherapySessionsMap.get(date);
-			existingTherapySessionMap.put(date, sessionsTobeSaved);
-			newTherapySessions.addAll(sessionsTobeSaved);
-		}
-		therapySessionRepository.save(newTherapySessions);
 	} 
 	
 	private List<TherapySession> prepareTherapySessionsForLast3days(
@@ -789,115 +816,4 @@ public class AdherenceCalculationService {
 		}
 		return therapySessions;
 	}
-
-/*	private void updateComplianceForDuration(
-			LocalDate currentTherapyDate,LocalDate latestComplianceDate,
-			LocalDate firstTransmissionDate,
-			SortedMap<LocalDate, PatientCompliance> complianceMap,
-			SortedMap<LocalDate, List<TherapySession>> therapySessionMap,
-			PatientCompliance currentCompliance,
-			ProtocolConstants protocolConstant) {
-		LocalDate firstTherapyDate = null;
-		LocalDate latestTherapyDate = null;
-		if(Objects.nonNull(therapySessionMap)){
-			firstTherapyDate = therapySessionMap.firstKey();
-			latestTherapyDate = therapySessionMap.lastKey();
-		}
-		if(Objects.nonNull(latestTherapyDate) && Objects.nonNull(currentTherapyDate)){
-			// Request received in sorted order, no old data
-			if(latestTherapyDate.isBefore(currentTherapyDate)){
-				List<LocalDate> allDates = DateUtil.getAllLocalDatesBetweenDates(latestTherapyDate.plusDays(1), currentCompliance.getDate());
-				// possibilities are  nightly job has already deducted missed therapy points
-				for(LocalDate date : allDates){
-					PatientCompliance compliance =  complianceMap.get(date);
-					// possibilities are  nightly job has already deducted missed therapy points
-					if(Objects.nonNull(compliance) && (date.equals(currentTherapyDate) || date.isAfter(currentTherapyDate))){
-						int score = compliance.getScore();
-						if(score <= (DEFAULT_COMPLIANCE_SCORE -2))
-							compliance.setScore(score+2);
-					}else{
-						// job hasn't run yet
-						if(Objects.isNull(compliance)){
-							PatientCompliance latestCompliance = complianceMap.get(complianceMap.lastKey());
-							latestCompliance.setDate(date);
-							compliance = latestCompliance;
-						}
-						// No missed Therapy Days
-						if(date.equals(currentTherapyDate)){
-							compliance = calculateComplianceScorePerDay(date,compliance,therapySessionMap,protocolConstant);
-							complianceMap.put(date, compliance);
-						}else{
-							// got missed therapy days
-							int score = compliance.getScore();
-							if(score > 0)
-								compliance.setScore(score - MISSED_THERAPY_POINTS);
-							compliance.setDate(date);
-							complianceMap.put(date, compliance);
-						}
-					}
-				}
-			}else if(Objects.nonNull(firstTherapyDate) && currentTherapyDate.isBefore(firstTherapyDate)){
-				// Received old data
-				List<LocalDate> allDates = DateUtil.getAllLocalDatesBetweenDates(firstTherapyDate, currentCompliance.getDate());
-			}else {
-				List<LocalDate> allDates = DateUtil.getAllLocalDatesBetweenDates(latestTherapyDate, currentCompliance.getDate());
-			}
-		}
-	}
-	
-	public PatientCompliance calculateComplianceScorePerDay(LocalDate date,
-			PatientCompliance compliance,
-			Map<LocalDate,List<TherapySession>> therapySessionMap,
-			ProtocolConstants protocolConstant){
-		List<TherapySession> last3DaysTherapySessions = new LinkedList<>();
-		for(int i = 1;i<=3;i++){
-			List<TherapySession> therapySessions = therapySessionMap.get(date.plusDays(1));
-			if(Objects.nonNull(therapySessions) && therapySessions.size() > 0)
-				last3DaysTherapySessions.addAll(therapySessions);
-		}
-		Map<String,Double> actualMetrics  = calculateTherapyMetricsPer3Days(last3DaysTherapySessions);
-		
-		boolean isHMRComplianceViolated = isHMRComplianceViolated(protocolConstant, actualMetrics);
-
-		boolean isSettingsDeviated = isSettingsDeviated(protocolConstant, actualMetrics);
-		
-		int currentScore = compliance.getScore();
-		int previousScore = currentScore;
-		String notificationType = "";
-		User patientUser = compliance.getPatientUser();
-		Long patientUserId = patientUser.getId();
-		PatientInfo patient = compliance.getPatient();
-		
-		if(isSettingsDeviated){
-			currentScore -=  SETTING_DEVIATION_POINTS;
-			notificationType =  SETTINGS_DEVIATION;				
-		}				
-
-		if(isHMRComplianceViolated){
-			currentScore -=  HMR_NON_COMPLIANCE_POINTS;
-			if(StringUtils.isBlank(notificationType))
-				notificationType =  HMR_NON_COMPLIANCE;
-			else
-				notificationType =  HMR_AND_SETTINGS_DEVIATION;
-		}
-		
-		if(previousScore < currentScore){
-			notificationService.deleteNotification(patientUserId,date);
-			currentScore = currentScore !=  DEFAULT_COMPLIANCE_SCORE ? currentScore + 1 : DEFAULT_COMPLIANCE_SCORE;
-		}
-		
-		// Point has been deducted due to Protocol violation
-		if(previousScore > currentScore){
-			notificationService.createOrUpdateNotification(patientUser, patient, patientUserId,
-					date, notificationType,false);
-		}
-
-		// Compliance Score is non-negative
-		currentScore = currentScore > 0? currentScore : 0;
-		
-		compliance.setScore(currentScore);
-		compliance.setHmrRunRate(actualMetrics.get("totalDuration").intValue());
-		
-		return compliance;
-	}*/
 }

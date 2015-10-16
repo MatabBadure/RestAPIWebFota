@@ -60,7 +60,6 @@ public class TherapySessionService {
 					.collect(
 							Collectors
 							.groupingBy(TherapySession::getDate));
-			
 			SortedMap<LocalDate,List<TherapySession>> receivedTherapySessionMap = new TreeMap<>(groupedTherapySessions);
 			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId());
 			PatientNoEvent patientNoEvent = patientNoEventRepository.findByPatientUserId(patientUser.getId());

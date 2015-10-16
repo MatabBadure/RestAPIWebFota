@@ -25,7 +25,5 @@ public class PatientVestDeviceDataWriter implements ItemWriter<List<PatientVestD
 				}
 			}
 		BatchUtil.flag = false;
-//		ExecutionContext stepContext = this.stepExecution.getExecutionContext();
-//      stepContext.put("deviceData", vestDeviceData);
 	}
 }

@@ -1,5 +1,6 @@
 package com.hillrom.vest.batch.processing;
 
+import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.hillrom.vest.batch.util.BatchUtil;
+import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientVestDeviceData;
@@ -37,6 +39,7 @@ import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.DeviceLogParser;
+import com.hillrom.vest.service.PatientComplianceService;
 import com.hillrom.vest.service.PatientNoEventService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil;
@@ -75,6 +78,9 @@ public class PatientVestDeviceDataDeltaReader implements
 	
 	@Inject
 	private TherapySessionService therapySessionService;
+	
+	@Inject
+	private PatientComplianceService complianceService;
 	
 	String patientDeviceRawData;
 	
@@ -217,6 +223,12 @@ public class PatientVestDeviceDataDeltaReader implements
 			LocalDate createdOrTransmittedDate = userExtension.getCreatedDate().toLocalDate();
 			noEventService.createIfNotExists(
 					new PatientNoEvent(createdOrTransmittedDate, createdOrTransmittedDate, patientInfo, userExtension));
+			PatientCompliance compliance = new PatientCompliance();
+			compliance.setPatient(patientInfo);
+			compliance.setPatientUser(userExtension);
+			compliance.setDate(userExtension.getCreatedDate().toLocalDate());
+			compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
+			complianceService.createOrUpdate(compliance);
 			return userPatientAssoc;
 		}
 	}

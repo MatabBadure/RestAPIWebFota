@@ -26,7 +26,6 @@
 		
 			<div th:each="clinicStatistics : ${clinicStatisticsMap}">
 				<div><p style="font-size: 14px; border-bottom: solid 1px #7BA4DA; padding-bottom: 3px; color:#7BA4DA;" th:text="${clinicStatistics.key}">Clinic Name</p></div>
-			
 				<div th:if="${user.missedTherapyNotification}" th:text="#{email.statisticsnotification.missedtherapy(${clinicStatistics.value.patientsWithMissedTherapy})}"></div>
 				<div th:if="${user.nonHMRNotification}" th:text="#{email.statisticsnotification.hmrNonCompliance(${clinicStatistics.value.patientsWithHmrNonCompliance})}"></div>
 				<div th:if="${user.settingDeviationNotification}" th:text="#{email.statisticsnotification.settingsDeviation(${clinicStatistics.value.patientsWithSettingDeviation})}"></div>
@@ -62,6 +61,7 @@
 		</ul>
 		<p style="font-size: 10px; color: #fff;">Copyright Hill-Rom 2015. All Right Reserved.</p>
 	</div>
+</div>
 </div>
 </body>
 </html>

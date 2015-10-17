@@ -998,7 +998,7 @@ public class UserSearchRepository {
 				+ " lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString) or "
 				+ " lower(user.hillrom_id) like lower(:queryString)) "
 				
-				+" where lower(IFNULL(clinic.clinic_admin_id,0))= :clinicAdminId ";
+				+" where lower(IFNULL(clinic.clinic_admin_id,0))= :clinicAdminId group by user.id ";
 		
 		
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString",

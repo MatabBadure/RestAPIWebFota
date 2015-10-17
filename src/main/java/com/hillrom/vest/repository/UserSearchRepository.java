@@ -1009,8 +1009,6 @@ public class UserSearchRepository {
 		
 		if(!StringUtils.isEmpty(clinicId)){
 			findPatientUserQuery = findPatientUserQuery.concat(" and clinic.id = '"+clinicId+"'");
-			
-			
 		}
 		findPatientUserQuery += groupBy;
 		

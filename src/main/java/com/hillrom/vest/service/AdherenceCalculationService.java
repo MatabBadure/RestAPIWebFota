@@ -772,9 +772,9 @@ public class AdherenceCalculationService {
 			SortedMap<LocalDate, List<TherapySession>> receivedTherapySessionsMap,
 			ProtocolConstants protocolConstant){
 
-		log.warn("***************************BEFORE************************************************");
+		/*log.warn("***************************BEFORE************************************************");
 		log.warn(latestCompliance.getDate()+" : "+latestCompliance);
-		log.warn("**********************************************************************************");
+		log.warn("**********************************************************************************");*/
 		boolean isHMRCompliant = isHMRCompliant(protocolConstant, metricsMap);
 
 		boolean isSettingsDeviated = isSettingsDeviated(protocolConstant, metricsMap);
@@ -838,9 +838,9 @@ public class AdherenceCalculationService {
 		if(Objects.nonNull(metricsMap.get("totalDuration")))
 			latestCompliance.setHmrRunRate(metricsMap.get("totalDuration").intValue());
 		complianceMap.put(latestCompliance.getDate(), latestCompliance);
-		log.warn("***************************AFTER************************************************");
+		/*log.warn("***************************AFTER************************************************");
 		log.warn(latestCompliance.getDate()+" : "+latestCompliance);
-		log.warn("**********************************************************************************");
+		log.warn("**********************************************************************************");*/
 	} 
 	
 	private List<TherapySession> prepareTherapySessionsForLast3days(

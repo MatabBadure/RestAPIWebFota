@@ -713,8 +713,11 @@ public class UserService {
 			newUser.setState(userExtensionDTO.getState());
 		if(StringUtils.isNotBlank(userExtensionDTO.getPrimaryPhone()))
 			newUser.setPrimaryPhone(userExtensionDTO.getPrimaryPhone());
-		if(StringUtils.isNotBlank(userExtensionDTO.getMobilePhone()))
+		if(StringUtils.isNotBlank(userExtensionDTO.getMobilePhone())){
 			newUser.setMobilePhone(userExtensionDTO.getMobilePhone());
+		}else{
+			newUser.setMobilePhone(null);
+		}
 		if(StringUtils.isNotBlank(userExtensionDTO.getFaxNumber()))
 			newUser.setFaxNumber(userExtensionDTO.getFaxNumber());
 		if(StringUtils.isNotBlank(userExtensionDTO.getNpiNumber()))

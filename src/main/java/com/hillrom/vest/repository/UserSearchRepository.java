@@ -747,7 +747,7 @@ public class UserSearchRepository {
 					}
 
 					PatientUserVO patientUserVO = new PatientUserVO(id, email, firstName,
-							lastName, IsDeletedInClinic?false:true, zipcode, address, city, dobLocalDate,
+							lastName, IsDeletedInClinic, zipcode, address, city, dobLocalDate,
 							gender, title, hillromId,createdAtDatetime,isActivated,state,
 							Objects.nonNull(adherence) ? adherence : 0,localLastTransmissionDate);
 					//mrnId,hcpNamesCSV,clinicNamesCSV
@@ -1045,7 +1045,7 @@ public class UserSearchRepository {
 					}
 
 					PatientUserVO patientUserVO = new PatientUserVO(id, email, firstName,
-							lastName, isActivatedInClinic?false:true, zipcode, address, city, dobLocalDate,
+							lastName, isActivatedInClinic, zipcode, address, city, dobLocalDate,
 							gender, title, hillromId,createdAtDatetime,isActivated,state,
 							Objects.nonNull(adherence) ? adherence : 0,localLastTransmissionDate);
 					//mrnId,hcpNamesCSV,clinicNamesCSV

@@ -18,6 +18,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;

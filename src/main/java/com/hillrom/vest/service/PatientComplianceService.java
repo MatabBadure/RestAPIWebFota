@@ -1,6 +1,5 @@
 package com.hillrom.vest.service;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.SortedMap;
@@ -54,11 +53,11 @@ public class PatientComplianceService {
 		return existingComplainceMap;
 	}
 	
-	public SortedMap<LocalDate,PatientCompliance> createOrUpdate(SortedMap<LocalDate,PatientCompliance> complianceMap){
-		if(complianceMap.size() > 0){
-			List<PatientCompliance> complianceList = new LinkedList<>(complianceMap.values());
-			complianceRepository.save(complianceList);
-		}
-		return complianceMap;
+	public int getMissedTherapyCountByPatientUserId(Long patientUSerId){
+		PatientCompliance existingCompliance = complianceRepository.findByPatientUserIdAndDate(patientUSerId,LocalDate.now());
+		if (Objects.nonNull(existingCompliance))
+			return existingCompliance.getMissedTherapyCount();
+		else
+			return 0;
 	}
 }

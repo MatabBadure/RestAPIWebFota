@@ -11,9 +11,8 @@ import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
-import net.minidev.json.JSONObject;
-
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -29,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.config.Constants;
+import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
@@ -42,6 +42,7 @@ import com.hillrom.vest.service.ClinicPatientService;
 import com.hillrom.vest.service.ClinicService;
 import com.hillrom.vest.service.HCPClinicService;
 import com.hillrom.vest.service.PatientHCPService;
+import com.hillrom.vest.service.PatientNoEventService;
 import com.hillrom.vest.service.RelationshipLabelService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.util.ExceptionConstants;
@@ -52,6 +53,8 @@ import com.hillrom.vest.web.rest.dto.HcpClinicsVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
+
+import net.minidev.json.JSONObject;
 
 /**
  * REST controller for managing user.
@@ -85,6 +88,9 @@ public class UserExtensionResource {
     
     @Inject
     private ClinicService clinicService;
+    
+    @Inject
+    private PatientNoEventService patientNoEventService;
     
     /**
      * POST  /user -> Create a new User.
@@ -284,6 +290,42 @@ public class UserExtensionResource {
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
     
+    /**
+     * GET  /user/hcpbypatientclinics/search -> // Get all HCPs associated with Clinics of a Patient.
+     */
+    @RequestMapping(value = "/patient/{patientUserId}/hcpbypatientclinics/search",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    public ResponseEntity<?> searchAssociatedHcp(@PathVariable Long patientUserId,
+    		@RequestParam(required=true,value = "searchString")String searchString,
+    		@RequestParam(required=false,value = "filter")String filter,
+    		@RequestParam(value = "page" , required = false) Integer offset,
+            @RequestParam(value = "per_page", required = false) Integer limit,
+            @RequestParam(value = "sort_by", required = false) String sortBy,
+            @RequestParam(value = "asc",required = false) Boolean isAscending)
+        throws URISyntaxException {
+    	if(searchString.endsWith("_")){
+    		   searchString = searchString.replace("_", "\\\\_");
+    	}
+    	String queryString = new StringBuilder("'%").append(searchString).append("%'").toString();
+    	Map<String,Boolean> sortOrder = new HashMap<>();
+    	if(sortBy != null  && !sortBy.equals("")) {
+    		isAscending =  (isAscending != null) ?  isAscending : true;
+    		sortOrder.put(sortBy, isAscending);
+    	}
+    	List<HcpVO> hcp;
+    	JSONObject jsonObject = new JSONObject();
+		try {
+			hcp = userSearchRepository.findHCPByPatientClinics(queryString,filter,patientUserId,sortOrder);
+        	jsonObject.put("HCPUser", hcp);
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+    		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
+    }
     
     /**
      * GET  user/clinicadmin/{id}/hcp/search -> search HCP associated with Clinic Admin
@@ -918,6 +960,25 @@ public class UserExtensionResource {
 	        	jsonObject.put("message", MessageConstants.HR_300);
 	        	jsonObject.put("patientUsers", patientList);
 	        }
+	        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    @RequestMapping(value = "/patient/{patientUserId}/firsttrasmissiondate",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JSONObject> getfirstTransmissionDateForPatient(@PathVariable Long patientUserId) {
+        log.debug("REST request to get last transmission date for the patient : {}", patientUserId);
+        JSONObject jsonObject = new JSONObject();
+        LocalDate firstTransmissionDate;
+        try {
+        	firstTransmissionDate  = patientNoEventService.getPatientFirstTransmittedDate(patientUserId);
+        	jsonObject.put("firstTransmissionDate",
+        			Objects.nonNull(firstTransmissionDate)?firstTransmissionDate.toString():null);
+        	
 	        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         } catch (HillromException hre){
         	jsonObject.put("ERROR", hre.getMessage());

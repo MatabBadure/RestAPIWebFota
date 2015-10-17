@@ -58,6 +58,7 @@ import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.AdherenceCalculationService;
+import com.hillrom.vest.service.PatientComplianceService;
 import com.hillrom.vest.service.PatientHCPService;
 import com.hillrom.vest.service.PatientProtocolService;
 import com.hillrom.vest.service.PatientVestDeviceService;
@@ -119,6 +120,9 @@ public class UserResource {
 	
 	@Inject
     private PatientHCPService patientHCPService;
+	
+	@Inject
+	private PatientComplianceService patientComplianceService;
 	
 	/**
 	 * GET /users -> get all users.
@@ -638,7 +642,7 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JSONObject> getMissedTherapyCount(@PathVariable Long id){
     	JSONObject json = new JSONObject();
-    	json.put("count",therapySessionService.getMissedTherapyCountByPatientUserId(id));
+    	json.put("count",patientComplianceService.getMissedTherapyCountByPatientUserId(id));
     	return new ResponseEntity<JSONObject>(json, HttpStatus.OK);
     }
     

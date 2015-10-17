@@ -2,6 +2,7 @@ package com.hillrom.vest.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -32,11 +33,11 @@ public class PatientNoEvent {
     @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
 	private LocalDate firstTransmissionDate;
 	
-	@OneToOne(optional=false,targetEntity=PatientInfo.class)
+	@OneToOne(optional=false,targetEntity=PatientInfo.class,fetch=FetchType.LAZY)
 	@JoinColumn(name="patient_id",referencedColumnName="id")
 	private PatientInfo patient;
 	
-	@OneToOne(optional=false,targetEntity=User.class)
+	@OneToOne(optional=false,targetEntity=User.class,fetch=FetchType.LAZY)
 	@JoinColumn(name="user_id",referencedColumnName="id")
 	private User patientUser;
 	

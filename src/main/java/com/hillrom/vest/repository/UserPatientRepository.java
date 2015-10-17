@@ -13,7 +13,7 @@ public interface UserPatientRepository extends
 		JpaRepository<UserPatientAssoc, UserPatientAssocPK> {
 
 	@Query("from UserPatientAssoc upa where upa.userPatientAssocPK.user.id = ?1")
-	List<Optional<UserPatientAssoc>> findOneByUserId(Long userId);
+	List<UserPatientAssoc> findOneByUserId(Long userId);
 	
 	@Query("from UserPatientAssoc upa where upa.userPatientAssocPK.patient.id = ?1")
 	List<UserPatientAssoc> findOneByPatientId(String patientId);

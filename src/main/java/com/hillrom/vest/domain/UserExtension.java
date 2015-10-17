@@ -13,14 +13,16 @@ import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.envers.AuditJoinTable;
+import org.hibernate.envers.Audited;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 /**
  * A UserExtension.
  */
 @Entity
+@Audited
 @Table(name = "USER_EXTENSION")
 @PrimaryKeyJoinColumn(name = "USER_ID", referencedColumnName = "id")
 @SQLDelete(sql = "UPDATE USER_EXTENSION SET is_deleted = 1 WHERE USER_ID = ?")
@@ -54,8 +56,8 @@ public class UserExtension extends User implements Serializable {
 	private String npiNumber;
 
 	@ManyToMany
-	@JoinTable(name = "CLINIC_USER_ASSOC", joinColumns = { @JoinColumn(name = "users_id", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "clinics_id", referencedColumnName = "id") })
-	@JsonManagedReference
+	@JoinTable(name = "CLINIC_USER_ASSOC", joinColumns = { @JoinColumn(name = "users_id", referencedColumnName = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "clinics_id", referencedColumnName = "id") })
+	@AuditJoinTable
 	private Set<Clinic> clinics = new HashSet<>();
 
 	@Column(name = "is_deleted", nullable = false)

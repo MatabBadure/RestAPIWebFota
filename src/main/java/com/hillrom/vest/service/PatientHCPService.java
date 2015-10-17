@@ -243,11 +243,12 @@ public class PatientHCPService {
 		List<String> clinicList = new LinkedList<>();
 		clinicList.add(clinicId);
 		List<Map<String,Object>> patientUsers = clinicService.getAssociatedPatientUsers(clinicList);
+		List<Long> patientUserIds = filterActivePatientIds(patientUsers);
 		if(patientUsers.isEmpty()) {
 			throw new HillromException(MessageConstants.HR_279);
+		} else if(patientUserIds.isEmpty()) {
+			throw new HillromException(MessageConstants.HR_267);
 		} else {
-			
-			List<Long> patientUserIds = filterActivePatientIds(patientUsers);
 			Map<LocalDate,Integer> datePatientNoEventCountMap = getPatientsWithNoEvents(date,date,patientUserIds);
 			int patientsWithNoEventRecorded = Objects.nonNull(datePatientNoEventCountMap.get(date))? datePatientNoEventCountMap.get(date):0;
 			statistics.put("patientsWithHmrNonCompliance", patientComplianceRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, patientUserIds).size());

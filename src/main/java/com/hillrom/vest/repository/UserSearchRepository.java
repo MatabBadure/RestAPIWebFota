@@ -998,9 +998,9 @@ public class UserSearchRepository {
 				+ " lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString) or "
 				+ " lower(user.hillrom_id) like lower(:queryString)) "
 				
-				+" where lower(IFNULL(clinic.clinic_admin_id,0))= :clinicAdminId group by user.id ";
+				+" where lower(IFNULL(clinic.clinic_admin_id,0))= :clinicAdminId ";
 		
-		
+		String groupBy = " group by user.id ";
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString",
 				queryString);
 		
@@ -1009,7 +1009,10 @@ public class UserSearchRepository {
 		
 		if(!StringUtils.isEmpty(clinicId)){
 			findPatientUserQuery = findPatientUserQuery.concat(" and clinic.id = '"+clinicId+"'");
+			
+			
 		}
+		findPatientUserQuery += groupBy;
 		
 		StringBuilder filterQuery = new StringBuilder();
 	
@@ -1023,6 +1026,8 @@ public class UserSearchRepository {
 
 			findPatientUserQuery = filterQuery.toString();
 		}
+		
+		
 		
 		String countSqlQuery = "select count(patientUsers.id) from ("
 				+ findPatientUserQuery + " ) patientUsers";
@@ -1235,8 +1240,6 @@ public class UserSearchRepository {
 			return patientUsers;
 		}
 
-	
-	
 	private Map<String,String> getSearchParams(String filterString){
 		
 		Map<String,String> filterMap = new HashMap<>();

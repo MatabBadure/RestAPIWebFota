@@ -651,6 +651,7 @@ public class UserSearchRepository {
 				+ " pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,"
 				+ " pc.missed_therapy_count as isMissedTherapy "
 				+ " from USER user"
+				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"'"
 				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id" 
 				+ " join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id  "
 				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate()  "
@@ -660,8 +661,7 @@ public class UserSearchRepository {
 				+ " like lower(:queryString) or lower(user.last_name) like lower(:queryString) "
 				+ " or lower(user.email) like lower(:queryString) or lower(CONCAT(user.first_name,' ',user.last_name)) "
 				+ " like lower(:queryString) or lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) "
-				+ " or lower(user.hillrom_id) like lower(:queryString) or lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString))"
-				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"'";
+				+ " or lower(user.hillrom_id) like lower(:queryString) or lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString))";
 				
 				String query2 = " where upa_hcp.user_id = :hcpUserID ";
 				String query3 =	" group by user.id ";
@@ -1162,7 +1162,7 @@ public class UserSearchRepository {
 	
 	//Patient Search which are not associated with the clinic
 	
-		public List<PatientUserVO> findPatientNotAssociatedToClinic(String clinicId, String searchString) {
+	public List<PatientUserVO> findPatientNotAssociatedToClinic(String clinicId, String searchString) {
 
 			String findPatientUserQuery = "select * from ( select user.id as patient_id,user.email as pemail,user.first_name as pfirstName,"
 					+ "user.last_name as plastName, user.is_deleted as isDeleted,user.zipcode as pzipcode,"

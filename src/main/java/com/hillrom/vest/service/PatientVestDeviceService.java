@@ -127,6 +127,7 @@ public class PatientVestDeviceService {
 		     		PatientVestDeviceHistory activeDevice = new PatientVestDeviceHistory(new PatientVestDevicePK(patientInfo, patientInfo.getSerialNumber()),
 		     				patientInfo.getBluetoothId(), patientInfo.getHubId(), true);
 		     		activeDevice.setCreatedDate(patientInfo.getDeviceAssocDate());
+		     		activeDevice.setLastModifiedDate(patientInfo.getDeviceAssocDate());
 		     		deviceList.add(activeDevice);
 	     		}
 	     	} else {

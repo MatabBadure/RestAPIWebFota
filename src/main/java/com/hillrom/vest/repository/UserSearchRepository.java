@@ -686,7 +686,7 @@ public class UserSearchRepository {
 			
 			filterQuery.append("select * from (");
 			
-			applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
+			applyQueryFiltersForHCPandClinicAdmin(findPatientUserQuery, filterQuery, filterMap);
 
 			findPatientUserQuery = filterQuery.toString();
 		}
@@ -732,7 +732,7 @@ public class UserSearchRepository {
 					String clinicNamesCSV = (String) record[17];
 					String hcpNamesCSV = (String) record[18];
 					String mrnId = (String) record[19];
-					Boolean IsDeletedInClinic = (Boolean) record[20];
+					Boolean IsActiveInClinic = (Boolean) record[20];
 					
 					java.util.Date localLastTransmissionDate = null;
 					
@@ -747,7 +747,7 @@ public class UserSearchRepository {
 					}
 
 					PatientUserVO patientUserVO = new PatientUserVO(id, email, firstName,
-							lastName, IsDeletedInClinic, zipcode, address, city, dobLocalDate,
+							lastName, IsActiveInClinic?false:true, zipcode, address, city, dobLocalDate,
 							gender, title, hillromId,createdAtDatetime,isActivated,state,
 							Objects.nonNull(adherence) ? adherence : 0,localLastTransmissionDate);
 					//mrnId,hcpNamesCSV,clinicNamesCSV
@@ -876,6 +876,19 @@ public class UserSearchRepository {
 		
 		applyIsNoEventFilter(filterQuery, filterMap);
 	}
+	
+	//isDeleted field has different meaning For patients in HCP and ClinicAdmin dashboard
+	private void applyQueryFiltersForHCPandClinicAdmin(String query, StringBuilder filterQuery, Map<String, String> filterMap) {
+		applyIsDeletedFiltersForHCPandClinicAdmin(query, filterQuery, filterMap);
+		
+		applyIsHMRNonCompliantFilter(filterQuery, filterMap);
+		
+		applyIsSettingsDeviatedFilter(filterQuery, filterMap);
+		
+		applyIsMissedTherapyFilter(filterQuery, filterMap);
+		
+		applyIsNoEventFilter(filterQuery, filterMap);
+	}
 
 	private void applyIsNoEventFilter(StringBuilder filterQuery, Map<String, String> filterMap) {
 		if(Objects.nonNull(filterMap.get("isNoEvent")) && "1".equals(filterMap.get("isNoEvent"))){
@@ -926,6 +939,22 @@ public class UserSearchRepository {
 			if("1".equals(filterMap.get("isDeleted")))
 				filterQuery.append(") as search_table where isDeleted in (1)");
 			else if("0".equals(filterMap.get("isDeleted")))
+				filterQuery.append(")  as search_table where isDeleted in (0)");
+			else
+				filterQuery.append(") as search_table where isDeleted in (0,1)");
+		}
+		else{
+			filterQuery.append(query);
+			filterQuery.append(") as search_table where isDeleted in (0,1)");
+		}
+	}private void applyIsDeletedFiltersForHCPandClinicAdmin(String query, StringBuilder filterQuery,
+			Map<String, String> filterMap) {
+		if(Objects.nonNull(filterMap.get("isDeleted"))){
+			filterQuery.append(query);
+			
+			if("0".equals(filterMap.get("isDeleted")))
+				filterQuery.append(") as search_table where isDeleted in (1)");
+			else if("1".equals(filterMap.get("isDeleted")))
 				filterQuery.append(")  as search_table where isDeleted in (0)");
 			else
 				filterQuery.append(") as search_table where isDeleted in (0,1)");
@@ -990,7 +1019,7 @@ public class UserSearchRepository {
 			
 			filterQuery.append("select * from (");
 			
-			applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
+			applyQueryFiltersForHCPandClinicAdmin(findPatientUserQuery, filterQuery, filterMap);
 
 			findPatientUserQuery = filterQuery.toString();
 		}
@@ -1045,7 +1074,7 @@ public class UserSearchRepository {
 					}
 
 					PatientUserVO patientUserVO = new PatientUserVO(id, email, firstName,
-							lastName, isActivatedInClinic, zipcode, address, city, dobLocalDate,
+							lastName, isActivatedInClinic?false:true, zipcode, address, city, dobLocalDate,
 							gender, title, hillromId,createdAtDatetime,isActivated,state,
 							Objects.nonNull(adherence) ? adherence : 0,localLastTransmissionDate);
 					//mrnId,hcpNamesCSV,clinicNamesCSV

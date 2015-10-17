@@ -956,18 +956,19 @@ public class UserSearchRepository {
 				+ " where patInfo.id = patInfoh.id group by patInfoh.id) as hcpname,patient_clinic.mrn_id as mrnid, patient_clinic.is_active as isDeleted, pc.is_hmr_compliant as isHMRNonCompliant,"
 				+ " pc.is_settings_deviated as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy from USER user "
 				+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = '"+PATIENT+"'"
+				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"' "
+				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id"
+				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate() "
+				+ " join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id "
+				+ " join CLINIC clinic on clinic.id = patient_clinic.clinic_id "
 				+ " and (lower(user.first_name)  like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString)  or "
 				+ " lower(user.email) like lower(:queryString) or "
 				+ " lower(CONCAT(user.first_name,' ',user.last_name))  like lower(:queryString) or "
 				+ " lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString)  or "
+				+ " lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString) or "
 				+ " lower(user.hillrom_id) like lower(:queryString)) "
-				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"' "
-				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id"
-				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate() "
-				+ " join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id "
-				+ " and lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString) "
-				+ " join CLINIC clinic on clinic.id = patient_clinic.clinic_id "
+				
 				+" where lower(IFNULL(clinic.clinic_admin_id,0))= :clinicAdminId ";
 		
 		

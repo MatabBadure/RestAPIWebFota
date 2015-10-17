@@ -38,7 +38,7 @@ public class TempRepository {
 				+" FROM    PATIENT_VEST_DEVICE_DATA_TEMP t "
 				+" WHERE   ROW(t.timestamp, t.sequence_number, t.event_id,t.patient_id,t.serial_number,"
 				+" t.bluetooth_id,t.hub_id,t.hmr,t.frequency,t.pressure,t.duration,t.checksum,t.user_id) NOT IN "
-				+" (SELECT  *  FROM    PATIENT_VEST_DEVICE_DATA ) ) as diff ";
+				+" (SELECT  *  FROM    PATIENT_VEST_DEVICE_DATA ) ) as diff order by  sequence_number";
 
 		Query query = entityManager.createNativeQuery(patientVestDeviceDataQuery);
 		
@@ -52,7 +52,7 @@ public class TempRepository {
 					String serial_number = (String) record[4];
 					String bluetooth_id = (String) record[5];
 					String hub_id = (String) record[6];
-					double hmr = ((BigDecimal) record[7]).doubleValue();
+					Double hmr = (Double) record[7];
 					Integer frequency = (Integer) record[8]; 
 					Integer pressure = (Integer) record[9]; 
 					Integer duration = (Integer)record[10];

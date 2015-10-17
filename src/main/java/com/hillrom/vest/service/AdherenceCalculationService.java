@@ -792,7 +792,7 @@ public class AdherenceCalculationService {
 			currentScore = currentScore - 2 >= 0 ? currentScore - 2 :currentScore;
 			isMissedTherapy = true;
 			latestCompliance.setHmrCompliant(false);// Miss Therapy represents HMR NonCompliance
-		}else{
+		}else if(currentMissedTherapyCount < latestCompliance.getMissedTherapyCount()){
 			// Add MISSED_THERAPY_POINTS, since Data Received 
 			currentScore = currentScore <= DEFAULT_COMPLIANCE_SCORE - 2 ? currentScore + 2 : currentScore;
 		}

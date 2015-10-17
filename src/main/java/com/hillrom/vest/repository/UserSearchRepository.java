@@ -531,12 +531,12 @@ public class UserSearchRepository {
 					java.util.Date localLastTransmissionDate = null;
 					
 					if(Objects.nonNull(lastTransmissionDate)){
-						localLastTransmissionDate =lastTransmissionDate;
+						localLastTransmissionDate = new java.util.Date(lastTransmissionDate.getTime());
 						
 					}
 					
 					java.util.Date dobLocalDate = null;
-					if(null !=dob){
+					if(Objects.nonNull(dob)){
 						dobLocalDate = new java.util.Date(dob.getTime());
 					}
 

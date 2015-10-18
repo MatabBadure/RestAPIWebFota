@@ -33,6 +33,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +53,6 @@ import com.hillrom.vest.repository.ProtocolConstantsRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.DateUtil;
-import com.hillrom.vest.web.rest.AccountResource;
 import com.hillrom.vest.web.rest.dto.ClinicStatsNotificationVO;
 
 
@@ -302,7 +302,7 @@ public class AdherenceCalculationService {
 				if(score > 0)
 					newCompliance.setScore(score- MISSED_THERAPY_POINTS);
 				int missedTherapyCount = compliance.getMissedTherapyCount();
-				if(missedTherapyCount > 0 && missedTherapyCount % 3 == 0){
+				if(missedTherapyCount >= 3 ){
 					notificationService.createOrUpdateNotification(compliance.getPatientUser(), compliance.getPatient(), compliance.getPatientUser().getId(),
 							today.toLocalDate(), MISSED_THERAPY,false);
 				}
@@ -343,26 +343,40 @@ public class AdherenceCalculationService {
 	/**
 	 * Runs every 3pm , sends the notifications to Patient User.
 	 */
+	@Async
 	@Scheduled(cron="0 0 15 * * *")
 	public void processPatientNotifications(){
 		LocalDate today = LocalDate.now();
 		List<Notification> notifications = notificationRepository.findByDate(today);
-		try{
-			notifications.forEach(notification -> {
-				User patientUser = notification.getPatientUser();
-				if(Objects.nonNull(patientUser.getEmail())){
-					// integrated Accepting mail notifications
-					String notificationType = notification.getNotificationType();
-					if(isPatientUserAcceptNotification(patientUser,
-							notificationType))
-					mailService.sendNotificationMailToPatient(patientUser,notificationType);
-				}
-			});
-		}catch(Exception ex){
-			StringWriter writer = new StringWriter();
-			PrintWriter printWriter = new PrintWriter( writer );
-			ex.printStackTrace( printWriter );
-			mailService.sendJobFailureNotification("processPatientNotifications",writer.toString());
+		if(notifications.size() > 0){
+			List<Long> patientUserIds = new LinkedList<>();
+			for(Notification notification : notifications){
+				patientUserIds.add(notification.getPatientUser().getId());
+			}
+			List<PatientCompliance> complianceList = patientComplianceRepository.findByDateBetweenAndPatientUserIdIn(today,
+					today,patientUserIds);
+			Map<User,Integer> complianceMap = new HashMap<>();
+			for(PatientCompliance compliance : complianceList){
+				complianceMap.put(compliance.getPatientUser(), compliance.getMissedTherapyCount());
+			}
+			try{
+				notifications.forEach(notification -> {
+					User patientUser = notification.getPatientUser();
+					if(Objects.nonNull(patientUser.getEmail())){
+						// integrated Accepting mail notifications
+						String notificationType = notification.getNotificationType();
+						int missedTherapyCount = complianceMap.get(patientUser);
+						if(isPatientUserAcceptNotification(patientUser,
+								notificationType))
+							mailService.sendNotificationMailToPatient(patientUser,notificationType,missedTherapyCount);
+					}
+				});
+			}catch(Exception ex){
+				StringWriter writer = new StringWriter();
+				PrintWriter printWriter = new PrintWriter( writer );
+				ex.printStackTrace( printWriter );
+				mailService.sendJobFailureNotification("processPatientNotifications",writer.toString());
+			}
 		}
 	}
 	
@@ -523,7 +537,7 @@ public class AdherenceCalculationService {
 					hmrNonCompliantPatients++;
 				if(cNotificationVO.isSettingsDeviated())
 					settingsDeviatedPatients++;
-				if(cNotificationVO.getMissedTherapyCount() > 0 && cNotificationVO.getMissedTherapyCount() % 3 == 0)
+				if(cNotificationVO.getMissedTherapyCount() >= 3)
 					missedTherapyPatients++;
 				
 				stats.put("patientsWithMissedTherapy", missedTherapyPatients);

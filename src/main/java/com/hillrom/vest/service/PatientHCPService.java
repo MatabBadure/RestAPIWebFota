@@ -379,7 +379,7 @@ public class PatientHCPService {
 						hmrNonCompliantCount++;
 					if(compliance.isSettingsDeviated())
 						settingsDeviatedCount++;
-					if(compliance.getMissedTherapyCount() > 0 && compliance.getMissedTherapyCount() % 3 == 0)
+					if(compliance.getMissedTherapyCount() >= 3)
 						missedTherapyCount++;
 				}
 			}

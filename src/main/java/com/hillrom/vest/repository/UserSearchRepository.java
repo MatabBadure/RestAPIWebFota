@@ -889,9 +889,9 @@ public class UserSearchRepository {
 		if(Objects.nonNull(filterMap.get("isMissedTherapy"))){
 			
 			if("1".equals(filterMap.get("isMissedTherapy")))
-				filterQuery.append(" and (isMissedTherapy > 0 && isMissedTherapy %3 = 0) ");
+				filterQuery.append(" and (isMissedTherapy >= 3) ");
 			else if("0".equals(filterMap.get("isMissedTherapy")))
-				filterQuery.append(" and (isMissedTherapy %3 <> 0)");
+				filterQuery.append(" and ( isMissedTherapy < 3 )");
 		}
 	}
 
@@ -1175,4 +1175,5 @@ public class UserSearchRepository {
 		}
 		return filterMap;
 	}
+
 }

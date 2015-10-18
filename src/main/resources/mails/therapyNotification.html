@@ -23,7 +23,7 @@
 		<div>
 			<p style="font-size: 14px; ">You are being notified your adherence to your care plan is out of range.</p>
 			<br/>      
-			    <p th:if="${isMissedTherapyNotification}" th:text="#{email.therapynotification.message}"></p>
+			    <p th:if="${isMissedTherapyNotification}" th:text="#{email.therapynotification.message(${missedTherapyCount})}"></p>
 				<p th:if="${isHmrNonComplianceNotification}" th:text="#{email.hmrnotification.message}"></p>
 				<p th:if="${isSettingsDeviatedNotification}" th:text="#{email.settingsnotification.message}"></p>
 		        <p th:if="${isHMRNonComplianceAndSettingsNotification}" th:text="#{email.hmrandsettingsnotification.message}"></p>

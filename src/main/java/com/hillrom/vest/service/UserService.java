@@ -1,5 +1,7 @@
 package com.hillrom.vest.service;
 
+import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,7 +24,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,6 +34,7 @@ import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.ClinicPatientAssoc;
+import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.User;
@@ -110,6 +112,9 @@ public class UserService {
     
     @Inject
 	private ClinicPatientRepository clinicPatientRepository;
+    
+    @Inject
+	private PatientComplianceService complianceService;
 
     public String generateDefaultPassword(User patientUser) {
 		StringBuilder defaultPassword = new StringBuilder();
@@ -121,17 +126,20 @@ public class UserService {
 		return defaultPassword.toString();
 	}
 
-    public Optional<User> activateRegistration(String key) {
+    public Optional<User> activateRegistration(String key) throws HillromException {
         log.debug("Activating user for activation key {}", key);
-        userRepository.findOneByActivationKey(key)
-            .map(user -> {
-                // activate given user for the registration key.
-                user.setActivated(true);
-                userRepository.save(user);
-                log.debug("Activated user: {}", user);
-                return user;
-            });
-        return Optional.empty();
+        Optional<User> optionalExistingUser = userRepository.findOneByActivationKey(key);
+           if(optionalExistingUser.isPresent()) {
+            	DateTime twoDaysAgo = DateTime.now().minusHours(48);
+                if(optionalExistingUser.get().getActivationLinkSentDate().isBefore(twoDaysAgo.toInstant().getMillis()))
+             	   throw new HillromException(ExceptionConstants.HR_592);//Activation Link Expired
+        		// activate given user for the registration key.
+                optionalExistingUser.get().setActivated(true);
+        		userRepository.save(optionalExistingUser.get());
+        		log.debug("Activated user: {}", optionalExistingUser.get());
+        		return optionalExistingUser;
+            }
+        throw new HillromException(ExceptionConstants.HR_601);//Invalid Activation Key;
     }
 
     /**
@@ -248,6 +256,7 @@ public class UserService {
         newUser.setActivated(false);
         // new user gets registration key
         newUser.setActivationKey(RandomUtil.generateActivationKey());
+        newUser.setActivationLinkSentDate(DateTime.now());
         authorities.add(authority);
         newUser.setAuthorities(authorities);
         userRepository.save(newUser);
@@ -313,23 +322,6 @@ public class UserService {
         return currentUser;
     }
 
-    /**
-     * Not activated users should be automatically deleted after 3 days.
-     * <p/>
-     * <p>
-     * This is scheduled to get fired everyday, at 01:00 (am).
-     * </p>
-     */
-    @Scheduled(cron = "0 0 1 * * ?")
-    public void removeNotActivatedUsers() {
-        DateTime now = new DateTime();
-        List<User> users = userRepository.findAllByActivatedIsFalseAndCreatedDateBefore(now.minusDays(3));
-        for (User user : users) {
-            log.debug("Deleting not activated user {}", user.getEmail());
-            userRepository.delete(user);
-        }
-    }
-
     private List<String> rolesAdminCanModerate() {
 		List<String> rolesAdminCanModerate = new ArrayList<String>();
     	rolesAdminCanModerate.add(AuthoritiesConstants.ACCT_SERVICES);
@@ -339,13 +331,13 @@ public class UserService {
 	}
 
     public UserExtension createUser(UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException{
-		if(userExtensionDTO.getEmail() != null) {
+		if(StringUtils.isNotBlank(userExtensionDTO.getEmail())) {
 			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
 			if (existingUser.isPresent()) {
 				throw new HillromException(ExceptionConstants.HR_501);
     		}
     	}
-		if(userExtensionDTO.getHillromId() != null) {
+		if(StringUtils.isNotBlank(userExtensionDTO.getHillromId())) {
 			Optional<User> existingUser = userRepository.findOneByHillromId(userExtensionDTO.getHillromId());
 			if (existingUser.isPresent()) {
 				throw new HillromException(ExceptionConstants.HR_522);
@@ -355,8 +347,8 @@ public class UserService {
     	if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())
     			&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
     		UserExtension user = createHillromTeamUser(userExtensionDTO);
-    		if(user.getId() != null) {
-    			if(userExtensionDTO.getEmail() != null) {
+    		if(Objects.nonNull(user.getId())) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail())) {
     				mailService.sendActivationEmail(user, baseUrl);
     			}
                 return user;
@@ -365,14 +357,14 @@ public class UserService {
     		}
     	} else if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
         	UserExtension user = createPatientUser(userExtensionDTO);
-    		if(user.getId() != null) {
+    		if(Objects.nonNull(user.getId())) {
                 return user;
     		} else {
     			throw new HillromException(ExceptionConstants.HR_521);
     		}
         } else if (AuthoritiesConstants.HCP.equals(userExtensionDTO.getRole())) {
         	UserExtension user = createHCPUser(userExtensionDTO);
-        	if(user.getId() != null) {
+        	if(Objects.nonNull(user.getId())) {
                 mailService.sendActivationEmail(user, baseUrl);
                 return user;
         	} else {
@@ -380,7 +372,7 @@ public class UserService {
     		}
         } else if (AuthoritiesConstants.CLINIC_ADMIN.equals(userExtensionDTO.getRole())) {
         	UserExtension user = createClinicAdminUser(userExtensionDTO);
-        	if(user.getId() != null) {
+        	if(Objects.nonNull(user.getId())) {
                 mailService.sendActivationEmail(user, baseUrl);
                 return user;
         	} else {
@@ -395,10 +387,7 @@ public class UserService {
     	UserExtension newUser = new UserExtension();
 		try {
 	    	assignValuesToUserObj(userExtensionDTO, newUser);
-			newUser.setActivated(false);
-			newUser.setDeleted(false);
-			newUser.setActivationKey(RandomUtil.generateActivationKey());
-			newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
+			assignStatusAndRoleAndActivationKey(userExtensionDTO, newUser);
 			userExtensionRepository.save(newUser);
 			log.debug("Created Information for User: {}", newUser);
 			return newUser;
@@ -451,6 +440,13 @@ public class UserService {
 		userExtensionRepository.save(newUser);
 		log.debug("Updated Information for Patient User: {}", newUser);
 		noEventService.createIfNotExists(new PatientNoEvent(newUser.getCreatedDate().toLocalDate(),null, patientInfo, newUser));
+		// All New Patient User should have default compliance Score 100.
+		PatientCompliance compliance = new PatientCompliance();
+		compliance.setPatient(patientInfo);
+		compliance.setPatientUser(newUser);
+		compliance.setDate(newUser.getCreatedDate().toLocalDate());
+		compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
+		complianceService.createOrUpdate(compliance);
 		return newUser;
 	}
 
@@ -466,9 +462,7 @@ public class UserService {
     public UserExtension createHCPUser(UserExtensionDTO userExtensionDTO) throws HillromException {
     	UserExtension newUser = new UserExtension();
 		assignValuesToUserObj(userExtensionDTO, newUser);
-		newUser.setActivated(false);
-		newUser.setDeleted(false);
-		newUser.setActivationKey(RandomUtil.generateActivationKey());
+		assignStatusAndRoleAndActivationKey(userExtensionDTO, newUser);
 		for(Map<String, String> clinicObj : userExtensionDTO.getClinicList()){
 			
 			if(Objects.isNull(clinicObj.get("id")))
@@ -477,7 +471,6 @@ public class UserService {
 			Clinic clinic = clinicRepository.getOne(clinicObj.get("id"));
 			newUser.getClinics().add(clinic);
 		}
-		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
 		userExtensionRepository.save(newUser);
 		log.debug("Created Information for User: {}", newUser);
 		return newUser;
@@ -486,12 +479,9 @@ public class UserService {
     public UserExtension createClinicAdminUser(UserExtensionDTO userExtensionDTO) throws HillromException {
     	UserExtension newUser = new UserExtension();
 		assignValuesToUserObj(userExtensionDTO, newUser);
-		newUser.setActivated(false);
-		newUser.setDeleted(false);
-		newUser.setActivationKey(RandomUtil.generateActivationKey());
-		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
+		assignStatusAndRoleAndActivationKey(userExtensionDTO, newUser);
 		userExtensionRepository.saveAndFlush(newUser);
-		if(newUser.getId() != null) {
+		if(Objects.nonNull(newUser.getId())) {
 			List<Clinic> clinicList = new LinkedList<>();
 			for(Map<String, String> clinicObj : userExtensionDTO.getClinicList()){
 				Clinic clinic = clinicRepository.getOne(clinicObj.get("id"));
@@ -505,15 +495,24 @@ public class UserService {
 			throw new HillromException(ExceptionConstants.HR_574);
 		}
 	}
+
+	private void assignStatusAndRoleAndActivationKey(
+			UserExtensionDTO userExtensionDTO, UserExtension newUser) {
+		newUser.setActivated(false);
+		newUser.setDeleted(false);
+		newUser.setActivationKey(RandomUtil.generateActivationKey());
+		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
+		newUser.setActivationLinkSentDate(DateTime.now());
+	}
     
     public UserExtension updateUser(Long id, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException{
-        if(userExtensionDTO.getEmail() != null) {
+        if(StringUtils.isNotBlank(userExtensionDTO.getEmail())) {
 			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
 			if(existingUser.isPresent() && !existingUser.get().getId().equals(id)) {
 				throw new HillromException(ExceptionConstants.HR_501);//e-mail address already in use
 			}
     	}
-        if(userExtensionDTO.getHillromId() != null) {
+        if(StringUtils.isNotBlank(userExtensionDTO.getHillromId())) {
 			Optional<User> existingUser = userRepository.findOneByHillromId(userExtensionDTO.getHillromId());
 			if (existingUser.isPresent() && !existingUser.get().getId().equals(id)) {
 				throw new HillromException(ExceptionConstants.HR_522);
@@ -525,7 +524,7 @@ public class UserService {
         if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())
         		&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
         	UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
-    		if(user.getId() != null) {
+    		if(Objects.nonNull(user.getId())) {
     			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
     				sendEmailNotification(baseUrl, user);
     			}
@@ -549,7 +548,7 @@ public class UserService {
 	    		}
     		}
            	UserExtension user = updatePatientUser(existingUser, userExtensionDTO);
-    		if(user.getId() != null) {
+    		if(Objects.nonNull(user.getId())) {
     			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && !userExtensionDTO.getEmail().equals(currentEmail)) {
     				sendEmailNotification(baseUrl, user);
     			}
@@ -559,7 +558,7 @@ public class UserService {
     		}
         } else if (AuthoritiesConstants.HCP.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updateHCPUser(existingUser, userExtensionDTO);
-    		if(user.getId() != null) {
+    		if(Objects.nonNull(user.getId())) {
     			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
     				sendEmailNotification(baseUrl, user);
     			}
@@ -569,13 +568,23 @@ public class UserService {
     		}
         } else if (AuthoritiesConstants.CLINIC_ADMIN.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updateClinicAdminUser(existingUser, userExtensionDTO);
-    		if(user.getId() != null) {
+    		if(Objects.nonNull(user.getId())) {
     			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
     				sendEmailNotification(baseUrl, user);
     			}
                 return user;
     		} else {
     			throw new HillromException(ExceptionConstants.HR_575);//Unable to update Clinic Admin.
+    		}
+        } if (AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())) {
+           	UserExtension user = updateCareGiverUser(existingUser, userExtensionDTO);
+    		if(Objects.nonNull(user.getId())) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
+    				sendEmailNotification(baseUrl, user);
+    			}
+                return user;
+    		} else {
+    			throw new HillromException(ExceptionConstants.HR_577);//Unable to update Care Giver.
     		}
         } else {
         	throw new HillromException(ExceptionConstants.HR_555);//Incorrect data
@@ -585,6 +594,7 @@ public class UserService {
 	private void sendEmailNotification(String baseUrl, UserExtension user) {
 		user.setActivationKey(RandomUtil.generateActivationKey());
 		user.setActivated(false);
+		user.setActivationLinkSentDate(DateTime.now());
 		userRepository.saveAndFlush(user);
 		mailService.sendActivationEmail(user, baseUrl);
 		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
@@ -603,18 +613,31 @@ public class UserService {
     public UserExtension updatePatientUser(UserExtension user, UserExtensionDTO userExtensionDTO) {
     	patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId())
     	.map(patient -> {
-    		assignValuesToPatientInfoObj(userExtensionDTO, patient);
-    		patientInfoRepository.save(patient);
-    		assignValuesToUserObj(userExtensionDTO, user);
-			userExtensionRepository.save(user);
+    		if(Objects.nonNull(userExtensionDTO.isExpired())){
+    			patient.setExpired(userExtensionDTO.isExpired());
+    			user.setExpired(userExtensionDTO.isExpired());
+    		}
 			if(!userExtensionDTO.getClinicMRNId().isEmpty()){
 				Optional<ClinicPatientAssoc> clinicPatientAssoc = clinicPatientRepository.findOneByClinicIdAndPatientId(
 						userExtensionDTO.getClinicMRNId().get("clinicId"), patient.getId());
 				if(clinicPatientAssoc.isPresent()){
 					clinicPatientAssoc.get().setMrnId(userExtensionDTO.getClinicMRNId().get("mrnId"));
+					if(Constants.ACTIVE.equalsIgnoreCase(userExtensionDTO.getClinicMRNId().get("status"))){
+						clinicPatientAssoc.get().setActive(true);
+					} else if(Constants.INACTIVE.equalsIgnoreCase(userExtensionDTO.getClinicMRNId().get("status"))){
+						clinicPatientAssoc.get().setActive(false);
+					} else if(Constants.EXPIRED.equalsIgnoreCase(userExtensionDTO.getClinicMRNId().get("status"))){
+						clinicPatientAssoc.get().setActive(false);
+						patient.setExpired(true);
+						user.setExpired(true);
+					} 
 					clinicPatientRepository.saveAndFlush(clinicPatientAssoc.get());
 				}
 			}
+			assignValuesToPatientInfoObj(userExtensionDTO, patient);
+    		patientInfoRepository.save(patient);
+    		assignValuesToUserObj(userExtensionDTO, user);
+			userExtensionRepository.save(user);
 			log.debug("Updated Information for Patient User: {}", user);
     		return user;
     	});
@@ -634,39 +657,44 @@ public class UserService {
 		log.debug("Updated Information for Clinic Admin User : {}", clinicAdminUser);
 		return clinicAdminUser;
 	}
+    public UserExtension updateCareGiverUser(UserExtension caregiverUser, UserExtensionDTO userExtensionDTO) {
+		assignValuesToUserObj(userExtensionDTO, caregiverUser);
+		userExtensionRepository.saveAndFlush(caregiverUser);
+		log.debug("Updated Information for Care Giver User : {}", caregiverUser);
+		return caregiverUser;
+	}
 
 	private void assignValuesToPatientInfoObj(UserExtensionDTO userExtensionDTO, PatientInfo patientInfo) {
 		patientInfo.setHillromId(userExtensionDTO.getHillromId());
-		if(userExtensionDTO.getTitle() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getTitle()))
 			patientInfo.setTitle(userExtensionDTO.getTitle());
-		if(userExtensionDTO.getFirstName() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getFirstName()))
 			patientInfo.setFirstName(userExtensionDTO.getFirstName());
-		if(userExtensionDTO.getMiddleName() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getMiddleName()))
 			patientInfo.setMiddleName(userExtensionDTO.getMiddleName());
-		if(userExtensionDTO.getLastName() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getLastName()))
 			patientInfo.setLastName(userExtensionDTO.getLastName());
-		if(userExtensionDTO.getGender() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getGender()))
 			patientInfo.setGender(userExtensionDTO.getGender());
-		if(userExtensionDTO.getDob() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getDob()))
 			patientInfo.setDob(LocalDate.parse(userExtensionDTO.getDob(), DateTimeFormat.forPattern("MM/dd/yyyy")));
-		if(userExtensionDTO.getLangKey() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getLangKey()))
 			patientInfo.setLangKey(userExtensionDTO.getLangKey());
-		if(userExtensionDTO.getEmail() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getEmail()))
 			patientInfo.setEmail(userExtensionDTO.getEmail());
-		if(userExtensionDTO.getAddress() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getAddress()))
 			patientInfo.setAddress(userExtensionDTO.getAddress());
 		if(userExtensionDTO.getZipcode() != null)
 			patientInfo.setZipcode(userExtensionDTO.getZipcode());
-		if(userExtensionDTO.getCity() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getCity()))
 			patientInfo.setCity(userExtensionDTO.getCity());
-		if(userExtensionDTO.getState() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getState()))
 			patientInfo.setState(userExtensionDTO.getState());
-		if(userExtensionDTO.getPrimaryPhone() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getPrimaryPhone()))
 			patientInfo.setPrimaryPhone(userExtensionDTO.getPrimaryPhone());
-		if(userExtensionDTO.getMobilePhone() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getMobilePhone()))
 			patientInfo.setMobilePhone(userExtensionDTO.getMobilePhone());
 		if(userExtensionDTO.isExpired()==true){
-		
 			patientInfo.setExpired(userExtensionDTO.isExpired());
 			patientInfo.setExpiredDate(new DateTime());
 		}
@@ -674,41 +702,44 @@ public class UserService {
 	}
 
 	private void assignValuesToUserObj(UserExtensionDTO userExtensionDTO, UserExtension newUser) {
-		if(userExtensionDTO.getTitle() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getTitle()))
 			newUser.setTitle(userExtensionDTO.getTitle());
-		if(userExtensionDTO.getFirstName() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getFirstName()))
 			newUser.setFirstName(userExtensionDTO.getFirstName());
-		if(userExtensionDTO.getMiddleName() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getMiddleName()))
 			newUser.setMiddleName(userExtensionDTO.getMiddleName());
-		if(userExtensionDTO.getLastName() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getLastName()))
 			newUser.setLastName(userExtensionDTO.getLastName());
-		if(userExtensionDTO.getEmail() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getEmail()))
 			newUser.setEmail(userExtensionDTO.getEmail());
-		if(userExtensionDTO.getSpeciality() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getSpeciality()))
 			newUser.setSpeciality(userExtensionDTO.getSpeciality());
-		if(userExtensionDTO.getCredentials() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getCredentials()))
 			newUser.setCredentials(userExtensionDTO.getCredentials());
-		if(userExtensionDTO.getAddress() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getAddress()))
 			newUser.setAddress(userExtensionDTO.getAddress());
 		if(userExtensionDTO.getZipcode() != null)
 			newUser.setZipcode(userExtensionDTO.getZipcode());
-		if(userExtensionDTO.getCity() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getCity()))
 			newUser.setCity(userExtensionDTO.getCity());
-		if(userExtensionDTO.getState() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getState()))
 			newUser.setState(userExtensionDTO.getState());
-		if(userExtensionDTO.getPrimaryPhone() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getPrimaryPhone()))
 			newUser.setPrimaryPhone(userExtensionDTO.getPrimaryPhone());
-		if(userExtensionDTO.getMobilePhone() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getMobilePhone())){
 			newUser.setMobilePhone(userExtensionDTO.getMobilePhone());
-		if(userExtensionDTO.getFaxNumber() != null)
+		}else{
+			newUser.setMobilePhone(null);
+		}
+		if(StringUtils.isNotBlank(userExtensionDTO.getFaxNumber()))
 			newUser.setFaxNumber(userExtensionDTO.getFaxNumber());
-		if(userExtensionDTO.getNpiNumber() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getNpiNumber()))
 			newUser.setNpiNumber(userExtensionDTO.getNpiNumber());
-		if(userExtensionDTO.getDob() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getDob()))
 			newUser.setDob(LocalDate.parse(userExtensionDTO.getDob(), DateTimeFormat.forPattern("MM/dd/yyyy")));
-		if(userExtensionDTO.getGender() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getGender()))
 			newUser.setGender(userExtensionDTO.getGender());
-		if(userExtensionDTO.getHillromId() != null)
+		if(StringUtils.isNotBlank(userExtensionDTO.getHillromId()))
 			newUser.setHillromId(userExtensionDTO.getHillromId());
 		newUser.setLangKey(userExtensionDTO.getLangKey());
 	}
@@ -1011,7 +1042,7 @@ public class UserService {
 
 	public UserExtension getHCPUser(Long id) throws HillromException{
 		UserExtension hcpUser = userExtensionRepository.findOne(id);
-		if(hcpUser.getId() != null) {
+		if(Objects.nonNull(hcpUser.getId())) {
 		} else {
 			throw new HillromException(ExceptionConstants.HR_533);//Unable to fetch HealthCare Professional.");
 		}
@@ -1031,7 +1062,7 @@ public class UserService {
 			ClinicPatientAssoc clinicPatientAssoc  = cpaIterator.next();
 			if(Objects.nonNull(clinicPatientAssoc)){
 				Map<String,Object> clinicMRNId = new HashMap<>();
-				clinicMRNId.put("clinic", clinicPatientAssoc.getClinic());
+				clinicMRNId.put("clinicId", clinicPatientAssoc.getClinic().getId());
 				clinicMRNId.put("mrnId", clinicPatientAssoc.getMrnId());
 				mrnId = clinicPatientAssoc.getMrnId(); 
 				patientUserVO.setMrnId(mrnId);
@@ -1053,7 +1084,7 @@ public class UserService {
 
 	public UserPatientAssoc createCaregiverUser(Long patientUserId, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException {
 		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
-		if(patientUser != null) {
+		if(Objects.nonNull(patientUser)) {
 			List<UserPatientAssoc> caregiverAssocList = getListOfCaregiversAssociatedToPatientUser(patientUser);
 			if(caregiverAssocList.size() >= Constants.MAX_NO_OF_CAREGIVERS) {
 				throw new HillromException(ExceptionConstants.HR_563);
@@ -1061,7 +1092,7 @@ public class UserService {
 		} else {
 			throw new HillromException(ExceptionConstants.HR_523);
 		}
-    	if(userExtensionDTO.getEmail() != null && AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())) {
+    	if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())) {
 			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
 			if (existingUser.isPresent()){
 				if(existingUser.get().getAuthorities().contains(new Authority(AuthoritiesConstants.CARE_GIVER))
@@ -1078,8 +1109,8 @@ public class UserService {
 				}
     		} else {
     			UserPatientAssoc caregiverAssoc = createCaregiver(patientUserId, userExtensionDTO);
-	    		if(caregiverAssoc.getUser().getId() != null) {
-	    			if(userExtensionDTO.getEmail() != null) {
+	    		if(Objects.nonNull(caregiverAssoc.getUser().getId())) {
+	    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail())) {
 	    				mailService.sendActivationEmail(caregiverAssoc.getUser(), baseUrl);
 	    			}
 	                return caregiverAssoc;
@@ -1119,14 +1150,11 @@ public class UserService {
 	public UserPatientAssoc createCaregiver(Long patientUserId, UserExtensionDTO userExtensionDTO) {
     	UserExtension newUser = new UserExtension();
     	UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
-    	if(patientUser != null) {
+    	if(Objects.nonNull(patientUser)) {
     		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
-    		if(patientInfo != null) {
+    		if(Objects.nonNull(patientInfo)) {
     			assignValuesToUserObj(userExtensionDTO, newUser);
-    			newUser.setActivated(false);
-    			newUser.setDeleted(false);
-    			newUser.setActivationKey(RandomUtil.generateActivationKey());
-        		newUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
+    			assignStatusAndRoleAndActivationKey(userExtensionDTO, newUser);
     			userExtensionRepository.save(newUser);
     			UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, newUser), AuthoritiesConstants.CARE_GIVER, userExtensionDTO.getRelationship());
     			userPatientRepository.saveAndFlush(userPatientAssoc);
@@ -1161,7 +1189,7 @@ public class UserService {
 
 	public String deleteCaregiverUser(Long patientUserId, Long caregiverId) throws HillromException {
     	UserExtension caregiverUser = userExtensionRepository.findOne(caregiverId);
-    	if(caregiverUser.getId() != null) {
+    	if(Objects.nonNull(caregiverUser.getId())) {
     		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
     		if(Objects.nonNull(patientUser)) {
 	    		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
@@ -1236,7 +1264,7 @@ public class UserService {
 		if (AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())) {
 			caregiverAssoc = updateCaregiver(patientUserId, caregiverUserId, userExtensionDTO);
 			if(Objects.nonNull(caregiverAssoc) && Objects.nonNull(caregiverAssoc.getUser().getId())) {
-				if(userExtensionDTO.getEmail() != null) {
+				if(StringUtils.isNotBlank(userExtensionDTO.getEmail())) {
 					mailService.sendActivationEmail(caregiverAssoc.getUser(), baseUrl);
 				}
 			} else {
@@ -1247,13 +1275,32 @@ public class UserService {
 		}
 		return caregiverAssoc;
 	}
+	
+	public UserExtension updateCaregiverUser(Long caregiverUserId, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException {
+		UserExtension caregiverUser = userExtensionRepository.findOne(caregiverUserId);
+		if (AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())) {
+			assignValuesToUserObj(userExtensionDTO, caregiverUser);
+			userExtensionRepository.saveAndFlush(caregiverUser);
+			if(Objects.nonNull(caregiverUser) ) {
+				if(StringUtils.isNotBlank(userExtensionDTO.getEmail())) {
+					mailService.sendActivationEmail(caregiverUser, baseUrl);
+				}
+			} else {
+				throw new HillromException(ExceptionConstants.HR_562);
+			}
+		} else {
+			throw new HillromException(ExceptionConstants.HR_555);
+		}
+		return caregiverUser;
+
+	}	
 
 	public UserPatientAssoc updateCaregiver(Long patientUserId, Long caregiverUserId, UserExtensionDTO userExtensionDTO) {
     	UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
     	UserExtension caregiverUser = userExtensionRepository.findOne(caregiverUserId);
     	if(Objects.nonNull(patientUser) && Objects.nonNull(caregiverUser)) {
     		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
-    		if(patientInfo != null) {
+    		if(Objects.nonNull(patientInfo)) {
     			assignValuesToUserObj(userExtensionDTO, caregiverUser);
     			caregiverUser.getAuthorities().add(authorityRepository.findOne(userExtensionDTO.getRole()));
     			userExtensionRepository.save(caregiverUser);
@@ -1267,13 +1314,14 @@ public class UserService {
     	}
     	return null;
 	}
+	
 
 	public UserPatientAssoc getCaregiverUser(Long patientUserId, Long caregiverUserId) throws HillromException {
     	JSONObject jsonObject = new JSONObject();
 		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
 		if(Objects.nonNull(patientUser)) {
 			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
-    		if(patientInfo != null) {
+    		if(Objects.nonNull(patientInfo)) {
     			List<UserPatientAssoc> caregiverAssocList = getListOfCaregiversAssociatedToPatientUser(patientUser);
     			List<UserPatientAssoc> filteredCaregiverAssocList =  caregiverAssocList.parallelStream()
     					.filter(caregiverAssoc -> caregiverUserId.equals(caregiverAssoc.getUser().getId()))
@@ -1287,6 +1335,18 @@ public class UserService {
     		} else {
     			throw new HillromException(ExceptionConstants.HR_523);
     		}
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);
+		}
+    }
+	
+	
+	public UserExtension getCaregiverUser(Long caregiverUserId) throws HillromException {
+    	JSONObject jsonObject = new JSONObject();
+		UserExtension caregiverUser = userExtensionRepository.findOne(caregiverUserId);
+		if(Objects.nonNull(caregiverUser)) {
+			jsonObject.put("message", MessageConstants.HR_263);
+			return caregiverUser;
 		} else {
 			throw new HillromException(ExceptionConstants.HR_512);
 		}
@@ -1306,7 +1366,7 @@ public class UserService {
 	
 	public User setHRMNotificationSetting(Long id, Map<String, Boolean> paramsMap) throws HillromException {
 		User user = userRepository.findOne(id);
-		if (user != null) {
+		if (Objects.nonNull(user)) {
 			user.setMissedTherapyNotification(paramsMap.get("isMissedTherapyNotification"));
 			user.setNonHMRNotification(paramsMap.get("isNonHMRNotification"));
 			user.setSettingDeviationNotification(paramsMap.get("isSettingDeviationNotification"));
@@ -1317,45 +1377,53 @@ public class UserService {
 		}
 	}
 	
-	public List<CareGiverVO> getAssociatedPatientsForCaregiver(Long caregiverId) throws HillromException {
+	public Map<String, List<CareGiverVO>> getAssociatedPatientsForCaregiver(Long caregiverId) throws HillromException {
     	List<UserPatientAssoc> patientAssocList = new LinkedList<>();
 		UserExtension caregiverUser = userExtensionRepository.findOne(caregiverId);
 
-		List<CareGiverVO> caregiverList = new LinkedList<>();
+		//List<List<CareGiverVO>> caregiverAndPatientList = new LinkedList<>();
+		Map<String, List<CareGiverVO>> caregiverAndPatientList = new HashMap<String, List<CareGiverVO>>();
 		if(Objects.nonNull(caregiverUser)) {
     		patientAssocList = userPatientRepository.findByUserIdAndUserRole(caregiverUser.getId(), AuthoritiesConstants.CARE_GIVER);
     		if(patientAssocList != null){
-    			
+    			List<CareGiverVO> caregiverList = new LinkedList<>();
+    			List<CareGiverVO> caregiverPatientList = new LinkedList<>();
     			for(UserPatientAssoc userPatientAssoc : patientAssocList){
-    				List<UserPatientAssoc> patientAssocHRIDList = new LinkedList<>();	
-    				CareGiverVO careGiverVO = new CareGiverVO(userPatientAssoc.getUserRole(), userPatientAssoc.getRelationshipLabel(), userPatientAssoc.getUser(),userPatientAssoc.getUser().getId(),userPatientAssoc.getPatient().getId());
+    				List<UserPatientAssoc> patientAssocHRIDList = new LinkedList<>();
     				
+    				CareGiverVO careGiverVO = new CareGiverVO(userPatientAssoc.getUserRole(), userPatientAssoc.getRelationshipLabel(), userPatientAssoc.getUser(),userPatientAssoc.getUser().getId(),userPatientAssoc.getPatient().getId());
+    				caregiverList.add(careGiverVO);
     				patientAssocHRIDList = userPatientRepository.findByPatientIdAndUserRole(userPatientAssoc.getPatient().getId(),AuthoritiesConstants.PATIENT);
     				
     				if(patientAssocHRIDList != null){
+    					
+    					
     	    			for(UserPatientAssoc userPatientAssocHRID : patientAssocHRIDList){
     	    				if(userPatientAssoc.getUser().getId().equals(caregiverId)){
     	    					
-    	    					System.out.println("PatientId before : " +userPatientAssoc.getPatient().getId());
-    	    					careGiverVO.setUserId(userPatientAssocHRID.getUser().getId());
-    	    	   				caregiverList.add(careGiverVO);
-    	    					System.out.println("PatientId after : " +careGiverVO.getUser().getId().toString());
+    	    					
+    	    					CareGiverVO careGiverPatientVO = new CareGiverVO(userPatientAssocHRID.getUserRole(), userPatientAssocHRID.getRelationshipLabel(), userPatientAssocHRID.getUser(),userPatientAssocHRID.getUser().getId(),userPatientAssocHRID.getPatient().getId());
+    	    					caregiverPatientList.add(careGiverPatientVO);
+    	    					
     	    				}
     	    			}
+    	    			
     	    		}
     			}
+    			caregiverAndPatientList.put("patients", caregiverPatientList);
+    			caregiverAndPatientList.put("caregivers",caregiverList);
     		}
 		} else {
 			throw new HillromException(ExceptionConstants.HR_523);
 		}
-		return caregiverList;
+		return caregiverAndPatientList;
     }
 
 	public PatientUserVO getPatientUserWithMRNId(Long patientUserId, String clinicId) throws HillromException{
 		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
 		if(Objects.nonNull(patientUser)) {
 			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
-    		if(patientInfo != null) {
+    		if(Objects.nonNull(patientInfo)) {
 				Optional<ClinicPatientAssoc> clinicPatientAssoc = clinicPatientRepository.findOneByClinicIdAndPatientId(
 						clinicId, patientInfo.getId());
 				PatientUserVO patientUserVO = new PatientUserVO(patientUser, patientInfo);
@@ -1363,6 +1431,13 @@ public class UserService {
 					Map<String,Object> clinicMRNId = new HashMap<>();
 					clinicMRNId.put("clinic", clinicPatientAssoc.get().getClinic());
 					clinicMRNId.put("mrnId", clinicPatientAssoc.get().getMrnId());
+					if(patientUserVO.isExpired()){
+						clinicMRNId.put("status", Constants.EXPIRED);
+					} else if(clinicPatientAssoc.get().getActive()){
+						clinicMRNId.put("status", Constants.ACTIVE);
+					} else {
+						clinicMRNId.put("status", Constants.INACTIVE);
+					}
 					patientUserVO.setClinicMRNId(clinicMRNId);
 				}
 				return patientUserVO;
@@ -1373,5 +1448,6 @@ public class UserService {
 			throw new HillromException(ExceptionConstants.HR_512);
 		}
 	}
+
 }
 

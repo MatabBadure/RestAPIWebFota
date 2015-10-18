@@ -12,12 +12,15 @@ import javax.persistence.Table;
 
 import org.springframework.boot.actuate.audit.listener.AuditApplicationEvent;
 
+import org.hibernate.envers.Audited;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * A Clinic.
  */
 @Entity
+@Audited
 @Table(name = "USER_PATIENT_ASSOC")
 @AssociationOverrides({
     @AssociationOverride(name = "userPatientAssocPK.user",

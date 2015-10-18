@@ -1,6 +1,7 @@
 package com.hillrom.vest.web.rest;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.User;
+import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.SecurityUtils;
@@ -33,6 +35,7 @@ import com.hillrom.vest.service.MailService;
 import com.hillrom.vest.service.UserLoginTokenService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.util.ExceptionConstants;
+import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 
 
@@ -89,10 +92,19 @@ public class AccountResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    public ResponseEntity<String> activateAccount(@RequestParam(value = "key") String key) {
-        return Optional.ofNullable(userService.activateRegistration(key))
-            .map(user -> new ResponseEntity<String>(HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+    public ResponseEntity<JSONObject> activateAccount(@RequestParam(value = "key") String key) {
+//        return Optional.ofNullable(userService.activateRegistration(key))
+//            .map(user -> new ResponseEntity<String>(HttpStatus.OK))
+//            .orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+//        
+        JSONObject jsonObject = new JSONObject();
+		try {
+			Optional<User> activatedUser = userService.activateRegistration(key);
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
     }
 
     /**

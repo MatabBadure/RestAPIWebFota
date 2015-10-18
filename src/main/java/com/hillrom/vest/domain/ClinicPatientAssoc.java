@@ -10,10 +10,13 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
+import org.hibernate.envers.Audited;
+
 /**
  * A Clinic.
  */
 @Entity
+@Audited
 @Table(name = "CLINIC_PATIENT_ASSOC")
 @AssociationOverrides({
     @AssociationOverride(name = "clinicPatientAssocPK.clinic",
@@ -30,6 +33,9 @@ public class ClinicPatientAssoc extends AbstractAuditingEntity implements Serial
     
     @Column(name="notes")
     private String notes;
+    
+    @Column(name="is_active")
+    private Boolean isActive = true;
     
 	public ClinicPatientAssoc() {
 		super();
@@ -81,6 +87,14 @@ public class ClinicPatientAssoc extends AbstractAuditingEntity implements Serial
 
 	public void setNotes(String notes) {
 		this.notes = notes;
+	}
+
+	public Boolean getActive() {
+		return isActive;
+	}
+
+	public void setActive(Boolean isActive) {
+		this.isActive = isActive;
 	}
 
 	@Override

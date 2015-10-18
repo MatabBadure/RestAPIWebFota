@@ -22,11 +22,12 @@ public class TherapyDataVO implements Serializable {
 	private int coughPauseDuration;
 	private int duration;
 	private double hmr;
+	private boolean missedTherapy;
 
 	public TherapyDataVO(DateTime timestamp, int treatmentsPerDay,int sessionNo,
 			int frequency, int pressure, int programmedCoughPauses,
 			int normalCoughPauses, int coughPauses, Note note, DateTime start,
-			DateTime end, int coughPauseDuration, int duration, double hmr) {
+			DateTime end, int coughPauseDuration, int duration, double hmr,boolean missedTherapy) {
 		super();
 		this.timestamp = timestamp;
 		this.treatmentsPerDay = treatmentsPerDay;
@@ -43,6 +44,7 @@ public class TherapyDataVO implements Serializable {
 		this.coughPauseDuration = coughPauseDuration;
 		this.duration = duration;
 		this.hmr = hmr;
+		this.missedTherapy = missedTherapy;
 	}
 
 	public TherapyDataVO() {
@@ -161,15 +163,23 @@ public class TherapyDataVO implements Serializable {
 		this.hmr = hmr;
 	}
 
+	public boolean isMissedTherapy() {
+		return missedTherapy;
+	}
+
+	public void setMissedTherapy(boolean missedTherapy) {
+		this.missedTherapy = missedTherapy;
+	}
+
 	@Override
 	public String toString() {
 		return "TherapyDataVO [timestamp=" + timestamp + ", treatmentsPerDay="+treatmentsPerDay
-				+ "sessionNo="+ sessionNo + ", frequency=" + frequency + ", pressure="
+				+ " sessionNo="+ sessionNo + ", frequency=" + frequency + ", pressure="
 				+ pressure + ", programmedCoughPauses=" + programmedCoughPauses
 				+ ", normalCoughPauses=" + normalCoughPauses + ", coughPauses="
 				+ coughPauses + ", note=" + note + ", start=" + start
 				+ ", end=" + end + ", coughPauseDuration=" + coughPauseDuration
-				+ ", duration=" + duration + ", hmr=" + hmr + "]";
+				+ ", duration=" + duration + ", hmr=" + hmr + "missedTherapy="+missedTherapy+"]";
 	}
 
 }

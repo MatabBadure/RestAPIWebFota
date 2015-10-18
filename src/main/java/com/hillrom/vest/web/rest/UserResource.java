@@ -58,6 +58,7 @@ import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.AdherenceCalculationService;
+import com.hillrom.vest.service.PatientComplianceService;
 import com.hillrom.vest.service.PatientHCPService;
 import com.hillrom.vest.service.PatientProtocolService;
 import com.hillrom.vest.service.PatientVestDeviceService;
@@ -119,6 +120,9 @@ public class UserResource {
 	
 	@Inject
     private PatientHCPService patientHCPService;
+	
+	@Inject
+	private PatientComplianceService patientComplianceService;
 	
 	/**
 	 * GET /users -> get all users.
@@ -198,12 +202,18 @@ public class UserResource {
 			else	
 				sortOrder.put(sortBy, isAscending);
 		}
-		Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientToHCPBy(
-				queryString, id, clinicId, filter, PaginationUtil.generatePageRequest(offset, limit),
-				sortOrder);
-		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
-				page, "/user/hcp/"+id+"/patient/search", offset, limit);
-		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+		Page<PatientUserVO> page;
+		try {
+			page = userSearchRepository.findAssociatedPatientToHCPBy(
+					queryString, id, clinicId, filter, PaginationUtil.generatePageRequest(offset, limit),
+					sortOrder);
+			HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
+					page, "/user/hcp/"+id+"/patient/search", offset, limit);
+			return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+		} catch (HillromException e) {
+			return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+		}
+		
 
 	}
    //For Patients associated with HCP in Admin
@@ -632,7 +642,7 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JSONObject> getMissedTherapyCount(@PathVariable Long id){
     	JSONObject json = new JSONObject();
-    	json.put("count",therapySessionService.getMissedTherapyCountByPatientUserId(id));
+    	json.put("count",patientComplianceService.getMissedTherapyCountByPatientUserId(id));
     	return new ResponseEntity<JSONObject>(json, HttpStatus.OK);
     }
     

@@ -1,5 +1,7 @@
 package com.hillrom.vest.service;
 
+import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +34,7 @@ import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.ClinicPatientAssoc;
+import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.User;
@@ -109,6 +112,9 @@ public class UserService {
     
     @Inject
 	private ClinicPatientRepository clinicPatientRepository;
+    
+    @Inject
+	private PatientComplianceService complianceService;
 
     public String generateDefaultPassword(User patientUser) {
 		StringBuilder defaultPassword = new StringBuilder();
@@ -434,6 +440,13 @@ public class UserService {
 		userExtensionRepository.save(newUser);
 		log.debug("Updated Information for Patient User: {}", newUser);
 		noEventService.createIfNotExists(new PatientNoEvent(newUser.getCreatedDate().toLocalDate(),null, patientInfo, newUser));
+		// All New Patient User should have default compliance Score 100.
+		PatientCompliance compliance = new PatientCompliance();
+		compliance.setPatient(patientInfo);
+		compliance.setPatientUser(newUser);
+		compliance.setDate(newUser.getCreatedDate().toLocalDate());
+		compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
+		complianceService.createOrUpdate(compliance);
 		return newUser;
 	}
 

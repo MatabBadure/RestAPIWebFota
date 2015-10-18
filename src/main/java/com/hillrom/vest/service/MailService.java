@@ -110,10 +110,11 @@ public class MailService {
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
     
-    public void sendNotificationMailToPatient(User user,String notificationType){
+    public void sendNotificationMailToPatient(User user,String notificationType,int missedTherapyCount){
        log.debug("Sending password reset e-mail to '{}'", user.getEmail());
        Context context = new Context();
        context.setVariable("user", user);
+       context.setVariable("missedTherapyCount", missedTherapyCount);
        context.setVariable("isMissedTherapyNotification", MISSED_THERAPY.equalsIgnoreCase(notificationType));
        context.setVariable("isHmrNonComplianceNotification", HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType));
        context.setVariable("isSettingsDeviatedNotification",SETTINGS_DEVIATION.equalsIgnoreCase(notificationType));

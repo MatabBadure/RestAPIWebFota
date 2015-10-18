@@ -639,7 +639,7 @@ public class UserSearchRepository {
 				+ " left outer join CLINIC_PATIENT_ASSOC user_clinicc on user_clinicc.patient_id = patInfoc.id  "
 				+ " left outer join CLINIC clinicc on user_clinicc.clinic_id = clinicc.id and user_clinicc.patient_id = patInfoc.id "
 				+ " where upac.user_id = user.id "
-				+ " group by patInfoc.id) as clinicname, (select  GROUP_CONCAT(userh.first_name, userh.last_name) "
+				+ " group by patInfoc.id) as clinicname, (select  GROUP_CONCAT(userh.first_name,' ', userh.last_name) "
 				+ " from USER userh "
 				+ " left outer join USER_AUTHORITY user_authorityh on user_authorityh.user_id = userh.id  "
 				+ "and user_authorityh.authority_name = 'HCP' " 

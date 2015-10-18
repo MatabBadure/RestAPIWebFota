@@ -115,7 +115,6 @@ public class PatientVestDeviceDataService {
 		return patientVestDeviceRecords;
 	}
 
-	@Async
 	public void saveToTemp(final String rawData) throws Exception {
 			Job addNewPodcastJob = applicationContext.getBean("processTherapySessionsAndCompliance", Job.class);
 			JobParameters jobParameters = new JobParametersBuilder()

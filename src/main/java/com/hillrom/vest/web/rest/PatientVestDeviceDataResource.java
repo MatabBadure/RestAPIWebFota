@@ -1,5 +1,6 @@
 package com.hillrom.vest.web.rest;
 
+import static com.hillrom.vest.util.MessageConstants.HR_303;
 import java.lang.management.ManagementFactory;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -51,12 +52,13 @@ public class PatientVestDeviceDataResource {
 		};
 		try{			
 			deviceDataService.saveToTemp(rawMessage);
+			jsonObject.put("message",HR_303);
 		}catch(Exception e){
 			JSONObject error = new JSONObject();
-			error.put("message", e.getMessage());
+			error.put("ERROR", e.getMessage());
 			return new ResponseEntity(error,HttpStatus.PARTIAL_CONTENT);
 		}
-		return new ResponseEntity(deviceData,HttpStatus.CREATED);
+		return new ResponseEntity(jsonObject,HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(value = "/vestdevicedata",

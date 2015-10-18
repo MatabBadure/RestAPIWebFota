@@ -52,8 +52,9 @@ import com.hillrom.vest.repository.ProtocolConstantsRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.DateUtil;
-import com.hillrom.vest.web.rest.AccountResource;
+import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.ClinicStatsNotificationVO;
+import com.hillrom.vest.web.rest.dto.PatientStatsVO;
 
 
 @Service
@@ -406,6 +407,43 @@ public class AdherenceCalculationService {
 			mailService.sendJobFailureNotification("processHcpClinicAdminNotifications",writer.toString());
 		}
 	}
+	
+	@Scheduled(cron="0 0/1 * * * * ")
+	public void processCareGiverNotifications() throws HillromException{
+		try{
+			List<CareGiverStatsNotificationVO> statsNotificationVOs = findPatientStatisticsCareGiver();
+
+			Map<String,String> cgIdNameMap = new HashMap<>();
+			
+			Map<String,List<PatientStatsVO>> cgIdPatientStatsMap = new HashMap<>();
+			
+			for(CareGiverStatsNotificationVO statsNotificationVO : statsNotificationVOs){
+				cgIdNameMap.put(statsNotificationVO.getCGEmail(), statsNotificationVO.getCareGiverName());
+				BigInteger patientUserId = statsNotificationVO.getPatientUserid();
+				String pFirstName = statsNotificationVO.getPatientFirstname();
+				String pLastName = statsNotificationVO.getPatientLastname();
+				int missedTherapyCount = statsNotificationVO.getMissedTherapyCount();
+				boolean isSettingsDeviated = statsNotificationVO.isSettingsDeviated();
+				boolean isHMRCompliant = statsNotificationVO.isHMRCompliant();
+				List<PatientStatsVO> patientStatsList = cgIdPatientStatsMap.get(statsNotificationVO.getCareGiverId());
+				if(Objects.isNull(patientStatsList))
+					patientStatsList = new LinkedList<>();
+				patientStatsList.add(new PatientStatsVO(patientUserId, pFirstName, pLastName, missedTherapyCount, isSettingsDeviated, isHMRCompliant));
+				cgIdPatientStatsMap.put(statsNotificationVO.getCGEmail(), patientStatsList);
+			}
+			
+			for(String cgEmail : cgIdNameMap.keySet()){
+				mailService.sendNotificationCareGiver(cgEmail, cgIdNameMap.get(cgEmail), cgIdPatientStatsMap.get(cgEmail));
+			}
+			
+			
+		}catch(Exception ex){
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter( writer );
+			ex.printStackTrace( printWriter );
+			mailService.sendJobFailureNotification("processHcpClinicAdminNotifications",writer.toString());
+		}
+	}
 
 	private Map<User, Map<String, Map<String, Integer>>> getProcessedUserClinicStatsMap(
 			Map<BigInteger, User> idUserMap,
@@ -494,6 +532,17 @@ public class AdherenceCalculationService {
 					(String)result[15],(String)result[16],(Integer)result[17], (Integer)result[18], (Integer)result[19],
 					(String)result[20]));
 		}
+		return statsNotificationVOs;
+	}
+	private List<CareGiverStatsNotificationVO> findPatientStatisticsCareGiver() {
+		List<Object[]> results =  clinicRepository.findPatientStatisticsCareGiver();
+		List<CareGiverStatsNotificationVO> statsNotificationVOs = new LinkedList<>();
+		for(Object[] result : results){
+			statsNotificationVOs.add(new CareGiverStatsNotificationVO((BigInteger)result[0], (String) result[1], (String)result[2],
+					(BigInteger)result[3],(String)result[4], (Integer)result[5],
+					(Boolean)result[6], (Boolean)result[7], (String)result[8],
+					(Boolean)result[9], (Boolean)result[10], (Boolean)result[11]));
+		}		
 		return statsNotificationVOs;
 	}
 

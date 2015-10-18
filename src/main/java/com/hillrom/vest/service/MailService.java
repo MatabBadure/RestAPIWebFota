@@ -1,5 +1,8 @@
 package com.hillrom.vest.service;
 import static com.hillrom.vest.config.NotificationTypeConstants.*;
+
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -22,6 +25,7 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.service.util.DateUtil;
+import com.hillrom.vest.web.rest.dto.PatientStatsVO;
 
 /**
  * Service for sending e-mails.
@@ -56,6 +60,7 @@ public class MailService {
      * Url to be sent in mail notification(stats for Clinic Admin/Hcp) Link
      */
     private String hcpOrClinicAdminDashboardUrl;
+    private String careGiverDashboardUrl;
     
     private String patientDashboardUrl;
     
@@ -63,6 +68,7 @@ public class MailService {
     public void init() {
         this.from = env.getProperty("mail.from");
         this.hcpOrClinicAdminDashboardUrl = env.getProperty("spring.notification.hcpOrClinicAdminDashboardUrl");
+        this.careGiverDashboardUrl = env.getProperty("spring.notification.careGiverDashboardUrl");
         this.patientDashboardUrl = env.getProperty("spring.notification.patientDashboardUrl");
     }
 
@@ -154,5 +160,21 @@ public class MailService {
         subject = messageSource.getMessage("email.statisticsnotification.subject", null, null);
         
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
+    
+    public void sendNotificationCareGiver(String email, String careGiverName,  List<PatientStatsVO> statistics){
+    	log.debug("Sending password reset e-mail to '{}'", email);
+        Context context = new Context();
+        context.setVariable("cgName", careGiverName);
+        context.setVariable("patientsStatisticsList",statistics);
+        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now(), "MMM dd,yyyy"));
+        context.setVariable("notificationUrl", careGiverDashboardUrl);
+        String content = "";
+        String subject = "";
+
+        content = templateEngine.process("careGiverStatisticsNotification", context);
+        subject = messageSource.getMessage("email.statisticsnotification.subject", null, null);
+        
+        sendEmail(new String[]{careGiverDashboardUrl}, subject, content, false, true);
     }
 }

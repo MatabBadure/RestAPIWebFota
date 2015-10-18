@@ -725,7 +725,7 @@ public class UserSearchRepository {
 			if("1".equals(filterMap.get("isMissedTherapy")))
 				filterQuery.append(" and (isMissedTherapy >= 3) ");
 			else if("0".equals(filterMap.get("isMissedTherapy")))
-				filterQuery.append(" and ( isMissedTherapy >=3 )");
+				filterQuery.append(" and ( isMissedTherapy < 3 )");
 		}
 	}
 

@@ -60,7 +60,15 @@ import com.hillrom.vest.web.rest.dto.ClinicStatsNotificationVO;
 @Transactional
 public class AdherenceCalculationService {
 
-    private final Logger log = LoggerFactory.getLogger(AdherenceCalculationService.class);
+    private static final String TREATMENTS_PER_DAY = "treatmentsPerDay";
+
+	private static final String TOTAL_DURATION = "totalDuration";
+
+	private static final String WEIGHTED_AVG_PRESSURE = "weightedAvgPressure";
+
+	private static final String WEIGHTED_AVG_FREQUENCY = "weightedAvgFrequency";
+
+	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationService.class);
     
 	@Inject
 	private PatientProtocolService protocolService;
@@ -154,7 +162,7 @@ public class AdherenceCalculationService {
 		if(latest3TherapySessions.isEmpty() || Objects.isNull(latestCompliance)){
 			noEventService.updatePatientFirstTransmittedDate(patientUserId,currentTherapyDate);
 			return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,
-					actualMetrics.get("totalDuration").intValue(),true,false,latestHmr);
+					actualMetrics.get(TOTAL_DURATION).intValue(),true,false,latestHmr);
 		}else{ 
 			// Default 2 points get deducted by assuming data not received for the day, hence add 2 points
 			currentScore = currentScore ==  DEFAULT_COMPLIANCE_SCORE ?  DEFAULT_COMPLIANCE_SCORE : currentScore + 2;
@@ -163,7 +171,7 @@ public class AdherenceCalculationService {
 			if(threeDaysAgo.isBefore(firstTherapySessionToPatient.getDate())){
 				if(latestCompliance.getDate().isBefore(currentTherapyDate)){
 					return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,
-							actualMetrics.get("totalDuration").intValue(),true,false,latestHmr);
+							actualMetrics.get(TOTAL_DURATION).intValue(),true,false,latestHmr);
 				}
 				latestCompliance.setScore(currentScore);
 				return latestCompliance;
@@ -201,11 +209,11 @@ public class AdherenceCalculationService {
 			currentScore = currentScore > 0? currentScore : 0; 
 			if(latestCompliance.getDate().isBefore(currentTherapyDate)){
 				return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,
-						actualMetrics.get("totalDuration").intValue(),isHMRCompliant,isSettingsDeviated,latestHmr);
+						actualMetrics.get(TOTAL_DURATION).intValue(),isHMRCompliant,isSettingsDeviated,latestHmr);
 			}
 			
 			latestCompliance.setScore(currentScore);
-			latestCompliance.setHmrRunRate(actualMetrics.get("totalDuration").intValue());
+			latestCompliance.setHmrRunRate(actualMetrics.get(TOTAL_DURATION).intValue());
 			return latestCompliance;
 		}
 	}
@@ -228,10 +236,10 @@ public class AdherenceCalculationService {
 		int maxHMRReading = Objects.nonNull(protocolConstant
 				.getMaxDuration()) ? protocolConstant.getMaxDuration()
 				:protocolConstant.getTreatmentsPerDay() * protocolConstant.getMaxMinutesPerTreatment();
-		if(minHMRReading > actualMetrics.get("totalDuration") ||
-				maxHMRReading < actualMetrics.get("totalDuration")){
+		if(minHMRReading > actualMetrics.get(TOTAL_DURATION) ||
+				maxHMRReading < actualMetrics.get(TOTAL_DURATION)){
 			return false;
-		}else if(protocolConstant.getTreatmentsPerDay() > actualMetrics.get("treatmentsPerDay")){
+		}else if(protocolConstant.getTreatmentsPerDay() > actualMetrics.get(TREATMENTS_PER_DAY)){
 			return false;
 		}
 		return true;
@@ -244,10 +252,10 @@ public class AdherenceCalculationService {
 	 * @return
 	 */
 	public boolean isSettingsDeviated(ProtocolConstants protocolConstant,
-			Map<String, Double> actualMetrics) {
-		if(protocolConstant.getMinFrequency() > actualMetrics.get("weightedAvgFrequency") 
-				|| (protocolConstant.getMaxFrequency()*0.85) > actualMetrics.get("weightedAvgFrequency")
-				|| (protocolConstant.getMaxFrequency()*1.15) < actualMetrics.get("weightedAvgFrequency")){
+			double weightedAvgFrequency) {
+		if(protocolConstant.getMinFrequency() > weightedAvgFrequency 
+				|| (protocolConstant.getMaxFrequency()*0.85) > weightedAvgFrequency
+				|| (protocolConstant.getMaxFrequency()*1.15) < weightedAvgFrequency){
 			return true;
 		}
 		return false;
@@ -271,10 +279,10 @@ public class AdherenceCalculationService {
 			++treatmentsPerDay;
 		}
 		Map<String,Double> actualMetrics = new HashMap<>();
-		actualMetrics.put("weightedAvgFrequency", weightedAvgFrequency);
-		actualMetrics.put("weightedAvgPressure", weightedAvgPressure);
-		actualMetrics.put("totalDuration", totalDuration/3);
-		actualMetrics.put("treatmentsPerDay", treatmentsPerDay/3);
+		actualMetrics.put(WEIGHTED_AVG_FREQUENCY, weightedAvgFrequency);
+		actualMetrics.put(WEIGHTED_AVG_PRESSURE, weightedAvgPressure);
+		actualMetrics.put(TOTAL_DURATION, totalDuration/3);
+		actualMetrics.put(TREATMENTS_PER_DAY, treatmentsPerDay/3);
 		return actualMetrics;
 	}
 
@@ -656,8 +664,8 @@ public class AdherenceCalculationService {
 			double hmr = getLatestHMR(existingTherapySessionMap, receivedTherapySessionsMap,therapyDate,
 					latest3DaysTherapySessions);
 			int hmrRunrate = 0;
-			if(Objects.nonNull(therapyMetrics.get("totalDuration"))){
-				hmrRunrate = therapyMetrics.get("totalDuration").intValue();
+			if(Objects.nonNull(therapyMetrics.get(TOTAL_DURATION))){
+				hmrRunrate = therapyMetrics.get(TOTAL_DURATION).intValue();
 			}
 			LocalDate lastTransmissionDate = getLatestTransmissionDate(
 					existingTherapySessionMap,receivedTherapySessionsMap, therapyDate);
@@ -762,6 +770,7 @@ public class AdherenceCalculationService {
 		compliance.setMissedTherapyCount(missedTherapyCount);
 		compliance.setHmrCompliant(latestcompliance.isHmrCompliant());
 		compliance.setLatestTherapyDate(latestcompliance.getLatestTherapyDate());
+		compliance.setSettingsDeviatedDaysCount(latestcompliance.getSettingsDeviatedDaysCount());
 		return compliance;
 	}
 
@@ -777,7 +786,7 @@ public class AdherenceCalculationService {
 		log.warn("**********************************************************************************");*/
 		boolean isHMRCompliant = isHMRCompliant(protocolConstant, metricsMap);
 
-		boolean isSettingsDeviated = isSettingsDeviated(protocolConstant, metricsMap);
+		boolean isSettingsDeviated = isSettingsDeviated(protocolConstant, metricsMap.get(WEIGHTED_AVG_FREQUENCY));
 		
 		int currentScore = latestCompliance.getScore();
 		int previousScore = currentScore;
@@ -802,7 +811,7 @@ public class AdherenceCalculationService {
 			latestCompliance.setSettingsDeviated(isSettingsDeviated);
 			if(isSettingsDeviated && !latestCompliance.isSettingsDeviated()){
 				currentScore -=  SETTING_DEVIATION_POINTS;
-				notificationType =  SETTINGS_DEVIATION;				
+				notificationType =  SETTINGS_DEVIATION;
 			}else if(!isSettingsDeviated && latestCompliance.isSettingsDeviated()){
 				currentScore += SETTING_DEVIATION_POINTS;
 			}
@@ -835,8 +844,8 @@ public class AdherenceCalculationService {
 		
 		latestCompliance.setMissedTherapyCount(currentMissedTherapyCount);
 		latestCompliance.setScore(currentScore);
-		if(Objects.nonNull(metricsMap.get("totalDuration")))
-			latestCompliance.setHmrRunRate(metricsMap.get("totalDuration").intValue());
+		if(Objects.nonNull(metricsMap.get(TOTAL_DURATION)))
+			latestCompliance.setHmrRunRate(metricsMap.get(TOTAL_DURATION).intValue());
 		complianceMap.put(latestCompliance.getDate(), latestCompliance);
 		/*log.warn("***************************AFTER************************************************");
 		log.warn(latestCompliance.getDate()+" : "+latestCompliance);

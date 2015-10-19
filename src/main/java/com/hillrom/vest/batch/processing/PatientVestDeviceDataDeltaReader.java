@@ -46,98 +46,94 @@ import com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.PatientVestDeviceDataVO;
 
-public class PatientVestDeviceDataDeltaReader implements
-		ItemReader<List<PatientVestDeviceData>> {
+public class PatientVestDeviceDataDeltaReader implements ItemReader<List<PatientVestDeviceData>> {
 
 	@Inject
 	private TempRepository tempRepository;
-	
+
 	@Inject
 	private UserRepository userRepository;
-	
+
 	@Inject
 	private UserPatientRepository userPatientRepository;
-	
+
 	@Inject
 	private PatientInfoRepository patientInfoRepository;
-	
+
 	@Inject
 	private UserExtensionRepository userExtensionRepository;
-	
+
 	@Inject
-	private  AuthorityRepository authorityRepository;
-	
+	private AuthorityRepository authorityRepository;
+
 	@Inject
 	private DeviceLogParser deviceLogParser;
-	
+
 	@Inject
 	private TempPatientVestDeviceDataRepository tempPatientVestDeviceDataRepository;
-	
+
 	@Inject
-	private PatientNoEventService noEventService;	
-	
+	private PatientNoEventService noEventService;
+
 	@Inject
 	private TherapySessionService therapySessionService;
-	
+
 	@Inject
 	private PatientComplianceService complianceService;
-	
+
 	String patientDeviceRawData;
-	
+
 	@Value("#{jobParameters['rawData']}")
 	public void setRawData(final String rawData) {
 		this.patientDeviceRawData = rawData;
-	    
-	  }
-	
-    private void parseRawData() {
-    
-	 PatientVestDeviceRawLog deviceRawLog = null;
-		List<TempPatientVestDeviceData> tempPatientVestDeviceRecords = null;
-			deviceRawLog = deviceLogParser.parseBase64StringToPatientVestDeviceRawLog(patientDeviceRawData);
 
-			tempPatientVestDeviceRecords = deviceLogParser
-					.parseBase64StringToPatientVestDeviceLogEntryForTemp(deviceRawLog.getDeviceData());
-
-			String deviceSerialNumber = deviceRawLog.getDeviceSerialNumber();
-
-			UserPatientAssoc userPatientAssoc = createPatientUserIfNotExists(deviceRawLog, deviceSerialNumber);
-			assignDefaultValuesToVestDeviceDataTemp(deviceRawLog, tempPatientVestDeviceRecords, userPatientAssoc);
-			tempPatientVestDeviceDataRepository.save(tempPatientVestDeviceRecords);
 	}
-	
+
+	private void parseRawData() {
+
+		PatientVestDeviceRawLog deviceRawLog = null;
+		List<TempPatientVestDeviceData> tempPatientVestDeviceRecords = null;
+		deviceRawLog = deviceLogParser.parseBase64StringToPatientVestDeviceRawLog(patientDeviceRawData);
+
+		tempPatientVestDeviceRecords = deviceLogParser
+				.parseBase64StringToPatientVestDeviceLogEntryForTemp(deviceRawLog.getDeviceData());
+
+		String deviceSerialNumber = deviceRawLog.getDeviceSerialNumber();
+
+		UserPatientAssoc userPatientAssoc = createPatientUserIfNotExists(deviceRawLog, deviceSerialNumber);
+		assignDefaultValuesToVestDeviceDataTemp(deviceRawLog, tempPatientVestDeviceRecords, userPatientAssoc);
+		tempPatientVestDeviceDataRepository.save(tempPatientVestDeviceRecords);
+	}
+
 	@Override
-	public List<PatientVestDeviceData> read() throws Exception,
-			UnexpectedInputException, ParseException,
-			NonTransientResourceException {
-		
+	public List<PatientVestDeviceData> read()
+			throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+
 		parseRawData();
-		List<PatientVestDeviceDataVO>  deviceDataDelta = tempRepository.getPatientDeviceDataDelta();
+		List<PatientVestDeviceDataVO> deviceDataDelta = tempRepository.getPatientDeviceDataDelta();
 		User patientUser = null;
 		PatientInfo patient = null;
-		if(Objects.nonNull(deviceDataDelta) && deviceDataDelta.size() > 0){
+		if (Objects.nonNull(deviceDataDelta) && deviceDataDelta.size() > 0) {
 			Long userId = deviceDataDelta.get(0).getUserId();
 			String patientId = deviceDataDelta.get(0).getPatientId();
 			patient = patientInfoRepository.findOne(patientId);
-			patientUser = userRepository.findOne(userId); 
-		}
-		else
+			patientUser = userRepository.findOne(userId);
+		} else
 			return null;
-		if(BatchUtil.flag)
+		if (BatchUtil.flag)
 			return null;
 
-		List<PatientVestDeviceData> patientVestDeviceRecords =  convertVOToPatientVestDeviceData(deviceDataDelta, patientUser,
-				patient);
+		List<PatientVestDeviceData> patientVestDeviceRecords = convertVOToPatientVestDeviceData(deviceDataDelta,
+				patientUser, patient);
 		List<TherapySession> therapySessions = PatientVestDeviceTherapyUtil
 				.prepareTherapySessionFromDeviceData(patientVestDeviceRecords);
 
 		therapySessionService.saveOrUpdate(therapySessions);
 		return patientVestDeviceRecords;
 	}
-	
-	private List<PatientVestDeviceData> convertVOToPatientVestDeviceData(
-			List<PatientVestDeviceDataVO> deviceDataDelta, User patientUser,
-			PatientInfo patient) {
+
+	private List<PatientVestDeviceData> convertVOToPatientVestDeviceData(List<PatientVestDeviceDataVO> deviceDataDelta,
+			User patientUser, PatientInfo patient) {
 		List<PatientVestDeviceData> vestDeviceDatas = new ArrayList<>();
 		PatientVestDeviceData patientVestDeviceData;
 
@@ -162,7 +158,7 @@ public class PatientVestDeviceDataDeltaReader implements
 		BatchUtil.flag = true;
 		return vestDeviceDatas;
 	}
-	
+
 	private void assignDefaultValuesToVestDeviceDataTemp(PatientVestDeviceRawLog deviceRawLog,
 			List<TempPatientVestDeviceData> patientVestDeviceRecords, UserPatientAssoc userPatientAssoc) {
 		patientVestDeviceRecords.stream().forEach(deviceData -> {
@@ -232,7 +228,7 @@ public class PatientVestDeviceDataDeltaReader implements
 			return userPatientAssoc;
 		}
 	}
-	
+
 	private void setNameToPatient(PatientInfo patientInfo, String customerName) {
 		String names[] = customerName.split(" ");
 		if (names.length == 2) {
@@ -245,7 +241,7 @@ public class PatientVestDeviceDataDeltaReader implements
 			assignNameToPatient(patientInfo, names[0], null, null);
 		}
 	}
-	
+
 	private void assignNameToPatient(PatientInfo patientInfo, String firstName, String lastName, String middleName) {
 		patientInfo.setFirstName(firstName);
 		patientInfo.setLastName(lastName);

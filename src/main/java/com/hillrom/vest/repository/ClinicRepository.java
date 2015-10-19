@@ -82,4 +82,23 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 					+ " as associated_hcp, PATIENT_COMPLIANCE pc "
 					+ " where puserid = pc.user_id AND pc.date=CURDATE() and associated_patient.hcp_id = associated_hcp.huserid ")
 	List<Object[]> findPatientStatisticsClinicForActiveClinics();
+	
+	@Query(nativeQuery=true,
+			 value="select puserid,pfirstname,plastname,cgvr_id,CONCAT(clastName,' ', cfirstName) as cname,pc.missed_therapy_count,pc.is_settings_deviated,pc.is_hmr_compliant,"
+					+"cemail, isMissedTherapyNotification,settingDeviationNotification, nonHmrNotification  from ( "
+					+"select user.id as puserid,user.first_name as pfirstName,user.last_name as plastName,upa_cgvr.user_id as cgvr_id "
+					+"from USER user  "
+					+"join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = 'PATIENT' "
+					+"join USER_PATIENT_ASSOC  upa on user.id= upa.user_id and upa.relation_label = 'SELF'  "
+					+"join PATIENT_INFO patInfo on upa.patient_id = patInfo.id  "
+					+"join USER_PATIENT_ASSOC upa_cgvr on patInfo.id = upa_cgvr.patient_id  "
+					+"where user.is_deleted = 0 and user.activated=1) as associated_patient,  "
+					+"(select cuser.id as cuserid,cuser.first_name as cfirstName,cuser.last_name as clastName,cuser.email as cemail, "
+					+"missed_therapy_notification as isMissedTherapyNotification, setting_deviation_notification as settingDeviationNotification, "
+					+ "non_hmr_notification as nonHmrNotification from USER cuser  "
+					+"join USER_AUTHORITY user_authorityc on user_authorityc.user_id = cuser.id and user_authorityc.authority_name = 'CARE_GIVER')  "
+					+"as associated_cgvr, PATIENT_COMPLIANCE pc  where  "
+					+"puserid = pc.user_id AND pc.date=CURDATE() and  "
+					+"associated_patient.cgvr_id = associated_cgvr.cuserid ")
+	List<Object[]> findPatientStatisticsCareGiver();
 }

@@ -92,18 +92,18 @@ public class ClinicService {
     }
 
     public ClinicVO updateClinic(String id, ClinicDTO clinicDTO) throws HillromException {
-    	Clinic clinic = clinicRepository.getOne(id);
-        if(Objects.isNull(clinic)) {
-        	throw new HillromException(ExceptionConstants.HR_548);//No such clinic found
-        } else if(StringUtils.isNotBlank(clinic.getId())) {
-        	if(Objects.nonNull(clinicDTO.getHillromId())) {
-    			Optional<Clinic> existingClinic = clinicRepository.findOneByHillromId(clinicDTO.getHillromId());
-    			if (existingClinic.isPresent() && !existingClinic.get().getId().equals(id)) {
-    				throw new HillromException(ExceptionConstants.HR_522);
-        		}
-        	}
-        	assignUpdatedValues(clinicDTO, clinic);
-        	if(clinicDTO.getParent()) {
+		Clinic clinic = clinicRepository.getOne(id);
+	    if(Objects.isNull(clinic)) {
+	    	throw new HillromException(ExceptionConstants.HR_548);//No such clinic found
+	    } else if(StringUtils.isNotBlank(clinic.getId())) {
+	    	if(Objects.nonNull(clinicDTO.getHillromId())) {
+				Optional<Clinic> existingClinic = clinicRepository.findOneByHillromId(clinicDTO.getHillromId());
+				if (existingClinic.isPresent() && !existingClinic.get().getId().equals(id)) {
+					throw new HillromException(ExceptionConstants.HR_522);
+	    		}
+	    	}
+	    	assignUpdatedValues(clinicDTO, clinic);
+	    	if(clinicDTO.getParent()) {
 	        	List<String> existingChildClinicIds = new ArrayList<String>();
 	        	List<String> newChildClinicIds = new ArrayList<String>();
 	        	for(Clinic childClinic : clinic.getChildClinics()) {
@@ -137,8 +137,8 @@ public class ClinicService {
     		clinicRepository.save(clinic);
         } else {
 	      	throw new HillromException(ExceptionConstants.HR_543);
-        }
-    	return ClinicVOBuilder.buildWithChildClinics(clinic);
+	    }
+	    return ClinicVOBuilder.buildWithChildClinics(clinic);
     }
     
     public String deleteClinic(String id) throws HillromException {

@@ -100,7 +100,10 @@ public class HCPClinicService {
 	    		clinicIdsString.append(clinic.getId());
 	    		clinicIdsString.append("',");
 	    	}
-	    	return clinicIdsString.deleteCharAt(clinicIdsString.lastIndexOf(",")).toString();
+	    	if(clinicIdsString.indexOf(",") < 0)
+	    		return "";
+	    	else 
+	    		return clinicIdsString.deleteCharAt(clinicIdsString.lastIndexOf(",")).toString();
 	    }
     }
 }

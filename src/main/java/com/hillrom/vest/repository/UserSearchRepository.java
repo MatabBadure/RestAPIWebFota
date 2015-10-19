@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -30,13 +31,13 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import com.hillrom.vest.domain.Clinic;
-import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.HCPClinicService;
 import com.hillrom.vest.util.ExceptionConstants;
+import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 
 @Repository
@@ -48,6 +49,8 @@ public class UserSearchRepository {
 	
 	@Inject
 	private HCPClinicService hcpClinicService;
+	@Inject
+	private UserPatientRepository userPatientRepository;
 	
 	public Page<HillRomUserVO> findHillRomTeamUsersBy(String queryString,String filter,
 			Pageable pageable, Map<String, Boolean> sortOrder) {
@@ -223,6 +226,104 @@ public class UserSearchRepository {
 		Page<HcpVO> page = new PageImpl<HcpVO>(hcpUsersSubList, null, count.intValue());
 
 		return page;
+	}
+	
+	// Get all HCPs associated with Clinics of a Patient
+	public List<HcpVO> findHCPByPatientClinics(String queryString, String filter, Long userId, Map<String,Boolean> sortOrder) throws HillromException {
+		
+		List<UserPatientAssoc> associations = userPatientRepository.findOneByUserId(userId);
+		associations = associations.stream().filter(assoc -> 
+			RelationshipLabelConstants.SELF.equalsIgnoreCase(assoc.getRelationshipLabel())
+		).collect(Collectors.toList());
+		UserPatientAssoc userPatientAssoc = associations.isEmpty()?null : associations.get(0);
+		if(Objects.isNull(userPatientAssoc))
+			throw new HillromException(ExceptionConstants.HR_523);
+		
+		String patientId = userPatientAssoc.getPatient().getId();
+		
+		String findHcpQuery = "select * from"
+			+" (select user.id,user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted, "
+			+ " user.zipcode,userExt.address,userExt.city as hcity,userExt.credentials,userExt.fax_number,userExt.primary_phone,"
+			+ " userExt.mobile_phone,"
+			+ " userExt.speciality,userExt.state as hstate,clinic.id as clinicId,clinic.name as clinicName,"
+			+ " user.created_date as createdAt,user.activated isActivated,userExt.npi_number as npiNumber  FROM USER user "
+			+ " join USER_EXTENSION userExt on user.id = userExt.user_id  and (lower(user.first_name) "
+			+ " like lower(:queryString) or lower(user.last_name) like lower(:queryString) or  "
+			+ " lower(CONCAT(user.first_name,' ',user.last_name)) like lower(:queryString) "
+			+ " or lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) "
+			+ " or lower(user.email) like lower(:queryString))  "
+			+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id "
+			+ " and user_authority.authority_name = '"+HCP+"' left outer "
+			+ " join CLINIC_USER_ASSOC user_clinic on user_clinic.users_id = user.id  "
+			+ " left outer join CLINIC clinic on user_clinic.clinics_id = clinic.id and user_clinic.users_id = user.id ) "
+			+ " as t,CLINIC_PATIENT_ASSOC cpasso "
+			+ " where cpasso.patient_id = ':patientId' and t.clinicId = cpasso.clinic_id";
+
+		StringBuilder filterQuery = new StringBuilder();
+	
+		if(StringUtils.isNotEmpty(filter) && !"all".equalsIgnoreCase(filter)){
+		
+			Map<String,String> filterMap = getSearchParams(filter);
+			
+			filterQuery.append("select * from (");
+			
+			applyIsDeletedFilter(findHcpQuery, filterQuery, filterMap);
+			
+			findHcpQuery = filterQuery.toString();
+		}
+			
+		findHcpQuery = findHcpQuery.replaceAll(":queryString", queryString);
+		findHcpQuery = findHcpQuery.replaceAll(":patientId", patientId);
+
+		String countSqlQuery = "select count(hcpUsers.id) from ("
+				+ findHcpQuery + " ) hcpUsers";
+
+		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
+		BigInteger count = (BigInteger) countQuery.getSingleResult();
+
+		Query query = getOrderedByQuery(findHcpQuery, sortOrder);
+		
+		List<HcpVO> hcpUsers = new ArrayList<>();
+		
+		List<Object[]> results = query.getResultList();
+
+		results.forEach(
+				(record) -> {
+					Long id = ((BigInteger) record[0]).longValue();
+					String email = (String) record[1];
+					String firstName = (String) record[2];
+					String lastName = (String) record[3];
+					Boolean isDeleted = (Boolean) record[4];
+					Integer zipcode = (Integer) record[5];
+					String address = (String) record[6];
+					String city = (String) record[7];
+					String credentials = (String) record[8];
+					
+					String faxNumber =  (String) record[9]; 
+					String primaryPhone = (String) record[10];
+					String mobilePhone = (String) record[11];
+					String speciality = (String) record[12];
+					String state = (String) record[13];
+					String clinicId = (String) record[14];
+					String clinicName = (String) record[15];
+					Timestamp createdAt = (Timestamp) record[16];
+					DateTime createdAtDatetime = new DateTime(createdAt);
+					Boolean isActivated = (Boolean) record[17];
+					String npiNumber = (String)record[18];
+					
+					Map<String, String> clinicMap = new HashMap<>();
+						clinicMap.put("id", clinicId);
+						clinicMap.put("name", clinicName);
+					
+					HcpVO hcpVO = new HcpVO(id, firstName, lastName, email,
+								isDeleted, zipcode, address, city, credentials,
+								faxNumber, primaryPhone, mobilePhone, speciality,
+								state, createdAtDatetime, isActivated, npiNumber);
+					hcpVO.getClinics().add(clinicMap);
+
+					hcpUsers.add(hcpVO);
+				});
+		return hcpUsers;
 	}
 	
 	
@@ -429,12 +530,12 @@ public class UserSearchRepository {
 					java.util.Date localLastTransmissionDate = null;
 					
 					if(Objects.nonNull(lastTransmissionDate)){
-						localLastTransmissionDate =lastTransmissionDate;
+						localLastTransmissionDate = new java.util.Date(lastTransmissionDate.getTime());
 						
 					}
 					
 					java.util.Date dobLocalDate = null;
-					if(null !=dob){
+					if(Objects.nonNull(dob)){
 						dobLocalDate = new java.util.Date(dob.getTime());
 					}
 
@@ -520,11 +621,13 @@ public class UserSearchRepository {
 		return query;
 	}
 	
+	//Pateint Search for HCP DashBoard
+	
 	public Page<PatientUserVO> findAssociatedPatientToHCPBy(String queryString, Long hcpUserID, String clinicId, String filter,
 			Pageable pageable, Map<String, Boolean> sortOrder) throws HillromException {
 
 		String findPatientUserQuery = " select user.id,user.email,user.first_name as firstName,user.last_name as lastName, "
-				+ " user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,"
+				+ " user.is_deleted as isUserDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob as patientDoB,"
 				+ " user.gender,user.title,user.hillrom_id,user.created_date as createdAt,"
 				+ " user.activated as isActivated, patInfo.state as state, pc.compliance_score adherence,"
 				+ " pc.last_therapy_session_date as last_date,"
@@ -537,42 +640,45 @@ public class UserSearchRepository {
 				+ " left outer join CLINIC_PATIENT_ASSOC user_clinicc on user_clinicc.patient_id = patInfoc.id  "
 				+ " left outer join CLINIC clinicc on user_clinicc.clinic_id = clinicc.id and user_clinicc.patient_id = patInfoc.id "
 				+ " where upac.user_id = user.id "
-				+ " group by patInfoc.id) as clinicname, (select  GROUP_CONCAT(userh.first_name, userh.last_name) "
+				+ " group by patInfoc.id) as clinicname, (select  GROUP_CONCAT(userh.first_name,' ', userh.last_name) "
 				+ " from USER userh "
 				+ " left outer join USER_AUTHORITY user_authorityh on user_authorityh.user_id = userh.id  "
 				+ "and user_authorityh.authority_name = 'HCP' " 
 				+ " join USER_PATIENT_ASSOC  upah on userh.id = upah.user_id and upah.relation_label = 'HCP' "
 				+ " left outer join PATIENT_INFO patInfoh on upah.patient_id = patInfoh.id "
 				+ " where patInfo.id = patInfoh.id"
-				+ " group by patInfoh.id) as hcpname, patient_clinic.mrn_id as mrnid,"
+				+ " group by patInfoh.id) as hcpname, patient_clinic.mrn_id as mrnid, patient_clinic.is_active as isDeleted,"
 				+ " pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,"
-				+ " pc.missed_therapy_count as isMissedTherapy"
+				+ " pc.missed_therapy_count as isMissedTherapy "
 				+ " from USER user"
-				+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id"
-				+ " and user_authority.authority_name = '"+PATIENT+"'and (lower(user.first_name) "
-				+ " like lower(:queryString) or lower(user.last_name) like lower(:queryString) "
-				+ " or lower(user.email) like lower(:queryString) or lower(CONCAT(user.first_name,' ',user.last_name)) "
-				+ " like lower(:queryString) or lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) "
-				+ " or lower(user.hillrom_id) like lower(:queryString))"
-				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"'  "
+				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"'"
 				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id" 
-				+" join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id  "
-				+" left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate()  "
-				+" join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id and "
-				+ " lower(IFNULL(patient_clinic.mrn_id,0)) like lower('%%') ";
+				+ " join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id  "
+				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate()  "
+				+ " left outer join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id "
+				+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id"
+				+ " and user_authority.authority_name = '"+PATIENT+"'";
+		
+				String searchQuery = " and (lower(user.first_name) "
+						+ " like lower(:queryString) or lower(user.last_name) like lower(:queryString) "
+						+ " or lower(user.email) like lower(:queryString) or lower(CONCAT(user.first_name,' ',user.last_name)) "
+						+ " like lower(:queryString) or lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) "
+						+ " or lower(user.hillrom_id) like lower(:queryString) or lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString)) ";
 				
 				String query2 = " where upa_hcp.user_id = :hcpUserID ";
 				String query3 =	" group by user.id ";
+				
+				String associatedClinicList = hcpClinicService.getFlattenedAssociatedClinicsIdForHCP(hcpUserID);
+				
+				String filterByAssociatedClinicList = StringUtils.isEmpty(associatedClinicList)?"": " or patient_clinic.clinic_id  in ("
+						+ associatedClinicList + " ) ";
 		if (StringUtils.isEmpty(clinicId) | "all".equalsIgnoreCase(clinicId)) {
-			findPatientUserQuery = findPatientUserQuery + query2 + " or patient_clinic.clinic_id  in ("
-					+ hcpClinicService.getFlattenedAssociatedClinicsIdForHCP(hcpUserID) + " ) " + query3;
+			findPatientUserQuery = findPatientUserQuery + query2 +searchQuery+ filterByAssociatedClinicList + query3;
 		} else if ("others".equalsIgnoreCase(clinicId)) {
-			findPatientUserQuery = findPatientUserQuery + query2 + " and patient_clinic.clinic_id not in ("
-					+ hcpClinicService.getFlattenedAssociatedClinicsIdForHCP(hcpUserID) + ")" +
-			query3;
+			findPatientUserQuery = findPatientUserQuery + query2 + searchQuery + query3;
 		} else
 			findPatientUserQuery = findPatientUserQuery + " where patient_clinic.clinic_id  ='" + clinicId + "'"
-					+ query3;
+					+ searchQuery +  query3;
 				
 		StringBuilder filterQuery = new StringBuilder();
 	
@@ -582,7 +688,7 @@ public class UserSearchRepository {
 			
 			filterQuery.append("select * from (");
 			
-			applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
+			applyQueryFiltersForHCPandClinicAdmin(findPatientUserQuery, filterQuery, filterMap);
 
 			findPatientUserQuery = filterQuery.toString();
 		}
@@ -628,21 +734,24 @@ public class UserSearchRepository {
 					String clinicNamesCSV = (String) record[17];
 					String hcpNamesCSV = (String) record[18];
 					String mrnId = (String) record[19];
+					Boolean IsActiveInClinic = (Boolean) record[20];
 					
 					java.util.Date localLastTransmissionDate = null;
 					
 					if(Objects.nonNull(lastTransmissionDate)){
-						localLastTransmissionDate =lastTransmissionDate;
-						
+						localLastTransmissionDate =lastTransmissionDate;	
 					}
 					
 					java.util.Date dobLocalDate = null;
 					if(null !=dob){
 						dobLocalDate = new java.util.Date(dob.getTime());
 					}
+					//Clinic wise active inactive is not the for the case og others
+					if(Objects.isNull(IsActiveInClinic))
+						IsActiveInClinic = !isDeleted;
 
 					PatientUserVO patientUserVO = new PatientUserVO(id, email, firstName,
-							lastName, isDeleted, zipcode, address, city, dobLocalDate,
+							lastName, IsActiveInClinic?false:true, zipcode, address, city, dobLocalDate,
 							gender, title, hillromId,createdAtDatetime,isActivated,state,
 							Objects.nonNull(adherence) ? adherence : 0,localLastTransmissionDate);
 					//mrnId,hcpNamesCSV,clinicNamesCSV
@@ -771,6 +880,19 @@ public class UserSearchRepository {
 		
 		applyIsNoEventFilter(filterQuery, filterMap);
 	}
+	
+	//isDeleted field has different meaning For patients in HCP and ClinicAdmin dashboard
+	private void applyQueryFiltersForHCPandClinicAdmin(String query, StringBuilder filterQuery, Map<String, String> filterMap) {
+		applyIsDeletedFiltersForHCPandClinicAdmin(query, filterQuery, filterMap);
+		
+		applyIsHMRNonCompliantFilter(filterQuery, filterMap);
+		
+		applyIsSettingsDeviatedFilter(filterQuery, filterMap);
+		
+		applyIsMissedTherapyFilter(filterQuery, filterMap);
+		
+		applyIsNoEventFilter(filterQuery, filterMap);
+	}
 
 	private void applyIsNoEventFilter(StringBuilder filterQuery, Map<String, String> filterMap) {
 		if(Objects.nonNull(filterMap.get("isNoEvent")) && "1".equals(filterMap.get("isNoEvent"))){
@@ -785,9 +907,9 @@ public class UserSearchRepository {
 		if(Objects.nonNull(filterMap.get("isMissedTherapy"))){
 			
 			if("1".equals(filterMap.get("isMissedTherapy")))
-				filterQuery.append(" and (isMissedTherapy > 0 && isMissedTherapy %3 = 0) ");
+				filterQuery.append(" and (isMissedTherapy >= 3) ");
 			else if("0".equals(filterMap.get("isMissedTherapy")))
-				filterQuery.append(" and (isMissedTherapy %3 <> 0)");
+				filterQuery.append(" and ( isMissedTherapy < 3 )");
 		}
 	}
 
@@ -829,12 +951,28 @@ public class UserSearchRepository {
 			filterQuery.append(query);
 			filterQuery.append(") as search_table where isDeleted in (0,1)");
 		}
+	}private void applyIsDeletedFiltersForHCPandClinicAdmin(String query, StringBuilder filterQuery,
+			Map<String, String> filterMap) {
+		if(Objects.nonNull(filterMap.get("isDeleted"))){
+			filterQuery.append(query);
+			
+			if("0".equals(filterMap.get("isDeleted")))
+				filterQuery.append(") as search_table where isDeleted in (1)");
+			else if("1".equals(filterMap.get("isDeleted")))
+				filterQuery.append(")  as search_table where isDeleted in (0)");
+			else
+				filterQuery.append(") as search_table where isDeleted in (0,1)");
+		}
+		else{
+			filterQuery.append(query);
+			filterQuery.append(") as search_table where isDeleted in (0,1)");
+		}
 	}
 
 	public Page<PatientUserVO> findAssociatedPatientToClinicAdminBy(String queryString, Long clinicAdminId, String clinicId, String filter,
 			Pageable pageable, Map<String, Boolean> sortOrder) {
 
-		String findPatientUserQuery = " select user.id,user.email,user.first_name as firstName,user.last_name as lastName,  user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,"
+		String findPatientUserQuery = " select user.id,user.email,user.first_name as firstName,user.last_name as lastName,  user.is_deleted as isUserDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,"
 				+ " user.gender,user.title,user.hillrom_id,user.created_date as createdAt, user.activated as isActivated, patInfo.state as state, pc.compliance_score adherence,"
 				+ " pc.last_therapy_session_date as last_date, "
 				+ " (select  GROUP_CONCAT(clinicc.name) from USER userc  "
@@ -848,24 +986,25 @@ public class UserSearchRepository {
 				+ " left outer join USER_AUTHORITY user_authorityh on user_authorityh.user_id = userh.id "
 				+ " and user_authorityh.authority_name = '"+HCP+"'  join USER_PATIENT_ASSOC  upah on userh.id = upah.user_id "
 				+ " and upah.relation_label = '"+HCP+"'  left outer join PATIENT_INFO patInfoh on upah.patient_id = patInfoh.id "
-				+ " where patInfo.id = patInfoh.id group by patInfoh.id) as hcpname,patient_clinic.mrn_id as mrnid, pc.is_hmr_compliant as isHMRNonCompliant,"
+				+ " where patInfo.id = patInfoh.id group by patInfoh.id) as hcpname,patient_clinic.mrn_id as mrnid, patient_clinic.is_active as isDeleted, pc.is_hmr_compliant as isHMRNonCompliant,"
 				+ " pc.is_settings_deviated as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy from USER user "
 				+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = '"+PATIENT+"'"
+				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"' "
+				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id"
+				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate() "
+				+ " join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id "
+				+ " join CLINIC clinic on clinic.id = patient_clinic.clinic_id "
 				+ " and (lower(user.first_name)  like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString)  or "
 				+ " lower(user.email) like lower(:queryString) or "
 				+ " lower(CONCAT(user.first_name,' ',user.last_name))  like lower(:queryString) or "
 				+ " lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString)  or "
+				+ " lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString) or "
 				+ " lower(user.hillrom_id) like lower(:queryString)) "
-				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"' "
-				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id"
-				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate() "
-				+ " join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id "
-				+ " and lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString) "
-				+ " join CLINIC clinic on clinic.id = patient_clinic.clinic_id "
+				
 				+" where lower(IFNULL(clinic.clinic_admin_id,0))= :clinicAdminId ";
 		
-		
+		String groupBy = " group by user.id ";
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString",
 				queryString);
 		
@@ -875,6 +1014,7 @@ public class UserSearchRepository {
 		if(!StringUtils.isEmpty(clinicId)){
 			findPatientUserQuery = findPatientUserQuery.concat(" and clinic.id = '"+clinicId+"'");
 		}
+		findPatientUserQuery += groupBy;
 		
 		StringBuilder filterQuery = new StringBuilder();
 	
@@ -884,10 +1024,12 @@ public class UserSearchRepository {
 			
 			filterQuery.append("select * from (");
 			
-			applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
+			applyQueryFiltersForHCPandClinicAdmin(findPatientUserQuery, filterQuery, filterMap);
 
 			findPatientUserQuery = filterQuery.toString();
 		}
+		
+		
 		
 		String countSqlQuery = "select count(patientUsers.id) from ("
 				+ findPatientUserQuery + " ) patientUsers";
@@ -899,8 +1041,55 @@ public class UserSearchRepository {
 		setPaginationParams(pageable, query);
 		
 		List<Object[]> results = query.getResultList();
+		
+		List<PatientUserVO> patientUsers = new LinkedList<>();
+		results.stream().forEach(
+				(record) -> {
+					Long id = ((BigInteger) record[0]).longValue();
+					String email = (String) record[1];
+					String firstName = (String) record[2];
+					String lastName = (String) record[3];
+					Boolean isDeleted = (Boolean) record[4];
+					Integer zipcode = (Integer) record[5];
+					String address = (String) record[6];
+					String city = (String) record[7];
+					Date dob = (Date) record[8];
+					String gender = (String) record[9];
+					String title = (String) record[10];
+					String hillromId = (String) record[11];
+					Timestamp createdAt = (Timestamp) record[12];
+					Boolean isActivated = (Boolean) record[13];
+					DateTime createdAtDatetime = new DateTime(createdAt);
+					String state = (String) record[14];
+					Integer adherence = (Integer) record[15];
+					Date lastTransmissionDate = (Date) record[16];
+					String clinicNamesCSV = (String) record[17];
+					String hcpNamesCSV = (String) record[18];
+					String mrnId = (String) record[19];
+					Boolean isActivatedInClinic = (Boolean) record[20];
+					
+					java.util.Date localLastTransmissionDate = null;
+					
+					if(Objects.nonNull(lastTransmissionDate)){
+						localLastTransmissionDate =lastTransmissionDate;
+						
+					}
+					
+					java.util.Date dobLocalDate = null;
+					if(null !=dob){
+						dobLocalDate = new java.util.Date(dob.getTime());
+					}
 
-		List<PatientUserVO> patientUsers = extractPatientSearchResultsToVO(results);
+					PatientUserVO patientUserVO = new PatientUserVO(id, email, firstName,
+							lastName, isActivatedInClinic?false:true, zipcode, address, city, dobLocalDate,
+							gender, title, hillromId,createdAtDatetime,isActivated,state,
+							Objects.nonNull(adherence) ? adherence : 0,localLastTransmissionDate);
+					//mrnId,hcpNamesCSV,clinicNamesCSV
+					patientUserVO.setMrnId(mrnId);
+					patientUserVO.setHcpNamesCSV(hcpNamesCSV);
+					patientUserVO.setClinicNamesCSV(clinicNamesCSV);
+					patientUsers.add(patientUserVO);
+				});
 
 		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());
 
@@ -926,7 +1115,8 @@ public class UserSearchRepository {
 				+ "lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) or "
 				+ "lower(user.hillrom_id) like lower(:queryString)) "
 				+ "join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"' "
-				+ "join PATIENT_INFO patInfo on upa.patient_id = patInfo.id join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id "
+				+ "join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
+				+ "join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id "
 				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate() ";
 		String query2 = " where upa_hcp.user_id = :hcpUserID ";
 		
@@ -1009,7 +1199,7 @@ public class UserSearchRepository {
 	
 	//Patient Search which are not associated with the clinic
 	
-		public List<PatientUserVO> findPatientNotAssociatedToClinic(String clinicId, String searchString) {
+	public List<PatientUserVO> findPatientNotAssociatedToClinic(String clinicId, String searchString) {
 
 			String findPatientUserQuery = "select * from ( select user.id as patient_id,user.email as pemail,user.first_name as pfirstName,"
 					+ "user.last_name as plastName, user.is_deleted as isDeleted,user.zipcode as pzipcode,"
@@ -1052,8 +1242,6 @@ public class UserSearchRepository {
 			return patientUsers;
 		}
 
-	
-	
 	private Map<String,String> getSearchParams(String filterString){
 		
 		Map<String,String> filterMap = new HashMap<>();
@@ -1071,4 +1259,5 @@ public class UserSearchRepository {
 		}
 		return filterMap;
 	}
+
 }

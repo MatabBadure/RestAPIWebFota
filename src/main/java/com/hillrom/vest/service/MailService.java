@@ -1,5 +1,8 @@
 package com.hillrom.vest.service;
 import static com.hillrom.vest.config.NotificationTypeConstants.*;
+
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -22,6 +25,8 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.service.util.DateUtil;
+import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
+import com.hillrom.vest.web.rest.dto.PatientStatsVO;
 
 /**
  * Service for sending e-mails.
@@ -56,6 +61,7 @@ public class MailService {
      * Url to be sent in mail notification(stats for Clinic Admin/Hcp) Link
      */
     private String hcpOrClinicAdminDashboardUrl;
+    private String careGiverDashboardUrl;
     
     private String patientDashboardUrl;
     
@@ -63,6 +69,7 @@ public class MailService {
     public void init() {
         this.from = env.getProperty("mail.from");
         this.hcpOrClinicAdminDashboardUrl = env.getProperty("spring.notification.hcpOrClinicAdminDashboardUrl");
+        this.careGiverDashboardUrl = env.getProperty("spring.notification.careGiverDashboardUrl");
         this.patientDashboardUrl = env.getProperty("spring.notification.patientDashboardUrl");
     }
 
@@ -110,10 +117,11 @@ public class MailService {
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
     
-    public void sendNotificationMailToPatient(User user,String notificationType){
+    public void sendNotificationMailToPatient(User user,String notificationType,int missedTherapyCount){
        log.debug("Sending password reset e-mail to '{}'", user.getEmail());
        Context context = new Context();
        context.setVariable("user", user);
+       context.setVariable("missedTherapyCount", missedTherapyCount);
        context.setVariable("isMissedTherapyNotification", MISSED_THERAPY.equalsIgnoreCase(notificationType));
        context.setVariable("isHmrNonComplianceNotification", HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType));
        context.setVariable("isSettingsDeviatedNotification",SETTINGS_DEVIATION.equalsIgnoreCase(notificationType));
@@ -154,5 +162,24 @@ public class MailService {
         subject = messageSource.getMessage("email.statisticsnotification.subject", null, null);
         
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
+    
+    public void sendNotificationCareGiver(CareGiverStatsNotificationVO careGiverStatsNotificationVO,  List<PatientStatsVO> statistics){
+    	log.debug("Sending care giver statistics e-mail to '{}'", careGiverStatsNotificationVO.getCGEmail());
+        Context context = new Context();
+        context.setVariable("careGiverStatsNotificationVO", careGiverStatsNotificationVO);
+        context.setVariable("patientsStatisticsList",statistics);
+        context.setVariable("isMultiplePatients",statistics.size()>1?true:false);
+        log.debug("statistics patient size {}", statistics.size());
+        
+        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now(), "MMM dd,yyyy"));
+        context.setVariable("notificationUrl", careGiverDashboardUrl);
+        String content = "";
+        String subject = "";
+
+        content = templateEngine.process("careGiverStatisticsNotification", context);
+        subject = messageSource.getMessage("email.statisticsnotification.subject", null, null);
+        
+        sendEmail(new String[]{careGiverStatsNotificationVO.getCGEmail()}, subject, content, false, true);
     }
 }

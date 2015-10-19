@@ -58,6 +58,7 @@ import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.AdherenceCalculationService;
+import com.hillrom.vest.service.PatientComplianceService;
 import com.hillrom.vest.service.PatientHCPService;
 import com.hillrom.vest.service.PatientProtocolService;
 import com.hillrom.vest.service.PatientVestDeviceService;
@@ -119,6 +120,9 @@ public class UserResource {
 	
 	@Inject
     private PatientHCPService patientHCPService;
+	
+	@Inject
+	private PatientComplianceService patientComplianceService;
 	
 	/**
 	 * GET /users -> get all users.
@@ -292,7 +296,7 @@ public class UserResource {
 	}
 
 	/**
-     * PUT  /patient/:id/linkvestdevice -> link vest device with patient {id}.
+     * PUT  /patient/:id/link -> link vest device with patient {id}.
      */
     @RequestMapping(value = "/patient/{id}/linkvestdevice",
             method = RequestMethod.PUT,
@@ -638,7 +642,7 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JSONObject> getMissedTherapyCount(@PathVariable Long id){
     	JSONObject json = new JSONObject();
-    	json.put("count",therapySessionService.getMissedTherapyCountByPatientUserId(id));
+    	json.put("count",patientComplianceService.getMissedTherapyCountByPatientUserId(id));
     	return new ResponseEntity<JSONObject>(json, HttpStatus.OK);
     }
     
@@ -967,4 +971,22 @@ public class UserResource {
 
 	}
 
+    @RequestMapping(value="/user/{id}/securityQuestion",
+    		method=RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<JSONObject> getSecurityQuestion(@PathVariable Long id){
+		log.debug("REST request to get Security Question for user {}",id);
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject = userService.getSecurityQuestion(id);
+			jsonObject.put("message", MessageConstants.HR_304);
+		} catch (HillromException e) {
+			jsonObject.put("ERROR",e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.BAD_REQUEST);
+		}
+		if(jsonObject.containsKey("ERROR")){
+			return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.OK);
+	}
 }

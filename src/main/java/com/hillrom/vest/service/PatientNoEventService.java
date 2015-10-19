@@ -9,7 +9,9 @@ import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.domain.PatientNoEvent;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.PatientNoEventsRepository;
+import com.hillrom.vest.util.ExceptionConstants;
 
 @Service
 @Transactional
@@ -39,5 +41,18 @@ public class PatientNoEventService {
 	
 	public PatientNoEvent findByPatientUserId(Long patientUserId){
 		return noEventsRepository.findByPatientUserId(patientUserId);
+	}
+	
+	public PatientNoEvent findByPatientId(String patientId){
+		return noEventsRepository.findByPatientId(patientId);
+	}
+	
+	public LocalDate getPatientFirstTransmittedDate(Long patientUserId) throws HillromException{
+		PatientNoEvent patientNoEvent = noEventsRepository.findByPatientUserId(patientUserId);
+		if(Objects.nonNull(patientNoEvent)){
+			return patientNoEvent.getFirstTransmissionDate();
+		}
+		else 
+			throw new HillromException(ExceptionConstants.HR_702);
 	}
 }

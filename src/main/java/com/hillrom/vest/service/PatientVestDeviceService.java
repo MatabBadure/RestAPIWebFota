@@ -52,12 +52,14 @@ public class PatientVestDeviceService {
     	if(assocList.isEmpty()) {
     		patientVestDeviceAssoc = assignDeviceToPatient(id, deviceData);
     	} else {
-    		List<PatientVestDeviceHistory> activeDeviceList = assocList.stream().filter(patientDevice -> patientDevice.isActive()).collect(Collectors.toList());
+    		//List<PatientVestDeviceHistory> activeDeviceList = assocList.stream().filter(patientDevice -> patientDevice.isActive()).collect(Collectors.toList());
+    		List<PatientVestDeviceHistory> activeDeviceList = assocList.stream().collect(Collectors.toList());
     		if(!activeDeviceList.isEmpty()){
     			PatientVestDeviceHistory activeDevice = activeDeviceList.get(0);
     			alreadyLinkedPatientuser = (User) activeDevice.getPatient().getUserPatientAssoc().stream().filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser();
     			if(alreadyLinkedPatientuser.getId().equals(id)){
-    				patientVestDeviceAssoc = updateDeviceDetailsForPatient(activeDevice, deviceData);
+    				//patientVestDeviceAssoc = updateDeviceDetailsForPatient(activeDevice, deviceData);
+    				return alreadyLinkedPatientuser;
     			} else {
     				return alreadyLinkedPatientuser;
     			}
@@ -125,6 +127,7 @@ public class PatientVestDeviceService {
 		     		PatientVestDeviceHistory activeDevice = new PatientVestDeviceHistory(new PatientVestDevicePK(patientInfo, patientInfo.getSerialNumber()),
 		     				patientInfo.getBluetoothId(), patientInfo.getHubId(), true);
 		     		activeDevice.setCreatedDate(patientInfo.getDeviceAssocDate());
+		     		activeDevice.setLastModifiedDate(patientInfo.getDeviceAssocDate());
 		     		deviceList.add(activeDevice);
 	     		}
 	     	} else {

@@ -126,25 +126,28 @@ public class AccountResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    public ResponseEntity<UserDTO> getAccount() {
-        return Optional.ofNullable(userService.getUserWithAuthorities())
-            .map(user -> {
-                return new ResponseEntity<>(
-                    new UserDTO(
-                        null,
-                        user.getTitle(),
-                        user.getFirstName(),
-                        user.getMiddleName(),
-                        user.getLastName(),
-                        user.getEmail(),
-                        user.getGender(),
-                        user.getZipcode(),
-                        user.getLangKey(),
-                        user.getAuthorities().stream().map(Authority::getName)
-                            .collect(Collectors.toList())),
-                HttpStatus.OK);
-            })
-            .orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+    public ResponseEntity<Object> getAccount() {
+    	JSONObject jsonObject = new JSONObject();
+    	Optional<User> optionalUser = userService.getUserWithAuthorities();
+    	if(optionalUser.isPresent()) {
+    		User user = optionalUser.get();
+    		UserDTO userDTO = new UserDTO(
+                    null,
+                    user.getTitle(),
+                    user.getFirstName(),
+                    user.getMiddleName(),
+                    user.getLastName(),
+                    user.getEmail(),
+                    user.getGender(),
+                    user.getZipcode(),
+                    user.getLangKey(),
+                    user.getAuthorities().stream().map(Authority::getName)
+                        .collect(Collectors.toList()));
+    		return new ResponseEntity<Object>(userDTO,HttpStatus.OK);
+    	} else {
+    		jsonObject.put("ERROR", ExceptionConstants.HR_603);
+    		return new ResponseEntity<Object>(jsonObject, HttpStatus.BAD_REQUEST);
+    	}
     }
 
     /**

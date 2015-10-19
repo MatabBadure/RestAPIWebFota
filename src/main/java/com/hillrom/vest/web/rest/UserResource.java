@@ -296,7 +296,7 @@ public class UserResource {
 	}
 
 	/**
-     * PUT  /patient/:id/linkvestdevice -> link vest device with patient {id}.
+     * PUT  /patient/:id/link -> link vest device with patient {id}.
      */
     @RequestMapping(value = "/patient/{id}/linkvestdevice",
             method = RequestMethod.PUT,

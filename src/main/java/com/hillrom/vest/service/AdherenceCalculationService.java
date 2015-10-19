@@ -99,19 +99,7 @@ public class AdherenceCalculationService {
 	private PatientComplianceService complianceService;
 	
 	@Inject
-	private TherapySessionService therapySessionService;
-	
-	@Inject
 	private PatientNoEventService noEventService;
-	
-	@Inject
-	private ClinicService clinicService;
-	
-	@Inject
-	private PatientHCPService patientHCPService;
-
-	@Inject
-	private UserRepository userRepository;
 	
 	@Inject
 	private ClinicRepository clinicRepository;
@@ -433,7 +421,7 @@ public class AdherenceCalculationService {
 		}
 	}
 	
-	@Scheduled(cron="0 0 15 * * *")
+	@Scheduled(cron="0 0/1 * * * *")
 	public void processCareGiverNotifications() throws HillromException{
 		try{
 			List<CareGiverStatsNotificationVO> statsNotificationVOs = findPatientStatisticsCareGiver();

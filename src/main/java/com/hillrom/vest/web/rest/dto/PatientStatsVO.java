@@ -9,7 +9,7 @@ public class PatientStatsVO {
 	private String patientLastname;
 	private int missedTherapyCount;
 	private boolean isSettingsDeviated;
-	private boolean isHMRCompliant;
+	private boolean isHmrCompliant;
 	
 	public PatientStatsVO(BigInteger patientUserid, String patientFirstname, String patientLastname,
 			int missedTherapyCount, boolean isSettingsDeviated, boolean isHMRCompliant) {
@@ -19,7 +19,7 @@ public class PatientStatsVO {
 		this.patientLastname = patientLastname;
 		this.missedTherapyCount = missedTherapyCount;
 		this.isSettingsDeviated = isSettingsDeviated;
-		this.isHMRCompliant = isHMRCompliant;
+		this.isHmrCompliant = isHMRCompliant;
 	}
 	
 	public BigInteger getPatientUserid() {
@@ -46,17 +46,24 @@ public class PatientStatsVO {
 	public void setMissedTherapyCount(int missedTherapyCount) {
 		this.missedTherapyCount = missedTherapyCount;
 	}
-	public boolean isSettingsDeviated() {
+	public boolean getIsSettingsDeviated() {
 		return isSettingsDeviated;
 	}
 	public void setSettingsDeviated(boolean isSettingsDeviated) {
 		this.isSettingsDeviated = isSettingsDeviated;
 	}
-	public boolean isHMRCompliant() {
-		return isHMRCompliant;
+	public boolean getIsHmrCompliant() {
+		return isHmrCompliant;
 	}
-	public void setHMRCompliant(boolean isHMRCompliant) {
-		this.isHMRCompliant = isHMRCompliant;
+	public void setHmrCompliant(boolean isHMRCompliant) {
+		this.isHmrCompliant = isHMRCompliant;
+	}
+
+	@Override
+	public String toString() {
+		return "PatientStatsVO [patientUserid=" + patientUserid + ", patientFirstname=" + patientFirstname
+				+ ", patientLastname=" + patientLastname + ", missedTherapyCount=" + missedTherapyCount
+				+ ", isSettingsDeviated=" + isSettingsDeviated + ", isHmrCompliant=" + isHmrCompliant + "]";
 	}
 	
 	

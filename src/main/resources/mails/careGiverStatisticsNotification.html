@@ -13,21 +13,23 @@
 
 	</div>
 	<div style="background-color: #7BA4DA;height: 92px;margin: 20px 0px;">
-		<h3 style="color: #fff;margin: 32px 0px 0px 25px;display: inline-block;"> Statistics notification</h3>
+		<h3 style="color: #fff;margin: 32px 0px 0px 25px;display: inline-block;"> Statistics Notification</h3>
 		<img src="statistics.png" th:src="@{|${notificationUrl}/images/statistics.png|}" style="float: right;"></img>
 	</div>
 	<div style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif;">
 		<div>
-			<h4 style="font-size: 14px;" th:text="#{email.reset.greeting(${cgName})}">Dear&nbsp;<span>Jose</span></h4>
+			<h4 style="font-size: 14px;" th:text="#{email.reset.greeting(${careGiverStatsNotificationVO.careGiverName})}">Dear&nbsp;<span>Jose</span></h4>
 		</div>
 		<div>
 			<p th:text="#{email.statisticsnotification.message(${today})}"></p>
 		<div>
 		
 			<div th:each="patientsStatistics : ${patientsStatisticsList}">
-				<div><p style="font-size: 14px; border-bottom: solid 1px #7BA4DA; padding-bottom: 3px; color:#7BA4DA;" th:text="${patientsStatistics.patientFirstname}">Patient Name</p></div>
-				<div th:text="#{email.caregiverstatisticsnotification.missedtherapy(${patientsStatistics.missedTherapyCount})}"></div>
-			</div>			
+				<div th:if="${isMultiplePatients}"><p style="font-size: 14px; border-bottom: solid 1px #7BA4DA; padding-bottom: 3px; color:#7BA4DA;" th:text="${patientsStatistics.patientLastname}+' '+${patientsStatistics.patientFirstname}">Patient Name</p></div>
+				<div th:if="${careGiverStatsNotificationVO.isHcpAcceptHMRNotification}" th:text="#{email.caregiverstatisticsnotification.missedtherapy(${patientsStatistics.missedTherapyCount})}"></div>
+				<div th:if="${careGiverStatsNotificationVO.isHcpAcceptSettingsNotification}" th:text="#{email.caregiverstatisticsnotification.hmrNonCompliance(${patientsStatistics.isHmrCompliant})}"></div>
+				<div th:if="${careGiverStatsNotificationVO.isHcpAcceptTherapyNotification}" th:text="#{email.caregiverstatisticsnotification.settingsDeviation(${patientsStatistics.isSettingsDeviated})}"></div>
+			</div>
 		</div>
 		<div style="margin: 40px 0px;">
 			<a style="font-size: 14px;" th:href="@{|${notificationUrl}/#/login|}">Click here to view details </a>

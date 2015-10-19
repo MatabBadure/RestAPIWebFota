@@ -87,19 +87,19 @@ public class CareGiverStatsNotificationVO {
 	public void setHMRCompliant(boolean isHMRCompliant) {
 		this.isHMRCompliant = isHMRCompliant;
 	}
-	public boolean isHcpAcceptHMRNotification() {
+	public boolean getIsHcpAcceptHMRNotification() {
 		return isHcpAcceptHMRNotification;
 	}
 	public void setHcpAcceptHMRNotification(boolean isHcpAcceptHMRNotification) {
 		this.isHcpAcceptHMRNotification = isHcpAcceptHMRNotification;
 	}
-	public boolean isHcpAcceptSettingsNotification() {
+	public boolean getIsHcpAcceptSettingsNotification() {
 		return isHcpAcceptSettingsNotification;
 	}
 	public void setHcpAcceptSettingsNotification(boolean isHcpAcceptSettingsNotification) {
 		this.isHcpAcceptSettingsNotification = isHcpAcceptSettingsNotification;
 	}
-	public boolean isHcpAcceptTherapyNotification() {
+	public boolean getIsHcpAcceptTherapyNotification() {
 		return isHcpAcceptTherapyNotification;
 	}
 	public void setHcpAcceptTherapyNotification(boolean isHcpAcceptTherapyNotification) {

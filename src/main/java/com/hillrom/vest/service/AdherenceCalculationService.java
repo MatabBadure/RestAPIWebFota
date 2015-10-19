@@ -408,24 +408,25 @@ public class AdherenceCalculationService {
 		}
 	}
 	
-	@Scheduled(cron="0 0/1 * * * * ")
+	@Scheduled(cron="0 0 15 * * * ")
 	public void processCareGiverNotifications() throws HillromException{
 		try{
 			List<CareGiverStatsNotificationVO> statsNotificationVOs = findPatientStatisticsCareGiver();
 
-			Map<String,String> cgIdNameMap = new HashMap<>();
+			Map<String,CareGiverStatsNotificationVO> cgIdNameMap = new HashMap<>();
 			
 			Map<String,List<PatientStatsVO>> cgIdPatientStatsMap = new HashMap<>();
 			
 			for(CareGiverStatsNotificationVO statsNotificationVO : statsNotificationVOs){
-				cgIdNameMap.put(statsNotificationVO.getCGEmail(), statsNotificationVO.getCareGiverName());
+				cgIdNameMap.put(statsNotificationVO.getCGEmail(), statsNotificationVO);
 				BigInteger patientUserId = statsNotificationVO.getPatientUserid();
 				String pFirstName = statsNotificationVO.getPatientFirstname();
 				String pLastName = statsNotificationVO.getPatientLastname();
 				int missedTherapyCount = statsNotificationVO.getMissedTherapyCount();
 				boolean isSettingsDeviated = statsNotificationVO.isSettingsDeviated();
 				boolean isHMRCompliant = statsNotificationVO.isHMRCompliant();
-				List<PatientStatsVO> patientStatsList = cgIdPatientStatsMap.get(statsNotificationVO.getCareGiverId());
+				
+				List<PatientStatsVO> patientStatsList = cgIdPatientStatsMap.get(statsNotificationVO.getCGEmail());
 				if(Objects.isNull(patientStatsList))
 					patientStatsList = new LinkedList<>();
 				patientStatsList.add(new PatientStatsVO(patientUserId, pFirstName, pLastName, missedTherapyCount, isSettingsDeviated, isHMRCompliant));
@@ -433,7 +434,11 @@ public class AdherenceCalculationService {
 			}
 			
 			for(String cgEmail : cgIdNameMap.keySet()){
-				mailService.sendNotificationCareGiver(cgEmail, cgIdNameMap.get(cgEmail), cgIdPatientStatsMap.get(cgEmail));
+				CareGiverStatsNotificationVO careGiverStatsNotificationVO = cgIdNameMap.get(cgEmail);
+				if(careGiverStatsNotificationVO.getIsHcpAcceptHMRNotification()|
+						careGiverStatsNotificationVO.getIsHcpAcceptSettingsNotification()|
+						careGiverStatsNotificationVO.getIsHcpAcceptTherapyNotification())
+					mailService.sendNotificationCareGiver(cgIdNameMap.get(cgEmail), cgIdPatientStatsMap.get(cgEmail));
 			}
 			
 			

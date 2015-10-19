@@ -25,6 +25,7 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.service.util.DateUtil;
+import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.PatientStatsVO;
 
 /**
@@ -162,11 +163,14 @@ public class MailService {
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
     
-    public void sendNotificationCareGiver(String email, String careGiverName,  List<PatientStatsVO> statistics){
-    	log.debug("Sending password reset e-mail to '{}'", email);
+    public void sendNotificationCareGiver(CareGiverStatsNotificationVO careGiverStatsNotificationVO,  List<PatientStatsVO> statistics){
+    	log.debug("Sending care giver statistics e-mail to '{}'", careGiverStatsNotificationVO.getCGEmail());
         Context context = new Context();
-        context.setVariable("cgName", careGiverName);
+        context.setVariable("careGiverStatsNotificationVO", careGiverStatsNotificationVO);
         context.setVariable("patientsStatisticsList",statistics);
+        context.setVariable("isMultiplePatients",statistics.size()>1?true:false);
+        log.debug("statistics patient size {}", statistics.size());
+        
         context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now(), "MMM dd,yyyy"));
         context.setVariable("notificationUrl", careGiverDashboardUrl);
         String content = "";
@@ -175,6 +179,6 @@ public class MailService {
         content = templateEngine.process("careGiverStatisticsNotification", context);
         subject = messageSource.getMessage("email.statisticsnotification.subject", null, null);
         
-        sendEmail(new String[]{careGiverDashboardUrl}, subject, content, false, true);
+        sendEmail(new String[]{careGiverStatsNotificationVO.getCGEmail()}, subject, content, false, true);
     }
 }

@@ -1,5 +1,6 @@
 package com.hillrom.vest.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,4 +19,7 @@ public interface UserSecurityQuestionRepository extends
 	
 	@Query("from UserSecurityQuestion usq where usq.user.id = ?1 and usq.securityQuestion.id = ?2")
 	Optional<UserSecurityQuestion> findOneByUserIdAndQuestionId(Long userId,Long questionId);
+	
+	@Query("from UserSecurityQuestion usq where usq.user.id = ?1")
+	List<UserSecurityQuestion> findByUserId(Long userId);
 }

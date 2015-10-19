@@ -122,7 +122,7 @@ public class ClinicService {
 	        		clinicRepository.save(childClinic);
 	        		clinic.getChildClinics().remove(childClinic);
 	        	}
-        	} else if(!clinicDTO.getParentClinic().isEmpty() && StringUtils.isNotBlank(clinicDTO.getParentClinic().get("id"))) {
+        	} else if(Objects.nonNull(clinicDTO.getParentClinic()) && StringUtils.isNotBlank(clinicDTO.getParentClinic().get("id"))) {
         		if(!id.equals(clinicDTO.getParentClinic().get("id"))) {
         			Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
         			parentClinic.setParent(true);

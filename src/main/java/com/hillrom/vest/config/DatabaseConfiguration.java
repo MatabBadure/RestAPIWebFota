@@ -8,6 +8,10 @@ import liquibase.integration.spring.SpringLiquibase;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
@@ -18,7 +22,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.jta.WebSphereUowTransactionManager;
 import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
@@ -110,4 +116,25 @@ public class DatabaseConfiguration implements EnvironmentAware {
     public String recaptchaPrivateKey(){
     	return recaptchaPropertyResolver.getProperty("recaptchaPrivateKey"); 
     }
+    
+    public JobRepository getJobRepository() throws Exception {
+		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+		factory.setDataSource(dataSource());
+		factory.setIsolationLevelForCreate("REPEATABLE_READ");
+		//factory.setTransactionManager(getTransactionManager());
+		factory.afterPropertiesSet();
+		return  (JobRepository) factory.getObject();
+	}
+ 
+ /*	public PlatformTransactionManager getTransactionManager() throws Exception {
+		return new WebSphereUowTransactionManager();
+	}
+ 
+	public JobLauncher getJobLauncher() throws Exception {
+		SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+		jobLauncher.setJobRepository(getJobRepository());
+		jobLauncher.afterPropertiesSet();
+		return jobLauncher;
+	}
+*/
 }

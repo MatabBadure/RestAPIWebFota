@@ -29,4 +29,6 @@ public interface TherapySessionRepository extends
 			LocalDate toTimestamp,List<Long> patientUserIds);
 	
 	public TherapySession findTop1ByPatientUserIdAndDateBeforeOrderByEndTimeDesc(Long patientUserId,LocalDate from);
+
+	public List<TherapySession> findByPatientUserId(Long patientUserId);
 }

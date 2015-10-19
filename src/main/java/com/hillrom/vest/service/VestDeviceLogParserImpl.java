@@ -13,6 +13,7 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.*;
 import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.*;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
+import com.hillrom.vest.domain.TempPatientVestDeviceData;
 import com.hillrom.vest.service.util.ParserUtil;
 
 @Component
@@ -126,6 +127,25 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 	private PatientVestDeviceData getPatientVestDeviceData(String base16String,
 			int sequenceNumber) {
 		PatientVestDeviceData patientVestDeviceData = new PatientVestDeviceData();
+		patientVestDeviceData.setSequenceNumber(sequenceNumber);
+		patientVestDeviceData.setHmr(getPatientVestDeviceDataHMR(base16String));
+		patientVestDeviceData
+				.setPressure(getPatientVestDeviceDataPressure(base16String));
+		patientVestDeviceData
+				.setFrequency(getPatientVestDeviceDataFrequency(base16String));
+		patientVestDeviceData
+				.setDuration(getPatientVestDeviceDataDuration(base16String));
+		patientVestDeviceData
+				.setEventId(getPatientVestDeviceEventCode(base16String));
+		patientVestDeviceData.setTimestamp(getPatientVestDeviceDataTimeStamp(
+				base16String)*1000);
+		patientVestDeviceData.setChecksum(getPatientVestDeviceDataChecksum(base16String));
+		return patientVestDeviceData;
+	}
+	
+	private TempPatientVestDeviceData getPatientVestDeviceDataForTemp(String base16String,
+			int sequenceNumber) {
+		TempPatientVestDeviceData patientVestDeviceData = new TempPatientVestDeviceData();
 		patientVestDeviceData.setSequenceNumber(sequenceNumber);
 		patientVestDeviceData.setHmr(getPatientVestDeviceDataHMR(base16String));
 		patientVestDeviceData
@@ -329,6 +349,39 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 			break;
 		}
 		return eventString;
+	}
+
+	@Override
+	public List<TempPatientVestDeviceData> parseBase64StringToPatientVestDeviceLogEntryForTemp(String base64String) {
+
+
+		List<TempPatientVestDeviceData> patientVestDeviceRecords = new LinkedList<>();
+		String base16String = ParserUtil.convertToBase16String(base64String);
+		if (base16String.length() <= 16)
+			return patientVestDeviceRecords;
+
+		// To validate bad data
+		String endTags = base16String.substring(base16String.length() - 16);
+
+		if (!EXPECTED_STRING.equals(endTags.toUpperCase().trim()))
+			throw new IllegalArgumentException(
+					"Could not parse data, Request contains Partial Data");
+
+		int logcount = 1;
+		int start;
+		int end;
+		start = 32 * 2 + (logcount - 1) * RECORD_SIZE * 2;
+		end = 32 * 2 + (logcount * RECORD_SIZE * 2);
+		while (start < base16String.length() & (end < base16String.length())) {
+			String log_segment = base16String.substring(start, end);
+			TempPatientVestDeviceData patientVestDeviceRecord = getPatientVestDeviceDataForTemp(
+					log_segment, logcount);
+			logcount++;
+			start = 32 * 2 + (logcount - 1) * RECORD_SIZE * 2;
+			end = 32 * 2 + (logcount * RECORD_SIZE * 2);
+			patientVestDeviceRecords.add(patientVestDeviceRecord);
+		}
+		return patientVestDeviceRecords;
 	}
 
 }

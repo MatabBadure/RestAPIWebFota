@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 
+import org.owasp.esapi.reference.IntegerAccessReferenceMap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,14 +29,14 @@ public class PaginationUtil {
 
     public static final int DEFAULT_LIMIT = 10;
 
-    public static final int MAX_LIMIT = 100;
+    public static final int MAX_LIMIT = Integer.MAX_VALUE;
 
     public static Pageable generatePageRequest(Integer offset, Integer limit) {
         if (offset == null || offset < MIN_OFFSET) {
             offset = DEFAULT_OFFSET;
         }
         if (limit == null || limit > MAX_LIMIT) {
-            limit = DEFAULT_LIMIT;
+            limit = MAX_LIMIT;
         }
         return new PageRequest(offset - 1, limit);
     }

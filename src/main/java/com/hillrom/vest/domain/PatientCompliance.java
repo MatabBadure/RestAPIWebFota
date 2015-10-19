@@ -63,6 +63,9 @@ public class PatientCompliance {
 	private LocalDate latestTherapyDate;
 	
 	private Double hmr;
+
+	@Column(name="settings_deviated_days_count")
+	private int settingsDeviatedDaysCount  = 0;
 	
 	public PatientCompliance() {
 		super();
@@ -96,6 +99,23 @@ public class PatientCompliance {
 		this.hmr = hmr;
 	}
 
+	public PatientCompliance(Integer score, LocalDate date,
+			PatientInfo patient, User patientUser,Integer hmrRunRate,Boolean isHMRCompliant,
+			Boolean isSettingsDeviated,Integer missedTherapyCount,
+			LocalDate lastTherapySessionDate,double hmr) {
+		super();
+		this.score = score;
+		this.date = date;
+		this.patient = patient;
+		this.patientUser = patientUser;
+		this.hmrRunRate = hmrRunRate;
+		this.isHmrCompliant = isHMRCompliant;
+		this.isSettingsDeviated = isSettingsDeviated;
+		this.missedTherapyCount = 0;
+		this.latestTherapyDate = date;
+		this.hmr = hmr;
+	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -199,6 +219,14 @@ public class PatientCompliance {
 		this.hmr = hmr;
 	}
 
+	public int getSettingsDeviatedDaysCount() {
+		return settingsDeviatedDaysCount;
+	}
+
+	public void setSettingsDeviatedDaysCount(int settingsDeviatedDaysCount) {
+		this.settingsDeviatedDaysCount = settingsDeviatedDaysCount;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -227,7 +255,13 @@ public class PatientCompliance {
 	@Override
 	public String toString() {
 		return "PatientCompliance [id=" + id + ", score=" + score + ", date="
-				+ date + ", hmrRunRate=" + hmrRunRate + "]";
+				+ date + ", hmrRunRate=" + hmrRunRate
+				+ ", isSettingsDeviated=" + isSettingsDeviated
+				+ ", isHmrCompliant=" + isHmrCompliant
+				+ ", missedTherapyCount=" + missedTherapyCount
+				+ ", latestTherapyDate=" + latestTherapyDate + ", hmr=" + hmr
+				+ "]";
 	}
 
+	
 }

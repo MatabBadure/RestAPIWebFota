@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<!-- Added Settings Deviated days count to PATIENT_COMPLIANCE -->
+	<changeSet author="jhipster" id="20151015183700">
+		<addColumn tableName="PATIENT_COMPLIANCE">
+        	<column name="settings_deviated_days_count" type="integer" defaultValueNumeric="0"/>
+        </addColumn>
+	</changeSet>
+</databaseChangeLog>

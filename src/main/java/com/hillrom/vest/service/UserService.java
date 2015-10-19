@@ -316,9 +316,11 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User getUserWithAuthorities() {
-        User currentUser = userRepository.findOneByEmail(SecurityUtils.getCurrentLogin()).get();
-        currentUser.getAuthorities().size(); // eagerly load the association
+    public Optional<User> getUserWithAuthorities() {
+        Optional<User> currentUser = userRepository.findOneByEmail(SecurityUtils.getCurrentLogin());
+        if(currentUser.isPresent()) {
+        	currentUser.get().getAuthorities().size(); // eagerly load the association
+        }
         return currentUser;
     }
 

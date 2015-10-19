@@ -657,11 +657,13 @@ public class UserSearchRepository {
 				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=curdate()  "
 				+ " left outer join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id "
 				+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id"
-				+ " and user_authority.authority_name = '"+PATIENT+"'and (lower(user.first_name) "
-				+ " like lower(:queryString) or lower(user.last_name) like lower(:queryString) "
-				+ " or lower(user.email) like lower(:queryString) or lower(CONCAT(user.first_name,' ',user.last_name)) "
-				+ " like lower(:queryString) or lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) "
-				+ " or lower(user.hillrom_id) like lower(:queryString) or lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString))";
+				+ " and user_authority.authority_name = '"+PATIENT+"'";
+		
+				String searchQuery = " and (lower(user.first_name) "
+						+ " like lower(:queryString) or lower(user.last_name) like lower(:queryString) "
+						+ " or lower(user.email) like lower(:queryString) or lower(CONCAT(user.first_name,' ',user.last_name)) "
+						+ " like lower(:queryString) or lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) "
+						+ " or lower(user.hillrom_id) like lower(:queryString) or lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString)) ";
 				
 				String query2 = " where upa_hcp.user_id = :hcpUserID ";
 				String query3 =	" group by user.id ";
@@ -671,12 +673,12 @@ public class UserSearchRepository {
 				String filterByAssociatedClinicList = StringUtils.isEmpty(associatedClinicList)?"": " or patient_clinic.clinic_id  in ("
 						+ associatedClinicList + " ) ";
 		if (StringUtils.isEmpty(clinicId) | "all".equalsIgnoreCase(clinicId)) {
-			findPatientUserQuery = findPatientUserQuery + query2 + filterByAssociatedClinicList + query3;
+			findPatientUserQuery = findPatientUserQuery + query2 +searchQuery+ filterByAssociatedClinicList + query3;
 		} else if ("others".equalsIgnoreCase(clinicId)) {
-			findPatientUserQuery = findPatientUserQuery + query2 + query3;
+			findPatientUserQuery = findPatientUserQuery + query2 + searchQuery + query3;
 		} else
 			findPatientUserQuery = findPatientUserQuery + " where patient_clinic.clinic_id  ='" + clinicId + "'"
-					+ query3;
+					+ searchQuery +  query3;
 				
 		StringBuilder filterQuery = new StringBuilder();
 	
@@ -737,14 +739,16 @@ public class UserSearchRepository {
 					java.util.Date localLastTransmissionDate = null;
 					
 					if(Objects.nonNull(lastTransmissionDate)){
-						localLastTransmissionDate =lastTransmissionDate;
-						
+						localLastTransmissionDate =lastTransmissionDate;	
 					}
 					
 					java.util.Date dobLocalDate = null;
 					if(null !=dob){
 						dobLocalDate = new java.util.Date(dob.getTime());
 					}
+					//Clinic wise active inactive is not the for the case og others
+					if(Objects.isNull(IsActiveInClinic))
+						IsActiveInClinic = !isDeleted;
 
 					PatientUserVO patientUserVO = new PatientUserVO(id, email, firstName,
 							lastName, IsActiveInClinic?false:true, zipcode, address, city, dobLocalDate,

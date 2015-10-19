@@ -421,7 +421,7 @@ public class AdherenceCalculationService {
 		}
 	}
 	
-	@Scheduled(cron="0 0/1 * * * *")
+	@Scheduled(cron="0 0 15 * * *")
 	public void processCareGiverNotifications() throws HillromException{
 		try{
 			List<CareGiverStatsNotificationVO> statsNotificationVOs = findPatientStatisticsCareGiver();

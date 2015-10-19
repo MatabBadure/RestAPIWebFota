@@ -99,7 +99,6 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 					+"join USER_AUTHORITY user_authorityc on user_authorityc.user_id = cuser.id and user_authorityc.authority_name = 'CARE_GIVER')  "
 					+"as associated_cgvr, PATIENT_COMPLIANCE pc  where  "
 					+"puserid = pc.user_id AND pc.date=CURDATE() and  "
-					+"(select count(*) from PATIENT_NO_EVENT pne where puserid = pne.user_id) >= 1 and  "
 					+"associated_patient.cgvr_id = associated_cgvr.cuserid ")
 	List<Object[]> findPatientStatisticsCareGiver();
 }

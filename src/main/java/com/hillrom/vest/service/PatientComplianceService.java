@@ -2,19 +2,17 @@ package com.hillrom.vest.service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
-import org.joda.time.DateTime;
-import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.domain.PatientCompliance;
-import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.repository.PatientComplianceRepository;
-import com.hillrom.vest.service.util.DateUtil;
 
 @Service
 @Transactional
@@ -44,6 +42,15 @@ public class PatientComplianceService {
 	
 	public PatientCompliance findTop1ByDateBeforeAndPatientUserId(LocalDate date,Long patientUserId){
 		return complianceRepository.findTop1ByDateBeforeAndPatientUserIdOrderByDateDesc(date, patientUserId);
+	}
+	
+	public SortedMap<LocalDate,PatientCompliance> getPatientComplainceMapByPatientUserId(Long patientUserId){
+		List<PatientCompliance> complianceList = complianceRepository.findByPatientUserId(patientUserId);
+		SortedMap<LocalDate,PatientCompliance> existingComplainceMap = new TreeMap<>(); 
+		for(PatientCompliance compliance : complianceList){
+			existingComplainceMap.put(compliance.getDate(),compliance);
+		}
+		return existingComplainceMap;
 	}
 	
 	public int getMissedTherapyCountByPatientUserId(Long patientUSerId){

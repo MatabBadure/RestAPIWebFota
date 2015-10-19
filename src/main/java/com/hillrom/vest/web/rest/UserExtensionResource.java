@@ -293,11 +293,11 @@ public class UserExtensionResource {
     /**
      * GET  /user/hcpbypatientclinics/search -> // Get all HCPs associated with Clinics of a Patient.
      */
-    @RequestMapping(value = "/patient/{patientId}/hcpbypatientclinics/search",
+    @RequestMapping(value = "/patient/{patientUserId}/hcpbypatientclinics/search",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    public ResponseEntity<?> searchAssociatedHcp(@PathVariable String patientId,
+    public ResponseEntity<?> searchAssociatedHcp(@PathVariable Long patientUserId,
     		@RequestParam(required=true,value = "searchString")String searchString,
     		@RequestParam(required=false,value = "filter")String filter,
     		@RequestParam(value = "page" , required = false) Integer offset,
@@ -314,11 +314,18 @@ public class UserExtensionResource {
     		isAscending =  (isAscending != null) ?  isAscending : true;
     		sortOrder.put(sortBy, isAscending);
     	}
-    	Page<HcpVO> page = userSearchRepository.findHCPByPatientClinics(queryString,filter,patientId,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/patient/"+patientId+"/hcpbypatientclinics/search", offset, limit);
-        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    	List<HcpVO> hcp;
+    	JSONObject jsonObject = new JSONObject();
+		try {
+			hcp = userSearchRepository.findHCPByPatientClinics(queryString,filter,patientUserId,sortOrder);
+        	jsonObject.put("HCPUser", hcp);
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+    		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
     }
-    
     
     /**
      * GET  user/clinicadmin/{id}/hcp/search -> search HCP associated with Clinic Admin

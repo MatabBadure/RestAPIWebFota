@@ -17,6 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -29,10 +31,13 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.HCPClinicService;
+import com.hillrom.vest.util.ExceptionConstants;
+import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 
 @Repository
@@ -44,6 +49,8 @@ public class UserSearchRepository {
 	
 	@Inject
 	private HCPClinicService hcpClinicService;
+	@Inject
+	private UserPatientRepository userPatientRepository;
 	
 	public Page<HillRomUserVO> findHillRomTeamUsersBy(String queryString,String filter,
 			Pageable pageable, Map<String, Boolean> sortOrder) {
@@ -222,8 +229,17 @@ public class UserSearchRepository {
 	}
 	
 	// Get all HCPs associated with Clinics of a Patient
-	public Page<HcpVO> findHCPByPatientClinics(String queryString, String filter, String patientId, 
-			Pageable pageable, Map<String, Boolean> sortOrder) {
+	public List<HcpVO> findHCPByPatientClinics(String queryString, String filter, Long userId, Map<String,Boolean> sortOrder) throws HillromException {
+		
+		List<UserPatientAssoc> associations = userPatientRepository.findOneByUserId(userId);
+		associations = associations.stream().filter(assoc -> 
+			RelationshipLabelConstants.SELF.equalsIgnoreCase(assoc.getRelationshipLabel())
+		).collect(Collectors.toList());
+		UserPatientAssoc userPatientAssoc = associations.isEmpty()?null : associations.get(0);
+		if(Objects.isNull(userPatientAssoc))
+			throw new HillromException(ExceptionConstants.HR_523);
+		
+		String patientId = userPatientAssoc.getPatient().getId();
 		
 		String findHcpQuery = "select * from"
 			+" (select user.id,user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted, "
@@ -307,16 +323,7 @@ public class UserSearchRepository {
 
 					hcpUsers.add(hcpVO);
 				});
-		int firstResult = pageable.getOffset();
-		int maxResults = firstResult + pageable.getPageSize();
-		List<HcpVO> hcpUsersSubList = new ArrayList<>();
-		if(firstResult < hcpUsers.size()){
-			maxResults = maxResults > hcpUsers.size() ? hcpUsers.size() : maxResults ;  
-			hcpUsersSubList = hcpUsers.subList(firstResult,maxResults);
-		}
-		Page<HcpVO> page = new PageImpl<HcpVO>(hcpUsersSubList, null, count.intValue());
-
-		return page;
+		return hcpUsers;
 	}
 	
 	
@@ -523,12 +530,12 @@ public class UserSearchRepository {
 					java.util.Date localLastTransmissionDate = null;
 					
 					if(Objects.nonNull(lastTransmissionDate)){
-						localLastTransmissionDate =lastTransmissionDate;
+						localLastTransmissionDate = new java.util.Date(lastTransmissionDate.getTime());
 						
 					}
 					
 					java.util.Date dobLocalDate = null;
-					if(null !=dob){
+					if(Objects.nonNull(dob)){
 						dobLocalDate = new java.util.Date(dob.getTime());
 					}
 
@@ -631,7 +638,7 @@ public class UserSearchRepository {
 				+ " left outer join CLINIC_PATIENT_ASSOC user_clinicc on user_clinicc.patient_id = patInfoc.id  "
 				+ " left outer join CLINIC clinicc on user_clinicc.clinic_id = clinicc.id and user_clinicc.patient_id = patInfoc.id "
 				+ " where upac.user_id = user.id "
-				+ " group by patInfoc.id) as clinicname, (select  GROUP_CONCAT(userh.first_name, userh.last_name) "
+				+ " group by patInfoc.id) as clinicname, (select  GROUP_CONCAT(userh.first_name,' ', userh.last_name) "
 				+ " from USER userh "
 				+ " left outer join USER_AUTHORITY user_authorityh on user_authorityh.user_id = userh.id  "
 				+ "and user_authorityh.authority_name = 'HCP' " 
@@ -881,9 +888,9 @@ public class UserSearchRepository {
 		if(Objects.nonNull(filterMap.get("isMissedTherapy"))){
 			
 			if("1".equals(filterMap.get("isMissedTherapy")))
-				filterQuery.append(" and (isMissedTherapy > 0 && isMissedTherapy %3 = 0) ");
+				filterQuery.append(" and (isMissedTherapy >= 3) ");
 			else if("0".equals(filterMap.get("isMissedTherapy")))
-				filterQuery.append(" and (isMissedTherapy %3 <> 0)");
+				filterQuery.append(" and ( isMissedTherapy < 3 )");
 		}
 	}
 
@@ -1167,4 +1174,5 @@ public class UserSearchRepository {
 		}
 		return filterMap;
 	}
+
 }

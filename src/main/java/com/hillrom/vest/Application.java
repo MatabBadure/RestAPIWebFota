@@ -20,7 +20,7 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
 
-@ComponentScan
+@ComponentScan(lazyInit=true)
 @EnableAutoConfiguration(exclude = {MetricFilterAutoConfiguration.class, MetricRepositoryAutoConfiguration.class})
 public class Application {
 
@@ -102,4 +102,5 @@ public class Application {
             "liquibase.structure", "liquibase.structurecompare", "liquibase.lockservice",
             "liquibase.ext", "liquibase.changelog"));
     }
+    
 }

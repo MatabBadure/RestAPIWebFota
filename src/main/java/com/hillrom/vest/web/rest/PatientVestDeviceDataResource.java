@@ -1,11 +1,11 @@
 package com.hillrom.vest.web.rest;
 
+import static com.hillrom.vest.util.MessageConstants.HR_303;
+import java.lang.management.ManagementFactory;
 import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import net.minidev.json.JSONObject;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -18,11 +18,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hillrom.vest.batch.util.BatchUtil;
 import com.hillrom.vest.domain.PatientVestDeviceData;
+import com.hillrom.vest.domain.TempPatientVestDeviceData;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.service.PatientVestDeviceDataService;
 import com.hillrom.vest.service.util.RequestUtil;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
+
+import net.minidev.json.JSONObject;
 
 @RestController
 @RequestMapping("/api")
@@ -47,13 +51,14 @@ public class PatientVestDeviceDataResource {
 			return new ResponseEntity(jsonObject,HttpStatus.BAD_REQUEST);
 		};
 		try{			
-			deviceData = deviceDataService.save(rawMessage);
+			deviceDataService.saveToTemp(rawMessage);
+			jsonObject.put("message",HR_303);
 		}catch(Exception e){
 			JSONObject error = new JSONObject();
-			error.put("message", e.getMessage());
+			error.put("ERROR", e.getMessage());
 			return new ResponseEntity(error,HttpStatus.PARTIAL_CONTENT);
 		}
-		return new ResponseEntity(deviceData,HttpStatus.CREATED);
+		return new ResponseEntity(jsonObject,HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(value = "/vestdevicedata",

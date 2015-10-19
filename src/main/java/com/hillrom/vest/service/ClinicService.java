@@ -122,18 +122,23 @@ public class ClinicService {
 	        		clinicRepository.save(childClinic);
 	        		clinic.getChildClinics().remove(childClinic);
 	        	}
-        	} else if(!clinicDTO.getParentClinic().isEmpty() && StringUtils.isNotBlank(clinicDTO.getParentClinic().get("id"))) {
-        		if(!id.equals(clinicDTO.getParentClinic().get("id"))) {
-        			Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
-        			parentClinic.setParent(true);
-        			clinicRepository.save(parentClinic);
-        			clinic.setParentClinic(parentClinic);       			
-        		} else {
-        			throw new HillromException(ExceptionConstants.HR_542);
-        		} 
-        	} else {
-       			clinicRepository.save(clinic);
-        	} 
+        	} else 
+        		try{
+	        		if(!clinicDTO.getParentClinic().isEmpty() && StringUtils.isNotBlank(clinicDTO.getParentClinic().get("id"))) {
+		        		if(!id.equals(clinicDTO.getParentClinic().get("id"))) {
+		        			Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
+		        			parentClinic.setParent(true);
+		        			clinicRepository.save(parentClinic);
+		        			clinic.setParentClinic(parentClinic);       			
+		        		} else {
+		        			throw new HillromException(ExceptionConstants.HR_542);
+		        		} 
+		        	} else {
+		       			clinicRepository.save(clinic);
+		        	} 
+        		} catch(Exception ex){
+        			clinicRepository.save(clinic);
+        		}
     		clinicRepository.save(clinic);
         } else {
 	      	throw new HillromException(ExceptionConstants.HR_543);

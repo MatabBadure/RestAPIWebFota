@@ -1448,6 +1448,22 @@ public class UserService {
 			throw new HillromException(ExceptionConstants.HR_512);
 		}
 	}
+	
+	public JSONObject getSecurityQuestion(Long userId) throws HillromException {
+		User existingUser = userRepository.findOne(userId);
+		JSONObject jsonObject = new JSONObject();
+		if(Objects.nonNull(existingUser)){
+			List<UserSecurityQuestion> userSecurityQuestionList = userSecurityQuestionService.findByUserId(userId);
+			if(userSecurityQuestionList.isEmpty()){
+				jsonObject.put("ERROR", ExceptionConstants.HR_602);
+			} else {
+				jsonObject.put("question",userSecurityQuestionList.get(userSecurityQuestionList.size()-1).getSecurityQuestion());
+			}
+		}else{
+			throw new HillromException(ExceptionConstants.HR_512);//User Doesn't exist
+		}
+		return jsonObject;
+	}
 
 }
 

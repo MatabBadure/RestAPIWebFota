@@ -119,6 +119,7 @@ public class ExceptionConstants {
     public static final String HR_600 = "Invalid DateFormat, expected is : "; 
 
     public static final String HR_601 = "Invalid Activation Key"; 
+    public static final String HR_602 = "No security question selected";
     
     public static final String HR_701 = "Note date cannot be before first  transmission date."; 
     

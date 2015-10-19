@@ -971,4 +971,22 @@ public class UserResource {
 
 	}
 
+    @RequestMapping(value="/user/{id}/securityQuestion",
+    		method=RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<JSONObject> getSecurityQuestion(@PathVariable Long id){
+		log.debug("REST request to get Security Question for user {}",id);
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject = userService.getSecurityQuestion(id);
+			jsonObject.put("message", MessageConstants.HR_304);
+		} catch (HillromException e) {
+			jsonObject.put("ERROR",e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.BAD_REQUEST);
+		}
+		if(jsonObject.containsKey("ERROR")){
+			return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.OK);
+	}
 }

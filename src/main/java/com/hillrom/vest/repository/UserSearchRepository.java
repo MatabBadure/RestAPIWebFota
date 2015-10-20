@@ -648,7 +648,7 @@ public class UserSearchRepository {
 				+ " left outer join PATIENT_INFO patInfoh on upah.patient_id = patInfoh.id "
 				+ " where patInfo.id = patInfoh.id"
 				+ " group by patInfoh.id) as hcpname, patient_clinic.mrn_id as mrnid, patient_clinic.is_active as isDeleted,"
-				+ " pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,"
+				+ " user.expired as isExpired, pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,"
 				+ " pc.missed_therapy_count as isMissedTherapy "
 				+ " from USER user"
 				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"'"
@@ -734,7 +734,8 @@ public class UserSearchRepository {
 					String clinicNamesCSV = (String) record[17];
 					String hcpNamesCSV = (String) record[18];
 					String mrnId = (String) record[19];
-					Boolean IsActiveInClinic = (Boolean) record[20];
+					Boolean isActiveInClinic = (Boolean) record[20];
+					Boolean isExpired = (Boolean) record[21];
 					
 					java.util.Date localLastTransmissionDate = null;
 					
@@ -747,17 +748,18 @@ public class UserSearchRepository {
 						dobLocalDate = new java.util.Date(dob.getTime());
 					}
 					//Clinic wise active inactive is not the for the case og others
-					if(Objects.isNull(IsActiveInClinic))
-						IsActiveInClinic = !isDeleted;
+					if(Objects.isNull(isActiveInClinic))
+						isActiveInClinic = !isDeleted;
 
 					PatientUserVO patientUserVO = new PatientUserVO(id, email, firstName,
-							lastName, IsActiveInClinic?false:true, zipcode, address, city, dobLocalDate,
+							lastName, isActiveInClinic?false:true, zipcode, address, city, dobLocalDate,
 							gender, title, hillromId,createdAtDatetime,isActivated,state,
 							Objects.nonNull(adherence) ? adherence : 0,localLastTransmissionDate);
 					//mrnId,hcpNamesCSV,clinicNamesCSV
 					patientUserVO.setMrnId(mrnId);
 					patientUserVO.setHcpNamesCSV(hcpNamesCSV);
 					patientUserVO.setClinicNamesCSV(clinicNamesCSV);
+					patientUserVO.setExpired(isExpired);
 					patientUsers.add(patientUserVO);
 				});
 
@@ -951,7 +953,8 @@ public class UserSearchRepository {
 			filterQuery.append(query);
 			filterQuery.append(") as search_table where isDeleted in (0,1)");
 		}
-	}private void applyIsDeletedFiltersForHCPandClinicAdmin(String query, StringBuilder filterQuery,
+	}
+	private void applyIsDeletedFiltersForHCPandClinicAdmin(String query, StringBuilder filterQuery,
 			Map<String, String> filterMap) {
 		if(Objects.nonNull(filterMap.get("isDeleted"))){
 			filterQuery.append(query);
@@ -986,7 +989,8 @@ public class UserSearchRepository {
 				+ " left outer join USER_AUTHORITY user_authorityh on user_authorityh.user_id = userh.id "
 				+ " and user_authorityh.authority_name = '"+HCP+"'  join USER_PATIENT_ASSOC  upah on userh.id = upah.user_id "
 				+ " and upah.relation_label = '"+HCP+"'  left outer join PATIENT_INFO patInfoh on upah.patient_id = patInfoh.id "
-				+ " where patInfo.id = patInfoh.id group by patInfoh.id) as hcpname,patient_clinic.mrn_id as mrnid, patient_clinic.is_active as isDeleted, pc.is_hmr_compliant as isHMRNonCompliant,"
+				+ " where patInfo.id = patInfoh.id group by patInfoh.id) as hcpname,patient_clinic.mrn_id as mrnid,"
+				+ " patient_clinic.is_active as isDeleted, user.expired as isExpired, pc.is_hmr_compliant as isHMRNonCompliant,"
 				+ " pc.is_settings_deviated as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy from USER user "
 				+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = '"+PATIENT+"'"
 				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"+SELF+"' "
@@ -1067,6 +1071,7 @@ public class UserSearchRepository {
 					String hcpNamesCSV = (String) record[18];
 					String mrnId = (String) record[19];
 					Boolean isActivatedInClinic = (Boolean) record[20];
+					Boolean isExpired = (Boolean) record[21];
 					
 					java.util.Date localLastTransmissionDate = null;
 					
@@ -1088,6 +1093,7 @@ public class UserSearchRepository {
 					patientUserVO.setMrnId(mrnId);
 					patientUserVO.setHcpNamesCSV(hcpNamesCSV);
 					patientUserVO.setClinicNamesCSV(clinicNamesCSV);
+					patientUserVO.setExpired(isExpired);
 					patientUsers.add(patientUserVO);
 				});
 

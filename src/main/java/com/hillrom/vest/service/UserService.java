@@ -1086,8 +1086,8 @@ public class UserService {
 
 	public UserPatientAssoc createCaregiverUser(Long patientUserId, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException {
 		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
+		List<UserPatientAssoc> caregiverAssocList = getListOfCaregiversAssociatedToPatientUser(patientUser);
 		if(Objects.nonNull(patientUser)) {
-			List<UserPatientAssoc> caregiverAssocList = getListOfCaregiversAssociatedToPatientUser(patientUser);
 			if(caregiverAssocList.size() >= Constants.MAX_NO_OF_CAREGIVERS) {
 				throw new HillromException(ExceptionConstants.HR_563);
 			}
@@ -1099,6 +1099,13 @@ public class UserService {
 			if (existingUser.isPresent()){
 				if(existingUser.get().getAuthorities().contains(new Authority(AuthoritiesConstants.CARE_GIVER))
 						|| existingUser.get().getAuthorities().contains(new Authority(AuthoritiesConstants.HCP))) {
+					if(!caregiverAssocList.isEmpty()){
+						for(UserPatientAssoc upa : caregiverAssocList){
+							if(upa.getUser().getEmail().equalsIgnoreCase(userExtensionDTO.getEmail())){
+								throw new HillromException(ExceptionConstants.HR_501);
+							}
+						}
+					}
 					UserPatientAssoc caregiverAssoc = associateExistingCaregiverUserWithPatient(patientUser, userExtensionDTO, existingUser);
 					if(Objects.nonNull(caregiverAssoc)){
 	    				mailService.sendActivationEmail(caregiverAssoc.getUser(), baseUrl);

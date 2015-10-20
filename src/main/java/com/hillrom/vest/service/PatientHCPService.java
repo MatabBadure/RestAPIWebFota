@@ -454,21 +454,17 @@ public class PatientHCPService {
     	    			hcpList.add((UserExtension)patientAssoc.getUser());
     	    		}
     	    	}
-    	     	if(!hcpList.isEmpty()){
-    	     		Set<UserExtension> filteredList = new HashSet<>();
-    	     		hcpList.forEach(hcpUser -> {
-	     				if(!hcpUser.getClinics().isEmpty()) {
-		     				hcpUser.getClinics().forEach(clinic -> {
-		     					if(clinic.getId().equals(filterByClinicId)){
-		     						filteredList.add(hcpUser);
-		     					}
-		     				});
-		     			}
-    	     		});
-    		    	return filteredList;
-    	     	} else {
-    	     		throw new HillromException(ExceptionConstants.HR_588);
-    	     	}
+	     		Set<UserExtension> filteredList = new HashSet<>();
+	     		hcpList.forEach(hcpUser -> {
+     				if(!hcpUser.getClinics().isEmpty()) {
+	     				hcpUser.getClinics().forEach(clinic -> {
+	     					if(clinic.getId().equals(filterByClinicId)){
+	     						filteredList.add(hcpUser);
+	     					}
+	     				});
+	     			}
+	     		});
+		    	return filteredList;
     		} else {
     			throw new HillromException(ExceptionConstants.HR_523);
     		}

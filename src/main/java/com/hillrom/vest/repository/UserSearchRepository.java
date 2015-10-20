@@ -1181,7 +1181,10 @@ public class UserSearchRepository {
 		int limit = columnNames.size();
 		int i = 0;
 		for (String columnName : columnNames.keySet()) {
-			sb.append("lower(").append(columnName).append(")");
+			if(!"adherence".equalsIgnoreCase(columnName))
+				sb.append("lower(").append(columnName).append(")");
+			else
+				sb.append(columnName);
 
 			if (columnNames.get(columnName))
 				sb.append(" ASC");

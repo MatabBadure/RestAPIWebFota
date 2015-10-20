@@ -668,33 +668,33 @@ public class UserService {
 
 	private void assignValuesToPatientInfoObj(UserExtensionDTO userExtensionDTO, PatientInfo patientInfo) {
 		patientInfo.setHillromId(userExtensionDTO.getHillromId());
-		if(StringUtils.isNotBlank(userExtensionDTO.getTitle()))
+		if(Objects.nonNull(userExtensionDTO.getTitle()))
 			patientInfo.setTitle(userExtensionDTO.getTitle());
-		if(StringUtils.isNotBlank(userExtensionDTO.getFirstName()))
+		if(Objects.nonNull(userExtensionDTO.getFirstName()))
 			patientInfo.setFirstName(userExtensionDTO.getFirstName());
-		if(StringUtils.isNotBlank(userExtensionDTO.getMiddleName()))
+		if(Objects.nonNull(userExtensionDTO.getMiddleName()))
 			patientInfo.setMiddleName(userExtensionDTO.getMiddleName());
-		if(StringUtils.isNotBlank(userExtensionDTO.getLastName()))
+		if(Objects.nonNull(userExtensionDTO.getLastName()))
 			patientInfo.setLastName(userExtensionDTO.getLastName());
-		if(StringUtils.isNotBlank(userExtensionDTO.getGender()))
+		if(Objects.nonNull(userExtensionDTO.getGender()))
 			patientInfo.setGender(userExtensionDTO.getGender());
-		if(StringUtils.isNotBlank(userExtensionDTO.getDob()))
+		if(Objects.nonNull(userExtensionDTO.getDob()))
 			patientInfo.setDob(LocalDate.parse(userExtensionDTO.getDob(), DateTimeFormat.forPattern("MM/dd/yyyy")));
-		if(StringUtils.isNotBlank(userExtensionDTO.getLangKey()))
+		if(Objects.nonNull(userExtensionDTO.getLangKey()))
 			patientInfo.setLangKey(userExtensionDTO.getLangKey());
-		if(StringUtils.isNotBlank(userExtensionDTO.getEmail()))
+		if(Objects.nonNull(userExtensionDTO.getEmail()))
 			patientInfo.setEmail(userExtensionDTO.getEmail());
-		if(StringUtils.isNotBlank(userExtensionDTO.getAddress()))
+		if(Objects.nonNull(userExtensionDTO.getAddress()))
 			patientInfo.setAddress(userExtensionDTO.getAddress());
-		if(userExtensionDTO.getZipcode() != null)
+		if(Objects.nonNull(userExtensionDTO.getZipcode()))
 			patientInfo.setZipcode(userExtensionDTO.getZipcode());
-		if(StringUtils.isNotBlank(userExtensionDTO.getCity()))
+		if(Objects.nonNull(userExtensionDTO.getCity()))
 			patientInfo.setCity(userExtensionDTO.getCity());
-		if(StringUtils.isNotBlank(userExtensionDTO.getState()))
+		if(Objects.nonNull(userExtensionDTO.getState()))
 			patientInfo.setState(userExtensionDTO.getState());
-		if(StringUtils.isNotBlank(userExtensionDTO.getPrimaryPhone()))
+		if(Objects.nonNull(userExtensionDTO.getPrimaryPhone()))
 			patientInfo.setPrimaryPhone(userExtensionDTO.getPrimaryPhone());
-		if(StringUtils.isNotBlank(userExtensionDTO.getMobilePhone()))
+		if(Objects.nonNull(userExtensionDTO.getMobilePhone()))
 			patientInfo.setMobilePhone(userExtensionDTO.getMobilePhone());
 		if(userExtensionDTO.isExpired()==true){
 			patientInfo.setExpired(userExtensionDTO.isExpired());
@@ -704,44 +704,44 @@ public class UserService {
 	}
 
 	private void assignValuesToUserObj(UserExtensionDTO userExtensionDTO, UserExtension newUser) {
-		if(StringUtils.isNotBlank(userExtensionDTO.getTitle()))
+		if(Objects.nonNull(userExtensionDTO.getTitle()))
 			newUser.setTitle(userExtensionDTO.getTitle());
-		if(StringUtils.isNotBlank(userExtensionDTO.getFirstName()))
+		if(Objects.nonNull(userExtensionDTO.getFirstName()))
 			newUser.setFirstName(userExtensionDTO.getFirstName());
-		if(StringUtils.isNotBlank(userExtensionDTO.getMiddleName()))
+		if(Objects.nonNull(userExtensionDTO.getMiddleName()))
 			newUser.setMiddleName(userExtensionDTO.getMiddleName());
-		if(StringUtils.isNotBlank(userExtensionDTO.getLastName()))
+		if(Objects.nonNull(userExtensionDTO.getLastName()))
 			newUser.setLastName(userExtensionDTO.getLastName());
-		if(StringUtils.isNotBlank(userExtensionDTO.getEmail()))
+		if(Objects.nonNull(userExtensionDTO.getEmail()))
 			newUser.setEmail(userExtensionDTO.getEmail());
-		if(StringUtils.isNotBlank(userExtensionDTO.getSpeciality()))
+		if(Objects.nonNull(userExtensionDTO.getSpeciality()))
 			newUser.setSpeciality(userExtensionDTO.getSpeciality());
-		if(StringUtils.isNotBlank(userExtensionDTO.getCredentials()))
+		if(Objects.nonNull(userExtensionDTO.getCredentials()))
 			newUser.setCredentials(userExtensionDTO.getCredentials());
-		if(StringUtils.isNotBlank(userExtensionDTO.getAddress()))
+		if(Objects.nonNull(userExtensionDTO.getAddress()))
 			newUser.setAddress(userExtensionDTO.getAddress());
-		if(userExtensionDTO.getZipcode() != null)
+		if(Objects.nonNull(userExtensionDTO.getZipcode()))
 			newUser.setZipcode(userExtensionDTO.getZipcode());
-		if(StringUtils.isNotBlank(userExtensionDTO.getCity()))
+		if(Objects.nonNull(userExtensionDTO.getCity()))
 			newUser.setCity(userExtensionDTO.getCity());
-		if(StringUtils.isNotBlank(userExtensionDTO.getState()))
+		if(Objects.nonNull(userExtensionDTO.getState()))
 			newUser.setState(userExtensionDTO.getState());
-		if(StringUtils.isNotBlank(userExtensionDTO.getPrimaryPhone()))
+		if(Objects.nonNull(userExtensionDTO.getPrimaryPhone()))
 			newUser.setPrimaryPhone(userExtensionDTO.getPrimaryPhone());
-		if(StringUtils.isNotBlank(userExtensionDTO.getMobilePhone())){
+		if(Objects.nonNull(userExtensionDTO.getMobilePhone())){
 			newUser.setMobilePhone(userExtensionDTO.getMobilePhone());
 		}else{
 			newUser.setMobilePhone(null);
 		}
-		if(StringUtils.isNotBlank(userExtensionDTO.getFaxNumber()))
+		if(Objects.nonNull(userExtensionDTO.getFaxNumber()))
 			newUser.setFaxNumber(userExtensionDTO.getFaxNumber());
-		if(StringUtils.isNotBlank(userExtensionDTO.getNpiNumber()))
+		if(Objects.nonNull(userExtensionDTO.getNpiNumber()))
 			newUser.setNpiNumber(userExtensionDTO.getNpiNumber());
-		if(StringUtils.isNotBlank(userExtensionDTO.getDob()))
+		if(Objects.nonNull(userExtensionDTO.getDob()))
 			newUser.setDob(LocalDate.parse(userExtensionDTO.getDob(), DateTimeFormat.forPattern("MM/dd/yyyy")));
-		if(StringUtils.isNotBlank(userExtensionDTO.getGender()))
+		if(Objects.nonNull(userExtensionDTO.getGender()))
 			newUser.setGender(userExtensionDTO.getGender());
-		if(StringUtils.isNotBlank(userExtensionDTO.getHillromId()))
+		if(Objects.nonNull(userExtensionDTO.getHillromId()))
 			newUser.setHillromId(userExtensionDTO.getHillromId());
 		newUser.setLangKey(userExtensionDTO.getLangKey());
 	}

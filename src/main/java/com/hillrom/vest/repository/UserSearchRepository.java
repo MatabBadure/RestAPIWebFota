@@ -448,7 +448,15 @@ public class UserSearchRepository {
 	public Page<PatientUserVO> findPatientBy(String queryString, String filter,
 			Pageable pageable, Map<String, Boolean> sortOrder) {
 		
-		String query1 ="select patient_id as id,pemail,pfirstName,plastName, isDeleted,pzipcode,paddress,pcity,pdob,pgender,ptitle,phillrom_id,createdAt,isActivated, state , adherence,last_date,mrnid,hName,clinicName,isHMRNonCompliant,isSettingsDeviated,isMissedTherapy  from (select user.id as patient_id,user.email as pemail,user.first_name as pfirstName,user.last_name as plastName, user.is_deleted as isDeleted, user.zipcode as pzipcode,patInfo.address paddress,patInfo.city as pcity,user.dob as pdob,user.gender as pgender,user.title as ptitle,  user.hillrom_id as phillrom_id,user.created_date as createdAt,user.activated as isActivated, patInfo.state as state ,  user_clinic.mrn_id as mrnid, clinic.id as pclinicid, GROUP_CONCAT(clinic.name) as clinicName,pc.compliance_score as adherence,  pc.last_therapy_session_date as last_date,pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,"
+		String query1 ="select patient_id as id,pemail,pfirstName,plastName, isDeleted,pzipcode,paddress,pcity,pdob,pgender,ptitle,"
+				+ "phillrom_id,createdAt,isActivated, state , adherence,last_date,mrnid,hName,clinicName,isExpired,isHMRNonCompliant,isSettingsDeviated,"
+				+ "isMissedTherapy  from (select user.id as patient_id,user.email as pemail,user.first_name as pfirstName,user.last_name as plastName,"
+				+ " user.is_deleted as isDeleted, user.zipcode as pzipcode,patInfo.address paddress,patInfo.city as pcity,user.dob as pdob,"
+				+ "user.gender as pgender,user.title as ptitle,  user.hillrom_id as phillrom_id,user.created_date as createdAt,"
+				+ "user.activated as isActivated, patInfo.state as state ,  user_clinic.mrn_id as mrnid, clinic.id as pclinicid, "
+				+ "GROUP_CONCAT(clinic.name) as clinicName, user.expired as isExpired, pc.compliance_score as adherence,  "
+				+ "pc.last_therapy_session_date as last_date,pc.is_hmr_compliant as isHMRNonCompliant,"
+				+ "pc.is_settings_deviated as isSettingsDeviated,"
 				+ " pc.missed_therapy_count as isMissedTherapy from USER user join USER_PATIENT_ASSOC  upa on user.id = upa.user_id "
 				+ " and upa.relation_label = '"+SELF+"' join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 				+ " left outer join CLINIC_PATIENT_ASSOC user_clinic on user_clinic.patient_id = patInfo.id "
@@ -526,6 +534,7 @@ public class UserSearchRepository {
 					String mrnId = (String) record[17];
 					String hcpNamesCSV = (String) record[18];
 					String clinicNamesCSV = (String) record[19];
+					Boolean isExpired = (Boolean) record[20];
 					
 					java.util.Date localLastTransmissionDate = null;
 					
@@ -547,6 +556,7 @@ public class UserSearchRepository {
 					patientUserVO.setMrnId(mrnId);
 					patientUserVO.setHcpNamesCSV(hcpNamesCSV);
 					patientUserVO.setClinicNamesCSV(clinicNamesCSV);
+					patientUserVO.setExpired(isExpired);
 					patientUsers.add(patientUserVO);
 				});
 		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());
@@ -775,7 +785,7 @@ public class UserSearchRepository {
 				+ " firstName,user.last_name as lastName, user.is_deleted as isDeleted,"
 				+ "user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,"
 				+ "user.title,user.hillrom_id,user.created_date as createdAt,"
-				+ "user.activated as isActivated, patInfo.state , compliance_score, pc.last_therapy_session_date as last_date, "
+				+ "user.activated as isActivated, patInfo.state , compliance_score, pc.last_therapy_session_date as last_date, user.expired, "
 				+ "pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,pc.missed_therapy_count as isMissedTherapy "
 				+ "from USER user"
 				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id  "
@@ -832,6 +842,7 @@ public class UserSearchRepository {
 
 	private List<PatientUserVO> extractPatientResultsToVO(List<Object[]> results) {
 		List<PatientUserVO> patientUsers = new LinkedList<>();
+		
 		results.stream().forEach(
 				(record) -> {
 					Long id = ((BigInteger) record[0]).longValue();
@@ -852,6 +863,7 @@ public class UserSearchRepository {
 					String state = (String) record[14];
 					Integer adherence = (Integer)record[15];
 					Date lastTransmissionDate = (Date) record[16];
+					Boolean isExpired = (Boolean) record[17];
 					
 					java.util.Date dobLocalDate = null;
 					if(null !=dob){
@@ -863,10 +875,14 @@ public class UserSearchRepository {
 						localLastTransmissionDate =lastTransmissionDate;
 						
 					}
-					patientUsers.add(new PatientUserVO(id, email, firstName,
+					
+					PatientUserVO  patientUser = new PatientUserVO(id, email, firstName,
 							lastName, isDeleted, zipcode, address, city, dobLocalDate,
 							gender, title, hillromId,createdAtDatetime,isActivated,state,
-							Objects.nonNull(adherence) ? adherence : 0,localLastTransmissionDate));
+							Objects.nonNull(adherence) ? adherence : 0,localLastTransmissionDate);
+					patientUser.setExpired(isExpired);
+					
+					patientUsers.add(patientUser);
 				});
 		return patientUsers;
 	}

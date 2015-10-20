@@ -751,7 +751,7 @@ public class AdherenceCalculationService {
 				compliance.setLatestTherapyDate(lastTransmissionDate);
 				compliance.setHmr(hmr);
 				compliance.setHmrRunRate(hmrRunrate);
-				processCompliance(compliance, missedTherapyCount,firstTransmittedDate,
+				calculateAdherenceScoreForTheDay(compliance, missedTherapyCount,firstTransmittedDate,
 						therapyMetrics, existingComplianceMap,existingTherapySessionMap,
 						receivedTherapySessionsMap, protocolConstant);
 			}
@@ -829,7 +829,7 @@ public class AdherenceCalculationService {
 		return compliance;
 	}
 
-	public void processCompliance(PatientCompliance latestCompliance,int currentMissedTherapyCount,
+	public void calculateAdherenceScoreForTheDay(PatientCompliance latestCompliance,int currentMissedTherapyCount,
 			LocalDate firstTransmissionDate,
 			Map<String,Double> metricsMap,SortedMap<LocalDate,PatientCompliance> complianceMap,
 			SortedMap<LocalDate, List<TherapySession>> existingTherapySessionMap,
@@ -859,43 +859,57 @@ public class AdherenceCalculationService {
 		}
 		
 		if(currentMissedTherapyCount == 0){
-			boolean isHMRCompliant = isHMRCompliant(protocolConstant, metricsMap);
+			if(isAfter3daysTransmission(latestCompliance, firstTransmissionDate)){
+				boolean isHMRCompliant = isHMRCompliant(protocolConstant, metricsMap);
 
-			boolean isSettingsDeviated = isSettingsDeviated(protocolConstant, metricsMap.get(WEIGHTED_AVG_FREQUENCY));
+				boolean isSettingsDeviated = isSettingsDeviated(protocolConstant, metricsMap.get(WEIGHTED_AVG_FREQUENCY));
 
-			latestCompliance.setHmrCompliant(isHMRCompliant);
-			
-			applySettingsDeviatedDaysCount(latestCompliance, complianceMap,
-					isSettingsDeviated);
-			
-			if(isSettingsDeviated && !latestCompliance.isSettingsDeviated()){
-				currentScore -=  SETTING_DEVIATION_POINTS;
-				notificationType =  SETTINGS_DEVIATION;
-			}else if(!isSettingsDeviated && latestCompliance.isSettingsDeviated()){
-				currentScore += SETTING_DEVIATION_POINTS;
-				// reset settingsDeviatedDays count if patient is adhere to settings
-				latestCompliance.setSettingsDeviatedDaysCount(0);
-			}
-			
-			if(!isHMRCompliant && latestCompliance.isHmrCompliant()){
-				currentScore -=  HMR_NON_COMPLIANCE_POINTS;
-				if(StringUtils.isBlank(notificationType))
-					notificationType =  HMR_NON_COMPLIANCE;
-				else
-					notificationType =  HMR_AND_SETTINGS_DEVIATION;				
-			}else if(isHMRCompliant && !latestCompliance.isHmrCompliant()){
-				currentScore +=  HMR_NON_COMPLIANCE_POINTS;
+				
+				
+				applySettingsDeviatedDaysCount(latestCompliance, complianceMap,
+						isSettingsDeviated);
+				
+				if(isSettingsDeviated && !latestCompliance.isSettingsDeviated()){
+					currentScore -=  SETTING_DEVIATION_POINTS;
+					notificationType =  SETTINGS_DEVIATION;
+					latestCompliance.setSettingsDeviated(isSettingsDeviated);
+				}else if(!isSettingsDeviated && latestCompliance.isSettingsDeviated()){
+					currentScore += SETTING_DEVIATION_POINTS;
+					// reset settingsDeviatedDays count if patient is adhere to settings
+					latestCompliance.setSettingsDeviatedDaysCount(0);
+					latestCompliance.setSettingsDeviated(isSettingsDeviated);
+				}
+				
+				if(!isHMRCompliant && latestCompliance.isHmrCompliant()){
+					latestCompliance.setHmrCompliant(isHMRCompliant);
+					currentScore -=  HMR_NON_COMPLIANCE_POINTS;
+					if(StringUtils.isBlank(notificationType))
+						notificationType =  HMR_NON_COMPLIANCE;
+					else
+						notificationType =  HMR_AND_SETTINGS_DEVIATION;				
+				}else if(isHMRCompliant && !latestCompliance.isHmrCompliant()){
+					latestCompliance.setHmrCompliant(isHMRCompliant);
+					currentScore +=  HMR_NON_COMPLIANCE_POINTS;
+				}
+			}else{
+				latestCompliance.setHmrCompliant(true);
+				latestCompliance.setSettingsDeviated(false);
 			}
 		}
 		
-		if(previousScore < currentScore){
+		// patient did therapy and he is adhere to protocol
+		if(previousScore < currentScore && 
+				currentMissedTherapyCount == 0 &&
+				isHMRCompliant(protocolConstant, metricsMap)
+				&& isSettingsDeviated(protocolConstant, metricsMap.get(WEIGHTED_AVG_FREQUENCY))){
 			notificationService.deleteNotification(patientUserId,latestCompliance.getDate());
 			currentScore = currentScore <=  DEFAULT_COMPLIANCE_SCORE - BONUS_POINTS ? currentScore + BONUS_POINTS : DEFAULT_COMPLIANCE_SCORE;
 		}
 		
-		// Point has been deducted due to Protocol violation
-		if(previousScore > currentScore 
-				&& DateUtil.getDaysCountBetweenLocalDates(firstTransmissionDate, latestCompliance.getDate()) >= 3){
+		// Patient did therapy but point has been deducted due to Protocol violation
+		if(previousScore > currentScore && currentMissedTherapyCount == 0
+				&& isAfter3daysTransmission(latestCompliance,
+						firstTransmissionDate)){
 			notificationService.createOrUpdateNotification(patientUser, patient, patientUserId,
 					latestCompliance.getDate(), notificationType,false);
 		}
@@ -913,6 +927,11 @@ public class AdherenceCalculationService {
 		log.warn("**********************************************************************************");*/
 	}
 
+	private boolean isAfter3daysTransmission(
+			PatientCompliance latestCompliance, LocalDate firstTransmissionDate) {
+		return DateUtil.getDaysCountBetweenLocalDates(firstTransmissionDate, latestCompliance.getDate()) >= 3;
+	}
+
 	private void applySettingsDeviatedDaysCount(
 			PatientCompliance latestCompliance,
 			SortedMap<LocalDate, PatientCompliance> complianceMap,
@@ -928,7 +947,6 @@ public class AdherenceCalculationService {
 			// If settingsDeviationDaysCount is 0 for previous date, settingsDeviationDaysCount would be 3 by default. increments thereafter
 			settingsDeviatedDaysCount =  previousSettingsDeviatedDaysCount == 0 ? DEFAULT_SETTINGS_DEVIATION_COUNT :++previousSettingsDeviatedDaysCount;
 			latestCompliance.setSettingsDeviatedDaysCount(settingsDeviatedDaysCount);
-			latestCompliance.setSettingsDeviated(isSettingsDeviated);
 		}
 	} 
 	

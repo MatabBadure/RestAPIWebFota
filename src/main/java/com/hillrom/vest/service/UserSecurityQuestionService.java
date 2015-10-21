@@ -1,5 +1,6 @@
 package com.hillrom.vest.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -26,8 +27,8 @@ public class UserSecurityQuestionService {
 	@Inject
 	private SecurityQuestionRepository questionRepository;
 	
-	public Optional<UserSecurityQuestion> findOneByUserId(Long userId){
-		return userSecurityQuestionRepository.findOneByUserId(userId);
+	public List<UserSecurityQuestion> findByUserId(Long userId){
+		return userSecurityQuestionRepository.findByUserId(userId);
 	}
 	
 	public Optional<UserSecurityQuestion> findOneByQuestionId(Long questionId){

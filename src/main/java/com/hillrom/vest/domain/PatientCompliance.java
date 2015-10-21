@@ -63,6 +63,9 @@ public class PatientCompliance {
 	private LocalDate latestTherapyDate;
 	
 	private Double hmr;
+
+	@Column(name="settings_deviated_days_count")
+	private int settingsDeviatedDaysCount  = 0;
 	
 	public PatientCompliance() {
 		super();
@@ -214,6 +217,14 @@ public class PatientCompliance {
 
 	public void setHmr(Double hmr) {
 		this.hmr = hmr;
+	}
+
+	public int getSettingsDeviatedDaysCount() {
+		return settingsDeviatedDaysCount;
+	}
+
+	public void setSettingsDeviatedDaysCount(int settingsDeviatedDaysCount) {
+		this.settingsDeviatedDaysCount = settingsDeviatedDaysCount;
 	}
 
 	@Override

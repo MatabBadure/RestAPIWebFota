@@ -93,57 +93,52 @@ public class ClinicService {
 
     public ClinicVO updateClinic(String id, ClinicDTO clinicDTO) throws HillromException {
     	Clinic clinic = clinicRepository.getOne(id);
-        if(Objects.isNull(clinic)) {
-        	throw new HillromException(ExceptionConstants.HR_548);//No such clinic found
-        } else if(StringUtils.isNotBlank(clinic.getId())) {
-        	if(Objects.nonNull(clinicDTO.getHillromId())) {
+    	if(Objects.isNull(clinic)) {
+    		throw new HillromException(ExceptionConstants.HR_548);//No such clinic found
+    	} else if(StringUtils.isNotBlank(clinic.getId())) {
+    		if(Objects.nonNull(clinicDTO.getHillromId())) {
     			Optional<Clinic> existingClinic = clinicRepository.findOneByHillromId(clinicDTO.getHillromId());
     			if (existingClinic.isPresent() && !existingClinic.get().getId().equals(id)) {
     				throw new HillromException(ExceptionConstants.HR_522);
-        		}
-        	}
-        	assignUpdatedValues(clinicDTO, clinic);
-        	if(clinicDTO.getParent()) {
-	        	List<String> existingChildClinicIds = new ArrayList<String>();
-	        	List<String> newChildClinicIds = new ArrayList<String>();
-	        	for(Clinic childClinic : clinic.getChildClinics()) {
-	        		existingChildClinicIds.add(childClinic.getId().toString());
-	        	}
-	        	for(Map<String, String> childClinic : clinicDTO.getChildClinicList()) {
-	        		newChildClinicIds.add(childClinic.get("id"));
-	        	}
-	        	List<String> clinicsToBeRemoved = RandomUtil.getDifference(existingChildClinicIds, newChildClinicIds);
-	        	
-	        	//TODO : to be refactored with clinicRepository.findAll(clinicsToBeRemoved)
-	        	for(String clinicId : clinicsToBeRemoved) {
-	        		Clinic childClinic = clinicRepository.getOne(clinicId);
-	        		
-	        		childClinic.setParentClinic(null);
-	        		clinicRepository.save(childClinic);
-	        		clinic.getChildClinics().remove(childClinic);
-	        	}
-        	} else 
-        		try{
-	        		if(!clinicDTO.getParentClinic().isEmpty() && StringUtils.isNotBlank(clinicDTO.getParentClinic().get("id"))) {
-		        		if(!id.equals(clinicDTO.getParentClinic().get("id"))) {
-		        			Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
-		        			parentClinic.setParent(true);
-		        			clinicRepository.save(parentClinic);
-		        			clinic.setParentClinic(parentClinic);       			
-		        		} else {
-		        			throw new HillromException(ExceptionConstants.HR_542);
-		        		} 
-		        	} else {
-		       			clinicRepository.save(clinic);
-		        	} 
-        		} catch(Exception ex){
-        			clinicRepository.save(clinic);
-        		}
+    			}
+    		}
+    		assignUpdatedValues(clinicDTO, clinic);
+    		if(clinicDTO.getParent()) {
+    			List<String> existingChildClinicIds = new ArrayList<String>();
+    			List<String> newChildClinicIds = new ArrayList<String>();
+    			for(Clinic childClinic : clinic.getChildClinics()) {
+    				existingChildClinicIds.add(childClinic.getId().toString());
+    			}
+    			for(Map<String, String> childClinic : clinicDTO.getChildClinicList()) {
+    				newChildClinicIds.add(childClinic.get("id"));
+    			}
+    			List<String> clinicsToBeRemoved = RandomUtil.getDifference(existingChildClinicIds, newChildClinicIds);
+    			
+    			//TODO : to be refactored with clinicRepository.findAll(clinicsToBeRemoved)
+    			for(String clinicId : clinicsToBeRemoved) {
+    				Clinic childClinic = clinicRepository.getOne(clinicId);
+    				
+    				childClinic.setParentClinic(null);
+    				clinicRepository.save(childClinic);
+    				clinic.getChildClinics().remove(childClinic);
+    			}
+    		} else if(Objects.nonNull(clinicDTO.getParentClinic()) && StringUtils.isNotBlank(clinicDTO.getParentClinic().get("id"))) {
+        		if(!id.equals(clinicDTO.getParentClinic().get("id"))) {
+        			Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
+        			parentClinic.setParent(true);
+        			clinicRepository.save(parentClinic);
+        			clinic.setParentClinic(parentClinic);       			
+        		} else {
+        			throw new HillromException(ExceptionConstants.HR_542);
+        		} 
+        	} else {
+       			clinicRepository.save(clinic);
+        	} 
     		clinicRepository.save(clinic);
         } else {
 	      	throw new HillromException(ExceptionConstants.HR_543);
-        }
-    	return ClinicVOBuilder.buildWithChildClinics(clinic);
+	    }
+	    return ClinicVOBuilder.buildWithChildClinics(clinic);
     }
     
     public String deleteClinic(String id) throws HillromException {
@@ -218,6 +213,7 @@ public class ClinicService {
 	        		Map<String, Object> patientMap = new HashMap<>();
 	        		patientMap.put("patient", (UserExtension) userService.getUserObjFromPatientInfo(clinicPatientAssoc.getPatient()));
 	        		patientMap.put("mrnId", clinicPatientAssoc.getMrnId());
+	        		patientMap.put("status", clinicPatientAssoc.getActive());
 	        		List<UserPatientAssoc> hcpAssocList = new LinkedList<>();
 	    	     	for(UserPatientAssoc patientAssoc : clinicPatientAssoc.getPatient().getUserPatientAssoc()){
 	    	    		if(AuthoritiesConstants.HCP.equals(patientAssoc.getUserRole())){

@@ -216,6 +216,45 @@ public class UserResource {
 		
 
 	}
+   
+   @RequestMapping(value = "/user/admin/hcp/{id}/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	
+  	public ResponseEntity<?> searchPatientAssociatedToHcpInAdmin(@PathVariable Long id,
+  			@RequestParam(required = true, value = "searchString") String searchString,
+  			@RequestParam(required = false, value = "clinicId") String clinicId,
+  			@RequestParam(required = false, value = "filter") String filter,
+  			@RequestParam(value = "page", required = false) Integer offset,
+  			@RequestParam(value = "per_page", required = false) Integer limit,
+  			@RequestParam(value = "sort_by", required = false) String sortBy,
+  			@RequestParam(value = "asc", required = false) Boolean isAscending)
+  			throws URISyntaxException {
+  		if(searchString.endsWith("_")){
+   		   searchString = searchString.replace("_", "\\\\_");
+  		}
+  		String queryString = new StringBuilder("'%").append(searchString)
+  				.append("%'").toString();
+  		Map<String, Boolean> sortOrder = new HashMap<>();
+  		if (StringUtils.isNotBlank(sortBy)) {
+  			isAscending = (isAscending != null) ? isAscending : true;
+  			if(sortBy.equalsIgnoreCase("email"))
+  				sortOrder.put("user." + sortBy, isAscending);
+  			else	
+  				sortOrder.put(sortBy, isAscending);
+  		}
+  		Page<PatientUserVO> page;
+  		try {
+  			page = userSearchRepository.findAssociatedPatientToHCPInAdmin(
+  					queryString, id, clinicId, filter, PaginationUtil.generatePageRequest(offset, limit),
+  					sortOrder);
+  			HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
+  					page, "/user/admin/hcp/"+id+"/patient/search", offset, limit);
+  			return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+  		} catch (HillromException e) {
+  			return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+  		}
+  		
+
+  	}
    //For Patients associated with HCP in Admin
    @RequestMapping(value = "/user/hcp/{id}/patient/clinicinfo/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	
@@ -296,7 +335,7 @@ public class UserResource {
 	}
 
 	/**
-     * PUT  /patient/:id/linkvestdevice -> link vest device with patient {id}.
+     * PUT  /patient/:id/link -> link vest device with patient {id}.
      */
     @RequestMapping(value = "/patient/{id}/linkvestdevice",
             method = RequestMethod.PUT,
@@ -971,4 +1010,22 @@ public class UserResource {
 
 	}
 
+    @RequestMapping(value="/user/{id}/securityQuestion",
+    		method=RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<JSONObject> getSecurityQuestion(@PathVariable Long id){
+		log.debug("REST request to get Security Question for user {}",id);
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject = userService.getSecurityQuestion(id);
+			jsonObject.put("message", MessageConstants.HR_304);
+		} catch (HillromException e) {
+			jsonObject.put("ERROR",e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.BAD_REQUEST);
+		}
+		if(jsonObject.containsKey("ERROR")){
+			return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.OK);
+	}
 }

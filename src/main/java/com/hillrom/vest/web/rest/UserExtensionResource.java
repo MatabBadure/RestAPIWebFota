@@ -929,12 +929,14 @@ public class UserExtensionResource {
 	        	filterByClinic = Constants.ALL;
 	        Set<UserExtension> hcpList= patientHCPService.getAssociatedHCPUsersForPatient(id, filterByClinic);
 	        if (hcpList.isEmpty()) {
-	        	jsonObject.put("message", ExceptionConstants.HR_588);
+	        	jsonObject.put("message", MessageConstants.HR_284);
+	        	jsonObject.put("hcpList", hcpList);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_290);
 	        	jsonObject.put("hcpList", hcpList);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }
-	        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         } catch (HillromException hre){
         	jsonObject.put("ERROR", hre.getMessage());
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);

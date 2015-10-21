@@ -43,3 +43,4 @@ spring:
     notification:
         hcpOrClinicAdminDashboardUrl: http://dev.hillromvest.com
         patientDashboardUrl: http://dev.hillromvest.com
+        careGiverDashboardUrl: http://dev.hillromvest.com

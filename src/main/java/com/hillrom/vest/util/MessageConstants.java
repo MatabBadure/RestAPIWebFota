@@ -85,4 +85,5 @@ public class MessageConstants {
     public static final String HR_302 = "No associated Patients with clinic found";
     
     public static final String HR_303 = "Data ingested successfully";
+    public static final String HR_304 = "Security question fetched successfully.";
 }

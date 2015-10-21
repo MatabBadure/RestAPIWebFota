@@ -317,7 +317,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthorities() {
-        Optional<User> currentUser = userRepository.findOneByEmail(SecurityUtils.getCurrentLogin());
+        Optional<User> currentUser = userRepository.findOneByEmailOrHillromId(SecurityUtils.getCurrentLogin());
         if(currentUser.isPresent()) {
         	currentUser.get().getAuthorities().size(); // eagerly load the association
         }

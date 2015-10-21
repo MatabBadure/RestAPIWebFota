@@ -1321,10 +1321,16 @@ public class UserService {
 
 	}	
 
-	public UserPatientAssoc updateCaregiver(Long patientUserId, Long caregiverUserId, UserExtensionDTO userExtensionDTO) {
+	public UserPatientAssoc updateCaregiver(Long patientUserId, Long caregiverUserId, UserExtensionDTO userExtensionDTO) throws HillromException {
     	UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
     	UserExtension caregiverUser = userExtensionRepository.findOne(caregiverUserId);
     	if(Objects.nonNull(patientUser) && Objects.nonNull(caregiverUser)) {
+    		if(StringUtils.isNotBlank(userExtensionDTO.getEmail())) {
+    			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
+    			if(existingUser.isPresent() && !existingUser.get().getId().equals(caregiverUserId)) {
+    				throw new HillromException(ExceptionConstants.HR_501);//e-mail address already in use
+    			}
+        	}
     		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
     		if(Objects.nonNull(patientInfo)) {
     			assignValuesToUserObj(userExtensionDTO, caregiverUser);

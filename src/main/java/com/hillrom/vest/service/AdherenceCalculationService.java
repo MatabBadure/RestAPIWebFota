@@ -857,7 +857,7 @@ public class AdherenceCalculationService {
 			// deduct since therapy has been MISSED
 			currentScore = currentScore > MISSED_THERAPY_POINTS  ? currentScore - MISSED_THERAPY_POINTS :0;
 			// Miss Therapy is exclusive to HMR NonCompliance and Settings Deviation
-			latestCompliance.setHmrCompliant(currentMissedTherapyCount >= 2);
+			latestCompliance.setHmrCompliant(currentMissedTherapyCount <= 2);
 			latestCompliance.setSettingsDeviated(false);
 		} else if(currentMissedTherapyCount < latestCompliance.getMissedTherapyCount() &&
 				latestCompliance.getMissedTherapyCount() >= DEFAULT_MISSED_THERAPY_DAYS_COUNT){

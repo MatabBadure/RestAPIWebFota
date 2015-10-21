@@ -808,7 +808,7 @@ public class UserSearchRepository {
 		} else if ("others".equalsIgnoreCase(clinicId)) {
 			findPatientUserQuery = findPatientUserQuery + query2 + searchQuery + query3;
 		} else
-			findPatientUserQuery = findPatientUserQuery + " where patient_clinic.clinic_id  ='" + clinicId + "'"
+			findPatientUserQuery = findPatientUserQuery + query2 + " and patient_clinic.clinic_id  ='" + clinicId + "'"
 					+ searchQuery + query3;
 
 		StringBuilder filterQuery = new StringBuilder();

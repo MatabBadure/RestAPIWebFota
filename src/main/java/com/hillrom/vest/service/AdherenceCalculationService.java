@@ -866,7 +866,7 @@ public class AdherenceCalculationService {
 			currentScore = currentScore > DEFAULT_COMPLIANCE_SCORE ? DEFAULT_COMPLIANCE_SCORE : currentScore ;
 		}
 		
-		if(currentMissedTherapyCount == 0){
+		if(currentMissedTherapyCount <= 2){
 			if(isAfter3daysTransmission(latestCompliance, firstTransmissionDate)){
 				boolean isHMRCompliant = isHMRCompliant(protocolConstant, metricsMap);
 

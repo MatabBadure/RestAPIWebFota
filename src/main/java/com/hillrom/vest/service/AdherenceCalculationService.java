@@ -1,11 +1,11 @@
 package com.hillrom.vest.service;
 
+import static com.hillrom.vest.config.AdherenceScoreConstants.BONUS_POINTS;
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
+import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_SETTINGS_DEVIATION_COUNT;
 import static com.hillrom.vest.config.AdherenceScoreConstants.HMR_NON_COMPLIANCE_POINTS;
 import static com.hillrom.vest.config.AdherenceScoreConstants.MISSED_THERAPY_POINTS;
 import static com.hillrom.vest.config.AdherenceScoreConstants.SETTING_DEVIATION_POINTS;
-import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_SETTINGS_DEVIATION_COUNT;
-import static com.hillrom.vest.config.AdherenceScoreConstants.BONUS_POINTS;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE;
 import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
@@ -15,6 +15,7 @@ import static com.hillrom.vest.service.util.DateUtil.getPlusOrMinusTodayLocalDat
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateCumulativeDuration;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateHMRRunRatePerDays;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
+import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_MISSED_THERAPY_DAYS_COUNT;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -53,7 +54,6 @@ import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.ProtocolConstantsRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
-import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.ClinicStatsNotificationVO;
@@ -299,22 +299,27 @@ public class AdherenceCalculationService {
 						compliance.getLatestTherapyDate(),
 						Objects.nonNull(compliance.getHmr())?compliance.getHmr():0.0d);
 				int score = Objects.isNull(compliance.getScore()) ? 0 : compliance.getScore(); 
-				if(score > 0)
-					newCompliance.setScore(score- MISSED_THERAPY_POINTS);
 				int missedTherapyCount = compliance.getMissedTherapyCount();
-				if(missedTherapyCount >= 3 ){
+				if(missedTherapyCount >= DEFAULT_MISSED_THERAPY_DAYS_COUNT ){
+					score = score < MISSED_THERAPY_POINTS ? 0 :  score - MISSED_THERAPY_POINTS ;
 					notificationService.createOrUpdateNotification(compliance.getPatientUser(), compliance.getPatient(), compliance.getPatientUser().getId(),
 							today.toLocalDate(), MISSED_THERAPY,false);
+				}else if(missedTherapyCount == 2){ // HMR Non Compliance
+					score = score < HMR_NON_COMPLIANCE_POINTS ? 0 : score - HMR_NON_COMPLIANCE_POINTS;
+					newCompliance.setHmrCompliant(false);
+					notificationService.createOrUpdateNotification(compliance.getPatientUser(), compliance.getPatient(), compliance.getPatientUser().getId(),
+							today.toLocalDate(), HMR_NON_COMPLIANCE,false);
 				}
+				newCompliance.setScore(score);
 				newComplianceList.add(newCompliance);
 			}
-			Map<Long,Integer> hmrRunRateMap = calculateHMRRunRateForPatientUsers(patientUserIds,getPlusOrMinusTodayLocalDate(-3),getPlusOrMinusTodayLocalDate(-1));
-			newComplianceList.parallelStream().forEach(patientCompliance -> {
+			Map<Long,Integer> hmrRunRateMap = calculateHMRRunRateForPatientUsers(patientUserIds,getPlusOrMinusTodayLocalDate(-2),today.toLocalDate());
+			for(PatientCompliance patientCompliance : newComplianceList){
 				Integer hmrRunRate = hmrRunRateMap.get(patientCompliance.getPatientUser().getId());
 				hmrRunRate = Objects.nonNull(hmrRunRate)? hmrRunRate : 0;
 				patientCompliance.setHmrRunRate(hmrRunRate);
 				complianceService.createOrUpdate(patientCompliance);
-			});
+			}
 		}catch(Exception ex){
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter( writer );
@@ -590,7 +595,7 @@ public class AdherenceCalculationService {
 					hmrNonCompliantPatients++;
 				if(cNotificationVO.isSettingsDeviated())
 					settingsDeviatedPatients++;
-				if(cNotificationVO.getMissedTherapyCount() >= 3)
+				if(cNotificationVO.getMissedTherapyCount() >= DEFAULT_MISSED_THERAPY_DAYS_COUNT)
 					missedTherapyPatients++;
 				
 				stats.put("patientsWithMissedTherapy", missedTherapyPatients);
@@ -729,7 +734,7 @@ public class AdherenceCalculationService {
 			LocalDate lastTransmissionDate = getLatestTransmissionDate(
 					existingTherapySessionMap,receivedTherapySessionsMap, therapyDate);
 			int missedTherapyCount = 0;
-			if(daysBetween == 0){ // first transmit
+			if(daysBetween <= 1){ // first transmit
 				PatientCompliance compliance = existingComplianceMap.get(therapyDate);
 				if(Objects.nonNull(compliance)){
 					compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
@@ -744,10 +749,9 @@ public class AdherenceCalculationService {
 				}
 				existingComplianceMap.put(therapyDate, compliance);
 			}else{
-				PatientCompliance compliance = existingComplianceMap.get(therapyDate);
 				missedTherapyCount = DateUtil.getDaysCountBetweenLocalDates(lastTransmissionDate, therapyDate);
-				compliance = getLatestCompliance(patientUser, patient,
-						existingComplianceMap, therapyDate, compliance);
+				PatientCompliance compliance = getLatestCompliance(patientUser, patient,
+						existingComplianceMap, therapyDate);
 				compliance.setLatestTherapyDate(lastTransmissionDate);
 				compliance.setHmr(hmr);
 				compliance.setHmrRunRate(hmrRunrate);
@@ -761,19 +765,16 @@ public class AdherenceCalculationService {
 	private PatientCompliance getLatestCompliance(User patientUser,
 			PatientInfo patient,
 			SortedMap<LocalDate, PatientCompliance> existingComplianceMap,
-			LocalDate therapyDate, PatientCompliance compliance) {
-		if(Objects.isNull(compliance)){
+			LocalDate therapyDate) {
 			SortedMap<LocalDate,PatientCompliance> mostRecentComplianceMap = existingComplianceMap.headMap(therapyDate);
 			PatientCompliance latestCompliance = null;
 			if(mostRecentComplianceMap.size() > 0){
 				latestCompliance = mostRecentComplianceMap.get(mostRecentComplianceMap.lastKey());
-				compliance = buildPatientCompliance(therapyDate, latestCompliance,latestCompliance.getMissedTherapyCount());
+				return buildPatientCompliance(therapyDate, latestCompliance,latestCompliance.getMissedTherapyCount());
 			}else{
-				compliance = new PatientCompliance(DEFAULT_COMPLIANCE_SCORE, therapyDate,
+				return new PatientCompliance(DEFAULT_COMPLIANCE_SCORE, therapyDate,
 						patient, patientUser,0,true,false,0d);
 			}
-		}
-		return compliance;
 	}
 
 	private LocalDate getLatestTransmissionDate(
@@ -836,10 +837,10 @@ public class AdherenceCalculationService {
 			SortedMap<LocalDate, List<TherapySession>> receivedTherapySessionsMap,
 			ProtocolConstants protocolConstant){
 
-		/*log.warn("***************************BEFORE************************************************");
+/*		log.warn("***************************BEFORE************************************************");
 		log.warn(latestCompliance.getDate()+" : "+latestCompliance);
-		log.warn("**********************************************************************************");*/
-				
+		log.warn("**********************************************************************************");
+*/				
 		int currentScore = latestCompliance.getScore();
 		int previousScore = currentScore;
 		String notificationType = "";
@@ -847,67 +848,69 @@ public class AdherenceCalculationService {
 		Long patientUserId = patientUser.getId();
 		PatientInfo patient = latestCompliance.getPatient();
 		// Missed Therapy 
-		if(currentMissedTherapyCount > latestCompliance.getMissedTherapyCount()){
+		if(currentMissedTherapyCount > latestCompliance.getMissedTherapyCount() &&
+				currentMissedTherapyCount >= DEFAULT_MISSED_THERAPY_DAYS_COUNT){
 			// deduct since therapy has been MISSED
-			currentScore = currentScore - MISSED_THERAPY_POINTS >= 0 ? currentScore - MISSED_THERAPY_POINTS :currentScore;
+			currentScore = currentScore > MISSED_THERAPY_POINTS  ? currentScore - MISSED_THERAPY_POINTS :0;
 			// Miss Therapy is exclusive to HMR NonCompliance and Settings Deviation
-			latestCompliance.setHmrCompliant(true);
+			latestCompliance.setHmrCompliant(currentMissedTherapyCount <= 2);
 			latestCompliance.setSettingsDeviated(false);
-		}else if(currentMissedTherapyCount < latestCompliance.getMissedTherapyCount()){
+		} else if(currentMissedTherapyCount < latestCompliance.getMissedTherapyCount() &&
+				latestCompliance.getMissedTherapyCount() >= DEFAULT_MISSED_THERAPY_DAYS_COUNT){
 			// Add MISSED_THERAPY_POINTS, since Data Received 
-			currentScore = currentScore <= DEFAULT_COMPLIANCE_SCORE - MISSED_THERAPY_POINTS ? currentScore + MISSED_THERAPY_POINTS : currentScore;
+			currentScore = currentScore + MISSED_THERAPY_POINTS ;
+			currentScore = currentScore > DEFAULT_COMPLIANCE_SCORE ? DEFAULT_COMPLIANCE_SCORE : currentScore ;
 		}
 		
-		if(currentMissedTherapyCount == 0){
+		if(currentMissedTherapyCount <= 2){
 			if(isAfter3daysTransmission(latestCompliance, firstTransmissionDate)){
 				boolean isHMRCompliant = isHMRCompliant(protocolConstant, metricsMap);
-
 				boolean isSettingsDeviated = isSettingsDeviated(protocolConstant, metricsMap.get(WEIGHTED_AVG_FREQUENCY));
-
-				
-				
 				applySettingsDeviatedDaysCount(latestCompliance, complianceMap,
 						isSettingsDeviated);
 				
-				if(isSettingsDeviated && !latestCompliance.isSettingsDeviated()){
+				if(isSettingsDeviated){
 					currentScore -=  SETTING_DEVIATION_POINTS;
 					notificationType =  SETTINGS_DEVIATION;
 					latestCompliance.setSettingsDeviated(isSettingsDeviated);
-				}else if(!isSettingsDeviated && latestCompliance.isSettingsDeviated()){
-					currentScore += SETTING_DEVIATION_POINTS;
+				}else {
+					// currentScore += SETTING_DEVIATION_POINTS;
 					// reset settingsDeviatedDays count if patient is adhere to settings
 					latestCompliance.setSettingsDeviatedDaysCount(0);
 					latestCompliance.setSettingsDeviated(isSettingsDeviated);
 				}
 				
-				if(!isHMRCompliant && latestCompliance.isHmrCompliant()){
+				if(!isHMRCompliant){
 					latestCompliance.setHmrCompliant(isHMRCompliant);
 					currentScore -=  HMR_NON_COMPLIANCE_POINTS;
 					if(StringUtils.isBlank(notificationType))
 						notificationType =  HMR_NON_COMPLIANCE;
 					else
 						notificationType =  HMR_AND_SETTINGS_DEVIATION;				
-				}else if(isHMRCompliant && !latestCompliance.isHmrCompliant()){
+				}else {
 					latestCompliance.setHmrCompliant(isHMRCompliant);
-					currentScore +=  HMR_NON_COMPLIANCE_POINTS;
+					// currentScore +=  HMR_NON_COMPLIANCE_POINTS;
 				}
 			}else{
-				latestCompliance.setHmrCompliant(true);
+				latestCompliance.setHmrCompliant(currentMissedTherapyCount <= 2);
 				latestCompliance.setSettingsDeviated(false);
 			}
+		}else if(currentMissedTherapyCount >= DEFAULT_MISSED_THERAPY_DAYS_COUNT){
+			notificationType = MISSED_THERAPY;
+			latestCompliance.setHmrCompliant(false);
 		}
 		
 		// patient did therapy and he is adhere to protocol
 		if(previousScore < currentScore && 
 				currentMissedTherapyCount == 0 &&
 				isHMRCompliant(protocolConstant, metricsMap)
-				&& isSettingsDeviated(protocolConstant, metricsMap.get(WEIGHTED_AVG_FREQUENCY))){
+				&& !isSettingsDeviated(protocolConstant, metricsMap.get(WEIGHTED_AVG_FREQUENCY))){
 			notificationService.deleteNotification(patientUserId,latestCompliance.getDate());
 			currentScore = currentScore <=  DEFAULT_COMPLIANCE_SCORE - BONUS_POINTS ? currentScore + BONUS_POINTS : DEFAULT_COMPLIANCE_SCORE;
 		}
 		
 		// Patient did therapy but point has been deducted due to Protocol violation
-		if(previousScore > currentScore && currentMissedTherapyCount == 0
+		if(previousScore > currentScore 
 				&& isAfter3daysTransmission(latestCompliance,
 						firstTransmissionDate)){
 			notificationService.createOrUpdateNotification(patientUser, patient, patientUserId,
@@ -922,14 +925,14 @@ public class AdherenceCalculationService {
 		if(Objects.nonNull(metricsMap.get(TOTAL_DURATION)))
 			latestCompliance.setHmrRunRate(metricsMap.get(TOTAL_DURATION).intValue());
 		complianceMap.put(latestCompliance.getDate(), latestCompliance);
-		/*log.warn("***************************AFTER************************************************");
+/*		log.warn("***************************AFTER************************************************");
 		log.warn(latestCompliance.getDate()+" : "+latestCompliance);
-		log.warn("**********************************************************************************");*/
-	}
+		log.warn("**********************************************************************************");
+*/	}
 
 	private boolean isAfter3daysTransmission(
 			PatientCompliance latestCompliance, LocalDate firstTransmissionDate) {
-		return DateUtil.getDaysCountBetweenLocalDates(firstTransmissionDate, latestCompliance.getDate()) >= 3;
+		return DateUtil.getDaysCountBetweenLocalDates(firstTransmissionDate, latestCompliance.getDate()) >= 2;
 	}
 
 	private void applySettingsDeviatedDaysCount(
@@ -955,7 +958,7 @@ public class AdherenceCalculationService {
 			SortedMap<LocalDate, List<TherapySession>> existingTherapySessionMap,
 			SortedMap<LocalDate, List<TherapySession>> receivedTherapySessionsMap) {
 		List<TherapySession> therapySessions = new LinkedList<>();
-		for(int i = 1;i <= 3;i++){
+		for(int i = 0;i < 3;i++){
 			List<TherapySession> previousExistingTherapySessions = existingTherapySessionMap.get(currentTherapyDate.minusDays(i));
 			//List<TherapySession> previousReceivedTherapySessions = receivedTherapySessionsMap.get(currentTherapyDate.minusDays(i));
 			if(Objects.nonNull(previousExistingTherapySessions))

@@ -231,8 +231,8 @@ public class ClinicService {
 		return patientUserList;
 	}
 	
-	public List<PatientUserVO> getNotAssociatedPatientUsers(String ClinicId, String searchString) throws HillromException {
-		List<PatientUserVO> patientUserList = userSearchRepository.findPatientNotAssociatedToClinic(ClinicId,searchString);
+	public List<PatientUserVO> getNotAssociatedPatientUsers(String ClinicId, String searchString, String filter) throws HillromException {
+		List<PatientUserVO> patientUserList = userSearchRepository.findPatientNotAssociatedToClinic(ClinicId,searchString, filter);
 		return patientUserList;
 	}
 	

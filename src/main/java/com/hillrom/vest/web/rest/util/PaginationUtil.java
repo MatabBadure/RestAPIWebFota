@@ -46,7 +46,7 @@ public class PaginationUtil {
             offset = DEFAULT_OFFSET;
         }
         if (limit == null || limit > MAX_LIMIT) {
-            limit = DEFAULT_LIMIT;
+            limit = MAX_LIMIT;
         }
         Sort sort = null;
         if(sortOrder.keySet().size() > 0) {

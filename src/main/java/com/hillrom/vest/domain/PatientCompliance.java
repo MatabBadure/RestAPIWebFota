@@ -45,13 +45,13 @@ public class PatientCompliance {
 	private User patientUser;
 	
 	@Column(name="hmr_run_rate")
-	private Integer hmrRunRate;
+	private Integer hmrRunRate = 0;
 	
 	@Column(name="is_settings_deviated")
 	private boolean isSettingsDeviated = false;
 	
 	@Column(name="is_hmr_compliant")
-	private boolean isHmrCompliant = false;
+	private boolean isHmrCompliant = true;
 	
 	@Column(name="missed_therapy_count")
 	private int missedTherapyCount;
@@ -62,7 +62,7 @@ public class PatientCompliance {
     @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
 	private LocalDate latestTherapyDate;
 	
-	private Double hmr;
+	private Double hmr = 0.0d;
 
 	@Column(name="settings_deviated_days_count")
 	private int settingsDeviatedDaysCount  = 0;

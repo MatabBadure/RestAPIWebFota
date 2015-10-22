@@ -314,12 +314,12 @@ public class AdherenceCalculationService {
 				newComplianceList.add(newCompliance);
 			}
 			Map<Long,Integer> hmrRunRateMap = calculateHMRRunRateForPatientUsers(patientUserIds,getPlusOrMinusTodayLocalDate(-2),today.toLocalDate());
-			newComplianceList.parallelStream().forEach(patientCompliance -> {
+			for(PatientCompliance patientCompliance : newComplianceList){
 				Integer hmrRunRate = hmrRunRateMap.get(patientCompliance.getPatientUser().getId());
 				hmrRunRate = Objects.nonNull(hmrRunRate)? hmrRunRate : 0;
 				patientCompliance.setHmrRunRate(hmrRunRate);
 				complianceService.createOrUpdate(patientCompliance);
-			});
+			}
 		}catch(Exception ex){
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter( writer );

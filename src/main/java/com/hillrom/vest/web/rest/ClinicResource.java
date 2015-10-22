@@ -127,8 +127,16 @@ public class ClinicResource {
     
     public ResponseEntity<List<Clinic>> getAll(@RequestParam(value = "page" , required = false) Integer offset,
                                   @RequestParam(value = "per_page", required = false) Integer limit,
-                                  @RequestParam(value = "filter",required = false) String filter)
+                                  @RequestParam(value = "filter",required = false) String filter,
+    							  @RequestParam(value = "sort_by",required = false) String sortBy,
+							  	  @RequestParam(value = "asc",required = false) Boolean isAscending)
         throws URISyntaxException {
+    	
+    	Map<String,Boolean> sortOrder = new HashMap<>(); 
+    	if(sortBy != null  && !sortBy.equals("")) {
+   		 isAscending =  (isAscending != null)?  isAscending : true;
+   		 sortOrder.put(sortBy, isAscending);
+   	 }
     	PredicateBuilder<Clinic> clinicPredicatebuilder = new PredicateBuilder<Clinic>(Clinic.class,"clinic");
         if (filter != null) {
             Pattern pattern = Pattern.compile("(\\w+?)(:|<|>)(\\w+?),");
@@ -138,7 +146,7 @@ public class ClinicResource {
             }
         }
         BooleanExpression exp = clinicPredicatebuilder.build();
-        Page<Clinic> page = clinicRepository.findAll(exp,PaginationUtil.generatePageRequest(offset, limit));
+        Page<Clinic> page = clinicRepository.findAll(exp,PaginationUtil.generatePageRequest(offset, limit, sortOrder));
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/clinics", offset, limit);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

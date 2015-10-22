@@ -608,8 +608,11 @@ public class UserResource {
     		date = LocalDate.fromDateFields(new Date(timestamp));
     	}
     	PatientCompliance compliance = complianceRepository.findByPatientUserIdAndDate(id, date);
-    	if(Objects.nonNull(compliance))
-    		return new ResponseEntity<>(compliance,HttpStatus.OK);
+    	if(Objects.nonNull(compliance)){
+    		if(Objects.isNull(compliance.getHmrRunRate()))
+    			compliance.setHmrRunRate(0);
+       		return new ResponseEntity<>(compliance,HttpStatus.OK);
+    	}
     	else
     		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

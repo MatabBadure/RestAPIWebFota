@@ -307,7 +307,9 @@ public class ClinicResource {
     		@RequestParam(value = "filter", required = false) String filter ) {
         log.debug("REST request to get patients not associated with Clinic : {}", searchString);
         JSONObject jsonObject = new JSONObject();
-        String queryString = new StringBuilder().append("'%").append(searchString).append("%'").toString();
+        String queryString =Objects.isNull(searchString)?
+        		new StringBuilder().append("'%").append("%'").toString()
+        		: new StringBuilder().append("'%").append(searchString).append("%'").toString();
         try {
             List<PatientUserVO> patientUserList = clinicService.getNotAssociatedPatientUsers(clinicId, queryString, filter);
 	        if(patientUserList.isEmpty()){

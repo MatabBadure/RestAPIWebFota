@@ -311,12 +311,15 @@ public class ClinicResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     public ResponseEntity<JSONObject> getNotAssociatedPatientUsers(@PathVariable String clinicId,
-    		@RequestParam(value = "searchString",required = false) String searchString) {
+    		@RequestParam(value = "searchString", required = false) String searchString,
+    		@RequestParam(value = "filter", required = false) String filter ) {
         log.debug("REST request to get patients not associated with Clinic : {}", searchString);
         JSONObject jsonObject = new JSONObject();
-        String queryString = new StringBuilder().append("'%").append(searchString).append("%'").toString();
+        String queryString =Objects.isNull(searchString)?
+        		new StringBuilder().append("'%").append("%'").toString()
+        		: new StringBuilder().append("'%").append(searchString).append("%'").toString();
         try {
-            List<PatientUserVO> patientUserList = clinicService.getNotAssociatedPatientUsers(clinicId, queryString);
+            List<PatientUserVO> patientUserList = clinicService.getNotAssociatedPatientUsers(clinicId, queryString, filter);
 	        if(patientUserList.isEmpty()){
 				jsonObject.put("message", MessageConstants.HR_302);
 				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);

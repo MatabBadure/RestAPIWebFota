@@ -265,8 +265,7 @@ public class PatientHCPService {
 			List<Map<String, Object>> patientUsers) {
 		List<Long> patientUserIds = new LinkedList<>();
 		patientUsers.forEach(patientUser -> {
-			UserExtension patient = (UserExtension)patientUser.get("patient");
-			if(patient.getActivated() && !patient.isDeleted()){
+			if((Boolean)patientUser.get("status")){
 				patientUserIds.add(((UserExtension)patientUser.get("patient")).getId());
 			}
 		});

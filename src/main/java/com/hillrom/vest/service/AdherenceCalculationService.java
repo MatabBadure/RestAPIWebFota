@@ -281,7 +281,7 @@ public class AdherenceCalculationService {
 	/**
 	 * Runs every midnight deducts the compliance score by 2 assuming therapy hasn't been done for today
 	 */
-	@Scheduled(cron="0 0 0 * * * ")
+	@Scheduled(cron="0 0/1 * * * * ")
 	public void processMissedTherapySessions(){
 		try{
 			List<PatientCompliance> patientComplianceList = patientComplianceRepository.findAllGroupByPatientUserIdOrderByDateDesc();
@@ -337,7 +337,7 @@ public class AdherenceCalculationService {
 		Map<Long,Integer> patientUserHMRRunrateMap = new HashMap<>();
 		List<TherapySession> therapySessions = therapySessionRepository.findByDateBetweenAndPatientUserIdIn(from, to, patientUserIds);
 		Map<User,List<TherapySession>> therapySessionsPerPatient = therapySessions.stream().collect(Collectors.groupingBy(TherapySession::getPatientUser));
-		int days = getDaysCountBetweenLocalDates(from, to);
+		int days = getDaysCountBetweenLocalDates(from, to)+1;// +1 is due to dates are inclusive ex: 24-october-15 to 26-october-15
 		for(User patientUser : therapySessionsPerPatient.keySet()){
 			List<TherapySession> sessions = therapySessionsPerPatient.get(patientUser);
 			patientUserHMRRunrateMap.put(patientUser.getId(), calculateHMRRunRatePerDays(sessions,days));

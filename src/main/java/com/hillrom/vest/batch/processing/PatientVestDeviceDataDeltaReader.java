@@ -145,7 +145,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 
 		for (PatientVestDeviceDataVO dataVO : deviceDataDelta) {
 			patientVestDeviceData = new PatientVestDeviceData();
-
+			patientVestDeviceData.setSerialNumber(dataVO.getSerialNumber());
 			patientVestDeviceData.setBluetoothId(dataVO.getBluetoothId());
 			patientVestDeviceData.setChecksum(dataVO.getChecksum());
 			patientVestDeviceData.setDuration(dataVO.getDuration());

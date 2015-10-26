@@ -834,4 +834,18 @@ public class UserExtensionResource {
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
+    
+    /**
+     * GET  /user -> get all the users.
+     */
+    @RequestMapping(value = "/pradeep",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    public void getAllTest(@RequestParam(value = "page" , required = false) Integer offset,
+                                  @RequestParam(value = "per_page", required = false) Integer limit)
+        throws URISyntaxException {
+    	List<String> tupleList = userSearchRepository.getAllTest(PaginationUtil.generatePageRequest(offset, limit));
+        
+    }
 }

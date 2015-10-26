@@ -20,7 +20,7 @@ mail:
     password:
     protocol: smtp
     tls: true
-    auth:
+    auth: true
     from: VisiView@hill-rom.com
     to: leah.noaeill1@hill-rom.com,vinay.joshi@hill-rom.com,brett.quada@hill-rom.com,VisiView@hill-rom.com
 

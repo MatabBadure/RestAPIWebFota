@@ -281,7 +281,7 @@ public class AdherenceCalculationService {
 	/**
 	 * Runs every midnight deducts the compliance score by 2 assuming therapy hasn't been done for today
 	 */
-	@Scheduled(cron="0 0/1 * * * * ")
+	@Scheduled(cron="0 0 0 * * * ")
 	public void processMissedTherapySessions(){
 		try{
 			List<PatientCompliance> patientComplianceList = patientComplianceRepository.findAllGroupByPatientUserIdOrderByDateDesc();

@@ -19,10 +19,10 @@ mail:
     username:
     password:
     protocol: smtp
-    tls: true
-    auth: true
-    from: VisiView@hill-rom.com
-    to: leah.noaeill1@hill-rom.com,vinay.joshi@hill-rom.com,brett.quada@hill-rom.com,VisiView@hill-rom.com
+    tls: false
+    auth: false
+    from: visiview@hill-rom.com
+    to: ganesh@neevtech.com,leah.noaeill1@hill-rom.com,vinay.joshi@hill-rom.com,brett.quada@hill-rom.com,visiview@hill-rom.com
 
 authentication:
     xauth:

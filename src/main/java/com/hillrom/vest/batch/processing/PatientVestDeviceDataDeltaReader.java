@@ -176,7 +176,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 		});
 	}
 
-	private UserPatientAssoc createPatientUserIfNotExists(PatientVestDeviceRawLog deviceRawLog,
+	private synchronized UserPatientAssoc createPatientUserIfNotExists(PatientVestDeviceRawLog deviceRawLog,
 			String deviceSerialNumber) {
 		Optional<PatientInfo> patientFromDB = patientInfoRepository.findOneBySerialNumber(deviceSerialNumber);
 

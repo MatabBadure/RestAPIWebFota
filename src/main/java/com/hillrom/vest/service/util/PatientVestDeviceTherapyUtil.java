@@ -37,6 +37,10 @@ public class PatientVestDeviceTherapyUtil {
 	private static final String EVENT_CODE_PROGRAM_START = "7";
 	private static final String EVENT_CODE_NORMAL_START = "1";
 	private static final String EVENT_CODE_PROGRAM_COMPLETED = "16";
+	private static final String EVENT_CODE_RAMPING_PAUSED = "21";
+	private static final String EVENT_CODE_RAMP_REACHED_PAUSED = "24";
+	private static final String EVENT_CODE_PROGRAM_PAUSED = "18";
+	private static final String EVENT_NORMAL_PAUSED = "5";
 
 	private PatientVestDeviceTherapyUtil(){
 		
@@ -57,7 +61,15 @@ public class PatientVestDeviceTherapyUtil {
 			frequency += calculateWeightedAvg( totalDuration,deviceEventRecord.getFrequency().longValue(),deviceEventRecord.getDuration());
 			pressure += calculateWeightedAvg(totalDuration,deviceEventRecord.getPressure().longValue(),deviceEventRecord.getDuration());
 			duration += deviceEventRecord.getDuration();
-			if(deviceEventRecord.getEventId().startsWith(EVENT_CODE_COUGH_PAUSE)){
+			if(deviceEventRecord.getEventId().startsWith(EVENT_CODE_COUGH_PAUSE) ||
+					deviceEventRecord.getEventId().startsWith(EVENT_CODE_PROGRAM_PAUSED) ||
+					deviceEventRecord.getEventId().startsWith(EVENT_CODE_RAMPING_PAUSED) ||
+					deviceEventRecord.getEventId().startsWith(EVENT_CODE_RAMP_REACHED_PAUSED) 
+					){
+				++programmedCoughPauses;
+				caughPauseDuration += deviceEventRecord.getDuration();
+			}else if(deviceEventRecord.getEventId().startsWith(EVENT_NORMAL_PAUSED)){
+				++normalCoughPauses;
 				caughPauseDuration += deviceEventRecord.getDuration();
 			}
 		}
@@ -95,6 +107,7 @@ public class PatientVestDeviceTherapyUtil {
 							){
 						TherapySession therapySession = assignTherapyMatrics(groupEntries);
 						therapySessions.add(therapySession);
+						i=j;
 						break;
 					}
 				}

@@ -663,16 +663,26 @@ public class AdherenceCalculationService {
 			}
 
  		}
-		// Save or update all compliance
-		for(LocalDate date: existingComplianceMap.keySet()){
-			complianceService.createOrUpdate(existingComplianceMap.get(date));
-		}
+		saveOrUpdateComplianceMap(existingComplianceMap);
+		saveOrUpdateTherapySessions(receivedTherapySessionsMap);
+	}
+
+	private synchronized void saveOrUpdateTherapySessions(
+			SortedMap<LocalDate, List<TherapySession>> receivedTherapySessionsMap) {
 		List<TherapySession> newTherapySessions = new LinkedList<>();
 		for(LocalDate date : receivedTherapySessionsMap.keySet()){
 			List<TherapySession> sessionsTobeSaved = receivedTherapySessionsMap.get(date);
 			newTherapySessions.addAll(sessionsTobeSaved);
 		}
 		therapySessionRepository.save(newTherapySessions);
+	}
+
+	private synchronized void saveOrUpdateComplianceMap(
+			SortedMap<LocalDate, PatientCompliance> existingComplianceMap) {
+		// Save or update all compliance
+		for(LocalDate date: existingComplianceMap.keySet()){
+			complianceService.createOrUpdate(existingComplianceMap.get(date));
+		}
 	}
 
 	private void handleFirstTimeTransmit(

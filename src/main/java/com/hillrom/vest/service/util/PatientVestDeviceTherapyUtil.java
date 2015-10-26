@@ -107,6 +107,7 @@ public class PatientVestDeviceTherapyUtil {
 							){
 						TherapySession therapySession = assignTherapyMatrics(groupEntries);
 						therapySessions.add(therapySession);
+						i=j;
 						break;
 					}
 				}

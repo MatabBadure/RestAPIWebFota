@@ -32,6 +32,7 @@ import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.repository.AuthorityRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
+import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
 import com.hillrom.vest.repository.TempPatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.TempRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
@@ -80,6 +81,9 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 
 	@Inject
 	private PatientComplianceService complianceService;
+	
+	@Inject
+	private PatientVestDeviceRawLogRepository deviceRawLogRepository;
 
 	String patientDeviceRawData;
 
@@ -95,6 +99,8 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 		List<TempPatientVestDeviceData> tempPatientVestDeviceRecords = null;
 		deviceRawLog = deviceLogParser.parseBase64StringToPatientVestDeviceRawLog(patientDeviceRawData);
 
+		deviceRawLogRepository.save(deviceRawLog);
+		
 		tempPatientVestDeviceRecords = deviceLogParser
 				.parseBase64StringToPatientVestDeviceLogEntryForTemp(deviceRawLog.getDeviceData());
 

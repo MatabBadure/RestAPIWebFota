@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @IdClass(PatientVestDeviceDataPK.class)
 @Entity
 @Table(name = "PATIENT_VEST_DEVICE_DATA")
-public class PatientVestDeviceData implements Serializable {
+public class PatientVestDeviceData implements Serializable,Comparable<PatientVestDeviceData> {
 
 	private static final long serialVersionUID = 1L;
 	@Id
@@ -185,5 +185,10 @@ public class PatientVestDeviceData implements Serializable {
 	@JsonIgnore
 	public double getHmrInMinutes(){
 		return this.hmr/60;
+	}
+
+	@Override
+	public int compareTo(PatientVestDeviceData o) {
+		return this.getTimestamp().compareTo(o.getTimestamp());
 	}
 }

@@ -2,6 +2,7 @@ package com.hillrom.vest.service;
 
 import static com.hillrom.vest.config.AdherenceScoreConstants.BONUS_POINTS;
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
+import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_MISSED_THERAPY_DAYS_COUNT;
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_SETTINGS_DEVIATION_COUNT;
 import static com.hillrom.vest.config.AdherenceScoreConstants.HMR_NON_COMPLIANCE_POINTS;
 import static com.hillrom.vest.config.AdherenceScoreConstants.MISSED_THERAPY_POINTS;
@@ -15,12 +16,14 @@ import static com.hillrom.vest.service.util.DateUtil.getPlusOrMinusTodayLocalDat
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateCumulativeDuration;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateHMRRunRatePerDays;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
-import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_MISSED_THERAPY_DAYS_COUNT;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigInteger;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -337,7 +340,7 @@ public class AdherenceCalculationService {
 		Map<Long,Integer> patientUserHMRRunrateMap = new HashMap<>();
 		List<TherapySession> therapySessions = therapySessionRepository.findByDateBetweenAndPatientUserIdIn(from, to, patientUserIds);
 		Map<User,List<TherapySession>> therapySessionsPerPatient = therapySessions.stream().collect(Collectors.groupingBy(TherapySession::getPatientUser));
-		int days = getDaysCountBetweenLocalDates(from, to);
+		int days = getDaysCountBetweenLocalDates(from, to)+1;// +1 is due to dates are inclusive ex: 24-october-15 to 26-october-15
 		for(User patientUser : therapySessionsPerPatient.keySet()){
 			List<TherapySession> sessions = therapySessionsPerPatient.get(patientUser);
 			patientUserHMRRunrateMap.put(patientUser.getId(), calculateHMRRunRatePerDays(sessions,days));
@@ -669,20 +672,78 @@ public class AdherenceCalculationService {
 
 	private synchronized void saveOrUpdateTherapySessions(
 			SortedMap<LocalDate, List<TherapySession>> receivedTherapySessionsMap) {
+		Map<LocalDate, List<TherapySession>> allTherapySessionMap = eleminateDuplicateTherapySessions(receivedTherapySessionsMap);
+		
 		List<TherapySession> newTherapySessions = new LinkedList<>();
-		for(LocalDate date : receivedTherapySessionsMap.keySet()){
-			List<TherapySession> sessionsTobeSaved = receivedTherapySessionsMap.get(date);
+		for(LocalDate date : allTherapySessionMap.keySet()){
+			List<TherapySession> sessionsTobeSaved = allTherapySessionMap.get(date);
 			newTherapySessions.addAll(sessionsTobeSaved);
 		}
 		therapySessionRepository.save(newTherapySessions);
 	}
 
+	private Map<LocalDate, List<TherapySession>> eleminateDuplicateTherapySessions(
+			SortedMap<LocalDate, List<TherapySession>> receivedTherapySessionsMap) {
+		List<List<TherapySession>> therapySessionsList = new LinkedList<>(receivedTherapySessionsMap.values());
+		Long patientUserId = therapySessionsList.get(0).get(0).getPatientUser().getId();
+		LocalDate from = receivedTherapySessionsMap.firstKey();
+		LocalDate to = receivedTherapySessionsMap.lastKey();
+		List<TherapySession> existingTherapySessions = therapySessionRepository.findByPatientUserIdAndDateRange(patientUserId, from, to);
+		Map<LocalDate,List<TherapySession>> existingTherapySessionMap = existingTherapySessions.stream().collect(Collectors.groupingBy(TherapySession::getDate));
+		Map<LocalDate,List<TherapySession>> allTherapySessionMap = new HashMap<>();
+		if(existingTherapySessionMap.size() > 0){
+			for(LocalDate date : receivedTherapySessionsMap.keySet()){
+				List<TherapySession> therapySessionsPerDate = existingTherapySessionMap.get(date);
+				if(Objects.nonNull(receivedTherapySessionsMap.get(date))){
+					List<TherapySession> receivedTherapySessions = receivedTherapySessionsMap.get(date);
+					for(TherapySession existingSession : therapySessionsPerDate){
+						Iterator<TherapySession> itr = receivedTherapySessions.iterator();
+						while(itr.hasNext()){
+							TherapySession receivedSession = itr.next();
+							if(existingSession.getDate().equals(receivedSession.getDate()) &&
+									existingSession.getStartTime().equals(receivedSession.getStartTime()) &&
+									existingSession.getEndTime().equals(receivedSession.getEndTime()) &&
+									existingSession.getFrequency().equals(receivedSession.getFrequency()) && 
+									existingSession.getPressure().equals(receivedSession.getPressure()) &&
+									existingSession.getDurationInMinutes().equals(receivedSession.getDurationInMinutes()) && 
+									existingSession.getHmr().equals(receivedSession.getHmr())){
+								itr.remove();
+							}
+						}
+					}
+					therapySessionsPerDate.addAll(receivedTherapySessionsMap.get(date));
+					Collections.sort(therapySessionsPerDate);
+				}
+				int sessionNo = 0;
+				for(TherapySession session : therapySessionsPerDate){
+					session.setSessionNo(++sessionNo);
+				}
+				allTherapySessionMap.put(date, therapySessionsPerDate);
+			}
+		}else{
+			for(LocalDate date : receivedTherapySessionsMap.keySet()){
+				allTherapySessionMap.put(date, receivedTherapySessionsMap.get(date));
+			}
+		}
+		return allTherapySessionMap;
+	}
+
 	private synchronized void saveOrUpdateComplianceMap(
 			SortedMap<LocalDate, PatientCompliance> existingComplianceMap) {
 		// Save or update all compliance
+		List<PatientCompliance> compliances = new LinkedList<>(existingComplianceMap.values());
+		Long patientUserId = compliances.get(0).getPatientUser().getId();
+		SortedMap<LocalDate, PatientCompliance>  complainceMapFromDB = complianceService.getPatientComplainceMapByPatientUserId(patientUserId);
 		for(LocalDate date: existingComplianceMap.keySet()){
-			complianceService.createOrUpdate(existingComplianceMap.get(date));
+			//	complianceService.createOrUpdate(existingComplianceMap.get(date));
+			PatientCompliance existingCompliance = complainceMapFromDB.get(date);
+			PatientCompliance newCompliance = existingComplianceMap.get(date);
+			if(Objects.nonNull(existingCompliance)){
+				newCompliance.setId(existingCompliance.getId());
+				existingComplianceMap.put(date,newCompliance);
+			}	
 		}
+		complianceService.saveAll(existingComplianceMap.values());
 	}
 
 	private void handleFirstTimeTransmit(

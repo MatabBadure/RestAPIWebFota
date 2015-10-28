@@ -21,7 +21,7 @@ import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 
 @Entity
 @Table(name="PATIENT_VEST_THERAPY_DATA")
-public class TherapySession {
+public class TherapySession implements Comparable<TherapySession>{
 	
 	@JsonIgnore
 	@Id
@@ -204,7 +204,7 @@ public class TherapySession {
 				+ ", sessionNo=" + sessionNo + ", sessionType=" + sessionType
 				+ ", startTime=" + startTime + ", endTime=" + endTime
 				+ ", frequency=" + frequency + ", pressure=" + pressure
-				+ ", durationInSeconds=" + durationInMinutes
+				+ ", durationInMinutes=" + durationInMinutes
 				+ ", programmedCaughPauses=" + programmedCaughPauses
 				+ ", normalCaughPauses=" + normalCaughPauses
 				+ ", caughPauseDuration=" + caughPauseDuration 
@@ -240,4 +240,10 @@ public class TherapySession {
 	public Long getTherapySessionByPatientUserId() {
 		return patientUser.getId();
 	}
+
+	@Override
+	public int compareTo(TherapySession o) {
+		return this.endTime.compareTo(o.getEndTime());
+	}
+
 }

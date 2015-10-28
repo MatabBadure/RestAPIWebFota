@@ -727,6 +727,9 @@ public class UserService {
 			newUser.setSpeciality(userExtensionDTO.getSpeciality());
 		if(Objects.nonNull(userExtensionDTO.getCredentials()))
 			newUser.setCredentials(userExtensionDTO.getCredentials());
+		else
+			newUser.setCredentials(null);
+		
 		if(Objects.nonNull(userExtensionDTO.getAddress()))
 			newUser.setAddress(userExtensionDTO.getAddress());
 		if(Objects.nonNull(userExtensionDTO.getZipcode()))
@@ -735,6 +738,9 @@ public class UserService {
 			newUser.setCity(userExtensionDTO.getCity());
 		if(Objects.nonNull(userExtensionDTO.getState()))
 			newUser.setState(userExtensionDTO.getState());
+		else 
+			newUser.setState(null);
+		
 		if(Objects.nonNull(userExtensionDTO.getPrimaryPhone()))
 			newUser.setPrimaryPhone(userExtensionDTO.getPrimaryPhone());
 		if(Objects.nonNull(userExtensionDTO.getMobilePhone())){

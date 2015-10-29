@@ -294,7 +294,7 @@ public class UserService {
     }
 
     public String updatePassword(Long id, Map<String, String> passwordList) throws HillromException {
-    	Optional<User> user = userRepository.findOneByEmail(SecurityUtils.getCurrentLogin());
+    	Optional<User> user = userRepository.findOneByEmailOrHillromId(SecurityUtils.getCurrentLogin());
     	if(user.isPresent()){
 			String encryptedNewPassword = passwordEncoder.encode(passwordList.get("newPassword"));
 			if(passwordEncoder.matches(passwordList.get("password"), user.get().getPassword())) {
@@ -727,6 +727,9 @@ public class UserService {
 			newUser.setSpeciality(userExtensionDTO.getSpeciality());
 		if(Objects.nonNull(userExtensionDTO.getCredentials()))
 			newUser.setCredentials(userExtensionDTO.getCredentials());
+		else
+			newUser.setCredentials(null);
+		
 		if(Objects.nonNull(userExtensionDTO.getAddress()))
 			newUser.setAddress(userExtensionDTO.getAddress());
 		if(Objects.nonNull(userExtensionDTO.getZipcode()))
@@ -735,6 +738,9 @@ public class UserService {
 			newUser.setCity(userExtensionDTO.getCity());
 		if(Objects.nonNull(userExtensionDTO.getState()))
 			newUser.setState(userExtensionDTO.getState());
+		else 
+			newUser.setState(null);
+		
 		if(Objects.nonNull(userExtensionDTO.getPrimaryPhone()))
 			newUser.setPrimaryPhone(userExtensionDTO.getPrimaryPhone());
 		if(Objects.nonNull(userExtensionDTO.getMobilePhone())){
@@ -1267,7 +1273,8 @@ public class UserService {
 		User existingUser = userRepository.findOne(id);
 		JSONObject jsonObject = new JSONObject();
 		if(Objects.nonNull(existingUser)){
-			if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())){
+			if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail()) ||
+					SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getHillromId())){
 				jsonObject = RequestUtil.checkRequiredParams(params, new String[]{"questionId","answer"});
 				if(jsonObject.containsKey("ERROR")){
 					return jsonObject;

@@ -1,4 +1,4 @@
-DROP PROCEDURE IF EXISTS  `manage_patient_user`;
+DROP PROCEDURE IF EXISTS `manage_patient_user`;
 DELIMITER $$
 CREATE PROCEDURE `manage_patient_user`(
 	IN operation_type_indicator VARCHAR(10),
@@ -53,25 +53,26 @@ BEGIN
 		START TRANSACTION;
         -- Get Hillrom ID
 		call get_next_patient_hillromid(@gen_patient_id);
-		
+		SET created_date = now();
+        
 		INSERT INTO `PATIENT_INFO` (`id`, `hillrom_id`, `hub_id`, `serial_number`, `bluetooth_id`, `title`, `first_name`, `middle_name`,
-		`last_name`, `dob`, `email`, `zipcode`, `web_login_created`, `primary_phone`, `mobile_phone`, `gender`, `lang_key`, `expired`, `expired_date`, `address`, `city`, `state`)
+		`last_name`, `dob`, `email`, `zipcode`, `web_login_created`, `primary_phone`, `mobile_phone`, `gender`, `lang_key`, `expired`, 
+        `expired_date`, `address`, `city`, `state`, `device_assoc_date`)
 		VALUES
 		(@gen_patient_id, hr_id, pat_hub_id, pat_device_serial_number, pat_bluetooth_id, pat_title, pat_first_name, pat_middle_name,
-			pat_last_name, pat_dob, pat_email, pat_zipcode,0, pat_primary_phone, pat_mobile_phone, pat_gender, pat_lang_key, 0, NULL, pat_address, pat_city, pat_state);
+			pat_last_name, pat_dob, pat_email, pat_zipcode,0, pat_primary_phone, pat_mobile_phone, pat_gender, pat_lang_key, 0, NULL,
+			pat_address, pat_city, pat_state, created_date);
 		
-        SET created_date = now();
-        
 		INSERT INTO `USER`(
 		`email`, `PASSWORD`, `title`, `first_name`, `middle_name`, `last_name`, `activated`, `lang_key`, `activation_key`, `reset_key`, 
 		`created_by`, `created_date`, `reset_date`, `last_loggedin_at`, `last_modified_by`, 
 		`last_modified_date`, `is_deleted`, `gender`, `zipcode`, `terms_condition_accepted`,
-		`terms_condition_accepted_date`, `dob`, `hillrom_id`,`hmr_notification`,`accept_hmr_notification`,`accept_hmr_setting`)
+		`terms_condition_accepted_date`, `dob`, `hillrom_id`,`activation_link_sent_date`)
 		VALUES(
 		pat_email, encrypted_password, pat_title, pat_first_name, pat_middle_name, pat_last_name, 0, pat_lang_key,NULL, NULL,
 		created_by, created_date, NULL, NULL, created_by, 
 		created_date, 0, pat_gender, pat_zipcode,0,
-		NULL, pat_dob, hr_id,0,0,0);
+		NULL, pat_dob, hr_id, NULL);
 		 
 		SELECT id INTO return_user_id FROM `USER` WHERE email = pat_email;
 		
@@ -83,9 +84,19 @@ BEGIN
         
         INSERT INTO `USER_AUTHORITY` (`user_id`,  `authority_name`)
 		VALUES(return_user_id,'PATIENT');
-	
-		COMMIT;
+
 		SET return_patient_id = @gen_patient_id;
+        INSERT INTO `PATIENT_COMPLIANCE` (`patient_id`, `user_id`, `date`, `compliance_score`, `hmr_run_rate`, `hmr`,
+		`is_hmr_compliant`, `is_settings_deviated`, `missed_therapy_count`,
+		`last_therapy_session_date`, `settings_deviated_days_count`)
+		VALUES
+		(@gen_patient_id,return_user_id,now(),100,0,0,true,false,0,null,0);
+        
+        INSERT INTO `PATIENT_NO_EVENT` (`first_transmission_date`, `user_created_date`, `patient_id`, `user_id`)
+		VALUES
+		(null, curdate(),@gen_patient_id,return_user_id);
+        
+		COMMIT;
 	-- Update Patient user
     
 	ELSEIF operation_type_indicator = 'UPDATE' THEN 

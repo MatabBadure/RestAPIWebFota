@@ -612,7 +612,7 @@ public class AdherenceCalculationService {
 		if(existingTherapySessionMap.size() > 0){
 			for(LocalDate date : receivedTherapySessionsMap.keySet()){
 				List<TherapySession> therapySessionsPerDate = existingTherapySessionMap.get(date);
-				if(Objects.nonNull(receivedTherapySessionsMap.get(date))){
+				if(Objects.nonNull(therapySessionsPerDate)){
 					List<TherapySession> receivedTherapySessions = receivedTherapySessionsMap.get(date);
 					for(TherapySession existingSession : therapySessionsPerDate){
 						Iterator<TherapySession> itr = receivedTherapySessions.iterator();
@@ -631,12 +631,12 @@ public class AdherenceCalculationService {
 					}
 					therapySessionsPerDate.addAll(receivedTherapySessionsMap.get(date));
 					Collections.sort(therapySessionsPerDate);
+					int sessionNo = 0;
+					for(TherapySession session : therapySessionsPerDate){
+						session.setSessionNo(++sessionNo);
+					}
+					allTherapySessionMap.put(date, therapySessionsPerDate);
 				}
-				int sessionNo = 0;
-				for(TherapySession session : therapySessionsPerDate){
-					session.setSessionNo(++sessionNo);
-				}
-				allTherapySessionMap.put(date, therapySessionsPerDate);
 			}
 		}else{
 			for(LocalDate date : receivedTherapySessionsMap.keySet()){

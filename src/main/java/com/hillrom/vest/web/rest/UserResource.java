@@ -609,8 +609,12 @@ public class UserResource {
     	}
     	PatientCompliance compliance = complianceRepository.findByPatientUserIdAndDate(id, date);
     	if(Objects.nonNull(compliance)){
-    		if(Objects.isNull(compliance.getHmrRunRate()))
+    		if(Objects.isNull(compliance.getHmrRunRate())){
     			compliance.setHmrRunRate(0);
+    		}
+    		// Missed Therapy count badge should show only >= 3
+			/*if(compliance.getMissedTherapyCount() < 3)
+				compliance.setMissedTherapyCount(0);*/
        		return new ResponseEntity<>(compliance,HttpStatus.OK);
     	}
     	else

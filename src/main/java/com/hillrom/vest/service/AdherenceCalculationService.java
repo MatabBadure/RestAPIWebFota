@@ -133,88 +133,6 @@ public class AdherenceCalculationService {
 	}
 
 	/**
-	 * Calculate Compliance per day (Get latest 3 days therapy Sessions and calculate WeightedAvg and add/substract points)
-	 * @param therapySessionsPerDay
-	 * @param protocolConstant
-	 * @return
-	 */
-	// TODO : to be re-factored, will be taken care while integrating the Protocol changes
-	public PatientCompliance calculateCompliancePerDay(
-			List<TherapySession> therapySessionsPerDay,ProtocolConstants protocolConstant) {
-		User patientUser = therapySessionsPerDay.get(0).getPatientUser();
-		PatientInfo patient = therapySessionsPerDay.get(0).getPatientInfo();
-		Long patientUserId = patientUser.getId();
-		LocalDate currentTherapyDate = therapySessionsPerDay.get(0).getDate();
-		LocalDate threeDaysAgo = currentTherapyDate.minusDays(3);
-		List<TherapySession> latest3TherapySessions = therapySessionRepository.findByPatientUserIdAndDateRange(patientUserId, threeDaysAgo,currentTherapyDate);
-		PatientCompliance latestCompliance = patientComplianceRepository.findTop1ByPatientUserIdOrderByDateDesc(patientUserId);
-		int currentScore = Objects.nonNull(latestCompliance) ? latestCompliance.getScore() : DEFAULT_COMPLIANCE_SCORE;
-		int previousScore = currentScore;
-		String notificationType = "";
-		Map<String,Double> actualMetrics = calculateTherapyMetricsPer3Days(latest3TherapySessions);
-		double latestHmr = therapySessionsPerDay.get(therapySessionsPerDay.size()-1).getHmr();
-		// First Time received Data,hence compliance will be 100.
-		if(latest3TherapySessions.isEmpty() || Objects.isNull(latestCompliance)){
-			noEventService.updatePatientFirstTransmittedDate(patientUserId,currentTherapyDate);
-			return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,
-					actualMetrics.get(TOTAL_DURATION).intValue(),true,false,latestHmr);
-		}else{ 
-			// Default 2 points get deducted by assuming data not received for the day, hence add 2 points
-			currentScore = currentScore ==  DEFAULT_COMPLIANCE_SCORE ?  DEFAULT_COMPLIANCE_SCORE : currentScore + 2;
-			TherapySession firstTherapySessionToPatient = therapySessionRepository.findTop1ByPatientUserIdOrderByDateAsc(patientUserId);
-			// First 3 days No Notifications, hence compliance doesn't change
-			if(threeDaysAgo.isBefore(firstTherapySessionToPatient.getDate())){
-				if(latestCompliance.getDate().isBefore(currentTherapyDate)){
-					return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,
-							actualMetrics.get(TOTAL_DURATION).intValue(),true,false,latestHmr);
-				}
-				latestCompliance.setScore(currentScore);
-				return latestCompliance;
-			}
-		
-			boolean isHMRCompliant = isHMRCompliant(protocolConstant, actualMetrics);
-
-			boolean isSettingsDeviated = isSettingsDeviated(protocolConstant, actualMetrics.get(WEIGHTED_AVG_FREQUENCY));
-			
-			if(isSettingsDeviated(protocolConstant, actualMetrics.get(WEIGHTED_AVG_FREQUENCY))){
-				currentScore -=  SETTING_DEVIATION_POINTS;
-				notificationType =  SETTINGS_DEVIATION;				
-			}				
-
-			if(!isHMRCompliant){
-				currentScore -=  HMR_NON_COMPLIANCE_POINTS;
-				if(StringUtils.isBlank(notificationType))
-					notificationType =  HMR_NON_COMPLIANCE;
-				else
-					notificationType =  HMR_AND_SETTINGS_DEVIATION;
-			}
-			
-			if(previousScore < currentScore){
-				notificationService.deleteNotification(patientUserId,currentTherapyDate);
-				currentScore = currentScore !=  DEFAULT_COMPLIANCE_SCORE ? currentScore + 1 : DEFAULT_COMPLIANCE_SCORE;
-			}
-			
-			// Point has been deducted due to Protocol violation
-			if(previousScore > currentScore){
-				notificationService.createOrUpdateNotification(patientUser, patient, patientUserId,
-						currentTherapyDate, notificationType,false);
-			}
-
-			// Compliance Score is non-negative
-			currentScore = currentScore > 0? currentScore : 0; 
-			if(latestCompliance.getDate().isBefore(currentTherapyDate)){
-				return new PatientCompliance(currentScore, currentTherapyDate, patient, patientUser,
-						actualMetrics.get(TOTAL_DURATION).intValue(),isHMRCompliant,isSettingsDeviated,latestHmr);
-			}
-			
-			latestCompliance.setScore(currentScore);
-			latestCompliance.setHmrRunRate(actualMetrics.get(TOTAL_DURATION).intValue());
-			return latestCompliance;
-		}
-	}
-
-
-	/**
 	 * Checks whether HMR Compliance violated(minHMRReading < actual < maxHMRReading)
 	 * @param protocolConstant
 	 * @param actualMetrics
@@ -818,6 +736,11 @@ public class AdherenceCalculationService {
 					compliance = new PatientCompliance(DEFAULT_COMPLIANCE_SCORE, therapyDate,
 							patient, patientUser,hmrRunrate,true,false,missedTherapyCount,lastTransmissionDate,hmr);
 				}
+				if(daysBetween == 1){ // second day of the transmission
+					missedTherapyCount = DateUtil.getDaysCountBetweenLocalDates(lastTransmissionDate, therapyDate);
+					compliance.setMissedTherapyCount(missedTherapyCount);
+					compliance.setLatestTherapyDate(lastTransmissionDate);
+				}
 				existingComplianceMap.put(therapyDate, compliance);
 			}else{
 				missedTherapyCount = DateUtil.getDaysCountBetweenLocalDates(lastTransmissionDate, therapyDate);
@@ -962,6 +885,10 @@ public class AdherenceCalculationService {
 					latestCompliance.setHmrCompliant(isHMRCompliant);
 					// currentScore +=  HMR_NON_COMPLIANCE_POINTS;
 				}
+				// Delete existing notification if adherence to protocol
+				notificationService.deleteNotificationIfExists(patientUserId,
+						latestCompliance.getDate(), currentMissedTherapyCount,
+						isHMRCompliant, isSettingsDeviated);
 			}else{
 				latestCompliance.setHmrCompliant(currentMissedTherapyCount <= 2);
 				latestCompliance.setSettingsDeviated(false);
@@ -976,7 +903,6 @@ public class AdherenceCalculationService {
 				currentMissedTherapyCount == 0 &&
 				isHMRCompliant(protocolConstant, metricsMap)
 				&& !isSettingsDeviated(protocolConstant, metricsMap.get(WEIGHTED_AVG_FREQUENCY))){
-			notificationService.deleteNotification(patientUserId,latestCompliance.getDate());
 			currentScore = currentScore <=  DEFAULT_COMPLIANCE_SCORE - BONUS_POINTS ? currentScore + BONUS_POINTS : DEFAULT_COMPLIANCE_SCORE;
 		}
 		

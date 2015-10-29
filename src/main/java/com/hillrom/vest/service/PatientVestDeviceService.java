@@ -48,6 +48,9 @@ public class PatientVestDeviceService {
     public Object linkVestDeviceWithPatient(Long id, Map<String, Object> deviceData) throws HillromException {
     	User alreadyLinkedPatientuser = new User();
     	List<PatientVestDeviceHistory> assocList = patientVestDeviceRepository.findBySerialNumber(deviceData.get("serialNumber").toString());
+    	List<PatientVestDeviceHistory> assocListByBluetoothID = patientVestDeviceRepository.findByBluetoothId(deviceData.get("bluetoothId").toString());
+    	if(!assocListByBluetoothID.isEmpty())
+    		throw new HillromException(ExceptionConstants.HR_578);
     	PatientVestDeviceHistory patientVestDeviceAssoc = new PatientVestDeviceHistory();
     	if(assocList.isEmpty()) {
     		patientVestDeviceAssoc = assignDeviceToPatient(id, deviceData);

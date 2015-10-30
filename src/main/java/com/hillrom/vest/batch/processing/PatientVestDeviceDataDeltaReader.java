@@ -113,7 +113,6 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 				.parseBase64StringToPatientVestDeviceLogEntry(deviceRawLog.getDeviceData());
 
 		String deviceSerialNumber = deviceRawLog.getDeviceSerialNumber();
-		String hillromId = patientInfoRepository.id();
 		UserPatientAssoc userPatientAssoc = createPatientUserIfNotExists(deviceRawLog, deviceSerialNumber);
 		assignDefaultValuesToVestDeviceDataTemp(deviceRawLog, patientVestDeviceEvents, userPatientAssoc);
 		return patientVestDeviceEvents;

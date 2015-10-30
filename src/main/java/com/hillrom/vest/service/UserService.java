@@ -1030,14 +1030,6 @@ public class UserService {
 				caregiversToBeDeleted.add((UserExtension)caregiverAssoc.getUser());
 			}
 		});
-		PatientInfo patient = getPatientInfoObjFromPatientUser(existingUser);
-		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patient.getId());
-		if(!clinicPatientAssocList.isEmpty()){
-			for(ClinicPatientAssoc clinicPatientAssoc : clinicPatientAssocList){
-				clinicPatientAssoc.setActive(false);
-			}
-			clinicPatientRepository.save(clinicPatientAssocList);
-		}
 		userExtensionRepository.delete(caregiversToBeDeleted);
 		userPatientRepository.delete(caregiverAssocList);
 		existingUser.setDeleted(true);
@@ -1562,14 +1554,6 @@ public class UserService {
 				caregiverToBeActivated.add((UserExtension)caregiverAssoc.getUser());
 			}
 		});
-		PatientInfo patient = getPatientInfoObjFromPatientUser(existingUser);
-		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patient.getId());
-		if(!clinicPatientAssocList.isEmpty()){
-			for(ClinicPatientAssoc clinicPatientAssoc : clinicPatientAssocList){
-				clinicPatientAssoc.setActive(true);
-			}
-			clinicPatientRepository.save(clinicPatientAssocList);
-		}
 		userExtensionRepository.save(caregiverToBeActivated);
 		userPatientRepository.save(caregiverAssocList);
 		existingUser.setDeleted(false);

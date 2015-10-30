@@ -48,23 +48,32 @@ public class PatientVestDeviceService {
     public Object linkVestDeviceWithPatient(Long id, Map<String, Object> deviceData) throws HillromException {
     	User alreadyLinkedPatientuser = new User();
     	List<PatientVestDeviceHistory> assocList = patientVestDeviceRepository.findBySerialNumber(deviceData.get("serialNumber").toString());
-    	List<PatientVestDeviceHistory> assocListByBluetoothID = patientVestDeviceRepository.findByBluetoothId(deviceData.get("bluetoothId").toString());
-    	if(!assocListByBluetoothID.isEmpty())
-    		throw new HillromException(ExceptionConstants.HR_578);
+    	Optional<PatientVestDeviceHistory> assocByBluetoothID = patientVestDeviceRepository.findByBluetoothIdAndStatusActive(deviceData.get("bluetoothId").toString());
     	PatientVestDeviceHistory patientVestDeviceAssoc = new PatientVestDeviceHistory();
+    	if(assocByBluetoothID.isPresent()) {
+    		alreadyLinkedPatientuser = (User) assocByBluetoothID.get().getPatient().getUserPatientAssoc().stream().filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser();
+    		if(!alreadyLinkedPatientuser.getId().equals(id)){
+    			throw new HillromException(ExceptionConstants.HR_578 
+    					+ alreadyLinkedPatientuser.getFirstName() 
+    					+ " " + alreadyLinkedPatientuser.getLastName() 
+    					+ " with HR ID : "+ alreadyLinkedPatientuser.getHillromId());
+			}
+    	}
     	if(assocList.isEmpty()) {
     		patientVestDeviceAssoc = assignDeviceToPatient(id, deviceData);
     	} else {
-    		//List<PatientVestDeviceHistory> activeDeviceList = assocList.stream().filter(patientDevice -> patientDevice.isActive()).collect(Collectors.toList());
-    		List<PatientVestDeviceHistory> activeDeviceList = assocList.stream().collect(Collectors.toList());
+    		List<PatientVestDeviceHistory> activeDeviceList = assocList.stream().filter(patientDevice -> patientDevice.isActive()).collect(Collectors.toList());
     		if(!activeDeviceList.isEmpty()){
     			PatientVestDeviceHistory activeDevice = activeDeviceList.get(0);
     			alreadyLinkedPatientuser = (User) activeDevice.getPatient().getUserPatientAssoc().stream().filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser();
     			if(alreadyLinkedPatientuser.getId().equals(id)){
-    				//patientVestDeviceAssoc = updateDeviceDetailsForPatient(activeDevice, deviceData);
-    				return alreadyLinkedPatientuser;
+    				patientVestDeviceAssoc = updateDeviceDetailsForPatient(activeDevice, deviceData);
+    				return patientVestDeviceAssoc;
     			} else {
-    				return alreadyLinkedPatientuser;
+    				throw new HillromException(ExceptionConstants.HR_572 
+        					+ alreadyLinkedPatientuser.getFirstName() 
+        					+ " " + alreadyLinkedPatientuser.getLastName() 
+        					+ " with HR ID : "+ alreadyLinkedPatientuser.getHillromId());
     			}
     		} else {
     			patientVestDeviceAssoc = assignDeviceToPatient(id, deviceData);

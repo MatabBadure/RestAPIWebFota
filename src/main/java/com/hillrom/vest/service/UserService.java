@@ -294,7 +294,7 @@ public class UserService {
     }
 
     public String updatePassword(Long id, Map<String, String> passwordList) throws HillromException {
-    	Optional<User> user = userRepository.findOneByEmail(SecurityUtils.getCurrentLogin());
+    	Optional<User> user = userRepository.findOneByEmailOrHillromId(SecurityUtils.getCurrentLogin());
     	if(user.isPresent()){
 			String encryptedNewPassword = passwordEncoder.encode(passwordList.get("newPassword"));
 			if(passwordEncoder.matches(passwordList.get("password"), user.get().getPassword())) {
@@ -524,17 +524,36 @@ public class UserService {
         UserExtension existingUser = userExtensionRepository.findOne(id);
         String currentEmail = StringUtils.isNotBlank(existingUser.getEmail()) ? existingUser.getEmail() : null;
         String currentHillromId = StringUtils.isNotBlank(existingUser.getHillromId()) ? existingUser.getHillromId() : null;
-        if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())
-        		&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
-        	UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
-    		if(Objects.nonNull(user.getId())) {
-    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
-    				sendEmailNotification(baseUrl, user);
-    			}
-    			callEventOnUpdatingHRID(userExtensionDTO, currentHillromId, user);
-                return user;
-    		} else {
-    			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
+        if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())){
+        	if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
+        		UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
+        		if(Objects.nonNull(user.getId())) {
+        			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
+        				sendEmailNotification(baseUrl, user);
+        			}
+        			callEventOnUpdatingHRID(userExtensionDTO, currentHillromId, user);
+                    return user;
+        		} else {
+        			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
+        		}
+        	} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))
+        			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ASSOCIATES))) {
+	        	if(SecurityUtils.getCurrentLogin().equals(existingUser.getEmail())) {
+	        		UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
+	        		if(Objects.nonNull(user.getId())) {
+	        			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
+	        				sendEmailNotification(baseUrl, user);
+	        			}
+	        			callEventOnUpdatingHRID(userExtensionDTO, currentHillromId, user);
+	                    return user;
+	        		} else {
+	        			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
+	        		}
+	        	} else {
+	        		throw new HillromException(ExceptionConstants.HR_403);
+	        	}
+        	} else {
+    			throw new HillromException(ExceptionConstants.HR_555);
     		}
     	} else if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
     		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(existingUser);
@@ -727,6 +746,9 @@ public class UserService {
 			newUser.setSpeciality(userExtensionDTO.getSpeciality());
 		if(Objects.nonNull(userExtensionDTO.getCredentials()))
 			newUser.setCredentials(userExtensionDTO.getCredentials());
+		else
+			newUser.setCredentials(null);
+		
 		if(Objects.nonNull(userExtensionDTO.getAddress()))
 			newUser.setAddress(userExtensionDTO.getAddress());
 		if(Objects.nonNull(userExtensionDTO.getZipcode()))
@@ -735,6 +757,9 @@ public class UserService {
 			newUser.setCity(userExtensionDTO.getCity());
 		if(Objects.nonNull(userExtensionDTO.getState()))
 			newUser.setState(userExtensionDTO.getState());
+		else 
+			newUser.setState(null);
+		
 		if(Objects.nonNull(userExtensionDTO.getPrimaryPhone()))
 			newUser.setPrimaryPhone(userExtensionDTO.getPrimaryPhone());
 		if(Objects.nonNull(userExtensionDTO.getMobilePhone())){
@@ -1267,7 +1292,8 @@ public class UserService {
 		User existingUser = userRepository.findOne(id);
 		JSONObject jsonObject = new JSONObject();
 		if(Objects.nonNull(existingUser)){
-			if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())){
+			if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail()) ||
+					SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getHillromId())){
 				jsonObject = RequestUtil.checkRequiredParams(params, new String[]{"questionId","answer"});
 				if(jsonObject.containsKey("ERROR")){
 					return jsonObject;

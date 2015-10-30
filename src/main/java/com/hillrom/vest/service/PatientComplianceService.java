@@ -1,5 +1,6 @@
 package com.hillrom.vest.service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.SortedMap;
@@ -59,5 +60,9 @@ public class PatientComplianceService {
 			return existingCompliance.getMissedTherapyCount();
 		else
 			return 0;
+	}
+	
+	public void saveAll(Collection<PatientCompliance> complainces){
+		complianceRepository.save(complainces);
 	}
 }

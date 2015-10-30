@@ -3,6 +3,8 @@ package com.hillrom.vest.service;
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

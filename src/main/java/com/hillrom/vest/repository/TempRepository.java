@@ -38,7 +38,7 @@ public class TempRepository {
 				+" FROM    PATIENT_VEST_DEVICE_DATA_TEMP t "
 				+" WHERE   ROW(t.timestamp, t.sequence_number, t.event_id,t.patient_id,t.serial_number,"
 				+" t.bluetooth_id,t.hub_id,t.hmr,t.frequency,t.pressure,t.duration,t.checksum,t.user_id) NOT IN "
-				+" (SELECT  *  FROM    PATIENT_VEST_DEVICE_DATA ) ) as diff order by  sequence_number";
+				+" (SELECT  *  FROM    PATIENT_VEST_DEVICE_DATA ) ) as diff order by  timestamp";
 
 		Query query = entityManager.createNativeQuery(patientVestDeviceDataQuery);
 		

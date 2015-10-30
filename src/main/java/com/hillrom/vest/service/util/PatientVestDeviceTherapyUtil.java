@@ -33,14 +33,21 @@ public class PatientVestDeviceTherapyUtil {
 	private static final String NORMAL_COUGH_PAUSES = "normalCoughPauses";
 	private static final String DURATION = "duration";
 	private static final String FREQUENCY = "frequency";
-	private static final String EVENT_CODE_COMPLETED = "3";
-	private static final String EVENT_CODE_PROGRAM_START = "7";
+	private static final String EVENT_CODE_NORMAL_COMPLETED = "3";
+	private static final String EVENT_CODE_PROGRAM_PT1_START = "7";
 	private static final String EVENT_CODE_NORMAL_START = "1";
 	private static final String EVENT_CODE_PROGRAM_COMPLETED = "16";
 	private static final String EVENT_CODE_RAMPING_PAUSED = "21";
 	private static final String EVENT_CODE_RAMP_REACHED_PAUSED = "24";
 	private static final String EVENT_CODE_PROGRAM_PAUSED = "18";
-	private static final String EVENT_NORMAL_PAUSED = "5";
+	private static final String EVENT_CODE_NORMAL_PAUSED = "5";
+	private static final String EVENT_CODE_PROGRAM_PT2_START = "8";
+	private static final String EVENT_CODE_PROGRAM_PT3_START = "9";
+	private static final String EVENT_CODE_PROGRAM_PT4_START = "10";
+	private static final String EVENT_CODE_PROGRAM_PT5_START = "11";
+	private static final String EVENT_CODE_PROGRAM_PT6_START = "12";
+	private static final String EVENT_CODE_PROGRAM_PT7_START = "13";
+	private static final String EVENT_CODE_PROGRAM_PT8_START = "14";
 
 	private PatientVestDeviceTherapyUtil(){
 		
@@ -68,7 +75,7 @@ public class PatientVestDeviceTherapyUtil {
 					){
 				++programmedCoughPauses;
 				caughPauseDuration += deviceEventRecord.getDuration();
-			}else if(deviceEventRecord.getEventId().startsWith(EVENT_NORMAL_PAUSED)){
+			}else if(deviceEventRecord.getEventId().startsWith(EVENT_CODE_NORMAL_PAUSED)){
 				++normalCoughPauses;
 				caughPauseDuration += deviceEventRecord.getDuration();
 			}
@@ -89,31 +96,47 @@ public class PatientVestDeviceTherapyUtil {
 			PatientVestDeviceData vestDeviceData = deviceData.get(i);
 			String eventCode = vestDeviceData.getEventId().split(EVENT_CODE_DELIMITER)[0];
 			List<PatientVestDeviceData> groupEntries = new LinkedList<>();
-			if(EVENT_CODE_NORMAL_START.equals(eventCode) ||
-			   EVENT_CODE_PROGRAM_START.equals(eventCode) || 
-			   EVENT_CODE_RAMP_STARTED.equals(eventCode)
+			if(isStartEventForTherapySession(eventCode)
 			   ){
 				groupEntries.add(vestDeviceData);
 				for(int j = i+1; j < deviceData.size() ; j++){
 					PatientVestDeviceData nextEventEntry = deviceData.get(j);
 					String nextEventCode = nextEventEntry.getEventId().split(EVENT_CODE_DELIMITER)[0];
 					groupEntries.add(nextEventEntry);
-					if(EVENT_CODE_COMPLETED.equals(nextEventCode) ||
-					   EVENT_CODE_PROGRAM_COMPLETED.equals(nextEventCode) ||
-					   EVENT_CODE_NORMAL_INCOMPLETE.equals(nextEventCode) ||
-					   EVENT_CODE_PROGRAM_INCOMPLETE.equals(nextEventCode) ||
-					   EVENT_CODE_RAMP_COMPLETED.equals(nextEventCode) ||
-					   EVENT_CODE_RAMP_INCOMPLETE.equals(nextEventCode)
+					if(isCompleteOrInCompleteEventForTherapySession(nextEventCode)
 							){
 						TherapySession therapySession = assignTherapyMatrics(groupEntries);
 						therapySessions.add(therapySession);
-						i=j;
+						i=j; // to skip the events iterated, shouldn't be removed in any case
 						break;
 					}
 				}
 			}
 		}
 		return therapySessions;
+	}
+
+	private static boolean isCompleteOrInCompleteEventForTherapySession(
+			String nextEventCode) {
+		return EVENT_CODE_NORMAL_COMPLETED.equals(nextEventCode) ||
+		   EVENT_CODE_PROGRAM_COMPLETED.equals(nextEventCode) ||
+		   EVENT_CODE_NORMAL_INCOMPLETE.equals(nextEventCode) ||
+		   EVENT_CODE_PROGRAM_INCOMPLETE.equals(nextEventCode) ||
+		   EVENT_CODE_RAMP_COMPLETED.equals(nextEventCode) ||
+		   EVENT_CODE_RAMP_INCOMPLETE.equals(nextEventCode);
+	}
+
+	private static boolean isStartEventForTherapySession(String eventCode) {
+		return EVENT_CODE_NORMAL_START.equals(eventCode) ||
+		   EVENT_CODE_PROGRAM_PT1_START.equals(eventCode) ||
+		   EVENT_CODE_PROGRAM_PT2_START.equals(eventCode) || 
+		   EVENT_CODE_PROGRAM_PT3_START.equals(eventCode) || 
+		   EVENT_CODE_PROGRAM_PT4_START.equals(eventCode) ||
+		   EVENT_CODE_PROGRAM_PT5_START.equals(eventCode) ||
+		   EVENT_CODE_PROGRAM_PT6_START.equals(eventCode) ||
+		   EVENT_CODE_PROGRAM_PT7_START.equals(eventCode) ||
+		   EVENT_CODE_PROGRAM_PT8_START.equals(eventCode) ||
+		   EVENT_CODE_RAMP_STARTED.equals(eventCode);
 	}
 
 	public static TherapySession assignTherapyMatrics(

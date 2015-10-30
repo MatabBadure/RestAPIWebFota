@@ -93,6 +93,7 @@ public class ExceptionConstants {
     public static final String HR_575 = "Unable to update clinic admin.";
     public static final String HR_576 = "Unable to get clinic admin.";
     public static final String HR_577 = "Unable to update Caregiver User.";
+    public static final String HR_578 = "Duplicate bluetooth id.";
     
     public static final String HR_581 = "No Patient Associated with HCP.";
     public static final String HR_582 = "No Clinics Associated with HCP.";

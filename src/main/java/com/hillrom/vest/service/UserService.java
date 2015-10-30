@@ -657,7 +657,6 @@ public class UserService {
 					} else if(Constants.INACTIVE.equalsIgnoreCase(userExtensionDTO.getClinicMRNId().get("status"))){
 						clinicPatientAssoc.get().setActive(false);
 					} else if(Constants.EXPIRED.equalsIgnoreCase(userExtensionDTO.getClinicMRNId().get("status"))){
-						clinicPatientAssoc.get().setActive(false);
 						patient.setExpired(true);
 						user.setExpired(true);
 					} 
@@ -1554,6 +1553,12 @@ public class UserService {
 				caregiverToBeActivated.add((UserExtension)caregiverAssoc.getUser());
 			}
 		});
+		if(existingUser.getExpired()) {
+			existingUser.setExpired(false);
+			PatientInfo patient = getPatientInfoObjFromPatientUser(existingUser);
+			patient.setExpired(false);
+			patientInfoRepository.saveAndFlush(patient);
+		}
 		userExtensionRepository.save(caregiverToBeActivated);
 		userPatientRepository.save(caregiverAssocList);
 		existingUser.setDeleted(false);

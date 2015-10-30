@@ -8,6 +8,7 @@ import javax.transaction.Transactional;
 import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 
+import static com.hillrom.vest.config.NotificationTypeConstants.*;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
@@ -47,15 +48,22 @@ public class NotificationService {
 	}
 
 	/**
-	 * Deletes Missed Therapy Notification if data received on 3rd day.
+	 * Deletes Notification if adherence to protocol or not a missed therapy.
 	 * @param patientUserId
 	 * @param currentTherapyDate
 	 */
-	public void deleteNotification(Long patientUserId,
-			LocalDate currentTherapyDate) {
+	public void deleteNotificationIfExists(Long patientUserId,
+			LocalDate currentTherapyDate,int missedTherapyCount,
+			boolean isHmrCompliant,boolean isSettingsDeviated) {
 		Notification existingNotificationofTheDay = notificationRepository.findByPatientUserIdAndDate(patientUserId, currentTherapyDate);
 		if(Objects.nonNull(existingNotificationofTheDay)){
-			notificationRepository.delete(existingNotificationofTheDay);
+			String notificationType = existingNotificationofTheDay.getNotificationType();
+			if((MISSED_THERAPY.equalsIgnoreCase(notificationType) && missedTherapyCount == 0) ||
+				(HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType) && isHmrCompliant) ||
+				(SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) && !isSettingsDeviated) ||
+				(HMR_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) && isHmrCompliant && !isSettingsDeviated)){
+				notificationRepository.delete(existingNotificationofTheDay);
+			}
 		}
 	}
 	

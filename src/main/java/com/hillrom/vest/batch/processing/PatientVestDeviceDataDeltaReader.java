@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 
 import org.joda.time.LocalDate;
 import org.springframework.batch.item.ItemReader;
@@ -100,7 +101,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 
 	}
 
-	private List<PatientVestDeviceData> parseRawData() {
+	private synchronized List<PatientVestDeviceData> parseRawData() {
 
 		PatientVestDeviceRawLog deviceRawLog = null;
 		List<PatientVestDeviceData> patientVestDeviceEvents = null;
@@ -112,7 +113,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 				.parseBase64StringToPatientVestDeviceLogEntry(deviceRawLog.getDeviceData());
 
 		String deviceSerialNumber = deviceRawLog.getDeviceSerialNumber();
-
+		String hillromId = patientInfoRepository.id();
 		UserPatientAssoc userPatientAssoc = createPatientUserIfNotExists(deviceRawLog, deviceSerialNumber);
 		assignDefaultValuesToVestDeviceDataTemp(deviceRawLog, patientVestDeviceEvents, userPatientAssoc);
 		return patientVestDeviceEvents;
@@ -159,6 +160,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 		});
 	}
 
+	@Transactional
 	private synchronized UserPatientAssoc createPatientUserIfNotExists(PatientVestDeviceRawLog deviceRawLog,
 			String deviceSerialNumber) {
 		Optional<PatientInfo> patientFromDB = patientInfoRepository.findOneBySerialNumber(deviceSerialNumber);
@@ -186,7 +188,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 			patientInfo = patientInfoRepository.save(patientInfo);
 
 			UserExtension userExtension = new UserExtension();
-			userExtension.setHillromId(hillromId);
+			userExtension.setHillromId(patientInfo.getHillromId());
 			userExtension.setActivated(true);
 			userExtension.setDeleted(false);
 			userExtension.setFirstName(patientInfo.getFirstName());

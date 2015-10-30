@@ -294,7 +294,7 @@ public class UserService {
     }
 
     public String updatePassword(Long id, Map<String, String> passwordList) throws HillromException {
-    	Optional<User> user = userRepository.findOneByEmail(SecurityUtils.getCurrentLogin());
+    	Optional<User> user = userRepository.findOneByEmailOrHillromId(SecurityUtils.getCurrentLogin());
     	if(user.isPresent()){
 			String encryptedNewPassword = passwordEncoder.encode(passwordList.get("newPassword"));
 			if(passwordEncoder.matches(passwordList.get("password"), user.get().getPassword())) {
@@ -317,7 +317,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthorities() {
-        Optional<User> currentUser = userRepository.findOneByEmail(SecurityUtils.getCurrentLogin());
+        Optional<User> currentUser = userRepository.findOneByEmailOrHillromId(SecurityUtils.getCurrentLogin());
         if(currentUser.isPresent()) {
         	currentUser.get().getAuthorities().size(); // eagerly load the association
         }
@@ -523,16 +523,37 @@ public class UserService {
         List<String> rolesAdminCanModerate = rolesAdminCanModerate();
         UserExtension existingUser = userExtensionRepository.findOne(id);
         String currentEmail = StringUtils.isNotBlank(existingUser.getEmail()) ? existingUser.getEmail() : null;
-        if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())
-        		&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
-        	UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
-    		if(Objects.nonNull(user.getId())) {
-    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
-    				sendEmailNotification(baseUrl, user);
-    			}
-                return user;
-    		} else {
-    			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
+        String currentHillromId = StringUtils.isNotBlank(existingUser.getHillromId()) ? existingUser.getHillromId() : null;
+        if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())){
+        	if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
+        		UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
+        		if(Objects.nonNull(user.getId())) {
+        			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
+        				sendEmailNotification(baseUrl, user);
+        			}
+        			callEventOnUpdatingHRID(userExtensionDTO, currentHillromId, user);
+                    return user;
+        		} else {
+        			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
+        		}
+        	} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))
+        			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ASSOCIATES))) {
+	        	if(SecurityUtils.getCurrentLogin().equals(existingUser.getEmail())) {
+	        		UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
+	        		if(Objects.nonNull(user.getId())) {
+	        			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
+	        				sendEmailNotification(baseUrl, user);
+	        			}
+	        			callEventOnUpdatingHRID(userExtensionDTO, currentHillromId, user);
+	                    return user;
+	        		} else {
+	        			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
+	        		}
+	        	} else {
+	        		throw new HillromException(ExceptionConstants.HR_403);
+	        	}
+        	} else {
+    			throw new HillromException(ExceptionConstants.HR_555);
     		}
     	} else if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
     		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(existingUser);
@@ -554,6 +575,7 @@ public class UserService {
     			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && !userExtensionDTO.getEmail().equals(currentEmail)) {
     				sendEmailNotification(baseUrl, user);
     			}
+    			callEventOnUpdatingHRID(userExtensionDTO, currentHillromId, user);
                 return user;
     		} else {
     			throw new HillromException(ExceptionConstants.HR_524);//Unable to update Patient.
@@ -592,6 +614,12 @@ public class UserService {
         	throw new HillromException(ExceptionConstants.HR_555);//Incorrect data
     	}
     }
+
+	private void callEventOnUpdatingHRID(UserExtensionDTO userExtensionDTO, String currentHillromId, UserExtension user) {
+		if(StringUtils.isNotBlank(userExtensionDTO.getHillromId()) && StringUtils.isNotBlank(currentHillromId) && !userExtensionDTO.getHillromId().equals(currentHillromId)) {
+			eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
+		}
+	}
 
 	private void sendEmailNotification(String baseUrl, UserExtension user) {
 		user.setActivationKey(RandomUtil.generateActivationKey());
@@ -718,6 +746,9 @@ public class UserService {
 			newUser.setSpeciality(userExtensionDTO.getSpeciality());
 		if(Objects.nonNull(userExtensionDTO.getCredentials()))
 			newUser.setCredentials(userExtensionDTO.getCredentials());
+		else
+			newUser.setCredentials(null);
+		
 		if(Objects.nonNull(userExtensionDTO.getAddress()))
 			newUser.setAddress(userExtensionDTO.getAddress());
 		if(Objects.nonNull(userExtensionDTO.getZipcode()))
@@ -726,6 +757,9 @@ public class UserService {
 			newUser.setCity(userExtensionDTO.getCity());
 		if(Objects.nonNull(userExtensionDTO.getState()))
 			newUser.setState(userExtensionDTO.getState());
+		else 
+			newUser.setState(null);
+		
 		if(Objects.nonNull(userExtensionDTO.getPrimaryPhone()))
 			newUser.setPrimaryPhone(userExtensionDTO.getPrimaryPhone());
 		if(Objects.nonNull(userExtensionDTO.getMobilePhone())){
@@ -1258,7 +1292,8 @@ public class UserService {
 		User existingUser = userRepository.findOne(id);
 		JSONObject jsonObject = new JSONObject();
 		if(Objects.nonNull(existingUser)){
-			if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())){
+			if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail()) ||
+					SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getHillromId())){
 				jsonObject = RequestUtil.checkRequiredParams(params, new String[]{"questionId","answer"});
 				if(jsonObject.containsKey("ERROR")){
 					return jsonObject;
@@ -1312,10 +1347,16 @@ public class UserService {
 
 	}	
 
-	public UserPatientAssoc updateCaregiver(Long patientUserId, Long caregiverUserId, UserExtensionDTO userExtensionDTO) {
+	public UserPatientAssoc updateCaregiver(Long patientUserId, Long caregiverUserId, UserExtensionDTO userExtensionDTO) throws HillromException {
     	UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
     	UserExtension caregiverUser = userExtensionRepository.findOne(caregiverUserId);
     	if(Objects.nonNull(patientUser) && Objects.nonNull(caregiverUser)) {
+    		if(StringUtils.isNotBlank(userExtensionDTO.getEmail())) {
+    			Optional<User> existingUser = userRepository.findOneByEmail(userExtensionDTO.getEmail());
+    			if(existingUser.isPresent() && !existingUser.get().getId().equals(caregiverUserId)) {
+    				throw new HillromException(ExceptionConstants.HR_501);//e-mail address already in use
+    			}
+        	}
     		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
     		if(Objects.nonNull(patientInfo)) {
     			assignValuesToUserObj(userExtensionDTO, caregiverUser);

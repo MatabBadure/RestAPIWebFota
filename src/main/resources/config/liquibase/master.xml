@@ -65,4 +65,5 @@
     <include file="classpath:/config/liquibase/changelog/20151015173700_added_isactive_field_clinicpatientassoc.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20151015183700_added_expired_field_user_table.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20151018163700_added_settings_deviation_days_count_to_patientcompliance.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20151029123200_load_defaut_user_to_user_extension_table.xml" relativeToChangelogFile="false"/>
  </databaseChangeLog>

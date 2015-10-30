@@ -213,6 +213,7 @@ public class ClinicService {
 	        		Map<String, Object> patientMap = new HashMap<>();
 	        		patientMap.put("patient", (UserExtension) userService.getUserObjFromPatientInfo(clinicPatientAssoc.getPatient()));
 	        		patientMap.put("mrnId", clinicPatientAssoc.getMrnId());
+	        		patientMap.put("status", clinicPatientAssoc.getActive());
 	        		List<UserPatientAssoc> hcpAssocList = new LinkedList<>();
 	    	     	for(UserPatientAssoc patientAssoc : clinicPatientAssoc.getPatient().getUserPatientAssoc()){
 	    	    		if(AuthoritiesConstants.HCP.equals(patientAssoc.getUserRole())){
@@ -230,8 +231,8 @@ public class ClinicService {
 		return patientUserList;
 	}
 	
-	public List<PatientUserVO> getNotAssociatedPatientUsers(String ClinicId, String searchString) throws HillromException {
-		List<PatientUserVO> patientUserList = userSearchRepository.findPatientNotAssociatedToClinic(ClinicId,searchString);
+	public List<PatientUserVO> getNotAssociatedPatientUsers(String ClinicId, String searchString, String filter) throws HillromException {
+		List<PatientUserVO> patientUserList = userSearchRepository.findPatientNotAssociatedToClinic(ClinicId,searchString, filter);
 		return patientUserList;
 	}
 	

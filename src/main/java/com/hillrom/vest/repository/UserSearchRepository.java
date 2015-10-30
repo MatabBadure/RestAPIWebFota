@@ -808,7 +808,7 @@ public class UserSearchRepository {
 		} else if ("others".equalsIgnoreCase(clinicId)) {
 			findPatientUserQuery = findPatientUserQuery + query2 + searchQuery + query3;
 		} else
-			findPatientUserQuery = findPatientUserQuery + " where patient_clinic.clinic_id  ='" + clinicId + "'"
+			findPatientUserQuery = findPatientUserQuery + query2 + " and patient_clinic.clinic_id  ='" + clinicId + "'"
 					+ searchQuery + query3;
 
 		StringBuilder filterQuery = new StringBuilder();
@@ -1322,7 +1322,7 @@ public class UserSearchRepository {
 
 	// Patient Search which are not associated with the clinic
 
-	public List<PatientUserVO> findPatientNotAssociatedToClinic(String clinicId, String searchString) {
+	public List<PatientUserVO> findPatientNotAssociatedToClinic(String clinicId, String searchString, String filter) {
 
 		String findPatientUserQuery = "select * from ( select user.id as patient_id,user.email as pemail,user.first_name as pfirstName,"
 				+ "user.last_name as plastName, user.is_deleted as isDeleted,user.zipcode as pzipcode,"
@@ -1354,6 +1354,19 @@ public class UserSearchRepository {
 			findPatientUserQuery = findPatientUserQuery.replaceAll(":searchString", searchString);
 
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":clinicId", clinicId);
+		
+		StringBuilder filterQuery = new StringBuilder();
+		
+		if (StringUtils.isNotEmpty(filter) && !"all".equalsIgnoreCase(filter)) {
+
+			Map<String, String> filterMap = getSearchParams(filter);
+
+			filterQuery.append("select * from (");
+
+			applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
+
+			findPatientUserQuery = filterQuery.toString();
+		}
 
 		Query patientQuery = entityManager.createNativeQuery(findPatientUserQuery);
 

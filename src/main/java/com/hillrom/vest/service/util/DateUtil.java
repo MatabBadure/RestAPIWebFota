@@ -34,7 +34,7 @@ public class DateUtil {
 	public static List<LocalDate> getAllLocalDatesBetweenDates(LocalDate from, LocalDate to) {
 		LocalDate startDate = from;
 		List<LocalDate> dates = new LinkedList<>();
-		while(startDate.isBefore(to) || startDate.equals(to)){
+		while(!startDate.isAfter(to)){
 			dates.add(startDate);
 			startDate = startDate.plusDays(1);
 		}

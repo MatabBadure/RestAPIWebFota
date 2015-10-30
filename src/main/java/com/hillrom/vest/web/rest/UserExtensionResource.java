@@ -987,4 +987,29 @@ public class UserExtensionResource {
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
+    
+    /**
+     * PUT  /user/:id/reactivate -> reactivate the "id" user.
+     */
+    @RequestMapping(value = "/user/{id}/reactivate",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN})
+    public ResponseEntity<JSONObject> reactivateUser(@PathVariable Long id) {
+        log.debug("REST request to reactivate User : {}", id);
+        JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject = userService.reactivateUser(id);
+			 if (jsonObject.containsKey("ERROR")) {
+		        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
+		        } else {
+		            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+		        }
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
+		}
+       
+    }
 }

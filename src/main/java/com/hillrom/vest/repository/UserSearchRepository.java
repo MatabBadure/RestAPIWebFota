@@ -428,7 +428,7 @@ public class UserSearchRepository {
 		return page;
 	}
 
-	// Patient Search
+	// Patient Search for Admin log in
 	public Page<PatientUserVO> findPatientBy(String queryString, String filter, Pageable pageable,
 			Map<String, Boolean> sortOrder) {
 
@@ -451,7 +451,7 @@ public class UserSearchRepository {
 				+ " lower(CONCAT(user.first_name,' ',user.last_name)) like lower(:queryString) or "
 				+ " lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) or ";
 
-		String hrIdSearch = " lower(user.hillrom_id) like lower(:queryString) or ";
+		String hrIdSearch = " lower(user.hillrom_id) like lower(:queryString))";
 
 		String query2 = " ((lower(IFNULL(patInfo.city,'')) like lower(:queryString)) or "
 				+ " (lower(IFNULL(patInfo.state,'')) like lower(:queryString))) )";
@@ -473,10 +473,10 @@ public class UserSearchRepository {
 		String findPatientUserQuery = query1;
 		// HCP , CLINIC_ADMIN can search on MRNID not HRID
 		if (SecurityUtils.isUserInRole(HCP) || SecurityUtils.isUserInRole(CLINIC_ADMIN))
-			findPatientUserQuery = findPatientUserQuery.concat(query2)
+			findPatientUserQuery = findPatientUserQuery
 					.substring(0, findPatientUserQuery.lastIndexOf(")")).concat(mrnIdSearch);
 		else // Admin can search on HRID not MRNID
-			findPatientUserQuery += hrIdSearch + query2;
+			findPatientUserQuery += hrIdSearch;
 		findPatientUserQuery += query3;
 
 		findPatientUserQuery = applyFiltersToQuery(filter, findPatientUserQuery);

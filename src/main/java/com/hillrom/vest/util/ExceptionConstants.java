@@ -87,12 +87,13 @@ public class ExceptionConstants {
     
     public static final String HR_570 = "Vest device is already in Inactive mode.";
     public static final String HR_571 = "Invalid Serial Number.";
-    public static final String HR_572 = "This Vest device is already linked to patient.";
+    public static final String HR_572 = "This vest device serial number is already linked to patient ";
     public static final String HR_573 = "Unable to deactivate vest device from patient.";
     public static final String HR_574 = "Unable to create clinic admin.";
     public static final String HR_575 = "Unable to update clinic admin.";
     public static final String HR_576 = "Unable to get clinic admin.";
     public static final String HR_577 = "Unable to update Caregiver User.";
+    public static final String HR_578 = "This bluetooth id is already linked to patient ";
     
     public static final String HR_581 = "No Patient Associated with HCP.";
     public static final String HR_582 = "No Clinics Associated with HCP.";
@@ -121,6 +122,8 @@ public class ExceptionConstants {
     public static final String HR_601 = "Invalid Activation Key"; 
     public static final String HR_602 = "No security question selected";
     public static final String HR_603 = "Invalid username, please enter valid email id.";
+    public static final String HR_604 = "Unable to activate User";
+    public static final String HR_605 = "User is already in active state.";
     
     public static final String HR_701 = "Note date cannot be before first  transmission date."; 
     

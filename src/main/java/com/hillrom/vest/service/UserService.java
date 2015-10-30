@@ -294,7 +294,7 @@ public class UserService {
     }
 
     public String updatePassword(Long id, Map<String, String> passwordList) throws HillromException {
-    	Optional<User> user = userRepository.findOneByEmail(SecurityUtils.getCurrentLogin());
+    	Optional<User> user = userRepository.findOneByEmailOrHillromId(SecurityUtils.getCurrentLogin());
     	if(user.isPresent()){
 			String encryptedNewPassword = passwordEncoder.encode(passwordList.get("newPassword"));
 			if(passwordEncoder.matches(passwordList.get("password"), user.get().getPassword())) {
@@ -524,17 +524,36 @@ public class UserService {
         UserExtension existingUser = userExtensionRepository.findOne(id);
         String currentEmail = StringUtils.isNotBlank(existingUser.getEmail()) ? existingUser.getEmail() : null;
         String currentHillromId = StringUtils.isNotBlank(existingUser.getHillromId()) ? existingUser.getHillromId() : null;
-        if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())
-        		&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.SUPER_ADMIN))) {
-        	UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
-    		if(Objects.nonNull(user.getId())) {
-    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
-    				sendEmailNotification(baseUrl, user);
-    			}
-    			callEventOnUpdatingHRID(userExtensionDTO, currentHillromId, user);
-                return user;
-    		} else {
-    			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
+        if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())){
+        	if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.SUPER_ADMIN))) {
+        		UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
+        		if(Objects.nonNull(user.getId())) {
+        			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
+        				sendEmailNotification(baseUrl, user);
+        			}
+        			callEventOnUpdatingHRID(userExtensionDTO, currentHillromId, user);
+                    return user;
+        		} else {
+        			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
+        		}
+        	} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.RC_ADMIN))
+        			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ASSOCIATES))) {
+	        	if(SecurityUtils.getCurrentLogin().equals(existingUser.getEmail())) {
+	        		UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
+	        		if(Objects.nonNull(user.getId())) {
+	        			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
+	        				sendEmailNotification(baseUrl, user);
+	        			}
+	        			callEventOnUpdatingHRID(userExtensionDTO, currentHillromId, user);
+	                    return user;
+	        		} else {
+	        			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
+	        		}
+	        	} else {
+	        		throw new HillromException(ExceptionConstants.HR_403);
+	        	}
+        	} else {
+    			throw new HillromException(ExceptionConstants.HR_555);
     		}
     	} else if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
     		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(existingUser);
@@ -727,6 +746,9 @@ public class UserService {
 			newUser.setSpeciality(userExtensionDTO.getSpeciality());
 		if(Objects.nonNull(userExtensionDTO.getCredentials()))
 			newUser.setCredentials(userExtensionDTO.getCredentials());
+		else
+			newUser.setCredentials(null);
+		
 		if(Objects.nonNull(userExtensionDTO.getAddress()))
 			newUser.setAddress(userExtensionDTO.getAddress());
 		if(Objects.nonNull(userExtensionDTO.getZipcode()))
@@ -735,6 +757,9 @@ public class UserService {
 			newUser.setCity(userExtensionDTO.getCity());
 		if(Objects.nonNull(userExtensionDTO.getState()))
 			newUser.setState(userExtensionDTO.getState());
+		else 
+			newUser.setState(null);
+		
 		if(Objects.nonNull(userExtensionDTO.getPrimaryPhone()))
 			newUser.setPrimaryPhone(userExtensionDTO.getPrimaryPhone());
 		if(Objects.nonNull(userExtensionDTO.getMobilePhone())){
@@ -1005,14 +1030,6 @@ public class UserService {
 				caregiversToBeDeleted.add((UserExtension)caregiverAssoc.getUser());
 			}
 		});
-		PatientInfo patient = getPatientInfoObjFromPatientUser(existingUser);
-		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patient.getId());
-		if(!clinicPatientAssocList.isEmpty()){
-			for(ClinicPatientAssoc clinicPatientAssoc : clinicPatientAssocList){
-				clinicPatientAssoc.setActive(false);
-			}
-			clinicPatientRepository.save(clinicPatientAssocList);
-		}
 		userExtensionRepository.delete(caregiversToBeDeleted);
 		userPatientRepository.delete(caregiverAssocList);
 		existingUser.setDeleted(true);
@@ -1267,7 +1284,8 @@ public class UserService {
 		User existingUser = userRepository.findOne(id);
 		JSONObject jsonObject = new JSONObject();
 		if(Objects.nonNull(existingUser)){
-			if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())){
+			if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail()) ||
+					SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getHillromId())){
 				jsonObject = RequestUtil.checkRequiredParams(params, new String[]{"questionId","answer"});
 				if(jsonObject.containsKey("ERROR")){
 					return jsonObject;
@@ -1495,6 +1513,51 @@ public class UserService {
 			throw new HillromException(ExceptionConstants.HR_512);//User Doesn't exist
 		}
 		return jsonObject;
+	}
+	
+	public JSONObject reactivateUser(Long id) throws HillromException {
+    	JSONObject jsonObject = new JSONObject();
+    	UserExtension existingUser = userExtensionRepository.findOne(id);
+    	List<Authority> authorities  = authorityRepository.findAll();
+    	Map<String,Authority> authorityMap = new HashMap<>();
+    	authorities.stream().forEach(authority -> {
+    		authorityMap.put(authority.getName(), authority);
+    	});
+		if(Objects.nonNull(existingUser)) {
+			if(existingUser.isDeleted()){
+				if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.SUPER_ADMIN))
+						|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.RC_ADMIN))){
+					if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
+						reactivatePatientUser(existingUser);
+						jsonObject.put("message", MessageConstants.HR_215);
+					} else {
+						throw new HillromException(ExceptionConstants.HR_604);
+					}
+				} else {
+					throw new HillromException(ExceptionConstants.HR_604);
+				}
+			} else {
+				throw new HillromException(ExceptionConstants.HR_605);
+			}
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);//No such user exist
+		}
+		return jsonObject;
+    }
+
+	private void reactivatePatientUser(UserExtension existingUser) {
+		List<UserPatientAssoc> caregiverAssocList = getListOfCaregiversAssociatedToPatientUser(existingUser);
+		List<UserExtension> caregiverToBeActivated = new LinkedList<>();
+		caregiverAssocList.forEach(caregiverAssoc -> {
+			if(caregiverAssoc.getUser().isDeleted()){
+				caregiverAssoc.getUser().setDeleted(false);
+				caregiverToBeActivated.add((UserExtension)caregiverAssoc.getUser());
+			}
+		});
+		userExtensionRepository.save(caregiverToBeActivated);
+		userPatientRepository.save(caregiverAssocList);
+		existingUser.setDeleted(false);
+		userExtensionRepository.save(existingUser);
 	}
 
 }

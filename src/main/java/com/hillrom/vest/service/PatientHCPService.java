@@ -256,7 +256,7 @@ public class PatientHCPService {
 			statistics.put("patientsWithMissedTherapy", patientComplianceRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date, patientUserIds).size());
 			statistics.put("patientsWithNoEventRecorded", patientsWithNoEventRecorded);
 			statistics.put("date", date.toString());
-			statistics.put("totalPatientCount", patientUsers.size());
+			statistics.put("totalPatientCount", patientUserIds.size());
 		}
 		return statistics;
 	}

@@ -15,6 +15,7 @@ public class MessageConstants {
     public static final String HR_212 = "Patient User updated successfully.";
     public static final String HR_213 = "Patient User fetched successfully.";
     public static final String HR_214 = "Patient User deleted successfully.";
+    public static final String HR_215 = "Patient User activated successfully.";
     
     public static final String HR_221 = "Clinic created successfully.";
     public static final String HR_222 = "Clinic updated successfully.";

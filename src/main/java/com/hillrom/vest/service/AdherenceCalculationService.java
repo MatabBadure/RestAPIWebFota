@@ -612,7 +612,7 @@ public class AdherenceCalculationService {
 		if(existingTherapySessionMap.size() > 0){
 			for(LocalDate date : receivedTherapySessionsMap.keySet()){
 				List<TherapySession> therapySessionsPerDate = existingTherapySessionMap.get(date);
-				if(Objects.nonNull(receivedTherapySessionsMap.get(date))){
+				if(Objects.nonNull(therapySessionsPerDate)){
 					List<TherapySession> receivedTherapySessions = receivedTherapySessionsMap.get(date);
 					for(TherapySession existingSession : therapySessionsPerDate){
 						Iterator<TherapySession> itr = receivedTherapySessions.iterator();
@@ -631,12 +631,12 @@ public class AdherenceCalculationService {
 					}
 					therapySessionsPerDate.addAll(receivedTherapySessionsMap.get(date));
 					Collections.sort(therapySessionsPerDate);
+					int sessionNo = 0;
+					for(TherapySession session : therapySessionsPerDate){
+						session.setSessionNo(++sessionNo);
+					}
+					allTherapySessionMap.put(date, therapySessionsPerDate);
 				}
-				int sessionNo = 0;
-				for(TherapySession session : therapySessionsPerDate){
-					session.setSessionNo(++sessionNo);
-				}
-				allTherapySessionMap.put(date, therapySessionsPerDate);
 			}
 		}else{
 			for(LocalDate date : receivedTherapySessionsMap.keySet()){
@@ -896,6 +896,8 @@ public class AdherenceCalculationService {
 		}else if(currentMissedTherapyCount >= DEFAULT_MISSED_THERAPY_DAYS_COUNT){
 			notificationType = MISSED_THERAPY;
 			latestCompliance.setHmrCompliant(false);
+			// reset settingsDeviatedDays count if patient is adhere to settings
+			latestCompliance.setSettingsDeviatedDaysCount(0);
 		}
 		
 		// patient did therapy and he is adhere to protocol

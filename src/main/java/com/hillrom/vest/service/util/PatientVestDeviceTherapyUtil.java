@@ -198,13 +198,6 @@ public class PatientVestDeviceTherapyUtil {
 	private static boolean isStartEventForTherapySession(String eventCode) {
 		return EVENT_CODE_NORMAL_START.equals(eventCode) ||
 		   EVENT_CODE_PROGRAM_PT1_START.equals(eventCode) ||
-		   EVENT_CODE_PROGRAM_PT2_START.equals(eventCode) || 
-		   EVENT_CODE_PROGRAM_PT3_START.equals(eventCode) || 
-		   EVENT_CODE_PROGRAM_PT4_START.equals(eventCode) ||
-		   EVENT_CODE_PROGRAM_PT5_START.equals(eventCode) ||
-		   EVENT_CODE_PROGRAM_PT6_START.equals(eventCode) ||
-		   EVENT_CODE_PROGRAM_PT7_START.equals(eventCode) ||
-		   EVENT_CODE_PROGRAM_PT8_START.equals(eventCode) ||
 		   EVENT_CODE_RAMP_STARTED.equals(eventCode);
 	}
 

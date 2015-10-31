@@ -896,6 +896,8 @@ public class AdherenceCalculationService {
 		}else if(currentMissedTherapyCount >= DEFAULT_MISSED_THERAPY_DAYS_COUNT){
 			notificationType = MISSED_THERAPY;
 			latestCompliance.setHmrCompliant(false);
+			// reset settingsDeviatedDays count if patient is adhere to settings
+			latestCompliance.setSettingsDeviatedDaysCount(0);
 		}
 		
 		// patient did therapy and he is adhere to protocol

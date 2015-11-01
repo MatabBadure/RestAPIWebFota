@@ -119,7 +119,8 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 			logcount++;
 			start = 32 * 2 + (logcount - 1) * RECORD_SIZE * 2;
 			end = 32 * 2 + (logcount * RECORD_SIZE * 2);
-			patientVestDeviceRecords.add(patientVestDeviceRecord);
+			if(!patientVestDeviceRecord.getEventId().startsWith("0"))
+				patientVestDeviceRecords.add(patientVestDeviceRecord);
 		}
 		return patientVestDeviceRecords;
 	}

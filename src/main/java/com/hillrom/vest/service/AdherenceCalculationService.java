@@ -609,38 +609,36 @@ public class AdherenceCalculationService {
 		List<TherapySession> existingTherapySessions = therapySessionRepository.findByPatientUserIdAndDateRange(patientUserId, from, to);
 		Map<LocalDate,List<TherapySession>> existingTherapySessionMap = existingTherapySessions.stream().collect(Collectors.groupingBy(TherapySession::getDate));
 		Map<LocalDate,List<TherapySession>> allTherapySessionMap = new HashMap<>();
-		if(existingTherapySessionMap.size() > 0){
-			for(LocalDate date : receivedTherapySessionsMap.keySet()){
-				List<TherapySession> therapySessionsPerDate = existingTherapySessionMap.get(date);
-				if(Objects.nonNull(therapySessionsPerDate)){
-					List<TherapySession> receivedTherapySessions = receivedTherapySessionsMap.get(date);
-					for(TherapySession existingSession : therapySessionsPerDate){
-						Iterator<TherapySession> itr = receivedTherapySessions.iterator();
-						while(itr.hasNext()){
-							TherapySession receivedSession = itr.next();
-							if(existingSession.getDate().equals(receivedSession.getDate()) &&
-									existingSession.getStartTime().equals(receivedSession.getStartTime()) &&
-									existingSession.getEndTime().equals(receivedSession.getEndTime()) &&
-									existingSession.getFrequency().equals(receivedSession.getFrequency()) && 
-									existingSession.getPressure().equals(receivedSession.getPressure()) &&
-									existingSession.getDurationInMinutes().equals(receivedSession.getDurationInMinutes()) && 
-									existingSession.getHmr().equals(receivedSession.getHmr())){
-								itr.remove();
-							}
+		for(LocalDate date : receivedTherapySessionsMap.keySet()){
+			List<TherapySession> therapySessionsPerDate = existingTherapySessionMap.get(date);
+			if(Objects.nonNull(therapySessionsPerDate)){
+				List<TherapySession> receivedTherapySessions = receivedTherapySessionsMap.get(date);
+				for(TherapySession existingSession : therapySessionsPerDate){
+					Iterator<TherapySession> itr = receivedTherapySessions.iterator();
+					while(itr.hasNext()){
+						TherapySession receivedSession = itr.next();
+						if(existingSession.getDate().equals(receivedSession.getDate()) &&
+								existingSession.getStartTime().equals(receivedSession.getStartTime()) &&
+								existingSession.getEndTime().equals(receivedSession.getEndTime()) &&
+								existingSession.getFrequency().equals(receivedSession.getFrequency()) && 
+								existingSession.getPressure().equals(receivedSession.getPressure()) &&
+								existingSession.getDurationInMinutes().equals(receivedSession.getDurationInMinutes()) && 
+								existingSession.getHmr().equals(receivedSession.getHmr())){
+							itr.remove();
 						}
 					}
-					therapySessionsPerDate.addAll(receivedTherapySessionsMap.get(date));
-					Collections.sort(therapySessionsPerDate);
-					int sessionNo = 0;
-					for(TherapySession session : therapySessionsPerDate){
-						session.setSessionNo(++sessionNo);
-					}
-					allTherapySessionMap.put(date, therapySessionsPerDate);
 				}
-			}
-		}else{
-			for(LocalDate date : receivedTherapySessionsMap.keySet()){
-				allTherapySessionMap.put(date, receivedTherapySessionsMap.get(date));
+				therapySessionsPerDate.addAll(receivedTherapySessionsMap.get(date));
+				Collections.sort(therapySessionsPerDate);
+				int sessionNo = 0;
+				for(TherapySession session : therapySessionsPerDate){
+					session.setSessionNo(++sessionNo);
+				}
+				allTherapySessionMap.put(date, therapySessionsPerDate);
+			}else{
+				for(LocalDate receivedDate : receivedTherapySessionsMap.keySet()){
+					allTherapySessionMap.put(receivedDate, receivedTherapySessionsMap.get(receivedDate));
+				}
 			}
 		}
 		return allTherapySessionMap;

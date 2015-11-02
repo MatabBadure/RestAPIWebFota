@@ -1012,4 +1012,30 @@ public class UserExtensionResource {
 		}
        
     }
+    
+    /**
+     * PUT  /user/:id/reactivation -> reactivation of user, updates activation key and time.
+     */
+    @RequestMapping(value = "/user/{id}/reactivation",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> userReactivation(@PathVariable Long id, HttpServletRequest request) {
+        log.debug("REST request to User Reactivation : {}", id);
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject = userService.userReactivation(id, baseUrl);
+			 if (jsonObject.containsKey("ERROR")) {
+		        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
+		        } else {
+		            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+		        }
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
+		}
+       
+    }
 }

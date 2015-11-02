@@ -1,7 +1,11 @@
 package com.hillrom.vest.service;
-import static com.hillrom.vest.config.NotificationTypeConstants.*;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE;
+import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
 
-import java.math.BigDecimal;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -24,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
-import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.DateUtil;
@@ -209,12 +212,19 @@ public class MailService {
     @Scheduled(cron="0 0 * * * *")
 	@Async
 	public void activationReminderEmail(){
-		DateTime currectTime =  new DateTime();
-		for(int interval = accountActivationReminderInterval; interval < 48; interval += accountActivationReminderInterval)
-		sendActivationReminderEmail(currectTime.minusHours(interval).minusHours(1),currectTime.minusHours(interval));
+    	try{
+			DateTime currectTime =  new DateTime();
+			for(int interval = accountActivationReminderInterval; interval < 48; interval += accountActivationReminderInterval)
+				getUsersActivationReminderEmail(currectTime.minusHours(interval).minusHours(1),currectTime.minusHours(interval));
+	    }catch(Exception ex){
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter( writer );
+			ex.printStackTrace( printWriter );
+			sendJobFailureNotification("activationReminderEmail",writer.toString());
+		}
 	}
     
-	private void sendActivationReminderEmail(DateTime fromTime,DateTime toTime){
+	private void getUsersActivationReminderEmail(DateTime fromTime,DateTime toTime){
 	    List<User> users = userRepository.findAllByActivatedIsFalseAndActivationLinkSentDateBetweeen(fromTime, toTime);
 	    log.debug("No of users ", users);
 	    for(User user : users){

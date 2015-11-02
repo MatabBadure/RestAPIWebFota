@@ -3,11 +3,8 @@ package com.hillrom.vest.batch.processing;
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -16,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.NonTransientResourceException;
@@ -30,7 +28,6 @@ import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.domain.TherapySession;
-import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.domain.UserPatientAssocPK;
@@ -50,7 +47,6 @@ import com.hillrom.vest.service.PatientNoEventService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil;
 import com.hillrom.vest.util.RelationshipLabelConstants;
-import com.hillrom.vest.web.rest.dto.PatientVestDeviceDataVO;
 
 public class PatientVestDeviceDataDeltaReader implements ItemReader<List<PatientVestDeviceData>> {
 
@@ -186,6 +182,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 			patientInfo.setBluetoothId(deviceRawLog.getDeviceAddress());
 			patientInfo.setHubId(deviceRawLog.getHubId());
 			patientInfo.setSerialNumber(deviceRawLog.getDeviceSerialNumber());
+			patientInfo.setDeviceAssocDate(new DateTime());
 			String customerName = deviceRawLog.getCustomerName();
 			setNameToPatient(patientInfo, customerName);
 			patientInfo = patientInfoRepository.save(patientInfo);

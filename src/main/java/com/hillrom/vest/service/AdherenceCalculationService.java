@@ -834,7 +834,6 @@ public class AdherenceCalculationService {
 		log.warn("**********************************************************************************");
 */				
 		int currentScore = latestCompliance.getScore();
-		int previousScore = currentScore;
 		String notificationType = "";
 		User patientUser = latestCompliance.getPatientUser();
 		Long patientUserId = patientUser.getId();
@@ -866,7 +865,6 @@ public class AdherenceCalculationService {
 					notificationType =  SETTINGS_DEVIATION;
 					latestCompliance.setSettingsDeviated(isSettingsDeviated);
 				}else {
-					// currentScore += SETTING_DEVIATION_POINTS;
 					// reset settingsDeviatedDays count if patient is adhere to settings
 					latestCompliance.setSettingsDeviatedDaysCount(0);
 					latestCompliance.setSettingsDeviated(isSettingsDeviated);
@@ -881,7 +879,6 @@ public class AdherenceCalculationService {
 						notificationType =  HMR_AND_SETTINGS_DEVIATION;				
 				}else {
 					latestCompliance.setHmrCompliant(isHMRCompliant);
-					// currentScore +=  HMR_NON_COMPLIANCE_POINTS;
 				}
 				// Delete existing notification if adherence to protocol
 				notificationService.deleteNotificationIfExists(patientUserId,
@@ -899,15 +896,14 @@ public class AdherenceCalculationService {
 		}
 		
 		// patient did therapy and he is adhere to protocol
-		if(previousScore < currentScore && 
-				currentMissedTherapyCount == 0 &&
-				isHMRCompliant(protocolConstant, metricsMap)
-				&& !isSettingsDeviated(protocolConstant, metricsMap.get(WEIGHTED_AVG_FREQUENCY))){
+		if(currentMissedTherapyCount == 0 &&
+			isHMRCompliant(protocolConstant, metricsMap)
+			&& !isSettingsDeviated(protocolConstant, metricsMap.get(WEIGHTED_AVG_FREQUENCY))){
 			currentScore = currentScore <=  DEFAULT_COMPLIANCE_SCORE - BONUS_POINTS ? currentScore + BONUS_POINTS : DEFAULT_COMPLIANCE_SCORE;
 		}
 		
 		// Patient did therapy but point has been deducted due to Protocol violation
-		if(previousScore > currentScore 
+		if(StringUtils.isNotBlank(notificationType)
 				&& isAfter3daysTransmission(latestCompliance,
 						firstTransmissionDate)){
 			notificationService.createOrUpdateNotification(patientUser, patient, patientUserId,

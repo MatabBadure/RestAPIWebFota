@@ -41,8 +41,8 @@ spring:
     recaptcha:
         recaptchaPrivateKey: 6LcXjQkTAAAAACiA7rx7o7wlifQ7n3VQ_It-sncc
     notification:
-        hcpOrClinicAdminDashboardUrl: http://uat.hillromvest.com
-        patientDashboardUrl: http://uat.hillromvest.com
-        baseUrl: http://uat.hillromvest.com
+        hcpOrClinicAdminDashboardUrl: http://indoffshre01v.hillromvest.com
+        patientDashboardUrl: http://indoffshre01v.hillromvest.com
+        baseUrl: http://indoffshre01v.hillromvest.com
         accountActivationReminderInterval: 12
         

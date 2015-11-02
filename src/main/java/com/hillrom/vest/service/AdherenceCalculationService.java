@@ -194,7 +194,7 @@ public class AdherenceCalculationService {
 		Map<String,Double> actualMetrics = new HashMap<>();
 		actualMetrics.put(WEIGHTED_AVG_FREQUENCY, weightedAvgFrequency);
 		actualMetrics.put(WEIGHTED_AVG_PRESSURE, weightedAvgPressure);
-		actualMetrics.put(TOTAL_DURATION, totalDuration/3);
+		actualMetrics.put(TOTAL_DURATION, totalDuration);
 		actualMetrics.put(TREATMENTS_PER_DAY, treatmentsPerDay/3);
 		return actualMetrics;
 	}
@@ -716,7 +716,7 @@ public class AdherenceCalculationService {
 					latest3DaysTherapySessions);
 			int hmrRunrate = 0;
 			if(Objects.nonNull(therapyMetrics.get(TOTAL_DURATION))){
-				hmrRunrate = therapyMetrics.get(TOTAL_DURATION).intValue();
+				hmrRunrate = therapyMetrics.get(TOTAL_DURATION).intValue()/3;// 3 days avg
 			}
 			LocalDate lastTransmissionDate = getLatestTransmissionDate(
 					existingTherapySessionMap,receivedTherapySessionsMap, therapyDate);
@@ -915,8 +915,6 @@ public class AdherenceCalculationService {
 		
 		latestCompliance.setMissedTherapyCount(currentMissedTherapyCount);
 		latestCompliance.setScore(currentScore);
-		if(Objects.nonNull(metricsMap.get(TOTAL_DURATION)))
-			latestCompliance.setHmrRunRate(metricsMap.get(TOTAL_DURATION).intValue());
 		complianceMap.put(latestCompliance.getDate(), latestCompliance);
 /*		log.warn("***************************AFTER************************************************");
 		log.warn(latestCompliance.getDate()+" : "+latestCompliance);

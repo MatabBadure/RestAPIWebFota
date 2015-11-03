@@ -270,7 +270,8 @@ public class UserExtensionResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     public ResponseEntity<?> searchHcp(@RequestParam(required=true,value = "searchString")String searchString,
-    		@RequestParam(required=false,value = "filter")String filter,
+    		@RequestParam(value = "filter", required=false)String filter,
+    		@RequestParam(value = "clinicId", required=false)String associatedToClinicId,
     		@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
             @RequestParam(value = "sort_by", required = false) String sortBy,
@@ -285,7 +286,8 @@ public class UserExtensionResource {
     		isAscending =  (isAscending != null) ?  isAscending : true;
     		sortOrder.put(sortBy, isAscending);
     	}
-    	Page<HcpVO> page = userSearchRepository.findHCPBy(queryString,filter,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+    	Page<HcpVO> page = userSearchRepository.findHCPBy(queryString,filter,
+    			PaginationUtil.generatePageRequest(offset, limit),sortOrder, associatedToClinicId);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/user/hcp/search", offset, limit);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -1001,6 +1003,32 @@ public class UserExtensionResource {
         JSONObject jsonObject = new JSONObject();
 		try {
 			jsonObject = userService.reactivateUser(id);
+			 if (jsonObject.containsKey("ERROR")) {
+		        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
+		        } else {
+		            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+		        }
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
+		}
+       
+    }
+    
+    /**
+     * PUT  /user/:id/reactivation -> reactivation of user, updates activation key and time.
+     */
+    @RequestMapping(value = "/user/{id}/reactivation",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> userReactivation(@PathVariable Long id, HttpServletRequest request) {
+        log.debug("REST request to User Reactivation : {}", id);
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject = userService.userReactivation(id, baseUrl);
 			 if (jsonObject.containsKey("ERROR")) {
 		        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
 		        } else {

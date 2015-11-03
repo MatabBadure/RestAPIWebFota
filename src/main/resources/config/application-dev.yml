@@ -44,3 +44,5 @@ spring:
         hcpOrClinicAdminDashboardUrl: http://dev.hillromvest.com
         patientDashboardUrl: http://dev.hillromvest.com
         careGiverDashboardUrl: http://dev.hillromvest.com
+        baseUrl: http://dev.hillromvest.com
+        accountActivationReminderInterval: 12

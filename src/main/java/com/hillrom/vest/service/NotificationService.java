@@ -9,6 +9,7 @@ import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 
 import static com.hillrom.vest.config.NotificationTypeConstants.*;
+import static com.hillrom.vest.config.AdherenceScoreConstants.*;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
@@ -58,7 +59,7 @@ public class NotificationService {
 		Notification existingNotificationofTheDay = notificationRepository.findByPatientUserIdAndDate(patientUserId, currentTherapyDate);
 		if(Objects.nonNull(existingNotificationofTheDay)){
 			String notificationType = existingNotificationofTheDay.getNotificationType();
-			if((MISSED_THERAPY.equalsIgnoreCase(notificationType) && missedTherapyCount == 0) ||
+			if((MISSED_THERAPY.equalsIgnoreCase(notificationType) && missedTherapyCount < DEFAULT_MISSED_THERAPY_DAYS_COUNT) ||
 				(HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType) && isHmrCompliant) ||
 				(SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) && !isSettingsDeviated) ||
 				(HMR_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) && isHmrCompliant && !isSettingsDeviated)){

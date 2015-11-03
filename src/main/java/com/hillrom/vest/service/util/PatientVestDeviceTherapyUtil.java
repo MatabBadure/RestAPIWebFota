@@ -18,6 +18,7 @@ import com.hillrom.vest.domain.User;
 
 public class PatientVestDeviceTherapyUtil {
 
+	private static final float SECONDS_PER_MINUTE = 60f;
 	private static final float MILLI_SECONDS_PER_MINUTE = 60000f;
 	private static final String EVENT_CODE_DELIMITER = ":";
 	private static final String EVENT_CODE_NORMAL_INCOMPLETE = "4";
@@ -42,13 +43,6 @@ public class PatientVestDeviceTherapyUtil {
 	private static final String EVENT_CODE_RAMP_REACHED_PAUSED = "24";
 	private static final String EVENT_CODE_PROGRAM_PAUSED = "18";
 	private static final String EVENT_CODE_NORMAL_PAUSED = "5";
-	private static final String EVENT_CODE_PROGRAM_PT2_START = "8";
-	private static final String EVENT_CODE_PROGRAM_PT3_START = "9";
-	private static final String EVENT_CODE_PROGRAM_PT4_START = "10";
-	private static final String EVENT_CODE_PROGRAM_PT5_START = "11";
-	private static final String EVENT_CODE_PROGRAM_PT6_START = "12";
-	private static final String EVENT_CODE_PROGRAM_PT7_START = "13";
-	private static final String EVENT_CODE_PROGRAM_PT8_START = "14";
 	private static final String EVENT_CODE_NORMAL_RESUMED = "6";
 	private static final String EVENT_CODE_PROGRAM_RESUMED = "19";
 	private static final String EVENT_CODE_RAMP_RESUMED = "27";
@@ -72,21 +66,13 @@ public class PatientVestDeviceTherapyUtil {
 			PatientVestDeviceData deviceEventRecord = deviceEventRecords.get(i);
 			frequency += calculateWeightedAvg( durationForWeightedAvgCalc,deviceEventRecord.getFrequency().longValue(),deviceEventRecord.getDuration());
 			pressure += calculateWeightedAvg(durationForWeightedAvgCalc,deviceEventRecord.getPressure().longValue(),deviceEventRecord.getDuration());
-			if(isProgrammedCoughPause(deviceEventRecord) || isNormalCoughPause(deviceEventRecord)){
-				if(isProgrammedCoughPause(deviceEventRecord))
-					++programmedCoughPauses;
-				if(isNormalCoughPause(deviceEventRecord))
-					++normalCoughPauses;
-				if( i+1 < deviceEventRecords.size()){
-					PatientVestDeviceData nextEvent = deviceEventRecords.get(i+1);
-					if(isResumedOrInCompleteEvent(nextEvent)){
-						caughPauseDuration += (nextEvent.getTimestamp()-deviceEventRecord.getTimestamp());
-					}
-				}
-			}
+			if(isProgrammedCoughPause(deviceEventRecord))
+				++programmedCoughPauses;
+			if(isNormalCoughPause(deviceEventRecord))
+				++normalCoughPauses;
 		}
-		durationOfSession = calculateDurationOfSession(deviceEventRecords, caughPauseDuration);
-		caughPauseDuration = (int)Math.ceil(caughPauseDuration/MILLI_SECONDS_PER_MINUTE);
+		durationOfSession = calculateDurationOfSession(deviceEventRecords);
+		caughPauseDuration = getCoughPauseDuration(deviceEventRecords,durationOfSession);
 		metricsMap.put(FREQUENCY, frequency);
 		metricsMap.put(PRESSURE, pressure);
 		metricsMap.put(DURATION, durationOfSession);
@@ -96,12 +82,18 @@ public class PatientVestDeviceTherapyUtil {
 		return metricsMap;
 	}
 
-	private static int calculateDurationOfSession(
-			List<PatientVestDeviceData> deviceEventRecords,
-			int caughPauseDuration) {
+	private static int getCoughPauseDuration(List<PatientVestDeviceData> deviceEventRecords,int durationOfSession) {
 		long endTimestamp = deviceEventRecords.get(deviceEventRecords.size()-1).getTimestamp();
 		long startTimestamp = deviceEventRecords.get(0).getTimestamp();
-		return (int)Math.ceil((endTimestamp - startTimestamp-caughPauseDuration)/MILLI_SECONDS_PER_MINUTE);
+		int totalDuration = (int) Math.round((endTimestamp-startTimestamp)/MILLI_SECONDS_PER_MINUTE);
+		return totalDuration - durationOfSession;
+	}
+
+	private static int calculateDurationOfSession(
+			List<PatientVestDeviceData> deviceEventRecords) {
+		double endHmr = deviceEventRecords.get(deviceEventRecords.size()-1).getHmr();
+		double startHmr = deviceEventRecords.get(0).getHmr();
+		return (int)Math.round((endHmr - startHmr)/SECONDS_PER_MINUTE);
 	}
 
 	/**
@@ -134,18 +126,6 @@ public class PatientVestDeviceTherapyUtil {
 				deviceEventRecord.getEventId().startsWith(EVENT_CODE_RAMP_REACHED_PAUSED);
 	}
 
-	private static boolean isResumedOrInCompleteEvent(
-			PatientVestDeviceData nextEvent) {
-		if(nextEvent.getEventId().startsWith(EVENT_CODE_NORMAL_RESUMED) || 
-		   nextEvent.getEventId().startsWith(EVENT_CODE_PROGRAM_RESUMED) ||
-		   nextEvent.getEventId().startsWith(EVENT_CODE_RAMP_RESUMED) || 
-		   isInCompleteEvent(nextEvent)){
-			return true;
-		}else{
-			return false;
-		}
-	}
-	
 	private static boolean isInCompleteEvent(
 			PatientVestDeviceData nextEvent) {
 		if(nextEvent.getEventId().startsWith(EVENT_CODE_NORMAL_INCOMPLETE) || 
@@ -198,13 +178,6 @@ public class PatientVestDeviceTherapyUtil {
 	private static boolean isStartEventForTherapySession(String eventCode) {
 		return EVENT_CODE_NORMAL_START.equals(eventCode) ||
 		   EVENT_CODE_PROGRAM_PT1_START.equals(eventCode) ||
-		   EVENT_CODE_PROGRAM_PT2_START.equals(eventCode) || 
-		   EVENT_CODE_PROGRAM_PT3_START.equals(eventCode) || 
-		   EVENT_CODE_PROGRAM_PT4_START.equals(eventCode) ||
-		   EVENT_CODE_PROGRAM_PT5_START.equals(eventCode) ||
-		   EVENT_CODE_PROGRAM_PT6_START.equals(eventCode) ||
-		   EVENT_CODE_PROGRAM_PT7_START.equals(eventCode) ||
-		   EVENT_CODE_PROGRAM_PT8_START.equals(eventCode) ||
 		   EVENT_CODE_RAMP_STARTED.equals(eventCode);
 	}
 

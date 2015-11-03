@@ -31,5 +31,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("from User user where LOWER(user.email) = ?1 or LOWER(user.hillromId) = ?1")
 	Optional<User> findOneByEmailOrHillromId(String login);
+    
+    @Query("from User user where activated = false and activationLinkSentDate between ?1 and ?2")
+    List<User> findAllByActivatedIsFalseAndActivationLinkSentDateBetweeen(DateTime dateTime1, DateTime dateTime2);
 
 }

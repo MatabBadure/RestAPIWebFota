@@ -1,7 +1,11 @@
 package com.hillrom.vest.service;
-import static com.hillrom.vest.config.NotificationTypeConstants.*;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE;
+import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
 
-import java.math.BigDecimal;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -11,6 +15,7 @@ import javax.inject.Inject;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang.CharEncoding;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -18,12 +23,13 @@ import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
-import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.User;
+import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.PatientStatsVO;
@@ -48,6 +54,9 @@ public class MailService {
 
     @Inject
     private MessageSource messageSource;
+    
+    @Inject
+    private UserRepository userRepository;
 
     @Inject
     private SpringTemplateEngine templateEngine;
@@ -62,8 +71,10 @@ public class MailService {
      */
     private String hcpOrClinicAdminDashboardUrl;
     private String careGiverDashboardUrl;
-    
     private String patientDashboardUrl;
+    private String baseUrl;
+    
+    private Integer accountActivationReminderInterval;
     
     @PostConstruct
     public void init() {
@@ -71,6 +82,9 @@ public class MailService {
         this.hcpOrClinicAdminDashboardUrl = env.getProperty("spring.notification.hcpOrClinicAdminDashboardUrl");
         this.careGiverDashboardUrl = env.getProperty("spring.notification.careGiverDashboardUrl");
         this.patientDashboardUrl = env.getProperty("spring.notification.patientDashboardUrl");
+        this.baseUrl = env.getProperty("spring.notification.baseUrl");
+        this.accountActivationReminderInterval =
+        		Integer.parseInt(env.getProperty("spring.notification.accountActivationReminderInterval"));
     }
 
     @Async
@@ -182,4 +196,40 @@ public class MailService {
         
         sendEmail(new String[]{careGiverStatsNotificationVO.getCGEmail()}, subject, content, false, true);
     }
+    
+    @Async
+    public void sendActivationReminderEmail(User user) {
+        log.debug("Sending activation Reminder e-mail to '{}'", user.getEmail());
+        Locale locale = Locale.forLanguageTag(user.getLangKey());
+        Context context = new Context(locale);
+        context.setVariable("user", user);
+        context.setVariable("notificationUrl", baseUrl);
+        String content = templateEngine.process("activationReminderEmail", context);
+        String subject = messageSource.getMessage("email.activation.title", null, locale);
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
+    
+    @Scheduled(cron="0 0 * * * *")
+	@Async
+	public void activationReminderEmail(){
+    	try{
+			DateTime currectTime =  new DateTime();
+			for(int interval = accountActivationReminderInterval; interval < 48; interval += accountActivationReminderInterval)
+				getUsersActivationReminderEmail(currectTime.minusHours(interval).minusHours(1),currectTime.minusHours(interval));
+	    }catch(Exception ex){
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter( writer );
+			ex.printStackTrace( printWriter );
+			sendJobFailureNotification("activationReminderEmail",writer.toString());
+		}
+	}
+    
+	private void getUsersActivationReminderEmail(DateTime fromTime,DateTime toTime){
+	    List<User> users = userRepository.findAllByActivatedIsFalseAndActivationLinkSentDateBetweeen(fromTime, toTime);
+	    log.debug("No of users ", users);
+	    for(User user : users){
+	    	sendActivationReminderEmail(user);
+	    }
+	}
+    
 }

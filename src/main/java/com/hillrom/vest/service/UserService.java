@@ -1564,6 +1564,32 @@ public class UserService {
 		existingUser.setDeleted(false);
 		userExtensionRepository.save(existingUser);
 	}
-
+	
+	//send activation link and send
+	public JSONObject userReactivation(Long id, String baseUrl) throws HillromException {
+    	JSONObject jsonObject = new JSONObject();
+    	UserExtension existingUser = userExtensionRepository.findOne(id);
+    	List<Authority> authorities  = authorityRepository.findAll();
+    	Map<String,Authority> authorityMap = new HashMap<>();
+    	authorities.stream().forEach(authority -> {
+    		authorityMap.put(authority.getName(), authority);
+    	});
+		if(Objects.nonNull(existingUser)) {
+			if(!existingUser.getActivated()){
+				if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))
+						|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))){
+					sendEmailNotification(baseUrl, existingUser);
+					jsonObject.put("message", MessageConstants.HR_215);
+				} else {
+					throw new HillromException(ExceptionConstants.HR_604);
+				}
+			} else {
+				throw new HillromException(ExceptionConstants.HR_605);
+			}
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);//No such user exist
+		}
+		return jsonObject;
+    }
 }
 

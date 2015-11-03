@@ -119,7 +119,8 @@ public class UserSearchRepository {
 		query.setMaxResults(maxResult);
 	}
 
-	public Page<HcpVO> findHCPBy(String queryString, String filter, Pageable pageable, Map<String, Boolean> sortOrder) {
+	public Page<HcpVO> findHCPBy(String queryString, String filter, Pageable pageable, Map<String, Boolean> sortOrder, 
+			String associatedToClinicId) {
 
 		String findHcpQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted,"
 				+ " user.zipcode,userExt.address,userExt.city as hcity,userExt.credentials,userExt.fax_number,userExt.primary_phone,"
@@ -134,7 +135,10 @@ public class UserSearchRepository {
 				+ AuthoritiesConstants.HCP + "'"
 				+ " left outer join CLINIC_USER_ASSOC user_clinic on user_clinic.users_id = user.id "
 				+ " left outer join CLINIC clinic on user_clinic.clinics_id = clinic.id and user_clinic.users_id = user.id ";
-
+		
+		if (StringUtils.isNotEmpty(associatedToClinicId))
+			findHcpQuery+= " where user_clinic.users_id in (select users_id from CLINIC_USER_ASSOC where clinics_id = '"+ associatedToClinicId +"')";
+		
 		StringBuilder filterQuery = new StringBuilder();
 
 		if (StringUtils.isNotEmpty(filter) && !"all".equalsIgnoreCase(filter)) {
@@ -149,6 +153,8 @@ public class UserSearchRepository {
 		}
 
 		findHcpQuery = findHcpQuery.replaceAll(":queryString", queryString);
+		
+		
 
 		String countSqlQuery = "select count(distinct hcpUsers.id) from (" + findHcpQuery + " ) hcpUsers";
 

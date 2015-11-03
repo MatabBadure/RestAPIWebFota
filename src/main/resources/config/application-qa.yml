@@ -43,3 +43,5 @@ spring:
     notification:
         hcpOrClinicAdminDashboardUrl: http://qa.hillromvest.com
         patientDashboardUrl: http://qa.hillromvest.com
+        baseUrl: http://qa.hillromvest.com
+        accountActivationReminderInterval: 12

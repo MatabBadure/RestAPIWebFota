@@ -108,9 +108,9 @@ public class AccountResource {
     }
 
     /**
-     * GET  /activate -> activate the registered user.
+     * GET  /validateActivationKey -> validate activation key.
      */
-    @RequestMapping(value = "/validateactivationkey",
+    @RequestMapping(value = "/validateActivationKey",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     

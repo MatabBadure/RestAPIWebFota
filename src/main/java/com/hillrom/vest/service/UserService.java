@@ -629,6 +629,15 @@ public class UserService {
 		mailService.sendActivationEmail(user, baseUrl);
 		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
 	}
+	
+	private void reSendEmailNotification(String baseUrl, UserExtension user) {
+		user.setActivationKey(RandomUtil.generateActivationKey());
+		user.setActivated(false);
+		user.setActivationLinkSentDate(DateTime.now());
+		userRepository.saveAndFlush(user);
+		mailService.reSendActivationEmail(user, baseUrl);
+		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
+	}
 
     public UserExtension updateHillromTeamUser(UserExtension user, UserExtensionDTO userExtensionDTO) {
 		assignValuesToUserObj(userExtensionDTO, user);
@@ -1565,31 +1574,44 @@ public class UserService {
 		userExtensionRepository.save(existingUser);
 	}
 	
-	//send activation link and send
+	// reset activation link and send
 	public JSONObject userReactivation(Long id, String baseUrl) throws HillromException {
-    	JSONObject jsonObject = new JSONObject();
-    	UserExtension existingUser = userExtensionRepository.findOne(id);
-    	List<Authority> authorities  = authorityRepository.findAll();
-    	Map<String,Authority> authorityMap = new HashMap<>();
-    	authorities.stream().forEach(authority -> {
-    		authorityMap.put(authority.getName(), authority);
-    	});
-		if(Objects.nonNull(existingUser)) {
-			if(!existingUser.getActivated()){
-				if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))
-						|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))){
-					sendEmailNotification(baseUrl, existingUser);
-					jsonObject.put("message", MessageConstants.HR_215);
+		JSONObject jsonObject = new JSONObject();
+		UserExtension existingUser = userExtensionRepository.findOne(id);
+		List<Authority> authorities = authorityRepository.findAll();
+		Map<String, Authority> authorityMap = new HashMap<>();
+		authorities.stream().forEach(authority -> {
+			authorityMap.put(authority.getName(), authority);
+		});
+		if (Objects.nonNull(existingUser)) {
+			if (SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+					.contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))
+					|| SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+							.contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))) {
+				if (existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
+					if (Objects.isNull(existingUser.getLastLoggedInAt())) {
+						if (Objects.nonNull(existingUser.getEmail())) {
+							reSendEmailNotification(baseUrl, existingUser);
+							jsonObject.put("message", MessageConstants.HR_305);
+						} else {
+							throw new HillromException(ExceptionConstants.HR_508);
+						}
+					} else {
+						throw new HillromException(ExceptionConstants.HR_605);
+					}
+				} else if (!existingUser.getActivated()) {
+					reSendEmailNotification(baseUrl, existingUser);
+					jsonObject.put("message", MessageConstants.HR_305);
 				} else {
-					throw new HillromException(ExceptionConstants.HR_604);
+					throw new HillromException(ExceptionConstants.HR_605);
 				}
 			} else {
-				throw new HillromException(ExceptionConstants.HR_605);
+				throw new HillromException(ExceptionConstants.HR_606);
 			}
 		} else {
-			throw new HillromException(ExceptionConstants.HR_512);//No such user exist
+			throw new HillromException(ExceptionConstants.HR_512);
 		}
 		return jsonObject;
-    }
+	}
 }
 

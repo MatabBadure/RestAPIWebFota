@@ -41,6 +41,8 @@ public class PatientUserVO {
 	private Boolean isActivated;
 	private int adherence;
 	private Date lastTransmissionDate;
+	private DateTime lastLoggedInAt;
+	
 	private List<Map<String,String>> clinics = new LinkedList<>();
 	
 
@@ -113,7 +115,7 @@ public class PatientUserVO {
 		this.primaryPhone = user.getPrimaryPhone();
 		this.createdAt = user.getCreatedDate();
 		this.isActivated = user.getActivated();
-		
+		this.lastLoggedInAt = user.getLastLoggedInAt();
 		if(null != patientInfo){			
 			this.state = patientInfo.getState();
 			this.hillromId = patientInfo.getHillromId();
@@ -340,5 +342,11 @@ public class PatientUserVO {
 		this.isExpired = isExpired;
 	}
 
+	public DateTime getLastLoggedInAt() {
+		return lastLoggedInAt;
+	}
+	public void setLastLoggedInAt(DateTime lastLoggedInAt) {
+		this.lastLoggedInAt = lastLoggedInAt;
+	}
 	
 }

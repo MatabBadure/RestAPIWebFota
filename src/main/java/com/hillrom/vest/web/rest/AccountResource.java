@@ -108,6 +108,23 @@ public class AccountResource {
     }
 
     /**
+     * GET  /activate -> activate the registered user.
+     */
+    @RequestMapping(value = "/validateactivationkey",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    public ResponseEntity<JSONObject> validateActivationKey(@RequestParam(value = "key") String key) { 
+        JSONObject jsonObject = new JSONObject();
+		try {
+			Optional<User> activatedUser = userService.validateActivationKey(key);
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
+    }
+    /**
      * GET  /authenticate -> check if the user is authenticated, and return its login.
      */
     @RequestMapping(value = "/authenticate",

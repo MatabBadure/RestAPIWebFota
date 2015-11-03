@@ -1029,14 +1029,10 @@ public class UserExtensionResource {
         JSONObject jsonObject = new JSONObject();
 		try {
 			jsonObject = userService.userReactivation(id, baseUrl);
-			 if (jsonObject.containsKey("ERROR")) {
-		        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
-		        } else {
-		            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
-		        }
+		    return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {
 			jsonObject.put("ERROR", e.getMessage());
-			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 		}
        
     }

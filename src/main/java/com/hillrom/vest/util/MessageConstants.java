@@ -87,4 +87,6 @@ public class MessageConstants {
     
     public static final String HR_303 = "Data ingested successfully";
     public static final String HR_304 = "Security question fetched successfully.";
+    
+    public static final String HR_305 = "Activation link sent successfully.";
 }

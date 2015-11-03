@@ -20,7 +20,7 @@ public class ExceptionConstants {
     
     // Hillrom team User
     public static final String HR_511 = "Unable to create Hillrom User.";
-    public static final String HR_512 = "No such user exist";
+    public static final String HR_512 = "No such user exists";
     public static final String HR_513 = "Unable to delete User";
     public static final String HR_514 = "Unable to fetch User";
     public static final String HR_515 = "Unable to create Caregiver User";
@@ -124,6 +124,7 @@ public class ExceptionConstants {
     public static final String HR_603 = "Invalid username, please enter valid email id.";
     public static final String HR_604 = "Unable to activate User";
     public static final String HR_605 = "User is already in active state.";
+    public static final String HR_606 = "Activation link can not be sent.";
     
     public static final String HR_701 = "Note date cannot be before first  transmission date."; 
     

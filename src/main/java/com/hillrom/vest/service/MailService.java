@@ -112,10 +112,22 @@ public class MailService {
         log.debug("Sending activation e-mail to '{}'", user.getEmail());
         Locale locale = Locale.forLanguageTag(user.getLangKey());
         Context context = new Context(locale);
-        context.setVariable("user", user);
+        context.setVariable("user", userNameFormatting(user));
         context.setVariable("baseUrl", baseUrl);
         String content = templateEngine.process("activationEmail", context);
         String subject = messageSource.getMessage("email.activation.title", null, locale);
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
+    
+    @Async
+    public void reSendActivationEmail(User user, String baseUrl) {
+        log.debug("Resending activation e-mail to '{}'", user.getEmail());
+        Locale locale = Locale.forLanguageTag(user.getLangKey());
+        Context context = new Context(locale);
+        context.setVariable("user", userNameFormatting(user));
+        context.setVariable("baseUrl", baseUrl);
+        String content = templateEngine.process("activationEmail", context);
+        String subject = messageSource.getMessage("email.reactivation.title", null, locale);
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
 
@@ -202,10 +214,10 @@ public class MailService {
         log.debug("Sending activation Reminder e-mail to '{}'", user.getEmail());
         Locale locale = Locale.forLanguageTag(user.getLangKey());
         Context context = new Context(locale);
-        context.setVariable("user", user);
+        context.setVariable("user", userNameFormatting(user));
         context.setVariable("notificationUrl", baseUrl);
         String content = templateEngine.process("activationReminderEmail", context);
-        String subject = messageSource.getMessage("email.activation.title", null, locale);
+        String subject = messageSource.getMessage("email.reactivation.title", null, locale);
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
     
@@ -232,4 +244,13 @@ public class MailService {
 	    }
 	}
     
+	private User userNameFormatting(User user){
+		user.setFirstName(userNameStringFormatting(user.getFirstName()));
+		user.setLastName(userNameStringFormatting(user.getLastName()));
+		return user;
+	}
+	
+	private String userNameStringFormatting(String userName){
+		return userName.substring(0, 1).toUpperCase() + userName.substring(1).toLowerCase();
+	}
 }

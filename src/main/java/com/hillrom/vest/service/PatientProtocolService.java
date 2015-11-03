@@ -142,7 +142,7 @@ public class PatientProtocolService {
 	     		if(protocolAssocList.isEmpty()){
 	     			return new LinkedList<PatientProtocolData>();
 	     		} else {
-	     			return protocolAssocList;
+	     			return getProtocolDetails(patientUserId, protocolAssocList.get(0).getProtocolKey());
 	     		}
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);

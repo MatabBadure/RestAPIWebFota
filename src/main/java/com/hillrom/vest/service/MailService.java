@@ -118,6 +118,18 @@ public class MailService {
         String subject = messageSource.getMessage("email.activation.title", null, locale);
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
+    
+    @Async
+    public void reSendActivationEmail(User user, String baseUrl) {
+        log.debug("Resending activation e-mail to '{}'", user.getEmail());
+        Locale locale = Locale.forLanguageTag(user.getLangKey());
+        Context context = new Context(locale);
+        context.setVariable("user", user);
+        context.setVariable("baseUrl", baseUrl);
+        String content = templateEngine.process("activationEmail", context);
+        String subject = messageSource.getMessage("email.reactivation.title", null, locale);
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
 
     @Async
     public void sendPasswordResetMail(User user, String baseUrl) {

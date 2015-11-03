@@ -56,10 +56,7 @@ public class PatientVestDeviceService {
     	if(assocByBluetoothID.isPresent()) {
     		alreadyLinkedPatientuser = (User) assocByBluetoothID.get().getPatient().getUserPatientAssoc().stream().filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser();
     		if(!alreadyLinkedPatientuser.getId().equals(id)){
-    			throw new HillromException(ExceptionConstants.HR_578 
-    					+ alreadyLinkedPatientuser.getFirstName() 
-    					+ " " + alreadyLinkedPatientuser.getLastName() 
-    					+ " with HR ID : "+ alreadyLinkedPatientuser.getHillromId());
+    			return alreadyLinkedPatientuser;
 			}
     	}
     	if(assocList.isEmpty()) {
@@ -73,10 +70,7 @@ public class PatientVestDeviceService {
     				patientVestDeviceAssoc = updateDeviceDetailsForPatient(activeDevice, deviceData);
     				return patientVestDeviceAssoc;
     			} else {
-    				throw new HillromException(ExceptionConstants.HR_572 
-        					+ alreadyLinkedPatientuser.getFirstName() 
-        					+ " " + alreadyLinkedPatientuser.getLastName() 
-        					+ " with HR ID : "+ alreadyLinkedPatientuser.getHillromId());
+    				return alreadyLinkedPatientuser;
     			}
     		} else {
     			PatientInfo patientInfo = userService.getPatientInfoObjFromPatientUser(userRepository.getOne(id));

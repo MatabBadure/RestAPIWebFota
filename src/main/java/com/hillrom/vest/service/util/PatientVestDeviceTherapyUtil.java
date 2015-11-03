@@ -18,7 +18,7 @@ import com.hillrom.vest.domain.User;
 
 public class PatientVestDeviceTherapyUtil {
 
-	private static final int SECONDS_PER_MINUTE = 60;
+	private static final float SECONDS_PER_MINUTE = 60f;
 	private static final float MILLI_SECONDS_PER_MINUTE = 60000f;
 	private static final String EVENT_CODE_DELIMITER = ":";
 	private static final String EVENT_CODE_NORMAL_INCOMPLETE = "4";
@@ -85,7 +85,7 @@ public class PatientVestDeviceTherapyUtil {
 	private static int getCoughPauseDuration(List<PatientVestDeviceData> deviceEventRecords,int durationOfSession) {
 		long endTimestamp = deviceEventRecords.get(deviceEventRecords.size()-1).getTimestamp();
 		long startTimestamp = deviceEventRecords.get(0).getTimestamp();
-		int totalDuration = (int) Math.ceil((endTimestamp-startTimestamp)/MILLI_SECONDS_PER_MINUTE);
+		int totalDuration = (int) Math.round((endTimestamp-startTimestamp)/MILLI_SECONDS_PER_MINUTE);
 		return totalDuration - durationOfSession;
 	}
 
@@ -93,7 +93,7 @@ public class PatientVestDeviceTherapyUtil {
 			List<PatientVestDeviceData> deviceEventRecords) {
 		double endHmr = deviceEventRecords.get(deviceEventRecords.size()-1).getHmr();
 		double startHmr = deviceEventRecords.get(0).getHmr();
-		return (int)Math.ceil((endHmr - startHmr)/SECONDS_PER_MINUTE);
+		return (int)Math.round((endHmr - startHmr)/SECONDS_PER_MINUTE);
 	}
 
 	/**

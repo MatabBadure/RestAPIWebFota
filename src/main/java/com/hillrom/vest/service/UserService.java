@@ -1098,10 +1098,13 @@ public class UserService {
 
 	public UserExtension getHCPUser(Long id) throws HillromException{
 		UserExtension hcpUser = userExtensionRepository.findOne(id);
-		if(Objects.nonNull(hcpUser.getId())) {
-		} else {
-			throw new HillromException(ExceptionConstants.HR_533);//Unable to fetch HealthCare Professional.");
-		}
+		if(Objects.nonNull(hcpUser))
+			if(Objects.nonNull(hcpUser.getId())) {
+			} else {
+				throw new HillromException(ExceptionConstants.HR_533);//Unable to fetch HealthCare Professional.");
+			}
+		else 
+			throw new HillromException(ExceptionConstants.HR_512);
 		return hcpUser;
 	 }
 

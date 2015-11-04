@@ -99,7 +99,7 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
 	private void processFirstTimeLogin(User user,String tokenPassword) {
 		if(null == user.getLastLoggedInAt()){
 			String defaultPassword = userService.generateDefaultPassword(user);
-			if(defaultPassword.equals(tokenPassword)){
+			if(defaultPassword.equalsIgnoreCase(tokenPassword)){
 				/* There could be possibility that password being NULL in User from DB, hence send the tokenPassword(user filled in login screen) in Exception Object
 				 * passing Null in Exception Object causes 500 error which breaks our flow
 				 */

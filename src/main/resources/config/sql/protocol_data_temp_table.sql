@@ -25,5 +25,5 @@ INSERT INTO `protocol_data_temp_table` VALUES
 ('HR2015000127','Custom',2,'point6',2,2,14,21,8,12,1,6),
 ('HR2015000128','Normal',2,'point1',20,40,10,14,10,11,1,8);
 
-CALL `create_patient_protocol_data`('Normal', 'HR2015000127', 'JDE APP');
-CALL `create_patient_protocol_data`('Custom', 'HR2015000128', 'JDE APP');
+CALL `create_patient_protocol`('Normal', 'HR2015000127', 'JDE APP');
+CALL `create_patient_protocol`('Custom', 'HR2015000128', 'JDE APP');

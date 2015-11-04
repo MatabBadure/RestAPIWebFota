@@ -160,6 +160,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "expired")
     private Boolean expired = false;
     
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @Column(name = "expiration_date", nullable = true)
+    private DateTime expirationDate = null;
+    
 	public User() {
 		super();
 	}
@@ -392,6 +396,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	public void setExpired(Boolean expired) {
 		this.expired = expired;
+	}
+
+	public DateTime getExpirationDate() {
+		return expirationDate;
+	}
+
+	public void setExpirationDate(DateTime expirationDate) {
+		this.expirationDate = expirationDate;
 	}
 
 	@Override

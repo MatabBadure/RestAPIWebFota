@@ -1,5 +1,9 @@
 package com.hillrom.vest.service.util;
 
+import static com.hillrom.vest.config.Constants.GROUP_BY_MONTHLY;
+import static com.hillrom.vest.config.Constants.GROUP_BY_WEEKLY;
+import static com.hillrom.vest.config.Constants.YYYY_MM_DD;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,9 +19,6 @@ import org.joda.time.format.DateTimeFormatter;
 
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.util.ExceptionConstants;
-
-import static  com.hillrom.vest.config.Constants.*;
-import static com.hillrom.vest.service.util.DateUtil.convertLocalDateToDateTime;
 
 public class DateUtil {
 
@@ -63,16 +64,6 @@ public class DateUtil {
 		return groupByWeek;
 	}
 	
-	/**
-	 * Converts LocalDate to DateTime
-	 * @param date
-	 * @return
-	 */
-	public static DateTime convertLocalDateToDateTime(
-			LocalDate date) {
-		return new DateTime(date.toDateTime(org.joda.time.LocalTime.MIDNIGHT));
-	}
-	
 	public static LocalDate parseStringToLocalDate(String dateString, String dateFormat) throws HillromException{
 		dateFormat = Objects.nonNull(dateFormat) ? dateFormat : YYYY_MM_DD; 
 		final DateTimeFormatter dtf = DateTimeFormat.forPattern(dateFormat);
@@ -113,7 +104,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static int getDaysCountBetweenLocalDates(LocalDate from,LocalDate to){
-		return Days.daysBetween(convertLocalDateToDateTime(from), convertLocalDateToDateTime(to)).getDays();
+		return Days.daysBetween(from, to).getDays();
 	}
 	
 	/**

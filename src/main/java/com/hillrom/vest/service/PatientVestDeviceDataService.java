@@ -2,9 +2,8 @@ package com.hillrom.vest.service;
 
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
+import static com.hillrom.vest.util.MessageConstants.HR_303;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -13,7 +12,9 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 import org.joda.time.LocalDate;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -115,13 +116,15 @@ public class PatientVestDeviceDataService {
 		return patientVestDeviceRecords;
 	}
 
-	public void saveToTemp(final String rawData) throws Exception {
+	public ExitStatus saveData(final String rawData) throws Exception {
 			Job addNewPodcastJob = applicationContext.getBean("processTherapySessionsAndCompliance", Job.class);
 			JobParameters jobParameters = new JobParametersBuilder()
     		.addLong("TIME", System.currentTimeMillis())
     		.addString("rawData", rawData)
     		.toJobParameters();
-			jobLauncher.run(addNewPodcastJob, jobParameters);
+			JobExecution jobExecution = jobLauncher.run(addNewPodcastJob, jobParameters);
+			ExitStatus status = jobExecution.getExitStatus();
+			return jobExecution.getExitStatus();
 	}
 
 	private UserPatientAssoc createPatientUserIfNotExists(PatientVestDeviceRawLog deviceRawLog,

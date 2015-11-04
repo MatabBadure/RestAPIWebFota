@@ -141,6 +141,18 @@ public class UserService {
             }
         throw new HillromException(ExceptionConstants.HR_601);//Invalid Activation Key;
     }
+    
+    public Optional<User> validateActivationKey(String key) throws HillromException {
+        log.debug("Activating user for activation key {}", key);
+        Optional<User> optionalExistingUser = userRepository.findOneByActivationKey(key);
+           if(optionalExistingUser.isPresent()) {
+            	DateTime twoDaysAgo = DateTime.now().minusHours(48);
+                if(optionalExistingUser.get().getActivationLinkSentDate().isBefore(twoDaysAgo.toInstant().getMillis()))
+             	   throw new HillromException(ExceptionConstants.HR_592);//Activation Link Expired
+        		return optionalExistingUser;
+            }
+        throw new HillromException(ExceptionConstants.HR_601);//Invalid Activation Key;
+    }
 
     /**
      * Completes the reset password flow
@@ -1086,10 +1098,13 @@ public class UserService {
 
 	public UserExtension getHCPUser(Long id) throws HillromException{
 		UserExtension hcpUser = userExtensionRepository.findOne(id);
-		if(Objects.nonNull(hcpUser.getId())) {
-		} else {
-			throw new HillromException(ExceptionConstants.HR_533);//Unable to fetch HealthCare Professional.");
-		}
+		if(Objects.nonNull(hcpUser))
+			if(Objects.nonNull(hcpUser.getId())) {
+			} else {
+				throw new HillromException(ExceptionConstants.HR_533);//Unable to fetch HealthCare Professional.");
+			}
+		else 
+			throw new HillromException(ExceptionConstants.HR_512);
 		return hcpUser;
 	 }
 

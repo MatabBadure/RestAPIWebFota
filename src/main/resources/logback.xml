@@ -9,9 +9,9 @@
     </appender>
 
 <!-- The FILE and ASYNC appenders are here as examples for a production configuration -->
-<!--
+
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">       
             <fileNamePattern>logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>90</maxHistory>
         </rollingPolicy>
@@ -25,7 +25,7 @@
         <queueSize>512</queueSize>
         <appender-ref ref="FILE"/>
     </appender>
--->
+
 
     <logger name="com.hillrom.vest" level="${logback.loglevel}"/>
 

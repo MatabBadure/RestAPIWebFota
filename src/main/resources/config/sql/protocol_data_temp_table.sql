@@ -10,7 +10,6 @@ CREATE TABLE `protocol_data_temp_table` (
   `max_frequency` bigint(20) DEFAULT NULL,
   `min_pressure` bigint(20) DEFAULT NULL,
   `max_pressure` bigint(20) DEFAULT NULL,
-  `protocol_key` varchar(45) NOT NULL,
   `to_be_inserted` int(11) DEFAULT '1',
   `id` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
@@ -18,15 +17,13 @@ CREATE TABLE `protocol_data_temp_table` (
 
 INSERT INTO `protocol_data_temp_table` VALUES 
 
-('HR2015000079','M',2,'Choice2',2,2,14,16,8,12,'M',1,1),
-('HR2015000079','M',2,'Choice2',2,2,14,17,8,12,'M',1,2),
-('HR2015000079','M',2,'Choice2',2,2,14,18,8,12,'M',1,3),
-('HR2015000079','M',2,'Choice2',2,2,14,19,8,12,'M',1,4),
-('HR2015000079','M',2,'Choice2',2,2,14,20,8,12,'M',1,5),
-('HR2015000079','M',2,'Choice2',2,2,14,21,8,12,'M',1,6),
-('HR2015000077','SO',2,'Choice3',2,2,14,20,8,12,'SO',1,7),
-('HR2015000078','S',2,'Choice1',20,40,10,14,10,11,'S',1,8);
+('HR2015000127','Custom',2,'point1',2,2,14,16,8,12,1,1),
+('HR2015000127','Custom',2,'point2',2,2,14,17,8,12,1,2),
+('HR2015000127','Custom',2,'point3',2,2,14,18,8,12,1,3),
+('HR2015000127','Custom',2,'point4',2,2,14,19,8,12,1,4),
+('HR2015000127','Custom',2,'point5',2,2,14,20,8,12,1,5),
+('HR2015000127','Custom',2,'point6',2,2,14,21,8,12,1,6),
+('HR2015000128','Normal',2,'point1',20,40,10,14,10,11,1,8);
 
-CALL `create_patient_protocol_data`('M', 'HR2015000079', 'JDE APP');
-CALL `create_patient_protocol_data`('S', 'HR2015000079', 'JDE APP');
-CALL `create_patient_protocol_data`('SO', 'HR2015000079', 'JDE APP');
+CALL `create_patient_protocol_data`('Normal', 'HR2015000127', 'JDE APP');
+CALL `create_patient_protocol_data`('Custom', 'HR2015000128', 'JDE APP');

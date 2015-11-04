@@ -25,7 +25,7 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 
 	@Override
 	public PatientVestDeviceRawLog parseBase64StringToPatientVestDeviceRawLog(
-			String base64String) {
+			String base64String) throws Exception{
 
 		String hub_timestamp = ParserUtil.getValueFromMessage(base64String,HUB_RECEIVE_TIME);
 		String sp_timestamp = ParserUtil.getValueFromMessage(base64String,SP_RECEIVE_TIME);
@@ -93,7 +93,7 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 
 	@Override
 	public List<PatientVestDeviceData> parseBase64StringToPatientVestDeviceLogEntry(
-			String base64String) {
+			String base64String) throws Exception{
 
 		List<PatientVestDeviceData> patientVestDeviceRecords = new LinkedList<>();
 		String base16String = ParserUtil.convertToBase16String(base64String);

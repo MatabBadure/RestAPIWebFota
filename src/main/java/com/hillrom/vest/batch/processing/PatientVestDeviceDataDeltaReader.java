@@ -15,6 +15,8 @@ import javax.transaction.Transactional;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
@@ -47,9 +49,12 @@ import com.hillrom.vest.service.PatientNoEventService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil;
 import com.hillrom.vest.util.RelationshipLabelConstants;
+import com.hillrom.vest.web.rest.PatientVestDeviceDataResource;
 
 public class PatientVestDeviceDataDeltaReader implements ItemReader<List<PatientVestDeviceData>> {
 
+	private final Logger log = LoggerFactory.getLogger(PatientVestDeviceDataDeltaReader.class);
+	
 	@Inject
 	private TempRepository tempRepository;
 
@@ -97,8 +102,8 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 
 	}
 
-	private synchronized List<PatientVestDeviceData> parseRawData() {
-
+	private synchronized List<PatientVestDeviceData> parseRawData() throws Exception{
+		log.debug("Parsing started ");
 		PatientVestDeviceRawLog deviceRawLog = null;
 		List<PatientVestDeviceData> patientVestDeviceEvents = null;
 		deviceRawLog = deviceLogParser.parseBase64StringToPatientVestDeviceRawLog(patientDeviceRawData);
@@ -118,7 +123,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 	@Override
 	public List<PatientVestDeviceData> read()
 			throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
-
+		log.debug("ItemReader started");
 		if (BatchUtil.flag)
 			return null;
 
@@ -134,13 +139,14 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 		}
 		List<PatientVestDeviceData> existingEvents = vestDeviceDataRepository.findByPatientUserIdAndTimestampBetween(patientUserId, from, to);
 
-		
+		log.debug("Calculating the Delta ");
 		List<PatientVestDeviceData> patientVestDeviceRecords = getDelta(existingEvents, patientVestDeviceEvents);
 		
 		// If no new events available , return empty list
 		if(patientVestDeviceRecords.isEmpty())
 			return patientVestDeviceRecords;
 		
+		log.debug("New Events found to be inserted ");
 		List<TherapySession> therapySessions = PatientVestDeviceTherapyUtil
 				.prepareTherapySessionFromDeviceData(patientVestDeviceRecords);
 
@@ -149,7 +155,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 	}
 
 	private synchronized void assignDefaultValuesToVestDeviceDataTemp(PatientVestDeviceRawLog deviceRawLog,
-			List<PatientVestDeviceData> patientVestDeviceRecords, UserPatientAssoc userPatientAssoc) {
+			List<PatientVestDeviceData> patientVestDeviceRecords, UserPatientAssoc userPatientAssoc) throws Exception{
 		patientVestDeviceRecords.stream().forEach(deviceData -> {
 			deviceData.setHubId(deviceRawLog.getHubId());
 			deviceData.setSerialNumber(deviceRawLog.getDeviceSerialNumber());
@@ -161,7 +167,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 
 	@Transactional
 	private synchronized UserPatientAssoc createPatientUserIfNotExists(PatientVestDeviceRawLog deviceRawLog,
-			String deviceSerialNumber) {
+			String deviceSerialNumber) throws Exception{
 		Optional<PatientInfo> patientFromDB = patientInfoRepository.findOneBySerialNumber(deviceSerialNumber);
 
 		PatientInfo patientInfo = null;

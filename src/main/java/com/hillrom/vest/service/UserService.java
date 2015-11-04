@@ -1165,7 +1165,7 @@ public class UserService {
 					}
 					UserPatientAssoc caregiverAssoc = associateExistingCaregiverUserWithPatient(patientUser, userExtensionDTO, existingUser);
 					if(Objects.nonNull(caregiverAssoc)){
-	    				mailService.sendActivationEmail(caregiverAssoc.getUser(), baseUrl);
+	    				if(!existingUser.get().getActivated()) mailService.sendActivationEmail(caregiverAssoc.getUser(), baseUrl);
 		                return caregiverAssoc;
 					} else {
 						throw new HillromException(ExceptionConstants.HR_561);
@@ -1548,10 +1548,29 @@ public class UserService {
     	});
 		if(Objects.nonNull(existingUser)) {
 			if(existingUser.isDeleted()){
-				if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))
-						|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))){
+				if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))){
 					if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 						reactivatePatientUser(existingUser);
+						jsonObject.put("message", MessageConstants.HR_215);
+					} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))) {
+						existingUser.setDeleted(false);
+						userExtensionRepository.saveAndFlush(existingUser);
+						jsonObject.put("message", MessageConstants.HR_215);
+					} else {
+						throw new HillromException(ExceptionConstants.HR_604);
+					}
+				} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))){
+					if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
+						reactivatePatientUser(existingUser);
+						jsonObject.put("message", MessageConstants.HR_215);
+					} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ADMIN)) 
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ACCT_SERVICES))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))) {
+						existingUser.setDeleted(false);
+						userExtensionRepository.saveAndFlush(existingUser);
 						jsonObject.put("message", MessageConstants.HR_215);
 					} else {
 						throw new HillromException(ExceptionConstants.HR_604);

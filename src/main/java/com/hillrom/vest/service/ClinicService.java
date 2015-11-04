@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.persistence.EntityNotFoundException;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -189,11 +190,11 @@ public class ClinicService {
 			clinic.setClinicAdminId(clinicDTO.getClinicAdminId());
 	}
 
-	public Set<UserExtension> getHCPUsers(List<String> idList) throws HillromException {
+	public Set<UserExtension> getHCPUsers(List<String> idList) throws HillromException, EntityNotFoundException {
 		Set<UserExtension> hcpUserList = new HashSet<>();
 		for(String id : idList){
 	    	Clinic clinic = clinicRepository.getOne(id);
-	        if(Objects.isNull(clinic)) {
+	        if(Objects.isNull(clinic)){
 	        	throw new HillromException(ExceptionConstants.HR_547);//Invalid clinic id found
 	        } else {
 	        	hcpUserList.addAll(clinic.getUsers());

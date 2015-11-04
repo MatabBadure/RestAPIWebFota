@@ -7,10 +7,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.*;
 import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.*;
+
+import com.hillrom.vest.batch.processing.PatientVestDeviceDataDeltaReader;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.domain.TempPatientVestDeviceData;
@@ -19,6 +23,8 @@ import com.hillrom.vest.service.util.ParserUtil;
 @Component
 public class VestDeviceLogParserImpl implements DeviceLogParser {
 
+	private final Logger log = LoggerFactory.getLogger(PatientVestDeviceDataDeltaReader.class);
+	
 	private static final String EXPECTED_STRING = "24454F50F0F0F0F0";
 	private static final String YYYY_MMM_DD_HH_MM_SS = "yyyy-MMM-dd hh:mm:ss";
 	private static final int RECORD_SIZE = 16;
@@ -26,7 +32,7 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 	@Override
 	public PatientVestDeviceRawLog parseBase64StringToPatientVestDeviceRawLog(
 			String base64String) throws Exception{
-
+		
 		String hub_timestamp = ParserUtil.getValueFromMessage(base64String,HUB_RECEIVE_TIME);
 		String sp_timestamp = ParserUtil.getValueFromMessage(base64String,SP_RECEIVE_TIME);
 
@@ -38,6 +44,7 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 				.getMillis());
 		patientVestDeviceRawLog.setSpReceiveTime(getTimeStamp(sp_timestamp)
 				.getMillis());
+		log.debug("PatientVestDeviceRawLog : "+patientVestDeviceRawLog);
 		return patientVestDeviceRawLog;
 	}
 
@@ -97,12 +104,17 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 
 		List<PatientVestDeviceData> patientVestDeviceRecords = new LinkedList<>();
 		String base16String = ParserUtil.convertToBase16String(base64String);
+		
+		log.debug("Base16 String "+base16String);
+		
 		if (base16String.length() <= 16)
 			return patientVestDeviceRecords;
 
 		// To validate bad data
 		String endTags = base16String.substring(base16String.length() - 16);
-
+		
+		log.debug("end tags for the message "+endTags);
+		
 		if (!EXPECTED_STRING.equals(endTags.toUpperCase().trim()))
 			throw new IllegalArgumentException(
 					"Could not parse data, Request contains Partial Data");
@@ -114,6 +126,9 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 		end = 32 * 2 + (logcount * RECORD_SIZE * 2);
 		while (start < base16String.length() & (end < base16String.length())) {
 			String log_segment = base16String.substring(start, end);
+			
+			log.debug("Data packet : "+log_segment);
+			
 			PatientVestDeviceData patientVestDeviceRecord = getPatientVestDeviceData(
 					log_segment, logcount);
 			logcount++;

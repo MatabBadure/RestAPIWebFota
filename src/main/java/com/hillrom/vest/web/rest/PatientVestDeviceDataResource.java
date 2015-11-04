@@ -43,7 +43,7 @@ public class PatientVestDeviceDataResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> receiveData(@RequestBody(required=true)String rawMessage){
-		log.debug("Received Data for ingestion length : ",rawMessage.length());
+		log.debug("Received Data for ingestion : ",rawMessage);
 		try{
 			rawMessage = rawMessage.replaceAll("\n", "").replaceAll(" ","");
 			String reqParams[] = new String[]{"device_data",

@@ -103,7 +103,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 	}
 
 	private synchronized List<PatientVestDeviceData> parseRawData() throws Exception{
-		log.debug("Parsing started ");
+		log.debug("Parsing started rawData : ",patientDeviceRawData);
 		PatientVestDeviceRawLog deviceRawLog = null;
 		List<PatientVestDeviceData> patientVestDeviceEvents = null;
 		deviceRawLog = deviceLogParser.parseBase64StringToPatientVestDeviceRawLog(patientDeviceRawData);
@@ -143,8 +143,10 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 		List<PatientVestDeviceData> patientVestDeviceRecords = getDelta(existingEvents, patientVestDeviceEvents);
 		
 		// If no new events available , return empty list
-		if(patientVestDeviceRecords.isEmpty())
+		if(patientVestDeviceRecords.isEmpty()){
+			log.debug("NO NEW EVENTS FOUND");
 			return patientVestDeviceRecords;
+		}
 		
 		log.debug("New Events found to be inserted ");
 		List<TherapySession> therapySessions = PatientVestDeviceTherapyUtil

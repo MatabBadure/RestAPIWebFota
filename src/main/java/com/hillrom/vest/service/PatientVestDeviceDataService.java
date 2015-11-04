@@ -3,7 +3,6 @@ package com.hillrom.vest.service;
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 import static com.hillrom.vest.util.MessageConstants.HR_303;
-import static com.hillrom.vest.util.MessageConstants.HR_306;
 
 import java.util.List;
 import java.util.Objects;

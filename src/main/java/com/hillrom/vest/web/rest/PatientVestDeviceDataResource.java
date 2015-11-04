@@ -48,7 +48,12 @@ public class PatientVestDeviceDataResource {
 		rawMessage = rawMessage.replaceAll("\n", "").replaceAll(" ","");
 		String reqParams[] = new String[]{"device_data",
         "device_serial_number","hub_id","hub_receive_time","device_address"};
-		JSONObject jsonObject = RequestUtil.checkRequiredParamsInQueryString(rawMessage, reqParams);
+		JSONObject jsonObject = new JSONObject();
+		if(!rawMessage.contains("&")){
+			jsonObject.put("ERROR","Missing Params : "+String.join(",", reqParams));
+			return new ResponseEntity(jsonObject,HttpStatus.BAD_REQUEST);
+		}
+		jsonObject = RequestUtil.checkRequiredParamsInQueryString(rawMessage, reqParams);
 		if(jsonObject.containsKey("ERROR")){
 			return new ResponseEntity(jsonObject,HttpStatus.BAD_REQUEST);
 		};

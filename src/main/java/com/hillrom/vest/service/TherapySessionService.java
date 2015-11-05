@@ -17,8 +17,11 @@ import javax.transaction.Transactional;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.hillrom.vest.batch.processing.PatientVestDeviceDataDeltaReader;
 import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
@@ -37,7 +40,6 @@ import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
 @Transactional
 public class TherapySessionService {
 
-	
 	@Inject
 	private TherapySessionRepository therapySessionRepository;
 
@@ -56,7 +58,7 @@ public class TherapySessionService {
 	@Inject
 	private PatientNoEventsRepository patientNoEventRepository;
 
-	public List<TherapySession> saveOrUpdate(List<TherapySession> therapySessions) throws HillromException{
+	public List<TherapySession> saveOrUpdate(List<TherapySession> therapySessions) throws Exception{
 		if(therapySessions.size() > 0){			
 			User patientUser = therapySessions.get(0).getPatientUser();
 			PatientInfo patient = therapySessions.get(0).getPatientInfo();
@@ -73,12 +75,6 @@ public class TherapySessionService {
 			SortedMap<LocalDate,PatientCompliance> existingComplianceMap = complianceService.getPatientComplainceMapByPatientUserId(patientUser.getId());
 			adherenceCalculationService.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
 					receivedTherapySessionMap, existingComplianceMap,protocol);
-			/*for(LocalDate date : receivedTherapySessionMap.keySet()){
-			List<TherapySession> therapySessionsPerDay = groupedTherapySessions.get(date);
-			adherenceCalculationService.calculateCompliancePerDay(therapySessionsPerDay,protocol);
-			//complianceService.createOrUpdate(compliance);
-			therapySessionRepository.save(therapySessionsPerDay);
-		}*/
 		}
 		return therapySessions;
 	}

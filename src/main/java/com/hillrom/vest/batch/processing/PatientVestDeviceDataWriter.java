@@ -20,10 +20,9 @@ public class PatientVestDeviceDataWriter implements ItemWriter<List<PatientVestD
 			throws Exception {
 		if(vestDeviceData.size() > 0){
 			for(List<PatientVestDeviceData> devData : vestDeviceData){
-				
-					deviceDataRepository.save(devData);
-				}
+				deviceDataRepository.save(devData);
 			}
+		}
 		BatchUtil.flag = false;
 	}
 }

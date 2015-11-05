@@ -113,7 +113,7 @@ public class AdherenceCalculationService {
 	 * @return
 	 */
 	public ProtocolConstants getProtocolByPatientUserId(
-			Long patientUserId) {
+			Long patientUserId) throws Exception{
 		List<PatientProtocolData> protocolData =  protocolService.findOneByPatientUserIdAndStatus(patientUserId, false);
 		if(protocolData.size() > 0){			
 			int maxFrequency = 0, minFrequency = 0, minPressure = 0, maxPressure = 0, minDuration = 0, maxDuration = 0, treatmentsPerDay = 0;
@@ -532,7 +532,7 @@ public class AdherenceCalculationService {
 			SortedMap<LocalDate,List<TherapySession>> existingTherapySessionMap,
 			SortedMap<LocalDate,List<TherapySession>> receivedTherapySessionsMap,
 			SortedMap<LocalDate,PatientCompliance> existingComplianceMap,
-			ProtocolConstants protocolConstant){
+			ProtocolConstants protocolConstant) throws Exception{
 		for(LocalDate currentTherapySessionDate : receivedTherapySessionsMap.keySet()){
 			List<TherapySession> receivedTherapySessions = receivedTherapySessionsMap.get(currentTherapySessionDate);
 			LocalDate firstTransmittedDate = null;
@@ -663,7 +663,7 @@ public class AdherenceCalculationService {
 			ProtocolConstants protocolConstant,
 			LocalDate currentTherapySessionDate,
 			LocalDate firstTransmittedDate, PatientInfo patient,
-			User patientUser, int totalDuration) {
+			User patientUser, int totalDuration) throws Exception{
 		noEventService.updatePatientFirstTransmittedDate(patientUser.getId(), currentTherapySessionDate);
 		PatientCompliance currentCompliance = new PatientCompliance(DEFAULT_COMPLIANCE_SCORE, currentTherapySessionDate,
 				patient, patientUser,totalDuration/3,true,false,0d);
@@ -681,7 +681,7 @@ public class AdherenceCalculationService {
 			ProtocolConstants protocolConstant,
 			SortedMap<LocalDate, PatientCompliance> existingComplianceMap,
 			SortedMap<LocalDate, List<TherapySession>> existingTherapySessionMap,
-			SortedMap<LocalDate, List<TherapySession>> receivedTherapySessionsMap) {
+			SortedMap<LocalDate, List<TherapySession>> receivedTherapySessionsMap) throws Exception{
 		
 		LocalDate latestComplianceDate = existingComplianceMap.lastKey();
 		
@@ -751,7 +751,7 @@ public class AdherenceCalculationService {
 	private PatientCompliance getLatestCompliance(User patientUser,
 			PatientInfo patient,
 			SortedMap<LocalDate, PatientCompliance> existingComplianceMap,
-			LocalDate therapyDate) {
+			LocalDate therapyDate) throws Exception {
 			SortedMap<LocalDate,PatientCompliance> mostRecentComplianceMap = existingComplianceMap.headMap(therapyDate);
 			PatientCompliance latestCompliance = null;
 			if(mostRecentComplianceMap.size() > 0){
@@ -766,7 +766,7 @@ public class AdherenceCalculationService {
 	private LocalDate getLatestTransmissionDate(
 			SortedMap<LocalDate, List<TherapySession>> existingTherapySessionMap,
 			SortedMap<LocalDate, List<TherapySession>> receivedTherapySessionsMap,
-			LocalDate date) {
+			LocalDate date) throws Exception{
 		LocalDate lastTransmissionDate = date;
 		// Get Latest TransmissionDate, if data has not been transmitted for the day get mostRecent date
 		if(Objects.isNull(existingTherapySessionMap.get(date))){
@@ -780,7 +780,7 @@ public class AdherenceCalculationService {
 	private double getLatestHMR(
 			SortedMap<LocalDate, List<TherapySession>> existingTherapySessionMap,
 			SortedMap<LocalDate, List<TherapySession>> receivedTherapySessionsMap,
-			LocalDate date, List<TherapySession> latest3DaysTherapySessions) {
+			LocalDate date, List<TherapySession> latest3DaysTherapySessions) throws Exception{
 		double hmr = 0;
 		if(Objects.nonNull(receivedTherapySessionsMap.get(date))){
 			List<TherapySession> currentTherapySessions = receivedTherapySessionsMap.get(date);
@@ -821,7 +821,7 @@ public class AdherenceCalculationService {
 			Map<String,Double> metricsMap,SortedMap<LocalDate,PatientCompliance> complianceMap,
 			SortedMap<LocalDate, List<TherapySession>> existingTherapySessionMap,
 			SortedMap<LocalDate, List<TherapySession>> receivedTherapySessionsMap,
-			ProtocolConstants protocolConstant){
+			ProtocolConstants protocolConstant) throws Exception{
 
 		int currentScore = latestCompliance.getScore();
 		String notificationType = "";
@@ -908,7 +908,7 @@ public class AdherenceCalculationService {
 	private void applySettingsDeviatedDaysCount(
 			PatientCompliance latestCompliance,
 			SortedMap<LocalDate, PatientCompliance> complianceMap,
-			boolean isSettingsDeviated) {
+			boolean isSettingsDeviated) throws Exception{
 		int settingsDeviatedDaysCount;
 		if(isSettingsDeviated){
 			int previousSettingsDeviatedDaysCount = 0;

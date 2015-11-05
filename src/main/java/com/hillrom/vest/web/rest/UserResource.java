@@ -572,7 +572,7 @@ public class UserResource {
     public ResponseEntity<JSONObject> getTherapyByPatientUserIdAndDate(@PathVariable Long id,
     		@RequestParam(value="from",required=false)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
     		@RequestParam(value="to",required=false)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
-    		@RequestParam(value="date",required=false)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date){
+    		@RequestParam(value="date",required=false)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date) throws Exception{
     	JSONObject jsonObject = new JSONObject();
     	if(Objects.nonNull(date)){
     		List<TherapySession> therapySessions = therapySessionService.findByPatientUserIdAndDate(id, date);

@@ -51,7 +51,7 @@ public class PatientVestDeviceTherapyUtil {
 		
 	}
 	
-	public static List<TherapySession> prepareTherapySessionFromDeviceData(List<PatientVestDeviceData> deviceData){
+	public static List<TherapySession> prepareTherapySessionFromDeviceData(List<PatientVestDeviceData> deviceData) throws Exception{
 		List<TherapySession> therapySessions = new LinkedList<>();
 		therapySessions = groupEventsToPrepareTherapySession(deviceData);
 		return groupTherapySessionsByDay(therapySessions);
@@ -116,14 +116,14 @@ public class PatientVestDeviceTherapyUtil {
 	private static boolean isNormalCoughPause(
 			PatientVestDeviceData deviceEventRecord) {
 		return deviceEventRecord.getEventId().startsWith(EVENT_CODE_NORMAL_PAUSED) ||
-				deviceEventRecord.getEventId().startsWith(EVENT_CODE_RAMPING_PAUSED);
+				deviceEventRecord.getEventId().startsWith(EVENT_CODE_RAMPING_PAUSED) || 
+				deviceEventRecord.getEventId().startsWith(EVENT_CODE_PROGRAM_PAUSED) ||
+				deviceEventRecord.getEventId().startsWith(EVENT_CODE_RAMP_REACHED_PAUSED);
 	}
 
 	private static boolean isProgrammedCoughPause(
 			PatientVestDeviceData deviceEventRecord) {
-		return deviceEventRecord.getEventId().startsWith(EVENT_CODE_COUGH_PAUSE) ||
-				deviceEventRecord.getEventId().startsWith(EVENT_CODE_PROGRAM_PAUSED) ||
-				deviceEventRecord.getEventId().startsWith(EVENT_CODE_RAMP_REACHED_PAUSED);
+		return deviceEventRecord.getEventId().startsWith(EVENT_CODE_COUGH_PAUSE);
 	}
 
 	private static boolean isInCompleteEvent(
@@ -139,7 +139,7 @@ public class PatientVestDeviceTherapyUtil {
 	
 
 	public static List<TherapySession> groupEventsToPrepareTherapySession(
-			List<PatientVestDeviceData> deviceData) {
+			List<PatientVestDeviceData> deviceData) throws Exception{
 		List<TherapySession> therapySessions = new LinkedList<TherapySession>();
 		for(int i = 0; i < deviceData.size() ; i++){
 			PatientVestDeviceData vestDeviceData = deviceData.get(i);
@@ -210,7 +210,8 @@ public class PatientVestDeviceTherapyUtil {
 		return therapySession;
 	}
 	
-	public static List<TherapySession> groupTherapySessionsByDay(List<TherapySession> therapySessions){
+	public static List<TherapySession> groupTherapySessionsByDay(List<TherapySession> therapySessions)
+			throws Exception{
 		List<TherapySession> updatedTherapySessions = new LinkedList<>();
 		Map<LocalDate,List<TherapySession>> groupByTherapyDate = therapySessions.stream()
 		        .collect(Collectors.groupingBy(TherapySession::getDate));

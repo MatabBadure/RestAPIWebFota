@@ -116,14 +116,14 @@ public class PatientVestDeviceTherapyUtil {
 	private static boolean isNormalCoughPause(
 			PatientVestDeviceData deviceEventRecord) {
 		return deviceEventRecord.getEventId().startsWith(EVENT_CODE_NORMAL_PAUSED) ||
-				deviceEventRecord.getEventId().startsWith(EVENT_CODE_RAMPING_PAUSED);
+				deviceEventRecord.getEventId().startsWith(EVENT_CODE_RAMPING_PAUSED) || 
+				deviceEventRecord.getEventId().startsWith(EVENT_CODE_PROGRAM_PAUSED) ||
+				deviceEventRecord.getEventId().startsWith(EVENT_CODE_RAMP_REACHED_PAUSED);
 	}
 
 	private static boolean isProgrammedCoughPause(
 			PatientVestDeviceData deviceEventRecord) {
-		return deviceEventRecord.getEventId().startsWith(EVENT_CODE_COUGH_PAUSE) ||
-				deviceEventRecord.getEventId().startsWith(EVENT_CODE_PROGRAM_PAUSED) ||
-				deviceEventRecord.getEventId().startsWith(EVENT_CODE_RAMP_REACHED_PAUSED);
+		return deviceEventRecord.getEventId().startsWith(EVENT_CODE_COUGH_PAUSE);
 	}
 
 	private static boolean isInCompleteEvent(

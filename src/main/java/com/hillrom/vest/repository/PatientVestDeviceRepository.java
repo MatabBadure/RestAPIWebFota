@@ -26,4 +26,7 @@ public interface PatientVestDeviceRepository extends
 	
 	@Query("from PatientVestDeviceHistory pvd where pvd.bluetoothId = ?1 and pvd.active = true")
 	Optional<PatientVestDeviceHistory> findByBluetoothIdAndStatusActive(String bluetoothId);
+	
+	@Query("from PatientVestDeviceHistory pvd where pvd.patientVestDevicePK.patient.id = ?1 order by pvd.lastModifiedDate desc")
+	List<PatientVestDeviceHistory> findLatestDeviceForPatient(String patientId);
 }

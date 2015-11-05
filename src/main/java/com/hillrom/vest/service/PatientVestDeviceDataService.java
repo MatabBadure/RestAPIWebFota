@@ -3,8 +3,8 @@ package com.hillrom.vest.service;
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -13,7 +13,11 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -40,10 +44,13 @@ import com.hillrom.vest.repository.VestDeviceBadDataRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil;
 import com.hillrom.vest.util.RelationshipLabelConstants;
+import com.hillrom.vest.web.rest.PatientVestDeviceDataResource;
 
 @Service
 public class PatientVestDeviceDataService {
 
+	private final Logger log = LoggerFactory.getLogger(PatientVestDeviceDataResource.class);
+	
 	@Inject
 	private DeviceLogParser deviceLogParser;
 
@@ -83,6 +90,9 @@ public class PatientVestDeviceDataService {
 	@Inject
 	private PatientComplianceService complianceService;
 	
+	@Inject
+	private MailService mailService;
+
 	public List<PatientVestDeviceData> save(final String rawData) {
 		PatientVestDeviceRawLog deviceRawLog = null;
 		List<PatientVestDeviceData> patientVestDeviceRecords = null;
@@ -115,13 +125,22 @@ public class PatientVestDeviceDataService {
 		return patientVestDeviceRecords;
 	}
 
-	public void saveToTemp(final String rawData) throws Exception {
-			Job addNewPodcastJob = applicationContext.getBean("processTherapySessionsAndCompliance", Job.class);
-			JobParameters jobParameters = new JobParametersBuilder()
-    		.addLong("TIME", System.currentTimeMillis())
-    		.addString("rawData", rawData)
-    		.toJobParameters();
-			jobLauncher.run(addNewPodcastJob, jobParameters);
+	public ExitStatus saveData(final String rawData) throws Exception {
+		log.debug("saveData has been called , rawData length",rawData.length());
+		Job addNewDataIngestionJob = applicationContext.getBean("processTherapySessionsAndCompliance", Job.class);
+		JobParameters jobParameters = new JobParametersBuilder()
+		.addLong("TIME", System.currentTimeMillis())
+		.addString("rawData", rawData)
+		.toJobParameters();
+		JobExecution jobExecution = jobLauncher.run(addNewDataIngestionJob, jobParameters);
+		log.debug("Job triggered @ Time ",System.currentTimeMillis());
+		ExitStatus exitStatus = jobExecution.getExitStatus();
+		// Sending mail Notification on Job Status (ON Success), this code should be removed later
+		log.debug("Job triggered @ Time ",exitStatus);
+		if(ExitStatus.COMPLETED.equals(exitStatus)){
+			mailService.sendStatusOnDataIngestionRequest(rawData, exitStatus.getExitCode(), !ExitStatus.COMPLETED.equals(exitStatus), "");
+		}
+		return exitStatus;
 	}
 
 	private UserPatientAssoc createPatientUserIfNotExists(PatientVestDeviceRawLog deviceRawLog,

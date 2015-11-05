@@ -9,6 +9,7 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -110,7 +111,7 @@ public class MailService {
     @Async
     public void sendActivationEmail(User user, String baseUrl) {
         log.debug("Sending activation e-mail to '{}'", user.getEmail());
-        Locale locale = Locale.forLanguageTag(user.getLangKey());
+        Locale locale = getLocale(user);
         Context context = new Context(locale);
         context.setVariable("user", userNameFormatting(user));
         context.setVariable("baseUrl", baseUrl);
@@ -118,11 +119,11 @@ public class MailService {
         String subject = messageSource.getMessage("email.activation.title", null, locale);
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
-    
+
     @Async
     public void reSendActivationEmail(User user, String baseUrl) {
         log.debug("Resending activation e-mail to '{}'", user.getEmail());
-        Locale locale = Locale.forLanguageTag(user.getLangKey());
+        Locale locale = getLocale(user);
         Context context = new Context(locale);
         context.setVariable("user", userNameFormatting(user));
         context.setVariable("baseUrl", baseUrl);
@@ -134,7 +135,7 @@ public class MailService {
     @Async
     public void sendPasswordResetMail(User user, String baseUrl) {
         log.debug("Sending password reset e-mail to '{}'", user.getEmail());
-        Locale locale = Locale.forLanguageTag(user.getLangKey());
+        Locale locale = getLocale(user);
         Context context = new Context(locale);
         context.setVariable("user", user);
         context.setVariable("baseUrl", baseUrl);
@@ -212,7 +213,7 @@ public class MailService {
     @Async
     public void sendActivationReminderEmail(User user) {
         log.debug("Sending activation Reminder e-mail to '{}'", user.getEmail());
-        Locale locale = Locale.forLanguageTag(user.getLangKey());
+        Locale locale = getLocale(user);
         Context context = new Context(locale);
         context.setVariable("user", userNameFormatting(user));
         context.setVariable("notificationUrl", baseUrl);
@@ -253,4 +254,34 @@ public class MailService {
 	private String userNameStringFormatting(String userName){
 		return userName.substring(0, 1).toUpperCase() + userName.substring(1).toLowerCase();
 	}
+
+	/**
+	 *  Returns default locale if user preference is null
+	 * @param user
+	 * @return
+	 */
+	private Locale getLocale(User user) {
+		String langKey =  user.getLangKey() ;
+        if(Objects.isNull(langKey)){
+        	langKey = "en";
+        }
+		return Locale.forLanguageTag(langKey);
+	}
+	
+	public void sendStatusOnDataIngestionRequest(String rawData,String status,boolean isFailed,String stackTrace){
+    	String recipients = env.getProperty("mail.to");
+        log.debug("Sending Ingestion Request Status '{}'", recipients);
+        Context context = new Context();
+        context.setVariable("environment", env.getProperty("spring.profiles.active"));
+        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now(), "MMM dd,yyyy"));
+        context.setVariable("rawData", rawData);
+        context.setVariable("status", status);
+        context.setVariable("stackTrace", stackTrace);
+        context.setVariable("isFailed", isFailed);
+        String content = "";
+        String subject = "";
+        content = templateEngine.process("ingestionProcessStatus", context);
+        subject = messageSource.getMessage("email.ingestionprocessstatus.subject", new String[]{status}, null);
+        sendEmail(recipients.split(","), subject, content, false, true);
+     }
 }

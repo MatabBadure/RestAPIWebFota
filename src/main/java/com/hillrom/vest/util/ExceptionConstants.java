@@ -129,4 +129,9 @@ public class ExceptionConstants {
     public static final String HR_701 = "Note date cannot be before first  transmission date."; 
     
     public static final String HR_702 = "First transmission date does not exist."; 
+    public static final String HR_703 = "Currently, this account is inactive. Kindly contact with Administrator.";
+    public static final String HR_704 = "e-mail address not registered";
+    public static final String HR_705 = "The activation link which you are trying to access is no more valid. ";
+    public static final String HR_706 = "Please contact Hill-Rom Respiratory Care Customer Support";
+    public static final String HR_707 = "The reset link which you are trying to access is no more valid. ";
 }

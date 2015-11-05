@@ -9,7 +9,7 @@ import com.hillrom.vest.domain.TempPatientVestDeviceData;
 
 public interface DeviceLogParser {
 
-	public PatientVestDeviceRawLog parseBase64StringToPatientVestDeviceRawLog(String base16String);
-	public List<PatientVestDeviceData> parseBase64StringToPatientVestDeviceLogEntry(String base64String);
+	public PatientVestDeviceRawLog parseBase64StringToPatientVestDeviceRawLog(String base16String) throws Exception;
+	public List<PatientVestDeviceData> parseBase64StringToPatientVestDeviceLogEntry(String base64String) throws Exception;
 	public List<TempPatientVestDeviceData> parseBase64StringToPatientVestDeviceLogEntryForTemp(String base64String);
 }

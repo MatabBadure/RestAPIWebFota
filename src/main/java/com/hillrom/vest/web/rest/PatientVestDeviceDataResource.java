@@ -1,12 +1,15 @@
 package com.hillrom.vest.web.rest;
 
-import static com.hillrom.vest.util.MessageConstants.HR_303;
-import java.lang.management.ManagementFactory;
 import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import net.minidev.json.JSONObject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,15 +21,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hillrom.vest.batch.util.BatchUtil;
 import com.hillrom.vest.domain.PatientVestDeviceData;
-import com.hillrom.vest.domain.TempPatientVestDeviceData;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.service.PatientVestDeviceDataService;
 import com.hillrom.vest.service.util.RequestUtil;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
-
-import net.minidev.json.JSONObject;
 
 @RestController
 @RequestMapping("/api")
@@ -38,27 +37,38 @@ public class PatientVestDeviceDataResource {
 	@Inject
 	private PatientVestDeviceDataRepository deviceDataRepository;
 	
+	private final Logger log = LoggerFactory.getLogger(PatientVestDeviceDataResource.class);
+	
 	@RequestMapping(value = "/receiveData",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> receiveData(@RequestBody(required=true)String rawMessage){
-		List<PatientVestDeviceData> deviceData = null;
-		rawMessage = rawMessage.replaceAll("\n", "").replaceAll(" ","");
-		String reqParams[] = new String[]{"device_data",
-        "device_serial_number","hub_id","hub_receive_time","device_address"};
-		JSONObject jsonObject = RequestUtil.checkRequiredParamsInQueryString(rawMessage, reqParams);
-		if(jsonObject.containsKey("ERROR")){
-			return new ResponseEntity(jsonObject,HttpStatus.BAD_REQUEST);
-		};
-		try{			
-			deviceDataService.saveToTemp(rawMessage);
-			jsonObject.put("message",HR_303);
+		log.debug("Received Data for ingestion : ",rawMessage);
+		try{
+			rawMessage = rawMessage.replaceAll("\n", "").replaceAll(" ","");
+			String reqParams[] = new String[]{"device_data",
+	        "device_serial_number","hub_id","hub_receive_time","device_address"};
+			JSONObject jsonObject = new JSONObject();
+			if(!rawMessage.contains("&")){
+				jsonObject.put("ERROR","Missing Params : "+String.join(",", reqParams));
+				return new ResponseEntity(jsonObject,HttpStatus.BAD_REQUEST);
+			}
+			jsonObject = RequestUtil.checkRequiredParamsInQueryString(rawMessage, reqParams);
+			if(jsonObject.containsKey("ERROR")){
+				return new ResponseEntity(jsonObject,HttpStatus.BAD_REQUEST);
+			};
+			ExitStatus exitStatus = deviceDataService.saveData(rawMessage);
+			jsonObject.put("message",exitStatus.getExitCode());
+			if(ExitStatus.COMPLETED.equals(exitStatus))
+				return new ResponseEntity(jsonObject,HttpStatus.CREATED);
+			else
+				return new ResponseEntity(jsonObject,HttpStatus.PARTIAL_CONTENT);
 		}catch(Exception e){
+			e.printStackTrace();
 			JSONObject error = new JSONObject();
 			error.put("ERROR", e.getMessage());
 			return new ResponseEntity(error,HttpStatus.PARTIAL_CONTENT);
 		}
-		return new ResponseEntity(jsonObject,HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(value = "/vestdevicedata",

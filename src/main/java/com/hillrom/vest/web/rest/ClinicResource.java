@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
+import javax.persistence.EntityNotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -247,12 +248,13 @@ public class ClinicResource {
     
     /**
      * GET  /clinics/hcp -> get the hcp users for the clinic.
+     * @throws EntityNotFoundException 
      */
     @RequestMapping(value = "/clinics/hcp",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    public ResponseEntity<JSONObject> getHCPUsers(@RequestParam(value = "filter",required = false) String filter) {
+    public ResponseEntity<JSONObject> getHCPUsers(@RequestParam(value = "filter",required = false) String filter) throws EntityNotFoundException {
         log.debug("REST request to get HCPs associated with Clinic : {}", filter);
         List<String> idList = new ArrayList<>();
         String[] idSet = filter.split(",");
@@ -270,6 +272,9 @@ public class ClinicResource {
             return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {
 			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+		} catch (EntityNotFoundException e) {
+			jsonObject.put("ERROR", ExceptionConstants.HR_547);
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 		}
         

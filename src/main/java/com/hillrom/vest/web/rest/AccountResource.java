@@ -108,6 +108,23 @@ public class AccountResource {
     }
 
     /**
+     * GET  /validateActivationKey -> validate activation key.
+     */
+    @RequestMapping(value = "/validateActivationKey",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    public ResponseEntity<JSONObject> validateActivationKey(@RequestParam(value = "key") String key) { 
+        JSONObject jsonObject = new JSONObject();
+		try {
+			Optional<User> activatedUser = userService.validateActivationKey(key);
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
+    }
+    /**
      * GET  /authenticate -> check if the user is authenticated, and return its login.
      */
     @RequestMapping(value = "/authenticate",
@@ -197,17 +214,25 @@ public class AccountResource {
     
     public ResponseEntity<JSONObject> requestPasswordReset(@RequestBody Map<String, String> body, HttpServletRequest request) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("message", "e-mail address not registered");
+        jsonObject.put("message", ExceptionConstants.HR_704);
         return userService.requestPasswordReset(body.get("email"))
         		.map(user -> {
-        			String baseUrl = request.getScheme() +
-        					"://" +
-        					request.getServerName() +
-        					":" +
-        					request.getServerPort();
-        			mailService.sendPasswordResetMail(user, baseUrl);
-        			jsonObject.put("message", "e-mail sent successfully.");
-        			return ResponseEntity.ok().body(jsonObject);
+        			if(user.isDeleted()){
+        				jsonObject.put("message", ExceptionConstants.HR_703);
+	        			return ResponseEntity.badRequest().body(jsonObject);
+        			} else if(Objects.isNull(user.getLastLoggedInAt())){
+        				jsonObject.put("message", ExceptionConstants.HR_703);
+	        			return ResponseEntity.badRequest().body(jsonObject);
+        			} else {
+	        			String baseUrl = request.getScheme() +
+	        					"://" +
+	        					request.getServerName() +
+	        					":" +
+	        					request.getServerPort();
+	        			mailService.sendPasswordResetMail(user, baseUrl);
+	        			jsonObject.put("message", "e-mail sent successfully.");
+	        			return ResponseEntity.ok().body(jsonObject);
+        			}
                }).orElse(ResponseEntity.badRequest().body(jsonObject));
     }
 
@@ -230,6 +255,21 @@ public class AccountResource {
 			return ResponseEntity.badRequest().body(jsonObject);
 		}
         
+    }
+    
+    @RequestMapping(value = "/validateResetKey",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+        
+    public ResponseEntity<JSONObject> validatePasswordResetKey(@RequestParam(value = "key") String key) {
+    	JSONObject jsonObject = new JSONObject();
+		try {
+			Optional<User> user = userService.validatePasswordResetKey(key);
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
     }
 
     private boolean checkPasswordLength(String password) {

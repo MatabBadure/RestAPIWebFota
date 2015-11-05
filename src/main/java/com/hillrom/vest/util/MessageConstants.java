@@ -26,6 +26,7 @@ public class MessageConstants {
     public static final String HR_232 = "Hillrom User updated successfully.";
     public static final String HR_233 = "Hillrom User fetched successfully.";
     public static final String HR_234 = "Hillrom User deleted successfully.";
+    public static final String HR_235 = "User activated successfully.";
     
     public static final String HR_241 = "Protocol created successfully.";
     public static final String HR_242 = "Protocol updated successfully.";

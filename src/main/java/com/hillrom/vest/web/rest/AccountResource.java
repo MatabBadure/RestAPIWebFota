@@ -214,10 +214,13 @@ public class AccountResource {
     
     public ResponseEntity<JSONObject> requestPasswordReset(@RequestBody Map<String, String> body, HttpServletRequest request) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("message", ExceptionConstants.HR_703);
+        jsonObject.put("message", ExceptionConstants.HR_704);
         return userService.requestPasswordReset(body.get("email"))
         		.map(user -> {
         			if(user.isDeleted()){
+        				jsonObject.put("message", ExceptionConstants.HR_703);
+	        			return ResponseEntity.badRequest().body(jsonObject);
+        			} else if(Objects.isNull(user.getLastLoggedInAt())){
         				jsonObject.put("message", ExceptionConstants.HR_703);
 	        			return ResponseEntity.badRequest().body(jsonObject);
         			} else {

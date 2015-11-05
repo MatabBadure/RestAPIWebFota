@@ -1,5 +1,3 @@
-DROP PROCEDURE IF EXISTS `create_patient_protocol`; 
- DELIMITER $$
 CREATE DEFINER=`root`@`%` PROCEDURE `create_patient_protocol`(
 	IN type_key varchar(15),
 	IN in_patient_id varchar(45),
@@ -126,5 +124,4 @@ BEGIN
 		ELSE
 			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Only Normal and Custom are supported as type_key.';
 	END IF;
-END$$
-DELIMITER ;
+END

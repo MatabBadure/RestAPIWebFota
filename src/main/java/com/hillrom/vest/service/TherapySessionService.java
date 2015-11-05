@@ -2,6 +2,7 @@ package com.hillrom.vest.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -152,8 +153,7 @@ public class TherapySessionService {
 				.stream()
 				.collect(
 						Collectors
-								.summingLong(TherapySession::getDurationLongValue))
-				.intValue()
+								.summingInt(TherapySession::getDurationInMinutes))
 				/ patientUserIds.size();
 		DateTime startTime = tpsInDuration.get(0).getStartTime();
 		DateTime endTime = tpsInDuration.get(tpsInDuration.size()-1).getEndTime();
@@ -201,6 +201,8 @@ public class TherapySessionService {
 				processedTherapies.add(missedTherapy);
 			}
 		}
+		// Sort based on timestamp
+		Collections.sort(processedTherapies);
 		return processedTherapies;
 	}
 
@@ -249,7 +251,7 @@ public class TherapySessionService {
 						session.getFrequency(),	session.getPressure(), programmedCoughPauses, normalCoughPauses,
 						programmedCoughPauses+normalCoughPauses, noteMap.get(date), session.getStartTime(),
 						session.getEndTime(), session.getCaughPauseDuration(),
-						session.getDurationInMinutes().intValue(), session.getHmr().doubleValue()/60,false);
+						session.getDurationInMinutes(), session.getHmr().doubleValue()/60,false);
 				therapyDataVOs.add(therapyDataVO);
 			}
 			therapyDataMap.put(date, therapyDataVOs);

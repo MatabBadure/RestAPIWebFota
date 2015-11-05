@@ -64,8 +64,8 @@ public class PatientVestDeviceTherapyUtil {
 		int durationForWeightedAvgCalc = getTotalDurationForWeightedAvgCalculation(deviceEventRecords);
 		for(int i = 0;i < deviceEventRecords.size(); i ++){
 			PatientVestDeviceData deviceEventRecord = deviceEventRecords.get(i);
-			frequency += calculateWeightedAvg( durationForWeightedAvgCalc,deviceEventRecord.getFrequency().longValue(),deviceEventRecord.getDuration());
-			pressure += calculateWeightedAvg(durationForWeightedAvgCalc,deviceEventRecord.getPressure().longValue(),deviceEventRecord.getDuration());
+			frequency += calculateWeightedAvg( durationForWeightedAvgCalc,deviceEventRecord.getFrequency(),deviceEventRecord.getDuration());
+			pressure += calculateWeightedAvg(durationForWeightedAvgCalc,deviceEventRecord.getPressure(),deviceEventRecord.getDuration());
 			if(isProgrammedCoughPause(deviceEventRecord))
 				++programmedCoughPauses;
 			if(isNormalCoughPause(deviceEventRecord))
@@ -191,7 +191,7 @@ public class PatientVestDeviceTherapyUtil {
 		therapySession.setDate(LocalDate.fromDateFields(new Date(timestamp)));
 		therapySession.setFrequency(metricsMap.get(FREQUENCY));
 		therapySession.setPressure(metricsMap.get(PRESSURE));
-		therapySession.setDurationInMinutes(metricsMap.get(DURATION).longValue());
+		therapySession.setDurationInMinutes(metricsMap.get(DURATION));
 		therapySession.setNormalCaughPauses(metricsMap.get(NORMAL_COUGH_PAUSES));
 		therapySession.setProgrammedCaughPauses(metricsMap.get(PROGRAMMED_COUGH_PAUSES));
 		therapySession.setCaughPauseDuration(metricsMap.get(CAUGH_PAUSE_DURATION));
@@ -228,13 +228,13 @@ public class PatientVestDeviceTherapyUtil {
 		return updatedTherapySessions;
 	}
 
-	public static int calculateWeightedAvg(double totalDuration,Long durationInMinutes,
+	public static int calculateWeightedAvg(double totalDuration,int durationInMinutes,
 			Integer frequency) {
 		return (int) Math.round(durationInMinutes*frequency/totalDuration);
 	}
 	
 	public static int calculateCumulativeDuration(List<TherapySession> therapySessions){
-		return therapySessions.stream().collect(Collectors.summingLong(TherapySession::getDurationInMinutes)).intValue();
+		return therapySessions.stream().collect(Collectors.summingInt(TherapySession::getDurationInMinutes));
 	}
 	
 	public static int calculateHMRRunRatePerDays(List<TherapySession> therapySessions,int days){

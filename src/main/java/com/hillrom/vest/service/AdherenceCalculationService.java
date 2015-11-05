@@ -182,7 +182,7 @@ public class AdherenceCalculationService {
 		double weightedAvgFrequency = 0.0;
 		double weightedAvgPressure = 0.0;
 		for(TherapySession therapySession : therapySessionsPerDay){
-			Long durationInMinutes = therapySession.getDurationInMinutes(); 
+			int durationInMinutes = therapySession.getDurationInMinutes(); 
 			weightedAvgFrequency += calculateWeightedAvg(totalDuration,durationInMinutes,therapySession.getFrequency());
 			weightedAvgPressure += calculateWeightedAvg(totalDuration,durationInMinutes,therapySession.getPressure());
 		}
@@ -616,7 +616,6 @@ public class AdherenceCalculationService {
 								existingSession.getEndTime().equals(receivedSession.getEndTime()) &&
 								existingSession.getFrequency().equals(receivedSession.getFrequency()) && 
 								existingSession.getPressure().equals(receivedSession.getPressure()) &&
-								existingSession.getDurationInMinutes().equals(receivedSession.getDurationInMinutes()) && 
 								existingSession.getHmr().equals(receivedSession.getHmr())){
 							itr.remove();
 						}
@@ -686,6 +685,12 @@ public class AdherenceCalculationService {
 		LocalDate latestComplianceDate = existingComplianceMap.lastKey();
 		
 		List<TherapySession> sessionsTobeSaved = receivedTherapySessionsMap.get(currentTherapyDate);
+		// Get the therapy sessions for currentTherapyDate from existing therapies
+		List<TherapySession> existingTherapies = existingTherapySessionMap.get(currentTherapyDate);
+		// add existing therapies to calculate metrics (HMR Run rate)
+		if(Objects.nonNull(existingTherapies)){
+			sessionsTobeSaved.addAll(existingTherapies);
+		}
 		existingTherapySessionMap.put(currentTherapyDate, sessionsTobeSaved);
 
 		List<LocalDate> allDates = new LinkedList<>();

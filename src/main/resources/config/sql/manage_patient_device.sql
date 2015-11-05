@@ -1,5 +1,3 @@
-DROP PROCEDURE IF EXISTS `manage_patient_device`;
-DELIMITER $$
 CREATE DEFINER=`root`@`%` PROCEDURE `manage_patient_device`(
 	IN operation_type_indicator VARCHAR(10),
     IN patient_id varchar(50), 
@@ -98,6 +96,4 @@ ELSEIF operation_type_indicator ='INACTIVATE' THEN
 		COMMIT;
 ELSE  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Operation not supported';
 END IF;
-
-END$$
-DELIMITER ;
+END

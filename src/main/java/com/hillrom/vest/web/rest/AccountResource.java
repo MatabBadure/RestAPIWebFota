@@ -214,17 +214,23 @@ public class AccountResource {
     
     public ResponseEntity<JSONObject> requestPasswordReset(@RequestBody Map<String, String> body, HttpServletRequest request) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("message", "e-mail address not registered");
+        jsonObject.put("ERROR", "e-mail address not registered");
         return userService.requestPasswordReset(body.get("email"))
         		.map(user -> {
-        			String baseUrl = request.getScheme() +
-        					"://" +
-        					request.getServerName() +
-        					":" +
-        					request.getServerPort();
-        			mailService.sendPasswordResetMail(user, baseUrl);
-        			jsonObject.put("message", "e-mail sent successfully.");
-        			return ResponseEntity.ok().body(jsonObject);
+        			JSONObject jsonObj = new JSONObject();
+        			if(user.isDeleted()){
+        				jsonObj.put("ERROR", "This email address belongs to inactive user.");
+	        			return ResponseEntity.badRequest().body(jsonObj);
+        			} else {
+	        			String baseUrl = request.getScheme() +
+	        					"://" +
+	        					request.getServerName() +
+	        					":" +
+	        					request.getServerPort();
+	        			mailService.sendPasswordResetMail(user, baseUrl);
+	        			jsonObj.put("message", "e-mail sent successfully.");
+	        			return ResponseEntity.ok().body(jsonObj);
+        			}
                }).orElse(ResponseEntity.badRequest().body(jsonObject));
     }
 

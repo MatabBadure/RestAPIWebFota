@@ -29,7 +29,7 @@
     <appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">
       <smtpHost>smtp.gmail.com</smtpHost>
       <from>test.hillrom@gmail.com</from>
-      <to>gopakumar@neevtech.com,raghu.narayanan@neevtech.com,ganesh@neevtech.com</to>
+      <to>rfti@yopmail.com</to>
       <subject>Error has occured</subject>
       <smtpPort>587</smtpPort>
       <username>test.hillrom@gmail.com</username>

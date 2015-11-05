@@ -3,6 +3,8 @@ package com.hillrom.vest.service;
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -87,6 +89,9 @@ public class PatientVestDeviceDataService {
 
 	@Inject
 	private PatientComplianceService complianceService;
+	
+	@Inject
+	private MailService mailService;
 
 	public List<PatientVestDeviceData> save(final String rawData) {
 		PatientVestDeviceRawLog deviceRawLog = null;
@@ -129,7 +134,13 @@ public class PatientVestDeviceDataService {
 		.toJobParameters();
 		JobExecution jobExecution = jobLauncher.run(addNewDataIngestionJob, jobParameters);
 		log.debug("Job triggered @ Time ",System.currentTimeMillis());
-		return jobExecution.getExitStatus();
+		ExitStatus exitStatus = jobExecution.getExitStatus();
+		// Sending mail Notification on Job Status (ON Success), this code should be removed later
+		log.debug("Job triggered @ Time ",exitStatus);
+		if(ExitStatus.COMPLETED.equals(exitStatus)){
+			mailService.sendStatusOnDataIngestionRequest(rawData, exitStatus.getExitCode(), !ExitStatus.COMPLETED.equals(exitStatus), "");
+		}
+		return exitStatus;
 	}
 
 	private UserPatientAssoc createPatientUserIfNotExists(PatientVestDeviceRawLog deviceRawLog,

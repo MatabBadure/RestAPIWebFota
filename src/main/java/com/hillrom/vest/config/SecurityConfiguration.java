@@ -99,6 +99,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/patient/{id}/vestdevicedata").permitAll()
             .antMatchers("/api/vestdevicedata").permitAll()
             .antMatchers("/api/validateActivationKey").permitAll()
+            .antMatchers("/api/validateResetKey").permitAll()
             .antMatchers("/api/users/{id}/exportVestDeviceData").authenticated()
             .antMatchers("/api/users/{id}/exportVestDeviceDataCSV").authenticated()
             .antMatchers("/api/users/{id}/exportTherapyData").authenticated()

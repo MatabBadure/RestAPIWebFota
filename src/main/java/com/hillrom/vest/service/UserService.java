@@ -163,6 +163,20 @@ public class UserService {
         throw new HillromException(ExceptionConstants.HR_601);//Invalid Activation Key;
     }
 
+    public Optional<User> validatePasswordResetKey(String key) throws HillromException {
+    	log.debug("Activating user for activation key {}", key);
+        Optional<User> optionalExistingUser = userRepository.findOneByResetKey(key);
+           if(optionalExistingUser.isPresent()) {
+        	   DateTime oneDayAgo = DateTime.now().minusHours(24);
+               if(optionalExistingUser.get().getResetDate().isBefore(oneDayAgo.toInstant().getMillis()))
+            	   throw new HillromException(ExceptionConstants.HR_504);//Reset Key Expired
+               else if(optionalExistingUser.get().isDeleted())
+            	   throw new HillromException(ExceptionConstants.HR_707);
+               else return optionalExistingUser;
+            }
+        throw new HillromException(ExceptionConstants.HR_556);//Invalid Reset Key;
+     }
+    
     /**
      * Completes the reset password flow
      * @param paramsMap

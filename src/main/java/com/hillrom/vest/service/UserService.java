@@ -164,7 +164,7 @@ public class UserService {
     }
 
     public Optional<User> validatePasswordResetKey(String key) throws HillromException {
-    	log.debug("Activating user for activation key {}", key);
+    	log.debug("validation for password reset key {}", key);
         Optional<User> optionalExistingUser = userRepository.findOneByResetKey(key);
            if(optionalExistingUser.isPresent()) {
         	   DateTime oneDayAgo = DateTime.now().minusHours(24);

@@ -267,4 +267,21 @@ public class MailService {
         }
 		return Locale.forLanguageTag(langKey);
 	}
+	
+	public void sendStatusOnDataIngestionRequest(String rawData,String status,boolean isFailed,String stackTrace){
+    	String recipients = env.getProperty("mail.to");
+        log.debug("Sending Ingestion Request Status '{}'", recipients);
+        Context context = new Context();
+        context.setVariable("environment", env.getProperty("spring.profiles.active"));
+        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now(), "MMM dd,yyyy"));
+        context.setVariable("rawData", rawData);
+        context.setVariable("status", status);
+        context.setVariable("stackTrace", stackTrace);
+        context.setVariable("isFailed", isFailed);
+        String content = "";
+        String subject = "";
+        content = templateEngine.process("ingestionProcessStatus", context);
+        subject = messageSource.getMessage("email.ingestionprocessstatus.subject", new String[]{status}, null);
+        sendEmail(recipients.split(","), subject, content, false, true);
+     }
 }

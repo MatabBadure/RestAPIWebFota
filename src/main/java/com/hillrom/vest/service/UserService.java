@@ -136,11 +136,15 @@ public class UserService {
             	DateTime twoDaysAgo = DateTime.now().minusHours(48);
                 if(optionalExistingUser.get().getActivationLinkSentDate().isBefore(twoDaysAgo.toInstant().getMillis()))
              	   throw new HillromException(ExceptionConstants.HR_592);//Activation Link Expired
-        		// activate given user for the registration key.
-                optionalExistingUser.get().setActivated(true);
-        		userRepository.save(optionalExistingUser.get());
-        		log.debug("Activated user: {}", optionalExistingUser.get());
-        		return optionalExistingUser;
+                else if(optionalExistingUser.get().isDeleted())
+                	throw new HillromException(ExceptionConstants.HR_705 + ExceptionConstants.HR_706);
+                else {
+	        		// activate given user for the registration key.
+	                optionalExistingUser.get().setActivated(true);
+	        		userRepository.save(optionalExistingUser.get());
+	        		log.debug("Activated user: {}", optionalExistingUser.get());
+	        		return optionalExistingUser;
+                }
             }
         throw new HillromException(ExceptionConstants.HR_601);//Invalid Activation Key;
     }
@@ -152,7 +156,9 @@ public class UserService {
             	DateTime twoDaysAgo = DateTime.now().minusHours(48);
                 if(optionalExistingUser.get().getActivationLinkSentDate().isBefore(twoDaysAgo.toInstant().getMillis()))
              	   throw new HillromException(ExceptionConstants.HR_592);//Activation Link Expired
-        		return optionalExistingUser;
+                else if(optionalExistingUser.get().isDeleted())
+                	throw new HillromException(ExceptionConstants.HR_705 + ExceptionConstants.HR_706);
+                else return optionalExistingUser;
             }
         throw new HillromException(ExceptionConstants.HR_601);//Invalid Activation Key;
     }

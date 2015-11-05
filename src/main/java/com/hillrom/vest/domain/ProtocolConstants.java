@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 @Entity
 @Table(name="PROTOCOL_CONSTANTS")
 public class ProtocolConstants {
@@ -53,6 +55,8 @@ public class ProtocolConstants {
 		this.treatmentsPerDay = treatmentsPerDay;
 		this.minDuration = minDuration;
 		this.maxDuration = maxDuration;
+		this.minMinutesPerTreatment = minDuration/treatmentsPerDay;
+		this.maxMinutesPerTreatment = maxDuration/treatmentsPerDay;
 	}
 	
 	public ProtocolConstants() {

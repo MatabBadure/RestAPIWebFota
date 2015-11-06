@@ -563,7 +563,7 @@ public class UserService {
         	if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
         		UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
         		if(Objects.nonNull(user.getId())) {
-        			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
+        			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
         				sendEmailNotification(baseUrl, user);
         			}
         			callEventOnUpdatingHRID(userExtensionDTO, currentHillromId, user);
@@ -576,7 +576,7 @@ public class UserService {
 	        	if(SecurityUtils.getCurrentLogin().equals(existingUser.getEmail())) {
 	        		UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
 	        		if(Objects.nonNull(user.getId())) {
-	        			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
+	        			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
 	        				sendEmailNotification(baseUrl, user);
 	        			}
 	        			callEventOnUpdatingHRID(userExtensionDTO, currentHillromId, user);
@@ -607,7 +607,7 @@ public class UserService {
     		}
            	UserExtension user = updatePatientUser(existingUser, userExtensionDTO);
     		if(Objects.nonNull(user.getId())) {
-    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && !userExtensionDTO.getEmail().equals(currentEmail)) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
     				sendEmailNotification(baseUrl, user);
     			}
     			callEventOnUpdatingHRID(userExtensionDTO, currentHillromId, user);
@@ -618,7 +618,7 @@ public class UserService {
         } else if (AuthoritiesConstants.HCP.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updateHCPUser(existingUser, userExtensionDTO);
     		if(Objects.nonNull(user.getId())) {
-    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
     				sendEmailNotification(baseUrl, user);
     			}
                 return user;
@@ -628,7 +628,7 @@ public class UserService {
         } else if (AuthoritiesConstants.CLINIC_ADMIN.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updateClinicAdminUser(existingUser, userExtensionDTO);
     		if(Objects.nonNull(user.getId())) {
-    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
     				sendEmailNotification(baseUrl, user);
     			}
                 return user;
@@ -638,7 +638,7 @@ public class UserService {
         } if (AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updateCareGiverUser(existingUser, userExtensionDTO);
     		if(Objects.nonNull(user.getId())) {
-    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail)) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
     				sendEmailNotification(baseUrl, user);
     			}
                 return user;

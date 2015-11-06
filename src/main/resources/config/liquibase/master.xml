@@ -69,4 +69,5 @@
     <include file="classpath:/config/liquibase/changelog/20151104133700_added_expiration_date_field_user_table.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20151104181330_alter_datatype_expiration_date.xml" relativeToChangelogFile="false"/>
  	<include file="classpath:/config/liquibase/changelog/20151105152030_added_stored_procedures_for_protocol_patientInfo_device.xml" relativeToChangelogFile="false"/>
+ 	<include file="classpath:/config/liquibase/changelog/20151105210200_updated_values_for_default_protocl.xml" relativeToChangelogFile="false"/>
  </databaseChangeLog>

@@ -43,6 +43,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
@@ -115,7 +116,7 @@ public class AdherenceCalculationService {
 	public ProtocolConstants getProtocolByPatientUserId(
 			Long patientUserId) throws Exception{
 		List<PatientProtocolData> protocolData =  protocolService.findOneByPatientUserIdAndStatus(patientUserId, false);
-		if(protocolData.size() > 0){			
+		if(protocolData.size() > 0 && Constants.NORMAL_PROTOCOL.equalsIgnoreCase(protocolData.get(0).getType())){			
 			int maxFrequency = 0, minFrequency = 0, minPressure = 0, maxPressure = 0, minDuration = 0, maxDuration = 0, treatmentsPerDay = 0;
 			for(PatientProtocolData protocol : protocolData){
 				maxFrequency += protocol.getMaxFrequency();
@@ -179,14 +180,16 @@ public class AdherenceCalculationService {
 	public Map<String,Double> calculateTherapyMetricsPer3Days(
 			List<TherapySession> therapySessionsPerDay) {
 		double totalDuration = calculateCumulativeDuration(therapySessionsPerDay);
-		double weightedAvgFrequency = 0.0;
-		double weightedAvgPressure = 0.0;
+		double weightedAvgFrequency = 0f;
+		double weightedAvgPressure = 0f;
 		for(TherapySession therapySession : therapySessionsPerDay){
 			int durationInMinutes = therapySession.getDurationInMinutes(); 
 			weightedAvgFrequency += calculateWeightedAvg(totalDuration,durationInMinutes,therapySession.getFrequency());
 			weightedAvgPressure += calculateWeightedAvg(totalDuration,durationInMinutes,therapySession.getPressure());
 		}
 		Map<String,Double> actualMetrics = new HashMap<>();
+		weightedAvgFrequency = Math.round(weightedAvgFrequency);
+		weightedAvgPressure = Math.round(weightedAvgPressure);
 		actualMetrics.put(WEIGHTED_AVG_FREQUENCY, weightedAvgFrequency);
 		actualMetrics.put(WEIGHTED_AVG_PRESSURE, weightedAvgPressure);
 		actualMetrics.put(TOTAL_DURATION, totalDuration);

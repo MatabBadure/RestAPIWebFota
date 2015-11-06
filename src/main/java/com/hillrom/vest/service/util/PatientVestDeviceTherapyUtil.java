@@ -60,12 +60,13 @@ public class PatientVestDeviceTherapyUtil {
 	public static Map<String,Integer> getTherapyMetricsMap(
 			List<PatientVestDeviceData> deviceEventRecords) {
 		Map<String,Integer> metricsMap = new HashMap<>();
-		int frequency = 0, pressure = 0, durationOfSession = 0, normalCoughPauses = 0, programmedCoughPauses = 0, caughPauseDuration = 0;
+		int durationOfSession = 0, normalCoughPauses = 0, programmedCoughPauses = 0, caughPauseDuration = 0;
 		int durationForWeightedAvgCalc = getTotalDurationForWeightedAvgCalculation(deviceEventRecords);
+		float frequency = 0, pressure = 0;
 		for(int i = 0;i < deviceEventRecords.size(); i ++){
 			PatientVestDeviceData deviceEventRecord = deviceEventRecords.get(i);
-			frequency += calculateWeightedAvg( durationForWeightedAvgCalc,deviceEventRecord.getFrequency(),deviceEventRecord.getDuration());
-			pressure += calculateWeightedAvg(durationForWeightedAvgCalc,deviceEventRecord.getPressure(),deviceEventRecord.getDuration());
+			frequency += calculateWeightedAvg( durationForWeightedAvgCalc,deviceEventRecord.getDuration(),deviceEventRecord.getFrequency());
+			pressure += calculateWeightedAvg(durationForWeightedAvgCalc,deviceEventRecord.getDuration(),deviceEventRecord.getPressure());
 			if(isProgrammedCoughPause(deviceEventRecord))
 				++programmedCoughPauses;
 			if(isNormalCoughPause(deviceEventRecord))
@@ -73,8 +74,8 @@ public class PatientVestDeviceTherapyUtil {
 		}
 		durationOfSession = calculateDurationOfSession(deviceEventRecords);
 		caughPauseDuration = getCoughPauseDuration(deviceEventRecords,durationOfSession);
-		metricsMap.put(FREQUENCY, frequency);
-		metricsMap.put(PRESSURE, pressure);
+		metricsMap.put(FREQUENCY, Math.round(frequency));
+		metricsMap.put(PRESSURE, Math.round(pressure));
 		metricsMap.put(DURATION, durationOfSession);
 		metricsMap.put(NORMAL_COUGH_PAUSES, normalCoughPauses);
 		metricsMap.put(PROGRAMMED_COUGH_PAUSES, programmedCoughPauses);
@@ -228,9 +229,9 @@ public class PatientVestDeviceTherapyUtil {
 		return updatedTherapySessions;
 	}
 
-	public static int calculateWeightedAvg(double totalDuration,int durationInMinutes,
+	public static double calculateWeightedAvg(double totalDuration,int durationInMinutes,
 			Integer frequency) {
-		return (int) Math.round(durationInMinutes*frequency/totalDuration);
+		return (durationInMinutes*frequency/totalDuration);
 	}
 	
 	public static int calculateCumulativeDuration(List<TherapySession> therapySessions){

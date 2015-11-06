@@ -22,7 +22,7 @@ mail:
     tls: false
     auth: false
     from: visiview@hill-rom.com
-    to: ganesh@neevtech.com,leah.noaeill1@hill-rom.com,vinay.joshi@hill-rom.com,brett.quada@hill-rom.com,visiview@hill-rom.com
+    to: ganesh@neevtech.com,joelpreetham.fernandes4@hill-rom.com,gopakumar@neevtech.com,raghu.narayanan@neevtech.com,rohan.kushwaha@neevtech.com
 
 authentication:
     xauth:

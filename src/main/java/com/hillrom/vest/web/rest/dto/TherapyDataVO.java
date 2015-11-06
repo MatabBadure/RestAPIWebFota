@@ -6,7 +6,7 @@ import org.joda.time.DateTime;
 
 import com.hillrom.vest.domain.Note;
 
-public class TherapyDataVO implements Serializable {
+public class TherapyDataVO implements Serializable,Comparable<TherapyDataVO> {
 
 	private DateTime timestamp;
 	private int treatmentsPerDay;
@@ -182,4 +182,10 @@ public class TherapyDataVO implements Serializable {
 				+ ", duration=" + duration + ", hmr=" + hmr + "missedTherapy="+missedTherapy+"]";
 	}
 
+	@Override
+	public int compareTo(TherapyDataVO o) {
+		return this.timestamp.compareTo(o.getTimestamp());
+	}
+
+	
 }

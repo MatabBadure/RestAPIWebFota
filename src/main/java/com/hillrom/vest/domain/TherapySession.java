@@ -64,7 +64,7 @@ public class TherapySession implements Comparable<TherapySession>{
 	private Integer pressure;
 	
 	@Column(name="duration_in_minutes")
-	private Long durationInMinutes;
+	private int durationInMinutes;
 	
 	@Column(name="programmed_caugh_pauses")
 	private Integer programmedCaughPauses;
@@ -158,11 +158,11 @@ public class TherapySession implements Comparable<TherapySession>{
 		this.pressure = pressure;
 	}
 
-	public Long getDurationInMinutes() {
+	public int getDurationInMinutes() {
 		return durationInMinutes;
 	}
 
-	public void setDurationInMinutes(Long durationInSeconds) {
+	public void setDurationInMinutes(int durationInSeconds) {
 		this.durationInMinutes = durationInSeconds;
 	}
 
@@ -214,11 +214,6 @@ public class TherapySession implements Comparable<TherapySession>{
 	@JsonIgnore
 	public int getTherapyDayOfTheYear(){
 		return this.date.getDayOfYear();
-	}
-	
-	@JsonIgnore
-	public long getDurationLongValue(){
-		return this.durationInMinutes.longValue();
 	}
 	
 	@JsonIgnore

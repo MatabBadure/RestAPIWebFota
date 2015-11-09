@@ -40,7 +40,7 @@ public class CsvUtil {
     	        new FmtDateTime("HH:MM a"), // End Time
     	        new ParseInt(), // frequency
     	        new ParseInt(), // pressure
-    	        new ParseLong(), // duration in minutes
+    	        new ParseInt(), // duration in minutes
     	        new ParseInt(), // programmed cough pauses
     	        new ParseInt(), // normal cough pauses
     	        new ParseInt() // cough pause duration

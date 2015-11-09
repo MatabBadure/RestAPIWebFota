@@ -266,7 +266,8 @@ public class PatientHCPService {
 		List<Long> patientUserIds = new LinkedList<>();
 		patientUsers.forEach(patientUser -> {
 			if((Boolean)patientUser.get("status")){
-				patientUserIds.add(((UserExtension)patientUser.get("patient")).getId());
+				if(Objects.nonNull(patientUser.get("patient")))
+					patientUserIds.add(((UserExtension)patientUser.get("patient")).getId());
 			}
 		});
 		return patientUserIds;

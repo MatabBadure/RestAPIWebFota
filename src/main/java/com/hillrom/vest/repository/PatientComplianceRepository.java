@@ -32,7 +32,5 @@ public interface PatientComplianceRepository extends
 	
 	List<PatientCompliance> findByDateBetweenAndPatientUserIdIn(LocalDate from,LocalDate to,List<Long> patientUserIds);
 	
-	PatientCompliance findTop1ByDateBeforeAndPatientUserIdOrderByDateDesc(LocalDate date,Long PatientUserId);
-	
 	List<PatientCompliance> findByPatientUserId(Long patientUserId);
 }

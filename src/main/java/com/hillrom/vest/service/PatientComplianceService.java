@@ -41,8 +41,8 @@ public class PatientComplianceService {
 		return compliance;
 	}
 	
-	public PatientCompliance findTop1ByDateBeforeAndPatientUserId(LocalDate date,Long patientUserId){
-		return complianceRepository.findTop1ByDateBeforeAndPatientUserIdOrderByDateDesc(date, patientUserId);
+	public PatientCompliance findLatestComplianceByPatientUserId(Long patientUserId){
+		return complianceRepository.findTop1ByPatientUserIdOrderByDateDesc(patientUserId);
 	}
 	
 	public SortedMap<LocalDate,PatientCompliance> getPatientComplainceMapByPatientUserId(Long patientUserId){

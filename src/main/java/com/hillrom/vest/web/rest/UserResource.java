@@ -67,6 +67,7 @@ import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.service.util.CsvUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
+import com.hillrom.vest.web.rest.dto.AdherenceTrendVO;
 import com.hillrom.vest.web.rest.dto.PatientComplianceVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.ProtocolDTO;
@@ -1025,4 +1026,15 @@ public class UserResource {
 		}
 		return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.OK);
 	}
+    
+    @RequestMapping(value="/user/{id}/adherenceTrend",
+    		method=RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<AdherenceTrendVO>> getAdherenceTrendForDuration(@PathVariable Long id,
+    		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to){
+    	log.debug("REST request to get Adherence Trend for the duration : ", id,from,to);
+        List<AdherenceTrendVO> adherenceTrends = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
+        return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);
+    }
 }

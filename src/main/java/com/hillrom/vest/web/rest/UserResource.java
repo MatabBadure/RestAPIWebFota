@@ -599,22 +599,12 @@ public class UserResource {
     @RequestMapping(value = "/users/{id}/compliance",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PatientCompliance> getComplianceScoreByPatientUserIdAndDate(@PathVariable Long id,
-    		@RequestParam(value="date",required=false)Long timestamp){
-    	LocalDate date = null;
-    	if(Objects.isNull(timestamp)){
-    		date = LocalDate.now();
-    	}else{
-    		date = LocalDate.fromDateFields(new Date(timestamp));
-    	}
-    	PatientCompliance compliance = complianceRepository.findByPatientUserIdAndDate(id, date);
+    public ResponseEntity<PatientCompliance> getComplianceScoreByPatientUserIdAndDate(@PathVariable Long id){
+    	PatientCompliance compliance = complianceRepository.findTop1ByPatientUserIdOrderByDateDesc(id);
     	if(Objects.nonNull(compliance)){
     		if(Objects.isNull(compliance.getHmrRunRate())){
     			compliance.setHmrRunRate(0);
     		}
-    		// Missed Therapy count badge should show only >= 3
-			/*if(compliance.getMissedTherapyCount() < 3)
-				compliance.setMissedTherapyCount(0);*/
        		return new ResponseEntity<>(compliance,HttpStatus.OK);
     	}
     	else

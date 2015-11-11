@@ -125,7 +125,12 @@ public class UserService {
 		// default password will have the first 4 letters from last name, if length of last name <= 4, use complete string
 		int endIndex = patientUser.getLastName().length() > Constants.NO_OF_CHARACTERS_TO_BE_EXTRACTED ? Constants.NO_OF_CHARACTERS_TO_BE_EXTRACTED : patientUser.getLastName().length() ;
 		defaultPassword.append(patientUser.getLastName().substring(0, endIndex));
-		defaultPassword.append(patientUser.getDob().toString(Constants.DATEFORMAT_MMddyyyy));
+		if(Objects.nonNull(patientUser.getDob().toString(Constants.DATEFORMAT_MMddyyyy))){
+			defaultPassword.append(patientUser.getDob().toString(Constants.DATEFORMAT_MMddyyyy));	
+		}else{
+			defaultPassword.append(patientUser.getDob().toString("00000000"));
+		}
+		
 		return defaultPassword.toString();
 	}
 

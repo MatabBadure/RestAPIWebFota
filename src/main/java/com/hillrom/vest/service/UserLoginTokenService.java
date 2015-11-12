@@ -42,7 +42,12 @@ public class UserLoginTokenService {
 			
 			DateTime tokenCreatedAt = securityToken.getCreatedTime();
 			long expiryTimeInMillis = securityToken.getCreatedTime().plus(1000 * tokenProvider.getTokenValidity()).getMillis();
-			boolean flag = System.currentTimeMillis() <= expiryTimeInMillis ;
+			boolean flag = false;
+			if(System.currentTimeMillis() <= expiryTimeInMillis){
+				flag = true;
+			}else{
+				flag = false;
+			}
 			securityToken.setCreatedTime(DateTime.now());
 			tokenRepository.save(securityToken);
 			log.debug("securityToken.getCreatedTime() : " + securityToken.getCreatedTime());

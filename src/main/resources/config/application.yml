@@ -28,6 +28,6 @@ authentication:
     xauth:
         secret: myXAuthSecret
         # Token is valid 30 minutes
-        tokenValidityInSeconds: 120
+        tokenValidityInSeconds: 300
 
 spring.batch.job.enabled: false

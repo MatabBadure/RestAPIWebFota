@@ -42,15 +42,27 @@ public class UserLoginTokenService {
 			
 			DateTime tokenCreatedAt = securityToken.getCreatedTime();
 			long expiryTimeInMillis = securityToken.getCreatedTime().plus(1000 * tokenProvider.getTokenValidity()).getMillis();
-			boolean flag = System.currentTimeMillis() <= expiryTimeInMillis ;
-			securityToken.setCreatedTime(DateTime.now());
-			tokenRepository.save(securityToken);
-			log.debug("securityToken.getCreatedTime() : " + securityToken.getCreatedTime());
-			log.debug("tokenProvider.getTokenValidity() : " + tokenProvider.getTokenValidity());
-			log.debug("System.currentTimeMillis() : " + System.currentTimeMillis());
-			log.debug("expiryTimeInMillis : " + expiryTimeInMillis);
-			log.debug("flag : " + flag);
-			return flag;
+			boolean flag = false;
+			if(System.currentTimeMillis() <= expiryTimeInMillis){
+				flag = true;
+				securityToken.setCreatedTime(DateTime.now());
+				tokenRepository.save(securityToken);
+				log.debug("securityToken.getCreatedTime() : " + securityToken.getCreatedTime());
+				log.debug("tokenProvider.getTokenValidity() : " + tokenProvider.getTokenValidity());
+				log.debug("System.currentTimeMillis() : " + System.currentTimeMillis());
+				log.debug("expiryTimeInMillis : " + expiryTimeInMillis);
+				log.debug("flag : " + flag);
+				return flag;				
+			}else{
+				flag = false;
+				log.debug("securityToken.getCreatedTime() : " + securityToken.getCreatedTime());
+				log.debug("tokenProvider.getTokenValidity() : " + tokenProvider.getTokenValidity());
+				log.debug("System.currentTimeMillis() : " + System.currentTimeMillis());
+				log.debug("expiryTimeInMillis : " + expiryTimeInMillis);
+				log.debug("flag : " + flag);
+				return flag;				
+			}
+
 
 		}
 	} 

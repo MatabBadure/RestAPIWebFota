@@ -44,6 +44,7 @@ public class UserLoginTokenService {
 		}else{
 			DateTime tokenCreatedAt = securityToken.getCreatedTime();
 			long expiryTimeInMillis = securityToken.getCreatedTime().plus(1000 * tokenProvider.getTokenValidity()).getMillis();
+			
 			log.debug("securityToken.getCreatedTime() : " + securityToken.getCreatedTime());
 			log.debug("tokenProvider.getTokenValidity() : " + tokenProvider.getTokenValidity());
 			log.debug("expiryTimeInMillis : " + expiryTimeInMillis);

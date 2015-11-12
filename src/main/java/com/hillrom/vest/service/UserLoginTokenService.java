@@ -48,7 +48,8 @@ public class UserLoginTokenService {
 			log.debug("securityToken.getCreatedTime() : " + securityToken.getCreatedTime());
 			log.debug("tokenProvider.getTokenValidity() : " + tokenProvider.getTokenValidity());
 			log.debug("System.currentTimeMillis() : " + System.currentTimeMillis());
-			log.debug("expiryTimeInMillis : " + expiryTimeInMillis);			
+			log.debug("expiryTimeInMillis : " + expiryTimeInMillis);
+			log.debug("flag : " + flag);
 			return flag;
 
 		}

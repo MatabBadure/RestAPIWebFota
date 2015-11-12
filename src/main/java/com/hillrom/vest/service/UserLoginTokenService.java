@@ -14,6 +14,8 @@ import com.hillrom.vest.security.xauth.TokenProvider;
 @Transactional
 public class UserLoginTokenService {
 	
+	private final Logger log = LoggerFactory.getLogger(UserLoginTokenService.class);
+	
 	@Inject
 	private UserLoginTokenRepository tokenRepository;
 	
@@ -30,14 +32,19 @@ public class UserLoginTokenService {
 	
 	public boolean validateToken(String authToken){
 		UserLoginToken securityToken = findOneById(authToken);
+		System.out.println("Inside validateToken "+ securityToken);
+		
 		if(null == securityToken){
+			securityToken.setCreatedTime(DateTime.now());
+			tokenRepository.save(securityToken);			
+			log.debug("Security Token with Created Time : ", securityToken);
 			return false;
 		}else{
 			DateTime tokenCreatedAt = securityToken.getCreatedTime();
 			long expiryTimeInMillis = securityToken.getCreatedTime().plus(1000 * tokenProvider.getTokenValidity()).getMillis();
+			log.debug("System.currentTimeMillis() : ", System.currentTimeMillis());
+			log.debug("expiryTimeInMillis : ", expiryTimeInMillis);
 			boolean flag = System.currentTimeMillis() <= expiryTimeInMillis ;
-			securityToken.setCreatedTime(DateTime.now());
-			tokenRepository.save(securityToken);
 			return flag;
 		}
 	} 

@@ -40,14 +40,14 @@ public class UserLoginTokenService {
 		if(null == securityToken){
 			securityToken.setCreatedTime(DateTime.now());
 			tokenRepository.save(securityToken);			
-			log.debug("Security Token with Created Time : ", securityToken);
+			log.debug("Security Token with Created Time : " + securityToken);
 			return false;
 		}else{
 			DateTime tokenCreatedAt = securityToken.getCreatedTime();
 			long expiryTimeInMillis = securityToken.getCreatedTime().plus(1000 * tokenProvider.getTokenValidity()).getMillis();
-			log.debug("System.currentTimeMillis() : ", System.currentTimeMillis());
-			log.debug("expiryTimeInMillis : ", expiryTimeInMillis);
-			log.debug("System.nanoTime() : ", System.nanoTime());
+			log.debug("System.currentTimeMillis() : " + System.currentTimeMillis());
+			log.debug("expiryTimeInMillis : " + expiryTimeInMillis);
+			log.debug("System.nanoTime() : "+ System.nanoTime());
 			boolean flag = System.currentTimeMillis() <= expiryTimeInMillis ;
 			return flag;
 		}

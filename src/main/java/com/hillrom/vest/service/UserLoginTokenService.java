@@ -35,7 +35,6 @@ public class UserLoginTokenService {
 	
 	public boolean validateToken(String authToken){
 		UserLoginToken securityToken = findOneById(authToken);
-		System.out.println("Inside validateToken "+ securityToken);
 		
 		if(null == securityToken){
 			securityToken.setCreatedTime(DateTime.now());
@@ -45,9 +44,11 @@ public class UserLoginTokenService {
 		}else{
 			DateTime tokenCreatedAt = securityToken.getCreatedTime();
 			long expiryTimeInMillis = securityToken.getCreatedTime().plus(1000 * tokenProvider.getTokenValidity()).getMillis();
+			log.debug("securityToken.getCreatedTime() : " + securityToken.getCreatedTime());
+			log.debug("tokenProvider.getTokenValidity() : " + tokenProvider.getTokenValidity());
+			log.debug("expiryTimeInMillis : " + expiryTimeInMillis);
 			log.debug("System.currentTimeMillis() : " + System.currentTimeMillis());
 			log.debug("expiryTimeInMillis : " + expiryTimeInMillis);
-			log.debug("System.nanoTime() : "+ System.nanoTime());
 			boolean flag = System.currentTimeMillis() <= expiryTimeInMillis ;
 			return flag;
 		}

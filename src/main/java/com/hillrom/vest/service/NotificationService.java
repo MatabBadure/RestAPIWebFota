@@ -1,5 +1,12 @@
 package com.hillrom.vest.service;
 
+import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_MISSED_THERAPY_DAYS_COUNT;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE;
+import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
+
+import java.util.List;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -8,8 +15,6 @@ import javax.transaction.Transactional;
 import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 
-import static com.hillrom.vest.config.NotificationTypeConstants.*;
-import static com.hillrom.vest.config.AdherenceScoreConstants.*;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
@@ -68,4 +73,7 @@ public class NotificationService {
 		}
 	}
 	
+	public List<Notification> findNotificationsByUserIdAndDateRange(Long patientUserId,LocalDate from,LocalDate to){
+		return notificationRepository.findByPatientUserIdAndDateBetweenAndIsAcknowledged(patientUserId, from, to, false);
+	} 
 }

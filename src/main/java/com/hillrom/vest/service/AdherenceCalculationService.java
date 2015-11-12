@@ -197,9 +197,9 @@ public class AdherenceCalculationService {
 	}
 
 	/**
-	 * Runs every midnight 2am deducts the compliance score by 5 if therapy hasn't been done for 3 days
+	 * Runs every midnight deducts the compliance score by 5 if therapy hasn't been done for 3 days
 	 */
-	@Scheduled(cron="0 0 2 * * * ")
+	@Scheduled(cron="0 0 0 * * * ")
 	public void processMissedTherapySessions(){
 		try{
 			List<PatientCompliance> patientComplianceList = patientComplianceRepository.findAllGroupByPatientUserIdOrderByDateDesc();
@@ -267,7 +267,7 @@ public class AdherenceCalculationService {
 	 * Runs every midnight , sends the notifications to Patient User.
 	 */
 	@Async
-	@Scheduled(cron="0 0 0 * * *")
+	@Scheduled(cron="0 45 23 * * *")
 	public void processPatientNotifications(){
 		LocalDate today = LocalDate.now();
 		List<Notification> notifications = notificationRepository.findByDate(today);
@@ -316,7 +316,7 @@ public class AdherenceCalculationService {
 	 * Runs every midnight , sends the statistics notifications to Clinic Admin and HCP.
 	 * @throws HillromException 
 	 */
-	@Scheduled(cron="0 0 0 * * * ")
+	@Scheduled(cron="0 45 23 * * * ")
 	public void processHcpClinicAdminNotifications() throws HillromException{
 		try{
 			List<ClinicStatsNotificationVO> statsNotificationVOs = getPatientStatsWithHcpAndClinicAdminAssociation();
@@ -344,7 +344,7 @@ public class AdherenceCalculationService {
 		}
 	}
 	
-	@Scheduled(cron="0 0 0 * * *")
+	@Scheduled(cron="0 45 23 * * *")
 	public void processCareGiverNotifications() throws HillromException{
 		try{
 			List<CareGiverStatsNotificationVO> statsNotificationVOs = findPatientStatisticsCareGiver();

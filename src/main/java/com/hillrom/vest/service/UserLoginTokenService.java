@@ -37,20 +37,20 @@ public class UserLoginTokenService {
 		UserLoginToken securityToken = findOneById(authToken);
 		
 		if(null == securityToken){
-			securityToken.setCreatedTime(DateTime.now());
-			tokenRepository.save(securityToken);			
-			log.debug("Security Token with Created Time : " + securityToken);
 			return false;
 		}else{
+			
 			DateTime tokenCreatedAt = securityToken.getCreatedTime();
 			long expiryTimeInMillis = securityToken.getCreatedTime().plus(1000 * tokenProvider.getTokenValidity()).getMillis();
+			boolean flag = System.currentTimeMillis() <= expiryTimeInMillis ;
+			securityToken.setCreatedTime(DateTime.now());
+			tokenRepository.save(securityToken);
 			log.debug("securityToken.getCreatedTime() : " + securityToken.getCreatedTime());
 			log.debug("tokenProvider.getTokenValidity() : " + tokenProvider.getTokenValidity());
-			log.debug("expiryTimeInMillis : " + expiryTimeInMillis);
 			log.debug("System.currentTimeMillis() : " + System.currentTimeMillis());
-			log.debug("expiryTimeInMillis : " + expiryTimeInMillis);
-			boolean flag = System.currentTimeMillis() <= expiryTimeInMillis ;
+			log.debug("expiryTimeInMillis : " + expiryTimeInMillis);			
 			return flag;
+
 		}
 	} 
 	

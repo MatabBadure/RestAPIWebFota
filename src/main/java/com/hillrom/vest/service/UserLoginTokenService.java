@@ -47,6 +47,7 @@ public class UserLoginTokenService {
 			long expiryTimeInMillis = securityToken.getCreatedTime().plus(1000 * tokenProvider.getTokenValidity()).getMillis();
 			log.debug("System.currentTimeMillis() : ", System.currentTimeMillis());
 			log.debug("expiryTimeInMillis : ", expiryTimeInMillis);
+			log.debug("System.nanoTime() : ", System.nanoTime());
 			boolean flag = System.currentTimeMillis() <= expiryTimeInMillis ;
 			return flag;
 		}

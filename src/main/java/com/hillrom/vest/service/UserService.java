@@ -121,7 +121,10 @@ public class UserService {
 
     public String generateDefaultPassword(User patientUser) {
 		StringBuilder defaultPassword = new StringBuilder();
-		defaultPassword.append(patientUser.getZipcode());
+		String zipcode = patientUser.getZipcode().toString();
+		defaultPassword.append(zipcode.length()==4?"0"+zipcode:zipcode.length()==3?"00"+zipcode:zipcode);
+		System.out.println(defaultPassword);
+		
 		// default password will have the first 4 letters from last name, if length of last name <= 4, use complete string
 		int endIndex = patientUser.getLastName().length() > Constants.NO_OF_CHARACTERS_TO_BE_EXTRACTED ? Constants.NO_OF_CHARACTERS_TO_BE_EXTRACTED : patientUser.getLastName().length() ;
 		defaultPassword.append(patientUser.getLastName().substring(0, endIndex));

@@ -15,13 +15,11 @@ public interface PatientComplianceRepository extends
 	
 	PatientCompliance findByPatientUserIdAndDate(Long patientUSerId,LocalDate date);
 	
-	@Query(nativeQuery=true,value="SELECT t1.* FROM PATIENT_COMPLIANCE t1 "
-			+ " INNER JOIN (SELECT user_id, MAX(date) as maxDate "
-			+ " FROM PATIENT_COMPLIANCE "
-			+ " GROUP BY user_id) t2 "
-			+ " ON t1.user_id=t2.user_id and t1.date = t2.maxDate "
+	@Query(nativeQuery=true,value="SELECT * FROM PATIENT_COMPLIANCE pc1 JOIN "
+			+ " (SELECT max(date) AS latest_date,user_id AS uid FROM PATIENT_COMPLIANCE GROUP BY user_id) pc2 "
+			+ " ON pc1.user_id = pc2.uid and pc1.date = pc2.latest_date GROUP BY pc1.user_id HAVING pc1.date <> current_date()"
 			)
-	List<PatientCompliance> findAllGroupByPatientUserIdOrderByDateDesc();
+	List<PatientCompliance> findMissedTherapyPatientsRecords();
 	
 	List<PatientCompliance> findByDateAndIsSettingsDeviatedAndPatientUserIdIn(LocalDate date,Boolean isSettingsDeviated,List<Long> patientUserIds);
 	

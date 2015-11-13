@@ -67,7 +67,7 @@ BEGIN
 		`last_modified_date`, `is_deleted`, `gender`, `zipcode`, `terms_condition_accepted`,
 		`terms_condition_accepted_date`, `dob`, `hillrom_id`,`activation_link_sent_date`)
 		VALUES(
-		pat_email, encrypted_password, pat_title, pat_first_name, pat_middle_name, pat_last_name, 0, pat_lang_key,NULL, NULL,
+		pat_email, encrypted_password, pat_title, pat_first_name, pat_middle_name, pat_last_name, 1, pat_lang_key,NULL, NULL,
 		created_by, created_date, NULL, NULL, created_by, 
 		created_date, 0, pat_gender, pat_zipcode,0,
 		NULL, pat_dob, hr_id, NULL);

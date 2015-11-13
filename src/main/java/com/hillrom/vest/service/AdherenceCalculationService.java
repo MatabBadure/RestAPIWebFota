@@ -903,7 +903,15 @@ public class AdherenceCalculationService {
 		// Compliance Score is non-negative
 		currentScore = currentScore > 0? currentScore : 0;
 		
-		latestCompliance.setMissedTherapyCount(currentMissedTherapyCount);
+		// Don't include today as missed Therapy day, This will be taken care by the job
+		if(LocalDate.now().equals(latestCompliance.getDate())){
+			if(currentMissedTherapyCount > 0){
+				latestCompliance.setMissedTherapyCount(currentMissedTherapyCount-1);
+			}
+		}else{
+			latestCompliance.setMissedTherapyCount(currentMissedTherapyCount);
+		}
+		
 		latestCompliance.setScore(currentScore);
 		complianceMap.put(latestCompliance.getDate(), latestCompliance);
 	}

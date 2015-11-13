@@ -44,7 +44,7 @@ public class UserLoginTokenService {
 			long expiryTimeInMillis = securityToken.getCreatedTime().plus(1000 * tokenProvider.getTokenValidity()).getMillis();
 			
 			boolean flag = false;
-			if(expiryTimeInMillis - System.currentTimeMillis() < 0 ){
+			if(expiryTimeInMillis - System.currentTimeMillis() >= 0 ){
 				log.debug("Last update time for Token : " + securityToken.getCreatedTime());
 				log.debug("Current application  time  : " + DateTime.now());
 				log.debug("Difference in seconds      : " + (expiryTimeInMillis - System.currentTimeMillis())/1000);

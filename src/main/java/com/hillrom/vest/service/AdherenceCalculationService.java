@@ -20,7 +20,6 @@ import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calcula
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigInteger;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -199,10 +198,10 @@ public class AdherenceCalculationService {
 	/**
 	 * Runs every midnight deducts the compliance score by 5 if therapy hasn't been done for 3 days
 	 */
-	@Scheduled(cron="0 0 0 * * * ")
+	@Scheduled(cron="0 59 23 * * * ")
 	public void processMissedTherapySessions(){
 		try{
-			List<PatientCompliance> patientComplianceList = patientComplianceRepository.findAllGroupByPatientUserIdOrderByDateDesc();
+			List<PatientCompliance> patientComplianceList = patientComplianceRepository.findMissedTherapyPatientsRecords();
 			List<PatientCompliance> newComplianceList = new LinkedList<>();
 			List<Long> patientUserIds = new LinkedList<>();
 			DateTime today = DateTime.now();
@@ -255,6 +254,7 @@ public class AdherenceCalculationService {
 		Map<Long,Integer> patientUserHMRRunrateMap = new HashMap<>();
 		List<TherapySession> therapySessions = therapySessionRepository.findByDateBetweenAndPatientUserIdIn(from, to, patientUserIds);
 		Map<User,List<TherapySession>> therapySessionsPerPatient = therapySessions.stream().collect(Collectors.groupingBy(TherapySession::getPatientUser));
+		
 		int days = getDaysCountBetweenLocalDates(from, to)+1;// +1 is due to dates are inclusive ex: 24-october-15 to 26-october-15
 		for(User patientUser : therapySessionsPerPatient.keySet()){
 			List<TherapySession> sessions = therapySessionsPerPatient.get(patientUser);
@@ -267,7 +267,7 @@ public class AdherenceCalculationService {
 	 * Runs every midnight , sends the notifications to Patient User.
 	 */
 	@Async
-	@Scheduled(cron="0 45 23 * * *")
+	@Scheduled(cron="0 15 0 * * *")
 	public void processPatientNotifications(){
 		LocalDate today = LocalDate.now();
 		List<Notification> notifications = notificationRepository.findByDate(today);
@@ -316,7 +316,7 @@ public class AdherenceCalculationService {
 	 * Runs every midnight , sends the statistics notifications to Clinic Admin and HCP.
 	 * @throws HillromException 
 	 */
-	@Scheduled(cron="0 45 23 * * * ")
+	@Scheduled(cron="0 15 0 * * * ")
 	public void processHcpClinicAdminNotifications() throws HillromException{
 		try{
 			List<ClinicStatsNotificationVO> statsNotificationVOs = getPatientStatsWithHcpAndClinicAdminAssociation();
@@ -344,7 +344,7 @@ public class AdherenceCalculationService {
 		}
 	}
 	
-	@Scheduled(cron="0 45 23 * * *")
+	@Scheduled(cron="0 15 0 * * *")
 	public void processCareGiverNotifications() throws HillromException{
 		try{
 			List<CareGiverStatsNotificationVO> statsNotificationVOs = findPatientStatisticsCareGiver();
@@ -903,7 +903,15 @@ public class AdherenceCalculationService {
 		// Compliance Score is non-negative
 		currentScore = currentScore > 0? currentScore : 0;
 		
-		latestCompliance.setMissedTherapyCount(currentMissedTherapyCount);
+		// Don't include today as missed Therapy day, This will be taken care by the job
+		if(LocalDate.now().equals(latestCompliance.getDate())){
+			if(currentMissedTherapyCount > 0){
+				latestCompliance.setMissedTherapyCount(currentMissedTherapyCount-1);
+			}
+		}else{
+			latestCompliance.setMissedTherapyCount(currentMissedTherapyCount);
+		}
+		
 		latestCompliance.setScore(currentScore);
 		complianceMap.put(latestCompliance.getDate(), latestCompliance);
 	}

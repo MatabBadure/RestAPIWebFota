@@ -6,8 +6,13 @@ import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIAN
 import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -16,6 +21,7 @@ import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.domain.Notification;
+import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.repository.NotificationRepository;
@@ -74,6 +80,26 @@ public class NotificationService {
 	}
 	
 	public List<Notification> findNotificationsByUserIdAndDateRange(Long patientUserId,LocalDate from,LocalDate to){
-		return notificationRepository.findByPatientUserIdAndDateBetweenAndIsAcknowledged(patientUserId, from, to, false);
-	} 
+		List<Long> patientUserIds = new LinkedList<>();
+		patientUserIds.add(patientUserId);
+		return notificationRepository.findByPatientUserIdInAndDateBetweenAndIsAcknowledged(patientUserIds, from, to, false);
+	}
+	
+	public Map<Long,List<Notification>> getNotificationMapByPatientIdsAndDate(List<Long> patientUserIds,LocalDate from,LocalDate to){
+		List<Notification> notifications = notificationRepository.findByPatientUserIdInAndDateBetweenAndIsAcknowledged(patientUserIds, from, to, false);
+		Map<Long,List<Notification>> notificationsMap = new HashMap<>();
+		for(Notification notification: notifications){
+			List<Notification> notificationsForUserId = notificationsMap.get(notification.getPatientUser().getId());
+			if(Objects.isNull(notificationsForUserId)){
+				notificationsForUserId = new LinkedList<>();
+			}
+			notificationsForUserId.add(notification);
+			notificationsMap.put(notification.getPatientUser().getId(), notificationsForUserId);
+		}
+		return notificationsMap;
+	}
+	
+	public void saveAll(Collection<Notification> notifications){
+		notificationRepository.save(notifications);
+	}
 }

@@ -238,7 +238,7 @@ public class PatientVestDeviceTherapyUtil {
 		return therapySessions.stream().collect(Collectors.summingInt(TherapySession::getDurationInMinutes));
 	}
 	
-	public static int calculateHMRRunRatePerDays(List<TherapySession> therapySessions,int days){
-		return calculateCumulativeDuration(therapySessions)/days;
+	public static int calculateHMRRunRatePerDays(List<TherapySession> therapySessions,float days){
+		return Math.round(calculateCumulativeDuration(therapySessions)/days);
 	}
 }

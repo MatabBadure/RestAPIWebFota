@@ -1,8 +1,15 @@
 package com.hillrom.vest.service;
 
+import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
+import static com.hillrom.vest.config.AdherenceScoreConstants.UPPER_BOUND_VALUE;
+
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -14,10 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientProtocolData;
+import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.PatientProtocolRepository;
+import com.hillrom.vest.repository.ProtocolConstantsRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -39,6 +48,9 @@ public class PatientProtocolService {
     
     @Inject
     private PatientProtocolRepository patientProtocolRepository;
+    
+	@Inject
+	private ProtocolConstantsRepository  protocolConstantsRepository;
     
     public List<PatientProtocolData> addProtocolToPatient(Long patientUserId, ProtocolDTO protocolDTO) throws HillromException {
     	if(Constants.CUSTOM_PROTOCOL.equals(protocolDTO.getType())){
@@ -207,5 +219,83 @@ public class PatientProtocolService {
 	public List<PatientProtocolData> findOneByPatientUserIdAndStatus(Long PatientUserId,boolean isDeleted){
 		return patientProtocolRepository.findByPatientUserIdAndDeleted(PatientUserId, isDeleted);
 	} 
+	
+	public List<PatientProtocolData> findByPatientUserIds(List<Long> patientUserIds){
+		return patientProtocolRepository.findByPatientUserIdAndActiveStatus(patientUserIds);
+	}
+	
+	/**
+	 * Get Protocol Constants by loading Protocol data
+	 * @param List<Long> patientUserIds
+	 * @return Map<Long,ProtocolConstants>
+	 */
+	public Map<Long,ProtocolConstants> getProtocolByPatientUserIds(
+			List<Long> patientUserIds) throws Exception{
+		List<PatientProtocolData> protocolData =  patientProtocolRepository.findByPatientUserIdAndActiveStatus(patientUserIds);
+		
+		Map<Long, List<PatientProtocolData>> userIdProtocolMap = prepareUserIdProtocolMap(protocolData);
+		Map<Long,ProtocolConstants> userIdProtocolConstantsMap = new HashMap<>();
+		for(Long patientUserId : patientUserIds){
+			List<PatientProtocolData> protocol = userIdProtocolMap.get(patientUserId);
+			if(Objects.nonNull(protocol) && protocol.size() > 0){			
+				String protocolType = protocol.get(0).getType();
+				if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(protocolType)){
+					userIdProtocolConstantsMap.put(patientUserId,getProtocolConstantFromNormalProtocol(protocol));
+				}else{
+					userIdProtocolConstantsMap.put(patientUserId,getProtocolConstantFromCustomProtocol(protocol));
+				}
+			}else{
+				userIdProtocolConstantsMap.put(patientUserId,protocolConstantsRepository.findOne(1L));
+			}
+		}
+		return userIdProtocolConstantsMap;
+	}
+
+	private Map<Long, List<PatientProtocolData>> prepareUserIdProtocolMap(
+			List<PatientProtocolData> protocolData) {
+		Map<Long, List<PatientProtocolData>> userIdProtocolMap = new HashMap<>();
+		for(PatientProtocolData protocol : protocolData){
+			List<PatientProtocolData> protocolForUserId = userIdProtocolMap.get(protocol.getPatientUser().getId());
+			if(Objects.isNull(protocolForUserId)){
+				protocolForUserId = new LinkedList<>();
+			}
+			protocolForUserId.add(protocol);
+			userIdProtocolMap.put(protocol.getPatientUser().getId(), protocolForUserId);
+		}
+		return userIdProtocolMap;
+	}
+
+	private ProtocolConstants getProtocolConstantFromNormalProtocol(
+			List<PatientProtocolData> protocolData) {
+		int maxFrequency,minFrequency,minPressure,maxPressure,minDuration,maxDuration,treatmentsPerDay;
+		PatientProtocolData protocol = protocolData.get(0); 
+		maxFrequency = protocol.getMaxFrequency();
+		minFrequency = protocol.getMinFrequency();
+		maxPressure = protocol.getMaxPressure();
+		minPressure = protocol.getMinPressure();
+		minDuration = protocol.getMinMinutesPerTreatment() * protocol.getTreatmentsPerDay();
+		maxDuration = protocol.getMaxMinutesPerTreatment() * protocol.getTreatmentsPerDay();
+		treatmentsPerDay = protocol.getTreatmentsPerDay();
+		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration,maxDuration);
+	}
+
+	private ProtocolConstants getProtocolConstantFromCustomProtocol(
+			List<PatientProtocolData> protocolData) {
+		int maxFrequency,minFrequency,minPressure,maxPressure,minDuration,maxDuration,treatmentsPerDay;
+		float weightedAvgFrequency = 0,weightedAvgPressure = 0;
+		double totalDuration = protocolData.stream().collect(Collectors.summingDouble(PatientProtocolData :: getMinMinutesPerTreatment));
+		for(PatientProtocolData protocol : protocolData){
+			weightedAvgFrequency += calculateWeightedAvg(totalDuration, protocol.getMinMinutesPerTreatment(), protocol.getMinFrequency());
+			weightedAvgPressure += calculateWeightedAvg(totalDuration, protocol.getMinMinutesPerTreatment(), protocol.getMinPressure());
+		}
+		treatmentsPerDay = protocolData.get(0).getTreatmentsPerDay();
+		minFrequency = Math.round(weightedAvgFrequency);
+		maxFrequency = (int) Math.round(minFrequency*UPPER_BOUND_VALUE);
+		minPressure = Math.round(weightedAvgPressure);
+		maxPressure = (int) Math.round(minPressure*UPPER_BOUND_VALUE);
+		minDuration = (int)(totalDuration*treatmentsPerDay);
+		maxDuration = (int) Math.round(minDuration *UPPER_BOUND_VALUE);
+		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration,maxDuration);
+	}
 }
 

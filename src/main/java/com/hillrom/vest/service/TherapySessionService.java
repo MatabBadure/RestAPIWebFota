@@ -193,7 +193,7 @@ public class TherapySessionService {
 				});
 				// updating HMR from previous day to form step graph
 				hmrInMinutes = therapySessions.get(therapySessions.size()-1).getHmr();
-			}else{
+			}else if(!date.isEqual(LocalDate.now())){ // Don't consider current date as missed therapy
 				// add missed therapy if user misses the therapy
 				TherapyDataVO missedTherapy = createTherapyDataWithTimeStamp(date);
 				missedTherapy.setNote(noteMap.get(date));

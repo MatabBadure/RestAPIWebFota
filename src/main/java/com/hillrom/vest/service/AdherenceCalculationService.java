@@ -36,8 +36,6 @@ import javax.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -67,7 +65,9 @@ import com.hillrom.vest.web.rest.dto.PatientStatsVO;
 @Transactional
 public class AdherenceCalculationService {
 
-    private static final String TREATMENTS_PER_DAY = "treatmentsPerDay";
+    private static final double LOWER_BOUND_VALUE = 0.85;
+
+	private static final double UPPER_BOUND_VALUE = 1.15;
 
 	private static final String TOTAL_DURATION = "totalDuration";
 
@@ -75,8 +75,6 @@ public class AdherenceCalculationService {
 
 	private static final String WEIGHTED_AVG_FREQUENCY = "weightedAvgFrequency";
 
-	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationService.class);
-    
 	@Inject
 	private PatientProtocolService protocolService;
 	
@@ -115,21 +113,49 @@ public class AdherenceCalculationService {
 	public ProtocolConstants getProtocolByPatientUserId(
 			Long patientUserId) throws Exception{
 		List<PatientProtocolData> protocolData =  protocolService.findOneByPatientUserIdAndStatus(patientUserId, false);
-		if(protocolData.size() > 0 && Constants.NORMAL_PROTOCOL.equalsIgnoreCase(protocolData.get(0).getType())){			
-			int maxFrequency = 0, minFrequency = 0, minPressure = 0, maxPressure = 0, minDuration = 0, maxDuration = 0, treatmentsPerDay = 0;
-			for(PatientProtocolData protocol : protocolData){
-				maxFrequency += protocol.getMaxFrequency();
-				minFrequency += protocol.getMinFrequency();
-				minPressure += protocol.getMinPressure();
-				maxPressure += protocol.getMaxPressure();
-				minDuration += protocol.getMinMinutesPerTreatment() * protocol.getTreatmentsPerDay();
-				maxDuration += protocol.getMaxMinutesPerTreatment() * protocol.getTreatmentsPerDay();
-				treatmentsPerDay += protocol.getTreatmentsPerDay();
+		if(protocolData.size() > 0){			
+			String protocolType = protocolData.get(0).getType();
+			if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(protocolType)){
+				return getProtocolConstantFromNormalProtocol(protocolData);
+			}else{
+				return getProtocolConstantFromCustomProtocol(protocolData);
 			}
-			return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration,maxDuration);
 		}else{
 			return protocolConstantsRepository.findOne(1L);
 		}
+	}
+
+	private ProtocolConstants getProtocolConstantFromNormalProtocol(
+			List<PatientProtocolData> protocolData) {
+		int maxFrequency,minFrequency,minPressure,maxPressure,minDuration,maxDuration,treatmentsPerDay;
+		PatientProtocolData protocol = protocolData.get(0); 
+		maxFrequency = protocol.getMaxFrequency();
+		minFrequency = protocol.getMinFrequency();
+		maxPressure = protocol.getMaxPressure();
+		minPressure = protocol.getMinPressure();
+		minDuration = protocol.getMinMinutesPerTreatment() * protocol.getTreatmentsPerDay();
+		maxDuration = protocol.getMaxMinutesPerTreatment() * protocol.getTreatmentsPerDay();
+		treatmentsPerDay = protocol.getTreatmentsPerDay();
+		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration,maxDuration);
+	}
+
+	private ProtocolConstants getProtocolConstantFromCustomProtocol(
+			List<PatientProtocolData> protocolData) {
+		int maxFrequency,minFrequency,minPressure,maxPressure,minDuration,maxDuration,treatmentsPerDay;
+		float weightedAvgFrequency = 0,weightedAvgPressure = 0;
+		double totalDuration = protocolData.stream().collect(Collectors.summingDouble(PatientProtocolData :: getMinMinutesPerTreatment));
+		for(PatientProtocolData protocol : protocolData){
+			weightedAvgFrequency += calculateWeightedAvg(totalDuration, protocol.getMinMinutesPerTreatment(), protocol.getMinFrequency());
+			weightedAvgPressure += calculateWeightedAvg(totalDuration, protocol.getMinMinutesPerTreatment(), protocol.getMinPressure());
+		}
+		treatmentsPerDay = protocolData.get(0).getTreatmentsPerDay();
+		minFrequency = Math.round(weightedAvgFrequency);
+		maxFrequency = (int) Math.round(minFrequency*UPPER_BOUND_VALUE);
+		minPressure = Math.round(weightedAvgPressure);
+		maxPressure = (int) Math.round(minPressure*UPPER_BOUND_VALUE);
+		minDuration = (int)(totalDuration*treatmentsPerDay);
+		maxDuration = (int) Math.round(minDuration *UPPER_BOUND_VALUE);
+		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration,maxDuration);
 	}
 
 	/**
@@ -164,8 +190,8 @@ public class AdherenceCalculationService {
 	 */
 	public boolean isSettingsDeviated(ProtocolConstants protocolConstant,
 			double weightedAvgFrequency) {
-		if((protocolConstant.getMinFrequency()* 0.85) > weightedAvgFrequency 
-				|| (protocolConstant.getMaxFrequency()*1.15) < weightedAvgFrequency){
+		if((protocolConstant.getMinFrequency()* LOWER_BOUND_VALUE) > weightedAvgFrequency 
+				|| (protocolConstant.getMaxFrequency()*UPPER_BOUND_VALUE) < weightedAvgFrequency){
 			return true;
 		}
 		return false;

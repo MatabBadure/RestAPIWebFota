@@ -180,7 +180,7 @@ public class MailService {
         Context context = new Context();
         context.setVariable("user", user);
         context.setVariable("clinicStatisticsMap",statistics);
-        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now(), "MMM dd,yyyy"));
+        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now().minusDays(1), "MMM dd,yyyy"));
         context.setVariable("notificationUrl", hcpOrClinicAdminDashboardUrl);
         String content = "";
         String subject = "";
@@ -199,7 +199,7 @@ public class MailService {
         context.setVariable("isMultiplePatients",statistics.size()>1?true:false);
         log.debug("statistics patient size {}", statistics.size());
         
-        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now(), "MMM dd,yyyy"));
+        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now().minusDays(1), "MMM dd,yyyy"));
         context.setVariable("notificationUrl", careGiverDashboardUrl);
         String content = "";
         String subject = "";

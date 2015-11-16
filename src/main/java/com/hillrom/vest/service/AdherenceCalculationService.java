@@ -233,16 +233,16 @@ public class AdherenceCalculationService {
 			DateTime today = DateTime.now();
 			for(PatientCompliance compliance : patientComplianceList){
 				patientUserIds.add(compliance.getPatientUser().getId());
+				int missedTherapyCount = compliance.getMissedTherapyCount()+1;
 				PatientCompliance newCompliance = new PatientCompliance(
 						today.toLocalDate(),
 						compliance.getPatient(),
 						compliance.getPatientUser(),
 						compliance.getHmrRunRate(),
-						compliance.getMissedTherapyCount()+1,
+						missedTherapyCount,
 						compliance.getLatestTherapyDate(),
 						Objects.nonNull(compliance.getHmr())?compliance.getHmr():0.0d);
 				int score = Objects.isNull(compliance.getScore()) ? 0 : compliance.getScore(); 
-				int missedTherapyCount = compliance.getMissedTherapyCount();
 				if(missedTherapyCount >= DEFAULT_MISSED_THERAPY_DAYS_COUNT ){
 					score = score < MISSED_THERAPY_POINTS ? 0 :  score - MISSED_THERAPY_POINTS ;
 					notificationService.createOrUpdateNotification(compliance.getPatientUser(), compliance.getPatient(), compliance.getPatientUser().getId(),

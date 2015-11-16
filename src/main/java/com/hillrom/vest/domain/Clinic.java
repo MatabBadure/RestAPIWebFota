@@ -49,6 +49,9 @@ public class Clinic implements Serializable {
 
     @Column(name = "address")
     private String address;
+    
+    @Column(name = "address2")
+    private String address2;
 
     @Column(name = "zipcode")
     private Integer zipcode;
@@ -118,14 +121,22 @@ public class Clinic implements Serializable {
     }
 
     public String getAddress() {
-        return address;
-    }
+		return address;
+	}
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
+	public void setAddress(String address) {
+		this.address = address;
+	}
 
-    public Integer getZipcode() {
+	public String getAddress2() {
+		return address2;
+	}
+
+	public void setAddress2(String address2) {
+		this.address2 = address2;
+	}
+
+	public Integer getZipcode() {
         return zipcode;
     }
 
@@ -268,6 +279,7 @@ public class Clinic implements Serializable {
                 "id=" + id +
                 ", name='" + name + "'" +
                 ", address='" + address + "'" +
+                ", address2='" + address2 + "'" +
                 ", zipcode='" + zipcode + "'" +
                 ", city='" + city + "'" +
                 ", state='" + state + "'" +

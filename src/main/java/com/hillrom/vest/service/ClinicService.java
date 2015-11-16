@@ -174,6 +174,8 @@ public class ClinicService {
 			clinic.setName(clinicDTO.getName());
 		if (clinicDTO.getAddress() != null)
 			clinic.setAddress(clinicDTO.getAddress());
+		if (clinicDTO.getAddress2() != null)
+			clinic.setAddress2(clinicDTO.getAddress2());
 		if (clinicDTO.getCity() != null)
 			clinic.setCity(clinicDTO.getCity());
 		if (clinicDTO.getState() != null)

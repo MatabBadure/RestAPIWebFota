@@ -12,8 +12,11 @@ public class ClinicDTO {
 	@Size(max = 50)
 	private String name;
 
-	@Size(max = 50)
+	@Size(max = 255)
     private String address;
+	
+	@Size(max = 255)
+    private String address2;
 
 	@Size(max = 50)
     private Integer zipcode;
@@ -47,12 +50,13 @@ public class ClinicDTO {
 		super();
 	}
 
-	public ClinicDTO(String name, String address, Integer zipcode, String city,
+	public ClinicDTO(String name, String address, String address2, Integer zipcode, String city,
 			String state, String phoneNumber, String faxNumber, Long clinicAdminId,
 			Boolean parent, String hillromId) {
 		super();
 		this.name = name;
 		this.address = address;
+		this.address2 = address2;
 		this.zipcode = zipcode;
 		this.city = city;
 		this.state = state;
@@ -77,6 +81,14 @@ public class ClinicDTO {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public String getAddress2() {
+		return address2;
+	}
+
+	public void setAddress2(String address2) {
+		this.address2 = address2;
 	}
 
 	public Integer getZipcode() {

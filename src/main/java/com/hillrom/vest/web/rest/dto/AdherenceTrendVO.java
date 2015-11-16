@@ -9,15 +9,15 @@ import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
 import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
+import com.hillrom.vest.domain.util.MMDDYYYYLocalDateSerializer;
 
 public class AdherenceTrendVO implements Serializable{
 
 	private int updatedScore;
 
 	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
-	@JsonSerialize(using = CustomLocalDateSerializer.class)
+	@JsonSerialize(using = MMDDYYYYLocalDateSerializer.class)
     @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
 	private LocalDate date;
 	private Map<String,Integer> notificationPoints = new HashMap<>();

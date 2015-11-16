@@ -125,7 +125,6 @@ public class PatientComplianceService {
 				trendVO.getNotificationPoints().put(notificationType,BONUS_POINTS);
 			else
 				trendVO.getNotificationPoints().put(notificationType,0);
-				trendVO.getNotificationPoints().put(MISSED_THERAPY_DISPLAY_VALUE,compliance.getMissedTherapyCount());
 		}
 	} 
 }

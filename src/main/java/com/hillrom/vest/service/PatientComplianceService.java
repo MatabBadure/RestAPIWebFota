@@ -44,6 +44,7 @@ public class PatientComplianceService {
 		if(Objects.nonNull(existingCompliance)){
 			existingCompliance.setScore(compliance.getScore());
 			existingCompliance.setHmrRunRate(compliance.getHmrRunRate());
+			existingCompliance.setMissedTherapyCount(compliance.getMissedTherapyCount());
 			compliance = complianceRepository.save(existingCompliance);
 		}else{
 			complianceRepository.save(compliance);
@@ -124,7 +125,6 @@ public class PatientComplianceService {
 				trendVO.getNotificationPoints().put(notificationType,BONUS_POINTS);
 			else
 				trendVO.getNotificationPoints().put(notificationType,0);
-				trendVO.getNotificationPoints().put(MISSED_THERAPY_DISPLAY_VALUE,compliance.getMissedTherapyCount());
 		}
 	} 
 }

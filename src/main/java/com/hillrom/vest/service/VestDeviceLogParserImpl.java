@@ -100,10 +100,10 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 
 	@Override
 	public List<PatientVestDeviceData> parseBase64StringToPatientVestDeviceLogEntry(
-			String base64String) throws Exception{
+			String base16String) throws Exception{
 
 		List<PatientVestDeviceData> patientVestDeviceRecords = new LinkedList<>();
-		String base16String = ParserUtil.convertToBase16String(base64String);
+		//String base16String = ParserUtil.convertToBase16String(base64String);
 		
 		log.debug("Base16 String "+base16String);
 		

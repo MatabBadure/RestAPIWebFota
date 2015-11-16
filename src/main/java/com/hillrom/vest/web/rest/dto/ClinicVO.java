@@ -14,7 +14,7 @@ public class ClinicVO implements Serializable {
 
     private String name;
 
-    private String address1;
+    private String address;
     
     private String address2;
 
@@ -43,13 +43,13 @@ public class ClinicVO implements Serializable {
     @JsonIgnore
     private List<ClinicVO> childClinicVOs = new LinkedList<>();
 
-    public ClinicVO(String id,String name, String address1, String address2, Integer zipcode, String city,
+    public ClinicVO(String id,String name, String address, String address2, Integer zipcode, String city,
 			String state, String phoneNumber, String faxNumber, Long clinicAdminId,
 			Boolean parent, String hillromId,Boolean deleted,DateTime createdAt) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.address1 = address1;
+		this.address = address;
 		this.address2 = address2;
 		this.zipcode = zipcode;
 		this.city = city;
@@ -83,12 +83,12 @@ public class ClinicVO implements Serializable {
         return zipcode;
     }
 
-    public String getAddress1() {
-		return address1;
+    public String getAddress() {
+		return address;
 	}
 
-	public void setAddress1(String address1) {
-		this.address1 = address1;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	public String getAddress2() {

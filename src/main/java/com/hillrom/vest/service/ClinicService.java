@@ -172,8 +172,8 @@ public class ClinicService {
 	private void assignUpdatedValues(ClinicDTO clinicDTO, Clinic clinic) {
 		if (clinicDTO.getName() != null)
 			clinic.setName(clinicDTO.getName());
-		if (clinicDTO.getAddress1() != null)
-			clinic.setAddress1(clinicDTO.getAddress1());
+		if (clinicDTO.getAddress() != null)
+			clinic.setAddress(clinicDTO.getAddress());
 		if (clinicDTO.getAddress2() != null)
 			clinic.setAddress2(clinicDTO.getAddress2());
 		if (clinicDTO.getCity() != null)

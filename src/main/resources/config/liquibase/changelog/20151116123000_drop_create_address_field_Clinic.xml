@@ -14,9 +14,7 @@
         Added the entity Clinic.
     -->
     <changeSet id="20151116123000" author="jhipster">
-    	<dropColumn tableName="CLINIC" columnName="address"/>
     	<addColumn tableName="CLINIC">
-        	<column name="address1" type="varchar(255)"/>
         	<column name="address2" type="varchar(255)"/>
         </addColumn>
     </changeSet>

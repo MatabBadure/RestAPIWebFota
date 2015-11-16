@@ -87,7 +87,7 @@ public class PatientVestDeviceTherapyUtil {
 		long endTimestamp = deviceEventRecords.get(deviceEventRecords.size()-1).getTimestamp();
 		long startTimestamp = deviceEventRecords.get(0).getTimestamp();
 		int totalDuration = (int) Math.round((endTimestamp-startTimestamp)/MILLI_SECONDS_PER_MINUTE);
-		return totalDuration - durationOfSession;
+		return (totalDuration - durationOfSession) > 0 ? (totalDuration - durationOfSession) : 0;
 	}
 
 	private static int calculateDurationOfSession(

@@ -930,6 +930,8 @@ public class AdherenceCalculationService {
 		if(LocalDate.now().equals(latestCompliance.getDate())){
 			if(currentMissedTherapyCount > 0){
 				latestCompliance.setMissedTherapyCount(currentMissedTherapyCount-1);
+			}else{
+				latestCompliance.setMissedTherapyCount(currentMissedTherapyCount);
 			}
 		}else{
 			latestCompliance.setMissedTherapyCount(currentMissedTherapyCount);

@@ -224,10 +224,10 @@ public class AdherenceCalculationService {
 	/**
 	 * Runs every midnight deducts the compliance score by 5 if therapy hasn't been done for 3 days
 	 */
-	@Scheduled(cron="0 0 0 * * * ")
+	@Scheduled(cron="0 59 23 * * * ")
 	public void processMissedTherapySessions(){
 		try{
-			List<PatientCompliance> patientComplianceList = patientComplianceRepository.findAllGroupByPatientUserIdOrderByDateDesc();
+			List<PatientCompliance> patientComplianceList = patientComplianceRepository.findMissedTherapyPatientsRecords();
 			List<PatientCompliance> newComplianceList = new LinkedList<>();
 			List<Long> patientUserIds = new LinkedList<>();
 			DateTime today = DateTime.now();
@@ -291,7 +291,7 @@ public class AdherenceCalculationService {
 	 * Runs every midnight , sends the notifications to Patient User.
 	 */
 	@Async
-	@Scheduled(cron="0 45 23 * * *")
+	@Scheduled(cron="0 15 0 * * *")
 	public void processPatientNotifications(){
 		LocalDate today = LocalDate.now();
 		List<Notification> notifications = notificationRepository.findByDate(today);
@@ -340,7 +340,7 @@ public class AdherenceCalculationService {
 	 * Runs every midnight , sends the statistics notifications to Clinic Admin and HCP.
 	 * @throws HillromException 
 	 */
-	@Scheduled(cron="0 45 23 * * * ")
+	@Scheduled(cron="0 15 0 * * * ")
 	public void processHcpClinicAdminNotifications() throws HillromException{
 		try{
 			List<ClinicStatsNotificationVO> statsNotificationVOs = getPatientStatsWithHcpAndClinicAdminAssociation();
@@ -368,7 +368,7 @@ public class AdherenceCalculationService {
 		}
 	}
 	
-	@Scheduled(cron="0 45 23 * * *")
+	@Scheduled(cron="0 15 0 * * *")
 	public void processCareGiverNotifications() throws HillromException{
 		try{
 			List<CareGiverStatsNotificationVO> statsNotificationVOs = findPatientStatisticsCareGiver();
@@ -926,7 +926,15 @@ public class AdherenceCalculationService {
 		// Compliance Score is non-negative
 		currentScore = currentScore > 0? currentScore : 0;
 		
-		latestCompliance.setMissedTherapyCount(currentMissedTherapyCount);
+		// Don't include today as missed Therapy day, This will be taken care by the job
+		if(LocalDate.now().equals(latestCompliance.getDate())){
+			if(currentMissedTherapyCount > 0){
+				latestCompliance.setMissedTherapyCount(currentMissedTherapyCount-1);
+			}
+		}else{
+			latestCompliance.setMissedTherapyCount(currentMissedTherapyCount);
+		}
+		
 		latestCompliance.setScore(currentScore);
 		complianceMap.put(latestCompliance.getDate(), latestCompliance);
 	}

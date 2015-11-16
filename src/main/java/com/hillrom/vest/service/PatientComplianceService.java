@@ -44,6 +44,7 @@ public class PatientComplianceService {
 		if(Objects.nonNull(existingCompliance)){
 			existingCompliance.setScore(compliance.getScore());
 			existingCompliance.setHmrRunRate(compliance.getHmrRunRate());
+			existingCompliance.setMissedTherapyCount(compliance.getMissedTherapyCount());
 			compliance = complianceRepository.save(existingCompliance);
 		}else{
 			complianceRepository.save(compliance);
@@ -111,20 +112,20 @@ public class PatientComplianceService {
 			LocalDate date, AdherenceTrendVO trendVO) {
 		String notificationType = Objects.isNull(notificationsMap.get(date)) ? "No Notification" : notificationsMap.get(date).get(0).getNotificationType();
 		if(SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)){
-			trendVO.getNotificationPoints().put(notificationType, -SETTING_DEVIATION_POINTS);
+			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
 		}else if(MISSED_THERAPY.equalsIgnoreCase(notificationType)){
-			trendVO.getNotificationPoints().put(notificationType, -MISSED_THERAPY_POINTS);
+			trendVO.getNotificationPoints().put(MISSED_THERAPY_DISPLAY_VALUE, -MISSED_THERAPY_POINTS);
 		}else if(HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType)){
-			trendVO.getNotificationPoints().put(notificationType, -HMR_NON_COMPLIANCE_POINTS);
+			trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_DISPLAY_VALUE, -HMR_NON_COMPLIANCE_POINTS);
 		}else if(HMR_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)){
-			trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE, -HMR_NON_COMPLIANCE_POINTS);
-			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION, -SETTING_DEVIATION_POINTS);
+			trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_DISPLAY_VALUE, -HMR_NON_COMPLIANCE_POINTS);
+			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
 		}else{
 			if(compliance.getMissedTherapyCount() == 0)
 				trendVO.getNotificationPoints().put(notificationType,BONUS_POINTS);
 			else
 				trendVO.getNotificationPoints().put(notificationType,0);
-				trendVO.getNotificationPoints().put(MISSED_THERAPY,compliance.getMissedTherapyCount());
+				trendVO.getNotificationPoints().put(MISSED_THERAPY_DISPLAY_VALUE,compliance.getMissedTherapyCount());
 		}
 	} 
 }

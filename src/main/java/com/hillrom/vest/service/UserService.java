@@ -613,6 +613,9 @@ public class UserService {
     		}
            	UserExtension user = updatePatientUser(existingUser, userExtensionDTO);
     		if(Objects.nonNull(user.getId())) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted() && user.getLastLoggedInAt()!=null) {
+    				sendEmailNotification(baseUrl, user);
+    			}
     			callEventOnUpdatingHRID(userExtensionDTO, currentHillromId, user);
                 return user;
     		} else {

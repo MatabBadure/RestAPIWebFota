@@ -71,4 +71,5 @@
  	<include file="classpath:/config/liquibase/changelog/20151105152030_added_stored_procedures_for_protocol_patientInfo_device.xml" relativeToChangelogFile="false"/>
  	<include file="classpath:/config/liquibase/changelog/20151105210200_updated_values_for_default_protocl.xml" relativeToChangelogFile="false"/>
  	<include file="classpath:/config/liquibase/changelog/20151106153600_alter_datatype_processed_in_jde_load_table.xml" relativeToChangelogFile="false"/>
+ 	<include file="classpath:/config/liquibase/changelog/20151116123000_drop_create_address_field_Clinic.xml" relativeToChangelogFile="false"/>
  </databaseChangeLog>

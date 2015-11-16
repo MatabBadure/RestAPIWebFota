@@ -143,4 +143,17 @@ public class ProtocolConstants {
 	public Integer getMaxDuration() {
 		return this.maxDuration;
 	}
+
+	@Override
+	public String toString() {
+		return "ProtocolConstants [treatmentsPerDay=" + treatmentsPerDay
+				+ ", minMinutesPerTreatment=" + minMinutesPerTreatment
+				+ ", maxMinutesPerTreatment=" + maxMinutesPerTreatment
+				+ ", minFrequency=" + minFrequency + ", maxFrequency="
+				+ maxFrequency + ", minPressure=" + minPressure
+				+ ", maxPressure=" + maxPressure + ", minDuration="
+				+ minDuration + ", maxDuration=" + maxDuration + "]";
+	}
+	
+	
 }

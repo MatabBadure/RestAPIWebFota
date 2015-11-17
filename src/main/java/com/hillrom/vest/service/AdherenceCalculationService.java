@@ -80,9 +80,6 @@ public class AdherenceCalculationService {
 	private TherapySessionRepository therapySessionRepository;
 	
 	@Inject
-	private ProtocolConstantsRepository  protocolConstantsRepository;
-	
-	@Inject
 	private PatientComplianceRepository patientComplianceRepository;
 	
 	@Inject
@@ -182,7 +179,7 @@ public class AdherenceCalculationService {
 	/**
 	 * Runs every midnight deducts the compliance score by 5 if therapy hasn't been done for 3 days
 	 */
-	@Scheduled(cron="0 46 0 * * * ")
+	@Scheduled(cron="0 59 23 * * * ")
 	public void processMissedTherapySessions(){
 		try{
 			LocalDate today = LocalDate.now();
@@ -194,20 +191,28 @@ public class AdherenceCalculationService {
 			Map<Long,Notification> notificationMap = new HashMap<>();
 			
 			for(PatientCompliance compliance : mstPatientComplianceList){
+				PatientCompliance newCompliance = new PatientCompliance(
+						today,
+						compliance.getPatient(),
+						compliance.getPatientUser(),
+						compliance.getHmrRunRate(),
+						compliance.getMissedTherapyCount()+1,
+						compliance.getLatestTherapyDate(),
+						Objects.nonNull(compliance.getHmr())? compliance.getHmr():0.0d);
 				if(compliance.getMissedTherapyCount() >= 2){ // missed Therapy for 3rd day or more than 3 days
-					mstNotificationMap.put(compliance.getPatientUser().getId(), compliance);
+					mstNotificationMap.put(compliance.getPatientUser().getId(), newCompliance);
 				}else{ // missed therapy for 1 or 2 days , might fall under hmrNonCompliance
-					hmrNonComplianceMap.put(compliance.getPatientUser().getId(), compliance);
+					hmrNonComplianceMap.put(compliance.getPatientUser().getId(), newCompliance);
 				}
 			}
 			
 			userProtocolConstantsMap = protocolService.getProtocolByPatientUserIds(new LinkedList<>(hmrNonComplianceMap.keySet()));
 			
-			Map<Long,Integer> hmrRunRateMap = calculateHMRRunRateForPatientUsers(new LinkedList<>(hmrNonComplianceMap.keySet()),getPlusOrMinusTodayLocalDate(-2),today);
+			Map<Long,List<TherapySession>> userIdLast3DaysTherapiesMap = getLast3DaysTherapiesGroupByUserId(new LinkedList<>(hmrNonComplianceMap.keySet()),getPlusOrMinusTodayLocalDate(-2),today);
 
 			calculateHMRComplianceForMST(today, hmrNonComplianceMap,
 					userProtocolConstantsMap, complianceMap, notificationMap,
-					hmrRunRateMap);
+					userIdLast3DaysTherapiesMap);
 			
 			calculateMissedTherapy(today, mstNotificationMap,
 					hmrNonComplianceMap, complianceMap, notificationMap);
@@ -274,20 +279,13 @@ public class AdherenceCalculationService {
 			Map<Long, PatientCompliance> complianceMap,
 			Map<Long, Notification> notificationMap) {
 		for(Long patientUserId : mstNotificationMap.keySet()){
-			PatientCompliance previousCompliance = mstNotificationMap.get(patientUserId);
-			int score = previousCompliance.getScore();
-			PatientCompliance newCompliance = new PatientCompliance(
-					today,
-					previousCompliance.getPatient(),
-					previousCompliance.getPatientUser(),
-					0,
-					previousCompliance.getMissedTherapyCount()+1,
-					previousCompliance.getLatestTherapyDate(),
-					Objects.nonNull(previousCompliance.getHmr())?previousCompliance.getHmr():0.0d);
+			PatientCompliance newCompliance = mstNotificationMap.get(patientUserId);
+			int score = newCompliance.getScore();
 			score = score < MISSED_THERAPY_POINTS ? 0 :  score - MISSED_THERAPY_POINTS ;
 			notificationMap.put(patientUserId, new Notification(MISSED_THERAPY,today,newCompliance.getPatientUser(), newCompliance.getPatient(),false));
 			newCompliance.setHmrCompliant(false);
 			newCompliance.setScore(score);
+			newCompliance.setHmrRunRate(0);
 			complianceMap.put(patientUserId, newCompliance);
 		}
 	}
@@ -298,25 +296,23 @@ public class AdherenceCalculationService {
 			Map<Long, ProtocolConstants> userProtocolConstantsMap,
 			Map<Long, PatientCompliance> complianceMap,
 			Map<Long, Notification> notificationMap,
-			Map<Long, Integer> hmrRunRateMap) {
+			Map<Long,List<TherapySession>> userIdLast3DaysTherapiesMap) {
 		for(Long patientUserId : hmrNonComplianceMap.keySet()){
-			PatientCompliance previousCompliance = hmrNonComplianceMap.get(patientUserId);
-			int score = previousCompliance.getScore();
-			int hmrRunrate = Objects.nonNull(hmrRunRateMap.get(patientUserId))?hmrRunRateMap.get(patientUserId):0;
-			PatientCompliance newCompliance = new PatientCompliance(
-					today,
-					previousCompliance.getPatient(),
-					previousCompliance.getPatientUser(),
-					hmrRunrate,
-					previousCompliance.getMissedTherapyCount()+1,
-					previousCompliance.getLatestTherapyDate(),
-					Objects.nonNull(previousCompliance.getHmr())?previousCompliance.getHmr():0.0d);
-			
-			double durationFor3Days = hmrRunrate*3; // runrate*3 = total duration
+			PatientCompliance newCompliance = hmrNonComplianceMap.get(patientUserId);
+			int score = newCompliance.getScore();
+			List<TherapySession> therapySessions = userIdLast3DaysTherapiesMap.get(patientUserId);
+			if(Objects.isNull(therapySessions)){
+				therapySessions = new LinkedList<>();
+			}
+			int hmrRunRate = calculateHMRRunRatePerSession(therapySessions);
+			newCompliance.setHmrRunRate(hmrRunRate);
+			double durationFor3Days = hmrRunRate*therapySessions.size(); // runrate*totalsessions = total duration
 			ProtocolConstants protocolConstant = userProtocolConstantsMap.get(patientUserId);
 
-			if(!isHMRCompliant(protocolConstant, durationFor3Days)){
-				score = score <= HMR_NON_COMPLIANCE_POINTS ? 0 : score - HMR_NON_COMPLIANCE_POINTS;
+			// HMR Compliance shouldn't be checked for new Patients created for initial 2 days
+			if(DateUtil.getDaysCountBetweenLocalDates(newCompliance.getPatientUser().getCreatedDate().toLocalDate(), today) > 2 
+					&& !isHMRCompliant(protocolConstant, durationFor3Days)){
+				score = score < HMR_NON_COMPLIANCE_POINTS ? 0 : score - HMR_NON_COMPLIANCE_POINTS;
 				newCompliance.setHmrCompliant(false);
 				notificationMap.put(patientUserId, new Notification(HMR_NON_COMPLIANCE,today,newCompliance.getPatientUser(), newCompliance.getPatient(),false));
 			}else{
@@ -332,15 +328,15 @@ public class AdherenceCalculationService {
 	 * @param patientUserIds
 	 * @return
 	 */
-	public Map<Long,Integer> calculateHMRRunRateForPatientUsers(List<Long> patientUserIds,LocalDate from,LocalDate to){
-		Map<Long,Integer> patientUserHMRRunrateMap = new HashMap<>();
+	public Map<Long,List<TherapySession>> getLast3DaysTherapiesGroupByUserId(List<Long> patientUserIds,LocalDate from,LocalDate to){
+		Map<Long,List<TherapySession>> patientUserTherapyMap = new HashMap<>();
 		List<TherapySession> therapySessions = therapySessionRepository.findByDateBetweenAndPatientUserIdIn(from, to, patientUserIds);
 		Map<User,List<TherapySession>> therapySessionsPerPatient = therapySessions.stream().collect(Collectors.groupingBy(TherapySession::getPatientUser));
 		for(User patientUser : therapySessionsPerPatient.keySet()){
 			List<TherapySession> sessions = therapySessionsPerPatient.get(patientUser);
-			patientUserHMRRunrateMap.put(patientUser.getId(), calculateHMRRunRatePerSession(sessions));
+			patientUserTherapyMap.put(patientUser.getId(), sessions);
 		}
-		return patientUserHMRRunrateMap;
+		return patientUserTherapyMap;
 	}
 	
 	/**

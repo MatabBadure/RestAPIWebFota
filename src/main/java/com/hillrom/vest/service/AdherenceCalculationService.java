@@ -16,7 +16,7 @@ import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATI
 import static com.hillrom.vest.service.util.DateUtil.getDaysCountBetweenLocalDates;
 import static com.hillrom.vest.service.util.DateUtil.getPlusOrMinusTodayLocalDate;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateCumulativeDuration;
-import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateHMRRunRatePerDays;
+import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateHMRRunRatePerSession;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 
 import java.io.PrintWriter;
@@ -336,11 +336,9 @@ public class AdherenceCalculationService {
 		Map<Long,Integer> patientUserHMRRunrateMap = new HashMap<>();
 		List<TherapySession> therapySessions = therapySessionRepository.findByDateBetweenAndPatientUserIdIn(from, to, patientUserIds);
 		Map<User,List<TherapySession>> therapySessionsPerPatient = therapySessions.stream().collect(Collectors.groupingBy(TherapySession::getPatientUser));
-		
-		int days = getDaysCountBetweenLocalDates(from, to)+1;// +1 is due to dates are inclusive ex: 24-october-15 to 26-october-15
 		for(User patientUser : therapySessionsPerPatient.keySet()){
 			List<TherapySession> sessions = therapySessionsPerPatient.get(patientUser);
-			patientUserHMRRunrateMap.put(patientUser.getId(), calculateHMRRunRatePerDays(sessions,days));
+			patientUserHMRRunrateMap.put(patientUser.getId(), calculateHMRRunRatePerSession(sessions));
 		}
 		return patientUserHMRRunrateMap;
 	}
@@ -798,10 +796,9 @@ public class AdherenceCalculationService {
 			
 			double hmr = getLatestHMR(existingTherapySessionMap, receivedTherapySessionsMap,therapyDate,
 					latest3DaysTherapySessions);
-			int hmrRunrate = 0;
-			if(Objects.nonNull(therapyMetrics.get(TOTAL_DURATION))){
-				hmrRunrate = Math.round(therapyMetrics.get(TOTAL_DURATION).intValue()/3f);
-			}
+			
+			int hmrRunrate = calculateHMRRunRatePerSession(latest3DaysTherapySessions);
+			
 			LocalDate lastTransmissionDate = getLatestTransmissionDate(
 					existingTherapySessionMap,receivedTherapySessionsMap, therapyDate);
 			int missedTherapyCount = 0;
@@ -989,6 +986,8 @@ public class AdherenceCalculationService {
 		if(LocalDate.now().equals(latestCompliance.getDate())){
 			if(currentMissedTherapyCount > 0){
 				latestCompliance.setMissedTherapyCount(currentMissedTherapyCount-1);
+			}else{
+				latestCompliance.setMissedTherapyCount(currentMissedTherapyCount);
 			}
 		}else{
 			latestCompliance.setMissedTherapyCount(currentMissedTherapyCount);

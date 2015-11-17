@@ -87,7 +87,7 @@ public class PatientVestDeviceTherapyUtil {
 		long endTimestamp = deviceEventRecords.get(deviceEventRecords.size()-1).getTimestamp();
 		long startTimestamp = deviceEventRecords.get(0).getTimestamp();
 		int totalDuration = (int) Math.round((endTimestamp-startTimestamp)/MILLI_SECONDS_PER_MINUTE);
-		return totalDuration - durationOfSession;
+		return (totalDuration - durationOfSession) > 0 ? (totalDuration - durationOfSession) : 0;
 	}
 
 	private static int calculateDurationOfSession(
@@ -238,7 +238,8 @@ public class PatientVestDeviceTherapyUtil {
 		return therapySessions.stream().collect(Collectors.summingInt(TherapySession::getDurationInMinutes));
 	}
 	
-	public static int calculateHMRRunRatePerDays(List<TherapySession> therapySessions,float days){
-		return Math.round(calculateCumulativeDuration(therapySessions)/days);
+	public static int calculateHMRRunRatePerSession(List<TherapySession> therapySessions){
+		float sessionsCount = therapySessions.isEmpty()?1:therapySessions.size();
+		return Math.round(calculateCumulativeDuration(therapySessions)/sessionsCount);
 	}
 }

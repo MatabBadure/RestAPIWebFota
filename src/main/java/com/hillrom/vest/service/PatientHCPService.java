@@ -370,9 +370,6 @@ public class PatientHCPService {
 	public Collection<StatisticsVO> getPatienCumulativeStatistics(LocalDate from, LocalDate to,
 			List<Long> patientUserIds){
 		Map<LocalDate, StatisticsVO> statisticsMap = new TreeMap<>();
-		if(to.isEqual(LocalDate.now())){
-			to = LocalDate.now().minusDays(1); // HCP, Clinic Admin could see yesterdays data
-		}
 		List<PatientCompliance> complianceList = patientComplianceRepository.findByDateBetweenAndPatientUserIdIn(from, to, patientUserIds);
 		Map<LocalDate,Integer> datePatientNoEventCountMap = getPatientsWithNoEvents(from,to,patientUserIds);
 		List<LocalDate> requestedDates = DateUtil.getAllLocalDatesBetweenDates(from, to);

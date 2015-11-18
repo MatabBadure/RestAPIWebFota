@@ -17,6 +17,7 @@ import javax.persistence.EntityNotFoundException;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.authority.mapping.Attributes2GrantedAuthoritiesMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -308,26 +309,38 @@ public class ClinicService {
 	
 	public User associateClinicAdmin(String clinicId, Map<String,String> clinicAdminId) throws HillromException {
 		Clinic clinic = clinicRepository.findOne(clinicId);
+		User clinicAdminUser = userRepository.findOne(Long.parseLong(clinicAdminId.get("id"))); 
         if(Objects.isNull(clinic)) 
 	      	throw new HillromException(ExceptionConstants.HR_548);
-        else 
-        {
-			User clinicAdminUser = userRepository.findOne(Long.parseLong(clinicAdminId.get("id")));        		
-			EntityUserAssoc entityUserAssoc = new EntityUserAssoc(clinicAdminUser, clinic, AuthoritiesConstants.CLINIC_ADMIN);
-			entityUserRepository.saveAndFlush(entityUserAssoc);
-			return clinicAdminUser;      	
-        }
+        else
+        	if(Objects.isNull(clinicAdminUser) && !clinicAdminUser.getAuthorities().contains(AuthoritiesConstants.CLINIC_ADMIN))
+        		throw new HillromException(ExceptionConstants.HR_538);
+        	else
+	        {
+	        	EntityUserAssoc entityUserAssoc = entityUserRepository.findByUserIdAndClinicIdAndUserRole(clinicAdminUser.getId(), clinicId,  AuthoritiesConstants.CLINIC_ADMIN);
+				if (Objects.nonNull(entityUserAssoc)) {
+					throw new HillromException(ExceptionConstants.HR_539);
+				}
+				       		
+				entityUserAssoc = new EntityUserAssoc(clinicAdminUser, clinic, AuthoritiesConstants.CLINIC_ADMIN);
+				entityUserRepository.saveAndFlush(entityUserAssoc);
+				return clinicAdminUser;      	
+	        }
     }
 	
 	public String dissociateClinicAdmin(String clinicId, Map<String, String> clinicAdminId) throws HillromException {
 		Clinic clinic = clinicRepository.findOne(clinicId);
+		
+		Long clinicAdminUserId = Long.parseLong(clinicAdminId.get("id"));
 		if (Objects.nonNull(clinic)) {
-			List<EntityUserAssoc> entityUserAssocList = new ArrayList<>();
-			UserExtension clinicAdminUser = userExtensionRepository.findOne(Long.parseLong(clinicAdminId.get("id")));
+			UserExtension clinicAdminUser = userExtensionRepository.findOne(clinicAdminUserId);
+			EntityUserAssoc entityUserAssoc = entityUserRepository.findByUserIdAndClinicIdAndUserRole(clinicAdminUserId, clinicId,  AuthoritiesConstants.CLINIC_ADMIN);
+			if (Objects.isNull(entityUserAssoc)) {
+				throw new HillromException(ExceptionConstants.HR_550);
+			}
 			if (Objects.nonNull(clinicAdminUser)) {
-				EntityUserAssoc entityUserAssoc = new EntityUserAssoc(clinicAdminUser, clinic,
-						AuthoritiesConstants.CLINIC_ADMIN);
-				entityUserAssocList.add(entityUserAssoc);
+				entityUserAssoc = new EntityUserAssoc(clinicAdminUser, clinic, AuthoritiesConstants.CLINIC_ADMIN);
+				entityUserRepository.delete(entityUserAssoc);
 				return MessageConstants.HR_256;
 			} else {
 				throw new HillromException(ExceptionConstants.HR_538);

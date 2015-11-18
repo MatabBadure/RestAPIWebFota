@@ -349,7 +349,7 @@ public class ClinicResource {
         log.debug("REST request to get Clinic admin: {}", id);
         JSONObject jsonObject = new JSONObject();
         try {
-        	User clinicAdminUser = clinicService.getClinicAdmin(id);
+        	List<User> clinicAdminUser = clinicService.getClinicAdmin(id);
 	        if(Objects.isNull(clinicAdminUser)){
 				jsonObject.put("message", MessageConstants.HR_286);
 				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);

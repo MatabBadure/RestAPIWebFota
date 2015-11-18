@@ -37,11 +37,8 @@ import com.hillrom.vest.repository.AuthorityRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
-import com.hillrom.vest.repository.TempPatientVestDeviceDataRepository;
-import com.hillrom.vest.repository.TempRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
-import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.DeviceLogParser;
 import com.hillrom.vest.service.PatientComplianceService;
@@ -49,18 +46,11 @@ import com.hillrom.vest.service.PatientNoEventService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil;
 import com.hillrom.vest.util.RelationshipLabelConstants;
-import com.hillrom.vest.web.rest.PatientVestDeviceDataResource;
 
 public class PatientVestDeviceDataDeltaReader implements ItemReader<List<PatientVestDeviceData>> {
 
 	private final Logger log = LoggerFactory.getLogger(PatientVestDeviceDataDeltaReader.class);
 	
-	@Inject
-	private TempRepository tempRepository;
-
-	@Inject
-	private UserRepository userRepository;
-
 	@Inject
 	private UserPatientRepository userPatientRepository;
 
@@ -75,9 +65,6 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 
 	@Inject
 	private DeviceLogParser deviceLogParser;
-
-	@Inject
-	private TempPatientVestDeviceDataRepository tempPatientVestDeviceDataRepository;
 
 	@Inject
 	private PatientNoEventService noEventService;
@@ -117,7 +104,6 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 		UserPatientAssoc userPatientAssoc = createPatientUserIfNotExists(deviceRawLog, deviceSerialNumber);
 		assignDefaultValuesToVestDeviceDataTemp(deviceRawLog, patientVestDeviceEvents, userPatientAssoc);
 		return patientVestDeviceEvents;
-		//tempPatientVestDeviceDataRepository.save(tempPatientVestDeviceRecords);
 	}
 
 	@Override
@@ -130,7 +116,9 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 		List<PatientVestDeviceData> patientVestDeviceEvents = parseRawData();
 		Long patientUserId = 0l, from,to;
 		if(patientVestDeviceEvents.isEmpty()){
-			return patientVestDeviceEvents;
+			// this is required to let reader to know there is nothing to be read further
+			BatchUtil.flag = true;  
+			return patientVestDeviceEvents; // spring batch reader to skip reading
 		}else{
 			patientUserId = patientVestDeviceEvents.get(0).getPatientUser().getId();
 			Collections.sort(patientVestDeviceEvents);

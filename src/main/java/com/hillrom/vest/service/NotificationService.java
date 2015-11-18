@@ -82,11 +82,11 @@ public class NotificationService {
 	public List<Notification> findNotificationsByUserIdAndDateRange(Long patientUserId,LocalDate from,LocalDate to){
 		List<Long> patientUserIds = new LinkedList<>();
 		patientUserIds.add(patientUserId);
-		return notificationRepository.findByPatientUserIdInAndDateBetweenAndIsAcknowledged(patientUserIds, from, to, false);
+		return notificationRepository.findByDateBetweenAndIsAcknowledgedAndPatientUserIdIn(from, to, false,patientUserIds);
 	}
 	
 	public Map<Long,List<Notification>> getNotificationMapByPatientIdsAndDate(List<Long> patientUserIds,LocalDate from,LocalDate to){
-		List<Notification> notifications = notificationRepository.findByPatientUserIdInAndDateBetweenAndIsAcknowledged(patientUserIds, from, to, false);
+		List<Notification> notifications = notificationRepository.findByDateBetweenAndIsAcknowledgedAndPatientUserIdIn(from, to, false,patientUserIds);
 		Map<Long,List<Notification>> notificationsMap = new HashMap<>();
 		for(Notification notification: notifications){
 			List<Notification> notificationsForUserId = notificationsMap.get(notification.getPatientUser().getId());

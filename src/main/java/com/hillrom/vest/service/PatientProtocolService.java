@@ -221,7 +221,7 @@ public class PatientProtocolService {
 	} 
 	
 	public List<PatientProtocolData> findByPatientUserIds(List<Long> patientUserIds){
-		return patientProtocolRepository.findByPatientUserIdAndActiveStatus(patientUserIds);
+		return patientProtocolRepository.findByDeletedAndPatientUserIdIn(false,patientUserIds);
 	}
 	
 	/**
@@ -231,7 +231,7 @@ public class PatientProtocolService {
 	 */
 	public Map<Long,ProtocolConstants> getProtocolByPatientUserIds(
 			List<Long> patientUserIds) throws Exception{
-		List<PatientProtocolData> protocolData =  patientProtocolRepository.findByPatientUserIdAndActiveStatus(patientUserIds);
+		List<PatientProtocolData> protocolData =  findByPatientUserIds(patientUserIds);
 		
 		Map<Long, List<PatientProtocolData>> userIdProtocolMap = prepareUserIdProtocolMap(protocolData);
 		Map<Long,ProtocolConstants> userIdProtocolConstantsMap = new HashMap<>();

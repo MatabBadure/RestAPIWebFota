@@ -118,7 +118,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 		if(patientVestDeviceEvents.isEmpty()){
 			// this is required to let reader to know there is nothing to be read further
 			BatchUtil.flag = true;  
-			return null; // spring batch reader to skip reading
+			return patientVestDeviceEvents; // spring batch reader to skip reading
 		}else{
 			patientUserId = patientVestDeviceEvents.get(0).getPatientUser().getId();
 			Collections.sort(patientVestDeviceEvents);

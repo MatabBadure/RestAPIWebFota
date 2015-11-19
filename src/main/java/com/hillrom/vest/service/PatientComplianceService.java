@@ -1,6 +1,19 @@
 package com.hillrom.vest.service;
 
+import static com.hillrom.vest.config.AdherenceScoreConstants.BONUS_POINTS;
+import static com.hillrom.vest.config.AdherenceScoreConstants.HMR_NON_COMPLIANCE_POINTS;
+import static com.hillrom.vest.config.AdherenceScoreConstants.MISSED_THERAPY_POINTS;
+import static com.hillrom.vest.config.AdherenceScoreConstants.SETTING_DEVIATION_POINTS;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_DISPLAY_VALUE;
+import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
+import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY_DISPLAY_VALUE;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_DISPLAY_VALUE;
+
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +32,6 @@ import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.web.rest.dto.AdherenceTrendVO;
-import static com.hillrom.vest.config.NotificationTypeConstants.*;
-import static com.hillrom.vest.config.AdherenceScoreConstants.*;
 
 @Service
 @Transactional
@@ -127,4 +138,18 @@ public class PatientComplianceService {
 				trendVO.getNotificationPoints().put(notificationType,0);
 		}
 	} 
+	
+	public Map<Long,List<PatientCompliance>> getPatientComplainceMapByPatientUserId(List<Long> patientUserIds,LocalDate from,LocalDate to){
+		List<PatientCompliance> complianceList = complianceRepository.findByDateBetweenAndPatientUserIdIn(from, to, patientUserIds);
+		Map<Long,List<PatientCompliance>> complianceMap = new HashMap<>();
+		for(PatientCompliance compliance: complianceList){
+			List<PatientCompliance> complianceListForUserId = complianceMap.get(compliance.getPatientUser().getId());
+			if(Objects.isNull(complianceListForUserId)){
+				complianceListForUserId = new LinkedList<>();
+			}
+			complianceListForUserId.add(compliance);
+			complianceMap.put(compliance.getPatientUser().getId(), complianceListForUserId);
+		}
+		return complianceMap;
+	}
 }

@@ -80,7 +80,7 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 					+ " left outer join CLINIC clinic on user_clinic.clinics_id = clinic.id and user_clinic.users_id = huser.id "
 					+ " where clinic.is_deleted=0 and (huser.non_hmr_notification=1 or huser.setting_deviation_notification=1 or huser.missed_therapy_notification=1 )) "
 					+ " as associated_hcp, PATIENT_COMPLIANCE pc "
-					+ " where puserid = pc.user_id AND pc.date=CURDATE() and associated_patient.hcp_id = associated_hcp.huserid ")
+					+ " where puserid = pc.user_id AND pc.date=SUBDATE(CURDATE(),1) and associated_patient.hcp_id = associated_hcp.huserid ")
 	List<Object[]> findPatientStatisticsClinicForActiveClinics();
 	
 	@Query(nativeQuery=true,
@@ -98,7 +98,7 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 					+ "non_hmr_notification as nonHmrNotification from USER cuser  "
 					+"join USER_AUTHORITY user_authorityc on user_authorityc.user_id = cuser.id and user_authorityc.authority_name = 'CARE_GIVER')  "
 					+"as associated_cgvr, PATIENT_COMPLIANCE pc  where  "
-					+"puserid = pc.user_id AND pc.date=CURDATE() and  "
+					+"puserid = pc.user_id AND pc.date=SUBDATE(CURDATE(),1) and  "
 					+"associated_patient.cgvr_id = associated_cgvr.cuserid ")
 	List<Object[]> findPatientStatisticsCareGiver();
 }

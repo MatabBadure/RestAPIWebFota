@@ -6,6 +6,7 @@ import org.joda.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import com.hillrom.vest.domain.Notification;
 
@@ -22,5 +23,5 @@ public interface NotificationRepository extends
 	
 	List<Notification> findByDateAndIsAcknowledgedAndNotificationTypeAndPatientUserIdIn(LocalDate date,Boolean isAcknowledged,String notificationType,List<Long> patientUserIds);
 	
-	List<Notification> findByPatientUserIdAndDateBetweenAndIsAcknowledged(Long patientUserId, LocalDate fromDate,LocalDate toDate,boolean isAcknowledged);
+	List<Notification> findByDateBetweenAndIsAcknowledgedAndPatientUserIdIn(LocalDate fromDate,LocalDate toDate,boolean isAcknowledged,List<Long> patientUserId);
 }

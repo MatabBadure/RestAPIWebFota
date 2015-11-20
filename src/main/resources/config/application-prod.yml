@@ -41,7 +41,8 @@ spring:
     recaptcha:
         recaptchaPrivateKey: 6LcXjQkTAAAAACiA7rx7o7wlifQ7n3VQ_It-sncc
     notification:
-        hcpOrClinicAdminDashboardUrl: http://visiview.hill-rom.com
-        patientDashboardUrl: http://visiview.hill-rom.com
-        baseUrl: http://visiview.hill-rom.com
+        hcpOrClinicAdminDashboardUrl: https://visiview.hill-rom.com
+        patientDashboardUrl: https://visiview.hill-rom.com
+        careGiverDashboardUrl: https://visiview.hill-rom.com
+        baseUrl: https://visiview.hill-rom.com
         accountActivationReminderInterval: 12

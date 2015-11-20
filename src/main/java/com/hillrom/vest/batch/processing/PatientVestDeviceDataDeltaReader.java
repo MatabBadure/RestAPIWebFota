@@ -211,6 +211,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 			compliance.setPatientUser(userExtension);
 			compliance.setDate(userExtension.getCreatedDate().toLocalDate());
 			compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
+			compliance.setLatestTherapyDate(createdOrTransmittedDate);
 			complianceService.createOrUpdate(compliance);
 			return userPatientAssoc;
 		}

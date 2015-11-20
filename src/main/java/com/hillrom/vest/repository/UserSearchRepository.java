@@ -911,8 +911,8 @@ public class UserSearchRepository {
 				+ "user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,"
 				+ "user.title,user.hillrom_id,user.created_date as createdAt,"
 				+ "user.activated as isActivated, patInfo.state , compliance_score, pc.last_therapy_session_date as last_date, user.expired, "
-				+ "pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,pc.missed_therapy_count as isMissedTherapy, max(pc.date) "
-				+ "from USER user" + " join USER_AUTHORITY user_authority on user_authority.user_id = user.id  "
+				+ "pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,pc.missed_therapy_count as isMissedTherapy, "
+				+ "max(pc.date) from USER user join USER_AUTHORITY user_authority on user_authority.user_id = user.id  "
 				+ "and user_authority.authority_name = '" + PATIENT + "' and "
 				+ "(lower(user.first_name) like lower(:queryString) or  "
 				+ "lower(user.last_name) like lower(:queryString) or  "
@@ -924,7 +924,7 @@ public class UserSearchRepository {
 				+ "join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 				+ "join CLINIC_PATIENT_ASSOC patient_clinic on "
 				+ "patient_clinic.patient_id = patInfo.id and patient_clinic.clinic_id = ':clinicId'"
-				+ "left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id ";
+				+ "left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id group by pc.user_id ";
 
 		StringBuilder filterQuery = new StringBuilder();
 

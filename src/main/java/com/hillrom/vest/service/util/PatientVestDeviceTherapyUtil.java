@@ -231,7 +231,8 @@ public class PatientVestDeviceTherapyUtil {
 
 	public static double calculateWeightedAvg(double totalDuration,int durationInMinutes,
 			Integer frequency) {
-		totalDuration = totalDuration > 0 ? totalDuration : 1;
+		if(totalDuration == 0) // safety check for divided by 0 exception
+			return 0;
 		return (durationInMinutes*frequency/totalDuration);
 	}
 	

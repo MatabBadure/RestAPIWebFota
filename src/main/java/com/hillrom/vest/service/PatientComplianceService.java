@@ -92,10 +92,6 @@ public class PatientComplianceService {
 		List<Long> patientUserIds = new LinkedList<>();
 		patientUserIds.add(patientUserId);
 		PatientCompliance latestCompliance = complianceRepository.findTop1ByPatientUserIdOrderByDateDesc(patientUserId);
-		if(Objects.nonNull(latestCompliance)){
-			if(to.isAfter(latestCompliance.getDate()))
-				to = latestCompliance.getDate();
-		}
 		List<PatientCompliance> complianceList = complianceRepository.findByDateBetweenAndPatientUserIdIn(from, to, patientUserIds);
 		SortedMap<LocalDate,PatientCompliance> complianceMap = new TreeMap<>();
 		for(PatientCompliance compliance : complianceList){
@@ -132,10 +128,7 @@ public class PatientComplianceService {
 			trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_DISPLAY_VALUE, -HMR_NON_COMPLIANCE_POINTS);
 			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
 		}else{
-			if(compliance.getMissedTherapyCount() == 0)
 				trendVO.getNotificationPoints().put(notificationType,BONUS_POINTS);
-			else
-				trendVO.getNotificationPoints().put(notificationType,0);
 		}
 	} 
 	

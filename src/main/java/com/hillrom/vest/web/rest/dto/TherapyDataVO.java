@@ -4,10 +4,13 @@ import java.io.Serializable;
 
 import org.joda.time.DateTime;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.Note;
+import com.hillrom.vest.domain.util.DateTimeSerializer;
 
 public class TherapyDataVO implements Serializable,Comparable<TherapyDataVO> {
 
+	@JsonSerialize(using= DateTimeSerializer.class)
 	private DateTime timestamp;
 	private int treatmentsPerDay;
 	private int sessionNo;
@@ -17,7 +20,9 @@ public class TherapyDataVO implements Serializable,Comparable<TherapyDataVO> {
 	private int normalCoughPauses;
 	private int coughPauses;
 	private Note note;
+	@JsonSerialize(using= DateTimeSerializer.class)
 	private DateTime start;
+	@JsonSerialize(using= DateTimeSerializer.class)
 	private DateTime end;
 	private int coughPauseDuration;
 	private int duration;

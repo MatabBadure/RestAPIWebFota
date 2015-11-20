@@ -56,7 +56,8 @@ public class UserSearchRepository {
 			Map<String, Boolean> sortOrder) {
 
 		String findHillromTeamUserQuery = "select distinct(user.id),user.first_name as firstName,user.last_name as lastName,user.email,"
-				+ " user_authority.authority_name as name,user.is_deleted as isDeleted,user.created_date as createdAt,user.activated as isActivated,user.hillrom_id as hillromId, userExt.mobile_phone as mobilePhone "
+				+ " user_authority.authority_name as name,user.is_deleted as isDeleted,user.created_date as createdAt,"
+				+ " user.activated as isActivated,user.hillrom_id as hillromId, userExt.mobile_phone as mobilePhone "
 				+ " from  USER_EXTENSION userExt join USER user on user.id = userExt.user_id and "
 				+ " (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or "
@@ -124,7 +125,8 @@ public class UserSearchRepository {
 
 		String findHcpQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted,"
 				+ " user.zipcode,userExt.address,userExt.city as hcity,userExt.credentials,userExt.fax_number,userExt.primary_phone,"
-				+ " userExt.mobile_phone,userExt.speciality,userExt.state as hstate,clinic.id as clinicId,clinic.name as clinicName,user.created_date as createdAt,user.activated isActivated,userExt.npi_number as npiNumber "
+				+ " userExt.mobile_phone,userExt.speciality,userExt.state as hstate,clinic.id as clinicId,clinic.name as clinicName,"
+				+ " user.created_date as createdAt,user.activated isActivated,userExt.npi_number as npiNumber "
 				+ " FROM USER user join USER_EXTENSION userExt on user.id = userExt.user_id "
 				+ " and (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or "
@@ -909,7 +911,7 @@ public class UserSearchRepository {
 				+ "user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,"
 				+ "user.title,user.hillrom_id,user.created_date as createdAt,"
 				+ "user.activated as isActivated, patInfo.state , compliance_score, pc.last_therapy_session_date as last_date, user.expired, "
-				+ "pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,pc.missed_therapy_count as isMissedTherapy "
+				+ "pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,pc.missed_therapy_count as isMissedTherapy, max(pc.date) "
 				+ "from USER user" + " join USER_AUTHORITY user_authority on user_authority.user_id = user.id  "
 				+ "and user_authority.authority_name = '" + PATIENT + "' and "
 				+ "(lower(user.first_name) like lower(:queryString) or  "
@@ -922,7 +924,7 @@ public class UserSearchRepository {
 				+ "join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 				+ "join CLINIC_PATIENT_ASSOC patient_clinic on "
 				+ "patient_clinic.patient_id = patInfo.id and patient_clinic.clinic_id = ':clinicId'"
-				+ "left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=subdate(curdate(),1)";
+				+ "left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id ";
 
 		StringBuilder filterQuery = new StringBuilder();
 

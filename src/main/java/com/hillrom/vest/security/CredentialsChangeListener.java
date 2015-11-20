@@ -20,7 +20,7 @@ public class CredentialsChangeListener implements
 	
 	@Override
 	public void onApplicationEvent(OnCredentialsChangeEvent event) {
-		System.out.println("Event class : "+event.getClass()+" timestamp : "+event.getTimestamp());
+		//System.out.println("Event class : "+event.getClass()+" timestamp : "+event.getTimestamp());
 		Long userId = event.getUserId();
 		deleteAllAuthenticationTokens(userId);
 		

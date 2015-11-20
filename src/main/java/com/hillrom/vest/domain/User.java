@@ -35,6 +35,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
 import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
+import com.hillrom.vest.domain.util.MMDDYYYYLocalDateSerializer;
 
 /**
  * A user.
@@ -136,7 +137,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private Set<UserPatientAssoc> userPatientAssoc = new HashSet<>();
     
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
-    @JsonSerialize(using = CustomLocalDateSerializer.class)
+    @JsonSerialize(using = MMDDYYYYLocalDateSerializer.class)
     @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
     @Column(name = "dob")
     private LocalDate dob;

@@ -5,12 +5,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.domain.util.MMDDYYYYLocalDateSerializer;
 import com.hillrom.vest.service.util.RandomUtil;
 
 
@@ -28,7 +30,10 @@ public class PatientUserVO {
 	private Integer zipcode;
 	private String address;
 	private String city;
-	private Date dob;
+	
+	@JsonSerialize(using = MMDDYYYYLocalDateSerializer.class)
+	private LocalDate dob;
+	
 	private String gender;
 	private String title;
 	private String hillromId;
@@ -56,7 +61,7 @@ public class PatientUserVO {
 	
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
-			String city, Date dob, String gender, String title,
+			String city, LocalDate dob, String gender, String title,
 			String hillromId,DateTime createdAt,Boolean isActivated, String state,int adherence, 
 			Date lastTransmissionDate) {
 		super();
@@ -80,7 +85,7 @@ public class PatientUserVO {
 				}
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
-			String city, Date dob, String gender, String title,
+			String city, LocalDate dob, String gender, String title,
 			String hillromId,DateTime createdAt,Boolean isActivated, String state) {
 		super();
 		this.id = id;
@@ -107,7 +112,7 @@ public class PatientUserVO {
 		this.lastName = user.getLastName();
 		this.isDeleted = user.isDeleted();
 		this.zipcode = user.getZipcode();
-		this.dob = user.getDob() != null ?user.getDob().toDate(): null;
+		this.dob = user.getDob() != null ?user.getDob(): null;
 		this.title = user.getTitle();
 		this.langKey = user.getLangKey();
 		this.middleName = user.getMiddleName();
@@ -191,11 +196,11 @@ public class PatientUserVO {
 		this.city = city;
 	}
 
-	public Date getDob() {
+	public LocalDate getDob() {
 		return dob;
 	}
 
-	public void setDob(Date dob) {
+	public void setDob(LocalDate dob) {
 		this.dob = dob;
 	}
 

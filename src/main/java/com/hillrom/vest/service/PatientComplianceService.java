@@ -56,6 +56,7 @@ public class PatientComplianceService {
 			existingCompliance.setScore(compliance.getScore());
 			existingCompliance.setHmrRunRate(compliance.getHmrRunRate());
 			existingCompliance.setMissedTherapyCount(compliance.getMissedTherapyCount());
+			existingCompliance.setSettingsDeviatedDaysCount(compliance.getSettingsDeviatedDaysCount());
 			compliance = complianceRepository.save(existingCompliance);
 		}else{
 			complianceRepository.save(compliance);

@@ -214,6 +214,7 @@ public class AdherenceCalculationService {
 							compliance.getLatestTherapyDate(),
 							Objects.nonNull(compliance.getHmr())? compliance.getHmr():0.0d);
 					newCompliance.setScore(compliance.getScore());
+					newCompliance.setSettingsDeviatedDaysCount(0);
 					if(newCompliance.getMissedTherapyCount() >= DEFAULT_MISSED_THERAPY_DAYS_COUNT){ // missed Therapy for 3rd day or more than 3 days
 						mstNotificationMap.put(compliance.getPatientUser().getId(), newCompliance);
 					}else{ // missed therapy for 1 or 2 days , might fall under hmrNonCompliance
@@ -959,6 +960,17 @@ public class AdherenceCalculationService {
 			if(currentMissedTherapyCount == 0){
 				// settings deviation should be calculated for consecutive 3 days with no missed therapy
 				if(last3daysTherapySessionMap.keySet().size() == 3){
+					// Check for each day settings deviation
+					for(LocalDate d : last3daysTherapySessionMap.keySet()){
+						List<TherapySession> therapySeesionsPerDay = last3daysTherapySessionMap.get(d);
+						double weightedFrequency = calculateTherapyMetricsPer3Days(therapySeesionsPerDay).get(WEIGHTED_AVG_FREQUENCY);
+						if(!isSettingsDeviated(protocolConstant, weightedFrequency)){
+							isSettingsDeviated = false;
+							break;
+						}else{
+							isSettingsDeviated = true;
+						}
+					}
 					applySettingsDeviatedDaysCount(latestCompliance, complianceMap,
 							isSettingsDeviated);
 					

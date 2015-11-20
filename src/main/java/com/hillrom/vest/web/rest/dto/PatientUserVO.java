@@ -9,8 +9,11 @@ import java.util.Objects;
 
 import org.joda.time.DateTime;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.UserExtension;
+import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
+import com.hillrom.vest.domain.util.MMDDYYYYLocalDateSerializer;
 import com.hillrom.vest.service.util.RandomUtil;
 
 
@@ -28,7 +31,10 @@ public class PatientUserVO {
 	private Integer zipcode;
 	private String address;
 	private String city;
+	
+	@JsonSerialize(using = MMDDYYYYLocalDateSerializer.class)
 	private Date dob;
+	
 	private String gender;
 	private String title;
 	private String hillromId;

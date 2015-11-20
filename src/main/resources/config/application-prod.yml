@@ -43,6 +43,6 @@ spring:
     notification:
         hcpOrClinicAdminDashboardUrl: http://visiview.hill-rom.com
         patientDashboardUrl: http://visiview.hill-rom.com
-        careGiverDashboardUrl: http://visiview.hillromvest.com
+        careGiverDashboardUrl: http://visiview.hill-rom.com
         baseUrl: http://visiview.hill-rom.com
         accountActivationReminderInterval: 12

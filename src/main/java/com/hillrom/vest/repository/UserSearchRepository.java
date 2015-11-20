@@ -26,6 +26,7 @@ import javax.persistence.Query;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -534,9 +535,9 @@ public class UserSearchRepository {
 
 			}
 
-			java.util.Date dobLocalDate = null;
+			LocalDate dobLocalDate = null;
 			if (Objects.nonNull(dob)) {
-				dobLocalDate = new java.util.Date(dob.getTime());
+				dobLocalDate = new LocalDate(dob.getTime());
 			}
 
 			PatientUserVO patientUserVO = new PatientUserVO(id, email, firstName, lastName, isDeleted, zipcode, address,
@@ -586,9 +587,9 @@ public class UserSearchRepository {
 
 			}
 
-			java.util.Date dobLocalDate = null;
-			if (null != dob) {
-				dobLocalDate = new java.util.Date(dob.getTime());
+			LocalDate dobLocalDate = null;
+			if (Objects.nonNull(dob)) {
+				dobLocalDate = new LocalDate(dob.getTime());
 			}
 
 			PatientUserVO patientUserVO = new PatientUserVO(id, email, firstName, lastName, isDeleted, zipcode, address,
@@ -735,9 +736,9 @@ public class UserSearchRepository {
 				localLastTransmissionDate = lastTransmissionDate;
 			}
 
-			java.util.Date dobLocalDate = null;
-			if (null != dob) {
-				dobLocalDate = new java.util.Date(dob.getTime());
+			LocalDate dobLocalDate = null;
+			if (Objects.nonNull(dob)) {
+				dobLocalDate = new LocalDate(dob.getTime());
 			}
 			// Clinic wise active inactive is not the for the case og others
 			if (Objects.isNull(isActiveInClinic))
@@ -876,9 +877,9 @@ public class UserSearchRepository {
 				localLastTransmissionDate = lastTransmissionDate;
 			}
 
-			java.util.Date dobLocalDate = null;
-			if (null != dob) {
-				dobLocalDate = new java.util.Date(dob.getTime());
+			LocalDate dobLocalDate = null;
+			if (Objects.nonNull(dob)){
+				dobLocalDate = new LocalDate(dob.getTime());
 			}
 			// Clinic wise active inactive is not the for the case og others
 			if (Objects.isNull(isActiveInClinic))
@@ -981,9 +982,9 @@ public class UserSearchRepository {
 			Date lastTransmissionDate = (Date) record[16];
 			Boolean isExpired = (Boolean) record[17];
 
-			java.util.Date dobLocalDate = null;
-			if (null != dob) {
-				dobLocalDate = new java.util.Date(dob.getTime());
+			LocalDate dobLocalDate = null;
+			if (Objects.nonNull(dob)) {
+				dobLocalDate = new LocalDate(dob.getTime());
 			}
 			java.util.Date localLastTransmissionDate = null;
 
@@ -1205,9 +1206,9 @@ public class UserSearchRepository {
 
 			}
 
-			java.util.Date dobLocalDate = null;
-			if (null != dob) {
-				dobLocalDate = new java.util.Date(dob.getTime());
+			LocalDate dobLocalDate = null;
+			if (Objects.nonNull(dob)) {
+				dobLocalDate = new LocalDate(dob.getTime());
 			}
 
 			PatientUserVO patientUserVO = new PatientUserVO(id, email, firstName, lastName,

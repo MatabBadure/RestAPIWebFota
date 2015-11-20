@@ -184,21 +184,41 @@ public class AdherenceCalculationService {
 			Map<Long,ProtocolConstants> userProtocolConstantsMap = new HashMap<>();
 			Map<Long,PatientCompliance> complianceMap = new HashMap<>();
 			Map<Long,Notification> notificationMap = new HashMap<>();
+			Map<Long,PatientNoEvent> userIdNoEventMap = noEventService.findAllGroupByPatientUserId();
 			
 			for(PatientCompliance compliance : mstPatientComplianceList){
-				PatientCompliance newCompliance = new PatientCompliance(
-						today,
-						compliance.getPatient(),
-						compliance.getPatientUser(),
-						compliance.getHmrRunRate(),
-						compliance.getMissedTherapyCount()+1,
-						compliance.getLatestTherapyDate(),
-						Objects.nonNull(compliance.getHmr())? compliance.getHmr():0.0d);
-				newCompliance.setScore(compliance.getScore());
-				if(newCompliance.getMissedTherapyCount() >= DEFAULT_MISSED_THERAPY_DAYS_COUNT){ // missed Therapy for 3rd day or more than 3 days
-					mstNotificationMap.put(compliance.getPatientUser().getId(), newCompliance);
-				}else{ // missed therapy for 1 or 2 days , might fall under hmrNonCompliance
-					hmrNonComplianceMap.put(compliance.getPatientUser().getId(), newCompliance);
+				Long userId = compliance.getPatientUser().getId();
+				PatientNoEvent noEvent = userIdNoEventMap.get(compliance.getPatientUser().getId());
+				// For No transmission users , compliance shouldn't be updated until transmission happens
+				if(Objects.nonNull(noEvent)&& (Objects.isNull(noEvent.getFirstTransmissionDate()))){
+					PatientCompliance newCompliance = new PatientCompliance(compliance.getScore(), today,
+							compliance.getPatient(), compliance.getPatientUser(),compliance.getHmrRunRate(),true,
+							false,0);
+					newCompliance.setLatestTherapyDate(null);// since no transmission 
+					complianceMap.put(userId, newCompliance);
+				}else if(Objects.nonNull(noEvent)&& (Objects.nonNull(noEvent.getFirstTransmissionDate()) && 
+						DateUtil.getDaysCountBetweenLocalDates(noEvent.getFirstTransmissionDate(), today) < 2)){
+					// For Transmitted users no notification for first two days
+					PatientCompliance newCompliance = new PatientCompliance(today,compliance.getPatient(),compliance.getPatientUser(),
+							compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1,compliance.getLatestTherapyDate(),
+							Objects.nonNull(compliance.getHmr())? compliance.getHmr():0.0d);
+					newCompliance.setScore(compliance.getScore());
+					complianceMap.put(userId, newCompliance);
+				}else {
+					PatientCompliance newCompliance = new PatientCompliance(
+							today,
+							compliance.getPatient(),
+							compliance.getPatientUser(),
+							compliance.getHmrRunRate(),
+							compliance.getMissedTherapyCount()+1,
+							compliance.getLatestTherapyDate(),
+							Objects.nonNull(compliance.getHmr())? compliance.getHmr():0.0d);
+					newCompliance.setScore(compliance.getScore());
+					if(newCompliance.getMissedTherapyCount() >= DEFAULT_MISSED_THERAPY_DAYS_COUNT){ // missed Therapy for 3rd day or more than 3 days
+						mstNotificationMap.put(compliance.getPatientUser().getId(), newCompliance);
+					}else{ // missed therapy for 1 or 2 days , might fall under hmrNonCompliance
+						hmrNonComplianceMap.put(compliance.getPatientUser().getId(), newCompliance);
+					}
 				}
 			}
 			
@@ -809,7 +829,11 @@ public class AdherenceCalculationService {
 				}
 				if(daysBetween == 1){ // second day of the transmission
 					missedTherapyCount = DateUtil.getDaysCountBetweenLocalDates(lastTransmissionDate, therapyDate);
-					compliance.setMissedTherapyCount(missedTherapyCount);
+					if(LocalDate.now().equals(therapyDate)){
+						compliance.setMissedTherapyCount(0);
+					}else{
+						compliance.setMissedTherapyCount(missedTherapyCount);
+					}
 					compliance.setLatestTherapyDate(lastTransmissionDate);
 				}
 				existingComplianceMap.put(therapyDate, compliance);

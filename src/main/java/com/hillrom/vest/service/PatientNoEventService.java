@@ -1,5 +1,8 @@
 package com.hillrom.vest.service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -54,5 +57,18 @@ public class PatientNoEventService {
 		}
 		else 
 			throw new HillromException(ExceptionConstants.HR_702);
+	}
+	
+	public List<PatientNoEvent> findAll(){
+		return noEventsRepository.findAll();
+	}
+	
+	public Map<Long,PatientNoEvent> findAllGroupByPatientUserId(){
+		List<PatientNoEvent> patientNoEvents = findAll();
+		Map<Long,PatientNoEvent> userIdNoEventsMap = new HashMap<>();
+		for(PatientNoEvent patientNoEvent : patientNoEvents){
+			userIdNoEventsMap.put(patientNoEvent.getPatientUser().getId(), patientNoEvent);
+		}
+		return userIdNoEventsMap;
 	}
 }

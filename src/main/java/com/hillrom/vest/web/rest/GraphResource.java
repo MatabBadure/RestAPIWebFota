@@ -3,10 +3,14 @@ package com.hillrom.vest.web.rest;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+
+import net.minidev.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hillrom.vest.domain.SecurityQuestion;
-import com.hillrom.vest.repository.SecurityQuestionRepository;
+import com.hillrom.vest.exceptionhandler.HillromException;
+
 
 /**
  * REST controller for managing Graph Functions.
@@ -31,8 +35,7 @@ public class GraphResource {
 
     private final Logger log = LoggerFactory.getLogger(GraphResource.class);
 
-    @Inject
-    private SecurityQuestionRepository securityQuestionRepository;
+
 
     /**
      * POST  /securityQuestions -> Post base64 Graph PDF string.
@@ -41,17 +44,17 @@ public class GraphResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    public ResponseEntity<JSONObject> downloadPDF(@Valid @RequestBody String base64EncodedString) throws HillromException {
+    public ResponseEntity<Object> downloadPDF(@RequestBody Map<String, String> base64EncodedString) {
         log.debug("REST request to return base64 Encoded String", base64EncodedString);
         JSONObject jsonObject = new JSONObject();
         try{
-	        if (Object.isNull(base64EncodedString)) {
-	            return ResponseEntity.badRequest().body(jsonObject);;
-	        }else{
-	        	jsonObject = base64EncodedString;
-	        }
-	        return ResponseEntity.ok().body(jsonObject);
-		} catch (HillromException e) {
+	        //if (Objects.nonNull(base64EncodedString)) {
+	          //  return ResponseEntity.badRequest().body(jsonObject);
+	        //}
+	        	
+	        return new ResponseEntity<Object>(base64EncodedString,HttpStatus.OK);
+	        	        
+		} catch (Exception e) {
 			jsonObject.put("ERROR",e.getMessage()); 
 			return ResponseEntity.badRequest().body(jsonObject);
 		}

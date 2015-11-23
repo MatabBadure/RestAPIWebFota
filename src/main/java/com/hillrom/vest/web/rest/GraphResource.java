@@ -48,9 +48,9 @@ public class GraphResource {
         log.debug("REST request to return base64 Encoded String", base64EncodedString);
         JSONObject jsonObject = new JSONObject();
         try{
-	        //if (Objects.nonNull(base64EncodedString)) {
-	          //  return ResponseEntity.badRequest().body(jsonObject);
-	        //}
+	        if (!Objects.nonNull(base64EncodedString)) {
+	            return ResponseEntity.badRequest().body(jsonObject);
+	        }
 	        	
 	        return new ResponseEntity<Object>(base64EncodedString,HttpStatus.OK);
 	        	        

@@ -48,9 +48,6 @@ public class PatientProtocolData extends AbstractAuditingEntity implements Seria
 	@Column(name = "min_minutes_per_treatment")
 	private int minMinutesPerTreatment;
 	
-	@Column(name = "max_minutes_per_treatment")
-	private int maxMinutesPerTreatment;
-	
 	@Column(name = "treatment_label")
 	private String treatmentLabel;
 	
@@ -78,8 +75,8 @@ public class PatientProtocolData extends AbstractAuditingEntity implements Seria
 
 	public PatientProtocolData(String type, PatientInfo patient,
 			User patientUser, int treatmentsPerDay, int minMinutesPerTreatment,
-			int maxMinutesPerTreatment, String treatmentLabel,
-			Integer minFrequency, Integer maxFrequency, Integer minPressure,
+			String treatmentLabel,Integer minFrequency,
+			Integer maxFrequency, Integer minPressure,
 			Integer maxPressure) {
 		super();
 		this.type = type;
@@ -87,7 +84,6 @@ public class PatientProtocolData extends AbstractAuditingEntity implements Seria
 		this.patientUser = patientUser;
 		this.treatmentsPerDay = treatmentsPerDay;
 		this.minMinutesPerTreatment = minMinutesPerTreatment;
-		this.maxMinutesPerTreatment = maxMinutesPerTreatment;
 		this.treatmentLabel = treatmentLabel;
 		this.minFrequency = minFrequency;
 		this.maxFrequency = maxFrequency;
@@ -110,16 +106,6 @@ public class PatientProtocolData extends AbstractAuditingEntity implements Seria
 	public void setType(String type) {
 		this.type = type;
 	}
-
-	public int getMaxMinutesPerTreatment() {
-		return maxMinutesPerTreatment;
-	}
-
-
-	public void setMaxMinutesPerTreatment(int maxMinutesPerTreatment) {
-		this.maxMinutesPerTreatment = maxMinutesPerTreatment;
-	}
-
 
 	public PatientInfo getPatient() {
 		return patient;

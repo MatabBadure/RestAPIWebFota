@@ -67,8 +67,8 @@ public class PatientProtocolService {
 		 	    Boolean isFirstPoint = true;
 		 		for(ProtocolEntryDTO protocolEntry : protocolDTO.getProtocolEntries()){
 		 			PatientProtocolData patientProtocolAssoc = new PatientProtocolData(protocolDTO.getType(), patientInfo, patientUser,
-		 					protocolDTO.getTreatmentsPerDay(), protocolEntry.getMinMinutesPerTreatment(), protocolEntry.getMaxMinutesPerTreatment(),
-		 					protocolEntry.getTreatmentLabel(), protocolEntry.getMinFrequency(), protocolEntry.getMaxFrequency(), protocolEntry.getMinPressure(),
+		 					protocolDTO.getTreatmentsPerDay(), protocolEntry.getMinMinutesPerTreatment(), protocolEntry.getTreatmentLabel(),
+		 					protocolEntry.getMinFrequency(), protocolEntry.getMaxFrequency(), protocolEntry.getMinPressure(),
 		 					protocolEntry.getMaxPressure());
 		 			if(isFirstPoint) {
 		 				patientProtocolAssoc.setId(protocolKey);
@@ -108,8 +108,8 @@ public class PatientProtocolService {
 				 		}
 		 			} else {
 		 				PatientProtocolData patientProtocolAssoc = new PatientProtocolData(type, patientInfo, patientUser,
-		 						treatmentsPerDay, ppd.getMinMinutesPerTreatment(), ppd.getMaxMinutesPerTreatment(),
-		 						ppd.getTreatmentLabel(), ppd.getMinFrequency(), ppd.getMaxFrequency(), ppd.getMinPressure(),
+		 						treatmentsPerDay, ppd.getMinMinutesPerTreatment(),ppd.getTreatmentLabel(),
+		 						ppd.getMinFrequency(), ppd.getMaxFrequency(), ppd.getMinPressure(),
 		 						ppd.getMaxPressure());
 			 			patientProtocolAssoc.setId(patientProtocolRepository.id());
 			 			patientProtocolAssoc.setProtocolKey(protocolKey);
@@ -133,8 +133,6 @@ public class PatientProtocolService {
 			cp.setTreatmentLabel(up.getTreatmentLabel());
 		if(Objects.nonNull(up.getMinMinutesPerTreatment()))
 			cp.setMinMinutesPerTreatment(up.getMinMinutesPerTreatment());
-		if(Objects.nonNull(up.getMaxMinutesPerTreatment()))
-			cp.setMaxMinutesPerTreatment(up.getMaxMinutesPerTreatment());
 		if(Objects.nonNull(up.getMinFrequency()))
 			cp.setMinFrequency(up.getMinFrequency());
 		if(Objects.nonNull(up.getMaxFrequency()))
@@ -267,21 +265,20 @@ public class PatientProtocolService {
 
 	private ProtocolConstants getProtocolConstantFromNormalProtocol(
 			List<PatientProtocolData> protocolData) {
-		int maxFrequency,minFrequency,minPressure,maxPressure,minDuration,maxDuration,treatmentsPerDay;
+		int maxFrequency,minFrequency,minPressure,maxPressure,minDuration,treatmentsPerDay;
 		PatientProtocolData protocol = protocolData.get(0); 
 		maxFrequency = protocol.getMaxFrequency();
 		minFrequency = protocol.getMinFrequency();
 		maxPressure = protocol.getMaxPressure();
 		minPressure = protocol.getMinPressure();
-		minDuration = protocol.getMinMinutesPerTreatment() * protocol.getTreatmentsPerDay();
-		maxDuration = protocol.getMaxMinutesPerTreatment() * protocol.getTreatmentsPerDay();
 		treatmentsPerDay = protocol.getTreatmentsPerDay();
-		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration,maxDuration);
+		minDuration = protocol.getMinMinutesPerTreatment() * protocol.getTreatmentsPerDay();
+		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration);
 	}
 
 	private ProtocolConstants getProtocolConstantFromCustomProtocol(
 			List<PatientProtocolData> protocolData) {
-		int maxFrequency,minFrequency,minPressure,maxPressure,minDuration,maxDuration,treatmentsPerDay;
+		int maxFrequency,minFrequency,minPressure,maxPressure,minDuration,treatmentsPerDay;
 		float weightedAvgFrequency = 0,weightedAvgPressure = 0;
 		double totalDuration = protocolData.stream().collect(Collectors.summingDouble(PatientProtocolData :: getMinMinutesPerTreatment));
 		for(PatientProtocolData protocol : protocolData){
@@ -294,8 +291,7 @@ public class PatientProtocolService {
 		minPressure = Math.round(weightedAvgPressure);
 		maxPressure = (int) Math.round(minPressure*UPPER_BOUND_VALUE);
 		minDuration = (int)(totalDuration*treatmentsPerDay);
-		maxDuration = (int) Math.round(minDuration *UPPER_BOUND_VALUE);
-		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration,maxDuration);
+		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration);
 	}
 }
 

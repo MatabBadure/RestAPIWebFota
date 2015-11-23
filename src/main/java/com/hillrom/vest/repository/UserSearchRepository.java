@@ -58,14 +58,14 @@ public class UserSearchRepository {
 
 		String findHillromTeamUserQuery = "select distinct(user.id),user.first_name as firstName,user.last_name as lastName,user.email,"
 				+ " user_authority.authority_name as name,user.is_deleted as isDeleted,user.created_date as createdAt,user.activated as isActivated,user.hillrom_id as hillromId, userExt.mobile_phone as mobilePhone "
-				+ " from  USER_EXTENSION userExt join USER user on user.id = userExt.user_id and "
+				+ " from  USER_EXTENSION userExt left outer join USER user on user.id = userExt.user_id and "
 				+ " (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or "
 				+ " lower(CONCAT(user.first_name,' ',user.last_name)) like lower(:queryString) or"
 				+ " lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) or"
 				+ " lower(user.email) like lower(:queryString) or lower(user.hillrom_id) like lower(:queryString)) "
-				+ " join  USER_AUTHORITY user_authority on user_authority.user_id = user.id "
-				+ " and  user_authority.authority_name in ('" + ADMIN + "','" + ACCT_SERVICES + "','" + ASSOCIATES
+				+ " left outer join  USER_AUTHORITY user_authority on user_authority.user_id = user.id "
+				+ " and  user_authority.authority_name in ('" + ADMIN + "','" + ACCT_SERVICES + "','" +  AuthoritiesConstants.CARE_GIVER + "','" + CLINIC_ADMIN + "','" + HCP + "','" + PATIENT + "','" + ASSOCIATES
 				+ "','" + HILLROM_ADMIN + "')";
 
 		StringBuilder filterQuery = new StringBuilder();

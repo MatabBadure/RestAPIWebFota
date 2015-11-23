@@ -35,13 +35,13 @@ public class GraphResource {
     private SecurityQuestionRepository securityQuestionRepository;
 
     /**
-     * POST  /securityQuestions -> Create a new securityQuestion.
+     * POST  /securityQuestions -> Post base64 Graph PDF string.
      */
     @RequestMapping(value = "/graph/pdfDownload",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    public ResponseEntity<JSONObject> downloadPDF(@Valid @RequestBody String base64EncodedString) throws URISyntaxException {
+    public ResponseEntity<JSONObject> downloadPDF(@Valid @RequestBody String base64EncodedString) throws HillromException {
         log.debug("REST request to return base64 Encoded String", base64EncodedString);
         JSONObject jsonObject = new JSONObject();
         try{

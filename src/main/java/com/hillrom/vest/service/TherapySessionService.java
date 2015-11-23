@@ -36,6 +36,7 @@ import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
+import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 
 @Service
 @Transactional
@@ -262,5 +263,36 @@ public class TherapySessionService {
 	public SortedMap<LocalDate,List<TherapySession>> getAllTherapySessionsMapByPatientUserId(Long patientUserId){
 		List<TherapySession> therapySessions =  therapySessionRepository.findByPatientUserId(patientUserId);
 		return groupTherapySessionsByDate(therapySessions);
+	}
+	
+	public List<TherapyDataVO> getComplianceGraphData(Long patientUserId,LocalDate from,LocalDate to){
+		List<TherapyDataVO> therapyData = findByPatientUserIdAndDateRange(patientUserId, from, to);
+		Map<LocalDate,List<TherapyDataVO>> therapyDataMap = therapyData.stream().collect(Collectors.groupingBy(TherapyDataVO::getDate));
+		SortedMap<LocalDate,List<TherapyDataVO>> therapyDataGroupByDate = new TreeMap<>(therapyDataMap);
+		List<TherapyDataVO> responseList = new LinkedList<>();
+		for(LocalDate date : therapyDataGroupByDate.keySet()){
+			List<TherapyDataVO> therapies = therapyDataGroupByDate.get(date);
+			int totalDuration = therapies.stream().collect(Collectors.summingInt(TherapyDataVO::getDuration));
+			int programmedCoughPauses=0,normalCoughPauses=0,coughPauseDuration=0;
+			float weightedAvgFrequency = 0.0f,weightedAvgPressure = 0.0f;
+			Note noteForTheDay = null;
+			int size = therapies.size();
+			DateTime start = therapies.get(0).getStart();
+			DateTime end = size > 0 ? therapies.get(size-1).getEnd(): null;
+			double hmr = size > 0 ? therapies.get(size-1).getHmr(): 0;
+			boolean isMissedTherapy = therapies.get(0).isMissedTherapy();
+			for(TherapyDataVO therapy : therapies){
+				programmedCoughPauses += therapy.getProgrammedCoughPauses();
+				normalCoughPauses += therapy.getNormalCoughPauses();
+				weightedAvgFrequency += calculateWeightedAvg(totalDuration, therapy.getDuration(), therapy.getFrequency());
+				weightedAvgPressure += calculateWeightedAvg(totalDuration, therapy.getDuration(), therapy.getFrequency());
+				noteForTheDay = therapy.getNote();
+			}
+			TherapyDataVO dataVO = new TherapyDataVO(therapies.get(0).getTimestamp(), Math.round(weightedAvgFrequency), Math.round(weightedAvgPressure),
+					programmedCoughPauses, normalCoughPauses, programmedCoughPauses+normalCoughPauses, noteForTheDay, start, end, coughPauseDuration,
+					totalDuration, hmr, isMissedTherapy);
+			responseList.add(dataVO);
+		}
+		return responseList;
 	}
 }

@@ -19,6 +19,7 @@ import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.domain.TempPatientVestDeviceData;
 import com.hillrom.vest.service.util.ParserUtil;
+import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.getEventStringByEventCode;
 
 @Component
 public class VestDeviceLogParserImpl implements DeviceLogParser {
@@ -217,7 +218,7 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 	private String getPatientVestDeviceEventCode(String base16String) {
 		String eventCodeString = ParserUtil.getFieldByStartAndEndOffset(
 				base16String, EVENT_CODE_START_OFFSET, EVENT_CODE_END_OFFSET);
-		String eventCode = getEventString(ParserUtil
+		String eventCode = getEventStringByEventCode(ParserUtil
 				.convertHexStringToInteger(eventCodeString));
 		return eventCode;
 	}
@@ -250,121 +251,6 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 		String checksumString = ParserUtil.getFieldByStartAndEndOffset(
 				base16String,CHECKSUM_START_OFFSET,CHECKSUM_END_OFFSET);
 		return ParserUtil.convertHexStringToInteger(checksumString);
-	}
-	
-	private String getEventString(int eventCode) {
-
-		String eventString;
-		switch (eventCode) {
-		case 1:
-			eventString = eventCode + ":SessionEventCodeNormalStarted";
-			break;
-		case 2:
-			eventString = eventCode + ":SessionEventCodeNormalSPChanged";
-			break;
-		case 3:
-			eventString = eventCode + ":SessionEventCodeCompleted";
-			break;
-		case 4:
-			eventString = eventCode + ":SessionEventCodeNormalIncomplete";
-			break;
-		case 5:
-			eventString = eventCode + ":SessionEventCodeNormalPaused";
-			break;
-		case 6:
-			eventString = eventCode + ":SessionEventCodeNormalResumed";
-			break;
-		case 7:
-			eventString = eventCode + ":SessionEventCodeProgramPt1Started";
-			break;
-		case 8:
-			eventString = eventCode + ":SessionEventCodeProgramPt2Started";
-			;
-			break;
-		case 9:
-			eventString = eventCode + ":SessionEventCodeProgramPt3Started";
-			;
-			break;
-		case 10:
-			eventString = eventCode + ":SessionEventCodeProgramPt4Started";
-			;
-			break;
-		case 11:
-			eventString = eventCode + ":SessionEventCodeProgramPt5Started";
-			break;
-		case 12:
-			eventString = eventCode + ":SessionEventCodeProgramPt6Started";
-			;
-			break;
-		case 13:
-			eventString = eventCode + ":SessionEventCodeProgramPt7Started";
-			;
-			break;
-		case 14:
-			eventString = eventCode + ":SessionEventCodeProgramPt8Started";
-			;
-			break;
-		case 15:
-			eventString = eventCode + ":SessionEventCodeProgramSPChanged";
-			;
-			break;
-		case 16:
-			eventString = eventCode + ":SessionEventCodeProgramCompleted";
-			;
-			break;
-		case 17:
-			eventString = eventCode + ":SessionEventCodeProgramIncomplete";
-			;
-			break;
-		case 18:
-			eventString = eventCode + ":SessionEventCodeProgramPaused";
-			;
-			break;
-		case 19:
-			eventString = eventCode + ":SessionEventCodeProgramResumed";
-			;
-			break;
-		case 20:
-			eventString = eventCode + ":SessionEventCodeRampStarted";
-			;
-			break;
-		case 21:
-			eventString = eventCode + ":SessionEventCodeRampingPaused";
-			;
-			break;
-		case 22:
-			eventString = eventCode + ":SessionEventCodeRampReached";
-			;
-			break;
-		case 23:
-			eventString = eventCode + ":SessionEventCodeRampReachedSPChanged";
-			;
-			break;
-		case 24:
-			eventString = eventCode + ":SessionEventCodeRampReachedPaused";
-			;
-			break;
-		case 25:
-			eventString = eventCode + ":SessionEventCodeRampCompleted";
-			;
-			break;
-		case 26:
-			eventString = eventCode + ":SessionEventCodeRampIncomplete";
-			;
-			break;
-		case 27:
-			eventString = eventCode + ":SessionEventCodeRampResumed";
-			;
-			break;
-		case 28:
-			eventString = eventCode + ":SessionEventCodeCoughPaused";
-			;
-			break;
-		default:
-			eventString = eventCode + ":Unknown";
-			break;
-		}
-		return eventString;
 	}
 
 	@Override

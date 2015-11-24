@@ -253,6 +253,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 					}
 				}
 			}
+			Collections.sort(newEvents);
 			return newEvents;
 		}
 	}

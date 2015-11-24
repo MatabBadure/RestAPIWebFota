@@ -84,7 +84,8 @@ public class PatientVestDeviceTherapyUtil {
 	}
 
 	private static int getCoughPauseDuration(List<PatientVestDeviceData> deviceEventRecords,int durationOfSession) {
-		long endTimestamp = deviceEventRecords.get(deviceEventRecords.size()-1).getTimestamp();
+		PatientVestDeviceData endOfSessionEvent = deviceEventRecords.get(deviceEventRecords.size()-1);
+		long endTimestamp = endOfSessionEvent.getTimestamp();
 		long startTimestamp = deviceEventRecords.get(0).getTimestamp();
 		int totalDuration = (int) Math.round((endTimestamp-startTimestamp)/MILLI_SECONDS_PER_MINUTE);
 		return (totalDuration - durationOfSession) > 0 ? (totalDuration - durationOfSession) : 0;
@@ -138,7 +139,6 @@ public class PatientVestDeviceTherapyUtil {
 		}
 	}
 	
-
 	public static List<TherapySession> groupEventsToPrepareTherapySession(
 			List<PatientVestDeviceData> deviceData) throws Exception{
 		List<TherapySession> therapySessions = new LinkedList<TherapySession>();
@@ -152,9 +152,24 @@ public class PatientVestDeviceTherapyUtil {
 				for(int j = i+1; j < deviceData.size() ; j++){
 					PatientVestDeviceData nextEventEntry = deviceData.get(j);
 					String nextEventCode = nextEventEntry.getEventId().split(EVENT_CODE_DELIMITER)[0];
-					groupEntries.add(nextEventEntry);
+						// Group entry if the nextEvent is not a start event
+						if(!isStartEventForTherapySession(nextEventCode))
+							groupEntries.add(nextEventEntry);
 					if(isCompleteOrInCompleteEventForTherapySession(nextEventCode)
-							){
+						|| isStartEventForTherapySession(nextEventCode)	){
+						// subsequent start events indicate therapy is incomplete due to unexpected reason
+						if(isStartEventForTherapySession(nextEventCode)){
+							PatientVestDeviceData inCompleteEvent = (PatientVestDeviceData) groupEntries.get(groupEntries.size()-1).clone();
+							if(groupEntries.get(0).getEventId().contains(SESSION_TYPE_PROGRAM))
+								inCompleteEvent.setEventId(getEventStringByEventCode(Integer.parseInt(EVENT_CODE_PROGRAM_INCOMPLETE)));
+							else
+								inCompleteEvent.setEventId(getEventStringByEventCode(Integer.parseInt(EVENT_CODE_NORMAL_INCOMPLETE)));
+							inCompleteEvent.setDuration(0);// DO NOT CHANGE: This is the indication, dummy event has been added for making session
+							inCompleteEvent.setFrequency(0);
+							inCompleteEvent.setPressure(0);
+							groupEntries.add(inCompleteEvent);// Add dummy incomplete event to finish the session
+							deviceData.add(j, inCompleteEvent);
+						}
 						TherapySession therapySession = assignTherapyMatrics(groupEntries);
 						therapySessions.add(therapySession);
 						i=j; // to skip the events iterated, shouldn't be removed in any case
@@ -231,7 +246,8 @@ public class PatientVestDeviceTherapyUtil {
 
 	public static double calculateWeightedAvg(double totalDuration,int durationInMinutes,
 			Integer frequency) {
-		totalDuration = totalDuration > 0 ? totalDuration : 1;
+		if(totalDuration == 0) // safety check for divided by 0 exception
+			return 0;
 		return (durationInMinutes*frequency/totalDuration);
 	}
 	
@@ -242,5 +258,120 @@ public class PatientVestDeviceTherapyUtil {
 	public static int calculateHMRRunRatePerSession(List<TherapySession> therapySessions){
 		float sessionsCount = therapySessions.isEmpty()?1:therapySessions.size();
 		return Math.round(calculateCumulativeDuration(therapySessions)/sessionsCount);
+	}
+	
+	public static String getEventStringByEventCode(int eventCode) {
+
+		String eventString;
+		switch (eventCode) {
+		case 1:
+			eventString = eventCode + ":SessionEventCodeNormalStarted";
+			break;
+		case 2:
+			eventString = eventCode + ":SessionEventCodeNormalSPChanged";
+			break;
+		case 3:
+			eventString = eventCode + ":SessionEventCodeCompleted";
+			break;
+		case 4:
+			eventString = eventCode + ":SessionEventCodeNormalIncomplete";
+			break;
+		case 5:
+			eventString = eventCode + ":SessionEventCodeNormalPaused";
+			break;
+		case 6:
+			eventString = eventCode + ":SessionEventCodeNormalResumed";
+			break;
+		case 7:
+			eventString = eventCode + ":SessionEventCodeProgramPt1Started";
+			break;
+		case 8:
+			eventString = eventCode + ":SessionEventCodeProgramPt2Started";
+			;
+			break;
+		case 9:
+			eventString = eventCode + ":SessionEventCodeProgramPt3Started";
+			;
+			break;
+		case 10:
+			eventString = eventCode + ":SessionEventCodeProgramPt4Started";
+			;
+			break;
+		case 11:
+			eventString = eventCode + ":SessionEventCodeProgramPt5Started";
+			break;
+		case 12:
+			eventString = eventCode + ":SessionEventCodeProgramPt6Started";
+			;
+			break;
+		case 13:
+			eventString = eventCode + ":SessionEventCodeProgramPt7Started";
+			;
+			break;
+		case 14:
+			eventString = eventCode + ":SessionEventCodeProgramPt8Started";
+			;
+			break;
+		case 15:
+			eventString = eventCode + ":SessionEventCodeProgramSPChanged";
+			;
+			break;
+		case 16:
+			eventString = eventCode + ":SessionEventCodeProgramCompleted";
+			;
+			break;
+		case 17:
+			eventString = eventCode + ":SessionEventCodeProgramIncomplete";
+			;
+			break;
+		case 18:
+			eventString = eventCode + ":SessionEventCodeProgramPaused";
+			;
+			break;
+		case 19:
+			eventString = eventCode + ":SessionEventCodeProgramResumed";
+			;
+			break;
+		case 20:
+			eventString = eventCode + ":SessionEventCodeRampStarted";
+			;
+			break;
+		case 21:
+			eventString = eventCode + ":SessionEventCodeRampingPaused";
+			;
+			break;
+		case 22:
+			eventString = eventCode + ":SessionEventCodeRampReached";
+			;
+			break;
+		case 23:
+			eventString = eventCode + ":SessionEventCodeRampReachedSPChanged";
+			;
+			break;
+		case 24:
+			eventString = eventCode + ":SessionEventCodeRampReachedPaused";
+			;
+			break;
+		case 25:
+			eventString = eventCode + ":SessionEventCodeRampCompleted";
+			;
+			break;
+		case 26:
+			eventString = eventCode + ":SessionEventCodeRampIncomplete";
+			;
+			break;
+		case 27:
+			eventString = eventCode + ":SessionEventCodeRampResumed";
+			;
+			break;
+		case 28:
+			eventString = eventCode + ":SessionEventCodeCoughPaused";
+			;
+			break;
+		default:
+			eventString = eventCode + ":Unknown";
+			break;
+		}
+		return eventString;
 	}
 }

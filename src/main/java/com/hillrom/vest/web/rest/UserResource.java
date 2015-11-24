@@ -1050,8 +1050,6 @@ public class UserResource {
 			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(id);
 			jsonObject.put("recommended", protocol);
 			jsonObject.put("actual", therapyData);
-		}else{
-			
 		}
 		return new ResponseEntity<>(jsonObject,HttpStatus.OK);
     }

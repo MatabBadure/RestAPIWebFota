@@ -72,7 +72,7 @@ BEGIN
 		created_date, 0, pat_gender, pat_zipcode,0,
 		NULL, pat_dob, hr_id, NULL);
 		 
-		SELECT id INTO return_user_id FROM `USER` WHERE email = pat_email;
+		SET return_user_id = last_insert_id();
 		
 		INSERT INTO `USER_EXTENSION` (`user_id`,`primary_phone`, `mobile_phone`,`address`,`city`,`state`,`is_deleted`)
 		VALUES (return_user_id, pat_primary_phone, pat_mobile_phone, pat_address, pat_city, pat_state,0);

@@ -285,7 +285,7 @@ public class TherapySessionService {
 				programmedCoughPauses += therapy.getProgrammedCoughPauses();
 				normalCoughPauses += therapy.getNormalCoughPauses();
 				weightedAvgFrequency += calculateWeightedAvg(totalDuration, therapy.getDuration(), therapy.getFrequency());
-				weightedAvgPressure += calculateWeightedAvg(totalDuration, therapy.getDuration(), therapy.getFrequency());
+				weightedAvgPressure += calculateWeightedAvg(totalDuration, therapy.getDuration(), therapy.getPressure());
 				noteForTheDay = therapy.getNote();
 			}
 			TherapyDataVO dataVO = new TherapyDataVO(therapies.get(0).getTimestamp(), Math.round(weightedAvgFrequency), Math.round(weightedAvgPressure),

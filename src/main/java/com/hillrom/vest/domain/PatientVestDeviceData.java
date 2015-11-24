@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @IdClass(PatientVestDeviceDataPK.class)
 @Entity
 @Table(name = "PATIENT_VEST_DEVICE_DATA")
-public class PatientVestDeviceData implements Serializable,Comparable<PatientVestDeviceData> {
+public class PatientVestDeviceData implements Serializable,Comparable<PatientVestDeviceData>,Cloneable {
 
 	private static final long serialVersionUID = 1L;
 	@Id
@@ -190,5 +190,9 @@ public class PatientVestDeviceData implements Serializable,Comparable<PatientVes
 	@Override
 	public int compareTo(PatientVestDeviceData o) {
 		return this.getTimestamp().compareTo(o.getTimestamp());
+	}
+	
+	public Object clone()throws CloneNotSupportedException{  
+		return super.clone();  
 	}
 }

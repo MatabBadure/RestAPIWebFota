@@ -32,6 +32,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import com.hillrom.vest.domain.Clinic;
+import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.security.AuthoritiesConstants;
@@ -497,6 +499,8 @@ public class UserSearchRepository {
 		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
 		BigInteger count = (BigInteger) countQuery.getSingleResult();
 
+		System.out.println("Query "+findPatientUserQuery);
+		
 		Query query = getOrderedByQuery(findPatientUserQuery, sortOrder);
 		setPaginationParams(pageable, query);
 
@@ -550,7 +554,7 @@ public class UserSearchRepository {
 			patientUserVO.setExpired(isExpired);
 			patientUsers.add(patientUserVO);
 		});
-		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());
+		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(addLatestAdherenceScore(patientUsers), null, count.intValue());
 
 		return page;
 	}
@@ -756,7 +760,7 @@ public class UserSearchRepository {
 			patientUsers.add(patientUserVO);
 		});
 
-		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());
+		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(addLatestAdherenceScore(patientUsers), null, count.intValue());
 
 		return page;
 	}
@@ -897,7 +901,7 @@ public class UserSearchRepository {
 			patientUsers.add(patientUserVO);
 		});
 
-		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());
+		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(addLatestAdherenceScore(patientUsers), null, count.intValue());
 
 		return page;
 	}
@@ -953,7 +957,7 @@ public class UserSearchRepository {
 
 		List<PatientUserVO> patientUsers = extractPatientResultsToVO(results);
 
-		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());
+		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(addLatestAdherenceScore(patientUsers), null, count.intValue());
 
 		return page;
 	}
@@ -1223,7 +1227,7 @@ public class UserSearchRepository {
 			patientUsers.add(patientUserVO);
 		});
 
-		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());
+		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(addLatestAdherenceScore(patientUsers), null, count.intValue());
 
 		return page;
 	}
@@ -1293,7 +1297,7 @@ public class UserSearchRepository {
 
 		List<PatientUserVO> patientUsers = extractPatientSearchResultsToVO(results);
 
-		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());
+		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(addLatestAdherenceScore(patientUsers), null, count.intValue());
 
 		return page;
 	}
@@ -1400,5 +1404,43 @@ public class UserSearchRepository {
 		}
 		return filterMap;
 	}
+	
+	
+	private List<PatientUserVO> addLatestAdherenceScore(List<PatientUserVO> patientUserVOs){
+		String complienceQuery = "select user_id, pc.date, compliance_score from PATIENT_COMPLIANCE pc where pc.user_id in ("+getFlattenedUserIds(patientUserVOs)+") AND pc.date IN (subdate(curdate(),1),curdate()) order by date";
+		Query query = entityManager.createNativeQuery(complienceQuery);
+		System.out.println("Query :: "+ complienceQuery);
+		List<Object[]> results = query.getResultList();
+		Map<Long,Integer> userComplianceMap = new HashMap<>();
+		results.stream().forEach((record) -> {
+			Long id = ((BigInteger) record[0]).longValue();
+			Date date = (Date) record[1];
+			Integer compliance = (Integer) record[2];
+			userComplianceMap.put(id, compliance);
+			});
+		
+			for(PatientUserVO pUser : patientUserVOs){
+				Integer adherence = userComplianceMap.get(pUser.getId());
+				pUser.setAdherence(Objects.nonNull(adherence) ? adherence : 0);
+	    	}
+		return patientUserVOs;
+	}
+	
+	
+	private String getFlattenedUserIds(List<PatientUserVO> patientUserVO){
+		StringBuilder userIdsString = new StringBuilder();
+	    if(Objects.isNull(patientUserVO)){
+	    	return null;
+	    } else {
+	    	for(PatientUserVO pUser : patientUserVO){
+	    		userIdsString.append(pUser.getId());
+	    		userIdsString.append(",");
+	    	}
+	    	if(userIdsString.indexOf(",") < 0)
+	    		return "";
+	    	else 
+	    		return userIdsString.deleteCharAt(userIdsString.lastIndexOf(",")).toString();
+	    }
+    }
 
 }

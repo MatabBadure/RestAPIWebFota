@@ -85,10 +85,6 @@ public class PatientVestDeviceTherapyUtil {
 
 	private static int getCoughPauseDuration(List<PatientVestDeviceData> deviceEventRecords,int durationOfSession) {
 		PatientVestDeviceData endOfSessionEvent = deviceEventRecords.get(deviceEventRecords.size()-1);
-		// Special case, unexpected end of session due to power failure as such
-		if((endOfSessionEvent.getEventId().startsWith(EVENT_CODE_NORMAL_INCOMPLETE) || 
-			endOfSessionEvent.getEventId().startsWith(EVENT_CODE_PROGRAM_INCOMPLETE)) && endOfSessionEvent.getDuration() == 0)
-			return 0;
 		long endTimestamp = endOfSessionEvent.getTimestamp();
 		long startTimestamp = deviceEventRecords.get(0).getTimestamp();
 		int totalDuration = (int) Math.round((endTimestamp-startTimestamp)/MILLI_SECONDS_PER_MINUTE);
@@ -163,7 +159,7 @@ public class PatientVestDeviceTherapyUtil {
 						|| isStartEventForTherapySession(nextEventCode)	){
 						// subsequent start events indicate therapy is incomplete due to unexpected reason
 						if(isStartEventForTherapySession(nextEventCode)){
-							PatientVestDeviceData inCompleteEvent = (PatientVestDeviceData) nextEventEntry.clone();
+							PatientVestDeviceData inCompleteEvent = (PatientVestDeviceData) groupEntries.get(groupEntries.size()-1).clone();
 							if(groupEntries.get(0).getEventId().contains(SESSION_TYPE_PROGRAM))
 								inCompleteEvent.setEventId(getEventStringByEventCode(Integer.parseInt(EVENT_CODE_PROGRAM_INCOMPLETE)));
 							else

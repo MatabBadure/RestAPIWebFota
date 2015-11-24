@@ -1037,4 +1037,22 @@ public class UserResource {
         List<AdherenceTrendVO> adherenceTrends = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
         return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/users/{id}/complianceGraphData",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JSONObject> getComplianceGraphData(@PathVariable Long id,
+    		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) throws Exception{
+    	JSONObject jsonObject = new JSONObject();
+    	List<TherapyDataVO> therapyData = therapySessionService.getComplianceGraphData(id, from, to);
+		if(therapyData.size() > 0){
+			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(id);
+			jsonObject.put("recommended", protocol);
+			jsonObject.put("actual", therapyData);
+		}else{
+			
+		}
+		return new ResponseEntity<>(jsonObject,HttpStatus.OK);
+    }
 }

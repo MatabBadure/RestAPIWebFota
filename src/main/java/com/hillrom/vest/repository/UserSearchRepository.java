@@ -125,8 +125,7 @@ public class UserSearchRepository {
 
 		String findHcpQuery = "select user.id,user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted,"
 				+ " user.zipcode,userExt.address,userExt.city as hcity,userExt.credentials,userExt.fax_number,userExt.primary_phone,"
-				+ " userExt.mobile_phone,userExt.speciality,userExt.state as hstate,clinic.id as clinicId,clinic.name as clinicName,"
-				+ " user.created_date as createdAt,user.activated isActivated,userExt.npi_number as npiNumber "
+				+ " userExt.mobile_phone,userExt.speciality,userExt.state as hstate,clinic.id as clinicId,clinic.name as clinicName,user.created_date as createdAt,user.activated isActivated,userExt.npi_number as npiNumber "
 				+ " FROM USER user join USER_EXTENSION userExt on user.id = userExt.user_id "
 				+ " and (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or "
@@ -448,7 +447,7 @@ public class UserSearchRepository {
 				+ " user.is_deleted as isDeleted, user.zipcode as pzipcode,patInfo.address paddress,patInfo.city as pcity,user.dob as pdob,"
 				+ "user.gender as pgender,user.title as ptitle,  user.hillrom_id as phillrom_id,user.created_date as createdAt,"
 				+ "user.activated as isActivated, patInfo.state as state ,  user_clinic.mrn_id as mrnid, clinic.id as pclinicid, "
-				+ "GROUP_CONCAT(clinic.name) as clinicName, user.expired as isExpired,  pc.compliance_score as adherence,  "
+				+ "GROUP_CONCAT(clinic.name) as clinicName, user.expired as isExpired, pc.compliance_score as adherence,  "
 				+ "pc.last_therapy_session_date as last_date,pc.is_hmr_compliant as isHMRNonCompliant,"
 				+ "pc.is_settings_deviated as isSettingsDeviated,"
 				+ " pc.missed_therapy_count as isMissedTherapy from USER user join USER_PATIENT_ASSOC  upa on user.id = upa.user_id "
@@ -470,14 +469,14 @@ public class UserSearchRepository {
 		// CLINIC_ADMIN
 		String mrnIdSearch = " or (lower(IFNULL(user_clinic.mrn_id,0)) like lower(:queryString) ) ) ";
 
-		String query3 = " left outer join PATIENT_COMPLIANCE pc on pc.id = (select pc1.id from PATIENT_COMPLIANCE pc1 where pc1.user_id = user.id and pc1.date = (select max(pc2.date) from PATIENT_COMPLIANCE pc2 where pc2.user_id = user.id)) "
+		String query3 = " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=subdate(curdate(),1) "
 				+ " left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and  user_clinic.patient_id = patInfo.id "
 				+ " group by user.id) as associated_patient left outer join (select  GROUP_CONCAT(huser.last_name ,' ',huser.first_name ) as hName, "
 				+ " clinic.id as hclinicid from USER huser join USER_AUTHORITY user_authorityh on user_authorityh.user_id = huser.id "
 				+ " and user_authorityh.authority_name = '" + HCP + "' "
 				+ " left outer join CLINIC_USER_ASSOC user_clinic on user_clinic.users_id = huser.id "
 				+ " left outer join CLINIC clinic on user_clinic.clinics_id = clinic.id and user_clinic.users_id = huser.id "
-				+ " left outer join PATIENT_COMPLIANCE pc on huser.id = pc.user_id "
+				+ " left outer join PATIENT_COMPLIANCE pc on huser.id = pc.user_id AND pc.date=subdate(curdate(),1) "
 				+ " group by clinic.id) as associated_hcp  on associated_patient.pclinicid = associated_hcp.hclinicid ";
 
 		String findPatientUserQuery = query1;
@@ -629,7 +628,7 @@ public class UserSearchRepository {
 		String findPatientUserQuery = " select user.id,user.email,user.first_name as firstName,user.last_name as lastName, "
 				+ " user.is_deleted as isUserDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob as patientDoB,"
 				+ " user.gender,user.title,user.hillrom_id,user.created_date as createdAt,"
-				+ " user.activated as isActivated, patInfo.state as state,  pc.compliance_score adherence,"
+				+ " user.activated as isActivated, patInfo.state as state, pc.compliance_score adherence,"
 				+ " pc.last_therapy_session_date as last_date," + " (select  GROUP_CONCAT(clinicc.name)"
 				+ " from USER userc "
 				+ " left outer join USER_AUTHORITY user_authorityc on user_authorityc.user_id = userc.id  "
@@ -648,11 +647,11 @@ public class UserSearchRepository {
 				+ " where patInfo.id = patInfoh.id"
 				+ " group by patInfoh.id) as hcpname, patient_clinic.mrn_id as mrnid, patient_clinic.is_active as isDeleted,"
 				+ " user.expired as isExpired, pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,"
-				+ " pc.missed_therapy_count as isMissedTherapy from USER user"
+				+ " pc.missed_therapy_count as isMissedTherapy " + " from USER user"
 				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '" + SELF + "'"
 				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id"
 				+ " join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id  "
-				+ " left outer join PATIENT_COMPLIANCE pc on pc.id = (select pc1.id from PATIENT_COMPLIANCE pc1 where pc1.user_id = user.id and pc1.date = (select max(pc2.date) from PATIENT_COMPLIANCE pc2 where pc2.user_id = user.id)) "
+				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=subdate(curdate(),1)  "
 				+ " left outer join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id "
 				+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id"
 				+ " and user_authority.authority_name = '" + PATIENT + "'";
@@ -770,7 +769,7 @@ public class UserSearchRepository {
 		String findPatientUserQuery = " select user.id,user.email,user.first_name as firstName,user.last_name as lastName, "
 				+ " user.is_deleted as isUserDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob as patientDoB,"
 				+ " user.gender,user.title,user.hillrom_id,user.created_date as createdAt,"
-				+ " user.activated as isActivated, patInfo.state as state,  pc.compliance_score adherence,"
+				+ " user.activated as isActivated, patInfo.state as state, pc.compliance_score adherence,"
 				+ " pc.last_therapy_session_date as last_date," + " (select  GROUP_CONCAT(clinicc.name)"
 				+ " from USER userc "
 				+ " left outer join USER_AUTHORITY user_authorityc on user_authorityc.user_id = userc.id  "
@@ -789,11 +788,11 @@ public class UserSearchRepository {
 				+ " where patInfo.id = patInfoh.id"
 				+ " group by patInfoh.id) as hcpname, patient_clinic.mrn_id as mrnid, patient_clinic.is_active as isDeleted,"
 				+ " user.expired as isExpired, pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,"
-				+ " pc.missed_therapy_count as isMissedTherapy from USER user"
+				+ " pc.missed_therapy_count as isMissedTherapy " + " from USER user"
 				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '" + SELF + "'"
 				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id"
 				+ " join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id  "
-				+ " left outer join PATIENT_COMPLIANCE pc on pc.id = (select pc1.id from PATIENT_COMPLIANCE pc1 where pc1.user_id = user.id and pc1.date = (select max(pc2.date) from PATIENT_COMPLIANCE pc2 where pc2.user_id = user.id)) "
+				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=subdate(curdate(),1)  "
 				+ " left outer join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id "
 				+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id"
 				+ " and user_authority.authority_name = '" + PATIENT + "'";
@@ -912,7 +911,7 @@ public class UserSearchRepository {
 				+ "user.title,user.hillrom_id,user.created_date as createdAt,"
 				+ "user.activated as isActivated, patInfo.state , compliance_score, pc.last_therapy_session_date as last_date, user.expired, "
 				+ "pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,pc.missed_therapy_count as isMissedTherapy "
-				+ " from USER user join USER_AUTHORITY user_authority on user_authority.user_id = user.id  "
+				+ "from USER user" + " join USER_AUTHORITY user_authority on user_authority.user_id = user.id  "
 				+ "and user_authority.authority_name = '" + PATIENT + "' and "
 				+ "(lower(user.first_name) like lower(:queryString) or  "
 				+ "lower(user.last_name) like lower(:queryString) or  "
@@ -924,7 +923,7 @@ public class UserSearchRepository {
 				+ "join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 				+ "join CLINIC_PATIENT_ASSOC patient_clinic on "
 				+ "patient_clinic.patient_id = patInfo.id and patient_clinic.clinic_id = ':clinicId'"
-				+ "left outer join PATIENT_COMPLIANCE pc on pc.id = (select pc1.id from PATIENT_COMPLIANCE pc1 where pc1.user_id = user.id and pc1.date = (select max(pc2.date) from PATIENT_COMPLIANCE pc2 where pc2.user_id = user.id))";
+				+ "left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=subdate(curdate(),1)";
 
 		StringBuilder filterQuery = new StringBuilder();
 
@@ -1107,7 +1106,7 @@ public class UserSearchRepository {
 			String clinicId, String filter, Pageable pageable, Map<String, Boolean> sortOrder) {
 
 		String findPatientUserQuery = " select user.id,user.email,user.first_name as firstName,user.last_name as lastName,  user.is_deleted as isUserDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,"
-				+ " user.gender,user.title,user.hillrom_id,user.created_date as createdAt, user.activated as isActivated, patInfo.state as state,  pc.compliance_score adherence,"
+				+ " user.gender,user.title,user.hillrom_id,user.created_date as createdAt, user.activated as isActivated, patInfo.state as state, pc.compliance_score adherence,"
 				+ " pc.last_therapy_session_date as last_date, "
 				+ " (select  GROUP_CONCAT(clinicc.name) from USER userc  "
 				+ " left outer join USER_AUTHORITY user_authorityc on user_authorityc.user_id = userc.id  and user_authorityc.authority_name = '"
@@ -1124,11 +1123,11 @@ public class UserSearchRepository {
 				+ "'  left outer join PATIENT_INFO patInfoh on upah.patient_id = patInfoh.id "
 				+ " where patInfo.id = patInfoh.id group by patInfoh.id) as hcpname,patient_clinic.mrn_id as mrnid,"
 				+ " patient_clinic.is_active as isDeleted, user.expired as isExpired, pc.is_hmr_compliant as isHMRNonCompliant,"
-				+ " pc.is_settings_deviated as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy  from USER user "
+				+ " pc.is_settings_deviated as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy from USER user "
 				+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = '"
 				+ PATIENT + "'" + " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"
 				+ SELF + "' " + " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id"
-				+ " left outer join PATIENT_COMPLIANCE pc on pc.id = (select pc1.id from PATIENT_COMPLIANCE pc1 where pc1.user_id = user.id and pc1.date = (select max(pc2.date) from PATIENT_COMPLIANCE pc2 where pc2.user_id = user.id)) "
+				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=subdate(curdate(),1) "
 				+ " join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id "
 				+ " join CLINIC clinic on clinic.id = patient_clinic.clinic_id "
 				+ " and (lower(user.first_name)  like lower(:queryString) or "
@@ -1237,7 +1236,7 @@ public class UserSearchRepository {
 		String query1 = "select user.id,user.email,user.first_name as firstName,user.last_name as"
 				+ " lastName, user.is_deleted as isDeleted,user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,"
 				+ "user.title,user.hillrom_id,user.created_date as createdAt,"
-				+ "user.activated as isActivated, patInfo.state as state,  pc.compliance_score adherence, pc.last_therapy_session_date as last_date, "
+				+ "user.activated as isActivated, patInfo.state as state, pc.compliance_score adherence, pc.last_therapy_session_date as last_date, "
 				+ "pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,pc.missed_therapy_count as isMissedTherapy "
 				+ "from USER user join USER_AUTHORITY user_authority on user_authority.user_id"
 				+ " = user.id and user_authority.authority_name = '" + PATIENT + "'and "
@@ -1250,7 +1249,7 @@ public class UserSearchRepository {
 				+ "join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '" + SELF + "' "
 				+ "join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 				+ "join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id "
-				+ " left outer join PATIENT_COMPLIANCE pc on pc.id = (select pc1.id from PATIENT_COMPLIANCE pc1 where pc1.user_id = user.id and pc1.date = (select max(pc2.date) from PATIENT_COMPLIANCE pc2 where pc2.user_id = user.id)) ";
+				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=subdate(curdate(),1) ";
 		String query2 = " where upa_hcp.user_id = :hcpUserID ";
 
 		if (!StringUtils.isEmpty(clinicId)) {
@@ -1336,7 +1335,7 @@ public class UserSearchRepository {
 				+ "user.last_name as plastName, user.is_deleted as isDeleted,user.zipcode as pzipcode,"
 				+ "patInfo.address paddress,patInfo.city as pcity,user.dob as pdob,user.gender as pgender,"
 				+ "user.title as ptitle,user.hillrom_id as phillrom_id,user.created_date as createdAt,"
-				+ "user.activated as isActivated, patInfo.state as state, pc.compliance_score as pcompliance_score, "
+				+ "user.activated as isActivated, patInfo.state as state,pc.compliance_score as pcompliance_score, "
 				+ "pc.last_therapy_session_date as last_date , user_clinic.mrn_id as mrnid,"
 				+ "clinic.id as pclinicid, GROUP_CONCAT(clinic.name) as clinicName from USER user "
 				+ "join USER_AUTHORITY user_authority on user_authority.user_id = user.id  and user_authority.authority_name = 'PATIENT' and "
@@ -1346,7 +1345,7 @@ public class UserSearchRepository {
 				+ "join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = 'Self' "
 				+ "join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 				+ "left outer join CLINIC_PATIENT_ASSOC user_clinic on " + "user_clinic.patient_id = patInfo.id "
-				+ "left outer join PATIENT_COMPLIANCE pc on pc.id = (select pc1.id from PATIENT_COMPLIANCE pc1 where pc1.user_id = user.id and pc1.date = (select max(pc2.date) from PATIENT_COMPLIANCE pc2 where pc2.user_id = user.id)) "
+				+ "left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=subdate(curdate(),1)  "
 				+ "left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and user_clinic.patient_id = patInfo.id "
 				+ " where clinic.id <> ':clinicId' or clinic.id IS NULL "
 				+ "group by user.id ) as tble where patient_id not in ( select user.id as patient_id  from USER user "

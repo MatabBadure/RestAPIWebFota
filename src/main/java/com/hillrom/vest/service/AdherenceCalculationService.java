@@ -38,10 +38,13 @@ import javax.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.hillrom.vest.batch.processing.PatientVestDeviceDataDeltaReader;
 import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
@@ -99,6 +102,8 @@ public class AdherenceCalculationService {
 	
 	@Inject
 	private ClinicRepository clinicRepository;
+
+	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationService.class);
 	
 	/**
 	 * Get Protocol Constants by loading Protocol data
@@ -174,10 +179,11 @@ public class AdherenceCalculationService {
 	/**
 	 * Runs every midnight deducts the compliance score by 5 if therapy hasn't been done for 3 days
 	 */
-	@Scheduled(cron="0 59 23 * * * ")
+	@Scheduled(cron="0 30 23 * * * ")
 	public void processMissedTherapySessions(){
 		try{
 			LocalDate today = LocalDate.now();
+			log.debug("Started calculating missed therapy "+DateTime.now()+","+today);
 			List<PatientCompliance> mstPatientComplianceList = patientComplianceRepository.findMissedTherapyPatientsRecords();
 			Map<Long,PatientCompliance> mstNotificationMap = new HashMap<>();
 			Map<Long,PatientCompliance> hmrNonComplianceMap = new HashMap<>();
@@ -215,6 +221,7 @@ public class AdherenceCalculationService {
 							Objects.nonNull(compliance.getHmr())? compliance.getHmr():0.0d);
 					newCompliance.setScore(compliance.getScore());
 					newCompliance.setSettingsDeviatedDaysCount(0);
+					log.debug("Compliance before calc "+newCompliance);
 					if(newCompliance.getMissedTherapyCount() >= DEFAULT_MISSED_THERAPY_DAYS_COUNT){ // missed Therapy for 3rd day or more than 3 days
 						mstNotificationMap.put(compliance.getPatientUser().getId(), newCompliance);
 					}else{ // missed therapy for 1 or 2 days , might fall under hmrNonCompliance
@@ -236,6 +243,7 @@ public class AdherenceCalculationService {
 			
 			updateNotificationsOnMST(today, notificationMap);
 			updateComplianceForMST(today, complianceMap);
+			log.debug("Started calculating missed therapy "+DateTime.now()+","+today);
 		}catch(Exception ex){
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter( writer );

@@ -243,7 +243,7 @@ public class AdherenceCalculationService {
 			
 			updateNotificationsOnMST(today, notificationMap);
 			updateComplianceForMST(today, complianceMap);
-			log.debug("Started calculating missed therapy "+DateTime.now()+","+today);
+			log.debug("Finished calculating missed therapy "+DateTime.now()+","+today);
 		}catch(Exception ex){
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter( writer );

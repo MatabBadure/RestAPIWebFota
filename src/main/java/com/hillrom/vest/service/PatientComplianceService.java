@@ -33,11 +33,9 @@ import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
-import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
-import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.web.rest.dto.AdherenceTrendVO;
 
 @Service
@@ -50,9 +48,6 @@ public class PatientComplianceService {
 	@Inject
 	private NotificationService notificationService;
 	
-	@Inject
-	private PatientNoEventService noEventService;
-
 	@Inject
 	private TherapySessionRepository therapySessionRepository;
 	

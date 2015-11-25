@@ -35,7 +35,7 @@ BEGIN
         RESIGNAL;
     END;
 		 
-	SET created_by = 'system';
+	SET created_by = 'JDE APP';
     SET encrypted_password = encrypt(CONCAT(CAST(pat_zipcode AS CHAR),SUBSTRING(pat_last_name,1,4),CAST(DATE_FORMAT(pat_dob,'%m%d%Y') AS CHAR)));
 -- Creare patient user when operation_type_indicator CREATE,
 	
@@ -130,6 +130,7 @@ BEGIN
 		UPDATE `USER` SET
 			`hillrom_id` = hr_id,
 			`email` = pat_email,
+			`PASSWORD` = encrypted_password,
 			`title` = pat_title,
 			`first_name` = pat_first_name,
 			`middle_name` = pat_middle_name,

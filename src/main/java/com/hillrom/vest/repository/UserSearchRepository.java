@@ -497,7 +497,6 @@ public class UserSearchRepository {
 		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
 		BigInteger count = (BigInteger) countQuery.getSingleResult();
 
-		System.out.println("Query "+findPatientUserQuery);
 		
 		Query query = getOrderedByQuery(findPatientUserQuery, sortOrder);
 		setPaginationParams(pageable, query);
@@ -1037,7 +1036,8 @@ public class UserSearchRepository {
 
 			filterQuery.append("and exists (SELECT PATIENT_NO_EVENT.id FROM PATIENT_NO_EVENT "
 					+ "WHERE PATIENT_NO_EVENT.user_id = search_table.id AND "
-					+ "PATIENT_NO_EVENT.first_transmission_date is null LIMIT 1)");
+					+ "PATIENT_NO_EVENT.first_transmission_date is null AND "
+					+ "PATIENT_NO_EVENT.user_created_date <> curdate() LIMIT 1)");
 		}
 	}
 

@@ -5,6 +5,7 @@ import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -140,6 +141,12 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 		List<TherapySession> therapySessions = PatientVestDeviceTherapyUtil
 				.prepareTherapySessionFromDeviceData(patientVestDeviceRecords);
 
+		if(therapySessions.isEmpty()){
+			log.debug("Could not make session out of the events received, discarding to get delta");
+			BatchUtil.flag = true;  
+			return new LinkedList<PatientVestDeviceData>();
+		}
+		
 		therapySessionService.saveOrUpdate(therapySessions);
 		return patientVestDeviceRecords;
 	}

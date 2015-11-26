@@ -469,14 +469,14 @@ public class UserSearchRepository {
 		// CLINIC_ADMIN
 		String mrnIdSearch = " or (lower(IFNULL(user_clinic.mrn_id,0)) like lower(:queryString) ) ) ";
 
-		String query3 = " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=subdate(curdate(),1) "
+		String query3 = " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) "
 				+ " left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and  user_clinic.patient_id = patInfo.id "
 				+ " group by user.id) as associated_patient left outer join (select  GROUP_CONCAT(huser.last_name ,' ',huser.first_name ) as hName, "
 				+ " clinic.id as hclinicid from USER huser join USER_AUTHORITY user_authorityh on user_authorityh.user_id = huser.id "
 				+ " and user_authorityh.authority_name = '" + HCP + "' "
 				+ " left outer join CLINIC_USER_ASSOC user_clinic on user_clinic.users_id = huser.id "
 				+ " left outer join CLINIC clinic on user_clinic.clinics_id = clinic.id and user_clinic.users_id = huser.id "
-				+ " left outer join PATIENT_COMPLIANCE pc on huser.id = pc.user_id AND pc.date=subdate(curdate(),1) "
+				+ " left outer join PATIENT_COMPLIANCE pc on huser.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) "
 				+ " group by clinic.id) as associated_hcp  on associated_patient.pclinicid = associated_hcp.hclinicid ";
 
 		String findPatientUserQuery = query1;
@@ -497,6 +497,7 @@ public class UserSearchRepository {
 		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
 		BigInteger count = (BigInteger) countQuery.getSingleResult();
 
+		
 		Query query = getOrderedByQuery(findPatientUserQuery, sortOrder);
 		setPaginationParams(pageable, query);
 
@@ -651,7 +652,7 @@ public class UserSearchRepository {
 				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '" + SELF + "'"
 				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id"
 				+ " join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id  "
-				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=subdate(curdate(),1)  "
+				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate())  "
 				+ " left outer join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id "
 				+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id"
 				+ " and user_authority.authority_name = '" + PATIENT + "'";
@@ -792,7 +793,7 @@ public class UserSearchRepository {
 				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '" + SELF + "'"
 				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id"
 				+ " join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id  "
-				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=subdate(curdate(),1)  "
+				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate())  "
 				+ " left outer join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id "
 				+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id"
 				+ " and user_authority.authority_name = '" + PATIENT + "'";
@@ -923,7 +924,7 @@ public class UserSearchRepository {
 				+ "join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 				+ "join CLINIC_PATIENT_ASSOC patient_clinic on "
 				+ "patient_clinic.patient_id = patInfo.id and patient_clinic.clinic_id = ':clinicId'"
-				+ "left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=subdate(curdate(),1)";
+				+ "left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate())";
 
 		StringBuilder filterQuery = new StringBuilder();
 
@@ -1035,7 +1036,8 @@ public class UserSearchRepository {
 
 			filterQuery.append("and exists (SELECT PATIENT_NO_EVENT.id FROM PATIENT_NO_EVENT "
 					+ "WHERE PATIENT_NO_EVENT.user_id = search_table.id AND "
-					+ "PATIENT_NO_EVENT.first_transmission_date is null LIMIT 1)");
+					+ "PATIENT_NO_EVENT.first_transmission_date is null AND "
+					+ "PATIENT_NO_EVENT.user_created_date <> curdate() LIMIT 1)");
 		}
 	}
 
@@ -1127,7 +1129,7 @@ public class UserSearchRepository {
 				+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = '"
 				+ PATIENT + "'" + " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"
 				+ SELF + "' " + " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id"
-				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=subdate(curdate(),1) "
+				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),IF(pc.date <> curdate(),subdate(curdate(),1),curdate()),curdate()) "
 				+ " join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id "
 				+ " join CLINIC clinic on clinic.id = patient_clinic.clinic_id "
 				+ " and (lower(user.first_name)  like lower(:queryString) or "
@@ -1249,7 +1251,7 @@ public class UserSearchRepository {
 				+ "join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '" + SELF + "' "
 				+ "join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 				+ "join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id "
-				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=subdate(curdate(),1) ";
+				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),IF(pc.date <> curdate(),subdate(curdate(),1),curdate()),curdate()) ";
 		String query2 = " where upa_hcp.user_id = :hcpUserID ";
 
 		if (!StringUtils.isEmpty(clinicId)) {
@@ -1345,7 +1347,7 @@ public class UserSearchRepository {
 				+ "join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = 'Self' "
 				+ "join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 				+ "left outer join CLINIC_PATIENT_ASSOC user_clinic on " + "user_clinic.patient_id = patInfo.id "
-				+ "left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=subdate(curdate(),1)  "
+				+ "left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),IF(pc.date <> curdate(),subdate(curdate(),1),curdate()),curdate())  "
 				+ "left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and user_clinic.patient_id = patInfo.id "
 				+ " where clinic.id <> ':clinicId' or clinic.id IS NULL "
 				+ "group by user.id ) as tble where patient_id not in ( select user.id as patient_id  from USER user "

@@ -10,11 +10,14 @@ import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
+import com.hillrom.vest.service.AdherenceCalculationService;
 
 public class PatientVestDeviceTherapyUtil {
 
@@ -46,6 +49,8 @@ public class PatientVestDeviceTherapyUtil {
 	private static final String EVENT_CODE_NORMAL_RESUMED = "6";
 	private static final String EVENT_CODE_PROGRAM_RESUMED = "19";
 	private static final String EVENT_CODE_RAMP_RESUMED = "27";
+
+	private static final Logger log = LoggerFactory.getLogger(PatientVestDeviceTherapyUtil.class);
 
 	private PatientVestDeviceTherapyUtil(){
 		
@@ -142,7 +147,9 @@ public class PatientVestDeviceTherapyUtil {
 	public static List<TherapySession> groupEventsToPrepareTherapySession(
 			List<PatientVestDeviceData> deviceData) throws Exception{
 		List<TherapySession> therapySessions = new LinkedList<TherapySession>();
-		for(int i = 0; i < deviceData.size() ; i++){
+		// This List will hold un-finished session events , will be discarded to get delta on next transmission 
+		List<PatientVestDeviceData> eventsToBeDiscarded = new LinkedList<>();
+		for(int i = 0;i < deviceData.size() ; i++){
 			PatientVestDeviceData vestDeviceData = deviceData.get(i);
 			String eventCode = vestDeviceData.getEventId().split(EVENT_CODE_DELIMITER)[0];
 			List<PatientVestDeviceData> groupEntries = new LinkedList<>();
@@ -174,9 +181,20 @@ public class PatientVestDeviceTherapyUtil {
 						therapySessions.add(therapySession);
 						i=j; // to skip the events iterated, shouldn't be removed in any case
 						break;
+					}else if(j == deviceData.size()-1){
+						//will be discarded to get delta on next transmission
+						log.debug("Discarding the events to make session with delta on next transmission");
+						log.debug("Events List"+groupEntries);
+						eventsToBeDiscarded.addAll(groupEntries);
+						i=j; // to skip the events iterated, shouldn't be removed in any case
+						break;
 					}
 				}
 			}
+		}
+		// Discarding these events to make session from delta
+		if(eventsToBeDiscarded.size() > 0){
+			deviceData.removeAll(eventsToBeDiscarded);
 		}
 		return therapySessions;
 	}

@@ -1405,6 +1405,10 @@ public class UserSearchRepository {
 	
 	
 	private List<PatientUserVO> addLatestAdherenceScore(List<PatientUserVO> patientUserVOs){
+		
+		if(patientUserVOs.isEmpty())
+			return patientUserVOs;
+		
 		String complienceQuery = "select user_id, pc.date, compliance_score from PATIENT_COMPLIANCE pc where pc.user_id in ("+getFlattenedUserIds(patientUserVOs)+") AND pc.date IN (subdate(curdate(),1),curdate()) order by date";
 		Query query = entityManager.createNativeQuery(complienceQuery);
 		System.out.println("Query :: "+ complienceQuery);

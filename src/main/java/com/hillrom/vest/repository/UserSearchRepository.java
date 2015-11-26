@@ -497,7 +497,6 @@ public class UserSearchRepository {
 		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
 		BigInteger count = (BigInteger) countQuery.getSingleResult();
 
-		System.out.println("Query "+findPatientUserQuery);
 		
 		Query query = getOrderedByQuery(findPatientUserQuery, sortOrder);
 		setPaginationParams(pageable, query);

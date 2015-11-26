@@ -953,7 +953,7 @@ public class AdherenceCalculationService {
 			latestCompliance.setSettingsDeviated(false);
 			// reset settingsDeviatedDays count if patient miss therapy
 			latestCompliance.setSettingsDeviatedDaysCount(0);
-		}else if(latestCompliance.getMissedTherapyCount() > MISSED_THERAPY_DAYS_COUNT_THRESHOLD && currentMissedTherapyCount == 0){
+		}else if(latestCompliance.getMissedTherapyCount() >= MISSED_THERAPY_DAYS_COUNT_THRESHOLD && currentMissedTherapyCount == 0){
 			currentScore = DEFAULT_COMPLIANCE_SCORE;
 			latestCompliance.setHmrCompliant(false);
 			latestCompliance.setSettingsDeviated(false);

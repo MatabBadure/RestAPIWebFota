@@ -162,7 +162,7 @@ public class PatientComplianceService {
 			LocalDate date) {
 		SortedMap<LocalDate,PatientCompliance> mostRecentComplianceMap = complianceMap.headMap(date);
 		int pointsChanged = BONUS_POINTS;
-		if(Objects.isNull(mostRecentComplianceMap) && mostRecentComplianceMap.size() > 0){
+		if(Objects.nonNull(mostRecentComplianceMap) && mostRecentComplianceMap.size() > 0){
 			LocalDate lastComplianceDate = mostRecentComplianceMap.lastKey();
 			PatientCompliance previousCompliance = mostRecentComplianceMap.get(lastComplianceDate);
 			PatientCompliance nextCompliance = complianceMap.get(date);

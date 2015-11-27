@@ -342,6 +342,9 @@ public class AdherenceCalculationService {
 				newCompliance.setHmrCompliant(true);
 			}
 			newCompliance.setScore(score);
+			// reset settings deviated count and flag on missed therapy
+			newCompliance.setSettingsDeviatedDaysCount(0);
+			newCompliance.setSettingsDeviated(false);
 			complianceMap.put(patientUserId, newCompliance);
 		}
 	}

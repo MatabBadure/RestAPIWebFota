@@ -8,6 +8,7 @@ import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
 import static com.hillrom.vest.security.AuthoritiesConstants.HILLROM_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 import static com.hillrom.vest.util.RelationshipLabelConstants.SELF;
+import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_SETTINGS_DEVIATION_COUNT;
 
 import java.math.BigInteger;
 import java.sql.Date;
@@ -1045,9 +1046,9 @@ public class UserSearchRepository {
 		if (Objects.nonNull(filterMap.get("isMissedTherapy"))) {
 
 			if ("1".equals(filterMap.get("isMissedTherapy")))
-				filterQuery.append(" and (isMissedTherapy >= 3) ");
+				filterQuery.append(" and (isMissedTherapy >="+DEFAULT_SETTINGS_DEVIATION_COUNT+") ");
 			else if ("0".equals(filterMap.get("isMissedTherapy")))
-				filterQuery.append(" and ( isMissedTherapy < 3 )");
+				filterQuery.append(" and ( isMissedTherapy < "+DEFAULT_SETTINGS_DEVIATION_COUNT+" )");
 		}
 	}
 

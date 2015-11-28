@@ -983,6 +983,9 @@ public class AdherenceCalculationService {
 					// reset settingsDeviatedDays count if patient is adhere to settings
 					latestCompliance.setSettingsDeviatedDaysCount(0);
 				}
+			}else{
+				// reset settingsDeviatedDays count if patient missed therapy
+				latestCompliance.setSettingsDeviatedDaysCount(0);
 			}
 
 			latestCompliance.setSettingsDeviated(isSettingsDeviated);

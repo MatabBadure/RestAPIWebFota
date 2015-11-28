@@ -245,7 +245,15 @@ public class PatientHCPService {
 		List<Map<String,Object>> patientUsers = clinicService.getAssociatedPatientUsers(clinicList);
 		List<Long> patientUserIds = filterActivePatientIds(patientUsers);
 		if(patientUsers.isEmpty()) {
-			throw new HillromException(MessageConstants.HR_279);
+	       	Map<String, Object> statistics0 = new HashMap();
+				statistics0.put("patientsWithHmrNonCompliance", 0);
+				statistics0.put("patientsWithSettingDeviation", 0);
+				statistics0.put("patientsWithMissedTherapy", 0);
+				statistics0.put("patientsWithNoEventRecorded", 0);
+				statistics0.put("date", LocalDate.now());
+				statistics0.put("totalPatientCount", 0);        	
+	        	return statistics0;
+			//throw new HillromException(MessageConstants.HR_279);
 		} else if(patientUserIds.isEmpty()) {
 			throw new HillromException(MessageConstants.HR_267);
 		} else {

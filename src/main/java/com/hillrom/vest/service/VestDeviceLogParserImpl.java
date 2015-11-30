@@ -1,25 +1,63 @@
 package com.hillrom.vest.service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.AIR_INTERFACE_TYPE;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CUC_VERSION;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CUSTOMER_ID;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CUSTOMER_NAME;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_ADDRESS;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_DATA;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_MODEL_TYPE;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_SERIAL_NUMBER;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_TYPE;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.HUB_ID;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.HUB_RECEIVE_TIME;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.HUB_RECEIVE_TIME_OFFSET;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.SP_RECEIVE_TIME;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.TIMEZONE;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.CHECKSUM_END_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.CHECKSUM_START_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.DAY_END_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.DAY_START_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.DURATION_END_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.DURATION_START_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.EVENT_CODE_END_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.EVENT_CODE_START_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.FREQUENCY_END_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.FREQUENCY_START_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.HMR_HOUR_END_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.HMR_HOUR_END_OFFSET1;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.HMR_HOUR_START_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.HMR_HOUR_START_OFFSET1;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.HMR_MINUTE_END_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.HMR_MINUTE_START_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.HOUR_END_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.HOUR_START_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.MINUTE_END_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.MINUTE_START_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.MONTH_END_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.MONTH_START_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.PRESSURE_END_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.PRESSURE_START_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.SECOND_END_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.SECOND_START_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.YEAR_END_OFFSET;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.YEAR_START_OFFSET;
+import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.getEventStringByEventCode;
+
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.joda.time.DateTime;
+import net.minidev.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.*;
-import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.*;
-
 import com.hillrom.vest.batch.processing.PatientVestDeviceDataDeltaReader;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
-import com.hillrom.vest.domain.TempPatientVestDeviceData;
 import com.hillrom.vest.service.util.ParserUtil;
-import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.getEventStringByEventCode;
 
 @Component
 public class VestDeviceLogParserImpl implements DeviceLogParser {
@@ -27,73 +65,65 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 	private final Logger log = LoggerFactory.getLogger(PatientVestDeviceDataDeltaReader.class);
 	
 	private static final String EXPECTED_STRING = "24454F50F0F0F0F0";
-	private static final String YYYY_MMM_DD_HH_MM_SS = "yyyy-MMM-dd hh:mm:ss";
 	private static final int RECORD_SIZE = 16;
 
 	@Override
 	public PatientVestDeviceRawLog parseBase64StringToPatientVestDeviceRawLog(
-			String base64String) throws Exception{
+			String rawMessage) throws Exception{
+		JSONObject qclJsonData = ParserUtil.getQclJsonDataFromRawMessage(rawMessage);
 		
-		String hub_timestamp = ParserUtil.getValueFromMessage(base64String,HUB_RECEIVE_TIME);
-		String sp_timestamp = ParserUtil.getValueFromMessage(base64String,SP_RECEIVE_TIME);
+		String hub_timestamp = ParserUtil.getValueFromQclJsonData(qclJsonData,HUB_RECEIVE_TIME);
+		String sp_timestamp = ParserUtil.getValueFromQclJsonData(qclJsonData,SP_RECEIVE_TIME);
 
-		PatientVestDeviceRawLog patientVestDeviceRawLog = createPatientVestDeviceRawLog(base64String);
+		PatientVestDeviceRawLog patientVestDeviceRawLog = createPatientVestDeviceRawLog(rawMessage,qclJsonData);
 		patientVestDeviceRawLog.setDeviceAddress(ParserUtil
-				.getValueFromMessage(base64String,DEVICE_ADDRESS));
+				.getValueFromQclJsonData(qclJsonData,DEVICE_ADDRESS));
 
-		patientVestDeviceRawLog.setHubReceiveTime(getTimeStamp(hub_timestamp)
-				.getMillis());
-		patientVestDeviceRawLog.setSpReceiveTime(getTimeStamp(sp_timestamp)
-				.getMillis());
+		try {
+			patientVestDeviceRawLog.setHubReceiveTime(Long.parseLong(hub_timestamp));
+			patientVestDeviceRawLog.setSpReceiveTime(Long.parseLong(sp_timestamp));
+		} catch (Exception e) {
+			throw new IllegalArgumentException(
+					"Could not parse data, Bad Content");
+		}
 		log.debug("PatientVestDeviceRawLog : "+patientVestDeviceRawLog);
 		return patientVestDeviceRawLog;
 	}
 
-	private DateTime getTimeStamp(String timestamp) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat(YYYY_MMM_DD_HH_MM_SS);
-		try {
-			return new DateTime(dateFormat.parse(timestamp).getTime());
-		} catch (ParseException | RuntimeException e) {
-			throw new IllegalArgumentException(
-					"Could not parse data, Bad Content");
-		}
-	}
-
 	private PatientVestDeviceRawLog createPatientVestDeviceRawLog(
-			String rawMessage) {
+			String rawMessage,JSONObject qclJsonData) {
 		PatientVestDeviceRawLog patientVestDeviceRawLog = new PatientVestDeviceRawLog();
 		patientVestDeviceRawLog.setRawMessage(rawMessage);
 		patientVestDeviceRawLog
 				.setAirInterfaceType(ParserUtil
-						.getValueFromMessage(
-								rawMessage,AIR_INTERFACE_TYPE));
-		patientVestDeviceRawLog.setCucVersion(ParserUtil.getValueFromMessage(
-				rawMessage, CUC_VERSION));
-		patientVestDeviceRawLog.setCustomerId(ParserUtil.getValueFromMessage(
-				rawMessage, CUSTOMER_ID));
+						.getValueFromQclJsonData(qclJsonData, AIR_INTERFACE_TYPE));
+		patientVestDeviceRawLog.setCucVersion(ParserUtil.getValueFromQclJsonData(
+				qclJsonData, CUC_VERSION));
+		patientVestDeviceRawLog.setCustomerId(ParserUtil.getValueFromQclJsonData(
+				qclJsonData, CUSTOMER_ID));
 		patientVestDeviceRawLog.setCustomerName(ParserUtil
-				.getValueFromMessage(rawMessage, CUSTOMER_NAME));
+				.getValueFromQclJsonData(qclJsonData, CUSTOMER_NAME));
 
-		patientVestDeviceRawLog.setDeviceData(ParserUtil.getValueFromMessage(
-				rawMessage, DEVICE_DATA));
+		patientVestDeviceRawLog.setDeviceData(ParserUtil.getValueFromQclJsonData(
+				qclJsonData, DEVICE_DATA));
 		patientVestDeviceRawLog
 				.setDeviceModelType(ParserUtil
-						.getValueFromMessage(
-								rawMessage,DEVICE_MODEL_TYPE));
+						.getValueFromQclJsonData(
+								qclJsonData,DEVICE_MODEL_TYPE));
 		patientVestDeviceRawLog
 				.setDeviceSerialNumber(ParserUtil
-						.getValueFromMessage(
-								rawMessage,DEVICE_SERIAL_NUMBER));
-		patientVestDeviceRawLog.setDeviceType(ParserUtil.getValueFromMessage(
-				rawMessage,DEVICE_TYPE));
-		patientVestDeviceRawLog.setHubId(ParserUtil.getValueFromMessage(
-				rawMessage, HUB_ID));
-		patientVestDeviceRawLog.setTimezone(ParserUtil.getValueFromMessage(
-				rawMessage, TIMEZONE));
+						.getValueFromQclJsonData(
+								qclJsonData,DEVICE_SERIAL_NUMBER));
+		patientVestDeviceRawLog.setDeviceType(ParserUtil.getValueFromQclJsonData(
+				qclJsonData,DEVICE_TYPE));
+		patientVestDeviceRawLog.setHubId(ParserUtil.getValueFromQclJsonData(
+				qclJsonData, HUB_ID));
+		patientVestDeviceRawLog.setTimezone(ParserUtil.getValueFromQclJsonData(
+				qclJsonData, TIMEZONE));
 		patientVestDeviceRawLog
 				.setHubReceiveTimeOffset(ParserUtil
-						.getValueFromMessage(
-								rawMessage,
+						.getValueFromQclJsonData(
+								qclJsonData,
 								 HUB_RECEIVE_TIME_OFFSET));
 		
 		return patientVestDeviceRawLog;
@@ -160,25 +190,6 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 		return patientVestDeviceData;
 	}
 	
-	private TempPatientVestDeviceData getPatientVestDeviceDataForTemp(String base16String,
-			int sequenceNumber) {
-		TempPatientVestDeviceData patientVestDeviceData = new TempPatientVestDeviceData();
-		patientVestDeviceData.setSequenceNumber(sequenceNumber);
-		patientVestDeviceData.setHmr(getPatientVestDeviceDataHMR(base16String));
-		patientVestDeviceData
-				.setPressure(getPatientVestDeviceDataPressure(base16String));
-		patientVestDeviceData
-				.setFrequency(getPatientVestDeviceDataFrequency(base16String));
-		patientVestDeviceData
-				.setDuration(getPatientVestDeviceDataDuration(base16String));
-		patientVestDeviceData
-				.setEventId(getPatientVestDeviceEventCode(base16String));
-		patientVestDeviceData.setTimestamp(getPatientVestDeviceDataTimeStamp(
-				base16String)*1000);
-		patientVestDeviceData.setChecksum(getPatientVestDeviceDataChecksum(base16String));
-		return patientVestDeviceData;
-	}
-
 	private Integer getPatientVestDeviceDataDuration(String base16String) {
 		String durationReadingString = ParserUtil.getFieldByStartAndEndOffset(
 				base16String, DURATION_START_OFFSET, DURATION_END_OFFSET);
@@ -252,38 +263,4 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 				base16String,CHECKSUM_START_OFFSET,CHECKSUM_END_OFFSET);
 		return ParserUtil.convertHexStringToInteger(checksumString);
 	}
-
-	@Override
-	public List<TempPatientVestDeviceData> parseBase64StringToPatientVestDeviceLogEntryForTemp(String base64String) {
-
-
-		List<TempPatientVestDeviceData> patientVestDeviceRecords = new LinkedList<>();
-		String base16String = ParserUtil.convertToBase16String(base64String);
-		if (base16String.length() <= 16)
-			return patientVestDeviceRecords;
-
-		// To validate bad data
-		String endTags = base16String.substring(base16String.length() - 16);
-
-		if (!EXPECTED_STRING.equals(endTags.toUpperCase().trim()))
-			throw new IllegalArgumentException(
-					"Could not parse data, Request contains Partial Data");
-
-		int logcount = 1;
-		int start;
-		int end;
-		start = 32 * 2 + (logcount - 1) * RECORD_SIZE * 2;
-		end = 32 * 2 + (logcount * RECORD_SIZE * 2);
-		while (start < base16String.length() & (end < base16String.length())) {
-			String log_segment = base16String.substring(start, end);
-			TempPatientVestDeviceData patientVestDeviceRecord = getPatientVestDeviceDataForTemp(
-					log_segment, logcount);
-			logcount++;
-			start = 32 * 2 + (logcount - 1) * RECORD_SIZE * 2;
-			end = 32 * 2 + (logcount * RECORD_SIZE * 2);
-			patientVestDeviceRecords.add(patientVestDeviceRecord);
-		}
-		return patientVestDeviceRecords;
-	}
-
 }

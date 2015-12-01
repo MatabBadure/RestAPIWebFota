@@ -30,6 +30,10 @@ BEGIN
     
 	SET created_date = now();
     
+    IF  (SELECT COUNT(*)  FROM PATIENT_PROTOCOL_DATA WHERE patient_id = in_patient_id AND is_deleted = 0 LIMIT 1) > 0 THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Protocol already exists for the Patient.';
+	END IF;
+    
 	SELECT `user_id` INTO temp_user_id FROM `USER_PATIENT_ASSOC` WHERE `patient_id`= in_patient_id AND `user_role` = 'PATIENT';
 
 	IF type_key = 'Normal' THEN

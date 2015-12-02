@@ -1,5 +1,6 @@
 package com.hillrom.vest.repository;
 
+import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_SETTINGS_DEVIATION_COUNT;
 import static com.hillrom.vest.security.AuthoritiesConstants.ACCT_SERVICES;
 import static com.hillrom.vest.security.AuthoritiesConstants.ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.ASSOCIATES;
@@ -8,7 +9,6 @@ import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
 import static com.hillrom.vest.security.AuthoritiesConstants.HILLROM_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 import static com.hillrom.vest.util.RelationshipLabelConstants.SELF;
-import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_SETTINGS_DEVIATION_COUNT;
 
 import java.math.BigInteger;
 import java.sql.Date;
@@ -71,14 +71,12 @@ public class UserSearchRepository {
 
 		StringBuilder filterQuery = new StringBuilder();
 
-		if (StringUtils.isNotEmpty(filter) && !"all".equalsIgnoreCase(filter)) {
+		Map<String, String> filterMap = getSearchParams(filter);
 
-			Map<String, String> filterMap = getSearchParams(filter);
-
-			filterQuery.append("select * from (");
-			applyIsDeletedFilter(findHillromTeamUserQuery, filterQuery, filterMap);
-			findHillromTeamUserQuery = filterQuery.toString();
-		}
+		filterQuery.append("select * from (");
+		applyIsDeletedFilter(findHillromTeamUserQuery, filterQuery, filterMap);
+		findHillromTeamUserQuery = filterQuery.toString();
+			
 		findHillromTeamUserQuery = findHillromTeamUserQuery.replaceAll(":queryString", queryString);
 		String countSqlQuery = "select count(hillromUsers.id) from (" + findHillromTeamUserQuery + ") hillromUsers";
 
@@ -1326,6 +1324,8 @@ public class UserSearchRepository {
 				sb.append(", ");
 			}
 		}
+		
+		System.out.println("Search Query :: "+queryString + sb.toString());
 		Query jpaQuery = entityManager.createNativeQuery(queryString + sb.toString());
 		return jpaQuery;
 	}

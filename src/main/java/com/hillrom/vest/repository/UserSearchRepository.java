@@ -28,6 +28,8 @@ import javax.persistence.Query;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -44,6 +46,8 @@ import com.hillrom.vest.web.rest.dto.PatientUserVO;
 
 @Repository
 public class UserSearchRepository {
+	
+	private final Logger log = LoggerFactory.getLogger(UserSearchRepository.class);
 
 	private static final String ORDER_BY_CLAUSE_START = " order by ";
 	@Inject
@@ -1325,7 +1329,8 @@ public class UserSearchRepository {
 			}
 		}
 		
-		System.out.println("Search Query :: "+queryString + sb.toString());
+		log.debug("Search Query :: "+queryString + sb.toString());
+		
 		Query jpaQuery = entityManager.createNativeQuery(queryString + sb.toString());
 		return jpaQuery;
 	}

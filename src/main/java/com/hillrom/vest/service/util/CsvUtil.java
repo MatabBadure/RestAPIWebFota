@@ -36,8 +36,8 @@ public class CsvUtil {
     			new FmtLocalDate("MM/dd/yyyy"), // ISBN
     	        new NotNull(), // treatmentsPerDay
     	        new NotNull(), // sessionType
-    	        new FmtDateTime("HH:MM a"), // Start Time
-    	        new FmtDateTime("HH:MM a"), // End Time
+    	        new FmtDateTime("hh:mm aa"), // Start Time
+    	        new FmtDateTime("hh:mm aa"), // End Time
     	        new ParseInt(), // frequency
     	        new ParseInt(), // pressure
     	        new ParseInt(), // duration in minutes
@@ -63,7 +63,7 @@ public class CsvUtil {
 
 	public static CellProcessor[] getCellProcessorForVestDeviceData() {
 		CellProcessor[] processors = new CellProcessor[] {
-    			new FmtLocalDate("MM/dd/yyyy"), // Date
+    			new FmtDateTime("MM/dd/yyyy hh:mm aa"), // Date
     			new ParseInt(), // Sequence number
     	        new NotNull(), // Event String
     	        new NotNull(), // Serial Number String

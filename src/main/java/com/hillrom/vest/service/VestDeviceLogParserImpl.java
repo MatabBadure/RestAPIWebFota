@@ -50,6 +50,7 @@ import java.util.List;
 
 import net.minidev.json.JSONObject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -125,6 +126,13 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 						.getValueFromQclJsonData(
 								qclJsonData,
 								 HUB_RECEIVE_TIME_OFFSET));
+		
+		if(StringUtils.isBlank(patientVestDeviceRawLog.getDeviceAddress()) || 
+				StringUtils.isBlank(patientVestDeviceRawLog.getDeviceSerialNumber()) ||
+				StringUtils.isBlank(patientVestDeviceRawLog.getDeviceData())){
+			throw new IllegalArgumentException(
+					"Could not parse data, Bad Content");
+		}
 		
 		return patientVestDeviceRawLog;
 	}

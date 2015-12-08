@@ -952,7 +952,7 @@ public class UserSearchRepository {
 			String email = (String) record[1];
 			String firstName = (String) record[2];
 			String lastName = (String) record[3];
-			Boolean isDeleted = BigInteger.ONE == ((BigInteger) record[4]) ? true : false;
+			Boolean isDeleted = 1 == ((Integer) record[4]) ? true : false;
 			Integer zipcode = (Integer) record[5];
 			String address = (String) record[6];
 			String city = (String) record[7];

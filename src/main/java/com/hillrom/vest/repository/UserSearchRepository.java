@@ -627,7 +627,7 @@ public class UserSearchRepository {
 			String filter, Pageable pageable, Map<String, Boolean> sortOrder) throws HillromException {
 
 		String findPatientUserQuery = " select user.id,user.email,user.first_name as firstName,user.last_name as lastName, "
-				+ " CONVERT(IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,1)),SIGNED) as isDeleted, user.zipcode,patInfo.address,patInfo.city,user.dob as patientDoB,"
+				+ " IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,1)) as isDeleted, user.zipcode,patInfo.address,patInfo.city,user.dob as patientDoB,"
 				+ " user.gender,user.title,user.hillrom_id,user.created_date as createdAt,"
 				+ " user.activated as isActivated, patInfo.state as state, pc.compliance_score adherence,"
 				+ " pc.last_therapy_session_date as last_date," + " (select  GROUP_CONCAT(clinicc.name)"
@@ -765,7 +765,7 @@ public class UserSearchRepository {
 			String filter, Pageable pageable, Map<String, Boolean> sortOrder) throws HillromException {
 
 		String findPatientUserQuery = " select user.id,user.email,user.first_name as firstName,user.last_name as lastName, "
-				+ " CONVERT(IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,1)),SIGNED) as isDeleted ,user.zipcode,patInfo.address,patInfo.city,user.dob as patientDoB,"
+				+ " IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,1)) as isDeleted ,user.zipcode,patInfo.address,patInfo.city,user.dob as patientDoB,"
 				+ " user.gender,user.title,user.hillrom_id,user.created_date as createdAt,"
 				+ " user.activated as isActivated, patInfo.state as state, pc.compliance_score adherence,"
 				+ " pc.last_therapy_session_date as last_date," + " (select  GROUP_CONCAT(clinicc.name)"
@@ -900,7 +900,7 @@ public class UserSearchRepository {
 			Pageable pageable, Map<String, Boolean> sortOrder) {
 
 		String findPatientUserQuery = "select user.id,user.email,user.first_name as"
-				+ " firstName,user.last_name as lastName, CONVERT(IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,1)),SIGNED) as isDeleted ,"
+				+ " firstName,user.last_name as lastName, IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,1)) as isDeleted ,"
 				+ "user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,"
 				+ "user.title,user.hillrom_id,user.created_date as createdAt,"
 				+ "user.activated as isActivated, patInfo.state , compliance_score, pc.last_therapy_session_date as last_date, user.expired, "
@@ -1065,7 +1065,7 @@ public class UserSearchRepository {
 			String clinicId, String filter, Pageable pageable, Map<String, Boolean> sortOrder) {
 
 		String findPatientUserQuery = " select user.id,user.email,user.first_name as firstName,user.last_name as lastName,  "
-				+ " CONVERT(IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,1)),SIGNED) as isDeleted ,user.zipcode,patInfo.address,patInfo.city,user.dob,"
+				+ " IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,1)) as isDeleted ,user.zipcode,patInfo.address,patInfo.city,user.dob,"
 				+ " user.gender,user.title,user.hillrom_id,user.created_date as createdAt, user.activated as isActivated, patInfo.state as state, pc.compliance_score adherence,"
 				+ " pc.last_therapy_session_date as last_date, "
 				+ " (select  GROUP_CONCAT(clinicc.name) from USER userc  "

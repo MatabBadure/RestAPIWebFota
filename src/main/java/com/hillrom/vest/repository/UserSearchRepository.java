@@ -629,7 +629,7 @@ public class UserSearchRepository {
 			String filter, Pageable pageable, Map<String, Boolean> sortOrder) throws HillromException {
 
 		String findPatientUserQuery = " select user.id,user.email,user.first_name as firstName,user.last_name as lastName, "
-				+ " IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,IF(patient_clinic.is_active<>NULL,1,user.is_deleted))) as isDeleted, user.zipcode,patInfo.address,patInfo.city,user.dob as patientDoB,"
+				+ " IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,IF(patient_clinic.is_active = NULL,user.is_deleted,1))) as isDeleted, user.zipcode,patInfo.address,patInfo.city,user.dob as patientDoB,"
 				+ " user.gender,user.title,user.hillrom_id,user.created_date as createdAt,"
 				+ " user.activated as isActivated, patInfo.state as state, pc.compliance_score adherence,"
 				+ " pc.last_therapy_session_date as last_date," + " (select  GROUP_CONCAT(clinicc.name)"
@@ -682,17 +682,14 @@ public class UserSearchRepository {
 
 		StringBuilder filterQuery = new StringBuilder();
 
-		if (StringUtils.isNotEmpty(filter) && !"all".equalsIgnoreCase(filter)) {
+		Map<String, String> filterMap = getSearchParams(filter);
 
-			Map<String, String> filterMap = getSearchParams(filter);
+		filterQuery.append("select * from (");
 
-			filterQuery.append("select * from (");
+		applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
 
-			applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
-
-			findPatientUserQuery = filterQuery.toString();
-		}
-
+		findPatientUserQuery = filterQuery.toString();
+			
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString", queryString);
 
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":hcpUserID", hcpUserID.toString());
@@ -767,13 +764,13 @@ public class UserSearchRepository {
 			String filter, Pageable pageable, Map<String, Boolean> sortOrder) throws HillromException {
 
 		String findPatientUserQuery = " select user.id,user.email,user.first_name as firstName,user.last_name as lastName, "
-				+ " IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,IF(patient_clinic.is_active<>NULL,1,user.is_deleted))) as isDeleted ,user.zipcode,patInfo.address,patInfo.city,user.dob as patientDoB,"
+				+ " IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,IF(patient_clinic.is_active = NULL,user.is_deleted,1))) as isDeleted ,user.zipcode,patInfo.address,patInfo.city,user.dob as patientDoB,"
 				+ " user.gender,user.title,user.hillrom_id,user.created_date as createdAt,"
 				+ " user.activated as isActivated, patInfo.state as state, pc.compliance_score adherence,"
 				+ " pc.last_therapy_session_date as last_date," + " (select  GROUP_CONCAT(clinicc.name)"
 				+ " from USER userc "
 				+ " left outer join USER_AUTHORITY user_authorityc on user_authorityc.user_id = userc.id  "
-				+ "and user_authorityc.authority_name = 'PATIENT' "
+				+ " and user_authorityc.authority_name = 'PATIENT' "
 				+ " join USER_PATIENT_ASSOC  upac on userc.id = upac.user_id and upac.relation_label = 'Self' "
 				+ " left outer join PATIENT_INFO patInfoc on upac.patient_id = patInfoc.id "
 				+ " left outer join CLINIC_PATIENT_ASSOC user_clinicc on user_clinicc.patient_id = patInfoc.id  "
@@ -821,21 +818,19 @@ public class UserSearchRepository {
 		System.out.println("HCP in Admin Query :: "+findPatientUserQuery);
 		StringBuilder filterQuery = new StringBuilder();
 
-		if (StringUtils.isNotEmpty(filter) && !"all".equalsIgnoreCase(filter)) {
+		Map<String, String> filterMap = getSearchParams(filter);
 
-			Map<String, String> filterMap = getSearchParams(filter);
+		filterQuery.append("select * from (");
 
-			filterQuery.append("select * from (");
+		applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
 
-			applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
-
-			findPatientUserQuery = filterQuery.toString();
-		}
+		findPatientUserQuery = filterQuery.toString();
 
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString", queryString);
 
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":hcpUserID", hcpUserID.toString());
 
+		System.out.println("HCP in Admin Query :: "+findPatientUserQuery);
 		String countSqlQuery = "select count(patientUsers.id) from (" + findPatientUserQuery + " ) patientUsers";
 
 		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
@@ -903,7 +898,7 @@ public class UserSearchRepository {
 			Pageable pageable, Map<String, Boolean> sortOrder) {
 
 		String findPatientUserQuery = "select user.id,user.email,user.first_name as"
-				+ " firstName,user.last_name as lastName, IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,IF(patient_clinic.is_active<>NULL,1,user.is_deleted))) as isDeleted ,"
+				+ " firstName,user.last_name as lastName, IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,IF(patient_clinic.is_active = NULL,user.is_deleted,1))) as isDeleted ,"
 				+ "user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,"
 				+ "user.title,user.hillrom_id,user.created_date as createdAt,"
 				+ "user.activated as isActivated, patInfo.state , compliance_score, pc.last_therapy_session_date as last_date, user.expired, "
@@ -924,20 +919,19 @@ public class UserSearchRepository {
 
 		StringBuilder filterQuery = new StringBuilder();
 
-		if (StringUtils.isNotEmpty(filter) && !"all".equalsIgnoreCase(filter)) {
+		Map<String, String> filterMap = getSearchParams(filter);
 
-			Map<String, String> filterMap = getSearchParams(filter);
+		filterQuery.append("select * from (");
 
-			filterQuery.append("select * from (");
+		applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
 
-			applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
-
-			findPatientUserQuery = filterQuery.toString();
-		}
+		findPatientUserQuery = filterQuery.toString();
 
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString", queryString);
 
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":clinicId", clinicID);
+		
+		System.out.println("Query :: "+ findPatientUserQuery);
 		String countSqlQuery = "select count(patientUsers.id) from (" + findPatientUserQuery + " ) patientUsers";
 
 		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
@@ -1068,7 +1062,7 @@ public class UserSearchRepository {
 			String clinicId, String filter, Pageable pageable, Map<String, Boolean> sortOrder) {
 
 		String findPatientUserQuery = " select user.id,user.email,user.first_name as firstName,user.last_name as lastName,  "
-				+ " IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,IF(patient_clinic.is_active<>NULL,1,user.is_deleted))) as isDeleted ,user.zipcode,patInfo.address,patInfo.city,user.dob,"
+				+ " IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,IF(patient_clinic.is_active = NULL,user.is_deleted,1))) as isDeleted ,user.zipcode,patInfo.address,patInfo.city,user.dob,"
 				+ " user.gender,user.title,user.hillrom_id,user.created_date as createdAt, user.activated as isActivated, patInfo.state as state, pc.compliance_score adherence,"
 				+ " pc.last_therapy_session_date as last_date, "
 				+ " (select  GROUP_CONCAT(clinicc.name) from USER userc  "
@@ -1115,16 +1109,13 @@ public class UserSearchRepository {
 
 		StringBuilder filterQuery = new StringBuilder();
 
-		if (StringUtils.isNotEmpty(filter) && !"all".equalsIgnoreCase(filter)) {
+		Map<String, String> filterMap = getSearchParams(filter);
 
-			Map<String, String> filterMap = getSearchParams(filter);
+		filterQuery.append("select * from (");
 
-			filterQuery.append("select * from (");
+		applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
 
-			applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
-
-			findPatientUserQuery = filterQuery.toString();
-		}
+		findPatientUserQuery = filterQuery.toString();
 
 		String countSqlQuery = "select count(patientUsers.id) from (" + findPatientUserQuery + " ) patientUsers";
 

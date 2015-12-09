@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -750,8 +751,9 @@ public class UserResource {
 			@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
 			@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
 			HttpServletResponse response) {
-		Long fromTimestamp = from.toDateTimeAtStartOfDay().getMillis();
-		Long toTimestamp = to.toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59).getMillis();
+		
+		Long fromTimestamp = from.toDateTimeAtStartOfDay(DateTimeZone.UTC).getMillis();
+		Long toTimestamp = to.toDateTimeAtStartOfDay(DateTimeZone.UTC).plusHours(23).plusMinutes(59).plusSeconds(59).getMillis();
 		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
 		ICsvBeanWriter beanWriter = null;
     	CellProcessor[] processors = CsvUtil.getCellProcessorForVestDeviceData();

@@ -737,8 +737,8 @@ public class UserResource {
 			@PathVariable Long id,
 			@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
 			@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
-		Long fromTimestamp = from.toDateTimeAtStartOfDay().getMillis();
-		Long toTimestamp = to.toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59).getMillis();
+		Long fromTimestamp = from.toDateTimeAtStartOfDay(DateTimeZone.UTC).getMillis();
+		Long toTimestamp = to.toDateTimeAtStartOfDay(DateTimeZone.UTC).plusHours(23).plusMinutes(59).plusSeconds(59).getMillis();
 		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
 		return new ResponseEntity<>(vestDeviceData,HttpStatus.OK);
 	}

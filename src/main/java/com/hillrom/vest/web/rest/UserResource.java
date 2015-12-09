@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -701,10 +702,11 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> exportVestDeviceData(
 			@PathVariable Long id,
-			@RequestParam(value="from",required=true)Long from,
-			@RequestParam(value="to",required=false)Long to) {
-		to = Objects.nonNull(to)?to:new Date().getTime();
-		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, from, to);
+			@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+			@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
+		Long fromTimestamp = from.toDateTimeAtStartOfDay(DateTimeZone.UTC).getMillis();
+		Long toTimestamp = to.toDateTimeAtStartOfDay(DateTimeZone.UTC).plusHours(23).plusMinutes(59).plusSeconds(59).getMillis();
+		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
 		return new ResponseEntity<>(vestDeviceData,HttpStatus.OK);
 	}
 	
@@ -713,11 +715,13 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public void exportVestDeviceDataCSV(
 			@PathVariable Long id,
-			@RequestParam(value="from",required=true)Long from,
-			@RequestParam(value="to",required=false)Long to,
+			@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+			@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
 			HttpServletResponse response) {
-		to = Objects.nonNull(to)?to:new Date().getTime();
-		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, from, to);
+		
+		Long fromTimestamp = from.toDateTimeAtStartOfDay(DateTimeZone.UTC).getMillis();
+		Long toTimestamp = to.toDateTimeAtStartOfDay(DateTimeZone.UTC).plusHours(23).plusMinutes(59).plusSeconds(59).getMillis();
+		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
 		ICsvBeanWriter beanWriter = null;
     	CellProcessor[] processors = CsvUtil.getCellProcessorForVestDeviceData();
     	try {

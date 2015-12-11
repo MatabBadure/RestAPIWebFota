@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.EntityUserAssoc;
+import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
@@ -365,8 +366,9 @@ public class ClinicService {
 	    if(Objects.isNull(clinicAdminUser)){
 	    	throw new HillromException(ExceptionConstants.HR_512);
 	    } else {
-	    	for(Clinic clinic : clinicRepository.findByClinicAdminId(clinicAdminUser.getId())){
-	    		clinics.add(ClinicVOBuilder.build(clinic));
+	    	List<EntityUserAssoc> entityUserAssocs = entityUserRepository.findByUserIdAndUserRole(clinicAdminId, AuthoritiesConstants.CLINIC_ADMIN);
+	    	for(EntityUserAssoc entityUserAssoc : entityUserAssocs){
+	    		clinics.add(ClinicVOBuilder.build(entityUserAssoc.getClinic()));
 	    	}
 	    	return clinics;
 	    }

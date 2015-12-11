@@ -15,5 +15,7 @@ public interface EntityUserRepository extends JpaRepository<EntityUserAssoc, Ent
 	
 	@Query("from EntityUserAssoc eua where eua.entityUserAssocPK.user.id = ?1 and eua.entityUserAssocPK.clinic.id=?2 and eua.userRole = ?3")
 	EntityUserAssoc findByUserIdAndClinicIdAndUserRole(Long id, String clinicId, String userRole);
-
+	
+	@Query("from EntityUserAssoc eua where eua.entityUserAssocPK.user.id = ?1 and eua.userRole = ?2")
+	List<EntityUserAssoc> findByUserIdAndUserRole(Long Id, String userRole);
 }

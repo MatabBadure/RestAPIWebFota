@@ -345,17 +345,9 @@ public class UserSearchRepository {
 				+ AuthoritiesConstants.HCP + "'"
 				+ " left outer join CLINIC_USER_ASSOC user_clinic on user_clinic.users_id = user.id "
 				+ " left outer join CLINIC clinic on user_clinic.clinics_id = clinic.id and user_clinic.users_id = user.id "
-				+ " where clinic.clinic_admin_id = :clinicAdminId ";
+				+ " where clinic.id = ':clinicId' ";
 
-		String clinicFilterQuery = " and clinic.id = ':clinicId'";
-
-		findHcpByClinicAdminQuery = findHcpByClinicAdminQuery.replaceAll(":clinicAdminId",
-				Long.toString(clinicAdminId));
-
-		if (StringUtils.isNotEmpty(paramClinicId)) {
-			findHcpByClinicAdminQuery += clinicFilterQuery;
-			findHcpByClinicAdminQuery = findHcpByClinicAdminQuery.replaceAll(":clinicId", paramClinicId);
-		}
+		findHcpByClinicAdminQuery = findHcpByClinicAdminQuery.replaceAll(":clinicId", paramClinicId);
 
 		StringBuilder filterQuery = new StringBuilder();
 

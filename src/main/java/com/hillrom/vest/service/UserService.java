@@ -34,6 +34,7 @@ import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.ClinicPatientAssoc;
+import com.hillrom.vest.domain.EntityUserAssoc;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
@@ -46,6 +47,7 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.AuthorityRepository;
 import com.hillrom.vest.repository.ClinicPatientRepository;
 import com.hillrom.vest.repository.ClinicRepository;
+import com.hillrom.vest.repository.EntityUserRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
@@ -118,6 +120,9 @@ public class UserService {
     
     @Inject
     private PatientVestDeviceService patientVestDeviceService;
+    
+    @Inject
+    private EntityUserRepository entityUserRepository;
 
     public String generateDefaultPassword(User patientUser) {
 		StringBuilder defaultPassword = new StringBuilder();
@@ -385,6 +390,7 @@ public class UserService {
 				throw new HillromException(ExceptionConstants.HR_522);
     		}
     	}
+		
     	List<String> rolesAdminCanModerate = rolesAdminCanModerate();
     	if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())
     			&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
@@ -524,14 +530,17 @@ public class UserService {
 		assignStatusAndRoleAndActivationKey(userExtensionDTO, newUser);
 		userExtensionRepository.saveAndFlush(newUser);
 		if(Objects.nonNull(newUser.getId())) {
-			List<Clinic> clinicList = new LinkedList<>();
 			for(Map<String, String> clinicObj : userExtensionDTO.getClinicList()){
 				Clinic clinic = clinicRepository.getOne(clinicObj.get("id"));
-				clinic.setClinicAdminId(newUser.getId());
-				clinicList.add(clinic);
+				//Associate User with Clinic as Clinic Admin
+				if(Objects.nonNull(clinic)){
+					EntityUserAssoc entityUserAssoc = new EntityUserAssoc(newUser, clinic, AuthoritiesConstants.CLINIC_ADMIN);
+					entityUserRepository.saveAndFlush(entityUserAssoc);
+				}
+				else 
+					throw new HillromException(ExceptionConstants.HR_548);
 			}
-			clinicRepository.save(clinicList);
-			log.debug("Created Information for User: {}", newUser);
+			log.debug("Created Information for Clinic Admin : {}", newUser);
 			return newUser;
 		} else {
 			throw new HillromException(ExceptionConstants.HR_574);

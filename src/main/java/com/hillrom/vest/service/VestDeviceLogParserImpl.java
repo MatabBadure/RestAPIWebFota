@@ -83,6 +83,12 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 		try {
 			patientVestDeviceRawLog.setHubReceiveTime(Long.parseLong(hub_timestamp));
 			patientVestDeviceRawLog.setSpReceiveTime(Long.parseLong(sp_timestamp));
+			if(StringUtils.isBlank(patientVestDeviceRawLog.getDeviceAddress()) || 
+					StringUtils.isBlank(patientVestDeviceRawLog.getDeviceSerialNumber()) ||
+					StringUtils.isBlank(patientVestDeviceRawLog.getDeviceData())){
+				throw new IllegalArgumentException(
+						"Could not parse data, Bad Content");
+			}
 		} catch (Exception e) {
 			throw new IllegalArgumentException(
 					"Could not parse data, Bad Content");
@@ -126,13 +132,6 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 						.getValueFromQclJsonData(
 								qclJsonData,
 								 HUB_RECEIVE_TIME_OFFSET));
-		
-		if(StringUtils.isBlank(patientVestDeviceRawLog.getDeviceAddress()) || 
-				StringUtils.isBlank(patientVestDeviceRawLog.getDeviceSerialNumber()) ||
-				StringUtils.isBlank(patientVestDeviceRawLog.getDeviceData())){
-			throw new IllegalArgumentException(
-					"Could not parse data, Bad Content");
-		}
 		
 		return patientVestDeviceRawLog;
 	}

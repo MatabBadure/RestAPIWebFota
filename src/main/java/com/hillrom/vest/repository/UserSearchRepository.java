@@ -1094,17 +1094,13 @@ public class UserSearchRepository {
 				+ " lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString)  or "
 				+ " lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString) or "
 				+ " lower(user.hillrom_id) like lower(:queryString)) "
-
-		+ " where lower(IFNULL(clinic.clinic_admin_id,0))= :clinicAdminId ";
+				+ " where clinic.id= ':clinicId'";
 
 		String groupBy = " group by user.id ";
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString", queryString);
 
-		findPatientUserQuery = findPatientUserQuery.replaceAll(":clinicAdminId", clinicAdminId.toString());
+		findPatientUserQuery = findPatientUserQuery.replaceAll(":clinicId", clinicId);
 
-		if (!StringUtils.isEmpty(clinicId)) {
-			findPatientUserQuery = findPatientUserQuery.concat(" and clinic.id = '" + clinicId + "'");
-		}
 		findPatientUserQuery += groupBy;
 
 		StringBuilder filterQuery = new StringBuilder();
@@ -1116,6 +1112,8 @@ public class UserSearchRepository {
 		applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
 
 		findPatientUserQuery = filterQuery.toString();
+		
+		System.out.println(findPatientUserQuery);
 
 		String countSqlQuery = "select count(patientUsers.id) from (" + findPatientUserQuery + " ) patientUsers";
 

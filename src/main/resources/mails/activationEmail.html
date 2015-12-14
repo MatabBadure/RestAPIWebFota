@@ -20,8 +20,10 @@
 			<h4 style="font-size: 14px;" th:text="#{email.reset.greeting(${user.firstName})}">Dear&nbsp;<span>Jose</span></h4>
 		</div>
 		<div>
-			<p style="font-size: 14px; ">Your Hillrom account has been created, please click on the URL below to activate it:</p>
+			<p style="font-size: 14px; ">Your VisiView account has been created. You still have one more step before you can log into the VisiView<sup>TM</sup> Health Portal. The link below will bring you to a page where you can create your password as well as select a security question and answer. <br /><br />
+			Please click on the link below to complete your account activation.</p>
 		</div>
+		
 		<div style="margin: 40px 0px;">
 			<a style="font-size: 14px;" th:href="@{|${baseUrl}/#/authenticate?key=${user.activationKey}|}" th:text="|${baseUrl}/#/authenticate?key=${user.activationKey}|">Click here</a>
 		</div>
@@ -36,11 +38,10 @@
 		</div>
 		<div style="margin: 50px 0px;">
 			<p style="font-size: 12px;">*** PLEASE DO NOT REPLY TO THIS EMAIL, IF YOU NEED TO CONTACT HILL-ROM, PLEASE CALL 800-426-4224<br/>
-			OR VISIT OUR WEBSITE AT HTTP://RESPIRATORYCAREHILL-ROM.COM/. ANY REPLIES TO THIS EMAIL WILL NOT<br/>
-			BE RECEIVED BY HILL-ROM.*** 
+			OR VISIT OUR WEBSITE AT HTTP://RESPIRATORYCAREHILL-ROM.COM/.<br/>
+			ANY REPLIES TO THIS EMAIL WILL NOT BE RECEIVED BY HILL-ROM.*** 
 			</p>
 		</div>
-
 	</div>
 	<div style="background-color: #7BA4DA;padding: 15px 0px;clear: left;display: inline-block;width: 100%; text-align: center;">
 		<ul style="padding:0px 0px; margin: 0px 0px;display: inline-block;">

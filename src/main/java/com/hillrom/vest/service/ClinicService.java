@@ -226,9 +226,10 @@ public class ClinicService {
 	        } else {
 	        	clinic.getClinicPatientAssoc().forEach(clinicPatientAssoc -> {
 	        		Map<String, Object> patientMap = new HashMap<>();
-	        		patientMap.put("patient", (UserExtension) userService.getUserObjFromPatientInfo(clinicPatientAssoc.getPatient()));
+	        		UserExtension patientUser = (UserExtension) userService.getUserObjFromPatientInfo(clinicPatientAssoc.getPatient());
+	        		patientMap.put("patient", patientUser);
 	        		patientMap.put("mrnId", clinicPatientAssoc.getMrnId());
-	        		patientMap.put("status", clinicPatientAssoc.getActive());
+	        		patientMap.put("status", clinicPatientAssoc.getActive() & !patientUser.isDeleted());
 	        		List<UserPatientAssoc> hcpAssocList = new LinkedList<>();
 	    	     	for(UserPatientAssoc patientAssoc : clinicPatientAssoc.getPatient().getUserPatientAssoc()){
 	    	    		if(AuthoritiesConstants.HCP.equals(patientAssoc.getUserRole())){
@@ -378,5 +379,4 @@ public class ClinicService {
 		List<Clinic> clinics = clinicRepository.findByDeletedAndClinicPatientAssocIsNotEmpty(isDeleted);
 		return clinics;
 	}
-	
 }

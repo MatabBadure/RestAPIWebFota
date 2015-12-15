@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hillrom.vest.batch.util.BatchUtil;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.VestDeviceBadData;
 import com.hillrom.vest.repository.VestDeviceBadDataRepository;
@@ -44,7 +43,6 @@ public class CustomItemReaderListener implements ItemReadListener<List<PatientVe
 		PrintWriter printWriter = new PrintWriter( writer );
 		ex.printStackTrace( printWriter );
 		mailServie.sendStatusOnDataIngestionRequest(patientDeviceRawData,"FAILED" ,true, writer.toString());
-		BatchUtil.flag = false; // DO NOT remove, this will block other sub-sequent requests
 	}
 	
 	@Value("#{jobParameters['rawData']}")

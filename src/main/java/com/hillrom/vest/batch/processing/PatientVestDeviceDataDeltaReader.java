@@ -24,7 +24,6 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Value;
 
-import com.hillrom.vest.batch.util.BatchUtil;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
@@ -82,12 +81,14 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 	@Inject
 	private PatientVestDeviceDataRepository vestDeviceDataRepository;
 
-	String patientDeviceRawData;
+	private String patientDeviceRawData;
+	
+	private boolean isReadComplete;
 
 	@Value("#{jobParameters['rawData']}")
 	public void setRawData(final String rawData) {
 		this.patientDeviceRawData = rawData;
-
+		this.isReadComplete = false;
 	}
 
 	private synchronized List<PatientVestDeviceData> parseRawData() throws Exception{
@@ -111,14 +112,14 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 	public List<PatientVestDeviceData> read()
 			throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
 		log.debug("ItemReader started");
-		if (BatchUtil.flag)
+		if (isReadComplete)
 			return null;
 
 		List<PatientVestDeviceData> patientVestDeviceEvents = parseRawData();
 		Long patientUserId = 0l, from,to;
 		if(patientVestDeviceEvents.isEmpty()){
 			// this is required to let reader to know there is nothing to be read further
-			BatchUtil.flag = true;  
+			isReadComplete = true;  
 			return patientVestDeviceEvents; // spring batch reader to skip reading
 		}else{
 			patientUserId = patientVestDeviceEvents.get(0).getPatientUser().getId();
@@ -143,7 +144,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 
 		if(therapySessions.isEmpty()){
 			log.debug("Could not make session out of the events received, discarding to get delta");
-			BatchUtil.flag = true;  
+			isReadComplete = true;  
 			return new LinkedList<PatientVestDeviceData>();
 		}
 		
@@ -244,7 +245,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 	}
 
 	private List<PatientVestDeviceData> getDelta(List<PatientVestDeviceData> existingEvents, List<PatientVestDeviceData> newEvents){
-		BatchUtil.flag = true;
+		isReadComplete = true;
 		if(Objects.isNull(existingEvents) || existingEvents.isEmpty())
 			return newEvents;
 		else{

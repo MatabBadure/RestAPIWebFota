@@ -20,6 +20,7 @@ import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.domain.TempPatientVestDeviceData;
 import com.hillrom.vest.service.util.ParserUtil;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.getEventStringByEventCode;
+import static com.hillrom.vest.config.VestDeviceRawLogOffsetConstants.INFO_PACKET_HEADER;
 
 @Component
 public class VestDeviceLogParserImpl implements DeviceLogParser {
@@ -129,14 +130,16 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 			String log_segment = base16String.substring(start, end);
 			
 			log.debug("Data packet : "+log_segment);
+			if(log_segment.startsWith(DATA_PACKET_HEADER)){
+				PatientVestDeviceData patientVestDeviceRecord = getPatientVestDeviceData(
+						log_segment, logcount);
+				if(!patientVestDeviceRecord.getEventId().startsWith("0"))
+					patientVestDeviceRecords.add(patientVestDeviceRecord);
+			}
 			
-			PatientVestDeviceData patientVestDeviceRecord = getPatientVestDeviceData(
-					log_segment, logcount);
 			logcount++;
 			start = 32 * 2 + (logcount - 1) * RECORD_SIZE * 2;
 			end = 32 * 2 + (logcount * RECORD_SIZE * 2);
-			if(!patientVestDeviceRecord.getEventId().startsWith("0"))
-				patientVestDeviceRecords.add(patientVestDeviceRecord);
 		}
 		return patientVestDeviceRecords;
 	}

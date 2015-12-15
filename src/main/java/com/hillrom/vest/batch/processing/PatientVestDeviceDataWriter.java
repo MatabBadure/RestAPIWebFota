@@ -23,6 +23,5 @@ public class PatientVestDeviceDataWriter implements ItemWriter<List<PatientVestD
 				deviceDataRepository.save(devData);
 			}
 		}
-		BatchUtil.flag = false;
 	}
 }

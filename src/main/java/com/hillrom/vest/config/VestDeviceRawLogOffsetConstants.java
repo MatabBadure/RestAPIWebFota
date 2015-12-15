@@ -25,5 +25,5 @@ public class VestDeviceRawLogOffsetConstants {
 	public static int TOTAL_RECORDS_END_OFFSET = 62;//2(30-1)+2*2
 	public static int CHECKSUM_START_OFFSET = 62;//2(32-1)
 	public static int CHECKSUM_END_OFFSET = 64;//2(32-1)+2
-	
+	public static final String INFO_PACKET_HEADER = "2449";
 }

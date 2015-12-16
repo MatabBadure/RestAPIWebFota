@@ -116,8 +116,9 @@ public class PatientComplianceService {
 
 		List<Notification> notifications = notificationService.findNotificationsByUserIdAndDateRange(patientUserId,fromDate,toDate);
 		Map<LocalDate,List<Notification>> notificationsMap = notifications.stream().collect(Collectors.groupingBy(Notification:: getDate));
+		SortedMap<LocalDate,PatientCompliance> actualMapRequested = complianceMap.tailMap(from);
 		List<AdherenceTrendVO> adherenceTrends = new LinkedList<>();
-		for(LocalDate date: complianceMap.keySet()){
+		for(LocalDate date: actualMapRequested.keySet()){
 			AdherenceTrendVO trendVO = new AdherenceTrendVO();
 			PatientCompliance compliance = complianceMap.get(date);
 			trendVO.setDate(date);

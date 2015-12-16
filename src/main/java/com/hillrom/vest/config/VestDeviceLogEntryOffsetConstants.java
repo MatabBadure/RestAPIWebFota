@@ -33,6 +33,7 @@ public class VestDeviceLogEntryOffsetConstants {
 	public static int DURATION_END_OFFSET = 30;//2(15-1)+2
 	public static int CHECKSUM_START_OFFSET = 30;//2(16-1)
 	public static int CHECKSUM_END_OFFSET = 32;//2(16-1)+2
+	public static final String DATA_PACKET_HEADER = "2456";
 
 }
 

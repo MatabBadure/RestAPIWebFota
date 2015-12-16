@@ -387,7 +387,7 @@ public class PatientVestDeviceTherapyUtil {
 			;
 			break;
 		default:
-			eventString = eventCode + ":Unknown";
+			eventString = 0 + ":Unknown";
 			break;
 		}
 		return eventString;

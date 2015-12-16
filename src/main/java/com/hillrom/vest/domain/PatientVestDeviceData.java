@@ -11,6 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -178,8 +180,8 @@ public class PatientVestDeviceData implements Serializable,Comparable<PatientVes
 	}	
 
 	@JsonIgnore
-	public LocalDate getDate(){
-		return LocalDate.fromDateFields(new Date(this.timestamp));
+	public DateTime getDate(){
+		return new DateTime(this.timestamp);
 	}
 	
 	@JsonIgnore

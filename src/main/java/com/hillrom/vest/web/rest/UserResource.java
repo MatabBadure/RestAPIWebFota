@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -256,39 +257,6 @@ public class UserResource {
   		
 
   	}
-   //For Patients associated with HCP in Admin
-   @RequestMapping(value = "/user/hcp/{id}/patient/clinicinfo/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	
-	public ResponseEntity<?> searchPatientAssociatedToHcpByClinic(@PathVariable Long id,
-			@RequestParam(required = true, value = "searchString") String searchString,
-			@RequestParam(required = false, value = "clinicId") String clinicId,
-			@RequestParam(required = false, value = "filter") String filter,
-			@RequestParam(value = "page", required = false) Integer offset,
-			@RequestParam(value = "per_page", required = false) Integer limit,
-			@RequestParam(value = "sort_by", required = false) String sortBy,
-			@RequestParam(value = "asc", required = false) Boolean isAscending)
-			throws URISyntaxException {
-		if(searchString.endsWith("_")){
-		   searchString = searchString.replace("_", "\\\\_");
-		}
-		String queryString = new StringBuilder("'%").append(searchString)
-				.append("%'").toString();
-		Map<String, Boolean> sortOrder = new HashMap<>();
-		if (StringUtils.isNotBlank(sortBy)) {
-			isAscending = (isAscending != null) ? isAscending : true;
-			if(sortBy.equalsIgnoreCase("email"))
-				sortOrder.put("user." + sortBy, isAscending);
-			else	
-				sortOrder.put(sortBy, isAscending);
-		}
-		Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientToHCPAndClinicBy(
-				queryString, id, clinicId, filter, PaginationUtil.generatePageRequest(offset, limit),
-				sortOrder);
-		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
-				page, "/user/hcp/"+id+"/patient/search", offset, limit);
-		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
-
-	}
 
 
    @RequestMapping(value = "/user/clinic/{clinicId}/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -734,10 +702,11 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> exportVestDeviceData(
 			@PathVariable Long id,
-			@RequestParam(value="from",required=true)Long from,
-			@RequestParam(value="to",required=false)Long to) {
-		to = Objects.nonNull(to)?to:new Date().getTime();
-		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, from, to);
+			@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+			@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
+		Long fromTimestamp = from.toDateTimeAtStartOfDay().getMillis();
+		Long toTimestamp = to.toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59).getMillis();
+		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
 		return new ResponseEntity<>(vestDeviceData,HttpStatus.OK);
 	}
 	
@@ -746,11 +715,13 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public void exportVestDeviceDataCSV(
 			@PathVariable Long id,
-			@RequestParam(value="from",required=true)Long from,
-			@RequestParam(value="to",required=false)Long to,
+			@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+			@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
 			HttpServletResponse response) {
-		to = Objects.nonNull(to)?to:new Date().getTime();
-		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, from, to);
+		
+		Long fromTimestamp = from.toDateTimeAtStartOfDay().getMillis();
+		Long toTimestamp = to.toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59).getMillis();
+		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
 		ICsvBeanWriter beanWriter = null;
     	CellProcessor[] processors = CsvUtil.getCellProcessorForVestDeviceData();
     	try {

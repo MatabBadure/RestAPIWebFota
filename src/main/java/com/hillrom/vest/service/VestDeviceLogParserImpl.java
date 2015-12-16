@@ -43,6 +43,7 @@ import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.SECOND_S
 import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.YEAR_END_OFFSET;
 import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.YEAR_START_OFFSET;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.getEventStringByEventCode;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.DATA_PACKET_HEADER;
 
 import java.util.Calendar;
 import java.util.LinkedList;
@@ -59,6 +60,8 @@ import com.hillrom.vest.batch.processing.PatientVestDeviceDataDeltaReader;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.service.util.ParserUtil;
+import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.getEventStringByEventCode;
+import static com.hillrom.vest.config.VestDeviceRawLogOffsetConstants.INFO_PACKET_HEADER;
 
 @Component
 public class VestDeviceLogParserImpl implements DeviceLogParser {
@@ -166,14 +169,16 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 			String log_segment = base16String.substring(start, end);
 			
 			log.debug("Data packet : "+log_segment);
+			if(log_segment.startsWith(DATA_PACKET_HEADER)){
+				PatientVestDeviceData patientVestDeviceRecord = getPatientVestDeviceData(
+						log_segment, logcount);
+				if(!patientVestDeviceRecord.getEventId().startsWith("0"))
+					patientVestDeviceRecords.add(patientVestDeviceRecord);
+			}
 			
-			PatientVestDeviceData patientVestDeviceRecord = getPatientVestDeviceData(
-					log_segment, logcount);
 			logcount++;
 			start = 32 * 2 + (logcount - 1) * RECORD_SIZE * 2;
 			end = 32 * 2 + (logcount * RECORD_SIZE * 2);
-			if(!patientVestDeviceRecord.getEventId().startsWith("0"))
-				patientVestDeviceRecords.add(patientVestDeviceRecord);
 		}
 		return patientVestDeviceRecords;
 	}

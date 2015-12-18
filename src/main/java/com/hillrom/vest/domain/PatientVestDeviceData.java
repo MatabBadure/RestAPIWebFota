@@ -1,7 +1,9 @@
 package com.hillrom.vest.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -185,8 +187,16 @@ public class PatientVestDeviceData implements Serializable,Comparable<PatientVes
 	}
 	
 	@JsonIgnore
-	public double getHmrInMinutes(){
-		return this.hmr/60;
+	public double getHmrInHours(){
+		if(Objects.nonNull(hmr))
+			return new BigDecimal(this.hmr/(60*60) ).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+		else
+			return 0;
+	}
+	
+	@JsonIgnore
+	public String getPatientBlueToothAddress(){
+		return "PAT_ID:BT:"+this.bluetoothId;
 	}
 
 	@Override

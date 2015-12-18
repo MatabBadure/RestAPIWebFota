@@ -23,6 +23,7 @@ import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.SecurityQuestion;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserSecurityQuestion;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.AuthorityRepository;
 import com.hillrom.vest.repository.SecurityQuestionRepository;
 import com.hillrom.vest.repository.UserRepository;
@@ -76,20 +77,20 @@ public class UserSecurityQuestionServiceTest {
 	}
 	
 	@Test
-	public void createUserSecurityQuestionSuccessfully(){
+	public void createUserSecurityQuestionSuccessfully() throws HillromException{
 		Optional<UserSecurityQuestion> mayBeSaved = securityQuestionService.saveOrUpdate(user.getId(), question.getId(), ANSWER);
 		assertThat(mayBeSaved.isPresent()).isTrue();
 		assertThat(mayBeSaved.get().getAnswer()).isEqualTo(ANSWER);
 	}
 	
 	@Test
-	public void failCreateUserSecurityQuestion(){
+	public void failCreateUserSecurityQuestion() throws HillromException{
 		Optional<UserSecurityQuestion> mayBeSaved = securityQuestionService.saveOrUpdate(user.getId(), null, ANSWER);
 		assertThat(mayBeSaved.isPresent()).isFalse();
 	}
 	
 	@Test
-	public void updateUserSecurityQuestionSuccessfully(){
+	public void updateUserSecurityQuestionSuccessfully() throws HillromException{
 		Optional<UserSecurityQuestion> mayBeSaved = securityQuestionService.saveOrUpdate(user.getId(), question.getId(), ANSWER);
 		mayBeSaved = securityQuestionService.findOneByUserIdAndQuestionId(user.getId(), question.getId());
 		mayBeSaved.get().setAnswer(PASSWORD);
@@ -100,8 +101,13 @@ public class UserSecurityQuestionServiceTest {
 	
 	@Test
 	public void failUpdateUserSecurityQuestion(){
-		Optional<UserSecurityQuestion> updated = securityQuestionService.saveOrUpdate(user.getId(), question.getId(), null);
-		assertThat(updated.isPresent()).isFalse();
+		Optional<UserSecurityQuestion> updated;
+		try {
+			updated = securityQuestionService.saveOrUpdate(user.getId(), question.getId(), null);
+			assertThat(updated.isPresent()).isFalse();
+		} catch (HillromException e) {
+		}
+		
 	}
 	
 	private User createUser() {

@@ -1591,20 +1591,18 @@ public class UserService {
 		}
 	}
 	
-	public JSONObject getSecurityQuestion(Long userId) throws HillromException {
+	public UserSecurityQuestion getSecurityQuestion(Long userId) throws HillromException {
 		User existingUser = userRepository.findOne(userId);
-		JSONObject jsonObject = new JSONObject();
 		if(Objects.nonNull(existingUser)){
-			List<UserSecurityQuestion> userSecurityQuestionList = userSecurityQuestionService.findByUserId(userId);
-			if(userSecurityQuestionList.isEmpty()){
-				jsonObject.put("ERROR", ExceptionConstants.HR_602);
+			Optional<UserSecurityQuestion> userSecurityQuestionOptional = userSecurityQuestionService.findByUserId(userId);
+			if(userSecurityQuestionOptional.isPresent()){
+				throw new HillromException(ExceptionConstants.HR_608);
 			} else {
-				jsonObject.put("question",userSecurityQuestionList.get(userSecurityQuestionList.size()-1).getSecurityQuestion());
+				return userSecurityQuestionOptional.get();
 			}
 		}else{
 			throw new HillromException(ExceptionConstants.HR_512);//User Doesn't exist
 		}
-		return jsonObject;
 	}
 	
 	public JSONObject reactivateUser(Long id) throws HillromException {

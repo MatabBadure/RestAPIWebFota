@@ -120,7 +120,7 @@ public class UserExtensionResource {
     }
 
     /**
-     * PUT  /user/:id -> Updates an existing user.
+     * PUT  /user/:id -> Updates an existing user. Associate should also be able to update
      */
     @RequestMapping(value = "/user/{id}",
         method = RequestMethod.PUT,

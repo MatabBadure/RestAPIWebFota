@@ -1,6 +1,6 @@
 package com.hillrom.vest.service;
 
-import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -10,9 +10,11 @@ import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.domain.SecurityQuestion;
 import com.hillrom.vest.domain.UserSecurityQuestion;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.SecurityQuestionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSecurityQuestionRepository;
+import com.hillrom.vest.util.ExceptionConstants;
 
 @Service
 @Transactional
@@ -27,7 +29,7 @@ public class UserSecurityQuestionService {
 	@Inject
 	private SecurityQuestionRepository questionRepository;
 	
-	public List<UserSecurityQuestion> findByUserId(Long userId){
+	public Optional<UserSecurityQuestion> findByUserId(Long userId){
 		return userSecurityQuestionRepository.findByUserId(userId);
 	}
 	
@@ -39,25 +41,28 @@ public class UserSecurityQuestionService {
 		return userSecurityQuestionRepository.findOneByUserIdAndQuestionId(userId,questionId);
 	}
 	
-	public Optional<UserSecurityQuestion> saveOrUpdate(Long userId,Long questionId,String answer){
-		if(null == userId || null == questionId || null == answer)
-			return Optional.empty();
-		Optional<UserSecurityQuestion> fromDatabase = findOneByUserIdAndQuestionId(userId, questionId);
+	public Optional<UserSecurityQuestion> saveOrUpdate(Long userId,Long questionId,String answer) throws HillromException{
+		if(Objects.isNull(userId) || Objects.isNull(questionId) || Objects.isNull(answer))
+			throw new HillromException(ExceptionConstants.HR_502);
+		
+		SecurityQuestion question = questionRepository.findOne(questionId);
+		if(Objects.isNull(question)){
+			throw new HillromException(ExceptionConstants.HR_557);
+		}
+		
+		UserSecurityQuestion userSecurityQuestion;
+		Optional<UserSecurityQuestion> fromDatabase = findByUserId(userId);
 		if(fromDatabase.isPresent()){
-			UserSecurityQuestion userSecQ = fromDatabase.get(); 
-			userSecQ.setAnswer(answer);
-			return Optional.of(userSecurityQuestionRepository.save(userSecQ));
-		}else{
-			UserSecurityQuestion userSecurityQuestion = new  UserSecurityQuestion();
+			userSecurityQuestion = fromDatabase.get(); 
+			userSecurityQuestion.setSecurityQuestion(question);
 			userSecurityQuestion.setAnswer(answer);
-			SecurityQuestion question = questionRepository.findOne(questionId);
-			if(null == question){
-				return Optional.empty();
-			}
+			return Optional.of(userSecurityQuestionRepository.save(userSecurityQuestion));
+		} else {
+			userSecurityQuestion = new  UserSecurityQuestion();
+			userSecurityQuestion.setAnswer(answer);
 			userSecurityQuestion.setSecurityQuestion(question);
 			userSecurityQuestion.setUser(userRepository.findOne(userId));
-			return Optional.of(userSecurityQuestionRepository.save(userSecurityQuestion));						
+			return Optional.of(userSecurityQuestionRepository.save(userSecurityQuestion));
 		}
 	}
-
 }

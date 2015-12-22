@@ -12,9 +12,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.envers.Audited;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
+@Audited
 @Table(name="USER_SECURITY_QUESTION")
 public class UserSecurityQuestion {
 	@Id

@@ -68,11 +68,11 @@ public class ExcelOutputService {
 			
 			HSSFCell dateCell = excelRow.createCell(1);
 			dateCell.setCellValue(deviceEvent.getDate().toDate());
-			dateCell.setCellStyle(createCellStyle(workBook,"mm/dd/yyyy"));
+			dateCell.setCellStyle(createCellStyle(workBook,"m/d/yy"));
 			
 			HSSFCell timeCell = excelRow.createCell(2);
 			timeCell.setCellValue(deviceEvent.getDate().toDate());
-			timeCell.setCellStyle(createCellStyle(workBook,"hh:mm aa"));
+			timeCell.setCellStyle(createCellStyle(workBook,"h:mm AM/PM"));
 			
 			excelRow.createCell(3).setCellValue(deviceEvent.getEventId());
 			excelRow.createCell(4).setCellValue(deviceEvent.getSerialNumber());

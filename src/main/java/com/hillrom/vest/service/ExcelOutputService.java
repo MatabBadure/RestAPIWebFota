@@ -24,6 +24,7 @@ import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CreationHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -62,17 +63,20 @@ public class ExcelOutputService {
 	
 	public void setExcelRows(HSSFWorkbook workBook,HSSFSheet excelSheet, List<PatientVestDeviceData> deviceEventsList){
 		int record = 1;
+		HSSFCellStyle dateStyle = createCellStyle(workBook,"m/d/yy");
+		HSSFCellStyle timeStyle = createCellStyle(workBook,"h:mm AM/PM");
 		for (PatientVestDeviceData deviceEvent : deviceEventsList) {
 			HSSFRow excelRow = excelSheet.createRow(record++);
 			excelRow.createCell(0).setCellValue(deviceEvent.getPatientBlueToothAddress());
 			
 			HSSFCell dateCell = excelRow.createCell(1);
+			dateCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
 			dateCell.setCellValue(deviceEvent.getDate().toDate());
-			dateCell.setCellStyle(createCellStyle(workBook,"m/d/yy"));
+			dateCell.setCellStyle(dateStyle);
 			
 			HSSFCell timeCell = excelRow.createCell(2);
 			timeCell.setCellValue(deviceEvent.getDate().toDate());
-			timeCell.setCellStyle(createCellStyle(workBook,"h:mm AM/PM"));
+			timeCell.setCellStyle(timeStyle);
 			
 			excelRow.createCell(3).setCellValue(deviceEvent.getEventId());
 			excelRow.createCell(4).setCellValue(deviceEvent.getSerialNumber());
@@ -85,10 +89,15 @@ public class ExcelOutputService {
 		}
 	}
 	
-	public HSSFCellStyle createCellStyle(HSSFWorkbook workbook,String dataFormat){
-		HSSFCellStyle hssfCellStyle = workbook.createCellStyle();
+	public HSSFCellStyle createCellStyle(HSSFWorkbook workBook,String dataFormat){
+		HSSFCellStyle hssfCellStyle = workBook.createCellStyle();
 		if(Objects.nonNull(dataFormat)){
-			hssfCellStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(dataFormat));	
+			CreationHelper createHelper = workBook.getCreationHelper();
+	        // Set the date format of date
+			hssfCellStyle.setDataFormat(createHelper.createDataFormat().getFormat(
+	                dataFormat));
+			hssfCellStyle.setWrapText(true);
+			//hssfCellStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(dataFormat));	
 		}
 		return hssfCellStyle;
 	} 

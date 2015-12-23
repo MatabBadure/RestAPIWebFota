@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -44,11 +43,14 @@ public class ExcelOutputService {
         
         HSSFWorkbook workBook = new HSSFWorkbook();
         HSSFSheet excelSheet = workBook.createSheet("Therapy Report");
+        /* Freeze top row alone */
+        excelSheet.createFreezePane(0,1);
     	String[] header = { PATIENT_ID,DATE,TIME, EVENT,
 				SERIAL_NO, DEVICE_ADDRESS, HUB_ADDRESS, FREQUENCY, PRESSURE,DURATION,HMR};
         setExcelHeader(excelSheet,header);
         setExcelRows(workBook, excelSheet, deviceEventsList);
-     
+        autoSizeColumns(excelSheet,11);
+        
         workBook.write(response.getOutputStream());
         response.getOutputStream().flush();
 	}
@@ -89,6 +91,8 @@ public class ExcelOutputService {
 		}
 	}
 	
+	
+	
 	public HSSFCellStyle createCellStyle(HSSFWorkbook workBook,String dataFormat){
 		HSSFCellStyle hssfCellStyle = workBook.createCellStyle();
 		if(Objects.nonNull(dataFormat)){
@@ -97,8 +101,13 @@ public class ExcelOutputService {
 			hssfCellStyle.setDataFormat(createHelper.createDataFormat().getFormat(
 	                dataFormat));
 			hssfCellStyle.setWrapText(true);
-			//hssfCellStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(dataFormat));	
 		}
 		return hssfCellStyle;
-	} 
+	}
+	
+	public void autoSizeColumns(HSSFSheet excelSheet,int columnCount){
+		for (int i = 0; i < columnCount; i++){
+			excelSheet.autoSizeColumn(i);
+		}
+	}
 }

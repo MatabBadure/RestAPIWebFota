@@ -81,7 +81,7 @@ public final class Constants {
 
 	public static final String HMR_IN_HOURS = "hmrInHours";
 
-	public static final String DURATION = "duration";
+	public static final String DURATION = "Duration";
 
 	public static final String HUB_ID = "hubId";
 
@@ -93,7 +93,7 @@ public final class Constants {
 
 	public static final String SEQUENCE_NUMBER = "sequenceNumber";
 
-	public static final String HMR = "hmr";
+	public static final String HMR = "Hmr";
 
 	public static final String HUB_ADDRESS = "Hub Id";
 

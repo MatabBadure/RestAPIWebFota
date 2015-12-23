@@ -587,7 +587,7 @@ public class UserService {
         		}
         	} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))
         			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ASSOCIATES))) {
-	        	if(SecurityUtils.getCurrentLogin().equals(existingUser.getEmail())) {
+	        	if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
 	        		UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
 	        		if(Objects.nonNull(user.getId())) {
 	        			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
@@ -1074,7 +1074,7 @@ public class UserService {
 					deletePatientUser(existingUser);
 					jsonObject.put("message", MessageConstants.HR_214);
 				} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ADMIN))) {
-					if(SecurityUtils.getCurrentLogin().equals(existingUser.getEmail())) {
+					if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
 						throw new HillromException(ExceptionConstants.HR_520);
 					}
 					existingUser.setDeleted(true);

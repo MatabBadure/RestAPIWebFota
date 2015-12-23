@@ -1596,9 +1596,9 @@ public class UserService {
 		if(Objects.nonNull(existingUser)){
 			Optional<UserSecurityQuestion> userSecurityQuestionOptional = userSecurityQuestionService.findByUserId(userId);
 			if(userSecurityQuestionOptional.isPresent()){
-				throw new HillromException(ExceptionConstants.HR_608);
+				return userSecurityQuestionOptional.get();				
 			} else {
-				return userSecurityQuestionOptional.get();
+				throw new HillromException(ExceptionConstants.HR_608);
 			}
 		}else{
 			throw new HillromException(ExceptionConstants.HR_512);//User Doesn't exist

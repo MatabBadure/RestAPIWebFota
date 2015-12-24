@@ -587,7 +587,7 @@ public class UserService {
         		}
         	} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))
         			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ASSOCIATES))) {
-	        	if(SecurityUtils.getCurrentLogin().equals(existingUser.getEmail())) {
+	        	if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
 	        		UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
 	        		if(Objects.nonNull(user.getId())) {
 	        			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
@@ -1074,7 +1074,7 @@ public class UserService {
 					deletePatientUser(existingUser);
 					jsonObject.put("message", MessageConstants.HR_214);
 				} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ADMIN))) {
-					if(SecurityUtils.getCurrentLogin().equals(existingUser.getEmail())) {
+					if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
 						throw new HillromException(ExceptionConstants.HR_520);
 					}
 					existingUser.setDeleted(true);
@@ -1591,20 +1591,18 @@ public class UserService {
 		}
 	}
 	
-	public JSONObject getSecurityQuestion(Long userId) throws HillromException {
+	public UserSecurityQuestion getSecurityQuestion(Long userId) throws HillromException {
 		User existingUser = userRepository.findOne(userId);
-		JSONObject jsonObject = new JSONObject();
 		if(Objects.nonNull(existingUser)){
-			List<UserSecurityQuestion> userSecurityQuestionList = userSecurityQuestionService.findByUserId(userId);
-			if(userSecurityQuestionList.isEmpty()){
-				jsonObject.put("ERROR", ExceptionConstants.HR_602);
+			Optional<UserSecurityQuestion> userSecurityQuestionOptional = userSecurityQuestionService.findByUserId(userId);
+			if(userSecurityQuestionOptional.isPresent()){
+				return userSecurityQuestionOptional.get();				
 			} else {
-				jsonObject.put("question",userSecurityQuestionList.get(userSecurityQuestionList.size()-1).getSecurityQuestion());
+				throw new HillromException(ExceptionConstants.HR_608);
 			}
 		}else{
 			throw new HillromException(ExceptionConstants.HR_512);//User Doesn't exist
 		}
-		return jsonObject;
 	}
 	
 	public JSONObject reactivateUser(Long id) throws HillromException {

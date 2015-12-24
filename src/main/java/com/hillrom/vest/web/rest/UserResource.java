@@ -1,7 +1,7 @@
 package com.hillrom.vest.web.rest;
 
-import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
 import static com.hillrom.vest.security.AuthoritiesConstants.CLINIC_ADMIN;
+import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -18,8 +18,9 @@ import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
+import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang.StringUtils;
-import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +60,7 @@ import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.AdherenceCalculationService;
+import com.hillrom.vest.service.ExcelOutputService;
 import com.hillrom.vest.service.PatientComplianceService;
 import com.hillrom.vest.service.PatientHCPService;
 import com.hillrom.vest.service.PatientProtocolService;
@@ -76,8 +78,6 @@ import com.hillrom.vest.web.rest.dto.StatisticsVO;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
-
-import net.minidev.json.JSONObject;
 /**
  * REST controller for managing users.
  */
@@ -125,7 +125,9 @@ public class UserResource {
 	
 	@Inject
 	private PatientComplianceService patientComplianceService;
-	
+
+	@Inject
+	private ExcelOutputService excelOutputService;
 	/**
 	 * GET /users -> get all users.
 	 */
@@ -711,8 +713,8 @@ public class UserResource {
 	}
 	
 	@RequestMapping(value = "/users/{id}/exportVestDeviceDataCSV",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+			produces="application/vnd.ms-excel",
+            method = RequestMethod.GET)
 	public void exportVestDeviceDataCSV(
 			@PathVariable Long id,
 			@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
@@ -722,32 +724,15 @@ public class UserResource {
 		Long fromTimestamp = from.toDateTimeAtStartOfDay().getMillis();
 		Long toTimestamp = to.toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59).getMillis();
 		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
-		ICsvBeanWriter beanWriter = null;
-    	CellProcessor[] processors = CsvUtil.getCellProcessorForVestDeviceData();
     	try {
-            beanWriter = new CsvBeanWriter(response.getWriter(),
-                    CsvPreference.STANDARD_PREFERENCE);
-			String[] header = CsvUtil.getHeaderValuesForVestDeviceDataCSV();
-			String[] headerMapping = CsvUtil.getHeaderMappingForVestDeviceData();
             if(vestDeviceData.size() > 0 ){
-            	beanWriter.writeHeader(header);
-                for (PatientVestDeviceData deviceData : vestDeviceData) {
-                    beanWriter.write(deviceData, headerMapping,processors);
-                }
+            	excelOutputService.createExcelOutputExcel(response, vestDeviceData);
             }else{
             	response.setStatus(204);
             }
         } catch (Exception ex) {
         	response.setStatus(500);
-        } finally {
-            if (beanWriter != null) {
-                try {
-                    beanWriter.close();
-                } catch (IOException ex) {
-                	response.setStatus(500);
-                }
-            }
-        }
+        } 
 	}
 	
 	/**
@@ -986,16 +971,13 @@ public class UserResource {
 		log.debug("REST request to get Security Question for user {}",id);
 		JSONObject jsonObject = new JSONObject();
 		try {
-			jsonObject = userService.getSecurityQuestion(id);
+			jsonObject.put("question", userService.getSecurityQuestion(id));
 			jsonObject.put("message", MessageConstants.HR_304);
+			return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.OK);
 		} catch (HillromException e) {
 			jsonObject.put("ERROR",e.getMessage());
 			return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.BAD_REQUEST);
 		}
-		if(jsonObject.containsKey("ERROR")){
-			return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.BAD_REQUEST);
-		}
-		return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.OK);
 	}
     
     @RequestMapping(value="/user/{id}/adherenceTrend",

@@ -122,13 +122,13 @@ public class AdherenceCalculationService {
 	 * @return
 	 */
 	public boolean isHMRCompliant(ProtocolConstants protocolConstant,
-			double actualTotalDuration) {
+			double actualTotalDuration3Days) {
 		// Custom Protocol, Min/Max Duration calculation is done
 		int minHMRReading = Objects.nonNull(protocolConstant
 				.getMinDuration()) ? protocolConstant.getMinDuration()
 				: protocolConstant.getTreatmentsPerDay()
 						* protocolConstant.getMinMinutesPerTreatment();
-		if(minHMRReading > actualTotalDuration ){
+		if(minHMRReading > Math.round(actualTotalDuration3Days/3)){
 			return false;
 		}
 		return true;

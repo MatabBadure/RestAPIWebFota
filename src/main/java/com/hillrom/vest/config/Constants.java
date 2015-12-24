@@ -63,7 +63,7 @@ public final class Constants {
 
 	public static final String PROGRAMMED_COUGH_PAUSES = "Programmed Cough Pauses";
 
-	public static final String MINUTES = "Minutes";
+	public static final String MINUTES = "Duration";
 
 	public static final String PRESSURE = "Pressure";
 
@@ -79,9 +79,9 @@ public final class Constants {
 
 	public static final String DATE = "Date";
 
-	public static final String HMR_IN_MINUTES = "hmrInMinutes";
+	public static final String HMR_IN_HOURS = "hmrInHours";
 
-	public static final String DURATION = "duration";
+	public static final String DURATION = "Duration";
 
 	public static final String HUB_ID = "hubId";
 
@@ -93,7 +93,7 @@ public final class Constants {
 
 	public static final String SEQUENCE_NUMBER = "sequenceNumber";
 
-	public static final String HMR = "hmr";
+	public static final String HMR = "Hmr";
 
 	public static final String HUB_ADDRESS = "Hub Id";
 
@@ -126,4 +126,10 @@ public final class Constants {
 	public static final String INACTIVE = "inactive";
 	
 	public static final String EXPIRED = "expired";
+	
+	public static final String TIME = "Time";
+	
+	public static final String PATIENT_ID = "Patient Id";
+	
+	public static final String PATIENT_BLUETOOTH_ADDRESS = "patientBlueToothAddress";
 }

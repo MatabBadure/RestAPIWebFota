@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.service.PatientVestDeviceDataService;
-import com.hillrom.vest.service.util.RequestUtil;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
+
 
 @RestController
 @RequestMapping("/api")
@@ -45,29 +45,18 @@ public class PatientVestDeviceDataResource {
 	public ResponseEntity<?> receiveData(@RequestBody(required=true)String rawMessage){
 		log.debug("Received Data for ingestion : ",rawMessage);
 		try{
-			rawMessage = rawMessage.replaceAll("\n", "").replaceAll(" ","");
-			String reqParams[] = new String[]{"device_data",
-	        "device_serial_number","hub_id","hub_receive_time","device_address"};
 			JSONObject jsonObject = new JSONObject();
-			if(!rawMessage.contains("&")){
-				jsonObject.put("ERROR","Missing Params : "+String.join(",", reqParams));
-				return new ResponseEntity(jsonObject,HttpStatus.BAD_REQUEST);
-			}
-			jsonObject = RequestUtil.checkRequiredParamsInQueryString(rawMessage, reqParams);
-			if(jsonObject.containsKey("ERROR")){
-				return new ResponseEntity(jsonObject,HttpStatus.BAD_REQUEST);
-			};
-			ExitStatus exitStatus = deviceDataService.saveData(rawMessage);
+			ExitStatus exitStatus = deviceDataService.saveData(rawMessage.replaceAll("\n", "").replaceAll(" ", ""));
 			jsonObject.put("message",exitStatus.getExitCode());
 			if(ExitStatus.COMPLETED.equals(exitStatus))
-				return new ResponseEntity(jsonObject,HttpStatus.CREATED);
+				return new ResponseEntity<>(jsonObject,HttpStatus.CREATED);
 			else
-				return new ResponseEntity(jsonObject,HttpStatus.PARTIAL_CONTENT);
+				return new ResponseEntity<>(jsonObject,HttpStatus.PARTIAL_CONTENT);
 		}catch(Exception e){
 			e.printStackTrace();
 			JSONObject error = new JSONObject();
 			error.put("ERROR", e.getMessage());
-			return new ResponseEntity(error,HttpStatus.PARTIAL_CONTENT);
+			return new ResponseEntity<>(error,HttpStatus.PARTIAL_CONTENT);
 		}
 	}
 	

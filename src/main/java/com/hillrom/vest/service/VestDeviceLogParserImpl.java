@@ -45,6 +45,7 @@ import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.YEAR_STA
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.getEventStringByEventCode;
 import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.DATA_PACKET_HEADER;
 
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,6 +61,7 @@ import com.hillrom.vest.batch.processing.PatientVestDeviceDataDeltaReader;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.service.util.ParserUtil;
+
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.getEventStringByEventCode;
 import static com.hillrom.vest.config.VestDeviceRawLogOffsetConstants.INFO_PACKET_HEADER;
 
@@ -184,7 +186,7 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 	}
 
 	private PatientVestDeviceData getPatientVestDeviceData(String base16String,
-			int sequenceNumber) {
+			int sequenceNumber) throws Exception{
 		PatientVestDeviceData patientVestDeviceData = new PatientVestDeviceData();
 		patientVestDeviceData.setSequenceNumber(sequenceNumber);
 		patientVestDeviceData.setHmr(getPatientVestDeviceDataHMR(base16String));
@@ -246,7 +248,7 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 		return eventCode;
 	}
 
-	private long getPatientVestDeviceDataTimeStamp(String base16String) {
+	private long getPatientVestDeviceDataTimeStamp(String base16String) throws Exception{
 		String yearString = ParserUtil.getFieldByStartAndEndOffset(
 				base16String, YEAR_START_OFFSET, YEAR_END_OFFSET);
 		int year = 2000 + ParserUtil.convertHexStringToInteger(yearString);
@@ -265,6 +267,11 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 		String secondString = ParserUtil.getFieldByStartAndEndOffset(
 				base16String,SECOND_START_OFFSET,SECOND_END_OFFSET);
 		int second = ParserUtil.convertHexStringToInteger(secondString);
+		
+		if(year > LocalDate.now().getYear()){
+			throw new IllegalArgumentException("Could not parse data, Invalid YEAR : "+year);
+		}
+		
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(year, month-1, day, hour, minute, second);
 		return calendar.getTimeInMillis()/1000;

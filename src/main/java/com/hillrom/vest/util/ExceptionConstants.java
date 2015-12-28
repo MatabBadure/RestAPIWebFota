@@ -67,8 +67,8 @@ public class ExceptionConstants {
     public static final String HR_554 = "Invalid Data";
     public static final String HR_555 = "Incorrect Data";
     public static final String HR_556 = "Invalid Reset Key";
-    public static final String HR_557 = "Invalid Security Question or Answer";//Is it same as HR_505?
-    public static final String HR_558 = "Forbidden";//Is it same as HR_505?
+    public static final String HR_557 = "Invalid Security Question or Answer";
+    public static final String HR_558 = "Forbidden";
     
     // Protocol
     public static final String HR_551 = "No such protocol found for patient.";
@@ -95,6 +95,7 @@ public class ExceptionConstants {
     public static final String HR_576 = "Unable to get clinic admin.";
     public static final String HR_577 = "Unable to update Caregiver User.";
     public static final String HR_578 = "This bluetooth id is already linked to patient ";
+    public static final String HR_579 = "Unable to update Associate User.";
     
     public static final String HR_581 = "No Patient Associated with HCP.";
     public static final String HR_582 = "No Clinics Associated with HCP.";
@@ -126,6 +127,7 @@ public class ExceptionConstants {
     public static final String HR_604 = "Unable to activate User";
     public static final String HR_605 = "User is already in active state.";
     public static final String HR_606 = "Activation link can not be sent.";
+    public static final String HR_608 = "No security question available";
     
     public static final String HR_701 = "Note date cannot be before first  transmission date."; 
     

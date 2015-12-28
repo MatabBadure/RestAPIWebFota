@@ -587,7 +587,7 @@ public class UserService {
         		}
         	} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))
         			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ASSOCIATES))) {
-	        	if(SecurityUtils.getCurrentLogin().equals(existingUser.getEmail())) {
+	        	if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
 	        		UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
 	        		if(Objects.nonNull(user.getId())) {
 	        			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
@@ -649,7 +649,7 @@ public class UserService {
     		} else {
     			throw new HillromException(ExceptionConstants.HR_575);//Unable to update Clinic Admin.
     		}
-        } if (AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())) {
+        } else if (AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updateCareGiverUser(existingUser, userExtensionDTO);
     		if(Objects.nonNull(user.getId())) {
     			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
@@ -658,6 +658,16 @@ public class UserService {
                 return user;
     		} else {
     			throw new HillromException(ExceptionConstants.HR_577);//Unable to update Care Giver.
+    		}
+        }else if (AuthoritiesConstants.ASSOCIATES.equals(userExtensionDTO.getRole())) {
+           	UserExtension user = updateAssociateUser(existingUser, userExtensionDTO);
+    		if(Objects.nonNull(user.getId())) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
+    				sendEmailNotification(baseUrl, user);
+    			}
+                return user;
+    		} else {
+    			throw new HillromException(ExceptionConstants.HR_579);//Unable to update Associate User.
     		}
         } else {
         	throw new HillromException(ExceptionConstants.HR_555);//Incorrect data
@@ -759,6 +769,14 @@ public class UserService {
 		log.debug("Updated Information for Care Giver User : {}", caregiverUser);
 		return caregiverUser;
 	}
+    
+    public UserExtension updateAssociateUser(UserExtension associateUser, UserExtensionDTO userExtensionDTO) {
+		assignValuesToUserObj(userExtensionDTO, associateUser);
+		userExtensionRepository.saveAndFlush(associateUser);
+		log.debug("Updated Information for Care Giver User : {}", associateUser);
+		return associateUser;
+	}
+
 
 	private void assignValuesToPatientInfoObj(UserExtensionDTO userExtensionDTO, PatientInfo patientInfo) {
 		patientInfo.setHillromId(userExtensionDTO.getHillromId());
@@ -1056,7 +1074,7 @@ public class UserService {
 					deletePatientUser(existingUser);
 					jsonObject.put("message", MessageConstants.HR_214);
 				} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ADMIN))) {
-					if(SecurityUtils.getCurrentLogin().equals(existingUser.getEmail())) {
+					if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
 						throw new HillromException(ExceptionConstants.HR_520);
 					}
 					existingUser.setDeleted(true);
@@ -1573,20 +1591,18 @@ public class UserService {
 		}
 	}
 	
-	public JSONObject getSecurityQuestion(Long userId) throws HillromException {
+	public UserSecurityQuestion getSecurityQuestion(Long userId) throws HillromException {
 		User existingUser = userRepository.findOne(userId);
-		JSONObject jsonObject = new JSONObject();
 		if(Objects.nonNull(existingUser)){
-			List<UserSecurityQuestion> userSecurityQuestionList = userSecurityQuestionService.findByUserId(userId);
-			if(userSecurityQuestionList.isEmpty()){
-				jsonObject.put("ERROR", ExceptionConstants.HR_602);
+			Optional<UserSecurityQuestion> userSecurityQuestionOptional = userSecurityQuestionService.findByUserId(userId);
+			if(userSecurityQuestionOptional.isPresent()){
+				return userSecurityQuestionOptional.get();				
 			} else {
-				jsonObject.put("question",userSecurityQuestionList.get(userSecurityQuestionList.size()-1).getSecurityQuestion());
+				throw new HillromException(ExceptionConstants.HR_608);
 			}
 		}else{
 			throw new HillromException(ExceptionConstants.HR_512);//User Doesn't exist
 		}
-		return jsonObject;
 	}
 	
 	public JSONObject reactivateUser(Long id) throws HillromException {

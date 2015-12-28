@@ -807,7 +807,6 @@ public class UserSearchRepository {
 			findPatientUserQuery = findPatientUserQuery + query2 + " and patient_clinic.clinic_id  ='" + clinicId + "'"
 					+ searchQuery + query3;
 
-		System.out.println("HCP in Admin Query :: "+findPatientUserQuery);
 		StringBuilder filterQuery = new StringBuilder();
 
 		Map<String, String> filterMap = getSearchParams(filter);
@@ -822,7 +821,6 @@ public class UserSearchRepository {
 
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":hcpUserID", hcpUserID.toString());
 
-		System.out.println("HCP in Admin Query :: "+findPatientUserQuery);
 		String countSqlQuery = "select count(patientUsers.id) from (" + findPatientUserQuery + " ) patientUsers";
 
 		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
@@ -893,7 +891,7 @@ public class UserSearchRepository {
 				+ " firstName,user.last_name as lastName, IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,IF(patient_clinic.is_active = NULL,user.is_deleted,1))) as isDeleted ,"
 				+ "user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,"
 				+ "user.title,user.hillrom_id,user.created_date as createdAt,"
-				+ "user.activated as isActivated, patInfo.state , compliance_score, pc.last_therapy_session_date as last_date, user.expired, "
+				+ "user.activated as isActivated, patInfo.state , compliance_score, pc.last_therapy_session_date as last_date, user.expired, patient_clinic.mrn_id as mrnId, "
 				+ "pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,pc.missed_therapy_count as isMissedTherapy "
 				+ "from USER user" + " join USER_AUTHORITY user_authority on user_authority.user_id = user.id  "
 				+ "and user_authority.authority_name = '" + PATIENT + "' and "
@@ -922,8 +920,7 @@ public class UserSearchRepository {
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString", queryString);
 
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":clinicId", clinicID);
-		
-		System.out.println("Query :: "+ findPatientUserQuery);
+
 		String countSqlQuery = "select count(patientUsers.id) from (" + findPatientUserQuery + " ) patientUsers";
 
 		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
@@ -956,6 +953,8 @@ public class UserSearchRepository {
 			Integer adherence = (Integer) record[15];
 			Date lastTransmissionDate = (Date) record[16];
 			Boolean isExpired = (Boolean) record[17];
+			String mrnId = (String) record[18];
+			
 
 			LocalDate dobLocalDate = null;
 			if (Objects.nonNull(dob)) {
@@ -972,6 +971,7 @@ public class UserSearchRepository {
 					city, dobLocalDate, gender, title, hillromId, createdAtDatetime, isActivated, state,
 					Objects.nonNull(adherence) ? adherence : 0, localLastTransmissionDate);
 			patientUser.setExpired(isExpired);
+			patientUser.setMrnId(mrnId);
 
 			patientUsers.add(patientUser);
 		});
@@ -1104,8 +1104,6 @@ public class UserSearchRepository {
 		applyQueryFilters(findPatientUserQuery, filterQuery, filterMap);
 
 		findPatientUserQuery = filterQuery.toString();
-		
-		System.out.println(findPatientUserQuery);
 
 		String countSqlQuery = "select count(patientUsers.id) from (" + findPatientUserQuery + " ) patientUsers";
 

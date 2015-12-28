@@ -268,10 +268,6 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 				base16String,SECOND_START_OFFSET,SECOND_END_OFFSET);
 		int second = ParserUtil.convertHexStringToInteger(secondString);
 		
-		if(year > LocalDate.now().getYear()){
-			throw new IllegalArgumentException("Could not parse data, Invalid YEAR : "+year);
-		}
-		
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(year, month-1, day, hour, minute, second);
 		return calendar.getTimeInMillis()/1000;

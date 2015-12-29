@@ -100,7 +100,8 @@ public class PatientVestDeviceTherapyUtil {
 			List<PatientVestDeviceData> deviceEventRecords) {
 		double endHmr = deviceEventRecords.get(deviceEventRecords.size()-1).getHmr();
 		double startHmr = deviceEventRecords.get(0).getHmr();
-		return (int)Math.round((endHmr - startHmr)/SECONDS_PER_MINUTE);
+		int duration =  (int)Math.round((endHmr - startHmr)/SECONDS_PER_MINUTE);
+		return duration > 0 ? duration : 1; // Hill-1347 if duration is a session is 0 , mark it as 1 min
 	}
 
 	/**

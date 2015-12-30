@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -101,7 +102,7 @@ public class ClinicPatientService {
 		for(Clinic clinic : associatedClinics){
 			clinics.add(ClinicVOBuilder.build(clinic));
 		}
-		return clinics;
+		return sortClinicVOList(clinics);
 	}
 
 	private List<Clinic> getAssociatedClinicsList(PatientInfo patientInfo) {
@@ -160,6 +161,12 @@ public class ClinicPatientService {
 				}
 			}
 		}
+	}
+	
+	private List<ClinicVO> sortClinicVOList(List<ClinicVO> clinics) {
+		return clinics.stream()
+				  .sorted((clinicVO1, clinicVO2) -> clinicVO1.getName().compareToIgnoreCase(clinicVO2.getName()))
+				  .collect(Collectors.toList());		
 	}
 }
 

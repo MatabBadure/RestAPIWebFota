@@ -2,12 +2,8 @@ package com.hillrom.vest.config;
 
 import javax.inject.Inject;
 
-import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.expression.SecurityExpressionHandler;
-import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
-import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -21,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.Http401UnauthorizedEntryPoint;
@@ -74,6 +71,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+	        .headers()
+	        .addHeaderWriter(new StaticHeadersWriter("X-Frame-Options","SAMEORIGIN"))
+	    .and()
             .exceptionHandling()
             .authenticationEntryPoint(authenticationEntryPoint)
         .and()

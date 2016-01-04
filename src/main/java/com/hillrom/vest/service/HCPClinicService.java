@@ -1,7 +1,6 @@
 package com.hillrom.vest.service;
 
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -19,8 +18,8 @@ import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
+import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
-import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.util.ClinicVOBuilder;
 
@@ -55,16 +54,16 @@ public class HCPClinicService {
     	return hcpUser;
     }
     
-    public Set<ClinicVO> getAssociatedClinicsForHCP(Long id) throws HillromException {
+    public List<ClinicVO> getAssociatedClinicsForHCP(Long id) throws HillromException {
 		UserExtension hcpUser = userExtensionRepository.findOne(id);
-		Set<ClinicVO> clinics = new HashSet<>();
+		List<ClinicVO> clinics = new ArrayList<>();
 	    if(Objects.isNull(hcpUser)){
 	    	throw new HillromException(ExceptionConstants.HR_512);
 	    } else {
 	    	for(Clinic clinic : hcpUser.getClinics()){
 	    		clinics.add(ClinicVOBuilder.build(clinic));
 	    	}
-	    	return clinics;
+	    	return RandomUtil.sortClinicVOListByName(clinics);
 	    }
     }
     

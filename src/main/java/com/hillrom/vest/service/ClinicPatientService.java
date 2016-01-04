@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -29,6 +28,7 @@ import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
+import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
@@ -102,7 +102,7 @@ public class ClinicPatientService {
 		for(Clinic clinic : associatedClinics){
 			clinics.add(ClinicVOBuilder.build(clinic));
 		}
-		return sortClinicVOList(clinics);
+		return RandomUtil.sortClinicVOListByName(clinics);
 	}
 
 	private List<Clinic> getAssociatedClinicsList(PatientInfo patientInfo) {
@@ -161,12 +161,6 @@ public class ClinicPatientService {
 				}
 			}
 		}
-	}
-	
-	private List<ClinicVO> sortClinicVOList(List<ClinicVO> clinics) {
-		return clinics.stream()
-				  .sorted((clinicVO1, clinicVO2) -> clinicVO1.getName().compareToIgnoreCase(clinicVO2.getName()))
-				  .collect(Collectors.toList());		
 	}
 }
 

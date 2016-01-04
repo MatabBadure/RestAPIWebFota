@@ -353,5 +353,5 @@ public class PatientUserVO {
 	public void setLastLoggedInAt(DateTime lastLoggedInAt) {
 		this.lastLoggedInAt = lastLoggedInAt;
 	}
-	
+		
 }

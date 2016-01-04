@@ -772,7 +772,7 @@ public class UserExtensionResource {
         log.debug("REST request to get associated clinics with HCP : {}", id);
         JSONObject jsonObject = new JSONObject();
         try {
-        	Set<ClinicVO> clinics= hcpClinicService.getAssociatedClinicsForHCP(id);
+        	List<ClinicVO> clinics= hcpClinicService.getAssociatedClinicsForHCP(id);
 	        if (clinics.isEmpty()) {
 	        	jsonObject.put("message", ExceptionConstants.HR_582);
 	        } else {

@@ -73,7 +73,5 @@ public class CareGiverVO implements Serializable{
 
 	public void setDeleted(Boolean deleted) {
 		this.deleted = deleted;
-	}
-	
-	
+	}	
 }

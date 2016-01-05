@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -257,7 +258,9 @@ public class ClinicService {
     }
 	
 	public ClinicVO getClinicWithChildClinics(String clinicId) throws HillromException{
-		return ClinicVOBuilder.buildWithChildClinics(getClinicInfo(clinicId));
+		ClinicVO clinicVO = ClinicVOBuilder.buildWithChildClinics(getClinicInfo(clinicId));
+		clinicVO.setChildClinicVOs(RandomUtil.sortClinicVOListByName(clinicVO.getChildClinicVOs()));
+		return clinicVO;
 	}
 	
 	public List<Clinic> getChildClinics(String clinicId) throws HillromException {

@@ -75,7 +75,7 @@ public class PatientUserServiceTest {
 		
 		SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 		Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES));
+        authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.RC_ADMIN));
         securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(USERNAME, PASSWORD, authorities));
         SecurityContextHolder.setContext(securityContext);
     }

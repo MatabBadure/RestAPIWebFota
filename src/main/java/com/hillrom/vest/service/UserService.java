@@ -288,7 +288,7 @@ public class UserService {
                                       String langKey) {
 
         User newUser = new User();
-        Authority authority = authorityRepository.findOne(AuthoritiesConstants.ADMIN);
+        Authority authority = authorityRepository.findOne(AuthoritiesConstants.SUPER_ADMIN);
         Set<Authority> authorities = new HashSet<>();
         String encryptedPassword = passwordEncoder.encode(password);
         // new user gets initially a generated password
@@ -371,9 +371,9 @@ public class UserService {
 
     private List<String> rolesAdminCanModerate() {
 		List<String> rolesAdminCanModerate = new ArrayList<String>();
-    	rolesAdminCanModerate.add(AuthoritiesConstants.ACCT_SERVICES);
+    	rolesAdminCanModerate.add(AuthoritiesConstants.RC_ADMIN);
     	rolesAdminCanModerate.add(AuthoritiesConstants.ASSOCIATES);
-    	rolesAdminCanModerate.add(AuthoritiesConstants.ADMIN);
+    	rolesAdminCanModerate.add(AuthoritiesConstants.SUPER_ADMIN);
 		return rolesAdminCanModerate;
 	}
 
@@ -393,7 +393,7 @@ public class UserService {
 		
     	List<String> rolesAdminCanModerate = rolesAdminCanModerate();
     	if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())
-    			&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
+    			&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.SUPER_ADMIN))) {
     		UserExtension user = createHillromTeamUser(userExtensionDTO);
     		if(Objects.nonNull(user.getId())) {
     			if(StringUtils.isNotBlank(userExtensionDTO.getEmail())) {
@@ -574,7 +574,7 @@ public class UserService {
         String currentEmail = StringUtils.isNotBlank(existingUser.getEmail()) ? existingUser.getEmail() : null;
         String currentHillromId = StringUtils.isNotBlank(existingUser.getHillromId()) ? existingUser.getHillromId() : null;
         if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())){
-        	if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
+        	if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.SUPER_ADMIN))) {
         		UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
         		if(Objects.nonNull(user.getId())) {
         			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
@@ -585,7 +585,7 @@ public class UserService {
         		} else {
         			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
         		}
-        	} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))
+        	} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.RC_ADMIN))
         			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ASSOCIATES))) {
 	        	if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
 	        		UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
@@ -1057,7 +1057,7 @@ public class UserService {
     		authorityMap.put(authority.getName(), authority);
     	});
 		if(Objects.nonNull(existingUser)) {
-			if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))) {
+			if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.RC_ADMIN))) {
 				if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 					deletePatientUser(existingUser);
 					jsonObject.put("message", MessageConstants.HR_214);
@@ -1069,18 +1069,18 @@ public class UserService {
 				} else {
 					throw new HillromException(ExceptionConstants.HR_513);//Unable to delete User
 				}
-			} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))){
+			} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.SUPER_ADMIN))){
 				if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 					deletePatientUser(existingUser);
 					jsonObject.put("message", MessageConstants.HR_214);
-				} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ADMIN))) {
-					if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
+				} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.SUPER_ADMIN))) {
+					if(SecurityUtils.getCurrentLogin().equals(existingUser.getEmail())) {
 						throw new HillromException(ExceptionConstants.HR_520);
 					}
 					existingUser.setDeleted(true);
 					userExtensionRepository.save(existingUser);
 					jsonObject.put("message", MessageConstants.HR_204);
-				} else if((existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ACCT_SERVICES))
+				} else if((existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RC_ADMIN))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
@@ -1615,7 +1615,8 @@ public class UserService {
     	});
 		if(Objects.nonNull(existingUser)) {
 			if(existingUser.isDeleted()){
-				if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))){
+				if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.SUPER_ADMIN))
+						|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.RC_ADMIN))){
 					if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 						reactivatePatientUser(existingUser);
 						jsonObject.put("message", MessageConstants.HR_215);
@@ -1627,12 +1628,12 @@ public class UserService {
 					} else {
 						throw new HillromException(ExceptionConstants.HR_604);
 					}
-				} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))){
+				} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.SUPER_ADMIN))){
 					if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 						reactivatePatientUser(existingUser);
 						jsonObject.put("message", MessageConstants.HR_215);
-					} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ADMIN)) 
-							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ACCT_SERVICES))
+					} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.SUPER_ADMIN)) 
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RC_ADMIN))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))) {
@@ -1687,9 +1688,9 @@ public class UserService {
 		});
 		if (Objects.nonNull(existingUser)) {
 			if (SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-					.contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))
+					.contains(new SimpleGrantedAuthority(AuthoritiesConstants.SUPER_ADMIN))
 					|| SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-							.contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))) {
+							.contains(new SimpleGrantedAuthority(AuthoritiesConstants.RC_ADMIN))) {
 				if (existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 					if (Objects.isNull(existingUser.getLastLoggedInAt())) {
 						if (Objects.nonNull(existingUser.getEmail())) {

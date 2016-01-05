@@ -99,7 +99,7 @@ public class UserExtensionResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN})
     public ResponseEntity<JSONObject> create(@RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
         log.debug("REST request to save User : {}", userExtensionDTO);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
@@ -126,7 +126,7 @@ public class UserExtensionResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CLINIC_ADMIN, AuthoritiesConstants.ASSOCIATES})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> update(@PathVariable Long id, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
         log.debug("REST request to update User : {}", userExtensionDTO);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
@@ -195,7 +195,7 @@ public class UserExtensionResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN})
     public ResponseEntity<JSONObject> delete(@PathVariable Long id) {
         log.debug("REST request to delete UserExtension : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -220,7 +220,7 @@ public class UserExtensionResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN})
     public ResponseEntity<JSONObject> dissociateClinicFromHCP(@PathVariable Long id, @RequestBody List<Map<String, String>> clinicList) {
         log.debug("REST request to dissociate clinic from HCP : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -392,7 +392,7 @@ public class UserExtensionResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> associateHCPToPatient(@PathVariable Long id, @RequestBody List<Map<String, String>> hcpList) {
         log.debug("REST request to associate HCP users with Patient : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -419,7 +419,7 @@ public class UserExtensionResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> getAssociatedHCPUserForPatient(@PathVariable Long id) {
         log.debug("REST request to get associated HCP users with Patient : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -444,7 +444,7 @@ public class UserExtensionResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN})
     public ResponseEntity<JSONObject> getAssociatedClinicsForPatient(@PathVariable Long id) {
         log.debug("REST request to get associated clinics with Patient : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -471,7 +471,7 @@ public class UserExtensionResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN})
     public ResponseEntity<JSONObject> associateClinicsToPatient(@PathVariable Long id, @RequestBody List<Map<String, String>> clinicList) {
         log.debug("REST request to associate clinic with Patient : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -498,7 +498,7 @@ public class UserExtensionResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN})
     public ResponseEntity<JSONObject> dissociateClinicsToPatient(@PathVariable Long id, @RequestBody List<Map<String, String>> clinicList) {
         log.debug("REST request to dissociate clinic with Patient : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -523,7 +523,7 @@ public class UserExtensionResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN, AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> createCaregiver(@PathVariable Long id, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
         log.debug("REST request to save User : {}", userExtensionDTO);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
@@ -551,7 +551,7 @@ public class UserExtensionResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN, AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> deleteCaregiver(@PathVariable Long patientUserId, @PathVariable Long id) {
         log.debug("REST request to delete caregiver : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -579,7 +579,7 @@ public class UserExtensionResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN, AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> getCaregiversForPatient(@PathVariable Long id) {
         log.debug("REST request to delete caregiver : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -605,7 +605,7 @@ public class UserExtensionResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN, AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> updateCaregiver(@PathVariable Long patientUserId, @PathVariable Long caregiverUserId, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
         log.debug("REST request to update caregiver User : {}", userExtensionDTO);
         JSONObject jsonObject = new JSONObject();
@@ -665,7 +665,7 @@ public class UserExtensionResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN, AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> getCaregiver(@PathVariable Long patientUserId, @PathVariable Long caregiverUserId) {
         log.debug("REST request to get caregiver User : {}", caregiverUserId);
         JSONObject jsonObject = new JSONObject();
@@ -717,7 +717,7 @@ public class UserExtensionResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN, AuthoritiesConstants.PATIENT})
     public ResponseEntity<JSONObject> getRelationshipLabels() {
         log.debug("REST request to get list of relationships of caregivers with a patient User");
         JSONObject jsonObject = new JSONObject();
@@ -739,7 +739,7 @@ public class UserExtensionResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> getAssociatedPatientUsersForHCP(@PathVariable Long id, @RequestParam(value = "filterByClinic",required = false) String filterByClinic) {
         log.debug("REST request to get associated patient users with HCP : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -767,7 +767,7 @@ public class UserExtensionResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.HCP})
     public ResponseEntity<?> getAssociatedClinicsForHCP(@PathVariable Long id) {
         log.debug("REST request to get associated clinics with HCP : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -793,7 +793,7 @@ public class UserExtensionResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> associateHCPToClinic(@PathVariable String id, @RequestBody List<Map<String, String>> hcpList) {
         log.debug("REST request to associate HCP users with clinic : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -820,7 +820,7 @@ public class UserExtensionResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> getAllUsersByRole(@RequestParam(value = "role",required = false) String role) {
         log.debug("REST request to get all users with role : {}", role);
         JSONObject jsonObject = new JSONObject();
@@ -847,7 +847,7 @@ public class UserExtensionResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN})
     public ResponseEntity<JSONObject> dissociateHCPToPatient(@PathVariable Long id, @RequestBody List<Map<String, String>> hcpList) {
         log.debug("REST request to dissociate hcp from Patient : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -869,7 +869,7 @@ public class UserExtensionResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<?> getAssociatedClinicsForClinicAdmin(@PathVariable Long id) {
         log.debug("REST request to get associated clinics with clinic admin user : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -895,7 +895,7 @@ public class UserExtensionResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CARE_GIVER})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.CARE_GIVER})
     public ResponseEntity<?> getAssociatedPatientsForCaregiver(@PathVariable Long id) {
         log.debug("REST request to get associated patients with caregiver : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -922,7 +922,7 @@ public class UserExtensionResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> getAssociatedHCPUsersForPatient(@PathVariable Long id, @RequestParam(value = "filterByClinic",required = false) String filterByClinic) {
         log.debug("REST request to get the hcp users associated with patient filter by Clinic : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -997,7 +997,7 @@ public class UserExtensionResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN})
     public ResponseEntity<JSONObject> reactivateUser(@PathVariable Long id) {
         log.debug("REST request to reactivate User : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -1022,7 +1022,7 @@ public class UserExtensionResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN})
     public ResponseEntity<JSONObject> userReactivation(@PathVariable Long id, HttpServletRequest request) {
         log.debug("REST request to User Reactivation : {}", id);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();

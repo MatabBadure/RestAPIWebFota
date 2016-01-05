@@ -69,7 +69,7 @@ public class ClinicResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN})
     public ResponseEntity<JSONObject> create(@RequestBody ClinicDTO clinicDTO) {
         log.debug("REST request to save Clinic : {}", clinicDTO);
         JSONObject jsonObject = new JSONObject();
@@ -96,7 +96,7 @@ public class ClinicResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN})
     public ResponseEntity<JSONObject> update(@PathVariable String id, @RequestBody ClinicDTO clinicDTO) {
         log.debug("REST request to update Clinic : {}", clinicDTO);
         JSONObject jsonObject = new JSONObject();
@@ -187,7 +187,7 @@ public class ClinicResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN})
     public ResponseEntity<JSONObject> delete(@PathVariable String id) {
     	log.debug("REST request to delete Clinic : {}", id);
     	JSONObject jsonObject = new JSONObject();
@@ -344,7 +344,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics/{id}/clinicadmin",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN})
     public ResponseEntity<JSONObject> getClinicAdmin(@PathVariable String id) {
         log.debug("REST request to get Clinic admin: {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -370,7 +370,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics/clinicadmins",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN})
     public ResponseEntity<JSONObject> getAllClinicAdmins() {
         log.debug("REST request to get all clinic admins: {}");
         JSONObject jsonObject = new JSONObject();
@@ -396,7 +396,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics/{id}/associateclinicadmin",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN})
     public ResponseEntity<JSONObject> associateClinicAdmin(@PathVariable String id, @RequestBody Map<String, String> clinicAdminId) {
         log.debug("REST request to associate clinic admin with clinic : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -422,7 +422,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics/{id}/dissociateclinicadmin",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.RC_ADMIN})
     public ResponseEntity<JSONObject> dissociateClinicAdmin(@PathVariable String id, @RequestBody Map<String, String> clinicAdminId) {
         log.debug("REST request to dissociate clinic admin with clinic : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -447,7 +447,7 @@ public class ClinicResource {
     @RequestMapping(value = "/clinics/{clinicId}/patientcount",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    @RolesAllowed({AuthoritiesConstants.SUPER_ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> getAssociatedPatientUsersCount(@PathVariable String clinicId) {
         log.debug("REST request to get patient count for Clinic : {}", clinicId);
         JSONObject jsonObject = new JSONObject();

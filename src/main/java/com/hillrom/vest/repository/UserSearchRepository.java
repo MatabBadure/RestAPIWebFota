@@ -1,13 +1,12 @@
 package com.hillrom.vest.repository;
 
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_SETTINGS_DEVIATION_COUNT;
-import static com.hillrom.vest.security.AuthoritiesConstants.ACCT_SERVICES;
-import static com.hillrom.vest.security.AuthoritiesConstants.ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.ASSOCIATES;
 import static com.hillrom.vest.security.AuthoritiesConstants.CLINIC_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
-import static com.hillrom.vest.security.AuthoritiesConstants.HILLROM_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
+import static com.hillrom.vest.security.AuthoritiesConstants.RC_ADMIN;
+import static com.hillrom.vest.security.AuthoritiesConstants.SUPER_ADMIN;
 import static com.hillrom.vest.util.RelationshipLabelConstants.SELF;
 
 import java.math.BigInteger;
@@ -70,9 +69,9 @@ public class UserSearchRepository {
 				+ " lower(CONCAT(user.first_name,' ',user.last_name)) like lower(:queryString) or"
 				+ " lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) or"
 				+ " lower(user.email) like lower(:queryString) or lower(user.hillrom_id) like lower(:queryString)) "
-				+ " left outer join  USER_AUTHORITY user_authority on user_authority.user_id = user.id "
-				+ " and  user_authority.authority_name in ('" + ADMIN + "','" + ACCT_SERVICES + "','" +  AuthoritiesConstants.CARE_GIVER + "','" + CLINIC_ADMIN + "','" + HCP + "','" + PATIENT + "','" + ASSOCIATES
-				+ "','" + HILLROM_ADMIN + "')";
+				+ " join  USER_AUTHORITY user_authority on user_authority.user_id = user.id "
+				+ " and  user_authority.authority_name in ('"+SUPER_ADMIN+"','"+RC_ADMIN+"','"+ASSOCIATES+"')";
+
 
 		StringBuilder filterQuery = new StringBuilder();
 

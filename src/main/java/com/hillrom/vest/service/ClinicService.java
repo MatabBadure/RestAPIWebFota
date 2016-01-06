@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -17,17 +18,14 @@ import javax.persistence.EntityNotFoundException;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.authority.mapping.Attributes2GrantedAuthoritiesMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.EntityUserAssoc;
-import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
-import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.EntityUserRepository;
@@ -38,8 +36,6 @@ import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
-import com.hillrom.vest.util.RelationshipLabelConstants;
-import com.hillrom.vest.web.rest.dto.CareGiverVO;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
@@ -262,7 +258,9 @@ public class ClinicService {
     }
 	
 	public ClinicVO getClinicWithChildClinics(String clinicId) throws HillromException{
-		return ClinicVOBuilder.buildWithChildClinics(getClinicInfo(clinicId));
+		ClinicVO clinicVO = ClinicVOBuilder.buildWithChildClinics(getClinicInfo(clinicId));
+		clinicVO.setChildClinicVOs(RandomUtil.sortClinicVOListByName(clinicVO.getChildClinicVOs()));
+		return clinicVO;
 	}
 	
 	public List<Clinic> getChildClinics(String clinicId) throws HillromException {
@@ -276,15 +274,15 @@ public class ClinicService {
 	
 	public List<User> getClinicAdmin(String clinicId) throws HillromException {
 		
-		List<User> clinicAdmin = new ArrayList<>();
+		List<User> clinicAdmins = new ArrayList<>();
 		Clinic clinic = clinicRepository.findOne(clinicId);
 		if (Objects.nonNull(clinic)) {
 			List<EntityUserAssoc> userAssocList  = entityUserRepository.findByClinicIdAndUserRole(clinic.getId(), AuthoritiesConstants.CLINIC_ADMIN);
 			if (Objects.nonNull(userAssocList)) {
 				for(EntityUserAssoc entityUserAssoc : userAssocList){
-					clinicAdmin.add(entityUserAssoc.getUser());
+					clinicAdmins.add(entityUserAssoc.getUser());
 				}
-				return clinicAdmin;
+				return RandomUtil.sortUserListByLastNameFirstName(clinicAdmins);
 			}
 			else 
 				throw new HillromException(ExceptionConstants.HR_607);

@@ -27,7 +27,6 @@ import com.hillrom.vest.domain.ClinicPatientAssoc;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
-import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
@@ -137,7 +136,7 @@ public class PatientHCPService {
 				hcpUsers.add(new HcpClinicsVO(hcp,hcp.getClinics()));
 			}
 		}
-		return hcpUsers;
+		return RandomUtil.sortHcpClinicsVOListByLastNameFirstName(hcpUsers);
 	}
 
 	private List<User> getAssociatedHCPUserList(PatientInfo patientInfo) {

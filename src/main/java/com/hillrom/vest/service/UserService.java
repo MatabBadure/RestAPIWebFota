@@ -1358,7 +1358,7 @@ public class UserService {
 		} else {
 			throw new HillromException(ExceptionConstants.HR_523);
 		}
-		return caregiverList;
+		return RandomUtil.sortCareGiverVOListByLastNameFirstName(caregiverList);
     }
 
 	private List<UserPatientAssoc> getListOfCaregiversAssociatedToPatientUser(UserExtension patientUser) {

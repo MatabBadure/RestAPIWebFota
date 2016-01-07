@@ -1084,7 +1084,8 @@ public class UserService {
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
-							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN)))) {
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CARE_GIVER)))) {
 					existingUser.setDeleted(true);
 					userExtensionRepository.save(existingUser);
 					jsonObject.put("message", MessageConstants.HR_204);
@@ -1635,7 +1636,8 @@ public class UserService {
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ACCT_SERVICES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
-							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))) {
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CARE_GIVER))) {
 						existingUser.setDeleted(false);
 						userExtensionRepository.saveAndFlush(existingUser);
 						jsonObject.put("message", MessageConstants.HR_235);

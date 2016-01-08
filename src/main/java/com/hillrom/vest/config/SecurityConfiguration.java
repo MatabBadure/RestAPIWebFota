@@ -17,7 +17,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
-import org.springframework.security.web.header.writers.StaticHeadersWriter;
 
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.Http401UnauthorizedEntryPoint;
@@ -71,9 +70,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-	        .headers()
-	        .addHeaderWriter(new StaticHeadersWriter("X-Frame-Options","SAMEORIGIN"))
-	    .and()
             .exceptionHandling()
             .authenticationEntryPoint(authenticationEntryPoint)
         .and()

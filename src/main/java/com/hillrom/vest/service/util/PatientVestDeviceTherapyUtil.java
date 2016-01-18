@@ -98,9 +98,23 @@ public class PatientVestDeviceTherapyUtil {
 
 	private static int calculateDurationOfSession(
 			List<PatientVestDeviceData> deviceEventRecords) {
+		// HMR Difference
 		double endHmr = deviceEventRecords.get(deviceEventRecords.size()-1).getHmr();
 		double startHmr = deviceEventRecords.get(0).getHmr();
-		return (int)Math.round((endHmr - startHmr)/SECONDS_PER_MINUTE);
+		int hmrDiff  = (int)Math.round((endHmr - startHmr)/SECONDS_PER_MINUTE);
+		
+		// Duration of the device was run
+		PatientVestDeviceData endOfSessionEvent = deviceEventRecords.get(deviceEventRecords.size()-1);
+		long endTimestamp = endOfSessionEvent.getTimestamp();
+		long startTimestamp = deviceEventRecords.get(0).getTimestamp();
+		int totalDuration = (int) Math.round((endTimestamp-startTimestamp)/MILLI_SECONDS_PER_MINUTE);
+		
+		// HILL-1384 : since it is observed , hmr being corrupted
+		if(hmrDiff > totalDuration)
+			return totalDuration;
+		else
+			return hmrDiff;
+		
 	}
 
 	/**

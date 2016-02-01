@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.actuate.autoconfigure.HealthMvcEndpointProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -196,11 +197,12 @@ public class UserExtensionResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
-    public ResponseEntity<JSONObject> delete(@PathVariable Long id) {
+    public ResponseEntity<JSONObject> delete(@PathVariable Long id, HttpServletRequest request) {
         log.debug("REST request to delete UserExtension : {}", id);
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         JSONObject jsonObject = new JSONObject();
 		try {
-			jsonObject = userService.deleteUser(id);
+			jsonObject = userService.deleteUser(id, baseUrl);
 			 if (jsonObject.containsKey("ERROR")) {
 		        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
 		        } else {

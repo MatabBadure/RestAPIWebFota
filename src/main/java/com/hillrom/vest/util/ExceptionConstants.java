@@ -10,7 +10,7 @@ public class ExceptionConstants {
     public static final String HR_502 = "Parameters missing";
     public static final String HR_503 = "Required field Answer is missing";
     public static final String HR_504 = "Reset Key Expired";
-    public static final String HR_505 = "Incorrect Security Question or Password";
+    public static final String HR_505 = "Incorrect Security Question or Answer";
     public static final String HR_506 = "Incorrect password";
     public static final String HR_507 = "Required field SecurityQuestion is missing";
     public static final String HR_508 = "Required field Email is missing";//Is it same as HR_505?

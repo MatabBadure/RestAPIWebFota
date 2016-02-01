@@ -1110,8 +1110,6 @@ public class UserService {
 		} else {
 			throw new HillromException(ExceptionConstants.HR_512);//No such user exist
 		}
-		
-		sendDeactivationEmailNotification(baseUrl, existingUser);
 		return jsonObject;
     }
 

@@ -43,6 +43,8 @@ import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 
+import scala.collection.concurrent.Debug;
+
 @Repository
 public class UserSearchRepository {
 	
@@ -80,11 +82,8 @@ public class UserSearchRepository {
 
 		Map<String, String> filterMap = getSearchParams(filter);
 		findHillromTeamUserQuery = appendAutorityFilter(findHillromTeamUserQuery, filterMap);
-		 
-
 		filterQuery.append("select * from (");
-		applyIsDeletedFilter(findHillromTeamUserQuery, filterQuery, filterMap);
-		applyIsActivatedFilter(filterQuery, filterMap);
+		applyIsDeletedAndIsActivatedFilter(findHillromTeamUserQuery, filterQuery, filterMap);
 		findHillromTeamUserQuery = filterQuery.toString();
 			
 		findHillromTeamUserQuery = findHillromTeamUserQuery.replaceAll(":queryString", queryString);
@@ -1056,16 +1055,37 @@ public class UserSearchRepository {
 		}
 	}
 	
-	private void applyIsActivatedFilter(StringBuilder filterQuery, Map<String, String> filterMap) {
-		if (Objects.nonNull(filterMap.get("isActivated"))) {
-			if ("0".equals(filterMap.get("isActivated")))
-				filterQuery.append(" and isActivated in (0) ");
-			else if ("1".equals(filterMap.get("isActivated")))
-				filterQuery.append(" and isActivated in (1) ");
-			else 
-				filterQuery.append(" and isActivated in (0,1) ");
+	private void applyIsDeletedAndIsActivatedFilter(String query, StringBuilder filterQuery, Map<String, String> filterMap) {
+		
+		log.debug("isDeleted :: " +filterMap.get("isDeleted"));
+		log.debug("isActivated :: " +filterMap.get("isActivated"));
+		if (Objects.nonNull(filterMap.get("isDeleted"))) {
+			filterQuery.append(query);
+			if ("1".equals(filterMap.get("isDeleted"))){
+				if("0".equals(filterMap.get("isActivated")))
+					filterQuery.append(") as search_table where isDeleted in (1) or ( isDeleted in (0) and isActivated in (0) )");
+				else if("1".equals(filterMap.get("isActivated")))
+					filterQuery.append(") as search_table where isDeleted in (1) ");
+			}
+			else if ("0".equals(filterMap.get("isDeleted"))){
+				if("0".equals(filterMap.get("isActivated")))
+					filterQuery.append(") as search_table where isDeleted in (0) or ( isDeleted in (0) and isActivated in (0) )");
+				else if("1".equals(filterMap.get("isActivated")))
+					filterQuery.append(") as search_table where isDeleted in (0) and isActivated in (1) ");
+			}
+			else if ("all".equalsIgnoreCase(filterMap.get("isDeleted"))){
+				if("1".equals(filterMap.get("isActivated")))
+					filterQuery.append(") as search_table where isDeleted in (1) or ( isDeleted in (0) and isActivated in (1) )");
+				else
+				    filterQuery.append(") as search_table where isDeleted in (0,1) ");
+			}
 		} else {
-			filterQuery.append(" and isActivated in (0,1)");
+			filterQuery.append(query);
+			if(Objects.nonNull(filterMap.get("isActivated")))
+				if("0".equals(filterMap.get("isActivated")))
+					filterQuery.append(") as search_table where isDeleted in (0) and isActivated in (0) ");
+				else
+					filterQuery.append(") as search_table where isDeleted in (0,1) ");
 		}
 	}
 	//Patient Search in Clinic Admin Dashboard

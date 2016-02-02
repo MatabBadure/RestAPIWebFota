@@ -11,12 +11,14 @@ import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.envers.Audited;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * A PATIENT_PROTOCOL_DATA.
  */
+@Audited
 @Entity
 @Table(name = "PATIENT_PROTOCOL_DATA")
 @SQLDelete(sql="UPDATE PATIENT_PROTOCOL  SET is_deleted = 1 where id = ?")

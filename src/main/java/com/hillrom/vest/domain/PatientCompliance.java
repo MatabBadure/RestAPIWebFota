@@ -1,5 +1,7 @@
 package com.hillrom.vest.domain;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -19,9 +22,10 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
 import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 
+@Audited
 @Entity
 @Table(name="PATIENT_COMPLIANCE")
-public class PatientCompliance {
+public class PatientCompliance extends AbstractAuditingEntity implements Serializable{
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
@@ -263,5 +267,10 @@ public class PatientCompliance {
 				+ "]";
 	}
 
+	@Override
+	public String getCreatedBy() {
+		return patientUser.getEmail();
+	}
+	
 	
 }

@@ -47,6 +47,7 @@ public class HillromTeamUserServiceTest {
 	private static final String ROLE = AuthoritiesConstants.ASSOCIATES;
 	private static final String EMAIL = "rishabhjain+"+Math.abs(Math.random()*100)+"@neevtech.com";
 	private static final String BASE_URL = "http://localhost:8080";
+	private static final String String = null;
 	
 	@Inject
 	private UserService userService;
@@ -98,8 +99,8 @@ public class HillromTeamUserServiceTest {
 	@Test(expected = Exception.class)
     public void assertThatHillromUserDeletedSuccessfully() throws HillromException {
 		UserExtension newHRUser = userService.createUser(userExtensionDTO, BASE_URL);
-    	
-		JSONObject jsonObject = userService.deleteUser(newHRUser.getId());
+    	String baseUrl = "baseUrl";
+		JSONObject jsonObject = userService.deleteUser(newHRUser.getId(),baseUrl);
         String message = (String) jsonObject.get("message");
         System.out.println("message Created : "+jsonObject);
         assertThat(message).isNotEmpty();

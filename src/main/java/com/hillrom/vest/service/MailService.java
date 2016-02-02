@@ -284,4 +284,16 @@ public class MailService {
         subject = messageSource.getMessage("email.ingestionprocessstatus.subject", new String[]{status}, null);
         sendEmail(recipients.split(","), subject, content, false, true);
      }
+	
+	@Async
+    public void sendDeactivationEmail(User user, String baseUrl) {
+        log.debug("Sending deactivation e-mail to '{}'", user.getEmail());
+        Locale locale = getLocale(user);
+        Context context = new Context(locale);
+        context.setVariable("user", userNameFormatting(user));
+        context.setVariable("baseUrl", baseUrl);
+        String content = templateEngine.process("deactivationEmail", context);
+        String subject = messageSource.getMessage("email.deactivation.title", null, locale);
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
 }

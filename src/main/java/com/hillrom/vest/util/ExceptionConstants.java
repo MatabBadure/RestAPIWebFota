@@ -137,4 +137,6 @@ public class ExceptionConstants {
     public static final String HR_705 = "The activation link which you are trying to access is no more valid. ";
     public static final String HR_706 = "Please contact Hill-Rom Respiratory Care Customer Support";
     public static final String HR_707 = "The reset link which you are trying to access is no more valid. ";
+
+    public static final String HR_708 = "Incorrect Hillrom User Authority";
 }

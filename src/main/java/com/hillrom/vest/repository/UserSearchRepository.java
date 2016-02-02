@@ -1,12 +1,8 @@
 package com.hillrom.vest.repository;
 
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_SETTINGS_DEVIATION_COUNT;
-import static com.hillrom.vest.security.AuthoritiesConstants.ACCT_SERVICES;
-import static com.hillrom.vest.security.AuthoritiesConstants.ADMIN;
-import static com.hillrom.vest.security.AuthoritiesConstants.ASSOCIATES;
 import static com.hillrom.vest.security.AuthoritiesConstants.CLINIC_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
-import static com.hillrom.vest.security.AuthoritiesConstants.HILLROM_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 import static com.hillrom.vest.util.RelationshipLabelConstants.SELF;
 
@@ -15,10 +11,12 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -35,6 +33,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.security.AuthoritiesConstants;
@@ -56,11 +55,16 @@ public class UserSearchRepository {
 
 	@Inject
 	private HCPClinicService hcpClinicService;
+	
 	@Inject
 	private UserPatientRepository userPatientRepository;
+	
+	@Inject
+	private AuthorityRepository authorityRepository;
+	
 
 	public Page<HillRomUserVO> findHillRomTeamUsersBy(String queryString, String filter, Pageable pageable,
-			Map<String, Boolean> sortOrder) {
+			Map<String, Boolean> sortOrder) throws HillromException {
 
 		String findHillromTeamUserQuery = "select distinct(user.id),user.first_name as firstName,user.last_name as lastName,user.email,"
 				+ " user_authority.authority_name as name,user.is_deleted as isDeleted,user.created_date as createdAt,user.activated as isActivated,user.hillrom_id as hillromId, userExt.mobile_phone as mobilePhone "
@@ -69,20 +73,23 @@ public class UserSearchRepository {
 				+ " lower(user.last_name) like lower(:queryString) or "
 				+ " lower(CONCAT(user.first_name,' ',user.last_name)) like lower(:queryString) or"
 				+ " lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) or"
-				+ " lower(user.email) like lower(:queryString) or lower(user.hillrom_id) like lower(:queryString)) "
-				+ " left outer join  USER_AUTHORITY user_authority on user_authority.user_id = user.id "
-				+ " and  user_authority.authority_name in ('" + ADMIN + "','" + ACCT_SERVICES + "','" +  AuthoritiesConstants.CARE_GIVER + "','" + CLINIC_ADMIN + "','" + HCP + "','" + PATIENT + "','" + ASSOCIATES
-				+ "','" + HILLROM_ADMIN + "')";
+				+ " lower(user.email) like lower(:queryString) or lower(user.hillrom_id) like lower(:queryString)) ";
+				
 
 		StringBuilder filterQuery = new StringBuilder();
 
 		Map<String, String> filterMap = getSearchParams(filter);
+		findHillromTeamUserQuery = appendAutorityFilter(findHillromTeamUserQuery, filterMap);
+		 
 
 		filterQuery.append("select * from (");
 		applyIsDeletedFilter(findHillromTeamUserQuery, filterQuery, filterMap);
+		applyIsActivatedFilter(filterQuery, filterMap);
 		findHillromTeamUserQuery = filterQuery.toString();
 			
 		findHillromTeamUserQuery = findHillromTeamUserQuery.replaceAll(":queryString", queryString);
+		
+		System.out.println("Query :: "+findHillromTeamUserQuery);
 		String countSqlQuery = "select count(hillromUsers.id) from (" + findHillromTeamUserQuery + ") hillromUsers";
 
 		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
@@ -1048,7 +1055,19 @@ public class UserSearchRepository {
 			filterQuery.append(") as search_table where isDeleted in (0,1)");
 		}
 	}
-
+	
+	private void applyIsActivatedFilter(StringBuilder filterQuery, Map<String, String> filterMap) {
+		if (Objects.nonNull(filterMap.get("isActivated"))) {
+			if ("0".equals(filterMap.get("isActivated")))
+				filterQuery.append(" and isActivated in (0) ");
+			else if ("1".equals(filterMap.get("isActivated")))
+				filterQuery.append(" and isActivated in (1) ");
+			else 
+				filterQuery.append(" and isActivated in (0,1) ");
+		} else {
+			filterQuery.append(" and isActivated in (0,1)");
+		}
+	}
 	//Patient Search in Clinic Admin Dashboard
 	public Page<PatientUserVO> findAssociatedPatientToClinicAdminBy(String queryString, Long clinicAdminId,
 			String clinicId, String filter, Pageable pageable, Map<String, Boolean> sortOrder) {
@@ -1284,5 +1303,25 @@ public class UserSearchRepository {
 			return BigInteger.ONE ==((BigInteger) isDeletedObject ) ? true : false;
 		else
 			return "1".equals(isDeletedObject.toString()) ? true : false;		
+	}
+	
+	private String appendAutorityFilter(String query, Map<String, String> filterMap) throws HillromException{
+		List<Authority> authorities = authorityRepository.findAll();
+		Set<String> authoritySet = new HashSet<>();
+    	authorities.stream().forEach(authority -> {
+    		authoritySet.add(authority.getName());
+    	});
+		
+		if(StringUtils.isEmpty(filterMap.get("authority")) | "all".equalsIgnoreCase(filterMap.get("authority"))){
+			query += " left outer join  USER_AUTHORITY user_authority on user_authority.user_id = user.id";
+			return query;
+		}
+		else if(authoritySet.contains(filterMap.get("authority").toUpperCase())){
+			query += " join  USER_AUTHORITY user_authority on user_authority.user_id = user.id "
+				 + " and  user_authority.authority_name in ('"+filterMap.get("authority")+"')";
+			return query;
+		}
+		else
+		   throw new HillromException(ExceptionConstants.HR_708);
 	}
 }

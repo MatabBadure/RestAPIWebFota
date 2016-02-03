@@ -88,12 +88,15 @@ public class UserSearchRepository {
 			
 		findHillromTeamUserQuery = findHillromTeamUserQuery.replaceAll(":queryString", queryString);
 		
-		System.out.println("Query :: "+findHillromTeamUserQuery);
 		String countSqlQuery = "select count(hillromUsers.id) from (" + findHillromTeamUserQuery + ") hillromUsers";
 
 		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
 		BigInteger count = (BigInteger) countQuery.getSingleResult();
-
+		//sort by isDeleted to isDeleted and isActive
+		if(sortOrder.containsKey("isDeleted")){
+			sortOrder.put("isActivated", sortOrder.get("isDeleted"));
+		}
+		
 		Query query = getOrderedByQuery(findHillromTeamUserQuery, sortOrder);
 		setPaginationParams(pageable, query);
 
@@ -1057,8 +1060,6 @@ public class UserSearchRepository {
 	
 	private void applyIsDeletedAndIsActivatedFilter(String query, StringBuilder filterQuery, Map<String, String> filterMap) {
 		
-		log.debug("isDeleted :: " +filterMap.get("isDeleted"));
-		log.debug("isActivated :: " +filterMap.get("isActivated"));
 		if (Objects.nonNull(filterMap.get("isDeleted"))) {
 			filterQuery.append(query);
 			if ("1".equals(filterMap.get("isDeleted"))){
@@ -1220,7 +1221,7 @@ public class UserSearchRepository {
 		int limit = columnNames.size();
 		int i = 0;
 		for (String columnName : columnNames.keySet()) {
-			if(!"adherence".equalsIgnoreCase(columnName))
+			if(!"adherence".equalsIgnoreCase(columnName) | !"isDeleted,isActivated".equalsIgnoreCase(columnName) )
 				sb.append("lower(").append(columnName).append(")");
 			else
 				sb.append(columnName);
@@ -1230,7 +1231,7 @@ public class UserSearchRepository {
 			else
 				sb.append(" DESC");
 
-			if (i != (limit - 1)) {
+			if (i++ != (limit - 1)) {
 				sb.append(", ");
 			}
 		}

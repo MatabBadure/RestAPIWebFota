@@ -697,6 +697,13 @@ public class UserService {
 		mailService.reSendActivationEmail(user, baseUrl);
 		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
 	}
+	
+	private void sendDeactivationEmailNotification(String baseUrl, UserExtension user) {
+		if (Objects.nonNull(user.getEmail()))
+			mailService.sendDeactivationEmail(user, baseUrl);
+		else 
+			log.warn("Email Id not present to sent deactivation mail.");
+	}
 
     public UserExtension updateHillromTeamUser(UserExtension user, UserExtensionDTO userExtensionDTO) {
 		assignValuesToUserObj(userExtensionDTO, user);
@@ -1048,7 +1055,7 @@ public class UserService {
 		return jsonObject;
 	}
 
-	public JSONObject deleteUser(Long id) throws HillromException {
+	public JSONObject deleteUser(Long id,  String baseUrl) throws HillromException {
     	JSONObject jsonObject = new JSONObject();
     	UserExtension existingUser = userExtensionRepository.findOne(id);
     	List<Authority> authorities  = authorityRepository.findAll();
@@ -1060,11 +1067,13 @@ public class UserService {
 			if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))) {
 				if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 					deletePatientUser(existingUser);
+					sendDeactivationEmailNotification(baseUrl, existingUser);
 					jsonObject.put("message", MessageConstants.HR_214);
 				} else if((existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN)))) {
 					existingUser.setDeleted(true);
 					userExtensionRepository.save(existingUser);
+					sendDeactivationEmailNotification(baseUrl, existingUser);
 					jsonObject.put("message", MessageConstants.HR_204);
 				} else {
 					throw new HillromException(ExceptionConstants.HR_513);//Unable to delete User
@@ -1072,6 +1081,7 @@ public class UserService {
 			} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))){
 				if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 					deletePatientUser(existingUser);
+					sendDeactivationEmailNotification(baseUrl, existingUser);
 					jsonObject.put("message", MessageConstants.HR_214);
 				} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ADMIN))) {
 					if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
@@ -1079,6 +1089,7 @@ public class UserService {
 					}
 					existingUser.setDeleted(true);
 					userExtensionRepository.save(existingUser);
+					sendDeactivationEmailNotification(baseUrl, existingUser);
 					jsonObject.put("message", MessageConstants.HR_204);
 				} else if((existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ACCT_SERVICES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
@@ -1088,6 +1099,7 @@ public class UserService {
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CARE_GIVER)))) {
 					existingUser.setDeleted(true);
 					userExtensionRepository.save(existingUser);
+					sendDeactivationEmailNotification(baseUrl, existingUser);
 					jsonObject.put("message", MessageConstants.HR_204);
 				} else {
 					throw new HillromException(ExceptionConstants.HR_513);//Unable to delete User

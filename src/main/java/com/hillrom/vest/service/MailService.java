@@ -32,6 +32,7 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.DateUtil;
+import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.PatientStatsVO;
 
@@ -239,8 +240,9 @@ public class MailService {
     
 	private void getUsersActivationReminderEmail(DateTime fromTime,DateTime toTime){
 	    List<User> users = userRepository.findAllByActivatedIsFalseAndActivationLinkSentDateBetweeen(fromTime, toTime);
-	    log.debug("No of users ", users);
 	    for(User user : users){
+	    	user.setActivationKey(RandomUtil.generateActivationKey());
+	    	userRepository.save(user);
 	    	sendActivationReminderEmail(user);
 	    }
 	}

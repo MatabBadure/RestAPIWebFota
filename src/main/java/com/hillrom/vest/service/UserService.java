@@ -1705,7 +1705,7 @@ public class UserService {
 					|| SecurityContextHolder.getContext().getAuthentication().getAuthorities()
 							.contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))) {
 				if (existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
-					if (Objects.isNull(existingUser.getLastLoggedInAt())) {
+					if (Objects.nonNull(existingUser.getLastLoggedInAt()) & !existingUser.getActivated()) {
 						if (Objects.nonNull(existingUser.getEmail())) {
 							reSendEmailNotification(baseUrl, existingUser);
 							jsonObject.put("message", MessageConstants.HR_305);

@@ -42,6 +42,9 @@ public class ClinicDTO {
 	private List<Map<String, String>> childClinicList = new ArrayList<Map<String,String>>();
 	
 	private Boolean parent;
+	
+	private Boolean deleted;
+
 
 	@Size(max = 50)
     private Map<String, String> parentClinic = new HashMap<>();
@@ -52,7 +55,7 @@ public class ClinicDTO {
 
 	public ClinicDTO(String name, String address, String address2, Integer zipcode, String city,
 			String state, String phoneNumber, String faxNumber, Long clinicAdminId,
-			Boolean parent, String hillromId) {
+			Boolean parent, Boolean deleted, String hillromId) {
 		super();
 		this.name = name;
 		this.address = address;
@@ -64,9 +67,19 @@ public class ClinicDTO {
 		this.faxNumber = faxNumber;
 		this.clinicAdminId = clinicAdminId;
 		this.parent = parent;
+		this.deleted = deleted;
 		this.hillromId = hillromId;
 	}
 
+
+	public Boolean getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(Boolean deleted) {
+		this.deleted = deleted;
+	}
+	
 	public String getName() {
 		return name;
 	}

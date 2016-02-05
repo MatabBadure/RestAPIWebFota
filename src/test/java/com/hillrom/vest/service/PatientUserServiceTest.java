@@ -106,8 +106,8 @@ public class PatientUserServiceTest {
 	@Test(expected = Exception.class)
     public void assertThatPatientUserIsDeleted() throws HillromException {
 		UserExtension newPatientUser = userService.createPatientUser(userExtensionDTO);
-    	
-        JSONObject jsonObject = userService.deleteUser(newPatientUser.getId());
+    	String baseUrl = "baseUrl";
+        JSONObject jsonObject = userService.deleteUser(newPatientUser.getId(),baseUrl);
         String message = (String) jsonObject.get("message");
         
         assertThat(message).isNotNull();

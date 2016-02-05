@@ -10,7 +10,7 @@ public class ExceptionConstants {
     public static final String HR_502 = "Parameters missing";
     public static final String HR_503 = "Required field Answer is missing";
     public static final String HR_504 = "Reset Key Expired";
-    public static final String HR_505 = "Incorrect Security Question or Password";
+    public static final String HR_505 = "Incorrect Security Question or Answer";
     public static final String HR_506 = "Incorrect password";
     public static final String HR_507 = "Required field SecurityQuestion is missing";
     public static final String HR_508 = "Required field Email is missing";//Is it same as HR_505?
@@ -137,4 +137,6 @@ public class ExceptionConstants {
     public static final String HR_705 = "The activation link which you are trying to access is no more valid. ";
     public static final String HR_706 = "Please contact Hill-Rom Respiratory Care Customer Support";
     public static final String HR_707 = "The reset link which you are trying to access is no more valid. ";
+
+    public static final String HR_708 = "Incorrect Hillrom User Authority";
 }

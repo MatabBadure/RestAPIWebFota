@@ -16,6 +16,7 @@ import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATI
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_DISPLAY_VALUE;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,15 +29,25 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.hillrom.vest.audit.service.PatientProtocolDataAuditService;
+import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
+import com.hillrom.vest.domain.PatientProtocolData;
+import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.TherapySession;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.PatientComplianceRepository;
+import com.hillrom.vest.repository.ProtocolConstantsRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.web.rest.dto.AdherenceTrendVO;
+import com.hillrom.vest.web.rest.dto.ProtocolRevisionVO;
+import com.hillrom.vest.web.rest.util.ProtocolDataVOBuilder;
 
 @Service
 @Transactional
@@ -50,6 +61,13 @@ public class PatientComplianceService {
 	
 	@Inject
 	private TherapySessionRepository therapySessionRepository;
+
+	@Inject
+	@Qualifier("patientProtocolDataAuditService")
+	private PatientProtocolDataAuditService protocolAuditService;
+	
+	@Inject
+	private ProtocolConstantsRepository protocolConstantsRepository;
 	
 	/**
 	 * Creates Or Updates Compliance 
@@ -97,7 +115,9 @@ public class PatientComplianceService {
 		complianceRepository.save(complainces);
 	}
 	
-	public List<AdherenceTrendVO> findAdherenceTrendByUserIdAndDateRange(Long patientUserId,LocalDate from,LocalDate to){
+	public List<ProtocolRevisionVO> findAdherenceTrendByUserIdAndDateRange(Long patientUserId,LocalDate from,LocalDate to)
+	throws HillromException{
+
 		List<Long> patientUserIds = new LinkedList<>();
 		patientUserIds.add(patientUserId);
 		TherapySession therapySession = therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(patientUserId);
@@ -111,12 +131,17 @@ public class PatientComplianceService {
 		List<PatientCompliance> complianceList = complianceRepository.findByDateBetweenAndPatientUserIdIn(fromDate, toDate, patientUserIds);
 		SortedMap<LocalDate,PatientCompliance> complianceMap = new TreeMap<>();
 		for(PatientCompliance compliance : complianceList){
-			complianceMap.put(compliance.getDate(),compliance);
+			complianceMap.put(compliance.getDate(), compliance);
 		}
 
 		List<Notification> notifications = notificationService.findNotificationsByUserIdAndDateRange(patientUserId,fromDate,toDate);
 		Map<LocalDate,List<Notification>> notificationsMap = notifications.stream().collect(Collectors.groupingBy(Notification:: getDate));
 		SortedMap<LocalDate,PatientCompliance> actualMapRequested = complianceMap.tailMap(from);
+		
+		PatientCompliance lastCompliance = actualMapRequested.get(actualMapRequested.lastKey());
+		DateTime dateTime = Objects.nonNull(lastCompliance.getLastModifiedDate()) ? lastCompliance.getLastModifiedDate() : lastCompliance.getDate().toDateTimeAtStartOfDay();  
+		SortedMap<DateTime,ProtocolRevisionVO> revisionData = protocolAuditService.findProtocolRevisionsByUserIdTillDate(patientUserId,dateTime);
+
 		List<AdherenceTrendVO> adherenceTrends = new LinkedList<>();
 		for(LocalDate date: actualMapRequested.keySet()){
 			AdherenceTrendVO trendVO = new AdherenceTrendVO();
@@ -124,11 +149,21 @@ public class PatientComplianceService {
 			trendVO.setDate(date);
 			trendVO.setUpdatedScore(compliance.getScore());
 			setNotificationPointsMap(complianceMap,notificationsMap,date,trendVO);
+			
+			DateTime processedTime = Objects.nonNull(compliance.getLastModifiedDate()) ? compliance.getLastModifiedDate() : compliance.getDate().toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59);
+			SortedMap<DateTime,ProtocolRevisionVO> recentRevisionMap = revisionData.headMap(processedTime);
+			DateTime dt =  recentRevisionMap.lastKey();
+			ProtocolRevisionVO revisionVO = recentRevisionMap.get(dt);
+			revisionVO.addAdherenceTrend(trendVO);
+			
+			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ revisionVO : "+revisionVO);
 			adherenceTrends.add(trendVO);
 		}
-		return adherenceTrends;
+		List<ProtocolRevisionVO> revisions = revisionData.values().stream().filter(rev -> rev.getAdherenceTrends().size() > 0).collect(Collectors.toList());
+		return revisions;
+		//return adherenceTrends;
 	}
-
+	
 	private void setNotificationPointsMap(
 			SortedMap<LocalDate,PatientCompliance> complianceMap,
 			Map<LocalDate, List<Notification>> notificationsMap,

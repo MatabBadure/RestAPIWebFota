@@ -254,5 +254,4 @@ public class PatientProtocolData extends AbstractAuditingEntity implements Seria
 				+ ", protocolKey=" + protocolKey + "]";
 	}
 
-	
 }

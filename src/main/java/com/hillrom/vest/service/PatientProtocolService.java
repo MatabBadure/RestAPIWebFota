@@ -143,7 +143,7 @@ public class PatientProtocolService {
 			cp.setMaxPressure(up.getMaxPressure());
 	}
 
-    public List<PatientProtocolData> getAllProtocolsAssociatedWithPatient(Long patientUserId) throws HillromException {
+    public List<PatientProtocolData> getActiveProtocolsAssociatedWithPatient(Long patientUserId) throws HillromException {
     	User patientUser = userRepository.findOne(patientUserId);
     	if(patientUser != null) {
 	    	PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
@@ -293,5 +293,19 @@ public class PatientProtocolService {
 		minDuration = (int)(totalDuration*treatmentsPerDay);
 		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration);
 	}
+	
+	public List<PatientProtocolData> getAllProtocolsAssociatedWithPatient(Long patientUserId) throws HillromException {
+    	User patientUser = userRepository.findOne(patientUserId);
+    	if(patientUser != null) {
+	    	PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
+	     	if(patientInfo != null){
+	     		return patientProtocolRepository.findByPatientUserIdOrderByCreatedDateAsc(patientUserId);
+	     	} else {
+	     		throw new HillromException(ExceptionConstants.HR_523);
+		 	}
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);
+     	}
+    }
 }
 

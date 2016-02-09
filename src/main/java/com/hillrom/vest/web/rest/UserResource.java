@@ -74,6 +74,7 @@ import com.hillrom.vest.web.rest.dto.AdherenceTrendVO;
 import com.hillrom.vest.web.rest.dto.PatientComplianceVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.ProtocolDTO;
+import com.hillrom.vest.web.rest.dto.ProtocolRevisionVO;
 import com.hillrom.vest.web.rest.dto.StatisticsVO;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
@@ -469,7 +470,7 @@ public class UserResource {
     	log.debug("REST request to get protocol for patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
     	try {
-    		List<PatientProtocolData> protocolList = patientProtocolService.getAllProtocolsAssociatedWithPatient(id);
+    		List<PatientProtocolData> protocolList = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);
     		if (protocolList.isEmpty()) {
 	        	jsonObject.put("message", MessageConstants.HR_245);
 	        } else {
@@ -983,12 +984,18 @@ public class UserResource {
     @RequestMapping(value="/user/{id}/adherenceTrend",
     		method=RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<AdherenceTrendVO>> getAdherenceTrendForDuration(@PathVariable Long id,
+    public ResponseEntity<?> getAdherenceTrendForDuration(@PathVariable Long id,
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
     		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to){
     	log.debug("REST request to get Adherence Trend for the duration : ", id,from,to);
-        List<AdherenceTrendVO> adherenceTrends = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
-        return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);
+    	try {
+
+            List<ProtocolRevisionVO> adherenceTrends = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
+            return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
+		} catch (Exception e) {
+			// TODO: handle exception
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
     }
 
     @RequestMapping(value = "/users/{id}/complianceGraphData",

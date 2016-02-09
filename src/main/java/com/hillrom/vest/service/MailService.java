@@ -32,6 +32,7 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.DateUtil;
+import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.PatientStatsVO;
 
@@ -239,8 +240,9 @@ public class MailService {
     
 	private void getUsersActivationReminderEmail(DateTime fromTime,DateTime toTime){
 	    List<User> users = userRepository.findAllByActivatedIsFalseAndActivationLinkSentDateBetweeen(fromTime, toTime);
-	    log.debug("No of users ", users);
 	    for(User user : users){
+	    	user.setActivationKey(RandomUtil.generateActivationKey());
+	    	userRepository.save(user);
 	    	sendActivationReminderEmail(user);
 	    }
 	}
@@ -284,4 +286,16 @@ public class MailService {
         subject = messageSource.getMessage("email.ingestionprocessstatus.subject", new String[]{status}, null);
         sendEmail(recipients.split(","), subject, content, false, true);
      }
+	
+	@Async
+    public void sendDeactivationEmail(User user, String baseUrl) {
+        log.debug("Sending deactivation e-mail to '{}'", user.getEmail());
+        Locale locale = getLocale(user);
+        Context context = new Context(locale);
+        context.setVariable("user", userNameFormatting(user));
+        context.setVariable("baseUrl", baseUrl);
+        String content = templateEngine.process("deactivationEmail", context);
+        String subject = messageSource.getMessage("email.deactivation.title", null, locale);
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
 }

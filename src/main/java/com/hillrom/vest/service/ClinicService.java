@@ -198,6 +198,8 @@ public class ClinicService {
 			clinic.setHillromId(clinicDTO.getHillromId());
 		if (clinicDTO.getClinicAdminId() != null)
 			clinic.setClinicAdminId(clinicDTO.getClinicAdminId());
+		if (clinicDTO.getDeleted() != null)
+			clinic.setDeleted(clinicDTO.getDeleted());
 	}
 
 	public Set<UserExtension> getHCPUsers(List<String> idList) throws HillromException, EntityNotFoundException {

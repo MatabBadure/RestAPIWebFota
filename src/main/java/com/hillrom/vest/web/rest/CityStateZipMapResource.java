@@ -1,5 +1,6 @@
 package com.hillrom.vest.web.rest;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.inject.Inject;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.service.CityStateZipMapService;
 
@@ -40,7 +40,7 @@ public class CityStateZipMapResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    public ResponseEntity<?> getCityStateZipValuesByCity(@RequestParam(value = "city") String city, HttpServletRequest request) {
+    public ResponseEntity<?> getCityStateZipValuesByCity(@RequestParam(required=true, value = "city") String city, HttpServletRequest request) {
     	
     	try {
 			return new ResponseEntity<>(cityStateZipMapService.getByCityName(city), HttpStatus.OK);
@@ -59,7 +59,7 @@ public class CityStateZipMapResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    public ResponseEntity<?> getCityStateZipValuesByZipCode(@RequestParam(value = "zipcode") int zipCode, HttpServletRequest request) {
+    public ResponseEntity<?> getCityStateZipValuesByZipCode(@RequestParam(required=true, value = "zipcode") Integer zipCode, HttpServletRequest request) {
     	
     	try {
 			return new ResponseEntity<>(cityStateZipMapService.getByZipCode(zipCode), HttpStatus.OK);
@@ -77,10 +77,9 @@ public class CityStateZipMapResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    public ResponseEntity<?> getCityStateZipValuesByZipCode(@RequestParam(value = "state") String state, HttpServletRequest request) {
+    public ResponseEntity<?> getCityStateZipValuesByZipCode(@RequestParam(required=true, value = "state") String state, HttpServletRequest request) {
     	
     	try {
-    		System.out.println("cityStateZipMapService :: "+cityStateZipMapService);
 			return new ResponseEntity<>(cityStateZipMapService.getByState(state), HttpStatus.OK);
 		} catch (HillromException e) {
 			JSONObject json = new JSONObject();

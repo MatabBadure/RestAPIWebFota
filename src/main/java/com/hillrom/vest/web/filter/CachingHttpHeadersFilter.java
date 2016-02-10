@@ -3,7 +3,9 @@ package com.hillrom.vest.web.filter;
 import org.springframework.core.env.Environment;
 
 import javax.servlet.*;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -46,6 +48,7 @@ public class CachingHttpHeadersFilter implements Filter {
 
         // Setting the Last-Modified header, for browser caching
         httpResponse.setDateHeader("Last-Modified", LAST_MODIFIED);
+        httpResponse.addCookie(new Cookie("made_write_conn","1263664141"));
 
         chain.doFilter(request, response);
     }

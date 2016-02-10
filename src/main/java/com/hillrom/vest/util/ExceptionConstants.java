@@ -139,7 +139,7 @@ public class ExceptionConstants {
     public static final String HR_707 = "The reset link which you are trying to access is no more valid. ";
 
     public static final String HR_708 = "Incorrect Hillrom User Authority";
-    public static final String HR_709 = "Incorrect City";
-    public static final String HR_710 = "Incorrect State";
-    public static final String HR_711 = "Incorrect Zip";
+    public static final String HR_709 = "Incorrect City Name";
+    public static final String HR_710 = "Incorrect State Name/Code";
+    public static final String HR_711 = "Incorrect Zip Code";
 }

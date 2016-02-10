@@ -59,7 +59,7 @@ public class CityStateZipMapResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    public ResponseEntity<?> getCityStateZipValuesByZipCode(@RequestParam(required=true, value = "zipcode") Integer zipCode, HttpServletRequest request) {
+    public ResponseEntity<?> getCityStateZipValuesByZipCode(@RequestParam(required=true, value = "zipcode")String zipCode, HttpServletRequest request) {
     	
     	try {
 			return new ResponseEntity<>(cityStateZipMapService.getByZipCode(zipCode), HttpStatus.OK);
@@ -77,7 +77,7 @@ public class CityStateZipMapResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    public ResponseEntity<?> getCityStateZipValuesByZipCode(@RequestParam(required=true, value = "state") String state, HttpServletRequest request) {
+    public ResponseEntity<?> getCityStateZipValuesByByState(@RequestParam(required=true, value = "state") String state, HttpServletRequest request) {
     	
     	try {
 			return new ResponseEntity<>(cityStateZipMapService.getByState(state), HttpStatus.OK);

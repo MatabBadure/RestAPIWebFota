@@ -32,8 +32,11 @@ public class CityStateZipMapService {
 		else throw new HillromException(ExceptionConstants.HR_709);
 	}
 	
-	public List<CityStateZipMap> getByZipCode(Integer zipCode) throws HillromException{
-		if(Objects.nonNull(zipCode))
+	public List<CityStateZipMap> getByZipCode(String zip) throws HillromException{
+		
+		Integer zipCode = Integer.parseInt(zip);
+		
+		if(Objects.isNull(zipCode))
 			throw new HillromException(ExceptionConstants.HR_711);
 			
 		List<CityStateZipMap> cityStateZipMaps = cityStateZipMapRepository.findAllByZipCode(zipCode); 
@@ -43,9 +46,12 @@ public class CityStateZipMapService {
 	}
 	
 	public List<CityStateZipMap> getByState(String state) throws HillromException{
+		if(StringUtils.isEmpty(state))
+			throw new HillromException(ExceptionConstants.HR_710);
+		
 		List<CityStateZipMap> cityStateZipMaps = cityStateZipMapRepository.findAllByState(state); 
 		if(Objects.nonNull(cityStateZipMaps) & !cityStateZipMaps.isEmpty())
 			return cityStateZipMaps;
-		else throw new HillromException(ExceptionConstants.HR_701);
+		else throw new HillromException(ExceptionConstants.HR_710);
 	}
 }

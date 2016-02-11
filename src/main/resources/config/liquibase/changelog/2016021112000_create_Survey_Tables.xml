@@ -85,7 +85,13 @@
 			<column name="user_id" type="Bigint">
 				<constraints nullable="false" />
 			</column>
-			<column name="answer_value" type="varchar(255)">
+			<column name="answer_value_1" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="answer_value_2" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="answer_value_3" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
 			<column name="compl_date" type="timestamp">

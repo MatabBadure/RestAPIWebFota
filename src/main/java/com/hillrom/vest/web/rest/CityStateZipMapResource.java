@@ -33,17 +33,13 @@ public class CityStateZipMapResource {
     @Inject
     private CityStateZipMapService cityStateZipMapService;
 
-    /**
-     * get  /CityStateZipValuesByCity -> get city state zip values by city the user.
-     */
-    @RequestMapping(value = "/cityStateZipValuesByCity",
+    @RequestMapping(value = "/cityStateZipMapByState",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    public ResponseEntity<?> getCityStateZipValuesByCity(@RequestParam(required=true, value = "city") String city, HttpServletRequest request) {
-    	
+    public ResponseEntity<?> getCityStateZipValuesByByState(@RequestParam(required=true, value = "state") String state, HttpServletRequest request) {	
     	try {
-			return new ResponseEntity<>(cityStateZipMapService.getByCityName(city), HttpStatus.OK);
+			return new ResponseEntity<>(cityStateZipMapService.getStateVOByState(state), HttpStatus.OK);
 		} catch (HillromException e) {
 			JSONObject json = new JSONObject();
 			json.put("ERROR",e.getMessage());
@@ -51,40 +47,11 @@ public class CityStateZipMapResource {
 		} 
     }
     
-
-    /**
-     * get  /CityStateZipValuesByCity -> get city state zipcode values by zipcode the user.
-     */
-    @RequestMapping(value = "/cityStateZipValuesByZipCode",
+    @RequestMapping(value = "/allstates",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    public ResponseEntity<?> getCityStateZipValuesByZipCode(@RequestParam(required=true, value = "zipcode")String zipCode, HttpServletRequest request) {
-    	
-    	try {
-			return new ResponseEntity<>(cityStateZipMapService.getByZipCode(zipCode), HttpStatus.OK);
-		} catch (HillromException e) {
-			JSONObject json = new JSONObject();
-			json.put("ERROR",e.getMessage());
-			return new ResponseEntity<>(json, HttpStatus.BAD_REQUEST);
-		} 
-    }
-    
-    /**
-     * get  /CityStateZipValuesByCity -> get city state zip values by state the user.
-     */
-    @RequestMapping(value = "/cityStateZipValuesByState",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    
-    public ResponseEntity<?> getCityStateZipValuesByByState(@RequestParam(required=true, value = "state") String state, HttpServletRequest request) {
-    	
-    	try {
-			return new ResponseEntity<>(cityStateZipMapService.getByState(state), HttpStatus.OK);
-		} catch (HillromException e) {
-			JSONObject json = new JSONObject();
-			json.put("ERROR",e.getMessage());
-			return new ResponseEntity<>(json, HttpStatus.BAD_REQUEST);
-		} 
+    public ResponseEntity<?> getState(HttpServletRequest request) {
+			return new ResponseEntity<>(cityStateZipMapService.getStates(), HttpStatus.OK);
     }
 }

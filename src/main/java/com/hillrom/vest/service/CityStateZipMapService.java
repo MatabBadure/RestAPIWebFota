@@ -44,8 +44,8 @@ public class CityStateZipMapService {
 			cityVO.setName(city);
 			for(CityStateZipMap csz : cszList){
 				cityVO.getZipcodes().add(csz.getZipCode());
-				stateVO.getCities().add(cityVO);
 			}
+			stateVO.getCities().add(cityVO);
 		}
 		return stateVO;
 	}

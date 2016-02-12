@@ -15,8 +15,6 @@ public class CityVO {
 		this.name = name;
 	}
 	public List<Integer> getZipcodes() {
-		if(Objects.isNull(zipcodes))
-			zipcodes = new LinkedList<>();
 		return zipcodes;
 	}
 }

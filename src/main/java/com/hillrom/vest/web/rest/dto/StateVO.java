@@ -7,16 +7,14 @@ import java.util.Objects;
 public class StateVO {
 
 	private String name;	
-	private List<CityVO> cities;
+	private List<CityVO> cities = new LinkedList<>();
 	public String getName() {
 		return name;
 	}
 	public void setName(String name) {
 		this.name = name;
 	}
-	public List<CityVO> getCities() {
-		if(Objects.isNull(cities))
-			cities = new LinkedList<>();
+	public List<CityVO> getCities() {			
 		return cities;
 	}
 }

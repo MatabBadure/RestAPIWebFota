@@ -37,7 +37,7 @@ public class CityStateZipMapResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    public ResponseEntity<?> getCityStateZipValuesByByState(@RequestParam(required=true, value = "state") String state, HttpServletRequest request) {	
+    public ResponseEntity<?> getCityStateZipValuesByByState(@RequestParam(required=true, value = "state") String state) {	
     	try {
 			return new ResponseEntity<>(cityStateZipMapService.getStateVOByState(state), HttpStatus.OK);
 		} catch (HillromException e) {
@@ -51,7 +51,7 @@ public class CityStateZipMapResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    public ResponseEntity<?> getState(HttpServletRequest request) {
+    public ResponseEntity<?> getState() {
 			return new ResponseEntity<>(cityStateZipMapService.getStates(), HttpStatus.OK);
     }
 }

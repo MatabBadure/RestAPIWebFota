@@ -125,7 +125,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/user/{id}/changeSecurityQuestion").authenticated()
             .antMatchers("/api/user/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES)
             .antMatchers("/api/patient/**").hasAnyAuthority(AuthoritiesConstants.ADMIN)
-            
+            .antMatchers("/api/cityStateZipValuesByCity").authenticated()
+            .antMatchers("/api/cityStateZipValuesBystate").authenticated()
+            .antMatchers("/api/cityStateZipValuesByZipCode").authenticated()
         .and()
             .apply(securityConfigurerAdapter());
 

@@ -15,7 +15,7 @@
 			<column name="id" type="bigint(20)" autoIncrement="${autoIncrement}">
 				<constraints primaryKey="true" nullable="false" />
 			</column>
-			<column name="zip" type="integer">
+			<column name="zip" type="varchar(255)">
 				<constraints nullable="false"/>
 			</column>
 			<column name="primary_city" type="varchar(255)">

@@ -142,4 +142,5 @@ public class ExceptionConstants {
     public static final String HR_709 = "Incorrect City Name";
     public static final String HR_710 = "Incorrect State Name/Code";
     public static final String HR_711 = "Incorrect Zip Code";
+    public static final String HR_712 = "Zip Code Not found";
 }

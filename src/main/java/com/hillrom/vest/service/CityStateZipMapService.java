@@ -1,6 +1,5 @@
 package com.hillrom.vest.service;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,29 +23,40 @@ public class CityStateZipMapService {
 
 	@Inject
 	private CityStateZipMapRepository cityStateZipMapRepository;
-	
-	
-	public List<String> getStates(){
-        return cityStateZipMapRepository.findUniqueStates();
+
+	public List<String> getStates() {
+		return cityStateZipMapRepository.findUniqueStates();
 	}
-	
-	public StateVO getStateVOByState(String state) throws HillromException{
-		if(StringUtils.isEmpty(state))
+
+	public StateVO getStateVOByState(String state) throws HillromException {
+		if (StringUtils.isEmpty(state))
 			throw new HillromException(ExceptionConstants.HR_710);
 		List<CityStateZipMap> cityStateZipMaps = cityStateZipMapRepository.findByState(state);
-		Map<String,List<CityStateZipMap>> zipsGroupByCity = (Map) cityStateZipMaps.stream().collect(Collectors.groupingBy(CityStateZipMap :: getCity));
+		Map<String, List<CityStateZipMap>> zipsGroupByCity = (Map) cityStateZipMaps.stream()
+				.collect(Collectors.groupingBy(CityStateZipMap::getCity));
 		StateVO stateVO = new StateVO();
 		stateVO.setName(state);
 		CityVO cityVO = null;
-		for(String city : zipsGroupByCity.keySet()){
+		for (String city : zipsGroupByCity.keySet()) {
 			List<CityStateZipMap> cszList = zipsGroupByCity.get(city);
 			cityVO = new CityVO();
 			cityVO.setName(city);
-			for(CityStateZipMap csz : cszList){
+			for (CityStateZipMap csz : cszList) {
 				cityVO.getZipcodes().add(csz.getZipCode());
 			}
 			stateVO.getCities().add(cityVO);
 		}
 		return stateVO;
+	}
+
+	public List<CityStateZipMap> getbyZipCode(String zipcode) throws HillromException {
+		if (StringUtils.isEmpty(zipcode))
+			throw new HillromException(ExceptionConstants.HR_711);
+		List<CityStateZipMap> cityStateZipMaps = cityStateZipMapRepository.findByZipCode(zipcode);
+
+		if (cityStateZipMaps.isEmpty())
+			throw new HillromException(ExceptionConstants.HR_712);
+		else
+			return cityStateZipMaps;
 	}
 }

@@ -1,7 +1,6 @@
 package com.hillrom.vest.web.rest;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +45,22 @@ public class CityStateZipMapResource {
 			return new ResponseEntity<>(json, HttpStatus.BAD_REQUEST);
 		} 
     }
+    
+    @RequestMapping(value = "/cityStateZipMapByZip",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    public ResponseEntity<?> getCityStateZipValuesByByZipcode(@RequestParam(required=true, value = "zipcode") String zipcode) {	
+    	try {
+			return new ResponseEntity<>(cityStateZipMapService.getbyZipCode(zipcode), HttpStatus.OK);
+		} catch (HillromException e) {
+			JSONObject json = new JSONObject();
+			json.put("ERROR",e.getMessage());
+			return new ResponseEntity<>(json, HttpStatus.BAD_REQUEST);
+		} 
+    }
+    
+    
     
     @RequestMapping(value = "/allstates",
             method = RequestMethod.GET,

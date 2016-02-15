@@ -17,7 +17,7 @@ public class CityStateZipMap {
 	private Long id;
 
 	@Column(name = "zip")
-	private Integer zipCode;
+	private String zipCode;
 
 	@Column(name = "primary_city")
 	private String city;
@@ -36,11 +36,11 @@ public class CityStateZipMap {
 		this.id = id;
 	}
 
-	public Integer getZipCode() {
+	public String getZipCode() {
 		return zipCode;
 	}
 
-	public void setZipCode(Integer zipCode) {
+	public void setZipCode(String zipCode) {
 		this.zipCode = zipCode;
 	}
 

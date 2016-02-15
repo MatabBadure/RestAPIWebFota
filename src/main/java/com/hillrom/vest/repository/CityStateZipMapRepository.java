@@ -12,5 +12,7 @@ public interface CityStateZipMapRepository extends JpaRepository<CityStateZipMap
 	@Query("Select distinct(state) from CityStateZipMap")
 	List<String> findUniqueStates();
 	
+	List<CityStateZipMap> findByZipCode(String zipCode);
+
 	List<CityStateZipMap> findByState(String state);
 }

@@ -156,12 +156,10 @@ public class PatientComplianceService {
 			ProtocolRevisionVO revisionVO = recentRevisionMap.get(dt);
 			revisionVO.addAdherenceTrend(trendVO);
 			
-			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ revisionVO : "+revisionVO);
 			adherenceTrends.add(trendVO);
 		}
 		List<ProtocolRevisionVO> revisions = revisionData.values().stream().filter(rev -> rev.getAdherenceTrends().size() > 0).collect(Collectors.toList());
 		return revisions;
-		//return adherenceTrends;
 	}
 	
 	private void setNotificationPointsMap(

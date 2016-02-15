@@ -45,7 +45,8 @@ public class ProtocolRevisionVO implements Serializable{
 		this.adherenceTrends = adherenceTrends;
 	}
 	public void addProtocol(ProtocolDataVO protocol){
-		this.protcols.add(protocol);
+		if(!protcols.contains(protocol))
+			this.protcols.add(protocol);
 	}
 	public void addAdherenceTrend(AdherenceTrendVO adherenceTrend){
 		this.adherenceTrends.add(adherenceTrend);

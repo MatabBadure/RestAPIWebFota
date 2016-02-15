@@ -122,5 +122,80 @@ public class ProtocolDataVO {
 				+ maxPressure + "]";
 	}
 
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result
+				+ ((maxFrequency == null) ? 0 : maxFrequency.hashCode());
+		result = prime * result
+				+ ((maxPressure == null) ? 0 : maxPressure.hashCode());
+		result = prime * result
+				+ ((minFrequency == null) ? 0 : minFrequency.hashCode());
+		result = prime * result + minMinutesPerTreatment;
+		result = prime * result
+				+ ((minPressure == null) ? 0 : minPressure.hashCode());
+		result = prime * result
+				+ ((treatmentLabel == null) ? 0 : treatmentLabel.hashCode());
+		result = prime * result + treatmentsPerDay;
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ProtocolDataVO other = (ProtocolDataVO) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (maxFrequency == null) {
+			if (other.maxFrequency != null)
+				return false;
+		} else if (!maxFrequency.equals(other.maxFrequency))
+			return false;
+		if (maxPressure == null) {
+			if (other.maxPressure != null)
+				return false;
+		} else if (!maxPressure.equals(other.maxPressure))
+			return false;
+		if (minFrequency == null) {
+			if (other.minFrequency != null)
+				return false;
+		} else if (!minFrequency.equals(other.minFrequency))
+			return false;
+		if (minMinutesPerTreatment != other.minMinutesPerTreatment)
+			return false;
+		if (minPressure == null) {
+			if (other.minPressure != null)
+				return false;
+		} else if (!minPressure.equals(other.minPressure))
+			return false;
+		if (treatmentLabel == null) {
+			if (other.treatmentLabel != null)
+				return false;
+		} else if (!treatmentLabel.equals(other.treatmentLabel))
+			return false;
+		if (treatmentsPerDay != other.treatmentsPerDay)
+			return false;
+		if (type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!type.equals(other.type))
+			return false;
+		return true;
+	}
+
+	
     
 }

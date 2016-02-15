@@ -53,6 +53,10 @@ public class PatientProtocolDataAuditService extends AuditableService<PatientPro
 		addDefaultProtocolOnUserCreation(userId, protocolRevMap,defaultProtocol);
 		prepareCurrentProtocolRevisions(protocolRevMap, existingProtocols,defaultProtocol);
 		prepareProtocolRevisions(protocolRevMap, revisionsList,defaultProtocol);
+		
+		/*if(protocolRevMap.size() == 1){
+			prepareCurrentProtocolRevisions(protocolRevMap, existingProtocols,defaultProtocol);
+		}*/
 		return protocolRevMap;
 	}
 
@@ -61,8 +65,7 @@ public class PatientProtocolDataAuditService extends AuditableService<PatientPro
 			ProtocolConstants defaultProtocol) {
 		User user = userRepository.findOne(userId);
 		DateTime dt = user.getCreatedDate();
-		ProtocolRevisionVO defaultAssignment = new ProtocolRevisionVO();
-		defaultAssignment.setFrom(dt);
+		ProtocolRevisionVO defaultAssignment = createRevision(dt, null);
 		defaultAssignment.addProtocol(ProtocolDataVOBuilder.convertProtocolConstantsToVO(defaultProtocol));
 		// default protocol to be available on user creation,hence 1 minute is deducted from created date
 		protocolRevMap.put(dt.minusMinutes(1), defaultAssignment); 
@@ -73,29 +76,55 @@ public class PatientProtocolDataAuditService extends AuditableService<PatientPro
 			List<PatientProtocolData> revisionsList,ProtocolConstants defaultProtocol) {
 		for(PatientProtocolData protocol : revisionsList){
 			DateTime lastModifiedDate = protocol.getLastModifiedDate();
+			updateLatestRevision(protocolRevMap, lastModifiedDate);
 			ProtocolRevisionVO revision = protocolRevMap.get(lastModifiedDate);
 			if(Objects.isNull(revision) && !protocol.isDeleted()){
 				ProtocolDataVO dataVO = ProtocolDataVOBuilder.convertProtocolDataToVO(protocol);
-				revision = createRevision(lastModifiedDate, null);
-				revision.addProtocol(dataVO);
-				updateLatestRevision(protocolRevMap, lastModifiedDate);
-				protocolRevMap.put(lastModifiedDate, revision);
+				SortedMap<DateTime, ProtocolRevisionVO> headMap = protocolRevMap.headMap(lastModifiedDate);
+				DateTime activeFrom = protocol.getCreatedDate();
+				DateTime latestKey = null;
+				if(Objects.nonNull(headMap) && headMap.size() > 0){
+					activeFrom = latestKey = headMap.lastKey();
+					activeFrom = headMap.get(activeFrom).getTo();
+				} 
+				revision = createRevision(activeFrom, null);
+				if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(protocol.getType())){
+					revision.addProtocol(dataVO);
+				}else{
+					// Handle custom protocol create & update revisions
+					ProtocolRevisionVO existingRev = protocolRevMap.get(latestKey);
+					if(Objects.nonNull(existingRev)){
+						if(existingRev.getProtcols().size() > 0 &&
+								Constants.CUSTOM_PROTOCOL.equalsIgnoreCase(existingRev.getProtcols().get(0).getType())){
+							for(ProtocolDataVO  vo : existingRev.getProtcols()){
+								if(!vo.getId().equalsIgnoreCase(protocol.getId()) ){
+									revision.addProtocol(vo);
+								}
+							}
+						}
+					}
+					revision.addProtocol(dataVO);
+				}
+				protocolRevMap.put(activeFrom, revision);
 			}else{
 				if(protocol.isDeleted()){
 					updateLatestRevision(protocolRevMap, lastModifiedDate);
 					ProtocolDataVO vo = ProtocolDataVOBuilder.convertProtocolConstantsToVO(defaultProtocol);
 					ProtocolRevisionVO defaultAssignment = createRevision(lastModifiedDate,null);
 					defaultAssignment.addProtocol(vo);
-					protocolRevMap.put(lastModifiedDate, defaultAssignment);
+					protocolRevMap.put(lastModifiedDate.plusSeconds(1), defaultAssignment);
 				}else{
 					List<ProtocolDataVO> protocolRev = revision.getProtcols();
 					ProtocolDataVO lastProtocolRev = protocolRev.get(protocolRev.size()-1);
 					
-					if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(lastProtocolRev.getType()))
+					if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(lastProtocolRev.getType())){
+						ProtocolRevisionVO nextRevision = createRevision(protocol.getLastModifiedDate(), null);
+						nextRevision.addProtocol(ProtocolDataVOBuilder.convertProtocolDataToVO(protocol));
+						protocolRevMap.put(lastModifiedDate.plusSeconds(1), nextRevision);
 						revision.setTo(lastModifiedDate);
+					}
 
-					ProtocolRevisionVO nextRevision = createNewRevisionForUpdate(
-							protocol, lastModifiedDate, revision);
+					ProtocolRevisionVO nextRevision = createNewRevisionForUpdate(protocolRevMap,protocol);
 					
 					protocolRevMap.put(lastModifiedDate, nextRevision);
 				}
@@ -115,49 +144,48 @@ public class PatientProtocolDataAuditService extends AuditableService<PatientPro
 			List<PatientProtocolData> protocolsList,ProtocolConstants defaultProtocol) {
 		for(PatientProtocolData protocol : protocolsList){
 			ProtocolDataVO dataVO = ProtocolDataVOBuilder.convertProtocolDataToVO(protocol);
-			ProtocolRevisionVO revision = protocolRevMap.get(protocol.getCreatedDate());
+			ProtocolRevisionVO revision = protocolRevMap.get(protocol.getLastModifiedDate());
 			DateTime activeTillDate = protocol.isDeleted() ? protocol.getLastModifiedDate() : null; 
 			if(Objects.isNull(revision)){
 				revision = createRevision(protocol.getCreatedDate(),activeTillDate);
 			}
 			revision.addProtocol(dataVO);
 			if(protocol.isDeleted()){
-				updateLatestRevision(protocolRevMap, protocol.getCreatedDate());
+				updateLatestRevision(protocolRevMap, protocol.getLastModifiedDate());
 				ProtocolDataVO defProDataVO = ProtocolDataVOBuilder.convertProtocolConstantsToVO(defaultProtocol);
-				ProtocolRevisionVO nextRevision = createRevision(activeTillDate, null);
+				ProtocolRevisionVO nextRevision = createRevision(protocol.getLastModifiedDate(), null);
 				nextRevision.addProtocol(defProDataVO);
 				protocolRevMap.put(protocol.getLastModifiedDate().plusSeconds(1),nextRevision);
 			}
-			protocolRevMap.put(protocol.getCreatedDate(), revision);
+			protocolRevMap.put(protocol.getLastModifiedDate(), revision);
 		}
 	}
 	
 	private ProtocolRevisionVO createNewRevisionForUpdate(
-			PatientProtocolData protocol, DateTime lastModifiedDate,
-			ProtocolRevisionVO revision) {
+			SortedMap<DateTime, ProtocolRevisionVO> protocolRevMap,
+			PatientProtocolData protocolData) {
+		SortedMap<DateTime, ProtocolRevisionVO> recentRevMap = protocolRevMap.headMap(protocolData.getLastModifiedDate().plusMillis(1));
+		ProtocolRevisionVO revision = null;
+		if(Objects.nonNull(recentRevMap) && recentRevMap.size() > 0){
+			revision = recentRevMap.get(recentRevMap.lastKey());
+		}
+		if(Objects.isNull(revision)){
+			revision = createRevision(protocolData.getLastModifiedDate(), null);
+		}
 		List<ProtocolDataVO> previousProtocol = revision.getProtcols();
-		ProtocolDataVO lastChange = previousProtocol.get(previousProtocol.size()-1);
-
-		if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(lastChange.getType())){
-			ProtocolRevisionVO nextRevision = new ProtocolRevisionVO();
-			nextRevision.setFrom(lastModifiedDate);
-			nextRevision.addProtocol(ProtocolDataVOBuilder.convertProtocolDataToVO(protocol));
-			return nextRevision;
-		}else{
 			int index = -1;
-			for(int i = 0; i < previousProtocol.size(); i++){
-				if(protocol.getId().equalsIgnoreCase(previousProtocol.get(i).getId())){
+			for(int i = 0; i < revision.getProtcols().size(); i++){
+				if(protocolData.getId().equalsIgnoreCase(previousProtocol.get(i).getId())){
 					index = i;
 					break;
 				}
 			}
 			if(index > -1){
-				revision.getProtcols().add(index, ProtocolDataVOBuilder.convertProtocolDataToVO(protocol));
+				revision.getProtcols().set(index, ProtocolDataVOBuilder.convertProtocolDataToVO(protocolData));
 			}else{
-				revision.addProtocol(ProtocolDataVOBuilder.convertProtocolDataToVO(protocol));
+				revision.addProtocol(ProtocolDataVOBuilder.convertProtocolDataToVO(protocolData));
 			}
 			return revision;
-		}
 	}
 
 	private void updateLatestRevision(

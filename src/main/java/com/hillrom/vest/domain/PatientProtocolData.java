@@ -12,6 +12,7 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.envers.Audited;
+import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

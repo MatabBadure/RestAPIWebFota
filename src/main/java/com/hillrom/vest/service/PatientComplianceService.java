@@ -66,9 +66,6 @@ public class PatientComplianceService {
 	@Qualifier("patientProtocolDataAuditService")
 	private PatientProtocolDataAuditService protocolAuditService;
 	
-	@Inject
-	private ProtocolConstantsRepository protocolConstantsRepository;
-	
 	/**
 	 * Creates Or Updates Compliance 
 	 * @param compliance
@@ -141,6 +138,14 @@ public class PatientComplianceService {
 		PatientCompliance lastCompliance = actualMapRequested.get(actualMapRequested.lastKey());
 		DateTime dateTime = Objects.nonNull(lastCompliance.getLastModifiedDate()) ? lastCompliance.getLastModifiedDate() : lastCompliance.getDate().toDateTimeAtStartOfDay();  
 		SortedMap<DateTime,ProtocolRevisionVO> revisionData = protocolAuditService.findProtocolRevisionsByUserIdTillDate(patientUserId,dateTime);
+		// if no revisions found,create a dummy revision with isValid = false
+		if(revisionData.isEmpty()){
+			ProtocolRevisionVO revisionVO = new ProtocolRevisionVO(lastCompliance.getPatientUser().getCreatedDate(),null);
+			revisionData.put(therapySession.getPatientUser().getCreatedDate().minusSeconds(1), revisionVO);
+		}else{
+			ProtocolRevisionVO revisionVO = new ProtocolRevisionVO(lastCompliance.getPatientUser().getCreatedDate(),revisionData.firstKey());
+			revisionData.put(therapySession.getPatientUser().getCreatedDate().minusSeconds(1), revisionVO);
+		}
 
 		List<AdherenceTrendVO> adherenceTrends = new LinkedList<>();
 		for(LocalDate date: actualMapRequested.keySet()){

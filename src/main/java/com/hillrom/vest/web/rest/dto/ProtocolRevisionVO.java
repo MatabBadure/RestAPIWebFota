@@ -17,6 +17,16 @@ public class ProtocolRevisionVO implements Serializable{
 	private List<ProtocolDataVO> protcols= new LinkedList<>();
 	private List<AdherenceTrendVO> adherenceTrends = new LinkedList<>();
 	
+	public ProtocolRevisionVO() {
+		super();
+	}
+	
+	public ProtocolRevisionVO(DateTime from, DateTime to) {
+		super();
+		this.from = from;
+		this.to = to;
+	}
+
 	@JsonSerialize(using= DateTimeSerializer.class)
 	public DateTime getFrom() {
 		return from;

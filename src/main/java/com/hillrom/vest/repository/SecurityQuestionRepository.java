@@ -1,12 +1,12 @@
 package com.hillrom.vest.repository;
 
-import com.hillrom.vest.domain.SecurityQuestion;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import com.hillrom.vest.domain.SecurityQuestion;
 
 /**
  * Spring Data JPA repository for the SecurityQuestion entity.
+ * 
  */
 public interface SecurityQuestionRepository extends JpaRepository<SecurityQuestion,Long> {
 

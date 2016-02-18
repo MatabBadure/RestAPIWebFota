@@ -14,6 +14,8 @@
         
     -->
     <changeSet id="20151106153600" author="jhipster">
-    	<addDefaultValue  tableName="JDE_LOAD_TABLE" columnName="processed" defaultValueNumeric="0"/>
+    	<modifyDataType  tableName="JDE_LOAD_TABLE" columnName="patient_dob" newDataType="date"/>
     </changeSet>
 </databaseChangeLog>
+        
+

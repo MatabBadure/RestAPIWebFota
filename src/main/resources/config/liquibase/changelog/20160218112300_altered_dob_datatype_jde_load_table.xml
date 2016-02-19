@@ -14,7 +14,7 @@
         
     -->
     <changeSet id="20160218112300" author="jhipster">
-    	<modifyDataType  tableName="JDE_LOAD_TABLE" columnName="patient_dob" newDataType="date"/>
+    	<modifyDataType  tableName="JDE_LOAD_TABLE" columnName="patient_dob" newDataType="datetime"/>
     </changeSet>
 </databaseChangeLog>
         

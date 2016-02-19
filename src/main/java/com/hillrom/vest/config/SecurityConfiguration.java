@@ -128,6 +128,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/cityStateZipValuesByCity").authenticated()
             .antMatchers("/api/cityStateZipValuesBystate").authenticated()
             .antMatchers("/api/cityStateZipValuesByZipCode").authenticated()
+            .antMatchers("/api/validateCredentials").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES)
         .and()
             .apply(securityConfigurerAdapter());
 

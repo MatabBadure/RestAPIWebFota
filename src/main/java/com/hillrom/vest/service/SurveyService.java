@@ -251,33 +251,35 @@ public class SurveyService {
 	public UserSurveyAnswerDTO getSurveyAnswerById(Long id) throws HillromException {
 
 		UserSurveyAnswer userSurveyAnswer = userSurveyAnswerRepository.findOne(id);
+		if (Objects.isNull(userSurveyAnswer))
+			throw new HillromException(ExceptionConstants.HR_512);
 		UserSurveyAnswerDTO userSurveyAnswerDTO = new UserSurveyAnswerDTO();
 		userSurveyAnswerDTO.setSurveyId(userSurveyAnswer.getSurvey().getId());
 		userSurveyAnswerDTO.setUserId(userSurveyAnswer.getUser().getId());
 		userSurveyAnswerDTO.getUserSurveyAnswer().add(userSurveyAnswer);
-		if (Objects.isNull(userSurveyAnswer))
-			throw new HillromException(ExceptionConstants.HR_512);
 		return userSurveyAnswerDTO;
 	}
 
 	public Survey getDueSurveyByUserId(Long id) throws HillromException {
 		User user = userRepository.findOne(id);
+		if (Objects.isNull(user))
+			throw new HillromException(ExceptionConstants.HR_512);
+		
 		if (Objects.isNull(userService.getPatientInfoObjFromPatientUser(user)))
 			throw new HillromException(ExceptionConstants.HR_523);
-
-		if (user.getCreatedDate().plusDays(FIVE_DAYS).isBeforeNow()
-				| user.getCreatedDate().plusDays(THIRTY_DAYS).isAfterNow()) {
-			if (userSurveyAnswerRepository.findCountByUserIdAndSurveyId(id, FIVE_DAY_SURVEY_ID) < 1)
+		
+		if ((user.getCreatedDate().plusDays(FIVE_DAYS).isBeforeNow()
+				& user.getCreatedDate().plusDays(THIRTY_DAYS).isAfterNow()) && 
+				userSurveyAnswerRepository.findCountByUserIdAndSurveyId(id, FIVE_DAY_SURVEY_ID) < 1) {
 				return surveyRepository.findOne(FIVE_DAY_SURVEY_ID);
 		} else if (user.getCreatedDate().plusDays(THIRTY_DAYS).isBeforeNow()
-				| user.getCreatedDate().plusDays(NINTY_DAYS).isAfterNow()) {
-			if (userSurveyAnswerRepository.findCountByUserIdAndSurveyId(id, THIRTY_DAY_SURVEY_ID) < 1)
+				& user.getCreatedDate().plusDays(NINTY_DAYS).isAfterNow() && 
+				userSurveyAnswerRepository.findCountByUserIdAndSurveyId(id, THIRTY_DAY_SURVEY_ID) < 1) {
 				return surveyRepository.findOne(THIRTY_DAY_SURVEY_ID);
-		} else if (user.getCreatedDate().plusDays(THIRTY_DAYS).isBeforeNow()) {
-			if (userSurveyAnswerRepository.findCountByUserIdAndSurveyId(id, THIRTY_DAY_SURVEY_ID) < 1)
-				return surveyRepository.findOne(THIRTY_DAY_SURVEY_ID);
+		} else if (user.getCreatedDate().plusDays(NINTY_DAYS).isBeforeNow() &&
+				userSurveyAnswerRepository.findCountByUserIdAndSurveyId(id, NIGHTY_DAY_SURVEY_ID) < 1) {
+				return surveyRepository.findOne(NIGHTY_DAY_SURVEY_ID);
 		} else
-			throw new HillromException(ExceptionConstants.HR_803);
-		return new Survey();
+			throw new HillromException(ExceptionConstants.HR_804);
 	}
 }

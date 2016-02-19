@@ -146,8 +146,6 @@ public class ExceptionConstants {
     public static final String HR_801 = "Invalid Survey Id";
     public static final String HR_802 = "Invalid Survey Answers";
     
-        public static final String HR_801 = "Invalid Survey Id";
-    public static final String HR_802 = "Invalid Survey Answers";
     public static final String HR_803 = "Incorrect request format";
     public static final String HR_804 = "No survey to take";
     public static final String HR_805 = "Survey taken already";

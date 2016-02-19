@@ -108,7 +108,7 @@
 		<addForeignKeyConstraint baseColumnNames="question_id"
 			baseTableName="USER_SURVEY_ANSWERS" constraintName="fk_usa_question_id"
 			referencedColumnNames="id" referencedTableName="QUESTIONS" />
-		<addForeignKeyConstraint baseColumnNames="question_id"
+		<addForeignKeyConstraint baseColumnNames="user_id"
 			baseTableName="USER_SURVEY_ANSWERS" constraintName="fk_usa_user_id"
 			referencedColumnNames="id" referencedTableName="USER" />
 

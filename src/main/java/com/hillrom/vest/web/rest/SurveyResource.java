@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.domain.Survey;
-import com.hillrom.vest.domain.UserSurveyAnswer;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.SurveyService;
@@ -91,10 +90,10 @@ public class SurveyResource {
 
 	@RolesAllowed({ AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT })
 	public ResponseEntity<?> getSurveyAnswerById(@PathVariable Long id) {
-		UserSurveyAnswer userSurveyAnswer;
+		UserSurveyAnswerDTO surveyAnswerDTO;
 		try {
-			userSurveyAnswer = surveyService.getSurveyAnswerById(id);
-			return new ResponseEntity<UserSurveyAnswer>(userSurveyAnswer, HttpStatus.OK);
+			surveyAnswerDTO = surveyService.getSurveyAnswerById(id);
+			return new ResponseEntity<UserSurveyAnswerDTO>(surveyAnswerDTO, HttpStatus.OK);
 		} catch (HillromException e) {
 			log.debug("User Survey Answer with id {} : Not Found", id);
 			JSONObject jsonObject = new JSONObject();

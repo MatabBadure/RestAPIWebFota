@@ -3,8 +3,6 @@ package com.hillrom.vest.web.rest.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.hillrom.vest.domain.SurveyQuestion;
-
 public final class SurveyVO {
 
 	private Long surveyId;

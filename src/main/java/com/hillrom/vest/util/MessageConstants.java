@@ -91,5 +91,7 @@ public class MessageConstants {
     public static final String HR_304 = "Security question fetched successfully.";
     
     public static final String HR_305 = "Activation link sent successfully.";
-    public static final String HR_306 = "Survey taken successfully.";
+    
+    public static final String HR_306 = "Authenticated successfully.";
+    public static final String HR_307 = "Survey taken successfully.";
 }

@@ -1,5 +1,6 @@
 package com.hillrom.vest.web.rest.dto;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import com.hillrom.vest.domain.UserSurveyAnswer;
@@ -7,7 +8,7 @@ import com.hillrom.vest.domain.UserSurveyAnswer;
 public class UserSurveyAnswerDTO {
 	private Long surveyId;
 	private Long userId;
-	private List<UserSurveyAnswer> userSurveyAnswers;
+	private List<UserSurveyAnswer> userSurveyAnswers = new LinkedList<>();
 
 	public Long getSurveyId() {
 		return surveyId;

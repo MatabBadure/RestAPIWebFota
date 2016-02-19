@@ -78,7 +78,7 @@ public class SurveyResource {
 		try {
 			System.out.println(userSurveyAnswers.toString());
 			surveyService.createSurveyAnswer(userSurveyAnswers);
-			jsonObject.put("message", MessageConstants.HR_306);
+			jsonObject.put("message", MessageConstants.HR_307);
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {
 			jsonObject.put("ERROR", e.getMessage());

@@ -102,4 +102,22 @@ public class SurveyResource {
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.NOT_FOUND);
 		}
 	}
+	/*
+	 **
+	 * get /duesurvey/{id} -> get Due Survey by User Id.
+	 */
+	@RequestMapping(value = "/survey/user/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+
+	@RolesAllowed({ AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT })
+	public ResponseEntity<?> getDueSurveyByUserId(@PathVariable Long id) {
+		Survey survey;
+		try {
+			survey = surveyService.getDueSurveyByUserId(id);
+			return new ResponseEntity<Survey>(survey, HttpStatus.OK);
+		} catch (HillromException e) {
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.NOT_FOUND);
+		}
+	}
 }

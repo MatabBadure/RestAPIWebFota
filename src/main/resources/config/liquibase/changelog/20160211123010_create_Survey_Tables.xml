@@ -127,6 +127,9 @@
 		
 		<addForeignKeyConstraint baseColumnNames="survey_ans_format_id"
 			baseTableName="QUESTIONS" constraintName="fk_question_survey_and_format_id"
-			referencedColumnNames="id" referencedTableName="HILLROM_TYPE_CODE_VALUES" />     
+			referencedColumnNames="id" referencedTableName="HILLROM_TYPE_CODE_VALUES" />    
+    	<loadUpdateData  encoding="UTF-8" file="config/liquibase/surveys.csv"
+			separator="," tableName="SURVEYS" primaryKey="id">
+		</loadUpdateData>
     </changeSet>
 </databaseChangeLog>

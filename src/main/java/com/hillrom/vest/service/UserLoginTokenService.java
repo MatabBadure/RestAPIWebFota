@@ -40,25 +40,27 @@ public class UserLoginTokenService {
 			return false;
 		}else{
 			
-			DateTime tokenCreatedAt = securityToken.getCreatedTime();
-			long expiryTimeInMillis = securityToken.getCreatedTime().plus(1000 * tokenProvider.getTokenValidity()).getMillis();
+			DateTime tokenModifiedAt = securityToken.getLastModifiedTime();
+			long expiryTimeInMillis = tokenModifiedAt.plus(1000 * tokenProvider.getTokenValidity()).getMillis();
+			DateTime now = DateTime.now();
 			
 			boolean flag = false;
-			if(expiryTimeInMillis - System.currentTimeMillis() >= 0 ){
-				log.debug("Last update time for Token : " + securityToken.getCreatedTime());
+			if(expiryTimeInMillis - System.currentTimeMillis() >= 0 && !securityToken.isExpired() ){
+				log.debug("Created time for Token : " + securityToken.getCreatedTime());
+				log.debug("Last updated time for Token : " + tokenModifiedAt);
 				log.debug("Current application  time  : " + DateTime.now());
 				log.debug("Difference in seconds      : " + (expiryTimeInMillis - System.currentTimeMillis())/1000);
 				flag = true;
-				securityToken.setCreatedTime(DateTime.now());
+				securityToken.setLastModifiedTime(now);
 				log.debug("flag : " + flag);
 				tokenRepository.save(securityToken);
 				return flag;				
 			}else{
 				flag = false;
-				log.debug("Last update time for Token : " + securityToken.getCreatedTime());
+				log.debug("Created time for Token : " + securityToken.getCreatedTime());
+				log.debug("Last updated time for Token : " + tokenModifiedAt);
 				log.debug("Current application  time  : " + DateTime.now());
 				log.debug("Difference in seconds      : " + (expiryTimeInMillis - System.currentTimeMillis())/1000);
-				log.debug("flag : " + flag);
 				return flag;				
 			}
 		}

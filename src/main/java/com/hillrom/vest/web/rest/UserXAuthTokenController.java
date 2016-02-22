@@ -3,6 +3,7 @@ package com.hillrom.vest.web.rest;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import net.minidev.json.JSONObject;
 
@@ -31,10 +32,10 @@ public class UserXAuthTokenController {
     @RequestMapping(value = "/authenticate",
             method = RequestMethod.POST)
     
-    public UserLoginToken authorize(@RequestBody(required=true) Map<String,String> credentialsMap) {
+    public UserLoginToken authorize(HttpServletRequest request,@RequestBody(required=true) Map<String,String> credentialsMap) {
     	String username = credentialsMap.get("username");
     	String password = credentialsMap.get("password"); 
-    	return authenticationService.authenticate(username, password);
+    	return authenticationService.authenticate(username, password,request.getRemoteAddr());
     }
 
     @RequestMapping(value = "/logout",

@@ -48,13 +48,13 @@ public class AuthenticationService {
     @Inject
     private PasswordEncoder passwordEncoder;
     
-    public UserLoginToken authenticate(String username,String password){
+    public UserLoginToken authenticate(String username,String password,String ipAddress){
     	if(StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)){
     		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
     		Authentication authentication = this.authenticationManager.authenticate(token);
     		SecurityContextHolder.getContext().setAuthentication(authentication);
     		UserDetails details = this.userDetailsService.loadUserByUsername(username);
-    		return tokenProvider.createToken(details);    		
+    		return tokenProvider.createToken(details,ipAddress);    		
     	}else{
     		throw new BadCredentialsException("Please provide Username and Password");
     	}

@@ -76,6 +76,7 @@
  	<include file="classpath:/config/liquibase/changelog/20160204173800_create_city_state_zip_map_table.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20160209183200_load_defaut_city_zip_state_map_data.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20160218112300_altered_dob_datatype_jde_load_table.xml" relativeToChangelogFile="false"/>
+ 	<include file="classpath:/config/liquibase/changelog/20160211123010_create_Survey_Tables.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20160219164732_added_expired_last_modified_time_to_UserLoginToken.xml" relativeToChangelogFile="false"/>
  </databaseChangeLog>
  

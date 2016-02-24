@@ -143,4 +143,9 @@ public class ExceptionConstants {
     public static final String HR_710 = "Incorrect State Name/Code";
     public static final String HR_711 = "Incorrect Zip Code";
     public static final String HR_712 = "Zip Code Not found";
+    
+    // Validate Credentials Api Exception messages
+    public static final String HR_714 = "Please enter the password for your Visi-View account.";
+    public static final String HR_716 = "The entered password is incorrect. Be sure you're using the password for your Visi-View account.";
+    
 }

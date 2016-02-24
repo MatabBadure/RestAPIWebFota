@@ -3,31 +3,85 @@ package com.hillrom.vest.domain;
 import java.io.Serializable;
 
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
+import javax.persistence.SqlResultSetMapping;
+import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
-import org.joda.time.LocalDate;
+import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 import com.hillrom.vest.domain.util.MMDDYYYYLocalDateSerializer;
+import com.hillrom.vest.repository.FiveDaySurveyReportVO;
 
 @Entity
 @Audited
 @Table(name = "USER_SURVEY_ANSWERS")
+@NamedNativeQueries({
+		@NamedNativeQuery(name = "fiveDaySurveyReport", query = "select ques.id as id, ques.question_text as questionText, ROUND (( "
+				+ "LENGTH(group_concat(answer_value_1)) "
+				+ "- LENGTH( REPLACE ( group_concat(answer_value_1), 'Yes', '') ) " + ") / LENGTH('Yes')) AS yesCount,"
+				+ "ROUND((LENGTH(group_concat(answer_value_1)) "
+				+ "- LENGTH( REPLACE ( group_concat(answer_value_1), 'No', '')) "
+				+ ") / LENGTH('No')) AS noCount , compl_date as compDate " 
+				+ "from QUESTIONS ques left outer join USER_SURVEY_ANSWERS usa "
+				+ "on ques.id = usa.question_id and usa.survey_id = 1 "
+				+ "and DATE(usa.compl_date) between ? and ? "
+				+ "where ques.id in (6,7,8,9,10,11,12)  "
+				+ "group by ques.id ", resultSetMapping = "fiveDaySurveyReportMapping"),
+
+		@NamedNativeQuery(name = "thirtyDaySurveyReport", query = "select ques.id as id, ques.question_text as questionText,"
+				+ "ROUND (( LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
+				+ "'Strongly disagree', '') ) ) / LENGTH('Strongly disagree')) AS stronglyDisagreeCount, "
+				+ "ROUND((LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
+				+ "'Somewhat disagree', '')) ) / LENGTH('Somewhat disagree')) AS somewhatDisagreeCount , "
+				+ "ROUND((LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
+				+ "'Neutral', '')) ) / LENGTH('Neutral')) AS neutralCount , "
+				+ "ROUND((LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
+				+ "'Somewhat agree', '')) ) / LENGTH('Somewhat agree')) AS somewhatAgreeCount,"
+				+ "ROUND (( LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
+				+ "'Strongly Agree', '') ) ) / LENGTH('Strongly Agree')) AS stronglyAgreeCount,  "
+				+ "ROUND (( LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
+				+ "'Unable to access', '') ) ) / LENGTH('Unable to access')) AS unableToAccessCount, "
+				+ "compl_date as compDate from QUESTIONS ques left outer join USER_SURVEY_ANSWERS usa "
+				+ "on ques.id = usa.question_id and usa.survey_id = 2 "
+				+ "and DATE(usa.compl_date) between ? and ? "
+				+ "where ques.id in (27,28,29,30,31,32,33)  "
+				+ "group by ques.id  ", resultSetMapping = "thirtyDaySurveyReportMapping") })
+
+@SqlResultSetMappings({
+		@SqlResultSetMapping(name = "fiveDaySurveyReportMapping", classes = @ConstructorResult(targetClass = FiveDaySurveyReportVO.class, columns = {
+				@ColumnResult(name = "id", type = Long.class), @ColumnResult(name = "questionText"),
+				@ColumnResult(name = "yesCount", type = Integer.class),
+				@ColumnResult(name = "noCount", type = Integer.class) }) ),
+		@SqlResultSetMapping(name = "thirtyDaySurveyReportMapping", classes = @ConstructorResult(targetClass = ThirtyDaySurveyReportVO.class, columns = {
+				@ColumnResult(name = "id", type = Long.class), @ColumnResult(name = "questionText"),
+				@ColumnResult(name = "stronglyDisagreeCount", type = Integer.class),
+				@ColumnResult(name = "somewhatDisagreeCount", type = Integer.class),
+				@ColumnResult(name = "neutralCount", type = Integer.class),
+				@ColumnResult(name = "somewhatAgreeCount", type = Integer.class),
+				@ColumnResult(name = "stronglyAgreeCount", type = Integer.class),
+				@ColumnResult(name = "unableToAccessCount", type = Integer.class), }) ) })
+
 public class UserSurveyAnswer implements Serializable {
 
 	/**
 	 * 
 	 */
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -54,11 +108,9 @@ public class UserSurveyAnswer implements Serializable {
 	@Column(name = "answer_value_3")
 	private String answerValue3;
 
-	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
-	@JsonSerialize(using = MMDDYYYYLocalDateSerializer.class)
-	@JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	@Column(name = "compl_date")
-	private LocalDate completionDate = LocalDate.now();
+	private DateTime completionDate = DateTime.now();
 
 	public Long getId() {
 		return id;
@@ -116,11 +168,11 @@ public class UserSurveyAnswer implements Serializable {
 		this.answerValue3 = answerValue3;
 	}
 
-	public LocalDate getCompletionDate() {
+	public DateTime getCompletionDate() {
 		return completionDate;
 	}
 
-	public void setCompletionDate(LocalDate completionDate) {
+	public void setCompletionDate(DateTime completionDate) {
 		this.completionDate = completionDate;
 	}
 
@@ -167,5 +219,4 @@ public class UserSurveyAnswer implements Serializable {
 				+ user + ", answerValue1=" + answerValue1 + ", answerValue2=" + answerValue2 + ", answerValue3="
 				+ answerValue3 + ", completionDate=" + completionDate + "]";
 	}
-
 }

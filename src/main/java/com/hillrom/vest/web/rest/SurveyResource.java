@@ -5,8 +5,10 @@ import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +16,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.domain.Survey;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.FiveDaySurveyReportVO;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.SurveyService;
 import com.hillrom.vest.util.MessageConstants;
@@ -113,6 +117,20 @@ public class SurveyResource {
 		try {
 			survey = surveyService.getDueSurveyByUserId(id);
 			return new ResponseEntity<Survey>(survey, HttpStatus.OK);
+		} catch (HillromException e) {
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value = "/survey/gridview/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RolesAllowed({ AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES })
+	public ResponseEntity<?> getSurveyGridViewById(@PathVariable Long id,
+			@RequestParam(required = true, value = "fromDate")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate fromDate,
+  			@RequestParam(required = true, value = "toDate")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate toDate) {
+		try {
+			return new ResponseEntity<JSONObject>(surveyService.getGridView(id, fromDate, toDate), HttpStatus.OK);
 		} catch (HillromException e) {
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("ERROR", e.getMessage());

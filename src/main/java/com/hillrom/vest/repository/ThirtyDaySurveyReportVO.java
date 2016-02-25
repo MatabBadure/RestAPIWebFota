@@ -1,4 +1,4 @@
-package com.hillrom.vest.domain;
+package com.hillrom.vest.repository;
 
 import java.util.Objects;
 

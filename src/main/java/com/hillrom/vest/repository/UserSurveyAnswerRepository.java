@@ -6,7 +6,6 @@ import org.joda.time.DateTime;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.hillrom.vest.domain.ThirtyDaySurveyReportVO;
 import com.hillrom.vest.domain.UserSurveyAnswer;
 
 /**
@@ -28,4 +27,8 @@ public interface UserSurveyAnswerRepository extends JpaRepository<UserSurveyAnsw
 	
 	@Query("from UserSurveyAnswer usa where usa.survey.id =?1 and usa.completionDate between ?2 and ?3")
 	List<UserSurveyAnswer> findSurveyBySurveyIdAndCompletionDate(Long surveyId, DateTime fromDateTime, DateTime toDateTime);
+	
+	@Query(name = "nintyDaySurveyReport")
+	List<NintyDaysResultSetVO> nintyDaySurveyReport(String fromDateTime, String toDateTime);
 }
+

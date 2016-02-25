@@ -21,11 +21,9 @@ import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.joda.time.DateTime;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
-import com.hillrom.vest.domain.util.MMDDYYYYLocalDateSerializer;
 import com.hillrom.vest.repository.FiveDaySurveyReportVO;
+import com.hillrom.vest.repository.NintyDaysResultSetVO;
+import com.hillrom.vest.repository.ThirtyDaySurveyReportVO;
 
 @Entity
 @Audited
@@ -36,10 +34,9 @@ import com.hillrom.vest.repository.FiveDaySurveyReportVO;
 				+ "- LENGTH( REPLACE ( group_concat(answer_value_1), 'Yes', '') ) " + ") / LENGTH('Yes')) AS yesCount,"
 				+ "ROUND((LENGTH(group_concat(answer_value_1)) "
 				+ "- LENGTH( REPLACE ( group_concat(answer_value_1), 'No', '')) "
-				+ ") / LENGTH('No')) AS noCount , compl_date as compDate " 
+				+ ") / LENGTH('No')) AS noCount , compl_date as compDate "
 				+ "from QUESTIONS ques left outer join USER_SURVEY_ANSWERS usa "
-				+ "on ques.id = usa.question_id and usa.survey_id = 1 "
-				+ "and DATE(usa.compl_date) between ? and ? "
+				+ "on ques.id = usa.question_id and usa.survey_id = 1 " + "and DATE(usa.compl_date) between ? and ? "
 				+ "where ques.id in (6,7,8,9,10,11,12)  "
 				+ "group by ques.id ", resultSetMapping = "fiveDaySurveyReportMapping"),
 
@@ -57,11 +54,14 @@ import com.hillrom.vest.repository.FiveDaySurveyReportVO;
 				+ "ROUND (( LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
 				+ "'Unable to access', '') ) ) / LENGTH('Unable to access')) AS unableToAccessCount, "
 				+ "compl_date as compDate from QUESTIONS ques left outer join USER_SURVEY_ANSWERS usa "
-				+ "on ques.id = usa.question_id and usa.survey_id = 2 "
-				+ "and DATE(usa.compl_date) between ? and ? "
+				+ "on ques.id = usa.question_id and usa.survey_id = 2 and DATE(usa.compl_date) between ? and ? "
 				+ "where ques.id in (27,28,29,30,31,32,33)  "
-				+ "group by ques.id  ", resultSetMapping = "thirtyDaySurveyReportMapping") })
-
+				+ "group by ques.id  ", resultSetMapping = "thirtyDaySurveyReportMapping"),
+		@NamedNativeQuery(name = "nintyDaySurveyReport", query = "select usa.user_id as userId, usa.question_id as questionId, "
+				+ "ques.question_text as questionText, usa.answer_value_1 as answerValue1 "
+				+ "from USER_SURVEY_ANSWERS usa left outer join  QUESTIONS ques on ques.id = usa.question_id "
+				+ "where usa.survey_id = 3 AND usa.question_id in (41,42,43,49,50,51) and  DATE(usa.compl_date) between ? and ? "
+				+ "group by usa.user_id,usa.question_id", resultSetMapping = "nintyDaySurveyReportMapping") })
 @SqlResultSetMappings({
 		@SqlResultSetMapping(name = "fiveDaySurveyReportMapping", classes = @ConstructorResult(targetClass = FiveDaySurveyReportVO.class, columns = {
 				@ColumnResult(name = "id", type = Long.class), @ColumnResult(name = "questionText"),
@@ -74,7 +74,12 @@ import com.hillrom.vest.repository.FiveDaySurveyReportVO;
 				@ColumnResult(name = "neutralCount", type = Integer.class),
 				@ColumnResult(name = "somewhatAgreeCount", type = Integer.class),
 				@ColumnResult(name = "stronglyAgreeCount", type = Integer.class),
-				@ColumnResult(name = "unableToAccessCount", type = Integer.class), }) ) })
+				@ColumnResult(name = "unableToAccessCount", type = Integer.class), }) ),
+		@SqlResultSetMapping(name = "nintyDaySurveyReportMapping", classes = @ConstructorResult(targetClass = NintyDaysResultSetVO.class, columns = {
+				@ColumnResult(name = "userId", type = Long.class),
+				@ColumnResult(name = "questionId", type = Long.class),
+				@ColumnResult(name = "questionText", type = String.class),
+				@ColumnResult(name = "answerValue1", type = String.class) }) ) })
 
 public class UserSurveyAnswer implements Serializable {
 

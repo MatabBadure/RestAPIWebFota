@@ -1,7 +1,10 @@
 package com.hillrom.vest.service;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -16,6 +19,8 @@ import com.hillrom.vest.domain.SurveyQuestionAssoc;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserSurveyAnswer;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.NintyDaySurveyReportVO;
+import com.hillrom.vest.repository.NintyDaysResultSetVO;
 import com.hillrom.vest.repository.SurveyQuestionAssocRepository;
 import com.hillrom.vest.repository.SurveyRepository;
 import com.hillrom.vest.repository.UserRepository;
@@ -173,11 +178,33 @@ public class SurveyService {
 		} else if (NIGHTY_DAY_SURVEY_ID.equals(surveyId)) {
 			responseJSON.put("count", userSurveyAnswerRepository.findSurveyCountByDateRange(surveyId,
 					fromDate.toDateTime(LocalTime.MIDNIGHT), toDate.plusDays(1).toDateTime(LocalTime.MIDNIGHT)));
-			responseJSON.put("surveyGridView",
-					userSurveyAnswerRepository.findSurveyBySurveyIdAndCompletionDate(surveyId,
-					fromDate.toDateTime(LocalTime.MIDNIGHT),toDate.plusDays(1).toDateTime(LocalTime.MIDNIGHT)));
+			responseJSON.put("surveyGridView",getNintyDaySurveyResponse(fromDate.toString(), toDate.toString()));
 			return responseJSON;
 		} else
 			throw new HillromException(ExceptionConstants.HR_801);
+	}
+
+	private List<NintyDaySurveyReportVO> getNintyDaySurveyResponse(String fromDateTime, String toDateTime) {
+		Map<Long, List<NintyDaysResultSetVO>> nintyDaysRSGroupedByUserID = (Map) userSurveyAnswerRepository
+				.nintyDaySurveyReport(fromDateTime,toDateTime).stream()
+				.collect(Collectors.groupingBy(NintyDaysResultSetVO::getUserId));
+
+		List<NintyDaySurveyReportVO> nintyDaySurveyReportVOs = new LinkedList<>();
+		NintyDaySurveyReportVO nintyDaySurveyReportVO;
+
+		List<NintyDaysResultSetVO> groupedNintyDaysResultSetVO;
+
+		for (Long userId : nintyDaysRSGroupedByUserID.keySet()) {
+			groupedNintyDaysResultSetVO = nintyDaysRSGroupedByUserID.get(userId);
+			nintyDaySurveyReportVO = new NintyDaySurveyReportVO(groupedNintyDaysResultSetVO.get(0).getAnswerValue(),
+					groupedNintyDaysResultSetVO.get(1).getAnswerValue(),
+					groupedNintyDaysResultSetVO.get(2).getAnswerValue(),
+					groupedNintyDaysResultSetVO.get(3).getAnswerValue(),
+					groupedNintyDaysResultSetVO.get(4).getAnswerValue(),
+					groupedNintyDaysResultSetVO.get(5).getAnswerValue());
+			nintyDaySurveyReportVOs.add(nintyDaySurveyReportVO);
+		}
+		return nintyDaySurveyReportVOs;
+
 	}
 }

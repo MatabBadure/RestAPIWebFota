@@ -115,11 +115,11 @@ public final class Constants {
 
 	public static final String NO_EVENT = "no_event";
 
-	public static final String GROUP_BY_YEARLY = "yearly";
+	public static final String YEAR = "year";
 	
-	public static final String GROUP_BY_MONTHLY = "monthly";
+	public static final String MONTH = "month";
 	
-	public static final String GROUP_BY_WEEKLY = "weekly";
+	public static final String WEEK = "week";
 	
 	public static final String ACTIVE = "active";
 	
@@ -132,4 +132,10 @@ public final class Constants {
 	public static final String PATIENT_ID = "Patient Id";
 	
 	public static final String PATIENT_BLUETOOTH_ADDRESS = "patientBlueToothAddress";
+	
+	public static final String DAY = "day";
+	
+	public static final String CUSTOM = "custom";
+	
+	public static final String DATEFORMAT_ddMMMyy = "dd-MMM-yy"; 
 }

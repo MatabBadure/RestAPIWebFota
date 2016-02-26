@@ -2,6 +2,7 @@ package com.hillrom.vest.service;
 
 import static com.hillrom.vest.config.Constants.XAXIS_TYPE_CATEGORIES;
 import static com.hillrom.vest.config.Constants.XAXIS_TYPE_DATETIME;
+import static com.hillrom.vest.config.Constants.LA_DAYVIEW_LABEL;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -41,14 +42,15 @@ public class LoginAnalyticsGraphService extends AbstractGraphService {
 				.stream().collect(
 						Collectors.groupingBy(LoginAnalyticsVO::getAuthority));
 		// As per requirement, day view should give the count of logins specific to role
+		Series seriesData = new Series();
+		seriesData.setName(LA_DAYVIEW_LABEL);
 		for(String authority : groupByAuthority.keySet()){
-			Series seriesData = createSeriesObjectWithName(authority);
 			List<LoginAnalyticsVO> analytics = groupByAuthority.get(authority);
-			GraphDataVO graphData = new GraphDataVO();
-			graphData.setY(analytics.stream().collect(Collectors.summingInt(LoginAnalyticsVO::getLoginCount)).toString());
+			int loginCount = analytics.stream().collect(Collectors.summingInt(LoginAnalyticsVO::getLoginCount));
+			GraphDataVO graphData = new GraphDataVO(null,loginCount);
 			seriesData.getData().add(graphData);
-			seriesList.add(seriesData);
 		}
+		seriesList.add(seriesData);
 		analyticsGraph.setSeries(seriesList);
 		return analyticsGraph;
 	}
@@ -77,8 +79,8 @@ public class LoginAnalyticsGraphService extends AbstractGraphService {
 			// populate y-axis data with analyticsData for each date
 			for(LocalDate date : groupByDate.keySet()){
 				xAxisLabels.add(DateUtil.formatDate(date, Constants.MMddyyyy));
-				GraphDataVO graphData = new GraphDataVO();
-				graphData.setY(groupByDate.get(date).stream().collect(Collectors.summingInt(LoginAnalyticsVO::getLoginCount)).toString());
+				int loginCount = groupByDate.get(date).stream().collect(Collectors.summingInt(LoginAnalyticsVO::getLoginCount));
+				GraphDataVO graphData = new GraphDataVO(null,loginCount);
 				seriesData.getData().add(graphData);
 			}
 			analyticsGraph.getxAxis().setCategories(xAxisLabels);
@@ -115,8 +117,7 @@ public class LoginAnalyticsGraphService extends AbstractGraphService {
 			// Group analyticsData by monthString (ex: jan'16)
 			for(LoginAnalyticsVO analytics : analyticsData){
 				xAxisLabels.add(analytics.getWeekOrMonthString());
-				GraphDataVO graphData = new GraphDataVO();
-				graphData.setY(analytics.getLoginCount()+"");
+				GraphDataVO graphData = new GraphDataVO(null,analytics.getLoginCount());
 				seriesData.getData().add(graphData);
 			}
 			seriesList.add(seriesData);
@@ -150,9 +151,8 @@ public class LoginAnalyticsGraphService extends AbstractGraphService {
 			for(LocalDate date : groupByDate.keySet()){
 				String xAxisLabel = DateUtil.formatDate(date, Constants.MMddyyyy);
 				xAxisLabels.add(xAxisLabel);
-				GraphDataVO graphData = new GraphDataVO();
-				graphData.setX(xAxisLabel);
-				graphData.setY(groupByDate.get(date).stream().collect(Collectors.summingInt(LoginAnalyticsVO::getLoginCount)).toString());
+				int loginCount = groupByDate.get(date).stream().collect(Collectors.summingInt(LoginAnalyticsVO::getLoginCount));
+				GraphDataVO graphData = new GraphDataVO(xAxisLabel,loginCount);
 				seriesData.getData().add(graphData);
 			}
 			analyticsGraph.getxAxis().setCategories(xAxisLabels);

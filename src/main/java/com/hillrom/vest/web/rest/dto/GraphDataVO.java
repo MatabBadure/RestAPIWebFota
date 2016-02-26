@@ -7,13 +7,13 @@ public class GraphDataVO {
 
 	@JsonInclude(Include.NON_NULL)
 	private String x;
-	private String y;
+	private int y;
 	
 	public GraphDataVO() {
 		super();
 	}
 	
-	public GraphDataVO(String x, String y) {
+	public GraphDataVO(String x, int y) {
 		super();
 		this.x = x;
 		this.y = y;
@@ -25,10 +25,12 @@ public class GraphDataVO {
 	public void setX(String x) {
 		this.x = x;
 	}
-	public String getY() {
+
+	public int getY() {
 		return y;
 	}
-	public void setY(String y) {
+
+	public void setY(int y) {
 		this.y = y;
 	}
 	

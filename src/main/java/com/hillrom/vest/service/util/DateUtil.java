@@ -1,14 +1,16 @@
 package com.hillrom.vest.service.util;
 
-import static com.hillrom.vest.config.Constants.GROUP_BY_MONTHLY;
-import static com.hillrom.vest.config.Constants.GROUP_BY_WEEKLY;
+import static com.hillrom.vest.config.Constants.MMddyyyy;
 import static com.hillrom.vest.config.Constants.YYYY_MM_DD;
+import static com.hillrom.vest.config.Constants.WEEK_SEPERATOR;
 
-import java.util.HashMap;
+import java.text.DateFormatSymbols;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.joda.time.Days;
@@ -116,26 +118,6 @@ public class DateUtil {
 	}
 	
 	/**
-	 * Return Map groupby Dates
-	 * @param from
-	 * @param to
-	 * @param groupBy
-	 * @return
-	 */
-	public static Map<Integer,List<LocalDate>> prepareDateRangeGroupByMap(LocalDate from,LocalDate to,String groupBy){
-		List<LocalDate> requestedDates  = DateUtil.getAllLocalDatesBetweenDates(from, to);
-		Map<Integer,List<LocalDate>> groupedDates = new HashMap<>();
-		if(GROUP_BY_WEEKLY.equalsIgnoreCase(groupBy)){
-			groupedDates = requestedDates.stream().collect(Collectors.groupingBy(LocalDate :: getDayOfWeek));
-		}else if(GROUP_BY_MONTHLY.equalsIgnoreCase(groupBy)){
-			groupedDates = requestedDates.stream().collect(Collectors.groupingBy(LocalDate :: getWeekOfWeekyear));
-		}else {
-			groupedDates =  requestedDates.stream().collect(Collectors.groupingBy(LocalDate :: getMonthOfYear));
-		}
-		return groupedDates;
-	}
-	
-	/**
 	 * convertLocalDateToStringFromat
 	 * @param date
 	 * @param format
@@ -143,6 +125,83 @@ public class DateUtil {
 	 */
 	public static String convertLocalDateToStringFromat(LocalDate date,String format){
 		DateTimeFormatter formatter = DateTimeFormat.forPattern(format);
+		return date.toString(formatter);
+	}
+	
+	
+	public static String getShortMonthNameByIndex(int index){
+		if(index > 0){
+			DateFormatSymbols symbols = new DateFormatSymbols();
+			return symbols.getShortMonths()[index-1];
+		}else{
+			throw new ArrayIndexOutOfBoundsException("Month index can't be <= 0");
+		}
+	}
+	
+	/**
+	 * prepare list of date strings (ex: 23-Feb-16) to be shown x-axis labels
+	 * @param dates
+	 * @return
+	 */
+	public static List<String> getDatesStringGroupByDay(List<LocalDate> dates){
+		List<String> dateStrings = new LinkedList<>();
+		for(LocalDate date: dates){
+			dateStrings.add(convertLocalDateToStringFromat(date, MMddyyyy));
+		}
+		return dateStrings;
+	}
+	
+	/**
+	 * prepare list of date strings (ex: week1(from-to)) to be shown x-axis labels
+	 * @param dates
+	 * @return
+	 */
+	public static List<String> getDatesStringGroupByWeek(List<LocalDate> dates) {
+		List<String> dateStrings = new LinkedList<>();
+		int DAYS = 7;
+		for (int i = 0; i < dates.size(); i += 7) {
+			int lastIndex = i + DAYS > dates.size() ? dates.size() : i + DAYS;
+			List<LocalDate> subList = dates.subList(i, lastIndex);
+			String fromDate = DateUtil.convertLocalDateToStringFromat(
+					subList.get(0), MMddyyyy);
+			String toDate = DateUtil.convertLocalDateToStringFromat(
+					subList.get(subList.size() - 1), MMddyyyy);
+			dateStrings.add(fromDate + WEEK_SEPERATOR
+					+ toDate);
+		}
+		return dateStrings;
+	}
+	
+	/**
+	 * prepare list of date strings (ex: Feb'16) to be shown x-axis labels
+	 * @param dates
+	 * @return
+	 */
+	public static  List<String> getDatesStringGroupByMonth(List<LocalDate> dates) {
+		List<String> dateStrings = new LinkedList<>();
+		SortedMap<Integer, List<LocalDate>> groupByYear = new TreeMap<>(dates
+				.stream().collect(
+						Collectors.groupingBy(LocalDate::getYearOfCentury)));
+		for (Integer year : groupByYear.keySet()) {
+			Map<Integer, List<LocalDate>> groupByMonth = groupByYear.get(year)
+					.stream()
+					.collect(Collectors.groupingBy(LocalDate::getMonthOfYear));
+			for (Integer month : groupByMonth.keySet()) {
+				dateStrings.add(new StringBuilder(DateUtil
+						.getShortMonthNameByIndex(month)).append("'")
+						.append(year).toString());
+			}
+		}
+		return dateStrings;
+	}
+
+	/**
+	 * return formatted date string as per pattern, default pattern is dd-MMM-yy
+	 * @param dates
+	 * @return
+	 */
+	public static String formatDate(LocalDate date, String pattern) {
+		DateTimeFormatter formatter = DateTimeFormat.forPattern(Objects.nonNull(pattern)?pattern:MMddyyyy);
 		return date.toString(formatter);
 	}
 }

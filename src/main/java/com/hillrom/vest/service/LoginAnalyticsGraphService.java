@@ -32,19 +32,17 @@ public class LoginAnalyticsGraphService extends AbstractGraphService {
 	@Override
 	public Graph populateGraphDataForDay(Object data, Filter filter) {
 		List<LoginAnalyticsVO> loginAnalyticsData = (List<LoginAnalyticsVO>) data;
-		Graph analyticsGraph = buildGraphObect(XAXIS_TYPE_CATEGORIES);
-		for(String authority : filter.getLegends()){
-			analyticsGraph.getxAxis().getCategories().add(getAuthorityLabel(authority));
-		}
-		List<Series> seriesList = new LinkedList<>();
 		// Group by authority gives authority wise list of analytics wrt dates
 		Map<String, List<LoginAnalyticsVO>> groupByAuthority = loginAnalyticsData
 				.stream().collect(
 						Collectors.groupingBy(LoginAnalyticsVO::getAuthority));
+		Graph analyticsGraph = buildGraphObect(XAXIS_TYPE_CATEGORIES);
+		List<Series> seriesList = new LinkedList<>();
 		// As per requirement, day view should give the count of logins specific to role
 		Series seriesData = new Series();
 		seriesData.setName(LA_DAYVIEW_LABEL);
-		for(String authority : groupByAuthority.keySet()){
+		for(String authority : filter.getLegends()){
+			analyticsGraph.getxAxis().getCategories().add(getAuthorityLabel(authority));
 			List<LoginAnalyticsVO> analytics = groupByAuthority.get(authority);
 			int loginCount = analytics.stream().collect(Collectors.summingInt(LoginAnalyticsVO::getLoginCount));
 			GraphDataVO graphData = new GraphDataVO(null,loginCount);

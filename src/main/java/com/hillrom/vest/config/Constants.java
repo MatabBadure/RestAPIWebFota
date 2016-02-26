@@ -137,5 +137,11 @@ public final class Constants {
 	
 	public static final String CUSTOM = "custom";
 	
-	public static final String DATEFORMAT_ddMMMyy = "dd-MMM-yy"; 
+	public static final String MMddyyyy = "MM/dd/yyyy";
+	
+	public static final String WEEK_SEPERATOR = " - ";
+	
+	public static final String XAXIS_TYPE_CATEGORIES = "categories";
+	
+	public static final String XAXIS_TYPE_DATETIME = "datetime";
 }

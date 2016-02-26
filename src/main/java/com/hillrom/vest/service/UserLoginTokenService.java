@@ -1,12 +1,11 @@
 package com.hillrom.vest.service;
 
+import static com.hillrom.vest.config.Constants.WEEK_SEPERATOR;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -25,11 +24,9 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.UserLoginTokenRepository;
 import com.hillrom.vest.security.xauth.TokenProvider;
 import com.hillrom.vest.service.util.DateUtil;
-import com.hillrom.vest.web.graph.builders.GraphBuilder;
 import com.hillrom.vest.web.rest.dto.Filter;
 import com.hillrom.vest.web.rest.dto.Graph;
 import com.hillrom.vest.web.rest.dto.LoginAnalyticsVO;
-import com.hillrom.vest.web.rest.dto.XaxisDataVO;
 
 @Service
 @Transactional
@@ -44,8 +41,8 @@ public class UserLoginTokenService {
 	private TokenProvider tokenProvider;
 	
 	@Inject
-	@Qualifier("loginAnalyticsGraphBuilder")
-	private GraphBuilder graphBuilder;
+	@Qualifier("loginAnalyticsGraphService")
+	private GraphService graphService;
 	
 	public UserLoginToken findOneById(String id){
 		return tokenRepository.findOne(id);
@@ -91,7 +88,6 @@ public class UserLoginTokenService {
 	public Graph getLoginAnalytics(LocalDate from,LocalDate to,String authorityCSV,String duration) throws HillromException{
 		List<String> authorities = Arrays.asList(authorityCSV.split(","));
 		List<LoginAnalyticsVO> actualLoginAnalytics = new LinkedList<>();
-		List<LocalDate> dates = new LinkedList<>();
 		if(Constants.WEEK.equalsIgnoreCase(duration) || Constants.DAY.equalsIgnoreCase(duration)||
 				Constants.CUSTOM.equalsIgnoreCase(duration)){
 			actualLoginAnalytics = tokenRepository.getAnalyticsForWeekOrDay(from.toString(), to.toString(), authorities);
@@ -104,29 +100,8 @@ public class UserLoginTokenService {
 		List<LoginAnalyticsVO> loginAnalytics = prepareDefaultDataForLoginAnalytics(from,to,authorities,duration);
 		// update the default with actual 
 		updateDefualtWithActualAnalytics(actualLoginAnalytics, loginAnalytics,duration);
-		boolean isUseLegends = false;
-		List<String> legends = new LinkedList<>();
-		// if duration is month,year : loginAnalytics to be populated with weekOrMonthString
-		// since dates field of analytics not populated , need to pass the strings in legend and flag to be true 
-		if(Constants.MONTH.equalsIgnoreCase(duration) || Constants.YEAR.equalsIgnoreCase(duration)){
-			isUseLegends = true;
-			for(LoginAnalyticsVO analytic : loginAnalytics){
-				if(Objects.nonNull(analytic.getWeekOrMonthString()) && !legends.contains(analytic.getWeekOrMonthString()))
-					legends.add(analytic.getWeekOrMonthString());
-			}
-		}else if(from.equals(to)){// if the duration is Day , populate x-axis with authorities
-			isUseLegends = true;
-			legends = authorities;
-		}else {// for any other duration , populate x-axis with date string
-			legends = authorities;
-			loginAnalytics.forEach(analytic -> {
-				if(Objects.nonNull(analytic.getDate()) && !dates.contains(analytic.getDate()))
-					dates.add(analytic.getDate());
-			});
-		}
 		Filter filter = new Filter(from,to,duration,authorities);
-		XaxisDataVO xaxisDataVO = new XaxisDataVO(null,dates, duration, isUseLegends, legends);
-		return graphBuilder.buildGraph(xaxisDataVO, loginAnalytics, filter);
+		return graphService.populateGraphData(loginAnalytics, filter);
 	}
 
 	private List<LoginAnalyticsVO> applyGroupByWeek(
@@ -142,9 +117,9 @@ public class UserLoginTokenService {
 			// get the analytics group by userId,to count the logins with unique users
 			Map<Long,List<LoginAnalyticsVO>> groupByUserId = analytics.stream().collect(Collectors.groupingBy(LoginAnalyticsVO :: getUserId));
 			for(String weekString : weekStrings){
-				String[] weekStartEnd = weekString.substring(weekString.indexOf('(')+1,weekString.indexOf(')')).split(" to ");
-				LocalDate start = DateUtil.parseStringToLocalDate(weekStartEnd[0], Constants.DATEFORMAT_ddMMMyy) ;
-				LocalDate end = DateUtil.parseStringToLocalDate(weekStartEnd[1], Constants.DATEFORMAT_ddMMMyy) ;
+				String[] weekStartEnd = weekString.split(WEEK_SEPERATOR);
+				LocalDate start = DateUtil.parseStringToLocalDate(weekStartEnd[0], Constants.MMddyyyy) ;
+				LocalDate end = DateUtil.parseStringToLocalDate(weekStartEnd[1], Constants.MMddyyyy) ;
 				LoginAnalyticsVO loginAnalyticsVO = new LoginAnalyticsVO();
 				loginAnalyticsVO.setAuthority(authority);
 				loginAnalyticsVO.setWeekOrMonthString(weekString);
@@ -210,15 +185,10 @@ public class UserLoginTokenService {
 	private List<LoginAnalyticsVO> populateLoginAnalyticsForYear(List<String> authorities,
 			List<LocalDate> requestedDates) {
 		List<LoginAnalyticsVO> defaultAnalytics = new LinkedList<>();
-		SortedMap<Integer,List<LocalDate>> groupByYear = new TreeMap<>(requestedDates.stream().collect(Collectors.groupingBy(LocalDate::getYearOfCentury)));
-		for(int year: groupByYear.keySet()){
-			List<LocalDate> dates = groupByYear.get(year);
-			SortedMap<Integer,List<LocalDate>> groupByMonth = new TreeMap<>(dates.stream().collect(Collectors.groupingBy(LocalDate::getMonthOfYear)));
-			for(int month : groupByMonth.keySet()){
-				String monthString = new StringBuilder(DateUtil.getShortMonthNameByIndex(month)).append("'").append(year).toString();
-				for(String authority: authorities){
-					defaultAnalytics.add(new LoginAnalyticsVO(monthString, 0, authority));
-				}
+		List<String> monthStrings = DateUtil.getDatesStringGroupByMonth(requestedDates);
+		for(String monthString : monthStrings){
+			for(String authority: authorities){
+				defaultAnalytics.add(new LoginAnalyticsVO(monthString, 0, authority));
 			}
 		}
 		return defaultAnalytics;
@@ -238,21 +208,12 @@ public class UserLoginTokenService {
 	private List<LoginAnalyticsVO> populateLoginAnalyticsForMonth(List<String> authorities,
 			List<LocalDate> requestedDates) {
 		List<LoginAnalyticsVO> defaultAnalytics = new LinkedList<>();
-		int DAYS = 7;
-		int weekCounter = 1;
-		// for each authority, in given duration make weeks from date selection
-		for (int i = 0; i < requestedDates.size(); i += 7) {
-			// end of week index
-			int lastIndex = i + DAYS > requestedDates.size() ? requestedDates.size() : i + DAYS;
-			// creating list of analytics that fall under week duration
-			List<LocalDate> subList = requestedDates.subList(i, lastIndex);
-			String fromDate = DateUtil.convertLocalDateToStringFromat(subList.get(0), Constants.DATEFORMAT_ddMMMyy);
-			String toDate = DateUtil.convertLocalDateToStringFromat(subList.get(subList.size()-1), Constants.DATEFORMAT_ddMMMyy);
-			String weekString = "week"+(weekCounter++)+"("+fromDate+" to "+toDate+")";
+		List<String> weekStrings = DateUtil.getDatesStringGroupByWeek(requestedDates);
+		for(String weekString : weekStrings){
 			for(String authority : authorities){
 				defaultAnalytics.add(new LoginAnalyticsVO(weekString, 0, authority));
 			}
-		}
+		}		
 		return defaultAnalytics;
 	}
 }

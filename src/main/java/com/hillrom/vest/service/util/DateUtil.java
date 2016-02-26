@@ -1,7 +1,8 @@
 package com.hillrom.vest.service.util;
 
-import static com.hillrom.vest.config.Constants.DATEFORMAT_ddMMMyy;
+import static com.hillrom.vest.config.Constants.MMddyyyy;
 import static com.hillrom.vest.config.Constants.YYYY_MM_DD;
+import static com.hillrom.vest.config.Constants.WEEK_SEPERATOR;
 
 import java.text.DateFormatSymbols;
 import java.util.LinkedList;
@@ -145,7 +146,7 @@ public class DateUtil {
 	public static List<String> getDatesStringGroupByDay(List<LocalDate> dates){
 		List<String> dateStrings = new LinkedList<>();
 		for(LocalDate date: dates){
-			dateStrings.add(convertLocalDateToStringFromat(date, DATEFORMAT_ddMMMyy));
+			dateStrings.add(convertLocalDateToStringFromat(date, MMddyyyy));
 		}
 		return dateStrings;
 	}
@@ -158,16 +159,15 @@ public class DateUtil {
 	public static List<String> getDatesStringGroupByWeek(List<LocalDate> dates) {
 		List<String> dateStrings = new LinkedList<>();
 		int DAYS = 7;
-		int weekCounter = 1;
 		for (int i = 0; i < dates.size(); i += 7) {
 			int lastIndex = i + DAYS > dates.size() ? dates.size() : i + DAYS;
 			List<LocalDate> subList = dates.subList(i, lastIndex);
 			String fromDate = DateUtil.convertLocalDateToStringFromat(
-					subList.get(0), DATEFORMAT_ddMMMyy);
+					subList.get(0), MMddyyyy);
 			String toDate = DateUtil.convertLocalDateToStringFromat(
-					subList.get(subList.size() - 1), DATEFORMAT_ddMMMyy);
-			dateStrings.add("week" + weekCounter++ + "(" + fromDate + " to "
-					+ toDate + ")");
+					subList.get(subList.size() - 1), MMddyyyy);
+			dateStrings.add(fromDate + WEEK_SEPERATOR
+					+ toDate);
 		}
 		return dateStrings;
 	}
@@ -193,5 +193,15 @@ public class DateUtil {
 			}
 		}
 		return dateStrings;
+	}
+
+	/**
+	 * return formatted date string as per pattern, default pattern is dd-MMM-yy
+	 * @param dates
+	 * @return
+	 */
+	public static String formatDate(LocalDate date, String pattern) {
+		DateTimeFormatter formatter = DateTimeFormat.forPattern(Objects.nonNull(pattern)?pattern:MMddyyyy);
+		return date.toString(formatter);
 	}
 }

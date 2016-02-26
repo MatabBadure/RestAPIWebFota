@@ -4,11 +4,14 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.util.CustomDateTimeDeserializer;
 import com.hillrom.vest.domain.util.CustomDateTimeSerializer;
+
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,6 +23,7 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "USER_LOGIN_TOKEN")
+@SQLDelete(sql="UPDATE USER_LOGIN_TOKEN SET is_expired = 1,last_modified_time = current_timestamp() WHERE id = ?")
 public class UserLoginToken implements Serializable {
 
     @Id
@@ -29,11 +33,23 @@ public class UserLoginToken implements Serializable {
     @JsonSerialize(using = CustomDateTimeSerializer.class)
     @JsonDeserialize(using = CustomDateTimeDeserializer.class)
     @Column(name = "created_time")
-    private DateTime createdTime;
+    private DateTime createdTime = DateTime.now();
 
-    @OneToOne
+    @ManyToOne
     private User user;
+    
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @JsonSerialize(using = CustomDateTimeSerializer.class)
+    @JsonDeserialize(using = CustomDateTimeDeserializer.class)
+    @Column(name = "last_modified_time")
+    private DateTime lastModifiedTime = DateTime.now();
 
+    @Column(name="ip_address")
+    private String ipAddress;
+    
+    @Column(name="is_expired")
+    private boolean isExpired;
+    
     public String getId() {
 		return id;
 	}
@@ -57,8 +73,36 @@ public class UserLoginToken implements Serializable {
     public void setUser(User user) {
         this.user = user;
     }
+    
+	public DateTime getLastModifiedTime() {
+		return lastModifiedTime;
+	}
 
-    @Override
+	public void setLastModifiedTime(DateTime lastModifiedTime) {
+		this.lastModifiedTime = lastModifiedTime;
+	}
+
+	public String getIpAddress() {
+		return ipAddress;
+	}
+
+	public void setIpAddress(String ipAddress) {
+		this.ipAddress = ipAddress;
+	}
+
+	public boolean isExpired() {
+		return isExpired;
+	}
+
+	public void setExpired(boolean isExpired) {
+		this.isExpired = isExpired;
+	}
+
+    public int getDuration() {
+		return Math.round((lastModifiedTime.getMillis()- createdTime.getMillis())/(1000*60));
+	}
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -74,7 +118,7 @@ public class UserLoginToken implements Serializable {
         return true;
     }
 
-    @Override
+	@Override
     public int hashCode() {
         return Objects.hashCode(id);
     }

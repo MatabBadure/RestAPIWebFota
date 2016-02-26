@@ -28,14 +28,14 @@ public class TokenProvider {
         this.userLoginTokenRepository = userLoginTokenRepository;
     }
 
-    public UserLoginToken createToken(UserDetails userDetails) {
+    public UserLoginToken createToken(UserDetails userDetails,String ipAddress) {
         long expiresAt = System.currentTimeMillis()+ 1000L * tokenValidity;
         String token = userDetails.getUsername() + SEPERATOR + expiresAt + SEPERATOR + computeSignature(userDetails, expiresAt);
         User user = userService.findOneByEmailOrHillromId(userDetails.getUsername()).get();
         UserLoginToken loginToken = new UserLoginToken();
         loginToken.setId(token);
-        loginToken.setCreatedTime(new DateTime(expiresAt));
         loginToken.setUser(user);
+        loginToken.setIpAddress(ipAddress);
         userLoginTokenRepository.save(loginToken);
         return loginToken;
     }

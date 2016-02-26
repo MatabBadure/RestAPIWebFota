@@ -43,8 +43,6 @@ import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 
-import scala.collection.concurrent.Debug;
-
 @Repository
 public class UserSearchRepository {
 	
@@ -69,7 +67,8 @@ public class UserSearchRepository {
 			Map<String, Boolean> sortOrder) throws HillromException {
 
 		String findHillromTeamUserQuery = "select distinct(user.id),user.first_name as firstName,user.last_name as lastName,user.email,"
-				+ " user_authority.authority_name as name,user.is_deleted as isDeleted,user.created_date as createdAt,user.activated as isActivated,user.hillrom_id as hillromId, userExt.mobile_phone as mobilePhone "
+				+ " user_authority.authority_name as name,user.is_deleted as isDeleted,user.created_date as createdAt,"
+				+ " user.activated as isActivated,user.hillrom_id as hillromId, userExt.mobile_phone as mobilePhone "
 				+ " from  USER_EXTENSION userExt left outer join USER user on user.id = userExt.user_id and "
 				+ " (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or "

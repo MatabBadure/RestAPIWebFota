@@ -144,4 +144,6 @@ public final class Constants {
 	public static final String XAXIS_TYPE_CATEGORIES = "categories";
 	
 	public static final String XAXIS_TYPE_DATETIME = "datetime";
+	
+	public static final String LA_DAYVIEW_LABEL = "No.of Logins";
 }

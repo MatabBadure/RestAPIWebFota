@@ -119,8 +119,8 @@ public class SurveyResource {
 			return new ResponseEntity<Survey>(survey, HttpStatus.OK);
 		} catch (HillromException e) {
 			JSONObject jsonObject = new JSONObject();
-			jsonObject.put("ERROR", e.getMessage());
-			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.NOT_FOUND);
+			jsonObject.put("MESSAGE", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.ACCEPTED);
 		}
 	}
 	
@@ -134,7 +134,7 @@ public class SurveyResource {
 		} catch (HillromException e) {
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("ERROR", e.getMessage());
-			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 		}
 	}
 }

@@ -78,5 +78,8 @@
     <include file="classpath:/config/liquibase/changelog/20160218112300_altered_dob_datatype_jde_load_table.xml" relativeToChangelogFile="false"/>
  	<include file="classpath:/config/liquibase/changelog/20160211123010_create_Survey_Tables.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20160219164732_added_expired_last_modified_time_to_UserLoginToken.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20160226192300_added_csv_for_login_token.xml" relativeToChangelogFile="false"/>
+ 
  </databaseChangeLog>
+ 
  

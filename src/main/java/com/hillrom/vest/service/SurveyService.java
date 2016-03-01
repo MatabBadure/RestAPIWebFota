@@ -9,10 +9,13 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import net.minidev.json.JSONObject;
+
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.springframework.stereotype.Service;
 
+import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.Survey;
 import com.hillrom.vest.domain.SurveyQuestion;
 import com.hillrom.vest.domain.SurveyQuestionAssoc;
@@ -25,12 +28,11 @@ import com.hillrom.vest.repository.SurveyQuestionAssocRepository;
 import com.hillrom.vest.repository.SurveyRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSurveyAnswerRepository;
+import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.web.rest.dto.SurveyQuestionVO;
 import com.hillrom.vest.web.rest.dto.SurveyVO;
 import com.hillrom.vest.web.rest.dto.UserSurveyAnswerDTO;
-
-import net.minidev.json.JSONObject;
 
 @Service
 @Transactional
@@ -50,6 +52,9 @@ public class SurveyService {
 
 	@Inject
 	private UserService userService;
+	
+	@Inject
+	private PatientNoEventService noEventService;
 
 	public static final Long FIVE_DAY_SURVEY_ID = 1L;
 	public static final Long THIRTY_DAY_SURVEY_ID = 2L;
@@ -146,15 +151,22 @@ public class SurveyService {
 		if (Objects.isNull(userService.getPatientInfoObjFromPatientUser(user)))
 			throw new HillromException(ExceptionConstants.HR_523);
 
-		if ((user.getCreatedDate().plusDays(FIVE_DAYS).isBeforeNow()
-				& user.getCreatedDate().plusDays(THIRTY_DAYS).isAfterNow())
+		// Checking whether first transmission was done
+		PatientNoEvent noEvent = noEventService.findByPatientUserId(id);
+		if( Objects.isNull(noEvent) || Objects.isNull(noEvent.getFirstTransmissionDate()))
+			throw new HillromException(ExceptionConstants.HR_804);
+		
+		LocalDate firstTransmissionDate = noEvent.getFirstTransmissionDate();
+		
+		int daysDifference = DateUtil.getDaysCountBetweenLocalDates(firstTransmissionDate, LocalDate.now()); 
+		if ((daysDifference >= FIVE_DAYS && daysDifference < THIRTY_DAYS)
 				&& userSurveyAnswerRepository.findCountByUserIdAndSurveyId(id, FIVE_DAY_SURVEY_ID) < 1) {
 			return surveyRepository.findOne(FIVE_DAY_SURVEY_ID);
-		} else if (user.getCreatedDate().plusDays(THIRTY_DAYS).isBeforeNow()
-				& user.getCreatedDate().plusDays(NINTY_DAYS).isAfterNow()
+		} else if (daysDifference >= THIRTY_DAYS
+				&& daysDifference < NINTY_DAYS
 				&& userSurveyAnswerRepository.findCountByUserIdAndSurveyId(id, THIRTY_DAY_SURVEY_ID) < 1) {
 			return surveyRepository.findOne(THIRTY_DAY_SURVEY_ID);
-		} else if (user.getCreatedDate().plusDays(NINTY_DAYS).isBeforeNow()
+		} else if (daysDifference >= NINTY_DAYS
 				&& userSurveyAnswerRepository.findCountByUserIdAndSurveyId(id, NIGHTY_DAY_SURVEY_ID) < 1) {
 			return surveyRepository.findOne(NIGHTY_DAY_SURVEY_ID);
 		} else

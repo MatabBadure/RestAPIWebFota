@@ -1,0 +1,140 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+<div style="width: 590px; border: solid 1px #7BA4DA; min-height: 350px; margin: 0 auto; font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; padding: 10px 15px;">
+	<div style="width: 100%;display: inline-block;">
+		<div style="">
+			<img src="logo-HillRom.png" th:src="@{|${baseUrl}/images/logo-HillRom.png|}" style="height: 30px; width: 100px;float: left;"></img>
+			<span style="margin: 6px 0px 0px 5px; display: inline-block; font-size: 14px;">VisiView<sup>TM</sup> <span>Health Portal</span></span>
+		</div>
+
+	</div>
+	<div style="background-color: #7BA4DA;height: 92px;margin: 20px 0px;">
+		<h3 style="color: #fff;margin: 32px 0px 0px 25px;display: inline-block;">Survey Completed !</h3>
+		<img src="surveyEmailIcon.png" th:src="@{|${baseUrl}/images/surveyEmailIcon.png|}" style="float: right;"></img>
+	</div>
+	<div style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; ">
+		<div>
+			<span style="font-size: 18px;color:#7BA4DA;border-bottom:1px solid #7BA4DA">Outcomes Monitoring: 30 Day Survey - The Vest&copy;  Airway Clearance System</span>
+		</div>
+		<div style="background-color:#f1f1f1; margin-top:20px;margin-bottom:20px;">
+			<div style="padding: 10px;width:50%;float:left;border-right:1px solid #ccc;border-bottom:1px solid #ccc;text-align:center">
+				<div>Patient Name</div>
+				<div style="display:block;color:#4F7CA5;margin-top:15px" th:text="${ansValue1Ques21}"> Jose M. Robert</div>
+			</div>
+			<div style="padding: 10px;text-align:center;border-bottom:1px solid #ccc;">
+				<div>Phone Number</div>
+				<div style="display:block;color:#4F7CA5;margin-top:15px" th:text="${ansValue1Ques22}"> 9977884422</div>
+			</div>
+			<div style="padding: 10px;width:50%;float:left;border-right:1px solid #ccc;border-bottom:1px solid #ccc;text-align:center">
+				<div>Date of birth</div>
+				<div style="display:block;color:#4F7CA5;margin-top:15px" th:text="${ansValue1Ques23}"> 12/05/1985</div>
+			</div>
+			<div style="padding: 10px;text-align:center;border-bottom:1px solid #ccc;">
+				<div>Hours of Use</div> 
+				<div style="display:block;color:#4F7CA5;margin-top:15px" th:text="${ansValue1Ques24}"> 8.5</div>
+			</div>
+			<div style="padding: 10px;width:50%;float:left;border-right:1px solid #ccc;border-bottom:1px solid #ccc;text-align:center">
+				<div>Serial Number</div>
+				<div style="display:block;color:#4F7CA5;margin-top:15px" th:text="${ansValue1Ques25}">123456</div>
+			</div>
+			<div style="padding: 10px;text-align:center;border-bottom:1px solid #ccc;">
+				<div>Date</div>
+				<div style="display:block;color:#4F7CA5;margin-top:15px" th:text="${ansValue1Ques26}"> 23/12/2016</div>
+			</div>
+			<div style="padding: 10px;text-align:center;width: 50%;">
+				<div>Clinical Follow-up</div>
+				<div style="display:block;color:#4F7CA5;margin-top:15px" th:text="${ansValue1Ques34}"> No</div>
+			</div>
+		
+		</div>
+		<div style="text-align:center"><span style="font-size: 18px;color:#7BA4DA;">Survey Response</span></div>
+
+		<div style="border-bottom:1px solid #ccc"></div>
+		
+		<div style="width:100%;">
+			<div style="width:10%;float:left;color:#666666;padding:10px 0"> Q-1</div>	
+			<div style="width:75%;float:left;color:#666666;border-right:1px solid #ccc;padding:10px 0 20px 0"> The therapy helps me clear seretions from my lungs
+			</div>	
+			<div style="color:#7ca3dc;padding: 5px 0;width:14%;float:left;text-align:center" th:text="${ansValue1Ques27}">Strongly Agree</div>
+		</div>
+		<div style="clear:both"></div>
+		<div style="border-bottom:1px solid #ccc"></div>
+		<div style="width:100%;">
+			<div style="width:10%;float:left;color:#666666;padding:10px 0"> Q-2</div>	
+			<div style="width:75%;float:left;color:#666666;border-right:1px solid #ccc;padding:10px 0 20px 0"> The therapy helps me manage my respiratory health at home
+				
+			</div>	
+			<div style="color:#7ca3dc;padding:10px 0;width:14%;float:left;text-align:center" th:text="${ansValue1Ques28}">Neutral</div>
+		</div>
+		<div style="clear:both"></div>
+		<div style="border-bottom:1px solid #ccc"></div>
+		<div style="width:100%;">
+			<div style="width:10%;float:left;color:#666666;padding:12px 0"> Q-3</div>	
+			<div style="width:75%;float:left;color:#666666;border-right:1px solid #ccc;padding:10px 0 11px 0"> using this therapy helps me have more energy to do my regular activities of daily living
+			</div>	
+			<div style="color:#7ca3dc;padding: 10px 0;width:14%;float:left;text-align:center" th:text="${ansValue1Ques29}">Somewhat agree</div>
+		</div>
+		<div style="clear:both"></div>
+		<div style="border-bottom:1px solid #ccc"></div>
+		<div style="width:100%;">
+			<div style="width:10%;float:left;color:#666666;padding:10px 0"> Q-4</div>	
+			<div style="width:75%;float:left;color:#666666;border-right:1px solid #ccc;padding:10px 0 20px 0">The therapy helps to minimize my shortness of breath
+			</div>	
+			<div style="color:#7ca3dc;padding:5px 0 ;width:14%;float:left;text-align:center" th:text="${ansValue1Ques30}">Somewhat disagree</div>
+		</div>
+		<div style="clear:both"></div>
+		<div style="border-bottom:1px solid #ccc"></div>
+		<div style="width:100%;">
+			<div style="width:10%;float:left;color:#666666;padding:10px 0"> Q-5</div>	
+			<div style="width:75%;float:left;color:#666666;border-right:1px solid #ccc;padding:10px 0 20px 0"> Using this therapy helps my quality of sleep
+			</div>	
+			<div style="color:#7ca3dc;padding:5px 0;width:14%;float:left;text-align:center" th:text="${ansValue1Ques31}">Strongly agree</div>
+		</div>
+		<div style="clear:both"></div>
+		<div style="border-bottom:1px solid #ccc"></div>
+		<div style="width:100%;">
+			<div style="width:10%;float:left;color:#666666;padding:10px 0"> Q-6</div>	
+			<div style="width:75%;float:left;color:#666666;border-right:1px solid #ccc;padding:10px 0 20px 0"> The therapy helps me feel better
+			</div>	
+			<div style="color:#7ca3dc;padding:5px 0;width:14%;float:left;text-align:center" th:text="${ansValue1Ques32}">Unable to assess</div>
+		</div>
+		<div style="clear:both"></div>
+		<div style="border-bottom:1px solid #ccc"></div>
+		<div style="width:100%;">
+			<div style="width:10%;float:left;color:#666666;padding:10px 0"> Q-6</div>	
+			<div style="width:75%;float:left;color:#666666;border-right:1px solid #ccc;padding:10px 0 20px 0"> I would like to continue with this therapy			</div>	
+			<div style="color:#7ca3dc;padding:5px 0;width:14%;float:left;text-align:center" th:text="${ansValue1Ques33}">Strongly agree</div>
+		</div>
+			<div style="clear:both"></div>
+		<div style="border-bottom:1px solid #ccc"></div>
+
+		<div style="margin-top:20px;margin-bottom:20px;text-align:right">
+		<button style="background-color:#7BA4DA;border:none;width:30%;padding:8px;color:#fff;font-size:14px;">View Overall Statistics</button>
+		</div>
+		<div style="margin: 40px 0px;">
+			<h4 style="font-size: 14px; margin-bottom: 0px;">Regards,</h4>
+			<p style="margin-top: 5px; font-size: 14px;">Your HILL-Rom Respiratory Care Team</p>
+		</div>
+		<div style="margin: 50px 0px;">
+			<p style="font-size: 12px;">*** PLEASE DO NOT REPLY TO THIS EMAIL, IF YOU NEED TO CONTACT HILL-ROM RESPIRATORY CARE, PLEASE CALL 800-426-4224
+			OR VISIT OUR WEBSITE AT HTTP://RESPIRATORYCARE.HILL-ROM.COM/.<br/>
+			ANY REPLIES TO THIS EMAIL WILL NOT BE RECEIVED BY HILL-ROM RESPIRATORY CARE.***
+			</p>
+		</div>
+	</div>
+	<div style="background-color: #7BA4DA;padding: 15px 0px;clear: left;display: inline-block;width: 100%; text-align: center;">
+		<ul style="padding:0px 0px; margin: 0px 0px;display: inline-block;">
+			<li style="margin-left:0px; list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; border-right: 1px solid #fff; padding-left: 15px; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/contactus" th:href="@{|${baseUrl}/#/contactus|}">Contact Us</a> </li>
+			<li style="margin-left:0px; list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; border-right: 1px solid #fff; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/privacyPolicy" th:href="@{|${baseUrl}/#/privacyPolicy|}">Privacy Policy</a></li>
+			<li style="margin-left:0px; list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; border-right: 1px solid #fff; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/termsOfUse" th:href="@{|${baseUrl}/#/termsOfUse|}">Terms of Use</a></li>
+			<li style="margin-left:0px; list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; border-right: 1px solid #fff; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/privacyPractices" th:href="@{|${baseUrl}/#/privacyPractices|}">HIPPA Notice of Privacy Practices</a></li>
+			<li style="margin-left:0px; list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/careSite" th:href="@{|${baseUrl}/#/careSite|}">Hill-Rom Respiratory Care</a></li>
+		</ul>
+		<p style="font-size: 10px; color: #fff;">Copyright Hill-Rom 2016. All Right Reserved.</p>
+	</div>
+</div>
+</body>
+</html>

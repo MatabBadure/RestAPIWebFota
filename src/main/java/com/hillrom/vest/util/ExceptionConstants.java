@@ -149,6 +149,7 @@ public class ExceptionConstants {
     public static final String HR_803 = "Incorrect request format";
     public static final String HR_804 = "No survey to take";
     public static final String HR_805 = "Survey taken already";
+    public static final String HR_806 = "You are not eligible to take this survey";
     // Validate Credentials Api Exception messages
     public static final String HR_714 = "Please enter the password for your Visi-View account.";
     public static final String HR_716 = "The entered password is incorrect. Be sure you're using the password for your Visi-View account.";

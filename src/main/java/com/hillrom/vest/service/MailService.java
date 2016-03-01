@@ -30,11 +30,13 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
 import com.hillrom.vest.domain.User;
+import com.hillrom.vest.domain.UserSurveyAnswer;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.PatientStatsVO;
+import com.hillrom.vest.web.rest.dto.UserSurveyAnswerDTO;
 
 /**
  * Service for sending e-mails.
@@ -297,5 +299,50 @@ public class MailService {
         String content = templateEngine.process("deactivationEmail", context);
         String subject = messageSource.getMessage("email.deactivation.title", null, locale);
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
+	
+	@Async
+    public void sendSurveyEmailReport(UserSurveyAnswerDTO userSurveyAnswerDTO, String baseUrl) {
+		String recipients = env.getProperty("mail.surveyreportemailids");
+		log.debug("Sending Survey email report '{}'", recipients);
+        Locale locale = Locale.getDefault();
+        String content = null;
+        Context context = new Context(Locale.getDefault());
+        context.setVariable("baseUrl", baseUrl);
+        for(UserSurveyAnswer userSurveyAnswer:userSurveyAnswerDTO.getUserSurveyAnswer()){
+        	context.setVariable("ansValue1Ques"+userSurveyAnswer.getSurveyQuestion().getId().toString(), userSurveyAnswer.getAnswerValue1());
+        	context.setVariable("ansValue2Ques"+userSurveyAnswer.getSurveyQuestion().getId().toString(), userSurveyAnswer.getAnswerValue2());
+        }
+        if(RandomUtil.FIVE_DAY_SURVEY_ID.equals(userSurveyAnswerDTO.getSurveyId()))
+        	content = templateEngine.process("fiveDaySurveyEmail", context);
+        else
+        	if(RandomUtil.THIRTY_DAY_SURVEY_ID.equals(userSurveyAnswerDTO.getSurveyId()))
+        		content = templateEngine.process("thirtyDaySurveyEmail", context);
+        	else
+        		content = templateEngine.process("nintyDaySurveyEmail", context);
+        String subject = messageSource.getMessage("email.survey.title", null, locale);
+        
+        if(Objects.nonNull(recipients))
+        	sendSurveyEmailToAdmin(recipients.split(","), subject, content, false, true);
+    }
+	
+	@Async
+    public void sendSurveyEmailToAdmin(String[] to, String subject, String content, boolean isMultipart, boolean isHtml) {
+        log.debug("Send e-mail[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
+                isMultipart, isHtml, to, subject, content);
+
+        // Prepare message using a Spring helper
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, CharEncoding.UTF_8);
+            message.setTo(to);
+            message.setFrom(from);
+            message.setSubject(subject);
+            message.setText(content, isHtml);
+            javaMailSender.send(mimeMessage);
+            log.debug("Sent e-mail to User '{}'", to.toString());
+        } catch (Exception e) {
+            log.warn("E-mail could not be sent to user '{}', exception is: {}", to, e.getMessage());
+        }
     }
 }

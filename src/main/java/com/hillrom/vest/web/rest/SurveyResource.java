@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.domain.Survey;
 import com.hillrom.vest.exceptionhandler.HillromException;
-import com.hillrom.vest.repository.FiveDaySurveyReportVO;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.SurveyService;
 import com.hillrom.vest.util.MessageConstants;
@@ -77,11 +77,11 @@ public class SurveyResource {
 	@RequestMapping(value = "/survey", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 
 	@RolesAllowed({ AuthoritiesConstants.PATIENT })
-	public ResponseEntity<?> addSurveyAnswers(@RequestBody UserSurveyAnswerDTO userSurveyAnswers) {
+	public ResponseEntity<?> addSurveyAnswers(@RequestBody UserSurveyAnswerDTO userSurveyAnswers, HttpServletRequest request) {
+		String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
 		JSONObject jsonObject = new JSONObject();
 		try {
-			System.out.println(userSurveyAnswers.toString());
-			surveyService.createSurveyAnswer(userSurveyAnswers);
+			surveyService.createSurveyAnswer(userSurveyAnswers,baseUrl);
 			jsonObject.put("message", MessageConstants.HR_307);
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {

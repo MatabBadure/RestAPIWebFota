@@ -69,7 +69,7 @@ public class LoginAnalyticsGraphService extends AbstractGraphService {
 		Map<String, List<LoginAnalyticsVO>> groupByAuthority = loginAnalyticsData
 				.stream().collect(
 						Collectors.groupingBy(LoginAnalyticsVO::getAuthority));
-		for(String authority : groupByAuthority.keySet()){
+		for(String authority : filter.getLegends()){
 			Series seriesData = createSeriesObjectWithName(authority);
 			List<String> xAxisLabels = new LinkedList<>();
 			// get login analytics date wise for each authority
@@ -107,7 +107,7 @@ public class LoginAnalyticsGraphService extends AbstractGraphService {
 				.stream().collect(
 						Collectors.groupingBy(LoginAnalyticsVO::getAuthority));
 		
-		for(String authority : groupByAuthority.keySet()){
+		for(String authority : filter.getLegends()){
 			Series seriesData = createSeriesObjectWithName(authority);
 			List<String> xAxisLabels = new LinkedList<>();
 			// analyticsData for specific authority
@@ -140,7 +140,7 @@ public class LoginAnalyticsGraphService extends AbstractGraphService {
 		Map<String, List<LoginAnalyticsVO>> groupByAuthority = loginAnalyticsData
 				.stream().collect(
 						Collectors.groupingBy(LoginAnalyticsVO::getAuthority));
-		for(String authority : groupByAuthority.keySet()){
+		for(String authority : filter.getLegends()){
 			Series seriesData = createSeriesObjectWithName(authority);
 			List<String> xAxisLabels = new LinkedList<>();
 			// get login analytics date wise for each authority
@@ -169,7 +169,7 @@ public class LoginAnalyticsGraphService extends AbstractGraphService {
 		Map<String,String> authorityLabelsMap = new HashMap<>();
 		authorityLabelsMap.put(AuthoritiesConstants.HCP,"HCP");
 		authorityLabelsMap.put(AuthoritiesConstants.PATIENT,"Patient");
-		authorityLabelsMap.put(AuthoritiesConstants.CARE_GIVER,"Care Giver");
+		authorityLabelsMap.put(AuthoritiesConstants.CARE_GIVER,"Caregiver");
 		authorityLabelsMap.put(AuthoritiesConstants.CLINIC_ADMIN,"Clinic Admin");
 		authorityLabelsMap.put(AuthoritiesConstants.ADMIN,"Admin");
 		authorityLabelsMap.put(AuthoritiesConstants.ACCT_SERVICES,"RC Admin");

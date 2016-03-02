@@ -23,6 +23,7 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.NintyDaySurveyReportVO;
 import com.hillrom.vest.repository.NintyDaysResultSetVO;
 import com.hillrom.vest.repository.SurveyQuestionAssocRepository;
+import com.hillrom.vest.repository.SurveyQuestionRepository;
 import com.hillrom.vest.repository.SurveyRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSurveyAnswerRepository;
@@ -59,6 +60,11 @@ public class SurveyService {
 
 	@Inject
 	private PatientNoEventService noEventService;
+	
+	@Inject
+	private SurveyQuestionRepository surveyQuestionRepository;
+	
+	
 
 	public List<Survey> getAllSurveys() {
 		return surveyRepository.findAll();
@@ -220,4 +226,13 @@ public class SurveyService {
 		}
 		return nintyDaySurveyReportVOs;
 	}
+	
+	public List<UserSurveyAnswer> getSurveyAnswerByQuestionId(Long id) throws HillromException {
+
+		SurveyQuestion surveyQuestion = surveyQuestionRepository.findOne(id);
+		if (Objects.isNull(surveyQuestion))
+			throw new HillromException(ExceptionConstants.HR_807);
+		return userSurveyAnswerRepository.findSurveyAnswerByQuestionId(id);
+	}
+
 }

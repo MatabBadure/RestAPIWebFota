@@ -28,6 +28,9 @@ public interface UserSurveyAnswerRepository extends JpaRepository<UserSurveyAnsw
 	@Query("from UserSurveyAnswer usa where usa.survey.id =?1 and usa.completionDate between ?2 and ?3")
 	List<UserSurveyAnswer> findSurveyBySurveyIdAndCompletionDate(Long surveyId, DateTime fromDateTime, DateTime toDateTime);
 	
+	@Query("from UserSurveyAnswer usa where usa.surveyQuestion.id =?1")
+	List<UserSurveyAnswer> findSurveyAnswerByQuestionId(Long surveyQuestionId);
+	
 	@Query(name = "nintyDaySurveyReport")
 	List<NintyDaysResultSetVO> nintyDaySurveyReport(String fromDateTime, String toDateTime);
 }

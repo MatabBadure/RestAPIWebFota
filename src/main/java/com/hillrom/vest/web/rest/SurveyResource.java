@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.domain.Survey;
+import com.hillrom.vest.domain.UserSurveyAnswer;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.SurveyService;
@@ -131,6 +132,18 @@ public class SurveyResource {
   			@RequestParam(required = true, value = "toDate")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate toDate) {
 		try {
 			return new ResponseEntity<JSONObject>(surveyService.getGridView(id, fromDate, toDate), HttpStatus.OK);
+		} catch (HillromException e) {
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/survey/answerbyquestion/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RolesAllowed({ AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES })
+	public ResponseEntity<?> getSurveyAnswerByQuestionId(@PathVariable Long id) {
+		try {
+			return new ResponseEntity< List<UserSurveyAnswer>>(surveyService.getSurveyAnswerByQuestionId(id), HttpStatus.OK);
 		} catch (HillromException e) {
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("ERROR", e.getMessage());

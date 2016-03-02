@@ -158,11 +158,6 @@ public class SurveyQuestion implements Serializable {
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
-		if (typeCodeFormat == null) {
-			if (other.typeCodeFormat != null)
-				return false;
-		} else if (!typeCodeFormat.equals(other.typeCodeFormat))
-			return false;
 		return true;
 	}
 

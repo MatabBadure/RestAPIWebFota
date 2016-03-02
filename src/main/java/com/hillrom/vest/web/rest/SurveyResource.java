@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.domain.Survey;
-import com.hillrom.vest.domain.UserSurveyAnswer;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.FiveDayViewVO;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.SurveyService;
 import com.hillrom.vest.util.MessageConstants;
@@ -143,7 +143,7 @@ public class SurveyResource {
 	@RolesAllowed({ AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES })
 	public ResponseEntity<?> getSurveyAnswerByQuestionId(@PathVariable Long id) {
 		try {
-			return new ResponseEntity< List<UserSurveyAnswer>>(surveyService.getSurveyAnswerByQuestionId(id), HttpStatus.OK);
+			return new ResponseEntity< List<FiveDayViewVO>>(surveyService.getSurveyAnswerByQuestionId(id), HttpStatus.OK);
 		} catch (HillromException e) {
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("ERROR", e.getMessage());

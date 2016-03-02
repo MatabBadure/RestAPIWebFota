@@ -20,8 +20,9 @@ import com.hillrom.vest.domain.SurveyQuestionAssoc;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserSurveyAnswer;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.FiveDayViewVO;
 import com.hillrom.vest.repository.NintyDaySurveyReportVO;
-import com.hillrom.vest.repository.NintyDaysResultSetVO;
+import com.hillrom.vest.repository.SurveyAnswerResultSetVO;
 import com.hillrom.vest.repository.SurveyQuestionAssocRepository;
 import com.hillrom.vest.repository.SurveyQuestionRepository;
 import com.hillrom.vest.repository.SurveyRepository;
@@ -205,14 +206,14 @@ public class SurveyService {
 	}
 
 	private List<NintyDaySurveyReportVO> getNintyDaySurveyResponse(String fromDateTime, String toDateTime) {
-		Map<Long, List<NintyDaysResultSetVO>> nintyDaysRSGroupedByUserID = (Map) userSurveyAnswerRepository
+		Map<Long, List<SurveyAnswerResultSetVO>> nintyDaysRSGroupedByUserID = (Map<Long, List<SurveyAnswerResultSetVO>>) userSurveyAnswerRepository
 				.nintyDaySurveyReport(fromDateTime, toDateTime).stream()
-				.collect(Collectors.groupingBy(NintyDaysResultSetVO::getUserId));
+				.collect(Collectors.groupingBy(SurveyAnswerResultSetVO::getUserId));
 
 		List<NintyDaySurveyReportVO> nintyDaySurveyReportVOs = new LinkedList<>();
 		NintyDaySurveyReportVO nintyDaySurveyReportVO;
 
-		List<NintyDaysResultSetVO> groupedNintyDaysResultSetVO;
+		List<SurveyAnswerResultSetVO> groupedNintyDaysResultSetVO;
 
 		for (Long userId : nintyDaysRSGroupedByUserID.keySet()) {
 			groupedNintyDaysResultSetVO = nintyDaysRSGroupedByUserID.get(userId);
@@ -227,12 +228,31 @@ public class SurveyService {
 		return nintyDaySurveyReportVOs;
 	}
 	
-	public List<UserSurveyAnswer> getSurveyAnswerByQuestionId(Long id) throws HillromException {
+	public List<FiveDayViewVO> getSurveyAnswerByQuestionId(Long id) throws HillromException {
 
 		SurveyQuestion surveyQuestion = surveyQuestionRepository.findOne(id);
 		if (Objects.isNull(surveyQuestion))
 			throw new HillromException(ExceptionConstants.HR_807);
-		return userSurveyAnswerRepository.findSurveyAnswerByQuestionId(id);
+		Map<Long, List<SurveyAnswerResultSetVO>> surveyAnswerRSGroupedByUserID = (Map<Long, List<SurveyAnswerResultSetVO>>) userSurveyAnswerRepository
+				.fiveDaySurveyViewReport(id).stream()
+				.collect(Collectors.groupingBy(SurveyAnswerResultSetVO::getUserId));
+
+		List<FiveDayViewVO> fiveDayViewVOs = new LinkedList<>();
+		FiveDayViewVO fiveDayViewVO;
+
+		List<SurveyAnswerResultSetVO> surveyAnswerResultSetVO;
+
+		for (Long userId : surveyAnswerRSGroupedByUserID.keySet()) {
+			surveyAnswerResultSetVO = surveyAnswerRSGroupedByUserID.get(userId);
+			fiveDayViewVO = new FiveDayViewVO(
+					surveyAnswerResultSetVO.get(0).getAnswerValue(),
+					surveyAnswerResultSetVO.get(1).getAnswerValue(),
+					surveyAnswerResultSetVO.get(2).getAnswerValue(),
+					surveyAnswerResultSetVO.get(3).getAnswerValue2());
+			fiveDayViewVOs.add(fiveDayViewVO);
+		}
+		return fiveDayViewVOs;
+	
 	}
 
 }

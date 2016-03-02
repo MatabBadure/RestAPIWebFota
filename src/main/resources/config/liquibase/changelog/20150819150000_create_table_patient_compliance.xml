@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
@@ -9,34 +9,12 @@
 
 	<property name="autoIncrement" value="true" dbms="mysql,h2,postgresql" />
 	<property name="autoIncrement" value="false" dbms="oracle" />
-	<!-- Added the entity UserExtension. -->
-	<changeSet id="20150819150000" author="jhipster">
-	
-		<createTable tableName="PATIENT_COMPLIANCE">
-			<column name="id" type="bigint" autoIncrement="${autoIncrement}">
-				<constraints primaryKey="true" nullable="false" />
-			</column>
-			<column name="patient_id" type="varchar(45)">
-				<constraints nullable="false"/>
-			</column>
-			<column name="user_id" type="bigint">
-				<constraints nullable="false"/>
-			</column>
-			<column name="date" type="date" />
-			<column name="compliance_score" type="integer" />
-			<column name="hmr_run_rate" type="integer" />
-			<column name="hmr" type="decimal" />
-		</createTable>
-		
-		<addForeignKeyConstraint baseColumnNames="patient_id"
-			baseTableName="PATIENT_COMPLIANCE" constraintName="fk_PATIENT_COMPLIANCE_patient_id"
-			referencedColumnNames="id" referencedTableName="PATIENT_INFO" />
-			
-		<addForeignKeyConstraint baseColumnNames="user_id"
-			baseTableName="PATIENT_COMPLIANCE" constraintName="fk_PATIENT_COMPLIANCE_user_id"
-			referencedColumnNames="id" referencedTableName="USER" />
-			
+	<changeSet  id="20160302175900" author="Hillrom Devs">
+		<addColumn tableName="PATIENT_COMPLIANCE">
+        	<column name="global_hmr_compliant_count" type="integer" defaultValueBoolean="0"/>
+        	<column name="global_settings_deviated_count" type="integer" defaultValueBoolean="0"/>
+        	<column name="global_missed_therapy_count" type="integer" defaultValueBoolean="0"/>
+        </addColumn>
 	</changeSet>
 </databaseChangeLog>
-
 		

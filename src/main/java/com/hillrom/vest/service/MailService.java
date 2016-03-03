@@ -310,12 +310,14 @@ public class MailService {
         Context context = new Context(Locale.getDefault());
         context.setVariable("baseUrl", baseUrl);
         for(UserSurveyAnswer userSurveyAnswer:userSurveyAnswerDTO.getUserSurveyAnswer()){
-        	context.setVariable("ansValue1Ques"+userSurveyAnswer.getSurveyQuestion().getId().toString(), 
-        			userSurveyAnswer.getAnswerValue1().length()>27 ?userSurveyAnswer.getAnswerValue1().substring(0, 27)+"..." 
-        					: userSurveyAnswer.getAnswerValue1());
-        	context.setVariable("ansValue2Ques"+userSurveyAnswer.getSurveyQuestion().getId().toString(), 
-        			userSurveyAnswer.getAnswerValue2().length()>27 ? userSurveyAnswer.getAnswerValue2().substring(0, 27)+"..." 
-        					: userSurveyAnswer.getAnswerValue2());
+        	if(Objects.nonNull(userSurveyAnswer.getAnswerValue1()))
+        		context.setVariable("ansValue1Ques"+userSurveyAnswer.getSurveyQuestion().getId().toString(), 
+        				userSurveyAnswer.getAnswerValue1().length()>27 ?
+        						userSurveyAnswer.getAnswerValue1().substring(0, 27)+"..." : userSurveyAnswer.getAnswerValue1());
+        	else 
+        		context.setVariable("ansValue1Ques"+userSurveyAnswer.getSurveyQuestion().getId().toString(),userSurveyAnswer.getAnswerValue1());
+        	
+        	context.setVariable("ansValue2Ques"+userSurveyAnswer.getSurveyQuestion().getId().toString(), userSurveyAnswer.getAnswerValue2());
         }
         if(RandomUtil.FIVE_DAY_SURVEY_ID.equals(userSurveyAnswerDTO.getSurveyId()))
         	content = templateEngine.process("fiveDaySurveyEmail", context);

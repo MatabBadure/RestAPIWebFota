@@ -146,4 +146,11 @@ public final class Constants {
 	public static final String XAXIS_TYPE_DATETIME = "datetime";
 	
 	public static final String LA_DAYVIEW_LABEL = "No.of Logins";
+	
+	public static final String UNABLE_TO_ASSESS = "Unable to assess";
+	public static final String STRONGLY_AGREE = "Strongly agree";
+	public static final String SOMEWHAT_AGREE= "Somewhat agree";
+	public static final String NEUTRAL = "Neutral";
+	public static final String SOMEWHAT_DISAGREE  = "Somewhat disagree";
+	public static final String STRONGLY_DISAGREE = "Strongly disagree";
 }

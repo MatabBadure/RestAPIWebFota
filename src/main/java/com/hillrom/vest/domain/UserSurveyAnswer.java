@@ -50,7 +50,7 @@ import com.hillrom.vest.config.Constants;
 				+ "ROUND((LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
 				+ "'"+Constants.NEUTRAL+"', '')) ) / LENGTH('"+Constants.NEUTRAL+"')) AS neutralCount , "
 				+ "ROUND((LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
-				+ "'"+Constants.STRONGLY_AGREE+"', '')) ) / LENGTH('"+Constants.STRONGLY_AGREE+"')) AS somewhatAgreeCount,"
+				+ "'"+Constants.SOMEWHAT_AGREE+"', '')) ) / LENGTH('"+Constants.SOMEWHAT_AGREE+"')) AS somewhatAgreeCount,"
 				+ "ROUND (( LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
 				+ "'"+Constants.STRONGLY_AGREE+"', '') ) ) / LENGTH('"+Constants.STRONGLY_AGREE+"')) AS stronglyAgreeCount,  "
 				+ "ROUND (( LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "

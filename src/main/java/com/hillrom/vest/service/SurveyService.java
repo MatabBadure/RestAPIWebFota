@@ -167,7 +167,7 @@ public class SurveyService {
 
 		LocalDate firstTransmissionDate = noEvent.getFirstTransmissionDate();
 
-		int daysDifference = DateUtil.getDaysCountBetweenLocalDates(firstTransmissionDate, LocalDate.now());
+		int daysDifference = DateUtil.getDaysCountBetweenLocalDates(firstTransmissionDate, LocalDate.now())+1; // days are inclusive for surveys;
 		if ((daysDifference >= RandomUtil.FIVE_DAYS && daysDifference < RandomUtil.THIRTY_DAYS)
 				&& userSurveyAnswerRepository.findCountByUserIdAndSurveyId(userId, RandomUtil.FIVE_DAY_SURVEY_ID) < 1) {
 			return surveyRepository.findOne(RandomUtil.FIVE_DAY_SURVEY_ID);

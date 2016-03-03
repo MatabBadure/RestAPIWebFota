@@ -53,7 +53,7 @@ public class UserDetailsService implements org.springframework.security.core.use
             	try{
             		password = userService.generateDefaultPassword(user);
             	}catch(Exception e){// Exception indicates that mandatory fields are not present
-            		new UsernameNotFoundException("User " + lowercaseEmail + " was not found in the database");
+            		throw new UsernameNotFoundException("User " + lowercaseEmail + " was not found in the database");
             	}
             }
             return new org.springframework.security.core.userdetails.User(lowercaseEmail,

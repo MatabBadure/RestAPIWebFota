@@ -56,7 +56,7 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
         	try{
         		password = userService.generateDefaultPassword(user);
         	}catch(Exception e){ // Exception indicates that mandatory fields are not present
-        		new UsernameNotFoundException("User " + login + " was not found in the database");
+        		throw new UsernameNotFoundException("User " + login + " was not found in the database");
         	}
         }
         

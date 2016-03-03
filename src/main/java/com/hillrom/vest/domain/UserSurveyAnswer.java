@@ -51,7 +51,7 @@ import com.hillrom.vest.repository.ThirtyDaySurveyReportVO;
 				+ "ROUND((LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
 				+ "'Somewhat agree', '')) ) / LENGTH('Somewhat agree')) AS somewhatAgreeCount,"
 				+ "ROUND (( LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
-				+ "'Strongly Agree', '') ) ) / LENGTH('Strongly Agree')) AS stronglyAgreeCount,  "
+				+ "'Strongly agree', '') ) ) / LENGTH('Strongly agree')) AS stronglyAgreeCount,  "
 				+ "ROUND (( LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
 				+ "'Unable to access', '') ) ) / LENGTH('Unable to access')) AS unableToAccessCount, "
 				+ "compl_date as compDate from QUESTIONS ques left outer join USER_SURVEY_ANSWERS usa "

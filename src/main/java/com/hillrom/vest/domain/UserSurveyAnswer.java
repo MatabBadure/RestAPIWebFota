@@ -25,6 +25,7 @@ import com.hillrom.vest.repository.FiveDaySurveyReportVO;
 import com.hillrom.vest.repository.FiveDayViewVO;
 import com.hillrom.vest.repository.SurveyAnswerResultSetVO;
 import com.hillrom.vest.repository.ThirtyDaySurveyReportVO;
+import com.hillrom.vest.config.Constants;
 
 @Entity
 @Audited
@@ -43,17 +44,17 @@ import com.hillrom.vest.repository.ThirtyDaySurveyReportVO;
 
 		@NamedNativeQuery(name = "thirtyDaySurveyReport", query = "select ques.id as id, ques.question_text as questionText,"
 				+ "ROUND (( LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
-				+ "'Strongly disagree', '') ) ) / LENGTH('Strongly disagree')) AS stronglyDisagreeCount, "
+				+ "'"+Constants.STRONGLY_DISAGREE+"', '') ) ) / LENGTH('"+Constants.STRONGLY_DISAGREE+"')) AS stronglyDisagreeCount, "
 				+ "ROUND((LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
-				+ "'Somewhat disagree', '')) ) / LENGTH('Somewhat disagree')) AS somewhatDisagreeCount , "
+				+ "'"+Constants.SOMEWHAT_DISAGREE+"', '')) ) / LENGTH('"+Constants.SOMEWHAT_DISAGREE+"')) AS somewhatDisagreeCount , "
 				+ "ROUND((LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
-				+ "'Neutral', '')) ) / LENGTH('Neutral')) AS neutralCount , "
+				+ "'"+Constants.NEUTRAL+"', '')) ) / LENGTH('"+Constants.NEUTRAL+"')) AS neutralCount , "
 				+ "ROUND((LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
-				+ "'Somewhat agree', '')) ) / LENGTH('Somewhat agree')) AS somewhatAgreeCount,"
+				+ "'"+Constants.STRONGLY_AGREE+"', '')) ) / LENGTH('"+Constants.STRONGLY_AGREE+"')) AS somewhatAgreeCount,"
 				+ "ROUND (( LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
-				+ "'Strongly agree', '') ) ) / LENGTH('Strongly agree')) AS stronglyAgreeCount,  "
+				+ "'"+Constants.STRONGLY_AGREE+"', '') ) ) / LENGTH('"+Constants.STRONGLY_AGREE+"')) AS stronglyAgreeCount,  "
 				+ "ROUND (( LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
-				+ "'Unable to access', '') ) ) / LENGTH('Unable to access')) AS unableToAccessCount, "
+				+ "'"+Constants.UNABLE_TO_ASSESS+"', '') ) ) / LENGTH('"+Constants.UNABLE_TO_ASSESS+"')) AS unableToAccessCount, "
 				+ "compl_date as compDate from QUESTIONS ques left outer join USER_SURVEY_ANSWERS usa "
 				+ "on ques.id = usa.question_id and usa.survey_id = 2 and DATE(usa.compl_date) between ? and ? "
 				+ "where ques.id in (27,28,29,30,31,32,33)  "

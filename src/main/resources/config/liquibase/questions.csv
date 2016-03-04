@@ -18,13 +18,13 @@ id,question_text,survey_ans_format_id,mandatory,possible_ans_1,possible_ans_2,po
 24,Hours of use (to one decimal point),3,1,null,null,null,null,null,null
 25,Serial number (seven digit number),4,0,null,null,null,null,null,null
 26,Date,2,1,null,null,null,null,null,null
-27,The therapy helps me clear secretions from my lungs,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to access
-28,The therapy helps me manage my respiratory health at home,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to access
-29,Using this therapy helps me have more energy to do my regular activities of daily living,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to access
-30,The therapy helps to minimize my shortness of breath,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to access
-31,Using this therapy helps my quality of sleep,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to access
-32,The therapy helps me feel better,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to access
-33,I would like to continue with this therapy,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to access
+27,The therapy helps me clear secretions from my lungs,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to assess
+28,The therapy helps me manage my respiratory health at home,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to assess
+29,Using this therapy helps me have more energy to do my regular activities of daily living,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to assess
+30,The therapy helps to minimize my shortness of breath,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to assess
+31,Using this therapy helps my quality of sleep,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to assess
+32,The therapy helps me feel better,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to assess
+33,I would like to continue with this therapy,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to assess
 34,Please have a clinician contact me within the next 3 business days,6,0,null,null,null,null,null,null
 41,Patient name,1,1,null,null,null,null,null,null
 42,Patient date of birth,2,1,null,null,null,null,null,null

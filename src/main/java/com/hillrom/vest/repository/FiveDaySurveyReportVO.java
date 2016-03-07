@@ -2,33 +2,20 @@ package com.hillrom.vest.repository;
 
 import java.util.Objects;
 
-public class FiveDaySurveyReportVO {
+import com.hillrom.vest.web.rest.dto.SurveyReportVO;
+
+public class FiveDaySurveyReportVO extends SurveyReportVO{
 	
-	private Long Id;
-	private String questionText;
 	private int yesCount;
 	private int noCount;
 	
 	public FiveDaySurveyReportVO(Long id, String questionText, 
 			Integer yesCount, Integer noCount){
-		this.Id = Objects.nonNull(id)?id:0;
-		this.questionText = questionText;
+		super(Objects.nonNull(id)?id:0,questionText);
 		this.yesCount = Objects.nonNull(yesCount)?yesCount:0;
 		this.noCount = Objects.nonNull(noCount)?noCount:0;	
 	}
 	
-	public Long getId() {
-		return Id;
-	}
-	public void setId(Long id) {
-		Id = id;
-	}
-	public String getQuestion() {
-		return questionText;
-	}
-	public void setQuestion(String question) {
-		this.questionText = question;
-	}
 	public int getYesCount() {
 		return yesCount;
 	}
@@ -43,7 +30,7 @@ public class FiveDaySurveyReportVO {
 	}
 	@Override
 	public String toString() {
-		return "FiveDaySurveyReportVO [Id=" + Id + ", questionText=" + questionText + ", yesCount=" + yesCount
+		return "FiveDaySurveyReportVO [Id=" + getId() + ", questionText=" + getQuestionText() + ", yesCount=" + yesCount
 				+ ", noCount=" + noCount + "]";
 	}	
 }

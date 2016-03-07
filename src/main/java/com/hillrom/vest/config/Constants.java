@@ -153,4 +153,22 @@ public final class Constants {
 	public static final String NEUTRAL = "Neutral";
 	public static final String SOMEWHAT_DISAGREE  = "Somewhat disagree";
 	public static final String STRONGLY_DISAGREE = "Strongly disagree";
+	
+	// 5days Survey question ids
+	public static final String FIVE_DAYS_SURVEY_QIDS = "6,7,8,9,10,11,12";
+	
+	// 30 days Survey question ids
+	public static final String THIRTY_DAYS_SURVEY_QIDS = "27,28,29,30,31,32,33";
+	
+	public static final Long FIVE_DAYS_SURVEY_ID = 1L;
+	
+	public static final Long THIRTY_DAYS_SURVEY_ID = 2L;
+	
+	// Survey Graph Constants
+	public static final String KEY_COUNT = "count";
+	public static final String Q_PREFIX = "Q-";
+	public static final String NO = "No";
+	public static final String YES = "Yes";
+	public static final String KEY_THIRTY_DAYS_SURVEY_REPORT = "thirtyDaysSurveyReport";
+	public static final String KEY_FIVE_DAYS_SURVEY_REPORT = "fiveDaysSurveyReport";
 }

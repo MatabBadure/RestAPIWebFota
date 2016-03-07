@@ -2,10 +2,10 @@ package com.hillrom.vest.repository;
 
 import java.util.Objects;
 
-public class ThirtyDaySurveyReportVO {
+import com.hillrom.vest.web.rest.dto.SurveyReportVO;
 
-	private Long id;
-	private String questionText;
+public class ThirtyDaySurveyReportVO extends SurveyReportVO{
+
 	private Integer stronglyDisagreeCount;
 	private Integer somewhatDisagreeCount;
 	private Integer neutralCount;
@@ -16,31 +16,13 @@ public class ThirtyDaySurveyReportVO {
 	public ThirtyDaySurveyReportVO(Long id, String questionText, Integer stronglyDisagreeCount,
 			Integer somewhatDisagreeCount, Integer neutralCount, Integer somewhatAgreeCount, Integer stronglyAgreeCount,
 			Integer unableToAccessCount) {
-		super();
-		this.id = id;
-		this.questionText = questionText;
+		super(id,questionText);
 		this.stronglyDisagreeCount = Objects.nonNull(stronglyDisagreeCount) ? stronglyDisagreeCount : 0;
 		this.somewhatDisagreeCount = Objects.nonNull(somewhatDisagreeCount) ? somewhatDisagreeCount : 0;
 		this.neutralCount = Objects.nonNull(neutralCount) ? neutralCount : 0;
 		this.somewhatAgreeCount = Objects.nonNull(somewhatAgreeCount) ? somewhatAgreeCount : 0;
 		this.stronglyAgreeCount = Objects.nonNull(stronglyAgreeCount) ? stronglyAgreeCount : 0;
 		this.unableToAccessCount = Objects.nonNull(unableToAccessCount) ? unableToAccessCount : 0;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getQuestionText() {
-		return questionText;
-	}
-
-	public void setQuestionText(String questionText) {
-		this.questionText = questionText;
 	}
 
 	public Integer getStronglyDisagreeCount() {

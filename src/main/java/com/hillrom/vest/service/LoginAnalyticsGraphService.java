@@ -1,8 +1,10 @@
 package com.hillrom.vest.service;
 
+import static com.hillrom.vest.config.Constants.LA_DAYVIEW_LABEL;
 import static com.hillrom.vest.config.Constants.XAXIS_TYPE_CATEGORIES;
 import static com.hillrom.vest.config.Constants.XAXIS_TYPE_DATETIME;
-import static com.hillrom.vest.config.Constants.LA_DAYVIEW_LABEL;
+import static com.hillrom.vest.service.util.GraphUtils.buildGraphObectWithXAxisType;
+import static com.hillrom.vest.service.util.GraphUtils.createSeriesObjectWithName;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -23,7 +25,6 @@ import com.hillrom.vest.web.rest.dto.Graph;
 import com.hillrom.vest.web.rest.dto.GraphDataVO;
 import com.hillrom.vest.web.rest.dto.LoginAnalyticsVO;
 import com.hillrom.vest.web.rest.dto.Series;
-import com.hillrom.vest.web.rest.dto.XaxisData;
 
 @Component(value="loginAnalyticsGraphService")
 public class LoginAnalyticsGraphService extends AbstractGraphService {
@@ -36,11 +37,10 @@ public class LoginAnalyticsGraphService extends AbstractGraphService {
 		Map<String, List<LoginAnalyticsVO>> groupByAuthority = loginAnalyticsData
 				.stream().collect(
 						Collectors.groupingBy(LoginAnalyticsVO::getAuthority));
-		Graph analyticsGraph = buildGraphObect(XAXIS_TYPE_CATEGORIES);
+		Graph analyticsGraph = buildGraphObectWithXAxisType(XAXIS_TYPE_CATEGORIES);
 		List<Series> seriesList = new LinkedList<>();
 		// As per requirement, day view should give the count of logins specific to role
-		Series seriesData = new Series();
-		seriesData.setName(LA_DAYVIEW_LABEL);
+		Series seriesData = createSeriesObjectWithName(LA_DAYVIEW_LABEL);
 		for(String authority : filter.getLegends()){
 			analyticsGraph.getxAxis().getCategories().add(getAuthorityLabel(authority));
 			List<LoginAnalyticsVO> analytics = groupByAuthority.get(authority);
@@ -53,24 +53,18 @@ public class LoginAnalyticsGraphService extends AbstractGraphService {
 		return analyticsGraph;
 	}
 
-	private Series createSeriesObjectWithName(String authority) {
-		Series seriesData = new Series();
-		seriesData.setName(getAuthorityLabel(authority));
-		return seriesData;
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public Graph populateGraphDataForWeek(Object data, Filter filter) {
 		List<LoginAnalyticsVO> loginAnalyticsData = (List<LoginAnalyticsVO>) data;
-		Graph analyticsGraph = buildGraphObect(XAXIS_TYPE_CATEGORIES);
+		Graph analyticsGraph = buildGraphObectWithXAxisType(XAXIS_TYPE_CATEGORIES);
 		List<Series> seriesList = new LinkedList<>();
 		// Group by authority gives authority wise list of analytics wrt dates
 		Map<String, List<LoginAnalyticsVO>> groupByAuthority = loginAnalyticsData
 				.stream().collect(
 						Collectors.groupingBy(LoginAnalyticsVO::getAuthority));
 		for(String authority : filter.getLegends()){
-			Series seriesData = createSeriesObjectWithName(authority);
+			Series seriesData = createSeriesObjectWithName(getAuthorityLabel(authority));
 			List<String> xAxisLabels = new LinkedList<>();
 			// get login analytics date wise for each authority
 			SortedMap<LocalDate,List<LoginAnalyticsVO>> groupByDate = new TreeMap<>(groupByAuthority.get(authority).stream().collect(Collectors.groupingBy(LoginAnalyticsVO :: getDate)));
@@ -87,20 +81,12 @@ public class LoginAnalyticsGraphService extends AbstractGraphService {
 		analyticsGraph.setSeries(seriesList);
 		return analyticsGraph;
 	}
-
-	private Graph buildGraphObect(String type) {
-		Graph analyticsGraph = new Graph();
-		XaxisData xAxis = new XaxisData();
-		xAxis.setType(type);
-		analyticsGraph.setxAxis(xAxis);
-		return analyticsGraph;
-	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public Graph populateGraphDataForMonth(Object data, Filter filter) {
 		List<LoginAnalyticsVO> loginAnalyticsData = (List<LoginAnalyticsVO>) data;
-		Graph analyticsGraph = buildGraphObect(XAXIS_TYPE_CATEGORIES);
+		Graph analyticsGraph = buildGraphObectWithXAxisType(XAXIS_TYPE_CATEGORIES);
 		List<Series> seriesList = new LinkedList<>();
 		// Group by authority gives authority wise list of analytics wrt dates		
 		Map<String, List<LoginAnalyticsVO>> groupByAuthority = loginAnalyticsData
@@ -108,7 +94,7 @@ public class LoginAnalyticsGraphService extends AbstractGraphService {
 						Collectors.groupingBy(LoginAnalyticsVO::getAuthority));
 		
 		for(String authority : filter.getLegends()){
-			Series seriesData = createSeriesObjectWithName(authority);
+			Series seriesData = createSeriesObjectWithName(getAuthorityLabel(authority));
 			List<String> xAxisLabels = new LinkedList<>();
 			// analyticsData for specific authority
 			List<LoginAnalyticsVO> analyticsData = groupByAuthority.get(authority);
@@ -134,14 +120,14 @@ public class LoginAnalyticsGraphService extends AbstractGraphService {
 	@Override
 	public Graph populateGraphDataForCustomDateRange(Object data, Filter filter) {
 		List<LoginAnalyticsVO> loginAnalyticsData = (List<LoginAnalyticsVO>) data;
-		Graph analyticsGraph = buildGraphObect(XAXIS_TYPE_DATETIME); 
+		Graph analyticsGraph = buildGraphObectWithXAxisType(XAXIS_TYPE_DATETIME); 
 		List<Series> seriesList = new LinkedList<>();
 		// Group by authority gives authority wise list of analytics wrt dates
 		Map<String, List<LoginAnalyticsVO>> groupByAuthority = loginAnalyticsData
 				.stream().collect(
 						Collectors.groupingBy(LoginAnalyticsVO::getAuthority));
 		for(String authority : filter.getLegends()){
-			Series seriesData = createSeriesObjectWithName(authority);
+			Series seriesData = createSeriesObjectWithName(getAuthorityLabel(authority));
 			List<String> xAxisLabels = new LinkedList<>();
 			// get login analytics date wise for each authority
 			SortedMap<LocalDate,List<LoginAnalyticsVO>> groupByDate = new TreeMap<>(groupByAuthority.get(authority).stream().collect(Collectors.groupingBy(LoginAnalyticsVO :: getDate)));

@@ -21,11 +21,10 @@ import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.joda.time.DateTime;
 
+import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.repository.FiveDaySurveyReportVO;
-import com.hillrom.vest.repository.FiveDayViewVO;
 import com.hillrom.vest.repository.SurveyAnswerResultSetVO;
 import com.hillrom.vest.repository.ThirtyDaySurveyReportVO;
-import com.hillrom.vest.config.Constants;
 
 @Entity
 @Audited
@@ -33,13 +32,13 @@ import com.hillrom.vest.config.Constants;
 @NamedNativeQueries({
 		@NamedNativeQuery(name = "fiveDaySurveyReport", query = "select ques.id as id, ques.question_text as questionText, ROUND (( "
 				+ "LENGTH(group_concat(answer_value_1)) "
-				+ "- LENGTH( REPLACE ( group_concat(answer_value_1), 'Yes', '') ) " + ") / LENGTH('Yes')) AS yesCount,"
+				+ "- LENGTH( REPLACE ( group_concat(answer_value_1), '"+Constants.YES+"', '') ) " + ") / LENGTH('"+Constants.YES+"')) AS yesCount,"
 				+ "ROUND((LENGTH(group_concat(answer_value_1)) "
-				+ "- LENGTH( REPLACE ( group_concat(answer_value_1), 'No', '')) "
-				+ ") / LENGTH('No')) AS noCount , compl_date as compDate "
+				+ "- LENGTH( REPLACE ( group_concat(answer_value_1), '"+Constants.NO+"', '')) "
+				+ ") / LENGTH('"+Constants.NO+"')) AS noCount , compl_date as compDate "
 				+ "from QUESTIONS ques left outer join USER_SURVEY_ANSWERS usa "
-				+ "on ques.id = usa.question_id and usa.survey_id = 1 " + "and DATE(usa.compl_date) between ? and ? "
-				+ "where ques.id in (6,7,8,9,10,11,12)  "
+				+ "on ques.id = usa.question_id and usa.survey_id = 1 " + "and DATE(usa.compl_date) between (:from) and (:to) "
+				+ "where ques.id in (:questionIds)  "
 				+ "group by ques.id ", resultSetMapping = "fiveDaySurveyReportMapping"),
 
 		@NamedNativeQuery(name = "thirtyDaySurveyReport", query = "select ques.id as id, ques.question_text as questionText,"
@@ -56,8 +55,8 @@ import com.hillrom.vest.config.Constants;
 				+ "ROUND (( LENGTH(group_concat(answer_value_1)) - LENGTH( REPLACE ( group_concat(answer_value_1),  "
 				+ "'"+Constants.UNABLE_TO_ASSESS+"', '') ) ) / LENGTH('"+Constants.UNABLE_TO_ASSESS+"')) AS unableToAccessCount, "
 				+ "compl_date as compDate from QUESTIONS ques left outer join USER_SURVEY_ANSWERS usa "
-				+ "on ques.id = usa.question_id and usa.survey_id = 2 and DATE(usa.compl_date) between ? and ? "
-				+ "where ques.id in (27,28,29,30,31,32,33)  "
+				+ "on ques.id = usa.question_id and usa.survey_id = 2 and DATE(usa.compl_date) between (:from) and (:to) "
+				+ "where ques.id in (:questionIds)  "
 				+ "group by ques.id  ", resultSetMapping = "thirtyDaySurveyReportMapping"),
 		@NamedNativeQuery(name = "nintyDaySurveyReport", query = "select usa.user_id as userId, usa.question_id as questionId, "
 				+ "ques.question_text as questionText, usa.answer_value_1 as answerValue1, usa.answer_value_2 as answerValue2 "

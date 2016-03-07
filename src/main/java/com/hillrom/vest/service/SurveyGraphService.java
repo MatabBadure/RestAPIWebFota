@@ -86,7 +86,7 @@ public class SurveyGraphService extends AbstractGraphService {
 			somewhatAgreeSeries.getData().add(new GraphDataVO(null, reportVO.getSomewhatAgreeCount()));
 			stronglyAgreeSeries.getData().add(new GraphDataVO(null, reportVO.getStronglyAgreeCount()));
 			unableToAssessSeries.getData().add(new GraphDataVO(null, reportVO.getUnableToAccessCount()));
-			surveyGraph.getSurveyQuestions().add(questionPrefix.concat(" ").concat(reportVO.getQuestionText()));
+			surveyGraph.getSurveyQuestions().add(reportVO.getQuestionText());
 		}
 		surveyGraph.getSeries().add(stronglyDisAgreeSeries);
 		surveyGraph.getSeries().add(someWhatDisAgreeSeries);
@@ -111,7 +111,7 @@ public class SurveyGraphService extends AbstractGraphService {
 			surveyGraph.getxAxis().getCategories().add(questionPrefix);
 			yesSeries.getData().add(new GraphDataVO(null, reportVO.getYesCount()));
 			noSeries.getData().add(new GraphDataVO(null, reportVO.getNoCount()));
-			surveyGraph.getSurveyQuestions().add(questionPrefix.concat(" ").concat(reportVO.getQuestionText()));
+			surveyGraph.getSurveyQuestions().add(reportVO.getQuestionText());
 		}
 		surveyGraph.getSeries().add(yesSeries);
 		surveyGraph.getSeries().add(noSeries);

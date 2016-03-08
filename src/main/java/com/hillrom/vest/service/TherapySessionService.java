@@ -289,9 +289,10 @@ public class TherapySessionService {
 				weightedAvgPressure += calculateWeightedAvg(totalDuration, therapy.getDuration(), therapy.getPressure());
 				noteForTheDay = therapy.getNote();
 			}
+			int minutes = 60*60;
 			TherapyDataVO dataVO = new TherapyDataVO(therapies.get(0).getTimestamp(), Math.round(weightedAvgFrequency), Math.round(weightedAvgPressure),
 					programmedCoughPauses, normalCoughPauses, programmedCoughPauses+normalCoughPauses, noteForTheDay, start, end, coughPauseDuration,
-					totalDuration, hmr, isMissedTherapy);
+					totalDuration, Math.round(hmr/minutes), isMissedTherapy);
 			responseList.add(dataVO);
 		}
 		return responseList;

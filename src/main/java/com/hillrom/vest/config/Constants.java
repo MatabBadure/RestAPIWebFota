@@ -190,4 +190,13 @@ public final class Constants {
 	public static final String KEY_PRESSURE = "pressure";
 	public static final String KEY_SESSION_NO = "sessionNo";
 
+	// Compliance Graph 
+	public static final String KEY_MAX = "max";
+	public static final String KEY_MIN = "min";
+	public static final String KEY_THERAPY_DATA = "therapyData";
+	public static final String KEY_PROTOCOL = "protocol";
+	public static final String PRESSURE_LABEL = "Pressure";
+	public static final String FREQUENCY_LABEL = "Frequency";
+	public static final String DURATION_LABEL = "Duration";
+
 }

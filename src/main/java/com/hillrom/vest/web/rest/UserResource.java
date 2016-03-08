@@ -135,7 +135,11 @@ public class UserResource {
 	
 	@Qualifier("hmrGraphService")
 	@Inject
-	private GraphService graphService;
+	private GraphService hmrGraphService;
+	
+	@Qualifier("complianceGraphService")
+	@Inject
+	private GraphService complianceGraphService;
 	/**
 	 * GET /users -> get all users.
 	 */
@@ -555,7 +559,7 @@ public class UserResource {
 
     		List<TherapyDataVO> therapyData = therapySessionService.findByPatientUserIdAndDateRange(id, from, to);
     		if(therapyData.size() > 0){
-    			Graph hmrGraph = graphService.populateGraphData(therapyData, new Filter(from, to, duration, null));
+    			Graph hmrGraph = hmrGraphService.populateGraphData(therapyData, new Filter(from, to, duration, null));
     			return new ResponseEntity<>(hmrGraph,HttpStatus.OK);
     		}
     		return new ResponseEntity<>(HttpStatus.OK);
@@ -988,16 +992,18 @@ public class UserResource {
     @RequestMapping(value = "/users/{id}/complianceGraphData",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JSONObject> getComplianceGraphData(@PathVariable Long id,
+    public ResponseEntity<?> getComplianceGraphData(@PathVariable Long id,
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
     		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) throws Exception{
-    	JSONObject jsonObject = new JSONObject();
     	List<TherapyDataVO> therapyData = therapySessionService.getComplianceGraphData(id, from, to);
 		if(therapyData.size() > 0){
 			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(id);
-			jsonObject.put("recommended", protocol);
-			jsonObject.put("actual", therapyData);
+			Map<String,Object> therapyAndProtocolData = new HashMap<>();
+			therapyAndProtocolData.put("protocol", protocol);
+			therapyAndProtocolData.put("therapyData", therapyData);
+			Graph complianceGraph = complianceGraphService.populateGraphData(therapyAndProtocolData, new Filter(from,to,null,null));
+			return new ResponseEntity<>(complianceGraph,HttpStatus.OK); 
 		}
-		return new ResponseEntity<>(jsonObject,HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
     }
 }

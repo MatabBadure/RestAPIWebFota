@@ -1,4 +1,4 @@
-CREATE PROCEDURE `update_global_field_benchmark`()
+CREATE DEFINER=`root`@`%` PROCEDURE `update_global_field_benchmark`()
 BEGIN
 	DECLARE temp_id bigint(20);
 	DECLARE temp_is_hmr_compliant INT;

@@ -9,13 +9,20 @@
 
 	<property name="autoIncrement" value="true" dbms="mysql,h2,postgresql" />
 	<property name="autoIncrement" value="false" dbms="oracle" />
-	
-	<changeSet id="20160303175900" author="Hillrom Devs" >
+
+	<changeSet id="20160303175900" author="Hillrom Devs">
 		<addColumn tableName="PATIENT_COMPLIANCE">
-        	<column name="global_hmr_compliant" type="integer" defaultValueBoolean="0"/>
-        	<column name="global_settings_deviated" type="integer" defaultValueBoolean="0"/>
-        	<column name="global_missed_therapy_count" type="integer" defaultValueBoolean="0"/>
-        </addColumn>
+			<column name="global_hmr_compliant" type="integer"
+				defaultValueBoolean="0" />
+			<column name="global_settings_deviated" type="integer"
+				defaultValueBoolean="0" />
+			<column name="global_missed_therapy_count" type="integer"
+				defaultValueBoolean="0" />
+		</addColumn>
+	</changeSet>
+	<changeSet id="20160309162100" author="Hillrom Devs">
+		<createProcedure path="./../../sql/update_global_field_benchmark.sql"
+			procedureName="create_patient_protocol" relativeToChangelogFile="true"></createProcedure>
 	</changeSet>
 </databaseChangeLog>
 

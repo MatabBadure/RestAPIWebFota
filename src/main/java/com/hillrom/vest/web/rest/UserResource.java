@@ -24,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -61,6 +62,7 @@ import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.ExcelOutputService;
+import com.hillrom.vest.service.GraphService;
 import com.hillrom.vest.service.PatientComplianceService;
 import com.hillrom.vest.service.PatientHCPService;
 import com.hillrom.vest.service.PatientProtocolService;
@@ -71,6 +73,8 @@ import com.hillrom.vest.service.util.CsvUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.AdherenceTrendVO;
+import com.hillrom.vest.web.rest.dto.Filter;
+import com.hillrom.vest.web.rest.dto.Graph;
 import com.hillrom.vest.web.rest.dto.PatientComplianceVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.ProtocolDTO;
@@ -128,6 +132,10 @@ public class UserResource {
 
 	@Inject
 	private ExcelOutputService excelOutputService;
+	
+	@Qualifier("hmrGraphService")
+	@Inject
+	private GraphService graphService;
 	/**
 	 * GET /users -> get all users.
 	 */
@@ -540,31 +548,17 @@ public class UserResource {
     @RequestMapping(value = "/users/{id}/therapyData",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JSONObject> getTherapyByPatientUserIdAndDate(@PathVariable Long id,
-    		@RequestParam(value="from",required=false)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
-    		@RequestParam(value="to",required=false)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
-    		@RequestParam(value="date",required=false)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date) throws Exception{
-    	JSONObject jsonObject = new JSONObject();
-    	if(Objects.nonNull(date)){
-    		List<TherapySession> therapySessions = therapySessionService.findByPatientUserIdAndDate(id, date);
-    		if(therapySessions.size() > 0){
-    			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(id);
-    			jsonObject.put("recommended", protocol);
-    			jsonObject.put("actual", therapySessions);
-    		}
-    		return new ResponseEntity<>(jsonObject,HttpStatus.OK);
-    	}else if(Objects.nonNull(from) && Objects.nonNull(to) ){
+    public ResponseEntity<?> getTherapyByPatientUserIdAndDate(@PathVariable Long id,
+    		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
+    		@RequestParam(value="duration",required=true)String duration) throws Exception{
+
     		List<TherapyDataVO> therapyData = therapySessionService.findByPatientUserIdAndDateRange(id, from, to);
     		if(therapyData.size() > 0){
-    			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(id);
-    			jsonObject.put("recommended", protocol);
-    			jsonObject.put("actual", therapyData);
+    			Graph hmrGraph = graphService.populateGraphData(therapyData, new Filter(from, to, duration, null));
+    			return new ResponseEntity<>(hmrGraph,HttpStatus.OK);
     		}
-    		return new ResponseEntity<>(jsonObject,HttpStatus.OK);
-    	}else{
-    		jsonObject.put("ERROR", "Required Params missing : [date or from&to]");
-    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-    	}
+    		return new ResponseEntity<>(HttpStatus.OK);
     }
     
     @RequestMapping(value = "/users/{id}/compliance",

@@ -171,4 +171,23 @@ public final class Constants {
 	public static final String YES = "Yes";
 	public static final String KEY_THIRTY_DAYS_SURVEY_REPORT = "thirtyDaysSurveyReport";
 	public static final String KEY_FIVE_DAYS_SURVEY_REPORT = "fiveDaysSurveyReport";
+	
+	// HMR Graph Date Formats
+	public static final String MMddyyyyHHMM = "MM/dd/yyyy (HH:MM a)";
+	public static final String HHMM = "HH:MM a";
+	public static final String MMddyyyyHHmmss = "MM/dd/yyyy HH:mm:ss";
+	
+	//HMR Graph Y-axis labels
+	public static final String MINUTES_LABEL = "Minutes";
+	public static final String HMR_LABEL = "HMR";
+	
+	//HMR Graph tooltip labels
+	public static final String KEY_NOTE_TEXT = "noteText";
+	public static final String KEY_COUGH_PAUSES = "coughPauses";
+	public static final String KEY_MISSED_THERAPY = "missedTherapy";
+	public static final String KEY_FREQUENCY = "frequency";
+	public static final String KEY_DURATION = "duration";
+	public static final String KEY_PRESSURE = "pressure";
+	public static final String KEY_SESSION_NO = "sessionNo";
+
 }

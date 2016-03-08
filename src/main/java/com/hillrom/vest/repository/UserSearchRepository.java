@@ -33,6 +33,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
@@ -1220,7 +1221,7 @@ public class UserSearchRepository {
 		int limit = columnNames.size();
 		int i = 0;
 		for (String columnName : columnNames.keySet()) {
-			if(!"adherence".equalsIgnoreCase(columnName) | !"isDeleted,isActivated".equalsIgnoreCase(columnName) )
+			if(!Constants.ADHERENCE.equalsIgnoreCase(columnName))
 				sb.append("lower(").append(columnName).append(")");
 			else
 				sb.append(columnName);

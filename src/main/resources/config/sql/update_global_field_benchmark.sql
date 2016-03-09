@@ -1,4 +1,4 @@
-CREATE DEFINER=`root`@`%` PROCEDURE `update_global_field_benchmark`()
+CREATE PROCEDURE `update_global_field_benchmark`()
 BEGIN
 	DECLARE temp_id bigint(20);
 	DECLARE temp_is_hmr_compliant INT;
@@ -40,7 +40,7 @@ BEGIN
 			temp_missed_therapy_count
 			FROM `PATIENT_COMPLIANCE` WHERE id = @temp_pc_id;
 
-			IF temp_is_hmr_compliant = 1 THEN 
+			IF temp_is_hmr_compliant = 0 THEN 
 				SET temp_global_hmr_non_adherence_counter = temp_global_hmr_non_adherence_counter + 1;
 			END IF;
 			-- Add n-3 when count is more then three else n. n = count of setting deviated 

@@ -24,6 +24,9 @@
 		<createProcedure path="./../../sql/update_global_field_benchmark.sql"
 			procedureName="create_patient_protocol" relativeToChangelogFile="true"></createProcedure>
 	</changeSet>
+	<changeSet id="20160310125500" author="Hillrom Devs">
+		<sql>call update_global_field_benchmark();</sql>
+	</changeSet>
 </databaseChangeLog>
 
 		

@@ -140,6 +140,11 @@ public class UserResource {
 	@Qualifier("complianceGraphService")
 	@Inject
 	private GraphService complianceGraphService;
+
+	@Qualifier("cumulativeStatsGraphService")
+	@Inject
+	private GraphService cumulativeStatsGraphService;
+
 	/**
 	 * GET /users -> get all users.
 	 */
@@ -831,12 +836,11 @@ public class UserResource {
         try {
         	Collection<StatisticsVO> statiticsCollection = patientHCPService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
 	        if (statiticsCollection.isEmpty()) {
-	        	jsonObject.put("message", ExceptionConstants.HR_584);
+	        	return new ResponseEntity<>(jsonObject, HttpStatus.OK);
 	        } else {
-	        	jsonObject.put("message", MessageConstants.HR_297);
-	        	jsonObject.put("cumulativeStatitics", statiticsCollection);
+	        	Graph cumulativeStatsGraph = cumulativeStatsGraphService.populateGraphData(statiticsCollection, new Filter(from,to,null,null));
+	        	return new ResponseEntity<>(cumulativeStatsGraph, HttpStatus.OK);
 	        }
-	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
         } catch (HillromException hre){
         	jsonObject.put("ERROR", hre.getMessage());
     		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);

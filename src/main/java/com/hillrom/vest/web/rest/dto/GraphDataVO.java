@@ -11,8 +11,6 @@ public class GraphDataVO {
 	@JsonInclude(Include.NON_NULL)
 	private String x;
 	private int y;
-	@JsonInclude(Include.NON_NULL)
-	private Boolean isMissedTherapy;
 	
 	@JsonInclude(Include.NON_EMPTY)
 	private Map<String,Object> toolText = new HashMap<>();
@@ -41,14 +39,6 @@ public class GraphDataVO {
 	public void setY(int y) {
 		this.y = y;
 	}
-	public boolean isMissedTherapy() {
-		return isMissedTherapy;
-	}
-
-	public void setMissedTherapy(boolean isMissedTherapy) {
-		this.isMissedTherapy = isMissedTherapy;
-	}
-
 	public void setToolText(Map<String, Object> toolText) {
 		this.toolText = toolText;
 	}

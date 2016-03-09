@@ -133,7 +133,7 @@ public class TherapySessionService {
 			return getAvgTreatmentStatisticsForTherapiesGroupedByDate(patientUserIds, tpsGroupedByDate);
 	}
 
-	public Collection<TreatmentStatisticsVO> getAvgTreatmentStatisticsForTherapiesGroupedByDate(List<Long> patientUserIds,
+	public LinkedList<TreatmentStatisticsVO> getAvgTreatmentStatisticsForTherapiesGroupedByDate(List<Long> patientUserIds,
 			Map<LocalDate, List<TherapySession>> tpsGroupedByDate) {
 		Map<LocalDate, TreatmentStatisticsVO> statisticsMap = new TreeMap<>();
 		TreatmentStatisticsVO statisticsVO;
@@ -143,7 +143,7 @@ public class TherapySessionService {
 						tpsOnDate);
 			statisticsMap.put(date, statisticsVO);
 		}
-		return statisticsMap.values();
+		return new LinkedList<>(statisticsMap.values());
 	}
 	
 	public TreatmentStatisticsVO calculateAvgTreatmentStatistics(

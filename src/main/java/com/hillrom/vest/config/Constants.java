@@ -208,4 +208,8 @@ public final class Constants {
 	public static final String MISSED_THERAPY_DAYS_LABEL = "Missed Therapy Days";
 	public static final String NO_TRANSMISSION_RECORDED_LABEL = "No Transmission Recorded";
 
+	// Treatment Stats Graph
+	public static final String AVERAGE_LENGTH_OF_TREATMENT_LABEL = "Average Length of Treatment";
+	public static final String AVERAGE_TREATMENTS_PER_DAY_LABEL = "Average Treatments Per Day";
+
 }

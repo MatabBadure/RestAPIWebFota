@@ -358,7 +358,7 @@ public class PatientHCPService {
 		}
 	}
 	
-	public Collection<StatisticsVO> getCumulativePatientStatisticsForClinicAssociatedWithHCP(Long hcpId, String clinicId, 
+	public List<StatisticsVO> getCumulativePatientStatisticsForClinicAssociatedWithHCP(Long hcpId, String clinicId, 
 			LocalDate from,LocalDate to) throws HillromException{
 		List<String> clinicList = new LinkedList<>();
 		clinicList.add(clinicId);
@@ -374,7 +374,7 @@ public class PatientHCPService {
 		}
 	}
 
-	public Collection<StatisticsVO> getPatienCumulativeStatistics(LocalDate from, LocalDate to,
+	public List<StatisticsVO> getPatienCumulativeStatistics(LocalDate from, LocalDate to,
 			List<Long> patientUserIds){
 		Map<LocalDate, StatisticsVO> statisticsMap = new TreeMap<>();
 		List<PatientCompliance> complianceList = patientComplianceRepository.findByDateBetweenAndPatientUserIdIn(from, to, patientUserIds);
@@ -398,7 +398,7 @@ public class PatientHCPService {
 					date,date);
 			statisticsMap.put(date, statisticsVO);
 		}
-		return statisticsMap.values();
+		return new LinkedList<>(statisticsMap.values());
 	}
 	
 	

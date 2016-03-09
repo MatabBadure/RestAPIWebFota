@@ -12,6 +12,7 @@ import static com.hillrom.vest.config.Constants.KEY_SESSION_NO;
 import static com.hillrom.vest.config.Constants.MINUTES_LABEL;
 import static com.hillrom.vest.config.Constants.MMddyyyyHHmmss;
 import static com.hillrom.vest.config.Constants.MMddyyyyHHMM;
+import static com.hillrom.vest.config.Constants.KEY_MISSED_THERAPY;
 
 import java.util.List;
 import java.util.Objects;
@@ -77,7 +78,7 @@ public class HMRGraphService extends AbstractGraphService {
 		}else{
 			point = new GraphDataVO(DateUtil.formatDate(therapy.getTimestamp(), MMddyyyyHHMM), (int)therapy.getHmr());
 		}
-		point.setMissedTherapy(therapy.isMissedTherapy());
+		point.getToolText().put(KEY_MISSED_THERAPY, therapy.isMissedTherapy());
 		point.getToolText().put(KEY_SESSION_NO,therapy.getSessionNo()+"/"+therapy.getTreatmentsPerDay());
 		point.getToolText().put(KEY_PRESSURE, therapy.getPressure());
 		point.getToolText().put(KEY_DURATION, therapy.getDuration());

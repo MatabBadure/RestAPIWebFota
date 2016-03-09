@@ -7,6 +7,7 @@ import static com.hillrom.vest.config.Constants.KEY_DURATION;
 import static com.hillrom.vest.config.Constants.KEY_FREQUENCY;
 import static com.hillrom.vest.config.Constants.KEY_MAX;
 import static com.hillrom.vest.config.Constants.KEY_MIN;
+import static com.hillrom.vest.config.Constants.KEY_MISSED_THERAPY;
 import static com.hillrom.vest.config.Constants.KEY_NOTE_TEXT;
 import static com.hillrom.vest.config.Constants.KEY_PRESSURE;
 import static com.hillrom.vest.config.Constants.KEY_PROTOCOL;
@@ -96,7 +97,7 @@ public class ComplianceGraphService extends AbstractGraphService {
 	}
 
 	private void populateToolTextValues(TherapyDataVO therapy, GraphDataVO point) {
-		point.setMissedTherapy(therapy.isMissedTherapy());
+		point.getToolText().put(KEY_MISSED_THERAPY, therapy.isMissedTherapy());
 		point.getToolText().put(KEY_PRESSURE, therapy.getPressure());
 		point.getToolText().put(KEY_DURATION, therapy.getDuration());
 		point.getToolText().put(KEY_FREQUENCY, therapy.getFrequency());

@@ -171,6 +171,9 @@ public final class Constants {
 	public static final String YES = "Yes";
 	public static final String KEY_THIRTY_DAYS_SURVEY_REPORT = "thirtyDaysSurveyReport";
 	public static final String KEY_FIVE_DAYS_SURVEY_REPORT = "fiveDaysSurveyReport";
+
+	//Column name to be checked in Patient search
+	public static final String ADHERENCE = "adherence";
 	
 	// HMR Graph Date Formats
 	public static final String MMddyyyyHHMM = "MM/dd/yyyy (HH:MM a)";
@@ -198,5 +201,11 @@ public final class Constants {
 	public static final String PRESSURE_LABEL = "Pressure";
 	public static final String FREQUENCY_LABEL = "Frequency";
 	public static final String DURATION_LABEL = "Duration";
+
+	// Cumulative Stats Graph 
+	public static final String HMR_NON_ADHERENCE_LABEL = "HMR Non-Adherence";
+	public static final String SETTING_DEVIATION_LABEL = "Setting Deviation";
+	public static final String MISSED_THERAPY_DAYS_LABEL = "Missed Therapy Days";
+	public static final String NO_TRANSMISSION_RECORDED_LABEL = "No Transmission Recorded";
 
 }

@@ -45,9 +45,9 @@ BEGIN
 			END IF;
 			-- Add n-3 when count is more then three else n. n = count of setting deviated 
 			IF temp_settings_deviated_days_count > 3 THEN 
-				SET temp_settings_deviated_days_count = temp_global_settings_deviated_days_count +(temp_settings_deviated_days_count - 3);
+				SET temp_global_settings_deviated_days_count = temp_global_settings_deviated_days_count +(temp_settings_deviated_days_count - 3);
 			ELSE
-				SET temp_settings_deviated_days_count = temp_global_settings_deviated_days_count + temp_settings_deviated_days_count;
+				SET temp_global_settings_deviated_days_count = temp_global_settings_deviated_days_count + temp_settings_deviated_days_count;
 			END IF;
 
 			IF temp_missed_therapy_count >= 1 THEN 

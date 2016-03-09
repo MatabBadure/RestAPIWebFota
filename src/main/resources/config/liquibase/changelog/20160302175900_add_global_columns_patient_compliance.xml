@@ -12,7 +12,7 @@
 
 	<changeSet id="20160303175900" author="Hillrom Devs">
 		<addColumn tableName="PATIENT_COMPLIANCE">
-			<column name="global_hmr_non_adherence_counter" type="integer"
+			<column name="global_hmr_non_adherence_count" type="integer"
 				defaultValueBoolean="0" />
 			<column name="global_settings_deviated_days_count" type="integer"
 				defaultValueBoolean="0" />

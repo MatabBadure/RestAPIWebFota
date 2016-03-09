@@ -36,6 +36,6 @@ public interface UserSurveyAnswerRepository extends JpaRepository<UserSurveyAnsw
 	List<SurveyAnswerResultSetVO> nintyDaySurveyReport(String fromDateTime, String toDateTime);
 	
 	@Query(name = "fiveDaySurveyReportView")
-	List<SurveyAnswerResultSetVO> fiveDaySurveyViewReport(Long questionId);
+	List<SurveyAnswerResultSetVO> fiveDaySurveyViewReport(Long questionId, String fromDateTime, String toDateTime);
 }
 

@@ -54,7 +54,7 @@ BEGIN
 				SET temp_global_missed_therapy_days_count = temp_global_missed_therapy_days_count + 1;
 			END IF;
 
-			UPDATE `PATIENT_COMPLIANCE` SET `global_hmr_non_adherence_counter` = temp_global_hmr_non_adherence_count ,
+			UPDATE `PATIENT_COMPLIANCE` SET `global_hmr_non_adherence_count` = temp_global_hmr_non_adherence_count ,
 			`global_settings_deviated_days_count` = temp_global_settings_deviated_days_count,
 			`global_missed_therapy_days_count` = temp_global_missed_therapy_days_count WHERE `id` = @temp_pc_id;
 

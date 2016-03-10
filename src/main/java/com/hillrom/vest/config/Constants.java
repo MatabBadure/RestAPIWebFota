@@ -171,4 +171,8 @@ public final class Constants {
 	public static final String YES = "Yes";
 	public static final String KEY_THIRTY_DAYS_SURVEY_REPORT = "thirtyDaysSurveyReport";
 	public static final String KEY_FIVE_DAYS_SURVEY_REPORT = "fiveDaysSurveyReport";
+	//Column name to be checked in Patient search
+	public static final String ADHERENCE = "adherence";
+	
+	
 }

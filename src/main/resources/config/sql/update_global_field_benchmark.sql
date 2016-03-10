@@ -5,7 +5,7 @@ BEGIN
 	DECLARE temp_is_settings_deviated INT ;
 	DECLARE temp_missed_therapy_count INT;
 	DECLARE temp_global_hmr_non_adherence_count INT DEFAULT 0;
-	DECLARE temp_global_settings_deviated_days_count INT DEFAULT 0;
+	DECLARE temp_global_settings_deviation_count INT DEFAULT 0;
 	DECLARE temp_global_missed_therapy_days_count INT DEFAULT 0;
 
 	-- Create temp table to mark processed users
@@ -45,7 +45,7 @@ BEGIN
 			END IF;
 			
 			IF temp_is_settings_deviated = 1 THEN 
-				SET temp_global_settings_deviated_days_count = temp_global_settings_deviated_days_count +1;
+				SET temp_global_settings_deviation_count = temp_global_settings_deviation_count +1;
 			END IF;
 
 			IF temp_missed_therapy_count >= 1 THEN 
@@ -53,7 +53,7 @@ BEGIN
 			END IF;
 
 			UPDATE `PATIENT_COMPLIANCE` SET `global_hmr_non_adherence_count` = temp_global_hmr_non_adherence_count ,
-			`global_settings_deviated_days_count` = temp_global_settings_deviated_days_count,
+			`global_settings_deviated_count` = temp_global_settings_deviation_count,
 			`global_missed_therapy_days_count` = temp_global_missed_therapy_days_count WHERE `id` = @temp_pc_id;
 
 			UPDATE `each_record_processed_validation` SET `processed` = 1 WHERE `id` = @temp_pc_id;
@@ -61,7 +61,7 @@ BEGIN
 		END WHILE;
 		UPDATE `user_processed_validation` SET `processed` = 1 WHERE `user_id` = @temp_user_id;	
 		SET temp_global_hmr_non_adherence_count = 0 ;
-		SET temp_global_settings_deviated_days_count = 0;
+		SET temp_global_settings_deviation_count = 0;
 		SET temp_global_missed_therapy_days_count = 0;
 	END WHILE;
 	-- Drop both temp tables

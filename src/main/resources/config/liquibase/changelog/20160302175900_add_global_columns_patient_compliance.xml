@@ -14,7 +14,7 @@
 		<addColumn tableName="PATIENT_COMPLIANCE">
 			<column name="global_hmr_non_adherence_count" type="integer"
 				defaultValueBoolean="0" />
-			<column name="global_settings_deviated_days_count" type="integer"
+			<column name="global_settings_deviated_count" type="integer"
 				defaultValueBoolean="0" />
 			<column name="global_missed_therapy_days_count" type="integer"
 				defaultValueBoolean="0" />

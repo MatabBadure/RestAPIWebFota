@@ -67,6 +67,15 @@ public class PatientCompliance {
 	@Column(name="settings_deviated_days_count")
 	private int settingsDeviatedDaysCount  = 0;
 	
+	@Column(name="global_missed_therapy_days_count")
+	private int globalMissedTherapyCounter;
+	
+	@Column(name="global_hmr_non_adherence_count")
+	private int globalHMRNonAdherenceCounter;
+	
+	@Column(name="global_settings_deviated_count")
+	private int globalSettingsDeviationCounter;
+	
 	public PatientCompliance() {
 		super();
 	}
@@ -225,6 +234,30 @@ public class PatientCompliance {
 
 	public void setSettingsDeviatedDaysCount(int settingsDeviatedDaysCount) {
 		this.settingsDeviatedDaysCount = settingsDeviatedDaysCount;
+	}
+
+	public int getGlobalMissedTherapyCounter() {
+		return globalMissedTherapyCounter;
+	}
+
+	public void setGlobalMissedTherapyCounter(int globalMissedTherapyCounter) {
+		this.globalMissedTherapyCounter = globalMissedTherapyCounter;
+	}
+
+	public int getGlobalHMRNonAdherenceCounter() {
+		return globalHMRNonAdherenceCounter;
+	}
+
+	public void setGlobalHMRNonAdherenceCounter(int globalHMRNonAdherenceCounter) {
+		this.globalHMRNonAdherenceCounter = globalHMRNonAdherenceCounter;
+	}
+
+	public int getGlobalSettingsDeviationCounter() {
+		return globalSettingsDeviationCounter;
+	}
+
+	public void setGlobalSettingsDeviationCounter(int globalSettingsDeviationCounter) {
+		this.globalSettingsDeviationCounter = globalSettingsDeviationCounter;
 	}
 
 	@Override

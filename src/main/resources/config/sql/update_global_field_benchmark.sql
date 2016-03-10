@@ -2,7 +2,7 @@ CREATE PROCEDURE `update_global_field_benchmark`()
 BEGIN
 	DECLARE temp_id bigint(20);
 	DECLARE temp_is_hmr_compliant INT;
-	DECLARE temp_settings_deviated_days_count INT ;
+	DECLARE temp_is_settings_deviated INT ;
 	DECLARE temp_missed_therapy_count INT;
 	DECLARE temp_global_hmr_non_adherence_count INT DEFAULT 0;
 	DECLARE temp_global_settings_deviated_days_count INT DEFAULT 0;
@@ -31,23 +31,21 @@ BEGIN
 			START TRANSACTION;
 			SELECT `id`,
 			`is_hmr_compliant`,
-			`settings_deviated_days_count`,
+			`is_settings_deviated`,
 			`missed_therapy_count`
 			INTO
 			temp_id,
 			temp_is_hmr_compliant,
-			temp_settings_deviated_days_count,
+			temp_is_settings_deviated,
 			temp_missed_therapy_count
 			FROM `PATIENT_COMPLIANCE` WHERE id = @temp_pc_id;
 
 			IF temp_is_hmr_compliant = 0 THEN 
 				SET temp_global_hmr_non_adherence_count = temp_global_hmr_non_adherence_count + 1;
 			END IF;
-			-- Add n-3 when count is more then three else n. n = count of setting deviated 
-			IF temp_settings_deviated_days_count > 3 THEN 
-				SET temp_global_settings_deviated_days_count = temp_global_settings_deviated_days_count +(temp_settings_deviated_days_count - 3);
-			ELSE
-				SET temp_global_settings_deviated_days_count = temp_global_settings_deviated_days_count + temp_settings_deviated_days_count;
+			
+			IF temp_is_settings_deviated = 1 THEN 
+				SET temp_global_settings_deviated_days_count = temp_global_settings_deviated_days_count +1;
 			END IF;
 
 			IF temp_missed_therapy_count >= 1 THEN 

@@ -24,7 +24,7 @@ public class BenchmarkRepository {
 	@Inject
 	private EntityManager entityManager;
 
-	public List<BenchmarkVO> getAverageBenchMark(LocalDate fromDate, LocalDate toDate, String cityCSV,
+	public List<BenchmarkVO> getAverageBenchmark(LocalDate fromDate, LocalDate toDate, String cityCSV,
 			String stateCSV) {
 
 		StringBuffer avgQueryString = new StringBuffer("SELECT pc.id as complainceId,pc.patient_id as patId, "

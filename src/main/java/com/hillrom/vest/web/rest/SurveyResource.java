@@ -156,8 +156,8 @@ public class SurveyResource {
 	
 	@RequestMapping(value = "/survey/{id}/graph", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getSurveyGraphById(@PathVariable Long id,
-			@RequestParam(required = true, value = "fromDate")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
-  			@RequestParam(required = true, value = "toDate")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
+			@RequestParam(required = true, value = "from")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+  			@RequestParam(required = true, value = "to")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
 			return new ResponseEntity< SurveyGraph>(surveyService.getSurveyGraphById(id, from, to), HttpStatus.OK);
 	}
 

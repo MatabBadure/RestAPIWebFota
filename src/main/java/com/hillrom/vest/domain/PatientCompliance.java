@@ -1,13 +1,19 @@
 package com.hillrom.vest.domain;
 
+import java.math.BigDecimal;
+import java.sql.Date;
+
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SqlResultSetMapping;
+import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
@@ -18,7 +24,27 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
 import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
+import com.hillrom.vest.repository.BenchmarkVO;
 
+@SqlResultSetMapping(name = "avgBenchmarkResultSetMapping", classes = @ConstructorResult(targetClass = BenchmarkVO.class, columns = {
+		@ColumnResult(name = "complainceId", type = Long.class),
+		@ColumnResult(name = "patId",type = String.class),
+		@ColumnResult(name = "userId",type = Long.class),
+		@ColumnResult(name = "dob", type = org.jadira.usertype.dateandtime.joda.PersistentLocalDate.class),
+		@ColumnResult(name = "age", type = Integer.class),
+		@ColumnResult(name = "zipcode",type = String.class),
+		@ColumnResult(name = "city",type = String.class),
+		@ColumnResult(name = "state",type = String.class),
+		@ColumnResult(name = "lastTherapySessionDate", type = org.jadira.usertype.dateandtime.joda.PersistentLocalDate.class),
+		@ColumnResult(name = "avgCompScore", type = BigDecimal.class),
+		@ColumnResult(name = "avgNonAdherenceCount", type = BigDecimal.class),
+		@ColumnResult(name = "avgSettingsDeviatedCount", type = BigDecimal.class),
+		@ColumnResult(name = "avgMissedTherapyDaysCount", type = BigDecimal.class)}))
+
+/*Long complianceId, String patientId, Long userId, Date dob, Integer age, String zipcode,
+String city, String state, Date lastTherapySessionDate, BigDecimal avgCompScore,
+BigDecimal avgNonAdherenceCount, BigDecimal avgSettingsDeviatedCount,
+BigDecimal avgMissedTherapyDaysCount*/
 @Entity
 @Table(name="PATIENT_COMPLIANCE")
 public class PatientCompliance {

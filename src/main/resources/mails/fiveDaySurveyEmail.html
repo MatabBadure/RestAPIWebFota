@@ -11,7 +11,7 @@
 			<table id="" width="600" height="" border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td width="600" height="4">
-						<img src="@{|${baseUrl}/images/top-border.png" width="600" height="4" alt=""></img></td>
+						<img th:src="@{|${baseUrl}/images/top-border.png" width="600" height="4" alt=""></img></td>
 				</tr>
 				<tr>
 					<td width="600" height="14" bgcolor="#ffffff" ></td>
@@ -21,7 +21,7 @@
 	</tr>
 	<tr>
 		<td>
-			<img src="@{|${baseUrl}/images/hill-rom-logo.png" width="600" height="36" alt="Hill-rom Logo"></img></td>
+			<img th:src="@{|${baseUrl}/images/hill-rom-logo.png" width="600" height="36" alt="Hill-rom Logo"></img></td>
 	</tr>
 	<tr>
 		<td  width="600" height="15" bgcolor="#ffffff">
@@ -29,7 +29,7 @@
 	</tr>
 	<tr>
 		<td>
-			<img src="@{|${baseUrl}/images/survey-completed-banner.png" width="600" height="95" alt="survey completed"></img></td>
+			<img th:src="@{|${baseUrl}/images/survey-completed-banner.png" width="600" height="95" alt="survey completed"></img></td>
 	</tr>
 	<tr>
 		<td width="600" height="31"></td>
@@ -437,7 +437,7 @@
 				<tr>
 					<td width="458" bgcolor="#ffffff">&nbsp;</td>
 					<td width="133">
-						<img src="@{|${baseUrl}/images/view-overall-statistics.png" width="133" alt="View Overall Statistics"></img></td>
+						<a th:href="@{|${baseUrl}/#/console/admin/survey-report|}" ><img th:src="@{|${baseUrl}/images/view-overall-statistics.png" width="133" alt="View Overall Statistics"></img></a></td>
 					<td width="9" bgcolor="#ffffff">&nbsp;</td>
 				</tr>
 			</table>

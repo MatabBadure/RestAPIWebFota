@@ -203,6 +203,7 @@ public class AdherenceCalculationService {
 							false,0);
 					newCompliance.setLatestTherapyDate(null);// since no transmission 
 					complianceMap.put(userId, newCompliance);
+					// HMR Compliance shouldn't be checked for Patients for initial 2 days of transmission date
 				}else if(Objects.nonNull(noEvent)&& (Objects.nonNull(noEvent.getFirstTransmissionDate()) && 
 						DateUtil.getDaysCountBetweenLocalDates(noEvent.getFirstTransmissionDate(), today) < 2)){
 					// For Transmitted users no notification for first two days
@@ -210,10 +211,9 @@ public class AdherenceCalculationService {
 							compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1,compliance.getLatestTherapyDate(),
 							Objects.nonNull(compliance.getHmr())? compliance.getHmr():0.0d);
 					newCompliance.setScore(compliance.getScore());
-					//increment global missed therapy counter
-					newCompliance.setGlobalMissedTherapyCounter(++globalMissedTherapyCounter);
-					newCompliance.setGlobalHMRNonAdherenceCounter(globalHMRNonAdherenceCounter);
-					newCompliance.setGlobalSettingsDeviationCounter(globalSettingsDeviationCounter);
+					updateGlobalCounters(++globalMissedTherapyCounter,
+							globalHMRNonAdherenceCounter,
+							globalSettingsDeviationCounter, newCompliance);
 					complianceMap.put(userId, newCompliance);
 				}else {
 					PatientCompliance newCompliance = new PatientCompliance(
@@ -227,9 +227,9 @@ public class AdherenceCalculationService {
 					newCompliance.setScore(compliance.getScore());
 					newCompliance.setSettingsDeviatedDaysCount(0);
 					// increment global missed therapy counter
-					newCompliance.setGlobalMissedTherapyCounter(++globalMissedTherapyCounter);
-					newCompliance.setGlobalHMRNonAdherenceCounter(globalHMRNonAdherenceCounter);
-					newCompliance.setGlobalSettingsDeviationCounter(globalSettingsDeviationCounter);
+					updateGlobalCounters(++globalMissedTherapyCounter,
+							globalHMRNonAdherenceCounter,
+							globalSettingsDeviationCounter, newCompliance);
 					log.debug("Compliance before calc "+newCompliance);
 					if(newCompliance.getMissedTherapyCount() >= DEFAULT_MISSED_THERAPY_DAYS_COUNT){ // missed Therapy for 3rd day or more than 3 days
 						mstNotificationMap.put(compliance.getPatientUser().getId(), newCompliance);
@@ -261,6 +261,14 @@ public class AdherenceCalculationService {
 		}
 	}
 
+	private void updateGlobalCounters(int globalMissedTherapyCounter,
+			int globalHMRNonAdherenceCounter,
+			int globalSettingsDeviationCounter, PatientCompliance newCompliance) {
+		newCompliance.setGlobalMissedTherapyCounter(globalMissedTherapyCounter);
+		newCompliance.setGlobalHMRNonAdherenceCounter(globalHMRNonAdherenceCounter);
+		newCompliance.setGlobalSettingsDeviationCounter(globalSettingsDeviationCounter);
+	}
+
 	// Create or Update Adherence Score on Missed Therapy day
 	private void updateComplianceForMST(LocalDate today,
 			Map<Long, PatientCompliance> complianceMap) {
@@ -279,6 +287,7 @@ public class AdherenceCalculationService {
 					existingCompliance.setHmrCompliant(currentCompliance.isHmrCompliant());
 					existingCompliance.setLatestTherapyDate(currentCompliance.getLatestTherapyDate());
 					existingCompliance.setMissedTherapyCount(currentCompliance.getMissedTherapyCount());
+					updateGlobalCounters(currentCompliance.getGlobalMissedTherapyCounter(), currentCompliance.getGlobalHMRNonAdherenceCounter(),currentCompliance.getGlobalSettingsDeviationCounter(), existingCompliance);
 					complianceMap.put(puId, existingCompliance);
 				} 
 			}
@@ -343,9 +352,7 @@ public class AdherenceCalculationService {
 			double durationFor3Days = hmrRunRate*therapySessions.size(); // runrate*totalsessions = total duration
 			ProtocolConstants protocolConstant = userProtocolConstantsMap.get(patientUserId);
 
-			// HMR Compliance shouldn't be checked for new Patients created for initial 2 days
-			if(DateUtil.getDaysCountBetweenLocalDates(newCompliance.getPatientUser().getCreatedDate().toLocalDate(), today) > 2 
-					&& !isHMRCompliant(protocolConstant, durationFor3Days)){
+			if(!isHMRCompliant(protocolConstant, durationFor3Days)){
 				score = score < HMR_NON_COMPLIANCE_POINTS ? 0 : score - HMR_NON_COMPLIANCE_POINTS;
 				newCompliance.setHmrCompliant(false);
 				// increment HMR Non Adherence Counter
@@ -942,9 +949,7 @@ public class AdherenceCalculationService {
 		compliance.setHmrCompliant(latestcompliance.isHmrCompliant());
 		compliance.setLatestTherapyDate(latestcompliance.getLatestTherapyDate());
 		compliance.setSettingsDeviatedDaysCount(latestcompliance.getSettingsDeviatedDaysCount());
-		compliance.setGlobalHMRNonAdherenceCounter(latestcompliance.getGlobalHMRNonAdherenceCounter());
-		compliance.setGlobalSettingsDeviationCounter(latestcompliance.getGlobalSettingsDeviationCounter());
-		compliance.setGlobalMissedTherapyCounter(latestcompliance.getGlobalMissedTherapyCounter());
+		updateGlobalCounters(latestcompliance.getGlobalMissedTherapyCounter(), latestcompliance.getGlobalHMRNonAdherenceCounter(), latestcompliance.getGlobalSettingsDeviationCounter(), compliance);
 		return compliance;
 	}
 

@@ -66,7 +66,7 @@ import com.hillrom.vest.repository.ThirtyDaySurveyReportVO;
 		@NamedNativeQuery(name = "fiveDaySurveyReportView", query = "select usa.user_id as userId, usa.question_id as questionId, "
 				+ "ques.question_text as questionText, usa.answer_value_1 as answerValue1, usa.answer_value_2 as answerValue2  "
 				+ "from USER_SURVEY_ANSWERS usa left outer join  QUESTIONS ques on ques.id = usa.question_id "
-				+ "where usa.survey_id = 1 AND usa.question_id in (1,4,5,?) "
+				+ "where usa.survey_id = 1 AND usa.question_id in (1,4,5,?) and DATE(usa.compl_date) between ? and ? "
 				+ "group by usa.user_id,usa.question_id", resultSetMapping = "surveyAnswerReportMapping") })
 @SqlResultSetMappings({
 		@SqlResultSetMapping(name = "fiveDaySurveyReportMapping", classes = @ConstructorResult(targetClass = FiveDaySurveyReportVO.class, columns = {

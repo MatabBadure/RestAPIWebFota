@@ -237,13 +237,13 @@ public class SurveyService {
 		return nintyDaySurveyReportVOs;
 	}
 	
-	public List<FiveDayViewVO> getSurveyAnswerByQuestionId(Long id) throws HillromException {
+	public List<FiveDayViewVO> getSurveyAnswerByQuestionId(Long id, LocalDate from,LocalDate to) throws HillromException {
 
 		SurveyQuestion surveyQuestion = surveyQuestionRepository.findOne(id);
 		if (Objects.isNull(surveyQuestion))
 			throw new HillromException(ExceptionConstants.HR_807);
 		Map<Long, List<SurveyAnswerResultSetVO>> surveyAnswerRSGroupedByUserID = (Map<Long, List<SurveyAnswerResultSetVO>>) userSurveyAnswerRepository
-				.fiveDaySurveyViewReport(id).stream()
+				.fiveDaySurveyViewReport(id, from.toString(), to.toString()).stream()
 				.collect(Collectors.groupingBy(SurveyAnswerResultSetVO::getUserId));
 
 		List<FiveDayViewVO> fiveDayViewVOs = new LinkedList<>();

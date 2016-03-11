@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.actuate.autoconfigure.HealthMvcEndpointProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -120,13 +121,13 @@ public class UserExtensionResource {
     }
 
     /**
-     * PUT  /user/:id -> Updates an existing user.
+     * PUT  /user/:id -> Updates an existing user. Associate should also be able to update
      */
     @RequestMapping(value = "/user/{id}",
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CLINIC_ADMIN})
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CLINIC_ADMIN, AuthoritiesConstants.ASSOCIATES})
     public ResponseEntity<JSONObject> update(@PathVariable Long id, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
         log.debug("REST request to update User : {}", userExtensionDTO);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
@@ -196,11 +197,12 @@ public class UserExtensionResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
-    public ResponseEntity<JSONObject> delete(@PathVariable Long id) {
+    public ResponseEntity<JSONObject> delete(@PathVariable Long id, HttpServletRequest request) {
         log.debug("REST request to delete UserExtension : {}", id);
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         JSONObject jsonObject = new JSONObject();
 		try {
-			jsonObject = userService.deleteUser(id);
+			jsonObject = userService.deleteUser(id, baseUrl);
 			 if (jsonObject.containsKey("ERROR")) {
 		        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
 		        } else {
@@ -241,7 +243,7 @@ public class UserExtensionResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    public ResponseEntity<List<HillRomUserVO>> search(@RequestParam(required=true,value = "searchString")String searchString,
+    public ResponseEntity<?> search(@RequestParam(required=true,value = "searchString")String searchString,
     		@RequestParam(required=false, value = "filter")String filter,
     		@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
@@ -257,7 +259,15 @@ public class UserExtensionResource {
     		isAscending =  (isAscending != null)?  isAscending : true;
     		sortOrder.put(sortBy, isAscending);
     	}
-    	Page<HillRomUserVO> page = userSearchRepository.findHillRomTeamUsersBy(queryString,filter,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+    	Page<HillRomUserVO> page;
+    	
+		try {
+			page = userSearchRepository.findHillRomTeamUsersBy(queryString,filter,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+		} catch (HillromException e) {
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/user/search", offset, limit);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -270,7 +280,8 @@ public class UserExtensionResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     public ResponseEntity<?> searchHcp(@RequestParam(required=true,value = "searchString")String searchString,
-    		@RequestParam(required=false,value = "filter")String filter,
+    		@RequestParam(value = "filter", required=false)String filter,
+    		@RequestParam(value = "clinicId", required=false)String associatedToClinicId,
     		@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
             @RequestParam(value = "sort_by", required = false) String sortBy,
@@ -285,7 +296,8 @@ public class UserExtensionResource {
     		isAscending =  (isAscending != null) ?  isAscending : true;
     		sortOrder.put(sortBy, isAscending);
     	}
-    	Page<HcpVO> page = userSearchRepository.findHCPBy(queryString,filter,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+    	Page<HcpVO> page = userSearchRepository.findHCPBy(queryString,filter,
+    			PaginationUtil.generatePageRequest(offset, limit),sortOrder, associatedToClinicId);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/user/hcp/search", offset, limit);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -770,7 +782,7 @@ public class UserExtensionResource {
         log.debug("REST request to get associated clinics with HCP : {}", id);
         JSONObject jsonObject = new JSONObject();
         try {
-        	Set<ClinicVO> clinics= hcpClinicService.getAssociatedClinicsForHCP(id);
+        	List<ClinicVO> clinics= hcpClinicService.getAssociatedClinicsForHCP(id);
 	        if (clinics.isEmpty()) {
 	        	jsonObject.put("message", ExceptionConstants.HR_582);
 	        } else {
@@ -986,5 +998,52 @@ public class UserExtensionResource {
         	jsonObject.put("ERROR", hre.getMessage());
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         }
+    }
+    
+    /**
+     * PUT  /user/:id/reactivate -> reactivate the "id" user.
+     */
+    @RequestMapping(value = "/user/{id}/reactivate",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> reactivateUser(@PathVariable Long id) {
+        log.debug("REST request to reactivate User : {}", id);
+        JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject = userService.reactivateUser(id);
+			 if (jsonObject.containsKey("ERROR")) {
+		        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
+		        } else {
+		            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+		        }
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
+		}
+       
+    }
+    
+    /**
+     * PUT  /user/:id/reactivation -> reactivation of user, updates activation key and time.
+     */
+    @RequestMapping(value = "/user/{id}/reactivation",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> userReactivation(@PathVariable Long id, HttpServletRequest request) {
+        log.debug("REST request to User Reactivation : {}", id);
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject = userService.userReactivation(id, baseUrl);
+		    return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
+       
     }
 }

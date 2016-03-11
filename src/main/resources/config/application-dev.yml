@@ -23,7 +23,7 @@ spring:
         database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
         database: MYSQL
         openInView: false
-        show_sql: true
+        show_sql: false
         generate-ddl: false
         hibernate:
             ddl-auto: update
@@ -41,6 +41,8 @@ spring:
     recaptcha:
         recaptchaPrivateKey: 6LcXjQkTAAAAACiA7rx7o7wlifQ7n3VQ_It-sncc
     notification:
-        hcpOrClinicAdminDashboardUrl: http://dev.hillromvest.com
-        patientDashboardUrl: http://dev.hillromvest.com
-        careGiverDashboardUrl: http://dev.hillromvest.com
+        hcpOrClinicAdminDashboardUrl: http://devserver.hillromvest.com
+        patientDashboardUrl: http://devserver.hillromvest.com
+        careGiverDashboardUrl: http://devserver.hillromvest.com
+        baseUrl: http://devserver.hillromvest.com
+        accountActivationReminderInterval: 12

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+	<!-- Insert user data to user extension table -->
+	<changeSet author="jhipster" id="20160226192300">
+		<loadUpdateData  encoding="UTF-8" file="config/liquibase/login_token-1.csv"
+			separator="," tableName="USER_LOGIN_TOKEN" primaryKey="id">
+			 <column name="is_expired" type="boolean" />
+		</loadUpdateData>
+	</changeSet>
+</databaseChangeLog>
+		

@@ -63,7 +63,7 @@ public final class Constants {
 
 	public static final String PROGRAMMED_COUGH_PAUSES = "Programmed Cough Pauses";
 
-	public static final String MINUTES = "Minutes";
+	public static final String MINUTES = "Duration";
 
 	public static final String PRESSURE = "Pressure";
 
@@ -79,9 +79,9 @@ public final class Constants {
 
 	public static final String DATE = "Date";
 
-	public static final String HMR_IN_MINUTES = "hmrInMinutes";
+	public static final String HMR_IN_HOURS = "hmrInHours";
 
-	public static final String DURATION = "duration";
+	public static final String DURATION = "Duration";
 
 	public static final String HUB_ID = "hubId";
 
@@ -93,7 +93,7 @@ public final class Constants {
 
 	public static final String SEQUENCE_NUMBER = "sequenceNumber";
 
-	public static final String HMR = "hmr";
+	public static final String HMR = "Hmr";
 
 	public static final String HUB_ADDRESS = "Hub Id";
 
@@ -115,15 +115,97 @@ public final class Constants {
 
 	public static final String NO_EVENT = "no_event";
 
-	public static final String GROUP_BY_YEARLY = "yearly";
+	public static final String YEAR = "year";
 	
-	public static final String GROUP_BY_MONTHLY = "monthly";
+	public static final String MONTH = "month";
 	
-	public static final String GROUP_BY_WEEKLY = "weekly";
+	public static final String WEEK = "week";
 	
 	public static final String ACTIVE = "active";
 	
 	public static final String INACTIVE = "inactive";
 	
 	public static final String EXPIRED = "expired";
+	
+	public static final String TIME = "Time";
+	
+	public static final String PATIENT_ID = "Patient Id";
+	
+	public static final String PATIENT_BLUETOOTH_ADDRESS = "patientBlueToothAddress";
+	
+	public static final String DAY = "day";
+	
+	public static final String CUSTOM = "custom";
+	
+	public static final String MMddyyyy = "MM/dd/yyyy";
+	
+	public static final String WEEK_SEPERATOR = " - ";
+	
+	public static final String XAXIS_TYPE_CATEGORIES = "categories";
+	
+	public static final String XAXIS_TYPE_DATETIME = "datetime";
+	
+	public static final String LA_DAYVIEW_LABEL = "No.of Logins";
+	
+	public static final String UNABLE_TO_ASSESS = "Unable to assess";
+	public static final String STRONGLY_AGREE = "Strongly agree";
+	public static final String SOMEWHAT_AGREE= "Somewhat agree";
+	public static final String NEUTRAL = "Neutral";
+	public static final String SOMEWHAT_DISAGREE  = "Somewhat disagree";
+	public static final String STRONGLY_DISAGREE = "Strongly disagree";
+	
+	// 5days Survey question ids
+	public static final String FIVE_DAYS_SURVEY_QIDS = "6,7,8,9,10,11,12";
+	
+	// 30 days Survey question ids
+	public static final String THIRTY_DAYS_SURVEY_QIDS = "27,28,29,30,31,32,33";
+	
+	public static final Long FIVE_DAYS_SURVEY_ID = 1L;
+	
+	public static final Long THIRTY_DAYS_SURVEY_ID = 2L;
+	
+	// Survey Graph Constants
+	public static final String KEY_COUNT = "count";
+	public static final String Q_PREFIX = "Q-";
+	public static final String NO = "No";
+	public static final String YES = "Yes";
+	public static final String KEY_THIRTY_DAYS_SURVEY_REPORT = "thirtyDaysSurveyReport";
+	public static final String KEY_FIVE_DAYS_SURVEY_REPORT = "fiveDaysSurveyReport";
+
+	//Column name to be checked in Patient search
+	public static final String ADHERENCE = "adherence";
+	
+	// HMR Graph Date Formats
+	public static final String MMddyyyyHHMM = "MM/dd/yyyy (HH:MM a)";
+	public static final String HHMM = "HH:MM a";
+	public static final String MMddyyyyHHmmss = "MM/dd/yyyy HH:mm:ss";
+	
+	//HMR Graph Y-axis labels
+	public static final String MINUTES_LABEL = "Minutes";
+	public static final String HMR_LABEL = "HMR";
+	
+	//HMR Graph tooltip labels
+	public static final String KEY_NOTE_TEXT = "noteText";
+	public static final String KEY_COUGH_PAUSES = "coughPauses";
+	public static final String KEY_MISSED_THERAPY = "missedTherapy";
+	public static final String KEY_FREQUENCY = "frequency";
+	public static final String KEY_DURATION = "duration";
+	public static final String KEY_PRESSURE = "pressure";
+	public static final String KEY_SESSION_NO = "sessionNo";
+
+	// Compliance Graph 
+	public static final String KEY_MAX = "max";
+	public static final String KEY_MIN = "min";
+	public static final String KEY_THERAPY_DATA = "therapyData";
+	public static final String KEY_PROTOCOL = "protocol";
+	public static final String PRESSURE_LABEL = "Pressure";
+	public static final String FREQUENCY_LABEL = "Frequency";
+	public static final String DURATION_LABEL = "Duration";
+
+	// Cumulative Stats Graph 
+	public static final String HMR_NON_ADHERENCE_LABEL = "HMR Non-Adherence";
+	public static final String SETTING_DEVIATION_LABEL = "Setting Deviation";
+	public static final String MISSED_THERAPY_DAYS_LABEL = "Missed Therapy Days";
+	public static final String NO_TRANSMISSION_RECORDED_LABEL = "No Transmission Recorded";
+
 }

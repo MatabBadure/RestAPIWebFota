@@ -3,11 +3,16 @@ package com.hillrom.vest.web.rest.dto;
 import java.io.Serializable;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.Note;
+import com.hillrom.vest.domain.util.DateTimeSerializer;
 
-public class TherapyDataVO implements Serializable {
+public class TherapyDataVO implements Serializable,Comparable<TherapyDataVO> {
 
+	@JsonSerialize(using= DateTimeSerializer.class)
 	private DateTime timestamp;
 	private int treatmentsPerDay;
 	private int sessionNo;
@@ -17,7 +22,9 @@ public class TherapyDataVO implements Serializable {
 	private int normalCoughPauses;
 	private int coughPauses;
 	private Note note;
+	@JsonSerialize(using= DateTimeSerializer.class)
 	private DateTime start;
+	@JsonSerialize(using= DateTimeSerializer.class)
 	private DateTime end;
 	private int coughPauseDuration;
 	private int duration;
@@ -33,6 +40,26 @@ public class TherapyDataVO implements Serializable {
 		this.treatmentsPerDay = treatmentsPerDay;
 		this.sessionNo = sessionNo;
 		this.sessionNo = sessionNo;
+		this.frequency = frequency;
+		this.pressure = pressure;
+		this.programmedCoughPauses = programmedCoughPauses;
+		this.normalCoughPauses = normalCoughPauses;
+		this.coughPauses = coughPauses;
+		this.note = note;
+		this.start = start;
+		this.end = end;
+		this.coughPauseDuration = coughPauseDuration;
+		this.duration = duration;
+		this.hmr = hmr;
+		this.missedTherapy = missedTherapy;
+	}
+
+	public TherapyDataVO(DateTime timestamp, int frequency, int pressure,
+			int programmedCoughPauses, int normalCoughPauses, int coughPauses,
+			Note note, DateTime start, DateTime end, int coughPauseDuration,
+			int duration, double hmr, boolean missedTherapy) {
+		super();
+		this.timestamp = timestamp;
 		this.frequency = frequency;
 		this.pressure = pressure;
 		this.programmedCoughPauses = programmedCoughPauses;
@@ -182,4 +209,13 @@ public class TherapyDataVO implements Serializable {
 				+ ", duration=" + duration + ", hmr=" + hmr + "missedTherapy="+missedTherapy+"]";
 	}
 
+	@Override
+	public int compareTo(TherapyDataVO o) {
+		return this.timestamp.compareTo(o.getTimestamp());
+	}
+
+	@JsonIgnore
+	public LocalDate getDate(){
+		return this.timestamp.toLocalDate();
+	}
 }

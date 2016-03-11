@@ -11,6 +11,7 @@ public class CareGiverVO implements Serializable{
 	private User user;
 	private Long userId;
 	private String patientId;
+	private Boolean deleted;
 
 	public Long getUserId() {
 		return userId;
@@ -37,6 +38,16 @@ public class CareGiverVO implements Serializable{
 		this.patientId = patientId;
 	}
 	
+	public CareGiverVO(String userRole, String relationshipLabel, User user,Long userId, String patientId, Boolean deleted) {
+		super();
+		this.userRole = userRole;
+		this.relationshipLabel = relationshipLabel;
+		this.user = user;
+		this.userId = userId;
+		this.patientId = patientId;
+		this.deleted = deleted;
+	}
+	
 	public String getUserRole() {
 		return userRole;
 	}
@@ -55,6 +66,12 @@ public class CareGiverVO implements Serializable{
 	public void setUser(User user) {
 		this.user = user;
 	}
-	
-	
+
+	public Boolean getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(Boolean deleted) {
+		this.deleted = deleted;
+	}	
 }

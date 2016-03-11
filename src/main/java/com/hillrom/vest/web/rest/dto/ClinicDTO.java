@@ -12,8 +12,11 @@ public class ClinicDTO {
 	@Size(max = 50)
 	private String name;
 
-	@Size(max = 50)
+	@Size(max = 255)
     private String address;
+	
+	@Size(max = 255)
+    private String address2;
 
 	@Size(max = 50)
     private Integer zipcode;
@@ -39,6 +42,9 @@ public class ClinicDTO {
 	private List<Map<String, String>> childClinicList = new ArrayList<Map<String,String>>();
 	
 	private Boolean parent;
+	
+	private Boolean deleted;
+
 
 	@Size(max = 50)
     private Map<String, String> parentClinic = new HashMap<>();
@@ -47,12 +53,13 @@ public class ClinicDTO {
 		super();
 	}
 
-	public ClinicDTO(String name, String address, Integer zipcode, String city,
+	public ClinicDTO(String name, String address, String address2, Integer zipcode, String city,
 			String state, String phoneNumber, String faxNumber, Long clinicAdminId,
-			Boolean parent, String hillromId) {
+			Boolean parent, Boolean deleted, String hillromId) {
 		super();
 		this.name = name;
 		this.address = address;
+		this.address2 = address2;
 		this.zipcode = zipcode;
 		this.city = city;
 		this.state = state;
@@ -60,9 +67,19 @@ public class ClinicDTO {
 		this.faxNumber = faxNumber;
 		this.clinicAdminId = clinicAdminId;
 		this.parent = parent;
+		this.deleted = deleted;
 		this.hillromId = hillromId;
 	}
 
+
+	public Boolean getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(Boolean deleted) {
+		this.deleted = deleted;
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -77,6 +94,14 @@ public class ClinicDTO {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public String getAddress2() {
+		return address2;
+	}
+
+	public void setAddress2(String address2) {
+		this.address2 = address2;
 	}
 
 	public Integer getZipcode() {

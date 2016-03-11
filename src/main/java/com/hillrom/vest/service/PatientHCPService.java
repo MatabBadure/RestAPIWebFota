@@ -27,7 +27,6 @@ import com.hillrom.vest.domain.ClinicPatientAssoc;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
-import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
@@ -137,7 +136,7 @@ public class PatientHCPService {
 				hcpUsers.add(new HcpClinicsVO(hcp,hcp.getClinics()));
 			}
 		}
-		return hcpUsers;
+		return RandomUtil.sortHcpClinicsVOListByLastNameFirstName(hcpUsers);
 	}
 
 	private List<User> getAssociatedHCPUserList(PatientInfo patientInfo) {
@@ -245,10 +244,19 @@ public class PatientHCPService {
 		List<Map<String,Object>> patientUsers = clinicService.getAssociatedPatientUsers(clinicList);
 		List<Long> patientUserIds = filterActivePatientIds(patientUsers);
 		if(patientUsers.isEmpty()) {
-			throw new HillromException(MessageConstants.HR_279);
+	       	Map<String, Object> statistics0 = new HashMap();
+				statistics0.put("patientsWithHmrNonCompliance", 0);
+				statistics0.put("patientsWithSettingDeviation", 0);
+				statistics0.put("patientsWithMissedTherapy", 0);
+				statistics0.put("patientsWithNoEventRecorded", 0);
+				statistics0.put("date", LocalDate.now());
+				statistics0.put("totalPatientCount", 0);        	
+	        	return statistics0;
+			//throw new HillromException(MessageConstants.HR_279);
 		} else if(patientUserIds.isEmpty()) {
 			throw new HillromException(MessageConstants.HR_267);
 		} else {
+			date = LocalDate.now().minusDays(1);// yester days data, HCP and Clinic Admin would see yesterdays data
 			Map<LocalDate,Integer> datePatientNoEventCountMap = getPatientsWithNoEvents(date,date,patientUserIds);
 			int patientsWithNoEventRecorded = Objects.nonNull(datePatientNoEventCountMap.get(date))? datePatientNoEventCountMap.get(date):0;
 			statistics.put("patientsWithHmrNonCompliance", patientComplianceRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, patientUserIds).size());
@@ -256,7 +264,7 @@ public class PatientHCPService {
 			statistics.put("patientsWithMissedTherapy", patientComplianceRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date, patientUserIds).size());
 			statistics.put("patientsWithNoEventRecorded", patientsWithNoEventRecorded);
 			statistics.put("date", date.toString());
-			statistics.put("totalPatientCount", patientUsers.size());
+			statistics.put("totalPatientCount", patientUserIds.size());
 		}
 		return statistics;
 	}
@@ -266,7 +274,8 @@ public class PatientHCPService {
 		List<Long> patientUserIds = new LinkedList<>();
 		patientUsers.forEach(patientUser -> {
 			if((Boolean)patientUser.get("status")){
-				patientUserIds.add(((UserExtension)patientUser.get("patient")).getId());
+				if(Objects.nonNull(patientUser.get("patient")))
+					patientUserIds.add(((UserExtension)patientUser.get("patient")).getId());
 			}
 		});
 		return patientUserIds;
@@ -349,7 +358,7 @@ public class PatientHCPService {
 		}
 	}
 	
-	public Collection<StatisticsVO> getCumulativePatientStatisticsForClinicAssociatedWithHCP(Long hcpId, String clinicId, 
+	public List<StatisticsVO> getCumulativePatientStatisticsForClinicAssociatedWithHCP(Long hcpId, String clinicId, 
 			LocalDate from,LocalDate to) throws HillromException{
 		List<String> clinicList = new LinkedList<>();
 		clinicList.add(clinicId);
@@ -357,12 +366,15 @@ public class PatientHCPService {
 		if(patientUsers.isEmpty()) {
 			throw new HillromException(MessageConstants.HR_279);
 		} else {
+			if(to.isEqual(LocalDate.now())){
+				to = LocalDate.now().minusDays(1); // HCP, Clinic Admin could see yesterdays data
+			}
 			List<Long> patientUserIds = filterActivePatientIds(patientUsers);
 			return getPatienCumulativeStatistics(from, to, patientUserIds);
 		}
 	}
 
-	public Collection<StatisticsVO> getPatienCumulativeStatistics(LocalDate from, LocalDate to,
+	public List<StatisticsVO> getPatienCumulativeStatistics(LocalDate from, LocalDate to,
 			List<Long> patientUserIds){
 		Map<LocalDate, StatisticsVO> statisticsMap = new TreeMap<>();
 		List<PatientCompliance> complianceList = patientComplianceRepository.findByDateBetweenAndPatientUserIdIn(from, to, patientUserIds);
@@ -386,7 +398,7 @@ public class PatientHCPService {
 					date,date);
 			statisticsMap.put(date, statisticsVO);
 		}
-		return statisticsMap.values();
+		return new LinkedList<>(statisticsMap.values());
 	}
 	
 	

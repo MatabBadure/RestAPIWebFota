@@ -1,7 +1,9 @@
 package com.hillrom.vest.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +13,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -18,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @IdClass(PatientVestDeviceDataPK.class)
 @Entity
 @Table(name = "PATIENT_VEST_DEVICE_DATA")
-public class PatientVestDeviceData implements Serializable {
+public class PatientVestDeviceData implements Serializable,Comparable<PatientVestDeviceData>,Cloneable {
 
 	private static final long serialVersionUID = 1L;
 	@Id
@@ -178,12 +182,29 @@ public class PatientVestDeviceData implements Serializable {
 	}	
 
 	@JsonIgnore
-	public LocalDate getDate(){
-		return LocalDate.fromDateFields(new Date(this.timestamp));
+	public DateTime getDate(){
+		return new DateTime(this.timestamp);
 	}
 	
 	@JsonIgnore
-	public double getHmrInMinutes(){
-		return this.hmr/60;
+	public double getHmrInHours(){
+		if(Objects.nonNull(hmr))
+			return new BigDecimal(this.hmr/(60*60) ).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+		else
+			return 0;
+	}
+	
+	@JsonIgnore
+	public String getPatientBlueToothAddress(){
+		return "PAT_ID:BT:"+this.bluetoothId;
+	}
+
+	@Override
+	public int compareTo(PatientVestDeviceData o) {
+		return this.getTimestamp().compareTo(o.getTimestamp());
+	}
+	
+	public Object clone()throws CloneNotSupportedException{  
+		return super.clone();  
 	}
 }

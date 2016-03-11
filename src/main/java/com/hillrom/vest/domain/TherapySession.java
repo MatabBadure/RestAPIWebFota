@@ -21,7 +21,7 @@ import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 
 @Entity
 @Table(name="PATIENT_VEST_THERAPY_DATA")
-public class TherapySession {
+public class TherapySession implements Comparable<TherapySession>{
 	
 	@JsonIgnore
 	@Id
@@ -64,7 +64,7 @@ public class TherapySession {
 	private Integer pressure;
 	
 	@Column(name="duration_in_minutes")
-	private Long durationInMinutes;
+	private int durationInMinutes;
 	
 	@Column(name="programmed_caugh_pauses")
 	private Integer programmedCaughPauses;
@@ -158,11 +158,11 @@ public class TherapySession {
 		this.pressure = pressure;
 	}
 
-	public Long getDurationInMinutes() {
+	public int getDurationInMinutes() {
 		return durationInMinutes;
 	}
 
-	public void setDurationInMinutes(Long durationInSeconds) {
+	public void setDurationInMinutes(int durationInSeconds) {
 		this.durationInMinutes = durationInSeconds;
 	}
 
@@ -204,7 +204,7 @@ public class TherapySession {
 				+ ", sessionNo=" + sessionNo + ", sessionType=" + sessionType
 				+ ", startTime=" + startTime + ", endTime=" + endTime
 				+ ", frequency=" + frequency + ", pressure=" + pressure
-				+ ", durationInSeconds=" + durationInMinutes
+				+ ", durationInMinutes=" + durationInMinutes
 				+ ", programmedCaughPauses=" + programmedCaughPauses
 				+ ", normalCaughPauses=" + normalCaughPauses
 				+ ", caughPauseDuration=" + caughPauseDuration 
@@ -214,11 +214,6 @@ public class TherapySession {
 	@JsonIgnore
 	public int getTherapyDayOfTheYear(){
 		return this.date.getDayOfYear();
-	}
-	
-	@JsonIgnore
-	public long getDurationLongValue(){
-		return this.durationInMinutes.longValue();
 	}
 	
 	@JsonIgnore
@@ -240,4 +235,10 @@ public class TherapySession {
 	public Long getTherapySessionByPatientUserId() {
 		return patientUser.getId();
 	}
+
+	@Override
+	public int compareTo(TherapySession o) {
+		return this.endTime.compareTo(o.getEndTime());
+	}
+
 }

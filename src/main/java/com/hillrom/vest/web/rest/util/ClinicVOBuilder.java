@@ -8,7 +8,7 @@ import com.hillrom.vest.web.rest.dto.ClinicVO;
 public class ClinicVOBuilder {
 
 	private static ClinicVO createClinicVo(Clinic clinic){
-		return new ClinicVO(clinic.getId(),clinic.getName(), clinic.getAddress(), clinic.getZipcode(), clinic.getCity(),
+		return new ClinicVO(clinic.getId(),clinic.getName(), clinic.getAddress(), clinic.getAddress2(),  clinic.getZipcode(), clinic.getCity(),
 				clinic.getState(), clinic.getPhoneNumber(), clinic.getFaxNumber(), clinic.getClinicAdminId(), 
 				clinic.isParent(), clinic.getHillromId(),clinic.isDeleted(),clinic.getCreatedAt());
 	}

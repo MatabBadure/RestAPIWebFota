@@ -8,13 +8,14 @@ public class MessageConstants {
     public static final String HR_201 = "User created successfully.";
     public static final String HR_202 = "User updated successfully.";
     public static final String HR_203 = "User fetched successfully.";
-    public static final String HR_204 = "User deleted successfully.";
+    public static final String HR_204 = "User deactivated successfully.";
     public static final String HR_205 = "Users fetched successfully.";
     
     public static final String HR_211 = "Patient User created successfully.";
     public static final String HR_212 = "Patient User updated successfully.";
     public static final String HR_213 = "Patient User fetched successfully.";
-    public static final String HR_214 = "Patient User deleted successfully.";
+    public static final String HR_214 = "Patient User deactivated successfully.";
+    public static final String HR_215 = "Patient User activated successfully.";
     
     public static final String HR_221 = "Clinic created successfully.";
     public static final String HR_222 = "Clinic updated successfully.";
@@ -25,6 +26,7 @@ public class MessageConstants {
     public static final String HR_232 = "Hillrom User updated successfully.";
     public static final String HR_233 = "Hillrom User fetched successfully.";
     public static final String HR_234 = "Hillrom User deleted successfully.";
+    public static final String HR_235 = "User activated successfully.";
     
     public static final String HR_241 = "Protocol created successfully.";
     public static final String HR_242 = "Protocol updated successfully.";
@@ -67,7 +69,8 @@ public class MessageConstants {
     public static final String HR_286 = "No clinic admin found.";
     public static final String HR_287 = "Clinic admin fetched successfully.";
     public static final String HR_288 = "Clinic admin associated successfully.";
-    public static final String HR_289 = "Clinic admin dissociated successfully.";
+    public static final String HR_289 = "Clinic Admin has been disassociated from clinic successfully.";
+    
     
     public static final String HR_290 = "HCP associated with Patient fetched successfully.";
     public static final String HR_291 = "Patients associated with HCP fetched successfully.";
@@ -86,4 +89,9 @@ public class MessageConstants {
     
     public static final String HR_303 = "Data ingested successfully";
     public static final String HR_304 = "Security question fetched successfully.";
+    
+    public static final String HR_305 = "Activation link sent successfully.";
+    
+    public static final String HR_306 = "Authenticated successfully.";
+    public static final String HR_307 = "Survey taken successfully.";
 }

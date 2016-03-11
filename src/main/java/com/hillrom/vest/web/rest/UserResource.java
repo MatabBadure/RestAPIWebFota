@@ -1,7 +1,7 @@
 package com.hillrom.vest.web.rest;
 
-import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
 import static com.hillrom.vest.security.AuthoritiesConstants.CLINIC_ADMIN;
+import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -18,10 +18,13 @@ import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
+import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -58,6 +61,8 @@ import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.AdherenceCalculationService;
+import com.hillrom.vest.service.ExcelOutputService;
+import com.hillrom.vest.service.GraphService;
 import com.hillrom.vest.service.PatientComplianceService;
 import com.hillrom.vest.service.PatientHCPService;
 import com.hillrom.vest.service.PatientProtocolService;
@@ -67,6 +72,9 @@ import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.service.util.CsvUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
+import com.hillrom.vest.web.rest.dto.AdherenceTrendVO;
+import com.hillrom.vest.web.rest.dto.Filter;
+import com.hillrom.vest.web.rest.dto.Graph;
 import com.hillrom.vest.web.rest.dto.PatientComplianceVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.ProtocolDTO;
@@ -74,8 +82,6 @@ import com.hillrom.vest.web.rest.dto.StatisticsVO;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
-
-import net.minidev.json.JSONObject;
 /**
  * REST controller for managing users.
  */
@@ -123,7 +129,22 @@ public class UserResource {
 	
 	@Inject
 	private PatientComplianceService patientComplianceService;
+
+	@Inject
+	private ExcelOutputService excelOutputService;
 	
+	@Qualifier("hmrGraphService")
+	@Inject
+	private GraphService hmrGraphService;
+	
+	@Qualifier("complianceGraphService")
+	@Inject
+	private GraphService complianceGraphService;
+
+	@Qualifier("cumulativeStatsGraphService")
+	@Inject
+	private GraphService cumulativeStatsGraphService;
+
 	/**
 	 * GET /users -> get all users.
 	 */
@@ -255,39 +276,6 @@ public class UserResource {
   		
 
   	}
-   //For Patients associated with HCP in Admin
-   @RequestMapping(value = "/user/hcp/{id}/patient/clinicinfo/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	
-	public ResponseEntity<?> searchPatientAssociatedToHcpByClinic(@PathVariable Long id,
-			@RequestParam(required = true, value = "searchString") String searchString,
-			@RequestParam(required = false, value = "clinicId") String clinicId,
-			@RequestParam(required = false, value = "filter") String filter,
-			@RequestParam(value = "page", required = false) Integer offset,
-			@RequestParam(value = "per_page", required = false) Integer limit,
-			@RequestParam(value = "sort_by", required = false) String sortBy,
-			@RequestParam(value = "asc", required = false) Boolean isAscending)
-			throws URISyntaxException {
-		if(searchString.endsWith("_")){
-		   searchString = searchString.replace("_", "\\\\_");
-		}
-		String queryString = new StringBuilder("'%").append(searchString)
-				.append("%'").toString();
-		Map<String, Boolean> sortOrder = new HashMap<>();
-		if (StringUtils.isNotBlank(sortBy)) {
-			isAscending = (isAscending != null) ? isAscending : true;
-			if(sortBy.equalsIgnoreCase("email"))
-				sortOrder.put("user." + sortBy, isAscending);
-			else	
-				sortOrder.put(sortBy, isAscending);
-		}
-		Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientToHCPAndClinicBy(
-				queryString, id, clinicId, filter, PaginationUtil.generatePageRequest(offset, limit),
-				sortOrder);
-		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
-				page, "/user/hcp/"+id+"/patient/search", offset, limit);
-		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
-
-	}
 
 
    @RequestMapping(value = "/user/clinic/{clinicId}/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -569,48 +557,28 @@ public class UserResource {
     @RequestMapping(value = "/users/{id}/therapyData",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JSONObject> getTherapyByPatientUserIdAndDate(@PathVariable Long id,
-    		@RequestParam(value="from",required=false)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
-    		@RequestParam(value="to",required=false)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
-    		@RequestParam(value="date",required=false)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date){
-    	JSONObject jsonObject = new JSONObject();
-    	if(Objects.nonNull(date)){
-    		List<TherapySession> therapySessions = therapySessionService.findByPatientUserIdAndDate(id, date);
-    		if(therapySessions.size() > 0){
-    			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(id);
-    			jsonObject.put("recommended", protocol);
-    			jsonObject.put("actual", therapySessions);
-    		}
-    		return new ResponseEntity<>(jsonObject,HttpStatus.OK);
-    	}else if(Objects.nonNull(from) && Objects.nonNull(to) ){
+    public ResponseEntity<?> getTherapyByPatientUserIdAndDate(@PathVariable Long id,
+    		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
+    		@RequestParam(value="duration",required=true)String duration) throws Exception{
+
     		List<TherapyDataVO> therapyData = therapySessionService.findByPatientUserIdAndDateRange(id, from, to);
     		if(therapyData.size() > 0){
-    			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(id);
-    			jsonObject.put("recommended", protocol);
-    			jsonObject.put("actual", therapyData);
+    			Graph hmrGraph = hmrGraphService.populateGraphData(therapyData, new Filter(from, to, duration, null));
+    			return new ResponseEntity<>(hmrGraph,HttpStatus.OK);
     		}
-    		return new ResponseEntity<>(jsonObject,HttpStatus.OK);
-    	}else{
-    		jsonObject.put("ERROR", "Required Params missing : [date or from&to]");
-    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-    	}
+    		return new ResponseEntity<>(HttpStatus.OK);
     }
     
     @RequestMapping(value = "/users/{id}/compliance",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PatientCompliance> getComplianceScoreByPatientUserIdAndDate(@PathVariable Long id,
-    		@RequestParam(value="date",required=false)Long timestamp){
-    	LocalDate date = null;
-    	if(Objects.isNull(timestamp)){
-    		date = LocalDate.now();
-    	}else{
-    		date = LocalDate.fromDateFields(new Date(timestamp));
-    	}
-    	PatientCompliance compliance = complianceRepository.findByPatientUserIdAndDate(id, date);
+    public ResponseEntity<PatientCompliance> getComplianceScoreByPatientUserIdAndDate(@PathVariable Long id){
+    	PatientCompliance compliance = complianceRepository.findTop1ByPatientUserIdOrderByDateDesc(id);
     	if(Objects.nonNull(compliance)){
-    		if(Objects.isNull(compliance.getHmrRunRate()))
+    		if(Objects.isNull(compliance.getHmrRunRate())){
     			compliance.setHmrRunRate(0);
+    		}
        		return new ResponseEntity<>(compliance,HttpStatus.OK);
     	}
     	else
@@ -739,49 +707,35 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> exportVestDeviceData(
 			@PathVariable Long id,
-			@RequestParam(value="from",required=true)Long from,
-			@RequestParam(value="to",required=false)Long to) {
-		to = Objects.nonNull(to)?to:new Date().getTime();
-		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, from, to);
+			@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+			@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
+		Long fromTimestamp = from.toDateTimeAtStartOfDay().getMillis();
+		Long toTimestamp = to.toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59).getMillis();
+		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
 		return new ResponseEntity<>(vestDeviceData,HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/users/{id}/exportVestDeviceDataCSV",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+			produces="application/vnd.ms-excel",
+            method = RequestMethod.GET)
 	public void exportVestDeviceDataCSV(
 			@PathVariable Long id,
-			@RequestParam(value="from",required=true)Long from,
-			@RequestParam(value="to",required=false)Long to,
+			@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+			@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
 			HttpServletResponse response) {
-		to = Objects.nonNull(to)?to:new Date().getTime();
-		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, from, to);
-		ICsvBeanWriter beanWriter = null;
-    	CellProcessor[] processors = CsvUtil.getCellProcessorForVestDeviceData();
+		
+		Long fromTimestamp = from.toDateTimeAtStartOfDay().getMillis();
+		Long toTimestamp = to.toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59).getMillis();
+		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
     	try {
-            beanWriter = new CsvBeanWriter(response.getWriter(),
-                    CsvPreference.STANDARD_PREFERENCE);
-			String[] header = CsvUtil.getHeaderValuesForVestDeviceDataCSV();
-			String[] headerMapping = CsvUtil.getHeaderMappingForVestDeviceData();
             if(vestDeviceData.size() > 0 ){
-            	beanWriter.writeHeader(header);
-                for (PatientVestDeviceData deviceData : vestDeviceData) {
-                    beanWriter.write(deviceData, headerMapping,processors);
-                }
+            	excelOutputService.createExcelOutputExcel(response, vestDeviceData);
             }else{
             	response.setStatus(204);
             }
         } catch (Exception ex) {
         	response.setStatus(500);
-        } finally {
-            if (beanWriter != null) {
-                try {
-                    beanWriter.close();
-                } catch (IOException ex) {
-                	response.setStatus(500);
-                }
-            }
-        }
+        } 
 	}
 	
 	/**
@@ -882,12 +836,11 @@ public class UserResource {
         try {
         	Collection<StatisticsVO> statiticsCollection = patientHCPService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
 	        if (statiticsCollection.isEmpty()) {
-	        	jsonObject.put("message", ExceptionConstants.HR_584);
+	        	return new ResponseEntity<>(jsonObject, HttpStatus.OK);
 	        } else {
-	        	jsonObject.put("message", MessageConstants.HR_297);
-	        	jsonObject.put("cumulativeStatitics", statiticsCollection);
+	        	Graph cumulativeStatsGraph = cumulativeStatsGraphService.populateGraphData(statiticsCollection, new Filter(from,to,null,null));
+	        	return new ResponseEntity<>(cumulativeStatsGraph, HttpStatus.OK);
 	        }
-	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
         } catch (HillromException hre){
         	jsonObject.put("ERROR", hre.getMessage());
     		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
@@ -1020,15 +973,41 @@ public class UserResource {
 		log.debug("REST request to get Security Question for user {}",id);
 		JSONObject jsonObject = new JSONObject();
 		try {
-			jsonObject = userService.getSecurityQuestion(id);
+			jsonObject.put("question", userService.getSecurityQuestion(id));
 			jsonObject.put("message", MessageConstants.HR_304);
+			return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.OK);
 		} catch (HillromException e) {
 			jsonObject.put("ERROR",e.getMessage());
 			return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.BAD_REQUEST);
 		}
-		if(jsonObject.containsKey("ERROR")){
-			return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.BAD_REQUEST);
-		}
-		return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.OK);
 	}
+    
+    @RequestMapping(value="/user/{id}/adherenceTrend",
+    		method=RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<AdherenceTrendVO>> getAdherenceTrendForDuration(@PathVariable Long id,
+    		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to){
+    	log.debug("REST request to get Adherence Trend for the duration : ", id,from,to);
+        List<AdherenceTrendVO> adherenceTrends = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
+        return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/users/{id}/complianceGraphData",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getComplianceGraphData(@PathVariable Long id,
+    		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) throws Exception{
+    	List<TherapyDataVO> therapyData = therapySessionService.getComplianceGraphData(id, from, to);
+		if(therapyData.size() > 0){
+			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(id);
+			Map<String,Object> therapyAndProtocolData = new HashMap<>();
+			therapyAndProtocolData.put("protocol", protocol);
+			therapyAndProtocolData.put("therapyData", therapyData);
+			Graph complianceGraph = complianceGraphService.populateGraphData(therapyAndProtocolData, new Filter(from,to,null,null));
+			return new ResponseEntity<>(complianceGraph,HttpStatus.OK); 
+		}
+		return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

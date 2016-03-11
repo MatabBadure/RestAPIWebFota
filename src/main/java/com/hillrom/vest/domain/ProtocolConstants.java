@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 @Entity
 @Table(name="PROTOCOL_CONSTANTS")
 public class ProtocolConstants {
@@ -21,9 +23,6 @@ public class ProtocolConstants {
 	
 	@Column(name="min_minutes_per_treatment")
 	private Integer minMinutesPerTreatment;
-	
-	@Column(name="max_minutes_per_treatment")
-	private Integer maxMinutesPerTreatment;
 	
 	@Column(name="min_frequency")
 	private Integer minFrequency;
@@ -40,19 +39,16 @@ public class ProtocolConstants {
 	@Transient
 	private Integer minDuration;
 
-	@Transient
-	private Integer maxDuration;
-	
 	public ProtocolConstants(Integer maxFrequency, Integer minFrequency,
 			Integer maxPressure, Integer minPressure, Integer treatmentsPerDay,
-			Integer minDuration, Integer maxDuration) {
+			Integer minDuration) {
 		this.maxFrequency = maxFrequency;
 		this.minFrequency = minFrequency;
 		this.maxPressure = maxPressure;
 		this.minPressure = minPressure;
 		this.treatmentsPerDay = treatmentsPerDay;
 		this.minDuration = minDuration;
-		this.maxDuration = maxDuration;
+		this.minMinutesPerTreatment = minDuration/treatmentsPerDay;
 	}
 	
 	public ProtocolConstants() {
@@ -82,14 +78,6 @@ public class ProtocolConstants {
 
 	public void setMinMinutesPerTreatment(Integer minMinutesPerTreatment) {
 		this.minMinutesPerTreatment = minMinutesPerTreatment;
-	}
-
-	public Integer getMaxMinutesPerTreatment() {
-		return maxMinutesPerTreatment;
-	}
-
-	public void setMaxMinutesPerTreatment(Integer maxMinutesPerTreatment) {
-		this.maxMinutesPerTreatment = maxMinutesPerTreatment;
 	}
 
 	public Integer getMinFrequency() {
@@ -128,15 +116,19 @@ public class ProtocolConstants {
 		this.minDuration = minDuration;
 	}
 
-	public void setMaxDuration(Integer maxDuration) {
-		this.maxDuration = maxDuration;
-	}
-
 	public Integer getMinDuration() {
 		return this.minDuration;
 	}
 
-	public Integer getMaxDuration() {
-		return this.maxDuration;
+	@Override
+	public String toString() {
+		return "ProtocolConstants [treatmentsPerDay=" + treatmentsPerDay
+				+ ", minMinutesPerTreatment=" + minMinutesPerTreatment
+				+ ", minFrequency=" + minFrequency + ", maxFrequency="
+				+ maxFrequency + ", minPressure=" + minPressure
+				+ ", maxPressure=" + maxPressure + ", minDuration="
+				+ minDuration + "]";
 	}
+	
+	
 }

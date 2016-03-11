@@ -10,7 +10,7 @@ public class ExceptionConstants {
     public static final String HR_502 = "Parameters missing";
     public static final String HR_503 = "Required field Answer is missing";
     public static final String HR_504 = "Reset Key Expired";
-    public static final String HR_505 = "Incorrect Security Question or Password";
+    public static final String HR_505 = "Incorrect Security Question or Answer";
     public static final String HR_506 = "Incorrect password";
     public static final String HR_507 = "Required field SecurityQuestion is missing";
     public static final String HR_508 = "Required field Email is missing";//Is it same as HR_505?
@@ -20,7 +20,7 @@ public class ExceptionConstants {
     
     // Hillrom team User
     public static final String HR_511 = "Unable to create Hillrom User.";
-    public static final String HR_512 = "No such user exist";
+    public static final String HR_512 = "No such user exists";
     public static final String HR_513 = "Unable to delete User";
     public static final String HR_514 = "Unable to fetch User";
     public static final String HR_515 = "Unable to create Caregiver User";
@@ -50,6 +50,7 @@ public class ExceptionConstants {
     public static final String HR_539 = "Clinic already associated with Clinic Admin.";
     public static final String HR_540 = "Unable to associate Clinic Admin.";
     public static final String HR_550 = "Unable to dissociate Clinic Admin.";
+    public static final String HR_607 = "No Clinic Admin associated.";
     
     //Clinic
     public static final String HR_541 = "Unable to create Clinic";
@@ -66,8 +67,8 @@ public class ExceptionConstants {
     public static final String HR_554 = "Invalid Data";
     public static final String HR_555 = "Incorrect Data";
     public static final String HR_556 = "Invalid Reset Key";
-    public static final String HR_557 = "Invalid Security Question or Answer";//Is it same as HR_505?
-    public static final String HR_558 = "Forbidden";//Is it same as HR_505?
+    public static final String HR_557 = "Invalid Security Question or Answer";
+    public static final String HR_558 = "Forbidden";
     
     // Protocol
     public static final String HR_551 = "No such protocol found for patient.";
@@ -87,12 +88,14 @@ public class ExceptionConstants {
     
     public static final String HR_570 = "Vest device is already in Inactive mode.";
     public static final String HR_571 = "Invalid Serial Number.";
-    public static final String HR_572 = "This Vest device is already linked to patient.";
+    public static final String HR_572 = "This vest device serial number or bluetooth id is already linked to patient ";
     public static final String HR_573 = "Unable to deactivate vest device from patient.";
     public static final String HR_574 = "Unable to create clinic admin.";
     public static final String HR_575 = "Unable to update clinic admin.";
     public static final String HR_576 = "Unable to get clinic admin.";
     public static final String HR_577 = "Unable to update Caregiver User.";
+    public static final String HR_578 = "This bluetooth id is already linked to patient ";
+    public static final String HR_579 = "Unable to update Associate User.";
     
     public static final String HR_581 = "No Patient Associated with HCP.";
     public static final String HR_582 = "No Clinics Associated with HCP.";
@@ -121,8 +124,35 @@ public class ExceptionConstants {
     public static final String HR_601 = "Invalid Activation Key"; 
     public static final String HR_602 = "No security question selected";
     public static final String HR_603 = "Invalid username, please enter valid email id.";
+    public static final String HR_604 = "Unable to activate User";
+    public static final String HR_605 = "User is already in active state.";
+    public static final String HR_606 = "Activation link can not be sent.";
+    public static final String HR_608 = "No security question available";
     
     public static final String HR_701 = "Note date cannot be before first  transmission date."; 
     
     public static final String HR_702 = "First transmission date does not exist."; 
+    public static final String HR_703 = "Currently, this account is inactive. Kindly contact with Administrator.";
+    public static final String HR_704 = "e-mail address not registered";
+    public static final String HR_705 = "The activation link which you are trying to access is no more valid. ";
+    public static final String HR_706 = "Please contact Hill-Rom Respiratory Care Customer Support";
+    public static final String HR_707 = "The reset link which you are trying to access is no more valid. ";
+
+    public static final String HR_708 = "Incorrect Hillrom User Authority";
+    public static final String HR_709 = "Incorrect City Name";
+    public static final String HR_710 = "Incorrect State Name/Code";
+    public static final String HR_711 = "Incorrect Zip Code";
+    public static final String HR_712 = "Zip Code Not found";
+    public static final String HR_801 = "Invalid Survey Id";
+    public static final String HR_802 = "Invalid Survey Answers";
+    
+    public static final String HR_803 = "Incorrect request format";
+    public static final String HR_804 = "No survey to take";
+    public static final String HR_805 = "Survey taken already";
+    public static final String HR_806 = "You are not eligible to take this survey";
+    public static final String HR_807 = "Invalid survey question id";
+    // Validate Credentials Api Exception messages
+    public static final String HR_714 = "Please enter the password for your Visi-View account.";
+    public static final String HR_716 = "The entered password is incorrect. Be sure you're using the password for your Visi-View account.";
+    
 }

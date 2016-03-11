@@ -2,6 +2,7 @@ package com.hillrom.vest.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,8 +18,11 @@ import javax.transaction.Transactional;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.hillrom.vest.batch.processing.PatientVestDeviceDataDeltaReader;
 import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
@@ -32,12 +36,12 @@ import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
+import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 
 @Service
 @Transactional
 public class TherapySessionService {
 
-	
 	@Inject
 	private TherapySessionRepository therapySessionRepository;
 
@@ -56,7 +60,7 @@ public class TherapySessionService {
 	@Inject
 	private PatientNoEventsRepository patientNoEventRepository;
 
-	public List<TherapySession> saveOrUpdate(List<TherapySession> therapySessions) throws HillromException{
+	public List<TherapySession> saveOrUpdate(List<TherapySession> therapySessions) throws Exception{
 		if(therapySessions.size() > 0){			
 			User patientUser = therapySessions.get(0).getPatientUser();
 			PatientInfo patient = therapySessions.get(0).getPatientInfo();
@@ -73,12 +77,6 @@ public class TherapySessionService {
 			SortedMap<LocalDate,PatientCompliance> existingComplianceMap = complianceService.getPatientComplainceMapByPatientUserId(patientUser.getId());
 			adherenceCalculationService.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
 					receivedTherapySessionMap, existingComplianceMap,protocol);
-			/*for(LocalDate date : receivedTherapySessionMap.keySet()){
-			List<TherapySession> therapySessionsPerDay = groupedTherapySessions.get(date);
-			adherenceCalculationService.calculateCompliancePerDay(therapySessionsPerDay,protocol);
-			//complianceService.createOrUpdate(compliance);
-			therapySessionRepository.save(therapySessionsPerDay);
-		}*/
 		}
 		return therapySessions;
 	}
@@ -156,8 +154,7 @@ public class TherapySessionService {
 				.stream()
 				.collect(
 						Collectors
-								.summingLong(TherapySession::getDurationLongValue))
-				.intValue()
+								.summingInt(TherapySession::getDurationInMinutes))
 				/ patientUserIds.size();
 		DateTime startTime = tpsInDuration.get(0).getStartTime();
 		DateTime endTime = tpsInDuration.get(tpsInDuration.size()-1).getEndTime();
@@ -176,9 +173,9 @@ public class TherapySessionService {
 			Map<LocalDate, List<TherapyDataVO>> therapySessionMap,
 			Map<LocalDate,Note> noteMap,
 			TherapySession latestTherapySession) {
-		int seconds = 60;
+		int minutes = 60*60;
 		// Get the latest HMR for the user before the requested duration
-		double hmrInMinutes = Objects.nonNull(latestTherapySession)?latestTherapySession.getHmr()/seconds:0d;
+		double hmrInHours = Objects.nonNull(latestTherapySession)?latestTherapySession.getHmr()/minutes:0d;
 		
 		// This is to discard the records if the user requested data beyond his/her first transmission date.
 		PatientNoEvent patientNoEvent = patientNoEventService.findByPatientUserId(patientUserId);
@@ -196,15 +193,17 @@ public class TherapySessionService {
 					processedTherapies.add(therapy);
 				});
 				// updating HMR from previous day to form step graph
-				hmrInMinutes = therapySessions.get(therapySessions.size()-1).getHmr();
-			}else{
+				hmrInHours = therapySessions.get(therapySessions.size()-1).getHmr();
+			}else if(date.isBefore(LocalDate.now())){ // Don't consider current date as missed therapy
 				// add missed therapy if user misses the therapy
 				TherapyDataVO missedTherapy = createTherapyDataWithTimeStamp(date);
 				missedTherapy.setNote(noteMap.get(date));
-				missedTherapy.setHmr(hmrInMinutes);
+				missedTherapy.setHmr(hmrInHours);
 				processedTherapies.add(missedTherapy);
 			}
 		}
+		// Sort based on timestamp
+		Collections.sort(processedTherapies);
 		return processedTherapies;
 	}
 
@@ -241,6 +240,7 @@ public class TherapySessionService {
 			Map<LocalDate, Note> noteMap) {
 		Map<LocalDate,List<TherapyDataVO>> therapyDataMap = new TreeMap<>();
 		TherapyDataVO therapyDataVO = null;
+		int minutes = 60*60;
 		for(LocalDate date : sessionMap.keySet()){
 			List<TherapySession> sessionsPerDate = sessionMap.get(date);
 			List<TherapyDataVO> therapyDataVOs = therapyDataMap.get(date);
@@ -253,7 +253,7 @@ public class TherapySessionService {
 						session.getFrequency(),	session.getPressure(), programmedCoughPauses, normalCoughPauses,
 						programmedCoughPauses+normalCoughPauses, noteMap.get(date), session.getStartTime(),
 						session.getEndTime(), session.getCaughPauseDuration(),
-						session.getDurationInMinutes().intValue(), session.getHmr().doubleValue()/60,false);
+						session.getDurationInMinutes(), Math.round(session.getHmr().doubleValue()/minutes),false);
 				therapyDataVOs.add(therapyDataVO);
 			}
 			therapyDataMap.put(date, therapyDataVOs);
@@ -264,5 +264,37 @@ public class TherapySessionService {
 	public SortedMap<LocalDate,List<TherapySession>> getAllTherapySessionsMapByPatientUserId(Long patientUserId){
 		List<TherapySession> therapySessions =  therapySessionRepository.findByPatientUserId(patientUserId);
 		return groupTherapySessionsByDate(therapySessions);
+	}
+	
+	public List<TherapyDataVO> getComplianceGraphData(Long patientUserId,LocalDate from,LocalDate to){
+		List<TherapyDataVO> therapyData = findByPatientUserIdAndDateRange(patientUserId, from, to);
+		Map<LocalDate,List<TherapyDataVO>> therapyDataMap = therapyData.stream().collect(Collectors.groupingBy(TherapyDataVO::getDate));
+		SortedMap<LocalDate,List<TherapyDataVO>> therapyDataGroupByDate = new TreeMap<>(therapyDataMap);
+		List<TherapyDataVO> responseList = new LinkedList<>();
+		for(LocalDate date : therapyDataGroupByDate.keySet()){
+			List<TherapyDataVO> therapies = therapyDataGroupByDate.get(date);
+			int totalDuration = therapies.stream().collect(Collectors.summingInt(TherapyDataVO::getDuration));
+			int programmedCoughPauses=0,normalCoughPauses=0,coughPauseDuration=0;
+			float weightedAvgFrequency = 0.0f,weightedAvgPressure = 0.0f;
+			Note noteForTheDay = null;
+			int size = therapies.size();
+			DateTime start = therapies.get(0).getStart();
+			DateTime end = size > 0 ? therapies.get(size-1).getEnd(): null;
+			double hmr = size > 0 ? therapies.get(size-1).getHmr(): 0;
+			boolean isMissedTherapy = therapies.get(0).isMissedTherapy();
+			for(TherapyDataVO therapy : therapies){
+				programmedCoughPauses += therapy.getProgrammedCoughPauses();
+				normalCoughPauses += therapy.getNormalCoughPauses();
+				weightedAvgFrequency += calculateWeightedAvg(totalDuration, therapy.getDuration(), therapy.getFrequency());
+				weightedAvgPressure += calculateWeightedAvg(totalDuration, therapy.getDuration(), therapy.getPressure());
+				noteForTheDay = therapy.getNote();
+			}
+			int minutes = 60*60;
+			TherapyDataVO dataVO = new TherapyDataVO(therapies.get(0).getTimestamp(), Math.round(weightedAvgFrequency), Math.round(weightedAvgPressure),
+					programmedCoughPauses, normalCoughPauses, programmedCoughPauses+normalCoughPauses, noteForTheDay, start, end, coughPauseDuration,
+					totalDuration, Math.round(hmr/minutes), isMissedTherapy);
+			responseList.add(dataVO);
+		}
+		return responseList;
 	}
 }

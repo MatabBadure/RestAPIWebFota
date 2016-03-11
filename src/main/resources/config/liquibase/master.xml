@@ -65,4 +65,21 @@
     <include file="classpath:/config/liquibase/changelog/20151015173700_added_isactive_field_clinicpatientassoc.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20151015183700_added_expired_field_user_table.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20151018163700_added_settings_deviation_days_count_to_patientcompliance.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20151029123200_load_defaut_user_to_user_extension_table.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20151104133700_added_expiration_date_field_user_table.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20151104181330_alter_datatype_expiration_date.xml" relativeToChangelogFile="false"/>
+ 	<include file="classpath:/config/liquibase/changelog/20151105152030_added_stored_procedures_for_protocol_patientInfo_device.xml" relativeToChangelogFile="false"/>
+ 	<include file="classpath:/config/liquibase/changelog/20151105210200_updated_values_for_default_protocl.xml" relativeToChangelogFile="false"/>
+ 	<include file="classpath:/config/liquibase/changelog/20151106153600_alter_datatype_processed_in_jde_load_table.xml" relativeToChangelogFile="false"/>
+ 	<include file="classpath:/config/liquibase/changelog/20151116123000_drop_create_address_field_Clinic.xml" relativeToChangelogFile="false"/>
+ 	<include file="classpath:/config/liquibase/changelog/20151118131600_Entity_User_Assoc_Table.xml" relativeToChangelogFile="false"/>
+ 	<include file="classpath:/config/liquibase/changelog/20160204173800_create_city_state_zip_map_table.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20160209183200_load_defaut_city_zip_state_map_data.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20160218112300_altered_dob_datatype_jde_load_table.xml" relativeToChangelogFile="false"/>
+ 	<include file="classpath:/config/liquibase/changelog/20160211123010_create_Survey_Tables.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20160219164732_added_expired_last_modified_time_to_UserLoginToken.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20160226192300_added_csv_for_login_token.xml" relativeToChangelogFile="false"/>
+ 
  </databaseChangeLog>
+ 
+ 

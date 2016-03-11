@@ -12,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.envers.Audited;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
@@ -19,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * A SecurityQuestion.
  */
 @Entity
+@Audited
 @Table(name = "SECURITY_QUESTION")
 public class SecurityQuestion implements Serializable {
 

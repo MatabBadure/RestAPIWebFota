@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.PatientInfo;
+import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.PatientVestDevicePK;
 import com.hillrom.vest.domain.User;
@@ -45,26 +46,42 @@ public class PatientVestDeviceService {
     @Inject
     private PatientInfoRepository patientInfoRepository;
     
+    @Inject
+    private UserService userService;
+    
     public Object linkVestDeviceWithPatient(Long id, Map<String, Object> deviceData) throws HillromException {
     	User alreadyLinkedPatientuser = new User();
     	List<PatientVestDeviceHistory> assocList = patientVestDeviceRepository.findBySerialNumber(deviceData.get("serialNumber").toString());
+    	Optional<PatientVestDeviceHistory> assocByBluetoothID = patientVestDeviceRepository.findByBluetoothIdAndStatusActive(deviceData.get("bluetoothId").toString());
     	PatientVestDeviceHistory patientVestDeviceAssoc = new PatientVestDeviceHistory();
+    	if(assocByBluetoothID.isPresent()) {
+    		alreadyLinkedPatientuser = (User) assocByBluetoothID.get().getPatient().getUserPatientAssoc().stream().filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser();
+    		if(!alreadyLinkedPatientuser.getId().equals(id)){
+    			return alreadyLinkedPatientuser;
+			}
+    	}
     	if(assocList.isEmpty()) {
     		patientVestDeviceAssoc = assignDeviceToPatient(id, deviceData);
     	} else {
-    		//List<PatientVestDeviceHistory> activeDeviceList = assocList.stream().filter(patientDevice -> patientDevice.isActive()).collect(Collectors.toList());
-    		List<PatientVestDeviceHistory> activeDeviceList = assocList.stream().collect(Collectors.toList());
+    		List<PatientVestDeviceHistory> activeDeviceList = assocList.stream().filter(patientDevice -> patientDevice.isActive()).collect(Collectors.toList());
     		if(!activeDeviceList.isEmpty()){
     			PatientVestDeviceHistory activeDevice = activeDeviceList.get(0);
     			alreadyLinkedPatientuser = (User) activeDevice.getPatient().getUserPatientAssoc().stream().filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser();
     			if(alreadyLinkedPatientuser.getId().equals(id)){
-    				//patientVestDeviceAssoc = updateDeviceDetailsForPatient(activeDevice, deviceData);
-    				return alreadyLinkedPatientuser;
+    				patientVestDeviceAssoc = updateDeviceDetailsForPatient(activeDevice, deviceData);
+    				return patientVestDeviceAssoc;
     			} else {
     				return alreadyLinkedPatientuser;
     			}
     		} else {
-    			patientVestDeviceAssoc = assignDeviceToPatient(id, deviceData);
+    			PatientInfo patientInfo = userService.getPatientInfoObjFromPatientUser(userRepository.getOne(id));
+    			List<PatientVestDeviceHistory> patientDeviceList = assocList.stream().filter(patientDevice -> 
+    			(patientDevice.getPatient().getId().equalsIgnoreCase(patientInfo.getId()) && !patientDevice.isActive())).collect(Collectors.toList());
+    			if(patientDeviceList.isEmpty()) {
+    				patientVestDeviceAssoc = assignDeviceToPatient(id, deviceData);	
+    			} else {
+    				patientVestDeviceAssoc = updateDeviceDetailsForPatient(patientDeviceList.get(0), deviceData);
+    			}
     		}
     	}
     	return patientVestDeviceAssoc;
@@ -109,6 +126,7 @@ public class PatientVestDeviceService {
 	 		activeDevice.setSerialNumber(Objects.nonNull(deviceData.get("serialNumber")) ? deviceData.get("serialNumber").toString() : null);
 	 		activeDevice.setBluetoothId(Objects.nonNull(deviceData.get("bluetoothId")) ? deviceData.get("bluetoothId").toString() : null);
 	 		activeDevice.setHubId(Objects.nonNull(deviceData.get("hubId")) ? deviceData.get("hubId").toString() : null);
+	 		activeDevice.setActive(true);
 	 		patientVestDeviceRepository.saveAndFlush(activeDevice);
 	 		return activeDevice;
 	 	} else {
@@ -178,5 +196,59 @@ public class PatientVestDeviceService {
     		throw new HillromException(ExceptionConstants.HR_512);//No such user exist
      	}
     }
+	
+	public PatientVestDeviceHistory deactivateActiveDeviceForPatient(Long id, DateTime dateTime) throws HillromException {
+		 User patientUser = userRepository.findOne(id);
+		 if(Objects.nonNull(patientUser)) {
+			 PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
+	     		if(Objects.nonNull(patientInfo)){
+	     			Optional<PatientVestDeviceHistory> vestDevice = patientVestDeviceRepository.findOneByPatientIdAndActiveStatus(patientInfo.getId(), true);
+	     			if(vestDevice.isPresent()) {
+	     				vestDevice.get().setActive(false);
+	     				vestDevice.get().setLastModifiedDate(dateTime);
+		 				patientVestDeviceRepository.saveAndFlush(vestDevice.get());
+		 				patientInfo.setSerialNumber(null);
+		 				patientInfo.setBluetoothId(null);
+		 				patientInfo.setHubId(null);
+		 				patientInfo.setDeviceAssocDate(null);
+		 				patientInfoRepository.saveAndFlush(patientInfo);
+	     				return vestDevice.get();
+	     			}
+     				return null;
+	     		} else {
+	     			throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
+	     		}
+		 } else {
+			 throw new HillromException(ExceptionConstants.HR_512);//No such user exist
+		 }
+	}
+	
+	public PatientVestDeviceHistory activateLatestDeviceForPatientBeforeExpiration(Long id) throws HillromException {
+		 User patientUser = userRepository.findOne(id);
+		 if(Objects.nonNull(patientUser)) {
+			 PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
+	     		if(Objects.nonNull(patientInfo)){
+	     			List<PatientVestDeviceHistory> vestDevice = patientVestDeviceRepository.findLatestDeviceForPatient(patientInfo.getId());
+	     			if(!vestDevice.isEmpty()) {
+	     				if(vestDevice.get(0).getLastModifiedDate().isAfter(patientUser.getExpirationDate())) {
+	     					vestDevice.get(0).setActive(true);
+			 				patientVestDeviceRepository.saveAndFlush(vestDevice.get(0));
+			 				patientInfo.setSerialNumber(vestDevice.get(0).getSerialNumber());
+			 				patientInfo.setBluetoothId(vestDevice.get(0).getBluetoothId());
+			 				patientInfo.setHubId(vestDevice.get(0).getHubId());
+			 				patientInfo.setDeviceAssocDate(vestDevice.get(0).getCreatedDate());
+			 				patientInfoRepository.saveAndFlush(patientInfo);
+		     				return vestDevice.get(0);
+	     				}
+	     				return vestDevice.get(0);
+	     			}
+    				return null;
+	     		} else {
+	     			throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
+	     		}
+		 } else {
+			 throw new HillromException(ExceptionConstants.HR_512);//No such user exist
+		 }
+	 }
 }
 

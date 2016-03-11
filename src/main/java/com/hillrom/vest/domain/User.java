@@ -35,6 +35,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
 import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
+import com.hillrom.vest.domain.util.MMDDYYYYLocalDateSerializer;
 
 /**
  * A user.
@@ -56,7 +57,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private Long id;
 
     @JsonIgnore
-    @Size(min = 60, max = 60)
+    @Size(max = 60)
     @Column(length = 60)
     private String password;
     
@@ -136,7 +137,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private Set<UserPatientAssoc> userPatientAssoc = new HashSet<>();
     
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
-    @JsonSerialize(using = CustomLocalDateSerializer.class)
+    @JsonSerialize(using = MMDDYYYYLocalDateSerializer.class)
     @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
     @Column(name = "dob")
     private LocalDate dob;
@@ -159,6 +160,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
     
     @Column(name = "expired")
     private Boolean expired = false;
+    
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @Column(name = "expiration_date", nullable = true)
+    private DateTime expirationDate = null;
     
 	public User() {
 		super();
@@ -392,6 +397,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	public void setExpired(Boolean expired) {
 		this.expired = expired;
+	}
+
+	public DateTime getExpirationDate() {
+		return expirationDate;
+	}
+
+	public void setExpirationDate(DateTime expirationDate) {
+		this.expirationDate = expirationDate;
 	}
 
 	@Override

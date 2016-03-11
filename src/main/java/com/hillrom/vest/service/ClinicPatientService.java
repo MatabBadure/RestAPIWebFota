@@ -28,6 +28,7 @@ import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
+import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
@@ -101,7 +102,7 @@ public class ClinicPatientService {
 		for(Clinic clinic : associatedClinics){
 			clinics.add(ClinicVOBuilder.build(clinic));
 		}
-		return clinics;
+		return RandomUtil.sortClinicVOListByName(clinics);
 	}
 
 	private List<Clinic> getAssociatedClinicsList(PatientInfo patientInfo) {

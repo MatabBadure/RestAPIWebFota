@@ -56,7 +56,7 @@ public class AuthenticationServiceTest {
     public void successfulLogin() {
         User newUser = createUser();
         String username = newUser.getEmail();
-        UserLoginToken token = authenticationService.authenticate(username, PASSWORD);
+        UserLoginToken token = authenticationService.authenticate(username, PASSWORD,null);
         assertThat(token);
         userRepository.delete(newUser);
     }
@@ -65,7 +65,7 @@ public class AuthenticationServiceTest {
     public void invalidCredentialsLogin() {
         User newUser = createUser();
         String username = newUser.getEmail();
-        authenticationService.authenticate(username, WRONG_PASSWORD);
+        authenticationService.authenticate(username, WRONG_PASSWORD,null);
         userRepository.delete(newUser);
     }
     
@@ -76,7 +76,7 @@ public class AuthenticationServiceTest {
         userRepository.save(newUser);
         
         String username = newUser.getEmail();
-        authenticationService.authenticate(username, PASSWORD);
+        authenticationService.authenticate(username, PASSWORD,null);
         userRepository.delete(newUser);
     }
     

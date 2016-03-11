@@ -1,0 +1,143 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+<div style="width: 590px; border: solid 1px #7BA4DA; min-height: 350px; margin: 0 auto; font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; padding: 10px 15px;">
+	<div style="width: 100%;display: inline-block;">
+		<div style="">
+			<img src="logo-HillRom.png" th:src="@{|${baseUrl}/images/logo-HillRom.png|}" style="height: 30px; width: 100px;float: left;"></img>
+			<span style="margin: 6px 0px 0px 5px; display: inline-block; font-size: 14px;">VisiView<sup>TM</sup> <span>Health Portal</span></span>
+		</div>
+
+	</div>
+	<div style="background-color: #7BA4DA;height: 92px;margin: 20px 0px;">
+		<h3 style="color: #fff;margin: 32px 0px 0px 25px;display: inline-block;">Survey Completed !</h3>
+		<img src="surveyEmailIcon.png" th:src="@{|${baseUrl}/images/surveyEmailIcon.png|}" style="float: right;"></img>
+	</div>
+	<div style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; ">
+		<div>
+			<span style="font-size: 17px;color:#7BA4DA;border-bottom:1px solid #7BA4DA;font-weight:bolder;">Outcomes Monitoring: 5 Day Survey - The Vest&copy;  Airway Clearance System</span>
+		</div>
+		<div style="background-color:#f1f1f1; margin-top:20px;margin-bottom:20px;">
+		<div style="padding: 8px 10px;height:58px;width:50%;float:left;border-right:1px solid #ccc;border-bottom:1px solid #ccc;text-align:center">
+			<div>Patient Name</div>
+			<div style="display:block;color:#4F7CA5;margin-top:15px;font-size:17px;font-weight:bolder;" th:text="${ansValue1Ques1}"> Jose M. Robert</div>
+		</div>		
+		<div style="padding: 8px 10px;height:58px;text-align:center;border-bottom:1px solid #ccc;text-align:center">
+			<div>Phone Number</div>
+			<div style="display:block;color:#4F7CA5;margin-top:15px;font-size:17px;font-weight:bolder;" th:text="${ansValue1Ques2}">990123456</div>
+		</div>
+		<div style="padding: 8px 10px;height:58px;width:50%;float:left;border-right:1px solid #ccc;text-align:center">
+			<div>Hours of Use</div>
+			<div style="display:block;color:#4F7CA5;margin-top:15px;font-size:17px;font-weight:bolder;" th:text="${ansValue1Ques3}">8.5</div>
+		</div>
+		<div style="padding: 8px 10px;height:58px;text-align:center;border-bottom:1px solid #ccc;text-align:center">
+			<div>Serial Number</div>
+			<div style="display:block;color:#4F7CA5;margin-top:15px;font-size:17px;font-weight:bolder;" th:text="${ansValue1Ques4}">2312345</div>
+		</div>
+		<div style="padding: 8px 10px;height:58px;width:50%;float:left;border-right:1px solid #ccc;text-align:center">
+			<div>Date</div>
+			<div style="display:block;color:#4F7CA5;margin-top:15px;font-size:17px;font-weight:bolder;" th:text="${ansValue1Ques5}">02-02-2009</div>
+		</div>
+		<div style="padding: 8px 10px;height:58px;text-align:center;border-bottom:1px solid #ccc;text-align:center">
+			<div>Clinical Follow-up</div>
+			<div style="display:block;color:#4F7CA5;margin-top:15px;font-size:17px;font-weight:bolder;" th:text="${ansValue1Ques13}">Yes</div>
+		</div>		
+		</div>
+		<div style="text-align:center"><span style="font-size: 17px;color:#7BA4DA;">Survey Response</span></div>
+
+		<div style="border-bottom:1px solid #ccc"></div>
+		
+		<div style="width:100%;font-size:14px;">
+			<div style="width:10%;float:left;color:#666666;padding:10px 0 10px 0"> Q-1</div>	
+			<div style="width:78%;float:left;color:#666666;border-right:1px solid #ccc;padding:10px 0 10px 0"> Did the trainer demonstrate and perform a complete therapy session?
+				<div style="color:#7ca3dc;padding:10px 0 10px 0;" th:if="${ansValue2Ques6 != null}" th:text="|Comment: ${ansValue2Ques6}|"></div>
+			</div>	
+			<div style="width:10%;float:left;color:#7ca3dc;text-align:center;padding:10px 0 10px 0" th:text="${ansValue1Ques6}"> Yes</div>	
+		</div>
+		<div style="clear:both"></div>
+		<div style="border-bottom:1px solid #ccc"></div>
+		<div style="width:100%;font-size:14px;">
+			<div style="width:10%;float:left;color:#666666;padding:10px 0 10px 0"> Q-2</div>	
+			<div style="width:78%;float:left;color:#666666;border-right:1px solid #ccc;padding:10px 0 10px 0"> Did the trainer make sure your garment fit you properly?
+				<div style="color:#7ca3dc;padding:10px 0 10px 0" th:if="${ansValue2Ques7 != null}" th:text="|Comment: ${ansValue2Ques7}|"></div>
+			</div>	
+			<div style="width:10%;float:left;color:#7ca3dc;text-align:center;padding:10px 0 10px 0" th:text="${ansValue1Ques7}"> No</div>	
+		</div>
+		<div style="clear:both"></div>
+		<div style="border-bottom:1px solid #ccc"></div>
+		<div style="width:100%;font-size:14px;">
+			<div style="width:10%;float:left;color:#666666;padding:10px 0 10px 0"> Q-3</div>	
+			<div style="width:78%;float:left;color:#666666;border-right:1px solid #ccc;padding:10px 0 10px 0"> Did the trainer explained the Outcomes Monitoring Program and how to obtain the hour meter reading The Vest &copy; System Device?
+				<div style="color:#7ca3dc;padding:10px 0 10px 0" th:if="${ansValue2Ques8 != null}" th:text="|Comment: ${ansValue2Ques8}|"></div>
+			</div>	
+			<div style="width:10%;float:left;color:#7ca3dc;text-align:center;padding:10px 0 10px 0" th:text="${ansValue1Ques8}"> No</div>	
+		</div>
+		<div style="clear:both"></div>
+		<div style="border-bottom:1px solid #ccc"></div>
+		<div style="width:100%;font-size:14px;">
+			<div style="width:10%;float:left;color:#666666;padding:10px 0 10px 0"> Q-4</div>	
+			<div style="width:78%;float:left;color:#666666;border-right:1px solid #ccc;;padding:10px 0 10px 0"> Did the trainer review trouble shooting and safety instructions regarding The Vest &copy; System usage?
+				<div style="color:#7ca3dc;padding:10px 0 10px 0" th:if="${ansValue2Ques9 != null}" th:text="|Comment: ${ansValue2Ques9}|"></div>
+			</div>	
+			<div style="width:10%;float:left;color:#7ca3dc;text-align:center;padding:10px 0 10px 0" th:text="${ansValue1Ques9}"> No</div>
+		</div>
+		<div style="clear:both"></div>
+		<div style="border-bottom:1px solid #ccc"></div>
+		<div style="width:100%;font-size:14px;">
+			<div style="width:10%;float:left;color:#666666;padding:10px 0 10px 0"> Q-5</div>	
+			<div style="width:78%;float:left;color:#666666;border-right:1px solid #ccc;;padding:10px 0 10px 0"> Did the trainer review trouble shooting and safety instructions regarding The Vest &copy; System usage?
+				<div style="color:#7ca3dc;padding:10px 0 10px 0" th:if="${ansValue2Ques10 != null}" th:text="|Comment: ${ansValue2Ques10}|">Answer</div>
+			</div>	
+			<div style="width:10%;float:left;color:#7ca3dc;text-align:center;padding:10px 0 10px 0" th:text="${ansValue1Ques10}"> No</div>
+		</div>
+		<div style="clear:both"></div>
+		<div style="border-bottom:1px solid #ccc"></div>
+		<div style="width:100%;font-size:14px;">
+			<div style="width:10%;float:left;color:#666666;padding:10px 0 10px 0"> Q-6</div>	
+			<div style="width:78%;float:left;color:#666666;border-right:1px solid #ccc;;padding:10px 0 10px 0"> Would you recommend this trainer to others?
+				<div style="color:#7ca3dc;padding:10px 0 10px 0"  th:if="${ansValue2Ques11 != null}" th:text="|Comment: ${ansValue2Ques11}|">Answer</div>
+			</div>	
+			<div style="width:10%;float:left;color:#7ca3dc;text-align:center;padding:10px 0 10px 0" th:text="${ansValue1Ques11}"> No</div>
+		</div>
+		<div style="clear:both"></div>
+		<div style="border-bottom:1px solid #ccc"></div>
+		<div style="width:100%;font-size:14px;">
+			<div style="width:10%;float:left;color:#666666;padding:10px 0 10px 0"> Q-7</div>	
+			<div style="width:78%;float:left;color:#666666;padding:10px 0 10px 0;"> Any other comments?
+				<div style="color:#7ca3dc;padding:10px 0 10px 0;" th:text="${ansValue2Ques12}">Answer</div>
+			</div>	
+			
+		</div>
+
+		<div style="clear:both"></div>
+		<div style="border-bottom:1px solid #ccc;"></div>
+		<div style="margin-top:20px;margin-bottom:20px;text-align:right">
+		<a href="http://indoffshre01v.hillromvest.com/#/console/admin/survey-report" target="_blank" style="border:none;width:30%;padding:8px;color:#7BA4DA;font-size:14px;" th:href="@{|${baseUrl}/#/console/admin/survey-report|}">View Overall Statistics	</a>
+		</div>
+		
+		<div style="margin: 40px 0px;">
+			<h4 style="font-size: 14px; margin-bottom: 0px;">Regards,</h4>
+			<p style="margin-top: 5px; font-size: 14px;">Your HILL-Rom Respiratory Care Team</p>
+		</div>
+		<div style="margin: 50px 0px;">
+			<p style="font-size: 12px;">*** PLEASE DO NOT REPLY TO THIS EMAIL, IF YOU NEED TO CONTACT HILL-ROM RESPIRATORY CARE, PLEASE CALL 800-426-4224
+			OR VISIT OUR WEBSITE AT HTTP://RESPIRATORYCARE.HILL-ROM.COM/.<br/>
+			ANY REPLIES TO THIS EMAIL WILL NOT BE RECEIVED BY HILL-ROM RESPIRATORY CARE.***
+			</p>
+		</div>
+	</div>
+	<div style="background-color: #7BA4DA;padding: 15px 0px;clear: left;display: inline-block;width: 100%; text-align: center;">
+		<ul style="padding:0px 0px; margin: 0px 0px;display: inline-block;">
+			<li style="margin-left:0px; list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; border-right: 1px solid #fff; padding-left: 15px; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/contactus" th:href="@{|${baseUrl}/#/contactus|}">Contact Us</a> </li>
+			<li style="margin-left:0px; list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; border-right: 1px solid #fff; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/privacyPolicy" th:href="@{|${baseUrl}/#/privacyPolicy|}">Privacy Policy</a></li>
+			<li style="margin-left:0px; list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; border-right: 1px solid #fff; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/termsOfUse" th:href="@{|${baseUrl}/#/termsOfUse|}">Terms of Use</a></li>
+			<li style="margin-left:0px; list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; border-right: 1px solid #fff; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/privacyPractices" th:href="@{|${baseUrl}/#/privacyPractices|}">HIPPA Notice of Privacy Practices</a></li>
+			<li style="margin-left:0px; list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/careSite" th:href="@{|${baseUrl}/#/careSite|}">Hill-Rom Respiratory Care</a></li>
+		</ul>
+		<p style="font-size: 10px; color: #fff;">Copyright Hill-Rom 2016. All Right Reserved.</p>
+	</div>
+</div>
+</body>
+</html>

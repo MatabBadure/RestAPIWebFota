@@ -173,9 +173,9 @@ public class TherapySessionService {
 			Map<LocalDate, List<TherapyDataVO>> therapySessionMap,
 			Map<LocalDate,Note> noteMap,
 			TherapySession latestTherapySession) {
-		int seconds = 60;
+		int minutes = 60*60;
 		// Get the latest HMR for the user before the requested duration
-		double hmrInMinutes = Objects.nonNull(latestTherapySession)?latestTherapySession.getHmr()/seconds:0d;
+		double hmrInHours = Objects.nonNull(latestTherapySession)?latestTherapySession.getHmr()/minutes:0d;
 		
 		// This is to discard the records if the user requested data beyond his/her first transmission date.
 		PatientNoEvent patientNoEvent = patientNoEventService.findByPatientUserId(patientUserId);
@@ -193,12 +193,12 @@ public class TherapySessionService {
 					processedTherapies.add(therapy);
 				});
 				// updating HMR from previous day to form step graph
-				hmrInMinutes = therapySessions.get(therapySessions.size()-1).getHmr();
+				hmrInHours = therapySessions.get(therapySessions.size()-1).getHmr();
 			}else if(date.isBefore(LocalDate.now())){ // Don't consider current date as missed therapy
 				// add missed therapy if user misses the therapy
 				TherapyDataVO missedTherapy = createTherapyDataWithTimeStamp(date);
 				missedTherapy.setNote(noteMap.get(date));
-				missedTherapy.setHmr(hmrInMinutes);
+				missedTherapy.setHmr(hmrInHours);
 				processedTherapies.add(missedTherapy);
 			}
 		}
@@ -240,6 +240,7 @@ public class TherapySessionService {
 			Map<LocalDate, Note> noteMap) {
 		Map<LocalDate,List<TherapyDataVO>> therapyDataMap = new TreeMap<>();
 		TherapyDataVO therapyDataVO = null;
+		int minutes = 60*60;
 		for(LocalDate date : sessionMap.keySet()){
 			List<TherapySession> sessionsPerDate = sessionMap.get(date);
 			List<TherapyDataVO> therapyDataVOs = therapyDataMap.get(date);
@@ -252,7 +253,7 @@ public class TherapySessionService {
 						session.getFrequency(),	session.getPressure(), programmedCoughPauses, normalCoughPauses,
 						programmedCoughPauses+normalCoughPauses, noteMap.get(date), session.getStartTime(),
 						session.getEndTime(), session.getCaughPauseDuration(),
-						session.getDurationInMinutes(), session.getHmr().doubleValue()/60,false);
+						session.getDurationInMinutes(), Math.round(session.getHmr().doubleValue()/minutes),false);
 				therapyDataVOs.add(therapyDataVO);
 			}
 			therapyDataMap.put(date, therapyDataVOs);
@@ -288,9 +289,10 @@ public class TherapySessionService {
 				weightedAvgPressure += calculateWeightedAvg(totalDuration, therapy.getDuration(), therapy.getPressure());
 				noteForTheDay = therapy.getNote();
 			}
+			int minutes = 60*60;
 			TherapyDataVO dataVO = new TherapyDataVO(therapies.get(0).getTimestamp(), Math.round(weightedAvgFrequency), Math.round(weightedAvgPressure),
 					programmedCoughPauses, normalCoughPauses, programmedCoughPauses+normalCoughPauses, noteForTheDay, start, end, coughPauseDuration,
-					totalDuration, hmr, isMissedTherapy);
+					totalDuration, Math.round(hmr/minutes), isMissedTherapy);
 			responseList.add(dataVO);
 		}
 		return responseList;

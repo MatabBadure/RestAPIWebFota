@@ -171,7 +171,6 @@ public final class Constants {
 	public static final String YES = "Yes";
 	public static final String KEY_THIRTY_DAYS_SURVEY_REPORT = "thirtyDaysSurveyReport";
 	public static final String KEY_FIVE_DAYS_SURVEY_REPORT = "fiveDaysSurveyReport";
-
 	//Column name to be checked in Patient search
 	public static final String ADHERENCE = "adherence";
 	
@@ -211,5 +210,11 @@ public final class Constants {
 	// Treatment Stats Graph
 	public static final String AVERAGE_LENGTH_OF_TREATMENT_LABEL = "Average Length of Treatment";
 	public static final String AVERAGE_TREATMENTS_PER_DAY_LABEL = "Average Treatments Per Day";
+
+// Bench Mark Parameter
+	public static final String BM_PARAM_SETTING_DEVIATION = "Setting Deviation";
+	public static final String BM_PARAM_HMR_DEVIATION = "HMR Deviation";
+	public static final String BM_PARAM_MISSED_THERAPY_DAYS = "Missed Therapy Days";
+	public static final String BM_PARAM_ADHERENCE_SCORE = "Adherence Score";
 
 }

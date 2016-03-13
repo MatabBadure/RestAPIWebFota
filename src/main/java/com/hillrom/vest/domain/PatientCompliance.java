@@ -24,9 +24,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
 import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
-import com.hillrom.vest.repository.BenchmarkVO;
+import com.hillrom.vest.repository.BenchmarkResultVO;
 
-@SqlResultSetMapping(name = "avgBenchmarkResultSetMapping", classes = @ConstructorResult(targetClass = BenchmarkVO.class, columns = {
+@SqlResultSetMapping(name = "avgBenchmarkResultSetMapping", classes = @ConstructorResult(targetClass = BenchmarkResultVO.class, columns = {
 		@ColumnResult(name = "complainceId", type = Long.class),
 		@ColumnResult(name = "patId",type = String.class),
 		@ColumnResult(name = "userId",type = Long.class),

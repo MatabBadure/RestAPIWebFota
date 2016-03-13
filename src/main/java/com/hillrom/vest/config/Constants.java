@@ -217,4 +217,5 @@ public final class Constants {
 	public static final String BM_PARAM_MISSED_THERAPY_DAYS = "Missed Therapy Days";
 	public static final String BM_PARAM_ADHERENCE_SCORE = "Adherence Score";
 
+	public static final String KEY_TOTAL_PATIENTS = "totalPatients";
 }

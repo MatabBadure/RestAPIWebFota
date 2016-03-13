@@ -1,7 +1,11 @@
 package com.hillrom.vest.service;
 
+import static com.hillrom.vest.config.Constants.BM_PARAM_ADHERENCE_SCORE;
+import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_DEVIATION;
+import static com.hillrom.vest.config.Constants.BM_PARAM_MISSED_THERAPY_DAYS;
+import static com.hillrom.vest.config.Constants.BM_PARAM_SETTING_DEVIATION;
+import static com.hillrom.vest.config.Constants.KEY_TOTAL_PATIENTS;
 import static com.hillrom.vest.config.Constants.XAXIS_TYPE_CATEGORIES;
-import static com.hillrom.vest.config.Constants.*;
 
 import java.util.List;
 
@@ -41,20 +45,31 @@ public class BenchMarkGraphService extends AbstractGraphService {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Graph populateGraphDataForCustomDateRange(Object data, Filter filter) {
-		/*List<BenchMarkDataVO> benchMarkData = (List<BenchMarkDataVO>) data;
+		List<BenchMarkDataVO> benchMarkData = (List<BenchMarkDataVO>) data;
 		BenchMarkFilter benchMarkFilter = (BenchMarkFilter) filter;
 		Graph benchMarkGraph = GraphUtils.buildGraphObectWithXAxisType(XAXIS_TYPE_CATEGORIES);
 		Series series = GraphUtils.createSeriesObjectWithName(benchMarkFilter.getyAxisParameter());
 		for(BenchMarkDataVO benchMarkVO : benchMarkData){
 			benchMarkGraph.getxAxis().getCategories().add(benchMarkVO.getGroupLabel());
-			GraphDataVO graphData = null;
+			GraphDataVO graphData = new GraphDataVO();
+			int y = 0;
 			if(BM_PARAM_ADHERENCE_SCORE.equalsIgnoreCase(benchMarkFilter.getBenchMarkParameter())){
-				graphData = new GraphDataVO(null, benchMarkVO.getAdherenceScoreBenchMark());
-				GraphDataVO
+				y = benchMarkVO.getAdherenceScoreBenchMark();
+			}else if(BM_PARAM_HMR_DEVIATION.equalsIgnoreCase(benchMarkFilter.getBenchMarkParameter())){
+				y=  benchMarkVO.gethMRDeviationBenchMark();
+			}else if(BM_PARAM_SETTING_DEVIATION.equalsIgnoreCase(benchMarkFilter.getBenchMarkParameter())){
+				y = benchMarkVO.getSettingDeviationBenchMark();
+			}else if(BM_PARAM_MISSED_THERAPY_DAYS.equalsIgnoreCase(benchMarkFilter.getBenchMarkParameter())){
+				y = benchMarkVO.getMissedTherapyDaysBenchMark();
 			}
-		}*/
-		return null;
+			graphData.setY(y);
+			graphData.getToolText().put(KEY_TOTAL_PATIENTS, benchMarkVO.getPatientCount());
+			series.getData().add(graphData);
+		}
+		benchMarkGraph.getSeries().add(series);
+		return benchMarkGraph;
 	}
 
 }

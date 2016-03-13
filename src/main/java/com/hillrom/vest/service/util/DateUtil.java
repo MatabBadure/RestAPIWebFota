@@ -1,8 +1,8 @@
 package com.hillrom.vest.service.util;
 
 import static com.hillrom.vest.config.Constants.MMddyyyy;
-import static com.hillrom.vest.config.Constants.YYYY_MM_DD;
 import static com.hillrom.vest.config.Constants.WEEK_SEPERATOR;
+import static com.hillrom.vest.config.Constants.YYYY_MM_DD;
 
 import java.text.DateFormatSymbols;
 import java.util.LinkedList;
@@ -13,6 +13,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
@@ -204,4 +205,15 @@ public class DateUtil {
 		DateTimeFormatter formatter = DateTimeFormat.forPattern(Objects.nonNull(pattern)?pattern:MMddyyyy);
 		return date.toString(formatter);
 	}
+	
+	/**
+	 * return formatted date string as per pattern, default pattern is dd-MMM-yy
+	 * @param dates
+	 * @return
+	 */
+	public static String formatDate(DateTime dateTime, String pattern) {
+		DateTimeFormatter formatter = DateTimeFormat.forPattern(Objects.nonNull(pattern)?pattern:MMddyyyy);
+		return dateTime.toString(formatter);
+	}
+
 }

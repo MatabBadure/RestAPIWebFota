@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import org.joda.time.LocalDate;
 
-public class BenchmarkVO{
+public class BenchmarkResultVO{
 	private Long complianceId;
 	private String patientId;
 	private Long userId;
@@ -20,7 +20,7 @@ public class BenchmarkVO{
 	private BigDecimal cumulativeMissedTherapyDaysCount;
 
 	
-	public BenchmarkVO(Long complianceId, String patientId, Long userId, LocalDate dob, Integer age, String zipcode,
+	public BenchmarkResultVO(Long complianceId, String patientId, Long userId, LocalDate dob, Integer age, String zipcode,
 			String city, String state, LocalDate lastTherapySessionDate, BigDecimal cumulativeCompScore,
 			BigDecimal cumulativeNonAdherenceCount, BigDecimal cumulativeSettingsDeviatedCount,
 			BigDecimal cumulativeMissedTherapyDaysCount) {

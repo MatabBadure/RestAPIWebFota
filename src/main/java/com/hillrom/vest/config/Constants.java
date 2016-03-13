@@ -174,5 +174,9 @@ public final class Constants {
 	//Column name to be checked in Patient search
 	public static final String ADHERENCE = "adherence";
 	
-	
+	// Bench Mark Parameter
+	public static final String BM_PARAM_SETTING_DEVIATION = "Setting Deviation";
+	public static final String BM_PARAM_HMR_DEVIATION = "HMR Deviation";
+	public static final String BM_PARAM_MISSED_THERAPY_DAYS = "Missed Therapy Days";
+	public static final String BM_PARAM_ADHERENCE_SCORE = "Adherence Score";
 }

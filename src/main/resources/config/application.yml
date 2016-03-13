@@ -23,7 +23,7 @@ mail:
     auth: true
     from: test.hillrom@gmail.com
     to: gopakumar@neevtech.com,rohan.kushwaha@neevtech.com,raghu.narayanan@neevtech.com,nagendra@neevtech.com
-    surveyreportemailids: joelkaka@gmail.com,joelpreetham.fernandes4@hill-rom.com,amit.saurabh@neevtech.com,nagendra@neevtech.com
+    surveyreportemailids: rohan.kushwaha@razorfish.com,rohangtr@gmail.com
 authentication:
     xauth:
         secret: myXAuthSecret

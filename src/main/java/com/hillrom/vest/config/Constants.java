@@ -171,8 +171,45 @@ public final class Constants {
 	public static final String YES = "Yes";
 	public static final String KEY_THIRTY_DAYS_SURVEY_REPORT = "thirtyDaysSurveyReport";
 	public static final String KEY_FIVE_DAYS_SURVEY_REPORT = "fiveDaysSurveyReport";
+
 	//Column name to be checked in Patient search
 	public static final String ADHERENCE = "adherence";
 	
+	// HMR Graph Date Formats
+	public static final String MMddyyyyHHMM = "MM/dd/yyyy (HH:MM a)";
+	public static final String HHMM = "HH:MM a";
+	public static final String MMddyyyyHHmmss = "MM/dd/yyyy HH:mm:ss";
 	
+	//HMR Graph Y-axis labels
+	public static final String MINUTES_LABEL = "Minutes";
+	public static final String HMR_LABEL = "HMR";
+	
+	//HMR Graph tooltip labels
+	public static final String KEY_NOTE_TEXT = "noteText";
+	public static final String KEY_COUGH_PAUSES = "coughPauses";
+	public static final String KEY_MISSED_THERAPY = "missedTherapy";
+	public static final String KEY_FREQUENCY = "frequency";
+	public static final String KEY_DURATION = "duration";
+	public static final String KEY_PRESSURE = "pressure";
+	public static final String KEY_SESSION_NO = "sessionNo";
+
+	// Compliance Graph 
+	public static final String KEY_MAX = "max";
+	public static final String KEY_MIN = "min";
+	public static final String KEY_THERAPY_DATA = "therapyData";
+	public static final String KEY_PROTOCOL = "protocol";
+	public static final String PRESSURE_LABEL = "Pressure";
+	public static final String FREQUENCY_LABEL = "Frequency";
+	public static final String DURATION_LABEL = "Duration";
+
+	// Cumulative Stats Graph 
+	public static final String HMR_NON_ADHERENCE_LABEL = "HMR Non-Adherence";
+	public static final String SETTING_DEVIATION_LABEL = "Setting Deviation";
+	public static final String MISSED_THERAPY_DAYS_LABEL = "Missed Therapy Days";
+	public static final String NO_TRANSMISSION_RECORDED_LABEL = "No Transmission Recorded";
+
+	// Treatment Stats Graph
+	public static final String AVERAGE_LENGTH_OF_TREATMENT_LABEL = "Average Length of Treatment";
+	public static final String AVERAGE_TREATMENTS_PER_DAY_LABEL = "Average Treatments Per Day";
+
 }

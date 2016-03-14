@@ -4,12 +4,15 @@ import java.math.BigDecimal;
 
 import org.joda.time.LocalDate;
 
+import com.hillrom.vest.service.util.DateUtil;
+
 public class BenchmarkResultVO{
 	private Long complianceId;
 	private String patientId;
 	private Long userId;
 	private LocalDate dob;
 	private Integer age;
+	private Integer clinicSize;
 	private String zipcode;
 	private String city;
 	private String state;
@@ -20,7 +23,7 @@ public class BenchmarkResultVO{
 	private BigDecimal cumulativeMissedTherapyDaysCount;
 
 	
-	public BenchmarkResultVO(Long complianceId, String patientId, Long userId, LocalDate dob, Integer age, String zipcode,
+	public BenchmarkResultVO(Long complianceId, String patientId, Long userId, LocalDate dob, String zipcode,
 			String city, String state, LocalDate lastTherapySessionDate, BigDecimal cumulativeCompScore,
 			BigDecimal cumulativeNonAdherenceCount, BigDecimal cumulativeSettingsDeviatedCount,
 			BigDecimal cumulativeMissedTherapyDaysCount) {
@@ -29,7 +32,6 @@ public class BenchmarkResultVO{
 		this.patientId = patientId;
 		this.userId = userId;
 		this.dob = dob;
-		this.age = age;
 		this.zipcode = zipcode;
 		this.city = city;
 		this.state = state;
@@ -39,6 +41,16 @@ public class BenchmarkResultVO{
 		this.cumulativeSettingsDeviatedCount = cumulativeSettingsDeviatedCount;
 		this.cumulativeMissedTherapyDaysCount = cumulativeMissedTherapyDaysCount;
 	}
+	
+	public BenchmarkResultVO(Long complianceId, String patientId, Long userId, LocalDate dob, String zipcode,
+			String city, String state, LocalDate lastTherapySessionDate, BigDecimal cumulativeCompScore,
+			BigDecimal cumulativeNonAdherenceCount, BigDecimal cumulativeSettingsDeviatedCount,
+			BigDecimal cumulativeMissedTherapyDaysCount,Integer clinicSize) {
+		this(complianceId,patientId,userId,dob,zipcode,city,state,lastTherapySessionDate,cumulativeCompScore,
+				cumulativeNonAdherenceCount,cumulativeSettingsDeviatedCount,cumulativeMissedTherapyDaysCount);
+		this.clinicSize = clinicSize;
+	}
+	
 	public Long getComplianceId() {
 		return complianceId;
 	}
@@ -64,7 +76,7 @@ public class BenchmarkResultVO{
 		this.dob = dob;
 	}
 	public Integer getAge() {
-		return age;
+		return DateUtil.getPeriodBetweenLocalDates(dob, LocalDate.now(), null);
 	}
 	public void setAge(Integer age) {
 		this.age = age;
@@ -116,6 +128,12 @@ public class BenchmarkResultVO{
 	}
 	public void setCumilativeMissedTherapyDaysCount(BigDecimal cumilativeMissedTherapyDaysCount) {
 		this.cumulativeMissedTherapyDaysCount = cumilativeMissedTherapyDaysCount;
+	}
+	public Integer getClinicSize() {
+		return clinicSize;
+	}
+	public void setClinicSize(Integer clinicSize) {
+		this.clinicSize = clinicSize;
 	}
 	@Override
 	public String toString() {

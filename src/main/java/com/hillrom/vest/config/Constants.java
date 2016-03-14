@@ -219,4 +219,10 @@ public final class Constants {
 	public static final String BM_PARAM_ADHERENCE_SCORE = "Adherence Score";
 
 	public static final String KEY_TOTAL_PATIENTS = "totalPatients";
+
+	// Constants used for calculating time-period between days
+	public static final String DAY_STRING = "Day";
+	public static final String MONTH_STRING = "Month";
+	public static final String YEAR_STRING = "Year";
+
 }

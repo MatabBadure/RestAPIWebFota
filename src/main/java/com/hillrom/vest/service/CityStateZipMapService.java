@@ -27,6 +27,20 @@ public class CityStateZipMapService {
 	public List<String> getStates() {
 		return cityStateZipMapRepository.findUniqueStates();
 	}
+	
+	public List<String> getAvailableStates() {
+		return cityStateZipMapRepository.findAvailableStates();
+	}
+	public List<String> getAvailableCities(String state) throws HillromException {
+		if(StringUtils.isEmpty(state))
+			throw new HillromException(ExceptionConstants.HR_710);
+		
+		return cityStateZipMapRepository.findAvailableCities(state);
+	}
+	
+	public List<String> getCitiesByState(String state) {
+		return cityStateZipMapRepository.findUniqueCitiesByState(state);
+	}
 
 	public StateVO getStateVOByState(String state) throws HillromException {
 		if (StringUtils.isEmpty(state))

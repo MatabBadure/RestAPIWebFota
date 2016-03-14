@@ -46,4 +46,6 @@ spring:
         careGiverDashboardUrl: http://indoffshre01v.hillromvest.com
         baseUrl: http://indoffshre01v.hillromvest.com
         accountActivationReminderInterval: 12
+    survey:
+        surveyreportemailids: nagendra.shetty@razorfish.com,amit.saurabh@razorfish.com,anubhav.sinha@razorfish.com,nagendra@neevtech.com,amit.saurabh@neevtech.com
         

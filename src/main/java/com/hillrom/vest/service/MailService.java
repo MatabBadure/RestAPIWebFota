@@ -303,7 +303,7 @@ public class MailService {
 	
 	@Async
     public void sendSurveyEmailReport(UserSurveyAnswerDTO userSurveyAnswerDTO, String baseUrl) {
-		String recipients = env.getProperty("mail.surveyreportemailids");
+		String recipients = env.getProperty("spring.survey.surveyreportemailids");
 		log.debug("Sending Survey email report '{}'", recipients);
         Locale locale = Locale.getDefault();
         String content = null;

@@ -6,6 +6,8 @@ import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import net.minidev.json.JSONObject;
+
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +28,9 @@ import com.hillrom.vest.repository.FiveDayViewVO;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.SurveyService;
 import com.hillrom.vest.util.MessageConstants;
+import com.hillrom.vest.web.rest.dto.SurveyGraph;
 import com.hillrom.vest.web.rest.dto.SurveyVO;
 import com.hillrom.vest.web.rest.dto.UserSurveyAnswerDTO;
-
-import net.minidev.json.JSONObject;
 
 /**
  * REST controller for survey APIs.
@@ -141,13 +142,23 @@ public class SurveyResource {
 	
 	@RequestMapping(value = "/survey/answerbyquestion/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@RolesAllowed({ AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES })
-	public ResponseEntity<?> getSurveyAnswerByQuestionId(@PathVariable Long id) {
+	public ResponseEntity<?> getSurveyAnswerByQuestionId(@PathVariable Long id,
+			@RequestParam(required = true, value = "fromDate")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+  			@RequestParam(required = true, value = "toDate")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
 		try {
-			return new ResponseEntity< List<FiveDayViewVO>>(surveyService.getSurveyAnswerByQuestionId(id), HttpStatus.OK);
+			return new ResponseEntity< List<FiveDayViewVO>>(surveyService.getSurveyAnswerByQuestionId(id, from, to), HttpStatus.OK);
 		} catch (HillromException e) {
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("ERROR", e.getMessage());
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@RequestMapping(value = "/survey/{id}/graph", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getSurveyGraphById(@PathVariable Long id,
+			@RequestParam(required = true, value = "from")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+  			@RequestParam(required = true, value = "to")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
+			return new ResponseEntity< SurveyGraph>(surveyService.getSurveyGraphById(id, from, to), HttpStatus.OK);
+	}
+
 }

@@ -1,5 +1,6 @@
 package com.hillrom.vest.service;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -9,10 +10,14 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import net.minidev.json.JSONObject;
+
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.Survey;
 import com.hillrom.vest.domain.SurveyQuestion;
@@ -20,22 +25,24 @@ import com.hillrom.vest.domain.SurveyQuestionAssoc;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserSurveyAnswer;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.FiveDaySurveyReportVO;
 import com.hillrom.vest.repository.FiveDayViewVO;
 import com.hillrom.vest.repository.NintyDaySurveyReportVO;
 import com.hillrom.vest.repository.SurveyAnswerResultSetVO;
 import com.hillrom.vest.repository.SurveyQuestionAssocRepository;
 import com.hillrom.vest.repository.SurveyQuestionRepository;
 import com.hillrom.vest.repository.SurveyRepository;
+import com.hillrom.vest.repository.ThirtyDaySurveyReportVO;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSurveyAnswerRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
+import com.hillrom.vest.web.rest.dto.Filter;
+import com.hillrom.vest.web.rest.dto.SurveyGraph;
 import com.hillrom.vest.web.rest.dto.SurveyQuestionVO;
 import com.hillrom.vest.web.rest.dto.SurveyVO;
 import com.hillrom.vest.web.rest.dto.UserSurveyAnswerDTO;
-
-import net.minidev.json.JSONObject;
 
 @Service
 @Transactional
@@ -65,8 +72,10 @@ public class SurveyService {
 	@Inject
 	private SurveyQuestionRepository surveyQuestionRepository;
 	
+	@Qualifier("surveyGraphService")
+	@Inject
+	private GraphService graphService;
 	
-
 	public List<Survey> getAllSurveys() {
 		return surveyRepository.findAll();
 	}
@@ -184,21 +193,21 @@ public class SurveyService {
 
 	public JSONObject getGridView(Long surveyId, LocalDate fromDate, LocalDate toDate) throws HillromException {
 		JSONObject responseJSON = new JSONObject();
+		List<Long> questionIds = getSurveyQuestionIdsBySurveyId(surveyId);
+		Integer surveyCount = userSurveyAnswerRepository.findSurveyCountByDateRange(surveyId,
+				fromDate.toDateTime(LocalTime.MIDNIGHT), toDate.plusDays(1).toDateTime(LocalTime.MIDNIGHT));
 		if (RandomUtil.FIVE_DAY_SURVEY_ID.equals(surveyId)) {
-			responseJSON.put("count", userSurveyAnswerRepository.findSurveyCountByDateRange(surveyId,
-					fromDate.toDateTime(LocalTime.MIDNIGHT), toDate.plusDays(1).toDateTime(LocalTime.MIDNIGHT)));
+			responseJSON.put("count", surveyCount);
 			responseJSON.put("surveyGridView",
-					userSurveyAnswerRepository.fiveDaySurveyReport(fromDate.toString(), toDate.toString()));
+					userSurveyAnswerRepository.fiveDaySurveyReport(fromDate.toString(), toDate.toString(),questionIds));
 			return responseJSON;
 		} else if (RandomUtil.THIRTY_DAY_SURVEY_ID.equals(surveyId)) {
-			responseJSON.put("count", userSurveyAnswerRepository.findSurveyCountByDateRange(surveyId,
-					fromDate.toDateTime(LocalTime.MIDNIGHT), toDate.plusDays(1).toDateTime(LocalTime.MIDNIGHT)));
+			responseJSON.put("count", surveyCount);
 			responseJSON.put("surveyGridView",
-					userSurveyAnswerRepository.thirtyDaySurveyReport(fromDate.toString(), toDate.toString()));
+					userSurveyAnswerRepository.thirtyDaySurveyReport(fromDate.toString(), toDate.toString(),questionIds));
 			return responseJSON;
 		} else if (RandomUtil.NIGHTY_DAY_SURVEY_ID.equals(surveyId)) {
-			responseJSON.put("count", userSurveyAnswerRepository.findSurveyCountByDateRange(surveyId,
-					fromDate.toDateTime(LocalTime.MIDNIGHT), toDate.plusDays(1).toDateTime(LocalTime.MIDNIGHT)));
+			responseJSON.put("count", surveyCount);
 			responseJSON.put("surveyGridView", getNintyDaySurveyResponse(fromDate.toString(), toDate.toString()));
 			return responseJSON;
 		} else
@@ -228,13 +237,13 @@ public class SurveyService {
 		return nintyDaySurveyReportVOs;
 	}
 	
-	public List<FiveDayViewVO> getSurveyAnswerByQuestionId(Long id) throws HillromException {
+	public List<FiveDayViewVO> getSurveyAnswerByQuestionId(Long id, LocalDate from,LocalDate to) throws HillromException {
 
 		SurveyQuestion surveyQuestion = surveyQuestionRepository.findOne(id);
 		if (Objects.isNull(surveyQuestion))
 			throw new HillromException(ExceptionConstants.HR_807);
 		Map<Long, List<SurveyAnswerResultSetVO>> surveyAnswerRSGroupedByUserID = (Map<Long, List<SurveyAnswerResultSetVO>>) userSurveyAnswerRepository
-				.fiveDaySurveyViewReport(id).stream()
+				.fiveDaySurveyViewReport(id, from.toString(), to.toString()).stream()
 				.collect(Collectors.groupingBy(SurveyAnswerResultSetVO::getUserId));
 
 		List<FiveDayViewVO> fiveDayViewVOs = new LinkedList<>();
@@ -244,6 +253,9 @@ public class SurveyService {
 
 		for (Long userId : surveyAnswerRSGroupedByUserID.keySet()) {
 			surveyAnswerResultSetVO = surveyAnswerRSGroupedByUserID.get(userId);
+			//Survey Comments needed only when answered No.
+			if(Constants.YES.equals(surveyAnswerResultSetVO.get(3).getAnswerValue()))
+				continue;
 			fiveDayViewVO = new FiveDayViewVO(
 					surveyAnswerResultSetVO.get(0).getAnswerValue(),
 					surveyAnswerResultSetVO.get(1).getAnswerValue(),
@@ -255,4 +267,37 @@ public class SurveyService {
 	
 	}
 
+	public SurveyGraph getSurveyGraphById(Long surveyId,LocalDate from,LocalDate to){
+		List<Long> questionIds = getSurveyQuestionIdsBySurveyId(surveyId);
+		Filter filter = new Filter();
+		filter.setFrom(from);
+		filter.setTo(to);
+		Integer surveyCount = userSurveyAnswerRepository.findSurveyCountByDateRange(surveyId,
+				from.toDateTime(LocalTime.MIDNIGHT), to.plusDays(1).toDateTime(LocalTime.MIDNIGHT));
+		Map<String,Object> surveyStatistics = new HashMap<>();
+		surveyStatistics.put(Constants.KEY_COUNT,surveyCount);
+		if(surveyId == Constants.FIVE_DAYS_SURVEY_ID){
+			List<FiveDaySurveyReportVO> fiveDaysSurveyReport = userSurveyAnswerRepository.fiveDaySurveyReport(from.toString(), to.toString(),
+					questionIds.subList(0, questionIds.size()-1));
+			surveyStatistics.put(Constants.KEY_FIVE_DAYS_SURVEY_REPORT, fiveDaysSurveyReport);
+			return (SurveyGraph) graphService.populateGraphData(surveyStatistics, filter);
+		}else{
+			List<ThirtyDaySurveyReportVO> thirtyDaysSurveyReport = userSurveyAnswerRepository.thirtyDaySurveyReport(from.toString(), to.toString(),
+					questionIds);
+			surveyStatistics.put(Constants.KEY_THIRTY_DAYS_SURVEY_REPORT, thirtyDaysSurveyReport);
+			return (SurveyGraph) graphService.populateGraphData(surveyStatistics, filter);
+		}
+	}
+	
+	public List<Long> getSurveyQuestionIdsBySurveyId(Long id){
+		String questionIdsCSV = Constants.FIVE_DAYS_SURVEY_QIDS;
+		List<Long> questionIds = new LinkedList<>();
+		if(!Constants.FIVE_DAYS_SURVEY_ID.equals(id)){
+			questionIdsCSV = Constants.THIRTY_DAYS_SURVEY_QIDS;
+		}
+		for(String qid : questionIdsCSV.split(",")){
+			questionIds.add(Long.parseLong(qid));
+		}
+		return questionIds;
+	}
 }

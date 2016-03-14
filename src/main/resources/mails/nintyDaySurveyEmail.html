@@ -1,107 +1,540 @@
 <html>
 <head>
-	<title></title>
+<title>Survey </title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
 </head>
-<body>
-<div style="width: 590px; border: solid 1px #7BA4DA; min-height: 350px; margin: 0 auto; font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; padding: 10px 15px;">
-	<div style="width: 100%;display: inline-block;">
-		<div style="">
-			<img src="logo-HillRom.png" th:src="@{|${baseUrl}/images/logo-HillRom.png|}" style="height: 30px; width: 100px;float: left;"></img>
-			<span style="margin: 6px 0px 0px 5px; display: inline-block; font-size: 14px;">VisiView<sup>TM</sup> <span>Health Portal</span></span>
-		</div>
+<body bgcolor="#FFFFFF" style="font-family:MyriadPro-Regular,'Myriad Pro Regular',MyriadPro,'Myriad Pro',Helvetica,Arial,sans-serif" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 
-	</div>
-	<div style="background-color: #7BA4DA;height: 92px;margin: 20px 0px;">
-		<h3 style="color: #fff;margin: 32px 0px 0px 25px;display: inline-block;">Survey Completed !</h3>
-		<img src="surveyEmailIcon.png" th:src="@{|${baseUrl}/images/surveyEmailIcon.png|}" style="float: right;"></img>
-	</div>
-	<div style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; ">
-		<div>
-			<span style="font-size: 17px;color:#7BA4DA;border-bottom:1px solid #7BA4DA;font-weight:bolder">Outcomes Monitoring: 90 Day Survey - The Vest&copy;  Airway Clearance System</span>
-		</div>
-		<div style="background-color:#f1f1f1; margin-top:20px;margin-bottom:20px;">
-			<div style="padding: 8px 10px;height:58px;width:50%;float:left;border-right:1px solid #ccc;border-bottom:1px solid #ccc;text-align:center">
-				<div>Patient Name</div>
-				<div style="display:block;color:#4F7CA5;margin-top:15px" th:text="${ansValue1Ques41}"> Jose M. Robert</div>
-			</div>
-			<div style="padding: 8px 10px;height:58px;text-align:center;border-bottom:1px solid #ccc;">
-				<div>Date of birth</div>
-				<div style="display:block;color:#4F7CA5;margin-top:15px;font-size:17px;font-weight:bolder;" th:text="${ansValue1Ques42}"> 12/05/1985</div>
-			</div>
+<table style="border:1px solid #7ca3dc" align="center" width="600" height="" border="0" cellpadding="0" cellspacing="0">
+	<tr>
+		<td>
+			<table id="" width="600" height="" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="600" height="4">
+						<img th:src="@{|${baseUrl}/images/top-border.png|}" width="600" height="4" alt=""></img></td>
+				</tr>
+				<tr>
+					<td width="600" height="14" bgcolor="#ffffff" ></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<img th:src="@{|${baseUrl}/images/hill-rom-logo.png|}" width="600" height="36" alt="Hill-rom Logo"></img></td>
+	</tr>
+	<tr>
+		<td  width="600" height="15" bgcolor="#ffffff">
+			</td>
+	</tr>
+	<tr>
+		<td>
+			<img th:src="@{|${baseUrl}/images/survey-completed-banner.png|}" width="600" height="95" alt="survey completed"></img></td>
+	</tr>
+	<tr>
+		<td width="600" height="31"></td>
+	</tr>
+	<tr>
+		<td width="600">
+			<table id="" width="600" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="19" height="21" bgcolor="#ffffff"></td>
+					<td width="549" height="21">
+						<span style="font-size:17px;color:#7ca3dc;font-family:myriad">Outcomes Monitoring: 90 Days Survey - The Vest<sup>&copy;</sup> Airway Clearance System</span>
+					</td>
+					<td width="32" height="21" bgcolor="#ffffff"></td>
+				</tr>
+			</table>
+			</td>
+	</tr>
+	<tr>
+		<td width="600" height="9">
+			<table width="600" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="19"  bgcolor="#ffffff"></td>
+					<td width="549"  style="border-top:1px solid #7ca3dc"></td>
+					<td width="32"  bgcolor="#ffffff"></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td width="600" height="21" bgcolor="#ffffff"></td>
+	</tr>
+	<tr style="background-color:#f1f1f1">
+		<td width="600" style="background-color:#f1f1f1">
+			<table style="background-color:#f1f1f1" width="600" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="19" bgcolor="#ffffff"></td>
+					<td width="281" style="border-bottom:1px solid #c1c1c1;background-color:#f1f1f1">
+						<table  width="281" border="0" cellpadding="0" cellspacing="0">
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281" align="center" style="color:#646568;font-size:14px;">Patient Name</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281"  align="center" style="color:#276092;font-weight:bold;font-size:17px" th:text="${ansValue1Ques41}">Jose M Robert</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+						</table>
+						
+					</td>
+					<td style="border-right:1px solid #c1c1c1"></td>
+					<td width="265"  style="border-bottom:1px solid #c1c1c1">
+						<table  width="281" border="0" cellpadding="0" cellspacing="0">
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281" align="center" style="color:#646568;font-size:14px;" >Date of Birth</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281"  align="center" style="color:#276092;font-weight:bold;font-size:17px" th:text="${ansValue1Ques42}">12/01/1985</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+						</table>
+					</td>
+					<td width="32" bgcolor="#ffffff"></td>
+				</tr>
+			</table>
 			
-			<div style="padding: 8px 10px;height:58px;width:50%;float:left;border-right:1px solid #ccc;border-bottom:1px solid #ccc;text-align:center">
-				<div>Main Phone Number</div>
-				<div style="display:block;color:#4F7CA5;margin-top:15px;font-size:17px;font-weight:bolder;" th:text="${ansValue1Ques43}"> 9977884422</div>
-			</div>
+		</td>
+	</tr>
+	
+	<tr>
+		<td width="600">
+			<table  width="600" style="background-color:#f1f1f1"  border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="19" bgcolor="#ffffff"></td>
+					<td width="281" style="border-bottom:1px solid #c1c1c1">
+						<table  width="281" border="0" cellpadding="0" cellspacing="0">
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281" align="center" style="color:#646568;font-size:14px;">Main Phone Number</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281"  align="center" style="color:#276092;font-weight:bold;font-size:17px" th:text="${ansValue1Ques43}">998-877-4455</td>
+							</tr>
+							<tr>
+								<td width="281" >&nbsp;</td>
+							</tr>
+						</table>
+						
+					</td>
+					<td style="border-right:1px solid #c1c1c1"></td>
+					<td width="265" style="border-bottom:1px solid #c1c1c1">
+						<table  width="281" border="0" style="background-color:#f1f1f1"  cellpadding="0" cellspacing="0">
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281" align="center" style="color:#646568;font-size:14px;">Secondary Phone Number</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281"  align="center" style="color:#276092;font-weight:bold;font-size:17px" th:text="${ansValue1Ques44}">998-888-4455</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+						</table>
+					</td>
+					<td width="32" bgcolor="#ffffff"></td>
+				</tr>
+			</table>
+			
+		</td>
+	</tr>
+	<tr>
+		<td width="600">
+			<table  width="600" border="0" cellpadding="0" style="background-color:#f1f1f1"  cellspacing="0">
+				<tr>
+					<td width="19" bgcolor="#ffffff"></td>
+					<td width="281" style="border-bottom:1px solid #c1c1c1;">
+						<table  width="281" border="0" cellpadding="0" cellspacing="0">
+							<tr>
+								<td width="281" >&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281" align="center" style="color:#646568;font-size:14px;">Address</td>
+							</tr>
+							<tr>
+								<td width="281" >&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281"  align="center" style="color:#276092;font-weight:bold;font-size:17px" th:text="${ansValue1Ques45}">123, 4th avenue</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+						</table>
+						
+					</td>
+					<td style="border-right:1px solid #c1c1c1"></td>
+					<td width="265" style="border-bottom:1px solid #c1c1c1;">
+						<table  width="281" border="0" style="background-color:#f1f1f1"  cellpadding="0" cellspacing="0">
+							<tr>
+								<td width="281" >&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281" align="center" style="color:#646568;font-size:14px;">City</td>
+							</tr>
+							<tr>
+								<td width="281" >&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281"  align="center" style="color:#276092;font-weight:bold;font-size:17px" th:text="${ansValue1Ques46}">New York City</td>
+							</tr>
+							<tr>
+								<td width="281" >&nbsp;</td>
+							</tr>
+						</table>
+					</td>
+					<td width="32" bgcolor="#ffffff"></td>
+				</tr>
+			</table>
+			
+		</td>
+	</tr>
 
-			<div style="padding: 8px 10px;height:58px;text-align:center;border-bottom:1px solid #ccc;">
-				<div>Secondary Phone Number</div>
-				<div style="display:block;color:#4F7CA5;margin-top:15px;font-size:17px;font-weight:bolder;"> 9977884422</div>
-			</div>
 
-			<div style="padding: 8px 10px;height:58px;width:50%;float:left;border-right:1px solid #ccc;border-bottom:1px solid #ccc;text-align:center">
-				<div>Address</div>
-				<div style="display:block;color:#4F7CA5;margin-top:15px;font-size:17px;font-weight:bolder;" th:text="${ansValue1Ques45}"> 123, 4th Avenue</div>
-			</div>
-			<div style="padding: 8px 10px;height:58px;text-align:center;border-bottom:1px solid #ccc;">
-				<div>City</div>
-				<div style="display:block;color:#4F7CA5;margin-top:15px;font-size:17px;font-weight:bolder;" th:text="${ansValue1Ques46}"> New york City</div>
-			</div>
-			<div style="padding: 8px 10px;height:58px;width:50%;float:left;border-right:1px solid #ccc;border-bottom:1px solid #ccc;text-align:center">
-				<div>State</div>
-				<div style="display:block;color:#4F7CA5;margin-top:15px;font-size:17px;font-weight:bolder;" th:text="${ansValue1Ques47}"> NY</div>
-			</div>
-			<div style="padding: 8px 10px;height:58px;text-align:center;border-bottom:1px solid #ccc;">
-				<div>Zip Code</div>
-				<div style="display:block;color:#4F7CA5;margin-top:15px;font-size:17px;font-weight:bolder;" th:text="${ansValue1Ques48}"> 10005</div>
-			</div>
-			<div style="padding: 8px 10px;height:58px;width:50%;float:left;border-right:1px solid #ccc;border-bottom:1px solid #ccc;text-align:center">
-				<div>Email Address</div>
-				<div style="display:block;color:#4F7CA5;margin-top:15px;font-size:17px;font-weight:bolder;" th:text="${ansValue1Ques49}"> Jose.rubert@gmail.com</div>
-			</div>
-			<div style="padding: 8px 10px;height:58px;text-align:center;border-bottom:1px solid #ccc;">
-				<div>Hours of Use</div>
-				<div style="display:block;color:#4F7CA5;margin-top:15px;font-size:17px;font-weight:bolder;" th:text="${ansValue1Ques50}">110</div>
-			</div>
-			<div style="padding: 8px 10px;height:58px;width:50%;float:left;border-right:1px solid #ccc;border-bottom:1px solid #ccc;text-align:center">
-				<div>Serial Number</div>
-				<div style="display:block;color:#4F7CA5;margin-top:15px;font-size:17px;font-weight:bolder;" th:text="${ansValue1Ques51}"> 1234567</div>
-			</div>
-			<div style="padding: 8px 10px;height:58px;text-align:center;border-bottom:1px solid #ccc;">
-				<div>Date</div>
-				<div style="display:block;color:#4F7CA5;margin-top:15px;font-size:17px;font-weight:bolder;" th:text="${ansValue1Ques52}">02/23/2016</div>
-			</div>
-			<div  style="padding: 8px 10px;height:58px;text-align:center;width: 50%;border-right:1px solid #ccc;">
-				<div>Clinical Follow-up</div>
-				<div style="display:block;color:#4F7CA5;margin-top:15px;font-size:17px;font-weight:bolder;" th:text="${ansValue1Ques53}"> No</div>
-			</div>
-			<div style="clear:both"></div>
-		</div>
-			<div style="clear:both"></div>
-		<div style="margin-top:20px;margin-bottom:20px;text-align:right">
-		<a href="http://indoffshre01v.hillromvest.com/#/console/admin/survey-report" target="_blank" style="border:none;width:30%;padding:8px;color:#7BA4DA;font-size:14px;" th:href="@{|${baseUrl}/#/console/admin/survey-report|}">View Overall Statistics	</a>
-		</div>
-		<div style="margin: 40px 0px;">
-			<h4 style="font-size: 14px; margin-bottom: 0px;">Regards,</h4>
-			<p style="margin-top: 5px; font-size: 14px;">Your HILL-Rom Respiratory Care Team</p>
-		</div>
-		<div style="margin: 50px 0px;">
-			<p style="font-size: 12px;">*** PLEASE DO NOT REPLY TO THIS EMAIL, IF YOU NEED TO CONTACT HILL-ROM RESPIRATORY CARE, PLEASE CALL 800-426-4224
-			OR VISIT OUR WEBSITE AT HTTP://RESPIRATORYCARE.HILL-ROM.COM/.<br/>
-			ANY REPLIES TO THIS EMAIL WILL NOT BE RECEIVED BY HILL-ROM RESPIRATORY CARE.***
-			</p>
-		</div>
-	</div>
-	<div style="background-color: #7BA4DA;padding: 15px 0px;clear: left;display: inline-block;width: 100%; text-align: center;">
-		<ul style="padding:0px 0px; margin: 0px 0px;display: inline-block;">
-			<li style="margin-left:0px; list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; border-right: 1px solid #fff; padding-left: 15px; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/contactus" th:href="@{|${baseUrl}/#/contactus|}">Contact Us</a> </li>
-			<li style="margin-left:0px; list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; border-right: 1px solid #fff; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/privacyPolicy" th:href="@{|${baseUrl}/#/privacyPolicy|}">Privacy Policy</a></li>
-			<li style="margin-left:0px; list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; border-right: 1px solid #fff; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/termsOfUse" th:href="@{|${baseUrl}/#/termsOfUse|}">Terms of Use</a></li>
-			<li style="margin-left:0px; list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; border-right: 1px solid #fff; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/privacyPractices" th:href="@{|${baseUrl}/#/privacyPractices|}">HIPPA Notice of Privacy Practices</a></li>
-			<li style="margin-left:0px; list-style-type: none;float: left;padding: 0px 5px;"><a style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif; color: #fff; font-size: 10px; padding-right: 5px; font-weight: 500;" href="http://hillromvest.com/#/careSite" th:href="@{|${baseUrl}/#/careSite|}">Hill-Rom Respiratory Care</a></li>
-		</ul>
-		<p style="font-size: 10px; color: #fff;">Copyright Hill-Rom 2016. All Right Reserved.</p>
-	</div>
-</div>
+
+<tr style="background-color:#f1f1f1">
+		<td width="600" style="background-color:#f1f1f1">
+			<table style="background-color:#f1f1f1" width="600" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="19" bgcolor="#ffffff"></td>
+					<td width="281" style="border-bottom:1px solid #c1c1c1;background-color:#f1f1f1">
+						<table  width="281" border="0" cellpadding="0" cellspacing="0">
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281" align="center" style="color:#646568;font-size:14px;">State</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281"  align="center" style="color:#276092;font-weight:bold;font-size:17px" th:text="${ansValue1Ques47}">NY</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+						</table>
+						
+					</td>
+					<td style="border-right:1px solid #c1c1c1"></td>
+					<td width="265"  style="border-bottom:1px solid #c1c1c1">
+						<table  width="281" border="0" cellpadding="0" cellspacing="0">
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281" align="center" style="color:#646568;font-size:14px;">Zip Code</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281"  align="center" style="color:#276092;font-weight:bold;font-size:17px" th:text="${ansValue1Ques48}">10005</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+						</table>
+					</td>
+					<td width="32" bgcolor="#ffffff"></td>
+				</tr>
+			</table>
+			
+		</td>
+	</tr>
+
+	<tr style="background-color:#f1f1f1">
+		<td width="600" style="background-color:#f1f1f1">
+			<table style="background-color:#f1f1f1" width="600" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="19" bgcolor="#ffffff"></td>
+					<td width="281" style="border-bottom:1px solid #c1c1c1;background-color:#f1f1f1">
+						<table  width="281" border="0" cellpadding="0" cellspacing="0">
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281" align="center" style="color:#646568;font-size:14px;">Email Address</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281"  align="center" style="color:#276092;font-weight:bold;font-size:17px" th:text="${ansValue1Ques49}">jose.robert@gmail.com</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+						</table>
+						
+					</td>
+					<td style="border-right:1px solid #c1c1c1"></td>
+					<td width="265"  style="border-bottom:1px solid #c1c1c1">
+						<table  width="281" border="0" cellpadding="0" cellspacing="0">
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281" align="center" style="color:#646568;font-size:14px;">Hours of Use</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281"  align="center" style="color:#276092;font-weight:bold;font-size:17px" th:text="${ansValue1Ques50}">8.5</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+						</table>
+					</td>
+					<td width="32" bgcolor="#ffffff"></td>
+				</tr>
+			</table>
+			
+		</td>
+	</tr>
+
+	<tr style="background-color:#f1f1f1">
+		<td width="600" style="background-color:#f1f1f1">
+			<table style="background-color:#f1f1f1" width="600" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="19" bgcolor="#ffffff"></td>
+					<td width="281" style="border-bottom:1px solid #c1c1c1;background-color:#f1f1f1">
+						<table  width="281" border="0" cellpadding="0" cellspacing="0">
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281" align="center" style="color:#646568;font-size:14px;"  th:text="${ansValue1Ques51}">Serial Number</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281"  align="center" style="color:#276092;font-weight:bold;font-size:17px">11111</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+						</table>
+						
+					</td>
+					<td style="border-right:1px solid #c1c1c1"></td>
+					<td width="265"  style="border-bottom:1px solid #c1c1c1">
+						<table  width="281" border="0" cellpadding="0" cellspacing="0">
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281" align="center" style="color:#646568;font-size:14px;">Date</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281"  align="center" style="color:#276092;font-weight:bold;font-size:17px"  th:text="${ansValue1Ques52}">12/01/1985</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+						</table>
+					</td>
+					<td width="32" bgcolor="#ffffff"></td>
+				</tr>
+			</table>
+			
+		</td>
+	</tr>
+
+	<tr style="background-color:#f1f1f1">
+		<td width="600" style="background-color:#f1f1f1">
+			<table style="background-color:#f1f1f1" width="600" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="19" bgcolor="#ffffff"></td>
+					<td width="281" style="background-color:#f1f1f1">
+						<table  width="281" border="0" cellpadding="0" cellspacing="0">
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281" align="center" style="color:#646568;font-size:14px;">Clinical follow-up</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281"  align="center" style="color:#276092;font-weight:bold;font-size:17px"  th:text="${ansValue1Ques53}">Yes</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+						</table>
+						
+					</td>
+					<td style="border-right:1px solid #c1c1c1"></td>
+					<td width="265">
+						<table  width="281" border="0" cellpadding="0" cellspacing="0">
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281" align="center" style="color:#646568;font-size:14px;">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281"  align="center" style="color:#276092;font-weight:bold;font-size:17px">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="281">&nbsp;</td>
+							</tr>
+						</table>
+					</td>
+					<td width="32" bgcolor="#ffffff"></td>
+				</tr>
+			</table>
+			
+		</td>
+	</tr>
+	
+
+
+
+	<tr>
+		<td width="600" bgcolor="#ffffff">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="600">
+			<table  width="600" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="448" bgcolor="#ffffff">&nbsp;</td>
+					<td width="143">
+					<a th:href="@{|${baseUrl}/#/console/admin/survey-report|}" ><img th:src="@{|${baseUrl}/images/view-overall-statistics.png|}" width="133" alt="View Overall Statistics"></img></a></td>
+					<td width="9" bgcolor="#ffffff">&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td width="600" bgcolor="#ffffff">&nbsp;</td>
+	</tr>
+	<tr>
+		<td>
+			<table width="600" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td rowspan="2" width="18" bgcolor="#ffffff">&nbsp;</td>
+					<td width="227" style="color:#646568"><b>Regards,</b></td>
+					<td rowspan="2" width="355"  bgcolor="#ffffff">&nbsp;</td>
+				</tr>
+				<tr>
+					<td width="227" style="color:#646568;font-size:14px;"><i>Your HILL-Rom Respiratory Care Team</i></td>
+				</tr>
+			</table>
+		
+		</td>
+	</tr>
+	<tr>
+		<td width="600" bgcolor="#ffffff">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="600">
+			<table width="600" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="19" bgcolor="#ffffff">&nbsp;</td>
+					
+					<td width="537"  style="color:#646568;font-size:12px;">***PLEASE DO NOT REPLY TO THIS MAIL, IF YOU NEED TO CONTACT HILL-ROM RESPIRATORY CARE, PLEASE CALL 800-426-4224 OR VISIT OUR WEBSITE AT HTTP://RESPIRATORYCARE.HILL-ROM.COM/. ANY REPLIES TO THIS EMAIL WILL NOT BE RECEIVED BY HILL-ROM RESPIRATORY CARE***</td>
+					
+					<td width="44" bgcolor="#ffffff">&nbsp;</td>
+				</tr>
+			</table>
+	
+		</td>
+	</tr>
+	<tr>
+		<td width="600" bgcolor="#ffffff">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="600">
+			<table width="600" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="10" bgcolor="#ffffff">&nbsp;</td>
+					<td width="581">
+						<table width="581"  border="0" cellpadding="0" cellspacing="0">
+						<tr>
+							<td width="581" bgcolor="#7ca3dc">&nbsp;</td>
+						</tr>
+						<tr>
+							<td width="581">
+									<table width="581" border="0" cellpadding="0" bgcolor="#7ca3dc" cellspacing="0">
+									<tr>
+									<td width="5" bgcolor="#7ca3dc">&nbsp;</td>
+									<td width="57" style="font-size:12px;color:#fff" ><a style="color:#fff;font-size:11px;text-decoration:none" th:href="@{|${baseUrl}/#/contactus|}" href="http://hillromvest.com/#/contactus">Contact Us</a></td>
+									<td width="6" bgcolor="#7ca3dc">&nbsp;</td>
+									<td  style="border-right:1px solid #fff"></td>
+									<td width="6" bgcolor="#7ca3dc">&nbsp;</td>
+									
+									<td width="77" style="font-size:12px;color:#fff" th:href="@{|${baseUrl}/#/privacyPolicy|}"><a style="color:#fff;font-size:11px;text-decoration:none" href="http://hillromvest.com/#/privacyPolicy">Privacy Policy</a></td>
+									<td width="6" bgcolor="#7ca3dc">&nbsp;</td>
+									<td style="border-right:1px solid #fff"></td>
+									<td width="7" bgcolor="#7ca3dc">&nbsp;</td>
+									<td width="70" style="font-size:12px;color:#fff" th:href="@{|${baseUrl}/#/termsOfUse|}"><a style="color:#fff;font-size:11px;text-decoration:none" href="http://hillromvest.com/#/termsOfUse">Terms of Use</a></td>
+									
+									<td style="border-right:1px solid #fff"></td>
+									<td width="6" bgcolor="#7ca3dc">&nbsp;</td>
+									<td width="172" style="font-size:12px;color:#fff" th:href="@{|${baseUrl}/#/privacyPractices|}"><a style="color:#fff;font-size:11px;text-decoration:none" href="http://hillromvest.com/#/privacyPractices">HIPPA Notice of Privacy Practices</a></td>
+									
+									<td style="border-right:1px solid #fff"></td>
+									<td width="6" bgcolor="#7ca3dc">&nbsp;</td>
+									<td width="154" style="font-size:12px;color:#fff" th:href="@{|${baseUrl}/#/careSite|}"><a style="color:#fff;font-size:11px;text-decoration:none" href="http://hillromvest.com/#/careSite">Hill-Rom Respiratory Care Site</a></td>
+									</tr>
+									</table>
+						
+							</td>
+						</tr>
+						<tr>
+							<td width="581" bgcolor="#7ca3dc">&nbsp;</td>
+						</tr>
+						<tr>
+							<td align="center" bgcolor="#7ca3dc" style="color:#fff;font-size:12px;">Copyright &copy; Hill-rom 2016. All Rights Reserved.
+							</td>
+						</tr>
+						</table>
+					</td>
+					<td width="9" bgcolor="#ffffff">&nbsp;</td>
+				</tr>
+			</table>
+			</td>
+	</tr>
+
+</table>
 </body>
 </html>

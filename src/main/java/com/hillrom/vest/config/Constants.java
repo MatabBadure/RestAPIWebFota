@@ -213,10 +213,10 @@ public final class Constants {
 	public static final String AVERAGE_TREATMENTS_PER_DAY_LABEL = "Average Treatments Per Day";
 
 	// Bench Mark Parameter
-	public static final String BM_PARAM_SETTING_DEVIATION = "Setting Deviation";
-	public static final String BM_PARAM_HMR_DEVIATION = "HMR Deviation";
-	public static final String BM_PARAM_MISSED_THERAPY_DAYS = "Missed Therapy Days";
-	public static final String BM_PARAM_ADHERENCE_SCORE = "Adherence Score";
+	public static final String BM_PARAM_SETTING_DEVIATION = "SettingDeviation";
+	public static final String BM_PARAM_HMR_DEVIATION = "HMRDeviation";
+	public static final String BM_PARAM_MISSED_THERAPY_DAYS = "MissedTherapy";
+	public static final String BM_PARAM_ADHERENCE_SCORE = "AdherenceScore";
 
 	public static final String KEY_TOTAL_PATIENTS = "totalPatients";
 
@@ -224,5 +224,12 @@ public final class Constants {
 	public static final String DAY_STRING = "Day";
 	public static final String MONTH_STRING = "Month";
 	public static final String YEAR_STRING = "Year";
+	
+	public static final String BM_TYPE_AVERAGE = "Average";
+	public static final String BM_TYPE_MEDIAN = "Median";
+	public static final String BM_TYPE_PERCENTILE = "Percentile";
+	
+	public static final String AGE_GROUP = "AgeGroup";
+	public static final String CLINIC_SIZE = "clinicSize";
 
 }

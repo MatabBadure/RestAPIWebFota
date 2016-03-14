@@ -9,7 +9,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.hssf.util.HSSFColor.PALE_BLUE;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,7 @@ public class BenchmarkRepository {
 				+ "pi.zipcode,pi.city,pi.state, pc.last_therapy_session_date as lastTherapySessionDate, "
 				+ "AVG(pc.compliance_score) as avgCompScore, "
 				+ "AVG(pc.global_hmr_non_adherence_count) as avgNonAdherenceCount, "
-				+ "AVG(pc.global_settings_deviated_days_count)  as avgSettingsDeviatedCount, "
+				+ "AVG(pc.global_settings_deviated_count)  as avgSettingsDeviatedCount, "
 				+ "AVG(pc.global_missed_therapy_days_count)  as avgMissedTherapyDaysCount "
 				+ "FROM PATIENT_COMPLIANCE pc " + "left outer join USER u on u.id = pc.user_id "
 				+ "left outer join USER_PATIENT_ASSOC upa on u.id = upa.user_id "

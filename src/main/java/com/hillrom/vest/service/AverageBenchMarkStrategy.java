@@ -8,7 +8,7 @@ public class AverageBenchMarkStrategy implements BenchMarkStrategy{
 
 	@Override
 	public double calculateBenchMark(List<BigDecimal> data) {
-		if(Objects.nonNull(data) || data.isEmpty()){
+		if(Objects.isNull(data) || data.isEmpty()){
 			return 0;
 		}else{
 			double sum = data.stream().mapToDouble(BigDecimal :: doubleValue).sum();

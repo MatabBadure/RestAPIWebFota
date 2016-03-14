@@ -9,6 +9,8 @@ import static com.hillrom.vest.config.Constants.XAXIS_TYPE_CATEGORIES;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import com.hillrom.vest.service.util.GraphUtils;
 import com.hillrom.vest.web.rest.dto.BenchMarkDataVO;
 import com.hillrom.vest.web.rest.dto.BenchMarkFilter;
@@ -17,6 +19,7 @@ import com.hillrom.vest.web.rest.dto.Graph;
 import com.hillrom.vest.web.rest.dto.GraphDataVO;
 import com.hillrom.vest.web.rest.dto.Series;
 
+@Component("benchMarkGraphService")
 public class BenchMarkGraphService extends AbstractGraphService {
 
 	@Override
@@ -50,7 +53,7 @@ public class BenchMarkGraphService extends AbstractGraphService {
 		List<BenchMarkDataVO> benchMarkData = (List<BenchMarkDataVO>) data;
 		BenchMarkFilter benchMarkFilter = (BenchMarkFilter) filter;
 		Graph benchMarkGraph = GraphUtils.buildGraphObectWithXAxisType(XAXIS_TYPE_CATEGORIES);
-		Series series = GraphUtils.createSeriesObjectWithName(benchMarkFilter.getyAxisParameter());
+		Series series = GraphUtils.createSeriesObjectWithName(benchMarkFilter.getBenchMarkParameter());
 		for(BenchMarkDataVO benchMarkVO : benchMarkData){
 			benchMarkGraph.getxAxis().getCategories().add(benchMarkVO.getGroupLabel());
 			GraphDataVO graphData = new GraphDataVO();

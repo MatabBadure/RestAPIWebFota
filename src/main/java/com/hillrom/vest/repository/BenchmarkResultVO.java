@@ -1,6 +1,7 @@
 package com.hillrom.vest.repository;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 import org.joda.time.LocalDate;
 
@@ -130,7 +131,7 @@ public class BenchmarkResultVO{
 		this.cumulativeMissedTherapyDaysCount = cumilativeMissedTherapyDaysCount;
 	}
 	public Integer getClinicSize() {
-		return clinicSize;
+		return Objects.nonNull(clinicSize)? clinicSize : 0;
 	}
 	public void setClinicSize(Integer clinicSize) {
 		this.clinicSize = clinicSize;

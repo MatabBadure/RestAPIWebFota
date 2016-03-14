@@ -68,18 +68,20 @@ public class BenchmarkService {
 	public List<BenchMarkDataVO> getBenchmarkDataByAgeGroupOrClinicSize(BenchMarkFilter filter) {
 		List<BenchmarkResultVO> benchmarkVOs = new LinkedList<>();
 		Map<String, List<BenchmarkResultVO>> groupBenchMarkMap = new HashMap<>();
+		SortedMap<String,BenchMarkDataVO> defaultBenchMarkData = new TreeMap<>();
 		if(BM_TYPE_AVERAGE.equalsIgnoreCase(filter.getBenchMarkType()) || Objects.isNull(filter.getBenchMarkType())){
 			if(AGE_GROUP.equalsIgnoreCase(filter.getxAxisParameter())){
 				benchmarkVOs = benchmarkRepository.getAverageBenchmarkByAge(filter.getFrom(), filter.getTo(), filter.getCityCSV(), filter.getStateCSV());
 				groupBenchMarkMap = mapBenchMarkByAgeGroup(benchmarkVOs);
+				defaultBenchMarkData = prepareDefaultDataByAgeGroupOrClinicSize(filter.getRangeCSV(),null);
 			}
 			else{
 				benchmarkVOs = benchmarkRepository.getAverageBenchmarkByClinicSize(filter.getFrom(), filter.getTo(), filter.getCityCSV(), filter.getStateCSV());
 				groupBenchMarkMap = mapBenchMarkByClinicSize(benchmarkVOs);
+				defaultBenchMarkData = prepareDefaultDataByAgeGroupOrClinicSize(null,filter.getRangeCSV());
 			}
 		}
 		BenchMarkStrategy benchMarkStrategy = BenchMarkStrategyFactory.getBenchMarkStrategy(filter.getBenchMarkType());
-		SortedMap<String,BenchMarkDataVO> defaultBenchMarkData = prepareDefaultDataByAgeGroupOrClinicSize(filter.getRangeCSV(),null);
 		for(String ageRangeLabel : defaultBenchMarkData.keySet()){
 			List<BenchmarkResultVO> values = groupBenchMarkMap.get(ageRangeLabel);
 			if(Objects.nonNull(values)){

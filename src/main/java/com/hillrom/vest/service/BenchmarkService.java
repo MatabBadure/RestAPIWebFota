@@ -53,7 +53,7 @@ public class BenchmarkService {
 	
 	public List<BenchMarkDataVO> getBenchmarkVOGroupedByAge(String ageRangeCSV, LocalDate fromDate,
 			LocalDate toDate, String stateCSV, String cityCSV, String benchMarkType,String benchMarkParameter) {
-		List<BenchmarkResultVO> benchmarkVOs = benchmarkRepository.getAverageBenchmark(fromDate, toDate, cityCSV, stateCSV);
+		List<BenchmarkResultVO> benchmarkVOs = benchmarkRepository.getAverageBenchmarkByAge(fromDate, toDate, cityCSV, stateCSV);
 		Map<String, List<BenchmarkResultVO>> ageGroupBenchMarkMap = mapBenchMarkByAgeGroup(benchmarkVOs);
 		BenchMarkStrategy benchMarkStrategy = BenchMarkStrategyFactory.getBenchMarkStrategy(benchMarkType);
 		SortedMap<String,BenchMarkDataVO> defaultBenchMarkData = prepareDefaultDataByAgeGroupOrClinicSize(ageRangeCSV,null);
@@ -175,13 +175,17 @@ public class BenchmarkService {
 		}
 		return ageRangeBenchmarkVOMap;
 	}
+	
+	
+	
+	
 
-	private Map<String, List<BenchmarkResultVO>> getAgeRangedMap(String ageRangeCSV) {
+	/*private Map<String, List<BenchmarkResultVO>> getAgeRangedMap(String ageRangeCSV) {
 
 		Map<String, List<BenchmarkResultVO>> ageRangeBenchmarkVOMap = new HashMap<>();
 		String[] ageRangeArray = ageRangeCSV.split(",");
 		for (String ageRange : ageRangeArray)
 			ageRangeBenchmarkVOMap.put(ageRange, new ArrayList<BenchmarkResultVO>());
 		return ageRangeBenchmarkVOMap;
-	}
+	}*/
 }

@@ -46,3 +46,5 @@ spring:
         careGiverDashboardUrl: http://qaserver.hillromvest.com
         baseUrl: http://qaserver.hillromvest.com
         accountActivationReminderInterval: 12
+    survey:
+        surveyreportemailids: rohan.kushwaha@razorfish.com,rohangtr@gmail.com

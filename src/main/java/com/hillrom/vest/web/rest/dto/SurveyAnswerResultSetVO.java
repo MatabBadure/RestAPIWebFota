@@ -1,4 +1,4 @@
-package com.hillrom.vest.repository;
+package com.hillrom.vest.web.rest.dto;
 
 public class SurveyAnswerResultSetVO {
 	public SurveyAnswerResultSetVO(Long userId, Long questionId, String questionText, String answerValue, String answerValue2) {

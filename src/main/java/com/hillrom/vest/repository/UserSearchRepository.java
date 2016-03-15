@@ -42,6 +42,8 @@ import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.HCPClinicService;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
+import com.hillrom.vest.web.rest.dto.HcpVO;
+import com.hillrom.vest.web.rest.dto.HillRomUserVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 
 @Repository

@@ -24,10 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.domain.Survey;
 import com.hillrom.vest.exceptionhandler.HillromException;
-import com.hillrom.vest.repository.FiveDayViewVO;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.SurveyService;
 import com.hillrom.vest.util.MessageConstants;
+import com.hillrom.vest.web.rest.dto.FiveDayViewVO;
 import com.hillrom.vest.web.rest.dto.SurveyGraph;
 import com.hillrom.vest.web.rest.dto.SurveyVO;
 import com.hillrom.vest.web.rest.dto.UserSurveyAnswerDTO;

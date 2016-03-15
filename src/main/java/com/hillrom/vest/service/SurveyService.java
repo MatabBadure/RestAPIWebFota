@@ -25,23 +25,23 @@ import com.hillrom.vest.domain.SurveyQuestionAssoc;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserSurveyAnswer;
 import com.hillrom.vest.exceptionhandler.HillromException;
-import com.hillrom.vest.repository.FiveDaySurveyReportVO;
-import com.hillrom.vest.repository.FiveDayViewVO;
-import com.hillrom.vest.repository.NintyDaySurveyReportVO;
-import com.hillrom.vest.repository.SurveyAnswerResultSetVO;
 import com.hillrom.vest.repository.SurveyQuestionAssocRepository;
 import com.hillrom.vest.repository.SurveyQuestionRepository;
 import com.hillrom.vest.repository.SurveyRepository;
-import com.hillrom.vest.repository.ThirtyDaySurveyReportVO;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSurveyAnswerRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.web.rest.dto.Filter;
+import com.hillrom.vest.web.rest.dto.FiveDaySurveyReportVO;
+import com.hillrom.vest.web.rest.dto.FiveDayViewVO;
+import com.hillrom.vest.web.rest.dto.NintyDaySurveyReportVO;
+import com.hillrom.vest.web.rest.dto.SurveyAnswerResultSetVO;
 import com.hillrom.vest.web.rest.dto.SurveyGraph;
 import com.hillrom.vest.web.rest.dto.SurveyQuestionVO;
 import com.hillrom.vest.web.rest.dto.SurveyVO;
+import com.hillrom.vest.web.rest.dto.ThirtyDaySurveyReportVO;
 import com.hillrom.vest.web.rest.dto.UserSurveyAnswerDTO;
 
 @Service

@@ -1,8 +1,6 @@
-package com.hillrom.vest.repository;
+package com.hillrom.vest.web.rest.dto;
 
 import java.util.Objects;
-
-import com.hillrom.vest.web.rest.dto.SurveyReportVO;
 
 public class FiveDaySurveyReportVO extends SurveyReportVO{
 	

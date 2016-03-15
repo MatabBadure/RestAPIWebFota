@@ -1,4 +1,4 @@
-package com.hillrom.vest.repository;
+package com.hillrom.vest.web.rest.dto;
 
 import org.joda.time.DateTime;
 

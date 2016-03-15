@@ -8,6 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.hillrom.vest.domain.UserSurveyAnswer;
+import com.hillrom.vest.web.rest.dto.FiveDaySurveyReportVO;
+import com.hillrom.vest.web.rest.dto.SurveyAnswerResultSetVO;
+import com.hillrom.vest.web.rest.dto.ThirtyDaySurveyReportVO;
 
 /**
  * Spring Data JPA repository for the SurveyQuestion entity.

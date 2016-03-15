@@ -16,6 +16,14 @@ public class BenchMarkDataVO {
 		this.groupLabel = groupLabel;
 		this.patientCount = patientCount;
 	}
+	public BenchMarkDataVO(String groupLabel, int patientCount, double adherenceScoreBenchMark,
+			double hMRRunrateBenchMark, double settingDeviationBenchMark, double missedTherapyDaysBenchMark) {
+		this(groupLabel,patientCount);
+		this.adherenceScoreBenchMark = (int)adherenceScoreBenchMark;
+		this.hMRRunrateBenchMark = (int)hMRRunrateBenchMark;
+		this.settingDeviationBenchMark = (int)settingDeviationBenchMark;
+		this.missedTherapyDaysBenchMark = (int)missedTherapyDaysBenchMark;
+	}
 	public String getGroupLabel() {
 		return groupLabel;
 	}

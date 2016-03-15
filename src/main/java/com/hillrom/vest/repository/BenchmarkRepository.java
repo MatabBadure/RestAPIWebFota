@@ -79,4 +79,43 @@ public class BenchmarkRepository {
 		Query avgQuery = entityManager.createNativeQuery(avgQueryString.toString(), "avgBenchmarkByClinicSizeResultSetMapping");
 		return avgQuery.getResultList();
 	}
+	
+	public List<BenchmarkResultVO> getGroupedAverageBenchmarkByAge(LocalDate fromDate, LocalDate toDate, String cityCSV,
+			String stateCSV){
+		    StringBuffer avgGroupedQueryString = new StringBuffer(
+			"SELECT count(distinct(pc.patient_id)) as patientcount, "
+			+"if(TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) between 0 and 5 , '0-5', "
+			+"(if(TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) between 6 and 10 ,'6-10', "
+			+"(if(TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) between 11 and 15 ,'11-15', "
+			+"(if(TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) between 16 and 20 ,'16-20', "
+			+"(if(TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) between 21 and 25 ,'21-25', "
+			+"(if(TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) between 26 and 30 ,'26-30', "
+			+"(if(TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) between 31 and 35 ,'31-35', "
+			+"(if(TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) between 36 and 40 ,'36-40', "
+			+"(if(TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) between 41 and 45 ,'41-45', "
+			+"(if(TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) between 46 and 50 ,'46-50', "
+			+"(if(TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) between 51 and 55 ,'51-55', "
+			+"(if(TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) between 56 and 60 ,'56-60', "
+			+"(if(TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) between 61 and 65 ,'61-65', "
+			+"(if(TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) between 66 and 70 ,'66-70', "
+			+"(if(TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) between 71 and 75 ,'71-75', "
+			+"(if(TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) between 76 and 80 ,'76-80','81-above'))))))))))))))))))))))))))))))) "
+			+"AS agerange, AVG(pc.compliance_score) as avgCompScore "
+			+"AVG(pc.global_hmr_non_adherence_count) as avgNonAdherenceCount, "
+			+"AVG(pc.global_settings_deviated_count)  as avgSettingsDeviatedCount, "
+			+"AVG(pc.global_missed_therapy_days_count)  as avgMissedTherapyDaysCount "
+			+"FROM PATIENT_COMPLIANCE pc where (pc.date between '" + fromDate.toString() + "'  AND '" + toDate.toString() + "') "
+			+"left outer join USER u on u.id = pc.user_id "
+			+"left outer join USER_PATIENT_ASSOC upa on u.id = upa.user_id "
+			+"left outer join PATIENT_INFO pi on pi.id = upa.patient_id");
+			if(StringUtils.isEmpty(cityCSV)) 
+				avgGroupedQueryString.append(" and pi.city in ('" + cityCSV + "')");
+	        if (StringUtils.isNotEmpty(stateCSV))
+	        	avgGroupedQueryString.append(" and pi.state in ('" + stateCSV + "') ");
+	        avgGroupedQueryString.append("left outer join USER_AUTHORITY ua on ua.user_id = pc.user_id "
+	        		+ "and ua.authority_name = 'PATIENT' group by agerange");
+	        	
+			Query avgQuery = entityManager.createNativeQuery(avgGroupedQueryString.toString(), "avgGroupedBenchmarkByAgeResultSetMapping");
+			return avgQuery.getResultList();
+	}
 }

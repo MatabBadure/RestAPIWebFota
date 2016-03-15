@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
 import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 import com.hillrom.vest.repository.BenchmarkResultVO;
+import com.hillrom.vest.web.rest.dto.BenchMarkDataVO;
 
 @SqlResultSetMappings({
 @SqlResultSetMapping(name = "avgBenchmarkResultSetMapping", classes = @ConstructorResult(targetClass = BenchmarkResultVO.class, columns = {
@@ -52,7 +53,14 @@ import com.hillrom.vest.repository.BenchmarkResultVO;
 		@ColumnResult(name = "avgNonAdherenceCount", type = BigDecimal.class),
 		@ColumnResult(name = "avgSettingsDeviatedCount", type = BigDecimal.class),
 		@ColumnResult(name = "avgMissedTherapyDaysCount", type = BigDecimal.class),
-		@ColumnResult(name = "clinicSize", type = Integer.class)}))})
+		@ColumnResult(name = "clinicSize", type = Integer.class)})),
+@SqlResultSetMapping(name = "avgGroupedBenchmarkByAgeResultSetMapping", classes = @ConstructorResult(targetClass = BenchMarkDataVO.class, columns = {
+		@ColumnResult(name = "patientcount", type = Integer.class),
+		@ColumnResult(name = "agerange",type = String.class),
+		@ColumnResult(name = "avgCompScore",type = Double.class),
+		@ColumnResult(name = "avgNonAdherenceCount", type = Double.class),
+		@ColumnResult(name = "avgSettingsDeviatedCount",type = Double.class),
+		@ColumnResult(name = "avgMissedTherapyDaysCount",type = Double.class)}))})
 
 /*Long complianceId, String patientId, Long userId, Date dob, Integer age, String zipcode,
 String city, String state, Date lastTherapySessionDate, BigDecimal avgCompScore,

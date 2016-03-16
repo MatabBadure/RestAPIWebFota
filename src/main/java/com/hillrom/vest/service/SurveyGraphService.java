@@ -16,13 +16,13 @@ import java.util.Objects;
 import org.springframework.stereotype.Component;
 
 import com.hillrom.vest.config.Constants;
-import com.hillrom.vest.repository.FiveDaySurveyReportVO;
-import com.hillrom.vest.repository.ThirtyDaySurveyReportVO;
 import com.hillrom.vest.web.rest.dto.Filter;
+import com.hillrom.vest.web.rest.dto.FiveDaySurveyReportVO;
 import com.hillrom.vest.web.rest.dto.Graph;
 import com.hillrom.vest.web.rest.dto.GraphDataVO;
 import com.hillrom.vest.web.rest.dto.Series;
 import com.hillrom.vest.web.rest.dto.SurveyGraph;
+import com.hillrom.vest.web.rest.dto.ThirtyDaySurveyReportVO;
 import com.hillrom.vest.web.rest.dto.XaxisData;
 
 @Component("surveyGraphService")

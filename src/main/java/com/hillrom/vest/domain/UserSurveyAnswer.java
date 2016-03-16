@@ -22,9 +22,9 @@ import org.hibernate.envers.Audited;
 import org.joda.time.DateTime;
 
 import com.hillrom.vest.config.Constants;
-import com.hillrom.vest.repository.FiveDaySurveyReportVO;
-import com.hillrom.vest.repository.SurveyAnswerResultSetVO;
-import com.hillrom.vest.repository.ThirtyDaySurveyReportVO;
+import com.hillrom.vest.web.rest.dto.FiveDaySurveyReportVO;
+import com.hillrom.vest.web.rest.dto.SurveyAnswerResultSetVO;
+import com.hillrom.vest.web.rest.dto.ThirtyDaySurveyReportVO;
 
 @Entity
 @Audited

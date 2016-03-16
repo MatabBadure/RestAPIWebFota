@@ -6,6 +6,7 @@ import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATI
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
+import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserSurveyAnswer;
 import com.hillrom.vest.repository.UserRepository;
@@ -303,12 +305,13 @@ public class MailService {
 	
 	@Async
     public void sendSurveyEmailReport(UserSurveyAnswerDTO userSurveyAnswerDTO, String baseUrl) {
-		String recipients = env.getProperty("mail.surveyreportemailids");
+		String recipients = env.getProperty("spring.survey.surveyreportemailids");
 		log.debug("Sending Survey email report '{}'", recipients);
         Locale locale = Locale.getDefault();
         String content = null;
         Context context = new Context(Locale.getDefault());
         context.setVariable("baseUrl", baseUrl);
+        String subject;
         for(UserSurveyAnswer userSurveyAnswer:userSurveyAnswerDTO.getUserSurveyAnswer()){
         	if(Objects.nonNull(userSurveyAnswer.getAnswerValue1()))
         		context.setVariable("ansValue1Ques"+userSurveyAnswer.getSurveyQuestion().getId().toString(), 
@@ -319,14 +322,16 @@ public class MailService {
         	
         	context.setVariable("ansValue2Ques"+userSurveyAnswer.getSurveyQuestion().getId().toString(), userSurveyAnswer.getAnswerValue2());
         }
-        if(RandomUtil.FIVE_DAY_SURVEY_ID.equals(userSurveyAnswerDTO.getSurveyId()))
-        	content = templateEngine.process("fiveDaySurveyEmail", context);
-        else
-        	if(RandomUtil.THIRTY_DAY_SURVEY_ID.equals(userSurveyAnswerDTO.getSurveyId()))
-        		content = templateEngine.process("thirtyDaySurveyEmail", context);
-        	else
-        		content = templateEngine.process("nintyDaySurveyEmail", context);
-        String subject = messageSource.getMessage("email.survey.title", null, locale);
+		if (RandomUtil.FIVE_DAY_SURVEY_ID.equals(userSurveyAnswerDTO.getSurveyId())) {
+			content = templateEngine.process("fiveDaySurveyEmail", context);
+			subject = messageSource.getMessage("email.survey.title.fiveday", null, locale) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);
+		} else if (RandomUtil.THIRTY_DAY_SURVEY_ID.equals(userSurveyAnswerDTO.getSurveyId())) {
+			content = templateEngine.process("thirtyDaySurveyEmail", context);
+			subject = messageSource.getMessage("email.survey.title.thirtyday", null, locale) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);
+		} else {
+			content = templateEngine.process("nintyDaySurveyEmail", context);
+			subject = messageSource.getMessage("email.survey.title.nintyday", null, locale) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);
+		}
         
         if(Objects.nonNull(recipients))
         	sendSurveyEmailToAdmin(recipients.split(","), subject, content, false, true);

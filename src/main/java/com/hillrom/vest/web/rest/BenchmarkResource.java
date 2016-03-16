@@ -1,6 +1,12 @@
 package com.hillrom.vest.web.rest;
 
+import static com.hillrom.vest.config.Constants.KEY_BENCH_MARK_DATA;
+import static com.hillrom.vest.config.Constants.KEY_RANGE_LABELS;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
 
 import javax.inject.Inject;
 
@@ -46,8 +52,12 @@ public class BenchmarkResource {
     		@RequestParam(value="range",required=true)String range
     		){
 		BenchMarkFilter filter = new BenchMarkFilter(from, to, xAxisParameter, benchMarkType, benchMarkParameter,stateCSV,cityCSV,range);
-		List<BenchMarkDataVO> benchMarkData = benchmarkService.getBenchmarkDataByAgeGroupOrClinicSize(filter);
-		Graph benchMarkGraph = benchMarkGraphService.populateGraphData(benchMarkData, filter);
+		SortedMap<String,BenchMarkDataVO> benchMarkData = benchmarkService.getBenchmarkDataByAgeGroupOrClinicSize(filter);
+		List<String> rangeLabels =  benchmarkService.getRangeLabels(filter);
+		Map<String,Object> benchMarkDataMap = new HashMap<>(2);
+		benchMarkDataMap.put(KEY_BENCH_MARK_DATA, benchMarkData);
+		benchMarkDataMap.put(KEY_RANGE_LABELS, rangeLabels);
+		Graph benchMarkGraph = benchMarkGraphService.populateGraphData(benchMarkDataMap, filter);
 		return new ResponseEntity<>(benchMarkGraph,HttpStatus.OK);
 	}
 }

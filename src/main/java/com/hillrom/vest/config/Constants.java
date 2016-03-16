@@ -213,10 +213,10 @@ public final class Constants {
 	public static final String AVERAGE_TREATMENTS_PER_DAY_LABEL = "Average Treatments Per Day";
 
 	// Bench Mark Parameter
-	public static final String BM_PARAM_SETTING_DEVIATION = "SettingDeviation";
+	public static final String BM_PARAM_SETTING_DEVIATION = "settingDeviation";
 	public static final String BM_PARAM_HMR_DEVIATION = "HMRDeviation";
-	public static final String BM_PARAM_MISSED_THERAPY_DAYS = "MissedTherapy";
-	public static final String BM_PARAM_ADHERENCE_SCORE = "AdherenceScore";
+	public static final String BM_PARAM_MISSED_THERAPY_DAYS = "missedTherapy";
+	public static final String BM_PARAM_ADHERENCE_SCORE = "adherenceScore";
 
 	public static final String KEY_TOTAL_PATIENTS = "totalPatients";
 
@@ -232,4 +232,15 @@ public final class Constants {
 	public static final String AGE_GROUP = "AgeGroup";
 	public static final String CLINIC_SIZE = "clinicSize";
 
+	public static final String KEY_RANGE_LABELS = "rangeLabels";
+	public static final String KEY_BENCH_MARK_DATA = "benchMarkData";
+	
+	// BenchMark Axis Labels
+	public static final String BM_PARAM_SETTING_DEVIATION_LABEL = "Setting Deviation";
+	public static final String BM_PARAM_HMR_DEVIATION_LABEL = "HMR Deviation";
+	public static final String BM_PARAM_MISSED_THERAPY_DAYS_LABEL = "Missed Therapy";
+	public static final String BM_PARAM_ADHERENCE_SCORE_LABEL = "Adherence Score";
+
+	public static final String AGE_GROUP_LABEL = "Age Group";
+	public static final String CLINIC_SIZE_LABEL = "Clinic Size";
 }

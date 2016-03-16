@@ -1,7 +1,10 @@
 package com.hillrom.vest.service.util;
 
+import static com.hillrom.vest.config.Constants.DAY_STRING;
 import static com.hillrom.vest.config.Constants.MMddyyyy;
+import static com.hillrom.vest.config.Constants.MONTH_STRING;
 import static com.hillrom.vest.config.Constants.WEEK_SEPERATOR;
+import static com.hillrom.vest.config.Constants.YEAR_STRING;
 import static com.hillrom.vest.config.Constants.YYYY_MM_DD;
 
 import java.text.DateFormatSymbols;
@@ -16,6 +19,8 @@ import java.util.stream.Collectors;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -214,6 +219,26 @@ public class DateUtil {
 	public static String formatDate(DateTime dateTime, String pattern) {
 		DateTimeFormatter formatter = DateTimeFormat.forPattern(Objects.nonNull(pattern)?pattern:MMddyyyy);
 		return dateTime.toString(formatter);
+	}
+
+	/**
+	 * return formatted date string as per pattern, default pattern is dd-MMM-yy
+	 * @param dates
+	 * @return
+	 */
+	public static int getPeriodBetweenLocalDates(LocalDate from, LocalDate to,String period) {
+		if(Objects.isNull(from) || Objects.isNull(to))
+			return 0;
+		else{
+			Period timePeriod =  new Period(from,to,PeriodType.yearMonthDay());
+			if(Objects.isNull(period) || YEAR_STRING.equalsIgnoreCase(period))
+				return timePeriod.getYears();
+			else if(MONTH_STRING.equalsIgnoreCase(period))
+				return timePeriod.getMonths();
+			else if(DAY_STRING.equalsIgnoreCase(period))
+				return timePeriod.getDays();
+			return 0;	
+		}
 	}
 
 }

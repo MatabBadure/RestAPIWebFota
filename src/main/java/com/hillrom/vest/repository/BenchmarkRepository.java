@@ -79,4 +79,31 @@ public class BenchmarkRepository {
 		Query avgQuery = entityManager.createNativeQuery(avgQueryString.toString(), "avgBenchmarkByClinicSizeResultSetMapping");
 		return avgQuery.getResultList();
 	}
+	
+	public List<BenchmarkResultVO> getBenchmarkDataByAge(LocalDate fromDate, LocalDate toDate, String cityCSV,
+			String stateCSV, String orderByParam) {
+
+		StringBuffer avgQueryString = new StringBuffer("SELECT pc.id as complainceId,pc.patient_id as patId, "
+				+ "pc.user_id as userId,pi.dob as dob," + "TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) AS age, "
+				+ "pi.zipcode,pi.city,pi.state, pc.last_therapy_session_date as lastTherapySessionDate, "
+				+ "pc.compliance_score as avgCompScore, "
+				+ "pc.global_hmr_non_adherence_count as avgNonAdherenceCount, "
+				+ "pc.global_settings_deviated_count as avgSettingsDeviatedCount, "
+				+ "pc.global_missed_therapy_days_count as avgMissedTherapyDaysCount "
+				+ "FROM PATIENT_COMPLIANCE pc "
+				+ "left outer join USER u on u.id = pc.user_id "
+				+ "left outer join USER_PATIENT_ASSOC upa on u.id = upa.user_id "
+				+ "left outer join PATIENT_INFO pi on pi.id = upa.patient_id ");
+		if (StringUtils.isNotEmpty(cityCSV))
+			avgQueryString.append("and pi.city in ('" + cityCSV + "') ");
+		if (StringUtils.isNotEmpty(stateCSV))
+			avgQueryString.append("and pi.state in ('" + stateCSV + "') ");
+		
+		avgQueryString.append("left outer join USER_AUTHORITY ua on ua.user_id = pc.user_id " 
+				+ "and ua.authority_name = '"+PATIENT+"' where pc.date between '" + fromDate.toString() + "'  AND '" + toDate.toString() + "'  ");		
+		avgQueryString.append(ORDER_BY_CLAUSE_START + orderByParam);
+
+		Query avgQuery = entityManager.createNativeQuery(avgQueryString.toString(), "avgBenchmarkResultSetMapping");
+		return avgQuery.getResultList();
+	}
 }

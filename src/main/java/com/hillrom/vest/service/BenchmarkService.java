@@ -1,6 +1,7 @@
 package com.hillrom.vest.service;
 
 import static com.hillrom.vest.config.Constants.AGE_GROUP;
+import static com.hillrom.vest.config.Constants.CLINIC_SIZE;
 import static com.hillrom.vest.config.Constants.BM_PARAM_ADHERENCE_SCORE;
 import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_DEVIATION;
 import static com.hillrom.vest.config.Constants.BM_PARAM_MISSED_THERAPY_DAYS;
@@ -65,7 +66,7 @@ public class BenchmarkService {
 	@Inject
 	private BenchmarkRepository benchmarkRepository;
 	
-	public List<BenchMarkDataVO> getBenchmarkDataByAgeGroupOrClinicSize(BenchMarkFilter filter) {
+	public SortedMap<String,BenchMarkDataVO> getBenchmarkDataByAgeGroupOrClinicSize(BenchMarkFilter filter) {
 		List<BenchmarkResultVO> benchmarkVOs = new LinkedList<>();
 		Map<String, List<BenchmarkResultVO>> groupBenchMarkMap = new HashMap<>();
 		SortedMap<String,BenchMarkDataVO> defaultBenchMarkData = new TreeMap<>();
@@ -73,13 +74,12 @@ public class BenchmarkService {
 			if(AGE_GROUP.equalsIgnoreCase(filter.getxAxisParameter())){
 				benchmarkVOs = benchmarkRepository.getAverageBenchmarkByAge(filter.getFrom(), filter.getTo(), filter.getCityCSV(), filter.getStateCSV());
 				groupBenchMarkMap = mapBenchMarkByAgeGroup(benchmarkVOs);
-				defaultBenchMarkData = prepareDefaultDataByAgeGroupOrClinicSize(filter.getRangeCSV(),null);
 			}
 			else{
 				benchmarkVOs = benchmarkRepository.getAverageBenchmarkByClinicSize(filter.getFrom(), filter.getTo(), filter.getCityCSV(), filter.getStateCSV());
 				groupBenchMarkMap = mapBenchMarkByClinicSize(benchmarkVOs);
-				defaultBenchMarkData = prepareDefaultDataByAgeGroupOrClinicSize(null,filter.getRangeCSV());
 			}
+			defaultBenchMarkData = prepareDefaultDataByAgeGroupOrClinicSize(filter);
 		}
 		BenchMarkStrategy benchMarkStrategy = BenchMarkStrategyFactory.getBenchMarkStrategy(filter.getBenchMarkType());
 		for(String ageRangeLabel : defaultBenchMarkData.keySet()){
@@ -91,7 +91,7 @@ public class BenchmarkService {
 				defaultBenchMarkData.put(ageRangeLabel, benchMarkDataVO);
 			}
 		}
-		return new LinkedList<>(defaultBenchMarkData.values());
+		return defaultBenchMarkData;
 	}
 
 	private BenchMarkDataVO prepareBenchMarkData(String benchMarkParameter,
@@ -158,33 +158,39 @@ public class BenchmarkService {
 	}
 
 	private SortedMap<String, BenchMarkDataVO> prepareDefaultDataByAgeGroupOrClinicSize(
-			String ageRangeCSV, String clinicSizeCSV) {
+			BenchMarkFilter filter) {
 		SortedMap<String,BenchMarkDataVO> benchMarkData = new TreeMap<>();
-		List<String> rangeLabels = new LinkedList<>();  
-		if(Objects.nonNull(ageRangeCSV)){
-			if(ageRangeCSV.equalsIgnoreCase("All")){
+		List<String> rangeLabels = getRangeLabels(filter);
+		rangeLabels.forEach(label -> {
+			benchMarkData.put(label, new BenchMarkDataVO(label, 0));
+		});
+		return benchMarkData;
+	}
+
+	public List<String> getRangeLabels(BenchMarkFilter filter) {
+		List<String> rangeLabels = new LinkedList<>();
+		String parameter = filter.getxAxisParameter();
+		if(Objects.nonNull(parameter) && AGE_GROUP.equalsIgnoreCase(parameter)){
+			if(filter.getRangeCSV().equalsIgnoreCase("All")){
 				rangeLabels = Arrays.asList(AGE_RANGE_0_TO_5,AGE_RANGE_6_TO_10,AGE_RANGE_11_TO_15,
 						AGE_RANGE_16_TO_20,AGE_RANGE_21_TO_25,AGE_RANGE_26_TO_30,AGE_RANGE_31_TO_35,
 						AGE_RANGE_36_TO_40,AGE_RANGE_41_TO_45,AGE_RANGE_46_TO_50,AGE_RANGE_51_TO_55,
 						AGE_RANGE_56_TO_60,AGE_RANGE_61_TO_65,AGE_RANGE_66_TO_70,AGE_RANGE_71_TO_75,
 						AGE_RANGE_76_TO_80,AGE_RANGE_81_AND_ABOVE);
 			}else{
-				rangeLabels = Arrays.asList(ageRangeCSV.split(","));
+				rangeLabels = Arrays.asList(filter.getRangeCSV().split(","));
 			}
-		}else if(Objects.nonNull(clinicSizeCSV)){
-			if(clinicSizeCSV.equalsIgnoreCase("All")){
+		}else if(Objects.nonNull(parameter) && CLINIC_SIZE.equalsIgnoreCase(parameter)){
+			if(filter.getRangeCSV().equalsIgnoreCase("All")){
 				rangeLabels = Arrays.asList(CLINIC_SIZE_RANGE_1_TO_25,CLINIC_SIZE_RANGE_26_TO_50,
 					CLINIC_SIZE_RANGE_51_TO_75,CLINIC_SIZE_RANGE_76_TO_100,CLINIC_SIZE_RANGE_101_TO_150,
 					CLINIC_SIZE_RANGE_151_TO_200,CLINIC_SIZE_RANGE_201_TO_250,CLINIC_SIZE_RANGE_251_TO_300,
 					CLINIC_SIZE_RANGE_301_TO_350,CLINIC_SIZE_RANGE_351_TO_400,CLINIC_SIZE_RANGE_401_AND_ABOVE);
 			}else{
-				rangeLabels = Arrays.asList(clinicSizeCSV.split(","));
+				rangeLabels = Arrays.asList(filter.getRangeCSV().split(","));
 			}
 		}
-		rangeLabels.forEach(label -> {
-			benchMarkData.put(label, new BenchMarkDataVO(label, 0));
-		});
-		return benchMarkData;
+		return rangeLabels;
 	}
 
 	private Map<String, List<BenchmarkResultVO>> mapBenchMarkByAgeGroup(List<BenchmarkResultVO> benchmarkVOs) {

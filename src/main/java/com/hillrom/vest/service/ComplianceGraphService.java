@@ -66,6 +66,7 @@ public class ComplianceGraphService extends AbstractGraphService {
 	public Graph populateGraphDataForCustomDateRange(Object data, Filter filter) {
 		Map<String,Object> complianceData = (Map<String, Object>) data;
 		ProtocolConstants protocol = (ProtocolConstants) complianceData.get(KEY_PROTOCOL);
+		int minDuration = getMinDuration(protocol); 
 		List<TherapyDataVO> therapyData = (List<TherapyDataVO>) complianceData.get(KEY_THERAPY_DATA);
 		String[] seriesNames = new String[]{DURATION_LABEL,FREQUENCY_LABEL,PRESSURE_LABEL};
 		Graph complianceGraph = GraphUtils.buildGraphObectWithXAxisType(Constants.XAXIS_TYPE_DATETIME);
@@ -77,7 +78,7 @@ public class ComplianceGraphService extends AbstractGraphService {
 				GraphDataVO point = null;
 				if(DURATION_LABEL.equalsIgnoreCase(seriesName)){
 					point = new GraphDataVO(DateUtil.formatDate(therapy.getTimestamp(), MMddyyyyHHMM), therapy.getDuration());
-					series.getPlotLines().put(KEY_MIN, protocol.getMinDuration());
+					series.getPlotLines().put(KEY_MIN, minDuration);
 				}else if(FREQUENCY_LABEL.equalsIgnoreCase(seriesName)){
 					point = new GraphDataVO(DateUtil.formatDate(therapy.getTimestamp(), MMddyyyyHHMM), therapy.getFrequency());
 					series.getPlotLines().put(KEY_MIN, protocol.getMinFrequency());
@@ -94,6 +95,17 @@ public class ComplianceGraphService extends AbstractGraphService {
 			complianceGraph.getSeries().add(series);
 		}
 		return complianceGraph;
+	}
+
+	private int getMinDuration(ProtocolConstants protocol) {
+		int minDuration = 0;
+		if(Objects.nonNull(protocol)){
+			minDuration = Objects.nonNull(protocol.getMinDuration()) ? protocol
+					.getMinDuration()
+					: (protocol.getTreatmentsPerDay() * protocol
+							.getMinMinutesPerTreatment()); 
+		}
+		return minDuration;
 	}
 
 	private void populateToolTextValues(TherapyDataVO therapy, GraphDataVO point) {

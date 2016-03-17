@@ -1,6 +1,7 @@
 package com.hillrom.vest.domain;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import javax.persistence.Column;
 import javax.persistence.ColumnResult;
@@ -52,12 +53,8 @@ import com.hillrom.vest.repository.BenchmarkResultVO;
 		@ColumnResult(name = "avgNonAdherenceCount", type = BigDecimal.class),
 		@ColumnResult(name = "avgSettingsDeviatedCount", type = BigDecimal.class),
 		@ColumnResult(name = "avgMissedTherapyDaysCount", type = BigDecimal.class),
-		@ColumnResult(name = "clinicSize", type = Integer.class)}))})
+		@ColumnResult(name = "clinicsize", type = BigInteger.class)}))})
 
-/*Long complianceId, String patientId, Long userId, Date dob, Integer age, String zipcode,
-String city, String state, Date lastTherapySessionDate, BigDecimal avgCompScore,
-BigDecimal avgNonAdherenceCount, BigDecimal avgSettingsDeviatedCount,
-BigDecimal avgMissedTherapyDaysCount*/
 @Entity
 @Table(name="PATIENT_COMPLIANCE")
 public class PatientCompliance {

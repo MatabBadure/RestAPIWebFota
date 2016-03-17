@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.service.BenchmarkService;
 import com.hillrom.vest.service.GraphService;
+import com.hillrom.vest.service.util.BenchMarkUtil;
 import com.hillrom.vest.web.rest.dto.BenchMarkDataVO;
 import com.hillrom.vest.web.rest.dto.BenchMarkFilter;
 import com.hillrom.vest.web.rest.dto.Graph;
@@ -52,8 +53,8 @@ public class BenchmarkResource {
     		@RequestParam(value="range",required=true)String range
     		){
 		BenchMarkFilter filter = new BenchMarkFilter(from, to, xAxisParameter, benchMarkType, benchMarkParameter,stateCSV,cityCSV,range);
-		SortedMap<String,BenchMarkDataVO> benchMarkData = benchmarkService.getBenchmarkDataByAgeGroupOrClinicSize(filter);
-		List<String> rangeLabels =  benchmarkService.getRangeLabels(filter);
+		SortedMap<String,BenchMarkDataVO> benchMarkData = benchmarkService.getBenchmarkDataForAdminParameterView(filter);
+		List<String> rangeLabels =  BenchMarkUtil.getRangeLabels(filter);
 		Map<String,Object> benchMarkDataMap = new HashMap<>(2);
 		benchMarkDataMap.put(KEY_BENCH_MARK_DATA, benchMarkData);
 		benchMarkDataMap.put(KEY_RANGE_LABELS, rangeLabels);

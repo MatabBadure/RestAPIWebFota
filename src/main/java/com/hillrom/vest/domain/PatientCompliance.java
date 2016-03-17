@@ -39,7 +39,8 @@ import com.hillrom.vest.repository.BenchmarkResultVO;
 		@ColumnResult(name = "avgCompScore", type = BigDecimal.class),
 		@ColumnResult(name = "avgNonAdherenceCount", type = BigDecimal.class),
 		@ColumnResult(name = "avgSettingsDeviatedCount", type = BigDecimal.class),
-		@ColumnResult(name = "avgMissedTherapyDaysCount", type = BigDecimal.class)})),
+		@ColumnResult(name = "avgMissedTherapyDaysCount", type = BigDecimal.class),
+		@ColumnResult(name = "avgHMRRunrate", type = BigDecimal.class)})),
 @SqlResultSetMapping(name = "avgBenchmarkByClinicSizeResultSetMapping", classes = @ConstructorResult(targetClass = BenchmarkResultVO.class, columns = {
 		@ColumnResult(name = "complainceId", type = Long.class),
 		@ColumnResult(name = "patId",type = String.class),
@@ -53,6 +54,7 @@ import com.hillrom.vest.repository.BenchmarkResultVO;
 		@ColumnResult(name = "avgNonAdherenceCount", type = BigDecimal.class),
 		@ColumnResult(name = "avgSettingsDeviatedCount", type = BigDecimal.class),
 		@ColumnResult(name = "avgMissedTherapyDaysCount", type = BigDecimal.class),
+		@ColumnResult(name = "avgHMRRunrate", type = BigDecimal.class),
 		@ColumnResult(name = "clinicsize", type = BigInteger.class)}))})
 
 @Entity

@@ -1,12 +1,14 @@
 package com.hillrom.vest.service;
 
 import static com.hillrom.vest.config.Constants.BM_PARAM_ADHERENCE_SCORE;
-import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_DEVIATION;
-import static com.hillrom.vest.config.Constants.BM_PARAM_MISSED_THERAPY_DAYS;
-import static com.hillrom.vest.config.Constants.BM_PARAM_SETTING_DEVIATION;
 import static com.hillrom.vest.config.Constants.BM_PARAM_ADHERENCE_SCORE_LABEL;
+import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_DEVIATION;
 import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_DEVIATION_LABEL;
+import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_RUNRATE;
+import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_RUNRATE_LABEL;
+import static com.hillrom.vest.config.Constants.BM_PARAM_MISSED_THERAPY_DAYS;
 import static com.hillrom.vest.config.Constants.BM_PARAM_MISSED_THERAPY_DAYS_LABEL;
+import static com.hillrom.vest.config.Constants.BM_PARAM_SETTING_DEVIATION;
 import static com.hillrom.vest.config.Constants.BM_PARAM_SETTING_DEVIATION_LABEL;
 import static com.hillrom.vest.config.Constants.KEY_BENCH_MARK_DATA;
 import static com.hillrom.vest.config.Constants.KEY_RANGE_LABELS;
@@ -79,6 +81,8 @@ public class BenchMarkGraphService extends AbstractGraphService {
 				y = benchMarkVO.getSettingDeviationBenchMark();
 			}else if(BM_PARAM_MISSED_THERAPY_DAYS.equalsIgnoreCase(benchMarkFilter.getBenchMarkParameter())){
 				y = benchMarkVO.getMissedTherapyDaysBenchMark();
+			}else if(BM_PARAM_HMR_RUNRATE.equalsIgnoreCase(benchMarkFilter.getBenchMarkParameter())){
+				y = benchMarkVO.gethMRRunrateBenchMark();
 			}
 			graphData.setY(y);
 			graphData.getToolText().put(KEY_TOTAL_PATIENTS, benchMarkVO.getPatientCount());
@@ -94,6 +98,7 @@ public class BenchMarkGraphService extends AbstractGraphService {
 		seriesNameMap.put(BM_PARAM_SETTING_DEVIATION, BM_PARAM_SETTING_DEVIATION_LABEL);
 		seriesNameMap.put(BM_PARAM_HMR_DEVIATION, BM_PARAM_HMR_DEVIATION_LABEL);
 		seriesNameMap.put(BM_PARAM_MISSED_THERAPY_DAYS, BM_PARAM_MISSED_THERAPY_DAYS_LABEL);
+		seriesNameMap.put(BM_PARAM_HMR_RUNRATE, BM_PARAM_HMR_RUNRATE_LABEL);
 		return seriesNameMap.get(name);
 	}
 }

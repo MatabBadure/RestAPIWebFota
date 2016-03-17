@@ -23,12 +23,13 @@ public class BenchmarkResultVO{
 	private BigDecimal cumulativeNonAdherenceCount;
 	private BigDecimal cumulativeSettingsDeviatedCount;
 	private BigDecimal cumulativeMissedTherapyDaysCount;
+	private BigDecimal cumulativeHMRRunrate;
 
 	
 	public BenchmarkResultVO(Long complianceId, String patientId, Long userId, LocalDate dob, String zipcode,
 			String city, String state, LocalDate lastTherapySessionDate, BigDecimal cumulativeCompScore,
 			BigDecimal cumulativeNonAdherenceCount, BigDecimal cumulativeSettingsDeviatedCount,
-			BigDecimal cumulativeMissedTherapyDaysCount) {
+			BigDecimal cumulativeMissedTherapyDaysCount,BigDecimal cumulativeHMRRunrate) {
 		super();
 		this.complianceId = complianceId;
 		this.patientId = patientId;
@@ -42,14 +43,15 @@ public class BenchmarkResultVO{
 		this.cumulativeNonAdherenceCount = cumulativeNonAdherenceCount ;
 		this.cumulativeSettingsDeviatedCount = cumulativeSettingsDeviatedCount;
 		this.cumulativeMissedTherapyDaysCount = cumulativeMissedTherapyDaysCount;
+		this.cumulativeHMRRunrate = cumulativeHMRRunrate;
 	}
 	
 	public BenchmarkResultVO(Long complianceId, String patientId, Long userId, LocalDate dob, String zipcode,
 			String city, String state, LocalDate lastTherapySessionDate, BigDecimal cumulativeCompScore,
 			BigDecimal cumulativeNonAdherenceCount, BigDecimal cumulativeSettingsDeviatedCount,
-			BigDecimal cumulativeMissedTherapyDaysCount,BigInteger clinicSize) {
+			BigDecimal cumulativeMissedTherapyDaysCount,BigDecimal cumulativeHMRRunrate,BigInteger clinicSize) {
 		this(complianceId,patientId,userId,dob,zipcode,city,state,lastTherapySessionDate,cumulativeCompScore,
-				cumulativeNonAdherenceCount,cumulativeSettingsDeviatedCount,cumulativeMissedTherapyDaysCount);
+				cumulativeNonAdherenceCount,cumulativeSettingsDeviatedCount,cumulativeMissedTherapyDaysCount,cumulativeHMRRunrate);
 		this.clinicSize = Objects.nonNull(clinicSize) ? clinicSize.intValue() : 0;
 	}
 	
@@ -137,6 +139,15 @@ public class BenchmarkResultVO{
 	public void setClinicSize(Integer clinicSize) {
 		this.clinicSize = clinicSize;
 	}
+	
+	public BigDecimal getCumulativeHMRRunrate() {
+		return cumulativeHMRRunrate;
+	}
+
+	public void setCumulativeHMRRunrate(BigDecimal cumulativeHMRRunrate) {
+		this.cumulativeHMRRunrate = cumulativeHMRRunrate;
+	}
+
 	@Override
 	public String toString() {
 		return "BenchmarkVO [complianceId=" + complianceId + ", patientId=" + patientId + ", userId=" + userId

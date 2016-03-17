@@ -217,6 +217,7 @@ public final class Constants {
 	public static final String BM_PARAM_HMR_DEVIATION = "HMRDeviation";
 	public static final String BM_PARAM_MISSED_THERAPY_DAYS = "missedTherapy";
 	public static final String BM_PARAM_ADHERENCE_SCORE = "adherenceScore";
+	public static final String BM_PARAM_HMR_RUNRATE = "HMRRunrate";
 
 	public static final String KEY_TOTAL_PATIENTS = "totalPatients";
 
@@ -240,7 +241,41 @@ public final class Constants {
 	public static final String BM_PARAM_HMR_DEVIATION_LABEL = "HMR Deviation";
 	public static final String BM_PARAM_MISSED_THERAPY_DAYS_LABEL = "Missed Therapy";
 	public static final String BM_PARAM_ADHERENCE_SCORE_LABEL = "Adherence Score";
+	public static final String BM_PARAM_HMR_RUNRATE_LABEL = "HMR Runrate";
 
 	public static final String AGE_GROUP_LABEL = "Age Group";
 	public static final String CLINIC_SIZE_LABEL = "Clinic Size";
+	
+	// BenchMark Filter Constants
+	public static final String AGE_RANGE_0_TO_5 = "0-5";
+	public static final String AGE_RANGE_6_TO_10 = "6-10";
+	public static final String AGE_RANGE_11_TO_15 = "11-15";
+	public static final String AGE_RANGE_16_TO_20 = "16-20";
+	public static final String AGE_RANGE_21_TO_25 = "21-25";
+	public static final String AGE_RANGE_26_TO_30 = "26-30";
+	public static final String AGE_RANGE_31_TO_35 = "31-35";
+	public static final String AGE_RANGE_36_TO_40 = "36-40";
+	public static final String AGE_RANGE_41_TO_45 = "41-45";
+	public static final String AGE_RANGE_46_TO_50 = "46-50";
+	public static final String AGE_RANGE_51_TO_55 = "51-55";
+	public static final String AGE_RANGE_56_TO_60 = "56-60";
+	public static final String AGE_RANGE_61_TO_65 = "61-65";
+	public static final String AGE_RANGE_66_TO_70 = "66-70";
+	public static final String AGE_RANGE_71_TO_75 = "71-75";
+	public static final String AGE_RANGE_76_TO_80 = "76-80";
+	public static final String AGE_RANGE_81_AND_ABOVE = "81-above";
+
+	
+	public static final String CLINIC_SIZE_RANGE_1_TO_25 = "1-25";
+	public static final String CLINIC_SIZE_RANGE_26_TO_50 = "26-50";
+	public static final String CLINIC_SIZE_RANGE_51_TO_75 = "51-75";
+	public static final String CLINIC_SIZE_RANGE_76_TO_100 = "76-100";
+	public static final String CLINIC_SIZE_RANGE_101_TO_150 = "101-150";
+	public static final String CLINIC_SIZE_RANGE_151_TO_200 = "151-200";
+	public static final String CLINIC_SIZE_RANGE_201_TO_250 = "201-250";
+	public static final String CLINIC_SIZE_RANGE_251_TO_300 = "251-300";
+	public static final String CLINIC_SIZE_RANGE_301_TO_350 = "301-350";
+	public static final String CLINIC_SIZE_RANGE_351_TO_400 = "351-400";
+	public static final String CLINIC_SIZE_RANGE_401_AND_ABOVE = "401-above";
+
 }

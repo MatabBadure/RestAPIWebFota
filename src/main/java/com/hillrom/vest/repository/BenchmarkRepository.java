@@ -41,7 +41,8 @@ public class BenchmarkRepository {
 				+ "AVG(pc.global_hmr_non_adherence_count) as avgNonAdherenceCount, "
 				+ "AVG(pc.global_settings_deviated_count)  as avgSettingsDeviatedCount, "
 				+ "AVG(pc.global_missed_therapy_days_count)  as avgMissedTherapyDaysCount "
-				+ "FROM PATIENT_COMPLIANCE pc " + "left outer join USER u on u.id = pc.user_id "
+				+ "FROM PATIENT_COMPLIANCE pc " 
+				+ "join USER u on u.id = pc.user_id "
 				+ "join USER_PATIENT_ASSOC upa on u.id = upa.user_id "
 				+ "join PATIENT_INFO pi on pi.id = upa.patient_id ");
 		if (StringUtils.isNotEmpty(cityCSV))
@@ -67,7 +68,7 @@ public class BenchmarkRepository {
 				+"AVG(pc.global_hmr_non_adherence_count) as avgNonAdherenceCount,  "
 				+"AVG(pc.global_settings_deviated_count)  as avgSettingsDeviatedCount,  "
 				+"AVG(pc.global_missed_therapy_days_count)  as avgMissedTherapyDaysCount, clinic_size_table.clinicsize "
-				+"FROM PATIENT_COMPLIANCE pc   left outer join USER u on u.id = pc.user_id  "
+				+"FROM PATIENT_COMPLIANCE pc join USER u on u.id = pc.user_id  "
 				+"join USER_PATIENT_ASSOC upa on u.id = upa.user_id  "
 				+"join PATIENT_INFO pi on pi.id = upa.patient_id ");
 		        if(StringUtils.isNotEmpty(cityCSV)) 
@@ -77,11 +78,12 @@ public class BenchmarkRepository {
 		        
 		        avgQueryString.append("join CLINIC_PATIENT_ASSOC cpa on cpa.patient_id = pi.id "					
 				+"join CLINIC cl on cl.id = cpa.clinic_id "
-				+"join USER_AUTHORITY ua on ua.user_id = pc.user_id   and ua.authority_name = '"+PATIENT+"' "
+				+"join USER_AUTHORITY ua on ua.user_id = pc.user_id  and ua.authority_name = '"+PATIENT+"' "
 				+"left outer join (select clinic_id as clinicid, count(patient_id) as clinicsize	 "					
 				+"from CLINIC_PATIENT_ASSOC group by clinic_id) as clinic_size_table on						 "
 				+"clinic_size_table.clinicid = cl.id where pc.date between '" + fromDate.toString() + "'  AND '" + toDate.toString() + "'  ");
 		        avgQueryString.append("group by pc.patient_id;");
+		        System.out.println(avgQueryString);
 		Query avgQuery = entityManager.createNativeQuery(avgQueryString.toString(),"avgBenchmarkByClinicSizeResultSetMapping");
 		return avgQuery.getResultList();
 	}

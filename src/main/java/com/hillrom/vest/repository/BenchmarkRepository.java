@@ -78,7 +78,7 @@ public class BenchmarkRepository {
 		        avgQueryString.append("left outer join CLINIC_PATIENT_ASSOC cpa on cpa.patient_id = pi.id "					
 				+"left outer join CLINIC cl on cl.id = cpa.clinic_id "
 				+"left outer join USER_AUTHORITY ua on ua.user_id = pc.user_id   and ua.authority_name = '"+PATIENT+"' "
-				+"left outer join (select clinic_id as clinicid,group_concat(patient_id),count(patient_id) as clinicsize	 "					
+				+"left outer join (select clinic_id as clinicid, count(patient_id) as clinicsize	 "					
 				+"from CLINIC_PATIENT_ASSOC group by clinic_id) as clinic_size_table on						 "
 				+"clinic_size_table.clinicid = cl.id where pc.date between '" + fromDate.toString() + "'  AND '" + toDate.toString() + "'  ");
 		        avgQueryString.append("group by pc.patient_id;");

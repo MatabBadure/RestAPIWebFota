@@ -2,6 +2,10 @@ package com.hillrom.vest.repository;
 
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -9,10 +13,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+
+import com.hillrom.vest.web.rest.dto.HillRomUserVO;
 
 @Repository
 public class BenchmarkRepository {
@@ -59,11 +66,11 @@ public class BenchmarkRepository {
 				+"AVG(pc.compliance_score) as avgCompScore,  "
 				+"AVG(pc.global_hmr_non_adherence_count) as avgNonAdherenceCount,  "
 				+"AVG(pc.global_settings_deviated_count)  as avgSettingsDeviatedCount,  "
-				+"AVG(pc.global_missed_therapy_days_count)  as avgMissedTherapyDaysCount,clinic_size_table.clinicsize  "
+				+"AVG(pc.global_missed_therapy_days_count)  as avgMissedTherapyDaysCount, clinic_size_table.clinicsize "
 				+"FROM PATIENT_COMPLIANCE pc   left outer join USER u on u.id = pc.user_id  "
 				+"left outer join USER_PATIENT_ASSOC upa on u.id = upa.user_id  "
 				+"left outer join PATIENT_INFO pi on pi.id = upa.patient_id ");
-		        if(StringUtils.isEmpty(cityCSV)) 
+		        if(StringUtils.isNotEmpty(cityCSV)) 
 		        	avgQueryString.append("and pi.city in ('" + cityCSV + "')");
 		        if (StringUtils.isNotEmpty(stateCSV))
 					avgQueryString.append("and pi.state in ('" + stateCSV + "') ");
@@ -76,7 +83,7 @@ public class BenchmarkRepository {
 				+"clinic_size_table.clinicid = cl.id where pc.date between '" + fromDate.toString() + "'  AND '" + toDate.toString() + "'  ");
 		        avgQueryString.append("group by pc.patient_id;");
 
-		Query avgQuery = entityManager.createNativeQuery(avgQueryString.toString(), "avgBenchmarkByClinicSizeResultSetMapping");
+		Query avgQuery = entityManager.createNativeQuery(avgQueryString.toString(),"avgBenchmarkByClinicSizeResultSetMapping");
 		return avgQuery.getResultList();
 	}
 }

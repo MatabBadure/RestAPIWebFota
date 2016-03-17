@@ -1,6 +1,7 @@
 package com.hillrom.vest.repository;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Objects;
 
 import org.joda.time.LocalDate;
@@ -46,10 +47,10 @@ public class BenchmarkResultVO{
 	public BenchmarkResultVO(Long complianceId, String patientId, Long userId, LocalDate dob, String zipcode,
 			String city, String state, LocalDate lastTherapySessionDate, BigDecimal cumulativeCompScore,
 			BigDecimal cumulativeNonAdherenceCount, BigDecimal cumulativeSettingsDeviatedCount,
-			BigDecimal cumulativeMissedTherapyDaysCount,Integer clinicSize) {
+			BigDecimal cumulativeMissedTherapyDaysCount,BigInteger clinicSize) {
 		this(complianceId,patientId,userId,dob,zipcode,city,state,lastTherapySessionDate,cumulativeCompScore,
 				cumulativeNonAdherenceCount,cumulativeSettingsDeviatedCount,cumulativeMissedTherapyDaysCount);
-		this.clinicSize = clinicSize;
+		this.clinicSize = Objects.nonNull(clinicSize) ? clinicSize.intValue() : 0;
 	}
 	
 	public Long getComplianceId() {

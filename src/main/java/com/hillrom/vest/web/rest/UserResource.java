@@ -457,8 +457,7 @@ public class UserResource {
     @RequestMapping(value = "/patient/{id}/protocol",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES , AuthoritiesConstants.HCP , AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> updateProtocolToPatient(@PathVariable Long id, @RequestBody List<PatientProtocolData> ppdList) {
     	log.debug("REST request to update protocol with patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();

@@ -12,7 +12,8 @@ public class BenchMarkFilter extends Filter{
 	private String stateCSV;
 	private String cityCSV;
 	private String rangeCSV;
-	
+	private Long userId; 
+	private String clinicId;
 	
 	public BenchMarkFilter(LocalDate from,LocalDate to,
 			String xAxisParameter,String benchMarkType,
@@ -32,6 +33,17 @@ public class BenchMarkFilter extends Filter{
 		super(from,to,"",new LinkedList<>());
 		this.benchMarkType = benchMarkType;
 		this.benchMarkParameter = benchMarkParameter;
+	}
+	public BenchMarkFilter(LocalDate from,LocalDate to,
+			String range,String xAxisParameter,String benchMarkType,
+			String benchMarkParameter,Long userId, String clinicId) {
+		super(from,to,"",new LinkedList<>());
+		this.rangeCSV = range;
+		this.xAxisParameter = xAxisParameter;
+		this.benchMarkType = benchMarkType;
+		this.benchMarkParameter = benchMarkParameter;
+		this.userId = userId;
+		this.clinicId = clinicId;
 	}
 
 	public String getxAxisParameter() {
@@ -75,6 +87,18 @@ public class BenchMarkFilter extends Filter{
 
 	public void setRangeCSV(String rangeCSV) {
 		this.rangeCSV = rangeCSV;
+	}
+	public Long getUserId() {
+		return userId;
+	}
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+	public String getClinicId() {
+		return clinicId;
+	}
+	public void setClinicId(String clinicId) {
+		this.clinicId = clinicId;
 	}	
 	
 }

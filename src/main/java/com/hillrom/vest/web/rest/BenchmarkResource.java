@@ -22,12 +22,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.service.BenchmarkService;
 import com.hillrom.vest.service.GraphService;
 import com.hillrom.vest.service.util.BenchMarkUtil;
 import com.hillrom.vest.web.rest.dto.BenchMarkDataVO;
 import com.hillrom.vest.web.rest.dto.BenchMarkFilter;
 import com.hillrom.vest.web.rest.dto.Graph;
+
+import net.minidev.json.JSONObject;
+
 
 @RestController
 @RequestMapping("/api")
@@ -39,6 +43,10 @@ public class BenchmarkResource {
 	@Qualifier("benchMarkGraphService")
 	@Inject
 	private GraphService benchMarkGraphService;
+	
+	@Qualifier("benchMarkPatientGraphService")
+	@Inject
+	private GraphService benchmarkPatientGraphService;
 
 	@RequestMapping(value = "/benchmark/parameter",
             method = RequestMethod.GET,
@@ -61,27 +69,29 @@ public class BenchmarkResource {
 		Graph benchMarkGraph = benchMarkGraphService.populateGraphData(benchMarkDataMap, filter);
 		return new ResponseEntity<>(benchMarkGraph,HttpStatus.OK);
 	}
-	/*/api/user/patient/{id}/benchmark?
-	parameterType=adherenceScore/missedTherapy/settingDeviation/HMRRunrate/HMRNonAdherence/
-	&benchMarkType=average/median/percentile
-	&from=2016-03-16
-	&to=2016-03-18
-	&clinicId=<clinicId>*/
 	@RequestMapping(value = "/user/patient/{id}/benchmark", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getBenchMarkForClinicByAgeGroup(@PathVariable Long id,
 			@RequestParam(value = "from", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
 			@RequestParam(value = "to", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to,
 			@RequestParam(value = "benchmarkType", required = true) String benchMarkType,
 			@RequestParam(value = "parameterType", required = true) String parameterType,
-			@RequestParam(value = "clinicId", required = true) String clinicId) {
-		BenchMarkFilter filter = new BenchMarkFilter(from, to, benchMarkType, parameterType);
-		SortedMap<String, BenchMarkDataVO> benchMarkData = benchmarkService.getBenchmarkDataForClinicByAgeGroup(filter,
-				clinicId);
+			@RequestParam(value = "clinicId", required = true) String clinicId,
+			@RequestParam(value = "range",required=true)String range,
+			@RequestParam(value = "xAxisParameter",required=false)String xAxisParameter){
+		BenchMarkFilter filter = new BenchMarkFilter(from, to,range,xAxisParameter, benchMarkType, parameterType, id, clinicId);
+		Map<String, SortedMap<String, BenchMarkDataVO>> benchMarkData;
+		try {
+			benchMarkData = benchmarkService.getBenchmarkDataForClinicByAgeGroup(filter);
+		} catch (HillromException e) {
+			JSONObject errorMessage = new JSONObject();
+			errorMessage.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+		}
 		List<String> rangeLabels = BenchMarkUtil.getRangeLabels(filter);
 		Map<String, Object> benchMarkDataMap = new HashMap<>(2);
 		benchMarkDataMap.put(KEY_BENCH_MARK_DATA, benchMarkData);
 		benchMarkDataMap.put(KEY_RANGE_LABELS, rangeLabels);
-		Graph benchMarkGraph = benchMarkGraphService.populateGraphData(benchMarkDataMap, filter);
+		Graph benchMarkGraph = benchmarkPatientGraphService.populateGraphData(benchMarkDataMap, filter);
 		return new ResponseEntity<>(benchMarkGraph, HttpStatus.OK);
 	}
 

@@ -277,5 +277,11 @@ public final class Constants {
 	public static final String CLINIC_SIZE_RANGE_301_TO_350 = "301-350";
 	public static final String CLINIC_SIZE_RANGE_351_TO_400 = "351-400";
 	public static final String CLINIC_SIZE_RANGE_401_AND_ABOVE = "401-above";
+	
+	public static final String BENCHMARK_DATA_SELF = "self";
+	
+	public static final String BENCHMARK_DATA_CLINIC = "clinicLevel";
+	
+	public static final String RELATION_LABEL_SELF = "Self";
 
 }

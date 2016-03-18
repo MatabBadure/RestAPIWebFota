@@ -26,6 +26,13 @@ public class BenchMarkFilter extends Filter{
 		this.cityCSV = cityCSV;
 		this.rangeCSV = rangeCSV;
 	}
+	public BenchMarkFilter(LocalDate from,LocalDate to,
+			String benchMarkType,
+			String benchMarkParameter) {
+		super(from,to,"",new LinkedList<>());
+		this.benchMarkType = benchMarkType;
+		this.benchMarkParameter = benchMarkParameter;
+	}
 
 	public String getxAxisParameter() {
 		return xAxisParameter;

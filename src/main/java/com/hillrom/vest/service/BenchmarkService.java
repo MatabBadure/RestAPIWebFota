@@ -59,5 +59,29 @@ public class BenchmarkService {
 		}
 		return defaultBenchMarkData;
 	}
+	
+public SortedMap<String,BenchMarkDataVO> getBenchmarkDataForClinicByAgeGroup(BenchMarkFilter filter, String clinicId) {
+		
+		List<BenchmarkResultVO> benchmarkVOs = new LinkedList<>();
+		Map<String, List<BenchmarkResultVO>> groupBenchMarkMap = new HashMap<>();
+		SortedMap<String,BenchMarkDataVO> defaultBenchMarkData = new TreeMap<>();
+		if(BM_TYPE_AVERAGE.equalsIgnoreCase(filter.getBenchMarkType()) || Objects.isNull(filter.getBenchMarkType())){
+			benchmarkVOs = benchmarkRepository.getAverageBenchmarkForClinicByAgeGroup(filter.getFrom(),
+					filter.getTo(), filter.getCityCSV(), filter.getStateCSV(), clinicId);
+			groupBenchMarkMap = mapBenchMarkByAgeGroup(benchmarkVOs);
+			defaultBenchMarkData = prepareDefaultDataByAgeGroupOrClinicSize(filter);
+		}
+		BenchMarkStrategy benchMarkStrategy = BenchMarkStrategyFactory.getBenchMarkStrategy(filter.getBenchMarkType());
+		for(String ageRangeLabel : defaultBenchMarkData.keySet()){
+			List<BenchmarkResultVO> values = groupBenchMarkMap.get(ageRangeLabel);
+			if(Objects.nonNull(values)){
+				BenchMarkDataVO benchMarkDataVO = prepareBenchMarkData(
+						filter.getBenchMarkParameter(), benchMarkStrategy, ageRangeLabel,
+						values);
+				defaultBenchMarkData.put(ageRangeLabel, benchMarkDataVO);
+			}
+		}
+		return defaultBenchMarkData;
+	}
 
 }

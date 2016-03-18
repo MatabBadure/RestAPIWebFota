@@ -16,6 +16,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,8 +43,7 @@ public class BenchmarkResource {
 	@RequestMapping(value = "/benchmark/parameter",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getBenchMarkByAgeGroupOrClinicSize(
-			@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+	public ResponseEntity<?> getBenchMarkByAgeGroupOrClinicSize(@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
     		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
     		@RequestParam(value="type",required=true)String benchMarkParameter,
     		@RequestParam(value="benchmarkType",required=true)String benchMarkType,
@@ -61,4 +61,28 @@ public class BenchmarkResource {
 		Graph benchMarkGraph = benchMarkGraphService.populateGraphData(benchMarkDataMap, filter);
 		return new ResponseEntity<>(benchMarkGraph,HttpStatus.OK);
 	}
+	/*/api/user/patient/{id}/benchmark?
+	parameterType=adherenceScore/missedTherapy/settingDeviation/HMRRunrate/HMRNonAdherence/
+	&benchMarkType=average/median/percentile
+	&from=2016-03-16
+	&to=2016-03-18
+	&clinicId=<clinicId>*/
+	@RequestMapping(value = "/user/patient/{id}/benchmark", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getBenchMarkForClinicByAgeGroup(@PathVariable Long id,
+			@RequestParam(value = "from", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
+			@RequestParam(value = "to", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to,
+			@RequestParam(value = "benchmarkType", required = true) String benchMarkType,
+			@RequestParam(value = "parameterType", required = true) String parameterType,
+			@RequestParam(value = "clinicId", required = true) String clinicId) {
+		BenchMarkFilter filter = new BenchMarkFilter(from, to, benchMarkType, parameterType);
+		SortedMap<String, BenchMarkDataVO> benchMarkData = benchmarkService.getBenchmarkDataForClinicByAgeGroup(filter,
+				clinicId);
+		List<String> rangeLabels = BenchMarkUtil.getRangeLabels(filter);
+		Map<String, Object> benchMarkDataMap = new HashMap<>(2);
+		benchMarkDataMap.put(KEY_BENCH_MARK_DATA, benchMarkData);
+		benchMarkDataMap.put(KEY_RANGE_LABELS, rangeLabels);
+		Graph benchMarkGraph = benchMarkGraphService.populateGraphData(benchMarkDataMap, filter);
+		return new ResponseEntity<>(benchMarkGraph, HttpStatus.OK);
+	}
+
 }

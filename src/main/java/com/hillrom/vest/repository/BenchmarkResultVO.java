@@ -24,7 +24,7 @@ public class BenchmarkResultVO{
 	private BigDecimal cumulativeSettingsDeviatedCount;
 	private BigDecimal cumulativeMissedTherapyDaysCount;
 	private BigDecimal cumulativeHMRRunrate;
-
+	private String clinicName;
 	
 	public BenchmarkResultVO(Long complianceId, String patientId, Long userId, LocalDate dob, String zipcode,
 			String city, String state, LocalDate lastTherapySessionDate, BigDecimal cumulativeCompScore,
@@ -53,6 +53,14 @@ public class BenchmarkResultVO{
 		this(complianceId,patientId,userId,dob,zipcode,city,state,lastTherapySessionDate,cumulativeCompScore,
 				cumulativeNonAdherenceCount,cumulativeSettingsDeviatedCount,cumulativeMissedTherapyDaysCount,cumulativeHMRRunrate);
 		this.clinicSize = Objects.nonNull(clinicSize) ? clinicSize.intValue() : 0;
+	}
+	public BenchmarkResultVO(Long complianceId, String patientId, Long userId, LocalDate dob, String zipcode,
+			String city, String state, LocalDate lastTherapySessionDate, BigDecimal cumulativeCompScore,
+			BigDecimal cumulativeNonAdherenceCount, BigDecimal cumulativeSettingsDeviatedCount,
+			BigDecimal cumulativeMissedTherapyDaysCount, BigDecimal cumulativeHMRRunrate, String clinicName) {
+		this(complianceId,patientId,userId,dob,zipcode,city,state,lastTherapySessionDate,cumulativeCompScore,
+				cumulativeNonAdherenceCount,cumulativeSettingsDeviatedCount,cumulativeMissedTherapyDaysCount,cumulativeHMRRunrate);
+		this.clinicName = clinicName;
 	}
 	
 	public Long getComplianceId() {
@@ -148,6 +156,13 @@ public class BenchmarkResultVO{
 		this.cumulativeHMRRunrate = cumulativeHMRRunrate;
 	}
 
+	public String getClinicName() {
+		return clinicName;
+	}
+	public void setClinicName(String clinicName) {
+		this.clinicName = clinicName;
+	}
+	
 	@Override
 	public String toString() {
 		return "BenchmarkVO [complianceId=" + complianceId + ", patientId=" + patientId + ", userId=" + userId

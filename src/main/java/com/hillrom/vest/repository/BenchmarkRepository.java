@@ -34,7 +34,7 @@ public class BenchmarkRepository {
 	public List<BenchmarkResultVO> getAverageBenchmarkByAge(LocalDate fromDate, LocalDate toDate, String cityCSV,
 			String stateCSV) {
 
-		StringBuffer avgQueryString = new StringBuffer("SELECT pc.id as complainceId,pc.patient_id as patId, "
+		StringBuilder avgQueryString = new StringBuilder("SELECT pc.id as complainceId,pc.patient_id as patId, "
 				+ "pc.user_id as userId,pi.dob as dob," + "TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) AS age, "
 				+ "pi.zipcode,pi.city,pi.state, pc.last_therapy_session_date as lastTherapySessionDate, "
 				+ "AVG(pc.compliance_score) as avgCompScore, "
@@ -42,8 +42,8 @@ public class BenchmarkRepository {
 				+ "AVG(pc.global_settings_deviated_count)  as avgSettingsDeviatedCount, "
 				+ "AVG(pc.global_missed_therapy_days_count)  as avgMissedTherapyDaysCount "
 				+ "FROM PATIENT_COMPLIANCE pc " + "left outer join USER u on u.id = pc.user_id "
-				+ "left outer join USER_PATIENT_ASSOC upa on u.id = upa.user_id "
-				+ "left outer join PATIENT_INFO pi on pi.id = upa.patient_id ");
+				+ "join USER_PATIENT_ASSOC upa on u.id = upa.user_id "
+				+ "join PATIENT_INFO pi on pi.id = upa.patient_id ");
 		if (StringUtils.isNotEmpty(cityCSV))
 			avgQueryString.append("and pi.city in ('" + cityCSV + "') ");
 		if (StringUtils.isNotEmpty(stateCSV))
@@ -60,7 +60,7 @@ public class BenchmarkRepository {
 	public List<BenchmarkResultVO> getAverageBenchmarkByClinicSize(LocalDate fromDate, LocalDate toDate, String cityCSV,
 			String stateCSV) {
 
-		StringBuffer avgQueryString = new StringBuffer("SELECT pc.id as complainceId,pc.patient_id as patId," 
+		StringBuilder avgQueryString = new StringBuilder("SELECT pc.id as complainceId,pc.patient_id as patId," 
 				+"pc.user_id as userId,pi.dob as dob, " 
 				+"pi.zipcode,pi.city,pi.state, pc.last_therapy_session_date as lastTherapySessionDate, "
 				+"AVG(pc.compliance_score) as avgCompScore,  "
@@ -68,21 +68,20 @@ public class BenchmarkRepository {
 				+"AVG(pc.global_settings_deviated_count)  as avgSettingsDeviatedCount,  "
 				+"AVG(pc.global_missed_therapy_days_count)  as avgMissedTherapyDaysCount, clinic_size_table.clinicsize "
 				+"FROM PATIENT_COMPLIANCE pc   left outer join USER u on u.id = pc.user_id  "
-				+"left outer join USER_PATIENT_ASSOC upa on u.id = upa.user_id  "
-				+"left outer join PATIENT_INFO pi on pi.id = upa.patient_id ");
+				+"join USER_PATIENT_ASSOC upa on u.id = upa.user_id  "
+				+"join PATIENT_INFO pi on pi.id = upa.patient_id ");
 		        if(StringUtils.isNotEmpty(cityCSV)) 
 		        	avgQueryString.append("and pi.city in ('" + cityCSV + "')");
 		        if (StringUtils.isNotEmpty(stateCSV))
 					avgQueryString.append("and pi.state in ('" + stateCSV + "') ");
 		        
-		        avgQueryString.append("left outer join CLINIC_PATIENT_ASSOC cpa on cpa.patient_id = pi.id "					
-				+"left outer join CLINIC cl on cl.id = cpa.clinic_id "
-				+"left outer join USER_AUTHORITY ua on ua.user_id = pc.user_id   and ua.authority_name = '"+PATIENT+"' "
-				+"left outer join (select clinic_id as clinicid,group_concat(patient_id),count(patient_id) as clinicsize	 "					
+		        avgQueryString.append("join CLINIC_PATIENT_ASSOC cpa on cpa.patient_id = pi.id "					
+				+"join CLINIC cl on cl.id = cpa.clinic_id "
+				+"join USER_AUTHORITY ua on ua.user_id = pc.user_id   and ua.authority_name = '"+PATIENT+"' "
+				+"left outer join (select clinic_id as clinicid, count(patient_id) as clinicsize	 "					
 				+"from CLINIC_PATIENT_ASSOC group by clinic_id) as clinic_size_table on						 "
 				+"clinic_size_table.clinicid = cl.id where pc.date between '" + fromDate.toString() + "'  AND '" + toDate.toString() + "'  ");
 		        avgQueryString.append("group by pc.patient_id;");
-
 		Query avgQuery = entityManager.createNativeQuery(avgQueryString.toString(),"avgBenchmarkByClinicSizeResultSetMapping");
 		return avgQuery.getResultList();
 	}

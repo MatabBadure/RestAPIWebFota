@@ -6,6 +6,7 @@ import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATI
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -29,11 +30,15 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
+import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.User;
+import com.hillrom.vest.domain.UserSurveyAnswer;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.DateUtil;
+import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.PatientStatsVO;
+import com.hillrom.vest.web.rest.dto.UserSurveyAnswerDTO;
 
 /**
  * Service for sending e-mails.
@@ -239,8 +244,9 @@ public class MailService {
     
 	private void getUsersActivationReminderEmail(DateTime fromTime,DateTime toTime){
 	    List<User> users = userRepository.findAllByActivatedIsFalseAndActivationLinkSentDateBetweeen(fromTime, toTime);
-	    log.debug("No of users ", users);
 	    for(User user : users){
+	    	user.setActivationKey(RandomUtil.generateActivationKey());
+	    	userRepository.save(user);
 	    	sendActivationReminderEmail(user);
 	    }
 	}
@@ -295,5 +301,59 @@ public class MailService {
         String content = templateEngine.process("deactivationEmail", context);
         String subject = messageSource.getMessage("email.deactivation.title", null, locale);
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
+	
+	@Async
+    public void sendSurveyEmailReport(UserSurveyAnswerDTO userSurveyAnswerDTO, String baseUrl) {
+		String recipients = env.getProperty("spring.survey.surveyreportemailids");
+		log.debug("Sending Survey email report '{}'", recipients);
+        Locale locale = Locale.getDefault();
+        String content = null;
+        Context context = new Context(Locale.getDefault());
+        context.setVariable("baseUrl", baseUrl);
+        String subject;
+        for(UserSurveyAnswer userSurveyAnswer:userSurveyAnswerDTO.getUserSurveyAnswer()){
+        	if(Objects.nonNull(userSurveyAnswer.getAnswerValue1()))
+        		context.setVariable("ansValue1Ques"+userSurveyAnswer.getSurveyQuestion().getId().toString(), 
+        				userSurveyAnswer.getAnswerValue1().length()>27 ?
+        						userSurveyAnswer.getAnswerValue1().substring(0, 27)+"..." : userSurveyAnswer.getAnswerValue1());
+        	else 
+        		context.setVariable("ansValue1Ques"+userSurveyAnswer.getSurveyQuestion().getId().toString(),userSurveyAnswer.getAnswerValue1());
+        	
+        	context.setVariable("ansValue2Ques"+userSurveyAnswer.getSurveyQuestion().getId().toString(), userSurveyAnswer.getAnswerValue2());
+        }
+		if (RandomUtil.FIVE_DAY_SURVEY_ID.equals(userSurveyAnswerDTO.getSurveyId())) {
+			content = templateEngine.process("fiveDaySurveyEmail", context);
+			subject = messageSource.getMessage("email.survey.title.fiveday", null, locale) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);
+		} else if (RandomUtil.THIRTY_DAY_SURVEY_ID.equals(userSurveyAnswerDTO.getSurveyId())) {
+			content = templateEngine.process("thirtyDaySurveyEmail", context);
+			subject = messageSource.getMessage("email.survey.title.thirtyday", null, locale) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);
+		} else {
+			content = templateEngine.process("nintyDaySurveyEmail", context);
+			subject = messageSource.getMessage("email.survey.title.nintyday", null, locale) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);
+		}
+        
+        if(Objects.nonNull(recipients))
+        	sendSurveyEmailToAdmin(recipients.split(","), subject, content, false, true);
+    }
+	
+	@Async
+    public void sendSurveyEmailToAdmin(String[] to, String subject, String content, boolean isMultipart, boolean isHtml) {
+        log.debug("Send e-mail[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
+                isMultipart, isHtml, to, subject, content);
+
+        // Prepare message using a Spring helper
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, CharEncoding.UTF_8);
+            message.setTo(to);
+            message.setFrom(from);
+            message.setSubject(subject);
+            message.setText(content, isHtml);
+            javaMailSender.send(mimeMessage);
+            log.debug("Sent e-mail to User '{}'", to.toString());
+        } catch (Exception e) {
+            log.warn("E-mail could not be sent to user '{}', exception is: {}", to, e.getMessage());
+        }
     }
 }

@@ -1193,8 +1193,10 @@ public class UserService {
 		if(null == user)
 			return Optional.empty();
 		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
+		PatientCompliance compliance = complianceService.findLatestComplianceByPatientUserId(id);
 		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patientInfo.getId());
 		PatientUserVO patientUserVO =  new PatientUserVO(user,patientInfo);
+		patientUserVO.setHoursOfUsage((compliance.getHmr()/(60*60)));
 		String mrnId;
 		java.util.Iterator<ClinicPatientAssoc> cpaIterator = clinicPatientAssocList.iterator();
 		while(cpaIterator.hasNext()){
@@ -1705,7 +1707,7 @@ public class UserService {
 					|| SecurityContextHolder.getContext().getAuthentication().getAuthorities()
 							.contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))) {
 				if (existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
-					if (Objects.isNull(existingUser.getLastLoggedInAt())) {
+					if (Objects.nonNull(existingUser.getLastLoggedInAt()) & !existingUser.getActivated()) {
 						if (Objects.nonNull(existingUser.getEmail())) {
 							reSendEmailNotification(baseUrl, existingUser);
 							jsonObject.put("message", MessageConstants.HR_305);

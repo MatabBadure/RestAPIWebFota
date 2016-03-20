@@ -34,8 +34,6 @@ import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
-import com.hillrom.vest.repository.HcpVO;
-import com.hillrom.vest.repository.HillRomUserVO;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
@@ -51,6 +49,8 @@ import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.CareGiverVO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.dto.HcpClinicsVO;
+import com.hillrom.vest.web.rest.dto.HcpVO;
+import com.hillrom.vest.web.rest.dto.HillRomUserVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
@@ -243,7 +243,7 @@ public class UserExtensionResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    public ResponseEntity<List<HillRomUserVO>> search(@RequestParam(required=true,value = "searchString")String searchString,
+    public ResponseEntity<?> search(@RequestParam(required=true,value = "searchString")String searchString,
     		@RequestParam(required=false, value = "filter")String filter,
     		@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
@@ -259,7 +259,15 @@ public class UserExtensionResource {
     		isAscending =  (isAscending != null)?  isAscending : true;
     		sortOrder.put(sortBy, isAscending);
     	}
-    	Page<HillRomUserVO> page = userSearchRepository.findHillRomTeamUsersBy(queryString,filter,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+    	Page<HillRomUserVO> page;
+    	
+		try {
+			page = userSearchRepository.findHillRomTeamUsersBy(queryString,filter,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+		} catch (HillromException e) {
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/user/search", offset, limit);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

@@ -1,6 +1,7 @@
 package com.hillrom.vest.security;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.service.UserService;
 
 /**
  * Authenticate a user from the database.
@@ -29,6 +31,9 @@ public class UserDetailsService implements org.springframework.security.core.use
     @Inject
     private UserRepository userRepository;
 
+    @Inject
+    private UserService userService;
+    
     @Override
     @Transactional
     public UserDetails loadUserByUsername(final String email) {
@@ -42,8 +47,17 @@ public class UserDetailsService implements org.springframework.security.core.use
             List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
                     .map(authority -> new SimpleGrantedAuthority(authority.getName()))
                     .collect(Collectors.toList());
+            String password = user.getPassword();
+            // handle NULL password for user created from Data Transmission / JDE script
+            if(Objects.isNull(password)){
+            	try{
+            		password = userService.generateDefaultPassword(user);
+            	}catch(Exception e){// Exception indicates that mandatory fields are not present
+            		throw new UsernameNotFoundException("User " + lowercaseEmail + " was not found in the database");
+            	}
+            }
             return new org.springframework.security.core.userdetails.User(lowercaseEmail,
-                    user.getPassword(),
+                    password,
                     grantedAuthorities);
         }).orElseThrow(() -> new UsernameNotFoundException("User " + lowercaseEmail + " was not found in the database"));
     }

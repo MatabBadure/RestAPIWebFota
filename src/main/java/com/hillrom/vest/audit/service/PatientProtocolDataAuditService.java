@@ -62,26 +62,18 @@ public class PatientProtocolDataAuditService extends AuditableService<PatientPro
 			ProtocolRevisionVO revision = protocolRevMap.get(lastModifiedDate);
 			List<PatientProtocolData> protocolData = protocolsMap.get(lastModifiedDate);
 			boolean isDeleted = protocolData.get(protocolData.size()-1).isDeleted();
-			DateTime createdDate = protocolData.get(protocolData.size()-1).getCreatedDate(); 
-			SortedMap<DateTime, ProtocolRevisionVO> revisionHeadMap = protocolRevMap.headMap(createdDate);
-			if(Objects.nonNull(revisionHeadMap)&& revisionHeadMap.size() > 0){
-				createdDate = revisionHeadMap.get(revisionHeadMap.lastKey()).getTo();
-			}
+			DateTime revisionCreatedDate = protocolData.get(protocolData.size()-1).getLastModifiedDate(); 
 			if(Objects.isNull(revision)){
-				revision = new ProtocolRevisionVO(createdDate,lastModifiedDate);
+				revision = new ProtocolRevisionVO(revisionCreatedDate,null);
 			}
 			for(PatientProtocolData protocol : protocolData){
 				revision.addProtocol(ProtocolDataVOBuilder.convertProtocolDataToVO(protocol));
 			}
+			updateLatestRevision(protocolRevMap, lastModifiedDate);
 			if(isDeleted){
-				updateLatestRevision(protocolRevMap, lastModifiedDate);
-				ProtocolRevisionVO nextRevision = new ProtocolRevisionVO(createdDate, null);
+				ProtocolRevisionVO nextRevision = new ProtocolRevisionVO(revisionCreatedDate, null);
 				nextRevision.addProtocol(ProtocolDataVOBuilder.convertProtocolConstantsToVO(defaultProtocol));
-				protocolRevMap.put(createdDate.plusSeconds(1),nextRevision);
-			}
-			if(Objects.isNull(createdDate)){
-				updateLatestRevision(protocolRevMap, lastModifiedDate);
-				revision.setFrom(lastModifiedDate);
+				protocolRevMap.put(revisionCreatedDate.plusSeconds(1),nextRevision);
 			}
 			protocolRevMap.put(revision.getFrom(),revision);
 		}

@@ -141,30 +141,41 @@ public class PatientComplianceService {
 		// if no revisions found,create a dummy revision with isValid = false
 		if(revisionData.isEmpty()){
 			ProtocolRevisionVO revisionVO = new ProtocolRevisionVO(lastCompliance.getPatientUser().getCreatedDate(),null);
-			revisionData.put(therapySession.getPatientUser().getCreatedDate().minusSeconds(1), revisionVO);
+			revisionData.put(lastCompliance.getPatientUser().getCreatedDate().minusSeconds(1), revisionVO);
 		}else{
 			ProtocolRevisionVO revisionVO = new ProtocolRevisionVO(lastCompliance.getPatientUser().getCreatedDate(),revisionData.firstKey());
-			revisionData.put(therapySession.getPatientUser().getCreatedDate().minusSeconds(1), revisionVO);
+			revisionData.put(lastCompliance.getPatientUser().getCreatedDate().minusSeconds(1), revisionVO);
 		}
 
-		List<AdherenceTrendVO> adherenceTrends = new LinkedList<>();
 		for(LocalDate date: actualMapRequested.keySet()){
 			AdherenceTrendVO trendVO = new AdherenceTrendVO();
 			PatientCompliance compliance = complianceMap.get(date);
 			trendVO.setDate(date);
 			trendVO.setUpdatedScore(compliance.getScore());
 			setNotificationPointsMap(complianceMap,notificationsMap,date,trendVO);
-			
-			DateTime processedTime = Objects.nonNull(compliance.getLastModifiedDate()) ? compliance.getLastModifiedDate() : compliance.getDate().toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59);
-			SortedMap<DateTime,ProtocolRevisionVO> recentRevisionMap = revisionData.headMap(processedTime);
-			DateTime dt =  recentRevisionMap.lastKey();
-			ProtocolRevisionVO revisionVO = recentRevisionMap.get(dt);
+			// Get datetime when compliance was processed
+			ProtocolRevisionVO revisionVO = getProtocolRevisionByCompliance(
+					revisionData, compliance);
 			revisionVO.addAdherenceTrend(trendVO);
-			
-			adherenceTrends.add(trendVO);
 		}
 		List<ProtocolRevisionVO> revisions = revisionData.values().stream().filter(rev -> rev.getAdherenceTrends().size() > 0).collect(Collectors.toList());
 		return revisions;
+	}
+
+	private ProtocolRevisionVO getProtocolRevisionByCompliance(
+			SortedMap<DateTime, ProtocolRevisionVO> revisionData,
+			PatientCompliance compliance) {
+		DateTime processedTime = Objects.nonNull(compliance.getLastModifiedDate()) ? compliance.getLastModifiedDate() : compliance.getDate().toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59);
+		// Get the recent protocol revisions before the processed time of compliance
+		SortedMap<DateTime,ProtocolRevisionVO> recentRevisionMap = revisionData.headMap(processedTime);
+		ProtocolRevisionVO revisionVO = null;
+		// if there is revision use the revision else use the default revision
+		if(Objects.nonNull(recentRevisionMap) && recentRevisionMap.size() > 0){
+			revisionVO = recentRevisionMap.get(recentRevisionMap.lastKey());
+		}else{
+			revisionVO = revisionData.get(revisionData.firstKey());
+		}
+		return revisionVO;
 	}
 	
 	private void setNotificationPointsMap(

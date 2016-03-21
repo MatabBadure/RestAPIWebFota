@@ -10,6 +10,8 @@ import java.util.SortedMap;
 
 import javax.inject.Inject;
 
+import net.minidev.json.JSONObject;
+
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -29,8 +31,6 @@ import com.hillrom.vest.service.util.BenchMarkUtil;
 import com.hillrom.vest.web.rest.dto.BenchMarkDataVO;
 import com.hillrom.vest.web.rest.dto.BenchMarkFilter;
 import com.hillrom.vest.web.rest.dto.Graph;
-
-import net.minidev.json.JSONObject;
 
 
 @RestController
@@ -61,13 +61,18 @@ public class BenchmarkResource {
     		@RequestParam(value="range",required=true)String range
     		){
 		BenchMarkFilter filter = new BenchMarkFilter(from, to, xAxisParameter, benchMarkType, benchMarkParameter,stateCSV,cityCSV,range);
-		SortedMap<String,BenchMarkDataVO> benchMarkData = benchmarkService.getBenchmarkDataForAdminParameterView(filter);
-		List<String> rangeLabels =  BenchMarkUtil.getRangeLabels(filter);
-		Map<String,Object> benchMarkDataMap = new HashMap<>(2);
-		benchMarkDataMap.put(KEY_BENCH_MARK_DATA, benchMarkData);
-		benchMarkDataMap.put(KEY_RANGE_LABELS, rangeLabels);
-		Graph benchMarkGraph = benchMarkGraphService.populateGraphData(benchMarkDataMap, filter);
-		return new ResponseEntity<>(benchMarkGraph,HttpStatus.OK);
+		try {
+			return new ResponseEntity<>(benchmarkService.getBenchMarkGraphForAdminParameterView(filter),HttpStatus.OK);
+		} catch (HillromException e) {
+			JSONObject errorMessage = new JSONObject();
+			errorMessage.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		} catch (Exception e){
+			JSONObject errorMessage = new JSONObject();
+			errorMessage.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
 	}
 	@RequestMapping(value = "/user/patient/{id}/benchmark", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getBenchMarkForClinicByAgeGroup(@PathVariable Long id,
@@ -81,18 +86,16 @@ public class BenchmarkResource {
 		BenchMarkFilter filter = new BenchMarkFilter(from, to,range,xAxisParameter, benchMarkType, parameterType, id, clinicId);
 		Map<String, SortedMap<String, BenchMarkDataVO>> benchMarkData;
 		try {
-			benchMarkData = benchmarkService.getBenchmarkDataForClinicByAgeGroup(filter);
+			return new ResponseEntity<>(benchmarkService.getBenchMarkDataForPatientView(filter), HttpStatus.OK);
 		} catch (HillromException e) {
 			JSONObject errorMessage = new JSONObject();
 			errorMessage.put("ERROR", e.getMessage());
 			return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+		} catch (Exception e){
+			JSONObject errorMessage = new JSONObject();
+			errorMessage.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		List<String> rangeLabels = BenchMarkUtil.getRangeLabels(filter);
-		Map<String, Object> benchMarkDataMap = new HashMap<>(2);
-		benchMarkDataMap.put(KEY_BENCH_MARK_DATA, benchMarkData);
-		benchMarkDataMap.put(KEY_RANGE_LABELS, rangeLabels);
-		Graph benchMarkGraph = benchmarkPatientGraphService.populateGraphData(benchMarkDataMap, filter);
-		return new ResponseEntity<>(benchMarkGraph, HttpStatus.OK);
 	}
 
 }

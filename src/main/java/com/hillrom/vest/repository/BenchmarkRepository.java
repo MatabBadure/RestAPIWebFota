@@ -13,6 +13,8 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.LocalDate;
 import org.springframework.stereotype.Repository;
 
+import com.hillrom.vest.web.rest.dto.BenchmarkResultVO;
+
 @Repository
 public class BenchmarkRepository {
 
@@ -36,7 +38,7 @@ public class BenchmarkRepository {
 				.append("AVG(pc.global_missed_therapy_days_count)  as avgMissedTherapyDaysCount, ")
 				.append("AVG(pc.hmr_run_rate) as avgHMRRunrate ")
 				.append("FROM PATIENT_COMPLIANCE pc left outer join USER u on u.id = pc.user_id ")
-				.append("join USER_PATIENT_ASSOC upa on u.id = upa.user_id ")
+				.append("join USER_PATIENT_ASSOC upa on u.id = upa.user_id and relation_label = '"+RELATION_LABEL_SELF+"' ")
 				.append("join PATIENT_INFO pi on pi.id = upa.patient_id ");
 		if (StringUtils.isNotEmpty(cityCSV))
 			avgQueryString.append("and pi.city in ('" + cityCSV + "') ");
@@ -64,7 +66,7 @@ public class BenchmarkRepository {
 				.append("AVG(pc.global_missed_therapy_days_count)  as avgMissedTherapyDaysCount,")
 				.append("AVG(pc.hmr_run_rate) as avgHMRRunrate, clinic_size_table.clinicsize ")
 				.append("FROM PATIENT_COMPLIANCE pc   left outer join USER u on u.id = pc.user_id  ")
-				.append("join USER_PATIENT_ASSOC upa on u.id = upa.user_id  ")
+				.append("join USER_PATIENT_ASSOC upa on u.id = upa.user_id  and relation_label = '"+RELATION_LABEL_SELF+"' ")
 				.append("join PATIENT_INFO pi on pi.id = upa.patient_id ");
 		        if(StringUtils.isNotEmpty(cityCSV)) 
 		        	avgQueryString.append("and pi.city in ('" + cityCSV + "')");

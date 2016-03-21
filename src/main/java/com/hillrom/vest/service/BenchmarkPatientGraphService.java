@@ -1,24 +1,17 @@
 package com.hillrom.vest.service;
 
+import static com.hillrom.vest.config.Constants.BENCHMARK_DATA_CLINIC;
+import static com.hillrom.vest.config.Constants.BENCHMARK_DATA_SELF;
 import static com.hillrom.vest.config.Constants.BM_PARAM_ADHERENCE_SCORE;
-import static com.hillrom.vest.config.Constants.BM_PARAM_ADHERENCE_SCORE_LABEL;
 import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_DEVIATION;
-import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_DEVIATION_LABEL;
 import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_RUNRATE;
-import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_RUNRATE_LABEL;
 import static com.hillrom.vest.config.Constants.BM_PARAM_MISSED_THERAPY_DAYS;
-import static com.hillrom.vest.config.Constants.BM_PARAM_MISSED_THERAPY_DAYS_LABEL;
 import static com.hillrom.vest.config.Constants.BM_PARAM_SETTING_DEVIATION;
-import static com.hillrom.vest.config.Constants.BM_PARAM_SETTING_DEVIATION_LABEL;
 import static com.hillrom.vest.config.Constants.KEY_BENCH_MARK_DATA;
 import static com.hillrom.vest.config.Constants.KEY_RANGE_LABELS;
 import static com.hillrom.vest.config.Constants.KEY_TOTAL_PATIENTS;
 import static com.hillrom.vest.config.Constants.XAXIS_TYPE_CATEGORIES;
 
-import static com.hillrom.vest.config.Constants.BENCHMARK_DATA_SELF;
-import static com.hillrom.vest.config.Constants.BENCHMARK_DATA_CLINIC;
-
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +19,6 @@ import java.util.SortedMap;
 
 import org.springframework.stereotype.Component;
 
-import com.hillrom.vest.repository.BenchmarkResultVO;
 import com.hillrom.vest.service.util.GraphUtils;
 import com.hillrom.vest.web.rest.dto.BenchMarkDataVO;
 import com.hillrom.vest.web.rest.dto.BenchMarkFilter;
@@ -77,36 +69,16 @@ public class BenchmarkPatientGraphService extends AbstractGraphService{
 		
 		SortedMap<String,BenchMarkDataVO> groupBenchMarkForClinicMap = benchMarkData.get(BENCHMARK_DATA_CLINIC);
 		SortedMap<String,BenchMarkDataVO> groupBenchMarkForPatientMap = benchMarkData.get(BENCHMARK_DATA_SELF);
-		int y1;
-		int y2;
 		for(String label : rangeLabels){
 			BenchMarkDataVO clinicbenchMarkVO = groupBenchMarkForClinicMap.getOrDefault(label, new BenchMarkDataVO(label, 0));
 			BenchMarkDataVO userbenchMarkVO = groupBenchMarkForPatientMap.getOrDefault(label, new BenchMarkDataVO(label, 0));
 			GraphDataVO clinicLevelGraphData = new GraphDataVO();
 			GraphDataVO selfGraphData = new GraphDataVO();
-			y1 = 0;
-			y2 = 0;
-			if(BM_PARAM_ADHERENCE_SCORE.equalsIgnoreCase(benchMarkFilter.getBenchMarkParameter())){
-				y1 = clinicbenchMarkVO.getAdherenceScoreBenchMark();
-				y2 = 0-userbenchMarkVO.getAdherenceScoreBenchMark();
-			}else if(BM_PARAM_HMR_DEVIATION.equalsIgnoreCase(benchMarkFilter.getBenchMarkParameter())){
-				y1=  clinicbenchMarkVO.gethMRDeviationBenchMark();
-				y2 = 0-userbenchMarkVO.gethMRDeviationBenchMark();
-			}else if(BM_PARAM_SETTING_DEVIATION.equalsIgnoreCase(benchMarkFilter.getBenchMarkParameter())){
-				y1 = clinicbenchMarkVO.getSettingDeviationBenchMark();
-				y2 = 0-userbenchMarkVO.getSettingDeviationBenchMark();
-			}else if(BM_PARAM_MISSED_THERAPY_DAYS.equalsIgnoreCase(benchMarkFilter.getBenchMarkParameter())){
-				y1 = clinicbenchMarkVO.getMissedTherapyDaysBenchMark();
-				y2 = 0-userbenchMarkVO.getMissedTherapyDaysBenchMark();
-			}else if(BM_PARAM_HMR_RUNRATE.equalsIgnoreCase(benchMarkFilter.getBenchMarkParameter())){
-				y1 = clinicbenchMarkVO.gethMRRunrateBenchMark();
-				y2 = 0-userbenchMarkVO.gethMRRunrateBenchMark();
-			}
-			clinicLevelGraphData.setY(y1);
+			clinicLevelGraphData.setY(getYAxisValueForBenchMark(benchMarkFilter.getBenchMarkParameter(), clinicbenchMarkVO));
 			clinicLevelGraphData.getToolText().put(KEY_TOTAL_PATIENTS, clinicbenchMarkVO.getPatientCount());
 			clinicSeries.getData().add(clinicLevelGraphData);
-			
-			selfGraphData.setY(y2);
+			// Since it is kind of mirror image graph, we make the value negative
+			selfGraphData.setY(0-getYAxisValueForBenchMark(benchMarkFilter.getBenchMarkParameter(), userbenchMarkVO));
 			selfSeries.getData().add(selfGraphData);
 		}
 		benchMarkGraph.getSeries().add(clinicSeries);
@@ -114,4 +86,20 @@ public class BenchmarkPatientGraphService extends AbstractGraphService{
 		return benchMarkGraph;
 	}
 
+	private int getYAxisValueForBenchMark(String benchMarkParameter,BenchMarkDataVO benchMarkData){
+		int yValue = 0;
+		switch(benchMarkParameter){
+		case BM_PARAM_ADHERENCE_SCORE : yValue = benchMarkData.getAdherenceScoreBenchMark();
+		break;
+		case BM_PARAM_HMR_DEVIATION : yValue = benchMarkData.gethMRDeviationBenchMark();
+		break;
+		case BM_PARAM_SETTING_DEVIATION :  yValue = benchMarkData.getSettingDeviationBenchMark();
+		break;
+		case BM_PARAM_MISSED_THERAPY_DAYS : yValue = benchMarkData.getMissedTherapyDaysBenchMark();
+		break;
+		case BM_PARAM_HMR_RUNRATE :  yValue = benchMarkData.gethMRRunrateBenchMark();
+		break;
+		}
+		return yValue;
+	}
 }

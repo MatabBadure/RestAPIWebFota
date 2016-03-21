@@ -46,10 +46,10 @@ import java.util.Objects;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import com.hillrom.vest.repository.BenchmarkResultVO;
 import com.hillrom.vest.service.BenchMarkStrategy;
 import com.hillrom.vest.web.rest.dto.BenchMarkDataVO;
 import com.hillrom.vest.web.rest.dto.BenchMarkFilter;
+import com.hillrom.vest.web.rest.dto.BenchmarkResultVO;
 
 public class BenchMarkUtil {
 

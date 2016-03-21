@@ -1,9 +1,11 @@
 package com.hillrom.vest.service;
 
 import static com.hillrom.vest.config.Constants.AGE_GROUP;
-import static com.hillrom.vest.config.Constants.BM_TYPE_AVERAGE;
-import static com.hillrom.vest.config.Constants.BENCHMARK_DATA_SELF;
 import static com.hillrom.vest.config.Constants.BENCHMARK_DATA_CLINIC;
+import static com.hillrom.vest.config.Constants.BENCHMARK_DATA_SELF;
+import static com.hillrom.vest.config.Constants.BM_TYPE_AVERAGE;
+import static com.hillrom.vest.config.Constants.KEY_BENCH_MARK_DATA;
+import static com.hillrom.vest.config.Constants.KEY_RANGE_LABELS;
 import static com.hillrom.vest.service.util.BenchMarkUtil.mapBenchMarkByAgeGroup;
 import static com.hillrom.vest.service.util.BenchMarkUtil.mapBenchMarkByClinicSize;
 import static com.hillrom.vest.service.util.BenchMarkUtil.prepareBenchMarkData;
@@ -21,14 +23,17 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.BenchmarkRepository;
-import com.hillrom.vest.repository.BenchmarkResultVO;
+import com.hillrom.vest.web.rest.dto.BenchmarkResultVO;
+import com.hillrom.vest.service.util.BenchMarkUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.web.rest.dto.BenchMarkDataVO;
 import com.hillrom.vest.web.rest.dto.BenchMarkFilter;
+import com.hillrom.vest.web.rest.dto.Graph;
 
 @Service
 @Transactional
@@ -36,6 +41,35 @@ public class BenchmarkService {
 	
 	@Inject
 	private BenchmarkRepository benchmarkRepository;
+	
+	@Qualifier("benchMarkGraphService")
+	@Inject
+	private GraphService benchMarkGraphService;
+	
+	@Qualifier("benchMarkPatientGraphService")
+	@Inject
+	private GraphService benchmarkPatientGraphService;
+	
+	public Graph getBenchMarkGraphForAdminParameterView(BenchMarkFilter filter) throws HillromException{
+		SortedMap<String,BenchMarkDataVO> benchMarkData = getBenchmarkDataForAdminParameterView(filter);
+		List<String> rangeLabels =  BenchMarkUtil.getRangeLabels(filter);
+		Map<String,Object> benchMarkDataMap = new HashMap<>(2);
+		benchMarkDataMap.put(KEY_BENCH_MARK_DATA, benchMarkData);
+		benchMarkDataMap.put(KEY_RANGE_LABELS, rangeLabels);
+		Graph benchMarkGraph = benchMarkGraphService.populateGraphData(benchMarkDataMap, filter);
+		return benchMarkGraph;
+
+	}
+	
+	public Graph getBenchMarkGraphForPatientView(BenchMarkFilter filter) throws HillromException{
+		Map<String, SortedMap<String, BenchMarkDataVO>> benchMarkData = getBenchMarkDataForPatientView(filter);
+		List<String> rangeLabels = BenchMarkUtil.getRangeLabels(filter);
+		Map<String, Object> benchMarkDataMap = new HashMap<>(2);
+		benchMarkDataMap.put(KEY_BENCH_MARK_DATA, benchMarkData);
+		benchMarkDataMap.put(KEY_RANGE_LABELS, rangeLabels);
+		Graph benchMarkGraph = benchmarkPatientGraphService.populateGraphData(benchMarkDataMap, filter);
+		return benchMarkGraph;
+	}
 	
 	public SortedMap<String,BenchMarkDataVO> getBenchmarkDataForAdminParameterView(BenchMarkFilter filter) {
 		List<BenchmarkResultVO> benchmarkVOs = new LinkedList<>();
@@ -65,8 +99,7 @@ public class BenchmarkService {
 		return defaultBenchMarkData;
 	}
 	
-	@SuppressWarnings("unused")
-	public Map<String,SortedMap<String,BenchMarkDataVO>> getBenchmarkDataForClinicByAgeGroup(BenchMarkFilter filter) throws HillromException {
+	public Map<String,SortedMap<String,BenchMarkDataVO>> getBenchMarkDataForPatientView(BenchMarkFilter filter) throws HillromException {
 		
 			List<BenchmarkResultVO> benchmarkVOs = new LinkedList<>();
 			Map<String, List<BenchmarkResultVO>> groupBenchMarkForClinicMap = new HashMap<>();
@@ -87,28 +120,40 @@ public class BenchmarkService {
 			}
 			BenchMarkStrategy benchMarkStrategy = BenchMarkStrategyFactory.getBenchMarkStrategy(filter.getBenchMarkType());
 			
-			for(String ageRangeLabel : defaultBenchMarkDataForClinic.keySet()){
-				List<BenchmarkResultVO> clinicLevelValues = groupBenchMarkForClinicMap.get(ageRangeLabel);
-				List<BenchmarkResultVO> userLevelValues = groupBenchMarkForPatientMap.get(ageRangeLabel);
-				//Clinic 
-				if(Objects.nonNull(clinicLevelValues)){
-					BenchMarkDataVO benchMarkDataVO = prepareBenchMarkData(
-							filter.getBenchMarkParameter(), benchMarkStrategy, ageRangeLabel,
-							clinicLevelValues);
-					defaultBenchMarkDataForClinic.put(ageRangeLabel, benchMarkDataVO);
-				}
-				//User
-				if(Objects.nonNull(userLevelValues)){
-					BenchMarkDataVO benchMarkDataVO = prepareBenchMarkData(
-							filter.getBenchMarkParameter(), benchMarkStrategy, ageRangeLabel,
-							userLevelValues);
-					defaultBenchMarkDataForUser.put(ageRangeLabel, benchMarkDataVO);
-				}
-			}
+			updateDefaultBenchMarkDataWithActualForPatientView(filter,
+					groupBenchMarkForClinicMap, groupBenchMarkForPatientMap,
+					defaultBenchMarkDataForClinic, defaultBenchMarkDataForUser,
+					benchMarkStrategy);
 			Map<String,SortedMap<String,BenchMarkDataVO>> defaultBenchMarkData = new HashMap<>();
 			defaultBenchMarkData.put(BENCHMARK_DATA_CLINIC, defaultBenchMarkDataForClinic);
 			defaultBenchMarkData.put(BENCHMARK_DATA_SELF, defaultBenchMarkDataForUser);
 			return defaultBenchMarkData;
 		}
+
+	private void updateDefaultBenchMarkDataWithActualForPatientView(BenchMarkFilter filter,
+			Map<String, List<BenchmarkResultVO>> groupBenchMarkForClinicMap,
+			Map<String, List<BenchmarkResultVO>> groupBenchMarkForPatientMap,
+			SortedMap<String, BenchMarkDataVO> defaultBenchMarkDataForClinic,
+			SortedMap<String, BenchMarkDataVO> defaultBenchMarkDataForUser,
+			BenchMarkStrategy benchMarkStrategy) {
+		for(String ageRangeLabel : defaultBenchMarkDataForClinic.keySet()){
+			List<BenchmarkResultVO> clinicLevelValues = groupBenchMarkForClinicMap.get(ageRangeLabel);
+			List<BenchmarkResultVO> userLevelValues = groupBenchMarkForPatientMap.get(ageRangeLabel);
+			//Clinic 
+			if(Objects.nonNull(clinicLevelValues)){
+				BenchMarkDataVO benchMarkDataVO = prepareBenchMarkData(
+						filter.getBenchMarkParameter(), benchMarkStrategy, ageRangeLabel,
+						clinicLevelValues);
+				defaultBenchMarkDataForClinic.put(ageRangeLabel, benchMarkDataVO);
+			}
+			//User
+			if(Objects.nonNull(userLevelValues)){
+				BenchMarkDataVO benchMarkDataVO = prepareBenchMarkData(
+						filter.getBenchMarkParameter(), benchMarkStrategy, ageRangeLabel,
+						userLevelValues);
+				defaultBenchMarkDataForUser.put(ageRangeLabel, benchMarkDataVO);
+			}
+		}
+	}
 	
 	}

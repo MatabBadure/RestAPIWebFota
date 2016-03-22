@@ -1,5 +1,6 @@
 package com.hillrom.vest.web.rest.dto;
 
+import static com.hillrom.vest.config.Constants.*;
 import java.util.LinkedList;
 
 import org.joda.time.LocalDate;
@@ -11,9 +12,10 @@ public class BenchMarkFilter extends Filter{
 	private String benchMarkParameter;
 	private String stateCSV;
 	private String cityCSV;
-	private String rangeCSV;
 	private Long userId; 
 	private String clinicId;
+	private String ageRangeCSV;
+	private String clinicSizeRangeCSV;
 	
 	public BenchMarkFilter(LocalDate from,LocalDate to,
 			String xAxisParameter,String benchMarkType,
@@ -25,7 +27,10 @@ public class BenchMarkFilter extends Filter{
 		this.benchMarkParameter = benchMarkParameter;
 		this.stateCSV = stateCSV;
 		this.cityCSV = cityCSV;
-		this.rangeCSV = rangeCSV;
+		if(AGE_GROUP.equalsIgnoreCase(xAxisParameter))
+			ageRangeCSV = rangeCSV;
+		else
+			clinicSizeRangeCSV = rangeCSV;
 	}
 	public BenchMarkFilter(LocalDate from,LocalDate to,
 			String benchMarkType,
@@ -38,7 +43,6 @@ public class BenchMarkFilter extends Filter{
 			String range,String xAxisParameter,String benchMarkType,
 			String benchMarkParameter,Long userId, String clinicId) {
 		super(from,to,"",new LinkedList<>());
-		this.rangeCSV = range;
 		this.xAxisParameter = xAxisParameter;
 		this.benchMarkType = benchMarkType;
 		this.benchMarkParameter = benchMarkParameter;
@@ -81,13 +85,6 @@ public class BenchMarkFilter extends Filter{
 		this.cityCSV = cityCSV;
 	}
 
-	public String getRangeCSV() {
-		return rangeCSV;
-	}
-
-	public void setRangeCSV(String rangeCSV) {
-		this.rangeCSV = rangeCSV;
-	}
 	public Long getUserId() {
 		return userId;
 	}
@@ -99,6 +96,19 @@ public class BenchMarkFilter extends Filter{
 	}
 	public void setClinicId(String clinicId) {
 		this.clinicId = clinicId;
+	}
+	public String getAgeRangeCSV() {
+		return ageRangeCSV;
+	}
+	public void setAgeRangeCSV(String ageRangeCSV) {
+		this.ageRangeCSV = ageRangeCSV;
+	}
+	public String getClinicSizeRangeCSV() {
+		return clinicSizeRangeCSV;
+	}
+	public void setClinicSizeRangeCSV(String clinicSizeRangeCSV) {
+		this.clinicSizeRangeCSV = clinicSizeRangeCSV;
 	}	
+	
 	
 }

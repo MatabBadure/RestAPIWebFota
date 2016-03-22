@@ -1,16 +1,25 @@
 package com.hillrom.vest.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import javax.persistence.AssociationOverride;
 import javax.persistence.AssociationOverrides;
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.SqlResultSetMapping;
+import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
 
 import org.hibernate.envers.Audited;
+
+import com.hillrom.vest.web.rest.dto.BenchmarkResultVO;
+import com.hillrom.vest.web.rest.dto.ClinicDiseaseStatisticsResultVO;
 
 /**
  * A Clinic.
@@ -23,6 +32,17 @@ import org.hibernate.envers.Audited;
         joinColumns = @JoinColumn(name = "CLINIC_ID", referencedColumnName="id")),
     @AssociationOverride(name = "clinicPatientAssocPK.patient",
         joinColumns = @JoinColumn(name = "PATIENT_ID", referencedColumnName="id")) })
+@SqlResultSetMappings({
+@SqlResultSetMapping(name = "clinicAndDiseaseStatsByAgeorClinicSize", classes = @ConstructorResult(targetClass = ClinicDiseaseStatisticsResultVO.class, columns = {
+		@ColumnResult(name = "totalPatients", type = BigInteger.class),
+		@ColumnResult(name = "ageRangeLabel",type = String.class),
+		@ColumnResult(name = "clinicSizeRangeLabel",type = Long.class),
+		@ColumnResult(name = "state",type = String.class),
+		@ColumnResult(name = "city",type = String.class)})),
+@SqlResultSetMapping(name = "clinicAndDiseaseStatsByState", classes = @ConstructorResult(targetClass = ClinicDiseaseStatisticsResultVO.class, columns = {
+		@ColumnResult(name = "totalPatients", type = BigInteger.class),
+		@ColumnResult(name = "state",type = String.class),
+		@ColumnResult(name = "city",type = String.class)}))})
 public class ClinicPatientAssoc extends AbstractAuditingEntity implements Serializable {
 
 	@EmbeddedId

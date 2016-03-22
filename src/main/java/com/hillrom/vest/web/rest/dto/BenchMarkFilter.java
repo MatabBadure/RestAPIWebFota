@@ -35,11 +35,9 @@ public class BenchMarkFilter extends Filter{
 		this.benchMarkParameter = benchMarkParameter;
 	}
 	public BenchMarkFilter(LocalDate from,LocalDate to,
-			String range,String xAxisParameter,String benchMarkType,
+			String benchMarkType,
 			String benchMarkParameter,Long userId, String clinicId) {
 		super(from,to,"",new LinkedList<>());
-		this.rangeCSV = range;
-		this.xAxisParameter = xAxisParameter;
 		this.benchMarkType = benchMarkType;
 		this.benchMarkParameter = benchMarkParameter;
 		this.userId = userId;

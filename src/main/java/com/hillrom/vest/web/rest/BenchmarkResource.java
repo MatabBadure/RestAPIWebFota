@@ -1,8 +1,6 @@
 package com.hillrom.vest.web.rest;
 
-import java.util.Map;
-import java.util.SortedMap;
-
+import static com.hillrom.vest.config.Constants.AGE_GROUP;
 import javax.inject.Inject;
 
 import net.minidev.json.JSONObject;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.service.BenchmarkService;
-import com.hillrom.vest.web.rest.dto.BenchMarkDataVO;
 import com.hillrom.vest.web.rest.dto.BenchMarkFilter;
 import com.hillrom.vest.web.rest.dto.Filter;
 
@@ -58,20 +55,17 @@ public class BenchmarkResource {
 		}
 		
 	}
-
+	
 	@RequestMapping(value = "/user/patient/{id}/benchmark", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getBenchMarkForClinicByAgeGroup(@PathVariable Long id,
 			@RequestParam(value = "from", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
 			@RequestParam(value = "to", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to,
 			@RequestParam(value = "benchmarkType", required = true) String benchMarkType,
 			@RequestParam(value = "parameterType", required = true) String parameterType,
-			@RequestParam(value = "clinicId", required = true) String clinicId,
-			@RequestParam(value = "range",required=true)String range,
-			@RequestParam(value = "xAxisParameter",required=false)String xAxisParameter){
-		BenchMarkFilter filter = new BenchMarkFilter(from, to,range,xAxisParameter, benchMarkType, parameterType, id, clinicId);
-		Map<String, SortedMap<String, BenchMarkDataVO>> benchMarkData;
+			@RequestParam(value = "clinicId", required = true) String clinicId){
+		BenchMarkFilter filter = new BenchMarkFilter(from, to,"All",AGE_GROUP,benchMarkType, parameterType, id, clinicId);
 		try {
-			return new ResponseEntity<>(benchmarkService.getBenchMarkDataForPatientView(filter), HttpStatus.OK);
+			return new ResponseEntity<>(benchmarkService.getBenchMarkGraphForPatientView(filter), HttpStatus.OK);
 		} catch (HillromException e) {
 			JSONObject errorMessage = new JSONObject();
 			errorMessage.put("ERROR", e.getMessage());

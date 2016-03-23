@@ -254,19 +254,20 @@ public class SurveyService {
 		for (Long userId : surveyAnswerRSGroupedByUserID.keySet()) {
 			surveyAnswerResultSetVO = surveyAnswerRSGroupedByUserID.get(userId);
 			//Survey Comments needed only when answered No.
-			if (Objects.nonNull(surveyAnswerResultSetVO.get(3).getAnswerValue()))
-			if(Constants.YES.equals(surveyAnswerResultSetVO.get(3).getAnswerValue()))
-				continue;
-			fiveDayViewVO = new FiveDayViewVO(
-					Objects.nonNull(surveyAnswerResultSetVO.get(0).getAnswerValue())?
-					surveyAnswerResultSetVO.get(0).getAnswerValue():"",
-					Objects.nonNull(surveyAnswerResultSetVO.get(1).getAnswerValue())?
-					surveyAnswerResultSetVO.get(1).getAnswerValue():"",
-					Objects.nonNull(surveyAnswerResultSetVO.get(2).getAnswerValue())?
-					surveyAnswerResultSetVO.get(2).getAnswerValue():"",
-					Objects.nonNull(surveyAnswerResultSetVO.get(3).getAnswerValue2())?
-					surveyAnswerResultSetVO.get(3).getAnswerValue2():"");
-			fiveDayViewVOs.add(fiveDayViewVO);
+			if (surveyAnswerResultSetVO.size()>=4){
+				if(Constants.YES.equals(surveyAnswerResultSetVO.get(3).getAnswerValue()))
+					continue;
+				fiveDayViewVO = new FiveDayViewVO(
+						Objects.nonNull(surveyAnswerResultSetVO.get(0).getAnswerValue())?
+						surveyAnswerResultSetVO.get(0).getAnswerValue():"",
+						Objects.nonNull(surveyAnswerResultSetVO.get(1).getAnswerValue())?
+						surveyAnswerResultSetVO.get(1).getAnswerValue():"",
+						Objects.nonNull(surveyAnswerResultSetVO.get(2).getAnswerValue())?
+						surveyAnswerResultSetVO.get(2).getAnswerValue():"",
+						Objects.nonNull(surveyAnswerResultSetVO.get(3).getAnswerValue2())?
+						surveyAnswerResultSetVO.get(3).getAnswerValue2():"");
+				fiveDayViewVOs.add(fiveDayViewVO);
+			}
 		}
 		return fiveDayViewVOs;
 	

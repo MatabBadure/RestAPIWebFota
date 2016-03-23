@@ -39,34 +39,47 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import com.hillrom.vest.web.rest.dto.BenchMarkFilter;
 import com.hillrom.vest.web.rest.dto.ClinicDiseaseStatisticsResultVO;
+import com.hillrom.vest.web.rest.dto.Filter;
 
 @Repository
 public class ClinicAndDiseaseStatisticsRepository {
 
 	@Inject
 	private EntityManager entityManager;
+	
+	private final Logger log = LoggerFactory.getLogger(ClinicAndDiseaseStatisticsRepository.class);
 
 	@SuppressWarnings("unchecked")
 	public List<ClinicDiseaseStatisticsResultVO> getClinicDiseaseStatsByState(
-			BenchMarkFilter filter) {
+			Filter filter) {
 		StringBuilder query = new StringBuilder(
 				"SELECT count(distinct(pi.id)) as totalPatients ");
 		query.append(",");
 		applyPatientRelatedJoins(query,filter);
 		applyStateAndCityFilters(query, filter);
-		query.append("group by pi.id");
+		
+		if(StringUtils.isNotEmpty(filter.getStateCSV())){
+			if(filter.getStateCSV().split(",").length <= 1){
+				query.append("group by pi.city");
+			}else{
+				query.append("group by pi.state");
+			}
+		}
+		log.debug(query.toString());
 		return (List<ClinicDiseaseStatisticsResultVO>) entityManager
 				.createNativeQuery(query.toString(),
-						"clinicAndDiseaseStatsByState");
+						"clinicAndDiseaseStatsByState").getResultList();
 	}
 
+	
 	@SuppressWarnings("unchecked")
 	public List<ClinicDiseaseStatisticsResultVO> getClinicDiseaseStatsByAgeGroupOrClinicSize(
-			BenchMarkFilter filter) {
+			Filter filter) {
 		StringBuilder query = new StringBuilder(
 				"SELECT count(distinct(pi.id)) as totalPatients, ");
 		if (AGE_GROUP.equalsIgnoreCase(filter.getxAxisParameter())) {
@@ -79,21 +92,33 @@ public class ClinicAndDiseaseStatisticsRepository {
 			applyCaseStatementForClinicSize(filter, query);
 		}
 		query.append(",");
+		// Hack to avoid duplicate resultset mapping, need to provide dummy column
+		if(AGE_GROUP.equalsIgnoreCase(filter.getxAxisParameter())){
+			query.append(" null as clinicSizeRangeLabel, ");
+		}else if(CLINIC_SIZE.equalsIgnoreCase(filter.getxAxisParameter())){
+			query.append(" null as ageRangeLabel, ");
+		}
+		
 		applyPatientRelatedJoins(query,filter);
 		applyStateAndCityFilters(query, filter);
 
-		if (CLINIC_SIZE.equalsIgnoreCase(filter.getxAxisParameter())) {
+		// Apply clinicRelated Joins if xAxisParameter is clinicSize or both
+		if (!AGE_GROUP.equalsIgnoreCase(filter.getxAxisParameter())) {
 			applyClinicRelatedJoins(query);
 		}
 
 		if (CLINIC_SIZE.equalsIgnoreCase(filter.getxAxisParameter())) {
 			query.append(" group by clinicSizeRangeLabel ");
-		} else {
+		} else if(AGE_GROUP.equalsIgnoreCase(filter.getxAxisParameter())) {
 			query.append("group by  ageRangeLabel");
+		} else {
+			query.append(" group by ageRangeLabel,clinicSizeRangeLabel ");
 		}
+		
+		log.debug(query.toString());
 		return (List<ClinicDiseaseStatisticsResultVO>) entityManager
 				.createNativeQuery(query.toString(),
-						"clinicAndDiseaseStatsByAgeorClinicSize");
+						"clinicAndDiseaseStatsByAgeorClinicSize").getResultList();
 	}
 
 	private void applyClinicRelatedJoins(StringBuilder query) {
@@ -105,7 +130,7 @@ public class ClinicAndDiseaseStatisticsRepository {
 	}
 
 	private void applyStateAndCityFilters(StringBuilder query,
-			BenchMarkFilter filter) {
+			Filter filter) {
 		if (StringUtils.isNotEmpty(filter.getStateCSV())) {
 			query.append(" and pi.state in (");
 			String[] states = filter.getStateCSV().split(",");
@@ -130,7 +155,7 @@ public class ClinicAndDiseaseStatisticsRepository {
 		}
 	}
 
-	private void applyPatientRelatedJoins(StringBuilder query,BenchMarkFilter filter) {
+	private void applyPatientRelatedJoins(StringBuilder query,Filter filter) {
 		query.append(" pi.state,pi.city ")
 				.append(" FROM PATIENT_INFO pi ")
 				.append(" join USER_PATIENT_ASSOC upa on pi.id = upa.patient_id ")
@@ -144,7 +169,7 @@ public class ClinicAndDiseaseStatisticsRepository {
 				.append("'").append(" and ").append("'").append(filter.getTo().toString()).append("'");
 	}
 
-	private void applyCaseStatementForClinicSize(BenchMarkFilter filter,
+	private void applyCaseStatementForClinicSize(Filter filter,
 			StringBuilder query) {
 		query.append(" case ");
 		String clinicSizeGroupRangeLabel = filter.getClinicSizeRangeCSV();
@@ -173,7 +198,7 @@ public class ClinicAndDiseaseStatisticsRepository {
 		query.append(" end as clinicSizeRangeLabel");
 	}
 
-	private void applyCaseStatementForAgeGroup(BenchMarkFilter filter,
+	private void applyCaseStatementForAgeGroup(Filter filter,
 			StringBuilder query) {
 		query.append(" case ");
 		String ageGroupRangeLabel = filter.getAgeRangeCSV();

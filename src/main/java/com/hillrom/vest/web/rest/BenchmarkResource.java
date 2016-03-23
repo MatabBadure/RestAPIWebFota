@@ -1,10 +1,5 @@
 package com.hillrom.vest.web.rest;
 
-import static com.hillrom.vest.config.Constants.KEY_BENCH_MARK_DATA;
-import static com.hillrom.vest.config.Constants.KEY_RANGE_LABELS;
-
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -13,7 +8,6 @@ import javax.inject.Inject;
 import net.minidev.json.JSONObject;
 
 import org.joda.time.LocalDate;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,11 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.service.BenchmarkService;
-import com.hillrom.vest.service.GraphService;
-import com.hillrom.vest.service.util.BenchMarkUtil;
 import com.hillrom.vest.web.rest.dto.BenchMarkDataVO;
 import com.hillrom.vest.web.rest.dto.BenchMarkFilter;
-import com.hillrom.vest.web.rest.dto.Graph;
+import com.hillrom.vest.web.rest.dto.Filter;
 
 
 @RestController
@@ -40,14 +32,6 @@ public class BenchmarkResource {
 	@Inject
 	private BenchmarkService benchmarkService;
 	
-	@Qualifier("benchMarkGraphService")
-	@Inject
-	private GraphService benchMarkGraphService;
-	
-	@Qualifier("benchMarkPatientGraphService")
-	@Inject
-	private GraphService benchmarkPatientGraphService;
-
 	@RequestMapping(value = "/benchmark/parameter",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -74,6 +58,7 @@ public class BenchmarkResource {
 		}
 		
 	}
+
 	@RequestMapping(value = "/user/patient/{id}/benchmark", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getBenchMarkForClinicByAgeGroup(@PathVariable Long id,
 			@RequestParam(value = "from", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
@@ -98,4 +83,28 @@ public class BenchmarkResource {
 		}
 	}
 
+	@RequestMapping(value = "/benchmark/statistics", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getBenchMarkForClinicByAgeGroup(
+			@RequestParam(value = "from", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
+			@RequestParam(value = "to", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to,
+			@RequestParam(value = "xAxisParameter",required=true)String xAxisParameter,
+			@RequestParam(value = "state", required = false) String stateCSV,
+			@RequestParam(value = "city", required = false) String cityCSV,
+			@RequestParam(value = "ageGroupRange",required=true)String ageGroupRange,
+			@RequestParam(value = "clinicSizeRange",required=true)String clinicSizeRange,
+			@RequestParam(value = "ignoreXAxis",required=false)boolean ignoreXAxis
+			){
+		Filter filter = new Filter(from, to,xAxisParameter, stateCSV, cityCSV, ageGroupRange, clinicSizeRange,ignoreXAxis);
+		try {
+			return new ResponseEntity<>(benchmarkService.getClinicAndDiseaseStatsGraph(filter), HttpStatus.OK);
+		} catch (HillromException e) {
+			JSONObject errorMessage = new JSONObject();
+			errorMessage.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+		} catch (Exception e){
+			JSONObject errorMessage = new JSONObject();
+			errorMessage.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

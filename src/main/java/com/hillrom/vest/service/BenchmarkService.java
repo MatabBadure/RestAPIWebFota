@@ -6,12 +6,14 @@ import static com.hillrom.vest.config.Constants.BENCHMARK_DATA_SELF;
 import static com.hillrom.vest.config.Constants.BM_TYPE_AVERAGE;
 import static com.hillrom.vest.config.Constants.KEY_BENCH_MARK_DATA;
 import static com.hillrom.vest.config.Constants.KEY_RANGE_LABELS;
+import static com.hillrom.vest.config.Constants.BOTH;
 import static com.hillrom.vest.service.util.BenchMarkUtil.mapBenchMarkByAgeGroup;
 import static com.hillrom.vest.service.util.BenchMarkUtil.mapBenchMarkByClinicSize;
 import static com.hillrom.vest.service.util.BenchMarkUtil.prepareBenchMarkData;
 import static com.hillrom.vest.service.util.BenchMarkUtil.prepareDefaultDataByAgeGroupOrClinicSize;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +30,14 @@ import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.BenchmarkRepository;
-import com.hillrom.vest.web.rest.dto.BenchmarkResultVO;
+import com.hillrom.vest.repository.ClinicAndDiseaseStatisticsRepository;
 import com.hillrom.vest.service.util.BenchMarkUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.web.rest.dto.BenchMarkDataVO;
 import com.hillrom.vest.web.rest.dto.BenchMarkFilter;
+import com.hillrom.vest.web.rest.dto.BenchmarkResultVO;
+import com.hillrom.vest.web.rest.dto.ClinicDiseaseStatisticsResultVO;
+import com.hillrom.vest.web.rest.dto.Filter;
 import com.hillrom.vest.web.rest.dto.Graph;
 
 @Service
@@ -49,6 +54,13 @@ public class BenchmarkService {
 	@Qualifier("benchMarkPatientGraphService")
 	@Inject
 	private GraphService benchmarkPatientGraphService;
+	
+	@Inject
+	private ClinicAndDiseaseStatisticsRepository statisticsRepository;
+	
+	@Qualifier("clinicAndStatsGraphService")
+	@Inject
+	private GraphService clinicAndStatsGraphService;
 	
 	public Graph getBenchMarkGraphForAdminParameterView(BenchMarkFilter filter) throws HillromException{
 		SortedMap<String,BenchMarkDataVO> benchMarkData = getBenchmarkDataForAdminParameterView(filter);
@@ -156,4 +168,31 @@ public class BenchmarkService {
 		}
 	}
 	
+	public Graph getClinicAndDiseaseStatsGraph(Filter filter) throws HillromException{
+		List<ClinicDiseaseStatisticsResultVO> statsResultsVO = new LinkedList<>(); 
+		if(!filter.isIgnoreXAxis()){
+			statsResultsVO = statisticsRepository.getClinicDiseaseStatsByAgeGroupOrClinicSize(filter);
+		}else{
+			statsResultsVO = statisticsRepository.getClinicDiseaseStatsByState(filter);
+		}
+		Map<String,List<ClinicDiseaseStatisticsResultVO>> statsMap = getClinicAndDiseaseStats(statsResultsVO,filter);
+		return clinicAndStatsGraphService.populateGraphData(statsMap, filter);
 	}
+	
+	public Map<String, List<ClinicDiseaseStatisticsResultVO>> getClinicAndDiseaseStats(List<ClinicDiseaseStatisticsResultVO> actualStats,Filter filter){
+		Map<String, List<ClinicDiseaseStatisticsResultVO>> defaultStatsMap = new LinkedHashMap<>();
+		if(!BOTH.equalsIgnoreCase(filter.getxAxisParameter()) )
+			defaultStatsMap = BenchMarkUtil.getDefaultDataForClinicAndDiseaseStats(filter);
+		else
+			defaultStatsMap = BenchMarkUtil.getDefaultDataForClinicAndDiseaseStatsByBoth(filter);
+		Map<String,List<ClinicDiseaseStatisticsResultVO>> actualStatsMap = BenchMarkUtil.groupStatsByXAxisParam(actualStats, filter);
+		// update the default map with actual stats
+		for(String label : defaultStatsMap.keySet()){
+			if(Objects.nonNull(actualStatsMap.get(label))){
+				defaultStatsMap.put(label, actualStatsMap.get(label));
+			}
+		}
+		return defaultStatsMap;
+	}
+	
+}

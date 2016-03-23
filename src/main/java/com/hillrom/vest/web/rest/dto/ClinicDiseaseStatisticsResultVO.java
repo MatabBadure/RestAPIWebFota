@@ -27,6 +27,16 @@ public class ClinicDiseaseStatisticsResultVO {
 		this.state = state;
 		this.city = city;
 	}
+	
+	public ClinicDiseaseStatisticsResultVO(Integer totalPatientCount,String ageGroupLabel,
+			String clinicSizeLabel,String state, String city) {
+		super();
+		this.totalPatients = Objects.nonNull(totalPatientCount) ? totalPatientCount.intValue() : 0;
+		this.ageGroupLabel = ageGroupLabel;
+		this.clinicSizeLabel = clinicSizeLabel;
+		this.state = state;
+		this.city = city;
+	}
 
 	public int getTotalPatients() {
 		return totalPatients;

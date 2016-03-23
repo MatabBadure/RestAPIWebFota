@@ -36,7 +36,7 @@ import com.hillrom.vest.web.rest.dto.ClinicDiseaseStatisticsResultVO;
 @SqlResultSetMapping(name = "clinicAndDiseaseStatsByAgeorClinicSize", classes = @ConstructorResult(targetClass = ClinicDiseaseStatisticsResultVO.class, columns = {
 		@ColumnResult(name = "totalPatients", type = BigInteger.class),
 		@ColumnResult(name = "ageRangeLabel",type = String.class),
-		@ColumnResult(name = "clinicSizeRangeLabel",type = Long.class),
+		@ColumnResult(name = "clinicSizeRangeLabel",type = String.class),
 		@ColumnResult(name = "state",type = String.class),
 		@ColumnResult(name = "city",type = String.class)})),
 @SqlResultSetMapping(name = "clinicAndDiseaseStatsByState", classes = @ConstructorResult(targetClass = ClinicDiseaseStatisticsResultVO.class, columns = {

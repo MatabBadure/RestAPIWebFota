@@ -1,58 +1,46 @@
 package com.hillrom.vest.service.util;
 
 import static com.hillrom.vest.config.Constants.AGE_GROUP;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_0_TO_5;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_11_TO_15;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_16_TO_20;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_21_TO_25;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_26_TO_30;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_31_TO_35;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_36_TO_40;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_41_TO_45;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_46_TO_50;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_51_TO_55;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_56_TO_60;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_61_TO_65;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_66_TO_70;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_6_TO_10;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_71_TO_75;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_76_TO_80;
 import static com.hillrom.vest.config.Constants.AGE_RANGE_81_AND_ABOVE;
+import static com.hillrom.vest.config.Constants.AGE_RANGE_LABELS;
 import static com.hillrom.vest.config.Constants.BM_PARAM_ADHERENCE_SCORE;
 import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_DEVIATION;
 import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_RUNRATE;
 import static com.hillrom.vest.config.Constants.BM_PARAM_MISSED_THERAPY_DAYS;
 import static com.hillrom.vest.config.Constants.BM_PARAM_SETTING_DEVIATION;
 import static com.hillrom.vest.config.Constants.CLINIC_SIZE;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_101_TO_150;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_151_TO_200;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_1_TO_25;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_201_TO_250;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_251_TO_300;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_26_TO_50;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_301_TO_350;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_351_TO_400;
 import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_401_AND_ABOVE;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_51_TO_75;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_76_TO_100;
+import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_LABELS;
+import static com.hillrom.vest.config.Constants.RANGE_SEPARATOR;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.collect.Range;
+import com.google.common.collect.RangeMap;
+import com.google.common.collect.TreeRangeMap;
 import com.hillrom.vest.service.BenchMarkStrategy;
 import com.hillrom.vest.web.rest.dto.BenchMarkDataVO;
 import com.hillrom.vest.web.rest.dto.BenchMarkFilter;
 import com.hillrom.vest.web.rest.dto.BenchmarkResultVO;
+import com.hillrom.vest.web.rest.dto.ClinicDiseaseStatisticsResultVO;
+import com.hillrom.vest.web.rest.dto.Filter;
 
 public class BenchMarkUtil {
 
+	public static final RangeMap<Integer,String> AGE_RANGE_MAP = getAgeRangeMap();
+	public static final RangeMap<Integer,String> CLINIC_SIZE_RANGE_MAP = getClinicSizeRangeMap();
 	
 	public static SortedMap<String, BenchMarkDataVO> prepareDefaultDataByAgeGroupOrClinicSize(
 			BenchMarkFilter filter) {
@@ -140,27 +128,27 @@ public class BenchMarkUtil {
 		benchMarkDataVO.setAdherenceScoreBenchMark((int)benchMarkValue);
 	}
 
-	public static List<String> getRangeLabels(BenchMarkFilter filter) {
+	public static List<String> getRangeLabels(Filter filter){
+		String rangeCSV = filter.getAgeRangeCSV();
+		if(Objects.isNull(rangeCSV)){
+			rangeCSV = filter.getClinicSizeRangeCSV();
+		}
+		return getRangeLabels(filter.getxAxisParameter(), rangeCSV);
+	}
+	
+	public static List<String> getRangeLabels(String parameter,String rangeCSV) {
 		List<String> rangeLabels = new LinkedList<>();
-		String parameter = filter.getxAxisParameter();
 		if(Objects.nonNull(parameter) && AGE_GROUP.equalsIgnoreCase(parameter)){
-			if("All".equalsIgnoreCase(filter.getAgeRangeCSV())){
-				rangeLabels = Arrays.asList(AGE_RANGE_0_TO_5,AGE_RANGE_6_TO_10,AGE_RANGE_11_TO_15,
-						AGE_RANGE_16_TO_20,AGE_RANGE_21_TO_25,AGE_RANGE_26_TO_30,AGE_RANGE_31_TO_35,
-						AGE_RANGE_36_TO_40,AGE_RANGE_41_TO_45,AGE_RANGE_46_TO_50,AGE_RANGE_51_TO_55,
-						AGE_RANGE_56_TO_60,AGE_RANGE_61_TO_65,AGE_RANGE_66_TO_70,AGE_RANGE_71_TO_75,
-						AGE_RANGE_76_TO_80,AGE_RANGE_81_AND_ABOVE);
+			if("All".equalsIgnoreCase(rangeCSV)){
+				rangeLabels = Arrays.asList(AGE_RANGE_LABELS);
 			}else{
-				rangeLabels = Arrays.asList(filter.getAgeRangeCSV().split(","));
+				rangeLabels = Arrays.asList(rangeCSV.split(","));
 			}
 		}else if(Objects.nonNull(parameter) && CLINIC_SIZE.equalsIgnoreCase(parameter)){
-			if("All".equalsIgnoreCase(filter.getClinicSizeRangeCSV())){
-				rangeLabels = Arrays.asList(CLINIC_SIZE_RANGE_1_TO_25,CLINIC_SIZE_RANGE_26_TO_50,
-					CLINIC_SIZE_RANGE_51_TO_75,CLINIC_SIZE_RANGE_76_TO_100,CLINIC_SIZE_RANGE_101_TO_150,
-					CLINIC_SIZE_RANGE_151_TO_200,CLINIC_SIZE_RANGE_201_TO_250,CLINIC_SIZE_RANGE_251_TO_300,
-					CLINIC_SIZE_RANGE_301_TO_350,CLINIC_SIZE_RANGE_351_TO_400,CLINIC_SIZE_RANGE_401_AND_ABOVE);
+			if("All".equalsIgnoreCase(rangeCSV)){
+				rangeLabels = Arrays.asList(CLINIC_SIZE_RANGE_LABELS);
 			}else{
-				rangeLabels = Arrays.asList(filter.getClinicSizeRangeCSV().split(","));
+				rangeLabels = Arrays.asList(rangeCSV.split(","));
 			}
 		}
 		return rangeLabels;
@@ -170,40 +158,8 @@ public class BenchMarkUtil {
 	public static Map<String, List<BenchmarkResultVO>> mapBenchMarkByAgeGroup(List<BenchmarkResultVO> benchmarkVOs) {
 		Map<String, List<BenchmarkResultVO>> ageRangeBenchmarkVOMap = new HashMap<>();
 		for (BenchmarkResultVO benchmarkVO : benchmarkVOs) {
-			if (benchmarkVO.getAge() <= 5)
-				addBenchMarkToMap(AGE_RANGE_0_TO_5,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 10)
-				addBenchMarkToMap(AGE_RANGE_6_TO_10,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 15)
-				addBenchMarkToMap(AGE_RANGE_11_TO_15,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 20)
-				addBenchMarkToMap(AGE_RANGE_16_TO_20,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 25)
-				addBenchMarkToMap(AGE_RANGE_21_TO_25,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 30)
-				addBenchMarkToMap(AGE_RANGE_26_TO_30,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 35)
-				addBenchMarkToMap(AGE_RANGE_31_TO_35,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 40)
-				addBenchMarkToMap(AGE_RANGE_36_TO_40,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 45)
-				addBenchMarkToMap(AGE_RANGE_41_TO_45,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 50)
-				addBenchMarkToMap(AGE_RANGE_46_TO_50,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 55)
-				addBenchMarkToMap(AGE_RANGE_51_TO_55,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 60)
-				addBenchMarkToMap(AGE_RANGE_56_TO_60,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 65)
-				addBenchMarkToMap(AGE_RANGE_61_TO_65,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 70)
-				addBenchMarkToMap(AGE_RANGE_66_TO_70,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 75)
-				addBenchMarkToMap(AGE_RANGE_71_TO_75,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 80)
-				addBenchMarkToMap(AGE_RANGE_76_TO_80,ageRangeBenchmarkVOMap, benchmarkVO);
-			else
-				addBenchMarkToMap(AGE_RANGE_81_AND_ABOVE,ageRangeBenchmarkVOMap, benchmarkVO);
+			String ageRange = AGE_RANGE_MAP.get(benchmarkVO.getAge());
+			addBenchMarkToMap(ageRange,ageRangeBenchmarkVOMap, benchmarkVO);
 		}
 		return ageRangeBenchmarkVOMap;
 	}
@@ -218,29 +174,124 @@ public class BenchMarkUtil {
 	public static Map<String, List<BenchmarkResultVO>> mapBenchMarkByClinicSize(List<BenchmarkResultVO> benchmarkVOs) {
 		Map<String, List<BenchmarkResultVO>> clinicSizeBenchMarkMap = new HashMap<>();
 		for (BenchmarkResultVO benchmarkVO : benchmarkVOs) {
-			if (benchmarkVO.getClinicSize() <= 25)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_1_TO_25,clinicSizeBenchMarkMap, benchmarkVO);
-			else if (benchmarkVO.getClinicSize() <= 50)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_26_TO_50,clinicSizeBenchMarkMap, benchmarkVO);
-			else if (benchmarkVO.getClinicSize() <= 75)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_51_TO_75,clinicSizeBenchMarkMap, benchmarkVO);
-			else if (benchmarkVO.getClinicSize() <= 100)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_76_TO_100,clinicSizeBenchMarkMap, benchmarkVO);
-			else if (benchmarkVO.getClinicSize() <= 150)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_101_TO_150,clinicSizeBenchMarkMap, benchmarkVO);
-			else if (benchmarkVO.getClinicSize() <= 200)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_151_TO_200,clinicSizeBenchMarkMap, benchmarkVO);
-			else if (benchmarkVO.getClinicSize() <= 250)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_201_TO_250,clinicSizeBenchMarkMap, benchmarkVO);
-			else if (benchmarkVO.getClinicSize() <= 300)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_251_TO_300,clinicSizeBenchMarkMap, benchmarkVO);
-			else if (benchmarkVO.getClinicSize() <= 350)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_301_TO_350,clinicSizeBenchMarkMap, benchmarkVO);
-			else if (benchmarkVO.getClinicSize() <= 400)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_351_TO_400,clinicSizeBenchMarkMap, benchmarkVO);
-			else
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_401_AND_ABOVE,clinicSizeBenchMarkMap, benchmarkVO);
+			String clinicSizeRange = CLINIC_SIZE_RANGE_MAP.get(benchmarkVO.getClinicSize());
+			addBenchMarkToMap(clinicSizeRange,clinicSizeBenchMarkMap, benchmarkVO);
 		}
 		return clinicSizeBenchMarkMap;
 	}
+	
+	public static RangeMap<Integer,String> createRangeMap() {
+		RangeMap<Integer,String> rangeMap = TreeRangeMap.create();
+		return  rangeMap;
+	}
+	
+	public static RangeMap<Integer,String> getAgeRangeMap(){
+		RangeMap<Integer,String> ageRangeMap = createRangeMap();
+		for(String ageRange : AGE_RANGE_LABELS){
+			String range[] = ageRange.split(RANGE_SEPARATOR);
+			if(!AGE_RANGE_81_AND_ABOVE.equalsIgnoreCase(ageRange)){
+				ageRangeMap.put(Range.closed(Integer.parseInt(range[0]), Integer.parseInt(range[1])),ageRange);
+			}else{
+				ageRangeMap.put(Range.closed(Integer.parseInt(range[0]), Integer.parseInt("100")),ageRange);
+			}
+		}
+		return ageRangeMap;
+	}
+
+	public static RangeMap<Integer,String> getClinicSizeRangeMap(){
+		RangeMap<Integer,String> clinicSizeRangeMap = createRangeMap();
+		for(String ageRange : CLINIC_SIZE_RANGE_LABELS){
+			String range[] = ageRange.split(RANGE_SEPARATOR);
+			if(!CLINIC_SIZE_RANGE_401_AND_ABOVE.equalsIgnoreCase(ageRange)){
+				clinicSizeRangeMap.put(Range.closed(Integer.parseInt(range[0]), Integer.parseInt(range[1])),ageRange);
+			}else{
+				clinicSizeRangeMap.put(Range.closed(Integer.parseInt(range[0]), Integer.valueOf(Integer.MAX_VALUE)),ageRange);
+			}
+		}
+		return clinicSizeRangeMap;
+	}
+
+	public static Map<String, List<ClinicDiseaseStatisticsResultVO>> getDefaultDataForClinicAndDiseaseStats(Filter filter){
+		List<String> rangeLabels = getRangeLabelsForStatsByXAxisParameter(filter);
+		return prepareDefaultDataForClinicAndDiseaseStats(filter, rangeLabels);
+	}
+
+	private static Map<String, List<ClinicDiseaseStatisticsResultVO>> prepareDefaultDataForClinicAndDiseaseStats(
+			Filter filter, List<String> rangeLabels) {
+		Map<String, List<ClinicDiseaseStatisticsResultVO>> statsMap = new LinkedHashMap<>();
+		boolean isMultipleStatesSelected = StringUtils.isEmpty(filter.getCityCSV());
+		for(String label : rangeLabels){
+			ClinicDiseaseStatisticsResultVO defaultData = null;
+			switch(filter.getxAxisParameter()){
+			case AGE_GROUP : defaultData = new ClinicDiseaseStatisticsResultVO(0, label, "", "", "");
+			break;
+			case CLINIC_SIZE : defaultData = new ClinicDiseaseStatisticsResultVO(0, "", label, "", "");
+			break;
+			default: if(isMultipleStatesSelected){
+						defaultData = new ClinicDiseaseStatisticsResultVO(0, "", "", label, "");
+					 }else{
+						 defaultData = new ClinicDiseaseStatisticsResultVO(0, "", "", "", label);
+					 }
+			}
+			List<ClinicDiseaseStatisticsResultVO> statsPerLabel = new LinkedList<>();
+			statsPerLabel.add(defaultData);
+			statsMap.put(label, statsPerLabel);
+		}
+		return statsMap;
+	}
+	
+	public static Map<String, List<ClinicDiseaseStatisticsResultVO>> getDefaultDataForClinicAndDiseaseStatsByBoth(Filter filter){
+		Map<String, List<ClinicDiseaseStatisticsResultVO>> statsMap = new LinkedHashMap<>();
+		List<String> ageRangeLabels = getRangeLabelsForStatsByXAxisParameter(filter);
+		List<String> clinicSizeRangeLabels = getRangeLabels(filter);
+		for(String ageRange : ageRangeLabels){
+			List<ClinicDiseaseStatisticsResultVO> clinicSizeRangeList = new LinkedList<>();
+			for(String clinicRange : clinicSizeRangeLabels){
+				clinicSizeRangeList.add(new ClinicDiseaseStatisticsResultVO(0, ageRange, clinicRange, "", ""));
+			}
+			statsMap.put(ageRange, clinicSizeRangeList);
+		}
+		return statsMap;
+	}
+
+	private static List<String> getRangeLabelsForStatsByXAxisParameter(Filter filter) {
+		List<String> rangeLabels = new LinkedList<>();
+		if(!filter.isIgnoreXAxis()){
+			switch(filter.getxAxisParameter()){
+			case AGE_GROUP : rangeLabels = getRangeLabels(filter);
+			break;
+			case CLINIC_SIZE : rangeLabels = getRangeLabels(filter);
+			break;
+			// For both option, ageGroup labels will be on xAxis
+			default: rangeLabels = getRangeLabels(AGE_GROUP,filter.getAgeRangeCSV());
+			}
+		}else{
+			if(StringUtils.isEmpty(filter.getCityCSV()))
+				rangeLabels = Arrays.asList(filter.getStateCSV().split(","));
+			else
+				rangeLabels = Arrays.asList(filter.getCityCSV().split(","));
+		}
+		return rangeLabels;
+	}
+
+	public static Map<String,List<ClinicDiseaseStatisticsResultVO>> groupStatsByXAxisParam(List<ClinicDiseaseStatisticsResultVO> actualStats,Filter filter){
+		Map<String,List<ClinicDiseaseStatisticsResultVO>> statsMap = new LinkedHashMap<>();
+		if(!filter.isIgnoreXAxis()){
+			switch(filter.getxAxisParameter()){
+			case AGE_GROUP : statsMap = actualStats.stream().collect(Collectors.groupingBy(ClinicDiseaseStatisticsResultVO :: getAgeGroupLabel));
+			break;
+			case CLINIC_SIZE : statsMap = actualStats.stream().collect(Collectors.groupingBy(ClinicDiseaseStatisticsResultVO :: getClinicSizeLabel));
+			break;
+			// This is applicable only for BOTH (Clinic Size and Age group)
+			default : statsMap = actualStats.stream().collect(Collectors.groupingBy(ClinicDiseaseStatisticsResultVO :: getAgeGroupLabel));
+			}
+		}else{
+			if(StringUtils.isEmpty(filter.getCityCSV()))
+				statsMap = actualStats.stream().collect(Collectors.groupingBy(ClinicDiseaseStatisticsResultVO :: getState));
+			else
+				statsMap = actualStats.stream().collect(Collectors.groupingBy(ClinicDiseaseStatisticsResultVO :: getCity));
+		}
+		return statsMap;
+	}
+
 }

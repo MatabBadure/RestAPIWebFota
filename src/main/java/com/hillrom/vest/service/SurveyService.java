@@ -254,6 +254,7 @@ public class SurveyService {
 		for (Long userId : surveyAnswerRSGroupedByUserID.keySet()) {
 			surveyAnswerResultSetVO = surveyAnswerRSGroupedByUserID.get(userId);
 			//Survey Comments needed only when answered No.
+			if (Objects.nonNull(surveyAnswerResultSetVO.get(3).getAnswerValue()))
 			if(Constants.YES.equals(surveyAnswerResultSetVO.get(3).getAnswerValue()))
 				continue;
 			fiveDayViewVO = new FiveDayViewVO(

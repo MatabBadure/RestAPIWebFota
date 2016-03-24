@@ -1,5 +1,6 @@
 package com.hillrom.vest.config;
 
+
 /**
  * Application constants.
  */
@@ -217,6 +218,7 @@ public final class Constants {
 	public static final String BM_PARAM_HMR_DEVIATION = "HMRDeviation";
 	public static final String BM_PARAM_MISSED_THERAPY_DAYS = "missedTherapy";
 	public static final String BM_PARAM_ADHERENCE_SCORE = "adherenceScore";
+	public static final String BM_PARAM_HMR_RUNRATE = "HMRRunrate";
 
 	public static final String KEY_TOTAL_PATIENTS = "totalPatients";
 
@@ -240,7 +242,66 @@ public final class Constants {
 	public static final String BM_PARAM_HMR_DEVIATION_LABEL = "HMR Deviation";
 	public static final String BM_PARAM_MISSED_THERAPY_DAYS_LABEL = "Missed Therapy";
 	public static final String BM_PARAM_ADHERENCE_SCORE_LABEL = "Adherence Score";
+	public static final String BM_PARAM_HMR_RUNRATE_LABEL = "HMR Runrate";
 
 	public static final String AGE_GROUP_LABEL = "Age Group";
 	public static final String CLINIC_SIZE_LABEL = "Clinic Size";
+	
+	// BenchMark Filter Constants
+	public static final String RANGE_SEPARATOR = "-";
+	public static final String AGE_RANGE_0_TO_5 = "0"+RANGE_SEPARATOR+"5";
+	public static final String AGE_RANGE_6_TO_10 = "6"+RANGE_SEPARATOR+"10";
+	public static final String AGE_RANGE_11_TO_15 = "11"+RANGE_SEPARATOR+"15";
+	public static final String AGE_RANGE_16_TO_20 = "16"+RANGE_SEPARATOR+"20";
+	public static final String AGE_RANGE_21_TO_25 = "21"+RANGE_SEPARATOR+"25";
+	public static final String AGE_RANGE_26_TO_30 = "26"+RANGE_SEPARATOR+"30";
+	public static final String AGE_RANGE_31_TO_35 = "31"+RANGE_SEPARATOR+"35";
+	public static final String AGE_RANGE_36_TO_40 = "36"+RANGE_SEPARATOR+"40";
+	public static final String AGE_RANGE_41_TO_45 = "41"+RANGE_SEPARATOR+"45";
+	public static final String AGE_RANGE_46_TO_50 = "46"+RANGE_SEPARATOR+"50";
+	public static final String AGE_RANGE_51_TO_55 = "51"+RANGE_SEPARATOR+"55";
+	public static final String AGE_RANGE_56_TO_60 = "56"+RANGE_SEPARATOR+"60";
+	public static final String AGE_RANGE_61_TO_65 = "61"+RANGE_SEPARATOR+"65";
+	public static final String AGE_RANGE_66_TO_70 = "66"+RANGE_SEPARATOR+"70";
+	public static final String AGE_RANGE_71_TO_75 = "71"+RANGE_SEPARATOR+"75";
+	public static final String AGE_RANGE_76_TO_80 = "76"+RANGE_SEPARATOR+"80";
+	public static final String AGE_RANGE_81_AND_ABOVE = "81"+RANGE_SEPARATOR+"above";
+
+	
+	public static final String CLINIC_SIZE_RANGE_1_TO_25 = "1"+RANGE_SEPARATOR+"25";
+	public static final String CLINIC_SIZE_RANGE_26_TO_50 = "26"+RANGE_SEPARATOR+"50";
+	public static final String CLINIC_SIZE_RANGE_51_TO_75 = "51"+RANGE_SEPARATOR+"75";
+	public static final String CLINIC_SIZE_RANGE_76_TO_100 = "76"+RANGE_SEPARATOR+"100";
+	public static final String CLINIC_SIZE_RANGE_101_TO_150 = "101"+RANGE_SEPARATOR+"150";
+	public static final String CLINIC_SIZE_RANGE_151_TO_200 = "151"+RANGE_SEPARATOR+"200";
+	public static final String CLINIC_SIZE_RANGE_201_TO_250 = "201"+RANGE_SEPARATOR+"250";
+	public static final String CLINIC_SIZE_RANGE_251_TO_300 = "251"+RANGE_SEPARATOR+"300";
+	public static final String CLINIC_SIZE_RANGE_301_TO_350 = "301"+RANGE_SEPARATOR+"350";
+	public static final String CLINIC_SIZE_RANGE_351_TO_400 = "351"+RANGE_SEPARATOR+"400";
+	public static final String CLINIC_SIZE_RANGE_401_AND_ABOVE = "401"+RANGE_SEPARATOR+"above";
+	
+	public static final String BENCHMARK_DATA_SELF = "self";
+	
+	public static final String BENCHMARK_DATA_CLINIC = "clinicLevel";
+	
+	public static final String RELATION_LABEL_SELF = "Self";
+
+	// Clinic And Disease benchmarking
+	public static final String BOTH = "both";
+	
+	public static final String[] AGE_RANGE_LABELS = new String[]{
+		AGE_RANGE_0_TO_5,AGE_RANGE_6_TO_10,AGE_RANGE_11_TO_15,
+		AGE_RANGE_16_TO_20,AGE_RANGE_21_TO_25,AGE_RANGE_26_TO_30,AGE_RANGE_31_TO_35,
+		AGE_RANGE_36_TO_40,AGE_RANGE_41_TO_45,AGE_RANGE_46_TO_50,AGE_RANGE_51_TO_55,
+		AGE_RANGE_56_TO_60,AGE_RANGE_61_TO_65,AGE_RANGE_66_TO_70,AGE_RANGE_71_TO_75,
+		AGE_RANGE_76_TO_80,AGE_RANGE_81_AND_ABOVE
+	};
+	
+	public static final String[] CLINIC_SIZE_RANGE_LABELS = new String[]{
+		CLINIC_SIZE_RANGE_1_TO_25,CLINIC_SIZE_RANGE_26_TO_50,
+		CLINIC_SIZE_RANGE_51_TO_75,CLINIC_SIZE_RANGE_76_TO_100,CLINIC_SIZE_RANGE_101_TO_150,
+		CLINIC_SIZE_RANGE_151_TO_200,CLINIC_SIZE_RANGE_201_TO_250,CLINIC_SIZE_RANGE_251_TO_300,
+		CLINIC_SIZE_RANGE_301_TO_350,CLINIC_SIZE_RANGE_351_TO_400,CLINIC_SIZE_RANGE_401_AND_ABOVE
+	};
+	
 }

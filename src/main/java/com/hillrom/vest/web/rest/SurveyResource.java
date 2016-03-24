@@ -158,7 +158,13 @@ public class SurveyResource {
 	public ResponseEntity<?> getSurveyGraphById(@PathVariable Long id,
 			@RequestParam(required = true, value = "from")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
   			@RequestParam(required = true, value = "to")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
+		try{
 			return new ResponseEntity< SurveyGraph>(surveyService.getSurveyGraphById(id, from, to), HttpStatus.OK);
+		}catch(HillromException e){
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
 	}
 
 }

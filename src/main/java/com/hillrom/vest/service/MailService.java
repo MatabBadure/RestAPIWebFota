@@ -33,12 +33,14 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserSurveyAnswer;
+import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.PatientStatsVO;
 import com.hillrom.vest.web.rest.dto.UserSurveyAnswerDTO;
+
 
 /**
  * Service for sending e-mails.
@@ -356,4 +358,16 @@ public class MailService {
             log.warn("E-mail could not be sent to user '{}', exception is: {}", to, e.getMessage());
         }
     }
+	
+    public void sendUpdateProtocolMailToPatient(User user,List<PatientProtocolData> patientProtocolDataList){
+        log.debug("Sending password reset e-mail to '{}'", user.getEmail());
+        Context context = new Context();
+        context.setVariable("user", user);
+        context.setVariable("notificationUrl", patientDashboardUrl);
+        String content = "";
+        String subject = "";
+ 	   content = templateEngine.process("therapyNotification", context);
+        subject = messageSource.getMessage("email.therapynotification.title", null, null);
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+     }
 }

@@ -3,6 +3,8 @@ package com.hillrom.vest.service;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 import static com.hillrom.vest.config.AdherenceScoreConstants.UPPER_BOUND_VALUE;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -51,6 +53,9 @@ public class PatientProtocolService {
     
 	@Inject
 	private ProtocolConstantsRepository  protocolConstantsRepository;
+	
+	@Inject
+	private MailService mailService;
     
     public List<PatientProtocolData> addProtocolToPatient(Long patientUserId, ProtocolDTO protocolDTO) throws HillromException {
     	if(Constants.CUSTOM_PROTOCOL.equals(protocolDTO.getType())){
@@ -117,6 +122,14 @@ public class PatientProtocolService {
 			 			protocolList.add(patientProtocolAssoc);
 		 			}
 		 		});
+		 		try{
+		 		mailService.sendUpdateProtocolMailToPatient(patientUser, protocolList);
+		 		}catch(Exception ex){
+					StringWriter writer = new StringWriter();
+					PrintWriter printWriter = new PrintWriter( writer );
+					ex.printStackTrace( printWriter );
+		 		}
+		 		
 		 		return protocolList;
 		 	} else {
 		 		throw new HillromException(ExceptionConstants.HR_523);

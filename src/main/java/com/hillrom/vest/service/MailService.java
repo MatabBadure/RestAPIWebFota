@@ -356,4 +356,16 @@ public class MailService {
             log.warn("E-mail could not be sent to user '{}', exception is: {}", to, e.getMessage());
         }
     }
+	
+    public void sendUpdateProtocolMailToPatient(User user,List<PatientProtocolData> patientProtocolDataList){
+        log.debug("Sending password reset e-mail to '{}'", user.getEmail());
+        Context context = new Context();
+        context.setVariable("user", user);
+        context.setVariable("notificationUrl", patientDashboardUrl);
+        String content = "";
+        String subject = "";
+ 	   content = templateEngine.process("therapyNotification", context);
+        subject = messageSource.getMessage("email.therapynotification.title", null, null);
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+     }
 }

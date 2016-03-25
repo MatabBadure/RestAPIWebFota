@@ -3,6 +3,8 @@ package com.hillrom.vest.service;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 import static com.hillrom.vest.config.AdherenceScoreConstants.UPPER_BOUND_VALUE;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;

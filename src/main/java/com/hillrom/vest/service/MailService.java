@@ -360,14 +360,14 @@ public class MailService {
     }
 	
     public void sendUpdateProtocolMailToPatient(User user,List<PatientProtocolData> patientProtocolDataList){
-        log.debug("Sending password reset e-mail to '{}'", user.getEmail());
+        log.debug("Sending patient protocol data update e-mail to '{}'", user.getEmail());
         Context context = new Context();
         context.setVariable("user", user);
         context.setVariable("notificationUrl", patientDashboardUrl);
         String content = "";
         String subject = "";
  	   content = templateEngine.process("therapyNotification", context);
-        subject = messageSource.getMessage("email.therapynotification.title", null, null);
+        subject = messageSource.getMessage("email.patientprotocoldata.title", null, null);
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
      }
 }

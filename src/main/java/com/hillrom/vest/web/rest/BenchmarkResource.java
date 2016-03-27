@@ -1,6 +1,7 @@
 package com.hillrom.vest.web.rest;
 
 import static com.hillrom.vest.config.Constants.AGE_GROUP;
+
 import javax.inject.Inject;
 
 import net.minidev.json.JSONObject;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.service.BenchmarkService;
+import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.web.rest.dto.BenchMarkFilter;
 import com.hillrom.vest.web.rest.dto.Filter;
 
@@ -50,7 +52,7 @@ public class BenchmarkResource {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		} catch (Exception e){
 			JSONObject errorMessage = new JSONObject();
-			errorMessage.put("ERROR", e.getMessage());
+			errorMessage.put("ERROR",ExceptionConstants.HR_717);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
@@ -72,7 +74,7 @@ public class BenchmarkResource {
 			return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
 		} catch (Exception e){
 			JSONObject errorMessage = new JSONObject();
-			errorMessage.put("ERROR", e.getMessage());
+			errorMessage.put("ERROR", ExceptionConstants.HR_717);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -97,8 +99,34 @@ public class BenchmarkResource {
 			return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
 		} catch (Exception e){
 			JSONObject errorMessage = new JSONObject();
-			errorMessage.put("ERROR", e.getMessage());
+			errorMessage.put("ERROR", ExceptionConstants.HR_717);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@RequestMapping(value = "/user/hcp/{id}/benchmark", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getClinicLevelBenchMArkForHCPOrClinicAdmin(@PathVariable Long id,
+			@RequestParam(value = "from", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
+			@RequestParam(value = "to", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to,
+			@RequestParam(value="state",required=false)String stateCSV,
+    		@RequestParam(value="city",required=false)String cityCSV,
+			@RequestParam(value = "benchmarkType", required = true) String benchMarkType,
+			@RequestParam(value = "parameterType", required = true) String parameterType,
+			@RequestParam(value = "clinicId", required = true) String clinicId){
+		BenchMarkFilter filter = new BenchMarkFilter(from, to,"All",AGE_GROUP,benchMarkType, parameterType, id, clinicId);
+		filter.setCityCSV(cityCSV);
+		filter.setStateCSV(stateCSV);
+		try {
+			return new ResponseEntity<>(benchmarkService.getClinicLevelBenchMarkGraphForHCPOrClinicAdmin(filter), HttpStatus.OK);
+		} catch (HillromException e) {
+			JSONObject errorMessage = new JSONObject();
+			errorMessage.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+		} catch (Exception e){
+			JSONObject errorMessage = new JSONObject();
+			errorMessage.put("ERROR", ExceptionConstants.HR_717);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 }

@@ -25,6 +25,7 @@ public class BenchmarkResultVO{
 	private BigDecimal cumulativeMissedTherapyDaysCount;
 	private BigDecimal cumulativeHMRRunrate;
 	private String clinicName;
+	private String ageRangeLabel;
 	
 	public BenchmarkResultVO(Long complianceId, String patientId, Long userId, LocalDate dob, String zipcode,
 			String city, String state, LocalDate lastTherapySessionDate, BigDecimal cumulativeCompScore,
@@ -61,6 +62,15 @@ public class BenchmarkResultVO{
 		this(complianceId,patientId,userId,dob,zipcode,city,state,lastTherapySessionDate,cumulativeCompScore,
 				cumulativeNonAdherenceCount,cumulativeSettingsDeviatedCount,cumulativeMissedTherapyDaysCount,cumulativeHMRRunrate);
 		this.clinicName = clinicName;
+	}
+	// For HCP/Clinic Admin view
+	public BenchmarkResultVO(String clinicName,String zipcode,String city, String state,String ageRangeLabel, BigDecimal cumulativeCompScore,
+			BigDecimal cumulativeNonAdherenceCount, BigDecimal cumulativeSettingsDeviatedCount,
+			BigDecimal cumulativeMissedTherapyDaysCount, BigDecimal cumulativeHMRRunrate) {
+		this(null,"",null,null,zipcode,city,state,null,cumulativeCompScore,
+				cumulativeNonAdherenceCount,cumulativeSettingsDeviatedCount,cumulativeMissedTherapyDaysCount,cumulativeHMRRunrate);
+		this.clinicName = clinicName;
+		this.ageRangeLabel = ageRangeLabel;
 	}
 	
 	public Long getComplianceId() {
@@ -162,7 +172,13 @@ public class BenchmarkResultVO{
 	public void setClinicName(String clinicName) {
 		this.clinicName = clinicName;
 	}
-	
+	public String getAgeRangeLabel() {
+		return ageRangeLabel;
+	}
+	public void setAgeRangeLabel(String ageRangeLabel) {
+		this.ageRangeLabel = ageRangeLabel;
+	}
+
 	@Override
 	public String toString() {
 		return "BenchmarkVO [complianceId=" + complianceId + ", patientId=" + patientId + ", userId=" + userId

@@ -42,9 +42,9 @@ public class BenchMarkUtil {
 	public static final RangeMap<Integer,String> AGE_RANGE_MAP = getAgeRangeMap();
 	public static final RangeMap<Integer,String> CLINIC_SIZE_RANGE_MAP = getClinicSizeRangeMap();
 	
-	public static SortedMap<String, BenchMarkDataVO> prepareDefaultDataByAgeGroupOrClinicSize(
+	public static Map<String, BenchMarkDataVO> prepareDefaultDataByAgeGroupOrClinicSize(
 			BenchMarkFilter filter) {
-		SortedMap<String,BenchMarkDataVO> benchMarkData = new TreeMap<>();
+		Map<String,BenchMarkDataVO> benchMarkData = new LinkedHashMap<>();
 		List<String> rangeLabels = getRangeLabels(filter);
 		rangeLabels.forEach(label -> {
 			benchMarkData.put(label, new BenchMarkDataVO(label, 0));

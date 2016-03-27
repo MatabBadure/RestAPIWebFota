@@ -304,4 +304,7 @@ public final class Constants {
 		CLINIC_SIZE_RANGE_301_TO_350,CLINIC_SIZE_RANGE_351_TO_400,CLINIC_SIZE_RANGE_401_AND_ABOVE
 	};
 	
+	// HCP and Clinic Admin Bench Marking
+	public static final String KEY_MY_CLINIC = "myClinic";
+	public static final String KEY_OTHER_CLINIC = "otherClinics";
 }

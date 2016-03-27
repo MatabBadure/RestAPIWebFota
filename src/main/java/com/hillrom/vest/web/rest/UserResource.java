@@ -564,14 +564,19 @@ public class UserResource {
     public ResponseEntity<?> getTherapyByPatientUserIdAndDate(@PathVariable Long id,
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
     		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
-    		@RequestParam(value="duration",required=true)String duration) throws Exception{
-
-    		List<TherapyDataVO> therapyData = therapySessionService.findByPatientUserIdAndDateRange(id, from, to);
-    		if(therapyData.size() > 0){
-    			Graph hmrGraph = hmrGraphService.populateGraphData(therapyData, new Filter(from, to, duration, null));
-    			return new ResponseEntity<>(hmrGraph,HttpStatus.OK);
-    		}
-    		return new ResponseEntity<>(HttpStatus.OK);
+    		@RequestParam(value="duration",required=true)String duration) {
+    		try{
+    			List<TherapyDataVO> therapyData = therapySessionService.findByPatientUserIdAndDateRange(id, from, to);
+    			if(therapyData.size() > 0){
+    				Graph hmrGraph = hmrGraphService.populateGraphData(therapyData, new Filter(from, to, duration, null));
+    				return new ResponseEntity<>(hmrGraph,HttpStatus.OK);
+    			}
+    			return new ResponseEntity<>(HttpStatus.OK);
+    		}catch(Exception ex){
+    			JSONObject jsonObject = new JSONObject();
+            	jsonObject.put("ERROR", ExceptionConstants.HR_717);
+        		return new ResponseEntity<>(jsonObject, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
     }
     
     @RequestMapping(value = "/users/{id}/compliance",
@@ -826,6 +831,7 @@ public class UserResource {
 
     /**
      * GET  /users/:hcpId/clinics/:clinicId/cumulativeStatistics -> get the patient statistics for clinic associated with hcp user.
+     * @throws Exception 
      */
     @RequestMapping(value = "/users/{hcpId}/clinics/{clinicId}/cumulativeStatistics",
             method = RequestMethod.GET,
@@ -834,7 +840,7 @@ public class UserResource {
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP})
     public ResponseEntity<?> getPatientsCumulativeStatisticsForClinicAssociatedWithHCP(@PathVariable Long hcpId, @PathVariable String clinicId,
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
-    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to){
         log.debug("REST request to get patients cumulative statistics for clinic {} associated with HCP : {}", clinicId, hcpId,from,to);
         JSONObject jsonObject = new JSONObject();
         try {
@@ -848,11 +854,15 @@ public class UserResource {
         } catch (HillromException hre){
         	jsonObject.put("ERROR", hre.getMessage());
     		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+        } catch(Exception ex){
+        	jsonObject.put("ERROR", ExceptionConstants.HR_717);
+    		return new ResponseEntity<>(jsonObject, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     
     /**
      * GET  /users/:hcpId/clinics/:clinicId/cumulativeStatistics -> get the patient statistics for clinic associated with hcp user.
+     * @throws Exception 
      */
     @RequestMapping(value = "/users/{hcpId}/clinics/{clinicId}/treatmentStatistics",
             method = RequestMethod.GET,
@@ -875,6 +885,9 @@ public class UserResource {
         } catch (HillromException hre){
         	jsonObject.put("ERROR", hre.getMessage());
     		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+        } catch(Exception ex){
+        	jsonObject.put("ERROR", ExceptionConstants.HR_717);
+    		return new ResponseEntity<>(jsonObject, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -1001,16 +1014,22 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getComplianceGraphData(@PathVariable Long id,
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
-    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) throws Exception{
-    	List<TherapyDataVO> therapyData = therapySessionService.getComplianceGraphData(id, from, to);
-		if(therapyData.size() > 0){
-			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(id);
-			Map<String,Object> therapyAndProtocolData = new HashMap<>();
-			therapyAndProtocolData.put("protocol", protocol);
-			therapyAndProtocolData.put("therapyData", therapyData);
-			Graph complianceGraph = complianceGraphService.populateGraphData(therapyAndProtocolData, new Filter(from,to,null,null));
-			return new ResponseEntity<>(complianceGraph,HttpStatus.OK); 
-		}
-		return new ResponseEntity<>(HttpStatus.OK);
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
+    	try{
+    		List<TherapyDataVO> therapyData = therapySessionService.getComplianceGraphData(id, from, to);
+    		if(therapyData.size() > 0){
+    			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(id);
+    			Map<String,Object> therapyAndProtocolData = new HashMap<>();
+    			therapyAndProtocolData.put("protocol", protocol);
+    			therapyAndProtocolData.put("therapyData", therapyData);
+    			Graph complianceGraph = complianceGraphService.populateGraphData(therapyAndProtocolData, new Filter(from,to,null,null));
+    			return new ResponseEntity<>(complianceGraph,HttpStatus.OK); 
+    		}
+    		return new ResponseEntity<>(HttpStatus.OK);
+    	} catch(Exception ex){
+    		JSONObject jsonObject = new JSONObject();
+        	jsonObject.put("ERROR", ExceptionConstants.HR_717);
+    		return new ResponseEntity<>(jsonObject, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
     }
 }

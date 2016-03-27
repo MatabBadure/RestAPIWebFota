@@ -31,11 +31,6 @@ import com.hillrom.vest.web.rest.dto.Series;
 public class BenchmarkPatientGraphService extends AbstractGraphService{
 
 	@Override
-	public Graph populateGraphData(Object data, Filter filter) {
-		return populateGraphDataForCustomDateRange(data, filter);
-	}
-
-	@Override
 	public Graph populateGraphDataForDay(Object data, Filter filter) {
 		return populateGraphDataForCustomDateRange(data, filter);
 	}

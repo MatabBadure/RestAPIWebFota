@@ -1,35 +1,11 @@
 package com.hillrom.vest.repository;
 
 import static com.hillrom.vest.config.Constants.AGE_GROUP;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_0_TO_5;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_11_TO_15;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_16_TO_20;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_21_TO_25;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_26_TO_30;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_31_TO_35;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_36_TO_40;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_41_TO_45;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_46_TO_50;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_51_TO_55;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_56_TO_60;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_61_TO_65;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_66_TO_70;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_6_TO_10;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_71_TO_75;
-import static com.hillrom.vest.config.Constants.AGE_RANGE_76_TO_80;
 import static com.hillrom.vest.config.Constants.AGE_RANGE_81_AND_ABOVE;
+import static com.hillrom.vest.config.Constants.AGE_RANGE_LABELS;
 import static com.hillrom.vest.config.Constants.CLINIC_SIZE;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_101_TO_150;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_151_TO_200;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_1_TO_25;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_201_TO_250;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_251_TO_300;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_26_TO_50;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_301_TO_350;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_351_TO_400;
 import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_401_AND_ABOVE;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_51_TO_75;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_76_TO_100;
+import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_LABELS;
 import static com.hillrom.vest.config.Constants.RELATION_LABEL_SELF;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 
@@ -63,13 +39,12 @@ public class ClinicAndDiseaseStatisticsRepository {
 		applyPatientRelatedJoins(query,filter);
 		applyStateAndCityFilters(query, filter);
 		
-		if(StringUtils.isNotEmpty(filter.getStateCSV())){
-			if(filter.getStateCSV().split(",").length <= 1){
-				query.append("group by pi.city");
-			}else{
-				query.append("group by pi.state");
-			}
+ 		if(StringUtils.isNotEmpty(filter.getStateCSV()) && filter.getStateCSV().split(",").length <= 1){
+			query.append("group by pi.city");
+		}else{
+			query.append("group by pi.state");
 		}
+		query.append(" having count(distinct pi.id) > 0");
 		log.debug(query.toString());
 		return (List<ClinicDiseaseStatisticsResultVO>) entityManager
 				.createNativeQuery(query.toString(),
@@ -176,13 +151,7 @@ public class ClinicAndDiseaseStatisticsRepository {
 		String clinicSizeGroupRangeLabels[] = clinicSizeGroupRangeLabel
 				.split(",");
 		if ("All".equalsIgnoreCase(clinicSizeGroupRangeLabel)) {
-			clinicSizeGroupRangeLabels = new String[] {
-					CLINIC_SIZE_RANGE_1_TO_25, CLINIC_SIZE_RANGE_26_TO_50,
-					CLINIC_SIZE_RANGE_51_TO_75, CLINIC_SIZE_RANGE_76_TO_100,
-					CLINIC_SIZE_RANGE_101_TO_150, CLINIC_SIZE_RANGE_151_TO_200,
-					CLINIC_SIZE_RANGE_201_TO_250, CLINIC_SIZE_RANGE_251_TO_300,
-					CLINIC_SIZE_RANGE_301_TO_350, CLINIC_SIZE_RANGE_351_TO_400,
-					CLINIC_SIZE_RANGE_401_AND_ABOVE };
+			clinicSizeGroupRangeLabels = CLINIC_SIZE_RANGE_LABELS;
 		}
 		for (String rangeLabel : clinicSizeGroupRangeLabels) {
 			String ranges[] = rangeLabel.split("-");
@@ -204,13 +173,7 @@ public class ClinicAndDiseaseStatisticsRepository {
 		String ageGroupRangeLabel = filter.getAgeRangeCSV();
 		String ageGroupRangeLabels[] = ageGroupRangeLabel.split(",");
 		if ("All".equalsIgnoreCase(ageGroupRangeLabel)) {
-			ageGroupRangeLabels = new String[] { AGE_RANGE_0_TO_5,
-					AGE_RANGE_6_TO_10, AGE_RANGE_11_TO_15, AGE_RANGE_16_TO_20,
-					AGE_RANGE_21_TO_25, AGE_RANGE_26_TO_30, AGE_RANGE_31_TO_35,
-					AGE_RANGE_36_TO_40, AGE_RANGE_41_TO_45, AGE_RANGE_46_TO_50,
-					AGE_RANGE_51_TO_55, AGE_RANGE_56_TO_60, AGE_RANGE_61_TO_65,
-					AGE_RANGE_66_TO_70, AGE_RANGE_71_TO_75, AGE_RANGE_76_TO_80,
-					AGE_RANGE_81_AND_ABOVE };
+			ageGroupRangeLabels = AGE_RANGE_LABELS;
 		}
 		for (String rangeLabel : ageGroupRangeLabels) {
 			String ranges[] = rangeLabel.split("-");

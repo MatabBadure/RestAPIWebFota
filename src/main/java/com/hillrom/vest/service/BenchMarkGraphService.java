@@ -63,7 +63,7 @@ public class BenchMarkGraphService extends AbstractGraphService {
 	@SuppressWarnings("unchecked")
 	public Graph populateGraphDataForCustomDateRange(Object data, Filter filter) {
 		Map<String,Object> benchMarkDataMap = (Map<String, Object>) data;
-		SortedMap<String,BenchMarkDataVO> benchMarkData = (SortedMap<String, BenchMarkDataVO>) benchMarkDataMap.getOrDefault(KEY_BENCH_MARK_DATA, new Object());
+		Map<String,BenchMarkDataVO> benchMarkData = (Map<String, BenchMarkDataVO>) benchMarkDataMap.getOrDefault(KEY_BENCH_MARK_DATA, new Object());
 		List<String> rangeLabels = (List<String>) benchMarkDataMap.getOrDefault(KEY_RANGE_LABELS,new LinkedList<>());
 		BenchMarkFilter benchMarkFilter = (BenchMarkFilter) filter;
 		Graph benchMarkGraph = GraphUtils.buildGraphObectWithXAxisType(XAXIS_TYPE_CATEGORIES);

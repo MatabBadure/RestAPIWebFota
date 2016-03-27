@@ -156,5 +156,7 @@ public class ExceptionConstants {
     // Validate Credentials Api Exception messages
     public static final String HR_714 = "Please enter the password for your Visi-View account.";
     public static final String HR_716 = "The entered password is incorrect. Be sure you're using the password for your Visi-View account.";
-    
+
+    // Generic Exception for Graph 
+    public static final String HR_717 = "Unable to process graph data";
 }

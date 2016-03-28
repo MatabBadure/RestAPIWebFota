@@ -50,7 +50,7 @@ public class BenchmarkPatientGraphService extends AbstractGraphService{
 	@SuppressWarnings("unchecked")
 	public Graph populateGraphDataForCustomDateRange(Object data, Filter filter) {
 		Map<String,Object> benchMarkDataMap = (Map<String, Object>) data;
-		Map<String,SortedMap<String,BenchMarkDataVO>> benchMarkData = (Map<String,SortedMap<String,BenchMarkDataVO>>) benchMarkDataMap.getOrDefault(KEY_BENCH_MARK_DATA, new Object());
+		Map<String,Map<String,BenchMarkDataVO>> benchMarkData = (Map<String,Map<String,BenchMarkDataVO>>) benchMarkDataMap.getOrDefault(KEY_BENCH_MARK_DATA, new Object());
 		List<String> rangeLabels = (List<String>) benchMarkDataMap.getOrDefault(KEY_RANGE_LABELS,new LinkedList<>());
 		BenchMarkFilter benchMarkFilter = (BenchMarkFilter) filter;
 		Graph benchMarkGraph = GraphUtils.buildGraphObectWithXAxisType(XAXIS_TYPE_CATEGORIES);
@@ -58,8 +58,8 @@ public class BenchmarkPatientGraphService extends AbstractGraphService{
 		Series selfSeries = GraphUtils.createSeriesObjectWithName("Self");
 		benchMarkGraph.getxAxis().getCategories().addAll(rangeLabels);
 		
-		SortedMap<String,BenchMarkDataVO> groupBenchMarkForClinicMap = benchMarkData.get(BENCHMARK_DATA_CLINIC);
-		SortedMap<String,BenchMarkDataVO> groupBenchMarkForPatientMap = benchMarkData.get(BENCHMARK_DATA_SELF);
+		Map<String,BenchMarkDataVO> groupBenchMarkForClinicMap = benchMarkData.get(BENCHMARK_DATA_CLINIC);
+		Map<String,BenchMarkDataVO> groupBenchMarkForPatientMap = benchMarkData.get(BENCHMARK_DATA_SELF);
 		for(String label : rangeLabels){
 			BenchMarkDataVO clinicbenchMarkVO = groupBenchMarkForClinicMap.getOrDefault(label, new BenchMarkDataVO(label, 0));
 			BenchMarkDataVO userbenchMarkVO = groupBenchMarkForPatientMap.getOrDefault(label, new BenchMarkDataVO(label, 0));

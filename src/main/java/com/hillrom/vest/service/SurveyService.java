@@ -273,7 +273,7 @@ public class SurveyService {
 	
 	}
 
-	public SurveyGraph getSurveyGraphById(Long surveyId,LocalDate from,LocalDate to){
+	public SurveyGraph getSurveyGraphById(Long surveyId,LocalDate from,LocalDate to) throws Exception{
 		List<Long> questionIds = getSurveyQuestionIdsBySurveyId(surveyId);
 		Filter filter = new Filter();
 		filter.setFrom(from);

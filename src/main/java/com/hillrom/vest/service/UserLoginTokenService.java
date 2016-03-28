@@ -85,7 +85,7 @@ public class UserLoginTokenService {
 		}
 	}
 	
-	public Graph getLoginAnalytics(LocalDate from,LocalDate to,String authorityCSV,String duration) throws HillromException{
+	public Graph getLoginAnalytics(LocalDate from,LocalDate to,String authorityCSV,String duration) throws Exception{
 		List<String> authorities = Arrays.asList(authorityCSV.split(","));
 		List<LoginAnalyticsVO> actualLoginAnalytics = new LinkedList<>();
 		if(Constants.WEEK.equalsIgnoreCase(duration) || Constants.DAY.equalsIgnoreCase(duration)||

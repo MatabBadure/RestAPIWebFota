@@ -1,6 +1,6 @@
 package com.hillrom.vest.service.util;
 
-import static com.hillrom.vest.config.Constants.AGE_GROUP;
+import static com.hillrom.vest.config.Constants.*;
 import static com.hillrom.vest.config.Constants.AGE_RANGE_81_AND_ABOVE;
 import static com.hillrom.vest.config.Constants.AGE_RANGE_LABELS;
 import static com.hillrom.vest.config.Constants.BM_PARAM_ADHERENCE_SCORE;
@@ -21,8 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -56,7 +54,7 @@ public class BenchMarkUtil {
 			BenchMarkStrategy benchMarkStrategy, String rangeLabel,
 			List<BenchmarkResultVO> values) {
 		BenchMarkDataVO benchMarkDataVO = new BenchMarkDataVO(rangeLabel,values.size());
-		switch(benchMarkParameter){
+		switch(benchMarkParameter.toLowerCase()){
 		case BM_PARAM_ADHERENCE_SCORE: setAdherenceScoreBenchMark(benchMarkStrategy,values,benchMarkDataVO);
 		break;
 		case BM_PARAM_MISSED_THERAPY_DAYS: setMissedTherapyBenchMark(benchMarkStrategy,values,benchMarkDataVO);
@@ -292,6 +290,43 @@ public class BenchMarkUtil {
 				statsMap = actualStats.stream().collect(Collectors.groupingBy(ClinicDiseaseStatisticsResultVO :: getCity));
 		}
 		return statsMap;
+	}
+
+	public static int getYAxisValueForBenchMark(String benchMarkParameter,BenchMarkDataVO benchMarkData){
+		int yValue = 0;
+		switch(benchMarkParameter.toLowerCase()){
+		case BM_PARAM_ADHERENCE_SCORE : yValue = benchMarkData.getAdherenceScoreBenchMark();
+		break;
+		case BM_PARAM_HMR_DEVIATION : yValue = benchMarkData.gethMRDeviationBenchMark();
+		break;
+		case BM_PARAM_SETTING_DEVIATION :  yValue = benchMarkData.getSettingDeviationBenchMark();
+		break;
+		case BM_PARAM_MISSED_THERAPY_DAYS : yValue = benchMarkData.getMissedTherapyDaysBenchMark();
+		break;
+		case BM_PARAM_HMR_RUNRATE :  yValue = benchMarkData.gethMRRunrateBenchMark();
+		break;
+		}
+		return yValue;
+	}
+	
+	public static String getBenchMarkParameterLabel(BenchMarkFilter filter){
+		switch(filter.getBenchMarkParameter().toLowerCase()){
+		case BM_PARAM_ADHERENCE_SCORE : return BM_PARAM_ADHERENCE_SCORE_LABEL;
+		case BM_PARAM_HMR_DEVIATION : return BM_PARAM_HMR_DEVIATION_LABEL;
+		case BM_PARAM_SETTING_DEVIATION :  return BM_PARAM_SETTING_DEVIATION_LABEL;
+		case BM_PARAM_MISSED_THERAPY_DAYS : return BM_PARAM_MISSED_THERAPY_DAYS_LABEL;
+		case BM_PARAM_HMR_RUNRATE :  return BM_PARAM_HMR_RUNRATE_LABEL;
+		}
+		return "";
+	}
+	
+	public static String getBenchMarkTypeLabel(String benchMarkType){
+		switch(benchMarkType){
+		case BM_TYPE_AVERAGE : return BM_TYPE_AVERAGE_LABEL;
+		case BM_TYPE_MEDIAN : return BM_TYPE_MEDIAN_LABEL;
+		case BM_TYPE_PERCENTILE : return BM_TYPE_PERCENTILE_LABEL;
+		default: return BM_TYPE_AVERAGE_LABEL;
+		}
 	}
 
 }

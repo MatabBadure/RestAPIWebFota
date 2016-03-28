@@ -2,15 +2,11 @@ package com.hillrom.vest.service;
 
 import static com.hillrom.vest.config.Constants.BENCHMARK_DATA_CLINIC;
 import static com.hillrom.vest.config.Constants.BENCHMARK_DATA_SELF;
-import static com.hillrom.vest.config.Constants.BM_PARAM_ADHERENCE_SCORE;
-import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_DEVIATION;
-import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_RUNRATE;
-import static com.hillrom.vest.config.Constants.BM_PARAM_MISSED_THERAPY_DAYS;
-import static com.hillrom.vest.config.Constants.BM_PARAM_SETTING_DEVIATION;
 import static com.hillrom.vest.config.Constants.KEY_BENCH_MARK_DATA;
 import static com.hillrom.vest.config.Constants.KEY_RANGE_LABELS;
 import static com.hillrom.vest.config.Constants.KEY_TOTAL_PATIENTS;
 import static com.hillrom.vest.config.Constants.XAXIS_TYPE_CATEGORIES;
+import static com.hillrom.vest.service.util.BenchMarkUtil.getYAxisValueForBenchMark;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -81,20 +77,4 @@ public class BenchmarkPatientGraphService extends AbstractGraphService{
 		return benchMarkGraph;
 	}
 
-	private int getYAxisValueForBenchMark(String benchMarkParameter,BenchMarkDataVO benchMarkData){
-		int yValue = 0;
-		switch(benchMarkParameter){
-		case BM_PARAM_ADHERENCE_SCORE : yValue = benchMarkData.getAdherenceScoreBenchMark();
-		break;
-		case BM_PARAM_HMR_DEVIATION : yValue = benchMarkData.gethMRDeviationBenchMark();
-		break;
-		case BM_PARAM_SETTING_DEVIATION :  yValue = benchMarkData.getSettingDeviationBenchMark();
-		break;
-		case BM_PARAM_MISSED_THERAPY_DAYS : yValue = benchMarkData.getMissedTherapyDaysBenchMark();
-		break;
-		case BM_PARAM_HMR_RUNRATE :  yValue = benchMarkData.gethMRRunrateBenchMark();
-		break;
-		}
-		return yValue;
-	}
 }

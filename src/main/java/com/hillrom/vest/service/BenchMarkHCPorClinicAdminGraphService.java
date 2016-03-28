@@ -1,13 +1,9 @@
 package com.hillrom.vest.service;
 
-import static com.hillrom.vest.config.Constants.BM_PARAM_ADHERENCE_SCORE;
-import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_DEVIATION;
-import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_RUNRATE;
-import static com.hillrom.vest.config.Constants.BM_PARAM_MISSED_THERAPY_DAYS;
-import static com.hillrom.vest.config.Constants.BM_PARAM_SETTING_DEVIATION;
 import static com.hillrom.vest.config.Constants.KEY_MY_CLINIC;
 import static com.hillrom.vest.config.Constants.KEY_OTHER_CLINIC;
 import static com.hillrom.vest.config.Constants.XAXIS_TYPE_CATEGORIES;
+import static com.hillrom.vest.service.util.BenchMarkUtil.*;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -47,13 +43,14 @@ public class BenchMarkHCPorClinicAdminGraphService extends AbstractGraphService 
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Graph populateGraphDataForCustomDateRange(Object data, Filter filter) throws Exception{
 		Map<String,Map<String,BenchMarkDataVO>> benchMarkDataMap = (Map<String,Map<String,BenchMarkDataVO>>) data;
 		BenchMarkFilter benchMarkFilter = (BenchMarkFilter) filter;
 		Graph benchMarkGraph = GraphUtils.buildGraphObectWithXAxisType(XAXIS_TYPE_CATEGORIES);
-		Series clinicSeries = GraphUtils.createSeriesObjectWithName("Clinic Patients Avg.Adherence Score");
+		Series myClinicSeries = GraphUtils.createSeriesObjectWithName("Clinic Patients Avg.Adherence Score");
 		String seriesName = getSecondSeriesName(benchMarkFilter);
-		Series selfSeries = GraphUtils.createSeriesObjectWithName(seriesName);
+		Series otherClinicSeries = GraphUtils.createSeriesObjectWithName(seriesName);
 		
 		Map<String,BenchMarkDataVO> myClinicBenchMarkMap = benchMarkDataMap.getOrDefault(KEY_MY_CLINIC,new LinkedHashMap<>(1));
 		Map<String,BenchMarkDataVO> otherClinicBenchMarkMap = benchMarkDataMap.getOrDefault(KEY_OTHER_CLINIC,new LinkedHashMap<>(1));
@@ -63,44 +60,28 @@ public class BenchMarkHCPorClinicAdminGraphService extends AbstractGraphService 
 			BenchMarkDataVO otherClinicsBenchMark = otherClinicBenchMarkMap.getOrDefault(label, new BenchMarkDataVO(label, 0));
 			GraphDataVO myClinicGraphData = new GraphDataVO();
 			// Since it is kind of mirror image graph, we make the value negative
-			myClinicGraphData.setY(0-getYAxisValueForBenchMark(benchMarkFilter.getBenchMarkParameter(), otherClinicsBenchMark));
-			selfSeries.getData().add(myClinicGraphData);
+			myClinicGraphData.setY(0-getYAxisValueForBenchMark(benchMarkFilter.getBenchMarkParameter(), myClinicBenchMark));
+			myClinicSeries.getData().add(myClinicGraphData);
 			
 			GraphDataVO otherClinicsGraphData = new GraphDataVO();
-			otherClinicsGraphData.setY(getYAxisValueForBenchMark(benchMarkFilter.getBenchMarkParameter(), myClinicBenchMark));
-			clinicSeries.getData().add(otherClinicsGraphData);
+			otherClinicsGraphData.setY(getYAxisValueForBenchMark(benchMarkFilter.getBenchMarkParameter(), otherClinicsBenchMark));
+			otherClinicSeries.getData().add(otherClinicsGraphData);
 		}
-		benchMarkGraph.getSeries().add(clinicSeries);
-		benchMarkGraph.getSeries().add(selfSeries);
+		benchMarkGraph.getSeries().add(myClinicSeries);
+		benchMarkGraph.getSeries().add(otherClinicSeries);
 		return benchMarkGraph;
 	}
 
-	private String getSecondSeriesName(Filter filter) {
-		String seriesName = "Avg Adherence Score";
+	private String getSecondSeriesName(BenchMarkFilter filter) {
+		StringBuilder seriesName = new StringBuilder();
 		if(StringUtils.isNotEmpty(filter.getStateCSV())){
-			seriesName = "State "+seriesName;
+			seriesName.append("State ");
 		}else if(StringUtils.isNotEmpty(filter.getCityCSV())){
-			seriesName = "City "+seriesName;
+			seriesName.append("City ");
 		}
-		return seriesName;
+		seriesName.append(getBenchMarkTypeLabel(filter.getBenchMarkType()))
+		.append(" ").append(getBenchMarkParameterLabel(filter));
+		return seriesName.toString();
 	}
-
-	private int getYAxisValueForBenchMark(String benchMarkParameter,BenchMarkDataVO benchMarkData){
-		int yValue = 0;
-		switch(benchMarkParameter){
-		case BM_PARAM_ADHERENCE_SCORE : yValue = benchMarkData.getAdherenceScoreBenchMark();
-		break;
-		case BM_PARAM_HMR_DEVIATION : yValue = benchMarkData.gethMRDeviationBenchMark();
-		break;
-		case BM_PARAM_SETTING_DEVIATION :  yValue = benchMarkData.getSettingDeviationBenchMark();
-		break;
-		case BM_PARAM_MISSED_THERAPY_DAYS : yValue = benchMarkData.getMissedTherapyDaysBenchMark();
-		break;
-		case BM_PARAM_HMR_RUNRATE :  yValue = benchMarkData.gethMRRunrateBenchMark();
-		break;
-		}
-		return yValue;
-	}
-
 
 }

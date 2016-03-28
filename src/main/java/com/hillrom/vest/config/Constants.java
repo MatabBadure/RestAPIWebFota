@@ -214,11 +214,11 @@ public final class Constants {
 	public static final String AVERAGE_TREATMENTS_PER_DAY_LABEL = "Average Treatments Per Day";
 
 	// Bench Mark Parameter
-	public static final String BM_PARAM_SETTING_DEVIATION = "settingDeviation";
-	public static final String BM_PARAM_HMR_DEVIATION = "HMRDeviation";
-	public static final String BM_PARAM_MISSED_THERAPY_DAYS = "missedTherapy";
-	public static final String BM_PARAM_ADHERENCE_SCORE = "adherenceScore";
-	public static final String BM_PARAM_HMR_RUNRATE = "HMRRunrate";
+	public static final String BM_PARAM_SETTING_DEVIATION = "settingdeviation";
+	public static final String BM_PARAM_HMR_DEVIATION = "hmrdeviation";
+	public static final String BM_PARAM_MISSED_THERAPY_DAYS = "missedtherapy";
+	public static final String BM_PARAM_ADHERENCE_SCORE = "adherencescore";
+	public static final String BM_PARAM_HMR_RUNRATE = "hmrrunrate";
 
 	public static final String KEY_TOTAL_PATIENTS = "totalPatients";
 
@@ -227,9 +227,9 @@ public final class Constants {
 	public static final String MONTH_STRING = "Month";
 	public static final String YEAR_STRING = "Year";
 	
-	public static final String BM_TYPE_AVERAGE = "Average";
-	public static final String BM_TYPE_MEDIAN = "Median";
-	public static final String BM_TYPE_PERCENTILE = "Percentile";
+	public static final String BM_TYPE_AVERAGE = "average";
+	public static final String BM_TYPE_MEDIAN = "median";
+	public static final String BM_TYPE_PERCENTILE = "percentile";
 	
 	public static final String AGE_GROUP = "AgeGroup";
 	public static final String CLINIC_SIZE = "clinicSize";
@@ -307,4 +307,7 @@ public final class Constants {
 	// HCP and Clinic Admin Bench Marking
 	public static final String KEY_MY_CLINIC = "myClinic";
 	public static final String KEY_OTHER_CLINIC = "otherClinics";
+	public static final String BM_TYPE_AVERAGE_LABEL = "Avg.";
+	public static final String BM_TYPE_MEDIAN_LABEL = "Med.";
+	public static final String BM_TYPE_PERCENTILE_LABEL = "Percentile.";
 }

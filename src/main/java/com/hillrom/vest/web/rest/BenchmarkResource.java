@@ -6,6 +6,7 @@ import javax.inject.Inject;
 
 import net.minidev.json.JSONObject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -92,6 +93,8 @@ public class BenchmarkResource {
 			){
 		Filter filter = new Filter(from, to,xAxisParameter, stateCSV, cityCSV, ageGroupRange, clinicSizeRange,ignoreXAxis);
 		try {
+			if(ignoreXAxis && StringUtils.isEmpty(stateCSV) && StringUtils.isEmpty(cityCSV))
+				throw new HillromException("Required Param ,state/city is missing ");
 			return new ResponseEntity<>(benchmarkService.getClinicAndDiseaseStatsGraph(filter), HttpStatus.OK);
 		} catch (HillromException e) {
 			JSONObject errorMessage = new JSONObject();

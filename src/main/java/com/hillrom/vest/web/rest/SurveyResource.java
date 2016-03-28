@@ -26,6 +26,7 @@ import com.hillrom.vest.domain.Survey;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.SurveyService;
+import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.FiveDayViewVO;
 import com.hillrom.vest.web.rest.dto.SurveyGraph;
@@ -157,8 +158,18 @@ public class SurveyResource {
 	@RequestMapping(value = "/survey/{id}/graph", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getSurveyGraphById(@PathVariable Long id,
 			@RequestParam(required = true, value = "from")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
-  			@RequestParam(required = true, value = "to")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
+  			@RequestParam(required = true, value = "to")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) throws Exception {
+		try{
 			return new ResponseEntity< SurveyGraph>(surveyService.getSurveyGraphById(id, from, to), HttpStatus.OK);
+		}catch(HillromException e){
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+		}catch(Exception e){
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("ERROR", ExceptionConstants.HR_717);
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 }

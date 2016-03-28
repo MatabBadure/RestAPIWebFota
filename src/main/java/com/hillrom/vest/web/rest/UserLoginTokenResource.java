@@ -117,7 +117,7 @@ public class UserLoginTokenResource {
     
     /**
      * GET  /loginAnalytics -> Get LoginAnalytics
-     * @throws HillromException 
+     * @throws Exception 
      */
     @RequestMapping(value = "/loginAnalytics",
             method = RequestMethod.GET,
@@ -126,7 +126,7 @@ public class UserLoginTokenResource {
     		@RequestParam(required=true,value="from")@DateTimeFormat(pattern="yyyy-MM-dd")LocalDate from,
     		@RequestParam(required=true,value="to")@DateTimeFormat(pattern="yyyy-MM-dd")LocalDate to,
     		@RequestParam(required=true,value="filters")String authorityCSV,
-    		@RequestParam(required=true,value="duration")String duration) throws HillromException{
+    		@RequestParam(required=true,value="duration")String duration) throws Exception{
     	return userLoginTokenService.getLoginAnalytics(from, to, authorityCSV,duration);
     }
 }

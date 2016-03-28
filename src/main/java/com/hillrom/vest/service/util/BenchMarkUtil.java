@@ -80,7 +80,7 @@ public class BenchMarkUtil {
 			paramValues.add(benchmarkVO.getCumulativeHMRRunrate());
 		});
 		benchMarkValue = benchMarkStrategy.calculateBenchMark(paramValues);
-		benchMarkDataVO.sethMRRunrateBenchMark((int)benchMarkValue);		
+		benchMarkDataVO.sethMRRunrateBenchMark((int)Math.round(benchMarkValue));		
 	}
 
 	public static void setSettingDeviationBenchMark(
@@ -92,7 +92,7 @@ public class BenchMarkUtil {
 			paramValues.add(benchmarkVO.getCumilativeSettingsDeviatedCount());
 		});
 		benchMarkValue = benchMarkStrategy.calculateBenchMark(paramValues);
-		benchMarkDataVO.setSettingDeviationBenchMark((int)benchMarkValue);
+		benchMarkDataVO.setSettingDeviationBenchMark((int)Math.round(benchMarkValue));
 	}
 
 	public static void setHMRDeviationBenchMark(BenchMarkStrategy benchMarkStrategy,
@@ -103,7 +103,7 @@ public class BenchMarkUtil {
 			paramValues.add(benchmarkVO.getCumilativeNonAdherenceCount());
 		});
 		benchMarkValue = benchMarkStrategy.calculateBenchMark(paramValues);
-		benchMarkDataVO.sethMRDeviationBenchMark((int)benchMarkValue);
+		benchMarkDataVO.sethMRDeviationBenchMark((int)Math.round(benchMarkValue));
 	}
 
 	public static void setMissedTherapyBenchMark(BenchMarkStrategy benchMarkStrategy,
@@ -114,7 +114,7 @@ public class BenchMarkUtil {
 			paramValues.add(benchmarkVO.getCumilativeMissedTherapyDaysCount());
 		});
 		benchMarkValue = benchMarkStrategy.calculateBenchMark(paramValues);
-		benchMarkDataVO.setMissedTherapyDaysBenchMark((int)benchMarkValue);
+		benchMarkDataVO.setMissedTherapyDaysBenchMark((int)Math.round(benchMarkValue));
 	}
 
 	public static void setAdherenceScoreBenchMark(BenchMarkStrategy benchMarkStrategy,
@@ -125,7 +125,7 @@ public class BenchMarkUtil {
 			paramValues.add(benchmarkVO.getCumilativeComplience());
 		});
 		benchMarkValue = benchMarkStrategy.calculateBenchMark(paramValues);
-		benchMarkDataVO.setAdherenceScoreBenchMark((int)benchMarkValue);
+		benchMarkDataVO.setAdherenceScoreBenchMark((int)Math.round(benchMarkValue));
 	}
 
 	public static List<String> getRangeLabels(Filter filter){

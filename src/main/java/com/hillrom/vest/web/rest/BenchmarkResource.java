@@ -105,7 +105,7 @@ public class BenchmarkResource {
 	}
 	
 	@RequestMapping(value = "/user/hcp/{id}/benchmark", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getClinicLevelBenchMArkForHCPOrClinicAdmin(@PathVariable Long id,
+	public ResponseEntity<?> getClinicLevelBenchMarkForHCP(@PathVariable Long id,
 			@RequestParam(value = "from", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
 			@RequestParam(value = "to", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to,
 			@RequestParam(value="state",required=false)String stateCSV,
@@ -129,4 +129,28 @@ public class BenchmarkResource {
 		}
 	}
 
+	@RequestMapping(value = "/user/clinicadmin/{id}/benchmark", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getClinicLevelBenchMarkForClinicAdmin(@PathVariable Long id,
+			@RequestParam(value = "from", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
+			@RequestParam(value = "to", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to,
+			@RequestParam(value="state",required=false)String stateCSV,
+    		@RequestParam(value="city",required=false)String cityCSV,
+			@RequestParam(value = "benchmarkType", required = true) String benchMarkType,
+			@RequestParam(value = "parameterType", required = true) String parameterType,
+			@RequestParam(value = "clinicId", required = true) String clinicId){
+		BenchMarkFilter filter = new BenchMarkFilter(from, to,"All",AGE_GROUP,benchMarkType, parameterType, id, clinicId);
+		filter.setCityCSV(cityCSV);
+		filter.setStateCSV(stateCSV);
+		try {
+			return new ResponseEntity<>(benchmarkService.getClinicLevelBenchMarkGraphForHCPOrClinicAdmin(filter), HttpStatus.OK);
+		} catch (HillromException e) {
+			JSONObject errorMessage = new JSONObject();
+			errorMessage.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+		} catch (Exception e){
+			JSONObject errorMessage = new JSONObject();
+			errorMessage.put("ERROR", ExceptionConstants.HR_717);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

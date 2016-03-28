@@ -1,9 +1,8 @@
 package com.hillrom.vest.service;
 
-import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 import static com.hillrom.vest.config.AdherenceScoreConstants.UPPER_BOUND_VALUE;
+import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -102,6 +102,7 @@ public class PatientProtocolService {
 		 			if(Objects.nonNull(ppd.getId())){
 			 			PatientProtocolData currentPPD = patientProtocolRepository.findOne(ppd.getId());
 				 		if(Objects.nonNull(currentPPD)){
+				 			currentPPD.setLastModifiedDate(DateTime.now());
 				 			assignValuesToPatientProtocolObj(ppd, currentPPD);
 			 				patientProtocolRepository.saveAndFlush(currentPPD);
 			 				protocolList.add(currentPPD);
@@ -113,6 +114,7 @@ public class PatientProtocolService {
 		 						ppd.getMaxPressure());
 			 			patientProtocolAssoc.setId(patientProtocolRepository.id());
 			 			patientProtocolAssoc.setProtocolKey(protocolKey);
+			 			patientProtocolAssoc.setLastModifiedDate(DateTime.now());
 			 			patientProtocolRepository.saveAndFlush(patientProtocolAssoc);
 			 			protocolList.add(patientProtocolAssoc);
 		 			}
@@ -143,7 +145,7 @@ public class PatientProtocolService {
 			cp.setMaxPressure(up.getMaxPressure());
 	}
 
-    public List<PatientProtocolData> getAllProtocolsAssociatedWithPatient(Long patientUserId) throws HillromException {
+    public List<PatientProtocolData> getActiveProtocolsAssociatedWithPatient(Long patientUserId) throws HillromException {
     	User patientUser = userRepository.findOne(patientUserId);
     	if(patientUser != null) {
 	    	PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
@@ -293,5 +295,19 @@ public class PatientProtocolService {
 		minDuration = (int)(totalDuration*treatmentsPerDay);
 		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration);
 	}
+	
+	public List<PatientProtocolData> getAllProtocolsAssociatedWithPatient(Long patientUserId) throws HillromException {
+    	User patientUser = userRepository.findOne(patientUserId);
+    	if(patientUser != null) {
+	    	PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
+	     	if(patientInfo != null){
+	     		return patientProtocolRepository.findByPatientUserIdOrderByCreatedDateAsc(patientUserId);
+	     	} else {
+	     		throw new HillromException(ExceptionConstants.HR_523);
+		 	}
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);
+     	}
+    }
 }
 

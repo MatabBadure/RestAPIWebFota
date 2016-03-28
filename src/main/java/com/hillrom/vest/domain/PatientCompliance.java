@@ -1,5 +1,6 @@
 package com.hillrom.vest.domain;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -17,6 +18,7 @@ import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -84,8 +86,9 @@ import com.hillrom.vest.web.rest.dto.BenchmarkResultVO;
 		@ColumnResult(name = "avgHMRRunrate", type = BigDecimal.class)}))
 })
 @Entity
+@Audited
 @Table(name="PATIENT_COMPLIANCE")
-public class PatientCompliance {
+public class PatientCompliance extends AbstractAuditingEntity implements Serializable{
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
@@ -360,5 +363,10 @@ public class PatientCompliance {
 				+ "]";
 	}
 
+	@Override
+	public String getCreatedBy() {
+		return patientUser.getEmail();
+	}
+	
 	
 }

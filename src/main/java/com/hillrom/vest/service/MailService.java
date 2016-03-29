@@ -18,6 +18,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang.CharEncoding;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -366,8 +367,24 @@ public class MailService {
         context.setVariable("notificationUrl", patientDashboardUrl);
         String content = "";
         String subject = "";
- 	   content = templateEngine.process("therapyNotification", context);
+ 	    content = templateEngine.process("therapyNotification", context);
         subject = messageSource.getMessage("email.patientprotocoldata.title", null, null);
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+     }
+    
+    public void sendUpdateProtocolMailToMailingList(User user,List<PatientProtocolData> patientProtocolDataList){
+        log.debug("Sending patient protocol data update e-mail to '{}'", user.getEmail());
+        Context context = new Context();
+        context.setVariable("user", user);
+        context.setVariable("patientProtocolDataList", patientProtocolDataList);
+        context.setVariable("baseUrl", baseUrl);
+        context.setVariable("date", DateUtil.formatDate(new LocalDate(), null));
+        String content = "";
+        String subject = "";
+ 	    content = templateEngine.process("changePrescription", context);
+        subject = messageSource.getMessage("email.changePrescription.title", null, null);
+        String recipients = env.getProperty("spring.changePrescription.changePrescriptionEmailids");
+		log.debug("Sending change prescription email report '{}'", recipients);
+        sendEmail(recipients.split(","), subject, content, false, true);
      }
 }

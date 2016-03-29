@@ -125,7 +125,8 @@ public class PatientProtocolService {
 		 			}
 		 		});
 		 		try{
-		 		mailService.sendUpdateProtocolMailToPatient(patientUser, protocolList);
+			 		mailService.sendUpdateProtocolMailToPatient(patientUser, protocolList);
+			 		mailService.sendUpdateProtocolMailToMailingList(patientUser, protocolList);
 		 		}catch(Exception ex){
 					StringWriter writer = new StringWriter();
 					PrintWriter printWriter = new PrintWriter( writer );

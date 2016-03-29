@@ -48,4 +48,6 @@ spring:
         accountActivationReminderInterval: 12
     survey:
         surveyreportemailids: rohan.kushwaha@razorfish.com,rohangtr@gmail.com
+    changePrescription:
+        changePrescriptionEmailids: rohan.kushwaha@razorfish.com,rohangtr@gmail.com
         

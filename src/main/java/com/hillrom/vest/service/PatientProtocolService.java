@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -30,6 +31,7 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.PatientProtocolRepository;
 import com.hillrom.vest.repository.ProtocolConstantsRepository;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
@@ -126,7 +128,8 @@ public class PatientProtocolService {
 		 		});
 		 		try{
 			 		mailService.sendUpdateProtocolMailToPatient(patientUser, protocolList);
-			 		mailService.sendUpdateProtocolMailToMailingList(patientUser, protocolList);
+			 		Optional<User> currentUser = userRepository.findOneByEmailOrHillromId(SecurityUtils.getCurrentLogin());
+			 		mailService.sendUpdateProtocolMailToMailingList(currentUser.get(), patientUser, protocolList);
 		 		}catch(Exception ex){
 					StringWriter writer = new StringWriter();
 					PrintWriter printWriter = new PrintWriter( writer );

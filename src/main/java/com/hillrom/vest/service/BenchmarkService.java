@@ -93,22 +93,23 @@ public class BenchmarkService {
 		Map<String,BenchMarkDataVO> defaultBenchMarkData = new LinkedHashMap<>();
 		if(BM_TYPE_AVERAGE.equalsIgnoreCase(filter.getBenchMarkType()) || Objects.isNull(filter.getBenchMarkType())){
 			if(AGE_GROUP.equalsIgnoreCase(filter.getxAxisParameter())){
-				benchmarkVOs = benchmarkRepository.getAverageBenchmarkByAge(filter.getFrom(), filter.getTo(), filter.getCityCSV(), filter.getStateCSV());
-				groupBenchMarkMap = mapBenchMarkByAgeGroup(benchmarkVOs);
+				benchmarkVOs = benchmarkRepository.getAverageBenchmarkByAgeForParameterView(filter);
+				groupBenchMarkMap = benchmarkVOs.stream().collect(Collectors.groupingBy(BenchmarkResultVO :: getAgeRangeLabel));
 			}
 			else{
-				benchmarkVOs = benchmarkRepository.getAverageBenchmarkByClinicSize(filter.getFrom(), filter.getTo(), filter.getCityCSV(), filter.getStateCSV());
-				groupBenchMarkMap = mapBenchMarkByClinicSize(benchmarkVOs);
+				benchmarkVOs = benchmarkRepository.getAverageBenchmarkByClinicSizeForParameterView(filter);
+				groupBenchMarkMap = benchmarkVOs.stream().collect(Collectors.groupingBy(BenchmarkResultVO :: getClinicSizeRangeLabel));
 			}
 			defaultBenchMarkData = prepareDefaultDataByAgeGroupOrClinicSize(filter);
 		}
 		BenchMarkStrategy benchMarkStrategy = BenchMarkStrategyFactory.getBenchMarkStrategy(filter.getBenchMarkType());
 		for(String ageRangeLabel : defaultBenchMarkData.keySet()){
 			List<BenchmarkResultVO> values = groupBenchMarkMap.get(ageRangeLabel);
-			if(Objects.nonNull(values)){
+			if(Objects.nonNull(values) && values.size() > 0){
 				BenchMarkDataVO benchMarkDataVO = prepareBenchMarkData(
 						filter.getBenchMarkParameter(), benchMarkStrategy, ageRangeLabel,
 						values);
+				benchMarkDataVO.setPatientCount(values.get(0).getPatientCount());
 				defaultBenchMarkData.put(ageRangeLabel, benchMarkDataVO);
 			}
 		}

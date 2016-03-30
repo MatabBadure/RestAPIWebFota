@@ -382,7 +382,7 @@ public class MailService {
         String content = "";
         String subject = "";
  	    content = templateEngine.process("changePrescription", context);
-        subject = messageSource.getMessage("email.changePrescription.title", null, null);
+        subject = messageSource.getMessage("email.changePrescription.title", null, null) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);
         String recipients = env.getProperty("spring.changePrescription.changePrescriptionEmailids");
 		log.debug("Sending change prescription email report '{}'", recipients);
         sendEmail(recipients.split(","), subject, content, false, true);

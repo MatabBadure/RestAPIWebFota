@@ -24,6 +24,7 @@ import java.util.SortedMap;
 
 import org.springframework.stereotype.Component;
 
+import com.hillrom.vest.service.util.BenchMarkUtil;
 import com.hillrom.vest.service.util.GraphUtils;
 import com.hillrom.vest.web.rest.dto.BenchMarkDataVO;
 import com.hillrom.vest.web.rest.dto.BenchMarkFilter;
@@ -68,7 +69,7 @@ public class BenchMarkGraphService extends AbstractGraphService {
 		List<String> rangeLabels = (List<String>) benchMarkDataMap.getOrDefault(KEY_RANGE_LABELS,new LinkedList<>());
 		BenchMarkFilter benchMarkFilter = (BenchMarkFilter) filter;
 		Graph benchMarkGraph = GraphUtils.buildGraphObectWithXAxisType(XAXIS_TYPE_CATEGORIES);
-		Series series = GraphUtils.createSeriesObjectWithName(getSeriesName(benchMarkFilter.getBenchMarkParameter()));
+		Series series = GraphUtils.createSeriesObjectWithName(BenchMarkUtil.getBenchMarkParameterLabel(benchMarkFilter));
 		benchMarkGraph.getxAxis().getCategories().addAll(rangeLabels);
 		for(String label : rangeLabels){
 			BenchMarkDataVO benchMarkVO = benchMarkData.getOrDefault(label, new BenchMarkDataVO(label, 0));
@@ -80,15 +81,5 @@ public class BenchMarkGraphService extends AbstractGraphService {
 		}
 		benchMarkGraph.getSeries().add(series);
 		return benchMarkGraph;
-	}
-
-	private String getSeriesName(String name){
-		Map<String,String> seriesNameMap = new HashMap<>();
-		seriesNameMap.put(BM_PARAM_ADHERENCE_SCORE.toLowerCase(), BM_PARAM_ADHERENCE_SCORE_LABEL);
-		seriesNameMap.put(BM_PARAM_SETTING_DEVIATION.toLowerCase(), BM_PARAM_SETTING_DEVIATION_LABEL);
-		seriesNameMap.put(BM_PARAM_HMR_DEVIATION.toLowerCase(), BM_PARAM_HMR_DEVIATION_LABEL);
-		seriesNameMap.put(BM_PARAM_MISSED_THERAPY_DAYS.toLowerCase(), BM_PARAM_MISSED_THERAPY_DAYS_LABEL);
-		seriesNameMap.put(BM_PARAM_HMR_RUNRATE.toLowerCase(), BM_PARAM_HMR_RUNRATE_LABEL);
-		return seriesNameMap.get(name);
 	}
 }

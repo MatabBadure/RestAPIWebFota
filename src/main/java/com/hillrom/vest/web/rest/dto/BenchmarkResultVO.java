@@ -26,7 +26,26 @@ public class BenchmarkResultVO{
 	private BigDecimal cumulativeHMRRunrate;
 	private String clinicName;
 	private String ageRangeLabel;
+	private String clinicSizeRangeLabel;
+	private Integer patientCount;
 	
+	public BenchmarkResultVO(String ageRangeLabel,String clinicSizeRangeLabel,
+			BigDecimal cumulativeCompScore,
+			BigDecimal cumulativeNonAdherenceCount,
+			BigDecimal cumulativeSettingsDeviatedCount,
+			BigDecimal cumulativeMissedTherapyDaysCount,
+			BigDecimal cumulativeHMRRunrate,  BigInteger patientCount) {
+		super();
+		this.cumulativeCompScore = cumulativeCompScore;
+		this.cumulativeNonAdherenceCount = cumulativeNonAdherenceCount;
+		this.cumulativeSettingsDeviatedCount = cumulativeSettingsDeviatedCount;
+		this.cumulativeMissedTherapyDaysCount = cumulativeMissedTherapyDaysCount;
+		this.cumulativeHMRRunrate = cumulativeHMRRunrate;
+		this.ageRangeLabel = ageRangeLabel;
+		this.clinicSizeRangeLabel = clinicSizeRangeLabel;
+		this.patientCount = Objects.nonNull(patientCount) ? patientCount.intValue() : 0;
+	}
+
 	public BenchmarkResultVO(Long complianceId, String patientId, Long userId, LocalDate dob, String zipcode,
 			String city, String state, LocalDate lastTherapySessionDate, BigDecimal cumulativeCompScore,
 			BigDecimal cumulativeNonAdherenceCount, BigDecimal cumulativeSettingsDeviatedCount,
@@ -177,6 +196,18 @@ public class BenchmarkResultVO{
 	}
 	public void setAgeRangeLabel(String ageRangeLabel) {
 		this.ageRangeLabel = ageRangeLabel;
+	}
+	public String getClinicSizeRangeLabel() {
+		return clinicSizeRangeLabel;
+	}
+	public void setClinicSizeRangeLabel(String clinicSizeRangeLabel) {
+		this.clinicSizeRangeLabel = clinicSizeRangeLabel;
+	}
+	public Integer getPatientCount() {
+		return patientCount;
+	}
+	public void setPatientCount(Integer patientCount) {
+		this.patientCount = patientCount;
 	}
 
 	@Override

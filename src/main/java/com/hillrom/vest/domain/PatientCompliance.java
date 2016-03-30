@@ -30,19 +30,14 @@ import com.hillrom.vest.web.rest.dto.BenchmarkResultVO;
 
 @SqlResultSetMappings({
 @SqlResultSetMapping(name = "avgBenchmarkResultSetMapping", classes = @ConstructorResult(targetClass = BenchmarkResultVO.class, columns = {
-		@ColumnResult(name = "complainceId", type = Long.class),
-		@ColumnResult(name = "patId",type = String.class),
-		@ColumnResult(name = "userId",type = Long.class),
-		@ColumnResult(name = "dob", type = org.jadira.usertype.dateandtime.joda.PersistentLocalDate.class),
-		@ColumnResult(name = "zipcode",type = String.class),
-		@ColumnResult(name = "city",type = String.class),
-		@ColumnResult(name = "state",type = String.class),
-		@ColumnResult(name = "lastTherapySessionDate", type = org.jadira.usertype.dateandtime.joda.PersistentLocalDate.class),
+		@ColumnResult(name = "ageRangeLabel", type = String.class),
+		@ColumnResult(name = "clinicSizeRangeLabel", type = String.class),
 		@ColumnResult(name = "avgCompScore", type = BigDecimal.class),
 		@ColumnResult(name = "avgNonAdherenceCount", type = BigDecimal.class),
 		@ColumnResult(name = "avgSettingsDeviatedCount", type = BigDecimal.class),
 		@ColumnResult(name = "avgMissedTherapyDaysCount", type = BigDecimal.class),
-		@ColumnResult(name = "avgHMRRunrate", type = BigDecimal.class)})),
+		@ColumnResult(name = "avgHMRRunrate", type = BigDecimal.class),
+		@ColumnResult(name = "patientCount", type = BigInteger.class)})),
 @SqlResultSetMapping(name = "avgBenchmarkByClinicSizeResultSetMapping", classes = @ConstructorResult(targetClass = BenchmarkResultVO.class, columns = {
 		@ColumnResult(name = "complainceId", type = Long.class),
 		@ColumnResult(name = "patId",type = String.class),

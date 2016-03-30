@@ -1,17 +1,20 @@
 package com.hillrom.vest.service;
 
 import static com.hillrom.vest.config.Constants.BM_PARAM_ADHERENCE_SCORE;
-import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_DEVIATION;
-import static com.hillrom.vest.config.Constants.BM_PARAM_MISSED_THERAPY_DAYS;
-import static com.hillrom.vest.config.Constants.BM_PARAM_SETTING_DEVIATION;
 import static com.hillrom.vest.config.Constants.BM_PARAM_ADHERENCE_SCORE_LABEL;
+import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_DEVIATION;
 import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_DEVIATION_LABEL;
+import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_RUNRATE;
+import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_RUNRATE_LABEL;
+import static com.hillrom.vest.config.Constants.BM_PARAM_MISSED_THERAPY_DAYS;
 import static com.hillrom.vest.config.Constants.BM_PARAM_MISSED_THERAPY_DAYS_LABEL;
+import static com.hillrom.vest.config.Constants.BM_PARAM_SETTING_DEVIATION;
 import static com.hillrom.vest.config.Constants.BM_PARAM_SETTING_DEVIATION_LABEL;
 import static com.hillrom.vest.config.Constants.KEY_BENCH_MARK_DATA;
 import static com.hillrom.vest.config.Constants.KEY_RANGE_LABELS;
 import static com.hillrom.vest.config.Constants.KEY_TOTAL_PATIENTS;
 import static com.hillrom.vest.config.Constants.XAXIS_TYPE_CATEGORIES;
+import static com.hillrom.vest.service.util.BenchMarkUtil.getYAxisValueForBenchMark;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -61,7 +64,7 @@ public class BenchMarkGraphService extends AbstractGraphService {
 	@SuppressWarnings("unchecked")
 	public Graph populateGraphDataForCustomDateRange(Object data, Filter filter) {
 		Map<String,Object> benchMarkDataMap = (Map<String, Object>) data;
-		SortedMap<String,BenchMarkDataVO> benchMarkData = (SortedMap<String, BenchMarkDataVO>) benchMarkDataMap.getOrDefault(KEY_BENCH_MARK_DATA, new Object());
+		Map<String,BenchMarkDataVO> benchMarkData = (Map<String, BenchMarkDataVO>) benchMarkDataMap.getOrDefault(KEY_BENCH_MARK_DATA, new Object());
 		List<String> rangeLabels = (List<String>) benchMarkDataMap.getOrDefault(KEY_RANGE_LABELS,new LinkedList<>());
 		BenchMarkFilter benchMarkFilter = (BenchMarkFilter) filter;
 		Graph benchMarkGraph = GraphUtils.buildGraphObectWithXAxisType(XAXIS_TYPE_CATEGORIES);
@@ -70,16 +73,7 @@ public class BenchMarkGraphService extends AbstractGraphService {
 		for(String label : rangeLabels){
 			BenchMarkDataVO benchMarkVO = benchMarkData.getOrDefault(label, new BenchMarkDataVO(label, 0));
 			GraphDataVO graphData = new GraphDataVO();
-			int y = 0;
-			if(BM_PARAM_ADHERENCE_SCORE.equalsIgnoreCase(benchMarkFilter.getBenchMarkParameter())){
-				y = benchMarkVO.getAdherenceScoreBenchMark();
-			}else if(BM_PARAM_HMR_DEVIATION.equalsIgnoreCase(benchMarkFilter.getBenchMarkParameter())){
-				y=  benchMarkVO.gethMRDeviationBenchMark();
-			}else if(BM_PARAM_SETTING_DEVIATION.equalsIgnoreCase(benchMarkFilter.getBenchMarkParameter())){
-				y = benchMarkVO.getSettingDeviationBenchMark();
-			}else if(BM_PARAM_MISSED_THERAPY_DAYS.equalsIgnoreCase(benchMarkFilter.getBenchMarkParameter())){
-				y = benchMarkVO.getMissedTherapyDaysBenchMark();
-			}
+			int y = getYAxisValueForBenchMark(benchMarkFilter.getBenchMarkParameter(), benchMarkVO);
 			graphData.setY(y);
 			graphData.getToolText().put(KEY_TOTAL_PATIENTS, benchMarkVO.getPatientCount());
 			series.getData().add(graphData);
@@ -90,10 +84,11 @@ public class BenchMarkGraphService extends AbstractGraphService {
 
 	private String getSeriesName(String name){
 		Map<String,String> seriesNameMap = new HashMap<>();
-		seriesNameMap.put(BM_PARAM_ADHERENCE_SCORE, BM_PARAM_ADHERENCE_SCORE_LABEL);
-		seriesNameMap.put(BM_PARAM_SETTING_DEVIATION, BM_PARAM_SETTING_DEVIATION_LABEL);
-		seriesNameMap.put(BM_PARAM_HMR_DEVIATION, BM_PARAM_HMR_DEVIATION_LABEL);
-		seriesNameMap.put(BM_PARAM_MISSED_THERAPY_DAYS, BM_PARAM_MISSED_THERAPY_DAYS_LABEL);
+		seriesNameMap.put(BM_PARAM_ADHERENCE_SCORE.toLowerCase(), BM_PARAM_ADHERENCE_SCORE_LABEL);
+		seriesNameMap.put(BM_PARAM_SETTING_DEVIATION.toLowerCase(), BM_PARAM_SETTING_DEVIATION_LABEL);
+		seriesNameMap.put(BM_PARAM_HMR_DEVIATION.toLowerCase(), BM_PARAM_HMR_DEVIATION_LABEL);
+		seriesNameMap.put(BM_PARAM_MISSED_THERAPY_DAYS.toLowerCase(), BM_PARAM_MISSED_THERAPY_DAYS_LABEL);
+		seriesNameMap.put(BM_PARAM_HMR_RUNRATE.toLowerCase(), BM_PARAM_HMR_RUNRATE_LABEL);
 		return seriesNameMap.get(name);
 	}
 }

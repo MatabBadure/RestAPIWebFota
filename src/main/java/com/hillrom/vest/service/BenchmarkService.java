@@ -1,75 +1,96 @@
 package com.hillrom.vest.service;
 
 import static com.hillrom.vest.config.Constants.AGE_GROUP;
-import static com.hillrom.vest.config.Constants.CLINIC_SIZE;
-import static com.hillrom.vest.config.Constants.BM_PARAM_ADHERENCE_SCORE;
-import static com.hillrom.vest.config.Constants.BM_PARAM_HMR_DEVIATION;
-import static com.hillrom.vest.config.Constants.BM_PARAM_MISSED_THERAPY_DAYS;
-import static com.hillrom.vest.config.Constants.BM_PARAM_SETTING_DEVIATION;
+import static com.hillrom.vest.config.Constants.BENCHMARK_DATA_CLINIC;
+import static com.hillrom.vest.config.Constants.BENCHMARK_DATA_SELF;
 import static com.hillrom.vest.config.Constants.BM_TYPE_AVERAGE;
+import static com.hillrom.vest.config.Constants.BOTH;
+import static com.hillrom.vest.config.Constants.KEY_BENCH_MARK_DATA;
+import static com.hillrom.vest.config.Constants.KEY_MY_CLINIC;
+import static com.hillrom.vest.config.Constants.KEY_OTHER_CLINIC;
+import static com.hillrom.vest.config.Constants.KEY_RANGE_LABELS;
+import static com.hillrom.vest.service.util.BenchMarkUtil.mapBenchMarkByAgeGroup;
+import static com.hillrom.vest.service.util.BenchMarkUtil.mapBenchMarkByClinicSize;
+import static com.hillrom.vest.service.util.BenchMarkUtil.prepareBenchMarkData;
+import static com.hillrom.vest.service.util.BenchMarkUtil.prepareDefaultDataByAgeGroupOrClinicSize;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.BenchmarkRepository;
-import com.hillrom.vest.repository.BenchmarkResultVO;
+import com.hillrom.vest.repository.ClinicAndDiseaseStatisticsRepository;
+import com.hillrom.vest.service.util.BenchMarkUtil;
+import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.web.rest.dto.BenchMarkDataVO;
 import com.hillrom.vest.web.rest.dto.BenchMarkFilter;
+import com.hillrom.vest.web.rest.dto.BenchmarkResultVO;
+import com.hillrom.vest.web.rest.dto.ClinicDiseaseStatisticsResultVO;
+import com.hillrom.vest.web.rest.dto.Filter;
+import com.hillrom.vest.web.rest.dto.Graph;
 
 @Service
 @Transactional
 public class BenchmarkService {
 	
-	private static final String AGE_RANGE_0_TO_5 = "0-5";
-	private static final String AGE_RANGE_6_TO_10 = "6-10";
-	private static final String AGE_RANGE_11_TO_15 = "11-15";
-	private static final String AGE_RANGE_16_TO_20 = "16-20";
-	private static final String AGE_RANGE_21_TO_25 = "21-25";
-	private static final String AGE_RANGE_26_TO_30 = "26-30";
-	private static final String AGE_RANGE_31_TO_35 = "31-35";
-	private static final String AGE_RANGE_36_TO_40 = "36-40";
-	private static final String AGE_RANGE_41_TO_45 = "41-45";
-	private static final String AGE_RANGE_46_TO_50 = "46-50";
-	private static final String AGE_RANGE_51_TO_55 = "51-55";
-	private static final String AGE_RANGE_56_TO_60 = "56-60";
-	private static final String AGE_RANGE_61_TO_65 = "61-65";
-	private static final String AGE_RANGE_66_TO_70 = "66-70";
-	private static final String AGE_RANGE_71_TO_75 = "71-75";
-	private static final String AGE_RANGE_76_TO_80 = "76-80";
-	private static final String AGE_RANGE_81_AND_ABOVE = "81-above";
-
-	
-	private static final String CLINIC_SIZE_RANGE_1_TO_25 = "1-25";
-	private static final String CLINIC_SIZE_RANGE_26_TO_50 = "26-50";
-	private static final String CLINIC_SIZE_RANGE_51_TO_75 = "51-75";
-	private static final String CLINIC_SIZE_RANGE_76_TO_100 = "76-100";
-	private static final String CLINIC_SIZE_RANGE_101_TO_150 = "101-150";
-	private static final String CLINIC_SIZE_RANGE_151_TO_200 = "151-200";
-	private static final String CLINIC_SIZE_RANGE_201_TO_250 = "201-250";
-	private static final String CLINIC_SIZE_RANGE_251_TO_300 = "251-300";
-	private static final String CLINIC_SIZE_RANGE_301_TO_350 = "301-350";
-	private static final String CLINIC_SIZE_RANGE_351_TO_400 = "351-400";
-	private static final String CLINIC_SIZE_RANGE_401_AND_ABOVE = "401-above";
-
 	@Inject
 	private BenchmarkRepository benchmarkRepository;
 	
-	public SortedMap<String,BenchMarkDataVO> getBenchmarkDataByAgeGroupOrClinicSize(BenchMarkFilter filter) {
+	@Qualifier("benchMarkGraphService")
+	@Inject
+	private GraphService benchMarkGraphService;
+	
+	@Qualifier("benchMarkPatientGraphService")
+	@Inject
+	private GraphService benchmarkPatientGraphService;
+	
+	@Inject
+	private ClinicAndDiseaseStatisticsRepository statisticsRepository;
+	
+	@Qualifier("clinicAndStatsGraphService")
+	@Inject
+	private GraphService clinicAndStatsGraphService;
+	
+	@Qualifier("benchMarkHCPorClinicAdminGraphService")
+	@Inject
+	private GraphService benchMarkHCPorClinicAdminGraphService;
+	
+	public Graph getBenchMarkGraphForAdminParameterView(BenchMarkFilter filter) throws Exception{
+		Map<String,BenchMarkDataVO> benchMarkData = getBenchmarkDataForAdminParameterView(filter);
+		List<String> rangeLabels =  BenchMarkUtil.getRangeLabels(filter);
+		Map<String,Object> benchMarkDataMap = new HashMap<>(2);
+		benchMarkDataMap.put(KEY_BENCH_MARK_DATA, benchMarkData);
+		benchMarkDataMap.put(KEY_RANGE_LABELS, rangeLabels);
+		Graph benchMarkGraph = benchMarkGraphService.populateGraphData(benchMarkDataMap, filter);
+		return benchMarkGraph;
+
+	}
+	
+	public Graph getBenchMarkGraphForPatientView(BenchMarkFilter filter) throws Exception{
+		Map<String, Map<String, BenchMarkDataVO>> benchMarkData = getBenchMarkDataForPatientView(filter);
+		List<String> rangeLabels = BenchMarkUtil.getRangeLabels(filter);
+		Map<String, Object> benchMarkDataMap = new HashMap<>(2);
+		benchMarkDataMap.put(KEY_BENCH_MARK_DATA, benchMarkData);
+		benchMarkDataMap.put(KEY_RANGE_LABELS, rangeLabels);
+		Graph benchMarkGraph = benchmarkPatientGraphService.populateGraphData(benchMarkDataMap, filter);
+		return benchMarkGraph;
+	}
+	
+	public Map<String,BenchMarkDataVO> getBenchmarkDataForAdminParameterView(BenchMarkFilter filter) {
 		List<BenchmarkResultVO> benchmarkVOs = new LinkedList<>();
 		Map<String, List<BenchmarkResultVO>> groupBenchMarkMap = new HashMap<>();
-		SortedMap<String,BenchMarkDataVO> defaultBenchMarkData = new TreeMap<>();
+		Map<String,BenchMarkDataVO> defaultBenchMarkData = new LinkedHashMap<>();
 		if(BM_TYPE_AVERAGE.equalsIgnoreCase(filter.getBenchMarkType()) || Objects.isNull(filter.getBenchMarkType())){
 			if(AGE_GROUP.equalsIgnoreCase(filter.getxAxisParameter())){
 				benchmarkVOs = benchmarkRepository.getAverageBenchmarkByAge(filter.getFrom(), filter.getTo(), filter.getCityCSV(), filter.getStateCSV());
@@ -93,181 +114,132 @@ public class BenchmarkService {
 		}
 		return defaultBenchMarkData;
 	}
-
-	private BenchMarkDataVO prepareBenchMarkData(String benchMarkParameter,
-			BenchMarkStrategy benchMarkStrategy, String rangeLabel,
-			List<BenchmarkResultVO> values) {
-		BenchMarkDataVO benchMarkDataVO = new BenchMarkDataVO(rangeLabel,values.size());
-		switch(benchMarkParameter){
-		case BM_PARAM_ADHERENCE_SCORE: setAdherenceScoreBenchMark(benchMarkStrategy,values,benchMarkDataVO);
-		break;
-		case BM_PARAM_MISSED_THERAPY_DAYS: setMissedTherapyBenchMark(benchMarkStrategy,values,benchMarkDataVO);
-		break;
-		case BM_PARAM_HMR_DEVIATION: setHMRDeviationBenchMark(benchMarkStrategy, values,benchMarkDataVO);
-		break;
-		case BM_PARAM_SETTING_DEVIATION: setSettingDeviationBenchMark(benchMarkStrategy,values,benchMarkDataVO);
-		break;
-		default: setAdherenceScoreBenchMark(benchMarkStrategy,values,benchMarkDataVO);
-		}
-		return benchMarkDataVO;
-	}
-
-	public void setSettingDeviationBenchMark(
-			BenchMarkStrategy benchMarkStrategy,
-			List<BenchmarkResultVO> values, BenchMarkDataVO benchMarkDataVO) {
-		double benchMarkValue;
-		List<BigDecimal> paramValues = new LinkedList<>();
-		values.stream().forEach(benchmarkVO -> {
-			paramValues.add(benchmarkVO.getCumilativeSettingsDeviatedCount());
-		});
-		benchMarkValue = benchMarkStrategy.calculateBenchMark(paramValues);
-		benchMarkDataVO.setSettingDeviationBenchMark((int)benchMarkValue);
-	}
-
-	public void setHMRDeviationBenchMark(BenchMarkStrategy benchMarkStrategy,
-			List<BenchmarkResultVO> values, BenchMarkDataVO benchMarkDataVO) {
-		double benchMarkValue;
-		List<BigDecimal> paramValues = new LinkedList<>();
-		values.stream().forEach(benchmarkVO -> {
-			paramValues.add(benchmarkVO.getCumilativeNonAdherenceCount());
-		});
-		benchMarkValue = benchMarkStrategy.calculateBenchMark(paramValues);
-		benchMarkDataVO.sethMRDeviationBenchMark((int)benchMarkValue);
-	}
-
-	public void setMissedTherapyBenchMark(BenchMarkStrategy benchMarkStrategy,
-			List<BenchmarkResultVO> values, BenchMarkDataVO benchMarkDataVO) {
-		double benchMarkValue;
-		List<BigDecimal> paramValues = new LinkedList<>();
-		values.stream().forEach(benchmarkVO -> {
-			paramValues.add(benchmarkVO.getCumilativeMissedTherapyDaysCount());
-		});
-		benchMarkValue = benchMarkStrategy.calculateBenchMark(paramValues);
-		benchMarkDataVO.setMissedTherapyDaysBenchMark((int)benchMarkValue);
-	}
-
-	public void setAdherenceScoreBenchMark(BenchMarkStrategy benchMarkStrategy,
-			List<BenchmarkResultVO> values,BenchMarkDataVO benchMarkDataVO) {
-		List<BigDecimal> paramValues = new LinkedList<>();
-		double benchMarkValue;
-		values.stream().forEach(benchmarkVO -> {
-			paramValues.add(benchmarkVO.getCumilativeComplience());
-		});
-		benchMarkValue = benchMarkStrategy.calculateBenchMark(paramValues);
-		benchMarkDataVO.setAdherenceScoreBenchMark((int)benchMarkValue);
-	}
-
-	private SortedMap<String, BenchMarkDataVO> prepareDefaultDataByAgeGroupOrClinicSize(
-			BenchMarkFilter filter) {
-		SortedMap<String,BenchMarkDataVO> benchMarkData = new TreeMap<>();
-		List<String> rangeLabels = getRangeLabels(filter);
-		rangeLabels.forEach(label -> {
-			benchMarkData.put(label, new BenchMarkDataVO(label, 0));
-		});
-		return benchMarkData;
-	}
-
-	public List<String> getRangeLabels(BenchMarkFilter filter) {
-		List<String> rangeLabels = new LinkedList<>();
-		String parameter = filter.getxAxisParameter();
-		if(Objects.nonNull(parameter) && AGE_GROUP.equalsIgnoreCase(parameter)){
-			if(filter.getRangeCSV().equalsIgnoreCase("All")){
-				rangeLabels = Arrays.asList(AGE_RANGE_0_TO_5,AGE_RANGE_6_TO_10,AGE_RANGE_11_TO_15,
-						AGE_RANGE_16_TO_20,AGE_RANGE_21_TO_25,AGE_RANGE_26_TO_30,AGE_RANGE_31_TO_35,
-						AGE_RANGE_36_TO_40,AGE_RANGE_41_TO_45,AGE_RANGE_46_TO_50,AGE_RANGE_51_TO_55,
-						AGE_RANGE_56_TO_60,AGE_RANGE_61_TO_65,AGE_RANGE_66_TO_70,AGE_RANGE_71_TO_75,
-						AGE_RANGE_76_TO_80,AGE_RANGE_81_AND_ABOVE);
-			}else{
-				rangeLabels = Arrays.asList(filter.getRangeCSV().split(","));
+	
+	public Map<String,Map<String,BenchMarkDataVO>> getBenchMarkDataForPatientView(BenchMarkFilter filter) throws HillromException {
+		
+			List<BenchmarkResultVO> benchmarkVOs = new LinkedList<>();
+			Map<String, List<BenchmarkResultVO>> groupBenchMarkForClinicMap = new HashMap<>();
+			Map<String, List<BenchmarkResultVO>> groupBenchMarkForPatientMap = new HashMap<>();
+			Map<String,BenchMarkDataVO> defaultBenchMarkDataForClinic = new LinkedHashMap<>();
+			Map<String,BenchMarkDataVO> defaultBenchMarkDataForUser = new LinkedHashMap<>();
+			if(BM_TYPE_AVERAGE.equalsIgnoreCase(filter.getBenchMarkType()) || Objects.isNull(filter.getBenchMarkType())){
+				benchmarkVOs = benchmarkRepository.getAverageBenchmarkForClinicByAgeGroup(filter.getFrom(),
+						filter.getTo(), filter.getCityCSV(), filter.getStateCSV(),filter.getClinicId());
+				Map<Long,List<BenchmarkResultVO>> userBenchmarkData = benchmarkVOs.stream().collect(Collectors.groupingBy(BenchmarkResultVO :: getUserId));
+				groupBenchMarkForClinicMap = mapBenchMarkByAgeGroup(benchmarkVOs);
+				if(Objects.nonNull(userBenchmarkData.get(filter.getUserId())))
+					groupBenchMarkForPatientMap = mapBenchMarkByAgeGroup(userBenchmarkData.get(filter.getUserId()));
+				else
+					throw new HillromException(ExceptionConstants.HR_808);
+				defaultBenchMarkDataForClinic = prepareDefaultDataByAgeGroupOrClinicSize(filter);
+				defaultBenchMarkDataForUser = prepareDefaultDataByAgeGroupOrClinicSize(filter);
 			}
-		}else if(Objects.nonNull(parameter) && CLINIC_SIZE.equalsIgnoreCase(parameter)){
-			if(filter.getRangeCSV().equalsIgnoreCase("All")){
-				rangeLabels = Arrays.asList(CLINIC_SIZE_RANGE_1_TO_25,CLINIC_SIZE_RANGE_26_TO_50,
-					CLINIC_SIZE_RANGE_51_TO_75,CLINIC_SIZE_RANGE_76_TO_100,CLINIC_SIZE_RANGE_101_TO_150,
-					CLINIC_SIZE_RANGE_151_TO_200,CLINIC_SIZE_RANGE_201_TO_250,CLINIC_SIZE_RANGE_251_TO_300,
-					CLINIC_SIZE_RANGE_301_TO_350,CLINIC_SIZE_RANGE_351_TO_400,CLINIC_SIZE_RANGE_401_AND_ABOVE);
-			}else{
-				rangeLabels = Arrays.asList(filter.getRangeCSV().split(","));
+			BenchMarkStrategy benchMarkStrategy = BenchMarkStrategyFactory.getBenchMarkStrategy(filter.getBenchMarkType());
+			
+			updateDefaultBenchMarkDataWithActualForPatientView(filter,
+					groupBenchMarkForClinicMap, groupBenchMarkForPatientMap,
+					defaultBenchMarkDataForClinic, defaultBenchMarkDataForUser,
+					benchMarkStrategy);
+			Map<String,Map<String,BenchMarkDataVO>> defaultBenchMarkData = new HashMap<>();
+			defaultBenchMarkData.put(BENCHMARK_DATA_CLINIC, defaultBenchMarkDataForClinic);
+			defaultBenchMarkData.put(BENCHMARK_DATA_SELF, defaultBenchMarkDataForUser);
+			return defaultBenchMarkData;
+		}
+
+	private void updateDefaultBenchMarkDataWithActualForPatientView(BenchMarkFilter filter,
+			Map<String, List<BenchmarkResultVO>> groupBenchMarkForClinicMap,
+			Map<String, List<BenchmarkResultVO>> groupBenchMarkForPatientMap,
+			Map<String, BenchMarkDataVO> defaultBenchMarkDataForClinic,
+			Map<String, BenchMarkDataVO> defaultBenchMarkDataForUser,
+			BenchMarkStrategy benchMarkStrategy) {
+		for(String ageRangeLabel : defaultBenchMarkDataForClinic.keySet()){
+			List<BenchmarkResultVO> clinicLevelValues = groupBenchMarkForClinicMap.get(ageRangeLabel);
+			List<BenchmarkResultVO> userLevelValues = groupBenchMarkForPatientMap.get(ageRangeLabel);
+			//Clinic 
+			if(Objects.nonNull(clinicLevelValues)){
+				BenchMarkDataVO benchMarkDataVO = prepareBenchMarkData(
+						filter.getBenchMarkParameter(), benchMarkStrategy, ageRangeLabel,
+						clinicLevelValues);
+				defaultBenchMarkDataForClinic.put(ageRangeLabel, benchMarkDataVO);
+			}
+			//User
+			if(Objects.nonNull(userLevelValues)){
+				BenchMarkDataVO benchMarkDataVO = prepareBenchMarkData(
+						filter.getBenchMarkParameter(), benchMarkStrategy, ageRangeLabel,
+						userLevelValues);
+				defaultBenchMarkDataForUser.put(ageRangeLabel, benchMarkDataVO);
 			}
 		}
-		return rangeLabels;
 	}
-
-	private Map<String, List<BenchmarkResultVO>> mapBenchMarkByAgeGroup(List<BenchmarkResultVO> benchmarkVOs) {
-		Map<String, List<BenchmarkResultVO>> ageRangeBenchmarkVOMap = new HashMap<>();
-		for (BenchmarkResultVO benchmarkVO : benchmarkVOs) {
-			if (benchmarkVO.getAge() <= 5)
-				addBenchMarkToMap(AGE_RANGE_0_TO_5,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 10)
-				addBenchMarkToMap(AGE_RANGE_6_TO_10,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 15)
-				addBenchMarkToMap(AGE_RANGE_11_TO_15,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 20)
-				addBenchMarkToMap(AGE_RANGE_16_TO_20,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 25)
-				addBenchMarkToMap(AGE_RANGE_21_TO_25,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 30)
-				addBenchMarkToMap(AGE_RANGE_26_TO_30,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 35)
-				addBenchMarkToMap(AGE_RANGE_31_TO_35,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 40)
-				addBenchMarkToMap(AGE_RANGE_36_TO_40,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 45)
-				addBenchMarkToMap(AGE_RANGE_41_TO_45,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 50)
-				addBenchMarkToMap(AGE_RANGE_46_TO_50,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 55)
-				addBenchMarkToMap(AGE_RANGE_51_TO_55,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 60)
-				addBenchMarkToMap(AGE_RANGE_56_TO_60,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 65)
-				addBenchMarkToMap(AGE_RANGE_61_TO_65,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 70)
-				addBenchMarkToMap(AGE_RANGE_66_TO_70,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 75)
-				addBenchMarkToMap(AGE_RANGE_71_TO_75,ageRangeBenchmarkVOMap, benchmarkVO);
-			else if (benchmarkVO.getAge() <= 80)
-				addBenchMarkToMap(AGE_RANGE_76_TO_80,ageRangeBenchmarkVOMap, benchmarkVO);
-			else
-				addBenchMarkToMap(AGE_RANGE_81_AND_ABOVE,ageRangeBenchmarkVOMap, benchmarkVO);
+	
+	public Graph getClinicAndDiseaseStatsGraph(Filter filter) throws Exception{
+		List<ClinicDiseaseStatisticsResultVO> statsResultsVO = new LinkedList<>(); 
+		if(!filter.isIgnoreXAxis()){
+			statsResultsVO = statisticsRepository.getClinicDiseaseStatsByAgeGroupOrClinicSize(filter);
+		}else{
+			statsResultsVO = statisticsRepository.getClinicDiseaseStatsByState(filter);
 		}
-		return ageRangeBenchmarkVOMap;
+		Map<String,List<ClinicDiseaseStatisticsResultVO>> statsMap = getClinicAndDiseaseStats(statsResultsVO,filter);
+		return clinicAndStatsGraphService.populateGraphData(statsMap, filter);
 	}
-
-	public void addBenchMarkToMap(String key,Map<String, List<BenchmarkResultVO>> rangeBenchMarkVOMap,
-			BenchmarkResultVO benchmarkVO) {
-		List<BenchmarkResultVO> benchmarkData = rangeBenchMarkVOMap.getOrDefault(key, new LinkedList<>());
-		benchmarkData.add(benchmarkVO);
-		rangeBenchMarkVOMap.put(key, benchmarkData);
-	}
-
-	private Map<String, List<BenchmarkResultVO>> mapBenchMarkByClinicSize(List<BenchmarkResultVO> benchmarkVOs) {
-		Map<String, List<BenchmarkResultVO>> clinicSizeBenchMarkMap = new HashMap<>();
-		for (BenchmarkResultVO benchmarkVO : benchmarkVOs) {
-			if (benchmarkVO.getClinicSize() <= 25)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_1_TO_25,clinicSizeBenchMarkMap, benchmarkVO);
-			else if (benchmarkVO.getClinicSize() <= 50)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_26_TO_50,clinicSizeBenchMarkMap, benchmarkVO);
-			else if (benchmarkVO.getClinicSize() <= 75)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_51_TO_75,clinicSizeBenchMarkMap, benchmarkVO);
-			else if (benchmarkVO.getClinicSize() <= 100)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_76_TO_100,clinicSizeBenchMarkMap, benchmarkVO);
-			else if (benchmarkVO.getClinicSize() <= 150)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_101_TO_150,clinicSizeBenchMarkMap, benchmarkVO);
-			else if (benchmarkVO.getClinicSize() <= 200)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_151_TO_200,clinicSizeBenchMarkMap, benchmarkVO);
-			else if (benchmarkVO.getClinicSize() <= 250)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_201_TO_250,clinicSizeBenchMarkMap, benchmarkVO);
-			else if (benchmarkVO.getClinicSize() <= 300)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_251_TO_300,clinicSizeBenchMarkMap, benchmarkVO);
-			else if (benchmarkVO.getClinicSize() <= 350)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_301_TO_350,clinicSizeBenchMarkMap, benchmarkVO);
-			else if (benchmarkVO.getClinicSize() <= 400)
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_351_TO_400,clinicSizeBenchMarkMap, benchmarkVO);
-			else
-				addBenchMarkToMap(CLINIC_SIZE_RANGE_401_AND_ABOVE,clinicSizeBenchMarkMap, benchmarkVO);
+	
+	public Map<String, List<ClinicDiseaseStatisticsResultVO>> getClinicAndDiseaseStats(List<ClinicDiseaseStatisticsResultVO> actualStats,Filter filter){
+		Map<String, List<ClinicDiseaseStatisticsResultVO>> defaultStatsMap = new LinkedHashMap<>();
+		if(!BOTH.equalsIgnoreCase(filter.getxAxisParameter()) )
+			defaultStatsMap = BenchMarkUtil.getDefaultDataForClinicAndDiseaseStats(filter);
+		else
+			defaultStatsMap = BenchMarkUtil.getDefaultDataForClinicAndDiseaseStatsByBoth(filter);
+		Map<String,List<ClinicDiseaseStatisticsResultVO>> actualStatsMap = BenchMarkUtil.groupStatsByXAxisParam(actualStats, filter);
+		// update the default map with actual stats
+		for(String label : defaultStatsMap.keySet()){
+			if(Objects.nonNull(actualStatsMap.get(label))){
+				defaultStatsMap.put(label, actualStatsMap.get(label));
+			}
 		}
-		return clinicSizeBenchMarkMap;
+		return defaultStatsMap;
 	}
 
+	public Graph getClinicLevelBenchMarkGraphForHCPOrClinicAdmin(BenchMarkFilter filter) throws Exception{
+		Map<String,Map<String,BenchMarkDataVO>> benchMarkData = getClinicLevelBenchMarkDataForHCPOrClinicAdmin(filter);
+		return benchMarkHCPorClinicAdminGraphService.populateGraphData(benchMarkData, filter);
+	}
+	
+	public Map<String,Map<String,BenchMarkDataVO>> getClinicLevelBenchMarkDataForHCPOrClinicAdmin(BenchMarkFilter filter){
+		List<BenchmarkResultVO> myClinicBenchMark =  benchmarkRepository.getAverageBenchMarkByAgeGroupForClinicAndAdminOrHCP(filter);
+		List<BenchmarkResultVO> otherClinicsBenchMark =  benchmarkRepository.getAverageBenchMarkByAgeGroupForRestOfClinics(filter);
+		Map<String,BenchMarkDataVO> defaultMyClinicData = BenchMarkUtil.prepareDefaultDataByAgeGroupOrClinicSize(filter);
+		Map<String,BenchMarkDataVO> defaultOtherClinicsData = BenchMarkUtil.prepareDefaultDataByAgeGroupOrClinicSize(filter);
+		Map<String, List<BenchmarkResultVO>> myClinicBenchMarkMap = myClinicBenchMark.stream().collect(Collectors.groupingBy(BenchmarkResultVO :: getAgeRangeLabel));
+		Map<String, List<BenchmarkResultVO>> otherClinicsBenchMarkMap = otherClinicsBenchMark.stream().collect(Collectors.groupingBy(BenchmarkResultVO :: getAgeRangeLabel));
+		BenchMarkStrategy benchMarkStrategy = BenchMarkStrategyFactory.getBenchMarkStrategy(filter.getBenchMarkType());
+		updateDefaultBenchMarkDataWithActualForClinicAdminAndHCPView(filter,myClinicBenchMarkMap,otherClinicsBenchMarkMap,defaultMyClinicData,defaultOtherClinicsData,benchMarkStrategy);
+		Map<String,Map<String,BenchMarkDataVO>> actualBenchMarkData = new LinkedHashMap<>();
+		actualBenchMarkData.put(KEY_MY_CLINIC, defaultMyClinicData);
+		actualBenchMarkData.put(KEY_OTHER_CLINIC, defaultOtherClinicsData);
+		return actualBenchMarkData;
+	}
+	
+	private void updateDefaultBenchMarkDataWithActualForClinicAdminAndHCPView(BenchMarkFilter filter,
+			Map<String, List<BenchmarkResultVO>> myClinicBenchMarkMap,
+			Map<String, List<BenchmarkResultVO>> otherClinicsBenchMarkMap,
+			Map<String, BenchMarkDataVO> defaultMyClinicData,
+			Map<String, BenchMarkDataVO> defaultBenchMarkDataForOtherClinic,
+			BenchMarkStrategy benchMarkStrategy) {
+		for(String ageRangeLabel : defaultMyClinicData.keySet()){
+			List<BenchmarkResultVO> myClinicValues = myClinicBenchMarkMap.get(ageRangeLabel);
+			List<BenchmarkResultVO> otherClinicsValues = otherClinicsBenchMarkMap.get(ageRangeLabel);
+			if(Objects.nonNull(myClinicValues)){
+				BenchMarkDataVO benchMarkDataVO = prepareBenchMarkData(
+						filter.getBenchMarkParameter(), benchMarkStrategy, ageRangeLabel,
+						myClinicValues);
+				defaultMyClinicData.put(ageRangeLabel, benchMarkDataVO);
+			}
+			if(Objects.nonNull(otherClinicsValues)){
+				BenchMarkDataVO benchMarkDataVO = prepareBenchMarkData(
+						filter.getBenchMarkParameter(), benchMarkStrategy, ageRangeLabel,
+						otherClinicsValues);
+				defaultBenchMarkDataForOtherClinic.put(ageRangeLabel, benchMarkDataVO);
+			}
+		}
+	}
 }

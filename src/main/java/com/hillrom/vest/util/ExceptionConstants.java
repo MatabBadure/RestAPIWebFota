@@ -151,8 +151,12 @@ public class ExceptionConstants {
     public static final String HR_805 = "Survey taken already";
     public static final String HR_806 = "You are not eligible to take this survey";
     public static final String HR_807 = "Invalid survey question id";
+    public static final String HR_808 = "Patient is not associated with the Clinic";
+    
     // Validate Credentials Api Exception messages
     public static final String HR_714 = "Please enter the password for your Visi-View account.";
     public static final String HR_716 = "The entered password is incorrect. Be sure you're using the password for your Visi-View account.";
-    
+
+    // Generic Exception for Graph 
+    public static final String HR_717 = "Unable to process graph data";
 }

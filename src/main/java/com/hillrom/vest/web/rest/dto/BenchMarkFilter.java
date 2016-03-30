@@ -6,33 +6,36 @@ import org.joda.time.LocalDate;
 
 public class BenchMarkFilter extends Filter{
 
-	private String xAxisParameter;
 	private String benchMarkType;
 	private String benchMarkParameter;
-	private String stateCSV;
-	private String cityCSV;
-	private String rangeCSV;
-	
+	private Long userId; 
+	private String clinicId;
 	
 	public BenchMarkFilter(LocalDate from,LocalDate to,
 			String xAxisParameter,String benchMarkType,
 			String benchMarkParameter,String stateCSV,
 			String cityCSV,String rangeCSV) {
-		super(from,to,"",new LinkedList<>());
-		this.xAxisParameter = xAxisParameter;
+		super(from,to,xAxisParameter,stateCSV,cityCSV,rangeCSV);
 		this.benchMarkType = benchMarkType;
 		this.benchMarkParameter = benchMarkParameter;
-		this.stateCSV = stateCSV;
-		this.cityCSV = cityCSV;
-		this.rangeCSV = rangeCSV;
 	}
-
-	public String getxAxisParameter() {
-		return xAxisParameter;
+	public BenchMarkFilter(LocalDate from,LocalDate to,
+			String benchMarkType,
+			String benchMarkParameter) {
+		super(from,to,"",new LinkedList<>());
+		this.benchMarkType = benchMarkType;
+		this.benchMarkParameter = benchMarkParameter;
 	}
-	public void setxAxisParameter(String xAxisParameter) {
-		this.xAxisParameter = xAxisParameter;
+	public BenchMarkFilter(LocalDate from,LocalDate to,
+			String range,String xAxisParameter,String benchMarkType,
+			String benchMarkParameter,Long userId, String clinicId) {
+		super(from,to,xAxisParameter,"","",range);
+		this.benchMarkType = benchMarkType;
+		this.benchMarkParameter = benchMarkParameter;
+		this.userId = userId;
+		this.clinicId = clinicId;
 	}
+	
 	public String getBenchMarkType() {
 		return benchMarkType;
 	}
@@ -45,29 +48,17 @@ public class BenchMarkFilter extends Filter{
 	public void setBenchMarkParameter(String benchMarkParameter) {
 		this.benchMarkParameter = benchMarkParameter;
 	}
-
-	public String getStateCSV() {
-		return stateCSV;
+	public Long getUserId() {
+		return userId;
 	}
-
-	public void setStateCSV(String stateCSV) {
-		this.stateCSV = stateCSV;
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
-
-	public String getCityCSV() {
-		return cityCSV;
+	public String getClinicId() {
+		return clinicId;
 	}
-
-	public void setCityCSV(String cityCSV) {
-		this.cityCSV = cityCSV;
+	public void setClinicId(String clinicId) {
+		this.clinicId = clinicId;
 	}
-
-	public String getRangeCSV() {
-		return rangeCSV;
-	}
-
-	public void setRangeCSV(String rangeCSV) {
-		this.rangeCSV = rangeCSV;
-	}	
 	
 }

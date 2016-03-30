@@ -48,7 +48,8 @@ public class BenchMarkHCPorClinicAdminGraphService extends AbstractGraphService 
 		Map<String,Map<String,BenchMarkDataVO>> benchMarkDataMap = (Map<String,Map<String,BenchMarkDataVO>>) data;
 		BenchMarkFilter benchMarkFilter = (BenchMarkFilter) filter;
 		Graph benchMarkGraph = GraphUtils.buildGraphObectWithXAxisType(XAXIS_TYPE_CATEGORIES);
-		Series myClinicSeries = GraphUtils.createSeriesObjectWithName("Clinic Patients Avg.Adherence Score");
+		String myClinicSeriesName = getFirstSeriesName(benchMarkFilter);
+		Series myClinicSeries = GraphUtils.createSeriesObjectWithName(myClinicSeriesName);
 		String seriesName = getSecondSeriesName(benchMarkFilter);
 		Series otherClinicSeries = GraphUtils.createSeriesObjectWithName(seriesName);
 		
@@ -72,9 +73,19 @@ public class BenchMarkHCPorClinicAdminGraphService extends AbstractGraphService 
 		return benchMarkGraph;
 	}
 
+	private String getFirstSeriesName(BenchMarkFilter benchMarkFilter) {
+		StringBuilder myClinicSeriesName = new StringBuilder("Clinic Patients ")
+		.append(getBenchMarkTypeLabel(benchMarkFilter.getBenchMarkType()))
+		.append(" ")
+		.append(getBenchMarkParameterLabel(benchMarkFilter));
+		return myClinicSeriesName.toString();
+	}
+
 	private String getSecondSeriesName(BenchMarkFilter filter) {
 		StringBuilder seriesName = new StringBuilder();
-		if(StringUtils.isNotEmpty(filter.getStateCSV())){
+		if(StringUtils.isEmpty(filter.getStateCSV()) && StringUtils.isEmpty(filter.getCityCSV())){
+			seriesName.append("National ");
+		}else if(StringUtils.isNotEmpty(filter.getStateCSV())){
 			seriesName.append("State ");
 		}else if(StringUtils.isNotEmpty(filter.getCityCSV())){
 			seriesName.append("City ");

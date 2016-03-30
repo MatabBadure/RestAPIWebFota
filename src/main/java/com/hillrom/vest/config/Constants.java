@@ -239,7 +239,7 @@ public final class Constants {
 	
 	// BenchMark Axis Labels
 	public static final String BM_PARAM_SETTING_DEVIATION_LABEL = "Setting Deviation";
-	public static final String BM_PARAM_HMR_DEVIATION_LABEL = "HMR Deviation";
+	public static final String BM_PARAM_HMR_DEVIATION_LABEL = "HMR Non Adherence";
 	public static final String BM_PARAM_MISSED_THERAPY_DAYS_LABEL = "Missed Therapy";
 	public static final String BM_PARAM_ADHERENCE_SCORE_LABEL = "Adherence Score";
 	public static final String BM_PARAM_HMR_RUNRATE_LABEL = "HMR Runrate";

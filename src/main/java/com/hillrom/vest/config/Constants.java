@@ -231,8 +231,8 @@ public final class Constants {
 	public static final String BM_TYPE_MEDIAN = "median";
 	public static final String BM_TYPE_PERCENTILE = "percentile";
 	
-	public static final String AGE_GROUP = "AgeGroup";
-	public static final String CLINIC_SIZE = "clinicSize";
+	public static final String AGE_GROUP = "agegroup";
+	public static final String CLINIC_SIZE = "clinicsize";
 
 	public static final String KEY_RANGE_LABELS = "rangeLabels";
 	public static final String KEY_BENCH_MARK_DATA = "benchMarkData";

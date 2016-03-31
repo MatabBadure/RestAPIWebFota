@@ -2,6 +2,8 @@ package com.hillrom.vest.repository;
 
 import static com.hillrom.vest.config.Constants.AGE_RANGE_81_AND_ABOVE;
 import static com.hillrom.vest.config.Constants.AGE_RANGE_LABELS;
+import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_401_AND_ABOVE;
+import static com.hillrom.vest.config.Constants.CLINIC_SIZE_RANGE_LABELS;
 import static com.hillrom.vest.config.Constants.RELATION_LABEL_SELF;
 import static com.hillrom.vest.security.AuthoritiesConstants.CLINIC_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
@@ -20,8 +22,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import com.hillrom.vest.security.SecurityUtils;
+import com.hillrom.vest.service.AverageBenchMarkStrategy;
 import com.hillrom.vest.web.rest.dto.BenchMarkFilter;
 import com.hillrom.vest.web.rest.dto.BenchmarkResultVO;
+import com.hillrom.vest.web.rest.dto.Filter;
 
 @Repository
 public class BenchmarkRepository {
@@ -34,23 +38,26 @@ public class BenchmarkRepository {
 	private EntityManager entityManager;
 
 	@SuppressWarnings("unchecked")
-	public List<BenchmarkResultVO> getAverageBenchmarkByAge(LocalDate fromDate, LocalDate toDate, String cityCSV,
-			String stateCSV) {
+	public List<BenchmarkResultVO> getAverageBenchmarkByAgeForParameterView(BenchMarkFilter filter) {
 
-		StringBuilder avgQueryString = new StringBuilder("SELECT pc.id as complainceId,pc.patient_id as patId, ");
-				avgQueryString.append("pc.user_id as userId,pi.dob as dob,TIMESTAMPDIFF(YEAR,pi.dob,CURDATE()) AS age, ")
-				.append("pi.zipcode,pi.city,pi.state, pc.last_therapy_session_date as lastTherapySessionDate, ");
+		StringBuilder avgQueryString = new StringBuilder("SELECT ");
+				applyCaseStatementForAgeGroup(filter.getAgeRangeCSV(), avgQueryString);
+				avgQueryString.append(",");
+				// to avoid one more result set mapping
+				avgQueryString.append("null as clinicSizeRangeLabel, ");
 				addBenchMarkParametersToQuery(avgQueryString);
+				avgQueryString.append(",");
+				avgQueryString.append(" count(distinct pi.id) as patientCount ");
 				avgQueryString.append("FROM PATIENT_COMPLIANCE pc join USER u on u.id = pc.user_id ")
 				.append("join USER_PATIENT_ASSOC upa on u.id = upa.user_id and relation_label = '"+RELATION_LABEL_SELF+"' ")
 				.append("join PATIENT_INFO pi on pi.id = upa.patient_id ");
 				
-				applyStateAndCityFilterOnPatients(cityCSV, stateCSV,
+				applyStateAndCityFilterOnPatients(filter.getCityCSV(), filter.getStateCSV(),
 						avgQueryString);
 		
 		avgQueryString.append(" join USER_AUTHORITY ua on ua.user_id = pc.user_id ") 
-				.append("and ua.authority_name = '"+PATIENT+"' where pc.date between '" + fromDate.toString() + "'  AND '" + toDate.toString() + "'  ");		
-		avgQueryString.append("group by pc.patient_id;");
+				.append("and ua.authority_name = '"+PATIENT+"' where pc.date between '" + filter.getFrom().toString() + "'  AND '" + filter.getTo().toString() + "'  ");		
+		avgQueryString.append("group by ageRangeLabel");
 		
 		log.debug(avgQueryString.toString());
 		Query avgQuery = entityManager.createNativeQuery(avgQueryString.toString(), "avgBenchmarkResultSetMapping");
@@ -58,20 +65,19 @@ public class BenchmarkRepository {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<BenchmarkResultVO> getAverageBenchmarkByClinicSize(LocalDate fromDate, LocalDate toDate, String cityCSV,
-			String stateCSV) {
+	public List<BenchmarkResultVO> getAverageBenchmarkByClinicSizeForParameterView(BenchMarkFilter filter) {
 		StringBuilder avgQueryString = new StringBuilder();
-				avgQueryString.append("SELECT pc.id as complainceId,pc.patient_id as patId,")
-				.append("pc.user_id as userId,pi.dob as dob, ") 
-				.append("pi.zipcode,pi.city,pi.state, pc.last_therapy_session_date as lastTherapySessionDate, ");
-				
+				avgQueryString.append("SELECT ");
+				avgQueryString.append("null as ageRangeLabel, ");
+				applyCaseStatementForClinicSize(filter.getClinicSizeRangeCSV(), avgQueryString);
+				avgQueryString.append(",");
 				addBenchMarkParametersToQuery(avgQueryString);
-
-				avgQueryString.append(", clinic_size_table.clinicsize ");
+				avgQueryString.append(",");
+				avgQueryString.append(" clinic_size_table.clinicsize as patientCount ");
 				
 				addPatientRelatedJoins(avgQueryString);
 		        
-				applyStateAndCityFilterOnPatients(cityCSV, stateCSV,
+				applyStateAndCityFilterOnPatients(filter.getCityCSV(), filter.getStateCSV(),
 						avgQueryString);
 		        
 		        avgQueryString.append("join CLINIC_PATIENT_ASSOC cpa on cpa.patient_id = pi.id ")					
@@ -80,10 +86,10 @@ public class BenchmarkRepository {
 		        avgQueryString.append("join USER_AUTHORITY ua on ua.user_id = pc.user_id   and ua.authority_name = '"+PATIENT+"' ")
 				.append("join (select clinic_id as clinicid, count(patient_id) as clinicsize	 ")					
 				.append("from CLINIC_PATIENT_ASSOC group by clinic_id) as clinic_size_table on ")
-				.append("clinic_size_table.clinicid = cl.id where pc.date between '" + fromDate.toString() + "'  AND '" + toDate.toString() + "'  ");
-		        avgQueryString.append("group by pc.patient_id;");
+				.append("clinic_size_table.clinicid = cl.id where pc.date between '" + filter.getFrom().toString() + "'  AND '" + filter.getTo().toString() + "'  ");
+		        avgQueryString.append("group by clinicSizeRangeLabel");
 		        log.debug(avgQueryString.toString());
-		Query avgQuery = entityManager.createNativeQuery(avgQueryString.toString(),"avgBenchmarkByClinicSizeResultSetMapping");
+		Query avgQuery = entityManager.createNativeQuery(avgQueryString.toString(),"avgBenchmarkResultSetMapping");
 		return avgQuery.getResultList();
 	}
 
@@ -239,4 +245,27 @@ public class BenchmarkRepository {
 		}
 		query.append(" end as ageRangeLabel ");
 	}
+	
+	private void applyCaseStatementForClinicSize(String clinicSizeGroupRangeLabel,
+			StringBuilder query) {
+		query.append(" case ");
+		String clinicSizeGroupRangeLabels[] = clinicSizeGroupRangeLabel
+				.split(",");
+		if ("All".equalsIgnoreCase(clinicSizeGroupRangeLabel)) {
+			clinicSizeGroupRangeLabels = CLINIC_SIZE_RANGE_LABELS;
+		}
+		for (String rangeLabel : clinicSizeGroupRangeLabels) {
+			String ranges[] = rangeLabel.split("-");
+			if (!CLINIC_SIZE_RANGE_401_AND_ABOVE.equalsIgnoreCase(rangeLabel)) {
+				query.append(" when clinic_size_table.clinicsize between ")
+						.append(ranges[0]).append(" and ").append(ranges[1]);
+			} else {
+				query.append(" when clinic_size_table.clinicsize >= ").append(
+						ranges[0]);
+			}
+			query.append(" then ").append("'").append(rangeLabel).append("'");
+		}
+		query.append(" end as clinicSizeRangeLabel");
+	}
+
 }

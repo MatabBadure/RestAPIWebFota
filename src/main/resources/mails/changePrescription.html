@@ -19,7 +19,7 @@
 	</tr>
 	<tr>
 		<td>
-			<img src="images/update_prescription.png" th:src="@{|${baseUrl}/images/update_prescription.png|}" width="581" height="97" alt=""></img></td>
+			<img src="images/update-prescription.png" th:src="@{|${baseUrl}/images/update-prescription.png|}" width="581" height="97" alt=""></img></td>
 	</tr>
 	<tr>
 		<td width="581" bgcolor="#fff">&nbsp;</td>
@@ -108,7 +108,7 @@
 						<td width="213">&nbsp;</td>
 						</tr>
 						<tr>
-						<td width="213" style="color:#276092;font-weight:bold;font-size:17px">Griffin Carl</td>
+						<td width="213" style="color:#276092;font-weight:bold;font-size:17px"  th:text="|${currentUser.lastName} ${currentUser.firstName}|" >Griffin Carl</td>
 						</tr>
 						<tr>
 						<td width="213">&nbsp;</td>

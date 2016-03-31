@@ -372,17 +372,18 @@ public class MailService {
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
      }
     
-    public void sendUpdateProtocolMailToMailingList(User user,List<PatientProtocolData> patientProtocolDataList){
-        log.debug("Sending patient protocol data update e-mail to '{}'", user.getEmail());
+    public void sendUpdateProtocolMailToMailingList(User currentUser, User patientUser,List<PatientProtocolData> patientProtocolDataList){
+        log.debug("Sending patient protocol data update e-mail to '{}'", patientUser.getEmail());
         Context context = new Context();
-        context.setVariable("user", user);
+        context.setVariable("user", patientUser);
+        context.setVariable("currentUser", currentUser);
         context.setVariable("patientProtocolDataList", patientProtocolDataList);
         context.setVariable("baseUrl", baseUrl);
         context.setVariable("date", DateUtil.formatDate(new LocalDate(), null));
         String content = "";
         String subject = "";
  	    content = templateEngine.process("changePrescription", context);
-        subject = messageSource.getMessage("email.changePrescription.title", null, null);
+        subject = messageSource.getMessage("email.changePrescription.title", null, null) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);
         String recipients = env.getProperty("spring.changePrescription.changePrescriptionEmailids");
 		log.debug("Sending change prescription email report '{}'", recipients);
         sendEmail(recipients.split(","), subject, content, false, true);

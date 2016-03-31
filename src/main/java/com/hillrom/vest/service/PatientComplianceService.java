@@ -126,6 +126,9 @@ public class PatientComplianceService {
 			toDate = to.minusDays(1);
 		}
 		List<PatientCompliance> complianceList = complianceRepository.findByDateBetweenAndPatientUserIdIn(fromDate, toDate, patientUserIds);
+		if(complianceList.isEmpty()){
+			throw new HillromException("No Data Available");
+		}
 		SortedMap<LocalDate,PatientCompliance> complianceMap = new TreeMap<>();
 		for(PatientCompliance compliance : complianceList){
 			complianceMap.put(compliance.getDate(), compliance);

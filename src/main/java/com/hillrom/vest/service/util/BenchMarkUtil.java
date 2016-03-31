@@ -241,13 +241,13 @@ public class BenchMarkUtil {
 	public static Map<String, List<ClinicDiseaseStatisticsResultVO>> getDefaultDataForClinicAndDiseaseStatsByBoth(Filter filter){
 		Map<String, List<ClinicDiseaseStatisticsResultVO>> statsMap = new LinkedHashMap<>();
 		List<String> ageRangeLabels = getRangeLabelsForStatsByXAxisParameter(filter);
-		List<String> clinicSizeRangeLabels = getRangeLabels(filter);
-		for(String ageRange : ageRangeLabels){
+		List<String> clinicSizeRangeLabels = getRangeLabels(CLINIC_SIZE,filter.getClinicSizeRangeCSV());
+		for(String clinicSizeRange : clinicSizeRangeLabels){
 			List<ClinicDiseaseStatisticsResultVO> clinicSizeRangeList = new LinkedList<>();
-			for(String clinicRange : clinicSizeRangeLabels){
-				clinicSizeRangeList.add(new ClinicDiseaseStatisticsResultVO(0, ageRange, clinicRange, "", ""));
+			for(String ageRange : ageRangeLabels){
+				clinicSizeRangeList.add(new ClinicDiseaseStatisticsResultVO(0, ageRange, clinicSizeRange, "", ""));
 			}
-			statsMap.put(ageRange, clinicSizeRangeList);
+			statsMap.put(clinicSizeRange, clinicSizeRangeList);
 		}
 		return statsMap;
 	}
@@ -281,7 +281,7 @@ public class BenchMarkUtil {
 			case CLINIC_SIZE : statsMap = actualStats.stream().collect(Collectors.groupingBy(ClinicDiseaseStatisticsResultVO :: getClinicSizeLabel));
 			break;
 			// This is applicable only for BOTH (Clinic Size and Age group)
-			default : statsMap = actualStats.stream().collect(Collectors.groupingBy(ClinicDiseaseStatisticsResultVO :: getAgeGroupLabel));
+			default : statsMap = actualStats.stream().collect(Collectors.groupingBy(ClinicDiseaseStatisticsResultVO :: getClinicSizeLabel));
 			}
 		}else{
 			if(StringUtils.isEmpty(filter.getCityCSV()))

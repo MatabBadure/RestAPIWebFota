@@ -72,7 +72,6 @@ import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.service.util.CsvUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
-import com.hillrom.vest.web.rest.dto.AdherenceTrendVO;
 import com.hillrom.vest.web.rest.dto.Filter;
 import com.hillrom.vest.web.rest.dto.Graph;
 import com.hillrom.vest.web.rest.dto.PatientComplianceVO;
@@ -1010,9 +1009,13 @@ public class UserResource {
 
             List<ProtocolRevisionVO> adherenceTrends = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
             return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
-		} catch (Exception e) {
+		} catch (HillromException e) {
 			// TODO: handle exception
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+		} catch(Exception e){
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
     }
 

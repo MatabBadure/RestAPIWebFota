@@ -256,9 +256,9 @@ public class BenchMarkUtil {
 		List<String> rangeLabels = new LinkedList<>();
 		if(!filter.isIgnoreXAxis()){
 			switch(filter.getxAxisParameter().toLowerCase()){
-			case AGE_GROUP : rangeLabels = getRangeLabels(filter);
+			case AGE_GROUP : rangeLabels = getRangeLabels(AGE_GROUP,filter.getAgeRangeCSV());
 			break;
-			case CLINIC_SIZE : rangeLabels = getRangeLabels(filter);
+			case CLINIC_SIZE : rangeLabels = getRangeLabels(CLINIC_SIZE,filter.getClinicSizeRangeCSV());
 			break;
 			// For both option, ageGroup labels will be on xAxis
 			default: rangeLabels = getRangeLabels(AGE_GROUP,filter.getAgeRangeCSV());

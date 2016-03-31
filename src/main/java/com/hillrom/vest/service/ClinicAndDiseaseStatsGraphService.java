@@ -94,7 +94,7 @@ public class ClinicAndDiseaseStatsGraphService extends AbstractGraphService{
 	}
 	
 	public static String getSeriesNameByXAxisParam(String xAxisParam){
-		switch(xAxisParam){
+		switch(xAxisParam.toLowerCase()){
 		case AGE_GROUP : return "Total No.of Patients by Age Group";
 		case CLINIC_SIZE : return "Total No.of Patients by Clinic Size";
 		case BOTH : return "";

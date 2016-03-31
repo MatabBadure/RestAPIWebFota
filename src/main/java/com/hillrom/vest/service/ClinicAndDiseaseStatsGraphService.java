@@ -6,6 +6,7 @@ import static com.hillrom.vest.config.Constants.CLINIC_SIZE;
 import static com.hillrom.vest.config.Constants.XAXIS_TYPE_CATEGORIES;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -66,20 +67,20 @@ public class ClinicAndDiseaseStatsGraphService extends AbstractGraphService{
 			clinicAndStatsGraph.getSeries().add(series);
 		}else{
 			List<String> clinicSizeRangeLabels = BenchMarkUtil.getRangeLabels(CLINIC_SIZE, filter.getClinicSizeRangeCSV());
-			for(String rangeLabel : statsMap.keySet()){
-				Series series = GraphUtils.createSeriesObjectWithName(rangeLabel);
-				clinicAndStatsGraph.getxAxis().getCategories().add(rangeLabel);
-				List<ClinicDiseaseStatisticsResultVO> statsResults = statsMap.get(rangeLabel);
-				int y = statsResults.stream().collect(Collectors.summingInt(ClinicDiseaseStatisticsResultVO :: getTotalPatients));
-				GraphDataVO graphData = new GraphDataVO(null, y);
-				graphData.setToolText(populateTooltipData(clinicSizeRangeLabels, filter)); // set the default values for the chosen range
-				for(ClinicDiseaseStatisticsResultVO result : statsResults){
-					graphData.getToolText().put(result.getClinicSizeLabel(), result.getTotalPatients());
+			List<String> ageRangeLabels = BenchMarkUtil.getRangeLabels(AGE_GROUP, filter.getAgeRangeCSV());
+			clinicAndStatsGraph.getxAxis().getCategories().addAll(ageRangeLabels);
+			for(String clinicSizeRangeLabel : clinicSizeRangeLabels){
+				List<ClinicDiseaseStatisticsResultVO> clinicSizeStats = statsMap.getOrDefault(clinicSizeRangeLabel,new LinkedList<ClinicDiseaseStatisticsResultVO>());
+				Map<String,List<ClinicDiseaseStatisticsResultVO>> clinicSizeStatsGroupByAge = clinicSizeStats.stream().collect(Collectors.groupingBy(ClinicDiseaseStatisticsResultVO :: getAgeGroupLabel));
+				Series series = GraphUtils.createSeriesObjectWithName(clinicSizeRangeLabel);
+				for(String ageRange : ageRangeLabels){
+					List<ClinicDiseaseStatisticsResultVO> clinicSizeStatsForAgeRange = clinicSizeStatsGroupByAge.getOrDefault(ageRange, new LinkedList<ClinicDiseaseStatisticsResultVO>());
+					int y = clinicSizeStatsForAgeRange.stream().collect(Collectors.summingInt(ClinicDiseaseStatisticsResultVO :: getTotalPatients));
+					GraphDataVO graphData = new GraphDataVO(null, y);
+					series.getData().add(graphData);
 				}
-				series.getData().add(graphData);
 				clinicAndStatsGraph.getSeries().add(series);
 			}
-
 		}
 		return clinicAndStatsGraph;
 	}
@@ -93,7 +94,7 @@ public class ClinicAndDiseaseStatsGraphService extends AbstractGraphService{
 	}
 	
 	public static String getSeriesNameByXAxisParam(String xAxisParam){
-		switch(xAxisParam){
+		switch(xAxisParam.toLowerCase()){
 		case AGE_GROUP : return "Total No.of Patients by Age Group";
 		case CLINIC_SIZE : return "Total No.of Patients by Clinic Size";
 		case BOTH : return "";

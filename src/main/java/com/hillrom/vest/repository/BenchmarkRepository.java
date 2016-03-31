@@ -41,7 +41,7 @@ public class BenchmarkRepository {
 	public List<BenchmarkResultVO> getAverageBenchmarkByAgeForParameterView(BenchMarkFilter filter) {
 
 		StringBuilder avgQueryString = new StringBuilder("SELECT ");
-				applyCaseStatementForAgeGroup(filter.getAgeRangeCSV(), avgQueryString);
+				applyCaseStatementForAgeGroup("All", avgQueryString);
 				avgQueryString.append(",");
 				// to avoid one more result set mapping
 				avgQueryString.append("null as clinicSizeRangeLabel, ");
@@ -69,7 +69,7 @@ public class BenchmarkRepository {
 		StringBuilder avgQueryString = new StringBuilder();
 				avgQueryString.append("SELECT ");
 				avgQueryString.append("null as ageRangeLabel, ");
-				applyCaseStatementForClinicSize(filter.getClinicSizeRangeCSV(), avgQueryString);
+				applyCaseStatementForClinicSize("All", avgQueryString);
 				avgQueryString.append(",");
 				addBenchMarkParametersToQuery(avgQueryString);
 				avgQueryString.append(",");

@@ -58,13 +58,13 @@ public class ClinicAndDiseaseStatisticsRepository {
 		StringBuilder query = new StringBuilder(
 				"SELECT count(distinct(pi.id)) as totalPatients, ");
 		if (AGE_GROUP.equalsIgnoreCase(filter.getxAxisParameter())) {
-			applyCaseStatementForAgeGroup(filter, query);
+			applyCaseStatementForAgeGroup("All", query);
 		} else if (CLINIC_SIZE.equalsIgnoreCase(filter.getxAxisParameter())) {
-			applyCaseStatementForClinicSize(filter, query);
+			applyCaseStatementForClinicSize("All", query);
 		} else {
-			applyCaseStatementForAgeGroup(filter, query);
+			applyCaseStatementForAgeGroup("All", query);
 			query.append(",");
-			applyCaseStatementForClinicSize(filter, query);
+			applyCaseStatementForClinicSize("All", query);
 		}
 		query.append(",");
 		// Hack to avoid duplicate resultset mapping, need to provide dummy column
@@ -144,10 +144,9 @@ public class ClinicAndDiseaseStatisticsRepository {
 				.append("'").append(" and ").append("'").append(filter.getTo().toString()).append("'");
 	}
 
-	private void applyCaseStatementForClinicSize(Filter filter,
+	private void applyCaseStatementForClinicSize(String clinicSizeGroupRangeLabel,
 			StringBuilder query) {
 		query.append(" case ");
-		String clinicSizeGroupRangeLabel = filter.getClinicSizeRangeCSV();
 		String clinicSizeGroupRangeLabels[] = clinicSizeGroupRangeLabel
 				.split(",");
 		if ("All".equalsIgnoreCase(clinicSizeGroupRangeLabel)) {
@@ -167,10 +166,9 @@ public class ClinicAndDiseaseStatisticsRepository {
 		query.append(" end as clinicSizeRangeLabel");
 	}
 
-	private void applyCaseStatementForAgeGroup(Filter filter,
+	private void applyCaseStatementForAgeGroup(String ageGroupRangeLabel,
 			StringBuilder query) {
 		query.append(" case ");
-		String ageGroupRangeLabel = filter.getAgeRangeCSV();
 		String ageGroupRangeLabels[] = ageGroupRangeLabel.split(",");
 		if ("All".equalsIgnoreCase(ageGroupRangeLabel)) {
 			ageGroupRangeLabels = AGE_RANGE_LABELS;

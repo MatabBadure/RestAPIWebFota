@@ -220,7 +220,7 @@ public class BenchMarkUtil {
 		boolean isMultipleStatesSelected = StringUtils.isEmpty(filter.getCityCSV());
 		for(String label : rangeLabels){
 			ClinicDiseaseStatisticsResultVO defaultData = null;
-			switch(filter.getxAxisParameter()){
+			switch(filter.getxAxisParameter().toLowerCase()){
 			case AGE_GROUP : defaultData = new ClinicDiseaseStatisticsResultVO(0, label, "", "", "");
 			break;
 			case CLINIC_SIZE : defaultData = new ClinicDiseaseStatisticsResultVO(0, "", label, "", "");
@@ -241,13 +241,13 @@ public class BenchMarkUtil {
 	public static Map<String, List<ClinicDiseaseStatisticsResultVO>> getDefaultDataForClinicAndDiseaseStatsByBoth(Filter filter){
 		Map<String, List<ClinicDiseaseStatisticsResultVO>> statsMap = new LinkedHashMap<>();
 		List<String> ageRangeLabels = getRangeLabelsForStatsByXAxisParameter(filter);
-		List<String> clinicSizeRangeLabels = getRangeLabels(filter);
-		for(String ageRange : ageRangeLabels){
+		List<String> clinicSizeRangeLabels = getRangeLabels(CLINIC_SIZE,filter.getClinicSizeRangeCSV());
+		for(String clinicSizeRange : clinicSizeRangeLabels){
 			List<ClinicDiseaseStatisticsResultVO> clinicSizeRangeList = new LinkedList<>();
-			for(String clinicRange : clinicSizeRangeLabels){
-				clinicSizeRangeList.add(new ClinicDiseaseStatisticsResultVO(0, ageRange, clinicRange, "", ""));
+			for(String ageRange : ageRangeLabels){
+				clinicSizeRangeList.add(new ClinicDiseaseStatisticsResultVO(0, ageRange, clinicSizeRange, "", ""));
 			}
-			statsMap.put(ageRange, clinicSizeRangeList);
+			statsMap.put(clinicSizeRange, clinicSizeRangeList);
 		}
 		return statsMap;
 	}
@@ -255,10 +255,10 @@ public class BenchMarkUtil {
 	private static List<String> getRangeLabelsForStatsByXAxisParameter(Filter filter) {
 		List<String> rangeLabels = new LinkedList<>();
 		if(!filter.isIgnoreXAxis()){
-			switch(filter.getxAxisParameter()){
-			case AGE_GROUP : rangeLabels = getRangeLabels(filter);
+			switch(filter.getxAxisParameter().toLowerCase()){
+			case AGE_GROUP : rangeLabels = getRangeLabels(AGE_GROUP,filter.getAgeRangeCSV());
 			break;
-			case CLINIC_SIZE : rangeLabels = getRangeLabels(filter);
+			case CLINIC_SIZE : rangeLabels = getRangeLabels(CLINIC_SIZE,filter.getClinicSizeRangeCSV());
 			break;
 			// For both option, ageGroup labels will be on xAxis
 			default: rangeLabels = getRangeLabels(AGE_GROUP,filter.getAgeRangeCSV());
@@ -275,13 +275,13 @@ public class BenchMarkUtil {
 	public static Map<String,List<ClinicDiseaseStatisticsResultVO>> groupStatsByXAxisParam(List<ClinicDiseaseStatisticsResultVO> actualStats,Filter filter){
 		Map<String,List<ClinicDiseaseStatisticsResultVO>> statsMap = new LinkedHashMap<>();
 		if(!filter.isIgnoreXAxis()){
-			switch(filter.getxAxisParameter()){
+			switch(filter.getxAxisParameter().toLowerCase()){
 			case AGE_GROUP : statsMap = actualStats.stream().collect(Collectors.groupingBy(ClinicDiseaseStatisticsResultVO :: getAgeGroupLabel));
 			break;
 			case CLINIC_SIZE : statsMap = actualStats.stream().collect(Collectors.groupingBy(ClinicDiseaseStatisticsResultVO :: getClinicSizeLabel));
 			break;
 			// This is applicable only for BOTH (Clinic Size and Age group)
-			default : statsMap = actualStats.stream().collect(Collectors.groupingBy(ClinicDiseaseStatisticsResultVO :: getAgeGroupLabel));
+			default : statsMap = actualStats.stream().collect(Collectors.groupingBy(ClinicDiseaseStatisticsResultVO :: getClinicSizeLabel));
 			}
 		}else{
 			if(StringUtils.isEmpty(filter.getCityCSV()))

@@ -57,6 +57,9 @@ public class ClinicPatientAssoc extends AbstractAuditingEntity implements Serial
     @Column(name="is_active")
     private Boolean isActive = true;
     
+    @Column(name = "expired")
+    private Boolean expired = false;
+    
 	public ClinicPatientAssoc() {
 		super();
 	}
@@ -115,6 +118,14 @@ public class ClinicPatientAssoc extends AbstractAuditingEntity implements Serial
 
 	public void setActive(Boolean isActive) {
 		this.isActive = isActive;
+	}
+	
+	public Boolean getExpired() {
+		return expired;
+	}
+
+	public void setExpired(Boolean expired) {
+		this.expired = expired;
 	}
 
 	@Override

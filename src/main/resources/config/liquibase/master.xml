@@ -80,6 +80,7 @@
     <include file="classpath:/config/liquibase/changelog/20160219164732_added_expired_last_modified_time_to_UserLoginToken.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20160226192300_added_csv_for_login_token.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20160302175900_add_global_columns_patient_compliance.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20160404124100_Clinic_wise_expired_db_changes.xml" relativeToChangelogFile="false"/>
  </databaseChangeLog>
  
  

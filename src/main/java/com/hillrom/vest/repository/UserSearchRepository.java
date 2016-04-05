@@ -627,7 +627,7 @@ public class UserSearchRepository {
 	}
 
 	// Pateint Search for HCP DashBoard
-
+	
 	public Page<PatientUserVO> findAssociatedPatientToHCPBy(String queryString, Long hcpUserID, String clinicId,
 			String filter, Pageable pageable, Map<String, Boolean> sortOrder) throws HillromException {
 
@@ -652,7 +652,7 @@ public class UserSearchRepository {
 				+ " left outer join PATIENT_INFO patInfoh on upah.patient_id = patInfoh.id "
 				+ " where patInfo.id = patInfoh.id"
 				+ " group by patInfoh.id) as hcpname, patient_clinic.mrn_id as mrnid,"
-				+ " user.expired as isExpired, pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,"
+				+ " patient_clinic.expired as isExpired, pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,"
 				+ " pc.missed_therapy_count as isMissedTherapy " + " from USER user"
 				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '" + SELF + "'"
 				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id"
@@ -902,7 +902,7 @@ public class UserSearchRepository {
 				+ " firstName,user.last_name as lastName, IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,IF(patient_clinic.is_active = NULL,user.is_deleted,1))) as isDeleted ,"
 				+ "user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,"
 				+ "user.title,user.hillrom_id,user.created_date as createdAt,"
-				+ "user.activated as isActivated, patInfo.state , compliance_score, pc.last_therapy_session_date as last_date, user.expired, patient_clinic.mrn_id as mrnId, "
+				+ "user.activated as isActivated, patInfo.state , compliance_score, pc.last_therapy_session_date as last_date, patient_clinic.expired, patient_clinic.mrn_id as mrnId, "
 				+ "pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,pc.missed_therapy_count as isMissedTherapy "
 				+ "from USER user" + " join USER_AUTHORITY user_authority on user_authority.user_id = user.id  "
 				+ "and user_authority.authority_name = '" + PATIENT + "' and "
@@ -1113,7 +1113,7 @@ public class UserSearchRepository {
 				+ "'  join USER_PATIENT_ASSOC  upah on userh.id = upah.user_id " + " and upah.relation_label = '" + HCP
 				+ "'  left outer join PATIENT_INFO patInfoh on upah.patient_id = patInfoh.id "
 				+ " where patInfo.id = patInfoh.id group by patInfoh.id) as hcpname,patient_clinic.mrn_id as mrnid,"
-				+ " user.expired as isExpired, pc.is_hmr_compliant as isHMRNonCompliant,"
+				+ " patient_clinic.expired as isExpired, pc.is_hmr_compliant as isHMRNonCompliant,"
 				+ " pc.is_settings_deviated as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy from USER user "
 				+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = '"
 				+ PATIENT + "'" + " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"

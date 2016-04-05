@@ -741,6 +741,7 @@ public class UserService {
 						clinicPatientAssoc.get().setActive(false);
 					} else if(Constants.EXPIRED.equalsIgnoreCase(userExtensionDTO.getClinicMRNId().get("status"))){
 						clinicPatientAssoc.get().setExpired(true);
+						clinicPatientAssoc.get().setActive(false);
 						clinicPatientAssoc.get().setExpirationDate(dateTime);
 						//No updating global Expire
 						/*patientVestDeviceService.deactivateActiveDeviceForPatient(user.getId(), dateTime);
@@ -1594,7 +1595,7 @@ public class UserService {
 					Map<String,Object> clinicMRNId = new HashMap<>();
 					clinicMRNId.put("clinic", clinicPatientAssoc.get().getClinic());
 					clinicMRNId.put("mrnId", clinicPatientAssoc.get().getMrnId());
-					if(patientUserVO.isExpired()){
+					if(clinicPatientAssoc.get().getExpired()){
 						clinicMRNId.put("status", Constants.EXPIRED);
 					} else if(clinicPatientAssoc.get().getActive()){
 						clinicMRNId.put("status", Constants.ACTIVE);

@@ -14,14 +14,9 @@
 		<addColumn tableName="PATIENT_COMPLIANCE">
 			<column name="expired"
 				type="boolean" valueBoolean="false" />
-			<column name="expired_date"
-				type="boolean" valueBoolean="false" />
+			<column name="expired_date" type="timestamp"/>
 		</addColumn>
 	</changeSet>
-	<!-- <changeSet id="20160404124100" author="Hillrom Devs">
-		<dropColumn columnName="expired" tableName="PATIENT_INFO"/>
-		<dropColumn columnName="expired_date" tableName="PATIENT_INFO"/>
-	</changeSet> -->
 </databaseChangeLog>
 
 		

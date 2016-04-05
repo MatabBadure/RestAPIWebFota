@@ -721,14 +721,15 @@ public class UserService {
     	Optional<PatientInfo> patient = patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId());
     	if(patient.isPresent()) {
     		DateTime dateTime = DateTime.now();
-    		if(userExtensionDTO.isExpired()){
+    		//No updating global Expire
+    		/*if(userExtensionDTO.isExpired()){
     			patientVestDeviceService.deactivateActiveDeviceForPatient(user.getId(), dateTime);
     			deleteCaregiverOnPatientDeactivation(user);
     			patient.get().setExpired(userExtensionDTO.isExpired());
     			user.setExpirationDate(dateTime);
     			user.setExpired(userExtensionDTO.isExpired());
     			user.setDeleted(true);
-    		}
+    		}*/
 			if(!userExtensionDTO.getClinicMRNId().isEmpty()){
 				Optional<ClinicPatientAssoc> clinicPatientAssoc = clinicPatientRepository.findOneByClinicIdAndPatientId(
 						userExtensionDTO.getClinicMRNId().get("clinicId"), patient.get().getId());
@@ -739,12 +740,15 @@ public class UserService {
 					} else if(Constants.INACTIVE.equalsIgnoreCase(userExtensionDTO.getClinicMRNId().get("status"))){
 						clinicPatientAssoc.get().setActive(false);
 					} else if(Constants.EXPIRED.equalsIgnoreCase(userExtensionDTO.getClinicMRNId().get("status"))){
-						patientVestDeviceService.deactivateActiveDeviceForPatient(user.getId(), dateTime);
+						clinicPatientAssoc.get().setExpired(true);
+						clinicPatientAssoc.get().setExpirationDate(dateTime);
+						//No updating global Expire
+						/*patientVestDeviceService.deactivateActiveDeviceForPatient(user.getId(), dateTime);
 						deleteCaregiverOnPatientDeactivation(user);
 						patient.get().setExpired(true);
 						user.setExpirationDate(dateTime);
 						user.setExpired(true);
-						user.setDeleted(true);
+						user.setDeleted(true);*/
 					} 
 					clinicPatientRepository.saveAndFlush(clinicPatientAssoc.get());
 				}

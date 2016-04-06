@@ -608,15 +608,17 @@ public class UserService {
     		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(existingUser);
     		if(Objects.nonNull(patientInfo)){
 	    		if(!userExtensionDTO.getClinicMRNId().isEmpty()){
-					List<ClinicPatientAssoc> existingClinics = clinicPatientRepository.findByMRNId(userExtensionDTO.getClinicMRNId().get("mrnId"));
-					if(!existingClinics.isEmpty()){
-						for(ClinicPatientAssoc clinicPatientAssoc : existingClinics) {
-							if(clinicPatientAssoc.getClinic().getId().equals(userExtensionDTO.getClinicMRNId().get("clinicId")) 
-									&& !clinicPatientAssoc.getPatient().getId().equals(patientInfo.getId())){
-								throw new HillromException(ExceptionConstants.HR_599);
+	    			if(StringUtils.isNotEmpty(userExtensionDTO.getClinicMRNId().get("mrnId"))){
+						List<ClinicPatientAssoc> existingClinics = clinicPatientRepository.findByMRNId(userExtensionDTO.getClinicMRNId().get("mrnId"));
+						if(!existingClinics.isEmpty()){
+							for(ClinicPatientAssoc clinicPatientAssoc : existingClinics) {
+								if(clinicPatientAssoc.getClinic().getId().equals(userExtensionDTO.getClinicMRNId().get("clinicId")) 
+										&& !clinicPatientAssoc.getPatient().getId().equals(patientInfo.getId())){
+									throw new HillromException(ExceptionConstants.HR_599);
+								}
 							}
 						}
-					}
+	    			}
 	    		}
     		}
            	UserExtension user = updatePatientUser(existingUser, userExtensionDTO);

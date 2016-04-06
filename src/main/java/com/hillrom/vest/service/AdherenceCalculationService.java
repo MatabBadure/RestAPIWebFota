@@ -135,15 +135,14 @@ public class AdherenceCalculationService {
 	}
 
 	/**
-	 * Checks Whether Settings deviated(protocol.minFrequency < actualWeightedAvgFreq < protocol.maxFrequency)
+	 * Checks Whether Settings deviated(protocol.minFrequency < actualWeightedAvgFreq)
 	 * @param protocolConstant
 	 * @param actualMetrics
 	 * @return
 	 */
 	public boolean isSettingsDeviated(ProtocolConstants protocolConstant,
 			double weightedAvgFrequency) {
-		if((protocolConstant.getMinFrequency()* LOWER_BOUND_VALUE) > weightedAvgFrequency 
-				|| (protocolConstant.getMaxFrequency()*UPPER_BOUND_VALUE) < weightedAvgFrequency){
+		if((protocolConstant.getMinFrequency()* LOWER_BOUND_VALUE) > weightedAvgFrequency){
 			return true;
 		}
 		return false;

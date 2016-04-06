@@ -1,5 +1,7 @@
 package com.hillrom.vest.service;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -145,8 +147,14 @@ public class SurveyService {
 		}
 
 		userSurveyAnswerRepository.save(userSurveyAnswers);
-		// Email
-		mailService.sendSurveyEmailReport(userSurveyAnswerDTO, baseUrl);
+		// Email to be sent to specific Email Ids
+		try{
+			mailService.sendSurveyEmailReport(userSurveyAnswerDTO, baseUrl);
+		}catch(Exception ex){
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter( writer );
+			ex.printStackTrace( printWriter );
+ 		}
 	}
 
 	public UserSurveyAnswerDTO getSurveyAnswerById(Long id) throws HillromException {

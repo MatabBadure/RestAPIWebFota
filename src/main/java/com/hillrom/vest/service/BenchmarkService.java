@@ -77,7 +77,7 @@ public class BenchmarkService {
 
 	private Graph validateGraphData(Graph benchMarkGraph)
 			throws HillromException {
-		if(!benchMarkGraph.isDataAvailable())
+		if(!benchMarkGraph.isEmpty())
 			return benchMarkGraph;
 		else
 			throw new HillromException(ExceptionConstants.HR_718);

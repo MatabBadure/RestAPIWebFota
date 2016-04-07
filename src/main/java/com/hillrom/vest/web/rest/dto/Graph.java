@@ -24,7 +24,7 @@ public class Graph {
 		this.series = series;
 	}
 
-	public boolean isDataAvailable(){
+	public boolean isEmpty(){
 		List<Integer> yValues = new LinkedList<>();
 		List<Integer> toolTipData = new LinkedList<>();
 		for(Series series : series){
@@ -38,11 +38,11 @@ public class Graph {
 				}
 			}
 		}
-		Collections.reverse(yValues);
-		Collections.reverse(toolTipData);
+		Collections.sort(yValues,Collections.reverseOrder());
+		Collections.sort(toolTipData,Collections.reverseOrder());
 		// if tool tip data and yValues both are 0 , then no data available
-		if((yValues.isEmpty() && toolTipData.isEmpty()) 
-				|| yValues.get(0).equals(0) && toolTipData.get(0).equals(0)){
+		if((yValues.isEmpty() || yValues.get(0).equals(0)) 
+				 && (toolTipData.isEmpty() || toolTipData.get(0).equals(0))){
 			return true;
 		}
 		return false;

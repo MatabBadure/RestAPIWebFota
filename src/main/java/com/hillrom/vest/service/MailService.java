@@ -371,8 +371,8 @@ public class MailService {
         subject = messageSource.getMessage("email.patientprotocoldata.title", null, null);
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
      }
-    
-    public void sendUpdateProtocolMailToMailingList(User currentUser, User patientUser,List<PatientProtocolData> patientProtocolDataList){
+    //Commenting this code as no mail has to be triggered when Protocal is updated
+    /*public void sendUpdateProtocolMailToMailingList(User currentUser, User patientUser,List<PatientProtocolData> patientProtocolDataList){
         log.debug("Sending patient protocol data update e-mail to '{}'", patientUser.getEmail());
         Context context = new Context();
         context.setVariable("user", patientUser);
@@ -387,5 +387,5 @@ public class MailService {
         String recipients = env.getProperty("spring.changePrescription.changePrescriptionEmailids");
 		log.debug("Sending change prescription email report '{}'", recipients);
         sendEmail(recipients.split(","), subject, content, false, true);
-     }
+     }*/
 }

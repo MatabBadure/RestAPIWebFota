@@ -10,7 +10,6 @@ import static com.hillrom.vest.config.Constants.KEY_MY_CLINIC;
 import static com.hillrom.vest.config.Constants.KEY_OTHER_CLINIC;
 import static com.hillrom.vest.config.Constants.KEY_RANGE_LABELS;
 import static com.hillrom.vest.service.util.BenchMarkUtil.mapBenchMarkByAgeGroup;
-import static com.hillrom.vest.service.util.BenchMarkUtil.mapBenchMarkByClinicSize;
 import static com.hillrom.vest.service.util.BenchMarkUtil.prepareBenchMarkData;
 import static com.hillrom.vest.service.util.BenchMarkUtil.prepareDefaultDataByAgeGroupOrClinicSize;
 
@@ -73,8 +72,15 @@ public class BenchmarkService {
 		benchMarkDataMap.put(KEY_BENCH_MARK_DATA, benchMarkData);
 		benchMarkDataMap.put(KEY_RANGE_LABELS, rangeLabels);
 		Graph benchMarkGraph = benchMarkGraphService.populateGraphData(benchMarkDataMap, filter);
-		return benchMarkGraph;
+		return validateGraphData(benchMarkGraph);
+	}
 
+	private Graph validateGraphData(Graph benchMarkGraph)
+			throws HillromException {
+		if(!benchMarkGraph.isEmpty())
+			return benchMarkGraph;
+		else
+			throw new HillromException(ExceptionConstants.HR_718);
 	}
 	
 	public Graph getBenchMarkGraphForPatientView(BenchMarkFilter filter) throws Exception{
@@ -84,7 +90,7 @@ public class BenchmarkService {
 		benchMarkDataMap.put(KEY_BENCH_MARK_DATA, benchMarkData);
 		benchMarkDataMap.put(KEY_RANGE_LABELS, rangeLabels);
 		Graph benchMarkGraph = benchmarkPatientGraphService.populateGraphData(benchMarkDataMap, filter);
-		return benchMarkGraph;
+		return validateGraphData(benchMarkGraph);
 	}
 	
 	public Map<String,BenchMarkDataVO> getBenchmarkDataForAdminParameterView(BenchMarkFilter filter) {
@@ -181,7 +187,8 @@ public class BenchmarkService {
 			statsResultsVO = statisticsRepository.getClinicDiseaseStatsByState(filter);
 		}
 		Map<String,List<ClinicDiseaseStatisticsResultVO>> statsMap = getClinicAndDiseaseStats(statsResultsVO,filter);
-		return clinicAndStatsGraphService.populateGraphData(statsMap, filter);
+		Graph benchMarkGraph = clinicAndStatsGraphService.populateGraphData(statsMap, filter);
+		return validateGraphData(benchMarkGraph);
 	}
 	
 	public Map<String, List<ClinicDiseaseStatisticsResultVO>> getClinicAndDiseaseStats(List<ClinicDiseaseStatisticsResultVO> actualStats,Filter filter){
@@ -202,7 +209,8 @@ public class BenchmarkService {
 
 	public Graph getClinicLevelBenchMarkGraphForHCPOrClinicAdmin(BenchMarkFilter filter) throws Exception{
 		Map<String,Map<String,BenchMarkDataVO>> benchMarkData = getClinicLevelBenchMarkDataForHCPOrClinicAdmin(filter);
-		return benchMarkHCPorClinicAdminGraphService.populateGraphData(benchMarkData, filter);
+		Graph benchMarkGraph  = benchMarkHCPorClinicAdminGraphService.populateGraphData(benchMarkData, filter);
+		return validateGraphData(benchMarkGraph);
 	}
 	
 	public Map<String,Map<String,BenchMarkDataVO>> getClinicLevelBenchMarkDataForHCPOrClinicAdmin(BenchMarkFilter filter){

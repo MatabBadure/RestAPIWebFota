@@ -50,11 +50,11 @@ public class BenchmarkResource {
 		} catch (HillromException e) {
 			JSONObject errorMessage = new JSONObject();
 			errorMessage.put("ERROR", e.getMessage());
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(errorMessage,HttpStatus.BAD_REQUEST);
 		} catch (Exception e){
 			JSONObject errorMessage = new JSONObject();
 			errorMessage.put("ERROR",ExceptionConstants.HR_717);
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(errorMessage,HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 	}
@@ -76,7 +76,7 @@ public class BenchmarkResource {
 		} catch (Exception e){
 			JSONObject errorMessage = new JSONObject();
 			errorMessage.put("ERROR", ExceptionConstants.HR_717);
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(errorMessage,HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -103,7 +103,7 @@ public class BenchmarkResource {
 		} catch (Exception e){
 			JSONObject errorMessage = new JSONObject();
 			errorMessage.put("ERROR", ExceptionConstants.HR_717);
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(errorMessage,HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
@@ -128,7 +128,7 @@ public class BenchmarkResource {
 		} catch (Exception e){
 			JSONObject errorMessage = new JSONObject();
 			errorMessage.put("ERROR", ExceptionConstants.HR_717);
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(errorMessage,HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -153,7 +153,7 @@ public class BenchmarkResource {
 		} catch (Exception e){
 			JSONObject errorMessage = new JSONObject();
 			errorMessage.put("ERROR", ExceptionConstants.HR_717);
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(errorMessage,HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

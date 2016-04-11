@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Graph {
 
 	private XaxisData xAxis = new XaxisData();
@@ -24,6 +26,7 @@ public class Graph {
 		this.series = series;
 	}
 
+	@JsonIgnore
 	public boolean isEmpty(){
 		List<Integer> yValues = new LinkedList<>();
 		List<Integer> toolTipData = new LinkedList<>();

@@ -143,4 +143,21 @@ public class ExceptionConstants {
     public static final String HR_710 = "Incorrect State Name/Code";
     public static final String HR_711 = "Incorrect Zip Code";
     public static final String HR_712 = "Zip Code Not found";
+    public static final String HR_801 = "Invalid Survey Id";
+    public static final String HR_802 = "Invalid Survey Answers";
+    
+    public static final String HR_803 = "Incorrect request format";
+    public static final String HR_804 = "No survey to take";
+    public static final String HR_805 = "Survey taken already";
+    public static final String HR_806 = "You are not eligible to take this survey";
+    public static final String HR_807 = "Invalid survey question id";
+    public static final String HR_808 = "Patient is not associated with the Clinic";
+    
+    // Validate Credentials Api Exception messages
+    public static final String HR_714 = "Please enter the password for your Visi-View account.";
+    public static final String HR_716 = "The entered password is incorrect. Be sure you're using the password for your Visi-View account.";
+
+    // Generic Exception for Graph 
+    public static final String HR_717 = "Unable to process graph data";
+    public static final String HR_718 = "No Data Available";
 }

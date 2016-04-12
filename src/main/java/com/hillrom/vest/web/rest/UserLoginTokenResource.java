@@ -8,8 +8,10 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +19,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.domain.UserLoginToken;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.UserLoginTokenRepository;
+import com.hillrom.vest.service.UserLoginTokenService;
+import com.hillrom.vest.web.rest.dto.Graph;
 
 /**
  * REST controller for managing UserLoginToken.
@@ -33,6 +39,9 @@ public class UserLoginTokenResource {
 
     @Inject
     private UserLoginTokenRepository userLoginTokenRepository;
+    
+    @Inject
+    private UserLoginTokenService userLoginTokenService;
 
     /**
      * POST  /userLoginTokens -> Create a new userLoginToken.
@@ -104,5 +113,20 @@ public class UserLoginTokenResource {
     public void delete(@PathVariable String id) {
         log.debug("REST request to delete UserLoginToken : {}", id);
         userLoginTokenRepository.delete(id);
+    }
+    
+    /**
+     * GET  /loginAnalytics -> Get LoginAnalytics
+     * @throws Exception 
+     */
+    @RequestMapping(value = "/loginAnalytics",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public Graph getLoAnalytics(
+    		@RequestParam(required=true,value="from")@DateTimeFormat(pattern="yyyy-MM-dd")LocalDate from,
+    		@RequestParam(required=true,value="to")@DateTimeFormat(pattern="yyyy-MM-dd")LocalDate to,
+    		@RequestParam(required=true,value="filters")String authorityCSV,
+    		@RequestParam(required=true,value="duration")String duration) throws Exception{
+    	return userLoginTokenService.getLoginAnalytics(from, to, authorityCSV,duration);
     }
 }

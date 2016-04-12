@@ -8,8 +8,11 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.envers.Audited;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+@Audited
 @Entity
 @Table(name="PROTOCOL_CONSTANTS")
 public class ProtocolConstants {

@@ -25,48 +25,58 @@ import net.minidev.json.JSONObject;
 @RequestMapping("/api")
 public class CityStateZipMapResource {
 
+	private final Logger log = LoggerFactory.getLogger(CityStateZipMapResource.class);
 
+	@Inject
+	private CityStateZipMapService cityStateZipMapService;
 
-    private final Logger log = LoggerFactory.getLogger(CityStateZipMapResource.class);
+	@RequestMapping(value = "/cityStateZipMapByState", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 
-    @Inject
-    private CityStateZipMapService cityStateZipMapService;
-
-    @RequestMapping(value = "/cityStateZipMapByState",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    
-    public ResponseEntity<?> getCityStateZipValuesByByState(@RequestParam(required=true, value = "state") String state) {	
-    	try {
+	public ResponseEntity<?> getCityStateZipValuesByByState(
+			@RequestParam(required = true, value = "state") String state) {
+		try {
 			return new ResponseEntity<>(cityStateZipMapService.getStateVOByState(state), HttpStatus.OK);
 		} catch (HillromException e) {
 			JSONObject json = new JSONObject();
-			json.put("ERROR",e.getMessage());
+			json.put("ERROR", e.getMessage());
 			return new ResponseEntity<>(json, HttpStatus.BAD_REQUEST);
-		} 
-    }
-    
-    @RequestMapping(value = "/cityStateZipMapByZip",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    
-    public ResponseEntity<?> getCityStateZipValuesByByZipcode(@RequestParam(required=true, value = "zipcode") String zipcode) {	
-    	try {
+		}
+	}
+
+	@RequestMapping(value = "/cityStateZipMapByZip", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+
+	public ResponseEntity<?> getCityStateZipValuesByByZipcode(
+			@RequestParam(required = true, value = "zipcode") String zipcode) {
+		try {
 			return new ResponseEntity<>(cityStateZipMapService.getbyZipCode(zipcode), HttpStatus.OK);
 		} catch (HillromException e) {
 			JSONObject json = new JSONObject();
-			json.put("ERROR",e.getMessage());
+			json.put("ERROR", e.getMessage());
 			return new ResponseEntity<>(json, HttpStatus.BAD_REQUEST);
-		} 
-    }
-    
-    
-    
-    @RequestMapping(value = "/allstates",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    
-    public ResponseEntity<?> getState() {
-			return new ResponseEntity<>(cityStateZipMapService.getStates(), HttpStatus.OK);
-    }
+		}
+	}
+
+	@RequestMapping(value = "/allstates", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+
+	public ResponseEntity<?> getState() {
+		return new ResponseEntity<>(cityStateZipMapService.getStates(), HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/availableStates", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+
+	public ResponseEntity<?> getAvailableState() {
+		return new ResponseEntity<>(cityStateZipMapService.getAvailableStates(), HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/availableCities", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+
+	public ResponseEntity<?> getCityByState(@RequestParam(required = true, value = "state") String state) {
+		try {
+			return new ResponseEntity<>(cityStateZipMapService.getAvailableCities(state), HttpStatus.OK);
+		} catch (HillromException e) {
+			JSONObject json = new JSONObject();
+			json.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(json, HttpStatus.BAD_REQUEST);
+		}
+	}
 }

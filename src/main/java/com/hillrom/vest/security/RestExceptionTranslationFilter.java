@@ -73,7 +73,7 @@ public class RestExceptionTranslationFilter extends ExceptionTranslationFilter {
 			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(),userDetails.getAuthorities());
 			SecurityContextHolder.getContext().setAuthentication(authToken);
 			
-			UserLoginToken token = tokenProvider.createToken(userDetails);
+			UserLoginToken token = tokenProvider.createToken(userDetails,request.getRemoteAddr());
 			
 			jsonObject.put("token", token.getId());
 			
@@ -89,7 +89,7 @@ public class RestExceptionTranslationFilter extends ExceptionTranslationFilter {
 			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(),userDetails.getAuthorities());
 			SecurityContextHolder.getContext().setAuthentication(authToken);
 			
-			UserLoginToken token = tokenProvider.createToken(userDetails);
+			UserLoginToken token = tokenProvider.createToken(userDetails,request.getRemoteAddr());
 			
 			jsonObject.put("token", token.getId());
             

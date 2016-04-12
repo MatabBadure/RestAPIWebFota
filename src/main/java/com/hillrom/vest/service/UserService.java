@@ -608,15 +608,17 @@ public class UserService {
     		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(existingUser);
     		if(Objects.nonNull(patientInfo)){
 	    		if(!userExtensionDTO.getClinicMRNId().isEmpty()){
-					List<ClinicPatientAssoc> existingClinics = clinicPatientRepository.findByMRNId(userExtensionDTO.getClinicMRNId().get("mrnId"));
-					if(!existingClinics.isEmpty()){
-						for(ClinicPatientAssoc clinicPatientAssoc : existingClinics) {
-							if(clinicPatientAssoc.getClinic().getId().equals(userExtensionDTO.getClinicMRNId().get("clinicId")) 
-									&& !clinicPatientAssoc.getPatient().getId().equals(patientInfo.getId())){
-								throw new HillromException(ExceptionConstants.HR_599);
+	    			if(StringUtils.isNotEmpty(userExtensionDTO.getClinicMRNId().get("mrnId"))){
+						List<ClinicPatientAssoc> existingClinics = clinicPatientRepository.findByMRNId(userExtensionDTO.getClinicMRNId().get("mrnId"));
+						if(!existingClinics.isEmpty()){
+							for(ClinicPatientAssoc clinicPatientAssoc : existingClinics) {
+								if(clinicPatientAssoc.getClinic().getId().equals(userExtensionDTO.getClinicMRNId().get("clinicId")) 
+										&& !clinicPatientAssoc.getPatient().getId().equals(patientInfo.getId())){
+									throw new HillromException(ExceptionConstants.HR_599);
+								}
 							}
 						}
-					}
+	    			}
 	    		}
     		}
            	UserExtension user = updatePatientUser(existingUser, userExtensionDTO);
@@ -1193,8 +1195,10 @@ public class UserService {
 		if(null == user)
 			return Optional.empty();
 		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
+		PatientCompliance compliance = complianceService.findLatestComplianceByPatientUserId(id);
 		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patientInfo.getId());
 		PatientUserVO patientUserVO =  new PatientUserVO(user,patientInfo);
+		patientUserVO.setHoursOfUsage((compliance.getHmr()/(60*60)));
 		String mrnId;
 		java.util.Iterator<ClinicPatientAssoc> cpaIterator = clinicPatientAssocList.iterator();
 		while(cpaIterator.hasNext()){

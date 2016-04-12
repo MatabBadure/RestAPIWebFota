@@ -33,6 +33,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
@@ -41,9 +42,9 @@ import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.HCPClinicService;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
+import com.hillrom.vest.web.rest.dto.HcpVO;
+import com.hillrom.vest.web.rest.dto.HillRomUserVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
-
-import scala.collection.concurrent.Debug;
 
 @Repository
 public class UserSearchRepository {
@@ -69,7 +70,8 @@ public class UserSearchRepository {
 			Map<String, Boolean> sortOrder) throws HillromException {
 
 		String findHillromTeamUserQuery = "select distinct(user.id),user.first_name as firstName,user.last_name as lastName,user.email,"
-				+ " user_authority.authority_name as name,user.is_deleted as isDeleted,user.created_date as createdAt,user.activated as isActivated,user.hillrom_id as hillromId, userExt.mobile_phone as mobilePhone "
+				+ " user_authority.authority_name as name,user.is_deleted as isDeleted,user.created_date as createdAt,"
+				+ " user.activated as isActivated,user.hillrom_id as hillromId, userExt.mobile_phone as mobilePhone "
 				+ " from  USER_EXTENSION userExt left outer join USER user on user.id = userExt.user_id and "
 				+ " (lower(user.first_name) like lower(:queryString) or "
 				+ " lower(user.last_name) like lower(:queryString) or "
@@ -1221,7 +1223,7 @@ public class UserSearchRepository {
 		int limit = columnNames.size();
 		int i = 0;
 		for (String columnName : columnNames.keySet()) {
-			if(!"adherence".equalsIgnoreCase(columnName) | !"isDeleted,isActivated".equalsIgnoreCase(columnName) )
+			if(!Constants.ADHERENCE.equalsIgnoreCase(columnName))
 				sb.append("lower(").append(columnName).append(")");
 			else
 				sb.append(columnName);

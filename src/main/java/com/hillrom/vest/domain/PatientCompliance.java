@@ -1,16 +1,24 @@
 package com.hillrom.vest.domain;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SqlResultSetMapping;
+import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -18,10 +26,64 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
 import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
+import com.hillrom.vest.web.rest.dto.BenchmarkResultVO;
 
+@SqlResultSetMappings({
+@SqlResultSetMapping(name = "avgBenchmarkResultSetMapping", classes = @ConstructorResult(targetClass = BenchmarkResultVO.class, columns = {
+		@ColumnResult(name = "ageRangeLabel", type = String.class),
+		@ColumnResult(name = "clinicSizeRangeLabel", type = String.class),
+		@ColumnResult(name = "avgCompScore", type = BigDecimal.class),
+		@ColumnResult(name = "avgNonAdherenceCount", type = BigDecimal.class),
+		@ColumnResult(name = "avgSettingsDeviatedCount", type = BigDecimal.class),
+		@ColumnResult(name = "avgMissedTherapyDaysCount", type = BigDecimal.class),
+		@ColumnResult(name = "avgHMRRunrate", type = BigDecimal.class),
+		@ColumnResult(name = "patientCount", type = BigInteger.class)})),
+@SqlResultSetMapping(name = "avgBenchmarkByClinicSizeResultSetMapping", classes = @ConstructorResult(targetClass = BenchmarkResultVO.class, columns = {
+		@ColumnResult(name = "complainceId", type = Long.class),
+		@ColumnResult(name = "patId",type = String.class),
+		@ColumnResult(name = "userId",type = Long.class),
+		@ColumnResult(name = "dob", type = org.jadira.usertype.dateandtime.joda.PersistentLocalDate.class),
+		@ColumnResult(name = "zipcode",type = String.class),
+		@ColumnResult(name = "city",type = String.class),
+		@ColumnResult(name = "state",type = String.class),
+		@ColumnResult(name = "lastTherapySessionDate", type = org.jadira.usertype.dateandtime.joda.PersistentLocalDate.class),
+		@ColumnResult(name = "avgCompScore", type = BigDecimal.class),
+		@ColumnResult(name = "avgNonAdherenceCount", type = BigDecimal.class),
+		@ColumnResult(name = "avgSettingsDeviatedCount", type = BigDecimal.class),
+		@ColumnResult(name = "avgMissedTherapyDaysCount", type = BigDecimal.class),
+		@ColumnResult(name = "avgHMRRunrate", type = BigDecimal.class),
+		@ColumnResult(name = "clinicsize", type = BigInteger.class)})),
+@SqlResultSetMapping(name = "avgBenchmarkForClinicByAgeGroupResultSetMapping", classes = @ConstructorResult(targetClass = BenchmarkResultVO.class, columns = {
+		@ColumnResult(name = "complainceId", type = Long.class),
+		@ColumnResult(name = "patId",type = String.class),
+		@ColumnResult(name = "userId",type = Long.class),
+		@ColumnResult(name = "dob", type = org.jadira.usertype.dateandtime.joda.PersistentLocalDate.class),
+		@ColumnResult(name = "zipcode",type = String.class),
+		@ColumnResult(name = "city",type = String.class),
+		@ColumnResult(name = "state",type = String.class),
+		@ColumnResult(name = "lastTherapySessionDate", type = org.jadira.usertype.dateandtime.joda.PersistentLocalDate.class),
+		@ColumnResult(name = "avgCompScore", type = BigDecimal.class),
+		@ColumnResult(name = "avgNonAdherenceCount", type = BigDecimal.class),
+		@ColumnResult(name = "avgSettingsDeviatedCount", type = BigDecimal.class),
+		@ColumnResult(name = "avgMissedTherapyDaysCount", type = BigDecimal.class),
+		@ColumnResult(name = "avgHMRRunrate", type = BigDecimal.class),
+		@ColumnResult(name = "clinicName", type = String.class)})),
+@SqlResultSetMapping(name = "avgBenchMarkForClinicAdminOrHCPByAgeGroup", classes = @ConstructorResult(targetClass = BenchmarkResultVO.class, columns = {
+		@ColumnResult(name = "name", type = String.class),
+		@ColumnResult(name = "zipcode",type = String.class),
+		@ColumnResult(name = "city",type = String.class),
+		@ColumnResult(name = "state",type = String.class),
+		@ColumnResult(name = "ageRangeLabel", type = String.class),
+		@ColumnResult(name = "avgCompScore", type = BigDecimal.class),
+		@ColumnResult(name = "avgNonAdherenceCount", type = BigDecimal.class),
+		@ColumnResult(name = "avgSettingsDeviatedCount", type = BigDecimal.class),
+		@ColumnResult(name = "avgMissedTherapyDaysCount", type = BigDecimal.class),
+		@ColumnResult(name = "avgHMRRunrate", type = BigDecimal.class)}))
+})
 @Entity
+@Audited
 @Table(name="PATIENT_COMPLIANCE")
-public class PatientCompliance {
+public class PatientCompliance extends AbstractAuditingEntity implements Serializable{
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
@@ -66,6 +128,15 @@ public class PatientCompliance {
 
 	@Column(name="settings_deviated_days_count")
 	private int settingsDeviatedDaysCount  = 0;
+	
+	@Column(name="global_missed_therapy_days_count")
+	private int globalMissedTherapyCounter;
+	
+	@Column(name="global_hmr_non_adherence_count")
+	private int globalHMRNonAdherenceCounter;
+	
+	@Column(name="global_settings_deviated_count")
+	private int globalSettingsDeviationCounter;
 	
 	public PatientCompliance() {
 		super();
@@ -227,6 +298,30 @@ public class PatientCompliance {
 		this.settingsDeviatedDaysCount = settingsDeviatedDaysCount;
 	}
 
+	public int getGlobalMissedTherapyCounter() {
+		return globalMissedTherapyCounter;
+	}
+
+	public void setGlobalMissedTherapyCounter(int globalMissedTherapyCounter) {
+		this.globalMissedTherapyCounter = globalMissedTherapyCounter;
+	}
+
+	public int getGlobalHMRNonAdherenceCounter() {
+		return globalHMRNonAdherenceCounter;
+	}
+
+	public void setGlobalHMRNonAdherenceCounter(int globalHMRNonAdherenceCounter) {
+		this.globalHMRNonAdherenceCounter = globalHMRNonAdherenceCounter;
+	}
+
+	public int getGlobalSettingsDeviationCounter() {
+		return globalSettingsDeviationCounter;
+	}
+
+	public void setGlobalSettingsDeviationCounter(int globalSettingsDeviationCounter) {
+		this.globalSettingsDeviationCounter = globalSettingsDeviationCounter;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -263,5 +358,10 @@ public class PatientCompliance {
 				+ "]";
 	}
 
+	@Override
+	public String getCreatedBy() {
+		return patientUser.getEmail();
+	}
+	
 	
 }

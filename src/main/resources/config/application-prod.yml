@@ -46,3 +46,7 @@ spring:
         careGiverDashboardUrl: https://visiview.hill-rom.com
         baseUrl: https://visiview.hill-rom.com
         accountActivationReminderInterval: 12
+    survey:
+        surveyreportemailids: rohan.kushwaha@razorfish.com
+    changePrescription:
+        changePrescriptionEmailids: rohan.kushwaha@razorfish.com,rohangtr@gmail.com

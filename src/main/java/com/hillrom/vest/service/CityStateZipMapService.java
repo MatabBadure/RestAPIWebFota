@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.CityStateZipMap;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.CityStateZipMapCustomRepository;
 import com.hillrom.vest.repository.CityStateZipMapRepository;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.web.rest.dto.CityVO;
@@ -22,16 +23,33 @@ import com.hillrom.vest.web.rest.dto.StateVO;
 public class CityStateZipMapService {
 
 	@Inject
-	private CityStateZipMapRepository cityStateZipMapRepository;
+	private CityStateZipMapRepository cityStateZipMapJpaRepository;
+	
+	@Inject
+	private CityStateZipMapCustomRepository cityStateZipMapCustomRepository;
 
 	public List<String> getStates() {
-		return cityStateZipMapRepository.findUniqueStates();
+		return cityStateZipMapJpaRepository.findUniqueStates();
+	}
+	
+	public Map<String, List<String>> getAvailableStates() {
+		return cityStateZipMapCustomRepository.getExistingStateAndCitiesMapInsystem();
+	}
+	public List<String> getAvailableCities(String state) throws HillromException {
+		if(StringUtils.isEmpty(state))
+			throw new HillromException(ExceptionConstants.HR_710);
+		
+		return cityStateZipMapJpaRepository.findAvailableCities(state);
+	}
+	
+	public List<String> getCitiesByState(String state) {
+		return cityStateZipMapJpaRepository.findUniqueCitiesByState(state);
 	}
 
 	public StateVO getStateVOByState(String state) throws HillromException {
 		if (StringUtils.isEmpty(state))
 			throw new HillromException(ExceptionConstants.HR_710);
-		List<CityStateZipMap> cityStateZipMaps = cityStateZipMapRepository.findByState(state);
+		List<CityStateZipMap> cityStateZipMaps = cityStateZipMapJpaRepository.findByState(state);
 		Map<String, List<CityStateZipMap>> zipsGroupByCity = (Map) cityStateZipMaps.stream()
 				.collect(Collectors.groupingBy(CityStateZipMap::getCity));
 		StateVO stateVO = new StateVO();
@@ -52,7 +70,7 @@ public class CityStateZipMapService {
 	public List<CityStateZipMap> getbyZipCode(String zipcode) throws HillromException {
 		if (StringUtils.isEmpty(zipcode))
 			throw new HillromException(ExceptionConstants.HR_711);
-		List<CityStateZipMap> cityStateZipMaps = cityStateZipMapRepository.findByZipCode(zipcode);
+		List<CityStateZipMap> cityStateZipMaps = cityStateZipMapJpaRepository.findByZipCode(zipcode);
 
 		if (cityStateZipMaps.isEmpty())
 			throw new HillromException(ExceptionConstants.HR_712);

@@ -1,18 +1,21 @@
 package com.hillrom.vest.service;
 
-import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 import static com.hillrom.vest.config.AdherenceScoreConstants.UPPER_BOUND_VALUE;
+import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 
-import java.util.Collection;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,7 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.PatientProtocolRepository;
 import com.hillrom.vest.repository.ProtocolConstantsRepository;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
@@ -51,6 +55,9 @@ public class PatientProtocolService {
     
 	@Inject
 	private ProtocolConstantsRepository  protocolConstantsRepository;
+	
+	@Inject
+	private MailService mailService;
     
     public List<PatientProtocolData> addProtocolToPatient(Long patientUserId, ProtocolDTO protocolDTO) throws HillromException {
     	if(Constants.CUSTOM_PROTOCOL.equals(protocolDTO.getType())){
@@ -102,6 +109,7 @@ public class PatientProtocolService {
 		 			if(Objects.nonNull(ppd.getId())){
 			 			PatientProtocolData currentPPD = patientProtocolRepository.findOne(ppd.getId());
 				 		if(Objects.nonNull(currentPPD)){
+				 			currentPPD.setLastModifiedDate(DateTime.now());
 				 			assignValuesToPatientProtocolObj(ppd, currentPPD);
 			 				patientProtocolRepository.saveAndFlush(currentPPD);
 			 				protocolList.add(currentPPD);
@@ -113,10 +121,22 @@ public class PatientProtocolService {
 		 						ppd.getMaxPressure());
 			 			patientProtocolAssoc.setId(patientProtocolRepository.id());
 			 			patientProtocolAssoc.setProtocolKey(protocolKey);
+			 			patientProtocolAssoc.setLastModifiedDate(DateTime.now());
 			 			patientProtocolRepository.saveAndFlush(patientProtocolAssoc);
 			 			protocolList.add(patientProtocolAssoc);
 		 			}
 		 		});
+		 		try{
+			 		mailService.sendUpdateProtocolMailToPatient(patientUser, protocolList);
+			 		//Commenting this code as no mail has to be triggered when Protocal is updated
+			 		/*Optional<User> currentUser = userRepository.findOneByEmailOrHillromId(SecurityUtils.getCurrentLogin());
+			 		mailService.sendUpdateProtocolMailToMailingList(currentUser.get(), patientUser, protocolList);*/
+		 		}catch(Exception ex){
+					StringWriter writer = new StringWriter();
+					PrintWriter printWriter = new PrintWriter( writer );
+					ex.printStackTrace( printWriter );
+		 		}
+		 		
 		 		return protocolList;
 		 	} else {
 		 		throw new HillromException(ExceptionConstants.HR_523);
@@ -143,7 +163,7 @@ public class PatientProtocolService {
 			cp.setMaxPressure(up.getMaxPressure());
 	}
 
-    public List<PatientProtocolData> getAllProtocolsAssociatedWithPatient(Long patientUserId) throws HillromException {
+    public List<PatientProtocolData> getActiveProtocolsAssociatedWithPatient(Long patientUserId) throws HillromException {
     	User patientUser = userRepository.findOne(patientUserId);
     	if(patientUser != null) {
 	    	PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
@@ -293,5 +313,19 @@ public class PatientProtocolService {
 		minDuration = (int)(totalDuration*treatmentsPerDay);
 		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration);
 	}
+	
+	public List<PatientProtocolData> getAllProtocolsAssociatedWithPatient(Long patientUserId) throws HillromException {
+    	User patientUser = userRepository.findOne(patientUserId);
+    	if(patientUser != null) {
+	    	PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
+	     	if(patientInfo != null){
+	     		return patientProtocolRepository.findByPatientUserIdOrderByCreatedDateAsc(patientUserId);
+	     	} else {
+	     		throw new HillromException(ExceptionConstants.HR_523);
+		 	}
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);
+     	}
+    }
 }
 

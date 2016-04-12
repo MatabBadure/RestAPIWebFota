@@ -30,4 +30,6 @@ public interface PatientProtocolRepository extends
 	List<PatientProtocolData> findByPatientIdAndActiveStatus(String patientId);
 	
 	List<PatientProtocolData> findByDeletedAndPatientUserIdIn(boolean deleted,List<Long> patientUserId);
+	
+	List<PatientProtocolData> findByPatientUserIdOrderByCreatedDateAsc(Long patientId);
 }

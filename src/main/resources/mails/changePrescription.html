@@ -1,0 +1,317 @@
+<html>
+<head>
+<title>Change Prescription</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" style="font-family:MyriadPro-Regular,'Myriad Pro Regular',MyriadPro,'Myriad Pro',Helvetica,Arial,sans-serif">
+<table align="center" style="color:#fff; border:2px solid #7ca3dc" width="600" height="1080" border="0" cellpadding="0" cellspacing="0">
+	<tr>
+		<td rowspan="28" width="10" style="color:#fff;">&nbsp;</td>
+		<td width="581" style="color:#fff;">&nbsp;</td>
+		<td rowspan="28" width="9" style="color:#fff;">&nbsp;</td>
+	</tr>
+	<tr>
+		<td>
+			<img src="images/hill-rom-logo.png" th:src="@{|${baseUrl}/images/hill-rom-logo.png|}" width="581" height="34" alt=""></img></td>
+	</tr>
+	<tr>
+		<td width="581" bgcolor="#fff">&nbsp;</td>
+	</tr>
+	<tr>
+		<td>
+			<img src="images/update-prescription.png" th:src="@{|${baseUrl}/images/update-prescription.png|}" width="581" height="97" alt=""></img></td>
+	</tr>
+	<tr>
+		<td width="581" bgcolor="#fff">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="581">
+		<table width="581" height="25" border="0" cellpadding="0" cellspacing="0">
+			<tr>
+			<td width="10" bgcolor="#fff">&nbsp;</td>
+			<td  width="262" style="color:#7ca3dc;font-size:17px;font-weight:bolder;border-bottom:1px solid #7ca3dc">Updated Prescription</td>
+			<td width="309" bgcolor="#fff" style="border-bottom:1px solid #7ca3dc">&nbsp;</td>
+			</tr>
+		</table>
+		</td>
+	</tr>
+	<tr>
+		<td width="581" height="28" bgcolor="#fff"> &nbsp;</td>
+	</tr>
+	<tr>
+		<td width="581" bgcolor="#f1f1f1">
+			<table width="581" border="0" cellpadding="0" cellspacing="0">
+			<tr>
+				<td width="76">&nbsp;</td>
+				<td width="213">
+					<table width="213" height="89" border="0" cellpadding="0" cellspacing="0" bgcolor="#f1f1f1">
+						<tr>
+						<td width="213" >&nbsp;</td>
+						</tr>
+						<tr>
+						<td width="213" style="color:#646568">Patient name</td>
+						</tr>
+						<tr>
+						<td width="213">&nbsp;</td>
+						</tr>
+						<tr>
+						<td width="213" style="color:#276092;font-weight:bold;font-size:17px" th:text="|${user.lastName} ${user.firstName}|">Jose M. Rubert</td>
+						</tr>
+						<tr>
+						<td width="213">&nbsp;</td>
+						</tr>
+					</table>	
+				</td>
+				<td width="4" style="border-right:1px solid #c1c1c1"  bgcolor="#f1f1f1">&nbsp;</td>
+				<td width="84">&nbsp;</td>
+				<td width="204">
+					<table width="213" height="89" border="0" cellpadding="0" cellspacing="0">
+						<tr>
+						<td width="213">&nbsp;</td>
+						</tr>
+						<tr>
+						<td width="213" style="color:#646568">Patient DOB</td>
+						</tr>
+						<tr>
+						<td width="213">&nbsp;</td>
+						</tr>
+						<tr>
+						<td width="213" style="color:#276092;font-weight:bold;font-size:17px" th:text="${user.dob}">10/26/2015</td>
+						</tr>
+						<tr>
+						<td width="213">&nbsp;</td>
+						</tr>
+					</table>
+				</td>
+			
+			</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td width="581" height="0" style="border-top:1px solid #c1c1c1"></td>
+	</tr>
+	<tr>
+		<td width="581" bgcolor="#f1f1f1">
+		  <table width="581" border="0" cellpadding="0" cellspacing="0">
+			<tr>
+				<td width="76">&nbsp;</td>
+				<td width="213">
+					<table width="213" height="89" border="0" cellpadding="0" cellspacing="0">
+						<tr>
+						<td width="213">&nbsp;</td>
+						</tr>
+						<tr>
+						<td width="213" style="color:#646568">Prescriber Name</td>
+						</tr>
+						<tr>
+						<td width="213">&nbsp;</td>
+						</tr>
+						<tr>
+						<td width="213" style="color:#276092;font-weight:bold;font-size:17px"  th:text="|${currentUser.lastName} ${currentUser.firstName}|" >Griffin Carl</td>
+						</tr>
+						<tr>
+						<td width="213">&nbsp;</td>
+						</tr>
+					</table>
+				</td>
+				<td width="4" style="border-right:1px solid #c1c1c1">&nbsp;</td>
+				<td width="84">&nbsp;</td>
+				<td width="204">
+					<table width="213" height="89" border="0" cellpadding="0" cellspacing="0">
+						<tr>
+						<td width="213">&nbsp;</td>
+						</tr>
+						<tr>
+						<td width="213" style="color:#646568">Date</td>
+						</tr>
+						<tr>
+						<td width="213">&nbsp;</td>
+						</tr>
+						<tr>
+						<td width="213" style="color:#276092;font-weight:bold;font-size:17px" th:text="${date}">02/23/2016</td>
+						</tr>
+						<tr>
+						<td width="213">&nbsp;</td>
+						</tr>
+					</table>
+				</td>
+				
+			</tr>
+		  </table>
+		</td>
+	</tr>
+
+	<tr>
+		<td height="40" width="581" bgcolor="#fff">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="581" style="text-align:center;color:#646568;font-size:17px;border-bottom:1px solid #f1f1f1">Protocol</td>
+	</tr>
+	
+	<tr>
+		<td width="581" style="border-bottom:1px solid #f1f1f1">
+		<table width="581" border="0"  height="47" cellpadding="0" cellspacing="0">
+		<tr>
+			<!-- <td width="27" bgcolor="#fff"></td> -->
+			<td width="102" style="color:#7ca3dc;font-size: 14px;text-align:center" >Type</td>
+			<td width="123" style="color:#7ca3dc;font-size: 14px;text-align:center">Treatments <br />/ Day</td>
+			<td width="123" style="color:#7ca3dc;font-size: 14px;text-align:center">Minutes <br /> / Treatment</td>
+			<td width="127" style="color:#7ca3dc;font-size: 14px;text-align:center">Frequency <br /> / Treatment</td>
+			<td width="106" style="color:#7ca3dc;font-size: 14px;text-align:center">Pressure <br /> / Treatments</td>
+		</tr>
+		</table>
+		</td>
+	</tr>
+
+	<tr>
+		<td width="581" style="border-bottom:1px solid #f1f1f1">
+			<table width="581" height="37" border="0" cellpadding="0" cellspacing="0">
+			<tr th:each="patientProtocolData : ${patientProtocolDataList}">
+				<td width="102" style="color:#646568;font-size: 14px;text-align:center" th:text="${patientProtocolData.type}">Normal</td>
+				<td width="123" style="color:#646568;font-size: 14px;text-align:center" th:text="${patientProtocolData.treatmentsPerDay}">4</td>
+				<td width="123" style="color:#646568;font-size: 14px;text-align:center" th:text="${patientProtocolData.minMinutesPerTreatment}">4</td>
+				<td width="127" style="color:#646568;font-size: 14px;text-align:center" th:text="${patientProtocolData.minFrequency}">8</td>
+				<td width="106" style="color:#646568;font-size: 14px;text-align:center" th:text="${patientProtocolData.minPressure}">7</td>
+			</tr>
+		</table>
+		</td>
+	</tr>
+	<tr>
+		<td height="50" width="581" bgcolor="#fff">&nbsp;</td>
+	</tr>
+
+	<tr>
+		<td width="581">
+			<table  width="581" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+				<td width="21" bgcolor="#fff">&nbsp;</td>
+				<td width="560" style="color:#7ca3dc">Terms and Conditions</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td bgcolor="#fff" width="581">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="581">
+		<table width="581" height="134" border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td width="21" bgcolor="#fff">&nbsp;</td>
+			<td width="499">
+				<table width="499" border="0" cellpadding="0" cellspacing="0"  style="color:#646568;font-size: 14px;">
+					<tr>
+						<td>1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Hoc non est positum in nostra actione. Ergo adhuc, quantum equidem intellego, causa non videtur fuisse mutandi nominis. Duo Reges: constructio interrete. Varietates</td>
+					</tr>
+					<tr><td height="10"></td></tr>
+					<tr>
+						<td>2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Hoc non est positum in nostra actione. Ergo adhuc, quantum equidem intellego, causa non videtur fuisse mutandi nominis. Duo Reges: constructio interrete. Varietates</td>
+					</tr>
+						<tr><td height="10"></td></tr>
+					<tr>
+						<td>3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Hoc non est positum in nostra actione. Ergo adhuc, quantum equidem intellego, causa non videtur fuisse mutandi nominis. Duo Reges: constructio interrete. Varietates</td>
+					</tr>
+				</table>
+			</td>
+			<td width="61" bgcolor="#fff">&nbsp;</td>
+		</tr>
+		</table>
+		</td>
+	</tr>
+		<tr>
+		<td width="600" bgcolor="#ffffff">&nbsp;</td>
+	</tr>
+		<tr>
+		<td>
+			<table width="600" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td rowspan="2" width="18" bgcolor="#ffffff">&nbsp;</td>
+					<td width="227" style="color:#646568"><b>Regards,</b></td>
+					<td rowspan="2" width="355"  bgcolor="#ffffff">&nbsp;</td>
+				</tr>
+				<tr>
+					<td width="227" style="color:#646568;font-size:14px;"><i>Your HILL-Rom Respiratory Care Team</i></td>
+				</tr>
+			</table>
+		
+		</td>
+	</tr>
+	<tr>
+		<td width="600" bgcolor="#ffffff">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="600">
+			<table width="600" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="19" bgcolor="#ffffff">&nbsp;</td>
+					
+					<td width="537"  style="color:#646568;font-size:12px;">***PLEASE DO NOT REPLY TO THIS MAIL, IF YOU NEED TO CONTACT HILL-ROM RESPIRATORY CARE, PLEASE CALL 800-426-4224 OR VISIT OUR WEBSITE AT HTTP://RESPIRATORYCARE.HILL-ROM.COM/. ANY REPLIES TO THIS EMAIL WILL NOT BE RECEIVED BY HILL-ROM RESPIRATORY CARE***</td>
+					
+					<td width="44" bgcolor="#ffffff">&nbsp;</td>
+				</tr>
+			</table>
+	
+		</td>
+	</tr>
+	<tr>
+		<td width="600" bgcolor="#ffffff">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="581" bgcolor="#fff">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="600">
+			<table width="600" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="10" bgcolor="#ffffff">&nbsp;</td>
+					<td width="581">
+						<table width="581"  border="0" cellpadding="0" cellspacing="0">
+						<tr>
+							<td width="581" bgcolor="#7ca3dc">&nbsp;</td>
+						</tr>
+						<tr>
+							<td width="581">
+									<table width="581" border="0" cellpadding="0" bgcolor="#7ca3dc" cellspacing="0">
+									<tr>
+									<td width="5" bgcolor="#7ca3dc">&nbsp;</td>
+									<td width="57" style="font-size:12px;color:#fff" ><a style="color:#fff;font-size:11px;text-decoration:none" th:href="@{|${baseUrl}/#/contactus|}" href="http://hillromvest.com/#/contactus">Contact Us</a></td>
+									<td width="6" bgcolor="#7ca3dc">&nbsp;</td>
+									<td  style="border-right:1px solid #fff"></td>
+									<td width="6" bgcolor="#7ca3dc">&nbsp;</td>
+									
+									<td width="77" style="font-size:12px;color:#fff" th:href="@{|${baseUrl}/#/privacyPolicy|}"><a style="color:#fff;font-size:11px;text-decoration:none" href="http://hillromvest.com/#/privacyPolicy">Privacy Policy</a></td>
+									<td width="6" bgcolor="#7ca3dc">&nbsp;</td>
+									<td style="border-right:1px solid #fff"></td>
+									<td width="7" bgcolor="#7ca3dc">&nbsp;</td>
+									<td width="70" style="font-size:12px;color:#fff" th:href="@{|${baseUrl}/#/termsOfUse|}"><a style="color:#fff;font-size:11px;text-decoration:none" href="http://hillromvest.com/#/termsOfUse">Terms of Use</a></td>
+									
+									<td style="border-right:1px solid #fff"></td>
+									<td width="6" bgcolor="#7ca3dc">&nbsp;</td>
+									<td width="172" style="font-size:12px;color:#fff" th:href="@{|${baseUrl}/#/privacyPractices|}"><a style="color:#fff;font-size:11px;text-decoration:none" href="http://hillromvest.com/#/privacyPractices">HIPPA Notice of Privacy Practices</a></td>
+									
+									<td style="border-right:1px solid #fff"></td>
+									<td width="6" bgcolor="#7ca3dc">&nbsp;</td>
+									<td width="154" style="font-size:12px;color:#fff" th:href="@{|${baseUrl}/#/careSite|}"><a style="color:#fff;font-size:11px;text-decoration:none" href="http://hillromvest.com/#/careSite">Hill-Rom Respiratory Care Site</a></td>
+									</tr>
+									</table>
+						
+							</td>
+						</tr>
+						<tr>
+							<td width="581" bgcolor="#7ca3dc">&nbsp;</td>
+						</tr>
+						<tr>
+							<td align="center" bgcolor="#7ca3dc" style="color:#fff;font-size:12px;">Copyright &copy; Hill-rom 2016. All Rights Reserved.
+							</td>
+						</tr>
+						</table>
+					</td>
+					<td width="9" bgcolor="#ffffff">&nbsp;</td>
+				</tr>
+			</table>
+			</td>
+	</tr>
+</table>
+</body>
+</html>

@@ -94,4 +94,10 @@ public class MessageConstants {
     
     public static final String HR_306 = "Authenticated successfully.";
     public static final String HR_307 = "Survey taken successfully.";
+    
+    public static final String HR_308 = "Test Result created successfully.";
+    public static final String HR_309 = "Test Result updated successfully.";
+    public static final String HR_310 = "Test Result fetched successfully.";
+    
+    
 }

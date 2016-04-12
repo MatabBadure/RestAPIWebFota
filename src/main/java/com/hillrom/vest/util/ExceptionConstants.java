@@ -160,4 +160,7 @@ public class ExceptionConstants {
     // Generic Exception for Graph 
     public static final String HR_717 = "Unable to process graph data";
     public static final String HR_718 = "No Data Available";
+    
+    //test result
+    public static final String HR_719 = "No such test result exists";
 }

@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -22,8 +23,11 @@ public class CityStateZipMapCustomRepository {
 		String query = "SELECT distinct(state), group_concat(distinct city) from PATIENT_INFO group by state having state is NOT NULL";
 		List<Object[]> resultSet = entityManager.createNativeQuery(query).getResultList();
 		Map<String,List<String>> stateCityMap = new LinkedHashMap<>();
-		for(Object[] stateCities : resultSet){
-			stateCityMap.put((String)stateCities[0], new LinkedList<String>(Arrays.asList(((String)stateCities[1]).split(","))));
+		for (Object[] stateCities : resultSet) {
+			stateCityMap.put((String) stateCities[0],
+					Objects.nonNull(stateCities[1])
+							? new LinkedList<String>(Arrays.asList(((String) stateCities[1]).split(",")))
+							: new LinkedList<String>());
 		}
 		return stateCityMap;
 	}

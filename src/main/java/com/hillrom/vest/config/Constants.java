@@ -238,9 +238,9 @@ public final class Constants {
 	public static final String KEY_BENCH_MARK_DATA = "benchMarkData";
 	
 	// BenchMark Axis Labels
-	public static final String BM_PARAM_SETTING_DEVIATION_LABEL = "Setting Deviation";
+	public static final String BM_PARAM_SETTING_DEVIATION_LABEL = "Cumulative Frequency Deviation Days";
 	public static final String BM_PARAM_HMR_DEVIATION_LABEL = "HMR Non Adherence";
-	public static final String BM_PARAM_MISSED_THERAPY_DAYS_LABEL = "Missed Therapy";
+	public static final String BM_PARAM_MISSED_THERAPY_DAYS_LABEL = "Cumulative Missed Days";
 	public static final String BM_PARAM_ADHERENCE_SCORE_LABEL = "Adherence Score";
 	public static final String BM_PARAM_HMR_RUNRATE_LABEL = " Average Session Minutes";
 

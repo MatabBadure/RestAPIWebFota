@@ -205,8 +205,8 @@ public final class Constants {
 
 	// Cumulative Stats Graph 
 	public static final String HMR_NON_ADHERENCE_LABEL = "HMR Non-Adherence";
-	public static final String SETTING_DEVIATION_LABEL = "Setting Deviation";
-	public static final String MISSED_THERAPY_DAYS_LABEL = "Missed Therapy Days";
+	public static final String SETTING_DEVIATION_LABEL = "Consecutive Frequency Deviation Days";
+	public static final String MISSED_THERAPY_DAYS_LABEL = "Consecutive Missed Days";
 	public static final String NO_TRANSMISSION_RECORDED_LABEL = "No Transmission Recorded";
 
 	// Treatment Stats Graph
@@ -242,7 +242,7 @@ public final class Constants {
 	public static final String BM_PARAM_HMR_DEVIATION_LABEL = "HMR Non Adherence";
 	public static final String BM_PARAM_MISSED_THERAPY_DAYS_LABEL = "Missed Therapy";
 	public static final String BM_PARAM_ADHERENCE_SCORE_LABEL = "Adherence Score";
-	public static final String BM_PARAM_HMR_RUNRATE_LABEL = "HMR Runrate";
+	public static final String BM_PARAM_HMR_RUNRATE_LABEL = " Average Session Minutes";
 
 	public static final String AGE_GROUP_LABEL = "Age Group";
 	public static final String CLINIC_SIZE_LABEL = "Clinic Size";

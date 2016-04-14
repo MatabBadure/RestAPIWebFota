@@ -6,6 +6,7 @@ import java.util.Objects;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.domain.PatientTestResult;
@@ -32,7 +33,7 @@ public class PateintTestResultService {
 	@Inject
 	private UserPatientRepository userPatientRepository;
 
-	public List<PatientTestResult> getPatientTestResult() {
+	public List<PatientTestResult> getPatientTestResult(LocalDate from, LocalDate to) {
 
 		return patientTestResultRepository.findAll();
 	}
@@ -41,8 +42,8 @@ public class PateintTestResultService {
 		return patientTestResultRepository.getOne(id);
 	}
 
-	public List<PatientTestResult> getPatientTestResultByUserId(Long id) {
-		return patientTestResultRepository.findByUserId(id);
+	public List<PatientTestResult> getPatientTestResultByUserId(Long id, LocalDate from, LocalDate to) {
+		return patientTestResultRepository.findByUserId(id, from, to);
 	}
 
 	public PatientTestResult createPatientTestResult(PatientTestResult patientTestResult, Long userId, String baseURL)

@@ -6,8 +6,10 @@ import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.domain.PatientTestResult;
@@ -43,21 +46,25 @@ public class PatientTestResultResource {
 	 */
 	@RequestMapping(value = "/testresult", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 
-	public ResponseEntity<?> getAllPatientTestResult() {
-		List<PatientTestResult> patientTestResults = pateintTestResultService.getPatientTestResult();
+	public ResponseEntity<?> getAllPatientTestResult(
+			@RequestParam(required = true, value = "from") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+			@RequestParam(required = true, value = "to") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
+		List<PatientTestResult> patientTestResults = pateintTestResultService.getPatientTestResult(from,to);
 		return new ResponseEntity<List<PatientTestResult>>(patientTestResults, HttpStatus.OK);
 	}
 
 	/*
 	 **
-	 * get /survey/{id} -> get test result.
+	 * get /testresult/{userId} -> get test result.
 	 */
 	@RequestMapping(value = "/testresult/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 
 	@RolesAllowed({ AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT })
-	public ResponseEntity<?> getPatientTestResultById(@PathVariable Long userId) throws HillromException {
+	public ResponseEntity<?> getPatientTestResultById(@PathVariable Long userId,
+			@RequestParam(required = true, value = "from") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+			@RequestParam(required = true, value = "to") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) throws HillromException {
 		List<PatientTestResult> patientTestResults;
-		patientTestResults = pateintTestResultService.getPatientTestResultByUserId(userId);
+		patientTestResults = pateintTestResultService.getPatientTestResultByUserId(userId, from,to);
 		return new ResponseEntity<List<PatientTestResult>>(patientTestResults, HttpStatus.OK);
 	}
 	

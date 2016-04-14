@@ -10,7 +10,7 @@ import com.hillrom.vest.domain.PatientTestResult;
 
 public interface PatientTestResultRepository extends JpaRepository<PatientTestResult, Long> {
 	
-	@Query("from PatientTestResult patientTestResult where patientTestResult.user.id = ?1 and completionDate between ?2 and ?3")
+	@Query("from PatientTestResult patientTestResult where patientTestResult.user.id = ?1 and patientTestResult.completionDate between ?2 and ?3")
     List<PatientTestResult> findByUserId(Long userId, LocalDate from, LocalDate to);
 	
 	List<PatientTestResult> findByCompletionDateBetween(LocalDate from, LocalDate to);

@@ -14,17 +14,22 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
+import com.hillrom.vest.domain.util.MMDDYYYYLocalDateSerializer;
 
 @Entity
 @Audited
 @Table(name = "TEST_RESULTS")
 @Inheritance(strategy = InheritanceType.JOINED)
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class,property= "id")
-public class PatientTestResult {
+public class PatientTestResult extends AbstractAuditingEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
@@ -39,9 +44,10 @@ public class PatientTestResult {
 	@JoinColumn(name = "patient_id")
 	private PatientInfo patientInfo;
 
-	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
+	@JsonSerialize(using = MMDDYYYYLocalDateSerializer.class)
 	@Column(name = "test_result_date")
-	private DateTime completionDate;
+	private LocalDate completionDate;
 
 	@Column(name = "FVC_L")
 	private double FVC_L;
@@ -91,11 +97,11 @@ public class PatientTestResult {
 		this.patientInfo = patientInfo;
 	}
 
-	public DateTime getCompletionDate() {
+	public LocalDate getCompletionDate() {
 		return completionDate;
 	}
 
-	public void setCompletionDate(DateTime completionDate) {
+	public void setCompletionDate(LocalDate completionDate) {
 		this.completionDate = completionDate;
 	}
 
@@ -162,7 +168,7 @@ public class PatientTestResult {
 	public void setComments(String comments) {
 		this.comments = comments;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

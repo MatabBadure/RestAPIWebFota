@@ -128,9 +128,8 @@ public class PatientProtocolService {
 		 		});
 		 		try{
 			 		mailService.sendUpdateProtocolMailToPatient(patientUser, protocolList);
-			 		//Commenting this code as no mail has to be triggered when Protocal is updated
-			 		/*Optional<User> currentUser = userRepository.findOneByEmailOrHillromId(SecurityUtils.getCurrentLogin());
-			 		mailService.sendUpdateProtocolMailToMailingList(currentUser.get(), patientUser, protocolList);*/
+			 		Optional<User> currentUser = userRepository.findOneByEmailOrHillromId(SecurityUtils.getCurrentLogin());
+			 		mailService.sendUpdateProtocolMailToMailingList(currentUser.get(), patientUser, protocolList);
 		 		}catch(Exception ex){
 					StringWriter writer = new StringWriter();
 					PrintWriter printWriter = new PrintWriter( writer );

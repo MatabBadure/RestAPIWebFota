@@ -19,9 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 import com.hillrom.vest.domain.util.MMDDYYYYLocalDateSerializer;
 
 @Entity

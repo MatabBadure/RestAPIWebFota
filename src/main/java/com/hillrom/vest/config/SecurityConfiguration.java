@@ -132,6 +132,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/validateCredentials").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES)
             .antMatchers("/api/loginAnalytics").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES,AuthoritiesConstants.ASSOCIATES)
             .antMatchers("/api/survey/{id}/graph").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES,AuthoritiesConstants.ASSOCIATES)
+            .antMatchers("/api/survey/{id}/graph").authenticated()        
         .and()
             .apply(securityConfigurerAdapter());
 

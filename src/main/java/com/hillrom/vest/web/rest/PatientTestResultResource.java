@@ -52,12 +52,31 @@ public class PatientTestResultResource {
 		List<PatientTestResult> patientTestResults = pateintTestResultService.getPatientTestResult(from,to);
 		return new ResponseEntity<List<PatientTestResult>>(patientTestResults, HttpStatus.OK);
 	}
+	
+	/*
+	 *
+	 * get /testresult -> get test result by id
+	 * 
+	 */
+	@RequestMapping(value = "/testresult/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+
+	public ResponseEntity<?> getPatientTestResultById(@PathVariable Long id) {
+		PatientTestResult patientTestResult;
+		try {
+			patientTestResult = pateintTestResultService.getPatientTestResultById(id);
+		} catch (HillromException e) {
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<PatientTestResult>(patientTestResult, HttpStatus.OK);
+	}
 
 	/*
 	 **
 	 * get /testresult/{userId} -> get test result.
 	 */
-	@RequestMapping(value = "/testresult/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/testresult/user/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 
 	@RolesAllowed({ AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT })
 	public ResponseEntity<?> getPatientTestResultById(@PathVariable Long userId,
@@ -72,7 +91,7 @@ public class PatientTestResultResource {
 	 **
 	 * POST /testresult -> create update test result.
 	 */
-	@RequestMapping(value = "/testresult/{userId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/testresult/user/{userId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 
 	@RolesAllowed({ AuthoritiesConstants.PATIENT })
 	public ResponseEntity<?> addPatientTestResult(@RequestBody PatientTestResult patientTestResult,@PathVariable Long userId, HttpServletRequest request) {

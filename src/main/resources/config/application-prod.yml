@@ -47,6 +47,6 @@ spring:
         baseUrl: https://visiview.hill-rom.com
         accountActivationReminderInterval: 12
     survey:
-        surveyreportemailids: rohan.kushwaha@razorfish.com
+        surveyreportemailids: rohan.kushwaha@razorfish.com,joelkaka@gmail.com 
     changePrescription:
-        changePrescriptionEmailids: rohan.kushwaha@razorfish.com,rohangtr@gmail.com
+        changePrescriptionEmailids: joelpreetham.fernandes4@hill-rom.com,joelkaka@gmail.com 

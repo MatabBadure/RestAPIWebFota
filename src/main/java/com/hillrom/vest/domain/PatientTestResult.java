@@ -13,11 +13,11 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -45,9 +45,9 @@ public class PatientTestResult extends AbstractAuditingEntity {
 	private PatientInfo patientInfo;
 
 	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
-	@JsonSerialize(using = MMDDYYYYLocalDateSerializer.class)
+    @JsonSerialize(using = MMDDYYYYLocalDateSerializer.class)
 	@Column(name = "test_result_date")
-	private LocalDate completionDate;
+	private LocalDate testResultDate;
 
 	@Column(name = "FVC_L")
 	private double FVC_L;
@@ -97,12 +97,12 @@ public class PatientTestResult extends AbstractAuditingEntity {
 		this.patientInfo = patientInfo;
 	}
 
-	public LocalDate getCompletionDate() {
-		return completionDate;
+	public LocalDate getTestResultDate() {
+		return testResultDate;
 	}
 
-	public void setCompletionDate(LocalDate completionDate) {
-		this.completionDate = completionDate;
+	public void setTestResultDate(LocalDate testResultDate) {
+		this.testResultDate = testResultDate;
 	}
 
 	public double getFVC_L() {
@@ -168,6 +168,11 @@ public class PatientTestResult extends AbstractAuditingEntity {
 	public void setComments(String comments) {
 		this.comments = comments;
 	}
+
+	@JsonInclude
+    public String getLastModifiedBy() {
+        return super.getLastModifiedBy();
+    }
 	
 	@Override
 	public int hashCode() {
@@ -189,7 +194,7 @@ public class PatientTestResult extends AbstractAuditingEntity {
 		temp = Double.doubleToLongBits(PEF_P);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result + ((comments == null) ? 0 : comments.hashCode());
-		result = prime * result + ((completionDate == null) ? 0 : completionDate.hashCode());
+		result = prime * result + ((testResultDate == null) ? 0 : testResultDate.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((patientInfo == null) ? 0 : patientInfo.hashCode());
 		result = prime * result + ((user == null) ? 0 : user.hashCode());

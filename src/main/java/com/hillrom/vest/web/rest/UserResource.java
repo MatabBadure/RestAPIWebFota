@@ -202,7 +202,7 @@ public class UserResource {
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
 
 	}
-	
+	//HCP log in. Patient associated to  to HCP
    @RequestMapping(value = "/user/hcp/{id}/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	
 	public ResponseEntity<?> searchPatientAssociatedToHcp(@PathVariable Long id,
@@ -281,7 +281,7 @@ public class UserResource {
 
   	}
 
-
+   //Admin login. Associated Patient to Clinic
    @RequestMapping(value = "/user/clinic/{clinicId}/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	
 	public ResponseEntity<?> searchPatientAssociatedToClinic(@PathVariable String clinicId,
@@ -916,6 +916,7 @@ public class UserResource {
         }
 	}
     
+    //Patient associated with clinic admin by clinic id
     @RequestMapping(value = "/user/clinicadmin/{id}/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
 	public ResponseEntity<?> searchPatientAssociatedToClinicAdmin(@PathVariable Long id,

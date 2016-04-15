@@ -16,7 +16,9 @@ import javax.persistence.SqlResultSetMapping;
 import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
+import org.joda.time.DateTime;
 
 import com.hillrom.vest.web.rest.dto.BenchmarkResultVO;
 import com.hillrom.vest.web.rest.dto.ClinicDiseaseStatisticsResultVO;
@@ -56,6 +58,13 @@ public class ClinicPatientAssoc extends AbstractAuditingEntity implements Serial
     
     @Column(name="is_active")
     private Boolean isActive = true;
+    
+    @Column(name = "expired")
+    private Boolean expired = false;
+    
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @Column(name = "expiration_date", nullable = true)
+    private DateTime expirationDate = null;
     
 	public ClinicPatientAssoc() {
 		super();
@@ -115,6 +124,22 @@ public class ClinicPatientAssoc extends AbstractAuditingEntity implements Serial
 
 	public void setActive(Boolean isActive) {
 		this.isActive = isActive;
+	}
+	
+	public Boolean getExpired() {
+		return expired;
+	}
+
+	public void setExpired(Boolean expired) {
+		this.expired = expired;
+	}
+	
+	public DateTime getExpirationDate() {
+		return expirationDate;
+	}
+
+	public void setExpirationDate(DateTime expirationDate) {
+		this.expirationDate = expirationDate;
 	}
 
 	@Override

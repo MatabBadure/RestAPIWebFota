@@ -18,10 +18,8 @@ import org.joda.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.joda.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.joda.ser.LocalDateTimeSerializer;
-import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
 import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
+import com.hillrom.vest.domain.util.MMDDYYYYLocalDateSerializer;
 
 @Entity
 @Table(name = "PATIENT_NOTE")
@@ -34,7 +32,7 @@ public class Note {
 	
 	@Column(name = "created_on")
 	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
-	@JsonSerialize(using = CustomLocalDateSerializer.class)
+	@JsonSerialize(using = MMDDYYYYLocalDateSerializer.class)
     @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
 	private LocalDate createdOn;
 

@@ -130,7 +130,6 @@ public class PatientUserVO {
 			this.gender = patientInfo.getGender();
 			this.city = patientInfo.getCity();
 			this.address = patientInfo.getAddress();
-			this.isExpired=patientInfo.getExpired();
 			this.serialNumber = patientInfo.getSerialNumber();
 		}
 	}

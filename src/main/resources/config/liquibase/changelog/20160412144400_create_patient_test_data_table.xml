@@ -56,4 +56,12 @@
 			baseTableName="TEST_RESULTS" constraintName="fk_tr_patient_id"
 			referencedColumnNames="id" referencedTableName="PATIENT_INFO" />
 	</changeSet>
+	
+	<changeSet id="20160418142100" author="Hillrom Devs">
+		<addColumn tableName="TEST_RESULTS">
+			<column name="last_updated_by" type="varchar(255)">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>

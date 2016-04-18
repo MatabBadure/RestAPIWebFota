@@ -72,8 +72,7 @@ public class PateintTestResultService {
 				}
 		}
 		String updatedBy = getUpdatedUserName();
-		patientTestResult.setCreatedBy(updatedBy);
-		patientTestResult.setLastModifiedBy(updatedBy);
+		patientTestResult.setLastUpdatedBy(updatedBy);
 		return patientTestResultRepository.saveAndFlush(patientTestResult);
 	}	
 	
@@ -97,7 +96,7 @@ public class PateintTestResultService {
 				}
 		}
 		String updatedBy = getUpdatedUserName();
-		patientTestResult.setLastModifiedBy(updatedBy);
+		patientTestResult.setLastUpdatedBy(updatedBy);
 		return patientTestResultRepository.saveAndFlush(patientTestResult);
 	}
 	
@@ -105,7 +104,7 @@ public class PateintTestResultService {
 		Optional<User> userFromDB = userRepository.findOneByEmailOrHillromId(SecurityUtils.getCurrentLogin());
 		if(userFromDB.isPresent()){
 			User user = userFromDB.get();
-			return new StringBuffer(user.getLastName()).append(" ").append(user.getFirstName()).toString();
+			return new StringBuilder(user.getLastName()).append(" ").append(user.getFirstName()).toString();
 		}else{
 			throw new HillromException(ExceptionConstants.HR_512);
 		}

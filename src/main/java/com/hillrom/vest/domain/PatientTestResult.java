@@ -13,18 +13,21 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
-import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hillrom.vest.domain.util.MMDDYYYYLocalDateSerializer;
 
 @Entity
 @Audited
 @Table(name = "TEST_RESULTS")
 @Inheritance(strategy = InheritanceType.JOINED)
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class,property= "id")
-public class PatientTestResult {
+public class PatientTestResult extends AbstractAuditingEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
@@ -39,9 +42,10 @@ public class PatientTestResult {
 	@JoinColumn(name = "patient_id")
 	private PatientInfo patientInfo;
 
-	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
+    @JsonSerialize(using = MMDDYYYYLocalDateSerializer.class)
 	@Column(name = "test_result_date")
-	private DateTime completionDate;
+	private LocalDate testResultDate;
 
 	@Column(name = "FVC_L")
 	private double FVC_L;
@@ -91,12 +95,12 @@ public class PatientTestResult {
 		this.patientInfo = patientInfo;
 	}
 
-	public DateTime getCompletionDate() {
-		return completionDate;
+	public LocalDate getTestResultDate() {
+		return testResultDate;
 	}
 
-	public void setCompletionDate(DateTime completionDate) {
-		this.completionDate = completionDate;
+	public void setTestResultDate(LocalDate testResultDate) {
+		this.testResultDate = testResultDate;
 	}
 
 	public double getFVC_L() {
@@ -163,6 +167,11 @@ public class PatientTestResult {
 		this.comments = comments;
 	}
 
+	@JsonInclude
+    public String getLastModifiedBy() {
+        return super.getLastModifiedBy();
+    }
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -183,7 +192,7 @@ public class PatientTestResult {
 		temp = Double.doubleToLongBits(PEF_P);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result + ((comments == null) ? 0 : comments.hashCode());
-		result = prime * result + ((completionDate == null) ? 0 : completionDate.hashCode());
+		result = prime * result + ((testResultDate == null) ? 0 : testResultDate.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((patientInfo == null) ? 0 : patientInfo.hashCode());
 		result = prime * result + ((user == null) ? 0 : user.hashCode());

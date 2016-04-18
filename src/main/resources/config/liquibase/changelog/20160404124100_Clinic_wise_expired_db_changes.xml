@@ -13,7 +13,7 @@
 	<changeSet id="20160404124100" author="Hillrom Devs">
 		<addColumn tableName="PATIENT_COMPLIANCE">
 			<column name="expired"
-				type="boolean" valueBoolean="false" />
+				type="boolean" defaultValueBoolean="false" />
 			<column name="expired_date" type="timestamp"/>
 		</addColumn>
 	</changeSet>

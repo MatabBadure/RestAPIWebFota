@@ -730,7 +730,7 @@ public class UserSearchRepository {
 			String clinicNamesCSV = (String) record[17];
 			String hcpNamesCSV = (String) record[18];
 			String mrnId = (String) record[19];
-			Boolean isExpired = (Boolean) record[20];
+			Boolean isExpired = Objects.nonNull((Boolean) record[20])? (Boolean) record[20] : false;
 
 			java.util.Date localLastTransmissionDate = null;
 

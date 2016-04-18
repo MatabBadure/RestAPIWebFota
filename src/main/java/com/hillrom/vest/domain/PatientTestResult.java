@@ -70,6 +70,9 @@ public class PatientTestResult extends AbstractAuditingEntity {
 
 	@Column(name = "Comments")
 	private String comments;
+	
+	@Column(name = "last_updated_by")
+	private String lastUpdatedBy;
 
 	public Long getId() {
 		return id;
@@ -163,14 +166,17 @@ public class PatientTestResult extends AbstractAuditingEntity {
 		return comments;
 	}
 
+	public String getLastUpdatedBy() {
+		return lastUpdatedBy;
+	}
+
+	public void setLastUpdatedBy(String lastUpdatedBy) {
+		this.lastUpdatedBy = lastUpdatedBy;
+	}
+
 	public void setComments(String comments) {
 		this.comments = comments;
 	}
-
-	@JsonInclude
-    public String getLastModifiedBy() {
-        return super.getLastModifiedBy();
-    }
 	
 	@Override
 	public int hashCode() {

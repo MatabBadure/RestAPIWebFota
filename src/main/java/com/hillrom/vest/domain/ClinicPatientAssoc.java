@@ -3,6 +3,7 @@ package com.hillrom.vest.domain;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Objects;
 
 import javax.persistence.AssociationOverride;
 import javax.persistence.AssociationOverrides;
@@ -127,7 +128,7 @@ public class ClinicPatientAssoc extends AbstractAuditingEntity implements Serial
 	}
 	
 	public Boolean getExpired() {
-		return expired;
+		return Objects.nonNull(expired)? expired : false;
 	}
 
 	public void setExpired(Boolean expired) {

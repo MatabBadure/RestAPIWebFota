@@ -1,5 +1,12 @@
 package com.hillrom.vest.service.util;
 
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.VEST_DURATION_LOWER_BOUND;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.VEST_DURATION_UPPER_BOUND;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.VEST_FREQUENCY_LOWER_BOUND;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.VEST_FREQUENCY_UPPER_BOUND;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.VEST_PRESSURE_LOWER_BOUND;
+import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.VEST_PRESSURE_UPPER_BOUND;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -192,6 +199,7 @@ public class PatientVestDeviceTherapyUtil {
 							deviceData.add(j, inCompleteEvent);
 						}
 						TherapySession therapySession = assignTherapyMatrics(groupEntries);
+						validateParameters(therapySession);
 						therapySessions.add(therapySession);
 						i=j; // to skip the events iterated, shouldn't be removed in any case
 						break;
@@ -211,6 +219,20 @@ public class PatientVestDeviceTherapyUtil {
 			deviceData.removeAll(eventsToBeDiscarded);
 		}
 		return therapySessions;
+	}
+
+	/**
+	 * Validate Data Limits : Frequency 5 - 20 , Pressure 1 - 10, duration 0 - 99
+	 * @param therapySession
+	 */
+	public static void validateParameters(TherapySession therapySession) {
+		// Check for Data Limits
+		if(therapySession.getFrequency() < VEST_FREQUENCY_LOWER_BOUND || therapySession.getFrequency() > VEST_FREQUENCY_UPPER_BOUND)
+			throw new IllegalArgumentException("Corrupted Data, Frequency Out Of Bounds : "+therapySession.getFrequency());
+		if(therapySession.getPressure() < VEST_PRESSURE_LOWER_BOUND || therapySession.getPressure() > VEST_PRESSURE_UPPER_BOUND)
+			throw new IllegalArgumentException("Corrupted Data, Pressure Out Of Bounds : "+therapySession.getPressure());
+		if(therapySession.getDurationInMinutes() < VEST_DURATION_LOWER_BOUND || therapySession.getDurationInMinutes() > VEST_DURATION_UPPER_BOUND)
+			throw new IllegalArgumentException("Corrupted Data, Duration Out Of Bounds : "+therapySession.getDurationInMinutes());
 	}
 
 	private static boolean isCompleteOrInCompleteEventForTherapySession(

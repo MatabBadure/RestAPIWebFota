@@ -35,5 +35,17 @@ public class VestDeviceLogEntryOffsetConstants {
 	public static int CHECKSUM_END_OFFSET = 32;//2(16-1)+2
 	public static final String DATA_PACKET_HEADER = "2456";
 
+
+	public static final int VEST_DURATION_LOWER_BOUND = 0;
+
+	public static final int VEST_DURATION_UPPER_BOUND = 99;
+
+	public static final int VEST_PRESSURE_UPPER_BOUND = 10;
+
+	public static final int VEST_PRESSURE_LOWER_BOUND = 1;
+
+	public static final int VEST_FREQUENCY_LOWER_BOUND = 5;
+
+	public static final int VEST_FREQUENCY_UPPER_BOUND = 20;
 }
 

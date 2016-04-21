@@ -47,6 +47,6 @@ spring:
         baseUrl: https://visiview.hill-rom.com
         accountActivationReminderInterval: 12
     survey:
-        surveyreportemailids: 
+        surveyreportemailids: Dana.Elzea@hill-rom.com,julie.ells@hill-rom.com,Megan.Nelson@hill-rom.com
     changePrescription:
-        changePrescriptionEmailids: 
+        changePrescriptionEmailids: mhrcaripatientrecords@hill-rom.com

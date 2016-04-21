@@ -40,7 +40,11 @@ public class AdherenceTrendVO implements Serializable{
 	public void setNotificationPoints(Map<String, Integer> notificationPoints) {
 		this.notificationPoints = notificationPoints;
 	}
-	
+	@Override
+	public String toString() {
+		return "AdherenceTrendVO [updatedScore=" + updatedScore + ", date="
+				+ date + ", notificationPoints=" + notificationPoints+ "]";
+	}	
 	
 	
 }

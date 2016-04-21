@@ -1,5 +1,6 @@
 package com.hillrom.vest.web.rest.dto;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -58,6 +59,8 @@ public class PatientUserVO {
 	private String hcpNamesCSV;
 	private String mrnId;
 	private boolean isExpired;
+	private double hoursOfUsage;
+	private String serialNumber;
 	
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
@@ -127,9 +130,8 @@ public class PatientUserVO {
 			this.gender = patientInfo.getGender();
 			this.city = patientInfo.getCity();
 			this.address = patientInfo.getAddress();
-			this.isExpired=patientInfo.getExpired();
+			this.serialNumber = patientInfo.getSerialNumber();
 		}
-		
 	}
 
 	public Long getId() {
@@ -352,6 +354,20 @@ public class PatientUserVO {
 	}
 	public void setLastLoggedInAt(DateTime lastLoggedInAt) {
 		this.lastLoggedInAt = lastLoggedInAt;
+	}
+	public double getHoursOfUsage() {
+		return new BigDecimal(hoursOfUsage)
+	    .setScale(1, BigDecimal.ROUND_HALF_UP)
+	    .doubleValue();
+	}
+	public void setHoursOfUsage(double hoursOfUsage) {
+		this.hoursOfUsage = hoursOfUsage;
+	}
+	public String getSerialNumber() {
+		return serialNumber;
+	}
+	public void setSerialNumber(String serialNumber) {
+		this.serialNumber = serialNumber;
 	}
 		
 }

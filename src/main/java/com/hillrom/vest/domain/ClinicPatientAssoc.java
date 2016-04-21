@@ -1,16 +1,28 @@
 package com.hillrom.vest.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Objects;
 
 import javax.persistence.AssociationOverride;
 import javax.persistence.AssociationOverrides;
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.SqlResultSetMapping;
+import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
+import org.joda.time.DateTime;
+
+import com.hillrom.vest.web.rest.dto.BenchmarkResultVO;
+import com.hillrom.vest.web.rest.dto.ClinicDiseaseStatisticsResultVO;
 
 /**
  * A Clinic.
@@ -23,6 +35,17 @@ import org.hibernate.envers.Audited;
         joinColumns = @JoinColumn(name = "CLINIC_ID", referencedColumnName="id")),
     @AssociationOverride(name = "clinicPatientAssocPK.patient",
         joinColumns = @JoinColumn(name = "PATIENT_ID", referencedColumnName="id")) })
+@SqlResultSetMappings({
+@SqlResultSetMapping(name = "clinicAndDiseaseStatsByAgeorClinicSize", classes = @ConstructorResult(targetClass = ClinicDiseaseStatisticsResultVO.class, columns = {
+		@ColumnResult(name = "totalPatients", type = BigInteger.class),
+		@ColumnResult(name = "ageRangeLabel",type = String.class),
+		@ColumnResult(name = "clinicSizeRangeLabel",type = String.class),
+		@ColumnResult(name = "state",type = String.class),
+		@ColumnResult(name = "city",type = String.class)})),
+@SqlResultSetMapping(name = "clinicAndDiseaseStatsByState", classes = @ConstructorResult(targetClass = ClinicDiseaseStatisticsResultVO.class, columns = {
+		@ColumnResult(name = "totalPatients", type = BigInteger.class),
+		@ColumnResult(name = "state",type = String.class),
+		@ColumnResult(name = "city",type = String.class)}))})
 public class ClinicPatientAssoc extends AbstractAuditingEntity implements Serializable {
 
 	@EmbeddedId
@@ -36,6 +59,13 @@ public class ClinicPatientAssoc extends AbstractAuditingEntity implements Serial
     
     @Column(name="is_active")
     private Boolean isActive = true;
+    
+    @Column(name = "expired")
+    private Boolean expired = false;
+    
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @Column(name = "expiration_date", nullable = true)
+    private DateTime expirationDate = null;
     
 	public ClinicPatientAssoc() {
 		super();
@@ -95,6 +125,22 @@ public class ClinicPatientAssoc extends AbstractAuditingEntity implements Serial
 
 	public void setActive(Boolean isActive) {
 		this.isActive = isActive;
+	}
+	
+	public Boolean getExpired() {
+		return Objects.nonNull(expired)? expired : false;
+	}
+
+	public void setExpired(Boolean expired) {
+		this.expired = expired;
+	}
+	
+	public DateTime getExpirationDate() {
+		return expirationDate;
+	}
+
+	public void setExpirationDate(DateTime expirationDate) {
+		this.expirationDate = expirationDate;
 	}
 
 	@Override

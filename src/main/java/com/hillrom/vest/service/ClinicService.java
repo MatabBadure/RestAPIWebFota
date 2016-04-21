@@ -343,7 +343,7 @@ public class ClinicService {
 			if (Objects.nonNull(clinicAdminUser)) {
 				entityUserAssoc = new EntityUserAssoc(clinicAdminUser, clinic, AuthoritiesConstants.CLINIC_ADMIN);
 				entityUserRepository.delete(entityUserAssoc);
-				return MessageConstants.HR_256;
+				return MessageConstants.HR_289;
 			} else {
 				throw new HillromException(ExceptionConstants.HR_538);
 			}

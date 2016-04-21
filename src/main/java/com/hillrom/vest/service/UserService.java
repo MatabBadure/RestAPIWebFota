@@ -608,15 +608,17 @@ public class UserService {
     		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(existingUser);
     		if(Objects.nonNull(patientInfo)){
 	    		if(!userExtensionDTO.getClinicMRNId().isEmpty()){
-					List<ClinicPatientAssoc> existingClinics = clinicPatientRepository.findByMRNId(userExtensionDTO.getClinicMRNId().get("mrnId"));
-					if(!existingClinics.isEmpty()){
-						for(ClinicPatientAssoc clinicPatientAssoc : existingClinics) {
-							if(clinicPatientAssoc.getClinic().getId().equals(userExtensionDTO.getClinicMRNId().get("clinicId")) 
-									&& !clinicPatientAssoc.getPatient().getId().equals(patientInfo.getId())){
-								throw new HillromException(ExceptionConstants.HR_599);
+	    			if(StringUtils.isNotEmpty(userExtensionDTO.getClinicMRNId().get("mrnId"))){
+						List<ClinicPatientAssoc> existingClinics = clinicPatientRepository.findByMRNId(userExtensionDTO.getClinicMRNId().get("mrnId"));
+						if(!existingClinics.isEmpty()){
+							for(ClinicPatientAssoc clinicPatientAssoc : existingClinics) {
+								if(clinicPatientAssoc.getClinic().getId().equals(userExtensionDTO.getClinicMRNId().get("clinicId")) 
+										&& !clinicPatientAssoc.getPatient().getId().equals(patientInfo.getId())){
+									throw new HillromException(ExceptionConstants.HR_599);
+								}
 							}
 						}
-					}
+	    			}
 	    		}
     		}
            	UserExtension user = updatePatientUser(existingUser, userExtensionDTO);
@@ -719,14 +721,15 @@ public class UserService {
     	Optional<PatientInfo> patient = patientInfoRepository.findOneByHillromId(userExtensionDTO.getHillromId());
     	if(patient.isPresent()) {
     		DateTime dateTime = DateTime.now();
-    		if(userExtensionDTO.isExpired()){
+    		//No updating global Expire
+    		/*if(userExtensionDTO.isExpired()){
     			patientVestDeviceService.deactivateActiveDeviceForPatient(user.getId(), dateTime);
     			deleteCaregiverOnPatientDeactivation(user);
     			patient.get().setExpired(userExtensionDTO.isExpired());
     			user.setExpirationDate(dateTime);
     			user.setExpired(userExtensionDTO.isExpired());
     			user.setDeleted(true);
-    		}
+    		}*/
 			if(!userExtensionDTO.getClinicMRNId().isEmpty()){
 				Optional<ClinicPatientAssoc> clinicPatientAssoc = clinicPatientRepository.findOneByClinicIdAndPatientId(
 						userExtensionDTO.getClinicMRNId().get("clinicId"), patient.get().getId());
@@ -737,12 +740,16 @@ public class UserService {
 					} else if(Constants.INACTIVE.equalsIgnoreCase(userExtensionDTO.getClinicMRNId().get("status"))){
 						clinicPatientAssoc.get().setActive(false);
 					} else if(Constants.EXPIRED.equalsIgnoreCase(userExtensionDTO.getClinicMRNId().get("status"))){
-						patientVestDeviceService.deactivateActiveDeviceForPatient(user.getId(), dateTime);
+						clinicPatientAssoc.get().setExpired(true);
+						clinicPatientAssoc.get().setActive(false);
+						clinicPatientAssoc.get().setExpirationDate(dateTime);
+						//No updating global Expire
+						/*patientVestDeviceService.deactivateActiveDeviceForPatient(user.getId(), dateTime);
 						deleteCaregiverOnPatientDeactivation(user);
 						patient.get().setExpired(true);
 						user.setExpirationDate(dateTime);
 						user.setExpired(true);
-						user.setDeleted(true);
+						user.setDeleted(true);*/
 					} 
 					clinicPatientRepository.saveAndFlush(clinicPatientAssoc.get());
 				}
@@ -1193,8 +1200,10 @@ public class UserService {
 		if(null == user)
 			return Optional.empty();
 		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
+		PatientCompliance compliance = complianceService.findLatestComplianceByPatientUserId(id);
 		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patientInfo.getId());
 		PatientUserVO patientUserVO =  new PatientUserVO(user,patientInfo);
+		patientUserVO.setHoursOfUsage((compliance.getHmr()/(60*60)));
 		String mrnId;
 		java.util.Iterator<ClinicPatientAssoc> cpaIterator = clinicPatientAssocList.iterator();
 		while(cpaIterator.hasNext()){
@@ -1586,7 +1595,7 @@ public class UserService {
 					Map<String,Object> clinicMRNId = new HashMap<>();
 					clinicMRNId.put("clinic", clinicPatientAssoc.get().getClinic());
 					clinicMRNId.put("mrnId", clinicPatientAssoc.get().getMrnId());
-					if(patientUserVO.isExpired()){
+					if(clinicPatientAssoc.get().getExpired()){
 						clinicMRNId.put("status", Constants.EXPIRED);
 					} else if(clinicPatientAssoc.get().getActive()){
 						clinicMRNId.put("status", Constants.ACTIVE);

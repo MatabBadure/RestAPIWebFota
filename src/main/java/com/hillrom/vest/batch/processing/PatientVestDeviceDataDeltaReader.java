@@ -28,6 +28,8 @@ import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientVestDeviceData;
+import com.hillrom.vest.domain.PatientVestDeviceHistory;
+import com.hillrom.vest.domain.PatientVestDevicePK;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.UserExtension;
@@ -37,6 +39,7 @@ import com.hillrom.vest.repository.AuthorityRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
+import com.hillrom.vest.repository.PatientVestDeviceRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
@@ -80,6 +83,10 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 	
 	@Inject
 	private PatientVestDeviceDataRepository vestDeviceDataRepository;
+
+	@Inject
+    private PatientVestDeviceRepository patientVestDeviceRepository;
+
 
 	private String patientDeviceRawData;
 	
@@ -221,6 +228,11 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 			compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
 			compliance.setLatestTherapyDate(createdOrTransmittedDate);
 			complianceService.createOrUpdate(compliance);
+			
+			// Create Patient Device History
+			PatientVestDeviceHistory deviceHistory = new PatientVestDeviceHistory(new PatientVestDevicePK(patientInfo, patientInfo.getSerialNumber()),
+					patientInfo.getBluetoothId(), patientInfo.getHubId(), true);
+			patientVestDeviceRepository.save(deviceHistory);
 			return userPatientAssoc;
 		}
 	}

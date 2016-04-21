@@ -9,7 +9,7 @@ spring:
         active: prod
     datasource:
         dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
-        url: jdbc:mysql://Indsugrc01vd:3306/hillromvest_prod?zeroDateTimeBehavior=convertToNull
+        url: jdbc:mysql://Indsugrc02v:3306/hillromvest_prod?zeroDateTimeBehavior=convertToNull
         databaseName: 
         serverName: 
         username: root
@@ -47,6 +47,6 @@ spring:
         baseUrl: https://visiview.hill-rom.com
         accountActivationReminderInterval: 12
     survey:
-        surveyreportemailids: rohan.kushwaha@razorfish.com,joelkaka@gmail.com 
+        surveyreportemailids: Dana.Elzea@hill-rom.com,julie.ells@hill-rom.com,Megan.Nelson@hill-rom.com
     changePrescription:
-        changePrescriptionEmailids: joelpreetham.fernandes4@hill-rom.com,joelkaka@gmail.com 
+        changePrescriptionEmailids: mhrcaripatientrecords@hill-rom.com

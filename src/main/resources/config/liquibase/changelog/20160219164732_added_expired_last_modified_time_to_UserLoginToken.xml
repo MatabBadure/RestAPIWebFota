@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<property name="now" value="now()" dbms="mysql,h2" />
+		
+	<!-- Added is_expired,last_modified_time,ip_address to USER_LOGIN_TOKEN -->
+	<changeSet author="jhipster" id="20160219164732">
+		<addColumn tableName="USER_LOGIN_TOKEN">
+			<column name="last_modified_time" type="timestamp" />
+        	<column name="is_expired" type="bit" valueBoolean="false"/>
+        	<column name="ip_address" type="varchar(255)"/>
+        </addColumn>
+        <sql>UPDATE USER_LOGIN_TOKEN SET is_expired = true,last_modified_time = date_add(created_time,INTERVAL 30 MINUTE);</sql>
+	</changeSet>
+</databaseChangeLog>

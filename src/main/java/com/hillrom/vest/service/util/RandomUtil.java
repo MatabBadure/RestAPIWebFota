@@ -17,6 +17,14 @@ import com.hillrom.vest.web.rest.dto.HcpClinicsVO;
  * Utility class for generating random Strings.
  */
 public final class RandomUtil {
+	
+	public static final Long FIVE_DAY_SURVEY_ID = 1L;
+	public static final Long THIRTY_DAY_SURVEY_ID = 2L;
+	public static final Long NIGHTY_DAY_SURVEY_ID = 3L;
+
+	public static final Integer FIVE_DAYS = 5;
+	public static final Integer THIRTY_DAYS = 30;
+	public static final Integer NINTY_DAYS = 90;
 
     private static final int DEF_COUNT = 20;
     

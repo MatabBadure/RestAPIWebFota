@@ -1,0 +1,41 @@
+id,question_text,survey_ans_format_id,mandatory,possible_ans_1,possible_ans_2,possible_ans_3,possible_ans_4,possible_ans_5,possible_ans_6
+1,Patient name,1,1,null,null,null,null,null,null
+2,Patient phone number,7,1,null,null,null,null,null,null
+3,Hours of use (to one decimal point),3,1,null,null,null,null,null,null
+4,Serial number (seven digit number),4,0,null,null,null,null,null,null
+5,Date,2,1,null,null,null,null,null,null
+6,Did the trainer demonstrate and perform a complete therapy session?,11,1,Yes,No,null,null,null,null
+7,Did the trainer make sure your garment fit you properly?,11,1,Yes,No,null,null,null,null
+8,Did the trainer explain the Outcomes Monitoring Program and how to obtain the hour meter reading The Vestﾮ System Device?,11,1,Yes,No,null,null,null,null
+9,Did the trainer review trouble shooting and safety instructions regarding The Vestﾮ System usage?,11,1,Yes,No,null,null,null,null
+10,Did the trainer provide you with our toll free 800 number in case you need to call us?,11,1,Yes,No,null,null,null,null
+11,Would you recommend this trainer to others?,11,1,Yes,No,null,null,null,null
+12,Any other comments,1,0,null,null,null,null,null,null
+13,Please have a clinician contact me within the next 3 business days,6,0,null,null,null,null,null,null
+21,Patient name,1,1,null,null,null,null,null,null
+22,Patient phone number,7,1,null,null,null,null,null,null
+23,Patient date of birth,2,1,null,null,null,null,null,null
+24,Hours of use (to one decimal point),3,1,null,null,null,null,null,null
+25,Serial number (seven digit number),4,0,null,null,null,null,null,null
+26,Date,2,1,null,null,null,null,null,null
+27,The therapy helps me clear secretions from my lungs,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to assess
+28,The therapy helps me manage my respiratory health at home,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to assess
+29,Using this therapy helps me have more energy to do my regular activities of daily living,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to assess
+30,The therapy helps to minimize my shortness of breath,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to assess
+31,Using this therapy helps my quality of sleep,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to assess
+32,The therapy helps me feel better,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to assess
+33,I would like to continue with this therapy,5,1,Strongly disagree,Somewhat disagree,Neutral,Somewhat agree,Strongly agree,Unable to assess
+34,Please have a clinician contact me within the next 3 business days,6,0,null,null,null,null,null,null
+41,Patient name,1,1,null,null,null,null,null,null
+42,Patient date of birth,2,1,null,null,null,null,null,null
+43,Main phone number,7,1,null,null,null,null,null,null
+44,Secondary phone number,7,0,null,null,null,null,null,null
+45,Address,1,0,null,null,null,null,null,null
+46,City,1,0,null,null,null,null,null,null
+47,State,1,0,null,null,null,null,null,null
+48,Zip code,1,0,null,null,null,null,null,null
+49,Email address,1,0,null,null,null,null,null,null
+50,Hours of use (to one decimal point),3,1,null,null,null,null,null,null
+51,Serial number (seven digit number),4,0,null,null,null,null,null,null
+52,Date,2,1,null,null,null,null,null,null
+53,Please have a clinician contact me within the next 3 business days,6,0,null,null,null,null,null,null

@@ -9,7 +9,7 @@ spring:
         active: qa
     datasource:
         dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
-        url: jdbc:mysql://hillromvest.ckyg8erbez54.us-west-2.rds.amazonaws.com:3306/hillromvest_qa
+        url: jdbc:mysql://hillromvest.ckyg8erbez54.us-west-2.rds.amazonaws.com:3306/hillromvest_qa?zeroDateTimeBehavior=convertToNull
         databaseName:
         serverName:
         username: root
@@ -46,3 +46,7 @@ spring:
         careGiverDashboardUrl: http://qaserver.hillromvest.com
         baseUrl: http://qaserver.hillromvest.com
         accountActivationReminderInterval: 12
+    survey:
+        surveyreportemailids: rohan.kushwaha@razorfish.com,rohangtr@gmail.com
+    changePrescription:
+        changePrescriptionEmailids: rohan.kushwaha@razorfish.com,rohangtr@gmail.com

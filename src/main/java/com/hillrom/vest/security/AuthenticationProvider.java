@@ -1,6 +1,7 @@
 package com.hillrom.vest.security;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -49,14 +50,24 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
         User user = getUserByLogin(login);
         
         String password = user.getPassword();
+
+        // handle NULL password for user created from Data Transmission / JDE script
+        if(Objects.isNull(password)){
+        	try{
+        		password = userService.generateDefaultPassword(user);
+        	}catch(Exception e){ // Exception indicates that mandatory fields are not present
+        		throw new UsernameNotFoundException("User " + login + " was not found in the database");
+        	}
+        }
+        
         String tokenPassword = (String) token.getCredentials();
         
         processFirstTimeLogin(user,tokenPassword);
         matchPasswords(password, tokenPassword);
         
-        UserDetails userDetails = buildUserDetails(user);
+        UserDetails userDetails = buildUserDetails(user,password);
         
-        return new UsernamePasswordAuthenticationToken(userDetails, user.getPassword(),
+        return new UsernamePasswordAuthenticationToken(userDetails, password,
         		userDetails.getAuthorities());
     }
 
@@ -132,12 +143,12 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
 	 * @param user
 	 * @return UserDetails
 	 */
-	private UserDetails buildUserDetails(User user){
+	private UserDetails buildUserDetails(User user,String password){
 		List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
                 .map(authority -> new SimpleGrantedAuthority(authority.getName()))
                 .collect(Collectors.toList());
         return  new org.springframework.security.core.userdetails.User(user.getEmail(),
-                user.getPassword(),
+        		password,
                 grantedAuthorities);
 	}
 	

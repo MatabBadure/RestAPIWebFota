@@ -61,7 +61,7 @@ public class ClinicPatientAssoc extends AbstractAuditingEntity implements Serial
     private Boolean isActive = true;
     
     @Column(name = "expired")
-    private Boolean expired = false;
+    private boolean expired = false;
     
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "expiration_date", nullable = true)

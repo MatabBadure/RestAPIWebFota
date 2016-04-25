@@ -376,6 +376,7 @@ public class MailService {
         log.debug("Sending patient protocol data update e-mail to '{}'", patientUser.getEmail());
         Context context = new Context();
         context.setVariable("user", patientUser);
+        context.setVariable("dob", DateUtil.formatDate(patientUser.getDob(), null));
         context.setVariable("currentUser", currentUser);
         context.setVariable("patientProtocolDataList", patientProtocolDataList);
         context.setVariable("baseUrl", baseUrl);

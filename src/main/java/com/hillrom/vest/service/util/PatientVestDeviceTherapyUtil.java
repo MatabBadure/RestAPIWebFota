@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
@@ -227,11 +228,14 @@ public class PatientVestDeviceTherapyUtil {
 	 */
 	public static void validateParameters(TherapySession therapySession) {
 		// Check for Data Limits
-		if(therapySession.getFrequency() < VEST_FREQUENCY_LOWER_BOUND || therapySession.getFrequency() > VEST_FREQUENCY_UPPER_BOUND)
+		if( Objects.isNull(therapySession.getFrequency()) || 
+				(therapySession.getFrequency() < VEST_FREQUENCY_LOWER_BOUND || therapySession.getFrequency() > VEST_FREQUENCY_UPPER_BOUND))
 			throw new IllegalArgumentException("Corrupted Data, Frequency Out Of Bounds : "+therapySession.getFrequency());
-		if(therapySession.getPressure() < VEST_PRESSURE_LOWER_BOUND || therapySession.getPressure() > VEST_PRESSURE_UPPER_BOUND)
+		if(Objects.isNull(therapySession.getPressure()) ||
+				(therapySession.getPressure() < VEST_PRESSURE_LOWER_BOUND || therapySession.getPressure() > VEST_PRESSURE_UPPER_BOUND))
 			throw new IllegalArgumentException("Corrupted Data, Pressure Out Of Bounds : "+therapySession.getPressure());
-		if(therapySession.getDurationInMinutes() < VEST_DURATION_LOWER_BOUND || therapySession.getDurationInMinutes() > VEST_DURATION_UPPER_BOUND)
+		if(Objects.isNull(therapySession.getDurationInMinutes()) || 
+				(therapySession.getDurationInMinutes() < VEST_DURATION_LOWER_BOUND || therapySession.getDurationInMinutes() > VEST_DURATION_UPPER_BOUND))
 			throw new IllegalArgumentException("Corrupted Data, Duration Out Of Bounds : "+therapySession.getDurationInMinutes());
 	}
 

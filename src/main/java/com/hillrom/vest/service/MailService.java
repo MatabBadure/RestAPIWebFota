@@ -134,7 +134,7 @@ public class MailService {
             message.setFrom(from);
             message.setSubject(subject);
             message.setText(content, isHtml);
-            message.addAttachment("file", hillromPDFDocument.createPDFDoc(attachmentFile));
+            message.addAttachment("file", attachmentFile);
             javaMailSender.send(mimeMessage);
             log.debug("Sent e-mail to User '{}'", to);
         } catch (Exception e) {
@@ -398,7 +398,7 @@ public class MailService {
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
      }
     
-    public void sendUpdateProtocolMailToMailingList(User currentUser, User patientUser,List<PatientProtocolData> patientProtocolDataList) throws IOException{
+    public void sendUpdateProtocolMailToMailingList(User currentUser, User patientUser,List<PatientProtocolData> patientProtocolDataList, File file) throws IOException{
         log.debug("Sending patient protocol data update e-mail to '{}'", patientUser.getEmail());
         Context context = new Context();
         context.setVariable("user", patientUser);
@@ -417,6 +417,6 @@ public class MailService {
         subject = messageSource.getMessage("email.changePrescription.title", null, null) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);
         String recipients = env.getProperty("spring.changePrescription.changePrescriptionEmailids");
 		log.debug("Sending change prescription email report '{}'", recipients);
-        sendEmail(recipients.split(","), subject, content, true, true, attachedFile);
+        sendEmail(recipients.split(","), subject, content, true, true, file);
      }
 }

@@ -16,6 +16,11 @@
 	</changeSet>
 	
 	<changeSet id="20160422134100" author="Hillrom Devs">
+		<addColumn tableName="CLINIC_PATIENT_ASSOC">
+			<column name="expired"
+				type="boolean" defaultValueBoolean="false" />
+			<column name="expired_date" type="timestamp"/>
+		</addColumn>
 		<sql>UPDATE CLINIC_PATIENT_ASSOC SET expired = 0 WHERE expired is NULL;</sql>
 	</changeSet>
 </databaseChangeLog>

@@ -49,5 +49,5 @@ spring:
     survey:
         surveyreportemailids: rohan.kushwaha@razorfish.com,rohangtr@gmail.com
     changePrescription:
-        changePrescriptionEmailids: rohan.kushwaha@razorfish.com,rohangtr@gmail.com
+        changePrescriptionEmailids: nagendra.shetty@razorfish.com,amit.saurabh@razorfish.com,anubhav.sinha@razorfish.com,nagendra@neevtech.com,amit.saurabh@neevtech.com
         

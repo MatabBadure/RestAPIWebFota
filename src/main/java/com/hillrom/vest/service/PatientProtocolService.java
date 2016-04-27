@@ -100,7 +100,7 @@ public class PatientProtocolService {
 		}
     }
     
-    public List<PatientProtocolData> updateProtocolToPatient(Long patientUserId, List<PatientProtocolData> ppdList, MultipartFile multipartFile) throws HillromException {
+    public List<PatientProtocolData> updateProtocolToPatient(Long patientUserId, List<PatientProtocolData> ppdList) throws HillromException {
     	User patientUser = userRepository.findOne(patientUserId);
 		if(patientUser != null) {
 			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
@@ -133,7 +133,7 @@ public class PatientProtocolService {
 		 		try{
 			 		mailService.sendUpdateProtocolMailToPatient(patientUser, protocolList);
 			 		Optional<User> currentUser = userRepository.findOneByEmailOrHillromId(SecurityUtils.getCurrentLogin());
-			 		mailService.sendUpdateProtocolMailToMailingList(currentUser.get(), patientUser, protocolList, convertMultipartFileToFile(multipartFile));
+			 		mailService.sendUpdateProtocolMailToMailingList(currentUser.get(), patientUser, protocolList);
 		 		}catch(Exception ex){
 					StringWriter writer = new StringWriter();
 					PrintWriter printWriter = new PrintWriter( writer );

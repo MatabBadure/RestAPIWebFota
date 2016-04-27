@@ -465,13 +465,12 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
-    public ResponseEntity<JSONObject> updateProtocolToPatient(@PathVariable Long id, @RequestBody List<PatientProtocolData> ppdList,
-    		@RequestParam(value="file",required = false) MultipartFile multipartFile) {
+    public ResponseEntity<JSONObject> updateProtocolToPatient(@PathVariable Long id, @RequestBody List<PatientProtocolData> ppdList) {
     	log.debug("REST request to update protocol with patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
     	try{
               
-    		List<PatientProtocolData> protocolList = patientProtocolService.updateProtocolToPatient(id, ppdList,multipartFile);
+    		List<PatientProtocolData> protocolList = patientProtocolService.updateProtocolToPatient(id, ppdList);
 	    	if (protocolList.isEmpty()) {
 	        	jsonObject.put("ERROR", ExceptionConstants.HR_560);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);

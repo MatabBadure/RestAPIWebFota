@@ -29,9 +29,9 @@ public interface UserPatientRepository extends
 	List<UserPatientAssoc> findByPatientIdAndUserRole(String patientId, String userRole);
 	
 	@Query(nativeQuery=true,value="SELECT id from USER u "
-			+ "join USER_PATIENT_ASSOC upa on u.id = upa.user_id and u.id = :userId "
-			+ "and upa.relation_label = :relationLabel and upa.patient_id = :patientId "
-			+ "left join CLINIC_USER_ASSOC cua on u.id =  cua.users_id and u.id = :userId "
-			+ "join CLINIC_PATIENT_ASSOC cpa on cua.clinics_id = cpa.clinic_id and cpa.patient_id = :patientId and cpa.is_active = :isActive")
+			+ "join CLINIC_USER_ASSOC cua on u.id =  cua.users_id and cua.users_id = :userId "
+			+ "join CLINIC_PATIENT_ASSOC cpa on cua.clinics_id = cpa.clinic_id and cpa.patient_id = :patientId and cpa.is_active = :isActive "
+			+ "left join USER_PATIENT_ASSOC upa on u.id = upa.user_id and u.id = :userId "
+			+ "and upa.relation_label = :relationLabel and upa.patient_id = :patientId ")
 	Long returnUserIdIfAssociationExists(@Param("userId")Long userId,@Param("relationLabel")String relationLabel,@Param("patientId")String patientId,@Param("isActive")boolean isActive);
 }

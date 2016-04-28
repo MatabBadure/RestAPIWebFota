@@ -122,4 +122,19 @@ public class PatientTestResultResource {
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@RequestMapping(value = "/testresult/patient/{id}/user/{userId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+
+	@RolesAllowed({ AuthoritiesConstants.HCP,AuthoritiesConstants.CLINIC_ADMIN})
+	public ResponseEntity<?> addPatientTestResultByHCPOrClinicAdmin(@RequestBody PatientTestResult patientTestResult,@PathVariable Long id,@PathVariable Long userId, HttpServletRequest request) {
+		JSONObject jsonObject = new JSONObject();
+		try {
+			pateintTestResultService.createPatientTestResultByHCPOrClinicAdmin(patientTestResult, id, userId);
+			jsonObject.put("message", MessageConstants.HR_308);
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
+	}
 }

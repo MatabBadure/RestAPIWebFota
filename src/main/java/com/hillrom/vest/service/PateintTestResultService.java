@@ -14,6 +14,7 @@ import com.hillrom.vest.domain.PatientTestResult;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.EntityUserRepository;
 import com.hillrom.vest.repository.PatientTestResultRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
@@ -34,6 +35,9 @@ public class PateintTestResultService {
 	
 	@Inject
 	private UserPatientRepository userPatientRepository;
+	
+	@Inject
+	private EntityUserRepository entityUserRepository;
 
 	public List<PatientTestResult> getPatientTestResult(LocalDate from, LocalDate to) {
 
@@ -108,5 +112,40 @@ public class PateintTestResultService {
 		}else{
 			throw new HillromException(ExceptionConstants.HR_512);
 		}
+	}
+	
+	public PatientTestResult createPatientTestResultByHCPOrClinicAdmin(PatientTestResult patientTestResult, Long patientUserId, Long userId)
+			throws HillromException {
+		
+		User user = userRepository.getOne(patientUserId);
+
+		if (Objects.isNull(user))
+			throw new HillromException(ExceptionConstants.HR_512);
+		
+		patientTestResult.setUser(user);
+		List<UserPatientAssoc> userPatientAssocs = null;
+		if (Objects.isNull(patientTestResult.getPatientInfo())) {
+			userPatientAssocs = userPatientRepository.findByUserIdAndUserRole(patientUserId, AuthoritiesConstants.PATIENT);
+			for (UserPatientAssoc userPatientAssoc : userPatientAssocs)
+				if (RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())) {
+					patientTestResult.setPatientInfo(userPatientAssoc.getPatient());
+					break;
+				}
+		}
+		if(validateAssociation(patientTestResult.getPatientInfo().getId(), userId)){
+			String updatedBy = getUpdatedUserName();
+			patientTestResult.setLastUpdatedBy(updatedBy);
+			return patientTestResultRepository.saveAndFlush(patientTestResult);
+		}else{
+			throw new HillromException(ExceptionConstants.HR_403);
+		}
+	}
+	
+	private boolean validateAssociation(String patientUserId, Long userId){
+		if(SecurityUtils.isUserInRole(AuthoritiesConstants.HCP))
+			return Objects.nonNull(userPatientRepository.returnUserIdIfAssociationExists(userId, AuthoritiesConstants.HCP, patientUserId, true));
+		if(SecurityUtils.isUserInRole(AuthoritiesConstants.CLINIC_ADMIN))
+			return Objects.nonNull(entityUserRepository.returnUserIdIfAssociationExists(userId, patientUserId, true));
+		return false;
 	}
 }

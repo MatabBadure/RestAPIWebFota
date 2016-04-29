@@ -7,8 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -22,11 +20,12 @@ import com.hillrom.vest.service.util.DateUtil;
 @Service
 public class HillromPdfFactory{
 	
-	@Inject
+	
 	HillromPDFDocument document;
 		
 	public File createPDFDoc(File file, User currentUser, User patientUser,
 			List<PatientProtocolData> patientProtocolDataList) throws IOException {
+		document = new HillromPDFDocument();
 
 		PDPageContentStream pdPageContentStream;
 		PDPage pdPage = new PDPage(PDRectangle.A4);
@@ -38,7 +37,7 @@ public class HillromPdfFactory{
 		int line = 50;
 		pdPageContentStream.beginText();
 		pdPageContentStream.setFont(document.fontBold, 8);
-		pdPageContentStream.newLineAtOffset((pdRectangle.getWidth()/2 - document.pdfHeaderText.length()) - 60,
+		pdPageContentStream.newLineAtOffset((pdRectangle.getWidth()/2 - document.pdfHeaderText.length()) - 40,
 		pdRectangle.getHeight() - line);
 		pdPageContentStream.showText(document.pdfHeaderText);
 		pdPageContentStream.endText();
@@ -200,6 +199,9 @@ public class HillromPdfFactory{
 		pdPageContentStream.moveTo(document.leftOffSet, line);
 		pdPageContentStream.lineTo(pdRectangle.getWidth() - document.rightOffset,line);
 		pdPageContentStream.stroke();
+		
+		
+		
 		pdPageContentStream.close();
 		document.save(file);
 		document.close();

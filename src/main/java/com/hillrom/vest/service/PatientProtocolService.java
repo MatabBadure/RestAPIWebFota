@@ -3,6 +3,9 @@ package com.hillrom.vest.service;
 import static com.hillrom.vest.config.AdherenceScoreConstants.UPPER_BOUND_VALUE;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -20,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.PatientInfo;
@@ -326,5 +330,20 @@ public class PatientProtocolService {
 			throw new HillromException(ExceptionConstants.HR_512);
      	}
     }
+	
+	public File convertMultipartFileToFile(MultipartFile file)
+	{    
+	    File convFile = new File(file.getOriginalFilename());
+	    try {
+			convFile.createNewFile();
+			FileOutputStream fos = new FileOutputStream(convFile); 
+		    fos.write(file.getBytes());
+		    fos.close(); 
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+	    return convFile;
+	}
 }
 

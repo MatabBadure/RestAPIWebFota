@@ -4,9 +4,11 @@ import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIAN
 import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -32,9 +34,9 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
 import com.hillrom.vest.config.Constants;
+import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserSurveyAnswer;
-import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.RandomUtil;
@@ -69,6 +71,9 @@ public class MailService {
 
     @Inject
     private SpringTemplateEngine templateEngine;
+    
+    @Inject
+    private HillromPDFHandler hillromPDFHandler;
 
     /**
      * System default email address that sends the e-mails.
@@ -113,6 +118,30 @@ public class MailService {
             log.debug("Sent e-mail to User '{}'", to);
         } catch (Exception e) {
             log.warn("E-mail could not be sent to user '{}', exception is: {}", to, e.getMessage());
+        }
+    }
+    
+    @Async
+    public void sendEmail(String[] to, String subject, String content, boolean isMultipart, boolean isHtml, File attachmentFile) {
+        log.debug("Send e-mail[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
+                isMultipart, isHtml, to, subject, content);
+
+        // Prepare message using a Spring helper
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, CharEncoding.UTF_8);
+            message.setTo(to);
+            message.setFrom(from);
+            message.setSubject(subject);
+            message.setText(content, isHtml);
+            message.addAttachment(attachmentFile.getName(), attachmentFile);
+            javaMailSender.send(mimeMessage);
+            log.debug("Sent e-mail to User '{}'", to);
+        } catch (Exception e) {
+            log.warn("E-mail could not be sent to user '{}', exception is: {}", to, e.getMessage());
+        }
+        finally{
+        	hillromPDFHandler.deletePdf(attachmentFile);
         }
     }
 
@@ -372,7 +401,7 @@ public class MailService {
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
      }
     
-    public void sendUpdateProtocolMailToMailingList(User currentUser, User patientUser,List<PatientProtocolData> patientProtocolDataList){
+    public void sendUpdateProtocolMailToMailingList(User currentUser, User patientUser,List<PatientProtocolData> patientProtocolDataList) throws IOException{
         log.debug("Sending patient protocol data update e-mail to '{}'", patientUser.getEmail());
         Context context = new Context();
         context.setVariable("user", patientUser);
@@ -383,10 +412,14 @@ public class MailService {
         context.setVariable("date", DateUtil.formatDate(new LocalDate(), null));
         String content = "";
         String subject = "";
+        File attachedFile = new File("pdf"+File.pathSeparator+"GeneratedPDF-"+LocalTime.now()+".pdf");
+        
+        File file = hillromPDFHandler.createPDFDoc(attachedFile, currentUser, patientUser, patientProtocolDataList);
+                
  	    content = templateEngine.process("changePrescription", context);
         subject = messageSource.getMessage("email.changePrescription.title", null, null) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);
         String recipients = env.getProperty("spring.changePrescription.changePrescriptionEmailids");
 		log.debug("Sending change prescription email report '{}'", recipients);
-        sendEmail(recipients.split(","), subject, content, false, true);
+        sendEmail(recipients.split(","), subject, content, true, true, file);
      }
 }

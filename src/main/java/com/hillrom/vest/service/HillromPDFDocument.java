@@ -5,7 +5,6 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.springframework.stereotype.Service;
 
-@Service
 public class HillromPDFDocument extends PDDocument{
 	
 	public PDFont fontPlain = PDType1Font.HELVETICA;

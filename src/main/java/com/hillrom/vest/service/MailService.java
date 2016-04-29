@@ -73,7 +73,7 @@ public class MailService {
     private SpringTemplateEngine templateEngine;
     
     @Inject
-    private HillromPDFDocument hillromPDFDocument;
+    private HillromPDFHandler hillromPDFHandler;
 
     /**
      * System default email address that sends the e-mails.
@@ -139,6 +139,9 @@ public class MailService {
             log.debug("Sent e-mail to User '{}'", to);
         } catch (Exception e) {
             log.warn("E-mail could not be sent to user '{}', exception is: {}", to, e.getMessage());
+        }
+        finally{
+        	hillromPDFHandler.deletePdf(attachmentFile);
         }
     }
 
@@ -411,10 +414,8 @@ public class MailService {
         String subject = "";
         File attachedFile = new File("pdf"+File.pathSeparator+"GeneratedPDF-"+LocalTime.now()+".pdf");
         
-        File file = hillromPDFDocument.createPDFDoc(attachedFile, currentUser, patientUser, patientProtocolDataList);
-        
-        System.out.println("File :: "+attachedFile);
-        
+        File file = hillromPDFHandler.createPDFDoc(attachedFile, currentUser, patientUser, patientProtocolDataList);
+                
  	    content = templateEngine.process("changePrescription", context);
         subject = messageSource.getMessage("email.changePrescription.title", null, null) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);
         String recipients = env.getProperty("spring.changePrescription.changePrescriptionEmailids");

@@ -13,5 +13,5 @@ public interface PatientTestResultRepository extends JpaRepository<PatientTestRe
 	@Query("from PatientTestResult patientTestResult where patientTestResult.user.id = ?1 and patientTestResult.testResultDate between ?2 and ?3 order by patientTestResult.testResultDate desc")
     List<PatientTestResult> findByUserIdAndBetweenTestResultDate(Long userId, LocalDate from, LocalDate to);
 	
-	List<PatientTestResult> findByTestResultDateBetween(LocalDate from, LocalDate to);
+	List<PatientTestResult> findByTestResultDateBetweenOrderByTestResultDateDesc(LocalDate from, LocalDate to);
 }

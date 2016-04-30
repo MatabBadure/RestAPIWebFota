@@ -3,6 +3,10 @@ package com.hillrom.vest.web.rest;
 import static com.hillrom.vest.security.AuthoritiesConstants.CLINIC_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -17,8 +21,6 @@ import java.util.Optional;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
-
-import net.minidev.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.LocalDate;
@@ -37,7 +39,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.io.ICsvBeanWriter;
@@ -82,6 +86,8 @@ import com.hillrom.vest.web.rest.dto.StatisticsVO;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
+
+import net.minidev.json.JSONObject;
 /**
  * REST controller for managing users.
  */
@@ -462,7 +468,8 @@ public class UserResource {
     public ResponseEntity<JSONObject> updateProtocolToPatient(@PathVariable Long id, @RequestBody List<PatientProtocolData> ppdList) {
     	log.debug("REST request to update protocol with patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
-    	try {
+    	try{
+              
     		List<PatientProtocolData> protocolList = patientProtocolService.updateProtocolToPatient(id, ppdList);
 	    	if (protocolList.isEmpty()) {
 	        	jsonObject.put("ERROR", ExceptionConstants.HR_560);

@@ -396,7 +396,7 @@ public class MailService {
         context.setVariable("notificationUrl", patientDashboardUrl);
         String content = "";
         String subject = "";
- 	    content = templateEngine.process("therapyNotification", context);
+ 	    content = templateEngine.process("changeProtocolNotification", context);
         subject = messageSource.getMessage("email.patientprotocoldata.title", null, null);
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
      }

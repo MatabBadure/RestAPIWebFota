@@ -188,7 +188,7 @@ public class SurveyService {
 		*/
 
 		
-		PatientInfo patientInfo = PatientInfoService.findOneByHillromId(user.getHillromId())
+		PatientInfo patientInfo = PatientInfoService.findOneByHillromId(user.getHillromId());
 		if (Objects.isNull(patientInfo) || Objects.isNull(patientInfo.getTrainingDate()))
 					throw new HillromException(ExceptionConstants.HR_804);
 		LocalDate trainingDate = patientInfo.getTrainingDate();

@@ -125,7 +125,7 @@ BEGIN
 			`lang_key` = pat_lang_key,
 			`address` = pat_address,
 			`city` = pat_city,
-			`state` = pat_state
+			`state` = pat_state,
 			`training_date` = pat_training_date
 		WHERE `serial_number`= pat_device_serial_number;
 		

@@ -20,6 +20,9 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Entity
 @Table(name = "PATIENT_VEST_DEVICE_HISTORY")
 @EntityListeners(AuditingEntityListener.class)
@@ -61,6 +64,9 @@ public class PatientVestDeviceHistory implements Serializable {
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "last_modified_date")
     private DateTime lastModifiedDate = DateTime.now();
+    
+    @Column(name="hmr")
+	private Double hmr = 0d; // default value for HMR
 
 	public PatientVestDeviceHistory() {
 		super();
@@ -154,7 +160,22 @@ public class PatientVestDeviceHistory implements Serializable {
 	public void setLastModifiedDate(DateTime lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
 	}
+	
+	@JsonIgnore
+	public Double getHmr() {
+		return hmr;
+	}
 
+	public void setHmr(Double hmr) {
+		this.hmr = hmr;
+	}
+
+	// This is used for sending hmr in hours
+	@JsonProperty(value="hmr")
+	public Double getHmrInHours(){
+		return (double) Math.round(hmr/(60*60));
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

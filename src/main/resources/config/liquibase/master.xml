@@ -84,6 +84,7 @@
     <include file="classpath:/config/liquibase/changelog/20160404124100_Clinic_wise_expired_db_changes.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20160422124100_complience_and_clinicWise_expired_db_changes.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20160502101440_add_training_date_patientinfo.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20160502213900_add_hmr_to_device_history_table.xml" relativeToChangelogFile="false"/>
  </databaseChangeLog>
  
  

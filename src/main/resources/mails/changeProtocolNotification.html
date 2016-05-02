@@ -21,26 +21,14 @@
 			<h4 style="font-size: 14px;" th:text="#{email.reset.greeting(${user.firstName})}">Dear&nbsp;<span>Jose</span></h4>
 		</div>
 		<div>
-			<p style="font-size: 14px; ">You are being notified that your protocol has changed</p>
-			<br/>      
-			    <p th:if="${isMissedTherapyNotification}" th:text="#{email.therapynotification.message(${missedTherapyCount})}"></p>
-				<p th:if="${isHmrNonComplianceNotification}" th:text="#{email.hmrnotification.message}"></p>
-				<p th:if="${isSettingsDeviatedNotification}" th:text="#{email.settingsnotification.message}"></p>
-		        <p th:if="${isHMRNonComplianceAndSettingsNotification}" th:text="#{email.hmrandsettingsnotification.message}"></p>
-		    <br/>
-			<p style="font-size: 14px;">Click the link below to see the details about this notification</p>
+			<p style="font-size: 14px; ">You are being notified that your protocol has been updated.</p>
+			<br/>
+			<p style="font-size: 14px;">Please check your Care Plan and Device section in the application for more information.</p>
 		</div>
-		<div style="margin: 40px 0px;">
-			<a style="font-size: 14px;" th:href="@{|${notificationUrl}/#/login|}">Click here to view details </a>
-		</div>
-		<div style="">
-			<p style="font-size: 14px;">If you have any problems or have questions, please contact <br />
-			Hill-Rom Respiratory Customer Support at 800-426-4224.
-			</p>
-		</div>
+		<br/>
 		<div style="margin: 40px 0px;">
 			<h4 style="font-size: 14px; margin-bottom: 0px;">Regards,</h4>
-			<p style="margin-top: 5px; font-size: 14px;">Your HILL-Rom Respiratory Care Team</p>
+			<p style="margin-top: 5px; font-size: 14px;">VisiView™ Health Portal</p>
 		</div>
 		<div style="margin: 50px 0px;">
 			<p style="font-size: 12px;">*** PLEASE DO NOT REPLY TO THIS EMAIL, IF YOU NEED TO CONTACT HILL-ROM RESPIRATORY CARE, PLEASE CALL 800-426-4224

@@ -26,6 +26,7 @@ import com.hillrom.vest.domain.SurveyQuestion;
 import com.hillrom.vest.domain.SurveyQuestionAssoc;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserSurveyAnswer;
+import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.SurveyQuestionAssocRepository;
 import com.hillrom.vest.repository.SurveyQuestionRepository;
@@ -70,6 +71,9 @@ public class SurveyService {
 
 	@Inject
 	private PatientNoEventService noEventService;
+	
+	@Inject
+	private PatientInfoService patientInfoService;
 	
 	@Inject
 	private SurveyQuestionRepository surveyQuestionRepository;
@@ -188,7 +192,7 @@ public class SurveyService {
 		*/
 
 		
-		PatientInfo patientInfo = PatientInfoService.findOneByHillromId(user.getHillromId());
+		PatientInfo patientInfo = patientInfoService.findOneByHillromId(user.getHillromId());
 		if (Objects.isNull(patientInfo) || Objects.isNull(patientInfo.getTrainingDate()))
 					throw new HillromException(ExceptionConstants.HR_804);
 		LocalDate trainingDate = patientInfo.getTrainingDate();

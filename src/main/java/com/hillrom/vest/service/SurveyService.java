@@ -74,6 +74,7 @@ public class SurveyService {
 	@Inject
 	private SurveyQuestionRepository surveyQuestionRepository;
 	
+	
 	@Qualifier("surveyGraphService")
 	@Inject
 	private GraphService graphService;
@@ -177,14 +178,22 @@ public class SurveyService {
 		if (Objects.isNull(userService.getPatientInfoObjFromPatientUser(user)))
 			throw new HillromException(ExceptionConstants.HR_523);
 
+		/**
 		// Checking whether first transmission was done
 		PatientNoEvent noEvent = noEventService.findByPatientUserId(userId);
 		if (Objects.isNull(noEvent) || Objects.isNull(noEvent.getFirstTransmissionDate()))
-			throw new HillromException(ExceptionConstants.HR_804);
+			throw new HillromException(ExceptionConstants.HR_804);		
 
 		LocalDate firstTransmissionDate = noEvent.getFirstTransmissionDate();
+		*/
 
-		int daysDifference = DateUtil.getDaysCountBetweenLocalDates(firstTransmissionDate, LocalDate.now())+1; // days are inclusive for surveys;
+		
+		PatientInfo patientInfo = PatientInfoService.findOneByHillromId(user.getHillromId())
+		if (Objects.isNull(patientInfo) || Objects.isNull(patientInfo.getTrainingDate()))
+					throw new HillromException(ExceptionConstants.HR_804);
+		LocalDate trainingDate = patientInfo.getTrainingDate();
+		
+		int daysDifference = DateUtil.getDaysCountBetweenLocalDates(trainingDate, LocalDate.now())+1; // days are inclusive for surveys;
 		if ((daysDifference >= RandomUtil.FIVE_DAYS && daysDifference < RandomUtil.THIRTY_DAYS)
 				&& userSurveyAnswerRepository.findCountByUserIdAndSurveyId(userId, RandomUtil.FIVE_DAY_SURVEY_ID) < 1) {
 			return surveyRepository.findOne(RandomUtil.FIVE_DAY_SURVEY_ID);

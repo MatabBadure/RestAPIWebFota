@@ -197,9 +197,17 @@ public class SurveyService {
 
 		
 		java.util.Optional<PatientInfo> patientInfo = patientInfoService.findOneByHillromId(user.getHillromId());
-		if (Objects.isNull(patientInfo) || Objects.isNull(patientInfo.getTrainingDate()))
-					throw new HillromException(ExceptionConstants.HR_804);
-		LocalDate trainingDate = patientInfo.getTrainingDate();
+		PatientInfo actualPatientInfo = null;
+		if(patientInfo.isPresent()){
+			actualPatientInfo =  patientInfo.get();
+			if (Objects.isNull(actualPatientInfo.getTrainingDate())){
+				throw new HillromException(ExceptionConstants.HR_804);
+			}
+		}else{
+			throw new HillromException(ExceptionConstants.HR_804);
+		}
+		
+		LocalDate trainingDate = actualPatientInfo.getTrainingDate();
 		
 		int daysDifference = DateUtil.getDaysCountBetweenLocalDates(trainingDate, LocalDate.now())+1; // days are inclusive for surveys;
 		if ((daysDifference >= RandomUtil.FIVE_DAYS && daysDifference < RandomUtil.THIRTY_DAYS)

@@ -33,7 +33,7 @@ import com.hillrom.vest.repository.SurveyQuestionRepository;
 import com.hillrom.vest.repository.SurveyRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSurveyAnswerRepository;
-import com.hillrom.vest.repository.patientInfoRepository;
+import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;

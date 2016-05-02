@@ -75,6 +75,9 @@ public class SurveyService {
 	@Inject
 	private PatientInfoService patientInfoService;
 	
+    @Inject
+    private PatientInfoRepository patientInfoRepository;
+	
 	@Inject
 	private SurveyQuestionRepository surveyQuestionRepository;
 	

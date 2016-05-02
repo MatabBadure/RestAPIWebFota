@@ -9,7 +9,7 @@
 
 	<property name="autoIncrement" value="true" dbms="mysql,h2,postgresql" />
 	<property name="autoIncrement" value="false" dbms="oracle" />
-	<!-- Added hmr notification to User table. -->
+	<!-- Added training date to patient_info table. -->
 	<changeSet author="jhipster" id="20160502101440">
 		<addColumn tableName="PATIENT_INFO">
         	<column name="training_date" type="timestamp"/>

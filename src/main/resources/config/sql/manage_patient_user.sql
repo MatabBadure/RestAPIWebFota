@@ -18,6 +18,7 @@ CREATE PROCEDURE `manage_patient_user`(
 	IN pat_address varchar(255),
     IN pat_city varchar(255),
     IN pat_state varchar(255),
+    IN pat_training_date datetime,
     OUT return_patient_id varchar(255),
     OUT return_user_id varchar(255)
 )
@@ -55,11 +56,11 @@ BEGIN
         
 		INSERT INTO `PATIENT_INFO` (`id`, `hillrom_id`, `hub_id`, `serial_number`, `bluetooth_id`, `title`, `first_name`, `middle_name`,
 		`last_name`, `dob`, `email`, `zipcode`, `web_login_created`, `primary_phone`, `mobile_phone`, `gender`, `lang_key`, `expired`, 
-        `expired_date`, `address`, `city`, `state`, `device_assoc_date`)
+        `expired_date`, `address`, `city`, `state`, `device_assoc_date`,`training_date`)
 		VALUES
 		(@gen_patient_id, hr_id, pat_hub_id, pat_device_serial_number, pat_bluetooth_id, pat_title, pat_first_name, pat_middle_name,
 			pat_last_name, pat_dob, pat_email, pat_zipcode,0, pat_primary_phone, pat_mobile_phone, pat_gender, pat_lang_key, 0, NULL,
-			pat_address, pat_city, pat_state, created_date);
+			pat_address, pat_city, pat_state, created_date,pat_training_date);
 		
 		INSERT INTO `USER`(
 		`email`, `PASSWORD`, `title`, `first_name`, `middle_name`, `last_name`, `activated`, `lang_key`, `activation_key`, `reset_key`, 
@@ -124,7 +125,8 @@ BEGIN
 			`lang_key` = pat_lang_key,
 			`address` = pat_address,
 			`city` = pat_city,
-			`state` = pat_state
+			`state` = pat_state,
+			`training_date` = pat_training_date
 		WHERE `serial_number`= pat_device_serial_number;
 		
 		UPDATE `USER` SET

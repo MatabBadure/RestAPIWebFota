@@ -16,6 +16,7 @@ import net.minidev.json.JSONObject;
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+import org.joda.time.DateTime; 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -207,9 +208,9 @@ public class SurveyService {
 			throw new HillromException(ExceptionConstants.HR_804);
 		}
 		
-		LocalDate trainingDate = actualPatientInfo.getTrainingDate();
+		DateTime  trainingDate = actualPatientInfo.getTrainingDate();
 		
-		int daysDifference = DateUtil.getDaysCountBetweenLocalDates(trainingDate, LocalDate.now())+1; // days are inclusive for surveys;
+		int daysDifference = DateUtil.getDaysCountBetweenLocalDates(trainingDate.toLocalDate(), LocalDate.now())+1; // days are inclusive for surveys;
 		if ((daysDifference >= RandomUtil.FIVE_DAYS && daysDifference < RandomUtil.THIRTY_DAYS)
 				&& userSurveyAnswerRepository.findCountByUserIdAndSurveyId(userId, RandomUtil.FIVE_DAY_SURVEY_ID) < 1) {
 			return surveyRepository.findOne(RandomUtil.FIVE_DAY_SURVEY_ID);

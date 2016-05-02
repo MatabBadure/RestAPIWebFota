@@ -287,6 +287,7 @@ public class PatientInfo implements Serializable {
 
 	public void setTrainingDate(DateTime trainingDate) {
 		this.trainingDate = trainingDate;
+	}
 
 	public Set<ClinicPatientAssoc> getClinicPatientAssoc() {
 		return clinicPatientAssoc;

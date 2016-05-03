@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.domain.UserPatientAssocPK;
@@ -26,4 +27,11 @@ public interface UserPatientRepository extends
 	
 	@Query("from UserPatientAssoc upa where upa.userPatientAssocPK.patient.id = ?1 and upa.userRole = ?2")
 	List<UserPatientAssoc> findByPatientIdAndUserRole(String patientId, String userRole);
+	
+	@Query(nativeQuery=true,value="SELECT id from USER u "
+			+ "join CLINIC_USER_ASSOC cua on u.id =  cua.users_id and cua.users_id = :userId "
+			+ "join CLINIC_PATIENT_ASSOC cpa on cua.clinics_id = cpa.clinic_id and cpa.patient_id = :patientId and cpa.is_active = :isActive "
+			+ "left join USER_PATIENT_ASSOC upa on u.id = upa.user_id and u.id = :userId "
+			+ "and upa.relation_label = :relationLabel and upa.patient_id = :patientId ")
+	Long returnUserIdIfAssociationExists(@Param("userId")Long userId,@Param("relationLabel")String relationLabel,@Param("patientId")String patientId,@Param("isActive")boolean isActive);
 }

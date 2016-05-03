@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
@@ -9,20 +9,10 @@
 
 	<property name="autoIncrement" value="true" dbms="mysql,h2,postgresql" />
 	<property name="autoIncrement" value="false" dbms="oracle" />
-
-	<changeSet id="20160422124100" author="Hillrom Devs">
-		<dropColumn tableName="PATIENT_COMPLIANCE" columnName="expired" />
-		<dropColumn tableName="PATIENT_COMPLIANCE" columnName="expired_date" />
-	</changeSet>
-	
-	<changeSet id="20160422134100" author="Hillrom Devs">
-		<addColumn tableName="CLINIC_PATIENT_ASSOC">
-			<column name="expired"
-				type="boolean" defaultValueBoolean="false" />
-			<column name="expiration_date" type="timestamp"/>
-		</addColumn>
-		<sql>UPDATE CLINIC_PATIENT_ASSOC SET expired = 0 WHERE expired is NULL;</sql>
+	<!-- Added training date to patient_info table. -->
+	<changeSet author="jhipster" id="20160502101440">
+		<addColumn tableName="PATIENT_INFO">
+        	<column name="training_date" type="timestamp"/>
+        </addColumn>
 	</changeSet>
 </databaseChangeLog>
-
-		

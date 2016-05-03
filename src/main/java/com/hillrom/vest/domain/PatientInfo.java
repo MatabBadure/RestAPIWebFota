@@ -94,6 +94,10 @@ public class PatientInfo implements Serializable {
     @Column(name = "expired_date", nullable = true)
     private DateTime expiredDate = null;
     
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @Column(name = "training_date", nullable = true)
+    private DateTime trainingDate = null;
+    
     @Column(name = "web_login_created")
     private Boolean webLoginCreated;
 
@@ -275,6 +279,14 @@ public class PatientInfo implements Serializable {
 
 	public void setExpiredDate(DateTime expiredDate) {
 		this.expiredDate = expiredDate;
+	}
+	
+	public DateTime getTrainingDate() {
+		return trainingDate;
+	}
+
+	public void setTrainingDate(DateTime trainingDate) {
+		this.trainingDate = trainingDate;
 	}
 
 	public Set<ClinicPatientAssoc> getClinicPatientAssoc() {

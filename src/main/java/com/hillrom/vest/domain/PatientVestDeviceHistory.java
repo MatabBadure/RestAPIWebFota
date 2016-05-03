@@ -170,10 +170,10 @@ public class PatientVestDeviceHistory implements Serializable {
 		this.hmr = hmr;
 	}
 
-	// This is used for sending hmr in hours
+	// This is used for sending hmr in Minutes
 	@JsonProperty(value="hmr")
-	public Double getHmrInHours(){
-		return (double) Math.round(hmr/(60*60));
+	public Double getHmrInMinutes(){
+		return (double) Math.round(hmr/(60));
 	}
 	
 	@Override

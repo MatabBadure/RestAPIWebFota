@@ -1,4 +1,4 @@
-CREATE DEFINER=`root`@`%` PROCEDURE `manage_patient_device`(
+CREATE PROCEDURE `manage_patient_device`(
 	IN operation_type_indicator VARCHAR(10),
     IN patient_id varchar(50), 
     IN pat_device_serial_number varchar(50), 
@@ -12,6 +12,8 @@ DECLARE temp_serial_number VARCHAR(50);
 DECLARE temp_patient_info_id VARCHAR(50);
 DECLARE temp_bluetooth_id VARCHAR(50);
 DECLARE created_by VARCHAR(50);
+DECLARE latest_hmr INT;
+
 
 
 SET today_date = now();
@@ -57,13 +59,16 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 
 		SELECT `id`, `serial_number`, `bluetooth_id` INTO temp_patient_info_id, temp_serial_number, temp_bluetooth_id FROM `PATIENT_INFO`
 		WHERE `serial_number` = pat_device_serial_number AND `id`= patient_id;
-        
         IF temp_patient_info_id IS NULL THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Device Serial No. not associated with the patient';
 		END IF;
 
 -- if serial number exists for patient, update patient_info and patient_vest_device_history tables 
 		START TRANSACTION;
+			SELECT max(hmr) INTO latest_hmr FROM PATIENT_VEST_DEVICE_DATA
+			WHERE patient_id = patient_id AND serial_number = pat_device_serial_number
+			AND bluetooth_id = temp_bluetooth_id;
+        
 			UPDATE `PATIENT_INFO` SET
 			`hub_id` = pat_hub_id,
 			`bluetooth_id` = pat_bluetooth_id
@@ -85,6 +90,10 @@ ELSEIF operation_type_indicator ='INACTIVATE' THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Device Serial No.  not associated with the patient';
 		END IF;
         START TRANSACTION;
+			SELECT max(hmr) INTO latest_hmr FROM PATIENT_VEST_DEVICE_DATA
+			WHERE patient_id = patient_id AND serial_number = pat_device_serial_number
+			AND bluetooth_id = temp_bluetooth_id;
+
 			UPDATE `PATIENT_INFO` SET
             `serial_number`=null,
 			`hub_id` = null,
@@ -92,7 +101,7 @@ ELSEIF operation_type_indicator ='INACTIVATE' THEN
 			WHERE `id` = patient_id;
 			
 			UPDATE `PATIENT_VEST_DEVICE_HISTORY` SET
-			`is_active` = 0 WHERE `patient_id` = patient_id;
+			`is_active` = 0, `hmr` = latest_hmr WHERE `patient_id` = patient_id;
 		COMMIT;
 ELSE  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Operation not supported';
 END IF;

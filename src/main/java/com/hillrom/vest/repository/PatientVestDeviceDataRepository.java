@@ -20,4 +20,6 @@ public interface PatientVestDeviceDataRepository extends
 	public Page<PatientVestDeviceData> findLatest(@Param("patientId")String patientId,Pageable pageable);
 	
 	public List<PatientVestDeviceData> findByPatientUserIdAndTimestampBetween(Long id,Long from,Long to);
+	
+	public PatientVestDeviceData findTop1ByPatientUserIdAndSerialNumberOrderByHmrDesc(Long id,String serialNumber);
 }

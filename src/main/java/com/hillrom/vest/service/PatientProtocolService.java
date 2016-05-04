@@ -361,6 +361,13 @@ public class PatientProtocolService {
 				treatmentsPerDay, ppd.getMinMinutesPerTreatment(),ppd.getTreatmentLabel(),
 				ppd.getMinFrequency(), ppd.getMaxFrequency(), ppd.getMinPressure(),
 				ppd.getMaxPressure());
+		if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(type))
+			patientProtocolAssoc.setTreatmentLabel(null);
+		
+		if(Constants.CUSTOM_PROTOCOL.equalsIgnoreCase(type)){
+			patientProtocolAssoc.setMaxFrequency(null);
+		    patientProtocolAssoc.setMaxPressure(null);
+		}
 		patientProtocolAssoc.setId(protocolId);
 		patientProtocolAssoc.setProtocolKey(protocolKey);
 		patientProtocolAssoc.setLastModifiedDate(DateTime.now());

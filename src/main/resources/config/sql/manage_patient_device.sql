@@ -12,7 +12,7 @@ DECLARE temp_serial_number VARCHAR(50);
 DECLARE temp_patient_info_id VARCHAR(50);
 DECLARE temp_bluetooth_id VARCHAR(50);
 DECLARE created_by VARCHAR(50);
-DECLARE latest_hmr INT;
+DECLARE latest_hmr DECIMAL(10,0);
 
 
 
@@ -101,7 +101,7 @@ ELSEIF operation_type_indicator ='INACTIVATE' THEN
 			WHERE `id` = patient_id;
 			
 			UPDATE `PATIENT_VEST_DEVICE_HISTORY` SET
-			`is_active` = 0, `hmr` = latest_hmr WHERE `patient_id` = patient_id;
+			`is_active` = 0, `hmr` = IFNULL(latest_hmr,0) WHERE `patient_id` = patient_id;
 		COMMIT;
 ELSE  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Operation not supported';
 END IF;

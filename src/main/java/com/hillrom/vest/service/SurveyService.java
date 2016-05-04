@@ -186,16 +186,6 @@ public class SurveyService {
 
 		if (Objects.isNull(userService.getPatientInfoObjFromPatientUser(user)))
 			throw new HillromException(ExceptionConstants.HR_523);
-
-		/**
-		// Checking whether first transmission was done
-		PatientNoEvent noEvent = noEventService.findByPatientUserId(userId);
-		if (Objects.isNull(noEvent) || Objects.isNull(noEvent.getFirstTransmissionDate()))
-			throw new HillromException(ExceptionConstants.HR_804);		
-
-		LocalDate firstTransmissionDate = noEvent.getFirstTransmissionDate();
-		*/
-
 		
 		java.util.Optional<PatientInfo> patientInfo = patientInfoService.findOneByHillromId(user.getHillromId());
 		PatientInfo actualPatientInfo = null;

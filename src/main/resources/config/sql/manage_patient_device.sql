@@ -101,7 +101,9 @@ ELSEIF operation_type_indicator ='INACTIVATE' THEN
 			WHERE `id` = patient_id;
 			
 			UPDATE `PATIENT_VEST_DEVICE_HISTORY` SET
-			`is_active` = 0, `hmr` = IFNULL(latest_hmr,0) WHERE `patient_id` = patient_id;
+			`is_active` = 0, `hmr` = IFNULL(latest_hmr,0) WHERE `patient_id` = patient_id
+			AND serial_number = pat_device_serial_number
+			AND bluetooth_id = temp_bluetooth_id;
 		COMMIT;
 ELSE  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Operation not supported';
 END IF;

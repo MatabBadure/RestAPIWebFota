@@ -145,13 +145,13 @@ public class PatientVestDeviceService {
 	    	PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
 	     	if(Objects.nonNull(patientInfo)){
 	     		deviceList = patientVestDeviceRepository.findByPatientId(patientInfo.getId());
-	     		if(Objects.nonNull(patientInfo.getSerialNumber())){
+	     		/*if(Objects.nonNull(patientInfo.getSerialNumber())){
 		     		PatientVestDeviceHistory activeDevice = new PatientVestDeviceHistory(new PatientVestDevicePK(patientInfo, patientInfo.getSerialNumber()),
 		     				patientInfo.getBluetoothId(), patientInfo.getHubId(), true);
 		     		activeDevice.setCreatedDate(patientInfo.getDeviceAssocDate());
 		     		activeDevice.setLastModifiedDate(patientInfo.getDeviceAssocDate());
 		     		deviceList.add(activeDevice);
-	     		}
+	     		}*/
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
 	     	}
@@ -266,5 +266,26 @@ public class PatientVestDeviceService {
 		else 
 			return 0d;
 	}
+	
+	public void updateHMR(User patientUser,PatientInfo patient)throws Exception{
+		Optional<PatientVestDeviceHistory>  deviceHistoryFromDB = patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(patient.getId(),patient.getSerialNumber());
+		if(deviceHistoryFromDB.isPresent()){
+			PatientVestDeviceHistory history = deviceHistoryFromDB.get();
+			history.setHmr(getLatestHMR(patientUser.getId(),patient.getSerialNumber()));
+			patientVestDeviceRepository.save(history);
+		}else{
+			PatientVestDeviceHistory history = new PatientVestDeviceHistory(new PatientVestDevicePK(patient, patient.getSerialNumber()),
+     				patient.getBluetoothId(), patient.getHubId(), true);
+     		history.setCreatedDate(patient.getDeviceAssocDate());
+     		history.setLastModifiedDate(patient.getDeviceAssocDate());
+     		history.setHmr(getLatestHMR(patientUser.getId(),patient.getSerialNumber()));
+     		patientVestDeviceRepository.save(history);
+		}
+	}
+	
+	public PatientVestDeviceHistory getLatestInActiveDeviceFromHistory(String patientId){
+		return patientVestDeviceRepository.findLatestInActiveDeviceByPatientId(patientId, false);
+	}
+	
 }
 

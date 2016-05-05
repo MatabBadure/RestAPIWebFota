@@ -7,6 +7,7 @@ import static com.hillrom.vest.config.Constants.WEEK_SEPERATOR;
 import static com.hillrom.vest.config.Constants.YEAR_STRING;
 import static com.hillrom.vest.config.Constants.YYYY_MM_DD;
 
+import java.security.InvalidParameterException;
 import java.text.DateFormatSymbols;
 import java.util.LinkedList;
 import java.util.List;
@@ -240,5 +241,21 @@ public class DateUtil {
 			return 0;	
 		}
 	}
-
+	public static String formatDateWithDaySuffix(DateTime dateTime, String pattern) {
+		String datetime = formatDate(dateTime, pattern);
+		String suffix;
+		int n = dateTime.getDayOfMonth();
+	    if(n < 1 && n > 31)
+	    	throw new InvalidParameterException();
+	    if (n >= 11 && n <= 13) {
+	        return "th";
+	    }
+	    switch (n % 10) {
+	        case 1:  suffix = "st";
+	        case 2:  suffix = "nd";
+	        case 3:  suffix = "rd";
+	        default: suffix = "th";
+	    }
+	    return datetime.replace("__", suffix);
+	}	
 }

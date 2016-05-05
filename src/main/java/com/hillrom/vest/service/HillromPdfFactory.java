@@ -174,7 +174,7 @@ public class HillromPdfFactory{
 		pdPageContentStream.setStrokingColor(Color.BLACK);
 		pdPageContentStream.newLineAtOffset(document.leftOffSet, pdRectangle.getHeight() - line);
 		pdPageContentStream.showText("Signature: Electronically signed by " + currentUser.getFirstName() + " "
-				+ currentUser.getLastName()+" on "+DateUtil.formatDate(new DateTime(), document.SIGN_DATETIME_PATTERN)+".");
+				+ currentUser.getLastName()+" on "+DateUtil.formatDateWithDaySuffix(new DateTime(), document.SIGN_DATETIME_PATTERN)+".");
 		pdPageContentStream.endText();
 		
 		line = 30;

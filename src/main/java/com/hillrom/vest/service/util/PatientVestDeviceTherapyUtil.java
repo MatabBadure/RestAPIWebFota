@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
@@ -15,9 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientVestDeviceData;
+import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
-import com.hillrom.vest.service.AdherenceCalculationService;
 
 public class PatientVestDeviceTherapyUtil {
 
@@ -56,9 +57,9 @@ public class PatientVestDeviceTherapyUtil {
 		
 	}
 	
-	public static List<TherapySession> prepareTherapySessionFromDeviceData(List<PatientVestDeviceData> deviceData) throws Exception{
+	public static List<TherapySession> prepareTherapySessionFromDeviceData(List<PatientVestDeviceData> deviceData,PatientVestDeviceHistory latestInActiveDeviceHistory) throws Exception{
 		List<TherapySession> therapySessions = new LinkedList<>();
-		therapySessions = groupEventsToPrepareTherapySession(deviceData);
+		therapySessions = groupEventsToPrepareTherapySession(deviceData,latestInActiveDeviceHistory);
 		return groupTherapySessionsByDay(therapySessions);
 	}
 
@@ -159,7 +160,7 @@ public class PatientVestDeviceTherapyUtil {
 	}
 	
 	public static List<TherapySession> groupEventsToPrepareTherapySession(
-			List<PatientVestDeviceData> deviceData) throws Exception{
+			List<PatientVestDeviceData> deviceData,PatientVestDeviceHistory latestInActiveDeviceHistory) throws Exception{
 		List<TherapySession> therapySessions = new LinkedList<TherapySession>();
 		// This List will hold un-finished session events , will be discarded to get delta on next transmission 
 		List<PatientVestDeviceData> eventsToBeDiscarded = new LinkedList<>();
@@ -192,6 +193,7 @@ public class PatientVestDeviceTherapyUtil {
 							deviceData.add(j, inCompleteEvent);
 						}
 						TherapySession therapySession = assignTherapyMatrics(groupEntries);
+						applyGlobalHMR(therapySession,latestInActiveDeviceHistory);
 						therapySessions.add(therapySession);
 						i=j; // to skip the events iterated, shouldn't be removed in any case
 						break;
@@ -211,6 +213,15 @@ public class PatientVestDeviceTherapyUtil {
 			deviceData.removeAll(eventsToBeDiscarded);
 		}
 		return therapySessions;
+	}
+
+	private static void applyGlobalHMR(TherapySession therapySession,
+			PatientVestDeviceHistory latestInActiveDeviceHistory)throws Exception {
+		if( Objects.nonNull(latestInActiveDeviceHistory) && (therapySession.getHmr() < latestInActiveDeviceHistory.getHmr())){
+			if(!(latestInActiveDeviceHistory.getSerialNumber().equalsIgnoreCase(therapySession.getSerialNumber()))){
+				therapySession.setHmr(therapySession.getHmr()+latestInActiveDeviceHistory.getHmr());
+			}
+		}
 	}
 
 	private static boolean isCompleteOrInCompleteEventForTherapySession(
@@ -236,6 +247,8 @@ public class PatientVestDeviceTherapyUtil {
 		PatientInfo patient = groupEntries.get(0).getPatient();
 		Map<String,Integer> metricsMap = getTherapyMetricsMap(groupEntries);
 		TherapySession therapySession = new TherapySession();
+		therapySession.setSerialNumber(groupEntries.get(0).getSerialNumber());
+		therapySession.setBluetoothId(groupEntries.get(0).getBluetoothId());
 		therapySession.setDate(LocalDate.fromDateFields(new Date(timestamp)));
 		therapySession.setFrequency(metricsMap.get(FREQUENCY));
 		therapySession.setPressure(metricsMap.get(PRESSURE));

@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 
@@ -167,30 +168,13 @@ public class HillromPdfFactory{
 			pdPageContentStream.stroke();
 		}
 
-		line += 40;
+		line += 60;
 		pdPageContentStream.beginText();
 		pdPageContentStream.setFont(document.fontBold, 8);
 		pdPageContentStream.setStrokingColor(Color.BLACK);
 		pdPageContentStream.newLineAtOffset(document.leftOffSet, pdRectangle.getHeight() - line);
-		pdPageContentStream.showText("This is an Electronically signed document by " + currentUser.getFirstName() + " "
-				+ currentUser.getLastName());
-		pdPageContentStream.endText();
-
-		line = 80;
-		pdPageContentStream.beginText();
-		pdPageContentStream.setFont(document.fontBold, 8);
-		pdPageContentStream.setStrokingColor(Color.BLACK);
-		pdPageContentStream.newLineAtOffset(document.leftOffSet, line);
-		pdPageContentStream.showText("Name: _________________________________________________________________    "
-				+ "Date: _____________________________________");
-		pdPageContentStream.endText();
-		
-		line = 60;
-		pdPageContentStream.beginText();
-		pdPageContentStream.setFont(document.fontBold, 8);
-		pdPageContentStream.setStrokingColor(Color.BLACK);
-		pdPageContentStream.newLineAtOffset(document.leftOffSet, line);
-		pdPageContentStream.showText("Signature: ______________________________________");
+		pdPageContentStream.showText("Signature: Electronically signed by " + currentUser.getFirstName() + " "
+				+ currentUser.getLastName()+" on "+DateUtil.formatDate(new DateTime(), document.SIGN_DATETIME_PATTERN)+".");
 		pdPageContentStream.endText();
 		
 		line = 30;
@@ -229,5 +213,4 @@ public class HillromPdfFactory{
 		StringBuilder name  = new StringBuilder(user.getFirstName()).append(" ").append(user.getLastName());
 		return name.length()>25 ? name.substring(0, 22) + "..." : name.toString() ;
 	}
-
 }

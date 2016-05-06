@@ -77,6 +77,12 @@ public class TherapySession implements Comparable<TherapySession>{
 	
 	@Column(name="hmr")
 	private Double hmr;
+	
+	@Column(name="serial_number")
+	private String serialNumber;
+	
+    @Column(name = "bluetooth_id")
+	private String bluetoothId;
 
 	public Long getId() {
 		return id;
@@ -234,6 +240,22 @@ public class TherapySession implements Comparable<TherapySession>{
 	@JsonIgnore
 	public Long getTherapySessionByPatientUserId() {
 		return patientUser.getId();
+	}
+
+	public String getSerialNumber() {
+		return serialNumber;
+	}
+
+	public void setSerialNumber(String serialNumber) {
+		this.serialNumber = serialNumber;
+	}
+
+	public String getBluetoothId() {
+		return bluetoothId;
+	}
+
+	public void setBluetoothId(String bluetoothId) {
+		this.bluetoothId = bluetoothId;
 	}
 
 	@Override

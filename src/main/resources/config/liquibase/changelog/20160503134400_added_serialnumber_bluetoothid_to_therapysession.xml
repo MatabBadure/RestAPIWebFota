@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<!-- Added hmr to PATIENT_VEST_DEVICE_HISTORY table. -->
+	<changeSet author="jhipster" id="20160503134400">
+		<addColumn tableName="PATIENT_VEST_THERAPY_DATA">
+			<column name="serial_number" type="varchar(255)" />
+			<column name="bluetooth_id" type="varchar(255)" />
+		</addColumn>
+		<sql>
+			UPDATE PATIENT_VEST_THERAPY_DATA therapy_data join (SELECT
+			pvdd.timestamp,pvdd.serial_number,pvdd.bluetooth_id, pvdd.user_id
+			FROM PATIENT_VEST_DEVICE_DATA pvdd join PATIENT_VEST_THERAPY_DATA pvtd
+			on pvdd.timestamp = unix_timestamp(pvtd.start_time)*1000 and
+			pvdd.user_id = pvtd.user_id) as device_data set
+			therapy_data.serial_number = device_data.serial_number,
+			therapy_data.bluetooth_id = device_data.bluetooth_id
+			WHERE unix_timestamp(therapy_data.start_time)*1000 = device_data.timestamp
+			and therapy_data.user_id = device_data.user_id;
+			<comment> Adding serial_number and bluetooth_id to therapy data</comment>
+		</sql>
+	</changeSet>
+</databaseChangeLog>

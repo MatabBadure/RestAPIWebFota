@@ -16,6 +16,7 @@ import net.minidev.json.JSONObject;
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+import org.joda.time.DateTime; 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -26,12 +27,14 @@ import com.hillrom.vest.domain.SurveyQuestion;
 import com.hillrom.vest.domain.SurveyQuestionAssoc;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserSurveyAnswer;
+import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.SurveyQuestionAssocRepository;
 import com.hillrom.vest.repository.SurveyQuestionRepository;
 import com.hillrom.vest.repository.SurveyRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSurveyAnswerRepository;
+import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
@@ -72,7 +75,14 @@ public class SurveyService {
 	private PatientNoEventService noEventService;
 	
 	@Inject
+	private PatientInfoService patientInfoService;
+	
+    @Inject
+    private PatientInfoRepository patientInfoRepository;
+	
+	@Inject
 	private SurveyQuestionRepository surveyQuestionRepository;
+	
 	
 	@Qualifier("surveyGraphService")
 	@Inject
@@ -176,15 +186,21 @@ public class SurveyService {
 
 		if (Objects.isNull(userService.getPatientInfoObjFromPatientUser(user)))
 			throw new HillromException(ExceptionConstants.HR_523);
-
-		// Checking whether first transmission was done
-		PatientNoEvent noEvent = noEventService.findByPatientUserId(userId);
-		if (Objects.isNull(noEvent) || Objects.isNull(noEvent.getFirstTransmissionDate()))
+		
+		java.util.Optional<PatientInfo> patientInfo = patientInfoService.findOneByHillromId(user.getHillromId());
+		PatientInfo actualPatientInfo = null;
+		if(patientInfo.isPresent()){
+			actualPatientInfo =  patientInfo.get();
+			if (Objects.isNull(actualPatientInfo.getTrainingDate())){
+				throw new HillromException(ExceptionConstants.HR_804);
+			}
+		}else{
 			throw new HillromException(ExceptionConstants.HR_804);
-
-		LocalDate firstTransmissionDate = noEvent.getFirstTransmissionDate();
-
-		int daysDifference = DateUtil.getDaysCountBetweenLocalDates(firstTransmissionDate, LocalDate.now())+1; // days are inclusive for surveys;
+		}
+		
+		DateTime  trainingDate = actualPatientInfo.getTrainingDate();
+		
+		int daysDifference = DateUtil.getDaysCountBetweenLocalDates(trainingDate.toLocalDate(), LocalDate.now())+1; // days are inclusive for surveys;
 		if ((daysDifference >= RandomUtil.FIVE_DAYS && daysDifference < RandomUtil.THIRTY_DAYS)
 				&& userSurveyAnswerRepository.findCountByUserIdAndSurveyId(userId, RandomUtil.FIVE_DAY_SURVEY_ID) < 1) {
 			return surveyRepository.findOne(RandomUtil.FIVE_DAY_SURVEY_ID);

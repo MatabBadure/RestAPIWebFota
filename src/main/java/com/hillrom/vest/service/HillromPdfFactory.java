@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -156,7 +157,9 @@ public class HillromPdfFactory{
 			line += 10;	
 			
 			float  i = document.leftOffSet + 90;
-			addNewLine(patientProtocolData.getType(), pdPageContentStream, document.leftOffSet+20, pdRectangle.getHeight() - line);
+			
+			String treatementLebel = Objects.nonNull(patientProtocolData.getTreatmentLabel())?patientProtocolData.getTreatmentLabel() : "";
+			addNewLine(patientProtocolData.getType()+" "+ treatementLebel, pdPageContentStream, document.leftOffSet+20, pdRectangle.getHeight() - line);
 			addNewLine(String.valueOf(patientProtocolData.getTreatmentsPerDay()), pdPageContentStream, i+=90, pdRectangle.getHeight() - line);
 			addNewLine(String.valueOf(patientProtocolData.getMinMinutesPerTreatment()), pdPageContentStream, i+=100, pdRectangle.getHeight() - line);
 			addNewLine(String.valueOf(patientProtocolData.getMinFrequency()), pdPageContentStream, i+=100, pdRectangle.getHeight() - line);

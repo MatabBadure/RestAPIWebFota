@@ -180,11 +180,6 @@ public class HillromPdfFactory{
 				+ currentUser.getLastName()+" on "+DateUtil.formatDateWithDaySuffix(new DateTime(), document.SIGN_DATETIME_PATTERN)+".");
 		pdPageContentStream.endText();
 		
-		pdPageContentStream.setNonStrokingColor(Color.BLACK);
-		pdPageContentStream.moveTo(document.leftOffSet + 50, line);
-		pdPageContentStream.lineTo(pdRectangle.getWidth()/2,line);
-		pdPageContentStream.stroke();
-		
 		line = 30;
 
 		pdPageContentStream.setNonStrokingColor(Color.BLACK);

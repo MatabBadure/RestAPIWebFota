@@ -416,7 +416,7 @@ public class MailService {
         
         File file = hillromPDFHandler.createPDFDoc(attachedFile, currentUser, patientUser, patientProtocolDataList);
                 
- 	    content = templateEngine.process("changePrescription", context);
+		content = templateEngine.process("changePrescription", context);
         subject = messageSource.getMessage("email.changePrescription.title", null, null) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);
         String recipients = env.getProperty("spring.changePrescription.changePrescriptionEmailids");
 		log.debug("Sending change prescription email report '{}'", recipients);

@@ -18,6 +18,8 @@ import javax.inject.Inject;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,7 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.PatientProtocolRepository;
 import com.hillrom.vest.repository.ProtocolConstantsRepository;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -142,9 +145,14 @@ public class PatientProtocolService {
 				try {
 					if(Objects.nonNull(patientUser.getEmail()))
 						mailService.sendUpdateProtocolMailToPatient(patientUser, protocolList);
-					Optional<User> currentUser = userRepository
+					if(SecurityContextHolder.getContext().getAuthentication()
+							.getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.HCP)) || SecurityContextHolder.getContext()
+							.getAuthentication()
+							.getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CLINIC_ADMIN))){ 
+						Optional<User> currentUser = userRepository
 							.findOneByEmailOrHillromId(SecurityUtils.getCurrentLogin());
-					mailService.sendUpdateProtocolMailToMailingList(currentUser.get(), patientUser, protocolList);
+						mailService.sendUpdateProtocolMailToMailingList(currentUser.get(), patientUser, protocolList);
+					}
 				} catch (Exception ex) {
 					StringWriter writer = new StringWriter();
 					PrintWriter printWriter = new PrintWriter(writer);
@@ -362,7 +370,7 @@ public class PatientProtocolService {
 				ppd.getMinFrequency(), ppd.getMaxFrequency(), ppd.getMinPressure(),
 				ppd.getMaxPressure());
 		if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(type))
-			patientProtocolAssoc.setTreatmentLabel(null);
+			patientProtocolAssoc.setTreatmentLabel("");
 		
 		if(Constants.CUSTOM_PROTOCOL.equalsIgnoreCase(type)){
 			patientProtocolAssoc.setMaxFrequency(null);

@@ -124,15 +124,19 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 
 		List<PatientVestDeviceData> patientVestDeviceEvents = parseRawData();
 		Long patientUserId = 0l, from,to;
+		String serialNumber = "";
+		String patientId = "";
 		if(patientVestDeviceEvents.isEmpty()){
 			// this is required to let reader to know there is nothing to be read further
 			isReadComplete = true;  
 			return patientVestDeviceEvents; // spring batch reader to skip reading
 		}else{
 			patientUserId = patientVestDeviceEvents.get(0).getPatientUser().getId();
+			patientId = patientVestDeviceEvents.get(0).getPatient().getId();
 			Collections.sort(patientVestDeviceEvents);
 			from = patientVestDeviceEvents.get(0).getTimestamp();
 			to = patientVestDeviceEvents.get(patientVestDeviceEvents.size()-1).getTimestamp();
+			serialNumber = patientVestDeviceEvents.get(0).getSerialNumber();
 		}
 		List<PatientVestDeviceData> existingEvents = vestDeviceDataRepository.findByPatientUserIdAndTimestampBetween(patientUserId, from, to);
 
@@ -146,8 +150,9 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 		}
 		
 		log.debug("New Events found to be inserted ");
+		PatientVestDeviceHistory latestInActiveDevice = patientVestDeviceRepository.findLatestInActiveDeviceByPatientId(patientId, false);
 		List<TherapySession> therapySessions = PatientVestDeviceTherapyUtil
-				.prepareTherapySessionFromDeviceData(patientVestDeviceRecords);
+				.prepareTherapySessionFromDeviceData(patientVestDeviceRecords,latestInActiveDevice);
 
 		if(therapySessions.isEmpty()){
 			log.debug("Could not make session out of the events received, discarding to get delta");

@@ -6,10 +6,12 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 
@@ -155,7 +157,9 @@ public class HillromPdfFactory{
 			line += 10;	
 			
 			float  i = document.leftOffSet + 90;
-			addNewLine(patientProtocolData.getType(), pdPageContentStream, document.leftOffSet+20, pdRectangle.getHeight() - line);
+			
+			String treatementLebel = Objects.nonNull(patientProtocolData.getTreatmentLabel())?patientProtocolData.getTreatmentLabel() : "";
+			addNewLine(patientProtocolData.getType()+" "+ treatementLebel, pdPageContentStream, document.leftOffSet+20, pdRectangle.getHeight() - line);
 			addNewLine(String.valueOf(patientProtocolData.getTreatmentsPerDay()), pdPageContentStream, i+=90, pdRectangle.getHeight() - line);
 			addNewLine(String.valueOf(patientProtocolData.getMinMinutesPerTreatment()), pdPageContentStream, i+=100, pdRectangle.getHeight() - line);
 			addNewLine(String.valueOf(patientProtocolData.getMinFrequency()), pdPageContentStream, i+=100, pdRectangle.getHeight() - line);
@@ -167,30 +171,13 @@ public class HillromPdfFactory{
 			pdPageContentStream.stroke();
 		}
 
-		line += 40;
+		line += 60;
 		pdPageContentStream.beginText();
 		pdPageContentStream.setFont(document.fontBold, 8);
 		pdPageContentStream.setStrokingColor(Color.BLACK);
 		pdPageContentStream.newLineAtOffset(document.leftOffSet, pdRectangle.getHeight() - line);
-		pdPageContentStream.showText("This is an Electronically signed document by " + currentUser.getFirstName() + " "
-				+ currentUser.getLastName());
-		pdPageContentStream.endText();
-
-		line = 80;
-		pdPageContentStream.beginText();
-		pdPageContentStream.setFont(document.fontBold, 8);
-		pdPageContentStream.setStrokingColor(Color.BLACK);
-		pdPageContentStream.newLineAtOffset(document.leftOffSet, line);
-		pdPageContentStream.showText("Name: _________________________________________________________________    "
-				+ "Date: _____________________________________");
-		pdPageContentStream.endText();
-		
-		line = 60;
-		pdPageContentStream.beginText();
-		pdPageContentStream.setFont(document.fontBold, 8);
-		pdPageContentStream.setStrokingColor(Color.BLACK);
-		pdPageContentStream.newLineAtOffset(document.leftOffSet, line);
-		pdPageContentStream.showText("Signature: ______________________________________");
+		pdPageContentStream.showText("Signature: Electronically signed by " + currentUser.getFirstName() + " "
+				+ currentUser.getLastName()+" on "+DateUtil.formatDateWithDaySuffix(new DateTime(), document.SIGN_DATETIME_PATTERN)+".");
 		pdPageContentStream.endText();
 		
 		line = 30;
@@ -229,5 +216,4 @@ public class HillromPdfFactory{
 		StringBuilder name  = new StringBuilder(user.getFirstName()).append(" ").append(user.getLastName());
 		return name.length()>25 ? name.substring(0, 22) + "..." : name.toString() ;
 	}
-
 }

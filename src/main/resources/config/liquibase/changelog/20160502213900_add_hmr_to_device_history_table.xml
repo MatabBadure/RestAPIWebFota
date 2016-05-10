@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<!-- Added hmr to PATIENT_VEST_DEVICE_HISTORY table. -->
+	<changeSet author="jhipster" id="20160502213900">
+		<addColumn tableName="PATIENT_VEST_DEVICE_HISTORY">
+        	<column name="hmr" type="decimal"/>
+        </addColumn>
+        <sql>
+        UPDATE PATIENT_VEST_DEVICE_HISTORY history SET history.hmr = (select dev_data.max_hmr from(
+		select ifnull(max(device_data.hmr),0) as max_hmr,pvdh.serial_number as device_serial_no
+		from PATIENT_VEST_DEVICE_HISTORY pvdh  left join PATIENT_VEST_DEVICE_DATA device_data
+		on pvdh.serial_number = device_data.serial_number
+		group by pvdh.serial_number) as dev_data where history.serial_number = dev_data.device_serial_no);
+        <comment> Adding hmr to device history</comment>
+        </sql>
+	</changeSet>
+</databaseChangeLog>

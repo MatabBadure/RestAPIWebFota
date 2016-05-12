@@ -5,12 +5,15 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hillrom.vest.domain.util.DecimalNumberSerializer;
 
 public class GraphDataVO {
 
 	@JsonInclude(Include.NON_NULL)
 	private String x;
-	private int y;
+	@JsonSerialize(using=DecimalNumberSerializer.class)
+	private double y;
 	
 	@JsonInclude(Include.NON_EMPTY)
 	private Map<String,Object> toolText = new HashMap<>();
@@ -19,7 +22,7 @@ public class GraphDataVO {
 		super();
 	}
 	
-	public GraphDataVO(String x, int y) {
+	public GraphDataVO(String x, double y) {
 		super();
 		this.x = x;
 		this.y = y;
@@ -32,11 +35,11 @@ public class GraphDataVO {
 		this.x = x;
 	}
 
-	public int getY() {
+	public double getY() {
 		return y;
 	}
 
-	public void setY(int y) {
+	public void setY(double y) {
 		this.y = y;
 	}
 	public void setToolText(Map<String, Object> toolText) {

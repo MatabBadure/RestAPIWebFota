@@ -22,6 +22,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hillrom.vest.domain.util.DecimalNumberSerializer;
 
 @Entity
 @Table(name = "PATIENT_VEST_DEVICE_HISTORY")
@@ -172,8 +174,9 @@ public class PatientVestDeviceHistory implements Serializable {
 
 	// This is used for sending hmr in Minutes
 	@JsonProperty(value="hmr")
+	@JsonSerialize(using=DecimalNumberSerializer.class)
 	public Double getHmrInMinutes(){
-		return (double) Math.round(hmr/(60));
+		return hmr/(60);
 	}
 	
 	@Override

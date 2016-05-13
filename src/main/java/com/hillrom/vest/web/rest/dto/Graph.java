@@ -28,7 +28,7 @@ public class Graph {
 
 	@JsonIgnore
 	public boolean isEmpty(){
-		List<Integer> yValues = new LinkedList<>();
+		List<Double> yValues = new LinkedList<>();
 		List<Integer> toolTipData = new LinkedList<>();
 		for(Series series : series){
 			List<GraphDataVO> graphData = series.getData();

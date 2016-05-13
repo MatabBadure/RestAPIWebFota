@@ -253,7 +253,7 @@ public class TherapySessionService {
 						session.getFrequency(),	session.getPressure(), programmedCoughPauses, normalCoughPauses,
 						programmedCoughPauses+normalCoughPauses, noteMap.get(date), session.getStartTime(),
 						session.getEndTime(), session.getCaughPauseDuration(),
-						session.getDurationInMinutes(), Math.round(session.getHmr().doubleValue()/minutes),false);
+						session.getDurationInMinutes(), session.getHmr().doubleValue()/minutes,false);
 				therapyDataVOs.add(therapyDataVO);
 			}
 			therapyDataMap.put(date, therapyDataVOs);

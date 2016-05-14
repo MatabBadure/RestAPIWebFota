@@ -243,19 +243,21 @@ public class DateUtil {
 	}
 	public static String formatDateWithDaySuffix(DateTime dateTime, String pattern) {
 		String datetime = formatDate(dateTime, pattern);
-		String suffix;
-		int n = dateTime.getDayOfMonth();
+		String suffix = getDayOfMonthSuffix(dateTime.getDayOfMonth());
+	    return datetime.replaceFirst(",", suffix+",");
+	}	
+	
+	private static String getDayOfMonthSuffix(final int n) {
 	    if(n < 1 && n > 31)
 	    	throw new InvalidParameterException();
 	    if (n >= 11 && n <= 13) {
 	        return "th";
 	    }
 	    switch (n % 10) {
-	        case 1:  suffix = "st";
-	        case 2:  suffix = "nd";
-	        case 3:  suffix = "rd";
-	        default: suffix = "th";
+	        case 1:  return "st";
+	        case 2:  return "nd";
+	        case 3:  return "rd";
+	        default: return "th";
 	    }
-	    return datetime.replace("__", suffix);
-	}	
+	}
 }

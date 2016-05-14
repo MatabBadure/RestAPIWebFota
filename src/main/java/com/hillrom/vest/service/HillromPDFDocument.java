@@ -15,7 +15,7 @@ public class HillromPDFDocument extends PDDocument{
 	public Float leftOffSet = 20.0f;
 	public Integer rightOffset = 20;
 	// __ will be replaced by st/nd/rd.
-	public String SIGN_DATETIME_PATTERN = "MMM d__, yyyy, hh:mm";
+	public String SIGN_DATETIME_PATTERN = "MMM d, yyyy, hh:mm";
 	public String[]  protocolTableHeader = "Type,Treatment Per Day,Minutes Per Treatment,Frequency Per Treatment,Pressure Per Treatment".split(",");
 	
 }

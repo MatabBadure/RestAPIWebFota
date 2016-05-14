@@ -76,7 +76,7 @@ public class HMRGraphService extends AbstractGraphService {
 		if(DAY.equalsIgnoreCase(filter.getDuration())){
 			point = new GraphDataVO(DateUtil.formatDate(therapy.getTimestamp(), MMddyyyyHHMM), therapy.getDuration());
 		}else{
-			point = new GraphDataVO(DateUtil.formatDate(therapy.getTimestamp(), MMddyyyyHHMM), (int)therapy.getHmr());
+			point = new GraphDataVO(DateUtil.formatDate(therapy.getTimestamp(), MMddyyyyHHMM), therapy.getHmr());
 		}
 		point.getToolText().put(KEY_MISSED_THERAPY, therapy.isMissedTherapy());
 		point.getToolText().put(KEY_SESSION_NO,therapy.getSessionNo()+"/"+therapy.getTreatmentsPerDay());

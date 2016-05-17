@@ -322,14 +322,18 @@ public class UserResource {
 
 	@RequestMapping(value = "/user/{id}/patient", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	
-	public ResponseEntity<PatientUserVO> getPatientUser(@PathVariable Long id) {
+	public ResponseEntity<?> getPatientUser(@PathVariable Long id) {
 		log.debug("REST request to get PatientUser : {}", id);
 		Optional<PatientUserVO> patientUser = userService.getPatientUser(id);
 		if(patientUser.isPresent()){
 			return new ResponseEntity<>(patientUser.get(),
 					HttpStatus.OK);
 		}
-		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		else{
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("ERROR",ExceptionConstants.HR_523);
+			return new ResponseEntity<>(jsonObject,HttpStatus.NOT_FOUND);
+		}
 	}
 
 	/**

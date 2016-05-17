@@ -33,7 +33,7 @@ public class ExceptionConstants {
     // Patient User
     public static final String HR_521 = "Unable to create Patient.";
     public static final String HR_522 = "HR Id already in use.";
-    public static final String HR_523 = "No such patient exist";
+    public static final String HR_523 = "No such patient exists";
     public static final String HR_524 = "Unable to update Patient";
     
     // HCP User

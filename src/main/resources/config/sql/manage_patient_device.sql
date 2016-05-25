@@ -17,7 +17,7 @@ DECLARE latest_hmr DECIMAL(10,0);
 
 
 SET today_date = now();
-SET created_by = 'System';
+SET created_by = 'JDE APP';
 
 -- check if same serial number or bluetooth_id exists for any patient
 
@@ -42,16 +42,16 @@ IF operation_type_indicator = 'CREATE' THEN
 		`device_assoc_date`= today_date WHERE `id` = patient_id;
 		
 		-- make other devices inactive in patient_vest_device_history tables 
-		
-		UPDATE `PATIENT_VEST_DEVICE_HISTORY` SET
-		`is_active` = 0 WHERE `patient_id` = patient_id;
+
+		UPDATE `PATIENT_VEST_DEVICE_HISTORY` pvdh SET
+		`is_active` = 0 WHERE pvdh.`patient_id` = patient_id;
 		
 		 -- make insert device into patient_vest_device_history with active.
 		 
 		INSERT INTO `PATIENT_VEST_DEVICE_HISTORY`
-			(`patient_id`, `serial_number`,	`bluetooth_id`,	`hub_id`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_active`)
+			(`patient_id`, `serial_number`,	`bluetooth_id`,	`hub_id`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_active`,`hmr`)
 			VALUES
-			(patient_id,pat_device_serial_number, pat_bluetooth_id,pat_hub_id,created_by,today_date,created_by,today_date,1);
+			(patient_id,pat_device_serial_number, pat_bluetooth_id,pat_hub_id,created_by,today_date,created_by,today_date,1,0);
 			
 	  COMMIT;
       
@@ -65,20 +65,17 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 
 -- if serial number exists for patient, update patient_info and patient_vest_device_history tables 
 		START TRANSACTION;
-			SELECT max(hmr) INTO latest_hmr FROM PATIENT_VEST_DEVICE_DATA
-			WHERE patient_id = patient_id AND serial_number = pat_device_serial_number
-			AND bluetooth_id = temp_bluetooth_id;
         
 			UPDATE `PATIENT_INFO` SET
 			`hub_id` = pat_hub_id,
 			`bluetooth_id` = pat_bluetooth_id
 			WHERE `id` = patient_id;
 			
-			UPDATE `PATIENT_VEST_DEVICE_HISTORY` SET
+			UPDATE `PATIENT_VEST_DEVICE_HISTORY` pvdh SET
 			`bluetooth_id` = pat_bluetooth_id,
 			`hub_id` = pat_hub_id,
 			`last_modified_date` = today_date
-			 WHERE `patient_id` = patient_id AND `serial_number` = pat_device_serial_number;
+			 WHERE pvdh.`patient_id` = patient_id AND `serial_number` = pat_device_serial_number;
 			COMMIT;
             
 ELSEIF operation_type_indicator ='INACTIVATE' THEN
@@ -100,8 +97,11 @@ ELSEIF operation_type_indicator ='INACTIVATE' THEN
 			`bluetooth_id` = null
 			WHERE `id` = patient_id;
 			
-			UPDATE `PATIENT_VEST_DEVICE_HISTORY` SET
-			`is_active` = 0, `hmr` = IFNULL(latest_hmr,0) WHERE `patient_id` = patient_id
+			UPDATE `PATIENT_VEST_DEVICE_HISTORY` pvdh SET
+			`is_active` = 0, `hmr` = IFNULL(latest_hmr,0), 
+			`last_modified_by` = created_by,
+			`last_modified_date` = today_date
+			WHERE pvdh.`patient_id` = patient_id
 			AND serial_number = pat_device_serial_number
 			AND bluetooth_id = temp_bluetooth_id;
 		COMMIT;

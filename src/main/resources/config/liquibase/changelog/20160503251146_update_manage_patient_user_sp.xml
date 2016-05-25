@@ -5,10 +5,7 @@
 
 	<!-- Change manage_patient_user stored Procedure. 20160503251146_update_manage_patient_user_sp.xml -->
 	<changeSet author="Neev Dev Team" id="20160503251146">
-		<dropProcedure procedureName="manage_patient_user"/>
-    	<createProcedure path="./../../sql/manage_patient_user.sql"
-          procedureName="manage_patient_user" relativeToChangelogFile="true"></createProcedure>
-          <dropProcedure procedureName="manage_patient_device"/>
+		<dropProcedure procedureName="manage_patient_device"/>
     	<createProcedure path="./../../sql/manage_patient_device.sql"
           procedureName="manage_patient_device" relativeToChangelogFile="true"></createProcedure>
 	</changeSet>

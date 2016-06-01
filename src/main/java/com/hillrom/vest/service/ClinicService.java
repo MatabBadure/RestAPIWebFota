@@ -176,6 +176,7 @@ public class ClinicService {
 	/**
 	 * @param clinicDTO
 	 * @param clinic
+	 * Method assignUpdatedValues
 	 */
 	private void assignUpdatedValues(ClinicDTO clinicDTO, Clinic clinic) {
 		if (clinicDTO.getName() != null)

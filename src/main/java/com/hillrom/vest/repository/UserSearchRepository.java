@@ -449,16 +449,16 @@ public class UserSearchRepository {
 	public Page<PatientUserVO> findPatientBy(String queryString, String filter, Pageable pageable,
 			Map<String, Boolean> sortOrder) {
 
-		String query1 = "select patient_id as id,pemail,pfirstName,plastName, isDeleted,pzipcode,paddress,pcity,pdob,pgender,ptitle,"
+		String query1 = "select patient_id as id,pemail,pfirstName,plastName, isDeleted,pzipcode,paddress,pcity,pdob,pgender,ptitle, "
 				+ "phillrom_id,createdAt,isActivated, state , adherence,last_date,mrnid,hName,clinicName,isExpired,isHMRNonCompliant,isSettingsDeviated,"
-				+ "isMissedTherapy  from (select user.id as patient_id,user.email as pemail,user.first_name as pfirstName,user.last_name as plastName,"
+				+ "isMissedTherapy,pSerialNumber from (select user.id as patient_id,user.email as pemail,user.first_name as pfirstName,user.last_name as plastName,"
 				+ " user.is_deleted as isDeleted, user.zipcode as pzipcode,patInfo.address paddress,patInfo.city as pcity,user.dob as pdob,"
 				+ "user.gender as pgender,user.title as ptitle,  user.hillrom_id as phillrom_id,user.created_date as createdAt,"
 				+ "user.activated as isActivated, patInfo.state as state ,  user_clinic.mrn_id as mrnid, clinic.id as pclinicid, "
 				+ "GROUP_CONCAT(clinic.name) as clinicName, user.expired as isExpired, pc.compliance_score as adherence,  "
 				+ "pc.last_therapy_session_date as last_date,pc.is_hmr_compliant as isHMRNonCompliant,"
 				+ "pc.is_settings_deviated as isSettingsDeviated,"
-				+ " pc.missed_therapy_count as isMissedTherapy from USER user join USER_PATIENT_ASSOC  upa on user.id = upa.user_id "
+				+ " pc.missed_therapy_count as isMissedTherapy,patInfo.serial_number as pSerialNumber from USER user join USER_PATIENT_ASSOC  upa on user.id = upa.user_id "
 				+ " and upa.relation_label = '" + SELF + "' join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 				+ " left outer join CLINIC_PATIENT_ASSOC user_clinic on user_clinic.patient_id = patInfo.id "
 				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id  and user_authority.authority_name = '"
@@ -467,8 +467,10 @@ public class UserSearchRepository {
 				+ " lower(user.email) like lower(:queryString) or "
 				+ " lower(CONCAT(user.first_name,' ',user.last_name)) like lower(:queryString) or "
 				+ " lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) or ";
-
+				
 		String hrIdSearch = " lower(user.hillrom_id) like lower(:queryString))";
+		
+		String hrSerialNumber =" lower(patInfo.serial_number) like lower(:queryString) or";
 
 		// This is applicable only when search is performed by HCP or
 		// CLINIC_ADMIN
@@ -489,11 +491,14 @@ public class UserSearchRepository {
 		if (SecurityUtils.isUserInRole(HCP) || SecurityUtils.isUserInRole(CLINIC_ADMIN))
 			findPatientUserQuery = findPatientUserQuery
 					.substring(0, findPatientUserQuery.lastIndexOf(")")).concat(mrnIdSearch);
-		else // Admin can search on HRID not MRNID
+		else{ // Admin can search on HRID not MRNID
+			findPatientUserQuery += hrSerialNumber;
 			findPatientUserQuery += hrIdSearch;
-		findPatientUserQuery += query3;
+			
+		}
+		    findPatientUserQuery += query3;
 
-		findPatientUserQuery = applyFiltersToQuery(filter, findPatientUserQuery);
+		    findPatientUserQuery = applyFiltersToQuery(filter, findPatientUserQuery);
 
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString", queryString);
 
@@ -533,6 +538,7 @@ public class UserSearchRepository {
 			String hcpNamesCSV = (String) record[18];
 			String clinicNamesCSV = (String) record[19];
 			Boolean isExpired = (Boolean) record[20];
+			String serialNumber = (String) record[24];
 
 			java.util.Date localLastTransmissionDate = null;
 
@@ -554,6 +560,7 @@ public class UserSearchRepository {
 			patientUserVO.setHcpNamesCSV(hcpNamesCSV);
 			patientUserVO.setClinicNamesCSV(clinicNamesCSV);
 			patientUserVO.setExpired(isExpired);
+			patientUserVO.setSerialNumber(serialNumber);
 			patientUsers.add(patientUserVO);
 		});
 		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());
@@ -667,6 +674,7 @@ public class UserSearchRepository {
 				+ " or lower(user.email) like lower(:queryString) or lower(CONCAT(user.first_name,' ',user.last_name)) "
 				+ " like lower(:queryString) or lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) "
 				+ " or lower(user.hillrom_id) like lower(:queryString) or lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString)) ";
+				
 
 		String query2 = " where upa_hcp.user_id = :hcpUserID ";
 		String query3 = " group by user.id ";

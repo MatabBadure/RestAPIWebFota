@@ -4,7 +4,7 @@ import com.hillrom.vest.web.rest.dto.Filter;
 import com.hillrom.vest.web.rest.dto.Graph;
 
 public interface GraphService {
-
+//Test graph service
 	public Graph populateGraphDataForDay(Object data,Filter filter) throws Exception;
 	public Graph populateGraphDataForWeek(Object data,Filter filter) throws Exception;
 	public Graph populateGraphDataForMonth(Object data,Filter filter) throws Exception;

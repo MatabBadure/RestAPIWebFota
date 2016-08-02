@@ -110,8 +110,11 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 				.parseBase64StringToPatientVestDeviceLogEntry(deviceRawLog.getDeviceData());
 
 		String deviceSerialNumber = deviceRawLog.getDeviceSerialNumber();
+		if(!patientVestDeviceEvents.isEmpty())
+		{
 		UserPatientAssoc userPatientAssoc = createPatientUserIfNotExists(deviceRawLog, deviceSerialNumber);
 		assignDefaultValuesToVestDeviceDataTemp(deviceRawLog, patientVestDeviceEvents, userPatientAssoc);
+		}
 		return patientVestDeviceEvents;
 	}
 
@@ -127,7 +130,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 		String serialNumber = "";
 		String patientId = "";
 		if(patientVestDeviceEvents.isEmpty()){
-			// this is required to let reader to know there is nothing to be read further
+		// this is required to let reader to know there is nothing to be read further
 			isReadComplete = true;  
 			return patientVestDeviceEvents; // spring batch reader to skip reading
 		}else{

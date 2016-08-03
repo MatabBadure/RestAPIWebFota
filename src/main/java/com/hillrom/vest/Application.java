@@ -30,7 +30,7 @@ public class Application {
     private Environment env;
 
     /**
-     * Initializes HillRomVest.
+     * Initializes HillRomVest Application.
      * <p/>
      * Spring profiles can be configured with a program arguments --spring.profiles.active=your-active-profile
      * <p/>

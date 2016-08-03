@@ -383,7 +383,7 @@ public class PatientProtocolService {
 		}
 		patientProtocolAssoc.setId(protocolId);
 		patientProtocolAssoc.setProtocolKey(protocolKey);
-		patientProtocolAssoc.setLastModifiedDate(DateTime.now());
+		patientProtocolAssoc.setLastModifiedDate(DateTime.now().plusSeconds(1));
 		patientProtocolRepository.saveAndFlush(patientProtocolAssoc);
 		protocolList.add(patientProtocolAssoc);
 	}

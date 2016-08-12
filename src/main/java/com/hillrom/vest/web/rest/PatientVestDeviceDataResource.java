@@ -45,7 +45,7 @@ public class PatientVestDeviceDataResource {
 	public ResponseEntity<?> receiveData(@RequestBody(required=true)String rawMessage){
 		log.debug("Received Data for ingestion : ",rawMessage);
 		try{
-			JSONObject jsonObject = new JSONObject();
+			JSONObject jsonObject = new JSONObject();			
 			ExitStatus exitStatus = deviceDataService.saveData(rawMessage.replaceAll("\n", "").replaceAll(" ", ""));
 			jsonObject.put("message",exitStatus.getExitCode());
 			if(ExitStatus.COMPLETED.equals(exitStatus))

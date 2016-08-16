@@ -176,6 +176,7 @@ public class ClinicService {
 	/**
 	 * @param clinicDTO
 	 * @param clinic
+	 * Method assignUpdated Values
 	 */
 	private void assignUpdatedValues(ClinicDTO clinicDTO, Clinic clinic) {
 		if (clinicDTO.getName() != null)
@@ -194,6 +195,8 @@ public class ClinicService {
 			clinic.setPhoneNumber(clinicDTO.getPhoneNumber());
 		if (clinicDTO.getFaxNumber() != null)
 			clinic.setFaxNumber(clinicDTO.getFaxNumber());
+		if (clinicDTO.getSpeciality() != null)
+			clinic.setSpeciality(clinicDTO.getSpeciality());
 		if (clinicDTO.getHillromId() != null)
 			clinic.setHillromId(clinicDTO.getHillromId());
 		if (clinicDTO.getClinicAdminId() != null)

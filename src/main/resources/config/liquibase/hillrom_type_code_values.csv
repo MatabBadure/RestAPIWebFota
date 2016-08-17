@@ -10,3 +10,10 @@ id,type,type_code,type_code_value
 9,survey_ans_format_types,email,email
 10,survey_ans_format_types,radiobutton,radiobutton
 11,survey_ans_format_types,radiobuttonAndText,radiobutton With a Text next to it
+12,clinic_speciality,Adult CF,Adult CF
+13,clinic_speciality,Pediatric CF,Pediatric CF
+14,clinic_speciality,Adult General Pulmonologist,Adult General Pulmonologist
+15,clinic_speciality,Pediatric General Pulmonologist,Pediatric General Pulmonologist
+16,clinic_speciality,Adult Neurology,Adult Neurology
+17,clinic_speciality,Pediatric Neurology,Pediatric Neurology
+18,clinic_speciality,Bronchiectasis,Bronchiectasis

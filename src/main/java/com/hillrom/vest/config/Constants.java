@@ -204,8 +204,8 @@ public final class Constants {
 	public static final String DURATION_LABEL = "Duration";
 
 	// Cumulative Stats Graph 
-	public static final String HMR_NON_ADHERENCE_LABEL = "HMR Non-Adherence";
-	public static final String SETTING_DEVIATION_LABEL = "Consecutive Frequency Deviation Days";
+	public static final String HMR_NON_ADHERENCE_LABEL = "Patients Below Treatment Minutes";
+	public static final String SETTING_DEVIATION_LABEL = "Patients Below Frequency Setting";
 	public static final String MISSED_THERAPY_DAYS_LABEL = "Consecutive Missed Days";
 	public static final String NO_TRANSMISSION_RECORDED_LABEL = "No Transmission Recorded";
 

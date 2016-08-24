@@ -61,9 +61,15 @@ public class ParserUtil {
 	public static JSONObject getQclJsonDataFromRawMessage(String rawMessage){
 		List<NameValuePair> params = URLEncodedUtils.parse(rawMessage, Charset.defaultCharset());
 		JSONObject qclJsonData = new JSONObject();
-		for(NameValuePair nameValuePair : params){
-			if(QCL_JSON_DATA.equalsIgnoreCase(nameValuePair.getName()))
-				qclJsonData = (JSONObject) JSONValue.parse(nameValuePair.getValue());
+		if(params.get(0).getName().equalsIgnoreCase("device_model_type") && params.get(0).getValue().equalsIgnoreCase("HillRom_Charger")){
+					qclJsonData.put("device_model_type", params.get(0).getValue());
+					qclJsonData.put("device_data", params.get(1).getValue());				
+		}else{
+			for(NameValuePair nameValuePair : params){
+				if(QCL_JSON_DATA.equalsIgnoreCase(nameValuePair.getName()))
+					qclJsonData = (JSONObject) JSONValue.parse(nameValuePair.getValue());
+				qclJsonData.put("device_model_type", "HillRom_Vest");
+			}
 		}
 		return qclJsonData;
 	}

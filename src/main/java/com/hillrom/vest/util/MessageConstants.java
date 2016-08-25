@@ -99,5 +99,7 @@ public class MessageConstants {
     public static final String HR_309 = "Test Result updated successfully.";
     public static final String HR_310 = "Test Result fetched successfully.";
     
+    public static final String HR_311 = "Type Code values fetched successfully.";
+    public static final String HR_312 = "No associated Type Code values found.";
     
 }

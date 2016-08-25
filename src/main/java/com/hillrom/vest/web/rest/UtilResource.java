@@ -39,14 +39,13 @@ public class UtilResource {
     /**
      * GET  /listTypeCode/{codeType} -> get all the speciality from type code.
      */
-    @RequestMapping(value = "/listTypeCode/{codeType}",
+    @RequestMapping(value = "/codeValues/{codeType}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
     public ResponseEntity<JSONObject> getListTypeCode(@PathVariable String codeType) throws HillromException {
         log.debug("REST request to get List of Type code : {}", codeType);
         JSONObject jsonObject = new JSONObject();
-        List<String> typeCodeList = hillromTypeCodeFormatRepository.findTypeCodeListVal(codeType);
+        List<String> typeCodeList = hillromTypeCodeFormatRepository.findCodeValuesList(codeType);
         if(typeCodeList.isEmpty()){
         	jsonObject.put("message", MessageConstants.HR_312);
         }else{        

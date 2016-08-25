@@ -10,5 +10,5 @@ import com.hillrom.vest.domain.HillromTypeCodeFormat;
 public interface HillromTypeCodeFormatRepository extends JpaRepository<HillromTypeCodeFormat, Long> {
 
 	@Query("from HillromTypeCodeFormat where type = ?1")
-	public List<String> findTypeCodeListVal(String type);
+	public List<String> findCodeValuesList(String type);
 }

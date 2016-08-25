@@ -143,6 +143,10 @@ public class UserResource {
 	@Inject
 	private GraphService hmrGraphService;
 	
+	@Qualifier("adherenceTrendGraphService")
+	@Inject
+	private GraphService adherenceTrendGraphService;
+	
 	@Qualifier("complianceGraphService")
 	@Inject
 	private GraphService complianceGraphService;
@@ -586,6 +590,31 @@ public class UserResource {
             }
     }
     
+	@RequestMapping(value = "/users/{id}/adherenceTrendGraphData", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getAdherenceTrendGraphData(
+			@PathVariable Long id,
+			@RequestParam(value = "from", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
+			@RequestParam(value = "to", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to,
+			@RequestParam(value = "duration", required = true) String duration) {
+		try {
+			List<ProtocolRevisionVO> adherenceTrendData = patientComplianceService
+					.findAdherenceTrendByUserIdAndDateRange(id, from, to);
+			if (adherenceTrendData.size() > 0) {
+				Graph adherenceTrendGraph = adherenceTrendGraphService
+						.populateGraphData(adherenceTrendData, new Filter(from,
+								to, duration, null));
+				return new ResponseEntity<>(adherenceTrendGraph, HttpStatus.OK);
+			}
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch (Exception ex) {
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("ERROR", ExceptionConstants.HR_717);
+			return new ResponseEntity<>(jsonObject,
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+    
     @RequestMapping(value = "/users/{id}/compliance",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -1014,8 +1043,7 @@ public class UserResource {
     		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to){
     	log.debug("REST request to get Adherence Trend for the duration : ", id,from,to);
     	try {
-
-            List<ProtocolRevisionVO> adherenceTrends = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
+    		List<ProtocolRevisionVO> adherenceTrends = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
             return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
 		} catch (HillromException e) {
 			// TODO: handle exception

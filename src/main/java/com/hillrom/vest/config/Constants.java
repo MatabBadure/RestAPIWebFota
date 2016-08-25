@@ -146,6 +146,8 @@ public final class Constants {
 	
 	public static final String XAXIS_TYPE_DATETIME = "datetime";
 	
+	public static final String XAXIS_TYPE_DATE = "date";
+	
 	public static final String LA_DAYVIEW_LABEL = "No.of Logins";
 	
 	public static final String UNABLE_TO_ASSESS = "Unable to assess";
@@ -193,6 +195,13 @@ public final class Constants {
 	public static final String KEY_DURATION = "duration";
 	public static final String KEY_PRESSURE = "pressure";
 	public static final String KEY_SESSION_NO = "sessionNo";
+	
+	//AdherenceTrend Graph Y-axis labels
+	public static final String ADHERENCE_SCORE_LABEL = "SCORE";
+	
+	//AdherenceTrend Graph tooltip labels
+	public static final String KEY_ADHERENCE_SCORE = "score";
+	public static final String KEY_NOTIFICATIONS_POINT = "notification";
 
 	// Compliance Graph 
 	public static final String KEY_MAX = "max";

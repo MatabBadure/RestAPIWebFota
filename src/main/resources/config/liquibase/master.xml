@@ -90,8 +90,7 @@
 	<include file="classpath:/config/liquibase/changelog/20160503251146_update_manage_patient_user_sp.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20160812165240_add_speciality_clinic.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20160824110756_create_charger_data_data_table.xml" relativeToChangelogFile="false"/>
-	<include file="classpath:/config/liquibase/changelog/20160822165530_add_speciality_typeCode.xml" relativeToChangelogFile="false"/>
-  </databaseChangeLog>
+	<include file="classpath:/config/liquibase/changelog/20160822165530_add_speciality_typeCode.xml" relativeToChangelogFile="false"/>  
  </databaseChangeLog>
  
  

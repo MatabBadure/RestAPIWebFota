@@ -1,9 +1,8 @@
 id,type,type_code,type_code_value
-12,clinic_speciality,AdultCF,Adult CF
-13,clinic_speciality,PediatricCF,Pediatric CF
-14,clinic_speciality,AdultGeneralPulmonologist,Adult General Pulmonologist
-15,clinic_speciality,PediatricGeneralPulmonologist,Pediatric General Pulmonologist
-16,clinic_speciality,AdultNeurology,Adult Neurology
-17,clinic_speciality,PediatricNeurology,Pediatric Neurology
+12,clinic_speciality,Adult CF,Adult CF
+13,clinic_speciality,Pediatric CF,Pediatric CF
+14,clinic_speciality,Adult GeneralPulmonologist,Adult General Pulmonologist
+15,clinic_speciality,Pediatric General Pulmonologist,Pediatric General Pulmonologist
+16,clinic_speciality,Adult Neurology,Adult Neurology
+17,clinic_speciality,Pediatric Neurology,Pediatric Neurology
 18,clinic_speciality,Bronchiectasis,Bronchiectasis
-19,clinic_speciality,testing_test,testing_test

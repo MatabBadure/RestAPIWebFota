@@ -88,6 +88,7 @@
     <include file="classpath:/config/liquibase/changelog/20160503134400_added_serialnumber_bluetoothid_to_therapysession.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20160503133800_update_manage_device_sp.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20160812165240_add_speciality_clinic.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20160822034818_add_patient_details.xml" relativeToChangelogFile="false"/>
 	
  </databaseChangeLog>
  

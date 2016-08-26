@@ -27,6 +27,8 @@ public class ClinicVO implements Serializable {
     private String phoneNumber;
 
     private String faxNumber;
+    
+    private String speciality;
 
     private String hillromId;
     
@@ -44,7 +46,7 @@ public class ClinicVO implements Serializable {
     private List<ClinicVO> childClinicVOs = new LinkedList<>();
 
     public ClinicVO(String id,String name, String address, String address2, Integer zipcode, String city,
-			String state, String phoneNumber, String faxNumber, Long clinicAdminId,
+			String state, String phoneNumber, String faxNumber, String speciality, Long clinicAdminId,
 			Boolean parent, String hillromId,Boolean deleted,DateTime createdAt) {
 		super();
 		this.id = id;
@@ -56,6 +58,7 @@ public class ClinicVO implements Serializable {
 		this.state = state;
 		this.phoneNumber = phoneNumber;
 		this.faxNumber = faxNumber;
+		this.speciality = speciality;
 		this.clinicAdminId = clinicAdminId;
 		this.parent = parent;
 		this.hillromId = hillromId;
@@ -135,6 +138,14 @@ public class ClinicVO implements Serializable {
         this.faxNumber = faxNumber;
     }
 
+    public String getSpeciality() {
+        return speciality;
+    }
+
+    public void setSpeciality(String speciality) {
+        this.speciality = speciality;
+    }
+    
     public String getHillromId() {
         return hillromId;
     }

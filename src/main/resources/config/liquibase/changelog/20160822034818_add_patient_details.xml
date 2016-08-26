@@ -17,5 +17,15 @@
    		<addColumn tableName="PATIENT_INFO">
         	<column name="garment_color" type="varchar(255)"/>
         </addColumn>
+        
+        <addColumn tableName="PATIENT_VEST_DEVICE_HISTORY">
+        	<column name="garment_type" type="varchar(255)"/>
+        </addColumn>
+        <addColumn tableName="PATIENT_VEST_DEVICE_HISTORY">
+        	<column name="garment_size" type="varchar(255)"/>
+        </addColumn>
+   		<addColumn tableName="PATIENT_VEST_DEVICE_HISTORY">
+        	<column name="garment_color" type="varchar(255)"/>
+        </addColumn>
 	</changeSet>
 </databaseChangeLog>

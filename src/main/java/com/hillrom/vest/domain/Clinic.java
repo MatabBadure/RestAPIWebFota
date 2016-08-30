@@ -67,6 +67,10 @@ public class Clinic implements Serializable {
 
     @Column(name = "fax_number")
     private String faxNumber;
+    
+    @Column(name = "speciality")
+    private String speciality;
+    
 
     @Column(name = "hillrom_id")
     private String hillromId;
@@ -176,6 +180,14 @@ public class Clinic implements Serializable {
         this.faxNumber = faxNumber;
     }
 
+    public String getSpeciality() {
+        return speciality;
+    }
+
+    public void setSpeciality(String speciality) {
+        this.speciality = speciality;
+    }    
+    
     public String getHillromId() {
         return hillromId;
     }
@@ -285,6 +297,7 @@ public class Clinic implements Serializable {
                 ", state='" + state + "'" +
                 ", phoneNumber='" + phoneNumber + "'" +
                 ", faxNumber='" + faxNumber + "'" +
+                ", speciality='" + speciality + "'" +                
                 ", hillromId='" + hillromId + "'" +
                 ", parentClinic='" + parentClinic + "'" +
                 ", deleted='" + deleted + "'" +

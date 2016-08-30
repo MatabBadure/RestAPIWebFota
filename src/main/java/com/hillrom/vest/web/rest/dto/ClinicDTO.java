@@ -32,6 +32,9 @@ public class ClinicDTO {
 
 	@Size(max = 50)
     private String faxNumber;
+	
+	@Size(max = 50)
+    private String speciality;
 
 	@Size(max = 50)
     private String hillromId;
@@ -54,7 +57,7 @@ public class ClinicDTO {
 	}
 
 	public ClinicDTO(String name, String address, String address2, Integer zipcode, String city,
-			String state, String phoneNumber, String faxNumber, Long clinicAdminId,
+			String state, String phoneNumber, String faxNumber, String speciality, Long clinicAdminId,
 			Boolean parent, Boolean deleted, String hillromId) {
 		super();
 		this.name = name;
@@ -65,6 +68,7 @@ public class ClinicDTO {
 		this.state = state;
 		this.phoneNumber = phoneNumber;
 		this.faxNumber = faxNumber;
+		this.speciality = speciality;
 		this.clinicAdminId = clinicAdminId;
 		this.parent = parent;
 		this.deleted = deleted;
@@ -143,7 +147,15 @@ public class ClinicDTO {
 	public void setFaxNumber(String faxNumber) {
 		this.faxNumber = faxNumber;
 	}
+	
+	public String getSpeciality() {
+		return speciality;
+	}
 
+	public void setSpeciality(String speciality) {
+		this.speciality = speciality;
+	}
+	
 	public String getHillromId() {
 		return hillromId;
 	}

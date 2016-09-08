@@ -64,7 +64,7 @@ public class PatientVestDeviceDataResource {
 
 			JSONObject chargerJsonData = ParserUtil.getQclJsonDataFromRawMessage(rawMessage);
 			if(chargerJsonData.get("device_model_type").toString().equalsIgnoreCase("HillRom_Monarch")){
-				ChargerData chargerData = chargerDataService.saveOrUpdateChargerData(chargerJsonData);	
+				ChargerData chargerData = chargerDataService.saveOrUpdateChargerData(rawMessage);	
 				if(chargerData.getDeviceData().length() > 0){
 					jsonObject.put("message",ExitStatus.COMPLETED);
 					return new ResponseEntity<>(jsonObject,HttpStatus.CREATED);

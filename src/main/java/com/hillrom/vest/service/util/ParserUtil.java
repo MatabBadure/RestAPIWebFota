@@ -86,8 +86,7 @@ public class ParserUtil {
 					qclJsonData.put(CRC, nameValuePair.getValue());					
 				qclJsonData.put("device_model_type", "HillRom_Monarch");
 			}
-				//	qclJsonData.put("device_model_type", params.get(0).getValue());
-				//	qclJsonData.put("device_data", params.get(1).getValue());				
+			
 		}else{
 			for(NameValuePair nameValuePair : params){
 				if(QCL_JSON_DATA.equalsIgnoreCase(nameValuePair.getName()))

@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import javax.inject.Inject;
+import net.minidev.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.LocalDate;
@@ -29,6 +30,13 @@ import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
+
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_SN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_WIFI;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_LTE;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_VER;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CRC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_DATA;
 
 @Service
 @Transactional
@@ -58,9 +66,9 @@ public class ChargerDataService {
 	
 
 	
-	public ChargerData saveOrUpdateChargerData(String deviceData) throws HillromException{			
+	public ChargerData saveOrUpdateChargerData(JSONObject chargerJsonData) throws HillromException{			
 		ChargerData chargerData = new ChargerData();
-		chargerData.setDeviceData(deviceData);
+		chargerData.setDeviceData(chargerJsonData.get(DEVICE_DATA).toString());
 		chargerData.setCreatedTime(new DateTime());
 		chargerDataRepository.save(chargerData);
 		return chargerData;

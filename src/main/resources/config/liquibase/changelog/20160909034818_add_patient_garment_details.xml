@@ -27,5 +27,8 @@
    		<addColumn tableName="PATIENT_VEST_DEVICE_HISTORY">
         	<column name="garment_color" type="varchar(255)"/>
         </addColumn>
+        <loadUpdateData encoding="UTF-8"
+			file="config/liquibase/hillrom_type_code_values_garment.csv" separator="," tableName="HILLROM_TYPE_CODE_VALUES" primaryKey="id">
+		</loadUpdateData>
 	</changeSet>
 </databaseChangeLog>

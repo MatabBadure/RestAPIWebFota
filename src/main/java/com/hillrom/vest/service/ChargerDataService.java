@@ -96,7 +96,7 @@ public class ChargerDataService {
 			if(missingParams.size() > 0){
 				throw new HillromException("Missing Params : "+String.join(",",missingParams));
 			}else{
-				if(!validateCheckSum(chargerJsonData.getOrDefault(CRC, new JSONObject()).toString()))
+				if(!validateCheckSum(chargerJsonData,chargerJsonData.getOrDefault(CRC, new JSONObject()).toString()))
 					throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	
 			}
 		}
@@ -104,7 +104,8 @@ public class ChargerDataService {
 		return chargerJsonData;
 	}
 	
-	private boolean validateCheckSum(String checkSum) throws HillromException {
+	private boolean validateCheckSum(JSONObject chargerJsonData, String checkSum) throws HillromException {
+		System.out.println("Charger Json Data : " + chargerJsonData);
 		String validCheckSum = "XXXX";
 		if(checkSum.equalsIgnoreCase(validCheckSum)){
 			return true;

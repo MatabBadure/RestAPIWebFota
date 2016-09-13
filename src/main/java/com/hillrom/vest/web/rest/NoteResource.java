@@ -92,6 +92,51 @@ public class NoteResource {
 			return new ResponseEntity<>(note, HttpStatus.CREATED);
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}	
+	
+	@RequestMapping(value="/memoNotes", method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> createMemo(@RequestBody(required=true) Map<String,String> paramsMap){
+		if(SecurityUtils.isUserInRole(AuthoritiesConstants.PATIENT)){
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		JSONObject jsonObject = new JSONObject();
+		String noteText = paramsMap.get("noteText");
+		String userId = paramsMap.get("userId");
+		String patientId = paramsMap.get("patientId");
+		String dateString = paramsMap.get("date");
+		
+		LocalDate date = null;
+		try {
+			date = StringUtils.isNoneBlank(dateString)? DateUtil.parseStringToLocalDate(dateString, YYYY_MM_DD) : LocalDate.now();
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+		}
+		Note note = null;
+	
+		if(Objects.isNull(noteText)){
+			jsonObject.put("ERROR", "Required Param missing [noteText]");
+			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+		}
+		
+		if(Objects.nonNull(userId) && Objects.nonNull(patientId)){
+			try {
+				note = noteService.saveOrUpdateNoteByUserForPatientId(Long.parseLong(userId), patientId, noteText,date);
+			} catch (NumberFormatException e) {
+				jsonObject.put("ERROR", "Number Format Exception");
+				return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+			} catch (HillromException e) {
+				jsonObject.put("ERROR", e.getMessage());
+				return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+			}
+		}else{
+			jsonObject.put("ERROR", "Required Param missing [noteText,patientId/userId]");
+			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+		}
+		if(Objects.nonNull(note)){
+			return new ResponseEntity<>(note, HttpStatus.CREATED);
+		}
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 	
 	@RequestMapping(value="/users/{userId}/notes",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)

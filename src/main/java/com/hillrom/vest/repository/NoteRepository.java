@@ -19,6 +19,9 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
 	@Query("from Note note where  note.patientUser.id = ?1  and note.createdOn = ?2")
 	Optional<Note> findOneByPatientUserIdAndCreatedOn(Long userId,LocalDate date);
 	
+	@Query("from Note note where note.patientUser.id = ?1  and note.patient.id = ?1 and note.createdOn = ?2")
+	Optional<Note> findOneByPatientUserIdAndPatientIdAndCreatedOn(Long userId,String patientId,LocalDate date);
+	
 	Page<Note> findByPatientUserIdAndCreatedOnBetweenAndDeletedOrderByCreatedOnDesc(Long userId,LocalDate from,LocalDate to,Boolean isDeleted,Pageable pageable);
 	
 	List<Note> findByPatientUserIdAndCreatedOnBetweenAndDeletedOrderByCreatedOnAsc(Long userId,LocalDate from,LocalDate to,Boolean isDeleted);

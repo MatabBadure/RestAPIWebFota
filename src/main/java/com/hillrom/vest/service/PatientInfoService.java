@@ -27,6 +27,13 @@ public class PatientInfoService {
     	Optional<PatientInfo> patientInfo = patientInfoRepository.findOneByHillromId(hillRomId);
     	return patientInfo;
     }
+    
+    public PatientInfo findOneById(String id){
+    	log.debug("id :: "+id);
+    	PatientInfo patientInfo = patientInfoRepository.findOneById(id);
+    	return patientInfo;
+    }
+    
  
     public void update(PatientInfo patientInfo){
     	log.debug("hillRomId :: "+patientInfo);

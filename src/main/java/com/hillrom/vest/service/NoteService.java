@@ -22,6 +22,7 @@ import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.NoteRepository;
+import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.util.ExceptionConstants;
@@ -45,6 +46,9 @@ public class NoteService {
 	
 	@Inject
 	private PatientNoEventService patientNoEventService;
+
+	@Inject
+	private PatientInfoService patientInfoService;
 	
 	public Note findOneByUserIdAndDate(Long userId,LocalDate date){
 		Optional<Note> note =  noteRepository.findOneByPatientUserIdAndCreatedOn(userId, date);
@@ -56,6 +60,13 @@ public class NoteService {
 	
 	public Note findOneByPatientIdAndDate(String patientId,LocalDate date){
 		Optional<Note> note =  noteRepository.findOneByPatientIdAndCreatedOn(patientId,date);
+		if(note.isPresent())
+			return note.get();
+		return null;
+	}
+	
+	public Note findOneByUserIdAndPatientIDAndDate(Long userId, String patientId, LocalDate date){
+		Optional<Note> note =  noteRepository.findOneByPatientUserIdAndPatientIdAndCreatedOn(userId, patientId, date);
 		if(note.isPresent())
 			return note.get();
 		return null;
@@ -120,6 +131,32 @@ public class NoteService {
 			existingNote.setDeleted(false);
 			noteRepository.save(existingNote);
 		}
+		return existingNote;
+	}
+	
+	public Note saveOrUpdateNoteByUserForPatientId(Long userId, String patientId,String note,LocalDate date) throws HillromException{
+		
+		if(StringUtils.isBlank(note))
+			return null;
+				
+		Note existingNote = findOneByUserIdAndPatientIDAndDate(userId, patientId, date);
+		if(Objects.isNull(existingNote)){
+			existingNote = new Note();
+			
+			PatientInfo patientInfo = patientInfoService.findOneById(patientId);
+	    	existingNote.setPatient(patientInfo);
+	    	
+	    	User patientUser = userRepository.findOne(userId);
+			existingNote.setPatientUser(patientUser);
+			existingNote.setNote(note);
+			existingNote.setCreatedOn(date);
+			noteRepository.save(existingNote);
+		}else{
+			existingNote.setNote(note);
+			existingNote.setDeleted(false);
+			noteRepository.save(existingNote);
+		}
+		
 		return existingNote;
 	}
 	

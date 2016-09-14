@@ -13,6 +13,8 @@ import net.minidev.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.joda.time.DateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,6 +54,7 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVI
 public class ChargerDataService {
 
 
+	private final Logger log = LoggerFactory.getLogger(ChargerDataService.class);
 
 	@Inject
 	private ChargerDataRepository chargerDataRepository;
@@ -96,7 +99,7 @@ public class ChargerDataService {
 			if(missingParams.size() > 0){
 				throw new HillromException("Missing Params : "+String.join(",",missingParams));
 			}else{
-				if(!validateCheckSum(chargerJsonData,chargerJsonData.getOrDefault(CRC, new JSONObject()).toString()))
+				if(!validateCheckSum(rawData,chargerJsonData.getOrDefault(CRC, new JSONObject()).toString()))
 					throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	
 			}
 		}
@@ -104,10 +107,21 @@ public class ChargerDataService {
 		return chargerJsonData;
 	}
 	
-	private boolean validateCheckSum(JSONObject chargerJsonData, String checkSum) throws HillromException {
-		System.out.println("Charger Json Data : " + chargerJsonData);
-		String validCheckSum = "XXXX";
-		if(checkSum.equalsIgnoreCase(validCheckSum)){
+	private boolean validateCheckSum(String rawData, String receivedCRC) throws HillromException {
+		log.debug("Raw Data : " + rawData);
+		
+		String buffer = rawData;int crc_value = 0;String sOut = "";
+		for(int i=0;i<buffer.length();i++)
+		{
+			sOut = sOut + (int)buffer.charAt(i) + " ";
+		    crc_value = crc_value + (int)buffer.charAt(i);
+		}
+		
+		log.debug("decimal String : "+sOut);
+		log.debug("Received CRC : " + Integer.parseInt(receivedCRC));
+		log.debug("calculated CRC : " + crc_value);
+		
+		if(crc_value == Integer.parseInt(receivedCRC)){
 			return true;
 		}else{
 			return false;

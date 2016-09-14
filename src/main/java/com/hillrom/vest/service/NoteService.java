@@ -134,12 +134,15 @@ public class NoteService {
 		return existingNote;
 	}
 	
+	// For updating patients memo notes by HCP/CA
 	public Note saveOrUpdateNoteByUserForPatientId(Long userId, String patientId,String note,LocalDate date) throws HillromException{
 		
 		if(StringUtils.isBlank(note))
 			return null;
 				
 		Note existingNote = findOneByUserIdAndPatientIDAndDate(userId, patientId, date);
+		
+		// For adding new memo note entered by HCP/CA for the patient with the same date
 		if(Objects.isNull(existingNote)){
 			existingNote = new Note();
 			
@@ -152,6 +155,8 @@ public class NoteService {
 			existingNote.setCreatedOn(date);
 			noteRepository.save(existingNote);
 		}else{
+			
+			// For updating the existing memo note entered by HCP/CA for the patient for the same date
 			existingNote.setNote(note);
 			existingNote.setDeleted(false);
 			noteRepository.save(existingNote);

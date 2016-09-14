@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 
 import net.minidev.json.JSONObject;
 
@@ -34,6 +35,8 @@ import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.NoteService;
 import com.hillrom.vest.service.util.DateUtil;
+import com.hillrom.vest.web.rest.dto.NoteDTO;
+import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 @RestController
@@ -94,16 +97,19 @@ public class NoteResource {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}	
 	
+	/**
+     * POST  /memoNotes -> Create memo notes for a patient by CA/HCP.
+     */
 	@RequestMapping(value="/memoNotes", method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> createMemo(@RequestBody(required=true) Map<String,String> paramsMap){
+	public ResponseEntity<?> createMemoNew(@Valid @RequestBody(required=true) NoteDTO noteDTO){
 		if(SecurityUtils.isUserInRole(AuthoritiesConstants.PATIENT)){
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 		JSONObject jsonObject = new JSONObject();
-		String noteText = paramsMap.get("noteText");
-		String userId = paramsMap.get("userId");
-		String patientId = paramsMap.get("patientId");
-		String dateString = paramsMap.get("date");
+		String noteText = noteDTO.getNote();
+		String userId = noteDTO.getUserId();
+		String patientId = noteDTO.getPatientId();
+		String dateString = noteDTO.getCreatedOn();
 		
 		LocalDate date = null;
 		try {

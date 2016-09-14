@@ -28,6 +28,7 @@ public class PatientInfoService {
     	return patientInfo;
     }
     
+    // To get the patient details by patient id
     public PatientInfo findOneById(String id){
     	log.debug("id :: "+id);
     	PatientInfo patientInfo = patientInfoRepository.findOneById(id);

@@ -96,8 +96,13 @@ public class ChargerDataService {
 			throw new HillromException("Missing Params : "+String.join(",",reqParams));
 		}else if(Objects.nonNull(chargerJsonData)){
 			List<String> missingParams = RandomUtil.getDifference(Arrays.asList(reqParams), new ArrayList<String>(chargerJsonData.keySet()));
+
 			if(missingParams.size() > 0){
-				throw new HillromException("Missing Params : "+String.join(",",missingParams));
+				if(missingParams.contains(DEVICE_SN) || (missingParams.contains(DEVICE_WIFI) && missingParams.contains(DEVICE_LTE)) ||
+						missingParams.contains(DEVICE_VER) || missingParams.contains(DEVICE_DATA) || missingParams.contains(CRC)
+						){
+					throw new HillromException("Missing Params : "+String.join(",",missingParams));
+				}
 			}else{
 				if(!validateCheckSum(rawData,chargerJsonData.getOrDefault(CRC, new JSONObject()).toString()))
 					throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	

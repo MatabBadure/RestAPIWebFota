@@ -92,6 +92,4 @@
 	<include file="classpath:/config/liquibase/changelog/20160824110756_create_charger_data_data_table.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20160822165530_add_speciality_typeCode.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20160909034818_add_patient_garment_details.xml" relativeToChangelogFile="false"/>
-	<include file="classpath:/config/liquibase/changelog/20160914040200_altered_datatype_ChargerData.xml" relativeToChangelogFile="false"/>
-	<include file="classpath:/config/liquibase/changelog/20160914042700_added_entities_Messaging.xml" relativeToChangelogFile="false"/>
  </databaseChangeLog>

@@ -24,4 +24,12 @@ public class PatientVestDeviceRawLogModelConstants {
 	public static final String TWO_NET_PROPERTIES = "twonetProperties";
 	public static final String VALUE = "value";
 	public static final String QCL_JSON_DATA = "qcl_json_data";
+	
+	
+	public static final String DEVICE_SN = "devSN";
+	public static final String DEVICE_WIFI = "devWIFI";
+	public static final String DEVICE_LTE = "devLTE";
+	public static final String DEVICE_VER = "devVer";
+	public static final String CRC = "crc";
+	
 }

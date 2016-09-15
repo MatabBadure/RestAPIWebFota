@@ -143,8 +143,8 @@ public class UserService {
         log.debug("Activating user for activation key {}", key);
         Optional<User> optionalExistingUser = userRepository.findOneByActivationKey(key);
            if(optionalExistingUser.isPresent()) {
-            	DateTime twoDaysAgo = DateTime.now().minusHours(48);
-                if(optionalExistingUser.get().getActivationLinkSentDate().isBefore(twoDaysAgo.toInstant().getMillis()))
+            	DateTime threeDaysAgo = DateTime.now().minusHours(72);
+                if(optionalExistingUser.get().getActivationLinkSentDate().isBefore(threeDaysAgo.toInstant().getMillis()))
              	   throw new HillromException(ExceptionConstants.HR_592);//Activation Link Expired
                 else if(optionalExistingUser.get().isDeleted())
                 	throw new HillromException(ExceptionConstants.HR_705 + ExceptionConstants.HR_706);
@@ -163,8 +163,8 @@ public class UserService {
         log.debug("Activating user for activation key {}", key);
         Optional<User> optionalExistingUser = userRepository.findOneByActivationKey(key);
            if(optionalExistingUser.isPresent()) {
-            	DateTime twoDaysAgo = DateTime.now().minusHours(48);
-                if(optionalExistingUser.get().getActivationLinkSentDate().isBefore(twoDaysAgo.toInstant().getMillis()))
+            	DateTime threeDaysAgo = DateTime.now().minusHours(72);
+                if(optionalExistingUser.get().getActivationLinkSentDate().isBefore(threeDaysAgo.toInstant().getMillis()))
              	   throw new HillromException(ExceptionConstants.HR_592);//Activation Link Expired
                 else if(optionalExistingUser.get().isDeleted())
                 	throw new HillromException(ExceptionConstants.HR_705 + ExceptionConstants.HR_706);
@@ -1200,6 +1200,8 @@ public class UserService {
 		if(null == user)
 			return Optional.empty();
 		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
+		if(null == patientInfo)
+			return Optional.empty();
 		PatientCompliance compliance = complianceService.findLatestComplianceByPatientUserId(id);
 		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patientInfo.getId());
 		PatientUserVO patientUserVO =  new PatientUserVO(user,patientInfo);

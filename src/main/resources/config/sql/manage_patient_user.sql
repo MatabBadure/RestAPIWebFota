@@ -87,9 +87,9 @@ BEGIN
 		SET return_patient_id = @gen_patient_id;
         INSERT INTO `PATIENT_COMPLIANCE` (`patient_id`, `user_id`, `date`, `compliance_score`, `hmr_run_rate`, `hmr`,
 		`is_hmr_compliant`, `is_settings_deviated`, `missed_therapy_count`,
-		`last_therapy_session_date`, `settings_deviated_days_count`)
+		`last_therapy_session_date`, `settings_deviated_days_count`,`created_by`,`created_date`)
 		VALUES
-		(@gen_patient_id,return_user_id,now(),100,0,0,true,false,0,null,0);
+		(@gen_patient_id,return_user_id,now(),100,0,0,true,false,0,null,0,created_by,created_date);
         
         INSERT INTO `PATIENT_NO_EVENT` (`first_transmission_date`, `user_created_date`, `patient_id`, `user_id`)
 		VALUES

@@ -66,5 +66,9 @@ public class AuditableRepository <T extends Serializable> implements IAuditOpera
 	        final List<T> resultList = convertToEntity(results);
 	        return resultList;
 	    }
+	    
+	    public EntityManager getEntityManager(){
+	    	   return entityManager; 
+	    }
 
 }

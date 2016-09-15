@@ -112,6 +112,7 @@ public class PatientProtocolService {
 				// Check whether protocol type is same
 				Boolean isFirstPoint = true;
 				PatientProtocolData existingPPD = patientProtocolRepository.findOne(ppdList.get(0).getId());
+				//If not same
 				if (Objects.nonNull(existingPPD) & !existingPPD.getType().equalsIgnoreCase(type)) {
 					String protocolId = null;
 					deleteProtocolForPatient(patientUserId, protocolKey);
@@ -242,6 +243,10 @@ public class PatientProtocolService {
 	     		} else {
 	     			protocolList.forEach(protocol -> {
 	     				protocol.setDeleted(true);
+	     				//When deleting last modified date needs to be updated
+	     				//one sec less than the new created Date to recognize 
+	     				//new and old separately
+	     				protocol.setLastModifiedDate(new DateTime().minusSeconds(1));
 	     				patientProtocolRepository.save(protocol);
 	     			});
 	     			return MessageConstants.HR_244;
@@ -378,7 +383,7 @@ public class PatientProtocolService {
 		}
 		patientProtocolAssoc.setId(protocolId);
 		patientProtocolAssoc.setProtocolKey(protocolKey);
-		patientProtocolAssoc.setLastModifiedDate(DateTime.now());
+		patientProtocolAssoc.setLastModifiedDate(DateTime.now().plusSeconds(1));
 		patientProtocolRepository.saveAndFlush(patientProtocolAssoc);
 		protocolList.add(patientProtocolAssoc);
 	}

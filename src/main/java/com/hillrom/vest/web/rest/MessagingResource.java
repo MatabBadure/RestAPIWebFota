@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 
 import net.minidev.json.JSONObject;
 
@@ -28,12 +29,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hillrom.vest.domain.ChargerData;
+import com.hillrom.vest.domain.Messages;
 import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
+import com.hillrom.vest.service.ChargerDataService;
+import com.hillrom.vest.service.MessagingService;
 import com.hillrom.vest.service.NoteService;
 import com.hillrom.vest.service.util.DateUtil;
+import com.hillrom.vest.web.rest.dto.MessageDTO;
+import com.hillrom.vest.web.rest.dto.NoteDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 @RestController
@@ -41,7 +48,38 @@ import com.hillrom.vest.web.rest.util.PaginationUtil;
 public class MessagingResource {
 
 	@Inject
-	private NoteService noteService;
+	private MessagingService messagingService;
+	
+	/**
+     * POST  /message -> Create / Compose new message.
+     */
+	@RequestMapping(value="/message", method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> createMessage(@Valid @RequestBody(required=true) MessageDTO messageDTO){
+
+		JSONObject jsonObject = new JSONObject();
+		
+		try{
+			
+	
+			Long fromUserId = messageDTO.getFromUserId();
+			String messageSubject = messageDTO.getMessageSubject();
+			Long messageSizeInMbs = messageDTO.getMessageSizeMbs();
+			String messageType = messageDTO.getMessageType();
+			Long toMessageId = messageDTO.getToMessageId();
+			Long rootMessageId = messageDTO.getRootMessageId();
+			String messageText = messageDTO.getMessageText();
+	
+			Messages newMessage = messagingService.saveOrUpdateMessageData(messageDTO);
+			if(Objects.nonNull(newMessage))
+				return new ResponseEntity<>(newMessage, HttpStatus.CREATED);
+		}catch(Exception ex){
+			jsonObject.put("ERROR", ex.getMessage());
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		
+	}
 	
 
 }

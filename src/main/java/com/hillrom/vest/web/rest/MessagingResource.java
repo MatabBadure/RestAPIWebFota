@@ -77,9 +77,9 @@ public class MessagingResource {
 	}
 
 	/**
-     * GET  /messages/{userId} -> Get Sent Messages for user inbox.
+     * GET  /messages/{fromUserId} -> Get All Sent Messages for user mailbox.
      */
-	@RequestMapping(value="/messages/{fromUserId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value="/messagesSent/{fromUserId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getMessagesSentForInbox(@PathVariable("fromUserId") Long fromUserId){
 
 		JSONObject jsonObject = new JSONObject();
@@ -97,4 +97,25 @@ public class MessagingResource {
 		
 	}
 
+	/**
+     * GET  /messages/{toUserId} -> Get All Received Messages for user mailbox.
+     */
+	@RequestMapping(value="/messagesReceived/{toUserId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getMessagesReceivedForInbox(@PathVariable("toUserId") Long toUserId){
+
+		JSONObject jsonObject = new JSONObject();
+		
+		try{
+			List<Messages> messageList = messagingService.getReceivedMessagesForMailbox(toUserId);
+			if(Objects.nonNull(messageList)){
+				return new ResponseEntity<>(messageList, HttpStatus.OK);
+			}
+		}catch(Exception ex){
+			jsonObject.put("ERROR", ex.getMessage());
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		
+	}
+	
 }

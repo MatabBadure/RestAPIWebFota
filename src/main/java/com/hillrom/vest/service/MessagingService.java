@@ -62,5 +62,12 @@ public class MessagingService {
         return newMessage;
 	}
 	
+	public List<Messages> getSentMessagesForMailbox(Long fromUserId) throws HillromException{
+		List<Messages> messageList = null;
+		messageList = messagingRepository.findByFromUserId(fromUserId);
+		return messageList;
+	}
+	
+	
 
 }

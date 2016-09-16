@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,7 @@ public class MessagingService {
 		
 		newMessage.setFromUserId(messageDTO.getFromUserId());
 		newMessage.setMessageSubject(messageDTO.getMessageSubject());
+		newMessage.setMessageDatetime(new DateTime());
 		newMessage.setMessageSizeMBs(messageDTO.getMessageSizeMbs());
 		newMessage.setMessageType(messageDTO.getMessageType());
 		newMessage.setToMessageId(messageDTO.getToMessageId());

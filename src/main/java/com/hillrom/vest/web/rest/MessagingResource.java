@@ -59,16 +59,7 @@ public class MessagingResource {
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-			
-	
-			Long fromUserId = messageDTO.getFromUserId();
-			String messageSubject = messageDTO.getMessageSubject();
-			Long messageSizeInMbs = messageDTO.getMessageSizeMbs();
-			String messageType = messageDTO.getMessageType();
-			Long toMessageId = messageDTO.getToMessageId();
-			Long rootMessageId = messageDTO.getRootMessageId();
-			String messageText = messageDTO.getMessageText();
-	
+				
 			Messages newMessage = messagingService.saveOrUpdateMessageData(messageDTO);
 			if(Objects.nonNull(newMessage))
 				return new ResponseEntity<>(newMessage, HttpStatus.CREATED);

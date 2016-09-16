@@ -24,6 +24,8 @@ public class MessageDTO {
     
     private String messageText;
     
+    private List<Long> toUserIds;
+    
 	
 
 
@@ -34,15 +36,6 @@ public class MessageDTO {
 
 
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "MessageDTO [fromUserId=" + fromUserId + ", messageSubject=" + messageSubject + ", messageSizeMbs="
-				+ messageSizeMbs + ", messageType=" + messageType + ", toMessageId=" + toMessageId + ", rootMessageId="
-				+ rootMessageId + ", messageText=" + messageText + "]";
-	}
 
 
 
@@ -61,8 +54,13 @@ public class MessageDTO {
 		result = prime * result + ((messageType == null) ? 0 : messageType.hashCode());
 		result = prime * result + ((rootMessageId == null) ? 0 : rootMessageId.hashCode());
 		result = prime * result + ((toMessageId == null) ? 0 : toMessageId.hashCode());
+		result = prime * result + ((toUserIds == null) ? 0 : toUserIds.hashCode());
 		return result;
 	}
+
+
+
+
 
 
 
@@ -114,8 +112,34 @@ public class MessageDTO {
 				return false;
 		} else if (!toMessageId.equals(other.toMessageId))
 			return false;
+		if (toUserIds == null) {
+			if (other.toUserIds != null)
+				return false;
+		} else if (!toUserIds.equals(other.toUserIds))
+			return false;
 		return true;
 	}
+
+
+
+
+
+
+
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "MessageDTO [fromUserId=" + fromUserId + ", messageSubject=" + messageSubject + ", messageSizeMbs="
+				+ messageSizeMbs + ", messageType=" + messageType + ", toMessageId=" + toMessageId + ", rootMessageId="
+				+ rootMessageId + ", messageText=" + messageText + ", toUserIds=" + toUserIds + "]";
+	}
+
+
+
+
 
 
 
@@ -257,5 +281,26 @@ public class MessageDTO {
 		this.messageText = messageText;
 	}
 
+
+
+
+	/**
+	 * @return the toUserIds
+	 */
+	public List<Long> getToUserIds() {
+		return toUserIds;
+	}
+
+
+
+
+	/**
+	 * @param toUserIds the toUserIds to set
+	 */
+	public void setToUserIds(List<Long> toUserIds) {
+		this.toUserIds = toUserIds;
+	}
+
+	
 
 }

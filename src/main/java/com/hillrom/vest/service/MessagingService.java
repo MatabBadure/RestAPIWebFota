@@ -1,5 +1,6 @@
 package com.hillrom.vest.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.vest.domain.MessageTouserAssoc;
 import com.hillrom.vest.domain.Messages;
 import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.PatientInfo;
@@ -25,6 +27,7 @@ import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.MessageTouserAssocRepository;
 import com.hillrom.vest.repository.MessagingRepository;
 import com.hillrom.vest.repository.NoteRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
@@ -41,6 +44,9 @@ public class MessagingService {
 	
 	@Inject
 	private MessagingRepository messagingRepository;
+	
+	@Inject
+	private MessageTouserAssocRepository messageTouserAssocRepository;
 	
 	
 
@@ -60,6 +66,18 @@ public class MessagingService {
 		messagingRepository.save(newMessage);
         log.debug("Created New Message: {}", newMessage);
         return newMessage;
+	}
+	
+	public List<MessageTouserAssoc> saveOrUpdateMessageTousersData(List<Long> toUserIds,Long newMessageId) throws HillromException{
+		List<MessageTouserAssoc> listMessageTouserAssoc = new ArrayList<MessageTouserAssoc>();
+		for(Long userId : toUserIds){
+			MessageTouserAssoc newMessageTouserAssoc = new MessageTouserAssoc();
+			newMessageTouserAssoc.setToMessageId(newMessageId);
+			newMessageTouserAssoc.setToUserId(userId);
+			messageTouserAssocRepository.save(newMessageTouserAssoc);
+			listMessageTouserAssoc.add(newMessageTouserAssoc);
+		}
+		return listMessageTouserAssoc;
 	}
 	
 	public List<Messages> getSentMessagesForMailbox(Long fromUserId) throws HillromException{

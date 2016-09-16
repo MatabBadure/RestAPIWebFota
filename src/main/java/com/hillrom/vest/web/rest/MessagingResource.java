@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.domain.ChargerData;
+import com.hillrom.vest.domain.MessageTouserAssoc;
 import com.hillrom.vest.domain.Messages;
 import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.exceptionhandler.HillromException;
@@ -61,8 +62,11 @@ public class MessagingResource {
 		try{
 				
 			Messages newMessage = messagingService.saveOrUpdateMessageData(messageDTO);
+			List<MessageTouserAssoc> newMessageTouserAssocList = messagingService.saveOrUpdateMessageTousersData(messageDTO.getToUserIds(),newMessage.getId());
+			jsonObject.put("Message", newMessage);
+			jsonObject.put("MessageTouserAssocList", newMessageTouserAssocList);
 			if(Objects.nonNull(newMessage))
-				return new ResponseEntity<>(newMessage, HttpStatus.CREATED);
+				return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
 		}catch(Exception ex){
 			jsonObject.put("ERROR", ex.getMessage());
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

@@ -71,6 +71,26 @@ public class MessagingResource {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		
 	}
-	
+
+	/**
+     * GET  /messages/{userId} -> Get Sent Messages for user inbox.
+     */
+	@RequestMapping(value="/messages/{fromUserId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getMessagesSentForInbox(@PathVariable("fromUserId") Long fromUserId){
+
+		JSONObject jsonObject = new JSONObject();
+		
+		try{
+			List<Messages> messageList = messagingService.getSentMessagesForMailbox(fromUserId);
+			if(Objects.nonNull(messageList)){
+				return new ResponseEntity<>(messageList, HttpStatus.OK);
+			}
+		}catch(Exception ex){
+			jsonObject.put("ERROR", ex.getMessage());
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		
+	}
 
 }

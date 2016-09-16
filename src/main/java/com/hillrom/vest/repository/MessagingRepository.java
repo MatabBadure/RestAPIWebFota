@@ -9,10 +9,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.gemfire.repository.Query;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.Messages;
 import com.hillrom.vest.domain.Note;
 
 public interface MessagingRepository extends JpaRepository<Messages, Long> {
 
 
+	@Query("from Messages messages where messages.fromUserId = ?1 order by messages.message_datetime desc")
+    List<Messages> findByFromUserId(Long fromUserId);
+	
+	
 }

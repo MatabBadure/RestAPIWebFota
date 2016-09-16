@@ -86,6 +86,17 @@ public class MessagingService {
 		return messageList;
 	}
 	
+	public List<Messages> getReceivedMessagesForMailbox(Long toUserId) throws HillromException{
+		List<MessageTouserAssoc> messageTouserAssocList = new ArrayList<MessageTouserAssoc>();;
+		List<Messages> associatedMessagesList = new ArrayList<Messages>();;
+		messageTouserAssocList = messageTouserAssocRepository.findByToUserId(toUserId);
+		for(MessageTouserAssoc messageTouserAssoc : messageTouserAssocList){
+			associatedMessagesList.add(messagingRepository.findById(messageTouserAssoc.getToMessageId()));
+		}
+		return associatedMessagesList;
+	}
+	
+	
 	
 
 }

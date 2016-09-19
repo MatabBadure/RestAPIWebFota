@@ -11,6 +11,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.util.MMDDYYYYLocalDateSerializer;
@@ -61,6 +62,7 @@ public class PatientUserVO {
 	private boolean isExpired;
 	private double hoursOfUsage;
 	private String serialNumber;
+	private Note note;
 	
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
@@ -369,5 +371,13 @@ public class PatientUserVO {
 	public void setSerialNumber(String serialNumber) {
 		this.serialNumber = serialNumber;
 	}
-		
+
+	public Note getNote() {
+		return note;
+	}
+
+	public void setNote(Note note) {
+		this.note = note;
+	}
+
 }

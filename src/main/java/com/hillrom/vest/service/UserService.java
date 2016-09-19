@@ -35,6 +35,7 @@ import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.ClinicPatientAssoc;
 import com.hillrom.vest.domain.EntityUserAssoc;
+import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
@@ -123,6 +124,9 @@ public class UserService {
     
     @Inject
     private EntityUserRepository entityUserRepository;
+    
+	@Inject
+	private NoteService noteService;
 
     public String generateDefaultPassword(User patientUser) {
 		StringBuilder defaultPassword = new StringBuilder();
@@ -1217,6 +1221,11 @@ public class UserService {
 				mrnId = clinicPatientAssoc.getMrnId(); 
 				patientUserVO.setMrnId(mrnId);
 				patientUserVO.setClinicMRNId(clinicMRNId);
+				Note note = noteService.findOneByUserIdAndPatientIDAndDate(
+						patientUserVO.getId(), clinicPatientAssoc.getClinic()
+								.getId(), clinicPatientAssoc.getCreatedDate()
+								.toLocalDate());
+				patientUserVO.setNote(note);
 			}
 		}
 		return Optional.of(patientUserVO);
@@ -1605,6 +1614,10 @@ public class UserService {
 						clinicMRNId.put("status", Constants.INACTIVE);
 					}
 					patientUserVO.setClinicMRNId(clinicMRNId);
+					Note note = noteService.findOneByUserIdAndPatientIDAndDate(
+							patientUserId, clinicId, clinicPatientAssoc.get()
+									.getCreatedDate().toLocalDate());
+					patientUserVO.setNote(note);
 				}
 				return patientUserVO;
     		} else {

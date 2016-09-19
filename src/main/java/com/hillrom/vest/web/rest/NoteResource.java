@@ -111,6 +111,11 @@ public class NoteResource {
 		String patientId = noteDTO.getPatientId();
 		String dateString = noteDTO.getCreatedOn();
 		
+		if(Objects.isNull(dateString)){
+			jsonObject.put("ERROR", "Required Param missing [dateString]");
+			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+		}
+		
 		LocalDate date = null;
 		try {
 			date = StringUtils.isNoneBlank(dateString)? DateUtil.parseStringToLocalDate(dateString, YYYY_MM_DD) : LocalDate.now();
@@ -127,7 +132,12 @@ public class NoteResource {
 		
 		if(Objects.nonNull(userId) && Objects.nonNull(patientId)){
 			try {
-				note = noteService.saveOrUpdateNoteByUserForPatientId(Long.parseLong(userId), patientId, noteText,date);
+				String s = "HR";
+				if(userId.length() > 4 && userId.contains(s)){
+					note = noteService.saveOrUpdateNoteByUserForPatientId(userId, patientId, noteText,date);
+				}else{
+					note = noteService.saveOrUpdateNoteByUserForPatientId(Long.parseLong(userId), patientId, noteText,date);
+				}
 			} catch (NumberFormatException e) {
 				jsonObject.put("ERROR", "Number Format Exception");
 				return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);

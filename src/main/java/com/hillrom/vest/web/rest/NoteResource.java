@@ -108,16 +108,11 @@ public class NoteResource {
 		JSONObject jsonObject = new JSONObject();
 		String noteText = noteDTO.getNote();
 		String userId = noteDTO.getUserId();
+		String userHrId = noteDTO.getUserHrId();
 		String patientId = noteDTO.getPatientId();
-		String dateString = noteDTO.getCreatedOn();
 		
-		LocalDate date = null;
-		try {
-			date = StringUtils.isNoneBlank(dateString)? DateUtil.parseStringToLocalDate(dateString, YYYY_MM_DD) : LocalDate.now();
-		} catch (HillromException e) {
-			jsonObject.put("ERROR", e.getMessage());
-			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
-		}
+		LocalDate date = LocalDate.now();
+		
 		Note note = null;
 	
 		if(Objects.isNull(noteText)){
@@ -125,9 +120,13 @@ public class NoteResource {
 			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 		}
 		
-		if(Objects.nonNull(userId) && Objects.nonNull(patientId)){
-			try {
-				note = noteService.saveOrUpdateNoteByUserForPatientId(Long.parseLong(userId), patientId, noteText,date);
+		if((Objects.nonNull(userId) || Objects.nonNull(userHrId)) && Objects.nonNull(patientId)){
+			try {				
+				if(Objects.nonNull(userHrId) && Objects.isNull(userId)){
+					note = noteService.saveOrUpdateNoteByUserForPatientId(userHrId, patientId, noteText, date);
+				}else{
+					note = noteService.saveOrUpdateNoteByUserForPatientId(Long.parseLong(userId), patientId, noteText, date);
+				}
 			} catch (NumberFormatException e) {
 				jsonObject.put("ERROR", "Number Format Exception");
 				return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);

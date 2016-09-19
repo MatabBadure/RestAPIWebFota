@@ -11,6 +11,9 @@ public class NoteDTO {
     private String userId;
 	
 	@Size(max = 50)
+    private String userHrId;
+		
+	@Size(max = 50)
     private String patientId;
 
 	@Size(max = 500)
@@ -25,11 +28,12 @@ public class NoteDTO {
 		super();
 	}
 
-	public NoteDTO(String createdOn, String userId, String patientId, String note, 
+	public NoteDTO(String createdOn, String userId, String userHrId, String patientId, String note, 
 			String modifiedAt, Boolean isDeleted) {
 		super();
 		this.createdOn = createdOn;
 		this.userId = userId;
+		this.userHrId = userHrId;
 		this.patientId = patientId;
 		this.note = note;
 		this.modifiedAt = modifiedAt;
@@ -52,6 +56,14 @@ public class NoteDTO {
 
 	public void setUserId(String userId) {
 		this.userId = userId;
+	}
+	
+	public String getUserHrId() {
+		return userHrId;
+	}
+
+	public void setUserHrId(String userHrId) {
+		this.userHrId = userHrId;
 	}
 	
 	public String getPatientId() {
@@ -89,9 +101,9 @@ public class NoteDTO {
 	@Override
 	public String toString() {
 		return "NoteDTO [createdOn=" + createdOn + ", userId="
-				+ userId + ", patientId=" + patientId + ", note=" + note
-				+ ", modifiedAt=" + modifiedAt + ", isDeleted="
-				+ isDeleted + "]";
+				+ userId + ",userHrId=" + userHrId + ", patientId=" 
+				+ patientId + ", note=" + note + ", modifiedAt=" 
+				+ modifiedAt + ", isDeleted=" + isDeleted + "]";
 	}
 	
 }

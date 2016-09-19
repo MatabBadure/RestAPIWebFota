@@ -20,7 +20,7 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
 	Optional<Note> findOneByPatientUserIdAndCreatedOn(Long userId,LocalDate date);
 	
 	// Added to get the Patient memo notes with respect to the HCP/CA user id and created date
-	@Query("from Note note where note.patientUser.id = ?1  and note.patient.id = ?1 and note.createdOn = ?2")
+	@Query("from Note note where note.patientUser.id = ?1  and note.patient.id = ?2 and note.createdOn = ?3")
 	Optional<Note> findOneByPatientUserIdAndPatientIdAndCreatedOn(Long userId,String patientId,LocalDate date);
 	
 	Page<Note> findByPatientUserIdAndCreatedOnBetweenAndDeletedOrderByCreatedOnDesc(Long userId,LocalDate from,LocalDate to,Boolean isDeleted,Pageable pageable);

@@ -108,8 +108,14 @@ public class NoteResource {
 		JSONObject jsonObject = new JSONObject();
 		String noteText = noteDTO.getNote();
 		String userId = noteDTO.getUserId();
+		String userHrId = noteDTO.getUserHrId();
 		String patientId = noteDTO.getPatientId();
 		String dateString = noteDTO.getCreatedOn();
+		
+		if(Objects.isNull(dateString)){
+			jsonObject.put("ERROR", "Required Param missing [dateString]");
+			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+		}
 		
 		LocalDate date = null;
 		try {
@@ -125,9 +131,14 @@ public class NoteResource {
 			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 		}
 		
-		if(Objects.nonNull(userId) && Objects.nonNull(patientId)){
+		if((Objects.nonNull(userId) || Objects.nonNull(userHrId)) && Objects.nonNull(patientId)){
 			try {
-				note = noteService.saveOrUpdateNoteByUserForPatientId(Long.parseLong(userId), patientId, noteText,date);
+				String s = "HR";
+				if(Objects.nonNull(userHrId) && Objects.isNull(userId)){
+					note = noteService.saveOrUpdateNoteByUserForPatientId(userHrId, patientId, noteText,date);
+				}else{
+					note = noteService.saveOrUpdateNoteByUserForPatientId(Long.parseLong(userId), patientId, noteText,date);
+				}
 			} catch (NumberFormatException e) {
 				jsonObject.put("ERROR", "Number Format Exception");
 				return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);

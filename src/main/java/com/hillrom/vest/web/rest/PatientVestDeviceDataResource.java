@@ -57,8 +57,15 @@ public class PatientVestDeviceDataResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> receiveData(@RequestBody(required=true)String rawMessage){
-		log.debug("Received Data for ingestion : ",rawMessage);
+
 		try{
+		//byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
+		//rawMessage = new String(decoded, "UTF-8");
+		//System.out.println("rawmessage : "+ (rawMessage) + "\n");
+
+		
+		log.debug("Received Data for ingestion : ",rawMessage);
+
 			JSONObject jsonObject = new JSONObject();
 
 

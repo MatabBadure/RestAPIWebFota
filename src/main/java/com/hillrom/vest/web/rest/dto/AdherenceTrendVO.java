@@ -1,7 +1,9 @@
 package com.hillrom.vest.web.rest.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.annotations.Type;
@@ -21,6 +23,7 @@ public class AdherenceTrendVO implements Serializable{
     @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
 	private LocalDate date;
 	private Map<String,Integer> notificationPoints = new HashMap<>();
+	private List<String> notificationDates = new ArrayList<String>();
 	
 	public int getUpdatedScore() {
 		return updatedScore;
@@ -40,6 +43,15 @@ public class AdherenceTrendVO implements Serializable{
 	public void setNotificationPoints(Map<String, Integer> notificationPoints) {
 		this.notificationPoints = notificationPoints;
 	}
+
+	public List<String> getNotificationDates() {
+		return notificationDates;
+	}
+
+	public void setNotificationDates(List<String> notificationDates) {
+		this.notificationDates = notificationDates;
+	}
+	
 	@Override
 	public String toString() {
 		return "AdherenceTrendVO [updatedScore=" + updatedScore + ", date="

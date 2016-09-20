@@ -155,7 +155,8 @@ public class PatientComplianceService {
 			PatientCompliance compliance = complianceMap.get(date);
 			trendVO.setDate(date);
 			trendVO.setUpdatedScore(compliance.getScore());
-			setNotificationPointsMap(complianceMap,notificationsMap,date,trendVO);
+			setNotificationPointsMap(complianceMap, notificationsMap, date,
+					trendVO, patientUserId);
 			// Get datetime when compliance was processed
 			ProtocolRevisionVO revisionVO = getProtocolRevisionByCompliance(
 					revisionData, compliance);
@@ -182,10 +183,9 @@ public class PatientComplianceService {
 	}
 	
 	private void setNotificationPointsMap(
-			SortedMap<LocalDate,PatientCompliance> complianceMap,
+			SortedMap<LocalDate, PatientCompliance> complianceMap,
 			Map<LocalDate, List<Notification>> notificationsMap,
-			LocalDate date,
-			AdherenceTrendVO trendVO) {
+			LocalDate date, AdherenceTrendVO trendVO, Long userId) {
 		int pointsChanged = getChangeInScore(complianceMap, date);
 		String notificationType = Objects.isNull(notificationsMap.get(date)) ? "No Notification" : notificationsMap.get(date).get(0).getNotificationType();
 		if(SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)){
@@ -208,6 +208,9 @@ public class PatientComplianceService {
 		}else{
 			trendVO.getNotificationPoints().put(notificationType,pointsChanged);
 		}
+		int limit = notificationType.equalsIgnoreCase(MISSED_THERAPY) ? 3 : 2;
+		trendVO.setNotificationDates(notificationService.getNotificationDates(
+				date, userId, notificationType, limit));
 	}
 
 	private int getChangeInScore(

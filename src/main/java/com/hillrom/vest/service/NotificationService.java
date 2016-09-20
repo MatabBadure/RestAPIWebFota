@@ -6,6 +6,7 @@ import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIAN
 import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -15,6 +16,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.transaction.Transactional;
 
 import org.joda.time.LocalDate;
@@ -32,6 +35,9 @@ public class NotificationService {
 
 	@Inject
 	private NotificationRepository notificationRepository;
+	
+	@Inject
+	private EntityManager entityManager;
 	
 	/**
 	 * Creates or Updates Notification with provided details
@@ -83,6 +89,26 @@ public class NotificationService {
 		List<Long> patientUserIds = new LinkedList<>();
 		patientUserIds.add(patientUserId);
 		return notificationRepository.findByDateBetweenAndIsAcknowledgedAndPatientUserIdIn(from, to, false,patientUserIds);
+	}
+	
+	public List<String> getNotificationDates(LocalDate date, Long userId,
+			String notificationType, int limit) {
+		Query query = entityManager
+				.createNativeQuery("select n.date from Notification n where  n.date <= '"
+						+ date
+						+ "' and n.user_id= "
+						+ userId
+						+ " and n.notification_type= '"
+						+ notificationType
+						+ "' order by n.date desc limit " + limit);
+		if (query != null && query.getResultList().size() > 0) {
+			List<String> notificationDates = new ArrayList<String>();
+			for (Object obj : query.getResultList()) {
+				notificationDates.add(obj.toString());
+			}
+			return notificationDates;
+		}
+		return null;
 	}
 	
 	public Map<Long,List<Notification>> getNotificationMapByPatientIdsAndDate(List<Long> patientUserIds,LocalDate from,LocalDate to){

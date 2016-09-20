@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 
 import net.minidev.json.JSONObject;
 
@@ -34,6 +35,8 @@ import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.NoteService;
 import com.hillrom.vest.service.util.DateUtil;
+import com.hillrom.vest.web.rest.dto.NoteDTO;
+import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 @RestController
@@ -82,6 +85,54 @@ public class NoteResource {
 				note = noteService.saveOrUpdateNoteByPatientId(patientId, noteText,date);
 			} catch (HillromException e) {
 				jsonObject.put("ERROR",e.getMessage());
+				return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+			}
+		}else{
+			jsonObject.put("ERROR", "Required Param missing [noteText,patientId/userId]");
+			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+		}
+		if(Objects.nonNull(note)){
+			return new ResponseEntity<>(note, HttpStatus.CREATED);
+		}
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}	
+	
+	/**
+     * POST  /memoNotes -> Create memo notes for a patient by CA/HCP.
+     */
+	@RequestMapping(value="/memoNotes", method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> createMemoNew(@Valid @RequestBody(required=true) NoteDTO noteDTO){
+		if(SecurityUtils.isUserInRole(AuthoritiesConstants.PATIENT)){
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		JSONObject jsonObject = new JSONObject();
+		String noteText = noteDTO.getNote();
+		String userId = noteDTO.getUserId();
+		String patientId = noteDTO.getPatientId();
+		String dateString = noteDTO.getCreatedOn();
+		
+		LocalDate date = null;
+		try {
+			date = StringUtils.isNoneBlank(dateString)? DateUtil.parseStringToLocalDate(dateString, YYYY_MM_DD) : LocalDate.now();
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+		}
+		Note note = null;
+	
+		if(Objects.isNull(noteText)){
+			jsonObject.put("ERROR", "Required Param missing [noteText]");
+			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+		}
+		
+		if(Objects.nonNull(userId) && Objects.nonNull(patientId)){
+			try {
+				note = noteService.saveOrUpdateNoteByUserForPatientId(Long.parseLong(userId), patientId, noteText,date);
+			} catch (NumberFormatException e) {
+				jsonObject.put("ERROR", "Number Format Exception");
+				return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
+			} catch (HillromException e) {
+				jsonObject.put("ERROR", e.getMessage());
 				return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 			}
 		}else{

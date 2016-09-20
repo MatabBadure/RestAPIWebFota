@@ -11,7 +11,6 @@
 	<property name="autoIncrement" value="false" dbms="oracle" />
 
 	<changeSet id="20160412144400" author="LnT Technology Services">
-		<dropTable tableName="CHARGER_DATA"/>
 		<createTable tableName="CHARGER_DATA">
 			<column name="id" type="mediumint" autoIncrement="${autoIncrement}">
 				<constraints primaryKey="true" nullable="false" />

@@ -1,5 +1,6 @@
 package com.hillrom.vest.service;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -92,6 +93,7 @@ public class ChargerDataService {
 		String reqParams[] = new String[]{DEVICE_SN,
 				DEVICE_WIFI,DEVICE_LTE,DEVICE_VER,DEVICE_DATA,CRC};
 		
+		
 		if(Objects.isNull(chargerJsonData) || chargerJsonData.keySet().isEmpty()){
 			throw new HillromException("Missing Params : "+String.join(",",reqParams));
 		}else if(Objects.nonNull(chargerJsonData)){
@@ -102,35 +104,95 @@ public class ChargerDataService {
 						missingParams.contains(DEVICE_VER) || missingParams.contains(DEVICE_DATA) || missingParams.contains(CRC)
 						){
 					throw new HillromException("Missing Params : "+String.join(",",missingParams));
+				}else{
+					validateCheckSum(rawData);
 				}
 			}else{
-				if(!validateCheckSum(rawData,chargerJsonData.getOrDefault(CRC, new JSONObject()).toString()))
-					throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	
+				//if(!validateCheckSum(rawData,chargerJsonData.getOrDefault(CRC, new JSONObject()).toString()))
+					//throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	
+				validateCheckSum(rawData);
 			}
 		}
 		
 		return chargerJsonData;
 	}
 	
-	private boolean validateCheckSum(String rawData, String receivedCRC) throws HillromException {
+	private void validateCheckSum(String rawData) throws HillromException {
 		log.debug("Raw Data : " + rawData);
 		
-		String buffer = rawData;int crc_value = 0;String sOut = "";
-		for(int i=0;i<buffer.length();i++)
+		String buffer = rawData;
+		int crc_value = 0;
+		String sOut = "";
+		int last_digit = 0;
+		int secondlast_digit = 0;
+
+		
+		for(int i=0;i<buffer.length() - 2;i++)
 		{
 			sOut = sOut + (int)buffer.charAt(i) + " ";
 		    crc_value = crc_value + (int)buffer.charAt(i);
 		}
 		
-		log.debug("decimal String : "+sOut);
-		log.debug("Received CRC : " + Integer.parseInt(receivedCRC));
-		log.debug("calculated CRC : " + crc_value);
 		
-		if(crc_value == Integer.parseInt(receivedCRC)){
-			return true;
-		}else{
-			return false;
-		}
+		last_digit = (int)buffer.charAt(buffer.length()-1) ;
+		secondlast_digit = (int)buffer.charAt(buffer.length()-2) ;
+		
+		log.debug("last digit : " + last_digit);
+		log.debug("second last digit : " + secondlast_digit);
+
+		log.debug("decimals till &crc= : "+sOut);
+
+		log.debug("calculated total : " + crc_value);
+		String binary_representation_crc = Integer.toBinaryString(crc_value);
+		log.debug("binary representation of calculated total : " + binary_representation_crc);
+		
+		log.debug("once complement : " + firstcomplement(binary_representation_crc));
+		
+		Integer ones_complement_of_crc = (Integer)Integer.parseUnsignedInt(firstcomplement(binary_representation_crc), 2);		
+		log.debug("Decimal representation of once complement : " + ones_complement_of_crc);
+		
+		Integer twos_complement_of_crc = (Integer) (ones_complement_of_crc + 1);
+
+		log.debug("twos complement : " + twos_complement_of_crc);
+		
+		log.debug("twos complement in binary : " + Integer.toBinaryString(twos_complement_of_crc));
+		
+		
+		short lsb_digit = (byte) (twos_complement_of_crc & 0xFF);           // Least significant "byte"
+		short msb_digit = (byte) ((twos_complement_of_crc & 0xFF00) >> 8);  // Most significant "byte"
+
+		
+		log.debug("lsb_digit : " + lsb_digit);
+		log.debug("msb_digit : " + msb_digit);
+		
+		//Example for 307 Lsb = 51 and msb = 1
+		//As per Leonardo
+		// 8296 - Once complement = 57239 + 1 = 57240
+		// 7186 - 58349 + 1 = 58350
+		// 11864  - 53671 + 1 = 53672
+
+		
 	}
 
+	
+	String firstcomplement(String binary)
+	{
+	    //String binary=Integer.toBinaryString(num);
+	    String complement="";
+	    for(int i=0; i<binary.length(); i++)
+	    {
+	         if(binary.charAt(i)=='0')
+	             complement = complement + "1";
+	         if(binary.charAt(i)=='1')
+	        	 complement = complement + "0";
+	    }
+	    
+	    return complement;
+
+	 }
+	
+
+ 
+	
+	
 }

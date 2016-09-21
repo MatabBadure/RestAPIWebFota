@@ -105,19 +105,19 @@ public class ChargerDataService {
 						){
 					throw new HillromException("Missing Params : "+String.join(",",missingParams));
 				}else{
-					validateCheckSum(rawData);
+					if(!validateCheckSum(rawData))
+						throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	
 				}
 			}else{
-				//if(!validateCheckSum(rawData,chargerJsonData.getOrDefault(CRC, new JSONObject()).toString()))
-					//throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	
-				validateCheckSum(rawData);
+				if(!validateCheckSum(rawData))
+					throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	
 			}
 		}
 		
 		return chargerJsonData;
 	}
 	
-	private void validateCheckSum(String rawData) throws HillromException {
+	private boolean validateCheckSum(String rawData) throws HillromException {
 		log.debug("Raw Data : " + rawData);
 		
 		String buffer = rawData;
@@ -143,7 +143,9 @@ public class ChargerDataService {
 		log.debug("decimals till &crc= : "+sOut);
 
 		log.debug("calculated total : " + crc_value);
-		String binary_representation_crc = Integer.toBinaryString(crc_value);
+		
+		String binary_representation_crc = appendLeadingZeros(Integer.toBinaryString(crc_value));
+		
 		log.debug("binary representation of calculated total : " + binary_representation_crc);
 		
 		log.debug("once complement : " + firstcomplement(binary_representation_crc));
@@ -156,17 +158,26 @@ public class ChargerDataService {
 		log.debug("twos complement : " + twos_complement_of_crc);
 		
 		log.debug("twos complement in binary : " + Integer.toBinaryString(twos_complement_of_crc));
-		
-		
-		short lsb_digit = (byte) (twos_complement_of_crc & 0xFF);           // Least significant "byte"
-		short msb_digit = (byte) ((twos_complement_of_crc & 0xFF00) >> 8);  // Most significant "byte"
 
+
+		Integer lsb_digit = (Integer)Integer.parseUnsignedInt(Integer.toBinaryString(twos_complement_of_crc & 0xFF),2);               // Least significant "byte"
+		Integer msb_digit = (Integer)Integer.parseUnsignedInt(Integer.toBinaryString((twos_complement_of_crc & 0xFF00) >> 8),2);      // Most significant "byte"
 		
+
 		log.debug("lsb_digit : " + lsb_digit);
 		log.debug("msb_digit : " + msb_digit);
 		
+		if((lsb_digit != secondlast_digit) || (msb_digit != last_digit)){
+			log.debug("CRC VALIDATION FAILED :"); 
+			return false;
+		}else{
+			return true;
+		}
+			
+		
+		
 		//Example for 307 Lsb = 51 and msb = 1
-		//As per Leonardo
+		//
 		// 8296 - Once complement = 57239 + 1 = 57240
 		// 7186 - 58349 + 1 = 58350
 		// 11864  - 53671 + 1 = 53672
@@ -177,7 +188,6 @@ public class ChargerDataService {
 	
 	String firstcomplement(String binary)
 	{
-	    //String binary=Integer.toBinaryString(num);
 	    String complement="";
 	    for(int i=0; i<binary.length(); i++)
 	    {
@@ -192,7 +202,17 @@ public class ChargerDataService {
 	 }
 	
 
+	String appendLeadingZeros(String binary)
+	{
+		int size = binary.length();
+		if(size != 16){
+			for(int i=0;i<16-size;i++){
+				binary = '0'+ binary;
+			}
+		}
+
+		return binary;
  
-	
+	}
 	
 }

@@ -105,11 +105,11 @@ public class ChargerDataService {
 						){
 					throw new HillromException("Missing Params : "+String.join(",",missingParams));
 				}else{
-					if(!validateCheckSum(rawData))
+					if(!validateCheckSum((rawData.substring(0, rawData.lastIndexOf("&crc=")+5)),(int)rawData.charAt(rawData.length()-2),(int)rawData.charAt(rawData.length()-1)))
 						throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	
 				}
 			}else{
-				if(!validateCheckSum(rawData))
+				if(!validateCheckSum((rawData.substring(0, rawData.lastIndexOf("&crc=")+5)),(int)rawData.charAt(rawData.length()-2),(int)rawData.charAt(rawData.length()-1)))
 					throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	
 			}
 		}
@@ -117,14 +117,13 @@ public class ChargerDataService {
 		return chargerJsonData;
 	}
 	
-	private boolean validateCheckSum(String rawData) throws HillromException {
-		log.debug("Raw Data : " + rawData);
+	private boolean validateCheckSum(String rawData,int secondlast_digit,int last_digit) throws HillromException {
+		log.debug("Raw Data inside validate check sum : " + rawData);
 		
 		String buffer = rawData;
 		int crc_value = 0;
 		String sOut = "";
-		int last_digit = 0;
-		int secondlast_digit = 0;
+
 
 		
 		for(int i=0;i<buffer.length() - 2;i++)
@@ -133,12 +132,9 @@ public class ChargerDataService {
 		    crc_value = crc_value + (int)buffer.charAt(i);
 		}
 		
-		
-		last_digit = (int)buffer.charAt(buffer.length()-1) ;
-		secondlast_digit = (int)buffer.charAt(buffer.length()-2) ;
-		
+		log.debug("second last digit : " + secondlast_digit);		
 		log.debug("last digit : " + last_digit);
-		log.debug("second last digit : " + secondlast_digit);
+
 
 		log.debug("decimals till &crc= : "+sOut);
 

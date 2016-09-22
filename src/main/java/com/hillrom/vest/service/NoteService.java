@@ -192,4 +192,12 @@ public class NoteService {
 		}
 		return dateNotesMap;
 	}
+	
+	public Note findMemoNotesForPatientId(Long userId, String patientId){
+		Optional<Note> note =  noteRepository.returnPatientMemo(userId, patientId);
+		if(note.isPresent())
+			return note.get();
+		return null;
+	}
+	
 }

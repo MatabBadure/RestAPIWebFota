@@ -321,7 +321,6 @@ public class UserResource {
 	}
 
 	@RequestMapping(value = "/user/{id}/patient", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	
 	public ResponseEntity<?> getPatientUser(@PathVariable Long id) {
 		log.debug("REST request to get PatientUser : {}", id);
 		Optional<PatientUserVO> patientUser = userService.getPatientUser(id);
@@ -905,15 +904,15 @@ public class UserResource {
     /**
      * GET  /patient/:patientUserId/clinic/:clinicId/mrnId -> get the patient user with clinic mrn id.
      */
-    @RequestMapping(value = "/patient/{patientUserId}/clinic/{clinicId}/mrnId", 
+    @RequestMapping(value = "/patient/{patientUserId}/clinic/{clinicId}/{caUserId}/mrnId", 
     		method = RequestMethod.GET, 
     		produces = MediaType.APPLICATION_JSON_VALUE)
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
-	public ResponseEntity<JSONObject> getPatientUserWithMRNId(@PathVariable Long patientUserId,@PathVariable String clinicId) {
+	public ResponseEntity<JSONObject> getPatientUserWithMRNId(@PathVariable Long patientUserId,@PathVariable String clinicId,@PathVariable Long caUserId) {
 		log.debug("REST request to get patient user with clinic mrn id : {}", patientUserId);
 		JSONObject jsonObject = new JSONObject();
         try {
-			PatientUserVO patientUser = userService.getPatientUserWithMRNId(patientUserId,clinicId);
+			PatientUserVO patientUser = userService.getPatientUserWithMRNId(patientUserId,clinicId,caUserId);
 			if (Objects.isNull(patientUser)) {
 	        	jsonObject.put("message", ExceptionConstants.HR_585);
 	        } else {

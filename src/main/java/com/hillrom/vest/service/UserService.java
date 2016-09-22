@@ -1608,7 +1608,7 @@ public class UserService {
 					Map<String,Object> clinicMRNId = new HashMap<>();
 					clinicMRNId.put("clinic", clinicPatientAssoc.get().getClinic());
 					clinicMRNId.put("mrnId", clinicPatientAssoc.get().getMrnId());
-					clinicMRNId.put("memoNote", Objects.nonNull(patientUser) ?  memoNote.getNote() : "");
+					clinicMRNId.put("memoNote", Objects.nonNull(memoNote) ?  memoNote.getNote() : "");
 					
 					if(clinicPatientAssoc.get().getExpired()){
 						clinicMRNId.put("status", Constants.EXPIRED);

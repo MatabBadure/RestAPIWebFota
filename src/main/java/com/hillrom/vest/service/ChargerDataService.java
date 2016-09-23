@@ -1,5 +1,6 @@
 package com.hillrom.vest.service;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -92,6 +93,7 @@ public class ChargerDataService {
 		String reqParams[] = new String[]{DEVICE_SN,
 				DEVICE_WIFI,DEVICE_LTE,DEVICE_VER,DEVICE_DATA,CRC};
 		
+		
 		if(Objects.isNull(chargerJsonData) || chargerJsonData.keySet().isEmpty()){
 			throw new HillromException("Missing Params : "+String.join(",",reqParams));
 		}else if(Objects.nonNull(chargerJsonData)){
@@ -102,9 +104,12 @@ public class ChargerDataService {
 						missingParams.contains(DEVICE_VER) || missingParams.contains(DEVICE_DATA) || missingParams.contains(CRC)
 						){
 					throw new HillromException("Missing Params : "+String.join(",",missingParams));
+				}else{
+					if(!validateCheckSum((rawData.substring(0, rawData.lastIndexOf("&crc=")+5)),(int)rawData.charAt(rawData.length()-2),(int)rawData.charAt(rawData.length()-1)))
+						throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	
 				}
 			}else{
-				if(!validateCheckSum(rawData,chargerJsonData.getOrDefault(CRC, new JSONObject()).toString()))
+				if(!validateCheckSum((rawData.substring(0, rawData.lastIndexOf("&crc=")+5)),(int)rawData.charAt(rawData.length()-2),(int)rawData.charAt(rawData.length()-1)))
 					throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	
 			}
 		}
@@ -112,25 +117,98 @@ public class ChargerDataService {
 		return chargerJsonData;
 	}
 	
-	private boolean validateCheckSum(String rawData, String receivedCRC) throws HillromException {
-		log.debug("Raw Data : " + rawData);
+	private boolean validateCheckSum(String rawData,int secondlast_digit,int last_digit) throws HillromException {
+		log.debug("Raw Data inside validate check sum : " + rawData);
 		
-		String buffer = rawData;int crc_value = 0;String sOut = "";
-		for(int i=0;i<buffer.length();i++)
+		String buffer = rawData;
+		int crc_value = 0;
+		String sOut = "";
+
+
+		
+		for(int i=0;i<buffer.length() - 2;i++)
 		{
 			sOut = sOut + (int)buffer.charAt(i) + " ";
 		    crc_value = crc_value + (int)buffer.charAt(i);
 		}
 		
-		log.debug("decimal String : "+sOut);
-		log.debug("Received CRC : " + Integer.parseInt(receivedCRC));
-		log.debug("calculated CRC : " + crc_value);
+		log.debug("second last digit : " + secondlast_digit);		
+		log.debug("last digit : " + last_digit);
+
+
+		log.debug("decimals till &crc= : "+sOut);
+
+		log.debug("calculated total : " + crc_value);
 		
-		if(crc_value == Integer.parseInt(receivedCRC)){
-			return true;
-		}else{
+		String binary_representation_crc = appendLeadingZeros(Integer.toBinaryString(crc_value));
+		
+		log.debug("binary representation of calculated total : " + binary_representation_crc);
+		
+		log.debug("once complement : " + firstcomplement(binary_representation_crc));
+		
+		Integer ones_complement_of_crc = (Integer)Integer.parseUnsignedInt(firstcomplement(binary_representation_crc), 2);		
+		log.debug("Decimal representation of once complement : " + ones_complement_of_crc);
+		
+		Integer twos_complement_of_crc = (Integer) (ones_complement_of_crc + 1);
+
+		log.debug("twos complement : " + twos_complement_of_crc);
+		
+		log.debug("twos complement in binary : " + Integer.toBinaryString(twos_complement_of_crc));
+
+
+		Integer lsb_digit = (Integer)Integer.parseUnsignedInt(Integer.toBinaryString(twos_complement_of_crc & 0xFF),2);               // Least significant "byte"
+		Integer msb_digit = (Integer)Integer.parseUnsignedInt(Integer.toBinaryString((twos_complement_of_crc & 0xFF00) >> 8),2);      // Most significant "byte"
+		
+
+		log.debug("lsb_digit : " + lsb_digit);
+		log.debug("msb_digit : " + msb_digit);
+		
+		if((lsb_digit != secondlast_digit) || (msb_digit != last_digit)){
+			log.debug("CRC VALIDATION FAILED :"); 
 			return false;
+		}else{
+			return true;
 		}
+			
+		
+		
+		//Example for 307 Lsb = 51 and msb = 1
+		//
+		// 8296 - Once complement = 57239 + 1 = 57240
+		// 7186 - 58349 + 1 = 58350
+		// 11864  - 53671 + 1 = 53672
+
+		
 	}
 
+	
+	String firstcomplement(String binary)
+	{
+	    String complement="";
+	    for(int i=0; i<binary.length(); i++)
+	    {
+	         if(binary.charAt(i)=='0')
+	             complement = complement + "1";
+	         if(binary.charAt(i)=='1')
+	        	 complement = complement + "0";
+	    }
+	    
+	    return complement;
+
+	 }
+	
+
+	String appendLeadingZeros(String binary)
+	{
+		int size = binary.length();
+		if(size != 16){
+			for(int i=0;i<16-size;i++){
+				binary = '0'+ binary;
+			}
+		}
+
+		return binary;
+ 
+	}
+	
 }

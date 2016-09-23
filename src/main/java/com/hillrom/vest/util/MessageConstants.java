@@ -102,4 +102,6 @@ public class MessageConstants {
     public static final String HR_311 = "Type Code values fetched successfully.";
     public static final String HR_312 = "No associated Type Code values found.";
     
+    public static final String HR_313 = "Adherence score resetted successfully.";
+    
 }

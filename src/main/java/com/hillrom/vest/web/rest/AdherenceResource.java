@@ -82,14 +82,10 @@ public class AdherenceResource {
     public ResponseEntity<JSONObject> create(@RequestBody AdherenceResetDTO adherenceResetDTO) {
         log.debug("REST request to save Adherence Reset : {}", adherenceResetDTO);
         
-        adherenceCalculationService.processMissedTherapySessions();
-        return null;
-        /*
         String patientId = adherenceResetDTO.getPatientId();
         String userId = adherenceResetDTO.getUserId();
 		String resetStartDate = adherenceResetDTO.getResetStartDate();
 		String resetScore = adherenceResetDTO.getResetScore();
-		//String resetDate = adherenceResetDTO.getResetDate();
 		String justification = adherenceResetDTO.getJustification();
 		String createdById = adherenceResetDTO.getCreatedBy();
 		 
@@ -120,7 +116,7 @@ public class AdherenceResource {
 		} catch (HillromException e) {
 			jsonObject.put("ERROR", e.getMessage());
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-		}*/
+		}
     }
 
    

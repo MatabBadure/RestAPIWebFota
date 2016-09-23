@@ -137,9 +137,6 @@ public class NoteService {
 	// For updating patients memo notes by HCP/CA using their user ID which is passed
 	public Note saveOrUpdateNoteByUserForPatientId(Long userId, String patientId, String note, LocalDate date) throws HillromException{
 		
-		if(StringUtils.isBlank(note))
-			return null;
-				
 		Note existingNote = findOneByUserIdAndPatientID(userId, patientId);
 		
 		// For adding new memo note entered by HCP/CA for the patient with the same date

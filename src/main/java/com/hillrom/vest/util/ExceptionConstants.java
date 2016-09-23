@@ -163,4 +163,7 @@ public class ExceptionConstants {
     
     //test result
     public static final String HR_719 = "No such test result exists";
+    
+    public static final String HR_720 = "Unable to reset adherence score";
+    
 }

@@ -1,0 +1,19 @@
+id,type,type_code,type_code_value
+19,garment_type,C3 Garment,C3 Garment
+20,garment_type,Wrap,Wrap
+21,garment_type,Chest Vest,Chest Vest
+22,garment_type,Full Vest,Full Vest
+23,garment_size,Child Small,Child Small
+24,garment_size,Child Medium,Child Medium
+25,garment_size,Child Large,Child Large
+26,garment_size,Adult X-Small,Adult X-Small
+27,garment_size,Adult Small,Adult Small
+28,garment_size,Adult Medium,Adult Medium
+29,garment_size,Adult Large,Adult Large
+30,garment_size,Adult XLarge,Adult XLarge
+31,garment_color,Black,Black
+32,garment_color,Blue,Blue
+33,garment_color,Pink,Pink
+34,garment_color,Purple,Purple
+35,garment_color,Camo,Camo
+36,garment_color,Pink Camo,Pink Camo

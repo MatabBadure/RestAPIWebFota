@@ -87,7 +87,11 @@
     <include file="classpath:/config/liquibase/changelog/20160502213900_add_hmr_to_device_history_table.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20160503134400_added_serialnumber_bluetoothid_to_therapysession.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/config/liquibase/changelog/20160503133800_update_manage_device_sp.xml" relativeToChangelogFile="false"/>
-    <include file="classpath:/config/liquibase/changelog/20160503251146_update_manage_patient_user_sp.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20160503251146_update_manage_patient_user_sp.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20160812165240_add_speciality_clinic.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20160824110756_create_charger_data_data_table.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20160822165530_add_speciality_typeCode.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20160909034818_add_patient_garment_details.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20160914040200_altered_datatype_ChargerData.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20160914042700_added_entities_Messaging.xml" relativeToChangelogFile="false"/>
  </databaseChangeLog>
- 
- 

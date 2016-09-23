@@ -17,6 +17,15 @@ import com.hillrom.vest.security.Base16Encoder;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.TWO_NET_PROPERTIES;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.VALUE;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.QCL_JSON_DATA;
+
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_SN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_WIFI;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_LTE;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_VER;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CRC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_DATA;
+
+
 public class ParserUtil {
 	
 	private ParserUtil(){
@@ -61,9 +70,29 @@ public class ParserUtil {
 	public static JSONObject getQclJsonDataFromRawMessage(String rawMessage){
 		List<NameValuePair> params = URLEncodedUtils.parse(rawMessage, Charset.defaultCharset());
 		JSONObject qclJsonData = new JSONObject();
-		for(NameValuePair nameValuePair : params){
-			if(QCL_JSON_DATA.equalsIgnoreCase(nameValuePair.getName()))
-				qclJsonData = (JSONObject) JSONValue.parse(nameValuePair.getValue());
+		if(params.get(0).getName().equalsIgnoreCase("device_model_type") && params.get(0).getValue().equalsIgnoreCase("HillRom_Monarch")){
+			for(NameValuePair nameValuePair : params){
+				if(DEVICE_SN.equalsIgnoreCase(nameValuePair.getName()))
+					qclJsonData.put(DEVICE_SN, nameValuePair.getValue());
+				if(DEVICE_WIFI.equalsIgnoreCase(nameValuePair.getName()))
+					qclJsonData.put(DEVICE_WIFI, nameValuePair.getValue());	
+				if(DEVICE_LTE.equalsIgnoreCase(nameValuePair.getName()))
+					qclJsonData.put(DEVICE_LTE, nameValuePair.getValue());	
+				if(DEVICE_VER.equalsIgnoreCase(nameValuePair.getName()))
+					qclJsonData.put(DEVICE_VER, nameValuePair.getValue());	
+				if(DEVICE_DATA.equalsIgnoreCase(nameValuePair.getName()))
+					qclJsonData.put(DEVICE_DATA, nameValuePair.getValue());	
+				if(CRC.equalsIgnoreCase(nameValuePair.getName()))
+					qclJsonData.put(CRC, nameValuePair.getValue());					
+				qclJsonData.put("device_model_type", "HillRom_Monarch");
+			}
+			
+		}else{
+			for(NameValuePair nameValuePair : params){
+				if(QCL_JSON_DATA.equalsIgnoreCase(nameValuePair.getName()))
+					qclJsonData = (JSONObject) JSONValue.parse(nameValuePair.getValue());
+				qclJsonData.put("device_model_type", "HillRom_Vest");
+			}
 		}
 		return qclJsonData;
 	}

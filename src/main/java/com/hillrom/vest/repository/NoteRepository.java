@@ -27,7 +27,7 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
 	Optional<Note> findOneByPatientUserIdAndPatientId(Long userId,String patientId);
 	
 	// Added to get the Patient memo notes for admin users entered byHCP/CA
-	@Query(nativeQuery=true,value="select * from patient_note where user_id <> :userId  and patient_id = :patientId")
+	@Query(nativeQuery=true,value="select * from PATIENT_NOTE where user_id <> :userId  and patient_id = :patientId")
 	Optional<Note> returnPatientMemo(@Param("userId")Long userId,@Param("patientId")String patientId);
 	
 	Page<Note> findByPatientUserIdAndCreatedOnBetweenAndDeletedOrderByCreatedOnDesc(Long userId,LocalDate from,LocalDate to,Boolean isDeleted,Pageable pageable);

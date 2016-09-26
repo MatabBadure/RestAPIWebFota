@@ -109,15 +109,9 @@ public class NoteResource {
 		String noteText = noteDTO.getNote();
 		String userId = noteDTO.getUserId();
 		String patientId = noteDTO.getPatientId();
-		String dateString = noteDTO.getCreatedOn();
 		
-		LocalDate date = null;
-		try {
-			date = StringUtils.isNoneBlank(dateString)? DateUtil.parseStringToLocalDate(dateString, YYYY_MM_DD) : LocalDate.now();
-		} catch (HillromException e) {
-			jsonObject.put("ERROR", e.getMessage());
-			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
-		}
+		LocalDate date = LocalDate.now();
+		
 		Note note = null;
 	
 		if(Objects.isNull(noteText)){
@@ -126,8 +120,8 @@ public class NoteResource {
 		}
 		
 		if(Objects.nonNull(userId) && Objects.nonNull(patientId)){
-			try {
-				note = noteService.saveOrUpdateNoteByUserForPatientId(Long.parseLong(userId), patientId, noteText,date);
+			try {				
+				note = noteService.saveOrUpdateNoteByUserForPatientId(Long.parseLong(userId), patientId, noteText, date);
 			} catch (NumberFormatException e) {
 				jsonObject.put("ERROR", "Number Format Exception");
 				return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
@@ -136,7 +130,7 @@ public class NoteResource {
 				return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 			}
 		}else{
-			jsonObject.put("ERROR", "Required Param missing [noteText,patientId/userId]");
+			jsonObject.put("ERROR", "Required Param missing [patientId/userId]");
 			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 		}
 		if(Objects.nonNull(note)){

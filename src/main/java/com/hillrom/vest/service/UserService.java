@@ -35,6 +35,7 @@ import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.ClinicPatientAssoc;
 import com.hillrom.vest.domain.EntityUserAssoc;
+import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
@@ -123,6 +124,9 @@ public class UserService {
     
     @Inject
     private EntityUserRepository entityUserRepository;
+    
+    @Inject
+	private NoteService noteService;
 
     public String generateDefaultPassword(User patientUser) {
 		StringBuilder defaultPassword = new StringBuilder();
@@ -1202,6 +1206,9 @@ public class UserService {
 		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
 		if(null == patientInfo)
 			return Optional.empty();
+		
+		Note memoNote = noteService.findMemoNotesForPatientId(id, user.getHillromId());
+		 
 		PatientCompliance compliance = complianceService.findLatestComplianceByPatientUserId(id);
 		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patientInfo.getId());
 		PatientUserVO patientUserVO =  new PatientUserVO(user,patientInfo);
@@ -1214,6 +1221,7 @@ public class UserService {
 				Map<String,Object> clinicMRNId = new HashMap<>();
 				clinicMRNId.put("clinicId", clinicPatientAssoc.getClinic().getId());
 				clinicMRNId.put("mrnId", clinicPatientAssoc.getMrnId());
+				clinicMRNId.put("memoNote", (null == memoNote) ? "" : memoNote.getNote());
 				mrnId = clinicPatientAssoc.getMrnId(); 
 				patientUserVO.setMrnId(mrnId);
 				patientUserVO.setClinicMRNId(clinicMRNId);
@@ -1585,11 +1593,14 @@ public class UserService {
 		return caregiverAndPatientList;
     }
 
-	public PatientUserVO getPatientUserWithMRNId(Long patientUserId, String clinicId) throws HillromException{
+	public PatientUserVO getPatientUserWithMRNId(Long patientUserId, String clinicId, Long clinicUserId) throws HillromException{
 		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
 		if(Objects.nonNull(patientUser)) {
 			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
     		if(Objects.nonNull(patientInfo)) {
+    			
+    			Note memoNote = noteService.findOneByUserIdAndPatientID(clinicUserId, patientUser.getHillromId());
+    			
 				Optional<ClinicPatientAssoc> clinicPatientAssoc = clinicPatientRepository.findOneByClinicIdAndPatientId(
 						clinicId, patientInfo.getId());
 				PatientUserVO patientUserVO = new PatientUserVO(patientUser, patientInfo);
@@ -1597,6 +1608,8 @@ public class UserService {
 					Map<String,Object> clinicMRNId = new HashMap<>();
 					clinicMRNId.put("clinic", clinicPatientAssoc.get().getClinic());
 					clinicMRNId.put("mrnId", clinicPatientAssoc.get().getMrnId());
+					clinicMRNId.put("memoNote", Objects.nonNull(memoNote) ?  memoNote.getNote() : "");
+					
 					if(clinicPatientAssoc.get().getExpired()){
 						clinicMRNId.put("status", Constants.EXPIRED);
 					} else if(clinicPatientAssoc.get().getActive()){

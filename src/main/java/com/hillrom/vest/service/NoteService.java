@@ -65,8 +65,8 @@ public class NoteService {
 		return null;
 	}
 	
-	public Note findOneByUserIdAndPatientIDAndDate(Long userId, String patientId, LocalDate date){
-		Optional<Note> note =  noteRepository.findOneByPatientUserIdAndPatientIdAndCreatedOn(userId, patientId, date);
+	public Note findOneByUserIdAndPatientID(Long userId, String patientId){
+		Optional<Note> note =  noteRepository.findOneByPatientUserIdAndPatientId(userId, patientId);
 		if(note.isPresent())
 			return note.get();
 		return null;
@@ -134,13 +134,10 @@ public class NoteService {
 		return existingNote;
 	}
 	
-	// For updating patients memo notes by HCP/CA
-	public Note saveOrUpdateNoteByUserForPatientId(Long userId, String patientId,String note,LocalDate date) throws HillromException{
+	// For updating patients memo notes by HCP/CA using their user ID which is passed
+	public Note saveOrUpdateNoteByUserForPatientId(Long userId, String patientId, String note, LocalDate date) throws HillromException{
 		
-		if(StringUtils.isBlank(note))
-			return null;
-				
-		Note existingNote = findOneByUserIdAndPatientIDAndDate(userId, patientId, date);
+		Note existingNote = findOneByUserIdAndPatientID(userId, patientId);
 		
 		// For adding new memo note entered by HCP/CA for the patient with the same date
 		if(Objects.isNull(existingNote)){
@@ -152,6 +149,7 @@ public class NoteService {
 	    	User patientUser = userRepository.findOne(userId);
 			existingNote.setPatientUser(patientUser);
 			existingNote.setNote(note);
+
 			existingNote.setCreatedOn(date);
 			noteRepository.save(existingNote);
 		}else{
@@ -191,4 +189,12 @@ public class NoteService {
 		}
 		return dateNotesMap;
 	}
+	
+	public Note findMemoNotesForPatientId(Long userId, String patientId){
+		Optional<Note> note =  noteRepository.returnPatientMemo(userId, patientId);
+		if(note.isPresent())
+			return note.get();
+		return null;
+	}
+	
 }

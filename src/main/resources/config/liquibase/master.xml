@@ -94,4 +94,7 @@
 	<include file="classpath:/config/liquibase/changelog/20160909034818_add_patient_garment_details.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20160914040200_altered_datatype_ChargerData.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20160914042700_added_entities_Messaging.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20160923062300_altered_hillromid_datatype_jde_load_table.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20160920183415_create_table_adherence_reset.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20160926125030_add_justification_typeCode.xml" relativeToChangelogFile="false"/>
  </databaseChangeLog>

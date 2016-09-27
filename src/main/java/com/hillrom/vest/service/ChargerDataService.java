@@ -118,7 +118,7 @@ public class ChargerDataService {
 	}
 	
 	private boolean validateCheckSum(String rawData,int secondlast_digit,int last_digit) throws HillromException {
-		log.debug("Raw Data inside validate check sum : " + rawData);
+		log.error("Raw Data inside validate check sum : " + rawData);
 		
 		String buffer = rawData;
 		int crc_value = 0;
@@ -132,39 +132,39 @@ public class ChargerDataService {
 		    crc_value = crc_value + (int)buffer.charAt(i);
 		}
 		
-		log.debug("second last digit : " + secondlast_digit);		
-		log.debug("last digit : " + last_digit);
+		log.error("second last digit : " + secondlast_digit);		
+		log.error("last digit : " + last_digit);
 
 
-		log.debug("decimals till &crc= : "+sOut);
+		log.error("decimals till &crc= : "+sOut);
 
-		log.debug("calculated total : " + crc_value);
+		log.error("calculated total : " + crc_value);
 		
 		String binary_representation_crc = appendLeadingZeros(Integer.toBinaryString(crc_value));
 		
-		log.debug("binary representation of calculated total : " + binary_representation_crc);
+		log.error("binary representation of calculated total : " + binary_representation_crc);
 		
-		log.debug("once complement : " + firstcomplement(binary_representation_crc));
+		log.error("once complement : " + firstcomplement(binary_representation_crc));
 		
 		Integer ones_complement_of_crc = (Integer)Integer.parseUnsignedInt(firstcomplement(binary_representation_crc), 2);		
-		log.debug("Decimal representation of once complement : " + ones_complement_of_crc);
+		log.error("Decimal representation of once complement : " + ones_complement_of_crc);
 		
 		Integer twos_complement_of_crc = (Integer) (ones_complement_of_crc + 1);
 
-		log.debug("twos complement : " + twos_complement_of_crc);
+		log.error("twos complement : " + twos_complement_of_crc);
 		
-		log.debug("twos complement in binary : " + Integer.toBinaryString(twos_complement_of_crc));
+		log.error("twos complement in binary : " + Integer.toBinaryString(twos_complement_of_crc));
 
 
 		Integer lsb_digit = (Integer)Integer.parseUnsignedInt(Integer.toBinaryString(twos_complement_of_crc & 0xFF),2);               // Least significant "byte"
 		Integer msb_digit = (Integer)Integer.parseUnsignedInt(Integer.toBinaryString((twos_complement_of_crc & 0xFF00) >> 8),2);      // Most significant "byte"
 		
 
-		log.debug("lsb_digit : " + lsb_digit);
-		log.debug("msb_digit : " + msb_digit);
+		log.error("lsb_digit : " + lsb_digit);
+		log.error("msb_digit : " + msb_digit);
 		
 		if((lsb_digit != secondlast_digit) || (msb_digit != last_digit)){
-			log.debug("CRC VALIDATION FAILED :"); 
+			log.error("CRC VALIDATION FAILED :"); 
 			return false;
 		}else{
 			return true;

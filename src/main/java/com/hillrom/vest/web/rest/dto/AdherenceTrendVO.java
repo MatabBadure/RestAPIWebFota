@@ -1,7 +1,9 @@
 package com.hillrom.vest.web.rest.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.annotations.Type;
@@ -9,6 +11,7 @@ import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 import com.hillrom.vest.domain.util.MMDDYYYYLocalDateSerializer;
 
@@ -21,6 +24,7 @@ public class AdherenceTrendVO implements Serializable{
     @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
 	private LocalDate date;
 	private Map<String,Integer> notificationPoints = new HashMap<>();
+	private List<Notification> prevNotificationDetails = new ArrayList(); 
 	
 	public int getUpdatedScore() {
 		return updatedScore;
@@ -40,10 +44,28 @@ public class AdherenceTrendVO implements Serializable{
 	public void setNotificationPoints(Map<String, Integer> notificationPoints) {
 		this.notificationPoints = notificationPoints;
 	}
+	
+	
+	/**
+	 * @return the prevNotificationDetails
+	 */
+	public List<Notification> getPrevNotificationDetails() {
+		return prevNotificationDetails;
+	}
+	/**
+	 * @param prevNotificationDetails the prevNotificationDetails to set
+	 */
+	public void setPrevNotificationDetails(List<Notification> prevNotificationDetails) {
+		this.prevNotificationDetails = prevNotificationDetails;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
-		return "AdherenceTrendVO [updatedScore=" + updatedScore + ", date="
-				+ date + ", notificationPoints=" + notificationPoints+ "]";
+		return "AdherenceTrendVO [updatedScore=" + updatedScore + ", date=" + date + ", notificationPoints="
+				+ notificationPoints + ", prevNotificationDetails=" + prevNotificationDetails + "]";
 	}	
 	
 	

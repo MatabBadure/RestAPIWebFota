@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
+import org.hamcrest.core.IsNull;
 import org.joda.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -143,9 +144,11 @@ public class NoteService {
 		if(Objects.isNull(existingNote)){
 			existingNote = new Note();
 			
-			PatientInfo patientInfo = patientInfoService.findOneById(patientId);
-	    	existingNote.setPatient(patientInfo);
-	    	
+			Optional<PatientInfo> patientInfo = patientInfoService.findOneByHillromId(patientId);
+			
+			if(patientInfo.isPresent())
+				existingNote.setPatient(patientInfo.get());
+			
 	    	User patientUser = userRepository.findOne(userId);
 			existingNote.setPatientUser(patientUser);
 			existingNote.setNote(note);

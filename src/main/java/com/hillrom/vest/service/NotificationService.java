@@ -7,6 +7,8 @@ import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,6 +20,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import org.joda.time.LocalDate;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.domain.Notification;
@@ -98,8 +101,33 @@ public class NotificationService {
 		}
 		return notificationsMap;
 	}
+
+	public List<Notification> getNotificationMapByDateAndNotificationTypeAndPatientId(LocalDate date,String notificationType, Long patientUserId){
+		List<Notification> notifications = notificationRepository.findByNotificationTypeAndPatientUserIdIn(notificationType, patientUserId);
+		Collections.sort(notifications,new NotificationComparator());
+		Collections.reverse(notifications);
+		List<Notification> prevNotifications = new LinkedList<Notification>();
+		for(Notification notification : notifications){
+			if(notification.getDate().isBefore(date))
+			prevNotifications.add(notification);
+		}
+	
+		List<Notification> prev3Notifications = new LinkedList<Notification>(prevNotifications.subList(0, 3));
+		
+		return prev3Notifications;
+	}
+	
+	
 	
 	public void saveAll(Collection<Notification> notifications){
 		notificationRepository.save(notifications);
+	}
+	
+	public class NotificationComparator implements Comparator<Notification>
+	{
+	    public int compare(Notification n1, Notification n2)
+	    {
+	       return n1.getDate().compareTo(n2.getDate());
+	   }
 	}
 }

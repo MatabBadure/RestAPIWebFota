@@ -26,5 +26,5 @@ public interface NotificationRepository extends
 	List<Notification> findByDateBetweenAndIsAcknowledgedAndPatientUserIdIn(LocalDate fromDate,LocalDate toDate,boolean isAcknowledged,List<Long> patientUserId);
 	
 
-	List<Notification> findByNotificationTypeAndPatientUserIdIn(String notificationType,Long patientUserId,Pageable pageable);
+	List<Notification> findByNotificationTypeAndPatientUserIdIn(String notificationType,Long patientUserId);
 }

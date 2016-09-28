@@ -112,7 +112,8 @@ public class NotificationService {
 			prevNotifications.add(notification);
 		}
 	
-		List<Notification> prev3Notifications = new LinkedList<Notification>(prevNotifications.subList(0, 3));
+
+		List<Notification> prev3Notifications = new LinkedList<Notification>(prevNotifications.subList(0, prevNotifications.size()<3?prevNotifications.size():3));
 		
 		return prev3Notifications;
 	}

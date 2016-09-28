@@ -194,7 +194,7 @@ public class PatientComplianceService {
 		int pointsChanged = getChangeInScore(complianceMap, date);
 		String notificationType = Objects.isNull(notificationsMap.get(date)) ? "No Notification" : notificationsMap.get(date).get(0).getNotificationType();
 		List<Notification> prevNotificationDetails = getPreviousNotificationDetails(date,notificationType,notificationsMap.get(date).get(0).getPatientUser().getId());
-		trendVO.setPrevNotificationDetails(prevNotificationDetails);
+		//trendVO.setPrevNotificationDetails(prevNotificationDetails);
 
 		if(SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)){
 			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);

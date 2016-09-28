@@ -193,7 +193,7 @@ public class PatientComplianceService {
 			AdherenceTrendVO trendVO) {
 		int pointsChanged = getChangeInScore(complianceMap, date);
 		String notificationType = Objects.isNull(notificationsMap.get(date)) ? "No Notification" : notificationsMap.get(date).get(0).getNotificationType();
-		if(!notificationType.equalsIgnoreCase("No Notification") && Objects.nonNull(notificationsMap.get(date))){
+		if(Objects.nonNull(notificationsMap.get(date))){
 			List<Notification> prevNotificationDetails = getPreviousNotificationDetails(date,notificationType,notificationsMap.get(date).get(0).getPatientUser().getId());
 			trendVO.setPrevNotificationDetails(prevNotificationDetails);
 		}

@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import org.joda.time.LocalDate;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.domain.Notification;
@@ -98,6 +99,13 @@ public class NotificationService {
 		}
 		return notificationsMap;
 	}
+
+	public List<Notification> getNotificationMapByDateAndNotificationTypeAndPatientId(String notificationType, Long patientUserId){
+		List<Notification> notifications = notificationRepository.findByNotificationTypeAndPatientUserIdIn(notificationType, patientUserId,new PageRequest(0, 1000));
+		return notifications;
+	}
+	
+	
 	
 	public void saveAll(Collection<Notification> notifications){
 		notificationRepository.save(notifications);

@@ -32,6 +32,7 @@ import javax.transaction.Transactional;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.audit.service.PatientProtocolDataAuditService;
@@ -115,6 +116,8 @@ public class PatientComplianceService {
 	public List<ProtocolRevisionVO> findAdherenceTrendByUserIdAndDateRange(Long patientUserId,LocalDate from,LocalDate to)
 	throws HillromException{
 
+
+		
 		List<Long> patientUserIds = new LinkedList<>();
 		patientUserIds.add(patientUserId);
 		TherapySession therapySession = therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(patientUserId);
@@ -188,6 +191,9 @@ public class PatientComplianceService {
 			AdherenceTrendVO trendVO) {
 		int pointsChanged = getChangeInScore(complianceMap, date);
 		String notificationType = Objects.isNull(notificationsMap.get(date)) ? "No Notification" : notificationsMap.get(date).get(0).getNotificationType();
+		List<Notification> prevNotificationDetails = getPreviousNotificationDetails(notificationType,notificationsMap.get(date).get(0).getPatientUser().getId());
+		trendVO.setPrevNotificationDetails(prevNotificationDetails);
+
 		if(SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)){
 			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
 		}else if(MISSED_THERAPY.equalsIgnoreCase(notificationType)){
@@ -210,6 +216,12 @@ public class PatientComplianceService {
 		}
 	}
 
+	private List<Notification> getPreviousNotificationDetails(String notificationType,Long patientUserId) {
+		List<Notification> prevNotifications = notificationService.getNotificationMapByDateAndNotificationTypeAndPatientId(notificationType,patientUserId);
+		System.out.println("Previous three notifications : " + prevNotifications);
+		return prevNotifications;
+	} 
+	
 	private int getChangeInScore(
 			SortedMap<LocalDate, PatientCompliance> complianceMap,
 			LocalDate date) {

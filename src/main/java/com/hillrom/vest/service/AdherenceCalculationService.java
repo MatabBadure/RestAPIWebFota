@@ -16,6 +16,7 @@ import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIAN
 import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
 import static com.hillrom.vest.service.util.DateUtil.getPlusOrMinusTodayLocalDate;
+import static com.hillrom.vest.service.util.DateUtil.getDateBeforeSpecificDays;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateCumulativeDuration;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateHMRRunRatePerSession;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
@@ -259,6 +260,43 @@ public class AdherenceCalculationService {
 			mailService.sendJobFailureNotification("processMissedTherapySessions",writer.toString());
 		}
 	}
+	
+	// Resetting the adherence score for the specific user from the adherence reset start date	
+	public void adherenceResetForPatient(Long userId, String patientId, LocalDate adherenceStartDate, Integer adherenceScore){
+		try{			
+			// Adherence Start date in string for query
+			String sAdherenceStDate = adherenceStartDate.toString();
+			
+			// Get the list of rows for the user id from the adherence reset start date 
+			List<PatientCompliance> patientComplianceList = patientComplianceRepository.returnComplianceForPatientIdDates(sAdherenceStDate, userId);
+			
+			// Getting the protocol constants for the user
+			ProtocolConstants userProtocolConstant = protocolService.getProtocolForPatientUserId(userId);
+			
+			for(PatientCompliance compliance : patientComplianceList){
+				
+				PatientCompliance currentCompliance = patientComplianceRepository.findById(compliance.getId());
+				
+				// Score remains the adherence score which has been set for first 2 days
+				if(DateUtil.getDaysCountBetweenLocalDates(adherenceStartDate, compliance.getDate()) <= 1){	
+					currentCompliance.setScore(adherenceScore);
+					patientComplianceRepository.save(currentCompliance);					
+				}else{
+					if(currentCompliance.getMissedTherapyCount() >= DEFAULT_MISSED_THERAPY_DAYS_COUNT){
+						// Missed therapy days
+						calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId);
+					}else{
+						// HMR Non Compliance
+						calculateUserHMRComplianceForMST(currentCompliance, userProtocolConstant, currentCompliance.getDate(), userId);
+					}
+				}
+			}		
+		}catch(Exception ex){
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter( writer );
+			ex.printStackTrace( printWriter );
+		}
+	}
 
 	private void updateGlobalCounters(int globalMissedTherapyCounter,
 			int globalHMRNonAdherenceCounter,
@@ -369,6 +407,77 @@ public class AdherenceCalculationService {
 			complianceMap.put(patientUserId, newCompliance);
 		}
 	}
+	
+	// calculate HMRCompliance on Missed Therapy Date for Per UserId
+	private void calculateUserHMRComplianceForMST(
+			PatientCompliance newCompliance,
+			ProtocolConstants userProtocolConstants,
+			LocalDate complianceDate,
+			Long userId) {
+		
+		// Getting previous day score
+		PatientCompliance prevCompliance = patientComplianceRepository.returnPrevDayScore(complianceDate.toString(),userId);
+		int score = prevCompliance.getScore();
+		
+		// Get earlier third day to finding therapy session
+		LocalDate threeDaysEarlyDate = getDateBeforeSpecificDays(complianceDate,3);
+		
+		// Get therapy session for last 3 days
+		List<TherapySession> therapySessions = therapySessionRepository.findByDateBetweenAndPatientUserId(threeDaysEarlyDate, complianceDate, userId);
+				
+		if(Objects.isNull(therapySessions)){
+			therapySessions = new LinkedList<>();
+		}
+		
+		int hmrRunRate = calculateHMRRunRatePerSession(therapySessions);
+		double durationFor3Days = hmrRunRate*therapySessions.size(); // runrate*totalsessions = total duration
+		
+		// validating the last 3 days therapies with respect to the user protocol
+		if(!isHMRCompliant(userProtocolConstants, durationFor3Days)){
+			score = score < HMR_NON_COMPLIANCE_POINTS ? 0 : score - HMR_NON_COMPLIANCE_POINTS;
+		}else{
+			score = score <=  DEFAULT_COMPLIANCE_SCORE - BONUS_POINTS ? score + BONUS_POINTS : DEFAULT_COMPLIANCE_SCORE;
+		}
+		
+		// Setting the new score with respect to the compliance deduction
+		newCompliance.setScore(score);
+		
+		// Saving the updated score for the specific date of compliance
+		patientComplianceRepository.save(newCompliance);
+	}
+		
+	
+	
+	// calculate score with respective to missed therapies
+	private void calculateUserMissedTherapy(
+			PatientCompliance newCompliance,
+			LocalDate complianceDate,
+			Long userId) {
+		
+		// Get the previous day compliance score
+		PatientCompliance prevCompliance = patientComplianceRepository.returnPrevDayScore(complianceDate.toString(),userId);
+		int score = prevCompliance.getScore();
+		
+		// Calculating the score on basis of missed therapy
+		score = score < MISSED_THERAPY_POINTS ? 0 :  score - MISSED_THERAPY_POINTS ;
+		
+		// Setting the score
+		newCompliance.setScore(score);
+		
+		// Saving the score values for the specific date of compliance
+		patientComplianceRepository.save(newCompliance);
+	
+	}
+		
+	/**
+	 * Get the therapy data between days and user ids
+	 * @param patientUserId, from date and to date
+	 * @return
+	 */
+	public List<TherapySession> getLast3DaysTherapiesForUserId(Long patientUserId,LocalDate from,LocalDate to){
+		List<TherapySession> therapySessions = therapySessionRepository.findByDateBetweenAndPatientUserId(from, to, patientUserId);
+		return therapySessions;
+	}	
 	
 	/**
 	 * Calculate HMRRunRate For PatientUsers

@@ -17,6 +17,7 @@ import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATI
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +33,7 @@ import javax.transaction.Transactional;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.audit.service.PatientProtocolDataAuditService;
@@ -115,6 +117,8 @@ public class PatientComplianceService {
 	public List<ProtocolRevisionVO> findAdherenceTrendByUserIdAndDateRange(Long patientUserId,LocalDate from,LocalDate to)
 	throws HillromException{
 
+
+		
 		List<Long> patientUserIds = new LinkedList<>();
 		patientUserIds.add(patientUserId);
 		TherapySession therapySession = therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(patientUserId);
@@ -162,6 +166,7 @@ public class PatientComplianceService {
 			revisionVO.addAdherenceTrend(trendVO);
 		}
 		List<ProtocolRevisionVO> revisions = revisionData.values().stream().filter(rev -> rev.getAdherenceTrends().size() > 0).collect(Collectors.toList());
+		System.out.print("Revisions : " + revisions);
 		return revisions;
 	}
 
@@ -188,6 +193,15 @@ public class PatientComplianceService {
 			AdherenceTrendVO trendVO) {
 		int pointsChanged = getChangeInScore(complianceMap, date);
 		String notificationType = Objects.isNull(notificationsMap.get(date)) ? "No Notification" : notificationsMap.get(date).get(0).getNotificationType();
+		try{
+			if(Objects.nonNull(notificationsMap.get(date))){
+				List<Notification> prevNotificationDetails = getPreviousNotificationDetails(date,notificationType,notificationsMap.get(date).get(0).getPatientUser().getId());
+				trendVO.setPrevNotificationDetails(prevNotificationDetails);
+			}
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+
 		if(SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)){
 			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
 		}else if(MISSED_THERAPY.equalsIgnoreCase(notificationType)){
@@ -210,6 +224,11 @@ public class PatientComplianceService {
 		}
 	}
 
+	private List<Notification> getPreviousNotificationDetails(LocalDate date,String notificationType,Long patientUserId) {
+		List<Notification> prevNotifications = notificationService.getNotificationMapByDateAndNotificationTypeAndPatientId(date,notificationType,patientUserId);
+		return prevNotifications;
+	} 
+	
 	private int getChangeInScore(
 			SortedMap<LocalDate, PatientCompliance> complianceMap,
 			LocalDate date) {
@@ -240,4 +259,5 @@ public class PatientComplianceService {
 		}
 		return complianceMap;
 	}
+	
 }

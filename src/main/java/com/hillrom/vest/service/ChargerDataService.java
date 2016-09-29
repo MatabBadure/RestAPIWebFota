@@ -105,12 +105,16 @@ public class ChargerDataService {
 						){
 					throw new HillromException("Missing Params : "+String.join(",",missingParams));
 				}else{
-					if(!validateCheckSum((rawData.substring(0, rawData.lastIndexOf("&crc=")+5)),(int)rawData.charAt(rawData.length()-2),(int)rawData.charAt(rawData.length()-1)))
-						throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	
+					if(!validateCheckSum((rawData.substring(0, rawData.lastIndexOf("&crc=")+5)),(int)rawData.charAt(rawData.length()-2),(int)rawData.charAt(rawData.length()-1))){
+						//throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	
+					return chargerJsonData;
+					}
 				}
 			}else{
-				if(!validateCheckSum((rawData.substring(0, rawData.lastIndexOf("&crc=")+5)),(int)rawData.charAt(rawData.length()-2),(int)rawData.charAt(rawData.length()-1)))
-					throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	
+				if(!validateCheckSum((rawData.substring(0, rawData.lastIndexOf("&crc=")+5)),(int)rawData.charAt(rawData.length()-2),(int)rawData.charAt(rawData.length()-1))){
+					//throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	
+				return chargerJsonData;
+				}
 			}
 		}
 		

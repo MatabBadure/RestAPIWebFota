@@ -1599,7 +1599,7 @@ public class UserService {
 			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
     		if(Objects.nonNull(patientInfo)) {
     			
-    			Note memoNote = noteService.findOneByUserIdAndPatientID(clinicUserId, patientUser.getHillromId());
+    			Note memoNote = noteService.findOneByUserIdAndPatientID(patientUser.getId(), patientInfo.getId());
     			
 				Optional<ClinicPatientAssoc> clinicPatientAssoc = clinicPatientRepository.findOneByClinicIdAndPatientId(
 						clinicId, patientInfo.getId());

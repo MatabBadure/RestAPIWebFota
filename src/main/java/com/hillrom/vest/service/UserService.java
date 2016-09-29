@@ -1207,7 +1207,7 @@ public class UserService {
 		if(null == patientInfo)
 			return Optional.empty();
 		
-		Note memoNote = noteService.findMemoNotesForPatientId(id, user.getHillromId());
+		Note memoNote = noteService.findMemoNotesForPatientId(id, patientInfo.getId());
 		 
 		PatientCompliance compliance = complianceService.findLatestComplianceByPatientUserId(id);
 		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patientInfo.getId());

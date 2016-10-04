@@ -79,6 +79,13 @@ public class ChargerDataService {
 	
 	
 
+	public JSONObject saveOrUpdateChargerData(int[] rawData) throws HillromException{	
+		calculateCheckSum(rawData);
+		
+		JSONObject chargerJsonData = new JSONObject();
+		chargerJsonData.put("RESULT", "OK");
+		return chargerJsonData;
+	}
 	
 	public JSONObject saveOrUpdateChargerData(String rawData) throws HillromException{			
 		JSONObject chargerJsonData = validateRequest(rawData);
@@ -237,5 +244,32 @@ public class ChargerDataService {
 		return binary;
  
 	}
+	
+	
+	  int calculateCheckSum(int[] rawData)
+	  {
+			log.error("RAW DATA : " + rawData);
+
+	    
+		    int nCheckSum = 0;
+		    
+		    //loop until crc=
+		    for ( int nCounter = 0; nCounter < (rawData.length) - 2; nCounter++ )
+		    {
+		      nCheckSum += rawData[nCounter];
+		    }
+		    
+		    System.out.print(nCheckSum + " ");
+		    while ( nCheckSum >  65535 )
+		    {
+		      nCheckSum -= 65535;
+		    }
+		    
+		    nCheckSum = ((~nCheckSum)& 0xFFFF) + 1;
+		    
+		    log.error("Check Sum  : "+ nCheckSum);
+		    
+		    return(nCheckSum);
+		  }
 	
 }

@@ -102,6 +102,29 @@ public class PatientVestDeviceDataResource {
 		}
 	}
 	
+	@RequestMapping(value = "/receiveDataCharger",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> receiveDataCharger(@RequestBody(required=true)int[] rawMessage){
+
+		try{
+
+		
+			log.debug("Received Data for ingestion : ",rawMessage);
+
+			JSONObject chargerJsonData = new JSONObject();
+
+			chargerJsonData = chargerDataService.saveOrUpdateChargerData(rawMessage);
+			return new ResponseEntity<>(chargerJsonData,HttpStatus.CREATED);
+
+		}catch(Exception e){
+			e.printStackTrace();
+			JSONObject error = new JSONObject();
+			error.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(error,HttpStatus.PARTIAL_CONTENT);
+		}
+	}
+	
 	@RequestMapping(value = "/vestdevicedata",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)

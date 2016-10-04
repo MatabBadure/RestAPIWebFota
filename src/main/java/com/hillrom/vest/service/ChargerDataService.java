@@ -1,6 +1,7 @@
 package com.hillrom.vest.service;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -79,13 +80,13 @@ public class ChargerDataService {
 	
 
 	
-	public ChargerData saveOrUpdateChargerData(String rawData) throws HillromException{			
+	public JSONObject saveOrUpdateChargerData(String rawData) throws HillromException{			
 		JSONObject chargerJsonData = validateRequest(rawData);
 		ChargerData chargerData = new ChargerData();
 		chargerData.setDeviceData(chargerJsonData.get(DEVICE_DATA).toString());
 		chargerData.setCreatedTime(new DateTime());
 		chargerDataRepository.save(chargerData);
-		return chargerData;
+		return chargerJsonData;
 	}
 	
 	private JSONObject validateRequest(final String rawData) throws HillromException {
@@ -103,17 +104,27 @@ public class ChargerDataService {
 				if(missingParams.contains(DEVICE_SN) || (missingParams.contains(DEVICE_WIFI) && missingParams.contains(DEVICE_LTE)) ||
 						missingParams.contains(DEVICE_VER) || missingParams.contains(DEVICE_DATA) || missingParams.contains(CRC)
 						){
-					throw new HillromException("Missing Params : "+String.join(",",missingParams));
-				}else{
-					if(!validateCheckSum((rawData.substring(0, rawData.lastIndexOf("&crc=")+5)),(int)rawData.charAt(rawData.length()-2),(int)rawData.charAt(rawData.length()-1))){
-						//throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	
+					chargerJsonData.put("RESULT", "NOT OK");
+					chargerJsonData.put("ERROR","Missing Params : "+String.join(",",missingParams));
 					return chargerJsonData;
+					//throw new HillromException("Missing Params : "+String.join(",",missingParams));
+				}else{
+					if(!validateCheckSum(rawData)){
+						//throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	
+						chargerJsonData.put("RESULT", "NOT OK");
+						chargerJsonData.put("ERROR","CRC Validation Failed");
+						return chargerJsonData;
 					}
 				}
 			}else{
-				if(!validateCheckSum((rawData.substring(0, rawData.lastIndexOf("&crc=")+5)),(int)rawData.charAt(rawData.length()-2),(int)rawData.charAt(rawData.length()-1))){
+				if(!validateCheckSum(rawData)){
 					//throw new HillromException("Invalid Checksum : "+chargerJsonData.getOrDefault(CRC, new JSONObject()).toString());	
-				return chargerJsonData;
+					chargerJsonData.put("RESULT", "NOT OK");
+					chargerJsonData.put("ERROR","CRC Validation Failed");
+					return chargerJsonData;
+				}else{
+					chargerJsonData.put("RESULT", "OK");
+					return chargerJsonData;					
 				}
 			}
 		}
@@ -121,28 +132,39 @@ public class ChargerDataService {
 		return chargerJsonData;
 	}
 	
-	private boolean validateCheckSum(String rawData,int secondlast_digit,int last_digit) throws HillromException {
+	//private boolean validateCheckSum(String rawData,int secondlast_digit,int last_digit) throws HillromException {
+	private boolean validateCheckSum(String rawData) throws HillromException {
 		log.error("Raw Data inside validate check sum : " + rawData);
 		
 		String buffer = rawData;
 		int crc_value = 0;
 		String sOut = "";
 
-
-		
-		for(int i=0;i<buffer.length() - 2;i++)
-		{
-			sOut = sOut + (int)buffer.charAt(i) + " ";
-		    crc_value = crc_value + (int)buffer.charAt(i);
+		byte[] b3 = rawData.getBytes(); //rawData.getBytes(StandardCharsets.UTF_8); // Java 7+ only
+		for(int i=0;i<b3.length;i++){
+			sOut = sOut + b3[i] + " ";
 		}
+
+		log.debug("Full Decimal Byte Array : "+sOut);
 		
+		int secondlast_digit = -1;
+		int last_digit = -1;
+		
+		log.debug("Byte Size of CRC String : "+ rawData.substring(rawData.lastIndexOf("&crc=")+5,rawData.length()).getBytes().length);
+		
+		
+		if((rawData.lastIndexOf("&crc=")>0) && (rawData.substring(rawData.lastIndexOf("&crc=")+5,rawData.length()).getBytes().length==2)){
+			secondlast_digit = Math.abs(b3[b3.length-2]);
+			last_digit = Math.abs(b3[b3.length-1]);
+		}
 		log.error("second last digit : " + secondlast_digit);		
 		log.error("last digit : " + last_digit);
-
-
-		log.error("decimals till &crc= : "+sOut);
-
-		log.error("calculated total : " + crc_value);
+		
+		for(int i=0;i<b3.length-2;i++){
+			crc_value = crc_value + Math.abs(b3[i]);
+		}
+		log.debug("crc_value : "+ crc_value);
+		
 		
 		String binary_representation_crc = appendLeadingZeros(Integer.toBinaryString(crc_value));
 		
@@ -175,13 +197,6 @@ public class ChargerDataService {
 		}
 			
 		
-		
-		//Example for 307 Lsb = 51 and msb = 1
-		//
-		// 8296 - Once complement = 57239 + 1 = 57240
-		// 7186 - 58349 + 1 = 58350
-		// 11864  - 53671 + 1 = 53672
-
 		
 	}
 

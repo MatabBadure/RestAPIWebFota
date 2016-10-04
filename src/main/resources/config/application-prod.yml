@@ -47,6 +47,6 @@ spring:
         baseUrl: https://visiview.hill-rom.com
         accountActivationReminderInterval: 12
     survey:
-        surveyreportemailids: joelpreetham.fernandes4@hill-rom.com,vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com
+        surveyreportemailids: joelpreetham.fernandes4@hill-rom.com,nagendra.shetty@razorfish.com,amit.saurabh@razorfish.com,anubhav.sinha@razorfish.com,nagendra@neevtech.com,amit.saurabh@neevtech.com 
     changePrescription:
-        changePrescriptionEmailids: joelpreetham.fernandes4@hill-rom.com,vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com
+        changePrescriptionEmailids: joelpreetham.fernandes4@hill-rom.com,nagendra.shetty@razorfish.com,amit.saurabh@razorfish.com,anubhav.sinha@razorfish.com,nagendra@neevtech.com,amit.saurabh@neevtech.com,rohan.kushwaha@razorfish.com

@@ -136,7 +136,6 @@ public class ChargerDataService {
 	private boolean validateCheckSum(String rawData) throws HillromException {
 		log.error("Raw Data inside validate check sum : " + rawData);
 		
-		String buffer = rawData;
 		int crc_value = 0;
 		String sOut = "";
 
@@ -145,12 +144,12 @@ public class ChargerDataService {
 			sOut = sOut + b3[i] + " ";
 		}
 
-		log.debug("Full Decimal Byte Array : "+sOut);
+		log.error("Full Decimal Byte Array : "+sOut);
 		
 		int secondlast_digit = -1;
 		int last_digit = -1;
 		
-		log.debug("Byte Size of CRC String : "+ rawData.substring(rawData.lastIndexOf("&crc=")+5,rawData.length()).getBytes().length);
+		log.error("Byte Size of CRC String : "+ rawData.substring(rawData.lastIndexOf("&crc=")+5,rawData.length()).getBytes().length);
 		
 		
 		if((rawData.lastIndexOf("&crc=")>0) && (rawData.substring(rawData.lastIndexOf("&crc=")+5,rawData.length()).getBytes().length==2)){
@@ -160,10 +159,19 @@ public class ChargerDataService {
 		log.error("second last digit : " + secondlast_digit);		
 		log.error("last digit : " + last_digit);
 		
-		for(int i=0;i<b3.length-2;i++){
+		String rawData_tillcrc = rawData.substring(0,rawData.lastIndexOf("&crc=")+5);
+		log.error("Raw Data till CRC : " + rawData_tillcrc);
+		b3 = rawData_tillcrc.getBytes();
+		
+		for(int i=0;i<b3.length;i++){
+			sOut = sOut + b3[i] + " ";
+		}
+		log.error("Full Decimal Byte till CRC : "+sOut);
+		
+		for(int i=0;i<b3.length;i++){
 			crc_value = crc_value + Math.abs(b3[i]);
 		}
-		log.debug("crc_value : "+ crc_value);
+		log.error("crc_value : "+ crc_value);
 		
 		
 		String binary_representation_crc = appendLeadingZeros(Integer.toBinaryString(crc_value));

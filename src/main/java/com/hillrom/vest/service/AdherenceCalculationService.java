@@ -291,8 +291,17 @@ public class AdherenceCalculationService {
 	}
 	
 	// Resetting the adherence score for the specific user from the adherence reset start date	
-	public void adherenceResetForPatient(Long userId, String patientId, LocalDate adherenceStartDate, Integer adherenceScore){
-		try{			
+	public String adherenceResetForPatient(Long userId, String patientId, LocalDate adherenceStartDate, Integer adherenceScore){
+		try{
+
+			Map<Long,PatientNoEvent> userIdNoEventMap = noEventService.findAllGroupByPatientUserId();
+			PatientNoEvent noEvent = userIdNoEventMap.get(userId);
+			if(Objects.nonNull(noEvent)){
+				LocalDate firstTransmit = noEvent.getFirstTransmissionDate();
+				if(adherenceStartDate.isBefore(firstTransmit)){
+					return "Adherence start date should be after first transmission date";
+				}
+			}		
 			// Adherence Start date in string for query
 			String sAdherenceStDate = adherenceStartDate.toString();
 			
@@ -325,6 +334,7 @@ public class AdherenceCalculationService {
 			PrintWriter printWriter = new PrintWriter( writer );
 			ex.printStackTrace( printWriter );
 		}
+		return "Adherence score resetted successfully";
 	}
 
 	private void updateGlobalCounters(int globalMissedTherapyCounter,
@@ -464,6 +474,8 @@ public class AdherenceCalculationService {
 		// validating the last 3 days therapies with respect to the user protocol
 		if(!isHMRCompliant(userProtocolConstants, durationFor3Days)){
 			score = score < HMR_NON_COMPLIANCE_POINTS ? 0 : score - HMR_NON_COMPLIANCE_POINTS;
+		}else if(newCompliance.isSettingsDeviated()){
+			score = score < SETTING_DEVIATION_POINTS ? 0 : score - SETTING_DEVIATION_POINTS;
 		}else{
 			score = score <=  DEFAULT_COMPLIANCE_SCORE - BONUS_POINTS ? score + BONUS_POINTS : DEFAULT_COMPLIANCE_SCORE;
 		}

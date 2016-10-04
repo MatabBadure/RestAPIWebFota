@@ -9,7 +9,7 @@ spring:
         active: prod
     datasource:
         dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
-        url: jdbc:mysql://Indsugrc02v:3306/hillromvest_prod
+        url: jdbc:mysql://Indsugrc01vd:3306/hillromvest_prod?zeroDateTimeBehavior=convertToNull
         databaseName: 
         serverName: 
         username: root
@@ -47,6 +47,6 @@ spring:
         baseUrl: https://visiview.hill-rom.com
         accountActivationReminderInterval: 12
     survey:
-        surveyreportemailids: joelkaka@gmail.com 
+        surveyreportemailids: joelpreetham.fernandes4@hill-rom.com,vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com
     changePrescription:
-        changePrescriptionEmailids: joelpreetham.fernandes4@hill-rom.com,joelkaka@gmail.com 
+        changePrescriptionEmailids: joelpreetham.fernandes4@hill-rom.com,vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com

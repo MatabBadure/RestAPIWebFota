@@ -59,28 +59,24 @@ public class PatientVestDeviceDataResource {
 	public ResponseEntity<?> receiveData(@RequestBody(required=true)String rawMessage){
 
 		try{
-		//byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
-		//rawMessage = new String(decoded, "UTF-8");
-		//System.out.println("rawmessage : "+ (rawMessage) + "\n");
+
 
 		
-		log.debug("Received Data for ingestion : ",rawMessage);
+			log.error("Received Data for ingestion : ",rawMessage);
 
 			JSONObject jsonObject = new JSONObject();
+			byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
+			String base64_decoded_Message = new String(decoded, "UTF-8");
+			log.debug("Base64 Decoded Message : ",base64_decoded_Message);
 
-
-			JSONObject chargerJsonData = ParserUtil.getQclJsonDataFromRawMessage(rawMessage);
+			JSONObject chargerJsonData = ParserUtil.getQclJsonDataFromRawMessage(base64_decoded_Message);
 			if(chargerJsonData.get("device_model_type").toString().equalsIgnoreCase("HillRom_Monarch")){
-				//ChargerData chargerData = chargerDataService.saveOrUpdateChargerData(rawMessage);
-				chargerJsonData = chargerDataService.saveOrUpdateChargerData(rawMessage);
-				//if(chargerData.getDeviceData().length() > 0){
+				chargerJsonData = chargerDataService.saveOrUpdateChargerData(base64_decoded_Message);
 				if(chargerJsonData.get("RESULT").equals("OK")){
-					//jsonObject.put("message",ExitStatus.COMPLETED);
 					jsonObject.put("message",chargerJsonData.get("RESULT") + " : " + chargerJsonData.get("ERROR"));
 					return new ResponseEntity<>(jsonObject,HttpStatus.CREATED);
 				}
 				else{
-					//jsonObject.put("message",ExitStatus.FAILED);
 					jsonObject.put("message",chargerJsonData.get("RESULT") + " : " + chargerJsonData.get("ERROR"));
 					return new ResponseEntity<>(jsonObject,HttpStatus.PARTIAL_CONTENT);
 				}
@@ -107,16 +103,11 @@ public class PatientVestDeviceDataResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> receiveDataCharger(@RequestBody(required=true)int[] rawMessage){
 
-		try{
-
-		
+		try{		
 			log.debug("Received Data for ingestion : ",rawMessage);
-
 			JSONObject chargerJsonData = new JSONObject();
-
 			chargerJsonData = chargerDataService.saveOrUpdateChargerData(rawMessage);
 			return new ResponseEntity<>(chargerJsonData,HttpStatus.CREATED);
-
 		}catch(Exception e){
 			e.printStackTrace();
 			JSONObject error = new JSONObject();

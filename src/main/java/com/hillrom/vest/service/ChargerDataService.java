@@ -253,13 +253,13 @@ public class ChargerDataService {
 	    
 		    int nCheckSum = 0;
 		    
-		    //loop until crc=
 		    for ( int nCounter = 0; nCounter < (rawData.length) - 2; nCounter++ )
 		    {
 		      nCheckSum += rawData[nCounter];
 		    }
 		    
-		    System.out.print(nCheckSum + " ");
+		    log.error("Check Sum  : "+ nCheckSum);
+		    
 		    while ( nCheckSum >  65535 )
 		    {
 		      nCheckSum -= 65535;

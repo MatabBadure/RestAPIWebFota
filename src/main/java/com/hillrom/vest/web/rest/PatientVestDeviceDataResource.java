@@ -71,13 +71,17 @@ public class PatientVestDeviceDataResource {
 
 			JSONObject chargerJsonData = ParserUtil.getQclJsonDataFromRawMessage(rawMessage);
 			if(chargerJsonData.get("device_model_type").toString().equalsIgnoreCase("HillRom_Monarch")){
-				ChargerData chargerData = chargerDataService.saveOrUpdateChargerData(rawMessage);	
-				if(chargerData.getDeviceData().length() > 0){
-					jsonObject.put("message",ExitStatus.COMPLETED);
+				//ChargerData chargerData = chargerDataService.saveOrUpdateChargerData(rawMessage);
+				chargerJsonData = chargerDataService.saveOrUpdateChargerData(rawMessage);
+				//if(chargerData.getDeviceData().length() > 0){
+				if(chargerJsonData.get("RESULT").equals("OK")){
+					//jsonObject.put("message",ExitStatus.COMPLETED);
+					jsonObject.put("message",chargerJsonData.get("RESULT") + " : " + chargerJsonData.get("ERROR"));
 					return new ResponseEntity<>(jsonObject,HttpStatus.CREATED);
 				}
 				else{
-					jsonObject.put("message",ExitStatus.FAILED);
+					//jsonObject.put("message",ExitStatus.FAILED);
+					jsonObject.put("message",chargerJsonData.get("RESULT") + " : " + chargerJsonData.get("ERROR"));
 					return new ResponseEntity<>(jsonObject,HttpStatus.PARTIAL_CONTENT);
 				}
 			}

@@ -1207,7 +1207,7 @@ public class UserService {
 		if(null == patientInfo)
 			return Optional.empty();
 		
-		Note memoNote = noteService.findMemoNotesForPatientId(id, user.getHillromId());
+		Note memoNote = noteService.findMemoNotesForPatientId(id, patientInfo.getId());
 		 
 		PatientCompliance compliance = complianceService.findLatestComplianceByPatientUserId(id);
 		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patientInfo.getId());
@@ -1599,7 +1599,7 @@ public class UserService {
 			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
     		if(Objects.nonNull(patientInfo)) {
     			
-    			Note memoNote = noteService.findOneByUserIdAndPatientID(clinicUserId, patientUser.getHillromId());
+    			Note memoNote = noteService.findOneByUserIdAndPatientID(patientUser.getId(), patientInfo.getId());
     			
 				Optional<ClinicPatientAssoc> clinicPatientAssoc = clinicPatientRepository.findOneByClinicIdAndPatientId(
 						clinicId, patientInfo.getId());

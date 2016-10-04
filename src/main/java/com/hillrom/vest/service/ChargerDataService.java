@@ -105,7 +105,7 @@ public class ChargerDataService {
 						missingParams.contains(DEVICE_VER) || missingParams.contains(DEVICE_DATA) || missingParams.contains(CRC)
 						){
 					chargerJsonData.put("RESULT", "NOT OK");
-					chargerJsonData.put("ERROR","Missing Params : "+String.join(",",missingParams));
+					chargerJsonData.put("ERROR","Missing Params");
 					return chargerJsonData;
 					//throw new HillromException("Missing Params : "+String.join(",",missingParams));
 				}else{

@@ -70,6 +70,7 @@ public class PatientVestDeviceDataResource {
 			//String base64_decoded_Message = new String(decoded, "UTF-8");
 			//log.debug("Base64 Decoded Message : ",base64_decoded_Message);
 
+			/**
 			JSONObject chargerJsonData = ParserUtil.getQclJsonDataFromRawMessage(rawMessage);
 			if(chargerJsonData.get("device_model_type").toString().equalsIgnoreCase("HillRom_Monarch")){
 				chargerJsonData = chargerDataService.saveOrUpdateChargerData(rawMessage);
@@ -81,7 +82,7 @@ public class PatientVestDeviceDataResource {
 					jsonObject.put("message",chargerJsonData.get("RESULT") + " : " + chargerJsonData.get("ERROR"));
 					return new ResponseEntity<>(jsonObject,HttpStatus.PARTIAL_CONTENT);
 				}
-			}
+			}*/
 			
 			ExitStatus exitStatus = deviceDataService.saveData(rawMessage.replaceAll("\n", "").replaceAll(" ", ""));
 			jsonObject.put("message",exitStatus.getExitCode());
@@ -105,19 +106,18 @@ public class PatientVestDeviceDataResource {
 	public ResponseEntity<?> receiveDataCharger(@RequestBody(required=true)String rawMessage){
 
 		try{		
-			log.error("Received Data for ingestion : ",rawMessage);
+			log.error("Received Data for ingestion in receiveDataCharger : ",rawMessage);
 			byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
 			int[] decoded_int = ParserUtil.convertToIntArray(decoded);
 			String sOut = "";
 			for(int i=0;i<decoded_int.length;i++){
 				sOut = sOut + decoded_int[i] + " ";
 			}
-
-			log.error("Full Decimal Byte Array : "+sOut);			
+			log.error("Full Decimal Byte Array in receiveDataCharger : "+sOut);			
 			String base64_decoded_Message = Arrays.toString(decoded_int);
 			log.error("Base64 Decoded Message : ",base64_decoded_Message);
 			JSONObject chargerJsonData = new JSONObject();
-			//chargerJsonData = chargerDataService.saveOrUpdateChargerData(rawMessage);
+			chargerJsonData = chargerDataService.saveOrUpdateChargerData(decoded_int);
 			return new ResponseEntity<>(chargerJsonData,HttpStatus.CREATED);
 		}catch(Exception e){
 			e.printStackTrace();

@@ -161,8 +161,8 @@ public class ChargerDataService {
 		
 		
 		if((rawData.lastIndexOf("&crc=")>0) && (rawData.substring(rawData.lastIndexOf("&crc=")+5,rawData.length()).getBytes().length==2)){
-			secondlast_digit = Math.abs(int_input[int_input.length-2]);
-			last_digit = Math.abs(int_input[int_input.length-1]);
+			secondlast_digit = int_input[int_input.length-2];
+			last_digit = int_input[int_input.length-1];
 		}
 		log.error("second last digit : " + secondlast_digit);		
 		log.error("last digit : " + last_digit);
@@ -177,7 +177,7 @@ public class ChargerDataService {
 		log.error("Full Decimal Byte till CRC : "+sOut);
 		
 		for(int i=0;i<int_input.length;i++){
-			crc_value = crc_value + Math.abs(b3[i]);
+			crc_value = crc_value + b3[i];
 		}
 		log.error("crc_value : "+ crc_value);
 		

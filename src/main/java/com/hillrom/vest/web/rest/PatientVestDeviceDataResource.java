@@ -65,13 +65,13 @@ public class PatientVestDeviceDataResource {
 			log.error("Received Data for ingestion : ",rawMessage);
 
 			JSONObject jsonObject = new JSONObject();
-			byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
-			String base64_decoded_Message = new String(decoded, "UTF-8");
-			log.debug("Base64 Decoded Message : ",base64_decoded_Message);
+			//byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
+			//String base64_decoded_Message = new String(decoded, "UTF-8");
+			//log.debug("Base64 Decoded Message : ",base64_decoded_Message);
 
-			JSONObject chargerJsonData = ParserUtil.getQclJsonDataFromRawMessage(base64_decoded_Message);
+			JSONObject chargerJsonData = ParserUtil.getQclJsonDataFromRawMessage(rawMessage);
 			if(chargerJsonData.get("device_model_type").toString().equalsIgnoreCase("HillRom_Monarch")){
-				chargerJsonData = chargerDataService.saveOrUpdateChargerData(base64_decoded_Message);
+				chargerJsonData = chargerDataService.saveOrUpdateChargerData(rawMessage);
 				if(chargerJsonData.get("RESULT").equals("OK")){
 					jsonObject.put("message",chargerJsonData.get("RESULT") + " : " + chargerJsonData.get("ERROR"));
 					return new ResponseEntity<>(jsonObject,HttpStatus.CREATED);

@@ -147,8 +147,9 @@ public class ChargerDataService {
 		String sOut = "";
 
 		byte[] b3 = rawData.getBytes(); //rawData.getBytes(StandardCharsets.UTF_8); // Java 7+ only
-		for(int i=0;i<b3.length;i++){
-			sOut = sOut + b3[i] + " ";
+		int[] int_input = ParserUtil.convertToIntArray(b3);
+		for(int i=0;i<int_input.length;i++){
+			sOut = sOut + int_input[i] + " ";
 		}
 
 		log.error("Full Decimal Byte Array : "+sOut);
@@ -160,8 +161,8 @@ public class ChargerDataService {
 		
 		
 		if((rawData.lastIndexOf("&crc=")>0) && (rawData.substring(rawData.lastIndexOf("&crc=")+5,rawData.length()).getBytes().length==2)){
-			secondlast_digit = Math.abs(b3[b3.length-2]);
-			last_digit = Math.abs(b3[b3.length-1]);
+			secondlast_digit = Math.abs(int_input[int_input.length-2]);
+			last_digit = Math.abs(int_input[int_input.length-1]);
 		}
 		log.error("second last digit : " + secondlast_digit);		
 		log.error("last digit : " + last_digit);
@@ -169,13 +170,13 @@ public class ChargerDataService {
 		String rawData_tillcrc = rawData.substring(0,rawData.lastIndexOf("&crc=")+5);
 		log.error("Raw Data till CRC : " + rawData_tillcrc);
 		b3 = rawData_tillcrc.getBytes();
-		
-		for(int i=0;i<b3.length;i++){
-			sOut = sOut + b3[i] + " ";
+		int_input = ParserUtil.convertToIntArray(b3);
+		for(int i=0;i<int_input.length;i++){
+			sOut = sOut + int_input[i] + " ";
 		}
 		log.error("Full Decimal Byte till CRC : "+sOut);
 		
-		for(int i=0;i<b3.length;i++){
+		for(int i=0;i<int_input.length;i++){
 			crc_value = crc_value + Math.abs(b3[i]);
 		}
 		log.error("crc_value : "+ crc_value);

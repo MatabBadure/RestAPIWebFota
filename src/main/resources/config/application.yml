@@ -16,12 +16,12 @@ async:
 mail:
     host: smtp.gmail.com
     port: 587
-    username: test.lnt.hillrom@gmail.com
+    username: test.hillrom@gmail.com
     password: hillrom12345
     protocol: smtp
     tls: true
     auth: true
-    from: test.lnt.hillrom@gmail.com
+    from: test.hillrom@gmail.com
     to: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com,raghu.nt@lnttechservices.com
 authentication:
     xauth:

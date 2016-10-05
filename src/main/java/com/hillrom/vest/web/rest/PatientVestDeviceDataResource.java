@@ -1,6 +1,7 @@
 package com.hillrom.vest.web.rest;
 
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -101,12 +102,22 @@ public class PatientVestDeviceDataResource {
 	@RequestMapping(value = "/receiveDataCharger",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> receiveDataCharger(@RequestBody(required=true)int[] rawMessage){
+	public ResponseEntity<?> receiveDataCharger(@RequestBody(required=true)String rawMessage){
 
 		try{		
-			log.debug("Received Data for ingestion : ",rawMessage);
+			log.error("Received Data for ingestion : ",rawMessage);
+			byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
+			int[] decoded_int = ParserUtil.convertToIntArray(decoded);
+			String sOut = "";
+			for(int i=0;i<decoded_int.length;i++){
+				sOut = sOut + decoded_int[i] + " ";
+			}
+
+			log.error("Full Decimal Byte Array : "+sOut);			
+			String base64_decoded_Message = Arrays.toString(decoded_int);
+			log.error("Base64 Decoded Message : ",base64_decoded_Message);
 			JSONObject chargerJsonData = new JSONObject();
-			chargerJsonData = chargerDataService.saveOrUpdateChargerData(rawMessage);
+			//chargerJsonData = chargerDataService.saveOrUpdateChargerData(rawMessage);
 			return new ResponseEntity<>(chargerJsonData,HttpStatus.CREATED);
 		}catch(Exception e){
 			e.printStackTrace();

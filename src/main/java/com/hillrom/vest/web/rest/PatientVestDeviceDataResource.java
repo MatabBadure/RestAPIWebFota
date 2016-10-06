@@ -119,7 +119,7 @@ public class PatientVestDeviceDataResource {
 			JSONObject chargerJsonData = new JSONObject();
 			chargerJsonData = chargerDataService.saveOrUpdateChargerData(decoded_int);
 			JSONObject result = new JSONObject();
-			result.put("RESULT", chargerJsonData.get("RESULT") + " " + chargerJsonData.get("ERROR"));
+			result.put("RESULT", chargerJsonData.get("RESULT") + " - " + chargerJsonData.get("ERROR"));
 			return new ResponseEntity<>(result,HttpStatus.CREATED);
 		}catch(Exception e){
 			e.printStackTrace();

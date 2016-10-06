@@ -808,42 +808,43 @@ public class AdherenceCalculationService {
 			SortedMap<LocalDate,List<TherapySession>> existingTherapySessionMap,
 			SortedMap<LocalDate,List<TherapySession>> receivedTherapySessionsMap,
 			SortedMap<LocalDate,PatientCompliance> existingComplianceMap,
-			ProtocolConstants protocolConstant) throws Exception{
-		for(LocalDate currentTherapySessionDate : receivedTherapySessionsMap.keySet()){
+			ProtocolConstants protocolConstant, PatientInfo patient) throws Exception{
+			//HILL-1843
+			LocalDate trainingOrFirstTransmissionDate = null;
+		
+			try{
+			LocalDate firstTransmissionDate = null;
+			LocalDate trainingDate = null;
+		  	if(Objects.nonNull(patientNoEvent)&& (Objects.nonNull(patientNoEvent.getFirstTransmissionDate()))){
+			  firstTransmissionDate = patientNoEvent.getFirstTransmissionDate();
+		  	}
+		  	if(Objects.nonNull(patient)&& (Objects.nonNull(patient.getTrainingDate()))){
+			  trainingDate = patient.getTrainingDate().toLocalDate();
+		  	}
+			log.debug("HILL-1843 : processAdherenceScore FirstTransmissionDate "+ firstTransmissionDate);
+			log.debug("HILL-1843 : processAdherenceScore trainingDate "+ trainingDate);
+			trainingOrFirstTransmissionDate = getTrainingOrFirstTransmissionDate(firstTransmissionDate,trainingDate);
+			log.debug("HILL-1843 : processAdherenceScore trainingOrFirstTransmissionDate "+ trainingOrFirstTransmissionDate);
+			}catch(Exception ex){
+			ex.printStackTrace();
+			}
+			for(LocalDate currentTherapySessionDate : receivedTherapySessionsMap.keySet()){
 			List<TherapySession> receivedTherapySessions = receivedTherapySessionsMap.get(currentTherapySessionDate);
 			LocalDate firstTransmittedDate = null;
 			LocalDate latestTherapyDate = null;
-			PatientInfo patient = null;
+			//PatientInfo patient = null;
 			User patientUser = null;
 			if(receivedTherapySessions.size() > 0){
 				patient = receivedTherapySessions.get(0).getPatientInfo();
 				patientUser = receivedTherapySessions.get(0).getPatientUser();
 				
-				//HILL-1843
-				LocalDate trainingOrFirstTransmissionDate = null;
-				
-				try{
-					LocalDate firstTransmissionDate = null;
-					LocalDate trainingDate = null;
-				  	if(Objects.nonNull(patientNoEvent)&& (Objects.nonNull(patientNoEvent.getFirstTransmissionDate()))){
-					  firstTransmissionDate = patientNoEvent.getFirstTransmissionDate();
-				  	}
-				  	if(Objects.nonNull(patient)&& (Objects.nonNull(patient.getTrainingDate()))){
-					  trainingDate = patient.getTrainingDate().toLocalDate();
-				  	}
-					log.debug("HILL-1843 : processAdherenceScore FirstTransmissionDate "+ firstTransmissionDate);
-					log.debug("HILL-1843 : processAdherenceScore trainingDate "+ trainingDate);
-					trainingOrFirstTransmissionDate = getTrainingOrFirstTransmissionDate(firstTransmissionDate,trainingDate);
-					log.debug("HILL-1843 : processAdherenceScore trainingOrFirstTransmissionDate "+ trainingOrFirstTransmissionDate);
-				}catch(Exception ex){
-					ex.printStackTrace();
-				}
+			
 				
 				//if(Objects.nonNull(patientNoEvent) && Objects.nonNull(patientNoEvent.getFirstTransmissionDate()))
 				if(Objects.nonNull(trainingOrFirstTransmissionDate))
 					//firstTransmittedDate = patientNoEvent.getFirstTransmissionDate();
 					firstTransmittedDate = trainingOrFirstTransmissionDate;
-				else
+				if(Objects.isNull(firstTransmittedDate))
 					firstTransmittedDate = currentTherapySessionDate;
 			}
 			

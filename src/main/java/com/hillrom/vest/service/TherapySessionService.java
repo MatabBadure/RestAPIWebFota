@@ -76,7 +76,7 @@ public class TherapySessionService {
 			SortedMap<LocalDate,List<TherapySession>> existingTherapySessionMap = getAllTherapySessionsMapByPatientUserId(patientUser.getId());
 			SortedMap<LocalDate,PatientCompliance> existingComplianceMap = complianceService.getPatientComplainceMapByPatientUserId(patientUser.getId());
 			adherenceCalculationService.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
-					receivedTherapySessionMap, existingComplianceMap,protocol, patient);
+					receivedTherapySessionMap, existingComplianceMap,protocol);
 		}
 		return therapySessions;
 	}

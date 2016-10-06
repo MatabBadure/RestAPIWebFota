@@ -125,6 +125,10 @@ public class ChargerDataService {
 						chargerJsonData.put("RESULT", "NOT OK");
 						chargerJsonData.put("ERROR","CRC Validation Failed");
 						return chargerJsonData;
+					}else{
+						chargerJsonData.put("RESULT", "OK");
+						chargerJsonData.put("ERROR","");
+						return chargerJsonData;					
 					}
 				}
 			}else{

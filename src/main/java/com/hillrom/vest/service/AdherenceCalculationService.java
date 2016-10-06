@@ -844,7 +844,7 @@ public class AdherenceCalculationService {
 				if(Objects.nonNull(trainingOrFirstTransmissionDate))
 					//firstTransmittedDate = patientNoEvent.getFirstTransmissionDate();
 					firstTransmittedDate = trainingOrFirstTransmissionDate;
-				if(Objects.isNull(firstTransmittedDate))
+				else if(Objects.isNull(firstTransmittedDate))
 					firstTransmittedDate = currentTherapySessionDate;
 			}
 			

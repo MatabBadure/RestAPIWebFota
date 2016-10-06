@@ -431,7 +431,7 @@ public class AdherenceCalculationService {
 		int score = prevCompliance.getScore();
 		
 		// Get earlier third day to finding therapy session
-		LocalDate threeDaysEarlyDate = getDateBeforeSpecificDays(complianceDate,3);
+		LocalDate threeDaysEarlyDate = getDateBeforeSpecificDays(complianceDate,2);
 		
 		// Get therapy session for last 3 days
 		List<TherapySession> therapySessions = therapySessionRepository.findByDateBetweenAndPatientUserId(threeDaysEarlyDate, complianceDate, userId);

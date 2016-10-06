@@ -81,17 +81,15 @@ public class ChargerDataService {
 
 
 	
-	public JSONObject saveOrUpdateChargerData(int[] decoded_int) throws HillromException{	
+	public JSONObject saveOrUpdateChargerData(String decoded_string) throws HillromException{	
 		
-		
-		String rawData = "";
-		for(int i=0;i<decoded_int.length;i++){
-			char ch = (char)decoded_int[i]; 
-			rawData = rawData + ch;
+		int[] decoded_int = new int[decoded_string.length()];
+		for(int i=0;i<decoded_string.length();i++){
+			int c = decoded_string.charAt(i);
+			decoded_int[i] = c;
 		}
-		log.error("RAW DATA in string : " + rawData);
-			
-		JSONObject chargerJsonData = validateRequest(rawData,decoded_int);
+		
+		JSONObject chargerJsonData = validateRequest(decoded_string,decoded_int);
 		ChargerData chargerData = new ChargerData();
 		chargerData.setDeviceData(chargerJsonData.get(DEVICE_DATA).toString());
 		chargerData.setCreatedTime(new DateTime());
@@ -152,9 +150,7 @@ public class ChargerDataService {
 	private boolean validateCheckSum(int[] int_input) throws HillromException {
 		int crc_value = 0;
 		String sOut = "";
-		
-		//int[] int_input = new int[]{100,101,118,105,99,101,95,109,111,100,101,108,95,116,121,112,101,61,72,105,108,108,82,111,109,95,77,111,110,97,114,99,104,38,100,101,118,83,78,61,0,0,0,0,38,100,101,118,87,73,70,73,61,0,35,167,143,38,52,38,100,101,118,86,101,114,61,1,0,0,0,9,0,1,0,38,100,101,118,105,99,101,68,97,116,97,61,0,0,0,1,16,1,1,0,27,30,16,1,1,0,27,32,0,0,2,255,0,0,0,3,60,0,27,30,7,12,4,7,62,60,0,27,32,16,12,4,7,62,38,99,114,99,61,17,224};
-		
+	
 		for(int i=0;i<int_input.length;i++){
 			sOut = sOut + int_input[i] + " ";
 		}

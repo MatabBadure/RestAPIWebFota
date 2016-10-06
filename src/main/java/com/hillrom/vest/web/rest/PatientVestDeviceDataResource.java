@@ -1,6 +1,8 @@
 package com.hillrom.vest.web.rest;
 
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +56,7 @@ public class PatientVestDeviceDataResource {
 	
 	private final Logger log = LoggerFactory.getLogger(PatientVestDeviceDataResource.class);
 	
+	
 	@RequestMapping(value = "/receiveData",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -66,23 +69,7 @@ public class PatientVestDeviceDataResource {
 			log.error("Received Data for ingestion : ",rawMessage);
 
 			JSONObject jsonObject = new JSONObject();
-			//byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
-			//String base64_decoded_Message = new String(decoded, "UTF-8");
-			//log.debug("Base64 Decoded Message : ",base64_decoded_Message);
 
-			/**
-			JSONObject chargerJsonData = ParserUtil.getQclJsonDataFromRawMessage(rawMessage);
-			if(chargerJsonData.get("device_model_type").toString().equalsIgnoreCase("HillRom_Monarch")){
-				chargerJsonData = chargerDataService.saveOrUpdateChargerData(rawMessage);
-				if(chargerJsonData.get("RESULT").equals("OK")){
-					jsonObject.put("message",chargerJsonData.get("RESULT") + " : " + chargerJsonData.get("ERROR"));
-					return new ResponseEntity<>(jsonObject,HttpStatus.CREATED);
-				}
-				else{
-					jsonObject.put("message",chargerJsonData.get("RESULT") + " : " + chargerJsonData.get("ERROR"));
-					return new ResponseEntity<>(jsonObject,HttpStatus.PARTIAL_CONTENT);
-				}
-			}*/
 			
 			ExitStatus exitStatus = deviceDataService.saveData(rawMessage.replaceAll("\n", "").replaceAll(" ", ""));
 			jsonObject.put("message",exitStatus.getExitCode());
@@ -106,18 +93,24 @@ public class PatientVestDeviceDataResource {
 	public ResponseEntity<?> receiveDataCharger(@RequestBody(required=true)String rawMessage){
 
 		try{		
-			log.error("Received Data for ingestion in receiveDataCharger : ",rawMessage);
+			log.error("Base64 Received Data for ingestion in receiveDataCharger : ",rawMessage);		
+			
 			byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
 			int[] decoded_int = ParserUtil.convertToIntArray(decoded);
-			String sOut = "";
-			for(int i=0;i<decoded_int.length;i++){
-				sOut = sOut + decoded_int[i] + " ";
+			
+			String decoded_string = new String(decoded);
+			log.error("Decoded value is " + decoded_string);
+			String sout = "";
+			for(int i=0;i<decoded_string.length();i++){
+				int c = decoded_string.charAt(i);
+				decoded_int[i] = c;
+				sout = sout + " " + decoded_int[i];
 			}
-			log.error("Full Decimal Byte Array in receiveDataCharger : "+sOut);			
-			String base64_decoded_Message = Arrays.toString(decoded_int);
-			log.error("Base64 Decoded Message : ",base64_decoded_Message);
+			
+			log.error("Base64 Decoded Message : ",sout);
+			
 			JSONObject chargerJsonData = new JSONObject();
-			chargerJsonData = chargerDataService.saveOrUpdateChargerData(decoded_int);
+			chargerJsonData = chargerDataService.saveOrUpdateChargerData(decoded_string);
 			JSONObject result = new JSONObject();
 			result.put("RESULT", chargerJsonData.get("RESULT") + " - " + chargerJsonData.get("ERROR"));
 			return new ResponseEntity<>(result,HttpStatus.CREATED);
@@ -128,6 +121,8 @@ public class PatientVestDeviceDataResource {
 			return new ResponseEntity<>(error,HttpStatus.PARTIAL_CONTENT);
 		}
 	}
+	
+
 	
 	@RequestMapping(value = "/vestdevicedata",
             method = RequestMethod.GET,

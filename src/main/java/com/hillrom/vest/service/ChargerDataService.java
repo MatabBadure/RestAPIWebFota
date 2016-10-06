@@ -134,6 +134,7 @@ public class ChargerDataService {
 					return chargerJsonData;
 				}else{
 					chargerJsonData.put("RESULT", "OK");
+					chargerJsonData.put("ERROR","");
 					return chargerJsonData;					
 				}
 			}

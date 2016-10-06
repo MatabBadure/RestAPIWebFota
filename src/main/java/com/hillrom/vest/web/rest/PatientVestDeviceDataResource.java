@@ -118,7 +118,9 @@ public class PatientVestDeviceDataResource {
 			log.error("Base64 Decoded Message : ",base64_decoded_Message);
 			JSONObject chargerJsonData = new JSONObject();
 			chargerJsonData = chargerDataService.saveOrUpdateChargerData(decoded_int);
-			return new ResponseEntity<>(chargerJsonData,HttpStatus.CREATED);
+			JSONObject result = new JSONObject();
+			result.put("RESULT", chargerJsonData.get("RESULT") + " " + chargerJsonData.get("ERROR"));
+			return new ResponseEntity<>(result,HttpStatus.CREATED);
 		}catch(Exception e){
 			e.printStackTrace();
 			JSONObject error = new JSONObject();

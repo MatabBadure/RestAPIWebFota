@@ -95,11 +95,15 @@ public class PatientVestDeviceDataResource {
 		try{		
 			log.error("Base64 Received Data for ingestion in receiveDataCharger : ",rawMessage);		
 			
+			
+			
 			byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
 			int[] decoded_int = ParserUtil.convertToIntArray(decoded);
 			
 			String decoded_string = new String(decoded);
 			log.error("Decoded value is " + decoded_string);
+			
+			/*
 			String sout = "";
 			for(int i=0;i<decoded_string.length();i++){
 				int c = decoded_string.charAt(i);
@@ -108,9 +112,10 @@ public class PatientVestDeviceDataResource {
 			}
 			
 			log.error("Base64 Decoded Message : ",sout);
+			*/
 			
 			JSONObject chargerJsonData = new JSONObject();
-			chargerJsonData = chargerDataService.saveOrUpdateChargerData(decoded_string);
+			chargerJsonData =   chargerDataService.saveOrUpdateChargerData(rawMessage,decoded_string);
 			JSONObject result = new JSONObject();
 			result.put("RESULT", chargerJsonData.get("RESULT") + " - " + chargerJsonData.get("ERROR"));
 			return new ResponseEntity<>(result,HttpStatus.CREATED);

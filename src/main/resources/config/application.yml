@@ -22,7 +22,7 @@ mail:
     tls: true
     auth: true
     from: test.hillrom@gmail.com
-    to: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com,raghu.nt@lnttechservices.com
+    to: vijayanand.jayapal@lnttechservices.com
 authentication:
     xauth:
         secret: myXAuthSecret

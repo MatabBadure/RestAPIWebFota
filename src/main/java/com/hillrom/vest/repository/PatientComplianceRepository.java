@@ -48,6 +48,7 @@ public interface PatientComplianceRepository extends
 	@Query(nativeQuery=true,value=" SELECT * from PATIENT_COMPLIANCE where date < :adherStDate and user_id = :userId order by date desc limit 1")
 	PatientCompliance returnPrevDayScore(
 			@Param("adherStDate")String adherStDate, @Param("userId")Long userId);
-			
+	@Query("from PatientCompliance pc where pc.date = ?1 and pc.patientUser.id = ?2")
+	PatientCompliance findByDateAndPatientUserId(LocalDate date,Long patientUserId);
 			
 }

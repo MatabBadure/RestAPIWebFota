@@ -292,10 +292,9 @@ public class AdherenceCalculationService {
 			// Adherence Start date in string for query
 			String sAdherenceStDate = adherenceStartDate.toString();
 					
-			/*LocalDate todayDate = LocalDate.now();
-			String today = todayDate.toString();
+			LocalDate todayDate = LocalDate.now();
 			LocalDate prevDate = DateUtil.getPlusOrMinusTodayLocalDate(-1);
-			*/
+			
 			
 			// Get the list of rows for the user id from the adherence reset start date 
 			List<PatientCompliance> patientComplianceList = patientComplianceRepository.returnComplianceForPatientIdDates(sAdherenceStDate, userId);
@@ -305,7 +304,7 @@ public class AdherenceCalculationService {
 			
 			for(PatientCompliance compliance : patientComplianceList){
 				
-				/*if(compliance.getDate().equals(todayDate)){
+				if(compliance.getDate().equals(todayDate)){
 					PatientCompliance prevCompliance = patientComplianceRepository.findByPatientUserIdAndDate(userId,prevDate);
 					compliance.setPatientUser(prevCompliance.getPatientUser());
 					compliance.setPatient(prevCompliance.getPatient());
@@ -323,7 +322,7 @@ public class AdherenceCalculationService {
 					
 					patientComplianceRepository.save(compliance);
 					
-				}else{*/
+				}else{
 				
 					PatientCompliance currentCompliance = patientComplianceRepository.findById(compliance.getId());
 					
@@ -346,7 +345,7 @@ public class AdherenceCalculationService {
 							calculateUserHMRComplianceForMST(currentCompliance, userProtocolConstant, currentCompliance.getDate(), userId, notification);
 						}
 					}
-				//}
+				}
 			}
 		}catch(Exception ex){
 			StringWriter writer = new StringWriter();

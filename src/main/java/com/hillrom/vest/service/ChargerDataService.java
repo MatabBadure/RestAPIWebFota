@@ -87,7 +87,10 @@ public class ChargerDataService {
 		for(int i=0;i<decoded_string.length();i++){
 			int c = decoded_string.charAt(i);
 			decoded_int[i] = c;
+			decoded_int[i] = decoded_int[i] & 0xff;
 		}
+		
+
 		
 		JSONObject chargerJsonData = validateRequest(decoded_string,decoded_int);
 		ChargerData chargerData = new ChargerData();

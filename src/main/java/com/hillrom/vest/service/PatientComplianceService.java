@@ -218,7 +218,7 @@ public class PatientComplianceService {
 			trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_DISPLAY_VALUE, -HMR_NON_COMPLIANCE_POINTS);
 			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
 		}else if(ADHERENCE_SCORE_RESET.equalsIgnoreCase(notificationType)){
-			trendVO.getNotificationPoints().put(ADHERENCE_SCORE_RESET_DISPLAY_VALUE, DEFAULT_COMPLIANCE_SCORE);
+			trendVO.getNotificationPoints().put(ADHERENCE_SCORE_RESET_DISPLAY_VALUE, complianceMap.get(date).getScore());
 		}else{
 			trendVO.getNotificationPoints().put(notificationType,pointsChanged);
 		}

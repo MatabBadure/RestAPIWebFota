@@ -33,15 +33,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.domain.AdherenceReset;
+import com.hillrom.vest.domain.PatientCompliance;
+import com.hillrom.vest.domain.PatientNoEvent;
+import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.AdherenceResetRepository;
+import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PredicateBuilder;
+import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.AdherenceResetService;
 import com.hillrom.vest.service.NoteService;
+import com.hillrom.vest.service.PatientNoEventService;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -70,6 +76,14 @@ public class AdherenceResource {
 
     @Inject
 	private AdherenceCalculationService adherenceCalculationService;
+	@Inject
+	private PatientComplianceRepository patientComplianceRepository;
+	
+    @Inject
+	private PatientNoEventService noEventService;
+    
+	@Inject
+	private TherapySessionRepository therapyRepository;
 	
     /**
      * POST  /clinics -> Create a new clinic.
@@ -103,6 +117,36 @@ public class AdherenceResource {
 		}
 		    	
 		try {
+			
+					
+			// Getting the compliance record for the user on adhrence start date
+			PatientCompliance patientCompliance = patientComplianceRepository.findByDateAndPatientUserId(resetStartDt,Long.parseLong(userId));
+			
+			// Getting the event record for the user 
+			PatientNoEvent noEvent = noEventService.findByPatientUserId(Long.parseLong(userId));
+			
+			// Check for existing adherence score is 100
+			if(Objects.nonNull(patientCompliance) && patientCompliance.getScore() == 100){
+				jsonObject.put("message", "Adherence score cannot be reset for existing adherence score of 100");
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+			}
+			else if(Objects.isNull(noEvent) || Objects.isNull(noEvent.getFirstTransmissionDate())){
+				
+				// Check for the non transmission users
+				jsonObject.put("message", "Adherence score cannot be reset for the non transmissions users");
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+			}else{
+				TherapySession therapy = therapyRepository.findTop1ByPatientUserIdOrderByDateAsc(Long.parseLong(userId));
+				if(Objects.nonNull(therapy)){
+					LocalDate firstTherapyDate = therapy.getDate();
+					
+					// Check for the reset date is not before first therapy date
+					if(resetStartDt.isBefore(firstTherapyDate)){
+						jsonObject.put("message", "Adherence start date should be after first therapy date");
+			            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+					}
+				}
+			}
 			AdherenceReset adherenceReset = adherenceResetService.createAdherenceReset(patientId, Long.parseLong(userId), resetDt, 
 																					Integer.parseInt(resetScore), resetStartDt, justification, Long.parseLong(createdById));
 	        if (Objects.isNull(adherenceReset)) {

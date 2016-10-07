@@ -301,6 +301,8 @@ public class AdherenceCalculationService {
 					
 					PatientCompliance currentCompliance = patientComplianceRepository.findById(compliance.getId());
 					
+					Notification notification = notificationRepository.findByPatientUserIdAndDate(userId, currentCompliance.getDate());
+					
 					// Score remains the adherence score which has been set for first 2 days
 					if(DateUtil.getDaysCountBetweenLocalDates(adherenceStartDate, compliance.getDate()) <= 1){	
 						currentCompliance.setScore(adherenceScore);
@@ -308,14 +310,12 @@ public class AdherenceCalculationService {
 					}else{
 						if(currentCompliance.getMissedTherapyCount() >= DEFAULT_MISSED_THERAPY_DAYS_COUNT){
 							// Missed therapy days
-							calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId);
+							calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, notification);
 						}else{
 							// HMR Non Compliance
-							calculateUserHMRComplianceForMST(currentCompliance, userProtocolConstant, currentCompliance.getDate(), userId);
+							calculateUserHMRComplianceForMST(currentCompliance, userProtocolConstant, currentCompliance.getDate(), userId, notification);
 						}
-					}PatientCompliance currentCompliance = patientComplianceRepository.findById(compliance.getId());
-					
-					Notification notification = notificationRepository.findByPatientUserIdAndDate(userId, currentCompliance.getDate());
+					}
 					
 					// Score remains the adherence score which has been set for first 2 days
 					if(DateUtil.getDaysCountBetweenLocalDates(adherenceStartDate, compliance.getDate()) <= 1){

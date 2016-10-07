@@ -468,19 +468,19 @@ public class AdherenceCalculationService {
 		// validating the last 3 days therapies with respect to the user protocol
 		if(!isHMRCompliant(userProtocolConstants, durationFor3Days)){
 			score = score < HMR_NON_COMPLIANCE_POINTS ? 0 : score - HMR_NON_COMPLIANCE_POINTS;
-			if(notification.getNotificationType().equals(ADHERENCE_SCORE_RESET)){
+			if(Objects.nonNull(notification) && notification.getNotificationType().equals(ADHERENCE_SCORE_RESET)){
 				notification.setNotificationType(HMR_NON_COMPLIANCE);
 				notificationRepository.save(notification);
 			}
 		}else if(newCompliance.isSettingsDeviated()){
 			score = score < SETTING_DEVIATION_POINTS ? 0 : score - SETTING_DEVIATION_POINTS;
-			if(notification.getNotificationType().equals(ADHERENCE_SCORE_RESET)){
+			if(Objects.nonNull(notification) && notification.getNotificationType().equals(ADHERENCE_SCORE_RESET)){
 				notification.setNotificationType(SETTINGS_DEVIATION);
 				notificationRepository.save(notification);
 			}
 		}else{
 			score = score <=  DEFAULT_COMPLIANCE_SCORE - BONUS_POINTS ? score + BONUS_POINTS : DEFAULT_COMPLIANCE_SCORE;
-			if(notification.getNotificationType().equals(ADHERENCE_SCORE_RESET)){
+			if(Objects.nonNull(notification) && notification.getNotificationType().equals(ADHERENCE_SCORE_RESET)){
 				notification.setNotificationType(null);
 				notificationRepository.save(notification);
 			}
@@ -502,7 +502,7 @@ public class AdherenceCalculationService {
 			Long userId,
 			Notification notification) {
 		
-		if(notification.getNotificationType().equals(ADHERENCE_SCORE_RESET)){
+		if(Objects.nonNull(notification) && notification.getNotificationType().equals(ADHERENCE_SCORE_RESET)){
 			notification.setNotificationType(MISSED_THERAPY);
 			notificationRepository.save(notification);
 		}

@@ -10,7 +10,7 @@ import static com.hillrom.vest.config.AdherenceScoreConstants.MISSED_THERAPY_DAY
 import static com.hillrom.vest.config.AdherenceScoreConstants.MISSED_THERAPY_POINTS;
 import static com.hillrom.vest.config.AdherenceScoreConstants.SETTING_DEVIATION_POINTS;
 import static com.hillrom.vest.config.AdherenceScoreConstants.UPPER_BOUND_VALUE;
-import static com.hillrom.vest.config.AdherenceScoreConstants.OLD_TRAINING_DATE;
+//import static com.hillrom.vest.config.AdherenceScoreConstants.OLD_TRAINING_DATE;
 import static com.hillrom.vest.config.NotificationTypeConstants.ADHERENCE_SCORE_RESET;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE;
@@ -198,7 +198,7 @@ public class AdherenceCalculationService {
 				int globalHMRNonAdherenceCounter = compliance.getGlobalHMRNonAdherenceCounter();
 				int globalSettingsDeviationCounter = compliance.getGlobalSettingsDeviationCounter();
 				
-				LocalDate trainingOrFirstTransmissionDate = null;
+				/*LocalDate trainingOrFirstTransmissionDate = null;
 				
 				try{
 					LocalDate firstTransmissionDate = null;
@@ -215,21 +215,21 @@ public class AdherenceCalculationService {
 					log.debug("HILL-1843 : processMissedTherapySessions trainingOrFirstTransmissionDate "+ trainingOrFirstTransmissionDate);
 				}catch(Exception ex){
 					ex.printStackTrace();
-				}
+				}*/
 				
 				// For No transmission users , compliance shouldn't be updated until transmission happens
-				//if(Objects.nonNull(noEvent)&& (Objects.isNull(noEvent.getFirstTransmissionDate()))){
-				if(Objects.isNull(trainingOrFirstTransmissionDate)){
+				if(Objects.nonNull(noEvent)&& (Objects.isNull(noEvent.getFirstTransmissionDate()))){
+				//if(Objects.isNull(trainingOrFirstTransmissionDate)){
 					PatientCompliance newCompliance = new PatientCompliance(compliance.getScore(), today,
 							compliance.getPatient(), compliance.getPatientUser(),compliance.getHmrRunRate(),true,
 							false,0);
 					newCompliance.setLatestTherapyDate(null);// since no transmission 
 					complianceMap.put(userId, newCompliance);
 					// HMR Compliance shouldn't be checked for Patients for initial 2 days of transmission date
-				}else if((Objects.nonNull(trainingOrFirstTransmissionDate) && 
-						DateUtil.getDaysCountBetweenLocalDates(trainingOrFirstTransmissionDate, today) < 2)){
-				//}else if(Objects.nonNull(noEvent)&& (Objects.nonNull(noEvent.getFirstTransmissionDate()) && 
-				//		DateUtil.getDaysCountBetweenLocalDates(noEvent.getFirstTransmissionDate(), today) < 2)){
+				//}else if((Objects.nonNull(trainingOrFirstTransmissionDate) && 
+				//		DateUtil.getDaysCountBetweenLocalDates(trainingOrFirstTransmissionDate, today) < 2)){
+				}else if(Objects.nonNull(noEvent)&& (Objects.nonNull(noEvent.getFirstTransmissionDate()) && 
+						DateUtil.getDaysCountBetweenLocalDates(noEvent.getFirstTransmissionDate(), today) < 2)){
 					// For Transmitted users no notification for first two days
 					PatientCompliance newCompliance = new PatientCompliance(today,compliance.getPatient(),compliance.getPatientUser(),
 							compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1,compliance.getLatestTherapyDate(),
@@ -291,6 +291,11 @@ public class AdherenceCalculationService {
 			
 			// Adherence Start date in string for query
 			String sAdherenceStDate = adherenceStartDate.toString();
+					
+			/*LocalDate todayDate = LocalDate.now();
+			String today = todayDate.toString();
+			LocalDate prevDate = DateUtil.getPlusOrMinusTodayLocalDate(-1);
+			*/
 			
 			// Get the list of rows for the user id from the adherence reset start date 
 			List<PatientCompliance> patientComplianceList = patientComplianceRepository.returnComplianceForPatientIdDates(sAdherenceStDate, userId);
@@ -300,27 +305,48 @@ public class AdherenceCalculationService {
 			
 			for(PatientCompliance compliance : patientComplianceList){
 				
-				PatientCompliance currentCompliance = patientComplianceRepository.findById(compliance.getId());
+				/*if(compliance.getDate().equals(todayDate)){
+					PatientCompliance prevCompliance = patientComplianceRepository.findByPatientUserIdAndDate(userId,prevDate);
+					compliance.setPatientUser(prevCompliance.getPatientUser());
+					compliance.setPatient(prevCompliance.getPatient());
+					compliance.setScore(prevCompliance.getScore());
+					compliance.setHmr(prevCompliance.getHmr());
+					compliance.setHmrRunRate(prevCompliance.getHmrRunRate());
+					compliance.setHmrCompliant(prevCompliance.isHmrCompliant());
+					compliance.setSettingsDeviated(prevCompliance.isSettingsDeviated());
+					compliance.setMissedTherapyCount(prevCompliance.getMissedTherapyCount());
+					compliance.setLatestTherapyDate(prevCompliance.getLatestTherapyDate());
+					compliance.setSettingsDeviatedDaysCount(prevCompliance.getSettingsDeviatedDaysCount());
+					compliance.setGlobalHMRNonAdherenceCounter(prevCompliance.getGlobalHMRNonAdherenceCounter());
+					compliance.setGlobalMissedTherapyCounter(prevCompliance.getGlobalMissedTherapyCounter());
+					compliance.setGlobalSettingsDeviationCounter(prevCompliance.getGlobalSettingsDeviationCounter());
+					
+					patientComplianceRepository.save(compliance);
+					
+				}else{*/
 				
-				Notification notification = notificationRepository.findByPatientUserIdAndDate(userId, currentCompliance.getDate());
-				
-				// Score remains the adherence score which has been set for first 2 days
-				if(DateUtil.getDaysCountBetweenLocalDates(adherenceStartDate, compliance.getDate()) <= 1){
-					if(adherenceStartDate.equals(compliance.getDate())){
-						notification.setNotificationType(ADHERENCE_SCORE_RESET);
-						notificationRepository.save(notification);
-					}
-					currentCompliance.setScore(adherenceScore);
-					patientComplianceRepository.save(currentCompliance);					
-				}else{
-					if(currentCompliance.getMissedTherapyCount() >= DEFAULT_MISSED_THERAPY_DAYS_COUNT){
-						// Missed therapy days
-						calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, notification);
+					PatientCompliance currentCompliance = patientComplianceRepository.findById(compliance.getId());
+					
+					Notification notification = notificationRepository.findByPatientUserIdAndDate(userId, currentCompliance.getDate());
+					
+					// Score remains the adherence score which has been set for first 2 days
+					if(DateUtil.getDaysCountBetweenLocalDates(adherenceStartDate, compliance.getDate()) <= 1){
+						if(adherenceStartDate.equals(compliance.getDate())){
+							notification.setNotificationType(ADHERENCE_SCORE_RESET);
+							notificationRepository.save(notification);
+						}
+						currentCompliance.setScore(adherenceScore);
+						patientComplianceRepository.save(currentCompliance);					
 					}else{
-						// HMR Non Compliance
-						calculateUserHMRComplianceForMST(currentCompliance, userProtocolConstant, currentCompliance.getDate(), userId, notification);
+						if(currentCompliance.getMissedTherapyCount() >= DEFAULT_MISSED_THERAPY_DAYS_COUNT){
+							// Missed therapy days
+							calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, notification);
+						}else{
+							// HMR Non Compliance
+							calculateUserHMRComplianceForMST(currentCompliance, userProtocolConstant, currentCompliance.getDate(), userId, notification);
+						}
 					}
-				}
+				//}
 			}
 		}catch(Exception ex){
 			StringWriter writer = new StringWriter();
@@ -820,10 +846,10 @@ public class AdherenceCalculationService {
 			SortedMap<LocalDate,List<TherapySession>> existingTherapySessionMap,
 			SortedMap<LocalDate,List<TherapySession>> receivedTherapySessionsMap,
 			SortedMap<LocalDate,PatientCompliance> existingComplianceMap,
-			ProtocolConstants protocolConstant, PatientInfo patient) throws Exception{
+			ProtocolConstants protocolConstant) throws Exception{
 		
 		//HILL-1843
-		LocalDate trainingOrFirstTransmissionDate = null;
+		/*LocalDate trainingOrFirstTransmissionDate = null;
 		
 		try{
 			LocalDate firstTransmissionDate = null;
@@ -841,22 +867,22 @@ public class AdherenceCalculationService {
 			log.debug("HILL-1843 : processAdherenceScore trainingOrFirstTransmissionDate "+ trainingOrFirstTransmissionDate);
 		}catch(Exception ex){
 			ex.printStackTrace();
-		}		
+		}*/		
 		
 		for(LocalDate currentTherapySessionDate : receivedTherapySessionsMap.keySet()){
 			List<TherapySession> receivedTherapySessions = receivedTherapySessionsMap.get(currentTherapySessionDate);
 			LocalDate firstTransmittedDate = null;
 			LocalDate latestTherapyDate = null;
-			//PatientInfo patient = null;
+			PatientInfo patient = null;
 			User patientUser = null;
 			if(receivedTherapySessions.size() > 0){
 				patient = receivedTherapySessions.get(0).getPatientInfo();
 				patientUser = receivedTherapySessions.get(0).getPatientUser();
 				
-				//if(Objects.nonNull(patientNoEvent) && Objects.nonNull(patientNoEvent.getFirstTransmissionDate()))
-				if(Objects.nonNull(trainingOrFirstTransmissionDate))
-					firstTransmittedDate = trainingOrFirstTransmissionDate;
-					//firstTransmittedDate = patientNoEvent.getFirstTransmissionDate();
+				if(Objects.nonNull(patientNoEvent) && Objects.nonNull(patientNoEvent.getFirstTransmissionDate()))
+				//if(Objects.nonNull(trainingOrFirstTransmissionDate))
+					//firstTransmittedDate = trainingOrFirstTransmissionDate;
+					firstTransmittedDate = patientNoEvent.getFirstTransmissionDate();
 				else if(Objects.isNull(firstTransmittedDate))
 					firstTransmittedDate = currentTherapySessionDate;
 			}
@@ -1314,7 +1340,7 @@ public class AdherenceCalculationService {
 		return isSettingsDeviated;
 	}
 	
-	private LocalDate getTrainingOrFirstTransmissionDate(LocalDate firstTransmissionDate, LocalDate trainingDate){
+	/*private LocalDate getTrainingOrFirstTransmissionDate(LocalDate firstTransmissionDate, LocalDate trainingDate){
         if (Objects.nonNull(trainingDate)){
 			if(trainingDate.isBefore(LocalDate.now().minusYears(OLD_TRAINING_DATE))){
 	            //Training date exists and is more than 1 year old, hence use First Transmission Date
@@ -1327,5 +1353,5 @@ public class AdherenceCalculationService {
 	        //Training date is still null and hence wait for it to come from TIMs
 	        return firstTransmissionDate;
         }        
-    }
+    }*/
 }

@@ -81,18 +81,20 @@ public class ChargerDataService {
 
 
 	
-	public JSONObject saveOrUpdateChargerData(String decoded_string) throws HillromException{	
+	public JSONObject saveOrUpdateChargerData(String encoded_string, String decoded_string) throws HillromException{	
 		
+		/**
 		int[] decoded_int = new int[decoded_string.length()];
 		for(int i=0;i<decoded_string.length();i++){
 			int c = decoded_string.charAt(i);
 			decoded_int[i] = c;
 			decoded_int[i] = decoded_int[i] & 0xff;
-		}
+		}*/
 		
-
+		log.error("Encoded String : " + encoded_string);
+		log.error("Decoded String : " + decoded_string);
 		
-		JSONObject chargerJsonData = validateRequest(decoded_string,decoded_int);
+		JSONObject chargerJsonData = validateRequest(encoded_string,decoded_string);
 		ChargerData chargerData = new ChargerData();
 		chargerData.setDeviceData(chargerJsonData.get(DEVICE_DATA).toString());
 		chargerData.setCreatedTime(new DateTime());
@@ -103,8 +105,9 @@ public class ChargerDataService {
 	
 
 	
-	private JSONObject validateRequest(String rawData,int[] decoded_int) throws HillromException {
-		JSONObject chargerJsonData = ParserUtil.getQclJsonDataFromRawMessage(rawData);
+	private JSONObject validateRequest(String rawData,String decoded_data) throws HillromException {
+		log.error("Inside validateRequest " + rawData);
+		JSONObject chargerJsonData = ParserUtil.getQclJsonDataFromRawMessage(decoded_data);
 		String reqParams[] = new String[]{DEVICE_SN,
 				DEVICE_WIFI,DEVICE_LTE,DEVICE_VER,DEVICE_DATA,CRC};
 		
@@ -122,7 +125,7 @@ public class ChargerDataService {
 					chargerJsonData.put("ERROR","Missing Params");
 					return chargerJsonData;
 				}else{
-					if(!validateCheckSum(decoded_int)){
+					if(!calculateCRC(rawData)){
 						chargerJsonData.put("RESULT", "NOT OK");
 						chargerJsonData.put("ERROR","CRC Validation Failed");
 						return chargerJsonData;
@@ -133,7 +136,7 @@ public class ChargerDataService {
 					}
 				}
 			}else{
-				if(!validateCheckSum(decoded_int)){
+				if(!calculateCRC(rawData)){
 					chargerJsonData.put("RESULT", "NOT OK");
 					chargerJsonData.put("ERROR","CRC Validation Failed");
 					return chargerJsonData;
@@ -244,6 +247,55 @@ public class ChargerDataService {
 		return binary;
  
 	}
+	
+
+	  private boolean calculateCRC(String base64String)
+	  {
+ 
+		log.error("Inside  calculateCRC : " ,base64String);
+		  
+	    int nCheckSum = 0;
+
+	    byte[] decoded = java.util.Base64.getDecoder().decode(base64String);
+	    
+	    int nDecodeCount = 0;
+	    for ( ; nDecodeCount < (decoded.length-2); nDecodeCount++ )
+	    {
+	      int nValue = (decoded[nDecodeCount] & 0xFF);
+	      nCheckSum += nValue;
+	    }
+	    
+	    int secondlast_digit = (decoded[decoded.length-2] & 0xFF);
+	    int last_digit = (decoded[decoded.length-1] & 0xFF);
+	    
+	    log.error("secondlast_digit : " ,secondlast_digit);
+	    log.error("last_digit : " ,last_digit);
+	    
+	    log.error("Inverted Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
+	    
+	    while ( nCheckSum >  65535 )
+	    {
+	      nCheckSum -= 65535;
+	    }
+	    
+	    int nMSB = decoded[nDecodeCount+1] & 0xFF;
+	    int nLSB = decoded[nDecodeCount] & 0xFF;
+	    
+	    log.error("MSB = %d [0x%x]\r\n" ,nMSB, nMSB);
+	    log.error("LSB = %d [0x%x]\r\n" ,nLSB, nLSB);
+	    log.error("Total Value = " + nCheckSum);
+	    nCheckSum = ((~nCheckSum)& 0xFFFF) + 1;
+	    log.error("Checksum Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
+	    
+		if((nLSB != secondlast_digit) || (nMSB != last_digit)){
+			log.error("CRC VALIDATION FAILED :"); 
+			return false;
+		}else{
+			return true;
+		}
+	}
+	
+
 	
 	
 

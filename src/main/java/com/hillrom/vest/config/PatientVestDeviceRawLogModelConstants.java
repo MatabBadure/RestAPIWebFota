@@ -31,5 +31,5 @@ public class PatientVestDeviceRawLogModelConstants {
 	public static final String DEVICE_LTE = "devLTE";
 	public static final String DEVICE_VER = "devVer";
 	public static final String CRC = "crc";
-	
+	public static final String DEVICE_MODEL = "device_model_type";
 }

@@ -50,6 +50,7 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVI
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CRC;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_ADDRESS;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_DATA;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_MODEL;
 
 @Service
 @Transactional
@@ -83,22 +84,17 @@ public class ChargerDataService {
 	
 	public JSONObject saveOrUpdateChargerData(String encoded_string, String decoded_string) throws HillromException{	
 		
-		/**
-		int[] decoded_int = new int[decoded_string.length()];
-		for(int i=0;i<decoded_string.length();i++){
-			int c = decoded_string.charAt(i);
-			decoded_int[i] = c;
-			decoded_int[i] = decoded_int[i] & 0xff;
-		}*/
 		
 		log.error("Encoded String : " + encoded_string);
 		log.error("Decoded String : " + decoded_string);
 		
 		JSONObject chargerJsonData = validateRequest(encoded_string,decoded_string);
-		ChargerData chargerData = new ChargerData();
-		chargerData.setDeviceData(chargerJsonData.get(DEVICE_DATA).toString());
-		chargerData.setCreatedTime(new DateTime());
-		chargerDataRepository.save(chargerData);
+		if(chargerJsonData.get("RESULT").equals("OK")){
+			ChargerData chargerData = new ChargerData();
+			chargerData.setDeviceData(chargerJsonData.get(DEVICE_DATA).toString());
+			chargerData.setCreatedTime(new DateTime());
+			chargerDataRepository.save(chargerData);
+		}
 		return chargerJsonData;
 
 	}
@@ -108,7 +104,7 @@ public class ChargerDataService {
 	private JSONObject validateRequest(String rawData,String decoded_data) throws HillromException {
 		log.error("Inside validateRequest " + rawData);
 		JSONObject chargerJsonData = ParserUtil.getQclJsonDataFromRawMessage(decoded_data);
-		String reqParams[] = new String[]{DEVICE_SN,
+		String reqParams[] = new String[]{DEVICE_MODEL,DEVICE_SN,
 				DEVICE_WIFI,DEVICE_LTE,DEVICE_VER,DEVICE_DATA,CRC};
 		
 		
@@ -118,7 +114,7 @@ public class ChargerDataService {
 			List<String> missingParams = RandomUtil.getDifference(Arrays.asList(reqParams), new ArrayList<String>(chargerJsonData.keySet()));
 
 			if(missingParams.size() > 0){
-				if(missingParams.contains(DEVICE_SN) || (missingParams.contains(DEVICE_WIFI) && missingParams.contains(DEVICE_LTE)) ||
+				if(missingParams.contains(DEVICE_MODEL) || missingParams.contains(DEVICE_SN) || (missingParams.contains(DEVICE_WIFI) && missingParams.contains(DEVICE_LTE)) ||
 						missingParams.contains(DEVICE_VER) || missingParams.contains(DEVICE_DATA) || missingParams.contains(CRC)
 						){
 					chargerJsonData.put("RESULT", "NOT OK");
@@ -153,100 +149,7 @@ public class ChargerDataService {
 	
 
 
-	private boolean validateCheckSum(int[] int_input) throws HillromException {
-		int crc_value = 0;
-		String sOut = "";
-	
-		for(int i=0;i<int_input.length;i++){
-			sOut = sOut + int_input[i] + " ";
-		}
 
-		log.error("Full Decimal Byte Array : "+sOut);
-		
-		int secondlast_digit = -1;
-		int last_digit = -1;
-		
-		secondlast_digit = int_input[int_input.length-2];
-		last_digit = int_input[int_input.length-1];		
-		log.error("second last digit : " + secondlast_digit);		
-		log.error("last digit : " + last_digit);
-		
-
-		sOut = "";
-		for(int i=0;i<int_input.length-2;i++){
-			sOut = sOut + int_input[i] + " ";
-		}
-		log.error("Full Decimal Byte till CRC : "+sOut);
-		
-		for(int i=0;i<int_input.length-2;i++){
-			crc_value = crc_value + int_input[i];
-		}
-		log.error("crc_value : "+ crc_value);
-		
-		
-		String binary_representation_crc = appendLeadingZeros(Integer.toBinaryString(crc_value));
-		
-		log.error("binary representation of calculated total : " + binary_representation_crc);
-		
-		log.error("once complement : " + firstcomplement(binary_representation_crc));
-		
-		Integer ones_complement_of_crc = (Integer)Integer.parseUnsignedInt(firstcomplement(binary_representation_crc), 2);		
-		log.error("Decimal representation of once complement : " + ones_complement_of_crc);
-		
-		Integer twos_complement_of_crc = (Integer) (ones_complement_of_crc + 1);
-
-		log.error("twos complement : " + twos_complement_of_crc);
-		
-		log.error("twos complement in binary : " + Integer.toBinaryString(twos_complement_of_crc));
-
-
-		Integer lsb_digit = (Integer)Integer.parseUnsignedInt(Integer.toBinaryString(twos_complement_of_crc & 0xFF),2);               // Least significant "byte"
-		Integer msb_digit = (Integer)Integer.parseUnsignedInt(Integer.toBinaryString((twos_complement_of_crc & 0xFF00) >> 8),2);      // Most significant "byte"
-		
-
-		log.error("lsb_digit : " + lsb_digit);
-		log.error("msb_digit : " + msb_digit);
-		
-		if((lsb_digit != secondlast_digit) || (msb_digit != last_digit)){
-			log.error("CRC VALIDATION FAILED :"); 
-			return false;
-		}else{
-			return true;
-		}
-			
-		
-		
-	}
-
-	
-	String firstcomplement(String binary)
-	{
-	    String complement="";
-	    for(int i=0; i<binary.length(); i++)
-	    {
-	         if(binary.charAt(i)=='0')
-	             complement = complement + "1";
-	         if(binary.charAt(i)=='1')
-	        	 complement = complement + "0";
-	    }
-	    
-	    return complement;
-
-	 }
-	
-
-	String appendLeadingZeros(String binary)
-	{
-		int size = binary.length();
-		if(size != 16){
-			for(int i=0;i<16-size;i++){
-				binary = '0'+ binary;
-			}
-		}
-
-		return binary;
- 
-	}
 	
 
 	  private boolean calculateCRC(String base64String)
@@ -265,13 +168,8 @@ public class ChargerDataService {
 	      nCheckSum += nValue;
 	    }
 	    
-	    int secondlast_digit = (decoded[decoded.length-2] & 0xFF);
-	    int last_digit = (decoded[decoded.length-1] & 0xFF);
 	    
-	    log.error("secondlast_digit : " ,secondlast_digit);
-	    log.error("last_digit : " ,last_digit);
-	    
-	    log.error("Inverted Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
+	    System.out.format("Inverted Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
 	    
 	    while ( nCheckSum >  65535 )
 	    {
@@ -281,18 +179,27 @@ public class ChargerDataService {
 	    int nMSB = decoded[nDecodeCount+1] & 0xFF;
 	    int nLSB = decoded[nDecodeCount] & 0xFF;
 	    
-	    log.error("MSB = %d [0x%x]\r\n" ,nMSB, nMSB);
-	    log.error("LSB = %d [0x%x]\r\n" ,nLSB, nLSB);
+	    System.out.format("MSB = %d [0x%x]\r\n" ,nMSB, nMSB);
+	    System.out.format("LSB = %d [0x%x]\r\n" ,nLSB, nLSB);
 	    log.error("Total Value = " + nCheckSum);
 	    nCheckSum = ((~nCheckSum)& 0xFFFF) + 1;
-	    log.error("Checksum Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
+	    System.out.format("Checksum Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
 	    
-		if((nLSB != secondlast_digit) || (nMSB != last_digit)){
-			log.error("CRC VALIDATION FAILED :"); 
-			return false;
-		}else{
-			return true;
-		}
+	    String msb_digit = Integer.toHexString(nMSB);
+	    String lsb_digit = Integer.toHexString(nLSB);
+	    String checksum_num =  Integer.toHexString(nCheckSum);
+	    
+	    System.out.println("MSB : " + msb_digit + " " +  "LSB : " + lsb_digit);
+	    System.out.println("Checksum : " + checksum_num);
+	    
+	    if((msb_digit+lsb_digit).equalsIgnoreCase(checksum_num)){
+	    	return true;
+	    }else{
+	    	log.error("CRC VALIDATION FAILED :"); 
+	    	return false;
+	    }
+
+		
 	}
 	
 

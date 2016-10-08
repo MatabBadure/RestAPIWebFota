@@ -98,21 +98,10 @@ public class PatientVestDeviceDataResource {
 			
 			
 			byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
-			int[] decoded_int = ParserUtil.convertToIntArray(decoded);
-			
+
 			String decoded_string = new String(decoded);
 			log.error("Decoded value is " + decoded_string);
-			
-			/*
-			String sout = "";
-			for(int i=0;i<decoded_string.length();i++){
-				int c = decoded_string.charAt(i);
-				decoded_int[i] = c;
-				sout = sout + " " + decoded_int[i];
-			}
-			
-			log.error("Base64 Decoded Message : ",sout);
-			*/
+
 			
 			JSONObject chargerJsonData = new JSONObject();
 			chargerJsonData =   chargerDataService.saveOrUpdateChargerData(rawMessage,decoded_string);

@@ -116,6 +116,16 @@ public class DateUtil {
 	}
 	
 	/**
+	 * Return days difference between two Local Dates
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public static LocalDate getDateBeforeSpecificDays(LocalDate date, int beforeDays){
+		return date.minusDays(Math.abs(beforeDays));
+	}
+	
+	/**
 	 * Return LocalDates group by Day Of Week
 	 * @param dates
 	 * @return

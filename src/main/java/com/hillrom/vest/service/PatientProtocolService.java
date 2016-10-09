@@ -293,6 +293,31 @@ public class PatientProtocolService {
 		}
 		return userIdProtocolConstantsMap;
 	}
+	
+	
+	/**
+	 * Get Protocol Constants by loading Protocol data for user Id
+	 * @param Long patientUserId
+	 * @return ProtocolConstants
+	 */
+	public ProtocolConstants getProtocolForPatientUserId(
+			Long patientUserId) throws Exception{
+		List<PatientProtocolData> protocol =  findOneByPatientUserIdAndStatus(patientUserId,false);
+		
+		ProtocolConstants userIdProtocolConstant;
+		
+		if(Objects.nonNull(protocol) && protocol.size() > 0){			
+			String protocolType = protocol.get(0).getType();
+			if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(protocolType)){
+				userIdProtocolConstant = getProtocolConstantFromNormalProtocol(protocol);
+			}else{
+				userIdProtocolConstant = getProtocolConstantFromCustomProtocol(protocol);
+			}
+		}else{
+			userIdProtocolConstant = protocolConstantsRepository.findOne(1L);
+		}
+		return userIdProtocolConstant;
+	}
 
 	private Map<Long, List<PatientProtocolData>> prepareUserIdProtocolMap(
 			List<PatientProtocolData> protocolData) {

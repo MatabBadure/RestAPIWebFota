@@ -189,6 +189,11 @@ public class ChargerDataService {
 	    String lsb_digit = Integer.toHexString(nLSB);
 	    String checksum_num =  Integer.toHexString(nCheckSum);
 	    
+	    if(msb_digit.length()<2)
+	    	msb_digit = "0"+msb_digit;
+	    if(lsb_digit.length()<2)
+	    	lsb_digit = "0"+lsb_digit;
+	    
 	    System.out.println("MSB : " + msb_digit + " " +  "LSB : " + lsb_digit);
 	    System.out.println("Checksum : " + checksum_num);
 	    

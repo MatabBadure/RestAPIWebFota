@@ -94,9 +94,16 @@ public class PatientInfo implements Serializable {
     @Column(name = "expired_date", nullable = true)
     private DateTime expiredDate = null;
     
-    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    // start:Hill-1843
+    
+   /* @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "training_date", nullable = true)
-    private DateTime trainingDate = null;
+    private DateTime trainingDate = null;*/
+    
+    @Column(name="training_date")
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+	private DateTime trainingDate;
+    // end:Hill-1843
     
     @Column(name = "web_login_created")
     private Boolean webLoginCreated;

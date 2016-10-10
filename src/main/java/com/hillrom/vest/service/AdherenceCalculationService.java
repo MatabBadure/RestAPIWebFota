@@ -10,7 +10,7 @@ import static com.hillrom.vest.config.AdherenceScoreConstants.MISSED_THERAPY_DAY
 import static com.hillrom.vest.config.AdherenceScoreConstants.MISSED_THERAPY_POINTS;
 import static com.hillrom.vest.config.AdherenceScoreConstants.SETTING_DEVIATION_POINTS;
 import static com.hillrom.vest.config.AdherenceScoreConstants.UPPER_BOUND_VALUE;
-//import static com.hillrom.vest.config.AdherenceScoreConstants.OLD_TRAINING_DATE;
+import static com.hillrom.vest.config.AdherenceScoreConstants.OLD_TRAINING_DATE;
 import static com.hillrom.vest.config.NotificationTypeConstants.ADHERENCE_SCORE_RESET;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE;
@@ -198,7 +198,7 @@ public class AdherenceCalculationService {
 				int globalHMRNonAdherenceCounter = compliance.getGlobalHMRNonAdherenceCounter();
 				int globalSettingsDeviationCounter = compliance.getGlobalSettingsDeviationCounter();
 				
-				/*LocalDate trainingOrFirstTransmissionDate = null;
+				LocalDate trainingOrFirstTransmissionDate = null;
 				
 				try{
 					LocalDate firstTransmissionDate = null;
@@ -215,21 +215,21 @@ public class AdherenceCalculationService {
 					log.debug("HILL-1843 : processMissedTherapySessions trainingOrFirstTransmissionDate "+ trainingOrFirstTransmissionDate);
 				}catch(Exception ex){
 					ex.printStackTrace();
-				}*/
+				}
 				
 				// For No transmission users , compliance shouldn't be updated until transmission happens
-				if(Objects.nonNull(noEvent)&& (Objects.isNull(noEvent.getFirstTransmissionDate()))){
-				//if(Objects.isNull(trainingOrFirstTransmissionDate)){
+				//if(Objects.nonNull(noEvent)&& (Objects.isNull(noEvent.getFirstTransmissionDate()))){
+				if(Objects.isNull(trainingOrFirstTransmissionDate)){
 					PatientCompliance newCompliance = new PatientCompliance(compliance.getScore(), today,
 							compliance.getPatient(), compliance.getPatientUser(),compliance.getHmrRunRate(),true,
 							false,0);
 					newCompliance.setLatestTherapyDate(null);// since no transmission 
 					complianceMap.put(userId, newCompliance);
 					// HMR Compliance shouldn't be checked for Patients for initial 2 days of transmission date
-				//}else if((Objects.nonNull(trainingOrFirstTransmissionDate) && 
-				//		DateUtil.getDaysCountBetweenLocalDates(trainingOrFirstTransmissionDate, today) < 2)){
-				}else if(Objects.nonNull(noEvent)&& (Objects.nonNull(noEvent.getFirstTransmissionDate()) && 
-						DateUtil.getDaysCountBetweenLocalDates(noEvent.getFirstTransmissionDate(), today) < 2)){
+				}else if((Objects.nonNull(trainingOrFirstTransmissionDate) && 
+						DateUtil.getDaysCountBetweenLocalDates(trainingOrFirstTransmissionDate, today) < 2)){
+				//}else if(Objects.nonNull(noEvent)&& (Objects.nonNull(noEvent.getFirstTransmissionDate()) && 
+					//	DateUtil.getDaysCountBetweenLocalDates(noEvent.getFirstTransmissionDate(), today) < 2)){
 					// For Transmitted users no notification for first two days
 					PatientCompliance newCompliance = new PatientCompliance(today,compliance.getPatient(),compliance.getPatientUser(),
 							compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1,compliance.getLatestTherapyDate(),
@@ -845,10 +845,10 @@ public class AdherenceCalculationService {
 			SortedMap<LocalDate,List<TherapySession>> existingTherapySessionMap,
 			SortedMap<LocalDate,List<TherapySession>> receivedTherapySessionsMap,
 			SortedMap<LocalDate,PatientCompliance> existingComplianceMap,
-			ProtocolConstants protocolConstant) throws Exception{
+			ProtocolConstants protocolConstant, PatientInfo patient) throws Exception{
 		
 		//HILL-1843
-		/*LocalDate trainingOrFirstTransmissionDate = null;
+		LocalDate trainingOrFirstTransmissionDate = null;
 		
 		try{
 			LocalDate firstTransmissionDate = null;
@@ -866,24 +866,27 @@ public class AdherenceCalculationService {
 			log.debug("HILL-1843 : processAdherenceScore trainingOrFirstTransmissionDate "+ trainingOrFirstTransmissionDate);
 		}catch(Exception ex){
 			ex.printStackTrace();
-		}*/		
+		}		
 		
+		// start:Hill-1843
+		if(Objects.nonNull(trainingOrFirstTransmissionDate)){
+		// end:Hill-1843	
 		for(LocalDate currentTherapySessionDate : receivedTherapySessionsMap.keySet()){
 			List<TherapySession> receivedTherapySessions = receivedTherapySessionsMap.get(currentTherapySessionDate);
 			LocalDate firstTransmittedDate = null;
 			LocalDate latestTherapyDate = null;
-			PatientInfo patient = null;
+			//PatientInfo patient = null;
 			User patientUser = null;
 			if(receivedTherapySessions.size() > 0){
 				patient = receivedTherapySessions.get(0).getPatientInfo();
 				patientUser = receivedTherapySessions.get(0).getPatientUser();
 				
-				if(Objects.nonNull(patientNoEvent) && Objects.nonNull(patientNoEvent.getFirstTransmissionDate()))
+				//if(Objects.nonNull(patientNoEvent) && Objects.nonNull(patientNoEvent.getFirstTransmissionDate()))
 				//if(Objects.nonNull(trainingOrFirstTransmissionDate))
-					//firstTransmittedDate = trainingOrFirstTransmissionDate;
-					firstTransmittedDate = patientNoEvent.getFirstTransmissionDate();
-				else if(Objects.isNull(firstTransmittedDate))
-					firstTransmittedDate = currentTherapySessionDate;
+					firstTransmittedDate = trainingOrFirstTransmissionDate;
+					//firstTransmittedDate = patientNoEvent.getFirstTransmissionDate();
+				//else if(Objects.isNull(firstTransmittedDate))
+				//	firstTransmittedDate = currentTherapySessionDate;
 			}
 			
 			int totalDuration = calculateCumulativeDuration(receivedTherapySessions);		
@@ -915,6 +918,15 @@ public class AdherenceCalculationService {
 			}
 
  		}
+		}
+		// start:Hill-1843
+		else
+		{
+		// when training date is null return
+		return;
+		}
+		// end:Hill-1843
+
 		saveOrUpdateComplianceMap(existingComplianceMap);
 		saveOrUpdateTherapySessions(receivedTherapySessionsMap);
 	}
@@ -1339,7 +1351,7 @@ public class AdherenceCalculationService {
 		return isSettingsDeviated;
 	}
 	
-	/*private LocalDate getTrainingOrFirstTransmissionDate(LocalDate firstTransmissionDate, LocalDate trainingDate){
+	private LocalDate getTrainingOrFirstTransmissionDate(LocalDate firstTransmissionDate, LocalDate trainingDate){
         if (Objects.nonNull(trainingDate)){
 			if(trainingDate.isBefore(LocalDate.now().minusYears(OLD_TRAINING_DATE))){
 	            //Training date exists and is more than 1 year old, hence use First Transmission Date
@@ -1350,7 +1362,7 @@ public class AdherenceCalculationService {
 			}
         }else{
 	        //Training date is still null and hence wait for it to come from TIMs
-	        return firstTransmissionDate;
+	        return trainingDate;
         }        
-    }*/
+    }
 }

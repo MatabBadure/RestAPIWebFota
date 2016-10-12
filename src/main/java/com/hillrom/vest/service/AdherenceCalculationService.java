@@ -226,10 +226,10 @@ public class AdherenceCalculationService {
 					newCompliance.setLatestTherapyDate(null);// since no transmission 
 					complianceMap.put(userId, newCompliance);
 					// HMR Compliance shouldn't be checked for Patients for initial 2 days of transmission date
-				}else if((Objects.nonNull(trainingOrFirstTransmissionDate) && 
+			}else if((Objects.nonNull(trainingOrFirstTransmissionDate) && 
 						DateUtil.getDaysCountBetweenLocalDates(trainingOrFirstTransmissionDate, today) < 2)){
-				//}else if(Objects.nonNull(noEvent)&& (Objects.nonNull(noEvent.getFirstTransmissionDate()) && 
-					//	DateUtil.getDaysCountBetweenLocalDates(noEvent.getFirstTransmissionDate(), today) < 2)){
+				}else if(Objects.nonNull(noEvent)&& (Objects.nonNull(noEvent.getFirstTransmissionDate()) && 
+						DateUtil.getDaysCountBetweenLocalDates(noEvent.getFirstTransmissionDate(), today) < 2)){
 					// For Transmitted users no notification for first two days
 					PatientCompliance newCompliance = new PatientCompliance(today,compliance.getPatient(),compliance.getPatientUser(),
 							compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1,compliance.getLatestTherapyDate(),
@@ -881,11 +881,12 @@ public class AdherenceCalculationService {
 				patient = receivedTherapySessions.get(0).getPatientInfo();
 				patientUser = receivedTherapySessions.get(0).getPatientUser();
 				
-				//if(Objects.nonNull(patientNoEvent) && Objects.nonNull(patientNoEvent.getFirstTransmissionDate()))
+			//	if(Objects.nonNull(patientNoEvent) && Objects.nonNull(patientNoEvent.getFirstTransmissionDate()))
 				//if(Objects.nonNull(trainingOrFirstTransmissionDate))
 					firstTransmittedDate = trainingOrFirstTransmissionDate;
-					//firstTransmittedDate = patientNoEvent.getFirstTransmissionDate();
+				//	firstTransmittedDate = patientNoEvent.getFirstTransmissionDate();
 				//else if(Objects.isNull(firstTransmittedDate))
+			//	else
 				//	firstTransmittedDate = currentTherapySessionDate;
 			}
 			
@@ -930,6 +931,7 @@ public class AdherenceCalculationService {
 		saveOrUpdateComplianceMap(existingComplianceMap);
 		saveOrUpdateTherapySessions(receivedTherapySessionsMap);
 	}
+
 
 	private synchronized void saveOrUpdateTherapySessions(
 			SortedMap<LocalDate, List<TherapySession>> receivedTherapySessionsMap) {
@@ -1012,9 +1014,17 @@ public class AdherenceCalculationService {
 			LocalDate currentTherapySessionDate,
 			LocalDate firstTransmittedDate, PatientInfo patient,
 			User patientUser, int totalDuration) throws Exception{
-		noEventService.updatePatientFirstTransmittedDate(patientUser.getId(), currentTherapySessionDate);
-		PatientCompliance currentCompliance = new PatientCompliance(DEFAULT_COMPLIANCE_SCORE, currentTherapySessionDate,
+		
+	// Hill Rom Changes
+		PatientNoEvent patientNoEvent =  noEventService.updatePatientFirstTransmittedDate(firstTransmittedDate, patientUser.getId(), currentTherapySessionDate);
+ 	   /*	PatientCompliance currentCompliance = new PatientCompliance(DEFAULT_COMPLIANCE_SCORE, currentTherapySessionDate,
+				patient, patientUser,totalDuration/3,true,false,0d);*/
+		LocalDate firstTransmissionDate =  patientNoEvent.getFirstTransmissionDate();
+		
+		PatientCompliance currentCompliance = new PatientCompliance(DEFAULT_COMPLIANCE_SCORE, firstTransmissionDate,
 				patient, patientUser,totalDuration/3,true,false,0d);
+		// Hill Rom Changes
+		
 		existingComplianceMap.put(currentTherapySessionDate, currentCompliance);
 		calculateAdherenceScoreForTheDuration(patientUser,patient,firstTransmittedDate,
 				currentTherapySessionDate,protocolConstant,existingComplianceMap,
@@ -1051,7 +1061,11 @@ public class AdherenceCalculationService {
 		for(LocalDate therapyDate : allDates){
 			// First Transmission Date to be updated
 			if(firstTransmittedDate.isAfter(therapyDate)){
-				noEventService.updatePatientFirstTransmittedDate(patientUser.getId(),therapyDate);
+				
+			//Hill Rom Changnes
+				noEventService.updatePatientFirstTransmittedDate(firstTransmittedDate, patientUser.getId(),therapyDate);
+			//Hill Rom Changnes
+				
 				firstTransmittedDate = therapyDate;
 			}
 			

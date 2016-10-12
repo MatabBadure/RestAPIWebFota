@@ -15,6 +15,7 @@ import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.PatientNoEventsRepository;
 import com.hillrom.vest.util.ExceptionConstants;
+import static com.hillrom.vest.config.AdherenceScoreConstants.OLD_TRAINING_DATE;
 
 @Service
 @Transactional
@@ -33,10 +34,22 @@ public class PatientNoEventService {
 		return patientNoEvent;
 	}
 	
-	public PatientNoEvent updatePatientFirstTransmittedDate(Long patientUserId,LocalDate transmittedDate){
+	// Hill Rom Changes
+	public PatientNoEvent updatePatientFirstTransmittedDate(LocalDate firstTransmittedDate, Long patientUserId,LocalDate transmittedDate){
 		PatientNoEvent patientNoEvent = noEventsRepository.findByPatientUserId(patientUserId);
+		// Hill Rom Changes
 		if(Objects.nonNull(patientNoEvent)){
-			patientNoEvent.setFirstTransmissionDate(transmittedDate);
+			// Hill Rom Changes
+			if(firstTransmittedDate.isBefore(LocalDate.now().minusYears(OLD_TRAINING_DATE)))
+				{
+					patientNoEvent.setFirstTransmissionDate(transmittedDate);
+				}
+			else
+				{
+					patientNoEvent.setFirstTransmissionDate(firstTransmittedDate);
+				}
+			// Hill Rom Changes
+			
 			noEventsRepository.save(patientNoEvent);
 		}
 		return patientNoEvent;

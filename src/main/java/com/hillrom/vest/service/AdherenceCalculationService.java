@@ -223,7 +223,7 @@ public class AdherenceCalculationService {
 				// For No transmission users , compliance shouldn't be updated until transmission happens
 				
 				//if(Objects.nonNull(noEvent)&& (Objects.isNull(noEvent.getFirstTransmissionDate()))){
-				if(Objects.nonNull(noEvent)&& (Objects.isNull(trainingOrFirstTransmissionDate))){
+				if(Objects.isNull(trainingOrFirstTransmissionDate)){
 				
 					PatientCompliance newCompliance = new PatientCompliance(compliance.getScore(), today,
 							compliance.getPatient(), compliance.getPatientUser(),compliance.getHmrRunRate(),true,
@@ -232,7 +232,7 @@ public class AdherenceCalculationService {
 					complianceMap.put(userId, newCompliance);
 					// HMR Compliance shouldn't be checked for Patients for initial 2 days of transmission date
 				
-				}else if(Objects.nonNull(noEvent)&& (Objects.nonNull(trainingOrFirstTransmissionDate) && 
+				}else if((Objects.nonNull(trainingOrFirstTransmissionDate) && 
 						DateUtil.getDaysCountBetweenLocalDates(trainingOrFirstTransmissionDate, today) < 2)){
 					
 					// For Transmitted users no notification for first two days

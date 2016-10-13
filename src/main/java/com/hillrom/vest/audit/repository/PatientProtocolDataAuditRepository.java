@@ -76,6 +76,7 @@ public class PatientProtocolDataAuditRepository extends
 		   ppd.setTreatmentLabel(Objects.nonNull(value[14])?value[14].toString():null);
 		   ppd.setTreatmentsPerDay((Integer)value[15]);
 		   ppd.setType(value[16].toString());
+		   resultList.add(ppd);
 		  }
 		        return resultList;
 	}

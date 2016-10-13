@@ -91,7 +91,7 @@ public class ChargerDataService {
 		JSONObject chargerJsonData = validateRequest(encoded_string,decoded_string);
 		if(chargerJsonData.get("RESULT").equals("OK")){
 			ChargerData chargerData = new ChargerData();
-			chargerData.setDeviceData(chargerJsonData.get(DEVICE_DATA).toString());
+			chargerData.setDeviceData(decoded_string);
 			chargerData.setCreatedTime(new DateTime());
 			chargerDataRepository.save(chargerData);
 		}

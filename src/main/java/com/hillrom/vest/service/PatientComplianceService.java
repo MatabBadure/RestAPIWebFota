@@ -190,18 +190,18 @@ public class PatientComplianceService {
 			SortedMap<LocalDate,PatientCompliance> complianceMap,
 			Map<LocalDate, List<Notification>> notificationsMap,
 			LocalDate date,
-			AdherenceTrendVO trendVO) {
+			AdherenceTrendVO trendVO) throws HillromException {
 		int pointsChanged = getChangeInScore(complianceMap, date);
 		String notificationType = Objects.isNull(notificationsMap.get(date)) ? "No Notification" : notificationsMap.get(date).get(0).getNotificationType();
-		/**
+		
 		try{
 			if(Objects.nonNull(notificationsMap.get(date))){
 				List<Notification> prevNotificationDetails = getPreviousNotificationDetails(date,notificationType,notificationsMap.get(date).get(0).getPatientUser().getId());
 				trendVO.setPrevNotificationDetails(prevNotificationDetails);
 			}
 		}catch(Exception ex){
-			ex.printStackTrace();
-		}*/
+			throw new HillromException("Error in retriving prevNotificationDetails");
+		}
 
 		if(SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)){
 			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);

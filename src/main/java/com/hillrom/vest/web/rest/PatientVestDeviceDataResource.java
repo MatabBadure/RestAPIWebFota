@@ -161,7 +161,7 @@ public class PatientVestDeviceDataResource {
         ChargerData chargerData = chargerDataService.findById(id);
         byte[] b = chargerData.getDeviceData().getBytes();
         String sout = "";
-        for(int i=0;i<b.length;i++) sout = sout + b[i]+ " ";
+        for(int i=0;i<b.length;i++) sout = sout + (b[i] & 0xFF ) + " ";
         chargerData.setDeviceData(sout);
     	jsonObject.put("device_data", chargerData);
         if (Objects.nonNull(chargerData)) {

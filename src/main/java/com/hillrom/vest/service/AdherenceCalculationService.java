@@ -1017,7 +1017,8 @@ public class AdherenceCalculationService {
 			LocalDate currentTherapySessionDate,
 			LocalDate firstTransmittedDate, PatientInfo patient,
 			User patientUser, int totalDuration) throws Exception{
-		noEventService.updatePatientFirstTransmittedDate(patientUser.getId(), currentTherapySessionDate);
+		//noEventService.updatePatientFirstTransmittedDate(patientUser.getId(), currentTherapySessionDate);
+		noEventService.updatePatientFirstTransmittedDate(patientUser.getId(), firstTransmittedDate);
 		PatientCompliance currentCompliance = new PatientCompliance(DEFAULT_COMPLIANCE_SCORE, currentTherapySessionDate,
 				patient, patientUser,totalDuration/3,true,false,0d);
 		existingComplianceMap.put(currentTherapySessionDate, currentCompliance);

@@ -177,7 +177,7 @@ public class AdherenceCalculationService {
 	/**
 	 * Runs every midnight deducts the compliance score by 5 if therapy hasn't been done for 3 days
 	 */
-	@Scheduled(cron="0 30 23 * * * ")
+	@Scheduled(cron="* * * * * * ")
 	public void processMissedTherapySessions(){
 		try{
 			LocalDate today = LocalDate.now();

@@ -41,7 +41,7 @@ BEGIN
 
 	IF type_key = 'Normal' THEN
 
-		select floor(9000000+ RAND() * 10000000) INTO temp_random_rev;		
+		select floor(900000+ RAND() * 1000000) INTO temp_random_rev;		
 		
         call get_next_protocol_hillromid(@gen_protocol_id);
 
@@ -101,7 +101,7 @@ BEGIN
       
       WHILE EXISTS(SELECT `id` FROM `protocol_data_temp_table` WHERE `type` = type_key AND `patient_id` = in_patient_id AND `to_be_inserted`= 1) DO
       
-	  select floor(9000000+ RAND() * 10000000) INTO temp_random_rev;
+	  select floor(900000+ RAND() * 1000000) INTO temp_random_rev;
 	  
       SELECT `id`,`type`,
 		`treatments_per_day`,

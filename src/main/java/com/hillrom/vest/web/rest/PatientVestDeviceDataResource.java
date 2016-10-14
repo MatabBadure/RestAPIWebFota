@@ -135,6 +135,13 @@ public class PatientVestDeviceDataResource {
 		try{	
 			JSONObject jsonObject = new JSONObject();
 			ChargerData chargerData = chargerDataService.findLatestData();
+	        byte[] b = java.util.Base64.getDecoder().decode(chargerData.getDeviceData());
+	        String sout = "";
+	        for(int i=0;i<b.length;i++) {
+	        	int val = b[i] & 0xFF;
+	        	sout = sout + val + " ";
+	        }
+	        chargerData.setDeviceData(sout);
 			jsonObject.put("device_data", chargerData);
 			if(chargerData.getDeviceData().length()>0)
 				return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.CREATED);

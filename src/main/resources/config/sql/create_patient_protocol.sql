@@ -7,6 +7,7 @@ BEGIN
 	DECLARE temp_user_id bigint(20);
 	DECLARE protocol_id varchar(45) ;
 	DECLARE created_date datetime;
+    DECLARE temp_random_rev bigint(20);
 
 	DECLARE temp_protocal_id INT; 
 	DECLARE temp_patient_id varchar(45); 
@@ -35,8 +36,12 @@ BEGIN
 	END IF;
     
 	SELECT `user_id` INTO temp_user_id FROM `USER_PATIENT_ASSOC` WHERE `patient_id`= in_patient_id AND `user_role` = 'PATIENT';
+	
+
 
 	IF type_key = 'Normal' THEN
+
+		select floor(9000000+ RAND() * 10000000) INTO temp_random_rev;		
 		
         call get_next_protocol_hillromid(@gen_protocol_id);
 
@@ -73,6 +78,15 @@ BEGIN
 		(@gen_protocol_id, in_patient_id, temp_user_id, type_key, temp_treatments_per_day, temp_treatment_label, 
         temp_min_minutes_per_treatment, temp_max_minutes_per_treatment, temp_min_frequency,temp_max_frequency,temp_min_pressure,
         temp_max_pressure,in_created_by,created_date ,in_created_by ,created_date,0,@gen_protocol_id);
+		
+		INSERT INTO AUDIT_REVISION_INFO (`id`, `timestamp`, `user_id`) 
+		VALUES 
+		(temp_random_rev, UNIX_TIMESTAMP(created_date), in_created_by);
+		
+		INSERT INTO PATIENT_PROTOCOL_DATA_AUD (`id`, `REV`, `REVTYPE`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_deleted`, `max_frequency`, `max_pressure`, `min_frequency`, `min_minutes_per_treatment`, `min_pressure`, `protocol_key`, `treatments_per_day`, `type`, `PATIENT_ID`, `USER_ID`) 
+		VALUES 
+		(@gen_protocol_id, temp_random_rev, 0, in_created_by, created_date, in_created_by, created_date,0 , temp_max_frequency, temp_max_pressure, temp_min_frequency, temp_min_minutes_per_treatment, temp_min_pressure, @gen_protocol_id, temp_treatments_per_day, type_key, in_patient_id, temp_user_id);
+
         
         UPDATE `protocol_data_temp_table` SET `to_be_inserted` = 0 where `id` = temp_protocal_id;
         END IF;
@@ -87,6 +101,8 @@ BEGIN
       
       WHILE EXISTS(SELECT `id` FROM `protocol_data_temp_table` WHERE `type` = type_key AND `patient_id` = in_patient_id AND `to_be_inserted`= 1) DO
       
+	  select floor(9000000+ RAND() * 10000000) INTO temp_random_rev;
+	  
       SELECT `id`,`type`,
 		`treatments_per_day`,
 		`treatment_label`,
@@ -119,6 +135,16 @@ BEGIN
 		(@gen_protocol_id, in_patient_id, temp_user_id, type_key, temp_treatments_per_day, temp_treatment_label, 
         temp_min_minutes_per_treatment, temp_max_minutes_per_treatment, temp_min_frequency,temp_max_frequency,temp_min_pressure,
         temp_max_pressure,in_created_by,created_date ,in_created_by ,created_date,0,temp_protocol_key); 
+
+		INSERT INTO AUDIT_REVISION_INFO (`id`, `timestamp`, `user_id`) 
+		VALUES 
+		(temp_random_rev, UNIX_TIMESTAMP(created_date), in_created_by);
+
+		
+		INSERT INTO PATIENT_PROTOCOL_DATA_AUD (`id`, `REV`, `REVTYPE`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_deleted`, `max_frequency`, `max_pressure`, `min_frequency`, `min_minutes_per_treatment`, `min_pressure`, `protocol_key`, `treatments_per_day`, `type`, `PATIENT_ID`, `USER_ID`) 
+		VALUES 
+		(@gen_protocol_id, temp_random_rev, 0, in_created_by, created_date, in_created_by, created_date,0 , temp_max_frequency, temp_max_pressure, temp_min_frequency, temp_min_minutes_per_treatment, temp_min_pressure, @gen_protocol_id, temp_treatments_per_day, type_key, in_patient_id, temp_user_id);
+
         
         UPDATE `protocol_data_temp_table` SET `to_be_inserted` = 0 where `id` = temp_protocal_id;
         call get_next_protocol_hillromid(@gen_protocol_id);

@@ -81,11 +81,11 @@ BEGIN
 		
 		INSERT INTO AUDIT_REVISION_INFO (`id`, `timestamp`, `user_id`) 
 		VALUES 
-		(temp_random_rev, UNIX_TIMESTAMP(created_date), in_created_by);
+		(temp_max_rev, UNIX_TIMESTAMP(created_date), in_created_by);
 		
 		INSERT INTO PATIENT_PROTOCOL_DATA_AUD (`id`, `REV`, `REVTYPE`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_deleted`, `max_frequency`, `max_pressure`, `min_frequency`, `min_minutes_per_treatment`, `min_pressure`, `protocol_key`, `treatments_per_day`, `type`, `PATIENT_ID`, `USER_ID`) 
 		VALUES 
-		(@gen_protocol_id, temp_random_rev, 0, in_created_by, created_date, in_created_by, created_date,0 , temp_max_frequency, temp_max_pressure, temp_min_frequency, temp_min_minutes_per_treatment, temp_min_pressure, @gen_protocol_id, temp_treatments_per_day, type_key, in_patient_id, temp_user_id);
+		(@gen_protocol_id, temp_max_rev, 0, in_created_by, created_date, in_created_by, created_date,0 , temp_max_frequency, temp_max_pressure, temp_min_frequency, temp_min_minutes_per_treatment, temp_min_pressure, @gen_protocol_id, temp_treatments_per_day, type_key, in_patient_id, temp_user_id);
 
         
         UPDATE `protocol_data_temp_table` SET `to_be_inserted` = 0 where `id` = temp_protocal_id;
@@ -138,12 +138,12 @@ BEGIN
 
 		INSERT INTO AUDIT_REVISION_INFO (`id`, `timestamp`, `user_id`) 
 		VALUES 
-		(temp_random_rev, UNIX_TIMESTAMP(created_date), in_created_by);
+		(temp_max_rev, UNIX_TIMESTAMP(created_date), in_created_by);
 
 		
 		INSERT INTO PATIENT_PROTOCOL_DATA_AUD (`id`, `REV`, `REVTYPE`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_deleted`, `max_frequency`, `max_pressure`, `min_frequency`, `min_minutes_per_treatment`, `min_pressure`, `protocol_key`, `treatments_per_day`, `type`, `PATIENT_ID`, `USER_ID`) 
 		VALUES 
-		(@gen_protocol_id, temp_random_rev, 0, in_created_by, created_date, in_created_by, created_date,0 , temp_max_frequency, temp_max_pressure, temp_min_frequency, temp_min_minutes_per_treatment, temp_min_pressure, @gen_protocol_id, temp_treatments_per_day, type_key, in_patient_id, temp_user_id);
+		(@gen_protocol_id, temp_max_rev, 0, in_created_by, created_date, in_created_by, created_date,0 , temp_max_frequency, temp_max_pressure, temp_min_frequency, temp_min_minutes_per_treatment, temp_min_pressure, @gen_protocol_id, temp_treatments_per_day, type_key, in_patient_id, temp_user_id);
 
         
         UPDATE `protocol_data_temp_table` SET `to_be_inserted` = 0 where `id` = temp_protocal_id;

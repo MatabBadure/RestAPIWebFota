@@ -159,7 +159,7 @@ public class PatientVestDeviceDataResource {
         log.debug("REST request to fetch charger device data for : {}", id);
         JSONObject jsonObject = new JSONObject();
         ChargerData chargerData = chargerDataService.findById(id);
-        byte[] b = chargerData.getDeviceData().getBytes();
+        byte[] b = java.util.Base64.getDecoder().decode(chargerData.getDeviceData());
         String sout = "";
         for(int i=0;i<b.length;i++) {
         	int val = b[i] & 0xFF;

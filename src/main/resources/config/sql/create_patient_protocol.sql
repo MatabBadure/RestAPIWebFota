@@ -7,7 +7,7 @@ BEGIN
 	DECLARE temp_user_id bigint(20);
 	DECLARE protocol_id varchar(45) ;
 	DECLARE created_date datetime;
-    DECLARE temp_random_rev bigint(20);
+    DECLARE temp_max_rev bigint(20);
 
 	DECLARE temp_protocal_id INT; 
 	DECLARE temp_patient_id varchar(45); 
@@ -41,7 +41,7 @@ BEGIN
 
 	IF type_key = 'Normal' THEN
 
-		select floor(900000+ RAND() * 1000000) INTO temp_random_rev;		
+		SELECT MAX(`id`)+1 INTO temp_max_rev FROM `AUDIT_REVISION_INFO`;			
 		
         call get_next_protocol_hillromid(@gen_protocol_id);
 
@@ -101,7 +101,7 @@ BEGIN
       
       WHILE EXISTS(SELECT `id` FROM `protocol_data_temp_table` WHERE `type` = type_key AND `patient_id` = in_patient_id AND `to_be_inserted`= 1) DO
       
-	  select floor(900000+ RAND() * 1000000) INTO temp_random_rev;
+	  SELECT MAX(`id`)+1 INTO temp_max_rev FROM `AUDIT_REVISION_INFO`;
 	  
       SELECT `id`,`type`,
 		`treatments_per_day`,

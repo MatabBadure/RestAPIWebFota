@@ -200,9 +200,7 @@ public final class Constants {
 	//AdherenceTrend Graph Y-axis labels
 	public static final String ADHERENCE_SCORE_LABEL = "SCORE";
 		
-	//AdherenceTrend Graph tooltip labels
-	//public static final String KEY_ADHERENCE_SCORE = "score";
-	//public static final String KEY_NOTIFICATIONS_POINT = "notification";
+	//AdherenceTrend Graph tooltip labels	
 	public static final String RESET_SCORE = "scoreReset";
     //hill-1847
 	// Compliance Graph 

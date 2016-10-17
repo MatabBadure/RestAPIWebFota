@@ -1070,7 +1070,7 @@ public class UserResource {
     		@RequestParam(value = "duration", required = true) String duration) {
     		try {
     			List<ProtocolRevisionVO> adherenceTrendData = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id, from, to);
-    			if (adherenceTrendData.size() > 0) {
+    			if (Objects.nonNull(adherenceTrendData) &&  adherenceTrendData.size() > 0) {
     				Graph adherenceTrendGraph = adherenceTrendGraphService.populateGraphData(adherenceTrendData, new Filter(from,to, duration, null));
     				return new ResponseEntity<>(adherenceTrendGraph, HttpStatus.OK);
     			}

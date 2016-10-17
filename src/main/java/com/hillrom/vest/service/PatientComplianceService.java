@@ -38,12 +38,14 @@ import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.audit.service.PatientProtocolDataAuditService;
 import com.hillrom.vest.config.Constants;
+import com.hillrom.vest.domain.AdherenceReset;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.AdherenceResetRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.ProtocolConstantsRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
@@ -67,6 +69,11 @@ public class PatientComplianceService {
 	@Inject
 	@Qualifier("patientProtocolDataAuditService")
 	private PatientProtocolDataAuditService protocolAuditService;
+	
+	//hill-1847
+	@Inject
+	private AdherenceResetRepository adherenceResetRepository;
+	//hill-1847
 	
 	/**
 	 * Creates Or Updates Compliance 
@@ -117,8 +124,9 @@ public class PatientComplianceService {
 	public List<ProtocolRevisionVO> findAdherenceTrendByUserIdAndDateRange(Long patientUserId,LocalDate from,LocalDate to)
 	throws HillromException{
 
-
-		
+		//hill-1847
+		boolean isResetDate = false;
+		//hill-1847
 		List<Long> patientUserIds = new LinkedList<>();
 		patientUserIds.add(patientUserId);
 		TherapySession therapySession = therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(patientUserId);
@@ -137,6 +145,16 @@ public class PatientComplianceService {
 		for(PatientCompliance compliance : complianceList){
 			complianceMap.put(compliance.getDate(), compliance);
 		}
+		//hill-1847
+		
+		//List<AdherenceReset> adherenceResetList = adherenceResetRepository.findByPatientUserId(patientUserId);
+		//for(AdherenceReset adherenceReset : adherenceResetList){
+		//LocalDate resetDate = adherenceReset.getResetDate();
+		/*if(resetDate.isBefore(toDate) || resetDate.equals(toDate)  && resetDate.isAfter(fromDate) || resetDate.equals(fromDate)){
+			resetDate = resetDate;
+		}*/
+		//}
+		//hill-1847
 
 		List<Notification> notifications = notificationService.findNotificationsByUserIdAndDateRange(patientUserId,fromDate,toDate);
 		Map<LocalDate,List<Notification>> notificationsMap = notifications.stream().collect(Collectors.groupingBy(Notification:: getDate));
@@ -159,6 +177,15 @@ public class PatientComplianceService {
 			PatientCompliance compliance = complianceMap.get(date);
 			trendVO.setDate(date);
 			trendVO.setUpdatedScore(compliance.getScore());
+			//hill-1847
+			List<AdherenceReset> adherenceResetList = adherenceResetRepository.findByPatientUserId(patientUserId);
+			for(AdherenceReset adherenceReset : adherenceResetList){
+				LocalDate resetDate = adherenceReset.getResetDate();
+				isResetDate = (resetDate.isBefore(toDate) || resetDate.equals(toDate)  && resetDate.isAfter(fromDate) || resetDate.equals(fromDate));
+				trendVO.setScoreReset(isResetDate);
+				break;
+			}
+			//hill-1847
 			setNotificationPointsMap(complianceMap,notificationsMap,date,trendVO);
 			// Get datetime when compliance was processed
 			ProtocolRevisionVO revisionVO = getProtocolRevisionByCompliance(

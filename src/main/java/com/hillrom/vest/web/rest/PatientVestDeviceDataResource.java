@@ -1,6 +1,9 @@
 package com.hillrom.vest.web.rest;
 
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -53,34 +56,20 @@ public class PatientVestDeviceDataResource {
 	
 	private final Logger log = LoggerFactory.getLogger(PatientVestDeviceDataResource.class);
 	
+	
 	@RequestMapping(value = "/receiveData",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> receiveData(@RequestBody(required=true)String rawMessage){
 
 		try{
-		//byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
-		//rawMessage = new String(decoded, "UTF-8");
-		//System.out.println("rawmessage : "+ (rawMessage) + "\n");
+
 
 		
-		log.debug("Received Data for ingestion : ",rawMessage);
+			log.error("Received Data for ingestion : ",rawMessage);
 
 			JSONObject jsonObject = new JSONObject();
 
-
-			JSONObject chargerJsonData = ParserUtil.getQclJsonDataFromRawMessage(rawMessage);
-			if(chargerJsonData.get("device_model_type").toString().equalsIgnoreCase("HillRom_Monarch")){
-				ChargerData chargerData = chargerDataService.saveOrUpdateChargerData(rawMessage);	
-				if(chargerData.getDeviceData().length() > 0){
-					jsonObject.put("message",ExitStatus.COMPLETED);
-					return new ResponseEntity<>(jsonObject,HttpStatus.CREATED);
-				}
-				else{
-					jsonObject.put("message",ExitStatus.FAILED);
-					return new ResponseEntity<>(jsonObject,HttpStatus.PARTIAL_CONTENT);
-				}
-			}
 			
 			ExitStatus exitStatus = deviceDataService.saveData(rawMessage.replaceAll("\n", "").replaceAll(" ", ""));
 			jsonObject.put("message",exitStatus.getExitCode());
@@ -97,6 +86,37 @@ public class PatientVestDeviceDataResource {
 			return new ResponseEntity<>(error,HttpStatus.PARTIAL_CONTENT);
 		}
 	}
+	
+	@RequestMapping(value = "/receiveDataCharger",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> receiveDataCharger(@RequestBody(required=true)String rawMessage){
+
+		try{		
+			log.error("Base64 Received Data for ingestion in receiveDataCharger : ",rawMessage);		
+			
+			
+			
+			byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
+
+			String decoded_string = new String(decoded);
+			log.error("Decoded value is " + decoded_string);
+
+			
+			JSONObject chargerJsonData = new JSONObject();
+			chargerJsonData =   chargerDataService.saveOrUpdateChargerData(rawMessage,decoded_string);
+			JSONObject result = new JSONObject();
+			result.put("RESULT", chargerJsonData.get("RESULT") + " - " + chargerJsonData.get("ERROR"));
+			return new ResponseEntity<>(result,HttpStatus.CREATED);
+		}catch(Exception e){
+			e.printStackTrace();
+			JSONObject error = new JSONObject();
+			error.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(error,HttpStatus.PARTIAL_CONTENT);
+		}
+	}
+	
+
 	
 	@RequestMapping(value = "/vestdevicedata",
             method = RequestMethod.GET,
@@ -115,6 +135,13 @@ public class PatientVestDeviceDataResource {
 		try{	
 			JSONObject jsonObject = new JSONObject();
 			ChargerData chargerData = chargerDataService.findLatestData();
+	        byte[] b = java.util.Base64.getDecoder().decode(chargerData.getDeviceData());
+	        String sout = "";
+	        for(int i=0;i<b.length;i++) {
+	        	int val = b[i] & 0xFF;
+	        	sout = sout + val + " ";
+	        }
+	        chargerData.setDeviceData(sout);
 			jsonObject.put("device_data", chargerData);
 			if(chargerData.getDeviceData().length()>0)
 				return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.CREATED);
@@ -139,6 +166,13 @@ public class PatientVestDeviceDataResource {
         log.debug("REST request to fetch charger device data for : {}", id);
         JSONObject jsonObject = new JSONObject();
         ChargerData chargerData = chargerDataService.findById(id);
+        byte[] b = java.util.Base64.getDecoder().decode(chargerData.getDeviceData());
+        String sout = "";
+        for(int i=0;i<b.length;i++) {
+        	int val = b[i] & 0xFF;
+        	sout = sout + val + " ";
+        }
+        chargerData.setDeviceData(sout);
     	jsonObject.put("device_data", chargerData);
         if (Objects.nonNull(chargerData)) {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);

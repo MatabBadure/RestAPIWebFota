@@ -3,8 +3,6 @@ package com.hillrom.vest.service;
 import static com.hillrom.vest.config.Constants.XAXIS_TYPE_DATE;
 import static com.hillrom.vest.config.Constants.ADHERENCE_SCORE_LABEL;
 import static com.hillrom.vest.config.Constants.MMddyyyy;
-//import static com.hillrom.vest.config.Constants.KEY_ADHERENCE_SCORE;
-//import static com.hillrom.vest.config.Constants.KEY_NOTIFICATIONS_POINT;
 import static com.hillrom.vest.config.Constants.RESET_SCORE;
 
 import java.util.List;
@@ -80,10 +78,6 @@ public class AdherenceTrendGraphService extends AbstractGraphService {
 		GraphDataVO point = new GraphDataVO(DateUtil.formatDate(
 				adherenceTrendData.getDate(), MMddyyyy),
 				adherenceTrendData.getUpdatedScore());
-		/*point.getToolText().put(KEY_ADHERENCE_SCORE,
-				adherenceTrendData.getUpdatedScore());*/
-		/*point.getToolText().put(KEY_NOTIFICATIONS_POINT,
-				adherenceTrendData.getNotificationPoints());*/
 		point.getToolText().put(RESET_SCORE,
 				adherenceTrendData.isScoreReset());
 		return point;

@@ -10,7 +10,7 @@ public class ClinicVOBuilder {
 	private static ClinicVO createClinicVo(Clinic clinic){
 		return new ClinicVO(clinic.getId(),clinic.getName(), clinic.getAddress(), clinic.getAddress2(),  clinic.getZipcode(), clinic.getCity(),
 				clinic.getState(), clinic.getPhoneNumber(), clinic.getFaxNumber(), clinic.getSpeciality(), clinic.getClinicAdminId(), 
-				clinic.isParent(), clinic.getHillromId(),clinic.isDeleted(),clinic.getCreatedAt());
+				clinic.isParent(), clinic.getHillromId(),clinic.isDeleted(),clinic.getCreatedAt(),clinic.getAdherenceSetting());
 	}
 	
 	public static ClinicVO build(Clinic clinic){

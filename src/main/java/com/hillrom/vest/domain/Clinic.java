@@ -1,11 +1,14 @@
 package com.hillrom.vest.domain;
 
 
+import static com.hillrom.vest.config.AdherenceScoreConstants.ADHERENCE_SETTING_DEFAULT_DAYS;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -264,7 +267,7 @@ public class Clinic implements Serializable {
 	}
 	
 	public Integer getAdherenceSetting() {
-        return adherenceSetting;
+        return Objects.isNull(this.adherenceSetting) ? ADHERENCE_SETTING_DEFAULT_DAYS : this.adherenceSetting;
     }
 
     public void setAdherenceSetting(Integer adherenceSetting) {

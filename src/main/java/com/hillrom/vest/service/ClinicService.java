@@ -40,7 +40,6 @@ import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.util.ClinicVOBuilder;
-import static com.hillrom.vest.config.AdherenceScoreConstants.ADHERENCE_SETTING_DEFAULT_DAYS;
 
 
 /**
@@ -385,13 +384,4 @@ public class ClinicService {
 		List<Clinic> clinics = clinicRepository.findByDeletedAndClinicPatientAssocIsNotEmpty(isDeleted);
 		return clinics;
 	}
-	
-	public Integer getClinicAdherenceSetting(String clinicId) throws HillromException {
-		Clinic clinic = clinicRepository.findOne(clinicId);
-        if(Objects.isNull(clinic)) {
-	      	throw new HillromException(ExceptionConstants.HR_548);
-        } else {
-        	return Objects.isNull(clinic.getAdherenceSetting())?ADHERENCE_SETTING_DEFAULT_DAYS:clinic.getAdherenceSetting();
-        }
-    }
 }

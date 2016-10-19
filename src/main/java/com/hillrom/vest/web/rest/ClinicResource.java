@@ -108,7 +108,7 @@ public class ClinicResource {
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_222);
 	            jsonObject.put("Clinic", clinicVO);
-	            if(clinicDTO.getParent()) {
+	            if(Objects.nonNull(clinicDTO.getParent()) && clinicDTO.getParent()) {
 	            	jsonObject.put("ChildClinic", clinicVO.getChildClinicVOs());
 	            }
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);

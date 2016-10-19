@@ -46,14 +46,12 @@ import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.AdherenceResetService;
-import com.hillrom.vest.service.ClinicService;
 import com.hillrom.vest.service.NoteService;
 import com.hillrom.vest.service.PatientNoEventService;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.AdherenceResetDTO;
-import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
@@ -87,12 +85,8 @@ public class AdherenceResource {
 	@Inject
 	private TherapySessionRepository therapyRepository;
 	
-    @Inject
-    private ClinicService clinicService;
-
-	
     /**
-     * POST  /clinics -> Adherence Reset.
+     * POST  /clinics -> Create a new clinic.
      */
     @RequestMapping(value = "/adherenceReset",
             method = RequestMethod.POST,
@@ -108,6 +102,7 @@ public class AdherenceResource {
 		String resetScore = adherenceResetDTO.getResetScore();
 		String justification = adherenceResetDTO.getJustification();
 		String createdById = adherenceResetDTO.getCreatedBy();
+		 
     	
 		JSONObject jsonObject = new JSONObject();
 		
@@ -122,6 +117,7 @@ public class AdherenceResource {
 		}
 		    	
 		try {
+			
 					
 			// Getting the compliance record for the user on adhrence start date
 			PatientCompliance patientCompliance = patientComplianceRepository.findByDateAndPatientUserId(resetStartDt,Long.parseLong(userId));
@@ -170,59 +166,7 @@ public class AdherenceResource {
 		}
     }
 
-    
-    /**
-     * PUT  /adherenceSetting/:clinicId -> Setting the Adherence value for clinic.
-     */
-    @RequestMapping(value = "/adherenceSetting/{clinicId}",
-        method = RequestMethod.PUT,
-        produces = MediaType.APPLICATION_JSON_VALUE)
-    
-    @RolesAllowed({AuthoritiesConstants.CLINIC_ADMIN})
-    public ResponseEntity<JSONObject> updateAdherenceSetting(@PathVariable String clinicId, @RequestBody ClinicDTO clinicDTO) {
-        log.debug("REST request to update Clinic : {}", clinicId);
-        JSONObject jsonObject = new JSONObject();
-		try {
-			ClinicVO clinicVO = clinicService.updateClinic(clinicId, clinicDTO);
-	        if (Objects.isNull(clinicVO)) {
-	        	jsonObject.put("ERROR", ExceptionConstants.HR_543);
-	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-	        } else {
-	        	jsonObject.put("message", MessageConstants.HR_222);	            
-	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
-	        }
-		} catch (HillromException e) {
-			jsonObject.put("ERROR", e.getMessage());
-			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-		}
-    }
-    
-    /**
-     * GET  /adherenceSetting/:clinicId -> Fetching the Adherence value for clinic.
-     */
-    @RequestMapping(value = "/adherenceSetting/{clinicId}",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    
-    public ResponseEntity<JSONObject> get(@PathVariable String clinicId) {
-        log.debug("REST request to get Clinic : {}", clinicId);
-        JSONObject jsonObject = new JSONObject();
-        try {
-    		Integer adherenceSetting = clinicService.getClinicAdherenceSetting(clinicId);
-	    	if (Objects.isNull(adherenceSetting)) {
-	        	jsonObject.put("ERROR", ExceptionConstants.HR_548);
-	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-	        } else {
-	        	jsonObject.put("message", MessageConstants.HR_223);
-	        	jsonObject.put("clinicAdherenceSetting", adherenceSetting);	        	
-	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
-	        }
-    	} catch(HillromException hre){
-    		jsonObject.put("ERROR", hre.getMessage());
-    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-    	}
-    }
-    
+   
 	
 	private Map<String,String> getSearchParams(String filterString){
 		

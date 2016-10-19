@@ -1,0 +1,6 @@
+id,type,type_code,type_code_value
+41,adherence_setting,1 Day,1
+42,adherence_setting,2 Days,2
+43,adherence_setting,3 Days(Default),3
+44,adherence_setting,4 Days,4
+45,adherence_setting,5 Days,5

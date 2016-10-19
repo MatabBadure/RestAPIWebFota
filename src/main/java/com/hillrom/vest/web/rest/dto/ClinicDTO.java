@@ -47,6 +47,9 @@ public class ClinicDTO {
 	private Boolean parent;
 	
 	private Boolean deleted;
+	
+	@Size(max = 50)
+    private Integer adherenceSetting;
 
 
 	@Size(max = 50)
@@ -58,7 +61,7 @@ public class ClinicDTO {
 
 	public ClinicDTO(String name, String address, String address2, Integer zipcode, String city,
 			String state, String phoneNumber, String faxNumber, String speciality, Long clinicAdminId,
-			Boolean parent, Boolean deleted, String hillromId) {
+			Boolean parent, Boolean deleted, String hillromId, Integer adherenceSetting) {
 		super();
 		this.name = name;
 		this.address = address;
@@ -73,6 +76,7 @@ public class ClinicDTO {
 		this.parent = parent;
 		this.deleted = deleted;
 		this.hillromId = hillromId;
+		this.adherenceSetting = adherenceSetting;
 	}
 
 
@@ -194,5 +198,13 @@ public class ClinicDTO {
 
 	public void setChildClinicList(List<Map<String, String>> childClinicList) {
 		this.childClinicList = childClinicList;
+	}
+	
+	public Integer getAdherenceSetting() {
+		return adherenceSetting;
+	}
+
+	public void setAdherenceSetting(Integer adherenceSetting) {
+		this.adherenceSetting = adherenceSetting;
 	}
 }

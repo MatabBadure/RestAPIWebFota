@@ -1,11 +1,14 @@
 package com.hillrom.vest.domain;
 
 
+import static com.hillrom.vest.config.AdherenceScoreConstants.ADHERENCE_SETTING_DEFAULT_DAYS;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -78,6 +81,9 @@ public class Clinic implements Serializable {
     @Column(name = "clinic_admin_id")
     private Long clinicAdminId;
 
+    @Column(name = "adherence_setting")
+    private Integer adherenceSetting;
+    
     @NotAudited
     @ManyToOne
     @JoinColumn(name="parent_clinic_id")
@@ -259,6 +265,14 @@ public class Clinic implements Serializable {
 	public void setCreatedAt(DateTime createdAt) {
 		this.createdAt = createdAt;
 	}
+	
+	public Integer getAdherenceSetting() {
+        return Objects.isNull(this.adherenceSetting) ? ADHERENCE_SETTING_DEFAULT_DAYS : this.adherenceSetting;
+    }
+
+    public void setAdherenceSetting(Integer adherenceSetting) {
+        this.adherenceSetting = adherenceSetting;
+    }
 
     @Override
 	public int hashCode() {
@@ -302,6 +316,7 @@ public class Clinic implements Serializable {
                 ", parentClinic='" + parentClinic + "'" +
                 ", deleted='" + deleted + "'" +
                 ", isParent='" + parent + "'" +
+                ", adherenceSetting='" + adherenceSetting + "'" +
                 '}';
     }
 }

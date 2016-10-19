@@ -40,6 +40,7 @@ import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.util.ClinicVOBuilder;
+import static com.hillrom.vest.config.AdherenceScoreConstants.ADHERENCE_SETTING_DEFAULT_DAYS;
 
 
 /**
@@ -390,7 +391,7 @@ public class ClinicService {
         if(Objects.isNull(clinic)) {
 	      	throw new HillromException(ExceptionConstants.HR_548);
         } else {
-        	return clinic.getAdherenceSetting();
+        	return Objects.isNull(clinic.getAdherenceSetting())?ADHERENCE_SETTING_DEFAULT_DAYS:clinic.getAdherenceSetting();
         }
     }
 }

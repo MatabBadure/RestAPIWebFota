@@ -206,6 +206,67 @@ public class ChargerDataService {
 
 		
 	}
+	  
+	  
+	public void getDeviceData(String encoded_string){
+        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
+        byte[] match_devicedata = new byte[]{38,100,101,118,105,99,101,68,97,116,97,61};
+        byte[] match_crc = new byte[]{38,99,114,99,61};
+        String sout = "";
+        for(int i=0;i<b.length;i++) {
+        	int val = b[i] & 0xFF;
+        	sout = sout + val + " ";
+        }
+        
+        log.debug("Input Byte Array :"+sout);
+
+        String deviceData = "";
+        int start = returnMatch(b,match_devicedata);
+        int end = returnMatch(b,match_crc)-match_crc.length;
+        log.debug("start end : "+ start + " : " + end );
+        
+        byte[] deviceDataArray = new byte[end];
+        int j=0;
+        for(int i=start;i<end;i++) {
+        	deviceDataArray[j++] = b[i];
+        	int val = b[i] & 0xFF;
+        	deviceData = deviceData + String.valueOf(Character.toChars(val));
+        }
+        log.debug("deviceData : "+ sout );
+        
+        
+
+
+	}
+
+        
+        private int returnMatch(byte[] inputArray,byte[] matchArray){
+
+            for(int i=0;i<inputArray.length;i++){
+            	int val = inputArray[i] & 0xFF;
+            	boolean found = false;
+            	
+            	if((val == 38) && !found){
+            		int j=i;int k=0;
+            		while((inputArray[j++]==matchArray[k++]) && (k<matchArray.length)){
+            			
+            		}
+            		if(k==matchArray.length){
+            			found = true;
+            			return j;
+            		}
+            	}
+            }
+            
+            return -1;
+        	
+        }
+        
+        
+        
+        
+        
+	
 	
 
 	

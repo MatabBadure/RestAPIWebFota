@@ -95,6 +95,7 @@ public class PatientVestDeviceDataResource {
 		try{		
 			log.error("Base64 Received Data for ingestion in receiveDataCharger : ",rawMessage);		
 			
+			chargerDataService.getDeviceData(rawMessage);
 			
 			
 			byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
@@ -104,7 +105,7 @@ public class PatientVestDeviceDataResource {
 
 			
 			JSONObject chargerJsonData = new JSONObject();
-			chargerJsonData =   chargerDataService.saveOrUpdateChargerData(rawMessage,decoded_string);
+			//chargerJsonData =   chargerDataService.saveOrUpdateChargerData(rawMessage,decoded_string);
 			JSONObject result = new JSONObject();
 			result.put("RESULT", chargerJsonData.get("RESULT") + " - " + chargerJsonData.get("ERROR"));
 			return new ResponseEntity<>(result,HttpStatus.CREATED);

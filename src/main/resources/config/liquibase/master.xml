@@ -97,4 +97,6 @@
 	<include file="classpath:/config/liquibase/changelog/20160923062300_altered_hillromid_datatype_jde_load_table.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20160920183415_create_table_adherence_reset.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20160926125030_add_justification_typeCode.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161018181815_alter_table_clinic_adherence_setting.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161018182530_add_adherenceSetting_typeCode.xml" relativeToChangelogFile="false"/>
  </databaseChangeLog>

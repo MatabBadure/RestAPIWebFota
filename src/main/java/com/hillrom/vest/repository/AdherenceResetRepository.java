@@ -16,6 +16,11 @@ public interface AdherenceResetRepository extends
 	
 	@Query("from AdherenceReset reset where  reset.patientUser.id = ?1  and reset.createdBy = ?2 and reset.resetDate = ?3")
 	Optional<AdherenceReset> findOneByPatientUserIdAndCreatedByAndResetDate(Long patientUserId, Long createdByUserId, LocalDate resetDate);
+
+	//hill-1847
+	@Query("from AdherenceReset reset where  reset.patientUser.id = ?1  and reset.resetDate = ?2")
+	List<AdherenceReset> findOneByPatientUserIdAndResetDate(Long patientUserId, LocalDate resetDate);
+	//hill-1847
 	
 	List<AdherenceReset> findByPatientUserId(Long patientUserId);
 }

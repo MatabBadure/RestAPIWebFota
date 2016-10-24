@@ -69,11 +69,11 @@ public class NotificationService {
 	 */
 	public void deleteNotificationIfExists(Long patientUserId,
 			LocalDate currentTherapyDate,int missedTherapyCount,
-			boolean isHmrCompliant,boolean isSettingsDeviated) {
+			boolean isHmrCompliant,boolean isSettingsDeviated, Integer adherenceSetting) {
 		Notification existingNotificationofTheDay = notificationRepository.findByPatientUserIdAndDate(patientUserId, currentTherapyDate);
 		if(Objects.nonNull(existingNotificationofTheDay)){
 			String notificationType = existingNotificationofTheDay.getNotificationType();
-			if((MISSED_THERAPY.equalsIgnoreCase(notificationType) && missedTherapyCount < DEFAULT_MISSED_THERAPY_DAYS_COUNT) ||
+			if((MISSED_THERAPY.equalsIgnoreCase(notificationType) && missedTherapyCount < adherenceSetting) ||
 				(HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType) && isHmrCompliant) ||
 				(SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) && !isSettingsDeviated) ||
 				(HMR_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) && isHmrCompliant && !isSettingsDeviated)){

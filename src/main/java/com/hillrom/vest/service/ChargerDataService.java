@@ -52,6 +52,38 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVI
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_DATA;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_MODEL;
 
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.SESSION_INDEX_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.START_TIME_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.END_TIME_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.START_BATTERY_LEVEL_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.END_BATTERY_LEVEL_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.NUMBER_OF_EVENTS_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.NUMBER_OF_PODS_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.HMR_SECONDS_LOC;
+
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVENT_TIMESTAMP_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVENT_CODE_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FREQUENCY_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.INTENSITY_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DURATION_LOC;
+
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.SESSION_INDEX;
+
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.SESSION_INDEX_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.START_TIME_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.END_TIME_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.START_BATTERY_LEVEL_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.END_BATTERY_LEVEL_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.NUMBER_OF_EVENTS_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.NUMBER_OF_PODS_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.HMR_SECONDS_LEN;
+
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVENT_TIMESTAMP_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVENT_CODE_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FREQUENCY_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.INTENSITY_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DURATION_LEN;
+
 @Service
 @Transactional
 public class ChargerDataService {
@@ -210,6 +242,7 @@ public class ChargerDataService {
 	  
 	public void getDeviceData(String encoded_string){
         byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
+        b = new byte[] {100,101,118,105,99,101,95,109,111,100,101,108,95,116,121,112,101,61,72,105,108,108,82,111,109,95,77,111,110,97,114,99,104,38,100,101,118,83,78,61,49,50,51,52,38,100,101,118,87,73,70,73,61,49,50,51,52,53,54,38,100,101,118,76,84,69,61,49,50,51,52,53,54,55,56,57,97,98,99,100,101,102,38,100,101,118,86,101,114,61,49,50,51,52,53,54,55,56,49,50,51,52,53,54,55,56,38,100,101,118,105,99,101,68,97,116,97,61,23,45,67,87,56,83,4,25,76,12,13,56,83,4,25,76,12,13,25,24,67,83,76,12,13,24,76,12,13,13,24,45,67,34,53,111,119,24,115,114,93,97,27,104,18,17,58,73,64,53,59,57,33,44,38,99,114,99,61,54,112};
         byte[] match_devicedata = new byte[]{38,100,101,118,105,99,101,68,97,116,97,61};
         byte[] match_crc = new byte[]{38,99,114,99,61};
         String sout = "";
@@ -234,8 +267,99 @@ public class ChargerDataService {
         }
         log.debug("deviceData : "+ sout );
         
+        byte[] session_index  = Arrays.copyOfRange(deviceDataArray, SESSION_INDEX_LOC, SESSION_INDEX_LOC + (SESSION_INDEX_LEN)-1);
+        sout = "";
+        for(int k=0;k<session_index.length;k++){
+        	sout = sout + session_index[k] + " ";
+        }
+        log.debug("session_index : "+ sout );
+              
+        byte[] start_time  = Arrays.copyOfRange(deviceDataArray, START_TIME_LOC-1, (START_TIME_LOC-1) + START_TIME_LEN);
+        sout = "";
+        for(int k=0;k<start_time.length;k++){
+        	sout = sout + start_time[k] + " ";
+        }
+        log.debug("start_time : "+ sout );
         
+        byte[] end_time  = Arrays.copyOfRange(deviceDataArray, END_TIME_LOC-1, (END_TIME_LOC-1) + END_TIME_LEN);        
+        sout = "";
+        for(int k=0;k<end_time.length;k++){
+        	sout = sout + end_time[k] + " ";
+        }
+        log.debug("end_time : "+ sout );
+        
+        byte[] start_battery_level  = Arrays.copyOfRange(deviceDataArray, START_BATTERY_LEVEL_LOC-1, (START_BATTERY_LEVEL_LOC-1) + START_BATTERY_LEVEL_LEN);
+        sout = "";
+        for(int k=0;k<start_battery_level.length;k++){
+        	sout = sout + start_battery_level[k] + " ";
+        }
+        log.debug("start_battery_level : "+ sout );
+        
+        byte[] end_battery_level  = Arrays.copyOfRange(deviceDataArray, END_BATTERY_LEVEL_LOC-1, (END_BATTERY_LEVEL_LOC-1) + END_BATTERY_LEVEL_LEN);
+        sout = "";
+        for(int k=0;k<end_battery_level.length;k++){
+        	sout = sout + end_battery_level[k] + " ";
+        }
+        log.debug("end_battery_level : "+ sout );
+        
+        byte[] number_of_events  = Arrays.copyOfRange(deviceDataArray, NUMBER_OF_EVENTS_LOC-1, (NUMBER_OF_EVENTS_LOC-1) + NUMBER_OF_EVENTS_LEN);
+        sout = "";
+        for(int k=0;k<number_of_events.length;k++){
+        	sout = sout + number_of_events[k] + " ";
+        }
+        log.debug("number_of_events : "+ sout );
+        
+        byte[] number_of_pods  = Arrays.copyOfRange(deviceDataArray, NUMBER_OF_PODS_LOC-1, (NUMBER_OF_PODS_LOC-1) + NUMBER_OF_PODS_LEN);
+        sout = "";
+        for(int k=0;k<number_of_pods.length;k++){
+        	sout = sout + number_of_pods[k] + " ";
+        }
+        log.debug("number_of_pods : "+ sout );
+        
+        byte[] hmr_seconds  = Arrays.copyOfRange(deviceDataArray, HMR_SECONDS_LOC-1, (HMR_SECONDS_LOC-1) + HMR_SECONDS_LEN);
+        sout = "";
+        for(int k=0;k<hmr_seconds.length;k++){
+        	sout = sout + hmr_seconds[k] + " ";
+        }
+        log.debug("hmr_seconds : "+ sout );
+        
+        log.debug("Value of deviceDataArray.length : "+ j );
+        for(int i=27;i<j;i=i+7){
+        	
+        	log.debug("Value of i : "+ i );
+        	
+	        byte[] event_timestamp  = Arrays.copyOfRange(deviceDataArray, i + EVENT_TIMESTAMP_LOC-1, (i+EVENT_TIMESTAMP_LOC-1) + EVENT_TIMESTAMP_LEN);
+	        sout = "";
+	        for(int k=0;k<event_timestamp.length;k++){
+	        	sout = sout + event_timestamp[k] + " ";
+	        }
+	        log.debug("event_timestamp : "+ sout );
+	        
+	        byte[] event_code  = Arrays.copyOfRange(deviceDataArray, i+EVENT_CODE_LOC-1, (i+EVENT_CODE_LOC-1) + EVENT_CODE_LEN);        
+	        sout = "";
+	        for(int k=0;k<event_code.length;k++){
+	        	sout = sout + event_code[k] + " ";
+	        }
+	        log.debug("event_code : "+ sout );
+	        
+	        byte[] frequency  = Arrays.copyOfRange(deviceDataArray, i+FREQUENCY_LOC-1, (i+FREQUENCY_LOC-1) + FREQUENCY_LEN);
+	        int frequency_val = (frequency[0] & 0xf0) >> 4;
+	        
+	        log.debug("frequency : "+ frequency_val );
+	        
+	        byte[] intensity  = Arrays.copyOfRange(deviceDataArray, i+INTENSITY_LOC-1, (i+INTENSITY_LOC-1) + INTENSITY_LEN);
+	        int intensity_val = intensity[0] & 0xf;
+	        
 
+	        log.debug("intensity : "+ intensity_val );
+	        
+	        byte[] duration  = Arrays.copyOfRange(deviceDataArray, i+DURATION_LOC-1, (i+DURATION_LOC-1) + DURATION_LEN);
+	        sout = "";
+	        for(int k=0;k<duration.length;k++){
+	        	sout = sout + duration[k] + " ";
+	        }
+	        log.debug("duration : "+ sout );
+        }
 
 	}
 

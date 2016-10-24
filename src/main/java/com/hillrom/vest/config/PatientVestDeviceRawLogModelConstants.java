@@ -52,35 +52,35 @@ public class PatientVestDeviceRawLogModelConstants {
 
 	/** Device_Data variable locations */ 
 	/** Log Data */
-	public static final double SESSION_INDEX_LOC = 0;
-	public static final double START_TIME_LOC = 5;
-	public static final double END_TIME_LOC = 12;
-	public static final double START_BATTERY_LEVEL_LOC = 19;
-	public static final double END_BATTERY_LEVEL_LOC = 20;
-	public static final double NUMBER_OF_EVENTS_LOC = 21;
-	public static final double NUMBER_OF_PODS_LOC = 22;
-	public static final double HMR_SECONDS_LOC = 23;
+	public static final int SESSION_INDEX_LOC = 0;
+	public static final int START_TIME_LOC = 5;
+	public static final int END_TIME_LOC = 12;
+	public static final int START_BATTERY_LEVEL_LOC = 19;
+	public static final int END_BATTERY_LEVEL_LOC = 20;
+	public static final int NUMBER_OF_EVENTS_LOC = 21;
+	public static final int NUMBER_OF_PODS_LOC = 22;
+	public static final int HMR_SECONDS_LOC = 23;
 	/** Log Event */
-	public static final double EVENT_TIMESTAMP_LOC = 0;
-	public static final double EVENT_CODE_LOC = 3;
-	public static final double FREQUENCY_LOC = 4;
-	public static final double INTENSITY_LOC = 4;
-	public static final double DURATION_LOC = 5;
+	public static final int EVENT_TIMESTAMP_LOC = 0;
+	public static final int EVENT_CODE_LOC = 3;
+	public static final int FREQUENCY_LOC = 4;
+	public static final int INTENSITY_LOC = 4;
+	public static final int DURATION_LOC = 5;
 	
 	/** Device_Data variable sizes */ 
 	/** Log Data */
-	public static final double SESSION_INDEX_LEN = 5;
-	public static final double START_TIME_LEN = 7;
-	public static final double END_TIME_LEN = 7;
-	public static final double START_BATTERY_LEVEL_LEN = 1;
-	public static final double END_BATTERY_LEVEL_LEN = 1;
-	public static final double NUMBER_OF_EVENTS_LEN = 1;
-	public static final double NUMBER_OF_PODS_LEN = 1;
-	public static final double HMR_SECONDS_LEN = 4;
+	public static final int SESSION_INDEX_LEN = 5;
+	public static final int START_TIME_LEN = 7;
+	public static final int END_TIME_LEN = 7;
+	public static final int START_BATTERY_LEVEL_LEN = 1;
+	public static final int END_BATTERY_LEVEL_LEN = 1;
+	public static final int NUMBER_OF_EVENTS_LEN = 1;
+	public static final int NUMBER_OF_PODS_LEN = 1;
+	public static final int HMR_SECONDS_LEN = 4;
 	/** Log Event */
-	public static final double EVENT_TIMESTAMP_LEN = 3;
-	public static final double EVENT_CODE_LEN = 1;
-	public static final double FREQUENCY_LEN = 0.5;
-	public static final double INTENSITY_LEN = 0.5;
-	public static final double DURATION_LEN = 2;
+	public static final int EVENT_TIMESTAMP_LEN = 3;
+	public static final int EVENT_CODE_LEN = 1;
+	public static final int FREQUENCY_LEN = 1; // Should be 0.5
+	public static final int INTENSITY_LEN = 1; // Should be 0.5
+	public static final int DURATION_LEN = 2;
 }

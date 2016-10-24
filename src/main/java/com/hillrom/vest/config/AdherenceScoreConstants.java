@@ -14,6 +14,4 @@ public class AdherenceScoreConstants {
 	public static final int MISSED_THERAPY_DAYS_COUNT_THRESHOLD = 100;
 	
 	public static int OLD_TRAINING_DATE = 1;
-
-	public static final int ADHERENCE_SETTING_DEFAULT_DAYS = 3;
 }

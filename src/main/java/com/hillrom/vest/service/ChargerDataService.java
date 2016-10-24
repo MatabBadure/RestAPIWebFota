@@ -1,20 +1,15 @@
 package com.hillrom.vest.service;
 
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.TreeMap;
 
 import javax.inject.Inject;
 import net.minidev.json.JSONObject;
 
-import org.apache.commons.lang.StringUtils;
-import org.joda.time.LocalDate;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.joda.time.DateTime;
@@ -24,31 +19,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.ChargerData;
-import com.hillrom.vest.domain.Note;
-import com.hillrom.vest.domain.PatientInfo;
-import com.hillrom.vest.domain.PatientNoEvent;
-import com.hillrom.vest.domain.User;
-import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ChargerDataRepository;
-import com.hillrom.vest.repository.NoteRepository;
-import com.hillrom.vest.repository.UserPatientRepository;
-import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.ParserUtil;
 import com.hillrom.vest.service.util.RandomUtil;
-import com.hillrom.vest.util.ExceptionConstants;
-import com.hillrom.vest.util.RelationshipLabelConstants;
 
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_SN;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_WIFI;
-import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.HUB_ID;
-import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.HUB_RECEIVE_TIME;
-import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.TWO_NET_PROPERTIES;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_LTE;
-import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_SERIAL_NUMBER;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_VER;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CRC;
-import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_ADDRESS;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_DATA;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_MODEL;
 
@@ -66,8 +46,6 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVEN
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FREQUENCY_LOC;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.INTENSITY_LOC;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DURATION_LOC;
-
-import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.SESSION_INDEX;
 
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.SESSION_INDEX_LEN;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.START_TIME_LEN;
@@ -323,10 +301,10 @@ public class ChargerDataService {
         }
         log.debug("hmr_seconds : "+ sout );
         
-        log.debug("Value of deviceDataArray.length : "+ j );
+        //log.debug("Value of deviceDataArray.length : "+ j );
         for(int i=27;i<j;i=i+7){
         	
-        	log.debug("Value of i : "+ i );
+        	//log.debug("Value of i : "+ i );
         	
 	        byte[] event_timestamp  = Arrays.copyOfRange(deviceDataArray, i + EVENT_TIMESTAMP_LOC-1, (i+EVENT_TIMESTAMP_LOC-1) + EVENT_TIMESTAMP_LEN);
 	        sout = "";

@@ -41,13 +41,15 @@ public class ClinicVO implements Serializable {
     private boolean parent = false;
 
     private DateTime createdAt;
+    
+    private Integer adherenceSetting;
 
     @JsonIgnore
     private List<ClinicVO> childClinicVOs = new LinkedList<>();
 
     public ClinicVO(String id,String name, String address, String address2, Integer zipcode, String city,
 			String state, String phoneNumber, String faxNumber, String speciality, Long clinicAdminId,
-			Boolean parent, String hillromId,Boolean deleted,DateTime createdAt) {
+			Boolean parent, String hillromId,Boolean deleted,DateTime createdAt,Integer adherenceSetting) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -64,6 +66,7 @@ public class ClinicVO implements Serializable {
 		this.hillromId = hillromId;
 		this.deleted = deleted;
 		this.createdAt = createdAt;
+		this.adherenceSetting = adherenceSetting;
 	}
     
     public String getId() {
@@ -202,5 +205,12 @@ public class ClinicVO implements Serializable {
 		this.childClinicVOs = childClinicVOs;
 	}
 
+	public Integer getAdherenceSetting() {
+        return adherenceSetting;
+    }
+	
+	public void setAdherenceSetting(Integer adherenceSetting) {
+        this.adherenceSetting = adherenceSetting;
+    }
 	
 }

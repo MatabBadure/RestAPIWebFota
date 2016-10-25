@@ -50,6 +50,9 @@ import com.hillrom.vest.web.rest.dto.AdherenceResetDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.util.ClinicVOBuilder;
+//hill-1847
+import org.joda.time.DateTime; 
+//hill-1847
 
 
 /**
@@ -79,20 +82,20 @@ public class AdherenceResetService {
     @Inject
     private EntityUserRepository entityUserRepository;
     
-    
-    public AdherenceReset findOneByPatientUserIdAndCreatedByAndResetDate(Long patientUserId, Long createdById, LocalDate resetDate){
+   //hill-1847
+    public AdherenceReset findOneByPatientUserIdAndCreatedByAndResetDate(Long patientUserId, Long createdById, DateTime resetDate){
     	Optional<AdherenceReset> adherenceReset = adherenceResetRepository.findOneByPatientUserIdAndCreatedByAndResetDate(patientUserId, createdById, resetDate);
     	if(adherenceReset.isPresent())
 			return adherenceReset.get();
 		return null;
 	}
-
-    public AdherenceReset createAdherenceReset(String patientId, Long patientUserId, LocalDate resetDate, Integer resetScore, 
+   //hill-1847
+    public AdherenceReset createAdherenceReset(String patientId, Long patientUserId, DateTime resetDate, Integer resetScore, 
 												LocalDate resetStartDate, String justification, Long createdById) throws HillromException {
-    	
+   
     	AdherenceReset existAdherenceReset = findOneByPatientUserIdAndCreatedByAndResetDate(patientUserId, createdById, resetDate);
-    	
-    	if(Objects.isNull(existAdherenceReset)){
+     //hill-1847
+    	//if(Objects.isNull(existAdherenceReset)){
     		existAdherenceReset = new AdherenceReset();
     		
     		User patientUser = userRepository.findOne(patientUserId);
@@ -109,14 +112,15 @@ public class AdherenceResetService {
     		
     		adherenceResetRepository.save(existAdherenceReset);
     		
-    	}else{
+    	/*}else{
     		existAdherenceReset.setResetScore(resetScore);
     		existAdherenceReset.setResetStartDate(resetStartDate);
     		existAdherenceReset.setJustification(justification);
     		
     		adherenceResetRepository.save(existAdherenceReset);
     		
-    	}
+    	}*/
+    		//hill-1847	
     	
     	return existAdherenceReset;
     }

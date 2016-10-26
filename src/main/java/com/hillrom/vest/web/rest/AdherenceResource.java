@@ -52,6 +52,7 @@ import com.hillrom.vest.web.rest.util.PaginationUtil;
 import com.mysema.query.types.expr.BooleanExpression;
 
 import net.minidev.json.JSONObject;
+import org.joda.time.DateTime;
 
 /**
  * REST controller for managing Clinic.
@@ -91,8 +92,9 @@ public class AdherenceResource {
 		 
     	
 		JSONObject jsonObject = new JSONObject();
-		
-		LocalDate resetDt = LocalDate.now();
+		//hill-1847
+		DateTime resetDt = DateUtil.getCurrentDateAndTime();
+		//hill-1847
 		LocalDate resetStartDt = null;
 		try {
 			resetStartDt	= StringUtils.isNoneBlank(resetStartDate)? DateUtil.parseStringToLocalDate(resetStartDate, YYYY_MM_DD) : LocalDate.now();

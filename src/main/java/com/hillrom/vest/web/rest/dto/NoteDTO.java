@@ -13,8 +13,7 @@ public class NoteDTO {
 	@Size(max = 50)
     private String patientId;
 
-	@Size(max = 5000)
-    private String note;
+	private String note;
 
 	@Size(max = 50)
     private String modifiedAt;

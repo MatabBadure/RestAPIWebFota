@@ -50,7 +50,7 @@ import com.hillrom.vest.web.rest.dto.AdherenceResetDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.util.ClinicVOBuilder;
-import org.joda.time.DateTime; 
+
 
 /**
  * Service class for managing users.
@@ -79,21 +79,20 @@ public class AdherenceResetService {
     @Inject
     private EntityUserRepository entityUserRepository;
     
-    //hill-1847
-    public AdherenceReset findOneByPatientUserIdAndCreatedByAndResetDate(Long patientUserId, Long createdById, DateTime resetDate){
+    
+    public AdherenceReset findOneByPatientUserIdAndCreatedByAndResetDate(Long patientUserId, Long createdById, LocalDate resetDate){
     	Optional<AdherenceReset> adherenceReset = adherenceResetRepository.findOneByPatientUserIdAndCreatedByAndResetDate(patientUserId, createdById, resetDate);
     	if(adherenceReset.isPresent())
 			return adherenceReset.get();
 		return null;
 	}
-    //hill-1847
-    public AdherenceReset createAdherenceReset(String patientId, Long patientUserId, DateTime resetDate, Integer resetScore, 
+
+    public AdherenceReset createAdherenceReset(String patientId, Long patientUserId, LocalDate resetDate, Integer resetScore, 
 												LocalDate resetStartDate, String justification, Long createdById) throws HillromException {
     	
     	AdherenceReset existAdherenceReset = findOneByPatientUserIdAndCreatedByAndResetDate(patientUserId, createdById, resetDate);
     	
-		//hill-1847
-    	
+    	if(Objects.isNull(existAdherenceReset)){
     		existAdherenceReset = new AdherenceReset();
     		
     		User patientUser = userRepository.findOne(patientUserId);
@@ -109,7 +108,16 @@ public class AdherenceResetService {
     		existAdherenceReset.setCreatedBy(createdById);
     		
     		adherenceResetRepository.save(existAdherenceReset);
-    	//hill-1847
+    		
+    	}else{
+    		existAdherenceReset.setResetScore(resetScore);
+    		existAdherenceReset.setResetStartDate(resetStartDate);
+    		existAdherenceReset.setJustification(justification);
+    		
+    		adherenceResetRepository.save(existAdherenceReset);
+    		
+    	}
+    	
     	return existAdherenceReset;
     }
 

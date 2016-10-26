@@ -166,7 +166,7 @@ public class PatientComplianceService {
 			trendVO.setUpdatedScore(compliance.getScore());
 			
 			//hill-1847
-			List<AdherenceReset> adherenceResetList = adherenceResetRepository.findOneByPatientUserIdAndResetStartDate(patientUserId,date);
+			List<AdherenceReset> adherenceResetList = adherenceResetRepository.findOneByPatientUserIdAndResetDate(patientUserId,date);
 			
 			if(Objects.nonNull(adherenceResetList) && adherenceResetList.size() > 0)
 			{

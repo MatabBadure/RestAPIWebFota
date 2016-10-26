@@ -9,7 +9,6 @@ import static com.hillrom.vest.config.Constants.YYYY_MM_DD;
 
 import java.security.InvalidParameterException;
 import java.text.DateFormatSymbols;
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -271,15 +270,4 @@ public class DateUtil {
 	        default: return "th";
 	    }
 	}
-	//hill-1847
-		/**
-		 * Returns today in DateTime
-		 * @return 
-		 */
-		public static DateTime getCurrentDateAndTime(){
-		Calendar cal = Calendar.getInstance();
-		DateTime dateTime = new DateTime(cal.getTime());
-		return dateTime;
-		}
-		//hill-1847
 }

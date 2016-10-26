@@ -12,6 +12,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -51,11 +52,11 @@ public class AdherenceReset {
 	@Column(name="reset_score")
 	private Integer resetScore;
 	
-	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
-    @JsonSerialize(using = MMDDYYYYLocalDateSerializer.class)
-    @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
-    @Column(name="reset_date")
-	private LocalDate resetDate;
+	//hill-1847
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+	@Column(name="reset_date")
+    private DateTime resetDate;
+	//hill-1847
 	
 	@Column(name="justification")
 	private String justification;
@@ -115,13 +116,15 @@ public class AdherenceReset {
     }
     
     
-	public LocalDate getResetDate() {
-		return resetDate;
-	}
+	//hill-1847
+  	public DateTime getResetDate() {
+  		return resetDate;
+  	}
 
-	public void setResetDate(LocalDate resetDate) {
-		this.resetDate = resetDate;
-	}	
+  	public void setResetDate(DateTime resetDate) {
+  		this.resetDate = resetDate;
+  	}
+  	//hill-1847
 	
 	public String getJustification() {
 		return justification;

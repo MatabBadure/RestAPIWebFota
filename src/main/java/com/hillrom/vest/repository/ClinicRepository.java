@@ -61,14 +61,14 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 
 	@Query(nativeQuery=true,
 			value=" select puserid,pfirstname,plastname,hcp_id,huserid,CONCAT(hlastName,' ', hfirstName) as hname,clinicId,clinicname,clinicadminid,pc.missed_therapy_count,pc.is_settings_deviated,pc.is_hmr_compliant,"
-					+ " nhn, sdn,mtn,hemail,caname,a_cahmr,a_casdn,a_camtn,a_caemail from ( "
+					+ " nhn, sdn,mtn,hemail,caname,a_cahmr,a_casdn,a_camtn,a_caemail,clinicadherencesetting from ( "
 					+ " select user.id as puserid,user.first_name as pfirstName,user.last_name as plastName,upa_hcp.user_id as hcp_id"
 					+ " from USER user join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = '"+PATIENT+"'"
 					+ " join USER_PATIENT_ASSOC  upa on user.id= upa.user_id and upa.relation_label = '"+SELF+"' "
 					+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 					+ " join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id "
 					+ " where user.is_deleted = 0 and user.activated=1) as associated_patient, "
-					+ " (select huser.id as huserid,huser.first_name as hfirstName,huser.last_name as hlastName,huser.email as hemail,clinic.id as clinicid,clinic.name as clinicname,clinic.clinic_admin_id as clinicadminid, "
+					+ " (select huser.id as huserid,huser.first_name as hfirstName,huser.last_name as hlastName,huser.email as hemail,clinic.id as clinicid,clinic.name as clinicname,clinic.clinic_admin_id as clinicadminid, clinic.adherence_setting as clinicadherencesetting, "
 					+ " (select CONCAT(ca.last_name,' ', ca.first_name)  from USER ca where id = clinic.clinic_admin_id) as caname, "
 					+ " (select ca.email from USER ca where id = clinic.clinic_admin_id) as a_caemail, "
 					+ " (select cahmr.non_hmr_notification  from USER cahmr where id = clinic.clinic_admin_id) as a_cahmr, "

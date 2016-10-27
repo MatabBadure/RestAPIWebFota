@@ -28,6 +28,7 @@ public class ClinicStatsNotificationVO {
 	private boolean isCAAcceptHMRNotification;
 	private boolean isCAAcceptSettingsNotification;
 	private boolean isCAAcceptTherapyNotification;
+	private Integer adherenceSetting;
 
 	public ClinicStatsNotificationVO(BigInteger patientUserid,
 			String patientFirstname,String patientLastname,
@@ -42,7 +43,8 @@ public class ClinicStatsNotificationVO {
 			Integer isCAAcceptHMRNotification,
 			Integer isCAAcceptSettingsNotification,
 			Integer isCAAcceptTherapyNotification,
-			String caEmail
+			String caEmail,
+			Integer adherenceSetting
 			) {
 		super();
 		this.patientUserid = patientUserid;
@@ -68,6 +70,7 @@ public class ClinicStatsNotificationVO {
 		this.isCAAcceptSettingsNotification = convertIntegerToBoolean(isCAAcceptSettingsNotification);
 		this.isCAAcceptTherapyNotification = convertIntegerToBoolean(isCAAcceptTherapyNotification);
 		this.caEmail = caEmail;
+		this.adherenceSetting = adherenceSetting;
 	}
 
 	
@@ -302,6 +305,15 @@ public class ClinicStatsNotificationVO {
 	public void setCAAcceptTherapyNotification(boolean isCAAcceptTherapyNotification) {
 		this.isCAAcceptTherapyNotification = isCAAcceptTherapyNotification;
 	}
+	
+	public Integer getAdherenceSetting() {
+		return adherenceSetting;
+	}
+
+
+	public void setAdherenceSetting(Integer adherenceSetting) {
+		this.adherenceSetting = adherenceSetting;
+	}
 
 
 	@Override
@@ -319,7 +331,9 @@ public class ClinicStatsNotificationVO {
 				+ ", isHcpAcceptSettingsNotification="
 				+ isHcpAcceptSettingsNotification
 				+ ", isHcpAcceptTherapyNotification="
-				+ isHcpAcceptTherapyNotification + "]";
+				+ isHcpAcceptTherapyNotification
+				+ ", adherenceSetting="
+				+ adherenceSetting+ "]";
 	}
 
 	public boolean convertIntegerToBoolean(Integer i){

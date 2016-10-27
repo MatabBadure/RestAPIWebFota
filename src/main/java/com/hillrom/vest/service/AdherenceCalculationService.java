@@ -222,7 +222,8 @@ public class AdherenceCalculationService {
 					complianceMap.put(userId, newCompliance);
 					// HMR Compliance shouldn't be checked for Patients for initial adherence setting days of transmission date
 				}else if(Objects.nonNull(noEvent)&& (Objects.nonNull(noEvent.getFirstTransmissionDate()) && 
-						DateUtil.getDaysCountBetweenLocalDates(noEvent.getFirstTransmissionDate(), today) < (adherenceSettingDay-1) )){
+						DateUtil.getDaysCountBetweenLocalDates(noEvent.getFirstTransmissionDate(), today) < (adherenceSettingDay-1) &&
+						adherenceSettingDay > 1 )){
 					// For Transmitted users no notification till earlier day of adherence Setting day(s)
 					PatientCompliance newCompliance = new PatientCompliance(today,compliance.getPatient(),compliance.getPatientUser(),
 							compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1,compliance.getLatestTherapyDate(),
@@ -320,26 +321,27 @@ public class AdherenceCalculationService {
 					
 					PatientCompliance currentCompliance = patientComplianceRepository.findById(compliance.getId());
 					
-					Notification notification = notificationRepository.findByPatientUserIdAndDate(userId, currentCompliance.getDate());
+					PatientInfo patient = currentCompliance.getPatient();
+					User patientUser = currentCompliance.getPatientUser();
 					
-					if(adherenceStartDate.isBefore(compliance.getDate()) &&
-							DateUtil.getDaysCountBetweenLocalDates(adherenceStartDate, compliance.getDate()) <= (adherenceSettingDay-1)){
+					if( ( adherenceStartDate.isBefore(compliance.getDate()) || adherenceStartDate.equals(compliance.getDate())) &&
+							DateUtil.getDaysCountBetweenLocalDates(adherenceStartDate, compliance.getDate()) <= (adherenceSettingDay-1) && 
+							adherenceSettingDay > 1){
 						
 						// Check whether the adherence start days is the compliance date
 						if(adherenceStartDate.equals(compliance.getDate())){
-							notification.setNotificationType(ADHERENCE_SCORE_RESET);
-							notificationRepository.save(notification);
+							notificationService.createOrUpdateNotification(patientUser, patient, userId,
+																			currentCompliance.getDate(), ADHERENCE_SCORE_RESET,false);
 						}
-						
 						currentCompliance.setScore(adherenceScore);
 						patientComplianceRepository.save(currentCompliance);					
 					}else{
 						if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay){
 							// Missed therapy days
-							calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, notification);
+							calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, patient, patientUser);
 						}else{
 							// HMR Non Compliance
-							calculateUserHMRComplianceForMST(currentCompliance, userProtocolConstant, currentCompliance.getDate(), userId, notification, adherenceSettingDay);
+							calculateUserHMRComplianceForMST(currentCompliance, userProtocolConstant, currentCompliance.getDate(), userId, patient, patientUser, adherenceSettingDay);
 						}
 					}
 				}
@@ -471,7 +473,8 @@ public class AdherenceCalculationService {
 			ProtocolConstants userProtocolConstants,
 			LocalDate complianceDate,
 			Long userId,
-			Notification notification,
+			PatientInfo patient,
+			User patientUser,
 			Integer adherenceSettingDay) {
 		
 		// Getting previous day score
@@ -491,28 +494,28 @@ public class AdherenceCalculationService {
 		int hmrRunRate = calculateHMRRunRatePerSession(therapySessions);
 		double durationForSettingDays = hmrRunRate*therapySessions.size(); // runrate*totalsessions = total duration
 		
+		String notification_type = "";		
+		boolean isSettingsDeviated = isSettingsDeviatedForSettingDays(therapySessions, userProtocolConstants, adherenceSettingDay);
+		
 		// validating the last adherence setting days therapies with respect to the user protocol
 		if(!isHMRCompliant(userProtocolConstants, durationForSettingDays, adherenceSettingDay)){
 			score = score < HMR_NON_COMPLIANCE_POINTS ? 0 : score - HMR_NON_COMPLIANCE_POINTS;
 			
 			newCompliance.setHmrCompliant(false);
-			if(Objects.nonNull(notification) && notification.getNotificationType().equals(ADHERENCE_SCORE_RESET)){
-				notification.setNotificationType(HMR_NON_COMPLIANCE);
-				notificationRepository.save(notification);
-			}
-		}else if(newCompliance.isSettingsDeviated()){
+			notification_type = HMR_NON_COMPLIANCE;
+		}else if(isSettingsDeviated){
 			score = score < SETTING_DEVIATION_POINTS ? 0 : score - SETTING_DEVIATION_POINTS;
-			if(Objects.nonNull(notification) && notification.getNotificationType().equals(ADHERENCE_SCORE_RESET)){
-				notification.setNotificationType(SETTINGS_DEVIATION);
-				notificationRepository.save(notification);
-			}
+			notification_type = SETTINGS_DEVIATION;
+			
+			int globalSettingsDeviationCounter = newCompliance.getGlobalSettingsDeviationCounter();
+			newCompliance.setGlobalSettingsDeviationCounter(++globalSettingsDeviationCounter);
 		}else{
-			score = score <=  DEFAULT_COMPLIANCE_SCORE - BONUS_POINTS ? score + BONUS_POINTS : DEFAULT_COMPLIANCE_SCORE;
-			if(Objects.nonNull(notification) && notification.getNotificationType().equals(ADHERENCE_SCORE_RESET)){
-				notification.setNotificationType(null);
-				notificationRepository.save(notification);
-			}
+			score = score <=  DEFAULT_COMPLIANCE_SCORE - BONUS_POINTS ? score + BONUS_POINTS : DEFAULT_COMPLIANCE_SCORE;			
+			notification_type = ADHERENCE_SCORE_RESET;
 		}
+		
+		notificationService.createOrUpdateNotification(patientUser, patient, userId,
+				complianceDate, notification_type, false);
 		
 		// Setting the new score with respect to the compliance deduction
 		newCompliance.setScore(score);
@@ -528,12 +531,11 @@ public class AdherenceCalculationService {
 			PatientCompliance newCompliance,
 			LocalDate complianceDate,
 			Long userId,
-			Notification notification) {
-		
-		if(Objects.nonNull(notification) && notification.getNotificationType().equals(ADHERENCE_SCORE_RESET)){
-			notification.setNotificationType(MISSED_THERAPY);
-			notificationRepository.save(notification);
-		}
+			PatientInfo patient,
+			User patientUser) {
+				
+		notificationService.createOrUpdateNotification(patientUser, patient, userId,
+				complianceDate, MISSED_THERAPY, false);
 		
 		// Get the previous day compliance score
 		PatientCompliance prevCompliance = patientComplianceRepository.returnPrevDayScore(complianceDate.toString(),userId);
@@ -778,13 +780,17 @@ public class AdherenceCalculationService {
 	private List<ClinicStatsNotificationVO> getPatientStatsWithHcpAndClinicAdminAssociation() {
 		List<Object[]> results =  clinicRepository.findPatientStatisticsClinicForActiveClinics();
 		List<ClinicStatsNotificationVO> statsNotificationVOs = new LinkedList<>();
-		for(Object[] result : results){
+		for(Object[] result : results){			
+			Integer adherenceSetting = 3;
+			if(Objects.nonNull(result[20])){
+				adherenceSetting = (Integer)result[20];
+			}			
 			statsNotificationVOs.add(new ClinicStatsNotificationVO((BigInteger)result[0], (String)result[1], (String)result[2],
 					(BigInteger)result[3],(BigInteger)result[4], (String)result[5], (String)result[6],(String)result[7],
 					(BigInteger)result[8],(Integer)result[9], (Boolean)result[10],
 					(Boolean)result[11], (Boolean)result[12], (Boolean)result[13], (Boolean)result[14],
 					(String)result[15],(String)result[16],(Integer)result[17], (Integer)result[18], (Integer)result[19],
-					(String)result[20]));
+					(String)result[20],adherenceSetting));
 		}
 		return statsNotificationVOs;
 	}

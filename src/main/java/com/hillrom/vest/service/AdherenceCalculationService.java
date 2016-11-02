@@ -323,7 +323,7 @@ public class AdherenceCalculationService {
 					
 					PatientInfo patient = currentCompliance.getPatient();
 					User patientUser = currentCompliance.getPatientUser();
-					
+					int initialPrevScoreFor1Day = 0; 
 					if( ( adherenceStartDate.isBefore(compliance.getDate()) || adherenceStartDate.equals(compliance.getDate())) &&
 							DateUtil.getDaysCountBetweenLocalDates(adherenceStartDate, compliance.getDate()) <= (adherenceSettingDay-1) && 
 							adherenceSettingDay > 1){
@@ -336,12 +336,16 @@ public class AdherenceCalculationService {
 						currentCompliance.setScore(adherenceScore);
 						patientComplianceRepository.save(currentCompliance);					
 					}else{
+						if(adherenceSettingDay == 1 && adherenceStartDate.equals(compliance.getDate())){
+							initialPrevScoreFor1Day = adherenceScore;
+						}
 						if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay){
 							// Missed therapy days
-							calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, patient, patientUser);
+							calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, patient, patientUser, initialPrevScoreFor1Day);
 						}else{
 							// HMR Non Compliance
-							calculateUserHMRComplianceForMST(currentCompliance, userProtocolConstant, currentCompliance.getDate(), userId, patient, patientUser, adherenceSettingDay);
+							calculateUserHMRComplianceForMST(currentCompliance, userProtocolConstant, currentCompliance.getDate(), userId, 
+									patient, patientUser, adherenceSettingDay, initialPrevScoreFor1Day);
 						}
 					}
 				}
@@ -475,11 +479,12 @@ public class AdherenceCalculationService {
 			Long userId,
 			PatientInfo patient,
 			User patientUser,
-			Integer adherenceSettingDay) {
+			Integer adherenceSettingDay,
+			int initialPrevScoreFor1Day) {
 		
-		// Getting previous day score
+		// Getting previous day score or adherence reset score for the adherence setting value as 1
 		PatientCompliance prevCompliance = patientComplianceRepository.returnPrevDayScore(complianceDate.toString(),userId);
-		int score = prevCompliance.getScore();
+		int score = initialPrevScoreFor1Day == 0 ? prevCompliance.getScore() : initialPrevScoreFor1Day;
 		
 		// Get earlier third day to finding therapy session
 		LocalDate adherenceSettingDaysEarlyDate = getDateBeforeSpecificDays(complianceDate,(adherenceSettingDay-1));
@@ -515,7 +520,7 @@ public class AdherenceCalculationService {
 		}
 		
 		notificationService.createOrUpdateNotification(patientUser, patient, userId,
-				complianceDate, notification_type, false);
+				complianceDate, (initialPrevScoreFor1Day == 0 ? notification_type : ADHERENCE_SCORE_RESET), false);
 		
 		// Setting the new score with respect to the compliance deduction
 		newCompliance.setScore(score);
@@ -532,14 +537,16 @@ public class AdherenceCalculationService {
 			LocalDate complianceDate,
 			Long userId,
 			PatientInfo patient,
-			User patientUser) {
+			User patientUser,
+			int initialPrevScoreFor1Day) {
 				
-		notificationService.createOrUpdateNotification(patientUser, patient, userId,
-				complianceDate, MISSED_THERAPY, false);
 		
-		// Get the previous day compliance score
+		notificationService.createOrUpdateNotification(patientUser, patient, userId,
+				complianceDate, (initialPrevScoreFor1Day == 0 ? MISSED_THERAPY : ADHERENCE_SCORE_RESET) , false);
+		
+		// Getting previous day score or adherence reset score for the adherence setting value as 1
 		PatientCompliance prevCompliance = patientComplianceRepository.returnPrevDayScore(complianceDate.toString(),userId);
-		int score = prevCompliance.getScore();
+		int score = initialPrevScoreFor1Day == 0 ? prevCompliance.getScore() : initialPrevScoreFor1Day; 
 		
 		// Calculating the score on basis of missed therapy
 		score = score < MISSED_THERAPY_POINTS ? 0 :  score - MISSED_THERAPY_POINTS ;
@@ -1045,7 +1052,7 @@ public class AdherenceCalculationService {
 			LocalDate lastTransmissionDate = getLatestTransmissionDate(
 					existingTherapySessionMap,receivedTherapySessionsMap, therapyDate);
 			int missedTherapyCount = 0;
-			if(daysBetween <= 1){ // first transmit
+			if(daysBetween <= 1 && adherenceSettingDay > 1){ // first transmit
 				PatientCompliance compliance = existingComplianceMap.get(therapyDate);
 				if(Objects.nonNull(compliance)){
 					compliance.setScore(DEFAULT_COMPLIANCE_SCORE);

@@ -129,14 +129,14 @@ public class AdherenceResource {
 			
 			// Check for existing adherence score is 100
 			if(Objects.nonNull(patientCompliance) && patientCompliance.getScore() == 100){
-				jsonObject.put("message", "Adherence score cannot be reset for existing adherence score of 100");
-	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+				jsonObject.put("ERROR", "Adherence score cannot be reset for existing adherence score of 100");
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 			}
 			else if(Objects.isNull(noEvent) || Objects.isNull(noEvent.getFirstTransmissionDate())){
 				
 				// Check for the non transmission users
-				jsonObject.put("message", "Adherence score cannot be reset for the non transmissions users");
-	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+				jsonObject.put("ERROR", "Adherence score cannot be reset for the non transmissions users");
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 			}else{
 				TherapySession therapy = therapyRepository.findTop1ByPatientUserIdOrderByDateAsc(Long.parseLong(userId));
 				if(Objects.nonNull(therapy)){
@@ -144,8 +144,8 @@ public class AdherenceResource {
 					
 					// Check for the reset date is not before first therapy date
 					if(resetStartDt.isBefore(firstTherapyDate)){
-						jsonObject.put("message", "Adherence start date should be after first therapy date");
-			            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+						jsonObject.put("ERROR", "Adherence start date should be after first therapy date");
+			            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 					}
 				}
 			}

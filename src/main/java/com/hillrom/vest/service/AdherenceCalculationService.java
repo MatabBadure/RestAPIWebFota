@@ -1082,7 +1082,7 @@ public class AdherenceCalculationService {
 			LocalDate lastTransmissionDate = getLatestTransmissionDate(
 					existingTherapySessionMap,receivedTherapySessionsMap, therapyDate);
 			int missedTherapyCount = 0;
-			if(daysBetween <= 1 && adherenceSettingDay > 1){ // first transmit
+			if( (daysBetween <= 1 && adherenceSettingDay > 1 ) || (daysBetween == 0 && adherenceSettingDay == 1) ){ // first transmit
 				PatientCompliance compliance = existingComplianceMap.get(therapyDate);
 				if(Objects.nonNull(compliance)){
 					compliance.setScore(DEFAULT_COMPLIANCE_SCORE);

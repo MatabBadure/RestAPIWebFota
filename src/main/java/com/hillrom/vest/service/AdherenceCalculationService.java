@@ -68,6 +68,11 @@ import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.ClinicStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.PatientStatsVO;
 
+//hill-1956
+import com.hillrom.vest.domain.AdherenceReset;
+import com.hillrom.vest.repository.AdherenceResetRepository;
+//hill-1956
+
 
 @Service
 @Transactional
@@ -112,6 +117,11 @@ public class AdherenceCalculationService {
 	@Inject
 	private UserService userService;
 	
+	
+	//hill-1956
+	@Inject
+	private AdherenceResetRepository adherenceResetRepository;
+	//hill-1956
 
 	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationService.class);
 	
@@ -1063,7 +1073,27 @@ public class AdherenceCalculationService {
 		else // Future Data has been sent 
 			allDates = DateUtil.getAllLocalDatesBetweenDates(latestComplianceDate, currentTherapyDate);
 		
+		//hill-1956
+		LocalDate firstresetDate = null;
+		LocalDate lastresetDate = allDates.get(allDates.size()-1);
+		//hill-1956
+				
+				
 		for(LocalDate therapyDate : allDates){
+			
+			//hill-1956
+			// query to find the adherence reset for the corresponding therapydate
+			List<AdherenceReset> adherenceResetList = adherenceResetRepository.findOneByPatientUserIdAndResetStartDate(patientUser.getId(),therapyDate);
+			
+			//if any adherence reset is found stop the adherence  calculation and set the therapy date as first resetdate
+			if(Objects.nonNull(adherenceResetList) && adherenceResetList.size() > 0)
+			{
+				firstresetDate = therapyDate;
+				break;
+			}
+			//hill-1956
+			
+			
 			// First Transmission Date to be updated
 			if(firstTransmittedDate.isAfter(therapyDate)){
 				noEventService.updatePatientFirstTransmittedDate(patientUser.getId(),therapyDate);
@@ -1119,6 +1149,35 @@ public class AdherenceCalculationService {
 						receivedTherapySessionsMap, protocolConstant,adherenceSettingDay);
 			}
 		}
+		
+		//hill-1956
+				if(Objects.nonNull(firstresetDate))
+				{
+					/* find the list of adherence reset for the specific duration
+					 * firstresetDate is the first reset date found for the user
+					 * lastresetDate is the last date in the request
+					 */
+					List<AdherenceReset> adherenceResetList = adherenceResetRepository.findOneByPatientUserIdAndResetStartDates(patientUser.getId(),firstresetDate,lastresetDate);
+					
+					if(Objects.nonNull(adherenceResetList) && adherenceResetList.size() > 0)
+					{
+						for(int i = 0; i < adherenceResetList.size(); i++)
+						{
+						// get the range of date from adherence reset to current date and do the adherence calculation
+						allDates = DateUtil.getAllLocalDatesBetweenDates(adherenceResetList.get(0).getResetStartDate(), DateUtil.getTodayLocalDate());
+
+						for(LocalDate restartdate : allDates){
+						
+							adherenceResetForPatient(patientUser.getId(), patient.getId().toString(), restartdate, DEFAULT_COMPLIANCE_SCORE);
+						}
+
+						
+						}
+					}
+					
+				}
+				//hill-1956
+				
 	}
 
 	private PatientCompliance getLatestCompliance(User patientUser,

@@ -1746,5 +1746,16 @@ public class UserService {
 		}
 		return jsonObject;
 	}
+	
+	public PatientInfo getPatientInfoObjFromPatientUserId(Long patientUserId) {
+		User patientUser = userRepository.getOne(patientUserId);
+		PatientInfo patientInfo = null;
+		for(UserPatientAssoc patientAssoc : patientUser.getUserPatientAssoc()){
+			if(RelationshipLabelConstants.SELF.equals(patientAssoc.getRelationshipLabel())){
+				patientInfo = patientAssoc.getPatient();
+			}
+		}
+		return patientInfo;
+	}
 }
 

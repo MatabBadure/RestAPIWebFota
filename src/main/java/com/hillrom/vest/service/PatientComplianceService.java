@@ -164,25 +164,16 @@ public class PatientComplianceService {
 			PatientCompliance compliance = complianceMap.get(date);
 			trendVO.setDate(date);
 			trendVO.setUpdatedScore(compliance.getScore());
-			
-			//hill-1847
-			List<AdherenceReset> adherenceResetList = adherenceResetRepository.findOneByPatientUserIdAndResetStartDate(patientUserId,date);
-			
-			if(Objects.nonNull(adherenceResetList) && adherenceResetList.size() > 0)
+			//hill-1847(bugfix)
+			if(Objects.nonNull(notificationsMap.get(date)) && notificationsMap.get(date).get(0).getNotificationType().equalsIgnoreCase(ADHERENCE_SCORE_RESET))
 			{
-				AdherenceReset adherenceReset = adherenceResetList.get(0);
-				Integer resetScore = adherenceReset.getResetScore();
-				if( resetScore > 0 )
-				{
-					trendVO.setScoreReset(true);
-				}
-				else
-				{
-					trendVO.setScoreReset(false);
-				}
+				trendVO.setScoreReset(true);
 			}
-			//hill-1847
-			
+			else
+			{
+				trendVO.setScoreReset(false);
+			}
+			//hill-1847(bugfix)
 			setNotificationPointsMap(complianceMap,notificationsMap,date,trendVO);
 			// Get datetime when compliance was processed
 			ProtocolRevisionVO revisionVO = getProtocolRevisionByCompliance(

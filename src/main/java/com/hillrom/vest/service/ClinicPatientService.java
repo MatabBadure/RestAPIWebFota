@@ -162,5 +162,15 @@ public class ClinicPatientService {
 			}
 		}
 	}
+	
+	public Clinic getAssociatedClinic(PatientInfo patientInfo) {
+		List<Clinic> clinics = new LinkedList<>();
+		for(ClinicPatientAssoc clinicPatientAssoc : patientInfo.getClinicPatientAssoc()){
+			clinics.add(clinicPatientAssoc.getClinic());
+		}
+		if(clinics.isEmpty())
+			return null; 
+		else
+			return clinics.get(0);		
+	}
 }
-

@@ -1339,8 +1339,10 @@ public class AdherenceCalculationService {
 			return ADHERENCE_SETTING_DEFAULT_DAYS;
 	}
 	
-	private Integer getAdherenceSettingForUserId(Long patientUserId){
+	//hill-2002
+	public Integer getAdherenceSettingForUserId(Long patientUserId){
 		PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(patientUserId);		
 		return getAdherenceSettingForPatient(patient);		
-	}
+	} 
+	//hill-2002
 }

@@ -1,5 +1,6 @@
 package com.hillrom.vest.web.rest;
 
+import static com.hillrom.vest.config.AdherenceScoreConstants.ADHERENCE_SETTING_DEFAULT_DAYS;
 import static com.hillrom.vest.security.AuthoritiesConstants.CLINIC_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
 
@@ -47,8 +48,10 @@ import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.io.ICsvBeanWriter;
 import org.supercsv.prefs.CsvPreference;
 
+import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
+import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
@@ -65,6 +68,7 @@ import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.AdherenceCalculationService;
+import com.hillrom.vest.service.ClinicPatientService;
 import com.hillrom.vest.service.ExcelOutputService;
 import com.hillrom.vest.service.GraphService;
 import com.hillrom.vest.service.PatientComplianceService;
@@ -88,6 +92,7 @@ import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 import net.minidev.json.JSONObject;
+
 /**
  * REST controller for managing users.
  */
@@ -160,7 +165,7 @@ public class UserResource {
 	@Qualifier("treatmentStatsGraphService")
 	@Inject
 	private GraphService treatmentStatsGraphService;
-
+	
 	/**
 	 * GET /users -> get all users.
 	 */
@@ -623,10 +628,26 @@ public class UserResource {
     	LocalDate toDate = Objects.isNull(to) ? LocalDate.now() : LocalDate.fromDateFields(new Date(to));
     	Pageable pageable = PaginationUtil.generatePageRequest(offset, limit);
     	Page<Notification> page = notificationRepository.findByPatientUserIdAndDateBetweenAndIsAcknowledged(id, fromDate,toDate,false, pageable);
+    	
     	HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/users/"+id+"/notifications", offset, limit);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
     
+    //hill-2002
+    /**
+     * GET  /users/:patientUserId/adherenceSettingNotifications -> get the patient adherenceSettingValue associated with clinic.
+     */
+	@RequestMapping(value = "/users/{patientUserId}/adherenceSettingNotifications", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<JSONObject> getAdherenceSettingNotificationsByPatientUserId(@PathVariable Long patientUserId) {
+		log.debug("REST request to get PatientUserId : {}", patientUserId);
+		JSONObject json = new JSONObject();
+	    Integer adherencesettingValue = adherenceCalculationService.getAdherenceSettingForUserId(patientUserId);
+		json.put("adherenceSettingvalue", adherencesettingValue);
+		return new ResponseEntity<>(json,  HttpStatus.OK);
+	}
+	//hill-2002
+    
+	
     @RequestMapping(value = "/users/{userId}/notifications/{id}",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -1082,5 +1103,4 @@ public class UserResource {
     		}
     }
     //hill-1847
-    
-}
+   }

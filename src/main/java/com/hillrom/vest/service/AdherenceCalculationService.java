@@ -515,8 +515,14 @@ public class AdherenceCalculationService {
 			int globalHMRNonAdhrenceCounter = prevCompliance.getGlobalHMRNonAdherenceCounter();
 			newCompliance.setGlobalHMRNonAdherenceCounter(++globalHMRNonAdhrenceCounter);
 			
+			notification_type = HMR_NON_COMPLIANCE;
 			newCompliance.setHmrCompliant(false);
-			notification_type = isSettingsDeviated ? HMR_AND_SETTINGS_DEVIATION : HMR_NON_COMPLIANCE;
+			
+			if(isSettingsDeviated){
+				notification_type = HMR_AND_SETTINGS_DEVIATION;
+				score = score < SETTING_DEVIATION_POINTS ? 0 : score - SETTING_DEVIATION_POINTS;
+			}
+
 		}else if(isSettingsDeviated){
 			score = score < SETTING_DEVIATION_POINTS ? 0 : score - SETTING_DEVIATION_POINTS;
 			notification_type = SETTINGS_DEVIATION;

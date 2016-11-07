@@ -25,7 +25,9 @@ public class AdherenceTrendVO implements Serializable{
 	private LocalDate date;
 	private Map<String,Integer> notificationPoints = new HashMap<>();
 	private List<Notification> prevNotificationDetails = new ArrayList(); 
-	
+	//hill-1847
+	private boolean scoreReset;
+	//hill-1847
 	public int getUpdatedScore() {
 		return updatedScore;
 	}
@@ -58,6 +60,14 @@ public class AdherenceTrendVO implements Serializable{
 	public void setPrevNotificationDetails(List<Notification> prevNotificationDetails) {
 		this.prevNotificationDetails = prevNotificationDetails;
 	}
+	//hill-1847
+	public boolean isScoreReset() {
+		return scoreReset;
+	}
+	public void setScoreReset(boolean scoreReset) {
+		this.scoreReset = scoreReset;
+	}
+	//hill-1847
 	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -65,7 +75,7 @@ public class AdherenceTrendVO implements Serializable{
 	@Override
 	public String toString() {
 		return "AdherenceTrendVO [updatedScore=" + updatedScore + ", date=" + date + ", notificationPoints="
-				+ notificationPoints + ", prevNotificationDetails=" + prevNotificationDetails + "]";
+				+ notificationPoints + ", prevNotificationDetails=" + prevNotificationDetails + ", scoreReset=" + scoreReset + "]";
 	}	
 	
 	

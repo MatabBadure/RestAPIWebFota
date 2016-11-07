@@ -1431,14 +1431,7 @@ public class UserService {
 		UserPatientAssoc caregiverAssoc = new UserPatientAssoc();
 		if (AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())) {
 			caregiverAssoc = updateCaregiver(patientUserId, caregiverUserId, userExtensionDTO);
-			if(Objects.nonNull(caregiverAssoc) && Objects.nonNull(caregiverAssoc.getUser().getId())) {
-				if(StringUtils.isNotBlank(userExtensionDTO.getEmail())) {
-					mailService.sendActivationEmail(caregiverAssoc.getUser(), baseUrl);
-				}
 			} else {
-				throw new HillromException(ExceptionConstants.HR_562);
-			}
-		} else {
 			throw new HillromException(ExceptionConstants.HR_555);
 		}
 		return caregiverAssoc;
@@ -1752,6 +1745,17 @@ public class UserService {
 			throw new HillromException(ExceptionConstants.HR_512);
 		}
 		return jsonObject;
+	}
+	
+	public PatientInfo getPatientInfoObjFromPatientUserId(Long patientUserId) {
+		User patientUser = userRepository.getOne(patientUserId);
+		PatientInfo patientInfo = null;
+		for(UserPatientAssoc patientAssoc : patientUser.getUserPatientAssoc()){
+			if(RelationshipLabelConstants.SELF.equals(patientAssoc.getRelationshipLabel())){
+				patientInfo = patientAssoc.getPatient();
+			}
+		}
+		return patientInfo;
 	}
 }
 

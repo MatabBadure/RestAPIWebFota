@@ -112,7 +112,7 @@ public class ClinicService {
     			}
     		}
     		assignUpdatedValues(clinicDTO, clinic);
-    		if(clinicDTO.getParent()) {
+    		if(Objects.nonNull(clinicDTO.getParent()) && clinicDTO.getParent()) {
     			List<String> existingChildClinicIds = new ArrayList<String>();
     			List<String> newChildClinicIds = new ArrayList<String>();
     			for(Clinic childClinic : clinic.getChildClinics()) {
@@ -203,6 +203,8 @@ public class ClinicService {
 			clinic.setClinicAdminId(clinicDTO.getClinicAdminId());
 		if (clinicDTO.getDeleted() != null)
 			clinic.setDeleted(clinicDTO.getDeleted());
+		if (clinicDTO.getAdherenceSetting() != null)
+			clinic.setAdherenceSetting(clinicDTO.getAdherenceSetting());
 	}
 
 	public Set<UserExtension> getHCPUsers(List<String> idList) throws HillromException, EntityNotFoundException {

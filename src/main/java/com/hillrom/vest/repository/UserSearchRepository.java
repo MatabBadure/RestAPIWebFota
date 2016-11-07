@@ -1,6 +1,7 @@
 package com.hillrom.vest.repository;
 
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_SETTINGS_DEVIATION_COUNT;
+import static com.hillrom.vest.config.AdherenceScoreConstants.ADHERENCE_SETTING_DEFAULT_DAYS;
 import static com.hillrom.vest.security.AuthoritiesConstants.CLINIC_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
@@ -451,14 +452,14 @@ public class UserSearchRepository {
 
 		String query1 = "select patient_id as id,pemail,pfirstName,plastName, isDeleted,pzipcode,paddress,pcity,pdob,pgender,ptitle,"
 				+ "phillrom_id,createdAt,isActivated, state , adherence,last_date,mrnid,hName,clinicName,isExpired,isHMRNonCompliant,isSettingsDeviated,"
-				+ "isMissedTherapy  from (select user.id as patient_id,user.email as pemail,user.first_name as pfirstName,user.last_name as plastName,"
+				+ "isMissedTherapy,adherencesetting  from (select user.id as patient_id,user.email as pemail,user.first_name as pfirstName,user.last_name as plastName,"
 				+ " user.is_deleted as isDeleted, user.zipcode as pzipcode,patInfo.address paddress,patInfo.city as pcity,user.dob as pdob,"
 				+ "user.gender as pgender,user.title as ptitle,  user.hillrom_id as phillrom_id,user.created_date as createdAt,"
 				+ "user.activated as isActivated, patInfo.state as state ,  user_clinic.mrn_id as mrnid, clinic.id as pclinicid, "
 				+ "GROUP_CONCAT(clinic.name) as clinicName, user.expired as isExpired, pc.compliance_score as adherence,  "
 				+ "pc.last_therapy_session_date as last_date,pc.is_hmr_compliant as isHMRNonCompliant,"
 				+ "pc.is_settings_deviated as isSettingsDeviated,"
-				+ " pc.missed_therapy_count as isMissedTherapy from USER user join USER_PATIENT_ASSOC  upa on user.id = upa.user_id "
+				+ " pc.missed_therapy_count as isMissedTherapy, clinic.adherence_setting as adherencesetting from USER user join USER_PATIENT_ASSOC  upa on user.id = upa.user_id "
 				+ " and upa.relation_label = '" + SELF + "' join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 				+ " left outer join CLINIC_PATIENT_ASSOC user_clinic on user_clinic.patient_id = patInfo.id "
 				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id  and user_authority.authority_name = '"
@@ -653,12 +654,13 @@ public class UserSearchRepository {
 				+ " where patInfo.id = patInfoh.id"
 				+ " group by patInfoh.id) as hcpname, patient_clinic.mrn_id as mrnid,"
 				+ " patient_clinic.expired as isExpired, pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,"
-				+ " pc.missed_therapy_count as isMissedTherapy " + " from USER user"
+				+ " pc.missed_therapy_count as isMissedTherapy,clinic.adherence_setting as adherencesetting " + " from USER user"
 				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '" + SELF + "'"
 				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id"
 				+ " join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id  "
 				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate())  "
 				+ " left outer join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id "
+				+ " left outer join CLINIC clinic on patient_clinic.clinic_id = clinic.id "
 				+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id"
 				+ " and user_authority.authority_name = '" + PATIENT + "'";
 
@@ -788,12 +790,13 @@ public class UserSearchRepository {
 				+ " where patInfo.id = patInfoh.id"
 				+ " group by patInfoh.id) as hcpname, patient_clinic.mrn_id as mrnid, "
 				+ " user.expired as isExpired, pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,"
-				+ " pc.missed_therapy_count as isMissedTherapy " + " from USER user"
+				+ " pc.missed_therapy_count as isMissedTherapy,clinic.adherence_setting as adherencesetting " + " from USER user"
 				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '" + SELF + "'"
 				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id"
 				+ " join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id  "
 				+ " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate())  "
 				+ " left outer join CLINIC_PATIENT_ASSOC patient_clinic on patient_clinic.patient_id = patInfo.id "
+				+ " left outer join CLINIC clinic on patient_clinic.clinic_id = clinic.id "
 				+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id"
 				+ " and user_authority.authority_name = '" + PATIENT + "'";
 
@@ -903,7 +906,7 @@ public class UserSearchRepository {
 				+ "user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,"
 				+ "user.title,user.hillrom_id,user.created_date as createdAt,"
 				+ "user.activated as isActivated, patInfo.state , compliance_score, pc.last_therapy_session_date as last_date, patient_clinic.expired, patient_clinic.mrn_id as mrnId, "
-				+ "pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,pc.missed_therapy_count as isMissedTherapy "
+				+ "pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,pc.missed_therapy_count as isMissedTherapy,clinic.adherence_setting as adherencesetting "
 				+ "from USER user" + " join USER_AUTHORITY user_authority on user_authority.user_id = user.id  "
 				+ "and user_authority.authority_name = '" + PATIENT + "' and "
 				+ "(lower(user.first_name) like lower(:queryString) or  "
@@ -916,6 +919,7 @@ public class UserSearchRepository {
 				+ "join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 				+ "join CLINIC_PATIENT_ASSOC patient_clinic on "
 				+ "patient_clinic.patient_id = patInfo.id and patient_clinic.clinic_id = ':clinicId'"
+				+ "join CLINIC clinic on clinic.id = patient_clinic.clinic_id "
 				+ "left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) group by pc.user_id";
 
 		StringBuilder filterQuery = new StringBuilder();
@@ -1018,9 +1022,9 @@ public class UserSearchRepository {
 		if (Objects.nonNull(filterMap.get("isMissedTherapy"))) {
 
 			if ("1".equals(filterMap.get("isMissedTherapy")))
-				filterQuery.append(" and (isMissedTherapy >="+DEFAULT_SETTINGS_DEVIATION_COUNT+") ");
+				filterQuery.append(" and (isMissedTherapy >= IF(ISNULL(adherencesetting),"+ADHERENCE_SETTING_DEFAULT_DAYS+",adherencesetting))");
 			else if ("0".equals(filterMap.get("isMissedTherapy")))
-				filterQuery.append(" and ( isMissedTherapy < "+DEFAULT_SETTINGS_DEVIATION_COUNT+" )");
+				filterQuery.append(" and ( isMissedTherapy < IF(ISNULL(adherencesetting),"+ADHERENCE_SETTING_DEFAULT_DAYS+",adherencesetting))");
 		}
 	}
 
@@ -1114,7 +1118,7 @@ public class UserSearchRepository {
 				+ "'  left outer join PATIENT_INFO patInfoh on upah.patient_id = patInfoh.id "
 				+ " where patInfo.id = patInfoh.id group by patInfoh.id) as hcpname,patient_clinic.mrn_id as mrnid,"
 				+ " patient_clinic.expired as isExpired, pc.is_hmr_compliant as isHMRNonCompliant,"
-				+ " pc.is_settings_deviated as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy from USER user "
+				+ " pc.is_settings_deviated as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy, clinic.adherence_setting as adherencesetting from USER user "
 				+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = '"
 				+ PATIENT + "'" + " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"
 				+ SELF + "' " + " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id"
@@ -1254,7 +1258,7 @@ public class UserSearchRepository {
 				+ "user.title as ptitle,user.hillrom_id as phillrom_id,user.created_date as createdAt,"
 				+ "user.activated as isActivated, patInfo.state as state,pc.compliance_score as pcompliance_score, "
 				+ "pc.last_therapy_session_date as last_date , user_clinic.mrn_id as mrnid,"
-				+ "clinic.id as pclinicid, GROUP_CONCAT(clinic.name) as clinicName from USER user "
+				+ "clinic.id as pclinicid, GROUP_CONCAT(clinic.name) as clinicName,clinic.adherence_setting as adherencesetting from USER user "
 				+ "join USER_AUTHORITY user_authority on user_authority.user_id = user.id  and user_authority.authority_name = 'PATIENT' and "
 				+ "(lower(user.first_name) like lower(:searchString) or  lower(user.last_name) like lower(:searchString) or   "
 				+ "lower(CONCAT(user.first_name,' ',user.last_name)) like lower(:searchString) or "

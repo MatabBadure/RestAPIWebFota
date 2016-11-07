@@ -75,49 +75,53 @@ public class ParserUtil {
 	}
 	
 	public static JSONObject getQclJsonDataFromRawMessage(String rawMessage){
-
 		List<NameValuePair> params = URLEncodedUtils.parse(rawMessage, Charset.defaultCharset());
 		JSONObject qclJsonData = new JSONObject();
-		
-		if(params.get(0).getName().equalsIgnoreCase("device_model_type") && params.get(0).getValue().equalsIgnoreCase("HillRom_Monarch")){
-			StringTokenizer st = new StringTokenizer(rawMessage, "&");
-			while (st.hasMoreTokens()) {
-			  String pair = st.nextToken();
-			  log.debug("StringTokenizer NameValue Pair : " + pair);
-			  if(pair.contains("=")){
-				  StringTokenizer st_NameValue = new StringTokenizer(pair, "=");
-				  String nameToken =  st_NameValue.nextToken();
-				  String valueToken = st_NameValue.nextToken();
-				  log.debug("StringTokenizer Name : " + nameToken);
-				  log.debug("StringTokenizer Value : " + valueToken);
-				  
-					if(DEVICE_SN.equalsIgnoreCase(nameToken))
-						qclJsonData.put(DEVICE_SN, valueToken);
-					if(DEVICE_WIFI.equalsIgnoreCase(nameToken))
-						qclJsonData.put(DEVICE_WIFI, valueToken);	
-					if(DEVICE_LTE.equalsIgnoreCase(nameToken))
-						qclJsonData.put(DEVICE_LTE, valueToken);	
-					if(DEVICE_VER.equalsIgnoreCase(nameToken))
-						qclJsonData.put(DEVICE_VER, valueToken);	
-					if(DEVICE_DATA.equalsIgnoreCase(nameToken))
-						qclJsonData.put(DEVICE_DATA, valueToken);	
-					if(CRC.equalsIgnoreCase(nameToken))
-						qclJsonData.put(CRC, valueToken);					
-					qclJsonData.put("device_model_type", "HillRom_Monarch");
-			  }
-			}
 
-			
-		}else{
-			for(NameValuePair nameValuePair : params){
-				if(QCL_JSON_DATA.equalsIgnoreCase(nameValuePair.getName()))
-					qclJsonData = (JSONObject) JSONValue.parse(nameValuePair.getValue());
-				qclJsonData.put("device_model_type", "HillRom_Vest");
-			}
+		for(NameValuePair nameValuePair : params){
+			if(QCL_JSON_DATA.equalsIgnoreCase(nameValuePair.getName()))
+				qclJsonData = (JSONObject) JSONValue.parse(nameValuePair.getValue());
+			qclJsonData.put("device_model_type", "HillRom_Vest");
 		}
+		
 		return qclJsonData;
 	}
-	
+
+	public static JSONObject getChargerQclJsonDataFromRawMessage(String rawMessage){
+
+		JSONObject qclJsonData = new JSONObject();
+			
+		StringTokenizer st = new StringTokenizer(rawMessage, "&");
+		while (st.hasMoreTokens()) {
+		  String pair = st.nextToken();
+		  log.debug("StringTokenizer NameValue Pair : " + pair);
+		  if(pair.contains("=")){
+			  StringTokenizer st_NameValue = new StringTokenizer(pair, "=");
+			  String nameToken =  st_NameValue.nextToken();
+			  String valueToken = st_NameValue.nextToken();
+			  log.debug("StringTokenizer Name : " + nameToken);
+			  log.debug("StringTokenizer Value : " + valueToken);
+			  
+				if(DEVICE_SN.equalsIgnoreCase(nameToken))
+					qclJsonData.put(DEVICE_SN, valueToken);
+				if(DEVICE_WIFI.equalsIgnoreCase(nameToken))
+					qclJsonData.put(DEVICE_WIFI, valueToken);	
+				if(DEVICE_LTE.equalsIgnoreCase(nameToken))
+					qclJsonData.put(DEVICE_LTE, valueToken);	
+				if(DEVICE_VER.equalsIgnoreCase(nameToken))
+					qclJsonData.put(DEVICE_VER, valueToken);	
+				if(DEVICE_DATA.equalsIgnoreCase(nameToken))
+					qclJsonData.put(DEVICE_DATA, valueToken);	
+				if(CRC.equalsIgnoreCase(nameToken))
+					qclJsonData.put(CRC, valueToken);					
+				qclJsonData.put("device_model_type", "HillRom_Monarch");
+		  }
+		}
+			
+		return qclJsonData;
+	}
+
+
 	public static String getValueFromQclJsonData(JSONObject qclJsonData,String key){
 		String value = "";
 		JSONObject twoNetProperties = (JSONObject) qclJsonData.get(TWO_NET_PROPERTIES);

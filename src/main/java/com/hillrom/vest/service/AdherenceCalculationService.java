@@ -117,7 +117,6 @@ public class AdherenceCalculationService {
 	@Inject
 	private UserService userService;
 	
-	
 	//hill-1956
 	@Inject
 	private AdherenceResetRepository adherenceResetRepository;
@@ -342,14 +341,20 @@ public class AdherenceCalculationService {
 					currentCompliance.setScore(adherenceScore);
 					patientComplianceRepository.save(currentCompliance);					
 				}else{
+										
+					List<TherapySession> therapyData = therapySessionRepository.findByPatientUserIdAndDate(userId, compliance.getDate());					
+					
 					if(adherenceSettingDay == 1 && adherenceStartDate.equals(compliance.getDate())){
 						initialPrevScoreFor1Day = adherenceScore;
 					}						
 					if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && !compliance.getDate().equals(todayDate)){
 						// Missed therapy days
 						calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, patient, patientUser, initialPrevScoreFor1Day);
+					}else if(therapyData.isEmpty() && compliance.getDate().equals(todayDate)){
+						// Setting the previous day compliance details for the no therapy done for today 
+						setPrevDayCompliance(currentCompliance, userId);
 					}else{
-						// HMR Non Compliance / Setting deviation
+						// HMR Non Compliance / Setting deviation & therapy data available
 						calculateUserHMRComplianceForMST(currentCompliance, userProtocolConstant, currentCompliance.getDate(), userId, 
 								patient, patientUser, adherenceSettingDay, initialPrevScoreFor1Day);
 					}
@@ -362,7 +367,26 @@ public class AdherenceCalculationService {
 		}
 		return "Adherence score reset successfully";
 	}
-
+	
+	// Setting the previous day compliance
+	private void setPrevDayCompliance(PatientCompliance currentCompliance, Long userId)
+	{
+		PatientCompliance preDayCompliance = patientComplianceRepository.returnPrevDayScore(currentCompliance.getDate().toString(),userId);
+		
+		currentCompliance.setGlobalHMRNonAdherenceCounter(preDayCompliance.getGlobalHMRNonAdherenceCounter());
+		currentCompliance.setGlobalMissedTherapyCounter(preDayCompliance.getGlobalMissedTherapyCounter());
+		currentCompliance.setGlobalSettingsDeviationCounter(preDayCompliance.getGlobalSettingsDeviationCounter());
+		currentCompliance.setHmr(preDayCompliance.getHmr());
+		currentCompliance.setHmrCompliant(preDayCompliance.isHmrCompliant());
+		currentCompliance.setHmrRunRate(preDayCompliance.getHmrRunRate());
+		currentCompliance.setLatestTherapyDate(preDayCompliance.getLatestTherapyDate());
+		currentCompliance.setMissedTherapyCount(preDayCompliance.getMissedTherapyCount());
+		currentCompliance.setScore(preDayCompliance.getScore());
+		currentCompliance.setSettingsDeviated(preDayCompliance.isSettingsDeviated());
+		currentCompliance.setSettingsDeviatedDaysCount(preDayCompliance.getSettingsDeviatedDaysCount());
+		patientComplianceRepository.save(currentCompliance);
+	}
+	
 	private void updateGlobalCounters(int globalMissedTherapyCounter,
 			int globalHMRNonAdherenceCounter,
 			int globalSettingsDeviationCounter, PatientCompliance newCompliance) {

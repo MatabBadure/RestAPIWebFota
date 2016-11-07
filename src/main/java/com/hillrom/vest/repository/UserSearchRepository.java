@@ -1022,9 +1022,9 @@ public class UserSearchRepository {
 		if (Objects.nonNull(filterMap.get("isMissedTherapy"))) {
 
 			if ("1".equals(filterMap.get("isMissedTherapy")))
-				filterQuery.append(" and (isMissedTherapy >= IF(ISNULL(adherencesetting),"+ADHERENCE_SETTING_DEFAULT_DAYS+",adherencesetting)");
+				filterQuery.append(" and (isMissedTherapy >= IF(ISNULL(adherencesetting),"+ADHERENCE_SETTING_DEFAULT_DAYS+",adherencesetting))");
 			else if ("0".equals(filterMap.get("isMissedTherapy")))
-				filterQuery.append(" and ( isMissedTherapy < IF(ISNULL(adherencesetting),"+ADHERENCE_SETTING_DEFAULT_DAYS+",adherencesetting)");
+				filterQuery.append(" and ( isMissedTherapy < IF(ISNULL(adherencesetting),"+ADHERENCE_SETTING_DEFAULT_DAYS+",adherencesetting))");
 		}
 	}
 

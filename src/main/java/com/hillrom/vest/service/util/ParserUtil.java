@@ -30,6 +30,9 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVI
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CRC;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_DATA;
 
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FRAG_TOTAL;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FRAG_CURRENT;
+
 
 public class ParserUtil {
 	
@@ -109,7 +112,11 @@ public class ParserUtil {
 				if(DEVICE_LTE.equalsIgnoreCase(nameToken))
 					qclJsonData.put(DEVICE_LTE, valueToken);	
 				if(DEVICE_VER.equalsIgnoreCase(nameToken))
-					qclJsonData.put(DEVICE_VER, valueToken);	
+					qclJsonData.put(DEVICE_VER, valueToken);
+				if(FRAG_TOTAL.equalsIgnoreCase(nameToken))
+					qclJsonData.put(FRAG_TOTAL, valueToken);
+				if(FRAG_CURRENT.equalsIgnoreCase(nameToken))
+					qclJsonData.put(FRAG_CURRENT, valueToken);
 				if(DEVICE_DATA.equalsIgnoreCase(nameToken))
 					qclJsonData.put(DEVICE_DATA, valueToken);	
 				if(CRC.equalsIgnoreCase(nameToken))

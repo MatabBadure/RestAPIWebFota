@@ -103,7 +103,7 @@ public class ChargerDataService {
 	
 	private JSONObject validateRequest(String rawData,String decoded_data) throws HillromException {
 		log.error("Inside validateRequest " + rawData);
-		JSONObject chargerJsonData = ParserUtil.getQclJsonDataFromRawMessage(decoded_data);
+		JSONObject chargerJsonData = ParserUtil.getChargerQclJsonDataFromRawMessage(decoded_data);
 		String reqParams[] = new String[]{DEVICE_MODEL,DEVICE_SN,
 				DEVICE_WIFI,DEVICE_LTE,DEVICE_VER,DEVICE_DATA,CRC};
 		

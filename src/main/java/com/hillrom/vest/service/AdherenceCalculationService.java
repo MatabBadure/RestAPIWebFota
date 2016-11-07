@@ -152,7 +152,7 @@ public class AdherenceCalculationService {
 				.getMinDuration()) ? protocolConstant.getMinDuration()
 				: protocolConstant.getTreatmentsPerDay()
 						* protocolConstant.getMinMinutesPerTreatment();
-		if(minHMRReading > Math.round(actualTotalDurationSettingDays/adherenceSettingDay)){
+		if( Math.round(minHMRReading * LOWER_BOUND_VALUE) > Math.round(actualTotalDurationSettingDays/adherenceSettingDay)){
 			return false;
 		}
 		return true;
@@ -1138,32 +1138,23 @@ public class AdherenceCalculationService {
 		}
 		
 		//hill-1956
-				if(Objects.nonNull(firstresetDate))
+		if(Objects.nonNull(firstresetDate))
+		{
+			/* find the list of adherence reset for the specific duration
+			 * firstresetDate is the first reset date found for the user
+			 * lastresetDate is the last date in the request
+			 */
+			List<AdherenceReset> adherenceResetList = adherenceResetRepository.findOneByPatientUserIdAndResetStartDates(patientUser.getId(),firstresetDate,lastresetDate);
+			
+			if(Objects.nonNull(adherenceResetList) && adherenceResetList.size() > 0)
+			{
+				for(int i = 0; i < adherenceResetList.size(); i++)
 				{
-					/* find the list of adherence reset for the specific duration
-					 * firstresetDate is the first reset date found for the user
-					 * lastresetDate is the last date in the request
-					 */
-					List<AdherenceReset> adherenceResetList = adherenceResetRepository.findOneByPatientUserIdAndResetStartDates(patientUser.getId(),firstresetDate,lastresetDate);
-					
-					if(Objects.nonNull(adherenceResetList) && adherenceResetList.size() > 0)
-					{
-						for(int i = 0; i < adherenceResetList.size(); i++)
-						{
-						// get the range of date from adherence reset to current date and do the adherence calculation
-						allDates = DateUtil.getAllLocalDatesBetweenDates(adherenceResetList.get(0).getResetStartDate(), DateUtil.getTodayLocalDate());
-
-						for(LocalDate restartdate : allDates){
-						
-							adherenceResetForPatient(patientUser.getId(), patient.getId().toString(), restartdate, DEFAULT_COMPLIANCE_SCORE);
-						}
-
-						
-						}
-					}
-					
+					adherenceResetForPatient(patientUser.getId(), patient.getId().toString(), adherenceResetList.get(i).getResetStartDate(), DEFAULT_COMPLIANCE_SCORE);							
 				}
-				//hill-1956
+			}
+		}
+		//hill-1956
 				
 	}
 

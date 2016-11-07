@@ -28,7 +28,7 @@ public interface AdherenceResetRepository extends
 	 @Query("from AdherenceReset reset where  reset.patientUser.id = ?1  and reset.resetStartDate = ?2")
 	 List<AdherenceReset> findOneByPatientUserIdAndResetStartDate(Long patientUserId, LocalDate resetStartDate);
 	
-	 @Query("from AdherenceReset reset where  reset.patientUser.id = ?1  and reset.resetStartDate between  ?2 and  ?3 ")
+	 @Query("from AdherenceReset reset where  reset.patientUser.id = ?1  and reset.resetStartDate between  ?2 and  ?3 ORDER BY reset.resetStartDate asc")
 	 List<AdherenceReset> findOneByPatientUserIdAndResetStartDates(Long patientUserId, LocalDate firstStartDate, LocalDate lastStartDate);
 	//hill-1956
 	

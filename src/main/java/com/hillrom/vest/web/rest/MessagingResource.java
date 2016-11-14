@@ -55,15 +55,19 @@ public class MessagingResource {
      * POST  /message -> Create / Compose new message.
      */
 	@RequestMapping(value="/message", method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> createMessage(@Valid @RequestBody(required=true) MessageDTO messageDTO){
+	public ResponseEntity<JSONObject> createMessage(@Valid @RequestBody(required=true) MessageDTO messageDTO){
 
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-				
+			//Insert message infm to Messages table 
 			Messages newMessage = messagingService.saveOrUpdateMessageData(messageDTO);
+			
+			// Get Id for the message created and update the same for to_messageId and root_message_id
+			Messages updatedNewMessage = messagingService.updateRootAndToMessageId(newMessage);
+			
 			List<MessageTouserAssoc> newMessageTouserAssocList = messagingService.saveOrUpdateMessageTousersData(messageDTO.getToUserIds(),newMessage.getId());
-			jsonObject.put("Message", newMessage);
+			jsonObject.put("Message", updatedNewMessage);
 			jsonObject.put("MessageTouserAssocList", newMessageTouserAssocList);
 			if(Objects.nonNull(newMessage))
 				return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);

@@ -67,6 +67,24 @@ public class MessagingService {
         log.debug("Created New Message: {}", newMessage);
         return newMessage;
 	}
+
+
+	public Messages updateRootAndToMessageId(Messages newMessage) throws HillromException{
+
+		//Messages newMessage = new Messages();
+		
+		newMessage.setFromUserId(newMessage.getFromUserId());
+		newMessage.setMessageSubject(newMessage.getMessageSubject());
+		newMessage.setMessageDatetime(new DateTime());
+		newMessage.setMessageSizeMBs(newMessage.getMessageSizeMBs());
+		newMessage.setMessageType(newMessage.getMessageType());
+		newMessage.setToMessageId(newMessage.getId());
+		newMessage.setRootMessageId(newMessage.getId());
+		newMessage.setMessageText(newMessage.getMessageText());
+		 messagingRepository.save(newMessage);
+        log.debug("updated RootMsgId and To MsgId", newMessage);
+        return newMessage;
+	}
 	
 	public List<MessageTouserAssoc> saveOrUpdateMessageTousersData(List<Long> toUserIds,Long newMessageId) throws HillromException{
 		List<MessageTouserAssoc> listMessageTouserAssoc = new ArrayList<MessageTouserAssoc>();

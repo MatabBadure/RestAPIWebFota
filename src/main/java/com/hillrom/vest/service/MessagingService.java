@@ -69,21 +69,19 @@ public class MessagingService {
 	}
 
 
-	public Messages updateRootAndToMessageId(Messages newMessage) throws HillromException{
+	public Messages updateMessageData(Long messageId, Messages updatedMessage) throws HillromException{
 
-		//Messages newMessage = new Messages();
-		
-		newMessage.setFromUserId(newMessage.getFromUserId());
-		newMessage.setMessageSubject(newMessage.getMessageSubject());
-		newMessage.setMessageDatetime(new DateTime());
-		newMessage.setMessageSizeMBs(newMessage.getMessageSizeMBs());
-		newMessage.setMessageType(newMessage.getMessageType());
-		newMessage.setToMessageId(newMessage.getId());
-		newMessage.setRootMessageId(newMessage.getId());
-		newMessage.setMessageText(newMessage.getMessageText());
-		 messagingRepository.save(newMessage);
-        log.debug("updated RootMsgId and To MsgId", newMessage);
-        return newMessage;
+		updatedMessage.setToMessageId(messageId);
+		updatedMessage.setRootMessageId(messageId);
+		updatedMessage.setFromUserId(updatedMessage.getFromUserId());
+		updatedMessage.setMessageSubject(updatedMessage.getMessageSubject());
+		updatedMessage.setMessageDatetime(new DateTime());
+		updatedMessage.setMessageSizeMBs(updatedMessage.getMessageSizeMBs());
+		updatedMessage.setMessageType(updatedMessage.getMessageType());
+		updatedMessage.setMessageText(updatedMessage.getMessageText());
+		 messagingRepository.save(updatedMessage);
+        log.debug("updated RootMsgId and To MsgId", updatedMessage);
+        return updatedMessage;
 	}
 	
 	public List<MessageTouserAssoc> saveOrUpdateMessageTousersData(List<Long> toUserIds,Long newMessageId) throws HillromException{

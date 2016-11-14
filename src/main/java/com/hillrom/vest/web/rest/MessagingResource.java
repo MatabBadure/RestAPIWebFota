@@ -64,7 +64,7 @@ public class MessagingResource {
 			Messages newMessage = messagingService.saveOrUpdateMessageData(messageDTO);
 			
 			// Get Id for the message created and update the same for to_messageId and root_message_id
-			Messages updatedNewMessage = messagingService.updateRootAndToMessageId(newMessage);
+			Messages updatedNewMessage = messagingService.updateMessageData(newMessage.getId(), newMessage);
 			
 			List<MessageTouserAssoc> newMessageTouserAssocList = messagingService.saveOrUpdateMessageTousersData(messageDTO.getToUserIds(),newMessage.getId());
 			jsonObject.put("Message", updatedNewMessage);

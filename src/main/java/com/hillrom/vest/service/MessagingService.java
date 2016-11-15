@@ -71,7 +71,7 @@ public class MessagingService {
         return newMessage;
 	}
 	
-	public List<MessageTouserAssoc> saveOrUpdateMessageTousersData(List<Long> toUserIds,Long newMessageId) throws HillromException{
+	public List<MessageTouserAssoc> saveOrUpdateMessageTousersData(List<Long> toUserIds,Long newMessageId,Long rootMessageId,Long toMessageId) throws HillromException{
 		List<MessageTouserAssoc> listMessageTouserAssoc = new ArrayList<MessageTouserAssoc>();
 		for(Long userId : toUserIds){
 			MessageTouserAssoc newMessageTouserAssoc = new MessageTouserAssoc();
@@ -81,7 +81,12 @@ public class MessagingService {
 			listMessageTouserAssoc.add(newMessageTouserAssoc);
 		}
 		Messages newMessage =  messagingRepository.findById(newMessageId);
-		newMessage.setRootMessageId(newMessageId);
+		if(Objects.isNull(rootMessageId)){
+			newMessage.setRootMessageId(newMessageId);
+		}else{
+			newMessage.setRootMessageId(rootMessageId);
+			newMessage.setToMessageId(toMessageId);
+		}
 		messagingRepository.save(newMessage);
 		return listMessageTouserAssoc;
 	}

@@ -80,6 +80,9 @@ public class MessagingService {
 			messageTouserAssocRepository.save(newMessageTouserAssoc);
 			listMessageTouserAssoc.add(newMessageTouserAssoc);
 		}
+		Messages newMessage =  messagingRepository.findById(newMessageId);
+		newMessage.setRootMessageId(newMessageId);
+		messagingRepository.save(newMessage);
 		return listMessageTouserAssoc;
 	}
 	

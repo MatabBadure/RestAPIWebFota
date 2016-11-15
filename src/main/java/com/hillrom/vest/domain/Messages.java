@@ -35,7 +35,7 @@ public class Messages {
     private DateTime messageDatetime;
 
 	@ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
-    @JoinColumn(name = "USER_ID")
+    @JoinColumn(name = "from_user_id")
 	@JsonIgnore
 	private User user;
 	

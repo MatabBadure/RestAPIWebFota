@@ -32,13 +32,13 @@ public class MessageTouserAssoc {
 	
 
 	@ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
-    @JoinColumn(name = "USER_ID")
+    @JoinColumn(name = "to_user_id")
 	@JsonIgnore
 	private User user;
 	
 
 	@ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
-    @JoinColumn(name = "MESSAGES_ID")
+    @JoinColumn(name = "to_message_id")
 	@JsonIgnore
 	private Messages messages;
 

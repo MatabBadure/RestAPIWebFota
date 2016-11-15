@@ -1,5 +1,6 @@
 package com.hillrom.vest.domain;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -33,8 +34,10 @@ public class Messages {
     @Column(name = "message_datetime")
     private DateTime messageDatetime;
 
-	@Column(name="from_user_id")
-	private Long fromUserId;
+	@ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @JoinColumn(name = "USER_ID")
+	@JsonIgnore
+	private User user;
 	
 	@Column(name="message_subject")
 	private String messageSubject;
@@ -88,18 +91,20 @@ public class Messages {
 		this.messageDatetime = messageDatetime;
 	}
 
+
+
 	/**
-	 * @return the fromUserId
+	 * @return the user
 	 */
-	public Long getFromUserId() {
-		return fromUserId;
+	public User getUser() {
+		return user;
 	}
 
 	/**
-	 * @param fromUserId the fromUserId to set
+	 * @param user the user to set
 	 */
-	public void setFromUserId(Long fromUserId) {
-		this.fromUserId = fromUserId;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	/**
@@ -193,7 +198,6 @@ public class Messages {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((fromUserId == null) ? 0 : fromUserId.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((messageDatetime == null) ? 0 : messageDatetime.hashCode());
 		result = prime * result + ((messageSizeMBs == null) ? 0 : messageSizeMBs.hashCode());
@@ -202,6 +206,7 @@ public class Messages {
 		result = prime * result + ((messageType == null) ? 0 : messageType.hashCode());
 		result = prime * result + ((rootMessageId == null) ? 0 : rootMessageId.hashCode());
 		result = prime * result + ((toMessageId == null) ? 0 : toMessageId.hashCode());
+		result = prime * result + ((user == null) ? 0 : user.hashCode());
 		return result;
 	}
 
@@ -217,11 +222,6 @@ public class Messages {
 		if (getClass() != obj.getClass())
 			return false;
 		Messages other = (Messages) obj;
-		if (fromUserId == null) {
-			if (other.fromUserId != null)
-				return false;
-		} else if (!fromUserId.equals(other.fromUserId))
-			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -262,6 +262,11 @@ public class Messages {
 				return false;
 		} else if (!toMessageId.equals(other.toMessageId))
 			return false;
+		if (user == null) {
+			if (other.user != null)
+				return false;
+		} else if (!user.equals(other.user))
+			return false;
 		return true;
 	}
 
@@ -270,12 +275,14 @@ public class Messages {
 	 */
 	@Override
 	public String toString() {
-		return "Message [id=" + id + ", messageDatetime=" + messageDatetime + ", fromUserId=" + fromUserId
-				+ ", messageSubject=" + messageSubject + ", messageSizeMBs=" + messageSizeMBs + ", messageType="
-				+ messageType + ", toMessageId=" + toMessageId + ", rootMessageId=" + rootMessageId + ", messageText="
-				+ messageText + "]";
+		return "Messages [id=" + id + ", messageDatetime=" + messageDatetime + ", user=" + user + ", messageSubject="
+				+ messageSubject + ", messageSizeMBs=" + messageSizeMBs + ", messageType=" + messageType
+				+ ", toMessageId=" + toMessageId + ", rootMessageId=" + rootMessageId + ", messageText=" + messageText
+				+ "]";
 	}
 
+
+	
 
 	
 }

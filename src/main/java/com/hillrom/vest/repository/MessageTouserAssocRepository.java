@@ -14,7 +14,7 @@ import com.hillrom.vest.domain.Messages;
 public interface MessageTouserAssocRepository extends
 		JpaRepository<MessageTouserAssoc, Long> {
 
-	@Query("from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.toUserId = ?1 order by messageTouserAssoc.toMessageId desc")
-    List<MessageTouserAssoc> findByToUserId(Long toUserId);
+	@Query("from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.user.id = ?1 order by messageTouserAssoc.messages.id desc")
+    List<MessageTouserAssoc> findByUserId(Long userId);
 
 }

@@ -1,5 +1,6 @@
 package com.hillrom.vest.domain;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -30,12 +31,16 @@ public class MessageTouserAssoc {
 	private Long id;
 	
 
-	@Column(name="to_user_id")
-	private Long toUserId;
+	@ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @JoinColumn(name = "USER_ID")
+	@JsonIgnore
+	private User user;
 	
 
-	@Column(name="to_message_id")
-	private Long toMessageId;
+	@ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @JoinColumn(name = "MESSAGES_ID")
+	@JsonIgnore
+	private Messages messages;
 
 
 	/**
@@ -54,35 +59,37 @@ public class MessageTouserAssoc {
 	}
 
 
+
+
 	/**
-	 * @return the toUserId
+	 * @return the user
 	 */
-	public Long getToUserId() {
-		return toUserId;
+	public User getUser() {
+		return user;
 	}
 
 
 	/**
-	 * @param toUserId the toUserId to set
+	 * @param user the user to set
 	 */
-	public void setToUserId(Long toUserId) {
-		this.toUserId = toUserId;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 
 	/**
-	 * @return the toMessageId
+	 * @return the messages
 	 */
-	public Long getToMessageId() {
-		return toMessageId;
+	public Messages getMessages() {
+		return messages;
 	}
 
 
 	/**
-	 * @param toMessageId the toMessageId to set
+	 * @param messages the messages to set
 	 */
-	public void setToMessageId(Long toMessageId) {
-		this.toMessageId = toMessageId;
+	public void setMessages(Messages messages) {
+		this.messages = messages;
 	}
 
 
@@ -94,8 +101,8 @@ public class MessageTouserAssoc {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((toMessageId == null) ? 0 : toMessageId.hashCode());
-		result = prime * result + ((toUserId == null) ? 0 : toUserId.hashCode());
+		result = prime * result + ((messages == null) ? 0 : messages.hashCode());
+		result = prime * result + ((user == null) ? 0 : user.hashCode());
 		return result;
 	}
 
@@ -117,15 +124,15 @@ public class MessageTouserAssoc {
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
-		if (toMessageId == null) {
-			if (other.toMessageId != null)
+		if (messages == null) {
+			if (other.messages != null)
 				return false;
-		} else if (!toMessageId.equals(other.toMessageId))
+		} else if (!messages.equals(other.messages))
 			return false;
-		if (toUserId == null) {
-			if (other.toUserId != null)
+		if (user == null) {
+			if (other.user != null)
 				return false;
-		} else if (!toUserId.equals(other.toUserId))
+		} else if (!user.equals(other.user))
 			return false;
 		return true;
 	}
@@ -136,8 +143,10 @@ public class MessageTouserAssoc {
 	 */
 	@Override
 	public String toString() {
-		return "MessageTouserAssoc [id=" + id + ", toUserId=" + toUserId + ", toMessageId=" + toMessageId + "]";
+		return "MessageTouserAssoc [id=" + id + ", user=" + user + ", messages=" + messages + "]";
 	}
+
+
 
 
 	

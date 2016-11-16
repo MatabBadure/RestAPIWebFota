@@ -108,45 +108,45 @@ public class MessagingService {
 		return associatedMessagesList;
 	}
 	
-	public List<MessageTouserAssoc> setMessagesArchivedUnarchived(List<MessageToUserAssoDTO> messageToUserArchivedList) throws HillromException{
+	public List<MessageTouserAssoc> setMessagesArchivedUnarchived(MessageToUserAssoDTO messageToUserArchivedList) throws HillromException{
 		List<MessageTouserAssoc> returnMessageTouserAssocList = new ArrayList<MessageTouserAssoc>();
-		for(MessageToUserAssoDTO messageToUserAssoDTO : messageToUserArchivedList){
-			log.debug("messageToUserAssoDTO.getUserId() " + messageToUserAssoDTO.getUserId());
-			log.debug("messageToUserAssoDTO.getMessageId() " + messageToUserAssoDTO.getMessageId());
+		//for(MessageToUserAssoDTO messageToUserAssoDTO : messageToUserArchivedList){
+			//log.debug("messageToUserAssoDTO.getUserId() " + messageToUserAssoDTO.getUserId());
+			//log.debug("messageToUserAssoDTO.getMessageId() " + messageToUserAssoDTO.getMessageId());
 			
-			MessageTouserAssoc messageTouserAssoc = messageTouserAssocRepository.findByUserIdAndMessageId(messageToUserAssoDTO.getUserId(),messageToUserAssoDTO.getMessageId());
-			log.debug("messageTouserAssoc.getId() " + messageTouserAssoc.getId());
-			log.debug("messageTouserAssoc.getUser().getId() " + messageTouserAssoc.getUser().getId());
-			log.debug("messageTouserAssoc.getMessages().getId() " + messageTouserAssoc.getMessages().getId());
-			log.debug("messageTouserAssoc.getIsArchived() " + messageTouserAssoc.getIsArchived());
+			MessageTouserAssoc messageTouserAssoc = messageTouserAssocRepository.findByUserIdAndMessageId(messageToUserArchivedList.getUserId(),messageToUserArchivedList.getMessageId());
+			//log.debug("messageTouserAssoc.getId() " + messageTouserAssoc.getId());
+			//log.debug("messageTouserAssoc.getUser().getId() " + messageTouserAssoc.getUser().getId());
+			//log.debug("messageTouserAssoc.getMessages().getId() " + messageTouserAssoc.getMessages().getId());
+			//log.debug("messageTouserAssoc.getIsArchived() " + messageTouserAssoc.getIsArchived());
 
-			log.debug("messageToUserAssoDTO.getUserId() " + messageToUserAssoDTO.getUserId());
-			log.debug("messageToUserAssoDTO.getMessageId() " + messageToUserAssoDTO.getMessageId());
-			log.debug("messageToUserAssoDTO.isArchived() " + messageToUserAssoDTO.isArchived());
-			messageTouserAssoc.setIsArchived(messageToUserAssoDTO.isArchived()?"1":"0");
+			//log.debug("messageToUserAssoDTO.getUserId() " + messageToUserAssoDTO.getUserId());
+			//log.debug("messageToUserAssoDTO.getMessageId() " + messageToUserAssoDTO.getMessageId());
+			//log.debug("messageToUserAssoDTO.isArchived() " + messageToUserAssoDTO.isArchived());
+			messageTouserAssoc.setIsArchived(messageToUserArchivedList.isArchived()?"1":"0");
 			returnMessageTouserAssocList.add(messageTouserAssoc);
-		}
+		//}
 		return returnMessageTouserAssocList;
 	}
 
-	public List<MessageTouserAssoc> setMessagesReadUnread(List<MessageToUserAssoDTO> messageToUserReadUnreadList) throws HillromException{
+	public List<MessageTouserAssoc> setMessagesReadUnread(MessageToUserAssoDTO messageToUserReadUnreadList) throws HillromException{
 		List<MessageTouserAssoc> returnMessageTouserAssocList = new ArrayList<MessageTouserAssoc>();
-		for(MessageToUserAssoDTO messageToUserAssoDTO : messageToUserReadUnreadList){
-			log.debug("messageToUserAssoDTO.getUserId() " + messageToUserAssoDTO.getUserId());
-			log.debug("messageToUserAssoDTO.getMessageId() " + messageToUserAssoDTO.getMessageId());
+		//for(MessageToUserAssoDTO messageToUserAssoDTO : messageToUserReadUnreadList){
+			//log.debug("messageToUserAssoDTO.getUserId() " + messageToUserAssoDTO.getUserId());
+			//log.debug("messageToUserAssoDTO.getMessageId() " + messageToUserAssoDTO.getMessageId());
 			
-			MessageTouserAssoc messageTouserAssoc = messageTouserAssocRepository.findByUserIdAndMessageId(messageToUserAssoDTO.getUserId(),messageToUserAssoDTO.getMessageId());
-			log.debug("messageTouserAssoc.getId() " + messageTouserAssoc.getId());
-			log.debug("messageTouserAssoc.getUser().getId() " + messageTouserAssoc.getUser().getId());
-			log.debug("messageTouserAssoc.getMessages().getId() " + messageTouserAssoc.getMessages().getId());
-			log.debug("messageTouserAssoc.getIsRead() " + messageTouserAssoc.getIsRead());
+			MessageTouserAssoc messageTouserAssoc = messageTouserAssocRepository.findByUserIdAndMessageId(messageToUserReadUnreadList.getUserId(),messageToUserReadUnreadList.getMessageId());
+			//log.debug("messageTouserAssoc.getId() " + messageTouserAssoc.getId());
+			//log.debug("messageTouserAssoc.getUser().getId() " + messageTouserAssoc.getUser().getId());
+			//log.debug("messageTouserAssoc.getMessages().getId() " + messageTouserAssoc.getMessages().getId());
+			//log.debug("messageTouserAssoc.getIsRead() " + messageTouserAssoc.getIsRead());
 
-			log.debug("messageToUserAssoDTO.getUserId() " + messageToUserAssoDTO.getUserId());
-			log.debug("messageToUserAssoDTO.getMessageId() " + messageToUserAssoDTO.getMessageId());
-			log.debug("messageToUserAssoDTO.isRead() " + messageToUserAssoDTO.isRead());
-			messageTouserAssoc.setIsArchived(messageToUserAssoDTO.isRead()?"1":"0");
+			//log.debug("messageToUserAssoDTO.getUserId() " + messageToUserAssoDTO.getUserId());
+			//log.debug("messageToUserAssoDTO.getMessageId() " + messageToUserAssoDTO.getMessageId());
+			//log.debug("messageToUserAssoDTO.isRead() " + messageToUserAssoDTO.isRead());
+			messageTouserAssoc.setIsRead(messageToUserReadUnreadList.isRead()?"1":"0");
 			returnMessageTouserAssocList.add(messageTouserAssoc);
-		}
+		//}
 		return returnMessageTouserAssocList;
 	}
 	

@@ -125,7 +125,7 @@ public class MessagingResource {
      * POST  /messages/archived -> Archive / UnArchive a list of messages in a user mailbox.
      */
 	@RequestMapping(value="/messages/archived",method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> setMessagesArchivedInarchived(@Valid @RequestBody(required=true)  List<MessageToUserAssoDTO> messageToUserArchivedList){
+	public ResponseEntity<?> setMessagesArchivedInarchived(@Valid @RequestBody(required=true)  MessageToUserAssoDTO messageToUserArchivedList){
 
 		JSONObject jsonObject = new JSONObject();
 		
@@ -146,7 +146,7 @@ public class MessagingResource {
      * POST  /messages/readunread -> Set as Read / UnRead a list of messages in a user mailbox.
      */
 	@RequestMapping(value="/messages/readunread",method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> setMessagesReadUnread(@Valid @RequestBody(required=true)  List<MessageToUserAssoDTO> messageToUserReadunreadList){
+	public ResponseEntity<?> setMessagesReadUnread(@Valid @RequestBody(required=true)  MessageToUserAssoDTO messageToUserReadunreadList){
 
 		JSONObject jsonObject = new JSONObject();
 		

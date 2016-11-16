@@ -142,4 +142,25 @@ public class MessagingResource {
 		
 	}
 	
+	/**
+     * POST  /messages/readunread -> Set as Read / UnRead a list of messages in a user mailbox.
+     */
+	@RequestMapping(value="/messages/readunread",method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> setMessagesReadUnread(@Valid @RequestBody(required=true)  List<MessageToUserAssoDTO> messageToUserReadunreadList){
+
+		JSONObject jsonObject = new JSONObject();
+		
+		try{
+			List<MessageTouserAssoc> messageTouserAssoc = messagingService.setMessagesReadUnread(messageToUserReadunreadList);
+			if(Objects.nonNull(messageTouserAssoc)){
+				return new ResponseEntity<>(messageTouserAssoc, HttpStatus.OK);
+			}
+		}catch(Exception ex){
+			jsonObject.put("ERROR", ex.getMessage());
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		
+	}
+	
 }

@@ -128,6 +128,27 @@ public class MessagingService {
 		}
 		return returnMessageTouserAssocList;
 	}
+
+	public List<MessageTouserAssoc> setMessagesReadUnread(List<MessageToUserAssoDTO> messageToUserReadUnreadList) throws HillromException{
+		List<MessageTouserAssoc> returnMessageTouserAssocList = new ArrayList<MessageTouserAssoc>();
+		for(MessageToUserAssoDTO messageToUserAssoDTO : messageToUserReadUnreadList){
+			log.debug("messageToUserAssoDTO.getUserId() " + messageToUserAssoDTO.getUserId());
+			log.debug("messageToUserAssoDTO.getMessageId() " + messageToUserAssoDTO.getMessageId());
+			
+			MessageTouserAssoc messageTouserAssoc = messageTouserAssocRepository.findByUserIdAndMessageId(messageToUserAssoDTO.getUserId(),messageToUserAssoDTO.getMessageId());
+			log.debug("messageTouserAssoc.getId() " + messageTouserAssoc.getId());
+			log.debug("messageTouserAssoc.getUser().getId() " + messageTouserAssoc.getUser().getId());
+			log.debug("messageTouserAssoc.getMessages().getId() " + messageTouserAssoc.getMessages().getId());
+			log.debug("messageTouserAssoc.getIsRead() " + messageTouserAssoc.getIsRead());
+
+			log.debug("messageToUserAssoDTO.getUserId() " + messageToUserAssoDTO.getUserId());
+			log.debug("messageToUserAssoDTO.getMessageId() " + messageToUserAssoDTO.getMessageId());
+			log.debug("messageToUserAssoDTO.isRead() " + messageToUserAssoDTO.isRead());
+			messageTouserAssoc.setIsArchived(messageToUserAssoDTO.isRead()?"1":"0");
+			returnMessageTouserAssocList.add(messageTouserAssoc);
+		}
+		return returnMessageTouserAssocList;
+	}
 	
 	
 	

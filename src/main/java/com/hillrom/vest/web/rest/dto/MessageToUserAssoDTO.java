@@ -15,6 +15,8 @@ public class MessageToUserAssoDTO {
     private Long messageId;
     
     private boolean archived;
+    
+    private boolean read;
 
 
 	public MessageToUserAssoDTO() {
@@ -94,6 +96,29 @@ public class MessageToUserAssoDTO {
 	}
 
 
+	
+
+
+
+	/**
+	 * @return the read
+	 */
+	public boolean isRead() {
+		return read;
+	}
+
+
+
+
+
+	/**
+	 * @param read the read to set
+	 */
+	public void setRead(boolean read) {
+		this.read = read;
+	}
+
+
 
 
 
@@ -106,6 +131,7 @@ public class MessageToUserAssoDTO {
 		int result = 1;
 		result = prime * result + (archived ? 1231 : 1237);
 		result = prime * result + ((messageId == null) ? 0 : messageId.hashCode());
+		result = prime * result + (read ? 1231 : 1237);
 		result = prime * result + ((userId == null) ? 0 : userId.hashCode());
 		return result;
 	}
@@ -133,6 +159,8 @@ public class MessageToUserAssoDTO {
 				return false;
 		} else if (!messageId.equals(other.messageId))
 			return false;
+		if (read != other.read)
+			return false;
 		if (userId == null) {
 			if (other.userId != null)
 				return false;
@@ -150,8 +178,14 @@ public class MessageToUserAssoDTO {
 	 */
 	@Override
 	public String toString() {
-		return "MessageToUserAssoDTO [userId=" + userId + ", messageId=" + messageId + ", archived=" + archived + "]";
+		return "MessageToUserAssoDTO [userId=" + userId + ", messageId=" + messageId + ", archived=" + archived
+				+ ", read=" + read + "]";
 	}
+
+
+
+
+
 
 
 

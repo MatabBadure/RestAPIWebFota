@@ -46,6 +46,9 @@ public class MessagingService {
 	private MessagingRepository messagingRepository;
 	
 	@Inject
+	private UserRepository userRepository;
+	
+	@Inject
 	private MessageTouserAssocRepository messageTouserAssocRepository;
 	
 	
@@ -55,7 +58,7 @@ public class MessagingService {
 
 		Messages newMessage = new Messages();
 		
-		newMessage.setFromUserId(messageDTO.getFromUserId());
+		newMessage.setUser(userRepository.findOne(messageDTO.getFromUserId()));
 		newMessage.setMessageSubject(messageDTO.getMessageSubject());
 		newMessage.setMessageDatetime(new DateTime());
 		newMessage.setMessageSizeMBs(messageDTO.getMessageSizeMbs());
@@ -68,30 +71,38 @@ public class MessagingService {
         return newMessage;
 	}
 	
-	public List<MessageTouserAssoc> saveOrUpdateMessageTousersData(List<Long> toUserIds,Long newMessageId) throws HillromException{
+	public List<MessageTouserAssoc> saveOrUpdateMessageTousersData(List<Long> toUserIds,Long newMessageId,Long rootMessageId,Long toMessageId) throws HillromException{
 		List<MessageTouserAssoc> listMessageTouserAssoc = new ArrayList<MessageTouserAssoc>();
 		for(Long userId : toUserIds){
 			MessageTouserAssoc newMessageTouserAssoc = new MessageTouserAssoc();
-			newMessageTouserAssoc.setToMessageId(newMessageId);
-			newMessageTouserAssoc.setToUserId(userId);
+			newMessageTouserAssoc.setMessages(messagingRepository.findById(newMessageId));
+			newMessageTouserAssoc.setUser(userRepository.findOne(userId));
 			messageTouserAssocRepository.save(newMessageTouserAssoc);
 			listMessageTouserAssoc.add(newMessageTouserAssoc);
 		}
+		Messages newMessage =  messagingRepository.findById(newMessageId);
+		if(Objects.isNull(rootMessageId)){
+			newMessage.setRootMessageId(newMessageId);
+		}else{
+			newMessage.setRootMessageId(rootMessageId);
+			newMessage.setToMessageId(toMessageId);
+		}
+		messagingRepository.save(newMessage);
 		return listMessageTouserAssoc;
 	}
 	
 	public List<Messages> getSentMessagesForMailbox(Long fromUserId) throws HillromException{
 		List<Messages> messageList = null;
-		messageList = messagingRepository.findByFromUserId(fromUserId);
+		messageList = messagingRepository.findByUserId(fromUserId);
 		return messageList;
 	}
 	
 	public List<Messages> getReceivedMessagesForMailbox(Long toUserId) throws HillromException{
 		List<MessageTouserAssoc> messageTouserAssocList = new ArrayList<MessageTouserAssoc>();;
 		List<Messages> associatedMessagesList = new ArrayList<Messages>();;
-		messageTouserAssocList = messageTouserAssocRepository.findByToUserId(toUserId);
+		messageTouserAssocList = messageTouserAssocRepository.findByUserId(toUserId);
 		for(MessageTouserAssoc messageTouserAssoc : messageTouserAssocList){
-			associatedMessagesList.add(messagingRepository.findById(messageTouserAssoc.getToMessageId()));
+			associatedMessagesList.add(messagingRepository.findById(messageTouserAssoc.getMessages().getId()));
 		}
 		return associatedMessagesList;
 	}

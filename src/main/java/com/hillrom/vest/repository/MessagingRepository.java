@@ -16,8 +16,8 @@ import com.hillrom.vest.domain.Note;
 public interface MessagingRepository extends JpaRepository<Messages, Long> {
 
 
-	@Query("from Messages messages where messages.fromUserId = ?1 order by messages.message_datetime desc")
-    List<Messages> findByFromUserId(Long fromUserId);
+	@Query("from Messages messages where messages.user.id = ?1 order by messages.message_datetime desc")
+    List<Messages> findByUserId(Long userId);
 
 	@Query("from Messages messages where messages.id = ?1")
     Messages findById(Long id);

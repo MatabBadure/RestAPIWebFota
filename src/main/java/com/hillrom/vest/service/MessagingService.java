@@ -123,7 +123,7 @@ public class MessagingService {
 			//log.debug("messageToUserAssoDTO.getUserId() " + messageToUserAssoDTO.getUserId());
 			//log.debug("messageToUserAssoDTO.getMessageId() " + messageToUserAssoDTO.getMessageId());
 			//log.debug("messageToUserAssoDTO.isArchived() " + messageToUserAssoDTO.isArchived());
-			messageTouserAssoc.setIsArchived(messageToUserArchivedList.isArchived()?"1":"0");
+			messageTouserAssoc.setIsArchived(messageToUserArchivedList.isArchived()?Boolean.TRUE:Boolean.FALSE);
 			returnMessageTouserAssocList.add(messageTouserAssoc);
 		//}
 		return returnMessageTouserAssocList;
@@ -144,7 +144,7 @@ public class MessagingService {
 			//log.debug("messageToUserAssoDTO.getUserId() " + messageToUserAssoDTO.getUserId());
 			//log.debug("messageToUserAssoDTO.getMessageId() " + messageToUserAssoDTO.getMessageId());
 			//log.debug("messageToUserAssoDTO.isRead() " + messageToUserAssoDTO.isRead());
-			messageTouserAssoc.setIsRead(messageToUserReadUnreadList.isRead()?"1":"0");
+			messageTouserAssoc.setIsRead(messageToUserReadUnreadList.isRead()?Boolean.TRUE:Boolean.FALSE);
 			returnMessageTouserAssocList.add(messageTouserAssoc);
 		//}
 		return returnMessageTouserAssocList;

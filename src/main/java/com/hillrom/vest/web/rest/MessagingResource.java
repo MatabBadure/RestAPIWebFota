@@ -3,6 +3,7 @@ package com.hillrom.vest.web.rest;
 import static com.hillrom.vest.config.Constants.YYYY_MM_DD;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import com.hillrom.vest.domain.ChargerData;
 import com.hillrom.vest.domain.MessageTouserAssoc;
 import com.hillrom.vest.domain.Messages;
 import com.hillrom.vest.domain.Note;
+import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
@@ -41,6 +43,7 @@ import com.hillrom.vest.service.MessagingService;
 import com.hillrom.vest.service.NoteService;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.web.rest.dto.MessageDTO;
+import com.hillrom.vest.web.rest.dto.MessageToUserAssoDTO;
 import com.hillrom.vest.web.rest.dto.NoteDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
@@ -109,6 +112,27 @@ public class MessagingResource {
 			List<Messages> messageList = messagingService.getReceivedMessagesForMailbox(toUserId);
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
+			}
+		}catch(Exception ex){
+			jsonObject.put("ERROR", ex.getMessage());
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		
+	}
+	
+	/**
+     * POST  /messages/archived -> Archive / UnArchive a list of messages in a user mailbox.
+     */
+	@RequestMapping(value="/messages/archived",method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> setMessagesArchivedInarchived(@Valid @RequestBody(required=true)  List<MessageToUserAssoDTO> messageToUserArchivedList){
+
+		JSONObject jsonObject = new JSONObject();
+		
+		try{
+			List<MessageTouserAssoc> messageTouserAssoc = messagingService.setMessagesArchivedUnarchived(messageToUserArchivedList);
+			if(Objects.nonNull(messageTouserAssoc)){
+				return new ResponseEntity<>(messageTouserAssoc, HttpStatus.OK);
 			}
 		}catch(Exception ex){
 			jsonObject.put("ERROR", ex.getMessage());

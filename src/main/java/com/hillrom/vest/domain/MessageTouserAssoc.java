@@ -43,13 +43,13 @@ public class MessageTouserAssoc {
 	private Messages messages;
 
 	@Column(name="is_archived")
-	private String isArchived;
+	private Boolean isArchived;
 	
 	@Column(name="is_read")
-	private String isRead;
+	private Boolean isRead;
 	
 	@Column(name="is_deleted")
-	private String isDeleted;
+	private Boolean isDeleted;
 
 	/**
 	 * @return the id
@@ -101,12 +101,10 @@ public class MessageTouserAssoc {
 	}
 
 
-	
-	
 	/**
 	 * @return the isArchived
 	 */
-	public String getIsArchived() {
+	public Boolean getIsArchived() {
 		return isArchived;
 	}
 
@@ -114,7 +112,7 @@ public class MessageTouserAssoc {
 	/**
 	 * @param isArchived the isArchived to set
 	 */
-	public void setIsArchived(String isArchived) {
+	public void setIsArchived(Boolean isArchived) {
 		this.isArchived = isArchived;
 	}
 
@@ -122,7 +120,7 @@ public class MessageTouserAssoc {
 	/**
 	 * @return the isRead
 	 */
-	public String getIsRead() {
+	public Boolean getIsRead() {
 		return isRead;
 	}
 
@@ -130,7 +128,7 @@ public class MessageTouserAssoc {
 	/**
 	 * @param isRead the isRead to set
 	 */
-	public void setIsRead(String isRead) {
+	public void setIsRead(Boolean isRead) {
 		this.isRead = isRead;
 	}
 
@@ -138,7 +136,7 @@ public class MessageTouserAssoc {
 	/**
 	 * @return the isDeleted
 	 */
-	public String getIsDeleted() {
+	public Boolean getIsDeleted() {
 		return isDeleted;
 	}
 
@@ -146,7 +144,7 @@ public class MessageTouserAssoc {
 	/**
 	 * @param isDeleted the isDeleted to set
 	 */
-	public void setIsDeleted(String isDeleted) {
+	public void setIsDeleted(Boolean isDeleted) {
 		this.isDeleted = isDeleted;
 	}
 
@@ -222,6 +220,11 @@ public class MessageTouserAssoc {
 		return "MessageTouserAssoc [id=" + id + ", user=" + user + ", messages=" + messages + ", isArchived="
 				+ isArchived + ", isRead=" + isRead + ", isDeleted=" + isDeleted + "]";
 	}
+
+
+	
+	
+
 
 
 

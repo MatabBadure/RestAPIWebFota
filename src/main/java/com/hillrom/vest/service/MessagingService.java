@@ -35,6 +35,7 @@ import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.MessageDTO;
+import com.hillrom.vest.web.rest.dto.MessageToUserAssoDTO;
 
 @Service
 @Transactional
@@ -105,6 +106,27 @@ public class MessagingService {
 			associatedMessagesList.add(messagingRepository.findById(messageTouserAssoc.getMessages().getId()));
 		}
 		return associatedMessagesList;
+	}
+	
+	public List<MessageTouserAssoc> setMessagesArchivedUnarchived(List<MessageToUserAssoDTO> messageToUserArchivedList) throws HillromException{
+		List<MessageTouserAssoc> returnMessageTouserAssocList = new ArrayList<MessageTouserAssoc>();
+		for(MessageToUserAssoDTO messageToUserAssoDTO : messageToUserArchivedList){
+			log.debug("messageToUserAssoDTO.getUserId() " + messageToUserAssoDTO.getUserId());
+			log.debug("messageToUserAssoDTO.getMessageId() " + messageToUserAssoDTO.getMessageId());
+			
+			MessageTouserAssoc messageTouserAssoc = messageTouserAssocRepository.findByUserIdAndMessageId(messageToUserAssoDTO.getUserId(),messageToUserAssoDTO.getMessageId());
+			log.debug("messageTouserAssoc.getId() " + messageTouserAssoc.getId());
+			log.debug("messageTouserAssoc.getUser().getId() " + messageTouserAssoc.getUser().getId());
+			log.debug("messageTouserAssoc.getMessages().getId() " + messageTouserAssoc.getMessages().getId());
+			log.debug("messageTouserAssoc.getIsArchived() " + messageTouserAssoc.getIsArchived());
+
+			log.debug("messageToUserAssoDTO.getUserId() " + messageToUserAssoDTO.getUserId());
+			log.debug("messageToUserAssoDTO.getMessageId() " + messageToUserAssoDTO.getMessageId());
+			log.debug("messageToUserAssoDTO.isArchived() " + messageToUserAssoDTO.isArchived());
+			messageTouserAssoc.setIsArchived(messageToUserAssoDTO.isArchived()?"1":"0");
+			returnMessageTouserAssocList.add(messageTouserAssoc);
+		}
+		return returnMessageTouserAssocList;
 	}
 	
 	

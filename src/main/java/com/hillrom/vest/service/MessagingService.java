@@ -15,6 +15,7 @@ import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,20 +93,20 @@ public class MessagingService {
 		return listMessageTouserAssoc;
 	}
 	
-	public List<Messages> getSentMessagesForMailbox(Long fromUserId) throws HillromException{
-		List<Messages> messageList = null;
-		messageList = messagingRepository.findByUserId(fromUserId);
+	public Page<Messages> getSentMessagesForMailbox(Long fromUserId,Pageable pageable) throws HillromException{
+		Page<Messages> messageList = null;
+		messageList = messagingRepository.findByUserId(fromUserId,pageable);
 		return messageList;
 	}
 	
-	public List<Messages> getReceivedMessagesForMailbox(Long toUserId) throws HillromException{
-		List<MessageTouserAssoc> messageTouserAssocList = new ArrayList<MessageTouserAssoc>();;
-		List<Messages> associatedMessagesList = new ArrayList<Messages>();;
-		messageTouserAssocList = messageTouserAssocRepository.findByUserId(toUserId);
+	public Page<Messages> getReceivedMessagesForMailbox(Long toUserId,Pageable pageable) throws HillromException{
+		List<Messages> associatedMessagesList = new ArrayList<Messages>();
+		Page<MessageTouserAssoc> messageTouserAssocList  = messageTouserAssocRepository.findByUserId(toUserId,pageable);
 		for(MessageTouserAssoc messageTouserAssoc : messageTouserAssocList){
 			associatedMessagesList.add(messagingRepository.findById(messageTouserAssoc.getMessages().getId()));
 		}
-		return associatedMessagesList;
+		Page<Messages> associatedMessagesPageList = new PageImpl<Messages> (associatedMessagesList);
+		return associatedMessagesPageList;
 	}
 	
 	public List<MessageTouserAssoc> setMessagesArchivedUnarchived(MessageToUserAssoDTO messageToUserArchivedList) throws HillromException{

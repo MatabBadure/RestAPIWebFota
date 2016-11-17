@@ -188,7 +188,7 @@ public class PatientVestDeviceDataResource {
 	public ResponseEntity<JSONObject> findAll() {
 		try{	
 			JSONObject jsonObject = new JSONObject();
-			Page<ChargerData> chargerDataList = chargerDataService.findAll(new PageRequest(0, 10));
+			Page<ChargerData> chargerDataList = chargerDataService.findAll(new PageRequest(0, 2));
 			jsonObject.put("device_data", chargerDataList);
 			if(Objects.nonNull(chargerDataList))
 				return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.CREATED);

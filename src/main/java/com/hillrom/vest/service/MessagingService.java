@@ -52,8 +52,11 @@ public class MessagingService {
 	@Inject
 	private MessageTouserAssocRepository messageTouserAssocRepository;
 	
+	@Inject
+	private MailService mailService;
 	
-
+	@Inject
+	private UserService userService;
 	
 	public Messages saveOrUpdateMessageData(MessageDTO messageDTO) throws HillromException{
 
@@ -72,7 +75,14 @@ public class MessagingService {
         return newMessage;
 	}
 	
-	public List<MessageTouserAssoc> saveOrUpdateMessageTousersData(List<Long> toUserIds,Long newMessageId,Long rootMessageId,Long toMessageId) throws HillromException{
+	public List<MessageTouserAssoc> saveOrUpdateMessageTousersData(MessageDTO messageDto) throws HillromException{
+		
+		Long newMessageId = messageDto.getId();
+		List<Long> toUserIds = messageDto.getToUserIds();
+		Long rootMessageId = messageDto.getRootMessageId();
+		Long toMessageId = messageDto.getToMessageId();
+		String messageSubject = messageDto.getMessageSubject();
+		
 		List<MessageTouserAssoc> listMessageTouserAssoc = new ArrayList<MessageTouserAssoc>();
 		for(Long userId : toUserIds){
 			MessageTouserAssoc newMessageTouserAssoc = new MessageTouserAssoc();
@@ -80,6 +90,10 @@ public class MessagingService {
 			newMessageTouserAssoc.setUser(userRepository.findOne(userId));
 			messageTouserAssocRepository.save(newMessageTouserAssoc);
 			listMessageTouserAssoc.add(newMessageTouserAssoc);
+			
+			User user = userService.getUser(userId);			
+			if(user.isMessageNotification())
+				mailService.sendMessageNotificationToUser(user, messageSubject);
 		}
 		Messages newMessage =  messagingRepository.findById(newMessageId);
 		if(Objects.isNull(rootMessageId)){

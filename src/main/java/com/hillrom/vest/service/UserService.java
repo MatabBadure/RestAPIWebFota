@@ -1531,12 +1531,13 @@ public class UserService {
 		}
 	 }
 	
-	public User setHRMNotificationSetting(Long id, Map<String, Boolean> paramsMap) throws HillromException {
+	public User setUserNotificationSetting(Long id, Map<String, Boolean> paramsMap) throws HillromException {
 		User user = userRepository.findOne(id);
 		if (Objects.nonNull(user)) {
 			user.setMissedTherapyNotification(paramsMap.get("isMissedTherapyNotification"));
 			user.setNonHMRNotification(paramsMap.get("isNonHMRNotification"));
-			user.setSettingDeviationNotification(paramsMap.get("isSettingDeviationNotification"));
+			user.setSettingDeviationNotification(paramsMap.get("isSettingDeviationNotification"));			
+			user.setMessageNotification(paramsMap.get("isMessageNotification"));
 			userRepository.save(user);
 			return user;
 		} else {

@@ -9,7 +9,8 @@ import javax.validation.constraints.Size;
 
 public class MessageDTO {
 	
-
+	private Long id;
+	
 	private Long fromUserId;
 
     private String messageSubject;
@@ -132,7 +133,7 @@ public class MessageDTO {
 	 */
 	@Override
 	public String toString() {
-		return "MessageDTO [fromUserId=" + fromUserId + ", messageSubject=" + messageSubject + ", messageSizeMbs="
+		return "MessageDTO [id=" + id + ", fromUserId=" + fromUserId + ", messageSubject=" + messageSubject + ", messageSizeMbs="
 				+ messageSizeMbs + ", messageType=" + messageType + ", toMessageId=" + toMessageId + ", rootMessageId="
 				+ rootMessageId + ", messageText=" + messageText + ", toUserIds=" + toUserIds + "]";
 	}
@@ -140,6 +141,22 @@ public class MessageDTO {
 
 
 
+	/**
+	 * @return the fromUserId
+	 */
+	public Long getId() {
+		return id;
+	}
+
+
+
+
+	/**
+	 * @param fromUserId the fromUserId to set
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 
 

@@ -74,8 +74,9 @@ public class MessagingService {
         return newMessage;
 	}
 	
-	public List<MessageTouserAssoc> saveOrUpdateMessageTousersData(MessageDTO messageDto,Long newMessageId) throws HillromException{
+	public List<MessageTouserAssoc> saveOrUpdateMessageTousersData(MessageDTO messageDto) throws HillromException{
 		
+		Long newMessageId = messageDto.getId();
 		List<Long> toUserIds = messageDto.getToUserIds();
 		Long rootMessageId = messageDto.getRootMessageId();
 		Long toMessageId = messageDto.getToMessageId();

@@ -17,6 +17,7 @@ import net.minidev.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.LocalDate;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
@@ -84,12 +85,13 @@ public class MessagingResource {
      * GET  /messages/{fromUserId} -> Get All Sent Messages for user mailbox.
      */
 	@RequestMapping(value="/messagesSent/{fromUserId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getMessagesSentForInbox(@PathVariable("fromUserId") Long fromUserId){
+	public ResponseEntity<?> getMessagesSentForInbox(@PathVariable("fromUserId") Long fromUserId,@RequestParam(value = "page" , required = false) Integer offset,
+            @RequestParam(value = "per_page", required = false) Integer limit){
 
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-			List<Messages> messageList = messagingService.getSentMessagesForMailbox(fromUserId);
+			Page<Messages> messageList = messagingService.getSentMessagesForMailbox(fromUserId,new PageRequest(offset, limit));
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}
@@ -105,12 +107,13 @@ public class MessagingResource {
      * GET  /messages/{toUserId} -> Get All Received Messages for user mailbox.
      */
 	@RequestMapping(value="/messagesReceived/{toUserId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getMessagesReceivedForInbox(@PathVariable("toUserId") Long toUserId){
+	public ResponseEntity<?> getMessagesReceivedForInbox(@PathVariable("toUserId") Long toUserId,@RequestParam(value = "page" , required = false) Integer offset,
+            @RequestParam(value = "per_page", required = false) Integer limit){
 
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-			List<Messages> messageList = messagingService.getReceivedMessagesForMailbox(toUserId);
+			Page<Messages> messageList = messagingService.getReceivedMessagesForMailbox(toUserId,new PageRequest(offset, limit));
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}

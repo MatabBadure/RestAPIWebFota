@@ -62,7 +62,7 @@ public class MessagingResource {
 		try{
 				
 			Messages newMessage = messagingService.saveOrUpdateMessageData(messageDTO);
-			List<MessageTouserAssoc> newMessageTouserAssocList = messagingService.saveOrUpdateMessageTousersData(messageDTO.getToUserIds(),newMessage.getId(),messageDTO.getRootMessageId(),messageDTO.getToMessageId());
+			List<MessageTouserAssoc> newMessageTouserAssocList = messagingService.saveOrUpdateMessageTousersData(messageDTO,newMessage.getId());
 			jsonObject.put("Message", newMessage);
 			jsonObject.put("MessageTouserAssocList", newMessageTouserAssocList);
 			if(Objects.nonNull(newMessage))

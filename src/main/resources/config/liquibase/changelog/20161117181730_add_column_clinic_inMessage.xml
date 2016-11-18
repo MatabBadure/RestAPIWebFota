@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+	
+	<!-- Added new field clinic_id field to message & message_touser_assoc table. -->
+	<changeSet author="LnT Technology Services" id="20161117181730">
+		<addColumn tableName="MESSAGES">
+        	<column name="from_clinic_id" type="varchar(255)"/>
+        </addColumn>
+								 
+		<addColumn tableName="MESSAGE_TOUSER_ASSOC">
+        	<column name="to_clinic_id" type="varchar(255)"/>
+        </addColumn>
+	</changeSet>
+	
+	<!-- Added new foreign key constraint for the field clinic_id field to message & message_touser_assoc table. -->
+	<changeSet  author="LnT Technology Services" id="20161117185030">
+		<addForeignKeyConstraint baseColumnNames="from_clinic_id"
+									 baseTableName="MESSAGES"
+									 constraintName="fk_ms_clinic_id"
+									 referencedColumnNames="id"
+									 referencedTableName="CLINIC"/>
+									 
+		<addForeignKeyConstraint baseColumnNames="to_clinic_id"
+									 baseTableName="MESSAGE_TOUSER_ASSOC"
+									 constraintName="fk_to_clinic_id"
+									 referencedColumnNames="id"
+									 referencedTableName="CLINIC"/>
+	</changeSet>
+</databaseChangeLog>

@@ -51,6 +51,9 @@ public class MessageTouserAssoc {
 	@Column(name="is_deleted")
 	private Boolean isDeleted;
 
+	@Column(name="to_clinic_id")
+	private String toClinicId;
+	
 	/**
 	 * @return the id
 	 */
@@ -149,6 +152,21 @@ public class MessageTouserAssoc {
 	}
 
 
+	/**
+	 * @return the messageText
+	 */
+	public String getToClinicId() {
+		return toClinicId;
+	}
+
+	/**
+	 * @param messageText the messageText to set
+	 */
+	public void setToClinicId(String toClinicId) {
+		this.toClinicId = toClinicId;
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -162,6 +180,7 @@ public class MessageTouserAssoc {
 		result = prime * result + ((isRead == null) ? 0 : isRead.hashCode());
 		result = prime * result + ((messages == null) ? 0 : messages.hashCode());
 		result = prime * result + ((user == null) ? 0 : user.hashCode());
+		result = prime * result + ((toClinicId == null) ? 0 : toClinicId.hashCode());
 		return result;
 	}
 
@@ -208,6 +227,11 @@ public class MessageTouserAssoc {
 				return false;
 		} else if (!user.equals(other.user))
 			return false;
+		if (toClinicId == null) {
+			if (other.toClinicId != null)
+				return false;
+		} else if (!toClinicId.equals(other.toClinicId))
+			return false;
 		return true;
 	}
 
@@ -218,7 +242,7 @@ public class MessageTouserAssoc {
 	@Override
 	public String toString() {
 		return "MessageTouserAssoc [id=" + id + ", user=" + user + ", messages=" + messages + ", isArchived="
-				+ isArchived + ", isRead=" + isRead + ", isDeleted=" + isDeleted + "]";
+				+ isArchived + ", isRead=" + isRead + ", isDeleted=" + isDeleted + ", toClinicId=" + toClinicId + "]";
 	}
 
 

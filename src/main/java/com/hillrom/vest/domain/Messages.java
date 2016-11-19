@@ -275,7 +275,7 @@ public class Messages {
 	 */
 	@Override
 	public String toString() {
-		return "Messages [id=" + id + ", messageDatetime=" + messageDatetime + ", user=" + user + ", messageSubject="
+		return "Messages [id=" + id + ", messageDatetime=" + messageDatetime + ", user=" + user + ", FromUserId="+ user.getId()+ ", messageSubject="
 				+ messageSubject + ", messageSizeMBs=" + messageSizeMBs + ", messageType=" + messageType
 				+ ", toMessageId=" + toMessageId + ", rootMessageId=" + rootMessageId + ", messageText=" + messageText
 				+ "]";

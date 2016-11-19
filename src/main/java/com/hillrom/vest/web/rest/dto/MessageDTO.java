@@ -1,11 +1,15 @@
 package com.hillrom.vest.web.rest.dto;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Column;
 import javax.validation.constraints.Size;
+
+import org.joda.time.DateTime;
 
 public class MessageDTO {
 	
@@ -26,8 +30,18 @@ public class MessageDTO {
     private String messageText;
     
     private List<Long> toUserIds;
+  
+	private DateTime msgDateTime = DateTime.now();
     
+	private Boolean isArchived;
 	
+	private Boolean isRead;
+	
+	private Boolean isDeleted;
+	
+	private int readMsgCount;
+	
+	private int unReadMsgCount;
 
 
 	public MessageDTO() {
@@ -135,10 +149,9 @@ public class MessageDTO {
 	public String toString() {
 		return "MessageDTO [id=" + id + ", fromUserId=" + fromUserId + ", messageSubject=" + messageSubject + ", messageSizeMbs="
 				+ messageSizeMbs + ", messageType=" + messageType + ", toMessageId=" + toMessageId + ", rootMessageId="
-				+ rootMessageId + ", messageText=" + messageText + ", toUserIds=" + toUserIds + "]";
+				+ rootMessageId + ", messageText=" + messageText + ", toUserIds=" + toUserIds + ", MessageDateTime="
+				+ msgDateTime + ", IsArchived="+ isArchived + ", IsDeleted=" + isDeleted+ ", isRead="+ isRead + "]";
 	}
-
-
 
 
 	/**
@@ -161,25 +174,7 @@ public class MessageDTO {
 
 
 
-	/**
-	 * @return the fromUserId
-	 */
-	public Long getFromUserId() {
-		return fromUserId;
-	}
-
-
-
-
-	/**
-	 * @param fromUserId the fromUserId to set
-	 */
-	public void setFromUserId(Long fromUserId) {
-		this.fromUserId = fromUserId;
-	}
-
-
-
+	
 
 	/**
 	 * @return the messageSubject
@@ -317,7 +312,104 @@ public class MessageDTO {
 	public void setToUserIds(List<Long> toUserIds) {
 		this.toUserIds = toUserIds;
 	}
-
 	
+	
+	public Long getFromUserId() {
+		return fromUserId;
+	}
+
+	public void setFromUserId(Long fromUserId) {
+		this.fromUserId = fromUserId;
+	}
+
+
+
+	/**
+	 * @return the isArchived
+	 */
+	public Boolean getIsArchived() {
+		return isArchived;
+	}
+
+
+	/**
+	 * @param isArchived the isArchived to set
+	 */
+	public void setIsArchived(Boolean isArchived) {
+		this.isArchived = isArchived;
+	}
+
+
+	/**
+	 * @return the isRead
+	 */
+	public Boolean getIsRead() {
+		return isRead;
+	}
+
+
+	/**
+	 * @param isRead the isRead to set
+	 */
+	public void setIsRead(Boolean isRead) {
+		this.isRead = isRead;
+	}
+
+
+	/**
+	 * @return the isDeleted
+	 */
+	public Boolean getIsDeleted() {
+		return isDeleted;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public int getReadMsgCount() {
+		return readMsgCount;
+	}
+
+	/**
+	 * 
+	 * @param readMsgCount
+	 */
+	public void setReadMsgCount(int readMsgCount) {
+		this.readMsgCount = readMsgCount;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public int getUnReadMsgCount() {
+		return unReadMsgCount;
+	}
+
+	/**
+	 * 
+	 * @param unReadMsgCount
+	 */
+	public void setUnReadMsgCount(int unReadMsgCount) {
+		this.unReadMsgCount = unReadMsgCount;
+	}
+	
+
+	/**
+	 * @param isDeleted the isDeleted to set
+	 */
+	public void setIsDeleted(Boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
+
+	   public DateTime getMsgDateTime() {
+			return msgDateTime;
+		}
+
+		public void setMsgDateTime(DateTime msgDateTime) {
+			this.msgDateTime = msgDateTime;
+		}
+
 
 }

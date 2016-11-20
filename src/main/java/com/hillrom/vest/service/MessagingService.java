@@ -38,6 +38,8 @@ import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.MessageDTO;
 import com.hillrom.vest.web.rest.dto.MessageToUserAssoDTO;
 
+import net.minidev.json.JSONObject;
+
 @Service
 @Transactional
 public class MessagingService {
@@ -113,13 +115,18 @@ public class MessagingService {
 		return messageList;
 	}
 	
-	public Page<Messages> getReceivedMessagesForMailbox(Long toUserId,Pageable pageable) throws HillromException{
-		List<Messages> associatedMessagesList = new ArrayList<Messages>();
+	public Page<JSONObject> getReceivedMessagesForMailbox(Long toUserId,Pageable pageable) throws HillromException{
+		//List<Messages> associatedMessagesList = new ArrayList<Messages>();
+
+		List<JSONObject> associatedMessagesList = new ArrayList<JSONObject>();
 		Page<MessageTouserAssoc> messageTouserAssocList  = messageTouserAssocRepository.findByUserId(toUserId,pageable);
 		for(MessageTouserAssoc messageTouserAssoc : messageTouserAssocList){
-			associatedMessagesList.add(messagingRepository.findById(messageTouserAssoc.getMessages().getId()));
+			JSONObject resultJSONObject = new JSONObject();
+			resultJSONObject.put("messageTouserAssoc", messageTouserAssoc);
+			resultJSONObject.put("message",messagingRepository.findById(messageTouserAssoc.getMessages().getId()));
+			associatedMessagesList.add(resultJSONObject);
 		}
-		Page<Messages> associatedMessagesPageList = new PageImpl<Messages> (associatedMessagesList);
+		Page<JSONObject> associatedMessagesPageList = new PageImpl<JSONObject> (associatedMessagesList);
 		return associatedMessagesPageList;
 	}
 	

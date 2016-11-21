@@ -102,4 +102,5 @@
 	<include file="classpath:/config/liquibase/changelog/20161025114045_alter_datatype_Adherence_Reset.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20161110183415_alter_table_entities_messaging.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20161115184030_add_column_message_notification_inUser.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161117181730_add_column_clinic_inMessage.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

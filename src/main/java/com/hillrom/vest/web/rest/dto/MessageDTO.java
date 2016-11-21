@@ -27,7 +27,9 @@ public class MessageDTO {
     
     private List<Long> toUserIds;
     
-	
+    private List<String> toClinicIds;
+    
+	private String fromClinicId;
 
 
 	public MessageDTO() {
@@ -56,6 +58,8 @@ public class MessageDTO {
 		result = prime * result + ((rootMessageId == null) ? 0 : rootMessageId.hashCode());
 		result = prime * result + ((toMessageId == null) ? 0 : toMessageId.hashCode());
 		result = prime * result + ((toUserIds == null) ? 0 : toUserIds.hashCode());
+		result = prime * result + ((toClinicIds == null) ? 0 : toClinicIds.hashCode());
+		result = prime * result + ((fromClinicId == null) ? 0 : fromClinicId.hashCode());
 		return result;
 	}
 
@@ -118,6 +122,16 @@ public class MessageDTO {
 				return false;
 		} else if (!toUserIds.equals(other.toUserIds))
 			return false;
+		if (toClinicIds == null) {
+			if (other.toClinicIds != null)
+				return false;
+		} else if (!toClinicIds.equals(other.toClinicIds))
+			return false;
+		if (fromClinicId == null) {
+			if (other.fromClinicId != null)
+				return false;
+		} else if (!fromClinicId.equals(other.fromClinicId))
+			return false;
 		return true;
 	}
 
@@ -135,14 +149,12 @@ public class MessageDTO {
 	public String toString() {
 		return "MessageDTO [id=" + id + ", fromUserId=" + fromUserId + ", messageSubject=" + messageSubject + ", messageSizeMbs="
 				+ messageSizeMbs + ", messageType=" + messageType + ", toMessageId=" + toMessageId + ", rootMessageId="
-				+ rootMessageId + ", messageText=" + messageText + ", toUserIds=" + toUserIds + "]";
+				+ rootMessageId + ", messageText=" + messageText + ", toUserIds=" + toUserIds + ", toClinicIds=" + toClinicIds +", fromClinicId=" + fromClinicId + "]";
 	}
 
 
-
-
 	/**
-	 * @return the fromUserId
+	 * @return the id
 	 */
 	public Long getId() {
 		return id;
@@ -152,7 +164,7 @@ public class MessageDTO {
 
 
 	/**
-	 * @param fromUserId the fromUserId to set
+	 * @param id the id to set
 	 */
 	public void setId(Long id) {
 		this.id = id;
@@ -318,6 +330,39 @@ public class MessageDTO {
 		this.toUserIds = toUserIds;
 	}
 
+	
+	/**
+	 * @return the toClinicIds
+	 */
+	public List<String> getToClinicIds() {
+		return toClinicIds;
+	}
+
+
+
+
+	/**
+	 * @param toClinicIds the toClinicIds to set
+	 */
+	public void setToClinicIds(List<String> toClinicIds) {
+		this.toClinicIds = toClinicIds;
+	}
+	
+	
+	/**
+	 * @return the fromClinicId
+	 */
+	public String getFromClinicId() {
+		return fromClinicId;
+	}
+	
+	
+	/**
+	 * @param fromClinicId the fromClinicId to set
+	 */
+	public void setFromClinicId(String fromClinicId) {
+		this.fromClinicId = fromClinicId;
+	}
 	
 
 }

@@ -28,6 +28,7 @@ import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.MessageTouserAssocRepository;
 import com.hillrom.vest.repository.MessagingRepository;
 import com.hillrom.vest.repository.NoteRepository;
@@ -61,11 +62,21 @@ public class MessagingService {
 	@Inject
 	private UserService userService;
 	
+	@Inject
+	private ClinicService clinicService;
+	
+	@Inject
+	private ClinicRepository clinicRepository;
+	
 	public Messages saveOrUpdateMessageData(MessageDTO messageDTO) throws HillromException{
 
 		Messages newMessage = new Messages();
 		
 		newMessage.setUser(userRepository.findOne(messageDTO.getFromUserId()));
+		
+		if(Objects.nonNull(messageDTO.getFromClinicId()))
+			newMessage.setFromClinic(clinicRepository.getOne(messageDTO.getFromClinicId()));
+		
 		newMessage.setMessageSubject(messageDTO.getMessageSubject());
 		newMessage.setMessageDatetime(new DateTime());
 		newMessage.setMessageSizeMBs(messageDTO.getMessageSizeMbs());
@@ -81,22 +92,46 @@ public class MessagingService {
 	public List<MessageTouserAssoc> saveOrUpdateMessageTousersData(MessageDTO messageDto) throws HillromException{
 		
 		Long newMessageId = messageDto.getId();
-		List<Long> toUserIds = messageDto.getToUserIds();
+		
+		List<Long> toUserIds = new ArrayList<Long>();
+		if(Objects.nonNull(messageDto.getToUserIds()))
+			toUserIds = messageDto.getToUserIds();
+		
 		Long rootMessageId = messageDto.getRootMessageId();
 		Long toMessageId = messageDto.getToMessageId();
 		String messageSubject = messageDto.getMessageSubject();
 		
+		List<String> toClinicIds = new ArrayList<String>();
+		if(Objects.nonNull(messageDto.getToClinicIds()))
+			toClinicIds = messageDto.getToClinicIds();
+		
 		List<MessageTouserAssoc> listMessageTouserAssoc = new ArrayList<MessageTouserAssoc>();
-		for(Long userId : toUserIds){
-			MessageTouserAssoc newMessageTouserAssoc = new MessageTouserAssoc();
-			newMessageTouserAssoc.setMessages(messagingRepository.findById(newMessageId));
-			newMessageTouserAssoc.setUser(userRepository.findOne(userId));
-			messageTouserAssocRepository.save(newMessageTouserAssoc);
-			listMessageTouserAssoc.add(newMessageTouserAssoc);
+		
+		if(toClinicIds.size() > 0){
 			
-			User user = userService.getUser(userId);			
-			if(user.isMessageNotification())
-				mailService.sendMessageNotificationToUser(user, messageSubject);
+			for(String clinicId : toClinicIds){
+				// To get the list of CA & HCP users for the Clinic id
+				List<User> caHcpUsers = clinicService.getCaHcpUsersForClinic(clinicId);
+				for(User caHcpUser : caHcpUsers){
+					MessageTouserAssoc newMessageTouserAssoc = new MessageTouserAssoc();
+					newMessageTouserAssoc.setMessages(messagingRepository.findById(newMessageId));
+					newMessageTouserAssoc.setUser(caHcpUser);					
+					newMessageTouserAssoc.setToClinic(clinicRepository.getOne(clinicId));					
+					messageTouserAssocRepository.save(newMessageTouserAssoc);
+					listMessageTouserAssoc.add(newMessageTouserAssoc);
+					sendMessageNotifiationToUser(caHcpUser.getId(), messageSubject);
+				}
+			}
+			
+		}else if(toUserIds.size() > 0){
+			for(Long userId : toUserIds){
+				MessageTouserAssoc newMessageTouserAssoc = new MessageTouserAssoc();
+				newMessageTouserAssoc.setMessages(messagingRepository.findById(newMessageId));
+				newMessageTouserAssoc.setUser(userRepository.findOne(userId));
+				messageTouserAssocRepository.save(newMessageTouserAssoc);
+				listMessageTouserAssoc.add(newMessageTouserAssoc);
+				sendMessageNotifiationToUser(userId, messageSubject);
+			}
 		}
 		Messages newMessage =  messagingRepository.findById(newMessageId);
 		if(Objects.isNull(rootMessageId)){
@@ -108,6 +143,12 @@ public class MessagingService {
 		messagingRepository.save(newMessage);
 		return listMessageTouserAssoc;
 	}
+	
+	public void sendMessageNotifiationToUser(Long userId, String messageSubject) throws HillromException{	
+		User user = userService.getUser(userId);
+		if(user.isMessageNotification())
+			mailService.sendMessageNotificationToUser(user, messageSubject);
+	}	
 	
 	public Page<Messages> getSentMessagesForMailbox(Long fromUserId,Pageable pageable) throws HillromException{
 		Page<Messages> messageList = null;

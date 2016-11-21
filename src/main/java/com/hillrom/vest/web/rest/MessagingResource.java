@@ -113,7 +113,7 @@ public class MessagingResource {
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-			Page<JSONObject> messageList = messagingService.getReceivedMessagesForMailbox(toUserId,new PageRequest(offset, limit));
+			Page<MessageTouserAssoc> messageList = messagingService.getReceivedMessagesForMailbox(toUserId,new PageRequest(offset, limit));
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}

@@ -104,17 +104,16 @@ public class MessagingResource {
 	}
 
 	/**
-     * GET  /messages/{toUserId} -> Get All Received Messages for user mailbox.
+     * GET  /messages/{toUserId} -> Get All Received Messages for user mailbox InBox/Archived.
      */
 	@RequestMapping(value="/messagesReceived/{toUserId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getMessagesReceivedForInbox(@PathVariable("toUserId") Long toUserId,@RequestParam(value = "page" , required = false) Integer offset,
-            @RequestParam(value = "per_page", required = false) Integer limit){
+            @RequestParam(value = "per_page", required = false) Integer limit, @RequestParam(value = "msgTypeBox", required = true) String msgTypeBox){
 
 		JSONObject jsonObject = new JSONObject();
 		
-		try{
-			Page<MessageTouserAssoc> messageList = messagingService.getReceivedMessagesForMailbox(toUserId,new PageRequest(offset, limit));
-			if(Objects.nonNull(messageList)){
+		try{ 
+			Page<MessageDTO> messageList = messagingService.getReceivedMessagesForMailbox(toUserId,new PageRequest(offset, limit), msgTypeBox);			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}
 		}catch(Exception ex){
@@ -129,7 +128,7 @@ public class MessagingResource {
      * POST  /messages/archived -> Archive / UnArchive a list of messages in a user mailbox.
      */
 	@RequestMapping(value="/messages/archived",method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> setMessagesArchivedInarchived(@Valid @RequestBody(required=true)  MessageToUserAssoDTO messageToUserArchivedList){
+	public ResponseEntity<?> setMessagesArchivedInarchived(@Valid @RequestBody(required=true) List<MessageToUserAssoDTO> messageToUserArchivedList){
 
 		JSONObject jsonObject = new JSONObject();
 		
@@ -150,7 +149,7 @@ public class MessagingResource {
      * POST  /messages/readunread -> Set as Read / UnRead a list of messages in a user mailbox.
      */
 	@RequestMapping(value="/messages/readunread",method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> setMessagesReadUnread(@Valid @RequestBody(required=true)  MessageToUserAssoDTO messageToUserReadunreadList){
+	public ResponseEntity<?> setMessagesReadUnread(@Valid @RequestBody(required=true) List<MessageToUserAssoDTO> messageToUserReadunreadList){
 
 		JSONObject jsonObject = new JSONObject();
 		

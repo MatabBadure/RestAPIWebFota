@@ -156,28 +156,49 @@ public class MessagingService {
 		return messageList;
 	}
 	
-	public Page<MessageTouserAssoc> getReceivedMessagesForMailbox(Long toUserId,Pageable pageable) throws HillromException{
+	public Page<MessageDTO> getReceivedMessagesForMailbox(Long toUserId,Pageable pageable, String msgTypeBox) throws HillromException{
+		//List<Messages> associatedMessagesList = new ArrayList<Messages>();
 
-		Page<MessageTouserAssoc> messageTouserAssocList  = messageTouserAssocRepository.findByUserId(toUserId,pageable);
-		return messageTouserAssocList;
+		List<MessageDTO> associatedMessagesList = new ArrayList<MessageDTO>();
+		/*
+		Page<MessageTouserAssoc> messageTouserAssocList  = messageTouserAssocRepository.findByUserId(toUserId,pageable);		
+		for(MessageTouserAssoc messageTouserAssoc : messageTouserAssocList){
+			JSONObject resultJSONObject = new JSONObject();
+			resultJSONObject.put("messageTouserAssoc", messageTouserAssoc);
+			resultJSONObject.put("message",messagingRepository.findById(messageTouserAssoc.getMessages().getId()));
+			associatedMessagesList.add(resultJSONObject);
+			
+		}*/
+		Page<MessageDTO> associatedMessagesPageList = new PageImpl<MessageDTO> (associatedMessagesList);
+		return associatedMessagesPageList;
 	}
 	
-	public List<MessageTouserAssoc> setMessagesArchivedUnarchived(MessageToUserAssoDTO messageToUserArchivedList) throws HillromException{
+	public List<MessageTouserAssoc> setMessagesArchivedUnarchived(List<MessageToUserAssoDTO> messageToUserArchivedList) throws HillromException{
 		List<MessageTouserAssoc> returnMessageTouserAssocList = new ArrayList<MessageTouserAssoc>();
+
+		 for(MessageToUserAssoDTO msgToUsrAsscList : messageToUserArchivedList)
+		 {
+				
+			MessageTouserAssoc messageTouserAssoc = messageTouserAssocRepository.findByUserIdAndMessageId(msgToUsrAsscList.getUserId(),msgToUsrAsscList.getMessageId());
 			
-		MessageTouserAssoc messageTouserAssoc = messageTouserAssocRepository.findByUserIdAndMessageId(messageToUserArchivedList.getUserId(),messageToUserArchivedList.getMessageId());
-		messageTouserAssoc.setIsArchived(messageToUserArchivedList.isArchived()?Boolean.TRUE:Boolean.FALSE);
-		returnMessageTouserAssocList.add(messageTouserAssoc);
+			messageTouserAssoc.setIsArchived(msgToUsrAsscList.isArchived()?Boolean.TRUE:Boolean.FALSE);
+			returnMessageTouserAssocList.add(messageTouserAssoc);
+		 }
+			
+		
 		return returnMessageTouserAssocList;
 	}
 
-	public List<MessageTouserAssoc> setMessagesReadUnread(MessageToUserAssoDTO messageToUserReadUnreadList) throws HillromException{
+	public List<MessageTouserAssoc> setMessagesReadUnread(List<MessageToUserAssoDTO> messageToUserReadUnreadList) throws HillromException{
 		List<MessageTouserAssoc> returnMessageTouserAssocList = new ArrayList<MessageTouserAssoc>();
+		
+		 for(MessageToUserAssoDTO msgToUsrAsscList : messageToUserReadUnreadList)
+		 {
+			MessageTouserAssoc messageTouserAssoc = messageTouserAssocRepository.findByUserIdAndMessageId(msgToUsrAsscList.getUserId(),msgToUsrAsscList.getMessageId());
 			
-		MessageTouserAssoc messageTouserAssoc = messageTouserAssocRepository.findByUserIdAndMessageId(messageToUserReadUnreadList.getUserId(),messageToUserReadUnreadList.getMessageId());
-
-		messageTouserAssoc.setIsRead(messageToUserReadUnreadList.isRead()?Boolean.TRUE:Boolean.FALSE);
-		returnMessageTouserAssocList.add(messageTouserAssoc);
+			messageTouserAssoc.setIsRead(msgToUsrAsscList.isRead()?Boolean.TRUE:Boolean.FALSE);
+			returnMessageTouserAssocList.add(messageTouserAssoc);
+		 }
 		return returnMessageTouserAssocList;
 	}
 	

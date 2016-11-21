@@ -156,10 +156,17 @@ public class MessagingService {
 		return messageList;
 	}
 	
-	public Page<MessageTouserAssoc> getReceivedMessagesForMailbox(Long toUserId,Pageable pageable) throws HillromException{
-
+	public Page<JSONObject> getReceivedMessagesForMailbox(Long toUserId,Pageable pageable) throws HillromException{
+		List<JSONObject> associatedMessagesList = new ArrayList<JSONObject>();
 		Page<MessageTouserAssoc> messageTouserAssocList  = messageTouserAssocRepository.findByUserId(toUserId,pageable);
-		return messageTouserAssocList;
+		for(MessageTouserAssoc messageTouserAssoc : messageTouserAssocList){
+			JSONObject resultJSONObject = new JSONObject();
+			resultJSONObject.put("messageTouserAssoc", messageTouserAssoc);
+			resultJSONObject.put("message",messagingRepository.findById(messageTouserAssoc.getMessages().getId()));
+			associatedMessagesList.add(resultJSONObject);
+		}
+		Page<JSONObject> associatedMessagesPageList = new PageImpl<JSONObject> (associatedMessagesList);
+		return associatedMessagesPageList;
 	}
 	
 	public List<MessageTouserAssoc> setMessagesArchivedUnarchived(MessageToUserAssoDTO messageToUserArchivedList) throws HillromException{

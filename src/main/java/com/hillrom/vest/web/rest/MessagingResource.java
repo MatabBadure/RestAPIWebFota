@@ -5,6 +5,7 @@ import static com.hillrom.vest.config.Constants.YYYY_MM_DD;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -108,12 +109,21 @@ public class MessagingResource {
      */
 	@RequestMapping(value="/messagesReceived/{toUserId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getMessagesReceivedForInbox(@PathVariable("toUserId") Long toUserId,@RequestParam(value = "page" , required = false) Integer offset,
-            @RequestParam(value = "per_page", required = false) Integer limit){
+            @RequestParam(value = "per_page", required = false) Integer limit,
+            @RequestParam(value = "sort_by", required = false) String sortBy,
+            @RequestParam(value = "asc",required = false) Boolean isAscending){
+		
+	   	 Map<String,Boolean> sortOrder = new HashMap<>();
+	   	 if(sortBy != null  && !sortBy.equals("")) {
+	   		 isAscending =  (isAscending != null)?  isAscending : true;
+	   		 sortOrder.put(sortBy, isAscending);
+	   	 }
 
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-			Page<JSONObject> messageList = messagingService.getReceivedMessagesForMailbox(toUserId,new PageRequest(offset, limit));
+			//Page<JSONObject> messageList = messagingService.getReceivedMessagesForMailbox(toUserId,new PageRequest(offset, limit));
+			Page<Object> messageList = messagingService.getReceivedMessagesForMailbox(toUserId,PaginationUtil.generatePageRequest(offset, limit, sortOrder));
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}

@@ -71,15 +71,15 @@ public class MessagingResource {
 			List<MessageTouserAssoc> newMessageTouserAssocList = messagingService.saveOrUpdateMessageTousersData(messageDTO);
 			jsonObject.put("Message", newMessage);
 			jsonObject.put("MessageTouserAssocList", newMessageTouserAssocList);
-			if(Objects.nonNull(newMessage))
+			if(Objects.nonNull(newMessage)){
+				jsonObject.put("statusMsg", "Message sent successfully");
 				return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
+			}
 		}catch(Exception ex){
 			jsonObject.put("ERROR", ex.getMessage());
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		
+		}		
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		
 	}
 
 	/**
@@ -107,8 +107,9 @@ public class MessagingResource {
 	/**
      * GET  /messages/{toUserId} -> Get All Received Messages for user mailbox.
      */
-	@RequestMapping(value="/messagesReceived/{toUserId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getMessagesReceivedForInbox(@PathVariable("toUserId") Long toUserId,@RequestParam(value = "page" , required = false) Integer offset,
+	@RequestMapping(value="/messagesReceived/{toId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getMessagesReceivedForInbox(@PathVariable("toId") String toId,@RequestParam(value = "isClinic" , required = false) boolean isClinic,
+			@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
             @RequestParam(value = "sort_by", required = false) String sortBy,
             @RequestParam(value = "asc",required = false) Boolean isAscending){
@@ -123,7 +124,7 @@ public class MessagingResource {
 		
 		try{
 			//Page<JSONObject> messageList = messagingService.getReceivedMessagesForMailbox(toUserId,new PageRequest(offset, limit));
-			Page<Object> messageList = messagingService.getReceivedMessagesForMailbox(toUserId,PaginationUtil.generatePageRequest(offset, limit, sortOrder));
+			Page<Object> messageList = messagingService.getReceivedMessagesForMailbox(isClinic, toId, PaginationUtil.generatePageRequest(offset, limit, sortOrder));
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}

@@ -156,7 +156,9 @@ public class MessagingService {
 		return messageList;
 	}
 	
-	public Page<Object> getReceivedMessagesForMailbox(boolean isClinic, String toId,Pageable pageable) throws HillromException{		
+	public Page<Object> getReceivedMessagesForMailbox(boolean isClinic, String toId,Pageable pageable) throws HillromException{
+		
+		// Check for the clinic flag to differentiate between whether the clinic id is passed or patient id is passed
 		Page<Object> messageTouserAssocList  = isClinic ? messageTouserAssocRepository.findByClinicId(toId,pageable) : messageTouserAssocRepository.findByUserId(Long.parseLong(toId),pageable);
 		return messageTouserAssocList;
 	}

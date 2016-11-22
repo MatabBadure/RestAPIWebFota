@@ -2,6 +2,7 @@ package com.hillrom.vest.repository;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -19,8 +20,13 @@ import org.joda.time.DateTime;
 public interface MessageTouserAssocRepository extends
 		JpaRepository<MessageTouserAssoc, Long> {
 
-	//@Query("from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.user.id = ?1 order by messageTouserAssoc.messages.id desc")
-    //Page<MessageTouserAssoc> findByUserId(Long userId,Pageable pageable);
+	// To get the count of archived & unarchived messages
+	@Query("SELECT messageTouserAssoc.isArchived,count(*) from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.user.id = ?1 group by messageTouserAssoc.isArchived")
+    List<Object> findArchivedCountByUserId(Long userId);
+	
+	// To get the count of read & unread messages
+	@Query("SELECT messageTouserAssoc.isRead,count(*) from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.user.id = ?1 group by messageTouserAssoc.isRead")
+    List<Object> findReadCountByUserId(Long userId);
 	
 	@Query("from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.user.id = ?1 and messageTouserAssoc.messages.id = ?2 order by messageTouserAssoc.messages.id desc")
     MessageTouserAssoc findByUserIdAndMessageId(Long userId, Long messageId);

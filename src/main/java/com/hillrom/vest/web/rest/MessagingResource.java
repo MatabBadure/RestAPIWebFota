@@ -112,6 +112,50 @@ public class MessagingResource {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		
 	}
+	
+	/**
+     * GET  /messages/{fromUserId}/archivedCount -> Get count of archived messages.
+     */
+	@RequestMapping(value="/messages/{fromUserId}/archivedCount",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getArchivedCountByUserId(@PathVariable("fromUserId") Long fromUserId){
+
+	   	 
+		JSONObject jsonObject = new JSONObject();
+		
+		try{
+			List<Object> messageList = messagingService.findArchivedCountByUserId(fromUserId);
+			if(Objects.nonNull(messageList)){
+				return new ResponseEntity<>(messageList, HttpStatus.OK);
+			}
+		}catch(Exception ex){
+			jsonObject.put("ERROR", ex.getMessage());
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		
+	}
+	
+	/**
+     * GET  /messages/{fromUserId}/readunredCount -> Get count of read-unread messages.
+     */
+	@RequestMapping(value="/messages/{fromUserId}/readunredCount",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getReadUnreadCountByUserId(@PathVariable("fromUserId") Long fromUserId){
+
+	   	 
+		JSONObject jsonObject = new JSONObject();
+		
+		try{
+			List<Object> messageList = messagingService.findReadCountByUserId(fromUserId);
+			if(Objects.nonNull(messageList)){
+				return new ResponseEntity<>(messageList, HttpStatus.OK);
+			}
+		}catch(Exception ex){
+			jsonObject.put("ERROR", ex.getMessage());
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		
+	}
 
 	/**
      * GET  /messages/{toUserId} -> Get All Received Messages for user mailbox.

@@ -86,13 +86,22 @@ public class MessagingResource {
      * GET  /messages/{fromUserId} -> Get All Sent Messages for user mailbox.
      */
 	@RequestMapping(value="/messagesSent/{fromUserId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getMessagesSentForInbox(@PathVariable("fromUserId") Long fromUserId,@RequestParam(value = "page" , required = false) Integer offset,
-            @RequestParam(value = "per_page", required = false) Integer limit){
+	public ResponseEntity<?> getMessagesSentForInbox(@PathVariable("fromUserId") Long fromUserId,
+			@RequestParam(value = "page" , required = false) Integer offset,
+            @RequestParam(value = "per_page", required = false) Integer limit,
+            @RequestParam(value = "sort_by", required = false) String sortBy,
+            @RequestParam(value = "asc",required = false) Boolean isAscending){
 
+	   	 Map<String,Boolean> sortOrder = new HashMap<>();
+	   	 if(sortBy != null  && !sortBy.equals("")) {
+	   		 isAscending =  (isAscending != null)?  isAscending : true;
+	   		 sortOrder.put(sortBy, isAscending);
+	   	 }
+	   	 
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-			Page<Messages> messageList = messagingService.getSentMessagesForMailbox(fromUserId,new PageRequest(offset, limit));
+			Page<Messages> messageList = messagingService.getSentMessagesForMailbox(fromUserId,PaginationUtil.generatePageRequest(offset, limit, sortOrder));
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}

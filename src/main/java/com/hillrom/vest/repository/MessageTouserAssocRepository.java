@@ -27,7 +27,8 @@ public interface MessageTouserAssocRepository extends
 	
 	@Query("Select messageTouserAssoc.id, messageTouserAssoc.isArchived, messageTouserAssoc.isRead, messageTouserAssoc.messages.messageDatetime, "
 			+ "messageTouserAssoc.messages.messageSubject, messageTouserAssoc.messages.messageSizeMBs, messageTouserAssoc.messages.messageType,"
-			+ "messageTouserAssoc.messages.user.lastName, messageTouserAssoc.messages.user.firstName from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.user.id = ?1")
+			+ "messageTouserAssoc.messages.fromClinic.name, messageTouserAssoc.messages.user.lastName, messageTouserAssoc.messages.user.firstName "
+			+ "from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.user.id = ?1")
     Page<Object> findByUserId(Long userId,Pageable pageable);
 	
 	@Query("Select messageTouserAssoc.id, messageTouserAssoc.isArchived, messageTouserAssoc.isRead, messageTouserAssoc.messages.messageDatetime, "

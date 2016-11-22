@@ -150,24 +150,26 @@ public class MessagingService {
 			mailService.sendMessageNotificationToUser(user, messageSubject);
 	}	
 	
-	public Page<Messages> getSentMessagesForMailbox(Long fromUserId,Pageable pageable) throws HillromException{
-		Page<Messages> messageList = null;
-		messageList = messagingRepository.findByUserId(fromUserId,pageable);
+	public Page<Object> getSentMessagesForMailbox(boolean isClinic, String clinicId, Long fromUserId, Pageable pageable) throws HillromException{
+		
+		Page<Object> messageList = null;
+		if(isClinic && !clinicId.isEmpty()){
+			messageList = messageTouserAssocRepository.findByClinicIdSent(fromUserId, clinicId, pageable);
+		}else{
+			messageList = messageTouserAssocRepository.findByUserIdSent(fromUserId, pageable);
+		}
 		return messageList;
 	}
 	
-public Page<Object> getReceivedMessagesForMailbox(boolean isClinic, String toId,Pageable pageable, String mailBoxType) throws HillromException{
-		
+	public Page<Object> getReceivedMessagesForMailbox(boolean isClinic, String toId, String mailBoxType, Pageable pageable) throws HillromException{
 		
 		boolean isArchived = Boolean.TRUE;
-		
-		if(Objects.nonNull(mailBoxType) && mailBoxType.equalsIgnoreCase("Inbox"))
-		{
+		if(Objects.nonNull(mailBoxType) && mailBoxType.equalsIgnoreCase("Inbox")){
 			isArchived = Boolean.FALSE;
 		}
 		
 		// Check for the clinic flag to differentiate between whether the clinic id is passed or patient id is passed
-		Page<Object> messageTouserAssocList  = isClinic ? messageTouserAssocRepository.findByClinicId(toId,pageable,isArchived) : messageTouserAssocRepository.findByUserId(Long.parseLong(toId),pageable, isArchived);
+		Page<Object> messageTouserAssocList  = isClinic ? messageTouserAssocRepository.findByClinicId(toId, isArchived, pageable) : messageTouserAssocRepository.findByUserId(Long.parseLong(toId), isArchived, pageable);
 		return messageTouserAssocList;
 	}
 	

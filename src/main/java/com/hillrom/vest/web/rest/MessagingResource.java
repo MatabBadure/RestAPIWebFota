@@ -87,6 +87,8 @@ public class MessagingResource {
      */
 	@RequestMapping(value="/messagesSent/{fromUserId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getMessagesSentForInbox(@PathVariable("fromUserId") Long fromUserId,
+			@RequestParam(value = "isClinic" , required = true) boolean isClinic,
+			@RequestParam(value = "clinicId" , required = false) String clinicId,
 			@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
             @RequestParam(value = "sort_by", required = false) String sortBy,
@@ -101,7 +103,8 @@ public class MessagingResource {
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-			Page<Messages> messageList = messagingService.getSentMessagesForMailbox(fromUserId,PaginationUtil.generatePageRequest(offset, limit, sortOrder));
+			
+			Page<Object> messageList = messagingService.getSentMessagesForMailbox(isClinic, clinicId, fromUserId, PaginationUtil.generatePageRequest(offset, limit, sortOrder));
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}
@@ -117,12 +120,13 @@ public class MessagingResource {
      * GET  /messages/{toUserId} -> Get All Received Messages for user mailbox.
      */
 	@RequestMapping(value="/messagesReceived/{toId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getMessagesReceivedForInbox(@PathVariable("toId") String toId,@RequestParam(value = "isClinic" , required = false) boolean isClinic,
+	public ResponseEntity<?> getMessagesReceivedForInbox(@PathVariable("toId") String toId,
+			@RequestParam(value = "isClinic" , required = true) boolean isClinic,
 			@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
             @RequestParam(value = "sort_by", required = false) String sortBy,
             @RequestParam(value = "asc",required = false) Boolean isAscending,
-            @RequestParam(value = "mailBoxType",required = false) String mailBoxType){
+            @RequestParam(value = "mailBoxType",required = true) String mailBoxType){
 		
 	   	 Map<String,Boolean> sortOrder = new HashMap<>();
 	   	 if(sortBy != null  && !sortBy.equals("")) {
@@ -134,7 +138,7 @@ public class MessagingResource {
 		
 		try{
 			//Page<JSONObject> messageList = messagingService.getReceivedMessagesForMailbox(toUserId,new PageRequest(offset, limit));
-			Page<Object> messageList = messagingService.getReceivedMessagesForMailbox(isClinic, toId, PaginationUtil.generatePageRequest(offset, limit, sortOrder), mailBoxType);
+			Page<Object> messageList = messagingService.getReceivedMessagesForMailbox(isClinic, toId, mailBoxType, PaginationUtil.generatePageRequest(offset, limit, sortOrder));
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}

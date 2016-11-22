@@ -121,7 +121,8 @@ public class MessagingResource {
 			@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
             @RequestParam(value = "sort_by", required = false) String sortBy,
-            @RequestParam(value = "asc",required = false) Boolean isAscending){
+            @RequestParam(value = "asc",required = false) Boolean isAscending,
+            @RequestParam(value = "mailBoxType",required = false) String mailBoxType){
 		
 	   	 Map<String,Boolean> sortOrder = new HashMap<>();
 	   	 if(sortBy != null  && !sortBy.equals("")) {
@@ -133,7 +134,7 @@ public class MessagingResource {
 		
 		try{
 			//Page<JSONObject> messageList = messagingService.getReceivedMessagesForMailbox(toUserId,new PageRequest(offset, limit));
-			Page<Object> messageList = messagingService.getReceivedMessagesForMailbox(isClinic, toId, PaginationUtil.generatePageRequest(offset, limit, sortOrder));
+			Page<Object> messageList = messagingService.getReceivedMessagesForMailbox(isClinic, toId, PaginationUtil.generatePageRequest(offset, limit, sortOrder), mailBoxType);
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}

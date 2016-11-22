@@ -149,6 +149,18 @@ public class MessagingService {
 		if(user.isMessageNotification())
 			mailService.sendMessageNotificationToUser(user, messageSubject);
 	}	
+
+	public List<Object> findArchivedCountByUserId(Long fromUserId) throws HillromException{
+		List<Object> messageList = null;
+		messageList = messageTouserAssocRepository.findArchivedCountByUserId(fromUserId);
+		return messageList;
+	}
+	
+	public List<Object> findReadCountByUserId(Long fromUserId) throws HillromException{
+		List<Object> messageList = null;
+		messageList = messageTouserAssocRepository.findReadCountByUserId(fromUserId);
+		return messageList;
+	}
 	
 	public Page<Messages> getSentMessagesForMailbox(Long fromUserId,Pageable pageable) throws HillromException{
 		Page<Messages> messageList = null;

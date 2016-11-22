@@ -179,7 +179,7 @@ public Page<Object> getReceivedMessagesForMailbox(boolean isClinic, String toId,
 		}
 		
 		// Check for the clinic flag to differentiate between whether the clinic id is passed or patient id is passed
-		Page<Object> messageTouserAssocList  = isClinic ? messageTouserAssocRepository.findByClinicId(toId,pageable,isArchived) : messageTouserAssocRepository.findByUserId(Long.parseLong(toId),pageable, isArchived);
+		Page<Object> messageTouserAssocList  = isClinic ? messageTouserAssocRepository.findByClinicId(toId,isArchived,pageable) : messageTouserAssocRepository.findByUserId(Long.parseLong(toId),isArchived,pageable);
 		return messageTouserAssocList;
 	}
 	

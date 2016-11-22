@@ -161,12 +161,12 @@ public class MessagingResource {
      * GET  /messages/{toUserId} -> Get All Received Messages for user mailbox.
      */
 	@RequestMapping(value="/messagesReceived/{toId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getMessagesReceivedForInbox(@PathVariable("toId") String toId,@RequestParam(value = "isClinic" , required = false) boolean isClinic,
+	public ResponseEntity<?> getMessagesReceivedForInbox(@PathVariable("toId") String toId,@RequestParam(value = "isClinic" , required = true) boolean isClinic,
 			@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
             @RequestParam(value = "sort_by", required = false) String sortBy,
             @RequestParam(value = "asc",required = false) Boolean isAscending,
-            @RequestParam(value = "mailBoxType",required = false) String mailBoxType){
+            @RequestParam(value = "mailBoxType",required = true) String mailBoxType){
 		
 	   	 Map<String,Boolean> sortOrder = new HashMap<>();
 	   	 if(sortBy != null  && !sortBy.equals("")) {

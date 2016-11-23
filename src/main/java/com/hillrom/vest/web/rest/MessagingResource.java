@@ -237,11 +237,11 @@ public class MessagingResource {
 	}
 	
 	/**
-     * GET  /messagesReceived/{toUserId} -> Get All Received Message Threads for user mailbox.
+     * GET  /messagesReceivedDetails/{toUserId}/{rootMessageId} -> Get All Received Message Threads for user mailbox.
      */
-	@RequestMapping(value="/messagesReceived/{toUserId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getMessagesReceivedForInbox(@PathVariable("toUserId") String toUserId,
-			@RequestParam(value = "rootMessageId" , required = true) Long rootMessageId,
+	@RequestMapping(value="/messagesReceivedDetails/{toUserId}/{rootMessageId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getMessagesReceivedDetailsForInbox(@PathVariable("toUserId") String toUserId,
+			@PathVariable("rootMessageId") Long rootMessageId,
 			@RequestParam(value = "isClinic" , required = true) boolean isClinic,
             @RequestParam(value = "mailBoxType",required = true) String mailBoxType){
 		

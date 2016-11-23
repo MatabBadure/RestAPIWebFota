@@ -236,4 +236,30 @@ public class MessagingResource {
 		
 	}
 	
+	/**
+     * GET  /messagesReceived/{toUserId} -> Get All Received Message Threads for user mailbox.
+     */
+	@RequestMapping(value="/messagesReceived/{toUserId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getMessagesReceivedForInbox(@PathVariable("toUserId") String toUserId,
+			@RequestParam(value = "rootMessageId" , required = true) Long rootMessageId,
+			@RequestParam(value = "isClinic" , required = true) boolean isClinic,
+            @RequestParam(value = "mailBoxType",required = true) String mailBoxType){
+		
+
+
+		JSONObject jsonObject = new JSONObject();
+		
+		try{
+			List<Object> messageList = messagingService.findByUserIdThreads(isClinic, toUserId, rootMessageId, mailBoxType);
+			if(Objects.nonNull(messageList)){
+				return new ResponseEntity<>(messageList, HttpStatus.OK);
+			}
+		}catch(Exception ex){
+			jsonObject.put("ERROR", ex.getMessage());
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		
+	}
+	
 }

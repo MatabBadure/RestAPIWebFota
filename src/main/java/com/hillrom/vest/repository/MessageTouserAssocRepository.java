@@ -48,7 +48,7 @@ public interface MessageTouserAssocRepository extends
 	// To get the list of messages sent to clinic from patients
 	@Query("Select messageTouserAssoc.id, messageTouserAssoc.messages.messageDatetime, messageTouserAssoc.messages.id, "
 				+ "messageTouserAssoc.messages.messageSubject, messageTouserAssoc.messages.messageSizeMBs, "
-				+ "messageTouserAssoc.messages.messageType, messageTouserAssoc.messageTouserAssoc.toClinic.name "
+				+ "messageTouserAssoc.messages.messageType, messageTouserAssoc.toClinic.name "
 				+ "from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.messages.user.id = ?1 ")
 	Page<Object> findByUserIdSent(Long userId, Pageable pageable);
 			

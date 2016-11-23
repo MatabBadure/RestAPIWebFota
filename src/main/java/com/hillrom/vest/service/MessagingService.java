@@ -224,7 +224,10 @@ public class MessagingService {
 		return messageTouserAssocList;
 	}
 	
-	
+	public Messages findByMessageId(Long messageId) throws HillromException{
+		Messages receivedMessage  = messagingRepository.findById(messageId);
+		return receivedMessage;
+	}	
 	
 
 }

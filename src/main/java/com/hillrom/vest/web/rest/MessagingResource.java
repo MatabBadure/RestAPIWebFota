@@ -262,4 +262,25 @@ public class MessagingResource {
 		
 	}
 	
+	/**
+     * GET  /messageDetails/{id} -> Get Received Message Details for user mailbox.
+     */
+	@RequestMapping(value="/messageDetails/{id}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getMessagesDetailsForInbox(@PathVariable("id") Long id){
+		
+		JSONObject jsonObject = new JSONObject();
+		
+		try{
+			Messages receivedMessage = messagingService.findByMessageId(id);
+			if(Objects.nonNull(receivedMessage)){
+				return new ResponseEntity<>(receivedMessage, HttpStatus.OK);
+			}
+		}catch(Exception ex){
+			jsonObject.put("ERROR", ex.getMessage());
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		
+	}
+	
 }

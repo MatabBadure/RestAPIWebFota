@@ -116,6 +116,8 @@ public class MessagingService {
 					MessageTouserAssoc newMessageTouserAssoc = new MessageTouserAssoc();
 					newMessageTouserAssoc.setMessages(messagingRepository.findById(newMessageId));
 					newMessageTouserAssoc.setUser(caHcpUser);					
+					newMessageTouserAssoc.setIsArchived(messageDto.isArchived());
+					newMessageTouserAssoc.setIsRead(messageDto.isRead());
 					newMessageTouserAssoc.setToClinic(clinicRepository.getOne(clinicId));					
 					messageTouserAssocRepository.save(newMessageTouserAssoc);
 					listMessageTouserAssoc.add(newMessageTouserAssoc);
@@ -128,6 +130,8 @@ public class MessagingService {
 				MessageTouserAssoc newMessageTouserAssoc = new MessageTouserAssoc();
 				newMessageTouserAssoc.setMessages(messagingRepository.findById(newMessageId));
 				newMessageTouserAssoc.setUser(userRepository.findOne(userId));
+				newMessageTouserAssoc.setIsArchived(messageDto.isArchived());
+				newMessageTouserAssoc.setIsRead(messageDto.isRead());
 				messageTouserAssocRepository.save(newMessageTouserAssoc);
 				listMessageTouserAssoc.add(newMessageTouserAssoc);
 				sendMessageNotifiationToUser(userId, messageSubject);

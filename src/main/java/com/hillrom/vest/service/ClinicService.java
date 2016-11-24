@@ -298,6 +298,49 @@ public class ClinicService {
 		}
 	}
 	
+	
+	public List<User> getCaHcpUsersForClinic(String clinicId) throws HillromException {
+		
+		List<User> cAhcpUsers = new ArrayList<>();
+		Clinic clinic = clinicRepository.findOne(clinicId);
+		
+		if (Objects.nonNull(clinic)) {
+			
+			// To get the list of HCP users for the clinic
+			List<String> idList = new ArrayList<>();
+	        idList.add(clinicId);
+			Set<UserExtension> hcpUserList = getHCPUsers(idList);
+			
+			// To get the list of CA users for the clinic
+			List<EntityUserAssoc> userAssocList  = entityUserRepository.findByClinicIdAndUserRole(clinic.getId(), AuthoritiesConstants.CLINIC_ADMIN);
+			
+			// Check for either HCP or Clinic is available for the Clinic
+			if (Objects.nonNull(hcpUserList) || Objects.nonNull(userAssocList) ) {
+			
+				// Check for HCP users available for the Clinic and add it in the list
+				if (Objects.nonNull(hcpUserList)) {								
+					for(UserExtension hcpUser : hcpUserList){
+						cAhcpUsers.add(hcpUser);
+					}
+				}
+				
+				// Check for CA users available for the Clinic and add it in the list
+				if(Objects.nonNull(userAssocList)){
+					for(EntityUserAssoc entityUserAssoc : userAssocList){
+						cAhcpUsers.add(entityUserAssoc.getUser());
+					}
+				}
+				
+				return cAhcpUsers;
+			}			
+			else 
+				throw new HillromException(ExceptionConstants.HR_607);
+		} else {
+			throw new HillromException(ExceptionConstants.HR_544); // No such clinic exist
+		}
+	}
+	
+	
 	public Set<User> getAllClinicAdmins() throws HillromException {
 		List<Clinic> clinicList = clinicRepository.findAllWithClinicAdmins();
 		if(clinicList.isEmpty()) {

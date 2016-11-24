@@ -661,10 +661,10 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.PATIENT, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
-    public ResponseEntity<JSONObject> updateHRMNotification(@PathVariable Long id, @RequestBody Map<String, Boolean> paramsMap) {
+    public ResponseEntity<JSONObject> updateUserNotification(@PathVariable Long id, @RequestBody Map<String, Boolean> paramsMap) {
     	JSONObject json = new JSONObject();
     	try {
-			json.put("user", userService.setHRMNotificationSetting(id, paramsMap));
+			json.put("user", userService.setUserNotificationSetting(id, paramsMap));
 			return new ResponseEntity<>(json,HttpStatus.OK);
 		} catch (HillromException e) {
 			json.put("ERROR", e.getMessage());

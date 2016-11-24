@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title th:text="#{email.messageNotification.title}">Message Notification</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    </head>
+    <body>
+        <p th:text="#{email.notification.greeting(${user})}">
+            Dear
+        </p>
+        <br/>
+        <p th:text="#{email.messagenotification.message(${today})}"></p>
+        <br/>
+        <p th:text="#{email.messagenotification.messageSubject(${messageSubject})}"></p>
+        <br/>        
+       	<br/>
+        
+        <p>
+            <span th:text="#{email.activation.text2}">Regards, </span>
+            <br/>
+            <em th:text="#{email.signature}">JHipster.</em>
+        </p>
+    </body>
+</html>

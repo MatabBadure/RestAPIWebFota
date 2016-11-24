@@ -59,7 +59,10 @@ public class Messages {
 	@Column(name="message_text")
 	private String messageText;
 
-	
+	@ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @JoinColumn(name = "from_clinic_id")
+	@JsonIgnore
+	private Clinic fromClinic;	
 
 
 
@@ -190,6 +193,20 @@ public class Messages {
 	public void setMessageText(String messageText) {
 		this.messageText = messageText;
 	}
+	
+	/**
+	 * @return the messageText
+	 */
+	public Clinic getFromClinic() {
+		return fromClinic;
+	}
+
+	/**
+	 * @param messageText the messageText to set
+	 */
+	public void setFromClinic(Clinic fromClinic) {
+		this.fromClinic = fromClinic;
+	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -206,6 +223,7 @@ public class Messages {
 		result = prime * result + ((messageType == null) ? 0 : messageType.hashCode());
 		result = prime * result + ((rootMessageId == null) ? 0 : rootMessageId.hashCode());
 		result = prime * result + ((toMessageId == null) ? 0 : toMessageId.hashCode());
+		result = prime * result + ((fromClinic == null) ? 0 : fromClinic.hashCode());
 		result = prime * result + ((user == null) ? 0 : user.hashCode());
 		return result;
 	}
@@ -247,6 +265,11 @@ public class Messages {
 				return false;
 		} else if (!messageText.equals(other.messageText))
 			return false;
+		if (fromClinic == null) {
+			if (other.fromClinic != null)
+				return false;
+		} else if (!fromClinic.equals(other.fromClinic))
+			return false;
 		if (messageType == null) {
 			if (other.messageType != null)
 				return false;
@@ -277,7 +300,7 @@ public class Messages {
 	public String toString() {
 		return "Messages [id=" + id + ", messageDatetime=" + messageDatetime + ", user=" + user + ", messageSubject="
 				+ messageSubject + ", messageSizeMBs=" + messageSizeMBs + ", messageType=" + messageType
-				+ ", toMessageId=" + toMessageId + ", rootMessageId=" + rootMessageId + ", messageText=" + messageText
+				+ ", toMessageId=" + toMessageId + ", rootMessageId=" + rootMessageId + ", messageText=" + messageText + ", fromClinic=" + fromClinic
 				+ "]";
 	}
 

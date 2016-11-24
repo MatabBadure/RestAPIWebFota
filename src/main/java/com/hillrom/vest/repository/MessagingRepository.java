@@ -17,7 +17,7 @@ public interface MessagingRepository extends JpaRepository<Messages, Long> {
 
 
 	@Query("from Messages messages where messages.user.id = ?1 order by messages.message_datetime desc")
-    List<Messages> findByUserId(Long userId);
+    Page<Messages> findByUserId(Long userId,Pageable pageable);
 
 	@Query("from Messages messages where messages.id = ?1")
     Messages findById(Long id);

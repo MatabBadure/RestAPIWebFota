@@ -311,6 +311,36 @@ public class ClinicResource {
         }
     }
     
+    
+    /**
+     * GET  /clinics/patients -> get the patient users for the clinic.
+     */
+    @RequestMapping(value = "/clinic/{clinicId}/patients",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN, AuthoritiesConstants.ADMIN})
+    public ResponseEntity<JSONObject> getPatientUsersForClinic(@PathVariable String clinicId) {
+        log.debug("REST request to get Clinic : {}", clinicId);
+        List<String> idList = new ArrayList<>();
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	idList.add(clinicId);        	
+            List<Map<String,Object>> patientUserList = clinicService.getAssociatedPatientUsers(idList);
+	        if(patientUserList.isEmpty()){
+				jsonObject.put("message", MessageConstants.HR_279);
+				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+			} else {
+		      	jsonObject.put("message", MessageConstants.HR_280);
+		      	jsonObject.put("patientUsers", patientUserList);
+		      	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+        } catch(HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    
     @RequestMapping(value = "/clinics/{clinicId}/notAssociatedPatients",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)

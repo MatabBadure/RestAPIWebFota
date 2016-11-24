@@ -1431,14 +1431,7 @@ public class UserService {
 		UserPatientAssoc caregiverAssoc = new UserPatientAssoc();
 		if (AuthoritiesConstants.CARE_GIVER.equals(userExtensionDTO.getRole())) {
 			caregiverAssoc = updateCaregiver(patientUserId, caregiverUserId, userExtensionDTO);
-			if(Objects.nonNull(caregiverAssoc) && Objects.nonNull(caregiverAssoc.getUser().getId())) {
-				if(StringUtils.isNotBlank(userExtensionDTO.getEmail())) {
-					mailService.sendActivationEmail(caregiverAssoc.getUser(), baseUrl);
-				}
 			} else {
-				throw new HillromException(ExceptionConstants.HR_562);
-			}
-		} else {
 			throw new HillromException(ExceptionConstants.HR_555);
 		}
 		return caregiverAssoc;
@@ -1538,12 +1531,13 @@ public class UserService {
 		}
 	 }
 	
-	public User setHRMNotificationSetting(Long id, Map<String, Boolean> paramsMap) throws HillromException {
+	public User setUserNotificationSetting(Long id, Map<String, Boolean> paramsMap) throws HillromException {
 		User user = userRepository.findOne(id);
 		if (Objects.nonNull(user)) {
 			user.setMissedTherapyNotification(paramsMap.get("isMissedTherapyNotification"));
 			user.setNonHMRNotification(paramsMap.get("isNonHMRNotification"));
-			user.setSettingDeviationNotification(paramsMap.get("isSettingDeviationNotification"));
+			user.setSettingDeviationNotification(paramsMap.get("isSettingDeviationNotification"));			
+			user.setMessageNotification(paramsMap.get("isMessageNotification"));
 			userRepository.save(user);
 			return user;
 		} else {

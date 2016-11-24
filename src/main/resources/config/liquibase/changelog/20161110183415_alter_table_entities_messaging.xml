@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+	
+	<!-- Added 3 flags to the table MESSAGE_TOUSER_ASSOC -->
+	<changeSet author="jhipster" id=" 20161110183415">
+		<addColumn tableName="MESSAGE_TOUSER_ASSOC">        	
+			<column name="is_archived" type="bit" defaultValueNumeric="0"/>
+                       	
+			<column name="is_deleted" type="bit" defaultValueNumeric="0"/>  
+              	
+			<column name="is_read" type="bit" defaultValueNumeric="0"/>
+        </addColumn>
+	</changeSet>
+</databaseChangeLog>

@@ -1,5 +1,6 @@
 package com.hillrom.vest.domain;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -30,14 +31,31 @@ public class MessageTouserAssoc {
 	private Long id;
 	
 
-	@Column(name="to_user_id")
-	private Long toUserId;
+	@ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @JoinColumn(name = "to_user_id")
+	@JsonIgnore
+	private User user;
 	
 
-	@Column(name="to_message_id")
-	private Long toMessageId;
+	@ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @JoinColumn(name = "to_message_id")
+	@JsonIgnore
+	private Messages messages;
 
+	@Column(name="is_archived")
+	private Boolean isArchived;
+	
+	@Column(name="is_read")
+	private Boolean isRead;
+	
+	@Column(name="is_deleted")
+	private Boolean isDeleted;
 
+	@ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @JoinColumn(name = "to_clinic_id")
+	@JsonIgnore
+	private Clinic toClinic;
+	
 	/**
 	 * @return the id
 	 */
@@ -54,38 +72,103 @@ public class MessageTouserAssoc {
 	}
 
 
+
+
 	/**
-	 * @return the toUserId
+	 * @return the user
 	 */
-	public Long getToUserId() {
-		return toUserId;
+	public User getUser() {
+		return user;
 	}
 
 
 	/**
-	 * @param toUserId the toUserId to set
+	 * @param user the user to set
 	 */
-	public void setToUserId(Long toUserId) {
-		this.toUserId = toUserId;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 
 	/**
-	 * @return the toMessageId
+	 * @return the messages
 	 */
-	public Long getToMessageId() {
-		return toMessageId;
+	public Messages getMessages() {
+		return messages;
 	}
 
 
 	/**
-	 * @param toMessageId the toMessageId to set
+	 * @param messages the messages to set
 	 */
-	public void setToMessageId(Long toMessageId) {
-		this.toMessageId = toMessageId;
+	public void setMessages(Messages messages) {
+		this.messages = messages;
 	}
 
 
+	/**
+	 * @return the isArchived
+	 */
+	public Boolean getIsArchived() {
+		return isArchived;
+	}
+
+
+	/**
+	 * @param isArchived the isArchived to set
+	 */
+	public void setIsArchived(Boolean isArchived) {
+		this.isArchived = isArchived;
+	}
+
+
+	/**
+	 * @return the isRead
+	 */
+	public Boolean getIsRead() {
+		return isRead;
+	}
+
+
+	/**
+	 * @param isRead the isRead to set
+	 */
+	public void setIsRead(Boolean isRead) {
+		this.isRead = isRead;
+	}
+
+
+	/**
+	 * @return the isDeleted
+	 */
+	public Boolean getIsDeleted() {
+		return isDeleted;
+	}
+
+
+	/**
+	 * @param isDeleted the isDeleted to set
+	 */
+	public void setIsDeleted(Boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
+
+
+	/**
+	 * @return the messageText
+	 */
+	public Clinic getToClinic() {
+		return toClinic;
+	}
+
+	/**
+	 * @param messageText the messageText to set
+	 */
+	public void setToClinic(Clinic toClinic) {
+		this.toClinic = toClinic;
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -94,8 +177,12 @@ public class MessageTouserAssoc {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((toMessageId == null) ? 0 : toMessageId.hashCode());
-		result = prime * result + ((toUserId == null) ? 0 : toUserId.hashCode());
+		result = prime * result + ((isArchived == null) ? 0 : isArchived.hashCode());
+		result = prime * result + ((isDeleted == null) ? 0 : isDeleted.hashCode());
+		result = prime * result + ((isRead == null) ? 0 : isRead.hashCode());
+		result = prime * result + ((messages == null) ? 0 : messages.hashCode());
+		result = prime * result + ((user == null) ? 0 : user.hashCode());
+		result = prime * result + ((toClinic == null) ? 0 : toClinic.hashCode());
 		return result;
 	}
 
@@ -117,15 +204,35 @@ public class MessageTouserAssoc {
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
-		if (toMessageId == null) {
-			if (other.toMessageId != null)
+		if (isArchived == null) {
+			if (other.isArchived != null)
 				return false;
-		} else if (!toMessageId.equals(other.toMessageId))
+		} else if (!isArchived.equals(other.isArchived))
 			return false;
-		if (toUserId == null) {
-			if (other.toUserId != null)
+		if (isDeleted == null) {
+			if (other.isDeleted != null)
 				return false;
-		} else if (!toUserId.equals(other.toUserId))
+		} else if (!isDeleted.equals(other.isDeleted))
+			return false;
+		if (isRead == null) {
+			if (other.isRead != null)
+				return false;
+		} else if (!isRead.equals(other.isRead))
+			return false;
+		if (messages == null) {
+			if (other.messages != null)
+				return false;
+		} else if (!messages.equals(other.messages))
+			return false;
+		if (user == null) {
+			if (other.user != null)
+				return false;
+		} else if (!user.equals(other.user))
+			return false;
+		if (toClinic == null) {
+			if (other.toClinic != null)
+				return false;
+		} else if (!toClinic.equals(other.toClinic))
 			return false;
 		return true;
 	}
@@ -136,8 +243,18 @@ public class MessageTouserAssoc {
 	 */
 	@Override
 	public String toString() {
-		return "MessageTouserAssoc [id=" + id + ", toUserId=" + toUserId + ", toMessageId=" + toMessageId + "]";
+		return "MessageTouserAssoc [id=" + id + ", user=" + user + ", messages=" + messages + ", isArchived="
+				+ isArchived + ", isRead=" + isRead + ", isDeleted=" + isDeleted + ", toClinic=" + toClinic + "]";
 	}
+
+
+	
+	
+
+
+
+
+
 
 
 	

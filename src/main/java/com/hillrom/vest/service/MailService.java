@@ -198,6 +198,22 @@ public class MailService {
        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
     
+    public void sendMessageNotificationToUser(User user, String messageSubject){
+        log.debug("Sending notification of inbox message to '{}'", user.getEmail());
+        
+        userNameFormatting(user);        
+        Context context = new Context();
+        context.setVariable("user", user.getFirstName());
+        context.setVariable("messageSubject", messageSubject);
+        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now(), "MMM dd,yyyy"));        
+        String content = "";
+        String subject = "";
+ 	   	content = templateEngine.process("messageNotification", context);
+        subject = messageSource.getMessage("email.messagenotification.title", null, null);
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);         
+     }
+    
+    
     public void sendJobFailureNotification(String jobName,String stackTrace){
     	String recipients = env.getProperty("mail.to");
         log.debug("Sending password reset e-mail to '{}'", recipients);

@@ -75,7 +75,7 @@ public class AdherenceTrendVO implements Serializable{
 	@Override
 	public String toString() {
 		return "AdherenceTrendVO [updatedScore=" + updatedScore + ", date=" + date + ", notificationPoints="
-				+ notificationPoints + ", prevNotificationDetails=" + prevNotificationDetails + "]";
+				+ notificationPoints + ", prevNotificationDetails=" + prevNotificationDetails + ", scoreReset=" + scoreReset + "]";
 	}	
 	
 	

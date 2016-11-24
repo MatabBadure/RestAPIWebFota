@@ -1,5 +1,6 @@
 package com.hillrom.vest.domain;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -33,8 +34,10 @@ public class Messages {
     @Column(name = "message_datetime")
     private DateTime messageDatetime;
 
-	@Column(name="from_user_id")
-	private Long fromUserId;
+	@ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @JoinColumn(name = "from_user_id")
+	@JsonIgnore
+	private User user;
 	
 	@Column(name="message_subject")
 	private String messageSubject;
@@ -56,7 +59,10 @@ public class Messages {
 	@Column(name="message_text")
 	private String messageText;
 
-	
+	@ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @JoinColumn(name = "from_clinic_id")
+	@JsonIgnore
+	private Clinic fromClinic;	
 
 
 
@@ -88,18 +94,20 @@ public class Messages {
 		this.messageDatetime = messageDatetime;
 	}
 
+
+
 	/**
-	 * @return the fromUserId
+	 * @return the user
 	 */
-	public Long getFromUserId() {
-		return fromUserId;
+	public User getUser() {
+		return user;
 	}
 
 	/**
-	 * @param fromUserId the fromUserId to set
+	 * @param user the user to set
 	 */
-	public void setFromUserId(Long fromUserId) {
-		this.fromUserId = fromUserId;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	/**
@@ -185,6 +193,20 @@ public class Messages {
 	public void setMessageText(String messageText) {
 		this.messageText = messageText;
 	}
+	
+	/**
+	 * @return the messageText
+	 */
+	public Clinic getFromClinic() {
+		return fromClinic;
+	}
+
+	/**
+	 * @param messageText the messageText to set
+	 */
+	public void setFromClinic(Clinic fromClinic) {
+		this.fromClinic = fromClinic;
+	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -193,7 +215,6 @@ public class Messages {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((fromUserId == null) ? 0 : fromUserId.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((messageDatetime == null) ? 0 : messageDatetime.hashCode());
 		result = prime * result + ((messageSizeMBs == null) ? 0 : messageSizeMBs.hashCode());
@@ -202,6 +223,8 @@ public class Messages {
 		result = prime * result + ((messageType == null) ? 0 : messageType.hashCode());
 		result = prime * result + ((rootMessageId == null) ? 0 : rootMessageId.hashCode());
 		result = prime * result + ((toMessageId == null) ? 0 : toMessageId.hashCode());
+		result = prime * result + ((fromClinic == null) ? 0 : fromClinic.hashCode());
+		result = prime * result + ((user == null) ? 0 : user.hashCode());
 		return result;
 	}
 
@@ -217,11 +240,6 @@ public class Messages {
 		if (getClass() != obj.getClass())
 			return false;
 		Messages other = (Messages) obj;
-		if (fromUserId == null) {
-			if (other.fromUserId != null)
-				return false;
-		} else if (!fromUserId.equals(other.fromUserId))
-			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -247,6 +265,11 @@ public class Messages {
 				return false;
 		} else if (!messageText.equals(other.messageText))
 			return false;
+		if (fromClinic == null) {
+			if (other.fromClinic != null)
+				return false;
+		} else if (!fromClinic.equals(other.fromClinic))
+			return false;
 		if (messageType == null) {
 			if (other.messageType != null)
 				return false;
@@ -262,6 +285,11 @@ public class Messages {
 				return false;
 		} else if (!toMessageId.equals(other.toMessageId))
 			return false;
+		if (user == null) {
+			if (other.user != null)
+				return false;
+		} else if (!user.equals(other.user))
+			return false;
 		return true;
 	}
 
@@ -270,12 +298,14 @@ public class Messages {
 	 */
 	@Override
 	public String toString() {
-		return "Message [id=" + id + ", messageDatetime=" + messageDatetime + ", fromUserId=" + fromUserId
-				+ ", messageSubject=" + messageSubject + ", messageSizeMBs=" + messageSizeMBs + ", messageType="
-				+ messageType + ", toMessageId=" + toMessageId + ", rootMessageId=" + rootMessageId + ", messageText="
-				+ messageText + "]";
+		return "Messages [id=" + id + ", messageDatetime=" + messageDatetime + ", user=" + user + ", messageSubject="
+				+ messageSubject + ", messageSizeMBs=" + messageSizeMBs + ", messageType=" + messageType
+				+ ", toMessageId=" + toMessageId + ", rootMessageId=" + rootMessageId + ", messageText=" + messageText + ", fromClinic=" + fromClinic
+				+ "]";
 	}
 
+
+	
 
 	
 }

@@ -42,8 +42,8 @@ public interface MessageTouserAssocRepository extends
 	@Query("Select messageTouserAssoc.id, messageTouserAssoc.isArchived, messageTouserAssoc.isRead, messageTouserAssoc.messages.id, messageTouserAssoc.messages.messageDatetime, "
 				+ "messageTouserAssoc.messages.messageSubject, messageTouserAssoc.messages.messageSizeMBs, messageTouserAssoc.messages.messageType,"
 				+ "messageTouserAssoc.messages.user.lastName, messageTouserAssoc.messages.user.firstName "
-				+ "from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.toClinic.id = ?1 and messageTouserAssoc.isArchived = ?2")
-	Page<Object> findByClinicId(String clinicId, boolean isArchived, Pageable pageable);
+				+ "from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.user.id = ?1 and messageTouserAssoc.toClinic.id = ?2 and messageTouserAssoc.isArchived = ?3")
+	Page<Object> findByClinicId(Long userId, String clinicId, boolean isArchived, Pageable pageable);
 	
 	// To get the list of messages sent to clinic from patients
 	@Query("Select messageTouserAssoc.id, messageTouserAssoc.messages.messageDatetime, messageTouserAssoc.messages.id, "

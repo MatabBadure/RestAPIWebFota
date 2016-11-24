@@ -177,15 +177,22 @@ public class MessagingService {
 		return messageList;
 	}
 	
-	public Page<Object> getReceivedMessagesForMailbox(boolean isClinic, String toId, String mailBoxType, Pageable pageable) throws HillromException{
+	public Page<Object> getReceivedMessagesForMailbox(boolean isClinic, String clinicId, Long toUserId, String mailBoxType, Pageable pageable) throws HillromException{
 		
 		boolean isArchived = Boolean.TRUE;
 		if(Objects.nonNull(mailBoxType) && mailBoxType.equalsIgnoreCase("Inbox")){
 			isArchived = Boolean.FALSE;
 		}
 		
+		Page<Object> messageTouserAssocList = null;
+		
 		// Check for the clinic flag to differentiate between whether the clinic id is passed or patient id is passed
-		Page<Object> messageTouserAssocList  = isClinic ? messageTouserAssocRepository.findByClinicId(toId, isArchived, pageable) : messageTouserAssocRepository.findByUserId(Long.parseLong(toId), isArchived, pageable);
+		if(isClinic && !clinicId.isEmpty()){
+			messageTouserAssocList = messageTouserAssocRepository.findByClinicId(toUserId, clinicId, isArchived, pageable);
+		}else{
+			messageTouserAssocList = messageTouserAssocRepository.findByUserId(toUserId, isArchived, pageable);
+		}
+		
 		return messageTouserAssocList;
 	}
 	

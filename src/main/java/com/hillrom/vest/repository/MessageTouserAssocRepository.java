@@ -36,6 +36,9 @@ public interface MessageTouserAssocRepository extends
 	@Query("from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.user.id = ?1 and messageTouserAssoc.messages.id = ?2 order by messageTouserAssoc.messages.id desc")
     MessageTouserAssoc findByUserIdAndMessageId(Long userId, Long messageId);
 	
+	@Query("from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.user.id = ?1 and messageTouserAssoc.messages.id = ?2 and messageTouserAssoc.toClinic.id = ?3 order by messageTouserAssoc.messages.id desc")
+    MessageTouserAssoc findByUserIdAndMessageIdAndClinicId(Long userId, Long messageId, String clinicId);
+	
 	// To get the list of messages from clinic to patients
 	@Query("Select messageTouserAssoc.id, messageTouserAssoc.isArchived, messageTouserAssoc.isRead, messageTouserAssoc.messages.id, messageTouserAssoc.messages.messageDatetime, "
 				+ "messageTouserAssoc.messages.messageSubject, messageTouserAssoc.messages.messageSizeMBs, messageTouserAssoc.messages.messageType,"

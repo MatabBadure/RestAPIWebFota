@@ -17,6 +17,8 @@ public class MessageToUserAssoDTO {
     private boolean archived;
     
     private boolean read;
+    
+    private String clinicId;
 
 
 	public MessageToUserAssoDTO() {
@@ -119,6 +121,23 @@ public class MessageToUserAssoDTO {
 	}
 
 
+	/**
+	 * @return the userId
+	 */
+	public String getClinicId() {
+		return clinicId;
+	}
+
+
+
+
+
+	/**
+	 * @param userId the userId to set
+	 */
+	public void setClinicId(String clinicId) {
+		this.clinicId = clinicId;
+	}
 
 
 
@@ -133,6 +152,7 @@ public class MessageToUserAssoDTO {
 		result = prime * result + ((messageId == null) ? 0 : messageId.hashCode());
 		result = prime * result + (read ? 1231 : 1237);
 		result = prime * result + ((userId == null) ? 0 : userId.hashCode());
+		result = prime * result + ((clinicId == null) ? 0 : clinicId.hashCode());
 		return result;
 	}
 
@@ -166,6 +186,11 @@ public class MessageToUserAssoDTO {
 				return false;
 		} else if (!userId.equals(other.userId))
 			return false;
+		if (clinicId == null) {
+			if (other.clinicId != null)
+				return false;
+		} else if (!clinicId.equals(other.clinicId))
+			return false;
 		return true;
 	}
 
@@ -179,7 +204,7 @@ public class MessageToUserAssoDTO {
 	@Override
 	public String toString() {
 		return "MessageToUserAssoDTO [userId=" + userId + ", messageId=" + messageId + ", archived=" + archived
-				+ ", read=" + read + "]";
+				+ ", read=" + read + ", clinicId=" + clinicId +  "]";
 	}
 
 

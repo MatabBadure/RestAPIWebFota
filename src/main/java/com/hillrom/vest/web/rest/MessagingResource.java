@@ -240,8 +240,8 @@ public class MessagingResource {
 	/**
      * GET  /messagesReceivedDetails/{toUserId}/{rootMessageId} -> Get All Received Message Threads for user mailbox.
      */
-	@RequestMapping(value="/messagesReceivedDetails/{toUserId}/{rootMessageId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getMessagesReceivedDetailsForInbox(@PathVariable("toUserId") String toUserId,
+	@RequestMapping(value="/messagesReceivedThreads/{toUserId}/{rootMessageId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getMessagesReceivedThreadsForInbox(@PathVariable("toUserId") Long toUserId,
 			@RequestParam(value = "clinicId" , required = false) String clinicId,
 			@PathVariable("rootMessageId") Long rootMessageId,
 			@RequestParam(value = "isClinic" , required = true) boolean isClinic,

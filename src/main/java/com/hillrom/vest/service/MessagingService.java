@@ -224,14 +224,21 @@ public class MessagingService {
 		return returnMessageTouserAssocList;
 	}
 	
-	public List<Object> findByUserIdThreads(boolean isClinic, String toId,String clinicId, Long rootMessageId,String mailBoxType) throws HillromException{
+	public List<Object> findByUserIdThreads(boolean isClinic, Long toUserId,String clinicId, Long rootMessageId,String mailBoxType) throws HillromException{
 		boolean isArchived = Boolean.TRUE;
 		if(Objects.nonNull(mailBoxType) && mailBoxType.equalsIgnoreCase("Inbox")){
 			isArchived = Boolean.FALSE;
 		}
 		
+		List<Object> messageTouserAssocList = null;
+		
 		// Check for the clinic flag to differentiate between whether the clinic id is passed or patient id is passed
-		List<Object> messageTouserAssocList  = isClinic ? messageTouserAssocRepository.findByClinicIdThreads(clinicId, isArchived,rootMessageId) : messageTouserAssocRepository.findByUserIdThreads(Long.parseLong(toId), isArchived,rootMessageId);
+		if(isClinic && !clinicId.isEmpty()){
+			messageTouserAssocList = messageTouserAssocRepository.findByClinicIdThreads(toUserId, clinicId, isArchived, rootMessageId);
+		}else{
+			messageTouserAssocList = messageTouserAssocRepository.findByUserIdThreads(toUserId, isArchived, rootMessageId);
+		}
+		
 		return messageTouserAssocList;
 	}
 	

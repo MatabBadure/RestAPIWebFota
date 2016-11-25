@@ -160,9 +160,9 @@ public class MessagingService {
 		return messageList;
 	}
 	
-	public List<Object> findReadCountByUserId(Long fromUserId) throws HillromException{
+	public List<Object> findReadCountByUserId(Long fromUserId, boolean isClinic, String clinicId) throws HillromException{
 		List<Object> messageList = null;
-		messageList = messageTouserAssocRepository.findReadCountByUserId(fromUserId);
+		messageList = (isClinic && !clinicId.isEmpty()) ? messageTouserAssocRepository.findReadCountByUserIdAndClinicId(fromUserId,clinicId) : messageTouserAssocRepository.findReadCountByUserId(fromUserId);
 		return messageList;
 	}
 	

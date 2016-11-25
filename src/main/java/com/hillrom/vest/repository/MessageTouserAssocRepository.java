@@ -27,6 +27,11 @@ public interface MessageTouserAssocRepository extends
 	// To get the count of read & unread messages
 	@Query("SELECT messageTouserAssoc.isRead,count(*) from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.user.id = ?1 and messageTouserAssoc.isArchived = false group by messageTouserAssoc.isRead")
     List<Object> findReadCountByUserId(Long userId);
+		
+	// To get the count of read & unread messages
+	@Query("SELECT messageTouserAssoc.isRead,count(*) from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.user.id = ?1 and messageTouserAssoc.toClinic.id = ?2 and messageTouserAssoc.isArchived = false group by messageTouserAssoc.isRead")
+    List<Object> findReadCountByUserIdAndClinicId(Long userId, String fromClinicId);
+	
 	
 	@Query("from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.user.id = ?1 and messageTouserAssoc.messages.id = ?2 order by messageTouserAssoc.messages.id desc")
     MessageTouserAssoc findByUserIdAndMessageId(Long userId, Long messageId);

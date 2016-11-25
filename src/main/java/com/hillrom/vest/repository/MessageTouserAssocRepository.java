@@ -64,19 +64,18 @@ public interface MessageTouserAssocRepository extends
 				+ "from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.messages.user.id = ?1 and messageTouserAssoc.messages.fromClinic.id = ?2")
 	Page<Object> findByClinicIdSent(Long userId, String clinicId, Pageable pageable);
 	
-	// To get the list of messages from clinic to patients
+	// To get the list of messages from clinic to patients by Thread
 	@Query("Select messageTouserAssoc.id, messageTouserAssoc.isArchived, messageTouserAssoc.isRead, messageTouserAssoc.messages.id, messageTouserAssoc.messages.messageDatetime, "
-				+ "messageTouserAssoc.messages.messageSubject, messageTouserAssoc.messages.messageSizeMBs, messageTouserAssoc.messages.messageType,"
-				+ "messageTouserAssoc.messages.toMessageId, messageTouserAssoc.messages.rootMessageId, messageTouserAssoc.messages.messageText,"				
+				+ "messageTouserAssoc.messages.messageSubject, messageTouserAssoc.messages.messageSizeMBs, messageTouserAssoc.messages.messageType,messageTouserAssoc.messages.messageText,"
 				+ "messageTouserAssoc.messages.fromClinic.name, messageTouserAssoc.messages.user.lastName, messageTouserAssoc.messages.user.firstName "
 				+ "from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.user.id = ?1 and messageTouserAssoc.isArchived = ?2 and messageTouserAssoc.messages.rootMessageId = ?3")
-	List<Object> findByUserIdThreads(Long userId, boolean isArchived,Long rootMessageId);
+	List<Object> findByUserIdThreads(Long userId, boolean isArchived, Long rootMessageId);
 		
-	// To get the list of messages from patient to clinic
+	// To get the list of messages from patient to clinic by Thread
 	@Query("Select messageTouserAssoc.id, messageTouserAssoc.isArchived, messageTouserAssoc.isRead, messageTouserAssoc.messages.id, messageTouserAssoc.messages.messageDatetime, "
-				+ "messageTouserAssoc.messages.messageSubject, messageTouserAssoc.messages.messageSizeMBs, messageTouserAssoc.messages.messageType,"
-				+ "messageTouserAssoc.messages.toMessageId, messageTouserAssoc.messages.rootMessageId, messageTouserAssoc.messages.messageText,"			
+				+ "messageTouserAssoc.messages.messageSubject, messageTouserAssoc.messages.messageSizeMBs, messageTouserAssoc.messages.messageType,messageTouserAssoc.messages.messageText,"
 				+ "messageTouserAssoc.messages.user.lastName, messageTouserAssoc.messages.user.firstName "
-				+ "from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.toClinic.id = ?1 and messageTouserAssoc.isArchived = ?2 and messageTouserAssoc.messages.rootMessageId = ?3")
-	List<Object> findByClinicIdThreads(String clinicId, boolean isArchived,Long rootMessageId);
+				+ "from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.user.id = ?1 and messageTouserAssoc.toClinic.id = ?2 and messageTouserAssoc.isArchived = ?3 and "
+				+ "messageTouserAssoc.messages.rootMessageId = ?4")
+	List<Object> findByClinicIdThreads(Long userId, String clinicId, boolean isArchived, Long rootMessageId);
 }

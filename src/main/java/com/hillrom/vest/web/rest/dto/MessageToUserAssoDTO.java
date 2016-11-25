@@ -18,7 +18,8 @@ public class MessageToUserAssoDTO {
     
     private boolean read;
 
-
+    private String clinicId;
+    
 	public MessageToUserAssoDTO() {
 		super();
 	}
@@ -120,6 +121,24 @@ public class MessageToUserAssoDTO {
 
 
 
+	/**
+	 * @return the clinicId
+	 */
+	public String getClinicId() {
+		return clinicId;
+	}
+
+
+
+
+
+	/**
+	 * @param clinicId the clinicId to set
+	 */
+	public void setClinicId(String clinicId) {
+		this.clinicId = clinicId;
+	}
+	
 
 
 	/* (non-Javadoc)
@@ -133,6 +152,7 @@ public class MessageToUserAssoDTO {
 		result = prime * result + ((messageId == null) ? 0 : messageId.hashCode());
 		result = prime * result + (read ? 1231 : 1237);
 		result = prime * result + ((userId == null) ? 0 : userId.hashCode());
+		result = prime * result + ((clinicId == null) ? 0 : clinicId.hashCode());
 		return result;
 	}
 
@@ -165,6 +185,11 @@ public class MessageToUserAssoDTO {
 			if (other.userId != null)
 				return false;
 		} else if (!userId.equals(other.userId))
+			return false;
+		if (clinicId == null) {
+			if (other.clinicId != null)
+				return false;
+		} else if (!clinicId.equals(other.clinicId))
 			return false;
 		return true;
 	}

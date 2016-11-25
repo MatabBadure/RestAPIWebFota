@@ -141,13 +141,14 @@ public class MessagingResource {
      * GET  /messages/{fromUserId}/readunredCount -> Get count of read-unread messages.
      */
 	@RequestMapping(value="/messages/{fromUserId}/readunredCount",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getReadUnreadCountByUserId(@PathVariable("fromUserId") Long fromUserId){
-
+	public ResponseEntity<?> getReadUnreadCountByUserId(@PathVariable("fromUserId") Long fromUserId,
+			@RequestParam(value = "isClinic" , required = true) boolean isClinic,
+			@RequestParam(value = "clinicId" , required = false) String clinicId){
 	   	 
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-			List<Object> messageList = messagingService.findReadCountByUserId(fromUserId);
+			List<Object> messageList = messagingService.findReadCountByUserId(fromUserId, isClinic, clinicId);
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}

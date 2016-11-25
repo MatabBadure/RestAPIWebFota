@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.validation.constraints.Size;
+//start: HILL-2004
+import org.joda.time.DateTime;
+//end: HILL-2004
 
 public class ClinicDTO {
 	
@@ -48,6 +51,11 @@ public class ClinicDTO {
 	
 	private Boolean deleted;
 	
+	//start: HILL-2004
+    private DateTime modifiedDate;
+	//end: HILL-2004
+    
+	
 	@Size(max = 50)
     private Integer adherenceSetting;
 
@@ -77,6 +85,9 @@ public class ClinicDTO {
 		this.deleted = deleted;
 		this.hillromId = hillromId;
 		this.adherenceSetting = adherenceSetting;
+		//start: HILL-2004
+		this.modifiedDate = modifiedDate;
+		//end: HILL-2004
 	}
 
 
@@ -207,4 +218,13 @@ public class ClinicDTO {
 	public void setAdherenceSetting(Integer adherenceSetting) {
 		this.adherenceSetting = adherenceSetting;
 	}
+	//start: HILL-2004
+		public DateTime getModifiedDate() {
+			return modifiedDate;
+		}
+
+		public void setModifiedDate(DateTime modifiedDate) {
+			this.modifiedDate = modifiedDate;
+		}
+	//end: HILL-2004
 }

@@ -84,6 +84,12 @@ public class Clinic implements Serializable {
     @Column(name = "adherence_setting")
     private Integer adherenceSetting;
     
+    //start: HILL-2004
+  	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+  	@Column(name="modified_date")
+     private DateTime modifiedDate;
+  	//end: HILL-2004
+  	
     @NotAudited
     @ManyToOne
     @JoinColumn(name="parent_clinic_id")
@@ -282,6 +288,16 @@ public class Clinic implements Serializable {
 		return result;
 	}
 
+    //start: HILL-2004
+    public DateTime getModifiedDate() {
+		return modifiedDate;
+	}
+
+	public void setModifiedDate(DateTime modifiedDate) {
+		this.modifiedDate = modifiedDate;
+	}
+	//end: HILL-2004
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -317,6 +333,9 @@ public class Clinic implements Serializable {
                 ", deleted='" + deleted + "'" +
                 ", isParent='" + parent + "'" +
                 ", adherenceSetting='" + adherenceSetting + "'" +
+                //start: HILL-2004
+                ", modifiedDate='" + modifiedDate + "'" +
+                //end: HILL-2004
                 '}';
     }
 }

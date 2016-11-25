@@ -163,6 +163,8 @@ public class ClinicPatientService {
 		}
 	}
 	
+	//start:HILL-2004
+	/*
 	public Clinic getAssociatedClinic(PatientInfo patientInfo) {
 		List<Clinic> clinics = new LinkedList<>();
 		for(ClinicPatientAssoc clinicPatientAssoc : patientInfo.getClinicPatientAssoc()){
@@ -173,4 +175,25 @@ public class ClinicPatientService {
 		else
 			return clinics.get(0);		
 	}
+	*/
+	 
+	public Clinic getAssociatedClinic(PatientInfo patientInfo) {
+		List<Clinic> clinics = new LinkedList<>();
+		List<String> clinicIdsList = new LinkedList<>();
+		
+		for(ClinicPatientAssoc clinicPatientAssoc : patientInfo.getClinicPatientAssoc()){ 
+			
+			clinicIdsList.add(clinicPatientAssoc.getClinic().getId());
+		}
+	
+		clinics = clinicRepository.findPatientLastModifiedAdherenceSetting(clinicIdsList);
+		
+		if(Objects.isNull(clinics))
+			return null; 
+		else
+			return clinics.get(0);		
+	}
+	//end:HILL-2004
+	
+	
 }

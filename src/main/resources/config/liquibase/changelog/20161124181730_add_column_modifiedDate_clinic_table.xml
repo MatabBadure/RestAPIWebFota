@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+	
+	<!-- Added new field modified_date to clinic table. -->
+	<changeSet author="LnT Technology Services" id="20161124181730">
+
+		<addColumn tableName="CLINIC">
+        	<column name="modified_date" type="timestamp"/>
+        </addColumn>
+		
+	</changeSet>
+</databaseChangeLog>

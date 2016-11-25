@@ -44,6 +44,10 @@ public class ClinicVO implements Serializable {
     
     private Integer adherenceSetting;
 
+    //start: HILL-2004
+    private DateTime modifiedDate;
+    //end: HILL-2004
+    
     @JsonIgnore
     private List<ClinicVO> childClinicVOs = new LinkedList<>();
 
@@ -67,6 +71,9 @@ public class ClinicVO implements Serializable {
 		this.deleted = deleted;
 		this.createdAt = createdAt;
 		this.adherenceSetting = adherenceSetting;
+		//start: HILL-2004
+		this.modifiedDate = modifiedDate;
+		//end: HILL-2004
 	}
     
     public String getId() {
@@ -212,5 +219,15 @@ public class ClinicVO implements Serializable {
 	public void setAdherenceSetting(Integer adherenceSetting) {
         this.adherenceSetting = adherenceSetting;
     }
+	
+	//start: HILL-2004
+    public DateTime getModifiedDate() {
+		return modifiedDate;
+	}
+
+	public void setModifiedDate(DateTime modifiedDate) {
+		this.modifiedDate = modifiedDate;
+	}
+   //end: HILL-2004
 	
 }

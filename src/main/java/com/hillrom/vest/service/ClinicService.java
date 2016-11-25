@@ -205,6 +205,10 @@ public class ClinicService {
 			clinic.setDeleted(clinicDTO.getDeleted());
 		if (clinicDTO.getAdherenceSetting() != null)
 			clinic.setAdherenceSetting(clinicDTO.getAdherenceSetting());
+		//start: HILL-2004
+		if (clinicDTO.getModifiedDate() != null)
+		    clinic.setModifiedDate(clinicDTO.getModifiedDate());
+		//end: HILL-2004
 	}
 
 	public Set<UserExtension> getHCPUsers(List<String> idList) throws HillromException, EntityNotFoundException {

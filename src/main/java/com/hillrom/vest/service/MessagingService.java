@@ -160,9 +160,9 @@ public class MessagingService {
 		return messageList;
 	}
 	
-	public List<Object> findReadCountByUserId(Long fromUserId) throws HillromException{
+	public List<Object> findReadCountByUserId(Long fromUserId, boolean isClinic, String clinicId) throws HillromException{
 		List<Object> messageList = null;
-		messageList = messageTouserAssocRepository.findReadCountByUserId(fromUserId);
+		messageList = (isClinic && !clinicId.isEmpty()) ? messageTouserAssocRepository.findReadCountByUserIdAndClinicId(fromUserId,clinicId) : messageTouserAssocRepository.findReadCountByUserId(fromUserId);
 		return messageList;
 	}
 	
@@ -177,15 +177,22 @@ public class MessagingService {
 		return messageList;
 	}
 	
-	public Page<Object> getReceivedMessagesForMailbox(boolean isClinic, String toId, String mailBoxType, Pageable pageable) throws HillromException{
+	public Page<Object> getReceivedMessagesForMailbox(boolean isClinic, String clinicId, Long toUserId, String mailBoxType, Pageable pageable) throws HillromException{
 		
 		boolean isArchived = Boolean.TRUE;
 		if(Objects.nonNull(mailBoxType) && mailBoxType.equalsIgnoreCase("Inbox")){
 			isArchived = Boolean.FALSE;
 		}
 		
+		Page<Object> messageTouserAssocList = null;
+		
 		// Check for the clinic flag to differentiate between whether the clinic id is passed or patient id is passed
-		Page<Object> messageTouserAssocList  = isClinic ? messageTouserAssocRepository.findByClinicId(toId, isArchived, pageable) : messageTouserAssocRepository.findByUserId(Long.parseLong(toId), isArchived, pageable);
+		if(isClinic && !clinicId.isEmpty()){
+			messageTouserAssocList = messageTouserAssocRepository.findByClinicId(toUserId, clinicId, isArchived, pageable);
+		}else{
+			messageTouserAssocList = messageTouserAssocRepository.findByUserId(toUserId, isArchived, pageable);
+		}
+		
 		return messageTouserAssocList;
 	}
 	
@@ -209,7 +216,15 @@ public class MessagingService {
 		
 		 for(MessageToUserAssoDTO msgToUsrAsscList : messageToUserReadUnreadList)
 		 {
-			MessageTouserAssoc messageTouserAssoc = messageTouserAssocRepository.findByUserIdAndMessageId(msgToUsrAsscList.getUserId(),msgToUsrAsscList.getMessageId());
+			String clinicId = msgToUsrAsscList.getClinicId();
+			MessageTouserAssoc messageTouserAssoc;
+			
+			// For HCP or CA, clinic id should be passed
+			if(Objects.nonNull(clinicId) && !clinicId.isEmpty()){
+				messageTouserAssoc = messageTouserAssocRepository.findByUserIdAndMessageIdAndClinicId(msgToUsrAsscList.getUserId(), msgToUsrAsscList.getMessageId(), clinicId);
+			}else{
+				messageTouserAssoc = messageTouserAssocRepository.findByUserIdAndMessageId(msgToUsrAsscList.getUserId(),msgToUsrAsscList.getMessageId());
+			}
 			
 			messageTouserAssoc.setIsRead(msgToUsrAsscList.isRead()?Boolean.TRUE:Boolean.FALSE);
 			returnMessageTouserAssocList.add(messageTouserAssoc);
@@ -217,14 +232,21 @@ public class MessagingService {
 		return returnMessageTouserAssocList;
 	}
 	
-	public List<Object> findByUserIdThreads(boolean isClinic, String toId,Long rootMessageId,String mailBoxType) throws HillromException{
+	public List<Object> findByUserIdThreads(boolean isClinic, Long toUserId,String clinicId, Long rootMessageId,String mailBoxType) throws HillromException{
 		boolean isArchived = Boolean.TRUE;
 		if(Objects.nonNull(mailBoxType) && mailBoxType.equalsIgnoreCase("Inbox")){
 			isArchived = Boolean.FALSE;
 		}
 		
+		List<Object> messageTouserAssocList = null;
+		
 		// Check for the clinic flag to differentiate between whether the clinic id is passed or patient id is passed
-		List<Object> messageTouserAssocList  = isClinic ? messageTouserAssocRepository.findByClinicIdThreads(toId, isArchived,rootMessageId) : messageTouserAssocRepository.findByUserIdThreads(Long.parseLong(toId), isArchived,rootMessageId);
+		if(isClinic && !clinicId.isEmpty()){
+			messageTouserAssocList = messageTouserAssocRepository.findByClinicIdThreads(toUserId, clinicId, isArchived, rootMessageId);
+		}else{
+			messageTouserAssocList = messageTouserAssocRepository.findByUserIdThreads(toUserId, isArchived, rootMessageId);
+		}
+		
 		return messageTouserAssocList;
 	}
 	

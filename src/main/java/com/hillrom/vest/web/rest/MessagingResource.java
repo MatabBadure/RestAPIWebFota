@@ -141,13 +141,14 @@ public class MessagingResource {
      * GET  /messages/{fromUserId}/readunredCount -> Get count of read-unread messages.
      */
 	@RequestMapping(value="/messages/{fromUserId}/readunredCount",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getReadUnreadCountByUserId(@PathVariable("fromUserId") Long fromUserId){
-
+	public ResponseEntity<?> getReadUnreadCountByUserId(@PathVariable("fromUserId") Long fromUserId,
+			@RequestParam(value = "isClinic" , required = true) boolean isClinic,
+			@RequestParam(value = "clinicId" , required = false) String clinicId){
 	   	 
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-			List<Object> messageList = messagingService.findReadCountByUserId(fromUserId);
+			List<Object> messageList = messagingService.findReadCountByUserId(fromUserId, isClinic, clinicId);
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}
@@ -162,9 +163,10 @@ public class MessagingResource {
 	/**
      * GET  /messages/{toUserId} -> Get All Received Messages for user mailbox.
      */
-	@RequestMapping(value="/messagesReceived/{toId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getMessagesReceivedForInbox(@PathVariable("toId") String toId,
+	@RequestMapping(value="/messagesReceived/{toUserId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getMessagesReceivedForInbox(@PathVariable("toUserId") Long toUserId,
 			@RequestParam(value = "isClinic" , required = true) boolean isClinic,
+			@RequestParam(value = "clinicId" , required = false) String clinicId,
 			@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
             @RequestParam(value = "sort_by", required = false) String sortBy,
@@ -181,7 +183,7 @@ public class MessagingResource {
 		
 		try{
 			//Page<JSONObject> messageList = messagingService.getReceivedMessagesForMailbox(toUserId,new PageRequest(offset, limit));
-			Page<Object> messageList = messagingService.getReceivedMessagesForMailbox(isClinic, toId, mailBoxType, PaginationUtil.generatePageRequest(offset, limit, sortOrder));
+			Page<Object> messageList = messagingService.getReceivedMessagesForMailbox(isClinic, clinicId, toUserId, mailBoxType, PaginationUtil.generatePageRequest(offset, limit, sortOrder));
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}
@@ -239,8 +241,9 @@ public class MessagingResource {
 	/**
      * GET  /messagesReceivedDetails/{toUserId}/{rootMessageId} -> Get All Received Message Threads for user mailbox.
      */
-	@RequestMapping(value="/messagesReceivedDetails/{toUserId}/{rootMessageId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getMessagesReceivedDetailsForInbox(@PathVariable("toUserId") String toUserId,
+	@RequestMapping(value="/messagesReceivedThreads/{toUserId}/{rootMessageId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getMessagesReceivedThreadsForInbox(@PathVariable("toUserId") Long toUserId,
+			@RequestParam(value = "clinicId" , required = false) String clinicId,
 			@PathVariable("rootMessageId") Long rootMessageId,
 			@RequestParam(value = "isClinic" , required = true) boolean isClinic,
             @RequestParam(value = "mailBoxType",required = true) String mailBoxType){
@@ -250,7 +253,7 @@ public class MessagingResource {
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-			List<Object> messageList = messagingService.findByUserIdThreads(isClinic, toUserId, rootMessageId, mailBoxType);
+			List<Object> messageList = messagingService.findByUserIdThreads(isClinic, toUserId,clinicId, rootMessageId, mailBoxType);
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}

@@ -41,6 +41,9 @@ import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.util.ClinicVOBuilder;
 
+//start: HILL-2004
+import com.hillrom.vest.service.util.DateUtil;
+//end: HILL-2004
 
 /**
  * Service class for managing users.
@@ -205,6 +208,13 @@ public class ClinicService {
 			clinic.setDeleted(clinicDTO.getDeleted());
 		if (clinicDTO.getAdherenceSetting() != null)
 			clinic.setAdherenceSetting(clinicDTO.getAdherenceSetting());
+		//start: HILL-2004
+		if (clinicDTO.getAdherenceSettingFlag() != null && clinicDTO.getAdherenceSettingFlag().equals(Boolean.TRUE))
+		{
+		   clinic.setAdherenceSettingModifiedDte(DateUtil.getCurrentDateAndTime());
+		}
+		//end: HILL-2004
+				
 	}
 
 	public Set<UserExtension> getHCPUsers(List<String> idList) throws HillromException, EntityNotFoundException {

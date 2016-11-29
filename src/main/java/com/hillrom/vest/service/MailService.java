@@ -198,14 +198,30 @@ public class MailService {
        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
     
-    public void sendMessageNotificationToUser(User user, String messageSubject){
+    public void sendMessageNotificationToUser(User user, String messageSubject, int patOrCaOrHcp){
         log.debug("Sending notification of inbox message to '{}'", user.getEmail());
         
-        userNameFormatting(user);        
+        String messageURLStr = "";
+        switch(patOrCaOrHcp){
+        case 1 : 
+        	messageURLStr = "patient/messages";
+        	break;
+        case 2:
+        	messageURLStr = "clinicadmin/messages_CA";
+        	break;
+        case 3:
+        	messageURLStr = "hcp/messages_HCP";
+        	break;
+        default :
+        	messageURLStr = "";
+        	break;
+        }        
+        
+        userNameFormatting(user);
         Context context = new Context();
         context.setVariable("user", user.getFirstName());
-        context.setVariable("messageSubject", messageSubject);
-        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now(), "MMM dd,yyyy"));        
+        context.setVariable("baseUrl", baseUrl);
+        context.setVariable("messageURLStr", messageURLStr);
         String content = "";
         String subject = "";
  	   	content = templateEngine.process("messageNotification", context);

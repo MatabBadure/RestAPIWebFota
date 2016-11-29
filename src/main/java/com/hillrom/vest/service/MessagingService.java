@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -20,20 +21,24 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.vest.domain.EntityUserAssoc;
 import com.hillrom.vest.domain.MessageTouserAssoc;
 import com.hillrom.vest.domain.Messages;
 import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.User;
+import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
+import com.hillrom.vest.repository.EntityUserRepository;
 import com.hillrom.vest.repository.MessageTouserAssocRepository;
 import com.hillrom.vest.repository.MessagingRepository;
 import com.hillrom.vest.repository.NoteRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.MessageDTO;
@@ -67,6 +72,9 @@ public class MessagingService {
 	
 	@Inject
 	private ClinicRepository clinicRepository;
+	
+	@Inject
+    private EntityUserRepository entityUserRepository;
 	
 	public Messages saveOrUpdateMessageData(MessageDTO messageDTO) throws HillromException{
 
@@ -107,25 +115,55 @@ public class MessagingService {
 		
 		List<MessageTouserAssoc> listMessageTouserAssoc = new ArrayList<MessageTouserAssoc>();
 		
+		// For Clinic Id
 		if(toClinicIds.size() > 0){
 			
 			for(String clinicId : toClinicIds){
-				// To get the list of CA & HCP users for the Clinic id
-				List<User> caHcpUsers = clinicService.getCaHcpUsersForClinic(clinicId);
-				for(User caHcpUser : caHcpUsers){
-					MessageTouserAssoc newMessageTouserAssoc = new MessageTouserAssoc();
-					newMessageTouserAssoc.setMessages(messagingRepository.findById(newMessageId));
-					newMessageTouserAssoc.setUser(caHcpUser);					
-					newMessageTouserAssoc.setIsArchived(messageDto.isArchived());
-					newMessageTouserAssoc.setIsRead(messageDto.isRead());
-					newMessageTouserAssoc.setToClinic(clinicRepository.getOne(clinicId));					
-					messageTouserAssocRepository.save(newMessageTouserAssoc);
-					listMessageTouserAssoc.add(newMessageTouserAssoc);
-					sendMessageNotifiationToUser(caHcpUser.getId(), messageSubject);
+				
+				// To get the list of HCP users for the clinic
+				List<String> idList = new ArrayList<>();
+		        idList.add(clinicId);
+				Set<UserExtension> hcpUserList = clinicService.getHCPUsers(idList);
+				
+				// Check for HCP users available for the Clinic and add it in the list
+				if (Objects.nonNull(hcpUserList)) {								
+					for(UserExtension hcpUser : hcpUserList){						
+						MessageTouserAssoc newMessageTouserAssoc = new MessageTouserAssoc();
+						newMessageTouserAssoc.setMessages(messagingRepository.findById(newMessageId));
+						newMessageTouserAssoc.setUser(hcpUser);					
+						newMessageTouserAssoc.setIsArchived(messageDto.isArchived());
+						newMessageTouserAssoc.setIsRead(messageDto.isRead());
+						newMessageTouserAssoc.setToClinic(clinicRepository.getOne(clinicId));					
+						messageTouserAssocRepository.save(newMessageTouserAssoc);
+						listMessageTouserAssoc.add(newMessageTouserAssoc);
+						
+						// Send email notification to HCP user if the user opted - Flag 3 for HCP
+						sendMessageNotifiationToUser(hcpUser.getId(), messageSubject, 3);
+					}
+				}				
+				
+				// To get the list of CA users for the clinic
+				List<EntityUserAssoc> clinicUserList  = entityUserRepository.findByClinicIdAndUserRole(clinicId, AuthoritiesConstants.CLINIC_ADMIN);
+				
+				// Check for CA users available for the Clinic and add it in the list
+				if(Objects.nonNull(clinicUserList)){
+					for(EntityUserAssoc clinicUserAssoc : clinicUserList){
+						MessageTouserAssoc newMessageTouserAssoc = new MessageTouserAssoc();
+						newMessageTouserAssoc.setMessages(messagingRepository.findById(newMessageId));
+						newMessageTouserAssoc.setUser(clinicUserAssoc.getUser());					
+						newMessageTouserAssoc.setIsArchived(messageDto.isArchived());
+						newMessageTouserAssoc.setIsRead(messageDto.isRead());
+						newMessageTouserAssoc.setToClinic(clinicRepository.getOne(clinicId));					
+						messageTouserAssocRepository.save(newMessageTouserAssoc);
+						listMessageTouserAssoc.add(newMessageTouserAssoc);
+						
+						// Send email notification to CA user if the user opted - Flag 2 for CA
+						sendMessageNotifiationToUser(clinicUserAssoc.getUser().getId(), messageSubject, 2);
+					}
 				}
 			}
-			
 		}else if(toUserIds.size() > 0){
+			// For List of Patients
 			for(Long userId : toUserIds){
 				MessageTouserAssoc newMessageTouserAssoc = new MessageTouserAssoc();
 				newMessageTouserAssoc.setMessages(messagingRepository.findById(newMessageId));
@@ -134,7 +172,9 @@ public class MessagingService {
 				newMessageTouserAssoc.setIsRead(messageDto.isRead());
 				messageTouserAssocRepository.save(newMessageTouserAssoc);
 				listMessageTouserAssoc.add(newMessageTouserAssoc);
-				sendMessageNotifiationToUser(userId, messageSubject);
+				
+				// Send email notification to Patient user if the user opted - Flag 1 for Patient
+				sendMessageNotifiationToUser(userId, messageSubject, 1);
 			}
 		}
 		Messages newMessage =  messagingRepository.findById(newMessageId);
@@ -148,10 +188,11 @@ public class MessagingService {
 		return listMessageTouserAssoc;
 	}
 	
-	public void sendMessageNotifiationToUser(Long userId, String messageSubject) throws HillromException{	
+	public void sendMessageNotifiationToUser(Long userId, String messageSubject, int patOrCaOrHcp) throws HillromException{	
 		User user = userService.getUser(userId);
+		
 		if(user.isMessageNotification())
-			mailService.sendMessageNotificationToUser(user, messageSubject);
+			mailService.sendMessageNotificationToUser(user, messageSubject, patOrCaOrHcp);
 	}	
 
 	public List<Object> findArchivedCountByUserId(Long fromUserId) throws HillromException{

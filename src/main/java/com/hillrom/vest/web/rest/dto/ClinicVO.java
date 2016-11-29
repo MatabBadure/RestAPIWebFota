@@ -44,6 +44,12 @@ public class ClinicVO implements Serializable {
     
     private Integer adherenceSetting;
 
+    //start: HILL-2004
+    private DateTime adherenceSettingModifiedDte;
+    
+    private Boolean adherenceSettingFlag;
+    //end: HILL-2004
+    
     @JsonIgnore
     private List<ClinicVO> childClinicVOs = new LinkedList<>();
 
@@ -67,6 +73,11 @@ public class ClinicVO implements Serializable {
 		this.deleted = deleted;
 		this.createdAt = createdAt;
 		this.adherenceSetting = adherenceSetting;
+		//start: HILL-2004
+		this.adherenceSettingModifiedDte = adherenceSettingModifiedDte;
+		this.adherenceSettingFlag = adherenceSettingFlag;
+		//end: HILL-2004
+				
 	}
     
     public String getId() {
@@ -212,5 +223,23 @@ public class ClinicVO implements Serializable {
 	public void setAdherenceSetting(Integer adherenceSetting) {
         this.adherenceSetting = adherenceSetting;
     }
+	
+	//start: HILL-2004
+	 public DateTime getAdherenceSettingModifiedDte() {
+			return adherenceSettingModifiedDte;
+		}
+
+		public void setAdherenceSettingModifiedDte(DateTime adherenceSettingModifiedDte) {
+			this.adherenceSettingModifiedDte = adherenceSettingModifiedDte;
+		}
+		
+		public Boolean getAdherenceSettingFlag() {
+			return adherenceSettingFlag;
+		}
+
+		public void setAdherenceSettingFlag(Boolean adherenceSettingFlag) {
+			this.adherenceSettingFlag = adherenceSettingFlag;
+		}
+  //end: HILL-2004
 	
 }

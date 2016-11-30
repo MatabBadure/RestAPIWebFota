@@ -43,14 +43,16 @@ public interface MessageTouserAssocRepository extends
 	// To get the list of messages from clinic to patients
 	@Query("Select messageTouserAssoc.id, messageTouserAssoc.isArchived, messageTouserAssoc.isRead, messageTouserAssoc.messages.id, messageTouserAssoc.messages.messageDatetime, "
 				+ "messageTouserAssoc.messages.messageSubject, messageTouserAssoc.messages.messageSizeMBs, messageTouserAssoc.messages.messageType,"
-				+ "messageTouserAssoc.messages.fromClinic.name, messageTouserAssoc.messages.fromClinic.id, messageTouserAssoc.messages.user.lastName, messageTouserAssoc.messages.user.firstName "
+				+ "messageTouserAssoc.messages.fromClinic.name, messageTouserAssoc.messages.fromClinic.id, messageTouserAssoc.messages.user.lastName, messageTouserAssoc.messages.user.firstName,"
+				+ "messageTouserAssoc.messages.toMessageId, messageTouserAssoc.messages.rootMessageId "
 				+ "from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.user.id = ?1 and messageTouserAssoc.isArchived = ?2")
 	Page<Object> findByUserId(Long userId, boolean isArchived, Pageable pageable);
 		
 	// To get the list of messages from patient to clinic
 	@Query("Select messageTouserAssoc.id, messageTouserAssoc.isArchived, messageTouserAssoc.isRead, messageTouserAssoc.messages.id, messageTouserAssoc.messages.messageDatetime, "
 				+ "messageTouserAssoc.messages.messageSubject, messageTouserAssoc.messages.messageSizeMBs, messageTouserAssoc.messages.messageType,"
-				+ "messageTouserAssoc.messages.user.lastName, messageTouserAssoc.messages.user.firstName, messageTouserAssoc.messages.user.id "
+				+ "messageTouserAssoc.messages.user.lastName, messageTouserAssoc.messages.user.firstName, messageTouserAssoc.messages.user.id,"
+				+ "messageTouserAssoc.messages.toMessageId, messageTouserAssoc.messages.rootMessageId "
 				+ "from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.user.id = ?1 and messageTouserAssoc.toClinic.id = ?2 and messageTouserAssoc.isArchived = ?3")
 	Page<Object> findByClinicId(Long userId, String clinicId, boolean isArchived, Pageable pageable);
 	

@@ -328,11 +328,9 @@ public class AdherenceCalculationService {
 						if(currentCompliance.getMissedTherapyCount() > 0){
 							currentCompliance.setMissedTherapyCount(prevCompliance.getMissedTherapyCount()+1);
 						}
-						if(isSettingDeviatedForUserOnDay(userId, currentCompliance.getDate() ,adherenceSettingDay, userProtocolConstant)){								
-							// If settingsDeviationDaysCount is 0 for previous date, settingsDeviationDaysCount would be adherence setting day default value. 
-							int settingsDeviatedDaysCount =  prevCompliance.getSettingsDeviatedDaysCount() == 0 ? adherenceSettingDay :(prevCompliance.getSettingsDeviatedDaysCount()+1);								
-							currentCompliance.setSettingsDeviatedDaysCount(settingsDeviatedDaysCount);								
-						}						
+						if(isSettingDeviatedForUserOnDay(userId, currentCompliance.getDate() ,adherenceSettingDay, userProtocolConstant)){
+							currentCompliance.setSettingsDeviatedDaysCount(prevCompliance.getSettingsDeviatedDaysCount()+1);
+						}
 						Notification existingNotificationofTheDay = notificationRepository.findByPatientUserIdAndDate(userId, compliance.getDate());
 						if(Objects.nonNull(existingNotificationofTheDay)){
 							notificationRepository.delete(existingNotificationofTheDay);

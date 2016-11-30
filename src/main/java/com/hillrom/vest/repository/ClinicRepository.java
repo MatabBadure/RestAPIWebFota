@@ -68,16 +68,17 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 					+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 					+ " join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id "
 					+ " where user.is_deleted = 0 and user.activated=1) as associated_patient, "
-					+ " (select huser.id as huserid,huser.first_name as hfirstName,huser.last_name as hlastName,huser.email as hemail,clinic.id as clinicid,clinic.name as clinicname,clinic.clinic_admin_id as clinicadminid, clinic.adherence_setting as clinicadherencesetting, "
-					+ " (select CONCAT(ca.last_name,' ', ca.first_name)  from USER ca where id = clinic.clinic_admin_id) as caname, "
-					+ " (select ca.email from USER ca where id = clinic.clinic_admin_id) as a_caemail, "
-					+ " (select cahmr.non_hmr_notification  from USER cahmr where id = clinic.clinic_admin_id) as a_cahmr, "
-					+ " (select casdn.setting_deviation_notification  from USER casdn where id = clinic.clinic_admin_id) as a_casdn, "
-					+ " (select camtn.missed_therapy_notification  from USER camtn where id = clinic.clinic_admin_id) as a_camtn, "
+					+ " (select huser.id as huserid,huser.first_name as hfirstName,huser.last_name as hlastName,huser.email as hemail,clinic.id as clinicid,clinic.name as clinicname,eua.user_id AS clinicadminid, clinic.adherence_setting as clinicadherencesetting, "
+					+ " (select CONCAT(ca.last_name,' ', ca.first_name)  from USER ca where id = eua.user_id) as caname, "
+					+ " (select ca.email from USER ca where id = eua.user_id) as a_caemail, "
+					+ " (select cahmr.non_hmr_notification  from USER cahmr where id = eua.user_id) as a_cahmr, "
+					+ " (select casdn.setting_deviation_notification  from USER casdn where id = eua.user_id) as a_casdn, "
+					+ " (select camtn.missed_therapy_notification  from USER camtn where id = eua.user_id) as a_camtn, "
 					+ " huser.non_hmr_notification as nhn, huser.setting_deviation_notification as sdn,huser.missed_therapy_notification as mtn from USER huser "
 					+ " join USER_AUTHORITY user_authorityh on user_authorityh.user_id = huser.id and user_authorityh.authority_name = '"+HCP+"' "
 					+ " left outer join CLINIC_USER_ASSOC user_clinic on user_clinic.users_id = huser.id "
 					+ " left outer join CLINIC clinic on user_clinic.clinics_id = clinic.id and user_clinic.users_id = huser.id "
+					+ " LEFT OUTER JOIN ENTITY_USER_ASSOC eua ON eua.entity_id = clinic.id and eua.user_id = huser.id "
 					+ " where clinic.is_deleted=0 and (huser.non_hmr_notification=1 or huser.setting_deviation_notification=1 or huser.missed_therapy_notification=1 )) "
 					+ " as associated_hcp, PATIENT_COMPLIANCE pc "
 					+ " where puserid = pc.user_id AND pc.date=SUBDATE(CURDATE(),1) and associated_patient.hcp_id = associated_hcp.huserid ")
@@ -101,4 +102,9 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 					+"puserid = pc.user_id AND pc.date=SUBDATE(CURDATE(),1) and  "
 					+"associated_patient.cgvr_id = associated_cgvr.cuserid ")
 	List<Object[]> findPatientStatisticsCareGiver();
+	
+	//start:HILL-2004
+	@Query("from Clinic clinic where clinic.id in (:clinicIds) order by clinic.adherenceSettingModifiedDte desc")
+	List<Clinic> findPatientLastModifiedAdherenceSetting(@Param("clinicIds")List<String> clinicIds);
+  //start:HILL-2004
 }

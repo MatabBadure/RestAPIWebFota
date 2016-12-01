@@ -186,12 +186,27 @@ public class ClinicPatientService {
 			clinicIdsList.add(clinicPatientAssoc.getClinic().getId());
 		}
 	
-		clinics = clinicRepository.findPatientLastModifiedAdherenceSetting(clinicIdsList);
+		if(Objects.nonNull(clinicIdsList) && clinicIdsList.size() > 0)
+		{
+			clinics = clinicRepository.findPatientLastModifiedAdherenceSetting(clinicIdsList);
+		}
 		
+		/*		
 		if(Objects.isNull(clinics))
 			return null; 
 		else
-			return clinics.get(0);		
+			return clinics.get(0);*/	
+		
+		if(Objects.nonNull(clinics) && clinics.size() > 0)
+		{
+			return clinics.get(0);	
+		}
+		else
+		{
+			return null;
+		}
+		
+		
 	}
 	//end:HILL-2004
 	

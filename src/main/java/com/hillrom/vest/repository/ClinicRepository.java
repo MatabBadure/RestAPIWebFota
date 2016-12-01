@@ -104,7 +104,7 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 	List<Object[]> findPatientStatisticsCareGiver();
 	
 	//start:HILL-2004
-	@Query("from Clinic clinic where clinic.id in (:clinicIds) order by clinic.adherenceSettingModifiedDte desc")
+	@Query("from Clinic clinic where clinic.id in :clinicIds order by clinic.adherenceSettingModifiedDte desc")
 	List<Clinic> findPatientLastModifiedAdherenceSetting(@Param("clinicIds")List<String> clinicIds);
   //start:HILL-2004
 }

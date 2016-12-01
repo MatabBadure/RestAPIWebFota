@@ -273,8 +273,8 @@ public class MessagingService {
 		return returnMessageTouserAssocList;
 	}
 	
-	public List<Messages> findByUserIdThreads(Long messageId, Long rootMessageId) throws HillromException{
-		List<Messages> threadMessagesList = new ArrayList<Messages>();
+	public List<Object> findByUserIdThreads(Long messageId, Long rootMessageId) throws HillromException{
+		List<Object> threadMessagesList = new ArrayList<Object>();
 		threadMessagesList = messagingRepository.returnForIdAndRootMessageId(messageId, rootMessageId);		
 		return threadMessagesList;
 	}

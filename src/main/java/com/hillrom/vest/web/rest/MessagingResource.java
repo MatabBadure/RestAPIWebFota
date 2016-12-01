@@ -248,7 +248,7 @@ public class MessagingResource {
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-			List<Messages> messageList = messagingService.findByUserIdThreads(messageId, rootMessageId);
+			List<Object> messageList = messagingService.findByUserIdThreads(messageId, rootMessageId);
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}

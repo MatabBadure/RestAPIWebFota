@@ -241,19 +241,14 @@ public class MessagingResource {
 	/**
      * GET  /messagesReceivedDetails/{toUserId}/{rootMessageId} -> Get All Received Message Threads for user mailbox.
      */
-	@RequestMapping(value="/messagesReceivedThreads/{toUserId}/{rootMessageId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getMessagesReceivedThreadsForInbox(@PathVariable("toUserId") Long toUserId,
-			@RequestParam(value = "clinicId" , required = false) String clinicId,
-			@PathVariable("rootMessageId") Long rootMessageId,
-			@RequestParam(value = "isClinic" , required = true) boolean isClinic,
-            @RequestParam(value = "mailBoxType",required = true) String mailBoxType){
-		
-
+	@RequestMapping(value="/messagesReceivedThreads/{messageId}/{rootMessageId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getMessagesReceivedThreadsForInbox(@PathVariable("messageId") Long messageId,			
+			@PathVariable("rootMessageId") Long rootMessageId){		
 
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-			List<Object> messageList = messagingService.findByUserIdThreads(isClinic, toUserId,clinicId, rootMessageId, mailBoxType);
+			List<Object> messageList = messagingService.findByUserIdThreads(messageId, rootMessageId);
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}
@@ -262,7 +257,6 @@ public class MessagingResource {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		
 	}
 	
 	/**

@@ -273,9 +273,9 @@ public class MessagingService {
 		return returnMessageTouserAssocList;
 	}
 	
-	public List<Object> findByUserIdThreads(Long messageId, Long rootMessageId) throws HillromException{
+	public List<Object> findByUserIdThreads(Long messageId, Long rootMessageId, Long userId, String clinicId) throws HillromException{
 		List<Object> threadMessagesList = new ArrayList<Object>();
-		threadMessagesList = messagingRepository.returnForIdAndRootMessageId(messageId, rootMessageId);		
+		threadMessagesList = messageTouserAssocRepository.returnThreadMessages(messageId, rootMessageId, userId, clinicId);
 		return threadMessagesList;
 	}
 	

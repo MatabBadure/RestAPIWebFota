@@ -15,6 +15,7 @@ import com.hillrom.vest.domain.ClinicPatientAssocPK;
 import com.hillrom.vest.domain.MessageTouserAssoc;
 import com.hillrom.vest.domain.Messages;
 import com.hillrom.vest.web.rest.dto.MessageToUserAssoDTO;
+
 import org.joda.time.DateTime;
 
 public interface MessageTouserAssocRepository extends
@@ -71,4 +72,15 @@ public interface MessageTouserAssocRepository extends
 				+ "from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.messages.user.id = ?1 and messageTouserAssoc.messages.fromClinic.id = ?2")
 	Page<Object> findByClinicIdSent(Long userId, String clinicId, Pageable pageable);
 
+	// To get the thread for the user id and clinic id
+	@Query("Select messageTouserAssoc.messages, "			
+			+ "CASE WHEN mfC.name IS NULL THEN (CASE WHEN messageTouserAssoc.messages.user.firstName IS NULL THEN '' ELSE (messageTouserAssoc.messages.user.firstName || ' ') END  || CASE WHEN messageTouserAssoc.messages.user.lastName IS NULL THEN '' ELSE messageTouserAssoc.messages.user.lastName END) ELSE mfC.name END "
+			+ "from MessageTouserAssoc messageTouserAssoc "			
+			+ "left join messageTouserAssoc.messages.fromClinic as mfC "			
+			+ "where messageTouserAssoc.messages.id <= ?1 and messageTouserAssoc.messages.rootMessageId = ?2 "
+			+ "and ((messageTouserAssoc.messages.user.id = ?3 and messageTouserAssoc.toClinic.id= ?4) "
+			+ "or (messageTouserAssoc.messages.fromClinic.id = ?4 and messageTouserAssoc.user.id= ?3)) "
+			+ "group by messageTouserAssoc.messages.id "
+			+ "order by messageTouserAssoc.messages.id desc")
+	List<Object> returnThreadMessages(Long messageId, Long rootMessageId, Long userId, String clinicId);
 }

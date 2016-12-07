@@ -15,12 +15,15 @@ import com.hillrom.vest.domain.ClinicPatientAssocPK;
 import com.hillrom.vest.domain.MessageTouserAssoc;
 import com.hillrom.vest.domain.Messages;
 import com.hillrom.vest.web.rest.dto.MessageToUserAssoDTO;
-
 import org.joda.time.DateTime;
 
 public interface MessageTouserAssocRepository extends
 		JpaRepository<MessageTouserAssoc, Long> {
 
+	// To get the message to user assosiation 
+	@Query("from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.id = ?1")
+	MessageTouserAssoc findById(Long id);
+	
 	// To get the count of archived & unarchived messages
 	@Query("SELECT messageTouserAssoc.isArchived,count(*) from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.user.id = ?1 group by messageTouserAssoc.isArchived")
     List<Object> findArchivedCountByUserId(Long userId);

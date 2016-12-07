@@ -9,7 +9,8 @@ import javax.validation.constraints.Size;
 
 public class MessageToUserAssoDTO {
 	
-
+	private Long id;
+	
 	private Long userId;
     
     private Long messageId;
@@ -25,7 +26,23 @@ public class MessageToUserAssoDTO {
 	}
 
 
-	
+	/**
+	 * @return the id
+	 */
+	public Long getId() {
+		return id;
+	}
+
+
+
+
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
 	
 
 	/**
@@ -151,6 +168,7 @@ public class MessageToUserAssoDTO {
 		result = prime * result + (archived ? 1231 : 1237);
 		result = prime * result + ((messageId == null) ? 0 : messageId.hashCode());
 		result = prime * result + (read ? 1231 : 1237);
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((userId == null) ? 0 : userId.hashCode());
 		result = prime * result + ((clinicId == null) ? 0 : clinicId.hashCode());
 		return result;
@@ -181,6 +199,11 @@ public class MessageToUserAssoDTO {
 			return false;
 		if (read != other.read)
 			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
 		if (userId == null) {
 			if (other.userId != null)
 				return false;
@@ -203,7 +226,7 @@ public class MessageToUserAssoDTO {
 	 */
 	@Override
 	public String toString() {
-		return "MessageToUserAssoDTO [userId=" + userId + ", messageId=" + messageId + ", archived=" + archived
+		return "MessageToUserAssoDTO [id=" + id + ", userId=" + userId + ", messageId=" + messageId + ", archived=" + archived
 				+ ", read=" + read + "]";
 	}
 

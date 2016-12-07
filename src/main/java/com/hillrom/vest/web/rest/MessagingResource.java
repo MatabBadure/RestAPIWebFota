@@ -239,16 +239,18 @@ public class MessagingResource {
 	}
 	
 	/**
-     * GET  /messagesReceivedDetails/{toUserId}/{rootMessageId} -> Get All Received Message Threads for user mailbox.
+     * GET  /messagesReceivedThreads/{messageId}/{rootMessageId} -> Get All Message Threads for user mailbox.
      */
 	@RequestMapping(value="/messagesReceivedThreads/{messageId}/{rootMessageId}",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getMessagesReceivedThreadsForInbox(@PathVariable("messageId") Long messageId,			
-			@PathVariable("rootMessageId") Long rootMessageId){		
+			@PathVariable("rootMessageId") Long rootMessageId,
+			@RequestParam(value = "userId" , required = true) Long userId,
+			@RequestParam(value = "clinicId" , required = true) String clinicId){
 
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-			List<Object> messageList = messagingService.findByUserIdThreads(messageId, rootMessageId);
+			List<Object> messageList = messagingService.findByUserIdThreads(messageId, rootMessageId, userId, clinicId);
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}

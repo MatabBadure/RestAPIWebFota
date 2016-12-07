@@ -242,8 +242,7 @@ public class MessagingService {
 		
 		 for(MessageToUserAssoDTO msgToUsrAsscList : messageToUserArchivedList)
 		 {
-				
-			MessageTouserAssoc messageTouserAssoc = messageTouserAssocRepository.findByUserIdAndMessageId(msgToUsrAsscList.getUserId(),msgToUsrAsscList.getMessageId());
+			MessageTouserAssoc messageTouserAssoc = messageTouserAssocRepository.findById(msgToUsrAsscList.getId());
 			
 			messageTouserAssoc.setIsArchived(msgToUsrAsscList.isArchived()?Boolean.TRUE:Boolean.FALSE);
 			returnMessageTouserAssocList.add(messageTouserAssoc);
@@ -257,16 +256,9 @@ public class MessagingService {
 		
 		 for(MessageToUserAssoDTO msgToUsrAsscList : messageToUserReadUnreadList)
 		 {
-			String clinicId = msgToUsrAsscList.getClinicId();
-			MessageTouserAssoc messageTouserAssoc;
-			
-			// For HCP or CA, clinic id should be passed
-			if(Objects.nonNull(clinicId) && !clinicId.isEmpty()){
-				messageTouserAssoc = messageTouserAssocRepository.findByUserIdAndMessageIdAndClinicId(msgToUsrAsscList.getUserId(), msgToUsrAsscList.getMessageId(), clinicId);
-			}else{
-				messageTouserAssoc = messageTouserAssocRepository.findByUserIdAndMessageId(msgToUsrAsscList.getUserId(),msgToUsrAsscList.getMessageId());
-			}
-			
+			 
+			 MessageTouserAssoc messageTouserAssoc = messageTouserAssocRepository.findById(msgToUsrAsscList.getId());
+			 
 			messageTouserAssoc.setIsRead(msgToUsrAsscList.isRead()?Boolean.TRUE:Boolean.FALSE);
 			returnMessageTouserAssocList.add(messageTouserAssoc);
 		 }

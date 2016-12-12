@@ -16,6 +16,14 @@ import com.hillrom.vest.domain.MessageTouserAssoc;
 import com.hillrom.vest.domain.Messages;
 import com.hillrom.vest.web.rest.dto.MessageToUserAssoDTO;
 import org.joda.time.DateTime;
+import org.hibernate.QueryException;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.dialect.MySQL5Dialect;
+import org.hibernate.dialect.function.SQLFunctionTemplate;
+import org.hibernate.dialect.function.StandardSQLFunction;
+import org.hibernate.type.StandardBasicTypes;
+import org.hibernate.type.StringType;
+import org.hibernate.type.Type;
 
 public interface MessageTouserAssocRepository extends
 		JpaRepository<MessageTouserAssoc, Long> {
@@ -71,8 +79,9 @@ public interface MessageTouserAssocRepository extends
 	// To get the list of messages sent to patient from clinic as CA/HCP
 	@Query("Select messageTouserAssoc.id, messageTouserAssoc.messages.messageDatetime, messageTouserAssoc.messages.id, "
 				+ "messageTouserAssoc.messages.messageSubject, messageTouserAssoc.messages.messageSizeMBs, "
-				+ "messageTouserAssoc.messages.messageType, messageTouserAssoc.user.lastName, messageTouserAssoc.user.firstName, messageTouserAssoc.user.id "
-				+ "from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.messages.user.id = ?1 and messageTouserAssoc.messages.fromClinic.id = ?2")
+				+ "messageTouserAssoc.messages.messageType, group_concat(concat(messageTouserAssoc.user.lastName,' ',messageTouserAssoc.user.firstName)), group_concat(messageTouserAssoc.user.id) "
+				+ "from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.messages.user.id = ?1 and messageTouserAssoc.messages.fromClinic.id = ?2 "
+				+ "group by messageTouserAssoc.messages.id")
 	Page<Object> findByClinicIdSent(Long userId, String clinicId, Pageable pageable);
 
 	// To get the thread for the user id and clinic id

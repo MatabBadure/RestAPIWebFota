@@ -5,5 +5,6 @@ public class CustomMySQL5InnoDBDialect extends org.hibernate.dialect.MySQL5InnoD
 	  public CustomMySQL5InnoDBDialect() {
 	    super();
 	    this.registerFunction("group_concat", new GroupConcatFunction());
+	    this.registerFunction("group_concat_distinct", new GroupConcatDistinctFunction());
 	  }
 	}

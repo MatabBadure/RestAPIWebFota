@@ -1080,8 +1080,22 @@ public class UserService {
 					deletePatientUser(existingUser);
 					sendDeactivationEmailNotification(baseUrl, existingUser);
 					jsonObject.put("message", MessageConstants.HR_214);
+				}
+				//hill-1844
+				else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ACCT_SERVICES))) {
+					if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
+						throw new HillromException(ExceptionConstants.HR_520);
+					}
+					existingUser.setDeleted(true);
+					userExtensionRepository.save(existingUser);
+					sendDeactivationEmailNotification(baseUrl, existingUser);
+					jsonObject.put("message", MessageConstants.HR_204);
 				} else if((existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CARE_GIVER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN)))) {
+					//hill-1844
 					existingUser.setDeleted(true);
 					userExtensionRepository.save(existingUser);
 					sendDeactivationEmailNotification(baseUrl, existingUser);
@@ -1650,8 +1664,13 @@ public class UserService {
 					if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 						reactivatePatientUser(existingUser);
 						jsonObject.put("message", MessageConstants.HR_215);
+						//hill-1844
 					} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ACCT_SERVICES))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CARE_GIVER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))) {
+						//hill-1844
 						existingUser.setDeleted(false);
 						userExtensionRepository.saveAndFlush(existingUser);
 						jsonObject.put("message", MessageConstants.HR_235);

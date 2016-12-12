@@ -337,7 +337,7 @@ public class MessagingResource {
 	      HttpServletResponse response) {
 	      try {
 	        // get your file as InputStream
-    	    File initialFile = new File("C:/github/everest/src/main/java/com/hillrom/vest/web/rest/" + fileName + ".pdf");
+    	    File initialFile = new File("/tmp/visiview-files/" + fileName + ".pdf");
     	    InputStream is = new FileInputStream(initialFile);  
     	    
     		response.addHeader("Content-disposition", "inline;filename=/tmp/visiview-files/" + fileName);

@@ -34,6 +34,6 @@ public String render(Type firstArgumentType, List arguments,
     //    throw new QueryException(new IllegalArgumentException(
     //            "group_concat shoudl have one arg"));
     //}
-    return "group_concat(" + arguments.get(0) + ")";
+    return "group_concat(" + arguments.get(0) + ") SEPARATOR ', ' ";
 }
 }

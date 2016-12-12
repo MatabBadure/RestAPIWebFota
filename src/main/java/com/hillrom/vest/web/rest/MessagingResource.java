@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import net.minidev.json.JSONObject;
@@ -54,7 +55,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Paths;
 
 @RestController
@@ -320,10 +324,34 @@ public class MessagingResource {
 	      stream.close();
 	    }
 	    catch (Exception e) {
-	      System.out.println(e.getMessage());
 	      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	    }
 	    
 	    return new ResponseEntity<>(HttpStatus.OK);
 	  } // method uploadFile
+	  
+	  
+
+	  
+	  @RequestMapping(value = "/files/{file_name}", method = RequestMethod.GET)
+	  public void getFile(
+	      @PathVariable("file_name") String fileName, 
+	      HttpServletResponse response) {
+	      try {
+	        // get your file as InputStream
+    	    File initialFile = new File("C:/github/everest/src/main/java/com/hillrom/vest/web/rest/" + fileName + ".pdf");
+    	    InputStream is = new FileInputStream(initialFile);  
+    	    
+    		response.addHeader("Content-disposition", "inline;filename=/tmp/visiview-files/" + fileName);
+    		response.setContentType("application/pdf");
+	        // copy it to response's OutputStream
+	        org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
+	        response.flushBuffer();
+	      } catch (IOException ex) {
+	    	  ex.printStackTrace();
+	        //log.info("Error writing file to output stream. Filename was '{}'", fileName, ex);
+	        throw new RuntimeException("IOError writing file to output stream");
+	      }
+
+	  }
 }

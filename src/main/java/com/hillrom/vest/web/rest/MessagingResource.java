@@ -308,7 +308,7 @@ public class MessagingResource {
 	    try {
 	      // Get the filename and build the local file path
 	      String filename = uploadfile.getOriginalFilename();
-	      String directory = "d:/temp";
+	      String directory = "/tmp/visiview-files";
 	      String filepath = Paths.get(directory, filename).toString();
 	      
 	      // Save the file locally

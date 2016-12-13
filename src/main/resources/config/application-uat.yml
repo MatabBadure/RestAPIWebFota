@@ -20,7 +20,7 @@ spring:
         useServerPrepStmts: true
 
     jpa:
-        database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+        database-platform: com.hillrom.vest.repository.util.CustomMySQL5InnoDBDialect
         database: MYSQL
         openInView: false
         show_sql: true

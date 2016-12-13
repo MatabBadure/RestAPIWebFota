@@ -43,8 +43,13 @@ import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.MessageDTO;
 import com.hillrom.vest.web.rest.dto.MessageToUserAssoDTO;
-
 import net.minidev.json.JSONObject;
+
+//Hill-1852
+import javax.servlet.http.HttpServletRequest;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+//Hill-1852
 
 @Service
 @Transactional
@@ -276,4 +281,47 @@ public class MessagingService {
 		return receivedMessage;
 	}	
 
+	//Hill-1852
+			/**
+		     * Runs every midnight to find patient reaching 18 years in coming 90 days and send  them email notification
+		     */
+		    // @Scheduled(cron="0 30 23 * * * ")
+		     public void processPatientReRegister(HttpServletRequest request){
+		    	 
+		    	 List<Object[]> patientDtlsList = null;
+		    	 String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+		    	 
+		            try{
+		                   
+		                   log.debug("Started calculating patients who is reaching 18 years in next 90 days ");
+		                   
+	                  	 	  // get all patients Details through repository 
+		                      patientDtlsList = userRepository.findUserDOB();
+		                   
+		                      // send activation link to those patients
+		                      for (Object[] object : patientDtlsList) {
+		                    	
+		                    	 String eMail =  (String) object[3];
+		                    	 User user = new User();
+		                    	 user.setEmail((String) object[6]);
+		                    	 user.setFirstName((String) object[7]);
+		                    	 user.setLastName((String) object[8]);
+		                    	 user.setActivationKey((String) object[9]);
+		                    	
+		                    	/* if(StringUtils.isNotBlank(eMail)) {
+		                    		 mailService.sendActivationEmail(user,baseUrl);
+		         				}*/
+		                    	
+		                   }
+		                   
+		            }catch(Exception ex){
+		    			StringWriter writer = new StringWriter();
+		    			PrintWriter printWriter = new PrintWriter( writer );
+		    			ex.printStackTrace( printWriter );
+		    			/*mailService.sendJobFailureNotification("processPatientReRegister",writer.toString());*/
+		    		}
+		            return;
+		     }
+		   //Hill-1852
+		     
 }

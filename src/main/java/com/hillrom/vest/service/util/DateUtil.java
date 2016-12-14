@@ -29,6 +29,18 @@ import org.joda.time.format.DateTimeFormatter;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.util.ExceptionConstants;
 
+
+//Hill-1852
+import javax.servlet.http.HttpServletRequest;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.time.Instant;
+//import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+//Hill-1852
+
 public class DateUtil {
 
 	private DateUtil(){
@@ -282,4 +294,19 @@ public class DateUtil {
 		return dateTime;
 		}
 		//hill-1847
+		
+		//Hill-1852
+		public static java.time.LocalDate getFutureLocalDate(int n){
+		
+			 Calendar minDate = Calendar.getInstance();
+     	 	minDate.add(Calendar.DATE, +n);
+     	 
+     	 	Date dt = (Date) minDate.getTime(); 
+     	 	Instant instant = Instant.ofEpochMilli(dt.getTime());
+     	 	LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+     	 	java.time.LocalDate localDate = localDateTime.toLocalDate();
+     	 	return localDate;
+		}
+		//Hill-1852
+		
 }

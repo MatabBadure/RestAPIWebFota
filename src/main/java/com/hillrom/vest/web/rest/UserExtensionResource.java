@@ -1,6 +1,7 @@
 package com.hillrom.vest.web.rest;
 
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.config.Constants;
+import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
@@ -458,11 +460,13 @@ public class UserExtensionResource {
         JSONObject jsonObject = new JSONObject();
 		try {
 			List<ClinicVO> clinics = clinicPatientService.getAssociatedClinicsForPatient(id);
+			Collections.sort(clinics);
 			if (clinics.isEmpty()) {
 				jsonObject.put("message", MessageConstants.HR_285);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_275);
 		    	jsonObject.put("clinics", clinics);
+		    	jsonObject.put("latestadherence",clinics.get(0).getAdherenceSetting());
 	        }
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {

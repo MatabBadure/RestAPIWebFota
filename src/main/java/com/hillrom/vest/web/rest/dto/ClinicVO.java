@@ -7,8 +7,9 @@ import java.util.List;
 import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hillrom.vest.domain.UserPatientAssoc;
 
-public class ClinicVO implements Serializable {
+public class ClinicVO implements Serializable,Comparable<ClinicVO> {
 
     private String id;
 
@@ -241,5 +242,10 @@ public class ClinicVO implements Serializable {
 			this.adherenceSettingFlag = adherenceSettingFlag;
 		}
   //end: HILL-2004
+		
+		@Override
+		public int compareTo(ClinicVO clinicVO) {
+			return this.getAdherenceSettingModifiedDte().compareTo(clinicVO.getAdherenceSettingModifiedDte());
+		}
 	
 }

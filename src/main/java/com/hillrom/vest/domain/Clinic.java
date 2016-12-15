@@ -33,6 +33,7 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.O
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hillrom.vest.web.rest.dto.ClinicVO;
 
 /**
  * A Clinic.
@@ -42,7 +43,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "CLINIC")
 @SQLDelete(sql="UPDATE CLINIC SET is_deleted = 1 WHERE id = ?")
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class,property= "@id,@name")
-public class Clinic implements Serializable {
+public class Clinic implements Serializable,Comparable<Clinic> {
 
     @Id
     private String id;
@@ -339,4 +340,9 @@ public class Clinic implements Serializable {
                 //end: HILL-2004
                 '}';
     }
+	
+	@Override
+	public int compareTo(Clinic clinic) {
+		return this.getAdherenceSettingModifiedDte().compareTo(clinic.getAdherenceSettingModifiedDte());
+	}
 }

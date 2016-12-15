@@ -466,7 +466,7 @@ public class UserExtensionResource {
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_275);
 		    	jsonObject.put("clinics", clinics);
-		    	jsonObject.put("latestadherence",clinics.get(0).getAdherenceSetting());
+		    	jsonObject.put("latestadherence",clinics.get(clinics.size()-1).getAdherenceSetting());
 	        }
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {

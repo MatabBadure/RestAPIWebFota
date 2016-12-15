@@ -104,5 +104,5 @@
 	<include file="classpath:/config/liquibase/changelog/20161115184030_add_column_message_notification_inUser.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20161117181730_add_column_clinic_inMessage.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20161124181730_add_column_modifiedAdhSettingDate_clinic_table.xml" relativeToChangelogFile="false"/>
-	<include file="classpath:/config/liquibase/changelog/20161214031404_added_row_in_authority_table.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161215021522_add_csa_role.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

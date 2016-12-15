@@ -4,12 +4,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 	
-	<!--
-        Added a row in AUTHORITY table.
-    -->
-	<changeSet id="20161214030256" author="jhipster">
-    <insert tableName="AUTHORITY">
-        <column name="name" value="CUSTOMER_SERVICES"/>
-    </insert>
-</changeSet>
+    <changeSet author="jhipster" id="20161215021522">
+    	<loadUpdateData encoding="UTF-8"
+		file="config/liquibase/csa_authority_20161215021522.csv" tableName="AUTHORITY" primaryKey="name">
+   	</loadUpdateData>
+    </changeSet>
 </databaseChangeLog>

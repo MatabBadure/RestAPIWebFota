@@ -464,11 +464,20 @@ public class UserExtensionResource {
 			if (clinics.isEmpty()) {
 				jsonObject.put("message", MessageConstants.HR_285);
 	        } else {
+
 	        	jsonObject.put("message", MessageConstants.HR_275);
 		    	jsonObject.put("clinics", clinics);
-				clinics.removeIf(o -> o.getAdherenceSettingModifiedDte() == null);
+
 				Collections.sort(clinics);
-		    	jsonObject.put("latestadherence",clinics.get(clinics.size()-1).getAdherenceSetting());
+				boolean flag = false;
+				for(int i=clinics.size()-1;i>=0 && !flag;i--){
+					if(clinics.get(i).getAdherenceSettingModifiedDte() != null){
+						jsonObject.put("latestadherence",clinics.get(i).getAdherenceSetting());
+						flag = true;
+					}
+				}
+	    		
+				
 	        }
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {

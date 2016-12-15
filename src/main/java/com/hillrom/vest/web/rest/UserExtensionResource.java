@@ -460,13 +460,14 @@ public class UserExtensionResource {
         JSONObject jsonObject = new JSONObject();
 		try {
 			List<ClinicVO> clinics = clinicPatientService.getAssociatedClinicsForPatient(id);
-			clinics.removeIf(o -> o.getAdherenceSettingModifiedDte() == null);
-			Collections.sort(clinics);
+
 			if (clinics.isEmpty()) {
 				jsonObject.put("message", MessageConstants.HR_285);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_275);
 		    	jsonObject.put("clinics", clinics);
+				clinics.removeIf(o -> o.getAdherenceSettingModifiedDte() == null);
+				Collections.sort(clinics);
 		    	jsonObject.put("latestadherence",clinics.get(clinics.size()-1).getAdherenceSetting());
 	        }
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);

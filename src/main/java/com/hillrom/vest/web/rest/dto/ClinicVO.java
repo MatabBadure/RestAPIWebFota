@@ -247,11 +247,16 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
 		@Override
 		public int compareTo(ClinicVO clinicVO) {
 			
+			/*
 		    if (clinicVO.getAdherenceSettingModifiedDte() == null) {
 		        return (this.getAdherenceSettingModifiedDte() == null) ? 0 : -1;
 		    }
 		    if (this.getAdherenceSettingModifiedDte() == null) {
 		        return 1;
+		    }*/
+			
+		    if ((clinicVO.getAdherenceSettingModifiedDte() == null) || (this.getAdherenceSettingModifiedDte() == null) ){
+		    	return this.getCreatedAt().compareTo(clinicVO.getCreatedAt());
 		    }
 			 
 			return this.getAdherenceSettingModifiedDte().compareTo(clinicVO.getAdherenceSettingModifiedDte());

@@ -346,11 +346,8 @@ public class Clinic implements Serializable,Comparable<Clinic> {
 	@Override
 	public int compareTo(Clinic clinic) {
 		
-	    if (clinic.getAdherenceSettingModifiedDte() == null) {
-	        return (this.getAdherenceSettingModifiedDte() == null) ? 0 : -1;
-	    }
-	    if (this.getAdherenceSettingModifiedDte() == null) {
-	        return 1;
+	    if ((clinic.getAdherenceSettingModifiedDte() == null) || (this.getAdherenceSettingModifiedDte() == null) ){
+	    	return this.getCreatedAt().compareTo(clinic.getCreatedAt());
 	    }
 		 
 		return this.getAdherenceSettingModifiedDte().compareTo(clinic.getAdherenceSettingModifiedDte());

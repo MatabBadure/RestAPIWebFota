@@ -180,6 +180,7 @@ public class ClinicPatientService {
 			clinics.add(clinicPatientAssoc.getClinic());
 		}
 	
+		clinics.removeIf(o -> o.getAdherenceSettingModifiedDte() == null);
 		Collections.sort(clinics);
 		
 		return clinics.get(clinics.size()-1);

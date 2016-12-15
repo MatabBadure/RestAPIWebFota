@@ -397,7 +397,10 @@ public class UserService {
 		
     	List<String> rolesAdminCanModerate = rolesAdminCanModerate();
     	if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())
-    			&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
+    			&& SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))
+    			//hill-1844
+    			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))) {
+    			//hill-1844 
     		UserExtension user = createHillromTeamUser(userExtensionDTO);
     		if(Objects.nonNull(user.getId())) {
     			if(StringUtils.isNotBlank(userExtensionDTO.getEmail())) {

@@ -63,6 +63,7 @@ import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.ExceptionConstants;
+import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.ClinicStatsNotificationVO;
@@ -287,6 +288,47 @@ public class AdherenceCalculationService {
 			mailService.sendJobFailureNotification("processMissedTherapySessions",writer.toString());
 		}
 	}
+	
+	// Resetting the adherence score for the specific user from the adherence reset start date	
+	public String adherenceSettingForClinic(String clinicId){
+		try{
+			Map<Long,PatientNoEvent> userIdNoEventMap = noEventService.findAllGroupByPatientUserId();
+			List<PatientInfo> patientList = clinicPatientService.getPatientListForClinic(clinicId);
+			
+			if(patientList.size()>0){			
+				for(PatientInfo patient : patientList){
+					
+					User user = userService.getUserObjFromPatientInfo(patient);
+					
+					LocalDate startDate = fineOneByPatientUserIdLatestResetStartDate(user.getId());
+					
+					if(Objects.isNull(startDate)){				
+						PatientNoEvent noEvent = userIdNoEventMap.get(user.getId());
+						if(Objects.nonNull(noEvent) &&  Objects.nonNull(noEvent.getFirstTransmissionDate())){
+							startDate = noEvent.getFirstTransmissionDate();
+						}
+					}
+					if(Objects.nonNull(startDate)){
+						adherenceResetForPatient(user.getId(),patient.getId(),startDate,DEFAULT_COMPLIANCE_SCORE);	
+					}					
+				}
+				return MessageConstants.HR_314;
+			}else{
+				return MessageConstants.HR_315;				
+			}
+		}catch(Exception ex){
+			log.debug(ex.getMessage());
+		}
+		return "Adherence score recalculated successfully for all patients under clinic";
+	}
+	
+	public LocalDate fineOneByPatientUserIdLatestResetStartDate(Long userId){    	
+    	List<AdherenceReset> adherenceReset = adherenceResetRepository.findOneByPatientUserIdLatestResetStartDate(userId);
+    	if(adherenceReset.size() > 0)
+    		return adherenceReset.get(0).getResetStartDate();
+    	else
+    		return null;
+    }
 	
 	// Resetting the adherence score for the specific user from the adherence reset start date	
 	public String adherenceResetForPatient(Long userId, String patientId, LocalDate adherenceStartDate, Integer adherenceScore){

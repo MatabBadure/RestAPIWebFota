@@ -36,6 +36,7 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.PredicateBuilder;
 import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.ClinicService;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -61,7 +62,9 @@ public class ClinicResource {
     
     @Inject
     private ClinicService clinicService;
-
+    
+    @Inject
+    private AdherenceCalculationService adherenceCalculationService;
     /**
      * POST  /clinics -> Create a new clinic.
      */
@@ -102,11 +105,15 @@ public class ClinicResource {
         JSONObject jsonObject = new JSONObject();
 		try {
 			ClinicVO clinicVO = clinicService.updateClinic(id, clinicDTO);
+			String successMessage = MessageConstants.HR_222;
+			if(Objects.nonNull(clinicDTO.getAdherenceSettingFlag()) && clinicDTO.getAdherenceSettingFlag()){
+				successMessage = adherenceCalculationService.adherenceSettingForClinic(id);
+			}
 	        if (Objects.isNull(clinicVO)) {
 	        	jsonObject.put("ERROR", ExceptionConstants.HR_543);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
-	        	jsonObject.put("message", MessageConstants.HR_222);
+	        	jsonObject.put("message", successMessage);
 	            jsonObject.put("Clinic", clinicVO);
 	            if(Objects.nonNull(clinicDTO.getParent()) && clinicDTO.getParent()) {
 	            	jsonObject.put("ChildClinic", clinicVO.getChildClinicVOs());

@@ -210,4 +210,20 @@ public class ClinicPatientService {
 	}
 	//end:HILL-2004
 	
+	
+	public List<PatientInfo> getPatientListForClinic(String clinicId) throws HillromException{
+		// get the clinic patient association for the clinic
+		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByClinicId(clinicId);
+		
+		List<PatientInfo> patientList = new LinkedList<>();
+		// Check for non null of object
+		if(Objects.nonNull(clinicPatientAssocList) && !clinicPatientAssocList.isEmpty()) {			
+			for(ClinicPatientAssoc clinicPatientAssoc : clinicPatientAssocList){				
+				patientList.add(clinicPatientAssoc.getPatient());				
+			}			
+		}
+		return patientList;
+	}
+	
+	
 }

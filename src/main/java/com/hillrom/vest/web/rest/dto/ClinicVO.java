@@ -7,8 +7,9 @@ import java.util.List;
 import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hillrom.vest.domain.UserPatientAssoc;
 
-public class ClinicVO implements Serializable {
+public class ClinicVO implements Serializable,Comparable<ClinicVO> {
 
     private String id;
 
@@ -55,7 +56,8 @@ public class ClinicVO implements Serializable {
 
     public ClinicVO(String id,String name, String address, String address2, Integer zipcode, String city,
 			String state, String phoneNumber, String faxNumber, String speciality, Long clinicAdminId,
-			Boolean parent, String hillromId,Boolean deleted,DateTime createdAt,Integer adherenceSetting) {
+			Boolean parent, String hillromId,Boolean deleted,DateTime createdAt,Integer adherenceSetting, DateTime adherenceSettingModifiedDte
+			) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -241,5 +243,19 @@ public class ClinicVO implements Serializable {
 			this.adherenceSettingFlag = adherenceSettingFlag;
 		}
   //end: HILL-2004
+		
+		@Override
+		public int compareTo(ClinicVO clinicVO) {
+			
+			
+		    if (clinicVO.getAdherenceSettingModifiedDte() == null) {
+		        return (this.getAdherenceSettingModifiedDte() == null) ? 0 : -1;
+		    }
+		    if (this.getAdherenceSettingModifiedDte() == null) {
+		        return 1;
+		    }
+			 
+			return this.getAdherenceSettingModifiedDte().compareTo(clinicVO.getAdherenceSettingModifiedDte());
+		}
 	
 }

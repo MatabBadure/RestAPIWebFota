@@ -79,7 +79,7 @@ public interface MessageTouserAssocRepository extends
 	// To get the list of messages sent to patient from clinic as CA/HCP
 	@Query("Select messageTouserAssoc.id, messageTouserAssoc.messages.messageDatetime, messageTouserAssoc.messages.id, "
 				+ "messageTouserAssoc.messages.messageSubject, messageTouserAssoc.messages.messageSizeMBs, "
-				+ "messageTouserAssoc.messages.messageType, group_concat(concat(messageTouserAssoc.user.lastName,' ',messageTouserAssoc.user.firstName)), group_concat(messageTouserAssoc.user.id) "
+				+ "messageTouserAssoc.messages.messageType, group_concat(concat(messageTouserAssoc.user.lastName,',',messageTouserAssoc.user.firstName)), group_concat(messageTouserAssoc.user.id) "
 				+ "from MessageTouserAssoc messageTouserAssoc where messageTouserAssoc.messages.user.id = ?1 and messageTouserAssoc.messages.fromClinic.id = ?2 "
 				+ "group by messageTouserAssoc.messages.id")
 	Page<Object> findByClinicIdSent(Long userId, String clinicId, Pageable pageable);

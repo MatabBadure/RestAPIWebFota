@@ -105,4 +105,8 @@
 	<include file="classpath:/config/liquibase/changelog/20161117181730_add_column_clinic_inMessage.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20161124181730_add_column_modifiedAdhSettingDate_clinic_table.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20161215021522_add_csa_role.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161117182532_add_typeCode_announcement_diagnosis_type.xml" relativeToChangelogFile="false"/>	
+	<include file="classpath:/config/liquibase/changelog/20161117182531_add_typeCode_announcement_patient_type.xml" relativeToChangelogFile="false"/>	
+	<include file="classpath:/config/liquibase/changelog/20161117182530_add_typeCode_announcement_send_to.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161116183415_create_table_announcements.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

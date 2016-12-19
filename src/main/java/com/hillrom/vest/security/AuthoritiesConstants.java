@@ -25,4 +25,8 @@ public final class AuthoritiesConstants {
     public static final String CARE_GIVER = "CARE_GIVER";
 
     public static final String ANONYMOUS = "ANONYMOUS";
+    
+    //hill-1845
+    public static final String CUSTOMER_SERVICES = "CUSTOMER_SERVICES";
+    //hill-1845 
 }

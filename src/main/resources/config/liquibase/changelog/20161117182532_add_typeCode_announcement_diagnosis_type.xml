@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+	
+	<changeSet author="jhipster" id="20161117182532">
+		<loadUpdateData encoding="UTF-8"
+			file="config/liquibase/201612171211516_hillrom_type_code_values_diagnosis_type.csv" separator="," tableName="HILLROM_TYPE_CODE_VALUES" primaryKey="id">
+		</loadUpdateData>
+	</changeSet>
+</databaseChangeLog>

@@ -68,13 +68,21 @@ public class Announcements {
 	private String patientType;
 
 	@Column(name="is_deleted")
-	private String isDeleted;
+	private boolean isDeleted;
 	
-	public String getIsDeleted() {
+
+
+	/**
+	 * @return the isDeleted
+	 */
+	public boolean isDeleted() {
 		return isDeleted;
 	}
 
-	public void setIsDeleted(String isDeleted) {
+	/**
+	 * @param isDeleted the isDeleted to set
+	 */
+	public void setDeleted(boolean isDeleted) {
 		this.isDeleted = isDeleted;
 	}
 

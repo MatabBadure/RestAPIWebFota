@@ -173,15 +173,25 @@ public class ClinicPatientService {
 	public Clinic getAssociatedClinic(PatientInfo patientInfo) {
 		List<Clinic> clinics = new LinkedList<>();
 		List<String> clinicIdsList = new LinkedList<>();
+		Clinic clinic = null;
 		
-		
+		// add all patient associtaed clinic information into the clinics list
 		for(ClinicPatientAssoc clinicPatientAssoc : patientInfo.getClinicPatientAssoc()){ 
 			
 			clinics.add(clinicPatientAssoc.getClinic());
 		}
 	
+		// remove objects with modifieddate as null
 		clinics.removeIf(o -> o.getAdherenceSettingModifiedDte() == null);
+		
+		// If all clinics modified date is null send default adherence setting date as null
+		if( clinics.size() == 0)
+		{
+			return clinic;
+		}
+		// else sort based on modified date, the lkatest modified date need to send as result
 		Collections.sort(clinics);
+		
 		
 		return clinics.get(clinics.size()-1);
 	

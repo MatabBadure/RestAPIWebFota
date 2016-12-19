@@ -44,7 +44,7 @@ public class AnnouncementsService {
 		announcement.setClinicType(announcementsDTO.getClicicType());
 		announcement.setPdfFilePath(announcementsDTO.getPdfFilePath());
 		announcement.setPatientType(announcementsDTO.getPatientType());
-		announcement.setIsDeleted("0");
+		announcement.setDeleted(false);
 		announcementsRepository.save(announcement);
         log.debug("Created New Announcement: {}", announcement);
         return announcement;
@@ -110,7 +110,7 @@ public class AnnouncementsService {
     	  Announcements announcement = announcementsRepository.findOne(id);
     	  if(Objects.nonNull(announcement))
     	  {
-    			  announcement.setIsDeleted("1");
+    			  announcement.setDeleted(true);
     			  announcement.setModifiedDate(DateUtil.getCurrentDateAndTime());
     			  announcementsRepository.save(announcement);
     	          log.debug("updated Announcement Details: {}", announcement);

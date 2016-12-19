@@ -292,10 +292,11 @@ public class AdherenceCalculationService {
 	// Resetting the adherence score for the specific user from the adherence reset start date	
 	public String adherenceSettingForClinic(String clinicId){
 		try{
+			long startTime = System.currentTimeMillis();
 			Map<Long,PatientNoEvent> userIdNoEventMap = noEventService.findAllGroupByPatientUserId();
 			List<PatientInfo> patientList = clinicPatientService.getPatientListForClinic(clinicId);
 			
-			if(patientList.size()>0){			
+			if(patientList.size()>0){
 				for(PatientInfo patient : patientList){
 					
 					User user = userService.getUserObjFromPatientInfo(patient);
@@ -312,8 +313,14 @@ public class AdherenceCalculationService {
 						adherenceResetForPatient(user.getId(),patient.getId(),startDate,DEFAULT_COMPLIANCE_SCORE);	
 					}					
 				}
+				long endTime   = System.currentTimeMillis();
+				long totalTime = endTime - startTime;
+				System.out.println("Program executed in :"+totalTime+" milliseconds");
 				return MessageConstants.HR_314;
 			}else{
+				long endTime   = System.currentTimeMillis();
+				long totalTime = endTime - startTime;
+				System.out.println(totalTime);
 				return MessageConstants.HR_315;				
 			}
 		}catch(Exception ex){

@@ -11,10 +11,10 @@ import com.hillrom.vest.domain.Announcements;
 public interface AnnouncementsRepository extends JpaRepository<Announcements, Long> {
 	
 	 	@Query(" from Announcements announcement where id = ? and isDeleted = ? ")
-	    Announcements findObeById(Long id, String isDeleted);
+	    Announcements findOneById(Long id, boolean isDeleted);
 	    
 	    @Query(" from Announcements announcement where isDeleted = ? ")
-	    List<Announcements> findAnnouncements(String isDeleted);
+	    List<Announcements> findAnnouncements(boolean isDeleted);
 	 
 	
 }

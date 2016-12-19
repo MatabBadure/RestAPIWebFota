@@ -62,7 +62,7 @@ public class AnnouncementsResource {
 			  List<Announcements> announcementsList = announcementsService.findAnnouncementData();
 			 jsonObject.put("Announcement_List", announcementsList);
 			 if(Objects.nonNull(announcementsList)){
-				jsonObject.put("announcementMsg", "Announcement sent successfully");
+				jsonObject.put("announcementMsg", "All Announcements retrieved successfully");
 				return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
 			}
 		}catch(Exception ex){
@@ -86,7 +86,7 @@ public class AnnouncementsResource {
 			  Announcements announcement = announcementsService.findAnnouncementById(id);
 			 jsonObject.put("Announcement", announcement);
 			 if(Objects.nonNull(announcement)){
-				jsonObject.put("announcementMsg", "Announcement sent successfully");
+				jsonObject.put("announcementMsg", "Announcement with id : " + id + " retrieved successfully");
 				return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
 			}
 		}catch(Exception ex){

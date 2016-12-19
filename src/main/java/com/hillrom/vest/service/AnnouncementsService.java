@@ -57,7 +57,7 @@ public class AnnouncementsService {
 	 */
  public List<Announcements> findAnnouncementData() throws HillromException{
 		
-		List<Announcements> announcements = announcementsRepository.findAnnouncements("0");
+		List<Announcements> announcements = announcementsRepository.findAnnouncements(false);
 		return announcements;
 	}
  
@@ -69,7 +69,7 @@ public class AnnouncementsService {
  */
  public Announcements findAnnouncementById(Long id) throws HillromException{
 		
-		Announcements announcements = announcementsRepository.findObeById(id,"0");
+		Announcements announcements = announcementsRepository.findOneById(id,false);
 		return announcements;
 	}
  

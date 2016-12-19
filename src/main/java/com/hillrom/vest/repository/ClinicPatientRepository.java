@@ -13,7 +13,7 @@ public interface ClinicPatientRepository extends
 		JpaRepository<ClinicPatientAssoc, ClinicPatientAssocPK> {
 
 	@Query("from ClinicPatientAssoc cpa where cpa.clinicPatientAssocPK.clinic.id = ?1")
-	List<Optional<ClinicPatientAssoc>> findOneByClinicId(String clinicId);
+	List<ClinicPatientAssoc> findOneByClinicId(String clinicId);
 	
 	@Query("from ClinicPatientAssoc cpa where cpa.clinicPatientAssocPK.patient.id = ?1")
 	List<ClinicPatientAssoc> findOneByPatientId(String patientId);

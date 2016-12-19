@@ -41,7 +41,14 @@ public interface PatientComplianceRepository extends
 	
 	List<PatientCompliance> findByPatientUserId(Long patientUserId);
 
-	@Query(nativeQuery=true,value=" SELECT * from PATIENT_COMPLIANCE where date >= :adherStDate and user_id = :userId order by date")
+	//@Query(nativeQuery=true,value=" SELECT * from PATIENT_COMPLIANCE where date >= :adherStDate and user_id = :userId order by date")
+	@Query(nativeQuery=true,value=" SELECT id,patient_id,user_id,date,compliance_score,hmr_run_rate,hmr,is_hmr_compliant,"
+			+ "is_settings_deviated,missed_therapy_count,last_therapy_session_date,settings_deviated_days_count,"
+			+ "global_hmr_non_adherence_count,global_settings_deviated_count,global_missed_therapy_days_count,"
+			+ "IF(created_by='','system',created_by) as created_by,"
+			+ "IF(created_date='0000-00-00 00:00:00','2016-07-01 23:30:08',created_date) as created_date,"
+			+ "last_modified_by,last_modified_date "
+			+ "from PATIENT_COMPLIANCE where date >= :adherStDate and user_id = :userId order by date")
 	List<PatientCompliance> returnComplianceForPatientIdDates(
 			@Param("adherStDate")String adherStDate, @Param("userId")Long userId);
 	

@@ -21,7 +21,7 @@ import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 import com.hillrom.vest.domain.util.MMDDYYYYLocalDateSerializer;
 
 @Entity
-@Table(name = "Announcements")
+@Table(name = "ANNOUNCEMENTS")
 public class Announcements {
 
 	@Id

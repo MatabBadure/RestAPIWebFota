@@ -1,21 +1,28 @@
 package com.hillrom.vest.web.rest;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import net.minidev.json.JSONObject;
+
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import com.hillrom.vest.domain.Announcements;
 import com.hillrom.vest.service.AnnouncementsService;
 import com.hillrom.vest.web.rest.dto.AnnouncementsDTO;
+import com.hillrom.vest.web.rest.util.PaginationUtil;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -54,12 +61,21 @@ public class AnnouncementsResource {
      * GET  /Announcement -> get All Announcements
      */
 	@RequestMapping(value="/announcements/getAll", method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getAnnouncements(){
+	public ResponseEntity<?> getAnnouncements(@RequestParam(value = "page" , required = false) Integer offset,
+            @RequestParam(value = "per_page", required = false) Integer limit,
+            @RequestParam(value = "sort_by", required = false) String sortBy,
+            @RequestParam(value = "asc",required = false) Boolean isAscending){
 
+	   	 Map<String,Boolean> sortOrder = new HashMap<>();
+	   	 if(sortBy != null  && !sortBy.equals("")) {
+	   		 isAscending =  (isAscending != null)?  isAscending : true;
+	   		 sortOrder.put(sortBy, isAscending);
+	   	 }
+	   	 
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-			  List<Announcements> announcementsList = announcementsService.findAnnouncementData();
+			 Page<Announcements> announcementsList = announcementsService.findAnnouncementData(PaginationUtil.generatePageRequest(offset, limit, sortOrder));
 			 jsonObject.put("Announcement_List", announcementsList);
 			 if(Objects.nonNull(announcementsList)){
 				jsonObject.put("announcementMsg", "All Announcements retrieved successfully");

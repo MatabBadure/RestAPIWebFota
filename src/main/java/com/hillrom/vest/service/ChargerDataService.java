@@ -326,7 +326,7 @@ public class ChargerDataService {
 		        log.debug("hmr_seconds : "+ sout );
 		        
 		        //log.debug("Value of deviceDataArray.length : "+ j );
-		        for(int i=27;i<j;i=i+7){
+		        for(int i=25;i<j;i=i+7){
 		        	
 		        	//log.debug("Value of i : "+ i );
 		        	
@@ -345,15 +345,20 @@ public class ChargerDataService {
 			        log.debug("event_code : "+ sout );
 			        
 			        byte[] frequency  = Arrays.copyOfRange(deviceDataArray, i+FREQUENCY_LOC-1, (i+FREQUENCY_LOC-1) + FREQUENCY_LEN);
-			        int frequency_val = (frequency[0] & 0xf0) >> 4;
-			        
-			        log.debug("frequency : "+ frequency_val );
+			        sout = "";
+			        for(int k=0;k<frequency.length;k++){
+			        	sout = sout + (frequency[k]  & 0xFF) + " ";
+			        }
+			        log.debug("frequency : "+ sout );
+
 			        
 			        byte[] intensity  = Arrays.copyOfRange(deviceDataArray, i+INTENSITY_LOC-1, (i+INTENSITY_LOC-1) + INTENSITY_LEN);
-			        int intensity_val = intensity[0] & 0xf;
-			        
-		
-			        log.debug("intensity : "+ intensity_val );
+			        sout = "";
+			        for(int k=0;k<intensity.length;k++){
+			        	sout = sout + (intensity[k]  & 0xFF) + " ";
+			        }
+			        log.debug("intensity : "+ sout );
+
 			        
 			        byte[] duration  = Arrays.copyOfRange(deviceDataArray, i+DURATION_LOC-1, (i+DURATION_LOC-1) + DURATION_LEN);
 			        sout = "";

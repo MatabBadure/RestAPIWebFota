@@ -85,6 +85,8 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FREQ
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.INTENSITY_LEN;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DURATION_LEN;
 
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVENT_LOG_START_POS;
+
 @Service
 @Transactional
 public class ChargerDataService {
@@ -326,7 +328,7 @@ public class ChargerDataService {
 		        log.debug("hmr_seconds : "+ sout );
 		        
 		        //log.debug("Value of deviceDataArray.length : "+ j );
-		        for(int i=25;i<j;i=i+7){
+		        for(int i=EVENT_LOG_START_POS;i<j;i=i+7){
 		        	
 		        	//log.debug("Value of i : "+ i );
 		        	

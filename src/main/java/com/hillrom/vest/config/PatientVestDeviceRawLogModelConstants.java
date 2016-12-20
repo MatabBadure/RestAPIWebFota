@@ -63,6 +63,9 @@ public class PatientVestDeviceRawLogModelConstants {
 	public static final int NUMBER_OF_EVENTS_LOC = 18;
 	public static final int NUMBER_OF_PODS_LOC = 19;
 	public static final int HMR_SECONDS_LOC = 20;
+	
+	public static final int EVENT_LOG_START_POS = 25;
+	
 	/** Log Event */
 	public static final int EVENT_TIMESTAMP_LOC = 0;
 	public static final int EVENT_CODE_LOC = 3;

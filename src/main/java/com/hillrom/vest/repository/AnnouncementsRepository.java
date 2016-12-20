@@ -18,6 +18,14 @@ public interface AnnouncementsRepository extends JpaRepository<Announcements, Lo
 	    
 	    @Query(" from Announcements announcement where isDeleted = ? ")
 	    Page<Announcements> findAnnouncements(boolean isDeleted,Pageable pageable);
+	    
+
+	    @Query(" from Announcements announcement, PatientInfo patientInfo where (announcement.sendTo = 'All' or announcement.sendTo = 'Patient') "
+		      + " and (announcement.patientType = 'All' or announcement.patientType = patientInfo.primaryDiagnosis or (TIMESTAMPDIFF((YEAR, pi.dob, current_date()) > 18, 'Adult', 'Peds') = announcement.patientType )) "
+		      + " and patientInfo.id = ?1  and announcement.isDeleted = ?2 ")
+	    List<Announcements> test(String patientId, boolean isDeleted); 
+
+
 	 
 	
 }

@@ -89,6 +89,29 @@ public class AnnouncementsResource {
 	}
 
 	
+	/**
+     * GET  /Announcement -> get All Announcements
+     */
+	@RequestMapping(value="/announcements/getAllTest", method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getAnnouncementsTest(){
+
+
+	   	 
+		JSONObject jsonObject = new JSONObject();
+		
+		try{
+			 List<Announcements> announcementsList = announcementsService.test();
+			 jsonObject.put("Announcement_List", announcementsList);
+			 if(Objects.nonNull(announcementsList)){
+				jsonObject.put("announcementMsg", "All Announcements retrieved successfully");
+				return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
+			}
+		}catch(Exception ex){
+			jsonObject.put("ERROR", ex.getMessage());
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}		
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
 	
 	/**
      * GET  /announcement -> get announcement based on id

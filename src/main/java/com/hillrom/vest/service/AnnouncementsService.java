@@ -62,7 +62,19 @@ public class AnnouncementsService {
 		Page<Announcements> announcements = announcementsRepository.findAnnouncements(false,pageable);
 		return announcements;
 	}
- 
+
+	/**
+	 * 
+	 * @return
+	 * @throws HillromException
+	 */
+public List<Announcements> test() throws HillromException{
+		
+		List<Announcements> announcements = announcementsRepository.test("HR2015000000",false);
+		return announcements;
+	}
+
+
 /**
  * 
  * @param id

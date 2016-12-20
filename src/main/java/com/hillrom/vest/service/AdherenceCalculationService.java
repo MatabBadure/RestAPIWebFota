@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.SortedMap;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -44,6 +45,7 @@ import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -290,7 +292,8 @@ public class AdherenceCalculationService {
 	}
 	
 	// Resetting the adherence score for the specific user from the adherence reset start date	
-	public String adherenceSettingForClinic(String clinicId){
+	@Async
+	public Future<String> adherenceSettingForClinic(String clinicId){
 		try{
 			long startTime = System.currentTimeMillis();
 			Map<Long,PatientNoEvent> userIdNoEventMap = noEventService.findAllGroupByPatientUserId();
@@ -316,17 +319,17 @@ public class AdherenceCalculationService {
 				long endTime   = System.currentTimeMillis();
 				long totalTime = endTime - startTime;
 				log.debug("adherenceSettingForClinic method executed in :"+totalTime+" milliseconds");
-				return MessageConstants.HR_314;
+				return new AsyncResult<>(MessageConstants.HR_314);
 			}else{
 				long endTime   = System.currentTimeMillis();
 				long totalTime = endTime - startTime;
 				log.debug("adherenceSettingForClinic method executed in :"+totalTime+" milliseconds");
-				return MessageConstants.HR_315;				
+				return new AsyncResult<>(MessageConstants.HR_315);				
 			}
 		}catch(Exception ex){
 			log.debug(ex.getMessage());
 		}
-		return "Adherence score recalculated successfully for all patients under clinic";
+		return new AsyncResult<>("Adherence score recalculated successfully for all patients under clinic");
 	}
 	
 	public LocalDate fineOneByPatientUserIdLatestResetStartDate(Long userId){    	

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -106,14 +107,15 @@ public class ClinicResource {
 		try {
 			ClinicVO clinicVO = clinicService.updateClinic(id, clinicDTO);
 			String successMessage = MessageConstants.HR_222;
+			Future<String> processResult = null;
 			if(Objects.nonNull(clinicDTO.getAdherenceSettingFlag()) && clinicDTO.getAdherenceSettingFlag()){
-				successMessage = adherenceCalculationService.adherenceSettingForClinic(id);
+				processResult = adherenceCalculationService.adherenceSettingForClinic(id); 
 			}
 	        if (Objects.isNull(clinicVO)) {
 	        	jsonObject.put("ERROR", ExceptionConstants.HR_543);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
-	        	jsonObject.put("message", successMessage);
+	        	jsonObject.put("message", processResult.isDone() ? successMessage:"ERROR");
 	            jsonObject.put("Clinic", clinicVO);
 	            if(Objects.nonNull(clinicDTO.getParent()) && clinicDTO.getParent()) {
 	            	jsonObject.put("ChildClinic", clinicVO.getChildClinicVOs());

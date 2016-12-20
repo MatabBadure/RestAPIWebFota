@@ -151,7 +151,7 @@ public class AdherenceCalculationService {
 		int minHMRReading = Objects.nonNull(protocolConstant
 				.getMinDuration()) ? protocolConstant.getMinDuration()
 				: protocolConstant.getTreatmentsPerDay()
-						* protocolConstant.getMinMinutesPerTreatment();
+						* protocolConstant.getMinMinutesPerTreatment();		
 		if( Math.round(minHMRReading * LOWER_BOUND_VALUE) > Math.round(actualTotalDurationSettingDays/adherenceSettingDay)){
 			return false;
 		}
@@ -315,12 +315,12 @@ public class AdherenceCalculationService {
 				}
 				long endTime   = System.currentTimeMillis();
 				long totalTime = endTime - startTime;
-				System.out.println("Program executed in :"+totalTime+" milliseconds");
+				log.debug("adherenceSettingForClinic method executed in :"+totalTime+" milliseconds");
 				return MessageConstants.HR_314;
 			}else{
 				long endTime   = System.currentTimeMillis();
 				long totalTime = endTime - startTime;
-				System.out.println(totalTime);
+				log.debug("adherenceSettingForClinic method executed in :"+totalTime+" milliseconds");
 				return MessageConstants.HR_315;				
 			}
 		}catch(Exception ex){

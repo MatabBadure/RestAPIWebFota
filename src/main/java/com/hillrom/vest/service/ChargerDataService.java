@@ -90,6 +90,9 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CRC_
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_DATA_FIELD_NAME;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FRAG_TOTAL_FIELD_NAME;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FRAG_CURRENT_FIELD_NAME;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_WIFI;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_SN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_VER;
 
 @Service
 @Transactional
@@ -253,6 +256,9 @@ public class ChargerDataService {
 				
 				int x = getFragTotal(encoded_string);
 				int y = getFragCurrent(encoded_string);
+				byte[] devsnbt = getDevSN(encoded_string);
+				byte[] wifibt = getDevWifi(encoded_string);
+				byte[] verbt = getDevVer(encoded_string);
 				
 		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
 		        //b = new byte[] {100,101,118,105,99,101,95,109,111,100,101,108,95,116,121,112,101,61,72,105,108,108,82,111,109,95,77,111,110,97,114,99,104,38,100,101,118,83,78,61,82,48,48,49,80,80,48,48,48,49,38,100,101,118,87,73,70,73,61,0,35,(byte)167,38,100,101,118,86,101,114,61,4,0,0,0,2,0,0,0,38,102,114,97,103,84,111,116,97,108,61,1,38,102,114,97,103,67,117,114,114,101,110,116,61,1,38,100,101,118,105,99,101,68,97,116,97,61,0,0,0,3,17,1,1,4,30,16,17,1,1,4,45,37,0,0,10,(byte)128,0,0,1,50,60,4,30,16,1,12,5,20,62,60,4,30,52,5,12,5,20,62,60,4,31,25,6,12,5,20,62,60,4,33,16,2,12,5,20,62,60,4,33,50,2,12,5,20,62,60,4,34,56,2,12,5,19,62,60,4,34,59,2,12,5,9,62,60,4,35,1,5,12,5,9,62,60,4,35,12,6,12,5,9,62,60,4,35,37,5,12,5,9,62,38,99,114,99,61,(byte)197,(byte)206};
@@ -382,6 +388,98 @@ public class ChargerDataService {
 		
 			}
 
+			public byte[] getDevSN(String encoded_string) throws HillromException{
+		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
+		        String sout = "";
+		        for(int i=0;i<b.length;i++) {
+		        	int val = b[i] & 0xFF;
+		        	sout = sout + val + " ";
+		        }
+		        
+		        //log.debug("Input Byte Array in devSN :"+sout);
+		
+		        
+		        String devSN = "";
+		        int start = returnMatch(b,DEV_SN);
+		        int end = returnMatch(b,DEV_WIFI)-DEV_WIFI.length;
+		        log.debug("start end : "+ start + " : " + end );
+		        
+		        byte[] devSNArray = new byte[end];
+		        int j=0;
+		        sout = "";
+		        for(int i=start;i<end;i++) {
+		        	devSNArray[j++] = b[i];
+		        	int val = b[i] & 0xFF;
+		        	devSN = devSN + val + " ";
+		        }
+
+		        
+		        log.debug("Value of devSN : "+ devSN );
+		        return devSNArray;
+		        
+			}
+			
+			public byte[] getDevWifi(String encoded_string) throws HillromException{
+		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
+		        String sout = "";
+		        for(int i=0;i<b.length;i++) {
+		        	int val = b[i] & 0xFF;
+		        	sout = sout + val + " ";
+		        }
+		        
+		        //log.debug("Input Byte Array in devWifi :"+sout);
+		
+		        
+		        String devWifi = "";
+		        int start = returnMatch(b,DEV_WIFI);
+		        int end = returnMatch(b,DEV_VER)-DEV_VER.length;
+		        log.debug("start end : "+ start + " : " + end );
+		        
+		        byte[] devWifiArray = new byte[end];
+		        int j=0;
+		        sout = "";
+		        for(int i=start;i<end;i++) {
+		        	devWifiArray[j++] = b[i];
+		        	int val = b[i] & 0xFF;
+		        	devWifi = devWifi + val + " ";
+		        }
+
+		        
+		        log.debug("Value of devWifi : "+ devWifi );
+		        return devWifiArray;
+		        
+			}
+			
+			public byte[] getDevVer(String encoded_string) throws HillromException{
+		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
+		        String sout = "";
+		        for(int i=0;i<b.length;i++) {
+		        	int val = b[i] & 0xFF;
+		        	sout = sout + val + " ";
+		        }
+		        
+		        //log.debug("Input Byte Array in devVer :"+sout);
+		
+		        
+		        String devVer = "";
+		        int start = returnMatch(b,DEV_VER);
+		        int end = returnMatch(b,FRAG_TOTAL_FIELD_NAME)-FRAG_TOTAL_FIELD_NAME.length;
+		        log.debug("start end : "+ start + " : " + end );
+		        
+		        byte[] devVerArray = new byte[end];
+		        int j=0;
+		        sout = "";
+		        for(int i=start;i<end;i++) {
+		        	devVerArray[j++] = b[i];
+		        	int val = b[i] & 0xFF;
+		        	devVer = devVer + val + " ";
+		        }
+
+		        
+		        log.debug("Value of devVer : "+ devVer );
+		        return devVerArray;
+		        
+			}
 			
 			public int getFragTotal(String encoded_string) throws HillromException{
 		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
@@ -391,7 +489,7 @@ public class ChargerDataService {
 		        	sout = sout + val + " ";
 		        }
 		        
-		        log.debug("Input Byte Array in getFragTotal :"+sout);
+		        //log.debug("Input Byte Array in getFragTotal :"+sout);
 		
 		        
 		        int start = returnMatch(b,FRAG_TOTAL_FIELD_NAME);
@@ -412,7 +510,7 @@ public class ChargerDataService {
 		        	sout = sout + val + " ";
 		        }
 		        
-		        log.debug("Input Byte Array in getFragCurrent :"+sout);
+		        //log.debug("Input Byte Array in getFragCurrent :"+sout);
 		
 		        
 		        int start = returnMatch(b,FRAG_CURRENT_FIELD_NAME);

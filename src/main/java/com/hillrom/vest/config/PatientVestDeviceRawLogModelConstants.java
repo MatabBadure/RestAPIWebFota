@@ -94,4 +94,7 @@ public class PatientVestDeviceRawLogModelConstants {
 	public static final byte[] CRC_FIELD_NAME = new byte[]{38,99,114,99,61};
 	public static final byte[] FRAG_TOTAL_FIELD_NAME = new byte[]{38,102,114,97,103,84,111,116,97,108,61};
 	public static final byte[] FRAG_CURRENT_FIELD_NAME = new byte[]{38,102,114,97,103,67,117,114,114,101,110,116,61};
+	public static final byte[] DEV_SN = new byte[]{38,100,101,118,83,78,61};
+	public static final byte[] DEV_WIFI = new byte[]{38,100,101,118,87,73,70,73,61};
+	public static final byte[] DEV_VER = new byte[]{38,100,101,118,86,101,114,61};
 }

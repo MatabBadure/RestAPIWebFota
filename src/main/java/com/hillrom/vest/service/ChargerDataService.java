@@ -243,7 +243,7 @@ public class ChargerDataService {
 	  
 			public void getDeviceData(String encoded_string){
 		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
-		        b = new byte[] {100,101,118,105,99,101,95,109,111,100,101,108,95,116,121,112,101,61,72,105,108,108,82,111,109,95,77,111,110,97,114,99,104,38,100,101,118,83,78,61,49,50,51,52,38,100,101,118,87,73,70,73,61,49,50,51,52,53,54,38,100,101,118,76,84,69,61,49,50,51,52,53,54,55,56,57,97,98,99,100,101,102,38,100,101,118,86,101,114,61,49,50,51,52,53,54,55,56,49,50,51,52,53,54,55,56,38,100,101,118,105,99,101,68,97,116,97,61,23,45,67,87,56,83,4,25,76,12,13,56,83,4,25,76,12,13,25,24,67,83,76,12,13,24,76,12,13,13,24,45,67,34,53,111,119,24,115,114,93,97,27,104,18,17,58,73,64,(byte)253,59,57,(byte)233,44,38,99,114,99,61,54,(byte)210};
+		        b = new byte[] {100,101,118,105,99,101,95,109,111,100,101,108,95,116,121,112,101,61,72,105,108,108,82,111,109,95,77,111,110,97,114,99,104,38,100,101,118,83,78,61,82,48,48,49,80,80,48,48,48,49,38,100,101,118,87,73,70,73,61,0,35,(byte)167,38,100,101,118,86,101,114,61,4,0,0,0,2,0,0,0,38,102,114,97,103,84,111,116,97,108,61,1,38,102,114,97,103,67,117,114,114,101,110,116,61,1,38,100,101,118,105,99,101,68,97,116,97,61,0,0,0,3,17,1,1,4,30,16,17,1,1,4,45,37,0,0,10,(byte)128,0,0,1,50,60,4,30,16,1,12,5,20,62,60,4,30,52,5,12,5,20,62,60,4,31,25,6,12,5,20,62,60,4,33,16,2,12,5,20,62,60,4,33,50,2,12,5,20,62,60,4,34,56,2,12,5,19,62,60,4,34,59,2,12,5,9,62,60,4,35,1,5,12,5,9,62,60,4,35,12,6,12,5,9,62,60,4,35,37,5,12,5,9,62,38,99,114,99,61,(byte)197,(byte)206};
 		        byte[] match_devicedata = new byte[]{38,100,101,118,105,99,101,68,97,116,97,61};
 		        byte[] match_crc = new byte[]{38,99,114,99,61};
 		        String sout = "";
@@ -268,56 +268,57 @@ public class ChargerDataService {
 		        }
 		        log.debug("deviceData : "+ sout );
 		        
-		        byte[] session_index  = Arrays.copyOfRange(deviceDataArray, SESSION_INDEX_LOC, SESSION_INDEX_LOC + (SESSION_INDEX_LEN)-1);
+		        byte[] session_index  = Arrays.copyOfRange(deviceDataArray, SESSION_INDEX_LOC, SESSION_INDEX_LOC + SESSION_INDEX_LEN);
 		        sout = "";
+		        
 		        for(int k=0;k<session_index.length;k++){
 		        	sout = sout + (session_index[k]  & 0xFF) + " ";
 		        }
 		        log.debug("session_index : "+ sout );
 		              
-		        byte[] start_time  = Arrays.copyOfRange(deviceDataArray, START_TIME_LOC-1, (START_TIME_LOC-1) + START_TIME_LEN);
+		        byte[] start_time  = Arrays.copyOfRange(deviceDataArray, START_TIME_LOC, START_TIME_LOC + START_TIME_LEN);
 		        sout = "";
 		        for(int k=0;k<start_time.length;k++){
 		        	sout = sout + (start_time[k]  & 0xFF) + " ";
 		        }
 		        log.debug("start_time : "+ sout );
 		        
-		        byte[] end_time  = Arrays.copyOfRange(deviceDataArray, END_TIME_LOC-1, (END_TIME_LOC-1) + END_TIME_LEN);        
+		        byte[] end_time  = Arrays.copyOfRange(deviceDataArray, END_TIME_LOC, END_TIME_LOC + END_TIME_LEN);        
 		        sout = "";
 		        for(int k=0;k<end_time.length;k++){
 		        	sout = sout + (end_time[k]  & 0xFF) + " ";
 		        }
 		        log.debug("end_time : "+ sout );
 		        
-		        byte[] start_battery_level  = Arrays.copyOfRange(deviceDataArray, START_BATTERY_LEVEL_LOC-1, (START_BATTERY_LEVEL_LOC-1) + START_BATTERY_LEVEL_LEN);
+		        byte[] start_battery_level  = Arrays.copyOfRange(deviceDataArray, START_BATTERY_LEVEL_LOC, START_BATTERY_LEVEL_LOC + START_BATTERY_LEVEL_LEN);
 		        sout = "";
 		        for(int k=0;k<start_battery_level.length;k++){
 		        	sout = sout + (start_battery_level[k]  & 0xFF) + " ";
 		        }
 		        log.debug("start_battery_level : "+ sout );
 		        
-		        byte[] end_battery_level  = Arrays.copyOfRange(deviceDataArray, END_BATTERY_LEVEL_LOC-1, (END_BATTERY_LEVEL_LOC-1) + END_BATTERY_LEVEL_LEN);
+		        byte[] end_battery_level  = Arrays.copyOfRange(deviceDataArray, END_BATTERY_LEVEL_LOC, END_BATTERY_LEVEL_LOC + END_BATTERY_LEVEL_LEN);
 		        sout = "";
 		        for(int k=0;k<end_battery_level.length;k++){
 		        	sout = sout + (end_battery_level[k]  & 0xFF) + " ";
 		        }
 		        log.debug("end_battery_level : "+ sout );
 		        
-		        byte[] number_of_events  = Arrays.copyOfRange(deviceDataArray, NUMBER_OF_EVENTS_LOC-1, (NUMBER_OF_EVENTS_LOC-1) + NUMBER_OF_EVENTS_LEN);
+		        byte[] number_of_events  = Arrays.copyOfRange(deviceDataArray, NUMBER_OF_EVENTS_LOC, NUMBER_OF_EVENTS_LOC + NUMBER_OF_EVENTS_LEN);
 		        sout = "";
 		        for(int k=0;k<number_of_events.length;k++){
 		        	sout = sout + (number_of_events[k]  & 0xFF) + " ";
 		        }
 		        log.debug("number_of_events : "+ sout );
 		        
-		        byte[] number_of_pods  = Arrays.copyOfRange(deviceDataArray, NUMBER_OF_PODS_LOC-1, (NUMBER_OF_PODS_LOC-1) + NUMBER_OF_PODS_LEN);
+		        byte[] number_of_pods  = Arrays.copyOfRange(deviceDataArray, NUMBER_OF_PODS_LOC, NUMBER_OF_PODS_LOC + NUMBER_OF_PODS_LEN);
 		        sout = "";
 		        for(int k=0;k<number_of_pods.length;k++){
 		        	sout = sout + (number_of_pods[k]  & 0xFF) + " ";
 		        }
 		        log.debug("number_of_pods : "+ sout );
 		        
-		        byte[] hmr_seconds  = Arrays.copyOfRange(deviceDataArray, HMR_SECONDS_LOC-1, (HMR_SECONDS_LOC-1) + HMR_SECONDS_LEN);
+		        byte[] hmr_seconds  = Arrays.copyOfRange(deviceDataArray, HMR_SECONDS_LOC, HMR_SECONDS_LOC + HMR_SECONDS_LEN);
 		        sout = "";
 		        for(int k=0;k<hmr_seconds.length;k++){
 		        	sout = sout + (hmr_seconds[k]  & 0xFF) + " ";

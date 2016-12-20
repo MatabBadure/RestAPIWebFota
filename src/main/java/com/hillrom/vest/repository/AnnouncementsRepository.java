@@ -1,6 +1,9 @@
 package com.hillrom.vest.repository;
 
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import com.hillrom.vest.domain.Announcements;
@@ -14,7 +17,7 @@ public interface AnnouncementsRepository extends JpaRepository<Announcements, Lo
 	    Announcements findOneById(Long id, boolean isDeleted);
 	    
 	    @Query(" from Announcements announcement where isDeleted = ? ")
-	    List<Announcements> findAnnouncements(boolean isDeleted);
+	    Page<Announcements> findAnnouncements(boolean isDeleted,Pageable pageable);
 	 
 	
 }

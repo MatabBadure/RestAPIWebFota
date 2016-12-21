@@ -59,7 +59,7 @@ import org.joda.time.DateTime;
 @Transactional
 public class AdherenceResetService {
 
-    private final Logger log = LoggerFactory.getLogger(ClinicService.class);
+    private final Logger log = LoggerFactory.getLogger(AdherenceResetService.class);
 
     @Inject
     private AdherenceResetRepository adherenceResetRepository;
@@ -113,6 +113,22 @@ public class AdherenceResetService {
     	return existAdherenceReset;
     }
 
+    
+    public List<AdherenceReset> findOneByPatientUserIdAndCreatedByAndResetDate(Long userId,String patientId) throws Exception{
+    	List<AdherenceReset> adherenceResetList = new ArrayList<AdherenceReset>();
+    	try{
+    	if(patientId != null){
+    		adherenceResetList = adherenceResetRepository.findAllByPatientId(patientId);
+    	}
+    	
+    	if(userId != null){
+    		adherenceResetList = adherenceResetRepository.findAllByPatientUserId(userId);
+    	}
+    	}catch(Exception ex){
+    		ex.printStackTrace();
+    	}
+    	return adherenceResetList;
+	}
     
 
 

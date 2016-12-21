@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.domain.AdherenceReset;
+import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.TherapySession;
@@ -186,5 +187,31 @@ public class AdherenceResource {
 		}
 		return filterMap;
 	}
+	
+	   /**
+     * GET  /adherenceResetList -> get all adherence reset list for patient / user.
+     */
+    @RequestMapping(value = "/adherenceResetList",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    public ResponseEntity<List<AdherenceReset>> getAdherenceResetList(@RequestParam(value = "user" , required = false) Long userId,
+    								@RequestParam(value = "patient" , required = false) String patientId)
+        throws HillromException {
+    	
+
+		JSONObject jsonObject = new JSONObject();
+		
+		try{
+			List<AdherenceReset> adherenceResetList = adherenceResetService.findOneByPatientUserIdAndCreatedByAndResetDate(userId,patientId);
+			if(Objects.nonNull(adherenceResetList)){
+				return new ResponseEntity<>(adherenceResetList, HttpStatus.OK);
+			}
+		}catch(Exception ex){
+			jsonObject.put("ERROR", ex.getMessage());
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
 }

@@ -80,12 +80,23 @@ public class MessagingResource {
 				
 			Messages newMessage = messagingService.saveOrUpdateMessageData(messageDTO);
 			messageDTO.setId(newMessage.getId());
-			List<MessageTouserAssoc> newMessageTouserAssocList = messagingService.saveOrUpdateMessageTousersData(messageDTO);
-			jsonObject.put("Message", newMessage);
-			jsonObject.put("MessageTouserAssocList", newMessageTouserAssocList);
-			if(Objects.nonNull(newMessage)){
-				jsonObject.put("statusMsg", "Message sent successfully");
-				return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
+			String returnValue = messagingService.saveOrUpdateMessageTousersData(messageDTO);
+			
+			if(Objects.nonNull(newMessage) && Objects.nonNull(returnValue) && returnValue != ""){
+				
+				String[] returnValues = returnValue.split("#");
+				
+				String statusMessage = returnValues[0];
+				int errorFlag = Integer.parseInt(returnValues[1]);
+				
+				//jsonObject.put("statusMsg", "Message sent successfully");
+				if(errorFlag == 0){
+					jsonObject.put("statusMsg", statusMessage);
+					return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
+				}else{
+					jsonObject.put("ERROR", statusMessage);
+					return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+				}
 			}
 		}catch(Exception ex){
 			jsonObject.put("ERROR", ex.getMessage());

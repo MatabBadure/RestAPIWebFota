@@ -53,11 +53,15 @@ public class PaginationUtil {
         	String sortingKey = (String)sortOrder.keySet().toArray()[0];
         	if(sortOrder.get(sortingKey)) {
         		sort = new Sort(new Order(Direction.ASC, sortingKey));
-        		if(sortingKey.equals("user.lastName") || sortingKey.equals("messages.user.lastName"))
+        		if(sortingKey.equals("user.lastName") || sortingKey.equals("messages.user.lastName") || 
+        				sortingKey.equals("toClinic.name") || sortingKey.equals("messages.fromClinic.name") || 
+        				sortingKey.equals("messages.messageSubject"))
         			sort = new Sort(new Order(Direction.ASC, sortingKey),new Order(Direction.DESC, "messages.messageDatetime"));
         	} else {
         		sort = new Sort(new Order(Direction.DESC, sortingKey));
-        		if(sortingKey.equals("user.lastName") || sortingKey.equals("messages.user.lastName"))
+        		if(sortingKey.equals("user.lastName") || sortingKey.equals("messages.user.lastName") || 
+        				sortingKey.equals("toClinic.name") || sortingKey.equals("messages.fromClinic.name") || 
+        				sortingKey.equals("messages.messageSubject"))
         			sort = new Sort(new Order(Direction.DESC, sortingKey),new Order(Direction.DESC, "messages.messageDatetime"));
         	}
         }

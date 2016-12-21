@@ -126,7 +126,8 @@ public class MessagingResource {
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-			Page<Object> messageList = messagingService.getSentMessagesForMailbox(isClinic, clinicId, fromUserId, PaginationUtil.generatePageRequest(offset, limit, sortOrder));
+			String addDateSort =  "messages.messageDatetime";
+			Page<Object> messageList = messagingService.getSentMessagesForMailbox(isClinic, clinicId, fromUserId, PaginationUtil.generatePageRequest(offset, limit, sortOrder, addDateSort));
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}
@@ -205,8 +206,8 @@ public class MessagingResource {
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-			//Page<JSONObject> messageList = messagingService.getReceivedMessagesForMailbox(toUserId,new PageRequest(offset, limit));
-			Page<Object> messageList = messagingService.getReceivedMessagesForMailbox(isClinic, clinicId, toUserId, mailBoxType, PaginationUtil.generatePageRequest(offset, limit, sortOrder));
+			String addDateSort =  "messages.messageDatetime";
+			Page<Object> messageList = messagingService.getReceivedMessagesForMailbox(isClinic, clinicId, toUserId, mailBoxType, PaginationUtil.generatePageRequest(offset, limit, sortOrder, addDateSort));
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}

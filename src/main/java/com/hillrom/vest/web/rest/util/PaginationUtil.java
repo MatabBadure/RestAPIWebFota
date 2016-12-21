@@ -53,16 +53,32 @@ public class PaginationUtil {
         	String sortingKey = (String)sortOrder.keySet().toArray()[0];
         	if(sortOrder.get(sortingKey)) {
         		sort = new Sort(new Order(Direction.ASC, sortingKey));
-        		if(sortingKey.equals("user.lastName") || sortingKey.equals("messages.user.lastName") || 
-        				sortingKey.equals("toClinic.name") || sortingKey.equals("messages.fromClinic.name") || 
-        				sortingKey.equals("messages.messageSubject"))
-        			sort = new Sort(new Order(Direction.ASC, sortingKey),new Order(Direction.DESC, "messages.messageDatetime"));
         	} else {
         		sort = new Sort(new Order(Direction.DESC, sortingKey));
-        		if(sortingKey.equals("user.lastName") || sortingKey.equals("messages.user.lastName") || 
-        				sortingKey.equals("toClinic.name") || sortingKey.equals("messages.fromClinic.name") || 
-        				sortingKey.equals("messages.messageSubject"))
-        			sort = new Sort(new Order(Direction.DESC, sortingKey),new Order(Direction.DESC, "messages.messageDatetime"));
+        	}
+        }
+        return new PageRequest(offset - 1, limit, sort);
+    }
+
+    // For Messaging, to include date sorting along with sorting params passed, except if date is sorted
+    public static Pageable generatePageRequest(Integer offset, Integer limit, Map<String, Boolean> sortOrder, String dateSort) {
+        if (offset == null || offset < MIN_OFFSET) {
+            offset = DEFAULT_OFFSET;
+        }
+        if (limit == null || limit > MAX_LIMIT) {
+            limit = MAX_LIMIT;
+        }
+        Sort sort = null;
+        if(sortOrder.keySet().size() > 0) {
+        	String sortingKey = (String)sortOrder.keySet().toArray()[0];
+        	if(sortOrder.get(sortingKey)) {
+        		sort = new Sort(new Order(Direction.ASC, sortingKey));
+        		if(!sortingKey.equals(dateSort))
+        			sort = new Sort(new Order(Direction.ASC, sortingKey),new Order(Direction.DESC, dateSort));
+        	} else {
+        		sort = new Sort(new Order(Direction.DESC, sortingKey));
+        		if(!sortingKey.equals(dateSort))
+        			sort = new Sort(new Order(Direction.DESC, sortingKey),new Order(Direction.DESC, dateSort));
         	}
         }
         return new PageRequest(offset - 1, limit, sort);

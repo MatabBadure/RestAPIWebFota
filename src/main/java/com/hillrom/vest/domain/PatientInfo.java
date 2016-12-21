@@ -121,6 +121,15 @@ public class PatientInfo implements Serializable {
 	@Column(name = "device_assoc_date")
     private DateTime deviceAssocDate;
 
+	//Start: Announcement changes
+    @Column(name = "primary_diagnosis")
+    private String primaryDiagnosis;
+    
+    public String getPrimaryDiagnosis() {
+		return primaryDiagnosis;
+	}
+    //End: Announcement changes
+    
     public String getId() {
 		return id;
 	}

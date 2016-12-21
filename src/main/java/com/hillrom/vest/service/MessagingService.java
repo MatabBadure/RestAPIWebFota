@@ -121,10 +121,7 @@ public class MessagingService {
 			//Integer clinicSize = toClinicIds.size();
 			List<String> clinicFailList =  new ArrayList<>();
 			
-			
 			for(String clinicId : toClinicIds){
-				
-				boolean hcpCaFlag = false;
 				
 				// To get the list of HCP users for the clinic
 				List<String> idList = new ArrayList<>();
@@ -134,7 +131,6 @@ public class MessagingService {
 				// Check for HCP users available for the Clinic and add it in the list
 				if (Objects.nonNull(hcpUserList)) {
 					for(UserExtension hcpUser : hcpUserList){
-						hcpCaFlag = true;
 						MessageTouserAssoc newMessageTouserAssoc = new MessageTouserAssoc();
 						newMessageTouserAssoc.setMessages(messagingRepository.findById(newMessageId));
 						newMessageTouserAssoc.setUser(hcpUser);
@@ -154,7 +150,6 @@ public class MessagingService {
 				// Check for CA users available for the Clinic and add it in the list
 				if(Objects.nonNull(clinicUserList)){
 					for(EntityUserAssoc clinicUserAssoc : clinicUserList){
-						hcpCaFlag = true;
 						MessageTouserAssoc newMessageTouserAssoc = new MessageTouserAssoc();
 						newMessageTouserAssoc.setMessages(messagingRepository.findById(newMessageId));
 						newMessageTouserAssoc.setUser(clinicUserAssoc.getUser());					
@@ -167,7 +162,9 @@ public class MessagingService {
 						sendMessageNotifiationToUser(clinicUserAssoc.getUser().getId(), messageSubject, 2);
 					}
 				}
-				if(!hcpCaFlag){
+
+				if((Objects.isNull(hcpUserList) && Objects.isNull(clinicUserList)) || 
+						((Objects.nonNull(hcpUserList) && hcpUserList.size() == 0) && (Objects.nonNull(clinicUserList) && clinicUserList.size()==0))){
 					clinicFailList.add(clinicRepository.getOne(clinicId).getName());
 				}
 			}

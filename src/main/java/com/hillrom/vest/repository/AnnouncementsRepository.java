@@ -29,11 +29,12 @@ public interface AnnouncementsRepository extends JpaRepository<Announcements, Lo
 	    	   + " and CURRENT_DATE() between announcement.startDate and announcement.endDate ")
 	    Page<Announcements> findAnnouncementsByClinicId(List<String> clinicIds, boolean isDeleted,Pageable pageable);
 	
+
 	    @Query(value=" SELECT * from  ANNOUNCEMENTS ac, PATIENT_INFO pi "
 				+ " where (ac.send_to = 'All' or ac.send_to = 'Patient') and (ac.patient_type = 'All' or pi.primary_diagnosis = ac.patient_type or "
 				+ " IF(TIMESTAMPDIFF(YEAR, pi.dob, CURDATE()) > 18, 'Adult', 'Peds') = ac.patient_type )  "
 				+ " and pi.id =:patientId and ac.is_deleted =:isDeleted and  ac.start_date <= now() and (ac.end_date >= now())", nativeQuery=true)
-	    Page<Announcements> findAnnouncementsByPatientId(@Param("patientId")String patientId,@Param("isDeleted")boolean isDeleted,Pageable pageable);
+	    List<Announcements> findAnnouncementsByPatientId(@Param("patientId")String patientId,@Param("isDeleted")boolean isDeleted,Pageable pageable);
 	    
 	     /* @Query(" from Announcements announcement, PatientInfo patientInfo where (announcement.sendTo = 'All' or announcement.sendTo = 'Patient') "
  	   + " and (announcement.patientType = 'All' or announcement.patientType = patientInfo.primaryDiagnosis or "

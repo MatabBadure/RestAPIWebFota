@@ -15,6 +15,7 @@ import com.hillrom.vest.domain.ClinicPatientAssocPK;
 import com.hillrom.vest.domain.MessageTouserAssoc;
 import com.hillrom.vest.domain.Messages;
 import com.hillrom.vest.web.rest.dto.MessageToUserAssoDTO;
+
 import org.joda.time.DateTime;
 import org.hibernate.QueryException;
 import org.hibernate.cfg.Configuration;
@@ -86,7 +87,10 @@ public interface MessageTouserAssocRepository extends
 
 	// To get the thread for the user id and clinic id
 	@Query("Select messageTouserAssoc.messages, "			
-			+ "CASE WHEN mfC.name IS NULL THEN (CASE WHEN messageTouserAssoc.messages.user.firstName IS NULL THEN '' ELSE (messageTouserAssoc.messages.user.firstName || ' ') END  || CASE WHEN messageTouserAssoc.messages.user.lastName IS NULL THEN '' ELSE messageTouserAssoc.messages.user.lastName END) ELSE mfC.name END "
+			+ "CASE WHEN mfC.name IS NULL THEN (CASE WHEN messageTouserAssoc.messages.user.lastName IS NULL THEN '' "
+			+ "ELSE (messageTouserAssoc.messages.user.lastName || ', ') END  || "
+			+ "CASE WHEN messageTouserAssoc.messages.user.firstName IS NULL THEN '' "
+			+ "ELSE messageTouserAssoc.messages.user.firstName END) ELSE mfC.name END "
 			+ "from MessageTouserAssoc messageTouserAssoc "			
 			+ "left join messageTouserAssoc.messages.fromClinic as mfC "			
 			+ "where messageTouserAssoc.messages.id <= ?1 and messageTouserAssoc.messages.rootMessageId = ?2 "

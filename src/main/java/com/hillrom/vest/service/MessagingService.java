@@ -97,7 +97,7 @@ public class MessagingService {
         return newMessage;
 	}
 	
-	public List<MessageTouserAssoc> saveOrUpdateMessageTousersData(MessageDTO messageDto) throws HillromException{
+	public String saveOrUpdateMessageTousersData(MessageDTO messageDto) throws HillromException{
 		
 		Long newMessageId = messageDto.getId();
 		
@@ -113,10 +113,12 @@ public class MessagingService {
 		if(Objects.nonNull(messageDto.getToClinicIds()))
 			toClinicIds = messageDto.getToClinicIds();
 		
-		List<MessageTouserAssoc> listMessageTouserAssoc = new ArrayList<MessageTouserAssoc>();
+		String statusMsg = "Message Sent successfully#0";
 		
 		// For Clinic Id
 		if(toClinicIds.size() > 0){
+			
+			List<String> clinicFailList =  new ArrayList<>();
 			
 			for(String clinicId : toClinicIds){
 				
@@ -126,16 +128,15 @@ public class MessagingService {
 				Set<UserExtension> hcpUserList = clinicService.getHCPUsers(idList);
 				
 				// Check for HCP users available for the Clinic and add it in the list
-				if (Objects.nonNull(hcpUserList)) {								
-					for(UserExtension hcpUser : hcpUserList){						
+				if (Objects.nonNull(hcpUserList)) {
+					for(UserExtension hcpUser : hcpUserList){
 						MessageTouserAssoc newMessageTouserAssoc = new MessageTouserAssoc();
 						newMessageTouserAssoc.setMessages(messagingRepository.findById(newMessageId));
-						newMessageTouserAssoc.setUser(hcpUser);					
+						newMessageTouserAssoc.setUser(hcpUser);
 						newMessageTouserAssoc.setIsArchived(messageDto.isArchived());
 						newMessageTouserAssoc.setIsRead(messageDto.isRead());
 						newMessageTouserAssoc.setToClinic(clinicRepository.getOne(clinicId));					
 						messageTouserAssocRepository.save(newMessageTouserAssoc);
-						listMessageTouserAssoc.add(newMessageTouserAssoc);
 						
 						// Send email notification to HCP user if the user opted - Flag 3 for HCP
 						sendMessageNotifiationToUser(hcpUser.getId(), messageSubject, 3);
@@ -155,13 +156,28 @@ public class MessagingService {
 						newMessageTouserAssoc.setIsRead(messageDto.isRead());
 						newMessageTouserAssoc.setToClinic(clinicRepository.getOne(clinicId));					
 						messageTouserAssocRepository.save(newMessageTouserAssoc);
-						listMessageTouserAssoc.add(newMessageTouserAssoc);
 						
 						// Send email notification to CA user if the user opted - Flag 2 for CA
 						sendMessageNotifiationToUser(clinicUserAssoc.getUser().getId(), messageSubject, 2);
 					}
+				}			
+			
+				if((Objects.isNull(hcpUserList) && Objects.isNull(clinicUserList)) || 
+						((Objects.nonNull(hcpUserList) && hcpUserList.size() == 0) && (Objects.nonNull(clinicUserList) && clinicUserList.size()==0))){
+					clinicFailList.add(clinicRepository.getOne(clinicId).getName());
 				}
 			}
+		
+			// get the list of clinic's, where message not sent
+			String clinicsString = StringUtils.join(clinicFailList,", ");
+			
+			// Checks for all the messages sent to clinics failed
+			if(toClinicIds.size() > 0 && toClinicIds.size() == clinicFailList.size()){
+				statusMsg = "Unable to send message to clinic(s) : "+clinicsString+"#1";
+			}else if(toClinicIds.size() > 0 && clinicFailList.size() != 0 && clinicFailList.size() < toClinicIds.size()){
+				// Checks for atleast one clinic failed to send message
+				statusMsg = "Message not sent to all clinic(s), unable to send message to clinic(s) : "+clinicsString+"#1";			
+			}	
 		}else if(toUserIds.size() > 0){
 			// For List of Patients
 			for(Long userId : toUserIds){
@@ -170,8 +186,7 @@ public class MessagingService {
 				newMessageTouserAssoc.setUser(userRepository.findOne(userId));
 				newMessageTouserAssoc.setIsArchived(messageDto.isArchived());
 				newMessageTouserAssoc.setIsRead(messageDto.isRead());
-				messageTouserAssocRepository.save(newMessageTouserAssoc);
-				listMessageTouserAssoc.add(newMessageTouserAssoc);
+				messageTouserAssocRepository.save(newMessageTouserAssoc);				
 				
 				// Send email notification to Patient user if the user opted - Flag 1 for Patient
 				sendMessageNotifiationToUser(userId, messageSubject, 1);
@@ -185,7 +200,7 @@ public class MessagingService {
 			newMessage.setToMessageId(toMessageId);
 		}
 		messagingRepository.save(newMessage);
-		return listMessageTouserAssoc;
+		return statusMsg;
 	}
 	
 	public void sendMessageNotifiationToUser(Long userId, String messageSubject, int patOrCaOrHcp) throws HillromException{	

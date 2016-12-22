@@ -306,7 +306,7 @@ public class MessagingResource {
 	   * 
 	   * While calling from pastman pass x-auth-token and name = uploadfile . Body should be form-data , uploadfile and ChooseFile
 	   */
-	  @RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
+	  @RequestMapping(value = "/messages/uploadFile", method = RequestMethod.POST)
 	  @ResponseBody
 	  public ResponseEntity<?> uploadFile(
 	      @RequestParam("uploadfile") MultipartFile uploadfile) {
@@ -333,7 +333,7 @@ public class MessagingResource {
 	  
 
 	  
-	  @RequestMapping(value = "/files/{file_name}", method = RequestMethod.GET)
+	  @RequestMapping(value = "/messages/files/{file_name}", method = RequestMethod.GET)
 	  public void getFile(
 	      @PathVariable("file_name") String fileName, 
 	      HttpServletResponse response) {

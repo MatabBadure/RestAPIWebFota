@@ -82,7 +82,8 @@ public class AnnouncementsResource {
             @RequestParam(value = "sort_by", required = false) String sortBy,
             @RequestParam(value = "asc",required = false) Boolean isAscending,
             @RequestParam(value = "userType", required = false) String userType,
-            @RequestParam(value = "userTypeId", required = false) Long userId){
+            @RequestParam(value = "userTypeId", required = false) Long userId,
+            @RequestParam(value = "patientId", required = false) String patientId){
 
 	   	 Map<String,Boolean> sortOrder = new HashMap<>();
 	   	 if(sortBy != null  && !sortBy.equals("")) {
@@ -98,10 +99,10 @@ public class AnnouncementsResource {
 				announcementsList = announcementsService.findAllAnnouncements(PaginationUtil.generatePageRequest(offset, limit, sortOrder));
 			}
 			if(userType.equalsIgnoreCase(AuthoritiesConstants.CLINIC_ADMIN) || userType.equalsIgnoreCase(AuthoritiesConstants.HCP)){
-				announcementsList = announcementsService.findVisibleAnnouncementsById(userType,userId,null,PaginationUtil.generatePageRequest(offset, limit, sortOrder));	
+				announcementsList = announcementsService.findVisibleAnnouncementsById(userType,userId,null,PaginationUtil.generatePageRequest(offset, limit, sortOrder),sortOrder);	
 			}
 			if(userType.equalsIgnoreCase(AuthoritiesConstants.PATIENT)){
-				announcementsList = announcementsService.findVisibleAnnouncementsById(userType,null,userId.toString(),PaginationUtil.generatePageRequest(offset, limit, sortOrder));	
+				announcementsList = announcementsService.findVisibleAnnouncementsById(userType,null,patientId,PaginationUtil.generatePageRequest(offset, limit, sortOrder),sortOrder);	
 			}
 			
 			 jsonObject.put("Announcement_List", announcementsList);

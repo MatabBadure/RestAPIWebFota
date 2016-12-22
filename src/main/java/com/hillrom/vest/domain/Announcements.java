@@ -70,18 +70,10 @@ public class Announcements {
 	@Column(name="is_deleted")
 	private boolean isDeleted;
 	
-
-
-	/**
-	 * @return the isDeleted
-	 */
 	public boolean isDeleted() {
 		return isDeleted;
 	}
 
-	/**
-	 * @param isDeleted the isDeleted to set
-	 */
 	public void setDeleted(boolean isDeleted) {
 		this.isDeleted = isDeleted;
 	}

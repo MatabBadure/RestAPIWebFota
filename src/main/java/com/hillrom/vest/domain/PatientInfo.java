@@ -101,6 +101,19 @@ public class PatientInfo implements Serializable {
     @Column(name = "web_login_created")
     private Boolean webLoginCreated;
 
+    //Start: Announcement changes
+    @Column(name = "primary_diagnosis")
+    private String primaryDiagnosis;
+    
+    public String getPrimaryDiagnosis() {
+		return primaryDiagnosis;
+	}
+    
+	public void setPrimaryDiagnosis(String primaryDiagnosis) {
+		this.primaryDiagnosis = primaryDiagnosis;
+	}
+	//End: Announcement changes
+	
     @NotAudited
     @OneToMany(mappedBy = "clinicPatientAssocPK.patient",fetch=FetchType.LAZY)
     @JsonIgnore

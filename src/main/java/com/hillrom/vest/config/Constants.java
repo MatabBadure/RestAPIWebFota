@@ -320,4 +320,9 @@ public final class Constants {
 	public static final String BM_TYPE_AVERAGE_LABEL = "Avg.";
 	public static final String BM_TYPE_MEDIAN_LABEL = "Med.";
 	public static final String BM_TYPE_PERCENTILE_LABEL = "Percentile.";
+	
+	//start:announcement changes
+	public static final String ANNOUNCEMENT_FILE_PATH = "/tmp/visiview-files/";
+	//end:announcement changes
+		
 }

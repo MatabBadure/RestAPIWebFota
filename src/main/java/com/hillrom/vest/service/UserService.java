@@ -594,21 +594,17 @@ public class UserService {
         		}
         	} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))
         			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ASSOCIATES))) {
-	        	if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
-	        		UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
-	        		if(Objects.nonNull(user.getId())) {
-	        			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
-	        				sendEmailNotification(baseUrl, user);
-	        			}
-	        			callEventOnUpdatingHRID(userExtensionDTO, currentHillromId, user);
-	                    return user;
+	        	UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
+	        	if(Objects.nonNull(user.getId())) {
+	        		if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
+	        			sendEmailNotification(baseUrl, user);
+	        		}
+	        		callEventOnUpdatingHRID(userExtensionDTO, currentHillromId, user);
+	                  return user;
 	        		} else {
 	        			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
 	        		}
 	        	} else {
-	        		throw new HillromException(ExceptionConstants.HR_403);
-	        	}
-        	} else {
     			throw new HillromException(ExceptionConstants.HR_555);
     		}
     	} else if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {

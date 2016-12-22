@@ -305,7 +305,7 @@ public class MessagingResource {
 	   * of errors.
 	   * 
 	   * While calling from pastman pass x-auth-token and name = uploadfile . Body should be form-data , uploadfile and ChooseFile
-	   *//*
+	   */
 	  @RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
 	  @ResponseBody
 	  public ResponseEntity<?> uploadFile(
@@ -353,5 +353,5 @@ public class MessagingResource {
 	        throw new RuntimeException("IOError writing file to output stream");
 	      }
 
-	  }*/
+	  }
 }

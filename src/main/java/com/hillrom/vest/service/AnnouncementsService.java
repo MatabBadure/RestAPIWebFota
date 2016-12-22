@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.Announcements;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.AnnouncementsPermissionRepository;
 import com.hillrom.vest.repository.AnnouncementsRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.util.DateUtil;
@@ -39,6 +40,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
+import java.util.Map;
+
 @Service
 @Transactional
 public class AnnouncementsService {
@@ -54,7 +57,9 @@ public class AnnouncementsService {
 	@Inject
 	private HCPClinicService hcpClinicService; 
 	
-	
+
+	@Inject
+	private AnnouncementsPermissionRepository announcementsPermissionRepository;
 
 	/**
 	 * 
@@ -69,8 +74,8 @@ public class AnnouncementsService {
 		announcement.setSubject(announcementsDTO.getSubject());
 		announcement.setStartDate(announcementsDTO.getStartDate());
 		announcement.setEndDate(announcementsDTO.getEndDate());
-		announcement.setCreatedDate(DateUtil.getCurrentDateAndTime());
-		announcement.setModifiedDate(DateUtil.getCurrentDateAndTime());
+		//announcement.setCreatedDate(DateUtil.getCurrentDateAndTime());
+		//announcement.setModifiedDate(DateUtil.getCurrentDateAndTime());
 		announcement.setSendTo(announcementsDTO.getSentTo());
 		announcement.setClinicType(announcementsDTO.getClicicType());
 		announcement.setPdfFilePath(announcementsDTO.getPdfFilePath());
@@ -109,42 +114,38 @@ public class AnnouncementsService {
 
 
  
-	public Page<Announcements> findVisibleAnnouncementsById(String userType, Long userId,String patientId,Pageable pageable) throws HillromException{
-			
-	 		Page<Announcements> announcementList = null; // new ArrayList<Announcements>();
-	 		List<Announcements> patientAnnouncementList = new ArrayList<Announcements>();
-	 		List<String> clinicList = new ArrayList<String>();
-	 		
-	 		if(userType.equalsIgnoreCase(AuthoritiesConstants.CLINIC_ADMIN)){
-	 			Set<ClinicVO> clinics = clinicService.getAssociatedClinicsForClinicAdmin(userId);
-	 			for(ClinicVO tclinic : clinics){
-	 				clinicList.add(tclinic.getId());
-	 			}
-	 		}
-	 		
-	 		if(userType.equalsIgnoreCase(AuthoritiesConstants.HCP)){
-	 			List<ClinicVO> clinics = hcpClinicService.getAssociatedClinicsForHCP(userId);
-	 			for(ClinicVO tclinic : clinics){
-	 				clinicList.add(tclinic.getId());
-	 			}
-	 		}
-	 		
-	 		
-	 		// Check for the clinic flag to differentiate between whether the clinic id is passed or patient id is passed
-			if(Objects.nonNull(clinicList)){
-				announcementList = announcementsRepository.findAnnouncementsByClinicId(clinicList, false,pageable);
-			}
-			
-			if(Objects.nonNull(patientId)){
-				patientAnnouncementList = announcementsRepository.findAnnouncementsByPatientId(patientId, false, pageable);
-		        announcementList = new PageImpl<Announcements>(patientAnnouncementList);
-				
-			}
-			
-	        
-	        return announcementList;
-	}
-	 
+public Page<Announcements> findVisibleAnnouncementsById(String userType, Long userId,String patientId,Pageable pageable,Map<String, Boolean> sortOrder) throws HillromException{
+		
+ 		Page<Announcements> announcementList = null; // new ArrayList<Announcements>();
+ 		List<String> clinicList =  new ArrayList<String>();
+ 		
+ 		if(userType.equalsIgnoreCase(AuthoritiesConstants.CLINIC_ADMIN)){
+ 			Set<ClinicVO> clinics = clinicService.getAssociatedClinicsForClinicAdmin(userId);
+ 			for(ClinicVO tclinic : clinics){
+ 				clinicList.add(tclinic.getId());
+ 			}
+ 		}
+ 		
+ 		if(userType.equalsIgnoreCase(AuthoritiesConstants.HCP)){
+ 			List<ClinicVO> clinics = hcpClinicService.getAssociatedClinicsForHCP(userId);
+ 			for(ClinicVO tclinic : clinics){
+ 				clinicList.add(tclinic.getId());
+ 			}
+ 		}
+ 		
+ 		
+ 		// Check for the clinic flag to differentiate between whether the clinic id is passed or patient id is passed
+		if(Objects.nonNull(clinicList) && clinicList.size() > 0){
+			announcementList = announcementsRepository.findAnnouncementsByClinicId(clinicList, false,pageable);
+		}
+		
+		if(Objects.nonNull(patientId)){
+			announcementList = announcementsPermissionRepository.findAnnouncementsByPatientId(pageable,sortOrder,patientId, false);
+		}
+		
+        
+        return announcementList;
+}
 	 
 	 
 	 
@@ -163,7 +164,7 @@ public class AnnouncementsService {
     			  announcement.setSubject(announcementsDTO.getSubject());
     			  announcement.setStartDate(announcementsDTO.getStartDate());
     			  announcement.setEndDate(announcementsDTO.getEndDate());
-    			  announcement.setModifiedDate(DateUtil.getCurrentDateAndTime());
+    			 // announcement.setModifiedDate(DateUtil.getCurrentDateAndTime());
     			  announcement.setSendTo(announcementsDTO.getSentTo());    			  
     			  announcement.setClinicType(announcementsDTO.getClicicType());
     			  announcement.setPdfFilePath(announcementsDTO.getPdfFilePath());
@@ -186,7 +187,7 @@ public class AnnouncementsService {
     	  if(Objects.nonNull(announcement))
     	  {
     			  announcement.setDeleted(false);
-    			  announcement.setModifiedDate(DateUtil.getCurrentDateAndTime());
+    			  //announcement.setModifiedDate(DateUtil.getCurrentDateAndTime());
     			  announcementsRepository.save(announcement);
     	          log.debug("updated Announcement Details: {}", announcement);
     	  }

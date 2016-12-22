@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -82,7 +81,8 @@ public class AnnouncementsResource {
             @RequestParam(value = "sort_by", required = false) String sortBy,
             @RequestParam(value = "asc",required = false) Boolean isAscending,
             @RequestParam(value = "userType", required = false) String userType,
-            @RequestParam(value = "userTypeId", required = false) Long userId){
+            @RequestParam(value = "userTypeId", required = false) Long userId,
+            @RequestParam(value = "patientId", required = false) String patientId){
 
 	   	 Map<String,Boolean> sortOrder = new HashMap<>();
 	   	 if(sortBy != null  && !sortBy.equals("")) {
@@ -98,10 +98,10 @@ public class AnnouncementsResource {
 				announcementsList = announcementsService.findAllAnnouncements(PaginationUtil.generatePageRequest(offset, limit, sortOrder));
 			}
 			if(userType.equalsIgnoreCase(AuthoritiesConstants.CLINIC_ADMIN) || userType.equalsIgnoreCase(AuthoritiesConstants.HCP)){
-				announcementsList = announcementsService.findVisibleAnnouncementsById(userType,userId,null,PaginationUtil.generatePageRequest(offset, limit, sortOrder));	
+				announcementsList = announcementsService.findVisibleAnnouncementsById(userType,userId,null,PaginationUtil.generatePageRequest(offset, limit, sortOrder),sortOrder);	
 			}
 			if(userType.equalsIgnoreCase(AuthoritiesConstants.PATIENT)){
-				announcementsList = announcementsService.findVisibleAnnouncementsById(userType,null,userId.toString(),PaginationUtil.generatePageRequest(offset, limit, sortOrder));	
+				announcementsList = announcementsService.findVisibleAnnouncementsById(userType,null,patientId,PaginationUtil.generatePageRequest(offset, limit, sortOrder),sortOrder);	
 			}
 			
 			 jsonObject.put("Announcement_List", announcementsList);
@@ -199,9 +199,9 @@ public class AnnouncementsResource {
 	   * 
 	   * While calling from pastman pass x-auth-token and name = uploadfile . Body should be form-data , uploadfile and ChooseFile
 	   */
-	  @RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
+	  @RequestMapping(value = "/announcement/uploadFile", method = RequestMethod.POST)
 	  @ResponseBody
-	  public ResponseEntity<?> uploadFile(
+	  public ResponseEntity<?> AnnouncementUploadFile(
 	      @RequestParam("uploadfile") MultipartFile uploadfile) {
 	    
 		  String filename = null;
@@ -239,8 +239,8 @@ public class AnnouncementsResource {
 	   * @param fileName
 	   * @param response
 	   */
-	  @RequestMapping(value = "/files/{file_name}", method = RequestMethod.GET)
-	  public ResponseEntity<?> getFile(
+	  @RequestMapping(value = "/announcement/files/{file_name}", method = RequestMethod.GET)
+	  public ResponseEntity<?> AnnouncementGetFile(
 	      @PathVariable("file_name") String fileName, 
 	      HttpServletResponse response) {
 		  

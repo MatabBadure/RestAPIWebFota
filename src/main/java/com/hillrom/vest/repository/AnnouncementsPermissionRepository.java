@@ -20,7 +20,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -80,10 +81,10 @@ public class AnnouncementsPermissionRepository {
 			String pdfFilePath = (String) record[4];
 			String sentTo = (String) record[5];
 			String subject = (String) record[6];
-			Timestamp createdAt = (Timestamp) record[7];
-			Timestamp modifiedAt = (Timestamp) record[8];
-			Timestamp startDate = (Timestamp) record[7];
-			Timestamp endDate = (Timestamp) record[8];
+			DateTime createdAt = new DateTime(record[7]);
+			DateTime modifiedAt = new DateTime(record[8]);
+			LocalDate startDate = new LocalDate(record[7]);
+			LocalDate endDate = new LocalDate(record[8]);
 			
 			Announcements announcement = new Announcements();
 			announcement.setId(id);

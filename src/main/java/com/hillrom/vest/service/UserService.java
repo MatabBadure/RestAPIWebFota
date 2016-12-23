@@ -376,6 +376,7 @@ public class UserService {
     private List<String> rolesAdminCanModerate() {
 		List<String> rolesAdminCanModerate = new ArrayList<String>();
     	rolesAdminCanModerate.add(AuthoritiesConstants.ACCT_SERVICES);
+    	rolesAdminCanModerate.add(AuthoritiesConstants.CUSTOMER_SERVICES);
     	rolesAdminCanModerate.add(AuthoritiesConstants.ASSOCIATES);
     	rolesAdminCanModerate.add(AuthoritiesConstants.ADMIN);
 		return rolesAdminCanModerate;
@@ -593,6 +594,7 @@ public class UserService {
         			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
         		}
         	} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))
+        			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))
         			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ASSOCIATES))) {
 	        	UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
 	        	if(Objects.nonNull(user.getId())) {

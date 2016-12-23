@@ -45,7 +45,7 @@ import com.hillrom.vest.web.rest.dto.PatientStatsVO;
 import com.hillrom.vest.web.rest.dto.UserSurveyAnswerDTO;
 
 
-//Hill-1852
+
 import javax.servlet.http.HttpServletRequest;
 
 import java.io.PrintWriter;
@@ -58,7 +58,7 @@ import java.util.Date;
 import com.hillrom.vest.service.util.DateUtil;
 
 import org.apache.commons.lang.StringUtils;
-//Hill-1852
+import java.util.Calendar;
 
 /**
  * Service for sending e-mails.
@@ -470,53 +470,6 @@ public class MailService {
         sendEmail(recipients.split(","), subject, content, true, true, file);
      }
     
-    //Hill-1852
-	/**
-     * Runs every midnight to find patient reaching 18 years in coming 90 days and send  them email notification
-     */
-    // @Scheduled(cron="0 30 23 * * * ")
-     public void processPatientReRegister(HttpServletRequest request){
-    	 
-    	 List<Object[]> patientDtlsList = null;
-    	 String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-    	 String eMail = "";
-    	 
-            try{
-                   
-                   log.debug("Started calculating patients who is reaching 18 years in next 90 days ");
-                   
-                   // get (CurrentDate + 90 days)
-                     java.time.LocalDate localDate = java.time.LocalDate.now().plusDays(90);
-                  
-                   	 // get all patients Details through repository 
-                      patientDtlsList = userRepository.findUserPatientsMaturityDobAfter90Days(localDate);
-                   
-                      // send activation link to those patients
-                      for (Object[] object : patientDtlsList) {
-                    	
-                    	 eMail =  (String) object[3];
-                    	 User user = new User();
-                    	 user.setEmail((String) object[6]);
-                    	 user.setFirstName((String) object[7]);
-                    	 user.setLastName((String) object[8]);
-                    	 user.setActivationKey((String) object[9]);
-                    	
-                    	 if(StringUtils.isNotEmpty(eMail)) {
-                    		 this.sendActivationEmail(user,baseUrl);
-         				}
-                    	
-                   }
-                   
-            }catch(Exception ex){
-    			StringWriter writer = new StringWriter();
-    			PrintWriter printWriter = new PrintWriter( writer );
-    			ex.printStackTrace( printWriter );
-    			System.out.println("ex :"+ex);
-    			this.sendJobFailureNotification("processPatientReRegister",writer.toString());
-    		}
-            return;
-     }
-   //Hill-1852
      
      
 }

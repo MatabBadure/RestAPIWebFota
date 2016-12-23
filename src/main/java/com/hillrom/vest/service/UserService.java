@@ -380,7 +380,6 @@ public class UserService {
     private List<String> rolesAdminCanModerate() {
 		List<String> rolesAdminCanModerate = new ArrayList<String>();
     	rolesAdminCanModerate.add(AuthoritiesConstants.ACCT_SERVICES);
-    	rolesAdminCanModerate.add(AuthoritiesConstants.CUSTOMER_SERVICES);
     	rolesAdminCanModerate.add(AuthoritiesConstants.ASSOCIATES);
     	rolesAdminCanModerate.add(AuthoritiesConstants.ADMIN);
     	//hill-1845

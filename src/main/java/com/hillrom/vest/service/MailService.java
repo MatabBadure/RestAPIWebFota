@@ -471,10 +471,11 @@ public class MailService {
      }
     
     
-   	/**
+   		/**
         * Runs every midnight to find patient reaching 18 years in coming 90 days and send  them email notification
         */
        // @Scheduled(cron="0 30 23 * * * ")
+    
         public void processPatientReRegister(HttpServletRequest request){
        	 
        	 List<Object[]> patientDtlsList = null;

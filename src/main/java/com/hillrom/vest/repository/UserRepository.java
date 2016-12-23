@@ -40,7 +40,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("from User user where activated = false and activationLinkSentDate between ?1 and ?2")
     List<User> findAllByActivatedIsFalseAndActivationLinkSentDateBetweeen(DateTime dateTime1, DateTime dateTime2);
 
-    //Hill-1852
+
     @Query(" SELECT pi.id, pi.firstName, pi.lastName, pi.email, pi.dob "
             + " ,uupa.id ,uupa.email, uupa.firstName ,uupa.lastName, uupa.activationKey "
             + " FROM PatientInfo pi "
@@ -49,6 +49,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             + " where upa.relationshipLabel = 'Caregiver' and upa.userRole = 'CARE_GIVER' and " 
     		+ " MONTH(pi.dob) = MONTH(:patientDob) and DAY(pi.dob) = DAY(:patientDob) and YEAR(pi.dob) + 18 = YEAR(:patientDob) ")
     List<Object[]> findUserPatientsMaturityDobAfter90Days(@Param("patientDob")LocalDate patientDob);
-    //Hill-1852
+    
     
 }

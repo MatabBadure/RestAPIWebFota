@@ -1,0 +1,5 @@
+id,type,type_code,type_code_value
+49,announcement_patient_type,All,All
+50,announcement_patient_type,Diagnosis,Diagnosis
+51,announcement_patient_type,Peds,Peds(0 - 18)
+52,announcement_patient_type,Adult,Adult(18+)

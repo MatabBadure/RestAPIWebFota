@@ -1,6 +1,7 @@
 package com.hillrom.vest.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -166,46 +167,34 @@ public class ClinicPatientService {
 	
    //start:HILL-2004
 	/*
-	public Clinic getAssociatedClinic(PatientInfo patientInfo) {
-		List<Clinic> clinics = new LinkedList<>();
-		for(ClinicPatientAssoc clinicPatientAssoc : patientInfo.getClinicPatientAssoc()){
-			clinics.add(clinicPatientAssoc.getClinic());
-		}
-		if(clinics.isEmpty())
-			return null; 
-		else
-			return clinics.get(0);		
-	} */
+		Method invoked from adherence calculation service to get the clinic with the latest adherence setting
+	 */
 	
 	public Clinic getAssociatedClinic(PatientInfo patientInfo) {
 		List<Clinic> clinics = new LinkedList<>();
 		List<String> clinicIdsList = new LinkedList<>();
+		Clinic clinic = null;
 		
+		// add all patient associtaed clinic information into the clinics list
 		for(ClinicPatientAssoc clinicPatientAssoc : patientInfo.getClinicPatientAssoc()){ 
 			
-			clinicIdsList.add(clinicPatientAssoc.getClinic().getId());
+			clinics.add(clinicPatientAssoc.getClinic());
 		}
 	
-		if(Objects.nonNull(clinicIdsList) && clinicIdsList.size() > 0)
-		{
-			clinics = clinicRepository.findPatientLastModifiedAdherenceSetting(clinicIdsList);
-		}
+		// remove objects with modifieddate as null
+		clinics.removeIf(o -> o.getAdherenceSettingModifiedDte() == null);
 		
-		/*		
-		if(Objects.isNull(clinics))
-			return null; 
-		else
-			return clinics.get(0);*/	
-		
-		if(Objects.nonNull(clinics) && clinics.size() > 0)
+		// If all clinics modified date is null send default adherence setting date as null
+		if( clinics.size() == 0)
 		{
-			return clinics.get(0);	
+			return clinic;
 		}
-		else
-		{
-			return null;
-		}
+		// else sort based on modified date, the lkatest modified date need to send as result
+		Collections.sort(clinics);
 		
+		
+		return clinics.get(clinics.size()-1);
+	
 		
 	}
 	//end:HILL-2004

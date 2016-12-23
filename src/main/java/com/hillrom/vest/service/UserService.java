@@ -2,7 +2,10 @@ package com.hillrom.vest.service;
 
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -16,6 +19,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -376,6 +380,7 @@ public class UserService {
     private List<String> rolesAdminCanModerate() {
 		List<String> rolesAdminCanModerate = new ArrayList<String>();
     	rolesAdminCanModerate.add(AuthoritiesConstants.ACCT_SERVICES);
+    	rolesAdminCanModerate.add(AuthoritiesConstants.CUSTOMER_SERVICES);
     	rolesAdminCanModerate.add(AuthoritiesConstants.ASSOCIATES);
     	rolesAdminCanModerate.add(AuthoritiesConstants.ADMIN);
     	//hill-1845
@@ -599,22 +604,19 @@ public class UserService {
         			//hill-1845
         			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))
         			//hill-1845
+
         			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ASSOCIATES))) {
-	        	if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
-	        		UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
-	        		if(Objects.nonNull(user.getId())) {
-	        			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
-	        				sendEmailNotification(baseUrl, user);
-	        			}
-	        			callEventOnUpdatingHRID(userExtensionDTO, currentHillromId, user);
-	                    return user;
+	        	UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
+	        	if(Objects.nonNull(user.getId())) {
+	        		if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
+	        			sendEmailNotification(baseUrl, user);
+	        		}
+	        		callEventOnUpdatingHRID(userExtensionDTO, currentHillromId, user);
+	                  return user;
 	        		} else {
 	        			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
 	        		}
 	        	} else {
-	        		throw new HillromException(ExceptionConstants.HR_403);
-	        	}
-        	} else {
     			throw new HillromException(ExceptionConstants.HR_555);
     		}
     	} else if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
@@ -1870,5 +1872,59 @@ public class UserService {
 		}
 		return patientInfo;
 	}
+	
+	
+	/**
+     * Runs every midnight to find patient reaching 18 years in coming 90 days and send  them email notification
+     */
+    // @Scheduled(cron="0 30 23 * * * ")
+     public void processPatientReRegister(HttpServletRequest request){
+    	 
+    	 List<Object[]> patientDtlsList = null;
+    	 String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+    	 String eMail = "";
+    	 
+            try{
+                   
+                   log.debug("Started calculating patients who is reaching 18 years in next 90 days ");
+                   
+                      Calendar cal = Calendar.getInstance();
+                      cal.add(Calendar.DATE, 90);
+                      
+                      int year = cal.get(Calendar.YEAR);
+                      int month = cal.get(Calendar.MONTH)+1;
+                      int day = cal.get(Calendar.DAY_OF_MONTH);
+
+                   	  // get all patients Details through repository 
+                      patientDtlsList = userRepository.findUserPatientsMaturityDobAfter90Days(year,month,day);
+                   
+                      // send activation link to those patients
+                      for (Object[] object : patientDtlsList) {
+                    	
+                    	 eMail =  (String) object[3];
+                    	 User user = new User();
+                    	 user.setEmail((String) object[6]);
+                    	 user.setFirstName((String) object[7]);
+                    	 user.setLastName((String) object[8]);
+                    	 user.setActivationKey((String) object[9]);
+                    	
+                    	 if(StringUtils.isNotEmpty(eMail)) {
+                    		 mailService.sendActivationEmail(user,baseUrl);
+         				}
+                    	
+                   }
+                   
+            }catch(Exception ex){
+    			StringWriter writer = new StringWriter();
+    			PrintWriter printWriter = new PrintWriter( writer );
+    			ex.printStackTrace( printWriter );
+    			System.out.println("ex :"+ex);
+    			mailService.sendJobFailureNotification("processPatientReRegister",writer.toString());
+    		}
+            return;
+     }
+   
+     
+     
 }
 

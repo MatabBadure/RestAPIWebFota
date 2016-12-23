@@ -17,6 +17,7 @@ import org.springframework.data.repository.query.Param;
 /**
  * Spring Data JPA repository for the User entity.
  */
+
 public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findOneByActivationKey(String activationKey);

@@ -487,6 +487,8 @@ public class MailService {
                       log.debug("Started calculating patients who is reaching 18 years in next 90 days ");
                       
                          Calendar cal = Calendar.getInstance();
+                         cal.add(Calendar.DATE, 90);
+                         
                          int year = cal.get(Calendar.YEAR);
                          int month = cal.get(Calendar.MONTH)+1;
                          int day = cal.get(Calendar.DAY_OF_MONTH);

@@ -186,7 +186,7 @@ public Page<Announcements> findVisibleAnnouncementsById(String userType, Long us
     	  Announcements announcement = announcementsRepository.findOne(id);
     	  if(Objects.nonNull(announcement))
     	  {
-    			  announcement.setDeleted(false);
+    			  announcement.setDeleted(true);
     			  announcement.setModifiedDate(DateUtil.getCurrentDateAndTime());
     			  announcementsRepository.save(announcement);
     	          log.debug("updated Announcement Details: {}", announcement);

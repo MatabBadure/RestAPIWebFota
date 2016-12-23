@@ -41,14 +41,27 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByActivatedIsFalseAndActivationLinkSentDateBetweeen(DateTime dateTime1, DateTime dateTime2);
 
 
-    @Query(" SELECT pi.id, pi.firstName, pi.lastName, pi.email, pi.dob "
+   /* @Query(" SELECT pi.id, pi.firstName, pi.lastName, pi.email, pi.dob "
             + " ,uupa.id ,uupa.email, uupa.firstName ,uupa.lastName, uupa.activationKey "
             + " FROM PatientInfo pi "
             + " left join pi.userPatientAssoc upa "
             + " left join upa.userPatientAssocPK.user uupa  "
             + " where upa.relationshipLabel = 'Caregiver' and upa.userRole = 'CARE_GIVER' and " 
     		+ " MONTH(pi.dob) = MONTH(:patientDob) and DAY(pi.dob) = DAY(:patientDob) and YEAR(pi.dob) + 18 = YEAR(:patientDob) ")
-    List<Object[]> findUserPatientsMaturityDobAfter90Days(@Param("patientDob")LocalDate patientDob);
+    List<Object[]> findUserPatientsMaturityDobAfter90Days(@Param("patientDob")LocalDate patientDob);*/
+   
+    
+    
+    @Query(" SELECT pi.id, pi.firstName, pi.lastName, pi.email, pi.dob "
+            + " ,uupa.id ,uupa.email, uupa.firstName ,uupa.lastName, uupa.activationKey "
+            + " FROM PatientInfo pi "
+            + " left join pi.userPatientAssoc upa "
+            + " left join upa.userPatientAssocPK.user uupa  "
+            + " where MONTH(pi.dob) = ?2  "
+            + " and DAY(pi.dob) = ?3 and YEAR(pi.dob) + 18 = ?1 "
+            + " and upa.relationshipLabel = 'Caregiver' and upa.userRole = 'CARE_GIVER'")
+       List<Object[]> findUserPatientsMaturityDobAfter90Days(int year, int month, int day);
+
     
     
 }

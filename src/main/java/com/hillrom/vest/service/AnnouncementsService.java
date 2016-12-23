@@ -74,8 +74,8 @@ public class AnnouncementsService {
 		announcement.setSubject(announcementsDTO.getSubject());
 		announcement.setStartDate(announcementsDTO.getStartDate());
 		announcement.setEndDate(announcementsDTO.getEndDate());
-		//announcement.setCreatedDate(DateUtil.getCurrentDateAndTime());
-		//announcement.setModifiedDate(DateUtil.getCurrentDateAndTime());
+		announcement.setCreatedDate(DateUtil.getCurrentDateAndTime());
+		announcement.setModifiedDate(DateUtil.getCurrentDateAndTime());
 		announcement.setSendTo(announcementsDTO.getSentTo());
 		announcement.setClinicType(announcementsDTO.getClicicType());
 		announcement.setPdfFilePath(announcementsDTO.getPdfFilePath());
@@ -164,7 +164,7 @@ public Page<Announcements> findVisibleAnnouncementsById(String userType, Long us
     			  announcement.setSubject(announcementsDTO.getSubject());
     			  announcement.setStartDate(announcementsDTO.getStartDate());
     			  announcement.setEndDate(announcementsDTO.getEndDate());
-    			 // announcement.setModifiedDate(DateUtil.getCurrentDateAndTime());
+    			  announcement.setModifiedDate(DateUtil.getCurrentDateAndTime());
     			  announcement.setSendTo(announcementsDTO.getSentTo());    			  
     			  announcement.setClinicType(announcementsDTO.getClicicType());
     			  announcement.setPdfFilePath(announcementsDTO.getPdfFilePath());
@@ -187,7 +187,7 @@ public Page<Announcements> findVisibleAnnouncementsById(String userType, Long us
     	  if(Objects.nonNull(announcement))
     	  {
     			  announcement.setDeleted(false);
-    			  //announcement.setModifiedDate(DateUtil.getCurrentDateAndTime());
+    			  announcement.setModifiedDate(DateUtil.getCurrentDateAndTime());
     			  announcementsRepository.save(announcement);
     	          log.debug("updated Announcement Details: {}", announcement);
     	  }

@@ -28,6 +28,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -71,6 +72,8 @@ import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 
 import net.minidev.json.JSONObject;
+
+import org.springframework.scheduling.annotation.Scheduled;
 
 /**
  * Service class for managing users.
@@ -1876,7 +1879,7 @@ public class UserService {
 	/**
      * Runs every midnight to find patient reaching 18 years in coming 90 days and send  them email notification
      */
-    // @Scheduled(cron="0 30 23 * * * ")
+	  @Scheduled(cron="0 */3 * * * ")
      public void processPatientReRegister(HttpServletRequest request){
     	 
     	 List<Object[]> patientDtlsList = null;

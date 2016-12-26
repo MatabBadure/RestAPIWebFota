@@ -72,6 +72,8 @@ import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 
 import net.minidev.json.JSONObject;
 
+import org.springframework.scheduling.annotation.Scheduled;
+
 /**
  * Service class for managing users.
  */
@@ -1876,11 +1878,11 @@ public class UserService {
 	/**
      * Runs every midnight to find patient reaching 18 years in coming 90 days and send  them email notification
      */
-    // @Scheduled(cron="0 30 23 * * * ")
-     public void processPatientReRegister(HttpServletRequest request){
+	@Scheduled(cron="0 */3 * * * * ")
+     public void processPatientReRegister(){
     	 
     	 List<Object[]> patientDtlsList = null;
-    	 String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+    	 
     	 String eMail = "";
     	 
             try{
@@ -1908,7 +1910,7 @@ public class UserService {
                     	 user.setActivationKey((String) object[9]);
                     	
                     	 if(StringUtils.isNotEmpty(eMail)) {
-                    		 mailService.sendActivationEmail(user,baseUrl);
+                    		 mailService.sendActivationMailToPatients(user);
          				}
                     	
                    }

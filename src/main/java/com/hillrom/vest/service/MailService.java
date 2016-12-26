@@ -471,5 +471,7 @@ public class MailService {
      }
     
      
-     
+    public void sendActivationMailToPatients(User user) {
+        this.sendActivationEmail(user, this.baseUrl );
+      }
 }

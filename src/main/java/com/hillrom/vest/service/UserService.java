@@ -1910,7 +1910,7 @@ public class UserService {
                     	 user.setActivationKey((String) object[9]);
                     	
                     	 if(StringUtils.isNotEmpty(eMail)) {
-                    		 mailService.sendActivationMailToPatients(user);
+                    		 mailService.sendMailTo18YearOldPatient(user);
          				}
                     	
                    }

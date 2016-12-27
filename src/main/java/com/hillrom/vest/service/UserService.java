@@ -421,7 +421,7 @@ public class UserService {
     	} else if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
         	UserExtension user = createPatientUser(userExtensionDTO);
     		if(Objects.nonNull(user.getId())) {
-                return user;
+    			return user;
     		} else {
     			throw new HillromException(ExceptionConstants.HR_521);
     		}
@@ -589,7 +589,8 @@ public class UserService {
         String currentEmail = StringUtils.isNotBlank(existingUser.getEmail()) ? existingUser.getEmail() : null;
         String currentHillromId = StringUtils.isNotBlank(existingUser.getHillromId()) ? existingUser.getHillromId() : null;
         if(rolesAdminCanModerate.contains(userExtensionDTO.getRole())){
-        	if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))) {
+        	if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))
+        			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))) {
         		UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
         		if(Objects.nonNull(user.getId())) {
         			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
@@ -600,12 +601,11 @@ public class UserService {
         		} else {
         			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
         		}
-        	} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))
+        	} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ASSOCIATES))
         			//hill-1845
-        			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))
-        			//hill-1845
-
-        			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ASSOCIATES))) {
+        			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))){
+        			//hill-1845 
+        		if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
 	        	UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
 	        	if(Objects.nonNull(user.getId())) {
 	        		if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
@@ -616,9 +616,12 @@ public class UserService {
 	        		} else {
 	        			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
 	        		}
-	        	} else {
+        		} else {
+        		throw new HillromException(ExceptionConstants.HR_403);
+        		}
+	        } else {
     			throw new HillromException(ExceptionConstants.HR_555);
-    		}
+    			}
     	} else if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
     		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(existingUser);
     		if(Objects.nonNull(patientInfo)){
@@ -696,7 +699,7 @@ public class UserService {
     			}
                 return user;
     		} else {
-    			throw new HillromException(ExceptionConstants.HR_579);//Unable to update Associate User.
+    			throw new HillromException(ExceptionConstants.HR_580);//Unable to update Customer Service User.
     		}
         }
         //hill-1845
@@ -816,14 +819,14 @@ public class UserService {
     public UserExtension updateAssociateUser(UserExtension associateUser, UserExtensionDTO userExtensionDTO) {
 		assignValuesToUserObj(userExtensionDTO, associateUser);
 		userExtensionRepository.saveAndFlush(associateUser);
-		log.debug("Updated Information for Care Giver User : {}", associateUser);
+		log.debug("Updated Information for Associate User : {}", associateUser);
 		return associateUser;
 	}
     //hill-1845
     public UserExtension updateCustomerServiceUser(UserExtension customerServiceUser, UserExtensionDTO userExtensionDTO) {
 		assignValuesToUserObj(userExtensionDTO, customerServiceUser);
 		userExtensionRepository.saveAndFlush(customerServiceUser);
-		log.debug("Updated Information for Care Giver User : {}", customerServiceUser);
+		log.debug("Updated Information for Customer Service User : {}", customerServiceUser);
 		return customerServiceUser;
 	}
    //hill-1845

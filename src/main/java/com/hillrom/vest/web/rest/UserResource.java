@@ -1083,4 +1083,35 @@ public class UserResource {
     }
     //hill-1847
     
+    
+    /**
+     * GET  /users/:userId/clinics/:clinicId/statistics -> get the patient statistics for clinic Badge associated with user.
+     */
+    @RequestMapping(value = "/users/{userId}/clinics/{clinicId}/badgestatistics",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<?> getPatientStatisticsForClinicBadgeAssociatedWithUser(@PathVariable Long userId, @PathVariable String clinicId,
+    		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+			@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
+        log.debug("REST request to get patient badge statistics for clinic {} associated with User : {}", clinicId, userId);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	LocalDate date = LocalDate.now();
+        	Map<String, Object> statitics = patientHCPService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(clinicId, from, to);
+	        if (statitics.isEmpty()) {
+	        	jsonObject.put("message", ExceptionConstants.HR_584);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_297);
+	        	jsonObject.put("statitics", statitics);
+	        }
+	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    
 }

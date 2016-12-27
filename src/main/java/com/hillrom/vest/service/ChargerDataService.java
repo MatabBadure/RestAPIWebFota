@@ -85,6 +85,15 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FREQ
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.INTENSITY_LEN;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DURATION_LEN;
 
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVENT_LOG_START_POS;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CRC_FIELD_NAME;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_DATA_FIELD_NAME;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FRAG_TOTAL_FIELD_NAME;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FRAG_CURRENT_FIELD_NAME;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_WIFI;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_SN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_VER;
+
 @Service
 @Transactional
 public class ChargerDataService {
@@ -160,6 +169,7 @@ public class ChargerDataService {
 								chargerJsonData.put("ERROR","CRC Validation Failed");
 								return chargerJsonData;
 							}else{
+								getDeviceData(rawData);
 								chargerJsonData.put("RESULT", "OK");
 								chargerJsonData.put("ERROR","");
 								return chargerJsonData;					
@@ -171,6 +181,7 @@ public class ChargerDataService {
 							chargerJsonData.put("ERROR","CRC Validation Failed");
 							return chargerJsonData;
 						}else{
+							getDeviceData(rawData);
 							chargerJsonData.put("RESULT", "OK");
 							chargerJsonData.put("ERROR","");
 							return chargerJsonData;					
@@ -241,11 +252,15 @@ public class ChargerDataService {
 				
 			}
 	  
-			public void getDeviceData(String encoded_string){
+			public void getDeviceData(String encoded_string) throws HillromException{
+				
+				int x = getFragTotal(encoded_string);
+				int y = getFragCurrent(encoded_string);
+				byte[] devsnbt = getDevSN(encoded_string);
+				byte[] wifibt = getDevWifi(encoded_string);
+				byte[] verbt = getDevVer(encoded_string);
+				
 		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
-		        b = new byte[] {100,101,118,105,99,101,95,109,111,100,101,108,95,116,121,112,101,61,72,105,108,108,82,111,109,95,77,111,110,97,114,99,104,38,100,101,118,83,78,61,49,50,51,52,38,100,101,118,87,73,70,73,61,49,50,51,52,53,54,38,100,101,118,76,84,69,61,49,50,51,52,53,54,55,56,57,97,98,99,100,101,102,38,100,101,118,86,101,114,61,49,50,51,52,53,54,55,56,49,50,51,52,53,54,55,56,38,100,101,118,105,99,101,68,97,116,97,61,23,45,67,87,56,83,4,25,76,12,13,56,83,4,25,76,12,13,25,24,67,83,76,12,13,24,76,12,13,13,24,45,67,34,53,111,119,24,115,114,93,97,27,104,18,17,58,73,64,(byte)253,59,57,(byte)233,44,38,99,114,99,61,54,(byte)210};
-		        byte[] match_devicedata = new byte[]{38,100,101,118,105,99,101,68,97,116,97,61};
-		        byte[] match_crc = new byte[]{38,99,114,99,61};
 		        String sout = "";
 		        for(int i=0;i<b.length;i++) {
 		        	int val = b[i] & 0xFF;
@@ -255,8 +270,8 @@ public class ChargerDataService {
 		        log.debug("Input Byte Array :"+sout);
 		
 		        String deviceData = "";
-		        int start = returnMatch(b,match_devicedata);
-		        int end = returnMatch(b,match_crc)-match_crc.length;
+		        int start = returnMatch(b,DEVICE_DATA_FIELD_NAME);
+		        int end = returnMatch(b,CRC_FIELD_NAME)-CRC_FIELD_NAME.length;
 		        log.debug("start end : "+ start + " : " + end );
 		        
 		        byte[] deviceDataArray = new byte[end];
@@ -268,56 +283,57 @@ public class ChargerDataService {
 		        }
 		        log.debug("deviceData : "+ sout );
 		        
-		        byte[] session_index  = Arrays.copyOfRange(deviceDataArray, SESSION_INDEX_LOC, SESSION_INDEX_LOC + (SESSION_INDEX_LEN)-1);
+		        byte[] session_index  = Arrays.copyOfRange(deviceDataArray, SESSION_INDEX_LOC, SESSION_INDEX_LOC + SESSION_INDEX_LEN);
 		        sout = "";
+		        
 		        for(int k=0;k<session_index.length;k++){
 		        	sout = sout + (session_index[k]  & 0xFF) + " ";
 		        }
 		        log.debug("session_index : "+ sout );
 		              
-		        byte[] start_time  = Arrays.copyOfRange(deviceDataArray, START_TIME_LOC-1, (START_TIME_LOC-1) + START_TIME_LEN);
+		        byte[] start_time  = Arrays.copyOfRange(deviceDataArray, START_TIME_LOC, START_TIME_LOC + START_TIME_LEN);
 		        sout = "";
 		        for(int k=0;k<start_time.length;k++){
 		        	sout = sout + (start_time[k]  & 0xFF) + " ";
 		        }
 		        log.debug("start_time : "+ sout );
 		        
-		        byte[] end_time  = Arrays.copyOfRange(deviceDataArray, END_TIME_LOC-1, (END_TIME_LOC-1) + END_TIME_LEN);        
+		        byte[] end_time  = Arrays.copyOfRange(deviceDataArray, END_TIME_LOC, END_TIME_LOC + END_TIME_LEN);        
 		        sout = "";
 		        for(int k=0;k<end_time.length;k++){
 		        	sout = sout + (end_time[k]  & 0xFF) + " ";
 		        }
 		        log.debug("end_time : "+ sout );
 		        
-		        byte[] start_battery_level  = Arrays.copyOfRange(deviceDataArray, START_BATTERY_LEVEL_LOC-1, (START_BATTERY_LEVEL_LOC-1) + START_BATTERY_LEVEL_LEN);
+		        byte[] start_battery_level  = Arrays.copyOfRange(deviceDataArray, START_BATTERY_LEVEL_LOC, START_BATTERY_LEVEL_LOC + START_BATTERY_LEVEL_LEN);
 		        sout = "";
 		        for(int k=0;k<start_battery_level.length;k++){
 		        	sout = sout + (start_battery_level[k]  & 0xFF) + " ";
 		        }
 		        log.debug("start_battery_level : "+ sout );
 		        
-		        byte[] end_battery_level  = Arrays.copyOfRange(deviceDataArray, END_BATTERY_LEVEL_LOC-1, (END_BATTERY_LEVEL_LOC-1) + END_BATTERY_LEVEL_LEN);
+		        byte[] end_battery_level  = Arrays.copyOfRange(deviceDataArray, END_BATTERY_LEVEL_LOC, END_BATTERY_LEVEL_LOC + END_BATTERY_LEVEL_LEN);
 		        sout = "";
 		        for(int k=0;k<end_battery_level.length;k++){
 		        	sout = sout + (end_battery_level[k]  & 0xFF) + " ";
 		        }
 		        log.debug("end_battery_level : "+ sout );
 		        
-		        byte[] number_of_events  = Arrays.copyOfRange(deviceDataArray, NUMBER_OF_EVENTS_LOC-1, (NUMBER_OF_EVENTS_LOC-1) + NUMBER_OF_EVENTS_LEN);
+		        byte[] number_of_events  = Arrays.copyOfRange(deviceDataArray, NUMBER_OF_EVENTS_LOC, NUMBER_OF_EVENTS_LOC + NUMBER_OF_EVENTS_LEN);
 		        sout = "";
 		        for(int k=0;k<number_of_events.length;k++){
 		        	sout = sout + (number_of_events[k]  & 0xFF) + " ";
 		        }
 		        log.debug("number_of_events : "+ sout );
 		        
-		        byte[] number_of_pods  = Arrays.copyOfRange(deviceDataArray, NUMBER_OF_PODS_LOC-1, (NUMBER_OF_PODS_LOC-1) + NUMBER_OF_PODS_LEN);
+		        byte[] number_of_pods  = Arrays.copyOfRange(deviceDataArray, NUMBER_OF_PODS_LOC, NUMBER_OF_PODS_LOC + NUMBER_OF_PODS_LEN);
 		        sout = "";
 		        for(int k=0;k<number_of_pods.length;k++){
 		        	sout = sout + (number_of_pods[k]  & 0xFF) + " ";
 		        }
 		        log.debug("number_of_pods : "+ sout );
 		        
-		        byte[] hmr_seconds  = Arrays.copyOfRange(deviceDataArray, HMR_SECONDS_LOC-1, (HMR_SECONDS_LOC-1) + HMR_SECONDS_LEN);
+		        byte[] hmr_seconds  = Arrays.copyOfRange(deviceDataArray, HMR_SECONDS_LOC, HMR_SECONDS_LOC + HMR_SECONDS_LEN);
 		        sout = "";
 		        for(int k=0;k<hmr_seconds.length;k++){
 		        	sout = sout + (hmr_seconds[k]  & 0xFF) + " ";
@@ -325,7 +341,7 @@ public class ChargerDataService {
 		        log.debug("hmr_seconds : "+ sout );
 		        
 		        //log.debug("Value of deviceDataArray.length : "+ j );
-		        for(int i=27;i<j;i=i+7){
+		        for(int i=EVENT_LOG_START_POS;i<j;i=i+7){
 		        	
 		        	//log.debug("Value of i : "+ i );
 		        	
@@ -344,15 +360,20 @@ public class ChargerDataService {
 			        log.debug("event_code : "+ sout );
 			        
 			        byte[] frequency  = Arrays.copyOfRange(deviceDataArray, i+FREQUENCY_LOC-1, (i+FREQUENCY_LOC-1) + FREQUENCY_LEN);
-			        int frequency_val = (frequency[0] & 0xf0) >> 4;
-			        
-			        log.debug("frequency : "+ frequency_val );
+			        sout = "";
+			        for(int k=0;k<frequency.length;k++){
+			        	sout = sout + (frequency[k]  & 0xFF) + " ";
+			        }
+			        log.debug("frequency : "+ sout );
+
 			        
 			        byte[] intensity  = Arrays.copyOfRange(deviceDataArray, i+INTENSITY_LOC-1, (i+INTENSITY_LOC-1) + INTENSITY_LEN);
-			        int intensity_val = intensity[0] & 0xf;
-			        
-		
-			        log.debug("intensity : "+ intensity_val );
+			        sout = "";
+			        for(int k=0;k<intensity.length;k++){
+			        	sout = sout + (intensity[k]  & 0xFF) + " ";
+			        }
+			        log.debug("intensity : "+ sout );
+
 			        
 			        byte[] duration  = Arrays.copyOfRange(deviceDataArray, i+DURATION_LOC-1, (i+DURATION_LOC-1) + DURATION_LEN);
 			        sout = "";
@@ -364,6 +385,140 @@ public class ChargerDataService {
 		
 			}
 
+			public byte[] getDevSN(String encoded_string) throws HillromException{
+		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
+		        String sout = "";
+		        for(int i=0;i<b.length;i++) {
+		        	int val = b[i] & 0xFF;
+		        	sout = sout + val + " ";
+		        }
+		        
+		        //log.debug("Input Byte Array in devSN :"+sout);
+		
+		        
+		        String devSN = "";
+		        int start = returnMatch(b,DEV_SN);
+		        int end = returnMatch(b,DEV_WIFI)-DEV_WIFI.length;
+		        log.debug("start end : "+ start + " : " + end );
+		        
+		        byte[] devSNArray = new byte[end];
+		        int j=0;
+		        sout = "";
+		        for(int i=start;i<end;i++) {
+		        	devSNArray[j++] = b[i];
+		        	int val = b[i] & 0xFF;
+		        	devSN = devSN + val + " ";
+		        }
+
+		        
+		        log.debug("Value of devSN : "+ devSN );
+		        return devSNArray;
+		        
+			}
+			
+			public byte[] getDevWifi(String encoded_string) throws HillromException{
+		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
+		        String sout = "";
+		        for(int i=0;i<b.length;i++) {
+		        	int val = b[i] & 0xFF;
+		        	sout = sout + val + " ";
+		        }
+		        
+		        //log.debug("Input Byte Array in devWifi :"+sout);
+		
+		        
+		        String devWifi = "";
+		        int start = returnMatch(b,DEV_WIFI);
+		        int end = returnMatch(b,DEV_VER)-DEV_VER.length;
+		        log.debug("start end : "+ start + " : " + end );
+		        
+		        byte[] devWifiArray = new byte[end];
+		        int j=0;
+		        sout = "";
+		        for(int i=start;i<end;i++) {
+		        	devWifiArray[j++] = b[i];
+		        	int val = b[i] & 0xFF;
+		        	devWifi = devWifi + val + " ";
+		        }
+
+		        
+		        log.debug("Value of devWifi : "+ devWifi );
+		        return devWifiArray;
+		        
+			}
+			
+			public byte[] getDevVer(String encoded_string) throws HillromException{
+		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
+		        String sout = "";
+		        for(int i=0;i<b.length;i++) {
+		        	int val = b[i] & 0xFF;
+		        	sout = sout + val + " ";
+		        }
+		        
+		        //log.debug("Input Byte Array in devVer :"+sout);
+		
+		        
+		        String devVer = "";
+		        int start = returnMatch(b,DEV_VER);
+		        int end = returnMatch(b,FRAG_TOTAL_FIELD_NAME)-FRAG_TOTAL_FIELD_NAME.length;
+		        log.debug("start end : "+ start + " : " + end );
+		        
+		        byte[] devVerArray = new byte[end];
+		        int j=0;
+		        sout = "";
+		        for(int i=start;i<end;i++) {
+		        	devVerArray[j++] = b[i];
+		        	int val = b[i] & 0xFF;
+		        	devVer = devVer + val + " ";
+		        }
+
+		        
+		        log.debug("Value of devVer : "+ devVer );
+		        return devVerArray;
+		        
+			}
+			
+			public int getFragTotal(String encoded_string) throws HillromException{
+		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
+		        String sout = "";
+		        for(int i=0;i<b.length;i++) {
+		        	int val = b[i] & 0xFF;
+		        	sout = sout + val + " ";
+		        }
+		        
+		        //log.debug("Input Byte Array in getFragTotal :"+sout);
+		
+		        
+		        int start = returnMatch(b,FRAG_TOTAL_FIELD_NAME);
+		        log.debug("start : "+ start  );
+		        
+		        int fragTotal = b[start] & 0xFF;
+		        
+		        log.debug("Total number of fragments : "+ fragTotal );
+		        return fragTotal;
+		        
+			}
+			
+			public int getFragCurrent(String encoded_string) throws HillromException{
+		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
+		        String sout = "";
+		        for(int i=0;i<b.length;i++) {
+		        	int val = b[i] & 0xFF;
+		        	sout = sout + val + " ";
+		        }
+		        
+		        //log.debug("Input Byte Array in getFragCurrent :"+sout);
+		
+		        
+		        int start = returnMatch(b,FRAG_CURRENT_FIELD_NAME);
+		        log.debug("start : "+ start  );
+		        
+		        int fragCurrent = b[start] & 0xFF;
+		        
+		        log.debug("Current fragment number : "+ fragCurrent );
+		        return fragCurrent;
+		        
+			}
 	        
 	        private int returnMatch(byte[] inputArray,byte[] matchArray){
 

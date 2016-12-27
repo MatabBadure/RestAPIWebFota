@@ -1,7 +1,9 @@
 package com.hillrom.vest.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -12,9 +14,33 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.Announcements;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.AnnouncementsPermissionRepository;
 import com.hillrom.vest.repository.AnnouncementsRepository;
+import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.web.rest.dto.AnnouncementsDTO;
+import com.hillrom.vest.web.rest.dto.ClinicVO;
+
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.file.Paths;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+
+import java.util.Map;
 
 @Service
 @Transactional
@@ -24,6 +50,16 @@ public class AnnouncementsService {
 	
 	@Inject
 	private AnnouncementsRepository announcementsRepository;
+	
+	@Inject
+	private ClinicService clinicService;
+	
+	@Inject
+	private HCPClinicService hcpClinicService; 
+	
+
+	@Inject
+	private AnnouncementsPermissionRepository announcementsPermissionRepository;
 
 	/**
 	 * 
@@ -46,6 +82,7 @@ public class AnnouncementsService {
 		announcement.setPatientType(announcementsDTO.getPatientType());
 		announcement.setDeleted(false);
 		announcementsRepository.save(announcement);
+		
         log.debug("Created New Announcement: {}", announcement);
         return announcement;
 	}
@@ -55,24 +92,63 @@ public class AnnouncementsService {
 	 * @return
 	 * @throws HillromException
 	 */
- public List<Announcements> findAnnouncementData() throws HillromException{
+	public Page<Announcements> findAllAnnouncements(Pageable pageable) throws HillromException{
 		
-		List<Announcements> announcements = announcementsRepository.findAnnouncements("0");
+		Page<Announcements> announcements = announcementsRepository.findAnnouncements(false,pageable);
 		return announcements;
 	}
  
-/**
- * 
- * @param id
- * @return
- * @throws HillromException
- */
- public Announcements findAnnouncementById(Long id) throws HillromException{
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 * @throws HillromException
+	 */
+	public Announcements findAnnouncementById(Long id) throws HillromException{
 		
-		Announcements announcements = announcementsRepository.findObeById(id,"0");
+		Announcements announcements = announcementsRepository.findOneById(id,false);
 		return announcements;
 	}
+
+
+
+
  
+public Page<Announcements> findVisibleAnnouncementsById(String userType, Long userId,String patientId,Pageable pageable,Map<String, Boolean> sortOrder) throws HillromException{
+		
+ 		Page<Announcements> announcementList = null; // new ArrayList<Announcements>();
+ 		List<String> clinicList =  new ArrayList<String>();
+ 		
+ 		if(userType.equalsIgnoreCase(AuthoritiesConstants.CLINIC_ADMIN)){
+ 			Set<ClinicVO> clinics = clinicService.getAssociatedClinicsForClinicAdmin(userId);
+ 			for(ClinicVO tclinic : clinics){
+ 				clinicList.add(tclinic.getId());
+ 			}
+ 		}
+ 		
+ 		if(userType.equalsIgnoreCase(AuthoritiesConstants.HCP)){
+ 			List<ClinicVO> clinics = hcpClinicService.getAssociatedClinicsForHCP(userId);
+ 			for(ClinicVO tclinic : clinics){
+ 				clinicList.add(tclinic.getId());
+ 			}
+ 		}
+ 		
+ 		
+ 		// Check for the clinic flag to differentiate between whether the clinic id is passed or patient id is passed
+		if(Objects.nonNull(clinicList) && clinicList.size() > 0){
+			announcementList = announcementsRepository.findAnnouncementsByClinicId(clinicList, false,pageable);
+		}
+		
+		if(Objects.nonNull(patientId)){
+			announcementList = announcementsPermissionRepository.findAnnouncementsByPatientId(pageable,sortOrder,patientId, false);
+		}
+		
+        
+        return announcementList;
+}
+	 
+	 
+	 
  /**
   * 
   * @param announcementsDTO
@@ -117,5 +193,7 @@ public class AnnouncementsService {
     	  }
     	  return announcement;	
       }
+ 
+
 	
 }

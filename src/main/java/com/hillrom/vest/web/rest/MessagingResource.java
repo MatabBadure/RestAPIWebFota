@@ -79,13 +79,24 @@ public class MessagingResource {
 		try{
 				
 			Messages newMessage = messagingService.saveOrUpdateMessageData(messageDTO);
-			messageDTO.setId(newMessage.getId());
-			List<MessageTouserAssoc> newMessageTouserAssocList = messagingService.saveOrUpdateMessageTousersData(messageDTO);
-			jsonObject.put("Message", newMessage);
-			jsonObject.put("MessageTouserAssocList", newMessageTouserAssocList);
-			if(Objects.nonNull(newMessage)){
-				jsonObject.put("statusMsg", "Message sent successfully");
-				return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
+			messageDTO.setId(newMessage.getId());			
+			String returnValue = messagingService.saveOrUpdateMessageTousersData(messageDTO);
+			
+			if(Objects.nonNull(newMessage) && Objects.nonNull(returnValue) && returnValue != ""){
+				
+				String[] returnValues = returnValue.split("#");
+				
+				String statusMessage = returnValues[0];
+				int errorFlag = Integer.parseInt(returnValues[1]);
+				
+				//jsonObject.put("statusMsg", "Message sent successfully");
+				if(errorFlag == 0){
+					jsonObject.put("statusMsg", statusMessage);
+					return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
+				}else{
+					jsonObject.put("ERROR", statusMessage);
+					return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+				}
 			}
 		}catch(Exception ex){
 			jsonObject.put("ERROR", ex.getMessage());
@@ -115,7 +126,8 @@ public class MessagingResource {
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-			Page<Object> messageList = messagingService.getSentMessagesForMailbox(isClinic, clinicId, fromUserId, PaginationUtil.generatePageRequest(offset, limit, sortOrder));
+			String addDateSort =  "messages.messageDatetime";
+			Page<Object> messageList = messagingService.getSentMessagesForMailbox(isClinic, clinicId, fromUserId, PaginationUtil.generatePageRequest(offset, limit, sortOrder, addDateSort));
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}
@@ -194,8 +206,8 @@ public class MessagingResource {
 		JSONObject jsonObject = new JSONObject();
 		
 		try{
-			//Page<JSONObject> messageList = messagingService.getReceivedMessagesForMailbox(toUserId,new PageRequest(offset, limit));
-			Page<Object> messageList = messagingService.getReceivedMessagesForMailbox(isClinic, clinicId, toUserId, mailBoxType, PaginationUtil.generatePageRequest(offset, limit, sortOrder));
+			String addDateSort =  "messages.messageDatetime";
+			Page<Object> messageList = messagingService.getReceivedMessagesForMailbox(isClinic, clinicId, toUserId, mailBoxType, PaginationUtil.generatePageRequest(offset, limit, sortOrder, addDateSort));
 			if(Objects.nonNull(messageList)){
 				return new ResponseEntity<>(messageList, HttpStatus.OK);
 			}
@@ -294,7 +306,7 @@ public class MessagingResource {
 		
 	}
 	
-	 /**
+	/* *//**
 	   * POST /uploadFile -> receive and locally save a file.
 	   * 
 	   * @param uploadfile The uploaded file as Multipart file parameter in the 

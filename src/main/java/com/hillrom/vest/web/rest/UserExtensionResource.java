@@ -127,7 +127,7 @@ public class UserExtensionResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CLINIC_ADMIN, AuthoritiesConstants.ASSOCIATES})
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CLINIC_ADMIN, AuthoritiesConstants.ASSOCIATES, AuthoritiesConstants.CUSTOMER_SERVICES})
     public ResponseEntity<JSONObject> update(@PathVariable Long id, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
         log.debug("REST request to update User : {}", userExtensionDTO);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
@@ -196,7 +196,9 @@ public class UserExtensionResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    //hill-1845
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES})
+    //hill-1845
     public ResponseEntity<JSONObject> delete(@PathVariable Long id, HttpServletRequest request) {
         log.debug("REST request to delete UserExtension : {}", id);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
@@ -1020,7 +1022,9 @@ public class UserExtensionResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    //hill-1845
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES})
+    //hill-1845
     public ResponseEntity<JSONObject> reactivateUser(@PathVariable Long id) {
         log.debug("REST request to reactivate User : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -1045,7 +1049,9 @@ public class UserExtensionResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    //hill-1845
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES})
+    //hill-1845
     public ResponseEntity<JSONObject> userReactivation(@PathVariable Long id, HttpServletRequest request) {
         log.debug("REST request to User Reactivation : {}", id);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();

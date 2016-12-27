@@ -51,4 +51,14 @@ public interface PatientComplianceRepository extends
 	
 	@Query("from PatientCompliance pc where pc.date = ?1 and pc.patientUser.id = ?2")
 	PatientCompliance findByDateAndPatientUserId(LocalDate date,Long patientUserId);
+	
+	
+    @Query("from PatientCompliance pc where (pc.date between ?1 and ?2) and pc.missedTherapyCount >= 3  and pc.patientUser.id in ?3 ")
+    List<PatientCompliance> findByDateBetweenAndMissedtherapyAndPatientUserIdIn(LocalDate from,LocalDate to,List<Long> patientUserIds);
+    
+    List<PatientCompliance> findByDateBetweenAndIsHmrCompliantAndPatientUserIdIn(LocalDate from,LocalDate to,Boolean isHmrCompliant,List<Long> patientUserIds);
+    
+    List<PatientCompliance> findByDateBetweenAndIsSettingsDeviatedAndPatientUserIdIn(LocalDate from,LocalDate to,Boolean isSettingsDeviated,List<Long> patientUserIds);
+	
+    
 }

@@ -269,6 +269,65 @@ public class PatientHCPService {
 		return statistics;
 	}
 
+	
+	/**
+	 * 
+	 * @param clinicId
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 * @throws HillromException
+	 */
+    public Map<String, Object> getTodaysPatientStatisticsForClinicAssociatedWithHCP(String clinicId, LocalDate startDate,LocalDate endDate) throws HillromException{
+    	
+    	    log.debug(" Entering getTodaysPatientStatisticsForClinicAssociatedWithHCP ");
+           Map<String, Object> statistics = new HashMap();
+           List<String> clinicList = new LinkedList<>();
+           clinicList.add(clinicId);
+           List<Map<String,Object>> patientUsers = clinicService.getAssociatedPatientUsers(clinicList);
+           List<Long> patientUserIds = filterActivePatientIds(patientUsers);
+           if(patientUsers.isEmpty()) {
+                  Map<String, Object> statistics0 = new HashMap();
+                        statistics0.put("patientsWithHmrNonComplianceRange", 0);
+                        statistics0.put("patientsWithSettingDeviationRange", 0);
+                        statistics0.put("patientsWithMissedTherapyRange", 0);
+                        statistics0.put("patientsWithNoEventRecordedRange", 0);
+                        statistics0.put("dateRange", LocalDate.now());
+                        statistics0.put("totalPatientCountRange", 0);          
+                  return statistics0;
+                  //throw new HillromException(MessageConstants.HR_279);
+           } else if(patientUserIds.isEmpty()) {
+                  throw new HillromException(MessageConstants.HR_267);
+           } else {
+                  
+                  startDate = startDate.minusDays(1);
+                  endDate = endDate.minusDays(1);
+                  
+                  Map<LocalDate,Integer> datePatientNoEventCountMap = getPatientsWithNoEvents(startDate,endDate,patientUserIds);
+                  int patientsWithNoEventRecorded = 0;
+                  for(LocalDate lDate : DateUtil.getAllLocalDatesBetweenDates(startDate, endDate)){
+                        int patientsWithNoEventRecordedtemp = Objects.nonNull(datePatientNoEventCountMap.get(lDate))? datePatientNoEventCountMap.get(lDate):0;
+                        patientsWithNoEventRecorded = patientsWithNoEventRecorded + patientsWithNoEventRecordedtemp;
+                  }
+                        
+                  int patientsWithHMRNonCompliance = patientComplianceRepository.findByDateBetweenAndIsHmrCompliantAndPatientUserIdIn(startDate,endDate, false, patientUserIds).size();
+                        
+                  int patientsWithSettingsDeviation = patientComplianceRepository.findByDateBetweenAndIsSettingsDeviatedAndPatientUserIdIn(startDate,endDate, true, patientUserIds).size();
+                        
+                  int patientsWithMissedTherapy = patientComplianceRepository.findByDateBetweenAndMissedtherapyAndPatientUserIdIn(startDate,endDate, patientUserIds).size();
+                  
+                  statistics.put("patientsWithHmrNonComplianceRange", patientsWithHMRNonCompliance);
+                  statistics.put("patientsWithSettingDeviationRange", patientsWithSettingsDeviation);
+                  statistics.put("patientsWithMissedTherapyRange", patientsWithMissedTherapy);
+                  statistics.put("patientsWithNoEventRecordedRange", patientsWithNoEventRecorded);
+                  statistics.put("dateRange", "Start Date " + startDate.toString() + " : " + " End Date " + endDate.toString());
+                  statistics.put("totalPatientCountRange", patientUserIds.size());
+           }
+           log.debug(" Exit getTodaysPatientStatisticsForClinicAssociatedWithHCP() ");
+           
+           return statistics;
+    }
+	
 	private List<Long> filterActivePatientIds(
 			List<Map<String, Object>> patientUsers) {
 		List<Long> patientUserIds = new LinkedList<>();

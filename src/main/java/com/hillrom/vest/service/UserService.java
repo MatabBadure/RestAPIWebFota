@@ -1873,11 +1873,10 @@ public class UserService {
 		return patientInfo;
 	}
 	
-	
 	/**
      * Runs every midnight to find patient reaching 18 years in coming 90 days and send  them email notification
      */
-	@Scheduled(cron="0,15,30,45 * * * * * ")
+	//@Scheduled(cron="0,15,30,45 * * * * * ")
      public void processPatientReRegister(){
     	 
     	 List<Object[]> patientDtlsList = null;
@@ -1898,12 +1897,15 @@ public class UserService {
                    	  // get all patients Details through repository 
                       patientDtlsList = userRepository.findUserPatientsMaturityDobAfter90Days(year,month,day);
                    
+                      patientDtlsList.stream().collect(Collectors.groupingBy(object->(String)object[0]));
+                      
+                      
                       // send activation link to those patients
                       for (Object[] object : patientDtlsList) {
                     	
                     	 eMail =  (String) object[3];
                     	 User user = new User();
-                    	 user.setEmail((String) object[6]);
+                    	 user.setEmail(eMail);
                     	 user.setFirstName((String) object[7]);
                     	 user.setLastName((String) object[8]);
                     	 user.setActivationKey((String) object[9]);

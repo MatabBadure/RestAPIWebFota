@@ -1876,7 +1876,7 @@ public class UserService {
 	/**
      * Runs every midnight to find patient reaching 18 years in coming 90 days and send  them email notification
      */
-	//@Scheduled(cron="0,15,30,45 * * * * * ")
+	@Scheduled(cron="*/5 * * * * *")
      public void processPatientReRegister(){
     	 
     	 List<Object[]> patientDtlsList = null;

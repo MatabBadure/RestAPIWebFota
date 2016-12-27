@@ -472,7 +472,6 @@ public class MailService {
     
     
         public void sendMailTo18YearOldPatient(User user) {
-        	
         this.sendActivationEmail(user, this.baseUrl );
       }
 }

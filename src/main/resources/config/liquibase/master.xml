@@ -110,4 +110,5 @@
 	<include file="classpath:/config/liquibase/changelog/20161117182531_add_typeCode_announcement_patient_type.xml" relativeToChangelogFile="false"/>	
 	<include file="classpath:/config/liquibase/changelog/20161117182530_add_typeCode_announcement_send_to.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20161116183415_create_table_announcements.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161226065600_monarch_tables.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

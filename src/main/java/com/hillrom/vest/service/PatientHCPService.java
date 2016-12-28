@@ -281,7 +281,7 @@ public class PatientHCPService {
     public Map<String, Object> getTodaysPatientStatisticsForClinicAssociatedWithHCP(String clinicId, LocalDate startDate,LocalDate endDate) throws HillromException{
     	
     	    log.debug(" Entering getTodaysPatientStatisticsForClinicAssociatedWithHCP ");
-           Map<String, Object> statistics = new HashMap();
+               Map<String, Object> statistics = new HashMap();
            List<String> clinicList = new LinkedList<>();
            clinicList.add(clinicId);
            List<Map<String,Object>> patientUsers = clinicService.getAssociatedPatientUsers(clinicList);
@@ -311,7 +311,7 @@ public class PatientHCPService {
                   }
                         
                   int patientsWithHMRNonCompliance = patientComplianceRepository.findByDateBetweenAndIsHmrCompliantAndPatientUserIdIn(startDate,endDate, false, patientUserIds).size();
-                        
+                  
                   int patientsWithSettingsDeviation = patientComplianceRepository.findByDateBetweenAndIsSettingsDeviatedAndPatientUserIdIn(startDate,endDate, true, patientUserIds).size();
                         
                   int patientsWithMissedTherapy = patientComplianceRepository.findByDateBetweenAndMissedtherapyAndPatientUserIdIn(startDate,endDate, patientUserIds).size();

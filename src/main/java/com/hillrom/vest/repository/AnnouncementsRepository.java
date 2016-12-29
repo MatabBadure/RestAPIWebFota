@@ -23,6 +23,7 @@ public interface AnnouncementsRepository extends JpaRepository<Announcements, Lo
 	    @Query(" from Announcements announcement where isDeleted = ? ")
 	    Page<Announcements> findAnnouncements(boolean isDeleted,Pageable pageable);
 	    
+	    
 	    // get Clinic iformations based on Id Deatils
 	    @Query("select distinct announcement.id, announcement.name, announcement.subject, announcement.startDate, announcement.endDate, announcement.createdDate, "
 	    	   + " announcement.modifiedDate, announcement.sendTo,announcement.clinicType,announcement.pdfFilePath, announcement.patientType, announcement.isDeleted "

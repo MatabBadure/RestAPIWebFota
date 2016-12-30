@@ -470,8 +470,10 @@ public class MailService {
         sendEmail(recipients.split(","), subject, content, true, true, file);
      }
     
+
     
         public void sendMailTo18YearOldPatient(User user) {
         this.sendActivationEmail(user, this.baseUrl );
       }
+
 }

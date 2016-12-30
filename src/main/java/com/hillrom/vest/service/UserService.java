@@ -601,11 +601,13 @@ public class UserService {
         		} else {
         			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
         		}
+
         	} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ASSOCIATES))
         			//hill-1845
         			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))){
         			//hill-1845 
         		if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
+
 	        	UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
 	        	if(Objects.nonNull(user.getId())) {
 	        		if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
@@ -616,10 +618,12 @@ public class UserService {
 	        		} else {
 	        			throw new HillromException(ExceptionConstants.HR_517);//Unable to update Hillrom User
 	        		}
+
         		} else {
         		throw new HillromException(ExceptionConstants.HR_403);
         		}
 	        } else {
+
     			throw new HillromException(ExceptionConstants.HR_555);
     			}
     	} else if (AuthoritiesConstants.PATIENT.equals(userExtensionDTO.getRole())) {
@@ -699,7 +703,9 @@ public class UserService {
     			}
                 return user;
     		} else {
+
     			throw new HillromException(ExceptionConstants.HR_580);//Unable to update Customer Service User.
+
     		}
         }
         //hill-1845
@@ -826,7 +832,9 @@ public class UserService {
     public UserExtension updateCustomerServiceUser(UserExtension customerServiceUser, UserExtensionDTO userExtensionDTO) {
 		assignValuesToUserObj(userExtensionDTO, customerServiceUser);
 		userExtensionRepository.saveAndFlush(customerServiceUser);
+
 		log.debug("Updated Information for Customer Service User : {}", customerServiceUser);
+
 		return customerServiceUser;
 	}
    //hill-1845
@@ -1876,6 +1884,7 @@ public class UserService {
 		return patientInfo;
 	}
 	
+
 	/**
      * Runs every midnight to find patient reaching 18 years in coming 90 days and send  them email notification
      */
@@ -1884,6 +1893,7 @@ public class UserService {
     	 
     	 List<Object[]> patientDtlsList = null;
     	 
+
     	 String eMail = "";
     	 
             try{
@@ -1900,14 +1910,17 @@ public class UserService {
                    	  // get all patients Details through repository 
                       patientDtlsList = userRepository.findUserPatientsMaturityDobAfter90Days(year,month,day);
                    
+
                       patientDtlsList.stream().collect(Collectors.groupingBy(object->(String)object[0]));
                       
                       
+
                       // send activation link to those patients
                       for (Object[] object : patientDtlsList) {
                     	
                     	 eMail =  (String) object[3];
                     	 User user = new User();
+
                     	 user.setEmail(eMail);
                     	 user.setFirstName((String) object[7]);
                     	 user.setLastName((String) object[8]);
@@ -1916,6 +1929,7 @@ public class UserService {
                     	 
                     	 if(StringUtils.isNotEmpty(eMail)) {
                     		 mailService.sendMailTo18YearOldPatient(user);
+
          				}
                     	
                    }

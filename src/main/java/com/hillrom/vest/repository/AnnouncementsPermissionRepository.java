@@ -130,7 +130,9 @@ public class AnnouncementsPermissionRepository {
 			maxResults = maxResults > announcements.size() ? announcements.size() : maxResults;
 			announcementsSubList = announcements.subList(firstResult, maxResults);
 		}
-		Page<Announcements> page = new PageImpl<Announcements>(announcementsSubList, null, count.intValue());
+
+		Page<Announcements> page = new PageImpl<Announcements>(announcementsSubList, pageable, count.intValue());
+
 
 		return page;
 	}

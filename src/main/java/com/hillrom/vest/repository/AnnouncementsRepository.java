@@ -26,7 +26,9 @@ public interface AnnouncementsRepository extends JpaRepository<Announcements, Lo
 	    // get Clinic iformations based on Id Deatils
 	    @Query(" from Announcements announcement, Clinic clinic where (announcement.sendTo = 'All' or announcement.sendTo = 'Clinic') "
 	    	   + " and (announcement.clinicType = 'All' or announcement.clinicType = clinic.speciality) and clinic.id in ?1  and announcement.isDeleted = ?2 "
-	    	   + " and CURRENT_DATE() between announcement.startDate and announcement.endDate ")
+
+	    	   + " and CURRENT_DATE() between announcement.startDate and announcement.endDate group by announcement.id")
+
 	    Page<Announcements> findAnnouncementsByClinicId(List<String> clinicIds, boolean isDeleted,Pageable pageable);
 	
 	    /*

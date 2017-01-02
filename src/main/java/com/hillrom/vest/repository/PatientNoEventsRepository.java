@@ -13,4 +13,6 @@ public interface PatientNoEventsRepository extends
 	List<PatientNoEvent> findByUserCreatedDateBeforeAndPatientUserIdIn(LocalDate date,List<Long> userIds);
 	PatientNoEvent findByPatientUserId(Long patientUserId);
 	PatientNoEvent findByPatientId(String patientId);
+	List<PatientNoEvent> findByPatientUserIdIn(List<Long> userIds);
+	
 }

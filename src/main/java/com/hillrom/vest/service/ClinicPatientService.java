@@ -1,7 +1,6 @@
 package com.hillrom.vest.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +57,9 @@ public class ClinicPatientService {
     
     @Inject
     private PatientInfoRepository patientInfoRepository;
+    
+    @Inject
+    private UserService userService;
     
     public List<ClinicVO> associateClinicsToPatient(Long id, List<Map<String, String>> clinicList) throws HillromException {
     	User patientUser = userRepository.findOne(id);
@@ -167,36 +169,90 @@ public class ClinicPatientService {
 	
    //start:HILL-2004
 	/*
-		Method invoked from adherence calculation service to get the clinic with the latest adherence setting
-	 */
+	public Clinic getAssociatedClinic(PatientInfo patientInfo) {
+		List<Clinic> clinics = new LinkedList<>();
+		for(ClinicPatientAssoc clinicPatientAssoc : patientInfo.getClinicPatientAssoc()){
+			clinics.add(clinicPatientAssoc.getClinic());
+		}
+		if(clinics.isEmpty())
+			return null; 
+		else
+			return clinics.get(0);		
+	} */
 	
 	public Clinic getAssociatedClinic(PatientInfo patientInfo) {
 		List<Clinic> clinics = new LinkedList<>();
 		List<String> clinicIdsList = new LinkedList<>();
-		Clinic clinic = null;
 		
-		// add all patient associtaed clinic information into the clinics list
 		for(ClinicPatientAssoc clinicPatientAssoc : patientInfo.getClinicPatientAssoc()){ 
 			
-			clinics.add(clinicPatientAssoc.getClinic());
+			clinicIdsList.add(clinicPatientAssoc.getClinic().getId());
 		}
 	
-		// remove objects with modifieddate as null
-		clinics.removeIf(o -> o.getAdherenceSettingModifiedDte() == null);
-		
-		// If all clinics modified date is null send default adherence setting date as null
-		if( clinics.size() == 0)
+		if(Objects.nonNull(clinicIdsList) && clinicIdsList.size() > 0)
 		{
-			return clinic;
+			clinics = clinicRepository.findPatientLastModifiedAdherenceSetting(clinicIdsList);
 		}
-		// else sort based on modified date, the lkatest modified date need to send as result
-		Collections.sort(clinics);
 		
+		/*		
+		if(Objects.isNull(clinics))
+			return null; 
+		else
+			return clinics.get(0);*/	
 		
-		return clinics.get(clinics.size()-1);
-	
+		if(Objects.nonNull(clinics) && clinics.size() > 0)
+		{
+			return clinics.get(0);	
+		}
+		else
+		{
+			return null;
+		}
+		
 		
 	}
 	//end:HILL-2004
+	
+	
+	public List<PatientInfo> getPatientListForClinic(String clinicId) throws HillromException{
+		// get the clinic patient association for the clinic
+		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByClinicId(clinicId);
+		
+		List<PatientInfo> patientList = new LinkedList<>();
+		// Check for non null of object
+		if(Objects.nonNull(clinicPatientAssocList) && !clinicPatientAssocList.isEmpty()) {			
+			for(ClinicPatientAssoc clinicPatientAssoc : clinicPatientAssocList){				
+				patientList.add(clinicPatientAssoc.getPatient());				
+			}			
+		}
+		return patientList;
+	}
+	
+	public List<User> getUserListForClinic(String clinicId) throws HillromException{
+		// get the clinic patient association for the clinic
+		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByClinicId(clinicId);
+		
+		List<User> userList = new LinkedList<>();
+		// Check for non null of object
+		if(Objects.nonNull(clinicPatientAssocList) && !clinicPatientAssocList.isEmpty()) {			
+			for(ClinicPatientAssoc clinicPatientAssoc : clinicPatientAssocList){				
+				userList.add(userService.getUserObjFromPatientInfo(clinicPatientAssoc.getPatient()));
+			}
+		}
+		
+		return userList;
+	}
+	
+	public List<Long> getUserIdListFromUserList(List<User> userList) throws HillromException{
+		
+		List<Long> userIdList = new LinkedList<>();
+		for(User user : userList ){
+			userIdList.add(user.getId());
+		}
+		
+		return userIdList;
+	}
+	
+	
 	
 }

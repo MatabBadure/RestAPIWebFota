@@ -599,8 +599,8 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<!-- log configuration -->
-				<logback.loglevel>DEBUG</logback.loglevel>
+				<!-- log configuration -->				
+				<logback.loglevel>ERROR</logback.loglevel>
 			</properties>
 			<dependencies>
 				<dependency>

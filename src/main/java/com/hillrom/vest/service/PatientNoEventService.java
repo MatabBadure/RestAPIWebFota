@@ -71,4 +71,13 @@ public class PatientNoEventService {
 		}
 		return userIdNoEventsMap;
 	}
+	public Map<Long,PatientNoEvent> findAllByPatientUserId(List<Long> userIdList){
+		List<PatientNoEvent> patientNoEvents = noEventsRepository.findByPatientUserIdIn(userIdList);
+		Map<Long,PatientNoEvent> userIdNoEventsMap = new HashMap<>();
+		for(PatientNoEvent patientNoEvent : patientNoEvents){
+			userIdNoEventsMap.put(patientNoEvent.getPatientUser().getId(), patientNoEvent);
+		}
+		return userIdNoEventsMap;
+	}	
+	
 }

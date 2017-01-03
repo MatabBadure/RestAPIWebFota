@@ -30,3 +30,7 @@ authentication:
         tokenValidityInSeconds: 1800
 
 spring.batch.job.enabled: false
+
+multipart:
+    max-file-size: 100Mb
+    max-request-size: 100Mb

@@ -229,7 +229,7 @@ public class AnnouncementsResource {
 	    }
 	    catch (Exception ex) {
 	    	jsonObject.put("ERROR", ex.getMessage());
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 	    }
 	  
 	  } 
@@ -260,7 +260,7 @@ public class AnnouncementsResource {
 	        
 	      } catch (IOException ex) {
 	    		jsonObject.put("ERROR", ex.getMessage());
-				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 	      }
 
 	  }

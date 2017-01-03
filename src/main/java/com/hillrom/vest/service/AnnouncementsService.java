@@ -114,15 +114,19 @@ public class AnnouncementsService {
 
 
  
-public Page<Announcements> findVisibleAnnouncementsById(String userType, Long userId,String patientId,Pageable pageable,Map<String, Boolean> sortOrder) throws HillromException{
+public Page<Announcements> findVisibleAnnouncementsById(String userType, Long userId,String patientId,String filterClinicId, Pageable pageable,Map<String, Boolean> sortOrder) throws HillromException{
 		
  		Page<Announcements> announcementList = null; // new ArrayList<Announcements>();
  		List<String> clinicList =  new ArrayList<String>();
  		
  		if(userType.equalsIgnoreCase(AuthoritiesConstants.CLINIC_ADMIN)){
- 			Set<ClinicVO> clinics = clinicService.getAssociatedClinicsForClinicAdmin(userId);
- 			for(ClinicVO tclinic : clinics){
- 				clinicList.add(tclinic.getId());
+ 			if(Objects.nonNull(filterClinicId)){
+ 				clinicList.add(filterClinicId);
+ 			}else{
+	 			Set<ClinicVO> clinics = clinicService.getAssociatedClinicsForClinicAdmin(userId);
+	 			for(ClinicVO tclinic : clinics){
+	 				clinicList.add(tclinic.getId());
+	 			}
  			}
  		}
  		

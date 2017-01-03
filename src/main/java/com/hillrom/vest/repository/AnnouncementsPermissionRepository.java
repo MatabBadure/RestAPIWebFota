@@ -48,7 +48,7 @@ public class AnnouncementsPermissionRepository {
 
 		String findAnnouncementsByPatientQuery = " SELECT ac.id,ac.clinic_type,ac.name, ac.patient_type, ac.pdf_file_path, ac.send_to, ac.subject, ac.created_date, ac.modified_date, ac.start_date, ac.end_date from  ANNOUNCEMENTS ac, PATIENT_INFO pi "
 				+ " where (ac.send_to = 'All' or ac.send_to = 'Patient') and (ac.patient_type = 'All' or pi.primary_diagnosis = ac.patient_type or "
-				+ " IF(TIMESTAMPDIFF(YEAR, pi.dob, CURDATE()) > 18, 'Adult', 'Peds') = ac.patient_type )  "
+				+ " IF(TIMESTAMPDIFF(YEAR, pi.dob, CURDATE()) >= 18, 'Adult', 'Peds') = ac.patient_type )  "
 				+ " and pi.id = :patientId and ac.is_deleted = :isDeleted and  ac.start_date <= now() and (ac.end_date >= now())";
 		
 

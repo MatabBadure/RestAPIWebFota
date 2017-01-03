@@ -49,4 +49,7 @@ spring:
     survey:
         surveyreportemailids: joelkaka@gmail.com 
     changePrescription:
-        changePrescriptionEmailids: joelpreetham.fernandes4@hill-rom.com,joelkaka@gmail.com 
+        changePrescriptionEmailids: joelpreetham.fernandes4@hill-rom.com,joelkaka@gmail.com
+    http:
+        multipart.max-file-size:  3MB
+        multipart.max-request-size: 20MB  

@@ -51,6 +51,6 @@ spring:
     changePrescription:
         changePrescriptionEmailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com   
     http:
-        multipart:
-          max-file-size: 3MB
-          max-request-size: 20MB
+     multipart:
+      maxFileSize: 3Mb
+      maxRequestSize: 20Mb

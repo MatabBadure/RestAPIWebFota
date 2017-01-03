@@ -250,7 +250,8 @@ public class AnnouncementsResource {
 	    	  
 	    	  File initialFile = new File(Constants.ANNOUNCEMENT_FILE_PATH + fileName + ".pdf");
 	    	  InputStream is = new FileInputStream(initialFile);  
-	    	  response.addHeader("Content-disposition", "inline;filename="+Constants.ANNOUNCEMENT_FILE_PATH + fileName);
+	    	  //response.addHeader("Content-disposition", "inline;filename="+Constants.ANNOUNCEMENT_FILE_PATH + fileName);
+	    	  response.addHeader("Content-disposition", "attachment;filename="+fileName);
 	    	  response.setContentType("application/pdf");
 	        // copy it to response's OutputStream
 	        org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());

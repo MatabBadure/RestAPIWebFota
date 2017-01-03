@@ -49,7 +49,8 @@ spring:
     survey:
         surveyreportemailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com
     changePrescription:
-        changePrescriptionEmailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com
+        changePrescriptionEmailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com   
     http:
-        multipart.max-file-size:  3MB
-        multipart.max-request-size: 20MB    
+        multipart:
+          max-file-size: 3MB
+          max-request-size: 20MB

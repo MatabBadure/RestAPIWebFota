@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SortedMap;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -60,6 +61,45 @@ public class NotificationService {
 			notificationRepository.save(existingNotificationofTheDay);
 		}
 		return existingNotificationofTheDay;
+	}
+	
+	/**
+	 * Creates or Updates Notification with provided details
+	 * @param patientUser
+	 * @param patient
+	 * @param patientUserId
+	 * @param currentTherapyDate
+	 * @param notificationType
+	 * @param isAcknowledged
+	 * @param existingNotificationofTheDay
+	 * @return
+	 */
+	public Notification createOrUpdateNotification(User patientUser,
+			PatientInfo patient, Long patientUserId,
+			LocalDate currentTherapyDate, String notificationType,boolean isAcknowledged,Notification existingNotificationofTheDay) {
+		
+		// Commenting the repository call and getting the current date notification from the param 
+		//Notification existingNotificationofTheDay = notificationRepository.findByPatientUserIdAndDate(patientUserId, currentTherapyDate);
+		
+		// Update missed therapy notification if exists for the day
+		if(Objects.nonNull(existingNotificationofTheDay)){
+			existingNotificationofTheDay.setNotificationType(notificationType);
+			existingNotificationofTheDay.setAcknowledged(isAcknowledged);
+			notificationRepository.save(existingNotificationofTheDay);
+		}else{
+			existingNotificationofTheDay = new Notification(notificationType,currentTherapyDate,patientUser,patient,false);
+			notificationRepository.save(existingNotificationofTheDay);
+		}
+		return existingNotificationofTheDay;
+	}
+	
+	// To get the notification object for the specific notification date
+	public Notification getNotificationForDay(List<Notification> notificationList, LocalDate reqDate) {
+		List<Notification> notificationFilter = notificationList.stream().filter(Notification->Notification.getDate().equals(reqDate)).collect(Collectors.toList());
+		if(!notificationFilter.isEmpty())
+			return notificationFilter.get(0);
+		else
+			return null;
 	}
 
 	/**

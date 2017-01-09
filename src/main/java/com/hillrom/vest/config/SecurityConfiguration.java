@@ -123,19 +123,25 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/env/**").hasAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/trace/**").hasAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/api-docs/**").hasAuthority(AuthoritiesConstants.ADMIN)
-            .antMatchers("/api/clinics/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES)
+             //hill-1845
+            .antMatchers("/api/clinics/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES)
+            //hill-1845
             .antMatchers("/api/hillromteamuser/**").hasAnyAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/protected/**").authenticated()
             .antMatchers("/api/user/{id}/changeSecurityQuestion").authenticated()
-            .antMatchers("/api/user/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES)
+            //hill-1845
+            .antMatchers("/api/user/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES)
+            //hill-1845
             .antMatchers("/api/patient/**").hasAnyAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/api/cityStateZipValuesByCity").authenticated()
             .antMatchers("/api/cityStateZipValuesBystate").authenticated()
             .antMatchers("/api/cityStateZipValuesByZipCode").authenticated()
-            .antMatchers("/api/survey/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT)
-            .antMatchers("/api/validateCredentials").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES)
-            .antMatchers("/api/loginAnalytics").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES,AuthoritiesConstants.ASSOCIATES)
-            .antMatchers("/api/survey/{id}/graph").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES,AuthoritiesConstants.ASSOCIATES)
+            .antMatchers("/api/survey/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT, AuthoritiesConstants.CUSTOMER_SERVICES)
+            //hill-1845
+            .antMatchers("/api/validateCredentials").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES)
+            .antMatchers("/api/loginAnalytics").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES,AuthoritiesConstants.ASSOCIATES, AuthoritiesConstants.CUSTOMER_SERVICES)
+            .antMatchers("/api/survey/{id}/graph").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES,AuthoritiesConstants.ASSOCIATES, AuthoritiesConstants.CUSTOMER_SERVICES)
+            //hill-1845
             .antMatchers("/api/survey/{id}/graph").authenticated()        
         .and()
             .apply(securityConfigurerAdapter());

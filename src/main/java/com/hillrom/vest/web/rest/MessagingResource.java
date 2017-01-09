@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import net.minidev.json.JSONObject;
@@ -48,6 +49,17 @@ import com.hillrom.vest.web.rest.dto.MessageDTO;
 import com.hillrom.vest.web.rest.dto.MessageToUserAssoDTO;
 import com.hillrom.vest.web.rest.dto.NoteDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
+
+
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/api")
@@ -294,4 +306,64 @@ public class MessagingResource {
 		
 	}
 	
+	/* *//**
+	   * POST /uploadFile -> receive and locally save a file.
+	   * 
+	   * @param uploadfile The uploaded file as Multipart file parameter in the 
+	   * HTTP request. The RequestParam name must be the same of the attribute 
+	   * "name" in the input tag with type file.
+	   * 
+	   * @return An http OK status in case of success, an http 4xx status in case 
+	   * of errors.
+	   * 
+	   * While calling from pastman pass x-auth-token and name = uploadfile . Body should be form-data , uploadfile and ChooseFile
+	   */
+	  @RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
+	  @ResponseBody
+	  public ResponseEntity<?> uploadFile(
+	      @RequestParam("uploadfile") MultipartFile uploadfile) {
+	    
+	    try {
+	      // Get the filename and build the local file path
+	      String filename = uploadfile.getOriginalFilename();
+	      String directory = "/tmp/visiview-files";
+	      String filepath = Paths.get(directory, filename).toString();
+	      
+	      // Save the file locally
+	      BufferedOutputStream stream =
+	          new BufferedOutputStream(new FileOutputStream(new File(filepath)));
+	      stream.write(uploadfile.getBytes());
+	      stream.close();
+	    }
+	    catch (Exception e) {
+	      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	    }
+	    
+	    return new ResponseEntity<>(HttpStatus.OK);
+	  } // method uploadFile
+	  
+	  
+
+	  
+	  @RequestMapping(value = "/files/{file_name}", method = RequestMethod.GET)
+	  public void getFile(
+	      @PathVariable("file_name") String fileName, 
+	      HttpServletResponse response) {
+	      try {
+	        // get your file as InputStream
+    	    File initialFile = new File("/tmp/visiview-files/" + fileName + ".pdf");
+    	    InputStream is = new FileInputStream(initialFile);  
+    	    
+    		response.addHeader("Content-disposition", "inline;filename=/tmp/visiview-files/" + fileName);
+    		response.setContentType("application/pdf");
+	        // copy it to response's OutputStream
+	        org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
+	        response.flushBuffer();
+	      } catch (IOException ex) {
+	    	  ex.printStackTrace();
+	        //log.info("Error writing file to output stream. Filename was '{}'", fileName, ex);
+	        throw new RuntimeException("IOError writing file to output stream");
+	      }
+
+	  }
 }

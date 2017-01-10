@@ -356,10 +356,11 @@ public class AdherenceCalculationService {
 		
 		List<LocalDate> allDates = DateUtil.getAllLocalDatesBetweenDates(fromDate, toDate);
 		
-		for(LocalDate date : allDates){			
-			session.addAll(sortedTherapySession.get(date));
+		for(LocalDate date : allDates){
 			
-		}		
+			if(Objects.nonNull(sortedTherapySession.get(date)))
+				session.addAll(sortedTherapySession.get(date));
+		}
 		
 		return session;
 	}
@@ -711,7 +712,7 @@ public class AdherenceCalculationService {
 		// existingNotificationofTheDay object of Notification is sent to avoid repository call
 		// userNotifications list object is sent to the method for getting the current day object
 		notificationService.createOrUpdateNotification(patientUser, patient, userId,
-				complianceDate, (initialPrevScoreFor1Day == 0 ? MISSED_THERAPY : ADHERENCE_SCORE_RESET) , false);
+				complianceDate, (initialPrevScoreFor1Day == 0 ? MISSED_THERAPY : ADHERENCE_SCORE_RESET) , false, existingNotificationofTheDay);
 		
 		// Commenting the repository call for previous day compliance by passing prevCompliance in the parameter
 		// Getting previous day score or adherence reset score for the adherence setting value as 1

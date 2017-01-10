@@ -4,6 +4,7 @@ package com.hillrom.vest.web.rest;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -227,9 +228,13 @@ public class AnnouncementsResource {
 	    		 return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
 	    		 
 	    }
+	    catch (FileNotFoundException ex) {
+	    	jsonObject.put("ERROR","The system cannot find the path/Directory specified");
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	    }
 	    catch (Exception ex) {
 	    	jsonObject.put("ERROR", ex.getMessage());
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	    	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	    }
 	  
 	  } 

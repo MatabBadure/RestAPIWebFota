@@ -426,8 +426,12 @@ public class AdherenceCalculationService {
 							
 					// Check whether the adherence start days is the compliance date
 					if(adherenceStartDate.equals(currentCompliance.getDate())){
-						notificationService.createOrUpdateNotification(patientUser, patient, userId,
-																		currentCompliance.getDate(), ADHERENCE_SCORE_RESET,false,existingNotificationofTheDay);
+						if(resetFlag == 1){
+							notificationService.createOrUpdateNotification(patientUser, patient, userId,
+																		currentCompliance.getDate(), ADHERENCE_SCORE_RESET, false, existingNotificationofTheDay);
+						}else{
+							notificationRepository.delete(existingNotificationofTheDay);
+						}
 						currentCompliance.setSettingsDeviatedDaysCount(0);
 						currentCompliance.setMissedTherapyCount(0);
 					} else {
@@ -675,7 +679,7 @@ public class AdherenceCalculationService {
 		newCompliance.setHmrRunRate(hmrRunRate);
 		double durationForSettingDays = hmrRunRate*therapySessions.size(); // runrate*totalsessions = total duration
 		
-		String notification_type = "";		
+		String notification_type = null;
 		boolean isSettingsDeviated = isSettingsDeviatedForSettingDays(therapySessions, userProtocolConstants, adherenceSettingDay);
 		
 		// validating the last adherence setting days therapies with respect to the user protocol
@@ -704,8 +708,11 @@ public class AdherenceCalculationService {
 			int globalSettingsDeviationCounter = prevCompliance.getGlobalSettingsDeviationCounter();
 			newCompliance.setGlobalSettingsDeviationCounter(++globalSettingsDeviationCounter);
 		}else{
-			score = score <=  DEFAULT_COMPLIANCE_SCORE - BONUS_POINTS ? score + BONUS_POINTS : DEFAULT_COMPLIANCE_SCORE;			
-			notification_type = ADHERENCE_SCORE_RESET;
+			score = score <=  DEFAULT_COMPLIANCE_SCORE - BONUS_POINTS ? score + BONUS_POINTS : DEFAULT_COMPLIANCE_SCORE;
+			//notification_type = ADHERENCE_SCORE_RESET;
+			notificationRepository.delete(existingNotificationofTheDay);
+			newCompliance.setScore(score);
+			return newCompliance;
 		}
 		
 		if(resetFlag == 1){

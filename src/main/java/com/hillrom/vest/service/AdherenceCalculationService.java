@@ -435,6 +435,12 @@ public class AdherenceCalculationService {
 						// Commenting the existing repository call and calling the the new method for getting the previous day compliance
 						//PatientCompliance prevCompliance = patientComplianceRepository.returnPrevDayScore(currentCompliance.getDate().toString(),userId);
 						PatientCompliance prevCompliance = returnPrevDayCompli(patientComplianceList, currentCompliance.getDate());
+						if(Objects.isNull(prevCompliance)){
+							prevCompliance = new PatientCompliance();
+							prevCompliance.setScore(adherenceScore);
+							prevCompliance.setSettingsDeviatedDaysCount(0);
+							prevCompliance.setMissedTherapyCount(0);
+						}
 						
 						if(currentCompliance.getMissedTherapyCount() > 0){
 							currentCompliance.setMissedTherapyCount(prevCompliance.getMissedTherapyCount()+1);

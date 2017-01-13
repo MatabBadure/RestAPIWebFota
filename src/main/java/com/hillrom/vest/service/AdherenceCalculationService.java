@@ -502,6 +502,7 @@ public class AdherenceCalculationService {
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter( writer );
 			ex.printStackTrace( printWriter );
+			mailService.sendJobFailureNotification("resetAdherenceCalculationPatient",writer.toString());
 		}
 		return "Adherence score reset successfully";
 	}

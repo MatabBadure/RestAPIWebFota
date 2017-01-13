@@ -659,7 +659,7 @@
 			</build>
 			<properties>
 				<!-- log configuration -->
-				<logback.loglevel>DEBUG</logback.loglevel>
+				<logback.loglevel>ERROR</logback.loglevel>
 			</properties>
 			<dependencies>
 				<dependency>

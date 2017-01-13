@@ -430,7 +430,8 @@ public class AdherenceCalculationService {
 							notificationService.createOrUpdateNotification(patientUser, patient, userId,
 																		currentCompliance.getDate(), ADHERENCE_SCORE_RESET, false, existingNotificationofTheDay);
 						}else{
-							notificationRepository.delete(existingNotificationofTheDay);
+							if(Objects.nonNull(existingNotificationofTheDay))
+								notificationRepository.delete(existingNotificationofTheDay);
 						}
 						currentCompliance.setSettingsDeviatedDaysCount(0);
 						currentCompliance.setMissedTherapyCount(0);
@@ -710,7 +711,9 @@ public class AdherenceCalculationService {
 		}else{
 			score = score <=  DEFAULT_COMPLIANCE_SCORE - BONUS_POINTS ? score + BONUS_POINTS : DEFAULT_COMPLIANCE_SCORE;
 			//notification_type = ADHERENCE_SCORE_RESET;
-			notificationRepository.delete(existingNotificationofTheDay);
+			
+			if(Objects.nonNull(existingNotificationofTheDay))
+				notificationRepository.delete(existingNotificationofTheDay);
 			newCompliance.setScore(score);
 			return newCompliance;
 		}

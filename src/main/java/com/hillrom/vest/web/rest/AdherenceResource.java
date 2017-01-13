@@ -157,7 +157,7 @@ public class AdherenceResource {
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
 				// For recalculating adherence score with the adherence start date
-	        	String errMsg = adherenceCalculationService.adherenceResetForPatient(Long.parseLong(userId), patientId, resetStartDt, Integer.parseInt(resetScore));
+	        	String errMsg = adherenceCalculationService.adherenceResetForPatient(Long.parseLong(userId), patientId, resetStartDt, Integer.parseInt(resetScore), 1);
 	        	//jsonObject.put("message", MessageConstants.HR_313);
 	        	jsonObject.put("message", errMsg);
 	            jsonObject.put("AdherenceReset", adherenceReset);

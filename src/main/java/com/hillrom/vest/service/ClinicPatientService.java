@@ -58,6 +58,9 @@ public class ClinicPatientService {
     
     @Inject
     private PatientInfoRepository patientInfoRepository;
+	
+	@Inject
+    private UserService userService;
     
     public List<ClinicVO> associateClinicsToPatient(Long id, List<Map<String, String>> clinicList) throws HillromException {
     	User patientUser = userRepository.findOne(id);
@@ -198,5 +201,44 @@ public class ClinicPatientService {
 		
 	}
 	//end:HILL-2004
+	
+	public List<PatientInfo> getPatientListForClinic(String clinicId) throws HillromException{
+		// get the clinic patient association for the clinic
+		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByClinicId(clinicId);
+		
+		List<PatientInfo> patientList = new LinkedList<>();
+		// Check for non null of object
+		if(Objects.nonNull(clinicPatientAssocList) && !clinicPatientAssocList.isEmpty()) {			
+			for(ClinicPatientAssoc clinicPatientAssoc : clinicPatientAssocList){				
+				patientList.add(clinicPatientAssoc.getPatient());				
+			}			
+		}
+		return patientList;
+	}
+	
+	public List<User> getUserListForClinic(String clinicId) throws HillromException{
+		// get the clinic patient association for the clinic
+		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByClinicId(clinicId);
+		
+		List<User> userList = new LinkedList<>();
+		// Check for non null of object
+		if(Objects.nonNull(clinicPatientAssocList) && !clinicPatientAssocList.isEmpty()) {			
+			for(ClinicPatientAssoc clinicPatientAssoc : clinicPatientAssocList){				
+				userList.add(userService.getUserObjFromPatientInfo(clinicPatientAssoc.getPatient()));
+			}
+		}
+		
+		return userList;
+	}
+	
+	public List<Long> getUserIdListFromUserList(List<User> userList) throws HillromException{
+		
+		List<Long> userIdList = new LinkedList<>();
+		for(User user : userList ){
+			userIdList.add(user.getId());
+		}
+		
+		return userIdList;
+	}
 	
 }

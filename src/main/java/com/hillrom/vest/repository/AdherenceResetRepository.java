@@ -34,4 +34,6 @@ public interface AdherenceResetRepository extends
 	 List<AdherenceReset> findOneByPatientUserIdAndResetStartDates(Long patientUserId, LocalDate firstStartDate, LocalDate lastStartDate);
 	//hill-1956
 	
+	@Query("from AdherenceReset reset where reset.patientUser.id = ?1 ORDER BY reset.resetStartDate desc")
+	List<AdherenceReset> findOneByPatientUserIdLatestResetStartDate(Long patientUserId);
 }

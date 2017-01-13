@@ -96,7 +96,9 @@ public class ExceptionConstants {
     public static final String HR_577 = "Unable to update Caregiver User.";
     public static final String HR_578 = "This bluetooth id is already linked to patient ";
     public static final String HR_579 = "Unable to update Associate User.";
-    
+ // hill-1845
+    public static final String HR_580 = "Unable to update Customer Service User.";
+ // hill-1845  
     public static final String HR_581 = "No Patient Associated with HCP.";
     public static final String HR_582 = "No Clinics Associated with HCP.";
     public static final String HR_583 = "Unable to associate HCP with clinic.";

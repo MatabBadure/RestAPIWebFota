@@ -161,6 +161,9 @@ public class LoginAnalyticsGraphService extends AbstractGraphService {
 		authorityLabelsMap.put(AuthoritiesConstants.ACCT_SERVICES,"RC Admin");
 		authorityLabelsMap.put(AuthoritiesConstants.HILLROM_ADMIN,"Hill-Rom Admin");
 		authorityLabelsMap.put(AuthoritiesConstants.ASSOCIATES,"Associates");
+		//hill-1845
+		authorityLabelsMap.put(AuthoritiesConstants.CUSTOMER_SERVICES,"Customer Services");
+		//hill-1845
 		return authorityLabelsMap.get(authority);
 	}
 }

@@ -1,0 +1,4 @@
+id,type,type_code,type_code_value
+46,announcement_send_to,All,All
+47,announcement_send_to,Clinic,Clinic
+48,announcement_send_to,Patient,Patient

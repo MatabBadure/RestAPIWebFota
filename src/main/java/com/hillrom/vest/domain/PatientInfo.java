@@ -90,6 +90,19 @@ public class PatientInfo implements Serializable {
     @Column(name = "expired")
     private Boolean expired = false;
     
+    //Start: Announcement changes
+    @Column(name = "primary_diagnosis")
+    private String primaryDiagnosis;
+    
+    public String getPrimaryDiagnosis() {
+		return primaryDiagnosis;
+	}
+    //End: Announcement changes
+	public void setPrimaryDiagnosis(String primaryDiagnosis) {
+		this.primaryDiagnosis = primaryDiagnosis;
+	}
+	//
+	
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "expired_date", nullable = true)
     private DateTime expiredDate = null;

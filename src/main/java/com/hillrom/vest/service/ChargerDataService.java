@@ -341,7 +341,7 @@ public class ChargerDataService {
 		        log.debug("hmr_seconds : "+ sout );
 		        
 		        //log.debug("Value of deviceDataArray.length : "+ j );
-		        for(int i=EVENT_LOG_START_POS;i<j;i=i+7){
+		        for(int i=EVENT_LOG_START_POS+1;i<j;i=i+9){
 		        	
 		        	//log.debug("Value of i : "+ i );
 		        	

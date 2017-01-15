@@ -79,6 +79,7 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.NUMB
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.NUMBER_OF_PODS_LEN;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.HMR_SECONDS_LEN;
 
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVENT_LOG_LEN;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVENT_TIMESTAMP_LEN;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVENT_CODE_LEN;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FREQUENCY_LEN;
@@ -341,7 +342,7 @@ public class ChargerDataService {
 		        log.debug("hmr_seconds : "+ sout );
 		        
 		        //log.debug("Value of deviceDataArray.length : "+ j );
-		        for(int i=EVENT_LOG_START_POS+1;i<j;i=i+9){
+		        for(int i=EVENT_LOG_START_POS+1;i<j;i=i+EVENT_LOG_LEN){
 		        	
 		        	//log.debug("Value of i : "+ i );
 		        	

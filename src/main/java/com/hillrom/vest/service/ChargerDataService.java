@@ -291,6 +291,8 @@ public class ChargerDataService {
 		        	sout = sout + (session_index[k]  & 0xFF) + " ";
 		        }
 		        log.debug("session_index : "+ sout );
+		        
+		        log.debug("Combined session_index : "+ intergerCombinedFromHex(session_index));
 		              
 		        byte[] start_time  = Arrays.copyOfRange(deviceDataArray, START_TIME_LOC, START_TIME_LOC + START_TIME_LEN);
 		        sout = "";
@@ -340,6 +342,7 @@ public class ChargerDataService {
 		        	sout = sout + (hmr_seconds[k]  & 0xFF) + " ";
 		        }
 		        log.debug("hmr_seconds : "+ sout );
+		        log.debug("Combined hmr_seconds : "+ intergerCombinedFromHex(hmr_seconds));
 		        
 		        //log.debug("Value of deviceDataArray.length : "+ j );
 		        for(int i=EVENT_LOG_START_POS+1;i<j;i=i+EVENT_LOG_LEN){
@@ -543,6 +546,18 @@ public class ChargerDataService {
 	        	
 	        }
 	
+	    	public int intergerCombinedFromHex(byte[] input)
+	    	{
+	    	    
+	    	    String hexString =  "";
+	    	    int hexTotal = 0;
+	    	    for (int t = 0; t < input.length; t++)
+	    	    {
+	    	    	hexTotal = hexTotal + Integer.parseInt(Integer.toHexString(input[t]& 0xFF), 16);
+	    	    }
+	    	    log.debug("hexTotal : " + hexTotal);
+	    	    return hexTotal;
+	    	}
 
 	
 	

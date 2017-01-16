@@ -94,7 +94,6 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FRAG
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_WIFI;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_SN;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_VER;
-import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.PING_PONG_PING;
 
 @Service
 @Transactional
@@ -133,6 +132,9 @@ public class ChargerDataService {
 				log.error("Decoded String : " + decoded_string);
 				
 				JSONObject chargerJsonData = validateRequest(encoded_string,decoded_string);
+				if(chargerJsonData.get("DEVICE_DATA").equals("PING_PONG_PING")){
+					log.debug("deviceData is PING_PONG_PING" + " Insert into PING_PONG_PING table");
+				}
 				if(chargerJsonData.get("RESULT").equals("OK")){
 					ChargerData chargerData = new ChargerData();
 					chargerData.setDeviceData(encoded_string);
@@ -162,18 +164,18 @@ public class ChargerDataService {
 								missingParams.contains(DEVICE_VER) || missingParams.contains(DEVICE_DATA) || missingParams.contains(CRC) ||
 								missingParams.contains(FRAG_TOTAL) || missingParams.contains(FRAG_CURRENT)
 								){
-							getDeviceData(rawData);
+							chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
 							chargerJsonData.put("RESULT", "NOT OK");
 							chargerJsonData.put("ERROR","Missing Params");
 							return chargerJsonData;
 						}else{
 							if(!calculateCRC(rawData)){
-								getDeviceData(rawData);
+								chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
 								chargerJsonData.put("RESULT", "NOT OK");
 								chargerJsonData.put("ERROR","CRC Validation Failed");
 								return chargerJsonData;
 							}else{
-								getDeviceData(rawData);
+								chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
 								chargerJsonData.put("RESULT", "OK");
 								chargerJsonData.put("ERROR","");
 								return chargerJsonData;					
@@ -185,7 +187,7 @@ public class ChargerDataService {
 							chargerJsonData.put("ERROR","CRC Validation Failed");
 							return chargerJsonData;
 						}else{
-							getDeviceData(rawData);
+							chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
 							chargerJsonData.put("RESULT", "OK");
 							chargerJsonData.put("ERROR","");
 							return chargerJsonData;					
@@ -256,7 +258,7 @@ public class ChargerDataService {
 				
 			}
 	  
-			public void getDeviceData(String encoded_string) throws HillromException{
+			public String getDeviceData(String encoded_string) throws HillromException{
 				
 
 				
@@ -284,10 +286,9 @@ public class ChargerDataService {
 		        log.debug("deviceData : "+ sout );
 		        
 		        if(deviceData.equalsIgnoreCase("PING_PONG_PING")){
-		        	log.debug("deviceData is PING_PONG_PING" );
-		        	return;
+		        	return "PING_PONG_PING";
 		        }
-		        log.debug("deviceData is Not PING_PONG_PING");
+	        	log.debug("deviceData is NOT PING_PONG_PING" );
 		        
 				int x = getFragTotal(encoded_string);
 				int y = getFragCurrent(encoded_string);
@@ -397,6 +398,8 @@ public class ChargerDataService {
 			        }
 			        log.debug("duration : "+ sout );
 		        }
+		        
+		        return "NOT_PING_PONG_PING";
 		
 			}
 

@@ -27,11 +27,13 @@ import com.hillrom.vest.domain.ChargerData;
 import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
+import com.hillrom.vest.domain.PingPongPing;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ChargerDataRepository;
 import com.hillrom.vest.repository.NoteRepository;
+import com.hillrom.vest.repository.PingPongPingRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.ParserUtil;
@@ -104,6 +106,10 @@ public class ChargerDataService {
 		
 			@Inject
 			private ChargerDataRepository chargerDataRepository;
+
+			@Inject
+			private PingPongPingRepository pingPongPingRepository;
+			
 			
 			
 			public ChargerData findLatestData(){
@@ -134,6 +140,10 @@ public class ChargerDataService {
 				JSONObject chargerJsonData = validateRequest(encoded_string,decoded_string);
 				if(chargerJsonData.get("DEVICE_DATA").equals("PING_PONG_PING")){
 					log.debug("deviceData is PING_PONG_PING" + " Insert into PING_PONG_PING table");
+					PingPongPing pingPongPingData = new PingPongPing();
+					pingPongPingData.setCreatedTime(new DateTime());
+					pingPongPingRepository.save(pingPongPingData);
+					
 				}
 				if(chargerJsonData.get("RESULT").equals("OK")){
 					ChargerData chargerData = new ChargerData();

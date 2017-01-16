@@ -27,11 +27,13 @@ import com.hillrom.vest.domain.ChargerData;
 import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
+import com.hillrom.vest.domain.PingPongPing;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ChargerDataRepository;
 import com.hillrom.vest.repository.NoteRepository;
+import com.hillrom.vest.repository.PingPongPingRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.ParserUtil;
@@ -104,6 +106,10 @@ public class ChargerDataService {
 		
 			@Inject
 			private ChargerDataRepository chargerDataRepository;
+
+			@Inject
+			private PingPongPingRepository pingPongPingRepository;
+			
 			
 			
 			public ChargerData findLatestData(){
@@ -132,6 +138,13 @@ public class ChargerDataService {
 				log.error("Decoded String : " + decoded_string);
 				
 				JSONObject chargerJsonData = validateRequest(encoded_string,decoded_string);
+				if(chargerJsonData.get("DEVICE_DATA").equals("PING_PONG_PING")){
+					log.debug("deviceData is PING_PONG_PING" + " Insert into PING_PONG_PING table");
+					PingPongPing pingPongPingData = new PingPongPing();
+					pingPongPingData.setCreatedTime(new DateTime());
+					pingPongPingRepository.save(pingPongPingData);
+					
+				}
 				if(chargerJsonData.get("RESULT").equals("OK")){
 					ChargerData chargerData = new ChargerData();
 					chargerData.setDeviceData(encoded_string);
@@ -161,16 +174,18 @@ public class ChargerDataService {
 								missingParams.contains(DEVICE_VER) || missingParams.contains(DEVICE_DATA) || missingParams.contains(CRC) ||
 								missingParams.contains(FRAG_TOTAL) || missingParams.contains(FRAG_CURRENT)
 								){
+							chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
 							chargerJsonData.put("RESULT", "NOT OK");
 							chargerJsonData.put("ERROR","Missing Params");
 							return chargerJsonData;
 						}else{
 							if(!calculateCRC(rawData)){
+								chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
 								chargerJsonData.put("RESULT", "NOT OK");
 								chargerJsonData.put("ERROR","CRC Validation Failed");
 								return chargerJsonData;
 							}else{
-								getDeviceData(rawData);
+								chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
 								chargerJsonData.put("RESULT", "OK");
 								chargerJsonData.put("ERROR","");
 								return chargerJsonData;					
@@ -182,7 +197,7 @@ public class ChargerDataService {
 							chargerJsonData.put("ERROR","CRC Validation Failed");
 							return chargerJsonData;
 						}else{
-							getDeviceData(rawData);
+							chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
 							chargerJsonData.put("RESULT", "OK");
 							chargerJsonData.put("ERROR","");
 							return chargerJsonData;					
@@ -253,13 +268,9 @@ public class ChargerDataService {
 				
 			}
 	  
-			public void getDeviceData(String encoded_string) throws HillromException{
+			public String getDeviceData(String encoded_string) throws HillromException{
 				
-				int x = getFragTotal(encoded_string);
-				int y = getFragCurrent(encoded_string);
-				byte[] devsnbt = getDevSN(encoded_string);
-				byte[] wifibt = getDevWifi(encoded_string);
-				byte[] verbt = getDevVer(encoded_string);
+
 				
 		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
 		        String sout = "";
@@ -283,6 +294,17 @@ public class ChargerDataService {
 		        	deviceData = deviceData + String.valueOf(Character.toChars(val));
 		        }
 		        log.debug("deviceData : "+ sout );
+		        
+		        if(deviceData.equalsIgnoreCase("PING_PONG_PING")){
+		        	return "PING_PONG_PING";
+		        }
+	        	log.debug("deviceData is NOT PING_PONG_PING" );
+		        
+				int x = getFragTotal(encoded_string);
+				int y = getFragCurrent(encoded_string);
+				byte[] devsnbt = getDevSN(encoded_string);
+				byte[] wifibt = getDevWifi(encoded_string);
+				byte[] verbt = getDevVer(encoded_string);
 		        
 		        byte[] session_index  = Arrays.copyOfRange(deviceDataArray, SESSION_INDEX_LOC, SESSION_INDEX_LOC + SESSION_INDEX_LEN);
 		        sout = "";
@@ -386,6 +408,8 @@ public class ChargerDataService {
 			        }
 			        log.debug("duration : "+ sout );
 		        }
+		        
+		        return "NOT_PING_PONG_PING";
 		
 			}
 

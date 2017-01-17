@@ -113,4 +113,5 @@
 	<include file="classpath:/config/liquibase/changelog/20161226065600_monarch_tables.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20161228181730_updated_value_for_diagnosis_typecode.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170116030400_create_ping_pong_ping_table.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170117030200_updated_clinic_speciality_hillrom_type_code.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

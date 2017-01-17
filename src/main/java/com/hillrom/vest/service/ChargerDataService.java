@@ -27,11 +27,13 @@ import com.hillrom.vest.domain.ChargerData;
 import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
+import com.hillrom.vest.domain.PingPongPing;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ChargerDataRepository;
 import com.hillrom.vest.repository.NoteRepository;
+import com.hillrom.vest.repository.PingPongPingRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.ParserUtil;
@@ -79,6 +81,7 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.NUMB
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.NUMBER_OF_PODS_LEN;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.HMR_SECONDS_LEN;
 
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVENT_LOG_LEN;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVENT_TIMESTAMP_LEN;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVENT_CODE_LEN;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FREQUENCY_LEN;
@@ -103,6 +106,10 @@ public class ChargerDataService {
 		
 			@Inject
 			private ChargerDataRepository chargerDataRepository;
+
+			@Inject
+			private PingPongPingRepository pingPongPingRepository;
+			
 			
 			
 			public ChargerData findLatestData(){
@@ -131,6 +138,13 @@ public class ChargerDataService {
 				log.error("Decoded String : " + decoded_string);
 				
 				JSONObject chargerJsonData = validateRequest(encoded_string,decoded_string);
+				if(chargerJsonData.get("DEVICE_DATA").equals("PING_PONG_PING")){
+					log.debug("deviceData is PING_PONG_PING" + " Insert into PING_PONG_PING table");
+					PingPongPing pingPongPingData = new PingPongPing();
+					pingPongPingData.setCreatedTime(new DateTime());
+					pingPongPingRepository.save(pingPongPingData);
+					
+				}
 				if(chargerJsonData.get("RESULT").equals("OK")){
 					ChargerData chargerData = new ChargerData();
 					chargerData.setDeviceData(encoded_string);
@@ -160,16 +174,18 @@ public class ChargerDataService {
 								missingParams.contains(DEVICE_VER) || missingParams.contains(DEVICE_DATA) || missingParams.contains(CRC) ||
 								missingParams.contains(FRAG_TOTAL) || missingParams.contains(FRAG_CURRENT)
 								){
+							chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
 							chargerJsonData.put("RESULT", "NOT OK");
 							chargerJsonData.put("ERROR","Missing Params");
 							return chargerJsonData;
 						}else{
 							if(!calculateCRC(rawData)){
+								chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
 								chargerJsonData.put("RESULT", "NOT OK");
 								chargerJsonData.put("ERROR","CRC Validation Failed");
 								return chargerJsonData;
 							}else{
-								getDeviceData(rawData);
+								chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
 								chargerJsonData.put("RESULT", "OK");
 								chargerJsonData.put("ERROR","");
 								return chargerJsonData;					
@@ -181,7 +197,7 @@ public class ChargerDataService {
 							chargerJsonData.put("ERROR","CRC Validation Failed");
 							return chargerJsonData;
 						}else{
-							getDeviceData(rawData);
+							chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
 							chargerJsonData.put("RESULT", "OK");
 							chargerJsonData.put("ERROR","");
 							return chargerJsonData;					
@@ -252,13 +268,9 @@ public class ChargerDataService {
 				
 			}
 	  
-			public void getDeviceData(String encoded_string) throws HillromException{
+			public String getDeviceData(String encoded_string) throws HillromException{
 				
-				int x = getFragTotal(encoded_string);
-				int y = getFragCurrent(encoded_string);
-				byte[] devsnbt = getDevSN(encoded_string);
-				byte[] wifibt = getDevWifi(encoded_string);
-				byte[] verbt = getDevVer(encoded_string);
+
 				
 		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
 		        String sout = "";
@@ -283,6 +295,17 @@ public class ChargerDataService {
 		        }
 		        log.debug("deviceData : "+ sout );
 		        
+		        if(deviceData.equalsIgnoreCase("PING_PONG_PING")){
+		        	return "PING_PONG_PING";
+		        }
+	        	log.debug("deviceData is NOT PING_PONG_PING" );
+		        
+				int x = getFragTotal(encoded_string);
+				int y = getFragCurrent(encoded_string);
+				byte[] devsnbt = getDevSN(encoded_string);
+				byte[] wifibt = getDevWifi(encoded_string);
+				byte[] verbt = getDevVer(encoded_string);
+		        
 		        byte[] session_index  = Arrays.copyOfRange(deviceDataArray, SESSION_INDEX_LOC, SESSION_INDEX_LOC + SESSION_INDEX_LEN);
 		        sout = "";
 		        
@@ -290,6 +313,8 @@ public class ChargerDataService {
 		        	sout = sout + (session_index[k]  & 0xFF) + " ";
 		        }
 		        log.debug("session_index : "+ sout );
+		        
+		        log.debug("Combined session_index : "+ intergerCombinedFromHex(session_index));
 		              
 		        byte[] start_time  = Arrays.copyOfRange(deviceDataArray, START_TIME_LOC, START_TIME_LOC + START_TIME_LEN);
 		        sout = "";
@@ -339,9 +364,10 @@ public class ChargerDataService {
 		        	sout = sout + (hmr_seconds[k]  & 0xFF) + " ";
 		        }
 		        log.debug("hmr_seconds : "+ sout );
+		        log.debug("Combined hmr_seconds : "+ intergerCombinedFromHex(hmr_seconds));
 		        
 		        //log.debug("Value of deviceDataArray.length : "+ j );
-		        for(int i=EVENT_LOG_START_POS;i<j;i=i+7){
+		        for(int i=EVENT_LOG_START_POS+1;i<j;i=i+EVENT_LOG_LEN){
 		        	
 		        	//log.debug("Value of i : "+ i );
 		        	
@@ -382,6 +408,8 @@ public class ChargerDataService {
 			        }
 			        log.debug("duration : "+ sout );
 		        }
+		        
+		        return "NOT_PING_PONG_PING";
 		
 			}
 
@@ -542,6 +570,18 @@ public class ChargerDataService {
 	        	
 	        }
 	
+	    	public int intergerCombinedFromHex(byte[] input)
+	    	{
+	    	    
+	    	    String hexString =  "";
+	    	    int hexTotal = 0;
+	    	    for (int t = 0; t < input.length; t++)
+	    	    {
+	    	    	hexTotal = hexTotal + Integer.parseInt(Integer.toHexString(input[t]& 0xFF), 16);
+	    	    }
+	    	    log.debug("hexTotal : " + hexTotal);
+	    	    return hexTotal;
+	    	}
 
 	
 	

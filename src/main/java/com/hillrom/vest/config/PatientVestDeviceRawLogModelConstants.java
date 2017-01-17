@@ -84,6 +84,7 @@ public class PatientVestDeviceRawLogModelConstants {
 	public static final int NUMBER_OF_PODS_LEN = 1;
 	public static final int HMR_SECONDS_LEN = 4;
 	/** Log Event */
+	public static final int EVENT_LOG_LEN = 9; // Including delimiters
 	public static final int EVENT_TIMESTAMP_LEN = 3;
 	public static final int EVENT_CODE_LEN = 1;
 	public static final int FREQUENCY_LEN = 1; 

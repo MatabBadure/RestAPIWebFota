@@ -300,8 +300,8 @@ public class PatientHCPService {
                   throw new HillromException(MessageConstants.HR_267);
            } else {
                   
-                  startDate = startDate.minusDays(1);
-                  endDate = endDate.minusDays(1);
+                 /* startDate = startDate.minusDays(1);
+                  endDate = endDate.minusDays(1);*/
                   
                   Map<LocalDate,Integer> datePatientNoEventCountMap = getPatientsWithNoEvents(startDate,endDate,patientUserIds);
                   int patientsWithNoEventRecorded = 0;

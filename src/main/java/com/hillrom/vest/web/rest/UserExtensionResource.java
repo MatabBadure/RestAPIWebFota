@@ -1,6 +1,7 @@
 package com.hillrom.vest.web.rest;
 
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.config.Constants;
+import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
@@ -125,7 +127,7 @@ public class UserExtensionResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CLINIC_ADMIN, AuthoritiesConstants.ASSOCIATES})
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CLINIC_ADMIN, AuthoritiesConstants.ASSOCIATES, AuthoritiesConstants.CUSTOMER_SERVICES})
     public ResponseEntity<JSONObject> update(@PathVariable Long id, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
         log.debug("REST request to update User : {}", userExtensionDTO);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
@@ -194,7 +196,9 @@ public class UserExtensionResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    //hill-1845
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES})
+    //hill-1845
     public ResponseEntity<JSONObject> delete(@PathVariable Long id, HttpServletRequest request) {
         log.debug("REST request to delete UserExtension : {}", id);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
@@ -458,11 +462,24 @@ public class UserExtensionResource {
         JSONObject jsonObject = new JSONObject();
 		try {
 			List<ClinicVO> clinics = clinicPatientService.getAssociatedClinicsForPatient(id);
+
 			if (clinics.isEmpty()) {
 				jsonObject.put("message", MessageConstants.HR_285);
 	        } else {
+
 	        	jsonObject.put("message", MessageConstants.HR_275);
 		    	jsonObject.put("clinics", clinics);
+
+				Collections.sort(clinics);
+				boolean flag = false;
+				for(int i=clinics.size()-1;i>=0 && !flag;i--){
+					if(clinics.get(i).getAdherenceSettingModifiedDte() != null){
+						jsonObject.put("latestadherence",clinics.get(i).getAdherenceSetting());
+						flag = true;
+					}
+				}
+	    		
+				
 	        }
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {
@@ -1005,7 +1022,9 @@ public class UserExtensionResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    //hill-1845
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES})
+    //hill-1845
     public ResponseEntity<JSONObject> reactivateUser(@PathVariable Long id) {
         log.debug("REST request to reactivate User : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -1030,7 +1049,9 @@ public class UserExtensionResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    //hill-1845
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES})
+    //hill-1845
     public ResponseEntity<JSONObject> userReactivation(@PathVariable Long id, HttpServletRequest request) {
         log.debug("REST request to User Reactivation : {}", id);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();

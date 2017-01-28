@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +37,7 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.PredicateBuilder;
 import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.ClinicService;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -61,6 +63,9 @@ public class ClinicResource {
     
     @Inject
     private ClinicService clinicService;
+	
+	@Inject
+    private AdherenceCalculationService adherenceCalculationService;
 
     /**
      * POST  /clinics -> Create a new clinic.
@@ -102,13 +107,21 @@ public class ClinicResource {
         JSONObject jsonObject = new JSONObject();
 		try {
 			ClinicVO clinicVO = clinicService.updateClinic(id, clinicDTO);
+			
+			String successMessage = MessageConstants.HR_222;
+			if(Objects.nonNull(clinicDTO.getAdherenceSettingFlag()) && clinicDTO.getAdherenceSettingFlag()){
+				adherenceCalculationService.adherenceSettingForClinic(id);
+				//successMessage = adherenceCalculationService.adherenceSettingForClinic(id).isDone() ? successMessage:"ERROR";
+				successMessage = "Adherence setting for the clinic initiated, will be completed soon";
+			}
+
 	        if (Objects.isNull(clinicVO)) {
 	        	jsonObject.put("ERROR", ExceptionConstants.HR_543);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
-	        	jsonObject.put("message", MessageConstants.HR_222);
+				jsonObject.put("message", successMessage);	        	
 	            jsonObject.put("Clinic", clinicVO);
-	            if(clinicDTO.getParent()) {
+	            if(Objects.nonNull(clinicDTO.getParent()) && clinicDTO.getParent()) {
 	            	jsonObject.put("ChildClinic", clinicVO.getChildClinicVOs());
 	            }
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
@@ -310,6 +323,36 @@ public class ClinicResource {
         	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
+    
+    
+    /**
+     * GET  /clinics/patients -> get the patient users for the clinic.
+     */
+    @RequestMapping(value = "/clinic/{clinicId}/patients",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN, AuthoritiesConstants.ADMIN})
+    public ResponseEntity<JSONObject> getPatientUsersForClinic(@PathVariable String clinicId) {
+        log.debug("REST request to get Clinic : {}", clinicId);
+        List<String> idList = new ArrayList<>();
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	idList.add(clinicId);        	
+            List<Map<String,Object>> patientUserList = clinicService.getAssociatedPatientUsers(idList);
+	        if(patientUserList.isEmpty()){
+				jsonObject.put("message", MessageConstants.HR_279);
+				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+			} else {
+		      	jsonObject.put("message", MessageConstants.HR_280);
+		      	jsonObject.put("patientUsers", patientUserList);
+		      	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+        } catch(HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
     
     @RequestMapping(value = "/clinics/{clinicId}/notAssociatedPatients",
             method = RequestMethod.GET,

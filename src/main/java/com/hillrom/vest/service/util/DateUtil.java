@@ -9,6 +9,7 @@ import static com.hillrom.vest.config.Constants.YYYY_MM_DD;
 
 import java.security.InvalidParameterException;
 import java.text.DateFormatSymbols;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -113,6 +114,16 @@ public class DateUtil {
 	 */
 	public static int getDaysCountBetweenLocalDates(LocalDate from,LocalDate to){
 		return Days.daysBetween(from, to).getDays();
+	}
+	
+	/**
+	 * Return days difference between two Local Dates
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public static LocalDate getDateBeforeSpecificDays(LocalDate date, int beforeDays){
+		return date.minusDays(Math.abs(beforeDays));
 	}
 	
 	/**
@@ -260,4 +271,15 @@ public class DateUtil {
 	        default: return "th";
 	    }
 	}
+	//hill-1847
+		/**
+		 * Returns today in DateTime
+		 * @return 
+		 */
+		public static DateTime getCurrentDateAndTime(){
+		Calendar cal = Calendar.getInstance();
+		DateTime dateTime = new DateTime(cal.getTime());
+		return dateTime;
+		}
+		//hill-1847
 }

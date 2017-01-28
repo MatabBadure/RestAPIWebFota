@@ -1,11 +1,14 @@
 package com.hillrom.vest.domain;
 
 
+import static com.hillrom.vest.config.AdherenceScoreConstants.ADHERENCE_SETTING_DEFAULT_DAYS;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,6 +33,7 @@ import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.O
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hillrom.vest.web.rest.dto.ClinicVO;
 
 /**
  * A Clinic.
@@ -39,7 +43,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "CLINIC")
 @SQLDelete(sql="UPDATE CLINIC SET is_deleted = 1 WHERE id = ?")
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class,property= "@id,@name")
-public class Clinic implements Serializable {
+public class Clinic implements Serializable,Comparable<Clinic> {
 
     @Id
     private String id;
@@ -78,6 +82,15 @@ public class Clinic implements Serializable {
     @Column(name = "clinic_admin_id")
     private Long clinicAdminId;
 
+    @Column(name = "adherence_setting")
+    private Integer adherenceSetting;
+    
+    //start: HILL-2004
+  	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+  	@Column(name="adherenceSetting_modified_date")
+     private DateTime adherenceSettingModifiedDte;
+  	//end: HILL-2004
+  	
     @NotAudited
     @ManyToOne
     @JoinColumn(name="parent_clinic_id")
@@ -259,6 +272,25 @@ public class Clinic implements Serializable {
 	public void setCreatedAt(DateTime createdAt) {
 		this.createdAt = createdAt;
 	}
+	
+	public Integer getAdherenceSetting() {
+        return Objects.isNull(this.adherenceSetting) ? ADHERENCE_SETTING_DEFAULT_DAYS : this.adherenceSetting;
+    }
+
+    public void setAdherenceSetting(Integer adherenceSetting) {
+        this.adherenceSetting = adherenceSetting;
+    }
+    
+    //start: HILL-2004
+   	public DateTime getAdherenceSettingModifiedDte() {
+   		return adherenceSettingModifiedDte;
+   	}
+
+   	public void setAdherenceSettingModifiedDte(DateTime adherenceSettingModifiedDte) {
+   		this.adherenceSettingModifiedDte = adherenceSettingModifiedDte;
+   	}
+   	//end: HILL-2004
+   	
 
     @Override
 	public int hashCode() {
@@ -302,6 +334,25 @@ public class Clinic implements Serializable {
                 ", parentClinic='" + parentClinic + "'" +
                 ", deleted='" + deleted + "'" +
                 ", isParent='" + parent + "'" +
+                ", adherenceSetting='" + adherenceSetting + "'" +
+                //start: HILL-2004
+                ", adherenceSetting_modified_date='" + adherenceSettingModifiedDte + "'" +
+                //end: HILL-2004
                 '}';
     }
+	
+
+	
+	@Override
+	public int compareTo(Clinic clinic) {
+		
+	    if (clinic.getAdherenceSettingModifiedDte() == null) {
+	        return (this.getAdherenceSettingModifiedDte() == null) ? 0 : -1;
+	    }
+	    if (this.getAdherenceSettingModifiedDte() == null) {
+	        return 1;
+	    }
+		 
+		return this.getAdherenceSettingModifiedDte().compareTo(clinic.getAdherenceSettingModifiedDte());
+	}
 }

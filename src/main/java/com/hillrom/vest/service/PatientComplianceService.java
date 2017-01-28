@@ -17,6 +17,7 @@ import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATI
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,16 +33,19 @@ import javax.transaction.Transactional;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.audit.service.PatientProtocolDataAuditService;
 import com.hillrom.vest.config.Constants;
+import com.hillrom.vest.domain.AdherenceReset;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.AdherenceResetRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.ProtocolConstantsRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
@@ -65,6 +69,11 @@ public class PatientComplianceService {
 	@Inject
 	@Qualifier("patientProtocolDataAuditService")
 	private PatientProtocolDataAuditService protocolAuditService;
+	
+	//hill-1847
+	@Inject
+	private AdherenceResetRepository adherenceResetRepository;
+	//hill-1847
 	
 	/**
 	 * Creates Or Updates Compliance 
@@ -155,6 +164,16 @@ public class PatientComplianceService {
 			PatientCompliance compliance = complianceMap.get(date);
 			trendVO.setDate(date);
 			trendVO.setUpdatedScore(compliance.getScore());
+			//hill-1847(bugfix)
+			if(Objects.nonNull(notificationsMap.get(date)) && notificationsMap.get(date).get(0).getNotificationType().equalsIgnoreCase(ADHERENCE_SCORE_RESET))
+			{
+				trendVO.setScoreReset(true);
+			}
+			else
+			{
+				trendVO.setScoreReset(false);
+			}
+			//hill-1847(bugfix)
 			setNotificationPointsMap(complianceMap,notificationsMap,date,trendVO);
 			// Get datetime when compliance was processed
 			ProtocolRevisionVO revisionVO = getProtocolRevisionByCompliance(
@@ -162,6 +181,7 @@ public class PatientComplianceService {
 			revisionVO.addAdherenceTrend(trendVO);
 		}
 		List<ProtocolRevisionVO> revisions = revisionData.values().stream().filter(rev -> rev.getAdherenceTrends().size() > 0).collect(Collectors.toList());
+		System.out.print("Revisions : " + revisions);
 		return revisions;
 	}
 
@@ -185,9 +205,19 @@ public class PatientComplianceService {
 			SortedMap<LocalDate,PatientCompliance> complianceMap,
 			Map<LocalDate, List<Notification>> notificationsMap,
 			LocalDate date,
-			AdherenceTrendVO trendVO) {
+			AdherenceTrendVO trendVO) throws HillromException {
 		int pointsChanged = getChangeInScore(complianceMap, date);
 		String notificationType = Objects.isNull(notificationsMap.get(date)) ? "No Notification" : notificationsMap.get(date).get(0).getNotificationType();
+		
+		try{
+			if(Objects.nonNull(notificationsMap.get(date))){
+				List<Notification> prevNotificationDetails = getPreviousNotificationDetails(date,notificationType,notificationsMap.get(date).get(0).getPatientUser().getId());
+				trendVO.setPrevNotificationDetails(prevNotificationDetails);
+			}
+		}catch(Exception ex){
+			throw new HillromException("Error in retriving prevNotificationDetails");
+		}
+
 		if(SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)){
 			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
 		}else if(MISSED_THERAPY.equalsIgnoreCase(notificationType)){
@@ -204,12 +234,17 @@ public class PatientComplianceService {
 			trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_DISPLAY_VALUE, -HMR_NON_COMPLIANCE_POINTS);
 			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
 		}else if(ADHERENCE_SCORE_RESET.equalsIgnoreCase(notificationType)){
-			trendVO.getNotificationPoints().put(ADHERENCE_SCORE_RESET_DISPLAY_VALUE, DEFAULT_COMPLIANCE_SCORE);
+			trendVO.getNotificationPoints().put(ADHERENCE_SCORE_RESET_DISPLAY_VALUE, complianceMap.get(date).getScore());
 		}else{
 			trendVO.getNotificationPoints().put(notificationType,pointsChanged);
 		}
 	}
 
+	private List<Notification> getPreviousNotificationDetails(LocalDate date,String notificationType,Long patientUserId) {
+		List<Notification> prevNotifications = notificationService.getNotificationMapByDateAndNotificationTypeAndPatientId(date,notificationType,patientUserId);
+		return prevNotifications;
+	} 
+	
 	private int getChangeInScore(
 			SortedMap<LocalDate, PatientCompliance> complianceMap,
 			LocalDate date) {
@@ -240,4 +275,5 @@ public class PatientComplianceService {
 		}
 		return complianceMap;
 	}
+	
 }

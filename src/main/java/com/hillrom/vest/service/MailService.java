@@ -45,6 +45,21 @@ import com.hillrom.vest.web.rest.dto.PatientStatsVO;
 import com.hillrom.vest.web.rest.dto.UserSurveyAnswerDTO;
 
 
+
+import javax.servlet.http.HttpServletRequest;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+
+import com.hillrom.vest.service.util.DateUtil;
+
+import org.apache.commons.lang.StringUtils;
+import java.util.Calendar;
+
 /**
  * Service for sending e-mails.
  * <p/>
@@ -197,6 +212,38 @@ public class MailService {
        subject = messageSource.getMessage("email.therapynotification.title", null, null);
        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
+    
+    public void sendMessageNotificationToUser(User user, String messageSubject, int patOrCaOrHcp){
+        log.debug("Sending notification of inbox message to '{}'", user.getEmail());
+        
+        String messageURLStr = "";
+        switch(patOrCaOrHcp){
+        case 1 : 
+        	messageURLStr = "patient/messages";
+        	break;
+        case 2:
+        	messageURLStr = "clinicadmin/messages_CA";
+        	break;
+        case 3:
+        	messageURLStr = "hcp/messages_HCP";
+        	break;
+        default :
+        	messageURLStr = "";
+        	break;
+        }        
+        
+        userNameFormatting(user);
+        Context context = new Context();
+        context.setVariable("user", user.getFirstName());
+        context.setVariable("baseUrl", baseUrl);
+        context.setVariable("messageURLStr", messageURLStr);
+        String content = "";
+        String subject = "";
+ 	   	content = templateEngine.process("messageNotification", context);
+        subject = messageSource.getMessage("email.messagenotification.title", null, null);
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);         
+     }
+    
     
     public void sendJobFailureNotification(String jobName,String stackTrace){
     	String recipients = env.getProperty("mail.to");
@@ -422,4 +469,11 @@ public class MailService {
 		log.debug("Sending change prescription email report '{}'", recipients);
         sendEmail(recipients.split(","), subject, content, true, true, file);
      }
+    
+
+    
+        public void sendMailTo18YearOldPatient(User user) {
+        this.sendActivationEmail(user, this.baseUrl );
+      }
+
 }

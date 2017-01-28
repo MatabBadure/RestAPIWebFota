@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+	
+    <changeSet author="jhipster" id="20161226065600">
+
+		<createTable tableName="VEST_DEVICE_BAD_DATA_MONARCH">
+			<column name="id" type="bigint" autoIncrement="${autoIncrement}">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="received_at" type="timestamp" defaultValueComputed="${now}">
+				<constraints nullable="false" />
+			</column>
+			<column name="request_data" type="mediumtext" />
+		</createTable>
+
+	
+
+	
+		<createTable tableName="PATIENT_VEST_THERAPY_DATA_MONARCH">
+			<column name="id" type="bigint" autoIncrement="${autoIncrement}">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="patient_id" type="varchar(45)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="user_id" type="bigint">
+				<constraints nullable="false"/>
+			</column>
+			<column name="date" type="date" />
+			<column name="session_type" type="varchar(50)" />
+			<column name="session_no" type="integer" />
+			<!-- New fields for monarch -->
+			<column name="therapy_index" type="integer" />
+			<column name="start_battery_level" type="integer" />
+			<column name="end_battery_level" type="integer" />
+			<column name="number_of_events" type="integer" />
+			<column name="number_of_pods" type="integer" />
+			<!-- End New fields for monarch -->
+			<column name="start_time" type="timestamp" />
+			<column name="end_time" type="timestamp" />
+			<column name="frequency" type="decimal" />
+			<column name="intensity" type="decimal" />
+			<column name="duration_in_minutes" type="bigint"/>
+			<column name="programmed_caugh_pauses" type="integer"/>
+			<column name="normal_caugh_pauses" type="integer"/>
+			<column name="caugh_pause_duration" type="integer"/>
+			<column name="hmr" type="double"/>
+			<column name="serial_number" type="varchar(255)" />
+			<column name="bluetooth_id" type="varchar(255)" />
+		</createTable>
+		
+		<addForeignKeyConstraint baseColumnNames="patient_id"
+			baseTableName="PATIENT_VEST_THERAPY_DATA_MONARCH" constraintName="fk_monarch_pvtd_patient_id"
+			referencedColumnNames="id" referencedTableName="PATIENT_INFO" />
+			
+		<addForeignKeyConstraint baseColumnNames="user_id"
+			baseTableName="PATIENT_VEST_THERAPY_DATA_MONARCH" constraintName="fk_monarch_pvtd_user_id"
+			referencedColumnNames="id" referencedTableName="USER" />
+
+
+
+        <createTable tableName="PATIENT_VEST_DEVICE_RAW_LOGS_MONARCH">
+            <column name="id" type="bigint" autoIncrement="${autoIncrement}" >
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <!-- <column name="hub_receive_time" type="bigint">
+                <constraints nullable="false" />
+            </column> -->
+            <column name="device_address" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="device_model_type" type="varchar(255)"/>
+            <column name="device_data" type="longtext"/>
+            <column name="device_serial_number" type="varchar(255)"/>
+            <column name="device_type" type="varchar(255)"/>
+            <!-- <column name="hub_id" type="varchar(255)"/> -->
+            <column name="air_interface_type" type="varchar(255)"/>
+            <column name="customer_name" type="varchar(255)"/>
+            <column name="timezone" type="varchar(255)"/>
+            <!-- <column name="sp_receive_time" type="bigint"/> -->
+            <!-- <column name="hub_receive_time_offset" type="integer"/> -->
+            <column name="cuc_version" type="varchar(255)"/>
+            <column name="customer_id" type="varchar(255)"/>
+            <column name="raw_message" type="longtext"/>
+        </createTable>
+        
+
+	
+
+		<createTable tableName="PATIENT_VEST_DEVICE_DATA_MONARCH">
+			<column name="timestamp" type="bigint">
+				<constraints nullable="false" />
+			</column>
+			<column name="sequence_number" type="integer">
+				<constraints nullable="false" />
+			</column>
+			<!-- event_id in vest,event_code in charger -->
+			<column name="event_code" type="varchar(255)" />
+			<column name="patient_id" type="varchar(255)" />
+			<column name="serial_number" type="varchar(255)" />
+			<column name="bluetooth_id" type="varchar(255)" />
+			<column name="hub_id" type="varchar(255)" />
+			<column name="hmr" type="decimal" />
+			<column name="frequency" type="integer" />
+			<column name="intensity" type="integer" />
+			<column name="duration" type="integer" />
+			<column name="checksum" type="integer" />
+			<column name="user_id" type="bigint"/>
+		</createTable>
+		<addPrimaryKey columnNames="bluetooth_id,timestamp,event_code"
+            constraintName="pk_patient_vest_device_data"
+            tableName="PATIENT_VEST_DEVICE_DATA_MONARCH"/>
+        <addForeignKeyConstraint baseColumnNames="patient_id"
+                                 baseTableName="PATIENT_VEST_DEVICE_DATA_MONARCH"
+                                 constraintName="fk_monarch_patient_vest_device_data_patient_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="PATIENT_INFO"/>
+        <addForeignKeyConstraint baseColumnNames="user_id"
+			baseTableName="PATIENT_VEST_DEVICE_DATA_MONARCH" constraintName="fk_monarch_pvdd_user_id"
+			referencedColumnNames="id" referencedTableName="USER" />
+
+
+
+
+	
+		<createTable tableName="PATIENT_VEST_DEVICE_HISTORY_MONARCH">
+			<column name="patient_id" type="varchar(45)">
+				<constraints nullable="false" />
+			</column>
+			<column name="serial_number" type="varchar(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="bluetooth_id" type="varchar(255)" />
+			<column name="hub_id" type="varchar(255)" />
+			<column name="created_by" type="varchar(50)" />
+			<column name="created_date" type="timestamp" defaultValueDate="${now}">
+				<constraints nullable="false" />
+			</column>
+			<column name="last_modified_by" type="varchar(50)" />
+			<column name="last_modified_date" type="timestamp" />
+			<column name="is_active" type="boolean" valueBoolean="false">
+				<constraints nullable="false" />
+			</column>
+			<column name="hmr" type="decimal"/>			        
+        	<column name="garment_type" type="varchar(255)"/>
+        	<column name="garment_size" type="varchar(255)"/>
+        	<column name="garment_color" type="varchar(255)"/>
+		</createTable>
+		
+		<addPrimaryKey columnNames="patient_id, serial_number"
+            constraintName="pk_monarch_patient_device_assoc"
+            tableName="PATIENT_VEST_DEVICE_HISTORY_MONARCH"/>
+
+		<addForeignKeyConstraint baseColumnNames="patient_id"
+			baseTableName="PATIENT_VEST_DEVICE_HISTORY_MONARCH" constraintName="fk_monarch_pvd_patient_id"
+			referencedColumnNames="id" referencedTableName="PATIENT_INFO" />
+		
+
+
+
+        
+
+
+	
+		<createTable tableName="PROTOCOL_CONSTANTS_MONARCH">
+			<column name="id" type="bigint" autoIncrement="${autoIncrement}">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="treatments_per_day" type="integer" />
+			
+			<column name="min_minutes_per_treatment" type="integer" />
+			<column name="max_minutes_per_treatment" type="integer" />
+			
+			<column name="min_frequency" type="integer" />
+			<column name="max_frequency" type="integer" />
+			
+			<column name="min_intensity" type="integer" />
+			<column name="max_intensity" type="integer" />
+		</createTable>
+		
+
+	
+		<createTable tableName="PATIENT_PROTOCOL_DATA_MONARCH">
+			<column name="id" type="varchar(45)">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="patient_id" type="varchar(45)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="user_id" type="bigint(20)">
+				<constraints nullable="false"/>
+			</column>
+			
+			<column name="type" type="varchar(10)" />
+			
+			<column name="treatments_per_day" type="bigint(20)" />
+			
+			<column name="treatment_label" type="varchar(45)" />
+			
+			<column name="min_minutes_per_treatment" type="bigint(20)" />
+			<column name="max_minutes_per_treatment" type="bigint(20)" />
+			
+			<column name="min_frequency" type="bigint(20)" />
+			<column name="max_frequency" type="bigint(20)" />
+			
+			<column name="min_intensity" type="bigint(20)" />
+			<column name="max_intensity" type="bigint(20)" />
+			
+			<column name="created_by" type="varchar(50)" />
+			<column name="created_date" type="timestamp" defaultValueDate="${now}">
+				<constraints nullable="false" />
+			</column>
+			<column name="last_modified_by" type="varchar(50)" />
+			<column name="last_modified_date" type="timestamp" />
+			<column name="is_deleted" type="boolean" valueBoolean="false">
+				<constraints nullable="false" />
+			</column>
+			<column name="protocol_key" type="varchar(45)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		
+		<addForeignKeyConstraint baseColumnNames="patient_id"
+			baseTableName="PATIENT_PROTOCOL_DATA_MONARCH" constraintName="fk_monarch_ppd_patient_id"
+			referencedColumnNames="id" referencedTableName="PATIENT_INFO" />
+			
+		<addForeignKeyConstraint baseColumnNames="user_id"
+			baseTableName="PATIENT_PROTOCOL_DATA_MONARCH" constraintName="fk_monarch_ppd_user_id"
+			referencedColumnNames="id" referencedTableName="USER" />
+
+	
+		<createTable tableName="PATIENT_NO_EVENT_MONARCH">
+			<column name="id" type="bigint" autoIncrement="${autoIncrement}">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="first_transmission_date" type="date" />
+			<column name="user_created_date" type="date" />
+			<column name="patient_id" type="varchar(255)" />
+			<column name="user_id" type="bigint(20)" />
+		</createTable>
+        <addForeignKeyConstraint baseColumnNames="patient_id"
+                                 baseTableName="PATIENT_NO_EVENT_MONARCH"
+                                 constraintName="fk_monarch_pat_no_event_patient_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="PATIENT_INFO"/>
+                                 
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="PATIENT_NO_EVENT_MONARCH"
+                                 constraintName="fk_monarch_pat_no_event_user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="USER"/>
+        
+        <createTable tableName="PATIENT_NOTE_MONARCH">
+			<column name="id" type="bigint" autoIncrement="${autoIncrement}">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="created_on" type="date" >
+				<constraints nullable="false"/>
+			</column>
+			<column name="user_id" type="bigint">
+				<constraints nullable="false" />
+			</column>
+			<column name="patient_id" type="varchar(255)">
+				<constraints nullable="false" />
+			</column>
+        	<column name="note" type="mediumtext">
+        		<constraints nullable="false" />
+        	</column>
+        	<column name="modified_at" type="timestamp" defaultValueComputed="${now}">
+				<constraints nullable="false"/>
+			</column>
+			<column name="is_deleted" type="boolean"/>
+		</createTable>
+
+        <addForeignKeyConstraint baseColumnNames="patient_id"
+                                 baseTableName="PATIENT_NOTE_MONARCH"
+                                 constraintName="fk_monarch_pat_note_patient_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="PATIENT_INFO"/>
+                                 
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="PATIENT_NOTE_MONARCH"
+                                 constraintName="fk_monarch_pat_note_user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="USER"/>
+
+
+
+	
+		<createTable tableName="PATIENT_COMPLIANCE_MONARCH">
+			<column name="id" type="bigint" autoIncrement="${autoIncrement}">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="patient_id" type="varchar(45)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="user_id" type="bigint">
+				<constraints nullable="false"/>
+			</column>
+			<column name="date" type="date" />
+			<column name="compliance_score" type="integer" />
+			<column name="hmr_run_rate" type="integer" />
+			<column name="hmr" type="decimal" />
+			<column name="is_hmr_compliant" type="boolean" defaultValueBoolean="false"/>
+        	<column name="is_settings_deviated" type="boolean" defaultValueBoolean="false"/>
+        	<column name="missed_therapy_count" type="integer" defaultValueBoolean="0"/>
+			<column name="last_therapy_session_date" type="date"/>
+			<column name="settings_deviated_days_count" type="integer" defaultValueNumeric="0"/>
+			<column name="global_hmr_non_adherence_count" type="integer"
+				defaultValueBoolean="0" />
+			<column name="global_settings_deviated_count" type="integer"
+				defaultValueBoolean="0" />
+			<column name="global_missed_therapy_days_count" type="integer"
+				defaultValueBoolean="0" />
+			<column name="created_by" type="varchar(50)" />
+			<column name="created_date" type="timestamp" defaultValueDate="${now}">
+				<constraints nullable="false" />
+			</column>
+			<column name="last_modified_by" type="varchar(50)" />
+			<column name="last_modified_date" type="timestamp" />
+
+		</createTable>
+		
+		<addForeignKeyConstraint baseColumnNames="patient_id"
+			baseTableName="PATIENT_COMPLIANCE_MONARCH" constraintName="fk_monarch_PATIENT_COMPLIANCE_patient_id"
+			referencedColumnNames="id" referencedTableName="PATIENT_INFO" />
+			
+		<addForeignKeyConstraint baseColumnNames="user_id"
+			baseTableName="PATIENT_COMPLIANCE_MONARCH" constraintName="fk_monarch_PATIENT_COMPLIANCE_user_id"
+			referencedColumnNames="id" referencedTableName="USER" />
+			
+	
+		<createTable tableName="NOTIFICATION_MONARCH">
+			<column name="id" type="bigint" autoIncrement="${autoIncrement}">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="patient_id" type="varchar(45)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="user_id" type="bigint">
+				<constraints nullable="false"/>
+			</column>
+			<column name="date" type="date" />
+			<column name="notification_type" type="varchar(50)" />
+			<column name="is_acknowledged" type="boolean" />
+		</createTable>
+		
+		<addForeignKeyConstraint baseColumnNames="patient_id"
+			baseTableName="NOTIFICATION_MONARCH" constraintName="fk_monarch_notification_patient_id"
+			referencedColumnNames="id" referencedTableName="PATIENT_INFO" />
+			
+		<addForeignKeyConstraint baseColumnNames="user_id"
+			baseTableName="NOTIFICATION_MONARCH" constraintName="fk_monarch_notification_user_id"
+			referencedColumnNames="id" referencedTableName="USER" />
+			
+
+		<createTable tableName="ADHERENCE_RESET_MONARCH">
+			<column name="id" type="mediumint" autoIncrement="${autoIncrement}">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="patient_id" type="varchar(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="user_id" type="bigint">
+				<constraints nullable="false"/>
+			</column>			
+			<column name="reset_start_date" type="date" >
+				<constraints nullable="false"/>
+			</column>
+			<column name="reset_score" type="integer" >
+				<constraints nullable="false"/>
+			</column>
+			<column name="reset_date" type="date" >
+				<constraints nullable="false"/>
+			</column>
+			<column name="justification" type="mediumtext">
+        		<constraints nullable="false" />
+        	</column>
+			<column name="created_by" type="bigint">
+				<constraints nullable="false"/>
+			</column>			
+			<column name="is_deleted" type="boolean" defaultValueComputed="0"/>
+		</createTable>
+
+	
+
+		<addForeignKeyConstraint baseColumnNames="patient_id"
+									baseTableName="ADHERENCE_RESET_MONARCH" 
+									constraintName="fk_monarch_adhRes_patient_id"
+									referencedColumnNames="id" 
+									referencedTableName="PATIENT_INFO" />
+			
+		<addForeignKeyConstraint baseColumnNames="user_id"
+									baseTableName="ADHERENCE_RESET_MONARCH" 
+									constraintName="fk_monarch_adhRes_user_id"
+									referencedColumnNames="id" 
+									referencedTableName="USER" />
+			
+	
+	
+	
+    </changeSet>
+</databaseChangeLog>

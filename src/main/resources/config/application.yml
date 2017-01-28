@@ -23,7 +23,6 @@ mail:
     auth: false
     from: visiview@hill-rom.com
     to: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com,raghu.nt@lnttechservices.com
-
 authentication:
     xauth:
         secret: myXAuthSecret
@@ -31,3 +30,7 @@ authentication:
         tokenValidityInSeconds: 1800
 
 spring.batch.job.enabled: false
+
+multipart:
+    max-file-size: 100Mb
+    max-request-size: 100Mb

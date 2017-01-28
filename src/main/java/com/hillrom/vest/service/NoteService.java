@@ -65,8 +65,8 @@ public class NoteService {
 		return null;
 	}
 	
-	public Note findOneByUserIdAndPatientIDAndDate(Long userId, String patientId, LocalDate date){
-		Optional<Note> note =  noteRepository.findOneByPatientUserIdAndPatientIdAndCreatedOn(userId, patientId, date);
+	public Note findOneByUserIdAndPatientID(Long userId, String patientId){
+		Optional<Note> note =  noteRepository.returnPatientMemo(userId, patientId);
 		if(note.isPresent())
 			return note.get();
 		return null;
@@ -134,29 +134,33 @@ public class NoteService {
 		return existingNote;
 	}
 	
-	// For updating patients memo notes by HCP/CA
-	public Note saveOrUpdateNoteByUserForPatientId(Long userId, String patientId,String note,LocalDate date) throws HillromException{
+	// For updating patients memo notes by HCP/CA using their user ID which is passed
+	public Note saveOrUpdateNoteByUserForPatientId(Long clinicUserId, String patientId, String note, LocalDate date) throws HillromException{
 		
-		if(StringUtils.isBlank(note))
-			return null;
+		Optional<PatientInfo> patientInfo = patientInfoService.findOneByHillromId(patientId);
+		String patInfoId = patientInfo.get().getId();
+		
+		User patientUser = userService.getUserObjFromPatientInfo(patientInfo.get());
 				
-		Note existingNote = findOneByUserIdAndPatientIDAndDate(userId, patientId, date);
+		Note existingNote = findOneByUserIdAndPatientID(patientUser.getId(), patInfoId);
 		
-		// For adding new memo note entered by HCP/CA for the patient with the same date
+		User clinicHcpUser = userRepository.findOne(clinicUserId);
+		
+		// For adding new memo note entered by HCP/CA for the patient
 		if(Objects.isNull(existingNote)){
 			existingNote = new Note();
 			
-			PatientInfo patientInfo = patientInfoService.findOneById(patientId);
-	    	existingNote.setPatient(patientInfo);
-	    	
-	    	User patientUser = userRepository.findOne(userId);
-			existingNote.setPatientUser(patientUser);
+			existingNote.setPatient(patientInfo.get());
+			
+	    	existingNote.setPatientUser(clinicHcpUser);
 			existingNote.setNote(note);
+
 			existingNote.setCreatedOn(date);
 			noteRepository.save(existingNote);
 		}else{
 			
-			// For updating the existing memo note entered by HCP/CA for the patient for the same date
+			// For updating the existing memo note entered by HCP/CA for the patient
+			existingNote.setPatientUser(clinicHcpUser);
 			existingNote.setNote(note);
 			existingNote.setDeleted(false);
 			noteRepository.save(existingNote);
@@ -191,4 +195,12 @@ public class NoteService {
 		}
 		return dateNotesMap;
 	}
+	
+	public Note findMemoNotesForPatientId(Long userId, String patientId){
+		Optional<Note> note =  noteRepository.returnPatientMemo(userId, patientId);
+		if(note.isPresent())
+			return note.get();
+		return null;
+	}
+	
 }

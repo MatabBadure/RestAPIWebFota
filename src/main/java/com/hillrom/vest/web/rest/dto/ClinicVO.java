@@ -7,8 +7,9 @@ import java.util.List;
 import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hillrom.vest.domain.UserPatientAssoc;
 
-public class ClinicVO implements Serializable {
+public class ClinicVO implements Serializable,Comparable<ClinicVO> {
 
     private String id;
 
@@ -41,13 +42,22 @@ public class ClinicVO implements Serializable {
     private boolean parent = false;
 
     private DateTime createdAt;
+    
+    private Integer adherenceSetting;
 
+    //start: HILL-2004
+    private DateTime adherenceSettingModifiedDte;
+    
+    private Boolean adherenceSettingFlag;
+    //end: HILL-2004
+    
     @JsonIgnore
     private List<ClinicVO> childClinicVOs = new LinkedList<>();
 
     public ClinicVO(String id,String name, String address, String address2, Integer zipcode, String city,
 			String state, String phoneNumber, String faxNumber, String speciality, Long clinicAdminId,
-			Boolean parent, String hillromId,Boolean deleted,DateTime createdAt) {
+			Boolean parent, String hillromId,Boolean deleted,DateTime createdAt,Integer adherenceSetting, DateTime adherenceSettingModifiedDte
+			) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -64,6 +74,12 @@ public class ClinicVO implements Serializable {
 		this.hillromId = hillromId;
 		this.deleted = deleted;
 		this.createdAt = createdAt;
+		this.adherenceSetting = adherenceSetting;
+		//start: HILL-2004
+		this.adherenceSettingModifiedDte = adherenceSettingModifiedDte;
+		this.adherenceSettingFlag = adherenceSettingFlag;
+		//end: HILL-2004
+				
 	}
     
     public String getId() {
@@ -202,5 +218,44 @@ public class ClinicVO implements Serializable {
 		this.childClinicVOs = childClinicVOs;
 	}
 
+	public Integer getAdherenceSetting() {
+        return adherenceSetting;
+    }
+	
+	public void setAdherenceSetting(Integer adherenceSetting) {
+        this.adherenceSetting = adherenceSetting;
+    }
+	
+	//start: HILL-2004
+	 public DateTime getAdherenceSettingModifiedDte() {
+			return adherenceSettingModifiedDte;
+		}
+
+		public void setAdherenceSettingModifiedDte(DateTime adherenceSettingModifiedDte) {
+			this.adherenceSettingModifiedDte = adherenceSettingModifiedDte;
+		}
+		
+		public Boolean getAdherenceSettingFlag() {
+			return adherenceSettingFlag;
+		}
+
+		public void setAdherenceSettingFlag(Boolean adherenceSettingFlag) {
+			this.adherenceSettingFlag = adherenceSettingFlag;
+		}
+  //end: HILL-2004
+		
+		@Override
+		public int compareTo(ClinicVO clinicVO) {
+			
+			
+		    if (clinicVO.getAdherenceSettingModifiedDte() == null) {
+		        return (this.getAdherenceSettingModifiedDte() == null) ? 0 : -1;
+		    }
+		    if (this.getAdherenceSettingModifiedDte() == null) {
+		        return 1;
+		    }
+			 
+			return this.getAdherenceSettingModifiedDte().compareTo(clinicVO.getAdherenceSettingModifiedDte());
+		}
 	
 }

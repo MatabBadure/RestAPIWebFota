@@ -94,4 +94,24 @@
 	<include file="classpath:/config/liquibase/changelog/20160909034818_add_patient_garment_details.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20160914040200_altered_datatype_ChargerData.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20160914042700_added_entities_Messaging.xml" relativeToChangelogFile="false"/>
- </databaseChangeLog>
+	<include file="classpath:/config/liquibase/changelog/20160923062300_altered_hillromid_datatype_jde_load_table.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20160920183415_create_table_adherence_reset.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20160926125030_add_justification_typeCode.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161018181815_alter_table_clinic_adherence_setting.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161018182530_add_adherenceSetting_typeCode.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161025114045_alter_datatype_Adherence_Reset.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161110183415_alter_table_entities_messaging.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161115184030_add_column_message_notification_inUser.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161117181730_add_column_clinic_inMessage.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161124181730_add_column_modifiedAdhSettingDate_clinic_table.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161116181730_updated_value_for_reset_justification_others.xml" relativeToChangelogFile="false"/>
+  <include file="classpath:/config/liquibase/changelog/20161215021522_add_csa_role.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161117182532_add_typeCode_announcement_diagnosis_type.xml" relativeToChangelogFile="false"/>	
+	<include file="classpath:/config/liquibase/changelog/20161117182531_add_typeCode_announcement_patient_type.xml" relativeToChangelogFile="false"/>	
+	<include file="classpath:/config/liquibase/changelog/20161117182530_add_typeCode_announcement_send_to.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161116183415_create_table_announcements.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161226065600_monarch_tables.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20161228181730_updated_value_for_diagnosis_typecode.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170116030400_create_ping_pong_ping_table.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170117030200_updated_clinic_speciality_hillrom_type_code.xml" relativeToChangelogFile="false"/>
+</databaseChangeLog>

@@ -143,6 +143,12 @@ public class UserResource {
 	@Inject
 	private GraphService hmrGraphService;
 	
+	//hill-1847
+	@Qualifier("adherenceTrendGraphService")
+	@Inject
+	private GraphService adherenceTrendGraphService;
+    //hill-1847
+	
 	@Qualifier("complianceGraphService")
 	@Inject
 	private GraphService complianceGraphService;
@@ -321,7 +327,6 @@ public class UserResource {
 	}
 
 	@RequestMapping(value = "/user/{id}/patient", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	
 	public ResponseEntity<?> getPatientUser(@PathVariable Long id) {
 		log.debug("REST request to get PatientUser : {}", id);
 		Optional<PatientUserVO> patientUser = userService.getPatientUser(id);
@@ -656,10 +661,10 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.PATIENT, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
-    public ResponseEntity<JSONObject> updateHRMNotification(@PathVariable Long id, @RequestBody Map<String, Boolean> paramsMap) {
+    public ResponseEntity<JSONObject> updateUserNotification(@PathVariable Long id, @RequestBody Map<String, Boolean> paramsMap) {
     	JSONObject json = new JSONObject();
     	try {
-			json.put("user", userService.setHRMNotificationSetting(id, paramsMap));
+			json.put("user", userService.setUserNotificationSetting(id, paramsMap));
 			return new ResponseEntity<>(json,HttpStatus.OK);
 		} catch (HillromException e) {
 			json.put("ERROR", e.getMessage());
@@ -905,15 +910,15 @@ public class UserResource {
     /**
      * GET  /patient/:patientUserId/clinic/:clinicId/mrnId -> get the patient user with clinic mrn id.
      */
-    @RequestMapping(value = "/patient/{patientUserId}/clinic/{clinicId}/mrnId", 
+    @RequestMapping(value = "/patient/{patientUserId}/clinic/{clinicId}/{caUserId}/mrnId", 
     		method = RequestMethod.GET, 
     		produces = MediaType.APPLICATION_JSON_VALUE)
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CLINIC_ADMIN})
-	public ResponseEntity<JSONObject> getPatientUserWithMRNId(@PathVariable Long patientUserId,@PathVariable String clinicId) {
+	public ResponseEntity<JSONObject> getPatientUserWithMRNId(@PathVariable Long patientUserId,@PathVariable String clinicId,@PathVariable Long caUserId) {
 		log.debug("REST request to get patient user with clinic mrn id : {}", patientUserId);
 		JSONObject jsonObject = new JSONObject();
         try {
-			PatientUserVO patientUser = userService.getPatientUserWithMRNId(patientUserId,clinicId);
+			PatientUserVO patientUser = userService.getPatientUserWithMRNId(patientUserId,clinicId,caUserId);
 			if (Objects.isNull(patientUser)) {
 	        	jsonObject.put("message", ExceptionConstants.HR_585);
 	        } else {
@@ -1054,4 +1059,59 @@ public class UserResource {
     		return new ResponseEntity<>(jsonObject, HttpStatus.INTERNAL_SERVER_ERROR);
     	}
     }
+    
+  //hill-1847
+    @RequestMapping(value = "/users/{id}/adherenceTrendGraphData", 
+    		method = RequestMethod.GET, 
+    		produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getAdherenceTrendGraphData(@PathVariable Long id,
+    		@RequestParam(value = "from", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
+    		@RequestParam(value = "to", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to,
+    		@RequestParam(value = "duration", required = true) String duration) {
+    		try {
+    			List<ProtocolRevisionVO> adherenceTrendData = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id, from, to);
+    			if (Objects.nonNull(adherenceTrendData) &&  adherenceTrendData.size() > 0) {
+    				Graph adherenceTrendGraph = adherenceTrendGraphService.populateGraphData(adherenceTrendData, new Filter(from,to, duration, null));
+    				return new ResponseEntity<>(adherenceTrendGraph, HttpStatus.OK);
+    			}
+    			return new ResponseEntity<>(HttpStatus.OK);
+    		} catch (Exception ex) {
+    			JSONObject jsonObject = new JSONObject();
+    			jsonObject.put("ERROR", ExceptionConstants.HR_717);
+    			return new ResponseEntity<>(jsonObject, HttpStatus.INTERNAL_SERVER_ERROR);
+    		}
+    }
+    //hill-1847
+    
+    
+    /**
+     * GET  /users/:userId/clinics/:clinicId/statistics -> get the patient statistics for clinic Badge associated with user.
+     */
+    @RequestMapping(value = "/users/{userId}/clinics/{clinicId}/badgestatistics",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<?> getPatientStatisticsForClinicBadgeAssociatedWithUser(@PathVariable Long userId, @PathVariable String clinicId,
+    		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+			@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
+        log.debug("REST request to get patient badge statistics for clinic {} associated with User : {}", clinicId, userId);
+        JSONObject jsonObject = new JSONObject();
+        try {
+        	LocalDate date = LocalDate.now();
+        	Map<String, Object> statitics = patientHCPService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(clinicId, from, to);
+	        if (statitics.isEmpty()) {
+	        	jsonObject.put("message", ExceptionConstants.HR_584);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_297);
+	        	jsonObject.put("statitics", statitics);
+	        }
+	        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+        } catch (HillromException hre){
+        	jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    
 }

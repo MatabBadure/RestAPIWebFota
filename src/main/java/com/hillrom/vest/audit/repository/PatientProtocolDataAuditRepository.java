@@ -69,6 +69,10 @@ public class PatientProtocolDataAuditRepository extends
 		   ppd.setLastModifiedBy(value[5].toString());
 		   ppd.setLastModifiedDate(new DateTime((java.sql.Timestamp)value[6]));
 		   ppd.setDeleted((boolean)value[7]);
+		   //Hill-1994
+		   ppd.setMaxFrequency((Integer)value[8]);
+		   ppd.setMaxPressure((Integer)value[9]);
+		   //Hill-1994
 		   ppd.setMinFrequency((Integer)value[10]);
 		   ppd.setMinMinutesPerTreatment((Integer)value[11]);
 		   ppd.setMinPressure((Integer)value[12]);
@@ -76,6 +80,8 @@ public class PatientProtocolDataAuditRepository extends
 		   ppd.setTreatmentLabel(Objects.nonNull(value[14])?value[14].toString():null);
 		   ppd.setTreatmentsPerDay((Integer)value[15]);
 		   ppd.setType(value[16].toString());
+		  
+		   resultList.add(ppd);
 		  }
 		        return resultList;
 	}

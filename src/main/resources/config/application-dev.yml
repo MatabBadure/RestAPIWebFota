@@ -20,7 +20,7 @@ spring:
         useServerPrepStmts: true
 
     jpa:
-        database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+        database-platform: com.hillrom.vest.repository.util.CustomMySQL5InnoDBDialect
         database: MYSQL
         openInView: false
         show_sql: false
@@ -47,7 +47,7 @@ spring:
         baseUrl: http://devserver.hillromvest.com
         accountActivationReminderInterval: 12
     survey:
-        surveyreportemailids: rohan.kushwaha@razorfish.com,rohangtr@gmail.com
+        surveyreportemailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com
     changePrescription:
-        changePrescriptionEmailids: nagendra.shetty@razorfish.com,amit.saurabh@razorfish.com,anubhav.sinha@razorfish.com,nagendra@neevtech.com,amit.saurabh@neevtech.com
+        changePrescriptionEmailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com
         

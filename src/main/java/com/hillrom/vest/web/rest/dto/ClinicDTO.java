@@ -7,6 +7,10 @@ import java.util.Map;
 
 import javax.validation.constraints.Size;
 
+//start: HILL-2004
+import org.joda.time.DateTime;
+//end: HILL-2004
+
 public class ClinicDTO {
 	
 	@Size(max = 50)
@@ -47,18 +51,26 @@ public class ClinicDTO {
 	private Boolean parent;
 	
 	private Boolean deleted;
+	
+	@Size(max = 50)
+    private Integer adherenceSetting;
 
 
 	@Size(max = 50)
     private Map<String, String> parentClinic = new HashMap<>();
 
+	//start: HILL-2004
+    private DateTime adherenceSettingModifiedDte;
+    private Boolean adherenceSettingFlag;
+	//end: HILL-2004
+    
 	public ClinicDTO() {
 		super();
 	}
 
 	public ClinicDTO(String name, String address, String address2, Integer zipcode, String city,
 			String state, String phoneNumber, String faxNumber, String speciality, Long clinicAdminId,
-			Boolean parent, Boolean deleted, String hillromId) {
+			Boolean parent, Boolean deleted, String hillromId, Integer adherenceSetting) {
 		super();
 		this.name = name;
 		this.address = address;
@@ -73,6 +85,11 @@ public class ClinicDTO {
 		this.parent = parent;
 		this.deleted = deleted;
 		this.hillromId = hillromId;
+		this.adherenceSetting = adherenceSetting;
+		//start: HILL-2004
+		this.adherenceSettingModifiedDte = adherenceSettingModifiedDte;
+		this.adherenceSettingFlag = adherenceSettingFlag;
+		//end: HILL-2004
 	}
 
 
@@ -195,4 +212,30 @@ public class ClinicDTO {
 	public void setChildClinicList(List<Map<String, String>> childClinicList) {
 		this.childClinicList = childClinicList;
 	}
+	
+	public Integer getAdherenceSetting() {
+		return adherenceSetting;
+	}
+
+	public void setAdherenceSetting(Integer adherenceSetting) {
+		this.adherenceSetting = adherenceSetting;
+	}
+	
+	//start: HILL-2004
+		public DateTime getAdherenceSettingModifiedDte() {
+			return adherenceSettingModifiedDte;
+		}
+
+		public void setAdherenceSettingModifiedDte(DateTime adherenceSettingModifiedDte) {
+			this.adherenceSettingModifiedDte = adherenceSettingModifiedDte;
+		}
+		public Boolean getAdherenceSettingFlag() {
+			return adherenceSettingFlag;
+		}
+
+		public void setAdherenceSettingFlag(Boolean adherenceSettingFlag) {
+			this.adherenceSettingFlag = adherenceSettingFlag;
+		}
+			
+		//end: HILL-2004
 }

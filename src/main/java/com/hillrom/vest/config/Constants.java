@@ -145,7 +145,9 @@ public final class Constants {
 	public static final String XAXIS_TYPE_CATEGORIES = "categories";
 	
 	public static final String XAXIS_TYPE_DATETIME = "datetime";
-	
+	//hill-1847
+	public static final String XAXIS_TYPE_DATE = "date";
+	//hill-1847
 	public static final String LA_DAYVIEW_LABEL = "No.of Logins";
 	
 	public static final String UNABLE_TO_ASSESS = "Unable to assess";
@@ -193,7 +195,15 @@ public final class Constants {
 	public static final String KEY_DURATION = "duration";
 	public static final String KEY_PRESSURE = "pressure";
 	public static final String KEY_SESSION_NO = "sessionNo";
-
+	
+	//hill-1847
+	//AdherenceTrend Graph Y-axis labels
+	public static final String ADHERENCE_SCORE_LABEL = "Adherence Score";
+		
+	//AdherenceTrend Graph tooltip labels	
+	public static final String RESET_SCORE = "scoreReset";
+    //hill-1847
+	
 	// Compliance Graph 
 	public static final String KEY_MAX = "max";
 	public static final String KEY_MIN = "min";
@@ -310,4 +320,8 @@ public final class Constants {
 	public static final String BM_TYPE_AVERAGE_LABEL = "Avg.";
 	public static final String BM_TYPE_MEDIAN_LABEL = "Med.";
 	public static final String BM_TYPE_PERCENTILE_LABEL = "Percentile.";
+	
+	//start:announcement changes
+		public static final String ANNOUNCEMENT_FILE_PATH = "/tmp/visiview-files/";
+	//end:announcement changes
 }

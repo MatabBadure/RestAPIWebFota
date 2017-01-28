@@ -13,8 +13,7 @@ public class NoteDTO {
 	@Size(max = 50)
     private String patientId;
 
-	@Size(max = 500)
-    private String note;
+	private String note;
 
 	@Size(max = 50)
     private String modifiedAt;
@@ -53,7 +52,6 @@ public class NoteDTO {
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
-	
 	public String getPatientId() {
 		return patientId;
 	}
@@ -89,9 +87,9 @@ public class NoteDTO {
 	@Override
 	public String toString() {
 		return "NoteDTO [createdOn=" + createdOn + ", userId="
-				+ userId + ", patientId=" + patientId + ", note=" + note
-				+ ", modifiedAt=" + modifiedAt + ", isDeleted="
-				+ isDeleted + "]";
+				+ userId + ",patientId=" 
+				+ patientId + ", note=" + note + ", modifiedAt=" 
+				+ modifiedAt + ", isDeleted=" + isDeleted + "]";
 	}
 	
 }

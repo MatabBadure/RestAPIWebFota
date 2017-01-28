@@ -94,9 +94,7 @@ public class PatientVestDeviceDataResource {
 
 		try{		
 			log.error("Base64 Received Data for ingestion in receiveDataCharger : ",rawMessage);		
-			
-			//chargerDataService.getDeviceData(rawMessage);
-			
+						
 			byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
 			
 	        String sout = "";

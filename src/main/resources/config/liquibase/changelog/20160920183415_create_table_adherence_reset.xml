@@ -50,9 +50,6 @@
 									constraintName="fk_adhRes_user_id"
 									referencedColumnNames="id" 
 									referencedTableName="USER" />
-											<modifySql dbms="mysql">
-		<append value="ENGINE=INNODB CHARSET=latin1"/>	
-			</modifySql>
 	</changeSet>
 	
 

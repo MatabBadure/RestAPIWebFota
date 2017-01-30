@@ -61,8 +61,8 @@ public class PatientVestDeviceDataResource {
 	
 	private final Logger log = LoggerFactory.getLogger(PatientVestDeviceDataResource.class);
 	
-	private static final String FILENAME_THERAPY = "D:\\temp\\PATIENT_VEST_THERAPY_DATA_MONARCH.csv";
-	private static final String FILENAME_DEVICE = "D:\\temp\\PATIENT_VEST_DEVICE_DATA_MONARCH.csv";
+	private static final String FILENAME_THERAPY = "C:/development/charger/PATIENT_VEST_THERAPY_DATA_MONARCH.csv";
+	private static final String FILENAME_DEVICE = "C:/development/charger/PATIENT_VEST_DEVICE_DATA_MONARCH.csv";
 	
 	@RequestMapping(value = "/receiveData",
             method = RequestMethod.POST,
@@ -276,7 +276,7 @@ public class PatientVestDeviceDataResource {
 	{
 
 
-	        String csvFile = "d:/temp/charger-test-data-1.csv";
+	        String csvFile = "C:/development/charger/charger-test-data-1.csv";
 	        String line = "";
 	        String cvsSplitBy = ",";
 	        String[] Outdata = new String[300];
@@ -288,9 +288,7 @@ public class PatientVestDeviceDataResource {
 
 	                // use comma as separator
 	               data = line.split(cvsSplitBy);
-
-	                //System.out.println("Data [base64= " + data[2]  + "]");
-	                Outdata[i++] = data[2];
+	               Outdata[i++] = data[2];
 	         
 	            }
 	            

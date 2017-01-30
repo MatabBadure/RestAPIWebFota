@@ -1,5 +1,10 @@
 package com.hillrom.vest.web.rest;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -56,6 +61,8 @@ public class PatientVestDeviceDataResource {
 	
 	private final Logger log = LoggerFactory.getLogger(PatientVestDeviceDataResource.class);
 	
+	private static final String FILENAME_THERAPY = "D:\\temp\\PATIENT_VEST_THERAPY_DATA_MONARCH.csv";
+	private static final String FILENAME_DEVICE = "D:\\temp\\PATIENT_VEST_DEVICE_DATA_MONARCH.csv";
 	
 	@RequestMapping(value = "/receiveData",
             method = RequestMethod.POST,
@@ -112,7 +119,7 @@ public class PatientVestDeviceDataResource {
 
 			
 			JSONObject chargerJsonData = new JSONObject();
-			chargerJsonData =   chargerDataService.saveOrUpdateChargerData(rawMessage,decoded_string);
+			chargerJsonData =   chargerDataService.saveOrUpdateChargerData(rawMessage,decoded_string,null,null);
 			JSONObject result = new JSONObject();
 			result.put("RESULT", chargerJsonData.get("RESULT") + " - " + chargerJsonData.get("ERROR"));
 			return new ResponseEntity<>(result,HttpStatus.CREATED);
@@ -123,6 +130,61 @@ public class PatientVestDeviceDataResource {
 			return new ResponseEntity<>(error,HttpStatus.PARTIAL_CONTENT);
 		}
 	}
+	
+	
+	@RequestMapping(value = "/parseTestDataCsv",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> parseTestDataCsv(){
+
+		try{		
+					
+			
+			String testData[] = readcsv();
+			BufferedWriter bwTherapy = createTherapyfile(FILENAME_THERAPY);
+			BufferedWriter bwDevice = createDevicefile(FILENAME_DEVICE);
+
+			for(int j=0; j<testData.length;j++){
+				
+				String rawMessage = testData[j];
+				
+				log.debug("Raw Message :"+rawMessage);
+				
+				byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
+				
+				//log.debug("Decoded Array :"+decoded);
+				
+		        String sout = "";
+		        for(int i=0;i<decoded.length;i++) {
+		        	int val = decoded[i] & 0xFF;
+		        	sout = sout + val + " ";
+		        }
+		        
+		        log.debug("Input Byte Array :"+sout);
+	
+				String decoded_string = new String(decoded);
+				//log.error("Decoded value is " + decoded_string);
+	
+				
+				JSONObject chargerJsonData = new JSONObject();
+				chargerJsonData =   chargerDataService.saveOrUpdateChargerData(rawMessage,decoded_string,bwTherapy,bwDevice);
+				log.debug("Last Record Processed : "+ j );
+			}
+
+
+			
+			JSONObject result = new JSONObject();
+			//result.put("RESULT", chargerJsonData.get("RESULT") + " - " + chargerJsonData.get("ERROR"));
+			return new ResponseEntity<>(result,HttpStatus.CREATED);
+		}catch(Exception e){
+			e.printStackTrace();
+			JSONObject error = new JSONObject();
+			error.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(error,HttpStatus.PARTIAL_CONTENT);
+		}
+		
+	}
+	
 	
 
 	
@@ -210,4 +272,76 @@ public class PatientVestDeviceDataResource {
 		}
 	}
 	
+	public static String[] readcsv() 
+	{
+
+
+	        String csvFile = "d:/temp/charger-test-data-1.csv";
+	        String line = "";
+	        String cvsSplitBy = ",";
+	        String[] Outdata = new String[300];
+	        String[] data = null;
+
+	        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+	        	int i=0;
+	            while ((line = br.readLine()) != null) {
+
+	                // use comma as separator
+	               data = line.split(cvsSplitBy);
+
+	                //System.out.println("Data [base64= " + data[2]  + "]");
+	                Outdata[i++] = data[2];
+	         
+	            }
+	            
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+
+	        return Outdata;
+	}  
+	
+
+
+	public BufferedWriter createTherapyfile(String fileName) {
+
+		BufferedWriter bw = null;
+		
+		try {
+				bw = new BufferedWriter(new FileWriter(fileName)) ;
+				
+				bw.append("devSN,Wifi,devVer,session_index,start_time,end_time,start_battery_level,end_battery_level,number_of_pods,number_of_events,hmr_seconds\n");
+
+				return bw;
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+
+		}
+		return bw;
+		
+
+	}
+	
+	public BufferedWriter createDevicefile(String fileName) {
+
+		BufferedWriter bw = null;
+		
+		try {
+				bw = new BufferedWriter(new FileWriter(fileName)) ;
+				
+				bw.append("event_timestamp,event_code,frequency,intensity,duration\n");
+
+			return bw;
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+
+		}
+		return bw;
+		
+
+	}
 }

@@ -1,5 +1,8 @@
 package com.hillrom.vest.service;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -131,25 +134,26 @@ public class ChargerDataService {
 
 
 	
-			public JSONObject saveOrUpdateChargerData(String encoded_string, String decoded_string) throws HillromException{	
+			public JSONObject saveOrUpdateChargerData(String encoded_string, String decoded_string,BufferedWriter bwTherapy,BufferedWriter bwDevice) throws HillromException{	
 				
 				
 				log.error("Encoded String : " + encoded_string);
 				log.error("Decoded String : " + decoded_string);
 				
-				JSONObject chargerJsonData = validateRequest(encoded_string,decoded_string);
+				JSONObject chargerJsonData = validateRequest(encoded_string,decoded_string,bwTherapy,bwDevice);
 				if(chargerJsonData.get("DEVICE_DATA").equals("PING_PONG_PING")){
 					log.debug("deviceData is PING_PONG_PING" + " Insert into PING_PONG_PING table");
-					PingPongPing pingPongPingData = new PingPongPing();
-					pingPongPingData.setCreatedTime(new DateTime());
-					pingPongPingRepository.save(pingPongPingData);
+					//PingPongPing pingPongPingData = new PingPongPing();
+					//pingPongPingData.setCreatedTime(new DateTime());
+					//pingPongPingRepository.save(pingPongPingData);
 					
 				}
 				if(chargerJsonData.get("RESULT").equals("OK")){
-					ChargerData chargerData = new ChargerData();
-					chargerData.setDeviceData(encoded_string);
-					chargerData.setCreatedTime(new DateTime());
-					chargerDataRepository.save(chargerData);
+					log.debug("deviceData is CHARGER DATA "); 
+					//ChargerData chargerData = new ChargerData();
+					//chargerData.setDeviceData(encoded_string);
+					//chargerData.setCreatedTime(new DateTime());
+					//chargerDataRepository.save(chargerData);
 				}
 				return chargerJsonData;
 		
@@ -157,7 +161,7 @@ public class ChargerDataService {
 	
 
 	
-			private JSONObject validateRequest(String rawData,String decoded_data) throws HillromException {
+			private JSONObject validateRequest(String rawData,String decoded_data,BufferedWriter bwTherapy,BufferedWriter bwDevice) throws HillromException {
 				log.error("Inside validateRequest " + rawData);
 				JSONObject chargerJsonData = ParserUtil.getChargerQclJsonDataFromRawMessage(decoded_data);
 				String reqParams[] = new String[]{DEVICE_MODEL,DEVICE_SN,
@@ -174,18 +178,18 @@ public class ChargerDataService {
 								missingParams.contains(DEVICE_VER) || missingParams.contains(DEVICE_DATA) || missingParams.contains(CRC) ||
 								missingParams.contains(FRAG_TOTAL) || missingParams.contains(FRAG_CURRENT)
 								){
-							chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
+							//chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData,bw));
 							chargerJsonData.put("RESULT", "NOT OK");
 							chargerJsonData.put("ERROR","Missing Params");
 							return chargerJsonData;
 						}else{
 							if(!calculateCRC(rawData)){
-								chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
+								//chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData,bw));
 								chargerJsonData.put("RESULT", "NOT OK");
 								chargerJsonData.put("ERROR","CRC Validation Failed");
 								return chargerJsonData;
 							}else{
-								chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
+								chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData,bwTherapy,bwDevice));
 								chargerJsonData.put("RESULT", "OK");
 								chargerJsonData.put("ERROR","");
 								return chargerJsonData;					
@@ -197,7 +201,7 @@ public class ChargerDataService {
 							chargerJsonData.put("ERROR","CRC Validation Failed");
 							return chargerJsonData;
 						}else{
-							chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
+							chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData,bwTherapy,bwDevice));
 							chargerJsonData.put("RESULT", "OK");
 							chargerJsonData.put("ERROR","");
 							return chargerJsonData;					
@@ -268,7 +272,7 @@ public class ChargerDataService {
 				
 			}
 	  
-			public String getDeviceData(String encoded_string) throws HillromException{
+			public String getDeviceData(String encoded_string,BufferedWriter bwTherapy,BufferedWriter bwDevice) throws HillromException{
 				
 
 				
@@ -302,9 +306,9 @@ public class ChargerDataService {
 		        
 				int x = getFragTotal(encoded_string);
 				int y = getFragCurrent(encoded_string);
-				byte[] devsnbt = getDevSN(encoded_string);
-				byte[] wifibt = getDevWifi(encoded_string);
-				byte[] verbt = getDevVer(encoded_string);
+				byte[] devsnbt = getDevSN(encoded_string,bwTherapy);
+				byte[] wifibt = getDevWifi(encoded_string,bwTherapy);
+				byte[] verbt = getDevVer(encoded_string,bwTherapy);
 		        
 		        byte[] session_index  = Arrays.copyOfRange(deviceDataArray, SESSION_INDEX_LOC, SESSION_INDEX_LOC + SESSION_INDEX_LEN);
 		        sout = "";
@@ -315,13 +319,16 @@ public class ChargerDataService {
 		        log.debug("session_index : "+ sout );
 		        
 		        log.debug("Combined session_index : "+ intergerCombinedFromHex(session_index));
-		              
+		        writetofile(intergerCombinedFromHex(session_index)+",",bwTherapy);
+		        
+		        
 		        byte[] start_time  = Arrays.copyOfRange(deviceDataArray, START_TIME_LOC, START_TIME_LOC + START_TIME_LEN);
 		        sout = "";
 		        for(int k=0;k<start_time.length;k++){
 		        	sout = sout + (start_time[k]  & 0xFF) + " ";
 		        }
 		        log.debug("start_time : "+ sout );
+		        writetofile(sout+",",bwTherapy);
 		        
 		        byte[] end_time  = Arrays.copyOfRange(deviceDataArray, END_TIME_LOC, END_TIME_LOC + END_TIME_LEN);        
 		        sout = "";
@@ -329,6 +336,7 @@ public class ChargerDataService {
 		        	sout = sout + (end_time[k]  & 0xFF) + " ";
 		        }
 		        log.debug("end_time : "+ sout );
+		        writetofile(sout+",",bwTherapy);
 		        
 		        byte[] start_battery_level  = Arrays.copyOfRange(deviceDataArray, START_BATTERY_LEVEL_LOC, START_BATTERY_LEVEL_LOC + START_BATTERY_LEVEL_LEN);
 		        sout = "";
@@ -336,6 +344,7 @@ public class ChargerDataService {
 		        	sout = sout + (start_battery_level[k]  & 0xFF) + " ";
 		        }
 		        log.debug("start_battery_level : "+ sout );
+		        writetofile(sout+",",bwTherapy);
 		        
 		        byte[] end_battery_level  = Arrays.copyOfRange(deviceDataArray, END_BATTERY_LEVEL_LOC, END_BATTERY_LEVEL_LOC + END_BATTERY_LEVEL_LEN);
 		        sout = "";
@@ -343,6 +352,7 @@ public class ChargerDataService {
 		        	sout = sout + (end_battery_level[k]  & 0xFF) + " ";
 		        }
 		        log.debug("end_battery_level : "+ sout );
+		        writetofile(sout+",",bwTherapy);
 		        
 		        byte[] number_of_events  = Arrays.copyOfRange(deviceDataArray, NUMBER_OF_EVENTS_LOC, NUMBER_OF_EVENTS_LOC + NUMBER_OF_EVENTS_LEN);
 		        sout = "";
@@ -350,6 +360,7 @@ public class ChargerDataService {
 		        	sout = sout + (number_of_events[k]  & 0xFF) + " ";
 		        }
 		        log.debug("number_of_events : "+ sout );
+		        writetofile(sout+",",bwTherapy);
 		        
 		        byte[] number_of_pods  = Arrays.copyOfRange(deviceDataArray, NUMBER_OF_PODS_LOC, NUMBER_OF_PODS_LOC + NUMBER_OF_PODS_LEN);
 		        sout = "";
@@ -357,6 +368,7 @@ public class ChargerDataService {
 		        	sout = sout + (number_of_pods[k]  & 0xFF) + " ";
 		        }
 		        log.debug("number_of_pods : "+ sout );
+		        writetofile(sout+",",bwTherapy);
 		        
 		        byte[] hmr_seconds  = Arrays.copyOfRange(deviceDataArray, HMR_SECONDS_LOC, HMR_SECONDS_LOC + HMR_SECONDS_LEN);
 		        sout = "";
@@ -365,6 +377,7 @@ public class ChargerDataService {
 		        }
 		        log.debug("hmr_seconds : "+ sout );
 		        log.debug("Combined hmr_seconds : "+ intergerCombinedFromHex(hmr_seconds));
+		        writetofile(intergerCombinedFromHex(hmr_seconds)+",",bwTherapy);
 		        
 		        //log.debug("Value of deviceDataArray.length : "+ j );
 		        for(int i=EVENT_LOG_START_POS+1;i<j;i=i+EVENT_LOG_LEN){
@@ -377,6 +390,7 @@ public class ChargerDataService {
 			        	sout = sout + (event_timestamp[k]  & 0xFF) + " ";
 			        }
 			        log.debug("event_timestamp : "+ sout );
+			        writetofile(sout+",",bwDevice);
 			        
 			        byte[] event_code  = Arrays.copyOfRange(deviceDataArray, i+EVENT_CODE_LOC-1, (i+EVENT_CODE_LOC-1) + EVENT_CODE_LEN);        
 			        sout = "";
@@ -384,6 +398,7 @@ public class ChargerDataService {
 			        	sout = sout + (event_code[k]  & 0xFF) + " ";
 			        }
 			        log.debug("event_code : "+ sout );
+			        writetofile(sout+",",bwDevice);
 			        
 			        byte[] frequency  = Arrays.copyOfRange(deviceDataArray, i+FREQUENCY_LOC-1, (i+FREQUENCY_LOC-1) + FREQUENCY_LEN);
 			        sout = "";
@@ -391,6 +406,7 @@ public class ChargerDataService {
 			        	sout = sout + (frequency[k]  & 0xFF) + " ";
 			        }
 			        log.debug("frequency : "+ sout );
+			        writetofile(sout+",",bwDevice);
 
 			        
 			        byte[] intensity  = Arrays.copyOfRange(deviceDataArray, i+INTENSITY_LOC-1, (i+INTENSITY_LOC-1) + INTENSITY_LEN);
@@ -399,6 +415,7 @@ public class ChargerDataService {
 			        	sout = sout + (intensity[k]  & 0xFF) + " ";
 			        }
 			        log.debug("intensity : "+ sout );
+			        writetofile(sout+",",bwDevice);
 
 			        
 			        byte[] duration  = Arrays.copyOfRange(deviceDataArray, i+DURATION_LOC-1, (i+DURATION_LOC-1) + DURATION_LEN);
@@ -407,13 +424,17 @@ public class ChargerDataService {
 			        	sout = sout + (duration[k]  & 0xFF) + " ";
 			        }
 			        log.debug("duration : "+ sout );
+			        writetofile(sout+",",bwDevice);
+			        
+			        writetofile("\n",bwDevice);
 		        }
 		        
+		        writetofile("\n",bwTherapy);
 		        return "NOT_PING_PONG_PING";
 		
 			}
 
-			public byte[] getDevSN(String encoded_string) throws HillromException{
+			public byte[] getDevSN(String encoded_string,BufferedWriter bwTherapy) throws HillromException{
 		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
 		        String sout = "";
 		        for(int i=0;i<b.length;i++) {
@@ -440,11 +461,12 @@ public class ChargerDataService {
 
 		        
 		        log.debug("Value of devSN : "+ devSN );
+		        writetofile(devSN+",",bwTherapy);
 		        return devSNArray;
 		        
 			}
 			
-			public byte[] getDevWifi(String encoded_string) throws HillromException{
+			public byte[] getDevWifi(String encoded_string,BufferedWriter bwTherapy) throws HillromException{
 		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
 		        String sout = "";
 		        for(int i=0;i<b.length;i++) {
@@ -471,11 +493,12 @@ public class ChargerDataService {
 
 		        
 		        log.debug("Value of devWifi : "+ devWifi );
+		        writetofile(devWifi+",",bwTherapy);
 		        return devWifiArray;
 		        
 			}
 			
-			public byte[] getDevVer(String encoded_string) throws HillromException{
+			public byte[] getDevVer(String encoded_string,BufferedWriter bwTherapy) throws HillromException{
 		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
 		        String sout = "";
 		        for(int i=0;i<b.length;i++) {
@@ -502,6 +525,7 @@ public class ChargerDataService {
 
 		        
 		        log.debug("Value of devVer : "+ devVer );
+		        writetofile(devVer+",",bwTherapy);
 		        return devVerArray;
 		        
 			}
@@ -583,6 +607,23 @@ public class ChargerDataService {
 	    	    return hexTotal;
 	    	}
 
+
+
+	    	
+	    	public void writetofile(String content,BufferedWriter bw) {
+
+	    		try  {
+
+	    			bw.append(content);
+
+
+	    		} catch (IOException e) {
+
+	    			e.printStackTrace();
+
+	    		}
+
+	    	}
 	
 	
 

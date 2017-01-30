@@ -93,6 +93,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/account/update_passwordsecurityquestion").permitAll()
             .antMatchers("/api/receiveData").permitAll()
             .antMatchers("/api/receiveDataCharger").permitAll()
+            .antMatchers("/api/parseTestDataCsv").permitAll()
             .antMatchers("/api/patient/{id}/vestdevicedata").permitAll()
             .antMatchers("/api/vestdevicedata").permitAll()
             .antMatchers("/api/chargerdevicedata").permitAll()

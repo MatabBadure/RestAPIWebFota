@@ -17,6 +17,8 @@ public interface NotificationRepository extends
 	
 	Notification findByPatientUserIdAndDate(Long patientUserId, LocalDate date);
 	
+	List<Notification> findByPatientUserId(Long patientUserId);
+	
 	List<Notification> findByDate(LocalDate date);
 	
 	List<Notification> findByDateAndIsAcknowledgedAndPatientUserIdIn(LocalDate date,Boolean isAcknowledged,List<Long> patientUserIds);

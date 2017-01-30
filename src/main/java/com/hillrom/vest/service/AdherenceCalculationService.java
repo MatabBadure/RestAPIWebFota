@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -44,6 +46,7 @@ import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +66,7 @@ import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.ExceptionConstants;
+import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.ClinicStatsNotificationVO;
@@ -288,8 +292,98 @@ public class AdherenceCalculationService {
 		}
 	}
 	
+	// Resetting the adherence score for the specific user from the adherence reset start date
+	@Async	
+	public Future<String> adherenceSettingForClinic(String clinicId){
+		try{
+			long startTime = System.currentTimeMillis();
+			
+			//List<PatientInfo> patientList = clinicPatientService.getPatientListForClinic(clinicId);
+			List<User> userList = clinicPatientService.getUserListForClinic(clinicId);
+			List<Long> userIdList = clinicPatientService.getUserIdListFromUserList(userList);
+			
+			Map<Long,PatientNoEvent> userIdNoEventMap = noEventService.findAllByPatientUserId(userIdList);
+			
+			if(userList.size()>0){
+				for(User user : userList){
+					//User user = userService.getUserObjFromPatientInfo(patient);
+					LocalDate startDate = fineOneByPatientUserIdLatestResetStartDate(user.getId());
+					
+					if(Objects.isNull(startDate)){				
+						PatientNoEvent noEvent = userIdNoEventMap.get(user.getId());
+						if(Objects.nonNull(noEvent) &&  Objects.nonNull(noEvent.getFirstTransmissionDate())){
+							startDate = noEvent.getFirstTransmissionDate();
+						}
+					}
+					if(Objects.nonNull(startDate)){
+						PatientInfo patient = userService.getPatientInfoObjFromPatientUser(user);
+						adherenceResetForPatient(user.getId(), patient.getId(), startDate, DEFAULT_COMPLIANCE_SCORE, 0);
+					}
+				}
+				long endTime   = System.currentTimeMillis();
+				long totalTime = endTime - startTime;
+				log.error("adherenceSettingForClinic method executed in :"+totalTime+" milliseconds");
+				return new AsyncResult<>(MessageConstants.HR_314);
+				//return new AsyncResult<>("Adherence Score recalculated initiated, will be completed soon");
+			}else{
+				long endTime   = System.currentTimeMillis();
+				long totalTime = endTime - startTime;				
+				log.error("adherenceSettingForClinic method executed in :"+totalTime+" milliseconds");
+				return new AsyncResult<>(MessageConstants.HR_315);				
+			}
+		}catch(Exception ex){
+			log.debug(ex.getMessage());
+		}
+		return new AsyncResult<>("Adherence score recalculated successfully for all patients under clinic");
+	}
+	
+	public LocalDate fineOneByPatientUserIdLatestResetStartDate(Long userId){    	
+    	List<AdherenceReset> adherenceReset = adherenceResetRepository.findOneByPatientUserIdLatestResetStartDate(userId);
+    	if(adherenceReset.size() > 0)
+    		return adherenceReset.get(0).getResetStartDate();
+    	else
+    		return null;
+    }
+	
+	// Getting the therapy data for the requested date
+	public List<TherapySession> getTherapyForDay(SortedMap<LocalDate,List<TherapySession>> sortedTherapySession,LocalDate curDate){		
+		return sortedTherapySession.get(curDate);
+	}
+	
+	// Getting the therapy data for the requested between period 
+	public List<TherapySession> getTherapyforBetweenDates(LocalDate fromDate, LocalDate toDate, SortedMap<LocalDate,List<TherapySession>> sortedTherapySession){
+		List<TherapySession> session = new LinkedList<>();
+		
+		List<LocalDate> allDates = DateUtil.getAllLocalDatesBetweenDates(fromDate, toDate);
+		
+		for(LocalDate date : allDates){
+			
+			if(Objects.nonNull(sortedTherapySession.get(date)))
+				session.addAll(sortedTherapySession.get(date));
+		}
+		
+		return session;
+	}
+	
+	// Getting the compliance object for the previous date / previous record 
+	public PatientCompliance returnPrevDayCompli(List<PatientCompliance> complianceList, LocalDate currDate){
+		
+		int j = -1;
+		for(int i = 0; i <= (complianceList.size()-1); i++){
+			if(complianceList.get(i).getDate() == currDate){				
+				j = i;
+			}
+		}
+		return (j > 0 ? complianceList.get(j-1) : null);
+	}
+	
+	// Grouping the therapy data by date 
+	public SortedMap<LocalDate,List<TherapySession>> groupTherapySessionsByDate(List<TherapySession> therapySessions){
+		return new TreeMap<>(therapySessions.stream().collect(Collectors.groupingBy(TherapySession :: getDate)));
+	}
+	
 	// Resetting the adherence score for the specific user from the adherence reset start date	
-	public String adherenceResetForPatient(Long userId, String patientId, LocalDate adherenceStartDate, Integer adherenceScore){
+	public String adherenceResetForPatient(Long userId, String patientId, LocalDate adherenceStartDate, Integer adherenceScore, Integer resetFlag){
 		try{
 			
 			// Adherence Start date in string for query
@@ -301,75 +395,124 @@ public class AdherenceCalculationService {
 			// Get the list of rows for the user id from the adherence reset start date 
 			List<PatientCompliance> patientComplianceList = patientComplianceRepository.returnComplianceForPatientIdDates(sAdherenceStDate, userId);
 			
+			List<PatientCompliance> complianceListToStore = new LinkedList<>();
+			
 			// Getting the protocol constants for the user
 			ProtocolConstants userProtocolConstant = protocolService.getProtocolForPatientUserId(userId);
 			
+			// Getting all the sessions of user from the repository 
+			List<TherapySession> therapySessionData = therapySessionRepository.findByPatientUserId(userId);
+			// grouping all the therapy sessions to the date
+			SortedMap<LocalDate,List<TherapySession>> sortedTherapy = groupTherapySessionsByDate(therapySessionData);
+			
+			// Getting all the notification for the user 
+			List<Notification> userNotifications = notificationRepository.findByPatientUserId(userId);			
+			
 			int adherenceSettingDay = getAdherenceSettingForUserId(userId);
 			
-			for(PatientCompliance compliance : patientComplianceList){
+			for(PatientCompliance currentCompliance : patientComplianceList){
 				
-				PatientCompliance currentCompliance = patientComplianceRepository.findById(compliance.getId());
+				//PatientCompliance currentCompliance = patientComplianceRepository.findById(compliance.getId());
 				
 				PatientInfo patient = currentCompliance.getPatient();
 				User patientUser = currentCompliance.getPatientUser();
-				int initialPrevScoreFor1Day = 0; 
-				if( ( adherenceStartDate.isBefore(compliance.getDate()) || adherenceStartDate.equals(compliance.getDate())) &&
-						DateUtil.getDaysCountBetweenLocalDates(adherenceStartDate, compliance.getDate()) < (adherenceSettingDay-1) && 
+				int initialPrevScoreFor1Day = 0;
+				
+				Notification existingNotificationofTheDay = notificationService.getNotificationForDay(userNotifications, currentCompliance.getDate());
+				
+				if( ( adherenceStartDate.isBefore(currentCompliance.getDate()) || adherenceStartDate.equals(currentCompliance.getDate())) &&
+						DateUtil.getDaysCountBetweenLocalDates(adherenceStartDate, currentCompliance.getDate()) < (adherenceSettingDay-1) && 
 						adherenceSettingDay > 1){
 							
 					// Check whether the adherence start days is the compliance date
-					if(adherenceStartDate.equals(compliance.getDate())){
-						notificationService.createOrUpdateNotification(patientUser, patient, userId,
-																		currentCompliance.getDate(), ADHERENCE_SCORE_RESET,false);
+					if(adherenceStartDate.equals(currentCompliance.getDate())){
+						if(resetFlag == 1){
+							notificationService.createOrUpdateNotification(patientUser, patient, userId,
+																		currentCompliance.getDate(), ADHERENCE_SCORE_RESET, false, existingNotificationofTheDay);
+						}else{
+							if(Objects.nonNull(existingNotificationofTheDay))
+								notificationRepository.delete(existingNotificationofTheDay);
+						}
 						currentCompliance.setSettingsDeviatedDaysCount(0);
 						currentCompliance.setMissedTherapyCount(0);
 					} else {
-						PatientCompliance prevCompliance = patientComplianceRepository.returnPrevDayScore(currentCompliance.getDate().toString(),userId);
+						
+						// Commenting the existing repository call and calling the the new method for getting the previous day compliance
+						//PatientCompliance prevCompliance = patientComplianceRepository.returnPrevDayScore(currentCompliance.getDate().toString(),userId);
+						PatientCompliance prevCompliance = returnPrevDayCompli(patientComplianceList, currentCompliance.getDate());
+						if(Objects.isNull(prevCompliance)){
+							prevCompliance = new PatientCompliance();
+							prevCompliance.setScore(adherenceScore);
+							prevCompliance.setSettingsDeviatedDaysCount(0);
+							prevCompliance.setMissedTherapyCount(0);
+						}
+						
 						if(currentCompliance.getMissedTherapyCount() > 0){
 							currentCompliance.setMissedTherapyCount(prevCompliance.getMissedTherapyCount()+1);
 						}
 						if(isSettingDeviatedForUserOnDay(userId, currentCompliance.getDate() ,adherenceSettingDay, userProtocolConstant)){
 							currentCompliance.setSettingsDeviatedDaysCount(prevCompliance.getSettingsDeviatedDaysCount()+1);
 						}
-						Notification existingNotificationofTheDay = notificationRepository.findByPatientUserIdAndDate(userId, compliance.getDate());
+						
+						// Commenting the existing repository call and calling the new method for getting the current day notification at beginning of for loop
+						//Notification existingNotificationofTheDay = notificationRepository.findByPatientUserIdAndDate(userId, currentCompliance.getDate());
+						
 						if(Objects.nonNull(existingNotificationofTheDay)){
 							notificationRepository.delete(existingNotificationofTheDay);
 						}
 					}
 					currentCompliance.setScore(adherenceScore);
-					patientComplianceRepository.save(currentCompliance);					
+					//patientComplianceRepository.save(currentCompliance);
+					complianceListToStore.add(currentCompliance);
 				}else{
-										
-					List<TherapySession> therapyData = therapySessionRepository.findByPatientUserIdAndDate(userId, compliance.getDate());					
 					
-					if(adherenceSettingDay == 1 && adherenceStartDate.equals(compliance.getDate())){
+					PatientCompliance prevCompliance = returnPrevDayCompli(patientComplianceList, currentCompliance.getDate());
+					if(Objects.isNull(prevCompliance)){
+						prevCompliance = new PatientCompliance();
+						prevCompliance.setScore(adherenceScore);
+						prevCompliance.setSettingsDeviatedDaysCount(0);
+						prevCompliance.setMissedTherapyCount(0);
+					}
+					
+					// Commenting the existing repository call and calling the the new method for getting the current day therapy details				
+					//List<TherapySession> therapyData = therapySessionRepository.findByPatientUserIdAndDate(userId, currentCompliance.getDate());					
+					List<TherapySession> therapyData = getTherapyForDay(sortedTherapy, currentCompliance.getDate());
+					
+					if(adherenceSettingDay == 1 && adherenceStartDate.equals(currentCompliance.getDate())){
 						initialPrevScoreFor1Day = adherenceScore;
 					}						
-					if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && !compliance.getDate().equals(todayDate)){
+					if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && !currentCompliance.getDate().equals(todayDate)){
+						// Adding the prevCompliance object for previous day compliance and existingNotificationofTheDay object for the current date Notification object
 						// Missed therapy days
-						calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, patient, patientUser, initialPrevScoreFor1Day);
-					}else if(therapyData.isEmpty() && compliance.getDate().equals(todayDate)){
+						complianceListToStore.add(calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, patient, patientUser, initialPrevScoreFor1Day, prevCompliance, existingNotificationofTheDay));
+					}else if( ( Objects.isNull(therapyData) || (Objects.nonNull(therapyData) && therapyData.isEmpty()) ) && currentCompliance.getDate().equals(todayDate)){
+						// Passing prevCompliance for avoiding the repository call to retrieve the previous day compliance
 						// Setting the previous day compliance details for the no therapy done for today 
-						setPrevDayCompliance(currentCompliance, userId);
+						complianceListToStore.add(setPrevDayCompliance(currentCompliance, userId, prevCompliance));
 					}else{
+						// Adding the sortedTherapy for all the therapies & prevCompliance object for previous day compliance and existingNotificationofTheDay object for the current date Notification object
 						// HMR Non Compliance / Setting deviation & therapy data available
-						calculateUserHMRComplianceForMST(currentCompliance, userProtocolConstant, currentCompliance.getDate(), userId, 
-								patient, patientUser, adherenceSettingDay, initialPrevScoreFor1Day);
+						complianceListToStore.add(calculateUserHMRComplianceForMST(currentCompliance, userProtocolConstant, currentCompliance.getDate(), userId, 
+								patient, patientUser, adherenceSettingDay, initialPrevScoreFor1Day,sortedTherapy, prevCompliance, existingNotificationofTheDay, resetFlag));
 					}
 				}
 			}
+			complianceService.saveAll(complianceListToStore);
 		}catch(Exception ex){
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter( writer );
 			ex.printStackTrace( printWriter );
+			mailService.sendJobFailureNotification("resetAdherenceCalculationPatient",writer.toString());
 		}
 		return "Adherence score reset successfully";
 	}
 	
 	// Setting the previous day compliance
-	private void setPrevDayCompliance(PatientCompliance currentCompliance, Long userId)
+	//private void setPrevDayCompliance(PatientCompliance currentCompliance, Long userId, PatientCompliance preDayCompliance)
+	private PatientCompliance setPrevDayCompliance(PatientCompliance currentCompliance, Long userId, PatientCompliance preDayCompliance)
 	{
-		PatientCompliance preDayCompliance = patientComplianceRepository.returnPrevDayScore(currentCompliance.getDate().toString(),userId);
+		// Commented the repository call and getting the previous day compliance from the method parameter
+		//PatientCompliance preDayCompliance = patientComplianceRepository.returnPrevDayScore(currentCompliance.getDate().toString(),userId);
 		
 		currentCompliance.setGlobalHMRNonAdherenceCounter(preDayCompliance.getGlobalHMRNonAdherenceCounter());
 		currentCompliance.setGlobalMissedTherapyCounter(preDayCompliance.getGlobalMissedTherapyCounter());
@@ -382,7 +525,10 @@ public class AdherenceCalculationService {
 		currentCompliance.setScore(preDayCompliance.getScore());
 		currentCompliance.setSettingsDeviated(preDayCompliance.isSettingsDeviated());
 		currentCompliance.setSettingsDeviatedDaysCount(preDayCompliance.getSettingsDeviatedDaysCount());
-		patientComplianceRepository.save(currentCompliance);
+		
+		//patientComplianceRepository.save(currentCompliance);
+		return currentCompliance;
+		
 	}
 	
 	private void updateGlobalCounters(int globalMissedTherapyCounter,
@@ -499,7 +645,8 @@ public class AdherenceCalculationService {
 	}
 	
 	// calculate HMRCompliance on Missed Therapy Date for Per UserId
-	private void calculateUserHMRComplianceForMST(
+	//private void calculateUserHMRComplianceForMST(
+	private PatientCompliance calculateUserHMRComplianceForMST(
 			PatientCompliance newCompliance,
 			ProtocolConstants userProtocolConstants,
 			LocalDate complianceDate,
@@ -507,17 +654,24 @@ public class AdherenceCalculationService {
 			PatientInfo patient,
 			User patientUser,
 			Integer adherenceSettingDay,
-			int initialPrevScoreFor1Day) {
+			int initialPrevScoreFor1Day,
+			SortedMap<LocalDate,List<TherapySession>> sortedTherapy,
+			PatientCompliance prevCompliance,
+			Notification existingNotificationofTheDay,
+			Integer resetFlag) {
 		
+		// Commented the repository call for previous day compliance and getting the prevCompliance from the method parameter
 		// Getting previous day score or adherence reset score for the adherence setting value as 1
-		PatientCompliance prevCompliance = patientComplianceRepository.returnPrevDayScore(complianceDate.toString(),userId);
+		// PatientCompliance prevCompliance = patientComplianceRepository.returnPrevDayScore(complianceDate.toString(),userId);
 		int score = initialPrevScoreFor1Day == 0 ? prevCompliance.getScore() : initialPrevScoreFor1Day;
 		
 		// Get earlier third day to finding therapy session
 		LocalDate adherenceSettingDaysEarlyDate = getDateBeforeSpecificDays(complianceDate,(adherenceSettingDay-1));
 		
+		//Commented the repository call for current day therapy session and getting the same from the method parameter and the calling method
 		// Get therapy session for last adherence Setting days
-		List<TherapySession> therapySessions = therapySessionRepository.findByDateBetweenAndPatientUserId(adherenceSettingDaysEarlyDate, complianceDate, userId);
+		// List<TherapySession> therapySessions = therapySessionRepository.findByDateBetweenAndPatientUserId(adherenceSettingDaysEarlyDate, complianceDate, userId);
+		List<TherapySession> therapySessions = getTherapyforBetweenDates(adherenceSettingDaysEarlyDate, complianceDate, sortedTherapy);
 				
 		if(Objects.isNull(therapySessions)){
 			therapySessions = new LinkedList<>();
@@ -527,7 +681,7 @@ public class AdherenceCalculationService {
 		newCompliance.setHmrRunRate(hmrRunRate);
 		double durationForSettingDays = hmrRunRate*therapySessions.size(); // runrate*totalsessions = total duration
 		
-		String notification_type = "";		
+		String notification_type = null;
 		boolean isSettingsDeviated = isSettingsDeviatedForSettingDays(therapySessions, userProtocolConstants, adherenceSettingDay);
 		
 		// validating the last adherence setting days therapies with respect to the user protocol
@@ -556,37 +710,54 @@ public class AdherenceCalculationService {
 			int globalSettingsDeviationCounter = prevCompliance.getGlobalSettingsDeviationCounter();
 			newCompliance.setGlobalSettingsDeviationCounter(++globalSettingsDeviationCounter);
 		}else{
-			score = score <=  DEFAULT_COMPLIANCE_SCORE - BONUS_POINTS ? score + BONUS_POINTS : DEFAULT_COMPLIANCE_SCORE;			
-			notification_type = ADHERENCE_SCORE_RESET;
+			score = score <=  DEFAULT_COMPLIANCE_SCORE - BONUS_POINTS ? score + BONUS_POINTS : DEFAULT_COMPLIANCE_SCORE;
+			//notification_type = ADHERENCE_SCORE_RESET;
+			
+			if(Objects.nonNull(existingNotificationofTheDay))
+				notificationRepository.delete(existingNotificationofTheDay);
+			newCompliance.setScore(score);
+			return newCompliance;
 		}
 		
+		if(resetFlag == 1){
+			notification_type = initialPrevScoreFor1Day == 0 ? notification_type : ADHERENCE_SCORE_RESET;
+		}			
+		
+		// Added the existingNotificationofTheDay param for passing the notification object for the current date
 		notificationService.createOrUpdateNotification(patientUser, patient, userId,
-				complianceDate, (initialPrevScoreFor1Day == 0 ? notification_type : ADHERENCE_SCORE_RESET), false);
+				complianceDate, notification_type, false, existingNotificationofTheDay);
 		
 		// Setting the new score with respect to the compliance deduction
 		newCompliance.setScore(score);
 		
 		// Saving the updated score for the specific date of compliance
-		patientComplianceRepository.save(newCompliance);
+		//patientComplianceRepository.save(newCompliance);
+		return newCompliance;
 	}
 		
 	
 	
 	// calculate score with respective to missed therapies
-	private void calculateUserMissedTherapy(
+	//private void calculateUserMissedTherapy(
+	private PatientCompliance calculateUserMissedTherapy(
 			PatientCompliance newCompliance,
 			LocalDate complianceDate,
 			Long userId,
 			PatientInfo patient,
 			User patientUser,
-			int initialPrevScoreFor1Day) {
+			int initialPrevScoreFor1Day,
+			PatientCompliance prevCompliance,
+			Notification existingNotificationofTheDay) {
 				
-		
+		// existingNotificationofTheDay object of Notification is sent to avoid repository call
+		// userNotifications list object is sent to the method for getting the current day object
 		notificationService.createOrUpdateNotification(patientUser, patient, userId,
-				complianceDate, (initialPrevScoreFor1Day == 0 ? MISSED_THERAPY : ADHERENCE_SCORE_RESET) , false);
+				complianceDate, (initialPrevScoreFor1Day == 0 ? MISSED_THERAPY : ADHERENCE_SCORE_RESET) , false, existingNotificationofTheDay);
 		
+		// Commenting the repository call for previous day compliance by passing prevCompliance in the parameter
 		// Getting previous day score or adherence reset score for the adherence setting value as 1
-		PatientCompliance prevCompliance = patientComplianceRepository.returnPrevDayScore(complianceDate.toString(),userId);
+		//PatientCompliance prevCompliance = patientComplianceRepository.returnPrevDayScore(complianceDate.toString(),userId);
+		
 		int score = initialPrevScoreFor1Day == 0 ? prevCompliance.getScore() : initialPrevScoreFor1Day; 
 		
 		// Calculating the score on basis of missed therapy
@@ -603,8 +774,9 @@ public class AdherenceCalculationService {
 		int globalMissedTherapyCounter = newCompliance.getGlobalMissedTherapyCounter();
 		newCompliance.setGlobalMissedTherapyCounter(++globalMissedTherapyCounter);
 		
+		return newCompliance;
 		// Saving the score values for the specific date of compliance
-		patientComplianceRepository.save(newCompliance);
+		//patientComplianceRepository.save(newCompliance);
 	
 	}
 		
@@ -1172,7 +1344,7 @@ public class AdherenceCalculationService {
 			{
 				for(int i = 0; i < adherenceResetList.size(); i++)
 				{
-					adherenceResetForPatient(patientUser.getId(), patient.getId().toString(), adherenceResetList.get(i).getResetStartDate(), DEFAULT_COMPLIANCE_SCORE);							
+					adherenceResetForPatient(patientUser.getId(), patient.getId().toString(), adherenceResetList.get(i).getResetStartDate(), DEFAULT_COMPLIANCE_SCORE, 1);
 				}
 			}
 		}

@@ -4,6 +4,7 @@ package com.hillrom.vest.web.rest;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,7 +83,8 @@ public class AnnouncementsResource {
             @RequestParam(value = "asc",required = false) Boolean isAscending,
             @RequestParam(value = "userType", required = false) String userType,
             @RequestParam(value = "userTypeId", required = false) Long userId,
-            @RequestParam(value = "patientId", required = false) String patientId){
+            @RequestParam(value = "patientId", required = false) String patientId,
+            @RequestParam(value = "filterClinicId", required = false) String filterClinicId){
 
 	   	 Map<String,Boolean> sortOrder = new HashMap<>();
 	   	 if(sortBy != null  && !sortBy.equals("")) {
@@ -98,10 +100,10 @@ public class AnnouncementsResource {
 				announcementsList = announcementsService.findAllAnnouncements(PaginationUtil.generatePageRequest(offset, limit, sortOrder));
 			}
 			if(userType.equalsIgnoreCase(AuthoritiesConstants.CLINIC_ADMIN) || userType.equalsIgnoreCase(AuthoritiesConstants.HCP)){
-				announcementsList = announcementsService.findVisibleAnnouncementsById(userType,userId,null,PaginationUtil.generatePageRequest(offset, limit, sortOrder),sortOrder);	
+				announcementsList = announcementsService.findVisibleAnnouncementsById(userType,userId,null,filterClinicId,PaginationUtil.generatePageRequest(offset, limit, sortOrder),sortOrder);	
 			}
 			if(userType.equalsIgnoreCase(AuthoritiesConstants.PATIENT)){
-				announcementsList = announcementsService.findVisibleAnnouncementsById(userType,null,patientId,PaginationUtil.generatePageRequest(offset, limit, sortOrder),sortOrder);	
+				announcementsList = announcementsService.findVisibleAnnouncementsById(userType,null,patientId,null,PaginationUtil.generatePageRequest(offset, limit, sortOrder),sortOrder);	
 			}
 			
 			 jsonObject.put("Announcement_List", announcementsList);
@@ -115,7 +117,6 @@ public class AnnouncementsResource {
 		}		
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
-
 	
 	/**
      * GET  /announcement -> get announcement based on id
@@ -227,9 +228,13 @@ public class AnnouncementsResource {
 	    		 return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
 	    		 
 	    }
+	    catch (FileNotFoundException ex) {
+	    	jsonObject.put("ERROR","The system cannot find the path/Directory specified");
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	    }
 	    catch (Exception ex) {
 	    	jsonObject.put("ERROR", ex.getMessage());
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	    	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	    }
 	  
 	  } 

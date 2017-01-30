@@ -171,7 +171,8 @@ public class PatientVestDeviceDataResource {
 				log.debug("Last Record Processed : "+ j );
 			}
 
-
+			bwTherapy.close();
+			bwDevice.close();
 			
 			JSONObject result = new JSONObject();
 			//result.put("RESULT", chargerJsonData.get("RESULT") + " - " + chargerJsonData.get("ERROR"));
@@ -304,9 +305,11 @@ public class PatientVestDeviceDataResource {
 	public BufferedWriter createTherapyfile(String fileName) {
 
 		BufferedWriter bw = null;
+		int bufferSize = 29 * 1024;
 		
 		try {
-				bw = new BufferedWriter(new FileWriter(fileName)) ;
+				//bw = new BufferedWriter(new FileWriter(fileName)) ;
+				  bw = new BufferedWriter(new FileWriter(fileName),bufferSize);
 				
 				bw.append("devSN,Wifi,devVer,session_index,start_time,end_time,start_battery_level,end_battery_level,number_of_pods,number_of_events,hmr_seconds\n");
 
@@ -325,9 +328,11 @@ public class PatientVestDeviceDataResource {
 	public BufferedWriter createDevicefile(String fileName) {
 
 		BufferedWriter bw = null;
+		int bufferSize = 37 * 1024;
 		
 		try {
-				bw = new BufferedWriter(new FileWriter(fileName)) ;
+				//bw = new BufferedWriter(new FileWriter(fileName)) ;
+				bw = new BufferedWriter(new FileWriter(fileName),bufferSize);
 				
 				bw.append("event_timestamp,event_code,frequency,intensity,duration\n");
 

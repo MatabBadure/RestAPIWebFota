@@ -311,7 +311,7 @@ public class PatientVestDeviceDataResource {
 				//bw = new BufferedWriter(new FileWriter(fileName)) ;
 				  bw = new BufferedWriter(new FileWriter(fileName),bufferSize);
 				
-				bw.append("devSN,Wifi,devVer,session_index,start_time,end_time,start_battery_level,end_battery_level,number_of_pods,number_of_events,hmr_seconds\n");
+				bw.append("devSN,Wifi,devVer,session_index,start_time,end_time,start_battery_level,end_battery_level,number_of_events,number_of_pods,hmr_seconds\n");
 
 				return bw;
 

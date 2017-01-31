@@ -328,7 +328,7 @@ public class ChargerDataService {
 		        	
 		        	sout = sout + (appendZero((start_time[k]  & 0xFF)+"")) + " ";
 		        }
-		        log.debug("start_time : "+ sout );
+		        //log.debug("start_time : "+ sout );
 		        sout = convertToDateTime(sout);
 		        log.debug("start_time : "+ sout );
 		        writetofile(sout+",",bwTherapy);
@@ -338,7 +338,7 @@ public class ChargerDataService {
 		        for(int k=0;k<end_time.length;k++){
 		        	sout = sout + (appendZero((end_time[k]  & 0xFF)+"")) + " ";
 		        }
-		        log.debug("end_time : "+ sout );
+		        //log.debug("end_time : "+ sout );
 		        sout = convertToDateTime(sout);
 		        log.debug("end_time : "+ sout );
 		        writetofile(sout+",",bwTherapy);
@@ -392,8 +392,10 @@ public class ChargerDataService {
 			        byte[] event_timestamp  = Arrays.copyOfRange(deviceDataArray, i + EVENT_TIMESTAMP_LOC-1, (i+EVENT_TIMESTAMP_LOC-1) + EVENT_TIMESTAMP_LEN);
 			        sout = "";
 			        for(int k=0;k<event_timestamp.length;k++){
-			        	sout = sout + (event_timestamp[k]  & 0xFF) + " ";
+			        	sout = sout + (appendZero((event_timestamp[k]  & 0xFF)+"")) + " ";
 			        }
+			        //log.debug("event_timestamp : "+ sout );
+			        sout = convertToTimestamp(sout);
 			        log.debug("event_timestamp : "+ sout );
 			        writetofile(sout+",",bwDevice);
 			        
@@ -466,7 +468,9 @@ public class ChargerDataService {
 
 		        
 		        log.debug("Value of devSN : "+ devSN );
-		        writetofile(devSN+",",bwTherapy);
+		        String devSNString = new String(devSNArray);
+		        log.debug("devSNString : "+ devSNString );
+		        writetofile(devSNString+",",bwTherapy);
 		        return devSNArray;
 		        
 			}
@@ -489,16 +493,18 @@ public class ChargerDataService {
 		        
 		        byte[] devWifiArray = new byte[end];
 		        int j=0;
-		        sout = "";
+		        sout = "";String hexWifi = "";
 		        for(int i=start;i<end;i++) {
 		        	devWifiArray[j++] = b[i];
 		        	int val = b[i] & 0xFF;
 		        	devWifi = devWifi + val + " ";
+		        	hexWifi = hexWifi + java.lang.Integer.toHexString(val);
 		        }
 
 		        
 		        log.debug("Value of devWifi : "+ devWifi );
-		        writetofile(devWifi+",",bwTherapy);
+		        log.debug("Value of devWifi Hex : "+ hexWifi );
+		        writetofile(hexWifi+",",bwTherapy);
 		        return devWifiArray;
 		        
 			}
@@ -521,16 +527,18 @@ public class ChargerDataService {
 		        
 		        byte[] devVerArray = new byte[end];
 		        int j=0;
-		        sout = "";
+		        sout = ""; String hexVer = "";
 		        for(int i=start;i<end;i++) {
 		        	devVerArray[j++] = b[i];
 		        	int val = b[i] & 0xFF;
 		        	devVer = devVer + val + " ";
+		        	hexVer = hexVer + java.lang.Integer.toHexString(val);
 		        }
 
 		        
 		        log.debug("Value of devVer : "+ devVer );
-		        writetofile(devVer+",",bwTherapy);
+		        log.debug("Value of devVer Hex : "+ hexVer );
+		        writetofile(hexVer+",",bwTherapy);
 		        return devVerArray;
 		        
 			}
@@ -648,7 +656,11 @@ public class ChargerDataService {
 	    		return val;
 	    	}
 	
-	
+	    	public String convertToTimestamp(String val){
+	    		val = val.replaceFirst(" ", ":");
+	    		val = val.replaceFirst(" ", ":");
+	    		return val;
+	    	}	
 
 	
 }

@@ -325,16 +325,21 @@ public class ChargerDataService {
 		        byte[] start_time  = Arrays.copyOfRange(deviceDataArray, START_TIME_LOC, START_TIME_LOC + START_TIME_LEN);
 		        sout = "";
 		        for(int k=0;k<start_time.length;k++){
-		        	sout = sout + (start_time[k]  & 0xFF) + " ";
+		        	
+		        	sout = sout + (appendZero((start_time[k]  & 0xFF)+"")) + " ";
 		        }
+		        log.debug("start_time : "+ sout );
+		        sout = convertToDateTime(sout);
 		        log.debug("start_time : "+ sout );
 		        writetofile(sout+",",bwTherapy);
 		        
 		        byte[] end_time  = Arrays.copyOfRange(deviceDataArray, END_TIME_LOC, END_TIME_LOC + END_TIME_LEN);        
 		        sout = "";
 		        for(int k=0;k<end_time.length;k++){
-		        	sout = sout + (end_time[k]  & 0xFF) + " ";
+		        	sout = sout + (appendZero((end_time[k]  & 0xFF)+"")) + " ";
 		        }
+		        log.debug("end_time : "+ sout );
+		        sout = convertToDateTime(sout);
 		        log.debug("end_time : "+ sout );
 		        writetofile(sout+",",bwTherapy);
 		        
@@ -623,6 +628,24 @@ public class ChargerDataService {
 
 	    		}
 
+	    	}
+	    	
+	    	public String appendZero(String val){
+	    		if(val.length() <= 1){
+	    			return "0"+val;
+	    		}else{
+	    			return val;
+	    		}
+	    	}
+	    	
+	    	public String convertToDateTime(String val){
+	    		val = val.replaceFirst(" ", "-");
+	    		val = val.replaceFirst(" ", "-");
+	    		val = val.replaceFirst(" ", "t");
+	    		val = val.replaceFirst(" ", ":");
+	    		val = val.replaceFirst(" ", ":");
+	    		val = val.replaceFirst("t", " ");
+	    		return val;
 	    	}
 	
 	

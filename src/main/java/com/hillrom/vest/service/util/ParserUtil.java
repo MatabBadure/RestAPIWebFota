@@ -139,15 +139,6 @@ public class ParserUtil {
 		return value;
 	}
 	
-	public static String getValueFromQclJsonDataMonarch(JSONObject qclJsonDataMonarch,String key){
-		String value = "";
-		String valuePropertiesNew = (String) qclJsonDataMonarch.get(key);
-		if(Objects.nonNull(valuePropertiesNew)){
-			return valuePropertiesNew;
-		}
-		return value;
-	}
-	
 	public static int[] convertToIntArray(byte[] input)
 	{
 	    int[] ret = new int[input.length];

@@ -2,16 +2,16 @@ server:
     port: 8080
 
 liquibase:
-    context: prod
+    context: uat
 
 spring:
     profiles:
-        active: prod
+        active: uat
     datasource:
         dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
-        url: jdbc:mysql://Indsugrc02v:3306/hillromvest_prod?zeroDateTimeBehavior=convertToNull
-        databaseName: 
-        serverName: 
+        url: jdbc:mysql://indoffshre02v.hillromvest.com:3306/hillromvest_prod?zeroDateTimeBehavior=convertToNull
+        databaseName:
+        serverName:
         username: root
         password: Hillrom123
         cachePrepStmts: true
@@ -41,12 +41,12 @@ spring:
     recaptcha:
         recaptchaPrivateKey: 6LcXjQkTAAAAACiA7rx7o7wlifQ7n3VQ_It-sncc
     notification:
-        hcpOrClinicAdminDashboardUrl: https://visiview.hill-rom.com
-        patientDashboardUrl: https://visiview.hill-rom.com
-        careGiverDashboardUrl: https://visiview.hill-rom.com
-        baseUrl: https://visiview.hill-rom.com
+        hcpOrClinicAdminDashboardUrl: http://indoffshre01v.hillromvest.com
+        patientDashboardUrl: http://indoffshre01v.hillromvest.com
+        careGiverDashboardUrl: http://indoffshre01v.hillromvest.com
+        baseUrl: http://indoffshre01v.hillromvest.com
         accountActivationReminderInterval: 12
     survey:
-        surveyreportemailids: Dana.Elzea@hill-rom.com,julie.ells@hill-rom.com,Megan.Nelson@hill-rom.com
+        surveyreportemailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com
     changePrescription:
-        changePrescriptionEmailids: mhrcaripatientrecords@hill-rom.com
+        changePrescriptionEmailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com

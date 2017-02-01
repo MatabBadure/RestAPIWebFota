@@ -16,27 +16,22 @@ import com.hillrom.vest.service.PatientVestDeviceService;
 public class PatientMonarchDeviceDataWriter implements ItemWriter<List<PatientVestDeviceDataMonarch>>{
 	
 	@Inject
-	private PatientMonarchDeviceDataRepository deviceDataRepository;
+	private PatientMonarchDeviceDataRepository deviceDataRepositoryMonarch;
 	
-	@Inject
-	private PatientVestDeviceService deviceService;
+	//@Inject
+	//private PatientVestDeviceService deviceService;
 	
 	@Override
-	public void write(List<? extends List<PatientVestDeviceDataMonarch>> vestDeviceData)
+	public void write(List<? extends List<PatientVestDeviceDataMonarch>> vestDeviceDataMonarch)
 			throws Exception {
-		if(vestDeviceData.size() > 0){
-			if(!vestDeviceData.get(0).isEmpty()){
-				User patientUser = vestDeviceData.get(0).get(0).getPatientUser();
-				PatientInfo patient = vestDeviceData.get(0).get(0).getPatient();
-				Double maxHMR = 0d;
-				for(List<PatientVestDeviceDataMonarch> devData : vestDeviceData){
-					deviceDataRepository.save(devData);
-					for(PatientVestDeviceDataMonarch deviceEvent : devData){
-						if(maxHMR < deviceEvent.getHmr())
-							maxHMR = deviceEvent.getHmr();
-					}
+		if(vestDeviceDataMonarch.size() > 0){
+			if(!vestDeviceDataMonarch.get(0).isEmpty()){
+				//User patientUser = vestDeviceData.get(0).get(0).getPatientUser();
+				//PatientInfo patient = vestDeviceData.get(0).get(0).getPatient();
+				for(List<PatientVestDeviceDataMonarch> devDataMonarch : vestDeviceDataMonarch){
+					deviceDataRepositoryMonarch.save(devDataMonarch);
 				}
-				deviceService.updateHMR(patientUser, patient);
+				//deviceService.updateHMR(patientUser, patient);
 			}
 		}
 	}

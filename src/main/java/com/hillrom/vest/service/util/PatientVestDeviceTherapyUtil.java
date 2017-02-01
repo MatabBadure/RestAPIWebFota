@@ -16,11 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientVestDeviceData;
-import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
-import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
 import com.hillrom.vest.domain.TherapySession;
-import com.hillrom.vest.domain.TherapySessionMonarch;
 import com.hillrom.vest.domain.User;
 
 public class PatientVestDeviceTherapyUtil {
@@ -65,12 +62,6 @@ public class PatientVestDeviceTherapyUtil {
 		therapySessions = groupEventsToPrepareTherapySession(deviceData,latestInActiveDeviceHistory);
 		return groupTherapySessionsByDay(therapySessions);
 	}
-	
-	public static List<TherapySessionMonarch> prepareTherapySessionFromDeviceDataMonarch(List<PatientVestDeviceDataMonarch> deviceData,PatientVestDeviceHistoryMonarch latestInActiveDeviceHistory) throws Exception{
-		List<TherapySessionMonarch> therapySessions = new LinkedList<>();
-		therapySessions = groupEventsToPrepareTherapySessionMonarch(deviceData,latestInActiveDeviceHistory);
-		return groupTherapySessionsByDayMonarch(therapySessions);
-	}
 
 	public static Map<String,Integer> getTherapyMetricsMap(
 			List<PatientVestDeviceData> deviceEventRecords) {
@@ -97,43 +88,9 @@ public class PatientVestDeviceTherapyUtil {
 		metricsMap.put(CAUGH_PAUSE_DURATION, caughPauseDuration);
 		return metricsMap;
 	}
-	
-	public static Map<String,Integer> getTherapyMetricsMapMonarch(
-			List<PatientVestDeviceDataMonarch> deviceEventRecords) {
-		Map<String,Integer> metricsMap = new HashMap<>();
-		int durationOfSession = 0, normalCoughPauses = 0, programmedCoughPauses = 0, caughPauseDuration = 0;
-		int durationForWeightedAvgCalc = getTotalDurationForWeightedAvgCalculationMonarch(deviceEventRecords);
-		float frequency = 0, pressure = 0;
-		for(int i = 0;i < deviceEventRecords.size(); i ++){
-			PatientVestDeviceDataMonarch deviceEventRecord = deviceEventRecords.get(i);
-			frequency += calculateWeightedAvg( durationForWeightedAvgCalc,deviceEventRecord.getDuration(),deviceEventRecord.getFrequency());
-			pressure += calculateWeightedAvg(durationForWeightedAvgCalc,deviceEventRecord.getDuration(),deviceEventRecord.getIntensity());
-			if(isProgrammedCoughPauseMonarch(deviceEventRecord))
-				++programmedCoughPauses;
-			if(isNormalCoughPauseMonarch(deviceEventRecord))
-				++normalCoughPauses;
-		}
-		durationOfSession = calculateDurationOfSessionMonarch(deviceEventRecords);
-		caughPauseDuration = getCoughPauseDurationMonarch(deviceEventRecords,durationOfSession);
-		metricsMap.put(FREQUENCY, Math.round(frequency));
-		metricsMap.put(PRESSURE, Math.round(pressure));
-		metricsMap.put(DURATION, durationOfSession);
-		metricsMap.put(NORMAL_COUGH_PAUSES, normalCoughPauses);
-		metricsMap.put(PROGRAMMED_COUGH_PAUSES, programmedCoughPauses);
-		metricsMap.put(CAUGH_PAUSE_DURATION, caughPauseDuration);
-		return metricsMap;
-	}
 
 	private static int getCoughPauseDuration(List<PatientVestDeviceData> deviceEventRecords,int durationOfSession) {
 		PatientVestDeviceData endOfSessionEvent = deviceEventRecords.get(deviceEventRecords.size()-1);
-		long endTimestamp = endOfSessionEvent.getTimestamp();
-		long startTimestamp = deviceEventRecords.get(0).getTimestamp();
-		int totalDuration = (int) Math.round((endTimestamp-startTimestamp)/MILLI_SECONDS_PER_MINUTE);
-		return (totalDuration - durationOfSession) > 0 ? (totalDuration - durationOfSession) : 0;
-	}
-	
-	private static int getCoughPauseDurationMonarch(List<PatientVestDeviceDataMonarch> deviceEventRecords,int durationOfSession) {
-		PatientVestDeviceDataMonarch endOfSessionEvent = deviceEventRecords.get(deviceEventRecords.size()-1);
 		long endTimestamp = endOfSessionEvent.getTimestamp();
 		long startTimestamp = deviceEventRecords.get(0).getTimestamp();
 		int totalDuration = (int) Math.round((endTimestamp-startTimestamp)/MILLI_SECONDS_PER_MINUTE);
@@ -160,28 +117,6 @@ public class PatientVestDeviceTherapyUtil {
 			return hmrDiff;
 		
 	}
-	
-	private static int calculateDurationOfSessionMonarch(
-			List<PatientVestDeviceDataMonarch> deviceEventRecords) {
-		// HMR Difference
-		double endHmr = deviceEventRecords.get(deviceEventRecords.size()-1).getHmr();
-		double startHmr = deviceEventRecords.get(0).getHmr();
-		int hmrDiff  = (int)Math.round((endHmr - startHmr)/SECONDS_PER_MINUTE);
-		
-		// Duration of the device was run
-		PatientVestDeviceDataMonarch endOfSessionEvent = deviceEventRecords.get(deviceEventRecords.size()-1);
-		long endTimestamp = endOfSessionEvent.getTimestamp();
-		long startTimestamp = deviceEventRecords.get(0).getTimestamp();
-		int totalDuration = (int) Math.round((endTimestamp-startTimestamp)/MILLI_SECONDS_PER_MINUTE);
-		
-		// HILL-1384 : since it is observed , hmr being corrupted
-		if(hmrDiff > totalDuration)
-			return totalDuration;
-		else
-			return hmrDiff;
-		
-	}
-	
 
 	/**
 	 *  Return totalDuration except the incomplete event
@@ -199,18 +134,6 @@ public class PatientVestDeviceTherapyUtil {
 		}
 		return totalDuration;
 	}
-	
-	private static Integer getTotalDurationForWeightedAvgCalculationMonarch(
-			List<PatientVestDeviceDataMonarch> deviceEventRecords) {
-		int totalDuration = 0;
-		for(int i = 0;i <deviceEventRecords.size();i++ ){
-			PatientVestDeviceDataMonarch eventRecord = deviceEventRecords.get(i);
-			if(!isInCompleteEventMonarch(eventRecord)){
-				totalDuration += eventRecord.getDuration();
-			}
-		}
-		return totalDuration;
-	}
 
 	private static boolean isNormalCoughPause(
 			PatientVestDeviceData deviceEventRecord) {
@@ -219,23 +142,10 @@ public class PatientVestDeviceTherapyUtil {
 				deviceEventRecord.getEventId().startsWith(EVENT_CODE_PROGRAM_PAUSED) ||
 				deviceEventRecord.getEventId().startsWith(EVENT_CODE_RAMP_REACHED_PAUSED);
 	}
-	
-	private static boolean isNormalCoughPauseMonarch(
-			PatientVestDeviceDataMonarch deviceEventRecord) {
-		return deviceEventRecord.getEventCode().startsWith(EVENT_CODE_NORMAL_PAUSED) ||
-				deviceEventRecord.getEventCode().startsWith(EVENT_CODE_RAMPING_PAUSED) || 
-				deviceEventRecord.getEventCode().startsWith(EVENT_CODE_PROGRAM_PAUSED) ||
-				deviceEventRecord.getEventCode().startsWith(EVENT_CODE_RAMP_REACHED_PAUSED);
-	}
 
 	private static boolean isProgrammedCoughPause(
 			PatientVestDeviceData deviceEventRecord) {
 		return deviceEventRecord.getEventId().startsWith(EVENT_CODE_COUGH_PAUSE);
-	}
-	
-	private static boolean isProgrammedCoughPauseMonarch(
-			PatientVestDeviceDataMonarch deviceEventRecord) {
-		return deviceEventRecord.getEventCode().startsWith(EVENT_CODE_COUGH_PAUSE);
 	}
 
 	private static boolean isInCompleteEvent(
@@ -243,17 +153,6 @@ public class PatientVestDeviceTherapyUtil {
 		if(nextEvent.getEventId().startsWith(EVENT_CODE_NORMAL_INCOMPLETE) || 
 				   nextEvent.getEventId().startsWith(EVENT_CODE_PROGRAM_INCOMPLETE) ||
 				   nextEvent.getEventId().startsWith(EVENT_CODE_RAMP_INCOMPLETE)){
-			return true;
-		}else{
-			return false;
-		}
-	}
-	
-	private static boolean isInCompleteEventMonarch(
-			PatientVestDeviceDataMonarch nextEvent) {
-		if(nextEvent.getEventCode().startsWith(EVENT_CODE_NORMAL_INCOMPLETE) || 
-				   nextEvent.getEventCode().startsWith(EVENT_CODE_PROGRAM_INCOMPLETE) ||
-				   nextEvent.getEventCode().startsWith(EVENT_CODE_RAMP_INCOMPLETE)){
 			return true;
 		}else{
 			return false;
@@ -315,75 +214,9 @@ public class PatientVestDeviceTherapyUtil {
 		}
 		return therapySessions;
 	}
-	
-	
-	public static List<TherapySessionMonarch> groupEventsToPrepareTherapySessionMonarch(
-			List<PatientVestDeviceDataMonarch> deviceData,PatientVestDeviceHistoryMonarch latestInActiveDeviceHistory) throws Exception{
-		List<TherapySessionMonarch> therapySessions = new LinkedList<TherapySessionMonarch>();
-		// This List will hold un-finished session events , will be discarded to get delta on next transmission 
-		List<PatientVestDeviceDataMonarch> eventsToBeDiscarded = new LinkedList<>();
-		for(int i = 0;i < deviceData.size() ; i++){
-			PatientVestDeviceDataMonarch vestDeviceData = deviceData.get(i);
-			String eventCode = vestDeviceData.getEventCode().split(EVENT_CODE_DELIMITER)[0];
-			List<PatientVestDeviceDataMonarch> groupEntries = new LinkedList<>();
-			if(isStartEventForTherapySession(eventCode)
-			   ){
-				groupEntries.add(vestDeviceData);
-				for(int j = i+1; j < deviceData.size() ; j++){
-					PatientVestDeviceDataMonarch nextEventEntry = deviceData.get(j);
-					String nextEventCode = nextEventEntry.getEventCode().split(EVENT_CODE_DELIMITER)[0];
-						// Group entry if the nextEvent is not a start event
-						if(!isStartEventForTherapySession(nextEventCode))
-							groupEntries.add(nextEventEntry);
-					if(isCompleteOrInCompleteEventForTherapySession(nextEventCode)
-						|| isStartEventForTherapySession(nextEventCode)	){
-						// subsequent start events indicate therapy is incomplete due to unexpected reason
-						if(isStartEventForTherapySession(nextEventCode)){
-							PatientVestDeviceDataMonarch inCompleteEvent = (PatientVestDeviceDataMonarch) groupEntries.get(groupEntries.size()-1).clone();
-							if(groupEntries.get(0).getEventCode().contains(SESSION_TYPE_PROGRAM))
-								inCompleteEvent.setEventCode(getEventStringByEventCode(Integer.parseInt(EVENT_CODE_PROGRAM_INCOMPLETE)));
-							else
-								inCompleteEvent.setEventCode(getEventStringByEventCode(Integer.parseInt(EVENT_CODE_NORMAL_INCOMPLETE)));
-							inCompleteEvent.setDuration(0);// DO NOT CHANGE: This is the indication, dummy event has been added for making session
-							inCompleteEvent.setFrequency(0);
-							inCompleteEvent.setIntensity(0);
-							groupEntries.add(inCompleteEvent);// Add dummy incomplete event to finish the session
-							deviceData.add(j, inCompleteEvent);
-						}
-						TherapySessionMonarch therapySession = assignTherapyMatricsMonarch(groupEntries);
-						applyGlobalHMRMonarch(therapySession,latestInActiveDeviceHistory);
-						therapySessions.add(therapySession);
-						i=j; // to skip the events iterated, shouldn't be removed in any case
-						break;
-					}else if(j == deviceData.size()-1){
-						//will be discarded to get delta on next transmission
-						log.debug("Discarding the events to make session with delta on next transmission");
-						log.debug("Events List"+groupEntries);
-						eventsToBeDiscarded.addAll(groupEntries);
-						i=j; // to skip the events iterated, shouldn't be removed in any case
-						break;
-					}
-				}
-			}
-		}
-		// Discarding these events to make session from delta
-		if(eventsToBeDiscarded.size() > 0){
-			deviceData.removeAll(eventsToBeDiscarded);
-		}
-		return therapySessions;
-	}
 
 	private static void applyGlobalHMR(TherapySession therapySession,
 			PatientVestDeviceHistory latestInActiveDeviceHistory)throws Exception {
-		if( Objects.nonNull(latestInActiveDeviceHistory) && (therapySession.getHmr() < latestInActiveDeviceHistory.getHmr())){
-			if(!(latestInActiveDeviceHistory.getSerialNumber().equalsIgnoreCase(therapySession.getSerialNumber()))){
-				therapySession.setHmr(therapySession.getHmr()+latestInActiveDeviceHistory.getHmr());
-			}
-		}
-	}
-	
-	private static void applyGlobalHMRMonarch(TherapySessionMonarch therapySession,
-			PatientVestDeviceHistoryMonarch latestInActiveDeviceHistory)throws Exception {
 		if( Objects.nonNull(latestInActiveDeviceHistory) && (therapySession.getHmr() < latestInActiveDeviceHistory.getHmr())){
 			if(!(latestInActiveDeviceHistory.getSerialNumber().equalsIgnoreCase(therapySession.getSerialNumber()))){
 				therapySession.setHmr(therapySession.getHmr()+latestInActiveDeviceHistory.getHmr());
@@ -438,37 +271,6 @@ public class PatientVestDeviceTherapyUtil {
 		return therapySession;
 	}
 	
-	public static TherapySessionMonarch assignTherapyMatricsMonarch(
-			List<PatientVestDeviceDataMonarch> groupEntries) {
-		Long timestamp = groupEntries.get(0).getTimestamp();
-		User patientUser = groupEntries.get(0).getPatientUser();
-		PatientInfo patient = groupEntries.get(0).getPatient();
-		Map<String,Integer> metricsMap = getTherapyMetricsMapMonarch(groupEntries);
-		TherapySessionMonarch therapySession = new TherapySessionMonarch();
-		therapySession.setSerialNumber(groupEntries.get(0).getSerialNumber());
-		//therapySession.setBluetoothId(groupEntries.get(0).getBluetoothId());
-		therapySession.setDate(LocalDate.fromDateFields(new Date(timestamp)));
-		therapySession.setFrequency(metricsMap.get(FREQUENCY));
-		therapySession.setPressure(metricsMap.get(PRESSURE));
-		therapySession.setDurationInMinutes(metricsMap.get(DURATION));
-		therapySession.setNormalCaughPauses(metricsMap.get(NORMAL_COUGH_PAUSES));
-		therapySession.setProgrammedCaughPauses(metricsMap.get(PROGRAMMED_COUGH_PAUSES));
-		therapySession.setCaughPauseDuration(metricsMap.get(CAUGH_PAUSE_DURATION));
-		
-		int size = groupEntries.size();
-		therapySession.setHmr(groupEntries.get(size-1).getHmr());
-		String sessionType = SESSION_TYPE_NORMAL;
-		if(groupEntries.get(0).getEventCode().contains(SESSION_TYPE_PROGRAM))
-			sessionType = SESSION_TYPE_PROGRAM;
-		therapySession.setSessionType(sessionType);
-		therapySession.setStartTime(new DateTime(groupEntries.get(0).getTimestamp()));
-		therapySession.setEndTime(new DateTime(groupEntries.get(size-1).getTimestamp()));
-		therapySession.setPatientInfo(patient);
-		therapySession.setPatientUser(patientUser);
-		
-		return therapySession;
-	}
-	
 	public static List<TherapySession> groupTherapySessionsByDay(List<TherapySession> therapySessions)
 			throws Exception{
 		List<TherapySession> updatedTherapySessions = new LinkedList<>();
@@ -479,24 +281,6 @@ public class PatientVestDeviceTherapyUtil {
 			List<TherapySession> groupedTherapySessions = groupByTherapyDate.get(keySetItr.next());
 			for(int i =0 ; i<groupedTherapySessions.size();i++){
 				TherapySession therapySession = groupedTherapySessions.get(i);
-				therapySession.setSessionNo(i+1);
-				updatedTherapySessions.add(therapySession);
-				
-			}
-		}
-		return updatedTherapySessions;
-	}
-	
-	public static List<TherapySessionMonarch> groupTherapySessionsByDayMonarch(List<TherapySessionMonarch> therapySessions)
-			throws Exception{
-		List<TherapySessionMonarch> updatedTherapySessions = new LinkedList<>();
-		Map<LocalDate,List<TherapySessionMonarch>> groupByTherapyDate = therapySessions.stream()
-		        .collect(Collectors.groupingBy(TherapySessionMonarch::getDate));
-		Iterator<LocalDate> keySetItr = groupByTherapyDate.keySet().iterator();
-		while(keySetItr.hasNext()){
-			List<TherapySessionMonarch> groupedTherapySessions = groupByTherapyDate.get(keySetItr.next());
-			for(int i =0 ; i<groupedTherapySessions.size();i++){
-				TherapySessionMonarch therapySession = groupedTherapySessions.get(i);
 				therapySession.setSessionNo(i+1);
 				updatedTherapySessions.add(therapySession);
 				

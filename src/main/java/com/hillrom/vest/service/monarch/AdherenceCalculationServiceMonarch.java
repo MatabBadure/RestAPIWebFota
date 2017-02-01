@@ -104,7 +104,7 @@ public class AdherenceCalculationServiceMonarch{
 	private static final String WEIGHTED_AVG_FREQUENCY = "weightedAvgFrequency";
 
 	@Inject
-	private PatientProtocolMonarchService protocolService;
+	private PatientProtocolMonarchService protocolMonarchService;
 	
 	@Inject
 	private TherapySessionMonarchRepository therapySessionMonarchRepository;
@@ -119,13 +119,13 @@ public class AdherenceCalculationServiceMonarch{
 	private MailService mailService;
 	
 	@Inject
-	private NotificationMonarchService notificationService;
+	private NotificationMonarchService notificationMonarchService;
 	
 	@Inject
-	private PatientComplianceMonarchService complianceService;
+	private PatientComplianceMonarchService complianceMonarchService;
 	
 	@Inject
-	private PatientNoEventMonarchService noEventService;
+	private PatientNoEventMonarchService noEventMonarchService;
 	
 	@Inject
 	private ClinicMonarchRepository clinicMonarchRepository;
@@ -152,7 +152,7 @@ public class AdherenceCalculationServiceMonarch{
 			Long patientUserId) throws Exception{
 		List<Long> patientUserIds = new LinkedList<>();
 		patientUserIds.add(patientUserId);
-		Map<Long,ProtocolConstantsMonarch> userIdProtolConstantsMap = protocolService.getProtocolByPatientUserIds(patientUserIds);
+		Map<Long,ProtocolConstantsMonarch> userIdProtolConstantsMap = protocolMonarchService.getProtocolByPatientUserIds(patientUserIds);
 		return userIdProtolConstantsMap.get(patientUserId);
 	}
 
@@ -228,7 +228,7 @@ public class AdherenceCalculationServiceMonarch{
 			Map<Long,ProtocolConstantsMonarch> userProtocolConstantsMap = new HashMap<>();
 			Map<Long,PatientComplianceMonarch> complianceMap = new HashMap<>();
 			Map<Long,NotificationMonarch> notificationMap = new HashMap<>();
-			Map<Long,PatientNoEventMonarch> userIdNoEventMap = noEventService.findAllGroupByPatientUserId();
+			Map<Long,PatientNoEventMonarch> userIdNoEventMap = noEventMonarchService.findAllGroupByPatientUserId();
 			
 			for(PatientComplianceMonarch compliance : mstPatientComplianceList){
 				Long userId = compliance.getPatientUser().getId();
@@ -285,7 +285,7 @@ public class AdherenceCalculationServiceMonarch{
 				}
 			}
 			
-			userProtocolConstantsMap = protocolService.getProtocolByPatientUserIds(new LinkedList<>(hmrNonComplianceMap.keySet()));
+			userProtocolConstantsMap = protocolMonarchService.getProtocolByPatientUserIds(new LinkedList<>(hmrNonComplianceMap.keySet()));
 			
 
 			calculateHMRComplianceForMST(today, hmrNonComplianceMap,
@@ -315,7 +315,7 @@ public class AdherenceCalculationServiceMonarch{
 			List<User> userList = clinicPatientService.getUserListForClinic(clinicId);
 			List<Long> userIdList = clinicPatientService.getUserIdListFromUserList(userList);
 			
-			Map<Long,PatientNoEventMonarch> userIdNoEventMap = noEventService.findAllByPatientUserId(userIdList);
+			Map<Long,PatientNoEventMonarch> userIdNoEventMap = noEventMonarchService.findAllByPatientUserId(userIdList);
 			
 			if(userList.size()>0){
 				for(User user : userList){
@@ -411,7 +411,7 @@ public class AdherenceCalculationServiceMonarch{
 			List<PatientComplianceMonarch> complianceListToStore = new LinkedList<>();
 			
 			// Getting the protocol constants for the user
-			ProtocolConstantsMonarch userProtocolConstant = protocolService.getProtocolForPatientUserId(userId);
+			ProtocolConstantsMonarch userProtocolConstant = protocolMonarchService.getProtocolForPatientUserId(userId);
 			
 			// Getting all the sessions of user from the repository 
 			List<TherapySessionMonarch> therapySessionData = therapySessionMonarchRepository.findByPatientUserId(userId);
@@ -431,7 +431,7 @@ public class AdherenceCalculationServiceMonarch{
 				User patientUser = currentCompliance.getPatientUser();
 				int initialPrevScoreFor1Day = 0;
 				
-				NotificationMonarch existingNotificationofTheDay = notificationService.getNotificationForDay(userNotifications, currentCompliance.getDate());
+				NotificationMonarch existingNotificationofTheDay = notificationMonarchService.getNotificationForDay(userNotifications, currentCompliance.getDate());
 				
 				if( ( adherenceStartDate.isBefore(currentCompliance.getDate()) || adherenceStartDate.equals(currentCompliance.getDate())) &&
 						DateUtil.getDaysCountBetweenLocalDates(adherenceStartDate, currentCompliance.getDate()) < (adherenceSettingDay-1) && 
@@ -440,7 +440,7 @@ public class AdherenceCalculationServiceMonarch{
 					// Check whether the adherence start days is the compliance date
 					if(adherenceStartDate.equals(currentCompliance.getDate())){
 						if(resetFlag == 1){
-							notificationService.createOrUpdateNotification(patientUser, patient, userId,
+							notificationMonarchService.createOrUpdateNotification(patientUser, patient, userId,
 																		currentCompliance.getDate(), ADHERENCE_SCORE_RESET, false, existingNotificationofTheDay);
 						}else{
 							if(Objects.nonNull(existingNotificationofTheDay))
@@ -510,7 +510,7 @@ public class AdherenceCalculationServiceMonarch{
 					}
 				}
 			}
-			complianceService.saveAll(complianceListToStore);
+			complianceMonarchService.saveAll(complianceListToStore);
 		}catch(Exception ex){
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter( writer );
@@ -555,9 +555,9 @@ public class AdherenceCalculationServiceMonarch{
 	// Create or Update Adherence Score on Missed Therapy day
 	private void updateComplianceForMST(LocalDate today,
 			Map<Long, PatientComplianceMonarch> complianceMap) {
-		Map<Long,List<PatientComplianceMonarch>> existingCompliances = complianceService.getPatientComplainceMapByPatientUserId(new LinkedList<>(complianceMap.keySet()),today,today);
+		Map<Long,List<PatientComplianceMonarch>> existingCompliances = complianceMonarchService.getPatientComplainceMapByPatientUserId(new LinkedList<>(complianceMap.keySet()),today,today);
 		if(existingCompliances.isEmpty()){
-			complianceService.saveAll(complianceMap.values());
+			complianceMonarchService.saveAll(complianceMap.values());
 		}else{
 			for(Long puId : existingCompliances.keySet()){
 				List<PatientComplianceMonarch> complianceForDay = existingCompliances.get(puId);
@@ -574,16 +574,16 @@ public class AdherenceCalculationServiceMonarch{
 					complianceMap.put(puId, existingCompliance);
 				} 
 			}
-			complianceService.saveAll(complianceMap.values());
+			complianceMonarchService.saveAll(complianceMap.values());
 		}
 	}
 
 	// Create or Update notifications on Missed Therapy
 	private void updateNotificationsOnMST(LocalDate today,
 			Map<Long, NotificationMonarch> notificationMap) {
-		Map<Long,List<NotificationMonarch>> existingNotifications = notificationService.getNotificationMapByPatientIdsAndDate(new LinkedList<>(notificationMap.keySet()), today, today);
+		Map<Long,List<NotificationMonarch>> existingNotifications = notificationMonarchService.getNotificationMapByPatientIdsAndDate(new LinkedList<>(notificationMap.keySet()), today, today);
 		if(existingNotifications.isEmpty()){
-			notificationService.saveAll(notificationMap.values());
+			notificationMonarchService.saveAll(notificationMap.values());
 		}else{
 			for(Long puId : existingNotifications.keySet()){
 				List<NotificationMonarch> notificationsforDay = existingNotifications.get(puId);
@@ -594,7 +594,7 @@ public class AdherenceCalculationServiceMonarch{
 					notificationMap.put(puId, existingNotification);
 				} 
 			}
-			notificationService.saveAll(notificationMap.values());
+			notificationMonarchService.saveAll(notificationMap.values());
 		}
 	}
 
@@ -737,7 +737,7 @@ public class AdherenceCalculationServiceMonarch{
 		}			
 		
 		// Added the existingNotificationofTheDay param for passing the notification object for the current date
-		notificationService.createOrUpdateNotification(patientUser, patient, userId,
+		notificationMonarchService.createOrUpdateNotification(patientUser, patient, userId,
 				complianceDate, notification_type, false, existingNotificationofTheDay);
 		
 		// Setting the new score with respect to the compliance deduction
@@ -764,7 +764,7 @@ public class AdherenceCalculationServiceMonarch{
 				
 		// existingNotificationofTheDay object of Notification is sent to avoid repository call
 		// userNotifications list object is sent to the method for getting the current day object
-		notificationService.createOrUpdateNotification(patientUser, patient, userId,
+		notificationMonarchService.createOrUpdateNotification(patientUser, patient, userId,
 				complianceDate, (initialPrevScoreFor1Day == 0 ? MISSED_THERAPY : ADHERENCE_SCORE_RESET) , false, existingNotificationofTheDay);
 		
 		// Commenting the repository call for previous day compliance by passing prevCompliance in the parameter
@@ -1208,7 +1208,7 @@ public class AdherenceCalculationServiceMonarch{
 		// Save or update all compliance
 		List<PatientComplianceMonarch> compliances = new LinkedList<>(existingComplianceMap.values());
 		Long patientUserId = compliances.get(0).getPatientUser().getId();
-		SortedMap<LocalDate, PatientComplianceMonarch>  complainceMapFromDB = complianceService.getPatientComplainceMapByPatientUserId(patientUserId);
+		SortedMap<LocalDate, PatientComplianceMonarch>  complainceMapFromDB = complianceMonarchService.getPatientComplainceMapByPatientUserId(patientUserId);
 		for(LocalDate date: existingComplianceMap.keySet()){
 			//	complianceService.createOrUpdate(existingComplianceMap.get(date));
 			PatientComplianceMonarch existingCompliance = complainceMapFromDB.get(date);
@@ -1218,7 +1218,7 @@ public class AdherenceCalculationServiceMonarch{
 				existingComplianceMap.put(date,newCompliance);
 			}	
 		}
-		complianceService.saveAll(existingComplianceMap.values());
+		complianceMonarchService.saveAll(existingComplianceMap.values());
 	}
 
 	private void handleFirstTimeTransmit(
@@ -1229,7 +1229,7 @@ public class AdherenceCalculationServiceMonarch{
 			LocalDate currentTherapySessionDate,
 			LocalDate firstTransmittedDate, PatientInfo patient,
 			User patientUser, int totalDuration, int adherenceSettingDay) throws Exception{
-		noEventService.updatePatientFirstTransmittedDate(patientUser.getId(), currentTherapySessionDate);
+		noEventMonarchService.updatePatientFirstTransmittedDate(patientUser.getId(), currentTherapySessionDate);
 		PatientComplianceMonarch currentCompliance = new PatientComplianceMonarch(DEFAULT_COMPLIANCE_SCORE, currentTherapySessionDate,
 				patient, patientUser,totalDuration/adherenceSettingDay,true,false,0d);
 		existingComplianceMap.put(currentTherapySessionDate, currentCompliance);
@@ -1290,7 +1290,7 @@ public class AdherenceCalculationServiceMonarch{
 			
 			// First Transmission Date to be updated
 			if(firstTransmittedDate.isAfter(therapyDate)){
-				noEventService.updatePatientFirstTransmittedDate(patientUser.getId(),therapyDate);
+				noEventMonarchService.updatePatientFirstTransmittedDate(patientUser.getId(),therapyDate);
 				firstTransmittedDate = therapyDate;
 			}
 			
@@ -1518,7 +1518,7 @@ public class AdherenceCalculationServiceMonarch{
 			
 			latestCompliance.setHmrCompliant(isHMRCompliant);
 			// Delete existing notification if adherence to protocol
-			notificationService.deleteNotificationIfExists(patientUserId,
+			notificationMonarchService.deleteNotificationIfExists(patientUserId,
 					latestCompliance.getDate(), currentMissedTherapyCount,
 					isHMRCompliant, isSettingsDeviated, adherenceSettingDay);
 			
@@ -1532,7 +1532,7 @@ public class AdherenceCalculationServiceMonarch{
 		
 		// Patient did therapy but point has been deducted due to Protocol violation
 		if(StringUtils.isNotBlank(notificationType)){
-			notificationService.createOrUpdateNotification(patientUser, patient, patientUserId,
+			notificationMonarchService.createOrUpdateNotification(patientUser, patient, patientUserId,
 					latestCompliance.getDate(), notificationType,false);
 		}
 

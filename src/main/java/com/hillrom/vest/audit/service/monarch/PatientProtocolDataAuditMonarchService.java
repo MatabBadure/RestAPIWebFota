@@ -35,7 +35,7 @@ import com.hillrom.vest.web.rest.util.monarch.ProtocolDataMonarchVOBuilder;
 public class PatientProtocolDataAuditMonarchService extends AuditableService<PatientProtocolDataMonarch> {
 
 	@Inject
-	@Qualifier("patientProtocolDataAuditRepository")
+	@Qualifier("patientProtocolDataAuditMonarchRepository")
 	PatientProtocolDataAuditMonarchRepository protocolDataAuditMonarchRepository;
 	
 	

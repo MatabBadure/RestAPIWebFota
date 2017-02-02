@@ -86,7 +86,6 @@ import java.util.List;
 import net.minidev.json.JSONObject;
 
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -98,7 +97,7 @@ import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.domain.PatientVestDeviceRawLogMonarch;
 import com.hillrom.vest.domain.PingPongPing;
 import com.hillrom.vest.service.util.ParserUtil;
-import com.hillrom.vest.service.util.ParserUtilMonarch;
+import com.hillrom.vest.service.util.monarch.ParserUtilMonarch;
 
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.getEventStringByEventCode;
 import static com.hillrom.vest.config.VestDeviceRawLogOffsetConstants.INFO_PACKET_HEADER;

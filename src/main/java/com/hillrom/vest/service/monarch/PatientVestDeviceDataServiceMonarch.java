@@ -1,4 +1,4 @@
-package com.hillrom.vest.service;
+package com.hillrom.vest.service.monarch;
 
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CRC;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CRC_FIELD_NAME;
@@ -78,6 +78,7 @@ import com.hillrom.vest.domain.PingPongPing;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ChargerDataRepository;
 import com.hillrom.vest.repository.PingPongPingRepository;
+import com.hillrom.vest.service.MailService;
 import com.hillrom.vest.service.util.ParserUtil;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.PatientVestDeviceDataResource;

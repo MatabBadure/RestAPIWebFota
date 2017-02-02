@@ -39,22 +39,22 @@ import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.repository.AuthorityRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
-import com.hillrom.vest.repository.PatientMonarchDeviceDataRepository;
-import com.hillrom.vest.repository.PatientMonarchDeviceRawLogRepository;
-import com.hillrom.vest.repository.PatientMonarchDeviceRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
+import com.hillrom.vest.repository.monarch.PatientMonarchDeviceDataRepository;
+import com.hillrom.vest.repository.monarch.PatientMonarchDeviceRawLogRepository;
+import com.hillrom.vest.repository.monarch.PatientMonarchDeviceRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.DeviceLogParser;
 import com.hillrom.vest.service.PatientComplianceService;
-import com.hillrom.vest.service.PatientNoEventServiceMonarch;
 import com.hillrom.vest.service.TherapySessionService;
-import com.hillrom.vest.service.TherapySessionServiceMonarch;
+import com.hillrom.vest.service.monarch.PatientNoEventServiceMonarch;
+import com.hillrom.vest.service.monarch.TherapySessionServiceMonarch;
 import com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil;
-import com.hillrom.vest.service.util.PatientVestDeviceTherapyUtilMonarch;
+import com.hillrom.vest.service.util.monarch.PatientVestDeviceTherapyUtilMonarch;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 
 public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVestDeviceDataMonarch>> {

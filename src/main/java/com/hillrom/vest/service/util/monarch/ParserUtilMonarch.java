@@ -1,4 +1,4 @@
-package com.hillrom.vest.service.util;
+package com.hillrom.vest.service.util.monarch;
 
 import java.nio.charset.Charset;
 import java.sql.Timestamp;

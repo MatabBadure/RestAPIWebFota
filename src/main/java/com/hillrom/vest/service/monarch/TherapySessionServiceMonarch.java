@@ -1,4 +1,4 @@
-package com.hillrom.vest.service;
+package com.hillrom.vest.service.monarch;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +34,11 @@ import com.hillrom.vest.domain.TherapySessionMonarch;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.PatientNoEventsRepository;
-import com.hillrom.vest.repository.TherapySessionRepositoryMonarch;
+import com.hillrom.vest.repository.monarch.TherapySessionRepositoryMonarch;
+import com.hillrom.vest.service.AdherenceCalculationService;
+import com.hillrom.vest.service.NoteService;
+import com.hillrom.vest.service.PatientComplianceService;
+import com.hillrom.vest.service.PatientNoEventService;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;

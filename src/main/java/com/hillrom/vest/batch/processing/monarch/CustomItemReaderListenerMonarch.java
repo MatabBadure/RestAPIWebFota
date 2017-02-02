@@ -15,7 +15,7 @@ import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
 import com.hillrom.vest.domain.VestDeviceBadData;
 import com.hillrom.vest.domain.VestDeviceBadDataMonarch;
 import com.hillrom.vest.repository.VestDeviceBadDataRepository;
-import com.hillrom.vest.repository.VestDeviceBadDataRepositoryMonarch;
+import com.hillrom.vest.repository.monarch.VestDeviceBadDataRepositoryMonarch;
 import com.hillrom.vest.service.MailService;
 
 public class CustomItemReaderListenerMonarch implements ItemReadListener<List<PatientVestDeviceDataMonarch>> {

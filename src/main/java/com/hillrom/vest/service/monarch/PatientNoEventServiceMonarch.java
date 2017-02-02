@@ -1,4 +1,4 @@
-package com.hillrom.vest.service;
+package com.hillrom.vest.service.monarch;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.domain.PatientNoEventMonarch;
 import com.hillrom.vest.exceptionhandler.HillromException;
-import com.hillrom.vest.repository.PatientNoEventsRepositoryMonarch;
+import com.hillrom.vest.repository.monarch.PatientNoEventsRepositoryMonarch;
 import com.hillrom.vest.util.ExceptionConstants;
 
 @Service

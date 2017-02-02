@@ -1,4 +1,4 @@
-package com.hillrom.vest.repository;
+package com.hillrom.vest.repository.monarch;
 
 import java.util.List;
 

@@ -9,8 +9,8 @@ import org.springframework.batch.item.ItemWriter;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
 import com.hillrom.vest.domain.User;
-import com.hillrom.vest.repository.PatientMonarchDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRepository;
+import com.hillrom.vest.repository.monarch.PatientMonarchDeviceDataRepository;
 import com.hillrom.vest.service.PatientVestDeviceService;
 
 public class PatientMonarchDeviceDataWriter implements ItemWriter<List<PatientVestDeviceDataMonarch>>{

@@ -31,7 +31,7 @@ import com.hillrom.vest.web.rest.dto.monarch.ProtocolRevisionMonarchVO;
 import com.hillrom.vest.web.rest.util.ProtocolDataVOBuilder;
 import com.hillrom.vest.web.rest.util.monarch.ProtocolDataMonarchVOBuilder;
 
-@Component("patientProtocolDataAuditService")
+@Component("patientProtocolDataAuditMonarchService")
 public class PatientProtocolDataAuditMonarchService extends AuditableService<PatientProtocolDataMonarch> {
 
 	@Inject

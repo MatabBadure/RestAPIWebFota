@@ -18,7 +18,7 @@ import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.UserPatientAssoc;
 
-@Component("patientProtocolDataAuditRepository")
+@Component("patientProtocolDataAuditMonarchRepository")
 public class PatientProtocolDataAuditMonarchRepository extends
 		AuditableRepository<PatientProtocolDataMonarch> {
 	

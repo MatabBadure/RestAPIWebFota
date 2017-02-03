@@ -1,5 +1,7 @@
 package com.hillrom.vest.web.rest;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -26,12 +28,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.domain.Authority;
+import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.AuthorityRepository;
+import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.MailService;
+import com.hillrom.vest.service.PatientVestDeviceService;
 import com.hillrom.vest.service.UserLoginTokenService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.util.ExceptionConstants;
@@ -59,7 +66,17 @@ public class AccountResource {
     
     @Inject
     private UserLoginTokenService authTokenService;
+    
+    
+    @Inject
+    private PatientVestDeviceService patientVestDeviceService;
 
+    @Inject
+    private UserExtensionRepository userExtensionRepository;
+    
+    @Inject
+    private AuthorityRepository authorityRepository;
+    
     /**
      * POST  /register -> register the user.
      */
@@ -145,9 +162,21 @@ public class AccountResource {
     
     public ResponseEntity<Object> getAccount() {
     	JSONObject jsonObject = new JSONObject();
-    	Optional<User> optionalUser = userService.getUserWithAuthorities();
-    	if(optionalUser.isPresent()) {
+    	Optional<User> optionalUser = userService.getUserWithAuthorities();    	
+    	if(optionalUser.isPresent()) {    		
     		User user = optionalUser.get();
+    		
+    		List<Authority> authorities  = authorityRepository.findAll();
+    		Map<String,Authority> authorityMap = new HashMap<>();
+        	authorities.stream().forEach(authority -> {
+        		authorityMap.put(authority.getName(), authority);
+        	});
+    		
+    		UserExtension existingUser = userExtensionRepository.findOne(user.getId());
+    		String deviceType = null;
+    		if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
+    			deviceType = patientVestDeviceService.getDeviceType(user);
+	    		}
     		UserDTO userDTO = new UserDTO(
                     null,
                     user.getTitle(),
@@ -160,7 +189,9 @@ public class AccountResource {
                     user.getLangKey(),
                     user.getAuthorities().stream().map(Authority::getName)
                         .collect(Collectors.toList()));
-    		return new ResponseEntity<Object>(userDTO,HttpStatus.OK);
+    		jsonObject.put("User Details", userDTO);
+    		jsonObject.put("Device Type", deviceType);
+    		return new ResponseEntity<Object>(jsonObject,HttpStatus.OK);
     	} else {
     		jsonObject.put("ERROR", ExceptionConstants.HR_603);
     		return new ResponseEntity<Object>(jsonObject, HttpStatus.BAD_REQUEST);

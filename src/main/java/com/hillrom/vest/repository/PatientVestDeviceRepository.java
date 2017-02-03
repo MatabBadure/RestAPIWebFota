@@ -36,5 +36,13 @@ public interface PatientVestDeviceRepository extends
 
 	@Query(nativeQuery = true, value = "SELECT * FROM PATIENT_VEST_DEVICE_HISTORY pvd where patient_id = :patientId and is_active = :isActive order by last_modified_by desc limit 1 ")
 	PatientVestDeviceHistory findLatestInActiveDeviceByPatientId(
-			@Param("patientId")String pateitnId, @Param("isActive")Boolean active);
+			@Param("patientId")String patientId, @Param("isActive")Boolean active);
+	
+	@Query(nativeQuery = true, value = "SELECT ( IF( EXISTS( SELECT * FROM PATIENT_VEST_DEVICE_HISTORY "
+			+ "WHERE patient_id =:patientId AND is_active), 'VEST', 'NO') )"
+	       		+ " UNION"
+	       	+ " SELECT  ( IF( EXISTS( SELECT * FROM PATIENT_VEST_DEVICE_HISTORY_MONARCH"
+	       	+ " WHERE patient_id =:patientId AND is_active), 'MONARCH', 'NO'))")	
+	List <String> findDeviceType(@Param("patientId")String patientId);
+	
 }

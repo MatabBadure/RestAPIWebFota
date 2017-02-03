@@ -1091,7 +1091,7 @@ public class AdherenceCalculationServiceMonarch{
 				|| user.isNonHMRNotification() || user.isSettingDeviationNotification());
 	}
 
-	public void processAdherenceScore(PatientNoEvent patientNoEvent,
+	public void processAdherenceScore(PatientNoEventMonarch patientNoEventMonarch,
 			SortedMap<LocalDate,List<TherapySessionMonarch>> existingTherapySessionMap,
 			SortedMap<LocalDate,List<TherapySessionMonarch>> receivedTherapySessionsMap,
 			SortedMap<LocalDate,PatientComplianceMonarch> existingComplianceMap,
@@ -1107,8 +1107,8 @@ public class AdherenceCalculationServiceMonarch{
 				patient = receivedTherapySessions.get(0).getPatientInfo();
 				patientUser = receivedTherapySessions.get(0).getPatientUser();						
 				
-				if(Objects.nonNull(patientNoEvent) && Objects.nonNull(patientNoEvent.getFirstTransmissionDate()))
-					firstTransmittedDate = patientNoEvent.getFirstTransmissionDate();
+				if(Objects.nonNull(patientNoEventMonarch) && Objects.nonNull(patientNoEventMonarch.getFirstTransmissionDate()))
+					firstTransmittedDate = patientNoEventMonarch.getFirstTransmissionDate();
 				else
 					firstTransmittedDate = currentTherapySessionDate;
 			}
@@ -1181,7 +1181,7 @@ public class AdherenceCalculationServiceMonarch{
 								existingSession.getStartTime().equals(receivedSession.getStartTime()) &&
 								existingSession.getEndTime().equals(receivedSession.getEndTime()) &&
 								existingSession.getFrequency().equals(receivedSession.getFrequency()) && 
-								existingSession.getPressure().equals(receivedSession.getPressure()) &&
+								existingSession.getIntensity().equals(receivedSession.getIntensity()) &&
 								existingSession.getHmr().equals(receivedSession.getHmr())){
 							itr.remove();
 						}

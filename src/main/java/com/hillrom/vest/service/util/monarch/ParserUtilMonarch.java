@@ -172,7 +172,25 @@ public class ParserUtilMonarch {
 		return qclJsonData;
 	}
 
-
+	public static String getMonarchDeviceData(String rawMessage){
+		
+        byte[] b = java.util.Base64.getDecoder().decode(rawMessage);
+        
+        String deviceData = "";
+        int start = returnMatch(b,DEVICE_DATA_FIELD_NAME);
+        int end = returnMatch(b,CRC_FIELD_NAME)-CRC_FIELD_NAME.length;
+        log.debug("start end : "+ start + " : " + end );
+        
+        byte[] deviceDataArray = new byte[end];
+        int j=0;
+        for(int i=start;i<end;i++) {
+        	deviceDataArray[j++] = b[i];
+        	int val = b[i] & 0xFF;
+        	deviceData = deviceData + String.valueOf(val) + " ";
+        }
+        return deviceData;        
+	}
+	
 	public static String getValueFromQclJsonData(JSONObject qclJsonData,String key){
 		String value = "";
 		JSONObject twoNetProperties = (JSONObject) qclJsonData.get(TWO_NET_PROPERTIES);

@@ -329,8 +329,8 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 		patientVestDeviceRawLogMonarch.setCustomerName(ParserUtil
 				.getValueFromQclJsonData(qclJsonDataMonarch, CUSTOMER_NAME));*/
 
-		patientVestDeviceRawLogMonarch.setDeviceData(ParserUtilMonarch.getValueFromQclJsonDataMonarch(
-				qclJsonDataMonarch, DEVICE_DATA));
+		patientVestDeviceRawLogMonarch.setDeviceData(ParserUtilMonarch.getMonarchDeviceData(rawMessageMonarch));
+
 		patientVestDeviceRawLogMonarch
 				.setDeviceModelType(ParserUtilMonarch
 						.getValueFromQclJsonDataMonarch(
@@ -339,6 +339,7 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 				.setDeviceSerialNumber(ParserUtilMonarch
 						.getValueFromQclJsonDataMonarch(
 								qclJsonDataMonarch,DEVICE_SN));
+		
 		/*patientVestDeviceRawLogMonarch.setDeviceType(ParserUtil.getValueFromQclJsonDataMonarch(
 				qclJsonDataMonarch,DEVICE_TYPE));
 		patientVestDeviceRawLogMonarch.setHubId(ParserUtil.getValueFromQclJsonData(

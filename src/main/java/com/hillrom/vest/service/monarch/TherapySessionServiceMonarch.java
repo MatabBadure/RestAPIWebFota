@@ -26,14 +26,18 @@ import org.springframework.stereotype.Service;
 import com.hillrom.vest.batch.processing.monarch.PatientMonarchDeviceDataReader;
 import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.PatientCompliance;
+import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
+import com.hillrom.vest.domain.PatientNoEventMonarch;
 import com.hillrom.vest.domain.ProtocolConstants;
+import com.hillrom.vest.domain.ProtocolConstantsMonarch;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.TherapySessionMonarch;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.PatientNoEventsRepository;
+import com.hillrom.vest.repository.monarch.PatientNoEventsRepositoryMonarch;
 import com.hillrom.vest.repository.monarch.TherapySessionRepositoryMonarch;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.NoteService;
@@ -53,10 +57,10 @@ public class TherapySessionServiceMonarch {
 	private TherapySessionRepositoryMonarch therapySessionRepositoryMonarch;
 
 	@Inject
-	private AdherenceCalculationService adherenceCalculationService;
+	private AdherenceCalculationServiceMonarch adherenceCalculationServiceMonarch;
 	
 	@Inject
-	private PatientComplianceService complianceService;
+	private PatientComplianceMonarchService complianceServiceMonarch;
 	
 	@Inject
 	private NoteService noteService;
@@ -65,7 +69,7 @@ public class TherapySessionServiceMonarch {
 	private PatientNoEventService patientNoEventService;
 
 	@Inject
-	private PatientNoEventsRepository patientNoEventRepository;
+	private PatientNoEventsRepositoryMonarch patientNoEventRepositoryMonarch;
 
 	public List<TherapySessionMonarch> saveOrUpdate(List<TherapySessionMonarch> therapySessionsMonarch) throws Exception{
 		if(therapySessionsMonarch.size() > 0){			
@@ -78,73 +82,16 @@ public class TherapySessionServiceMonarch {
 							Collectors
 							.groupingBy(TherapySessionMonarch::getDate));
 			SortedMap<LocalDate,List<TherapySessionMonarch>> receivedTherapySessionMapMonarch = new TreeMap<>(groupedTherapySessions);
-			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId());
-			PatientNoEvent patientNoEvent = patientNoEventRepository.findByPatientUserId(patientUser.getId());
-			//SortedMap<LocalDate,List<TherapySessionMonarch>> existingTherapySessionMap = getAllTherapySessionsMapByPatientUserId(patientUser.getId());
-			SortedMap<LocalDate,PatientCompliance> existingComplianceMap = complianceService.getPatientComplainceMapByPatientUserId(patientUser.getId());
-			/*adherenceCalculationService.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
-					receivedTherapySessionMap, existingComplianceMap,protocol);*/
-			saveOrUpdateTherapySessions(receivedTherapySessionMapMonarch);
+			ProtocolConstantsMonarch protocol = adherenceCalculationServiceMonarch.getProtocolByPatientUserId(patientUser.getId());
+			PatientNoEventMonarch patientNoEvent = patientNoEventRepositoryMonarch.findByPatientUserId(patientUser.getId());
+			SortedMap<LocalDate,List<TherapySessionMonarch>> existingTherapySessionMap = getAllTherapySessionsMapByPatientUserId(patientUser.getId());
+			SortedMap<LocalDate,PatientComplianceMonarch> existingComplianceMapMonarch = complianceServiceMonarch.getPatientComplainceMapByPatientUserId(patientUser.getId());
+			adherenceCalculationServiceMonarch.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
+					receivedTherapySessionMapMonarch, existingComplianceMapMonarch,protocol);			
 		}
 		return therapySessionsMonarch;
 	}
 	
-	private Map<LocalDate, List<TherapySessionMonarch>> eleminateDuplicateTherapySessions(
-			SortedMap<LocalDate, List<TherapySessionMonarch>> receivedTherapySessionsMap) {
-		List<List<TherapySessionMonarch>> therapySessionsList = new LinkedList<>(receivedTherapySessionsMap.values());
-		Long patientUserId = therapySessionsList.get(0).get(0).getPatientUser().getId();
-		LocalDate from = receivedTherapySessionsMap.firstKey();
-		LocalDate to = receivedTherapySessionsMap.lastKey();
-		List<TherapySessionMonarch> existingTherapySessions = therapySessionRepositoryMonarch.findByPatientUserIdAndDateRange(patientUserId, from, to);
-		Map<LocalDate,List<TherapySessionMonarch>> existingTherapySessionMap = existingTherapySessions.stream().collect(Collectors.groupingBy(TherapySessionMonarch::getDate));
-		Map<LocalDate,List<TherapySessionMonarch>> allTherapySessionMap = new HashMap<>();
-		for(LocalDate date : receivedTherapySessionsMap.keySet()){
-			List<TherapySessionMonarch> therapySessionsPerDate = existingTherapySessionMap.get(date);
-			if(Objects.nonNull(therapySessionsPerDate)){
-				List<TherapySessionMonarch> receivedTherapySessions = receivedTherapySessionsMap.get(date);
-				for(TherapySessionMonarch existingSession : therapySessionsPerDate){
-					Iterator<TherapySessionMonarch> itr = receivedTherapySessions.iterator();
-					while(itr.hasNext()){
-						TherapySessionMonarch receivedSession = itr.next();
-						if(existingSession.getDate().equals(receivedSession.getDate()) &&
-								existingSession.getStartTime().equals(receivedSession.getStartTime()) &&
-								existingSession.getEndTime().equals(receivedSession.getEndTime()) &&
-								existingSession.getFrequency().equals(receivedSession.getFrequency()) && 
-								existingSession.getPressure().equals(receivedSession.getPressure()) &&
-								existingSession.getHmr().equals(receivedSession.getHmr())){
-							itr.remove();
-						}
-					}
-				}
-				therapySessionsPerDate.addAll(receivedTherapySessionsMap.get(date));
-				Collections.sort(therapySessionsPerDate);
-				int sessionNo = 0;
-				for(TherapySessionMonarch session : therapySessionsPerDate){
-					session.setSessionNo(++sessionNo);
-				}
-				allTherapySessionMap.put(date, therapySessionsPerDate);
-			}else{
-				for(LocalDate receivedDate : receivedTherapySessionsMap.keySet()){
-					allTherapySessionMap.put(receivedDate, receivedTherapySessionsMap.get(receivedDate));
-				}
-			}
-		}
-		return allTherapySessionMap;
-	}
-	
-	private synchronized void saveOrUpdateTherapySessions(
-			SortedMap<LocalDate, List<TherapySessionMonarch>> receivedTherapySessionsMapMonarch) {
-		//Map<LocalDate, List<TherapySessionMonarch>> allTherapySessionMapMonarch = eleminateDuplicateTherapySessions(receivedTherapySessionsMapMonarch);
-		Map<LocalDate, List<TherapySessionMonarch>> allTherapySessionMapMonarch = receivedTherapySessionsMapMonarch;
-		
-		List<TherapySessionMonarch> newTherapySessionsMonarch = new LinkedList<>();
-		for(LocalDate date : allTherapySessionMapMonarch.keySet()){
-			List<TherapySessionMonarch> sessionsTobeSavedMonarch = allTherapySessionMapMonarch.get(date);
-			newTherapySessionsMonarch.addAll(sessionsTobeSavedMonarch);
-		}
-		therapySessionRepositoryMonarch.save(newTherapySessionsMonarch);
-	}
-
 	/*public void removeExistingTherapySessions(
 			List<TherapySessionMonarch> therapySessions, User patientUser) {
 		TherapySession latestTherapySession =  therapySessionRepository.findTop1ByPatientUserIdOrderByEndTimeDesc(patientUser.getId());
@@ -176,10 +123,10 @@ public class TherapySessionServiceMonarch {
 		return formatResponse(tpsGroupByDate, dateNotesMap, patientUserId, from, to);
 	}*/
 	
-	/*public SortedMap<LocalDate,List<TherapySessionMonarch>> groupTherapySessionsByDate(List<TherapySessionMonarch> therapySessions){
-		return new TreeMap<>(therapySessions.stream().collect(Collectors.groupingBy(TherapySession :: getDate)));
+	public SortedMap<LocalDate,List<TherapySessionMonarch>> groupTherapySessionsByDate(List<TherapySessionMonarch> therapySessions){
+		return new TreeMap<>(therapySessions.stream().collect(Collectors.groupingBy(TherapySessionMonarch :: getDate)));
 	}
-	
+	/*
 	public List<TherapySessionMonarch> findByPatientUserIdAndDate(Long id,LocalDate date){
 		return  therapySessionRepositoryMonarch.findByPatientUserIdAndDate(id,date);
 	}	
@@ -325,10 +272,10 @@ public class TherapySessionServiceMonarch {
 		return therapyDataMap;
 	} 
 	
-	/*public SortedMap<LocalDate,List<TherapySessionMonarch>> getAllTherapySessionsMapByPatientUserId(Long patientUserId){
+	public SortedMap<LocalDate,List<TherapySessionMonarch>> getAllTherapySessionsMapByPatientUserId(Long patientUserId){
 		List<TherapySessionMonarch> therapySessions =  therapySessionRepositoryMonarch.findByPatientUserId(patientUserId);
 		return groupTherapySessionsByDate(therapySessions);
-	}*/
+	}
 	
 	/*public List<TherapyDataVO> getComplianceGraphData(Long patientUserId,LocalDate from,LocalDate to){
 		List<TherapyDataVO> therapyData = findByPatientUserIdAndDateRange(patientUserId, from, to);

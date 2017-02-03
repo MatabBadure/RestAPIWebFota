@@ -198,6 +198,19 @@ public class PatientVestDeviceDataServiceMonarch {
 				DEVICE_WIFI,DEVICE_LTE,DEVICE_VER,FRAG_TOTAL,FRAG_CURRENT,DEVICE_DATA,CRC};
 		if(Objects.isNull(qclJsonData) || qclJsonData.keySet().isEmpty()){
 			throw new HillromException("Missing Params : "+String.join(",",reqParams));
+		}else if(Objects.nonNull(qclJsonData)){
+			//JSONObject allProperties = (JSONObject) qclJsonData.getOrDefault(TWO_NET_PROPERTIES, new JSONObject());
+			List<String> missingParams = RandomUtil.getDifference(Arrays.asList(reqParams), new ArrayList<String>(qclJsonData.keySet()));
+			
+			// To check either WIFI / LTE is available
+			if( missingParams.contains(DEVICE_WIFI) && !missingParams.contains(DEVICE_LTE) ){
+				missingParams.remove(DEVICE_WIFI);
+			}else if(missingParams.contains(DEVICE_LTE) && !missingParams.contains(DEVICE_WIFI)){
+				missingParams.remove(DEVICE_LTE);
+			}
+			
+			if(missingParams.size() > 0)
+				throw new HillromException("Missing Params : "+String.join(",",missingParams));
 		}
 	}
 

@@ -177,15 +177,8 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 			return new LinkedList<PatientVestDeviceDataMonarch>();
 		}
 		therapySessionServiceMonarch.saveOrUpdate(therapySessionsMonarch);
-		//
-		/*return patientVestDeviceRecords;
-		
-		List<TherapySessionMonarch> therapySessions = PatientVestDeviceTherapyUtil
-				.prepareTherapySessionFromDeviceDataMonarch(patientVestDeviceRecords,latestInActiveDevice);
-		therapySessionService.saveOrUpdate(therapySessions);*/
 		
 		isReadComplete = true;
-		
 		return patientVestDeviceEventsMonarch;
 	}
 
@@ -225,7 +218,8 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 			patientInfo.setSerialNumber(deviceRawLog.getDeviceSerialNumber());
 			patientInfo.setDeviceAssocDate(new DateTime());
 			//String customerName = deviceRawLog.getCustomerName();
-			//setNameToPatient(patientInfo, customerName);
+			// Hardcoded the patient name to Hill-Rom Monarch for monarch users
+			setNameToPatient(patientInfo, "Hill-Rom Monarch");
 			patientInfo = patientInfoRepository.save(patientInfo);
 
 			UserExtension userExtension = new UserExtension();

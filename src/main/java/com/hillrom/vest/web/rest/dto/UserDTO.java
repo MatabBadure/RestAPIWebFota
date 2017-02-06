@@ -45,13 +45,16 @@ public class UserDTO {
     private List<String> roles;
     
     private Boolean termsConditionAccepted;
+    
+    private String deviceType;
+    
 
     public UserDTO() {
     }
 
 	public UserDTO(String password, String title, String firstName,
 			String middleName, String lastName, String email, String gender,
-			Integer zipcode, String langKey, List<String> roles) {
+			Integer zipcode, String langKey, List<String> roles, String deviceType) {
 		super();
 		this.password = password;
 		this.title = title;
@@ -63,6 +66,7 @@ public class UserDTO {
 		this.zipcode = zipcode;
 		this.langKey = langKey;
 		this.roles = roles;
+		this.deviceType = deviceType;
 	}
 
 	public String getPassword() {
@@ -152,6 +156,13 @@ public class UserDTO {
 	public void setTermsConditionAccepted(Boolean termsConditionAccepted) {
 		this.termsConditionAccepted = termsConditionAccepted;
 	}
+	public String getDeviceType() {
+		return deviceType;
+	}
+	public void setDeviceType(String deviceType) {
+		this.deviceType = deviceType;
+	}
+
 
 	@Override
 	public String toString() {

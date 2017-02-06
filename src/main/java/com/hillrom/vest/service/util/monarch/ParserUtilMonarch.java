@@ -402,6 +402,56 @@ public class ParserUtilMonarch {
 	    return hexTotal;
 	}
 	
+	  private String getCRCChecksum(String encoded_string)
+	  {
+
+		log.debug("Inside  getCRCChecksum : " ,encoded_string);
+		  
+	    int nCheckSum = 0;
+
+	    byte[] decoded = java.util.Base64.getDecoder().decode(encoded_string);
+	    
+	    int nDecodeCount = 0;
+	    for ( ; nDecodeCount < (decoded.length-2); nDecodeCount++ )
+	    {
+	      int nValue = (decoded[nDecodeCount] & 0xFF);
+	      nCheckSum += nValue;
+	    }
+	    
+	    
+	    System.out.format("Inverted Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
+	    
+	    while ( nCheckSum >  65535 )
+	    {
+	      nCheckSum -= 65535;
+	    }
+	    
+	    int nMSB = decoded[nDecodeCount+1] & 0xFF;
+	    int nLSB = decoded[nDecodeCount] & 0xFF;
+	    
+	    System.out.format("MSB = %d [0x%x]\r\n" ,nMSB, nMSB);
+	    System.out.format("LSB = %d [0x%x]\r\n" ,nLSB, nLSB);
+	    log.error("Total Value = " + nCheckSum);
+	    nCheckSum = ((~nCheckSum)& 0xFFFF) + 1;
+	    System.out.format("Checksum Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
+	    
+	    String msb_digit = Integer.toHexString(nMSB);
+	    String lsb_digit = Integer.toHexString(nLSB);
+	    String checksum_num =  Integer.toHexString(nCheckSum);
+	    
+	    if(msb_digit.length()<2)
+	    	msb_digit = "0"+msb_digit;
+	    if(lsb_digit.length()<2)
+	    	lsb_digit = "0"+lsb_digit;
+	    
+	    System.out.println("MSB : " + msb_digit + " " +  "LSB : " + lsb_digit);
+	    System.out.println("Checksum : " + checksum_num);
+	    
+
+	    return checksum_num;
+		
+	}
+	
 	
 	
 }

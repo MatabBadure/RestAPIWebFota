@@ -41,6 +41,7 @@ import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.AdherenceResetRepository;
+import com.hillrom.vest.repository.AdhrenceResetHistoryRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PredicateBuilder;
 import com.hillrom.vest.repository.TherapySessionRepository;
@@ -53,7 +54,9 @@ import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.AdherenceResetDTO;
+import com.hillrom.vest.web.rest.dto.AdherenceResetHistoryVO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
+import com.hillrom.vest.web.rest.dto.HillRomUserVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 import com.mysema.query.types.expr.BooleanExpression;
@@ -72,6 +75,9 @@ public class AdherenceResource {
 
     @Inject
     private AdherenceResetRepository adherenceResetRepository;
+    
+    @Inject
+    private AdhrenceResetHistoryRepository adhrenceResetHistoryRepository;
     
     @Inject
     private AdherenceResetService adherenceResetService;
@@ -167,6 +173,45 @@ public class AdherenceResource {
 			jsonObject.put("ERROR", e.getMessage());
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 		}
+    }
+    
+    
+    //Hill-2133
+    /**
+     * GET  /adherenceResetHistory -> Get Adherence Reset History For Patient
+     */
+    @RequestMapping(value = "/user/{id}/AdherenceResetHistoryForPatient",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<?> adherenceResetHistoryForPatient(@PathVariable("id") Long userId,
+			@RequestParam(value = "page" , required = false) Integer offset,
+            @RequestParam(value = "per_page", required = false) Integer limit,
+            @RequestParam(value = "sort_by", required = false) String sortBy,
+            @RequestParam(value = "asc",required = false) Boolean isAscending) throws URISyntaxException  {
+        
+    	
+		Map<String,Boolean> sortOrder = new HashMap<>();
+    	if(sortBy != null  && !sortBy.equals("")) {
+    		isAscending =  (isAscending != null)?  isAscending : true;
+    		sortOrder.put(sortBy, isAscending);
+    	}
+    	Page<AdherenceResetHistoryVO> page = null;
+    	JSONObject jsonObject = new JSONObject();
+    	
+		try {
+			page = adhrenceResetHistoryRepository.getAdherenceResetHistoryForPatient(userId,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+			jsonObject.put("Adherence_Reset_History", page);
+			 if(Objects.nonNull(page)){
+				jsonObject.put("AdherenceResetHistoryMessage", "Adherence Reset History retrieved successfully");
+				return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
+			}
+		} catch (HillromException e) {			
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);        
     }
 
    

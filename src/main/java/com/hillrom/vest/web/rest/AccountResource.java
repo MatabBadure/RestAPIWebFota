@@ -166,6 +166,7 @@ public class AccountResource {
     	if(optionalUser.isPresent()) {    		
     		User user = optionalUser.get();
     		String deviceType = patientVestDeviceService.getDeviceType(user);
+    		
     		UserDTO userDTO = new UserDTO(
                     null,
                     user.getTitle(),
@@ -177,10 +178,9 @@ public class AccountResource {
                     user.getZipcode(),
                     user.getLangKey(),
                     user.getAuthorities().stream().map(Authority::getName)
-                        .collect(Collectors.toList()));
-    		jsonObject.put("User Details", userDTO);
-    		jsonObject.put("Device Type", deviceType);
-    		return new ResponseEntity<Object>(jsonObject,HttpStatus.OK);
+                        .collect(Collectors.toList()),
+                    deviceType);
+    		return new ResponseEntity<Object>(userDTO,HttpStatus.OK);
     	} else {
     		jsonObject.put("ERROR", ExceptionConstants.HR_603);
     		return new ResponseEntity<Object>(jsonObject, HttpStatus.BAD_REQUEST);

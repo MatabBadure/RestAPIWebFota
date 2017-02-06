@@ -71,7 +71,6 @@ public class UserDTO {
 	public UserDTO(String password, String title, String firstName,
 			String middleName, String lastName, String email, String gender,
 			Integer zipcode, String langKey, List<String> roles, String deviceType) {
-		super();
 		this.password = password;
 		this.title = title;
 		this.firstName = firstName;

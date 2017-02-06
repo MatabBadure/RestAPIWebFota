@@ -54,6 +54,22 @@ public class UserDTO {
 
 	public UserDTO(String password, String title, String firstName,
 			String middleName, String lastName, String email, String gender,
+			Integer zipcode, String langKey, List<String> roles) {
+		super();
+		this.password = password;
+		this.title = title;
+		this.firstName = firstName;
+		this.middleName = middleName;
+		this.lastName = lastName;
+		this.email = email;
+		this.gender = gender;
+		this.zipcode = zipcode;
+		this.langKey = langKey;
+		this.roles = roles;
+	}
+	
+	public UserDTO(String password, String title, String firstName,
+			String middleName, String lastName, String email, String gender,
 			Integer zipcode, String langKey, List<String> roles, String deviceType) {
 		super();
 		this.password = password;

@@ -192,7 +192,7 @@ public class UserResource {
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,
 			@RequestParam(value = "asc", required = false) Boolean isAscending,
-			@RequestParam(required = true, value = "deviceType") String deviceType)
+			@RequestParam(value = "deviceType", required = true) String deviceType)
 			throws URISyntaxException {
 		if(searchString.endsWith("_")){
  		   searchString = searchString.replace("_", "\\\\_");

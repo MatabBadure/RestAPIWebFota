@@ -191,7 +191,8 @@ public class UserResource {
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,
-			@RequestParam(value = "asc", required = false) Boolean isAscending)
+			@RequestParam(value = "asc", required = false) Boolean isAscending,
+			@RequestParam(value = "deviceType", required = true) String deviceType)
 			throws URISyntaxException {
 		if(searchString.endsWith("_")){
  		   searchString = searchString.replace("_", "\\\\_");
@@ -208,7 +209,7 @@ public class UserResource {
 		}
 		Page<PatientUserVO> page = userSearchRepository.findPatientBy(
 				queryString, filter, PaginationUtil.generatePageRequest(offset, limit),
-				sortOrder);
+				sortOrder, deviceType);
 		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
 				page, "/user/patient/search", offset, limit);
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);

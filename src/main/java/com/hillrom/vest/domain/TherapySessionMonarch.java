@@ -63,6 +63,9 @@ public class TherapySessionMonarch implements Comparable<TherapySessionMonarch>{
 	@Column(name="pressure")
 	private Integer pressure;
 	
+	@Column(name="intensity")
+	private Integer intensity;
+	
 	@Column(name="duration_in_minutes")
 	private int durationInMinutes;
 	
@@ -256,6 +259,14 @@ public class TherapySessionMonarch implements Comparable<TherapySessionMonarch>{
 
 	public void setBluetoothId(String bluetoothId) {
 		this.bluetoothId = bluetoothId;
+	}	
+	
+	public Integer getIntensity() {
+		return intensity;
+	}
+
+	public void setIntensity(Integer intensity) {
+		this.intensity = intensity;
 	}
 
 	@Override

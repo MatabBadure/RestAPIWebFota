@@ -38,13 +38,13 @@ public interface PatientVestDeviceRepository extends
 	PatientVestDeviceHistory findLatestInActiveDeviceByPatientId(
 			@Param("patientId")String patientId, @Param("isActive")Boolean active);
 	
-	@Query(nativeQuery = true, value = "SELECT IF (t1.s1>0 AND t2.s2>0,'ALL',IF(t1.s1>0 AND t2.s2=0,'VEST', "
-			+ " IF(t1.s1=0 AND t2.s2>0,'MONARCH','NONE'))) from"
-			+ " (SELECT CASE WHEN COUNT(1) > 0 THEN PATIENT_VEST_DEVICE_HISTORY.serial_number ELSE 0 END AS s1"
-			+ "	from hillromvest_prod.PATIENT_VEST_DEVICE_HISTORY "
-			+ " WHERE patient_id =:patientId AND is_active) t1"
-			+ "(SELECT CASE WHEN COUNT(1) > 0 THEN PATIENT_VEST_DEVICE_HISTORY_MONARCH.serial_number ELSE 0 END AS s2"
-			+ " from PATIENT_VEST_DEVICE_HISTORY_MONARCH"
-			+"	WHERE patient_id =:patientId AND is_active) t2"	)
+	@Query(nativeQuery = true, value = " SELECT IF (t1.s1>0 AND t2.s2>0,'ALL',IF(t1.s1>0 AND t2.s2=0,'VEST', "
+			+ " IF(t1.s1=0 AND t2.s2>0,'MONARCH','NONE'))) from "
+			+ " (SELECT CASE WHEN COUNT(*) > 0 THEN PATIENT_VEST_DEVICE_HISTORY.serial_number ELSE 0 END AS s1 "
+			+ "	from PATIENT_VEST_DEVICE_HISTORY "
+			+ " WHERE patient_id =:patientId AND is_active) t1, "
+			+ " (SELECT CASE WHEN COUNT(*) > 0 THEN PATIENT_VEST_DEVICE_HISTORY_MONARCH.serial_number ELSE 0 END AS s2 "
+			+ " from PATIENT_VEST_DEVICE_HISTORY_MONARCH "
+			+ " WHERE patient_id =:patientId AND is_active) t2 ")
 	String findDeviceType(@Param("patientId")String patientId);
 }

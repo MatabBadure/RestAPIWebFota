@@ -194,6 +194,7 @@ public final class Constants {
 	public static final String KEY_FREQUENCY = "frequency";
 	public static final String KEY_DURATION = "duration";
 	public static final String KEY_PRESSURE = "pressure";
+	public static final String KEY_INTENSITY = "intensity";
 	public static final String KEY_SESSION_NO = "sessionNo";
 	
 	//hill-1847

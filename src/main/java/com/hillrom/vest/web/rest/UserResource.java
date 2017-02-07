@@ -73,6 +73,7 @@ import com.hillrom.vest.service.PatientProtocolService;
 import com.hillrom.vest.service.PatientVestDeviceService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.UserService;
+import com.hillrom.vest.service.monarch.TherapySessionServiceMonarch;
 import com.hillrom.vest.service.util.CsvUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -160,6 +161,13 @@ public class UserResource {
 	@Qualifier("treatmentStatsGraphService")
 	@Inject
 	private GraphService treatmentStatsGraphService;
+	
+	@Inject
+	private TherapySessionServiceMonarch therapySessionServiceMonarch;
+	
+	@Qualifier("hmrGraphServiceMonarch")
+	@Inject
+	private GraphService hmrGraphServiceMonarch;
 
 	/**
 	 * GET /users -> get all users.
@@ -581,14 +589,25 @@ public class UserResource {
     public ResponseEntity<?> getTherapyByPatientUserIdAndDate(@PathVariable Long id,
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
     		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
-    		@RequestParam(value="duration",required=true)String duration) {
+    		@RequestParam(value="duration",required=true)String duration,
+    		@RequestParam(value="deviceType",required=true)String deviceType) {
     		try{
-    			List<TherapyDataVO> therapyData = therapySessionService.findByPatientUserIdAndDateRange(id, from, to);
-    			if(therapyData.size() > 0){
-    				Graph hmrGraph = hmrGraphService.populateGraphData(therapyData, new Filter(from, to, duration, null));
-    				return new ResponseEntity<>(hmrGraph,HttpStatus.OK);
+    			if(deviceType.equals("VEST")){
+    				List<TherapyDataVO> therapyData = therapySessionService.findByPatientUserIdAndDateRange(id, from, to);
+    				if(therapyData.size() > 0){
+    					Graph hmrGraph = hmrGraphService.populateGraphData(therapyData, new Filter(from, to, duration, null));
+    					return new ResponseEntity<>(hmrGraph,HttpStatus.OK);
+    				}
+    			}
+    			if(deviceType.equals("MONARCH")){
+    				List<TherapyDataVO> therapyData = therapySessionServiceMonarch.findByPatientUserIdAndDateRange(id, from, to);
+        			if(therapyData.size() > 0){
+        				Graph hmrGraph = hmrGraphServiceMonarch.populateGraphData(therapyData, new Filter(from, to, duration, null));
+        				return new ResponseEntity<>(hmrGraph,HttpStatus.OK);
+        			}
     			}
     			return new ResponseEntity<>(HttpStatus.OK);
+    			
     		}catch(Exception ex){
     			JSONObject jsonObject = new JSONObject();
             	jsonObject.put("ERROR", ExceptionConstants.HR_717);

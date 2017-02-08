@@ -278,35 +278,35 @@ public class TherapySessionServiceMonarch {
 		return groupTherapySessionsByDate(therapySessions);
 	}
 	
-	/*public List<TherapyDataVO> getComplianceGraphData(Long patientUserId,LocalDate from,LocalDate to){
-		List<TherapyDataVO> therapyData = findByPatientUserIdAndDateRange(patientUserId, from, to);
-		Map<LocalDate,List<TherapyDataVO>> therapyDataMap = therapyData.stream().collect(Collectors.groupingBy(TherapyDataVO::getDate));
-		SortedMap<LocalDate,List<TherapyDataVO>> therapyDataGroupByDate = new TreeMap<>(therapyDataMap);
-		List<TherapyDataVO> responseList = new LinkedList<>();
+	public List<TherapyDataMonarchVO> getComplianceGraphData(Long patientUserId,LocalDate from,LocalDate to){
+		List<TherapyDataMonarchVO> therapyData = findByPatientUserIdAndDateRange(patientUserId, from, to);
+		Map<LocalDate,List<TherapyDataMonarchVO>> therapyDataMap = therapyData.stream().collect(Collectors.groupingBy(TherapyDataMonarchVO::getDate));
+		SortedMap<LocalDate,List<TherapyDataMonarchVO>> therapyDataGroupByDate = new TreeMap<>(therapyDataMap);
+		List<TherapyDataMonarchVO> responseList = new LinkedList<>();
 		for(LocalDate date : therapyDataGroupByDate.keySet()){
-			List<TherapyDataVO> therapies = therapyDataGroupByDate.get(date);
-			int totalDuration = therapies.stream().collect(Collectors.summingInt(TherapyDataVO::getDuration));
+			List<TherapyDataMonarchVO> therapies = therapyDataGroupByDate.get(date);
+			int totalDuration = therapies.stream().collect(Collectors.summingInt(TherapyDataMonarchVO::getDuration));
 			int programmedCoughPauses=0,normalCoughPauses=0,coughPauseDuration=0;
-			float weightedAvgFrequency = 0.0f,weightedAvgPressure = 0.0f;
-			Note noteForTheDay = null;
+			float weightedAvgFrequency = 0.0f,weightedAvgIntensity = 0.0f;
+			NoteMonarch noteForTheDay = null;
 			int size = therapies.size();
 			DateTime start = therapies.get(0).getStart();
 			DateTime end = size > 0 ? therapies.get(size-1).getEnd(): null;
 			double hmr = size > 0 ? therapies.get(size-1).getHmr(): 0;
 			boolean isMissedTherapy = therapies.get(0).isMissedTherapy();
-			for(TherapyDataVO therapy : therapies){
+			for(TherapyDataMonarchVO therapy : therapies){
 				programmedCoughPauses += therapy.getProgrammedCoughPauses();
 				normalCoughPauses += therapy.getNormalCoughPauses();
 				weightedAvgFrequency += calculateWeightedAvg(totalDuration, therapy.getDuration(), therapy.getFrequency());
-				weightedAvgPressure += calculateWeightedAvg(totalDuration, therapy.getDuration(), therapy.getPressure());
-				noteForTheDay = therapy.getNote();
+				weightedAvgIntensity += calculateWeightedAvg(totalDuration, therapy.getDuration(), therapy.getIntensity());
+				noteForTheDay = therapy.getNoteMonarch();
 			}
 			int minutes = 60*60;
-			TherapyDataVO dataVO = new TherapyDataVO(therapies.get(0).getTimestamp(), Math.round(weightedAvgFrequency), Math.round(weightedAvgPressure),
+			TherapyDataMonarchVO dataVO = new TherapyDataMonarchVO(therapies.get(0).getTimestamp(), Math.round(weightedAvgFrequency), Math.round(weightedAvgIntensity),
 					programmedCoughPauses, normalCoughPauses, programmedCoughPauses+normalCoughPauses, noteForTheDay, start, end, coughPauseDuration,
 					totalDuration, Math.round(hmr/minutes), isMissedTherapy);
 			responseList.add(dataVO);
 		}
 		return responseList;
-	}*/
+	}
 }

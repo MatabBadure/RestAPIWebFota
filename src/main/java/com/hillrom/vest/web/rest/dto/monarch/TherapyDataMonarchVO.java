@@ -56,6 +56,26 @@ public class TherapyDataMonarchVO implements Serializable,Comparable<TherapyData
 		this.hmr = hmr;
 		this.missedTherapy = missedTherapy;
 	}
+	
+	public TherapyDataMonarchVO(DateTime timestamp, int frequency, int intensity,
+			int programmedCoughPauses, int normalCoughPauses, int coughPauses,
+			NoteMonarch note, DateTime start, DateTime end, int coughPauseDuration,
+			int duration, double hmr, boolean missedTherapy) {
+		super();
+		this.timestamp = timestamp;
+		this.frequency = frequency;
+		this.pressure = pressure;
+		this.programmedCoughPauses = programmedCoughPauses;
+		this.normalCoughPauses = normalCoughPauses;
+		this.coughPauses = coughPauses;
+		this.noteMonarch = note;
+		this.start = start;
+		this.end = end;
+		this.coughPauseDuration = coughPauseDuration;
+		this.duration = duration;
+		this.hmr = hmr;
+		this.missedTherapy = missedTherapy;
+	}
 
 	public TherapyDataMonarchVO() {
 		super();

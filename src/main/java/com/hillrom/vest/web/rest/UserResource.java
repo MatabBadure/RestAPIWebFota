@@ -88,6 +88,7 @@ import com.hillrom.vest.web.rest.dto.StatisticsVO;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
 import com.hillrom.vest.web.rest.dto.monarch.ProtocolRevisionMonarchVO;
+import com.hillrom.vest.web.rest.dto.monarch.TherapyDataMonarchVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 import net.minidev.json.JSONObject;
@@ -610,7 +611,7 @@ public class UserResource {
     				}
     			}
     			if(deviceType.equals("MONARCH")){
-    				List<TherapyDataVO> therapyData = therapySessionServiceMonarch.findByPatientUserIdAndDateRange(id, from, to);
+    				List<TherapyDataMonarchVO> therapyData = therapySessionServiceMonarch.findByPatientUserIdAndDateRange(id, from, to);
         			if(therapyData.size() > 0){
         				Graph hmrGraph = hmrGraphServiceMonarch.populateGraphData(therapyData, new Filter(from, to, duration, null));
         				return new ResponseEntity<>(hmrGraph,HttpStatus.OK);

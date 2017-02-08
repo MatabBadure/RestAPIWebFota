@@ -53,6 +53,7 @@ import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.ProtocolConstants;
+import com.hillrom.vest.domain.ProtocolConstantsMonarch;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
@@ -74,6 +75,7 @@ import com.hillrom.vest.service.PatientVestDeviceService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.service.monarch.TherapySessionServiceMonarch;
+import com.hillrom.vest.service.monarch.AdherenceCalculationServiceMonarch;
 import com.hillrom.vest.service.monarch.PatientComplianceMonarchService;
 import com.hillrom.vest.service.util.CsvUtil;
 import com.hillrom.vest.util.ExceptionConstants;
@@ -179,7 +181,14 @@ public class UserResource {
 	@Qualifier("hmrGraphServiceMonarch")
 	@Inject
 	private GraphService hmrGraphServiceMonarch;
-
+	
+	@Inject
+	private AdherenceCalculationServiceMonarch adherenceCalculationServiceMonarch;
+	
+	@Qualifier("complianceGraphServiceMonarch")
+	@Inject
+	private GraphService complianceGraphServiceMonarch;
+	
 	/**
 	 * GET /users -> get all users.
 	 */
@@ -1072,8 +1081,10 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getComplianceGraphData(@PathVariable Long id,
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
-    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
+    		@RequestParam(value = "deviceType", required = true) String deviceType){
     	try{
+    		if(deviceType.equals("VEST")){
     		List<TherapyDataVO> therapyData = therapySessionService.getComplianceGraphData(id, from, to);
     		if(therapyData.size() > 0){
     			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(id);
@@ -1083,6 +1094,18 @@ public class UserResource {
     			Graph complianceGraph = complianceGraphService.populateGraphData(therapyAndProtocolData, new Filter(from,to,null,null));
     			return new ResponseEntity<>(complianceGraph,HttpStatus.OK); 
     		}
+    		}
+    		if(deviceType.equals("MONARCH")){
+        		List<TherapyDataMonarchVO> therapyData = therapySessionServiceMonarch.getComplianceGraphData(id, from, to);
+        		if(therapyData.size() > 0){
+        			ProtocolConstantsMonarch protocol = adherenceCalculationServiceMonarch.getProtocolByPatientUserId(id);
+        			Map<String,Object> therapyAndProtocolData = new HashMap<>();
+        			therapyAndProtocolData.put("protocol", protocol);
+        			therapyAndProtocolData.put("therapyData", therapyData);
+        			Graph complianceGraph = complianceGraphServiceMonarch.populateGraphData(therapyAndProtocolData, new Filter(from,to,null,null));
+        			return new ResponseEntity<>(complianceGraph,HttpStatus.OK); 
+        		}
+        		}
     		return new ResponseEntity<>(HttpStatus.OK);
     	} catch(Exception ex){
     		JSONObject jsonObject = new JSONObject();

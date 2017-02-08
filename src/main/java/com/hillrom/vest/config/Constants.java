@@ -211,6 +211,7 @@ public final class Constants {
 	public static final String KEY_THERAPY_DATA = "therapyData";
 	public static final String KEY_PROTOCOL = "protocol";
 	public static final String PRESSURE_LABEL = "Pressure";
+	public static final String INTENSITY_LABEL = "Intensity";
 	public static final String FREQUENCY_LABEL = "Frequency";
 	public static final String DURATION_LABEL = "Duration";
 

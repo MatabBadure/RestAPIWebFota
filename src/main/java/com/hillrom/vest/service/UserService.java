@@ -1729,7 +1729,7 @@ public class UserService {
 		}
 	}
 	
-	public JSONObject reactivateUser(Long id) throws HillromException {
+	public JSONObject reactivateUser(Long id,String baseUrl) throws HillromException {
     	JSONObject jsonObject = new JSONObject();
     	UserExtension existingUser = userExtensionRepository.findOne(id);
     	List<Authority> authorities  = authorityRepository.findAll();
@@ -1742,6 +1742,8 @@ public class UserService {
 				if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))){
 					if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 						reactivatePatientUser(existingUser);
+						//hill-2178
+						mailService.sendReactivationEmail(existingUser,baseUrl);
 						jsonObject.put("message", MessageConstants.HR_215);
 						//hill-1844
 					} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
@@ -1755,6 +1757,8 @@ public class UserService {
 						//hill-1844
 						existingUser.setDeleted(false);
 						userExtensionRepository.saveAndFlush(existingUser);
+						//hill-2178
+						mailService.sendReactivationEmail(existingUser,baseUrl);
 						jsonObject.put("message", MessageConstants.HR_235);
 					} else {
 						throw new HillromException(ExceptionConstants.HR_604);
@@ -1764,12 +1768,16 @@ public class UserService {
 				else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))){
 					if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 						reactivatePatientUser(existingUser);
+						//hill-2178
+						mailService.sendReactivationEmail(existingUser,baseUrl);
 						jsonObject.put("message", MessageConstants.HR_215);
 						} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))) {
 						existingUser.setDeleted(false);
 						userExtensionRepository.saveAndFlush(existingUser);
+						//hill-2178
+						mailService.sendReactivationEmail(existingUser,baseUrl);
 						jsonObject.put("message", MessageConstants.HR_235);
 					} else {
 						throw new HillromException(ExceptionConstants.HR_604);
@@ -1779,6 +1787,8 @@ public class UserService {
 				else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))){
 					if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 						reactivatePatientUser(existingUser);
+						//hill-2178
+						mailService.sendReactivationEmail(existingUser,baseUrl);
 						jsonObject.put("message", MessageConstants.HR_215);
 					} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ADMIN)) 
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ACCT_SERVICES))
@@ -1791,6 +1801,8 @@ public class UserService {
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CARE_GIVER))) {
 						existingUser.setDeleted(false);
 						userExtensionRepository.saveAndFlush(existingUser);
+						//hill-2178
+						mailService.sendReactivationEmail(existingUser,baseUrl);
 						jsonObject.put("message", MessageConstants.HR_235);
 					} else {
 						throw new HillromException(ExceptionConstants.HR_604);
@@ -1806,6 +1818,7 @@ public class UserService {
 		}
 		return jsonObject;
     }
+
 
 	private void reactivatePatientUser(UserExtension existingUser) throws HillromException {
 		List<UserPatientAssoc> caregiverAssocList = getListOfCaregiversAssociatedToPatientUser(existingUser);

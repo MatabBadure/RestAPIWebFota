@@ -41,6 +41,9 @@ public class AdherenceResetDTO {
 	@Size(max = 50)
     private String createdBy;
 	
+	@Size(max = 50)
+    private String deviceType;
+	
 	private Boolean isDeleted;
 
 	public AdherenceResetDTO() {
@@ -48,7 +51,7 @@ public class AdherenceResetDTO {
 	}
 
 	public AdherenceResetDTO(String userId, String patientId, String resetStartDate, String resetScore,
-			String resetDate, String justification, String createdBy, Boolean isDeleted) {
+			String resetDate, String justification, String createdBy, Boolean isDeleted, String deviceType) {
 		super();
 		this.userId = userId;
 		this.patientId = patientId;
@@ -58,6 +61,7 @@ public class AdherenceResetDTO {
 		this.justification = justification;
 		this.createdBy = createdBy;
 		this.isDeleted = isDeleted;
+		this.deviceType = deviceType;
 	}
 
 	public String getUserId() {
@@ -123,11 +127,20 @@ public class AdherenceResetDTO {
 		this.isDeleted = isDeleted;
 	}
 	
+	
+	public String getDeviceType() {
+		return deviceType;
+	}
+
+	public void setDeviceType(String deviceType) {
+		this.deviceType = deviceType;
+	}
+
 	@Override
 	public String toString() {
 		return "AdherenceResetDTO [userId="+ userId + ",patientId="
 				+ patientId + ", resetStartDate=" + resetStartDate + ", resetScore="
-				+ resetScore + ", resetDate=" + resetDate + ", justification="
+				+ resetScore + ", resetDate=" + resetDate + ", deviceType=" + deviceType + ", justification="
 				+ justification + ", createdBy=" + createdBy + ", isDeleted=" + isDeleted + "]";
 		
 	}

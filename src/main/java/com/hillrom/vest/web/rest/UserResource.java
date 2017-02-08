@@ -74,6 +74,7 @@ import com.hillrom.vest.service.PatientVestDeviceService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.service.monarch.TherapySessionServiceMonarch;
+import com.hillrom.vest.service.monarch.PatientComplianceMonarchService;
 import com.hillrom.vest.service.util.CsvUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -86,6 +87,7 @@ import com.hillrom.vest.web.rest.dto.ProtocolRevisionVO;
 import com.hillrom.vest.web.rest.dto.StatisticsVO;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
+import com.hillrom.vest.web.rest.dto.monarch.ProtocolRevisionMonarchVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 import net.minidev.json.JSONObject;
@@ -138,6 +140,9 @@ public class UserResource {
 	private PatientComplianceService patientComplianceService;
 
 	@Inject
+	private PatientComplianceMonarchService patientComplianceMonarchService;
+	
+	@Inject
 	private ExcelOutputService excelOutputService;
 	
 	@Qualifier("hmrGraphService")
@@ -149,6 +154,11 @@ public class UserResource {
 	@Inject
 	private GraphService adherenceTrendGraphService;
     //hill-1847
+	
+	@Qualifier("adherenceTrendGraphServiceMonarch")
+	@Inject
+	private GraphService adherenceTrendGraphServiceMonarch;
+    
 	
 	@Qualifier("complianceGraphService")
 	@Inject
@@ -1087,12 +1097,26 @@ public class UserResource {
     public ResponseEntity<?> getAdherenceTrendGraphData(@PathVariable Long id,
     		@RequestParam(value = "from", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
     		@RequestParam(value = "to", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to,
-    		@RequestParam(value = "duration", required = true) String duration) {
+    		@RequestParam(value = "duration", required = true) String duration,
+    		@RequestParam(value = "deviceType", required = true) String deviceType) {
     		try {
-    			List<ProtocolRevisionVO> adherenceTrendData = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id, from, to);
+    			
+    			List<ProtocolRevisionVO> adherenceTrendData = null;
+    			List<ProtocolRevisionMonarchVO> adherenceTrendDataMonarch = null;
+    			
+    			if(deviceType.equals("VEST")){
+    				adherenceTrendData = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id, from, to);
+    			}else if(deviceType.equals("MONARCH")){
+    				adherenceTrendDataMonarch = patientComplianceMonarchService.findAdherenceTrendByUserIdAndDateRange(id, from, to);
+    			}
+    			
     			if (Objects.nonNull(adherenceTrendData) &&  adherenceTrendData.size() > 0) {
     				Graph adherenceTrendGraph = adherenceTrendGraphService.populateGraphData(adherenceTrendData, new Filter(from,to, duration, null));
     				return new ResponseEntity<>(adherenceTrendGraph, HttpStatus.OK);
+    			}
+    			else if(Objects.nonNull(adherenceTrendDataMonarch) &&  adherenceTrendDataMonarch.size() > 0) {
+    				Graph adherenceTrendGraphMonarch = adherenceTrendGraphServiceMonarch.populateGraphData(adherenceTrendDataMonarch, new Filter(from,to, duration, null));
+    				return new ResponseEntity<>(adherenceTrendGraphMonarch, HttpStatus.OK);
     			}
     			return new ResponseEntity<>(HttpStatus.OK);
     		} catch (Exception ex) {

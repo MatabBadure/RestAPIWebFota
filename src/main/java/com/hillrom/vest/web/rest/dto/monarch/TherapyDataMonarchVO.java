@@ -1,4 +1,4 @@
-package com.hillrom.vest.web.rest.dto;
+package com.hillrom.vest.web.rest.dto.monarch;
 
 import java.io.Serializable;
 
@@ -8,9 +8,10 @@ import org.joda.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.Note;
+import com.hillrom.vest.domain.NoteMonarch;
 import com.hillrom.vest.domain.util.DateTimeSerializer;
 
-public class TherapyDataVO implements Serializable,Comparable<TherapyDataVO> {
+public class TherapyDataMonarchVO implements Serializable,Comparable<TherapyDataMonarchVO> {
 
 	@JsonSerialize(using= DateTimeSerializer.class)
 	private DateTime timestamp;
@@ -30,10 +31,12 @@ public class TherapyDataVO implements Serializable,Comparable<TherapyDataVO> {
 	private int duration;
 	private double hmr;
 	private boolean missedTherapy;
-
-	public TherapyDataVO(DateTime timestamp, int treatmentsPerDay,int sessionNo,
-			int frequency, int pressure, int programmedCoughPauses,
-			int normalCoughPauses, int coughPauses, Note note, DateTime start,
+	private NoteMonarch noteMonarch;
+	private int intensity;
+	
+	public TherapyDataMonarchVO(DateTime timestamp, int treatmentsPerDay,int sessionNo,
+			int frequency, int intensity, int programmedCoughPauses,
+			int normalCoughPauses, int coughPauses, NoteMonarch note, DateTime start,
 			DateTime end, int coughPauseDuration, int duration, double hmr,boolean missedTherapy) {
 		super();
 		this.timestamp = timestamp;
@@ -41,11 +44,11 @@ public class TherapyDataVO implements Serializable,Comparable<TherapyDataVO> {
 		this.sessionNo = sessionNo;
 		this.sessionNo = sessionNo;
 		this.frequency = frequency;
-		this.pressure = pressure;
+		this.intensity = intensity;
 		this.programmedCoughPauses = programmedCoughPauses;
 		this.normalCoughPauses = normalCoughPauses;
 		this.coughPauses = coughPauses;
-		this.note = note;
+		this.noteMonarch = note;
 		this.start = start;
 		this.end = end;
 		this.coughPauseDuration = coughPauseDuration;
@@ -54,27 +57,7 @@ public class TherapyDataVO implements Serializable,Comparable<TherapyDataVO> {
 		this.missedTherapy = missedTherapy;
 	}
 
-	public TherapyDataVO(DateTime timestamp, int frequency, int pressure,
-			int programmedCoughPauses, int normalCoughPauses, int coughPauses,
-			Note note, DateTime start, DateTime end, int coughPauseDuration,
-			int duration, double hmr, boolean missedTherapy) {
-		super();
-		this.timestamp = timestamp;
-		this.frequency = frequency;
-		this.pressure = pressure;
-		this.programmedCoughPauses = programmedCoughPauses;
-		this.normalCoughPauses = normalCoughPauses;
-		this.coughPauses = coughPauses;
-		this.note = note;
-		this.start = start;
-		this.end = end;
-		this.coughPauseDuration = coughPauseDuration;
-		this.duration = duration;
-		this.hmr = hmr;
-		this.missedTherapy = missedTherapy;
-	}
-
-	public TherapyDataVO() {
+	public TherapyDataMonarchVO() {
 		super();
 	}
 
@@ -197,12 +180,27 @@ public class TherapyDataVO implements Serializable,Comparable<TherapyDataVO> {
 	public void setMissedTherapy(boolean missedTherapy) {
 		this.missedTherapy = missedTherapy;
 	}
+	
+	public NoteMonarch getNoteMonarch() {
+		return noteMonarch;
+	}
+
+	public void setNoteMonarch(NoteMonarch noteMonarch) {
+		this.noteMonarch = noteMonarch;
+	}
+	public int getIntensity() {
+		return intensity;
+	}
+
+	public void setIntensity(int intensity) {
+		this.intensity = intensity;
+	}
 
 	@Override
 	public String toString() {
-		return "TherapyDataVO [timestamp=" + timestamp + ", treatmentsPerDay="+treatmentsPerDay
-				+ " sessionNo="+ sessionNo + ", frequency=" + frequency + ", pressure="
-				+ pressure + ", programmedCoughPauses=" + programmedCoughPauses
+		return "TherapyDataMonarchVO [timestamp=" + timestamp + ", treatmentsPerDay="+treatmentsPerDay
+				+ " sessionNo="+ sessionNo + ", frequency=" + frequency + ", intensity="
+				+ intensity + ", programmedCoughPauses=" + programmedCoughPauses
 				+ ", normalCoughPauses=" + normalCoughPauses + ", coughPauses="
 				+ coughPauses + ", note=" + note + ", start=" + start
 				+ ", end=" + end + ", coughPauseDuration=" + coughPauseDuration
@@ -210,7 +208,7 @@ public class TherapyDataVO implements Serializable,Comparable<TherapyDataVO> {
 	}
 
 	@Override
-	public int compareTo(TherapyDataVO o) {
+	public int compareTo(TherapyDataMonarchVO o) {
 		return this.timestamp.compareTo(o.getTimestamp());
 	}
 

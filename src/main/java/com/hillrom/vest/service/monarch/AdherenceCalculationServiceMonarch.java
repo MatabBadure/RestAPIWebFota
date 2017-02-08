@@ -99,7 +99,7 @@ public class AdherenceCalculationServiceMonarch{
 
 	private static final String TOTAL_DURATION = "totalDuration";
 
-	private static final String WEIGHTED_AVG_PRESSURE = "weightedAvgPressure";
+	private static final String WEIGHTED_AVG_INTESITY = "weightedAvgIntensity";
 
 	private static final String WEIGHTED_AVG_FREQUENCY = "weightedAvgFrequency";
 
@@ -191,7 +191,7 @@ public class AdherenceCalculationServiceMonarch{
 	}
 
 	/**
-	 * Calculates Metrics such as weightedAvgFrequency,Pressure,treatmentsPerDay,duration for last adherence setting days
+	 * Calculates Metrics such as weightedAvgFrequency,Intensity,treatmentsPerDay,duration for last adherence setting days
 	 * @param therapySessionsPerDay
 	 * @return
 	 */
@@ -199,17 +199,17 @@ public class AdherenceCalculationServiceMonarch{
 			List<TherapySessionMonarch> therapySessionsPerDay) {
 		double totalDuration = calculateCumulativeDuration(therapySessionsPerDay);
 		double weightedAvgFrequency = 0f;
-		double weightedAvgPressure = 0f;
+		double weightedAvgIntensity = 0f;
 		for(TherapySessionMonarch therapySession : therapySessionsPerDay){
 			int durationInMinutes = therapySession.getDurationInMinutes(); 
 			weightedAvgFrequency += calculateWeightedAvg(totalDuration,durationInMinutes,therapySession.getFrequency());
-			weightedAvgPressure += calculateWeightedAvg(totalDuration,durationInMinutes,therapySession.getIntensity());
+			weightedAvgIntensity += calculateWeightedAvg(totalDuration,durationInMinutes,therapySession.getIntensity());
 		}
 		Map<String,Double> actualMetrics = new HashMap<>();
 		weightedAvgFrequency = Math.round(weightedAvgFrequency);
-		weightedAvgPressure = Math.round(weightedAvgPressure);
+		weightedAvgIntensity = Math.round(weightedAvgIntensity);
 		actualMetrics.put(WEIGHTED_AVG_FREQUENCY, weightedAvgFrequency);
-		actualMetrics.put(WEIGHTED_AVG_PRESSURE, weightedAvgPressure);
+		actualMetrics.put(WEIGHTED_AVG_INTESITY, weightedAvgIntensity);
 		actualMetrics.put(TOTAL_DURATION, totalDuration);
 		return actualMetrics;
 	}

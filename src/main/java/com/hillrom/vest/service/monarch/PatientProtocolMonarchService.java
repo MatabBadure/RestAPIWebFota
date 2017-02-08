@@ -43,8 +43,8 @@ import com.hillrom.vest.service.MailService;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
-import com.hillrom.vest.web.rest.dto.ProtocolDTO;
-import com.hillrom.vest.web.rest.dto.ProtocolEntryDTO;
+import com.hillrom.vest.web.rest.dto.monarch.ProtocolMonarchDTO;
+import com.hillrom.vest.web.rest.dto.monarch.ProtocolEntryMonarchDTO;
 
 /**
  * Service class for managing users.
@@ -67,7 +67,7 @@ public class PatientProtocolMonarchService {
 	@Inject
 	private MailService mailService;
     
-    public List<PatientProtocolDataMonarch> addProtocolToPatient(Long patientUserId, ProtocolDTO protocolDTO) throws HillromException {
+    public List<PatientProtocolDataMonarch> addProtocolToPatient(Long patientUserId, ProtocolMonarchDTO protocolDTO) throws HillromException {
     	if(Constants.CUSTOM_PROTOCOL.equals(protocolDTO.getType())){
     		if(protocolDTO.getProtocolEntries().size() < 1 || protocolDTO.getProtocolEntries().size() > 7){
     			throw new HillromException(ExceptionConstants.HR_552);
@@ -80,11 +80,11 @@ public class PatientProtocolMonarchService {
 		 		String protocolKey = patientProtocolMonarchRepository.id();
 		 	    List<PatientProtocolDataMonarch> protocolList = new LinkedList<>();
 		 	    Boolean isFirstPoint = true;
-		 		for(ProtocolEntryDTO protocolEntry : protocolDTO.getProtocolEntries()){
+		 		for(ProtocolEntryMonarchDTO protocolEntry : protocolDTO.getProtocolEntries()){
 		 			PatientProtocolDataMonarch patientProtocolAssoc = new PatientProtocolDataMonarch(protocolDTO.getType(), patientInfo, patientUser,
 		 					protocolDTO.getTreatmentsPerDay(), protocolEntry.getMinMinutesPerTreatment(), protocolEntry.getTreatmentLabel(),
-		 					protocolEntry.getMinFrequency(), protocolEntry.getMaxFrequency(), protocolEntry.getMinPressure(),
-		 					protocolEntry.getMaxPressure());
+		 					protocolEntry.getMinFrequency(), protocolEntry.getMaxFrequency(), protocolEntry.getMinIntensity(),
+		 					protocolEntry.getMaxIntensity());
 		 			if(isFirstPoint) {
 		 				patientProtocolAssoc.setId(protocolKey);
 		 				isFirstPoint = false;
@@ -183,10 +183,10 @@ public class PatientProtocolMonarchService {
 			cp.setMinFrequency(up.getMinFrequency());
 		if(Objects.nonNull(up.getMaxFrequency()))
 			cp.setMaxFrequency(up.getMaxFrequency());
-		if(Objects.nonNull(up.getMinPressure()))
-			cp.setMinPressure(up.getMinPressure());
-		if(Objects.nonNull(up.getMaxPressure()))
-			cp.setMaxPressure(up.getMaxPressure());
+		if(Objects.nonNull(up.getMinIntensity()))
+			cp.setMinIntensity(up.getMinIntensity());
+		if(Objects.nonNull(up.getMaxIntensity()))
+			cp.setMaxIntensity(up.getMaxIntensity());
 	}
 
     public List<PatientProtocolDataMonarch> getActiveProtocolsAssociatedWithPatient(Long patientUserId) throws HillromException {
@@ -340,33 +340,33 @@ public class PatientProtocolMonarchService {
 
 	private ProtocolConstantsMonarch getProtocolConstantFromNormalProtocol(
 			List<PatientProtocolDataMonarch> protocolData) {
-		int maxFrequency,minFrequency,minPressure,maxPressure,minDuration,treatmentsPerDay;
+		int maxFrequency,minFrequency,minIntensity,maxIntensity,minDuration,treatmentsPerDay;
 		PatientProtocolDataMonarch protocol = protocolData.get(0); 
 		maxFrequency = protocol.getMaxFrequency();
 		minFrequency = protocol.getMinFrequency();
-		maxPressure = protocol.getMaxPressure();
-		minPressure = protocol.getMinPressure();
+		maxIntensity = protocol.getMaxIntensity();
+		minIntensity = protocol.getMinIntensity();
 		treatmentsPerDay = protocol.getTreatmentsPerDay();
 		minDuration = protocol.getMinMinutesPerTreatment() * protocol.getTreatmentsPerDay();
-		return new ProtocolConstantsMonarch(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration);
+		return new ProtocolConstantsMonarch(maxFrequency,minFrequency,maxIntensity,minIntensity,treatmentsPerDay,minDuration);
 	}
 
 	private ProtocolConstantsMonarch getProtocolConstantFromCustomProtocol(
 			List<PatientProtocolDataMonarch> protocolData) {
-		int maxFrequency,minFrequency,minPressure,maxPressure,minDuration,treatmentsPerDay;
-		float weightedAvgFrequency = 0,weightedAvgPressure = 0;
+		int maxFrequency,minFrequency,minIntensity,maxIntensity,minDuration,treatmentsPerDay;
+		float weightedAvgFrequency = 0,weightedAvgIntensity = 0;
 		double totalDuration = protocolData.stream().collect(Collectors.summingDouble(PatientProtocolDataMonarch :: getMinMinutesPerTreatment));
 		for(PatientProtocolDataMonarch protocol : protocolData){
 			weightedAvgFrequency += calculateWeightedAvg(totalDuration, protocol.getMinMinutesPerTreatment(), protocol.getMinFrequency());
-			weightedAvgPressure += calculateWeightedAvg(totalDuration, protocol.getMinMinutesPerTreatment(), protocol.getMinPressure());
+			weightedAvgIntensity += calculateWeightedAvg(totalDuration, protocol.getMinMinutesPerTreatment(), protocol.getMinIntensity());
 		}
 		treatmentsPerDay = protocolData.get(0).getTreatmentsPerDay();
 		minFrequency = Math.round(weightedAvgFrequency);
 		maxFrequency = (int) Math.round(minFrequency*UPPER_BOUND_VALUE);
-		minPressure = Math.round(weightedAvgPressure);
-		maxPressure = (int) Math.round(minPressure*UPPER_BOUND_VALUE);
+		minIntensity = Math.round(weightedAvgIntensity);
+		maxIntensity = (int) Math.round(minIntensity*UPPER_BOUND_VALUE);
 		minDuration = (int)(totalDuration*treatmentsPerDay);
-		return new ProtocolConstantsMonarch(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration);
+		return new ProtocolConstantsMonarch(maxFrequency,minFrequency,maxIntensity,minIntensity,treatmentsPerDay,minDuration);
 	}
 	
 	public List<PatientProtocolDataMonarch> getAllProtocolsAssociatedWithPatient(Long patientUserId) throws HillromException {
@@ -388,8 +388,8 @@ public class PatientProtocolMonarchService {
 			PatientProtocolDataMonarch ppd) {
 		PatientProtocolDataMonarch patientProtocolAssoc = new PatientProtocolDataMonarch(type, patientInfo, patientUser,
 				treatmentsPerDay, ppd.getMinMinutesPerTreatment(),ppd.getTreatmentLabel(),
-				ppd.getMinFrequency(), ppd.getMaxFrequency(), ppd.getMinPressure(),
-				ppd.getMaxPressure());
+				ppd.getMinFrequency(), ppd.getMaxFrequency(), ppd.getMinIntensity(),
+				ppd.getMaxIntensity());
 		patientProtocolAssoc.setId(patientProtocolMonarchRepository.id());
 		patientProtocolAssoc.setProtocolKey(protocolKey);
 		patientProtocolAssoc.setLastModifiedDate(DateTime.now());
@@ -402,14 +402,14 @@ public class PatientProtocolMonarchService {
 			PatientProtocolDataMonarch ppd, String protocolId) {
 		PatientProtocolDataMonarch patientProtocolAssoc = new PatientProtocolDataMonarch(type, patientInfo, patientUser,
 				treatmentsPerDay, ppd.getMinMinutesPerTreatment(),ppd.getTreatmentLabel(),
-				ppd.getMinFrequency(), ppd.getMaxFrequency(), ppd.getMinPressure(),
-				ppd.getMaxPressure());
+				ppd.getMinFrequency(), ppd.getMaxFrequency(), ppd.getMinIntensity(),
+				ppd.getMaxIntensity());
 		if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(type))
 			patientProtocolAssoc.setTreatmentLabel("");
 		
 		if(Constants.CUSTOM_PROTOCOL.equalsIgnoreCase(type)){
 			patientProtocolAssoc.setMaxFrequency(null);
-		    patientProtocolAssoc.setMaxPressure(null);
+		    patientProtocolAssoc.setMaxIntensity(null);
 		}
 		patientProtocolAssoc.setId(protocolId);
 		patientProtocolAssoc.setProtocolKey(protocolKey);

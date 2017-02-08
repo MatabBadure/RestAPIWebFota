@@ -71,7 +71,13 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 	
     @Column(name="protocol_key")
     private String protocolKey;
- 
+    
+    @Column(name = "min_intensity")
+	private Integer minIntensity;
+	
+	@Column(name = "max_intensity")
+	private Integer maxIntensity;
+
 	public PatientProtocolDataMonarch() {
 		super();
 	}
@@ -79,8 +85,8 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 	public PatientProtocolDataMonarch(String type, PatientInfo patient,
 			User patientUser, int treatmentsPerDay, int minMinutesPerTreatment,
 			String treatmentLabel,Integer minFrequency,
-			Integer maxFrequency, Integer minPressure,
-			Integer maxPressure) {
+			Integer maxFrequency, Integer minIntensity,
+			Integer maxIntensity) {
 		super();
 		this.type = type;
 		this.patient = patient;
@@ -90,8 +96,8 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 		this.treatmentLabel = treatmentLabel;
 		this.minFrequency = minFrequency;
 		this.maxFrequency = maxFrequency;
-		this.minPressure = minPressure;
-		this.maxPressure = maxPressure;
+		this.minIntensity = minIntensity;
+		this.maxIntensity = maxIntensity;
 	}
 
 	public String getId() {
@@ -197,6 +203,22 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 	public void setProtocolKey(String protocolKey) {
 		this.protocolKey = protocolKey;
 	}
+	
+	public Integer getMinIntensity() {
+		return minIntensity;
+	}
+
+	public void setMinIntensity(Integer minIntensity) {
+		this.minIntensity = minIntensity;
+	}
+
+	public Integer getMaxIntensity() {
+		return maxIntensity;
+	}
+
+	public void setMaxIntensity(Integer maxIntensity) {
+		this.maxIntensity = maxIntensity;
+	}
 
 	@Override
 	public int hashCode() {
@@ -253,6 +275,7 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 				+ patientUser + ", treatmentsPerDay=" + treatmentsPerDay + ", minMinutesPerTreatment="
 				+ minMinutesPerTreatment + ", treatmentLabel=" + treatmentLabel + ", minFrequency=" + minFrequency
 				+ ", maxFrequency=" + maxFrequency + ", minPressure=" + minPressure + ", maxPressure=" + maxPressure
+				+ ", minIntensity=" + minIntensity + ", maxIntensity=" + maxIntensity
 				+ ", deleted=" + deleted + ", protocolKey=" + protocolKey + "]";
 	}
 

@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.domain.AdherenceReset;
+import com.hillrom.vest.domain.AdherenceResetMonarch;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientNoEvent;
@@ -50,6 +51,8 @@ import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.AdherenceResetService;
 import com.hillrom.vest.service.NoteService;
 import com.hillrom.vest.service.PatientNoEventService;
+import com.hillrom.vest.service.monarch.AdherenceCalculationServiceMonarch;
+import com.hillrom.vest.service.monarch.AdherenceResetServiceMonarch;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -62,6 +65,7 @@ import com.hillrom.vest.web.rest.util.PaginationUtil;
 import com.mysema.query.types.expr.BooleanExpression;
 
 import net.minidev.json.JSONObject;
+
 import org.joda.time.DateTime;
 
 /**
@@ -83,7 +87,14 @@ public class AdherenceResource {
     private AdherenceResetService adherenceResetService;
 
     @Inject
+    private AdherenceResetServiceMonarch adherenceResetServiceMonarch;    
+    
+    @Inject
 	private AdherenceCalculationService adherenceCalculationService;
+    
+    @Inject
+	private AdherenceCalculationServiceMonarch adherenceCalculationServiceMonarch;
+    
 	@Inject
 	private PatientComplianceRepository patientComplianceRepository;
 	
@@ -110,6 +121,7 @@ public class AdherenceResource {
 		String resetScore = adherenceResetDTO.getResetScore();
 		String justification = adherenceResetDTO.getJustification();
 		String createdById = adherenceResetDTO.getCreatedBy();
+		String deviceType = adherenceResetDTO.getDeviceType();
 		 
     	
 		JSONObject jsonObject = new JSONObject();
@@ -156,18 +168,34 @@ public class AdherenceResource {
 					}
 				}
 			}
-			AdherenceReset adherenceReset = adherenceResetService.createAdherenceReset(patientId, Long.parseLong(userId), resetDt, 
+			AdherenceReset adherenceReset = null;
+			AdherenceResetMonarch adherenceResetMonarch = null; 
+					
+			if(deviceType == "VEST"){
+				adherenceReset = adherenceResetService.createAdherenceReset(patientId, Long.parseLong(userId), resetDt, 
 																					Integer.parseInt(resetScore), resetStartDt, justification, Long.parseLong(createdById));
-	        if (Objects.isNull(adherenceReset)) {
-	        	jsonObject.put("ERROR", ExceptionConstants.HR_720);
-	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-	        } else {
+			}else if(deviceType == "MONARCH"){			
+				adherenceResetMonarch = adherenceResetServiceMonarch.createAdherenceReset(patientId, Long.parseLong(userId), resetDt, 
+					Integer.parseInt(resetScore), resetStartDt, justification, Long.parseLong(createdById));
+			}
+			
+	        if (Objects.nonNull(adherenceReset) && Objects.isNull(adherenceResetMonarch)) {
 				// For recalculating adherence score with the adherence start date
 	        	String errMsg = adherenceCalculationService.adherenceResetForPatient(Long.parseLong(userId), patientId, resetStartDt, Integer.parseInt(resetScore), 1);
 	        	//jsonObject.put("message", MessageConstants.HR_313);
 	        	jsonObject.put("message", errMsg);
 	            jsonObject.put("AdherenceReset", adherenceReset);
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+	        } else if (Objects.isNull(adherenceReset) && Objects.nonNull(adherenceResetMonarch)) {
+				// For recalculating adherence score with the adherence start date
+	        	String errMsg = adherenceCalculationServiceMonarch.adherenceResetForPatient(Long.parseLong(userId), patientId, resetStartDt, Integer.parseInt(resetScore), 1);
+	        	//jsonObject.put("message", MessageConstants.HR_313);
+	        	jsonObject.put("message", errMsg);
+	            jsonObject.put("AdherenceReset", adherenceReset);
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+	        } else {
+	        	jsonObject.put("ERROR", ExceptionConstants.HR_720);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        }
 		} catch (HillromException e) {
 			jsonObject.put("ERROR", e.getMessage());

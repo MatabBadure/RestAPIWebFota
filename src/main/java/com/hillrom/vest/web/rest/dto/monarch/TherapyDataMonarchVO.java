@@ -198,9 +198,9 @@ public class TherapyDataMonarchVO implements Serializable,Comparable<TherapyData
 
 	@Override
 	public String toString() {
-		return "TherapyDataVO [timestamp=" + timestamp + ", treatmentsPerDay="+treatmentsPerDay
-				+ " sessionNo="+ sessionNo + ", frequency=" + frequency + ", pressure="
-				+ pressure + ", programmedCoughPauses=" + programmedCoughPauses
+		return "TherapyDataMonarchVO [timestamp=" + timestamp + ", treatmentsPerDay="+treatmentsPerDay
+				+ " sessionNo="+ sessionNo + ", frequency=" + frequency + ", intensity="
+				+ intensity + ", programmedCoughPauses=" + programmedCoughPauses
 				+ ", normalCoughPauses=" + normalCoughPauses + ", coughPauses="
 				+ coughPauses + ", note=" + note + ", start=" + start
 				+ ", end=" + end + ", coughPauseDuration=" + coughPauseDuration

@@ -26,7 +26,7 @@ import com.hillrom.vest.web.rest.dto.Filter;
 import com.hillrom.vest.web.rest.dto.Graph;
 import com.hillrom.vest.web.rest.dto.GraphDataVO;
 import com.hillrom.vest.web.rest.dto.Series;
-import com.hillrom.vest.web.rest.dto.TherapyDataVO;
+import com.hillrom.vest.web.rest.dto.monarch.TherapyDataMonarchVO;
 
 @Component("hmrGraphServiceMonarch")
 public class HMRGraphServiceMonarch extends AbstractGraphService {
@@ -55,14 +55,14 @@ public class HMRGraphServiceMonarch extends AbstractGraphService {
 	@SuppressWarnings("unchecked")
 	public Graph populateGraphDataForCustomDateRange(Object data, Filter filter) {
 		Graph hmrGraph = GraphUtils.buildGraphObectWithXAxisType(XAXIS_TYPE_DATETIME);
-		List<TherapyDataVO> therapyData = (List<TherapyDataVO>) data;
+		List<TherapyDataMonarchVO> therapyData = (List<TherapyDataMonarchVO>) data;
 		String seriesLabel = HMR_LABEL;
 		String datePattern = MMddyyyyHHmmss;
 		if(DAY.equalsIgnoreCase(filter.getDuration())){
 			seriesLabel = MINUTES_LABEL;
 		}
 		Series durationSeries = GraphUtils.createSeriesObjectWithName(seriesLabel);
-		for(TherapyDataVO therapy : therapyData){
+		for(TherapyDataMonarchVO therapy : therapyData){
 			hmrGraph.getxAxis().getCategories().add(DateUtil.formatDate(therapy.getTimestamp(), datePattern));
 			GraphDataVO point = createSeriesDataWithToolText(filter, therapy);
 			durationSeries.getData().add(point);
@@ -72,7 +72,7 @@ public class HMRGraphServiceMonarch extends AbstractGraphService {
 	}
 
 	private GraphDataVO createSeriesDataWithToolText(Filter filter,
-			TherapyDataVO therapy) {
+			TherapyDataMonarchVO therapy) {
 		GraphDataVO point = null;
 		if(DAY.equalsIgnoreCase(filter.getDuration())){
 			point = new GraphDataVO(DateUtil.formatDate(therapy.getTimestamp(), MMddyyyyHHMM), therapy.getDuration());

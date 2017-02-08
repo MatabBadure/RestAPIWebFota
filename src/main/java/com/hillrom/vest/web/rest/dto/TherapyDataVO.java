@@ -8,6 +8,7 @@ import org.joda.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.Note;
+import com.hillrom.vest.domain.NoteMonarch;
 import com.hillrom.vest.domain.util.DateTimeSerializer;
 
 public class TherapyDataVO implements Serializable,Comparable<TherapyDataVO> {
@@ -30,7 +31,9 @@ public class TherapyDataVO implements Serializable,Comparable<TherapyDataVO> {
 	private int duration;
 	private double hmr;
 	private boolean missedTherapy;
-
+	private NoteMonarch noteMonarch;
+	private int intensity;
+	
 	public TherapyDataVO(DateTime timestamp, int treatmentsPerDay,int sessionNo,
 			int frequency, int pressure, int programmedCoughPauses,
 			int normalCoughPauses, int coughPauses, Note note, DateTime start,
@@ -66,6 +69,29 @@ public class TherapyDataVO implements Serializable,Comparable<TherapyDataVO> {
 		this.normalCoughPauses = normalCoughPauses;
 		this.coughPauses = coughPauses;
 		this.note = note;
+		this.start = start;
+		this.end = end;
+		this.coughPauseDuration = coughPauseDuration;
+		this.duration = duration;
+		this.hmr = hmr;
+		this.missedTherapy = missedTherapy;
+	}
+	
+	public TherapyDataVO(DateTime timestamp, int treatmentsPerDay,int sessionNo,
+			int frequency, int intensity, int programmedCoughPauses,
+			int normalCoughPauses, int coughPauses, NoteMonarch note, DateTime start,
+			DateTime end, int coughPauseDuration, int duration, double hmr,boolean missedTherapy) {
+		super();
+		this.timestamp = timestamp;
+		this.treatmentsPerDay = treatmentsPerDay;
+		this.sessionNo = sessionNo;
+		this.sessionNo = sessionNo;
+		this.frequency = frequency;
+		this.intensity = intensity;
+		this.programmedCoughPauses = programmedCoughPauses;
+		this.normalCoughPauses = normalCoughPauses;
+		this.coughPauses = coughPauses;
+		this.noteMonarch = note;
 		this.start = start;
 		this.end = end;
 		this.coughPauseDuration = coughPauseDuration;
@@ -196,6 +222,21 @@ public class TherapyDataVO implements Serializable,Comparable<TherapyDataVO> {
 
 	public void setMissedTherapy(boolean missedTherapy) {
 		this.missedTherapy = missedTherapy;
+	}
+	
+	public NoteMonarch getNoteMonarch() {
+		return noteMonarch;
+	}
+
+	public void setNoteMonarch(NoteMonarch noteMonarch) {
+		this.noteMonarch = noteMonarch;
+	}
+	public int getIntensity() {
+		return intensity;
+	}
+
+	public void setIntensity(int intensity) {
+		this.intensity = intensity;
 	}
 
 	@Override

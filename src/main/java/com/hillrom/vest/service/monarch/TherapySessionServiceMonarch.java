@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.batch.processing.monarch.PatientMonarchDeviceDataReader;
 import com.hillrom.vest.domain.Note;
+import com.hillrom.vest.domain.NoteMonarch;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientInfo;
@@ -63,7 +64,7 @@ public class TherapySessionServiceMonarch {
 	private PatientComplianceMonarchService complianceServiceMonarch;
 	
 	@Inject
-	private NoteService noteService;
+	private NoteServiceMonarch noteServiceMonarch;
 	
 	@Inject
 	private PatientNoEventService patientNoEventService;
@@ -115,13 +116,13 @@ public class TherapySessionServiceMonarch {
 		}
 	}*/
 	
-	/*public List<TherapyDataVO> findByPatientUserIdAndDateRange(Long patientUserId,LocalDate from,LocalDate to){
+	public List<TherapyDataVO> findByPatientUserIdAndDateRange(Long patientUserId,LocalDate from,LocalDate to){
 		List<TherapySessionMonarch> sessions = therapySessionRepositoryMonarch
 				.findByPatientUserIdAndDateRange(patientUserId,from,to);
-		Map<LocalDate, Note> dateNotesMap = noteService.findByPatientUserIdAndCreatedOnBetweenGroupByCreatedOn(patientUserId, from, to, false);
+		Map<LocalDate, NoteMonarch> dateNotesMap = noteServiceMonarch.findByPatientUserIdAndCreatedOnBetweenGroupByCreatedOn(patientUserId, from, to, false);
 		Map<LocalDate,List<TherapySessionMonarch>> tpsGroupByDate = groupTherapySessionsByDate(sessions);
 		return formatResponse(tpsGroupByDate, dateNotesMap, patientUserId, from, to);
-	}*/
+	}
 	
 	public SortedMap<LocalDate,List<TherapySessionMonarch>> groupTherapySessionsByDate(List<TherapySessionMonarch> therapySessions){
 		return new TreeMap<>(therapySessions.stream().collect(Collectors.groupingBy(TherapySessionMonarch :: getDate)));
@@ -182,7 +183,7 @@ public class TherapySessionServiceMonarch {
 	private List<TherapyDataVO> prepareTherapySessionsAddMissedTherapyData(Long patientUserId,
 			LocalDate from, LocalDate to,
 			Map<LocalDate, List<TherapyDataVO>> therapySessionMap,
-			Map<LocalDate,Note> noteMap,
+			Map<LocalDate,NoteMonarch> noteMap,
 			TherapySessionMonarch latestTherapySession) {
 		int minutes = 60*60;
 		// Get the latest HMR for the user before the requested duration
@@ -200,7 +201,7 @@ public class TherapySessionServiceMonarch {
 			if(Objects.nonNull(therapySessionMap.get(date))){
 				List<TherapyDataVO> therapySessions = therapySessionMap.get(date);
 				therapySessions.forEach(therapy -> {
-					therapy.setNote(noteMap.get(date));
+					therapy.setNoteMonarch(noteMap.get(date));
 					processedTherapies.add(therapy);
 				});
 				// updating HMR from previous day to form step graph
@@ -208,7 +209,7 @@ public class TherapySessionServiceMonarch {
 			}else if(date.isBefore(LocalDate.now())){ // Don't consider current date as missed therapy
 				// add missed therapy if user misses the therapy
 				TherapyDataVO missedTherapy = createTherapyDataWithTimeStamp(date);
-				missedTherapy.setNote(noteMap.get(date));
+				missedTherapy.setNoteMonarch(noteMap.get(date));
 				missedTherapy.setHmr(hmrInHours);
 				processedTherapies.add(missedTherapy);
 			}
@@ -231,7 +232,7 @@ public class TherapySessionServiceMonarch {
 	}
 	
 	private List<TherapyDataVO> formatResponse(Map<LocalDate,List<TherapySessionMonarch>> sessionMap,
-			Map<LocalDate, Note> noteMap,Long patientUserId,LocalDate from,LocalDate to){
+			Map<LocalDate, NoteMonarch> noteMap,Long patientUserId,LocalDate from,LocalDate to){
 		TherapySessionMonarch latestTherapySession = therapySessionRepositoryMonarch.findTop1ByPatientUserIdAndDateBeforeOrderByEndTimeDesc(patientUserId,from);
 		Map<LocalDate, List<TherapyDataVO>> therapyDataMap = assignNotesToTherapySession(
 				sessionMap, noteMap);
@@ -248,7 +249,7 @@ public class TherapySessionServiceMonarch {
 
 	private Map<LocalDate, List<TherapyDataVO>> assignNotesToTherapySession(
 			Map<LocalDate, List<TherapySessionMonarch>> sessionMap,
-			Map<LocalDate, Note> noteMap) {
+			Map<LocalDate, NoteMonarch> noteMap) {
 		Map<LocalDate,List<TherapyDataVO>> therapyDataMap = new TreeMap<>();
 		TherapyDataVO therapyDataVO = null;
 		int minutes = 60*60;
@@ -258,10 +259,10 @@ public class TherapySessionServiceMonarch {
 			if(Objects.isNull(therapyDataVOs))
 				therapyDataVOs = new LinkedList<>();
 			for(TherapySessionMonarch session: sessionsPerDate){
-				int programmedCoughPauses = session.getProgrammedCaughPauses();
+				int programmedCoughPauses = session.getProgrammedCaughPauses()==null?0:session.getProgrammedCaughPauses();
 				int normalCoughPauses = session.getNormalCaughPauses();
 				therapyDataVO = new TherapyDataVO(session.getStartTime(), sessionsPerDate.size(),session.getSessionNo(), 
-						session.getFrequency(),	session.getPressure(), programmedCoughPauses, normalCoughPauses,
+						session.getFrequency(),	session.getIntensity(), programmedCoughPauses, normalCoughPauses,
 						programmedCoughPauses+normalCoughPauses, noteMap.get(date), session.getStartTime(),
 						session.getEndTime(), session.getCaughPauseDuration(),
 						session.getDurationInMinutes(), session.getHmr().doubleValue()/minutes,false);

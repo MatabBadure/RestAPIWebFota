@@ -211,11 +211,15 @@ public class PatientVestDeviceTherapyUtilMonarch {
 		long startTimestamp = deviceEventRecordsMonarch.get(0).getTimestamp();
 		int totalDuration = (int) Math.round((endTimestamp-startTimestamp)/MILLI_SECONDS_PER_MINUTE);
 		
+		
 		// HILL-1384 : since it is observed , hmr being corrupted
-		if(hmrDiff > totalDuration)
+		/*if(hmrDiff > totalDuration)
 			return totalDuration;
 		else
-			return hmrDiff;
+			return hmrDiff;*/
+		
+		// Not consider the HMR, and considering only the timestamp difference
+		return totalDuration;
 		
 	}
 	
@@ -401,14 +405,16 @@ public class PatientVestDeviceTherapyUtilMonarch {
 
 	private static boolean isStartEventForTherapySessionMonarch(String eventCode) {
 		return EVENT_CODE_NORMAL_START_MONARCH.equals(eventCode) ||
-				EVENT_CODE_PROGRAM_STEP1_START_MONARCH.equals(eventCode) ||
+				EVENT_CODE_PROGRAM_STEP1_START_MONARCH.equals(eventCode); 
+				
+				/*||
 				EVENT_CODE_PROGRAM_STEP2_START_MONARCH.equals(eventCode) ||
 				EVENT_CODE_PROGRAM_STEP3_START_MONARCH.equals(eventCode) ||
 				EVENT_CODE_PROGRAM_STEP4_START_MONARCH.equals(eventCode) ||
 				EVENT_CODE_PROGRAM_STEP5_START_MONARCH.equals(eventCode) ||
 				EVENT_CODE_PROGRAM_STEP6_START_MONARCH.equals(eventCode) ||
 				EVENT_CODE_PROGRAM_STEP7_START_MONARCH.equals(eventCode) ||
-				EVENT_CODE_PROGRAM_STEP8_START_MONARCH.equals(eventCode);
+				EVENT_CODE_PROGRAM_STEP8_START_MONARCH.equals(eventCode);*/
 	}
 
 	public static TherapySession assignTherapyMatrics(

@@ -478,12 +478,31 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
         }
         log.debug("start_time : "+ sout );
         
+        int start_date =  start_time[2];
+        int start_month =  start_time[1];
+        int start_year =  start_time[0];
+        int start_hour =  start_time[3];
+        int start_minute =  start_time[4];
+        int start_second =  start_time[5];
+        
         byte[] end_time  = Arrays.copyOfRange(deviceDataArray, END_TIME_LOC, END_TIME_LOC + END_TIME_LEN);        
         sout = "";
         for(int k=0;k<end_time.length;k++){
         	sout = sout + (end_time[k]  & 0xFF) + " ";
         }
         log.debug("end_time : "+ sout );
+        
+        int end_date =  end_time[0];
+        int end_month =  end_time[1];
+        int end_year =  end_time[2];
+        int end_hour =  end_time[3];
+        int end_minute =  end_time[4];
+        int end_second =  end_time[5];
+        
+        int startEndVary = 0;
+        if(start_date != end_date){
+        	startEndVary = 1;	
+        }
         
         byte[] start_battery_level  = Arrays.copyOfRange(deviceDataArray, START_BATTERY_LEVEL_LOC, START_BATTERY_LEVEL_LOC + START_BATTERY_LEVEL_LEN);
         sout = "";
@@ -565,8 +584,8 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 	        
 	        PatientVestDeviceDataMonarch monarchDeviceDataVal = new PatientVestDeviceDataMonarch();
 	        
-	       /* 
-	        SimpleDateFormat datetimeFormatter1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");	        
+	        
+	       /* SimpleDateFormat datetimeFormatter1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");	        
 	        Date lFromDate1 = null;
 			try {
 				lFromDate1 = datetimeFormatter1.parse(new String(event_timestamp));
@@ -577,12 +596,18 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 			
 
 	        
-	        String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+	        String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());*/
 	        
-	        java.sql.Timestamp timestamp = java.sql.Timestamp.valueOf("2007-09-23 15:30:59.0");
+	        int eventHour = event_timestamp[0];
+	        int eventMin = event_timestamp[1];
+	        int eventSec = event_timestamp[2];
 	        
+	        String dateValue = "20"+start_year+"-"+start_month+"-"+start_date+" "+eventHour+":"+eventMin+":"+eventSec+".0";
 	        
-	        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+	        java.sql.Timestamp timestamp = java.sql.Timestamp.valueOf(dateValue);
+	        long tsTime2 = timestamp.getTime();
+	        
+	        /*DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 	        Date date = null;
 			try {
 				date = dateFormat.parse("23/09/2007 15:30:30");
@@ -592,13 +617,12 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 			}
 	        long time = date.getTime();	        */
 	        
-	        java.util.Date today = new java.util.Date();
+	        /*java.util.Date today = new java.util.Date();
 	        java.sql.Timestamp ts1 = new java.sql.Timestamp(today.getTime());
 	        long tsTime1 = ts1.getTime();
-	        
-	        
+	        */
 			
-	        monarchDeviceDataVal.setTimestamp(tsTime1);
+	        monarchDeviceDataVal.setTimestamp(tsTime2);
 	        // todo : hardcoded for temporary
 	        monarchDeviceDataVal.setSequenceNumber(1); 
 	        monarchDeviceDataVal.setEventCode(eventCode);
@@ -607,7 +631,6 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 	        monarchDeviceDataVal.setFrequency(Integer.parseInt(freqValue));
 	        monarchDeviceDataVal.setIntensity(Integer.parseInt(intensityVal));
 	        monarchDeviceDataVal.setDuration(Integer.parseInt(durationVal));
-	        
 	        
 	        monarchDeviceData.add(monarchDeviceDataVal);
 	        

@@ -203,7 +203,7 @@ public class AdherenceCalculationServiceMonarch{
 		for(TherapySessionMonarch therapySession : therapySessionsPerDay){
 			int durationInMinutes = therapySession.getDurationInMinutes(); 
 			weightedAvgFrequency += calculateWeightedAvg(totalDuration,durationInMinutes,therapySession.getFrequency());
-			weightedAvgPressure += calculateWeightedAvg(totalDuration,durationInMinutes,therapySession.getPressure());
+			weightedAvgPressure += calculateWeightedAvg(totalDuration,durationInMinutes,therapySession.getIntensity());
 		}
 		Map<String,Double> actualMetrics = new HashMap<>();
 		weightedAvgFrequency = Math.round(weightedAvgFrequency);

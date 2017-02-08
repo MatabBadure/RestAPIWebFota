@@ -1024,12 +1024,15 @@ public class UserExtensionResource {
     
     //hill-1845
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES})
-    //hill-1845
-    public ResponseEntity<JSONObject> reactivateUser(@PathVariable Long id) {
+    //hill-1845,
+    public ResponseEntity<JSONObject> reactivateUser(@PathVariable Long id, HttpServletRequest request) {
         log.debug("REST request to reactivate User : {}", id);
+        //hill-2178
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         JSONObject jsonObject = new JSONObject();
 		try {
-			jsonObject = userService.reactivateUser(id);
+			//hill-2178
+			jsonObject = userService.reactivateUser(id,baseUrl);
 			 if (jsonObject.containsKey("ERROR")) {
 		        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
 		        } else {

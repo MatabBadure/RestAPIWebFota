@@ -115,4 +115,5 @@
 	<include file="classpath:/config/liquibase/changelog/20170116030400_create_ping_pong_ping_table.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170117030200_updated_clinic_speciality_hillrom_type_code.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170131024800_add_column_inTHERAPY_DATA_MONARCH.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170209162030_updated_values_for_default_protocol_monarch.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

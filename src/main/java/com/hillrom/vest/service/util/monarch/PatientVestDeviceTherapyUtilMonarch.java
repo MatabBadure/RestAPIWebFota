@@ -19,7 +19,6 @@ import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
-import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.TherapySessionMonarch;
 import com.hillrom.vest.domain.User;
 
@@ -377,7 +376,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 		return therapySessions;
 	}
 
-	private static void applyGlobalHMR(TherapySession therapySession,
+	private static void applyGlobalHMR(TherapySessionMonarch therapySession,
 			PatientVestDeviceHistory latestInActiveDeviceHistory)throws Exception {
 		if( Objects.nonNull(latestInActiveDeviceHistory) && (therapySession.getHmr() < latestInActiveDeviceHistory.getHmr())){
 			if(!(latestInActiveDeviceHistory.getSerialNumber().equalsIgnoreCase(therapySession.getSerialNumber()))){
@@ -417,13 +416,13 @@ public class PatientVestDeviceTherapyUtilMonarch {
 				EVENT_CODE_PROGRAM_STEP8_START_MONARCH.equals(eventCode);*/
 	}
 
-	public static TherapySession assignTherapyMatrics(
+	public static TherapySessionMonarch assignTherapyMatrics(
 			List<PatientVestDeviceData> groupEntries) {
 		Long timestamp = groupEntries.get(0).getTimestamp();
 		User patientUser = groupEntries.get(0).getPatientUser();
 		PatientInfo patient = groupEntries.get(0).getPatient();
 		Map<String,Integer> metricsMap = getTherapyMetricsMap(groupEntries);
-		TherapySession therapySession = new TherapySession();
+		TherapySessionMonarch therapySession = new TherapySessionMonarch();
 		therapySession.setSerialNumber(groupEntries.get(0).getSerialNumber());
 		therapySession.setBluetoothId(groupEntries.get(0).getBluetoothId());
 		therapySession.setDate(LocalDate.fromDateFields(new Date(timestamp)));
@@ -479,16 +478,16 @@ public class PatientVestDeviceTherapyUtilMonarch {
 		return therapySessionMonarch;
 	}
 	
-	public static List<TherapySession> groupTherapySessionsByDay(List<TherapySession> therapySessions)
+	public static List<TherapySessionMonarch> groupTherapySessionsByDay(List<TherapySessionMonarch> therapySessions)
 			throws Exception{
-		List<TherapySession> updatedTherapySessions = new LinkedList<>();
-		Map<LocalDate,List<TherapySession>> groupByTherapyDate = therapySessions.stream()
-		        .collect(Collectors.groupingBy(TherapySession::getDate));
+		List<TherapySessionMonarch> updatedTherapySessions = new LinkedList<>();
+		Map<LocalDate,List<TherapySessionMonarch>> groupByTherapyDate = therapySessions.stream()
+		        .collect(Collectors.groupingBy(TherapySessionMonarch::getDate));
 		Iterator<LocalDate> keySetItr = groupByTherapyDate.keySet().iterator();
 		while(keySetItr.hasNext()){
-			List<TherapySession> groupedTherapySessions = groupByTherapyDate.get(keySetItr.next());
+			List<TherapySessionMonarch> groupedTherapySessions = groupByTherapyDate.get(keySetItr.next());
 			for(int i =0 ; i<groupedTherapySessions.size();i++){
-				TherapySession therapySession = groupedTherapySessions.get(i);
+				TherapySessionMonarch therapySession = groupedTherapySessions.get(i);
 				therapySession.setSessionNo(i+1);
 				updatedTherapySessions.add(therapySession);
 				
@@ -522,11 +521,11 @@ public class PatientVestDeviceTherapyUtilMonarch {
 		return (durationInMinutes*frequency/totalDuration);
 	}
 	
-	public static int calculateCumulativeDuration(List<TherapySession> therapySessions){
-		return therapySessions.stream().collect(Collectors.summingInt(TherapySession::getDurationInMinutes));
+	public static int calculateCumulativeDuration(List<TherapySessionMonarch> therapySessions){
+		return therapySessions.stream().collect(Collectors.summingInt(TherapySessionMonarch::getDurationInMinutes));
 	}
 	
-	public static int calculateHMRRunRatePerSession(List<TherapySession> therapySessions){
+	public static int calculateHMRRunRatePerSession(List<TherapySessionMonarch> therapySessions){
 		float sessionsCount = therapySessions.isEmpty()?1:therapySessions.size();
 		return Math.round(calculateCumulativeDuration(therapySessions)/sessionsCount);
 	}

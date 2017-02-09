@@ -52,7 +52,7 @@ import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.DeviceLogParser;
 import com.hillrom.vest.service.PatientComplianceService;
 import com.hillrom.vest.service.TherapySessionService;
-import com.hillrom.vest.service.monarch.PatientNoEventServiceMonarch;
+import com.hillrom.vest.service.monarch.PatientNoEventMonarchService;
 import com.hillrom.vest.service.monarch.TherapySessionServiceMonarch;
 import com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil;
 import com.hillrom.vest.service.util.monarch.PatientVestDeviceTherapyUtilMonarch;
@@ -78,7 +78,7 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 	private DeviceLogParser deviceLogParser;
 
 	@Inject
-	private PatientNoEventServiceMonarch noEventServiceMonarch;
+	private PatientNoEventMonarchService noEventServiceMonarch;
 
 	@Inject
 	private TherapySessionServiceMonarch therapySessionServiceMonarch;

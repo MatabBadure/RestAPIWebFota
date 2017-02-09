@@ -94,7 +94,7 @@ public final class Constants {
 
 	public static final String SEQUENCE_NUMBER = "sequenceNumber";
 
-	public static final String HMR = "Hmr";
+	public static final String HMR = "Total Therapy Hours";
 
 	public static final String HUB_ADDRESS = "Hub Id";
 
@@ -185,7 +185,7 @@ public final class Constants {
 	
 	//HMR Graph Y-axis labels
 	public static final String MINUTES_LABEL = "Minutes";
-	public static final String HMR_LABEL = "HMR";
+	public static final String HMR_LABEL = "Total Therapy Hours";
 	
 	//HMR Graph tooltip labels
 	public static final String KEY_NOTE_TEXT = "noteText";

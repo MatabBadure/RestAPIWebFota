@@ -1,5 +1,8 @@
 package com.hillrom.vest.web.rest;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -97,40 +100,26 @@ public class PatientVestDeviceDataResource {
 	public ResponseEntity<?> receiveDataCharger(@RequestBody(required=true)String rawMessage){
 
 		try{		
-			log.error("Base64 Received Data for ingestion in receiveDataCharger : ",rawMessage);		
+			String[] data = readcsv();
+			JSONObject chargerJsonData = null;ExitStatus exitStatus = null;
 			
+			for(int i=0;i<data.length;i++){
+				
+				rawMessage = data[i];
+				log.error("Base64 Received Data for ingestion in receiveDataCharger : ",rawMessage);		
+				
+				
+				chargerJsonData = new JSONObject();
+				
+				exitStatus = deviceDataServiceMonarch.saveData(rawMessage);
+				chargerJsonData.put("message",exitStatus.getExitCode());
 			
-			JSONObject chargerJsonData = new JSONObject();
+			}
 			
-			ExitStatus exitStatus = deviceDataServiceMonarch.saveData(rawMessage);
-			chargerJsonData.put("message",exitStatus.getExitCode());
 			if(ExitStatus.COMPLETED.equals(exitStatus))
 				return new ResponseEntity<>(chargerJsonData,HttpStatus.CREATED);
 			else
 				return new ResponseEntity<>(chargerJsonData,HttpStatus.PARTIAL_CONTENT);
-			
-			/*
-			//chargerDataService.getDeviceData(rawMessage);
-			
-			byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
-			
-	        String sout = "";
-	        for(int i=0;i<decoded.length;i++) {
-	        	int val = decoded[i] & 0xFF;
-	        	sout = sout + val + " ";
-	        }
-	        
-	        log.debug("Input Byte Array :"+sout);
-
-			String decoded_string = new String(decoded);
-			log.error("Decoded value is " + decoded_string);
-
-			
-			JSONObject chargerJsonData = new JSONObject();
-			chargerJsonData =   chargerDataService.saveOrUpdateChargerData(rawMessage,decoded_string);
-			JSONObject result = new JSONObject();
-			result.put("RESULT", chargerJsonData.get("RESULT") + " - " + chargerJsonData.get("ERROR"));
-			return new ResponseEntity<>(result,HttpStatus.CREATED);*/
 		}catch(Exception e){
 			e.printStackTrace();
 			JSONObject error = new JSONObject();
@@ -224,5 +213,32 @@ public class PatientVestDeviceDataResource {
 			return new ResponseEntity<>(error,HttpStatus.PARTIAL_CONTENT);
 		}
 	}
+	
+	public static String[] readcsv() 
+	{
+
+
+	        String csvFile = "C:/development/charger/charger-test-data-1.csv";
+	        String line = "";
+	        String cvsSplitBy = ",";
+	        String[] Outdata = new String[300];
+	        String[] data = null;
+
+	        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+	        	int i=0;
+	            while ((line = br.readLine()) != null) {
+
+	                // use comma as separator
+	               data = line.split(cvsSplitBy);
+	               Outdata[i++] = data[2];
+	         
+	            }
+	            
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+
+	        return Outdata;
+	} 
 	
 }

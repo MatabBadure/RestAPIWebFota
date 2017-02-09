@@ -218,7 +218,7 @@ public class PatientVestDeviceDataResource {
 	{
 
 
-	        String csvFile = "C:/development/charger/charger-test-data-1.csv";
+	        String csvFile = "/tmp/charger-test-data-1.csv";
 	        String line = "";
 	        String cvsSplitBy = ",";
 	        String[] Outdata = new String[300];

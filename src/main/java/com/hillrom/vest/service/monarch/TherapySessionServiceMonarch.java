@@ -29,7 +29,6 @@ import com.hillrom.vest.domain.NoteMonarch;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientInfo;
-import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientNoEventMonarch;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.ProtocolConstantsMonarch;
@@ -66,8 +65,11 @@ public class TherapySessionServiceMonarch {
 	@Inject
 	private NoteServiceMonarch noteServiceMonarch;
 	
+	/*@Inject
+	private PatientNoEventService patientNoEventService;*/
+	
 	@Inject
-	private PatientNoEventService patientNoEventService;
+	private PatientNoEventMonarchService patientNoEventMonarchService;
 
 	@Inject
 	private PatientNoEventsRepositoryMonarch patientNoEventRepositoryMonarch;
@@ -190,7 +192,7 @@ public class TherapySessionServiceMonarch {
 		double hmrInHours = Objects.nonNull(latestTherapySession)?latestTherapySession.getHmr()/minutes:0d;
 		
 		// This is to discard the records if the user requested data beyond his/her first transmission date.
-		PatientNoEvent patientNoEvent = patientNoEventService.findByPatientUserId(patientUserId);
+		PatientNoEventMonarch patientNoEvent = patientNoEventMonarchService.findByPatientUserId(patientUserId);
 		if(Objects.nonNull(patientNoEvent) && Objects.nonNull(patientNoEvent.getFirstTransmissionDate()))
 			from = from.isAfter(patientNoEvent.getFirstTransmissionDate()) ? from : patientNoEvent.getFirstTransmissionDate();
 		// Prepare the list of dates to which data has to be shown

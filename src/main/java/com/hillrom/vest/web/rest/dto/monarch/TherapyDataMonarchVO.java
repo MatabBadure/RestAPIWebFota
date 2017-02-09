@@ -42,7 +42,6 @@ public class TherapyDataMonarchVO implements Serializable,Comparable<TherapyData
 		this.timestamp = timestamp;
 		this.treatmentsPerDay = treatmentsPerDay;
 		this.sessionNo = sessionNo;
-		this.sessionNo = sessionNo;
 		this.frequency = frequency;
 		this.intensity = intensity;
 		this.programmedCoughPauses = programmedCoughPauses;
@@ -64,7 +63,7 @@ public class TherapyDataMonarchVO implements Serializable,Comparable<TherapyData
 		super();
 		this.timestamp = timestamp;
 		this.frequency = frequency;
-		this.pressure = pressure;
+		this.intensity = intensity;
 		this.programmedCoughPauses = programmedCoughPauses;
 		this.normalCoughPauses = normalCoughPauses;
 		this.coughPauses = coughPauses;

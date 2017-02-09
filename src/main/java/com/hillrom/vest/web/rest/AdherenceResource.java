@@ -171,10 +171,10 @@ public class AdherenceResource {
 			AdherenceReset adherenceReset = null;
 			AdherenceResetMonarch adherenceResetMonarch = null; 
 					
-			if(deviceType == "VEST"){
+			if(deviceType.equals("VEST")){
 				adherenceReset = adherenceResetService.createAdherenceReset(patientId, Long.parseLong(userId), resetDt, 
 																					Integer.parseInt(resetScore), resetStartDt, justification, Long.parseLong(createdById));
-			}else if(deviceType == "MONARCH"){			
+			}else if(deviceType.equals("MONARCH")){
 				adherenceResetMonarch = adherenceResetServiceMonarch.createAdherenceReset(patientId, Long.parseLong(userId), resetDt, 
 					Integer.parseInt(resetScore), resetStartDt, justification, Long.parseLong(createdById));
 			}

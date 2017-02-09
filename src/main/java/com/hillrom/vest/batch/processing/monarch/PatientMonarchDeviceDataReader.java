@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
+import com.hillrom.vest.domain.PatientNoEventMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
@@ -243,8 +244,8 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 			userExtensionRepository.save(userExtension);
 			patientInfoRepository.save(patientInfo);
 			LocalDate createdOrTransmittedDate = userExtension.getCreatedDate().toLocalDate();
-			/*noEventService.createIfNotExists(
-					new PatientNoEvent(createdOrTransmittedDate, createdOrTransmittedDate, patientInfo, userExtension));*/
+			noEventServiceMonarch.createIfNotExists(
+					new PatientNoEventMonarch(createdOrTransmittedDate, createdOrTransmittedDate, patientInfo, userExtension));
 			PatientCompliance compliance = new PatientCompliance();
 			compliance.setPatient(patientInfo);
 			compliance.setPatientUser(userExtension);

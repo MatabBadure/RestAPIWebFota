@@ -94,7 +94,7 @@ public final class Constants {
 
 	public static final String SEQUENCE_NUMBER = "sequenceNumber";
 
-	public static final String HMR = "Hmr";
+	public static final String HMR = "Total Therapy Hours";
 
 	public static final String HUB_ADDRESS = "Hub Id";
 
@@ -185,7 +185,7 @@ public final class Constants {
 	
 	//HMR Graph Y-axis labels
 	public static final String MINUTES_LABEL = "Minutes";
-	public static final String HMR_LABEL = "HMR";
+	public static final String HMR_LABEL = "Total Therapy Hours";
 	
 	//HMR Graph tooltip labels
 	public static final String KEY_NOTE_TEXT = "noteText";
@@ -214,10 +214,10 @@ public final class Constants {
 	public static final String DURATION_LABEL = "Duration";
 
 	// Cumulative Stats Graph 
-	public static final String HMR_NON_ADHERENCE_LABEL = "Patients Below Treatment Minutes";
-	public static final String SETTING_DEVIATION_LABEL = "Patients Below Frequency Setting";
-	public static final String MISSED_THERAPY_DAYS_LABEL = "Patients with Missed Therapy Day(s)";
-	public static final String NO_TRANSMISSION_RECORDED_LABEL = "Patients No Transmission Recorded";
+	public static final String HMR_NON_ADHERENCE_LABEL = "HMR Non-Adherence";
+	public static final String SETTING_DEVIATION_LABEL = "Consecutive Frequency Deviation Days";
+	public static final String MISSED_THERAPY_DAYS_LABEL = "Consecutive Missed Days";
+	public static final String NO_TRANSMISSION_RECORDED_LABEL = "No Transmission Recorded";
 
 	// Treatment Stats Graph
 	public static final String AVERAGE_LENGTH_OF_TREATMENT_LABEL = "Average Length of Treatment";

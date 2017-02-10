@@ -23,6 +23,7 @@ mail:
     auth: false
     from: visiview@hill-rom.com
     to: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com,raghu.nt@lnttechservices.com
+
 authentication:
     xauth:
         secret: myXAuthSecret

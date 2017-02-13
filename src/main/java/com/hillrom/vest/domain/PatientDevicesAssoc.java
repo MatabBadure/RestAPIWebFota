@@ -16,6 +16,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -43,6 +44,18 @@ public class PatientDevicesAssoc implements Serializable {
     @Column(name = "is_active")
     private Boolean isActive = false;
 
+    
+    public PatientDevicesAssoc() {
+		super();
+	}
+
+	public PatientDevicesAssoc(String patientId, String deviceType,Boolean isActive) {
+		super();
+		this.patientId = patientId;
+		this.deviceType = deviceType;
+		this.isActive = isActive;
+	}
+    
 	/**
 	 * @return the id
 	 */

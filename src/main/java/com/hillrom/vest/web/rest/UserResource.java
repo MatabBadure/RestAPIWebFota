@@ -74,6 +74,7 @@ import com.hillrom.vest.service.PatientProtocolService;
 import com.hillrom.vest.service.PatientVestDeviceService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.UserService;
+import com.hillrom.vest.service.monarch.PatientHCPMonarchService;
 import com.hillrom.vest.service.monarch.TherapySessionServiceMonarch;
 import com.hillrom.vest.service.monarch.AdherenceCalculationServiceMonarch;
 import com.hillrom.vest.service.monarch.PatientComplianceMonarchService;
@@ -188,6 +189,9 @@ public class UserResource {
 	@Qualifier("complianceGraphServiceMonarch")
 	@Inject
 	private GraphService complianceGraphServiceMonarch;
+	
+	@Inject
+    private PatientHCPMonarchService patientHCPMonarchService;
 	
 	/**
 	 * GET /users -> get all users.
@@ -896,17 +900,30 @@ public class UserResource {
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP})
     public ResponseEntity<?> getPatientsCumulativeStatisticsForClinicAssociatedWithHCP(@PathVariable Long hcpId, @PathVariable String clinicId,
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
-    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to){
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
+    		@RequestParam(value = "deviceType", required = true) String deviceType){
         log.debug("REST request to get patients cumulative statistics for clinic {} associated with HCP : {}", clinicId, hcpId,from,to);
         JSONObject jsonObject = new JSONObject();
         try {
-        	Collection<StatisticsVO> statiticsCollection = patientHCPService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
-	        if (statiticsCollection.isEmpty()) {
-	        	return new ResponseEntity<>(jsonObject, HttpStatus.OK);
-	        } else {
-	        	Graph cumulativeStatsGraph = cumulativeStatsGraphService.populateGraphData(statiticsCollection, new Filter(from,to,null,null));
-	        	return new ResponseEntity<>(cumulativeStatsGraph, HttpStatus.OK);
-	        }
+        	if(deviceType.equals("VEST")){
+	        	Collection<StatisticsVO> statiticsCollection = patientHCPService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
+		        if (statiticsCollection.isEmpty()) {
+		        	return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+		        } else {
+		        	Graph cumulativeStatsGraph = cumulativeStatsGraphService.populateGraphData(statiticsCollection, new Filter(from,to,null,null));
+		        	return new ResponseEntity<>(cumulativeStatsGraph, HttpStatus.OK);
+		        }
+        	}
+        	if(deviceType.equals("MONARCH")){
+        		Collection<StatisticsVO> statiticsCollection = patientHCPMonarchService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
+    	        if (statiticsCollection.isEmpty()) {
+    	        	return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    	        } else {
+    	        	Graph cumulativeStatsGraph = cumulativeStatsGraphService.populateGraphData(statiticsCollection, new Filter(from,to,null,null));
+    	        	return new ResponseEntity<>(cumulativeStatsGraph, HttpStatus.OK);
+    	        }
+        	}
+        	return new ResponseEntity<>(HttpStatus.OK);
         } catch (HillromException hre){
         	jsonObject.put("ERROR", hre.getMessage());
     		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
@@ -917,7 +934,7 @@ public class UserResource {
     }
     
     /**
-     * GET  /users/:hcpId/clinics/:clinicId/cumulativeStatistics -> get the patient statistics for clinic associated with hcp user.
+     * GET  /users/:hcpId/clinics/:clinicId/treatmentStatistics -> get the patient statistics for clinic associated with hcp user.
      * @throws Exception 
      */
     @RequestMapping(value = "/users/{hcpId}/clinics/{clinicId}/treatmentStatistics",
@@ -927,10 +944,12 @@ public class UserResource {
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP})
     public ResponseEntity<?> getPatientsTreatmentStatisticsForClinicAssociatedWithHCP(@PathVariable Long hcpId, @PathVariable String clinicId,
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
-    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
+    		@RequestParam(value = "deviceType", required = true) String deviceType) {
         log.debug("REST request to get patients treatement statistics for clinic {} associated with HCP : {}", clinicId, hcpId,from,to);
         JSONObject jsonObject = new JSONObject();
         try {
+        	if(deviceType.equals("VEST")){
         	Collection<TreatmentStatisticsVO> statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
 	        if (statiticsCollection.isEmpty()) {
 	        	return new ResponseEntity<>(HttpStatus.OK);
@@ -938,6 +957,17 @@ public class UserResource {
 	        	Graph treatmentStatsGraph = treatmentStatsGraphService.populateGraphData(statiticsCollection, new Filter(from,to,null,null));
 		        return new ResponseEntity<>(treatmentStatsGraph, HttpStatus.OK);
 	        }
+        	}
+        	if(deviceType.equals("MONARCH")){
+        		Collection<TreatmentStatisticsVO> statiticsCollection = patientHCPMonarchService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
+    	        if (statiticsCollection.isEmpty()) {
+    	        	return new ResponseEntity<>(HttpStatus.OK);
+    	        } else {
+    	        	Graph treatmentStatsGraph = treatmentStatsGraphService.populateGraphData(statiticsCollection, new Filter(from,to,null,null));
+    		        return new ResponseEntity<>(treatmentStatsGraph, HttpStatus.OK);
+    	        }
+        	}
+        	return new ResponseEntity<>(HttpStatus.OK);
         } catch (HillromException hre){
         	jsonObject.put("ERROR", hre.getMessage());
     		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
@@ -946,7 +976,7 @@ public class UserResource {
     		return new ResponseEntity<>(jsonObject, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+    
     /**
      * GET  /patient/:patientUserId/clinic/:clinicId/mrnId -> get the patient user with clinic mrn id.
      */

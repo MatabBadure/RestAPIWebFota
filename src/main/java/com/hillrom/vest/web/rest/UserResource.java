@@ -905,25 +905,19 @@ public class UserResource {
         log.debug("REST request to get patients cumulative statistics for clinic {} associated with HCP : {}", clinicId, hcpId,from,to);
         JSONObject jsonObject = new JSONObject();
         try {
+        	Collection<StatisticsVO> statiticsCollection = null;
         	if(deviceType.equals("VEST")){
-	        	Collection<StatisticsVO> statiticsCollection = patientHCPService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
-		        if (statiticsCollection.isEmpty()) {
-		        	return new ResponseEntity<>(jsonObject, HttpStatus.OK);
-		        } else {
-		        	Graph cumulativeStatsGraph = cumulativeStatsGraphService.populateGraphData(statiticsCollection, new Filter(from,to,null,null));
-		        	return new ResponseEntity<>(cumulativeStatsGraph, HttpStatus.OK);
-		        }
+	        	statiticsCollection = patientHCPService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);		      
         	}
         	if(deviceType.equals("MONARCH")){
-        		Collection<StatisticsVO> statiticsCollection = patientHCPMonarchService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
-    	        if (statiticsCollection.isEmpty()) {
-    	        	return new ResponseEntity<>(jsonObject, HttpStatus.OK);
-    	        } else {
-    	        	Graph cumulativeStatsGraph = cumulativeStatsGraphService.populateGraphData(statiticsCollection, new Filter(from,to,null,null));
-    	        	return new ResponseEntity<>(cumulativeStatsGraph, HttpStatus.OK);
-    	        }
+        		statiticsCollection = patientHCPMonarchService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
         	}
-        	return new ResponseEntity<>(HttpStatus.OK);
+        	if (statiticsCollection.isEmpty()) {
+        		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+        	} else {
+        		Graph cumulativeStatsGraph = cumulativeStatsGraphService.populateGraphData(statiticsCollection, new Filter(from,to,null,null));
+        		return new ResponseEntity<>(cumulativeStatsGraph, HttpStatus.OK);
+		    }
         } catch (HillromException hre){
         	jsonObject.put("ERROR", hre.getMessage());
     		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
@@ -949,25 +943,19 @@ public class UserResource {
         log.debug("REST request to get patients treatement statistics for clinic {} associated with HCP : {}", clinicId, hcpId,from,to);
         JSONObject jsonObject = new JSONObject();
         try {
+        	Collection<TreatmentStatisticsVO> statiticsCollection = null;
         	if(deviceType.equals("VEST")){
-        	Collection<TreatmentStatisticsVO> statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
-	        if (statiticsCollection.isEmpty()) {
-	        	return new ResponseEntity<>(HttpStatus.OK);
-	        } else {
-	        	Graph treatmentStatsGraph = treatmentStatsGraphService.populateGraphData(statiticsCollection, new Filter(from,to,null,null));
-		        return new ResponseEntity<>(treatmentStatsGraph, HttpStatus.OK);
-	        }
+        	statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
         	}
         	if(deviceType.equals("MONARCH")){
-        		Collection<TreatmentStatisticsVO> statiticsCollection = patientHCPMonarchService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
-    	        if (statiticsCollection.isEmpty()) {
-    	        	return new ResponseEntity<>(HttpStatus.OK);
-    	        } else {
-    	        	Graph treatmentStatsGraph = treatmentStatsGraphService.populateGraphData(statiticsCollection, new Filter(from,to,null,null));
-    		        return new ResponseEntity<>(treatmentStatsGraph, HttpStatus.OK);
-    	        }
+        	statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
         	}
-        	return new ResponseEntity<>(HttpStatus.OK);
+        	if (statiticsCollection.isEmpty()) {
+   	        	return new ResponseEntity<>(HttpStatus.OK);
+   	        } else {
+   	        	Graph treatmentStatsGraph = treatmentStatsGraphService.populateGraphData(statiticsCollection, new Filter(from,to,null,null));
+   		        return new ResponseEntity<>(treatmentStatsGraph, HttpStatus.OK);
+   	        }
         } catch (HillromException hre){
         	jsonObject.put("ERROR", hre.getMessage());
     		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);

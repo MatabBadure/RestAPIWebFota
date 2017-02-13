@@ -36,8 +36,11 @@ import com.hillrom.vest.domain.AdherenceReset;
 import com.hillrom.vest.domain.AdherenceResetMonarch;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.PatientCompliance;
+import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientNoEvent;
+import com.hillrom.vest.domain.PatientNoEventMonarch;
 import com.hillrom.vest.domain.TherapySession;
+import com.hillrom.vest.domain.TherapySessionMonarch;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.exceptionhandler.HillromException;
@@ -46,6 +49,8 @@ import com.hillrom.vest.repository.AdhrenceResetHistoryRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PredicateBuilder;
 import com.hillrom.vest.repository.TherapySessionRepository;
+import com.hillrom.vest.repository.monarch.PatientComplianceMonarchRepository;
+import com.hillrom.vest.repository.monarch.TherapySessionMonarchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.AdherenceResetService;
@@ -53,6 +58,7 @@ import com.hillrom.vest.service.NoteService;
 import com.hillrom.vest.service.PatientNoEventService;
 import com.hillrom.vest.service.monarch.AdherenceCalculationServiceMonarch;
 import com.hillrom.vest.service.monarch.AdherenceResetServiceMonarch;
+import com.hillrom.vest.service.monarch.PatientNoEventMonarchService;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -100,9 +106,18 @@ public class AdherenceResource {
 	
     @Inject
 	private PatientNoEventService noEventService;
+
+    @Inject
+	private TherapySessionRepository therapyRepository;
     
 	@Inject
-	private TherapySessionRepository therapyRepository;
+	private PatientComplianceMonarchRepository patientComplianceMonarchRepository;
+	
+    @Inject
+	private PatientNoEventMonarchService noEventMonarchService;
+    
+	@Inject
+	private TherapySessionMonarchRepository therapyMonarchRepository;
 	
     /**
      * POST  /clinics -> Create a new clinic.
@@ -146,23 +161,35 @@ public class AdherenceResource {
 			// Getting the event record for the user 
 			PatientNoEvent noEvent = noEventService.findByPatientUserId(Long.parseLong(userId));
 			
+			
+			// Getting the compliance record for the user on adherence start date for monarch
+			PatientComplianceMonarch patientComplianceMonarch = patientComplianceMonarchRepository.findByDateAndPatientUserId(resetStartDt,Long.parseLong(userId));
+			
+			// Getting the event record for the user in monarch 
+			PatientNoEventMonarch noEventMonarch = noEventMonarchService.findByPatientUserId(Long.parseLong(userId));
+			
 			// Check for existing adherence score is 100
-			if(Objects.nonNull(patientCompliance) && patientCompliance.getScore() == 100){
+			if( (deviceType.equals("VEST") && Objects.nonNull(patientCompliance) && patientCompliance.getScore() == 100)
+					|| (deviceType.equals("MONARCH") && Objects.nonNull(patientComplianceMonarch) && patientComplianceMonarch.getScore() == 100)){
 				jsonObject.put("ERROR", "Adherence score cannot be reset for existing adherence score of 100");
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 			}
-			else if(Objects.isNull(noEvent) || Objects.isNull(noEvent.getFirstTransmissionDate())){
+			else if( (deviceType.equals("VEST") && (Objects.isNull(noEvent) || Objects.isNull(noEvent.getFirstTransmissionDate()))) ||
+					(deviceType.equals("MONARCH") && (Objects.isNull(noEventMonarch) || Objects.isNull(noEventMonarch.getFirstTransmissionDate()))) ){
 				
 				// Check for the non transmission users
 				jsonObject.put("ERROR", "Adherence score cannot be reset for the non transmissions users");
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 			}else{
 				TherapySession therapy = therapyRepository.findTop1ByPatientUserIdOrderByDateAsc(Long.parseLong(userId));
-				if(Objects.nonNull(therapy)){
+				TherapySessionMonarch therapyMonarch = therapyMonarchRepository.findTop1ByPatientUserIdOrderByDateAsc(Long.parseLong(userId));
+				
+				if(Objects.nonNull(therapy) && Objects.nonNull(therapyMonarch)){
 					LocalDate firstTherapyDate = therapy.getDate();
+					LocalDate firstTherapyDateMonarch = therapyMonarch.getDate();
 					
 					// Check for the reset date is not before first therapy date
-					if(resetStartDt.isBefore(firstTherapyDate)){
+					if(resetStartDt.isBefore(firstTherapyDate) || resetStartDt.isBefore(firstTherapyDateMonarch)){
 						jsonObject.put("ERROR", "Adherence start date should be after first therapy date");
 			            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 					}

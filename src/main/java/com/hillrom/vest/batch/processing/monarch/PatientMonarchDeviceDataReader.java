@@ -25,6 +25,7 @@ import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.hillrom.vest.domain.PatientCompliance;
+import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientNoEventMonarch;
@@ -39,6 +40,7 @@ import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.domain.UserPatientAssocPK;
 import com.hillrom.vest.repository.AuthorityRepository;
+import com.hillrom.vest.repository.PatientDevicesAssocRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
@@ -94,6 +96,9 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 
 	@Inject
     private PatientMonarchDeviceRepository patientMonarchDeviceRepository;
+	
+	@Inject
+    private PatientDevicesAssocRepository patientDevicesAssocRepository;
 
 	private String patientDeviceRawData;
 	
@@ -258,6 +263,10 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 			PatientVestDeviceHistoryMonarch deviceHistoryMonarch = new PatientVestDeviceHistoryMonarch(new PatientVestDevicePK(patientInfo, patientInfo.getSerialNumber()),
 					patientInfo.getBluetoothId(), patientInfo.getHubId(), true);
 			patientMonarchDeviceRepository.save(deviceHistoryMonarch);
+			
+			PatientDevicesAssoc deviceAssoc = new PatientDevicesAssoc(patientInfo.getId(), "MONARCH" ,true);
+			patientDevicesAssocRepository.save(deviceAssoc);
+			
 			return userPatientAssoc;
 		}
 	}

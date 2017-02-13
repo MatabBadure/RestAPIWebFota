@@ -129,25 +129,25 @@ public class TherapySessionServiceMonarch {
 	public SortedMap<LocalDate,List<TherapySessionMonarch>> groupTherapySessionsByDate(List<TherapySessionMonarch> therapySessions){
 		return new TreeMap<>(therapySessions.stream().collect(Collectors.groupingBy(TherapySessionMonarch :: getDate)));
 	}
-	/*
+	
 	public List<TherapySessionMonarch> findByPatientUserIdAndDate(Long id,LocalDate date){
 		return  therapySessionMonarchRepository.findByPatientUserIdAndDate(id,date);
 	}	
 	
 	public Map<Long,List<TherapySessionMonarch>> getTherapySessionsGroupByPatientUserId(List<Long> patientUserIds){
 		List<TherapySessionMonarch> therapySessions = therapySessionMonarchRepository.findTop1ByPatientUserIdInOrderByEndTimeDesc(patientUserIds);
-		return therapySessions.stream().collect(Collectors.groupingBy(TherapySession::getTherapySessionByPatientUserId));
-	}*/
+		return therapySessions.stream().collect(Collectors.groupingBy(TherapySessionMonarch::getTherapySessionByPatientUserId));
+	}
 
-	/*public Collection<TreatmentStatisticsVO> getTreatmentStatisticsByPatientUserIdsAndDuration(
+	public Collection<TreatmentStatisticsVO> getTreatmentStatisticsByPatientUserIdsAndDuration(
 			List<Long> patientUserIds,
 			LocalDate from,LocalDate to) {
 		List<TherapySessionMonarch> therapySessions = therapySessionMonarchRepository.findByDateBetweenAndPatientUserIdIn(from, to, patientUserIds);
 		Map<LocalDate,List<TherapySessionMonarch>> tpsGroupedByDate = therapySessions.stream().collect(Collectors.groupingBy(TherapySessionMonarch :: getDate));
 			return getAvgTreatmentStatisticsForTherapiesGroupedByDate(patientUserIds, tpsGroupedByDate);
-	}*/
+	}
 
-	/*public LinkedList<TreatmentStatisticsVO> getAvgTreatmentStatisticsForTherapiesGroupedByDate(List<Long> patientUserIds,
+	public LinkedList<TreatmentStatisticsVO> getAvgTreatmentStatisticsForTherapiesGroupedByDate(List<Long> patientUserIds,
 			Map<LocalDate, List<TherapySessionMonarch>> tpsGroupedByDate) {
 		Map<LocalDate, TreatmentStatisticsVO> statisticsMap = new TreeMap<>();
 		TreatmentStatisticsVO statisticsVO;
@@ -174,7 +174,7 @@ public class TherapySessionServiceMonarch {
 		DateTime endTime = tpsInDuration.get(tpsInDuration.size()-1).getEndTime();
 		statisticsVO = new TreatmentStatisticsVO(avgTreatment,avgDuration,startTime,endTime);
 		return statisticsVO;
-	}*/
+	}
 
 	/**
 	 * prepare dummy therapy data for the week

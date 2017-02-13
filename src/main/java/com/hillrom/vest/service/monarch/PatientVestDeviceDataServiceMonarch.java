@@ -222,10 +222,12 @@ public class PatientVestDeviceDataServiceMonarch {
 		log.error("Decoded String : " + decoded_string);
 		
 		JSONObject chargerJsonData = validateRequest(encoded_string,decoded_string);
-		if(chargerJsonData.get("DEVICE_DATA").equals("PING_PONG_PING")){
+		JSONObject deviceData = (JSONObject) chargerJsonData.get("DEVICE_DATA");
+		if(deviceData.get("device_data_type").equals("PING_PONG_PING")){
 			log.debug("deviceData is PING_PONG_PING" + " Insert into PING_PONG_PING table");
 			PingPongPing pingPongPingData = new PingPongPing();
 			pingPongPingData.setCreatedTime(new DateTime());
+			pingPongPingData.setSerialNumber(deviceData.get("serial_number").toString());
 			pingPongPingRepository.save(pingPongPingData);
 			
 		}
@@ -351,9 +353,9 @@ public class PatientVestDeviceDataServiceMonarch {
 		
 	}
 
-	public String getDeviceData(String encoded_string) throws HillromException{
+	public JSONObject getDeviceData(String encoded_string) throws HillromException{
 		
-
+		JSONObject chargerDataPieces = new  JSONObject();
 		
         byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
         String sout = "";
@@ -376,18 +378,25 @@ public class PatientVestDeviceDataServiceMonarch {
         	int val = b[i] & 0xFF;
         	deviceData = deviceData + String.valueOf(Character.toChars(val));
         }
+        chargerDataPieces.put("deviceData",sout);
         log.debug("deviceData : "+ sout );
         
         if(deviceData.equalsIgnoreCase("PING_PONG_PING")){
-        	return "PING_PONG_PING";
+        	chargerDataPieces.put("device_data_type","PING_PONG_PING");
+        	return chargerDataPieces;
+        	//return "PING_PONG_PING";
         }
+    	chargerDataPieces.put("device_data_type","NOT_PING_PONG_PING");
     	log.debug("deviceData is NOT PING_PONG_PING" );
         
 		int x = getFragTotal(encoded_string);
 		int y = getFragCurrent(encoded_string);
 		byte[] devsnbt = getDevSN(encoded_string);
+		chargerDataPieces.put("serial_number",devsnbt);
 		byte[] wifibt = getDevWifi(encoded_string);
+		chargerDataPieces.put("device_wifi",wifibt);
 		byte[] verbt = getDevVer(encoded_string);
+		chargerDataPieces.put("device_ver",verbt);
         
         byte[] session_index  = Arrays.copyOfRange(deviceDataArray, SESSION_INDEX_LOC, SESSION_INDEX_LOC + SESSION_INDEX_LEN);
         sout = "";
@@ -395,6 +404,7 @@ public class PatientVestDeviceDataServiceMonarch {
         for(int k=0;k<session_index.length;k++){
         	sout = sout + (session_index[k]  & 0xFF) + " ";
         }
+        chargerDataPieces.put("session_index",sout);
         log.debug("session_index : "+ sout );
         
         log.debug("Combined session_index : "+ intergerCombinedFromHex(session_index));
@@ -404,6 +414,7 @@ public class PatientVestDeviceDataServiceMonarch {
         for(int k=0;k<start_time.length;k++){
         	sout = sout + (start_time[k]  & 0xFF) + " ";
         }
+        chargerDataPieces.put("start_time",sout);
         log.debug("start_time : "+ sout );
         
         byte[] end_time  = Arrays.copyOfRange(deviceDataArray, END_TIME_LOC, END_TIME_LOC + END_TIME_LEN);        
@@ -411,6 +422,7 @@ public class PatientVestDeviceDataServiceMonarch {
         for(int k=0;k<end_time.length;k++){
         	sout = sout + (end_time[k]  & 0xFF) + " ";
         }
+        chargerDataPieces.put("end_time",sout);
         log.debug("end_time : "+ sout );
         
         byte[] start_battery_level  = Arrays.copyOfRange(deviceDataArray, START_BATTERY_LEVEL_LOC, START_BATTERY_LEVEL_LOC + START_BATTERY_LEVEL_LEN);
@@ -418,6 +430,7 @@ public class PatientVestDeviceDataServiceMonarch {
         for(int k=0;k<start_battery_level.length;k++){
         	sout = sout + (start_battery_level[k]  & 0xFF) + " ";
         }
+        chargerDataPieces.put("start_battery_level",sout);
         log.debug("start_battery_level : "+ sout );
         
         byte[] end_battery_level  = Arrays.copyOfRange(deviceDataArray, END_BATTERY_LEVEL_LOC, END_BATTERY_LEVEL_LOC + END_BATTERY_LEVEL_LEN);
@@ -425,6 +438,7 @@ public class PatientVestDeviceDataServiceMonarch {
         for(int k=0;k<end_battery_level.length;k++){
         	sout = sout + (end_battery_level[k]  & 0xFF) + " ";
         }
+        chargerDataPieces.put("end_battery_level",sout);
         log.debug("end_battery_level : "+ sout );
         
         byte[] number_of_events  = Arrays.copyOfRange(deviceDataArray, NUMBER_OF_EVENTS_LOC, NUMBER_OF_EVENTS_LOC + NUMBER_OF_EVENTS_LEN);
@@ -432,6 +446,7 @@ public class PatientVestDeviceDataServiceMonarch {
         for(int k=0;k<number_of_events.length;k++){
         	sout = sout + (number_of_events[k]  & 0xFF) + " ";
         }
+        chargerDataPieces.put("number_of_events",sout);
         log.debug("number_of_events : "+ sout );
         
         byte[] number_of_pods  = Arrays.copyOfRange(deviceDataArray, NUMBER_OF_PODS_LOC, NUMBER_OF_PODS_LOC + NUMBER_OF_PODS_LEN);
@@ -439,6 +454,7 @@ public class PatientVestDeviceDataServiceMonarch {
         for(int k=0;k<number_of_pods.length;k++){
         	sout = sout + (number_of_pods[k]  & 0xFF) + " ";
         }
+        chargerDataPieces.put("number_of_pods",sout);
         log.debug("number_of_pods : "+ sout );
         
         byte[] hmr_seconds  = Arrays.copyOfRange(deviceDataArray, HMR_SECONDS_LOC, HMR_SECONDS_LOC + HMR_SECONDS_LEN);
@@ -446,7 +462,9 @@ public class PatientVestDeviceDataServiceMonarch {
         for(int k=0;k<hmr_seconds.length;k++){
         	sout = sout + (hmr_seconds[k]  & 0xFF) + " ";
         }
+        
         log.debug("hmr_seconds : "+ sout );
+        chargerDataPieces.put("hmr_seconds",intergerCombinedFromHex(hmr_seconds));
         log.debug("Combined hmr_seconds : "+ intergerCombinedFromHex(hmr_seconds));
         
         //log.debug("Value of deviceDataArray.length : "+ j );
@@ -492,7 +510,8 @@ public class PatientVestDeviceDataServiceMonarch {
 	        log.debug("duration : "+ sout );
         }
         
-        return "NOT_PING_PONG_PING";
+    	chargerDataPieces.put("device_data_type","NOT_PING_PONG_PING");
+    	return chargerDataPieces;
 
 	}
 

@@ -117,4 +117,5 @@
 	<include file="classpath:/config/liquibase/changelog/20170131024800_add_column_inTHERAPY_DATA_MONARCH.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170209162030_updated_values_for_default_protocol_monarch.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170213102800_updated_patient_device_type_hillrom_type_code.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170213104500_create_patient_devices_assoc_table.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

@@ -37,8 +37,8 @@ import com.hillrom.vest.domain.TherapySessionMonarch;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.PatientNoEventsRepository;
-import com.hillrom.vest.repository.monarch.PatientNoEventsRepositoryMonarch;
-import com.hillrom.vest.repository.monarch.TherapySessionRepositoryMonarch;
+import com.hillrom.vest.repository.monarch.PatientNoEventsMonarchRepository;
+import com.hillrom.vest.repository.monarch.TherapySessionMonarchRepository;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.NoteService;
 import com.hillrom.vest.service.PatientComplianceService;
@@ -54,7 +54,7 @@ import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calcula
 public class TherapySessionServiceMonarch {
 
 	@Inject
-	private TherapySessionRepositoryMonarch therapySessionRepositoryMonarch;
+	private TherapySessionMonarchRepository therapySessionMonarchRepository;
 
 	@Inject
 	private AdherenceCalculationServiceMonarch adherenceCalculationServiceMonarch;
@@ -72,7 +72,7 @@ public class TherapySessionServiceMonarch {
 	private PatientNoEventMonarchService patientNoEventMonarchService;
 
 	@Inject
-	private PatientNoEventsRepositoryMonarch patientNoEventRepositoryMonarch;
+	private PatientNoEventsMonarchRepository patientNoEventRepositoryMonarch;
 
 	public List<TherapySessionMonarch> saveOrUpdate(List<TherapySessionMonarch> therapySessionsMonarch) throws Exception{
 		if(therapySessionsMonarch.size() > 0){			
@@ -119,7 +119,7 @@ public class TherapySessionServiceMonarch {
 	}*/
 	
 	public List<TherapyDataMonarchVO> findByPatientUserIdAndDateRange(Long patientUserId,LocalDate from,LocalDate to){
-		List<TherapySessionMonarch> sessions = therapySessionRepositoryMonarch
+		List<TherapySessionMonarch> sessions = therapySessionMonarchRepository
 				.findByPatientUserIdAndDateRange(patientUserId,from,to);
 		Map<LocalDate, NoteMonarch> dateNotesMap = noteServiceMonarch.findByPatientUserIdAndCreatedOnBetweenGroupByCreatedOn(patientUserId, from, to, false);
 		Map<LocalDate,List<TherapySessionMonarch>> tpsGroupByDate = groupTherapySessionsByDate(sessions);
@@ -131,18 +131,18 @@ public class TherapySessionServiceMonarch {
 	}
 	/*
 	public List<TherapySessionMonarch> findByPatientUserIdAndDate(Long id,LocalDate date){
-		return  therapySessionRepositoryMonarch.findByPatientUserIdAndDate(id,date);
+		return  therapySessionMonarchRepository.findByPatientUserIdAndDate(id,date);
 	}	
 	
 	public Map<Long,List<TherapySessionMonarch>> getTherapySessionsGroupByPatientUserId(List<Long> patientUserIds){
-		List<TherapySessionMonarch> therapySessions = therapySessionRepositoryMonarch.findTop1ByPatientUserIdInOrderByEndTimeDesc(patientUserIds);
+		List<TherapySessionMonarch> therapySessions = therapySessionMonarchRepository.findTop1ByPatientUserIdInOrderByEndTimeDesc(patientUserIds);
 		return therapySessions.stream().collect(Collectors.groupingBy(TherapySession::getTherapySessionByPatientUserId));
 	}*/
 
 	/*public Collection<TreatmentStatisticsVO> getTreatmentStatisticsByPatientUserIdsAndDuration(
 			List<Long> patientUserIds,
 			LocalDate from,LocalDate to) {
-		List<TherapySessionMonarch> therapySessions = therapySessionRepositoryMonarch.findByDateBetweenAndPatientUserIdIn(from, to, patientUserIds);
+		List<TherapySessionMonarch> therapySessions = therapySessionMonarchRepository.findByDateBetweenAndPatientUserIdIn(from, to, patientUserIds);
 		Map<LocalDate,List<TherapySessionMonarch>> tpsGroupedByDate = therapySessions.stream().collect(Collectors.groupingBy(TherapySessionMonarch :: getDate));
 			return getAvgTreatmentStatisticsForTherapiesGroupedByDate(patientUserIds, tpsGroupedByDate);
 	}*/
@@ -235,7 +235,7 @@ public class TherapySessionServiceMonarch {
 	
 	private List<TherapyDataMonarchVO> formatResponse(Map<LocalDate,List<TherapySessionMonarch>> sessionMap,
 			Map<LocalDate, NoteMonarch> noteMap,Long patientUserId,LocalDate from,LocalDate to){
-		TherapySessionMonarch latestTherapySession = therapySessionRepositoryMonarch.findTop1ByPatientUserIdAndDateBeforeOrderByEndTimeDesc(patientUserId,from);
+		TherapySessionMonarch latestTherapySession = therapySessionMonarchRepository.findTop1ByPatientUserIdAndDateBeforeOrderByEndTimeDesc(patientUserId,from);
 		Map<LocalDate, List<TherapyDataMonarchVO>> therapyDataMap = assignNotesToTherapySession(
 				sessionMap, noteMap);
 		if(sessionMap.isEmpty() && noteMap.isEmpty()){
@@ -276,7 +276,7 @@ public class TherapySessionServiceMonarch {
 	} 
 	
 	public SortedMap<LocalDate,List<TherapySessionMonarch>> getAllTherapySessionsMapByPatientUserId(Long patientUserId){
-		List<TherapySessionMonarch> therapySessions =  therapySessionRepositoryMonarch.findByPatientUserId(patientUserId);
+		List<TherapySessionMonarch> therapySessions =  therapySessionMonarchRepository.findByPatientUserId(patientUserId);
 		return groupTherapySessionsByDate(therapySessions);
 	}
 	

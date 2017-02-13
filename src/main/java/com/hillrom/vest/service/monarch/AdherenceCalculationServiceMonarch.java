@@ -18,9 +18,9 @@ import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATI
 import static com.hillrom.vest.config.AdherenceScoreConstants.ADHERENCE_SETTING_DEFAULT_DAYS;
 import static com.hillrom.vest.service.util.DateUtil.getPlusOrMinusTodayLocalDate;
 import static com.hillrom.vest.service.util.DateUtil.getDateBeforeSpecificDays;
-import static com.hillrom.vest.service.util.monarch.PatientVestDeviceTherapyMonarchUtil.calculateCumulativeDuration;
-import static com.hillrom.vest.service.util.monarch.PatientVestDeviceTherapyMonarchUtil.calculateHMRRunRatePerSession;
-import static com.hillrom.vest.service.util.monarch.PatientVestDeviceTherapyMonarchUtil.calculateWeightedAvg;
+import static com.hillrom.vest.service.util.monarch.PatientVestDeviceTherapyUtilMonarch.calculateCumulativeDuration;
+import static com.hillrom.vest.service.util.monarch.PatientVestDeviceTherapyUtilMonarch.calculateHMRRunRatePerSession;
+import static com.hillrom.vest.service.util.monarch.PatientVestDeviceTherapyUtilMonarch.calculateWeightedAvg;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

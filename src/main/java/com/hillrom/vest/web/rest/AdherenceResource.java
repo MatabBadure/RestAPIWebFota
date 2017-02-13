@@ -162,10 +162,10 @@ public class AdherenceResource {
 			PatientNoEvent noEvent = noEventService.findByPatientUserId(Long.parseLong(userId));
 			
 			
-			// Getting the compliance record for the user on adhrence start date
+			// Getting the compliance record for the user on adherence start date for monarch
 			PatientComplianceMonarch patientComplianceMonarch = patientComplianceMonarchRepository.findByDateAndPatientUserId(resetStartDt,Long.parseLong(userId));
 			
-			// Getting the event record for the user 
+			// Getting the event record for the user in monarch 
 			PatientNoEventMonarch noEventMonarch = noEventMonarchService.findByPatientUserId(Long.parseLong(userId));
 			
 			// Check for existing adherence score is 100

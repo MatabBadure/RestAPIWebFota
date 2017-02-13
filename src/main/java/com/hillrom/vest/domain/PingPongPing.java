@@ -37,6 +37,9 @@ public class PingPongPing implements Serializable {
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "created_time")
     private DateTime createdTime;
+    
+    @Column(name = "serial_number")
+    private String serialNumber;
 
 	/**
 	 * @return the id
@@ -73,6 +76,22 @@ public class PingPongPing implements Serializable {
 		return serialVersionUID;
 	}
 
+	
+	
+	/**
+	 * @return the serialNumber
+	 */
+	public String getSerialNumber() {
+		return serialNumber;
+	}
+
+	/**
+	 * @param serialNumber the serialNumber to set
+	 */
+	public void setSerialNumber(String serialNumber) {
+		this.serialNumber = serialNumber;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -82,6 +101,7 @@ public class PingPongPing implements Serializable {
 		int result = 1;
 		result = prime * result + ((createdTime == null) ? 0 : createdTime.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((serialNumber == null) ? 0 : serialNumber.hashCode());
 		return result;
 	}
 
@@ -107,6 +127,11 @@ public class PingPongPing implements Serializable {
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
+		if (serialNumber == null) {
+			if (other.serialNumber != null)
+				return false;
+		} else if (!serialNumber.equals(other.serialNumber))
+			return false;
 		return true;
 	}
 
@@ -115,7 +140,7 @@ public class PingPongPing implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return "PingPongPing [id=" + id + ", createdTime=" + createdTime + "]";
+		return "PingPongPing [id=" + id + ", createdTime=" + createdTime + ", serialNumber=" + serialNumber + "]";
 	}
 
 

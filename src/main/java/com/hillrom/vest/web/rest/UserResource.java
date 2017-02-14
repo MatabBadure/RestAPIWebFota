@@ -49,6 +49,7 @@ import org.supercsv.prefs.CsvPreference;
 
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
+import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
@@ -63,6 +64,7 @@ import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
+import com.hillrom.vest.repository.monarch.PatientComplianceMonarchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.AdherenceCalculationService;
@@ -127,6 +129,9 @@ public class UserResource {
 	
 	@Inject
 	private PatientComplianceRepository complianceRepository;
+	
+	@Inject
+	private PatientComplianceMonarchRepository complianceMonarchRepository;
 	
 	@Inject
 	private NotificationRepository notificationRepository;
@@ -642,15 +647,27 @@ public class UserResource {
     @RequestMapping(value = "/users/{id}/compliance",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PatientCompliance> getComplianceScoreByPatientUserIdAndDate(@PathVariable Long id){
-    	PatientCompliance compliance = complianceRepository.findTop1ByPatientUserIdOrderByDateDesc(id);
-    	if(Objects.nonNull(compliance)){
-    		if(Objects.isNull(compliance.getHmrRunRate())){
-    			compliance.setHmrRunRate(0);
-    		}
-       		return new ResponseEntity<>(compliance,HttpStatus.OK);
-    	}
-    	else
+    public ResponseEntity<?> getComplianceScoreByPatientUserIdAndDate(@PathVariable Long id,
+    		@RequestParam(value="deviceType",required=true) String deviceType) {
+    	
+    	if(deviceType.equals("VEST")){
+    		PatientCompliance compliance = patientComplianceService.findLatestComplianceByPatientUserId(id);
+    		if(Objects.nonNull(compliance)){
+        		if(Objects.isNull(compliance.getHmrRunRate())){
+        			compliance.setHmrRunRate(0);
+        		}
+           		return new ResponseEntity<>(compliance,HttpStatus.OK);
+        	}
+    	}else if (deviceType.equals("MONARCH")){
+    		PatientComplianceMonarch compliance = patientComplianceMonarchService.findLatestComplianceByPatientUserId(id);
+    		if(Objects.nonNull(compliance)){
+        		if(Objects.isNull(compliance.getHmrRunRate())){
+        			compliance.setHmrRunRate(0);
+        		}
+           		return new ResponseEntity<>(compliance,HttpStatus.OK);
+        	}
+    	}    	
+    	
     		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

@@ -647,7 +647,7 @@ public class UserResource {
     		@RequestParam(value="deviceType",required=true) String deviceType) {
     	
     	if(deviceType.equals("VEST")){
-    		PatientCompliance compliance = complianceRepository.findTop1ByPatientUserIdOrderByDateDesc(id);
+    		PatientCompliance compliance = patientComplianceService.findLatestComplianceByPatientUserId(id);
     		if(Objects.nonNull(compliance)){
         		if(Objects.isNull(compliance.getHmrRunRate())){
         			compliance.setHmrRunRate(0);
@@ -655,7 +655,7 @@ public class UserResource {
            		return new ResponseEntity<>(compliance,HttpStatus.OK);
         	}
     	}else if (deviceType.equals("MONARCH")){
-    		PatientComplianceMonarch compliance = complianceMonarchRepository.findTop1ByPatientUserIdOrderByDateDesc(id);
+    		PatientComplianceMonarch compliance = patientComplianceMonarchService.findLatestComplianceByPatientUserId(id);
     		if(Objects.nonNull(compliance)){
         		if(Objects.isNull(compliance.getHmrRunRate())){
         			compliance.setHmrRunRate(0);

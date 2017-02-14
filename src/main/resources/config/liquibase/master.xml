@@ -119,4 +119,6 @@
 	<include file="classpath:/config/liquibase/changelog/20170213102800_updated_patient_device_type_hillrom_type_code.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170213104500_create_patient_devices_assoc_table.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170213110200_add_column_PING_PONG_AND_RAW_LOGS_MONARCH.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170213035700_add_column_PING_PONG_PING.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170214121600_add_column_FRAG_CURRENT_TOTAL_RAW_LOGS_MONARCH.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

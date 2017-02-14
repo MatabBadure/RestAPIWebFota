@@ -402,7 +402,7 @@ public class ParserUtilMonarch {
 	    return hexTotal;
 	}
 	
-	  private String getCRCChecksum(String encoded_string)
+	  public static String getCRCChecksum(String encoded_string)
 	  {
 
 		log.debug("Inside  getCRCChecksum : " ,encoded_string);

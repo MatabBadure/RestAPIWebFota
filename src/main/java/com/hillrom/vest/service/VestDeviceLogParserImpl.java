@@ -316,18 +316,13 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 	}
 
 	private PatientVestDeviceRawLogMonarch createPatientVestDeviceRawLogMonarch(
-			String rawMessageMonarch,JSONObject qclJsonDataMonarch) {
+			String rawMessageMonarch,JSONObject qclJsonDataMonarch)  throws Exception{
 		PatientVestDeviceRawLogMonarch patientVestDeviceRawLogMonarch = new PatientVestDeviceRawLogMonarch();
 		patientVestDeviceRawLogMonarch.setRawMessage(rawMessageMonarch);
-		/*patientVestDeviceRawLogMonarch
-				.setAirInterfaceType(ParserUtil
-						.getValueFromQclJsonData(qclJsonDataMonarch, AIR_INTERFACE_TYPE));*/
+
 		patientVestDeviceRawLogMonarch.setCucVersion(ParserUtilMonarch.getValueFromQclJsonDataMonarch(
 				qclJsonDataMonarch, DEVICE_VER));
-		/*patientVestDeviceRawLogMonarch.setCustomerId(ParserUtil.getValueFromQclJsonData(
-				qclJsonDataMonarch, CUSTOMER_ID));
-		patientVestDeviceRawLogMonarch.setCustomerName(ParserUtil
-				.getValueFromQclJsonData(qclJsonDataMonarch, CUSTOMER_NAME));*/
+
 
 		patientVestDeviceRawLogMonarch.setDeviceData(ParserUtilMonarch.getMonarchDeviceData(rawMessageMonarch));
 
@@ -340,17 +335,9 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 						.getValueFromQclJsonDataMonarch(
 								qclJsonDataMonarch,DEVICE_SN));
 		
-		/*patientVestDeviceRawLogMonarch.setDeviceType(ParserUtil.getValueFromQclJsonDataMonarch(
-				qclJsonDataMonarch,DEVICE_TYPE));
-		patientVestDeviceRawLogMonarch.setHubId(ParserUtil.getValueFromQclJsonData(
-				qclJsonDataMonarch, HUB_ID));*/
-		/*patientVestDeviceRawLogMonarch.setTimezone(ParserUtil.getValueFromQclJsonData(
-				qclJsonDataMonarch, TIMEZONE));*/
-		/*patientVestDeviceRawLogMonarch
-				.setHubReceiveTimeOffset(ParserUtil
-						.getValueFromQclJsonData(
-								qclJsonDataMonarch,
-								 HUB_RECEIVE_TIME_OFFSET));*/
+		patientVestDeviceRawLogMonarch.setTotalFragments(ParserUtilMonarch.getFragTotal(rawMessageMonarch)+"");
+		patientVestDeviceRawLogMonarch.setCurrentFragment(ParserUtilMonarch.getFragCurrent(rawMessageMonarch)+"");
+		patientVestDeviceRawLogMonarch.setChecksum(ParserUtilMonarch.getCRCChecksum(rawMessageMonarch)+"");
 		
 		return patientVestDeviceRawLogMonarch;
 	}

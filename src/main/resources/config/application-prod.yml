@@ -47,6 +47,6 @@ spring:
         baseUrl: https://visiview.hill-rom.com
         accountActivationReminderInterval: 12
     survey:
-        surveyreportemailids: joelkaka@gmail.com
+        surveyreportemailids: joelkaka@gmail.com 
     changePrescription:
-        changePrescriptionEmailids: joelpreetham.fernandes4@hill-rom.com,joelkaka@gmail.com
+        changePrescriptionEmailids: joelpreetham.fernandes4@hill-rom.com,joelkaka@gmail.com 

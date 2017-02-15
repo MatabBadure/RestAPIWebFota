@@ -244,9 +244,8 @@ public class UserResource {
 			else	
 				sortOrder.put(sortBy, isAscending);
 		}
-		Page<PatientUserVO> page = userSearchRepository.findPatientBy(
-				queryString, filter, PaginationUtil.generatePageRequest(offset, limit),
-				sortOrder, deviceType);
+		Page<PatientUserVO> page = userService.patientSearch(
+				queryString, filter, sortOrder, deviceType, offset, limit);
 		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
 				page, "/user/patient/search", offset, limit);
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);

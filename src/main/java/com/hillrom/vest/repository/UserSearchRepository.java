@@ -461,7 +461,8 @@ public class UserSearchRepository {
 				+ " pc.is_settings_deviated as isSettingsDeviated,"
 				+ " pc.missed_therapy_count as isMissedTherapy, clinic.adherence_setting as adherencesetting from USER user join USER_PATIENT_ASSOC  upa on user.id = upa.user_id "
 				+ " and upa.relation_label = '" + SELF + "' join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
-				+ " left outer join CLINIC_PATIENT_ASSOC user_clinic on user_clinic.patient_id = patInfo.id "
+				+ " left outer join CLINIC_PATIENT_ASSOC user_clinic on user_clinic.patient_id = patInfo.id"
+				+ " left outer join PATIENT_DEVICES_ASSOC patient_dev_assoc on patient_dev_assoc.patient_id = patInfo.id  "
 				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id  and user_authority.authority_name = '"
 				+ PATIENT + "' "
 				+ " and (lower(user.first_name) like lower(:queryString) or  lower(user.last_name) like lower(:queryString) or "
@@ -477,6 +478,7 @@ public class UserSearchRepository {
 		
 		String query3a = " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) "
 					+ " left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and  user_clinic.patient_id = patInfo.id "
+					+ " where patient_dev_assoc.device_type='"+deviceType+"' "
 					+ " group by user.id) as associated_patient left outer join (select  GROUP_CONCAT(huser.last_name ,' ',huser.first_name ) as hName, "
 					+ " clinic.id as hclinicid from USER huser join USER_AUTHORITY user_authorityh on user_authorityh.user_id = huser.id "
 					+ " and user_authorityh.authority_name = '" + HCP + "' "
@@ -487,6 +489,7 @@ public class UserSearchRepository {
 		
 		String query3b = " left outer join PATIENT_COMPLIANCE_MONARCH pc on user.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) "
 					+ " left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and  user_clinic.patient_id = patInfo.id "
+					+ " where patient_dev_assoc.device_type='"+deviceType+"' "
 					+ " group by user.id) as associated_patient left outer join (select  GROUP_CONCAT(huser.last_name ,' ',huser.first_name ) as hName, "
 					+ " clinic.id as hclinicid from USER huser join USER_AUTHORITY user_authorityh on user_authorityh.user_id = huser.id "
 					+ " and user_authorityh.authority_name = '" + HCP + "' "

@@ -28,6 +28,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -57,6 +59,7 @@ import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.OnCredentialsChangeEvent;
 import com.hillrom.vest.security.SecurityUtils;
@@ -69,6 +72,7 @@ import com.hillrom.vest.web.rest.dto.CareGiverVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
+import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 import net.minidev.json.JSONObject;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -133,6 +137,9 @@ public class UserService {
     @Inject
 	private NoteService noteService;
 
+    @Inject
+	private UserSearchRepository userSearchRepository;
+    
     public String generateDefaultPassword(User patientUser) {
 		StringBuilder defaultPassword = new StringBuilder();
 		String zipcode = patientUser.getZipcode().toString();
@@ -291,6 +298,14 @@ public class UserService {
                userRepository.save(user);
                return user;
            });
+    }
+    
+    public Page<PatientUserVO> patientSearch(String queryString, String filter,
+			Map<String, Boolean> sortOrder, String deviceType, Integer offset, Integer limit){
+    	Page<PatientUserVO> page = userSearchRepository.findPatientBy(
+				queryString, filter, PaginationUtil.generatePageRequest(offset, limit),
+				sortOrder, deviceType);
+    	return page;
     }
 
     public User createUserInformation(String password, String firstName, String lastName, String email,

@@ -244,9 +244,8 @@ public class UserResource {
 			else	
 				sortOrder.put(sortBy, isAscending);
 		}
-		Page<PatientUserVO> page = userSearchRepository.findPatientBy(
-				queryString, filter, PaginationUtil.generatePageRequest(offset, limit),
-				sortOrder, deviceType);
+		Page<PatientUserVO> page = userService.patientSearch(
+				queryString, filter, sortOrder, deviceType, offset, limit);
 		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
 				page, "/user/patient/search", offset, limit);
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
@@ -340,7 +339,8 @@ public class UserResource {
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,
-			@RequestParam(value = "asc", required = false) Boolean isAscending)
+			@RequestParam(value = "asc", required = false) Boolean isAscending,
+			@RequestParam(value = "deviceType", required = true) String deviceType)
 			throws URISyntaxException {
 		if(searchString.endsWith("_")){
 		   searchString = searchString.replace("_", "\\\\_");
@@ -355,9 +355,8 @@ public class UserResource {
 			else	
 				sortOrder.put(sortBy, isAscending);
 		}
-		Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientsToClinicBy(
-				queryString,clinicId, filter, PaginationUtil.generatePageRequest(offset, limit),
-				sortOrder);
+		Page<PatientUserVO> page = userService.patientSearchByClinic(
+				queryString,clinicId, filter,sortOrder, deviceType,offset, limit);
 		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
 				page, "/user/clinic/"+clinicId+"/patient/search", offset, limit);
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
@@ -832,22 +831,15 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
-    public ResponseEntity<?> getPatientStatisticsForClinicAssociated(@PathVariable Long userId, @PathVariable String clinicId,
-    		@RequestParam(value="deviceType",required=true) String deviceType) {
+    public ResponseEntity<?> getPatientStatisticsForClinicAssociated(@PathVariable Long userId, @PathVariable String clinicId) {
         log.debug("REST request to get patient statistics for clinic {} associated with User : {}", clinicId, userId);
         JSONObject jsonObject = new JSONObject();
         try {
-        	Map<String, Object> statitics = null;
         	LocalDate date = LocalDate.now();
-        	if(deviceType.equals("VEST")) {
-        		statitics = patientHCPService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(clinicId, date);
-        	}
-        	else if(deviceType.equals("MONARCH")) {
-        		statitics = patientHCPMonarchService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(clinicId, date);
-        	}
-        	if(statitics.isEmpty()) {
+        	Map<String, Object> statitics = patientHCPService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(clinicId, date);
+	        if (statitics.isEmpty()) {
 	        	jsonObject.put("message", ExceptionConstants.HR_584);
-	        }else {
+	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_297);
 	        	jsonObject.put("statitics", statitics);
 	        }

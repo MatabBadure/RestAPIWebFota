@@ -38,6 +38,7 @@ import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.util.QueryConstants;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.HCPClinicService;
@@ -462,6 +463,7 @@ public class UserSearchRepository {
 				+ " pc.missed_therapy_count as isMissedTherapy, clinic.adherence_setting as adherencesetting from USER user join USER_PATIENT_ASSOC  upa on user.id = upa.user_id "
 				+ " and upa.relation_label = '" + SELF + "' join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 				+ " left outer join CLINIC_PATIENT_ASSOC user_clinic on user_clinic.patient_id = patInfo.id "
+				+ " left outer join PATIENT_DEVICES_ASSOC patient_dev_assoc on patient_dev_assoc.patient_id = patInfo.id "
 				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id  and user_authority.authority_name = '"
 				+ PATIENT + "' "
 				+ " and (lower(user.first_name) like lower(:queryString) or  lower(user.last_name) like lower(:queryString) or "
@@ -477,6 +479,7 @@ public class UserSearchRepository {
 		
 		String query3a = " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) "
 					+ " left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and  user_clinic.patient_id = patInfo.id "
+					+ " where patient_dev_assoc.device_type = '"+deviceType+"'  "
 					+ " group by user.id) as associated_patient left outer join (select  GROUP_CONCAT(huser.last_name ,' ',huser.first_name ) as hName, "
 					+ " clinic.id as hclinicid from USER huser join USER_AUTHORITY user_authorityh on user_authorityh.user_id = huser.id "
 					+ " and user_authorityh.authority_name = '" + HCP + "' "
@@ -487,6 +490,7 @@ public class UserSearchRepository {
 		
 		String query3b = " left outer join PATIENT_COMPLIANCE_MONARCH pc on user.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) "
 					+ " left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and  user_clinic.patient_id = patInfo.id "
+					+ " where patient_dev_assoc.device_type = '"+deviceType+"'  "
 					+ " group by user.id) as associated_patient left outer join (select  GROUP_CONCAT(huser.last_name ,' ',huser.first_name ) as hName, "
 					+ " clinic.id as hclinicid from USER huser join USER_AUTHORITY user_authorityh on user_authorityh.user_id = huser.id "
 					+ " and user_authorityh.authority_name = '" + HCP + "' "
@@ -495,24 +499,32 @@ public class UserSearchRepository {
 					+ " left outer join PATIENT_COMPLIANCE_MONARCH pc on huser.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) "
 					+ " group by clinic.id) as associated_hcp  on associated_patient.pclinicid = associated_hcp.hclinicid ";
 		
-		String query3 ="";
+		String query3 ="";		
+				
 		
 		if(deviceType.equals("VEST")){
 			query3 = query3a;
 		}if(deviceType.equals("MONARCH")){
 			query3 = query3b;
-		}
+		} 
 	
 		String findPatientUserQuery = query1;
 		// HCP , CLINIC_ADMIN can search on MRNID not HRID
-		if (SecurityUtils.isUserInRole(HCP) || SecurityUtils.isUserInRole(CLINIC_ADMIN))
+		if (SecurityUtils.isUserInRole(HCP) || SecurityUtils.isUserInRole(CLINIC_ADMIN)){			
 			findPatientUserQuery = findPatientUserQuery
 					.substring(0, findPatientUserQuery.lastIndexOf(")")).concat(mrnIdSearch);
-		else // Admin can search on HRID not MRNID
+			if(deviceType.equals("ALL")){
+				findPatientUserQuery = QueryConstants.QUERY_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_CLINIC_ADMIN_LOGIN;
+			}
+		}else{ // Admin can search on HRID not MRNID
 			findPatientUserQuery += hrIdSearch;
 			findPatientUserQuery += query3;
-
-
+				if(deviceType.equals("ALL")){
+					findPatientUserQuery = QueryConstants.QUERY_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN;
+				}
+			}
+			
+			
 		findPatientUserQuery = applyFiltersToQuery(filter, findPatientUserQuery);
 
 		findPatientUserQuery = findPatientUserQuery.replaceAll(":queryString", queryString);
@@ -919,7 +931,7 @@ public class UserSearchRepository {
 	}
 
 	public Page<PatientUserVO> findAssociatedPatientsToClinicBy(String queryString, String clinicID, String filter,
-			Pageable pageable, Map<String, Boolean> sortOrder) {
+			Pageable pageable, Map<String, Boolean> sortOrder,String deviceType) {
 
 		String findPatientUserQuery = "select user.id,user.email,user.first_name as"
 				+ " firstName,user.last_name as lastName, IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,IF(patient_clinic.is_active = NULL,user.is_deleted,1))) as isDeleted ,"

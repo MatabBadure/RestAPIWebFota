@@ -87,15 +87,22 @@ public class PatientHCPMonarchService extends PatientHCPService{
     private PatientComplianceMonarchRepository patientComplianceMonarchRepository;
     
     @Inject
+    private PatientComplianceRepository patientComplianceRepository;
+    
+    @Inject
     private TherapySessionServiceMonarch therapySessionMonarchService;
     
     @Inject
     private PatientNoEventsMonarchRepository noEventsMonarchRepository;
     
     @Inject
+    private PatientNoEventsRepository noEventsRepository;
+    
+    @Inject
     private ClinicPatientRepository clinicPatientRepository;
 
-
+    @Inject
+    private PatientHCPService patientHCPService;
 	
 	
 	public Map<String, Object> getTodaysPatientStatisticsForClinicAssociatedWithHCP(String clinicId, LocalDate date) throws HillromException{
@@ -123,6 +130,42 @@ public class PatientHCPMonarchService extends PatientHCPService{
 			statistics.put("patientsWithHmrNonCompliance", patientComplianceMonarchRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, patientUserIds).size());
 			statistics.put("patientsWithSettingDeviation", patientComplianceMonarchRepository.findByDateAndIsSettingsDeviatedAndPatientUserIdIn(date, true, patientUserIds).size());
 			statistics.put("patientsWithMissedTherapy", patientComplianceMonarchRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date, patientUserIds).size());
+			statistics.put("patientsWithNoEventRecorded", patientsWithNoEventRecorded);
+			statistics.put("date", date.toString());
+			statistics.put("totalPatientCount", patientUserIds.size());
+		}
+		return statistics;
+	}
+	
+	public Map<String, Object> getTodaysPatientStatisticsForClinicAssociatedWithHCPAll(String clinicId, LocalDate date) throws HillromException{
+		Map<String, Object> statistics = new HashMap();
+		List<String> clinicList = new LinkedList<>();
+		clinicList.add(clinicId);
+		List<Map<String,Object>> patientUsers = clinicService.getAssociatedPatientUsers(clinicList);
+		List<Long> patientUserIds = filterActivePatientIds(patientUsers);
+		if(patientUsers.isEmpty()) {
+	       	Map<String, Object> statistics0 = new HashMap();
+				statistics0.put("patientsWithHmrNonCompliance", 0);
+				statistics0.put("patientsWithSettingDeviation", 0);
+				statistics0.put("patientsWithMissedTherapy", 0);
+				statistics0.put("patientsWithNoEventRecorded", 0);
+				statistics0.put("date", LocalDate.now());
+				statistics0.put("totalPatientCount", 0);        	
+	        	return statistics0;
+			//throw new HillromException(MessageConstants.HR_279);
+		} else if(patientUserIds.isEmpty()) {
+			throw new HillromException(MessageConstants.HR_267);
+		} else {
+			date = LocalDate.now().minusDays(1);// yester days data, HCP and Clinic Admin would see yesterdays data
+			Map<LocalDate,Integer> datePatientNoEventCountMap = new HashMap<LocalDate, Integer>(getPatientsWithNoEvents(date,date,patientUserIds));
+			datePatientNoEventCountMap.putAll(patientHCPService.getPatientsWithNoEvents(date, date, patientUserIds));
+			int patientsWithNoEventRecorded = Objects.nonNull(datePatientNoEventCountMap.get(date))? datePatientNoEventCountMap.get(date):0;
+			int patientsWithHmrNonCompliance = patientComplianceMonarchRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, patientUserIds).size() + patientComplianceRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, patientUserIds).size();
+			int patientsWithSettingDeviation = patientComplianceMonarchRepository.findByDateAndIsSettingsDeviatedAndPatientUserIdIn(date, true, patientUserIds).size() + patientComplianceRepository.findByDateAndIsSettingsDeviatedAndPatientUserIdIn(date, true, patientUserIds).size();
+			int patientsWithMissedTherapy =  patientComplianceMonarchRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date, patientUserIds).size() + patientComplianceRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date, patientUserIds).size();
+			statistics.put("patientsWithHmrNonCompliance", patientsWithHmrNonCompliance);
+			statistics.put("patientsWithSettingDeviation", patientsWithSettingDeviation);
+			statistics.put("patientsWithMissedTherapy", patientsWithMissedTherapy);
 			statistics.put("patientsWithNoEventRecorded", patientsWithNoEventRecorded);
 			statistics.put("date", date.toString());
 			statistics.put("totalPatientCount", patientUserIds.size());

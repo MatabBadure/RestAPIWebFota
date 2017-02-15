@@ -836,8 +836,17 @@ public class UserResource {
         JSONObject jsonObject = new JSONObject();
         try {
         	LocalDate date = LocalDate.now();
-        	Map<String, Object> statitics = patientHCPService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(clinicId, date);
-	        if (statitics.isEmpty()) {
+
+        	if(deviceType.equals("VEST")) {
+        		statitics = patientHCPService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(clinicId, date);
+        	}
+        	else if(deviceType.equals("MONARCH")) {
+        		statitics = patientHCPMonarchService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(clinicId, date);
+        	}
+        	else if(deviceType.equals("ALL")) {
+        		statitics = patientHCPMonarchService.getTodaysPatientStatisticsForClinicAssociatedWithHCPAll(clinicId, date);
+        	}
+        	if(statitics.isEmpty()) {
 	        	jsonObject.put("message", ExceptionConstants.HR_584);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_297);

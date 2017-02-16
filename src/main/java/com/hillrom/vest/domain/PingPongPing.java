@@ -40,6 +40,12 @@ public class PingPongPing implements Serializable {
     
     @Column(name = "serial_number")
     private String serialNumber;
+    
+    @Column(name = "dev_wifi")
+    private String devWifi;
+    
+    @Column(name = "dev_lte")
+    private String devLte;
 
 	/**
 	 * @return the id
@@ -91,6 +97,36 @@ public class PingPongPing implements Serializable {
 	public void setSerialNumber(String serialNumber) {
 		this.serialNumber = serialNumber;
 	}
+	
+	
+
+	/**
+	 * @return the devWifi
+	 */
+	public String getDevWifi() {
+		return devWifi;
+	}
+
+	/**
+	 * @param devWifi the devWifi to set
+	 */
+	public void setDevWifi(String devWifi) {
+		this.devWifi = devWifi;
+	}
+
+	/**
+	 * @return the devLte
+	 */
+	public String getDevLte() {
+		return devLte;
+	}
+
+	/**
+	 * @param devLte the devLte to set
+	 */
+	public void setDevLte(String devLte) {
+		this.devLte = devLte;
+	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -100,6 +136,8 @@ public class PingPongPing implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((createdTime == null) ? 0 : createdTime.hashCode());
+		result = prime * result + ((devLte == null) ? 0 : devLte.hashCode());
+		result = prime * result + ((devWifi == null) ? 0 : devWifi.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((serialNumber == null) ? 0 : serialNumber.hashCode());
 		return result;
@@ -122,6 +160,16 @@ public class PingPongPing implements Serializable {
 				return false;
 		} else if (!createdTime.equals(other.createdTime))
 			return false;
+		if (devLte == null) {
+			if (other.devLte != null)
+				return false;
+		} else if (!devLte.equals(other.devLte))
+			return false;
+		if (devWifi == null) {
+			if (other.devWifi != null)
+				return false;
+		} else if (!devWifi.equals(other.devWifi))
+			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -140,7 +188,8 @@ public class PingPongPing implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return "PingPongPing [id=" + id + ", createdTime=" + createdTime + ", serialNumber=" + serialNumber + "]";
+		return "PingPongPing [id=" + id + ", createdTime=" + createdTime + ", serialNumber=" + serialNumber
+				+ ", devWifi=" + devWifi + ", devLte=" + devLte + "]";
 	}
 
 

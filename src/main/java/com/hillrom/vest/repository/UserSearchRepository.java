@@ -935,25 +935,43 @@ public class UserSearchRepository {
 
 		String findPatientUserQuery = "select user.id,user.email,user.first_name as"
 				+ " firstName,user.last_name as lastName, IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,IF(patient_clinic.is_active = NULL,user.is_deleted,1))) as isDeleted ,"
-				+ "user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,"
-				+ "user.title,user.hillrom_id,user.created_date as createdAt,"
-				+ "user.activated as isActivated, patInfo.state , compliance_score, pc.last_therapy_session_date as last_date, patient_clinic.expired, patient_clinic.mrn_id as mrnId, "
-				+ "pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,pc.missed_therapy_count as isMissedTherapy,clinic.adherence_setting as adherencesetting "
-				+ "from USER user" + " join USER_AUTHORITY user_authority on user_authority.user_id = user.id  "
-				+ "and user_authority.authority_name = '" + PATIENT + "' and "
-				+ "(lower(user.first_name) like lower(:queryString) or  "
-				+ "lower(user.last_name) like lower(:queryString) or  "
-				+ "lower(user.email) like lower(:queryString) or "
-				+ "lower(CONCAT(user.first_name,' ',user.last_name)) like lower(:queryString) or "
-				+ "lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) or "
-				+ "lower(user.hillrom_id) like lower(:queryString)) "
-				+ "join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '" + SELF + "' "
-				+ "join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
-				+ "join CLINIC_PATIENT_ASSOC patient_clinic on "
-				+ "patient_clinic.patient_id = patInfo.id and patient_clinic.clinic_id = ':clinicId'"
-				+ "join CLINIC clinic on clinic.id = patient_clinic.clinic_id "
-				+ "left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) group by pc.user_id";
+				+ " user.zipcode,patInfo.address,patInfo.city,user.dob,user.gender,"
+				+ " user.title,user.hillrom_id,user.created_date as createdAt,"
+				+ " user.activated as isActivated, patInfo.state , compliance_score, pc.last_therapy_session_date as last_date, patient_clinic.expired, patient_clinic.mrn_id as mrnId, "
+				+ " pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,pc.missed_therapy_count as isMissedTherapy,clinic.adherence_setting as adherencesetting "
+				+ " from USER user" + " join USER_AUTHORITY user_authority on user_authority.user_id = user.id  "
+				+ " and user_authority.authority_name = '" + PATIENT + "' and "
+				+ " (lower(user.first_name) like lower(:queryString) or  "
+				+ " lower(user.last_name) like lower(:queryString) or  "
+				+ " lower(user.email) like lower(:queryString) or "
+				+ " lower(CONCAT(user.first_name,' ',user.last_name)) like lower(:queryString) or "
+				+ " lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) or "
+				+ " lower(user.hillrom_id) like lower(:queryString)) "
+				+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '" + SELF + "' "
+				+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
+				+ " join CLINIC_PATIENT_ASSOC patient_clinic on "
+				+ " patient_clinic.patient_id = patInfo.id and patient_clinic.clinic_id = ':clinicId'"
+				+ " join CLINIC clinic on clinic.id = patient_clinic.clinic_id "
+				+ " left outer join PATIENT_DEVICES_ASSOC patient_dev_assoc on patient_dev_assoc.patient_id = patInfo.id ";
+		
+		String queryVestDevType = " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id "
+				+ " AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) "
+				+ " where patient_dev_assoc.device_type IN ('VEST','ALL') group by pc.user_id";
 
+		String queryMonarchDevType = " left outer join PATIENT_COMPLIANCE_MONARCH pc on user.id = pc.user_id "
+				+ " AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) "
+				+ " where patient_dev_assoc.device_type IN ('MONARCH','ALL') group by pc.user_id";
+		
+		if(deviceType.equals("VEST")){
+			findPatientUserQuery = findPatientUserQuery + queryVestDevType;
+		}else if (deviceType.equals("MONARCH")){
+			findPatientUserQuery = findPatientUserQuery + queryMonarchDevType;
+		} else if(deviceType.equals("ALL")){
+			String query1 = findPatientUserQuery + queryVestDevType;
+			String query2 = findPatientUserQuery + queryMonarchDevType;
+			findPatientUserQuery = query1 + " UNION " + query2;
+		}
+		
 		StringBuilder filterQuery = new StringBuilder();
 
 		Map<String, String> filterMap = getSearchParams(filter);

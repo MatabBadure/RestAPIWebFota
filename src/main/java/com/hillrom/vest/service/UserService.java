@@ -189,6 +189,21 @@ public class UserService {
     	return page;
     }
     
+    public Page<PatientUserVO> associatedPatientSearchInClinicAdmin(Long id,String queryString, String clinicId, String filter,
+			Map<String, Boolean> sortOrder, String deviceType,Integer offset, Integer limit){
+    	Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientToClinicAdminBy(
+				queryString, id, clinicId, filter, PaginationUtil.generatePageRequest(offset, limit),
+				sortOrder,deviceType);
+    	return page;
+    }
+    
+    public Page<PatientUserVO> patientSearchUnderHCPUser(String queryString, Long id, String clinicId, String filter,
+			Map<String, Boolean> sortOrder, String deviceType,Integer offset, Integer limit) throws HillromException{
+    	Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientToHCPBy(queryString, id, clinicId,
+    			filter, PaginationUtil.generatePageRequest(offset, limit),sortOrder,deviceType);
+    	return page;
+    }
+    
     public Optional<User> validateActivationKey(String key) throws HillromException {
         log.debug("Activating user for activation key {}", key);
         Optional<User> optionalExistingUser = userRepository.findOneByActivationKey(key);

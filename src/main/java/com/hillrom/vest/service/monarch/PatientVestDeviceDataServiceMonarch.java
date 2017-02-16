@@ -111,21 +111,7 @@ public class PatientVestDeviceDataServiceMonarch {
 	private ApplicationContext applicationContextMonarch;
 	// Added lated
 	
-	/*
-	public ChargerData findLatestData(){
-		ChargerData chargerData =  chargerDataRepository.findLatestData();
-			return chargerData;
-	}
 
-	public ChargerData findById(Long id){
-		ChargerData chargerData =  chargerDataRepository.findById(id);
-			return chargerData;
-	}
-
-	public Page<ChargerData> findAll(Pageable pageable){
-		Page<ChargerData> chargerDataList =  chargerDataRepository.findAll(pageable);
-			return chargerDataList;
-	}*/
 
 
 	public String decodeData(final String rawMessage){
@@ -147,31 +133,6 @@ public class PatientVestDeviceDataServiceMonarch {
 	public ExitStatus saveData(final String rawData) throws Exception {
 		log.debug("saveData has been called , rawData length",rawData.length());
 
-		//String decoded_string = decodeData(rawData);
-		//JSONObject chargerJsonData = validateRequest(rawData, decoded_string);
-		
-		/*
-		JSONObject chargerJsonData = validateRequest(encoded_string,decoded_string);
-		if(chargerJsonData.get("DEVICE_DATA").equals("PING_PONG_PING")){
-			log.debug("deviceData is PING_PONG_PING" + " Insert into PING_PONG_PING table");
-			PingPongPing pingPongPingData = new PingPongPing();
-			pingPongPingData.setCreatedTime(new DateTime());
-			pingPongPingRepository.save(pingPongPingData);
-			
-		}
-		if(chargerJsonData.get("RESULT").equals("OK")){
-			ChargerData chargerData = new ChargerData();
-			chargerData.setDeviceData(encoded_string);
-			chargerData.setCreatedTime(new DateTime());
-			chargerDataRepository.save(chargerData);
-		}
-		return chargerJsonData;
-		*/
-		
-		/*if(chargerJsonData.get("RESULT").equals("NOT OK"))
-			throw new HillromException(chargerJsonData.get("ERROR").toString());*/
-		
-		//String decodedData = decodeData(rawData);
 		
 		validateRequest(rawData);
 		
@@ -687,38 +648,5 @@ public class PatientVestDeviceDataServiceMonarch {
 	
 	
 	
-	/*public ExitStatus saveData(final String rawData) throws Exception {
-		log.debug("saveData has been called , rawData length",rawData.length());
 
-		validateRequest(rawData);
-		
-		Job addNewDataIngestionJob = applicationContext.getBean("processTherapySessionsAndCompliance", Job.class);
-		JobParameters jobParameters = new JobParametersBuilder()
-		.addLong("TIME", System.currentTimeMillis())
-		.addString("rawData", rawData)
-		.toJobParameters();
-		JobExecution jobExecution = jobLauncher.run(addNewDataIngestionJob, jobParameters);
-		log.debug("Job triggered @ Time ",System.currentTimeMillis());
-		ExitStatus exitStatus = jobExecution.getExitStatus();
-		// Sending mail Notification on Job Status (ON Success), this code should be removed later
-		log.debug("Job triggered @ Time ",exitStatus);
-		if(ExitStatus.COMPLETED.equals(exitStatus)){
-			mailService.sendStatusOnDataIngestionRequest(rawData, exitStatus.getExitCode(), !ExitStatus.COMPLETED.equals(exitStatus), "");
-		}
-		return exitStatus;
-	}
-
-	private void validateRequest(final String rawData) throws HillromException {
-		JSONObject qclJsonData = ParserUtil.getQclJsonDataFromRawMessage(rawData);
-		String reqParams[] = new String[]{DEVICE_DATA,
-        DEVICE_SERIAL_NUMBER,HUB_ID,HUB_RECEIVE_TIME,DEVICE_ADDRESS};
-		if(Objects.isNull(qclJsonData) || qclJsonData.keySet().isEmpty()){
-			throw new HillromException("Missing Params : "+String.join(",",reqParams));
-		}else if(Objects.nonNull(qclJsonData)){
-			JSONObject twoNetProperties = (JSONObject) qclJsonData.getOrDefault(TWO_NET_PROPERTIES, new JSONObject());
-			List<String> missingParams = RandomUtil.getDifference(Arrays.asList(reqParams), new ArrayList<String>(twoNetProperties.keySet()));
-			if(missingParams.size() > 0)
-				throw new HillromException("Missing Params : "+String.join(",",missingParams));
-		}
-	}*/
 }

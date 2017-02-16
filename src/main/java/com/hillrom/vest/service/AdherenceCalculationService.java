@@ -55,6 +55,7 @@ import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
+import com.hillrom.vest.domain.PatientNoEventMonarch;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
@@ -64,6 +65,8 @@ import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
+import com.hillrom.vest.service.monarch.AdherenceCalculationServiceMonarch;
+import com.hillrom.vest.service.monarch.PatientNoEventMonarchService;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -113,6 +116,9 @@ public class AdherenceCalculationService {
 	private PatientNoEventService noEventService;
 	
 	@Inject
+	private PatientNoEventMonarchService noEventMonarchService;
+	
+	@Inject
 	private ClinicRepository clinicRepository;
 	
 	@Inject
@@ -126,6 +132,12 @@ public class AdherenceCalculationService {
 	private AdherenceResetRepository adherenceResetRepository;
 	//hill-1956
 
+	@Inject
+	private AdherenceCalculationServiceMonarch adherenceCalculationServiceMonarch;
+	
+	@Inject
+    private PatientVestDeviceService patientVestDeviceService;
+	
 	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationService.class);
 	
 	/**
@@ -303,34 +315,51 @@ public class AdherenceCalculationService {
 			List<Long> userIdList = clinicPatientService.getUserIdListFromUserList(userList);
 			
 			Map<Long,PatientNoEvent> userIdNoEventMap = noEventService.findAllByPatientUserId(userIdList);
-			
+			Map<Long,PatientNoEventMonarch> userIdNoEventMapMonarch = noEventMonarchService.findAllByPatientUserId(userIdList);
+			String successMessage = "";
 			if(userList.size()>0){
 				for(User user : userList){
 					//User user = userService.getUserObjFromPatientInfo(patient);
-					LocalDate startDate = fineOneByPatientUserIdLatestResetStartDate(user.getId());
 					
-					if(Objects.isNull(startDate)){				
+					LocalDate startDate = fineOneByPatientUserIdLatestResetStartDate(user.getId());
+					LocalDate startDateMonarch = adherenceCalculationServiceMonarch.fineOneByPatientUserIdLatestResetStartDate(user.getId());
+					
+					String deviceType = patientVestDeviceService.getDeviceType(user);
+					
+					if((deviceType.equals("VEST") || deviceType.equals("ALL")) && Objects.isNull(startDate)){
 						PatientNoEvent noEvent = userIdNoEventMap.get(user.getId());
+
 						if(Objects.nonNull(noEvent) &&  Objects.nonNull(noEvent.getFirstTransmissionDate())){
 							startDate = noEvent.getFirstTransmissionDate();
 						}
+					}else if( (deviceType.equals("MONARCH") || deviceType.equals("ALL")) && Objects.isNull(startDateMonarch)){
+						PatientNoEventMonarch noEventMonarch = userIdNoEventMapMonarch.get(user.getId());						
+						
+						if(Objects.nonNull(noEventMonarch) &&  Objects.nonNull(noEventMonarch.getFirstTransmissionDate())){
+							startDateMonarch = noEventMonarch.getFirstTransmissionDate();
+						}
 					}
+					
 					if(Objects.nonNull(startDate)){
 						PatientInfo patient = userService.getPatientInfoObjFromPatientUser(user);
-						adherenceResetForPatient(user.getId(), patient.getId(), startDate, DEFAULT_COMPLIANCE_SCORE, 0);
+						if(deviceType.equals("VEST")){
+							adherenceResetForPatient(user.getId(), patient.getId(), startDate, DEFAULT_COMPLIANCE_SCORE, 0);
+						}else if(deviceType.equals("MONARCH")){
+							adherenceCalculationServiceMonarch.adherenceResetForPatient(user.getId(), patient.getId(), startDateMonarch, DEFAULT_COMPLIANCE_SCORE, 0);
+						}else if(deviceType.equals("ALL")){
+							adherenceResetForPatient(user.getId(), patient.getId(), startDate, DEFAULT_COMPLIANCE_SCORE, 0);
+							adherenceCalculationServiceMonarch.adherenceResetForPatient(user.getId(), patient.getId(), startDateMonarch, DEFAULT_COMPLIANCE_SCORE, 0);
+						}
 					}
 				}
-				long endTime   = System.currentTimeMillis();
-				long totalTime = endTime - startTime;
-				log.error("adherenceSettingForClinic method executed in :"+totalTime+" milliseconds");
-				return new AsyncResult<>(MessageConstants.HR_314);
-				//return new AsyncResult<>("Adherence Score recalculated initiated, will be completed soon");
+				successMessage = MessageConstants.HR_314;
 			}else{
-				long endTime   = System.currentTimeMillis();
-				long totalTime = endTime - startTime;				
-				log.error("adherenceSettingForClinic method executed in :"+totalTime+" milliseconds");
-				return new AsyncResult<>(MessageConstants.HR_315);				
+				successMessage = MessageConstants.HR_315;
 			}
+			long endTime   = System.currentTimeMillis();
+			long totalTime = endTime - startTime;				
+			log.error("adherenceSettingForClinic method executed in :"+totalTime+" milliseconds");
+			return new AsyncResult<>(successMessage);			
 		}catch(Exception ex){
 			log.debug(ex.getMessage());
 		}

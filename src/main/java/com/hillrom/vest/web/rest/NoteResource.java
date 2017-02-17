@@ -225,7 +225,6 @@ public class NoteResource {
     		 page = noteServiceMonarch.findByUserIdAndDateRange(userId, fromDate, toDate,isDeleted, pageable);
     	}
     	HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/notes", offset, limit);
-    	
-        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    	return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 }

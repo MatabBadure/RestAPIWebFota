@@ -1341,7 +1341,11 @@ public class UserService {
 		PatientCompliance compliance = complianceService.findLatestComplianceByPatientUserId(id);
 		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patientInfo.getId());
 		PatientUserVO patientUserVO =  new PatientUserVO(user,patientInfo);
-		patientUserVO.setHoursOfUsage((compliance.getHmr()/(60*60)));
+
+		// to do for Monarch
+		if(Objects.nonNull(compliance))
+			patientUserVO.setHoursOfUsage((compliance.getHmr()/(60*60)));
+
 		String mrnId;
 		java.util.Iterator<ClinicPatientAssoc> cpaIterator = clinicPatientAssocList.iterator();
 		while(cpaIterator.hasNext()){

@@ -53,6 +53,7 @@ import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
+import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.ProtocolConstantsMonarch;
 import com.hillrom.vest.domain.TherapySession;
@@ -77,6 +78,7 @@ import com.hillrom.vest.service.PatientVestDeviceService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.service.monarch.PatientHCPMonarchService;
+import com.hillrom.vest.service.monarch.PatientVestDeviceMonarchService;
 import com.hillrom.vest.service.monarch.TherapySessionServiceMonarch;
 import com.hillrom.vest.service.monarch.AdherenceCalculationServiceMonarch;
 import com.hillrom.vest.service.monarch.PatientComplianceMonarchService;
@@ -117,6 +119,9 @@ public class UserResource {
 	
 	@Inject
 	private PatientVestDeviceService patientVestDeviceService;
+	
+	@Inject
+	private PatientVestDeviceMonarchService patientVestDeviceMonarchService;
 
 	@Inject
 	private PatientProtocolService patientProtocolService;
@@ -415,11 +420,18 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
-    public ResponseEntity<JSONObject> getLinkedVestDeviceWithPatient(@PathVariable Long id) {
+    public ResponseEntity<JSONObject> getLinkedVestDeviceWithPatient(@PathVariable Long id,
+    		@RequestParam(value = "deviceType", required = true) String deviceType) {
     	log.debug("REST request to link vest device with patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
 		try {
-			List<PatientVestDeviceHistory> deviceList = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
+			List<?> deviceList = null;
+			if(deviceType.equals("VEST")){
+				deviceList = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
+			} else if(deviceType.equals("MONARCH")){
+				deviceList = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
+			}
+			
 			if(deviceList.isEmpty()){
      			jsonObject.put("message",MessageConstants.HR_281); //No device linked with patient.
      		} else {

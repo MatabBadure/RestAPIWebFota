@@ -25,6 +25,7 @@ import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.hillrom.vest.domain.PatientCompliance;
+import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
@@ -51,8 +52,9 @@ import com.hillrom.vest.repository.monarch.PatientMonarchDeviceDataRepository;
 import com.hillrom.vest.repository.monarch.PatientMonarchDeviceRawLogRepository;
 import com.hillrom.vest.repository.monarch.PatientMonarchDeviceRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.service.DeviceLogMonarchParser;
 import com.hillrom.vest.service.DeviceLogParser;
-import com.hillrom.vest.service.PatientComplianceService;
+import com.hillrom.vest.service.monarch.PatientComplianceMonarchService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.monarch.PatientNoEventMonarchService;
 import com.hillrom.vest.service.monarch.TherapySessionServiceMonarch;
@@ -77,7 +79,7 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 	private AuthorityRepository authorityRepository;
 
 	@Inject
-	private DeviceLogParser deviceLogParser;
+	private DeviceLogMonarchParser deviceLogMonarchParser;
 
 	@Inject
 	private PatientNoEventMonarchService noEventServiceMonarch;
@@ -86,7 +88,7 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 	private TherapySessionServiceMonarch therapySessionServiceMonarch;
 
 	@Inject
-	private PatientComplianceService complianceService;
+	private PatientComplianceMonarchService complianceMonarchService;
 	
 	@Inject
 	private PatientMonarchDeviceRawLogRepository deviceRawLogRepositoryMonarch;
@@ -114,13 +116,13 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 		log.debug("Parsing started rawData : ",patientDeviceRawData);
 		PatientVestDeviceRawLogMonarch deviceRawLogMonarch = null;
 		List<PatientVestDeviceDataMonarch> patientVestDeviceEventsMonarch = null;
-		deviceRawLogMonarch = deviceLogParser.parseBase64StringToPatientMonarchDeviceRawLog(patientDeviceRawData);
+		deviceRawLogMonarch = deviceLogMonarchParser.parseBase64StringToPatientMonarchDeviceRawLog(patientDeviceRawData);
 
 		deviceRawLogRepositoryMonarch.save(deviceRawLogMonarch);
 		
 		//checkPingPong();
 		
-		patientVestDeviceEventsMonarch = deviceLogParser
+		patientVestDeviceEventsMonarch = deviceLogMonarchParser
 				.parseBase64StringToPatientMonarchDeviceLogEntry(patientDeviceRawData);
 
 		String deviceSerialNumber = deviceRawLogMonarch.getDeviceSerialNumber();
@@ -251,13 +253,13 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 			LocalDate createdOrTransmittedDate = userExtension.getCreatedDate().toLocalDate();
 			noEventServiceMonarch.createIfNotExists(
 					new PatientNoEventMonarch(createdOrTransmittedDate, createdOrTransmittedDate, patientInfo, userExtension));
-			PatientCompliance compliance = new PatientCompliance();
+			PatientComplianceMonarch compliance = new PatientComplianceMonarch();
 			compliance.setPatient(patientInfo);
 			compliance.setPatientUser(userExtension);
 			compliance.setDate(userExtension.getCreatedDate().toLocalDate());
 			compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
 			compliance.setLatestTherapyDate(createdOrTransmittedDate);
-			complianceService.createOrUpdate(compliance);
+			complianceMonarchService.createOrUpdate(compliance);
 			
 			// Create Patient Device History
 			PatientVestDeviceHistoryMonarch deviceHistoryMonarch = new PatientVestDeviceHistoryMonarch(new PatientVestDevicePK(patientInfo, patientInfo.getSerialNumber()),

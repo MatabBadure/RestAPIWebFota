@@ -94,7 +94,7 @@ public final class Constants {
 
 	public static final String SEQUENCE_NUMBER = "sequenceNumber";
 
-	public static final String HMR = "Hmr";
+	public static final String HMR = "Total Therapy Hours";
 
 	public static final String HUB_ADDRESS = "Hub Id";
 
@@ -185,7 +185,7 @@ public final class Constants {
 	
 	//HMR Graph Y-axis labels
 	public static final String MINUTES_LABEL = "Minutes";
-	public static final String HMR_LABEL = "HMR";
+	public static final String HMR_LABEL = "Total Therapy Hours";
 	
 	//HMR Graph tooltip labels
 	public static final String KEY_NOTE_TEXT = "noteText";
@@ -194,6 +194,7 @@ public final class Constants {
 	public static final String KEY_FREQUENCY = "frequency";
 	public static final String KEY_DURATION = "duration";
 	public static final String KEY_PRESSURE = "pressure";
+	public static final String KEY_INTENSITY = "intensity";
 	public static final String KEY_SESSION_NO = "sessionNo";
 	
 	//hill-1847
@@ -210,6 +211,7 @@ public final class Constants {
 	public static final String KEY_THERAPY_DATA = "therapyData";
 	public static final String KEY_PROTOCOL = "protocol";
 	public static final String PRESSURE_LABEL = "Pressure";
+	public static final String INTENSITY_LABEL = "Intensity";
 	public static final String FREQUENCY_LABEL = "Frequency";
 	public static final String DURATION_LABEL = "Duration";
 

@@ -49,10 +49,13 @@ import org.supercsv.prefs.CsvPreference;
 
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
+import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
+import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
 import com.hillrom.vest.domain.ProtocolConstants;
+import com.hillrom.vest.domain.ProtocolConstantsMonarch;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
@@ -62,6 +65,7 @@ import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
+import com.hillrom.vest.repository.monarch.PatientComplianceMonarchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.AdherenceCalculationService;
@@ -73,6 +77,11 @@ import com.hillrom.vest.service.PatientProtocolService;
 import com.hillrom.vest.service.PatientVestDeviceService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.UserService;
+import com.hillrom.vest.service.monarch.PatientHCPMonarchService;
+import com.hillrom.vest.service.monarch.PatientVestDeviceMonarchService;
+import com.hillrom.vest.service.monarch.TherapySessionServiceMonarch;
+import com.hillrom.vest.service.monarch.AdherenceCalculationServiceMonarch;
+import com.hillrom.vest.service.monarch.PatientComplianceMonarchService;
 import com.hillrom.vest.service.util.CsvUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -85,6 +94,8 @@ import com.hillrom.vest.web.rest.dto.ProtocolRevisionVO;
 import com.hillrom.vest.web.rest.dto.StatisticsVO;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
+import com.hillrom.vest.web.rest.dto.monarch.ProtocolRevisionMonarchVO;
+import com.hillrom.vest.web.rest.dto.monarch.TherapyDataMonarchVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 import net.minidev.json.JSONObject;
@@ -108,6 +119,9 @@ public class UserResource {
 	
 	@Inject
 	private PatientVestDeviceService patientVestDeviceService;
+	
+	@Inject
+	private PatientVestDeviceMonarchService patientVestDeviceMonarchService;
 
 	@Inject
 	private PatientProtocolService patientProtocolService;
@@ -120,6 +134,9 @@ public class UserResource {
 	
 	@Inject
 	private PatientComplianceRepository complianceRepository;
+	
+	@Inject
+	private PatientComplianceMonarchRepository complianceMonarchRepository;
 	
 	@Inject
 	private NotificationRepository notificationRepository;
@@ -137,6 +154,9 @@ public class UserResource {
 	private PatientComplianceService patientComplianceService;
 
 	@Inject
+	private PatientComplianceMonarchService patientComplianceMonarchService;
+	
+	@Inject
 	private ExcelOutputService excelOutputService;
 	
 	@Qualifier("hmrGraphService")
@@ -149,6 +169,11 @@ public class UserResource {
 	private GraphService adherenceTrendGraphService;
     //hill-1847
 	
+	@Qualifier("adherenceTrendGraphServiceMonarch")
+	@Inject
+	private GraphService adherenceTrendGraphServiceMonarch;
+    
+	
 	@Qualifier("complianceGraphService")
 	@Inject
 	private GraphService complianceGraphService;
@@ -160,7 +185,24 @@ public class UserResource {
 	@Qualifier("treatmentStatsGraphService")
 	@Inject
 	private GraphService treatmentStatsGraphService;
-
+	
+	@Inject
+	private TherapySessionServiceMonarch therapySessionServiceMonarch;
+	
+	@Qualifier("hmrGraphServiceMonarch")
+	@Inject
+	private GraphService hmrGraphServiceMonarch;
+	
+	@Inject
+	private AdherenceCalculationServiceMonarch adherenceCalculationServiceMonarch;
+	
+	@Qualifier("complianceGraphServiceMonarch")
+	@Inject
+	private GraphService complianceGraphServiceMonarch;
+	
+	@Inject
+    private PatientHCPMonarchService patientHCPMonarchService;
+	
 	/**
 	 * GET /users -> get all users.
 	 */
@@ -191,7 +233,8 @@ public class UserResource {
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,
-			@RequestParam(value = "asc", required = false) Boolean isAscending)
+			@RequestParam(value = "asc", required = false) Boolean isAscending,
+			@RequestParam(value = "deviceType", required = true) String deviceType)
 			throws URISyntaxException {
 		if(searchString.endsWith("_")){
  		   searchString = searchString.replace("_", "\\\\_");
@@ -206,14 +249,14 @@ public class UserResource {
 			else	
 				sortOrder.put(sortBy, isAscending);
 		}
-		Page<PatientUserVO> page = userSearchRepository.findPatientBy(
-				queryString, filter, PaginationUtil.generatePageRequest(offset, limit),
-				sortOrder);
+		Page<PatientUserVO> page = userService.patientSearch(
+				queryString, filter, sortOrder, deviceType, offset, limit);
 		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
 				page, "/user/patient/search", offset, limit);
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
 
 	}
+	
 	//HCP log in. Patient associated to  to HCP
    @RequestMapping(value = "/user/hcp/{id}/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	
@@ -224,6 +267,7 @@ public class UserResource {
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,
+			@RequestParam(value = "deviceType", required = false) String deviceType,
 			@RequestParam(value = "asc", required = false) Boolean isAscending)
 			throws URISyntaxException {
 		if(searchString.endsWith("_")){
@@ -241,9 +285,8 @@ public class UserResource {
 		}
 		Page<PatientUserVO> page;
 		try {
-			page = userSearchRepository.findAssociatedPatientToHCPBy(
-					queryString, id, clinicId, filter, PaginationUtil.generatePageRequest(offset, limit),
-					sortOrder);
+			page = userService.patientSearchUnderHCPUser(
+					queryString, id, clinicId, filter,sortOrder,deviceType, offset, limit);
 			HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
 					page, "/user/hcp/"+id+"/patient/search", offset, limit);
 			return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
@@ -295,14 +338,15 @@ public class UserResource {
 
    //Admin login. Associated Patient to Clinic
    @RequestMapping(value = "/user/clinic/{clinicId}/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	
+   @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES,AuthoritiesConstants.CLINIC_ADMIN})
 	public ResponseEntity<?> searchPatientAssociatedToClinic(@PathVariable String clinicId,
 			@RequestParam(required = true, value = "searchString") String searchString,
 			@RequestParam(required = false, value = "filter") String filter,
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,
-			@RequestParam(value = "asc", required = false) Boolean isAscending)
+			@RequestParam(value = "asc", required = false) Boolean isAscending,
+			@RequestParam(value = "deviceType", required = true) String deviceType)
 			throws URISyntaxException {
 		if(searchString.endsWith("_")){
 		   searchString = searchString.replace("_", "\\\\_");
@@ -317,9 +361,8 @@ public class UserResource {
 			else	
 				sortOrder.put(sortBy, isAscending);
 		}
-		Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientsToClinicBy(
-				queryString,clinicId, filter, PaginationUtil.generatePageRequest(offset, limit),
-				sortOrder);
+		Page<PatientUserVO> page = userService.patientSearchByClinic(
+				queryString,clinicId, filter,sortOrder, deviceType,offset, limit);
 		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
 				page, "/user/clinic/"+clinicId+"/patient/search", offset, limit);
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
@@ -377,11 +420,18 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
-    public ResponseEntity<JSONObject> getLinkedVestDeviceWithPatient(@PathVariable Long id) {
+    public ResponseEntity<JSONObject> getLinkedVestDeviceWithPatient(@PathVariable Long id,
+    		@RequestParam(value = "deviceType", required = true) String deviceType) {
     	log.debug("REST request to link vest device with patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
 		try {
-			List<PatientVestDeviceHistory> deviceList = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
+			List<?> deviceList = null;
+			if(deviceType.equals("VEST")){
+				deviceList = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
+			} else if(deviceType.equals("MONARCH")){
+				deviceList = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
+			}
+			
 			if(deviceList.isEmpty()){
      			jsonObject.put("message",MessageConstants.HR_281); //No device linked with patient.
      		} else {
@@ -580,14 +630,25 @@ public class UserResource {
     public ResponseEntity<?> getTherapyByPatientUserIdAndDate(@PathVariable Long id,
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
     		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
-    		@RequestParam(value="duration",required=true)String duration) {
+    		@RequestParam(value="duration",required=true)String duration,
+    		@RequestParam(value="deviceType",required=true)String deviceType) {
     		try{
-    			List<TherapyDataVO> therapyData = therapySessionService.findByPatientUserIdAndDateRange(id, from, to);
-    			if(therapyData.size() > 0){
-    				Graph hmrGraph = hmrGraphService.populateGraphData(therapyData, new Filter(from, to, duration, null));
-    				return new ResponseEntity<>(hmrGraph,HttpStatus.OK);
+    			if(deviceType.equals("VEST")){
+    				List<TherapyDataVO> therapyData = therapySessionService.findByPatientUserIdAndDateRange(id, from, to);
+    				if(therapyData.size() > 0){
+    					Graph hmrGraph = hmrGraphService.populateGraphData(therapyData, new Filter(from, to, duration, null));
+    					return new ResponseEntity<>(hmrGraph,HttpStatus.OK);
+    				}
+    			}
+    			if(deviceType.equals("MONARCH")){
+    				List<TherapyDataMonarchVO> therapyData = therapySessionServiceMonarch.findByPatientUserIdAndDateRange(id, from, to);
+        			if(therapyData.size() > 0){
+        				Graph hmrGraph = hmrGraphServiceMonarch.populateGraphData(therapyData, new Filter(from, to, duration, null));
+        				return new ResponseEntity<>(hmrGraph,HttpStatus.OK);
+        			}
     			}
     			return new ResponseEntity<>(HttpStatus.OK);
+    			
     		}catch(Exception ex){
     			JSONObject jsonObject = new JSONObject();
             	jsonObject.put("ERROR", ExceptionConstants.HR_717);
@@ -598,15 +659,27 @@ public class UserResource {
     @RequestMapping(value = "/users/{id}/compliance",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PatientCompliance> getComplianceScoreByPatientUserIdAndDate(@PathVariable Long id){
-    	PatientCompliance compliance = complianceRepository.findTop1ByPatientUserIdOrderByDateDesc(id);
-    	if(Objects.nonNull(compliance)){
-    		if(Objects.isNull(compliance.getHmrRunRate())){
-    			compliance.setHmrRunRate(0);
-    		}
-       		return new ResponseEntity<>(compliance,HttpStatus.OK);
-    	}
-    	else
+    public ResponseEntity<?> getComplianceScoreByPatientUserIdAndDate(@PathVariable Long id,
+    		@RequestParam(value="deviceType",required=true) String deviceType) {
+    	
+    	if(deviceType.equals("VEST")){
+    		PatientCompliance compliance = patientComplianceService.findLatestComplianceByPatientUserId(id);
+    		if(Objects.nonNull(compliance)){
+        		if(Objects.isNull(compliance.getHmrRunRate())){
+        			compliance.setHmrRunRate(0);
+        		}
+           		return new ResponseEntity<>(compliance,HttpStatus.OK);
+        	}
+    	}else if (deviceType.equals("MONARCH")){
+    		PatientComplianceMonarch compliance = patientComplianceMonarchService.findLatestComplianceByPatientUserId(id);
+    		if(Objects.nonNull(compliance)){
+        		if(Objects.isNull(compliance.getHmrRunRate())){
+        			compliance.setHmrRunRate(0);
+        		}
+           		return new ResponseEntity<>(compliance,HttpStatus.OK);
+        	}
+    	}    	
+    	
     		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -771,13 +844,24 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
-    public ResponseEntity<?> getPatientStatisticsForClinicAssociated(@PathVariable Long userId, @PathVariable String clinicId) {
+    public ResponseEntity<?> getPatientStatisticsForClinicAssociated(@PathVariable Long userId, @PathVariable String clinicId,
+    		@RequestParam(value="deviceType",required=true) String deviceType) {
         log.debug("REST request to get patient statistics for clinic {} associated with User : {}", clinicId, userId);
         JSONObject jsonObject = new JSONObject();
         try {
+        	Map<String, Object> statitics = null;
         	LocalDate date = LocalDate.now();
-        	Map<String, Object> statitics = patientHCPService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(clinicId, date);
-	        if (statitics.isEmpty()) {
+
+        	if(deviceType.equals("VEST")) {
+        		statitics = patientHCPService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(clinicId, date);
+        	}
+        	else if(deviceType.equals("MONARCH")) {
+        		statitics = patientHCPMonarchService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(clinicId, date);
+        	}
+        	else if(deviceType.equals("ALL")) {
+        		statitics = patientHCPMonarchService.getTodaysPatientStatisticsForClinicAssociatedWithHCPAll(clinicId, date);
+        	}
+        	if(statitics.isEmpty()) {
 	        	jsonObject.put("message", ExceptionConstants.HR_584);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_297);
@@ -856,17 +940,24 @@ public class UserResource {
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP})
     public ResponseEntity<?> getPatientsCumulativeStatisticsForClinicAssociatedWithHCP(@PathVariable Long hcpId, @PathVariable String clinicId,
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
-    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to){
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
+    		@RequestParam(value = "deviceType", required = true) String deviceType){
         log.debug("REST request to get patients cumulative statistics for clinic {} associated with HCP : {}", clinicId, hcpId,from,to);
         JSONObject jsonObject = new JSONObject();
         try {
-        	Collection<StatisticsVO> statiticsCollection = patientHCPService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
-	        if (statiticsCollection.isEmpty()) {
-	        	return new ResponseEntity<>(jsonObject, HttpStatus.OK);
-	        } else {
-	        	Graph cumulativeStatsGraph = cumulativeStatsGraphService.populateGraphData(statiticsCollection, new Filter(from,to,null,null));
-	        	return new ResponseEntity<>(cumulativeStatsGraph, HttpStatus.OK);
-	        }
+        	Collection<StatisticsVO> statiticsCollection = null;
+        	if(deviceType.equals("VEST")){
+	        	statiticsCollection = patientHCPService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);		      
+        	}
+        	if(deviceType.equals("MONARCH")){
+        		statiticsCollection = patientHCPMonarchService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
+        	}
+        	if (statiticsCollection.isEmpty()) {
+        		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+        	} else {
+        		Graph cumulativeStatsGraph = cumulativeStatsGraphService.populateGraphData(statiticsCollection, new Filter(from,to,null,null));
+        		return new ResponseEntity<>(cumulativeStatsGraph, HttpStatus.OK);
+		    }
         } catch (HillromException hre){
         	jsonObject.put("ERROR", hre.getMessage());
     		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
@@ -877,7 +968,7 @@ public class UserResource {
     }
     
     /**
-     * GET  /users/:hcpId/clinics/:clinicId/cumulativeStatistics -> get the patient statistics for clinic associated with hcp user.
+     * GET  /users/:hcpId/clinics/:clinicId/treatmentStatistics -> get the patient statistics for clinic associated with hcp user.
      * @throws Exception 
      */
     @RequestMapping(value = "/users/{hcpId}/clinics/{clinicId}/treatmentStatistics",
@@ -887,17 +978,24 @@ public class UserResource {
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP})
     public ResponseEntity<?> getPatientsTreatmentStatisticsForClinicAssociatedWithHCP(@PathVariable Long hcpId, @PathVariable String clinicId,
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
-    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
+    		@RequestParam(value = "deviceType", required = true) String deviceType) {
         log.debug("REST request to get patients treatement statistics for clinic {} associated with HCP : {}", clinicId, hcpId,from,to);
         JSONObject jsonObject = new JSONObject();
         try {
-        	Collection<TreatmentStatisticsVO> statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
-	        if (statiticsCollection.isEmpty()) {
-	        	return new ResponseEntity<>(HttpStatus.OK);
-	        } else {
-	        	Graph treatmentStatsGraph = treatmentStatsGraphService.populateGraphData(statiticsCollection, new Filter(from,to,null,null));
-		        return new ResponseEntity<>(treatmentStatsGraph, HttpStatus.OK);
-	        }
+        	Collection<TreatmentStatisticsVO> statiticsCollection = null;
+        	if(deviceType.equals("VEST")){
+        	statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
+        	}
+        	if(deviceType.equals("MONARCH")){
+        	statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
+        	}
+        	if (statiticsCollection.isEmpty()) {
+   	        	return new ResponseEntity<>(HttpStatus.OK);
+   	        } else {
+   	        	Graph treatmentStatsGraph = treatmentStatsGraphService.populateGraphData(statiticsCollection, new Filter(from,to,null,null));
+   		        return new ResponseEntity<>(treatmentStatsGraph, HttpStatus.OK);
+   	        }
         } catch (HillromException hre){
         	jsonObject.put("ERROR", hre.getMessage());
     		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
@@ -906,7 +1004,7 @@ public class UserResource {
     		return new ResponseEntity<>(jsonObject, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+    
     /**
      * GET  /patient/:patientUserId/clinic/:clinicId/mrnId -> get the patient user with clinic mrn id.
      */
@@ -942,7 +1040,8 @@ public class UserResource {
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,
-			@RequestParam(value = "asc", required = false) Boolean isAscending)
+			@RequestParam(value = "asc", required = false) Boolean isAscending,
+			@RequestParam(value = "deviceType", required = false) String deviceType)
 			throws URISyntaxException {
 		if(searchString.endsWith("_")){
  		   searchString = searchString.replace("_", "\\\\_");
@@ -957,9 +1056,10 @@ public class UserResource {
 			else	
 				sortOrder.put(sortBy, isAscending);
 		}
-		Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientToClinicAdminBy(
-				queryString, id, clinicId, filter, PaginationUtil.generatePageRequest(offset, limit),
-				sortOrder);
+		
+		Page<PatientUserVO> page = userService.associatedPatientSearchInClinicAdmin(id,
+				queryString,clinicId, filter,sortOrder, deviceType,offset, limit);
+		
 		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
 				page, "/user/clinicadmin/"+id+"/patient/search", offset, limit);
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
@@ -975,7 +1075,8 @@ public class UserResource {
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,
-			@RequestParam(value = "asc", required = false) Boolean isAscending)
+			@RequestParam(value = "asc", required = false) Boolean isAscending,
+			@RequestParam(value = "deviceType", required = false) String deviceType)
 			throws URISyntaxException {
 		if(searchString.endsWith("_")){
  		   searchString = searchString.replace("_", "\\\\_");
@@ -992,7 +1093,7 @@ public class UserResource {
 		}
 		Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientToClinicAdminBy(
 				queryString, id, clinicId, filter, PaginationUtil.generatePageRequest(offset, limit),
-				sortOrder);
+				sortOrder,deviceType);
 		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
 				page, "/user/hcp/"+id+"/clinic/patient/search", offset, limit);
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
@@ -1041,8 +1142,10 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getComplianceGraphData(@PathVariable Long id,
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
-    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to) {
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
+    		@RequestParam(value = "deviceType", required = true) String deviceType){
     	try{
+    		if(deviceType.equals("VEST")){
     		List<TherapyDataVO> therapyData = therapySessionService.getComplianceGraphData(id, from, to);
     		if(therapyData.size() > 0){
     			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(id);
@@ -1052,6 +1155,18 @@ public class UserResource {
     			Graph complianceGraph = complianceGraphService.populateGraphData(therapyAndProtocolData, new Filter(from,to,null,null));
     			return new ResponseEntity<>(complianceGraph,HttpStatus.OK); 
     		}
+    		}
+    		if(deviceType.equals("MONARCH")){
+        		List<TherapyDataMonarchVO> therapyData = therapySessionServiceMonarch.getComplianceGraphData(id, from, to);
+        		if(therapyData.size() > 0){
+        			ProtocolConstantsMonarch protocol = adherenceCalculationServiceMonarch.getProtocolByPatientUserId(id);
+        			Map<String,Object> therapyAndProtocolData = new HashMap<>();
+        			therapyAndProtocolData.put("protocol", protocol);
+        			therapyAndProtocolData.put("therapyData", therapyData);
+        			Graph complianceGraph = complianceGraphServiceMonarch.populateGraphData(therapyAndProtocolData, new Filter(from,to,null,null));
+        			return new ResponseEntity<>(complianceGraph,HttpStatus.OK); 
+        		}
+        		}
     		return new ResponseEntity<>(HttpStatus.OK);
     	} catch(Exception ex){
     		JSONObject jsonObject = new JSONObject();
@@ -1067,12 +1182,26 @@ public class UserResource {
     public ResponseEntity<?> getAdherenceTrendGraphData(@PathVariable Long id,
     		@RequestParam(value = "from", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
     		@RequestParam(value = "to", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to,
-    		@RequestParam(value = "duration", required = true) String duration) {
+    		@RequestParam(value = "duration", required = true) String duration,
+    		@RequestParam(value = "deviceType", required = true) String deviceType) {
     		try {
-    			List<ProtocolRevisionVO> adherenceTrendData = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id, from, to);
+    			
+    			List<ProtocolRevisionVO> adherenceTrendData = null;
+    			List<ProtocolRevisionMonarchVO> adherenceTrendDataMonarch = null;
+    			
+    			if(deviceType.equals("VEST")){
+    				adherenceTrendData = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id, from, to);
+    			}else if(deviceType.equals("MONARCH")){
+    				adherenceTrendDataMonarch = patientComplianceMonarchService.findAdherenceTrendByUserIdAndDateRange(id, from, to);
+    			}
+    			
     			if (Objects.nonNull(adherenceTrendData) &&  adherenceTrendData.size() > 0) {
     				Graph adherenceTrendGraph = adherenceTrendGraphService.populateGraphData(adherenceTrendData, new Filter(from,to, duration, null));
     				return new ResponseEntity<>(adherenceTrendGraph, HttpStatus.OK);
+    			}
+    			else if(Objects.nonNull(adherenceTrendDataMonarch) &&  adherenceTrendDataMonarch.size() > 0) {
+    				Graph adherenceTrendGraphMonarch = adherenceTrendGraphServiceMonarch.populateGraphData(adherenceTrendDataMonarch, new Filter(from,to, duration, null));
+    				return new ResponseEntity<>(adherenceTrendGraphMonarch, HttpStatus.OK);
     			}
     			return new ResponseEntity<>(HttpStatus.OK);
     		} catch (Exception ex) {

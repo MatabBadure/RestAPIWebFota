@@ -36,6 +36,7 @@ import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.ChargerDataService;
 import com.hillrom.vest.service.PatientVestDeviceDataService;
+import com.hillrom.vest.service.monarch.PatientVestDeviceDataServiceMonarch;
 import com.hillrom.vest.service.util.ParserUtil;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
@@ -47,6 +48,9 @@ public class PatientVestDeviceDataResource {
 	
 	@Inject
 	private PatientVestDeviceDataService deviceDataService;
+	
+	@Inject
+	private PatientVestDeviceDataServiceMonarch deviceDataServiceMonarch;
 	
 	@Inject
 	private ChargerDataService chargerDataService;
@@ -95,6 +99,17 @@ public class PatientVestDeviceDataResource {
 		try{		
 			log.error("Base64 Received Data for ingestion in receiveDataCharger : ",rawMessage);		
 			
+			
+			JSONObject chargerJsonData = new JSONObject();
+			
+			ExitStatus exitStatus = deviceDataServiceMonarch.saveData(rawMessage);
+			chargerJsonData.put("message",exitStatus.getExitCode());
+			if(ExitStatus.COMPLETED.equals(exitStatus))
+				return new ResponseEntity<>(chargerJsonData,HttpStatus.CREATED);
+			else
+				return new ResponseEntity<>(chargerJsonData,HttpStatus.PARTIAL_CONTENT);
+			
+			/*
 			//chargerDataService.getDeviceData(rawMessage);
 			
 			byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
@@ -115,7 +130,7 @@ public class PatientVestDeviceDataResource {
 			chargerJsonData =   chargerDataService.saveOrUpdateChargerData(rawMessage,decoded_string);
 			JSONObject result = new JSONObject();
 			result.put("RESULT", chargerJsonData.get("RESULT") + " - " + chargerJsonData.get("ERROR"));
-			return new ResponseEntity<>(result,HttpStatus.CREATED);
+			return new ResponseEntity<>(result,HttpStatus.CREATED);*/
 		}catch(Exception e){
 			e.printStackTrace();
 			JSONObject error = new JSONObject();

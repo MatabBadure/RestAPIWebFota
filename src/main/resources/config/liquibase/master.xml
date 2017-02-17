@@ -121,4 +121,5 @@
 	<include file="classpath:/config/liquibase/changelog/20170213110200_add_column_PING_PONG_AND_RAW_LOGS_MONARCH.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170213035700_add_column_PING_PONG_PING.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170214121600_add_column_FRAG_CURRENT_TOTAL_RAW_LOGS_MONARCH.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170217053300_add_column_VEST_DEVICE_DATA_MONARCH.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

@@ -60,6 +60,7 @@ import com.hillrom.vest.domain.ProtocolConstantsMonarch;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
@@ -208,6 +209,8 @@ public class UserResource {
 	
 	@Inject
     private PatientProtocolMonarchService patientProtocolMonarchService;
+  @Inject
+    private ClinicRepository clinicRepository;
 	
 	/**
 	 * GET /users -> get all users.
@@ -948,6 +951,26 @@ public class UserResource {
     }
     
     /**
+     * GET  /:clinicId -> get the no. of patient under clinic with respect to device types.
+     */
+       @RequestMapping(value = "activePatCountForDevice/{clinicId}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<?> getactive(@PathVariable String clinicId){
+    	log.debug("REST request to get no. of active patient for clinic {} ", clinicId);
+        JSONObject jsonObject = new JSONObject();
+       
+			List<Object[]> deviceTypeAndCountOfPatients = clinicRepository.findByDeviceTypeAndPatientCount(clinicId);
+						
+			for(Object[] deviceTypeAndCountOfPatient : deviceTypeAndCountOfPatients){
+				jsonObject.put(deviceTypeAndCountOfPatient[0].toString(), deviceTypeAndCountOfPatient[1]);						
+		    }					
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+    }
+    
+    /**
      * GET  /users/:userId/clinics/:clinicId/patients -> get the patient list filter by metric type for clinic associated with user.
      */
     @RequestMapping(value = "/users/{userId}/clinics/{clinicId}/patients",
@@ -1061,7 +1084,7 @@ public class UserResource {
         	statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
         	}
         	if(deviceType.equals("MONARCH")){
-        	statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
+        	statiticsCollection = patientHCPMonarchService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
         	}
         	if (statiticsCollection.isEmpty()) {
    	        	return new ResponseEntity<>(HttpStatus.OK);
@@ -1194,12 +1217,19 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAdherenceTrendForDuration(@PathVariable Long id,
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
-    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to){
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
+    		@RequestParam(value = "deviceType", required = true) String deviceType){
     	log.debug("REST request to get Adherence Trend for the duration : ", id,from,to);
     	try {
-
-            List<ProtocolRevisionVO> adherenceTrends = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
-            return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
+    		if(deviceType.equals("VEST")){
+    			List<ProtocolRevisionVO> adherenceTrends = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
+    			return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
+    		}
+    		if(deviceType.equals("MONARCH")){
+                List<ProtocolRevisionMonarchVO> adherenceTrends = patientComplianceMonarchService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
+                return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
+        	}
+    		return new ResponseEntity<>(HttpStatus.OK);
 		} catch (HillromException e) {
 			// TODO: handle exception
 			JSONObject jsonObject = new JSONObject();

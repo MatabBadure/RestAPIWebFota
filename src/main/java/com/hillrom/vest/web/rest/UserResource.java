@@ -988,7 +988,7 @@ public class UserResource {
         	statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
         	}
         	if(deviceType.equals("MONARCH")){
-        	statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
+        	statiticsCollection = patientHCPMonarchService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
         	}
         	if (statiticsCollection.isEmpty()) {
    	        	return new ResponseEntity<>(HttpStatus.OK);

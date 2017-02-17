@@ -59,6 +59,7 @@ import com.hillrom.vest.domain.ProtocolConstantsMonarch;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
@@ -202,6 +203,9 @@ public class UserResource {
 	
 	@Inject
     private PatientHCPMonarchService patientHCPMonarchService;
+	
+	@Inject
+    private ClinicRepository clinicRepository;
 	
 	/**
 	 * GET /users -> get all users.
@@ -872,6 +876,26 @@ public class UserResource {
         	jsonObject.put("ERROR", hre.getMessage());
     		return new ResponseEntity<>(jsonObject, HttpStatus.BAD_REQUEST);
         }
+    }
+    
+    /**
+     * GET  /:clinicId -> get the no. of patient under clinic with respect to device types.
+     */
+       @RequestMapping(value = "activePatCountForDevice/{clinicId}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<?> getactive(@PathVariable String clinicId){
+    	log.debug("REST request to get no. of active patient for clinic {} ", clinicId);
+        JSONObject jsonObject = new JSONObject();
+       
+			List<Object[]> deviceTypeAndCountOfPatients = clinicRepository.findByDeviceTypeAndPatientCount(clinicId);
+						
+			for(Object[] deviceTypeAndCountOfPatient : deviceTypeAndCountOfPatients){
+				jsonObject.put(deviceTypeAndCountOfPatient[0].toString(), deviceTypeAndCountOfPatient[1]);						
+		    }					
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
     }
     
     /**

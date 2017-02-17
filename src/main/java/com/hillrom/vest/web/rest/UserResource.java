@@ -1145,12 +1145,19 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAdherenceTrendForDuration(@PathVariable Long id,
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
-    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to){
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
+    		@RequestParam(value = "deviceType", required = true) String deviceType){
     	log.debug("REST request to get Adherence Trend for the duration : ", id,from,to);
     	try {
-
-            List<ProtocolRevisionVO> adherenceTrends = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
-            return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
+    		if(deviceType.equals("VEST")){
+    			List<ProtocolRevisionVO> adherenceTrends = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
+    			return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
+    		}
+    		if(deviceType.equals("MONARCH")){
+                List<ProtocolRevisionMonarchVO> adherenceTrends = patientComplianceMonarchService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
+                return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
+        	}
+    		return new ResponseEntity<>(HttpStatus.OK);
 		} catch (HillromException e) {
 			// TODO: handle exception
 			JSONObject jsonObject = new JSONObject();

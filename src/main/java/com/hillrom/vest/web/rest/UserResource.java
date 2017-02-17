@@ -1156,7 +1156,7 @@ public class UserResource {
     		if(deviceType.equals("MONARCH")){
                 List<ProtocolRevisionMonarchVO> adherenceTrends = patientComplianceMonarchService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
                 return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
-        		}
+        	}
     		return new ResponseEntity<>(HttpStatus.OK);
 		} catch (HillromException e) {
 			// TODO: handle exception

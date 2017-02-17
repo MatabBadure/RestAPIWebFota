@@ -328,7 +328,7 @@ public class PatientHCPService {
            return statistics;
     }
 	
-	private List<Long> filterActivePatientIds(
+	protected List<Long> filterActivePatientIds(
 			List<Map<String, Object>> patientUsers) {
 		List<Long> patientUserIds = new LinkedList<>();
 		patientUsers.forEach(patientUser -> {

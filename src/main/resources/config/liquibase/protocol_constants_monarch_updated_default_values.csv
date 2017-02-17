@@ -1,0 +1,2 @@
+id,treatments_per_day,min_minutes_per_treatment,max_minutes_per_treatment,min_frequency,max_frequency,min_intensity,max_intensity,min_pressure,max_pressure
+1,2,10,20,10,14,7,10,0,0

@@ -19,6 +19,7 @@ import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.PatientVestDevicePK;
 import com.hillrom.vest.domain.User;
+import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.PatientInfoRepository;
@@ -285,6 +286,18 @@ public class PatientVestDeviceService {
 	
 	public PatientVestDeviceHistory getLatestInActiveDeviceFromHistory(String patientId){
 		return patientVestDeviceRepository.findLatestInActiveDeviceByPatientId(patientId, false);
+	}
+	
+	public String getDeviceType(User user){
+		PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(user.getId());		
+		if(patient != null){
+			PatientInfo checkPatientId = patientInfoRepository.findOneById(patient.getId());
+			if(Objects.nonNull(checkPatientId.getId() ) ){
+				String deviceType = patientVestDeviceRepository.findDeviceType(patient.getId());
+				return deviceType;
+			}
+		}
+		return null;
 	}
 	
 }

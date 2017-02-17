@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+	
+	<!-- Added new fields serial_number in PING_PONG_PING & checksum in RAW_LOGS_MONARCH table. -->
+	<changeSet author="LnT Technology Services" id="20170213035700">
+		<addColumn tableName="PING_PONG_PING">
+        	<column name="dev_wifi" type="varchar(255)"/>
+        </addColumn>
+								 
+		<addColumn tableName="PING_PONG_PING">
+        	<column name="dev_lte" type="varchar(255)"/>
+        </addColumn>
+        
+	</changeSet>
+	
+</databaseChangeLog>

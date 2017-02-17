@@ -28,6 +28,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -57,6 +59,7 @@ import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.OnCredentialsChangeEvent;
 import com.hillrom.vest.security.SecurityUtils;
@@ -69,6 +72,7 @@ import com.hillrom.vest.web.rest.dto.CareGiverVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
+import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 import net.minidev.json.JSONObject;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -132,6 +136,9 @@ public class UserService {
     
     @Inject
 	private NoteService noteService;
+    
+    @Inject
+	private UserSearchRepository userSearchRepository;
 
     public String generateDefaultPassword(User patientUser) {
 		StringBuilder defaultPassword = new StringBuilder();
@@ -166,6 +173,35 @@ public class UserService {
                 }
             }
         throw new HillromException(ExceptionConstants.HR_601);//Invalid Activation Key;
+    }
+    
+    public Page<PatientUserVO> patientSearch(String queryString, String filter,
+			Map<String, Boolean> sortOrder, String deviceType,Integer offset, Integer limit){
+    	Page<PatientUserVO> page = userSearchRepository.findPatientBy(
+				queryString, filter, PaginationUtil.generatePageRequest(offset, limit), sortOrder, deviceType);
+    	return page;
+    }
+    
+    public Page<PatientUserVO> patientSearchByClinic(String queryString, String clinicId, String filter,
+			Map<String, Boolean> sortOrder, String deviceType,Integer offset, Integer limit){
+    	Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientsToClinicBy(
+				queryString,clinicId, filter, PaginationUtil.generatePageRequest(offset, limit), sortOrder, deviceType);
+    	return page;
+    }
+    
+    public Page<PatientUserVO> associatedPatientSearchInClinicAdmin(Long id,String queryString, String clinicId, String filter,
+			Map<String, Boolean> sortOrder, String deviceType,Integer offset, Integer limit){
+    	Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientToClinicAdminBy(
+				queryString, id, clinicId, filter, PaginationUtil.generatePageRequest(offset, limit),
+				sortOrder,deviceType);
+    	return page;
+    }
+    
+    public Page<PatientUserVO> patientSearchUnderHCPUser(String queryString, Long id, String clinicId, String filter,
+			Map<String, Boolean> sortOrder, String deviceType,Integer offset, Integer limit) throws HillromException{
+    	Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientToHCPBy(queryString, id, clinicId,
+    			filter, PaginationUtil.generatePageRequest(offset, limit),sortOrder,deviceType);
+    	return page;
     }
     
     public Optional<User> validateActivationKey(String key) throws HillromException {
@@ -1305,7 +1341,11 @@ public class UserService {
 		PatientCompliance compliance = complianceService.findLatestComplianceByPatientUserId(id);
 		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patientInfo.getId());
 		PatientUserVO patientUserVO =  new PatientUserVO(user,patientInfo);
-		patientUserVO.setHoursOfUsage((compliance.getHmr()/(60*60)));
+
+		// to do for Monarch
+		if(Objects.nonNull(compliance))
+			patientUserVO.setHoursOfUsage((compliance.getHmr()/(60*60)));
+
 		String mrnId;
 		java.util.Iterator<ClinicPatientAssoc> cpaIterator = clinicPatientAssocList.iterator();
 		while(cpaIterator.hasNext()){
@@ -1729,7 +1769,7 @@ public class UserService {
 		}
 	}
 	
-	public JSONObject reactivateUser(Long id) throws HillromException {
+	public JSONObject reactivateUser(Long id,String baseUrl) throws HillromException {
     	JSONObject jsonObject = new JSONObject();
     	UserExtension existingUser = userExtensionRepository.findOne(id);
     	List<Authority> authorities  = authorityRepository.findAll();
@@ -1742,6 +1782,8 @@ public class UserService {
 				if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES))){
 					if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 						reactivatePatientUser(existingUser);
+						//hill-2178
+						mailService.sendReactivationEmail(existingUser,baseUrl);
 						jsonObject.put("message", MessageConstants.HR_215);
 						//hill-1844
 					} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
@@ -1755,6 +1797,8 @@ public class UserService {
 						//hill-1844
 						existingUser.setDeleted(false);
 						userExtensionRepository.saveAndFlush(existingUser);
+						//hill-2178
+						mailService.sendReactivationEmail(existingUser,baseUrl);
 						jsonObject.put("message", MessageConstants.HR_235);
 					} else {
 						throw new HillromException(ExceptionConstants.HR_604);
@@ -1764,12 +1808,16 @@ public class UserService {
 				else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))){
 					if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 						reactivatePatientUser(existingUser);
+						//hill-2178
+						mailService.sendReactivationEmail(existingUser,baseUrl);
 						jsonObject.put("message", MessageConstants.HR_215);
 						} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))) {
 						existingUser.setDeleted(false);
 						userExtensionRepository.saveAndFlush(existingUser);
+						//hill-2178
+						mailService.sendReactivationEmail(existingUser,baseUrl);
 						jsonObject.put("message", MessageConstants.HR_235);
 					} else {
 						throw new HillromException(ExceptionConstants.HR_604);
@@ -1779,6 +1827,8 @@ public class UserService {
 				else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN))){
 					if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 						reactivatePatientUser(existingUser);
+						//hill-2178
+						mailService.sendReactivationEmail(existingUser,baseUrl);
 						jsonObject.put("message", MessageConstants.HR_215);
 					} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ADMIN)) 
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ACCT_SERVICES))
@@ -1791,6 +1841,8 @@ public class UserService {
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CARE_GIVER))) {
 						existingUser.setDeleted(false);
 						userExtensionRepository.saveAndFlush(existingUser);
+						//hill-2178
+						mailService.sendReactivationEmail(existingUser,baseUrl);
 						jsonObject.put("message", MessageConstants.HR_235);
 					} else {
 						throw new HillromException(ExceptionConstants.HR_604);
@@ -1806,6 +1858,7 @@ public class UserService {
 		}
 		return jsonObject;
     }
+
 
 	private void reactivatePatientUser(UserExtension existingUser) throws HillromException {
 		List<UserPatientAssoc> caregiverAssocList = getListOfCaregiversAssociatedToPatientUser(existingUser);

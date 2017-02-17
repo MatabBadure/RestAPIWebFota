@@ -8,8 +8,8 @@ import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceRawLogMonarch;
 
 
-public interface DeviceLogParser {
+public interface DeviceLogMonarchParser {
 
-	public PatientVestDeviceRawLog parseBase64StringToPatientVestDeviceRawLog(String base16String) throws Exception;
-	public List<PatientVestDeviceData> parseBase64StringToPatientVestDeviceLogEntry(String base64String) throws Exception;
+	public PatientVestDeviceRawLogMonarch parseBase64StringToPatientMonarchDeviceRawLog(String base16String) throws Exception;
+	public List<PatientVestDeviceDataMonarch> parseBase64StringToPatientMonarchDeviceLogEntry(String base64String) throws Exception;
 }

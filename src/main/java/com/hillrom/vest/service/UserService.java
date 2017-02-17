@@ -189,6 +189,21 @@ public class UserService {
     	return page;
     }
     
+    public Page<PatientUserVO> associatedPatientSearchInClinicAdmin(Long id,String queryString, String clinicId, String filter,
+			Map<String, Boolean> sortOrder, String deviceType,Integer offset, Integer limit){
+    	Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientToClinicAdminBy(
+				queryString, id, clinicId, filter, PaginationUtil.generatePageRequest(offset, limit),
+				sortOrder,deviceType);
+    	return page;
+    }
+    
+    public Page<PatientUserVO> patientSearchUnderHCPUser(String queryString, Long id, String clinicId, String filter,
+			Map<String, Boolean> sortOrder, String deviceType,Integer offset, Integer limit) throws HillromException{
+    	Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientToHCPBy(queryString, id, clinicId,
+    			filter, PaginationUtil.generatePageRequest(offset, limit),sortOrder,deviceType);
+    	return page;
+    }
+    
     public Optional<User> validateActivationKey(String key) throws HillromException {
         log.debug("Activating user for activation key {}", key);
         Optional<User> optionalExistingUser = userRepository.findOneByActivationKey(key);
@@ -1326,7 +1341,11 @@ public class UserService {
 		PatientCompliance compliance = complianceService.findLatestComplianceByPatientUserId(id);
 		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patientInfo.getId());
 		PatientUserVO patientUserVO =  new PatientUserVO(user,patientInfo);
-		patientUserVO.setHoursOfUsage((compliance.getHmr()/(60*60)));
+
+		// to do for Monarch
+		if(Objects.nonNull(compliance))
+			patientUserVO.setHoursOfUsage((compliance.getHmr()/(60*60)));
+
 		String mrnId;
 		java.util.Iterator<ClinicPatientAssoc> cpaIterator = clinicPatientAssocList.iterator();
 		while(cpaIterator.hasNext()){

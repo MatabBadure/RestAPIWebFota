@@ -53,6 +53,7 @@ import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
+import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.ProtocolConstantsMonarch;
 import com.hillrom.vest.domain.TherapySession;
@@ -77,6 +78,7 @@ import com.hillrom.vest.service.PatientVestDeviceService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.service.monarch.PatientHCPMonarchService;
+import com.hillrom.vest.service.monarch.PatientVestDeviceMonarchService;
 import com.hillrom.vest.service.monarch.TherapySessionServiceMonarch;
 import com.hillrom.vest.service.monarch.AdherenceCalculationServiceMonarch;
 import com.hillrom.vest.service.monarch.PatientComplianceMonarchService;
@@ -117,6 +119,9 @@ public class UserResource {
 	
 	@Inject
 	private PatientVestDeviceService patientVestDeviceService;
+	
+	@Inject
+	private PatientVestDeviceMonarchService patientVestDeviceMonarchService;
 
 	@Inject
 	private PatientProtocolService patientProtocolService;
@@ -251,6 +256,7 @@ public class UserResource {
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
 
 	}
+	
 	//HCP log in. Patient associated to  to HCP
    @RequestMapping(value = "/user/hcp/{id}/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	
@@ -261,6 +267,7 @@ public class UserResource {
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,
+			@RequestParam(value = "deviceType", required = false) String deviceType,
 			@RequestParam(value = "asc", required = false) Boolean isAscending)
 			throws URISyntaxException {
 		if(searchString.endsWith("_")){
@@ -278,9 +285,8 @@ public class UserResource {
 		}
 		Page<PatientUserVO> page;
 		try {
-			page = userSearchRepository.findAssociatedPatientToHCPBy(
-					queryString, id, clinicId, filter, PaginationUtil.generatePageRequest(offset, limit),
-					sortOrder);
+			page = userService.patientSearchUnderHCPUser(
+					queryString, id, clinicId, filter,sortOrder,deviceType, offset, limit);
 			HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
 					page, "/user/hcp/"+id+"/patient/search", offset, limit);
 			return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
@@ -332,7 +338,7 @@ public class UserResource {
 
    //Admin login. Associated Patient to Clinic
    @RequestMapping(value = "/user/clinic/{clinicId}/patient/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	
+   @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES,AuthoritiesConstants.CLINIC_ADMIN})
 	public ResponseEntity<?> searchPatientAssociatedToClinic(@PathVariable String clinicId,
 			@RequestParam(required = true, value = "searchString") String searchString,
 			@RequestParam(required = false, value = "filter") String filter,
@@ -414,11 +420,18 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT})
-    public ResponseEntity<JSONObject> getLinkedVestDeviceWithPatient(@PathVariable Long id) {
+    public ResponseEntity<JSONObject> getLinkedVestDeviceWithPatient(@PathVariable Long id,
+    		@RequestParam(value = "deviceType", required = true) String deviceType) {
     	log.debug("REST request to link vest device with patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
 		try {
-			List<PatientVestDeviceHistory> deviceList = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
+			List<?> deviceList = null;
+			if(deviceType.equals("VEST")){
+				deviceList = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
+			} else if(deviceType.equals("MONARCH")){
+				deviceList = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
+			}
+			
 			if(deviceList.isEmpty()){
      			jsonObject.put("message",MessageConstants.HR_281); //No device linked with patient.
      		} else {
@@ -975,7 +988,7 @@ public class UserResource {
         	statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
         	}
         	if(deviceType.equals("MONARCH")){
-        	statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
+        	statiticsCollection = patientHCPMonarchService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
         	}
         	if (statiticsCollection.isEmpty()) {
    	        	return new ResponseEntity<>(HttpStatus.OK);
@@ -1027,7 +1040,8 @@ public class UserResource {
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,
-			@RequestParam(value = "asc", required = false) Boolean isAscending)
+			@RequestParam(value = "asc", required = false) Boolean isAscending,
+			@RequestParam(value = "deviceType", required = false) String deviceType)
 			throws URISyntaxException {
 		if(searchString.endsWith("_")){
  		   searchString = searchString.replace("_", "\\\\_");
@@ -1042,9 +1056,10 @@ public class UserResource {
 			else	
 				sortOrder.put(sortBy, isAscending);
 		}
-		Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientToClinicAdminBy(
-				queryString, id, clinicId, filter, PaginationUtil.generatePageRequest(offset, limit),
-				sortOrder);
+		
+		Page<PatientUserVO> page = userService.associatedPatientSearchInClinicAdmin(id,
+				queryString,clinicId, filter,sortOrder, deviceType,offset, limit);
+		
 		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
 				page, "/user/clinicadmin/"+id+"/patient/search", offset, limit);
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
@@ -1060,7 +1075,8 @@ public class UserResource {
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,
-			@RequestParam(value = "asc", required = false) Boolean isAscending)
+			@RequestParam(value = "asc", required = false) Boolean isAscending,
+			@RequestParam(value = "deviceType", required = false) String deviceType)
 			throws URISyntaxException {
 		if(searchString.endsWith("_")){
  		   searchString = searchString.replace("_", "\\\\_");
@@ -1077,7 +1093,7 @@ public class UserResource {
 		}
 		Page<PatientUserVO> page = userSearchRepository.findAssociatedPatientToClinicAdminBy(
 				queryString, id, clinicId, filter, PaginationUtil.generatePageRequest(offset, limit),
-				sortOrder);
+				sortOrder,deviceType);
 		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
 				page, "/user/hcp/"+id+"/clinic/patient/search", offset, limit);
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);

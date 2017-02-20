@@ -51,6 +51,7 @@ import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientProtocolData;
+import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
@@ -59,6 +60,7 @@ import com.hillrom.vest.domain.ProtocolConstantsMonarch;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
@@ -78,6 +80,7 @@ import com.hillrom.vest.service.PatientVestDeviceService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.service.monarch.PatientHCPMonarchService;
+import com.hillrom.vest.service.monarch.PatientProtocolMonarchService;
 import com.hillrom.vest.service.monarch.PatientVestDeviceMonarchService;
 import com.hillrom.vest.service.monarch.TherapySessionServiceMonarch;
 import com.hillrom.vest.service.monarch.AdherenceCalculationServiceMonarch;
@@ -94,6 +97,7 @@ import com.hillrom.vest.web.rest.dto.ProtocolRevisionVO;
 import com.hillrom.vest.web.rest.dto.StatisticsVO;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
+import com.hillrom.vest.web.rest.dto.monarch.ProtocolMonarchDTO;
 import com.hillrom.vest.web.rest.dto.monarch.ProtocolRevisionMonarchVO;
 import com.hillrom.vest.web.rest.dto.monarch.TherapyDataMonarchVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
@@ -202,6 +206,11 @@ public class UserResource {
 	
 	@Inject
     private PatientHCPMonarchService patientHCPMonarchService;
+	
+	@Inject
+    private PatientProtocolMonarchService patientProtocolMonarchService;
+  @Inject
+    private ClinicRepository clinicRepository;
 	
 	/**
 	 * GET /users -> get all users.
@@ -492,12 +501,41 @@ public class UserResource {
 	/**
      * POST  /patient/:id/protocol -> add protocol with patient {id}.
      */
-    @RequestMapping(value = "/patient/{id}/protocol",
+    @RequestMapping(value = "/patient/{id}/protocol/monarchdevice",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
-    public ResponseEntity<JSONObject> addProtocolToPatient(@PathVariable Long id, @RequestBody ProtocolDTO protocolDTO) {
+    public ResponseEntity<JSONObject> addProtocolToPatientForMonarchDevice(@PathVariable Long id,
+    		@RequestBody ProtocolMonarchDTO protocoMonarchDTO) {
+    	log.debug("REST request to add protocol with patient user : {}", id);
+    	JSONObject jsonObject = new JSONObject();
+    	try {
+    		List<PatientProtocolDataMonarch> protocolList = patientProtocolMonarchService.addProtocolToPatient(id, protocoMonarchDTO);
+	    	if (protocolList.isEmpty()) {
+	        	jsonObject.put("message", ExceptionConstants.HR_559);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_241);
+	        	jsonObject.put("protocol", protocolList);
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
+	        }
+    	} catch(HillromException hre){
+    		jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+    	}
+    }
+    
+    /**
+     * POST  /patient/:id/protocol -> add protocol with patient {id}.
+     */
+    @RequestMapping(value = "/patient/{id}/protocol/vestdevice",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> addProtocolToPatientForVestDevice(@PathVariable Long id,
+    		@RequestBody ProtocolDTO protocolDTO) {
     	log.debug("REST request to add protocol with patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
     	try {
@@ -519,17 +557,46 @@ public class UserResource {
     /**
      * PUT  /patient/:id/protocol -> update protocol with patient {id}.
      */
-    @RequestMapping(value = "/patient/{id}/protocol",
+    @RequestMapping(value = "/patient/{id}/protocol/vestdevice",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
-    public ResponseEntity<JSONObject> updateProtocolToPatient(@PathVariable Long id, @RequestBody List<PatientProtocolData> ppdList) {
+    public ResponseEntity<JSONObject> updateProtocolToPatientForMonarchDevice(@PathVariable Long id,
+    		@RequestBody List<PatientProtocolData> ppdList) {
     	log.debug("REST request to update protocol with patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
     	try{
               
     		List<PatientProtocolData> protocolList = patientProtocolService.updateProtocolToPatient(id, ppdList);
+	    	if (protocolList.isEmpty()) {
+	        	jsonObject.put("ERROR", ExceptionConstants.HR_560);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        } else {
+	        	jsonObject.put("message", MessageConstants.HR_242);
+	        	jsonObject.put("protocol", protocolList);
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+    	} catch(HillromException hre){
+    		jsonObject.put("ERROR", hre.getMessage());
+    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+    	}
+    }
+    
+    /**
+     * PUT  /patient/:id/protocol -> update protocol with patient {id}.
+     */
+    @RequestMapping(value = "/patient/{id}/protocol/monarchdevice",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> updateProtocolToPatientForVestDevice(@PathVariable Long id,
+    		@RequestBody List<PatientProtocolDataMonarch> ppdList) {
+    	log.debug("REST request to update protocol with patient user : {}", id);
+    	JSONObject jsonObject = new JSONObject();
+    	try{              
+    		List<PatientProtocolDataMonarch> protocolList = patientProtocolMonarchService.updateProtocolToPatient(id, ppdList);
 	    	if (protocolList.isEmpty()) {
 	        	jsonObject.put("ERROR", ExceptionConstants.HR_560);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
@@ -552,17 +619,26 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
-    public ResponseEntity<JSONObject> getAllProtocolsAssociatedWithPatient(@PathVariable Long id) {
+    public ResponseEntity<JSONObject> getAllProtocolsAssociatedWithPatient(@PathVariable Long id,
+    		@RequestParam(value = "deviceType", required = true) String deviceType) {
     	log.debug("REST request to get protocol for patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
     	try {
-    		List<PatientProtocolData> protocolList = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);
+    		List<?> protocolList = null;
+    		if(deviceType.equals("VEST")){
+    			protocolList = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);    			
+    		}
+    		else if(deviceType.equals("MONARCH")){
+    			 protocolList = patientProtocolMonarchService.getActiveProtocolsAssociatedWithPatient(id);    			
+    		}
+    		
     		if (protocolList.isEmpty()) {
 	        	jsonObject.put("message", MessageConstants.HR_245);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_243);
 	        	jsonObject.put("protocol", protocolList);
 	        }
+    		    		
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
     	} catch(HillromException hre){
     		jsonObject.put("ERROR", hre.getMessage());
@@ -875,6 +951,26 @@ public class UserResource {
     }
     
     /**
+     * GET  /:clinicId -> get the no. of patient under clinic with respect to device types.
+     */
+       @RequestMapping(value = "activePatCountForDevice/{clinicId}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<?> getactive(@PathVariable String clinicId){
+    	log.debug("REST request to get no. of active patient for clinic {} ", clinicId);
+        JSONObject jsonObject = new JSONObject();
+       
+			List<Object[]> deviceTypeAndCountOfPatients = clinicRepository.findByDeviceTypeAndPatientCount(clinicId);
+						
+			for(Object[] deviceTypeAndCountOfPatient : deviceTypeAndCountOfPatients){
+				jsonObject.put(deviceTypeAndCountOfPatient[0].toString(), deviceTypeAndCountOfPatient[1]);						
+		    }					
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+    }
+    
+    /**
      * GET  /users/:userId/clinics/:clinicId/patients -> get the patient list filter by metric type for clinic associated with user.
      */
     @RequestMapping(value = "/users/{userId}/clinics/{clinicId}/patients",
@@ -1121,12 +1217,19 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAdherenceTrendForDuration(@PathVariable Long id,
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
-    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to){
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
+    		@RequestParam(value = "deviceType", required = true) String deviceType){
     	log.debug("REST request to get Adherence Trend for the duration : ", id,from,to);
     	try {
-
-            List<ProtocolRevisionVO> adherenceTrends = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
-            return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
+    		if(deviceType.equals("VEST")){
+    			List<ProtocolRevisionVO> adherenceTrends = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
+    			return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
+    		}
+    		if(deviceType.equals("MONARCH")){
+                List<ProtocolRevisionMonarchVO> adherenceTrends = patientComplianceMonarchService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
+                return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
+        	}
+    		return new ResponseEntity<>(HttpStatus.OK);
 		} catch (HillromException e) {
 			// TODO: handle exception
 			JSONObject jsonObject = new JSONObject();

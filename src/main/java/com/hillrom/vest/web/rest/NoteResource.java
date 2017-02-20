@@ -30,10 +30,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.domain.Note;
+import com.hillrom.vest.domain.NoteMonarch;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.NoteService;
+import com.hillrom.vest.service.monarch.NoteServiceMonarch;
+import com.hillrom.vest.service.monarch.NoteServiceMonarch;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.web.rest.dto.NoteDTO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
@@ -46,6 +49,9 @@ public class NoteResource {
 	@Inject
 	private NoteService noteService;
 	
+	@Inject
+	private NoteServiceMonarch noteServiceMonarch;
+	
 	@RequestMapping(value="/notes", method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> create(@RequestBody(required=true) Map<String,String> paramsMap){
 		if(!SecurityUtils.isUserInRole(AuthoritiesConstants.PATIENT)){
@@ -56,6 +62,7 @@ public class NoteResource {
 		String userId = paramsMap.get("userId");
 		String patientId = paramsMap.get("patientId");
 		String dateString = paramsMap.get("date");
+		String deviceType = paramsMap.get("deviceType");
 		
 		LocalDate date = null;
 		try {
@@ -65,14 +72,19 @@ public class NoteResource {
 			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 		}
 		Note note = null;
-	
+		NoteMonarch noteMonarch = null;
+		
 		if(Objects.isNull(noteText)){
 			jsonObject.put("ERROR", "Required Param missing [noteText]");
 			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 		}
 		if(Objects.nonNull(userId)){
 			try {
-				note = noteService.saveOrUpdateNoteByUserId(Long.parseLong(userId), noteText,date);
+				if(deviceType.equals("VEST")){
+					note = noteService.saveOrUpdateNoteByUserId(Long.parseLong(userId), noteText,date);
+				} else if(deviceType.equals("MONARCH")){	
+					noteMonarch = noteServiceMonarch.saveOrUpdateNoteByUserId(Long.parseLong(userId), noteText,date);
+				}
 			} catch (NumberFormatException e) {
 				jsonObject.put("ERROR", "Number Format Exception");
 				return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
@@ -81,8 +93,12 @@ public class NoteResource {
 				return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 			}
 		}else if(Objects.nonNull(patientId)){
-			try {
-				note = noteService.saveOrUpdateNoteByPatientId(patientId, noteText,date);
+			try {				
+				if(deviceType.equals("VEST")){
+					note = noteService.saveOrUpdateNoteByPatientId(patientId, noteText,date);
+				} else if(deviceType.equals("MONARCH")){
+					noteMonarch = noteServiceMonarch.saveOrUpdateNoteByPatientId(patientId, noteText,date);
+				}				
 			} catch (HillromException e) {
 				jsonObject.put("ERROR",e.getMessage());
 				return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
@@ -91,9 +107,12 @@ public class NoteResource {
 			jsonObject.put("ERROR", "Required Param missing [noteText,patientId/userId]");
 			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 		}
+		
 		if(Objects.nonNull(note)){
 			return new ResponseEntity<>(note, HttpStatus.CREATED);
-		}
+		} else if(Objects.nonNull(noteMonarch)){
+			return new ResponseEntity<>(noteMonarch, HttpStatus.CREATED);
+		}		
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}	
 	
@@ -189,16 +208,23 @@ public class NoteResource {
 	@RequestMapping(value = "/notes",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Note>> getNotificationsByPatientUserId(@RequestParam("from") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate fromDate,
+    public ResponseEntity<?> getNotificationsByPatientUserId(@RequestParam("from") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate fromDate,
     		@RequestParam("to") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate toDate,
     		@RequestParam(value="userId",required=true)Long userId,
     		@RequestParam(value="deleted",required=false)boolean isDeleted,
     		@RequestParam(value = "page" , required = false) Integer offset,
-            @RequestParam(value = "per_page", required = false) Integer limit) throws URISyntaxException{
+            @RequestParam(value = "per_page", required = false) Integer limit,
+            @RequestParam(value = "deviceType", required = true) String deviceType) throws URISyntaxException{
     	
     	Pageable pageable = PaginationUtil.generatePageRequest(offset, limit);
-    	Page<Note> page = noteService.findByUserIdAndDateRange(userId, fromDate, toDate,isDeleted, pageable);
+		Page<?> page = null;
+    	if(deviceType.equals("VEST")){
+    		 page = noteService.findByUserIdAndDateRange(userId, fromDate, toDate,isDeleted, pageable);
+    	}
+    	if(deviceType.equals("MONARCH")){
+    		 page = noteServiceMonarch.findByUserIdAndDateRange(userId, fromDate, toDate,isDeleted, pageable);
+    	}
     	HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/notes", offset, limit);
-        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    	return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 }

@@ -921,7 +921,8 @@ public class UserExtensionResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.CARE_GIVER})
-    public ResponseEntity<?> getAssociatedPatientsForCaregiver(@PathVariable Long id) {
+    public ResponseEntity<?> getAssociatedPatientsForCaregiver(@PathVariable Long id,
+    		@RequestParam(value = "deviceType", required = true) String deviceType) {
         log.debug("REST request to get associated patients with caregiver : {}", id);
         JSONObject jsonObject = new JSONObject();
         try {

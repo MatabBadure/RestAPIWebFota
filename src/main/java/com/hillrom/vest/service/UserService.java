@@ -1,6 +1,8 @@
 package com.hillrom.vest.service;
 
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
+import static com.hillrom.vest.config.Constants.VEST;
+import static com.hillrom.vest.config.Constants.MONARCH;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -79,7 +81,6 @@ import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 import net.minidev.json.JSONObject;
-
 import org.springframework.scheduling.annotation.Scheduled;
 
 /**
@@ -1351,28 +1352,27 @@ public class UserService {
 		PatientComplianceMonarch complianceMonarch = null;
 		Note memoNote = null;
 		NoteMonarch memoNoteMonarch = null;
-		if(deviceType.equals("VEST")){
+		if(deviceType.equals(VEST)){
 			memoNote = noteService.findMemoNotesForPatientId(id, patientInfo.getId());
 		}
-		else if(deviceType.equals("MONARCH")){
+		else if(deviceType.equals(MONARCH)){
 			memoNoteMonarch = noteServiceMonarch.findMemoNotesForPatientId(id, patientInfo.getId());
 		}
-		if(deviceType.equals("VEST")){
+		if(deviceType.equals(VEST)){
 			compliance = complianceService.findLatestComplianceByPatientUserId(id);
-			
 		}
-		else if(deviceType.equals("MONARCH")){
+		else if(deviceType.equals(MONARCH)){
 			complianceMonarch = complianceMonarchService.findLatestComplianceByPatientUserId(id);
 		}
 		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patientInfo.getId());
 		PatientUserVO patientUserVO =  new PatientUserVO(user,patientInfo,deviceType);
 
 		// to do for Monarch
-		if(deviceType.equals("VEST")){
+		if(deviceType.equals(VEST)){
 			if(Objects.nonNull(compliance))
 			patientUserVO.setHoursOfUsage((compliance.getHmr()/(60*60)));
 		}
-		else if(deviceType.equals("MONARCH")){
+		else if(deviceType.equals(MONARCH)){
 			if(Objects.nonNull(complianceMonarch))
 			patientUserVO.setHoursOfUsage((complianceMonarch.getHmr()/(60*60)));
 		}
@@ -1385,10 +1385,10 @@ public class UserService {
 				Map<String,Object> clinicMRNId = new HashMap<>();
 				clinicMRNId.put("clinicId", clinicPatientAssoc.getClinic().getId());
 				clinicMRNId.put("mrnId", clinicPatientAssoc.getMrnId());
-				if(deviceType.equals("VEST")){
+				if(deviceType.equals(VEST)){
 					clinicMRNId.put("memoNote", (null == memoNote) ? "" : memoNote.getNote());
 				}
-				else if(deviceType.equals("MONARCH")){
+				else if(deviceType.equals(MONARCH)){
 					clinicMRNId.put("memoNoteMonarch", (null == memoNoteMonarch) ? "" : memoNoteMonarch.getNote());
 				}
 				mrnId = clinicPatientAssoc.getMrnId(); 
@@ -1730,17 +1730,13 @@ public class UserService {
     				CareGiverVO careGiverVO = new CareGiverVO(userPatientAssoc.getUserRole(), userPatientAssoc.getRelationshipLabel(), userPatientAssoc.getUser(),userPatientAssoc.getUser().getId(),userPatientAssoc.getPatient().getId());
     				caregiverList.add(careGiverVO);
     				patientAssocHRIDList = userPatientRepository.findByPatientIdAndUserRole(userPatientAssoc.getPatient().getId(),AuthoritiesConstants.PATIENT);
-    				
+    			
+    				String deviceType = patientVestDeviceService.getDeviceType(userPatientAssoc.getPatient().getId());
     				if(patientAssocHRIDList != null){
-    					
-    					
-    	    			for(UserPatientAssoc userPatientAssocHRID : patientAssocHRIDList){
+    					for(UserPatientAssoc userPatientAssocHRID : patientAssocHRIDList){
     	    				if(userPatientAssoc.getUser().getId().equals(caregiverId)){
-    	    					
-    	    					
-    	    					CareGiverVO careGiverPatientVO = new CareGiverVO(userPatientAssocHRID.getUserRole(), userPatientAssocHRID.getRelationshipLabel(), userPatientAssocHRID.getUser(),userPatientAssocHRID.getUser().getId(),userPatientAssocHRID.getPatient().getId());
+    	    					CareGiverVO careGiverPatientVO = new CareGiverVO(userPatientAssocHRID.getUserRole(), userPatientAssocHRID.getRelationshipLabel(), userPatientAssocHRID.getUser(),userPatientAssocHRID.getUser().getId(),userPatientAssocHRID.getPatient().getId(),deviceType);
     	    					caregiverPatientList.add(careGiverPatientVO);
-    	    					
     	    				}
     	    			}
     	    			

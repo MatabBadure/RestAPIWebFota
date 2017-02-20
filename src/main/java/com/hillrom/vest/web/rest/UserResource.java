@@ -2,6 +2,9 @@ package com.hillrom.vest.web.rest;
 
 import static com.hillrom.vest.security.AuthoritiesConstants.CLINIC_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
+import static com.hillrom.vest.config.Constants.VEST;
+import static com.hillrom.vest.config.Constants.MONARCH;
+//import static com.hillrom.vest.config.Constants.ALL;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -436,9 +439,9 @@ public class UserResource {
     	JSONObject jsonObject = new JSONObject();
 		try {
 			List<?> deviceList = null;
-			if(deviceType.equals("VEST")){
+			if(deviceType.equals(VEST)){
 				deviceList = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
-			} else if(deviceType.equals("MONARCH")){
+			} else if(deviceType.equals(MONARCH)){
 				deviceList = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
 			}
 			
@@ -626,10 +629,10 @@ public class UserResource {
     	JSONObject jsonObject = new JSONObject();
     	try {
     		List<?> protocolList = null;
-    		if(deviceType.equals("VEST")){
+    		if(deviceType.equals(VEST)){
     			protocolList = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);    			
     		}
-    		else if(deviceType.equals("MONARCH")){
+    		else if(deviceType.equals(MONARCH)){
     			 protocolList = patientProtocolMonarchService.getActiveProtocolsAssociatedWithPatient(id);    			
     		}
     		
@@ -710,14 +713,14 @@ public class UserResource {
     		@RequestParam(value="duration",required=true)String duration,
     		@RequestParam(value="deviceType",required=true)String deviceType) {
     		try{
-    			if(deviceType.equals("VEST")){
+    			if(deviceType.equals(VEST)){
     				List<TherapyDataVO> therapyData = therapySessionService.findByPatientUserIdAndDateRange(id, from, to);
     				if(therapyData.size() > 0){
     					Graph hmrGraph = hmrGraphService.populateGraphData(therapyData, new Filter(from, to, duration, null));
     					return new ResponseEntity<>(hmrGraph,HttpStatus.OK);
     				}
     			}
-    			if(deviceType.equals("MONARCH")){
+    			if(deviceType.equals(MONARCH)){
     				List<TherapyDataMonarchVO> therapyData = therapySessionServiceMonarch.findByPatientUserIdAndDateRange(id, from, to);
         			if(therapyData.size() > 0){
         				Graph hmrGraph = hmrGraphServiceMonarch.populateGraphData(therapyData, new Filter(from, to, duration, null));
@@ -739,7 +742,7 @@ public class UserResource {
     public ResponseEntity<?> getComplianceScoreByPatientUserIdAndDate(@PathVariable Long id,
     		@RequestParam(value="deviceType",required=true) String deviceType) {
     	
-    	if(deviceType.equals("VEST")){
+    	if(deviceType.equals(VEST)){
     		PatientCompliance compliance = patientComplianceService.findLatestComplianceByPatientUserId(id);
     		if(Objects.nonNull(compliance)){
         		if(Objects.isNull(compliance.getHmrRunRate())){
@@ -747,7 +750,7 @@ public class UserResource {
         		}
            		return new ResponseEntity<>(compliance,HttpStatus.OK);
         	}
-    	}else if (deviceType.equals("MONARCH")){
+    	}else if (deviceType.equals(MONARCH)){
     		PatientComplianceMonarch compliance = patientComplianceMonarchService.findLatestComplianceByPatientUserId(id);
     		if(Objects.nonNull(compliance)){
         		if(Objects.isNull(compliance.getHmrRunRate())){
@@ -929,10 +932,10 @@ public class UserResource {
         	Map<String, Object> statitics = null;
         	LocalDate date = LocalDate.now();
 
-        	if(deviceType.equals("VEST")) {
+        	if(deviceType.equals(VEST)) {
         		statitics = patientHCPService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(clinicId, date);
         	}
-        	else if(deviceType.equals("MONARCH")) {
+        	else if(deviceType.equals(MONARCH)) {
         		statitics = patientHCPMonarchService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(clinicId, date);
         	}
         	else if(deviceType.equals("ALL")) {
@@ -1043,10 +1046,10 @@ public class UserResource {
         JSONObject jsonObject = new JSONObject();
         try {
         	Collection<StatisticsVO> statiticsCollection = null;
-        	if(deviceType.equals("VEST")){
+        	if(deviceType.equals(VEST)){
 	        	statiticsCollection = patientHCPService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);		      
         	}
-        	if(deviceType.equals("MONARCH")){
+        	if(deviceType.equals(MONARCH)){
         		statiticsCollection = patientHCPMonarchService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
         	}
         	if (statiticsCollection.isEmpty()) {
@@ -1081,10 +1084,10 @@ public class UserResource {
         JSONObject jsonObject = new JSONObject();
         try {
         	Collection<TreatmentStatisticsVO> statiticsCollection = null;
-        	if(deviceType.equals("VEST")){
+        	if(deviceType.equals(VEST)){
         	statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
         	}
-        	if(deviceType.equals("MONARCH")){
+        	if(deviceType.equals(MONARCH)){
         	statiticsCollection = patientHCPMonarchService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
         	}
         	if (statiticsCollection.isEmpty()) {
@@ -1222,11 +1225,11 @@ public class UserResource {
     		@RequestParam(value = "deviceType", required = true) String deviceType){
     	log.debug("REST request to get Adherence Trend for the duration : ", id,from,to);
     	try {
-    		if(deviceType.equals("VEST")){
+    		if(deviceType.equals(VEST)){
     			List<ProtocolRevisionVO> adherenceTrends = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
     			return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
     		}
-    		if(deviceType.equals("MONARCH")){
+    		if(deviceType.equals(MONARCH)){
                 List<ProtocolRevisionMonarchVO> adherenceTrends = patientComplianceMonarchService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
                 return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
         	}
@@ -1249,7 +1252,7 @@ public class UserResource {
     		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
     		@RequestParam(value = "deviceType", required = true) String deviceType){
     	try{
-    		if(deviceType.equals("VEST")){
+    		if(deviceType.equals(VEST)){
     		List<TherapyDataVO> therapyData = therapySessionService.getComplianceGraphData(id, from, to);
     		if(therapyData.size() > 0){
     			ProtocolConstants protocol = adherenceCalculationService.getProtocolByPatientUserId(id);
@@ -1260,7 +1263,7 @@ public class UserResource {
     			return new ResponseEntity<>(complianceGraph,HttpStatus.OK); 
     		}
     		}
-    		if(deviceType.equals("MONARCH")){
+    		if(deviceType.equals(MONARCH)){
         		List<TherapyDataMonarchVO> therapyData = therapySessionServiceMonarch.getComplianceGraphData(id, from, to);
         		if(therapyData.size() > 0){
         			ProtocolConstantsMonarch protocol = adherenceCalculationServiceMonarch.getProtocolByPatientUserId(id);
@@ -1293,9 +1296,9 @@ public class UserResource {
     			List<ProtocolRevisionVO> adherenceTrendData = null;
     			List<ProtocolRevisionMonarchVO> adherenceTrendDataMonarch = null;
     			
-    			if(deviceType.equals("VEST")){
+    			if(deviceType.equals(VEST)){
     				adherenceTrendData = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id, from, to);
-    			}else if(deviceType.equals("MONARCH")){
+    			}else if(deviceType.equals(MONARCH)){
     				adherenceTrendDataMonarch = patientComplianceMonarchService.findAdherenceTrendByUserIdAndDateRange(id, from, to);
     			}
     			

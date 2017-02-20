@@ -1730,13 +1730,13 @@ public class UserService {
     				CareGiverVO careGiverVO = new CareGiverVO(userPatientAssoc.getUserRole(), userPatientAssoc.getRelationshipLabel(), userPatientAssoc.getUser(),userPatientAssoc.getUser().getId(),userPatientAssoc.getPatient().getId());
     				caregiverList.add(careGiverVO);
     				patientAssocHRIDList = userPatientRepository.findByPatientIdAndUserRole(userPatientAssoc.getPatient().getId(),AuthoritiesConstants.PATIENT);
-    			
     				String deviceType = patientVestDeviceService.getDeviceType(userPatientAssoc.getPatient().getId());
     				if(patientAssocHRIDList != null){
     					for(UserPatientAssoc userPatientAssocHRID : patientAssocHRIDList){
     	    				if(userPatientAssoc.getUser().getId().equals(caregiverId)){
     	    					CareGiverVO careGiverPatientVO = new CareGiverVO(userPatientAssocHRID.getUserRole(), userPatientAssocHRID.getRelationshipLabel(), userPatientAssocHRID.getUser(),userPatientAssocHRID.getUser().getId(),userPatientAssocHRID.getPatient().getId(),deviceType);
     	    					caregiverPatientList.add(careGiverPatientVO);
+    	    					
     	    				}
     	    			}
     	    			

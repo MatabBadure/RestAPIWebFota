@@ -300,7 +300,6 @@ public class PatientVestDeviceService {
 		return patientVestDeviceRepository.findLatestInActiveDeviceByPatientId(patientId, false);
 	}
 	
-	
 	public String getDeviceType(User user){
 		PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(user.getId());		
 		if(patient != null){

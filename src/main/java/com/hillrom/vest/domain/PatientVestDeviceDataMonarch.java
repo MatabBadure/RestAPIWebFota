@@ -38,6 +38,9 @@ public class PatientVestDeviceDataMonarch implements Serializable,Comparable<Pat
 	@Column(name = "serial_number")
 	private String serialNumber;
 	
+	@Id
+	@Column(name = "bluetooth_id")
+	private String bluetoothId;
 	
 	
 	private Double hmr;
@@ -70,6 +73,14 @@ public class PatientVestDeviceDataMonarch implements Serializable,Comparable<Pat
 
 	public Integer getSequenceNumber() {
 		return sequenceNumber;
+	}
+	
+	public String getBluetoothId() {
+		return bluetoothId;
+	}
+
+	public void setBluetoothId(String bluetoothId) {
+		this.bluetoothId = bluetoothId;
 	}
 
 	public void setSequenceNumber(Integer sequenceNumber) {
@@ -165,6 +176,10 @@ public class PatientVestDeviceDataMonarch implements Serializable,Comparable<Pat
 			return 0;
 	}
 	
+	@JsonIgnore
+	public String getPatientBlueToothAddress(){
+		return "PAT_ID:BT:"+this.bluetoothId;
+	}
 
 
 	@Override

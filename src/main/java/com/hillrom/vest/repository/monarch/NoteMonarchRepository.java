@@ -24,11 +24,11 @@ public interface NoteMonarchRepository extends JpaRepository<NoteMonarch, Long> 
 	/*
 	// Added to get the Patient memo notes with respect to the HCP/CA user id
 	@Query("from NoteMonarch note where note.patientUser.id = ?1  and note.patient.id = ?2")
-	Optional<NoteMonarch> findOneByPatientUserIdAndPatientId(Long userId,String patientId);
+	Optional<NoteMonarch> findOneByPatientUserIdAndPatientId(Long userId,String patientId);*/
 	
 	// Added to get the Patient memo notes for admin users entered byHCP/CA
 	@Query(nativeQuery=true,value="select * from PATIENT_NOTE_MONARCH where user_id <> :userId  and patient_id = :patientId")
-	Optional<NoteMonarch> returnPatientMemo(@Param("userId")Long userId,@Param("patientId")String patientId);*/
+	Optional<NoteMonarch> returnPatientMemo(@Param("userId")Long userId,@Param("patientId")String patientId);
 	
 	Page<NoteMonarch> findByPatientUserIdAndCreatedOnBetweenAndDeletedOrderByCreatedOnDesc(Long userId,LocalDate from,LocalDate to,Boolean isDeleted,Pageable pageable);
 	

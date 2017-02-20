@@ -42,7 +42,9 @@ import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.ClinicPatientAssoc;
 import com.hillrom.vest.domain.EntityUserAssoc;
 import com.hillrom.vest.domain.Note;
+import com.hillrom.vest.domain.NoteMonarch;
 import com.hillrom.vest.domain.PatientCompliance;
+import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.User;
@@ -63,6 +65,8 @@ import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.OnCredentialsChangeEvent;
 import com.hillrom.vest.security.SecurityUtils;
+import com.hillrom.vest.service.monarch.NoteServiceMonarch;
+import com.hillrom.vest.service.monarch.PatientComplianceMonarchService;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.service.util.RequestUtil;
 import com.hillrom.vest.util.ExceptionConstants;
@@ -75,6 +79,7 @@ import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 import net.minidev.json.JSONObject;
+
 import org.springframework.scheduling.annotation.Scheduled;
 
 /**
@@ -139,6 +144,12 @@ public class UserService {
     
     @Inject
 	private UserSearchRepository userSearchRepository;
+    
+    @Inject
+	private NoteServiceMonarch noteServiceMonarch;
+    
+    @Inject
+    private PatientComplianceMonarchService complianceMonarchService;
 
     public String generateDefaultPassword(User patientUser) {
 		StringBuilder defaultPassword = new StringBuilder();
@@ -1335,16 +1346,36 @@ public class UserService {
 		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
 		if(null == patientInfo)
 			return Optional.empty();
-		
-		Note memoNote = noteService.findMemoNotesForPatientId(id, patientInfo.getId());
-		 
-		PatientCompliance compliance = complianceService.findLatestComplianceByPatientUserId(id);
+		String deviceType = patientVestDeviceService.getDeviceType(user);
+		PatientCompliance compliance =null;
+		PatientComplianceMonarch complianceMonarch = null;
+		Note memoNote = null;
+		NoteMonarch memoNoteMonarch = null;
+		if(deviceType.equals("VEST")){
+			memoNote = noteService.findMemoNotesForPatientId(id, patientInfo.getId());
+		}
+		else if(deviceType.equals("MONARCH")){
+			memoNoteMonarch = noteServiceMonarch.findMemoNotesForPatientId(id, patientInfo.getId());
+		}
+		if(deviceType.equals("VEST")){
+			compliance = complianceService.findLatestComplianceByPatientUserId(id);
+			
+		}
+		else if(deviceType.equals("MONARCH")){
+			complianceMonarch = complianceMonarchService.findLatestComplianceByPatientUserId(id);
+		}
 		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patientInfo.getId());
-		PatientUserVO patientUserVO =  new PatientUserVO(user,patientInfo);
+		PatientUserVO patientUserVO =  new PatientUserVO(user,patientInfo,deviceType);
 
 		// to do for Monarch
-		if(Objects.nonNull(compliance))
+		if(deviceType.equals("VEST")){
+			if(Objects.nonNull(compliance))
 			patientUserVO.setHoursOfUsage((compliance.getHmr()/(60*60)));
+		}
+		else if(deviceType.equals("MONARCH")){
+			if(Objects.nonNull(complianceMonarch))
+			patientUserVO.setHoursOfUsage((complianceMonarch.getHmr()/(60*60)));
+		}
 
 		String mrnId;
 		java.util.Iterator<ClinicPatientAssoc> cpaIterator = clinicPatientAssocList.iterator();
@@ -1354,7 +1385,12 @@ public class UserService {
 				Map<String,Object> clinicMRNId = new HashMap<>();
 				clinicMRNId.put("clinicId", clinicPatientAssoc.getClinic().getId());
 				clinicMRNId.put("mrnId", clinicPatientAssoc.getMrnId());
-				clinicMRNId.put("memoNote", (null == memoNote) ? "" : memoNote.getNote());
+				if(deviceType.equals("VEST")){
+					clinicMRNId.put("memoNote", (null == memoNote) ? "" : memoNote.getNote());
+				}
+				else if(deviceType.equals("MONARCH")){
+					clinicMRNId.put("memoNoteMonarch", (null == memoNoteMonarch) ? "" : memoNoteMonarch.getNote());
+				}
 				mrnId = clinicPatientAssoc.getMrnId(); 
 				patientUserVO.setMrnId(mrnId);
 				patientUserVO.setClinicMRNId(clinicMRNId);
@@ -1362,7 +1398,6 @@ public class UserService {
 		}
 		return Optional.of(patientUserVO);
 	}
-
 	public User getUser(Long id) throws HillromException{
 		User user = userRepository.findOne(id);
 		if(Objects.nonNull(user)) {

@@ -379,7 +379,8 @@ public class UserResource {
 	}
 
 	@RequestMapping(value = "/user/{id}/patient", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getPatientUser(@PathVariable Long id) {
+	public ResponseEntity<?> getPatientUser(@PathVariable Long id,
+			@RequestParam(value = "deviceType", required = true) String deviceType) {
 		log.debug("REST request to get PatientUser : {}", id);
 		Optional<PatientUserVO> patientUser = userService.getPatientUser(id);
 		if(patientUser.isPresent()){

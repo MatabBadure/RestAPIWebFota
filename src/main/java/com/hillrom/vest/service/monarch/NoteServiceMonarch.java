@@ -139,4 +139,11 @@ public class NoteServiceMonarch {
 		return existingNote;
 	}
 	
+	public NoteMonarch findMemoNotesForPatientId(Long userId, String patientId){
+		Optional<NoteMonarch> note =  noteMonarchRepository.returnPatientMemo(userId, patientId);
+		if(note.isPresent())
+			return note.get();
+		return null;
+	}
+	
 }

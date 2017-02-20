@@ -392,37 +392,52 @@ public class UserResource {
 			return new ResponseEntity<>(jsonObject,HttpStatus.NOT_FOUND);
 		}
 	}
-
+	
 	/**
-     * PUT  /patient/:id/link -> link vest device with patient {id}.
+     * PUT  /patient/:id/link -> link vest/monarch device with patient {id}. 
+     * For adding new device & updating the Device
      */
-    @RequestMapping(value = "/patient/{id}/linkvestdevice",
+    @RequestMapping(value = "/patient/{id}/linkdevice",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
-    public ResponseEntity<JSONObject> linkVestDeviceWithPatient(@PathVariable Long id, @RequestBody Map<String, Object> deviceData) {
+    public ResponseEntity<JSONObject> linkMonarchDeviceWithPatient(@PathVariable Long id, 
+    		@RequestBody Map<String, Object> deviceData,
+    		@RequestParam(value = "deviceType", required = true) String deviceType){
     	log.debug("REST request to link vest device with patient user : {}", id);
         JSONObject jsonObject = new JSONObject();
 		try {
-			Object responseObj = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
+			Object responseObj  = null;
+			if(deviceType.equals("VEST")){
+				responseObj = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
+			}else if(deviceType.equals("MONARCH")){
+				responseObj = patientVestDeviceMonarchService.linkVestDeviceWithPatient(id, deviceData);
+			}
+			 
 			if (responseObj instanceof User) {
 				jsonObject.put("ERROR", ExceptionConstants.HR_572);
 				jsonObject.put("user", (User) responseObj);
 				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 			} else {
 				jsonObject.put("message", MessageConstants.HR_282);
-				jsonObject.put("user", (PatientVestDeviceHistory) responseObj);
+				//jsonObject.put("deviceType", patientVestDeviceMonarchService.getDeviceType(id));
+				if(deviceType.equals("VEST")){
+					jsonObject.put("user", (PatientVestDeviceHistory) responseObj);
+				}else if(deviceType.equals("MONARCH")){
+					jsonObject.put("user", (PatientVestDeviceHistoryMonarch) responseObj);
+				}				
 				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 			}
 		} catch (HillromException e) {
 			jsonObject.put("ERROR",e.getMessage());
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 		}
-    }
+    }	
     
     /**
-     * GET  /patient/:id/vestdevice -> get linked vest device with patient {id}.
+     * GET  /patient/:id/vestdevice -> get linked vest/monarch device with patient {id}.
+     * For getting all the device related to the patient
      */
     @RequestMapping(value = "/patient/{id}/vestdevice",
             method = RequestMethod.GET,
@@ -433,19 +448,17 @@ public class UserResource {
     		@RequestParam(value = "deviceType", required = true) String deviceType) {
     	log.debug("REST request to link vest device with patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
-		try {
-			List<?> deviceList = null;
-			if(deviceType.equals("VEST")){
-				deviceList = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
-			} else if(deviceType.equals("MONARCH")){
-				deviceList = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
-			}
+		try {		
+			List<PatientVestDeviceHistory> deviceList_vest = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
+			List<PatientVestDeviceHistoryMonarch> deviceList_monarch = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
 			
-			if(deviceList.isEmpty()){
+			if(deviceList_vest.isEmpty() && deviceList_monarch.isEmpty()){
      			jsonObject.put("message",MessageConstants.HR_281); //No device linked with patient.
      		} else {
-     			jsonObject.put("message", MessageConstants.HR_282);//Vest devices linked with patient fetched successfully.
-     			jsonObject.put("deviceList", deviceList);
+     			jsonObject.put("message", MessageConstants.HR_282);//Vest/monarch devices linked with patient fetched successfully.
+     			//jsonObject.put("deviceType", patientVestDeviceService.getDeviceType(id));
+     			jsonObject.put("VEST_DEVICE_LIST", deviceList_vest);
+     			jsonObject.put("MONARCH_DEVICE_LIST", deviceList_monarch);
      		}
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {
@@ -455,18 +468,26 @@ public class UserResource {
     }
     
     /**
-     * DELETE  /patient/:id/deactivatevestdevice/:serialNumber -> deactivate vest device with {serialNumber} from patient {id}.
+     * DELETE  /patient/:id/deactivatevestdevice/:serialNumber -> deactivate vest/monarch device with {serialNumber} from patient {id}.
      */
-    @RequestMapping(value = "/patient/{id}/deactivatevestdevice/{serialNumber}",
+    @RequestMapping(value = "/patient/{id}/deactivatedevice/{serialNumber}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
-    public ResponseEntity<JSONObject> deactivateVestDeviceFromPatient(@PathVariable Long id, @PathVariable String serialNumber) {
+    public ResponseEntity<JSONObject> deactivateVestDeviceFromPatient(@PathVariable Long id, 
+    		@PathVariable String serialNumber,
+    		@RequestParam(value = "deviceType", required = true) String deviceType) {
     	log.debug("REST request to deactivate vest device with serial number {} from patient user : {}", serialNumber, id);
     	JSONObject jsonObject = new JSONObject();
     	try {
-			String message = patientVestDeviceService.deactivateVestDeviceFromPatient(id, serialNumber);
+    		String message = "";
+    		if(deviceType.equals("VEST")){
+    			 message = patientVestDeviceService.deactivateVestDeviceFromPatient(id, serialNumber);
+    		} else if(deviceType.equals("MONARCH")){
+    			 message = patientVestDeviceMonarchService.deactivateVestDeviceFromPatient(id, serialNumber);
+    		}
+			
 			if (StringUtils.isBlank(message)) {
 				jsonObject.put("ERROR", ExceptionConstants.HR_573);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
@@ -619,24 +640,19 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
-    public ResponseEntity<JSONObject> getAllProtocolsAssociatedWithPatient(@PathVariable Long id,
-    		@RequestParam(value = "deviceType", required = true) String deviceType) {
+    public ResponseEntity<JSONObject> getAllProtocolsAssociatedWithPatient(@PathVariable Long id) {
     	log.debug("REST request to get protocol for patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
     	try {
-    		List<?> protocolList = null;
-    		if(deviceType.equals("VEST")){
-    			protocolList = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);    			
-    		}
-    		else if(deviceType.equals("MONARCH")){
-    			 protocolList = patientProtocolMonarchService.getActiveProtocolsAssociatedWithPatient(id);    			
-    		}
+    			List<PatientProtocolData> protocolList_VEST = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);
+    			List<PatientProtocolDataMonarch> protocolList_MONARCH = patientProtocolMonarchService.getActiveProtocolsAssociatedWithPatient(id);
     		
-    		if (protocolList.isEmpty()) {
+    		if (protocolList_VEST.isEmpty() && protocolList_MONARCH.isEmpty()) {
 	        	jsonObject.put("message", MessageConstants.HR_245);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_243);
-	        	jsonObject.put("protocol", protocolList);
+	        	jsonObject.put("VEST_DEVICE_PROTOCOL", protocolList_VEST);
+	        	jsonObject.put("MONARCH_DEVICE_PROTOCOL", protocolList_MONARCH);
 	        }
     		    		
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
@@ -654,11 +670,18 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
-    public ResponseEntity<JSONObject> getProtocolDetails(@PathVariable Long id, @PathVariable String protocolId) {
+    public ResponseEntity<JSONObject> getProtocolDetails(@PathVariable Long id, @PathVariable String protocolId,
+    		@RequestParam(value = "deviceType", required = true) String deviceType) {
     	log.debug("REST request to get protocol details with {} for patient user : {}", protocolId, id);
     	JSONObject jsonObject = new JSONObject();
     	try {
-    		List<PatientProtocolData> protocolList = patientProtocolService.getProtocolDetails(id, protocolId);
+    		List<?> protocolList = null;
+    		if(deviceType.equals("VEST")){
+    			protocolList = patientProtocolService.getProtocolDetails(id, protocolId);
+    		}else if(deviceType.equals("MONARCH")){
+    			protocolList = patientProtocolMonarchService.getProtocolDetails(id, protocolId);
+    		}
+    		
     		if (protocolList.isEmpty()) {
 	        	jsonObject.put("ERROR", ExceptionConstants.HR_551);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
@@ -681,11 +704,18 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
-    public ResponseEntity<JSONObject> deleteProtocolForPatient(@PathVariable Long id, @PathVariable String protocolId) {
+    public ResponseEntity<JSONObject> deleteProtocolForPatient(@PathVariable Long id, @PathVariable String protocolId,
+    		@RequestParam(value = "deviceType", required = true) String deviceType) {
     	log.debug("REST request to delete protocol for patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
-    	try {
-	    	String message = patientProtocolService.deleteProtocolForPatient(id, protocolId);
+    	try {    		
+    		String message = "Invalid Device Type";
+    		if(deviceType.equals("VEST")){
+    			message = patientProtocolService.deleteProtocolForPatient(id, protocolId);
+    		}else if(deviceType.equals("MONARCH")){
+    			message = patientProtocolMonarchService.deleteProtocolForPatient(id, protocolId);
+    		}    		
+	    	 
 	        if (Objects.isNull(message)) {
 	        	jsonObject.put("message", MessageConstants.HR_245);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);

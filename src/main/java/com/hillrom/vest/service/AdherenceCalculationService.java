@@ -340,7 +340,7 @@ public class AdherenceCalculationService {
 						}
 					}
 					
-					if(Objects.nonNull(startDate)){
+					if(Objects.nonNull(startDate) || Objects.nonNull(startDateMonarch)){
 						PatientInfo patient = userService.getPatientInfoObjFromPatientUser(user);
 						if(deviceType.equals("VEST")){
 							adherenceResetForPatient(user.getId(), patient.getId(), startDate, DEFAULT_COMPLIANCE_SCORE, 0);

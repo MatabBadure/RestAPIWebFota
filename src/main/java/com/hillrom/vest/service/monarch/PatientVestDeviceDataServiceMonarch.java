@@ -173,114 +173,30 @@ public class PatientVestDeviceDataServiceMonarch {
 			if(missingParams.size() > 0)
 				throw new HillromException("Missing Params : "+String.join(",",missingParams));
 		}
-	}
-
-
-	public JSONObject saveOrUpdateChargerData(String encoded_string, String decoded_string) throws HillromException{	
-		
-		
-		log.error("Encoded String : " + encoded_string);
-		log.error("Decoded String : " + decoded_string);
-		
-		JSONObject chargerJsonData = validateRequest(encoded_string,decoded_string);
-		JSONObject deviceData = (JSONObject) chargerJsonData.get("DEVICE_DATA");
-		if(deviceData.get("device_data_type").equals("PING_PONG_PING")){
-			log.debug("deviceData is PING_PONG_PING" + " Insert into PING_PONG_PING table");
-			PingPongPing pingPongPingData = new PingPongPing();
-			pingPongPingData.setCreatedTime(new DateTime());
-			pingPongPingData.setSerialNumber(deviceData.get("serial_number").toString());
-			pingPongPingRepository.save(pingPongPingData);
-			
+		if(!calculateCRC(rawData)){
+			throw new HillromException("CRC checksum error");
 		}
-		if(chargerJsonData.get("RESULT").equals("OK")){
-			ChargerData chargerData = new ChargerData();
-			chargerData.setDeviceData(encoded_string);
-			chargerData.setCreatedTime(new DateTime());
-			chargerDataRepository.save(chargerData);
-		}
-		return chargerJsonData;
-
 	}	
 
-
-	private JSONObject validateRequest(String rawData,String decoded_data) throws HillromException {
-		log.error("Inside validateRequest " + rawData);
-		JSONObject chargerJsonData = ParserUtil.getChargerQclJsonDataFromRawMessage(decoded_data);
-		String reqParams[] = new String[]{DEVICE_MODEL,DEVICE_SN,
-				DEVICE_WIFI,DEVICE_LTE,DEVICE_VER,FRAG_TOTAL,FRAG_CURRENT,DEVICE_DATA,CRC};
-		
-		
-		if(Objects.isNull(chargerJsonData) || chargerJsonData.keySet().isEmpty()){
-			throw new HillromException("Missing Params : "+String.join(",",reqParams));
-		}else if(Objects.nonNull(chargerJsonData)){
-			List<String> missingParams = RandomUtil.getDifference(Arrays.asList(reqParams), new ArrayList<String>(chargerJsonData.keySet()));
-
-			if(missingParams.size() > 0){
-				if(missingParams.contains(DEVICE_MODEL) || missingParams.contains(DEVICE_SN) || (missingParams.contains(DEVICE_WIFI) && missingParams.contains(DEVICE_LTE)) ||
-						missingParams.contains(DEVICE_VER) || missingParams.contains(DEVICE_DATA) || missingParams.contains(CRC) ||
-						missingParams.contains(FRAG_TOTAL) || missingParams.contains(FRAG_CURRENT)
-						){
-					chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
-					chargerJsonData.put("RESULT", "NOT OK");
-					chargerJsonData.put("ERROR","Missing Params");
-					return chargerJsonData;
-				}else{
-					if(!calculateCRC(rawData)){
-						chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
-						chargerJsonData.put("RESULT", "NOT OK");
-						chargerJsonData.put("ERROR","CRC Validation Failed");
-						return chargerJsonData;
-					}else{
-						chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
-						chargerJsonData.put("RESULT", "OK");
-						chargerJsonData.put("ERROR","");
-						return chargerJsonData;					
-					}
-				}
-			}else{
-				if(!calculateCRC(rawData)){
-					chargerJsonData.put("RESULT", "NOT OK");
-					chargerJsonData.put("ERROR","CRC Validation Failed");
-					return chargerJsonData;
-				}else{
-					chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
-					chargerJsonData.put("RESULT", "OK");
-					chargerJsonData.put("ERROR","");
-					return chargerJsonData;					
-				}
-			}
-		}
-		
-		return chargerJsonData;
-	}
-
-
-
-
-
-
-	  private boolean calculateCRC(String base64String)
-	  {
- 
+	private boolean calculateCRC(String base64String)
+	{	
 		log.error("Inside  calculateCRC : " ,base64String);
-		  
-	    int nCheckSum = 0;
+	  
+		int nCheckSum = 0;
 
-	    byte[] decoded = java.util.Base64.getDecoder().decode(base64String);
-	    
-	    int nDecodeCount = 0;
+		byte[] decoded = java.util.Base64.getDecoder().decode(base64String);
+    
+		int nDecodeCount = 0;
 	    for ( ; nDecodeCount < (decoded.length-2); nDecodeCount++ )
 	    {
-	      int nValue = (decoded[nDecodeCount] & 0xFF);
-	      nCheckSum += nValue;
-	    }
-	    
-	    
+	    	int nValue = (decoded[nDecodeCount] & 0xFF);
+	    	nCheckSum += nValue;
+	    }    
 	    System.out.format("Inverted Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
-	    
+    
 	    while ( nCheckSum >  65535 )
 	    {
-	      nCheckSum -= 65535;
+	    	nCheckSum -= 65535;
 	    }
 	    
 	    int nMSB = decoded[nDecodeCount+1] & 0xFF;
@@ -310,8 +226,6 @@ public class PatientVestDeviceDataServiceMonarch {
 	    	log.error("CRC VALIDATION FAILED :"); 
 	    	return false;
 	    }
-
-		
 	}
 
 	public JSONObject getDeviceData(String encoded_string) throws HillromException{

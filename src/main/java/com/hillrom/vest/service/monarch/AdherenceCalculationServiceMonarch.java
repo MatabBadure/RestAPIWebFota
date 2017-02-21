@@ -217,8 +217,8 @@ public class AdherenceCalculationServiceMonarch{
 	/**
 	 * Runs every midnight deducts the compliance score by 5 if therapy hasn't been done for adherence setting day(s)
 	 */
-	//@Scheduled(cron="0 30 23 * * * ")
-	public void processMissedTherapySessions(){
+	@Scheduled(cron="0 55 23 * * * ")	
+	public void processMissedTherapySessionsMonarch(){
 		try{
 			LocalDate today = LocalDate.now();
 			log.debug("Started calculating missed therapy "+DateTime.now()+","+today);
@@ -823,8 +823,8 @@ public class AdherenceCalculationServiceMonarch{
 	 * Runs every midnight , sends the notifications to Patient User.
 	 */
 	@Async
-	//@Scheduled(cron="0 15 0 * * *")
-	public void processPatientNotifications(){
+	@Scheduled(cron="0 25 0 * * *")	
+	public void processPatientNotificationsMonarch(){
 		LocalDate yesterday = LocalDate.now().minusDays(1);
 		List<NotificationMonarch> notifications = notificationMonarchRepository.findByDate(yesterday);
 		if(notifications.size() > 0){
@@ -872,8 +872,8 @@ public class AdherenceCalculationServiceMonarch{
 	 * Runs every midnight , sends the statistics notifications to Clinic Admin and HCP.
 	 * @throws HillromException 
 	 */
-	//@Scheduled(cron="0 15 0 * * * ")
-	public void processHcpClinicAdminNotifications() throws HillromException{
+	@Scheduled(cron="0 25 0 * * * ")	
+	public void processHcpClinicAdminNotificationsMonarch() throws HillromException{
 		try{
 			List<ClinicStatsNotificationVO> statsNotificationVOs = getPatientStatsWithHcpAndClinicAdminAssociation();
 			Map<BigInteger, User> idUserMap = getIdUserMapFromPatientStats(statsNotificationVOs);
@@ -900,8 +900,8 @@ public class AdherenceCalculationServiceMonarch{
 		}
 	}
 	
-	//@Scheduled(cron="0 15 0 * * *")
-	public void processCareGiverNotifications() throws HillromException{
+	@Scheduled(cron="0 25 0 * * *")	
+	public void processCareGiverNotificationsMonarch() throws HillromException{
 		try{
 			List<CareGiverStatsNotificationVO> statsNotificationVOs = findPatientStatisticsCareGiver();
 

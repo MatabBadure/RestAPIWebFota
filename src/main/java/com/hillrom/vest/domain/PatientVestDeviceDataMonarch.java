@@ -60,6 +60,31 @@ public class PatientVestDeviceDataMonarch implements Serializable,Comparable<Pat
 	@JoinColumn(name="user_id",referencedColumnName="id")
 	private User patientUser;
 	
+	@Column(name = "therapy_index")
+	private Integer therapyIndex;
+	
+	@Column(name = "start_battery_level")
+	private Integer startBatteryLevel;
+	
+	@Column(name = "end_battery_level")
+	private Integer endBatteryLevel;
+	
+	@Column(name = "number_of_events")
+	private Integer numberOfEvents;
+	
+	@Column(name = "number_of_pods")
+	private Integer numberOfPods;
+	
+	@Column(name = "dev_wifi")
+	private String devWifi;
+	
+	@Column(name = "dev_lte")
+	private String devLte;
+	
+	@Column(name = "dev_version")
+	private String devVersion;
+	
+	
 	public Long getTimestamp() {
 		return timestamp;
 	}
@@ -151,6 +176,69 @@ public class PatientVestDeviceDataMonarch implements Serializable,Comparable<Pat
 		this.patientUser = patientUser;
 	}
 
+	public Integer getTherapyIndex() {
+		return therapyIndex;
+	}
+
+	public void setTherapyIndex(Integer therapyIndex) {
+		this.therapyIndex = therapyIndex;
+	}
+
+	public Integer getStartBatteryLevel() {
+		return startBatteryLevel;
+	}
+
+	public void setStartBatteryLevel(Integer startBatteryLevel) {
+		this.startBatteryLevel = startBatteryLevel;
+	}
+
+	public Integer getEndBatteryLevel() {
+		return endBatteryLevel;
+	}
+
+	public void setEndBatteryLevel(Integer endBatteryLevel) {
+		this.endBatteryLevel = endBatteryLevel;
+	}
+
+	public Integer getNumberOfEvents() {
+		return numberOfEvents;
+	}
+
+	public void setNumberOfEvents(Integer numberOfEvents) {
+		this.numberOfEvents = numberOfEvents;
+	}
+
+	public Integer getNumberOfPods() {
+		return numberOfPods;
+	}
+
+	public void setNumberOfPods(Integer numberOfPods) {
+		this.numberOfPods = numberOfPods;
+	}
+
+	public String getDevWifi() {
+		return devWifi;
+	}
+
+	public void setDevWifi(String devWifi) {
+		this.devWifi = devWifi;
+	}
+
+	public String getDevLte() {
+		return devLte;
+	}
+
+	public void setDevLte(String devLte) {
+		this.devLte = devLte;
+	}
+
+	public String getDevVersion() {
+		return devVersion;
+	}
+
+	public void setDevVersion(String devVersion) {
+		this.devVersion = devVersion;
+	}
 
 	@JsonIgnore
 	public DateTime getDate(){
@@ -165,7 +253,7 @@ public class PatientVestDeviceDataMonarch implements Serializable,Comparable<Pat
 			return 0;
 	}
 	
-
+	
 
 	@Override
 	public int compareTo(PatientVestDeviceDataMonarch o) {

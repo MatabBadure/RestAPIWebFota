@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.DefaultEvaluationContextProvider;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -56,6 +57,7 @@ import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceData;
+import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
 import com.hillrom.vest.domain.ProtocolConstants;
@@ -71,6 +73,7 @@ import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.repository.monarch.PatientComplianceMonarchRepository;
+import com.hillrom.vest.repository.monarch.PatientMonarchDeviceDataRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.AdherenceCalculationService;
@@ -153,6 +156,9 @@ public class UserResource {
 
 	@Inject
 	private PatientVestDeviceDataRepository deviceDataRepository;
+	
+	@Inject
+	private PatientMonarchDeviceDataRepository monarchdeviceDataRepository;
 	
 	@Inject
     private PatientHCPService patientHCPService;
@@ -382,8 +388,7 @@ public class UserResource {
 	}
 
 	@RequestMapping(value = "/user/{id}/patient", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getPatientUser(@PathVariable Long id,
-			@RequestParam(value = "deviceType", required = true) String deviceType) {
+	public ResponseEntity<?> getPatientUser(@PathVariable Long id) {
 		log.debug("REST request to get PatientUser : {}", id);
 		Optional<PatientUserVO> patientUser = userService.getPatientUser(id);
 		if(patientUser.isPresent()){
@@ -452,20 +457,10 @@ public class UserResource {
     		@RequestParam(value = "deviceType", required = true) String deviceType) {
     	log.debug("REST request to link vest device with patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
-
-		try {
-			List<?> deviceList = null;
-			if(deviceType.equals(VEST)){
-				deviceList = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
-			} else if(deviceType.equals(MONARCH)){
-				deviceList = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
-			}
-
 		try {		
 			List<PatientVestDeviceHistory> deviceList_vest = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
 			List<PatientVestDeviceHistoryMonarch> deviceList_monarch = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
 
-			
 			if(deviceList_vest.isEmpty() && deviceList_monarch.isEmpty()){
      			jsonObject.put("message",MessageConstants.HR_281); //No device linked with patient.
      		} else {
@@ -659,16 +654,8 @@ public class UserResource {
     	JSONObject jsonObject = new JSONObject();
     	try {
 
-    		List<?> protocolList = null;
-    		if(deviceType.equals(VEST)){
-    			protocolList = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);    			
-    		}
-    		else if(deviceType.equals(MONARCH)){
-    			 protocolList = patientProtocolMonarchService.getActiveProtocolsAssociatedWithPatient(id);    			
-    		}
-
-    			List<PatientProtocolData> protocolList_VEST = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);
-    			List<PatientProtocolDataMonarch> protocolList_MONARCH = patientProtocolMonarchService.getActiveProtocolsAssociatedWithPatient(id);
+    		List<PatientProtocolData> protocolList_VEST = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);
+    		List<PatientProtocolDataMonarch> protocolList_MONARCH = patientProtocolMonarchService.getActiveProtocolsAssociatedWithPatient(id);
     		
     		if (protocolList_VEST.isEmpty() && protocolList_MONARCH.isEmpty()) {
 	        	jsonObject.put("message", MessageConstants.HR_245);
@@ -949,17 +936,33 @@ public class UserResource {
 			@PathVariable Long id,
 			@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
 			@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
+			@RequestParam(value="deviceType",required=true) String deviceType,
 			HttpServletResponse response) {
 		
 		Long fromTimestamp = from.toDateTimeAtStartOfDay().getMillis();
 		Long toTimestamp = to.toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59).getMillis();
-		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
-    	try {
-            if(vestDeviceData.size() > 0 ){
-            	excelOutputService.createExcelOutputExcel(response, vestDeviceData);
-            }else{
-            	response.setStatus(204);
-            }
+		
+		try{		
+		
+			if(deviceType.equals("VEST")){
+				List<PatientVestDeviceData>	vestdeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
+				if(vestdeviceData.size() > 0 ){
+	            	excelOutputService.createExcelOutputExcel(response, vestdeviceData);
+	            }else{
+	            	response.setStatus(204);
+	            }
+	
+			}else if(deviceType.equals("MONARCH")){
+				List<PatientVestDeviceDataMonarch> monarchdeviceData = monarchdeviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
+
+				if(monarchdeviceData.size() > 0 ){
+	            	excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
+	            }else{
+	            	response.setStatus(204);
+	            }
+			}		
+		
+
         } catch (Exception ex) {
         	response.setStatus(500);
         } 

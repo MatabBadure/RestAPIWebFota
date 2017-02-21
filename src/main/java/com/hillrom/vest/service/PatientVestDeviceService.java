@@ -54,6 +54,18 @@ public class PatientVestDeviceService {
     @Inject
     private PatientVestDeviceDataRepository deviceDataRepository;
     
+    public String getDeviceType(Long userId){
+		PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(userId);		
+		if(patient != null){
+			PatientInfo checkPatientId = patientInfoRepository.findOneById(patient.getId());
+			if(Objects.nonNull(checkPatientId.getId() ) ){
+				String deviceType = patientVestDeviceRepository.findDeviceType(patient.getId());
+				return deviceType;
+			}
+		}
+		return null;
+	}
+    
     public Object linkVestDeviceWithPatient(Long id, Map<String, Object> deviceData) throws HillromException {
     	User alreadyLinkedPatientuser = new User();
     	List<PatientVestDeviceHistory> assocList = patientVestDeviceRepository.findBySerialNumber(deviceData.get("serialNumber").toString());
@@ -286,6 +298,15 @@ public class PatientVestDeviceService {
 	
 	public PatientVestDeviceHistory getLatestInActiveDeviceFromHistory(String patientId){
 		return patientVestDeviceRepository.findLatestInActiveDeviceByPatientId(patientId, false);
+	}
+	
+	public String getDeviceType(String patientId){		
+		PatientInfo checkPatientId = patientInfoRepository.findOneById(patientId);
+		if(Objects.nonNull(checkPatientId.getId() ) ){
+			String deviceType = patientVestDeviceRepository.findDeviceType(patientId);
+			return deviceType;
+		}
+	return null;
 	}
 	
 	public String getDeviceType(User user){

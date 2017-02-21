@@ -185,23 +185,38 @@ public class NoteResource {
 		}
 		JSONObject jsonObject = new JSONObject();
 		String noteText = paramsMap.get("noteText");
+		String deviceType = paramsMap.get("deviceType");
 		if(Objects.isNull(noteText)){
 			jsonObject.put("ERROR", "Required Param missing [noteText]");
 			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 		}
-		Note note = noteService.update(id, noteText);
-		if(Objects.nonNull(note)){
-			return new ResponseEntity<>(note, HttpStatus.OK);
+		if(deviceType.equals("VEST")){
+			Note note = noteService.update(id, noteText);
+				if(Objects.nonNull(note)){
+					return new ResponseEntity<>(note, HttpStatus.OK);
+				}
+		}
+		else if(deviceType.equals("MONARCH")){
+			NoteMonarch note = noteServiceMonarch.update(id, noteText);
+			if(Objects.nonNull(note)){
+				return new ResponseEntity<>(note, HttpStatus.OK);
+			}
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 	
 	@RequestMapping(value="/notes/{id}", method=RequestMethod.DELETE,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> delete(@PathVariable Long id){
+	public ResponseEntity<?> delete(@PathVariable Long id,
+			@RequestParam(value = "deviceType", required = true) String deviceType){
 		if(!SecurityUtils.isUserInRole(AuthoritiesConstants.PATIENT)){
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		noteService.deleteNote(id);
+		if(deviceType.equals("VEST")){
+			noteService.deleteNote(id);
+		}
+		else if(deviceType.equals("MONARCH")){
+			noteServiceMonarch.deleteNote(id);
+		}
 		return ResponseEntity.ok().build();
 	}
 	

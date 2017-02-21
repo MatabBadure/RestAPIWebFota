@@ -1127,8 +1127,14 @@ public class UserResource {
         	if(deviceType.equals(VEST)){
 	        	statiticsCollection = patientHCPService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);		      
         	}
-        	if(deviceType.equals(MONARCH)){
+        	else if(deviceType.equals(MONARCH)){
         		statiticsCollection = patientHCPMonarchService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
+        	}
+        	else if(deviceType.equals("ALL")){
+        		Collection<StatisticsVO> statiticsCollection_vest =  patientHCPService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
+        		Collection<StatisticsVO> statiticsCollection_monarch = patientHCPMonarchService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
+        		statiticsCollection_vest.addAll(statiticsCollection_monarch);
+        		statiticsCollection = statiticsCollection_vest;
         	}
         	if (statiticsCollection.isEmpty()) {
         		return new ResponseEntity<>(jsonObject, HttpStatus.OK);

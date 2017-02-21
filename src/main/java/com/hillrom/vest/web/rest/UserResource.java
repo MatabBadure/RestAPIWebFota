@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.DefaultEvaluationContextProvider;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -53,6 +55,7 @@ import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceData;
+import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
 import com.hillrom.vest.domain.ProtocolConstants;
@@ -68,6 +71,7 @@ import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.repository.monarch.PatientComplianceMonarchRepository;
+import com.hillrom.vest.repository.monarch.PatientMonarchDeviceDataRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.AdherenceCalculationService;
@@ -150,6 +154,9 @@ public class UserResource {
 
 	@Inject
 	private PatientVestDeviceDataRepository deviceDataRepository;
+	
+	@Inject
+	private PatientMonarchDeviceDataRepository monarchdeviceDataRepository;
 	
 	@Inject
     private PatientHCPService patientHCPService;
@@ -448,17 +455,29 @@ public class UserResource {
     		@RequestParam(value = "deviceType", required = true) String deviceType) {
     	log.debug("REST request to link vest device with patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
-		try {		
-			List<PatientVestDeviceHistory> deviceList_vest = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
-			List<PatientVestDeviceHistoryMonarch> deviceList_monarch = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
+		try {	
 			
-			if(deviceList_vest.isEmpty() && deviceList_monarch.isEmpty()){
+			List<?> deviceList = null;
+    		if(deviceType.equals("VEST")){
+    			deviceList = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
+    		}else if(deviceType.equals("MONARCH")){
+    			deviceList = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
+    		}
+//			List<PatientVestDeviceHistory> deviceList_vest = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
+//			List<PatientVestDeviceHistoryMonarch> deviceList_monarch = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
+			
+			if(deviceList.isEmpty()){
      			jsonObject.put("message",MessageConstants.HR_281); //No device linked with patient.
      		} else {
      			jsonObject.put("message", MessageConstants.HR_282);//Vest/monarch devices linked with patient fetched successfully.
      			//jsonObject.put("deviceType", patientVestDeviceService.getDeviceType(id));
-     			jsonObject.put("VEST_DEVICE_LIST", deviceList_vest);
-     			jsonObject.put("MONARCH_DEVICE_LIST", deviceList_monarch);
+     			if(deviceType.equals("VEST")){
+     				jsonObject.put("devicelist", (List<PatientVestDeviceHistory>) deviceList);
+        		}else if(deviceType.equals("MONARCH")){
+        			jsonObject.put("devicelist", (List<PatientVestDeviceHistoryMonarch>) deviceList);
+        		}
+//     			jsonObject.put("VEST_DEVICE_LIST", deviceList_vest);
+//     			jsonObject.put("MONARCH_DEVICE_LIST", deviceList_monarch);
      		}
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {
@@ -640,19 +659,33 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
-    public ResponseEntity<JSONObject> getAllProtocolsAssociatedWithPatient(@PathVariable Long id) {
+    public ResponseEntity<JSONObject> getAllProtocolsAssociatedWithPatient(@PathVariable Long id,
+    		@RequestParam(value = "deviceType", required = true) String deviceType) {
     	log.debug("REST request to get protocol for patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
     	try {
-    			List<PatientProtocolData> protocolList_VEST = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);
-    			List<PatientProtocolDataMonarch> protocolList_MONARCH = patientProtocolMonarchService.getActiveProtocolsAssociatedWithPatient(id);
+    		List<?> protocolList = null;
+    		if(deviceType.equals("VEST")){
+    			protocolList = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);
+    		}else if(deviceType.equals("MONARCH")){
+    			protocolList = patientProtocolMonarchService.getActiveProtocolsAssociatedWithPatient(id);
+    		}
     		
-    		if (protocolList_VEST.isEmpty() && protocolList_MONARCH.isEmpty()) {
+//    			List<PatientProtocolData> protocolList_VEST = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);
+//    			List<PatientProtocolDataMonarch> protocolList_MONARCH = patientProtocolMonarchService.getActiveProtocolsAssociatedWithPatient(id);
+//    		
+    			    			
+    		if (protocolList.isEmpty()) {
 	        	jsonObject.put("message", MessageConstants.HR_245);
 	        } else {
 	        	jsonObject.put("message", MessageConstants.HR_243);
-	        	jsonObject.put("VEST_DEVICE_PROTOCOL", protocolList_VEST);
-	        	jsonObject.put("MONARCH_DEVICE_PROTOCOL", protocolList_MONARCH);
+	        	if(deviceType.equals("VEST")){
+	        		jsonObject.put("protocol", (List <PatientProtocolData>) protocolList);
+	    		}else if(deviceType.equals("MONARCH")){
+	    			jsonObject.put("protocol", (List <PatientProtocolDataMonarch>) protocolList);
+	    		}
+//	        	jsonObject.put("protocol", protocolList);
+//	        	jsonObject.put("MONARCH_DEVICE_PROTOCOL", protocolList_MONARCH);
 	        }
     		    		
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
@@ -926,17 +959,31 @@ public class UserResource {
 			@PathVariable Long id,
 			@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
 			@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to,
+			@RequestParam(value="deviceType",required=true) String deviceType,
 			HttpServletResponse response) {
 		
 		Long fromTimestamp = from.toDateTimeAtStartOfDay().getMillis();
 		Long toTimestamp = to.toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59).getMillis();
-		List<PatientVestDeviceData> vestDeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
-    	try {
-            if(vestDeviceData.size() > 0 ){
-            	excelOutputService.createExcelOutputExcel(response, vestDeviceData);
-            }else{
-            	response.setStatus(204);
-            }
+		
+		try{		
+		
+			if(deviceType.equals("VEST")){
+				List<PatientVestDeviceData>	vestdeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
+				if(vestdeviceData.size() > 0 ){
+	            	excelOutputService.createExcelOutputExcel(response, vestdeviceData);
+	            }else{
+	            	response.setStatus(204);
+	            }
+	
+			}else if(deviceType.equals("MONARCH")){
+				List<PatientVestDeviceDataMonarch> monarchdeviceData = monarchdeviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
+				if(monarchdeviceData.size() > 0 ){
+	            	excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
+	            }else{
+	            	response.setStatus(204);
+	            }
+			}		
+		
         } catch (Exception ex) {
         	response.setStatus(500);
         } 

@@ -62,7 +62,7 @@ public class PatientVestDeviceMonarchService {
     public Object linkVestDeviceWithPatient(Long id, Map<String, Object> deviceData) throws HillromException {
     	User alreadyLinkedPatientuser = new User();
     	List<PatientVestDeviceHistoryMonarch> assocList = patientMonarchDeviceRepository.findBySerialNumber(deviceData.get("serialNumber").toString());
-    	Optional<PatientVestDeviceHistoryMonarch> assocByBluetoothID = patientMonarchDeviceRepository.findByBluetoothIdAndStatusActive(deviceData.get("bluetoothId").toString());
+    	Optional<PatientVestDeviceHistoryMonarch> assocByBluetoothID = patientMonarchDeviceRepository.findByBluetoothIdAndStatusActive(deviceData.get("wifiId").toString());
     	PatientVestDeviceHistoryMonarch patientVestDeviceAssoc = new PatientVestDeviceHistoryMonarch();
     	if(assocByBluetoothID.isPresent()) {
     		alreadyLinkedPatientuser = (User) assocByBluetoothID.get().getPatient().getUserPatientAssoc().stream().filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser();
@@ -103,8 +103,8 @@ public class PatientVestDeviceMonarchService {
 			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
 		 	if(Objects.nonNull(patientInfo)){
 		 		patientInfo.setSerialNumber(Objects.nonNull(deviceData.get("serialNumber")) ? deviceData.get("serialNumber").toString() : null);
-		 		patientInfo.setBluetoothId(Objects.nonNull(deviceData.get("bluetoothId")) ? deviceData.get("bluetoothId").toString() : null);
-		 		patientInfo.setHubId(Objects.nonNull(deviceData.get("hubId")) ? deviceData.get("hubId").toString() : null);
+		 		patientInfo.setBluetoothId(Objects.nonNull(deviceData.get("wifiId")) ? deviceData.get("wifiId").toString() : null);
+//		 		patientInfo.setHubId(Objects.nonNull(deviceData.get("hubId")) ? deviceData.get("hubId").toString() : null);
 		 		patientInfo.setDeviceAssocDate(DateTime.now());
 		 		patientInfoRepository.save(patientInfo);
 		 		Optional<PatientVestDeviceHistoryMonarch> currentAssoc = patientMonarchDeviceRepository.findOneByPatientIdAndActiveStatus(patientInfo.getId(), true);
@@ -114,7 +114,7 @@ public class PatientVestDeviceMonarchService {
 		 		}
 		 		PatientVestDeviceHistoryMonarch patientVestDeviceAssoc = new PatientVestDeviceHistoryMonarch(
 		 				new PatientVestDevicePK(patientInfo, Objects.nonNull(deviceData.get("serialNumber")) ? deviceData.get("serialNumber").toString() : null), 
-		 				Objects.nonNull(deviceData.get("bluetoothId")) ? deviceData.get("bluetoothId").toString() : null, 
+		 				Objects.nonNull(deviceData.get("wifiId")) ? deviceData.get("wifiId").toString() : null, 
 		 				Objects.nonNull(deviceData.get("hubId")) ? deviceData.get("hubId").toString() : null, true);
 		 		patientMonarchDeviceRepository.saveAndFlush(patientVestDeviceAssoc);
 		 		return patientVestDeviceAssoc;
@@ -130,11 +130,11 @@ public class PatientVestDeviceMonarchService {
 		PatientInfo patientInfo = activeDevice.getPatient();
 	 	if(Objects.nonNull(patientInfo)){
 	 		patientInfo.setSerialNumber(Objects.nonNull(deviceData.get("serialNumber")) ? deviceData.get("serialNumber").toString() : null);
-	 		patientInfo.setBluetoothId(Objects.nonNull(deviceData.get("bluetoothId")) ? deviceData.get("bluetoothId").toString() : null);
+	 		patientInfo.setBluetoothId(Objects.nonNull(deviceData.get("wifiId")) ? deviceData.get("wifiId").toString() : null);
 	 		patientInfo.setHubId(Objects.nonNull(deviceData.get("hubId")) ? deviceData.get("hubId").toString() : null);
 	 		patientInfoRepository.save(patientInfo);
 	 		activeDevice.setSerialNumber(Objects.nonNull(deviceData.get("serialNumber")) ? deviceData.get("serialNumber").toString() : null);
-	 		activeDevice.setBluetoothId(Objects.nonNull(deviceData.get("bluetoothId")) ? deviceData.get("bluetoothId").toString() : null);
+	 		activeDevice.setBluetoothId(Objects.nonNull(deviceData.get("wifiId")) ? deviceData.get("wifiId").toString() : null);
 	 		activeDevice.setHubId(Objects.nonNull(deviceData.get("hubId")) ? deviceData.get("hubId").toString() : null);
 	 		activeDevice.setActive(true);
 	 		patientMonarchDeviceRepository.saveAndFlush(activeDevice);
@@ -304,6 +304,7 @@ public class PatientVestDeviceMonarchService {
 		}
 		return null;
 	}
+	
 	
 }
 

@@ -139,4 +139,24 @@ public class NoteServiceMonarch {
 		return existingNote;
 	}
 	
+	public NoteMonarch update(Long id,String noteText){
+		NoteMonarch existingNote = noteMonarchRepository.findOne(id);
+		if(Objects.nonNull(existingNote)){
+			existingNote.setNote(noteText);
+			noteMonarchRepository.save(existingNote);
+		}
+		return existingNote;	
+	}
+	
+	public void deleteNote(Long id){
+		noteMonarchRepository.delete(id);
+	}
+	
+	public NoteMonarch findMemoNotesForPatientId(Long userId, String patientId){
+		Optional<NoteMonarch> note =  noteMonarchRepository.returnPatientMemo(userId, patientId);
+		if(note.isPresent())
+			return note.get();
+		return null;
+	}
+	
 }

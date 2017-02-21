@@ -159,6 +159,33 @@ public class PatientUserVO {
 			this.serialNumber = patientInfo.getSerialNumber();
 		}
 	}
+	
+	public PatientUserVO(UserExtension user, PatientInfo patientInfo, String deviceType) {
+		this.id = user.getId();
+		this.email = RandomUtil.isValidEmail(user.getEmail())? user.getEmail():null;
+		this.firstName = user.getFirstName();
+		this.lastName = user.getLastName();
+		this.isDeleted = user.isDeleted();
+		this.zipcode = user.getZipcode();
+		this.dob = user.getDob() != null ?user.getDob(): null;
+		this.title = user.getTitle();
+		this.langKey = user.getLangKey();
+		this.middleName = user.getMiddleName();
+		this.mobilePhone = user.getMobilePhone();
+		this.primaryPhone = user.getPrimaryPhone();
+		this.createdAt = user.getCreatedDate();
+		this.isActivated = user.getActivated();
+		this.lastLoggedInAt = user.getLastLoggedInAt();
+		if(null != patientInfo){			
+			this.state = patientInfo.getState();
+			this.hillromId = patientInfo.getHillromId();
+			this.gender = patientInfo.getGender();
+			this.city = patientInfo.getCity();
+			this.address = patientInfo.getAddress();
+			this.serialNumber = patientInfo.getSerialNumber();
+			this.deviceType = deviceType;
+		}
+	}
 
 	public Long getId() {
 		return id;

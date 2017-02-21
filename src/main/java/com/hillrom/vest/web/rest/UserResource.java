@@ -475,9 +475,9 @@ public class UserResource {
      			jsonObject.put("message", MessageConstants.HR_282);//Vest/monarch devices linked with patient fetched successfully.
      			//jsonObject.put("deviceType", patientVestDeviceService.getDeviceType(id));
      			if(deviceType.equals("VEST")){
-     				jsonObject.put("devicelist", (List<PatientVestDeviceHistory>) deviceList);
+     				jsonObject.put("deviceList", (List<PatientVestDeviceHistory>) deviceList);
         		}else if(deviceType.equals("MONARCH")){
-        			jsonObject.put("devicelist", (List<PatientVestDeviceHistoryMonarch>) deviceList);
+        			jsonObject.put("deviceList", (List<PatientVestDeviceHistoryMonarch>) deviceList);
         		}
 //     			jsonObject.put("VEST_DEVICE_LIST", deviceList_vest);
 //     			jsonObject.put("MONARCH_DEVICE_LIST", deviceList_monarch);

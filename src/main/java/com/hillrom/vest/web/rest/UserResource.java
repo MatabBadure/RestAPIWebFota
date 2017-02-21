@@ -1169,10 +1169,16 @@ public class UserResource {
         try {
         	Collection<TreatmentStatisticsVO> statiticsCollection = null;
         	if(deviceType.equals(VEST)){
-        	statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
+        		statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
         	}
-        	if(deviceType.equals(MONARCH)){
-        	statiticsCollection = patientHCPMonarchService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
+        	else if(deviceType.equals(MONARCH)){
+        		statiticsCollection = patientHCPMonarchService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
+        	}
+        	else if(deviceType.equals("ALL")){
+        		Collection<TreatmentStatisticsVO> statiticsCollection_vest =  patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
+        		Collection<TreatmentStatisticsVO> statiticsCollection_monarch = patientHCPMonarchService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
+        		statiticsCollection_vest.addAll(statiticsCollection_monarch);
+        		statiticsCollection = statiticsCollection_vest;
         	}
         	if (statiticsCollection.isEmpty()) {
    	        	return new ResponseEntity<>(HttpStatus.OK);

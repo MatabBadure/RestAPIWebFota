@@ -268,7 +268,8 @@ public class PatientVestDeviceDataMonarch implements Serializable,Comparable<Pat
 	public String getPatientBlueToothAddress(){
 		return "PAT_ID:BT:"+this.bluetoothId;
 	}
-  
+ 
+
 	@Override
 	public int compareTo(PatientVestDeviceDataMonarch o) {
 		return this.getTimestamp().compareTo(o.getTimestamp());

@@ -102,21 +102,18 @@ public class PatientVestDeviceDataResource {
 			
 			ExitStatus exitStatus = deviceDataServiceMonarch.saveData(rawMessage);
 			
-			if(ExitStatus.COMPLETED.equals(exitStatus)){				
-				chargerJsonData.put("RESULT", "OK");
-				chargerJsonData.put("ERROR","");
+			if(ExitStatus.COMPLETED.equals(exitStatus)){
+				chargerJsonData.put("RESULT", "OK - ");
 				return new ResponseEntity<>(chargerJsonData,HttpStatus.CREATED);
 			}
 			else{
-				chargerJsonData.put("RESULT", "NOT OK");				
-				chargerJsonData.put("ERROR","UnKnown Error");
+				chargerJsonData.put("RESULT", "NOT OK - UnKnown Error");
 				return new ResponseEntity<>(chargerJsonData,HttpStatus.PARTIAL_CONTENT);
 			}
 		}catch(Exception e){
 			e.printStackTrace();
 			JSONObject error = new JSONObject();
-			error.put("RESULT", "NOT OK");
-			error.put("ERROR", e.getMessage());
+			error.put("RESULT", "NOT OK - "+e.getMessage());
 			return new ResponseEntity<>(error,HttpStatus.PARTIAL_CONTENT);
 		}
 	}

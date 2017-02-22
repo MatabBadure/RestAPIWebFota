@@ -95,50 +95,28 @@ public class PatientVestDeviceDataResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> receiveDataCharger(@RequestBody(required=true)String rawMessage){
-
-		try{		
-			log.error("Base64 Received Data for ingestion in receiveDataCharger : ",rawMessage);		
-			
+		try{
+			log.error("Base64 Received Data for ingestion in receiveDataCharger : ",rawMessage);
 			
 			JSONObject chargerJsonData = new JSONObject();
 			
 			ExitStatus exitStatus = deviceDataServiceMonarch.saveData(rawMessage);
-			chargerJsonData.put("message",exitStatus.getExitCode());
-			if(ExitStatus.COMPLETED.equals(exitStatus))
+			
+			if(ExitStatus.COMPLETED.equals(exitStatus)){
+				chargerJsonData.put("RESULT", "OK - ");
 				return new ResponseEntity<>(chargerJsonData,HttpStatus.CREATED);
-			else
+			}
+			else{
+				chargerJsonData.put("RESULT", "NOT OK - UnKnown Error");
 				return new ResponseEntity<>(chargerJsonData,HttpStatus.PARTIAL_CONTENT);
-			
-			/*
-			//chargerDataService.getDeviceData(rawMessage);
-			
-			byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
-			
-	        String sout = "";
-	        for(int i=0;i<decoded.length;i++) {
-	        	int val = decoded[i] & 0xFF;
-	        	sout = sout + val + " ";
-	        }
-	        
-	        log.debug("Input Byte Array :"+sout);
-
-			String decoded_string = new String(decoded);
-			log.error("Decoded value is " + decoded_string);
-
-			
-			JSONObject chargerJsonData = new JSONObject();
-			chargerJsonData =   chargerDataService.saveOrUpdateChargerData(rawMessage,decoded_string);
-			JSONObject result = new JSONObject();
-			result.put("RESULT", chargerJsonData.get("RESULT") + " - " + chargerJsonData.get("ERROR"));
-			return new ResponseEntity<>(result,HttpStatus.CREATED);*/
+			}
 		}catch(Exception e){
 			e.printStackTrace();
 			JSONObject error = new JSONObject();
-			error.put("ERROR", e.getMessage());
+			error.put("RESULT", "NOT OK - "+e.getMessage());
 			return new ResponseEntity<>(error,HttpStatus.PARTIAL_CONTENT);
 		}
 	}
-	
 
 	
 	@RequestMapping(value = "/vestdevicedata",

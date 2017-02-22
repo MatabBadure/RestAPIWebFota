@@ -321,6 +321,73 @@ public class ParserUtilMonarch {
         
 	}
 	
+	
+	public static String getDevWifiString(String encoded_string) throws HillromException{
+        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
+        String sout = "";
+        for(int i=0;i<b.length;i++) {
+        	int val = b[i] & 0xFF;
+        	sout = sout + val + " ";
+        }
+        
+        //log.debug("Input Byte Array in devWifi :"+sout);
+
+        
+        String devWifi = "";
+        int start = returnMatch(b,DEV_WIFI);
+        int end = returnMatch(b,DEV_VER)-DEV_VER.length;
+        log.debug("start end : "+ start + " : " + end );
+        if(start < 0 || end < 0){
+        	return null;
+        }
+        byte[] devWifiArray = new byte[end];
+        int j=0;
+        sout = "";
+        for(int i=start;i<end;i++) {
+        	devWifiArray[j++] = b[i];
+        	int val = b[i] & 0xFF;
+        	devWifi = devWifi + val + " ";
+        }
+
+        
+        log.debug("Value of devWifi : "+ devWifi );
+        return devWifi;
+        
+	}
+	
+	public static String getDevVerString(String encoded_string) throws HillromException{
+        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
+        String sout = "";
+        for(int i=0;i<b.length;i++) {
+        	int val = b[i] & 0xFF;
+        	sout = sout + val + " ";
+        }
+        
+        //log.debug("Input Byte Array in devVer :"+sout);
+
+        
+        String devVer = "";
+        int start = returnMatch(b,DEV_VER);
+        int end = returnMatch(b,FRAG_TOTAL_FIELD_NAME)-FRAG_TOTAL_FIELD_NAME.length;
+        log.debug("start end : "+ start + " : " + end );
+        if(start < 0 || end < 0){
+        	return null;
+        }
+        byte[] devVerArray = new byte[end];
+        int j=0;
+        sout = "";
+        for(int i=start;i<end;i++) {
+        	devVerArray[j++] = b[i];
+        	int val = b[i] & 0xFF;
+        	devVer = devVer + val + " ";
+        }
+
+        
+        log.debug("Value of devVer : "+ devVer );
+        return devVer;
+        
+	}
+	
 	public static int getFragTotal(String encoded_string) throws HillromException{
         byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
         String sout = "";

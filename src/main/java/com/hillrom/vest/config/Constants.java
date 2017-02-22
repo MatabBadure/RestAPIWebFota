@@ -326,4 +326,11 @@ public final class Constants {
 	//start:announcement changes
 		public static final String ANNOUNCEMENT_FILE_PATH = "/tmp/visiview-files/";
 	//end:announcement changes
+		
+	//Device Type
+	public static final String VEST = "VEST";
+	public static final String MONARCH = "MONARCH";
+	
+	public static final String INTENSITY = "Intensity";
+	
 }

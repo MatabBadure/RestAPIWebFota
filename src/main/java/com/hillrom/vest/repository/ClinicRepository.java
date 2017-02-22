@@ -110,11 +110,11 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 	
 	@Query(nativeQuery=true,
 			 value=" Select dtype,if(count is null,0,count) from "
-			 		+ " (SELECT type_code as dtype FROM hillromvest_qa.HILLROM_TYPE_CODE_VALUES"
+			 		+ " (SELECT type_code as dtype FROM HILLROM_TYPE_CODE_VALUES"
 			 		+ " where type = 'patient_device_type') a left outer join "
 			 		+ "	(select PDA.device_type as pdtype,count(*) as count "
-			 		+ " from hillromvest_dev.CLINIC_PATIENT_ASSOC CPA "
-			 		+ " left outer join hillromvest_dev.PATIENT_DEVICES_ASSOC PDA "
+			 		+ " from CLINIC_PATIENT_ASSOC CPA "
+			 		+ " left outer join PATIENT_DEVICES_ASSOC PDA "
 			 		+ " on CPA.patient_id=PDA.patient_id "
 			 		+ " where CPA.is_active=1 and clinic_id = :clinicId "
 			 		+ " group by PDA.device_type "

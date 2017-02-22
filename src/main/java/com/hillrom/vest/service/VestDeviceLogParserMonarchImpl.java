@@ -82,10 +82,12 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import net.minidev.json.JSONObject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -96,15 +98,19 @@ import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.domain.PatientVestDeviceRawLogMonarch;
 import com.hillrom.vest.domain.PingPongPing;
+import com.hillrom.vest.repository.PingPongPingRepository;
 import com.hillrom.vest.service.util.ParserUtil;
 import com.hillrom.vest.service.util.monarch.ParserUtilMonarch;
 
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.getEventStringByEventCode;
 import static com.hillrom.vest.config.VestDeviceRawLogOffsetConstants.INFO_PACKET_HEADER;
 
+import javax.inject.Inject;
 @Component
 public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 
+	@Inject
+	private PingPongPingRepository pingpongpingrepository;
 	private final Logger log = LoggerFactory.getLogger(PatientVestDeviceDataDeltaReader.class);
 	
 	private PatientVestDeviceRawLogMonarch createPatientVestDeviceRawLogMonarch(
@@ -188,6 +194,26 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 	}
 	
 	
+	private String injectPingPongData(String deviceData,String slNo,String wifiId,String lteId) {		
+		try{
+			if(deviceData.equals("PING_PONG_PING")) {
+				log.debug("deviceData is PING_PONG_PING" + " Insert into PING_PONG_PING table");
+				PingPongPing pingPongPingData = new PingPongPing();
+				pingPongPingData.setCreatedTime(new DateTime());				
+				if(Objects.isNull(lteId)){
+					pingPongPingData.setDevWifi(wifiId);	
+				}else if(Objects.isNull(wifiId)){
+					pingPongPingData.setDevLte(lteId);
+				}
+				pingPongPingData.setSerialNumber(slNo);
+				pingpongpingrepository.save(pingPongPingData);
+				return "OK";
+			}
+		}catch(Exception e){
+			e.printStackTrace();			
+		}	
+		return null;
+	}
 
 	@Override
 	public List<PatientVestDeviceDataMonarch> parseBase64StringToPatientMonarchDeviceLogEntry(
@@ -234,9 +260,14 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 		byte[] verbt = ParserUtilMonarch.getDevVer(base64String);
         
 		String deviceSerNo = new String(devsnbt);
-		//String wifiSerNo = new String(wifibt);
-		//String deviceVer = new String(verbt);
 				
+		String wifiSerNo = ParserUtilMonarch.getDevWifiString(base64String);
+		String deviceVer = ParserUtilMonarch.getDevVerString(base64String);
+		String lteSerNo = null;
+
+		if(Objects.nonNull(injectPingPongData(deviceData, deviceSerNo, wifiSerNo, lteSerNo))){
+			return monarchDeviceData;
+		}
 		
         byte[] session_index  = Arrays.copyOfRange(deviceDataArray, SESSION_INDEX_LOC, SESSION_INDEX_LOC + SESSION_INDEX_LEN);
         sout = "";
@@ -249,7 +280,7 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
         //String sessionIndexVal =  sout;
         
         log.debug("Combined session_index : "+ ParserUtilMonarch.intergerCombinedFromHex(session_index));
-              
+        Integer sessionIndexVal =  ParserUtilMonarch.intergerCombinedFromHex(session_index);
         byte[] start_time  = Arrays.copyOfRange(deviceDataArray, START_TIME_LOC, START_TIME_LOC + START_TIME_LEN);
         sout = "";
         for(int k=0;k<start_time.length;k++){
@@ -286,30 +317,34 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
         byte[] start_battery_level  = Arrays.copyOfRange(deviceDataArray, START_BATTERY_LEVEL_LOC, START_BATTERY_LEVEL_LOC + START_BATTERY_LEVEL_LEN);
         sout = "";
         for(int k=0;k<start_battery_level.length;k++){
-        	sout = sout + (start_battery_level[k]  & 0xFF) + " ";
+        	sout = sout + (start_battery_level[k]  & 0xFF) ;
         }
         log.debug("start_battery_level : "+ sout );
+        String startBatteryLevel = sout;
         
         byte[] end_battery_level  = Arrays.copyOfRange(deviceDataArray, END_BATTERY_LEVEL_LOC, END_BATTERY_LEVEL_LOC + END_BATTERY_LEVEL_LEN);
         sout = "";
         for(int k=0;k<end_battery_level.length;k++){
-        	sout = sout + (end_battery_level[k]  & 0xFF) + " ";
+        	sout = sout + (end_battery_level[k]  & 0xFF) ;
         }
         log.debug("end_battery_level : "+ sout );
+        String endBatteryLevel = sout;
         
         byte[] number_of_events  = Arrays.copyOfRange(deviceDataArray, NUMBER_OF_EVENTS_LOC, NUMBER_OF_EVENTS_LOC + NUMBER_OF_EVENTS_LEN);
         sout = "";
         for(int k=0;k<number_of_events.length;k++){
-        	sout = sout + (number_of_events[k]  & 0xFF) + " ";
+        	sout = sout + (number_of_events[k]  & 0xFF) ;
         }
         log.debug("number_of_events : "+ sout );
+        String numOfEvents = sout;
         
         byte[] number_of_pods  = Arrays.copyOfRange(deviceDataArray, NUMBER_OF_PODS_LOC, NUMBER_OF_PODS_LOC + NUMBER_OF_PODS_LEN);
         sout = "";
         for(int k=0;k<number_of_pods.length;k++){
-        	sout = sout + (number_of_pods[k]  & 0xFF) + " ";
+        	sout = sout + (number_of_pods[k]  & 0xFF) ;
         }
         log.debug("number_of_pods : "+ sout );
+        String numOfPods = sout;
         
         byte[] hmr_seconds  = Arrays.copyOfRange(deviceDataArray, HMR_SECONDS_LOC, HMR_SECONDS_LOC + HMR_SECONDS_LEN);
         sout = "";
@@ -403,13 +438,23 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 			
 	        monarchDeviceDataVal.setTimestamp(tsTime2);
 	        // todo : hardcoded for temporary
-	        monarchDeviceDataVal.setSequenceNumber(1); 
+	        monarchDeviceDataVal.setSequenceNumber(1);
 	        monarchDeviceDataVal.setEventCode(eventCode);
 	        monarchDeviceDataVal.setSerialNumber(deviceSerNo);
 	        monarchDeviceDataVal.setHmr(hmrSeconds);
 	        monarchDeviceDataVal.setFrequency(Integer.parseInt(freqValue));
 	        monarchDeviceDataVal.setIntensity(Integer.parseInt(intensityVal));
 	        monarchDeviceDataVal.setDuration(Integer.parseInt(durationVal));
+	        
+	        // Bluetooth Id needs to be deleted from Monarch table. which is not applicable in Monarch
+	        monarchDeviceDataVal.setBluetoothId("Dummy_bluetooth_id");
+	        monarchDeviceDataVal.setTherapyIndex(sessionIndexVal);	        
+	        monarchDeviceDataVal.setStartBatteryLevel(Integer.parseInt(startBatteryLevel));
+	        monarchDeviceDataVal.setEndBatteryLevel(Integer.parseInt(endBatteryLevel));
+	        monarchDeviceDataVal.setNumberOfEvents(Integer.parseInt(numOfEvents));
+	        monarchDeviceDataVal.setNumberOfPods(Integer.parseInt(numOfPods));
+	        monarchDeviceDataVal.setDevWifi(wifiSerNo);
+	        monarchDeviceDataVal.setDevVersion(deviceVer);
 	        
 	        monarchDeviceData.add(monarchDeviceDataVal);
 	        

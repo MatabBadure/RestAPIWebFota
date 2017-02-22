@@ -132,7 +132,6 @@ public class PatientVestDeviceDataServiceMonarch {
 
 	public ExitStatus saveData(final String rawData) throws Exception {
 		log.debug("saveData has been called , rawData length",rawData.length());
-
 		
 		validateRequest(rawData);
 		
@@ -158,7 +157,8 @@ public class PatientVestDeviceDataServiceMonarch {
 		String reqParams[] = new String[]{DEVICE_MODEL,DEVICE_SN,
 				DEVICE_WIFI,DEVICE_LTE,DEVICE_VER,FRAG_TOTAL,FRAG_CURRENT,DEVICE_DATA,CRC};
 		if(Objects.isNull(qclJsonData) || qclJsonData.keySet().isEmpty()){
-			throw new HillromException("Missing Params : "+String.join(",",reqParams));
+			//throw new HillromException("Missing Params : "+String.join(",",reqParams));
+			throw new HillromException("Missing Params");
 		}else if(Objects.nonNull(qclJsonData)){
 			//JSONObject allProperties = (JSONObject) qclJsonData.getOrDefault(TWO_NET_PROPERTIES, new JSONObject());
 			List<String> missingParams = RandomUtil.getDifference(Arrays.asList(reqParams), new ArrayList<String>(qclJsonData.keySet()));
@@ -171,12 +171,13 @@ public class PatientVestDeviceDataServiceMonarch {
 			}
 			
 			if(missingParams.size() > 0)
-				throw new HillromException("Missing Params : "+String.join(",",missingParams));
+				//throw new HillromException("Missing Params : "+String.join(",",missingParams));
+				throw new HillromException("Missing Params");
 		}
 		if(!calculateCRC(rawData)){
-			throw new HillromException("CRC checksum error");
+			throw new HillromException("CRC Validation Failed");
 		}
-	}	
+	}
 
 	private boolean calculateCRC(String base64String)
 	{	

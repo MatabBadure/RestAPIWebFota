@@ -446,6 +446,7 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 	        monarchDeviceDataVal.setIntensity(Integer.parseInt(intensityVal));
 	        monarchDeviceDataVal.setDuration(Integer.parseInt(durationVal));
 	        
+	        // Bluetooth Id needs to be deleted from Monarch table. which is not applicable in Monarch
 	        monarchDeviceDataVal.setBluetoothId("Dummy_bluetooth_id");
 	        monarchDeviceDataVal.setTherapyIndex(sessionIndexVal);	        
 	        monarchDeviceDataVal.setStartBatteryLevel(Integer.parseInt(startBatteryLevel));

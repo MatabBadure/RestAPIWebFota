@@ -96,29 +96,32 @@ public class PatientVestDeviceDataResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> receiveDataCharger(@RequestBody(required=true)String rawMessage){
 
-		try{		
-			log.error("Base64 Received Data for ingestion in receiveDataCharger : ",rawMessage);		
+		try{
+			log.error("Base64 Received Data for ingestion in receiveDataCharger : ",rawMessage);
 
-			
+
+
 			
 			JSONObject chargerJsonData = new JSONObject();
 			
 			ExitStatus exitStatus = deviceDataServiceMonarch.saveData(rawMessage);
-			chargerJsonData.put("message",exitStatus.getExitCode());
-			if(ExitStatus.COMPLETED.equals(exitStatus))
-				return new ResponseEntity<>(chargerJsonData,HttpStatus.CREATED);
-			else
-				return new ResponseEntity<>(chargerJsonData,HttpStatus.PARTIAL_CONTENT);
 			
+			if(ExitStatus.COMPLETED.equals(exitStatus)){
+				chargerJsonData.put("RESULT", "OK - ");
+				return new ResponseEntity<>(chargerJsonData,HttpStatus.CREATED);
+			}
+			else{
+				chargerJsonData.put("RESULT", "NOT OK - UnKnown Error");
+				return new ResponseEntity<>(chargerJsonData,HttpStatus.PARTIAL_CONTENT);
 
+			}
 		}catch(Exception e){
 			e.printStackTrace();
 			JSONObject error = new JSONObject();
-			error.put("ERROR", e.getMessage());
+			error.put("RESULT", "NOT OK - "+e.getMessage());
 			return new ResponseEntity<>(error,HttpStatus.PARTIAL_CONTENT);
 		}
 	}
-	
 
 	
 	@RequestMapping(value = "/vestdevicedata",

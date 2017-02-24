@@ -56,11 +56,11 @@ public class PatientProtocolDataAuditMonarchRepository extends
 		   ppd.setDeleted((boolean)value[7]);
 		   //Hill-1994
 		   ppd.setMaxFrequency((Integer)value[8]);
-		   ppd.setMaxPressure((Integer)value[9]);
+		   ppd.setMaxIntensity((Integer)value[19]);
 		   //Hill-1994
 		   ppd.setMinFrequency((Integer)value[10]);
 		   ppd.setMinMinutesPerTreatment((Integer)value[11]);
-		   ppd.setMinPressure((Integer)value[12]);
+		   ppd.setMinIntensity((Integer)value[20]);
 		   ppd.setProtocolKey(value[13].toString());
 		   ppd.setTreatmentLabel(Objects.nonNull(value[14])?value[14].toString():null);
 		   ppd.setTreatmentsPerDay((Integer)value[15]);

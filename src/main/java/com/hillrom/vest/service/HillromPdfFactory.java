@@ -357,7 +357,7 @@ public class HillromPdfFactory{
 			addNewLine(String.valueOf(patientProtocolData.getTreatmentsPerDay()), pdPageContentStream, i+=90, pdRectangle.getHeight() - line);
 			addNewLine(String.valueOf(patientProtocolData.getMinMinutesPerTreatment()), pdPageContentStream, i+=100, pdRectangle.getHeight() - line);
 			addNewLine(String.valueOf(patientProtocolData.getMinFrequency()), pdPageContentStream, i+=100, pdRectangle.getHeight() - line);
-			addNewLine(String.valueOf(patientProtocolData.getMinPressure()), pdPageContentStream, i+=100, pdRectangle.getHeight() - line);
+			addNewLine(String.valueOf(patientProtocolData.getMinIntensity()), pdPageContentStream, i+=100, pdRectangle.getHeight() - line);
 			line += 10;
 			pdPageContentStream.setNonStrokingColor(Color.GRAY);
 			pdPageContentStream.moveTo(document.leftOffSet, pdRectangle.getHeight() - line);

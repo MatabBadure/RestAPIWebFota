@@ -36,6 +36,7 @@ import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.ChargerDataService;
 import com.hillrom.vest.service.PatientVestDeviceDataService;
+import com.hillrom.vest.service.monarch.PatientVestDeviceDataServiceMonarch;
 import com.hillrom.vest.service.util.ParserUtil;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
@@ -47,6 +48,9 @@ public class PatientVestDeviceDataResource {
 	
 	@Inject
 	private PatientVestDeviceDataService deviceDataService;
+	
+	@Inject
+	private PatientVestDeviceDataServiceMonarch deviceDataServiceMonarch;
 	
 	@Inject
 	private ChargerDataService chargerDataService;
@@ -92,38 +96,30 @@ public class PatientVestDeviceDataResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> receiveDataCharger(@RequestBody(required=true)String rawMessage){
 
-		try{		
-			log.error("Base64 Received Data for ingestion in receiveDataCharger : ",rawMessage);		
-			
-			//chargerDataService.getDeviceData(rawMessage);
-			
-			byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
-			
-	        String sout = "";
-	        for(int i=0;i<decoded.length;i++) {
-	        	int val = decoded[i] & 0xFF;
-	        	sout = sout + val + " ";
-	        }
-	        
-	        log.debug("Input Byte Array :"+sout);
 
-			String decoded_string = new String(decoded);
-			log.error("Decoded value is " + decoded_string);
+		try{
+			log.error("Base64 Received Data for ingestion in receiveDataCharger : ",rawMessage);
 
+      JSONObject chargerJsonData = new JSONObject();
 			
-			JSONObject chargerJsonData = new JSONObject();
-			chargerJsonData =   chargerDataService.saveOrUpdateChargerData(rawMessage,decoded_string);
-			JSONObject result = new JSONObject();
-			result.put("RESULT", chargerJsonData.get("RESULT") + " - " + chargerJsonData.get("ERROR"));
-			return new ResponseEntity<>(result,HttpStatus.CREATED);
+			ExitStatus exitStatus = deviceDataServiceMonarch.saveData(rawMessage);
+			
+			if(ExitStatus.COMPLETED.equals(exitStatus)){
+				chargerJsonData.put("RESULT", "OK - ");
+				return new ResponseEntity<>(chargerJsonData,HttpStatus.CREATED);
+			}
+			else{
+				chargerJsonData.put("RESULT", "NOT OK - UnKnown Error");
+				return new ResponseEntity<>(chargerJsonData,HttpStatus.PARTIAL_CONTENT);
+
+			}
 		}catch(Exception e){
 			e.printStackTrace();
 			JSONObject error = new JSONObject();
-			error.put("ERROR", e.getMessage());
+			error.put("RESULT", "NOT OK - "+e.getMessage());
 			return new ResponseEntity<>(error,HttpStatus.PARTIAL_CONTENT);
 		}
 	}
-	
 
 	
 	@RequestMapping(value = "/vestdevicedata",

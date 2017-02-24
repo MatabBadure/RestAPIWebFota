@@ -38,17 +38,23 @@ public class ProtocolConstantsMonarch {
 	
 	@Column(name="max_pressure")
 	private Integer maxPressure;
-
+	
+	@Column(name="min_intensity")
+	private Integer minIntensity;
+	
+	@Column(name="max_intensity")
+	private Integer maxIntensity;
+	
 	@Transient
 	private Integer minDuration;
 
 	public ProtocolConstantsMonarch(Integer maxFrequency, Integer minFrequency,
-			Integer maxPressure, Integer minPressure, Integer treatmentsPerDay,
+			Integer maxIntensity, Integer minIntensity, Integer treatmentsPerDay,
 			Integer minDuration) {
 		this.maxFrequency = maxFrequency;
 		this.minFrequency = minFrequency;
-		this.maxPressure = maxPressure;
-		this.minPressure = minPressure;
+		this.maxIntensity = maxIntensity;
+		this.minIntensity = minIntensity;
 		this.treatmentsPerDay = treatmentsPerDay;
 		this.minDuration = minDuration;
 		this.minMinutesPerTreatment = minDuration/treatmentsPerDay;
@@ -122,6 +128,23 @@ public class ProtocolConstantsMonarch {
 	public Integer getMinDuration() {
 		return this.minDuration;
 	}
+	
+	public Integer getMinIntensity() {
+		return minIntensity;
+	}
+
+	public void setMinIntensity(Integer minIntensity) {
+		this.minIntensity = minIntensity;
+	}
+
+	public Integer getMaxIntensity() {
+		return maxIntensity;
+	}
+
+	public void setMaxIntensity(Integer maxIntensity) {
+		this.maxIntensity = maxIntensity;
+	}
+
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()

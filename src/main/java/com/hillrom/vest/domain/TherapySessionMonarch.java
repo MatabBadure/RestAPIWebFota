@@ -63,6 +63,9 @@ public class TherapySessionMonarch implements Comparable<TherapySessionMonarch>{
 	@Column(name="pressure")
 	private Integer pressure;
 	
+	@Column(name="intensity")
+	private Integer intensity;
+	
 	@Column(name="duration_in_minutes")
 	private int durationInMinutes;
 	
@@ -83,6 +86,28 @@ public class TherapySessionMonarch implements Comparable<TherapySessionMonarch>{
 	
     @Column(name = "bluetooth_id")
 	private String bluetoothId;
+    
+    @Column(name="therapy_index")
+	private Integer therapyIndex;
+    
+    @Column(name="start_battery_level")
+	private Integer startBatteryLevel;
+    
+    @Column(name="end_battery_level")
+	private Integer endBatteryLevel;
+    
+    @Column(name="number_of_events")
+	private Integer numberOfEvents;
+    
+    @Column(name="number_of_pods")
+	private Integer numberOfPods;
+    
+    @Column(name = "dev_wifi")
+	private String devWifi;
+    
+    @Column(name = "dev_version")
+	private String devVersion;
+    
 
 	public Long getId() {
 		return id;
@@ -203,6 +228,62 @@ public class TherapySessionMonarch implements Comparable<TherapySessionMonarch>{
 	public void setHmr(Double hmr) {
 		this.hmr = hmr;
 	}
+	
+	public Integer getTherapyIndex() {
+		return therapyIndex;
+	}
+
+	public void setTherapyIndex(Integer therapyIndex) {
+		this.therapyIndex = therapyIndex;
+	}
+
+	public Integer getStartBatteryLevel() {
+		return startBatteryLevel;
+	}
+
+	public void setStartBatteryLevel(Integer startBatteryLevel) {
+		this.startBatteryLevel = startBatteryLevel;
+	}
+
+	public Integer getEndBatteryLevel() {
+		return endBatteryLevel;
+	}
+
+	public void setEndBatteryLevel(Integer endBatteryLevel) {
+		this.endBatteryLevel = endBatteryLevel;
+	}
+
+	public Integer getNumberOfEvents() {
+		return numberOfEvents;
+	}
+
+	public void setNumberOfEvents(Integer numberOfEvents) {
+		this.numberOfEvents = numberOfEvents;
+	}
+
+	public Integer getNumberOfPods() {
+		return numberOfPods;
+	}
+
+	public void setNumberOfPods(Integer numberOfPods) {
+		this.numberOfPods = numberOfPods;
+	}
+
+	public String getDevWifi() {
+		return devWifi;
+	}
+
+	public void setDevWifi(String devWifi) {
+		this.devWifi = devWifi;
+	}
+
+	public String getDevVersion() {
+		return devVersion;
+	}
+
+	public void setDevVersion(String devVersion) {
+		this.devVersion = devVersion;
+	}
 
 	@Override
 	public String toString() {
@@ -256,6 +337,14 @@ public class TherapySessionMonarch implements Comparable<TherapySessionMonarch>{
 
 	public void setBluetoothId(String bluetoothId) {
 		this.bluetoothId = bluetoothId;
+	}	
+	
+	public Integer getIntensity() {
+		return intensity;
+	}
+
+	public void setIntensity(Integer intensity) {
+		this.intensity = intensity;
 	}
 
 	@Override

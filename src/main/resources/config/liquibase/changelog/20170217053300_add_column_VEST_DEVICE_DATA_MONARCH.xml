@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+	
+	<!-- Added new fields to PATIENT_VEST_DEVICE_DATA_MONARCH table. -->
+	<changeSet author="LnT Technology Services" id="20170217053300">
+		<addColumn tableName="PATIENT_VEST_DEVICE_DATA_MONARCH">
+			<column name="therapy_index" type="integer" />
+		</addColumn>
+		<addColumn tableName="PATIENT_VEST_DEVICE_DATA_MONARCH">	
+			<column name="start_battery_level" type="integer" />
+		</addColumn>
+		<addColumn tableName="PATIENT_VEST_DEVICE_DATA_MONARCH">
+			<column name="end_battery_level" type="integer" />
+		</addColumn>
+		<addColumn tableName="PATIENT_VEST_DEVICE_DATA_MONARCH">
+			<column name="number_of_events" type="integer" />
+		</addColumn>
+		<addColumn tableName="PATIENT_VEST_DEVICE_DATA_MONARCH">
+			<column name="number_of_pods" type="integer" />
+        </addColumn>
+		<addColumn tableName="PATIENT_VEST_DEVICE_DATA_MONARCH">
+        	<column name="dev_wifi" type="varchar(255)"/>
+        </addColumn>						 
+		<addColumn tableName="PATIENT_VEST_DEVICE_DATA_MONARCH">
+        	<column name="dev_lte" type="varchar(255)"/>
+        </addColumn>
+        <addColumn tableName="PATIENT_VEST_DEVICE_DATA_MONARCH">
+        	<column name="dev_version" type="varchar(255)"/>
+        </addColumn>   
+	</changeSet>
+	
+</databaseChangeLog>

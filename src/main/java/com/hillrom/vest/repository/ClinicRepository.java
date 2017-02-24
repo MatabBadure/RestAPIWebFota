@@ -107,4 +107,17 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 	@Query("from Clinic clinic where clinic.id in :clinicIds order by clinic.adherenceSettingModifiedDte desc")
 	List<Clinic> findPatientLastModifiedAdherenceSetting(@Param("clinicIds")List<String> clinicIds);
   //start:HILL-2004
+	
+	@Query(nativeQuery=true,
+			 value=" Select dtype,if(count is null,0,count) from "
+			 		+ " (SELECT type_code as dtype FROM HILLROM_TYPE_CODE_VALUES"
+			 		+ " where type = 'patient_device_type') a left outer join "
+			 		+ "	(select PDA.device_type as pdtype,count(*) as count "
+			 		+ " from CLINIC_PATIENT_ASSOC CPA "
+			 		+ " left outer join PATIENT_DEVICES_ASSOC PDA "
+			 		+ " on CPA.patient_id=PDA.patient_id "
+			 		+ " where CPA.is_active=1 and clinic_id = :clinicId "
+			 		+ " group by PDA.device_type "
+			 		+ " order by count desc) b on a.dtype = b.pdtype " )
+	List<Object[]> findByDeviceTypeAndPatientCount(@Param("clinicId")String clinicId);
 }

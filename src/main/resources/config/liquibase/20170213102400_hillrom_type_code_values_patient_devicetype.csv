@@ -1,0 +1,4 @@
+id,type,type_code,type_code_value
+55,patient_device_type,VEST,VEST
+56,patient_device_type,MONARCH,MONARCH
+57,patient_device_type,ALL,ALL

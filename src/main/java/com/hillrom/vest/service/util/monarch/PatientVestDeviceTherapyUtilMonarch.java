@@ -427,7 +427,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 		therapySession.setBluetoothId(groupEntries.get(0).getBluetoothId());
 		therapySession.setDate(LocalDate.fromDateFields(new Date(timestamp)));
 		therapySession.setFrequency(metricsMap.get(FREQUENCY));
-		therapySession.setPressure(metricsMap.get(PRESSURE));
+		therapySession.setIntensity(metricsMap.get(INTENSITY));
 		therapySession.setDurationInMinutes(metricsMap.get(DURATION));
 		therapySession.setNormalCaughPauses(metricsMap.get(NORMAL_COUGH_PAUSES));
 		therapySession.setProgrammedCaughPauses(metricsMap.get(PROGRAMMED_COUGH_PAUSES));

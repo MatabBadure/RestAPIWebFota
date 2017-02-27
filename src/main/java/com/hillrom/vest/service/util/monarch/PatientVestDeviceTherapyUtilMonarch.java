@@ -404,16 +404,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 
 	private static boolean isStartEventForTherapySessionMonarch(String eventCode) {
 		return EVENT_CODE_NORMAL_START_MONARCH.equals(eventCode) ||
-				EVENT_CODE_PROGRAM_STEP1_START_MONARCH.equals(eventCode); 
-				
-				/*||
-				EVENT_CODE_PROGRAM_STEP2_START_MONARCH.equals(eventCode) ||
-				EVENT_CODE_PROGRAM_STEP3_START_MONARCH.equals(eventCode) ||
-				EVENT_CODE_PROGRAM_STEP4_START_MONARCH.equals(eventCode) ||
-				EVENT_CODE_PROGRAM_STEP5_START_MONARCH.equals(eventCode) ||
-				EVENT_CODE_PROGRAM_STEP6_START_MONARCH.equals(eventCode) ||
-				EVENT_CODE_PROGRAM_STEP7_START_MONARCH.equals(eventCode) ||
-				EVENT_CODE_PROGRAM_STEP8_START_MONARCH.equals(eventCode);*/
+				EVENT_CODE_PROGRAM_STEP1_START_MONARCH.equals(eventCode);
 	}
 
 	public static TherapySessionMonarch assignTherapyMatrics(

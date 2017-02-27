@@ -72,7 +72,7 @@ public class PatientProtocolDataAuditMonarchService extends AuditableService<Pat
 				revision.addProtocol(ProtocolDataMonarchVOBuilder.convertProtocolDataMonarchToVO(protocol));
 			}
 			updateLatestRevision(protocolRevMap, lastModifiedDate);
-			if(isDeleted){
+ 			if(isDeleted){
 				ProtocolRevisionMonarchVO nextRevision = new ProtocolRevisionMonarchVO(revisionCreatedDate, null);
 				nextRevision.addProtocol(ProtocolDataMonarchVOBuilder.convertProtocolConstantsMonarchToVO(defaultProtocol));
 				protocolRevMap.put(revisionCreatedDate.plusSeconds(1),nextRevision);

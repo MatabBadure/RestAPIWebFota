@@ -9,7 +9,7 @@ spring:
         active: dev
     datasource:
         dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
-        url: jdbc:mysql://hillromvest.ckyg8erbez54.us-west-2.rds.amazonaws.com:3306/hillromvest_dev?zeroDateTimeBehavior=convertToNull
+        url: jdbc:mysql://indoffshre02v.hillromvest.com:3306/hillromvest_prod?zeroDateTimeBehavior=convertToNull
         databaseName:
         serverName:
         username: root

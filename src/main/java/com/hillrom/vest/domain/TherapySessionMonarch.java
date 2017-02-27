@@ -60,9 +60,6 @@ public class TherapySessionMonarch implements Comparable<TherapySessionMonarch>{
 	@Column(name="frequency")
 	private Integer frequency;
 	
-	@Column(name="pressure")
-	private Integer pressure;
-	
 	@Column(name="intensity")
 	private Integer intensity;
 	
@@ -181,14 +178,6 @@ public class TherapySessionMonarch implements Comparable<TherapySessionMonarch>{
 		this.frequency = frequency;
 	}
 
-	public Integer getPressure() {
-		return pressure;
-	}
-
-	public void setPressure(Integer pressure) {
-		this.pressure = pressure;
-	}
-
 	public int getDurationInMinutes() {
 		return durationInMinutes;
 	}
@@ -290,7 +279,7 @@ public class TherapySessionMonarch implements Comparable<TherapySessionMonarch>{
 		return "TherapySession [id=" + id + ", date=" + date
 				+ ", sessionNo=" + sessionNo + ", sessionType=" + sessionType
 				+ ", startTime=" + startTime + ", endTime=" + endTime
-				+ ", frequency=" + frequency + ", pressure=" + pressure
+				+ ", frequency=" + frequency + ", intensity=" + intensity
 				+ ", durationInMinutes=" + durationInMinutes
 				+ ", programmedCaughPauses=" + programmedCaughPauses
 				+ ", normalCaughPauses=" + normalCaughPauses

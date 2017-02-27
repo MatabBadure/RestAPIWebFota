@@ -10,8 +10,8 @@ public class ProtocolDataMonarchVOBuilder {
 	public static ProtocolDataMonarchVO convertProtocolDataMonarchToVO(PatientProtocolDataMonarch protocolData){
 		return new ProtocolDataMonarchVO(protocolData.getId(),protocolData.getType(),
 				protocolData.getTreatmentsPerDay(), protocolData.getMinMinutesPerTreatment(),
-				protocolData.getTreatmentLabel(), protocolData.getMinFrequency(), protocolData.getMaxFrequency(), protocolData.getMinPressure(),
-				protocolData.getMaxPressure());
+				protocolData.getTreatmentLabel(), protocolData.getMinFrequency(), protocolData.getMaxFrequency(), protocolData.getMinIntensity(),
+				protocolData.getMaxIntensity());
 	}
 	
 	public static ProtocolDataMonarchVO convertProtocolConstantsMonarchToVO(ProtocolConstantsMonarch protocolData){

@@ -22,4 +22,6 @@ public interface PatientMonarchDeviceDataRepository extends
 	public List<PatientVestDeviceDataMonarch> findByPatientUserIdAndTimestampBetween(Long id,Long from,Long to);
 	
 	public PatientVestDeviceDataMonarch findTop1ByPatientUserIdAndSerialNumberOrderByHmrDesc(Long id,String serialNumber);
+	
+	public List<PatientVestDeviceDataMonarch> findByPatientUserIdAndSerialNumberAndTherapyIndex(Long id,String serialNumber,Integer therapyIndex);
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+	
+	<!-- Added new field to PATIENT_VEST_DEVICE_RAW_LOGS_MONARCH table. -->
+	<changeSet author="LnT Technology Services" id="20170227143200">
+		<addColumn tableName="PATIENT_VEST_DEVICE_RAW_LOGS_MONARCH">			
+			<column name="created_time" type="timestamp" defaultValueDate="${now}"/>
+		</addColumn>		
+	</changeSet>
+	
+</databaseChangeLog>

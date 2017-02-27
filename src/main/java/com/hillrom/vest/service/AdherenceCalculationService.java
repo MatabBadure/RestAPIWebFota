@@ -326,29 +326,42 @@ public class AdherenceCalculationService {
 					
 					String deviceType = patientVestDeviceService.getDeviceType(user);
 					
+					// flag for adherence setting / existing reset of score for adherence setting  
+					int resetFlagForSetting = 0;
+					
+					if( ( deviceType.equals("VEST") && Objects.nonNull(startDate) ) || 
+							( deviceType.equals("MONARCH") && Objects.nonNull(startDateMonarch) ) ||
+							( deviceType.equals("ALL") && Objects.nonNull(startDate) && Objects.nonNull(startDateMonarch) ) ){
+						// To identify unique for existing reset for the patient
+						resetFlagForSetting = 2;
+					}
+					
+					
 					if((deviceType.equals("VEST") || deviceType.equals("ALL")) && Objects.isNull(startDate)){
 						PatientNoEvent noEvent = userIdNoEventMap.get(user.getId());
-
+						
 						if(Objects.nonNull(noEvent) &&  Objects.nonNull(noEvent.getFirstTransmissionDate())){
 							startDate = noEvent.getFirstTransmissionDate();
 						}
+						
 					}else if( (deviceType.equals("MONARCH") || deviceType.equals("ALL")) && Objects.isNull(startDateMonarch)){
 						PatientNoEventMonarch noEventMonarch = userIdNoEventMapMonarch.get(user.getId());						
 						
 						if(Objects.nonNull(noEventMonarch) &&  Objects.nonNull(noEventMonarch.getFirstTransmissionDate())){
 							startDateMonarch = noEventMonarch.getFirstTransmissionDate();
 						}
+						
 					}
 					
 					if(Objects.nonNull(startDate) || Objects.nonNull(startDateMonarch)){
 						PatientInfo patient = userService.getPatientInfoObjFromPatientUser(user);
 						if(deviceType.equals("VEST")){
-							adherenceResetForPatient(user.getId(), patient.getId(), startDate, DEFAULT_COMPLIANCE_SCORE, 0);
+							adherenceResetForPatient(user.getId(), patient.getId(), startDate, DEFAULT_COMPLIANCE_SCORE, resetFlagForSetting);
 						}else if(deviceType.equals("MONARCH")){
-							adherenceCalculationServiceMonarch.adherenceResetForPatient(user.getId(), patient.getId(), startDateMonarch, DEFAULT_COMPLIANCE_SCORE, 0);
+							adherenceCalculationServiceMonarch.adherenceResetForPatient(user.getId(), patient.getId(), startDateMonarch, DEFAULT_COMPLIANCE_SCORE, resetFlagForSetting);
 						}else if(deviceType.equals("ALL")){
-							adherenceResetForPatient(user.getId(), patient.getId(), startDate, DEFAULT_COMPLIANCE_SCORE, 0);
-							adherenceCalculationServiceMonarch.adherenceResetForPatient(user.getId(), patient.getId(), startDateMonarch, DEFAULT_COMPLIANCE_SCORE, 0);
+							adherenceResetForPatient(user.getId(), patient.getId(), startDate, DEFAULT_COMPLIANCE_SCORE, resetFlagForSetting);
+							adherenceCalculationServiceMonarch.adherenceResetForPatient(user.getId(), patient.getId(), startDateMonarch, DEFAULT_COMPLIANCE_SCORE, resetFlagForSetting);
 						}
 					}
 				}
@@ -455,7 +468,7 @@ public class AdherenceCalculationService {
 							
 					// Check whether the adherence start days is the compliance date
 					if(adherenceStartDate.equals(currentCompliance.getDate())){
-						if(resetFlag == 1){
+						if(resetFlag == 1 || (resetFlag == 2 && adherenceSettingDay != 1)){
 							notificationService.createOrUpdateNotification(patientUser, patient, userId,
 																		currentCompliance.getDate(), ADHERENCE_SCORE_RESET, false, existingNotificationofTheDay);
 						}else{
@@ -748,7 +761,7 @@ public class AdherenceCalculationService {
 			return newCompliance;
 		}
 		
-		if(resetFlag == 1){
+		if(resetFlag == 1 || (resetFlag == 2 && adherenceSettingDay != 1)){
 			notification_type = initialPrevScoreFor1Day == 0 ? notification_type : ADHERENCE_SCORE_RESET;
 		}			
 		

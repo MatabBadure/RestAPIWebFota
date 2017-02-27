@@ -95,8 +95,12 @@ public class PatientVestDeviceDataResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> receiveDataCharger(@RequestBody(required=true)String rawMessage){
+
 		try{
 			log.error("Base64 Received Data for ingestion in receiveDataCharger : ",rawMessage);
+
+
+
 			
 			JSONObject chargerJsonData = new JSONObject();
 			
@@ -109,6 +113,7 @@ public class PatientVestDeviceDataResource {
 			else{
 				chargerJsonData.put("RESULT", "NOT OK - UnKnown Error");
 				return new ResponseEntity<>(chargerJsonData,HttpStatus.PARTIAL_CONTENT);
+
 			}
 		}catch(Exception e){
 			e.printStackTrace();

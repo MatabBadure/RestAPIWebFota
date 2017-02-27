@@ -32,6 +32,7 @@ public class PatientVestDeviceRawLogModelConstants {
 	public static final String DEVICE_VER = "devVer";
 	public static final String CRC = "crc";
 	public static final String DEVICE_MODEL = "device_model_type";
+
 	
 	public static final String FRAG_TOTAL = "fragTotal";
 	public static final String FRAG_CURRENT = "fragCurrent";
@@ -99,4 +100,5 @@ public class PatientVestDeviceRawLogModelConstants {
 	public static final byte[] DEV_WIFI = new byte[]{38,100,101,118,87,73,70,73,61};
 	public static final byte[] DEV_LTE = new byte[]{38,100,101,118,76,84,69,61}; // TO BE MODIFIED ACCORDING TO THE REAL DATA
 	public static final byte[] DEV_VER = new byte[]{38,100,101,118,86,101,114,61};
+
 }

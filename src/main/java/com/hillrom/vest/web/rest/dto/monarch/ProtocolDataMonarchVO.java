@@ -18,14 +18,14 @@ public class ProtocolDataMonarchVO {
 	
 	private Integer maxFrequency;
 	
-	private Integer minPressure;
+	private Integer minIntensity;
 	
-	private Integer maxPressure;
+	private Integer maxIntensity;
 	
 	public ProtocolDataMonarchVO(String id,String type, int treatmentsPerDay, int minMinutesPerTreatment,
 			String treatmentLabel,Integer minFrequency,
-			Integer maxFrequency, Integer minPressure,
-			Integer maxPressure) {
+			Integer maxFrequency, Integer minIntensity,
+			Integer maxIntensity) {
 		super();
 		this.id = id;
 		this.type = type;
@@ -34,8 +34,8 @@ public class ProtocolDataMonarchVO {
 		this.treatmentLabel = treatmentLabel;
 		this.minFrequency = minFrequency;
 		this.maxFrequency = maxFrequency;
-		this.minPressure = minPressure;
-		this.maxPressure = maxPressure;
+		this.minIntensity = minIntensity;
+		this.maxIntensity = maxIntensity;
 	}
 
 	
@@ -95,20 +95,20 @@ public class ProtocolDataMonarchVO {
 		this.maxFrequency = maxFrequency;
 	}
 
-	public Integer getMinPressure() {
-		return minPressure;
+	public Integer getMinIntensity() {
+		return minIntensity;
 	}
 
-	public void setMinPressure(Integer minPressure) {
-		this.minPressure = minPressure;
+	public void setMinPressure(Integer minIntensity) {
+		this.minIntensity = minIntensity;
 	}
 
-	public Integer getMaxPressure() {
-		return maxPressure;
+	public Integer getMaxIntensity() {
+		return maxIntensity;
 	}
 
-	public void setMaxPressure(Integer maxPressure) {
-		this.maxPressure = maxPressure;
+	public void setMaxPressure(Integer maxIntensity) {
+		this.maxIntensity = maxIntensity;
 	}
 
 	@Override
@@ -118,8 +118,8 @@ public class ProtocolDataMonarchVO {
 				+ ", minMinutesPerTreatment=" + minMinutesPerTreatment
 				+ ", treatmentLabel=" + treatmentLabel + ", minFrequency="
 				+ minFrequency + ", maxFrequency=" + maxFrequency
-				+ ", minPressure=" + minPressure + ", maxPressure="
-				+ maxPressure + "]";
+				+ ", minIntensity=" + minIntensity + ", maxIntensity="
+				+ maxIntensity + "]";
 	}
 
 
@@ -131,12 +131,12 @@ public class ProtocolDataMonarchVO {
 		result = prime * result
 				+ ((maxFrequency == null) ? 0 : maxFrequency.hashCode());
 		result = prime * result
-				+ ((maxPressure == null) ? 0 : maxPressure.hashCode());
+				+ ((maxIntensity == null) ? 0 : maxIntensity.hashCode());
 		result = prime * result
 				+ ((minFrequency == null) ? 0 : minFrequency.hashCode());
 		result = prime * result + minMinutesPerTreatment;
 		result = prime * result
-				+ ((minPressure == null) ? 0 : minPressure.hashCode());
+				+ ((minIntensity == null) ? 0 : minIntensity.hashCode());
 		result = prime * result
 				+ ((treatmentLabel == null) ? 0 : treatmentLabel.hashCode());
 		result = prime * result + treatmentsPerDay;
@@ -164,10 +164,10 @@ public class ProtocolDataMonarchVO {
 				return false;
 		} else if (!maxFrequency.equals(other.maxFrequency))
 			return false;
-		if (maxPressure == null) {
-			if (other.maxPressure != null)
+		if (maxIntensity == null) {
+			if (other.maxIntensity != null)
 				return false;
-		} else if (!maxPressure.equals(other.maxPressure))
+		} else if (!maxIntensity.equals(other.maxIntensity))
 			return false;
 		if (minFrequency == null) {
 			if (other.minFrequency != null)
@@ -176,10 +176,10 @@ public class ProtocolDataMonarchVO {
 			return false;
 		if (minMinutesPerTreatment != other.minMinutesPerTreatment)
 			return false;
-		if (minPressure == null) {
-			if (other.minPressure != null)
+		if (minIntensity == null) {
+			if (other.minIntensity != null)
 				return false;
-		} else if (!minPressure.equals(other.minPressure))
+		} else if (!minIntensity.equals(other.minIntensity))
 			return false;
 		if (treatmentLabel == null) {
 			if (other.treatmentLabel != null)

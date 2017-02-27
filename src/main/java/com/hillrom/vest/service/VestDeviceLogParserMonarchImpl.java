@@ -118,6 +118,7 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 		PatientVestDeviceRawLogMonarch patientVestDeviceRawLogMonarch = new PatientVestDeviceRawLogMonarch();
 		patientVestDeviceRawLogMonarch.setRawMessage(rawMessageMonarch);
 
+		// TO BE ELEMINATED : CUC version no longer used in Monarch
 		patientVestDeviceRawLogMonarch.setCucVersion(ParserUtilMonarch.getValueFromQclJsonDataMonarch(
 				qclJsonDataMonarch, DEVICE_VER));
 
@@ -162,13 +163,14 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 		
 		String decodedString = decodeData(rawMessageMonarch);
 		
-		JSONObject qclJsonDataMonarch = ParserUtil.getChargerQclJsonDataFromRawMessage(decodedString);
+		JSONObject jsonDataMonarch = ParserUtil.getChargerJsonDataFromRawMessage(decodedString);
 		
 		/*String hub_timestamp = ParserUtil.getValueFromQclJsonData(qclJsonDataMonarch,HUB_RECEIVE_TIME);
 		String sp_timestamp = ParserUtil.getValueFromQclJsonData(qclJsonDataMonarch,SP_RECEIVE_TIME);*/
 
-		PatientVestDeviceRawLogMonarch patientVestDeviceRawLogMonarch = createPatientVestDeviceRawLogMonarch(rawMessageMonarch,qclJsonDataMonarch);
+		PatientVestDeviceRawLogMonarch patientVestDeviceRawLogMonarch = createPatientVestDeviceRawLogMonarch(rawMessageMonarch,jsonDataMonarch);
 		
+		// TO BE ELEMINATED : Device Address (Bluetooth)  no longer used in Monarch
 		patientVestDeviceRawLogMonarch.setDeviceAddress("Hardcoded_Dev_address");
 
 		try {
@@ -252,19 +254,26 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
     		}
         }*/
         
-		int x = ParserUtilMonarch.getFragTotal(base64String);
-		int y = ParserUtilMonarch.getFragCurrent(base64String);
+		int fragTotal = ParserUtilMonarch.getFragTotal(base64String);
+		int fragCurr = ParserUtilMonarch.getFragCurrent(base64String);
 		
 		byte[] devsnbt = ParserUtilMonarch.getDevSN(base64String);
-		byte[] wifibt = ParserUtilMonarch.getDevWifi(base64String);
-		byte[] verbt = ParserUtilMonarch.getDevVer(base64String);
+		
+		// TO BE ELIMINATED : Not used in monarch
+		//byte[] wifibt = ParserUtilMonarch.getDevWifi(base64String);
+		//byte[] verbt = ParserUtilMonarch.getDevVer(base64String);
         
 		String deviceSerNo = new String(devsnbt);
-				
-		String wifiSerNo = ParserUtilMonarch.getDevWifiString(base64String);
+		
+		// Flag 1 for WIFI
+		String wifiSerNo = ParserUtilMonarch.getDevWifiOrLteString(base64String, 1);
+		
+		//String lteSerNo = null;
+		// Flag 2 for LTE
+		String lteSerNo = ParserUtilMonarch.getDevWifiOrLteString(base64String, 2);
+		
 		String deviceVer = ParserUtilMonarch.getDevVerString(base64String);
-		String lteSerNo = null;
-
+		
 		if(Objects.nonNull(injectPingPongData(deviceData, deviceSerNo, wifiSerNo, lteSerNo))){
 			return monarchDeviceData;
 		}
@@ -294,7 +303,8 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
         int start_hour =  start_time[3];
         int start_minute =  start_time[4];
         int start_second =  start_time[5];
-        
+
+        // TO BE ELIMINATED - If not required
         byte[] end_time  = Arrays.copyOfRange(deviceDataArray, END_TIME_LOC, END_TIME_LOC + END_TIME_LEN);        
         sout = "";
         for(int k=0;k<end_time.length;k++){
@@ -364,7 +374,9 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 	        for(int k=0;k<event_timestamp.length;k++){
 	        	sout = sout + (event_timestamp[k]  & 0xFF) + " ";
 	        }
-	        String eventTimestamp = sout;	        
+	        
+	        // TO BE ELIMINATED
+	        //String eventTimestamp = sout;	        
 	        
 	        byte[] event_code  = Arrays.copyOfRange(deviceDataArray, i+EVENT_CODE_LOC-1, (i+EVENT_CODE_LOC-1) + EVENT_CODE_LEN);        
 	        sout = "";
@@ -398,20 +410,6 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 	        
 	        PatientVestDeviceDataMonarch monarchDeviceDataVal = new PatientVestDeviceDataMonarch();
 	        
-	        
-	       /* SimpleDateFormat datetimeFormatter1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");	        
-	        Date lFromDate1 = null;
-			try {
-				lFromDate1 = datetimeFormatter1.parse(new String(event_timestamp));
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}        
-			Long eventTS = lFromDate1.getTime();
-			
-
-	        
-	        String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());*/
-	        
 	        int eventHour = event_timestamp[0];
 	        int eventMin = event_timestamp[1];
 	        int eventSec = event_timestamp[2];
@@ -420,24 +418,9 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 	        
 	        java.sql.Timestamp timestamp = java.sql.Timestamp.valueOf(dateValue);
 	        long tsTime2 = timestamp.getTime();
-	        
-	        /*DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-	        Date date = null;
-			try {
-				date = dateFormat.parse("23/09/2007 15:30:30");
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	        long time = date.getTime();	        */
-	        
-	        /*java.util.Date today = new java.util.Date();
-	        java.sql.Timestamp ts1 = new java.sql.Timestamp(today.getTime());
-	        long tsTime1 = ts1.getTime();
-	        */
 			
 	        monarchDeviceDataVal.setTimestamp(tsTime2);
-	        // todo : hardcoded for temporary
+	        // TO BE ELIMINATED : Not used in monarch todo : hardcoded for temporary
 	        monarchDeviceDataVal.setSequenceNumber(1);
 	        monarchDeviceDataVal.setEventCode(eventCode);
 	        monarchDeviceDataVal.setSerialNumber(deviceSerNo);
@@ -446,8 +429,12 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 	        monarchDeviceDataVal.setIntensity(Integer.parseInt(intensityVal));
 	        monarchDeviceDataVal.setDuration(Integer.parseInt(durationVal));
 	        
-	        // Bluetooth Id needs to be deleted from Monarch table. which is not applicable in Monarch
+	        // TO BE ELIMINATED : Bluetooth Id needs to be deleted from Monarch table. which is not applicable in Monarch
 	        monarchDeviceDataVal.setBluetoothId("Dummy_bluetooth_id");
+	        
+			monarchDeviceDataVal.setFragTotal(fragTotal);			
+	        monarchDeviceDataVal.setFragCurrent(fragCurr);
+	        
 	        monarchDeviceDataVal.setTherapyIndex(sessionIndexVal);	        
 	        monarchDeviceDataVal.setStartBatteryLevel(Integer.parseInt(startBatteryLevel));
 	        monarchDeviceDataVal.setEndBatteryLevel(Integer.parseInt(endBatteryLevel));

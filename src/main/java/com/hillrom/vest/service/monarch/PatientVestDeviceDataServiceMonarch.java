@@ -52,6 +52,7 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.TWO_
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -74,14 +75,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.domain.ChargerData;
+import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
 import com.hillrom.vest.domain.PingPongPing;
+import com.hillrom.vest.domain.TherapySessionMonarch;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ChargerDataRepository;
 import com.hillrom.vest.repository.PingPongPingRepository;
+import com.hillrom.vest.repository.monarch.PatientMonarchDeviceDataRepository;
 import com.hillrom.vest.service.MailService;
 import com.hillrom.vest.service.util.ParserUtil;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.PatientVestDeviceDataResource;
+import com.hillrom.vest.web.rest.dto.monarch.TherapyDataMonarchVO;
 
 @Service
 public class PatientVestDeviceDataServiceMonarch {
@@ -111,6 +116,8 @@ public class PatientVestDeviceDataServiceMonarch {
 	private ApplicationContext applicationContextMonarch;
 	// Added lated
 	
+	@Inject
+	private PatientMonarchDeviceDataRepository patientMonarchDeviceDataRepository;
 
 
 
@@ -153,7 +160,7 @@ public class PatientVestDeviceDataServiceMonarch {
 
 	private void validateRequest(final String rawData) throws HillromException {
 		String decodedData = decodeData(rawData);
-		JSONObject qclJsonData = ParserUtil.getChargerQclJsonDataFromRawMessage(decodedData);
+		JSONObject qclJsonData = ParserUtil.getChargerJsonDataFromRawMessage(decodedData);
 		String reqParams[] = new String[]{DEVICE_MODEL,DEVICE_SN,
 				DEVICE_WIFI,DEVICE_LTE,DEVICE_VER,FRAG_TOTAL,FRAG_CURRENT,DEVICE_DATA,CRC};
 		if(Objects.isNull(qclJsonData) || qclJsonData.keySet().isEmpty()){
@@ -561,7 +568,12 @@ public class PatientVestDeviceDataServiceMonarch {
 	    return hexTotal;
 	}
 	
-	
-	
+	public List<PatientVestDeviceDataMonarch> getDeviceDataForAllFragments(Long patientUserId, String serialNumber, int therapyIndex){
+		
+		List<PatientVestDeviceDataMonarch> allDeviceData = 
+				patientMonarchDeviceDataRepository.findByPatientUserIdAndSerialNumberAndTherapyIndex(patientUserId, serialNumber, therapyIndex);
+		
+		return allDeviceData;
+	}
 
 }

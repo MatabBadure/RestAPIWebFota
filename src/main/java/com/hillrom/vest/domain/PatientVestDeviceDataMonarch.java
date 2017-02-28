@@ -63,6 +63,12 @@ public class PatientVestDeviceDataMonarch implements Serializable,Comparable<Pat
 	@JoinColumn(name="user_id",referencedColumnName="id")
 	private User patientUser;
 	
+	@Column(name = "frag_total")
+	private Integer fragTotal;
+	
+	@Column(name = "frag_current")
+	private Integer fragCurrent;
+	
 	@Column(name = "therapy_index")
 	private Integer therapyIndex;
 	
@@ -249,6 +255,22 @@ public class PatientVestDeviceDataMonarch implements Serializable,Comparable<Pat
 
 	public void setDevVersion(String devVersion) {
 		this.devVersion = devVersion;
+	}
+
+	public Integer getFragTotal() {
+		return fragTotal;
+	}
+
+	public void setFragTotal(Integer fragTotal) {
+		this.fragTotal = fragTotal;
+	}
+
+	public Integer getFragCurrent() {
+		return fragCurrent;
+	}
+
+	public void setFragCurrent(Integer fragCurrent) {
+		this.fragCurrent = fragCurrent;
 	}
 
 	@JsonIgnore

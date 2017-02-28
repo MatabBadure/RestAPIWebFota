@@ -62,10 +62,10 @@ public class PatientVestDeviceMonarchService {
     public Object linkVestDeviceWithPatient(Long id, Map<String, Object> deviceData) throws HillromException {
     	User alreadyLinkedPatientuser = new User();
     	List<PatientVestDeviceHistoryMonarch> assocList = patientMonarchDeviceRepository.findBySerialNumber(deviceData.get("serialNumber").toString());
-    	Optional<PatientVestDeviceHistoryMonarch> assocByBluetoothID = patientMonarchDeviceRepository.findByBluetoothIdAndStatusActive(deviceData.get("wifiId").toString());
+    	Optional<PatientVestDeviceHistoryMonarch> assocByWifiID = patientMonarchDeviceRepository.findByWifiIdAndStatusActive(deviceData.get("wifiId").toString());
     	PatientVestDeviceHistoryMonarch patientVestDeviceAssoc = new PatientVestDeviceHistoryMonarch();
-    	if(assocByBluetoothID.isPresent()) {
-    		alreadyLinkedPatientuser = (User) assocByBluetoothID.get().getPatient().getUserPatientAssoc().stream().filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser();
+    	if(assocByWifiID.isPresent()) {
+    		alreadyLinkedPatientuser = (User) assocByWifiID.get().getPatient().getUserPatientAssoc().stream().filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser();
     		if(!alreadyLinkedPatientuser.getId().equals(id)){
     			return alreadyLinkedPatientuser;
 			}
@@ -74,9 +74,9 @@ public class PatientVestDeviceMonarchService {
     		patientVestDeviceAssoc = assignDeviceToPatient(id, deviceData);
     	} else {
     		List<PatientVestDeviceHistoryMonarch> activeDeviceList = assocList.stream().filter(patientDevice -> patientDevice.isActive()).collect(Collectors.toList());
-    		if(!activeDeviceList.isEmpty()){
-    			PatientVestDeviceHistoryMonarch activeDevice = activeDeviceList.get(0);
-    			alreadyLinkedPatientuser = (User) activeDevice.getPatient().getUserPatientAssoc().stream().filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser();
+     		if(!activeDeviceList.isEmpty()){
+     			PatientVestDeviceHistoryMonarch activeDevice = activeDeviceList.get(0);
+      			alreadyLinkedPatientuser = (User) activeDevice.getPatient().getUserPatientAssoc().stream().filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser();
     			if(alreadyLinkedPatientuser.getId().equals(id)){
     				patientVestDeviceAssoc = updateDeviceDetailsForPatient(activeDevice, deviceData);
     				return patientVestDeviceAssoc;
@@ -134,7 +134,7 @@ public class PatientVestDeviceMonarchService {
 	 		patientInfo.setHubId(Objects.nonNull(deviceData.get("hubId")) ? deviceData.get("hubId").toString() : null);
 	 		patientInfoRepository.save(patientInfo);
 	 		activeDevice.setSerialNumber(Objects.nonNull(deviceData.get("serialNumber")) ? deviceData.get("serialNumber").toString() : null);
-	 		activeDevice.setBluetoothId(Objects.nonNull(deviceData.get("wifiId")) ? deviceData.get("wifiId").toString() : null);
+	 		activeDevice.setWifiId(Objects.nonNull(deviceData.get("wifiId")) ? deviceData.get("wifiId").toString() : null);
 	 		activeDevice.setHubId(Objects.nonNull(deviceData.get("hubId")) ? deviceData.get("hubId").toString() : null);
 	 		activeDevice.setActive(true);
 	 		patientMonarchDeviceRepository.saveAndFlush(activeDevice);
@@ -248,7 +248,7 @@ public class PatientVestDeviceMonarchService {
 	     					vestDevice.get(0).setActive(true);
 			 				patientMonarchDeviceRepository.saveAndFlush(vestDevice.get(0));
 			 				patientInfo.setSerialNumber(vestDevice.get(0).getSerialNumber());
-			 				patientInfo.setBluetoothId(vestDevice.get(0).getBluetoothId());
+			 				patientInfo.setBluetoothId(vestDevice.get(0).getWifiId());
 			 				patientInfo.setHubId(vestDevice.get(0).getHubId());
 			 				patientInfo.setDeviceAssocDate(vestDevice.get(0).getCreatedDate());
 			 				patientInfoRepository.saveAndFlush(patientInfo);

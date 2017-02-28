@@ -90,7 +90,7 @@ public class ParserUtil {
 		return qclJsonData;
 	}
 
-	public static JSONObject getChargerQclJsonDataFromRawMessage(String rawMessage){
+	public static JSONObject getChargerJsonDataFromRawMessage(String rawMessage){
 
 		JSONObject qclJsonData = new JSONObject();
 			

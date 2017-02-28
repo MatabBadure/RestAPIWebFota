@@ -137,6 +137,10 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 		patientVestDeviceRawLogMonarch.setTotalFragments(ParserUtilMonarch.getFragTotal(rawMessageMonarch)+"");
 		patientVestDeviceRawLogMonarch.setCurrentFragment(ParserUtilMonarch.getFragCurrent(rawMessageMonarch)+"");
 		patientVestDeviceRawLogMonarch.setChecksum(ParserUtilMonarch.getCRCChecksum(rawMessageMonarch)+"");
+		patientVestDeviceRawLogMonarch.setDeviceAddress(ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch,1) == null ? 
+															ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch,2) : 
+																ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch,1) );
+		
 		
 		return patientVestDeviceRawLogMonarch;
 	}
@@ -170,17 +174,13 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 
 		PatientVestDeviceRawLogMonarch patientVestDeviceRawLogMonarch = createPatientVestDeviceRawLogMonarch(rawMessageMonarch,jsonDataMonarch);
 		
-		// TO BE ELEMINATED : Device Address (Bluetooth)  no longer used in Monarch
-		patientVestDeviceRawLogMonarch.setDeviceAddress("Hardcoded_Dev_address");
-
 		try {
 			/*patientVestDeviceRawLog.setHubReceiveTime(Long.parseLong(hub_timestamp));
 			patientVestDeviceRawLog.setSpReceiveTime(Long.parseLong(sp_timestamp));*/
 			
 			/*if(StringUtils.isBlank(patientVestDeviceRawLogMonarch.getDeviceAddress()) || 
 					StringUtils.isBlank(patientVestDeviceRawLogMonarch.getDeviceSerialNumber()) ||
-					StringUtils.isBlank(patientVestDeviceRawLogMonarch.getDeviceData())){*/
-				
+					StringUtils.isBlank(patientVestDeviceRawLogMonarch.getDeviceData())){*/				
 			
 			if(StringUtils.isBlank(patientVestDeviceRawLogMonarch.getDeviceSerialNumber()) ||
 						StringUtils.isBlank(patientVestDeviceRawLogMonarch.getDeviceData())){	

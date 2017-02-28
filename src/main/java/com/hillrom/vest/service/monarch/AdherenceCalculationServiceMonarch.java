@@ -439,7 +439,7 @@ public class AdherenceCalculationServiceMonarch{
 							
 					// Check whether the adherence start days is the compliance date
 					if(adherenceStartDate.equals(currentCompliance.getDate())){
-						if(resetFlag == 1){
+						if(resetFlag == 1 || (resetFlag == 2 && adherenceSettingDay != 1)){							 
 							notificationMonarchService.createOrUpdateNotification(patientUser, patient, userId,
 																		currentCompliance.getDate(), ADHERENCE_SCORE_RESET, false, existingNotificationofTheDay);
 						}else{
@@ -732,7 +732,7 @@ public class AdherenceCalculationServiceMonarch{
 			return newCompliance;
 		}
 		
-		if(resetFlag == 1){
+		if(resetFlag == 1 || (resetFlag == 2 && adherenceSettingDay != 1)){
 			notification_type = initialPrevScoreFor1Day == 0 ? notification_type : ADHERENCE_SCORE_RESET;
 		}			
 		

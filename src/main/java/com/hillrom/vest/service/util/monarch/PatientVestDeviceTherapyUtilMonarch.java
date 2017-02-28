@@ -404,16 +404,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 
 	private static boolean isStartEventForTherapySessionMonarch(String eventCode) {
 		return EVENT_CODE_NORMAL_START_MONARCH.equals(eventCode) ||
-				EVENT_CODE_PROGRAM_STEP1_START_MONARCH.equals(eventCode); 
-				
-				/*||
-				EVENT_CODE_PROGRAM_STEP2_START_MONARCH.equals(eventCode) ||
-				EVENT_CODE_PROGRAM_STEP3_START_MONARCH.equals(eventCode) ||
-				EVENT_CODE_PROGRAM_STEP4_START_MONARCH.equals(eventCode) ||
-				EVENT_CODE_PROGRAM_STEP5_START_MONARCH.equals(eventCode) ||
-				EVENT_CODE_PROGRAM_STEP6_START_MONARCH.equals(eventCode) ||
-				EVENT_CODE_PROGRAM_STEP7_START_MONARCH.equals(eventCode) ||
-				EVENT_CODE_PROGRAM_STEP8_START_MONARCH.equals(eventCode);*/
+				EVENT_CODE_PROGRAM_STEP1_START_MONARCH.equals(eventCode);
 	}
 
 	public static TherapySessionMonarch assignTherapyMatrics(
@@ -427,7 +418,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 		therapySession.setBluetoothId(groupEntries.get(0).getBluetoothId());
 		therapySession.setDate(LocalDate.fromDateFields(new Date(timestamp)));
 		therapySession.setFrequency(metricsMap.get(FREQUENCY));
-		therapySession.setPressure(metricsMap.get(PRESSURE));
+		therapySession.setIntensity(metricsMap.get(INTENSITY));
 		therapySession.setDurationInMinutes(metricsMap.get(DURATION));
 		therapySession.setNormalCaughPauses(metricsMap.get(NORMAL_COUGH_PAUSES));
 		therapySession.setProgrammedCaughPauses(metricsMap.get(PROGRAMMED_COUGH_PAUSES));

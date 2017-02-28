@@ -60,12 +60,6 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 	@Column(name = "max_frequency")
 	private Integer maxFrequency;
 	
-	@Column(name = "min_pressure")
-	private Integer minPressure;
-	
-	@Column(name = "max_pressure")
-	private Integer maxPressure;
-	
 	@Column(name = "is_deleted")
 	private boolean deleted = false;
 	
@@ -172,22 +166,6 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 		this.maxFrequency = maxFrequency;
 	}
 
-	public Integer getMinPressure() {
-		return minPressure;
-	}
-
-	public void setMinPressure(Integer minPressure) {
-		this.minPressure = minPressure;
-	}
-
-	public Integer getMaxPressure() {
-		return maxPressure;
-	}
-
-	public void setMaxPressure(Integer maxPressure) {
-		this.maxPressure = maxPressure;
-	}
-
 	public boolean isDeleted() {
 		return deleted;
 	}
@@ -274,7 +252,7 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 		return "PatientProtocolDataMonarch [id=" + id + ", type=" + type + ", patient=" + patient + ", patientUser="
 				+ patientUser + ", treatmentsPerDay=" + treatmentsPerDay + ", minMinutesPerTreatment="
 				+ minMinutesPerTreatment + ", treatmentLabel=" + treatmentLabel + ", minFrequency=" + minFrequency
-				+ ", maxFrequency=" + maxFrequency + ", minPressure=" + minPressure + ", maxPressure=" + maxPressure
+				+ ", maxFrequency=" + maxFrequency + ", minPressure=" + minIntensity + ", maxPressure=" + maxIntensity
 				+ ", minIntensity=" + minIntensity + ", maxIntensity=" + maxIntensity
 				+ ", deleted=" + deleted + ", protocolKey=" + protocolKey + "]";
 	}

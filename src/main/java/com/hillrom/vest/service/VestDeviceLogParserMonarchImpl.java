@@ -141,6 +141,7 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 															ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch,2) : 
 																ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch,1) );
 		
+		
 		return patientVestDeviceRawLogMonarch;
 	}
 	
@@ -179,8 +180,7 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 			
 			/*if(StringUtils.isBlank(patientVestDeviceRawLogMonarch.getDeviceAddress()) || 
 					StringUtils.isBlank(patientVestDeviceRawLogMonarch.getDeviceSerialNumber()) ||
-					StringUtils.isBlank(patientVestDeviceRawLogMonarch.getDeviceData())){*/
-				
+					StringUtils.isBlank(patientVestDeviceRawLogMonarch.getDeviceData())){*/				
 			
 			if(StringUtils.isBlank(patientVestDeviceRawLogMonarch.getDeviceSerialNumber()) ||
 						StringUtils.isBlank(patientVestDeviceRawLogMonarch.getDeviceData())){	

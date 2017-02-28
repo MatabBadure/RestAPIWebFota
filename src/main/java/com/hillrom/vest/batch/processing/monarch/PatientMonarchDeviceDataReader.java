@@ -118,8 +118,7 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 		List<PatientVestDeviceDataMonarch> patientVestDeviceEventsMonarch = null;
 		deviceRawLogMonarch = deviceLogMonarchParser.parseBase64StringToPatientMonarchDeviceRawLog(patientDeviceRawData);
 
-		deviceRawLogRepositoryMonarch.save(deviceRawLogMonarch);
-		
+		deviceRawLogRepositoryMonarch.save(deviceRawLogMonarch);		
 		//checkPingPong();
 		
 		patientVestDeviceEventsMonarch = deviceLogMonarchParser

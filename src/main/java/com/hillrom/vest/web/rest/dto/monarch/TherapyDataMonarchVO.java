@@ -22,7 +22,7 @@ public class TherapyDataMonarchVO implements Serializable,Comparable<TherapyData
 	private int programmedCoughPauses;
 	private int normalCoughPauses;
 	private int coughPauses;
-	private Note note;
+	//private Note note;
 	@JsonSerialize(using= DateTimeSerializer.class)
 	private DateTime start;
 	@JsonSerialize(using= DateTimeSerializer.class)
@@ -31,7 +31,7 @@ public class TherapyDataMonarchVO implements Serializable,Comparable<TherapyData
 	private int duration;
 	private double hmr;
 	private boolean missedTherapy;
-	private NoteMonarch noteMonarch;
+	private NoteMonarch note;
 	private int intensity;
 	
 	public TherapyDataMonarchVO(DateTime timestamp, int treatmentsPerDay,int sessionNo,
@@ -47,7 +47,7 @@ public class TherapyDataMonarchVO implements Serializable,Comparable<TherapyData
 		this.programmedCoughPauses = programmedCoughPauses;
 		this.normalCoughPauses = normalCoughPauses;
 		this.coughPauses = coughPauses;
-		this.noteMonarch = note;
+		this.note = note;
 		this.start = start;
 		this.end = end;
 		this.coughPauseDuration = coughPauseDuration;
@@ -67,7 +67,7 @@ public class TherapyDataMonarchVO implements Serializable,Comparable<TherapyData
 		this.programmedCoughPauses = programmedCoughPauses;
 		this.normalCoughPauses = normalCoughPauses;
 		this.coughPauses = coughPauses;
-		this.noteMonarch = note;
+		this.note = note;
 		this.start = start;
 		this.end = end;
 		this.coughPauseDuration = coughPauseDuration;
@@ -144,11 +144,11 @@ public class TherapyDataMonarchVO implements Serializable,Comparable<TherapyData
 		this.coughPauses = coughPauses;
 	}
 
-	public Note getNote() {
+	public NoteMonarch getNote() {
 		return note;
 	}
 
-	public void setNote(Note note) {
+	public void setNote(NoteMonarch note) {
 		this.note = note;
 	}
 
@@ -201,11 +201,11 @@ public class TherapyDataMonarchVO implements Serializable,Comparable<TherapyData
 	}
 	
 	public NoteMonarch getNoteMonarch() {
-		return noteMonarch;
+		return note;
 	}
 
 	public void setNoteMonarch(NoteMonarch noteMonarch) {
-		this.noteMonarch = noteMonarch;
+		this.note = noteMonarch;
 	}
 	public int getIntensity() {
 		return intensity;

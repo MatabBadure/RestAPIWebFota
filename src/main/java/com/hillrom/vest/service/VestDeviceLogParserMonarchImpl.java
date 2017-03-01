@@ -361,7 +361,7 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
         for(int k=0;k<hmr_seconds.length;k++){
         	sout = sout + (hmr_seconds[k]  & 0xFF) + " ";
         }        
-        int combinedHmr = ParserUtilMonarch.intergerCombinedFromHex(hmr_seconds);        
+        int combinedHmr = ParserUtilMonarch.intergerCombinedFromHexForHMR(hmr_seconds);        
         double hmrSeconds = (double)combinedHmr;
         
         //log.debug("Value of deviceDataArray.length : "+ j );

@@ -457,6 +457,16 @@ public class ParserUtilMonarch {
     	
     }
 	
+	public static int intergerCombinedFromHexForHMR(byte[] input)
+	{	    
+	    String hexTotal = "";
+	    for (int t = 0; t < input.length; t++){
+	    	hexTotal = hexTotal + Integer.toHexString(input[t]& 0xFF);
+	    }
+	    log.debug("hexTotal : " + Integer.parseInt(hexTotal, 16));
+	    return Integer.parseInt(hexTotal, 16);
+	}
+	
 	public static int intergerCombinedFromHex(byte[] input)
 	{
 	    
@@ -466,6 +476,7 @@ public class ParserUtilMonarch {
 	    {
 	    	hexTotal = hexTotal + Integer.parseInt(Integer.toHexString(input[t]& 0xFF), 16);
 	    }
+	    
 	    log.debug("hexTotal : " + hexTotal);
 	    return hexTotal;
 	}

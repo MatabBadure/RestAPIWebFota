@@ -236,7 +236,7 @@ public class ParserUtilMonarch {
         
         String devSN = "";
         int start = returnMatch(b,DEV_SN);
-        int end = returnMatch(b,DEV_WIFI)-DEV_WIFI.length;
+        int end = returnMatch(b,DEV_WIFI) == -1 ? returnMatch(b,DEV_LTE)-DEV_LTE.length :returnMatch(b,DEV_WIFI)-DEV_WIFI.length;
         log.debug("start end : "+ start + " : " + end );
         if(start < 0 || end < 0){
         	return null;

@@ -93,10 +93,23 @@ public class ParserUtil {
 	public static JSONObject getChargerJsonDataFromRawMessage(String rawMessage){
 
 		JSONObject qclJsonData = new JSONObject();
-			
-		StringTokenizer st = new StringTokenizer(rawMessage, "&");
-		while (st.hasMoreTokens()) {
-		  String pair = st.nextToken();
+		
+		String rawInput = rawMessage.replace("&"+DEVICE_SN, "&###"+DEVICE_SN);
+		
+		rawInput = rawInput.replace("&"+DEVICE_WIFI, "&###"+DEVICE_WIFI);
+		rawInput = rawInput.replace("&"+DEVICE_LTE, "&###"+DEVICE_LTE);
+		rawInput = rawInput.replace("&"+DEVICE_VER, "&###"+DEVICE_VER);
+		rawInput = rawInput.replace("&"+FRAG_TOTAL, "&###"+FRAG_TOTAL);
+		rawInput = rawInput.replace("&"+FRAG_CURRENT, "&###"+FRAG_CURRENT);
+		rawInput = rawInput.replace("&"+DEVICE_DATA, "&###"+DEVICE_DATA);
+		rawInput = rawInput.replace("&"+CRC, "&###"+CRC);
+		
+		String[] splitInput = rawInput.split("&###");
+		
+		//StringTokenizer st = new StringTokenizer(rawMessage, "&###");
+		//while (st.hasMoreTokens()) {
+		  //String pair = st.nextToken();
+		for(String pair : splitInput){
 		  log.debug("StringTokenizer NameValue Pair : " + pair);
 		  if(pair.contains("=")){
 			  StringTokenizer st_NameValue = new StringTokenizer(pair, "=");

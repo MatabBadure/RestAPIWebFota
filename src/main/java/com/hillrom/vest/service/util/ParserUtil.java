@@ -101,10 +101,11 @@ public class ParserUtil {
 		  if(pair.contains("=")){
 			  StringTokenizer st_NameValue = new StringTokenizer(pair, "=");
 			  String nameToken =  st_NameValue.nextToken();
+			  String valueToken;
 			  if(DEVICE_SN.equalsIgnoreCase(nameToken) || DEVICE_WIFI.equalsIgnoreCase(nameToken) || DEVICE_LTE.equalsIgnoreCase(nameToken)
 					  || DEVICE_VER.equalsIgnoreCase(nameToken) || FRAG_TOTAL.equalsIgnoreCase(nameToken) || FRAG_CURRENT.equalsIgnoreCase(nameToken) ||
 					  DEVICE_DATA.equalsIgnoreCase(nameToken) || CRC.equalsIgnoreCase(nameToken)){
-						  String valueToken = st_NameValue.nextToken();
+						  valueToken = st_NameValue.nextToken();
 						  log.debug("StringTokenizer Name : " + nameToken);
 						  log.debug("StringTokenizer Value : " + valueToken);
 						  
@@ -125,6 +126,12 @@ public class ParserUtil {
 							if(CRC.equalsIgnoreCase(nameToken))
 								qclJsonData.put(CRC, valueToken);					
 							qclJsonData.put("device_model_type", "HillRom_Monarch");
+			  }else{
+				  
+				  valueToken = st_NameValue.nextToken();
+				  log.debug("StringTokenizer Name : " + nameToken);
+				  log.debug("StringTokenizer Value : " + valueToken);
+				  
 			  }
 				
 		  }

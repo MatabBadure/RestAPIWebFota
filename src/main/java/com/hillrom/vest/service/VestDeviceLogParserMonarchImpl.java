@@ -440,7 +440,12 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 	        monarchDeviceDataVal.setEndBatteryLevel(Integer.parseInt(endBatteryLevel));
 	        monarchDeviceDataVal.setNumberOfEvents(Integer.parseInt(numOfEvents));
 	        monarchDeviceDataVal.setNumberOfPods(Integer.parseInt(numOfPods));
-	        monarchDeviceDataVal.setDevWifi(wifiSerNo);
+	        
+	        if(Objects.nonNull(wifiSerNo))
+	        	monarchDeviceDataVal.setDevWifi(wifiSerNo);
+	        else
+	        	monarchDeviceDataVal.setDevLte(lteSerNo);
+	        	
 	        monarchDeviceDataVal.setDevVersion(deviceVer);
 	        
 	        monarchDeviceData.add(monarchDeviceDataVal);

@@ -24,6 +24,7 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.VALU
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.QCL_JSON_DATA;
 
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_SN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_MODEL;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_WIFI;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_LTE;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_VER;
@@ -93,40 +94,32 @@ public class ParserUtil {
 	public static JSONObject getChargerJsonDataFromRawMessage(String rawMessage){
 
 		JSONObject qclJsonData = new JSONObject();
-			
-		StringTokenizer st = new StringTokenizer(rawMessage, "&");
-		while (st.hasMoreTokens()) {
-		  String pair = st.nextToken();
-		  log.debug("StringTokenizer NameValue Pair : " + pair);
-		  if(pair.contains("=")){
-			  StringTokenizer st_NameValue = new StringTokenizer(pair, "=");
-			  String nameToken =  st_NameValue.nextToken();
-			  String valueToken = st_NameValue.nextToken();
-			  log.debug("StringTokenizer Name : " + nameToken);
-			  log.debug("StringTokenizer Value : " + valueToken);
-			  
-				if(DEVICE_SN.equalsIgnoreCase(nameToken))
-					qclJsonData.put(DEVICE_SN, valueToken);
-				if(DEVICE_WIFI.equalsIgnoreCase(nameToken))
-					qclJsonData.put(DEVICE_WIFI, valueToken);	
-				if(DEVICE_LTE.equalsIgnoreCase(nameToken))
-					qclJsonData.put(DEVICE_LTE, valueToken);	
-				if(DEVICE_VER.equalsIgnoreCase(nameToken))
-					qclJsonData.put(DEVICE_VER, valueToken);
-				if(FRAG_TOTAL.equalsIgnoreCase(nameToken))
-					qclJsonData.put(FRAG_TOTAL, valueToken);
-				if(FRAG_CURRENT.equalsIgnoreCase(nameToken))
-					qclJsonData.put(FRAG_CURRENT, valueToken);
-				if(DEVICE_DATA.equalsIgnoreCase(nameToken))
-					qclJsonData.put(DEVICE_DATA, valueToken);	
-				if(CRC.equalsIgnoreCase(nameToken))
-					qclJsonData.put(CRC, valueToken);					
-				qclJsonData.put("device_model_type", "HillRom_Monarch");
-		  }
-		}
+		
+		String devModel = rawMessage.substring(rawMessage.indexOf(DEVICE_MODEL)+DEVICE_MODEL.length()+1, rawMessage.indexOf(DEVICE_SN)-1);
+		String devSn = rawMessage.substring(rawMessage.indexOf(DEVICE_SN)+DEVICE_SN.length()+1, rawMessage.indexOf(DEVICE_WIFI)<0?rawMessage.indexOf(DEVICE_LTE)-1:rawMessage.indexOf(DEVICE_WIFI)-1);
+		String devWifi = rawMessage.indexOf(DEVICE_WIFI) < 0 ? rawMessage.substring(rawMessage.indexOf(DEVICE_WIFI)+DEVICE_WIFI.length()+1, rawMessage.indexOf(DEVICE_VER)-1):null;
+		String devLte = rawMessage.indexOf(DEVICE_LTE) < 0 ? rawMessage.substring(rawMessage.indexOf(DEVICE_LTE)+DEVICE_LTE.length()+1, rawMessage.indexOf(DEVICE_VER)-1):null;
+		String devVer = rawMessage.substring(rawMessage.indexOf(DEVICE_VER)+DEVICE_VER.length()+1, rawMessage.indexOf(FRAG_TOTAL)-1);
+		String fragTotal = rawMessage.substring(rawMessage.indexOf(FRAG_TOTAL)+FRAG_TOTAL.length()+1 , rawMessage.indexOf(FRAG_CURRENT)-1);
+		String fragCurrent = rawMessage.substring(rawMessage.indexOf(FRAG_CURRENT)+FRAG_CURRENT.length()+1, rawMessage.indexOf(DEVICE_DATA)-1);
+		String devData = rawMessage.substring(rawMessage.indexOf(DEVICE_DATA)+DEVICE_DATA.length()+1, rawMessage.indexOf(CRC)-1);
+		String devCrc = rawMessage.substring(rawMessage.indexOf(CRC)+CRC.length()+1, rawMessage.length());
+		
+		qclJsonData.put(DEVICE_MODEL, devModel);
+		qclJsonData.put(DEVICE_SN, devSn);
+		qclJsonData.put(DEVICE_WIFI, devWifi);
+		qclJsonData.put(DEVICE_LTE, devLte);
+		qclJsonData.put(DEVICE_VER, devVer);
+		qclJsonData.put(FRAG_TOTAL, fragTotal);
+		qclJsonData.put(FRAG_CURRENT, fragCurrent);
+		qclJsonData.put(DEVICE_DATA, devData);
+		qclJsonData.put(CRC, devCrc);
 			
 		return qclJsonData;
 	}
+	
+	
+
 
 
 	public static String getValueFromQclJsonData(JSONObject qclJsonData,String key){

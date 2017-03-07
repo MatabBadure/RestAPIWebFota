@@ -236,7 +236,7 @@ public class ParserUtilMonarch {
         
         String devSN = "";
         int start = returnMatch(b,DEV_SN);
-        int end = returnMatch(b,DEV_WIFI)-DEV_WIFI.length;
+        int end = returnMatch(b,DEV_WIFI) == -1 ? returnMatch(b,DEV_LTE)-DEV_LTE.length :returnMatch(b,DEV_WIFI)-DEV_WIFI.length;
         log.debug("start end : "+ start + " : " + end );
         if(start < 0 || end < 0){
         	return null;
@@ -457,6 +457,16 @@ public class ParserUtilMonarch {
     	
     }
 	
+	public static int intergerCombinedFromHexForHMR(byte[] input)
+	{	    
+	    String hexTotal = "";
+	    for (int t = 0; t < input.length; t++){
+	    	hexTotal = hexTotal + Integer.toHexString(input[t]& 0xFF);
+	    }
+	    log.debug("hexTotal : " + Integer.parseInt(hexTotal, 16));
+	    return Integer.parseInt(hexTotal, 16);
+	}
+	
 	public static int intergerCombinedFromHex(byte[] input)
 	{
 	    
@@ -466,6 +476,7 @@ public class ParserUtilMonarch {
 	    {
 	    	hexTotal = hexTotal + Integer.parseInt(Integer.toHexString(input[t]& 0xFF), 16);
 	    }
+	    
 	    log.debug("hexTotal : " + hexTotal);
 	    return hexTotal;
 	}

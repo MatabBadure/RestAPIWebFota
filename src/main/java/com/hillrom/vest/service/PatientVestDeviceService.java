@@ -117,12 +117,13 @@ public class PatientVestDeviceService {
 		 		Optional<PatientVestDeviceHistory> currentAssoc = patientVestDeviceRepository.findOneByPatientIdAndActiveStatus(patientInfo.getId(), true);
 		 		if(currentAssoc.isPresent()){
 	 				currentAssoc.get().setActive(false);
+	 				currentAssoc.get().setLastModifiedDate(DateTime.now());
 	 				patientVestDeviceRepository.save(currentAssoc.get());
 		 		}
 		 		PatientVestDeviceHistory patientVestDeviceAssoc = new PatientVestDeviceHistory(
 		 				new PatientVestDevicePK(patientInfo, Objects.nonNull(deviceData.get("serialNumber")) ? deviceData.get("serialNumber").toString() : null), 
 		 				Objects.nonNull(deviceData.get("bluetoothId")) ? deviceData.get("bluetoothId").toString() : null, 
-		 				Objects.nonNull(deviceData.get("hubId")) ? deviceData.get("hubId").toString() : null, true);
+		 				Objects.nonNull(deviceData.get("hubId")) ? deviceData.get("hubId").toString() : null, true, DateTime.now());
 		 		patientVestDeviceRepository.saveAndFlush(patientVestDeviceAssoc);
 		 		return patientVestDeviceAssoc;
 		 	} else {
@@ -144,6 +145,7 @@ public class PatientVestDeviceService {
 	 		activeDevice.setBluetoothId(Objects.nonNull(deviceData.get("bluetoothId")) ? deviceData.get("bluetoothId").toString() : null);
 	 		activeDevice.setHubId(Objects.nonNull(deviceData.get("hubId")) ? deviceData.get("hubId").toString() : null);
 	 		activeDevice.setActive(true);
+	 		activeDevice.setLastModifiedDate(DateTime.now());
 	 		patientVestDeviceRepository.saveAndFlush(activeDevice);
 	 		return activeDevice;
 	 	} else {
@@ -195,6 +197,7 @@ public class PatientVestDeviceService {
 		     			patientDeviceAssoc.get().setActive(false);
 		     			// When dis-associated update the latest hmr
 		     			patientDeviceAssoc.get().setHmr(getLatestHMR(id, serialNumber));
+		     			patientDeviceAssoc.get().setLastModifiedDate(DateTime.now());
 		 				patientVestDeviceRepository.save(patientDeviceAssoc.get());
 		 				patientInfo.setSerialNumber(null);
 		 				patientInfo.setBluetoothId(null);
@@ -227,6 +230,7 @@ public class PatientVestDeviceService {
 	     				vestDevice.get().setLastModifiedDate(dateTime);
 		     			// When dis-associated update the latest hmr 
 	     				vestDevice.get().setHmr(getLatestHMR(id,patientInfo.getSerialNumber()));
+	     				vestDevice.get().setLastModifiedDate(DateTime.now());
 		 				patientVestDeviceRepository.saveAndFlush(vestDevice.get());
 		 				patientInfo.setSerialNumber(null);
 		 				patientInfo.setBluetoothId(null);
@@ -253,6 +257,7 @@ public class PatientVestDeviceService {
 	     			if(!vestDevice.isEmpty()) {
 	     				if(vestDevice.get(0).getLastModifiedDate().isAfter(patientUser.getExpirationDate())) {
 	     					vestDevice.get(0).setActive(true);
+	     					vestDevice.get(0).setLastModifiedDate(DateTime.now());	     					
 			 				patientVestDeviceRepository.saveAndFlush(vestDevice.get(0));
 			 				patientInfo.setSerialNumber(vestDevice.get(0).getSerialNumber());
 			 				patientInfo.setBluetoothId(vestDevice.get(0).getBluetoothId());
@@ -285,6 +290,7 @@ public class PatientVestDeviceService {
 		if(deviceHistoryFromDB.isPresent()){
 			PatientVestDeviceHistory history = deviceHistoryFromDB.get();
 			history.setHmr(getLatestHMR(patientUser.getId(),patient.getSerialNumber()));
+			history.setLastModifiedDate(DateTime.now());
 			patientVestDeviceRepository.save(history);
 		}else{
 			PatientVestDeviceHistory history = new PatientVestDeviceHistory(new PatientVestDevicePK(patient, patient.getSerialNumber()),

@@ -82,6 +82,16 @@ public class PatientVestDeviceHistory implements Serializable {
 		this.hubId = hubId;
 		this.active = active;
 	}
+	
+	public PatientVestDeviceHistory(PatientVestDevicePK patientVestDevicePK,
+			String bluetoothId, String hubId, Boolean active, DateTime ModifiedDate) {
+		super();
+		this.patientVestDevicePK = patientVestDevicePK;
+		this.bluetoothId = bluetoothId;
+		this.hubId = hubId;
+		this.active = active;
+		this.lastModifiedDate = ModifiedDate;
+	}
 
 	public PatientVestDevicePK getPatientVestDevicePK() {
 		return patientVestDevicePK;

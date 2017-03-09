@@ -65,7 +65,7 @@ public class PatientVestDeviceHistory implements Serializable {
     @LastModifiedDate
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "last_modified_date")
-    private DateTime lastModifiedDate = DateTime.now();
+    private DateTime lastModifiedDate; // = DateTime.now();
     
     @Column(name="hmr")
 	private Double hmr = 0d; // default value for HMR
@@ -81,6 +81,16 @@ public class PatientVestDeviceHistory implements Serializable {
 		this.bluetoothId = bluetoothId;
 		this.hubId = hubId;
 		this.active = active;
+	}
+	
+	public PatientVestDeviceHistory(PatientVestDevicePK patientVestDevicePK,
+			String bluetoothId, String hubId, Boolean active, DateTime ModifiedDate) {
+		super();
+		this.patientVestDevicePK = patientVestDevicePK;
+		this.bluetoothId = bluetoothId;
+		this.hubId = hubId;
+		this.active = active;
+		this.lastModifiedDate = ModifiedDate;
 	}
 
 	public PatientVestDevicePK getPatientVestDevicePK() {

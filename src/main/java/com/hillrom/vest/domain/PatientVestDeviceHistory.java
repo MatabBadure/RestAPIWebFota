@@ -65,7 +65,7 @@ public class PatientVestDeviceHistory implements Serializable {
     @LastModifiedDate
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "last_modified_date")
-    private DateTime lastModifiedDate = DateTime.now();
+    private DateTime lastModifiedDate; // = DateTime.now();
     
     @Column(name="hmr")
 	private Double hmr = 0d; // default value for HMR

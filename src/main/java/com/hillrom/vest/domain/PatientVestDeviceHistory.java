@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
@@ -63,9 +64,10 @@ public class PatientVestDeviceHistory implements Serializable {
     private String lastModifiedBy;
 
     @LastModifiedDate
+    @org.springframework.data.annotation.Transient
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "last_modified_date")
-    private DateTime lastModifiedDate; // = DateTime.now();
+    private DateTime lastModifiedDate;
     
     @Column(name="hmr")
 	private Double hmr = 0d; // default value for HMR

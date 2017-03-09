@@ -289,8 +289,7 @@ public class PatientVestDeviceService {
 		Optional<PatientVestDeviceHistory>  deviceHistoryFromDB = patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(patient.getId(),patient.getSerialNumber());
 		if(deviceHistoryFromDB.isPresent()){
 			PatientVestDeviceHistory history = deviceHistoryFromDB.get();
-			history.setHmr(getLatestHMR(patientUser.getId(),patient.getSerialNumber()));
-			history.setLastModifiedDate(DateTime.now());
+			history.setHmr(getLatestHMR(patientUser.getId(),patient.getSerialNumber()));			
 			patientVestDeviceRepository.save(history);
 		}else{
 			PatientVestDeviceHistory history = new PatientVestDeviceHistory(new PatientVestDevicePK(patient, patient.getSerialNumber()),

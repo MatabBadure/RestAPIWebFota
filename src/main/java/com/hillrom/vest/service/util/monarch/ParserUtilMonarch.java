@@ -439,15 +439,12 @@ public class ParserUtilMonarch {
 
         for(int i=0;i<inputArray.length;i++){
         	int val = inputArray[i] & 0xFF;
-        	boolean found = false;
-        	
-        	if((val == 38) && !found){
+        	if(val == 38){
         		int j=i;int k=0;
         		while((inputArray[j++]==matchArray[k++]) && (k<matchArray.length)){
         			
         		}
         		if(k==matchArray.length){
-        			found = true;
         			return j;
         		}
         	}

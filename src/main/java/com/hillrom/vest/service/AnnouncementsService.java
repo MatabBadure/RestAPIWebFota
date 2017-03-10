@@ -139,7 +139,7 @@ public Page<Announcements> findVisibleAnnouncementsById(String userType, Long us
  		
  		
  		// Check for the clinic flag to differentiate between whether the clinic id is passed or patient id is passed
-		if(Objects.nonNull(clinicList) && clinicList.size() > 0){
+ 		if(clinicList.size() > 0){
 			announcementList = announcementsRepository.findAnnouncementsByClinicId(clinicList, false,pageable);
 		}
 		

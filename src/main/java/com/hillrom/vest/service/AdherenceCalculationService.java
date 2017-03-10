@@ -1127,7 +1127,7 @@ public class AdherenceCalculationService {
 			ProtocolConstants protocolConstant) throws Exception{
 		for(LocalDate currentTherapySessionDate : receivedTherapySessionsMap.keySet()){
 			List<TherapySession> receivedTherapySessions = receivedTherapySessionsMap.get(currentTherapySessionDate);
-			LocalDate firstTransmittedDate = null;
+			LocalDate firstTransmittedDate = new LocalDate();
 			LocalDate latestTherapyDate = null;
 			PatientInfo patient = null;
 			User patientUser = null;

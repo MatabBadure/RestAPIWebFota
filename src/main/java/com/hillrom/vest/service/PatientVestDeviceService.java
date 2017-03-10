@@ -177,7 +177,7 @@ public class PatientVestDeviceService {
     }
 
 	private PatientInfo getPatientInfoObjFromPatientUser(User patientUser) {
-		PatientInfo patientInfo = null;
+		PatientInfo patientInfo = new PatientInfo();
 		for(UserPatientAssoc patientAssoc : patientUser.getUserPatientAssoc()){
 			if(RelationshipLabelConstants.SELF.equals(patientAssoc.getRelationshipLabel())){
 				patientInfo = patientAssoc.getPatient();

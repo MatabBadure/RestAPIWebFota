@@ -253,10 +253,13 @@ public class UserSearchRepository {
 				.filter(assoc -> RelationshipLabelConstants.SELF.equalsIgnoreCase(assoc.getRelationshipLabel()))
 				.collect(Collectors.toList());
 		UserPatientAssoc userPatientAssoc = associations.isEmpty() ? null : associations.get(0);
+		
+		String patientId = ""; 
+				
 		if (Objects.isNull(userPatientAssoc))
 			throw new HillromException(ExceptionConstants.HR_523);
-
-		String patientId = userPatientAssoc.getPatient().getId();
+		else
+			patientId = userPatientAssoc.getPatient().getId();
 
 		String findHcpQuery = "select * from"
 				+ " (select user.id,user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted, "

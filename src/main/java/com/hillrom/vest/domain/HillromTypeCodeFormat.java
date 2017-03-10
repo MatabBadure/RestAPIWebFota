@@ -84,4 +84,9 @@ public class HillromTypeCodeFormat implements Serializable {
 
 		return true;
 	}
+	
+	 @Override
+	    public int hashCode() {
+	        return Objects.hashCode(id);
+	    }
 }

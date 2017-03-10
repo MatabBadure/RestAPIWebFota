@@ -6,6 +6,8 @@ import static com.hillrom.vest.config.Constants.VEST;
 import static com.hillrom.vest.config.Constants.MONARCH;
 //import static com.hillrom.vest.config.Constants.ALL;
 
+
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -460,7 +463,7 @@ public class UserResource {
     	JSONObject jsonObject = new JSONObject();
 		try {	
 			
-			List<?> deviceList = null;
+			List<?> deviceList = new ArrayList<>();
     		if(deviceType.equals("VEST")){
     			deviceList = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
     		}else if(deviceType.equals("MONARCH")){
@@ -667,7 +670,7 @@ public class UserResource {
     	log.debug("REST request to get protocol for patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
     	try {
-    		List<?> protocolList = null;
+    		List<?> protocolList = new ArrayList<>();
     		if(deviceType.equals("VEST")){
     			protocolList = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);
     		}else if(deviceType.equals("MONARCH")){
@@ -711,7 +714,7 @@ public class UserResource {
     	log.debug("REST request to get protocol details with {} for patient user : {}", protocolId, id);
     	JSONObject jsonObject = new JSONObject();
     	try {
-    		List<?> protocolList = null;
+    		List<?> protocolList = new ArrayList<>();
     		if(deviceType.equals("VEST")){
     			protocolList = patientProtocolService.getProtocolDetails(id, protocolId);
     		}else if(deviceType.equals("MONARCH")){
@@ -1007,7 +1010,7 @@ public class UserResource {
         log.debug("REST request to get patient statistics for clinic {} associated with User : {}", clinicId, userId);
         JSONObject jsonObject = new JSONObject();
         try {
-        	Map<String, Object> statitics = null;
+        	Map<String, Object> statitics = new HashMap<String, Object>();
         	LocalDate date = LocalDate.now();
 
         	if(deviceType.equals(VEST)) {
@@ -1123,7 +1126,7 @@ public class UserResource {
         log.debug("REST request to get patients cumulative statistics for clinic {} associated with HCP : {}", clinicId, hcpId,from,to);
         JSONObject jsonObject = new JSONObject();
         try {
-        	Collection<StatisticsVO> statiticsCollection = null;
+        	Collection<StatisticsVO> statiticsCollection = new LinkedList<StatisticsVO>();
         	if(deviceType.equals(VEST)){
 	        	statiticsCollection = patientHCPService.getCumulativePatientStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);		      
         	}
@@ -1165,7 +1168,7 @@ public class UserResource {
         log.debug("REST request to get patients treatement statistics for clinic {} associated with HCP : {}", clinicId, hcpId,from,to);
         JSONObject jsonObject = new JSONObject();
         try {
-        	Collection<TreatmentStatisticsVO> statiticsCollection = null;
+        	Collection<TreatmentStatisticsVO> statiticsCollection = new LinkedList<TreatmentStatisticsVO>();
         	if(deviceType.equals(VEST)){
         		statiticsCollection = patientHCPService.getTreatmentStatisticsForClinicAssociatedWithHCP(hcpId,clinicId,from,to);
         	}

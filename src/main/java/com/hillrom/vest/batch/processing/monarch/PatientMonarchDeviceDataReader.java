@@ -57,6 +57,7 @@ import com.hillrom.vest.service.DeviceLogParser;
 import com.hillrom.vest.service.monarch.PatientComplianceMonarchService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.monarch.PatientNoEventMonarchService;
+import com.hillrom.vest.service.monarch.PatientVestDeviceDataServiceMonarch;
 import com.hillrom.vest.service.monarch.TherapySessionServiceMonarch;
 import com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil;
 import com.hillrom.vest.service.util.monarch.PatientVestDeviceTherapyUtilMonarch;
@@ -102,6 +103,9 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 	@Inject
     private PatientDevicesAssocRepository patientDevicesAssocRepository;
 
+	@Inject
+	PatientVestDeviceDataServiceMonarch patientVestDeviceDataServiceMonarch;
+	
 	private String patientDeviceRawData;
 	
 	private boolean isReadComplete;
@@ -117,9 +121,8 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 		PatientVestDeviceRawLogMonarch deviceRawLogMonarch = null;
 		List<PatientVestDeviceDataMonarch> patientVestDeviceEventsMonarch = null;
 		deviceRawLogMonarch = deviceLogMonarchParser.parseBase64StringToPatientMonarchDeviceRawLog(patientDeviceRawData);
-
-		deviceRawLogRepositoryMonarch.save(deviceRawLogMonarch);		
-		//checkPingPong();
+		
+		deviceRawLogRepositoryMonarch.save(deviceRawLogMonarch);
 		
 		patientVestDeviceEventsMonarch = deviceLogMonarchParser
 				.parseBase64StringToPatientMonarchDeviceLogEntry(patientDeviceRawData);
@@ -152,14 +155,19 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 		// this is required to let reader to know there is nothing to be read further
 			isReadComplete = true;  
 			return patientVestDeviceEventsMonarch; // spring batch reader to skip reading
-		}else{
-			patientUserId = patientVestDeviceEventsMonarch.get(0).getPatientUser().getId();
-			patientId = patientVestDeviceEventsMonarch.get(0).getPatient().getId();
-			Collections.sort(patientVestDeviceEventsMonarch);
-			from = patientVestDeviceEventsMonarch.get(0).getTimestamp();
-			to = patientVestDeviceEventsMonarch.get(patientVestDeviceEventsMonarch.size()-1).getTimestamp();
-			serialNumber = patientVestDeviceEventsMonarch.get(0).getSerialNumber();
 		}
+		
+		patientUserId = patientVestDeviceEventsMonarch.get(0).getPatientUser().getId();
+		patientId = patientVestDeviceEventsMonarch.get(0).getPatient().getId();
+		Collections.sort(patientVestDeviceEventsMonarch);
+		from = patientVestDeviceEventsMonarch.get(0).getTimestamp();
+		to = patientVestDeviceEventsMonarch.get(patientVestDeviceEventsMonarch.size()-1).getTimestamp();
+		serialNumber = patientVestDeviceEventsMonarch.get(0).getSerialNumber();
+		
+		int therapyIndex = patientVestDeviceEventsMonarch.get(0).getTherapyIndex();
+		int fragTotal = patientVestDeviceEventsMonarch.get(0).getFragTotal();
+		int fragCurr = patientVestDeviceEventsMonarch.get(0).getFragCurrent();			
+					
 		// Commenting the code to get the existing events to make the diff with current events
 		//List<PatientVestDeviceDataMonarch> existingEvents = monarchDeviceDataRepository.findByPatientUserIdAndTimestampBetween(patientUserId, from, to);
 
@@ -172,20 +180,29 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 			return patientVestDeviceRecords;
 		}*/
 		
-		// using the old variable for the delta value
-		List<PatientVestDeviceDataMonarch> patientVestDeviceRecordsMonarch = patientVestDeviceEventsMonarch;
-		
-		//log.debug("New Events found to be inserted ");
-		PatientVestDeviceHistoryMonarch latestInActiveDevice = patientMonarchDeviceRepository.findLatestInActiveDeviceByPatientId(patientId, false);
-		List<TherapySessionMonarch> therapySessionsMonarch = PatientVestDeviceTherapyUtilMonarch
-				.prepareTherapySessionFromDeviceDataMonarch(patientVestDeviceRecordsMonarch,latestInActiveDevice);
-
-		if(therapySessionsMonarch.isEmpty()){
-			log.debug("Could not make session out of the events received, discarding to get delta");
-			isReadComplete = true;  
-			return new LinkedList();
+		if(fragTotal == 1 || (fragTotal != 1 && fragTotal == fragCurr)){		
+			List<PatientVestDeviceDataMonarch> patientVestDeviceRecordsMonarch = new LinkedList<>();
+			
+			if(fragTotal != 1 && fragTotal == fragCurr){
+				List<PatientVestDeviceDataMonarch> existingVestDeviceEventsMonarch = patientVestDeviceDataServiceMonarch.getDeviceDataForAllFragments(patientUserId, serialNumber, therapyIndex);
+				
+				patientVestDeviceRecordsMonarch.addAll(existingVestDeviceEventsMonarch);
+				patientVestDeviceRecordsMonarch.addAll(patientVestDeviceEventsMonarch);
+			}else{
+				patientVestDeviceRecordsMonarch = patientVestDeviceEventsMonarch;
+			}
+			
+			PatientVestDeviceHistoryMonarch latestInActiveDevice = patientMonarchDeviceRepository.findLatestInActiveDeviceByPatientId(patientId, false);
+			List<TherapySessionMonarch> therapySessionsMonarch = PatientVestDeviceTherapyUtilMonarch
+					.prepareTherapySessionFromDeviceDataMonarch(patientVestDeviceRecordsMonarch,latestInActiveDevice);
+	
+			if(therapySessionsMonarch.isEmpty()){
+				log.debug("Could not make session out of the events received, discarding to get delta");
+				isReadComplete = true;
+				return new LinkedList<PatientVestDeviceDataMonarch>();
+			}
+			therapySessionServiceMonarch.saveOrUpdate(therapySessionsMonarch);
 		}
-		therapySessionServiceMonarch.saveOrUpdate(therapySessionsMonarch);
 		
 		isReadComplete = true;
 		return patientVestDeviceEventsMonarch;

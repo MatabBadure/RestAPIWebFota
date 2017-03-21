@@ -505,6 +505,36 @@ public class ClinicResource {
         }
     }
 	
+    @RequestMapping(value = "/adherenceResetProgress/{clinicId}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> getadherenceResetProgress(@PathVariable String clinicId) {
+        log.debug("REST request to get adherenceResetProgress");
+        JSONObject jsonObject = new JSONObject();
+        try {        	
+              String progress = adherenceCalculationService.getAdherenceResetProgressUpdate(clinicId);
+              if(Objects.isNull(progress)){
+            	  jsonObject.put("tot", 0);
+                  jsonObject.put("cur", 0);
+                  jsonObject.put("sta", "inprogress");
+              }else{
+            	  String[] splitProgress = progress.split("-");
+            	  jsonObject.put("tot", splitProgress[0]);
+                  jsonObject.put("cur", splitProgress[1]);                  
+                  jsonObject.put("sta", splitProgress[0].equals(splitProgress[1])?"completed":"inprogress");                 
+              }
+              System.out.println("progress value -- "+progress);              
+              return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+       } catch(Exception e){
+              jsonObject.put("ERROR", e.getMessage());
+              System.out.println("Exception in adherenceResetProgress - "+e.getMessage());
+              return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+       }
+    }
+
+    
 	private Map<String,String> getSearchParams(String filterString){
 		
 		Map<String,String> filterMap = new HashMap<>();

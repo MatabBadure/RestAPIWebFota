@@ -1351,13 +1351,8 @@ public class UserService {
 		PatientCompliance compliance =null;
 		PatientComplianceMonarch complianceMonarch = null;
 		Note memoNote = null;
-		NoteMonarch memoNoteMonarch = null;
-		if(deviceType.equals(VEST)){
-			memoNote = noteService.findMemoNotesForPatientId(id, patientInfo.getId());
-		}
-		else if(deviceType.equals(MONARCH)){
-			memoNoteMonarch = noteServiceMonarch.findMemoNotesForPatientId(id, patientInfo.getId());
-		}
+		memoNote = noteService.findMemoNotesForPatientId(id, patientInfo.getId());
+		
 		if(deviceType.equals(VEST)){
 			compliance = complianceService.findLatestComplianceByPatientUserId(id);
 		}
@@ -1385,12 +1380,7 @@ public class UserService {
 				Map<String,Object> clinicMRNId = new HashMap<>();
 				clinicMRNId.put("clinicId", clinicPatientAssoc.getClinic().getId());
 				clinicMRNId.put("mrnId", clinicPatientAssoc.getMrnId());
-				if(deviceType.equals(VEST)){
-					clinicMRNId.put("memoNote", (null == memoNote) ? "" : memoNote.getNote());
-				}
-				else if(deviceType.equals(MONARCH)){
-					clinicMRNId.put("memoNoteMonarch", (null == memoNoteMonarch) ? "" : memoNoteMonarch.getNote());
-				}
+				clinicMRNId.put("memoNote", (null == memoNote) ? "" : memoNote.getNote());
 				mrnId = clinicPatientAssoc.getMrnId(); 
 				patientUserVO.setMrnId(mrnId);
 				patientUserVO.setClinicMRNId(clinicMRNId);

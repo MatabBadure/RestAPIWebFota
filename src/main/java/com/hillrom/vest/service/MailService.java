@@ -396,7 +396,6 @@ public class MailService {
     	try{
     		DateTime currectTime =  new DateTime();
 			List<User> user = userRepository.findAll();
-			if(currectTime.isAfter(DateTime.now().minusHours(72)))
 			getUsersActivationReminderEmail(currectTime.minusHours(72).minusHours(1),currectTime.minusHours(72));
 			DateTime threeDaysAgo = DateTime.now().minusHours(72);
 				if(user.get(0).getActivationLinkSentDate().isBefore(threeDaysAgo.toInstant().getMillis()))

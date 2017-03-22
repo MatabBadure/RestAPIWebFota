@@ -49,6 +49,7 @@ import com.hillrom.vest.web.rest.dto.UserSurveyAnswerDTO;
 
 
 
+
 import javax.servlet.http.HttpServletRequest;
 
 import java.io.PrintWriter;
@@ -395,20 +396,14 @@ public class MailService {
 	public void activationReminderEmail(){
     	try{
     		DateTime currectTime =  new DateTime();
-    		int interval = accountActivationReminderInterval;
-			List<User> user = userRepository.findAll();
-			getUsersActivationReminderEmail(currectTime.minusHours(interval).minusHours(1),currectTime.minusHours(interval));
-			DateTime threeDaysAgo = DateTime.now().minusHours(72);
-				if(user.get(0).getActivationLinkSentDate().isBefore(threeDaysAgo.toInstant().getMillis()))
-					throw new HillromException(ExceptionConstants.HR_721);//Activation Remainder Link Expired
-				else 
-		        	throw new HillromException(ExceptionConstants.HR_722 + ExceptionConstants.HR_706);
-	    }catch(Exception ex){
-			StringWriter writer = new StringWriter();
-			PrintWriter printWriter = new PrintWriter( writer );
-			ex.printStackTrace( printWriter );
-			sendJobFailureNotification("activationReminderEmail",writer.toString());
-		}
+    			for(int interval = accountActivationReminderInterval; interval < 144; interval += accountActivationReminderInterval)
+    				getUsersActivationReminderEmail(currectTime.minusHours(interval).minusHours(1),currectTime.minusHours(interval));
+    	    }catch(Exception ex){
+    			StringWriter writer = new StringWriter();
+    			PrintWriter printWriter = new PrintWriter( writer );
+    			ex.printStackTrace( printWriter );
+    			sendJobFailureNotification("activationReminderEmail",writer.toString());
+    		}
 	}
     
 	private void getUsersActivationReminderEmail(DateTime fromTime,DateTime toTime){

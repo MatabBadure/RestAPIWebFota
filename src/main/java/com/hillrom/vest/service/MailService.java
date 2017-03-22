@@ -391,7 +391,7 @@ public class MailService {
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
     
-    @Scheduled(cron="*/10 * * * *")
+    @Scheduled(cron="*/10 * * * * *")
 	@Async
 	public void activationReminderEmail(){
     	try{

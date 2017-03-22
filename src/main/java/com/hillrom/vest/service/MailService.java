@@ -38,12 +38,14 @@ import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserSurveyAnswer;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.PatientStatsVO;
 import com.hillrom.vest.web.rest.dto.UserSurveyAnswerDTO;
+
 
 
 
@@ -57,8 +59,10 @@ import java.time.ZoneId;
 import java.util.Date;
 
 import com.hillrom.vest.service.util.DateUtil;
+import com.hillrom.vest.util.ExceptionConstants;
 
 import org.apache.commons.lang.StringUtils;
+
 import java.util.Calendar;
 
 /**
@@ -390,9 +394,14 @@ public class MailService {
 	@Async
 	public void activationReminderEmail(){
     	try{
-			DateTime currectTime =  new DateTime();
-			for(int interval = accountActivationReminderInterval; interval < 72; interval += accountActivationReminderInterval)
-				getUsersActivationReminderEmail(currectTime.minusHours(interval).minusHours(1),currectTime.minusHours(interval));
+    		DateTime currectTime =  new DateTime();
+			List<User> user = userRepository.findAll();
+			getUsersActivationReminderEmail(currectTime.minusHours(72).minusHours(1),currectTime.minusHours(72));
+			DateTime threeDaysAgo = DateTime.now().minusHours(72);
+				if(user.get(0).getActivationLinkSentDate().isBefore(threeDaysAgo.toInstant().getMillis()))
+					throw new HillromException(ExceptionConstants.HR_721);//Activation Remainder Link Expired
+				else 
+		        	throw new HillromException(ExceptionConstants.HR_722 + ExceptionConstants.HR_706);
 	    }catch(Exception ex){
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter( writer );

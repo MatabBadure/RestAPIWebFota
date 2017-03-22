@@ -395,8 +395,9 @@ public class MailService {
 	public void activationReminderEmail(){
     	try{
     		DateTime currectTime =  new DateTime();
+    		int interval = accountActivationReminderInterval;
 			List<User> user = userRepository.findAll();
-			getUsersActivationReminderEmail(currectTime.minusHours(72).minusHours(1),currectTime.minusHours(72));
+			getUsersActivationReminderEmail(currectTime.minusHours(interval).minusHours(1),currectTime.minusHours(interval));
 			DateTime threeDaysAgo = DateTime.now().minusHours(72);
 				if(user.get(0).getActivationLinkSentDate().isBefore(threeDaysAgo.toInstant().getMillis()))
 					throw new HillromException(ExceptionConstants.HR_721);//Activation Remainder Link Expired

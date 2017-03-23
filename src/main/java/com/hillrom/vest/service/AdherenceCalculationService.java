@@ -366,7 +366,7 @@ public class AdherenceCalculationService {
 						}
 					}
 					adherenceResetProgressUpdate++;
-					adherenceResetProgressTotalCurrent.put(clinicId, userList.size()+"-"+(adherenceResetProgressUpdate > userList.size() ? userList.size() : adherenceResetProgressUpdate) );
+					adherenceResetProgressTotalCurrent.put(clinicId, userList.size()+"-"+adherenceResetProgressUpdate);
                     System.out.println("Patient Count - "+adherenceResetProgressUpdate);
 				}
 				adherenceResetProgressUpdate = 0;

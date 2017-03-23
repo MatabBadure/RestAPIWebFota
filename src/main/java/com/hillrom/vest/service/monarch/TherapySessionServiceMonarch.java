@@ -89,8 +89,17 @@ public class TherapySessionServiceMonarch {
 			PatientNoEventMonarch patientNoEvent = patientNoEventRepositoryMonarch.findByPatientUserId(patientUser.getId());
 			SortedMap<LocalDate,List<TherapySessionMonarch>> existingTherapySessionMap = getAllTherapySessionsMapByPatientUserId(patientUser.getId());
 			SortedMap<LocalDate,PatientComplianceMonarch> existingComplianceMapMonarch = complianceServiceMonarch.getPatientComplainceMapByPatientUserId(patientUser.getId());
-			adherenceCalculationServiceMonarch.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
-					receivedTherapySessionMapMonarch, existingComplianceMapMonarch,protocol);			
+			
+			String deviceType = "both";
+			if(deviceType.equals("monarch")){
+				adherenceCalculationServiceMonarch.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
+					receivedTherapySessionMapMonarch, existingComplianceMapMonarch,protocol);
+			}else if(deviceType.equals("both")){
+				adherenceCalculationServiceMonarch.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
+						receivedTherapySessionMapMonarch, existingComplianceMapMonarch,protocol,patientUser.getId());
+					
+			}
+			
 		}
 		return therapySessionsMonarch;
 	}

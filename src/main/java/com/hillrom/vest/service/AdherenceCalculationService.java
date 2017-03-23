@@ -366,7 +366,7 @@ public class AdherenceCalculationService {
 						}
 					}
 					adherenceResetProgressUpdate++;
-					adherenceResetProgressTotalCurrent.put(clinicId, userList.size()+"-"+adherenceResetProgressUpdate);
+					adherenceResetProgressTotalCurrent.put(clinicId, userList.size()+"-"+(adherenceResetProgressUpdate > userList.size() ? userList.size() : adherenceResetProgressUpdate) );
                     System.out.println("Patient Count - "+adherenceResetProgressUpdate);
 				}
 				adherenceResetProgressUpdate = 0;
@@ -1604,12 +1604,13 @@ public class AdherenceCalculationService {
 				previousSettingsDeviatedDaysCount = previousCompliance.getSettingsDeviatedDaysCount();
 			}
 			// If settingsDeviationDaysCount is 0 for previous date, settingsDeviationDaysCount would be default value. increments thereafter
-			settingsDeviatedDaysCount =  previousSettingsDeviatedDaysCount == 0 ? adherenceSettingDay :++previousSettingsDeviatedDaysCount;
+			// settingsDeviatedDaysCount =  previousSettingsDeviatedDaysCount == 0 ? adherenceSettingDay :++previousSettingsDeviatedDaysCount;
+			settingsDeviatedDaysCount =  ++previousSettingsDeviatedDaysCount;
 			latestCompliance.setSettingsDeviatedDaysCount(settingsDeviatedDaysCount);
 		}
 	} 
 	
-	private List<TherapySession> prepareTherapySessionsForLastSettingdays(
+	public List<TherapySession> prepareTherapySessionsForLastSettingdays(
 			LocalDate currentTherapyDate,
 			SortedMap<LocalDate, List<TherapySession>> existingTherapySessionMap,
 			SortedMap<LocalDate, List<TherapySession>> receivedTherapySessionsMap,
@@ -1623,7 +1624,7 @@ public class AdherenceCalculationService {
 		return therapySessions;
 	}
 	
-	private boolean isSettingsDeviatedForSettingDays(List<TherapySession> lastSettingDaysTherapySessions,
+	public boolean isSettingsDeviatedForSettingDays(List<TherapySession> lastSettingDaysTherapySessions,
 			ProtocolConstants protocol, Integer adherenceSettingDay){
 		Map<LocalDate, List<TherapySession>> lastSettingDaysTherapySessionMap = lastSettingDaysTherapySessions
 				.stream().collect(

@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.Future;
@@ -91,6 +92,9 @@ public class AdherenceCalculationService {
 
 	private static final String WEIGHTED_AVG_FREQUENCY = "weightedAvgFrequency";
 
+	private static volatile int adherenceResetProgressUpdate = 0;
+	private static volatile HashMap<String, String> adherenceResetProgressTotalCurrent = new HashMap<String, String>();
+	
 	@Inject
 	private PatientProtocolService protocolService;
 	
@@ -284,9 +288,6 @@ public class AdherenceCalculationService {
 			
 			userProtocolConstantsMap = protocolService.getProtocolByPatientUserIds(new LinkedList<>(hmrNonComplianceMap.keySet()));
 			
-			//int maxAdherenceSetting = getMaxAdherenceSettingDay();			
-			//Map<Long,List<TherapySession>> userIdLastSettingDaysTherapiesMap = getLastSettingDaysTherapiesGroupByUserId(new LinkedList<>(hmrNonComplianceMap.keySet()),getPlusOrMinusTodayLocalDate(-(maxAdherenceSetting-1)),today);
-
 			calculateHMRComplianceForMST(today, hmrNonComplianceMap,
 					userProtocolConstantsMap, complianceMap, notificationMap);
 			
@@ -310,16 +311,17 @@ public class AdherenceCalculationService {
 		try{
 			long startTime = System.currentTimeMillis();
 			
-			//List<PatientInfo> patientList = clinicPatientService.getPatientListForClinic(clinicId);
 			List<User> userList = clinicPatientService.getUserListForClinic(clinicId);
 			List<Long> userIdList = clinicPatientService.getUserIdListFromUserList(userList);
 			
 			Map<Long,PatientNoEvent> userIdNoEventMap = noEventService.findAllByPatientUserId(userIdList);
 			Map<Long,PatientNoEventMonarch> userIdNoEventMapMonarch = noEventMonarchService.findAllByPatientUserId(userIdList);
 			String successMessage = "";
+			
 			if(userList.size()>0){
+				adherenceResetProgressTotalCurrent.put(clinicId, userList.size()+"-0");
+				System.out.println("No of Users - "+userList.size());
 				for(User user : userList){
-					//User user = userService.getUserObjFromPatientInfo(patient);
 					
 					LocalDate startDate = fineOneByPatientUserIdLatestResetStartDate(user.getId());
 					LocalDate startDateMonarch = adherenceCalculationServiceMonarch.fineOneByPatientUserIdLatestResetStartDate(user.getId());
@@ -332,10 +334,10 @@ public class AdherenceCalculationService {
 					if( ( deviceType.equals("VEST") && Objects.nonNull(startDate) ) || 
 							( deviceType.equals("MONARCH") && Objects.nonNull(startDateMonarch) ) ||
 							( deviceType.equals("ALL") && Objects.nonNull(startDate) && Objects.nonNull(startDateMonarch) ) ){
+						
 						// To identify unique for existing reset for the patient
 						resetFlagForSetting = 2;
 					}
-					
 					
 					if((deviceType.equals("VEST") || deviceType.equals("ALL")) && Objects.isNull(startDate)){
 						PatientNoEvent noEvent = userIdNoEventMap.get(user.getId());
@@ -350,7 +352,6 @@ public class AdherenceCalculationService {
 						if(Objects.nonNull(noEventMonarch) &&  Objects.nonNull(noEventMonarch.getFirstTransmissionDate())){
 							startDateMonarch = noEventMonarch.getFirstTransmissionDate();
 						}
-						
 					}
 					
 					if(Objects.nonNull(startDate) || Objects.nonNull(startDateMonarch)){
@@ -364,9 +365,15 @@ public class AdherenceCalculationService {
 							adherenceCalculationServiceMonarch.adherenceResetForPatient(user.getId(), patient.getId(), startDateMonarch, DEFAULT_COMPLIANCE_SCORE, resetFlagForSetting);
 						}
 					}
+					adherenceResetProgressUpdate++;
+					adherenceResetProgressTotalCurrent.put(clinicId, userList.size()+"-"+adherenceResetProgressUpdate);
+                    System.out.println("Patient Count - "+adherenceResetProgressUpdate);
 				}
+				adherenceResetProgressUpdate = 0;
 				successMessage = MessageConstants.HR_314;
 			}else{
+				adherenceResetProgressTotalCurrent.put(clinicId,"0-0");
+				System.out.println("Patient Count - No users");
 				successMessage = MessageConstants.HR_315;
 			}
 			long endTime   = System.currentTimeMillis();
@@ -1667,4 +1674,24 @@ public class AdherenceCalculationService {
 		PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(patientUserId);		
 		return getAdherenceSettingForPatient(patient);		
 	}
+	
+	public String getAdherenceResetProgressUpdate(String clinicId){
+		
+		 // Get a set of the entries
+        Set set = adherenceResetProgressTotalCurrent.entrySet();
+        
+        // Get an iterator
+        Iterator i = set.iterator();
+
+        // Display elements
+        while(i.hasNext()) {
+			Map.Entry me = (Map.Entry)i.next();
+			if(me.getKey().equals(clinicId)){
+				return me.getValue().toString();
+			}
+        }
+        
+        return null;		
+	}
+	
 }

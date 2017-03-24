@@ -124,5 +124,6 @@
 	<include file="classpath:/config/liquibase/changelog/20170217053300_add_column_VEST_DEVICE_DATA_MONARCH.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170224160200_add_column_VEST_DEVICE_DATA_MONARCH.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170227143200_add_column_PATIENT_VEST_DEVICE_RAW_LOGS_MONARCH.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170316014700_add_column_PATIENT_DEVICES_ASSOC.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

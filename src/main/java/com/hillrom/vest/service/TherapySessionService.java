@@ -75,8 +75,16 @@ public class TherapySessionService {
 			PatientNoEvent patientNoEvent = patientNoEventRepository.findByPatientUserId(patientUser.getId());
 			SortedMap<LocalDate,List<TherapySession>> existingTherapySessionMap = getAllTherapySessionsMapByPatientUserId(patientUser.getId());
 			SortedMap<LocalDate,PatientCompliance> existingComplianceMap = complianceService.getPatientComplainceMapByPatientUserId(patientUser.getId());
-			adherenceCalculationService.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
-					receivedTherapySessionMap, existingComplianceMap,protocol);
+						
+			String deviceType = "both";
+			if(deviceType.equals("vest")){
+				adherenceCalculationService.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
+						receivedTherapySessionMap, existingComplianceMap,protocol);
+			}else if(deviceType.equals("both")){
+				adherenceCalculationService.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
+						receivedTherapySessionMap, existingComplianceMap,protocol,patientUser.getId());
+			}		
+			
 		}
 		return therapySessions;
 	}

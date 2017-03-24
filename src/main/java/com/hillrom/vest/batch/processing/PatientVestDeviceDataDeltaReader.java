@@ -186,12 +186,12 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 	@Transactional
 	private synchronized UserPatientAssoc createPatientUserIfNotExists(PatientVestDeviceRawLog deviceRawLog,
 			String deviceSerialNumber) throws Exception{
-		Optional<PatientInfo> patientFromDB = patientInfoRepository.findOneBySerialNumber(deviceSerialNumber);
-
+		
+		Optional<PatientDevicesAssoc> patientDevicesFromDB = patientDevicesAssocRepository.findOneBySerialNumber(deviceSerialNumber);
 		PatientInfo patientInfo = null;
 
-		if (patientFromDB.isPresent()) {
-			patientInfo = patientFromDB.get();
+		if (patientDevicesFromDB.isPresent()) {
+			patientInfo = patientInfoRepository.findOneById(patientDevicesFromDB.get().getPatientId());
 			List<UserPatientAssoc> associations = userPatientRepository.findOneByPatientId(patientInfo.getId());
 			List<UserPatientAssoc> userPatientAssociations = associations.stream()
 					.filter(assoc -> RelationshipLabelConstants.SELF.equalsIgnoreCase(assoc.getRelationshipLabel()))
@@ -247,7 +247,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 					patientInfo.getBluetoothId(), patientInfo.getHubId(), true, DateTime.now());
 			patientVestDeviceRepository.save(deviceHistory);
 			
-			PatientDevicesAssoc deviceAssoc = new PatientDevicesAssoc(patientInfo.getId(), "VEST" ,true);
+			PatientDevicesAssoc deviceAssoc = new PatientDevicesAssoc(patientInfo.getId(), "VEST", true, deviceSerialNumber, hillromId);
 			patientDevicesAssocRepository.save(deviceAssoc);
 			
 			return userPatientAssoc;

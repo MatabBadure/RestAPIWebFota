@@ -44,16 +44,23 @@ public class PatientDevicesAssoc implements Serializable {
     @Column(name = "is_active")
     private Boolean isActive = false;
 
+    @Column(name = "serial_number")
+    private String serialNumber;
+    
+    @Column(name = "hillrom_id")
+    private String hillromId;
     
     public PatientDevicesAssoc() {
 		super();
 	}
 
-	public PatientDevicesAssoc(String patientId, String deviceType,Boolean isActive) {
+	public PatientDevicesAssoc(String patientId, String deviceType,Boolean isActive, String serialNumber, String hillromId) {
 		super();
 		this.patientId = patientId;
 		this.deviceType = deviceType;
 		this.isActive = isActive;
+		this.serialNumber = serialNumber;
+		this.hillromId = hillromId;
 	}
     
 	/**
@@ -110,6 +117,34 @@ public class PatientDevicesAssoc implements Serializable {
 	 */
 	public void setIsActive(Boolean isActive) {
 		this.isActive = isActive;
+	}
+
+	/**
+	 * @return the serialNumber
+	 */
+	public String getSerialNumber() {
+		return serialNumber;
+	}
+
+	/**
+	 * @param serialNumber the serialNumber to set
+	 */
+	public void setSerialNumber(String serialNumber) {
+		this.serialNumber = serialNumber;
+	}
+
+	/**
+	 * @return the hillromId
+	 */
+	public String getHillromId() {
+		return hillromId;
+	}
+
+	/**
+	 * @param hillromId the hillromId to set
+	 */
+	public void setHillromId(String hillromId) {
+		this.hillromId = hillromId;
 	}
 
 	/* (non-Javadoc)

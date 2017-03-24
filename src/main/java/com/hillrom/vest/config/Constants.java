@@ -1,6 +1,6 @@
 package com.hillrom.vest.config;
 
-import static com.hillrom.vest.config.Constants.WIFIorLTE_SERIAL_NO;
+
 
 
 /**

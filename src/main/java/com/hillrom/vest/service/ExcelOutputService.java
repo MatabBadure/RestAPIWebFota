@@ -29,11 +29,9 @@ import org.apache.poi.ss.usermodel.CreationHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
-import com.hillrom.vest.repository.PatientInfoRepository;
+
 
 @Service
 public class ExcelOutputService {
@@ -142,9 +140,9 @@ public class ExcelOutputService {
 			excelRow.createCell(5).setCellValue(deviceEvent.getDevLte());
 			}
 			else{
-			//excelRow.createCell(6).setCellValue("");
 			excelRow.createCell(5).setCellValue(deviceEvent.getDevWifi());
 			}
+			excelRow.createCell(6).setCellValue("");
 			excelRow.createCell(7).setCellValue(deviceEvent.getFrequency());
 			excelRow.createCell(8).setCellValue(deviceEvent.getIntensity());
 			excelRow.createCell(9).setCellValue(deviceEvent.getDuration());

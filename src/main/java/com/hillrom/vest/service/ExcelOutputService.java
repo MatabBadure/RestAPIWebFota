@@ -142,11 +142,11 @@ public class ExcelOutputService {
 			else{
 			excelRow.createCell(5).setCellValue(deviceEvent.getDevWifi());
 			}
-			excelRow.createCell(6).setCellValue("");
-			excelRow.createCell(7).setCellValue(deviceEvent.getFrequency());
-			excelRow.createCell(8).setCellValue(deviceEvent.getIntensity());
-			excelRow.createCell(9).setCellValue(deviceEvent.getDuration());
-			excelRow.createCell(10).setCellValue(deviceEvent.getHmrInHours());
+			//excelRow.createCell(6).setCellValue("");
+			excelRow.createCell(6).setCellValue(deviceEvent.getFrequency());
+			excelRow.createCell(7).setCellValue(deviceEvent.getIntensity());
+			excelRow.createCell(8).setCellValue(deviceEvent.getDuration());
+			excelRow.createCell(9).setCellValue(deviceEvent.getHmrInHours());
 		}
 	}
 	

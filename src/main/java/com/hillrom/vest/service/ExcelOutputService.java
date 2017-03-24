@@ -29,11 +29,9 @@ import org.apache.poi.ss.usermodel.CreationHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
-import com.hillrom.vest.repository.PatientInfoRepository;
+
 
 @Service
 public class ExcelOutputService {

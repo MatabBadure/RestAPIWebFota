@@ -140,9 +140,9 @@ public class ExcelOutputService {
 			excelRow.createCell(5).setCellValue(deviceEvent.getDevLte());
 			}
 			else{
-			//excelRow.createCell(6).setCellValue("");
 			excelRow.createCell(5).setCellValue(deviceEvent.getDevWifi());
 			}
+			excelRow.createCell(6).setCellValue("");
 			excelRow.createCell(7).setCellValue(deviceEvent.getFrequency());
 			excelRow.createCell(8).setCellValue(deviceEvent.getIntensity());
 			excelRow.createCell(9).setCellValue(deviceEvent.getDuration());

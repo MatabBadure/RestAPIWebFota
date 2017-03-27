@@ -366,7 +366,7 @@ public class ParserUtilMonarch {
         if(flagWifiLte == 1){
         	int combinedWifi = ParserUtilMonarch.intergerCombinedFromHex(devWifiOrLteArray);
         	String combinedWifiTest = ParserUtilMonarch.intergerCombinedFromHexForWifi(devWifiOrLteArray);
-        	int combinedWifiSecond = ParserUtilMonarch.intergerCombinedFromHexForHMR(devWifiOrLteArray);
+        	//int combinedWifiSecond = ParserUtilMonarch.intergerCombinedFromHexForHMR(devWifiOrLteArray);
         	
         	log.debug("Value of devWifi : "+ combinedWifi );
         	return Integer.toString(combinedWifi);

@@ -12,9 +12,21 @@ import static com.hillrom.vest.config.AdherenceScoreConstants.SETTING_DEVIATION_
 import static com.hillrom.vest.config.AdherenceScoreConstants.UPPER_BOUND_VALUE;
 import static com.hillrom.vest.config.NotificationTypeConstants.ADHERENCE_SCORE_RESET;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_VEST_AND_SETTINGS_DEVIATION;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_MONARCH_AND_SETTINGS_DEVIATION;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION_VEST;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_MONARCH_AND_SETTINGS_DEVIATION_VEST;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_VEST_AND_SETTINGS_DEVIATION_VEST;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION_MONARCH;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_MONARCH_AND_SETTINGS_DEVIATION_MONARCH;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_VEST_AND_SETTINGS_DEVIATION_MONARCH;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_VEST;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_MONARCH;
 import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_VEST;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_MONARCH;
 import static com.hillrom.vest.config.AdherenceScoreConstants.ADHERENCE_SETTING_DEFAULT_DAYS;
 import static com.hillrom.vest.service.util.DateUtil.getPlusOrMinusTodayLocalDate;
 import static com.hillrom.vest.service.util.DateUtil.getDateBeforeSpecificDays;
@@ -47,6 +59,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -147,6 +160,7 @@ public class AdherenceCalculationServiceMonarch{
 	//hill-1956
 	
 	@Inject
+	@Lazy
 	private AdherenceCalculationService adherenceCalculationService;
 	
 	@Inject
@@ -156,6 +170,7 @@ public class AdherenceCalculationServiceMonarch{
 	private PatientNoEventsRepository patientNoEventRepository;
 
 	@Inject
+	@Lazy
 	private TherapySessionService therapySessionService;
 	
 	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationServiceMonarch.class);
@@ -1279,7 +1294,6 @@ public class AdherenceCalculationServiceMonarch{
 						totalDuration, adherenceSettingDay);
 			}else { // User Transmitting data in Subsequent requests
 				// data is sent in sorted order
-				latestTherapyDate = existingTherapySessionMap.lastKey();
 				if (Objects.nonNull(firstTransmittedDate) && Objects.nonNull(currentTherapySessionDate)
 						&& firstTransmittedDate.isBefore(currentTherapySessionDate)){
 					// Data sent in sorted order
@@ -1402,7 +1416,13 @@ public class AdherenceCalculationServiceMonarch{
 			SortedMap<LocalDate, List<TherapySessionMonarch>> receivedTherapySessionsMap,
 			Integer adherenceSettingDay) throws Exception{
 		
-		LocalDate latestComplianceDate = existingComplianceMap.lastKey();
+		LocalDate latestComplianceDate;
+		if(existingComplianceMap.size()>0){
+			latestComplianceDate = existingComplianceMap.lastKey();
+		}else{
+			SortedMap<LocalDate,PatientCompliance> existingComplianceVestMap = complianceService.getPatientComplainceMapByPatientUserId(patientUser.getId());
+			latestComplianceDate = existingComplianceVestMap.lastKey();
+		}
 		
 		List<TherapySessionMonarch> sessionsTobeSaved = receivedTherapySessionsMap.get(currentTherapyDate);
 		// Get the therapy sessions for currentTherapyDate from existing therapies
@@ -1456,13 +1476,23 @@ public class AdherenceCalculationServiceMonarch{
 			
 			int hmrRunrate = calculateHMRRunRatePerSession(latestSettingDaysTherapySessions);
 			
+			String deviceType = "Both";			
+			if(deviceType == "Both"){				
+				SortedMap<LocalDate, List<TherapySession>> existingTherapySessionMapVest = 
+						therapySessionService.getAllTherapySessionsMapByPatientUserId(patientUser.getId());
+				
+				List<TherapySession> latestSettingDaysTherapySessionsVest = adherenceCalculationService.prepareTherapySessionsForLastSettingdays(therapyDate,
+						existingTherapySessionMapVest,adherenceSettingDay);
+				
+				hmrRunrate = calculateHMRRunRatePerSession(latestSettingDaysTherapySessions, latestSettingDaysTherapySessionsVest);				
+			}
+			
 			LocalDate lastTransmissionDate = getLatestTransmissionDate(
 					existingTherapySessionMap, therapyDate);
-			
-			String deviceType = "Both";			
+						
 			if(deviceType == "Both"){
 				SortedMap<LocalDate,List<TherapySession>> existingTherapySessionMapVest = 
-						therapySessionService.getAllTherapySessionsMapByPatientUserId(patientUser.getId());				
+						therapySessionService.getAllTherapySessionsMapByPatientUserId(patientUser.getId());
 				lastTransmissionDate = getLatestTransmissionDate(
 						existingTherapySessionMapVest, existingTherapySessionMap, therapyDate);
 			}
@@ -1662,33 +1692,39 @@ public class AdherenceCalculationServiceMonarch{
 			SortedMap<LocalDate,List<TherapySession>> existingTherapySessionMapVest = null; 
 					
 			Map<String,Double> therapyMetrics;
-			boolean isHMRCompliant;
+			Map<String,Double> therapyMetricsVest;
+			boolean isHMRCompliant = true;
+			boolean isHMRCompliantVest = true;
 			
 			List<TherapySessionMonarch> latestSettingDaysTherapySessions = prepareTherapySessionsForLastSettingdays(latestCompliance.getDate(),
 					existingTherapySessionMap,adherenceSettingDay);
 			
 			String deviceType = "Both";
 			
+			therapyMetrics = calculateTherapyMetricsPerSettingDays(latestSettingDaysTherapySessions);				
+			isHMRCompliant = isHMRCompliant(protocolConstant, therapyMetrics.get(TOTAL_DURATION),adherenceSettingDay);
+			
 			if("Both" == deviceType){
 				existingTherapySessionMapVest = 
 						therapySessionService.getAllTherapySessionsMapByPatientUserId(patientUser.getId());
 				
 				ProtocolConstants protocolConstantVest = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId()); 
+			
+				List<TherapySession> latestSettingDaysTherapySessionsVest = adherenceCalculationService.prepareTherapySessionsForLastSettingdays(latestCompliance.getDate(),
+						existingTherapySessionMapVest,adherenceSettingDay);
 				
-				Map<String, Object> latestSettingDaysTherapySessionsBoth = prepareTherapySessionsForLastSettingdays(latestCompliance.getDate(),
+				therapyMetricsVest = adherenceCalculationService.calculateTherapyMetricsPerSettingDays(latestSettingDaysTherapySessionsVest);
+				isHMRCompliantVest = adherenceCalculationService.isHMRCompliant(protocolConstantVest, therapyMetricsVest.get(TOTAL_DURATION),adherenceSettingDay);
+				
+				/*Map<String, Object> latestSettingDaysTherapySessionsBoth = prepareTherapySessionsForLastSettingdays(latestCompliance.getDate(),
 						existingTherapySessionMap,existingTherapySessionMapVest,adherenceSettingDay);
 				
 				therapyMetrics = calculateTherapyMetricsPerSettingDaysBoth(latestSettingDaysTherapySessionsBoth);
-				isHMRCompliant = isHMRCompliant(protocolConstant, protocolConstantVest, therapyMetrics.get(TOTAL_DURATION),adherenceSettingDay);
-			}else{
-			
-			
-				therapyMetrics = calculateTherapyMetricsPerSettingDays(latestSettingDaysTherapySessions);
-				
-				isHMRCompliant = isHMRCompliant(protocolConstant, therapyMetrics.get(TOTAL_DURATION),adherenceSettingDay);
+				isHMRCompliant = isHMRCompliant(protocolConstant, protocolConstantVest, therapyMetrics.get(TOTAL_DURATION),adherenceSettingDay);*/
 			}
 			
 			boolean isSettingsDeviated = false;
+			boolean isSettingsDeviatedVest = false;
 					
 			// Settings deviated to be calculated only on Therapy done days
 			if(currentMissedTherapyCount == 0){
@@ -1696,26 +1732,32 @@ public class AdherenceCalculationServiceMonarch{
 				isSettingsDeviated = isSettingsDeviatedForSettingDays(latestSettingDaysTherapySessions, protocolConstant, adherenceSettingDay);
 				
 				if("Both" == deviceType){
-					
 					List<TherapySession> latestSettingDaysTherapySessionsVest = adherenceCalculationService.prepareTherapySessionsForLastSettingdays(latestCompliance.getDate(),
 							existingTherapySessionMapVest,adherenceSettingDay);
 					
 					ProtocolConstants protocolConstantVest = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId());
 					
-					if(!isSettingsDeviated){
-						isSettingsDeviated = adherenceCalculationService.isSettingsDeviatedForSettingDays(latestSettingDaysTherapySessionsVest, protocolConstantVest, adherenceSettingDay);
-					}
+					isSettingsDeviatedVest = adherenceCalculationService.isSettingsDeviatedForSettingDays(latestSettingDaysTherapySessionsVest, protocolConstantVest, adherenceSettingDay);					
 				}
 				
 				applySettingsDeviatedDaysCount(latestCompliance, complianceMap,
-						isSettingsDeviated, adherenceSettingDay);
-				if(isSettingsDeviated){
+						(isSettingsDeviated || isSettingsDeviatedVest), adherenceSettingDay);
+
+				if(isSettingsDeviated || isSettingsDeviatedVest){
 					currentScore -=  SETTING_DEVIATION_POINTS;
-					notificationType =  SETTINGS_DEVIATION;
+					
+					if(isSettingsDeviated && isSettingsDeviatedVest){
+						notificationType =  SETTINGS_DEVIATION;
+					}else if(isSettingsDeviated && !isSettingsDeviatedVest){
+						notificationType =  SETTINGS_DEVIATION_MONARCH;
+					}else if(!isSettingsDeviated && isSettingsDeviatedVest){
+						notificationType =  SETTINGS_DEVIATION_VEST;
+					}
+					
 					// increment global settings Deviation counter
 					int globalSettingsDeviationCounter = latestCompliance.getGlobalSettingsDeviationCounter();
 					latestCompliance.setGlobalSettingsDeviationCounter(++globalSettingsDeviationCounter);
-				}else {
+				}else{
 					// reset settingsDeviatedDays count if patient is adhere to settings
 					latestCompliance.setSettingsDeviatedDaysCount(0);
 				}
@@ -1726,13 +1768,12 @@ public class AdherenceCalculationServiceMonarch{
 
 			latestCompliance.setSettingsDeviated(isSettingsDeviated);
 			
-			if(!isHMRCompliant){
+			if(!isHMRCompliant || !isHMRCompliantVest){
 				if(!today.equals(latestCompliance.getDate()) || currentMissedTherapyCount == 0){
 					currentScore -=  HMR_NON_COMPLIANCE_POINTS;
-					if(StringUtils.isBlank(notificationType))
-						notificationType =  HMR_NON_COMPLIANCE;
-					else
-						notificationType =  HMR_AND_SETTINGS_DEVIATION;
+					
+					notificationType = getNotificationString(notificationType, isHMRCompliant, isHMRCompliantVest);
+					
 					// increment global HMR Non Adherence Counter
 					int globalHMRNonAdherenceCounter = latestCompliance.getGlobalHMRNonAdherenceCounter();
 					latestCompliance.setGlobalHMRNonAdherenceCounter(++globalHMRNonAdherenceCounter);
@@ -1778,6 +1819,49 @@ public class AdherenceCalculationServiceMonarch{
 		complianceMap.put(latestCompliance.getDate(), latestCompliance);
 	}
 
+	public String getNotificationString(String notificationType,boolean isHMRCompliant,boolean isHMRCompliantVest)
+	{	
+		String retNotificationType = "";
+		
+		// When the no notification and both the Vest and Monarch are non HMR compliant
+		if(StringUtils.isBlank(notificationType) && !isHMRCompliant && !isHMRCompliantVest)
+			retNotificationType =  HMR_NON_COMPLIANCE;
+		// When the no notification and Monarch is HMR non compliant & Vest is HMR compliant
+		else if(StringUtils.isBlank(notificationType) && !isHMRCompliant && isHMRCompliantVest)
+			retNotificationType =  HMR_NON_COMPLIANCE_MONARCH;
+		// When the no notification and Vest is HMR non compliant & Monarch is HMR compliant
+		else if(StringUtils.isBlank(notificationType) && isHMRCompliant && !isHMRCompliantVest)
+			retNotificationType =  HMR_NON_COMPLIANCE_VEST;
+		// When both the device setting is deviated and both the device HMR is non compliant
+		else if(notificationType.equals(SETTINGS_DEVIATION) && !isHMRCompliant && !isHMRCompliantVest)
+			retNotificationType =  HMR_AND_SETTINGS_DEVIATION;
+		// When both the device setting is deviated and Vest is HMR non compliant and Monarch is HMR compliant
+		else if(notificationType.equals(SETTINGS_DEVIATION) && isHMRCompliant && !isHMRCompliantVest)
+			retNotificationType =  HMR_VEST_AND_SETTINGS_DEVIATION;
+		// When both the device setting is deviated and Monarch is HMR non compliant and Vest is HMR compliant
+		else if(notificationType.equals(SETTINGS_DEVIATION) && !isHMRCompliant && isHMRCompliantVest)
+			retNotificationType =  HMR_MONARCH_AND_SETTINGS_DEVIATION;
+		// When Vest device is setting deviated and Both the device are HMR non compliant
+		else if(notificationType.equals(SETTINGS_DEVIATION_VEST) && !isHMRCompliant && !isHMRCompliantVest)
+			retNotificationType =  HMR_AND_SETTINGS_DEVIATION_VEST;
+		// When Vest device is setting deviated and Monarch is HMR non compliant and Vest is HMR compliant
+		else if(notificationType.equals(SETTINGS_DEVIATION_VEST) && !isHMRCompliant && isHMRCompliantVest)
+			retNotificationType =  HMR_MONARCH_AND_SETTINGS_DEVIATION_VEST;
+		// When Vest device is setting deviated and Vest is HMR non compliant and Monarch is HMR compliant
+		else if(notificationType.equals(SETTINGS_DEVIATION_VEST) && isHMRCompliant && !isHMRCompliantVest)
+			retNotificationType =  HMR_VEST_AND_SETTINGS_DEVIATION_VEST;
+		// When Vest device is setting deviated and Both the device are HMR non compliant
+		else if(notificationType.equals(SETTINGS_DEVIATION_MONARCH) && !isHMRCompliant && !isHMRCompliantVest)
+			retNotificationType =  HMR_AND_SETTINGS_DEVIATION_MONARCH;
+		// When Vest device is setting deviated and Monarch is HMR non compliant and Vest is HMR compliant
+		else if(notificationType.equals(SETTINGS_DEVIATION_MONARCH) && !isHMRCompliant && isHMRCompliantVest)
+			retNotificationType =  HMR_MONARCH_AND_SETTINGS_DEVIATION_MONARCH;
+		// When Vest device is setting deviated and Vest is HMR non compliant and Monarch is HMR compliant
+		else if(notificationType.equals(SETTINGS_DEVIATION_MONARCH) && isHMRCompliant && !isHMRCompliantVest)
+			retNotificationType =  HMR_VEST_AND_SETTINGS_DEVIATION_MONARCH;
+		
+		return retNotificationType;
+	}
 	private void applySettingsDeviatedDaysCount(
 			PatientComplianceMonarch latestCompliance,
 			SortedMap<LocalDate, PatientComplianceMonarch> complianceMap,
@@ -1799,7 +1883,7 @@ public class AdherenceCalculationServiceMonarch{
 	
 	public List<TherapySessionMonarch> prepareTherapySessionsForLastSettingdays(
 			LocalDate currentTherapyDate,
-			SortedMap<LocalDate, List<TherapySessionMonarch>> existingTherapySessionMap,			
+			SortedMap<LocalDate, List<TherapySessionMonarch>> existingTherapySessionMap,
 			Integer adherenceSettingDay) {
 		List<TherapySessionMonarch> therapySessions = new LinkedList<>();
 		for(int i = 0;i < adherenceSettingDay;i++){

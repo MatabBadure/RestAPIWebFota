@@ -19,6 +19,7 @@ import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
+import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.TherapySessionMonarch;
 import com.hillrom.vest.domain.User;
 
@@ -527,6 +528,19 @@ public class PatientVestDeviceTherapyUtilMonarch {
 	public static int calculateHMRRunRatePerSession(List<TherapySessionMonarch> therapySessions){
 		float sessionsCount = therapySessions.isEmpty()?1:therapySessions.size();
 		return Math.round(calculateCumulativeDuration(therapySessions)/sessionsCount);
+	}
+	
+	public static int calculateCumulativeDurationVest(List<TherapySession> therapySessions){
+		return therapySessions.stream().collect(Collectors.summingInt(TherapySession::getDurationInMinutes));
+	}
+	
+	public static int calculateHMRRunRatePerSession(List<TherapySessionMonarch> therapySessions,List<TherapySession> therapySessionsVest){
+		float sessionsCount = therapySessions.isEmpty()?1:therapySessions.size();
+		
+		float sessionsCountVest = therapySessions.isEmpty()?1:therapySessions.size();
+		
+		return Math.round((calculateCumulativeDuration(therapySessions)+calculateCumulativeDurationVest(therapySessionsVest))
+																								/(sessionsCount+sessionsCountVest));
 	}
 	
 	public static String getEventStringByEventCode(int eventCode) {

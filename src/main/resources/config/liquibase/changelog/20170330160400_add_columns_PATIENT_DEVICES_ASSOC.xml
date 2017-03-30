@@ -5,8 +5,7 @@
 	
 	<!-- Added new field created_date in PATIENT_DEVICES_ASSOC table. -->
 	<changeSet author="LnT Technology Services" id="20170329160400">
-		<addColumn tableName="PATIENT_DEVICES_ASSOC">
-			<column name="created_date" type="timestamp" defaultValueDate="${now}"/>
+		<addColumn tableName="PATIENT_DEVICES_ASSOC">			
 			<column name="old_patient_id" type="varchar(255)" />
         </addColumn>
 	</changeSet>

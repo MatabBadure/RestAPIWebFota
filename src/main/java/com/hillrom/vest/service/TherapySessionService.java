@@ -36,6 +36,7 @@ import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
+
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 
 @Service
@@ -75,12 +76,13 @@ public class TherapySessionService {
 			PatientNoEvent patientNoEvent = patientNoEventRepository.findByPatientUserId(patientUser.getId());
 			SortedMap<LocalDate,List<TherapySession>> existingTherapySessionMap = getAllTherapySessionsMapByPatientUserId(patientUser.getId());
 			SortedMap<LocalDate,PatientCompliance> existingComplianceMap = complianceService.getPatientComplainceMapByPatientUserId(patientUser.getId());
-						
-			String deviceType = "both";
-			if(deviceType.equals("vest")){
+			
+			String deviceType = adherenceCalculationService.getDeviceTypeValue(patient.getId());
+			
+			if(deviceType.equals("VEST")){
 				adherenceCalculationService.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
 						receivedTherapySessionMap, existingComplianceMap,protocol);
-			}else if(deviceType.equals("both")){
+			}else if(deviceType.equals("BOTH")){
 				adherenceCalculationService.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
 						receivedTherapySessionMap, existingComplianceMap,protocol,patientUser.getId());
 			}		

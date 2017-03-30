@@ -1,7 +1,6 @@
 package com.hillrom.vest.domain;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,6 +18,10 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
+import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 
 
 /**
@@ -49,6 +52,15 @@ public class PatientDevicesAssoc implements Serializable {
     
     @Column(name = "hillrom_id")
     private String hillromId;
+    
+    @Column(name="created_date")
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
+	@JsonSerialize(using = CustomLocalDateSerializer.class)
+    @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
+	private LocalDate createdDate;
+    
+    @Column(name = "old_patient_id")
+    private String oldPatientId;
     
     public PatientDevicesAssoc() {
 		super();
@@ -146,7 +158,35 @@ public class PatientDevicesAssoc implements Serializable {
 	public void setHillromId(String hillromId) {
 		this.hillromId = hillromId;
 	}
+	
+		/**
+	 * @return the createdDate
+	 */
+	public LocalDate getCreatedDate() {
+		return createdDate;
+	}
 
+	/**
+	 * @param createdDate the createdDate to set
+	 */
+	public void setCreatedDate(LocalDate createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	/**
+	 * @return the oldPatientId
+	 */
+	public String getOldPatientId() {
+		return oldPatientId;
+	}
+
+	/**
+	 * @param patientId the patientId to set
+	 */
+	public void setOldPatientId(String oldPatientId) {
+		this.oldPatientId = oldPatientId;
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */

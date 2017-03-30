@@ -812,7 +812,8 @@ public class UserResource {
         		}
            		return new ResponseEntity<>(compliance,HttpStatus.OK);
         	}
-    	}else if (deviceType.equals(MONARCH)){
+    	//}else if (deviceType.equals(MONARCH)){
+    	}else {
     		PatientComplianceMonarch compliance = patientComplianceMonarchService.findLatestComplianceByPatientUserId(id);
     		if(Objects.nonNull(compliance)){
         		if(Objects.isNull(compliance.getHmrRunRate())){
@@ -1437,5 +1438,19 @@ public class UserResource {
         }
     }
     
+    /**
+     * GET  /users/:userId/clinics/:clinicId/statistics -> get the patient statistics for clinic Badge associated with user.
+     */
+    @RequestMapping(value = "/testingDeviceCron",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<?> getTetingDeviceCron() throws HillromException {
+        log.debug("REST request to get testing Device Cron");
+        JSONObject jsonObject = new JSONObject();        
+		adherenceCalculationServiceMonarch.processDeviceDetails();        	
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    }
     
 }

@@ -21,6 +21,7 @@ import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.batch.processing.monarch.PatientMonarchDeviceDataReader;
@@ -60,6 +61,10 @@ public class TherapySessionServiceMonarch {
 	private AdherenceCalculationServiceMonarch adherenceCalculationServiceMonarch;
 	
 	@Inject
+	@Lazy
+	private AdherenceCalculationService adherenceCalculationService;
+	
+	@Inject
 	private PatientComplianceMonarchService complianceServiceMonarch;
 	
 	@Inject
@@ -90,11 +95,13 @@ public class TherapySessionServiceMonarch {
 			SortedMap<LocalDate,List<TherapySessionMonarch>> existingTherapySessionMap = getAllTherapySessionsMapByPatientUserId(patientUser.getId());
 			SortedMap<LocalDate,PatientComplianceMonarch> existingComplianceMapMonarch = complianceServiceMonarch.getPatientComplainceMapByPatientUserId(patientUser.getId());
 			
-			String deviceType = "both";
-			if(deviceType.equals("monarch")){
+			
+			String deviceType = adherenceCalculationService.getDeviceTypeValue(patient.getId());
+			
+			if(deviceType.equals("MONARCH")){
 				adherenceCalculationServiceMonarch.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
 					receivedTherapySessionMapMonarch, existingComplianceMapMonarch,protocol);
-			}else if(deviceType.equals("both")){
+			}else if(deviceType.equals("BOTH")){
 				adherenceCalculationServiceMonarch.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
 						receivedTherapySessionMapMonarch, existingComplianceMapMonarch,protocol,patientUser.getId());
 					

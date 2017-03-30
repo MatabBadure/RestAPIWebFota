@@ -534,13 +534,14 @@ public class PatientVestDeviceTherapyUtilMonarch {
 		return therapySessions.stream().collect(Collectors.summingInt(TherapySession::getDurationInMinutes));
 	}
 	
-	public static int calculateHMRRunRatePerSession(List<TherapySessionMonarch> therapySessions,List<TherapySession> therapySessionsVest){
-		float sessionsCount = therapySessions.isEmpty()?1:therapySessions.size();
+	public static int calculateHMRRunRatePerSessionBoth(List<TherapySessionMonarch> therapySessions,List<TherapySession> therapySessionsVest){
+		float sessionsCountMonarch = therapySessions.isEmpty()?0:therapySessions.size();		
+		float sessionsCountVest = therapySessionsVest.isEmpty()?0:therapySessions.size();
 		
-		float sessionsCountVest = therapySessions.isEmpty()?1:therapySessions.size();
+		float sessionsCount = (sessionsCountMonarch+sessionsCountVest) == 0 ? 1 :(sessionsCountMonarch+sessionsCountVest);
 		
 		return Math.round((calculateCumulativeDuration(therapySessions)+calculateCumulativeDurationVest(therapySessionsVest))
-																								/(sessionsCount+sessionsCountVest));
+																								/(sessionsCount));
 	}
 	
 	public static String getEventStringByEventCode(int eventCode) {

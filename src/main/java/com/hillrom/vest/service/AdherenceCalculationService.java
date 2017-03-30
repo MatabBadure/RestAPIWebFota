@@ -22,6 +22,7 @@ import static com.hillrom.vest.service.util.DateUtil.getPlusOrMinusTodayLocalDat
 import static com.hillrom.vest.service.util.DateUtil.getDateBeforeSpecificDays;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateCumulativeDuration;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateHMRRunRatePerSession;
+import static com.hillrom.vest.service.util.monarch.PatientVestDeviceTherapyUtilMonarch.calculateHMRRunRatePerSessionBoth;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 
 import java.io.PrintWriter;
@@ -34,6 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -58,6 +60,7 @@ import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
+import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientNoEventMonarch;
@@ -71,6 +74,7 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
+import com.hillrom.vest.repository.PatientDevicesAssocRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.service.monarch.AdherenceCalculationServiceMonarch;
 import com.hillrom.vest.service.monarch.PatientComplianceMonarchService;
@@ -159,7 +163,10 @@ public class AdherenceCalculationService {
     private PatientComplianceMonarchService complianceServiceMonarch;
 		
 	@Inject
-    private PatientNoEventsMonarchRepository patientNoEventMonarchRepository; 
+    private PatientNoEventsMonarchRepository patientNoEventMonarchRepository;
+	
+	@Inject
+	PatientDevicesAssocRepository patientDevicesAssocRepository;
     
 	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationService.class);
 	
@@ -1579,11 +1586,22 @@ public class AdherenceCalculationService {
 			
 			int hmrRunrate = calculateHMRRunRatePerSession(latestSettingDaysTherapySessions);
 			
+			String deviceType = getDeviceTypeValue(patient.getId());
+			
+			if(deviceType.equals("BOTH")){				
+				SortedMap<LocalDate, List<TherapySessionMonarch>> existingTherapySessionMapMonarch = 
+						therapySessionServiceMonarch.getAllTherapySessionsMapByPatientUserId(patientUser.getId());
+				
+				List<TherapySessionMonarch> latestSettingDaysTherapySessionsMonarch = adherenceCalculationServiceMonarch.prepareTherapySessionsForLastSettingdays(therapyDate,
+						existingTherapySessionMapMonarch,adherenceSettingDay);
+				
+				hmrRunrate = calculateHMRRunRatePerSessionBoth(latestSettingDaysTherapySessionsMonarch, latestSettingDaysTherapySessions);				
+			}
+			
 			LocalDate lastTransmissionDate = getLatestTransmissionDate(
 					existingTherapySessionMap, therapyDate);
 						
-			String deviceType = "Both";			
-			if(deviceType == "Both"){
+			if(deviceType.equals("BOTH")){
 				SortedMap<LocalDate,List<TherapySessionMonarch>> existingTherapySessionMapMonarch = 
 						therapySessionServiceMonarch.getAllTherapySessionsMapByPatientUserId(patientUser.getId());				
 				lastTransmissionDate = adherenceCalculationServiceMonarch.getLatestTransmissionDate(
@@ -1773,8 +1791,10 @@ public class AdherenceCalculationService {
 			therapyMetrics = calculateTherapyMetricsPerSettingDays(latestSettingDaysTherapySessions);			
 			isHMRCompliant = isHMRCompliant(protocolConstant, therapyMetrics.get(TOTAL_DURATION),adherenceSettingDay);
 			
-			String deviceType = "Both";
-			if("Both" == deviceType){
+			
+			String deviceType = getDeviceTypeValue(patient.getId());
+			
+			if(deviceType.equals("BOTH")){
 				
 				
 				existingTherapySessionMapMonarch = 
@@ -1810,7 +1830,7 @@ public class AdherenceCalculationService {
 			if(currentMissedTherapyCount == 0){
 				isSettingsDeviated = isSettingsDeviatedForSettingDays(latestSettingDaysTherapySessions, protocolConstant, adherenceSettingDay);
 				
-				if("Both" == deviceType){
+				if(deviceType.equals("BOTH")){
 					
 					List<TherapySessionMonarch> latestSettingDaysTherapySessionsMonarch = adherenceCalculationServiceMonarch.prepareTherapySessionsForLastSettingdays(latestCompliance.getDate(),
 							existingTherapySessionMapMonarch,adherenceSettingDay);
@@ -1822,10 +1842,12 @@ public class AdherenceCalculationService {
 				
 				applySettingsDeviatedDaysCount(latestCompliance, complianceMap,
 						isSettingsDeviated, adherenceSettingDay);
+				
+				
 				if(isSettingsDeviated || isSettingsDeviatedMonarch){
 					currentScore -=  SETTING_DEVIATION_POINTS;
 					
-					if(isSettingsDeviated && isSettingsDeviatedMonarch){
+					if(isSettingsDeviated && (deviceType.equals("VEST") ||  isSettingsDeviatedMonarch)){
 						notificationType =  SETTINGS_DEVIATION;
 					}else if(isSettingsDeviated && !isSettingsDeviatedMonarch){
 						notificationType =  SETTINGS_DEVIATION_VEST;
@@ -1851,8 +1873,14 @@ public class AdherenceCalculationService {
 				if(!today.equals(latestCompliance.getDate()) || currentMissedTherapyCount == 0){
 					currentScore -=  HMR_NON_COMPLIANCE_POINTS;
 					
-					notificationType = adherenceCalculationServiceMonarch.getNotificationString(notificationType, isHMRCompliantMonarch, isHMRCompliant);
-					
+					if(deviceType.equals("VEST")){
+						if(StringUtils.isBlank(notificationType))
+							notificationType =  HMR_NON_COMPLIANCE;
+						else
+							notificationType =  HMR_AND_SETTINGS_DEVIATION;
+					}else{
+						notificationType = adherenceCalculationServiceMonarch.getNotificationString(notificationType, isHMRCompliantMonarch, isHMRCompliant);
+					}
 					// increment global HMR Non Adherence Counter
 					int globalHMRNonAdherenceCounter = latestCompliance.getGlobalHMRNonAdherenceCounter();
 					latestCompliance.setGlobalHMRNonAdherenceCounter(++globalHMRNonAdherenceCounter);
@@ -1999,6 +2027,16 @@ public class AdherenceCalculationService {
         }
         
         return null;		
+	}
+	
+	public String getDeviceTypeValue(String patientId){		
+		List<PatientDevicesAssoc> patientDevicesFromDB = patientDevicesAssocRepository.findByPatientId(patientId);
+		
+		if(patientDevicesFromDB.size()>1){
+			return "BOTH";
+		}else{
+			return patientDevicesFromDB.get(0).getDeviceType();
+		}		
 	}
 	
 }

@@ -2,12 +2,13 @@ package com.hillrom.vest.config;
 
 public class NotificationTypeConstants {
 
-	public static String SETTINGS_DEVIATION = "SETTINGS_DEVIATION";
+	public static final String SETTINGS_DEVIATION = "SETTINGS_DEVIATION";
 	public static String HMR_NON_COMPLIANCE = "HMR_NON_COMPLIANCE";
 	public static String HMR_AND_SETTINGS_DEVIATION = HMR_NON_COMPLIANCE+" AND "+SETTINGS_DEVIATION;
-	public static String SETTINGS_DEVIATION_VEST = "SETTINGS_DEVIATION_VEST";
+	
+	public static final String SETTINGS_DEVIATION_VEST = "SETTINGS_DEVIATION_VEST";
 	public static String HMR_NON_COMPLIANCE_VEST = "HMR_NON_COMPLIANCE_VEST";
-	public static String SETTINGS_DEVIATION_MONARCH = "SETTINGS_DEVIATION_MONARCH";
+	public static final String SETTINGS_DEVIATION_MONARCH = "SETTINGS_DEVIATION_MONARCH";
 	public static String HMR_NON_COMPLIANCE_MONARCH = "HMR_NON_COMPLIANCE_MONARCH";
 	
 	public static String HMR_AND_SETTINGS_DEVIATION_VEST = HMR_NON_COMPLIANCE+" AND "+SETTINGS_DEVIATION_VEST;	
@@ -27,4 +28,11 @@ public class NotificationTypeConstants {
 	public static String HMR_AND_SETTINGS_DEVIATION_DISPLAY_VALUE = HMR_NON_COMPLIANCE+" and "+SETTINGS_DEVIATION;
 	public static String MISSED_THERAPY_DISPLAY_VALUE = "Missed Therapy Days";
 	public static String ADHERENCE_SCORE_RESET_DISPLAY_VALUE = "Adherence Score Reset";
+	
+	
+	public static String SETTINGS_DEVIATION_VEST_DISPLAY_VALUE = "Setting Deviation(V)";
+	public static String SETTINGS_DEVIATION_MONARCH_DISPLAY_VALUE = "Setting Deviation(M)";	
+	public static String HMR_NON_COMPLIANCE_VEST_DISPLAY_VALUE = "Below Treatment Minutes(V)";
+	public static String HMR_NON_COMPLIANCE_MONARCH_DISPLAY_VALUE = "Below Treatment Minutes(M)";	
+	
 }

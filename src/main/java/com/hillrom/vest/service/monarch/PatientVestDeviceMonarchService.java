@@ -62,10 +62,10 @@ public class PatientVestDeviceMonarchService {
     public Object linkVestDeviceWithPatient(Long id, Map<String, Object> deviceData) throws HillromException {
     	User alreadyLinkedPatientuser = new User();
     	List<PatientVestDeviceHistoryMonarch> assocList = patientMonarchDeviceRepository.findBySerialNumber(deviceData.get("serialNumber").toString());
-    	Optional<PatientVestDeviceHistoryMonarch> assocByWifiID = patientMonarchDeviceRepository.findByWifiIdAndStatusActive(deviceData.get("wifiId").toString());
+    	List<PatientVestDeviceHistoryMonarch> assocByWifiID = patientMonarchDeviceRepository.findByWifiIdAndStatusActive(deviceData.get("wifiId").toString());
     	PatientVestDeviceHistoryMonarch patientVestDeviceAssoc = new PatientVestDeviceHistoryMonarch();
-    	if(assocByWifiID.isPresent()) {
-    		alreadyLinkedPatientuser = (User) assocByWifiID.get().getPatient().getUserPatientAssoc().stream().filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser();
+    	if(!assocByWifiID.isEmpty()) {
+    		alreadyLinkedPatientuser = (User) assocByWifiID.get(0).getPatient().getUserPatientAssoc().stream().filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser();
     		if(!alreadyLinkedPatientuser.getId().equals(id)){
     			return alreadyLinkedPatientuser;
 			}

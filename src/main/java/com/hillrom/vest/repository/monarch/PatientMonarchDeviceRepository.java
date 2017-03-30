@@ -28,7 +28,7 @@ public interface PatientMonarchDeviceRepository extends
 			String patientId, Boolean active);
 
 	@Query("from PatientVestDeviceHistoryMonarch pvd where pvd.wifiId = ?1 or pvd.lteId = ?1 and pvd.active = true")
-	Optional<PatientVestDeviceHistoryMonarch> findByWifiIdAndStatusActive(
+	List<PatientVestDeviceHistoryMonarch> findByWifiIdAndStatusActive(
 			String wifiId);
 
 	@Query("from PatientVestDeviceHistoryMonarch pvd where pvd.patientVestDevicePK.patient.id = ?1 order by pvd.lastModifiedDate desc")

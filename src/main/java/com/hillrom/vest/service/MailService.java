@@ -395,18 +395,17 @@ public class MailService {
 	@Async
 	public void activationReminderEmail(){
     	try{
-    		DateTime currectTime =  new DateTime();
-    		for(int interval = accountActivationReminderInterval; interval < 48; interval += accountActivationReminderInterval){
-    			log.debug("interval == ", interval);
-    			getUsersActivationReminderEmail(currectTime.minusHours(interval).minusHours(1),currectTime.minusHours(interval));
-    			}
-    				
-    	    }catch(Exception ex){
-    			StringWriter writer = new StringWriter();
-    			PrintWriter printWriter = new PrintWriter( writer );
-    			ex.printStackTrace( printWriter );
-    			sendJobFailureNotification("activationReminderEmail",writer.toString());
-    		}
+
+			DateTime currectTime =  new DateTime();
+			for(int interval = accountActivationReminderInterval; interval < 144; interval += accountActivationReminderInterval)
+				getUsersActivationReminderEmail(currectTime.minusHours(interval).minusHours(1),currectTime.minusHours(interval));
+	    }catch(Exception ex){
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter( writer );
+			ex.printStackTrace( printWriter );
+			sendJobFailureNotification("activationReminderEmail",writer.toString());
+		}
+
 	}
     
 	private void getUsersActivationReminderEmail(DateTime fromTime,DateTime toTime){

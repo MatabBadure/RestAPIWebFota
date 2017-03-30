@@ -45,7 +45,7 @@ spring:
         patientDashboardUrl: https://visiview.hill-rom.com
         careGiverDashboardUrl: https://visiview.hill-rom.com
         baseUrl: https://visiview.hill-rom.com
-        accountActivationReminderInterval: 12
+        accountActivationReminderInterval: 72
     survey:
         surveyreportemailids: Dana.Elzea@hill-rom.com,julie.ells@hill-rom.com,Megan.Nelson@hill-rom.com
     changePrescription:

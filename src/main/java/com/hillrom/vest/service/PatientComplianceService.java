@@ -15,6 +15,19 @@ import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY_D
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_DISPLAY_VALUE;
 
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION_VEST;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION_MONARCH;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_VEST_AND_SETTINGS_DEVIATION;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_MONARCH_AND_SETTINGS_DEVIATION;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_MONARCH_AND_SETTINGS_DEVIATION_VEST;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_VEST_AND_SETTINGS_DEVIATION_VEST;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_MONARCH_AND_SETTINGS_DEVIATION_MONARCH;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_VEST_AND_SETTINGS_DEVIATION_MONARCH;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_VEST_DISPLAY_VALUE;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_MONARCH_DISPLAY_VALUE;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_MONARCH_DISPLAY_VALUE;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_VEST_DISPLAY_VALUE;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -235,11 +248,35 @@ public class PatientComplianceService {
 			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
 		}else if(ADHERENCE_SCORE_RESET.equalsIgnoreCase(notificationType)){
 			trendVO.getNotificationPoints().put(ADHERENCE_SCORE_RESET_DISPLAY_VALUE, complianceMap.get(date).getScore());
+		}else if(HMR_AND_SETTINGS_DEVIATION_VEST.equalsIgnoreCase(notificationType)){
+			trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_DISPLAY_VALUE, -HMR_NON_COMPLIANCE_POINTS);
+			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_VEST_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
+		}else if(HMR_AND_SETTINGS_DEVIATION_MONARCH.equalsIgnoreCase(notificationType)){
+			trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_DISPLAY_VALUE, -HMR_NON_COMPLIANCE_POINTS);
+			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_MONARCH_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
+		}else if(HMR_VEST_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)){
+			trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_VEST_DISPLAY_VALUE, -HMR_NON_COMPLIANCE_POINTS);
+			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
+		}else if(HMR_MONARCH_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)){
+			trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_MONARCH_DISPLAY_VALUE, -HMR_NON_COMPLIANCE_POINTS);
+			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
+		}else if(HMR_MONARCH_AND_SETTINGS_DEVIATION_VEST.equalsIgnoreCase(notificationType)){
+			trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_MONARCH_DISPLAY_VALUE, -HMR_NON_COMPLIANCE_POINTS);
+			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_VEST_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
+		}else if(HMR_VEST_AND_SETTINGS_DEVIATION_VEST.equalsIgnoreCase(notificationType)){
+			trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_VEST_DISPLAY_VALUE, -HMR_NON_COMPLIANCE_POINTS);
+			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_VEST_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
+		}else if(HMR_MONARCH_AND_SETTINGS_DEVIATION_MONARCH.equalsIgnoreCase(notificationType)){
+			trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_MONARCH_DISPLAY_VALUE, -HMR_NON_COMPLIANCE_POINTS);
+			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_MONARCH_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
+		}else if(HMR_VEST_AND_SETTINGS_DEVIATION_MONARCH.equalsIgnoreCase(notificationType)){
+			trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_VEST_DISPLAY_VALUE, -HMR_NON_COMPLIANCE_POINTS);
+			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_MONARCH_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
 		}else{
 			trendVO.getNotificationPoints().put(notificationType,pointsChanged);
 		}
-	}
-
+	}	
+	
 	private List<Notification> getPreviousNotificationDetails(LocalDate date,String notificationType,Long patientUserId) {
 		List<Notification> prevNotifications = notificationService.getNotificationMapByDateAndNotificationTypeAndPatientId(date,notificationType,patientUserId);
 		return prevNotifications;

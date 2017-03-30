@@ -98,6 +98,18 @@ public class DateUtil {
 		}
 	}
 	
+	/** Get Date by Plus or Minus Days
+	 * @param days
+	 * @return
+	 */
+	public static LocalDate getPlusOrMinusDate(int days,LocalDate date){		
+		if(days > 0){
+			return date.plusDays(days);
+		}else{
+			return date.minusDays(Math.abs(days));
+		}
+	}
+	
 	/**
 	 * Returns today in LocalDate
 	 * @return 

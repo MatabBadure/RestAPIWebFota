@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+	
+	<!-- Added new field hmr_vest in PATIENT_COMPLIANCE_MONARCH table. -->
+	<changeSet author="LnT Technology Services" id="20170329161200">
+		<addColumn tableName="PATIENT_COMPLIANCE_MONARCH">
+        	<column name="hmr_vest" type="decimal"/>
+        </addColumn>
+	</changeSet>
+	
+</databaseChangeLog>

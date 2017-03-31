@@ -45,7 +45,9 @@ spring:
         patientDashboardUrl: http://devserver.hillromvest.com
         careGiverDashboardUrl: http://devserver.hillromvest.com
         baseUrl: http://devserver.hillromvest.com
+
         accountActivationReminderInterval: 2
+
     survey:
         surveyreportemailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com
     changePrescription:

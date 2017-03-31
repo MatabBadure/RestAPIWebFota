@@ -51,7 +51,7 @@ public class PatientDevicesAssoc implements Serializable {
     private String serialNumber;
     
     @Column(name = "hillrom_id")
-    private String hillromId;
+    private String hillromId = null;
     
     @Column(name="created_date")
 	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")

@@ -143,7 +143,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private LocalDate dob;
     
     @Column(name="hillrom_id")
-    private String hillromId;
+    private String hillromId = null;
     
     @Column(name="missed_therapy_notification")
     private boolean missedTherapyNotification = false;

@@ -77,7 +77,7 @@ public class Clinic implements Serializable,Comparable<Clinic> {
     
 
     @Column(name = "hillrom_id")
-    private String hillromId;
+    private String hillromId = null;
     
     @Column(name = "clinic_admin_id")
     private Long clinicAdminId;

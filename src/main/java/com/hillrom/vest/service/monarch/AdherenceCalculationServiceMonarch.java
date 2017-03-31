@@ -774,19 +774,19 @@ public class AdherenceCalculationServiceMonarch{
 			List<PatientComplianceMonarch> complianceListToStore = new LinkedList<>();
 			
 			// Getting the protocol constants for the user
-			ProtocolConstantsMonarch userProtocolConstant = protocolMonarchService.getProtocolForPatientUserId(userId);
+			ProtocolConstantsMonarch userProtocolConstant = protocolMonarchService.getProtocolForPatientUserId(oldUserId);
 			
 			// Getting all the sessions of user from the repository 
-			List<TherapySessionMonarch> therapySessionData = therapySessionMonarchRepository.findByPatientUserId(userId);
+			List<TherapySessionMonarch> therapySessionData = therapySessionMonarchRepository.findByPatientUserId(oldUserId);
 			// grouping all the therapy sessions to the date
 			SortedMap<LocalDate,List<TherapySessionMonarch>> sortedTherapy = groupTherapySessionsByDate(therapySessionData);
 			
 			// Getting all the notification for the user 
-			List<NotificationMonarch> userNotifications = notificationMonarchRepository.findByPatientUserId(userId);			
+			List<NotificationMonarch> userNotifications = notificationMonarchRepository.findByPatientUserId(oldUserId);			
 			
 			
 			// Getting the protocol constants for the user for vest
-			ProtocolConstants userProtocolConstantVest = protocolVestService.getProtocolForPatientUserId(oldUserId);
+			ProtocolConstants userProtocolConstantVest = protocolVestService.getProtocolForPatientUserId(userId);
 			
 			// Getting all the sessions of user from the repository for vest 
 			List<TherapySession> therapySessionDataVest = therapySessionRepository.findByPatientUserId(userId);
@@ -814,17 +814,20 @@ public class AdherenceCalculationServiceMonarch{
 						prevCompliance.setMissedTherapyCount(0);
 					}
 					
-					List<TherapySessionMonarch> therapyData = getTherapyForDay(sortedTherapy, currentCompliance.getDate());
-					List<TherapySession> therapyDataVest = adherenceCalculationService.getTherapyForDay(sortedTherapyVest, currentCompliance.getDate());
+					List<TherapySessionMonarch> therapyData = new LinkedList<>();
+					List<TherapySession> therapyDataVest = new LinkedList<>();
+					
+					therapyData = getTherapyForDay(sortedTherapy, currentCompliance.getDate());
+					therapyDataVest = adherenceCalculationService.getTherapyForDay(sortedTherapyVest, currentCompliance.getDate());
 					
 					/*if(adherenceSettingDay == 1 && adherenceStartDate.equals(currentCompliance.getDate())){
 						initialPrevScoreFor1Day = adherenceScore;
 					}*/						
-					if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && !currentCompliance.getDate().equals(todayDate) && therapyDataVest.size() == 0 ){
+					if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && !currentCompliance.getDate().equals(todayDate) && (Objects.isNull(therapyDataVest) || therapyDataVest.isEmpty()) ){
 						// Adding the prevCompliance object for previous day compliance and existingNotificationofTheDay object for the current date Notification object
 						// Missed therapy days
 						complianceListToStore.add(calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, patient, patientUser, initialPrevScoreFor1Day, prevCompliance, existingNotificationofTheDay));
-					}else if( therapyData.size() == 0 && therapyDataVest.size() == 0 && currentCompliance.getDate().equals(todayDate)){
+					}else if( (Objects.isNull(therapyData) || therapyData.isEmpty()) && (Objects.isNull(therapyDataVest) || therapyDataVest.isEmpty()) && currentCompliance.getDate().equals(todayDate)){						
 						// Passing prevCompliance for avoiding the repository call to retrieve the previous day compliance
 						// Setting the previous day compliance details for the no therapy done for today 
 						complianceListToStore.add(setPrevDayCompliance(currentCompliance, userId, prevCompliance));
@@ -1243,7 +1246,7 @@ public class AdherenceCalculationServiceMonarch{
 		boolean isHMRCompliantVest = adherenceCalculationService.isHMRCompliant(userProtocolConstantsVest, durationForSettingDaysVest, adherenceSettingDay);
 		
 		// validating the last adherence setting days therapies with respect to the user protocol
-		if(!isHMRCompliantMonarch){
+		if(!isHMRCompliantMonarch || !isHMRCompliantVest){
 			score = score < HMR_NON_COMPLIANCE_POINTS ? 0 : score - HMR_NON_COMPLIANCE_POINTS;
 			
 			int globalHMRNonAdhrenceCounter = prevCompliance.getGlobalHMRNonAdherenceCounter();
@@ -1278,7 +1281,7 @@ public class AdherenceCalculationServiceMonarch{
 			( (!isSettingsDeviatedMonarch && isSettingsDeviatedVest) ? SETTINGS_DEVIATION_VEST : 
 				( (!isSettingsDeviatedMonarch && !isSettingsDeviatedVest) ? SETTINGS_DEVIATION_MONARCH : "" ) );
 		
-		getNotificationString(notificationType,isHMRCompliantMonarch,isHMRCompliantVest);
+		notification_type = getNotificationString(notificationType,isHMRCompliantMonarch,isHMRCompliantVest);
 		
 		
 		/*if(resetFlag == 1 || (resetFlag == 2 && adherenceSettingDay != 1)){

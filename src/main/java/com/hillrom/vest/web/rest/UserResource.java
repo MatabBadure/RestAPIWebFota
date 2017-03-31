@@ -6,6 +6,7 @@ import static com.hillrom.vest.config.Constants.VEST;
 import static com.hillrom.vest.config.Constants.MONARCH;
 //import static com.hillrom.vest.config.Constants.ALL;
 
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -418,24 +419,29 @@ public class UserResource {
     	log.debug("REST request to link vest device with patient user : {}", id);
         JSONObject jsonObject = new JSONObject();
 		try {
-			Object responseObj  = null;
+			Object responseObj_Vest = null;
+			Object responseObj_Monarch = null;
 			if(deviceType.equals("VEST")){
-				responseObj = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
+				responseObj_Vest = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
 			}else if(deviceType.equals("MONARCH")){
-				responseObj = patientVestDeviceMonarchService.linkVestDeviceWithPatient(id, deviceData);
+				responseObj_Monarch = patientVestDeviceMonarchService.linkVestDeviceWithPatient(id, deviceData);
 			}
 			 
-			if (responseObj instanceof User) {
+			if (responseObj_Vest instanceof User) {
 				jsonObject.put("ERROR", ExceptionConstants.HR_572);
-				jsonObject.put("user", (User) responseObj);
+				jsonObject.put("user", (User) responseObj_Vest);
 				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-			} else {
+			}else if(responseObj_Monarch instanceof User){
+				jsonObject.put("ERROR", ExceptionConstants.HR_723);
+				jsonObject.put("user", (User) responseObj_Monarch);
+				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+			}else {
 				jsonObject.put("message", MessageConstants.HR_282);
 				//jsonObject.put("deviceType", patientVestDeviceMonarchService.getDeviceType(id));
 				if(deviceType.equals("VEST")){
-					jsonObject.put("user", (PatientVestDeviceHistory) responseObj);
+					jsonObject.put("user", (PatientVestDeviceHistory) responseObj_Vest);
 				}else if(deviceType.equals("MONARCH")){
-					jsonObject.put("user", (PatientVestDeviceHistoryMonarch) responseObj);
+					jsonObject.put("user", (PatientVestDeviceHistoryMonarch) responseObj_Monarch);
 				}				
 				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 			}

@@ -459,28 +459,33 @@ public class UserResource {
     	log.debug("REST request to link vest device with patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
 		try {	
-			
+			List<PatientVestDeviceHistory> deviceList_vest =null;
+    		List<PatientVestDeviceHistoryMonarch> deviceList_monarch = null;
 			List<?> deviceList = null;
     		if(deviceType.equals("VEST")){
     			deviceList = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
     		}else if(deviceType.equals("MONARCH")){
     			deviceList = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
     		}
-//			List<PatientVestDeviceHistory> deviceList_vest = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
-//			List<PatientVestDeviceHistoryMonarch> deviceList_monarch = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
-			
-			if(deviceList.isEmpty()){
+    		else if(deviceType.equals("ALL")){
+    			deviceList_vest = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
+    			deviceList_monarch = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
+    		}
+			//if(deviceList.isEmpty() && deviceList_vest.isEmpty() && deviceList_monarch.isEmpty()){
+			if(Objects.isNull(deviceList) && Objects.isNull(deviceList_vest) && Objects.isNull(deviceList_monarch)){
      			jsonObject.put("message",MessageConstants.HR_281); //No device linked with patient.
      		} else {
      			jsonObject.put("message", MessageConstants.HR_282);//Vest/monarch devices linked with patient fetched successfully.
-     			//jsonObject.put("deviceType", patientVestDeviceService.getDeviceType(id));
+     			jsonObject.put("deviceType", patientVestDeviceService.getDeviceType(id));
      			if(deviceType.equals("VEST")){
      				jsonObject.put("deviceList", (List<PatientVestDeviceHistory>) deviceList);
         		}else if(deviceType.equals("MONARCH")){
         			jsonObject.put("deviceList", (List<PatientVestDeviceHistoryMonarch>) deviceList);
         		}
-//     			jsonObject.put("VEST_DEVICE_LIST", deviceList_vest);
-//     			jsonObject.put("MONARCH_DEVICE_LIST", deviceList_monarch);
+        		else if(deviceType.equals("ALL")){
+     			jsonObject.put("VEST_DEVICE_LIST", deviceList_vest);
+    			jsonObject.put("MONARCH_DEVICE_LIST", deviceList_monarch);
+        		}
      		}
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {

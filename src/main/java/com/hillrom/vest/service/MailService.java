@@ -391,13 +391,13 @@ public class MailService {
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
     
-    @Scheduled(cron="0 0 * * * *")
+    @Scheduled(cron="0 */2 * * * *")
 	@Async
 	public void activationReminderEmail(){
     	try{
 
 			DateTime currectTime =  new DateTime();
-			for(int interval = accountActivationReminderInterval; interval < 144; interval += accountActivationReminderInterval)
+			for(int interval = accountActivationReminderInterval; interval < 4; interval += accountActivationReminderInterval)
 				getUsersActivationReminderEmail(currectTime.minusHours(interval).minusHours(1),currectTime.minusHours(interval));
 	    }catch(Exception ex){
 			StringWriter writer = new StringWriter();

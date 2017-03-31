@@ -45,7 +45,7 @@ spring:
         patientDashboardUrl: http://qaserver.hillromvest.com
         careGiverDashboardUrl: http://qaserver.hillromvest.com
         baseUrl: http://qaserver.hillromvest.com
-        accountActivationReminderInterval: 72
+        accountActivationReminderInterval: 2
     survey:
         surveyreportemailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com
     changePrescription:

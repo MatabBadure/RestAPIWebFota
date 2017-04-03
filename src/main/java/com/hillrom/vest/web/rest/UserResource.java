@@ -466,27 +466,37 @@ public class UserResource {
     	JSONObject jsonObject = new JSONObject();
 		try {	
 			
-			List<?> deviceList = null;
+			List<?> deviceList = new ArrayList();
+			List<PatientVestDeviceHistory> deviceList_vest = new ArrayList();
+			List<PatientVestDeviceHistoryMonarch> deviceList_monarch = new ArrayList();
     		if(deviceType.equals("VEST")){
     			deviceList = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
     		}else if(deviceType.equals("MONARCH")){
     			deviceList = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
+    		}else if(deviceType.equals("ALL")){
+    			deviceList_vest = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
+    			deviceList_monarch = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
     		}
-//			List<PatientVestDeviceHistory> deviceList_vest = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
-//			List<PatientVestDeviceHistoryMonarch> deviceList_monarch = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
-			
-			if(deviceList.isEmpty()){
+			if(deviceType.equals("VEST") && deviceList.isEmpty()){ 
      			jsonObject.put("message",MessageConstants.HR_281); //No device linked with patient.
-     		} else {
+     		} 
+			else if(deviceType.equals("MONARCH") && deviceList.isEmpty()){
+				jsonObject.put("message",MessageConstants.HR_281); //No device linked with patient.
+			}
+			else if(deviceType.equals("ALL") && deviceList_vest.isEmpty() && deviceList_monarch.isEmpty()){
+				jsonObject.put("message",MessageConstants.HR_281); //No device linked with patient.
+			}
+			else {
      			jsonObject.put("message", MessageConstants.HR_282);//Vest/monarch devices linked with patient fetched successfully.
      			//jsonObject.put("deviceType", patientVestDeviceService.getDeviceType(id));
      			if(deviceType.equals("VEST")){
      				jsonObject.put("deviceList", (List<PatientVestDeviceHistory>) deviceList);
         		}else if(deviceType.equals("MONARCH")){
         			jsonObject.put("deviceList", (List<PatientVestDeviceHistoryMonarch>) deviceList);
+        		}else if(deviceType.equals("ALL")){
+        			jsonObject.put("VEST_DEVICE_LIST", deviceList_vest);
+        			jsonObject.put("MONARCH_DEVICE_LIST", deviceList_monarch);
         		}
-//     			jsonObject.put("VEST_DEVICE_LIST", deviceList_vest);
-//     			jsonObject.put("MONARCH_DEVICE_LIST", deviceList_monarch);
      		}
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {
@@ -673,28 +683,38 @@ public class UserResource {
     	log.debug("REST request to get protocol for patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
     	try {
-    		List<?> protocolList = null;
+    		List<?> protocolList = new ArrayList();
+    		List<PatientProtocolData> protocolList_VEST = new ArrayList();
+    		List<PatientProtocolDataMonarch> protocolList_MONARCH = new ArrayList();
+    		
     		if(deviceType.equals("VEST")){
     			protocolList = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);
     		}else if(deviceType.equals("MONARCH")){
     			protocolList = patientProtocolMonarchService.getActiveProtocolsAssociatedWithPatient(id);
+    		}else if(deviceType.equals("ALL")){
+    			protocolList_VEST = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);
+    			protocolList_MONARCH = patientProtocolMonarchService.getActiveProtocolsAssociatedWithPatient(id);   		
     		}
     		
-//    			List<PatientProtocolData> protocolList_VEST = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);
-//    			List<PatientProtocolDataMonarch> protocolList_MONARCH = patientProtocolMonarchService.getActiveProtocolsAssociatedWithPatient(id);
-//    		
-    			    			
-    		if (protocolList.isEmpty()) {
+    		if (deviceType.equals("VEST") && protocolList.isEmpty()){
 	        	jsonObject.put("message", MessageConstants.HR_245);
-	        } else {
+	        }
+    		else if(deviceType.equals("MONARCH") && protocolList.isEmpty()){
+    			jsonObject.put("message", MessageConstants.HR_245);
+    		}
+    		else if(deviceType.equals("ALL") && protocolList_VEST.isEmpty() && protocolList_MONARCH.isEmpty()){
+    			jsonObject.put("message", MessageConstants.HR_245);
+    		}
+    		else {
 	        	jsonObject.put("message", MessageConstants.HR_243);
 	        	if(deviceType.equals("VEST")){
 	        		jsonObject.put("protocol", (List <PatientProtocolData>) protocolList);
 	    		}else if(deviceType.equals("MONARCH")){
 	    			jsonObject.put("protocol", (List <PatientProtocolDataMonarch>) protocolList);
+	    		}else if(deviceType.equals("ALL")){
+	        	jsonObject.put("VEST_DEVICE_PROTOCOL", protocolList_VEST);
+	        	jsonObject.put("MONARCH_DEVICE_PROTOCOL", protocolList_MONARCH);
 	    		}
-//	        	jsonObject.put("protocol", protocolList);
-//	        	jsonObject.put("MONARCH_DEVICE_PROTOCOL", protocolList_MONARCH);
 	        }
     		    		
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);

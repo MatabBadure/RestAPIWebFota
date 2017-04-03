@@ -45,7 +45,7 @@ spring:
         patientDashboardUrl: http://indoffshre01v.hillromvest.com
         careGiverDashboardUrl: http://indoffshre01v.hillromvest.com
         baseUrl: http://indoffshre01v.hillromvest.com
-        accountActivationReminderInterval: 12
+        accountActivationReminderInterval: 2
     survey:
         surveyreportemailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com
     changePrescription:

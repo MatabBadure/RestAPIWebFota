@@ -72,7 +72,6 @@ public class PatientProtocolDataAuditService extends AuditableService<PatientPro
 			updateLatestRevision(protocolRevMap, lastModifiedDate);
 			if(isDeleted){
 				ProtocolRevisionVO nextRevision = new ProtocolRevisionVO(revisionCreatedDate, null);
-				nextRevision.addProtocol(ProtocolDataVOBuilder.convertProtocolConstantsToVO(defaultProtocol));
 				protocolRevMap.put(revisionCreatedDate.plusSeconds(1),nextRevision);
 			}
 			protocolRevMap.put(revision.getFrom(),revision);

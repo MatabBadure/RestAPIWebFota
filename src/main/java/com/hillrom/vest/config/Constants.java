@@ -1,6 +1,8 @@
 package com.hillrom.vest.config;
 
 
+
+
 /**
  * Application constants.
  */
@@ -131,6 +133,10 @@ public final class Constants {
 	public static final String TIME = "Time";
 	
 	public static final String PATIENT_ID = "Patient Id";
+	
+	public static final String HILLROM_ID = "Tims Id";
+	
+	public static final String WIFIorLTE_SERIAL_NO= "WIFI/LTE Serial Number";
 	
 	public static final String PATIENT_BLUETOOTH_ADDRESS = "patientBlueToothAddress";
 	

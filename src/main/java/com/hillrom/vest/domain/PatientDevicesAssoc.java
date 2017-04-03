@@ -1,7 +1,6 @@
 package com.hillrom.vest.domain;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,6 +18,10 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
+import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 
 
 /**
@@ -44,16 +47,32 @@ public class PatientDevicesAssoc implements Serializable {
     @Column(name = "is_active")
     private Boolean isActive = false;
 
+    @Column(name = "serial_number")
+    private String serialNumber;
+    
+    @Column(name = "hillrom_id")
+    private String hillromId = null;
+    
+    @Column(name="created_date")
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
+	@JsonSerialize(using = CustomLocalDateSerializer.class)
+    @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
+	private LocalDate createdDate;
+    
+    @Column(name = "old_patient_id")
+    private String oldPatientId;
     
     public PatientDevicesAssoc() {
 		super();
 	}
 
-	public PatientDevicesAssoc(String patientId, String deviceType,Boolean isActive) {
+	public PatientDevicesAssoc(String patientId, String deviceType,Boolean isActive, String serialNumber, String hillromId) {
 		super();
 		this.patientId = patientId;
 		this.deviceType = deviceType;
 		this.isActive = isActive;
+		this.serialNumber = serialNumber;
+		this.hillromId = hillromId;
 	}
     
 	/**
@@ -112,6 +131,62 @@ public class PatientDevicesAssoc implements Serializable {
 		this.isActive = isActive;
 	}
 
+	/**
+	 * @return the serialNumber
+	 */
+	public String getSerialNumber() {
+		return serialNumber;
+	}
+
+	/**
+	 * @param serialNumber the serialNumber to set
+	 */
+	public void setSerialNumber(String serialNumber) {
+		this.serialNumber = serialNumber;
+	}
+
+	/**
+	 * @return the hillromId
+	 */
+	public String getHillromId() {
+		return hillromId;
+	}
+
+	/**
+	 * @param hillromId the hillromId to set
+	 */
+	public void setHillromId(String hillromId) {
+		this.hillromId = hillromId;
+	}
+	
+		/**
+	 * @return the createdDate
+	 */
+	public LocalDate getCreatedDate() {
+		return createdDate;
+	}
+
+	/**
+	 * @param createdDate the createdDate to set
+	 */
+	public void setCreatedDate(LocalDate createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	/**
+	 * @return the oldPatientId
+	 */
+	public String getOldPatientId() {
+		return oldPatientId;
+	}
+
+	/**
+	 * @param patientId the patientId to set
+	 */
+	public void setOldPatientId(String oldPatientId) {
+		this.oldPatientId = oldPatientId;
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */

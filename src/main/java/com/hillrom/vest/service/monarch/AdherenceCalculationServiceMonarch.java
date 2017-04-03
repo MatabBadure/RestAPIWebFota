@@ -12,19 +12,35 @@ import static com.hillrom.vest.config.AdherenceScoreConstants.SETTING_DEVIATION_
 import static com.hillrom.vest.config.AdherenceScoreConstants.UPPER_BOUND_VALUE;
 import static com.hillrom.vest.config.NotificationTypeConstants.ADHERENCE_SCORE_RESET;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_VEST_AND_SETTINGS_DEVIATION;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_MONARCH_AND_SETTINGS_DEVIATION;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION_VEST;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_MONARCH_AND_SETTINGS_DEVIATION_VEST;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_VEST_AND_SETTINGS_DEVIATION_VEST;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION_MONARCH;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_MONARCH_AND_SETTINGS_DEVIATION_MONARCH;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_VEST_AND_SETTINGS_DEVIATION_MONARCH;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_VEST;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_MONARCH;
 import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_VEST;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_MONARCH;
 import static com.hillrom.vest.config.AdherenceScoreConstants.ADHERENCE_SETTING_DEFAULT_DAYS;
 import static com.hillrom.vest.service.util.DateUtil.getPlusOrMinusTodayLocalDate;
 import static com.hillrom.vest.service.util.DateUtil.getDateBeforeSpecificDays;
+import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateCumulativeDuration;
 import static com.hillrom.vest.service.util.monarch.PatientVestDeviceTherapyUtilMonarch.calculateCumulativeDuration;
 import static com.hillrom.vest.service.util.monarch.PatientVestDeviceTherapyUtilMonarch.calculateHMRRunRatePerSession;
+import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateHMRRunRatePerSession;
+import static com.hillrom.vest.service.util.monarch.PatientVestDeviceTherapyUtilMonarch.calculateHMRRunRatePerSessionBoth;
 import static com.hillrom.vest.service.util.monarch.PatientVestDeviceTherapyUtilMonarch.calculateWeightedAvg;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,6 +61,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -55,6 +72,7 @@ import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.NotificationMonarch;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
+import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientNoEventMonarch;
@@ -68,6 +86,9 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
+import com.hillrom.vest.repository.PatientDevicesAssocRepository;
+import com.hillrom.vest.repository.PatientInfoRepository;
+import com.hillrom.vest.repository.PatientNoEventsRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.repository.monarch.AdherenceResetMonarchRepository;
 import com.hillrom.vest.repository.monarch.ClinicMonarchRepository;
@@ -77,6 +98,10 @@ import com.hillrom.vest.repository.monarch.TherapySessionMonarchRepository;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.ClinicPatientService;
 import com.hillrom.vest.service.MailService;
+import com.hillrom.vest.service.PatientComplianceService;
+import com.hillrom.vest.service.PatientNoEventService;
+import com.hillrom.vest.service.PatientProtocolService;
+import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.ExceptionConstants;
@@ -128,6 +153,9 @@ public class AdherenceCalculationServiceMonarch{
 	private PatientNoEventMonarchService noEventMonarchService;
 	
 	@Inject
+	private PatientNoEventService noEventMonarchServiceVest;
+	
+	@Inject
 	private ClinicMonarchRepository clinicMonarchRepository;
 	
 	@Inject
@@ -140,7 +168,42 @@ public class AdherenceCalculationServiceMonarch{
 	@Inject
 	private AdherenceResetMonarchRepository adherenceResetMonarchRepository;
 	//hill-1956
+	
+	@Inject
+	@Lazy
+	private AdherenceCalculationService adherenceCalculationService;
+	
+	@Inject
+	private PatientComplianceService complianceService;
+	
+	@Inject
+	private PatientNoEventsRepository patientNoEventRepository;
 
+	@Inject
+	private PatientProtocolService protocolVestService;
+	
+	@Inject
+	@Lazy
+	private TherapySessionService therapySessionService;
+	
+	@Inject
+	private PatientDevicesAssocRepository patientDevicesAssocRepository;
+	
+	@Inject
+	private PatientComplianceRepository patientComplianceRepository;
+	
+	@Inject
+	private PatientInfoRepository patientInfoRepository;
+	
+	@Inject
+	private NotificationRepository notificationRepository;
+	
+	@Inject
+	private TherapySessionRepository therapySessionRepository;
+	
+	@Inject
+	private TherapySessionServiceMonarch therapySessionMonarchService;
+	
 	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationServiceMonarch.class);
 	
 	/**
@@ -170,6 +233,37 @@ public class AdherenceCalculationServiceMonarch{
 				.getMinDuration()) ? protocolConstant.getMinDuration()
 				: protocolConstant.getTreatmentsPerDay()
 						* protocolConstant.getMinMinutesPerTreatment();
+		if( Math.round(minHMRReading * LOWER_BOUND_VALUE) > Math.round(actualTotalDurationSettingDays/adherenceSettingDay)){
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Checks whether HMR Compliance violated(minHMRReading < actual < maxHMRReading)
+	 * @param protocolConstantMonarch
+	 * @param actualMetrics
+	 * @return
+	 */
+	public boolean isHMRCompliant(ProtocolConstantsMonarch protocolConstantMonarch,
+			ProtocolConstants protocolConstantVest,
+			double actualTotalDurationSettingDays, 
+			Integer adherenceSettingDay) {
+		// Custom Protocol, Min/Max Duration calculation is done
+		int minHMRReading = Objects.nonNull(protocolConstantMonarch
+				.getMinDuration()) ? protocolConstantMonarch.getMinDuration()
+				: protocolConstantMonarch.getTreatmentsPerDay()
+						* protocolConstantMonarch.getMinMinutesPerTreatment();
+		
+		// Getting the minimum reading from the vest protocol		
+		int minHMRReadingVest = Objects.nonNull(protocolConstantVest
+				.getMinDuration()) ? protocolConstantVest.getMinDuration()
+				: protocolConstantVest.getTreatmentsPerDay()
+						* protocolConstantVest.getMinMinutesPerTreatment();
+
+		// Adding both the protocols minimum HMR from Vest and Monarch		
+		minHMRReading = minHMRReading + minHMRReadingVest;
+		
 		if( Math.round(minHMRReading * LOWER_BOUND_VALUE) > Math.round(actualTotalDurationSettingDays/adherenceSettingDay)){
 			return false;
 		}
@@ -215,6 +309,44 @@ public class AdherenceCalculationServiceMonarch{
 	}
 
 	/**
+	 * Calculates Metrics such as weightedAvgFrequency,Intensity,treatmentsPerDay,duration for last adherence setting days
+	 * @param therapySessionsPerDay
+	 * @return
+	 */
+	public Map<String,Double> calculateTherapyMetricsPerSettingDaysBoth(
+			Map<String, Object> combined) {
+		
+		List<TherapySessionMonarch> therapySessionsPerDay = (List<TherapySessionMonarch>) combined.get("Monarch");
+		List<TherapySession> therapySessionsPerDayVest = (List<TherapySession>) combined.get("Vest");
+		
+		double totalDuration = calculateCumulativeDuration(therapySessionsPerDay) + calculateCumulativeDuration(therapySessionsPerDayVest);
+		
+		double weightedAvgFrequency = 0f;
+		double weightedAvgIntensity = 0f;
+		
+		for(TherapySessionMonarch therapySession : therapySessionsPerDay){
+			int durationInMinutes = therapySession.getDurationInMinutes(); 
+			weightedAvgFrequency += calculateWeightedAvg(totalDuration,durationInMinutes,therapySession.getFrequency());
+			weightedAvgIntensity += calculateWeightedAvg(totalDuration,durationInMinutes,therapySession.getIntensity());
+		}
+		
+		for(TherapySession therapySession : therapySessionsPerDayVest){
+			int durationInMinutes = therapySession.getDurationInMinutes(); 
+			weightedAvgFrequency += calculateWeightedAvg(totalDuration,durationInMinutes,therapySession.getFrequency());
+			weightedAvgIntensity += calculateWeightedAvg(totalDuration,durationInMinutes,therapySession.getPressure());
+		}
+		
+		Map<String,Double> actualMetrics = new HashMap<>();
+		weightedAvgFrequency = Math.round(weightedAvgFrequency);
+		weightedAvgIntensity = Math.round(weightedAvgIntensity);
+		actualMetrics.put(WEIGHTED_AVG_FREQUENCY, weightedAvgFrequency);
+		actualMetrics.put(WEIGHTED_AVG_INTESITY, weightedAvgIntensity);
+		actualMetrics.put(TOTAL_DURATION, totalDuration);
+		
+		return actualMetrics;
+	}
+	
+	/**
 	 * Runs every midnight deducts the compliance score by 5 if therapy hasn't been done for adherence setting day(s)
 	 */
 	@Scheduled(cron="0 55 23 * * * ")	
@@ -225,71 +357,34 @@ public class AdherenceCalculationServiceMonarch{
 			List<PatientComplianceMonarch> mstPatientComplianceList = patientComplianceMonarchRepository.findMissedTherapyPatientsRecords();
 			Map<Long,PatientComplianceMonarch> mstNotificationMap = new HashMap<>();
 			Map<Long,PatientComplianceMonarch> hmrNonComplianceMap = new HashMap<>();
+			Map<Long,PatientComplianceMonarch> hmrNonComplianceMapBoth = new HashMap<>();
 			Map<Long,ProtocolConstantsMonarch> userProtocolConstantsMap = new HashMap<>();
+			Map<Long,ProtocolConstants> userProtocolConstantsVestMap = new HashMap<>();
 			Map<Long,PatientComplianceMonarch> complianceMap = new HashMap<>();
 			Map<Long,NotificationMonarch> notificationMap = new HashMap<>();
 			Map<Long,PatientNoEventMonarch> userIdNoEventMap = noEventMonarchService.findAllGroupByPatientUserId();
 			
+			Map<Long,PatientNoEvent> userIdNoEventMapVest = noEventMonarchServiceVest.findAllGroupByPatientUserId();
+			
 			for(PatientComplianceMonarch compliance : mstPatientComplianceList){
-				Long userId = compliance.getPatientUser().getId();
-				PatientInfo patientInfo = compliance.getPatient();
 				
-				Integer adherenceSettingDay = getAdherenceSettingForPatient(patientInfo);
+				String deviceType = adherenceCalculationService.getDeviceTypeValue(compliance.getPatient().getId());
 				
-				PatientNoEventMonarch noEvent = userIdNoEventMap.get(compliance.getPatientUser().getId());
-				//global counters
-				int globalMissedTherapyCounter = compliance.getGlobalMissedTherapyCounter();
-				int globalHMRNonAdherenceCounter = compliance.getGlobalHMRNonAdherenceCounter();
-				int globalSettingsDeviationCounter = compliance.getGlobalSettingsDeviationCounter();
-				// For No transmission users , compliance shouldn't be updated until transmission happens
-				if(Objects.nonNull(noEvent)&& (Objects.isNull(noEvent.getFirstTransmissionDate()))){
-					PatientComplianceMonarch newCompliance = new PatientComplianceMonarch(compliance.getScore(), today,
-							compliance.getPatient(), compliance.getPatientUser(),compliance.getHmrRunRate(),true,
-							false,0);
-					newCompliance.setLatestTherapyDate(null);// since no transmission 
-					complianceMap.put(userId, newCompliance);
-					// HMR Compliance shouldn't be checked for Patients for initial adherence setting days of transmission date
-				}else if(Objects.nonNull(noEvent)&& (Objects.nonNull(noEvent.getFirstTransmissionDate()) && 
-						DateUtil.getDaysCountBetweenLocalDates(noEvent.getFirstTransmissionDate(), today) < (adherenceSettingDay-1) &&
-						adherenceSettingDay > 1 )){
-					// For Transmitted users no notification till earlier day of adherence Setting day(s)
-					PatientComplianceMonarch newCompliance = new PatientComplianceMonarch(today,compliance.getPatient(),compliance.getPatientUser(),
-							compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1,compliance.getLatestTherapyDate(),
-							Objects.nonNull(compliance.getHmr())? compliance.getHmr():0.0d);
-					newCompliance.setScore(compliance.getScore());
-					updateGlobalCounters(++globalMissedTherapyCounter,
-							globalHMRNonAdherenceCounter,
-							globalSettingsDeviationCounter, newCompliance);
-					complianceMap.put(userId, newCompliance);
-				}else {
-					PatientComplianceMonarch newCompliance = new PatientComplianceMonarch(
-							today,
-							compliance.getPatient(),
-							compliance.getPatientUser(),
-							compliance.getHmrRunRate(),
-							compliance.getMissedTherapyCount()+1,
-							compliance.getLatestTherapyDate(),
-							Objects.nonNull(compliance.getHmr())? compliance.getHmr():0.0d);
-					newCompliance.setScore(compliance.getScore());
-					newCompliance.setSettingsDeviatedDaysCount(0);
-					// increment global missed therapy counter
-					updateGlobalCounters(++globalMissedTherapyCounter,
-							globalHMRNonAdherenceCounter,
-							globalSettingsDeviationCounter, newCompliance);
-					log.debug("Compliance before calc "+newCompliance);
-					if(newCompliance.getMissedTherapyCount() >= adherenceSettingDay){ // missed Therapy for adherenceSetting day(s) or more than adherenceSetting day(s) days
-						mstNotificationMap.put(compliance.getPatientUser().getId(), newCompliance);
-					}else{ // missed therapy for less than adherence setting day(s) , might fall under hmrNonCompliance
-						hmrNonComplianceMap.put(compliance.getPatientUser().getId(), newCompliance);
-					}
-				}
+				if(deviceType.equals("MONARCH"))
+					processForEachPatientMonarch(compliance, userIdNoEventMap, complianceMap, mstNotificationMap,hmrNonComplianceMap);
+				else if(deviceType.equals("BOTH"))
+					processForEachPatientBoth(compliance, userIdNoEventMap, userIdNoEventMapVest, complianceMap, mstNotificationMap,hmrNonComplianceMapBoth);
 			}
 			
 			userProtocolConstantsMap = protocolMonarchService.getProtocolByPatientUserIds(new LinkedList<>(hmrNonComplianceMap.keySet()));
-			
+			userProtocolConstantsVestMap = protocolVestService.getProtocolByPatientUserIds(new LinkedList<>(hmrNonComplianceMap.keySet()));
 
+			// Update HMR for the Both device patients
+			calculateHMRComplianceForMSTBoth(today, hmrNonComplianceMapBoth,
+						userProtocolConstantsMap, userProtocolConstantsVestMap, complianceMap, notificationMap);
+			
 			calculateHMRComplianceForMST(today, hmrNonComplianceMap,
-					userProtocolConstantsMap, complianceMap, notificationMap);
+						userProtocolConstantsMap, complianceMap, notificationMap);
 			
 			calculateMissedTherapy(today, mstNotificationMap,
 					hmrNonComplianceMap, complianceMap, notificationMap);
@@ -305,8 +400,147 @@ public class AdherenceCalculationServiceMonarch{
 		}
 	}
 	
+	private void processForEachPatientMonarch(PatientComplianceMonarch compliance, Map<Long,PatientNoEventMonarch> userIdNoEventMap, 
+			Map<Long,PatientComplianceMonarch> complianceMap, Map<Long,PatientComplianceMonarch> mstNotificationMap,
+			Map<Long,PatientComplianceMonarch> hmrNonComplianceMap){
+		
+		LocalDate today = LocalDate.now();
+		Long userId = compliance.getPatientUser().getId();
+		PatientInfo patientInfo = compliance.getPatient();
+		
+		Integer adherenceSettingDay = getAdherenceSettingForPatient(patientInfo);
+		
+		PatientNoEventMonarch noEvent = userIdNoEventMap.get(compliance.getPatientUser().getId());
+		
+		//global counters
+		int globalMissedTherapyCounter = compliance.getGlobalMissedTherapyCounter();
+		int globalHMRNonAdherenceCounter = compliance.getGlobalHMRNonAdherenceCounter();
+		int globalSettingsDeviationCounter = compliance.getGlobalSettingsDeviationCounter();
+		// For No transmission users , compliance shouldn't be updated until transmission happens
+		
+		if(Objects.nonNull(noEvent) && (Objects.isNull(noEvent.getFirstTransmissionDate()))){
+			PatientComplianceMonarch newCompliance = new PatientComplianceMonarch(compliance.getScore(), today,
+					compliance.getPatient(), compliance.getPatientUser(),compliance.getHmrRunRate(),true,
+					false,0);
+			newCompliance.setLatestTherapyDate(null);// since no transmission 
+			complianceMap.put(userId, newCompliance);
+			// HMR Compliance shouldn't be checked for Patients for initial adherence setting days of transmission date
+		}else if(Objects.nonNull(noEvent)&& (Objects.nonNull(noEvent.getFirstTransmissionDate()) && 
+				DateUtil.getDaysCountBetweenLocalDates(noEvent.getFirstTransmissionDate(), today) < (adherenceSettingDay-1) &&
+				adherenceSettingDay > 1 )){
+			// For Transmitted users no notification till earlier day of adherence Setting day(s)
+			PatientComplianceMonarch newCompliance = new PatientComplianceMonarch(today,compliance.getPatient(),compliance.getPatientUser(),
+					compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1,compliance.getLatestTherapyDate(),
+					Objects.nonNull(compliance.getHmr())? compliance.getHmr():0.0d);
+			newCompliance.setScore(compliance.getScore());
+			updateGlobalCounters(++globalMissedTherapyCounter,
+					globalHMRNonAdherenceCounter,
+					globalSettingsDeviationCounter, newCompliance);
+			complianceMap.put(userId, newCompliance);
+		}else {
+			PatientComplianceMonarch newCompliance = new PatientComplianceMonarch(
+					today,
+					compliance.getPatient(),
+					compliance.getPatientUser(),
+					compliance.getHmrRunRate(),
+					compliance.getMissedTherapyCount()+1,
+					compliance.getLatestTherapyDate(),
+					Objects.nonNull(compliance.getHmr())? compliance.getHmr():0.0d);
+			newCompliance.setScore(compliance.getScore());
+			newCompliance.setSettingsDeviatedDaysCount(0);
+			// increment global missed therapy counter
+			updateGlobalCounters(++globalMissedTherapyCounter,
+					globalHMRNonAdherenceCounter,
+					globalSettingsDeviationCounter, newCompliance);
+			log.debug("Compliance before calc "+newCompliance);
+			if(newCompliance.getMissedTherapyCount() >= adherenceSettingDay){ // missed Therapy for adherenceSetting day(s) or more than adherenceSetting day(s) days
+				mstNotificationMap.put(compliance.getPatientUser().getId(), newCompliance);
+			}else{ // missed therapy for less than adherence setting day(s) , might fall under hmrNonCompliance
+				hmrNonComplianceMap.put(compliance.getPatientUser().getId(), newCompliance);
+			}
+		}
+	}
+	
+	private void processForEachPatientBoth(PatientComplianceMonarch compliance, Map<Long,PatientNoEventMonarch> userIdNoEventMap, 
+			Map<Long,PatientNoEvent> userIdNoEventMapVest, Map<Long,PatientComplianceMonarch> complianceMap, 
+			Map<Long,PatientComplianceMonarch> mstNotificationMap, Map<Long,PatientComplianceMonarch> hmrNonComplianceMap){
+		
+		LocalDate today = LocalDate.now();
+		Long userId = compliance.getPatientUser().getId();
+		PatientInfo patientInfo = compliance.getPatient();
+		
+		Integer adherenceSettingDay = getAdherenceSettingForPatient(patientInfo);
+		
+		PatientNoEventMonarch noEvent = userIdNoEventMap.get(compliance.getPatientUser().getId());
+		PatientNoEvent noEventVest = userIdNoEventMapVest.get(compliance.getPatientUser().getId());
+		
+		//global counters
+		int globalMissedTherapyCounter = compliance.getGlobalMissedTherapyCounter();
+		int globalHMRNonAdherenceCounter = compliance.getGlobalHMRNonAdherenceCounter();
+		int globalSettingsDeviationCounter = compliance.getGlobalSettingsDeviationCounter();
+		
+		LocalDate firstTransmissionDateMonarch = (Objects.nonNull(noEvent) && Objects.nonNull(noEvent.getFirstTransmissionDate())) ? 
+														noEvent.getFirstTransmissionDate() : null; 
+		
+		LocalDate firstTransmissionDateVest = (Objects.nonNull(noEventVest) && Objects.nonNull(noEventVest.getFirstTransmissionDate())) ? 
+														noEventVest.getFirstTransmissionDate() : null;
+
+		LocalDate firstTransmissionVestOrMonarch = null; 
+		if( Objects.nonNull(firstTransmissionDateVest) && Objects.nonNull(firstTransmissionDateMonarch)){
+			firstTransmissionVestOrMonarch = firstTransmissionDateVest.isBefore(firstTransmissionDateMonarch) ? 
+														firstTransmissionDateVest : firstTransmissionDateMonarch;  
+		}else if(Objects.isNull(firstTransmissionDateVest)){
+			firstTransmissionVestOrMonarch = firstTransmissionDateMonarch;
+		}else{
+			firstTransmissionVestOrMonarch = firstTransmissionDateVest;
+		}
+		
+		// For No transmission users , compliance shouldn't be updated until transmission happens		
+		if( Objects.isNull(firstTransmissionDateVest) && Objects.isNull(firstTransmissionDateMonarch)){
+			PatientComplianceMonarch newCompliance = new PatientComplianceMonarch(compliance.getScore(), today,
+					compliance.getPatient(), compliance.getPatientUser(),compliance.getHmrRunRate(),true,
+					false,0);
+			newCompliance.setLatestTherapyDate(null);// since no transmission 
+			complianceMap.put(userId, newCompliance);
+			// HMR Compliance shouldn't be checked for Patients for initial adherence setting days of transmission date
+		}else if(Objects.nonNull(firstTransmissionVestOrMonarch) && 
+				DateUtil.getDaysCountBetweenLocalDates(firstTransmissionVestOrMonarch, today) < (adherenceSettingDay-1) &&
+				adherenceSettingDay > 1 ){
+			// For Transmitted users no notification till earlier day of adherence Setting day(s)
+			PatientComplianceMonarch newCompliance = new PatientComplianceMonarch(today,compliance.getPatient(),compliance.getPatientUser(),
+					compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1,compliance.getLatestTherapyDate(),
+					Objects.nonNull(compliance.getHmr())? compliance.getHmr():0.0d);
+			newCompliance.setScore(compliance.getScore());
+			updateGlobalCounters(++globalMissedTherapyCounter,
+					globalHMRNonAdherenceCounter,
+					globalSettingsDeviationCounter, newCompliance);
+			complianceMap.put(userId, newCompliance);
+		}else {
+			PatientComplianceMonarch newCompliance = new PatientComplianceMonarch(
+					today,
+					compliance.getPatient(),
+					compliance.getPatientUser(),
+					compliance.getHmrRunRate(),
+					compliance.getMissedTherapyCount()+1,
+					compliance.getLatestTherapyDate(),
+					Objects.nonNull(compliance.getHmr())? compliance.getHmr():0.0d);
+			newCompliance.setScore(compliance.getScore());
+			newCompliance.setSettingsDeviatedDaysCount(0);
+			// increment global missed therapy counter
+			updateGlobalCounters(++globalMissedTherapyCounter,
+					globalHMRNonAdherenceCounter,
+					globalSettingsDeviationCounter, newCompliance);
+			log.debug("Compliance before calc "+newCompliance);
+			if(newCompliance.getMissedTherapyCount() >= adherenceSettingDay){ // missed Therapy for adherenceSetting day(s) or more than adherenceSetting day(s) days
+				mstNotificationMap.put(compliance.getPatientUser().getId(), newCompliance);
+			}else{ // missed therapy for less than adherence setting day(s) , might fall under hmrNonCompliance
+				hmrNonComplianceMap.put(compliance.getPatientUser().getId(), newCompliance);
+			}
+		}
+	}
+	
 	// Resetting the adherence score for the specific user from the adherence reset start date
-	@Async	
+	/*@Async	
 	public Future<String> adherenceSettingForClinic(String clinicId){
 		try{
 			long startTime = System.currentTimeMillis();
@@ -330,7 +564,16 @@ public class AdherenceCalculationServiceMonarch{
 					}
 					if(Objects.nonNull(startDate)){
 						PatientInfo patient = userService.getPatientInfoObjFromPatientUser(user);
-						adherenceResetForPatient(user.getId(), patient.getId(), startDate, DEFAULT_COMPLIANCE_SCORE, 0);
+						
+						String deviceType = adherenceCalculationService.getDeviceTypeValue(patient.getId());
+						
+						if(deviceType == "MONARCH"){
+							adherenceResetForPatient(user.getId(), patient.getId(), startDate, DEFAULT_COMPLIANCE_SCORE, 0);
+						}else if(deviceType == "BOTH"){							
+							PatientNoEventMonarch noEventMonarch = noEventMonarchService.findByPatientUserId(user.getId());
+							adherenceCalculationBoth(user.getId(), patient.getId(), startDate, 
+									noEventMonarch.getFirstTransmissionDate(), DEFAULT_COMPLIANCE_SCORE, user.getId(), 0);
+						}
 					}
 				}
 				long endTime   = System.currentTimeMillis();
@@ -348,7 +591,7 @@ public class AdherenceCalculationServiceMonarch{
 			log.debug(ex.getMessage());
 		}
 		return new AsyncResult<>("Adherence score recalculated successfully for all patients under clinic");
-	}
+	}*/
 	
 	public LocalDate fineOneByPatientUserIdLatestResetStartDate(Long userId){    	
     	List<AdherenceResetMonarch> adherenceReset = adherenceResetMonarchRepository.findOneByPatientUserIdLatestResetStartDate(userId);
@@ -405,8 +648,11 @@ public class AdherenceCalculationServiceMonarch{
 			LocalDate todayDate = LocalDate.now();
 			LocalDate prevDate = DateUtil.getPlusOrMinusTodayLocalDate(-1);
 			
+			LocalDate prevAdherenceStartDate = DateUtil.getPlusOrMinusDate(-1, adherenceStartDate);
+			String prevAdherenceStartDateString = prevAdherenceStartDate.toString();
+			
 			// Get the list of rows for the user id from the adherence reset start date 
-			List<PatientComplianceMonarch> patientComplianceList = patientComplianceMonarchRepository.returnComplianceForPatientIdDates(sAdherenceStDate, userId);
+			List<PatientComplianceMonarch> patientComplianceList = patientComplianceMonarchRepository.returnComplianceForPatientIdDates((resetFlag == 3 ? prevAdherenceStartDateString : sAdherenceStDate), userId);
 			
 			List<PatientComplianceMonarch> complianceListToStore = new LinkedList<>();
 			
@@ -425,32 +671,60 @@ public class AdherenceCalculationServiceMonarch{
 			
 			for(PatientComplianceMonarch currentCompliance : patientComplianceList){
 				
+				if(resetFlag == 1 || resetFlag == 2 || (resetFlag == 3 && !currentCompliance.getDate().isBefore(adherenceStartDate))){
 				
-				
-				PatientInfo patient = currentCompliance.getPatient();
-				User patientUser = currentCompliance.getPatientUser();
-				int initialPrevScoreFor1Day = 0;
-				
-				NotificationMonarch existingNotificationofTheDay = notificationMonarchService.getNotificationForDay(userNotifications, currentCompliance.getDate());
-				
-				if( ( adherenceStartDate.isBefore(currentCompliance.getDate()) || adherenceStartDate.equals(currentCompliance.getDate())) &&
-						DateUtil.getDaysCountBetweenLocalDates(adherenceStartDate, currentCompliance.getDate()) < (adherenceSettingDay-1) && 
-						adherenceSettingDay > 1){
+					PatientInfo patient = currentCompliance.getPatient();
+					User patientUser = currentCompliance.getPatientUser();
+					int initialPrevScoreFor1Day = 0;
+					
+					NotificationMonarch existingNotificationofTheDay = notificationMonarchService.getNotificationForDay(userNotifications, currentCompliance.getDate());
+					
+					if( ( adherenceStartDate.isBefore(currentCompliance.getDate()) || adherenceStartDate.equals(currentCompliance.getDate())) &&
+							DateUtil.getDaysCountBetweenLocalDates(adherenceStartDate, currentCompliance.getDate()) < (adherenceSettingDay-1) && 
+							adherenceSettingDay > 1 && resetFlag != 3){
+								
+						// Check whether the adherence start days is the compliance date
+						if(adherenceStartDate.equals(currentCompliance.getDate())){
+							if(resetFlag == 1 || (resetFlag == 2 && adherenceSettingDay != 1)){							 
+								notificationMonarchService.createOrUpdateNotification(patientUser, patient, userId,
+																			currentCompliance.getDate(), ADHERENCE_SCORE_RESET, false, existingNotificationofTheDay);
+							}else{
+								if(Objects.nonNull(existingNotificationofTheDay))
+									notificationMonarchRepository.delete(existingNotificationofTheDay);
+							}
+							currentCompliance.setSettingsDeviatedDaysCount(0);
+							currentCompliance.setMissedTherapyCount(0);
+						} else {
 							
-					// Check whether the adherence start days is the compliance date
-					if(adherenceStartDate.equals(currentCompliance.getDate())){
-						if(resetFlag == 1 || (resetFlag == 2 && adherenceSettingDay != 1)){							 
-							notificationMonarchService.createOrUpdateNotification(patientUser, patient, userId,
-																		currentCompliance.getDate(), ADHERENCE_SCORE_RESET, false, existingNotificationofTheDay);
-						}else{
-							if(Objects.nonNull(existingNotificationofTheDay))
+							// Commenting the existing repository call and calling the the new method for getting the previous day compliance
+							
+							PatientComplianceMonarch prevCompliance = returnPrevDayCompli(patientComplianceList, currentCompliance.getDate());
+							if(Objects.isNull(prevCompliance)){
+								prevCompliance = new PatientComplianceMonarch();
+								prevCompliance.setScore(adherenceScore);
+								prevCompliance.setSettingsDeviatedDaysCount(0);
+								prevCompliance.setMissedTherapyCount(0);
+							}
+							
+							if(currentCompliance.getMissedTherapyCount() > 0){
+								currentCompliance.setMissedTherapyCount(prevCompliance.getMissedTherapyCount()+1);
+							}
+							if(isSettingDeviatedForUserOnDay(userId, currentCompliance.getDate() ,adherenceSettingDay, userProtocolConstant)){
+								currentCompliance.setSettingsDeviatedDaysCount(prevCompliance.getSettingsDeviatedDaysCount()+1);
+							}
+							
+							// Commenting the existing repository call and calling the new method for getting the current day notification at beginning of for loop
+							
+							
+							if(Objects.nonNull(existingNotificationofTheDay)){
 								notificationMonarchRepository.delete(existingNotificationofTheDay);
+							}
 						}
-						currentCompliance.setSettingsDeviatedDaysCount(0);
-						currentCompliance.setMissedTherapyCount(0);
-					} else {
+						currentCompliance.setScore(adherenceScore);
 						
-						// Commenting the existing repository call and calling the the new method for getting the previous day compliance
+						complianceListToStore.add(currentCompliance);
+					}else{
+						
 						
 						PatientComplianceMonarch prevCompliance = returnPrevDayCompli(patientComplianceList, currentCompliance.getDate());
 						if(Objects.isNull(prevCompliance)){
@@ -460,53 +734,27 @@ public class AdherenceCalculationServiceMonarch{
 							prevCompliance.setMissedTherapyCount(0);
 						}
 						
-						if(currentCompliance.getMissedTherapyCount() > 0){
-							currentCompliance.setMissedTherapyCount(prevCompliance.getMissedTherapyCount()+1);
-						}
-						if(isSettingDeviatedForUserOnDay(userId, currentCompliance.getDate() ,adherenceSettingDay, userProtocolConstant)){
-							currentCompliance.setSettingsDeviatedDaysCount(prevCompliance.getSettingsDeviatedDaysCount()+1);
-						}
+						// Commenting the existing repository call and calling the the new method for getting the current day therapy details				
+										
+						List<TherapySessionMonarch> therapyData = getTherapyForDay(sortedTherapy, currentCompliance.getDate());
 						
-						// Commenting the existing repository call and calling the new method for getting the current day notification at beginning of for loop
-						
-						
-						if(Objects.nonNull(existingNotificationofTheDay)){
-							notificationMonarchRepository.delete(existingNotificationofTheDay);
+						if(adherenceSettingDay == 1 && adherenceStartDate.equals(currentCompliance.getDate())){
+							initialPrevScoreFor1Day = adherenceScore;
+						}						
+						if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && !currentCompliance.getDate().equals(todayDate)){
+							// Adding the prevCompliance object for previous day compliance and existingNotificationofTheDay object for the current date Notification object
+							// Missed therapy days
+							complianceListToStore.add(calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, patient, patientUser, initialPrevScoreFor1Day, prevCompliance, existingNotificationofTheDay));
+						}else if( ( Objects.isNull(therapyData) || (Objects.nonNull(therapyData) && therapyData.isEmpty()) ) && currentCompliance.getDate().equals(todayDate)){
+							// Passing prevCompliance for avoiding the repository call to retrieve the previous day compliance
+							// Setting the previous day compliance details for the no therapy done for today 
+							complianceListToStore.add(setPrevDayCompliance(currentCompliance, userId, prevCompliance));
+						}else{
+							// Adding the sortedTherapy for all the therapies & prevCompliance object for previous day compliance and existingNotificationofTheDay object for the current date Notification object
+							// HMR Non Compliance / Setting deviation & therapy data available
+							complianceListToStore.add(calculateUserHMRComplianceForMST(currentCompliance, userProtocolConstant, currentCompliance.getDate(), userId, 
+									patient, patientUser, adherenceSettingDay, initialPrevScoreFor1Day,sortedTherapy, prevCompliance, existingNotificationofTheDay, resetFlag));
 						}
-					}
-					currentCompliance.setScore(adherenceScore);
-					
-					complianceListToStore.add(currentCompliance);
-				}else{
-					
-					PatientComplianceMonarch prevCompliance = returnPrevDayCompli(patientComplianceList, currentCompliance.getDate());
-					if(Objects.isNull(prevCompliance)){
-						prevCompliance = new PatientComplianceMonarch();
-						prevCompliance.setScore(adherenceScore);
-						prevCompliance.setSettingsDeviatedDaysCount(0);
-						prevCompliance.setMissedTherapyCount(0);
-					}
-					
-					// Commenting the existing repository call and calling the the new method for getting the current day therapy details				
-									
-					List<TherapySessionMonarch> therapyData = getTherapyForDay(sortedTherapy, currentCompliance.getDate());
-					
-					if(adherenceSettingDay == 1 && adherenceStartDate.equals(currentCompliance.getDate())){
-						initialPrevScoreFor1Day = adherenceScore;
-					}						
-					if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && !currentCompliance.getDate().equals(todayDate)){
-						// Adding the prevCompliance object for previous day compliance and existingNotificationofTheDay object for the current date Notification object
-						// Missed therapy days
-						complianceListToStore.add(calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, patient, patientUser, initialPrevScoreFor1Day, prevCompliance, existingNotificationofTheDay));
-					}else if( ( Objects.isNull(therapyData) || (Objects.nonNull(therapyData) && therapyData.isEmpty()) ) && currentCompliance.getDate().equals(todayDate)){
-						// Passing prevCompliance for avoiding the repository call to retrieve the previous day compliance
-						// Setting the previous day compliance details for the no therapy done for today 
-						complianceListToStore.add(setPrevDayCompliance(currentCompliance, userId, prevCompliance));
-					}else{
-						// Adding the sortedTherapy for all the therapies & prevCompliance object for previous day compliance and existingNotificationofTheDay object for the current date Notification object
-						// HMR Non Compliance / Setting deviation & therapy data available
-						complianceListToStore.add(calculateUserHMRComplianceForMST(currentCompliance, userProtocolConstant, currentCompliance.getDate(), userId, 
-								patient, patientUser, adherenceSettingDay, initialPrevScoreFor1Day,sortedTherapy, prevCompliance, existingNotificationofTheDay, resetFlag));
 					}
 				}
 			}
@@ -518,6 +766,155 @@ public class AdherenceCalculationServiceMonarch{
 			mailService.sendJobFailureNotificationMonarch("resetAdherenceCalculationPatientMonarch",writer.toString());
 		}
 		return "Adherence score reset successfully";
+	}
+
+	public String adherenceCalculationBoth(Long userId, String patientId, LocalDate adherenceStartDate, 
+			LocalDate firstTransmissionOfOldDevice, Integer adherenceScore, Long oldUserId, Integer flag){
+		// flag 1 - for adherence reset
+		// flag 2 - for adherence setting / window
+		// flag 3 - vest ingestion
+		// flag 4 - monarch ingestion		
+		
+		try{			
+			// Adherence Start date in string for query
+			String sAdherenceStDate = adherenceStartDate.toString();
+			
+			LocalDate todayDate = LocalDate.now();
+			
+			LocalDate prevAdherenceStartDate = DateUtil.getPlusOrMinusDate(-1, adherenceStartDate);
+			String prevAdherenceStartDateString = prevAdherenceStartDate.toString();
+						
+			// Get the list of rows for the user id from the adherence reset start date 
+			List<PatientComplianceMonarch> patientComplianceList = patientComplianceMonarchRepository.returnComplianceForPatientIdDates((flag == 3 || flag == 4 ? prevAdherenceStartDateString : sAdherenceStDate), userId);
+			
+			List<PatientComplianceMonarch> complianceListToStore = new LinkedList<>();
+			
+			// Getting the protocol constants for the user
+			ProtocolConstantsMonarch userProtocolConstant = protocolMonarchService.getProtocolForPatientUserId(oldUserId);
+			
+			// Getting all the sessions of user from the repository 
+			List<TherapySessionMonarch> therapySessionData = therapySessionMonarchRepository.findByPatientUserId(oldUserId);
+			// grouping all the therapy sessions to the date
+			SortedMap<LocalDate,List<TherapySessionMonarch>> sortedTherapy = groupTherapySessionsByDate(therapySessionData);
+			
+			// Getting all the notification for the user 
+			List<NotificationMonarch> userNotifications = notificationMonarchRepository.findByPatientUserId(oldUserId);			
+			
+			
+			// Getting the protocol constants for the user for vest
+			ProtocolConstants userProtocolConstantVest = protocolVestService.getProtocolForPatientUserId(userId);
+			
+			// Getting all the sessions of user from the repository for vest 
+			List<TherapySession> therapySessionDataVest = therapySessionRepository.findByPatientUserId(userId);
+			// grouping all the therapy sessions to the date for vest
+			SortedMap<LocalDate,List<TherapySession>> sortedTherapyVest = adherenceCalculationService.groupTherapySessionsByDate(therapySessionDataVest);
+			
+			
+			int adherenceSettingDay = getAdherenceSettingForUserId(userId);
+			
+			for(PatientComplianceMonarch currentCompliance : patientComplianceList){
+				
+				if(!currentCompliance.getDate().isBefore(adherenceStartDate)){
+				
+					PatientInfo patient = currentCompliance.getPatient();
+					User patientUser = currentCompliance.getPatientUser();
+					int initialPrevScoreFor1Day = 0;
+					
+					NotificationMonarch existingNotificationofTheDay = notificationMonarchService.getNotificationForDay(userNotifications, currentCompliance.getDate());						
+					
+					if( ( adherenceStartDate.isBefore(currentCompliance.getDate()) || adherenceStartDate.equals(currentCompliance.getDate())) &&
+								DateUtil.getDaysCountBetweenLocalDates(adherenceStartDate, currentCompliance.getDate()) < (adherenceSettingDay-1) && 
+								adherenceSettingDay > 1 && (flag != 3 && flag != 4)){		
+						
+						if(adherenceStartDate.equals(currentCompliance.getDate())){
+							
+							if(flag == 1 || (flag == 2 && adherenceSettingDay != 1)){
+								notificationMonarchService.createOrUpdateNotification(patientUser, patient, userId,
+										currentCompliance.getDate(), ADHERENCE_SCORE_RESET, false, existingNotificationofTheDay);
+							}else{
+								if(Objects.nonNull(existingNotificationofTheDay))
+									notificationMonarchRepository.delete(existingNotificationofTheDay);
+							}
+							
+							currentCompliance.setSettingsDeviatedDaysCount(0);
+							currentCompliance.setMissedTherapyCount(0);
+						} else {							
+							PatientComplianceMonarch prevCompliance = returnPrevDayCompli(patientComplianceList, currentCompliance.getDate());
+							if(Objects.isNull(prevCompliance)){
+								prevCompliance = new PatientComplianceMonarch();
+								prevCompliance.setScore(adherenceScore);
+								prevCompliance.setSettingsDeviatedDaysCount(0);
+								prevCompliance.setMissedTherapyCount(0);
+							}
+							
+							if(currentCompliance.getMissedTherapyCount() > 0){
+								currentCompliance.setMissedTherapyCount(prevCompliance.getMissedTherapyCount()+1);
+							}
+							if(isSettingDeviatedForUserOnDay(userId, currentCompliance.getDate() ,adherenceSettingDay, userProtocolConstant)){
+								currentCompliance.setSettingsDeviatedDaysCount(prevCompliance.getSettingsDeviatedDaysCount()+1);
+							}
+							
+							// Commenting the existing repository call and calling the new method for getting the current day notification at beginning of for loop
+							
+							
+							if(Objects.nonNull(existingNotificationofTheDay)){
+								notificationMonarchRepository.delete(existingNotificationofTheDay);
+							}
+						}
+						currentCompliance.setScore(adherenceScore);						
+						complianceListToStore.add(currentCompliance);
+					}else{
+				
+						if((flag != 3 && flag != 4) || ((flag == 3 || flag == 4) && 
+								(DateUtil.getDaysCountBetweenLocalDates(adherenceStartDate, currentCompliance.getDate()) > (adherenceSettingDay-1) || 
+								DateUtil.getDaysCountBetweenLocalDates(firstTransmissionOfOldDevice, currentCompliance.getDate()) > (adherenceSettingDay-1)))){
+							
+							PatientComplianceMonarch prevCompliance = returnPrevDayCompli(patientComplianceList, currentCompliance.getDate());
+							if(Objects.isNull(prevCompliance)){
+								prevCompliance = new PatientComplianceMonarch();
+								prevCompliance.setScore(adherenceScore);
+								prevCompliance.setSettingsDeviatedDaysCount(0);
+								prevCompliance.setMissedTherapyCount(0);
+							}
+							
+							List<TherapySessionMonarch> therapyData = new LinkedList<>();
+							List<TherapySession> therapyDataVest = new LinkedList<>();
+							
+							therapyData = getTherapyForDay(sortedTherapy, currentCompliance.getDate());
+							therapyDataVest = adherenceCalculationService.getTherapyForDay(sortedTherapyVest, currentCompliance.getDate());
+							
+							if((flag != 3 && flag != 4) && adherenceSettingDay == 1 && adherenceStartDate.equals(currentCompliance.getDate())){
+								initialPrevScoreFor1Day = adherenceScore;
+							}						
+							if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && !currentCompliance.getDate().equals(todayDate) && (Objects.isNull(therapyDataVest) || therapyDataVest.isEmpty()) ){
+								// Adding the prevCompliance object for previous day compliance and existingNotificationofTheDay object for the current date Notification object
+								// Missed therapy days
+								complianceListToStore.add(calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, patient, patientUser, initialPrevScoreFor1Day, prevCompliance, existingNotificationofTheDay));
+							}else if( (Objects.isNull(therapyData) || therapyData.isEmpty()) && (Objects.isNull(therapyDataVest) || therapyDataVest.isEmpty()) && currentCompliance.getDate().equals(todayDate)){						
+								// Passing prevCompliance for avoiding the repository call to retrieve the previous day compliance
+								// Setting the previous day compliance details for the no therapy done for today 
+								complianceListToStore.add(setPrevDayCompliance(currentCompliance, userId, prevCompliance));
+							}else{
+								// Adding the sortedTherapy for all the therapies & prevCompliance object for previous day compliance and existingNotificationofTheDay object for the current date Notification object
+								// HMR Non Compliance / Setting deviation & therapy data available
+								complianceListToStore.add(calculateUserHMRComplianceForMSTBoth(currentCompliance, userProtocolConstant, userProtocolConstantVest, currentCompliance.getDate(), userId, 
+										patient, patientUser, adherenceSettingDay, initialPrevScoreFor1Day,sortedTherapy, sortedTherapyVest, prevCompliance, existingNotificationofTheDay, flag));
+							}
+						
+						}
+					}
+				
+				}
+			}
+			complianceMonarchService.saveAll(complianceListToStore);
+		}catch(Exception ex){
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter( writer );
+			ex.printStackTrace( printWriter );
+			mailService.sendJobFailureNotificationMonarch("adherenceCalculationBoth",writer.toString());
+		}
+		return "Adherence score reset successfully";
+		
 	}
 	
 	// Setting the previous day compliance
@@ -657,6 +1054,74 @@ public class AdherenceCalculationServiceMonarch{
 		}
 	}
 	
+	// calculate HMRCompliance on Missed Therapy Date
+		private void calculateHMRComplianceForMSTBoth(LocalDate today,
+				Map<Long, PatientComplianceMonarch> hmrNonComplianceMap,
+				Map<Long, ProtocolConstantsMonarch> userProtocolConstantsMap,
+				Map<Long, ProtocolConstants> userProtocolConstantsVestMap,
+				Map<Long, PatientComplianceMonarch> complianceMap,
+				Map<Long, NotificationMonarch> notificationMap) {
+			
+			for(Long patientUserId : hmrNonComplianceMap.keySet()){
+				
+				PatientComplianceMonarch newCompliance = hmrNonComplianceMap.get(patientUserId);
+				
+				int score = newCompliance.getScore();
+				int adherenceSettingDay = getAdherenceSettingForUserId(patientUserId);
+				List<TherapySessionMonarch> therapySessions = getLastSettingDaysTherapiesForUserId(patientUserId,getPlusOrMinusTodayLocalDate(-(adherenceSettingDay-1)),today); 
+				
+				List<TherapySession> therapySessionsVest = adherenceCalculationService.getLastSettingDaysTherapiesForUserId(patientUserId,getPlusOrMinusTodayLocalDate(-(adherenceSettingDay-1)),today);
+				
+				if(Objects.isNull(therapySessions)){
+					therapySessions = new LinkedList<>();
+				}
+				
+				if(Objects.isNull(therapySessionsVest)){
+					therapySessionsVest = new LinkedList<>();
+				}
+				
+				int hmrRunRateVest = calculateHMRRunRatePerSession(therapySessionsVest);
+				int hmrRunRateMonarch = calculateHMRRunRatePerSession(therapySessions);
+				
+				int hmrRunRateBoth = calculateHMRRunRatePerSessionBoth(therapySessions, therapySessionsVest);
+				newCompliance.setHmrRunRate(hmrRunRateBoth);
+				
+				double durationForSettingDaysMonarch = hmrRunRateMonarch*therapySessions.size(); // runrate*totalsessions = total duration
+				double durationForSettingDaysVest = hmrRunRateVest*therapySessions.size(); // runrate*totalsessions = total duration
+				
+				ProtocolConstantsMonarch protocolConstant = userProtocolConstantsMap.get(patientUserId);
+				ProtocolConstants protocolConstantVest = userProtocolConstantsVestMap.get(patientUserId);
+
+				boolean isHmrCompliantVest = adherenceCalculationService.isHMRCompliant(protocolConstantVest, durationForSettingDaysMonarch, adherenceSettingDay);
+				boolean isHmrCompliantMonarch = isHMRCompliant(protocolConstant, durationForSettingDaysVest, adherenceSettingDay);
+				
+				if(!isHmrCompliantVest || !isHmrCompliantMonarch){
+					score = score < HMR_NON_COMPLIANCE_POINTS ? 0 : score - HMR_NON_COMPLIANCE_POINTS;
+					newCompliance.setHmrCompliant(false);
+					// increment HMR Non Adherence Counter
+					int globalHMRNonAdherenceCounter = newCompliance.getGlobalHMRNonAdherenceCounter();
+					newCompliance.setGlobalHMRNonAdherenceCounter(++globalHMRNonAdherenceCounter);
+					
+					String notificationType = HMR_NON_COMPLIANCE_MONARCH;
+					if(!isHmrCompliantVest){
+						if(!isHmrCompliantMonarch)
+							notificationType = HMR_NON_COMPLIANCE;
+						else 
+							notificationType = HMR_NON_COMPLIANCE_VEST;
+					}
+					notificationMap.put(patientUserId, new NotificationMonarch(notificationType,today,newCompliance.getPatientUser(), newCompliance.getPatient(),false));
+				}else{
+					score = score <=  DEFAULT_COMPLIANCE_SCORE - BONUS_POINTS ? score + BONUS_POINTS : DEFAULT_COMPLIANCE_SCORE;
+					newCompliance.setHmrCompliant(true);
+				}
+				newCompliance.setScore(score);
+				// reset settings deviated count and flag on missed therapy
+				newCompliance.setSettingsDeviatedDaysCount(0);
+				newCompliance.setSettingsDeviated(false);
+				complianceMap.put(patientUserId, newCompliance);
+			}
+		}
+	
 	// calculate HMRCompliance on Missed Therapy Date for Per UserId
 	//private void calculateUserHMRComplianceForMST(
 	private PatientComplianceMonarch calculateUserHMRComplianceForMST(
@@ -788,11 +1253,119 @@ public class AdherenceCalculationServiceMonarch{
 		newCompliance.setGlobalMissedTherapyCounter(++globalMissedTherapyCounter);
 		
 		return newCompliance;
-		// Saving the score values for the specific date of compliance
-		
+		// Saving the score values for the specific date of compliance		
 	
 	}
 		
+	
+	// calculate HMRCompliance on Missed Therapy Date for both devices		
+	private PatientComplianceMonarch calculateUserHMRComplianceForMSTBoth(
+			PatientComplianceMonarch newCompliance,
+			ProtocolConstantsMonarch userProtocolConstants,
+			ProtocolConstants userProtocolConstantsVest,
+			LocalDate complianceDate,
+			Long userId,
+			PatientInfo patient,
+			User patientUser,
+			Integer adherenceSettingDay,
+			int initialPrevScoreFor1Day,
+			SortedMap<LocalDate,List<TherapySessionMonarch>> sortedTherapy,
+			SortedMap<LocalDate,List<TherapySession>> sortedTherapyVest,
+			PatientComplianceMonarch prevCompliance,
+			NotificationMonarch existingNotificationofTheDay,
+			Integer resetFlag) {
+		
+		// Commented the repository call for previous day compliance and getting the prevCompliance from the method parameter
+		// Getting previous day score or adherence reset score for the adherence setting value as 1
+		
+		int score = initialPrevScoreFor1Day == 0 ? prevCompliance.getScore() : initialPrevScoreFor1Day;
+		
+		// Get earlier third day to finding therapy session
+		LocalDate adherenceSettingDaysEarlyDate = getDateBeforeSpecificDays(complianceDate,(adherenceSettingDay-1));
+		
+		//Commented the repository call for current day therapy session and getting the same from the method parameter and the calling method
+		// Get therapy session for last adherence Setting days
+		List<TherapySessionMonarch> therapySessions = new LinkedList<>();
+		therapySessions = getTherapyforBetweenDates(adherenceSettingDaysEarlyDate, complianceDate, sortedTherapy);
+		
+		// Get therapy session for last adherence Setting days
+		List<TherapySession> therapySessionsVest = new LinkedList<>(); 
+		therapySessionsVest = adherenceCalculationService.getTherapyforBetweenDates(adherenceSettingDaysEarlyDate, complianceDate, sortedTherapyVest);
+		
+		int hmrRunRate = calculateHMRRunRatePerSession(therapySessions);
+		
+		int hmrRunRateBoth = calculateHMRRunRatePerSessionBoth(therapySessions, therapySessionsVest);
+		newCompliance.setHmrRunRate(hmrRunRateBoth);
+		
+		double durationForSettingDays = hmrRunRate*therapySessions.size(); // runrate*totalsessions = total duration
+		
+		int hmrRunRateVest = calculateHMRRunRatePerSession(therapySessionsVest);
+		double durationForSettingDaysVest = hmrRunRateVest*therapySessionsVest.size(); // runrate*totalsessions = total duration
+		
+		String notification_type = null;
+		boolean isSettingsDeviatedMonarch = isSettingsDeviatedForSettingDays(therapySessions, userProtocolConstants, adherenceSettingDay);
+		
+		boolean isSettingsDeviatedVest = adherenceCalculationService.isSettingsDeviatedForSettingDays(therapySessionsVest, userProtocolConstantsVest, adherenceSettingDay);
+		
+		
+		boolean isHMRCompliantMonarch = isHMRCompliant(userProtocolConstants, durationForSettingDays, adherenceSettingDay);
+		boolean isHMRCompliantVest = adherenceCalculationService.isHMRCompliant(userProtocolConstantsVest, durationForSettingDaysVest, adherenceSettingDay);
+		
+		// validating the last adherence setting days therapies with respect to the user protocol
+		if(!isHMRCompliantMonarch || !isHMRCompliantVest){
+			score = score < HMR_NON_COMPLIANCE_POINTS ? 0 : score - HMR_NON_COMPLIANCE_POINTS;
+			
+			int globalHMRNonAdhrenceCounter = prevCompliance.getGlobalHMRNonAdherenceCounter();
+			newCompliance.setGlobalHMRNonAdherenceCounter(++globalHMRNonAdhrenceCounter);
+			
+			newCompliance.setHmrCompliant(false);
+			
+			if(isSettingsDeviatedMonarch){				
+				score = score < SETTING_DEVIATION_POINTS ? 0 : score - SETTING_DEVIATION_POINTS;
+			}
+			
+	
+		}else if(isSettingsDeviatedMonarch){
+			score = score < SETTING_DEVIATION_POINTS ? 0 : score - SETTING_DEVIATION_POINTS;
+			
+			// Previous day setting deviation count / 0 for 1 day adherence setting 
+			int setDeviationCount = initialPrevScoreFor1Day == 0 ? prevCompliance.getSettingsDeviatedDaysCount() : 0;			
+			newCompliance.setSettingsDeviatedDaysCount(setDeviationCount+1);
+			
+			int globalSettingsDeviationCounter = prevCompliance.getGlobalSettingsDeviationCounter();
+			newCompliance.setGlobalSettingsDeviationCounter(++globalSettingsDeviationCounter);
+		}else{
+			score = score <=  DEFAULT_COMPLIANCE_SCORE - BONUS_POINTS ? score + BONUS_POINTS : DEFAULT_COMPLIANCE_SCORE;
+			
+			if(Objects.nonNull(existingNotificationofTheDay))
+				notificationMonarchRepository.delete(existingNotificationofTheDay);
+			newCompliance.setScore(score);
+			return newCompliance;
+		}
+		
+		String notificationType = (isSettingsDeviatedMonarch && isSettingsDeviatedVest) ? SETTINGS_DEVIATION : 
+			( (!isSettingsDeviatedMonarch && isSettingsDeviatedVest) ? SETTINGS_DEVIATION_VEST : 
+				( (!isSettingsDeviatedMonarch && !isSettingsDeviatedVest) ? SETTINGS_DEVIATION_MONARCH : "" ) );
+		
+		notification_type = getNotificationString(notificationType,isHMRCompliantMonarch,isHMRCompliantVest);
+		
+		
+		/*if(resetFlag == 1 || (resetFlag == 2 && adherenceSettingDay != 1)){
+			notification_type = initialPrevScoreFor1Day == 0 ? notification_type : ADHERENCE_SCORE_RESET;
+		}*/			
+		
+		// Added the existingNotificationofTheDay param for passing the notification object for the current date
+		notificationMonarchService.createOrUpdateNotification(patientUser, patient, userId,
+				complianceDate, notification_type, false, existingNotificationofTheDay);
+		
+		// Setting the new score with respect to the compliance deduction
+		newCompliance.setScore(score);
+		
+		// Saving the updated score for the specific date of compliance
+		
+		return newCompliance;
+	}
+	
 	/**
 	 * Get the therapy data between days and user ids
 	 * @param patientUserId, from date and to date
@@ -1148,6 +1721,72 @@ public class AdherenceCalculationServiceMonarch{
 		saveOrUpdateTherapySessions(receivedTherapySessionsMap);
 	}
 
+	public void processAdherenceScore(PatientNoEventMonarch patientNoEventMonarch,
+			SortedMap<LocalDate,List<TherapySessionMonarch>> existingTherapySessionMap,
+			SortedMap<LocalDate,List<TherapySessionMonarch>> receivedTherapySessionsMap,
+			SortedMap<LocalDate,PatientComplianceMonarch> existingComplianceMap,
+			ProtocolConstantsMonarch protocolConstant, Long patientUserId) throws Exception{
+					
+		SortedMap<LocalDate,List<TherapySession>> existingTherapySessionMapVest = therapySessionService.getAllTherapySessionsMapByPatientUserId(patientUserId);		
+		
+		for(LocalDate currentTherapySessionDate : receivedTherapySessionsMap.keySet()){
+			List<TherapySessionMonarch> receivedTherapySessions = receivedTherapySessionsMap.get(currentTherapySessionDate);
+			LocalDate firstTransmittedDate = null;
+			LocalDate latestTherapyDate = null;
+			PatientInfo patient = null;
+			User patientUser = null;
+			
+			if(receivedTherapySessions.size() > 0){
+				patient = receivedTherapySessions.get(0).getPatientInfo();
+				patientUser = receivedTherapySessions.get(0).getPatientUser();						
+				
+				PatientNoEvent patientNoEventVest = patientNoEventRepository.findByPatientUserId(patientUser.getId());
+				
+				if(Objects.nonNull(patientNoEventMonarch) && Objects.nonNull(patientNoEventMonarch.getFirstTransmissionDate()) 
+						&& Objects.nonNull(patientNoEventVest) && Objects.nonNull(patientNoEventVest.getFirstTransmissionDate()))
+					firstTransmittedDate = patientNoEventVest.getFirstTransmissionDate().isBefore(patientNoEventMonarch.getFirstTransmissionDate()) ? 
+							patientNoEventVest.getFirstTransmissionDate() : patientNoEventMonarch.getFirstTransmissionDate();
+				else if(Objects.nonNull(patientNoEventMonarch) && Objects.nonNull(patientNoEventMonarch.getFirstTransmissionDate()))
+					firstTransmittedDate = patientNoEventMonarch.getFirstTransmissionDate();
+				else if(Objects.nonNull(patientNoEventVest) && Objects.nonNull(patientNoEventVest.getFirstTransmissionDate()))
+					firstTransmittedDate = patientNoEventVest.getFirstTransmissionDate();
+				else
+					firstTransmittedDate = currentTherapySessionDate;
+			}
+			
+			int adherenceSettingDay = getAdherenceSettingForPatient(patient);
+			
+			int totalDuration = calculateCumulativeDuration(receivedTherapySessions);		
+			// Existing User First Time Transmission Data OR New User First Time Transmission Data
+			if(existingTherapySessionMap.isEmpty() && existingTherapySessionMapVest.isEmpty() ){
+				handleFirstTimeTransmit(existingTherapySessionMap,
+						receivedTherapySessionsMap, existingComplianceMap,
+						protocolConstant, currentTherapySessionDate,
+						firstTransmittedDate, patient, patientUser,
+						totalDuration, adherenceSettingDay);
+			}else { // User Transmitting data in Subsequent requests
+				// data is sent in sorted order
+				if (Objects.nonNull(firstTransmittedDate) && Objects.nonNull(currentTherapySessionDate)
+						&& firstTransmittedDate.isBefore(currentTherapySessionDate)){
+					// Data sent in sorted order
+					calculateAdherenceScoreForTheDuration(patientUser,patient,firstTransmittedDate,
+							currentTherapySessionDate,protocolConstant,existingComplianceMap,
+							existingTherapySessionMap,receivedTherapySessionsMap, adherenceSettingDay);
+				}else{
+					// Older data sent
+					firstTransmittedDate = currentTherapySessionDate;
+					handleFirstTimeTransmit(existingTherapySessionMap,
+							receivedTherapySessionsMap, existingComplianceMap,
+							protocolConstant, currentTherapySessionDate,
+							firstTransmittedDate, patient, patientUser,
+							totalDuration, adherenceSettingDay);
+				}
+			}
+ 		}
+		saveOrUpdateComplianceMap(existingComplianceMap);
+		saveOrUpdateTherapySessions(receivedTherapySessionsMap);
+	}
+	
 	private synchronized void saveOrUpdateTherapySessions(
 			SortedMap<LocalDate, List<TherapySessionMonarch>> receivedTherapySessionsMap) {
 		Map<LocalDate, List<TherapySessionMonarch>> allTherapySessionMap = eleminateDuplicateTherapySessions(receivedTherapySessionsMap);
@@ -1203,7 +1842,7 @@ public class AdherenceCalculationServiceMonarch{
 		return allTherapySessionMap;
 	}
 
-	private synchronized void saveOrUpdateComplianceMap(
+	public synchronized void saveOrUpdateComplianceMap(
 			SortedMap<LocalDate, PatientComplianceMonarch> existingComplianceMap) {
 		// Save or update all compliance
 		List<PatientComplianceMonarch> compliances = new LinkedList<>(existingComplianceMap.values());
@@ -1249,7 +1888,13 @@ public class AdherenceCalculationServiceMonarch{
 			SortedMap<LocalDate, List<TherapySessionMonarch>> receivedTherapySessionsMap,
 			Integer adherenceSettingDay) throws Exception{
 		
-		LocalDate latestComplianceDate = existingComplianceMap.lastKey();
+		LocalDate latestComplianceDate;
+		if(existingComplianceMap.size()>0){
+			latestComplianceDate = existingComplianceMap.lastKey();
+		}else{
+			SortedMap<LocalDate,PatientCompliance> existingComplianceVestMap = complianceService.getPatientComplainceMapByPatientUserId(patientUser.getId());
+			latestComplianceDate = existingComplianceVestMap.lastKey();
+		}
 		
 		List<TherapySessionMonarch> sessionsTobeSaved = receivedTherapySessionsMap.get(currentTherapyDate);
 		// Get the therapy sessions for currentTherapyDate from existing therapies
@@ -1296,15 +1941,36 @@ public class AdherenceCalculationServiceMonarch{
 			
 			int daysBetween = DateUtil.getDaysCountBetweenLocalDates(firstTransmittedDate, therapyDate);
 			List<TherapySessionMonarch> latestSettingDaysTherapySessions = prepareTherapySessionsForLastSettingdays(therapyDate,
-					existingTherapySessionMap,receivedTherapySessionsMap,adherenceSettingDay);
+					existingTherapySessionMap,adherenceSettingDay);
 			
 			double hmr = getLatestHMR(existingTherapySessionMap, receivedTherapySessionsMap,therapyDate,
 					latestSettingDaysTherapySessions);
 			
 			int hmrRunrate = calculateHMRRunRatePerSession(latestSettingDaysTherapySessions);
 			
+			
+			String deviceType = adherenceCalculationService.getDeviceTypeValue(patient.getId());
+			
+			if(deviceType.equals("BOTH")){				
+				SortedMap<LocalDate, List<TherapySession>> existingTherapySessionMapVest = 
+						therapySessionService.getAllTherapySessionsMapByPatientUserId(patientUser.getId());
+				
+				List<TherapySession> latestSettingDaysTherapySessionsVest = adherenceCalculationService.prepareTherapySessionsForLastSettingdays(therapyDate,
+						existingTherapySessionMapVest,adherenceSettingDay);
+				
+				hmrRunrate = calculateHMRRunRatePerSessionBoth(latestSettingDaysTherapySessions, latestSettingDaysTherapySessionsVest);				
+			}
+			
 			LocalDate lastTransmissionDate = getLatestTransmissionDate(
-					existingTherapySessionMap,receivedTherapySessionsMap, therapyDate);
+					existingTherapySessionMap, therapyDate);
+						
+			if(deviceType.equals("BOTH")){
+				SortedMap<LocalDate,List<TherapySession>> existingTherapySessionMapVest = 
+						therapySessionService.getAllTherapySessionsMapByPatientUserId(patientUser.getId());
+				lastTransmissionDate = getLatestTransmissionDate(
+						existingTherapySessionMapVest, existingTherapySessionMap, therapyDate);
+			}
+			
 			int missedTherapyCount = 0;
 			if( (daysBetween <= 1 && adherenceSettingDay > 1 ) || (daysBetween == 0 && adherenceSettingDay == 1) ){ // first transmit
 				PatientComplianceMonarch compliance = existingComplianceMap.get(therapyDate);
@@ -1365,7 +2031,7 @@ public class AdherenceCalculationServiceMonarch{
 				
 	}
 
-	private PatientComplianceMonarch getLatestCompliance(User patientUser,
+	public PatientComplianceMonarch getLatestCompliance(User patientUser,
 			PatientInfo patient,
 			SortedMap<LocalDate, PatientComplianceMonarch> existingComplianceMap,
 			LocalDate therapyDate) throws Exception {
@@ -1382,7 +2048,6 @@ public class AdherenceCalculationServiceMonarch{
 
 	private LocalDate getLatestTransmissionDate(
 			SortedMap<LocalDate, List<TherapySessionMonarch>> existingTherapySessionMap,
-			SortedMap<LocalDate, List<TherapySessionMonarch>> receivedTherapySessionsMap,
 			LocalDate date) throws Exception{
 		LocalDate lastTransmissionDate = date;
 		// Get Latest TransmissionDate, if data has not been transmitted for the day get mostRecent date
@@ -1392,6 +2057,29 @@ public class AdherenceCalculationServiceMonarch{
 				lastTransmissionDate = mostRecentTherapySessionMap.lastKey();
 		}
 		return lastTransmissionDate;
+	}
+	
+	public LocalDate getLatestTransmissionDate(
+			SortedMap<LocalDate, List<TherapySession>> existingTherapySessionMapVest,
+			SortedMap<LocalDate, List<TherapySessionMonarch>> existingTherapySessionMapMonarch,
+			LocalDate date) throws Exception{
+		LocalDate lastTransmissionDateVest = date;
+		LocalDate lastTransmissionDateMonarch = date;
+		// Get Latest TransmissionDate for Monarch, if data has not been transmitted for the day get mostRecent date
+		if(Objects.isNull(existingTherapySessionMapMonarch.get(date))){
+			SortedMap<LocalDate,List<TherapySessionMonarch>> mostRecentTherapySessionMap = existingTherapySessionMapMonarch.headMap(date);
+			if(mostRecentTherapySessionMap.size()>0)
+				lastTransmissionDateMonarch = mostRecentTherapySessionMap.lastKey();
+		}
+		
+		// Get Latest TransmissionDate for Vest, if data has not been transmitted for the day get mostRecent date
+		if(Objects.isNull(existingTherapySessionMapVest.get(date))){
+			SortedMap<LocalDate,List<TherapySession>> mostRecentTherapySessionMap = existingTherapySessionMapVest.headMap(date);
+			if(mostRecentTherapySessionMap.size()>0)
+				lastTransmissionDateVest = mostRecentTherapySessionMap.lastKey();
+		}
+		
+		return (lastTransmissionDateMonarch.isAfter(lastTransmissionDateVest) ? lastTransmissionDateMonarch : lastTransmissionDateVest);
 	}
 
 	private double getLatestHMR(
@@ -1474,25 +2162,77 @@ public class AdherenceCalculationServiceMonarch{
 			latestCompliance.setMissedTherapyCount(0);
 			notificationType = ADHERENCE_SCORE_RESET; 
 		}else{
+
+			SortedMap<LocalDate,List<TherapySession>> existingTherapySessionMapVest = null; 
+					
+			Map<String,Double> therapyMetrics;
+			Map<String,Double> therapyMetricsVest;
+			boolean isHMRCompliant = true;
+			boolean isHMRCompliantVest = true;
+			
 			List<TherapySessionMonarch> latestSettingDaysTherapySessions = prepareTherapySessionsForLastSettingdays(latestCompliance.getDate(),
-					existingTherapySessionMap,receivedTherapySessionsMap,adherenceSettingDay);
-			Map<String,Double> therapyMetrics = calculateTherapyMetricsPerSettingDays(latestSettingDaysTherapySessions);
+					existingTherapySessionMap,adherenceSettingDay);
 			
-			boolean isHMRCompliant = isHMRCompliant(protocolConstant, therapyMetrics.get(TOTAL_DURATION),adherenceSettingDay);
+			
+			String deviceType = adherenceCalculationService.getDeviceTypeValue(patient.getId());
+			
+			therapyMetrics = calculateTherapyMetricsPerSettingDays(latestSettingDaysTherapySessions);				
+			isHMRCompliant = isHMRCompliant(protocolConstant, therapyMetrics.get(TOTAL_DURATION),adherenceSettingDay);
+			
+			if(deviceType.equals("BOTH")){
+				existingTherapySessionMapVest = 
+						therapySessionService.getAllTherapySessionsMapByPatientUserId(patientUser.getId());
+				
+				ProtocolConstants protocolConstantVest = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId()); 
+			
+				List<TherapySession> latestSettingDaysTherapySessionsVest = adherenceCalculationService.prepareTherapySessionsForLastSettingdays(latestCompliance.getDate(),
+						existingTherapySessionMapVest,adherenceSettingDay);
+				
+				therapyMetricsVest = adherenceCalculationService.calculateTherapyMetricsPerSettingDays(latestSettingDaysTherapySessionsVest);
+				isHMRCompliantVest = adherenceCalculationService.isHMRCompliant(protocolConstantVest, therapyMetricsVest.get(TOTAL_DURATION),adherenceSettingDay);
+				
+				/*Map<String, Object> latestSettingDaysTherapySessionsBoth = prepareTherapySessionsForLastSettingdays(latestCompliance.getDate(),
+						existingTherapySessionMap,existingTherapySessionMapVest,adherenceSettingDay);
+				
+				therapyMetrics = calculateTherapyMetricsPerSettingDaysBoth(latestSettingDaysTherapySessionsBoth);
+				isHMRCompliant = isHMRCompliant(protocolConstant, protocolConstantVest, therapyMetrics.get(TOTAL_DURATION),adherenceSettingDay);*/
+			}
+			
 			boolean isSettingsDeviated = false;
-			
+			boolean isSettingsDeviatedVest = false;
+					
 			// Settings deviated to be calculated only on Therapy done days
 			if(currentMissedTherapyCount == 0){
+				
 				isSettingsDeviated = isSettingsDeviatedForSettingDays(latestSettingDaysTherapySessions, protocolConstant, adherenceSettingDay);
+				
+				if(deviceType.equals("BOTH")){
+					List<TherapySession> latestSettingDaysTherapySessionsVest = adherenceCalculationService.prepareTherapySessionsForLastSettingdays(latestCompliance.getDate(),
+							existingTherapySessionMapVest,adherenceSettingDay);
+					
+					ProtocolConstants protocolConstantVest = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId());
+					
+					isSettingsDeviatedVest = adherenceCalculationService.isSettingsDeviatedForSettingDays(latestSettingDaysTherapySessionsVest, protocolConstantVest, adherenceSettingDay);					
+				}
+				
 				applySettingsDeviatedDaysCount(latestCompliance, complianceMap,
-						isSettingsDeviated, adherenceSettingDay);
-				if(isSettingsDeviated){
+						(isSettingsDeviated || isSettingsDeviatedVest), adherenceSettingDay);
+
+				if(isSettingsDeviated || isSettingsDeviatedVest){
 					currentScore -=  SETTING_DEVIATION_POINTS;
-					notificationType =  SETTINGS_DEVIATION;
+					
+					if(isSettingsDeviated && (deviceType.equals("MONARCH") ||  isSettingsDeviatedVest)){
+						notificationType =  SETTINGS_DEVIATION;
+					}else if(isSettingsDeviated && !isSettingsDeviatedVest){
+						notificationType =  SETTINGS_DEVIATION_MONARCH;
+					}else if(!isSettingsDeviated && isSettingsDeviatedVest){
+						notificationType =  SETTINGS_DEVIATION_VEST;
+					}
+					
 					// increment global settings Deviation counter
 					int globalSettingsDeviationCounter = latestCompliance.getGlobalSettingsDeviationCounter();
 					latestCompliance.setGlobalSettingsDeviationCounter(++globalSettingsDeviationCounter);
-				}else {
+				}else{
 					// reset settingsDeviatedDays count if patient is adhere to settings
 					latestCompliance.setSettingsDeviatedDaysCount(0);
 				}
@@ -1503,13 +2243,19 @@ public class AdherenceCalculationServiceMonarch{
 
 			latestCompliance.setSettingsDeviated(isSettingsDeviated);
 			
-			if(!isHMRCompliant){
+			if(!isHMRCompliant || !isHMRCompliantVest){
 				if(!today.equals(latestCompliance.getDate()) || currentMissedTherapyCount == 0){
 					currentScore -=  HMR_NON_COMPLIANCE_POINTS;
-					if(StringUtils.isBlank(notificationType))
-						notificationType =  HMR_NON_COMPLIANCE;
-					else
-						notificationType =  HMR_AND_SETTINGS_DEVIATION;
+					
+					if(deviceType.equals("MONARCH")){
+						if(StringUtils.isBlank(notificationType))
+							notificationType =  HMR_NON_COMPLIANCE;
+						else
+							notificationType =  HMR_AND_SETTINGS_DEVIATION;
+					}else{
+						notificationType = getNotificationString(notificationType, isHMRCompliant, isHMRCompliantVest);
+					}
+					
 					// increment global HMR Non Adherence Counter
 					int globalHMRNonAdherenceCounter = latestCompliance.getGlobalHMRNonAdherenceCounter();
 					latestCompliance.setGlobalHMRNonAdherenceCounter(++globalHMRNonAdherenceCounter);
@@ -1555,7 +2301,70 @@ public class AdherenceCalculationServiceMonarch{
 		complianceMap.put(latestCompliance.getDate(), latestCompliance);
 	}
 
-	private void applySettingsDeviatedDaysCount(
+	public String getNotificationString(String notificationType,boolean isHMRCompliantMonarch,boolean isHMRCompliantVest)
+	{	
+		String retNotificationType = "";
+		
+		notificationType = StringUtils.isBlank(notificationType) ? "" : notificationType;  
+		
+		switch(notificationType){
+		
+			case "":
+				// When there is no setting is deviated and HMR compliant / non compliant in either of the device combinations
+				if(!isHMRCompliantMonarch){
+					if(!isHMRCompliantVest)
+						retNotificationType =  HMR_NON_COMPLIANCE;	
+					else
+						retNotificationType =  HMR_NON_COMPLIANCE_MONARCH;					
+				}else{
+					if(!isHMRCompliantVest)
+						retNotificationType =  HMR_NON_COMPLIANCE_VEST;
+				}
+				break;
+				
+			case SETTINGS_DEVIATION:				
+				// When both the device setting is deviated and HMR compliant / non compliant in either of the device combinations			
+				if(!isHMRCompliantMonarch){
+					if(!isHMRCompliantVest)
+						retNotificationType =  HMR_AND_SETTINGS_DEVIATION;
+					else
+						retNotificationType =  HMR_MONARCH_AND_SETTINGS_DEVIATION;					
+				}else{
+					if(!isHMRCompliantVest)
+						retNotificationType =  HMR_VEST_AND_SETTINGS_DEVIATION;
+				}
+				break;
+			
+			case SETTINGS_DEVIATION_VEST:				
+				// When Vest device is setting deviated and HMR compliant / non compliant in either of the device combinations
+				if(!isHMRCompliantMonarch){
+					if(!isHMRCompliantVest)
+						retNotificationType =  HMR_AND_SETTINGS_DEVIATION_VEST;
+					else
+						retNotificationType =  HMR_MONARCH_AND_SETTINGS_DEVIATION_VEST;	
+				}else{
+					if(!isHMRCompliantVest)
+						retNotificationType =  HMR_VEST_AND_SETTINGS_DEVIATION_VEST;
+				}
+				break;
+				
+			case SETTINGS_DEVIATION_MONARCH:				
+				// When Monarch device is setting deviated and HMR compliant / non compliant in either of the device combinations
+				if(!isHMRCompliantMonarch)
+					if(!isHMRCompliantVest)
+						retNotificationType =  HMR_AND_SETTINGS_DEVIATION_MONARCH;
+					else 
+						retNotificationType =  HMR_MONARCH_AND_SETTINGS_DEVIATION_MONARCH;
+				else{
+					if(!isHMRCompliantVest)
+						retNotificationType =  HMR_VEST_AND_SETTINGS_DEVIATION_MONARCH;
+				}
+				break;
+		}
+		
+		return retNotificationType;
+	}
+	public void applySettingsDeviatedDaysCount(
 			PatientComplianceMonarch latestCompliance,
 			SortedMap<LocalDate, PatientComplianceMonarch> complianceMap,
 			boolean isSettingsDeviated, Integer adherenceSettingDay) throws Exception{
@@ -1568,15 +2377,15 @@ public class AdherenceCalculationServiceMonarch{
 				previousSettingsDeviatedDaysCount = previousCompliance.getSettingsDeviatedDaysCount();
 			}
 			// If settingsDeviationDaysCount is 0 for previous date, settingsDeviationDaysCount would be default value. increments thereafter
-			settingsDeviatedDaysCount =  previousSettingsDeviatedDaysCount == 0 ? adherenceSettingDay :++previousSettingsDeviatedDaysCount;
+			//settingsDeviatedDaysCount =  previousSettingsDeviatedDaysCount == 0 ? adherenceSettingDay :++previousSettingsDeviatedDaysCount;
+			settingsDeviatedDaysCount =  ++previousSettingsDeviatedDaysCount;
 			latestCompliance.setSettingsDeviatedDaysCount(settingsDeviatedDaysCount);
 		}
 	} 
 	
-	private List<TherapySessionMonarch> prepareTherapySessionsForLastSettingdays(
+	public List<TherapySessionMonarch> prepareTherapySessionsForLastSettingdays(
 			LocalDate currentTherapyDate,
 			SortedMap<LocalDate, List<TherapySessionMonarch>> existingTherapySessionMap,
-			SortedMap<LocalDate, List<TherapySessionMonarch>> receivedTherapySessionsMap,
 			Integer adherenceSettingDay) {
 		List<TherapySessionMonarch> therapySessions = new LinkedList<>();
 		for(int i = 0;i < adherenceSettingDay;i++){
@@ -1587,7 +2396,58 @@ public class AdherenceCalculationServiceMonarch{
 		return therapySessions;
 	}
 	
+	public Map<String,Object> prepareTherapySessionsForLastSettingdays(
+			LocalDate currentTherapyDate,
+			SortedMap<LocalDate, List<TherapySessionMonarch>> existingTherapySessionMap,
+			SortedMap<LocalDate, List<TherapySession>> existingTherapySessionMapVest,			
+			Integer adherenceSettingDay) {
+		
+		List<Object> therapySessions = new LinkedList<>();
+		Map<String,Object> combined = new HashMap<String,Object>();
+		
+		for(int i = 0;i < adherenceSettingDay;i++){
+			List<TherapySessionMonarch> previousExistingTherapySessions = existingTherapySessionMap.get(currentTherapyDate.minusDays(i));
+			if(Objects.nonNull(previousExistingTherapySessions))
+				therapySessions.addAll(previousExistingTherapySessions);
+			combined.put("Monarch", previousExistingTherapySessions);
+				
+			
+			List<TherapySession> previousExistingTherapySessionsVest = existingTherapySessionMapVest.get(currentTherapyDate.minusDays(i));
+			if(Objects.nonNull(previousExistingTherapySessionsVest))
+				therapySessions.addAll( previousExistingTherapySessionsVest);
+			combined.put("Vest", previousExistingTherapySessionsVest);
+			
+		}
+		return combined;
+	}
+	
+	public boolean isSettingsDeviatedForSettingDays(List<TherapySessionMonarch> lastSettingDaysTherapySessions,
+			ProtocolConstantsMonarch protocol, Integer adherenceSettingDay){
+		Map<LocalDate, List<TherapySessionMonarch>> lastSettingDaysTherapySessionMap = lastSettingDaysTherapySessions
+				.stream().collect(
+						Collectors.groupingBy(TherapySessionMonarch::getDate));
+		boolean isSettingsDeviated = false;
+		// This is for checking settings deviation, settings deviation should be calculated for consecutive adherence setting days
+		//(exclusive missed therapy)
+		if(lastSettingDaysTherapySessionMap.keySet().size() == adherenceSettingDay){
+			for(LocalDate d : lastSettingDaysTherapySessionMap.keySet()){
+				List<TherapySessionMonarch> therapySeesionsPerDay = lastSettingDaysTherapySessionMap.get(d);
+				double weightedFrequency = calculateTherapyMetricsPerSettingDays(therapySeesionsPerDay).get(WEIGHTED_AVG_FREQUENCY);
+				if(!isSettingsDeviated(protocol, weightedFrequency)){
+					isSettingsDeviated = false;
+					break;
+				}else{
+					isSettingsDeviated = true;
+				}
+			}
+		}else{
+			return false;
+		}
+		return isSettingsDeviated;
+	}
+	
 	private boolean isSettingsDeviatedForSettingDays(List<TherapySessionMonarch> lastSettingDaysTherapySessions,
+			List<TherapySession> lastSettingDaysTherapySessionsVest,
 			ProtocolConstantsMonarch protocol, Integer adherenceSettingDay){
 		Map<LocalDate, List<TherapySessionMonarch>> lastSettingDaysTherapySessionMap = lastSettingDaysTherapySessions
 				.stream().collect(
@@ -1638,4 +2498,185 @@ public class AdherenceCalculationServiceMonarch{
 		PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(patientUserId);		
 		return getAdherenceSettingForPatient(patient);		
 	}
+	
+	
+	/**
+	 * Runs every midnight deducts the compliance score by 5 if therapy hasn't been done for adherence setting day(s)
+	 */
+	//@Scheduled(cron="0 55 23 * * * ")	
+	public void processDeviceDetails(){
+		try{
+			LocalDate today = LocalDate.now();
+			log.debug("Started Device details "+DateTime.now()+","+today);
+			List<PatientDevicesAssoc> patDevAssList = patientDevicesAssocRepository.findByCreatedDate(today.toString());
+			Map<Long,PatientNoEventMonarch> userIdNoEventMap = noEventMonarchService.findAllGroupByPatientUserId();
+			
+			Map<Long,PatientNoEvent> userIdNoEventMapVest = noEventMonarchServiceVest.findAllGroupByPatientUserId();
+			
+			for(PatientDevicesAssoc patDevice : patDevAssList){
+				
+				List<PatientDevicesAssoc> devAssForPatientList = patientDevicesAssocRepository.findByPatientId(patDevice.getPatientId());
+				
+				if(devAssForPatientList.size()>1){
+					LocalDate vestCreatedDate = null;
+					LocalDate monarchCreatedDate = null;
+					
+					Map<String, Long> deviceCreatedDate = new HashMap<>();
+					for(PatientDevicesAssoc device : devAssForPatientList){
+						if(device.getDeviceType().equals("VEST")){
+							vestCreatedDate = device.getCreatedDate();
+						}else if(device.getDeviceType().equals("MONARCH")){
+							monarchCreatedDate = device.getCreatedDate();
+						}							
+					}
+					
+					PatientInfo patientInfo = patientInfoRepository.findOneById(patDevice.getPatientId());
+					User user = userService.getUserObjFromPatientInfo(patientInfo);
+					
+					PatientInfo patientInfoOld = patientInfoRepository.findOneById(patDevice.getOldPatientId());
+					User userOld = userService.getUserObjFromPatientInfo(patientInfoOld);
+					
+					/*String vestPatientId = null;
+					String monarchPatientId = null;
+					
+					Long vestUserId = null;
+					Long monarchUserId = null;	*/				
+					
+					LocalDate firstTransmissionDateMonarch = null;
+					
+					PatientNoEventMonarch noEventMonarch = userIdNoEventMap.get(userOld.getId());
+					
+					if(Objects.nonNull(noEventMonarch) && (Objects.nonNull(noEventMonarch.getFirstTransmissionDate()))){
+						firstTransmissionDateMonarch = noEventMonarch.getFirstTransmissionDate();
+					}
+					
+					LocalDate firstTransmissionDateVest = null;
+					
+					PatientNoEvent noEventVest = userIdNoEventMapVest.get(user.getId());
+					
+					if(Objects.nonNull(noEventVest) && (Objects.nonNull(noEventVest.getFirstTransmissionDate()))){
+						firstTransmissionDateVest = noEventVest.getFirstTransmissionDate();
+					}
+					
+					
+					if(vestCreatedDate.isBefore(monarchCreatedDate)){
+						
+						List<PatientCompliance> patientComplianceList = patientComplianceRepository.findByPatientUserId(user.getId());
+						List <PatientComplianceMonarch> complianceListToSave = new LinkedList<>();
+						
+						for(PatientCompliance patientCompliance : patientComplianceList){
+							PatientComplianceMonarch compliance = new PatientComplianceMonarch(patientCompliance.getScore(),
+									patientCompliance.getDate(),
+									patientCompliance.getPatient(),
+									patientCompliance.getPatientUser(),
+									patientCompliance.getHmrRunRate(),
+									patientCompliance.getHmr(),
+									patientCompliance.isHmrCompliant(),
+									patientCompliance.isSettingsDeviated(),
+									patientCompliance.getMissedTherapyCount(),
+									patientCompliance.getLatestTherapyDate(),
+									patientCompliance.getSettingsDeviatedDaysCount(),
+									patientCompliance.getGlobalHMRNonAdherenceCounter(),
+									patientCompliance.getGlobalSettingsDeviationCounter(),
+									patientCompliance.getGlobalMissedTherapyCounter());
+							 		
+							complianceListToSave.add(compliance);						 
+						}
+						complianceMonarchService.saveAll(complianceListToSave);
+						
+						List<Notification> notificationList = notificationRepository.findByPatientUserId(user.getId());
+						
+						List <NotificationMonarch> notificationListToSave = new LinkedList<>();
+						
+						for(Notification patientNotification : notificationList){
+							NotificationMonarch notification = new NotificationMonarch(
+									patientNotification.getNotificationType(),
+									patientNotification.getDate(),
+									patientNotification.getPatientUser(),
+									patientNotification.getPatient(),
+									patientNotification.isAcknowledged());
+									
+							notificationListToSave.add(notification);						 
+						}
+						notificationMonarchService.saveAll(notificationListToSave);
+						
+						List<TherapySessionMonarch> therapySessionMonarchList = therapySessionMonarchRepository.findByPatientUserId(userOld.getId());
+						
+						List <TherapySessionMonarch> therapySessionListToSave = new LinkedList<>();
+						
+						for(TherapySessionMonarch patientTherapySession : therapySessionMonarchList){
+							TherapySessionMonarch therapySession = new TherapySessionMonarch(patientInfo, user, 
+									patientTherapySession.getDate(), patientTherapySession.getSessionNo(),
+									patientTherapySession.getSessionType(), patientTherapySession.getStartTime(), patientTherapySession.getEndTime(),
+									patientTherapySession.getFrequency(), patientTherapySession.getIntensity(), patientTherapySession.getDurationInMinutes(),
+									patientTherapySession.getProgrammedCaughPauses(), patientTherapySession.getNormalCaughPauses(),
+									patientTherapySession.getCaughPauseDuration(), patientTherapySession.getHmr(), patientTherapySession.getSerialNumber(),
+									patientTherapySession.getBluetoothId(), patientTherapySession.getTherapyIndex(),
+									patientTherapySession.getStartBatteryLevel(), patientTherapySession.getEndBatteryLevel(),
+									patientTherapySession.getNumberOfEvents(), patientTherapySession.getNumberOfPods(), patientTherapySession.getDevWifi(),
+									patientTherapySession.getDevVersion());
+								
+							therapySessionListToSave.add(therapySession);
+						}
+						therapySessionMonarchService.saveAll(therapySessionListToSave);
+						
+						adherenceCalculationBoth(user.getId(), null, firstTransmissionDateMonarch, firstTransmissionDateVest, DEFAULT_COMPLIANCE_SCORE, userOld.getId(), 4);
+					}else{
+						//List<PatientCompliance> patientComplianceList = patientComplianceRepository.findByPatientUserIdAndDateBefore(user.getId(), firstTransmissionDateMonarch);
+						
+						/*List<PatientCompliance> patientComplianceList = patientComplianceRepository.findByPatientUserId(user.getId());
+						List <PatientComplianceMonarch> complianceListToSave = new LinkedList<>();
+						
+						for(PatientCompliance patientCompliance : patientComplianceList){
+							PatientComplianceMonarch compliance = new PatientComplianceMonarch(patientCompliance.getScore(),
+									patientCompliance.getDate(),
+									patientCompliance.getPatient(),
+									patientCompliance.getPatientUser(),
+									patientCompliance.getHmrRunRate(),
+									patientCompliance.getHmr(),
+									patientCompliance.isHmrCompliant(),
+									patientCompliance.isSettingsDeviated(),
+									patientCompliance.getMissedTherapyCount(),
+									patientCompliance.getLatestTherapyDate(),
+									patientCompliance.getSettingsDeviatedDaysCount(),
+									patientCompliance.getGlobalHMRNonAdherenceCounter(),
+									patientCompliance.getGlobalSettingsDeviationCounter(),
+									patientCompliance.getGlobalMissedTherapyCounter());
+							 		
+							complianceListToSave.add(compliance);						 
+						}
+						complianceMonarchService.saveAll(complianceListToSave);
+						
+						//List<Notification> notificationList = notificationRepository.findByPatientUserIdAndDateBefore(user.getId(), firstTransmissionDateMonarch);
+						List<Notification> notificationList = notificationRepository.findByPatientUserId(user.getId());
+						
+						List <NotificationMonarch> notificationListToSave = new LinkedList<>();
+						
+						for(Notification patientNotification : notificationList){
+							NotificationMonarch notification = new NotificationMonarch(
+									patientNotification.getNotificationType(),
+									patientNotification.getDate(),
+									patientNotification.getPatientUser(),
+									patientNotification.getPatient(),
+									patientNotification.isAcknowledged());
+									
+							notificationListToSave.add(notification);						 
+						}
+						notificationMonarchService.saveAll(notificationListToSave);*/
+						adherenceCalculationBoth(user.getId(), null, firstTransmissionDateVest, firstTransmissionDateMonarch, DEFAULT_COMPLIANCE_SCORE, userOld.getId(), 3);
+					}
+					
+				}
+			}
+			
+		}catch(Exception ex){
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter( writer );
+			ex.printStackTrace( printWriter );
+			mailService.sendJobFailureNotificationMonarch("processDeviceDetails",writer.toString());
+		}
+	}
+	
+	
+	
 }

@@ -356,27 +356,28 @@ public class AdherenceCalculationService {
 					LocalDate startDate = fineOneByPatientUserIdLatestResetStartDate(user.getId());
 					LocalDate startDateMonarch = adherenceCalculationServiceMonarch.fineOneByPatientUserIdLatestResetStartDate(user.getId());
 					
-					String deviceType = patientVestDeviceService.getDeviceType(user);
+					PatientInfo patient = userService.getPatientInfoObjFromPatientUser(user);
+					String deviceType = getDeviceTypeValue(patient.getId());
 					
 					// flag for adherence setting / existing reset of score for adherence setting  
 					int resetFlagForSetting = 0;
 					
 					if( ( deviceType.equals("VEST") && Objects.nonNull(startDate) ) || 
 							( deviceType.equals("MONARCH") && Objects.nonNull(startDateMonarch) ) ||
-							( deviceType.equals("ALL") && Objects.nonNull(startDate) && Objects.nonNull(startDateMonarch) ) ){
+							( deviceType.equals("BOTH") && Objects.nonNull(startDate) && Objects.nonNull(startDateMonarch) ) ){
 						
 						// To identify unique for existing reset for the patient
 						resetFlagForSetting = 2;
 					}
 					
-					if((deviceType.equals("VEST") || deviceType.equals("ALL")) && Objects.isNull(startDate)){
+					if((deviceType.equals("VEST") || deviceType.equals("BOTH")) && Objects.isNull(startDate)){
 						PatientNoEvent noEvent = userIdNoEventMap.get(user.getId());
 						
 						if(Objects.nonNull(noEvent) &&  Objects.nonNull(noEvent.getFirstTransmissionDate())){
 							startDate = noEvent.getFirstTransmissionDate();
 						}
 						
-					}else if( (deviceType.equals("MONARCH") || deviceType.equals("ALL")) && Objects.isNull(startDateMonarch)){
+					}else if( (deviceType.equals("MONARCH") || deviceType.equals("BOTH")) && Objects.isNull(startDateMonarch)){
 						PatientNoEventMonarch noEventMonarch = userIdNoEventMapMonarch.get(user.getId());						
 						
 						if(Objects.nonNull(noEventMonarch) &&  Objects.nonNull(noEventMonarch.getFirstTransmissionDate())){
@@ -385,14 +386,15 @@ public class AdherenceCalculationService {
 					}
 					
 					if(Objects.nonNull(startDate) || Objects.nonNull(startDateMonarch)){
-						PatientInfo patient = userService.getPatientInfoObjFromPatientUser(user);
+						//PatientInfo patient = userService.getPatientInfoObjFromPatientUser(user);
 						if(deviceType.equals("VEST")){
 							adherenceResetForPatient(user.getId(), patient.getId(), startDate, DEFAULT_COMPLIANCE_SCORE, resetFlagForSetting);
 						}else if(deviceType.equals("MONARCH")){
 							adherenceCalculationServiceMonarch.adherenceResetForPatient(user.getId(), patient.getId(), startDateMonarch, DEFAULT_COMPLIANCE_SCORE, resetFlagForSetting);
-						}else if(deviceType.equals("ALL")){
-							adherenceResetForPatient(user.getId(), patient.getId(), startDate, DEFAULT_COMPLIANCE_SCORE, resetFlagForSetting);
-							adherenceCalculationServiceMonarch.adherenceResetForPatient(user.getId(), patient.getId(), startDateMonarch, DEFAULT_COMPLIANCE_SCORE, resetFlagForSetting);
+						}else if(deviceType.equals("BOTH")){
+							adherenceCalculationServiceMonarch.adherenceCalculationBoth(user.getId(), patient.getId(), startDate, 
+									startDateMonarch, DEFAULT_COMPLIANCE_SCORE, user.getId(), resetFlagForSetting);
+
 						}
 					}
 					adherenceResetProgressUpdate++;
@@ -1458,7 +1460,6 @@ public class AdherenceCalculationService {
 			
 			LocalDate lastTransmissionDate = getLatestTransmissionDate(
 					existingTherapySessionMap, therapyDate);
-			
 			int missedTherapyCount = 0;
 			if( (daysBetween <= 1 && adherenceSettingDay > 1 ) || (daysBetween == 0 && adherenceSettingDay == 1) ){ // first transmit
 				PatientCompliance compliance = existingComplianceMap.get(therapyDate);

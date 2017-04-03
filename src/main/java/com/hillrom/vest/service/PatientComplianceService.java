@@ -275,8 +275,8 @@ public class PatientComplianceService {
 		}else{
 			trendVO.getNotificationPoints().put(notificationType,pointsChanged);
 		}
-	}	
-	
+	}
+
 	private List<Notification> getPreviousNotificationDetails(LocalDate date,String notificationType,Long patientUserId) {
 		List<Notification> prevNotifications = notificationService.getNotificationMapByDateAndNotificationTypeAndPatientId(date,notificationType,patientUserId);
 		return prevNotifications;

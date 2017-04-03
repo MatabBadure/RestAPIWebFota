@@ -37,7 +37,7 @@ public class PatientInfo implements Serializable {
     private String id;
 
     @Column(name = "hillrom_id")
-    private String hillromId = null;
+    private String hillromId;
 
     @Column(name = "hub_id")
     private String hubId;

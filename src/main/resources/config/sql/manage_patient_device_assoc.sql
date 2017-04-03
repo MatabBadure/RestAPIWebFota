@@ -82,7 +82,7 @@ delimiter ;
 -- The above section will be updated with the logic below to take care of
 -- Seven cases from the current TIMS script.
 
---if(pat_patient_Type == SD){
+-- if(pat_patient_Type == SD){
 --	if (pat_device_type == VEST) {
 --		if(operation_type == UPDATE){
 --			SELECT `hillromid` INTO temp_hillrom_id FROM `PATIENT_DEVICES_ASSOC` WHERE `hillromid` = pat_hillromid;
@@ -92,9 +92,9 @@ delimiter ;
 --
 --		}
 --	}
---}
+-- }
 
---if(pat_patient_Type == SD){
+-- if(pat_patient_Type == SD){
 --	if (pat_device_type == MONARCH) {
 --		if(operation_type == UPDATE){
 --			SELECT `hillromid` INTO temp_hillrom_id FROM `PATIENT_DEVICES_ASSOC` WHERE `hillromid` = pat_hillromid;
@@ -104,28 +104,28 @@ delimiter ;
 --
 --		}
 --	}
---}
+-- }
 
---if(pat_patient_Type == SD){
+-- if(pat_patient_Type == SD){
 --	if (pat_device_type == VEST) {
 --		if(operation_type == CREATE){
 --			insert into PVDA values (patient_id, 'VEST',serial_number,hillrom_id,'Y')
 --			
 --		}
 --	}
---}
+-- }
 
---if(pat_patient_Type == SD){
+-- if(pat_patient_Type == SD){
 --	if (pat_device_type == MONARCH) {
 --		if(operation_type == CREATE){
 --			insert into PVDA values (patient_id, 'MONARCH',serial_number,hillrom_id,'Y')
 --			
 --		}
 --	}
---}
+-- }
 
 
---if(pat_patient_Type == SD){
+-- if(pat_patient_Type == SD){
 --	if (pat_device_type == VEST) {
 --		if(operation_type == UPDATE){
 --			SELECT `serial_number` INTO temp_serial_number FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_serial_number;
@@ -135,9 +135,9 @@ delimiter ;
 --
 --		}
 --	}
---}
+-- }
 
---if(pat_patient_Type == SD){
+-- if(pat_patient_Type == SD){
 --	if (pat_device_type == MONARCH) {
 --		if(operation_type == UPDATE){
 --			SELECT `serial_number` INTO temp_serial_number FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_serial_number;
@@ -147,9 +147,9 @@ delimiter ;
 --
 --		}
 --	}
---}
+-- }
 
---if(pat_patient_Type == CD){
+-- if(pat_patient_Type == CD){
 --	if (pat_device_type == VEST) {
 --		if(operation_type == UPDATE){
 --			SELECT `hillromid` INTO temp_hillrom_id FROM `PATIENT_DEVICES_ASSOC` WHERE `hillromid` = pat_hillromid;
@@ -159,9 +159,9 @@ delimiter ;
 --
 --		}
 --	}
---}
+-- }
 
---if(pat_patient_Type == CD){
+-- if(pat_patient_Type == CD){
 --	if (pat_device_type == MONARCH) {
 --		if(operation_type == UPDATE){
 --			SELECT `hillromid` INTO temp_hillrom_id FROM `PATIENT_DEVICES_ASSOC` WHERE `hillromid` = pat_hillromid;
@@ -171,9 +171,9 @@ delimiter ;
 --
 --		}
 --	}
---}
+-- }
 
---if(pat_patient_Type == CD){
+-- if(pat_patient_Type == CD){
 --	if (pat_device_type == VEST) {
 --		if(operation_type == UPDATE){
 --			SELECT `serial_number` INTO temp_serial_number FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_serial_number;
@@ -183,9 +183,9 @@ delimiter ;
 --
 --		}
 --	}
---}
+-- }
 
---if(pat_patient_Type == CD){
+-- if(pat_patient_Type == CD){
 --	if (pat_device_type == MONARCH) {
 --		if(operation_type == UPDATE){
 --			SELECT `serial_number` INTO temp_serial_number FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_serial_number;
@@ -195,10 +195,10 @@ delimiter ;
 --
 --		}
 --	}
---}
+-- }
 
 
---if(pat_patient_Type == CD){
+-- if(pat_patient_Type == CD){
 --	if (pat_device_type == MONARCH) {
 --		if(operation_type == CREATE){
 --			
@@ -207,9 +207,9 @@ delimiter ;
 --
 --		}
 --	}
---}
+-- }
 
---if(pat_patient_Type == CD){
+-- if(pat_patient_Type == CD){
 --	if (pat_device_type == VEST) {
 --		if(operation_type == CREATE){
 --			
@@ -218,9 +218,9 @@ delimiter ;
 --
 --		}
 --	}
---}
+-- }
 
---if(pat_patient_Type == CD){
+-- if(pat_patient_Type == CD){
 --	if (pat_device_type == VEST) {
 --		if(operation_type == UPDATE){
 --			SELECT `serial_number`,`is_active` INTO temp_serial_number,temp_is_active FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_serial_number;
@@ -230,9 +230,9 @@ delimiter ;
 --
 --		}
 --	}
---}
+-- }
 
---if(pat_patient_Type == CD){
+-- if(pat_patient_Type == CD){
 --	if (pat_device_type == MONARCH) {
 --		if(operation_type == UPDATE){
 --			SELECT `serial_number`,`is_active` INTO temp_serial_number,temp_is_active FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_serial_number;
@@ -242,4 +242,4 @@ delimiter ;
 --
 --		}
 --	}
---}
+-- }

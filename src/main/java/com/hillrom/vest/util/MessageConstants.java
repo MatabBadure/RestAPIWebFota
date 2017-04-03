@@ -61,7 +61,7 @@ public class MessageConstants {
     public static final String HR_280 = "Associated Patients with clinic fetched successfully.";
     
     public static final String HR_281 = "No device linked with patient.";
-    public static final String HR_282 = "Vest devices linked with patient fetched successfully.";
+    public static final String HR_282 = "Vest/Monarch devices linked with patient fetched successfully.";
     public static final String HR_283 = "Vest device for patient is deactivated successfully.";
     
     public static final String HR_284 = "No HCP associated with Patient.";

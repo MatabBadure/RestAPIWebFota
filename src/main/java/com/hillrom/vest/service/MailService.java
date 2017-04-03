@@ -396,8 +396,7 @@ public class MailService {
 	public void activationReminderEmail(){
     	try{
     		DateTime currectTime =  new DateTime();
-    		for(int interval = accountActivationReminderInterval; interval < 48; interval += accountActivationReminderInterval){
-    			log.debug("interval == ", interval);
+    		for(int interval = accountActivationReminderInterval; interval < 144; interval += accountActivationReminderInterval){
     			getUsersActivationReminderEmail(currectTime.minusHours(interval).minusHours(1),currectTime.minusHours(interval));
     			}
     				

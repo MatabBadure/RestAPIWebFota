@@ -2227,13 +2227,16 @@ public class AdherenceCalculationService {
 	}
 	
 	public String getDeviceTypeValue(String patientId){		
-		List<PatientDevicesAssoc> patientDevicesFromDB = patientDevicesAssocRepository.findByPatientId(patientId);
+		List<PatientDevicesAssoc> patientDevicesFromDB = new LinkedList<>();
+		patientDevicesFromDB = patientDevicesAssocRepository.findByPatientId(patientId);
 		
 		if(patientDevicesFromDB.size()>1){
 			return "BOTH";
-		}else{
+		}else if(patientDevicesFromDB.size()==1){
 			return patientDevicesFromDB.get(0).getDeviceType();
-		}		
+		}else{
+			return "";
+		}
 	}
 	
 }

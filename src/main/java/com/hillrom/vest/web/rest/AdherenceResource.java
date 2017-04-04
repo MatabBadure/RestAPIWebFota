@@ -49,6 +49,7 @@ import com.hillrom.vest.repository.AdhrenceResetHistoryRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PredicateBuilder;
 import com.hillrom.vest.repository.TherapySessionRepository;
+import com.hillrom.vest.repository.monarch.AdherenceResetHistoryMonarchRepository;
 import com.hillrom.vest.repository.monarch.PatientComplianceMonarchRepository;
 import com.hillrom.vest.repository.monarch.TherapySessionMonarchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
@@ -88,6 +89,9 @@ public class AdherenceResource {
     
     @Inject
     private AdhrenceResetHistoryRepository adhrenceResetHistoryRepository;
+    
+    @Inject
+    private AdherenceResetHistoryMonarchRepository adhrenceResetHistoryMonarchRepository;
     
     @Inject
     private AdherenceResetService adherenceResetService;
@@ -251,7 +255,8 @@ public class AdherenceResource {
 			@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
             @RequestParam(value = "sort_by", required = false) String sortBy,
-            @RequestParam(value = "asc",required = false) Boolean isAscending) throws URISyntaxException  {
+            @RequestParam(value = "asc",required = false) Boolean isAscending,
+            @RequestParam(value = "deviceType", required = true) String deviceType) throws URISyntaxException  {
         
     	
 		Map<String,Boolean> sortOrder = new HashMap<>();
@@ -263,8 +268,18 @@ public class AdherenceResource {
     	JSONObject jsonObject = new JSONObject();
     	
 		try {
-			page = adhrenceResetHistoryRepository.getAdherenceResetHistoryForPatient(userId,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
-			jsonObject.put("Adherence_Reset_History", page);
+			if(deviceType.equals("VEST")){
+				page = adhrenceResetHistoryRepository.getAdherenceResetHistoryForPatient(userId,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+				jsonObject.put("Adherence_Reset_History", page);
+			}else if(deviceType.equals("MONARCH")){
+				page = adhrenceResetHistoryMonarchRepository.getAdherenceResetHistoryForPatient(userId,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+				jsonObject.put("Adherence_Reset_History", page);
+			}
+			else if(deviceType.equals("ALL")){
+				page = adhrenceResetHistoryMonarchRepository.getAdherenceResetHistoryForPatientAll(userId,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+				jsonObject.put("Adherence_Reset_History", page);
+			}
+			
 			 if(Objects.nonNull(page)){
 				jsonObject.put("AdherenceResetHistoryMessage", "Adherence Reset History retrieved successfully");
 				return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);

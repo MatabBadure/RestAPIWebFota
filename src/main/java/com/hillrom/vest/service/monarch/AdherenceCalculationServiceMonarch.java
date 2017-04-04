@@ -886,8 +886,7 @@ public class AdherenceCalculationServiceMonarch{
 							if((flag != 3 && flag != 4) && adherenceSettingDay == 1 && adherenceStartDate.equals(currentCompliance.getDate())){
 								initialPrevScoreFor1Day = adherenceScore;
 							}						
-							//if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && !currentCompliance.getDate().equals(todayDate) && (Objects.isNull(therapyDataVest) || therapyDataVest.isEmpty()) ){
-							if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && !currentCompliance.getDate().equals(todayDate) ){
+							if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && !currentCompliance.getDate().equals(todayDate) && (Objects.isNull(therapyDataVest) || therapyDataVest.isEmpty()) ){							
 								// Adding the prevCompliance object for previous day compliance and existingNotificationofTheDay object for the current date Notification object
 								// Missed therapy days
 								complianceListToStore.add(calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, patient, patientUser, initialPrevScoreFor1Day, prevCompliance, existingNotificationofTheDay));

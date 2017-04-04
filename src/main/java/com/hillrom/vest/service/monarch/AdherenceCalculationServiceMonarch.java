@@ -891,16 +891,20 @@ public class AdherenceCalculationServiceMonarch{
 									(Objects.isNull(therapyData) || therapyData.isEmpty()) ){							
 								// Adding the prevCompliance object for previous day compliance and existingNotificationofTheDay object for the current date Notification object
 								// Missed therapy days
-								complianceListToStore.add(calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, patient, patientUser, initialPrevScoreFor1Day, prevCompliance, existingNotificationofTheDay));
-							}else if( (Objects.isNull(therapyData) || therapyData.isEmpty()) && (Objects.isNull(therapyDataVest) || therapyDataVest.isEmpty()) && currentCompliance.getDate().equals(todayDate)){						
+								complianceListToStore.add(calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, patient, 
+										patientUser, initialPrevScoreFor1Day, prevCompliance, existingNotificationofTheDay));
+							}else if( (Objects.isNull(therapyData) || therapyData.isEmpty()) && 
+									(Objects.isNull(therapyDataVest) || therapyDataVest.isEmpty()) && 
+									currentCompliance.getDate().equals(todayDate)){						
 								// Passing prevCompliance for avoiding the repository call to retrieve the previous day compliance
 								// Setting the previous day compliance details for the no therapy done for today 
 								complianceListToStore.add(setPrevDayCompliance(currentCompliance, userId, prevCompliance));
 							}else{
 								// Adding the sortedTherapy for all the therapies & prevCompliance object for previous day compliance and existingNotificationofTheDay object for the current date Notification object
 								// HMR Non Compliance / Setting deviation & therapy data available
-								complianceListToStore.add(calculateUserHMRComplianceForMSTBoth(currentCompliance, userProtocolConstant, userProtocolConstantVest, currentCompliance.getDate(), userId, 
-										patient, patientUser, adherenceSettingDay, initialPrevScoreFor1Day,sortedTherapy, sortedTherapyVest, prevCompliance, existingNotificationofTheDay, flag));
+								complianceListToStore.add(calculateUserHMRComplianceForMSTBoth(currentCompliance, userProtocolConstant, 
+										userProtocolConstantVest, currentCompliance.getDate(), userId,patient, patientUser, adherenceSettingDay, 
+										initialPrevScoreFor1Day,sortedTherapy, sortedTherapyVest, prevCompliance, existingNotificationofTheDay, flag));
 							}
 						
 						}
@@ -1322,7 +1326,7 @@ public class AdherenceCalculationServiceMonarch{
 			
 			newCompliance.setHmrCompliant(false);
 			
-			if(isSettingsDeviatedMonarch){				
+			if(isSettingsDeviatedMonarch || isSettingsDeviatedVest){				
 				score = score < SETTING_DEVIATION_POINTS ? 0 : score - SETTING_DEVIATION_POINTS;
 			}
 			
@@ -1347,7 +1351,7 @@ public class AdherenceCalculationServiceMonarch{
 		
 		String notificationType = (isSettingsDeviatedMonarch && isSettingsDeviatedVest) ? SETTINGS_DEVIATION : 
 			( (!isSettingsDeviatedMonarch && isSettingsDeviatedVest) ? SETTINGS_DEVIATION_VEST : 
-				( (!isSettingsDeviatedMonarch && !isSettingsDeviatedVest) ? SETTINGS_DEVIATION_MONARCH : "" ) );
+				( (isSettingsDeviatedMonarch && !isSettingsDeviatedVest) ? SETTINGS_DEVIATION_MONARCH : "" ) );
 		
 		notification_type = getNotificationString(notificationType,isHMRCompliantMonarch,isHMRCompliantVest);
 		

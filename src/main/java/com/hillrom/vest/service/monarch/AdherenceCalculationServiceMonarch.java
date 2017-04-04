@@ -798,7 +798,7 @@ public class AdherenceCalculationServiceMonarch{
 			SortedMap<LocalDate,List<TherapySessionMonarch>> sortedTherapy = groupTherapySessionsByDate(therapySessionData);
 			
 			// Getting all the notification for the user 
-			List<NotificationMonarch> userNotifications = notificationMonarchRepository.findByPatientUserId(oldUserId);			
+			List<NotificationMonarch> userNotifications = notificationMonarchRepository.findByPatientUserId(userId);			
 			
 			
 			// Getting the protocol constants for the user for vest
@@ -1366,6 +1366,12 @@ public class AdherenceCalculationServiceMonarch{
 		
 		// Setting the new score with respect to the compliance deduction
 		newCompliance.setScore(score);
+		
+		// Setting to missed therapy count as 0 for any of the device is having therapy
+		if( (resetFlag == 3 || resetFlag == 4) && 
+				( Objects.nonNull(sortedTherapy.get(complianceDate)) || Objects.nonNull(sortedTherapyVest.get(complianceDate)))){
+			newCompliance.setMissedTherapyCount(0);
+		}
 		
 		// Saving the updated score for the specific date of compliance
 		

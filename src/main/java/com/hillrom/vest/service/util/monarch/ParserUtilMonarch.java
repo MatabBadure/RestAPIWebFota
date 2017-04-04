@@ -325,18 +325,6 @@ public class ParserUtilMonarch {
 	
 	public static String getDevWifiOrLteString(String encoded_string,int flagWifiLte) throws HillromException{
 		
-		
-		/*byte[] hmr_seconds  = Arrays.copyOfRange(deviceDataArray, HMR_SECONDS_LOC, HMR_SECONDS_LOC + HMR_SECONDS_LEN);
-        sout = "";
-        for(int k=0;k<hmr_seconds.length;k++){
-        	sout = sout + (hmr_seconds[k]  & 0xFF) + " ";
-        }        
-        int combinedHmr = ParserUtilMonarch.intergerCombinedFromHexForHMR(hmr_seconds);        
-        double hmrSeconds = (double)combinedHmr;
-        */
-        
-		
-		
         byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
         String sout = "";
         for(int i=0;i<b.length;i++) {
@@ -366,7 +354,6 @@ public class ParserUtilMonarch {
         if(flagWifiLte == 1){
         	int combinedWifi = ParserUtilMonarch.intergerCombinedFromHex(devWifiOrLteArray);
         	String combinedWifiTest = ParserUtilMonarch.intergerCombinedFromHexForWifi(devWifiOrLteArray);
-        	//int combinedWifiSecond = ParserUtilMonarch.intergerCombinedFromHexForHMR(devWifiOrLteArray);
         	
         	log.debug("Value of devWifi : "+ combinedWifi );
         	return Integer.toString(combinedWifi);

@@ -57,6 +57,8 @@ public interface PatientVestDeviceRepository extends
 	
 	@Query(nativeQuery = true, value = " SELECT IF (pda.patient_type='CD','ALL', pda.device_type) as ptype "
 			+ " from PATIENT_DEVICES_ASSOC pda "
-			+ " where patient_id =:patientId ")
+			+ " where patient_id =:patientId and is_active=1"
+			+ " group by patient_id ")
 	String findDeviceType(@Param("patientId")String patientId);
+
 }

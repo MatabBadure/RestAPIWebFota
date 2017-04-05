@@ -885,8 +885,10 @@ public class AdherenceCalculationServiceMonarch{
 							
 							if((flag != 3 && flag != 4) && adherenceSettingDay == 1 && adherenceStartDate.equals(currentCompliance.getDate())){
 								initialPrevScoreFor1Day = adherenceScore;
-							}						
-							if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && !currentCompliance.getDate().equals(todayDate) && 
+							}
+							if(prevCompliance.getMissedTherapyCount() >= (adherenceSettingDay-1) && 
+									currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && 
+									!currentCompliance.getDate().equals(todayDate) && 
 									(Objects.isNull(therapyDataVest) || therapyDataVest.isEmpty()) && 
 									(Objects.isNull(therapyData) || therapyData.isEmpty()) ){							
 								// Adding the prevCompliance object for previous day compliance and existingNotificationofTheDay object for the current date Notification object
@@ -1368,9 +1370,11 @@ public class AdherenceCalculationServiceMonarch{
 		newCompliance.setScore(score);
 		
 		// Setting to missed therapy count as 0 for any of the device is having therapy
-		if( (resetFlag == 3 || resetFlag == 4) && 
-				( Objects.nonNull(sortedTherapy.get(complianceDate)) || Objects.nonNull(sortedTherapyVest.get(complianceDate)))){
-			newCompliance.setMissedTherapyCount(0);
+		if( (resetFlag == 3 || resetFlag == 4) ){
+			if(( Objects.nonNull(sortedTherapy.get(complianceDate)) || Objects.nonNull(sortedTherapyVest.get(complianceDate))))
+				newCompliance.setMissedTherapyCount(0);
+			else
+				newCompliance.setMissedTherapyCount(prevCompliance.getMissedTherapyCount()+1);
 		}
 		
 		// Saving the updated score for the specific date of compliance

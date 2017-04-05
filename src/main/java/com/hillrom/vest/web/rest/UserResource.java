@@ -721,8 +721,21 @@ public class UserResource {
 	    		}else if(deviceType.equals("MONARCH")){
 	    			jsonObject.put("protocol", (List <PatientProtocolDataMonarch>) protocolList);
 	    		}else if(deviceType.equals("ALL")){
-	        	jsonObject.put("VEST_DEVICE_PROTOCOL", protocolList_VEST);
-	        	jsonObject.put("MONARCH_DEVICE_PROTOCOL", protocolList_MONARCH);
+	        //	jsonObject.put("VEST_DEVICE_PROTOCOL", protocolList_VEST);
+	        //	jsonObject.put("MONARCH_DEVICE_PROTOCOL", protocolList_MONARCH);
+
+				List<Object> objList = new ArrayList();
+				for (PatientProtocolDataMonarch devMonarch : protocolList_MONARCH) {
+					Object oneobject = devMonarch;
+				//	oneobject = devMonarch.getDeviceType();
+					objList.add(oneobject);
+				}
+				for (PatientProtocolData devVest : protocolList_VEST) {
+					Object oneobject = devVest;
+					objList.add(oneobject);
+				}
+    			jsonObject.put("protocol", objList);
+			
 	    		}
 	        }
     		    		

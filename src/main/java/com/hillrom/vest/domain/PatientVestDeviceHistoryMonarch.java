@@ -18,12 +18,14 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.util.DecimalNumberSerializer;
+
 
 @Entity
 @Table(name = "PATIENT_VEST_DEVICE_HISTORY_MONARCH")
@@ -75,6 +77,9 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
     
     @Column(name="hmr")
 	private Double hmr = 0d; // default value for HMR
+    
+    @Transient
+	private String deviceType;
 
 	public PatientVestDeviceHistoryMonarch() {
 		super();
@@ -87,6 +92,7 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 		this.wifiId = wifiId;
 		this.hubId = hubId;
 		this.active = active;
+		this.deviceType = "MONARCH";
 	}
 
 	public PatientVestDevicePK getPatientVestDevicePK() {
@@ -183,6 +189,16 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 
 	public void setLastModifiedDate(DateTime lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
+	}
+	
+	@Transient
+	public String getDeviceType() {
+		return deviceType;
+	}
+
+    @Transient
+	public void setDeviceType(String deviceType) {
+		this.deviceType = deviceType;
 	}
 	
 	@JsonIgnore

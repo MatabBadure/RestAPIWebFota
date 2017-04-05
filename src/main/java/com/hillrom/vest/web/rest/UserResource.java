@@ -496,12 +496,12 @@ public class UserResource {
 				}else if (deviceType.equals("ALL")) {
 					List<Object> objList = new ArrayList();
 					for (PatientVestDeviceHistoryMonarch devMonarch : deviceList_monarch) {
-						//devMonarch.setDeviceType(MONARCH);
+						devMonarch.setDeviceType(MONARCH);
 						Object oneobject = devMonarch;
 						objList.add(oneobject);
 					}
 					for (PatientVestDeviceHistory devVest : deviceList_vest) {
-						//devVest.setDeviceType(VEST);
+						devVest.setDeviceType(VEST);
 						Object oneobject = devVest;
 						objList.add(oneobject);
 					}

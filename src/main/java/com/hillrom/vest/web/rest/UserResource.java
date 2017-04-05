@@ -7,6 +7,7 @@ import static com.hillrom.vest.config.Constants.MONARCH;
 //import static com.hillrom.vest.config.Constants.ALL;
 
 
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -488,15 +489,23 @@ public class UserResource {
 			}
 			else {
      			jsonObject.put("message", MessageConstants.HR_282);//Vest/monarch devices linked with patient fetched successfully.
-     			//jsonObject.put("deviceType", patientVestDeviceService.getDeviceType(id));
      			if(deviceType.equals("VEST")){
      				jsonObject.put("deviceList", (List<PatientVestDeviceHistory>) deviceList);
         		}else if(deviceType.equals("MONARCH")){
         			jsonObject.put("deviceList", (List<PatientVestDeviceHistoryMonarch>) deviceList);
-        		}else if(deviceType.equals("ALL")){
-        			jsonObject.put("VEST_DEVICE_LIST", deviceList_vest);
-        			jsonObject.put("MONARCH_DEVICE_LIST", deviceList_monarch);
-        		}
+				}else if (deviceType.equals("ALL")) {
+					List<Object> objList = new ArrayList();
+					for (PatientVestDeviceHistoryMonarch devMonarch : deviceList_monarch) {
+						devMonarch.setHubId("MONARCH");
+						Object oneobject = devMonarch;
+						objList.add(oneobject);
+					}
+					for (PatientVestDeviceHistory devVest : deviceList_vest) {
+						Object oneobject = devVest;
+						objList.add(oneobject);
+					}
+        			jsonObject.put("deviceList", objList);
+    			}
      		}
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {

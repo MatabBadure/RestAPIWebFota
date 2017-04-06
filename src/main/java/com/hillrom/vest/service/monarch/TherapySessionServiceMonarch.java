@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import com.hillrom.vest.batch.processing.monarch.PatientMonarchDeviceDataReader;
 import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.NoteMonarch;
+import com.hillrom.vest.domain.NotificationMonarch;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientInfo;
@@ -326,5 +327,9 @@ public class TherapySessionServiceMonarch {
 			responseList.add(dataVO);
 		}
 		return responseList;
+	}
+	
+	public void saveAll(Collection<TherapySessionMonarch> therapySessionMonarch){
+		therapySessionMonarchRepository.save(therapySessionMonarch);
 	}
 }

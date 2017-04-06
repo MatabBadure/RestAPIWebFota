@@ -20,9 +20,6 @@ public interface PatientDevicesAssocRepository extends JpaRepository<PatientDevi
 	
 	@Query("from PatientDevicesAssoc PDA where PDA.serialNumber = ?1 and isActive=1")
 	Optional<PatientDevicesAssoc> findOneBySerialNumber(String deviceAddress);
-	
-	/*@Query("from PatientDevicesAssoc where date(createdDate) = ?1")	 
-	List<PatientDevicesAssoc> findByCreatedDate(LocalDate createdDate);*/
 
 	@Query(nativeQuery=true,value=" SELECT * from PATIENT_DEVICES_ASSOC where is_active=1 and date(created_date)=:createdDate ")
 	List<PatientDevicesAssoc> findByCreatedDate(@Param("createdDate")String createdDate);

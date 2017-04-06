@@ -261,7 +261,6 @@ public class PatientComplianceMonarch extends AbstractAuditingEntity implements 
 		this.hmr = hmr;
 	}
 
-	
 	public int getSettingsDeviatedDaysCount() {
 		return settingsDeviatedDaysCount;
 	}

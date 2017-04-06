@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.SQLDelete;
@@ -71,6 +72,11 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 	
 	@Column(name = "max_intensity")
 	private Integer maxIntensity;
+	
+	@Transient
+	private String deviceType;
+
+
 
 	public PatientProtocolDataMonarch() {
 		super();
@@ -92,6 +98,7 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 		this.maxFrequency = maxFrequency;
 		this.minIntensity = minIntensity;
 		this.maxIntensity = maxIntensity;
+		this.deviceType = "MONARCH";
 	}
 
 	public String getId() {
@@ -196,6 +203,16 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 
 	public void setMaxIntensity(Integer maxIntensity) {
 		this.maxIntensity = maxIntensity;
+	}
+	
+	@Transient
+	public String getDeviceType() {
+		return deviceType;
+	}
+
+	@Transient
+	public void setDeviceType(String deviceType) {
+		this.deviceType = deviceType;
 	}
 
 	@Override

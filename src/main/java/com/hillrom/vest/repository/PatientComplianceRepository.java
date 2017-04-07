@@ -67,5 +67,8 @@ public interface PatientComplianceRepository extends
 	    
 	    @Query("from PatientCompliance pc where (pc.date between ?1 and ?2) and pc.isSettingsDeviated = ?3 and pc.patientUser.id in ?4 group by pc.patientUser.id ")
 	    List<PatientCompliance> findByDateBetweenAndIsSettingsDeviatedAndPatientUserIdIn(LocalDate from,LocalDate to,Boolean isSettingsDeviated,List<Long> patientUserIds);
-    
+ 
+	    @Query("from PatientCompliance pc where pc.patientUser.id = ?1 and pc.date < ?2")
+		List<PatientCompliance> findByPatientUserIdAndDateBefore(Long patientUserId, LocalDate date);	    
+
 }

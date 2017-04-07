@@ -49,6 +49,7 @@ import com.hillrom.vest.repository.AdhrenceResetHistoryRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PredicateBuilder;
 import com.hillrom.vest.repository.TherapySessionRepository;
+import com.hillrom.vest.repository.monarch.AdherenceResetHistoryMonarchRepository;
 import com.hillrom.vest.repository.monarch.PatientComplianceMonarchRepository;
 import com.hillrom.vest.repository.monarch.TherapySessionMonarchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
@@ -88,6 +89,9 @@ public class AdherenceResource {
     
     @Inject
     private AdhrenceResetHistoryRepository adhrenceResetHistoryRepository;
+    
+    @Inject
+    private AdherenceResetHistoryMonarchRepository adhrenceResetHistoryMonarchRepository;
     
     @Inject
     private AdherenceResetService adherenceResetService;
@@ -170,12 +174,14 @@ public class AdherenceResource {
 			
 			// Check for existing adherence score is 100
 			if( (deviceType.equals("VEST") && Objects.nonNull(patientCompliance) && patientCompliance.getScore() == 100)
-					|| (deviceType.equals("MONARCH") && Objects.nonNull(patientComplianceMonarch) && patientComplianceMonarch.getScore() == 100)){
+					|| ((deviceType.equals("MONARCH") || deviceType.equals("BOTH")) && Objects.nonNull(patientComplianceMonarch) && patientComplianceMonarch.getScore() == 100)){
 				jsonObject.put("ERROR", "Adherence score cannot be reset for existing adherence score of 100");
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 			}
 			else if( (deviceType.equals("VEST") && (Objects.isNull(noEvent) || Objects.isNull(noEvent.getFirstTransmissionDate()))) ||
-					(deviceType.equals("MONARCH") && (Objects.isNull(noEventMonarch) || Objects.isNull(noEventMonarch.getFirstTransmissionDate()))) ){
+					(deviceType.equals("MONARCH") && (Objects.isNull(noEventMonarch) || Objects.isNull(noEventMonarch.getFirstTransmissionDate()))) ||
+					(deviceType.equals("BOTH") && ((Objects.isNull(noEvent) && Objects.isNull(noEventMonarch)) || 
+							(Objects.isNull(noEventMonarch.getFirstTransmissionDate()))) && Objects.isNull(noEvent.getFirstTransmissionDate())) ){
 				
 				// Check for the non transmission users
 				jsonObject.put("ERROR", "Adherence score cannot be reset for the non transmissions users");
@@ -184,16 +190,15 @@ public class AdherenceResource {
 				TherapySession therapy = therapyRepository.findTop1ByPatientUserIdOrderByDateAsc(Long.parseLong(userId));
 				TherapySessionMonarch therapyMonarch = therapyMonarchRepository.findTop1ByPatientUserIdOrderByDateAsc(Long.parseLong(userId));
 				
-				if(Objects.nonNull(therapy) && Objects.nonNull(therapyMonarch)){
-					LocalDate firstTherapyDate = therapy.getDate();
-					LocalDate firstTherapyDateMonarch = therapyMonarch.getDate();
-					
-					// Check for the reset date is not before first therapy date
-					if(resetStartDt.isBefore(firstTherapyDate) || resetStartDt.isBefore(firstTherapyDateMonarch)){
-						jsonObject.put("ERROR", "Adherence start date should be after first therapy date");
-			            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-					}
+				LocalDate firstTherapyDate = Objects.nonNull(therapy) ? therapy.getDate() : null;
+				LocalDate firstTherapyDateMonarch = Objects.nonNull(therapyMonarch) ? therapyMonarch.getDate() : null;
+				
+				if((Objects.nonNull(firstTherapyDate) && resetStartDt.isBefore(firstTherapyDate)) || 
+						(Objects.nonNull(firstTherapyDateMonarch) && resetStartDt.isBefore(firstTherapyDateMonarch))){
+					jsonObject.put("ERROR", "Adherence start date should be after first therapy date");
+		            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 				}
+				
 			}
 			AdherenceReset adherenceReset = null;
 			AdherenceResetMonarch adherenceResetMonarch = null; 
@@ -201,21 +206,27 @@ public class AdherenceResource {
 			if(deviceType.equals("VEST")){
 				adherenceReset = adherenceResetService.createAdherenceReset(patientId, Long.parseLong(userId), resetDt, 
 																					Integer.parseInt(resetScore), resetStartDt, justification, Long.parseLong(createdById));
-			}else if(deviceType.equals("MONARCH")){
+			}else if(deviceType.equals("MONARCH") || deviceType.equals("BOTH")){
 				adherenceResetMonarch = adherenceResetServiceMonarch.createAdherenceReset(patientId, Long.parseLong(userId), resetDt, 
 					Integer.parseInt(resetScore), resetStartDt, justification, Long.parseLong(createdById));
 			}
 			
+			String errMsg = "";
 	        if (Objects.nonNull(adherenceReset) && Objects.isNull(adherenceResetMonarch)) {
 				// For recalculating adherence score with the adherence start date
-	        	String errMsg = adherenceCalculationService.adherenceResetForPatient(Long.parseLong(userId), patientId, resetStartDt, Integer.parseInt(resetScore), 1);
+	        	errMsg = adherenceCalculationService.adherenceResetForPatient(Long.parseLong(userId), patientId, resetStartDt, Integer.parseInt(resetScore), 1);
 	        	//jsonObject.put("message", MessageConstants.HR_313);
 	        	jsonObject.put("message", errMsg);
 	            jsonObject.put("AdherenceReset", adherenceReset);
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.CREATED);
 	        } else if (Objects.isNull(adherenceReset) && Objects.nonNull(adherenceResetMonarch)) {
 				// For recalculating adherence score with the adherence start date
-	        	String errMsg = adherenceCalculationServiceMonarch.adherenceResetForPatient(Long.parseLong(userId), patientId, resetStartDt, Integer.parseInt(resetScore), 1);
+	        	
+	        	if(deviceType.equals("BOTH")){
+	        		errMsg = adherenceCalculationServiceMonarch.adherenceCalculationBoth(Long.parseLong(userId), patientId, resetStartDt, noEventMonarch.getFirstTransmissionDate(), Integer.parseInt(resetScore), Long.parseLong(userId), 1);
+	        	}else{
+	        		errMsg = adherenceCalculationServiceMonarch.adherenceResetForPatient(Long.parseLong(userId), patientId, resetStartDt, Integer.parseInt(resetScore), 1);
+	        	}
 	        	//jsonObject.put("message", MessageConstants.HR_313);
 	        	jsonObject.put("message", errMsg);
 	            jsonObject.put("AdherenceReset", adherenceReset);
@@ -244,7 +255,8 @@ public class AdherenceResource {
 			@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
             @RequestParam(value = "sort_by", required = false) String sortBy,
-            @RequestParam(value = "asc",required = false) Boolean isAscending) throws URISyntaxException  {
+            @RequestParam(value = "asc",required = false) Boolean isAscending,
+            @RequestParam(value = "deviceType", required = true) String deviceType) throws URISyntaxException  {
         
     	
 		Map<String,Boolean> sortOrder = new HashMap<>();
@@ -256,8 +268,18 @@ public class AdherenceResource {
     	JSONObject jsonObject = new JSONObject();
     	
 		try {
-			page = adhrenceResetHistoryRepository.getAdherenceResetHistoryForPatient(userId,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
-			jsonObject.put("Adherence_Reset_History", page);
+			if(deviceType.equals("VEST")){
+				page = adhrenceResetHistoryRepository.getAdherenceResetHistoryForPatient(userId,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+				jsonObject.put("Adherence_Reset_History", page);
+			}else if(deviceType.equals("MONARCH")){
+				page = adhrenceResetHistoryMonarchRepository.getAdherenceResetHistoryForPatient(userId,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+				jsonObject.put("Adherence_Reset_History", page);
+			}
+			else if(deviceType.equals("ALL")){
+				page = adhrenceResetHistoryMonarchRepository.getAdherenceResetHistoryForPatientAll(userId,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+				jsonObject.put("Adherence_Reset_History", page);
+			}
+			
 			 if(Objects.nonNull(page)){
 				jsonObject.put("AdherenceResetHistoryMessage", "Adherence Reset History retrieved successfully");
 				return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);

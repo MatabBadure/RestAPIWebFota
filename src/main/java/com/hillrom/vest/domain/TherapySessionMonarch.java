@@ -105,6 +105,46 @@ public class TherapySessionMonarch implements Comparable<TherapySessionMonarch>{
     @Column(name = "dev_version")
 	private String devVersion;
     
+    
+    public TherapySessionMonarch() {
+		super();
+	}
+
+	public TherapySessionMonarch(PatientInfo patientInfo,
+			User patientUser, LocalDate date, Integer sessionNo,
+			String sessionType, DateTime startTime, DateTime endTime,
+			Integer frequency, Integer intensity, int durationInMinutes,
+			Integer programmedCaughPauses, Integer normalCaughPauses,
+			Integer caughPauseDuration, Double hmr, String serialNumber,
+			String bluetoothId, Integer therapyIndex,
+			Integer startBatteryLevel, Integer endBatteryLevel,
+			Integer numberOfEvents, Integer numberOfPods, String devWifi,
+			String devVersion) {
+		super();		
+		this.patientInfo = patientInfo;
+		this.patientUser = patientUser;
+		this.date = date;
+		this.sessionNo = sessionNo;
+		this.sessionType = sessionType;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.frequency = frequency;
+		this.intensity = intensity;
+		this.durationInMinutes = durationInMinutes;
+		this.programmedCaughPauses = programmedCaughPauses;
+		this.normalCaughPauses = normalCaughPauses;
+		this.caughPauseDuration = caughPauseDuration;
+		this.hmr = hmr;
+		this.serialNumber = serialNumber;
+		this.bluetoothId = bluetoothId;
+		this.therapyIndex = therapyIndex;
+		this.startBatteryLevel = startBatteryLevel;
+		this.endBatteryLevel = endBatteryLevel;
+		this.numberOfEvents = numberOfEvents;
+		this.numberOfPods = numberOfPods;
+		this.devWifi = devWifi;
+		this.devVersion = devVersion;
+	}	
 
 	public Long getId() {
 		return id;

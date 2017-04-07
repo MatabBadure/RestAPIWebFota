@@ -90,6 +90,9 @@ public class PatientVestDeviceDataMonarch implements Serializable,Comparable<Pat
 	@Column(name = "dev_lte")
 	private String devLte;
 	
+	@Column(name = "dev_bt")
+	private String devBt;
+	
 	@Column(name = "dev_version")
 	private String devVersion;
 	
@@ -247,6 +250,14 @@ public class PatientVestDeviceDataMonarch implements Serializable,Comparable<Pat
 
 	public void setDevLte(String devLte) {
 		this.devLte = devLte;
+	}
+	
+	public String getDevBt() {
+		return devBt;
+	}
+
+	public void setDevBt(String devBt) {
+		this.devBt = devBt;
 	}
 
 	public String getDevVersion() {

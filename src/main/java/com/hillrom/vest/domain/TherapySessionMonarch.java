@@ -102,6 +102,12 @@ public class TherapySessionMonarch implements Comparable<TherapySessionMonarch>{
     @Column(name = "dev_wifi")
 	private String devWifi;
     
+    @Column(name = "dev_lte")
+	private String devLte;
+    
+    @Column(name = "dev_bt")
+	private String devBt;
+    
     @Column(name = "dev_version")
 	private String devVersion;
     
@@ -118,7 +124,7 @@ public class TherapySessionMonarch implements Comparable<TherapySessionMonarch>{
 			Integer caughPauseDuration, Double hmr, String serialNumber,
 			String bluetoothId, Integer therapyIndex,
 			Integer startBatteryLevel, Integer endBatteryLevel,
-			Integer numberOfEvents, Integer numberOfPods, String devWifi,
+			Integer numberOfEvents, Integer numberOfPods, String devWifi,String devLte,String devBt,
 			String devVersion) {
 		super();		
 		this.patientInfo = patientInfo;
@@ -143,6 +149,8 @@ public class TherapySessionMonarch implements Comparable<TherapySessionMonarch>{
 		this.numberOfEvents = numberOfEvents;
 		this.numberOfPods = numberOfPods;
 		this.devWifi = devWifi;
+		this.devLte = devLte;
+		this.devBt = devBt;
 		this.devVersion = devVersion;
 	}	
 
@@ -304,8 +312,24 @@ public class TherapySessionMonarch implements Comparable<TherapySessionMonarch>{
 
 	public void setDevWifi(String devWifi) {
 		this.devWifi = devWifi;
+	}	
+	
+	public String getDevLte() {
+		return devLte;
 	}
 
+	public void setDevLte(String devLte) {
+		this.devLte = devLte;
+	}
+	
+	public String getDevBt() {
+		return devBt;
+	}
+
+	public void setDevBt(String devBt) {
+		this.devBt = devBt;
+	}
+	
 	public String getDevVersion() {
 		return devVersion;
 	}

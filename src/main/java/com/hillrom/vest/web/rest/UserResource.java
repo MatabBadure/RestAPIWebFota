@@ -8,6 +8,7 @@ import static com.hillrom.vest.config.Constants.MONARCH;
 
 
 
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -721,25 +722,19 @@ public class UserResource {
 	        		jsonObject.put("protocol", (List <PatientProtocolData>) protocolList);
 	    		}else if(deviceType.equals("MONARCH")){
 	    			jsonObject.put("protocol", (List <PatientProtocolDataMonarch>) protocolList);
-	    		}else if(deviceType.equals("ALL")){
-	        //	jsonObject.put("VEST_DEVICE_PROTOCOL", protocolList_VEST);
-	        //	jsonObject.put("MONARCH_DEVICE_PROTOCOL", protocolList_MONARCH);
-
-				List<Object> objList = new ArrayList();
-				for (PatientProtocolDataMonarch devMonarch : protocolList_MONARCH) {
-					Object oneobject = devMonarch;
-				//	oneobject = devMonarch.getDeviceType();
-					objList.add(oneobject);
+				} else if (deviceType.equals("ALL")) {
+					List<Object> objList = new ArrayList();
+					for (PatientProtocolDataMonarch devMonarch : protocolList_MONARCH) {
+						Object oneobject = devMonarch;
+						objList.add(oneobject);
+					}
+					for (PatientProtocolData devVest : protocolList_VEST) {
+						Object oneobject = devVest;
+						objList.add(oneobject);
+					}
+					jsonObject.put("protocol", objList);
 				}
-				for (PatientProtocolData devVest : protocolList_VEST) {
-					Object oneobject = devVest;
-					objList.add(oneobject);
-				}
-    			jsonObject.put("protocol", objList);
-			
-	    		}
 	        }
-    		    		
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
     	} catch(HillromException hre){
     		jsonObject.put("ERROR", hre.getMessage());

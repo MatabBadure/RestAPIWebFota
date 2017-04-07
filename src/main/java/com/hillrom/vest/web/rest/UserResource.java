@@ -7,6 +7,7 @@ import static com.hillrom.vest.config.Constants.MONARCH;
 //import static com.hillrom.vest.config.Constants.ALL;
 
 
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -488,15 +489,24 @@ public class UserResource {
 			}
 			else {
      			jsonObject.put("message", MessageConstants.HR_282);//Vest/monarch devices linked with patient fetched successfully.
-     			//jsonObject.put("deviceType", patientVestDeviceService.getDeviceType(id));
      			if(deviceType.equals("VEST")){
      				jsonObject.put("deviceList", (List<PatientVestDeviceHistory>) deviceList);
         		}else if(deviceType.equals("MONARCH")){
         			jsonObject.put("deviceList", (List<PatientVestDeviceHistoryMonarch>) deviceList);
-        		}else if(deviceType.equals("ALL")){
-        			jsonObject.put("VEST_DEVICE_LIST", deviceList_vest);
-        			jsonObject.put("MONARCH_DEVICE_LIST", deviceList_monarch);
-        		}
+				}else if (deviceType.equals("ALL")) {
+					List<Object> objList = new ArrayList();
+					for (PatientVestDeviceHistoryMonarch devMonarch : deviceList_monarch) {
+						devMonarch.setDeviceType(MONARCH);
+						Object oneobject = devMonarch;
+						objList.add(oneobject);
+					}
+					for (PatientVestDeviceHistory devVest : deviceList_vest) {
+						devVest.setDeviceType(VEST);
+						Object oneobject = devVest;
+						objList.add(oneobject);
+					}
+        			jsonObject.put("deviceList", objList);
+    			}
      		}
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {
@@ -712,8 +722,21 @@ public class UserResource {
 	    		}else if(deviceType.equals("MONARCH")){
 	    			jsonObject.put("protocol", (List <PatientProtocolDataMonarch>) protocolList);
 	    		}else if(deviceType.equals("ALL")){
-	        	jsonObject.put("VEST_DEVICE_PROTOCOL", protocolList_VEST);
-	        	jsonObject.put("MONARCH_DEVICE_PROTOCOL", protocolList_MONARCH);
+	        //	jsonObject.put("VEST_DEVICE_PROTOCOL", protocolList_VEST);
+	        //	jsonObject.put("MONARCH_DEVICE_PROTOCOL", protocolList_MONARCH);
+
+				List<Object> objList = new ArrayList();
+				for (PatientProtocolDataMonarch devMonarch : protocolList_MONARCH) {
+					Object oneobject = devMonarch;
+				//	oneobject = devMonarch.getDeviceType();
+					objList.add(oneobject);
+				}
+				for (PatientProtocolData devVest : protocolList_VEST) {
+					Object oneobject = devVest;
+					objList.add(oneobject);
+				}
+    			jsonObject.put("protocol", objList);
+			
 	    		}
 	        }
     		    		
@@ -838,7 +861,8 @@ public class UserResource {
         		}
            		return new ResponseEntity<>(compliance,HttpStatus.OK);
         	}
-    	}else if (deviceType.equals(MONARCH)){
+    	//}else if (deviceType.equals(MONARCH)){
+    	}else {
     		PatientComplianceMonarch compliance = patientComplianceMonarchService.findLatestComplianceByPatientUserId(id);
     		if(Objects.nonNull(compliance)){
         		if(Objects.isNull(compliance.getHmrRunRate())){
@@ -1463,5 +1487,19 @@ public class UserResource {
         }
     }
     
+    /**
+     * GET  /users/:userId/clinics/:clinicId/statistics -> get the patient statistics for clinic Badge associated with user.
+     */
+    @RequestMapping(value = "/testingDeviceCron",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<?> getTetingDeviceCron() throws HillromException {
+        log.debug("REST request to get testing Device Cron");
+        JSONObject jsonObject = new JSONObject();        
+		adherenceCalculationServiceMonarch.processDeviceDetails();        	
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    }
     
 }

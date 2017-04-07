@@ -29,4 +29,7 @@ public interface NotificationRepository extends
 	
 
 	List<Notification> findByNotificationTypeAndPatientUserIdIn(String notificationType,Long patientUserId);
+	
+	@Query("from Notification nf where nf.patientUser.id = ?1 and nf.date < ?2")	
+	List<Notification> findByPatientUserIdAndDateBefore(Long patientUserId,LocalDate date);
 }

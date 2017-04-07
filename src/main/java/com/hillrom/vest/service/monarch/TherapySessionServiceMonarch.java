@@ -21,11 +21,13 @@ import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.batch.processing.monarch.PatientMonarchDeviceDataReader;
 import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.NoteMonarch;
+import com.hillrom.vest.domain.NotificationMonarch;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientInfo;
@@ -60,6 +62,10 @@ public class TherapySessionServiceMonarch {
 	private AdherenceCalculationServiceMonarch adherenceCalculationServiceMonarch;
 	
 	@Inject
+	@Lazy
+	private AdherenceCalculationService adherenceCalculationService;
+	
+	@Inject
 	private PatientComplianceMonarchService complianceServiceMonarch;
 	
 	@Inject
@@ -89,8 +95,19 @@ public class TherapySessionServiceMonarch {
 			PatientNoEventMonarch patientNoEvent = patientNoEventRepositoryMonarch.findByPatientUserId(patientUser.getId());
 			SortedMap<LocalDate,List<TherapySessionMonarch>> existingTherapySessionMap = getAllTherapySessionsMapByPatientUserId(patientUser.getId());
 			SortedMap<LocalDate,PatientComplianceMonarch> existingComplianceMapMonarch = complianceServiceMonarch.getPatientComplainceMapByPatientUserId(patientUser.getId());
-			adherenceCalculationServiceMonarch.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
-					receivedTherapySessionMapMonarch, existingComplianceMapMonarch,protocol);			
+			
+			
+			String deviceType = adherenceCalculationService.getDeviceTypeValue(patient.getId());
+			
+			if(deviceType.equals("MONARCH")){
+				adherenceCalculationServiceMonarch.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
+					receivedTherapySessionMapMonarch, existingComplianceMapMonarch,protocol);
+			}else if(deviceType.equals("BOTH")){
+				adherenceCalculationServiceMonarch.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
+						receivedTherapySessionMapMonarch, existingComplianceMapMonarch,protocol,patientUser.getId());
+					
+			}
+			
 		}
 		return therapySessionsMonarch;
 	}
@@ -310,5 +327,9 @@ public class TherapySessionServiceMonarch {
 			responseList.add(dataVO);
 		}
 		return responseList;
+	}
+	
+	public void saveAll(Collection<TherapySessionMonarch> therapySessionMonarch){
+		therapySessionMonarchRepository.save(therapySessionMonarch);
 	}
 }

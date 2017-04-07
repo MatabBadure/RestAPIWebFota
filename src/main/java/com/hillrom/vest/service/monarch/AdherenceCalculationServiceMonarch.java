@@ -2630,6 +2630,7 @@ public class AdherenceCalculationServiceMonarch{
 									patientTherapySession.getBluetoothId(), patientTherapySession.getTherapyIndex(),
 									patientTherapySession.getStartBatteryLevel(), patientTherapySession.getEndBatteryLevel(),
 									patientTherapySession.getNumberOfEvents(), patientTherapySession.getNumberOfPods(), patientTherapySession.getDevWifi(),
+									patientTherapySession.getDevLte(),patientTherapySession.getDevBt(),
 									patientTherapySession.getDevVersion());
 								
 							therapySessionListToSave.add(therapySession);

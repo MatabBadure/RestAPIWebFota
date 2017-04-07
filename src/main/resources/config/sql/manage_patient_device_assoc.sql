@@ -25,6 +25,7 @@ DECLARE monarch_device_patient_type VARCHAR(50);
 DECLARE monarch_device_device_type VARCHAR(50);
 DECLARE vest_device_hillrom_id  VARCHAR(50);
 DECLARE temp_patient_info_id  VARCHAR(50);
+DECLARE temp_pat_patient_type VARCHAR(50);
 
 DECLARE created_by VARCHAR(50);
 DECLARE latest_hmr DECIMAL(10,0);
@@ -34,6 +35,7 @@ DECLARE latest_hmr DECIMAL(10,0);
 SET today_date = now();
 SET created_by = 'JDE APP';
 SET monarch_device_patient_type = 'SD';
+SET temp_pat_patient_type = 'SD';
 
 -- All cases from Leah's document "VisiView Phase 3 Test Cases for TIMs Integration"
 

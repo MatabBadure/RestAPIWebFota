@@ -33,8 +33,8 @@ public class AdherenceResetHistoryMonarchRepository {
 		public Page<AdherenceResetHistoryVO> getAdherenceResetHistoryForPatient(Long userId,Pageable pageable,
 				Map<String, Boolean> sortOrder) throws HillromException {
 
-			String adherenceResetHistoryQuery = "SELECT DATE_FORMAT(reset_start_date,'%d/%m/%Y') as c1 , "
-					+ " DATE_FORMAT(reset_date,'%d/%m/%Y') as c2 , "
+			String adherenceResetHistoryQuery = "SELECT DATE_FORMAT(reset_start_date,'%m/%d/%Y') as c1 , "
+					+ " DATE_FORMAT(reset_date,'%m/%d/%Y') as c2 , "
 					+ " DATE_FORMAT(reset_date,'%k:%i%p') as c3 , "
 					+ " CASE justification "
 					+ "	WHEN 'Hospitalization' THEN justification "
@@ -93,8 +93,8 @@ public class AdherenceResetHistoryMonarchRepository {
 		public Page<AdherenceResetHistoryVO> getAdherenceResetHistoryForPatientAll(Long userId,Pageable pageable,
 				Map<String, Boolean> sortOrder) throws HillromException {
 
-			String adherenceResetHistoryQuery = "(SELECT DATE_FORMAT(T1.reset_start_date,'%d/%m/%Y') as c1 , "
-					+ " DATE_FORMAT(T1.reset_date,'%d/%m/%Y') as c2 , "
+			String adherenceResetHistoryQuery = "(SELECT DATE_FORMAT(T1.reset_start_date,'%m/%d/%Y') as c1 , "
+					+ " DATE_FORMAT(T1.reset_date,'%m/%d/%Y') as c2 , "
 					+ " DATE_FORMAT(T1.reset_date,'%k:%i%p') as c3 , "
 					+ " CASE T1.justification "
 					+ "	WHEN 'Hospitalization' THEN T1.justification "
@@ -112,8 +112,8 @@ public class AdherenceResetHistoryMonarchRepository {
 					
 					+ " UNION "
 					
-					+ " (SELECT DATE_FORMAT(T2.reset_start_date,'%d/%m/%Y') as c1 ,"
-					+ " DATE_FORMAT(T2.reset_date,'%d/%m/%Y') as c2 , "
+					+ " (SELECT DATE_FORMAT(T2.reset_start_date,'%m/%d/%Y') as c1 ,"
+					+ " DATE_FORMAT(T2.reset_date,'%m/%d/%Y') as c2 , "
 					+ " DATE_FORMAT(T2.reset_date,'%k:%i%p') as c3 , "
 					+ " CASE T2.justification "
 					+ "	WHEN 'Hospitalization' THEN T2.justification "

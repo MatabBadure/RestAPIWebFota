@@ -1,4 +1,4 @@
-package com.hillrom.vest.repository;
+package com.hillrom.vest.repository.monarch;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -17,10 +17,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.web.rest.dto.AdherenceResetHistoryVO;
 
 @Repository
-public class AdhrenceResetHistoryRepository {
+public class AdherenceResetHistoryMonarchRepository {
 	
 	private final Logger log = LoggerFactory.getLogger(UserSearchRepository.class);
 	private static final String ORDER_BY_CLAUSE_START = " order by ";
@@ -47,7 +48,7 @@ public class AdhrenceResetHistoryRepository {
 					+ "	WHEN 'No connectivity' THEN 'NA' "
 					+ "	ELSE justification "
 					+ "	END " 
-					+ " FROM ADHERENCE_RESET where user_id = "+userId+" ORDER BY reset_date desc ";
+					+ " FROM ADHERENCE_RESET_MONARCH where user_id = "+userId+" ORDER BY reset_date desc ";
 				
 			String countSqlQuery = "select count(adherenceResetHistory.c1) from (" + adherenceResetHistoryQuery + ") adherenceResetHistory";
 
@@ -88,6 +89,85 @@ public class AdhrenceResetHistoryRepository {
 			return page;
 		}
 
+		
+		public Page<AdherenceResetHistoryVO> getAdherenceResetHistoryForPatientAll(Long userId,Pageable pageable,
+				Map<String, Boolean> sortOrder) throws HillromException {
+
+			String adherenceResetHistoryQuery = "(SELECT DATE_FORMAT(T1.reset_start_date,'%m/%d/%Y') as c1 , "
+					+ " DATE_FORMAT(T1.reset_date,'%m/%d/%Y') as c2 , "
+					+ " DATE_FORMAT(T1.reset_date,'%k:%i%p') as c3 , "
+					+ " CASE T1.justification "
+					+ "	WHEN 'Hospitalization' THEN T1.justification "
+					+ "	WHEN 'Device issue' THEN T1.justification "
+					+ "	WHEN 'No connectivity' THEN T1.justification "
+					+ " ELSE 'Other'"
+					+ "	END, "
+					+ " CASE T1.justification "
+					+ "	WHEN 'Hospitalization' THEN 'NA' "
+					+ "	WHEN 'Device issue' THEN 'NA' "
+					+ "	WHEN 'No connectivity' THEN 'NA' "
+					+ "	ELSE T1.justification "
+					+ "	END  "
+					+ " FROM ADHERENCE_RESET T1 where T1.user_id = "+userId+") "
+					
+					+ " UNION "
+					
+					+ " (SELECT DATE_FORMAT(T2.reset_start_date,'%m/%d/%Y') as c1 ,"
+					+ " DATE_FORMAT(T2.reset_date,'%m/%d/%Y') as c2 , "
+					+ " DATE_FORMAT(T2.reset_date,'%k:%i%p') as c3 , "
+					+ " CASE T2.justification "
+					+ "	WHEN 'Hospitalization' THEN T2.justification "
+					+ "	WHEN 'Device issue' THEN T2.justification "
+					+ "	WHEN 'No connectivity' THEN T2.justification "
+					+ " ELSE 'Other'"
+					+ "	END, "
+					+ " CASE T2.justification "
+					+ " WHEN 'Hospitalization' THEN 'NA' "
+					+ "	WHEN 'Device issue' THEN 'NA' "
+					+ "	WHEN 'No connectivity' THEN 'NA' "
+					+ "	ELSE T2.justification "
+					+ "	END  "
+					+ " FROM ADHERENCE_RESET_MONARCH T2 where T2.user_id = "+userId+") ORDER BY c2 desc ";
+				
+			String countSqlQuery = "select count(adherenceResetHistory.c1) from (" + adherenceResetHistoryQuery + ") adherenceResetHistory";
+
+			Query countQuery = entityManager.createNativeQuery(countSqlQuery);
+			BigInteger count = (BigInteger) countQuery.getSingleResult();
+			//sort by isDeleted to isDeleted and isActive
+			/*if(sortOrder.containsKey("isDeleted")){
+				sortOrder.put("isActivated", sortOrder.get("isDeleted"));
+			}*/
+			
+			Query query = getOrderedByQuery(adherenceResetHistoryQuery, sortOrder);
+			setPaginationParams(pageable, query);
+
+			List<AdherenceResetHistoryVO> historyList = new ArrayList<>();
+			List<Object[]> results = query.getResultList();
+			results.stream().forEach((record) -> {				
+				String resetStartDate = (String) record[0];
+				String resetDate = (String) record[1];
+				String resetTime = (String) record[2];
+				String justification = (String) record[3];
+				String comments = (String) record[4];
+
+				AdherenceResetHistoryVO adhRstHistoryVO = new AdherenceResetHistoryVO(resetStartDate, resetDate,
+						resetTime, justification, comments);
+				historyList.add(adhRstHistoryVO);
+			});
+			
+			int firstResult = pageable.getOffset();
+			int maxResults = firstResult + pageable.getPageSize();
+			List<AdherenceResetHistoryVO> adhRstHistoryList = new ArrayList<>();
+			if (firstResult < historyList.size()) {
+				maxResults = maxResults > historyList.size() ? historyList.size() : maxResults;
+				adhRstHistoryList = historyList.subList(firstResult, maxResults);
+			}		
+
+			Page<AdherenceResetHistoryVO> page = new PageImpl<AdherenceResetHistoryVO>(historyList, pageable, count.intValue());
+
+			return page;
+		}
+		
 		private void setPaginationParams(Pageable pageable, Query query) {
 
 			int firstResult = pageable.getOffset();
@@ -132,3 +212,4 @@ public class AdhrenceResetHistoryRepository {
 		
 
 }
+

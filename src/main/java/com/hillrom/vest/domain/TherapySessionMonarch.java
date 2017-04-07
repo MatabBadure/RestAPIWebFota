@@ -102,9 +102,57 @@ public class TherapySessionMonarch implements Comparable<TherapySessionMonarch>{
     @Column(name = "dev_wifi")
 	private String devWifi;
     
+    @Column(name = "dev_lte")
+	private String devLte;
+    
+    @Column(name = "dev_bt")
+	private String devBt;
+    
     @Column(name = "dev_version")
 	private String devVersion;
     
+    
+    public TherapySessionMonarch() {
+		super();
+	}
+
+	public TherapySessionMonarch(PatientInfo patientInfo,
+			User patientUser, LocalDate date, Integer sessionNo,
+			String sessionType, DateTime startTime, DateTime endTime,
+			Integer frequency, Integer intensity, int durationInMinutes,
+			Integer programmedCaughPauses, Integer normalCaughPauses,
+			Integer caughPauseDuration, Double hmr, String serialNumber,
+			String bluetoothId, Integer therapyIndex,
+			Integer startBatteryLevel, Integer endBatteryLevel,
+			Integer numberOfEvents, Integer numberOfPods, String devWifi,String devLte,String devBt,
+			String devVersion) {
+		super();		
+		this.patientInfo = patientInfo;
+		this.patientUser = patientUser;
+		this.date = date;
+		this.sessionNo = sessionNo;
+		this.sessionType = sessionType;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.frequency = frequency;
+		this.intensity = intensity;
+		this.durationInMinutes = durationInMinutes;
+		this.programmedCaughPauses = programmedCaughPauses;
+		this.normalCaughPauses = normalCaughPauses;
+		this.caughPauseDuration = caughPauseDuration;
+		this.hmr = hmr;
+		this.serialNumber = serialNumber;
+		this.bluetoothId = bluetoothId;
+		this.therapyIndex = therapyIndex;
+		this.startBatteryLevel = startBatteryLevel;
+		this.endBatteryLevel = endBatteryLevel;
+		this.numberOfEvents = numberOfEvents;
+		this.numberOfPods = numberOfPods;
+		this.devWifi = devWifi;
+		this.devLte = devLte;
+		this.devBt = devBt;
+		this.devVersion = devVersion;
+	}	
 
 	public Long getId() {
 		return id;
@@ -264,8 +312,24 @@ public class TherapySessionMonarch implements Comparable<TherapySessionMonarch>{
 
 	public void setDevWifi(String devWifi) {
 		this.devWifi = devWifi;
+	}	
+	
+	public String getDevLte() {
+		return devLte;
 	}
 
+	public void setDevLte(String devLte) {
+		this.devLte = devLte;
+	}
+	
+	public String getDevBt() {
+		return devBt;
+	}
+
+	public void setDevBt(String devBt) {
+		this.devBt = devBt;
+	}
+	
 	public String getDevVersion() {
 		return devVersion;
 	}

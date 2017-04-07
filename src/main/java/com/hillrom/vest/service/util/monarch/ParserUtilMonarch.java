@@ -324,6 +324,7 @@ public class ParserUtilMonarch {
 	
 	
 	public static String getDevWifiOrLteString(String encoded_string,int flagWifiLte) throws HillromException{
+		
         byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
         String sout = "";
         for(int i=0;i<b.length;i++) {
@@ -349,11 +350,17 @@ public class ParserUtilMonarch {
         	int val = b[i] & 0xFF;
         	devWifiOrLte = devWifiOrLte + val + " ";
         }
-
         
-        log.debug("Value of devWifi : "+ devWifiOrLte );
-        return devWifiOrLte;
-        
+        if(flagWifiLte == 1){
+        	int combinedWifi = ParserUtilMonarch.intergerCombinedFromHex(devWifiOrLteArray);
+        	String combinedWifiTest = ParserUtilMonarch.intergerCombinedFromHexForWifi(devWifiOrLteArray);
+        	
+        	log.debug("Value of devWifi : "+ combinedWifi );
+        	return Integer.toString(combinedWifi);
+        }else{
+        	log.debug("Value of devWifi : "+ devWifiOrLte );
+        	return devWifiOrLte;
+        }
 	}
 	
 	public static String getDevVerString(String encoded_string) throws HillromException{
@@ -465,6 +472,16 @@ public class ParserUtilMonarch {
 	    }
 	    log.debug("hexTotal : " + Integer.parseInt(hexTotal, 16));
 	    return Integer.parseInt(hexTotal, 16);
+	}
+	
+	public static String intergerCombinedFromHexForWifi(byte[] input)
+	{	    
+	    String hexTotal = "";
+	    for (int t = 0; t < input.length; t++){
+	    	hexTotal = hexTotal + Integer.toHexString(input[t]& 0xFF);
+	    }
+	    //log.debug("hexTotal : " + Integer.parseInt(hexTotal, 16));
+	    return hexTotal;
 	}
 	
 	public static int intergerCombinedFromHex(byte[] input)

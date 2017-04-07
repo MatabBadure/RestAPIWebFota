@@ -46,6 +46,9 @@ public class PingPongPing implements Serializable {
     
     @Column(name = "dev_lte")
     private String devLte;
+    
+    @Column(name = "dev_bt")
+    private String devBt;
 
 	/**
 	 * @return the id
@@ -128,6 +131,15 @@ public class PingPongPing implements Serializable {
 		this.devLte = devLte;
 	}
 
+
+	public String getDevBt() {
+		return devBt;
+	}
+
+	public void setDevBt(String devBt) {
+		this.devBt = devBt;
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -138,6 +150,7 @@ public class PingPongPing implements Serializable {
 		result = prime * result + ((createdTime == null) ? 0 : createdTime.hashCode());
 		result = prime * result + ((devLte == null) ? 0 : devLte.hashCode());
 		result = prime * result + ((devWifi == null) ? 0 : devWifi.hashCode());
+		result = prime * result + ((devBt == null) ? 0 : devBt.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((serialNumber == null) ? 0 : serialNumber.hashCode());
 		return result;
@@ -170,6 +183,11 @@ public class PingPongPing implements Serializable {
 				return false;
 		} else if (!devWifi.equals(other.devWifi))
 			return false;
+		if (devBt == null) {
+			if (other.devBt != null)
+				return false;
+		} else if (!devBt.equals(other.devBt))
+			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -189,7 +207,7 @@ public class PingPongPing implements Serializable {
 	@Override
 	public String toString() {
 		return "PingPongPing [id=" + id + ", createdTime=" + createdTime + ", serialNumber=" + serialNumber
-				+ ", devWifi=" + devWifi + ", devLte=" + devLte + "]";
+				+ ", devWifi=" + devWifi + ", devBt=" + devBt + ", devLte=" + devLte + "]";
 	}
 
 

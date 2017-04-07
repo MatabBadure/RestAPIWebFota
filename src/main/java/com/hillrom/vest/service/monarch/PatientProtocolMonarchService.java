@@ -217,7 +217,14 @@ public class PatientProtocolMonarchService {
 	     		if(protocolAssocList.isEmpty()){
 	     			return new LinkedList<PatientProtocolDataMonarch>();
 	     		} else {
-	     			return protocolAssocList;
+	     			List<PatientProtocolDataMonarch> protocolAssocListToSave = new LinkedList<>();
+	     			for(PatientProtocolDataMonarch protocolAssoc: protocolAssocList){
+	     				protocolAssoc.setDeviceType("MONARCH");
+	     				patientProtocolMonarchRepository.save(protocolAssoc);
+	     				protocolAssocListToSave.add(protocolAssoc);
+	     			}
+	     			//return protocolAssocList;
+	     			return protocolAssocListToSave;
 	     		}
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);

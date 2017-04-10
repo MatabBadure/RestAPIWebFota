@@ -163,7 +163,7 @@ public class PatientVestDeviceDataServiceMonarch {
 		String decodedData = decodeData(rawData);
 		JSONObject qclJsonData = ParserUtil.getChargerJsonDataFromRawMessage(decodedData);
 		String reqParams[] = new String[]{DEVICE_MODEL,DEVICE_SN,
-				DEVICE_WIFI,DEVICE_LTE,DEVICE_VER,FRAG_TOTAL,FRAG_CURRENT,DEVICE_DATA,CRC};
+				DEVICE_WIFI,DEVICE_LTE,DEVICE_BT,DEVICE_VER,FRAG_TOTAL,FRAG_CURRENT,DEVICE_DATA,CRC};
 		if(Objects.isNull(qclJsonData) || qclJsonData.keySet().isEmpty()){
 			//throw new HillromException("Missing Params : "+String.join(",",reqParams));
 			throw new HillromException("Missing Params");

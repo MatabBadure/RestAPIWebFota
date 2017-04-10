@@ -137,9 +137,11 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 		patientVestDeviceRawLogMonarch.setTotalFragments(ParserUtilMonarch.getFragTotal(rawMessageMonarch)+"");
 		patientVestDeviceRawLogMonarch.setCurrentFragment(ParserUtilMonarch.getFragCurrent(rawMessageMonarch)+"");
 		patientVestDeviceRawLogMonarch.setChecksum(ParserUtilMonarch.getCRCChecksum(rawMessageMonarch)+"");
-		patientVestDeviceRawLogMonarch.setDeviceAddress(ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch,1) == null ? 
-															ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch,2) : 
-																ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch,1) );
+		patientVestDeviceRawLogMonarch.setDeviceAddress(ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch, 1) == null ? 
+															(ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch, 2) == null ?
+																	ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch, 3) : 
+																			ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch, 2)) :  
+																ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch, 1) );
 		
 		
 		return patientVestDeviceRawLogMonarch;
@@ -196,17 +198,19 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 	}
 	
 	
-	private String injectPingPongData(String deviceData,String slNo,String wifiId,String lteId) {		
+	private String injectPingPongData(String deviceData,String slNo,String wifiSerNo,String lteSerNo,String btSerNo) {		
 		try{
 			if(deviceData.equals("PING_PONG_PING")) {
 				log.debug("deviceData is PING_PONG_PING" + " Insert into PING_PONG_PING table");
 				PingPongPing pingPongPingData = new PingPongPing();
 				pingPongPingData.setCreatedTime(new DateTime());				
-				if(Objects.isNull(lteId)){
-					pingPongPingData.setDevWifi(wifiId);	
-				}else if(Objects.isNull(wifiId)){
-					pingPongPingData.setDevLte(lteId);
-				}
+				if(Objects.isNull(lteSerNo)){
+					pingPongPingData.setDevWifi(wifiSerNo);	
+				}else if(Objects.isNull(wifiSerNo)){
+					pingPongPingData.setDevLte(lteSerNo);
+				}else if(Objects.isNull(btSerNo)){
+					pingPongPingData.setDevLte(btSerNo);
+				} 
 				pingPongPingData.setSerialNumber(slNo);
 				pingpongpingrepository.save(pingPongPingData);
 				return "OK";
@@ -272,9 +276,11 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 		// Flag 2 for LTE
 		String lteSerNo = ParserUtilMonarch.getDevWifiOrLteString(base64String, 2);
 		
+		String btSerNo = ParserUtilMonarch.getDevWifiOrLteString(base64String, 3);
+		
 		String deviceVer = ParserUtilMonarch.getDevVerString(base64String);
 		
-		if(Objects.nonNull(injectPingPongData(deviceData, deviceSerNo, wifiSerNo, lteSerNo))){
+		if(Objects.nonNull(injectPingPongData(deviceData, deviceSerNo, wifiSerNo, lteSerNo, btSerNo))){
 			return monarchDeviceData;
 		}
 		
@@ -443,9 +449,11 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 	        
 	        if(Objects.nonNull(wifiSerNo))
 	        	monarchDeviceDataVal.setDevWifi(wifiSerNo);
-	        else
+	        else if(Objects.nonNull(lteSerNo))
 	        	monarchDeviceDataVal.setDevLte(lteSerNo);
-	        	
+	        else 
+	        	monarchDeviceDataVal.setDevBt(btSerNo);	
+	        
 	        monarchDeviceDataVal.setDevVersion(deviceVer);
 	        
 	        monarchDeviceData.add(monarchDeviceDataVal);

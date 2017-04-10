@@ -473,6 +473,8 @@ public class PatientVestDeviceTherapyUtilMonarch {
 		therapySessionMonarch.setNumberOfEvents(groupEntriesMonarch.get(0).getNumberOfEvents());
 		therapySessionMonarch.setNumberOfPods(groupEntriesMonarch.get(0).getNumberOfPods());		
 		therapySessionMonarch.setDevWifi(groupEntriesMonarch.get(0).getDevWifi());
+		therapySessionMonarch.setDevLte(groupEntriesMonarch.get(0).getDevLte());
+		therapySessionMonarch.setDevBt(groupEntriesMonarch.get(0).getDevBt());
 		therapySessionMonarch.setDevVersion(groupEntriesMonarch.get(0).getDevVersion());
 		
 		return therapySessionMonarch;

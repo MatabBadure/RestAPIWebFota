@@ -466,55 +466,36 @@ public class UserResource {
     		@RequestParam(value = "deviceType", required = true) String deviceType) {
     	log.debug("REST request to link vest device with patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
-		try {	
-			
-			List<?> deviceList = new ArrayList();
-			List<PatientVestDeviceHistory> deviceList_vest = new ArrayList();
-			List<PatientVestDeviceHistoryMonarch> deviceList_monarch = new ArrayList();
-    		if(deviceType.equals("VEST")){
-    			deviceList = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
-    		}else if(deviceType.equals("MONARCH")){
-    			deviceList = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
-    		}else if(deviceType.equals("ALL")){
-    			deviceList_vest = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
-    			deviceList_monarch = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
-    		}
-			if(deviceType.equals("VEST") && deviceList.isEmpty()){ 
-     			jsonObject.put("message",MessageConstants.HR_281); //No device linked with patient.
-     		} 
-			else if(deviceType.equals("MONARCH") && deviceList.isEmpty()){
-				jsonObject.put("message",MessageConstants.HR_281); //No device linked with patient.
+		try {
+			List<PatientVestDeviceHistory> deviceList_vest = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
+			List<PatientVestDeviceHistoryMonarch> deviceList_monarch = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
+
+			if (deviceList_vest.isEmpty() && deviceList_monarch.isEmpty()) {
+				jsonObject.put("message", MessageConstants.HR_281); // No device linked with patient.
+			} else {
+				jsonObject.put("message", MessageConstants.HR_282);// Vest/monarch devices linked with patient fetched successfully.
+
+				List<Object> objList = new ArrayList();
+				for (PatientVestDeviceHistoryMonarch devMonarch : deviceList_monarch) {
+					devMonarch.setDeviceType(MONARCH);
+					Object oneobject = devMonarch;
+					objList.add(oneobject);
+				}
+				for (PatientVestDeviceHistory devVest : deviceList_vest) {
+					devVest.setDeviceType(VEST);
+					Object oneobject = devVest;
+					objList.add(oneobject);
+				}
+				jsonObject.put("deviceList", objList);
+
 			}
-			else if(deviceType.equals("ALL") && deviceList_vest.isEmpty() && deviceList_monarch.isEmpty()){
-				jsonObject.put("message",MessageConstants.HR_281); //No device linked with patient.
-			}
-			else {
-     			jsonObject.put("message", MessageConstants.HR_282);//Vest/monarch devices linked with patient fetched successfully.
-     			if(deviceType.equals("VEST")){
-     				jsonObject.put("deviceList", (List<PatientVestDeviceHistory>) deviceList);
-        		}else if(deviceType.equals("MONARCH")){
-        			jsonObject.put("deviceList", (List<PatientVestDeviceHistoryMonarch>) deviceList);
-				}else if (deviceType.equals("ALL")) {
-					List<Object> objList = new ArrayList();
-					for (PatientVestDeviceHistoryMonarch devMonarch : deviceList_monarch) {
-						devMonarch.setDeviceType(MONARCH);
-						Object oneobject = devMonarch;
-						objList.add(oneobject);
-					}
-					for (PatientVestDeviceHistory devVest : deviceList_vest) {
-						devVest.setDeviceType(VEST);
-						Object oneobject = devVest;
-						objList.add(oneobject);
-					}
-        			jsonObject.put("deviceList", objList);
-    			}
-     		}
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {
-			jsonObject.put("ERROR",e.getMessage());
-			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject,
+					HttpStatus.BAD_REQUEST);
 		}
-    }
+	}
     
     /**
      * DELETE  /patient/:id/deactivatevestdevice/:serialNumber -> deactivate vest/monarch device with {serialNumber} from patient {id}.
@@ -693,54 +674,32 @@ public class UserResource {
     		@RequestParam(value = "deviceType", required = true) String deviceType) {
     	log.debug("REST request to get protocol for patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
-    	try {
-    		List<?> protocolList = new ArrayList();
-    		List<PatientProtocolData> protocolList_VEST = new ArrayList();
-    		List<PatientProtocolDataMonarch> protocolList_MONARCH = new ArrayList();
-    		
-    		if(deviceType.equals("VEST")){
-    			protocolList = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);
-    		}else if(deviceType.equals("MONARCH")){
-    			protocolList = patientProtocolMonarchService.getActiveProtocolsAssociatedWithPatient(id);
-    		}else if(deviceType.equals("ALL")){
-    			protocolList_VEST = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);
-    			protocolList_MONARCH = patientProtocolMonarchService.getActiveProtocolsAssociatedWithPatient(id);   		
-    		}
-    		
-    		if (deviceType.equals("VEST") && protocolList.isEmpty()){
-	        	jsonObject.put("message", MessageConstants.HR_245);
-	        }
-    		else if(deviceType.equals("MONARCH") && protocolList.isEmpty()){
-    			jsonObject.put("message", MessageConstants.HR_245);
-    		}
-    		else if(deviceType.equals("ALL") && protocolList_VEST.isEmpty() && protocolList_MONARCH.isEmpty()){
-    			jsonObject.put("message", MessageConstants.HR_245);
-    		}
-    		else {
-	        	jsonObject.put("message", MessageConstants.HR_243);
-	        	if(deviceType.equals("VEST")){
-	        		jsonObject.put("protocol", (List <PatientProtocolData>) protocolList);
-	    		}else if(deviceType.equals("MONARCH")){
-	    			jsonObject.put("protocol", (List <PatientProtocolDataMonarch>) protocolList);
-				} else if (deviceType.equals("ALL")) {
-					List<Object> objList = new ArrayList();
-					for (PatientProtocolDataMonarch devMonarch : protocolList_MONARCH) {
-						Object oneobject = devMonarch;
-						objList.add(oneobject);
-					}
-					for (PatientProtocolData devVest : protocolList_VEST) {
-						Object oneobject = devVest;
-						objList.add(oneobject);
-					}
-					jsonObject.put("protocol", objList);
+		try {
+			List<PatientProtocolData> protocolList_VEST = patientProtocolService.getActiveProtocolsAssociatedWithPatient(id);
+			List<PatientProtocolDataMonarch> protocolList_MONARCH = patientProtocolMonarchService.getActiveProtocolsAssociatedWithPatient(id);
+
+			if (protocolList_VEST.isEmpty() && protocolList_MONARCH.isEmpty()) {
+				jsonObject.put("message", MessageConstants.HR_245);
+			} else {
+				List<Object> objList = new ArrayList();
+				for (PatientProtocolDataMonarch devMonarch : protocolList_MONARCH) {
+					Object oneobject = devMonarch;
+					objList.add(oneobject);
 				}
-	        }
-    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
-    	} catch(HillromException hre){
-    		jsonObject.put("ERROR", hre.getMessage());
-    		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
-    	}
-    }
+				for (PatientProtocolData devVest : protocolList_VEST) {
+					Object oneobject = devVest;
+					objList.add(oneobject);
+				}
+				jsonObject.put("protocol", objList);
+			}
+
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+		} catch (HillromException hre) {
+			jsonObject.put("ERROR", hre.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject,
+					HttpStatus.BAD_REQUEST);
+		}
+	}
     
     /**
      * GET  /patient/:id/protocol/:protocolId -> get protocol details with {protocolId} for patient {id}.
@@ -794,9 +753,8 @@ public class UserResource {
     			message = patientProtocolService.deleteProtocolForPatient(id, protocolId);
     		}else if(deviceType.equals("MONARCH")){
     			message = patientProtocolMonarchService.deleteProtocolForPatient(id, protocolId);
-    		}    		
-	    	 
-	        if (Objects.isNull(message)) {
+    		}
+	    	 if (Objects.isNull(message)) {
 	        	jsonObject.put("message", MessageConstants.HR_245);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {

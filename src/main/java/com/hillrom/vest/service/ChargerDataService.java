@@ -440,7 +440,7 @@ public class ChargerDataService {
 		        				returnMatch(b,DEV_WIFI)-DEV_WIFI.length;
 		        log.debug("start end : "+ start + " : " + end );
 		        
-		        byte[] devSNArray = new byte[end];
+		        byte[] devSNArray = new byte[end<0?0:end];
 		        int j=0;
 		        sout = "";
 		        for(int i=start;i<end;i++) {

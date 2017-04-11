@@ -5,10 +5,6 @@ import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
 import static com.hillrom.vest.config.Constants.VEST;
 import static com.hillrom.vest.config.Constants.MONARCH;
 //import static com.hillrom.vest.config.Constants.ALL;
-
-
-
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -58,6 +54,8 @@ import org.supercsv.prefs.CsvPreference;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
+import com.hillrom.vest.domain.PatientDevicesAssoc;
+import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceData;
@@ -72,6 +70,7 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
+import com.hillrom.vest.repository.PatientDevicesAssocRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.repository.UserRepository;
@@ -175,6 +174,10 @@ public class UserResource {
 	
 	@Inject
 	private ExcelOutputService excelOutputService;
+	
+	
+	@Inject
+	private PatientDevicesAssocRepository patientDevicesAssocRepository;
 	
 	@Qualifier("hmrGraphService")
 	@Inject
@@ -423,12 +426,44 @@ public class UserResource {
 		try {
 			Object responseObj_Vest = null;
 			Object responseObj_Monarch = null;
-			if(deviceType.equals("VEST")){
-				responseObj_Vest = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
-			}else if(deviceType.equals("MONARCH")){
-				responseObj_Monarch = patientVestDeviceMonarchService.linkVestDeviceWithPatient(id, deviceData);
+		
+			PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(id);
+    		
+			if(deviceType.equals("VEST") || deviceType.equals("ALL")){				
+				if(deviceData.get("deviceType").toString().equals("MONARCH")){
+					responseObj_Monarch = patientVestDeviceMonarchService.linkVestDeviceWithPatient(id, deviceData);	
+					PatientDevicesAssoc checkPatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
+					if(Objects.isNull(checkPatientType)){
+						PatientDevicesAssoc addPatientType = new PatientDevicesAssoc(patient.getId(), "MONARCH", "CD", true, deviceData.get("serialNumber").toString(), patient.getHillromId());
+						patientDevicesAssocRepository.save(addPatientType);
+					}else{
+						checkPatientType.setPatientType("CD");
+						patientDevicesAssocRepository.save(checkPatientType);
+					}
+					PatientDevicesAssoc updatePatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
+					updatePatientType.setPatientType("CD");
+					patientDevicesAssocRepository.save(updatePatientType);
+				}else if(deviceData.get("deviceType").toString().equals("VEST")){
+					responseObj_Vest = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
+				}
+			}else if(deviceType.equals("MONARCH") || deviceType.equals("ALL")){
+				if(deviceData.get("deviceType").toString().equals("VEST")){					
+					responseObj_Vest = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
+					PatientDevicesAssoc checkPatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
+					if(Objects.isNull(checkPatientType)){
+						PatientDevicesAssoc addPatientType = new PatientDevicesAssoc(patient.getId(), "VEST", "CD", true, deviceData.get("serialNumber").toString(), patient.getHillromId());
+						patientDevicesAssocRepository.save(addPatientType);						
+					}else{
+						checkPatientType.setPatientType("CD");
+						patientDevicesAssocRepository.save(checkPatientType);
+					}				
+					PatientDevicesAssoc updatePatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
+					updatePatientType.setPatientType("CD");
+					patientDevicesAssocRepository.save(updatePatientType);
+				}else if(deviceData.get("deviceType").toString().equals("MONARCH")){
+					responseObj_Monarch = patientVestDeviceMonarchService.linkVestDeviceWithPatient(id, deviceData);
+				}
 			}
-			 
 			if (responseObj_Vest instanceof User) {
 				jsonObject.put("ERROR", ExceptionConstants.HR_572);
 				jsonObject.put("user", (User) responseObj_Vest);
@@ -439,12 +474,21 @@ public class UserResource {
 				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 			}else {
 				jsonObject.put("message", MessageConstants.HR_282);
-				//jsonObject.put("deviceType", patientVestDeviceMonarchService.getDeviceType(id));
-				if(deviceType.equals("VEST")){
-					jsonObject.put("user", (PatientVestDeviceHistory) responseObj_Vest);
-				}else if(deviceType.equals("MONARCH")){
+				if(deviceType.equals("VEST") || deviceType.equals("ALL")){
+					if(deviceData.get("deviceType").toString().equals("MONARCH")){
+						jsonObject.put("user", (PatientVestDeviceHistoryMonarch) responseObj_Monarch);
+					}
+					else{
+						jsonObject.put("user", (PatientVestDeviceHistory) responseObj_Vest);
+					}
+				}else if(deviceType.equals("MONARCH") || deviceType.equals("ALL")){
+					if(deviceData.get("deviceType").toString().equals("VEST")){
+						jsonObject.put("user", (PatientVestDeviceHistory) responseObj_Vest);
+					}
+					else{
 					jsonObject.put("user", (PatientVestDeviceHistoryMonarch) responseObj_Monarch);
-				}				
+					}
+				}
 				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 			}
 		} catch (HillromException e) {

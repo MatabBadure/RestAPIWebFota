@@ -6,6 +6,7 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVI
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_DATA;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_DATA_FIELD_NAME;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_LTE;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_BT;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_MODEL;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_SERIAL_NUMBER;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_SN;
@@ -162,7 +163,7 @@ public class PatientVestDeviceDataServiceMonarch {
 		String decodedData = decodeData(rawData);
 		JSONObject qclJsonData = ParserUtil.getChargerJsonDataFromRawMessage(decodedData);
 		String reqParams[] = new String[]{DEVICE_MODEL,DEVICE_SN,
-				DEVICE_WIFI,DEVICE_LTE,DEVICE_VER,FRAG_TOTAL,FRAG_CURRENT,DEVICE_DATA,CRC};
+				DEVICE_WIFI,DEVICE_LTE,DEVICE_BT,DEVICE_VER,FRAG_TOTAL,FRAG_CURRENT,DEVICE_DATA,CRC};
 		if(Objects.isNull(qclJsonData) || qclJsonData.keySet().isEmpty()){
 			//throw new HillromException("Missing Params : "+String.join(",",reqParams));
 			throw new HillromException("Missing Params");
@@ -170,11 +171,16 @@ public class PatientVestDeviceDataServiceMonarch {
 			//JSONObject allProperties = (JSONObject) qclJsonData.getOrDefault(TWO_NET_PROPERTIES, new JSONObject());
 			List<String> missingParams = RandomUtil.getDifference(Arrays.asList(reqParams), new ArrayList<String>(qclJsonData.keySet()));
 			
-			// To check either WIFI / LTE is available
-			if( missingParams.contains(DEVICE_WIFI) && !missingParams.contains(DEVICE_LTE) ){
+			// To check either WIFI / LTE / BT is available
+			if( missingParams.contains(DEVICE_WIFI) && !missingParams.contains(DEVICE_LTE) && missingParams.contains(DEVICE_BT)){
 				missingParams.remove(DEVICE_WIFI);
-			}else if(missingParams.contains(DEVICE_LTE) && !missingParams.contains(DEVICE_WIFI)){
+				missingParams.remove(DEVICE_BT);
+			}else if(missingParams.contains(DEVICE_LTE) && !missingParams.contains(DEVICE_WIFI) && missingParams.contains(DEVICE_BT)){
 				missingParams.remove(DEVICE_LTE);
+				missingParams.remove(DEVICE_BT);
+			}else if(missingParams.contains(DEVICE_LTE) && missingParams.contains(DEVICE_WIFI) && !missingParams.contains(DEVICE_BT)){
+				missingParams.remove(DEVICE_LTE);
+				missingParams.remove(DEVICE_WIFI);
 			}
 			
 			if(missingParams.size() > 0)

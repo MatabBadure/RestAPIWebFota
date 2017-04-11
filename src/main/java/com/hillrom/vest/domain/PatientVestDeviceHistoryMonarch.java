@@ -49,6 +49,9 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 	@Column(name = "dev_lte")
 	private String lteId;
 	
+	@Column(name = "dev_bt")
+	private String devBt;
+	
 	@Column(name="hub_id")
 	private String hubId;
 	
@@ -119,13 +122,13 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 		getPatientVestDevicePK().setSerialNumber(serialNumber);
 	}
 	
-	/*public String getBluetoothId() {
-		return bluetoothId;
+	public String getDevBt() {
+		return devBt;
 	}
 
-	public void setBluetoothId(String bluetoothId) {
-		this.bluetoothId = bluetoothId;
-	}*/
+	public void setDevBt(String devBt) {
+		this.devBt = devBt;
+	}
 	
 	public String getWifiId() {
 		return wifiId;

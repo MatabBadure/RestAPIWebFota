@@ -420,7 +420,8 @@ public class UserResource {
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> linkMonarchDeviceWithPatient(@PathVariable Long id, 
     		@RequestBody Map<String, Object> deviceData,
-    		@RequestParam(value = "deviceType", required = true) String deviceType){
+    		@RequestParam(value = "deviceType", required = true) String deviceType,
+    		@RequestParam(value = "deviceValue", required = true) String deviceValue){
     	log.debug("REST request to link vest device with patient user : {}", id);
         JSONObject jsonObject = new JSONObject();
 		try {
@@ -429,8 +430,8 @@ public class UserResource {
 		
 			PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(id);
     		
-			if(deviceType.equals("VEST") || deviceType.equals("ALL")){				
-				if(deviceData.get("deviceType").toString().equals("MONARCH")){
+			if(deviceType.equals("VEST") || deviceType.equals("ALL")){
+				if(deviceValue.equals("MONARCH")){
 					responseObj_Monarch = patientVestDeviceMonarchService.linkVestDeviceWithPatient(id, deviceData);	
 					PatientDevicesAssoc checkPatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
 					if(Objects.isNull(checkPatientType)){
@@ -443,11 +444,11 @@ public class UserResource {
 					PatientDevicesAssoc updatePatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
 					updatePatientType.setPatientType("CD");
 					patientDevicesAssocRepository.save(updatePatientType);
-				}else if(deviceData.get("deviceType").toString().equals("VEST")){
+				}else if(deviceValue.equals("VEST")){
 					responseObj_Vest = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
 				}
 			}else if(deviceType.equals("MONARCH") || deviceType.equals("ALL")){
-				if(deviceData.get("deviceType").toString().equals("VEST")){					
+				if(deviceValue.equals("VEST")){				
 					responseObj_Vest = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
 					PatientDevicesAssoc checkPatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
 					if(Objects.isNull(checkPatientType)){
@@ -460,7 +461,7 @@ public class UserResource {
 					PatientDevicesAssoc updatePatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
 					updatePatientType.setPatientType("CD");
 					patientDevicesAssocRepository.save(updatePatientType);
-				}else if(deviceData.get("deviceType").toString().equals("MONARCH")){
+				}else if(deviceValue.equals("MONARCH")){
 					responseObj_Monarch = patientVestDeviceMonarchService.linkVestDeviceWithPatient(id, deviceData);
 				}
 			}
@@ -475,18 +476,18 @@ public class UserResource {
 			}else {
 				jsonObject.put("message", MessageConstants.HR_282);
 				if(deviceType.equals("VEST") || deviceType.equals("ALL")){
-					if(deviceData.get("deviceType").toString().equals("MONARCH")){
+					if(deviceValue.equals("MONARCH")){
 						jsonObject.put("user", (PatientVestDeviceHistoryMonarch) responseObj_Monarch);
 					}
 					else{
 						jsonObject.put("user", (PatientVestDeviceHistory) responseObj_Vest);
 					}
 				}else if(deviceType.equals("MONARCH") || deviceType.equals("ALL")){
-					if(deviceData.get("deviceType").toString().equals("VEST")){
+					if(deviceValue.equals("VEST")){
 						jsonObject.put("user", (PatientVestDeviceHistory) responseObj_Vest);
 					}
 					else{
-					jsonObject.put("user", (PatientVestDeviceHistoryMonarch) responseObj_Monarch);
+						jsonObject.put("user", (PatientVestDeviceHistoryMonarch) responseObj_Monarch);
 					}
 				}
 				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);

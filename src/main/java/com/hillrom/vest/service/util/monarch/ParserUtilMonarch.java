@@ -36,6 +36,7 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_VER;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_WIFI;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_LTE;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_BT;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DURATION_LEN;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DURATION_LOC;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.END_BATTERY_LEVEL_LEN;
@@ -236,7 +237,11 @@ public class ParserUtilMonarch {
         
         String devSN = "";
         int start = returnMatch(b,DEV_SN);
-        int end = returnMatch(b,DEV_WIFI) == -1 ? returnMatch(b,DEV_LTE)-DEV_LTE.length :returnMatch(b,DEV_WIFI)-DEV_WIFI.length;
+        int end = returnMatch(b,DEV_WIFI) == -1 ? 
+        			(returnMatch(b,DEV_LTE) == -1 ? 
+        					returnMatch(b,DEV_BT)-DEV_BT.length : 
+        						returnMatch(b,DEV_LTE)-DEV_LTE.length ) :
+        		returnMatch(b,DEV_WIFI)-DEV_WIFI.length;
         log.debug("start end : "+ start + " : " + end );
         if(start < 0 || end < 0){
         	return null;
@@ -323,7 +328,7 @@ public class ParserUtilMonarch {
 	}
 	
 	
-	public static String getDevWifiOrLteString(String encoded_string,int flagWifiLte) throws HillromException{
+	public static String getDevWifiOrLteString(String encoded_string,int flagWifiLteBt) throws HillromException{
 		
         byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
         String sout = "";
@@ -332,34 +337,34 @@ public class ParserUtilMonarch {
         	sout = sout + val + " ";
         }
                 
-        String devWifiOrLte = "";
+        String devWifiOrLteOrBt = "";
         
         // Flag 1-WIFI & 2-LTE 
-        int start = flagWifiLte == 1 ? returnMatch(b,DEV_WIFI) : (flagWifiLte == 2 ? returnMatch(b,DEV_LTE) : -1);
+        int start = flagWifiLteBt == 1 ? returnMatch(b,DEV_WIFI) : (flagWifiLteBt == 2 ? returnMatch(b,DEV_LTE) : (flagWifiLteBt == 3 ? returnMatch(b,DEV_BT) : -1));
         
         int end = returnMatch(b,DEV_VER)-DEV_VER.length;
         log.debug("start end : "+ start + " : " + end );
         if(start < 0 || end < 0){
         	return null;
         }
-        byte[] devWifiOrLteArray = new byte[end];
+        byte[] devWifiOrLteOrBtArray = new byte[end];
         int j=0;
         sout = "";
         for(int i=start;i<end;i++) {
-        	devWifiOrLteArray[j++] = b[i];
+        	devWifiOrLteOrBtArray[j++] = b[i];
         	int val = b[i] & 0xFF;
-        	devWifiOrLte = devWifiOrLte + val + " ";
+        	devWifiOrLteOrBt = devWifiOrLteOrBt + val + " ";
         }
         
-        if(flagWifiLte == 1){
-        	int combinedWifi = ParserUtilMonarch.intergerCombinedFromHex(devWifiOrLteArray);
-        	String combinedWifiTest = ParserUtilMonarch.intergerCombinedFromHexForWifi(devWifiOrLteArray);
+        if(flagWifiLteBt == 1){
+        	int combinedWifi = ParserUtilMonarch.intergerCombinedFromHex(devWifiOrLteOrBtArray);
+        	String combinedWifiTest = ParserUtilMonarch.intergerCombinedFromHexForWifi(devWifiOrLteOrBtArray);
         	
         	log.debug("Value of devWifi : "+ combinedWifi );
         	return Integer.toString(combinedWifi);
         }else{
-        	log.debug("Value of devWifi : "+ devWifiOrLte );
-        	return devWifiOrLte;
+        	log.debug("Value of devWifi : "+ devWifiOrLteOrBt );
+        	return devWifiOrLteOrBt;
         }
 	}
 	

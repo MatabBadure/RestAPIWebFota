@@ -5,13 +5,6 @@ import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
 import static com.hillrom.vest.config.Constants.VEST;
 import static com.hillrom.vest.config.Constants.MONARCH;
 //import static com.hillrom.vest.config.Constants.ALL;
-
-
-
-
-
-
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;

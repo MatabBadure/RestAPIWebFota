@@ -65,6 +65,10 @@ public class PatientNoEventMonarchService {
 		return noEventsMonarchRepository.findAll();
 	}
 	
+	public void save(PatientNoEventMonarch patientNoEventMonarch){
+		noEventsMonarchRepository.save(patientNoEventMonarch);
+	}
+	
 	public Map<Long,PatientNoEventMonarch> findAllGroupByPatientUserId(){
 		List<PatientNoEventMonarch> patientNoEvents = findAll();
 		Map<Long,PatientNoEventMonarch> userIdNoEventsMap = new HashMap<>();

@@ -94,6 +94,7 @@ import com.hillrom.vest.repository.monarch.AdherenceResetMonarchRepository;
 import com.hillrom.vest.repository.monarch.ClinicMonarchRepository;
 import com.hillrom.vest.repository.monarch.NotificationMonarchRepository;
 import com.hillrom.vest.repository.monarch.PatientComplianceMonarchRepository;
+import com.hillrom.vest.repository.monarch.PatientNoEventsMonarchRepository;
 import com.hillrom.vest.repository.monarch.TherapySessionMonarchRepository;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.ClinicPatientService;
@@ -203,6 +204,9 @@ public class AdherenceCalculationServiceMonarch{
 	
 	@Inject
 	private TherapySessionServiceMonarch therapySessionMonarchService;
+	
+	@Inject
+	private PatientNoEventsMonarchRepository noEventMonarchRepository;
 	
 	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationServiceMonarch.class);
 	
@@ -376,12 +380,17 @@ public class AdherenceCalculationServiceMonarch{
 					processForEachPatientBoth(compliance, userIdNoEventMap, userIdNoEventMapVest, complianceMap, mstNotificationMap,hmrNonComplianceMapBoth);
 			}
 			
-			userProtocolConstantsMap = protocolMonarchService.getProtocolByPatientUserIds(new LinkedList<>(hmrNonComplianceMap.keySet()));
-			userProtocolConstantsVestMap = protocolVestService.getProtocolByPatientUserIds(new LinkedList<>(hmrNonComplianceMap.keySet()));
+			List<Long> patientUserIds =  new LinkedList<>(hmrNonComplianceMap.keySet());
+			patientUserIds.addAll(new LinkedList<>(hmrNonComplianceMapBoth.keySet()));
+			
+			userProtocolConstantsMap = protocolMonarchService.getProtocolByPatientUserIds(patientUserIds);
+			userProtocolConstantsVestMap = protocolVestService.getProtocolByPatientUserIds(patientUserIds);
 
-			// Update HMR for the Both device patients
-			calculateHMRComplianceForMSTBoth(today, hmrNonComplianceMapBoth,
-						userProtocolConstantsMap, userProtocolConstantsVestMap, complianceMap, notificationMap);
+			if(Objects.nonNull(hmrNonComplianceMapBoth)){
+				// Update HMR for the Both device patients
+				calculateHMRComplianceForMSTBoth(today, hmrNonComplianceMapBoth,
+							userProtocolConstantsMap, userProtocolConstantsVestMap, complianceMap, notificationMap);
+			}
 			
 			calculateHMRComplianceForMST(today, hmrNonComplianceMap,
 						userProtocolConstantsMap, complianceMap, notificationMap);
@@ -1100,8 +1109,14 @@ public class AdherenceCalculationServiceMonarch{
 				ProtocolConstantsMonarch protocolConstant = userProtocolConstantsMap.get(patientUserId);
 				ProtocolConstants protocolConstantVest = userProtocolConstantsVestMap.get(patientUserId);
 
-				boolean isHmrCompliantVest = adherenceCalculationService.isHMRCompliant(protocolConstantVest, durationForSettingDaysMonarch, adherenceSettingDay);
-				boolean isHmrCompliantMonarch = isHMRCompliant(protocolConstant, durationForSettingDaysVest, adherenceSettingDay);
+				boolean isHmrCompliantVest = true; 
+				boolean isHmrCompliantMonarch = true; 
+				if(!therapySessionsVest.isEmpty()){
+					isHmrCompliantVest = adherenceCalculationService.isHMRCompliant(protocolConstantVest, durationForSettingDaysVest, adherenceSettingDay);
+				}
+				if(!therapySessions.isEmpty()){
+					isHmrCompliantMonarch = isHMRCompliant(protocolConstant, durationForSettingDaysMonarch, adherenceSettingDay);
+				}
 				
 				if(!isHmrCompliantVest || !isHmrCompliantMonarch){
 					score = score < HMR_NON_COMPLIANCE_POINTS ? 0 : score - HMR_NON_COMPLIANCE_POINTS;
@@ -2636,6 +2651,13 @@ public class AdherenceCalculationServiceMonarch{
 							therapySessionListToSave.add(therapySession);
 						}
 						therapySessionMonarchService.saveAll(therapySessionListToSave);
+						
+						PatientNoEventMonarch patientNoEventMonarch = noEventMonarchRepository.findByPatientUserId(userOld.getId());
+						
+						PatientNoEventMonarch noEventMonarchToSave = new PatientNoEventMonarch(patientNoEventMonarch.getUserCreatedDate(),
+								patientNoEventMonarch.getFirstTransmissionDate(), patientInfo, user);						
+						
+						noEventMonarchService.save(noEventMonarchToSave);
 						
 						adherenceCalculationBoth(user.getId(), null, firstTransmissionDateMonarch, firstTransmissionDateVest, DEFAULT_COMPLIANCE_SCORE, userOld.getId(), 4);
 					}else{

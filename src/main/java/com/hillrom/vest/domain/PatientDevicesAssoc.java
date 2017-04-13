@@ -76,6 +76,7 @@ public class PatientDevicesAssoc implements Serializable {
 		this.isActive = isActive;
 		this.serialNumber = serialNumber;
 		this.hillromId = hillromId;
+		this.patientType = "SD";
 	}
 	
 	public PatientDevicesAssoc(String patientId, String deviceType, String patientType, Boolean isActive, String serialNumber, String hillromId) {

@@ -1064,9 +1064,13 @@ public class UserResource {
         	else if(deviceType.equals(MONARCH)) {
         		statitics = patientHCPMonarchService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(clinicId, date);
         	}
+        	else if(deviceType.equals("BOTH")){
+        		statitics = patientHCPMonarchService.getTodaysPatientStatisticsForClinicAssociatedWithHCPBoth(clinicId, date);
+        	}
         	else if(deviceType.equals("ALL")) {
         		statitics = patientHCPMonarchService.getTodaysPatientStatisticsForClinicAssociatedWithHCPAll(clinicId, date);
         	}
+        
         	if(statitics.isEmpty()) {
 	        	jsonObject.put("message", ExceptionConstants.HR_584);
 	        } else {
@@ -1181,6 +1185,10 @@ public class UserResource {
         	else if(deviceType.equals("ALL")){
         		Collection<StatisticsVO> statiticsCollection_all =  patientHCPMonarchService.getCumulativePatientStatisticsForClinicAssociatedWithHCPAll(hcpId,clinicId,from,to);
         		statiticsCollection = statiticsCollection_all;
+        	}
+        	else if(deviceType.equals("BOTH")){
+        		Collection<StatisticsVO> statiticsCollection_both =  patientHCPMonarchService.getCumulativePatientStatisticsForClinicAssociatedWithHCPBoth(hcpId,clinicId,from,to);
+        		statiticsCollection = statiticsCollection_both;
         	}
         	if (statiticsCollection.isEmpty()) {
         		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
@@ -1365,11 +1373,11 @@ public class UserResource {
     			List<ProtocolRevisionVO> adherenceTrends = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
     			return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
     		}
-    		if(deviceType.equals(MONARCH)){
+    		else{
                 List<ProtocolRevisionMonarchVO> adherenceTrends = patientComplianceMonarchService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
                 return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
         	}
-    		return new ResponseEntity<>(HttpStatus.OK);
+    		
 		} catch (HillromException e) {
 			// TODO: handle exception
 			JSONObject jsonObject = new JSONObject();
@@ -1434,7 +1442,7 @@ public class UserResource {
     			
     			if(deviceType.equals(VEST)){
     				adherenceTrendData = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id, from, to);
-    			}else if(deviceType.equals(MONARCH)){
+    			}else {
     				adherenceTrendDataMonarch = patientComplianceMonarchService.findAdherenceTrendByUserIdAndDateRange(id, from, to);
     			}
     			

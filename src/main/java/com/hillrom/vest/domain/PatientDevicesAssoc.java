@@ -62,6 +62,9 @@ public class PatientDevicesAssoc implements Serializable {
     @Column(name = "old_patient_id")
     private String oldPatientId;
     
+    @Column(name = "patient_type")
+    private String patientType;
+    
     public PatientDevicesAssoc() {
 		super();
 	}
@@ -73,6 +76,7 @@ public class PatientDevicesAssoc implements Serializable {
 		this.isActive = isActive;
 		this.serialNumber = serialNumber;
 		this.hillromId = hillromId;
+		this.patientType = "SD";
 	}
     
 	/**
@@ -187,6 +191,20 @@ public class PatientDevicesAssoc implements Serializable {
 		this.oldPatientId = oldPatientId;
 	}
 	
+	/**
+	 * @return the patientType
+	 */
+	public String getPatientType() {
+		return patientType;
+	}
+
+	/**
+	 * @param patientType the patientType to set
+	 */
+	public void setPatientType(String patientType) {
+		this.patientType = patientType;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */

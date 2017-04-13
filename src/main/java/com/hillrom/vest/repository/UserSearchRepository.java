@@ -646,6 +646,8 @@ public class UserSearchRepository {
 		}else if (deviceType.equals("MONARCH")){	//MONARCH DEVICE TYPE
 			findPatientUserQuery = QueryConstants.QUERY_PATIENT_SEARCH_UNDER_HCP_USER_FOR_MONARCH;
 			searchQuery = QueryConstants.QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH;
+			searchQuery += QueryConstants.QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH_ALL;
+			
 			
 			if (StringUtils.isEmpty(clinicId) | "all".equalsIgnoreCase(clinicId)) {
 				findPatientUserQuery = findPatientUserQuery + query2 + searchQuery + filterByAssociatedClinicList + query3;
@@ -658,7 +660,9 @@ public class UserSearchRepository {
 			
 			//VEST
 			findPatientUserQuery = QueryConstants.QUERY_PATIENT_SEARCH_UNDER_HCP_USER_FOR_VEST;
-			searchQuery = QueryConstants.QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_VEST;
+			
+			searchQuery = QueryConstants.QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_VEST;			
+			
 			if (StringUtils.isEmpty(clinicId) | "all".equalsIgnoreCase(clinicId)) {
 				findPatientUserQuery = findPatientUserQuery + query2 + searchQuery + filterByAssociatedClinicList + query3;
 			} else if ("others".equalsIgnoreCase(clinicId)) {
@@ -672,7 +676,10 @@ public class UserSearchRepository {
 			
 			//MONARCH
 			findPatientUserQuery = QueryConstants.QUERY_PATIENT_SEARCH_UNDER_HCP_USER_FOR_MONARCH;
+			
 			searchQuery = QueryConstants.QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH;
+			searchQuery += QueryConstants.QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH_DEVTYPE;
+			
 			if (StringUtils.isEmpty(clinicId) | "all".equalsIgnoreCase(clinicId)) {
 				findPatientUserQuery = findPatientUserQuery + query2 + searchQuery + filterByAssociatedClinicList + query3;
 			} else if ("others".equalsIgnoreCase(clinicId)) {
@@ -911,7 +918,7 @@ public class UserSearchRepository {
 			findPatientUserQuery = findPatientUserQuery + QueryConstants.QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_PART2_MONARCH_DEVTYPE;
 		} else if(deviceType.equals("ALL")){
 			String query1 = findPatientUserQuery + QueryConstants.QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_PART2_VEST_DEVTYPE;
-			String query2 = findPatientUserQuery + QueryConstants.QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_PART2_MONARCH_DEVTYPE;
+			String query2 = findPatientUserQuery + QueryConstants.QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_MONARCH_DEVTYPE_EX_ALL;
 			findPatientUserQuery = query1 + " UNION " + query2;
 		}
 		
@@ -1099,7 +1106,7 @@ public class UserSearchRepository {
 			findPatientUserQuery = QueryConstants.QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_ADMIN_MONARCH_DEVTYPE;
 		}else {
 			String q1 = QueryConstants.QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_ADMIN_VEST_DEVTYPE;
-			String q2 = QueryConstants.QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_ADMIN_MONARCH_DEVTYPE;
+			String q2 = QueryConstants.QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_ADMIN_MONARCH_DEVTYPE_EX_ALL;
 			findPatientUserQuery = q1 + " UNION " + q2;
 		}
 		

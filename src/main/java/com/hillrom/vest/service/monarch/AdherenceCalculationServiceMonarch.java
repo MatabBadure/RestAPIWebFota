@@ -376,12 +376,17 @@ public class AdherenceCalculationServiceMonarch{
 					processForEachPatientBoth(compliance, userIdNoEventMap, userIdNoEventMapVest, complianceMap, mstNotificationMap,hmrNonComplianceMapBoth);
 			}
 			
-			userProtocolConstantsMap = protocolMonarchService.getProtocolByPatientUserIds(new LinkedList<>(hmrNonComplianceMap.keySet()));
-			userProtocolConstantsVestMap = protocolVestService.getProtocolByPatientUserIds(new LinkedList<>(hmrNonComplianceMap.keySet()));
+			List<Long> patientUserIds =  new LinkedList<>(hmrNonComplianceMap.keySet());
+			patientUserIds.addAll(new LinkedList<>(hmrNonComplianceMapBoth.keySet()));
+			
+			userProtocolConstantsMap = protocolMonarchService.getProtocolByPatientUserIds(patientUserIds);
+			userProtocolConstantsVestMap = protocolVestService.getProtocolByPatientUserIds(patientUserIds);
 
-			// Update HMR for the Both device patients
-			calculateHMRComplianceForMSTBoth(today, hmrNonComplianceMapBoth,
-						userProtocolConstantsMap, userProtocolConstantsVestMap, complianceMap, notificationMap);
+			if(Objects.nonNull(hmrNonComplianceMapBoth)){
+				// Update HMR for the Both device patients
+				calculateHMRComplianceForMSTBoth(today, hmrNonComplianceMapBoth,
+							userProtocolConstantsMap, userProtocolConstantsVestMap, complianceMap, notificationMap);
+			}
 			
 			calculateHMRComplianceForMST(today, hmrNonComplianceMap,
 						userProtocolConstantsMap, complianceMap, notificationMap);
@@ -1100,8 +1105,14 @@ public class AdherenceCalculationServiceMonarch{
 				ProtocolConstantsMonarch protocolConstant = userProtocolConstantsMap.get(patientUserId);
 				ProtocolConstants protocolConstantVest = userProtocolConstantsVestMap.get(patientUserId);
 
-				boolean isHmrCompliantVest = adherenceCalculationService.isHMRCompliant(protocolConstantVest, durationForSettingDaysMonarch, adherenceSettingDay);
-				boolean isHmrCompliantMonarch = isHMRCompliant(protocolConstant, durationForSettingDaysVest, adherenceSettingDay);
+				boolean isHmrCompliantVest = true; 
+				boolean isHmrCompliantMonarch = true; 
+				if(!therapySessionsVest.isEmpty()){
+					isHmrCompliantVest = adherenceCalculationService.isHMRCompliant(protocolConstantVest, durationForSettingDaysVest, adherenceSettingDay);
+				}
+				if(!therapySessions.isEmpty()){
+					isHmrCompliantMonarch = isHMRCompliant(protocolConstant, durationForSettingDaysMonarch, adherenceSettingDay);
+				}
 				
 				if(!isHmrCompliantVest || !isHmrCompliantMonarch){
 					score = score < HMR_NON_COMPLIANCE_POINTS ? 0 : score - HMR_NON_COMPLIANCE_POINTS;

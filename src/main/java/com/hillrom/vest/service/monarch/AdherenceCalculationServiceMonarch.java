@@ -94,6 +94,7 @@ import com.hillrom.vest.repository.monarch.AdherenceResetMonarchRepository;
 import com.hillrom.vest.repository.monarch.ClinicMonarchRepository;
 import com.hillrom.vest.repository.monarch.NotificationMonarchRepository;
 import com.hillrom.vest.repository.monarch.PatientComplianceMonarchRepository;
+import com.hillrom.vest.repository.monarch.PatientNoEventsMonarchRepository;
 import com.hillrom.vest.repository.monarch.TherapySessionMonarchRepository;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.ClinicPatientService;
@@ -203,6 +204,9 @@ public class AdherenceCalculationServiceMonarch{
 	
 	@Inject
 	private TherapySessionServiceMonarch therapySessionMonarchService;
+	
+	@Inject
+	private PatientNoEventsMonarchRepository noEventMonarchRepository;
 	
 	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationServiceMonarch.class);
 	
@@ -2636,6 +2640,13 @@ public class AdherenceCalculationServiceMonarch{
 							therapySessionListToSave.add(therapySession);
 						}
 						therapySessionMonarchService.saveAll(therapySessionListToSave);
+						
+						PatientNoEventMonarch patientNoEventMonarch = noEventMonarchRepository.findByPatientUserId(userOld.getId());
+						
+						PatientNoEventMonarch noEventMonarchToSave = new PatientNoEventMonarch(patientNoEventMonarch.getUserCreatedDate(),
+								patientNoEventMonarch.getFirstTransmissionDate(), patientInfo, user);						
+						
+						noEventMonarchService.save(noEventMonarchToSave);
 						
 						adherenceCalculationBoth(user.getId(), null, firstTransmissionDateMonarch, firstTransmissionDateVest, DEFAULT_COMPLIANCE_SCORE, userOld.getId(), 4);
 					}else{

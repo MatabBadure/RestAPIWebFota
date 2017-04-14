@@ -102,6 +102,7 @@ public class ParserUtil {
 			  StringTokenizer st_NameValue = new StringTokenizer(pair, "=");
 			  String nameToken =  st_NameValue.nextToken();
 			  String valueToken = st_NameValue.nextToken();
+			  String DEVICE_BT = "devBT";
 			  log.debug("StringTokenizer Name : " + nameToken);
 			  log.debug("StringTokenizer Value : " + valueToken);
 			  
@@ -111,6 +112,8 @@ public class ParserUtil {
 					qclJsonData.put(DEVICE_WIFI, valueToken);	
 				if(DEVICE_LTE.equalsIgnoreCase(nameToken))
 					qclJsonData.put(DEVICE_LTE, valueToken);	
+				if(DEVICE_BT.equalsIgnoreCase(nameToken))
+					qclJsonData.put(DEVICE_BT, valueToken);
 				if(DEVICE_VER.equalsIgnoreCase(nameToken))
 					qclJsonData.put(DEVICE_VER, valueToken);
 				if(FRAG_TOTAL.equalsIgnoreCase(nameToken))

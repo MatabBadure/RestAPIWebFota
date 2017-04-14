@@ -165,8 +165,10 @@ public class ChargerDataService {
 			private JSONObject validateRequest(String rawData,String decoded_data) throws HillromException {
 				log.error("Inside validateRequest " + rawData);
 				JSONObject chargerJsonData = ParserUtil.getChargerQclJsonDataFromRawMessage(decoded_data);
+				String DEVICE_BT = "devBT";
+				
 				String reqParams[] = new String[]{DEVICE_MODEL,DEVICE_SN,
-						DEVICE_WIFI,DEVICE_LTE,DEVICE_VER,FRAG_TOTAL,FRAG_CURRENT,DEVICE_DATA,CRC};
+						DEVICE_WIFI,DEVICE_LTE,DEVICE_BT,DEVICE_VER,FRAG_TOTAL,FRAG_CURRENT,DEVICE_DATA,CRC};
 				
 				
 				if(Objects.isNull(chargerJsonData) || chargerJsonData.keySet().isEmpty()){
@@ -175,7 +177,7 @@ public class ChargerDataService {
 					List<String> missingParams = RandomUtil.getDifference(Arrays.asList(reqParams), new ArrayList<String>(chargerJsonData.keySet()));
 		
 					if(missingParams.size() > 0){
-						if(missingParams.contains(DEVICE_MODEL) || missingParams.contains(DEVICE_SN) || (missingParams.contains(DEVICE_WIFI) && missingParams.contains(DEVICE_LTE)) ||
+						if(missingParams.contains(DEVICE_MODEL) || missingParams.contains(DEVICE_SN) || (missingParams.contains(DEVICE_WIFI) && missingParams.contains(DEVICE_LTE) && missingParams.contains(DEVICE_BT)) ||
 								missingParams.contains(DEVICE_VER) || missingParams.contains(DEVICE_DATA) || missingParams.contains(CRC) ||
 								missingParams.contains(FRAG_TOTAL) || missingParams.contains(FRAG_CURRENT)
 								){
@@ -431,13 +433,16 @@ public class ChargerDataService {
 		        
 		        //log.debug("Input Byte Array in devSN :"+sout);
 		
+		        byte[] DEV_BT = new byte[]{38,100,101,118,66,84,61};
 		        
 		        String devSN = "";
 		        int start = returnMatch(b,DEV_SN);
-		        int end = returnMatch(b,DEV_WIFI) == -1 ? returnMatch(b,DEV_LTE)-DEV_LTE.length : returnMatch(b,DEV_WIFI)-DEV_WIFI.length;
+		        int end = returnMatch(b,DEV_WIFI) == -1 ?
+		        			(returnMatch(b,DEV_LTE) == -1 ? returnMatch(b,DEV_BT)-DEV_BT.length : returnMatch(b,DEV_LTE)-DEV_LTE.length) :
+		        				returnMatch(b,DEV_WIFI)-DEV_WIFI.length;
 		        log.debug("start end : "+ start + " : " + end );
 		        
-		        byte[] devSNArray = new byte[end];
+		        byte[] devSNArray = new byte[end<0?0:end];
 		        int j=0;
 		        sout = "";
 		        for(int i=start;i<end;i++) {

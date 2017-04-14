@@ -96,6 +96,7 @@ import com.hillrom.vest.service.monarch.TherapySessionServiceMonarch;
 import com.hillrom.vest.service.monarch.AdherenceCalculationServiceMonarch;
 import com.hillrom.vest.service.monarch.PatientComplianceMonarchService;
 import com.hillrom.vest.service.util.CsvUtil;
+import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.Filter;
@@ -441,11 +442,13 @@ public class UserResource {
 						patientDevicesAssocRepository.save(addPatientType);
 						patDevList.add(addPatientType);
 					}else{
-						checkPatientType.setPatientType("CD");
+						checkPatientType.setPatientType("CD");						
+						checkPatientType.setCreatedDate(Objects.isNull(checkPatientType.getCreatedDate()) ? 
+															DateUtil.getPlusOrMinusTodayLocalDate(-1) :  checkPatientType.getCreatedDate());
 						patientDevicesAssocRepository.save(checkPatientType);
 						patDevList.add(checkPatientType);
 					}
-					adherenceCalculationServiceMonarch.executeMergingProcess(patDevList);
+					adherenceCalculationServiceMonarch.executeMergingProcess(patDevList, 1);
 					
 					PatientDevicesAssoc updatePatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
 					updatePatientType.setPatientType("CD");
@@ -463,11 +466,14 @@ public class UserResource {
 						patientDevicesAssocRepository.save(addPatientType);
 						patDevList.add(addPatientType);
 					}else{
-						checkPatientType.setPatientType("CD");
+						checkPatientType.setPatientType("CD");						
+						checkPatientType.setCreatedDate(Objects.isNull(checkPatientType.getCreatedDate()) ? 
+								DateUtil.getPlusOrMinusTodayLocalDate(-1) :  checkPatientType.getCreatedDate());
+						
 						patientDevicesAssocRepository.save(checkPatientType);
 						patDevList.add(checkPatientType);
 					}
-					adherenceCalculationServiceMonarch.executeMergingProcess(patDevList);
+					adherenceCalculationServiceMonarch.executeMergingProcess(patDevList, 1);
 					
 					PatientDevicesAssoc updatePatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
 					updatePatientType.setPatientType("CD");

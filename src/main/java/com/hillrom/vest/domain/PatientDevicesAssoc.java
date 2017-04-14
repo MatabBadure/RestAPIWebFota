@@ -87,6 +87,7 @@ public class PatientDevicesAssoc implements Serializable {
 		this.isActive = isActive;
 		this.serialNumber = serialNumber;
 		this.hillromId = hillromId;
+		this.createdDate = LocalDate.now();
 	}
     
 	/**

@@ -126,38 +126,53 @@ public class PatientVestDeviceTherapyUtilMonarch {
 			List<PatientVestDeviceDataMonarch> deviceEventRecordsMonarch) {
 		Map<String,Integer> metricsMapMonarch = new HashMap<>();
 		//int durationOfSession = 0, normalCoughPauses = 0, programmedCoughPauses = 0, caughPauseDuration = 0;
+		int normalCoughPauses = 0,totalCoughPauseDuration = 0;
 		int durationOfSessionMonarch = 0, coughPauses = 0, caughPauseDuration = 0;
 		int durationForWeightedAvgCalcMonarch = getTotalDurationForWeightedAvgCalculationMonarch(deviceEventRecordsMonarch);
 		float frequency = 0, intensity = 0;
-		int startCoughPause=-1, endCoughPause = -1;
+		int startCoughPause=-1, endCoughPause = -1, startNormalCoughPause = -1, endNormalCoughPause = -1;
 		for(int i = 0;i < deviceEventRecordsMonarch.size(); i ++){
 			PatientVestDeviceDataMonarch deviceEventRecordMonarch = deviceEventRecordsMonarch.get(i);
 			frequency += calculateWeightedAvg( durationForWeightedAvgCalcMonarch,deviceEventRecordMonarch.getDuration(),deviceEventRecordMonarch.getFrequency());
 			intensity += calculateWeightedAvg(durationForWeightedAvgCalcMonarch,deviceEventRecordMonarch.getDuration(),deviceEventRecordMonarch.getIntensity());
-			/*if(isProgrammedCoughPauseMonarch(deviceEventRecordMonarch))
-				++programmedCoughPauses;
-			if(isNormalCoughPauseMonarch(deviceEventRecordMonarch))
-				++normalCoughPauses;*/
-			if(isStartCoughPauseMonarch(deviceEventRecordMonarch)){
+			
+			if(isNormalStartCoughPauseMonarch(deviceEventRecordMonarch)){
+				++normalCoughPauses;
+				startNormalCoughPause = i;
+			}else if(isStartCoughPauseMonarch(deviceEventRecordMonarch)){
 				++coughPauses;
 				startCoughPause = i;
-			}	
-			if(isEndCoughPauseMonarch(deviceEventRecordMonarch))
+			}
+			
+			if(isNormalEndCoughPauseMonarch(deviceEventRecordMonarch) || isProgrammedStartCoughPauseMonarch(deviceEventRecordMonarch))
+				endNormalCoughPause = i;
+			else if(isEndCoughPauseMonarch(deviceEventRecordMonarch) || isProgrammedEndCoughPauseMonarch(deviceEventRecordMonarch))
 				endCoughPause = i;
+			
+			if(startCoughPause>0 && endCoughPause>0 && endCoughPause == (startCoughPause+1)){
+				caughPauseDuration = calculateCoughPauseMonarch(deviceEventRecordsMonarch,startCoughPause, endCoughPause);
+				if(caughPauseDuration<30){
+					--coughPauses;
+				}else{
+					totalCoughPauseDuration += caughPauseDuration; 
+				}
+			}else if(startNormalCoughPause>0 && endNormalCoughPause>0 && endNormalCoughPause == (startNormalCoughPause+1)){
+				caughPauseDuration = calculateCoughPauseMonarch(deviceEventRecordsMonarch,startNormalCoughPause, endNormalCoughPause);
+				if(caughPauseDuration<30){
+					--normalCoughPauses;
+				}else{
+					totalCoughPauseDuration += caughPauseDuration; 
+				}
+			}
 		}
 		durationOfSessionMonarch = calculateDurationOfSessionMonarch(deviceEventRecordsMonarch);
-		
-		if(startCoughPause>0 && endCoughPause>0){
-			caughPauseDuration = calculateCoughPauseMonarch(deviceEventRecordsMonarch,startCoughPause, endCoughPause);	
-		}		
 		
 		metricsMapMonarch.put(FREQUENCY, Math.round(frequency));
 		metricsMapMonarch.put(INTENSITY, Math.round(intensity));
 		metricsMapMonarch.put(DURATION, durationOfSessionMonarch);
-		metricsMapMonarch.put(NORMAL_COUGH_PAUSES, coughPauses);
-		//metricsMapMonarch.put(NORMAL_COUGH_PAUSES, normalCoughPauses);
-		//metricsMapMonarch.put(PROGRAMMED_COUGH_PAUSES, programmedCoughPauses);
-		metricsMapMonarch.put(CAUGH_PAUSE_DURATION, caughPauseDuration);
+		metricsMapMonarch.put(NORMAL_COUGH_PAUSES, normalCoughPauses);
+		metricsMapMonarch.put(PROGRAMMED_COUGH_PAUSES, coughPauses);
+		metricsMapMonarch.put(CAUGH_PAUSE_DURATION, totalCoughPauseDuration);
 		return metricsMapMonarch;
 	}
 
@@ -227,9 +242,9 @@ public class PatientVestDeviceTherapyUtilMonarch {
 			List<PatientVestDeviceDataMonarch> deviceEventRecordsMonarch,int startCoughPause, int endCoughPause) {
 		// HMR Difference
 		
-		double endCoughPauseHMR = deviceEventRecordsMonarch.get(endCoughPause).getHmr();
-		double startCoughPauseHMR = deviceEventRecordsMonarch.get(startCoughPause).getHmr();
-		int coughPauseDuration = (int)Math.round((endCoughPauseHMR - startCoughPauseHMR)/SECONDS_PER_MINUTE);
+		long endCoughPauseHMR = deviceEventRecordsMonarch.get(endCoughPause).getTimestamp();
+		long startCoughPauseHMR = deviceEventRecordsMonarch.get(startCoughPause).getTimestamp();
+		int coughPauseDuration = (int)Math.round((endCoughPauseHMR - startCoughPauseHMR)/1000);
 		
 		return coughPauseDuration;		
 	}
@@ -289,6 +304,26 @@ public class PatientVestDeviceTherapyUtilMonarch {
 			PatientVestDeviceDataMonarch deviceEventRecord) {
 		return deviceEventRecord.getEventCode().startsWith(EVENT_CODE_COUGH_PAUSE);
 	}*/
+	
+	private static boolean isNormalStartCoughPauseMonarch(
+			PatientVestDeviceDataMonarch deviceEventRecord) {
+		return deviceEventRecord.getEventCode().startsWith(EVENT_CODE_NORMAL_PAUSE_MONARCH);
+	}
+	
+	private static boolean isNormalEndCoughPauseMonarch(
+			PatientVestDeviceDataMonarch deviceEventRecord) {
+		return deviceEventRecord.getEventCode().startsWith(EVENT_CODE_NORMAL_RESUME_MONARCH);
+	}
+
+	private static boolean isProgrammedStartCoughPauseMonarch(
+			PatientVestDeviceDataMonarch deviceEventRecord) {
+		return deviceEventRecord.getEventCode().startsWith(EVENT_CODE_PROGRAM_PAUSE_MONARCH);
+	}
+	
+	private static boolean isProgrammedEndCoughPauseMonarch(
+			PatientVestDeviceDataMonarch deviceEventRecord) {
+		return deviceEventRecord.getEventCode().startsWith(EVENT_CODE_PROGRAM_RESUME_MONARCH);
+	}
 	
 	private static boolean isStartCoughPauseMonarch(
 			PatientVestDeviceDataMonarch deviceEventRecord) {

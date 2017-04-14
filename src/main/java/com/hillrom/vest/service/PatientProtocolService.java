@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientProtocolData;
+import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserPatientAssoc;
@@ -212,7 +213,13 @@ public class PatientProtocolService {
 	     		if(protocolAssocList.isEmpty()){
 	     			return new LinkedList<PatientProtocolData>();
 	     		} else {
-	     			return protocolAssocList;
+	     			List<PatientProtocolData> protocolAssocListToSave = new LinkedList<>();
+	     			for(PatientProtocolData protocolAssoc: protocolAssocList){
+	     				protocolAssoc.setDeviceType("VEST");
+	     				patientProtocolRepository.save(protocolAssoc);
+	     				protocolAssocListToSave.add(protocolAssoc);
+	     			}
+	     			return protocolAssocListToSave;
 	     		}
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);

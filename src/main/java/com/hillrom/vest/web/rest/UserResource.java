@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -434,13 +435,18 @@ public class UserResource {
 				if(deviceValue.equals("MONARCH")){
 					responseObj_Monarch = patientVestDeviceMonarchService.linkVestDeviceWithPatient(id, deviceData);	
 					PatientDevicesAssoc checkPatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
+					List<PatientDevicesAssoc> patDevList = new LinkedList<>();
 					if(Objects.isNull(checkPatientType)){
 						PatientDevicesAssoc addPatientType = new PatientDevicesAssoc(patient.getId(), "MONARCH", "CD", true, deviceData.get("serialNumber").toString(), patient.getHillromId());
 						patientDevicesAssocRepository.save(addPatientType);
+						patDevList.add(addPatientType);
 					}else{
 						checkPatientType.setPatientType("CD");
 						patientDevicesAssocRepository.save(checkPatientType);
+						patDevList.add(checkPatientType);
 					}
+					adherenceCalculationServiceMonarch.executeMergingProcess(patDevList);
+					
 					PatientDevicesAssoc updatePatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
 					updatePatientType.setPatientType("CD");
 					patientDevicesAssocRepository.save(updatePatientType);
@@ -451,13 +457,18 @@ public class UserResource {
 				if(deviceValue.equals("VEST")){				
 					responseObj_Vest = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
 					PatientDevicesAssoc checkPatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
+					List<PatientDevicesAssoc> patDevList = new LinkedList<>();
 					if(Objects.isNull(checkPatientType)){
 						PatientDevicesAssoc addPatientType = new PatientDevicesAssoc(patient.getId(), "VEST", "CD", true, deviceData.get("serialNumber").toString(), patient.getHillromId());
-						patientDevicesAssocRepository.save(addPatientType);						
+						patientDevicesAssocRepository.save(addPatientType);
+						patDevList.add(addPatientType);
 					}else{
 						checkPatientType.setPatientType("CD");
 						patientDevicesAssocRepository.save(checkPatientType);
-					}				
+						patDevList.add(checkPatientType);
+					}
+					adherenceCalculationServiceMonarch.executeMergingProcess(patDevList);
+					
 					PatientDevicesAssoc updatePatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
 					updatePatientType.setPatientType("CD");
 					patientDevicesAssocRepository.save(updatePatientType);

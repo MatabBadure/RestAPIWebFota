@@ -2576,7 +2576,11 @@ public class AdherenceCalculationServiceMonarch{
 					vestCreatedDate = device.getCreatedDate();
 				}else if(device.getDeviceType().equals("MONARCH")){
 					monarchCreatedDate = device.getCreatedDate();
-				}							
+				}
+				if(Objects.isNull(vestCreatedDate) && Objects.isNull(monarchCreatedDate)){
+					vestCreatedDate = DateUtil.getPlusOrMinusTodayLocalDate(-1);
+					monarchCreatedDate = LocalDate.now();
+				}
 			}
 			
 			PatientInfo patientInfo = patientInfoRepository.findOneById(patDevice.getPatientId());

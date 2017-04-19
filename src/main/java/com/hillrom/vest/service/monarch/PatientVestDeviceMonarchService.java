@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientVestDeviceData;
+import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
 import com.hillrom.vest.domain.PatientVestDevicePK;
 import com.hillrom.vest.domain.User;
@@ -26,6 +27,7 @@ import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRepository;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.repository.monarch.PatientMonarchDeviceDataRepository;
 import com.hillrom.vest.repository.monarch.PatientMonarchDeviceRepository;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.util.ExceptionConstants;
@@ -57,7 +59,7 @@ public class PatientVestDeviceMonarchService {
     private UserService userService;
 
     @Inject
-    private PatientVestDeviceDataRepository deviceDataRepository;
+    private PatientMonarchDeviceDataRepository deviceDataRepository;
     
     public Object linkVestDeviceWithPatient(Long id, Map<String, Object> deviceData) throws HillromException {
     	User alreadyLinkedPatientuser = new User();
@@ -266,7 +268,7 @@ public class PatientVestDeviceMonarchService {
 	 }
 	
 	public Double getLatestHMR(Long id,String serialNumber){
-		PatientVestDeviceData deviceData = deviceDataRepository.findTop1ByPatientUserIdAndSerialNumberOrderByHmrDesc(id, serialNumber);
+		PatientVestDeviceDataMonarch deviceData = deviceDataRepository.findTop1ByPatientUserIdAndSerialNumberOrderByHmrDesc(id, serialNumber);
 		if(Objects.nonNull(deviceData))
 			return deviceData.getHmr();
 		else 

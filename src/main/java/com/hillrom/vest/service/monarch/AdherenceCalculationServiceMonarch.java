@@ -206,7 +206,7 @@ public class AdherenceCalculationServiceMonarch{
 	private TherapySessionServiceMonarch therapySessionMonarchService;
 	
 	@Inject
-	private PatientNoEventsMonarchRepository noEventMonarchRepository;
+	private PatientNoEventsRepository noEventRepository;
 	
 	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationServiceMonarch.class);
 	
@@ -777,6 +777,11 @@ public class AdherenceCalculationServiceMonarch{
 		return "Adherence score reset successfully";
 	}
 
+	// Grouping the Patient Compliance Monarch data by date 
+	public SortedMap<LocalDate,List<PatientComplianceMonarch>> groupPatientComplianceByDate(List<PatientComplianceMonarch> patientComplianceMonarch){
+		return new TreeMap<>(patientComplianceMonarch.stream().collect(Collectors.groupingBy(PatientComplianceMonarch :: getDate)));
+	}
+		
 	public String adherenceCalculationBoth(Long userId, String patientId, LocalDate adherenceStartDate, 
 			LocalDate firstTransmissionOfOldDevice, Integer adherenceScore, Long oldUserId, Integer flag){
 		// flag 1 - for adherence reset
@@ -2562,6 +2567,15 @@ public class AdherenceCalculationServiceMonarch{
 		}
 	}
 
+	// To get the notification object for the specific notification date
+	public PatientComplianceMonarch getComplianceForDay(List<PatientComplianceMonarch> complianceMonarchList, LocalDate reqDate) {
+		List<PatientComplianceMonarch> complianceMonarchFilter = complianceMonarchList.stream().filter(PatientComplianceMonarch->PatientComplianceMonarch.getDate().equals(reqDate)).collect(Collectors.toList());
+		if(!complianceMonarchFilter.isEmpty())
+			return complianceMonarchFilter.get(0);
+		else
+			return null;
+	}
+		
 	public void executeMergingProcessLoop(Map<Long,PatientNoEventMonarch> userIdNoEventMap,
 			Map<Long,PatientNoEvent> userIdNoEventMapVest,
 			PatientDevicesAssoc patDevice, int flag){
@@ -2614,13 +2628,21 @@ public class AdherenceCalculationServiceMonarch{
 				List<PatientCompliance> patientComplianceList = patientComplianceRepository.findByPatientUserId(user.getId());
 				List <PatientComplianceMonarch> complianceListToSave = new LinkedList<>();
 				
+				List<PatientComplianceMonarch> patientComplianceMonarchList = patientComplianceMonarchRepository.findByPatientUserId(userOld.getId());
+				
 				for(PatientCompliance patientCompliance : patientComplianceList){
+					
+					Double hmrMonarch = 0.0;
+					PatientComplianceMonarch complianceMonarch = getComplianceForDay(patientComplianceMonarchList, patientCompliance.getDate());
+					if(Objects.nonNull(complianceMonarch))
+						hmrMonarch = complianceMonarch.getHmr();
+					
 					PatientComplianceMonarch compliance = new PatientComplianceMonarch(patientCompliance.getScore(),
 							patientCompliance.getDate(),
 							patientCompliance.getPatient(),
 							patientCompliance.getPatientUser(),
 							patientCompliance.getHmrRunRate(),
-							patientCompliance.getHmr(),
+							hmrMonarch,
 							patientCompliance.isHmrCompliant(),
 							patientCompliance.isSettingsDeviated(),
 							patientCompliance.getMissedTherapyCount(),
@@ -2628,7 +2650,8 @@ public class AdherenceCalculationServiceMonarch{
 							patientCompliance.getSettingsDeviatedDaysCount(),
 							patientCompliance.getGlobalHMRNonAdherenceCounter(),
 							patientCompliance.getGlobalSettingsDeviationCounter(),
-							patientCompliance.getGlobalMissedTherapyCounter());
+							patientCompliance.getGlobalMissedTherapyCounter(),
+							patientCompliance.getHmr());
 					 		
 					complianceListToSave.add(compliance);						 
 				}
@@ -2672,10 +2695,10 @@ public class AdherenceCalculationServiceMonarch{
 					}
 					therapySessionMonarchService.saveAll(therapySessionListToSave);
 					
-					PatientNoEventMonarch patientNoEventMonarch = noEventMonarchRepository.findByPatientUserId(userOld.getId());
+					PatientNoEvent patientNoEvent = noEventRepository.findByPatientUserId(user.getId());
 					
-					PatientNoEventMonarch noEventMonarchToSave = new PatientNoEventMonarch(patientNoEventMonarch.getUserCreatedDate(),
-							patientNoEventMonarch.getFirstTransmissionDate(), patientInfo, user);						
+					PatientNoEventMonarch noEventMonarchToSave = new PatientNoEventMonarch(patientNoEvent.getUserCreatedDate(),
+							patientNoEvent.getFirstTransmissionDate(), patientInfo, user);
 					
 					noEventMonarchService.save(noEventMonarchToSave);
 					

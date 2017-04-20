@@ -95,9 +95,6 @@ public class ExcelOutputService {
         setExcelRows(workBook, excelSheet, deviceEventsListVest);
         autoSizeColumns(excelSheet,11);
         
-        workBook.write(response.getOutputStream());
-        response.getOutputStream().flush();
-        
         //HSSFWorkbook workBook = new HSSFWorkbook();
         HSSFSheet excelSheetMonarch = workBook.createSheet("Therapy Report Monarch");
         /* Freeze top row alone */

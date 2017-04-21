@@ -916,6 +916,7 @@ public class UserSearchRepository {
 			findPatientUserQuery = findPatientUserQuery + QueryConstants.QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_PART2_VEST_DEVTYPE;
 		}else if (deviceType.equals("MONARCH")){
 			findPatientUserQuery = findPatientUserQuery + QueryConstants.QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_PART2_MONARCH_DEVTYPE;
+			findPatientUserQuery += QueryConstants.QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_ADMIN_MONARCH_DEVTYPE_PART2;
 		} else if(deviceType.equals("ALL")){
 			String query1 = findPatientUserQuery + QueryConstants.QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_PART2_VEST_DEVTYPE;
 			String query2 = findPatientUserQuery + QueryConstants.QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_MONARCH_DEVTYPE_EX_ALL;

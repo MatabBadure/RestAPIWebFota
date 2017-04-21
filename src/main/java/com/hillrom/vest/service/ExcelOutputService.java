@@ -13,6 +13,7 @@ import static com.hillrom.vest.config.Constants.SERIAL_NO;
 import static com.hillrom.vest.config.Constants.TIME;
 import static com.hillrom.vest.config.Constants.HILLROM_ID;
 import static com.hillrom.vest.config.Constants.WIFIorLTE_SERIAL_NO;
+import static com.hillrom.vest.config.Constants.INTENSITY;
 
 import java.io.IOException;
 import java.util.List;
@@ -73,6 +74,36 @@ public class ExcelOutputService {
         setExcelHeader(excelSheet,header);
         setExcelRowsForMonarch(workBook, excelSheet, deviceEventsList);
         autoSizeColumns(excelSheet,11);
+        
+        workBook.write(response.getOutputStream());
+        response.getOutputStream().flush();
+	}
+	
+	public void createExcelOutputExcelForAll(HttpServletResponse response,List<PatientVestDeviceData> deviceEventsListVest,List<PatientVestDeviceDataMonarch> deviceEventsListMonarch) throws IOException{
+		log.debug("Received Device Data for Vest :"+deviceEventsListVest+" & Monarch"+deviceEventsListMonarch);
+		
+		response.setContentType("application/vnd.ms-excel");
+        response.setHeader("Content-Disposition", "attachment; filename=TherapyReport.xls");
+        
+        HSSFWorkbook workBook = new HSSFWorkbook();
+        HSSFSheet excelSheet = workBook.createSheet("Therapy Report Vest");
+        /* Freeze top row alone */
+        excelSheet.createFreezePane(0,1);
+    	String[] headerVest = { PATIENT_ID,DATE,TIME, EVENT,
+				SERIAL_NO, DEVICE_ADDRESS, HUB_ADDRESS, FREQUENCY, PRESSURE,DURATION,HMR};
+        setExcelHeader(excelSheet,headerVest);
+        setExcelRows(workBook, excelSheet, deviceEventsListVest);
+        autoSizeColumns(excelSheet,11);
+        
+        //HSSFWorkbook workBook = new HSSFWorkbook();
+        HSSFSheet excelSheetMonarch = workBook.createSheet("Therapy Report Monarch");
+        /* Freeze top row alone */
+        excelSheetMonarch.createFreezePane(0,1);
+    	String[] headerMonarch = { HILLROM_ID,DATE,TIME, EVENT,
+				SERIAL_NO, WIFIorLTE_SERIAL_NO, FREQUENCY, INTENSITY,DURATION,HMR};
+        setExcelHeader(excelSheetMonarch,headerMonarch);
+        setExcelRowsForMonarch(workBook, excelSheetMonarch, deviceEventsListMonarch);
+        autoSizeColumns(excelSheetMonarch,11);
         
         workBook.write(response.getOutputStream());
         response.getOutputStream().flush();

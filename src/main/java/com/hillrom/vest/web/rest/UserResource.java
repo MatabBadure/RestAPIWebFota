@@ -72,6 +72,7 @@ import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PatientDevicesAssocRepository;
+import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.repository.UserRepository;
@@ -230,6 +231,9 @@ public class UserResource {
   @Inject
     private ClinicRepository clinicRepository;
 	
+  	@Inject
+  	private 
+  	PatientInfoRepository patientInfoRepository;
 	/**
 	 * GET /users -> get all users.
 	 */
@@ -1037,7 +1041,7 @@ public class UserResource {
 		
 			if(deviceType.equals("VEST")){
 				List<PatientVestDeviceData>	vestdeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
-				if(vestdeviceData.size() > 0 ){
+				if(!vestdeviceData.isEmpty() ){
 	            	excelOutputService.createExcelOutputExcel(response, vestdeviceData);
 	            }else{
 	            	response.setStatus(204);
@@ -1046,12 +1050,44 @@ public class UserResource {
 			}else if(deviceType.equals("MONARCH")){
 				List<PatientVestDeviceDataMonarch> monarchdeviceData = monarchdeviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
 
-				if(monarchdeviceData.size() > 0 ){
+				if(!monarchdeviceData.isEmpty() ){
 	            	excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
 	            }else{
 	            	response.setStatus(204);
 	            }
-			}		
+			}else if(deviceType.equals("ALL")){
+				
+				PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(id);
+				
+				PatientDevicesAssoc checkPatientTypeVest = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
+				PatientDevicesAssoc checkPatientTypeMonarch = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
+				
+				String patientId;
+				String vestPatientId = patient.getId();
+				String monarchPatientId = patient.getId();
+				if(Objects.nonNull(checkPatientTypeMonarch.getOldPatientId())){
+					patientId = checkPatientTypeMonarch.getOldPatientId();
+					PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
+					monarchPatientId = patientInfoOld.getId();
+				}else if(Objects.nonNull(checkPatientTypeVest.getOldPatientId())){
+					patientId = checkPatientTypeVest.getOldPatientId();
+					PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
+					vestPatientId = patientInfoOld.getId();
+				}				
+				
+				List<PatientVestDeviceData>	vestdeviceData = deviceDataRepository.findByPatientIdAndTimestampBetween(vestPatientId, fromTimestamp, toTimestamp);				
+				List<PatientVestDeviceDataMonarch> monarchdeviceData = monarchdeviceDataRepository.findByPatientIdAndTimestampBetween(monarchPatientId, fromTimestamp, toTimestamp);
+				
+				if(!vestdeviceData.isEmpty() && monarchdeviceData.isEmpty() ){
+	            	excelOutputService.createExcelOutputExcel(response, vestdeviceData);
+	            }else if(vestdeviceData.isEmpty() && !monarchdeviceData.isEmpty() ){
+	            	excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
+	            }else if(!vestdeviceData.isEmpty() && !monarchdeviceData.isEmpty() ){
+	            	excelOutputService.createExcelOutputExcelForAll(response, vestdeviceData, monarchdeviceData);
+	            }else{
+	            	response.setStatus(204);
+	            }
+			}
 		
 
         } catch (Exception ex) {

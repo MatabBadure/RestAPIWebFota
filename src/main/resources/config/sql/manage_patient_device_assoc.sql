@@ -1,5 +1,5 @@
 DELIMITER $$
-CREATE DEFINER=`root`@`%` PROCEDURE `manage_patient_device_assoc`(
+CREATE DEFINER=`root`@`localhost` PROCEDURE `manage_patient_device_assoc`(
 	IN operation_type_indicator VARCHAR(10),
     IN pat_patient_id varchar(50),
 	IN pat_device_type varchar(50),
@@ -49,12 +49,8 @@ IF operation_type_indicator = 'CREATE' THEN
 		SELECT `patient_id`, `serial_number` ,`patient_type` ,`device_type`,`hillrom_id` INTO temp_patient_info_id, temp_serial_number ,device_patient_type , temp_device_type,device_hillrom_id
 		FROM `PATIENT_DEVICES_ASSOC`
 		WHERE `patient_id` = pat_patient_id;
-			
-		IF temp_patient_info_id IS NULL THEN
-			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Device Serial No.  not associated with the patient';
-		END IF;
-	
-		IF  pat_device_type = 'MONARCH' AND device_hillrom_id IS NOT NULL  THEN
+		
+		IF  pat_device_type = 'MONARCH' AND device_hillrom_id IS NOT NULL THEN
 		
 				SELECT `hillrom_id`,`patient_id` INTO vest_device_hillrom_id ,vest_device_patient_id FROM `PATIENT_DEVICES_ASSOC` 
 				WHERE `hillrom_id` = pat_hillrom_id AND `device_type` = 'VEST';
@@ -71,7 +67,7 @@ IF operation_type_indicator = 'CREATE' THEN
 						INSERT INTO `PATIENT_DEVICES_ASSOC`
 						(`patient_id`, `device_type`, `is_active`, `serial_number`, `hillrom_id`, `patient_type`, `created_date`, `modified_date`,
 						`old_patient_id`,`training_date`,`diagnosis1`,`diagnosis2`,`diagnosis3`,`diagnosis4`,`garment_type`,`garment_size`,`garment_color`)
-						VALUES	(pat_patient_id,pat_device_type,1,pat_device_serial_number,pat_hillrom_id,'CD',today_date,null,pat_old_id,pat_training_date,pat_diagnosis_code1,pat_diagnosis_code2,pat_diagnosis_code3,pat_diagnosis_code4,pat_garment_type,pat_garment_size,pat_garment_color);
+						VALUES	(pat_patient_id,pat_device_type,1,pat_device_serial_number,pat_hillrom_id,'CD',today_date,today_date,pat_old_id,pat_training_date,pat_diagnosis_code1,pat_diagnosis_code2,pat_diagnosis_code3,pat_diagnosis_code4,pat_garment_type,pat_garment_size,pat_garment_color);
 						
 					COMMIT;						
 

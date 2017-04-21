@@ -22,4 +22,6 @@ public interface PatientVestDeviceDataRepository extends
 	public List<PatientVestDeviceData> findByPatientUserIdAndTimestampBetween(Long id,Long from,Long to);
 	
 	public PatientVestDeviceData findTop1ByPatientUserIdAndSerialNumberOrderByHmrDesc(Long id,String serialNumber);
+	
+	public List<PatientVestDeviceData> findByPatientIdAndTimestampBetween(String patientId,Long from,Long to);
 }

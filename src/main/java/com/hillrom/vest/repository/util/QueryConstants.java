@@ -13,7 +13,7 @@ public class QueryConstants {
 			+ " or lower(user.hillrom_id) like lower(:queryString) or lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString)) ";
 	
 	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_VEST = " and "
-			+ " patient_dev_assoc.device_type in ('VEST','ALL') "
+			+ " patient_dev_assoc.ptype in ('VEST','ALL') "
 			+ " and (lower(user.first_name) "
 			+ " like lower(:queryString) or lower(user.last_name) like lower(:queryString) "
 			+ " or lower(user.email) like lower(:queryString) or lower(CONCAT(user.first_name,' ',user.last_name)) "
@@ -44,7 +44,7 @@ public class QueryConstants {
 			+ " group by patInfoh.id) as hcpname, patient_clinic.mrn_id as mrnid,"
 			+ " patient_clinic.expired as isExpired, pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,"
 			+ " pc.missed_therapy_count as isMissedTherapy,clinic.adherence_setting as adherencesetting,"
-			+ " patient_dev_assoc.device_type as devType from USER user"
+			+ " patient_dev_assoc.ptype as devType from USER user"
 			+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '" + SELF + "'"
 			+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id"
 			+ " join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id  "
@@ -83,7 +83,7 @@ public class QueryConstants {
 			+ " group by patInfoh.id) as hcpname, patient_clinic.mrn_id as mrnid,"
 			+ " patient_clinic.expired as isExpired, pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,"
 			+ " pc.missed_therapy_count as isMissedTherapy,clinic.adherence_setting as adherencesetting,"
-			+ " patient_dev_assoc.device_type as devType from USER user"
+			+ " patient_dev_assoc.ptype as devType from USER user"
 			+ " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '" + SELF + "'"
 			+ " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id"
 			+ " join USER_PATIENT_ASSOC upa_hcp on patInfo.id = upa_hcp.patient_id  "
@@ -193,7 +193,7 @@ public class QueryConstants {
 				+" user_clinic.mrn_id as mrnid, clinic.id as pclinicid,  GROUP_CONCAT(clinic.name) as clinicName, "
 				+" user.expired as isExpired, pc.compliance_score as adherence,   pc.last_therapy_session_date as last_date, "
 				+" pc.is_hmr_compliant as isHMRNonCompliant, pc.is_settings_deviated as isSettingsDeviated, "
-				+" pc.missed_therapy_count as isMissedTherapy, clinic.adherence_setting as adherencesetting,patient_dev_assoc.device_type as devType " 
+				+" pc.missed_therapy_count as isMissedTherapy, clinic.adherence_setting as adherencesetting,patient_dev_assoc.ptype as devType " 
 				+" from USER user "
 				+" join " 
 				+" USER_PATIENT_ASSOC  upa on user.id = upa.user_id  and upa.relation_label = 'Self' join "
@@ -216,7 +216,7 @@ public class QueryConstants {
 				+" left outer join PATIENT_COMPLIANCE_MONARCH pc on user.id = pc.user_id " 
 				+" AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) " 
 				+" left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and  user_clinic.patient_id = patInfo.id"  
-				+" where patient_dev_assoc.device_type in ('MONARCH','ALL')   group by user.id) as associated_patient " 
+				+" where patient_dev_assoc.ptype in ('MONARCH','ALL')   group by user.id) as associated_patient " 
 				+" left outer join " 
 				+" (select  GROUP_CONCAT(huser.last_name ,' ',huser.first_name ) as hName,  clinic.id as hclinicid " 
 				+" from USER huser " 
@@ -244,7 +244,7 @@ public class QueryConstants {
 				+" pc.compliance_score as adherence,   pc.last_therapy_session_date "
 				+" as last_date,pc.is_hmr_compliant as isHMRNonCompliant, pc.is_settings_deviated "
 				+" as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy, " 
-				+" clinic.adherence_setting as adherencesetting,patient_dev_assoc.device_type as devType " 
+				+" clinic.adherence_setting as adherencesetting,patient_dev_assoc.ptype as devType " 
 				+" from USER user " 
 				+" join "
 				+" USER_PATIENT_ASSOC  upa on user.id = upa.user_id  and upa.relation_label = 'Self' "
@@ -270,7 +270,7 @@ public class QueryConstants {
 				+" pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate())	"  
 				+" left outer join " 
 				+" CLINIC clinic on user_clinic.clinic_id = clinic.id and  user_clinic.patient_id = patInfo.id "		
-				+" where patient_dev_assoc.device_type IN ('VEST','ALL') " 
+				+" where patient_dev_assoc.ptype IN ('VEST') " 
 				+" group by user.id) as associated_patient " 
 				+" left outer join" 
 				+" (select "  
@@ -298,7 +298,7 @@ public class QueryConstants {
 			+ " GROUP_CONCAT(clinic.name) as clinicName, user.expired as isExpired, pc.compliance_score as adherence,  "
 			+ " pc.last_therapy_session_date as last_date,pc.is_hmr_compliant as isHMRNonCompliant,"
 			+ " pc.is_settings_deviated as isSettingsDeviated,"
-			+ " pc.missed_therapy_count as isMissedTherapy, clinic.adherence_setting as adherencesetting,patient_dev_assoc.device_type as devType from USER user join USER_PATIENT_ASSOC  upa on user.id = upa.user_id "
+			+ " pc.missed_therapy_count as isMissedTherapy, clinic.adherence_setting as adherencesetting,patient_dev_assoc.ptype as devType from USER user join USER_PATIENT_ASSOC  upa on user.id = upa.user_id "
 			+ " and upa.relation_label = '" + SELF + "' join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
 			+ " left outer join CLINIC_PATIENT_ASSOC user_clinic on user_clinic.patient_id = patInfo.id "
 			+ " left outer join " 
@@ -316,7 +316,7 @@ public class QueryConstants {
 
 	public static String QUERY_PATIENT_SEARCH_PART2_VEST = " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) "
 			+ " left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and  user_clinic.patient_id = patInfo.id "
-			+ " where patient_dev_assoc.device_type IN ('VEST','ALL')  "
+			+ " where patient_dev_assoc.ptype IN ('VEST','ALL')  "
 			+ " group by user.id) as associated_patient left outer join (select  GROUP_CONCAT(huser.last_name ,' ',huser.first_name ) as hName, "
 			+ " clinic.id as hclinicid from USER huser join USER_AUTHORITY user_authorityh on user_authorityh.user_id = huser.id "
 			+ " and user_authorityh.authority_name = '" + HCP + "' "
@@ -327,7 +327,7 @@ public class QueryConstants {
 
 	public static String QUERY_PATIENT_SEARCH_PART2_MONARCH = " left outer join PATIENT_COMPLIANCE_MONARCH pc on user.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) "
 			+ " left outer join CLINIC clinic on user_clinic.clinic_id = clinic.id and  user_clinic.patient_id = patInfo.id "
-			+ " where patient_dev_assoc.device_type IN ('MONARCH','ALL')   "
+			+ " where patient_dev_assoc.ptype IN ('MONARCH','ALL')   "
 			+ " group by user.id) as associated_patient left outer join (select  GROUP_CONCAT(huser.last_name ,' ',huser.first_name ) as hName, "
 			+ " clinic.id as hclinicid from USER huser join USER_AUTHORITY user_authorityh on user_authorityh.user_id = huser.id "
 			+ " and user_authorityh.authority_name = '" + HCP + "' "
@@ -342,7 +342,7 @@ public class QueryConstants {
 			+ " user.title,user.hillrom_id,user.created_date as createdAt,"
 			+ " user.activated as isActivated, patInfo.state , compliance_score, pc.last_therapy_session_date as last_date, patient_clinic.expired, patient_clinic.mrn_id as mrnId, "
 			+ " pc.is_hmr_compliant as isHMRNonCompliant,pc.is_settings_deviated as isSettingsDeviated,pc.missed_therapy_count as isMissedTherapy,clinic.adherence_setting as adherencesetting,"
-			+ " patient_dev_assoc.device_type as devType "
+			+ " patient_dev_assoc.ptype as devType "
 			+ " from USER user" + " join USER_AUTHORITY user_authority on user_authority.user_id = user.id  "
 			+ " and user_authority.authority_name = '" + PATIENT + "' and "
 			+ " (lower(user.first_name) like lower(:queryString) or  "
@@ -365,18 +365,19 @@ public class QueryConstants {
 	
 	public static String QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_PART2_VEST_DEVTYPE = " left outer join PATIENT_COMPLIANCE pc on user.id = pc.user_id "
 			+ " AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) "
-			+ " where patient_dev_assoc.device_type IN ('VEST','ALL') group by pc.user_id";
+			+ " where patient_dev_assoc.ptype IN ('VEST','ALL') group by pc.user_id";
 
 	public static String QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_PART2_MONARCH_DEVTYPE = " left outer join PATIENT_COMPLIANCE_MONARCH pc on user.id = pc.user_id "
 			+ " AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) ";
 			
 	
-	public static String QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_PART3_MONARCH_DEVTYPE = " where patient_dev_assoc.device_type IN ('MONARCH','ALL') group by pc.user_id";
+	public static String QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_PART3_MONARCH_DEVTYPE = " where patient_dev_assoc.ptype IN ('MONARCH','ALL') group by pc.user_id";
 	
-	public static String QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_MONARCH_DEVTYPE = QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_PART2_MONARCH_DEVTYPE + QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_PART3_MONARCH_DEVTYPE;
+	public static String QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_MONARCH_DEVTYPE = QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_PART2_MONARCH_DEVTYPE 
+			+ QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_PART3_MONARCH_DEVTYPE;
 	
-	public static String QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_MONARCH_DEVTYPE_EX_ALL = QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_PART2_MONARCH_DEVTYPE   
-			+ " where patient_dev_assoc.device_type IN ('MONARCH') group by pc.user_id";
+	public static String QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_MONARCH_DEVTYPE_EX_ALL = QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_PART2_MONARCH_DEVTYPE 
+			+ " where patient_dev_assoc.ptype IN ('MONARCH') group by pc.user_id";
 	
 	public static String QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_ADMIN_VEST_DEVTYPE = " select user.id,user.email,user.first_name as firstName,user.last_name as lastName,  "
 			+ " IF(user.is_deleted=true,1,IF(patient_clinic.is_active=true,0,IF(patient_clinic.is_active = NULL,user.is_deleted,1))) as isDeleted ,user.zipcode,patInfo.address,patInfo.city,user.dob,"
@@ -398,7 +399,7 @@ public class QueryConstants {
 			+ " where patInfo.id = patInfoh.id group by patInfoh.id) as hcpname,patient_clinic.mrn_id as mrnid,"
 			+ " patient_clinic.expired as isExpired, pc.is_hmr_compliant as isHMRNonCompliant,"
 			+ " pc.is_settings_deviated as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy, clinic.adherence_setting as adherencesetting,"
-			+ " patient_dev_assoc.device_type as devType from USER user "
+			+ " patient_dev_assoc.ptype as devType from USER user "
 			+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = '"
 			+ PATIENT + "'" + " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"
 			+ SELF + "' " + " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id"
@@ -418,7 +419,7 @@ public class QueryConstants {
 			+ " lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString)  or "
 			+ " lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString) or "
 			+ " lower(user.hillrom_id) like lower(:queryString)) "			
-			+ " where clinic.id= ':clinicId' and patient_dev_assoc.device_type in ('VEST','ALL')";
+			+ " where clinic.id= ':clinicId' and patient_dev_assoc.ptype in ('VEST','ALL')";
 	
 	
 	public static String QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_ADMIN_MONARCH_DEVTYPE_PART1 = " select user.id,user.email,user.first_name as firstName,user.last_name as lastName,  "
@@ -441,7 +442,7 @@ public class QueryConstants {
 			+ " where patInfo.id = patInfoh.id group by patInfoh.id) as hcpname,patient_clinic.mrn_id as mrnid,"
 			+ " patient_clinic.expired as isExpired, pc.is_hmr_compliant as isHMRNonCompliant,"
 			+ " pc.is_settings_deviated as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy, clinic.adherence_setting as adherencesetting,"
-			+ " patient_dev_assoc.device_type as devType from USER user "
+			+ " patient_dev_assoc.ptype as devType from USER user "
 			+ " left outer join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = '"
 			+ PATIENT + "'" + " join USER_PATIENT_ASSOC  upa on user.id = upa.user_id and upa.relation_label = '"
 			+ SELF + "' " + " join PATIENT_INFO patInfo on upa.patient_id = patInfo.id"
@@ -462,15 +463,15 @@ public class QueryConstants {
 			+ " lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString) or "
 			+ " lower(user.hillrom_id) like lower(:queryString)) ";
 	
-	public static String QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_ADMIN_MONARCH_DEVTYPE_PART2 = " where clinic.id= ':clinicId' and patient_dev_assoc.device_type in ('MONARCH','ALL')";
+	public static String QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_ADMIN_MONARCH_DEVTYPE_PART2 = " where clinic.id= ':clinicId' and patient_dev_assoc.ptype in ('MONARCH','ALL')";
 	
 	public static String QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_ADMIN_MONARCH_DEVTYPE = QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_ADMIN_MONARCH_DEVTYPE_PART1 + QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_ADMIN_MONARCH_DEVTYPE_PART2;
 	
 	public static String QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_ADMIN_MONARCH_DEVTYPE_EX_ALL = QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_ADMIN_MONARCH_DEVTYPE_PART1   
-			+ " where clinic.id= ':clinicId' and patient_dev_assoc.device_type in ('MONARCH')";
+			+ " where clinic.id= ':clinicId' and patient_dev_assoc.ptype in ('MONARCH')";
 	
 	
-	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH_ALL = " and patient_dev_assoc.device_type in ('MONARCH','ALL')";
-	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH_DEVTYPE = " and patient_dev_assoc.device_type in ('MONARCH')";
+	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH_ALL = " and patient_dev_assoc.ptype in ('MONARCH','ALL')";
+	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH_DEVTYPE = " and patient_dev_assoc.ptype in ('MONARCH')";
 
 }

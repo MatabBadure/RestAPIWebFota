@@ -75,6 +75,9 @@ public class PatientComplianceMonarch extends AbstractAuditingEntity implements 
 	
 	private Double hmr = 0.0d;
 	
+	@Column(name="hmr_vest")
+	private Double hmrVest = 0.0d;	
+	
 	@Column(name="settings_deviated_days_count")
 	private int settingsDeviatedDaysCount  = 0;
 	
@@ -140,7 +143,7 @@ public class PatientComplianceMonarch extends AbstractAuditingEntity implements 
 			PatientInfo patient, User patientUser,Integer hmrRunRate,double hmr, Boolean isHMRCompliant,
 			Boolean isSettingsDeviated,Integer missedTherapyCount,LocalDate latestTherapyDate,			
 			Integer settingsDeviatedDaysCount,Integer globalHMRNonAdherenceCounter, 
-			Integer globalSettingsDeviationCounter, Integer globalMissedTherapyCounter) {
+			Integer globalSettingsDeviationCounter, Integer globalMissedTherapyCounter, double hmrVest) {
 		super();
 		this.score = score;
 		this.date = date;
@@ -156,6 +159,7 @@ public class PatientComplianceMonarch extends AbstractAuditingEntity implements 
 		this.globalHMRNonAdherenceCounter = globalHMRNonAdherenceCounter;
 		this.globalSettingsDeviationCounter = globalSettingsDeviationCounter;
 		this.globalMissedTherapyCounter = globalMissedTherapyCounter;
+		this.hmrVest = hmrVest;
 	}
 	
 	public Long getId() {
@@ -259,6 +263,20 @@ public class PatientComplianceMonarch extends AbstractAuditingEntity implements 
 
 	public void setHmr(Double hmr) {
 		this.hmr = hmr;
+	}	
+	
+	/**
+	 * @return the hmrVest
+	 */
+	public Double getHmrVest() {
+		return hmrVest;
+	}
+
+	/**
+	 * @param hmrVest the hmrVest to set
+	 */
+	public void setHmrVest(Double hmrVest) {
+		this.hmrVest = hmrVest;
 	}
 
 	public int getSettingsDeviatedDaysCount() {

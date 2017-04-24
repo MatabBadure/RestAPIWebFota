@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -71,6 +72,7 @@ import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PatientDevicesAssocRepository;
+import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.repository.UserRepository;
@@ -95,6 +97,7 @@ import com.hillrom.vest.service.monarch.TherapySessionServiceMonarch;
 import com.hillrom.vest.service.monarch.AdherenceCalculationServiceMonarch;
 import com.hillrom.vest.service.monarch.PatientComplianceMonarchService;
 import com.hillrom.vest.service.util.CsvUtil;
+import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.Filter;
@@ -228,6 +231,9 @@ public class UserResource {
   @Inject
     private ClinicRepository clinicRepository;
 	
+  	@Inject
+  	private 
+  	PatientInfoRepository patientInfoRepository;
 	/**
 	 * GET /users -> get all users.
 	 */
@@ -434,13 +440,20 @@ public class UserResource {
 				if(deviceValue.equals("MONARCH")){
 					responseObj_Monarch = patientVestDeviceMonarchService.linkVestDeviceWithPatient(id, deviceData);	
 					PatientDevicesAssoc checkPatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
+					List<PatientDevicesAssoc> patDevList = new LinkedList<>();
 					if(Objects.isNull(checkPatientType)){
 						PatientDevicesAssoc addPatientType = new PatientDevicesAssoc(patient.getId(), "MONARCH", "CD", true, deviceData.get("serialNumber").toString(), patient.getHillromId());
 						patientDevicesAssocRepository.save(addPatientType);
+						patDevList.add(addPatientType);
 					}else{
-						checkPatientType.setPatientType("CD");
+						checkPatientType.setPatientType("CD");						
+						checkPatientType.setCreatedDate(Objects.isNull(checkPatientType.getCreatedDate()) ? 
+															DateUtil.getPlusOrMinusTodayLocalDate(-1) :  checkPatientType.getCreatedDate());
 						patientDevicesAssocRepository.save(checkPatientType);
+						patDevList.add(checkPatientType);
 					}
+					adherenceCalculationServiceMonarch.executeMergingProcess(patDevList, 1);
+					
 					PatientDevicesAssoc updatePatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
 					updatePatientType.setPatientType("CD");
 					patientDevicesAssocRepository.save(updatePatientType);
@@ -451,13 +464,21 @@ public class UserResource {
 				if(deviceValue.equals("VEST")){				
 					responseObj_Vest = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
 					PatientDevicesAssoc checkPatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
+					List<PatientDevicesAssoc> patDevList = new LinkedList<>();
 					if(Objects.isNull(checkPatientType)){
 						PatientDevicesAssoc addPatientType = new PatientDevicesAssoc(patient.getId(), "VEST", "CD", true, deviceData.get("serialNumber").toString(), patient.getHillromId());
-						patientDevicesAssocRepository.save(addPatientType);						
+						patientDevicesAssocRepository.save(addPatientType);
+						patDevList.add(addPatientType);
 					}else{
-						checkPatientType.setPatientType("CD");
+						checkPatientType.setPatientType("CD");						
+						checkPatientType.setCreatedDate(Objects.isNull(checkPatientType.getCreatedDate()) ? 
+								DateUtil.getPlusOrMinusTodayLocalDate(-1) :  checkPatientType.getCreatedDate());
+						
 						patientDevicesAssocRepository.save(checkPatientType);
-					}				
+						patDevList.add(checkPatientType);
+					}
+					adherenceCalculationServiceMonarch.executeMergingProcess(patDevList, 1);
+					
 					PatientDevicesAssoc updatePatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
 					updatePatientType.setPatientType("CD");
 					patientDevicesAssocRepository.save(updatePatientType);
@@ -1020,7 +1041,7 @@ public class UserResource {
 		
 			if(deviceType.equals("VEST")){
 				List<PatientVestDeviceData>	vestdeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
-				if(vestdeviceData.size() > 0 ){
+				if(!vestdeviceData.isEmpty() ){
 	            	excelOutputService.createExcelOutputExcel(response, vestdeviceData);
 	            }else{
 	            	response.setStatus(204);
@@ -1029,12 +1050,44 @@ public class UserResource {
 			}else if(deviceType.equals("MONARCH")){
 				List<PatientVestDeviceDataMonarch> monarchdeviceData = monarchdeviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
 
-				if(monarchdeviceData.size() > 0 ){
+				if(!monarchdeviceData.isEmpty() ){
 	            	excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
 	            }else{
 	            	response.setStatus(204);
 	            }
-			}		
+			}else if(deviceType.equals("ALL")){
+				
+				PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(id);
+				
+				PatientDevicesAssoc checkPatientTypeVest = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
+				PatientDevicesAssoc checkPatientTypeMonarch = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
+				
+				String patientId;
+				String vestPatientId = patient.getId();
+				String monarchPatientId = patient.getId();
+				if(Objects.nonNull(checkPatientTypeMonarch.getOldPatientId())){
+					patientId = checkPatientTypeMonarch.getOldPatientId();
+					PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
+					monarchPatientId = patientInfoOld.getId();
+				}else if(Objects.nonNull(checkPatientTypeVest.getOldPatientId())){
+					patientId = checkPatientTypeVest.getOldPatientId();
+					PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
+					vestPatientId = patientInfoOld.getId();
+				}				
+				
+				List<PatientVestDeviceData>	vestdeviceData = deviceDataRepository.findByPatientIdAndTimestampBetween(vestPatientId, fromTimestamp, toTimestamp);				
+				List<PatientVestDeviceDataMonarch> monarchdeviceData = monarchdeviceDataRepository.findByPatientIdAndTimestampBetween(monarchPatientId, fromTimestamp, toTimestamp);
+				
+				if(!vestdeviceData.isEmpty() && monarchdeviceData.isEmpty() ){
+	            	excelOutputService.createExcelOutputExcel(response, vestdeviceData);
+	            }else if(vestdeviceData.isEmpty() && !monarchdeviceData.isEmpty() ){
+	            	excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
+	            }else if(!vestdeviceData.isEmpty() && !monarchdeviceData.isEmpty() ){
+	            	excelOutputService.createExcelOutputExcelForAll(response, vestdeviceData, monarchdeviceData);
+	            }else{
+	            	response.setStatus(204);
+	            }
+			}
 		
 
         } catch (Exception ex) {

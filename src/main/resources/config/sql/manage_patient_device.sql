@@ -35,7 +35,7 @@ IF operation_type_indicator = 'CREATE' THEN
 	END IF;
 	
 	SELECT `patient_id`, `serial_number`, `is_active` INTO pvdh_patient_id, pvdh_serial_number, pvdh_is_active FROM `PATIENT_VEST_DEVICE_HISTORY`
-	WHERE `serial_number` = pat_device_serial_number;
+	WHERE `serial_number` = pat_device_serial_number and `patient_id` = patient_id;
     
 	START TRANSACTION;
 	  
@@ -57,7 +57,7 @@ IF operation_type_indicator = 'CREATE' THEN
 		IF pvdh_is_active IS NOT NULL THEN
 			IF pvdh_is_active =0 THEN
 					UPDATE `PATIENT_VEST_DEVICE_HISTORY` pvdh SET
-					`is_active` = 1 WHERE pvdh.`serial_number` = pvdh_serial_number;
+					`is_active` = 1 WHERE pvdh.`serial_number` = pvdh_serial_number  and pvdh.`patient_id` = pvdh_patient_id;
 			END IF;
 		ELSE 
 			INSERT INTO `PATIENT_VEST_DEVICE_HISTORY`

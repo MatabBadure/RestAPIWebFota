@@ -1362,21 +1362,26 @@ public class UserService {
 		Note memoNote = null;
 		memoNote = noteService.findMemoNotesForPatientId(id, patientInfo.getId());
 		
-		if(deviceType.equals(VEST)){
+		// Added Objects.isNull(deviceType) for patient before device associated
+		if((Objects.nonNull(deviceType) && deviceType.equals(VEST)) || Objects.isNull(deviceType)){
 			compliance = complianceService.findLatestComplianceByPatientUserId(id);
 		}
-		else if(deviceType.equals(MONARCH)){
+		else {
 			complianceMonarch = complianceMonarchService.findLatestComplianceByPatientUserId(id);
 		}
 		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patientInfo.getId());
-		PatientUserVO patientUserVO =  new PatientUserVO(user,patientInfo,deviceType);
+		
+		PatientUserVO patientUserVO;
+		if(Objects.nonNull(deviceType))
+			patientUserVO =  new PatientUserVO(user,patientInfo,deviceType);
+		else
+			patientUserVO =  new PatientUserVO(user,patientInfo);
 
-		// to do for Monarch
-		if(deviceType.equals(VEST)){
+		if(Objects.nonNull(deviceType) && deviceType.equals(VEST)){
 			if(Objects.nonNull(compliance))
 			patientUserVO.setHoursOfUsage((compliance.getHmr()/(60*60)));
 		}
-		else if(deviceType.equals(MONARCH)){
+		else if(Objects.nonNull(deviceType)){
 			if(Objects.nonNull(complianceMonarch))
 			patientUserVO.setHoursOfUsage((complianceMonarch.getHmr()/(60*60)));
 		}
@@ -1733,7 +1738,11 @@ public class UserService {
     				if(patientAssocHRIDList != null){
     					for(UserPatientAssoc userPatientAssocHRID : patientAssocHRIDList){
     	    				if(userPatientAssoc.getUser().getId().equals(caregiverId)){
-    	    					CareGiverVO careGiverPatientVO = new CareGiverVO(userPatientAssocHRID.getUserRole(), userPatientAssocHRID.getRelationshipLabel(), userPatientAssocHRID.getUser(),userPatientAssocHRID.getUser().getId(),userPatientAssocHRID.getPatient().getId(),deviceType);
+    	    					CareGiverVO careGiverPatientVO;
+    	    					if(Objects.nonNull(deviceType))
+    	    						careGiverPatientVO = new CareGiverVO(userPatientAssocHRID.getUserRole(), userPatientAssocHRID.getRelationshipLabel(), userPatientAssocHRID.getUser(),userPatientAssocHRID.getUser().getId(),userPatientAssocHRID.getPatient().getId(),deviceType);
+    	    					else 
+    	    						careGiverPatientVO = new CareGiverVO(userPatientAssocHRID.getUserRole(), userPatientAssocHRID.getRelationshipLabel(), userPatientAssocHRID.getUser(),userPatientAssocHRID.getUser().getId(),userPatientAssocHRID.getPatient().getId());
     	    					caregiverPatientList.add(careGiverPatientVO);
     	    					
     	    				}

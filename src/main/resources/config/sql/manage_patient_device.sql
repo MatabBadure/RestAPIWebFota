@@ -29,13 +29,13 @@ IF operation_type_indicator = 'CREATE' THEN
 
 	SELECT `id`, `serial_number`, `bluetooth_id` INTO temp_patient_info_id, temp_serial_number, temp_bluetooth_id FROM `PATIENT_INFO`
 	WHERE `serial_number` = pat_device_serial_number OR `bluetooth_id` =  pat_bluetooth_id;
-	
-	SELECT `patient_id`, `serial_number`, `is_active` INTO pvdh_patient_id, pvdh_serial_number, pvdh_is_active FROM `PATIENT_VEST_DEVICE_HISTORY`
-	WHERE `serial_number` = pat_device_serial_number;
 
 	IF temp_patient_info_id IS NOT NULL THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Device Serial No. or Bluetooth ID already associated with a patient';
 	END IF;
+	
+	SELECT `patient_id`, `serial_number`, `is_active` INTO pvdh_patient_id, pvdh_serial_number, pvdh_is_active FROM `PATIENT_VEST_DEVICE_HISTORY`
+	WHERE `serial_number` = pat_device_serial_number;
     
 	START TRANSACTION;
 	  

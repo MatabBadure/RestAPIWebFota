@@ -28,12 +28,13 @@ IF operation_type_indicator = 'CREATE' THEN
 	SELECT `id`, `serial_number` INTO temp_patient_info_id, temp_serial_number FROM `PATIENT_INFO`
 	WHERE `serial_number` = pat_device_serial_number;
 
-	SELECT `patient_id`, `serial_number`, `is_active` INTO pvdhm_patient_id, pvdhm_serial_number, pvdhm_is_active FROM `PATIENT_VEST_DEVICE_HISTORY_MONARCH`
-	WHERE `serial_number` = pat_device_serial_number;
 	
 	IF temp_patient_info_id IS NOT NULL THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Device Serial No. already associated with a patient';
 	END IF;
+
+	SELECT `patient_id`, `serial_number`, `is_active` INTO pvdhm_patient_id, pvdhm_serial_number, pvdhm_is_active FROM `PATIENT_VEST_DEVICE_HISTORY_MONARCH`
+	WHERE `serial_number` = pat_device_serial_number;
     
 	START TRANSACTION;
 	  

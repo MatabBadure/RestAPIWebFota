@@ -777,6 +777,15 @@ public class UserService {
 		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
 	}
 	
+	private void sendEmailNotificationReactivate(String baseUrl, UserExtension user) {
+		user.setActivationKey(RandomUtil.generateActivationKey());
+		user.setActivated(false);
+		user.setActivationLinkSentDate(DateTime.now());
+		userRepository.saveAndFlush(user);
+		mailService.sendReactivationEmail(user, baseUrl);
+		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
+	}
+	
 	private void reSendEmailNotification(String baseUrl, UserExtension user) {
 		user.setActivationKey(RandomUtil.generateActivationKey());
 		user.setActivated(false);
@@ -1849,7 +1858,8 @@ public class UserService {
 					if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 						reactivatePatientUser(existingUser);
 						//hill-2178
-						mailService.sendReactivationEmail(existingUser,baseUrl);
+						//mailService.sendReactivationEmail(existingUser,baseUrl);
+						sendEmailNotificationReactivate(baseUrl, existingUser);
 						jsonObject.put("message", MessageConstants.HR_215);
 					} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ADMIN)) 
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ACCT_SERVICES))
@@ -1863,7 +1873,8 @@ public class UserService {
 						existingUser.setDeleted(false);
 						userExtensionRepository.saveAndFlush(existingUser);
 						//hill-2178
-						mailService.sendReactivationEmail(existingUser,baseUrl);
+						//mailService.sendReactivationEmail(existingUser,baseUrl);
+						sendEmailNotificationReactivate(baseUrl, existingUser);
 						jsonObject.put("message", MessageConstants.HR_235);
 					} else {
 						throw new HillromException(ExceptionConstants.HR_604);

@@ -86,7 +86,7 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 ELSEIF operation_type_indicator ='INACTIVATE' THEN
 
 		SELECT `id`, `serial_number` INTO temp_patient_info_id, temp_serial_number FROM `PATIENT_INFO`
-		WHERE `serial_number` = pat_device_serial_number  AND `patient_id` = patient_id;
+		WHERE `serial_number` = pat_device_serial_number  AND `id` = patient_id;
         
         IF temp_patient_info_id IS NULL THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Device Serial No.  not associated with the patient';

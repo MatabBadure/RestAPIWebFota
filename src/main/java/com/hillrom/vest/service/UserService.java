@@ -499,7 +499,6 @@ public class UserService {
 		try {
 	    	assignValuesToUserObj(userExtensionDTO, newUser);
 			assignStatusAndRoleAndActivationKey(userExtensionDTO, newUser);
-			asdf
 			userExtensionRepository.save(newUser);
 			log.debug("Created Information for User: {}", newUser);
 			return newUser;

@@ -1362,21 +1362,27 @@ public class UserService {
 		Note memoNote = null;
 		memoNote = noteService.findMemoNotesForPatientId(id, patientInfo.getId());
 		
-		if(deviceType.equals(VEST)){
+		// Added Objects.isNull(deviceType) for patient before device associated
+		if(deviceType.equals(VEST) || Objects.isNull(deviceType)){
 			compliance = complianceService.findLatestComplianceByPatientUserId(id);
 		}
 		else if(deviceType.equals(MONARCH)){
 			complianceMonarch = complianceMonarchService.findLatestComplianceByPatientUserId(id);
 		}
 		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patientInfo.getId());
-		PatientUserVO patientUserVO =  new PatientUserVO(user,patientInfo,deviceType);
+		
+		PatientUserVO patientUserVO;
+		if(Objects.nonNull(deviceType) && !deviceType.isEmpty() && !deviceType.equals(""))
+			patientUserVO =  new PatientUserVO(user,patientInfo,deviceType);
+		else
+			patientUserVO =  new PatientUserVO(user,patientInfo);
 
 		// to do for Monarch
-		if(deviceType.equals(VEST)){
+		if(Objects.nonNull(deviceType) && deviceType.equals(VEST)){
 			if(Objects.nonNull(compliance))
 			patientUserVO.setHoursOfUsage((compliance.getHmr()/(60*60)));
 		}
-		else if(deviceType.equals(MONARCH)){
+		else if(Objects.nonNull(deviceType) && deviceType.equals(MONARCH)){
 			if(Objects.nonNull(complianceMonarch))
 			patientUserVO.setHoursOfUsage((complianceMonarch.getHmr()/(60*60)));
 		}

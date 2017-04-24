@@ -2628,15 +2628,19 @@ public class AdherenceCalculationServiceMonarch{
 				List<PatientCompliance> patientComplianceList = patientComplianceRepository.findByPatientUserId(user.getId());
 				List <PatientComplianceMonarch> complianceListToSave = new LinkedList<>();
 				
-				List<PatientComplianceMonarch> patientComplianceMonarchList = patientComplianceMonarchRepository.findByPatientUserId(userOld.getId());
+				List<PatientComplianceMonarch> patientComplianceMonarchList = null;
+				if(flag == 2){
+					patientComplianceMonarchList = patientComplianceMonarchRepository.findByPatientUserId(userOld.getId());
+				}
 				
 				for(PatientCompliance patientCompliance : patientComplianceList){
 					
 					Double hmrMonarch = 0.0;
-					PatientComplianceMonarch complianceMonarch = getComplianceForDay(patientComplianceMonarchList, patientCompliance.getDate());
-					if(Objects.nonNull(complianceMonarch))
-						hmrMonarch = complianceMonarch.getHmr();
-					
+					if(flag == 2){
+						PatientComplianceMonarch complianceMonarch = getComplianceForDay(patientComplianceMonarchList, patientCompliance.getDate());
+						if(Objects.nonNull(complianceMonarch))
+							hmrMonarch = complianceMonarch.getHmr();
+					}
 					PatientComplianceMonarch compliance = new PatientComplianceMonarch(patientCompliance.getScore(),
 							patientCompliance.getDate(),
 							patientCompliance.getPatient(),

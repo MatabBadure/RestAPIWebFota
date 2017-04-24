@@ -64,10 +64,42 @@ IF operation_type_indicator = 'CREATE' THEN
 						where PVDA.`hillrom_id` =  pat_hillrom_id 
 						AND PVDA.`device_type` = 'VEST' ;
 
-						INSERT INTO `PATIENT_DEVICES_ASSOC`
-						(`patient_id`, `device_type`, `is_active`, `serial_number`, `hillrom_id`, `patient_type`, `created_date`, `modified_date`,
-						`old_patient_id`,`training_date`,`diagnosis1`,`diagnosis2`,`diagnosis3`,`diagnosis4`,`garment_type`,`garment_size`,`garment_color`)
-						VALUES	(pat_patient_id,pat_device_type,1,pat_device_serial_number,pat_hillrom_id,'CD',today_date,today_date,pat_old_id,pat_training_date,pat_diagnosis_code1,pat_diagnosis_code2,pat_diagnosis_code3,pat_diagnosis_code4,pat_garment_type,pat_garment_size,pat_garment_color);
+						SELECT  `patient_id` ,`serial_number` ,`device_type` INTO temp_patient_info_id , temp_serial_number , temp_device_type
+						FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number AND `device_type` = 'MONARCH';
+						
+						IF temp_patient_info_id <> pat_patient_id AND temp_serial_number = pat_device_serial_number 
+							AND temp_device_type = 'MONARCH' THEN
+							
+							UPDATE `PATIENT_INFO` SET
+							`expired` = 1,
+							`expired_date` = today_date
+							WHERE `id` = temp_patient_info_id;
+							
+							UPDATE PATIENT_DEVICES_ASSOC PVDA SET 
+							`patient_id` = pat_patient_id,
+							`hillrom_id` =  pat_hillrom_id,
+							`patient_type` ='CD', 
+							`modified_date` = today_date,
+							`old_patient_id` = temp_patient_info_id,
+							`diagnosis1` = pat_diagnosis_code1,
+							`diagnosis2` = pat_diagnosis_code2,
+							`diagnosis3` = pat_diagnosis_code3,
+							`diagnosis4` = pat_diagnosis_code4,
+							`garment_type` = pat_garment_type,
+							`garment_size` = pat_garment_size,
+							`garment_color` = pat_garment_color
+							where PVDA.`serial_number` = pat_device_serial_number  
+							AND  (PVDA.`hillrom_id` = '' OR PVDA.`hillrom_id` IS NULL) AND PVDA. `patient_type` = 'SD' 
+							AND PVDA.`device_type` = 'MONARCH' ;
+							
+						ELSE
+						
+							INSERT INTO `PATIENT_DEVICES_ASSOC`
+							(`patient_id`, `device_type`, `is_active`, `serial_number`, `hillrom_id`, `patient_type`, `created_date`, `modified_date`,
+							`old_patient_id`,`training_date`,`diagnosis1`,`diagnosis2`,`diagnosis3`,`diagnosis4`,`garment_type`,`garment_size`,`garment_color`)
+							VALUES	(pat_patient_id,pat_device_type,1,pat_device_serial_number,pat_hillrom_id,'CD',today_date,today_date,pat_old_id,pat_training_date,pat_diagnosis_code1,pat_diagnosis_code2,pat_diagnosis_code3,pat_diagnosis_code4,pat_garment_type,pat_garment_size,pat_garment_color);
+							
+						END IF;
 						
 					COMMIT;						
 
@@ -171,7 +203,6 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 			END IF;
 		
 		END IF;
-	 	
 ELSE  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Operation not supported';
 END IF;
 END$$

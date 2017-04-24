@@ -1864,7 +1864,8 @@ public class UserService {
 						existingUser.setDeleted(false);
 						userExtensionRepository.saveAndFlush(existingUser);
 						//hill-2178
-						mailService.sendReactivationEmail(existingUser,baseUrl);
+						//mailService.sendReactivationEmail(existingUser,baseUrl);
+						sendEmailNotification(baseUrl, existingUser);
 						jsonObject.put("message", MessageConstants.HR_235);
 					} else {
 						throw new HillromException(ExceptionConstants.HR_604);

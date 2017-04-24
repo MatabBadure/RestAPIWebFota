@@ -92,6 +92,11 @@ ELSEIF operation_type_indicator ='INACTIVATE' THEN
 			`last_modified_date` = today_date
 			WHERE pvdhm.`patient_id` = patient_id
 			AND serial_number = pat_device_serial_number;
+			
+			UPDATE `PATIENT_DEVICES_ASSOC` 
+			SET `is_active` = 0
+            WHERE `patient_id` = patient_id and `serial_number` = pat_device_serial_number;
+            			
 		COMMIT;
 ELSE  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Operation not supported';
 END IF;

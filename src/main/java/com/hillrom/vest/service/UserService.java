@@ -1849,7 +1849,7 @@ public class UserService {
 					if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 						reactivatePatientUser(existingUser);
 						//hill-2178
-						mailService.sendReactivationEmail(existingUser,baseUrl);
+						//mailService.sendReactivationEmail(existingUser,baseUrl);
 						sendEmailNotification(baseUrl, existingUser);
 						jsonObject.put("message", MessageConstants.HR_215);
 					} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ADMIN)) 

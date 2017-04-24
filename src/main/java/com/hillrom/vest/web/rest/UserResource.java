@@ -1499,7 +1499,7 @@ public class UserResource {
     			List<ProtocolRevisionVO> adherenceTrendData = null;
     			List<ProtocolRevisionMonarchVO> adherenceTrendDataMonarch = null;
     			
-    			if(deviceType.equals(VEST)){
+    			if(deviceType.equals(VEST) || deviceType.equals("null") || Objects.isNull(deviceType)){
     				adherenceTrendData = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id, from, to);
     			}else {
     				adherenceTrendDataMonarch = patientComplianceMonarchService.findAdherenceTrendByUserIdAndDateRange(id, from, to);

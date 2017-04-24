@@ -499,6 +499,7 @@ public class UserService {
 		try {
 	    	assignValuesToUserObj(userExtensionDTO, newUser);
 			assignStatusAndRoleAndActivationKey(userExtensionDTO, newUser);
+			asdf
 			userExtensionRepository.save(newUser);
 			log.debug("Created Information for User: {}", newUser);
 			return newUser;
@@ -1733,7 +1734,11 @@ public class UserService {
     				if(patientAssocHRIDList != null){
     					for(UserPatientAssoc userPatientAssocHRID : patientAssocHRIDList){
     	    				if(userPatientAssoc.getUser().getId().equals(caregiverId)){
-    	    					CareGiverVO careGiverPatientVO = new CareGiverVO(userPatientAssocHRID.getUserRole(), userPatientAssocHRID.getRelationshipLabel(), userPatientAssocHRID.getUser(),userPatientAssocHRID.getUser().getId(),userPatientAssocHRID.getPatient().getId(),deviceType);
+    	    					CareGiverVO careGiverPatientVO;
+    	    					if(Objects.nonNull(deviceType))
+    	    						careGiverPatientVO = new CareGiverVO(userPatientAssocHRID.getUserRole(), userPatientAssocHRID.getRelationshipLabel(), userPatientAssocHRID.getUser(),userPatientAssocHRID.getUser().getId(),userPatientAssocHRID.getPatient().getId(),deviceType);
+    	    					else 
+    	    						careGiverPatientVO = new CareGiverVO(userPatientAssocHRID.getUserRole(), userPatientAssocHRID.getRelationshipLabel(), userPatientAssocHRID.getUser(),userPatientAssocHRID.getUser().getId(),userPatientAssocHRID.getPatient().getId());
     	    					caregiverPatientList.add(careGiverPatientVO);
     	    					
     	    				}

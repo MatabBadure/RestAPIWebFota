@@ -1377,12 +1377,11 @@ public class UserService {
 		else
 			patientUserVO =  new PatientUserVO(user,patientInfo);
 
-		// to do for Monarch
 		if(Objects.nonNull(deviceType) && deviceType.equals(VEST)){
 			if(Objects.nonNull(compliance))
 			patientUserVO.setHoursOfUsage((compliance.getHmr()/(60*60)));
 		}
-		else if(Objects.nonNull(deviceType) && deviceType.equals(MONARCH)){
+		else if(Objects.nonNull(deviceType)){
 			if(Objects.nonNull(complianceMonarch))
 			patientUserVO.setHoursOfUsage((complianceMonarch.getHmr()/(60*60)));
 		}

@@ -257,7 +257,7 @@ public class PatientVestDeviceService {
 	     			if(!vestDevice.isEmpty()) {
 	     				if(vestDevice.get(0).getLastModifiedDate().isAfter(patientUser.getExpirationDate())) {
 	     					vestDevice.get(0).setActive(true);
-	     					vestDevice.get(0).setLastModifiedDate(DateTime.now());	     					
+	     					vestDevice.get(0).setLastModifiedDate(DateTime.now());
 			 				patientVestDeviceRepository.saveAndFlush(vestDevice.get(0));
 			 				patientInfo.setSerialNumber(vestDevice.get(0).getSerialNumber());
 			 				patientInfo.setBluetoothId(vestDevice.get(0).getBluetoothId());

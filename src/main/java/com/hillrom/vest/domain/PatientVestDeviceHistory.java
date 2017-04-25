@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
@@ -99,6 +100,16 @@ public class PatientVestDeviceHistory implements Serializable {
 		this.active = active;
 		this.lastModifiedDate = ModifiedDate;
 		this.deviceType = "VEST";
+	}
+
+	public PatientVestDeviceHistory(PatientVestDevicePK patientVestDevicePK,
+			String bluetoothId, String hubId, Boolean active, DateTime ModifiedDate) {
+		super();
+		this.patientVestDevicePK = patientVestDevicePK;
+		this.bluetoothId = bluetoothId;
+		this.hubId = hubId;
+		this.active = active;
+		this.lastModifiedDate = ModifiedDate;
 	}
 
 	public PatientVestDevicePK getPatientVestDevicePK() {

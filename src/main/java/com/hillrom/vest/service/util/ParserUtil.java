@@ -163,6 +163,7 @@ public class ParserUtil {
 		}
 		
 		
+
 		/*
 		StringTokenizer st = new StringTokenizer(rawMessage, "&");
 		while (st.hasMoreTokens()) {
@@ -208,6 +209,7 @@ public class ParserUtil {
 
 		  }
 		}*/
+
 			
 		return qclJsonData;
 	}

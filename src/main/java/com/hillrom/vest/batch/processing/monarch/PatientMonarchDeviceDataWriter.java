@@ -12,26 +12,31 @@ import com.hillrom.vest.domain.User;
 import com.hillrom.vest.repository.PatientVestDeviceRepository;
 import com.hillrom.vest.repository.monarch.PatientMonarchDeviceDataRepository;
 import com.hillrom.vest.service.PatientVestDeviceService;
+import com.hillrom.vest.service.monarch.PatientVestDeviceMonarchService;
+
 
 public class PatientMonarchDeviceDataWriter implements ItemWriter<List<PatientVestDeviceDataMonarch>>{
 	
 	@Inject
 	private PatientMonarchDeviceDataRepository deviceDataRepositoryMonarch;
 	
-	//@Inject
-	//private PatientVestDeviceService deviceService;
+
+	@Inject
+	private PatientVestDeviceMonarchService deviceServiceMonarch;
+
 	
 	@Override
 	public void write(List<? extends List<PatientVestDeviceDataMonarch>> vestDeviceDataMonarch)
 			throws Exception {
 		if(vestDeviceDataMonarch.size() > 0){
 			if(!vestDeviceDataMonarch.get(0).isEmpty()){
-				//User patientUser = vestDeviceData.get(0).get(0).getPatientUser();
-				//PatientInfo patient = vestDeviceData.get(0).get(0).getPatient();
+				User patientUser = vestDeviceDataMonarch.get(0).get(0).getPatientUser();
+				PatientInfo patient = vestDeviceDataMonarch.get(0).get(0).getPatient();
 				for(List<PatientVestDeviceDataMonarch> devDataMonarch : vestDeviceDataMonarch){
 					deviceDataRepositoryMonarch.save(devDataMonarch);
 				}
-				//deviceService.updateHMR(patientUser, patient);
+				deviceServiceMonarch.updateHMR(patientUser, patient);
+
 			}
 		}
 	}

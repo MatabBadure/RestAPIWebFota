@@ -94,6 +94,9 @@ import com.hillrom.vest.repository.monarch.AdherenceResetMonarchRepository;
 import com.hillrom.vest.repository.monarch.ClinicMonarchRepository;
 import com.hillrom.vest.repository.monarch.NotificationMonarchRepository;
 import com.hillrom.vest.repository.monarch.PatientComplianceMonarchRepository;
+
+import com.hillrom.vest.repository.monarch.PatientNoEventsMonarchRepository;
+
 import com.hillrom.vest.repository.monarch.TherapySessionMonarchRepository;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.ClinicPatientService;
@@ -204,6 +207,11 @@ public class AdherenceCalculationServiceMonarch{
 	@Inject
 	private TherapySessionServiceMonarch therapySessionMonarchService;
 	
+
+	@Inject
+	private PatientNoEventsRepository noEventRepository;
+	
+
 	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationServiceMonarch.class);
 	
 	/**
@@ -376,12 +384,19 @@ public class AdherenceCalculationServiceMonarch{
 					processForEachPatientBoth(compliance, userIdNoEventMap, userIdNoEventMapVest, complianceMap, mstNotificationMap,hmrNonComplianceMapBoth);
 			}
 			
-			userProtocolConstantsMap = protocolMonarchService.getProtocolByPatientUserIds(new LinkedList<>(hmrNonComplianceMap.keySet()));
-			userProtocolConstantsVestMap = protocolVestService.getProtocolByPatientUserIds(new LinkedList<>(hmrNonComplianceMap.keySet()));
 
-			// Update HMR for the Both device patients
-			calculateHMRComplianceForMSTBoth(today, hmrNonComplianceMapBoth,
-						userProtocolConstantsMap, userProtocolConstantsVestMap, complianceMap, notificationMap);
+			List<Long> patientUserIds =  new LinkedList<>(hmrNonComplianceMap.keySet());
+			patientUserIds.addAll(new LinkedList<>(hmrNonComplianceMapBoth.keySet()));
+			
+			userProtocolConstantsMap = protocolMonarchService.getProtocolByPatientUserIds(patientUserIds);
+			userProtocolConstantsVestMap = protocolVestService.getProtocolByPatientUserIds(patientUserIds);
+
+			if(Objects.nonNull(hmrNonComplianceMapBoth)){
+				// Update HMR for the Both device patients
+				calculateHMRComplianceForMSTBoth(today, hmrNonComplianceMapBoth,
+							userProtocolConstantsMap, userProtocolConstantsVestMap, complianceMap, notificationMap);
+			}
+
 			
 			calculateHMRComplianceForMST(today, hmrNonComplianceMap,
 						userProtocolConstantsMap, complianceMap, notificationMap);
@@ -768,6 +783,13 @@ public class AdherenceCalculationServiceMonarch{
 		return "Adherence score reset successfully";
 	}
 
+
+	// Grouping the Patient Compliance Monarch data by date 
+	public SortedMap<LocalDate,List<PatientComplianceMonarch>> groupPatientComplianceByDate(List<PatientComplianceMonarch> patientComplianceMonarch){
+		return new TreeMap<>(patientComplianceMonarch.stream().collect(Collectors.groupingBy(PatientComplianceMonarch :: getDate)));
+	}
+		
+
 	public String adherenceCalculationBoth(Long userId, String patientId, LocalDate adherenceStartDate, 
 			LocalDate firstTransmissionOfOldDevice, Integer adherenceScore, Long oldUserId, Integer flag){
 		// flag 1 - for adherence reset
@@ -1100,8 +1122,16 @@ public class AdherenceCalculationServiceMonarch{
 				ProtocolConstantsMonarch protocolConstant = userProtocolConstantsMap.get(patientUserId);
 				ProtocolConstants protocolConstantVest = userProtocolConstantsVestMap.get(patientUserId);
 
-				boolean isHmrCompliantVest = adherenceCalculationService.isHMRCompliant(protocolConstantVest, durationForSettingDaysMonarch, adherenceSettingDay);
-				boolean isHmrCompliantMonarch = isHMRCompliant(protocolConstant, durationForSettingDaysVest, adherenceSettingDay);
+
+				boolean isHmrCompliantVest = true; 
+				boolean isHmrCompliantMonarch = true; 
+				if(!therapySessionsVest.isEmpty()){
+					isHmrCompliantVest = adherenceCalculationService.isHMRCompliant(protocolConstantVest, durationForSettingDaysVest, adherenceSettingDay);
+				}
+				if(!therapySessions.isEmpty()){
+					isHmrCompliantMonarch = isHMRCompliant(protocolConstant, durationForSettingDaysMonarch, adherenceSettingDay);
+				}
+
 				
 				if(!isHmrCompliantVest || !isHmrCompliantMonarch){
 					score = score < HMR_NON_COMPLIANCE_POINTS ? 0 : score - HMR_NON_COMPLIANCE_POINTS;
@@ -2517,174 +2547,20 @@ public class AdherenceCalculationServiceMonarch{
 	
 	
 	/**
-	 * Runs every midnight deducts the compliance score by 5 if therapy hasn't been done for adherence setting day(s)
+
+	 * Runs every midnight to integrate the patient who is using both devices after identified
+
 	 */
 	//@Scheduled(cron="0 55 23 * * * ")	
 	public void processDeviceDetails(){
 		try{
 			LocalDate today = LocalDate.now();
 			log.debug("Started Device details "+DateTime.now()+","+today);
-			List<PatientDevicesAssoc> patDevAssList = patientDevicesAssocRepository.findByCreatedDate(today.toString());
-			Map<Long,PatientNoEventMonarch> userIdNoEventMap = noEventMonarchService.findAllGroupByPatientUserId();
+
 			
-			Map<Long,PatientNoEvent> userIdNoEventMapVest = noEventMonarchServiceVest.findAllGroupByPatientUserId();
+			List<PatientDevicesAssoc> patDevAssList = patientDevicesAssocRepository.findByCreatedDate(today.toString());			
 			
-			for(PatientDevicesAssoc patDevice : patDevAssList){
-				
-				List<PatientDevicesAssoc> devAssForPatientList = patientDevicesAssocRepository.findByPatientId(patDevice.getPatientId());
-				
-				if(devAssForPatientList.size()>1){
-					LocalDate vestCreatedDate = null;
-					LocalDate monarchCreatedDate = null;
-					
-					Map<String, Long> deviceCreatedDate = new HashMap<>();
-					for(PatientDevicesAssoc device : devAssForPatientList){
-						if(device.getDeviceType().equals("VEST")){
-							vestCreatedDate = device.getCreatedDate();
-						}else if(device.getDeviceType().equals("MONARCH")){
-							monarchCreatedDate = device.getCreatedDate();
-						}							
-					}
-					
-					PatientInfo patientInfo = patientInfoRepository.findOneById(patDevice.getPatientId());
-					User user = userService.getUserObjFromPatientInfo(patientInfo);
-					
-					PatientInfo patientInfoOld = patientInfoRepository.findOneById(patDevice.getOldPatientId());
-					User userOld = userService.getUserObjFromPatientInfo(patientInfoOld);
-					
-					/*String vestPatientId = null;
-					String monarchPatientId = null;
-					
-					Long vestUserId = null;
-					Long monarchUserId = null;	*/				
-					
-					LocalDate firstTransmissionDateMonarch = null;
-					
-					PatientNoEventMonarch noEventMonarch = userIdNoEventMap.get(userOld.getId());
-					
-					if(Objects.nonNull(noEventMonarch) && (Objects.nonNull(noEventMonarch.getFirstTransmissionDate()))){
-						firstTransmissionDateMonarch = noEventMonarch.getFirstTransmissionDate();
-					}
-					
-					LocalDate firstTransmissionDateVest = null;
-					
-					PatientNoEvent noEventVest = userIdNoEventMapVest.get(user.getId());
-					
-					if(Objects.nonNull(noEventVest) && (Objects.nonNull(noEventVest.getFirstTransmissionDate()))){
-						firstTransmissionDateVest = noEventVest.getFirstTransmissionDate();
-					}
-					
-					
-					if(vestCreatedDate.isBefore(monarchCreatedDate)){
-						
-						List<PatientCompliance> patientComplianceList = patientComplianceRepository.findByPatientUserId(user.getId());
-						List <PatientComplianceMonarch> complianceListToSave = new LinkedList<>();
-						
-						for(PatientCompliance patientCompliance : patientComplianceList){
-							PatientComplianceMonarch compliance = new PatientComplianceMonarch(patientCompliance.getScore(),
-									patientCompliance.getDate(),
-									patientCompliance.getPatient(),
-									patientCompliance.getPatientUser(),
-									patientCompliance.getHmrRunRate(),
-									patientCompliance.getHmr(),
-									patientCompliance.isHmrCompliant(),
-									patientCompliance.isSettingsDeviated(),
-									patientCompliance.getMissedTherapyCount(),
-									patientCompliance.getLatestTherapyDate(),
-									patientCompliance.getSettingsDeviatedDaysCount(),
-									patientCompliance.getGlobalHMRNonAdherenceCounter(),
-									patientCompliance.getGlobalSettingsDeviationCounter(),
-									patientCompliance.getGlobalMissedTherapyCounter());
-							 		
-							complianceListToSave.add(compliance);						 
-						}
-						complianceMonarchService.saveAll(complianceListToSave);
-						
-						List<Notification> notificationList = notificationRepository.findByPatientUserId(user.getId());
-						
-						List <NotificationMonarch> notificationListToSave = new LinkedList<>();
-						
-						for(Notification patientNotification : notificationList){
-							NotificationMonarch notification = new NotificationMonarch(
-									patientNotification.getNotificationType(),
-									patientNotification.getDate(),
-									patientNotification.getPatientUser(),
-									patientNotification.getPatient(),
-									patientNotification.isAcknowledged());
-									
-							notificationListToSave.add(notification);						 
-						}
-						notificationMonarchService.saveAll(notificationListToSave);
-						
-						List<TherapySessionMonarch> therapySessionMonarchList = therapySessionMonarchRepository.findByPatientUserId(userOld.getId());
-						
-						List <TherapySessionMonarch> therapySessionListToSave = new LinkedList<>();
-						
-						for(TherapySessionMonarch patientTherapySession : therapySessionMonarchList){
-							TherapySessionMonarch therapySession = new TherapySessionMonarch(patientInfo, user, 
-									patientTherapySession.getDate(), patientTherapySession.getSessionNo(),
-									patientTherapySession.getSessionType(), patientTherapySession.getStartTime(), patientTherapySession.getEndTime(),
-									patientTherapySession.getFrequency(), patientTherapySession.getIntensity(), patientTherapySession.getDurationInMinutes(),
-									patientTherapySession.getProgrammedCaughPauses(), patientTherapySession.getNormalCaughPauses(),
-									patientTherapySession.getCaughPauseDuration(), patientTherapySession.getHmr(), patientTherapySession.getSerialNumber(),
-									patientTherapySession.getBluetoothId(), patientTherapySession.getTherapyIndex(),
-									patientTherapySession.getStartBatteryLevel(), patientTherapySession.getEndBatteryLevel(),
-									patientTherapySession.getNumberOfEvents(), patientTherapySession.getNumberOfPods(), patientTherapySession.getDevWifi(),
-									patientTherapySession.getDevLte(),patientTherapySession.getDevBt(),
-									patientTherapySession.getDevVersion());
-								
-							therapySessionListToSave.add(therapySession);
-						}
-						therapySessionMonarchService.saveAll(therapySessionListToSave);
-						
-						adherenceCalculationBoth(user.getId(), null, firstTransmissionDateMonarch, firstTransmissionDateVest, DEFAULT_COMPLIANCE_SCORE, userOld.getId(), 4);
-					}else{
-						//List<PatientCompliance> patientComplianceList = patientComplianceRepository.findByPatientUserIdAndDateBefore(user.getId(), firstTransmissionDateMonarch);
-						
-						/*List<PatientCompliance> patientComplianceList = patientComplianceRepository.findByPatientUserId(user.getId());
-						List <PatientComplianceMonarch> complianceListToSave = new LinkedList<>();
-						
-						for(PatientCompliance patientCompliance : patientComplianceList){
-							PatientComplianceMonarch compliance = new PatientComplianceMonarch(patientCompliance.getScore(),
-									patientCompliance.getDate(),
-									patientCompliance.getPatient(),
-									patientCompliance.getPatientUser(),
-									patientCompliance.getHmrRunRate(),
-									patientCompliance.getHmr(),
-									patientCompliance.isHmrCompliant(),
-									patientCompliance.isSettingsDeviated(),
-									patientCompliance.getMissedTherapyCount(),
-									patientCompliance.getLatestTherapyDate(),
-									patientCompliance.getSettingsDeviatedDaysCount(),
-									patientCompliance.getGlobalHMRNonAdherenceCounter(),
-									patientCompliance.getGlobalSettingsDeviationCounter(),
-									patientCompliance.getGlobalMissedTherapyCounter());
-							 		
-							complianceListToSave.add(compliance);						 
-						}
-						complianceMonarchService.saveAll(complianceListToSave);
-						
-						//List<Notification> notificationList = notificationRepository.findByPatientUserIdAndDateBefore(user.getId(), firstTransmissionDateMonarch);
-						List<Notification> notificationList = notificationRepository.findByPatientUserId(user.getId());
-						
-						List <NotificationMonarch> notificationListToSave = new LinkedList<>();
-						
-						for(Notification patientNotification : notificationList){
-							NotificationMonarch notification = new NotificationMonarch(
-									patientNotification.getNotificationType(),
-									patientNotification.getDate(),
-									patientNotification.getPatientUser(),
-									patientNotification.getPatient(),
-									patientNotification.isAcknowledged());
-									
-							notificationListToSave.add(notification);						 
-						}
-						notificationMonarchService.saveAll(notificationListToSave);*/
-						adherenceCalculationBoth(user.getId(), null, firstTransmissionDateVest, firstTransmissionDateMonarch, DEFAULT_COMPLIANCE_SCORE, userOld.getId(), 3);
-					}
-					
-				}
-			}
+			executeMergingProcess(patDevAssList, 2);
 			
 		}catch(Exception ex){
 			StringWriter writer = new StringWriter();
@@ -2693,7 +2569,163 @@ public class AdherenceCalculationServiceMonarch{
 			mailService.sendJobFailureNotificationMonarch("processDeviceDetails",writer.toString());
 		}
 	}
+
+	public void executeMergingProcess(List<PatientDevicesAssoc> patDevAssList, int flag){
+		
+		Map<Long,PatientNoEventMonarch> userIdNoEventMap = noEventMonarchService.findAllGroupByPatientUserId();			
+		Map<Long,PatientNoEvent> userIdNoEventMapVest = noEventMonarchServiceVest.findAllGroupByPatientUserId();
 	
-	
+		for(PatientDevicesAssoc patDevice : patDevAssList){
+			executeMergingProcessLoop(userIdNoEventMap, userIdNoEventMapVest, patDevice, flag);	
+		}
+	}
+
+	// To get the notification object for the specific notification date
+	public PatientComplianceMonarch getComplianceForDay(List<PatientComplianceMonarch> complianceMonarchList, LocalDate reqDate) {
+		List<PatientComplianceMonarch> complianceMonarchFilter = complianceMonarchList.stream().filter(PatientComplianceMonarch->PatientComplianceMonarch.getDate().equals(reqDate)).collect(Collectors.toList());
+		if(!complianceMonarchFilter.isEmpty())
+			return complianceMonarchFilter.get(0);
+		else
+			return null;
+	}
+		
+	public void executeMergingProcessLoop(Map<Long,PatientNoEventMonarch> userIdNoEventMap,
+			Map<Long,PatientNoEvent> userIdNoEventMapVest,
+			PatientDevicesAssoc patDevice, int flag){
+		List<PatientDevicesAssoc> devAssForPatientList = patientDevicesAssocRepository.findByPatientId(patDevice.getPatientId());
+		
+		if(devAssForPatientList.size()>1){
+			LocalDate vestCreatedDate = null;
+			LocalDate monarchCreatedDate = null;
+			
+			for(PatientDevicesAssoc device : devAssForPatientList){
+				if(device.getDeviceType().equals("VEST")){
+					vestCreatedDate = device.getCreatedDate();
+				}else if(device.getDeviceType().equals("MONARCH")){
+					monarchCreatedDate = device.getCreatedDate();
+				}
+				if(Objects.isNull(vestCreatedDate) && Objects.isNull(monarchCreatedDate)){
+					vestCreatedDate = DateUtil.getPlusOrMinusTodayLocalDate(-1);
+					monarchCreatedDate = LocalDate.now();
+				}
+			}
+			
+			PatientInfo patientInfo = patientInfoRepository.findOneById(patDevice.getPatientId());
+			User user = userService.getUserObjFromPatientInfo(patientInfo);
+			
+			LocalDate firstTransmissionDateMonarch = null;
+			User userOld = null;
+			
+			if(flag == 2){
+				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patDevice.getOldPatientId());
+				userOld = userService.getUserObjFromPatientInfo(patientInfoOld);
+				
+				PatientNoEventMonarch noEventMonarch = userIdNoEventMap.get(userOld.getId());
+				
+				if(Objects.nonNull(noEventMonarch) && (Objects.nonNull(noEventMonarch.getFirstTransmissionDate()))){
+					firstTransmissionDateMonarch = noEventMonarch.getFirstTransmissionDate();
+				}
+			}
+			
+			LocalDate firstTransmissionDateVest = null;
+			
+			PatientNoEvent noEventVest = userIdNoEventMapVest.get(user.getId());
+			
+			if(Objects.nonNull(noEventVest) && (Objects.nonNull(noEventVest.getFirstTransmissionDate()))){
+				firstTransmissionDateVest = noEventVest.getFirstTransmissionDate();
+			}
+			
+			
+			if(Objects.nonNull(vestCreatedDate) && vestCreatedDate.isBefore(monarchCreatedDate)){
+				
+				List<PatientCompliance> patientComplianceList = patientComplianceRepository.findByPatientUserId(user.getId());
+				List <PatientComplianceMonarch> complianceListToSave = new LinkedList<>();
+				
+				List<PatientComplianceMonarch> patientComplianceMonarchList = null;
+				if(flag == 2){
+					patientComplianceMonarchList = patientComplianceMonarchRepository.findByPatientUserId(userOld.getId());
+				}
+				
+				for(PatientCompliance patientCompliance : patientComplianceList){
+					
+					Double hmrMonarch = 0.0;
+					if(flag == 2){
+						PatientComplianceMonarch complianceMonarch = getComplianceForDay(patientComplianceMonarchList, patientCompliance.getDate());
+						if(Objects.nonNull(complianceMonarch))
+							hmrMonarch = complianceMonarch.getHmr();
+					}
+					PatientComplianceMonarch compliance = new PatientComplianceMonarch(patientCompliance.getScore(),
+							patientCompliance.getDate(),
+							patientCompliance.getPatient(),
+							patientCompliance.getPatientUser(),
+							patientCompliance.getHmrRunRate(),
+							hmrMonarch,
+							patientCompliance.isHmrCompliant(),
+							patientCompliance.isSettingsDeviated(),
+							patientCompliance.getMissedTherapyCount(),
+							patientCompliance.getLatestTherapyDate(),
+							patientCompliance.getSettingsDeviatedDaysCount(),
+							patientCompliance.getGlobalHMRNonAdherenceCounter(),
+							patientCompliance.getGlobalSettingsDeviationCounter(),
+							patientCompliance.getGlobalMissedTherapyCounter(),
+							patientCompliance.getHmr());
+					 		
+					complianceListToSave.add(compliance);						 
+				}
+				complianceMonarchService.saveAll(complianceListToSave);
+				
+				List<Notification> notificationList = notificationRepository.findByPatientUserId(user.getId());
+				
+				List <NotificationMonarch> notificationListToSave = new LinkedList<>();
+				
+				for(Notification patientNotification : notificationList){
+					NotificationMonarch notification = new NotificationMonarch(
+							patientNotification.getNotificationType(),
+							patientNotification.getDate(),
+							patientNotification.getPatientUser(),
+							patientNotification.getPatient(),
+							patientNotification.isAcknowledged());
+							
+					notificationListToSave.add(notification);
+				}
+				notificationMonarchService.saveAll(notificationListToSave);
+				
+				if(flag == 2){
+					List<TherapySessionMonarch> therapySessionMonarchList = therapySessionMonarchRepository.findByPatientUserId(userOld.getId());
+					
+					List <TherapySessionMonarch> therapySessionListToSave = new LinkedList<>();
+					
+					for(TherapySessionMonarch patientTherapySession : therapySessionMonarchList){
+						TherapySessionMonarch therapySession = new TherapySessionMonarch(patientInfo, user, 
+								patientTherapySession.getDate(), patientTherapySession.getSessionNo(),
+								patientTherapySession.getSessionType(), patientTherapySession.getStartTime(), patientTherapySession.getEndTime(),
+								patientTherapySession.getFrequency(), patientTherapySession.getIntensity(), patientTherapySession.getDurationInMinutes(),
+								patientTherapySession.getProgrammedCaughPauses(), patientTherapySession.getNormalCaughPauses(),
+								patientTherapySession.getCaughPauseDuration(), patientTherapySession.getHmr(), patientTherapySession.getSerialNumber(),
+								patientTherapySession.getBluetoothId(), patientTherapySession.getTherapyIndex(),
+								patientTherapySession.getStartBatteryLevel(), patientTherapySession.getEndBatteryLevel(),
+								patientTherapySession.getNumberOfEvents(), patientTherapySession.getNumberOfPods(), patientTherapySession.getDevWifi(),
+								patientTherapySession.getDevLte(),patientTherapySession.getDevBt(),
+								patientTherapySession.getDevVersion());
+							
+						therapySessionListToSave.add(therapySession);
+					}
+					therapySessionMonarchService.saveAll(therapySessionListToSave);
+					
+					PatientNoEvent patientNoEvent = noEventRepository.findByPatientUserId(user.getId());
+					
+					PatientNoEventMonarch noEventMonarchToSave = new PatientNoEventMonarch(patientNoEvent.getUserCreatedDate(),
+							patientNoEvent.getFirstTransmissionDate(), patientInfo, user);
+					
+					noEventMonarchService.save(noEventMonarchToSave);
+					
+					adherenceCalculationBoth(user.getId(), null, firstTransmissionDateMonarch, firstTransmissionDateVest, DEFAULT_COMPLIANCE_SCORE, userOld.getId(), 4);
+				}
+			}else{
+				if(flag == 2)
+					adherenceCalculationBoth(user.getId(), null, firstTransmissionDateVest, firstTransmissionDateMonarch, DEFAULT_COMPLIANCE_SCORE, userOld.getId(), 3);
+			}
+		}
+	}
 	
 }

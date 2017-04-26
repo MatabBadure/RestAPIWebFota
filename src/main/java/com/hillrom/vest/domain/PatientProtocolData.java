@@ -13,6 +13,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.envers.Audited;
 import org.joda.time.DateTime;
+import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -71,6 +72,9 @@ public class PatientProtocolData extends AbstractAuditingEntity implements Seria
 	
     @Column(name="protocol_key")
     private String protocolKey;
+    
+    @Transient
+	private String deviceType;
  
 	public PatientProtocolData() {
 		super();
@@ -92,6 +96,7 @@ public class PatientProtocolData extends AbstractAuditingEntity implements Seria
 		this.maxFrequency = maxFrequency;
 		this.minPressure = minPressure;
 		this.maxPressure = maxPressure;
+		this.deviceType = "VEST";
 	}
 
 	public String getId() {
@@ -196,6 +201,16 @@ public class PatientProtocolData extends AbstractAuditingEntity implements Seria
 
 	public void setProtocolKey(String protocolKey) {
 		this.protocolKey = protocolKey;
+	}
+	
+	@Transient
+	public String getDeviceType() {
+		return deviceType;
+	}
+
+	@Transient
+	public void setDeviceType(String deviceType) {
+		this.deviceType = deviceType;
 	}
 
 	@Override

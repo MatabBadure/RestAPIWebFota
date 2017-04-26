@@ -12,6 +12,11 @@ DECLARE temp_patient_info_id VARCHAR(50);
 DECLARE created_by VARCHAR(50);
 DECLARE latest_hmr DECIMAL(10,0);
 
+DECLARE pvdhm_patient_id VARCHAR(50); 
+DECLARE pvdhm_serial_number VARCHAR(50); 
+DECLARE pvdhm_is_active VARCHAR(10);
+
+
 
 
 SET today_date = now();
@@ -25,9 +30,15 @@ IF operation_type_indicator = 'CREATE' THEN
 	SELECT `id`, `serial_number` INTO temp_patient_info_id, temp_serial_number FROM `PATIENT_INFO`
 	WHERE `serial_number` = pat_device_serial_number;
 
+
+	
 	IF temp_patient_info_id IS NOT NULL THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Device Serial No. already associated with a patient';
 	END IF;
+
+	SELECT `patient_id`, `serial_number`, `is_active` INTO pvdhm_patient_id, pvdhm_serial_number, pvdhm_is_active FROM `PATIENT_VEST_DEVICE_HISTORY_MONARCH`
+	WHERE `serial_number` = pat_device_serial_number and `patient_id` = patient_id;
+
     
 	START TRANSACTION;
 	  
@@ -43,11 +54,20 @@ IF operation_type_indicator = 'CREATE' THEN
 		`is_active` = 0 WHERE pvdhm.`patient_id` = patient_id;
 		
 		 -- make insert device into patient_vest_device_history_monarch with active.
-		 
-		INSERT INTO `PATIENT_VEST_DEVICE_HISTORY_MONARCH`
-			(`patient_id`, `serial_number`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_active`,`hmr`)
-			VALUES
-			(patient_id,pat_device_serial_number, created_by,today_date,created_by,today_date,1,0);
+
+
+		IF pvdhm_is_active IS NOT NULL THEN
+			IF pvdhm_is_active =0 THEN
+					UPDATE `PATIENT_VEST_DEVICE_HISTORY_MONARCH` pvdhm SET
+					`is_active` = 1 WHERE pvdhm.`serial_number` = pvdhm_serial_number and pvdhm.`patient_id` = pvdhm_patient_id;
+			END IF;
+		ELSE 		 
+			INSERT INTO `PATIENT_VEST_DEVICE_HISTORY_MONARCH`
+				(`patient_id`, `serial_number`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_active`,`hmr`)
+				VALUES
+				(patient_id,pat_device_serial_number, created_by,today_date,created_by,today_date,1,0);
+		END IF;		
+
 			
 	  COMMIT;
       
@@ -73,7 +93,9 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 ELSEIF operation_type_indicator ='INACTIVATE' THEN
 
 		SELECT `id`, `serial_number` INTO temp_patient_info_id, temp_serial_number FROM `PATIENT_INFO`
-		WHERE `serial_number` = pat_device_serial_number  AND `patient_id` = patient_id;
+
+		WHERE `serial_number` = pat_device_serial_number  AND `id` = patient_id;
+
         
         IF temp_patient_info_id IS NULL THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Device Serial No.  not associated with the patient';
@@ -92,6 +114,13 @@ ELSEIF operation_type_indicator ='INACTIVATE' THEN
 			`last_modified_date` = today_date
 			WHERE pvdhm.`patient_id` = patient_id
 			AND serial_number = pat_device_serial_number;
+
+			
+			UPDATE `PATIENT_DEVICES_ASSOC` 
+			SET `is_active` = 0
+            WHERE `patient_id` = patient_id and `serial_number` = pat_device_serial_number;
+            			
+
 		COMMIT;
 ELSE  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Operation not supported';
 END IF;

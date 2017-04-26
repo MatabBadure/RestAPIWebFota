@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.SQLDelete;
@@ -60,18 +61,23 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 	@Column(name = "max_frequency")
 	private Integer maxFrequency;
 	
-	@Column(name = "min_pressure")
-	private Integer minPressure;
-	
-	@Column(name = "max_pressure")
-	private Integer maxPressure;
-	
 	@Column(name = "is_deleted")
 	private boolean deleted = false;
 	
     @Column(name="protocol_key")
     private String protocolKey;
- 
+    
+    @Column(name = "min_intensity")
+	private Integer minIntensity;
+	
+	@Column(name = "max_intensity")
+	private Integer maxIntensity;
+	
+	@Transient
+	private String deviceType;
+
+
+
 	public PatientProtocolDataMonarch() {
 		super();
 	}
@@ -79,8 +85,8 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 	public PatientProtocolDataMonarch(String type, PatientInfo patient,
 			User patientUser, int treatmentsPerDay, int minMinutesPerTreatment,
 			String treatmentLabel,Integer minFrequency,
-			Integer maxFrequency, Integer minPressure,
-			Integer maxPressure) {
+			Integer maxFrequency, Integer minIntensity,
+			Integer maxIntensity) {
 		super();
 		this.type = type;
 		this.patient = patient;
@@ -90,8 +96,9 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 		this.treatmentLabel = treatmentLabel;
 		this.minFrequency = minFrequency;
 		this.maxFrequency = maxFrequency;
-		this.minPressure = minPressure;
-		this.maxPressure = maxPressure;
+		this.minIntensity = minIntensity;
+		this.maxIntensity = maxIntensity;
+		this.deviceType = "MONARCH";
 	}
 
 	public String getId() {
@@ -166,22 +173,6 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 		this.maxFrequency = maxFrequency;
 	}
 
-	public Integer getMinPressure() {
-		return minPressure;
-	}
-
-	public void setMinPressure(Integer minPressure) {
-		this.minPressure = minPressure;
-	}
-
-	public Integer getMaxPressure() {
-		return maxPressure;
-	}
-
-	public void setMaxPressure(Integer maxPressure) {
-		this.maxPressure = maxPressure;
-	}
-
 	public boolean isDeleted() {
 		return deleted;
 	}
@@ -196,6 +187,32 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 
 	public void setProtocolKey(String protocolKey) {
 		this.protocolKey = protocolKey;
+	}
+	
+	public Integer getMinIntensity() {
+		return minIntensity;
+	}
+
+	public void setMinIntensity(Integer minIntensity) {
+		this.minIntensity = minIntensity;
+	}
+
+	public Integer getMaxIntensity() {
+		return maxIntensity;
+	}
+
+	public void setMaxIntensity(Integer maxIntensity) {
+		this.maxIntensity = maxIntensity;
+	}
+	
+	@Transient
+	public String getDeviceType() {
+		return deviceType;
+	}
+
+	@Transient
+	public void setDeviceType(String deviceType) {
+		this.deviceType = deviceType;
 	}
 
 	@Override
@@ -252,7 +269,8 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 		return "PatientProtocolDataMonarch [id=" + id + ", type=" + type + ", patient=" + patient + ", patientUser="
 				+ patientUser + ", treatmentsPerDay=" + treatmentsPerDay + ", minMinutesPerTreatment="
 				+ minMinutesPerTreatment + ", treatmentLabel=" + treatmentLabel + ", minFrequency=" + minFrequency
-				+ ", maxFrequency=" + maxFrequency + ", minPressure=" + minPressure + ", maxPressure=" + maxPressure
+				+ ", maxFrequency=" + maxFrequency + ", minPressure=" + minIntensity + ", maxPressure=" + maxIntensity
+				+ ", minIntensity=" + minIntensity + ", maxIntensity=" + maxIntensity
 				+ ", deleted=" + deleted + ", protocolKey=" + protocolKey + "]";
 	}
 

@@ -59,6 +59,15 @@ public class PatientVestDeviceRawLogMonarch implements Serializable {
 
     @Column(name = "raw_message")
     private String rawMessage;
+    
+    @Column(name = "checksum")
+    private String checksum;
+    
+    @Column(name = "total_fragments")
+    private String totalFragments;
+    
+    @Column(name = "current_fragment")
+    private String currentFragment;
 
 	/**
 	 * @return the id
@@ -235,6 +244,49 @@ public class PatientVestDeviceRawLogMonarch implements Serializable {
 		return serialVersionUID;
 	}
 
+	
+	/**
+	 * @return the checksum
+	 */
+	public String getChecksum() {
+		return checksum;
+	}
+
+	/**
+	 * @param checksum the checksum to set
+	 */
+	public void setChecksum(String checksum) {
+		this.checksum = checksum;
+	}
+
+	/**
+	 * @return the totalFragments
+	 */
+	public String getTotalFragments() {
+		return totalFragments;
+	}
+
+	/**
+	 * @param totalFragments the totalFragments to set
+	 */
+	public void setTotalFragments(String totalFragments) {
+		this.totalFragments = totalFragments;
+	}
+
+	/**
+	 * @return the currentFragment
+	 */
+	public String getCurrentFragment() {
+		return currentFragment;
+	}
+
+	/**
+	 * @param currentFragment the currentFragment to set
+	 */
+	public void setCurrentFragment(String currentFragment) {
+		this.currentFragment = currentFragment;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -243,7 +295,9 @@ public class PatientVestDeviceRawLogMonarch implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((airInterfaceType == null) ? 0 : airInterfaceType.hashCode());
+		result = prime * result + ((checksum == null) ? 0 : checksum.hashCode());
 		result = prime * result + ((cucVersion == null) ? 0 : cucVersion.hashCode());
+		result = prime * result + ((currentFragment == null) ? 0 : currentFragment.hashCode());
 		result = prime * result + ((customerId == null) ? 0 : customerId.hashCode());
 		result = prime * result + ((customerName == null) ? 0 : customerName.hashCode());
 		result = prime * result + ((deviceAddress == null) ? 0 : deviceAddress.hashCode());
@@ -254,6 +308,7 @@ public class PatientVestDeviceRawLogMonarch implements Serializable {
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((rawMessage == null) ? 0 : rawMessage.hashCode());
 		result = prime * result + ((timezone == null) ? 0 : timezone.hashCode());
+		result = prime * result + ((totalFragments == null) ? 0 : totalFragments.hashCode());
 		return result;
 	}
 
@@ -274,10 +329,20 @@ public class PatientVestDeviceRawLogMonarch implements Serializable {
 				return false;
 		} else if (!airInterfaceType.equals(other.airInterfaceType))
 			return false;
+		if (checksum == null) {
+			if (other.checksum != null)
+				return false;
+		} else if (!checksum.equals(other.checksum))
+			return false;
 		if (cucVersion == null) {
 			if (other.cucVersion != null)
 				return false;
 		} else if (!cucVersion.equals(other.cucVersion))
+			return false;
+		if (currentFragment == null) {
+			if (other.currentFragment != null)
+				return false;
+		} else if (!currentFragment.equals(other.currentFragment))
 			return false;
 		if (customerId == null) {
 			if (other.customerId != null)
@@ -329,6 +394,11 @@ public class PatientVestDeviceRawLogMonarch implements Serializable {
 				return false;
 		} else if (!timezone.equals(other.timezone))
 			return false;
+		if (totalFragments == null) {
+			if (other.totalFragments != null)
+				return false;
+		} else if (!totalFragments.equals(other.totalFragments))
+			return false;
 		return true;
 	}
 
@@ -341,7 +411,8 @@ public class PatientVestDeviceRawLogMonarch implements Serializable {
 				+ deviceModelType + ", deviceData=" + deviceData + ", deviceSerialNumber=" + deviceSerialNumber
 				+ ", deviceType=" + deviceType + ", airInterfaceType=" + airInterfaceType + ", customerName="
 				+ customerName + ", timezone=" + timezone + ", cucVersion=" + cucVersion + ", customerId=" + customerId
-				+ ", rawMessage=" + rawMessage + "]";
+				+ ", rawMessage=" + rawMessage + ", checksum=" + checksum + ", totalFragments=" + totalFragments
+				+ ", currentFragment=" + currentFragment + "]";
 	}
 
 

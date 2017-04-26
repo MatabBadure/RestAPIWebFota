@@ -19,6 +19,7 @@ import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.PatientVestDevicePK;
 import com.hillrom.vest.domain.User;
+import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.PatientInfoRepository;
@@ -52,6 +53,18 @@ public class PatientVestDeviceService {
 
     @Inject
     private PatientVestDeviceDataRepository deviceDataRepository;
+    
+    public String getDeviceType(Long userId){
+		PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(userId);		
+		if(patient != null){
+			PatientInfo checkPatientId = patientInfoRepository.findOneById(patient.getId());
+			if(Objects.nonNull(checkPatientId.getId() ) ){
+				String deviceType = patientVestDeviceRepository.findDeviceType(patient.getId());
+				return deviceType;
+			}
+		}
+		return null;
+	}
     
     public Object linkVestDeviceWithPatient(Long id, Map<String, Object> deviceData) throws HillromException {
     	User alreadyLinkedPatientuser = new User();
@@ -244,7 +257,9 @@ public class PatientVestDeviceService {
 	     			if(!vestDevice.isEmpty()) {
 	     				if(vestDevice.get(0).getLastModifiedDate().isAfter(patientUser.getExpirationDate())) {
 	     					vestDevice.get(0).setActive(true);
-	     					vestDevice.get(0).setLastModifiedDate(DateTime.now());
+
+	     					vestDevice.get(0).setLastModifiedDate(DateTime.now());	     					
+
 			 				patientVestDeviceRepository.saveAndFlush(vestDevice.get(0));
 			 				patientInfo.setSerialNumber(vestDevice.get(0).getSerialNumber());
 			 				patientInfo.setBluetoothId(vestDevice.get(0).getBluetoothId());
@@ -276,7 +291,7 @@ public class PatientVestDeviceService {
 		Optional<PatientVestDeviceHistory>  deviceHistoryFromDB = patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(patient.getId(),patient.getSerialNumber());
 		if(deviceHistoryFromDB.isPresent()){
 			PatientVestDeviceHistory history = deviceHistoryFromDB.get();
-			history.setHmr(getLatestHMR(patientUser.getId(),patient.getSerialNumber()));
+			history.setHmr(getLatestHMR(patientUser.getId(),patient.getSerialNumber()));			
 			patientVestDeviceRepository.save(history);
 		}else{
 			PatientVestDeviceHistory history = new PatientVestDeviceHistory(new PatientVestDevicePK(patient, patient.getSerialNumber()),
@@ -290,6 +305,27 @@ public class PatientVestDeviceService {
 	
 	public PatientVestDeviceHistory getLatestInActiveDeviceFromHistory(String patientId){
 		return patientVestDeviceRepository.findLatestInActiveDeviceByPatientId(patientId, false);
+	}
+	
+	public String getDeviceType(String patientId){		
+		PatientInfo checkPatientId = patientInfoRepository.findOneById(patientId);
+		if(Objects.nonNull(checkPatientId.getId() ) ){
+			String deviceType = patientVestDeviceRepository.findDeviceType(patientId);
+			return deviceType;
+		}
+	return null;
+	}
+	
+	public String getDeviceType(User user){
+		PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(user.getId());		
+		if(patient != null){
+			PatientInfo checkPatientId = patientInfoRepository.findOneById(patient.getId());
+			if(Objects.nonNull(checkPatientId.getId() ) ){
+				String deviceType = patientVestDeviceRepository.findDeviceType(patient.getId());
+				return deviceType;
+			}
+		}
+		return null;
 	}
 	
 }

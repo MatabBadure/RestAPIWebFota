@@ -1,5 +1,8 @@
 package com.hillrom.vest.web.rest;
 
+import static com.hillrom.vest.config.Constants.VEST;
+import static com.hillrom.vest.config.Constants.MONARCH;
+
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,6 +47,7 @@ import com.hillrom.vest.service.PatientHCPService;
 import com.hillrom.vest.service.PatientNoEventService;
 import com.hillrom.vest.service.RelationshipLabelService;
 import com.hillrom.vest.service.UserService;
+import com.hillrom.vest.service.monarch.PatientNoEventMonarchService;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.CareGiverVO;
@@ -92,6 +96,9 @@ public class UserExtensionResource {
     
     @Inject
     private PatientNoEventService patientNoEventService;
+    
+    @Inject
+    private PatientNoEventMonarchService patientNoEventMonarchService;
     
     /**
      * POST  /user -> Create a new User.
@@ -999,15 +1006,22 @@ public class UserExtensionResource {
     @RequestMapping(value = "/patient/{patientUserId}/firsttrasmissiondate",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JSONObject> getfirstTransmissionDateForPatient(@PathVariable Long patientUserId) {
+    public ResponseEntity<JSONObject> getfirstTransmissionDateForPatient(@PathVariable Long patientUserId,
+    		@RequestParam(value = "deviceType", required = false) String deviceType) {
         log.debug("REST request to get last transmission date for the patient : {}", patientUserId);
         JSONObject jsonObject = new JSONObject();
         LocalDate firstTransmissionDate;
         try {
-        	firstTransmissionDate  = patientNoEventService.getPatientFirstTransmittedDate(patientUserId);
-        	jsonObject.put("firstTransmissionDate",
+        	if(deviceType.equals(VEST)){
+        		firstTransmissionDate  = patientNoEventService.getPatientFirstTransmittedDate(patientUserId);
+        		jsonObject.put("firstTransmissionDate",
         			Objects.nonNull(firstTransmissionDate)?firstTransmissionDate.toString():null);
-        	
+        	}
+        	else if(deviceType.equals(MONARCH)){
+        		firstTransmissionDate  = patientNoEventMonarchService.getPatientFirstTransmittedDate(patientUserId);
+            	jsonObject.put("firstTransmissionDate",
+            			Objects.nonNull(firstTransmissionDate)?firstTransmissionDate.toString():null);
+            	}
 	        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
         } catch (HillromException hre){
         	jsonObject.put("ERROR", hre.getMessage());
@@ -1024,12 +1038,15 @@ public class UserExtensionResource {
     
     //hill-1845
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES})
-    //hill-1845
-    public ResponseEntity<JSONObject> reactivateUser(@PathVariable Long id) {
+    //hill-1845,
+    public ResponseEntity<JSONObject> reactivateUser(@PathVariable Long id, HttpServletRequest request) {
         log.debug("REST request to reactivate User : {}", id);
+        //hill-2178
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         JSONObject jsonObject = new JSONObject();
 		try {
-			jsonObject = userService.reactivateUser(id);
+			//hill-2178
+			jsonObject = userService.reactivateUser(id,baseUrl);
 			 if (jsonObject.containsKey("ERROR")) {
 		        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
 		        } else {

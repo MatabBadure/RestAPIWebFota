@@ -61,7 +61,33 @@ public class PatientUserVO {
 	private boolean isExpired;
 	private double hoursOfUsage;
 	private String serialNumber;
+	private String deviceType;
 	
+	public PatientUserVO(Long id, String email, String firstName,
+			String lastName, Boolean isDeleted, Integer zipcode, String address,
+			String city, LocalDate dob, String gender, String title,
+			String hillromId,DateTime createdAt,Boolean isActivated, String state,int adherence, 
+			Date lastTransmissionDate, String deviceType) {
+		super();
+		this.id = id;
+		this.email = email;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.isDeleted = isDeleted;
+		this.zipcode = zipcode;
+		this.address = address;
+		this.city = city;
+		this.dob = dob;
+		this.gender = gender;
+		this.title = title;
+		this.hillromId = hillromId;
+		this.createdAt = createdAt;
+		this.isActivated = isActivated;
+		this.state = state;
+		this.adherence = adherence;
+		this.lastTransmissionDate= lastTransmissionDate;
+		this.deviceType = deviceType;
+				}
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
 			String city, LocalDate dob, String gender, String title,
@@ -131,6 +157,33 @@ public class PatientUserVO {
 			this.city = patientInfo.getCity();
 			this.address = patientInfo.getAddress();
 			this.serialNumber = patientInfo.getSerialNumber();
+		}
+	}
+	
+	public PatientUserVO(UserExtension user, PatientInfo patientInfo, String deviceType) {
+		this.id = user.getId();
+		this.email = RandomUtil.isValidEmail(user.getEmail())? user.getEmail():null;
+		this.firstName = user.getFirstName();
+		this.lastName = user.getLastName();
+		this.isDeleted = user.isDeleted();
+		this.zipcode = user.getZipcode();
+		this.dob = user.getDob() != null ?user.getDob(): null;
+		this.title = user.getTitle();
+		this.langKey = user.getLangKey();
+		this.middleName = user.getMiddleName();
+		this.mobilePhone = user.getMobilePhone();
+		this.primaryPhone = user.getPrimaryPhone();
+		this.createdAt = user.getCreatedDate();
+		this.isActivated = user.getActivated();
+		this.lastLoggedInAt = user.getLastLoggedInAt();
+		if(null != patientInfo){			
+			this.state = patientInfo.getState();
+			this.hillromId = patientInfo.getHillromId();
+			this.gender = patientInfo.getGender();
+			this.city = patientInfo.getCity();
+			this.address = patientInfo.getAddress();
+			this.serialNumber = patientInfo.getSerialNumber();
+			this.deviceType = deviceType;
 		}
 	}
 
@@ -368,6 +421,12 @@ public class PatientUserVO {
 	}
 	public void setSerialNumber(String serialNumber) {
 		this.serialNumber = serialNumber;
+	}
+	public String getDeviceType() {
+		return deviceType;
+	}
+	public void setDeviceType(String deviceType) {
+		this.deviceType = serialNumber;
 	}
 		
 }

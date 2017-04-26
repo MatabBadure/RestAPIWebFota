@@ -36,5 +36,29 @@ public interface PatientVestDeviceRepository extends
 
 	@Query(nativeQuery = true, value = "SELECT * FROM PATIENT_VEST_DEVICE_HISTORY pvd where patient_id = :patientId and is_active = :isActive order by last_modified_by desc limit 1 ")
 	PatientVestDeviceHistory findLatestInActiveDeviceByPatientId(
-			@Param("patientId")String pateitnId, @Param("isActive")Boolean active);
+			@Param("patientId")String patientId, @Param("isActive")Boolean active);
+	
+/*	@Query(nativeQuery = true, value = " SELECT IF (t1.s1>0 AND t2.s2>0,'ALL',IF(t1.s1>0 AND t2.s2=0,'VEST', "
+			+ " IF(t1.s1=0 AND t2.s2>0,'MONARCH','NONE'))) from "
+			+ " (SELECT CASE WHEN COUNT(*) > 0 THEN PATIENT_VEST_DEVICE_HISTORY.serial_number ELSE 0 END AS s1 "
+			+ "	from PATIENT_VEST_DEVICE_HISTORY "
+			+ " WHERE patient_id =:patientId AND is_active) t1, "
+			+ " (SELECT CASE WHEN COUNT(*) > 0 THEN PATIENT_VEST_DEVICE_HISTORY_MONARCH.serial_number ELSE 0 END AS s2 "
+			+ " from PATIENT_VEST_DEVICE_HISTORY_MONARCH "
+			+ " WHERE patient_id =:patientId AND is_active) t2 ")
+	String findDeviceType(@Param("patientId")String patientId);*/
+	
+	
+/*	@Query(nativeQuery = true, value = " SELECT device_type "
+			+ " from PATIENT_DEVICES_ASSOC "
+			+ " WHERE patient_id =:patientId AND is_active ")
+	String findDeviceType(@Param("patientId")String patientId);*/
+	
+	
+	@Query(nativeQuery = true, value = " SELECT IF (pda.patient_type='CD','ALL', pda.device_type) as ptype "
+			+ " from PATIENT_DEVICES_ASSOC pda "
+			+ " where patient_id =:patientId and is_active=1"
+			+ " group by patient_id ")
+	String findDeviceType(@Param("patientId")String patientId);
+
 }

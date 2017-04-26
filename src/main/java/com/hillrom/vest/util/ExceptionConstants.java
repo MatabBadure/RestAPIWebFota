@@ -167,5 +167,8 @@ public class ExceptionConstants {
     public static final String HR_719 = "No such test result exists";
     
     public static final String HR_720 = "Unable to reset adherence score";
+	public static final String HR_721 = "Activation remainder link expired. ";
+	public static final String HR_722 = "The activation remainder link which you are trying to access is no more valid. ";
     
+	public static final String HR_723 = "This monarch device serial number or Wifi/LTE/BT serial number is already linked to patient ";
 }

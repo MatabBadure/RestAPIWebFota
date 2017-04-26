@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+	
+	<!-- Added new fields to PATIENT_VEST_DEVICE_DATA_MONARCH table. -->
+	<changeSet author="LnT Technology Services" id="20170224160200">
+		<addColumn tableName="PATIENT_VEST_DEVICE_DATA_MONARCH">
+			<column name="frag_total" type="integer" />
+		</addColumn>
+		<addColumn tableName="PATIENT_VEST_DEVICE_DATA_MONARCH">	
+			<column name="frag_current" type="integer" />
+		</addColumn>		
+	</changeSet>	
+</databaseChangeLog>

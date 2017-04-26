@@ -35,14 +35,18 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 
 import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.PatientProtocolData;
+import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserSurveyAnswer;
+import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.PatientStatsVO;
 import com.hillrom.vest.web.rest.dto.UserSurveyAnswerDTO;
+
+
 
 
 
@@ -56,8 +60,10 @@ import java.time.ZoneId;
 import java.util.Date;
 
 import com.hillrom.vest.service.util.DateUtil;
+import com.hillrom.vest.util.ExceptionConstants;
 
 import org.apache.commons.lang.StringUtils;
+
 import java.util.Calendar;
 
 /**
@@ -183,6 +189,19 @@ public class MailService {
         String subject = messageSource.getMessage("email.reactivation.title", null, locale);
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
+    
+    //HILL-2178
+    @Async
+    public void sendReactivationEmail(User user, String baseUrl) {
+        log.debug("sending Reactivation e-mail to '{}'", user.getEmail());
+        Locale locale = getLocale(user);
+        Context context = new Context(locale);
+        context.setVariable("user", userNameFormatting(user));
+        context.setVariable("baseUrl", baseUrl);
+        String content = templateEngine.process("reactivationEmail", context);
+        String subject = messageSource.getMessage("email.reactivation.title", null, locale);
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
 
     @Async
     public void sendPasswordResetMail(User user, String baseUrl) {
@@ -212,6 +231,23 @@ public class MailService {
        subject = messageSource.getMessage("email.therapynotification.title", null, null);
        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
+    
+    public void sendNotificationMailToPatientMonarch(User user,String notificationType,int missedTherapyCount){
+        log.debug("Sending password reset e-mail to '{}'", user.getEmail());
+        Context context = new Context();
+        context.setVariable("user", user);
+        context.setVariable("missedTherapyCount", missedTherapyCount);
+        context.setVariable("isMissedTherapyNotification", MISSED_THERAPY.equalsIgnoreCase(notificationType));
+        context.setVariable("isHmrNonComplianceNotification", HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType));
+        context.setVariable("isSettingsDeviatedNotification",SETTINGS_DEVIATION.equalsIgnoreCase(notificationType));
+        context.setVariable("isHMRNonComplianceAndSettingsNotification", HMR_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType));
+        context.setVariable("notificationUrl", patientDashboardUrl);
+        String content = "";
+        String subject = "";
+ 	   content = templateEngine.process("therapyNotification", context);
+        subject = messageSource.getMessage("email.therapynotification.title", null, null);
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+     }
     
     public void sendMessageNotificationToUser(User user, String messageSubject, int patOrCaOrHcp){
         log.debug("Sending notification of inbox message to '{}'", user.getEmail());
@@ -259,7 +295,37 @@ public class MailService {
         sendEmail(recipients.split(","), subject, content, false, true);
      }
     
+    public void sendJobFailureNotificationMonarch(String jobName,String stackTrace){
+    	String recipients = env.getProperty("mail.to");
+        log.debug("Sending password reset e-mail to '{}'", recipients);
+        Context context = new Context();
+        context.setVariable("environment", env.getProperty("spring.profiles.active"));
+        context.setVariable("jobName", jobName);
+        context.setVariable("stackTrace", stackTrace);
+        String content = "";
+        String subject = "";
+        content = templateEngine.process("jobFailureNotification", context);
+        subject = messageSource.getMessage("email.jobfailure.subject", null, null);
+        sendEmail(recipients.split(","), subject, content, false, true);
+     }
+    
     public void sendNotificationMailToHCPAndClinicAdmin(User user,Map<String,Map<String,Integer>> statistics){
+    	log.debug("Sending password reset e-mail to '{}'", user.getEmail());
+        Context context = new Context();
+        context.setVariable("user", user);
+        context.setVariable("clinicStatisticsMap",statistics);
+        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now().minusDays(1), "MMM dd,yyyy"));
+        context.setVariable("notificationUrl", hcpOrClinicAdminDashboardUrl);
+        String content = "";
+        String subject = "";
+
+        content = templateEngine.process("statisticsNotification", context);
+        subject = messageSource.getMessage("email.statisticsnotification.subject", null, null);
+        
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
+    
+    public void sendNotificationMailToHCPAndClinicAdminMonarch(User user,Map<String,Map<String,Integer>> statistics){
     	log.debug("Sending password reset e-mail to '{}'", user.getEmail());
         Context context = new Context();
         context.setVariable("user", user);
@@ -294,6 +360,25 @@ public class MailService {
         sendEmail(new String[]{careGiverStatsNotificationVO.getCGEmail()}, subject, content, false, true);
     }
     
+    public void sendNotificationCareGiverMonarch(CareGiverStatsNotificationVO careGiverStatsNotificationVO,  List<PatientStatsVO> statistics){
+    	log.debug("Sending care giver statistics e-mail to '{}'", careGiverStatsNotificationVO.getCGEmail());
+        Context context = new Context();
+        context.setVariable("careGiverStatsNotificationVO", careGiverStatsNotificationVO);
+        context.setVariable("patientsStatisticsList",statistics);
+        context.setVariable("isMultiplePatients",statistics.size()>1?true:false);
+        log.debug("statistics patient size {}", statistics.size());
+        
+        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now().minusDays(1), "MMM dd,yyyy"));
+        context.setVariable("notificationUrl", careGiverDashboardUrl);
+        String content = "";
+        String subject = "";
+
+        content = templateEngine.process("careGiverStatisticsNotification", context);
+        subject = messageSource.getMessage("email.statisticsnotification.subject", null, null);
+        
+        sendEmail(new String[]{careGiverStatsNotificationVO.getCGEmail()}, subject, content, false, true);
+    }
+    
     @Async
     public void sendActivationReminderEmail(User user) {
         log.debug("Sending activation Reminder e-mail to '{}'", user.getEmail());
@@ -310,8 +395,9 @@ public class MailService {
 	@Async
 	public void activationReminderEmail(){
     	try{
+
 			DateTime currectTime =  new DateTime();
-			for(int interval = accountActivationReminderInterval; interval < 72; interval += accountActivationReminderInterval)
+			for(int interval = accountActivationReminderInterval; interval < 144; interval += accountActivationReminderInterval)
 				getUsersActivationReminderEmail(currectTime.minusHours(interval).minusHours(1),currectTime.minusHours(interval));
 	    }catch(Exception ex){
 			StringWriter writer = new StringWriter();
@@ -319,6 +405,7 @@ public class MailService {
 			ex.printStackTrace( printWriter );
 			sendJobFailureNotification("activationReminderEmail",writer.toString());
 		}
+
 	}
     
 	private void getUsersActivationReminderEmail(DateTime fromTime,DateTime toTime){
@@ -448,6 +535,18 @@ public class MailService {
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
      }
     
+    public void sendUpdateProtocolMailToPatientMonarch(User user,List<PatientProtocolDataMonarch> patientProtocolDataList){
+        log.debug("Sending patient protocol data update e-mail to '{}'", user.getEmail());
+        Context context = new Context();
+        context.setVariable("user", user);
+        context.setVariable("notificationUrl", patientDashboardUrl);
+        String content = "";
+        String subject = "";
+ 	    content = templateEngine.process("changeProtocolNotification", context);
+        subject = messageSource.getMessage("email.patientprotocoldata.title", null, null);
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+     }
+    
     public void sendUpdateProtocolMailToMailingList(User currentUser, User patientUser,List<PatientProtocolData> patientProtocolDataList) throws IOException{
         log.debug("Sending patient protocol data update e-mail to '{}'", patientUser.getEmail());
         Context context = new Context();
@@ -462,6 +561,28 @@ public class MailService {
         File attachedFile = new File("pdf"+File.pathSeparator+"GeneratedPDF-"+LocalTime.now()+".pdf");
         
         File file = hillromPDFHandler.createPDFDoc(attachedFile, currentUser, patientUser, patientProtocolDataList);
+                
+		content = templateEngine.process("changePrescription", context);
+        subject = messageSource.getMessage("email.changePrescription.title", null, null) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);
+        String recipients = env.getProperty("spring.changePrescription.changePrescriptionEmailids");
+		log.debug("Sending change prescription email report '{}'", recipients);
+        sendEmail(recipients.split(","), subject, content, true, true, file);
+     }
+    
+    public void sendUpdateProtocolMailToMailingListMonarch(User currentUser, User patientUser,List<PatientProtocolDataMonarch> patientProtocolDataList) throws IOException{
+        log.debug("Sending patient protocol data update e-mail to '{}'", patientUser.getEmail());
+        Context context = new Context();
+        context.setVariable("user", patientUser);
+        context.setVariable("dob", DateUtil.formatDate(patientUser.getDob(), null));
+        context.setVariable("currentUser", currentUser);
+        context.setVariable("patientProtocolDataList", patientProtocolDataList);
+        context.setVariable("baseUrl", baseUrl);
+        context.setVariable("date", DateUtil.formatDate(new LocalDate(), null));
+        String content = "";
+        String subject = "";
+        File attachedFile = new File("pdf"+File.pathSeparator+"GeneratedPDF-"+LocalTime.now()+".pdf");
+        
+        File file = hillromPDFHandler.createPDFDocMonarch(attachedFile, currentUser, patientUser, patientProtocolDataList);
                 
 		content = templateEngine.process("changePrescription", context);
         subject = messageSource.getMessage("email.changePrescription.title", null, null) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);

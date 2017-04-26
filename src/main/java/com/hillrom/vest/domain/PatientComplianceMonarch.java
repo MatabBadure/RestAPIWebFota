@@ -74,7 +74,7 @@ public class PatientComplianceMonarch extends AbstractAuditingEntity implements 
 	private LocalDate latestTherapyDate;
 	
 	private Double hmr = 0.0d;
-
+	
 	@Column(name="settings_deviated_days_count")
 	private int settingsDeviatedDaysCount  = 0;
 	
@@ -134,6 +134,28 @@ public class PatientComplianceMonarch extends AbstractAuditingEntity implements 
 		this.missedTherapyCount = 0;
 		this.latestTherapyDate = date;
 		this.hmr = hmr;
+	}
+	
+	public PatientComplianceMonarch(Integer score, LocalDate date,
+			PatientInfo patient, User patientUser,Integer hmrRunRate,double hmr, Boolean isHMRCompliant,
+			Boolean isSettingsDeviated,Integer missedTherapyCount,LocalDate latestTherapyDate,			
+			Integer settingsDeviatedDaysCount,Integer globalHMRNonAdherenceCounter, 
+			Integer globalSettingsDeviationCounter, Integer globalMissedTherapyCounter) {
+		super();
+		this.score = score;
+		this.date = date;
+		this.patient = patient;
+		this.patientUser = patientUser;
+		this.hmrRunRate = hmrRunRate;
+		this.hmr = hmr;
+		this.isHmrCompliant = isHMRCompliant;
+		this.isSettingsDeviated = isSettingsDeviated;
+		this.missedTherapyCount = missedTherapyCount;
+		this.latestTherapyDate = latestTherapyDate;		
+		this.settingsDeviatedDaysCount = settingsDeviatedDaysCount;
+		this.globalHMRNonAdherenceCounter = globalHMRNonAdherenceCounter;
+		this.globalSettingsDeviationCounter = globalSettingsDeviationCounter;
+		this.globalMissedTherapyCounter = globalMissedTherapyCounter;
 	}
 	
 	public Long getId() {

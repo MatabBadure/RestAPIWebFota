@@ -114,4 +114,23 @@
 	<include file="classpath:/config/liquibase/changelog/20161228181730_updated_value_for_diagnosis_typecode.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170116030400_create_ping_pong_ping_table.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170117030200_updated_clinic_speciality_hillrom_type_code.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170131024800_add_column_inTHERAPY_DATA_MONARCH.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170209162030_updated_values_for_default_protocol_monarch.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170213102800_updated_patient_device_type_hillrom_type_code.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170213104500_create_patient_devices_assoc_table.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170213110200_add_column_PING_PONG_AND_RAW_LOGS_MONARCH.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170213035700_add_column_PING_PONG_PING.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170214121600_add_column_FRAG_CURRENT_TOTAL_RAW_LOGS_MONARCH.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170217053300_add_column_VEST_DEVICE_DATA_MONARCH.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170224160200_add_column_VEST_DEVICE_DATA_MONARCH.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170227143200_add_column_PATIENT_VEST_DEVICE_RAW_LOGS_MONARCH.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170316014700_add_column_PATIENT_DEVICES_ASSOC.xml" relativeToChangelogFile="false"/>	
+  <include file="classpath:/config/liquibase/changelog/20172803114330_add_extra_columns_to_PATIENT_DEVICES_ASSOC.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170329161200_add_column_hmr_vest_PATIENT_COMPLIANCE_MONARCH.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170330160400_add_columns_PATIENT_DEVICES_ASSOC.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170329194000_alter_datatype_notification_type_in_Notification.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170304031906_update_reset_date_datatype.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170403062300_add_more_columns_to_PATIENT_DEVICES_ASSOC.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170407114500_add_devBT_column_to_3tables.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170407123500_add_devBT_column_to_history.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

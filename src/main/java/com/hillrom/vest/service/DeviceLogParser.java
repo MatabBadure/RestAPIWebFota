@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
+import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
+import com.hillrom.vest.domain.PatientVestDeviceRawLogMonarch;
 
 
 public interface DeviceLogParser {

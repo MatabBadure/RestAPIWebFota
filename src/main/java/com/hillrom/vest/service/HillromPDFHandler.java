@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.domain.PatientProtocolData;
+import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.User;
 
 @Service
@@ -27,6 +28,12 @@ public class HillromPDFHandler {
 	public File createPDFDoc(File file, User currentUser, User patientUser,
 			List<PatientProtocolData> patientProtocolDataList) throws IOException {
 		return hillromPdfFactory.createPDFDoc(file, currentUser, patientUser, patientProtocolDataList);
+
+	}
+	
+	public File createPDFDocMonarch(File file, User currentUser, User patientUser,
+			List<PatientProtocolDataMonarch> patientProtocolDataList) throws IOException {
+		return hillromPdfFactory.createPDFDocMonarch(file, currentUser, patientUser, patientProtocolDataList);
 
 	}
 }

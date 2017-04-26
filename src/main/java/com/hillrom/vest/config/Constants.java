@@ -1,6 +1,8 @@
 package com.hillrom.vest.config;
 
 
+
+
 /**
  * Application constants.
  */
@@ -132,6 +134,10 @@ public final class Constants {
 	
 	public static final String PATIENT_ID = "Patient Id";
 	
+	public static final String HILLROM_ID = "Tims Id";
+	
+	public static final String WIFIorLTE_SERIAL_NO= "WIFI/LTE Serial Number";
+	
 	public static final String PATIENT_BLUETOOTH_ADDRESS = "patientBlueToothAddress";
 	
 	public static final String DAY = "day";
@@ -194,6 +200,7 @@ public final class Constants {
 	public static final String KEY_FREQUENCY = "frequency";
 	public static final String KEY_DURATION = "duration";
 	public static final String KEY_PRESSURE = "pressure";
+	public static final String KEY_INTENSITY = "intensity";
 	public static final String KEY_SESSION_NO = "sessionNo";
 	
 	//hill-1847
@@ -209,9 +216,10 @@ public final class Constants {
 	public static final String KEY_MIN = "min";
 	public static final String KEY_THERAPY_DATA = "therapyData";
 	public static final String KEY_PROTOCOL = "protocol";
-	public static final String PRESSURE_LABEL = "Pressure";
-	public static final String FREQUENCY_LABEL = "Frequency";
-	public static final String DURATION_LABEL = "Duration";
+	public static final String PRESSURE_LABEL = "Avg Pressure/Intensity";
+	public static final String INTENSITY_LABEL = "Avg Pressure/Intensity";
+	public static final String FREQUENCY_LABEL = "Avg Frequency";
+	public static final String DURATION_LABEL = "Avg Duration";
 
 	// Cumulative Stats Graph 
 	public static final String HMR_NON_ADHERENCE_LABEL = "Patients Below Therapy Minutes";
@@ -324,4 +332,11 @@ public final class Constants {
 	//start:announcement changes
 		public static final String ANNOUNCEMENT_FILE_PATH = "/tmp/visiview-files/";
 	//end:announcement changes
+		
+	//Device Type
+	public static final String VEST = "VEST";
+	public static final String MONARCH = "MONARCH";
+	
+	public static final String INTENSITY = "Intensity";
+	
 }

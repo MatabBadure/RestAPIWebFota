@@ -10,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
@@ -25,6 +24,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.util.DecimalNumberSerializer;
+
+import org.springframework.data.annotation.Transient;
 
 @Entity
 @Table(name = "PATIENT_VEST_DEVICE_HISTORY")
@@ -71,6 +72,9 @@ public class PatientVestDeviceHistory implements Serializable {
     
     @Column(name="hmr")
 	private Double hmr = 0d; // default value for HMR
+    
+    @Transient
+   	private String deviceType;
 
 	public PatientVestDeviceHistory() {
 		super();
@@ -83,8 +87,9 @@ public class PatientVestDeviceHistory implements Serializable {
 		this.bluetoothId = bluetoothId;
 		this.hubId = hubId;
 		this.active = active;
+		this.deviceType = "VEST";
 	}
-
+	
 	public PatientVestDeviceHistory(PatientVestDevicePK patientVestDevicePK,
 			String bluetoothId, String hubId, Boolean active, DateTime ModifiedDate) {
 		super();
@@ -93,6 +98,7 @@ public class PatientVestDeviceHistory implements Serializable {
 		this.hubId = hubId;
 		this.active = active;
 		this.lastModifiedDate = ModifiedDate;
+		this.deviceType = "VEST";
 	}
 
 	public PatientVestDevicePK getPatientVestDevicePK() {
@@ -173,6 +179,16 @@ public class PatientVestDeviceHistory implements Serializable {
 
 	public void setLastModifiedDate(DateTime lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
+	}
+	
+	@Transient
+	public String getDeviceType() {
+		return deviceType;
+	}
+
+    @Transient
+	public void setDeviceType(String deviceType) {
+		this.deviceType = deviceType;
 	}
 	
 	@JsonIgnore

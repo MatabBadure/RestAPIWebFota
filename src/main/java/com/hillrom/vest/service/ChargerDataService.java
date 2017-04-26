@@ -54,7 +54,6 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVI
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_DATA;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_MODEL;
 
-
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FRAG_TOTAL;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FRAG_CURRENT;
 
@@ -98,7 +97,6 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_LTE;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_SN;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_VER;
-
 
 @Service
 @Transactional
@@ -159,15 +157,14 @@ public class ChargerDataService {
 			}
 	
 
-
 	
-
 			private JSONObject validateRequest(String rawData,String decoded_data) throws HillromException {
 				log.error("Inside validateRequest " + rawData);
-				JSONObject chargerJsonData = ParserUtil.getChargerQclJsonDataFromRawMessage(decoded_data);
-				String DEVICE_BT = "devBT";
-				
-				String reqParams[] = new String[]{DEVICE_MODEL,DEVICE_SN,
+
+        String DEVICE_BT = "devBT";
+				JSONObject chargerJsonData = ParserUtil.getChargerJsonDataFromRawMessage(decoded_data);
+
+        String reqParams[] = new String[]{DEVICE_MODEL,DEVICE_SN,
 						DEVICE_WIFI,DEVICE_LTE,DEVICE_BT,DEVICE_VER,FRAG_TOTAL,FRAG_CURRENT,DEVICE_DATA,CRC};
 				
 				
@@ -213,10 +210,8 @@ public class ChargerDataService {
 				}
 				
 				return chargerJsonData;
-
 			}
 	
-
 
 
 
@@ -632,7 +627,6 @@ public class ChargerDataService {
 	    	    log.debug("hexTotal : " + hexTotal);
 	    	    return hexTotal;
 	    	}
-
 
 	
 	

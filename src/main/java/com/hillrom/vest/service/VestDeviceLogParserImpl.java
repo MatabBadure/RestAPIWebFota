@@ -1,19 +1,52 @@
 package com.hillrom.vest.service;
 
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.AIR_INTERFACE_TYPE;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CRC_FIELD_NAME;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CUC_VERSION;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CUSTOMER_ID;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CUSTOMER_NAME;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_ADDRESS;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_DATA;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_DATA_FIELD_NAME;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_MODEL_TYPE;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_SERIAL_NUMBER;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_TYPE;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DURATION_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DURATION_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.END_BATTERY_LEVEL_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.END_BATTERY_LEVEL_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.END_TIME_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.END_TIME_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVENT_CODE_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVENT_CODE_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVENT_LOG_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVENT_LOG_START_POS;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVENT_TIMESTAMP_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.EVENT_TIMESTAMP_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FREQUENCY_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FREQUENCY_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.HMR_SECONDS_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.HMR_SECONDS_LOC;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.HUB_ID;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.HUB_RECEIVE_TIME;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.HUB_RECEIVE_TIME_OFFSET;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.INTENSITY_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.INTENSITY_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.NUMBER_OF_EVENTS_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.NUMBER_OF_EVENTS_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.NUMBER_OF_PODS_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.NUMBER_OF_PODS_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.SESSION_INDEX_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.SESSION_INDEX_LOC;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.SP_RECEIVE_TIME;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.START_BATTERY_LEVEL_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.START_BATTERY_LEVEL_LOC;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.START_TIME_LEN;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.START_TIME_LOC;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.TIMEZONE;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_VER;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_MODEL;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_SN;
 import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.CHECKSUM_END_OFFSET;
 import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.CHECKSUM_START_OFFSET;
 import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.DAY_END_OFFSET;
@@ -45,6 +78,7 @@ import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.YEAR_STA
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.getEventStringByEventCode;
 import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.DATA_PACKET_HEADER;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,8 +92,13 @@ import org.springframework.stereotype.Component;
 
 import com.hillrom.vest.batch.processing.PatientVestDeviceDataDeltaReader;
 import com.hillrom.vest.domain.PatientVestDeviceData;
+import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
+import com.hillrom.vest.domain.PatientVestDeviceRawLogMonarch;
+import com.hillrom.vest.domain.PingPongPing;
 import com.hillrom.vest.service.util.ParserUtil;
+import com.hillrom.vest.service.util.monarch.ParserUtilMonarch;
+
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.getEventStringByEventCode;
 import static com.hillrom.vest.config.VestDeviceRawLogOffsetConstants.INFO_PACKET_HEADER;
 
@@ -274,5 +313,48 @@ public class VestDeviceLogParserImpl implements DeviceLogParser {
 		String checksumString = ParserUtil.getFieldByStartAndEndOffset(
 				base16String,CHECKSUM_START_OFFSET,CHECKSUM_END_OFFSET);
 		return ParserUtil.convertHexStringToInteger(checksumString);
+	}
+
+	private PatientVestDeviceRawLogMonarch createPatientVestDeviceRawLogMonarch(
+			String rawMessageMonarch,JSONObject qclJsonDataMonarch)  throws Exception{
+		PatientVestDeviceRawLogMonarch patientVestDeviceRawLogMonarch = new PatientVestDeviceRawLogMonarch();
+		patientVestDeviceRawLogMonarch.setRawMessage(rawMessageMonarch);
+
+		patientVestDeviceRawLogMonarch.setCucVersion(ParserUtilMonarch.getValueFromQclJsonDataMonarch(
+				qclJsonDataMonarch, DEVICE_VER));
+
+
+		patientVestDeviceRawLogMonarch.setDeviceData(ParserUtilMonarch.getMonarchDeviceData(rawMessageMonarch));
+
+		patientVestDeviceRawLogMonarch
+				.setDeviceModelType(ParserUtilMonarch
+						.getValueFromQclJsonDataMonarch(
+								qclJsonDataMonarch,DEVICE_MODEL));
+		patientVestDeviceRawLogMonarch
+				.setDeviceSerialNumber(ParserUtilMonarch
+						.getValueFromQclJsonDataMonarch(
+								qclJsonDataMonarch,DEVICE_SN));
+		
+		patientVestDeviceRawLogMonarch.setTotalFragments(ParserUtilMonarch.getFragTotal(rawMessageMonarch)+"");
+		patientVestDeviceRawLogMonarch.setCurrentFragment(ParserUtilMonarch.getFragCurrent(rawMessageMonarch)+"");
+		patientVestDeviceRawLogMonarch.setChecksum(ParserUtilMonarch.getCRCChecksum(rawMessageMonarch)+"");
+		
+		return patientVestDeviceRawLogMonarch;
+	}
+	
+	public String decodeData(final String rawMessage){
+		byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
+		
+        String sout = "";
+        for(int i=0;i<decoded.length;i++) {
+        	int val = decoded[i] & 0xFF;
+        	sout = sout + val + " ";
+        }
+        
+        log.debug("Input Byte Array :"+sout);
+
+		String decoded_string = new String(decoded);
+		log.error("Decoded value is " + decoded_string);
+		return decoded_string;
 	}
 }

@@ -18,12 +18,14 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hillrom.vest.domain.util.DecimalNumberSerializer;
+
 
 @Entity
 @Table(name = "PATIENT_VEST_DEVICE_HISTORY_MONARCH")
@@ -38,8 +40,17 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 	@EmbeddedId
 	private PatientVestDevicePK patientVestDevicePK;
 
-	@Column(name = "bluetooth_id")
-	private String bluetoothId;
+	/*@Column(name = "bluetooth_id")
+	private String bluetoothId;*/
+	
+	@Column(name = "dev_wifi")
+	private String wifiId;
+	
+	@Column(name = "dev_lte")
+	private String lteId;
+	
+	@Column(name = "dev_bt")
+	private String devBt;
 	
 	@Column(name="hub_id")
 	private String hubId;
@@ -69,18 +80,22 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
     
     @Column(name="hmr")
 	private Double hmr = 0d; // default value for HMR
+    
+    @Transient
+	private String deviceType;
 
 	public PatientVestDeviceHistoryMonarch() {
 		super();
 	}
 
 	public PatientVestDeviceHistoryMonarch(PatientVestDevicePK patientVestDevicePK,
-			String bluetoothId, String hubId, Boolean active) {
+			String wifiId, String hubId, Boolean active) {
 		super();
 		this.patientVestDevicePK = patientVestDevicePK;
-		this.bluetoothId = bluetoothId;
+		this.wifiId = wifiId;
 		this.hubId = hubId;
 		this.active = active;
+		this.deviceType = "MONARCH";
 	}
 
 	public PatientVestDevicePK getPatientVestDevicePK() {
@@ -107,12 +122,28 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 		getPatientVestDevicePK().setSerialNumber(serialNumber);
 	}
 	
-	public String getBluetoothId() {
-		return bluetoothId;
+	public String getDevBt() {
+		return devBt;
 	}
 
-	public void setBluetoothId(String bluetoothId) {
-		this.bluetoothId = bluetoothId;
+	public void setDevBt(String devBt) {
+		this.devBt = devBt;
+	}
+	
+	public String getWifiId() {
+		return wifiId;
+	}
+
+	public void setWifiId(String wifiId) {
+		this.wifiId = wifiId;
+	}
+	
+	public String getLteId() {
+		return lteId;
+	}
+
+	public void setLteId(String lteId) {
+		this.lteId = lteId;
 	}
 
 	public String getHubId() {
@@ -163,6 +194,16 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 		this.lastModifiedDate = lastModifiedDate;
 	}
 	
+	@Transient
+	public String getDeviceType() {
+		return deviceType;
+	}
+
+    @Transient
+	public void setDeviceType(String deviceType) {
+		this.deviceType = deviceType;
+	}
+	
 	@JsonIgnore
 	public Double getHmr() {
 		return hmr;
@@ -185,7 +226,7 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 		int result = 1;
 		result = prime * result + ((active == null) ? 0 : active.hashCode());
 		result = prime * result
-				+ ((bluetoothId == null) ? 0 : bluetoothId.hashCode());
+				+ ((wifiId == null) ? 0 : wifiId.hashCode());
 		result = prime * result + ((hubId == null) ? 0 : hubId.hashCode());
 		result = prime
 				* result
@@ -208,10 +249,10 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 				return false;
 		} else if (!active.equals(other.active))
 			return false;
-		if (bluetoothId == null) {
-			if (other.bluetoothId != null)
+		if (wifiId == null) {
+			if (other.wifiId != null)
 				return false;
-		} else if (!bluetoothId.equals(other.bluetoothId))
+		} else if (!wifiId.equals(other.wifiId))
 			return false;
 		if (hubId == null) {
 			if (other.hubId != null)
@@ -231,8 +272,8 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return "PatientVestDeviceHistoryMonarch [patientVestDevicePK=" + patientVestDevicePK + ", bluetoothId="
-				+ bluetoothId + ", hubId=" + hubId + ", active=" + active + ", createdBy=" + createdBy
+		return "PatientVestDeviceHistoryMonarch [patientVestDevicePK=" + patientVestDevicePK + ", wifiId="
+				+ wifiId + ", hubId=" + hubId + ", active=" + active + ", createdBy=" + createdBy
 				+ ", createdDate=" + createdDate + ", lastModifiedBy=" + lastModifiedBy + ", lastModifiedDate="
 				+ lastModifiedDate + ", hmr=" + hmr + "]";
 	}

@@ -38,6 +38,9 @@ public class PatientVestDeviceDataMonarch implements Serializable,Comparable<Pat
 	@Column(name = "serial_number")
 	private String serialNumber;
 	
+	@Id
+	@Column(name = "bluetooth_id")
+	private String bluetoothId;
 	
 	
 	private Double hmr;
@@ -60,6 +63,40 @@ public class PatientVestDeviceDataMonarch implements Serializable,Comparable<Pat
 	@JoinColumn(name="user_id",referencedColumnName="id")
 	private User patientUser;
 	
+	@Column(name = "frag_total")
+	private Integer fragTotal;
+	
+	@Column(name = "frag_current")
+	private Integer fragCurrent;
+	
+	@Column(name = "therapy_index")
+	private Integer therapyIndex;
+	
+	@Column(name = "start_battery_level")
+	private Integer startBatteryLevel;
+	
+	@Column(name = "end_battery_level")
+	private Integer endBatteryLevel;
+	
+	@Column(name = "number_of_events")
+	private Integer numberOfEvents;
+	
+	@Column(name = "number_of_pods")
+	private Integer numberOfPods;
+	
+	@Column(name = "dev_wifi")
+	private String devWifi;
+	
+	@Column(name = "dev_lte")
+	private String devLte;
+	
+	@Column(name = "dev_bt")
+	private String devBt;
+	
+	@Column(name = "dev_version")
+	private String devVersion;
+	
+	
 	public Long getTimestamp() {
 		return timestamp;
 	}
@@ -70,6 +107,14 @@ public class PatientVestDeviceDataMonarch implements Serializable,Comparable<Pat
 
 	public Integer getSequenceNumber() {
 		return sequenceNumber;
+	}
+	
+	public String getBluetoothId() {
+		return bluetoothId;
+	}
+
+	public void setBluetoothId(String bluetoothId) {
+		this.bluetoothId = bluetoothId;
 	}
 
 	public void setSequenceNumber(Integer sequenceNumber) {
@@ -151,6 +196,93 @@ public class PatientVestDeviceDataMonarch implements Serializable,Comparable<Pat
 		this.patientUser = patientUser;
 	}
 
+	public Integer getTherapyIndex() {
+		return therapyIndex;
+	}
+
+	public void setTherapyIndex(Integer therapyIndex) {
+		this.therapyIndex = therapyIndex;
+	}
+
+	public Integer getStartBatteryLevel() {
+		return startBatteryLevel;
+	}
+
+	public void setStartBatteryLevel(Integer startBatteryLevel) {
+		this.startBatteryLevel = startBatteryLevel;
+	}
+
+	public Integer getEndBatteryLevel() {
+		return endBatteryLevel;
+	}
+
+	public void setEndBatteryLevel(Integer endBatteryLevel) {
+		this.endBatteryLevel = endBatteryLevel;
+	}
+
+	public Integer getNumberOfEvents() {
+		return numberOfEvents;
+	}
+
+	public void setNumberOfEvents(Integer numberOfEvents) {
+		this.numberOfEvents = numberOfEvents;
+	}
+
+	public Integer getNumberOfPods() {
+		return numberOfPods;
+	}
+
+	public void setNumberOfPods(Integer numberOfPods) {
+		this.numberOfPods = numberOfPods;
+	}
+
+	public String getDevWifi() {
+		return devWifi;
+	}
+
+	public void setDevWifi(String devWifi) {
+		this.devWifi = devWifi;
+	}
+
+	public String getDevLte() {
+		return devLte;
+	}
+
+	public void setDevLte(String devLte) {
+		this.devLte = devLte;
+	}
+	
+	public String getDevBt() {
+		return devBt;
+	}
+
+	public void setDevBt(String devBt) {
+		this.devBt = devBt;
+	}
+
+	public String getDevVersion() {
+		return devVersion;
+	}
+
+	public void setDevVersion(String devVersion) {
+		this.devVersion = devVersion;
+	}
+
+	public Integer getFragTotal() {
+		return fragTotal;
+	}
+
+	public void setFragTotal(Integer fragTotal) {
+		this.fragTotal = fragTotal;
+	}
+
+	public Integer getFragCurrent() {
+		return fragCurrent;
+	}
+
+	public void setFragCurrent(Integer fragCurrent) {
+		this.fragCurrent = fragCurrent;
+	}
 
 	@JsonIgnore
 	public DateTime getDate(){
@@ -165,7 +297,11 @@ public class PatientVestDeviceDataMonarch implements Serializable,Comparable<Pat
 			return 0;
 	}
 	
-
+	@JsonIgnore
+	public String getPatientBlueToothAddress(){
+		return "PAT_ID:BT:"+this.bluetoothId;
+	}
+ 
 
 	@Override
 	public int compareTo(PatientVestDeviceDataMonarch o) {

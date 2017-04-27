@@ -163,6 +163,7 @@ public class ParserUtil {
 		}
 		
 		
+
 		/*
 		StringTokenizer st = new StringTokenizer(rawMessage, "&");
 		while (st.hasMoreTokens()) {
@@ -171,6 +172,7 @@ public class ParserUtil {
 		  if(pair.contains("=")){
 			  StringTokenizer st_NameValue = new StringTokenizer(pair, "=");
 			  String nameToken =  st_NameValue.nextToken();
+
 			  String valueToken;
 			  if(DEVICE_SN.equalsIgnoreCase(nameToken) || DEVICE_WIFI.equalsIgnoreCase(nameToken) || DEVICE_LTE.equalsIgnoreCase(nameToken)
 					  || DEVICE_VER.equalsIgnoreCase(nameToken) || FRAG_TOTAL.equalsIgnoreCase(nameToken) || FRAG_CURRENT.equalsIgnoreCase(nameToken) ||
@@ -204,8 +206,10 @@ public class ParserUtil {
 				  
 			  }
 				
+
 		  }
 		}*/
+
 			
 		return qclJsonData;
 	}

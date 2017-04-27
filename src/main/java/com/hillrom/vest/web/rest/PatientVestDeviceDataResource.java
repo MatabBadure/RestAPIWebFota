@@ -96,13 +96,11 @@ public class PatientVestDeviceDataResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> receiveDataCharger(@RequestBody(required=true)String rawMessage){
 
+
 		try{
 			log.error("Base64 Received Data for ingestion in receiveDataCharger : ",rawMessage);
 
-
-
-			
-			JSONObject chargerJsonData = new JSONObject();
+      JSONObject chargerJsonData = new JSONObject();
 			
 			ExitStatus exitStatus = deviceDataServiceMonarch.saveData(rawMessage);
 			

@@ -55,8 +55,10 @@ import org.supercsv.prefs.CsvPreference;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
+
 import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
+
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceData;
@@ -231,9 +233,11 @@ public class UserResource {
   @Inject
     private ClinicRepository clinicRepository;
 	
+
   	@Inject
   	private 
   	PatientInfoRepository patientInfoRepository;
+
 	/**
 	 * GET /users -> get all users.
 	 */
@@ -426,13 +430,16 @@ public class UserResource {
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
     public ResponseEntity<JSONObject> linkMonarchDeviceWithPatient(@PathVariable Long id, 
     		@RequestBody Map<String, Object> deviceData,
+
     		@RequestParam(value = "deviceType", required = true) String deviceType,
     		@RequestParam(value = "deviceValue", required = true) String deviceValue){
+
     	log.debug("REST request to link vest device with patient user : {}", id);
         JSONObject jsonObject = new JSONObject();
 		try {
 			Object responseObj_Vest = null;
 			Object responseObj_Monarch = null;
+
 			String changedDevType = "";
 		
 			PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(id);
@@ -491,6 +498,7 @@ public class UserResource {
 					changedDevType = "MONARCH";
 				}
 			}
+
 			if (responseObj_Vest instanceof User) {
 				jsonObject.put("ERROR", ExceptionConstants.HR_572);
 				jsonObject.put("user", (User) responseObj_Vest);
@@ -501,6 +509,7 @@ public class UserResource {
 				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 			}else {
 				jsonObject.put("message", MessageConstants.HR_282);
+
 				jsonObject.put("changedDevType", changedDevType);
 				if(deviceType.equals("VEST") || deviceType.equals("ALL")){
 					if(deviceValue.equals("MONARCH")){
@@ -517,6 +526,7 @@ public class UserResource {
 						jsonObject.put("user", (PatientVestDeviceHistoryMonarch) responseObj_Monarch);
 					}
 				}
+
 				return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 			}
 		} catch (HillromException e) {
@@ -538,6 +548,7 @@ public class UserResource {
     		@RequestParam(value = "deviceType", required = true) String deviceType) {
     	log.debug("REST request to link vest device with patient user : {}", id);
     	JSONObject jsonObject = new JSONObject();
+
 		try {
 			List<PatientVestDeviceHistory> deviceList_vest = patientVestDeviceService.getLinkedVestDeviceWithPatient(id);
 			List<PatientVestDeviceHistoryMonarch> deviceList_monarch = patientVestDeviceMonarchService.getLinkedVestDeviceWithPatientMonarch(id);
@@ -625,6 +636,7 @@ public class UserResource {
      * POST  /patient/:id/protocol -> add protocol with patient {id}.
      */
     @RequestMapping(value = "/patient/{id}/protocol/monarchdevice",
+
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
@@ -653,10 +665,12 @@ public class UserResource {
      * POST  /patient/:id/protocol -> add protocol with patient {id}.
      */
     @RequestMapping(value = "/patient/{id}/protocol/vestdevice",
+
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+
     public ResponseEntity<JSONObject> addProtocolToPatientForVestDevice(@PathVariable Long id,
     		@RequestBody ProtocolDTO protocolDTO) {
     	log.debug("REST request to add protocol with patient user : {}", id);
@@ -714,6 +728,7 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+
     public ResponseEntity<JSONObject> updateProtocolToPatientForVestDevice(@PathVariable Long id,
     		@RequestBody List<PatientProtocolDataMonarch> ppdList) {
     	log.debug("REST request to update protocol with patient user : {}", id);
@@ -825,8 +840,10 @@ public class UserResource {
     			message = patientProtocolService.deleteProtocolForPatient(id, protocolId);
     		}else if(deviceType.equals("MONARCH")){
     			message = patientProtocolMonarchService.deleteProtocolForPatient(id, protocolId);
+
     		}
 	    	 if (Objects.isNull(message)) {
+
 	        	jsonObject.put("message", MessageConstants.HR_245);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
@@ -1047,7 +1064,9 @@ public class UserResource {
 		
 			if(deviceType.equals("VEST")){
 				List<PatientVestDeviceData>	vestdeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
+
 				if(!vestdeviceData.isEmpty() ){
+
 	            	excelOutputService.createExcelOutputExcel(response, vestdeviceData);
 	            }else{
 	            	response.setStatus(204);
@@ -1056,11 +1075,14 @@ public class UserResource {
 			}else if(deviceType.equals("MONARCH")){
 				List<PatientVestDeviceDataMonarch> monarchdeviceData = monarchdeviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
 
+
 				if(!monarchdeviceData.isEmpty() ){
+
 	            	excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
 	            }else{
 	            	response.setStatus(204);
 	            }
+
 			}else if(deviceType.equals("ALL")){
 				
 				PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(id);
@@ -1094,6 +1116,7 @@ public class UserResource {
 	            	response.setStatus(204);
 	            }
 			}
+
 		
 
         } catch (Exception ex) {
@@ -1123,6 +1146,7 @@ public class UserResource {
         	else if(deviceType.equals(MONARCH)) {
         		statitics = patientHCPMonarchService.getTodaysPatientStatisticsForClinicAssociatedWithHCP(clinicId, date);
         	}
+
         	else if(deviceType.equals("BOTH")){
         		statitics = patientHCPMonarchService.getTodaysPatientStatisticsForClinicAssociatedWithHCPBoth(clinicId, date);
         	}
@@ -1130,6 +1154,7 @@ public class UserResource {
         		statitics = patientHCPMonarchService.getTodaysPatientStatisticsForClinicAssociatedWithHCPAll(clinicId, date);
         	}
         
+
         	if(statitics.isEmpty()) {
 	        	jsonObject.put("message", ExceptionConstants.HR_584);
 	        } else {
@@ -1245,10 +1270,12 @@ public class UserResource {
         		Collection<StatisticsVO> statiticsCollection_all =  patientHCPMonarchService.getCumulativePatientStatisticsForClinicAssociatedWithHCPAll(hcpId,clinicId,from,to);
         		statiticsCollection = statiticsCollection_all;
         	}
+
         	else if(deviceType.equals("BOTH")){
         		Collection<StatisticsVO> statiticsCollection_both =  patientHCPMonarchService.getCumulativePatientStatisticsForClinicAssociatedWithHCPBoth(hcpId,clinicId,from,to);
         		statiticsCollection = statiticsCollection_both;
         	}
+
         	if (statiticsCollection.isEmpty()) {
         		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
         	} else {
@@ -1432,11 +1459,13 @@ public class UserResource {
     			List<ProtocolRevisionVO> adherenceTrends = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
     			return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
     		}
+
     		else{
                 List<ProtocolRevisionMonarchVO> adherenceTrends = patientComplianceMonarchService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
                 return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
         	}
     		
+
 		} catch (HillromException e) {
 			// TODO: handle exception
 			JSONObject jsonObject = new JSONObject();
@@ -1501,7 +1530,9 @@ public class UserResource {
     			
     			if(deviceType.equals(VEST)){
     				adherenceTrendData = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id, from, to);
+
     			}else {
+
     				adherenceTrendDataMonarch = patientComplianceMonarchService.findAdherenceTrendByUserIdAndDateRange(id, from, to);
     			}
     			

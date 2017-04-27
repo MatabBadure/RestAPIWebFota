@@ -94,7 +94,9 @@ import com.hillrom.vest.repository.monarch.AdherenceResetMonarchRepository;
 import com.hillrom.vest.repository.monarch.ClinicMonarchRepository;
 import com.hillrom.vest.repository.monarch.NotificationMonarchRepository;
 import com.hillrom.vest.repository.monarch.PatientComplianceMonarchRepository;
+
 import com.hillrom.vest.repository.monarch.PatientNoEventsMonarchRepository;
+
 import com.hillrom.vest.repository.monarch.TherapySessionMonarchRepository;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.ClinicPatientService;
@@ -205,9 +207,11 @@ public class AdherenceCalculationServiceMonarch{
 	@Inject
 	private TherapySessionServiceMonarch therapySessionMonarchService;
 	
+
 	@Inject
 	private PatientNoEventsRepository noEventRepository;
 	
+
 	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationServiceMonarch.class);
 	
 	/**
@@ -380,6 +384,7 @@ public class AdherenceCalculationServiceMonarch{
 					processForEachPatientBoth(compliance, userIdNoEventMap, userIdNoEventMapVest, complianceMap, mstNotificationMap,hmrNonComplianceMapBoth);
 			}
 			
+
 			List<Long> patientUserIds =  new LinkedList<>(hmrNonComplianceMap.keySet());
 			patientUserIds.addAll(new LinkedList<>(hmrNonComplianceMapBoth.keySet()));
 			
@@ -391,6 +396,7 @@ public class AdherenceCalculationServiceMonarch{
 				calculateHMRComplianceForMSTBoth(today, hmrNonComplianceMapBoth,
 							userProtocolConstantsMap, userProtocolConstantsVestMap, complianceMap, notificationMap);
 			}
+
 			
 			calculateHMRComplianceForMST(today, hmrNonComplianceMap,
 						userProtocolConstantsMap, complianceMap, notificationMap);
@@ -777,11 +783,13 @@ public class AdherenceCalculationServiceMonarch{
 		return "Adherence score reset successfully";
 	}
 
+
 	// Grouping the Patient Compliance Monarch data by date 
 	public SortedMap<LocalDate,List<PatientComplianceMonarch>> groupPatientComplianceByDate(List<PatientComplianceMonarch> patientComplianceMonarch){
 		return new TreeMap<>(patientComplianceMonarch.stream().collect(Collectors.groupingBy(PatientComplianceMonarch :: getDate)));
 	}
 		
+
 	public String adherenceCalculationBoth(Long userId, String patientId, LocalDate adherenceStartDate, 
 			LocalDate firstTransmissionOfOldDevice, Integer adherenceScore, Long oldUserId, Integer flag){
 		// flag 1 - for adherence reset
@@ -1114,6 +1122,7 @@ public class AdherenceCalculationServiceMonarch{
 				ProtocolConstantsMonarch protocolConstant = userProtocolConstantsMap.get(patientUserId);
 				ProtocolConstants protocolConstantVest = userProtocolConstantsVestMap.get(patientUserId);
 
+
 				boolean isHmrCompliantVest = true; 
 				boolean isHmrCompliantMonarch = true; 
 				if(!therapySessionsVest.isEmpty()){
@@ -1122,6 +1131,7 @@ public class AdherenceCalculationServiceMonarch{
 				if(!therapySessions.isEmpty()){
 					isHmrCompliantMonarch = isHMRCompliant(protocolConstant, durationForSettingDaysMonarch, adherenceSettingDay);
 				}
+
 				
 				if(!isHmrCompliantVest || !isHmrCompliantMonarch){
 					score = score < HMR_NON_COMPLIANCE_POINTS ? 0 : score - HMR_NON_COMPLIANCE_POINTS;
@@ -2537,13 +2547,16 @@ public class AdherenceCalculationServiceMonarch{
 	
 	
 	/**
+
 	 * Runs every midnight to integrate the patient who is using both devices after identified
+
 	 */
 	//@Scheduled(cron="0 55 23 * * * ")	
 	public void processDeviceDetails(){
 		try{
 			LocalDate today = LocalDate.now();
 			log.debug("Started Device details "+DateTime.now()+","+today);
+
 			
 			List<PatientDevicesAssoc> patDevAssList = patientDevicesAssocRepository.findByCreatedDate(today.toString());			
 			

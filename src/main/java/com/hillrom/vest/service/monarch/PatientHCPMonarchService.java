@@ -37,7 +37,9 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicPatientRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PatientNoEventsRepository;
+
 import com.hillrom.vest.repository.PatientVestDeviceRepository;
+
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
@@ -71,9 +73,11 @@ public class PatientHCPMonarchService extends PatientHCPService{
 
     @Inject
     private UserPatientRepository userPatientRepository;
+
     
     @Inject
     private PatientVestDeviceRepository patientVestDeviecRepository;
+
 
     @Inject
     private UserExtensionRepository userExtensionRepository;
@@ -141,6 +145,7 @@ public class PatientHCPMonarchService extends PatientHCPService{
 		return statistics;
 	}
 	
+
 	private List<Map<String,Object>> getComboDeviceTypePatients(List<Map<String, Object>> patientUsers) {
 		List<Map<String,Object>> patientUsersToRet = new LinkedList<>();
 		patientUsers.forEach(patientUser -> {
@@ -195,6 +200,7 @@ public class PatientHCPMonarchService extends PatientHCPService{
 		return statistics;
 	}
 	
+
 	public Map<String, Object> getTodaysPatientStatisticsForClinicAssociatedWithHCPAll(String clinicId, LocalDate date) throws HillromException{
 		Map<String, Object> statistics = new HashMap();
 		List<String> clinicList = new LinkedList<>();
@@ -372,6 +378,7 @@ public class PatientHCPMonarchService extends PatientHCPService{
 		return new LinkedList<>(statisticsMap.values());
 	}
 	
+
 	public List<StatisticsVO> getPatienCumulativeStatisticsBoth(LocalDate from, LocalDate to,
 			List<Long> patientUserIds){
 		Map<LocalDate, StatisticsVO> statisticsMap = new TreeMap<>();
@@ -402,6 +409,7 @@ public class PatientHCPMonarchService extends PatientHCPService{
 		}
 		return new LinkedList<>(statisticsMap.values());
 	}
+
 	
 	public Map<Long, List<PatientComplianceMonarch>> getComplianceMonarchGroupByPatientUserId(
 			LocalDate from, LocalDate to, List<Long> patientUserIds) {
@@ -442,6 +450,7 @@ public class PatientHCPMonarchService extends PatientHCPService{
 		return patientWithNoEventsMap;
 	}
 	
+
 	public Map<LocalDate,Integer> getPatientsWithNoEventsForComboDeviceType(LocalDate from,LocalDate to,List<Long> patientUserIds) {		
 		List<PatientNoEvent> patientsVest = noEventsRepository.findByUserCreatedDateBeforeAndPatientUserIdIn(to.plusDays(1),patientUserIds);
 		Map<LocalDate,Integer> patientWithNoEventsMap = new HashMap<>(); 
@@ -468,6 +477,7 @@ public class PatientHCPMonarchService extends PatientHCPService{
 		return patientWithNoEventsMap;
 	}
 	
+
 	public List<StatisticsVO> getCumulativePatientStatisticsForClinicAssociatedWithHCPAll(Long hcpId, String clinicId, 
 			LocalDate from,LocalDate to) throws HillromException{
 		List<String> clinicList = new LinkedList<>();
@@ -484,6 +494,7 @@ public class PatientHCPMonarchService extends PatientHCPService{
 		}
 	}
 	
+
 	public List<StatisticsVO> getCumulativePatientStatisticsForClinicAssociatedWithHCPBoth(Long hcpId, String clinicId, 
 			LocalDate from,LocalDate to) throws HillromException{
 		List<String> clinicList = new LinkedList<>();
@@ -501,6 +512,7 @@ public class PatientHCPMonarchService extends PatientHCPService{
 		}
 	}
 	
+
 	public List<StatisticsVO> getPatienCumulativeStatisticsAll(LocalDate from, LocalDate to,
 			List<Long> patientUserIds){
 		Map<LocalDate, StatisticsVO> statisticsMap = new TreeMap<>();

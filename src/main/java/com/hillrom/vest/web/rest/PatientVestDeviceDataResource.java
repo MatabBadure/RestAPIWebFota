@@ -134,14 +134,6 @@ public class PatientVestDeviceDataResource {
 			}
 		}catch(Exception e){
 			e.printStackTrace();
-			
-			// Charger POC code addition start. Insert into charger_data table even for missing params
-			try{
-			chargerJsonDataPOC =   chargerDataService.saveOrUpdateChargerData(rawMessage,decoded_string);			
-			}catch(Exception ex){
-				ex.printStackTrace();
-			}
-			// Charger POC code addition end
 			JSONObject error = new JSONObject();
 			error.put("RESULT", "NOT OK - "+e.getMessage());
 			return new ResponseEntity<>(error,HttpStatus.PARTIAL_CONTENT);

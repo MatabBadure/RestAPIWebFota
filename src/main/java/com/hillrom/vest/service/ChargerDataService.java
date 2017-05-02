@@ -139,19 +139,19 @@ public class ChargerDataService {
 				log.error("Decoded String : " + decoded_string);
 				
 				JSONObject chargerJsonData = validateRequest(encoded_string,decoded_string);
-				if(chargerJsonData.get("DEVICE_DATA").equals("PING_PONG_PING")){
-					log.debug("deviceData is PING_PONG_PING" + " Insert into PING_PONG_PING table");
-					PingPongPing pingPongPingData = new PingPongPing();
-					pingPongPingData.setCreatedTime(new DateTime());
-					pingPongPingRepository.save(pingPongPingData);
-					
-				}
-				if(chargerJsonData.get("RESULT").equals("OK")){
+				
+				//if(chargerJsonData.get("DEVICE_DATA").equals("PING_PONG_PING")){
+				//	log.debug("deviceData is PING_PONG_PING" + " Insert into PING_PONG_PING table");
+				//	PingPongPing pingPongPingData = new PingPongPing();
+				//	pingPongPingData.setCreatedTime(new DateTime());
+				//	pingPongPingRepository.save(pingPongPingData);
+				//}
+				//if(chargerJsonData.get("RESULT").equals("OK")){
 					ChargerData chargerData = new ChargerData();
 					chargerData.setDeviceData(encoded_string);
 					chargerData.setCreatedTime(new DateTime());
 					chargerDataRepository.save(chargerData);
-				}
+				//}
 				return chargerJsonData;
 		
 			}
@@ -438,7 +438,7 @@ public class ChargerDataService {
 		        				returnMatch(b,DEV_WIFI)-DEV_WIFI.length;
 		        log.debug("start end : "+ start + " : " + end );
 		        
-		        byte[] devSNArray = new byte[end<0?0:end];
+		        byte[] devSNArray = new byte[end];
 		        int j=0;
 		        sout = "";
 		        for(int i=start;i<end;i++) {

@@ -134,4 +134,5 @@
 	<include file="classpath:/config/liquibase/changelog/20170407114500_add_devBT_column_to_3tables.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170407123500_add_devBT_column_to_history.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170422073700_added_protocol_monarch_sequence_id_table.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170503155500_add_createdBy_to_patientDeviceAssoc.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

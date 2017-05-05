@@ -247,7 +247,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 					patientInfo.getBluetoothId(), patientInfo.getHubId(), true, DateTime.now());
 			patientVestDeviceRepository.save(deviceHistory);
 			
-			PatientDevicesAssoc deviceAssoc = new PatientDevicesAssoc(patientInfo.getId(), "VEST", true, deviceSerialNumber, hillromId);
+			PatientDevicesAssoc deviceAssoc = new PatientDevicesAssoc(patientInfo.getId(), "VEST", true, deviceSerialNumber);
 			patientDevicesAssocRepository.save(deviceAssoc);
 			
 			return userPatientAssoc;

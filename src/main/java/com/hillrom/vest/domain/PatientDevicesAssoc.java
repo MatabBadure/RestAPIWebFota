@@ -65,18 +65,28 @@ public class PatientDevicesAssoc implements Serializable {
     @Column(name = "patient_type")
     private String patientType;
     
+    @Column(name="modified_date")
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
+	@JsonSerialize(using = CustomLocalDateSerializer.class)
+    @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
+	private LocalDate modifiedDate;
+    
+    @Column(name = "created_by")
+    private String createdBy;
+    
     public PatientDevicesAssoc() {
 		super();
 	}
 
-	public PatientDevicesAssoc(String patientId, String deviceType,Boolean isActive, String serialNumber, String hillromId) {
+	public PatientDevicesAssoc(String patientId, String deviceType,Boolean isActive, String serialNumber) {
 		super();
 		this.patientId = patientId;
 		this.deviceType = deviceType;
 		this.isActive = isActive;
 		this.serialNumber = serialNumber;
-		this.hillromId = hillromId;
 		this.patientType = "SD";
+		this.createdDate = LocalDate.now();
+		this.createdBy = "APP";
 	}
 	
 	public PatientDevicesAssoc(String patientId, String deviceType, String patientType, Boolean isActive, String serialNumber, String hillromId) {
@@ -88,6 +98,7 @@ public class PatientDevicesAssoc implements Serializable {
 		this.serialNumber = serialNumber;
 		this.hillromId = hillromId;
 		this.createdDate = LocalDate.now();
+		this.createdBy = "APP";
 	}
     
 	/**
@@ -214,6 +225,20 @@ public class PatientDevicesAssoc implements Serializable {
 	 */
 	public void setPatientType(String patientType) {
 		this.patientType = patientType;
+	}
+
+	/**
+	 * @return the modifiedDate
+	 */
+	public LocalDate getModifiedDate() {
+		return modifiedDate;
+	}
+
+	/**
+	 * @param modifiedDate the modifiedDate to set
+	 */
+	public void setModifiedDate(LocalDate modifiedDate) {
+		this.modifiedDate = modifiedDate;
 	}
 
 	/* (non-Javadoc)

@@ -139,26 +139,26 @@ public class PatientVestDeviceTherapyUtilMonarch {
 			if(isNormalStartCoughPauseMonarch(deviceEventRecordMonarch)){
 				++normalCoughPauses;
 				startNormalCoughPause = i;
-			}else if(isStartCoughPauseMonarch(deviceEventRecordMonarch)){
+			}else if(isStartCoughPauseMonarch(deviceEventRecordMonarch) || isProgrammedStartCoughPauseMonarch(deviceEventRecordMonarch)){
 				++coughPauses;
 				startCoughPause = i;
 			}
 			
-			if(isNormalEndCoughPauseMonarch(deviceEventRecordMonarch) || isProgrammedStartCoughPauseMonarch(deviceEventRecordMonarch))
+			if(isNormalEndCoughPauseMonarch(deviceEventRecordMonarch))
 				endNormalCoughPause = i;
 			else if(isEndCoughPauseMonarch(deviceEventRecordMonarch) || isProgrammedEndCoughPauseMonarch(deviceEventRecordMonarch))
 				endCoughPause = i;
 			
 			if(startCoughPause>0 && endCoughPause>0 && endCoughPause == (startCoughPause+1)){
 				caughPauseDuration = calculateCoughPauseMonarch(deviceEventRecordsMonarch,startCoughPause, endCoughPause);
-				if(caughPauseDuration<30){
+				if(caughPauseDuration < 30 && coughPauses > 0){
 					--coughPauses;
 				}else{
 					totalCoughPauseDuration += caughPauseDuration; 
 				}
 			}else if(startNormalCoughPause>0 && endNormalCoughPause>0 && endNormalCoughPause == (startNormalCoughPause+1)){
 				caughPauseDuration = calculateCoughPauseMonarch(deviceEventRecordsMonarch,startNormalCoughPause, endNormalCoughPause);
-				if(caughPauseDuration<30){
+				if(caughPauseDuration < 30 && normalCoughPauses > 0){
 					--normalCoughPauses;
 				}else{
 					totalCoughPauseDuration += caughPauseDuration; 

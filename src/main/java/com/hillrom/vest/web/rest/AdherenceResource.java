@@ -181,7 +181,8 @@ public class AdherenceResource {
 			else if( (deviceType.equals("VEST") && (Objects.isNull(noEvent) || Objects.isNull(noEvent.getFirstTransmissionDate()))) ||
 					(deviceType.equals("MONARCH") && (Objects.isNull(noEventMonarch) || Objects.isNull(noEventMonarch.getFirstTransmissionDate()))) ||
 					(deviceType.equals("ALL") && ((Objects.isNull(noEvent) && Objects.isNull(noEventMonarch)) || 
-							(Objects.isNull(noEventMonarch.getFirstTransmissionDate()))) && Objects.isNull(noEvent.getFirstTransmissionDate())) ){
+							(Objects.nonNull(noEventMonarch) && Objects.isNull(noEventMonarch.getFirstTransmissionDate()))) && 
+							Objects.isNull(noEvent.getFirstTransmissionDate())) ){
 				
 				// Check for the non transmission users
 				jsonObject.put("ERROR", "Adherence score cannot be reset for the non transmissions users");

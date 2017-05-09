@@ -2657,7 +2657,14 @@ public class AdherenceCalculationServiceMonarch{
 		     				patientVestDeviceAssoc.setCreatedBy(monarchDeviceHist.getCreatedBy());
 		     				patientVestDeviceAssoc.setCreatedDate(monarchDeviceHist.getCreatedDate());
 		     				patientVestDeviceAssoc.setHmr(monarchDeviceHist.getHmr());
-		     				patientVestDeviceAssoc.setCreatedBy(monarchDeviceHist.getCreatedBy());
+		     				
+		     				patientVestDeviceAssoc.setDevBt(monarchDeviceHist.getDevBt());
+		     				patientVestDeviceAssoc.setWifiId(monarchDeviceHist.getWifiId());
+		     				patientVestDeviceAssoc.setLteId(monarchDeviceHist.getLteId());
+		     				patientVestDeviceAssoc.setGarmentColor(monarchDeviceHist.getGarmentColor());
+		     				patientVestDeviceAssoc.setGarmentSize(monarchDeviceHist.getGarmentSize());
+		     				patientVestDeviceAssoc.setGarmentType(monarchDeviceHist.getGarmentType());
+		     				
 		    		 		patientMonarchDeviceRepository.saveAndFlush(patientVestDeviceAssoc);
 		     			}
 		     		}

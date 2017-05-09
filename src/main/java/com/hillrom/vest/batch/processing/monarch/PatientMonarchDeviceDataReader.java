@@ -284,7 +284,7 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 					patientInfo.getBluetoothId(), patientInfo.getHubId(), true);
 			patientMonarchDeviceRepository.save(deviceHistoryMonarch);
 			
-			PatientDevicesAssoc deviceAssoc = new PatientDevicesAssoc(patientInfo.getId(), "MONARCH", true, deviceSerialNumber, hillromId);
+			PatientDevicesAssoc deviceAssoc = new PatientDevicesAssoc(patientInfo.getId(), "MONARCH", true, deviceSerialNumber);
 			patientDevicesAssocRepository.save(deviceAssoc);
 			
 			return userPatientAssoc;

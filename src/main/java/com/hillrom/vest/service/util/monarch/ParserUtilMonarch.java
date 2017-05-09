@@ -78,6 +78,7 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CRC;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_DATA;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FRAG_TOTAL;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.FRAG_CURRENT;
+import static com.hillrom.vest.config.Constants.CONNECTIONTYPE;
 
 
 public class ParserUtilMonarch {
@@ -328,7 +329,7 @@ public class ParserUtilMonarch {
 	}
 	
 	
-	public static String getDevWifiOrLteString(String encoded_string,int flagWifiLteBt) throws HillromException{
+	public static String getDevWifiOrLteString(String encoded_string, CONNECTIONTYPE flagWifiLteBt) throws HillromException{
 		
         byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
         String sout = "";
@@ -339,8 +340,8 @@ public class ParserUtilMonarch {
                 
         String devWifiOrLteOrBt = "";
         
-        // Flag 1-WIFI & 2-LTE 
-        int start = flagWifiLteBt == 1 ? returnMatch(b,DEV_WIFI) : (flagWifiLteBt == 2 ? returnMatch(b,DEV_LTE) : (flagWifiLteBt == 3 ? returnMatch(b,DEV_BT) : -1));
+        // Flag 1-WIFI, 2-LTE & 3-BT 
+        int start = flagWifiLteBt.equals(CONNECTIONTYPE.devWIFI) ? returnMatch(b,DEV_WIFI) : (flagWifiLteBt.equals(CONNECTIONTYPE.devLTE) ? returnMatch(b,DEV_LTE) : (flagWifiLteBt.equals(CONNECTIONTYPE.devBT) ? returnMatch(b,DEV_BT) : -1));
         
         int end = returnMatch(b,DEV_VER)-DEV_VER.length;
         log.debug("start end : "+ start + " : " + end );
@@ -350,22 +351,16 @@ public class ParserUtilMonarch {
         byte[] devWifiOrLteOrBtArray = new byte[end];
         int j=0;
         sout = "";
+        String stringValue = "";
         for(int i=start;i<end;i++) {
         	devWifiOrLteOrBtArray[j++] = b[i];
         	int val = b[i] & 0xFF;
-        	devWifiOrLteOrBt = devWifiOrLteOrBt + val + " ";
+        	stringValue += (char)val;
         }
         
-        if(flagWifiLteBt == 1){
-        	int combinedWifi = ParserUtilMonarch.intergerCombinedFromHex(devWifiOrLteOrBtArray);
-        	String combinedWifiTest = ParserUtilMonarch.intergerCombinedFromHexForWifi(devWifiOrLteOrBtArray);
+    	log.debug("Value of devWifi : "+ stringValue );
+    	return stringValue;
         	
-        	log.debug("Value of devWifi : "+ combinedWifi );
-        	return Integer.toString(combinedWifi);
-        }else{
-        	log.debug("Value of devWifi : "+ devWifiOrLteOrBt );
-        	return devWifiOrLteOrBt;
-        }
 	}
 	
 	public static String getDevVerString(String encoded_string) throws HillromException{

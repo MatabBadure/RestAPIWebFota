@@ -174,14 +174,15 @@ public class AdherenceResource {
 			
 			// Check for existing adherence score is 100
 			if( (deviceType.equals("VEST") && Objects.nonNull(patientCompliance) && patientCompliance.getScore() == 100)
-					|| ((deviceType.equals("MONARCH") || deviceType.equals("BOTH")) && Objects.nonNull(patientComplianceMonarch) && patientComplianceMonarch.getScore() == 100)){
+					|| ((deviceType.equals("MONARCH") || deviceType.equals("ALL")) && Objects.nonNull(patientComplianceMonarch) && patientComplianceMonarch.getScore() == 100)){
 				jsonObject.put("ERROR", "Adherence score cannot be reset for existing adherence score of 100");
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 			}
 			else if( (deviceType.equals("VEST") && (Objects.isNull(noEvent) || Objects.isNull(noEvent.getFirstTransmissionDate()))) ||
 					(deviceType.equals("MONARCH") && (Objects.isNull(noEventMonarch) || Objects.isNull(noEventMonarch.getFirstTransmissionDate()))) ||
-					(deviceType.equals("BOTH") && ((Objects.isNull(noEvent) && Objects.isNull(noEventMonarch)) || 
-							(Objects.isNull(noEventMonarch.getFirstTransmissionDate()))) && Objects.isNull(noEvent.getFirstTransmissionDate())) ){
+					(deviceType.equals("ALL") && ((Objects.isNull(noEvent) && Objects.isNull(noEventMonarch)) || 
+							(Objects.nonNull(noEventMonarch) && Objects.isNull(noEventMonarch.getFirstTransmissionDate()))) && 
+							Objects.isNull(noEvent.getFirstTransmissionDate())) ){
 				
 				// Check for the non transmission users
 				jsonObject.put("ERROR", "Adherence score cannot be reset for the non transmissions users");
@@ -206,7 +207,7 @@ public class AdherenceResource {
 			if(deviceType.equals("VEST")){
 				adherenceReset = adherenceResetService.createAdherenceReset(patientId, Long.parseLong(userId), resetDt, 
 																					Integer.parseInt(resetScore), resetStartDt, justification, Long.parseLong(createdById));
-			}else if(deviceType.equals("MONARCH") || deviceType.equals("BOTH")){
+			}else if(deviceType.equals("MONARCH") || deviceType.equals("ALL")){
 				adherenceResetMonarch = adherenceResetServiceMonarch.createAdherenceReset(patientId, Long.parseLong(userId), resetDt, 
 					Integer.parseInt(resetScore), resetStartDt, justification, Long.parseLong(createdById));
 			}
@@ -222,7 +223,7 @@ public class AdherenceResource {
 	        } else if (Objects.isNull(adherenceReset) && Objects.nonNull(adherenceResetMonarch)) {
 				// For recalculating adherence score with the adherence start date
 	        	
-	        	if(deviceType.equals("BOTH")){
+	        	if(deviceType.equals("ALL")){
 	        		errMsg = adherenceCalculationServiceMonarch.adherenceCalculationBoth(Long.parseLong(userId), patientId, resetStartDt, noEventMonarch.getFirstTransmissionDate(), Integer.parseInt(resetScore), Long.parseLong(userId), 1);
 	        	}else{
 	        		errMsg = adherenceCalculationServiceMonarch.adherenceResetForPatient(Long.parseLong(userId), patientId, resetStartDt, Integer.parseInt(resetScore), 1);

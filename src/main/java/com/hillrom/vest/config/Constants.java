@@ -339,4 +339,5 @@ public final class Constants {
 	
 	public static final String INTENSITY = "Intensity";
 	
+	public enum CONNECTIONTYPE {devWIFI, devLTE, devBT}	
 }

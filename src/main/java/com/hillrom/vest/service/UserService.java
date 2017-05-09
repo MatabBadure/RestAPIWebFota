@@ -1362,6 +1362,7 @@ public class UserService {
 		Note memoNote = null;
 		memoNote = noteService.findMemoNotesForPatientId(id, patientInfo.getId());
 		
+
 		// Added Objects.isNull(deviceType) for patient before device associated
 		if((Objects.nonNull(deviceType) && deviceType.equals(VEST)) || Objects.isNull(deviceType)){
 			compliance = complianceService.findLatestComplianceByPatientUserId(id);
@@ -1382,6 +1383,7 @@ public class UserService {
 			patientUserVO.setHoursOfUsage((compliance.getHmr()/(60*60)));
 		}
 		else if(Objects.nonNull(deviceType)){
+
 			if(Objects.nonNull(complianceMonarch))
 			patientUserVO.setHoursOfUsage((complianceMonarch.getHmr()/(60*60)));
 		}
@@ -1738,11 +1740,13 @@ public class UserService {
     				if(patientAssocHRIDList != null){
     					for(UserPatientAssoc userPatientAssocHRID : patientAssocHRIDList){
     	    				if(userPatientAssoc.getUser().getId().equals(caregiverId)){
+
     	    					CareGiverVO careGiverPatientVO;
     	    					if(Objects.nonNull(deviceType))
     	    						careGiverPatientVO = new CareGiverVO(userPatientAssocHRID.getUserRole(), userPatientAssocHRID.getRelationshipLabel(), userPatientAssocHRID.getUser(),userPatientAssocHRID.getUser().getId(),userPatientAssocHRID.getPatient().getId(),deviceType);
     	    					else 
     	    						careGiverPatientVO = new CareGiverVO(userPatientAssocHRID.getUserRole(), userPatientAssocHRID.getRelationshipLabel(), userPatientAssocHRID.getUser(),userPatientAssocHRID.getUser().getId(),userPatientAssocHRID.getPatient().getId());
+
     	    					caregiverPatientList.add(careGiverPatientVO);
     	    					
     	    				}
@@ -1867,8 +1871,10 @@ public class UserService {
 					if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 						reactivatePatientUser(existingUser);
 						//hill-2178
+
 						//mailService.sendReactivationEmail(existingUser,baseUrl);
 						sendEmailNotificationReactivate(baseUrl, existingUser);
+
 						jsonObject.put("message", MessageConstants.HR_215);
 					} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ADMIN)) 
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ACCT_SERVICES))
@@ -1882,8 +1888,10 @@ public class UserService {
 						existingUser.setDeleted(false);
 						userExtensionRepository.saveAndFlush(existingUser);
 						//hill-2178
+
 						//mailService.sendReactivationEmail(existingUser,baseUrl);
 						sendEmailNotificationReactivate(baseUrl, existingUser);
+
 						jsonObject.put("message", MessageConstants.HR_235);
 					} else {
 						throw new HillromException(ExceptionConstants.HR_604);

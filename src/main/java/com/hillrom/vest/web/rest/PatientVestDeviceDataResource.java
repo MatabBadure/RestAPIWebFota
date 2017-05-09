@@ -97,6 +97,7 @@ public class PatientVestDeviceDataResource {
 	public ResponseEntity<?> receiveDataCharger(@RequestBody(required=true)String rawMessage){
 
 
+
 		JSONObject chargerJsonDataPOC = new JSONObject();
 		String decoded_string = "";
 		try{
@@ -115,6 +116,7 @@ public class PatientVestDeviceDataResource {
 			// Charger POC code addition end
 
 			JSONObject chargerJsonData = new JSONObject();
+
 			
 			ExitStatus exitStatus = deviceDataServiceMonarch.saveData(rawMessage);
 			

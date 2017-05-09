@@ -13,7 +13,9 @@ import static com.hillrom.vest.config.Constants.SERIAL_NO;
 import static com.hillrom.vest.config.Constants.TIME;
 import static com.hillrom.vest.config.Constants.HILLROM_ID;
 import static com.hillrom.vest.config.Constants.WIFIorLTE_SERIAL_NO;
+
 import static com.hillrom.vest.config.Constants.INTENSITY;
+
 
 import java.io.IOException;
 import java.util.List;
@@ -79,6 +81,7 @@ public class ExcelOutputService {
         response.getOutputStream().flush();
 	}
 	
+
 	public void createExcelOutputExcelForAll(HttpServletResponse response,List<PatientVestDeviceData> deviceEventsListVest,List<PatientVestDeviceDataMonarch> deviceEventsListMonarch) throws IOException{
 		log.debug("Received Device Data for Vest :"+deviceEventsListVest+" & Monarch"+deviceEventsListMonarch);
 		
@@ -109,6 +112,7 @@ public class ExcelOutputService {
         response.getOutputStream().flush();
 	}
 	
+
 	public void setExcelHeader(HSSFSheet excelSheet,String ...headerNames) {
 		HSSFRow excelHeader = excelSheet.createRow(0);
 		int cellCount = 0;

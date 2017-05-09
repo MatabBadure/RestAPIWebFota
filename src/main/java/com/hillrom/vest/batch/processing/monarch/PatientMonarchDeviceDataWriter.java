@@ -14,13 +14,16 @@ import com.hillrom.vest.repository.monarch.PatientMonarchDeviceDataRepository;
 import com.hillrom.vest.service.PatientVestDeviceService;
 import com.hillrom.vest.service.monarch.PatientVestDeviceMonarchService;
 
+
 public class PatientMonarchDeviceDataWriter implements ItemWriter<List<PatientVestDeviceDataMonarch>>{
 	
 	@Inject
 	private PatientMonarchDeviceDataRepository deviceDataRepositoryMonarch;
 	
+
 	@Inject
 	private PatientVestDeviceMonarchService deviceServiceMonarch;
+
 	
 	@Override
 	public void write(List<? extends List<PatientVestDeviceDataMonarch>> vestDeviceDataMonarch)
@@ -33,6 +36,7 @@ public class PatientMonarchDeviceDataWriter implements ItemWriter<List<PatientVe
 					deviceDataRepositoryMonarch.save(devDataMonarch);
 				}
 				deviceServiceMonarch.updateHMR(patientUser, patient);
+
 			}
 		}
 	}

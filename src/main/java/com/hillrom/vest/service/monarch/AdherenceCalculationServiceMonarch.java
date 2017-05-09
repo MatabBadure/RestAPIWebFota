@@ -78,6 +78,7 @@ import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientNoEventMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
+import com.hillrom.vest.domain.PatientVestDevicePK;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.ProtocolConstantsMonarch;
 import com.hillrom.vest.domain.TherapySession;
@@ -2644,8 +2645,20 @@ public class AdherenceCalculationServiceMonarch{
 					
 					if(monarchDevice.isPresent()){
 		     			if(monarchDevice.get().isActive()) {
-		     				monarchDevice.get().setPatient(patientInfo);		     				
-			 				patientMonarchDeviceRepository.save(monarchDevice.get());			 				
+		     				
+		     				PatientVestDeviceHistoryMonarch monarchDeviceHist = monarchDevice.get();
+		     				monarchDeviceHist.setActive(false);
+		     				patientMonarchDeviceRepository.save(monarchDeviceHist);
+		     				
+		     				PatientVestDeviceHistoryMonarch patientVestDeviceAssoc = new PatientVestDeviceHistoryMonarch(
+		    		 				new PatientVestDevicePK(patientInfo, monarchDeviceHist.getSerialNumber()), 
+		    		 				monarchDeviceHist.getWifiId(), 
+		    		 				monarchDeviceHist.getHubId(), true);
+		     				patientVestDeviceAssoc.setCreatedBy(monarchDeviceHist.getCreatedBy());
+		     				patientVestDeviceAssoc.setCreatedDate(monarchDeviceHist.getCreatedDate());
+		     				patientVestDeviceAssoc.setHmr(monarchDeviceHist.getHmr());
+		     				patientVestDeviceAssoc.setCreatedBy(monarchDeviceHist.getCreatedBy());
+		    		 		patientMonarchDeviceRepository.saveAndFlush(patientVestDeviceAssoc);
 		     			}
 		     		}
 					patientComplianceMonarchList = patientComplianceMonarchRepository.findByPatientUserId(userOld.getId());
@@ -2732,4 +2745,5 @@ public class AdherenceCalculationServiceMonarch{
 			}
 		}
 	}
+	
 }

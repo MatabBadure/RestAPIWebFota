@@ -558,15 +558,28 @@ public class UserResource {
 				jsonObject.put("message", MessageConstants.HR_281); // No device linked with patient.
 			} else {
 				jsonObject.put("message", MessageConstants.HR_282);// Vest/monarch devices linked with patient fetched successfully.
+				
+				DateTime vestLastModified = null;
+				DateTime monarchLastModified = null;
 
-				DateTime vestLastModified = Objects.nonNull(deviceList_vest.get(0).getLastModifiedDate()) ? 
-												deviceList_vest.get(0).getLastModifiedDate() : 
-													(Objects.nonNull(deviceList_vest.get(0).getCreatedDate()) ? 
-														deviceList_vest.get(0).getCreatedDate() : null);
-				DateTime monarchLastModified = Objects.nonNull(deviceList_monarch.get(0).getLastModifiedDate()) ?
-												deviceList_monarch.get(0).getLastModifiedDate() : 
-													(Objects.nonNull(deviceList_monarch.get(0).getCreatedDate()) ?
-															deviceList_monarch.get(0).getCreatedDate() : null);
+				if(!deviceList_vest.isEmpty()){
+					if(Objects.nonNull(deviceList_vest.get(0).getLastModifiedDate())){
+						vestLastModified = deviceList_vest.get(0).getLastModifiedDate();
+					}else{
+						if(Objects.nonNull(deviceList_vest.get(0).getCreatedDate()))
+							vestLastModified = deviceList_vest.get(0).getCreatedDate();
+					}
+				}
+				
+				if(!deviceList_monarch.isEmpty()){
+					if(Objects.nonNull(deviceList_monarch.get(0).getLastModifiedDate())){
+						monarchLastModified = deviceList_monarch.get(0).getLastModifiedDate();
+					}else{
+						if(Objects.nonNull(deviceList_monarch.get(0).getCreatedDate())){
+							monarchLastModified = deviceList_monarch.get(0).getCreatedDate();
+						}
+					}
+				}				
 				
 				List<Object> objList = new ArrayList();
 				if( (Objects.nonNull(monarchLastModified) 

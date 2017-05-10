@@ -411,7 +411,9 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 	        monarchDeviceDataVal.setDuration(Integer.parseInt(durationVal));
 	        
 	        // TO BE ELIMINATED : Bluetooth Id needs to be deleted from Monarch table. which is not applicable in Monarch
-	        monarchDeviceDataVal.setBluetoothId("Dummy_bluetooth_id");
+	        monarchDeviceDataVal.setBluetoothId(Objects.nonNull(wifiSerNo) ? wifiSerNo : 
+	        											( Objects.nonNull(lteSerNo) ? lteSerNo : 
+	        													(Objects.nonNull(lteSerNo) ? btSerNo : "Dummy_bluetooth_id")));
 	        
 			monarchDeviceDataVal.setFragTotal(fragTotal);			
 	        monarchDeviceDataVal.setFragCurrent(fragCurr);

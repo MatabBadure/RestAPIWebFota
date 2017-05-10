@@ -35,7 +35,7 @@ public class AdherenceResetHistoryMonarchRepository {
 
 			String adherenceResetHistoryQuery = "SELECT DATE_FORMAT(reset_start_date,'%m/%d/%Y') as c1 , "
 					+ " DATE_FORMAT(reset_date,'%m/%d/%Y') as c2 , "
-					+ " DATE_FORMAT(reset_date,'%k:%i%p') as c3 , "
+					+ " DATE_FORMAT(reset_date,'%l:%i%p') as c3 , "
 					+ " CASE justification "
 					+ "	WHEN 'Hospitalization' THEN justification "
 					+ "	WHEN 'Device issue' THEN justification "
@@ -95,7 +95,7 @@ public class AdherenceResetHistoryMonarchRepository {
 
 			String adherenceResetHistoryQuery = "(SELECT DATE_FORMAT(T1.reset_start_date,'%m/%d/%Y') as c1 , "
 					+ " DATE_FORMAT(T1.reset_date,'%m/%d/%Y') as c2 , "
-					+ " DATE_FORMAT(T1.reset_date,'%k:%i%p') as c3 , "
+					+ " DATE_FORMAT(T1.reset_date,'%l:%i%p') as c3 , "
 					+ " CASE T1.justification "
 					+ "	WHEN 'Hospitalization' THEN T1.justification "
 					+ "	WHEN 'Device issue' THEN T1.justification "
@@ -114,7 +114,7 @@ public class AdherenceResetHistoryMonarchRepository {
 					
 					+ " (SELECT DATE_FORMAT(T2.reset_start_date,'%m/%d/%Y') as c1 ,"
 					+ " DATE_FORMAT(T2.reset_date,'%m/%d/%Y') as c2 , "
-					+ " DATE_FORMAT(T2.reset_date,'%k:%i%p') as c3 , "
+					+ " DATE_FORMAT(T2.reset_date,'%l:%i%p') as c3 , "
 					+ " CASE T2.justification "
 					+ "	WHEN 'Hospitalization' THEN T2.justification "
 					+ "	WHEN 'Device issue' THEN T2.justification "

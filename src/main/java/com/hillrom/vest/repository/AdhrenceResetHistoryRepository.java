@@ -34,7 +34,7 @@ public class AdhrenceResetHistoryRepository {
 
 			String adherenceResetHistoryQuery = "SELECT DATE_FORMAT(reset_start_date,'%m/%d/%Y') as c1 , "
 					+ " DATE_FORMAT(reset_date,'%m/%d/%Y') as c2 , "
-					+ " DATE_FORMAT(reset_date,'%k:%i%p') as c3 , "
+					+ " DATE_FORMAT(reset_date,'%l:%i%p') as c3 , "
 					+ " CASE justification "
 					+ "	WHEN 'Hospitalization' THEN justification "
 					+ "	WHEN 'Device issue' THEN justification "

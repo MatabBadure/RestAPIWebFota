@@ -195,7 +195,7 @@ public class AdherenceResource {
 				LocalDate firstTherapyDateMonarch = Objects.nonNull(therapyMonarch) ? therapyMonarch.getDate() : null;
 				
 				if((Objects.nonNull(firstTherapyDate) && resetStartDt.isBefore(firstTherapyDate)) || 
-						(Objects.nonNull(firstTherapyDateMonarch) && resetStartDt.isBefore(firstTherapyDateMonarch))){
+						(deviceType.equals("MONARCH") && Objects.nonNull(firstTherapyDateMonarch) && resetStartDt.isBefore(firstTherapyDateMonarch))){
 					jsonObject.put("ERROR", "Adherence start date should be after first therapy date");
 		            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 				}

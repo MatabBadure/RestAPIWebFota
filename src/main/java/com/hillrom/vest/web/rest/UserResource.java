@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.LocalDate;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -547,16 +548,40 @@ public class UserResource {
 			} else {
 				jsonObject.put("message", MessageConstants.HR_282);// Vest/monarch devices linked with patient fetched successfully.
 
+				DateTime vestLastModified = Objects.nonNull(deviceList_vest.get(0).getLastModifiedDate()) ? 
+												deviceList_vest.get(0).getLastModifiedDate() : 
+													(Objects.nonNull(deviceList_vest.get(0).getCreatedDate()) ? 
+														deviceList_vest.get(0).getCreatedDate() : null);
+				DateTime monarchLastModified = Objects.nonNull(deviceList_monarch.get(0).getLastModifiedDate()) ?
+												deviceList_monarch.get(0).getLastModifiedDate() : 
+													(Objects.nonNull(deviceList_monarch.get(0).getCreatedDate()) ?
+															deviceList_monarch.get(0).getCreatedDate() : null);
+				
 				List<Object> objList = new ArrayList();
-				for (PatientVestDeviceHistoryMonarch devMonarch : deviceList_monarch) {
-					devMonarch.setDeviceType(MONARCH);
-					Object oneobject = devMonarch;
-					objList.add(oneobject);
-				}
-				for (PatientVestDeviceHistory devVest : deviceList_vest) {
-					devVest.setDeviceType(VEST);
-					Object oneobject = devVest;
-					objList.add(oneobject);
+				if( (Objects.nonNull(monarchLastModified) 
+						&& Objects.nonNull(vestLastModified) 
+						&& monarchLastModified.isAfter(vestLastModified)) ){
+					for (PatientVestDeviceHistoryMonarch devMonarch : deviceList_monarch) {
+						devMonarch.setDeviceType(MONARCH);
+						Object oneobject = devMonarch;
+						objList.add(oneobject);
+					}
+					for (PatientVestDeviceHistory devVest : deviceList_vest) {
+						devVest.setDeviceType(VEST);
+						Object oneobject = devVest;
+						objList.add(oneobject);
+					}
+				}else{
+					for (PatientVestDeviceHistory devVest : deviceList_vest) {
+						devVest.setDeviceType(VEST);
+						Object oneobject = devVest;
+						objList.add(oneobject);
+					}
+					for (PatientVestDeviceHistoryMonarch devMonarch : deviceList_monarch) {
+						devMonarch.setDeviceType(MONARCH);
+						Object oneobject = devMonarch;
+						objList.add(oneobject);
+					}					
 				}
 				jsonObject.put("deviceList", objList);
 

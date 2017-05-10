@@ -142,20 +142,24 @@ public class PatientVestDeviceTherapyUtilMonarch {
 			if(isNormalStartCoughPauseMonarch(deviceEventRecordMonarch)){
 				++normalCoughPauses;
 				startNormalCoughPause = i;
-			}else if(isStartCoughPauseMonarch(deviceEventRecordMonarch)){
-				++coughPauses;
-				startCoughPause = i;
-			}else if(isProgrammedStartCoughPauseMonarch(deviceEventRecordMonarch)){
-				++progCoughPauses;
-				startProgCoughPause = i;
+			}else {
+				if(isStartCoughPauseMonarch(deviceEventRecordMonarch)){			
+					++coughPauses;
+					startCoughPause = i;
+				}else if(isProgrammedStartCoughPauseMonarch(deviceEventRecordMonarch)){
+					++progCoughPauses;
+					startProgCoughPause = i;
+				}
 			}
 			
-			if(isNormalEndCoughPauseMonarch(deviceEventRecordMonarch))
+			if(isNormalEndCoughPauseMonarch(deviceEventRecordMonarch)){
 				endNormalCoughPause = i;
-			else if(isEndCoughPauseMonarch(deviceEventRecordMonarch))
-				endCoughPause = i;
-			else if(isProgrammedEndCoughPauseMonarch(deviceEventRecordMonarch))
-				endProgCoughPause = i;
+			}else {
+				if(isEndCoughPauseMonarch(deviceEventRecordMonarch))			
+					endCoughPause = i;
+				else if(isProgrammedEndCoughPauseMonarch(deviceEventRecordMonarch))
+					endProgCoughPause = i;
+			}
 			
 			if(startCoughPause>0 && endCoughPause>0 
 					&& (endCoughPause == (startCoughPause+1) 
@@ -167,7 +171,9 @@ public class PatientVestDeviceTherapyUtilMonarch {
 					totalCoughPauseDuration += caughPauseDuration; 
 				}
 				startCoughPause = -1;
-			}if(startProgCoughPause>0 && endProgCoughPause>0 
+			}
+			
+			if(startProgCoughPause>0 && endProgCoughPause>0 
 					&& (endProgCoughPause == (startProgCoughPause+1) 
 							|| endProgCoughPause == (startProgCoughPause+2))){
 				caughPauseDuration = calculateCoughPauseMonarch(deviceEventRecordsMonarch,startProgCoughPause, endProgCoughPause);
@@ -177,7 +183,9 @@ public class PatientVestDeviceTherapyUtilMonarch {
 					totalCoughPauseDuration += caughPauseDuration; 
 				}
 				startProgCoughPause = -1;
-			}else if(startNormalCoughPause>0 && endNormalCoughPause>0 && endNormalCoughPause == (startNormalCoughPause+1)){
+			}
+			
+			if(startNormalCoughPause>0 && endNormalCoughPause>0 && endNormalCoughPause == (startNormalCoughPause+1)){
 				caughPauseDuration = calculateCoughPauseMonarch(deviceEventRecordsMonarch,startNormalCoughPause, endNormalCoughPause);
 				if(caughPauseDuration < 30 && normalCoughPauses > 0){
 					--normalCoughPauses;

@@ -126,11 +126,14 @@ public class PatientVestDeviceTherapyUtilMonarch {
 			List<PatientVestDeviceDataMonarch> deviceEventRecordsMonarch) {
 		Map<String,Integer> metricsMapMonarch = new HashMap<>();
 		//int durationOfSession = 0, normalCoughPauses = 0, programmedCoughPauses = 0, caughPauseDuration = 0;
-		int normalCoughPauses = 0,totalCoughPauseDuration = 0,progCoughPauses = 0;
+		int normalCoughPauses = 0,totalCoughPauseDuration = 0;
 		int durationOfSessionMonarch = 0, coughPauses = 0, caughPauseDuration = 0;
 		int durationForWeightedAvgCalcMonarch = getTotalDurationForWeightedAvgCalculationMonarch(deviceEventRecordsMonarch);
 		float frequency = 0, intensity = 0;
-		int startCoughPause=-1, endCoughPause = -1, startNormalCoughPause = -1, endNormalCoughPause = -1, startProgCoughPause = -1, endProgCoughPause = -1;
+		int startCoughPause=-1, endCoughPause = -1, startNormalCoughPause = -1, endNormalCoughPause = -1;
+		int progCoughPauses = 0;
+		int startProgCoughPause = -1, endProgCoughPause = -1;
+		
 		for(int i = 0;i < deviceEventRecordsMonarch.size(); i ++){
 			PatientVestDeviceDataMonarch deviceEventRecordMonarch = deviceEventRecordsMonarch.get(i);
 			frequency += calculateWeightedAvg( durationForWeightedAvgCalcMonarch,deviceEventRecordMonarch.getDuration(),deviceEventRecordMonarch.getFrequency());

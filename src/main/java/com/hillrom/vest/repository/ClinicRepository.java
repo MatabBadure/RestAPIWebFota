@@ -122,6 +122,7 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 			 		+ "		from PATIENT_DEVICES_ASSOC " 
 			 		+ "		where patient_type='CD' and is_active=1 "
 			 		+ "		group by patient_id)) PDA "
+
 			 		+ " on CPA.patient_id=PDA.patient_id "
 			 		+ " where CPA.is_active=1 and clinic_id = :clinicId "
 			 		+ " group by PDA.device_type "

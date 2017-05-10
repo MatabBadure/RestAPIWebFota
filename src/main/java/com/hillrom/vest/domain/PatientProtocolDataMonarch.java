@@ -74,8 +74,9 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 	@Column(name = "max_intensity")
 	private Integer maxIntensity;
 	
-    @Transient
-	private String deviceType;
+
+  @Transient
+  private String deviceType;
 
 
 
@@ -206,12 +207,14 @@ public class PatientProtocolDataMonarch extends AbstractAuditingEntity implement
 		this.maxIntensity = maxIntensity;
 	}
 	
-    @Transient
+
+  @Transient
 	public String getDeviceType() {
 		return deviceType;
 	}
 
-    @Transient
+
+  @Transient
 	public void setDeviceType(String deviceType) {
 		this.deviceType = deviceType;
 	}

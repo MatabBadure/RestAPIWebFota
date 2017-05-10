@@ -62,8 +62,10 @@ public class PatientDevicesAssoc implements Serializable {
     @Column(name = "old_patient_id")
     private String oldPatientId;
     
+
     @Column(name = "patient_type")
     private String patientType;
+
     
     @Column(name="modified_date")
 	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
@@ -74,6 +76,7 @@ public class PatientDevicesAssoc implements Serializable {
     @Column(name = "created_by")
     private String createdBy;
     
+
     public PatientDevicesAssoc() {
 		super();
 	}
@@ -84,6 +87,10 @@ public class PatientDevicesAssoc implements Serializable {
 		this.deviceType = deviceType;
 		this.isActive = isActive;
 		this.serialNumber = serialNumber;
+
+		this.hillromId = hillromId;
+
+
 		this.patientType = "SD";
 		this.createdDate = LocalDate.now();
 		this.createdBy = "APP";
@@ -98,7 +105,9 @@ public class PatientDevicesAssoc implements Serializable {
 		this.serialNumber = serialNumber;
 		this.hillromId = hillromId;
 		this.createdDate = LocalDate.now();
+
 		this.createdBy = "APP";
+
 	}
     
 	/**
@@ -213,6 +222,7 @@ public class PatientDevicesAssoc implements Serializable {
 		this.oldPatientId = oldPatientId;
 	}
 	
+
 	/**
 	 * @return the patientType
 	 */
@@ -227,6 +237,7 @@ public class PatientDevicesAssoc implements Serializable {
 		this.patientType = patientType;
 	}
 
+
 	/**
 	 * @return the modifiedDate
 	 */
@@ -240,6 +251,7 @@ public class PatientDevicesAssoc implements Serializable {
 	public void setModifiedDate(LocalDate modifiedDate) {
 		this.modifiedDate = modifiedDate;
 	}
+
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -298,4 +310,5 @@ public class PatientDevicesAssoc implements Serializable {
 		return "PatientDevicesAssoc [id=" + id + ", patientId=" + patientId + ", deviceType=" + deviceType
 				+ ", isActive=" + isActive + "]";
 	}
+
 }

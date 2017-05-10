@@ -26,7 +26,8 @@ import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATI
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_DISPLAY_VALUE;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_MONARCH_DISPLAY_VALUE;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_VEST_DISPLAY_VALUE;
-
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_MONARCH;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_MONARCH;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -248,6 +249,11 @@ public class PatientComplianceMonarchService {
 				trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_DISPLAY_VALUE, -HMR_NON_COMPLIANCE_POINTS);
 			else
 				trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_DISPLAY_VALUE, pointsChanged);
+		}else if(HMR_NON_COMPLIANCE_MONARCH.equalsIgnoreCase(notificationType)){
+			trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_MONARCH_DISPLAY_VALUE,
+					(pointsChanged > 0 ? (-HMR_NON_COMPLIANCE_POINTS) : pointsChanged));
+		}else if(SETTINGS_DEVIATION_MONARCH.equalsIgnoreCase(notificationType)){
+			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_MONARCH_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
 		}else if(HMR_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)){
 			trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_DISPLAY_VALUE, -HMR_NON_COMPLIANCE_POINTS);
 			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);

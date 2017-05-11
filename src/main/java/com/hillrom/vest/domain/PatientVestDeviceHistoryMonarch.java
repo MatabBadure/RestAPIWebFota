@@ -84,6 +84,15 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
     @Transient
 	private String deviceType;
 
+    @Column(name="garment_type")
+	private String garmentType;
+    
+    @Column(name="garment_size")
+	private String garmentSize;
+    
+    @Column(name="garment_color")
+	private String garmentColor;
+    
 	public PatientVestDeviceHistoryMonarch() {
 		super();
 	}
@@ -211,6 +220,48 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 
 	public void setHmr(Double hmr) {
 		this.hmr = hmr;
+	}
+
+	/**
+	 * @return the garmentType
+	 */
+	public String getGarmentType() {
+		return garmentType;
+	}
+
+	/**
+	 * @param garmentType the garmentType to set
+	 */
+	public void setGarmentType(String garmentType) {
+		this.garmentType = garmentType;
+	}
+
+	/**
+	 * @return the garmentSize
+	 */
+	public String getGarmentSize() {
+		return garmentSize;
+	}
+
+	/**
+	 * @param garmentSize the garmentSize to set
+	 */
+	public void setGarmentSize(String garmentSize) {
+		this.garmentSize = garmentSize;
+	}
+
+	/**
+	 * @return the garmentColor
+	 */
+	public String getGarmentColor() {
+		return garmentColor;
+	}
+
+	/**
+	 * @param garmentColor the garmentColor to set
+	 */
+	public void setGarmentColor(String garmentColor) {
+		this.garmentColor = garmentColor;
 	}
 
 	// This is used for sending hmr in Minutes

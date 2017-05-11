@@ -48,6 +48,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.Future;
@@ -76,6 +77,8 @@ import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientNoEventMonarch;
+import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
+import com.hillrom.vest.domain.PatientVestDevicePK;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.ProtocolConstantsMonarch;
 import com.hillrom.vest.domain.TherapySession;
@@ -94,7 +97,11 @@ import com.hillrom.vest.repository.monarch.AdherenceResetMonarchRepository;
 import com.hillrom.vest.repository.monarch.ClinicMonarchRepository;
 import com.hillrom.vest.repository.monarch.NotificationMonarchRepository;
 import com.hillrom.vest.repository.monarch.PatientComplianceMonarchRepository;
+
+import com.hillrom.vest.repository.monarch.PatientMonarchDeviceRepository;
+
 import com.hillrom.vest.repository.monarch.PatientNoEventsMonarchRepository;
+
 import com.hillrom.vest.repository.monarch.TherapySessionMonarchRepository;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.ClinicPatientService;
@@ -205,9 +212,15 @@ public class AdherenceCalculationServiceMonarch{
 	@Inject
 	private TherapySessionServiceMonarch therapySessionMonarchService;
 	
+
 	@Inject
 	private PatientNoEventsRepository noEventRepository;
 	
+
+	@Inject
+    private PatientMonarchDeviceRepository patientMonarchDeviceRepository;
+	
+
 	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationServiceMonarch.class);
 	
 	/**
@@ -380,6 +393,7 @@ public class AdherenceCalculationServiceMonarch{
 					processForEachPatientBoth(compliance, userIdNoEventMap, userIdNoEventMapVest, complianceMap, mstNotificationMap,hmrNonComplianceMapBoth);
 			}
 			
+
 			List<Long> patientUserIds =  new LinkedList<>(hmrNonComplianceMap.keySet());
 			patientUserIds.addAll(new LinkedList<>(hmrNonComplianceMapBoth.keySet()));
 			
@@ -391,6 +405,7 @@ public class AdherenceCalculationServiceMonarch{
 				calculateHMRComplianceForMSTBoth(today, hmrNonComplianceMapBoth,
 							userProtocolConstantsMap, userProtocolConstantsVestMap, complianceMap, notificationMap);
 			}
+
 			
 			calculateHMRComplianceForMST(today, hmrNonComplianceMap,
 						userProtocolConstantsMap, complianceMap, notificationMap);
@@ -777,11 +792,13 @@ public class AdherenceCalculationServiceMonarch{
 		return "Adherence score reset successfully";
 	}
 
+
 	// Grouping the Patient Compliance Monarch data by date 
 	public SortedMap<LocalDate,List<PatientComplianceMonarch>> groupPatientComplianceByDate(List<PatientComplianceMonarch> patientComplianceMonarch){
 		return new TreeMap<>(patientComplianceMonarch.stream().collect(Collectors.groupingBy(PatientComplianceMonarch :: getDate)));
 	}
 		
+
 	public String adherenceCalculationBoth(Long userId, String patientId, LocalDate adherenceStartDate, 
 			LocalDate firstTransmissionOfOldDevice, Integer adherenceScore, Long oldUserId, Integer flag){
 		// flag 1 - for adherence reset
@@ -1114,6 +1131,7 @@ public class AdherenceCalculationServiceMonarch{
 				ProtocolConstantsMonarch protocolConstant = userProtocolConstantsMap.get(patientUserId);
 				ProtocolConstants protocolConstantVest = userProtocolConstantsVestMap.get(patientUserId);
 
+
 				boolean isHmrCompliantVest = true; 
 				boolean isHmrCompliantMonarch = true; 
 				if(!therapySessionsVest.isEmpty()){
@@ -1122,6 +1140,7 @@ public class AdherenceCalculationServiceMonarch{
 				if(!therapySessions.isEmpty()){
 					isHmrCompliantMonarch = isHMRCompliant(protocolConstant, durationForSettingDaysMonarch, adherenceSettingDay);
 				}
+
 				
 				if(!isHmrCompliantVest || !isHmrCompliantMonarch){
 					score = score < HMR_NON_COMPLIANCE_POINTS ? 0 : score - HMR_NON_COMPLIANCE_POINTS;
@@ -2537,15 +2556,18 @@ public class AdherenceCalculationServiceMonarch{
 	
 	
 	/**
+
 	 * Runs every midnight to integrate the patient who is using both devices after identified
+
 	 */
 	//@Scheduled(cron="0 55 23 * * * ")	
 	public void processDeviceDetails(){
 		try{
 			LocalDate today = LocalDate.now();
 			log.debug("Started Device details "+DateTime.now()+","+today);
+
 			
-			List<PatientDevicesAssoc> patDevAssList = patientDevicesAssocRepository.findByCreatedDate(today.toString());			
+			List<PatientDevicesAssoc> patDevAssList = patientDevicesAssocRepository.findByModifiedDate(today.toString());			
 			
 			executeMergingProcess(patDevAssList, 2);
 			
@@ -2584,12 +2606,16 @@ public class AdherenceCalculationServiceMonarch{
 		if(devAssForPatientList.size()>1){
 			LocalDate vestCreatedDate = null;
 			LocalDate monarchCreatedDate = null;
+			String vestSerialNumber = null;
+			String monarchSerialNumber = null;
 			
 			for(PatientDevicesAssoc device : devAssForPatientList){
 				if(device.getDeviceType().equals("VEST")){
 					vestCreatedDate = device.getCreatedDate();
+					vestSerialNumber = device.getSerialNumber();
 				}else if(device.getDeviceType().equals("MONARCH")){
 					monarchCreatedDate = device.getCreatedDate();
+					monarchSerialNumber = device.getSerialNumber();
 				}
 				if(Objects.isNull(vestCreatedDate) && Objects.isNull(monarchCreatedDate)){
 					vestCreatedDate = DateUtil.getPlusOrMinusTodayLocalDate(-1);
@@ -2622,14 +2648,41 @@ public class AdherenceCalculationServiceMonarch{
 				firstTransmissionDateVest = noEventVest.getFirstTransmissionDate();
 			}
 			
-			
-			if(Objects.nonNull(vestCreatedDate) && vestCreatedDate.isBefore(monarchCreatedDate)){
+			if(Objects.nonNull(vestCreatedDate) && Objects.nonNull(monarchCreatedDate) && (vestCreatedDate.isBefore(monarchCreatedDate) || vestCreatedDate.isEqual(monarchCreatedDate))){
 				
 				List<PatientCompliance> patientComplianceList = patientComplianceRepository.findByPatientUserId(user.getId());
 				List <PatientComplianceMonarch> complianceListToSave = new LinkedList<>();
 				
 				List<PatientComplianceMonarch> patientComplianceMonarchList = null;
 				if(flag == 2){
+					
+					Optional<PatientVestDeviceHistoryMonarch> monarchDevice = patientMonarchDeviceRepository.findOneByPatientIdAndSerialNumber(patDevice.getOldPatientId(),monarchSerialNumber);
+					
+					if(monarchDevice.isPresent()){
+		     			if(monarchDevice.get().isActive()) {
+		     				
+		     				PatientVestDeviceHistoryMonarch monarchDeviceHist = monarchDevice.get();
+		     				monarchDeviceHist.setActive(false);
+		     				patientMonarchDeviceRepository.save(monarchDeviceHist);
+		     				
+		     				PatientVestDeviceHistoryMonarch patientVestDeviceAssoc = new PatientVestDeviceHistoryMonarch(
+		    		 				new PatientVestDevicePK(patientInfo, monarchDeviceHist.getSerialNumber()), 
+		    		 				monarchDeviceHist.getWifiId(), 
+		    		 				monarchDeviceHist.getHubId(), true);
+		     				patientVestDeviceAssoc.setCreatedBy(monarchDeviceHist.getCreatedBy());
+		     				patientVestDeviceAssoc.setCreatedDate(monarchDeviceHist.getCreatedDate());
+		     				patientVestDeviceAssoc.setHmr(monarchDeviceHist.getHmr());
+		     				
+		     				patientVestDeviceAssoc.setDevBt(monarchDeviceHist.getDevBt());
+		     				patientVestDeviceAssoc.setWifiId(monarchDeviceHist.getWifiId());
+		     				patientVestDeviceAssoc.setLteId(monarchDeviceHist.getLteId());
+		     				patientVestDeviceAssoc.setGarmentColor(monarchDeviceHist.getGarmentColor());
+		     				patientVestDeviceAssoc.setGarmentSize(monarchDeviceHist.getGarmentSize());
+		     				patientVestDeviceAssoc.setGarmentType(monarchDeviceHist.getGarmentType());
+		     				
+		    		 		patientMonarchDeviceRepository.saveAndFlush(patientVestDeviceAssoc);
+		     			}
+		     		}
 					patientComplianceMonarchList = patientComplianceMonarchRepository.findByPatientUserId(userOld.getId());
 				}
 				
@@ -2708,7 +2761,7 @@ public class AdherenceCalculationServiceMonarch{
 					
 					adherenceCalculationBoth(user.getId(), null, firstTransmissionDateMonarch, firstTransmissionDateVest, DEFAULT_COMPLIANCE_SCORE, userOld.getId(), 4);
 				}
-			}else{
+			}else if( Objects.nonNull(vestCreatedDate) && Objects.nonNull(monarchCreatedDate) && vestCreatedDate.isAfter(monarchCreatedDate) ){
 				if(flag == 2)
 					adherenceCalculationBoth(user.getId(), null, firstTransmissionDateVest, firstTransmissionDateMonarch, DEFAULT_COMPLIANCE_SCORE, userOld.getId(), 3);
 			}

@@ -21,8 +21,8 @@ public interface PatientDevicesAssocRepository extends JpaRepository<PatientDevi
 	@Query("from PatientDevicesAssoc PDA where PDA.serialNumber = ?1 and isActive=1")
 	Optional<PatientDevicesAssoc> findOneBySerialNumber(String deviceAddress);
 
-	@Query(nativeQuery=true,value=" SELECT * from PATIENT_DEVICES_ASSOC where is_active=1 and date(created_date)=:createdDate ")
-	List<PatientDevicesAssoc> findByCreatedDate(@Param("createdDate")String createdDate);
+	@Query(nativeQuery=true,value=" SELECT * from PATIENT_DEVICES_ASSOC where is_active=1 and date(modified_date)=:modifiedDate ")
+	List<PatientDevicesAssoc> findByModifiedDate(@Param("modifiedDate")String modifiedDate);
 	
 	@Query("from PatientDevicesAssoc where patientId = ?1 and isActive=1")	 
 	List<PatientDevicesAssoc> findByPatientId(String patientId);
@@ -30,6 +30,8 @@ public interface PatientDevicesAssocRepository extends JpaRepository<PatientDevi
 	@Query("from PatientDevicesAssoc where oldPatientId = ?1 and isActive=1 ")	 
 	List<PatientDevicesAssoc> findByOldPatientId(String oldPatientId);
 	
+
 	@Query("from PatientDevicesAssoc PDA where PDA.patientId = ?1 and deviceType=?2 and isActive=1")
 	PatientDevicesAssoc findOneByPatientIdAndDeviceType(String patientId, String deviceType);
+
 }

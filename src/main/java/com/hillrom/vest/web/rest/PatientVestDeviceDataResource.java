@@ -96,15 +96,34 @@ public class PatientVestDeviceDataResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> receiveDataCharger(@RequestBody(required=true)String rawMessage){
 
+
+
+		JSONObject chargerJsonDataPOC = new JSONObject();
+		String decoded_string = "";
 		try{
 			log.error("Base64 Received Data for ingestion in receiveDataCharger : ",rawMessage);
-
-
-
 			
+			// Charger POC code addition start
+			byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);		
+	        String sout = "";
+	        for(int i=0;i<decoded.length;i++) {
+	        	int val = decoded[i] & 0xFF;
+	        	sout = sout + val + " ";
+	        }
+	        log.debug("Input Byte Array :"+sout);
+			decoded_string = new String(decoded);
+			log.error("Decoded value is " + decoded_string);
+			// Charger POC code addition end
+
 			JSONObject chargerJsonData = new JSONObject();
+
 			
 			ExitStatus exitStatus = deviceDataServiceMonarch.saveData(rawMessage);
+			
+
+			// Charger POC code addition start
+			chargerJsonDataPOC =   chargerDataService.saveOrUpdateChargerData(rawMessage,decoded_string);			
+			// Charger POC code addition end
 			
 			if(ExitStatus.COMPLETED.equals(exitStatus)){
 				chargerJsonData.put("RESULT", "OK - ");

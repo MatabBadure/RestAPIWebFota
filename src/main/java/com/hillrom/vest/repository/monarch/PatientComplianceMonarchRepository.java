@@ -47,7 +47,7 @@ public interface PatientComplianceMonarchRepository extends
 			+ "global_hmr_non_adherence_count,global_settings_deviated_count,global_missed_therapy_days_count,"
 			+ "IF(created_by='','system',created_by) as created_by,"
 			+ "IF(created_date='0000-00-00 00:00:00','2016-07-01 23:30:08',created_date) as created_date,"
-			+ "last_modified_by,last_modified_date "
+			+ "last_modified_by,last_modified_date,hmr_vest "
 			+ "from PATIENT_COMPLIANCE_MONARCH where date >= :adherStDate and user_id = :userId order by date")
 	List<PatientComplianceMonarch> returnComplianceForPatientIdDates(
 			@Param("adherStDate")String adherStDate, @Param("userId")Long userId);

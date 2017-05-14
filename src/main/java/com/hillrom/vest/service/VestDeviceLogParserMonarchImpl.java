@@ -77,6 +77,7 @@ import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.YEAR_END
 import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.YEAR_START_OFFSET;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.getEventStringByEventCode;
 import static com.hillrom.vest.config.VestDeviceLogEntryOffsetConstants.DATA_PACKET_HEADER;
+import static com.hillrom.vest.config.Constants.CONNECTIONTYPE;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -137,11 +138,11 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 		patientVestDeviceRawLogMonarch.setTotalFragments(ParserUtilMonarch.getFragTotal(rawMessageMonarch)+"");
 		patientVestDeviceRawLogMonarch.setCurrentFragment(ParserUtilMonarch.getFragCurrent(rawMessageMonarch)+"");
 		patientVestDeviceRawLogMonarch.setChecksum(ParserUtilMonarch.getCRCChecksum(rawMessageMonarch)+"");
-		patientVestDeviceRawLogMonarch.setDeviceAddress(ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch, 1) == null ? 
-															(ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch, 2) == null ?
-																	ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch, 3) : 
-																			ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch, 2)) :  
-																ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch, 1) );
+		patientVestDeviceRawLogMonarch.setDeviceAddress(ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch, CONNECTIONTYPE.devWIFI) == null ? 
+															(ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch, CONNECTIONTYPE.devLTE) == null ?
+																	ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch, CONNECTIONTYPE.devBT) : 
+																			ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch, CONNECTIONTYPE.devLTE)) :  
+																ParserUtilMonarch.getDevWifiOrLteString(rawMessageMonarch, CONNECTIONTYPE.devWIFI) );
 		
 		
 		return patientVestDeviceRawLogMonarch;
@@ -170,20 +171,10 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 		String decodedString = decodeData(rawMessageMonarch);
 		
 		JSONObject jsonDataMonarch = ParserUtil.getChargerJsonDataFromRawMessage(decodedString);
-		
-		/*String hub_timestamp = ParserUtil.getValueFromQclJsonData(qclJsonDataMonarch,HUB_RECEIVE_TIME);
-		String sp_timestamp = ParserUtil.getValueFromQclJsonData(qclJsonDataMonarch,SP_RECEIVE_TIME);*/
 
 		PatientVestDeviceRawLogMonarch patientVestDeviceRawLogMonarch = createPatientVestDeviceRawLogMonarch(rawMessageMonarch,jsonDataMonarch);
 		
 		try {
-			/*patientVestDeviceRawLog.setHubReceiveTime(Long.parseLong(hub_timestamp));
-			patientVestDeviceRawLog.setSpReceiveTime(Long.parseLong(sp_timestamp));*/
-			
-			/*if(StringUtils.isBlank(patientVestDeviceRawLogMonarch.getDeviceAddress()) || 
-					StringUtils.isBlank(patientVestDeviceRawLogMonarch.getDeviceSerialNumber()) ||
-					StringUtils.isBlank(patientVestDeviceRawLogMonarch.getDeviceData())){*/				
-			
 			if(StringUtils.isBlank(patientVestDeviceRawLogMonarch.getDeviceSerialNumber()) ||
 						StringUtils.isBlank(patientVestDeviceRawLogMonarch.getDeviceData())){	
 				throw new IllegalArgumentException(
@@ -248,35 +239,21 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
         	deviceData = deviceData + String.valueOf(Character.toChars(val));
         }
         log.debug("deviceData : "+ sout );
-        /*
-        if(deviceData.equalsIgnoreCase("PING_PONG_PING")){        	
-    			log.debug("deviceData is PING_PONG_PING" + " Insert into PING_PONG_PING table");
-    			PingPongPing pingPongPingData = new PingPongPing();
-    			pingPongPingData.setCreatedTime(new DateTime());
-    			
-    			pingPongPingRepository.save(pingPongPingData);    			
-    		}
-        }*/
         
 		int fragTotal = ParserUtilMonarch.getFragTotal(base64String);
 		int fragCurr = ParserUtilMonarch.getFragCurrent(base64String);
 		
 		byte[] devsnbt = ParserUtilMonarch.getDevSN(base64String);
 		
-		// TO BE ELIMINATED : Not used in monarch
-		//byte[] wifibt = ParserUtilMonarch.getDevWifi(base64String);
-		//byte[] verbt = ParserUtilMonarch.getDevVer(base64String);
-        
 		String deviceSerNo = new String(devsnbt);
 		
 		// Flag 1 for WIFI
-		String wifiSerNo = ParserUtilMonarch.getDevWifiOrLteString(base64String, 1);
+		String wifiSerNo = ParserUtilMonarch.getDevWifiOrLteString(base64String, CONNECTIONTYPE.devWIFI);
 		
-		//String lteSerNo = null;
 		// Flag 2 for LTE
-		String lteSerNo = ParserUtilMonarch.getDevWifiOrLteString(base64String, 2);
+		String lteSerNo = ParserUtilMonarch.getDevWifiOrLteString(base64String, CONNECTIONTYPE.devLTE);
 		
-		String btSerNo = ParserUtilMonarch.getDevWifiOrLteString(base64String, 3);
+		String btSerNo = ParserUtilMonarch.getDevWifiOrLteString(base64String, CONNECTIONTYPE.devBT);
 		
 		String deviceVer = ParserUtilMonarch.getDevVerString(base64String);
 		
@@ -291,8 +268,6 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
         	sout = sout + (session_index[k]  & 0xFF) + " ";
         }
         log.debug("session_index : "+ sout );
-        //String sessionIndexVal = new String(session_index);
-        //String sessionIndexVal =  sout;
         
         log.debug("Combined session_index : "+ ParserUtilMonarch.intergerCombinedFromHex(session_index));
         Integer sessionIndexVal =  ParserUtilMonarch.intergerCombinedFromHex(session_index);
@@ -436,7 +411,9 @@ public class VestDeviceLogParserMonarchImpl implements DeviceLogMonarchParser {
 	        monarchDeviceDataVal.setDuration(Integer.parseInt(durationVal));
 	        
 	        // TO BE ELIMINATED : Bluetooth Id needs to be deleted from Monarch table. which is not applicable in Monarch
-	        monarchDeviceDataVal.setBluetoothId("Dummy_bluetooth_id");
+	        monarchDeviceDataVal.setBluetoothId(Objects.nonNull(wifiSerNo) ? wifiSerNo : 
+	        											( Objects.nonNull(lteSerNo) ? lteSerNo : 
+	        													(Objects.nonNull(lteSerNo) ? btSerNo : "Dummy_bluetooth_id")));
 	        
 			monarchDeviceDataVal.setFragTotal(fragTotal);			
 	        monarchDeviceDataVal.setFragCurrent(fragCurr);

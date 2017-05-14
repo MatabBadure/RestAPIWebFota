@@ -64,7 +64,7 @@ BEGIN
 		 temp_max_frequency,
 		 temp_min_pressure,
 		 temp_max_pressure 
-         FROM `protocol_data_temp_table` WHERE `type` = type_key AND `patient_id` = in_patient_id;
+         FROM `protocol_data_temp_table` WHERE `type` = type_key AND `patient_id` = in_patient_id  AND `to_be_inserted` = 1 LIMIT 1;
          
          IF temp_protocal_id IS NOT NULL THEN
          

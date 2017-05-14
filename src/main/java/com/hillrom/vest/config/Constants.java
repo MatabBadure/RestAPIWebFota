@@ -330,7 +330,7 @@ public final class Constants {
 	public static final String BM_TYPE_PERCENTILE_LABEL = "Percentile.";
 	
 	//start:announcement changes
-		public static final String ANNOUNCEMENT_FILE_PATH = "/tmp/visiview-files/";
+		public static final String ANNOUNCEMENT_FILE_PATH = "/opt/visiview-files/";
 	//end:announcement changes
 		
 	//Device Type
@@ -339,4 +339,5 @@ public final class Constants {
 	
 	public static final String INTENSITY = "Intensity";
 	
+	public enum CONNECTIONTYPE {devWIFI, devLTE, devBT}	
 }

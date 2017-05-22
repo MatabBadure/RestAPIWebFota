@@ -1,9 +1,13 @@
+DROP procedure IF EXISTS `manage_patient_device`;
+
+DELIMITER $$
 CREATE PROCEDURE `manage_patient_device`(
 	IN operation_type_indicator VARCHAR(10),
     IN patient_id varchar(50), 
     IN pat_device_serial_number varchar(50), 
 	IN pat_bluetooth_id varchar(50),
-    IN pat_hub_id varchar(50)
+    IN pat_hub_id varchar(50),
+    IN pat_is_pending bit(1)
     )
 BEGIN
 
@@ -87,7 +91,8 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 			UPDATE `PATIENT_VEST_DEVICE_HISTORY` pvdh SET
 			`bluetooth_id` = pat_bluetooth_id,
 			`hub_id` = pat_hub_id,
-			`last_modified_date` = today_date
+			`last_modified_date` = today_date,
+			`is_pending` = pat_is_pending
 			 WHERE pvdh.`patient_id` = patient_id AND `serial_number` = pat_device_serial_number;
 			COMMIT;
             
@@ -125,4 +130,5 @@ ELSEIF operation_type_indicator ='INACTIVATE' THEN
 		COMMIT;
 ELSE  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Operation not supported';
 END IF;
-END
+END $$
+DELIMITER ;

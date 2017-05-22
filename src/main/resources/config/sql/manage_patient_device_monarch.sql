@@ -1,8 +1,11 @@
-delimiter //
+DROP procedure IF EXISTS `manage_patient_device_monarch`;
+
+DELIMITER $$
 CREATE PROCEDURE `manage_patient_device_monarch`(
 	IN operation_type_indicator VARCHAR(10),
     IN patient_id varchar(50), 
-    IN pat_device_serial_number varchar(50)
+    IN pat_device_serial_number varchar(50),
+    IN pat_is_pending bit(1)
     )
 BEGIN
 
@@ -86,7 +89,8 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 			-- WHERE `id` = patient_id;
 			
 			UPDATE `PATIENT_VEST_DEVICE_HISTORY_MONARCH` pvdhm SET
-			`last_modified_date` = today_date
+			`last_modified_date` = today_date,
+			`is_pending` = pat_is_pending
 			 WHERE pvdhm.`patient_id` = patient_id AND `serial_number` = pat_device_serial_number;
 			COMMIT;
             
@@ -125,5 +129,5 @@ ELSEIF operation_type_indicator ='INACTIVATE' THEN
 ELSE  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Operation not supported';
 END IF;
 END
-//
-delimiter ;
+$$
+DELIMITER ;

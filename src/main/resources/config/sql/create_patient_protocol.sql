@@ -1,5 +1,9 @@
+DROP procedure IF EXISTS `create_patient_protocol`;
+
+DELIMITER $$
 CREATE DEFINER=`root`@`%` PROCEDURE `create_patient_protocol`(
 	IN type_key varchar(15),
+	IN operation_type varchar(15),
 	IN in_patient_id varchar(45),
     IN in_created_by varchar(50)
 )
@@ -21,6 +25,7 @@ BEGIN
 	DECLARE temp_min_pressure bigint(20);
 	DECLARE temp_max_pressure bigint(20);
 	DECLARE temp_protocol_key varchar(45);
+	DECLARE counter INT;
     
 	DECLARE EXIT HANDLER FOR SQLEXCEPTION
     
@@ -30,128 +35,258 @@ BEGIN
     END;
     
 	SET created_date = now();
+	SET counter = 0;
     
-    IF  (SELECT COUNT(*)  FROM PATIENT_PROTOCOL_DATA WHERE patient_id = in_patient_id AND is_deleted = 0 LIMIT 1) > 0 THEN
+    IF  (SELECT COUNT(*)  FROM PATIENT_PROTOCOL_DATA WHERE patient_id = in_patient_id AND is_deleted <> 0 LIMIT 1) > 0 THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Protocol already exists for the Patient.';
 	END IF;
     
 	SELECT `user_id` INTO temp_user_id FROM `USER_PATIENT_ASSOC` WHERE `patient_id`= in_patient_id AND `user_role` = 'PATIENT';
 	
 
+	IF operation_type = 'Insert' THEN
+		IF type_key = 'Normal' THEN
 
-	IF type_key = 'Normal' THEN
+			SELECT MAX(`id`)+1 INTO temp_max_rev FROM `AUDIT_REVISION_INFO`;			
+			
+			call get_next_protocol_hillromid(@gen_protocol_id);
 
-		SELECT MAX(`id`)+1 INTO temp_max_rev FROM `AUDIT_REVISION_INFO`;			
+			SELECT `id`,`type`,
+			`treatments_per_day`,
+			`treatment_label`,
+			`min_minutes_per_treatment`,
+			`max_minutes_per_treatment`,
+			`min_frequency`,
+			`max_frequency`,
+			`min_pressure`,
+			`max_pressure` INTO
+			temp_protocal_id,
+			 temp_type_key,
+			 temp_treatments_per_day,
+			 temp_treatment_label,
+			 temp_min_minutes_per_treatment,
+			 temp_max_minutes_per_treatment,
+			 temp_min_frequency,
+			 temp_max_frequency,
+			 temp_min_pressure,
+			 temp_max_pressure 
+			 FROM `protocol_data_temp_table` WHERE `type` = type_key AND `patient_id` = in_patient_id  AND `to_be_inserted` = 1 LIMIT 1;
+			 
+			 IF temp_protocal_id IS NOT NULL THEN
+			 
+			call get_next_protocol_hillromid(@gen_protocol_id);
+			INSERT INTO PATIENT_PROTOCOL_DATA
+			( `id`, `patient_id`,`user_id`, `type`, `treatments_per_day`,`treatment_label`,
+			`min_minutes_per_treatment`,`max_minutes_per_treatment`,`min_frequency`, `max_frequency`, `min_pressure`, 
+			`max_pressure`,`created_by`,`created_date`, `last_modified_by`,`last_modified_date`,`is_deleted`,
+			`protocol_key`)
+			VALUES
+			(@gen_protocol_id, in_patient_id, temp_user_id, type_key, temp_treatments_per_day, temp_treatment_label, 
+			temp_min_minutes_per_treatment, temp_max_minutes_per_treatment, temp_min_frequency,temp_max_frequency,temp_min_pressure,
+			temp_max_pressure,in_created_by,created_date ,in_created_by ,created_date,0,@gen_protocol_id);
+			
+			INSERT INTO AUDIT_REVISION_INFO (`id`, `timestamp`, `user_id`) 
+			VALUES 
+			(temp_max_rev, UNIX_TIMESTAMP(created_date), in_created_by);
+			
+			INSERT INTO PATIENT_PROTOCOL_DATA_AUD (`id`, `REV`, `REVTYPE`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_deleted`, `max_frequency`, `max_pressure`, `min_frequency`, `min_minutes_per_treatment`, `min_pressure`, `protocol_key`, `treatments_per_day`, `type`, `PATIENT_ID`, `USER_ID`) 
+			VALUES 
+			(@gen_protocol_id, temp_max_rev, 0, in_created_by, created_date, in_created_by, created_date,0 , temp_max_frequency, temp_max_pressure, temp_min_frequency, temp_min_minutes_per_treatment, temp_min_pressure, @gen_protocol_id, temp_treatments_per_day, type_key, in_patient_id, temp_user_id);
+
+			
+			UPDATE `protocol_data_temp_table` SET `to_be_inserted` = 0 where `id` = temp_protocal_id;
+			END IF;
+
+
+		ELSEIF type_key = 'Custom' THEN 
+			
+		  START TRANSACTION;
+		  call get_next_protocol_hillromid(@gen_protocol_id);
+		  
+		  SET temp_protocol_key = @gen_protocol_id;
+		  
+		  WHILE EXISTS(SELECT `id` FROM `protocol_data_temp_table` WHERE `type` = type_key AND `patient_id` = in_patient_id AND `to_be_inserted`= 1) DO
+		  
+		  SELECT MAX(`id`)+1 INTO temp_max_rev FROM `AUDIT_REVISION_INFO`;
+		  
+		  SELECT `id`,`type`,
+			`treatments_per_day`,
+			`treatment_label`,
+			`min_minutes_per_treatment`,
+			`max_minutes_per_treatment`,
+			`min_frequency`,
+			`max_frequency`,
+			`min_pressure`,
+			`max_pressure` INTO
+			 temp_protocal_id,
+			 temp_type_key,
+			 temp_treatments_per_day,
+			 temp_treatment_label,
+			 temp_min_minutes_per_treatment,
+			 temp_max_minutes_per_treatment,
+			 temp_min_frequency,
+			 temp_max_frequency,
+			 temp_min_pressure,
+			 temp_max_pressure
+			 FROM `protocol_data_temp_table` WHERE `type` = type_key AND `patient_id` = in_patient_id AND `to_be_inserted` = 1 LIMIT 1;
+			 
+			UPDATE `protocol_data_temp_table` SET `to_be_inserted` = 0 where `id` = temp_protocal_id;
+			
+			INSERT INTO PATIENT_PROTOCOL_DATA
+			( `id`, `patient_id`,`user_id`, `type`, `treatments_per_day`,`treatment_label`,
+			`min_minutes_per_treatment`,`max_minutes_per_treatment`,`min_frequency`, `max_frequency`, `min_pressure`, 
+			`max_pressure`,`created_by`,`created_date`, `last_modified_by`,`last_modified_date`,`is_deleted`,
+			`protocol_key`)
+			VALUES
+			(@gen_protocol_id, in_patient_id, temp_user_id, type_key, temp_treatments_per_day, temp_treatment_label, 
+			temp_min_minutes_per_treatment, temp_max_minutes_per_treatment, temp_min_frequency,temp_max_frequency,temp_min_pressure,
+			temp_max_pressure,in_created_by,created_date ,in_created_by ,created_date,0,temp_protocol_key); 
+
+			INSERT INTO AUDIT_REVISION_INFO (`id`, `timestamp`, `user_id`) 
+			VALUES 
+			(temp_max_rev, UNIX_TIMESTAMP(created_date), in_created_by);
+
+			
+			INSERT INTO PATIENT_PROTOCOL_DATA_AUD (`id`, `REV`, `REVTYPE`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_deleted`, `max_frequency`, `max_pressure`, `min_frequency`, `min_minutes_per_treatment`, `min_pressure`, `protocol_key`, `treatments_per_day`, `type`, `PATIENT_ID`, `USER_ID`) 
+			VALUES 
+			(@gen_protocol_id, temp_max_rev, 0, in_created_by, created_date, in_created_by, created_date,0 , temp_max_frequency, temp_max_pressure, temp_min_frequency, temp_min_minutes_per_treatment, temp_min_pressure, @gen_protocol_id, temp_treatments_per_day, type_key, in_patient_id, temp_user_id);
+
+			
+			UPDATE `protocol_data_temp_table` SET `to_be_inserted` = 0 where `id` = temp_protocal_id;
+			call get_next_protocol_hillromid(@gen_protocol_id);
+		END WHILE;
+		COMMIT;
+			
+			ELSE
+				SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Only Normal and Custom are supported as type_key.';
+		END IF;
+	
+	ELSEIF operation_type = 'Update' THEN	
 		
-        call get_next_protocol_hillromid(@gen_protocol_id);
+		IF type_key = 'Normal' THEN
 
-		SELECT `id`,`type`,
-		`treatments_per_day`,
-		`treatment_label`,
-		`min_minutes_per_treatment`,
-		`max_minutes_per_treatment`,
-		`min_frequency`,
-		`max_frequency`,
-		`min_pressure`,
-		`max_pressure` INTO
-        temp_protocal_id,
-		 temp_type_key,
-		 temp_treatments_per_day,
-		 temp_treatment_label,
-		 temp_min_minutes_per_treatment,
-		 temp_max_minutes_per_treatment,
-		 temp_min_frequency,
-		 temp_max_frequency,
-		 temp_min_pressure,
-		 temp_max_pressure 
-         FROM `protocol_data_temp_table` WHERE `type` = type_key AND `patient_id` = in_patient_id  AND `to_be_inserted` = 1 LIMIT 1;
-         
-         IF temp_protocal_id IS NOT NULL THEN
-         
-		call get_next_protocol_hillromid(@gen_protocol_id);
-		INSERT INTO PATIENT_PROTOCOL_DATA
-		( `id`, `patient_id`,`user_id`, `type`, `treatments_per_day`,`treatment_label`,
-        `min_minutes_per_treatment`,`max_minutes_per_treatment`,`min_frequency`, `max_frequency`, `min_pressure`, 
-        `max_pressure`,`created_by`,`created_date`, `last_modified_by`,`last_modified_date`,`is_deleted`,
-		`protocol_key`)
-		VALUES
-		(@gen_protocol_id, in_patient_id, temp_user_id, type_key, temp_treatments_per_day, temp_treatment_label, 
-        temp_min_minutes_per_treatment, temp_max_minutes_per_treatment, temp_min_frequency,temp_max_frequency,temp_min_pressure,
-        temp_max_pressure,in_created_by,created_date ,in_created_by ,created_date,0,@gen_protocol_id);
-		
-		INSERT INTO AUDIT_REVISION_INFO (`id`, `timestamp`, `user_id`) 
-		VALUES 
-		(temp_max_rev, UNIX_TIMESTAMP(created_date), in_created_by);
-		
-		INSERT INTO PATIENT_PROTOCOL_DATA_AUD (`id`, `REV`, `REVTYPE`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_deleted`, `max_frequency`, `max_pressure`, `min_frequency`, `min_minutes_per_treatment`, `min_pressure`, `protocol_key`, `treatments_per_day`, `type`, `PATIENT_ID`, `USER_ID`) 
-		VALUES 
-		(@gen_protocol_id, temp_max_rev, 0, in_created_by, created_date, in_created_by, created_date,0 , temp_max_frequency, temp_max_pressure, temp_min_frequency, temp_min_minutes_per_treatment, temp_min_pressure, @gen_protocol_id, temp_treatments_per_day, type_key, in_patient_id, temp_user_id);
+			SELECT MAX(`id`)+1 INTO temp_max_rev FROM `AUDIT_REVISION_INFO`;			
+			
 
-        
-        UPDATE `protocol_data_temp_table` SET `to_be_inserted` = 0 where `id` = temp_protocal_id;
-        END IF;
+			SELECT `id`,`type`,
+			`treatments_per_day`,
+			`treatment_label`,
+			`min_minutes_per_treatment`,
+			`max_minutes_per_treatment`,
+			`min_frequency`,
+			`max_frequency`,
+			`min_pressure`,
+			`max_pressure` INTO
+			temp_protocal_id,
+			 temp_type_key,
+			 temp_treatments_per_day,
+			 temp_treatment_label,
+			 temp_min_minutes_per_treatment,
+			 temp_max_minutes_per_treatment,
+			 temp_min_frequency,
+			 temp_max_frequency,
+			 temp_min_pressure,
+			 temp_max_pressure 
+			 FROM `protocol_data_temp_table` WHERE `type` = type_key AND `patient_id` = in_patient_id AND `to_be_inserted` = 1 LIMIT 1;
+			 
+			 IF temp_protocal_id IS NOT NULL THEN
+			 
+			
+			UPDATE PATIENT_PROTOCOL_DATA SET 
+			`treatments_per_day` = temp_treatments_per_day,
+			`treatment_label` = temp_treatment_label,
+			`min_minutes_per_treatment` = temp_min_minutes_per_treatment,
+			`max_minutes_per_treatment` = temp_max_minutes_per_treatment,
+			`min_frequency` = temp_min_frequency, 
+			`max_frequency` = temp_max_frequency, 
+			`min_pressure` = temp_min_pressure, 
+			`max_pressure` = temp_max_pressure,
+			`last_modified_by` = in_created_by,
+			`last_modified_date` = created_date
+			WHERE
+			`patient_id` = in_patient_id and `user_id` = temp_user_id and `type` = type_key;
+			
+			
+			INSERT INTO AUDIT_REVISION_INFO (`id`, `timestamp`, `user_id`) 
+			VALUES 
+			(temp_max_rev, UNIX_TIMESTAMP(created_date), in_created_by);
+			
+			INSERT INTO PATIENT_PROTOCOL_DATA_AUD (`id`, `REV`, `REVTYPE`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_deleted`, `max_frequency`, `max_pressure`, `min_frequency`, `min_minutes_per_treatment`, `min_pressure`, `protocol_key`, `treatments_per_day`, `type`, `PATIENT_ID`, `USER_ID`) 
+			VALUES 
+			(temp_max_rev, temp_max_rev, 1, in_created_by, created_date, in_created_by, created_date,0 , temp_max_frequency, temp_max_pressure, temp_min_frequency, temp_min_minutes_per_treatment, temp_min_pressure, temp_protocal_id, temp_treatments_per_day, type_key, in_patient_id, temp_user_id);
+
+			
+			UPDATE `protocol_data_temp_table` SET `to_be_inserted` = 0 where `id` = temp_protocal_id;
+			END IF;
 
 
-	ELSEIF type_key = 'Custom' THEN 
-		
-	  START TRANSACTION;
-      call get_next_protocol_hillromid(@gen_protocol_id);
-      
-      SET temp_protocol_key = @gen_protocol_id;
-      
-      WHILE EXISTS(SELECT `id` FROM `protocol_data_temp_table` WHERE `type` = type_key AND `patient_id` = in_patient_id AND `to_be_inserted`= 1) DO
-      
-	  SELECT MAX(`id`)+1 INTO temp_max_rev FROM `AUDIT_REVISION_INFO`;
-	  
-      SELECT `id`,`type`,
-		`treatments_per_day`,
-		`treatment_label`,
-		`min_minutes_per_treatment`,
-		`max_minutes_per_treatment`,
-		`min_frequency`,
-		`max_frequency`,
-		`min_pressure`,
-		`max_pressure` INTO
-         temp_protocal_id,
-		 temp_type_key,
-		 temp_treatments_per_day,
-		 temp_treatment_label,
-		 temp_min_minutes_per_treatment,
-		 temp_max_minutes_per_treatment,
-		 temp_min_frequency,
-		 temp_max_frequency,
-		 temp_min_pressure,
-		 temp_max_pressure
-         FROM `protocol_data_temp_table` WHERE `type` = type_key AND `patient_id` = in_patient_id AND `to_be_inserted` = 1 LIMIT 1;
-         
-		UPDATE `protocol_data_temp_table` SET `to_be_inserted` = 0 where `id` = temp_protocal_id;
-        
-		INSERT INTO PATIENT_PROTOCOL_DATA
-		( `id`, `patient_id`,`user_id`, `type`, `treatments_per_day`,`treatment_label`,
-        `min_minutes_per_treatment`,`max_minutes_per_treatment`,`min_frequency`, `max_frequency`, `min_pressure`, 
-        `max_pressure`,`created_by`,`created_date`, `last_modified_by`,`last_modified_date`,`is_deleted`,
-		`protocol_key`)
-		VALUES
-		(@gen_protocol_id, in_patient_id, temp_user_id, type_key, temp_treatments_per_day, temp_treatment_label, 
-        temp_min_minutes_per_treatment, temp_max_minutes_per_treatment, temp_min_frequency,temp_max_frequency,temp_min_pressure,
-        temp_max_pressure,in_created_by,created_date ,in_created_by ,created_date,0,temp_protocol_key); 
+		ELSEIF type_key = 'Custom' THEN 
+			
+		  START TRANSACTION;
 
-		INSERT INTO AUDIT_REVISION_INFO (`id`, `timestamp`, `user_id`) 
-		VALUES 
-		(temp_max_rev, UNIX_TIMESTAMP(created_date), in_created_by);
+		  
+		  WHILE EXISTS(SELECT `id` FROM `protocol_data_temp_table` WHERE `type` = type_key AND `patient_id` = in_patient_id AND `to_be_inserted`= 1) DO
+		  SET counter = counter + 1;
+		  SELECT MAX(`id`)+1 INTO temp_max_rev FROM `AUDIT_REVISION_INFO`;
+		  
+		  SELECT `id`,`type`,
+			`treatments_per_day`,
+			`treatment_label`,
+			`min_minutes_per_treatment`,
+			`max_minutes_per_treatment`,
+			`min_frequency`,
+			`max_frequency`,
+			`min_pressure`,
+			`max_pressure` INTO
+			 temp_protocal_id,
+			 temp_type_key,
+			 temp_treatments_per_day,
+			 temp_treatment_label,
+			 temp_min_minutes_per_treatment,
+			 temp_max_minutes_per_treatment,
+			 temp_min_frequency,
+			 temp_max_frequency,
+			 temp_min_pressure,
+			 temp_max_pressure
+			 FROM `protocol_data_temp_table` WHERE `type` = type_key AND `patient_id` = in_patient_id AND `to_be_inserted` = 1 LIMIT 1;
+			 
+			UPDATE `protocol_data_temp_table` SET `to_be_inserted` = 0 where `id` = temp_protocal_id;
+			
+			UPDATE PATIENT_PROTOCOL_DATA SET 
+			`treatments_per_day` = temp_treatments_per_day,
+			`treatment_label` = temp_treatment_label,
+			`min_minutes_per_treatment` = temp_min_minutes_per_treatment,
+			`max_minutes_per_treatment` = temp_max_minutes_per_treatment,
+			`min_frequency` = temp_min_frequency, 
+			`max_frequency` = temp_max_frequency, 
+			`min_pressure` = temp_min_pressure, 
+			`max_pressure` = temp_max_pressure,
+			`last_modified_by` = in_created_by,
+			`last_modified_date` = created_date
+			WHERE
+			`id` = (select `id` from (
+					select `id`, @rownum:=@rownum + 1 as rownumber 
+					from 
+					(select * from PATIENT_PROTOCOL_DATA where `patient_id` = in_patient_id and `user_id` = temp_user_id and `type` = type_key ) As ppd, (select @rownum:=0) vars order by `id`) sq where rownumber = counter);
 
-		
-		INSERT INTO PATIENT_PROTOCOL_DATA_AUD (`id`, `REV`, `REVTYPE`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_deleted`, `max_frequency`, `max_pressure`, `min_frequency`, `min_minutes_per_treatment`, `min_pressure`, `protocol_key`, `treatments_per_day`, `type`, `PATIENT_ID`, `USER_ID`) 
-		VALUES 
-		(@gen_protocol_id, temp_max_rev, 0, in_created_by, created_date, in_created_by, created_date,0 , temp_max_frequency, temp_max_pressure, temp_min_frequency, temp_min_minutes_per_treatment, temp_min_pressure, @gen_protocol_id, temp_treatments_per_day, type_key, in_patient_id, temp_user_id);
+			INSERT INTO AUDIT_REVISION_INFO (`id`, `timestamp`, `user_id`) 
+			VALUES 
+			(temp_max_rev, UNIX_TIMESTAMP(created_date), in_created_by);
 
-        
-        UPDATE `protocol_data_temp_table` SET `to_be_inserted` = 0 where `id` = temp_protocal_id;
-        call get_next_protocol_hillromid(@gen_protocol_id);
-    END WHILE;
-    COMMIT;
-		
-		ELSE
-			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Only Normal and Custom are supported as type_key.';
-	END IF;
-END
+			
+			INSERT INTO PATIENT_PROTOCOL_DATA_AUD (`id`, `REV`, `REVTYPE`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_deleted`, `max_frequency`, `max_pressure`, `min_frequency`, `min_minutes_per_treatment`, `min_pressure`, `protocol_key`, `treatments_per_day`, `type`, `PATIENT_ID`, `USER_ID`) 
+			VALUES 
+			(temp_max_rev, temp_max_rev, 1, in_created_by, created_date, in_created_by, created_date,0 , temp_max_frequency, temp_max_pressure, temp_min_frequency, temp_min_minutes_per_treatment, temp_min_pressure, temp_protocal_id, temp_treatments_per_day, type_key, in_patient_id, temp_user_id);
+
+			
+			UPDATE `protocol_data_temp_table` SET `to_be_inserted` = 0 where `id` = temp_protocal_id;
+
+		END WHILE;
+		COMMIT;
+			
+			ELSE
+				SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Only Normal and Custom are supported as type_key.';
+		END IF;		
+	END IF;	
+END $$
+DELIMITER ;

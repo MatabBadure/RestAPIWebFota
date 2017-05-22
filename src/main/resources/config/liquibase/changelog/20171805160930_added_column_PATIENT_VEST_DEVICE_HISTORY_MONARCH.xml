@@ -9,7 +9,7 @@
     -->
     <changeSet id="20171805160930" author="jhipster">
     	<addColumn tableName="PATIENT_VEST_DEVICE_HISTORY_MONARCH">
-			<column name="is_pending" type="boolean"/>
+			<column name="is_pending" type="boolean" valueBoolean="false"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>

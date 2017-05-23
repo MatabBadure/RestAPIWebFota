@@ -216,6 +216,8 @@ public class AdherenceCalculationServiceMonarch{
 	@Inject
 	private PatientNoEventsRepository noEventRepository;
 	
+	@Inject
+	private PatientNoEventsMonarchRepository noEventRepositoryMonarch;
 
 	@Inject
     private PatientMonarchDeviceRepository patientMonarchDeviceRepository;
@@ -2752,10 +2754,11 @@ public class AdherenceCalculationServiceMonarch{
 					}
 					therapySessionMonarchService.saveAll(therapySessionListToSave);
 					
-					PatientNoEvent patientNoEvent = noEventRepository.findByPatientUserId(user.getId());
 					
-					PatientNoEventMonarch noEventMonarchToSave = new PatientNoEventMonarch(patientNoEvent.getUserCreatedDate(),
-							patientNoEvent.getFirstTransmissionDate(), patientInfo, user);
+					PatientNoEventMonarch patientNoEventMonarch = noEventRepositoryMonarch.findByPatientUserId(userOld.getId());
+					
+					PatientNoEventMonarch noEventMonarchToSave = new PatientNoEventMonarch(patientNoEventMonarch.getUserCreatedDate(),
+							patientNoEventMonarch.getFirstTransmissionDate(), patientInfo, user);
 					
 					noEventMonarchService.save(noEventMonarchToSave);
 					

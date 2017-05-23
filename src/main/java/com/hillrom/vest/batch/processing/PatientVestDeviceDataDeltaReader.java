@@ -191,13 +191,22 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 		PatientInfo patientInfo = null;
 
 		if (patientDevicesFromDB.isPresent()) {
-			patientInfo = patientInfoRepository.findOneById(patientDevicesFromDB.get().getPatientId());
-			List<UserPatientAssoc> associations = userPatientRepository.findOneByPatientId(patientInfo.getId());
-			List<UserPatientAssoc> userPatientAssociations = associations.stream()
-					.filter(assoc -> RelationshipLabelConstants.SELF.equalsIgnoreCase(assoc.getRelationshipLabel()))
-					.collect(Collectors.toList());
-			return userPatientAssociations.get(0);
+			return retrieveUserPatientAssoc(patientDevicesFromDB.get().getPatientId());
+			
 		} else {
+			
+			List<PatientVestDeviceHistory> patientVestDeviceHistoryList = patientVestDeviceRepository.findBySerialNumber(deviceSerialNumber);
+			
+			if(!patientVestDeviceHistoryList.isEmpty()){
+				
+				PatientVestDeviceHistory patientVestDevicePatient = patientVestDeviceHistoryList.get(0);
+				
+				Optional<PatientVestDeviceHistory> patientVestDeviceHistory = patientVestDeviceRepository.findOneByPatientIdAndPendingStatus(patientVestDevicePatient.getPatient().getId(), true);
+				
+				if (patientVestDeviceHistory.isPresent()){
+					return retrieveUserPatientAssoc(patientVestDeviceHistory.get().getPatient().getId());
+				}
+			}
 			patientInfo = new PatientInfo();
 			// Assigns the next hillromId for the patient
 			String hillromId = patientInfoRepository.id();
@@ -253,7 +262,16 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 			return userPatientAssoc;
 		}
 	}
-
+	
+	public UserPatientAssoc retrieveUserPatientAssoc(String patientId){
+		PatientInfo patientInfo = patientInfoRepository.findOneById(patientId);
+		List<UserPatientAssoc> associations = userPatientRepository.findOneByPatientId(patientInfo.getId());
+		List<UserPatientAssoc> userPatientAssociations = associations.stream()
+				.filter(assoc -> RelationshipLabelConstants.SELF.equalsIgnoreCase(assoc.getRelationshipLabel()))
+				.collect(Collectors.toList());
+		return userPatientAssociations.get(0);
+	}
+	
 	private void setNameToPatient(PatientInfo patientInfo, String customerName) {
 		String names[] = customerName.split(" ");
 		if (names.length == 2) {

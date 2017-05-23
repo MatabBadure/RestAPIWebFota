@@ -468,20 +468,11 @@ public class ParserUtilMonarch {
 	{	    
 	    String hexTotal = "";
 	    for (int t = 0; t < input.length; t++){
-	    	hexTotal = hexTotal + Integer.toHexString(input[t]& 0xFF);
+	    	String integerToHex = Integer.toHexString(input[t]& 0xFF);
+	    	hexTotal = hexTotal + (integerToHex.length() == 1 ? "0"+integerToHex : integerToHex);
 	    }
 	    log.debug("hexTotal : " + Integer.parseInt(hexTotal, 16));
 	    return Integer.parseInt(hexTotal, 16);
-	}
-	
-	public static String intergerCombinedFromHexForWifi(byte[] input)
-	{	    
-	    String hexTotal = "";
-	    for (int t = 0; t < input.length; t++){
-	    	hexTotal = hexTotal + Integer.toHexString(input[t]& 0xFF);
-	    }
-	    //log.debug("hexTotal : " + Integer.parseInt(hexTotal, 16));
-	    return hexTotal;
 	}
 	
 	public static int intergerCombinedFromHex(byte[] input)

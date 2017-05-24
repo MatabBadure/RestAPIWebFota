@@ -201,7 +201,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 		
 		metricsMapMonarch.put(FREQUENCY, Math.round(frequency));
 		metricsMapMonarch.put(INTENSITY, Math.round(intensity));
-		metricsMapMonarch.put(DURATION, durationOfSessionMonarch);
+		metricsMapMonarch.put(DURATION, durationOfSessionMonarch-totalCoughPauseDuration);
 		metricsMapMonarch.put(NORMAL_COUGH_PAUSES, normalCoughPauses);
 		metricsMapMonarch.put(PROGRAMMED_COUGH_PAUSES, (coughPauses == 0 ? progCoughPauses : coughPauses));
 		metricsMapMonarch.put(CAUGH_PAUSE_DURATION, totalCoughPauseDuration);

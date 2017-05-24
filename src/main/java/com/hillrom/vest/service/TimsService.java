@@ -64,6 +64,16 @@ public class TimsService {
 	public void createPatientProtocolMonarch(String typeKey,String operationType,String inPatientId,String inCreatedBy) throws HillromException{		
 		timsRepository.createPatientProtocolMonarch(typeKey,operationType,inPatientId,inCreatedBy);
 	}
+	
+	/**
+	 * 
+	 * @param
+	 * @return
+	 * @throws HillromException
+	 */
+	public void createPatientProtocol(String typeKey,String operationType,String inPatientId,String inCreatedBy) throws HillromException{		
+		timsRepository.createPatientProtocol(typeKey,operationType,inPatientId,inCreatedBy);
+	}
 
 
 

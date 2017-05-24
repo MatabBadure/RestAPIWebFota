@@ -55,7 +55,7 @@ public class TimsResource {
      * POST  /createpatientprotocolmonarch
      */
 	@RequestMapping(value="/createpatientprotocolmonarch", method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> test(){
+	public ResponseEntity<?> createpatientprotocolmonarch(){
 
 		JSONObject jsonObject = new JSONObject();
 		
@@ -69,7 +69,25 @@ public class TimsResource {
 		}		
 		
 	}
-	  
+
+	/**
+     * POST  /createpatientprotocol
+     */
+	@RequestMapping(value="/createpatientprotocol", method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> createpatientprotocol(){
+
+		JSONObject jsonObject = new JSONObject();
+		
+		try{
+			  timsService.createPatientProtocol("Normal","Insert","HR2017000606","App");
+			  jsonObject.put("timsMsg", "createPatientProtocol stored procedure executed successfully");
+			  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			
+		}catch(Exception ex){
+			jsonObject.put("ERROR", ex.getMessage());
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}		
+		
+	}
 	
 	
 }

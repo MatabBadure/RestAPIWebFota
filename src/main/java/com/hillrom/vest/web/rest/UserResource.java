@@ -458,6 +458,7 @@ public class UserResource {
 						checkPatientType.setPatientType("CD");						
 						checkPatientType.setCreatedDate(Objects.isNull(checkPatientType.getCreatedDate()) ? 
 															DateUtil.getPlusOrMinusTodayLocalDate(-1) :  checkPatientType.getCreatedDate());
+						checkPatientType.setSerialNumber(deviceData.get("serialNumber").toString());
 						patientDevicesAssocRepository.save(checkPatientType);
 						patDevList.add(checkPatientType);
 					}
@@ -484,7 +485,7 @@ public class UserResource {
 						checkPatientType.setPatientType("CD");						
 						checkPatientType.setCreatedDate(Objects.isNull(checkPatientType.getCreatedDate()) ? 
 								DateUtil.getPlusOrMinusTodayLocalDate(-1) :  checkPatientType.getCreatedDate());
-						
+						checkPatientType.setSerialNumber(deviceData.get("serialNumber").toString());
 						patientDevicesAssocRepository.save(checkPatientType);
 						patDevList.add(checkPatientType);
 					}

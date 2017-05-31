@@ -28,6 +28,7 @@ import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
  * Patient Devices Assoc for Charger Device.
  */
 @Entity
+@Audited
 @Table(name = "PATIENT_DEVICES_ASSOC")
 public class PatientDevicesAssoc implements Serializable {
 
@@ -45,7 +46,7 @@ public class PatientDevicesAssoc implements Serializable {
     private String deviceType;
     
     @Column(name = "is_active")
-    private Boolean isActive = false;
+    private Boolean isActive;
 
     @Column(name = "serial_number")
     private String serialNumber;

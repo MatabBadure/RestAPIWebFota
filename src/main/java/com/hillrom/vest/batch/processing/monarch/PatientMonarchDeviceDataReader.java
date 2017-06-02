@@ -242,7 +242,7 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 				Optional<PatientVestDeviceHistoryMonarch> patientMonarchDeviceHistory = patientMonarchDeviceRepository.findOneByPatientIdAndPendingStatus(patientMonarchDevicePatient.getPatient().getId(), true);
 			
 				if (patientMonarchDeviceHistory.isPresent()){
-					return retrieveUserPatientAssoc(patientMonarchDeviceHistory.get().getPatient().getId());
+					return retrieveUserPatientAssoc(patientMonarchDevicePatient.getPatient().getId());
 				}
 			}
 			

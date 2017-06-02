@@ -68,5 +68,8 @@ public interface PatientVestDeviceRepository extends
 			+ " group by patient_id ")
 	String checkDeviceType(@Param("patientId")String patientId);
 
+	@Query("from PatientVestDeviceHistory pvd where pvd.patientVestDevicePK.patient.id = ?1 and pvd.pending = ?2")
+	Optional<PatientVestDeviceHistory> findOneByPatientIdAndPendingStatus(
+			String patientId, Boolean pending);
 
 }

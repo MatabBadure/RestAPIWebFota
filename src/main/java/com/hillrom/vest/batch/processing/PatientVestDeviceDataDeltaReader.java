@@ -208,7 +208,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 				Optional<PatientVestDeviceHistory> patientVestDeviceHistory = patientVestDeviceRepository.findOneByPatientIdAndPendingStatus(patientVestDevicePatient.getPatient().getId(), true);
 				
 				if (patientVestDeviceHistory.isPresent()){
-					return retrieveUserPatientAssoc(patientVestDeviceHistory.get().getPatient().getId());
+					return retrieveUserPatientAssoc(patientVestDevicePatient.getPatient().getId());
 				}
 			}
 			patientInfo = new PatientInfo();

@@ -95,6 +95,11 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 			`last_modified_date` = today_date,
             `is_active` = 0
 			 WHERE pvdhm.`patient_id` = patient_id AND `serial_number` = pat_old_device_serial_number;
+			 
+			 UPDATE `PATIENT_DEVICES_ASSOC` pda SET
+			`serial_number` = pat_new_device_serial_number
+			 WHERE pda.`patient_id` = patient_id AND `serial_number` = pat_old_device_serial_number;
+			 
 			COMMIT;
             
 ELSEIF operation_type_indicator ='INACTIVATE' THEN

@@ -461,7 +461,8 @@ public class UserResource {
 					patientDevicesAssocRepository.save(checkPatientType);
 					patDevList.add(checkPatientType);
 				}
-				adherenceCalculationServiceMonarch.executeMergingProcess(patDevList, 1);
+				if(deviceType.equals("VEST"))
+					adherenceCalculationServiceMonarch.executeMergingProcess(patDevList, 1);
 				
 				PatientDevicesAssoc updatePatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
 				updatePatientType.setPatientType("CD");
@@ -486,7 +487,8 @@ public class UserResource {
 						patientDevicesAssocRepository.save(checkPatientType);
 						patDevList.add(checkPatientType);
 					}
-					adherenceCalculationServiceMonarch.executeMergingProcess(patDevList, 1);
+					if(deviceType.equals("MONARCH"))
+						adherenceCalculationServiceMonarch.executeMergingProcess(patDevList, 1);
 					
 					PatientDevicesAssoc updatePatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
 					updatePatientType.setPatientType("CD");

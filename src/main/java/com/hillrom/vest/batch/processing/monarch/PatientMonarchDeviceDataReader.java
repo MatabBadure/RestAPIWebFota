@@ -3,6 +3,7 @@ package com.hillrom.vest.batch.processing.monarch;
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -54,6 +55,7 @@ import com.hillrom.vest.repository.monarch.PatientMonarchDeviceRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.DeviceLogMonarchParser;
 import com.hillrom.vest.service.DeviceLogParser;
+import com.hillrom.vest.service.PatientInfoService;
 import com.hillrom.vest.service.monarch.PatientComplianceMonarchService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.monarch.PatientNoEventMonarchService;
@@ -105,6 +107,9 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 
 	@Inject
 	PatientVestDeviceDataServiceMonarch patientVestDeviceDataServiceMonarch;
+	
+	@Inject
+    private PatientInfoService patientInfoService;
 	
 	private String patientDeviceRawData;
 	
@@ -299,8 +304,8 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 	}
 	
 	public UserPatientAssoc retrieveUserPatientAssoc(String patientId){
-		PatientInfo patientInfo = patientInfoRepository.findOneById(patientId);
-		List<UserPatientAssoc> associations = userPatientRepository.findOneByPatientId(patientInfo.getId());
+		PatientInfo patientInfo = patientInfoService.findOneById(patientId);
+		List<UserPatientAssoc> associations = new ArrayList<UserPatientAssoc> (patientInfo.getUserPatientAssoc());
 		List<UserPatientAssoc> userPatientAssociations = associations.stream()
 				.filter(assoc -> RelationshipLabelConstants.SELF.equalsIgnoreCase(assoc.getRelationshipLabel()))
 				.collect(Collectors.toList());

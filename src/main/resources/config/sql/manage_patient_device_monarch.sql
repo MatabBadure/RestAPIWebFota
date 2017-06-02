@@ -4,7 +4,8 @@ DELIMITER $$
 CREATE PROCEDURE `manage_patient_device_monarch`(
 	IN operation_type_indicator VARCHAR(10),
     IN patient_id varchar(50), 
-    IN pat_device_serial_number varchar(50),
+    IN pat_old_device_serial_number varchar(50),
+    IN pat_new_device_serial_number varchar(50),
     IN pat_is_pending bit(1)
     )
 BEGIN
@@ -76,8 +77,8 @@ IF operation_type_indicator = 'CREATE' THEN
       
 ELSEIF operation_type_indicator ='UPDATE' THEN
 
-		SELECT `id`, `serial_number` INTO temp_patient_info_id, temp_serial_number FROM `PATIENT_INFO`
-		WHERE `serial_number` = pat_device_serial_number AND `id`= patient_id;
+		 SELECT count(*) INTO temp_patient_info_id FROM `PATIENT_DEVICES_ASSOC`
+		 WHERE `serial_number` = pat_old_device_serial_number AND `patient_id`= patient_id;
         IF temp_patient_info_id IS NULL THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Device Serial No. not associated with the patient';
 		END IF;
@@ -85,13 +86,15 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 -- if serial number exists for patient, update patient_info and patient_vest_device_history_monarch tables 
 		START TRANSACTION;
         
-			-- UPDATE `PATIENT_INFO` SET
-			-- WHERE `id` = patient_id;
+			INSERT INTO `PATIENT_VEST_DEVICE_HISTORY_MONARCH`
+				(`patient_id`, `serial_number`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_active`,`hmr`,`is_pending`)
+				VALUES
+				(patient_id,pat_new_device_serial_number, created_by,today_date,created_by,today_date,1,0,1);
 			
 			UPDATE `PATIENT_VEST_DEVICE_HISTORY_MONARCH` pvdhm SET
 			`last_modified_date` = today_date,
-			`is_pending` = pat_is_pending
-			 WHERE pvdhm.`patient_id` = patient_id AND `serial_number` = pat_device_serial_number;
+            `is_active` = 0
+			 WHERE pvdhm.`patient_id` = patient_id AND `serial_number` = pat_old_device_serial_number;
 			COMMIT;
             
 ELSEIF operation_type_indicator ='INACTIVATE' THEN

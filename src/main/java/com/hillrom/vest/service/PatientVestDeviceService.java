@@ -14,14 +14,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
+import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
 import com.hillrom.vest.domain.PatientVestDevicePK;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.PatientDevicesAssocRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRepository;
@@ -53,6 +56,9 @@ public class PatientVestDeviceService {
 
     @Inject
     private PatientVestDeviceDataRepository deviceDataRepository;
+
+    @Inject
+    PatientDevicesAssocRepository patientDevicesAssoc;
     
     public String getDeviceType(Long userId){
 		PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(userId);		
@@ -288,18 +294,29 @@ public class PatientVestDeviceService {
 	}
 	
 	public void updateHMR(User patientUser,PatientInfo patient)throws Exception{
-		Optional<PatientVestDeviceHistory>  deviceHistoryFromDB = patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(patient.getId(),patient.getSerialNumber());
+		Optional<PatientVestDeviceHistory>  deviceHistoryFromDB = 
+				patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(patient.getId(),patient.getSerialNumber());
 		if(deviceHistoryFromDB.isPresent()){
 			PatientVestDeviceHistory history = deviceHistoryFromDB.get();
 			history.setHmr(getLatestHMR(patientUser.getId(),patient.getSerialNumber()));			
 			patientVestDeviceRepository.save(history);
 		}else{
-			PatientVestDeviceHistory history = new PatientVestDeviceHistory(new PatientVestDevicePK(patient, patient.getSerialNumber()),
-     				patient.getBluetoothId(), patient.getHubId(), true);
-     		history.setCreatedDate(patient.getDeviceAssocDate());
-     		history.setLastModifiedDate(patient.getDeviceAssocDate());
-     		history.setHmr(getLatestHMR(patientUser.getId(),patient.getSerialNumber()));
-     		patientVestDeviceRepository.save(history);
+			PatientDevicesAssoc oldPatientDevicesAssoc = patientDevicesAssoc.findOneByPatientIdAndDeviceType(patient.getId(),"VEST");
+			Optional<PatientVestDeviceHistory> oldDeviceHistoryFromDB = 
+					patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(patient.getId(),
+																						oldPatientDevicesAssoc.getSerialNumber());
+			if(oldDeviceHistoryFromDB.isPresent()){
+				PatientVestDeviceHistory history = oldDeviceHistoryFromDB.get();
+				history.setHmr(getLatestHMR(patientUser.getId(),oldPatientDevicesAssoc.getSerialNumber()));
+				patientVestDeviceRepository.save(history);
+			}else{
+				PatientVestDeviceHistory history = new PatientVestDeviceHistory(new PatientVestDevicePK(patient, patient.getSerialNumber()),
+	     				patient.getBluetoothId(), patient.getHubId(), true);
+	     		history.setCreatedDate(patient.getDeviceAssocDate());
+	     		history.setLastModifiedDate(patient.getDeviceAssocDate());
+	     		history.setHmr(getLatestHMR(patientUser.getId(),patient.getSerialNumber()));
+	     		patientVestDeviceRepository.save(history);
+			}
 		}
 	}
 	

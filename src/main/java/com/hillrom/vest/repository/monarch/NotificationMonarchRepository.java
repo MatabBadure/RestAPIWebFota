@@ -30,4 +30,7 @@ public interface NotificationMonarchRepository extends
 	
 
 	List<NotificationMonarch> findByNotificationTypeAndPatientUserIdIn(String notificationType,Long patientUserId);
+	
+	@Query("from NotificationMonarch nf where nf.patientUser.id = ?1 and nf.date = ?2")
+	List<NotificationMonarch> findAllByPatientUserIdAndDate(Long patientUserId, LocalDate date);
 }

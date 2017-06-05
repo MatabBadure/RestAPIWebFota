@@ -5,8 +5,7 @@ CREATE PROCEDURE `manage_patient_device_monarch`(
 	IN operation_type_indicator VARCHAR(10),
     IN patient_id varchar(50), 
     IN pat_old_device_serial_number varchar(50),
-    IN pat_new_device_serial_number varchar(50),
-    IN pat_is_pending bit(1)
+    IN pat_new_device_serial_number varchar(50)
     )
 BEGIN
 

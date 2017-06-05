@@ -7,8 +7,7 @@ CREATE PROCEDURE `manage_patient_device`(
     IN pat_old_device_serial_number varchar(50),
     IN pat_new_device_serial_number varchar(50),
 	IN pat_bluetooth_id varchar(50),
-    IN pat_hub_id varchar(50),
-    IN pat_is_pending bit(1)
+    IN pat_hub_id varchar(50)
     )
 BEGIN
 
@@ -33,14 +32,14 @@ SET created_by = 'JDE APP';
 IF operation_type_indicator = 'CREATE' THEN
 
 	SELECT `id`, `serial_number`, `bluetooth_id` INTO temp_patient_info_id, temp_serial_number, temp_bluetooth_id FROM `PATIENT_INFO`
-	WHERE `serial_number` = pat_device_serial_number OR `bluetooth_id` =  pat_bluetooth_id;
+	WHERE `serial_number` = pat_old_device_serial_number OR `bluetooth_id` =  pat_bluetooth_id;
 
 	IF temp_patient_info_id IS NOT NULL THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Device Serial No. or Bluetooth ID already associated with a patient';
 	END IF;
 	
 	SELECT `patient_id`, `serial_number`, `is_active` INTO pvdh_patient_id, pvdh_serial_number, pvdh_is_active FROM `PATIENT_VEST_DEVICE_HISTORY`
-	WHERE `serial_number` = pat_device_serial_number and `patient_id` = patient_id;
+	WHERE `serial_number` = pat_old_device_serial_number and `patient_id` = patient_id;
     
 	START TRANSACTION;
 	  
@@ -48,7 +47,7 @@ IF operation_type_indicator = 'CREATE' THEN
 	  
 		UPDATE `PATIENT_INFO` SET
 		`hub_id` = pat_hub_id,
-		`serial_number` = pat_device_serial_number,
+		`serial_number` = pat_old_device_serial_number,
 		`bluetooth_id` = pat_bluetooth_id,
 		`device_assoc_date`= today_date WHERE `id` = patient_id;
 		
@@ -68,7 +67,7 @@ IF operation_type_indicator = 'CREATE' THEN
 			INSERT INTO `PATIENT_VEST_DEVICE_HISTORY`
 				(`patient_id`, `serial_number`,	`bluetooth_id`,	`hub_id`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_active`,`hmr`)
 				VALUES
-				(patient_id,pat_device_serial_number, pat_bluetooth_id,pat_hub_id,created_by,today_date,created_by,today_date,1,0);
+				(patient_id,pat_old_device_serial_number, pat_bluetooth_id,pat_hub_id,created_by,today_date,created_by,today_date,1,0);
 		END IF;	
 			
 	  COMMIT;
@@ -104,14 +103,14 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 ELSEIF operation_type_indicator ='INACTIVATE' THEN
 
 		SELECT `id`, `serial_number`, `bluetooth_id` INTO temp_patient_info_id, temp_serial_number, temp_bluetooth_id FROM `PATIENT_INFO`
-		WHERE `serial_number` = pat_device_serial_number  AND `id` = patient_id;
+		WHERE `serial_number` = pat_old_device_serial_number  AND `id` = patient_id;
         
         IF temp_patient_info_id IS NULL THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Device Serial No.  not associated with the patient';
 		END IF;
         START TRANSACTION;
 			SELECT max(hmr) INTO latest_hmr FROM PATIENT_VEST_DEVICE_DATA
-			WHERE patient_id = patient_id AND serial_number = pat_device_serial_number
+			WHERE patient_id = patient_id AND serial_number = pat_old_device_serial_number
 			AND bluetooth_id = temp_bluetooth_id;
 
 			UPDATE `PATIENT_INFO` SET
@@ -125,12 +124,12 @@ ELSEIF operation_type_indicator ='INACTIVATE' THEN
 			`last_modified_by` = created_by,
 			`last_modified_date` = today_date
 			WHERE pvdh.`patient_id` = patient_id
-			AND serial_number = pat_device_serial_number
+			AND serial_number = pat_old_device_serial_number
 			AND bluetooth_id = temp_bluetooth_id;
 			
 			UPDATE `PATIENT_DEVICES_ASSOC` 
 			SET `is_active` = 0
-            WHERE `patient_id` = patient_id and `serial_number` = pat_device_serial_number;
+            WHERE `patient_id` = patient_id and `serial_number` = pat_old_device_serial_number;
             
 		COMMIT;
 ELSE  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Operation not supported';

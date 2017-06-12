@@ -2559,10 +2559,10 @@ public class AdherenceCalculationServiceMonarch{
 	
 	/**
 
-	 * Runs every midnight to integrate the patient who is using both devices after identified
+	 * Runs every morning 9AM after the TIMS job executed to integrate the patient who is using both devices after identified
 
 	 */
-	//@Scheduled(cron="0 55 23 * * * ")	
+	@Scheduled(cron="0 0 9 * * * ")
 	public void processDeviceDetails(){
 		try{
 			LocalDate today = LocalDate.now();
@@ -2582,10 +2582,11 @@ public class AdherenceCalculationServiceMonarch{
 	}
 
 	public void executeMergingProcess(List<PatientDevicesAssoc> patDevAssList, int flag){
-		
+		// Passing the flag 1 for device update  and 2 for cron job, merging processing
 		Map<Long,PatientNoEventMonarch> userIdNoEventMap = noEventMonarchService.findAllGroupByPatientUserId();			
 		Map<Long,PatientNoEvent> userIdNoEventMapVest = noEventMonarchServiceVest.findAllGroupByPatientUserId();
 	
+		// Looping through all the patient device association, for device update only once loop will be executed
 		for(PatientDevicesAssoc patDevice : patDevAssList){
 			executeMergingProcessLoop(userIdNoEventMap, userIdNoEventMapVest, patDevice, flag);	
 		}
@@ -2599,18 +2600,20 @@ public class AdherenceCalculationServiceMonarch{
 		else
 			return null;
 	}
-		
+
 	public void executeMergingProcessLoop(Map<Long,PatientNoEventMonarch> userIdNoEventMap,
 			Map<Long,PatientNoEvent> userIdNoEventMapVest,
 			PatientDevicesAssoc patDevice, int flag){
-		List<PatientDevicesAssoc> devAssForPatientList = patientDevicesAssocRepository.findByPatientId(patDevice.getPatientId());
 		
+		// Identifying both device patient by the size more than 1
+		List<PatientDevicesAssoc> devAssForPatientList = patientDevicesAssocRepository.findByPatientId(patDevice.getPatientId());
 		if(devAssForPatientList.size()>1){
 			LocalDate vestCreatedDate = null;
 			LocalDate monarchCreatedDate = null;
 			String vestSerialNumber = null;
 			String monarchSerialNumber = null;
 			
+			// Looping through the patient devices
 			for(PatientDevicesAssoc device : devAssForPatientList){
 				if(device.getDeviceType().equals("VEST")){
 					vestCreatedDate = device.getCreatedDate();
@@ -2625,6 +2628,7 @@ public class AdherenceCalculationServiceMonarch{
 				}
 			}
 			
+			// Get the Patient details
 			PatientInfo patientInfo = patientInfoRepository.findOneById(patDevice.getPatientId());
 			User user = userService.getUserObjFromPatientInfo(patientInfo);
 			
@@ -2632,6 +2636,7 @@ public class AdherenceCalculationServiceMonarch{
 			User userOld = null;
 			
 			if(flag == 2){
+				// Get the Patient old details
 				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patDevice.getOldPatientId());
 				userOld = userService.getUserObjFromPatientInfo(patientInfoOld);
 				
@@ -2650,16 +2655,19 @@ public class AdherenceCalculationServiceMonarch{
 				firstTransmissionDateVest = noEventVest.getFirstTransmissionDate();
 			}
 			
-			if(Objects.nonNull(vestCreatedDate) && Objects.nonNull(monarchCreatedDate) && (vestCreatedDate.isBefore(monarchCreatedDate) || vestCreatedDate.isEqual(monarchCreatedDate))){
+			// Identifying the new device is Monarch and old device is Vest
+			if(Objects.nonNull(vestCreatedDate) && Objects.nonNull(monarchCreatedDate) && 
+					(vestCreatedDate.isBefore(monarchCreatedDate) || vestCreatedDate.isEqual(monarchCreatedDate))){
 				
 				List<PatientCompliance> patientComplianceList = patientComplianceRepository.findByPatientUserId(user.getId());
 				List <PatientComplianceMonarch> complianceListToSave = new LinkedList<>();
 				
 				List<PatientComplianceMonarch> patientComplianceMonarchList = null;
+
 				if(flag == 2){
-					
 					Optional<PatientVestDeviceHistoryMonarch> monarchDevice = patientMonarchDeviceRepository.findOneByPatientIdAndSerialNumber(patDevice.getOldPatientId(),monarchSerialNumber);
 					
+					// During merging the devices during the cron job
 					if(monarchDevice.isPresent()){
 		     			if(monarchDevice.get().isActive()) {
 		     				
@@ -2692,6 +2700,7 @@ public class AdherenceCalculationServiceMonarch{
 					
 					Double hmrMonarch = 0.0;
 					if(flag == 2){
+						// Updating HMR for monarch
 						PatientComplianceMonarch complianceMonarch = getComplianceForDay(patientComplianceMonarchList, patientCompliance.getDate());
 						if(Objects.nonNull(complianceMonarch))
 							hmrMonarch = complianceMonarch.getHmr();
@@ -2712,7 +2721,8 @@ public class AdherenceCalculationServiceMonarch{
 							patientCompliance.getGlobalMissedTherapyCounter(),
 							patientCompliance.getHmr());
 					 		
-					complianceListToSave.add(compliance);						 
+					complianceListToSave.add(compliance);
+
 				}
 				complianceMonarchService.saveAll(complianceListToSave);
 				

@@ -445,34 +445,33 @@ public class UserResource {
 		
 			PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(id);
     		
-			if(deviceType.equals("VEST") || deviceType.equals("ALL")){
-				if(deviceValue.equals("MONARCH")){
-					responseObj_Monarch = patientVestDeviceMonarchService.linkVestDeviceWithPatient(id, deviceData);	
-					PatientDevicesAssoc checkPatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
-					List<PatientDevicesAssoc> patDevList = new LinkedList<>();
-					if(Objects.isNull(checkPatientType)){
-						PatientDevicesAssoc addPatientType = new PatientDevicesAssoc(patient.getId(), "MONARCH", "CD", true, deviceData.get("serialNumber").toString(), patient.getHillromId());
-						patientDevicesAssocRepository.save(addPatientType);
-						patDevList.add(addPatientType);
-					}else{
-						checkPatientType.setPatientType("CD");						
-						checkPatientType.setCreatedDate(Objects.isNull(checkPatientType.getCreatedDate()) ? 
-															DateUtil.getPlusOrMinusTodayLocalDate(-1) :  checkPatientType.getCreatedDate());
-						patientDevicesAssocRepository.save(checkPatientType);
-						patDevList.add(checkPatientType);
-					}
-					adherenceCalculationServiceMonarch.executeMergingProcess(patDevList, 1);
-					
-					PatientDevicesAssoc updatePatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
-					updatePatientType.setPatientType("CD");
-					patientDevicesAssocRepository.save(updatePatientType);
-					changedDevType = "ALL";
-				}else if(deviceValue.equals("VEST")){
-					responseObj_Vest = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
-					changedDevType = "VEST";
+			if((deviceType.equals("VEST") || deviceType.equals("ALL") ) && deviceValue.equals("MONARCH")){
+				responseObj_Monarch = patientVestDeviceMonarchService.linkVestDeviceWithPatient(id, deviceData);
+				PatientDevicesAssoc checkPatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
+				List<PatientDevicesAssoc> patDevList = new LinkedList<>();
+				if(Objects.isNull(checkPatientType)){
+					PatientDevicesAssoc addPatientType = new PatientDevicesAssoc(patient.getId(), "MONARCH", "CD", true, deviceData.get("serialNumber").toString(), patient.getHillromId());
+					patientDevicesAssocRepository.save(addPatientType);
+					patDevList.add(addPatientType);
+				}else{
+					checkPatientType.setPatientType("CD");
+					checkPatientType.setCreatedDate(Objects.isNull(checkPatientType.getCreatedDate()) ? 
+														DateUtil.getPlusOrMinusTodayLocalDate(-1) :  checkPatientType.getCreatedDate());
+					checkPatientType.setSerialNumber(deviceData.get("serialNumber").toString());
+					patientDevicesAssocRepository.save(checkPatientType);
+					patDevList.add(checkPatientType);
 				}
-			}else if(deviceType.equals("MONARCH") || deviceType.equals("ALL")){
-				if(deviceValue.equals("VEST")){				
+				if(deviceType.equals("VEST"))
+					adherenceCalculationServiceMonarch.executeMergingProcess(patDevList, 1);
+				
+				PatientDevicesAssoc updatePatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
+				updatePatientType.setPatientType("CD");
+				patientDevicesAssocRepository.save(updatePatientType);
+				changedDevType = "ALL";
+			}else if(deviceType.equals("VEST") && deviceValue.equals("VEST")){
+				responseObj_Vest = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
+				changedDevType = "VEST";
+			}else if((deviceType.equals("MONARCH") || deviceType.equals("ALL")) && deviceValue.equals("VEST")){
 					responseObj_Vest = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
 					PatientDevicesAssoc checkPatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
 					List<PatientDevicesAssoc> patDevList = new LinkedList<>();
@@ -484,20 +483,20 @@ public class UserResource {
 						checkPatientType.setPatientType("CD");						
 						checkPatientType.setCreatedDate(Objects.isNull(checkPatientType.getCreatedDate()) ? 
 								DateUtil.getPlusOrMinusTodayLocalDate(-1) :  checkPatientType.getCreatedDate());
-						
+						checkPatientType.setSerialNumber(deviceData.get("serialNumber").toString());
 						patientDevicesAssocRepository.save(checkPatientType);
 						patDevList.add(checkPatientType);
 					}
-					adherenceCalculationServiceMonarch.executeMergingProcess(patDevList, 1);
+					if(deviceType.equals("MONARCH"))
+						adherenceCalculationServiceMonarch.executeMergingProcess(patDevList, 1);
 					
 					PatientDevicesAssoc updatePatientType = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
 					updatePatientType.setPatientType("CD");
 					patientDevicesAssocRepository.save(updatePatientType);
 					changedDevType = "ALL";
-				}else if(deviceValue.equals("MONARCH")){
-					responseObj_Monarch = patientVestDeviceMonarchService.linkVestDeviceWithPatient(id, deviceData);
-					changedDevType = "MONARCH";
-				}
+			}else if(deviceType.equals("MONARCH") && deviceValue.equals("MONARCH")){
+				responseObj_Monarch = patientVestDeviceMonarchService.linkVestDeviceWithPatient(id, deviceData);
+				changedDevType = "MONARCH";
 			}
 
 			if (responseObj_Vest instanceof User) {

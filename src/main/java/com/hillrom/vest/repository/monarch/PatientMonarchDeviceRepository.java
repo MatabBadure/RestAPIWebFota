@@ -37,4 +37,9 @@ public interface PatientMonarchDeviceRepository extends
 	@Query(nativeQuery = true, value = "SELECT * FROM PATIENT_VEST_DEVICE_HISTORY_MONARCH pvd where patient_id = :patientId and is_active = :isActive order by last_modified_by desc limit 1 ")
 	PatientVestDeviceHistoryMonarch findLatestInActiveDeviceByPatientId(
 			@Param("patientId")String pateitnId, @Param("isActive")Boolean active);
+	
+	@Query("from PatientVestDeviceHistoryMonarch pvd where pvd.patientVestDevicePK.patient.id = ?1 and pvd.pending = ?2")
+	Optional<PatientVestDeviceHistoryMonarch> findOneByPatientIdAndPendingStatus(
+			String patientId, Boolean pending);
+	
 }

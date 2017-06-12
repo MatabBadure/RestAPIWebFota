@@ -58,6 +58,9 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 	@Column(name="is_active")
 	private Boolean active = false;
 	
+	@Column(name="is_pending")
+	private Boolean pending = false;
+	
 	@CreatedBy
     @NotNull
     @Column(name = "created_by", nullable = false, length = 50, updatable = false)
@@ -169,6 +172,14 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 
 	public void setActive(Boolean active) {
 		this.active = active;
+	}
+	
+	public Boolean isPending() {
+		return pending;
+	}
+
+	public void setPending(Boolean pending) {
+		this.pending = pending;
 	}
 
 	public String getCreatedBy() {

@@ -52,12 +52,22 @@ public class NotificationMonarchService {
 	public NotificationMonarch createOrUpdateNotification(User patientUser,
 			PatientInfo patient, Long patientUserId,
 			LocalDate currentTherapyDate, String notificationType,boolean isAcknowledged) {
-		NotificationMonarch existingNotificationofTheDay = notificationMonarchRepository.findByPatientUserIdAndDate(patientUserId, currentTherapyDate);
+		
+		List<NotificationMonarch> existingNotificationofTheDayList = notificationMonarchRepository.findAllByPatientUserIdAndDate(patientUserId, currentTherapyDate);
+		NotificationMonarch existingNotificationofTheDay = null;
 		// Update missed therapy notification if exists for the day
-		if(Objects.nonNull(existingNotificationofTheDay)){
-			existingNotificationofTheDay.setNotificationType(notificationType);
-			existingNotificationofTheDay.setAcknowledged(isAcknowledged);
-			notificationMonarchRepository.save(existingNotificationofTheDay);
+		if(!existingNotificationofTheDayList.isEmpty()){
+			int counter = 0;
+			for(NotificationMonarch existingNotificationofTheDayUpdate : existingNotificationofTheDayList){
+				if(existingNotificationofTheDayList.size() > 1 && counter == 0){
+					notificationMonarchRepository.delete(existingNotificationofTheDayUpdate);
+				}else{
+					existingNotificationofTheDayUpdate.setNotificationType(notificationType);
+					existingNotificationofTheDayUpdate.setAcknowledged(isAcknowledged);
+					notificationMonarchRepository.save(existingNotificationofTheDayUpdate);
+				}
+				counter++;
+			}
 		}else{
 			existingNotificationofTheDay = new NotificationMonarch(notificationType,currentTherapyDate,patientUser,patient,false);
 			notificationMonarchRepository.save(existingNotificationofTheDay);
@@ -112,14 +122,16 @@ public class NotificationMonarchService {
 	public void deleteNotificationIfExists(Long patientUserId,
 			LocalDate currentTherapyDate,int missedTherapyCount,
 			boolean isHmrCompliant,boolean isSettingsDeviated, Integer adherenceSetting) {
-		NotificationMonarch existingNotificationofTheDay = notificationMonarchRepository.findByPatientUserIdAndDate(patientUserId, currentTherapyDate);
-		if(Objects.nonNull(existingNotificationofTheDay)){
-			String notificationType = existingNotificationofTheDay.getNotificationType();
-			if((MISSED_THERAPY.equalsIgnoreCase(notificationType) && missedTherapyCount < adherenceSetting) ||
-				(HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType) && isHmrCompliant) ||
-				(SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) && !isSettingsDeviated) ||
-				(HMR_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) && isHmrCompliant && !isSettingsDeviated)){
-				notificationMonarchRepository.delete(existingNotificationofTheDay);
+		List<NotificationMonarch> existingNotificationofTheDayList = notificationMonarchRepository.findAllByPatientUserIdAndDate(patientUserId, currentTherapyDate);
+		if(!existingNotificationofTheDayList.isEmpty()){
+			for(NotificationMonarch existingNotificationofTheDay : existingNotificationofTheDayList){
+				String notificationType = existingNotificationofTheDay.getNotificationType();
+				if((MISSED_THERAPY.equalsIgnoreCase(notificationType) && missedTherapyCount < adherenceSetting) ||
+					(HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType) && isHmrCompliant) ||
+					(SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) && !isSettingsDeviated) ||
+					(HMR_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) && isHmrCompliant && !isSettingsDeviated)){
+					notificationMonarchRepository.delete(existingNotificationofTheDay);
+				}
 			}
 		}
 	}

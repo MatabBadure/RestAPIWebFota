@@ -37,15 +37,14 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.ClinicPatientRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PatientNoEventsRepository;
-
 import com.hillrom.vest.repository.PatientVestDeviceRepository;
-
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.monarch.PatientComplianceMonarchRepository;
 import com.hillrom.vest.repository.monarch.PatientNoEventsMonarchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.ClinicService;
 import com.hillrom.vest.service.PatientHCPService;
 import com.hillrom.vest.service.TherapySessionService;
@@ -112,6 +111,8 @@ public class PatientHCPMonarchService extends PatientHCPService{
     @Inject
     private PatientHCPService patientHCPService;
 	
+    @Inject
+    private AdherenceCalculationService adherenceCalculationService;
 	
 	public Map<String, Object> getTodaysPatientStatisticsForClinicAssociatedWithHCP(String clinicId, LocalDate date) throws HillromException{
 		Map<String, Object> statistics = new HashMap();
@@ -223,10 +224,31 @@ public class PatientHCPMonarchService extends PatientHCPService{
 			date = LocalDate.now().minusDays(1);// yester days data, HCP and Clinic Admin would see yesterdays data
 			Map<LocalDate,Integer> datePatientNoEventCountMap = new HashMap<LocalDate, Integer>(getPatientsWithNoEvents(date,date,patientUserIds));
 			datePatientNoEventCountMap.putAll(patientHCPService.getPatientsWithNoEvents(date, date, patientUserIds));
+			
+			List<Long> vestPatientUserIds = new LinkedList<>();
+			for(Long patientUserId : patientUserIds){
+				
+				PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(patientUserId);
+				String deviceType = adherenceCalculationService.getDeviceTypeValue(patient.getId());
+				if(deviceType.equals("VEST")){
+					vestPatientUserIds.add(patientUserId);
+				}
+			}			
+			
 			int patientsWithNoEventRecorded = Objects.nonNull(datePatientNoEventCountMap.get(date))? datePatientNoEventCountMap.get(date):0;
-			int patientsWithHmrNonCompliance = patientComplianceMonarchRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, patientUserIds).size() + patientComplianceRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, patientUserIds).size();
-			int patientsWithSettingDeviation = patientComplianceMonarchRepository.findByDateAndIsSettingsDeviatedAndPatientUserIdIn(date, true, patientUserIds).size() + patientComplianceRepository.findByDateAndIsSettingsDeviatedAndPatientUserIdIn(date, true, patientUserIds).size();
-			int patientsWithMissedTherapy =  patientComplianceMonarchRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date, patientUserIds).size() + patientComplianceRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date, patientUserIds).size();
+			
+			int patientsWithHmrNonCompliance = patientComplianceMonarchRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, patientUserIds).size() 
+													+ (vestPatientUserIds.isEmpty() ? 0 : 
+														patientComplianceRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, vestPatientUserIds).size());
+			
+			int patientsWithSettingDeviation = patientComplianceMonarchRepository.findByDateAndIsSettingsDeviatedAndPatientUserIdIn(date, true, patientUserIds).size() 
+													+ (vestPatientUserIds.isEmpty() ? 0 :
+														patientComplianceRepository.findByDateAndIsSettingsDeviatedAndPatientUserIdIn(date, true, vestPatientUserIds).size());
+			
+			int patientsWithMissedTherapy =  patientComplianceMonarchRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date, patientUserIds).size() 
+													+ (vestPatientUserIds.isEmpty() ? 0 :
+														patientComplianceRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date, vestPatientUserIds).size());
+			
 			statistics.put("patientsWithHmrNonCompliance", patientsWithHmrNonCompliance);
 			statistics.put("patientsWithSettingDeviation", patientsWithSettingDeviation);
 			statistics.put("patientsWithMissedTherapy", patientsWithMissedTherapy);

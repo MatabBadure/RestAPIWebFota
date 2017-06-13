@@ -3,6 +3,7 @@ package com.hillrom.vest.batch.processing.monarch;
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -54,6 +55,7 @@ import com.hillrom.vest.repository.monarch.PatientMonarchDeviceRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.DeviceLogMonarchParser;
 import com.hillrom.vest.service.DeviceLogParser;
+import com.hillrom.vest.service.PatientInfoService;
 import com.hillrom.vest.service.monarch.PatientComplianceMonarchService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.monarch.PatientNoEventMonarchService;
@@ -105,6 +107,9 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 
 	@Inject
 	PatientVestDeviceDataServiceMonarch patientVestDeviceDataServiceMonarch;
+	
+	@Inject
+    private PatientInfoService patientInfoService;
 	
 	private String patientDeviceRawData;
 	
@@ -227,13 +232,20 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 		PatientInfo patientInfo = null;
 
 		if (patientDevicesFromDB.isPresent()) {
-			patientInfo = patientInfoRepository.findOneById(patientDevicesFromDB.get().getPatientId());
-			List<UserPatientAssoc> associations = userPatientRepository.findOneByPatientId(patientInfo.getId());
-			List<UserPatientAssoc> userPatientAssociations = associations.stream()
-					.filter(assoc -> RelationshipLabelConstants.SELF.equalsIgnoreCase(assoc.getRelationshipLabel()))
-					.collect(Collectors.toList());
-			return userPatientAssociations.get(0);
+			return retrieveUserPatientAssoc(patientDevicesFromDB.get().getPatientId());
 		} else {
+			
+			List<PatientVestDeviceHistoryMonarch> patientMonarchDeviceHistoryList = patientMonarchDeviceRepository.findBySerialNumber(deviceSerialNumber);
+			if(!patientMonarchDeviceHistoryList.isEmpty()){
+				PatientVestDeviceHistoryMonarch patientMonarchDevicePatient = patientMonarchDeviceHistoryList.get(0);
+			
+				Optional<PatientVestDeviceHistoryMonarch> patientMonarchDeviceHistory = patientMonarchDeviceRepository.findOneByPatientIdAndPendingStatus(patientMonarchDevicePatient.getPatient().getId(), true);
+			
+				if (patientMonarchDeviceHistory.isPresent()){
+					return retrieveUserPatientAssoc(patientMonarchDevicePatient.getPatient().getId());
+				}
+			}
+			
 			patientInfo = new PatientInfo();
 			// Assigns the next hillromId for the patient
 			String hillromId = patientInfoRepository.id();
@@ -290,6 +302,15 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 			return userPatientAssoc;
 		}
 	}
+	
+	public UserPatientAssoc retrieveUserPatientAssoc(String patientId){
+		PatientInfo patientInfo = patientInfoService.findOneById(patientId);
+		List<UserPatientAssoc> associations = new ArrayList<UserPatientAssoc> (patientInfo.getUserPatientAssoc());
+		List<UserPatientAssoc> userPatientAssociations = associations.stream()
+				.filter(assoc -> RelationshipLabelConstants.SELF.equalsIgnoreCase(assoc.getRelationshipLabel()))
+				.collect(Collectors.toList());
+		return userPatientAssociations.get(0);
+	}
 
 	private void setNameToPatient(PatientInfo patientInfo, String customerName) {
 		String names[] = customerName.split(" ");
@@ -309,27 +330,4 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 		patientInfo.setLastName(lastName);
 		patientInfo.setMiddleName(middleName);
 	}
-
-	
-	/*private List<PatientVestDeviceData> getDelta(List<PatientVestDeviceDataMonarch> existingEvents, List<PatientVestDeviceData> newEvents){
-		isReadComplete = true;
-		if(Objects.isNull(existingEvents) || existingEvents.isEmpty())
-			return newEvents;
-		else{
-			Iterator<PatientVestDeviceDataMonarch> itr = newEvents.iterator();
-			while(itr.hasNext()){
-				PatientVestDeviceDataMonarch newEvent = itr.next();
-				for(PatientVestDeviceDataMonarch existingData : existingEvents){
-					if(newEvent.getTimestamp().equals(existingData.getTimestamp()) &&
-					   newEvent.getBluetoothId().equals(existingData.getBluetoothId()) && 
-					   newEvent.getEventId().equals(existingData.getEventId())){
-						itr.remove();
-						break;
-					}
-				}
-			}
-			Collections.sort(newEvents);
-			return newEvents;
-		}
-	}*/
 }

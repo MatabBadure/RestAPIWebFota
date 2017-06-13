@@ -467,7 +467,7 @@ public class ParserUtilMonarch {
 	public static int intergerCombinedFromHexForHMR(byte[] input)
 	{	    
 	    String hexTotal = "";
-	    for (int t = 0; t < input.length; t++){	    	
+	    for (int t = 0; t < input.length; t++){
 	    	String integerToHex = Integer.toHexString(input[t]& 0xFF);
 	    	hexTotal = hexTotal + (integerToHex.length() == 1 ? "0"+integerToHex : integerToHex);
 	    }

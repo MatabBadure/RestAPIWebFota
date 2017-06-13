@@ -9,7 +9,7 @@ spring:
         active: prod
     datasource:
         dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
-        url: jdbc:mysql://Indsugrc02v:3306/hillromvest_prod?zeroDateTimeBehavior=convertToNull
+        url: jdbc:mysql://Indsugrc01vd:3306/hillromvest_prod?zeroDateTimeBehavior=convertToNull
         databaseName: 
         serverName: 
         username: root
@@ -41,12 +41,12 @@ spring:
     recaptcha:
         recaptchaPrivateKey: 6LcXjQkTAAAAACiA7rx7o7wlifQ7n3VQ_It-sncc
     notification:
-        hcpOrClinicAdminDashboardUrl: https://visiview.hill-rom.com
-        patientDashboardUrl: https://visiview.hill-rom.com
-        careGiverDashboardUrl: https://visiview.hill-rom.com
-        baseUrl: https://visiview.hill-rom.com
+        hcpOrClinicAdminDashboardUrl: https://visiview-test.hill-rom.com
+        patientDashboardUrl: https://visiview-test.hill-rom.com
+        careGiverDashboardUrl: https://visiview-test.hill-rom.com
+        baseUrl: https://visiview-test.hill-rom.com
         accountActivationReminderInterval: 72
     survey:
-        surveyreportemailids: Dana.Elzea@hill-rom.com,julie.ells@hill-rom.com,Megan.Nelson@hill-rom.com
+        surveyreportemailids: 
     changePrescription:
-        changePrescriptionEmailids: mhrcaripatientrecords@hill-rom.com
+        changePrescriptionEmailids: 

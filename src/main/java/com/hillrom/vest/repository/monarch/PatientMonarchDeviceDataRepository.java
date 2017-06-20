@@ -27,5 +27,9 @@ public interface PatientMonarchDeviceDataRepository extends
 
 	
 	public List<PatientVestDeviceDataMonarch> findByPatientIdAndTimestampBetween(String patientId,Long from,Long to);
-
+	
+	// Query to retrieve list of event under therapy 
+	@Query(nativeQuery=true,value="select * from PATIENT_VEST_DEVICE_DATA_MONARCH where patient_id = :patientId and from_unixtime(timestamp/1000) between :startTime and :endTime")
+	public List<PatientVestDeviceDataMonarch> returnByPatientIdAndTimeStampBetween(@Param("patientId") String patientId, @Param("startTime")String startTime, @Param("endTime")String endTime);
+	
 }

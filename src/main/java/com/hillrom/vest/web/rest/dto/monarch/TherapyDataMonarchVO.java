@@ -1,6 +1,7 @@
 package com.hillrom.vest.web.rest.dto.monarch;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -33,11 +34,20 @@ public class TherapyDataMonarchVO implements Serializable,Comparable<TherapyData
 	private boolean missedTherapy;
 	private NoteMonarch note;
 	private int intensity;
+	//new attribute added
+	private int startBatteryLevel;
+	private int endBatteryLevel;
+	
+	List <Integer> errorList = null;
+	List <Integer> bluetoothSource = null;
+	List <String> powerConnectStatus = null;
+	
 	
 	public TherapyDataMonarchVO(DateTime timestamp, int treatmentsPerDay,int sessionNo,
 			int frequency, int intensity, int programmedCoughPauses,
 			int normalCoughPauses, int coughPauses, NoteMonarch note, DateTime start,
-			DateTime end, int coughPauseDuration, int duration, double hmr,boolean missedTherapy) {
+			DateTime end, int coughPauseDuration, int duration, double hmr,boolean missedTherapy,
+			int startBatteryLevel,int endBatteryLevel,List <Integer> errorList, List <Integer> bluetoothSource, List <String> powerConnectStatus ) {
 		super();
 		this.timestamp = timestamp;
 		this.treatmentsPerDay = treatmentsPerDay;
@@ -54,6 +64,11 @@ public class TherapyDataMonarchVO implements Serializable,Comparable<TherapyData
 		this.duration = duration;
 		this.hmr = hmr;
 		this.missedTherapy = missedTherapy;
+		this.startBatteryLevel = startBatteryLevel;
+		this.endBatteryLevel = endBatteryLevel;
+		this.errorList = errorList;
+		this.bluetoothSource = bluetoothSource;
+		this.powerConnectStatus = powerConnectStatus;
 	}
 	
 	public TherapyDataMonarchVO(DateTime timestamp, int frequency, int intensity,
@@ -74,6 +89,78 @@ public class TherapyDataMonarchVO implements Serializable,Comparable<TherapyData
 		this.duration = duration;
 		this.hmr = hmr;
 		this.missedTherapy = missedTherapy;
+	}
+
+	
+	
+	/**
+	 * @return the errorList
+	 */
+	public List<Integer> getErrorList() {
+		return errorList;
+	}
+
+	/**
+	 * @param errorList the errorList to set
+	 */
+	public void setErrorList(List<Integer> errorList) {
+		this.errorList = errorList;
+	}
+
+	/**
+	 * @return the bluetoothSource
+	 */
+	public List<Integer> getBluetoothSource() {
+		return bluetoothSource;
+	}
+
+	/**
+	 * @param bluetoothSource the bluetoothSource to set
+	 */
+	public void setBluetoothSource(List<Integer> bluetoothSource) {
+		this.bluetoothSource = bluetoothSource;
+	}
+
+	/**
+	 * @return the powerConnectStatus
+	 */
+	public List<String> getPowerConnectStatus() {
+		return powerConnectStatus;
+	}
+
+	/**
+	 * @param powerConnectStatus the powerConnectStatus to set
+	 */
+	public void setPowerConnectStatus(List<String> powerConnectStatus) {
+		this.powerConnectStatus = powerConnectStatus;
+	}
+
+	/**
+	 * @return the startBatteryLevel
+	 */
+	public int getStartBatteryLevel() {
+		return startBatteryLevel;
+	}
+
+	/**
+	 * @param startBatteryLevel the startBatteryLevel to set
+	 */
+	public void setStartBatteryLevel(int startBatteryLevel) {
+		this.startBatteryLevel = startBatteryLevel;
+	}
+
+	/**
+	 * @return the endBatteryLevel
+	 */
+	public int getEndBatteryLevel() {
+		return endBatteryLevel;
+	}
+
+	/**
+	 * @param endBatteryLevel the endBatteryLevel to set
+	 */
+	public void setEndBatteryLevel(int endBatteryLevel) {
+		this.endBatteryLevel = endBatteryLevel;
 	}
 
 	public TherapyDataMonarchVO() {
@@ -223,7 +310,7 @@ public class TherapyDataMonarchVO implements Serializable,Comparable<TherapyData
 				+ ", normalCoughPauses=" + normalCoughPauses + ", coughPauses="
 				+ coughPauses + ", note=" + note + ", start=" + start
 				+ ", end=" + end + ", coughPauseDuration=" + coughPauseDuration
-				+ ", duration=" + duration + ", hmr=" + hmr + "missedTherapy="+missedTherapy+"]";
+				+ ", duration=" + duration + ", hmr=" + hmr + ",missedTherapy="+missedTherapy+ ",startBatteryLevel="+startBatteryLevel+",endBatteryLevel="+endBatteryLevel+"]";
 	}
 
 	@Override

@@ -1,10 +1,11 @@
 package com.hillrom.vest.service.monarch;
 
+import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -17,39 +18,28 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import org.joda.time.DateTime;
-import org.joda.time.Days;
 import org.joda.time.LocalDate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import com.hillrom.vest.batch.processing.monarch.PatientMonarchDeviceDataReader;
-import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.NoteMonarch;
-import com.hillrom.vest.domain.NotificationMonarch;
-import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEventMonarch;
-import com.hillrom.vest.domain.ProtocolConstants;
+import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
 import com.hillrom.vest.domain.ProtocolConstantsMonarch;
-import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.TherapySessionMonarch;
 import com.hillrom.vest.domain.User;
-import com.hillrom.vest.exceptionhandler.HillromException;
-import com.hillrom.vest.repository.PatientNoEventsRepository;
+import com.hillrom.vest.repository.monarch.PatientMonarchDeviceDataRepository;
 import com.hillrom.vest.repository.monarch.PatientNoEventsMonarchRepository;
 import com.hillrom.vest.repository.monarch.TherapySessionMonarchRepository;
 import com.hillrom.vest.service.AdherenceCalculationService;
-import com.hillrom.vest.service.NoteService;
-import com.hillrom.vest.service.PatientComplianceService;
-import com.hillrom.vest.service.PatientNoEventService;
 import com.hillrom.vest.service.util.DateUtil;
+import com.hillrom.vest.service.util.monarch.PatientVestDeviceTherapyUtilMonarch;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
 import com.hillrom.vest.web.rest.dto.monarch.TherapyDataMonarchVO;
-
-import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 
 @Service
 @Transactional
@@ -79,6 +69,9 @@ public class TherapySessionServiceMonarch {
 
 	@Inject
 	private PatientNoEventsMonarchRepository patientNoEventRepositoryMonarch;
+	
+	@Inject
+	private PatientMonarchDeviceDataRepository patientMonarchDeviceDataRepository;
 
 	public List<TherapySessionMonarch> saveOrUpdate(List<TherapySessionMonarch> therapySessionsMonarch) throws Exception{
 		if(therapySessionsMonarch.size() > 0){			
@@ -280,11 +273,43 @@ public class TherapySessionServiceMonarch {
 			for(TherapySessionMonarch session: sessionsPerDate){
 				int programmedCoughPauses = session.getProgrammedCaughPauses()==null?0:session.getProgrammedCaughPauses();
 				int normalCoughPauses = session.getNormalCaughPauses();
+
+				
+				   DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+				   String startTime = fmt.print(session.getStartTime());
+				   String endTime = fmt.print(session.getEndTime());
+				
+				List<PatientVestDeviceDataMonarch> sessionEvents = patientMonarchDeviceDataRepository.returnByPatientIdAndTimeStampBetween(session.getPatientInfo().getId(),startTime,endTime);
+				
+				List <Integer> errorList = new LinkedList<>();
+				List <Integer> bluetoothSource = new LinkedList<>();
+				List <String> powerConnectStatus = new LinkedList<>();
+				
+				String EVENT_CODE_ERROR_MONARCH = "22";
+				String EVENT_CODE_BT_CHANGE_SOURCE_MONARCH = "23";
+				String EVENT_CODE_POWER_CONNECTED_MONARCH = "24";
+				String EVENT_CODE_POWER_DISCONNECTED_MONARCH = "25";
+				
+				for(PatientVestDeviceDataMonarch sessionEvent : sessionEvents){					
+					// Bluetooth source change
+					if(sessionEvent.getEventCode().equals(EVENT_CODE_BT_CHANGE_SOURCE_MONARCH)){
+						bluetoothSource.add(sessionEvent.getIntensity());
+					}else {
+						if(sessionEvent.getEventCode().equals(EVENT_CODE_POWER_CONNECTED_MONARCH) || 
+								sessionEvent.getEventCode().equals(EVENT_CODE_POWER_DISCONNECTED_MONARCH)){					
+							powerConnectStatus.add(sessionEvent.getEventCode());												
+						}
+						else if(sessionEvent.getEventCode().equals(EVENT_CODE_ERROR_MONARCH)){
+							errorList.add(sessionEvent.getIntensity());
+						}
+					}
+				}
+				
 				therapyDataVO = new TherapyDataMonarchVO(session.getStartTime(), sessionsPerDate.size(),session.getSessionNo(), 
 						session.getFrequency(),	session.getIntensity(), programmedCoughPauses, normalCoughPauses,
 						programmedCoughPauses+normalCoughPauses, noteMap.get(date), session.getStartTime(),
 						session.getEndTime(), session.getCaughPauseDuration(),
-						session.getDurationInMinutes(), session.getHmr().doubleValue()/minutes,false);
+						session.getDurationInMinutes(), session.getHmr().doubleValue()/minutes,false,session.getStartBatteryLevel(),session.getEndBatteryLevel(),errorList,bluetoothSource,powerConnectStatus);
 				therapyDataVOs.add(therapyDataVO);
 			}
 			therapyDataMap.put(date, therapyDataVOs);

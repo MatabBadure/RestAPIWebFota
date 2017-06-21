@@ -13,6 +13,11 @@ import static com.hillrom.vest.config.Constants.MMddyyyyHHmmss;
 import static com.hillrom.vest.config.Constants.MMddyyyyHHMM;
 import static com.hillrom.vest.config.Constants.KEY_MISSED_THERAPY;
 import static com.hillrom.vest.config.Constants.KEY_INTENSITY;
+import static com.hillrom.vest.config.Constants.KEY_START_BATTERY_LEVEL;
+import static com.hillrom.vest.config.Constants.KEY_END_BATTERY_LEVEL;
+import static com.hillrom.vest.config.Constants.KEY_ERROR_CODES;
+import static com.hillrom.vest.config.Constants.KEY_BT_CHANGE_EVENTS;
+import static com.hillrom.vest.config.Constants.KEY_POWER_CHANGE_EVENTS;
 
 import java.util.List;
 import java.util.Objects;
@@ -85,6 +90,14 @@ public class HMRGraphServiceMonarch extends AbstractGraphService {
 		point.getToolText().put(KEY_DURATION, therapy.getDuration());
 		point.getToolText().put(KEY_FREQUENCY, therapy.getFrequency());
 		point.getToolText().put(KEY_COUGH_PAUSES, therapy.getCoughPauses());
+		
+		// Added Monarch values for session view implementation
+		point.getToolText().put(KEY_START_BATTERY_LEVEL, Objects.nonNull(therapy.getStartBatteryLevel()) ? therapy.getStartBatteryLevel() : "");
+		point.getToolText().put(KEY_END_BATTERY_LEVEL, Objects.nonNull(therapy.getEndBatteryLevel()) ? therapy.getEndBatteryLevel() : "");				
+		point.getToolText().put(KEY_ERROR_CODES, therapy.getErrorList());
+		point.getToolText().put(KEY_BT_CHANGE_EVENTS, therapy.getBluetoothSource());
+		point.getToolText().put(KEY_POWER_CHANGE_EVENTS, therapy.getPowerConnectStatus());
+		
 		if(Objects.nonNull(therapy.getNote()))
 			point.getToolText().put(KEY_NOTE_TEXT, therapy.getNote().getNote());
 		return point;

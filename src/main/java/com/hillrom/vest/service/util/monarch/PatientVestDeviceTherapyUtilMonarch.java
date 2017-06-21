@@ -412,7 +412,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 						if(!isStartEventForTherapySessionMonarch(nextEventCodeMonarch))
 							groupEntriesMonarch.add(nextEventEntryMonarch);
 					if(isCompleteOrInCompleteEventForTherapySessionMonarch(nextEventCodeMonarch)
-						|| isErrorEventForTherapySessionMonarch(nextEventCodeMonarch)
+						|| ( isErrorEventForTherapySessionMonarch(nextEventCodeMonarch) && (j == (deviceDataMonarch.size()-1)) )
 						|| isStartEventForTherapySessionMonarch(nextEventCodeMonarch)	){
 						// subsequent start events indicate therapy is incomplete due to unexpected reason
 						if(isStartEventForTherapySessionMonarch(nextEventCodeMonarch)){

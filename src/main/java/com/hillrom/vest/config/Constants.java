@@ -203,6 +203,13 @@ public final class Constants {
 	public static final String KEY_INTENSITY = "intensity";
 	public static final String KEY_SESSION_NO = "sessionNo";
 	
+	//Monarch tooltip labels
+	public static final String KEY_START_BATTERY_LEVEL = "startBatteryLevel";
+	public static final String KEY_END_BATTERY_LEVEL = "endBatteryLevel";
+	public static final String KEY_ERROR_CODES = "errorCodes";
+	public static final String KEY_BT_CHANGE_EVENTS = "btChangeEvents";
+	public static final String KEY_POWER_CHANGE_EVENTS = "powerChangeEvents";
+	
 	//hill-1847
 	//AdherenceTrend Graph Y-axis labels
 	public static final String ADHERENCE_SCORE_LABEL = "Adherence Score";

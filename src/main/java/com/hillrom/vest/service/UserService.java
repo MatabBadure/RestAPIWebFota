@@ -558,6 +558,7 @@ public class UserService {
 		compliance.setDate(newUser.getCreatedDate().toLocalDate());
 		compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
 		complianceService.createOrUpdate(compliance);
+		
 		return newUser;
 	}
 
@@ -930,6 +931,13 @@ public class UserService {
 			patientInfo.setExpired(userExtensionDTO.isExpired());
 			patientInfo.setExpiredDate(new DateTime());
 		}
+		//added garment details
+		if(Objects.nonNull(userExtensionDTO.getGarmentColor()))
+			patientInfo.setGarmentColor(userExtensionDTO.getGarmentColor());
+		if(Objects.nonNull(userExtensionDTO.getGarmentSize()))
+			patientInfo.setGarmentSize(userExtensionDTO.getGarmentSize());
+		if(Objects.nonNull(userExtensionDTO.getGarmentType()))
+			patientInfo.setGarmentType(userExtensionDTO.getGarmentType());
 		patientInfo.setWebLoginCreated(true);
 	}
 
@@ -979,6 +987,13 @@ public class UserService {
 			newUser.setGender(userExtensionDTO.getGender());
 		if(Objects.nonNull(userExtensionDTO.getHillromId()))
 			newUser.setHillromId(userExtensionDTO.getHillromId());
+		// added garment details
+		if (Objects.nonNull(userExtensionDTO.getGarmentColor()))
+			newUser.setGarmentColor(userExtensionDTO.getGarmentColor());
+		if (Objects.nonNull(userExtensionDTO.getGarmentSize()))
+			newUser.setGarmentSize(userExtensionDTO.getGarmentSize());
+		if (Objects.nonNull(userExtensionDTO.getGarmentType()))
+			newUser.setGarmentType(userExtensionDTO.getGarmentType());
 		newUser.setLangKey(userExtensionDTO.getLangKey());
 	}
 

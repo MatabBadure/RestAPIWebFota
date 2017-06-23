@@ -11,6 +11,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.envers.AuditJoinTable;
@@ -62,6 +63,7 @@ public class UserExtension extends User implements Serializable {
 
 	@Column(name = "is_deleted", nullable = false)
 	private boolean deleted = false;
+	
 
 	public String getSpeciality() {
 		return speciality;

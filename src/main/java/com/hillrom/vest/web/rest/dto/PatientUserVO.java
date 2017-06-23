@@ -63,6 +63,12 @@ public class PatientUserVO {
 	private String serialNumber;
 	private String deviceType;
 	
+	private String garmentColor;
+
+	private String garmentSize;
+
+	private String garmentType;
+
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
 			String city, LocalDate dob, String gender, String title,
@@ -87,6 +93,7 @@ public class PatientUserVO {
 		this.adherence = adherence;
 		this.lastTransmissionDate= lastTransmissionDate;
 		this.deviceType = deviceType;
+		
 				}
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
@@ -157,6 +164,10 @@ public class PatientUserVO {
 			this.city = patientInfo.getCity();
 			this.address = patientInfo.getAddress();
 			this.serialNumber = patientInfo.getSerialNumber();
+			this.garmentColor = patientInfo.getGarmentColor();
+			this.garmentSize = patientInfo.getGarmentSize();
+			this.garmentType = patientInfo.getGarmentType();
+			
 		}
 	}
 	
@@ -184,9 +195,31 @@ public class PatientUserVO {
 			this.address = patientInfo.getAddress();
 			this.serialNumber = patientInfo.getSerialNumber();
 			this.deviceType = deviceType;
+			this.garmentColor = patientInfo.getGarmentColor();
+			this.garmentSize = patientInfo.getGarmentSize();
+			this.garmentType = patientInfo.getGarmentType();
 		}
 	}
 
+	
+	public String getGarmentColor() {
+		return garmentColor;
+	}
+	public void setGarmentColor(String garmentColor) {
+		this.garmentColor = garmentColor;
+	}
+	public String getGarmentSize() {
+		return garmentSize;
+	}
+	public void setGarmentSize(String garmentSize) {
+		this.garmentSize = garmentSize;
+	}
+	public String getGarmentType() {
+		return garmentType;
+	}
+	public void setGarmentType(String garmentType) {
+		this.garmentType = garmentType;
+	}
 	public Long getId() {
 		return id;
 	}

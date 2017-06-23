@@ -52,6 +52,13 @@ public class UserExtensionDTO extends UserDTO {
     private Map<String,String> clinicMRNId = new HashMap<>();
     
     private boolean expired;
+    
+	private String garmentColor;
+	
+	private String garmentSize;
+	
+	private String garmentType;
+	
 
     public UserExtensionDTO() {
     }
@@ -72,6 +79,50 @@ public class UserExtensionDTO extends UserDTO {
 		this.npiNumber = npiNumber;
 		this.role = role;
 		this.clinicList = clinicList;
+	}
+	
+	
+
+	/**
+	 * @return the garmentColor
+	 */
+	public String getGarmentColor() {
+		return garmentColor;
+	}
+
+	/**
+	 * @param garmentColor the garmentColor to set
+	 */
+	public void setGarmentColor(String garmentColor) {
+		this.garmentColor = garmentColor;
+	}
+
+	/**
+	 * @return the garmentSize
+	 */
+	public String getGarmentSize() {
+		return garmentSize;
+	}
+
+	/**
+	 * @param garmentSize the garmentSize to set
+	 */
+	public void setGarmentSize(String garmentSize) {
+		this.garmentSize = garmentSize;
+	}
+
+	/**
+	 * @return the garmentType
+	 */
+	public String getGarmentType() {
+		return garmentType;
+	}
+
+	/**
+	 * @param garmentType the garmentType to set
+	 */
+	public void setGarmentType(String garmentType) {
+		this.garmentType = garmentType;
 	}
 
 	public String getSpeciality() {

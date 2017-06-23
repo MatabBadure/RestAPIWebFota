@@ -17,6 +17,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -33,7 +34,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
 import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 import com.hillrom.vest.domain.util.MMDDYYYYLocalDateSerializer;
 
@@ -167,6 +167,24 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "expiration_date", nullable = true)
     private DateTime expirationDate = null;
+
+    //Garment changes
+    @Transient
+    @JsonSerialize
+    @JsonDeserialize
+	private String garmentColor;
+	
+    @Transient
+    @JsonSerialize
+    @JsonDeserialize
+	private String garmentSize;
+	
+    @Transient
+    @JsonSerialize
+    @JsonDeserialize
+	private String garmentType;
+	
+	
     
 	public User() {
 		super();
@@ -184,6 +202,31 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.settingDeviationNotification = settingDeviationNotification;
 	}
 
+	
+
+	public String getGarmentColor() {
+		return garmentColor;
+	}
+
+	public void setGarmentColor(String garmentColor) {
+		this.garmentColor = garmentColor;
+	}
+
+	public String getGarmentSize() {
+		return garmentSize;
+	}
+
+	public void setGarmentSize(String garmentSize) {
+		this.garmentSize = garmentSize;
+	}
+
+	public String getGarmentType() {
+		return garmentType;
+	}
+
+	public void setGarmentType(String garmentType) {
+		this.garmentType = garmentType;
+	}
 
 	public Long getId() {
         return id;

@@ -94,6 +94,17 @@ public class PatientInfo implements Serializable {
     @Column(name = "primary_diagnosis")
     private String primaryDiagnosis;
     
+    //Garments changes
+    @Column(name = "garment_type")
+    private String garmentType;
+    
+    @Column(name = "garment_size")
+    private String garmentSize;
+    
+    @Column(name = "garment_color")
+    private String garmentColor;
+    
+    
     public String getPrimaryDiagnosis() {
 		return primaryDiagnosis;
 	}
@@ -133,8 +144,46 @@ public class PatientInfo implements Serializable {
 	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	@Column(name = "device_assoc_date")
     private DateTime deviceAssocDate;
+	
+	
 
-    public String getId() {
+    /**
+	 * @return the garmentType
+	 */
+	public String getGarmentType() {
+		return garmentType;
+	}
+	/**
+	 * @param garmentType the garmentType to set
+	 */
+	public void setGarmentType(String garmentType) {
+		this.garmentType = garmentType;
+	}
+	/**
+	 * @return the garmentSize
+	 */
+	public String getGarmentSize() {
+		return garmentSize;
+	}
+	/**
+	 * @param garmentSize the garmentSize to set
+	 */
+	public void setGarmentSize(String garmentSize) {
+		this.garmentSize = garmentSize;
+	}
+	/**
+	 * @return the garmentColor
+	 */
+	public String getGarmentColor() {
+		return garmentColor;
+	}
+	/**
+	 * @param garmentColor the garmentColor to set
+	 */
+	public void setGarmentColor(String garmentColor) {
+		this.garmentColor = garmentColor;
+	}
+	public String getId() {
 		return id;
 	}
 

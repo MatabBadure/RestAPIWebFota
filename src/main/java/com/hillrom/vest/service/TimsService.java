@@ -1,6 +1,7 @@
 package com.hillrom.vest.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -25,12 +26,14 @@ import com.hillrom.vest.domain.Announcements;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.AnnouncementsPermissionRepository;
 import com.hillrom.vest.repository.AnnouncementsRepository;
+import com.hillrom.vest.repository.PatientDevicesAssocRepository;
 import com.hillrom.vest.repository.TimsRepository;
 import com.hillrom.vest.repository.TimsUserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.web.rest.dto.AnnouncementsDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
+import com.hillrom.vest.web.rest.dto.PatientInfoDTO;
 
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -68,6 +71,12 @@ public class TimsService {
 	
 	@Inject
 	private TimsUserRepository timsUserRepository;
+	
+	@Inject
+	private PatientDevicesAssocRepository patientDevicesAssocRepository;
+
+	@Inject
+	private PatientInfoService patientInfoService;
 	
 	
 
@@ -200,61 +209,47 @@ public class TimsService {
 		
     }
 	
-	//Own Inplementation for use case
+
 	
-	public void comonProccallforPatientwithnoDeviceVestSwapandMonarcadd(){
-		String operationType, inPatientId, inPatientoldDeviceSerialNumber, inPatientNewDeviceSerialNumber, inPatientBluetoothId, inPatientHubId= null;
-		//timsRepository.managaPatientDevice(operationType, inPatientId, inPatientoldDeviceSerialNumber, inPatientNewDeviceSerialNumber, inPatientBluetoothId, inPatientHubId);
-		//timsRepository.managaPatientDeviceAssociation(operationType, inpatientPatientId, inpatientDeviceType, inpatientDeviceIsActive, inPatientBluetoothId, inpatientHillromId, inpatientOldId, inpatientTrainingDate, inpatientDiagnosisCode1, inpatientDiagnosisCode2, inpatientDiagnosisCode3, inpatientDiagnosisCode4, inpatientGarmentType, inpatientGarmentSize, inpatientGarmentColor);
-		//timsRepository.createPatientProtocol(typeKey, operationType, inPatientId, inCreatedBy);
+	
+	public String getDeviceTypeFromRecord(Map fileRecords, int position){
+		PatientInfoDTO patientInfoDTO = (PatientInfoDTO) fileRecords.get(position);
+		return patientInfoDTO.getDevice_type();
+	}
+	
+	public boolean isSerialNoExistInPatientdeviceAssoc(String serialNumber){
+		
+		if(Objects.nonNull(patientDevicesAssocRepository.findOneBySerialNumber(serialNumber)))
+			return true;
+		
+		return false;
+	}
+	
+	public boolean isHillromIdExistInPatientInfo(String hillromId){
+		
+		if(Objects.nonNull(patientInfoService.findOneByHillromId(hillromId)))
+				return true;
+		
+		return false;
+	}
+	
+	public boolean NeitherPatientNorDeviceExistVest(PatientInfoDTO patientInfoDTO){
+		
+		if((!isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))){
+		
+			//managePatientUser(CREATE)
+			//managaPatientDevice(CREATE)
+			//managaPatientDeviceAssociation(CREATE)
+			//createPatientProtocol()
+		}
+		
+		return true;
 		
 	}
 	
-	public boolean isSerialNoExistinPatientdeviceAssoc(){
-		String serialNofromExcel= "abc";
-		boolean isSerialNoExistinPatientdeviceAssoc= true;
-		if(serialNofromExcel!=null){
-			//Write logic to check serial in Patient_device associatio ;
-		}
-		return isSerialNoExistinPatientdeviceAssoc;
-	}
-	
-	public boolean istHillromIdExistinPatientInfo(){
-		String hilRomIdfromExcel= "abc";
-		boolean isSerialNoExistinPatientdeviceAssoc= true;
-		if(hilRomIdfromExcel!=null){
-			//Write logic to check serial in Patient_Info ;
-		}
-		return isSerialNoExistinPatientdeviceAssoc;
-	}
-	
-	public boolean isDeviceExistforCurrentHillRominPatDeviceAss(){
-		String istHillromIdExistinPatientInfo= "abc";
-		boolean isDeviceExistforCurrentHillRominPatDeviceAss= true;
-		if(istHillromIdExistinPatientInfo!=null){
-			//Write logic to check serial in Patient_Info ;
-		}
-		return isDeviceExistforCurrentHillRominPatDeviceAss;
-	}
+
 }
 
 
-
-
-
-
-
-
-
-/*//Not required for Timsneed to delete
-	public void createPatientUser(String hrId,String inDeviceSerialNumber,String inPatientAddress,String inPatientName,
-			String inPatientCity,String inPatientState,String inPatientZip,String inPatientdob,String inPatientLang,String inPatientGender,String inPatientEmail) throws HillromException{		
-		
-		timsRepository.createPatientUser(hrId, inDeviceSerialNumber, inPatientAddress, inPatientName, inPatientCity, inPatientState,
-				inPatientZip, inPatientdob, inPatientLang, inPatientGender, inPatientEmail);
-	}
-	
-
-*/
 
 

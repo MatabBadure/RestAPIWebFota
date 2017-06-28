@@ -46,6 +46,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -82,7 +83,7 @@ public class TimsInputReaderService {
 	        DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");
 
 	        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
-	        	HashSet hs = new HashSet();
+	        	Map fileRecords = new HashMap();
 	        	
 	        	boolean header = true;
 
@@ -114,6 +115,7 @@ public class TimsInputReaderService {
 		            
 		            
 		            if(!header){
+		            	int k = 1; // record position in file
 			            patientInfoDTO.setDevice_type(data[0]);
 			            patientInfoDTO.setTims_cust(data[1]);
 			            patientInfoDTO.setSerial_num(data[2]);
@@ -151,7 +153,7 @@ public class TimsInputReaderService {
 			        	
 	
 	
-			            hs.add(patientInfoDTO);
+			            fileRecords.put(k++, patientInfoDTO);
 		            }
 		            
 		            header = false;
@@ -159,7 +161,7 @@ public class TimsInputReaderService {
 		            
 	            }
 	            
-	            log.debug("Excel File contents in HashSet : " + hs);
+	            log.debug("Excel File contents in HashSet : " + fileRecords);
 	            
 	        } catch (IOException e) {
 	            e.printStackTrace();

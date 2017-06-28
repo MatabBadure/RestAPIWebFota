@@ -263,6 +263,15 @@ public class TimsService {
 		return false;
 	}
 	
+	public boolean isCurrentSerialNumberOwnedByDifferentPatient(String serialNumber, String currentPatientId){
+		
+		if((Objects.nonNull(patientDevicesAssocRepository.findOneBySerialNumber(serialNumber))) && 
+				(!patientDevicesAssocRepository.findOneBySerialNumber(serialNumber).get().getPatientId().equalsIgnoreCase(currentPatientId))) 
+				return true;
+		
+		return false;
+	}
+	
 	// All Cases start below <ScenarioName>Vest or <ScenarioName>Monarch
 	
 	public boolean NeitherPatientNorDeviceExist_VEST(PatientInfoDTO patientInfoDTO){
@@ -333,6 +342,40 @@ public class TimsService {
 			
 
 			//managePatientUser(UPDATE)
+			//managaPatientDeviceAssociation(CREATE)
+			//createPatientProtocol()
+			
+			
+		}
+		
+		return true;		
+	}
+	
+	public boolean DeviceOwnedByDifferentPatient_VEST(PatientInfoDTO patientInfoDTO){
+		if((isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (!isCurrentSerialNumberOwnedByShell(patientInfoDTO.getSerial_num())) 
+				&& (isCurrentSerialNumberOwnedByDifferentPatient(patientInfoDTO.getSerial_num(),
+						patientInfoRepository.findOneBySerialNumber(patientInfoDTO.getSerial_num()).get().getId() )) ){
+			
+			//managaPatientDevice(INACTIVATE)
+			//managePatientUser(CREATE)
+			//managaPatientDeviceAssociation(CREATE)
+			//createPatientProtocol()
+			
+			
+		}
+		
+		return true;		
+	}
+	
+	public boolean DeviceIsOrphanPatientDoesNotExist_VEST(PatientInfoDTO patientInfoDTO){
+		if((isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (!isCurrentSerialNumberOwnedByShell(patientInfoDTO.getSerial_num())) 
+				&& (!isCurrentSerialNumberOwnedByDifferentPatient(patientInfoDTO.getSerial_num(),
+						patientInfoRepository.findOneBySerialNumber(patientInfoDTO.getSerial_num()).get().getId() )) ){
+			
+			//managePatientUser(CREATE)
+			//managaPatientDevice(CREATE)
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
 			

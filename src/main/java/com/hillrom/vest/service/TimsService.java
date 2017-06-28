@@ -27,6 +27,7 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.AnnouncementsPermissionRepository;
 import com.hillrom.vest.repository.AnnouncementsRepository;
 import com.hillrom.vest.repository.PatientDevicesAssocRepository;
+import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.TimsRepository;
 import com.hillrom.vest.repository.TimsUserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
@@ -77,6 +78,9 @@ public class TimsService {
 
 	@Inject
 	private PatientInfoService patientInfoService;
+
+	@Inject
+	private PatientInfoRepository patientInfoRepository;
 	
 	
 
@@ -233,7 +237,35 @@ public class TimsService {
 		return false;
 	}
 	
-	public boolean NeitherPatientNorDeviceExistVest(PatientInfoDTO patientInfoDTO){
+	public boolean isHillromIdExistInPatientDeviceAssoc(String hillromId){
+		
+		if(Objects.nonNull(patientDevicesAssocRepository.findByHillromId(hillromId)))
+				return true;
+		
+		return false;
+	}
+	
+	public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
+		
+		if((Objects.nonNull(patientDevicesAssocRepository.findByHillromId(hillromId))) 
+			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("VEST")))
+				return true;
+		
+		return false;
+	}
+	
+
+	public boolean isCurrentSerialNumberOwnedByShell(String serialNumber){
+		
+		if((Objects.nonNull(patientInfoRepository.findOneBySerialNumber(serialNumber))) && (patientInfoRepository.findOneBySerialNumber(serialNumber).get().getFirstName().equalsIgnoreCase("Hill-Rom"))) 
+				return true;
+		
+		return false;
+	}
+	
+	// All Cases start below <ScenarioName>Vest or <ScenarioName>Monarch
+	
+	public boolean NeitherPatientNorDeviceExist_VEST(PatientInfoDTO patientInfoDTO){
 		
 		if((!isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))){
 		
@@ -247,6 +279,68 @@ public class TimsService {
 		
 	}
 	
+	public boolean PatientExistsWithNODevice_VEST(PatientInfoDTO patientInfoDTO){
+		
+		if((!isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (!isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
+			
+
+			//managaPatientDevice(CREATE)
+			//managaPatientDeviceAssociation(CREATE)
+			//createPatientProtocol()
+		}
+		
+		return true;
+		
+		
+	}
+	
+	public boolean PatientHasMonarchAddVisivest_VEST(PatientInfoDTO patientInfoDTO){
+		
+		if((!isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
+			
+
+			//managaPatientDevice(CREATE)
+			//managaPatientDeviceAssociation(CREATE)
+			//createPatientProtocol()
+			
+		}
+		
+		return true;
+		
+	}
+	
+	public boolean PatientHasDifferentVisivestSwap_VEST(PatientInfoDTO patientInfoDTO){
+		if((!isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) && (isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
+			
+
+			//managaPatientDevice(UPDATE)
+			//managaPatientDeviceAssociation(CREATE)
+			//createPatientProtocol()
+			
+			
+		}
+		
+		return true;		
+	}
+	
+
+	public boolean DeviceOwnedByShell_VEST(PatientInfoDTO patientInfoDTO){
+		if((isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& isCurrentSerialNumberOwnedByShell(patientInfoDTO.getSerial_num()) ){
+			
+
+			//managePatientUser(UPDATE)
+			//managaPatientDeviceAssociation(CREATE)
+			//createPatientProtocol()
+			
+			
+		}
+		
+		return true;		
+	}
 
 }
 

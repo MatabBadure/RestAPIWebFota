@@ -33,5 +33,8 @@ public interface PatientDevicesAssocRepository extends JpaRepository<PatientDevi
 
 	@Query("from PatientDevicesAssoc PDA where PDA.patientId = ?1 and deviceType=?2 and isActive=1")
 	PatientDevicesAssoc findOneByPatientIdAndDeviceType(String patientId, String deviceType);
+	
+	@Query("from PatientDevicesAssoc PDA where PDA.hillromId = ?1 and isActive=1")
+	Optional<PatientDevicesAssoc> findByHillromId(String hillromId);
 
 }

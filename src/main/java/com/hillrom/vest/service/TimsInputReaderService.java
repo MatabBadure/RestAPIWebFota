@@ -42,11 +42,15 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Paths;
-
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.datetime.DateFormatter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.http.HttpStatus;
@@ -57,26 +61,30 @@ import java.util.Map;
 @Transactional
 public class TimsInputReaderService {
 
-	private final Logger log = LoggerFactory.getLogger(TimsInputReaderService.class);
+	private final Logger log = LoggerFactory.getLogger("com.hillrom.vest.tims");
 	
 	@Inject
 	private TimsRepository timsRepository;
 	
-	//@Scheduled(cron="0/5 * * * * * ")
+	@Scheduled(cron="0/5 * * * * * ")
 	public void readcsv() 
 	{
 
 
-	        String csvFile = "c:/temp/tims_patients.csv";
+	        String csvFile = "c:/temp/flat file.csv";
+	        log.debug("Started reading flat file : " + csvFile);
 	        String line = "";
 	        String cvsSplitBy = ",";
 	        String Outdata = "";
 	        String[] data = null;
+	        DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yyyy");
 	        DateTimeFormatter dobFormat = DateTimeFormat.forPattern("MM/dd/yyyy");
 	        DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");
 
 	        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
 	        	HashSet hs = new HashSet();
+	        	
+	        	boolean header = true;
 
 	            while ((line = br.readLine()) != null) {
 
@@ -85,46 +93,73 @@ public class TimsInputReaderService {
 	               
 	               PatientInfoDTO patientInfoDTO = new PatientInfoDTO();
 		            String record = "";
-		            for(int i=0;i<28;i++){
-		            	record = i==27?record + data[i]:record + data[i]+",";
+		            for(int i=0;i<18;i++){
+		            	try{
+		            		data[i] = Objects.nonNull(data[i]) ? data[i] : "";
+		            		record = i==17?record + data[i]:record + data[i]+",";
+		            	}catch(ArrayIndexOutOfBoundsException ex){
+
+		            	}
+		            	
 		            }
 		            
-		            //log.debug("Base64 Received Data for ingestion in receiveDataCharger : " + record);
 		            
-	            	patientInfoDTO.setId(data[0]);
-	            	patientInfoDTO.setHillrom_id(data[1]);
-	            	patientInfoDTO.setHub_id(data[2]);
-	            	patientInfoDTO.setSerial_number(data[3]);
-	            	patientInfoDTO.setBluetooth_id(data[4]);
-	            	patientInfoDTO.setTitle(data[5]);
-	            	patientInfoDTO.setFirst_name(data[6]);
-	            	patientInfoDTO.setMiddle_name(data[7]);
-	            	patientInfoDTO.setLast_name(data[8]);
-	            	patientInfoDTO.setDob(data[9].equalsIgnoreCase("NULL")? null: DateTime.parse(data[9],dobFormat));
-	            	patientInfoDTO.setEmail(data[10]);
-	            	patientInfoDTO.setZipcode(data[11]);
-	            	patientInfoDTO.setWeb_login_created(Boolean.getBoolean(data[12]));
-	            	patientInfoDTO.setPrimary_phone(data[13]);
-	            	patientInfoDTO.setMobile_phone(data[14]);
-	            	patientInfoDTO.setGender(data[15]);
-	            	patientInfoDTO.setLang_key(data[16]);
-	            	patientInfoDTO.setExpired(Boolean.getBoolean(data[17]));
-	            	patientInfoDTO.setExpired_date(data[18].equalsIgnoreCase("NULL")? null: DateTime.parse(data[18],deviceAssocdateFormat));
-	            	patientInfoDTO.setAddress(data[19]);
-	            	patientInfoDTO.setCity(data[20]);
-	            	patientInfoDTO.setState(data[21]);
-	            	patientInfoDTO.setDevice_assoc_date(data[22].equalsIgnoreCase("NULL")? null: DateTime.parse(data[22],deviceAssocdateFormat));
-	            	patientInfoDTO.setTraining_date(data[23].equalsIgnoreCase("NULL")? null: DateTime.parse(data[23],deviceAssocdateFormat));
-	            	patientInfoDTO.setPrimary_diagnosis(data[24]);
-	            	patientInfoDTO.setGarment_type(data[25]);
-	            	patientInfoDTO.setGarment_size(data[26]);
-	            	patientInfoDTO.setGarment_color(data[27]);
+		            
+		            String s = "";
+		            for(int j=0;j<data.length;j++){
+		            	s = s + "\t" + data[j];
+		            }
+		            log.debug("Excel File Read as : " + s);
 
-		            hs.add(patientInfoDTO);
-
+		            
+		            
+		            if(!header){
+			            patientInfoDTO.setDevice_type(data[0]);
+			            patientInfoDTO.setTims_cust(data[1]);
+			            patientInfoDTO.setSerial_num(data[2]);
+			            patientInfoDTO.setShip_dt(data[3].equalsIgnoreCase("")? null: LocalDate.parse(data[3],dobFormat));
+			            patientInfoDTO.setHub_id(data[4]);
+			            patientInfoDTO.setGarment_cd(data[5]);
+			            patientInfoDTO.setGarment_type(data[6]);
+			            patientInfoDTO.setGarment_size(data[7]);
+			            patientInfoDTO.setGarment_color(data[8]);
+			            patientInfoDTO.setFirst_nm(data[9]);
+			            patientInfoDTO.setLast_nm(data[10]);
+			            patientInfoDTO.setZip_cd(data[11]);
+			            patientInfoDTO.setTrain_dt(data[12].equalsIgnoreCase("")? null: LocalDate.parse(data[12],dobFormat));
+			            patientInfoDTO.setDob(data[13].equalsIgnoreCase("")? null: LocalDate.parse(data[13],dobFormat));
+			            if(data.length >= 15){
+			            	patientInfoDTO.setDx1(data[14]);
+			            }else{
+			            	patientInfoDTO.setDx1(null);
+			            }
+			            if(data.length >= 16){
+			            	patientInfoDTO.setDx2(data[15]);
+			            }else{
+			            	patientInfoDTO.setDx2(null);
+			            }
+			            if(data.length >= 17){
+			            	patientInfoDTO.setDx3(data[16]);
+			            }else{
+			            	patientInfoDTO.setDx3(null);
+			            }
+			            if(data.length >= 18){
+			            	patientInfoDTO.setDx4(data[17]);
+			            }else{
+			            	patientInfoDTO.setDx4(null);
+			            }
+			        	
+	
+	
+			            hs.add(patientInfoDTO);
+		            }
+		            
+		            header = false;
+		            
+		            
 	            }
 	            
-	            log.debug("Final TIMS_Patients Table : " + hs);
+	            log.debug("Excel File contents in HashSet : " + hs);
 	            
 	        } catch (IOException e) {
 	            e.printStackTrace();

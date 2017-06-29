@@ -88,8 +88,8 @@ public class TimsService {
 	
 	
 
-	/* DateTimeFormatter dobFormat = DateTimeFormat.forPattern("MM/dd/yyyy");
-     DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");*/
+	 DateTimeFormatter dobFormat = DateTimeFormat.forPattern("MM/dd/yyyy");
+    /* DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");*/
  
 	/**
 	 * 
@@ -107,8 +107,11 @@ public class TimsService {
 	 * @return
 	 * @throws HillromException
 	 */
-	public void createPatientProtocol(String typeKey,String operationType,String inPatientId,String inCreatedBy) throws HillromException{		
-		timsRepository.createPatientProtocol(typeKey,operationType,inPatientId,inCreatedBy);
+	public void createPatientProtocol(PatientInfoDTO patientInfoDTO) throws HillromException{		
+			timsRepository.createPatientProtocol(patientInfoDTO.getProtocol_type_key(),
+												 patientInfoDTO.getOperation_type(),
+												 patientInfoDTO.getPatient_id(),
+												 patientInfoDTO.getCreated_by());
 	}
 
   //Start of my code
@@ -118,11 +121,14 @@ public class TimsService {
 	 * @return
 	 * @throws HillromException
 	 */
-	public void managaPatientDevice(String operationType,String inPatientId,String inPatientoldDeviceSerialNumber,String inPatientNewDeviceSerialNumber,
-			String inPatientBluetoothId,String inPatientHubId) throws HillromException{		
+	public void managePatientDevice(PatientInfoDTO patientInfoDTO) throws HillromException{		
 		
-		timsRepository.managaPatientDevice(operationType, inPatientId, inPatientoldDeviceSerialNumber, inPatientNewDeviceSerialNumber,
-				inPatientBluetoothId, inPatientHubId);
+		timsRepository.managePatientDevice(patientInfoDTO.getOperation_type(), 
+											patientInfoDTO.getPatient_id(), 
+											patientInfoDTO.getOld_serial_number(), 
+											patientInfoDTO.getNew_serial_number(),
+											patientInfoDTO.getBluetooth_id(), 
+											patientInfoDTO.getHub_id());
 	}
 
 
@@ -134,14 +140,23 @@ public class TimsService {
 	 */
 	
 	
-	public void managaPatientDeviceAssociation(String operationType,String inpatientPatientId,String inpatientDeviceType,String inpatientDeviceIsActive,
-			String inPatientBluetoothId,String inpatientHillromId,String inpatientOldId,DateTimeFormatter inpatientTrainingDate,String inpatientDiagnosisCode1,
-			String inpatientDiagnosisCode2,String inpatientDiagnosisCode3,String inpatientDiagnosisCode4,String inpatientGarmentType,
-			String inpatientGarmentSize,String inpatientGarmentColor) throws HillromException{	
+	public void managePatientDeviceAssociation(PatientInfoDTO patientInfoDTO) throws HillromException{	
 		
-		timsRepository.managaPatientDeviceAssociation(operationType,inpatientPatientId,inpatientDeviceType,inpatientDeviceIsActive,inPatientBluetoothId,
-				inpatientHillromId,inpatientOldId,inpatientTrainingDate,inpatientDiagnosisCode1,inpatientDiagnosisCode2,
-				inpatientDiagnosisCode3,inpatientDiagnosisCode4,inpatientGarmentType,inpatientGarmentSize,inpatientGarmentColor);
+		timsRepository.managePatientDeviceAssociation(patientInfoDTO.getOperation_type(),
+													  patientInfoDTO.getPatient_id(),
+													  patientInfoDTO.getDevice_type(),
+													  patientInfoDTO.getIs_active(),
+													  patientInfoDTO.getBluetooth_id(),
+													  patientInfoDTO.getTims_cust(),
+													  patientInfoDTO.getOld_patient_id(),
+													  patientInfoDTO.getTrain_dt(),
+													  patientInfoDTO.getDx1(),
+													  patientInfoDTO.getDx2(),
+													  patientInfoDTO.getDx3(),
+													  patientInfoDTO.getDx4(),
+													  patientInfoDTO.getGarment_type(),
+													  patientInfoDTO.getGarment_size(),
+													  patientInfoDTO.getGarment_color());
 	}
 
 	
@@ -152,17 +167,34 @@ public class TimsService {
 	 * @throws HillromException
 	 */
 	
-	public JSONObject managePatientUser(String operationTypeIndicator,String inhillRomId,String inPatientHubId,String inPatientBluetoothId,
-			String inPatientDeviceSerialNumber,String inPatientTitle,String inPatientFirstName,String inPatientMiddleName,String inPatientLastName,
-			String inPatientdob,String inPatientEmail,String inPatientZipCode,String inPatientPrimaryPhone,String inPatientMobilePhone,String inPatientGender,
-			String inPatientlangKey,String inPatientAddress,String inPatientCity,String inPatientState,String inPatientTrainingDate,
-			String inPatientPrimaryDiagnosis,String inPatientgarmentType,String inPatientGarmentSize,String inPatientGarmentColor) throws HillromException {	
+	public JSONObject managePatientUser(PatientInfoDTO patientInfoDTO) throws HillromException {	
 
+		// Question : Bluetooth Id and garment code,title in xls ?
 		
-		return timsUserRepository.managePatientUser(operationTypeIndicator, inhillRomId, inPatientHubId, inPatientBluetoothId, inPatientDeviceSerialNumber, inPatientTitle,
-				inPatientFirstName, inPatientMiddleName, inPatientLastName, inPatientdob, inPatientEmail, inPatientZipCode, inPatientPrimaryPhone, 
-				inPatientMobilePhone, inPatientGender, inPatientlangKey, inPatientAddress, inPatientCity, inPatientState, inPatientTrainingDate, 
-				inPatientPrimaryDiagnosis, inPatientgarmentType, inPatientGarmentSize, inPatientGarmentColor);
+		return timsUserRepository.managePatientUser(patientInfoDTO.getOperation_type(), 
+													patientInfoDTO.getTims_cust(), 
+													patientInfoDTO.getHub_id(), 
+													patientInfoDTO.getBluetooth_id(), 
+													patientInfoDTO.getSerial_num(), 
+													patientInfoDTO.getTitle(),
+													patientInfoDTO.getFirst_nm(), 
+													patientInfoDTO.getMiddle_nm(), 
+													patientInfoDTO.getLast_nm(), 
+													patientInfoDTO.getDob().toString(dobFormat), 
+													patientInfoDTO.getEmail(), 
+													patientInfoDTO.getZip_cd(), 
+													patientInfoDTO.getPrimary_phone(), 
+													patientInfoDTO.getMobile_phone(), 
+													patientInfoDTO.getGender(), 
+													patientInfoDTO.getLang_key(), 
+													patientInfoDTO.getAddress(), 
+													patientInfoDTO.getCity(), 
+													patientInfoDTO.getState(), 
+													null, // Following fields no longer being used from this table 
+													null, 
+													null, 
+													null, 
+													null);
 		
 		
 	}
@@ -298,7 +330,7 @@ public class TimsService {
 	
 	// All Cases start below <ScenarioName>Vest or <ScenarioName>Monarch
 	
-	public boolean NeitherPatientNorDeviceExistCASE1_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean CASE1_NeitherPatientNorDeviceExist_VEST(PatientInfoDTO patientInfoDTO){
 		
 		if((!isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))){
 		
@@ -306,6 +338,24 @@ public class TimsService {
 			//managaPatientDevice(CREATE)
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
+			try{
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientUser(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDevice(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceAssociation(patientInfoDTO);
+				
+				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocol(patientInfoDTO);
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}				
+			
 			return true;
 		}
 		
@@ -313,7 +363,7 @@ public class TimsService {
 		
 	}
 	
-	public boolean PatientExistsWithNODeviceCASE2_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean CASE2_PatientExistsWithNODevice_VEST(PatientInfoDTO patientInfoDTO){
 		
 		if((!isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
@@ -322,6 +372,20 @@ public class TimsService {
 			//managaPatientDevice(CREATE)
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
+			try{
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDevice(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceAssociation(patientInfoDTO);
+				
+				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocol(patientInfoDTO);
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}	
 			
 			return true;
 		}
@@ -331,7 +395,7 @@ public class TimsService {
 		
 	}
 	
-	public boolean PatientHasMonarchAddVisivestCASE3_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean CASE3_PatientHasMonarchAddVisivest_VEST(PatientInfoDTO patientInfoDTO){
 		
 		if((!isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
@@ -340,6 +404,20 @@ public class TimsService {
 			//managaPatientDevice(CREATE)
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
+			try{
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDevice(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceAssociation(patientInfoDTO);
+				
+				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocol(patientInfoDTO);
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}	
 			
 			return true;
 			
@@ -349,7 +427,7 @@ public class TimsService {
 		
 	}
 	
-	public boolean PatientHasDifferentVisivestSwapCASE4_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean CASE4_PatientHasDifferentVisivestSwap_VEST(PatientInfoDTO patientInfoDTO){
 		if((!isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) && (isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 			
@@ -357,6 +435,20 @@ public class TimsService {
 			//managaPatientDevice(UPDATE)
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
+			try{
+				patientInfoDTO.setOperation_type("UPDATE");
+				managePatientDevice(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceAssociation(patientInfoDTO);
+				
+				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocol(patientInfoDTO);
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}		
 			
 			return true;
 			
@@ -367,7 +459,7 @@ public class TimsService {
 	}
 	
 
-	public boolean DeviceOwnedByShellCASE5_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean CASE5_DeviceOwnedByShell_VEST(PatientInfoDTO patientInfoDTO){
 		if((isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& isCurrentSerialNumberOwnedByShell(patientInfoDTO.getSerial_num()) ){
 			
@@ -376,13 +468,29 @@ public class TimsService {
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
 			
+
+			try{
+				patientInfoDTO.setOperation_type("UPDATE");
+				managePatientUser(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceAssociation(patientInfoDTO);
+				
+				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocol(patientInfoDTO);
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}
+			
 			return true;
 		}
 		
 		return false;		
 	}
 	
-	public boolean DeviceOwnedByDifferentPatientCASE6_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean CASE6_DeviceOwnedByDifferentPatient_VEST(PatientInfoDTO patientInfoDTO){
 		if((isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isCurrentSerialNumberOwnedByShell(patientInfoDTO.getSerial_num())) 
 				&& (isCurrentSerialNumberOwnedByDifferentPatient(patientInfoDTO.getSerial_num() )) ){
@@ -391,6 +499,23 @@ public class TimsService {
 			//managePatientUser(CREATE)
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
+			try{
+				patientInfoDTO.setOperation_type("INACTIVATE");
+				managePatientDevice(patientInfoDTO);
+
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientUser(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceAssociation(patientInfoDTO);
+				
+				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocol(patientInfoDTO);
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}			
 			
 			return true;
 		}
@@ -398,7 +523,7 @@ public class TimsService {
 		return false;		
 	}
 	
-	public boolean DeviceIsOrphanPatientDoesNotExistCASE7_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean CASE7_DeviceIsOrphanPatientDoesNotExist_VEST(PatientInfoDTO patientInfoDTO){
 		if((isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isCurrentSerialNumberOwnedByShell(patientInfoDTO.getSerial_num())) 
 				&& (!isCurrentSerialNumberOwnedByDifferentPatient(patientInfoDTO.getSerial_num() )) ){
@@ -408,6 +533,23 @@ public class TimsService {
 			//managaPatientDevice(CREATE)
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
+			try{
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientUser(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDevice(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceAssociation(patientInfoDTO);
+				
+				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocol(patientInfoDTO);
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}	
 			
 			return true;
 		}
@@ -417,7 +559,7 @@ public class TimsService {
 	
 	
 
-	public boolean DeviceIsOrphanButPatientExistCASE8_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean CASE8_DeviceIsOrphanButPatientExist_VEST(PatientInfoDTO patientInfoDTO){
 		if((isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isCurrentSerialNumberOwnedByCurrentHillromId(patientInfoDTO.getSerial_num())) 
 				&& (isOwnerExistsForCurrentSerialNumber(patientInfoDTO.getSerial_num() )) ){
@@ -426,6 +568,20 @@ public class TimsService {
 			//managaPatientDevice(CREATE)
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
+			try{
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDevice(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceAssociation(patientInfoDTO);
+				
+				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocol(patientInfoDTO);
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}
 			
 			return true;
 		}
@@ -436,14 +592,21 @@ public class TimsService {
 	
 
 	
-	public boolean DeviceOwnedByDifferentPatientCASE9_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean DeviceOwnedByDifferentPatient_VEST(PatientInfoDTO patientInfoDTO){
 		if((isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isCurrentSerialNumberOwnedByCurrentHillromId(patientInfoDTO.getSerial_num())) 
 				&& (!isOwnerExistsForCurrentSerialNumber(patientInfoDTO.getSerial_num() )) ){
 
+			//managePatientDevice(INACTIVATE)
 			
-
-			//managaPatientDevice(INACTIVATE)
+			try{
+				patientInfoDTO.setOperation_type("INACTIVATE");
+				managePatientDevice(patientInfoDTO);
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}
+			
 
 			
 			return true;
@@ -454,16 +617,33 @@ public class TimsService {
 
 
 	
-	public boolean PatientHasDifferentVisivestSwapCASE10_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean CASE9_PatientHasDifferentVisivestSwap_VEST(PatientInfoDTO patientInfoDTO){
 		
-		if(DeviceOwnedByDifferentPatientCASE9_VEST(patientInfoDTO)){
+		if(DeviceOwnedByDifferentPatient_VEST(patientInfoDTO)){
 		
 			if( (isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) && (isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 				
 	
-				//managaPatientDevice(UPDATE)
-				//managaPatientDeviceAssociation(CREATE)
+				//managePatientDevice(UPDATE)
+				//managePatientDeviceAssociation(CREATE)
 				//createPatientProtocol()
+				
+				//Question : How do you know whether to pass a Normal or Custom protocol key ?
+				try{
+					patientInfoDTO.setOperation_type("UPDATE");
+					managePatientDevice(patientInfoDTO);
+					
+					patientInfoDTO.setOperation_type("CREATE");
+					managePatientDeviceAssociation(patientInfoDTO);
+					
+					patientInfoDTO.setProtocol_type_key("Normal");
+					patientInfoDTO.setOperation_type("Insert");
+					createPatientProtocol(patientInfoDTO);
+				}catch(Exception ex){
+					ex.printStackTrace();
+					return false;
+				}
+				
 				return true;
 			}
 			
@@ -475,16 +655,31 @@ public class TimsService {
 		
 	}
 	
-	public boolean PatientHasMonarchAddVisivestCASE11_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean CASE10_PatientHasMonarchAddVisivest_VEST(PatientInfoDTO patientInfoDTO){
 		
-		if(DeviceOwnedByDifferentPatientCASE9_VEST(patientInfoDTO)){
+		if(DeviceOwnedByDifferentPatient_VEST(patientInfoDTO)){
 		
 			if( (isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 				
 	
-				//managaPatientDevice(CREATE)
-				//managaPatientDeviceAssociation(CREATE)
+				//managePatientDevice(CREATE)
+				//managePatientDeviceAssociation(CREATE)
 				//createPatientProtocol()
+				
+				try{
+					patientInfoDTO.setOperation_type("CREATE");
+					managePatientDevice(patientInfoDTO);
+					
+					patientInfoDTO.setOperation_type("CREATE");
+					managePatientDeviceAssociation(patientInfoDTO);
+					
+					patientInfoDTO.setProtocol_type_key("Normal");
+					patientInfoDTO.setOperation_type("Insert");
+					createPatientProtocol(patientInfoDTO);
+				}catch(Exception ex){
+					ex.printStackTrace();
+					return false;
+				}
 				
 				return true;
 			}
@@ -497,16 +692,30 @@ public class TimsService {
 		
 	}
 	
-	public boolean PatientExistsWithNODeviceCASE12_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean CASE11_PatientExistsWithNODevice_VEST(PatientInfoDTO patientInfoDTO){
 		
-		if(DeviceOwnedByDifferentPatientCASE9_VEST(patientInfoDTO)){
+		if(DeviceOwnedByDifferentPatient_VEST(patientInfoDTO)){
 		
 			if (!isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) {
 				
 	
-				//managaPatientDevice(CREATE)
-				//managaPatientDeviceAssociation(CREATE)
+				//managePatientDevice(CREATE)
+				//managePatientDeviceAssociation(CREATE)
 				//createPatientProtocol()
+				try{
+					patientInfoDTO.setOperation_type("CREATE");
+					managePatientDevice(patientInfoDTO);
+					
+					patientInfoDTO.setOperation_type("CREATE");
+					managePatientDeviceAssociation(patientInfoDTO);
+					
+					patientInfoDTO.setProtocol_type_key("Normal");
+					patientInfoDTO.setOperation_type("Insert");
+					createPatientProtocol(patientInfoDTO);
+				}catch(Exception ex){
+					ex.printStackTrace();
+					return false;
+				}
 				
 				return true;
 			}

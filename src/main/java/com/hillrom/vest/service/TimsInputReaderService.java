@@ -67,8 +67,44 @@ public class TimsInputReaderService {
 	@Inject
 	private TimsRepository timsRepository;
 	
-	@Scheduled(cron="0/5 * * * * * ")
-	public void readcsv() 
+	@Inject
+	private TimsService timsService;
+	
+	//@Scheduled(cron="0/5 * * * * * ")
+	public void ExecuteTIMSJob() 
+	{
+		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
+		
+		for (Map.Entry<Integer, PatientInfoDTO> entry : fileRecords.entrySet()) {
+		    Integer position = entry.getKey();
+		    PatientInfoDTO record = entry.getValue();
+		    
+		    if(record.getDevice_type().equalsIgnoreCase("VEST")){
+		    	
+		    	timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record);
+		    	timsService.CASE2_PatientExistsWithNODevice_VEST(record);
+		    	timsService.CASE3_PatientHasMonarchAddVisivest_VEST(record);
+		    	timsService.CASE4_PatientHasDifferentVisivestSwap_VEST(record);
+		    	timsService.CASE5_DeviceOwnedByShell_VEST(record);
+		    	timsService.CASE6_DeviceOwnedByDifferentPatient_VEST(record);
+		    	timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_VEST(record);
+		    	timsService.CASE8_DeviceIsOrphanButPatientExist_VEST(record);
+		    	timsService.CASE9_PatientHasDifferentVisivestSwap_VEST(record);
+		    	timsService.CASE10_PatientHasMonarchAddVisivest_VEST(record);
+		    	timsService.CASE11_PatientExistsWithNODevice_VEST(record);
+		    	
+		    }
+
+		    if(record.getDevice_type().equalsIgnoreCase("MONARCH")){
+		    	
+		    }
+		    
+		}
+		
+	}
+
+	
+	public Map readcsv() 
 	{
 
 
@@ -83,7 +119,7 @@ public class TimsInputReaderService {
 	        DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");
 
 	        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
-	        	Map fileRecords = new HashMap();
+	        	Map<Integer, PatientInfoDTO> fileRecords = new HashMap<Integer, PatientInfoDTO>();
 	        	
 	        	boolean header = true;
 
@@ -162,10 +198,14 @@ public class TimsInputReaderService {
 	            }
 	            
 	            log.debug("Excel File contents in HashSet : " + fileRecords);
+	            return fileRecords;
 	            
 	        } catch (IOException e) {
 	            e.printStackTrace();
+	            return null;
 	        }
+	        
+	        
 
 	       
 	} 

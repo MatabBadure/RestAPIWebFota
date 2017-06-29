@@ -90,7 +90,7 @@ public class TimsResource {
 		System.out.println("I am here in call of createpatientprotocol ");
 		
 		try{
-			  timsService.createPatientProtocol("Normal","Insert","HR2017000606","App");
+			  //timsService.createPatientProtocol("Normal","Insert","HR2017000606","App");
 			  jsonObject.put("timsMsg", "createPatientProtocol stored procedure executed successfully");
 			  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			
 		}catch(Exception ex){
@@ -110,8 +110,8 @@ public class TimsResource {
 		JSONObject jsonObject = new JSONObject();
 		System.out.println("I am here in call of managaPatientDevice ");
 		try{ 
-			   timsService.managaPatientDevice("CREATE","HR2015000002","64-00132","64-00132",
-					   "00:06:66:62:4B:06","QUALC00100017682");
+			   //timsService.managePatientDevice("CREATE","HR2015000002","64-00132","64-00132",
+				//	   "00:06:66:62:4B:06","QUALC00100017682");
 			   
 			   /* timsService.managaPatientDevice("INACTIVATE","HR2015000002","64-00132","64-00132",
 					         "00:06:66:62:4B:06","QUALC00100017682");
@@ -166,7 +166,7 @@ public class TimsResource {
 		try{	
 			
 
-			
+			/*
 			JSONObject jsonReturnObject = timsService.managePatientUser("CREATE",
 					    					"99188",
 					    					null,
@@ -190,8 +190,8 @@ public class TimsResource {
 					    					null,
 					    					null,
 					    					null,
-					    					null);
-			  jsonObject.put("returnValues",jsonReturnObject);
+					    					null);*/
+			  //jsonObject.put("returnValues",jsonReturnObject);
 			  jsonObject.put("timsMsg", "managePatientUser stored procedure executed successfully");
 			  
 			  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			

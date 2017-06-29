@@ -38,7 +38,7 @@ public interface TimsRepository extends JpaRepository<Tims, Long> {
 			  					 @Param("in_created_by") String inCreatedBy);
     //Start of my code 
     @Procedure(name = "manage_patient_device")
-    void managaPatientDevice(@Param("operation_type") String operationType,
+    void managePatientDevice(@Param("operation_type") String operationType,
 				 @Param("patient_id") String inPatientId,
 				 @Param("pat_old_device_serial_number") String inPatientoldDeviceSerialNumber,
 				 @Param("pat_new_device_serial_number") String inPatientNewDeviceSerialNumber,
@@ -46,14 +46,14 @@ public interface TimsRepository extends JpaRepository<Tims, Long> {
 				 @Param("pat_hub_id") String inPatientHubId);
     
     @Procedure(name = "manage_patient_device_assoc")
-    void managaPatientDeviceAssociation(@Param("operation_type_indicator") String operationType,
+    void managePatientDeviceAssociation(@Param("operation_type_indicator") String operationType,
 				 @Param("pat_patient_id") String inpatientPatientId,//Need Clarification
 				 @Param("pat_device_type") String inpatientDeviceType,
 				 @Param("pat_device_is_active") String inpatientDeviceIsActive,
 				 @Param("pat_device_serial_number") String inPatientBluetoothId,
 				 @Param("pat_hillrom_id") String inpatientHillromId,
 				 @Param("pat_old_id") String inpatientOldId,
-				 @Param("pat_training_date") DateTimeFormatter inpatientTrainingDate,//Need to check for datetime
+				 @Param("pat_training_date") LocalDate inpatientTrainingDate,//Need to check for datetime
 				 @Param("pat_diagnosis_code1") String inpatientDiagnosisCode1,
 				 @Param("pat_diagnosis_code2") String inpatientDiagnosisCode2,
 				 @Param("pat_diagnosis_code3") String inpatientDiagnosisCode3,

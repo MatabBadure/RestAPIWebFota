@@ -28,6 +28,7 @@ import com.hillrom.vest.repository.AnnouncementsPermissionRepository;
 import com.hillrom.vest.repository.AnnouncementsRepository;
 import com.hillrom.vest.repository.PatientDevicesAssocRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
+import com.hillrom.vest.repository.PatientVestDeviceRepository;
 import com.hillrom.vest.repository.TimsRepository;
 import com.hillrom.vest.repository.TimsUserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
@@ -81,6 +82,9 @@ public class TimsService {
 
 	@Inject
 	private PatientInfoRepository patientInfoRepository;
+
+	@Inject
+	private PatientVestDeviceRepository patientVestDeviceRepository;
 	
 	
 
@@ -263,18 +267,38 @@ public class TimsService {
 		return false;
 	}
 	
-	public boolean isCurrentSerialNumberOwnedByDifferentPatient(String serialNumber, String currentPatientId){
+	public boolean isCurrentSerialNumberOwnedByDifferentPatient(String serialNumber){
 		
-		if((Objects.nonNull(patientDevicesAssocRepository.findOneBySerialNumber(serialNumber))) && 
-				(!patientDevicesAssocRepository.findOneBySerialNumber(serialNumber).get().getPatientId().equalsIgnoreCase(currentPatientId))) 
+		if((Objects.nonNull(patientVestDeviceRepository.findBySerialNumber(serialNumber))) && 
+				(!patientDevicesAssocRepository.findOneBySerialNumber(serialNumber).get().getPatientId().equalsIgnoreCase
+						(patientVestDeviceRepository.findOneBySerialNumberAndStatusActive(serialNumber).get(0).getPatient().getId()))) 
+				return true;
+		
+		return false;
+	}
+
+	public boolean isCurrentSerialNumberOwnedByCurrentHillromId(String serialNumber){
+		
+		if((Objects.nonNull(patientVestDeviceRepository.findBySerialNumber(serialNumber))) && 
+				(patientDevicesAssocRepository.findOneBySerialNumber(serialNumber).get().getHillromId().equalsIgnoreCase
+						(patientVestDeviceRepository.findOneBySerialNumberAndStatusActive(serialNumber).get(0).getPatient().getHillromId()))) 
+				return true;
+		
+		return false;
+	}
+
+	public boolean isOwnerExistsForCurrentSerialNumber(String serialNumber){
+		
+		if(Objects.nonNull(patientVestDeviceRepository.findOneBySerialNumberAndStatusActive(serialNumber))) 
 				return true;
 		
 		return false;
 	}
 	
+	
 	// All Cases start below <ScenarioName>Vest or <ScenarioName>Monarch
 	
-	public boolean NeitherPatientNorDeviceExist_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean NeitherPatientNorDeviceExistCASE1_VEST(PatientInfoDTO patientInfoDTO){
 		
 		if((!isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))){
 		
@@ -282,13 +306,14 @@ public class TimsService {
 			//managaPatientDevice(CREATE)
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
+			return true;
 		}
 		
-		return true;
+		return false;
 		
 	}
 	
-	public boolean PatientExistsWithNODevice_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean PatientExistsWithNODeviceCASE2_VEST(PatientInfoDTO patientInfoDTO){
 		
 		if((!isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
@@ -297,14 +322,16 @@ public class TimsService {
 			//managaPatientDevice(CREATE)
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
+			
+			return true;
 		}
 		
-		return true;
+		return false;
 		
 		
 	}
 	
-	public boolean PatientHasMonarchAddVisivest_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean PatientHasMonarchAddVisivestCASE3_VEST(PatientInfoDTO patientInfoDTO){
 		
 		if((!isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
@@ -314,13 +341,15 @@ public class TimsService {
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
 			
+			return true;
+			
 		}
 		
-		return true;
+		return false;
 		
 	}
 	
-	public boolean PatientHasDifferentVisivestSwap_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean PatientHasDifferentVisivestSwapCASE4_VEST(PatientInfoDTO patientInfoDTO){
 		if((!isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) && (isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 			
@@ -329,14 +358,16 @@ public class TimsService {
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
 			
+			return true;
+			
 			
 		}
 		
-		return true;		
+		return false;		
 	}
 	
 
-	public boolean DeviceOwnedByShell_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean DeviceOwnedByShellCASE5_VEST(PatientInfoDTO patientInfoDTO){
 		if((isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& isCurrentSerialNumberOwnedByShell(patientInfoDTO.getSerial_num()) ){
 			
@@ -345,44 +376,145 @@ public class TimsService {
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
 			
-			
+			return true;
 		}
 		
-		return true;		
+		return false;		
 	}
 	
-	public boolean DeviceOwnedByDifferentPatient_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean DeviceOwnedByDifferentPatientCASE6_VEST(PatientInfoDTO patientInfoDTO){
 		if((isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isCurrentSerialNumberOwnedByShell(patientInfoDTO.getSerial_num())) 
-				&& (isCurrentSerialNumberOwnedByDifferentPatient(patientInfoDTO.getSerial_num(),
-						patientInfoRepository.findOneBySerialNumber(patientInfoDTO.getSerial_num()).get().getId() )) ){
+				&& (isCurrentSerialNumberOwnedByDifferentPatient(patientInfoDTO.getSerial_num() )) ){
 			
 			//managaPatientDevice(INACTIVATE)
 			//managePatientUser(CREATE)
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
 			
-			
+			return true;
 		}
 		
-		return true;		
+		return false;		
 	}
 	
-	public boolean DeviceIsOrphanPatientDoesNotExist_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean DeviceIsOrphanPatientDoesNotExistCASE7_VEST(PatientInfoDTO patientInfoDTO){
 		if((isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isCurrentSerialNumberOwnedByShell(patientInfoDTO.getSerial_num())) 
-				&& (!isCurrentSerialNumberOwnedByDifferentPatient(patientInfoDTO.getSerial_num(),
-						patientInfoRepository.findOneBySerialNumber(patientInfoDTO.getSerial_num()).get().getId() )) ){
+				&& (!isCurrentSerialNumberOwnedByDifferentPatient(patientInfoDTO.getSerial_num() )) ){
+
 			
 			//managePatientUser(CREATE)
 			//managaPatientDevice(CREATE)
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
 			
-			
+			return true;
 		}
 		
-		return true;		
+		return false;		
+	}
+	
+	
+
+	public boolean DeviceIsOrphanButPatientExistCASE8_VEST(PatientInfoDTO patientInfoDTO){
+		if((isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (!isCurrentSerialNumberOwnedByCurrentHillromId(patientInfoDTO.getSerial_num())) 
+				&& (isOwnerExistsForCurrentSerialNumber(patientInfoDTO.getSerial_num() )) ){
+
+			
+			//managaPatientDevice(CREATE)
+			//managaPatientDeviceAssociation(CREATE)
+			//createPatientProtocol()
+			
+			return true;
+		}
+		
+		return false;		
+	}
+	
+	
+
+	
+	public boolean DeviceOwnedByDifferentPatientCASE9_VEST(PatientInfoDTO patientInfoDTO){
+		if((isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (!isCurrentSerialNumberOwnedByCurrentHillromId(patientInfoDTO.getSerial_num())) 
+				&& (!isOwnerExistsForCurrentSerialNumber(patientInfoDTO.getSerial_num() )) ){
+
+			
+
+			//managaPatientDevice(INACTIVATE)
+
+			
+			return true;
+		}
+		
+		return false;		
+	}
+
+
+	
+	public boolean PatientHasDifferentVisivestSwapCASE10_VEST(PatientInfoDTO patientInfoDTO){
+		
+		if(DeviceOwnedByDifferentPatientCASE9_VEST(patientInfoDTO)){
+		
+			if( (isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) && (isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
+				
+	
+				//managaPatientDevice(UPDATE)
+				//managaPatientDeviceAssociation(CREATE)
+				//createPatientProtocol()
+				return true;
+			}
+			
+			return false;
+		}
+		
+		return false;
+		
+		
+	}
+	
+	public boolean PatientHasMonarchAddVisivestCASE11_VEST(PatientInfoDTO patientInfoDTO){
+		
+		if(DeviceOwnedByDifferentPatientCASE9_VEST(patientInfoDTO)){
+		
+			if( (isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
+				
+	
+				//managaPatientDevice(CREATE)
+				//managaPatientDeviceAssociation(CREATE)
+				//createPatientProtocol()
+				
+				return true;
+			}
+			
+			return false;
+		
+		}
+		
+		return false;
+		
+	}
+	
+	public boolean PatientExistsWithNODeviceCASE12_VEST(PatientInfoDTO patientInfoDTO){
+		
+		if(DeviceOwnedByDifferentPatientCASE9_VEST(patientInfoDTO)){
+		
+			if (!isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) {
+				
+	
+				//managaPatientDevice(CREATE)
+				//managaPatientDeviceAssociation(CREATE)
+				//createPatientProtocol()
+				
+				return true;
+			}
+			
+			return false;
+		
+		}
+		return false;	
 	}
 
 }

@@ -37,6 +37,7 @@ import com.hillrom.vest.domain.Announcements;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.AnnouncementsService;
+import com.hillrom.vest.service.TimsInputReaderService;
 import com.hillrom.vest.service.TimsService;
 import com.hillrom.vest.web.rest.dto.AnnouncementsDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
@@ -58,6 +59,9 @@ public class TimsResource {
 
 	@Inject
 	private TimsService timsService;
+	
+	@Inject
+	private TimsInputReaderService timsInputReaderService;
 	
 	
 		
@@ -299,21 +303,20 @@ public class TimsResource {
 						return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 					}
 	}
-}
 
 
 
 
-// Not required for Tims Migration need to delete
 
-	/*@RequestMapping(value="/createPatientUser", method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> createPatientUser(){
+
+
+	@RequestMapping(value="/executeTIMSJob", method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> executeTIMSJob(){
 
 		JSONObject jsonObject = new JSONObject();
-		System.out.println("I am here in call of managaPatientUser ");
+
 		try{		  
-			  timsService.createPatientUser("hrId", "inDeviceSerialNumber", "inPatientAddress", "inPatientName", "inPatientCity", "inPatientState",
-					  "inPatientZip","inPatientdob","inPatientLang","inPatientGender","inPatientEmail");
+			  timsInputReaderService.ExecuteTIMSJob();
 			  jsonObject.put("timsMsg", "managaPatientUser stored procedure executed successfully");
 			  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			
 		}catch(Exception ex){
@@ -321,7 +324,7 @@ public class TimsResource {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}		
 	}
-*/
 
+}
 
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.Announcements;
+import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.AnnouncementsPermissionRepository;
 import com.hillrom.vest.repository.AnnouncementsRepository;
@@ -265,7 +267,8 @@ public class TimsService {
 	
 	public boolean isSerialNoExistInPatientdeviceAssocVest(String serialNumber){
 		
-		if(Objects.nonNull(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST")))
+		Optional<PatientDevicesAssoc> test = patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST");
+		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST")!= null)
 			return true;
 		
 		return false;
@@ -273,7 +276,7 @@ public class TimsService {
 	
 	public boolean isSerialNoExistInPatientdeviceAssocMonarch(String serialNumber){
 		
-		if(Objects.nonNull(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH")))
+		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").isPresent())
 			return true;
 		
 		return false;
@@ -281,7 +284,7 @@ public class TimsService {
 	
 	public boolean isHillromIdExistInPatientInfo(String hillromId){
 		
-		if(Objects.nonNull(patientInfoService.findOneByHillromId(hillromId)))
+		if(patientInfoService.findOneByHillromId(hillromId).isPresent())
 				return true;
 		
 		return false;
@@ -289,7 +292,7 @@ public class TimsService {
 	
 	public boolean isHillromIdExistInPatientDeviceAssocVest(String hillromId){
 		
-		if(Objects.nonNull(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"VEST")))
+		if(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"VEST").isPresent())
 				return true;
 		
 		return false;
@@ -297,7 +300,7 @@ public class TimsService {
 	
 	public boolean isHillromIdExistInPatientDeviceAssocMonarch(String hillromId){
 		
-		if(Objects.nonNull(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"MONARCH")))
+		if(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"MONARCH").isPresent())
 				return true;
 		
 		return false;
@@ -305,7 +308,7 @@ public class TimsService {
 	
 	public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 		
-		if((Objects.nonNull(patientDevicesAssocRepository.findByHillromId(hillromId))) 
+		if((patientDevicesAssocRepository.findByHillromId(hillromId).isPresent()) 
 			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("VEST")))
 				return true;
 		
@@ -314,7 +317,7 @@ public class TimsService {
 	
 	public boolean isHillromIdHasMonarchDeviceInPatientDeviceAssoc(String hillromId){
 		
-		if((Objects.nonNull(patientDevicesAssocRepository.findByHillromId(hillromId))) 
+		if((patientDevicesAssocRepository.findByHillromId(hillromId).isPresent()) 
 			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("MONARCH")))
 				return true;
 		
@@ -324,7 +327,7 @@ public class TimsService {
 
 	public boolean isCurrentSerialNumberOwnedByShell(String serialNumber){
 		
-		if((Objects.nonNull(patientInfoRepository.findOneBySerialNumber(serialNumber))) && (patientInfoRepository.findOneBySerialNumber(serialNumber).get().getFirstName().equalsIgnoreCase("Hill-Rom"))) 
+		if((patientInfoRepository.findOneBySerialNumber(serialNumber).isPresent()) && (patientInfoRepository.findOneBySerialNumber(serialNumber).get().getFirstName().equalsIgnoreCase("Hill-Rom"))) 
 				return true;
 		
 		return false;
@@ -332,7 +335,7 @@ public class TimsService {
 	
 	public boolean isCurrentSerialNumberOwnedByDifferentPatientVest(String serialNumber){
 		
-		if((Objects.nonNull(patientVestDeviceRepository.findBySerialNumber(serialNumber))) && 
+		if((!patientVestDeviceRepository.findBySerialNumber(serialNumber).isEmpty()) && 
 				(!patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").get().getPatientId().equalsIgnoreCase
 						(patientVestDeviceRepository.findOneBySerialNumberAndStatusActive(serialNumber).get(0).getPatient().getId()))) 
 				return true;
@@ -342,7 +345,7 @@ public class TimsService {
 	
 	public boolean isCurrentSerialNumberOwnedByDifferentPatientMonarch(String serialNumber){
 		
-		if((Objects.nonNull(patientMonarchDeviceRepository.findBySerialNumber(serialNumber))) && 
+		if((!patientMonarchDeviceRepository.findBySerialNumber(serialNumber).isEmpty()) && 
 				(!patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").get().getPatientId().equalsIgnoreCase
 						(patientMonarchDeviceRepository.findOneBySerialNumberAndStatusActive(serialNumber).get(0).getPatient().getId()))) 
 				return true;
@@ -352,7 +355,7 @@ public class TimsService {
 
 	public boolean isCurrentSerialNumberOwnedByCurrentHillromIdVest(String serialNumber){
 		
-		if((Objects.nonNull(patientVestDeviceRepository.findBySerialNumber(serialNumber))) && 
+		if((!patientVestDeviceRepository.findBySerialNumber(serialNumber).isEmpty()) && 
 				(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").get().getHillromId().equalsIgnoreCase
 						(patientVestDeviceRepository.findOneBySerialNumberAndStatusActive(serialNumber).get(0).getPatient().getHillromId()))) 
 				return true;
@@ -362,7 +365,7 @@ public class TimsService {
 	
 	public boolean isCurrentSerialNumberOwnedByCurrentHillromIdMonarch(String serialNumber){
 		
-		if((Objects.nonNull(patientMonarchDeviceRepository.findBySerialNumber(serialNumber))) && 
+		if((!patientMonarchDeviceRepository.findBySerialNumber(serialNumber).isEmpty()) && 
 				(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").get().getHillromId().equalsIgnoreCase
 						(patientMonarchDeviceRepository.findOneBySerialNumberAndStatusActive(serialNumber).get(0).getPatient().getHillromId()))) 
 				return true;
@@ -372,7 +375,7 @@ public class TimsService {
 
 	public boolean isOwnerExistsForCurrentSerialNumberVest(String serialNumber){
 		
-		if(Objects.nonNull(patientVestDeviceRepository.findOneBySerialNumberAndStatusActive(serialNumber))) 
+		if(!patientVestDeviceRepository.findOneBySerialNumberAndStatusActive(serialNumber).isEmpty()) 
 				return true;
 		
 		return false;
@@ -380,7 +383,7 @@ public class TimsService {
 	
 	public boolean isOwnerExistsForCurrentSerialNumberMonarch(String serialNumber){
 		
-		if(Objects.nonNull(patientMonarchDeviceRepository.findOneBySerialNumberAndStatusActive(serialNumber))) 
+		if(!patientMonarchDeviceRepository.findOneBySerialNumberAndStatusActive(serialNumber).isEmpty()) 
 				return true;
 		
 		return false;

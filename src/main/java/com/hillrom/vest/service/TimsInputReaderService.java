@@ -133,7 +133,9 @@ public class TimsInputReaderService {
 	        	Map<Integer, PatientInfoDTO> fileRecords = new HashMap<Integer, PatientInfoDTO>();
 	        	
 	        	boolean header = true;
-
+            	
+	        	int k = 1; // record position in file
+            	
 	            while ((line = br.readLine()) != null) {
 
 	                // use comma as separator
@@ -162,7 +164,7 @@ public class TimsInputReaderService {
 		            
 		            
 		            if(!header){
-		            	int k = 1; // record position in file
+
 			            patientInfoDTO.setDevice_type(data[0]);
 			            patientInfoDTO.setTims_cust(data[1]);
 			            patientInfoDTO.setSerial_num(data[2]);

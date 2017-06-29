@@ -70,7 +70,7 @@ public class TimsResource {
 		JSONObject jsonObject = new JSONObject();
 		System.out.println("I am here in call of createpatientprotocolmonarch ");
 		try{
-			  timsService.createPatientProtocolMonarch("Normal","Insert","HR2015000002","App");
+			  //timsService.createPatientProtocolMonarch("Normal","Insert","HR2015000002","App");
 			  jsonObject.put("timsMsg", "createPatientProtocolMonarch stored procedure executed successfully");
 			  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			
 		}catch(Exception ex){
@@ -210,10 +210,10 @@ public class TimsResource {
 			JSONObject jsonObject = new JSONObject();
 			System.out.println("I am here in call of managePatientDeviceMonarch ");
 			try{		  
-				  timsService.managePatientDeviceMonarch("CREATE",
-						  									"HR2017000802",
-						  									"RP003PP333",
-						  									null);
+				 // timsService.managePatientDeviceMonarch("CREATE",
+				//		  									"HR2017000802",
+				//		  									"RP003PP333",
+				//		  									null);
 				  jsonObject.put("timsMsg", "managePatientDeviceMonarch stored procedure executed successfully");
 				  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			
 			}catch(Exception ex){

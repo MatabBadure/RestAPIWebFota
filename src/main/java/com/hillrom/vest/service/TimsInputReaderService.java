@@ -96,6 +96,17 @@ public class TimsInputReaderService {
 		    }
 
 		    if(record.getDevice_type().equalsIgnoreCase("MONARCH")){
+		    	timsService.CASE1_NeitherPatientNorDeviceExist_MONARCH(record);
+		    	timsService.CASE2_PatientExistsWithNODevice_MONARCH(record);
+		    	timsService.CASE3_PatientHasVisivestAddMonarch_MONARCH(record);
+		    	timsService.CASE4_PatientHasDifferentMonarchSwap_MONARCH(record);
+		    	timsService.CASE5_DeviceOwnedByShell_MONARCH(record);
+		    	timsService.CASE6_DeviceOwnedByDifferentPatient_MONARCH(record);
+		    	timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_MONARCH(record);
+		    	timsService.CASE8_DeviceIsOrphanButPatientExist_MONARCH(record);
+		    	timsService.CASE9_PatientHasDifferentMonarchSwap_MONARCH(record);
+		    	timsService.CASE10_PatientHasVisivestAddMonarch_MONARCH(record);
+		    	timsService.CASE11_PatientExistsWithNODevice_MONARCH(record);		    	
 		    	
 		    }
 		    

@@ -97,8 +97,11 @@ public class TimsService {
 	 * @return
 	 * @throws HillromException
 	 */
-	public void createPatientProtocolMonarch(String typeKey,String operationType,String inPatientId,String inCreatedBy) throws HillromException{		
-		timsRepository.createPatientProtocolMonarch(typeKey,operationType,inPatientId,inCreatedBy);
+	public void createPatientProtocolMonarch(PatientInfoDTO patientInfoDTO) throws HillromException{		
+				timsRepository.createPatientProtocolMonarch(patientInfoDTO.getProtocol_type_key(),
+						 patientInfoDTO.getOperation_type(),
+						 patientInfoDTO.getPatient_id(),
+						 patientInfoDTO.getCreated_by());
 	}
 	
 	/**
@@ -201,12 +204,12 @@ public class TimsService {
 	
 	
 	
-	public void managePatientDeviceMonarch(String operationTypeIndicator,String inPatientId,String inPatientoldDeviceSerialNumber,String inPatientNewDeviceSerialNumber) throws HillromException{		
+	public void managePatientDeviceMonarch(PatientInfoDTO patientInfoDTO) throws HillromException{		
 		
-		timsRepository.managePatientDeviceMonarch(operationTypeIndicator, 
-												  inPatientId, 
-												  Objects.isNull(inPatientoldDeviceSerialNumber)?"":inPatientoldDeviceSerialNumber, 
-												  Objects.isNull(inPatientNewDeviceSerialNumber)?"":inPatientNewDeviceSerialNumber);
+			timsRepository.managePatientDeviceMonarch(patientInfoDTO.getOperation_type(), 
+				patientInfoDTO.getPatient_id(), 
+				patientInfoDTO.getOld_serial_number(), 
+				patientInfoDTO.getNew_serial_number());
 	}
 	
 	
@@ -328,7 +331,7 @@ public class TimsService {
 	}
 	
 	
-	// All Cases start below <ScenarioName>Vest or <ScenarioName>Monarch
+	// All Cases start below <ScenarioName>Vest
 	
 	public boolean CASE1_NeitherPatientNorDeviceExist_VEST(PatientInfoDTO patientInfoDTO){
 		
@@ -712,6 +715,404 @@ public class TimsService {
 					patientInfoDTO.setProtocol_type_key("Normal");
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocol(patientInfoDTO);
+				}catch(Exception ex){
+					ex.printStackTrace();
+					return false;
+				}
+				
+				return true;
+			}
+			
+			return false;
+		
+		}
+		return false;	
+	}
+	
+	// All Cases start below  <ScenarioName>Monarch
+	
+	public boolean CASE1_NeitherPatientNorDeviceExist_MONARCH(PatientInfoDTO patientInfoDTO){
+		
+		if((!isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))){
+		
+			//managePatientUser(CREATE)
+			//managaPatientDeviceMonarch(CREATE)
+			//managaPatientDeviceAssociation(CREATE)
+			//createPatientProtocolMonarch()
+			try{
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientUser(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceMonarch(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceAssociation(patientInfoDTO);
+				
+				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocolMonarch(patientInfoDTO);
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}				
+			
+			return true;
+		}
+		
+		return false;
+		
+	}
+	
+	public boolean CASE2_PatientExistsWithNODevice_MONARCH(PatientInfoDTO patientInfoDTO){
+		
+		if((!isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (!isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
+			
+
+			//managaPatientDeviceMonarch(CREATE)
+			//managaPatientDeviceAssociation(CREATE)
+			//createPatientProtocolMonarch()
+			try{
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceMonarch(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceAssociation(patientInfoDTO);
+				
+				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocolMonarch(patientInfoDTO);
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}	
+			
+			return true;
+		}
+		
+		return false;
+		
+		
+	}
+	
+	public boolean CASE3_PatientHasVisivestAddMonarch_MONARCH(PatientInfoDTO patientInfoDTO){
+		
+		if((!isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
+			
+
+			//managaPatientDeviceMonarch(CREATE)
+			//managaPatientDeviceAssociation(CREATE)
+			//createPatientProtocolMonarch()
+			try{
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceMonarch(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceAssociation(patientInfoDTO);
+				
+				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocolMonarch(patientInfoDTO);
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}	
+			
+			return true;
+			
+		}
+		
+		return false;
+		
+	}
+	
+	public boolean CASE4_PatientHasDifferentMonarchSwap_MONARCH(PatientInfoDTO patientInfoDTO){
+		if((!isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) && (isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
+			
+
+			//managaPatientDeviceMonarch(UPDATE)
+			//managaPatientDeviceAssociation(CREATE)
+			//createPatientProtocolMonarch()
+			try{
+				patientInfoDTO.setOperation_type("UPDATE");
+				managePatientDeviceMonarch(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceAssociation(patientInfoDTO);
+				
+				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocolMonarch(patientInfoDTO);
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}		
+			
+			return true;
+			
+			
+		}
+		
+		return false;		
+	}
+	
+
+	public boolean CASE5_DeviceOwnedByShell_MONARCH(PatientInfoDTO patientInfoDTO){
+		if((isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& isCurrentSerialNumberOwnedByShell(patientInfoDTO.getSerial_num()) ){
+			
+
+			//managePatientUser(UPDATE)
+			//managaPatientDeviceAssociation(CREATE)
+			//createPatientProtocolMonarch()
+			
+
+			try{
+				patientInfoDTO.setOperation_type("UPDATE");
+				managePatientUser(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceAssociation(patientInfoDTO);
+				
+				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocolMonarch(patientInfoDTO);
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}
+			
+			return true;
+		}
+		
+		return false;		
+	}
+	
+	public boolean CASE6_DeviceOwnedByDifferentPatient_MONARCH(PatientInfoDTO patientInfoDTO){
+		if((isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (!isCurrentSerialNumberOwnedByShell(patientInfoDTO.getSerial_num())) 
+				&& (isCurrentSerialNumberOwnedByDifferentPatient(patientInfoDTO.getSerial_num() )) ){
+			
+			//managaPatientDeviceMonarch(INACTIVATE)
+			//managePatientUser(CREATE)
+			//managaPatientDeviceAssociation(CREATE)
+			//createPatientProtocolMonarch()
+			try{
+				patientInfoDTO.setOperation_type("INACTIVATE");
+				managePatientDeviceMonarch(patientInfoDTO);
+
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientUser(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceAssociation(patientInfoDTO);
+				
+				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocolMonarch(patientInfoDTO);
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}			
+			
+			return true;
+		}
+		
+		return false;		
+	}
+	
+	public boolean CASE7_DeviceIsOrphanPatientDoesNotExist_MONARCH(PatientInfoDTO patientInfoDTO){
+		if((isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (!isCurrentSerialNumberOwnedByShell(patientInfoDTO.getSerial_num())) 
+				&& (!isCurrentSerialNumberOwnedByDifferentPatient(patientInfoDTO.getSerial_num() )) ){
+
+			
+			//managePatientUser(CREATE)
+			//managaPatientDeviceMonarch(CREATE)
+			//managaPatientDeviceAssociation(CREATE)
+			//createPatientProtocolMonarch()
+			try{
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientUser(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceMonarch(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceAssociation(patientInfoDTO);
+				
+				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocolMonarch(patientInfoDTO);
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}	
+			
+			return true;
+		}
+		
+		return false;		
+	}
+	
+	
+
+	public boolean CASE8_DeviceIsOrphanButPatientExist_MONARCH(PatientInfoDTO patientInfoDTO){
+		if((isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (!isCurrentSerialNumberOwnedByCurrentHillromId(patientInfoDTO.getSerial_num())) 
+				&& (isOwnerExistsForCurrentSerialNumber(patientInfoDTO.getSerial_num() )) ){
+
+			
+			//managaPatientDeviceMonarch(CREATE)
+			//managaPatientDeviceAssociation(CREATE)
+			//createPatientProtocolMonarch()
+			try{
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceMonarch(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceAssociation(patientInfoDTO);
+				
+				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocolMonarch(patientInfoDTO);
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}
+			
+			return true;
+		}
+		
+		return false;		
+	}
+	
+	
+
+	
+	public boolean DeviceOwnedByDifferentPatient_MONARCH(PatientInfoDTO patientInfoDTO){
+		if((isSerialNoExistInPatientdeviceAssoc(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (!isCurrentSerialNumberOwnedByCurrentHillromId(patientInfoDTO.getSerial_num())) 
+				&& (!isOwnerExistsForCurrentSerialNumber(patientInfoDTO.getSerial_num() )) ){
+
+			//managePatientDeviceMonarch(INACTIVATE)
+			
+			try{
+				patientInfoDTO.setOperation_type("INACTIVATE");
+				managePatientDeviceMonarch(patientInfoDTO);
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}
+			
+
+			
+			return true;
+		}
+		
+		return false;		
+	}
+
+
+	
+	public boolean CASE9_PatientHasDifferentMonarchSwap_MONARCH(PatientInfoDTO patientInfoDTO){
+		
+		if(DeviceOwnedByDifferentPatient_MONARCH(patientInfoDTO)){
+		
+			if( (isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) && (isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
+				
+	
+				//managePatientDeviceMonarch(UPDATE)
+				//managePatientDeviceAssociation(CREATE)
+				//createPatientProtocolMonarch()
+				
+				//Question : How do you know whether to pass a Normal or Custom protocol key ?
+				try{
+					patientInfoDTO.setOperation_type("UPDATE");
+					managePatientDeviceMonarch(patientInfoDTO);
+					
+					patientInfoDTO.setOperation_type("CREATE");
+					managePatientDeviceAssociation(patientInfoDTO);
+					
+					patientInfoDTO.setProtocol_type_key("Normal");
+					patientInfoDTO.setOperation_type("Insert");
+					createPatientProtocolMonarch(patientInfoDTO);
+				}catch(Exception ex){
+					ex.printStackTrace();
+					return false;
+				}
+				
+				return true;
+			}
+			
+			return false;
+		}
+		
+		return false;
+		
+		
+	}
+	
+	public boolean CASE10_PatientHasVisivestAddMonarch_MONARCH(PatientInfoDTO patientInfoDTO){
+		
+		if(DeviceOwnedByDifferentPatient_MONARCH(patientInfoDTO)){
+		
+			if( (isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
+				
+	
+				//managePatientDeviceMonarch(CREATE)
+				//managePatientDeviceAssociation(CREATE)
+				//createPatientProtocolMonarch()
+				
+				try{
+					patientInfoDTO.setOperation_type("CREATE");
+					managePatientDeviceMonarch(patientInfoDTO);
+					
+					patientInfoDTO.setOperation_type("CREATE");
+					managePatientDeviceAssociation(patientInfoDTO);
+					
+					patientInfoDTO.setProtocol_type_key("Normal");
+					patientInfoDTO.setOperation_type("Insert");
+					createPatientProtocolMonarch(patientInfoDTO);
+				}catch(Exception ex){
+					ex.printStackTrace();
+					return false;
+				}
+				
+				return true;
+			}
+			
+			return false;
+		
+		}
+		
+		return false;
+		
+	}
+	
+	public boolean CASE11_PatientExistsWithNODevice_MONARCH(PatientInfoDTO patientInfoDTO){
+		
+		if(DeviceOwnedByDifferentPatient_MONARCH(patientInfoDTO)){
+		
+			if (!isHillromIdExistInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) {
+				
+	
+				//managePatientDeviceMonarch(CREATE)
+				//managePatientDeviceAssociation(CREATE)
+				//createPatientProtocolMonarch()
+				try{
+					patientInfoDTO.setOperation_type("CREATE");
+					managePatientDeviceMonarch(patientInfoDTO);
+					
+					patientInfoDTO.setOperation_type("CREATE");
+					managePatientDeviceAssociation(patientInfoDTO);
+					
+					patientInfoDTO.setProtocol_type_key("Normal");
+					patientInfoDTO.setOperation_type("Insert");
+					createPatientProtocolMonarch(patientInfoDTO);
 				}catch(Exception ex){
 					ex.printStackTrace();
 					return false;

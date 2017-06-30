@@ -267,8 +267,8 @@ public class TimsService {
 	
 	public boolean isSerialNoExistInPatientdeviceAssocVest(String serialNumber){
 		
-		Optional<PatientDevicesAssoc> test = patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST");
-		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST")!= null)
+		
+		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").isPresent())
 			return true;
 		
 		return false;

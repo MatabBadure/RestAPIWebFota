@@ -93,7 +93,7 @@ public class TimsService {
 	private PatientMonarchDeviceRepository patientMonarchDeviceRepository;
 	
 
-	 DateTimeFormatter dobFormat = DateTimeFormat.forPattern("MM/dd/yyyy");
+	 DateTimeFormatter dobFormat = DateTimeFormat.forPattern("MM-dd-yyyy");
     /* DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");*/
  
 	/**

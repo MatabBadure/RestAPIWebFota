@@ -217,7 +217,7 @@ public class PatientVestDeviceTherapyUtil {
 
 	private static void applyGlobalHMR(TherapySession therapySession,
 			PatientVestDeviceHistory latestInActiveDeviceHistory)throws Exception {
-		if( Objects.nonNull(latestInActiveDeviceHistory) && (therapySession.getHmr() < latestInActiveDeviceHistory.getHmr())){
+		if( Objects.nonNull(latestInActiveDeviceHistory) ){
 			if(!(latestInActiveDeviceHistory.getSerialNumber().equalsIgnoreCase(therapySession.getSerialNumber()))){
 				therapySession.setHmr(therapySession.getHmr()+latestInActiveDeviceHistory.getHmr());
 			}

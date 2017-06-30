@@ -90,7 +90,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 		
 	}
 	
-	public static List<TherapySessionMonarch> prepareTherapySessionFromDeviceDataMonarch(List<PatientVestDeviceDataMonarch> deviceDataMonarch,PatientVestDeviceHistoryMonarch latestInActiveDeviceHistory) throws Exception{
+	public static List<TherapySessionMonarch> prepareTherapySessionFromDeviceDataMonarch(List<PatientVestDeviceDataMonarch> deviceDataMonarch,List<PatientVestDeviceHistoryMonarch> latestInActiveDeviceHistory) throws Exception{
 		List<TherapySessionMonarch> therapySessionsMonarch = new LinkedList<>();
 		therapySessionsMonarch = groupEventsToPrepareTherapySessionMonarch(deviceDataMonarch,latestInActiveDeviceHistory);
 		return groupTherapySessionsByDayMonarch(therapySessionsMonarch);
@@ -394,7 +394,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 	}
 	
 	public static List<TherapySessionMonarch> groupEventsToPrepareTherapySessionMonarch(
-			List<PatientVestDeviceDataMonarch> deviceDataMonarch,PatientVestDeviceHistoryMonarch latestInActiveDeviceHistory) throws Exception{
+			List<PatientVestDeviceDataMonarch> deviceDataMonarch,List<PatientVestDeviceHistoryMonarch> latestInActiveDeviceHistory) throws Exception{
 		List<TherapySessionMonarch> therapySessions = new LinkedList<TherapySessionMonarch>();
 		// This List will hold un-finished session events , will be discarded to get delta on next transmission 
 		List<PatientVestDeviceDataMonarch> eventsToBeDiscardedMonarch = new LinkedList<>();
@@ -428,7 +428,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 							deviceDataMonarch.add(j, inCompleteEventMonarch);
 						}
 						TherapySessionMonarch therapySession = assignTherapyMatricsMonarch(groupEntriesMonarch);
-						//applyGlobalHMRMonarch(therapySession,latestInActiveDeviceHistory);
+						applyGlobalHMRMonarch(therapySession,latestInActiveDeviceHistory);
 						therapySessions.add(therapySession);
 						i=j; // to skip the events iterated, shouldn't be removed in any case
 						break;
@@ -460,10 +460,12 @@ public class PatientVestDeviceTherapyUtilMonarch {
 	}
 	
 	private static void applyGlobalHMRMonarch(TherapySessionMonarch therapySession,
-			PatientVestDeviceHistoryMonarch latestInActiveDeviceHistory)throws Exception {
-		if( Objects.nonNull(latestInActiveDeviceHistory) && (therapySession.getHmr() < latestInActiveDeviceHistory.getHmr())){
-			if(!(latestInActiveDeviceHistory.getSerialNumber().equalsIgnoreCase(therapySession.getSerialNumber()))){
-				therapySession.setHmr(therapySession.getHmr()+latestInActiveDeviceHistory.getHmr());
+			List<PatientVestDeviceHistoryMonarch> latestInActiveDeviceHistory)throws Exception {
+		if(Objects.nonNull(latestInActiveDeviceHistory) && !latestInActiveDeviceHistory.isEmpty()){
+			for(PatientVestDeviceHistoryMonarch inActiveDevice : latestInActiveDeviceHistory){
+				if(!(inActiveDevice.getSerialNumber().equalsIgnoreCase(therapySession.getSerialNumber()))){
+					therapySession.setHmr(therapySession.getHmr()+inActiveDevice.getHmr());
+				}
 			}
 		}
 	}

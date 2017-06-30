@@ -162,7 +162,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 		}
 		
 		log.debug("New Events found to be inserted ");
-		PatientVestDeviceHistory latestInActiveDevice = patientVestDeviceRepository.findLatestInActiveDeviceByPatientId(patientId, false);
+		List<PatientVestDeviceHistory> latestInActiveDevice = patientVestDeviceRepository.findAllInActiveDeviceByPatientId(patientId);
 		List<TherapySession> therapySessions = PatientVestDeviceTherapyUtil
 				.prepareTherapySessionFromDeviceData(patientVestDeviceRecords,latestInActiveDevice);
 

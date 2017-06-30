@@ -197,7 +197,7 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 				patientVestDeviceRecordsMonarch = patientVestDeviceEventsMonarch;
 			}
 			
-			PatientVestDeviceHistoryMonarch latestInActiveDevice = patientMonarchDeviceRepository.findLatestInActiveDeviceByPatientId(patientId, false);
+			List<PatientVestDeviceHistoryMonarch> latestInActiveDevice = patientMonarchDeviceRepository.findAllInActiveDeviceByPatientId(patientId);
 			List<TherapySessionMonarch> therapySessionsMonarch = PatientVestDeviceTherapyUtilMonarch
 					.prepareTherapySessionFromDeviceDataMonarch(patientVestDeviceRecordsMonarch,latestInActiveDevice);
 	

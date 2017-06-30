@@ -72,4 +72,7 @@ public interface PatientVestDeviceRepository extends
 	Optional<PatientVestDeviceHistory> findOneByPatientIdAndPendingStatus(
 			String patientId, Boolean pending);
 
+	@Query(nativeQuery = true, value = "SELECT * FROM PATIENT_VEST_DEVICE_HISTORY pvd where patient_id = :patientId and is_active = false order by last_modified_by desc")
+	List<PatientVestDeviceHistory> findAllInActiveDeviceByPatientId(
+			@Param("patientId")String patientId);
 }

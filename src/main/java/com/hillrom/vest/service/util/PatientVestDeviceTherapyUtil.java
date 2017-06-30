@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
@@ -57,7 +58,7 @@ public class PatientVestDeviceTherapyUtil {
 		
 	}
 	
-	public static List<TherapySession> prepareTherapySessionFromDeviceData(List<PatientVestDeviceData> deviceData,PatientVestDeviceHistory latestInActiveDeviceHistory) throws Exception{
+	public static List<TherapySession> prepareTherapySessionFromDeviceData(List<PatientVestDeviceData> deviceData,List<PatientVestDeviceHistory> latestInActiveDeviceHistory) throws Exception{
 		List<TherapySession> therapySessions = new LinkedList<>();
 		therapySessions = groupEventsToPrepareTherapySession(deviceData,latestInActiveDeviceHistory);
 		return groupTherapySessionsByDay(therapySessions);
@@ -160,7 +161,7 @@ public class PatientVestDeviceTherapyUtil {
 	}
 	
 	public static List<TherapySession> groupEventsToPrepareTherapySession(
-			List<PatientVestDeviceData> deviceData,PatientVestDeviceHistory latestInActiveDeviceHistory) throws Exception{
+			List<PatientVestDeviceData> deviceData,List<PatientVestDeviceHistory> latestInActiveDeviceHistory) throws Exception{
 		List<TherapySession> therapySessions = new LinkedList<TherapySession>();
 		// This List will hold un-finished session events , will be discarded to get delta on next transmission 
 		List<PatientVestDeviceData> eventsToBeDiscarded = new LinkedList<>();
@@ -216,10 +217,12 @@ public class PatientVestDeviceTherapyUtil {
 	}
 
 	private static void applyGlobalHMR(TherapySession therapySession,
-			PatientVestDeviceHistory latestInActiveDeviceHistory)throws Exception {
-		if( Objects.nonNull(latestInActiveDeviceHistory) && (therapySession.getHmr() < latestInActiveDeviceHistory.getHmr())){
-			if(!(latestInActiveDeviceHistory.getSerialNumber().equalsIgnoreCase(therapySession.getSerialNumber()))){
-				therapySession.setHmr(therapySession.getHmr()+latestInActiveDeviceHistory.getHmr());
+			List<PatientVestDeviceHistory> latestInActiveDeviceHistory)throws Exception {
+		if(Objects.nonNull(latestInActiveDeviceHistory) && !latestInActiveDeviceHistory.isEmpty()){
+			for(PatientVestDeviceHistory inActiveDevice : latestInActiveDeviceHistory){
+				if(!(inActiveDevice.getSerialNumber().equalsIgnoreCase(therapySession.getSerialNumber()))){
+					therapySession.setHmr(therapySession.getHmr()+inActiveDevice.getHmr());
+				}
 			}
 		}
 	}

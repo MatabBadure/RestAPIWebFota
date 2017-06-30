@@ -2,7 +2,6 @@ package com.hillrom.vest.service.monarch;
 
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,7 +36,6 @@ import com.hillrom.vest.repository.monarch.PatientNoEventsMonarchRepository;
 import com.hillrom.vest.repository.monarch.TherapySessionMonarchRepository;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.util.DateUtil;
-import com.hillrom.vest.service.util.monarch.PatientVestDeviceTherapyUtilMonarch;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
 import com.hillrom.vest.web.rest.dto.monarch.TherapyDataMonarchVO;
 

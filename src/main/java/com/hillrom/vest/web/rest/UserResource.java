@@ -499,7 +499,7 @@ public class UserResource {
 					changedDevType = "ALL";
 			}else if(deviceType.equals("MONARCH") && deviceValue.equals("MONARCH")){
 				responseObj_Monarch = patientVestDeviceMonarchService.linkVestDeviceWithPatient(id, deviceData);
-				PatientDevicesAssoc updateSerialNumber = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
+				PatientDevicesAssoc updateSerialNumber = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
 				updateSerialNumber.setSerialNumber(deviceData.get("serialNumber").toString());
 				patientDevicesAssocRepository.save(updateSerialNumber);
 				changedDevType = "MONARCH";

@@ -93,21 +93,56 @@ public class TimsService {
 	private PatientMonarchDeviceRepository patientMonarchDeviceRepository;
 	
 
-	 DateTimeFormatter dobFormat = DateTimeFormat.forPattern("MM-dd-yyyy");
+	 DateTimeFormatter dobFormat = DateTimeFormat.forPattern("yyyy-MM-dd");
     /* DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");*/
  
-	/**
+	
+		/**
+		 * 
+		 * @param
+		 * @return
+		 * @throws HillromException
+		 */
+		public void insertIntoProtocolDataTempTable(String patient_id,
+                									String type,
+									                int treatments_per_day,
+									                String treatment_label,
+									                int min_minutes_per_treatment,
+									                int max_minutes_per_treatment,
+									                int min_frequency,
+									                int max_frequency,
+									                int min_pressure,
+									                int max_pressure,
+									                int to_be_inserted,
+									                String user_id) throws HillromException{		
+					timsUserRepository.insertIntoProtocolDataTempTable(patient_id,
+													type,
+									                treatments_per_day,
+									                treatment_label,
+									                min_minutes_per_treatment,
+									                max_minutes_per_treatment,
+									                min_frequency,
+									                max_frequency,
+									                min_pressure,
+									                max_pressure,
+									                to_be_inserted,
+									                user_id);
+		}
+	 
+	 /**
 	 * 
 	 * @param
 	 * @return
 	 * @throws HillromException
 	 */
 	public void createPatientProtocolMonarch(PatientInfoDTO patientInfoDTO) throws HillromException{		
-				timsRepository.createPatientProtocolMonarch(patientInfoDTO.getProtocol_type_key(),
+				timsUserRepository.createPatientProtocolMonarch(patientInfoDTO.getProtocol_type_key(),
 						 patientInfoDTO.getOperation_type(),
 						 patientInfoDTO.getPatient_id(),
 						 patientInfoDTO.getCreated_by());
 	}
+	
+	
 	
 	/**
 	 * 
@@ -116,7 +151,7 @@ public class TimsService {
 	 * @throws HillromException
 	 */
 	public void createPatientProtocol(PatientInfoDTO patientInfoDTO) throws HillromException{		
-			timsRepository.createPatientProtocol(patientInfoDTO.getProtocol_type_key(),
+			timsUserRepository.createPatientProtocol(patientInfoDTO.getProtocol_type_key(),
 												 patientInfoDTO.getOperation_type(),
 												 patientInfoDTO.getPatient_id(),
 												 patientInfoDTO.getCreated_by());
@@ -131,7 +166,7 @@ public class TimsService {
 	 */
 	public void managePatientDevice(PatientInfoDTO patientInfoDTO) throws HillromException{		
 		
-		timsRepository.managePatientDevice(patientInfoDTO.getOperation_type(), 
+		timsUserRepository.managePatientDevice(patientInfoDTO.getOperation_type(), 
 											patientInfoDTO.getPatient_id(), 
 											patientInfoDTO.getOld_serial_number(), 
 											patientInfoDTO.getNew_serial_number(),
@@ -150,7 +185,7 @@ public class TimsService {
 	
 	public void managePatientDeviceAssociation(PatientInfoDTO patientInfoDTO) throws HillromException{	
 		
-		timsRepository.managePatientDeviceAssociation(patientInfoDTO.getOperation_type(),
+		timsUserRepository.managePatientDeviceAssociation(patientInfoDTO.getOperation_type(),
 													  patientInfoDTO.getPatient_id(),
 													  patientInfoDTO.getDevice_type(),
 													  patientInfoDTO.getIs_active(),
@@ -211,7 +246,7 @@ public class TimsService {
 	
 	public void managePatientDeviceMonarch(PatientInfoDTO patientInfoDTO) throws HillromException{		
 		
-			timsRepository.managePatientDeviceMonarch(patientInfoDTO.getOperation_type(), 
+			timsUserRepository.managePatientDeviceMonarch(patientInfoDTO.getOperation_type(), 
 				patientInfoDTO.getPatient_id(), 
 				patientInfoDTO.getOld_serial_number(), 
 				patientInfoDTO.getNew_serial_number());

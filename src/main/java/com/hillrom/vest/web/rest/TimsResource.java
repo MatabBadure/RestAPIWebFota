@@ -35,11 +35,13 @@ import org.springframework.data.domain.Page;
 import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Announcements;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.TimsUserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.AnnouncementsService;
 import com.hillrom.vest.service.TimsInputReaderService;
 import com.hillrom.vest.service.TimsService;
 import com.hillrom.vest.web.rest.dto.AnnouncementsDTO;
+import com.hillrom.vest.web.rest.dto.PatientInfoDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 import org.springframework.web.bind.annotation.PathVariable;
@@ -62,20 +64,25 @@ public class TimsResource {
 	
 	@Inject
 	private TimsInputReaderService timsInputReaderService;
+
+	@Inject
+	private TimsUserRepository timsUserRepository;
 	
 	
 		
 	/**
-     * POST  /createpatientprotocolmonarch
+     * POST  /insertIntoProtocolDataTempTable
      */
-	@RequestMapping(value="/createpatientprotocolmonarch", method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value="/insertIntoProtocolDataTempTable", method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> createpatientprotocolmonarch(){
 
 		JSONObject jsonObject = new JSONObject();
 		System.out.println("I am here in call of createpatientprotocolmonarch ");
 		try{
-			  //timsService.createPatientProtocolMonarch("Normal","Insert","HR2015000002","App");
-			  jsonObject.put("timsMsg", "createPatientProtocolMonarch stored procedure executed successfully");
+				
+				
+			timsUserRepository.insertIntoProtocolDataTempTable("HR2015000002", "Normal", 2, "3", 5, 20, 10, 14, 1, 10, 1, "214");
+			  jsonObject.put("timsMsg", "Record in protocol data temp table created successfully");
 			  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			
 		}catch(Exception ex){
 			jsonObject.put("ERROR", ex.getMessage());

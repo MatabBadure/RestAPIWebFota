@@ -41,8 +41,7 @@ public class TimsUserRepository{
 	private EntityManager entityManager;
 
 	@SuppressWarnings("unchecked")
-	/* @Procedure(name = "manage_patient_user")
-	@Transactional*/
+
 	public JSONObject managePatientUser(String operationTypeIndicator,
 										String inhillRomId,
 										String inPatientHubId,
@@ -121,7 +120,7 @@ public class TimsUserRepository{
 				proc.setParameter("pat_address", inPatientAddress);
 				proc.setParameter("pat_city", inPatientCity);
 				proc.setParameter("pat_state", inPatientState);
-				proc.setParameter("pat_training_date",  inPatientTrainingDate);
+				proc.setParameter("pat_training_date", inPatientTrainingDate);
 				proc.setParameter("pat_primary_diagnosis",inPatientPrimaryDiagnosis);
 				proc.setParameter("pat_garment_type", inPatientgarmentType);
 				proc.setParameter("pat_garment_size", inPatientGarmentSize);
@@ -131,12 +130,11 @@ public class TimsUserRepository{
 				proc.registerStoredProcedureParameter("return_patient_id",String.class, ParameterMode.OUT);
 				proc.registerStoredProcedureParameter("return_user_id",String.class, ParameterMode.OUT);
 				
-
-				proc.executeUpdate();
 				String outPatientId =(String) proc.getOutputParameterValue("return_patient_id");
 				String outPatientUser =(String) proc.getOutputParameterValue("return_user_id");
-			
+				proc.executeUpdate();
 				
+				System.out.println("Value of patientId " +  outPatientId + "Value of user_id " + outPatientUser );
 
 				returnValues.put("return_patient_id", outPatientId);
 				returnValues.put("return_user_id", outPatientUser);
@@ -151,7 +149,218 @@ public class TimsUserRepository{
 
 	}
 
+	
+			public void createPatientProtocolMonarch(String typeKey,
+						  String operationType,
+						  String inPatientId,
+						  String inCreatedBy){
+				entityManager
+				.createNativeQuery("call create_patient_protocol_monarch("
+				+ ":type_key,"
+				+ ":operation_type,"
+				+ ":inPatientId,"
+				+ ":inCreatedBy)")
+				.setParameter("type_key", typeKey)
+				.setParameter("operation_type", operationType)
+				.setParameter("inPatientId",inPatientId)
+				.setParameter("inCreatedBy", inCreatedBy)
+				.executeUpdate();
+				
+
+			
+			}
+			
+			
+			public void createPatientProtocol(String typeKey,
+					 String operationType,
+					 String inPatientId,
+					 String inCreatedBy){
+			
+				entityManager
+				.createNativeQuery("call create_patient_protocol("
+				+ ":type_key,"
+				+ ":operation_type,"
+				+ ":inPatientId,"
+				+ ":inCreatedBy)")
+				.setParameter("type_key", typeKey)
+				.setParameter("operation_type", operationType)
+				.setParameter("inPatientId",inPatientId)
+				.setParameter("inCreatedBy", inCreatedBy)
+				.executeUpdate();
+				
+			}
+			
+			
+			
+			public void managePatientDevice(String operationType,
+			String inPatientId,
+			String inPatientoldDeviceSerialNumber,
+			String inPatientNewDeviceSerialNumber,
+			String inPatientBluetoothId,
+			String inPatientHubId){
+			
+				try{
+					entityManager
+					.createNativeQuery("call manage_patient_device("
+					+ ":operation_type,"
+					+ ":patient_id,"
+					+ ":pat_old_device_serial_number,"
+					+ ":pat_new_device_serial_number,"
+					+ ":pat_bluetooth_id,"				   		
+					+ ":pat_hub_id)")
+					.setParameter("operation_type", operationType)
+					.setParameter("patient_id", inPatientId)
+					.setParameter("pat_old_device_serial_number",inPatientoldDeviceSerialNumber)
+					.setParameter("pat_new_device_serial_number", inPatientNewDeviceSerialNumber)
+					.setParameter("pat_bluetooth_id", inPatientBluetoothId)
+					.setParameter("pat_hub_id",inPatientHubId)					
+					.executeUpdate();
+				}catch(Exception ex){
+					ex.printStackTrace();
+				}
+				
+
+			
+			}
+			
+			
+			public void managePatientDeviceAssociation(String operationType,
+			String inpatientPatientId,//Need Clarification
+			String inpatientDeviceType,
+			String inpatientDeviceIsActive,
+			String inDeviceSerialNumber,
+			String inpatientHillromId,
+			String inpatientOldId,
+			LocalDate inpatientTrainingDate,//Need to check for datetime
+			String inpatientDiagnosisCode1,
+			String inpatientDiagnosisCode2,
+			String inpatientDiagnosisCode3,
+			String inpatientDiagnosisCode4,
+			String inpatientGarmentType,
+			String inpatientGarmentSize,
+			String inpatientGarmentColor){
+			
+			
+					entityManager
+					.createNativeQuery("call manage_patient_device_assoc("
+					+ ":operation_type_indicator,"
+					+ ":pat_patient_id,"
+					+ ":pat_device_type,"
+					+ ":pat_device_is_active,"
+					+ ":pat_device_serial_number,"
+					+ ":pat_hillrom_id,"
+					+ ":pat_old_id,"
+					+ ":pat_training_date,"
+					+ ":pat_diagnosis_code1,"
+					+ ":pat_diagnosis_code2,"
+					+ ":pat_diagnosis_code3,"
+					+ ":pat_diagnosis_code4,"
+					+ ":pat_garment_type,"
+					+ ":pat_garment_size,"
+					+ ":pat_garment_color)")
+					.setParameter("operation_type_indicator", operationType)
+					.setParameter("pat_patient_id", inpatientPatientId)
+					.setParameter("pat_device_type",inpatientDeviceType)
+					.setParameter("pat_device_is_active", inpatientDeviceIsActive)
+					.setParameter("pat_device_serial_number", inDeviceSerialNumber )
+					.setParameter("pat_hillrom_id", inpatientHillromId)
+					.setParameter("pat_old_id", inpatientOldId)
+					.setParameter("pat_training_date", inpatientTrainingDate)
+					.setParameter("pat_diagnosis_code1", inpatientDiagnosisCode1)
+					.setParameter("pat_diagnosis_code2", inpatientDiagnosisCode2)
+					.setParameter("pat_diagnosis_code3", inpatientDiagnosisCode3)
+					.setParameter("pat_diagnosis_code4", inpatientDiagnosisCode4)
+					.setParameter("pat_garment_type", inpatientGarmentType)
+					.setParameter("pat_garment_size", inpatientGarmentSize)
+					.setParameter("pat_garment_color", inpatientGarmentColor)
+					.executeUpdate();
+					
+			
+			
+			}
+			
+			
+			
+			
+			
+			
+			public void managePatientDeviceMonarch(String operationTypeIndicator,
+						String inPatientId,
+						String inPatientoldDeviceSerialNumber,
+						String inPatientNewDeviceSerialNumber){
+			
+					List result = entityManager
+					.createNativeQuery("call manage_patient_device_monarch("
+					+ ":operation_type_indicator,"
+					+ ":patient_id,"
+					+ ":pat_old_device_serial_number,"			   		
+					+ ":pat_new_device_serial_number)")
+					.setParameter("operation_type_indicator", operationTypeIndicator)
+					.setParameter("patient_id", inPatientId)
+					.setParameter("pat_old_device_serial_number",inPatientoldDeviceSerialNumber)
+					.setParameter("pat_new_device_serial_number", inPatientNewDeviceSerialNumber)			
+					.getResultList();
+					
+					System.out.println("Returned values from manage_patient_device_monarch : " + result);
+			}
    
+			
+			@Transactional
+            public void insertIntoProtocolDataTempTable(String patient_id,
+                                                                                String type,
+                                                                                int treatments_per_day,
+                                                                                String treatment_label,
+                                                                                int min_minutes_per_treatment,
+                                                                                int max_minutes_per_treatment,
+                                                                                int min_frequency,
+                                                                                int max_frequency,
+                                                                                int min_pressure,
+                                                                                int max_pressure,
+                                                                                int to_be_inserted,
+                                                                                String user_id){
+           
+                         entityManager
+                         .createNativeQuery("insert into protocol_data_temp_table("
+                                + "patient_id,"
+                                + "type,"
+                                + "treatments_per_day,"          
+                                + "treatment_label,"      
+                                + "min_minutes_per_treatment,"          
+                                + "max_minutes_per_treatment,"          
+                                + "min_frequency,"        
+                                + "max_frequency,"        
+                                + "min_pressure,"         
+                                + "max_pressure,"         
+                                + "to_be_inserted,"       
+                                + "id) values ("
+                                + ":patient_id,"
+                                + ":type,"
+                                + ":treatments_per_day,"         
+                                + ":treatment_label,"            
+                                + ":min_minutes_per_treatment,"         
+                                + ":max_minutes_per_treatment,"         
+                                + ":min_frequency,"       
+                                + ":max_frequency,"       
+                                + ":min_pressure,"        
+                                + ":max_pressure,"        
+                                + ":to_be_inserted,"
+                                + ":id)")
+                         .setParameter("patient_id", patient_id)
+                         .setParameter("type", type)
+                         .setParameter("treatments_per_day",treatments_per_day)
+                         .setParameter("treatment_label", treatment_label)     
+                         .setParameter("min_minutes_per_treatment", min_minutes_per_treatment)
+                         .setParameter("max_minutes_per_treatment", max_minutes_per_treatment)
+                         .setParameter("min_frequency",min_frequency)
+                         .setParameter("max_frequency", max_frequency)  
+                         .setParameter("min_pressure", min_pressure)
+                         .setParameter("max_pressure", max_pressure)
+                         .setParameter("to_be_inserted",to_be_inserted)
+                         .setParameter("id", user_id)                                 
+                         .executeUpdate();
+           
+
+            }
     
 }
 

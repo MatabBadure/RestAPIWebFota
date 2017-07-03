@@ -1,0 +1,114 @@
+id,type,type_code,type_code_value
+58,monarch_event_codes,0x1,Manual therapy start
+59,monarch_event_codes,0x2,Manual therapy data changed
+60,monarch_event_codes,0x3,Manual therapy complete
+61,monarch_event_codes,0x4,Manual therapy incomplete
+62,monarch_event_codes,0x5,Manual therapy pause
+63,monarch_event_codes,0x6,Manual therapy resumed
+64,monarch_event_codes,0x7,Program Therapy - Step 1 start
+65,monarch_event_codes,0x8,Program Therapy - Step 2 start
+66,monarch_event_codes,0x9,Program Therapy - Step 3 start
+67,monarch_event_codes,0xA,Program Therapy - Step 4 start
+68,monarch_event_codes,0xB,Program Therapy - Step 5 start
+69,monarch_event_codes,0xC,Program Therapy - Step 6 start
+70,monarch_event_codes,0xD,Program Therapy - Step 7 start
+71,monarch_event_codes,0xE,Program Therapy - Step 8 start
+72,monarch_event_codes,0xF,Program Therapy complete
+73,monarch_event_codes,0x10,Program Therapy incomplete
+74,monarch_event_codes,0x11,Program Therapy pause
+75,monarch_event_codes,0x12,Program Therapy resume
+76,monarch_event_codes,0x13,Program Therapy data changed
+77,monarch_event_codes,0x14,Cough Pause start
+78,monarch_event_codes,0x15,Cough Pause end
+79,monarch_event_codes,0x16,Error Event
+80,monarch_event_codes,0x17,Bluetooth change source
+81,monarch_event_codes,0x18,Power source connected
+82,monarch_event_codes,0x19,Power source disconnected
+83,monarch_error_codes,0x00,No error
+84,monarch_error_codes,0x01,Spi read fail
+85,monarch_error_codes,0x02,Spi write fail
+86,monarch_error_codes,0x03,Uart read fail
+87,monarch_error_codes,0x04,Uart write faile
+88,monarch_error_codes,0x05,I2C write fail
+89,monarch_error_codes,0x06,I2C read fail
+90,monarch_error_codes,0x07,Mutex error
+91,monarch_error_codes,0x08,Message queue error
+92,monarch_error_codes,0x09,EEPROM error
+93,monarch_error_codes,0x0A,Invalid value
+94,monarch_error_codes,0x0B,I2C bus error
+95,monarch_error_codes,0x0C,I2C timeout error
+96,monarch_error_codes,0x0D,I2C arbitration error
+97,monarch_error_codes,0x0E,I2C acknowledge error
+98,monarch_error_codes,0x0F,I2C overrun/underrun error
+99,monarch_error_codes,0x10,I2C failed DMA transfer
+100,monarch_error_codes,0x11,RTC not synch
+101,monarch_error_codes,0x12,Null pointer error
+102,monarch_error_codes,0x13,Module not found
+103,monarch_error_codes,0x14,Module have no handler
+104,monarch_error_codes,0x15,Communication service unknown
+105,monarch_error_codes,0x16,Communication service no handler
+106,monarch_error_codes,0x17,Buffer full
+107,monarch_error_codes,0x18,Object ID unknown
+108,monarch_error_codes,0x19,Sub-index unknown
+109,monarch_error_codes,0x1A,Communication polling full
+110,monarch_error_codes,0x1B,HAL error
+111,monarch_error_codes,0x1C,In-rush not settled
+112,monarch_error_codes,0x1D,Sensor h bridge fault
+113,monarch_error_codes,0x1E,Invalid therapy data in EEPROM
+114,monarch_error_codes,0x1F,Temperature too high
+115,monarch_error_codes,0x20,Temperature too low
+116,monarch_error_codes,0x21,UART noise error
+117,monarch_error_codes,0x22,UART timeout error
+118,monarch_error_codes,0x23,UART frame error
+119,monarch_error_codes,0x24,UART parity error
+120,monarch_error_codes,0x25,UART overrun
+121,monarch_error_codes,0x26,UART failed DMA transfer
+122,monarch_error_codes,0x27,Timeout occurring from pending mutex or event flags
+123,monarch_error_codes,0x28,Bluetooth module initialization failure
+124,monarch_error_codes,0x29,WIFI module initialization error
+125,monarch_error_codes,0x2A,LTE module initialization error
+126,monarch_error_codes,0x2B,Bluetooth module connection error
+127,monarch_error_codes,0x2C,WIFI module connection error
+128,monarch_error_codes,0x2D,LTE module connection error
+129,monarch_error_codes,0x30,Checksum error
+130,monarch_error_codes,0x31,Critical data read failure
+131,monarch_error_codes,0x32,Pendant communication error
+132,monarch_error_codes,0x33,Pendant power down
+133,monarch_error_codes,0x34,Pendant disconnected
+134,monarch_error_codes,0x35,Main FLT inactive
+135,monarch_error_codes,0x36,FLT low voltage
+136,monarch_error_codes,0x37,No sync between vcmctrl and therapy manager
+137,monarch_error_codes,0x38,Pendant low voltage
+138,monarch_error_codes,0x39,System startup communication error
+139,monarch_error_codes,0x40,EEPROM wrong ID
+140,monarch_error_codes,0x41,EEPROM size fail
+141,monarch_error_codes,0x42,General error - out of bounds
+142,monarch_error_codes,0x43,General error - wrong state
+143,monarch_error_codes,0x50,USB overload
+144,monarch_error_codes,0x51,USB wrong device
+145,monarch_error_codes,0x55,Charging error
+146,monarch_error_codes,0x56,Therapy timer corrupted
+147,monarch_error_codes,0x57,Therapy data corrupted
+148,monarch_error_codes,0x61,HB fault for VCM 1
+149,monarch_error_codes,0x62,HB fault for VCM 2
+150,monarch_error_codes,0x63,HB fault for VCM 3
+151,monarch_error_codes,0x64,HB fault for VCM 4
+152,monarch_error_codes,0x65,HB fault for VCM 5
+153,monarch_error_codes,0x66,HB fault for VCM 6
+154,monarch_error_codes,0x67,HB fault for VCM 7
+155,monarch_error_codes,0x68,HB fault for VCM 8
+156,monarch_error_codes,0x69,Driver FLT when enabling
+157,monarch_error_codes,0x70,Over temperature discharge
+158,monarch_error_codes,0x71,Over temperature charge
+159,monarch_error_codes,0x72,Over current discharge
+160,monarch_error_codes,0x73,Over current charge
+161,monarch_error_codes,0x74,VCM open
+162,monarch_error_codes,0x75,Pendant lcd init error
+163,monarch_error_codes,0x76,Button stuck error
+164,monarch_error_codes,0x77,Pendant flash error
+165,monarch_error_codes,0x78,Battery pin detection not working
+166,monarch_error_codes,0xF7,Main watchdog error
+167,monarch_error_codes,0xF8,CAN watchdog error
+168,monarch_error_codes,0xF9,Interrupt watchdog error
+169,monarch_error_codes,0xFA,Watchdog task error
+170,monarch_error_codes,0xFF,Unknown error

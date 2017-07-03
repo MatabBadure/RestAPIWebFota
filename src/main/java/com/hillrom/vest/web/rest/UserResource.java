@@ -470,6 +470,9 @@ public class UserResource {
 				changedDevType = "ALL";
 			}else if(deviceType.equals("VEST") && deviceValue.equals("VEST")){
 				responseObj_Vest = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
+				PatientDevicesAssoc updateSerialNumber = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
+				updateSerialNumber.setSerialNumber(deviceData.get("serialNumber").toString());
+				patientDevicesAssocRepository.save(updateSerialNumber);
 				changedDevType = "VEST";
 			}else if((deviceType.equals("MONARCH") || deviceType.equals("ALL")) && deviceValue.equals("VEST")){
 					responseObj_Vest = patientVestDeviceService.linkVestDeviceWithPatient(id, deviceData);
@@ -496,6 +499,9 @@ public class UserResource {
 					changedDevType = "ALL";
 			}else if(deviceType.equals("MONARCH") && deviceValue.equals("MONARCH")){
 				responseObj_Monarch = patientVestDeviceMonarchService.linkVestDeviceWithPatient(id, deviceData);
+				PatientDevicesAssoc updateSerialNumber = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
+				updateSerialNumber.setSerialNumber(deviceData.get("serialNumber").toString());
+				patientDevicesAssocRepository.save(updateSerialNumber);
 				changedDevType = "MONARCH";
 			}
 

@@ -55,6 +55,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.http.HttpStatus;
 
+import com.hillrom.vest.config.Constants;
+
 import java.util.Map;
 
 @Service
@@ -116,7 +118,7 @@ public class TimsInputReaderService {
 	{
 
 
-	        String csvFile = "c:/temp/flat file.csv";
+	        String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
 	        log.debug("Started reading flat file : " + csvFile);
 	        String line = "";
 	        String cvsSplitBy = ",";

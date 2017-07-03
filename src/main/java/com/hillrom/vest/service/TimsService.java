@@ -294,16 +294,17 @@ public class TimsService {
     }
 	
 	public void listLogDirectory(String logfilePath) throws HillromException {
-		
+		/*
 		File folder = new File(logfilePath);
 		File[] listOfFiles = folder.listFiles();
 
 		for (File file : listOfFiles) {
-		    if (file.isFile()) {
+		    if (file.isFile()) {*/
 		    	try {
-			    	log.debug(file.getName());
+			    	//log.debug(file.getName());
 			    	
-			        String command = "grep -o \"doing nothing\" " + file.getName() + "  | wc -l";
+			        //String command = "grep -o \"doing nothing\" " + file.getName() + "  | wc -l";
+		    		String command = "ls -ltr *.log";
 			        log.debug(command);
 			        Process p = Runtime.getRuntime().exec(command);
 			        log.debug(" process : " + p);
@@ -327,8 +328,8 @@ public class TimsService {
 		    	}catch(Exception ex){
 		    		ex.printStackTrace();
 		    	}
-		    }
-		}
+		  /*  }
+		}*/
 		
 
 

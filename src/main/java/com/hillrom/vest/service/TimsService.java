@@ -304,14 +304,15 @@ public class TimsService {
 			    	log.debug(file.getName());
 			    	
 			        String command = "grep -o 'doing nothing' " + file.getName() + "  | wc -l";
+			        log.debug(command);
 			        Process p = Runtime.getRuntime().exec(command);
+			        log.debug(" process : " + p);
 			        p.waitFor();
 			        BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			        String output;
 			        while ((output = br.readLine()) != null) {
 			        	log.debug(output);
 			        }
-			        log.debug("exit: " + p.exitValue());
 			        p.destroy();
 		    	}catch(Exception ex){
 		    		ex.printStackTrace();

@@ -340,6 +340,8 @@ public final class Constants {
 		public static final String ANNOUNCEMENT_FILE_PATH = "/opt/visiview-files/";
 	//end:announcement changes
 		
+		public static final String TIMS_CSV_FILE_PATH = "/opt/tims-csv-files/";
+		
 	//Device Type
 	public static final String VEST = "VEST";
 	public static final String MONARCH = "MONARCH";

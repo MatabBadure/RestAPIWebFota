@@ -293,6 +293,17 @@ public class TimsService {
     }
 	
 	public void listLogDirectory(String logfilePath) throws HillromException {
+		
+		File folder = new File(logfilePath);
+		File[] listOfFiles = folder.listFiles();
+
+		for (File file : listOfFiles) {
+		    if (file.isFile()) {
+		    	log.debug(file.getName());
+		    }
+		}
+		
+		/*
         Path dir = Paths.get(logfilePath);
         try {
             DirectoryStream<Path> ds = Files.newDirectoryStream(dir, "*.{log}");
@@ -301,7 +312,7 @@ public class TimsService {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 	
 

@@ -297,7 +297,7 @@ public class TimsService {
         try {
             DirectoryStream<Path> ds = Files.newDirectoryStream(dir, "*.{log}");
             for (Path entry: ds) {
-                System.out.println(entry);
+            	log.debug(entry.getFileName().toString());
             }
         } catch (IOException e) {
             e.printStackTrace();

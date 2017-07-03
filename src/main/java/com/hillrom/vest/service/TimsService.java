@@ -302,7 +302,8 @@ public class TimsService {
 		    if (file.isFile()) {
 		    	try {
 			    	log.debug(file.getName());
-			        String command = "grep -i doing " + file.getName();
+			    	
+			        String command = "grep -o 'doing nothing' " + file.getName() + "  | wc -l";
 			        Process p = Runtime.getRuntime().exec(command);
 			        p.waitFor();
 			        BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));

@@ -303,7 +303,7 @@ public class TimsService {
 		    	try {
 			    	log.debug(file.getName());
 			    	
-			        String command = "grep -o 'doing nothing' " + file.getName() + "  | wc -l";
+			        String command = "grep -o \"doing nothing\" " + file.getName() + "  | wc -l";
 			        log.debug(command);
 			        Process p = Runtime.getRuntime().exec(command);
 			        log.debug(" process : " + p);

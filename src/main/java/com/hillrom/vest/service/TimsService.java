@@ -52,6 +52,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -287,6 +290,18 @@ public class TimsService {
 		  }
 	  return content;
 		
+    }
+	
+	public void listLogDirectory(String logfilePath) throws HillromException {
+        Path dir = Paths.get(logfilePath);
+        try {
+            DirectoryStream<Path> ds = Files.newDirectoryStream(dir, "*.{log}");
+            for (Path entry: ds) {
+                System.out.println(entry);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 	
 

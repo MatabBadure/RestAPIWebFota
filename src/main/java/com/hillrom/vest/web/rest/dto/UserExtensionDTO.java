@@ -52,6 +52,19 @@ public class UserExtensionDTO extends UserDTO {
     private Map<String,String> clinicMRNId = new HashMap<>();
     
     private boolean expired;
+    
+	private String vestGarmentColor;
+	
+	private String vestGarmentSize;
+	
+	private String vestGarmentType;
+	
+	private String monarchGarmentColor;
+
+	private String monarchGarmentSize;
+
+	private String monarchGarmentType;
+	
 
     public UserExtensionDTO() {
     }
@@ -73,6 +86,55 @@ public class UserExtensionDTO extends UserDTO {
 		this.role = role;
 		this.clinicList = clinicList;
 	}
+
+	public String getVestGarmentColor() {
+		return vestGarmentColor;
+	}
+
+	public void setVestGarmentColor(String vestGarmentColor) {
+		this.vestGarmentColor = vestGarmentColor;
+	}
+
+	public String getVestGarmentSize() {
+		return vestGarmentSize;
+	}
+
+	public void setVestGarmentSize(String vestGarmentSize) {
+		this.vestGarmentSize = vestGarmentSize;
+	}
+
+	public String getVestGarmentType() {
+		return vestGarmentType;
+	}
+
+	public void setVestGarmentType(String vestGarmentType) {
+		this.vestGarmentType = vestGarmentType;
+	}
+
+	public String getMonarchGarmentColor() {
+		return monarchGarmentColor;
+	}
+
+	public void setMonarchGarmentColor(String monarchGarmentColor) {
+		this.monarchGarmentColor = monarchGarmentColor;
+	}
+
+	public String getMonarchGarmentSize() {
+		return monarchGarmentSize;
+	}
+
+	public void setMonarchGarmentSize(String monarchGarmentSize) {
+		this.monarchGarmentSize = monarchGarmentSize;
+	}
+
+	public String getMonarchGarmentType() {
+		return monarchGarmentType;
+	}
+
+	public void setMonarchGarmentType(String monarchGarmentType) {
+		this.monarchGarmentType = monarchGarmentType;
+	}
+	
 
 	public String getSpeciality() {
 		return speciality;

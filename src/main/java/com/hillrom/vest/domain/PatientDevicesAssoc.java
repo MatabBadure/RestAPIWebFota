@@ -54,6 +54,16 @@ public class PatientDevicesAssoc implements Serializable {
     @Column(name = "hillrom_id")
     private String hillromId = null;
     
+  //Garments changes
+    @Column(name = "garment_type")
+    private String garmentType;
+    
+    @Column(name = "garment_size")
+    private String garmentSize;
+    
+    @Column(name = "garment_color")
+    private String garmentColor;
+    
     @Column(name="created_date")
 	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
 	@JsonSerialize(using = CustomLocalDateSerializer.class)
@@ -110,7 +120,33 @@ public class PatientDevicesAssoc implements Serializable {
 		this.createdBy = "APP";
 
 	}
+	
+	
     
+	public String getGarmentType() {
+		return garmentType;
+	}
+
+	public void setGarmentType(String garmentType) {
+		this.garmentType = garmentType;
+	}
+
+	public String getGarmentSize() {
+		return garmentSize;
+	}
+
+	public void setGarmentSize(String garmentSize) {
+		this.garmentSize = garmentSize;
+	}
+
+	public String getGarmentColor() {
+		return garmentColor;
+	}
+
+	public void setGarmentColor(String garmentColor) {
+		this.garmentColor = garmentColor;
+	}
+
 	/**
 	 * @return the id
 	 */

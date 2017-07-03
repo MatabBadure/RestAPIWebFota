@@ -17,6 +17,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -33,7 +34,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.hillrom.vest.domain.util.CustomLocalDateSerializer;
 import com.hillrom.vest.domain.util.ISO8601LocalDateDeserializer;
 import com.hillrom.vest.domain.util.MMDDYYYYLocalDateSerializer;
 
@@ -167,6 +167,39 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "expiration_date", nullable = true)
     private DateTime expirationDate = null;
+
+    //Garment changes
+    @Transient
+    @JsonSerialize
+    @JsonDeserialize
+	private String vestGarmentColor;
+	
+    @Transient
+    @JsonSerialize
+    @JsonDeserialize
+	private String vestGarmentSize;
+	
+    @Transient
+    @JsonSerialize
+    @JsonDeserialize
+	private String vestGarmentType;
+	
+    
+    @Transient
+    @JsonSerialize
+    @JsonDeserialize
+	private String monarchGarmentColor;
+	
+    @Transient
+    @JsonSerialize
+    @JsonDeserialize
+	private String monarchGarmentSize;
+	
+    @Transient
+    @JsonSerialize
+    @JsonDeserialize
+	private String monarchGarmentType;
+	
     
 	public User() {
 		super();
@@ -189,7 +222,59 @@ public class User extends AbstractAuditingEntity implements Serializable {
         return id;
     }
 
-    public void setId(Long id) {
+    public String getVestGarmentColor() {
+		return vestGarmentColor;
+	}
+
+	public void setVestGarmentColor(String vestGarmentColor) {
+		this.vestGarmentColor = vestGarmentColor;
+	}
+
+	public String getVestGarmentSize() {
+		return vestGarmentSize;
+	}
+
+	public void setVestGarmentSize(String vestGarmentSize) {
+		this.vestGarmentSize = vestGarmentSize;
+	}
+
+	public String getVestGarmentType() {
+		return vestGarmentType;
+	}
+
+	public void setVestGarmentType(String vestGarmentType) {
+		this.vestGarmentType = vestGarmentType;
+	}
+
+	public String getMonarchGarmentColor() {
+		return monarchGarmentColor;
+	}
+
+	public void setMonarchGarmentColor(String monarchGarmentColor) {
+		this.monarchGarmentColor = monarchGarmentColor;
+	}
+
+	public String getMonarchGarmentSize() {
+		return monarchGarmentSize;
+	}
+
+	public void setMonarchGarmentSize(String monarchGarmentSize) {
+		this.monarchGarmentSize = monarchGarmentSize;
+	}
+
+	public String getMonarchGarmentType() {
+		return monarchGarmentType;
+	}
+
+	public void setMonarchGarmentType(String monarchGarmentType) {
+		this.monarchGarmentType = monarchGarmentType;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public void setId(Long id) {
         this.id = id;
     }
 

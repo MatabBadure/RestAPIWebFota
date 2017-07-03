@@ -2,7 +2,6 @@ package com.hillrom.vest.service;
 
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
 import static com.hillrom.vest.config.Constants.VEST;
-import static com.hillrom.vest.config.Constants.MONARCH;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -21,7 +20,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+
+import net.minidev.json.JSONObject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,9 +43,9 @@ import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.ClinicPatientAssoc;
 import com.hillrom.vest.domain.EntityUserAssoc;
 import com.hillrom.vest.domain.Note;
-import com.hillrom.vest.domain.NoteMonarch;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
+import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.User;
@@ -59,6 +58,7 @@ import com.hillrom.vest.repository.AuthorityRepository;
 import com.hillrom.vest.repository.ClinicPatientRepository;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.EntityUserRepository;
+import com.hillrom.vest.repository.PatientDevicesAssocRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
@@ -75,13 +75,11 @@ import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.CareGiverVO;
+import com.hillrom.vest.web.rest.dto.GarmentDTO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
-
-import net.minidev.json.JSONObject;
-import org.springframework.scheduling.annotation.Scheduled;
 
 /**
  * Service class for managing users.
@@ -109,6 +107,9 @@ public class UserService {
 
     @Inject
     private PatientInfoRepository patientInfoRepository;
+    
+    @Inject
+    private PatientDevicesAssocRepository patientDevicesAssocRepository;
 
     @Inject
     private PatientInfoService patientInfoService;
@@ -520,12 +521,26 @@ public class UserService {
 		UserExtension newUser = new UserExtension();
 		String patientInfoId = patientInfoRepository.id();
 		PatientInfo patientInfo = new PatientInfo();
+		PatientDevicesAssoc patientDevicesAssoc = new PatientDevicesAssoc();
+		
 		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
-
+		
+		assignValuesToPatientDeviceAssocObj(userExtensionDTO,
+				patientDevicesAssoc);
 		// Assigns Next Patient HillromId from Stored Procedure
 		patientInfo.setId(patientInfoId);
 		patientInfo = patientInfoRepository.save(patientInfo);
 		log.debug("Created Information for Patient : {}", patientInfo);
+		
+		///Insert Garament details in patient device ass info 
+		patientDevicesAssoc.setPatientId(patientInfoId);
+		patientDevicesAssoc.setCreatedDate(new LocalDate());
+		patientDevicesAssoc.setHillromId(userExtensionDTO.getHillromId());
+		patientDevicesAssoc.setIsActive(true);
+		if(Objects.nonNull(userExtensionDTO.getDeviceType()))
+			patientDevicesAssoc.setDeviceType(userExtensionDTO.getDeviceType());
+		patientDevicesAssoc = patientDevicesAssocRepository.save(patientDevicesAssoc);
+		log.debug("Created Information for PatientDevice Association : {}", patientDevicesAssoc);
 
 		assignValuesToUserObj(userExtensionDTO, newUser);
 
@@ -559,6 +574,31 @@ public class UserService {
 		compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
 		complianceService.createOrUpdate(compliance);
 		return newUser;
+	}
+
+	private void assignValuesToPatientDeviceAssocObj(
+			UserExtensionDTO userExtensionDTO,
+			PatientDevicesAssoc patientDevicesAssoc) {
+		if(Objects.nonNull(userExtensionDTO.getVestGarmentColor()) &&
+				Objects.nonNull(userExtensionDTO.getVestGarmentSize()) &&
+				Objects.nonNull(userExtensionDTO.getVestGarmentType())){
+			if (Objects.nonNull(userExtensionDTO.getVestGarmentColor()))
+				patientDevicesAssoc.setGarmentColor(userExtensionDTO.getVestGarmentColor());
+			if (Objects.nonNull(userExtensionDTO.getVestGarmentSize()))
+				patientDevicesAssoc.setGarmentSize(userExtensionDTO.getVestGarmentSize());
+			if (Objects.nonNull(userExtensionDTO.getVestGarmentType()))
+				patientDevicesAssoc.setGarmentType(userExtensionDTO.getVestGarmentType());
+		}
+		if(Objects.nonNull(userExtensionDTO.getMonarchGarmentColor()) &&
+				Objects.nonNull(userExtensionDTO.getMonarchGarmentSize()) &&
+				Objects.nonNull(userExtensionDTO.getMonarchGarmentType())){
+			if (Objects.nonNull(userExtensionDTO.getMonarchGarmentColor()))
+				patientDevicesAssoc.setGarmentColor(userExtensionDTO.getMonarchGarmentColor());
+			if (Objects.nonNull(userExtensionDTO.getMonarchGarmentSize()))
+				patientDevicesAssoc.setGarmentSize(userExtensionDTO.getMonarchGarmentSize());
+			if (Objects.nonNull(userExtensionDTO.getMonarchGarmentType()))
+				patientDevicesAssoc.setGarmentType(userExtensionDTO.getMonarchGarmentType());
+		}
 	}
 
 	public UserPatientAssoc createUserPatientAssociation(UserExtension newUser,
@@ -851,6 +891,25 @@ public class UserService {
 			}
 			assignValuesToPatientInfoObj(userExtensionDTO, patient.get());
     		patientInfoRepository.save(patient.get());
+    		
+    		//Updating into Patient Device association
+    		List<PatientDevicesAssoc> updatePatientTypeList = patientDevicesAssocRepository.findByPatientId(patient.get().getId());
+			// Looping through the patient devices
+			for (PatientDevicesAssoc updatePatientType : updatePatientTypeList) {
+				if(updatePatientType.getDeviceType().equals("VEST")){
+					assignValuesToPatientDeviceAssocObj(userExtensionDTO, updatePatientType);
+					updatePatientType.setModifiedDate(new LocalDate());
+					patientDevicesAssocRepository.save(updatePatientType);
+					log.debug("Upadted Information for PatientDevice Association : {}", updatePatientType);
+				} else if(updatePatientType.getDeviceType().equals("MONARCH")){
+					assignValuesToPatientDeviceAssocObj(userExtensionDTO, updatePatientType);
+					updatePatientType.setModifiedDate(new LocalDate());
+					patientDevicesAssocRepository.save(updatePatientType);
+					log.debug("Upadted Information for PatientDevice Association : {}", updatePatientType);
+				}
+				
+			}
+			
     		assignValuesToUserObj(userExtensionDTO, user);
 			userExtensionRepository.save(user);
 			log.debug("Updated Information for Patient User: {}", user);
@@ -979,6 +1038,30 @@ public class UserService {
 			newUser.setGender(userExtensionDTO.getGender());
 		if(Objects.nonNull(userExtensionDTO.getHillromId()))
 			newUser.setHillromId(userExtensionDTO.getHillromId());
+		
+		// added garment details
+		
+		if(Objects.nonNull(userExtensionDTO.getVestGarmentColor()) &&
+				Objects.nonNull(userExtensionDTO.getVestGarmentSize()) &&
+				Objects.nonNull(userExtensionDTO.getVestGarmentType()) ){
+		
+			if (Objects.nonNull(userExtensionDTO.getVestGarmentColor()))
+				newUser.setVestGarmentColor(userExtensionDTO.getVestGarmentColor());
+			if (Objects.nonNull(userExtensionDTO.getVestGarmentSize()))
+				newUser.setVestGarmentSize(userExtensionDTO.getVestGarmentSize());
+			if (Objects.nonNull(userExtensionDTO.getVestGarmentType()))
+				newUser.setVestGarmentType(userExtensionDTO.getVestGarmentType());
+		}
+		if(Objects.nonNull(userExtensionDTO.getMonarchGarmentColor()) &&
+				Objects.nonNull(userExtensionDTO.getMonarchGarmentSize()) &&
+				Objects.nonNull(userExtensionDTO.getMonarchGarmentType()) ){
+			if (Objects.nonNull(userExtensionDTO.getMonarchGarmentColor()))
+				newUser.setMonarchGarmentColor(userExtensionDTO.getMonarchGarmentColor());
+			if (Objects.nonNull(userExtensionDTO.getMonarchGarmentSize()))
+				newUser.setMonarchGarmentSize(userExtensionDTO.getMonarchGarmentSize());
+			if (Objects.nonNull(userExtensionDTO.getMonarchGarmentType()))
+				newUser.setMonarchGarmentType(userExtensionDTO.getMonarchGarmentType());
+		}
 		newUser.setLangKey(userExtensionDTO.getLangKey());
 	}
 
@@ -1354,6 +1437,10 @@ public class UserService {
 		if(null == user)
 			return Optional.empty();
 		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
+		
+		// Repository call for patient device info 
+				List<PatientDevicesAssoc> patientDevicesAssocList = patientDevicesAssocRepository
+						.findByPatientId(patientInfo.getId());
 		if(null == patientInfo)
 			return Optional.empty();
 		String deviceType = patientVestDeviceService.getDeviceType(user);
@@ -1373,10 +1460,30 @@ public class UserService {
 		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patientInfo.getId());
 		
 		PatientUserVO patientUserVO;
-		if(Objects.nonNull(deviceType))
+		if(Objects.nonNull(deviceType)){
 			patientUserVO =  new PatientUserVO(user,patientInfo,deviceType);
-		else
+			// Looping through the patient devices
+			for (PatientDevicesAssoc device : patientDevicesAssocList) {
+				if (device.getDeviceType().equals("VEST")) {
+					patientUserVO.setVestGarmentColor(device.getGarmentColor());
+					patientUserVO.setVestGarmentSize(device.getGarmentSize());
+					patientUserVO.setVestGarmentType(device.getGarmentType());
+				} else if (device.getDeviceType().equals("MONARCH")) {
+					patientUserVO.setMonarchGarmentColor(device
+							.getGarmentColor());
+					patientUserVO
+							.setMonarchGarmentSize(device.getGarmentSize());
+					patientUserVO
+							.setMonarchGarmentType(device.getGarmentType());
+				}
+			}
+		}
+			
+		else{
 			patientUserVO =  new PatientUserVO(user,patientInfo);
+		}
+			
+			
 
 		if(Objects.nonNull(deviceType) && deviceType.equals(VEST)){
 			if(Objects.nonNull(compliance))

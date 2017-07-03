@@ -84,10 +84,44 @@ import java.util.Objects;
 	                            @StoredProcedureParameter(mode = ParameterMode.IN, name = "patient_id", type = String.class),
 	                            @StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_old_device_serial_number", type = String.class),
 	                            @StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_new_device_serial_number", type = String.class)
-	                              })							   
+	                              }),							   
 								   
-})
 
+
+@NamedStoredProcedureQuery(  
+	    name="managepatientuser",  
+	    procedureName="manage_patient_user",   
+	    parameters={          
+	        @StoredProcedureParameter(mode = ParameterMode.IN, name = "operation_type_indicator", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "hr_id", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_hub_id", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_bluetooth_id", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_device_serial_number", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_title", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_first_name", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_middle_name", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_last_name", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_dob", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_email", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_zipcode", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_primary_phone", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_mobile_phone", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_gender", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_lang_key", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_address", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_city", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_state", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_training_date", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_primary_diagnosis", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_garment_type", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_garment_size", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.IN, name = "pat_garment_color", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.OUT, name = "return_patient_id", type = String.class),
+			@StoredProcedureParameter(mode = ParameterMode.OUT, name = "return_user_id", type = String.class)
+	    }  
+	    )
+
+})
 public class Tims implements Serializable {
 	
 	   	@Id 

@@ -3,6 +3,8 @@ package com.hillrom.vest.repository;
 import static com.hillrom.vest.config.Constants.RELATION_LABEL_SELF;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 
+import java.sql.CallableStatement;
+import java.sql.Types;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -28,8 +30,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.hibernate.Session;
+import org.hibernate.internal.SessionImpl;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
+
 
 /**
  * Spring Data JPA repository for the Tims Patient & Patient User entity.
@@ -72,7 +77,48 @@ public class TimsUserRepository{
 			try{
 		
 				
+				
+						
+				java.sql.Connection connection = entityManager.unwrap(SessionImpl.class).connection();
+				
 
+
+				 
+				  CallableStatement callableStatement = connection.prepareCall("{call manage_patient_user(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+
+				  callableStatement.setString(1, operationTypeIndicator);//Parameter #1
+				  callableStatement.setString(2, inhillRomId);////Parameter #2
+				  callableStatement.setString(3, inPatientHubId);// //Parameter #3
+				  callableStatement.setString(4, inPatientBluetoothId);// //Parameter #3
+				  callableStatement.setString(5, inPatientDeviceSerialNumber);// //Parameter #3
+				  callableStatement.setString(6, inPatientTitle);// //Parameter #3
+				  callableStatement.setString(7, inPatientFirstName);// //Parameter #3
+				  callableStatement.setString(8, inPatientMiddleName);// //Parameter #3
+				  callableStatement.setString(9, inPatientLastName);// //Parameter #3
+				  callableStatement.setString(10, inPatientdob);// //Parameter #3
+				  callableStatement.setString(11, inPatientEmail);// //Parameter #3
+				  callableStatement.setString(12, inPatientZipCode);// //Parameter #3
+				  callableStatement.setString(13, inPatientPrimaryPhone);// //Parameter #3
+				  callableStatement.setString(14, inPatientMobilePhone);// //Parameter #3
+				  callableStatement.setString(15, inPatientGender);// //Parameter #3
+				  callableStatement.setString(16, inPatientlangKey);// //Parameter #3
+				  callableStatement.setString(17, inPatientAddress);// //Parameter #3
+				  callableStatement.setString(18, inPatientCity);// //Parameter #3
+				  callableStatement.setString(19, inPatientState);// //Parameter #3
+				  callableStatement.setString(20, inPatientTrainingDate);// //Parameter #3
+				  callableStatement.setString(21, inPatientPrimaryDiagnosis);// //Parameter #3
+				  callableStatement.setString(22, inPatientgarmentType);// //Parameter #3
+				  callableStatement.setString(23, inPatientGarmentSize);// //Parameter #3
+				  callableStatement.setString(24, inPatientGarmentColor);// //Parameter #3				  
+				  callableStatement.registerOutParameter(25, Types.VARCHAR); //Output # 1
+				  callableStatement.registerOutParameter(26, Types.VARCHAR); //Output # 2
+				  callableStatement.execute();
+
+				  String outPatientId = callableStatement.getString(25);
+				  String outPatientUser = callableStatement.getString(26);
+				
+				
+				/*
 				StoredProcedureQuery proc=  entityManager.createStoredProcedureQuery("manage_patient_user");
 				
 				proc.registerStoredProcedureParameter("operation_type_indicator",String.class, ParameterMode.IN);
@@ -136,8 +182,10 @@ public class TimsUserRepository{
 				
 				System.out.println("Value of patientId " +  outPatientId + "Value of user_id " + outPatientUser );
 
+				*/
 				returnValues.put("return_patient_id", outPatientId);
 				returnValues.put("return_user_id", outPatientUser);
+				
 			}
 			catch(Exception ex){
 				ex.printStackTrace();

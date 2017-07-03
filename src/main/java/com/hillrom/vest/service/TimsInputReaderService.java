@@ -21,7 +21,6 @@ import com.hillrom.vest.domain.Announcements;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.AnnouncementsPermissionRepository;
 import com.hillrom.vest.repository.AnnouncementsRepository;
-import com.hillrom.vest.repository.TimsRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.web.rest.dto.AnnouncementsDTO;
@@ -64,8 +63,6 @@ public class TimsInputReaderService {
 
 	private final Logger log = LoggerFactory.getLogger("com.hillrom.vest.tims");
 	
-	@Inject
-	private TimsRepository timsRepository;
 	
 	@Inject
 	private TimsService timsService;

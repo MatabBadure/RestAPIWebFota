@@ -22,7 +22,6 @@ import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 
 import com.hillrom.vest.domain.Announcements;
-import com.hillrom.vest.domain.Tims;
 import com.hillrom.vest.web.rest.dto.BenchMarkFilter;
 import com.hillrom.vest.web.rest.dto.BenchmarkResultVO;
 

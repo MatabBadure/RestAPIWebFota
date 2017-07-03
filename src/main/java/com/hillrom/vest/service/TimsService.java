@@ -31,7 +31,6 @@ import com.hillrom.vest.repository.AnnouncementsRepository;
 import com.hillrom.vest.repository.PatientDevicesAssocRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRepository;
-import com.hillrom.vest.repository.TimsRepository;
 import com.hillrom.vest.repository.TimsUserRepository;
 import com.hillrom.vest.repository.monarch.PatientMonarchDeviceRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
@@ -71,8 +70,6 @@ public class TimsService {
 
 	private final Logger log = LoggerFactory.getLogger("com.hillrom.vest.tims");
 	
-	@Inject
-	private TimsRepository timsRepository;
 	
 	@Inject
 	private TimsUserRepository timsUserRepository;

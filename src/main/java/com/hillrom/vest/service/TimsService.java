@@ -310,10 +310,19 @@ public class TimsService {
 			        p.waitFor();
 			        BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			        log.debug(" bufferreader : " + br);
+
 			        String output;
 			        while ((output = br.readLine()) != null) {
 			        	log.debug("output " + output);
 			        }
+			        
+			        int len;
+			        if ((len = p.getErrorStream().available()) > 0) {
+			          byte[] buf = new byte[len]; 
+			          p.getErrorStream().read(buf); 
+			          log.debug("Command error:\t\""+new String(buf)+"\""); 
+			        }
+			        
 			        p.destroy();
 		    	}catch(Exception ex){
 		    		ex.printStackTrace();

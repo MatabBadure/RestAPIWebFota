@@ -2,6 +2,7 @@ package com.hillrom.vest.service;
 
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
 import static com.hillrom.vest.config.Constants.VEST;
+import static com.hillrom.vest.config.Constants.MONARCH;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -75,7 +76,6 @@ import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.CareGiverVO;
-import com.hillrom.vest.web.rest.dto.GarmentDTO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
@@ -525,14 +525,14 @@ public class UserService {
 		
 		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
 		
-		assignValuesToPatientDeviceAssocObj(userExtensionDTO,
-				patientDevicesAssoc);
 		// Assigns Next Patient HillromId from Stored Procedure
 		patientInfo.setId(patientInfoId);
 		patientInfo = patientInfoRepository.save(patientInfo);
 		log.debug("Created Information for Patient : {}", patientInfo);
 		
 		///Insert Garament details in patient device ass info 
+		assignGarmentValuesToPatientDeviceAssocObj(userExtensionDTO,
+				patientDevicesAssoc);
 		patientDevicesAssoc.setPatientId(patientInfoId);
 		patientDevicesAssoc.setCreatedDate(new LocalDate());
 		patientDevicesAssoc.setHillromId(userExtensionDTO.getHillromId());
@@ -576,7 +576,7 @@ public class UserService {
 		return newUser;
 	}
 
-	private void assignValuesToPatientDeviceAssocObj(
+	private void assignGarmentValuesToPatientDeviceAssocObj(
 			UserExtensionDTO userExtensionDTO,
 			PatientDevicesAssoc patientDevicesAssoc) {
 		if(Objects.nonNull(userExtensionDTO.getVestGarmentColor()) &&
@@ -896,13 +896,13 @@ public class UserService {
     		List<PatientDevicesAssoc> updatePatientTypeList = patientDevicesAssocRepository.findByPatientId(patient.get().getId());
 			// Looping through the patient devices
 			for (PatientDevicesAssoc updatePatientType : updatePatientTypeList) {
-				if(updatePatientType.getDeviceType().equals("VEST")){
-					assignValuesToPatientDeviceAssocObj(userExtensionDTO, updatePatientType);
+				if(updatePatientType.getDeviceType().equals(VEST)){
+					assignGarmentValuesToPatientDeviceAssocObj(userExtensionDTO, updatePatientType);
 					updatePatientType.setModifiedDate(new LocalDate());
 					patientDevicesAssocRepository.save(updatePatientType);
 					log.debug("Upadted Information for PatientDevice Association : {}", updatePatientType);
-				} else if(updatePatientType.getDeviceType().equals("MONARCH")){
-					assignValuesToPatientDeviceAssocObj(userExtensionDTO, updatePatientType);
+				} else if(updatePatientType.getDeviceType().equals(MONARCH)){
+					assignGarmentValuesToPatientDeviceAssocObj(userExtensionDTO, updatePatientType);
 					updatePatientType.setModifiedDate(new LocalDate());
 					patientDevicesAssocRepository.save(updatePatientType);
 					log.debug("Upadted Information for PatientDevice Association : {}", updatePatientType);
@@ -1040,7 +1040,6 @@ public class UserService {
 			newUser.setHillromId(userExtensionDTO.getHillromId());
 		
 		// added garment details
-		
 		if(Objects.nonNull(userExtensionDTO.getVestGarmentColor()) &&
 				Objects.nonNull(userExtensionDTO.getVestGarmentSize()) &&
 				Objects.nonNull(userExtensionDTO.getVestGarmentType()) ){
@@ -1464,11 +1463,11 @@ public class UserService {
 			patientUserVO =  new PatientUserVO(user,patientInfo,deviceType);
 			// Looping through the patient devices
 			for (PatientDevicesAssoc device : patientDevicesAssocList) {
-				if (device.getDeviceType().equals("VEST")) {
+				if (device.getDeviceType().equals(VEST)) {
 					patientUserVO.setVestGarmentColor(device.getGarmentColor());
 					patientUserVO.setVestGarmentSize(device.getGarmentSize());
 					patientUserVO.setVestGarmentType(device.getGarmentType());
-				} else if (device.getDeviceType().equals("MONARCH")) {
+				} else if (device.getDeviceType().equals(MONARCH)) {
 					patientUserVO.setMonarchGarmentColor(device
 							.getGarmentColor());
 					patientUserVO

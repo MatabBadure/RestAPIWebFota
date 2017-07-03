@@ -309,9 +309,10 @@ public class TimsService {
 			        log.debug(" process : " + p);
 			        p.waitFor();
 			        BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			        log.debug(" bufferreader : " + br);
 			        String output;
 			        while ((output = br.readLine()) != null) {
-			        	log.debug(output);
+			        	log.debug("output " + output);
 			        }
 			        p.destroy();
 		    	}catch(Exception ex){

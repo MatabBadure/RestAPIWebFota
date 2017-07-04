@@ -468,7 +468,7 @@ public class TimsService {
 
 	public boolean isOwnerExistsForCurrentSerialNumberVest(String serialNumber){
 		
-		if(!patientVestDeviceRepository.findOneBySerialNumberAndStatusActive(serialNumber).isEmpty()) 
+		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").isPresent()) 
 				return true;
 		
 		return false;
@@ -476,7 +476,7 @@ public class TimsService {
 	
 	public boolean isOwnerExistsForCurrentSerialNumberMonarch(String serialNumber){
 		
-		if(!patientMonarchDeviceRepository.findOneBySerialNumberAndStatusActive(serialNumber).isEmpty()) 
+		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").isPresent()) 
 				return true;
 		
 		return false;

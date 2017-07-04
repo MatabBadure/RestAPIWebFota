@@ -142,10 +142,10 @@ public class TimsInputReaderService {
 	               
 	               PatientInfoDTO patientInfoDTO = new PatientInfoDTO();
 		            String record = "";
-		            for(int i=0;i<18;i++){
+		            for(int i=0;i<27;i++){
 		            	try{
 		            		data[i] = Objects.nonNull(data[i]) ? data[i] : "";
-		            		record = i==17?record + data[i]:record + data[i]+",";
+		            		record = i==26?record + data[i]:record + data[i]+",";
 		            	}catch(ArrayIndexOutOfBoundsException ex){
 
 		            	}
@@ -169,32 +169,41 @@ public class TimsInputReaderService {
 			            patientInfoDTO.setSerial_num(data[2]);
 			            patientInfoDTO.setShip_dt(data[3].equalsIgnoreCase("")? null: LocalDate.parse(data[3],dobFormat));
 			            patientInfoDTO.setHub_id(data[4]);
-			            patientInfoDTO.setGarment_cd(data[5]);
-			            patientInfoDTO.setGarment_type(data[6]);
-			            patientInfoDTO.setGarment_size(data[7]);
-			            patientInfoDTO.setGarment_color(data[8]);
-			            patientInfoDTO.setFirst_nm(data[9]);
-			            patientInfoDTO.setLast_nm(data[10]);
-			            patientInfoDTO.setZip_cd(data[11]);
-			            patientInfoDTO.setTrain_dt(data[12].equalsIgnoreCase("")? null: LocalDate.parse(data[12],dobFormat));
-			            patientInfoDTO.setDob(data[13].equalsIgnoreCase("")? null: LocalDate.parse(data[13],dobFormat));
-			            if(data.length >= 15){
-			            	patientInfoDTO.setDx1(data[14]);
+			            patientInfoDTO.setBluetooth_id(data[5]);
+			            patientInfoDTO.setGarment_cd(data[6]);
+			            patientInfoDTO.setGarment_type(data[7]);
+			            patientInfoDTO.setGarment_size(data[8]);
+			            patientInfoDTO.setGarment_color(data[9]);
+			            patientInfoDTO.setTitle(data[10]);
+			            patientInfoDTO.setFirst_nm(data[11]);
+			            patientInfoDTO.setMiddle_nm(data[12]);
+			            patientInfoDTO.setLast_nm(data[13]);
+			            patientInfoDTO.setEmail(data[14]);
+			            patientInfoDTO.setAddress(data[15]);
+			            patientInfoDTO.setZip_cd(data[16]);
+			            patientInfoDTO.setPrimary_phone(data[17]);
+			            patientInfoDTO.setMobile_phone(data[18]);
+			            patientInfoDTO.setTrain_dt(data[19].equalsIgnoreCase("")? null: LocalDate.parse(data[19],dobFormat));
+			            patientInfoDTO.setDob(data[20].equalsIgnoreCase("")? null: LocalDate.parse(data[20],dobFormat));
+			            patientInfoDTO.setGender(data[21]);
+			            patientInfoDTO.setLang_key(data[22]);
+			            if(data.length >= 24){
+			            	patientInfoDTO.setDx1(data[23]);
 			            }else{
 			            	patientInfoDTO.setDx1(null);
 			            }
-			            if(data.length >= 16){
-			            	patientInfoDTO.setDx2(data[15]);
+			            if(data.length >= 25){
+			            	patientInfoDTO.setDx2(data[24]);
 			            }else{
 			            	patientInfoDTO.setDx2(null);
 			            }
-			            if(data.length >= 17){
-			            	patientInfoDTO.setDx3(data[16]);
+			            if(data.length >= 26){
+			            	patientInfoDTO.setDx3(data[25]);
 			            }else{
 			            	patientInfoDTO.setDx3(null);
 			            }
-			            if(data.length >= 18){
-			            	patientInfoDTO.setDx4(data[17]);
+			            if(data.length >= 27){
+			            	patientInfoDTO.setDx4(data[26]);
 			            }else{
 			            	patientInfoDTO.setDx4(null);
 			            }

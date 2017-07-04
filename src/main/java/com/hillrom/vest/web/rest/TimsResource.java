@@ -69,7 +69,28 @@ public class TimsResource {
 	private TimsUserRepository timsUserRepository;
 	
 	
+
+	/**
+     * GET  /listLogDirectory
+     */
+	@RequestMapping(value="/listLogDirectory", method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> listLogDirectory(){
+
+		JSONObject jsonObject = new JSONObject();
+
+		try{
+				
+				
+			timsService.listLogDirectory("/usr/tomcat/apache-tomcat-8.0.28/TIMS/logs");
+			  jsonObject.put("timsMsg", "Record in protocol data temp table created successfully");
+			  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			
+		}catch(Exception ex){
+			jsonObject.put("ERROR", ex.getMessage());
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}		
 		
+	}
+	
 	/**
      * POST  /insertIntoProtocolDataTempTable
      */

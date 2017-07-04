@@ -50,8 +50,12 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -287,6 +291,68 @@ public class TimsService {
 		  }
 	  return content;
 		
+    }
+	
+	public void listLogDirectory(String logfilePath) throws HillromException {
+		
+		File folder = new File(logfilePath);
+		File[] listOfFiles = folder.listFiles();
+		String matchStr = "doing nothing";
+
+		for (File file : listOfFiles) {
+		    if (file.isFile()) {
+		    	try {
+			    	log.debug(file.getName());
+			    	
+			        //String command = "grep -o \"doing nothing\" " + file.getName() + "  | wc -l";
+
+			    	final ProcessBuilder builder = new ProcessBuilder();
+			    	builder.command("grep", matchStr, file.getName());
+
+			    	// redirect stderr to stdout
+			    	builder.redirectErrorStream(true);
+
+			    	final Process process = builder.start();
+
+			    	BufferedReader br = new BufferedReader(
+			    	    new InputStreamReader(process.getInputStream()));
+			    	String output = null;
+			    	while ((output = br.readLine()) != null) {
+			    		log.debug("output " + output);
+			    	}
+
+			    	process.waitFor();
+			    	
+			    	/*
+			        log.debug(command);
+			        Process p = Runtime.getRuntime().exec(command);
+			        log.debug(" process : " + p);
+			        p.waitFor();
+			        BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			        log.debug(" bufferreader : " + br);
+
+			        String output;
+			        while ((output = br.readLine()) != null) {
+			        	log.debug("output " + output);
+			        }
+			        
+			        int len;
+			        if ((len = p.getErrorStream().available()) > 0) {
+			          byte[] buf = new byte[len]; 
+			          p.getErrorStream().read(buf); 
+			          log.debug("Command error:\t\""+new String(buf)+"\""); 
+			        }
+			        
+			        p.destroy();*/
+			    	
+		    	}catch(Exception ex){
+		    		ex.printStackTrace();
+		    	}
+		    }
+		}
+		
+
+
     }
 	
 

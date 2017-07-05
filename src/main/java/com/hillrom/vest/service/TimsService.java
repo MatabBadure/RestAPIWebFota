@@ -366,40 +366,51 @@ public class TimsService {
 	public boolean isSerialNoExistInPatientdeviceAssocVest(String serialNumber){
 		
 		
-		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").isPresent())
+		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").isPresent()){
+			log.debug("Checking isSerialNoExistInPatientdeviceAssocVest ");
 			return true;
+		}
+			
 		
 		return false;
 	}
 	
 	public boolean isSerialNoExistInPatientdeviceAssocMonarch(String serialNumber){
 		
-		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").isPresent())
+		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").isPresent()){
+			log.debug("Checking isSerialNoExistInPatientdeviceAssocMonarch ");
 			return true;
+		}
 		
 		return false;
 	}
 	
 	public boolean isHillromIdExistInPatientInfo(String hillromId){
 		
-		if(patientInfoService.findOneByHillromId(hillromId).isPresent())
+		if(patientInfoService.findOneByHillromId(hillromId).isPresent()){
+			log.debug("Checking isHillromIdExistInPatientInfo ");
 				return true;
+		}
 		
 		return false;
 	}
 	
 	public boolean isHillromIdExistInPatientDeviceAssocVest(String hillromId){
 		
-		if(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"VEST").isPresent())
+		if(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"VEST").isPresent()){
+				log.debug("Checking isHillromIdExistInPatientDeviceAssocVest ");
 				return true;
+		}
 		
 		return false;
 	}
 	
 	public boolean isHillromIdExistInPatientDeviceAssocMonarch(String hillromId){
 		
-		if(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"MONARCH").isPresent())
+		if(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"MONARCH").isPresent()){
+				log.debug("Checking isHillromIdExistInPatientDeviceAssocMonarch ");
 				return true;
+		}
 		
 		return false;
 	}
@@ -407,8 +418,10 @@ public class TimsService {
 	public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 		
 		if((patientDevicesAssocRepository.findByHillromId(hillromId).isPresent()) 
-			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("VEST")))
+			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("VEST"))){
+				log.debug("Checking isHillromIdHasVestDeviceInPatientDeviceAssoc ");
 				return true;
+		}
 		
 		return false;
 	}
@@ -416,8 +429,10 @@ public class TimsService {
 	public boolean isHillromIdHasMonarchDeviceInPatientDeviceAssoc(String hillromId){
 		
 		if((patientDevicesAssocRepository.findByHillromId(hillromId).isPresent()) 
-			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("MONARCH")))
+			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("MONARCH"))){
+				log.debug("Checking isHillromIdHasMonarchDeviceInPatientDeviceAssoc ");
 				return true;
+		}
 		
 		return false;
 	}
@@ -425,63 +440,79 @@ public class TimsService {
 
 	public boolean isCurrentSerialNumberOwnedByShellVest(String serialNumber){
 		
-		if((patientInfoRepository.findOneBySerialNumber(serialNumber).get().getFirstName().equalsIgnoreCase("Hill-Rom")) && (patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").isPresent()) ) 
-				return true;
+		if((patientInfoRepository.findOneBySerialNumber(serialNumber).get().getFirstName().equalsIgnoreCase("Hill-Rom")) && (patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").isPresent()) ) {
+			log.debug("Checking isCurrentSerialNumberOwnedByShellVest ");	
+			return true;
+		}
 		
 		return false;
 	}
 	
 	public boolean isCurrentSerialNumberOwnedByShellMonarch(String serialNumber){
 		
-		if((patientInfoRepository.findOneBySerialNumber(serialNumber).get().getFirstName().equalsIgnoreCase("Hill-Rom")) && (patientInfoRepository.findOneBySerialNumber(serialNumber).get().getLastName().equalsIgnoreCase("Monarch")) && (patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").isPresent()) ) 
-				return true;
+		if((patientInfoRepository.findOneBySerialNumber(serialNumber).get().getFirstName().equalsIgnoreCase("Hill-Rom")) && (patientInfoRepository.findOneBySerialNumber(serialNumber).get().getLastName().equalsIgnoreCase("Monarch")) && (patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").isPresent()) ){ 
+			log.debug("Checking isCurrentSerialNumberOwnedByShellMonarch ");	
+			return true;
+		}
 		
 		return false;
 	}
 	
 	public boolean isCurrentSerialNumberOwnedByDifferentPatientVest(String serialNumber,String hillromId){
 		
-		if(!patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").get().getHillromId().equalsIgnoreCase(hillromId)) 
+		if(!patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").get().getHillromId().equalsIgnoreCase(hillromId)) {
+				log.debug("Checking isCurrentSerialNumberOwnedByDifferentPatientVest ");
 				return true;
+		}
 		
 		return false;
 	}
 	
 	public boolean isCurrentSerialNumberOwnedByDifferentPatientMonarch(String serialNumber,String hillromId){
 		
-		if(!patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").get().getHillromId().equalsIgnoreCase(hillromId)) 
-				return true;
+		if(!patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").get().getHillromId().equalsIgnoreCase(hillromId)){ 
+			log.debug("Checking isCurrentSerialNumberOwnedByDifferentPatientMonarch ");	
+			return true;
+		}
 		
 		return false;
 	}
 
 	public boolean isCurrentSerialNumberOwnedByCurrentHillromIdVest(String serialNumber,String hillromId){
 		
-		if(patientDevicesAssocRepository.findOneBySerialNumberAndHillromIdAndDeviceType(serialNumber,hillromId,"VEST").isPresent()) 
+		if(patientDevicesAssocRepository.findOneBySerialNumberAndHillromIdAndDeviceType(serialNumber,hillromId,"VEST").isPresent()){
+				log.debug("Checking isCurrentSerialNumberOwnedByCurrentHillromIdVest ");
 				return true;		
+		}
 		return false;
 	}
 	
 	public boolean isCurrentSerialNumberOwnedByCurrentHillromIdMonarch(String serialNumber,String hillromId){
 		
-		if(patientDevicesAssocRepository.findOneBySerialNumberAndHillromIdAndDeviceType(serialNumber,hillromId,"MONARCH").isPresent()) 
+		if(patientDevicesAssocRepository.findOneBySerialNumberAndHillromIdAndDeviceType(serialNumber,hillromId,"MONARCH").isPresent()) {
+			log.debug("Checking isCurrentSerialNumberOwnedByCurrentHillromIdMonarch ");
 			return true;	
+		}
 
 		return false;
 	}
 
 	public boolean isOwnerExistsForCurrentSerialNumberVest(String serialNumber){
 		
-		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").isPresent()) 
+		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").isPresent()) {
+				log.debug("Checking isOwnerExistsForCurrentSerialNumberVest ");
 				return true;
+		}
 		
 		return false;
 	}
 	
 	public boolean isOwnerExistsForCurrentSerialNumberMonarch(String serialNumber){
 		
-		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").isPresent()) 
+		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").isPresent()){ 
+				log.debug("Checking isOwnerExistsForCurrentSerialNumberMonarch ");
 				return true;
+		}
 		
 		return false;
 	}

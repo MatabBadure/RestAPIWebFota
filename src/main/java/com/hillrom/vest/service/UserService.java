@@ -537,8 +537,7 @@ public class UserService {
 		patientDevicesAssoc.setCreatedDate(new LocalDate());
 		patientDevicesAssoc.setHillromId(userExtensionDTO.getHillromId());
 		patientDevicesAssoc.setIsActive(true);
-		if (Objects.nonNull(userExtensionDTO.getDeviceType()))
-			patientDevicesAssoc.setDeviceType(userExtensionDTO.getDeviceType());
+		patientDevicesAssoc.setDeviceType(VEST);
 		patientDevicesAssoc = patientDevicesAssocRepository
 				.save(patientDevicesAssoc);
 		log.debug("Created Information for PatientDevice Association : {}",

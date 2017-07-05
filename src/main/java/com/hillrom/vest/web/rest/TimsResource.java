@@ -55,6 +55,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import static com.hillrom.vest.config.Constants.LOG_DIRECTORY;
+import static com.hillrom.vest.config.Constants.MATCH_STRING;
 
 
 @RestController
@@ -81,18 +83,7 @@ public class TimsResource {
 		JSONObject jsonObject = new JSONObject();
 		try{
 			
-			
-			List<String> returnVal = timsService.listLogDirectory("/usr/tomcat/apache-tomcat-8.0.28/TIMS/logs");
-			System.out.println("Start of the returnVal-->\n");
-            System.out.println(returnVal);
-            System.out.println("End of the returnVal");
-			/*List<String> returnVal = new LinkedList<>();
-			returnVal.add("asdfasdf.log,Success,2017-07-05");
-			returnVal.add("asdfasdf1.log,Success,2017-06-05");
-			returnVal.add("asdfasdf2.log,Failure,2017-07-03");
-			returnVal.add("asdfasdf3.log,Success,2017-07-02");
-			returnVal.add("asdfasdf4.log,Failure,2017-03-02");
-			returnVal.add("asdfasdf5.log,Success,2017-01-01");*/
+			List<String> returnVal = timsService.listLogDirectory(LOG_DIRECTORY, MATCH_STRING);
 			
 			List<Object> valueObj = new LinkedList<>();
             for(String grepValue : returnVal){
@@ -103,13 +94,9 @@ public class TimsResource {
                     hmap.put("lastMod",grepVal[2]);
                     valueObj.add(hmap);
             }
-            System.out.println("Start of the output-->");
-            System.out.println(valueObj);
-            System.out.println("<--End of of the output");
-              jsonObject.put("fileDtls", valueObj);
-			  jsonObject.put("timsMsg", "Record in protocol data temp table created successfully");
-			  System.out.println(jsonObject);
-			  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
+		  jsonObject.put("fileDtls", valueObj);
+		  jsonObject.put("timsMsg", "Record in protocol data temp table created successfully");		  
+		  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
 		}catch(Exception ex){
 			jsonObject.put("ERROR", ex.getMessage());
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

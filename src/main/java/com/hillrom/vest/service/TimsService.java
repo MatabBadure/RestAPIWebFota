@@ -295,11 +295,10 @@ public class TimsService {
 		
     }
 	
-	public List<String> listLogDirectory(String logfilePath) throws HillromException {
+	public List<String> listLogDirectory(String logfilePath, String matchStr) throws HillromException {
 		
 		File folder = new File(logfilePath);
 		File[] listOfFiles = folder.listFiles();
-		String matchStr = "doing nothing";
 		
 		List<String> returnLogFiles = new LinkedList<>();
 		
@@ -307,60 +306,16 @@ public class TimsService {
 		    if (file.isFile()) {
 		    	try {
 			    	log.debug(file.getName());
-			    	
-			        //String command = "grep -o \"doing nothing\" " + file.getName() + "  | wc -l";
 
-			    	/*final ProcessBuilder builder = new ProcessBuilder();
-			    	builder.command("grep", matchStr, file.getName());
-
-			    	// redirect stderr to stdout
-			    	builder.redirectErrorStream(true);
-
-			    	final Process process = builder.start();
-
-			    	BufferedReader br = new BufferedReader(
-			    	    new InputStreamReader(process.getInputStream()));
-			    	String output = null;
-			    	while ((output = br.readLine()) != null) {
-			    		log.debug("output " + output);
-			    	}
-
-			    	process.waitFor();*/
-			    	                
 	                Runtime rt = Runtime.getRuntime();
-	                //String[] cmd = { "/bin/sh", "-c", "grep -c '"+matchStr+"' '/root/testFolder/testing/"+file.getName()+"' " };
-	                String[] cmd = { "/bin/sh", "-c", "grep -c '"+matchStr+"' '"+logfilePath+"/"+file.getName()+"' " };
+	                String[] cmd = { "/bin/sh", "-c", "grep -c '"+matchStr+"' '"+logfilePath+file.getName()+"' " };
 	                Process proc = rt.exec(cmd);
 	                BufferedReader is = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 	                String line;
 	                Date lastModifiedDate = new Date(file.lastModified());
 	                while ((line = is.readLine()) != null) {
 	                    returnLogFiles.add(file.getName()+","+(Integer.parseInt(line)>0?"Success":"Failure")+","+lastModifiedDate);
-	                    System.out.println(file.getName()+" has the success of :"+line);
-	                }
-			    	
-			    	return returnLogFiles;
-			    	/*
-			        log.debug(command);
-			        Process p = Runtime.getRuntime().exec(command);
-			        log.debug(" process : " + p);
-			        p.waitFor();
-			        BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			        log.debug(" bufferreader : " + br);
-
-			        String output;
-			        while ((output = br.readLine()) != null) {
-			        	log.debug("output " + output);
-			        }
-			        
-			        int len;
-			        if ((len = p.getErrorStream().available()) > 0) {
-			          byte[] buf = new byte[len]; 
-			          p.getErrorStream().read(buf); 
-			          log.debug("Command error:\t\""+new String(buf)+"\""); 
-			        }
-			        
-			        p.destroy();*/
+	                }			    	
 			    	
 		    	}catch(Exception ex){
 		    		ex.printStackTrace();

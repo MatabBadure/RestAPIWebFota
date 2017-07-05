@@ -1,7 +1,9 @@
 package com.hillrom.vest.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -293,12 +295,14 @@ public class TimsService {
 		
     }
 	
-	public void listLogDirectory(String logfilePath) throws HillromException {
+	public List<String> listLogDirectory(String logfilePath) throws HillromException {
 		
 		File folder = new File(logfilePath);
 		File[] listOfFiles = folder.listFiles();
 		String matchStr = "doing nothing";
-
+		
+		List<String> returnLogFiles = new LinkedList<>();
+		
 		for (File file : listOfFiles) {
 		    if (file.isFile()) {
 		    	try {
@@ -306,7 +310,7 @@ public class TimsService {
 			    	
 			        //String command = "grep -o \"doing nothing\" " + file.getName() + "  | wc -l";
 
-			    	final ProcessBuilder builder = new ProcessBuilder();
+			    	/*final ProcessBuilder builder = new ProcessBuilder();
 			    	builder.command("grep", matchStr, file.getName());
 
 			    	// redirect stderr to stdout
@@ -321,8 +325,21 @@ public class TimsService {
 			    		log.debug("output " + output);
 			    	}
 
-			    	process.waitFor();
+			    	process.waitFor();*/
+			    	                
+	                Runtime rt = Runtime.getRuntime();
+	                //String[] cmd = { "/bin/sh", "-c", "grep -c '"+matchStr+"' '/root/testFolder/testing/"+file.getName()+"' " };
+	                String[] cmd = { "/bin/sh", "-c", "grep -c '"+matchStr+"' '"+logfilePath+"/"+file.getName()+"' " };
+	                Process proc = rt.exec(cmd);
+	                BufferedReader is = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+	                String line;
+	                Date lastModifiedDate = new Date(file.lastModified());
+	                while ((line = is.readLine()) != null) {
+	                    returnLogFiles.add(file.getName()+","+(Integer.parseInt(line)>0?"Success":"Failure")+","+lastModifiedDate);
+	                    System.out.println(file.getName()+" has the success of :"+line);
+	                }
 			    	
+			    	return returnLogFiles;
 			    	/*
 			        log.debug(command);
 			        Process p = Runtime.getRuntime().exec(command);
@@ -351,7 +368,7 @@ public class TimsService {
 		    }
 		}
 		
-
+		return returnLogFiles;
 
     }
 	

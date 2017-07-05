@@ -144,6 +144,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             //hill-1845
             .antMatchers("/api/survey/{id}/graph").authenticated()      
             .antMatchers("/api/retrieveLogData/logs").permitAll()
+            .antMatchers("/api/executeTIMSJob").hasAuthority(AuthoritiesConstants.ADMIN)
         .and()
             .apply(securityConfigurerAdapter());
 

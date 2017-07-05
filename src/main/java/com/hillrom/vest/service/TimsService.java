@@ -293,12 +293,12 @@ public class TimsService {
 		
     }
 	
-	public void listLogDirectory(String logfilePath) throws HillromException {
+	public List<String> listLogDirectory(String logfilePath) throws HillromException {
 		
 		File folder = new File(logfilePath);
 		File[] listOfFiles = folder.listFiles();
 		String matchStr = "doing nothing";
-
+		List<String> returnLogFiles = null;
 		for (File file : listOfFiles) {
 		    if (file.isFile()) {
 		    	try {
@@ -306,7 +306,7 @@ public class TimsService {
 			    	
 			        //String command = "grep -o \"doing nothing\" " + file.getName() + "  | wc -l";
 
-			    	final ProcessBuilder builder = new ProcessBuilder();
+			    	/*final ProcessBuilder builder = new ProcessBuilder();
 			    	builder.command("grep", matchStr, file.getName());
 
 			    	// redirect stderr to stdout
@@ -321,8 +321,19 @@ public class TimsService {
 			    		log.debug("output " + output);
 			    	}
 
-			    	process.waitFor();
+			    	process.waitFor();*/
 			    	
+			    	Runtime rt = Runtime.getRuntime();
+                    String[] cmd = { "/bin/sh", "-c", "grep -c '"+matchStr+"' '"+logfilePath+"/"+file.getName()+"' " };
+                    Process proc = rt.exec(cmd);
+                    BufferedReader is = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+                    String line;
+                    while ((line = is.readLine()) != null) {
+                    	returnLogFiles.add(file.getName()+","+line); 
+                        System.out.println(file.getName()+" has the "+matchStr+" of :"+line+" times");
+                    }
+			    	
+                    return returnLogFiles;
 			    	/*
 			        log.debug(command);
 			        Process p = Runtime.getRuntime().exec(command);
@@ -351,7 +362,7 @@ public class TimsService {
 		    }
 		}
 		
-
+		return returnLogFiles;
 
     }
 	

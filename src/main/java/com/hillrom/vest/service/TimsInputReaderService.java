@@ -73,13 +73,13 @@ public class TimsInputReaderService {
 	public void ExecuteTIMSJob() 
 	{
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
-		
+		log.debug("Starting to process records ");
 		for (Map.Entry<Integer, PatientInfoDTO> entry : fileRecords.entrySet()) {
 		    Integer position = entry.getKey();
 		    PatientInfoDTO record = entry.getValue();
-		    
+		    log.debug("Processing record position : "+position);
 		    if(record.getDevice_type().equalsIgnoreCase("VEST")){
-		    	
+		    	log.debug("Inside VEST loop ");
 		    	timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record);
 		    	timsService.CASE2_PatientExistsWithNODevice_VEST(record);
 		    	timsService.CASE3_PatientHasMonarchAddVisivest_VEST(record);
@@ -95,6 +95,7 @@ public class TimsInputReaderService {
 		    }
 
 		    if(record.getDevice_type().equalsIgnoreCase("MONARCH")){
+		    	log.debug("Inside MONARCH loop ");
 		    	timsService.CASE1_NeitherPatientNorDeviceExist_MONARCH(record);
 		    	timsService.CASE2_PatientExistsWithNODevice_MONARCH(record);
 		    	timsService.CASE3_PatientHasVisivestAddMonarch_MONARCH(record);

@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List; 
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 
@@ -77,18 +79,25 @@ public class TimsResource {
 	public ResponseEntity<?> listLogDirectory(){
 
 		JSONObject jsonObject = new JSONObject();
-
 		try{
-				
-				
-			timsService.listLogDirectory("/usr/tomcat/apache-tomcat-8.0.28/TIMS/logs");
+			List<String> returnVal = timsService.listLogDirectory("/usr/tomcat/apache-tomcat-8.0.28/TIMS/logs");
+
+			List<Object> valueObj = new LinkedList<>();
+            for(String grepValue : returnVal){
+                HashMap<String, String> hmap = new HashMap<String, String>();
+                    String[] grepVal = grepValue.split(",");
+                    hmap.put("fileName",grepVal[0]);
+                    hmap.put("numOfReturnVal",grepVal[1]);
+                    hmap.put("lastModified",grepVal[2]);
+                    valueObj.add(hmap);
+            }
+              jsonObject.put("fileDtls", valueObj);
 			  jsonObject.put("timsMsg", "Record in protocol data temp table created successfully");
-			  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			
+			  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
 		}catch(Exception ex){
 			jsonObject.put("ERROR", ex.getMessage());
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}		
-		
 	}
 	
 	/**

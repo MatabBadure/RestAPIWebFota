@@ -423,29 +423,33 @@ public class TimsService {
 	}
 	
 
-	public boolean isCurrentSerialNumberOwnedByShell(String serialNumber){
+	public boolean isCurrentSerialNumberOwnedByShellVest(String serialNumber){
 		
-		if((patientInfoRepository.findOneBySerialNumber(serialNumber).isPresent()) && (patientInfoRepository.findOneBySerialNumber(serialNumber).get().getFirstName().equalsIgnoreCase("Hill-Rom"))) 
+		if((patientInfoRepository.findOneBySerialNumber(serialNumber).get().getFirstName().equalsIgnoreCase("Hill-Rom")) && (patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").isPresent()) ) 
 				return true;
 		
 		return false;
 	}
 	
-	public boolean isCurrentSerialNumberOwnedByDifferentPatientVest(String serialNumber){
+	public boolean isCurrentSerialNumberOwnedByShellMonarch(String serialNumber){
 		
-		if((!patientVestDeviceRepository.findBySerialNumber(serialNumber).isEmpty()) && 
-				(!patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").get().getPatientId().equalsIgnoreCase
-						(patientVestDeviceRepository.findOneBySerialNumberAndStatusActive(serialNumber).get(0).getPatient().getId()))) 
+		if((patientInfoRepository.findOneBySerialNumber(serialNumber).get().getFirstName().equalsIgnoreCase("Hill-Rom")) && (patientInfoRepository.findOneBySerialNumber(serialNumber).get().getLastName().equalsIgnoreCase("Monarch")) && (patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").isPresent()) ) 
 				return true;
 		
 		return false;
 	}
 	
-	public boolean isCurrentSerialNumberOwnedByDifferentPatientMonarch(String serialNumber){
+	public boolean isCurrentSerialNumberOwnedByDifferentPatientVest(String serialNumber,String hillromId){
 		
-		if((!patientMonarchDeviceRepository.findBySerialNumber(serialNumber).isEmpty()) && 
-				(!patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").get().getPatientId().equalsIgnoreCase
-						(patientMonarchDeviceRepository.findOneBySerialNumberAndStatusActive(serialNumber).get(0).getPatient().getId()))) 
+		if(!patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").get().getHillromId().equalsIgnoreCase(hillromId)) 
+				return true;
+		
+		return false;
+	}
+	
+	public boolean isCurrentSerialNumberOwnedByDifferentPatientMonarch(String serialNumber,String hillromId){
+		
+		if(!patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").get().getHillromId().equalsIgnoreCase(hillromId)) 
 				return true;
 		
 		return false;
@@ -453,14 +457,14 @@ public class TimsService {
 
 	public boolean isCurrentSerialNumberOwnedByCurrentHillromIdVest(String serialNumber,String hillromId){
 		
-		if(patientDevicesAssocRepository.findOneBySerialNumberAndHillromIdAndDeviceType(serialNumber,hillromId,"VEST").get().getHillromId().equalsIgnoreCase(hillromId)) 
+		if(patientDevicesAssocRepository.findOneBySerialNumberAndHillromIdAndDeviceType(serialNumber,hillromId,"VEST").isPresent()) 
 				return true;		
 		return false;
 	}
 	
 	public boolean isCurrentSerialNumberOwnedByCurrentHillromIdMonarch(String serialNumber,String hillromId){
 		
-		if(patientDevicesAssocRepository.findOneBySerialNumberAndHillromIdAndDeviceType(serialNumber,hillromId,"MONARCH").get().getHillromId().equalsIgnoreCase(hillromId)) 
+		if(patientDevicesAssocRepository.findOneBySerialNumberAndHillromIdAndDeviceType(serialNumber,hillromId,"MONARCH").isPresent()) 
 			return true;	
 
 		return false;
@@ -616,7 +620,7 @@ public class TimsService {
 
 	public boolean CASE5_DeviceOwnedByShell_VEST(PatientInfoDTO patientInfoDTO){
 		if((isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
-				&& isCurrentSerialNumberOwnedByShell(patientInfoDTO.getSerial_num()) ){
+				&& isCurrentSerialNumberOwnedByShellVest(patientInfoDTO.getSerial_num()) ){
 			
 
 			//managePatientUser(UPDATE)
@@ -647,8 +651,8 @@ public class TimsService {
 	
 	public boolean CASE6_DeviceOwnedByDifferentPatient_VEST(PatientInfoDTO patientInfoDTO){
 		if((isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
-				&& (!isCurrentSerialNumberOwnedByShell(patientInfoDTO.getSerial_num())) 
-				&& (isCurrentSerialNumberOwnedByDifferentPatientVest(patientInfoDTO.getSerial_num() )) ){
+				&& (!isCurrentSerialNumberOwnedByShellVest(patientInfoDTO.getSerial_num())) 
+				&& (isCurrentSerialNumberOwnedByDifferentPatientVest(patientInfoDTO.getSerial_num(), patientInfoDTO.getTims_cust())) ){
 			
 			//managaPatientDevice(INACTIVATE)
 			//managePatientUser(CREATE)
@@ -680,8 +684,8 @@ public class TimsService {
 	
 	public boolean CASE7_DeviceIsOrphanPatientDoesNotExist_VEST(PatientInfoDTO patientInfoDTO){
 		if((isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
-				&& (!isCurrentSerialNumberOwnedByShell(patientInfoDTO.getSerial_num())) 
-				&& (!isCurrentSerialNumberOwnedByDifferentPatientVest(patientInfoDTO.getSerial_num() )) ){
+				&& (!isCurrentSerialNumberOwnedByShellVest(patientInfoDTO.getSerial_num())) 
+				&& (!isCurrentSerialNumberOwnedByDifferentPatientVest(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust() )) ){
 
 			
 			//managePatientUser(CREATE)
@@ -1014,7 +1018,7 @@ public class TimsService {
 
 	public boolean CASE5_DeviceOwnedByShell_MONARCH(PatientInfoDTO patientInfoDTO){
 		if((isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
-				&& isCurrentSerialNumberOwnedByShell(patientInfoDTO.getSerial_num()) ){
+				&& isCurrentSerialNumberOwnedByShellMonarch(patientInfoDTO.getSerial_num()) ){
 			
 
 			//managePatientUser(UPDATE)
@@ -1045,8 +1049,8 @@ public class TimsService {
 	
 	public boolean CASE6_DeviceOwnedByDifferentPatient_MONARCH(PatientInfoDTO patientInfoDTO){
 		if((isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
-				&& (!isCurrentSerialNumberOwnedByShell(patientInfoDTO.getSerial_num())) 
-				&& (isCurrentSerialNumberOwnedByDifferentPatientMonarch(patientInfoDTO.getSerial_num() )) ){
+				&& (!isCurrentSerialNumberOwnedByShellMonarch(patientInfoDTO.getSerial_num())) 
+				&& (isCurrentSerialNumberOwnedByDifferentPatientMonarch(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust() )) ){
 			
 			//managaPatientDeviceMonarch(INACTIVATE)
 			//managePatientUser(CREATE)
@@ -1078,8 +1082,8 @@ public class TimsService {
 	
 	public boolean CASE7_DeviceIsOrphanPatientDoesNotExist_MONARCH(PatientInfoDTO patientInfoDTO){
 		if((isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
-				&& (!isCurrentSerialNumberOwnedByShell(patientInfoDTO.getSerial_num())) 
-				&& (!isCurrentSerialNumberOwnedByDifferentPatientMonarch(patientInfoDTO.getSerial_num() )) ){
+				&& (!isCurrentSerialNumberOwnedByShellMonarch(patientInfoDTO.getSerial_num())) 
+				&& (!isCurrentSerialNumberOwnedByDifferentPatientMonarch(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust() )) ){
 
 			
 			//managePatientUser(CREATE)

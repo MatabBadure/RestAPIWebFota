@@ -1483,15 +1483,36 @@ public class UserService {
 		}
 		return Optional.of(patientUserVO);
 	}
-	public User getUser(Long id) throws HillromException{
+
+	public User getUser(Long id) throws HillromException {
 		User user = userRepository.findOne(id);
-		if(Objects.nonNull(user)) {
-			return user;
-		} else {
-			throw new HillromException(ExceptionConstants.HR_512);//No such user exist
+
+		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
+
+		List<PatientDevicesAssoc> patientDevicesAssocList = patientDevicesAssocRepository
+				.findByPatientId(patientInfo.getId());
+		// Garment Changes :Looping through the patient devices
+		for (PatientDevicesAssoc device : patientDevicesAssocList) {
+			if (device.getDeviceType().equals(VEST)) {
+				user.setVestGarmentColor(device.getGarmentColor());
+				user.setVestGarmentSize(device.getGarmentSize());
+				user.setVestGarmentType(device.getGarmentType());
+			} else if (device.getDeviceType().equals(MONARCH)) {
+				user.setMonarchGarmentColor(device.getGarmentColor());
+				user.setMonarchGarmentSize(device.getGarmentSize());
+				user.setMonarchGarmentType(device.getGarmentType());
+			}
 		}
 
-	 }
+		if (Objects.nonNull(user)) {
+			return user;
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);// No such
+																	// user
+																	// exist
+		}
+
+	}
 
 	public UserPatientAssoc createCaregiverUser(Long patientUserId, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException {
 		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
@@ -1853,6 +1874,24 @@ public class UserService {
 				Optional<ClinicPatientAssoc> clinicPatientAssoc = clinicPatientRepository.findOneByClinicIdAndPatientId(
 						clinicId, patientInfo.getId());
 				PatientUserVO patientUserVO = new PatientUserVO(patientUser, patientInfo);
+				List<PatientDevicesAssoc> patientDevicesAssocList = patientDevicesAssocRepository
+						.findByPatientId(patientInfo.getId());
+				// Garment Changes :Looping through the patient devices
+				for (PatientDevicesAssoc device : patientDevicesAssocList) {
+					if (device.getDeviceType().equals(VEST)) {
+						patientUserVO.setVestGarmentColor(device.getGarmentColor());
+						patientUserVO.setVestGarmentSize(device.getGarmentSize());
+						patientUserVO.setVestGarmentType(device.getGarmentType());
+					} else if (device.getDeviceType().equals(MONARCH)) {
+						patientUserVO.setMonarchGarmentColor(device
+								.getGarmentColor());
+						patientUserVO
+								.setMonarchGarmentSize(device.getGarmentSize());
+						patientUserVO
+								.setMonarchGarmentType(device.getGarmentType());
+					}
+				}
+				
 				if(clinicPatientAssoc.isPresent()){
 					Map<String,Object> clinicMRNId = new HashMap<>();
 					clinicMRNId.put("clinic", clinicPatientAssoc.get().getClinic());

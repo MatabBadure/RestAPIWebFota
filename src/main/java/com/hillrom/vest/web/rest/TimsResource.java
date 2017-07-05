@@ -86,9 +86,9 @@ public class TimsResource {
             for(String grepValue : returnVal){
                 HashMap<String, String> hmap = new HashMap<String, String>();
                     String[] grepVal = grepValue.split(",");
-                    hmap.put("fileName",grepVal[0]);
-                    hmap.put("numOfReturnVal",grepVal[1]);
-                    hmap.put("lastModified",grepVal[2]);
+                    hmap.put("file",grepVal[0]);
+                    hmap.put("status",grepVal[1]);
+                    hmap.put("lastMod",grepVal[2]);
                     valueObj.add(hmap);
             }
               jsonObject.put("fileDtls", valueObj);

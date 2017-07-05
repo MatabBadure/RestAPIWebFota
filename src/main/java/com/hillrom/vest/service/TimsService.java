@@ -335,7 +335,7 @@ public class TimsService {
 	                String line;
 	                Date lastModifiedDate = new Date(file.lastModified());
 	                while ((line = is.readLine()) != null) {
-	                    returnLogFiles.add(file.getName()+","+line+","+lastModifiedDate);
+	                    returnLogFiles.add(file.getName()+","+(Integer.parseInt(line)>0?"Success":"Failure")+","+lastModifiedDate);
 	                    System.out.println(file.getName()+" has the success of :"+line);
 	                }
 			    	

@@ -83,7 +83,9 @@ public class TimsResource {
 			
 			
 			List<String> returnVal = timsService.listLogDirectory("/usr/tomcat/apache-tomcat-8.0.28/TIMS/logs");
-
+			System.out.println("Start of the returnVal-->\n");
+            System.out.println(returnVal);
+            System.out.println("End of the returnVal");
 			/*List<String> returnVal = new LinkedList<>();
 			returnVal.add("asdfasdf.log,Success,2017-07-05");
 			returnVal.add("asdfasdf1.log,Success,2017-06-05");

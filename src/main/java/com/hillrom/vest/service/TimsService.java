@@ -670,6 +670,10 @@ public class TimsService {
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
 			try{
+				String patient_id_of_serial_number_to_inactivate = patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(patientInfoDTO.getSerial_num(),"VEST").get().getPatientId();
+				patientInfoDTO.setPatient_id(patient_id_of_serial_number_to_inactivate);
+				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+				patientInfoDTO.setNew_serial_number(null);
 				patientInfoDTO.setOperation_type("INACTIVATE");
 				managePatientDevice(patientInfoDTO);
 

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -37,6 +38,7 @@ import com.hillrom.vest.repository.TimsUserRepository;
 import com.hillrom.vest.repository.monarch.PatientMonarchDeviceRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.util.DateUtil;
+import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.AnnouncementsDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.dto.PatientInfoDTO;
@@ -508,7 +510,9 @@ public class TimsService {
 			//createPatientProtocol()
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
-				managePatientUser(patientInfoDTO);
+				JSONObject returnValues =  managePatientUser(patientInfoDTO);
+				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
+				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDevice(patientInfoDTO);
@@ -516,7 +520,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				patientInfoDTO.setProtocol_type_key("Normal");
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
 			}catch(Exception ex){
@@ -549,7 +553,11 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				patientInfoDTO.setProtocol_type_key("Normal");
+
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
+						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
 			}catch(Exception ex){
@@ -582,7 +590,10 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
+						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
 			}catch(Exception ex){
@@ -614,7 +625,10 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
+						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
 			}catch(Exception ex){
@@ -644,12 +658,14 @@ public class TimsService {
 
 			try{
 				patientInfoDTO.setOperation_type("UPDATE");
-				managePatientUser(patientInfoDTO);
+				JSONObject returnValues = managePatientUser(patientInfoDTO);
+				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
+				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				patientInfoDTO.setProtocol_type_key("Normal");
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
 			}catch(Exception ex){
@@ -683,12 +699,14 @@ public class TimsService {
 				managePatientDevice(patientInfoDTO);
 
 				patientInfoDTO.setOperation_type("CREATE");
-				managePatientUser(patientInfoDTO);
+				JSONObject returnValues =   managePatientUser(patientInfoDTO);
+				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
+				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				patientInfoDTO.setProtocol_type_key("Normal");
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
 			}catch(Exception ex){
@@ -715,7 +733,9 @@ public class TimsService {
 			//createPatientProtocol()
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
-				managePatientUser(patientInfoDTO);
+				JSONObject returnValues = managePatientUser(patientInfoDTO);
+				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
+				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDevice(patientInfoDTO);
@@ -723,7 +743,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				patientInfoDTO.setProtocol_type_key("Normal");
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
 			}catch(Exception ex){
@@ -756,7 +776,10 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
+						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
 			}catch(Exception ex){
@@ -819,7 +842,10 @@ public class TimsService {
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
 					
-					patientInfoDTO.setProtocol_type_key("Normal");
+					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
+							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
+					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocol(patientInfoDTO);
 				}catch(Exception ex){
@@ -858,7 +884,10 @@ public class TimsService {
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
 					
-					patientInfoDTO.setProtocol_type_key("Normal");
+					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
+							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
+					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocol(patientInfoDTO);
 				}catch(Exception ex){
@@ -896,7 +925,10 @@ public class TimsService {
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
 					
-					patientInfoDTO.setProtocol_type_key("Normal");
+					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
+							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
+					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocol(patientInfoDTO);
 				}catch(Exception ex){
@@ -927,7 +959,9 @@ public class TimsService {
 			//createPatientProtocolMonarch()
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
-				managePatientUser(patientInfoDTO);
+				JSONObject returnValues = managePatientUser(patientInfoDTO);
+				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
+				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceMonarch(patientInfoDTO);
@@ -935,7 +969,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				patientInfoDTO.setProtocol_type_key("Normal");
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
 			}catch(Exception ex){
@@ -968,7 +1002,10 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
+						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
 			}catch(Exception ex){
@@ -1002,7 +1039,10 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
+						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
 			}catch(Exception ex){
@@ -1036,7 +1076,10 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
+						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
 			}catch(Exception ex){
@@ -1068,12 +1111,14 @@ public class TimsService {
 
 			try{
 				patientInfoDTO.setOperation_type("UPDATE");
-				managePatientUser(patientInfoDTO);
+				JSONObject returnValues = managePatientUser(patientInfoDTO);
+				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
+				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				patientInfoDTO.setProtocol_type_key("Normal");
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
 			}catch(Exception ex){
@@ -1104,12 +1149,14 @@ public class TimsService {
 				managePatientDeviceMonarch(patientInfoDTO);
 
 				patientInfoDTO.setOperation_type("CREATE");
-				managePatientUser(patientInfoDTO);
+				JSONObject returnValues = managePatientUser(patientInfoDTO);
+				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
+				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				patientInfoDTO.setProtocol_type_key("Normal");
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
 			}catch(Exception ex){
@@ -1138,7 +1185,9 @@ public class TimsService {
 			//createPatientProtocolMonarch()
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
-				managePatientUser(patientInfoDTO);
+				JSONObject returnValues = managePatientUser(patientInfoDTO);
+				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
+				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceMonarch(patientInfoDTO);
@@ -1146,7 +1195,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				patientInfoDTO.setProtocol_type_key("Normal");
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
 			}catch(Exception ex){
@@ -1181,7 +1230,10 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				patientInfoDTO.setProtocol_type_key("Normal");
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
+						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
 			}catch(Exception ex){
@@ -1247,7 +1299,10 @@ public class TimsService {
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
 					
-					patientInfoDTO.setProtocol_type_key("Normal");
+					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
+							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
+					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocolMonarch(patientInfoDTO);
 				}catch(Exception ex){
@@ -1286,7 +1341,10 @@ public class TimsService {
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
 					
-					patientInfoDTO.setProtocol_type_key("Normal");
+					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
+							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
+					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocolMonarch(patientInfoDTO);
 				}catch(Exception ex){
@@ -1324,7 +1382,10 @@ public class TimsService {
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
 					
-					patientInfoDTO.setProtocol_type_key("Normal");
+					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
+							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
+					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocolMonarch(patientInfoDTO);
 				}catch(Exception ex){

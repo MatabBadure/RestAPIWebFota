@@ -26,6 +26,7 @@ import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.web.rest.dto.AnnouncementsDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.dto.PatientInfoDTO;
+import com.hillrom.vest.web.rest.dto.ProtocolDataTempDTO;
 
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -73,6 +74,8 @@ public class TimsInputReaderService {
 	public void ExecuteTIMSJob() 
 	{
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
+		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
+		
 		log.debug("Starting to process records ");
 		for (Map.Entry<Integer, PatientInfoDTO> entry : fileRecords.entrySet()) {
 		    Integer position = entry.getKey();
@@ -233,6 +236,92 @@ public class TimsInputReaderService {
 	} 
 
 
+	public Map readProtocolcsv() 
+	{
+
+
+	        String csvFile = Constants.TIMS_CSV_FILE_PATH + "protocol_data.csv";
+	        log.debug("Started reading protocol data flat file : " + csvFile);
+	        String line = "";
+	        String cvsSplitBy = ",";
+	        String Outdata = "";
+	        String[] data = null;
+	        DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yyyy");
+	        DateTimeFormatter dobFormat = DateTimeFormat.forPattern("MM/dd/yyyy");
+	        DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");
+
+	        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+	        	Map<Integer, ProtocolDataTempDTO> fileRecords = new HashMap<Integer, ProtocolDataTempDTO>();
+	        	
+	        	boolean header = true;
+            	
+	        	int k = 1; // record position in file
+            	
+	            while ((line = br.readLine()) != null) {
+
+	                // use comma as separator
+	               data = line.split(cvsSplitBy);
+	               
+	               ProtocolDataTempDTO protocolDataTempDTO = new ProtocolDataTempDTO();
+		            String record = "";
+		            for(int i=0;i<12;i++){
+		            	try{
+		            		data[i] = Objects.nonNull(data[i]) ? data[i] : "";
+		            		record = i==11?record + data[i]:record + data[i]+",";
+		            	}catch(ArrayIndexOutOfBoundsException ex){
+
+		            	}
+		            	
+		            }
+		            
+		            
+		            
+		            String s = "";
+		            for(int j=0;j<data.length;j++){
+		            	s = s + "\t" + data[j];
+		            }
+		            log.debug("Excel File Read as : " + s);
+
+		            
+		            
+		            if(!header){
+
+		            	protocolDataTempDTO.setPatient_id(data[0]);
+		            	protocolDataTempDTO.setType(data[1]);
+		            	protocolDataTempDTO.setTreatmentsPerDay(Integer.parseInt(data[2]));
+		            	protocolDataTempDTO.setTreatmentLabel(data[3]);
+		            	protocolDataTempDTO.setMinMinutesPerTreatment(data[4].trim().length()==0?0:Integer.parseInt(data[4]));
+		            	protocolDataTempDTO.setMaxMinutesPerTreatment(Integer.parseInt(data[5]));
+		            	protocolDataTempDTO.setMinFrequency(Integer.parseInt(data[6]));
+		            	protocolDataTempDTO.setMaxFrequency(Integer.parseInt(data[7]));
+		            	protocolDataTempDTO.setMinPressure(Integer.parseInt(data[8]));
+		            	protocolDataTempDTO.setMaxPressure(Integer.parseInt(data[9]));
+		            	protocolDataTempDTO.setTo_be_inserted(Integer.parseInt(data[10]));
+		            	protocolDataTempDTO.setId(data[11]);
+		            	
+			        	
+	
+	
+			            fileRecords.put(k++, protocolDataTempDTO);
+		            }
+		            
+		            header = false;
+		            
+		            
+	            }
+	            
+	            log.debug("Excel File contents in HashMap : " + fileRecords);
+	            return fileRecords;
+	            
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	            return null;
+	        }
+	        
+	        
+
+	       
+	} 
 
 
 

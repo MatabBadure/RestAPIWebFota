@@ -31,7 +31,7 @@ SET created_by = 'JDE APP';
         
 IF operation_type_indicator = 'CREATE' THEN
 
-	SELECT `id`, `serial_number`, `bluetooth_id` INTO temp_patient_info_id, temp_serial_number, temp_bluetooth_id FROM `PATIENT_INFO`
+	SELECT `patient_id`, `serial_number`, `bluetooth_id` INTO temp_patient_info_id, temp_serial_number, temp_bluetooth_id FROM `PATIENT_DEVICES_ASSOC`
 	WHERE `serial_number` = pat_old_device_serial_number OR `bluetooth_id` =  pat_bluetooth_id;
 
 	IF temp_patient_info_id IS NOT NULL THEN
@@ -102,8 +102,8 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
             
 ELSEIF operation_type_indicator ='INACTIVATE' THEN
 
-		SELECT `id`, `serial_number`, `bluetooth_id` INTO temp_patient_info_id, temp_serial_number, temp_bluetooth_id FROM `PATIENT_INFO`
-		WHERE `serial_number` = pat_old_device_serial_number  AND `id` = patient_id;
+		SELECT `patient_id`, `serial_number`, `bluetooth_id` INTO temp_patient_info_id, temp_serial_number, temp_bluetooth_id FROM `PATIENT_DEVICES_ASSOC`
+		WHERE `serial_number` = pat_old_device_serial_number  AND `patient_id` = patient_id;
         
         IF temp_patient_info_id IS NULL THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Device Serial No.  not associated with the patient';

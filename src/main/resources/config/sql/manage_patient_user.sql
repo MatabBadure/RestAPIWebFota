@@ -1,3 +1,6 @@
+DROP procedure IF EXISTS `manage_patient_user`;
+
+DELIMITER $$
 CREATE PROCEDURE `manage_patient_user`(
 	IN operation_type_indicator VARCHAR(10),
     IN hr_id varchar(255),
@@ -46,7 +49,7 @@ BEGIN
 	
 	IF operation_type_indicator = 'CREATE' THEN
     
-		SELECT `serial_number` INTO temp_serial_number FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number;
+		SELECT `serial_number` INTO temp_serial_number FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number and `is_active` = 1;
         
 		-- When Hillrom id already exists
         IF temp_serial_number IS NOT NULL THEN
@@ -104,7 +107,7 @@ BEGIN
     
 	ELSEIF operation_type_indicator = 'UPDATE' THEN 
     
-		SELECT `id` INTO return_patient_id FROM `PATIENT_INFO` WHERE `serial_number` = pat_device_serial_number;
+		SELECT `patient_id` INTO return_patient_id FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number;
 		SELECT `user_id` INTO return_user_id FROM `USER_PATIENT_ASSOC` WHERE `patient_id`= return_patient_id AND `user_role`= 'PATIENT';
         
         IF return_patient_id IS NULL THEN
@@ -165,7 +168,7 @@ BEGIN
         
 	ELSEIF operation_type_indicator = 'DELETE' THEN 
     
-		SELECT `id` INTO return_patient_id FROM `PATIENT_INFO` WHERE `serial_number` = pat_device_serial_number;
+		SELECT `patient_id` INTO return_patient_id FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number;
 		SELECT `user_id` INTO return_user_id FROM `USER_PATIENT_ASSOC` WHERE `patient_id`= return_patient_id;
         
         IF (return_user_id IS NULL) THEN 
@@ -179,4 +182,5 @@ BEGIN
 	ELSE
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Only CREATE, UPDATE and DELETE are supported as operation type ID';
     END IF;
-END
+END $$
+DELIMITER ;

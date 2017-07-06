@@ -49,7 +49,7 @@ BEGIN
 	
 	IF operation_type_indicator = 'CREATE' THEN
     
-		SELECT `serial_number` INTO temp_serial_number FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number;
+		SELECT `serial_number` INTO temp_serial_number FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number and `is_active` = 1;
         
 		-- When Hillrom id already exists
         IF temp_serial_number IS NOT NULL THEN

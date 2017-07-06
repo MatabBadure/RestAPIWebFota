@@ -551,7 +551,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-
+				//TBD patient_id and patient_user_id	
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
@@ -585,6 +585,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
+				//TBD patient_id and patient_user_id
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
@@ -617,6 +618,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
+				//TBD patient_id and patient_user_id
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
@@ -647,7 +649,9 @@ public class TimsService {
 
 			try{
 				patientInfoDTO.setOperation_type("UPDATE");
-				managePatientUser(patientInfoDTO);
+				JSONObject returnValues = managePatientUser(patientInfoDTO);
+				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
+				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
@@ -763,6 +767,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
+				//TBD patient Id and patient_user id
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
@@ -826,6 +831,7 @@ public class TimsService {
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
 					
+					//TBD patient_id and patient_user_id
 					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocol(patientInfoDTO);
@@ -865,6 +871,7 @@ public class TimsService {
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
 					
+					//TBD patient_id and patient_user_id
 					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocol(patientInfoDTO);
@@ -903,6 +910,7 @@ public class TimsService {
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
 					
+					//TBD patient_id and patient_user_id
 					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocol(patientInfoDTO);
@@ -977,6 +985,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
+				//TBD patient_id and patient_user_id
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
@@ -1011,6 +1020,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
+				//TBD patient_id and patient_user_id
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
@@ -1045,6 +1055,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
+				//TBD patient_id and patient_user_id
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
@@ -1196,6 +1207,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
+				//TBD patient_id and patient_user_id
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
@@ -1262,6 +1274,7 @@ public class TimsService {
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
 					
+					//TBD patient_id and patient_user_id
 					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocolMonarch(patientInfoDTO);
@@ -1301,6 +1314,7 @@ public class TimsService {
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
 					
+					//TBD patient_id and patient_user_id
 					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocolMonarch(patientInfoDTO);
@@ -1339,6 +1353,7 @@ public class TimsService {
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
 					
+					//TBD patient_id and patient_user_id
 					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocolMonarch(patientInfoDTO);

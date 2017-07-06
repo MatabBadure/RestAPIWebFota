@@ -51,14 +51,13 @@ public class PatientInfoDTO {
 	private String address;
 	private String city;
 	private String state;
-	
+	private String patient_user_id;
 
 
 
 	public PatientInfoDTO() {
 		super();
 	}
-
 
 
 
@@ -71,14 +70,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param operation_type the operation_type to set
 	 */
 	public void setOperation_type(String operation_type) {
 		this.operation_type = operation_type;
 	}
-
 
 
 
@@ -91,14 +88,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param device_type the device_type to set
 	 */
 	public void setDevice_type(String device_type) {
 		this.device_type = device_type;
 	}
-
 
 
 
@@ -111,14 +106,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param tims_cust the tims_cust to set
 	 */
 	public void setTims_cust(String tims_cust) {
 		this.tims_cust = tims_cust;
 	}
-
 
 
 
@@ -131,14 +124,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param serial_num the serial_num to set
 	 */
 	public void setSerial_num(String serial_num) {
 		this.serial_num = serial_num;
 	}
-
 
 
 
@@ -151,14 +142,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param ship_dt the ship_dt to set
 	 */
 	public void setShip_dt(LocalDate ship_dt) {
 		this.ship_dt = ship_dt;
 	}
-
 
 
 
@@ -171,14 +160,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param hub_id the hub_id to set
 	 */
 	public void setHub_id(String hub_id) {
 		this.hub_id = hub_id;
 	}
-
 
 
 
@@ -191,14 +178,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param bluetooth_id the bluetooth_id to set
 	 */
 	public void setBluetooth_id(String bluetooth_id) {
 		this.bluetooth_id = bluetooth_id;
 	}
-
 
 
 
@@ -211,14 +196,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param garment_cd the garment_cd to set
 	 */
 	public void setGarment_cd(String garment_cd) {
 		this.garment_cd = garment_cd;
 	}
-
 
 
 
@@ -231,14 +214,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param garment_type the garment_type to set
 	 */
 	public void setGarment_type(String garment_type) {
 		this.garment_type = garment_type;
 	}
-
 
 
 
@@ -251,14 +232,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param garment_size the garment_size to set
 	 */
 	public void setGarment_size(String garment_size) {
 		this.garment_size = garment_size;
 	}
-
 
 
 
@@ -271,14 +250,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param garment_color the garment_color to set
 	 */
 	public void setGarment_color(String garment_color) {
 		this.garment_color = garment_color;
 	}
-
 
 
 
@@ -291,14 +268,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param title the title to set
 	 */
 	public void setTitle(String title) {
 		this.title = title;
 	}
-
 
 
 
@@ -311,14 +286,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param first_nm the first_nm to set
 	 */
 	public void setFirst_nm(String first_nm) {
 		this.first_nm = first_nm;
 	}
-
 
 
 
@@ -331,14 +304,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param middle_nm the middle_nm to set
 	 */
 	public void setMiddle_nm(String middle_nm) {
 		this.middle_nm = middle_nm;
 	}
-
 
 
 
@@ -351,14 +322,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param last_nm the last_nm to set
 	 */
 	public void setLast_nm(String last_nm) {
 		this.last_nm = last_nm;
 	}
-
 
 
 
@@ -371,14 +340,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param email the email to set
 	 */
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
 
 
 
@@ -391,14 +358,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param zip_cd the zip_cd to set
 	 */
 	public void setZip_cd(String zip_cd) {
 		this.zip_cd = zip_cd;
 	}
-
 
 
 
@@ -411,14 +376,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param train_dt the train_dt to set
 	 */
 	public void setTrain_dt(LocalDate train_dt) {
 		this.train_dt = train_dt;
 	}
-
 
 
 
@@ -431,14 +394,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param dob the dob to set
 	 */
 	public void setDob(LocalDate dob) {
 		this.dob = dob;
 	}
-
 
 
 
@@ -451,14 +412,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param dx1 the dx1 to set
 	 */
 	public void setDx1(String dx1) {
 		this.dx1 = dx1;
 	}
-
 
 
 
@@ -471,14 +430,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param dx2 the dx2 to set
 	 */
 	public void setDx2(String dx2) {
 		this.dx2 = dx2;
 	}
-
 
 
 
@@ -491,14 +448,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param dx3 the dx3 to set
 	 */
 	public void setDx3(String dx3) {
 		this.dx3 = dx3;
 	}
-
 
 
 
@@ -511,14 +466,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param dx4 the dx4 to set
 	 */
 	public void setDx4(String dx4) {
 		this.dx4 = dx4;
 	}
-
 
 
 
@@ -531,14 +484,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param patient_id the patient_id to set
 	 */
 	public void setPatient_id(String patient_id) {
 		this.patient_id = patient_id;
 	}
-
 
 
 
@@ -551,14 +502,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param old_serial_number the old_serial_number to set
 	 */
 	public void setOld_serial_number(String old_serial_number) {
 		this.old_serial_number = old_serial_number;
 	}
-
 
 
 
@@ -571,14 +520,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param new_serial_number the new_serial_number to set
 	 */
 	public void setNew_serial_number(String new_serial_number) {
 		this.new_serial_number = new_serial_number;
 	}
-
 
 
 
@@ -591,14 +538,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param old_patient_id the old_patient_id to set
 	 */
 	public void setOld_patient_id(String old_patient_id) {
 		this.old_patient_id = old_patient_id;
 	}
-
 
 
 
@@ -611,14 +556,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param is_active the is_active to set
 	 */
 	public void setIs_active(String is_active) {
 		this.is_active = is_active;
 	}
-
 
 
 
@@ -631,14 +574,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param protocol_type_key the protocol_type_key to set
 	 */
 	public void setProtocol_type_key(String protocol_type_key) {
 		this.protocol_type_key = protocol_type_key;
 	}
-
 
 
 
@@ -651,14 +592,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param created_by the created_by to set
 	 */
 	public void setCreated_by(String created_by) {
 		this.created_by = created_by;
 	}
-
 
 
 
@@ -671,14 +610,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param primary_phone the primary_phone to set
 	 */
 	public void setPrimary_phone(String primary_phone) {
 		this.primary_phone = primary_phone;
 	}
-
 
 
 
@@ -691,14 +628,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param mobile_phone the mobile_phone to set
 	 */
 	public void setMobile_phone(String mobile_phone) {
 		this.mobile_phone = mobile_phone;
 	}
-
 
 
 
@@ -711,14 +646,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param gender the gender to set
 	 */
 	public void setGender(String gender) {
 		this.gender = gender;
 	}
-
 
 
 
@@ -731,14 +664,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param lang_key the lang_key to set
 	 */
 	public void setLang_key(String lang_key) {
 		this.lang_key = lang_key;
 	}
-
 
 
 
@@ -751,14 +682,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param address the address to set
 	 */
 	public void setAddress(String address) {
 		this.address = address;
 	}
-
 
 
 
@@ -771,14 +700,12 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param city the city to set
 	 */
 	public void setCity(String city) {
 		this.city = city;
 	}
-
 
 
 
@@ -791,7 +718,6 @@ public class PatientInfoDTO {
 
 
 
-
 	/**
 	 * @param state the state to set
 	 */
@@ -799,6 +725,23 @@ public class PatientInfoDTO {
 		this.state = state;
 	}
 
+
+
+	/**
+	 * @return the patient_user_id
+	 */
+	public String getPatient_user_id() {
+		return patient_user_id;
+	}
+
+
+
+	/**
+	 * @param patient_user_id the patient_user_id to set
+	 */
+	public void setPatient_user_id(String patient_user_id) {
+		this.patient_user_id = patient_user_id;
+	}
 
 
 
@@ -837,6 +780,7 @@ public class PatientInfoDTO {
 		result = prime * result + ((old_serial_number == null) ? 0 : old_serial_number.hashCode());
 		result = prime * result + ((operation_type == null) ? 0 : operation_type.hashCode());
 		result = prime * result + ((patient_id == null) ? 0 : patient_id.hashCode());
+		result = prime * result + ((patient_user_id == null) ? 0 : patient_user_id.hashCode());
 		result = prime * result + ((primary_phone == null) ? 0 : primary_phone.hashCode());
 		result = prime * result + ((protocol_type_key == null) ? 0 : protocol_type_key.hashCode());
 		result = prime * result + ((serial_num == null) ? 0 : serial_num.hashCode());
@@ -848,7 +792,6 @@ public class PatientInfoDTO {
 		result = prime * result + ((zip_cd == null) ? 0 : zip_cd.hashCode());
 		return result;
 	}
-
 
 
 
@@ -1004,6 +947,11 @@ public class PatientInfoDTO {
 				return false;
 		} else if (!patient_id.equals(other.patient_id))
 			return false;
+		if (patient_user_id == null) {
+			if (other.patient_user_id != null)
+				return false;
+		} else if (!patient_user_id.equals(other.patient_user_id))
+			return false;
 		if (primary_phone == null) {
 			if (other.primary_phone != null)
 				return false;
@@ -1054,7 +1002,6 @@ public class PatientInfoDTO {
 
 
 
-
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -1070,8 +1017,10 @@ public class PatientInfoDTO {
 				+ old_serial_number + ", new_serial_number=" + new_serial_number + ", old_patient_id=" + old_patient_id
 				+ ", is_active=" + is_active + ", protocol_type_key=" + protocol_type_key + ", created_by=" + created_by
 				+ ", primary_phone=" + primary_phone + ", mobile_phone=" + mobile_phone + ", gender=" + gender
-				+ ", lang_key=" + lang_key + ", address=" + address + ", city=" + city + ", state=" + state + "]";
+				+ ", lang_key=" + lang_key + ", address=" + address + ", city=" + city + ", state=" + state
+				+ ", patient_user_id=" + patient_user_id + "]";
 	}
+
 
 
 

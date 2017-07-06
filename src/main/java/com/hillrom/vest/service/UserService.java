@@ -529,8 +529,9 @@ public class UserService {
 		patientInfo = patientInfoRepository.save(patientInfo);
 		log.debug("Created Information for Patient : {}", patientInfo);
 		
-		
 		// /Insert Garament details in patient device ass info
+		
+
 		assignGarmentValuesToPatientDeviceAssocObj(userExtensionDTO,
 				patientDevicesAssoc);
 		patientDevicesAssoc.setPatientId(patientInfoId);
@@ -542,7 +543,7 @@ public class UserService {
 				.save(patientDevicesAssoc);
 		log.debug("Created Information for PatientDevice Association : {}",
 				patientDevicesAssoc);
-
+	
 		assignValuesToUserObj(userExtensionDTO, newUser);
 
 		newUser.setPassword(passwordEncoder
@@ -898,13 +899,24 @@ public class UserService {
 			// Looping through the patient devices
 			for (PatientDevicesAssoc updatePatientType : updatePatientTypeList) {
 				if(updatePatientType.getDeviceType().equals(VEST)){
-					assignGarmentValuesToPatientDeviceAssocObj(userExtensionDTO, updatePatientType);
+					if (Objects.nonNull(userExtensionDTO.getVestGarmentColor()))
+						updatePatientType.setGarmentColor(userExtensionDTO.getVestGarmentColor());
+					if (Objects.nonNull(userExtensionDTO.getVestGarmentSize()))
+						updatePatientType.setGarmentSize(userExtensionDTO.getVestGarmentSize());
+					if (Objects.nonNull(userExtensionDTO.getVestGarmentType()))
+						updatePatientType.setGarmentType(userExtensionDTO.getVestGarmentType());
 					patientDevicesAssocRepository.save(updatePatientType);
-					log.debug("Upadted Information for PatientDevice Association : {}", updatePatientType);
-				} else if(updatePatientType.getDeviceType().equals(MONARCH)){
-					assignGarmentValuesToPatientDeviceAssocObj(userExtensionDTO, updatePatientType);
+					log.debug("Upadted Information for PatientDevice Vest Association : {}", updatePatientType);
+				}
+				if(updatePatientType.getDeviceType().equals(MONARCH)){
+					if (Objects.nonNull(userExtensionDTO.getMonarchGarmentColor()))
+						updatePatientType.setGarmentColor(userExtensionDTO.getMonarchGarmentColor());
+					if (Objects.nonNull(userExtensionDTO.getMonarchGarmentSize()))
+						updatePatientType.setGarmentSize(userExtensionDTO.getMonarchGarmentSize());
+					if (Objects.nonNull(userExtensionDTO.getMonarchGarmentType()))
+						updatePatientType.setGarmentType(userExtensionDTO.getMonarchGarmentType());
 					patientDevicesAssocRepository.save(updatePatientType);
-					log.debug("Upadted Information for PatientDevice Association : {}", updatePatientType);
+					log.debug("Upadted Information for PatientDevice Monarch Association : {}", updatePatientType);
 				}
 				
 			}

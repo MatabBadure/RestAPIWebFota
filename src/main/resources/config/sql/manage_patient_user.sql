@@ -104,7 +104,7 @@ BEGIN
     
 	ELSEIF operation_type_indicator = 'UPDATE' THEN 
     
-		SELECT `id` INTO return_patient_id FROM `PATIENT_INFO` WHERE `serial_number` = pat_device_serial_number;
+		SELECT `patient_id` INTO return_patient_id FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number;
 		SELECT `user_id` INTO return_user_id FROM `USER_PATIENT_ASSOC` WHERE `patient_id`= return_patient_id AND `user_role`= 'PATIENT';
         
         IF return_patient_id IS NULL THEN
@@ -165,7 +165,7 @@ BEGIN
         
 	ELSEIF operation_type_indicator = 'DELETE' THEN 
     
-		SELECT `id` INTO return_patient_id FROM `PATIENT_INFO` WHERE `serial_number` = pat_device_serial_number;
+		SELECT `patient_id` INTO return_patient_id FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number;
 		SELECT `user_id` INTO return_user_id FROM `USER_PATIENT_ASSOC` WHERE `patient_id`= return_patient_id;
         
         IF (return_user_id IS NULL) THEN 

@@ -412,9 +412,11 @@ public class TimsService {
 
 	public boolean isCurrentSerialNumberOwnedByShellVest(String serialNumber){
 		
-		if((patientInfoRepository.findOneBySerialNumber(serialNumber).get().getFirstName().equalsIgnoreCase("Hill-Rom")) && (patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").isPresent()) ) {
-			log.debug("Checking isCurrentSerialNumberOwnedByShellVest ");	
-			return true;
+		if((patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").isPresent()) ) {
+			if((patientInfoRepository.findOneById(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").get().getPatientId()).getFirstName().equalsIgnoreCase("Hill-Rom")) ){
+				log.debug("Checking isCurrentSerialNumberOwnedByShellVest ");	
+				return true;
+			}
 		}
 		
 		return false;
@@ -422,9 +424,12 @@ public class TimsService {
 	
 	public boolean isCurrentSerialNumberOwnedByShellMonarch(String serialNumber){
 		
-		if((patientInfoRepository.findOneBySerialNumber(serialNumber).get().getFirstName().equalsIgnoreCase("Hill-Rom")) && (patientInfoRepository.findOneBySerialNumber(serialNumber).get().getLastName().equalsIgnoreCase("Monarch")) && (patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").isPresent()) ){ 
-			log.debug("Checking isCurrentSerialNumberOwnedByShellMonarch ");	
-			return true;
+		if((patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").isPresent()) ) {
+				String patientId = patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").get().getPatientId();	
+				if((patientInfoRepository.findOneById(patientId).getFirstName().equalsIgnoreCase("Hill-Rom")) && (patientInfoRepository.findOneById(patientId).getLastName().equalsIgnoreCase("Monarch")) ){
+					log.debug("Checking isCurrentSerialNumberOwnedByShellMonarch ");	
+					return true;
+				}
 		}
 		
 		return false;

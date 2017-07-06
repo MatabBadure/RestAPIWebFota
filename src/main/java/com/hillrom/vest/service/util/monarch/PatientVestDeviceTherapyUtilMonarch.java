@@ -412,6 +412,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 						if(!isStartEventForTherapySessionMonarch(nextEventCodeMonarch))
 							groupEntriesMonarch.add(nextEventEntryMonarch);
 					if(isCompleteOrInCompleteEventForTherapySessionMonarch(nextEventCodeMonarch)
+						|| ( isErrorEventForTherapySessionMonarch(nextEventCodeMonarch) && (j == (deviceDataMonarch.size()-1)) )
 						|| isStartEventForTherapySessionMonarch(nextEventCodeMonarch)	){
 						// subsequent start events indicate therapy is incomplete due to unexpected reason
 						if(isStartEventForTherapySessionMonarch(nextEventCodeMonarch)){
@@ -427,7 +428,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 							deviceDataMonarch.add(j, inCompleteEventMonarch);
 						}
 						TherapySessionMonarch therapySession = assignTherapyMatricsMonarch(groupEntriesMonarch);
-						//applyGlobalHMRMonarch(therapySession,latestInActiveDeviceHistory);
+						applyGlobalHMRMonarch(therapySession,latestInActiveDeviceHistory);
 						therapySessions.add(therapySession);
 						i=j; // to skip the events iterated, shouldn't be removed in any case
 						break;
@@ -460,7 +461,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 	
 	private static void applyGlobalHMRMonarch(TherapySessionMonarch therapySession,
 			PatientVestDeviceHistoryMonarch latestInActiveDeviceHistory)throws Exception {
-		if( Objects.nonNull(latestInActiveDeviceHistory) && (therapySession.getHmr() < latestInActiveDeviceHistory.getHmr())){
+		if( Objects.nonNull(latestInActiveDeviceHistory) ){
 			if(!(latestInActiveDeviceHistory.getSerialNumber().equalsIgnoreCase(therapySession.getSerialNumber()))){
 				therapySession.setHmr(therapySession.getHmr()+latestInActiveDeviceHistory.getHmr());
 			}
@@ -474,12 +475,17 @@ public class PatientVestDeviceTherapyUtilMonarch {
 				EVENT_CODE_NORMAL_INCOMPLETE_MONARCH.equals(nextEventCode) ||
 				EVENT_CODE_PROGRAM_INCOMPLETE_MONARCH.equals(nextEventCode);
 	}
+	
+	private static boolean isErrorEventForTherapySessionMonarch(
+			String nextEventCode) {
+		return EVENT_CODE_ERROR_MONARCH.equals(nextEventCode);
+	}	
 
 	private static boolean isStartEventForTherapySessionMonarch(String eventCode) {
 		return EVENT_CODE_NORMAL_START_MONARCH.equals(eventCode) ||
 				EVENT_CODE_PROGRAM_STEP1_START_MONARCH.equals(eventCode);
-	}
-
+	}	 
+	
 	public static TherapySessionMonarch assignTherapyMatrics(
 			List<PatientVestDeviceData> groupEntries) {
 		Long timestamp = groupEntries.get(0).getTimestamp();
@@ -732,4 +738,27 @@ public class PatientVestDeviceTherapyUtilMonarch {
 		}
 		return eventString;
 	}
+	
+	public String getEventCode(String eventCode) {
+		String eventCodeValue;
+		switch (eventCode) {
+			case "error":
+				eventCodeValue = EVENT_CODE_ERROR_MONARCH;
+				break;
+			case "btChange":
+				eventCodeValue = EVENT_CODE_BT_CHANGE_SOURCE_MONARCH;
+				break;
+			case "powerConnected":
+				eventCodeValue = EVENT_CODE_POWER_CONNECTED_MONARCH;
+				break;
+			case "powerDisConnected":
+				eventCodeValue = EVENT_CODE_POWER_DISCONNECTED_MONARCH;
+				break;
+			default:
+				eventCodeValue = "";
+				break;
+		}
+		return eventCodeValue;
+	}	
+	
 }

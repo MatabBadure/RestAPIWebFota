@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List; 
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 
@@ -53,6 +55,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import static com.hillrom.vest.config.Constants.LOG_DIRECTORY;
+import static com.hillrom.vest.config.Constants.MATCH_STRING;
 
 
 @RestController
@@ -77,18 +81,26 @@ public class TimsResource {
 	public ResponseEntity<?> listLogDirectory(){
 
 		JSONObject jsonObject = new JSONObject();
-
 		try{
-				
-				
-			timsService.listLogDirectory("/usr/tomcat/apache-tomcat-8.0.28/TIMS/logs");
-			  jsonObject.put("timsMsg", "Record in protocol data temp table created successfully");
-			  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			
+			
+			List<String> returnVal = timsService.listLogDirectory(LOG_DIRECTORY, MATCH_STRING);
+			
+			List<Object> valueObj = new LinkedList<>();
+            for(String grepValue : returnVal){
+                HashMap<String, String> hmap = new HashMap<String, String>();
+                    String[] grepVal = grepValue.split(",");
+                    hmap.put("file",grepVal[0]);
+                    hmap.put("status",grepVal[1]);
+                    hmap.put("lastMod",grepVal[2]);
+                    valueObj.add(hmap);
+            }
+		  jsonObject.put("fileDtls", valueObj);
+		  jsonObject.put("timsMsg", "Record in protocol data temp table created successfully");		  
+		  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
 		}catch(Exception ex){
 			jsonObject.put("ERROR", ex.getMessage());
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}		
-		
 	}
 	
 	/**

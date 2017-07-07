@@ -16,6 +16,8 @@ import javax.persistence.StoredProcedureQuery;
 import net.minidev.json.JSONObject;
 
 import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
@@ -40,6 +42,8 @@ import org.joda.time.LocalDateTime;
  */
 @Repository
 public class TimsUserRepository{
+	
+	private final Logger log = LoggerFactory.getLogger("com.hillrom.vest.tims");
 	
 	@Inject
 	private EntityManager entityManager;
@@ -69,7 +73,7 @@ public class TimsUserRepository{
 										String inPatientPrimaryDiagnosis,
 										String inPatientgarmentType,
 										String inPatientGarmentSize,
-										String inPatientGarmentColor) {
+										String inPatientGarmentColor)  throws Exception{
 
 		
 			JSONObject returnValues = new JSONObject();
@@ -85,32 +89,32 @@ public class TimsUserRepository{
 				 
 				  CallableStatement callableStatement = connection.prepareCall("{call manage_patient_user(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
 
-				  callableStatement.setString(1, operationTypeIndicator);//Parameter #1
-				  callableStatement.setString(2, inhillRomId);////Parameter #2
-				  callableStatement.setString(3, inPatientHubId);// //Parameter #3
-				  callableStatement.setString(4, inPatientBluetoothId);// //Parameter #3
-				  callableStatement.setString(5, inPatientDeviceSerialNumber);// //Parameter #3
-				  callableStatement.setString(6, inPatientTitle);// //Parameter #3
-				  callableStatement.setString(7, inPatientFirstName);// //Parameter #3
-				  callableStatement.setString(8, inPatientMiddleName);// //Parameter #3
-				  callableStatement.setString(9, inPatientLastName);// //Parameter #3
-				  callableStatement.setString(10, inPatientdob);// //Parameter #3
-				  callableStatement.setString(11, inPatientEmail);// //Parameter #3
-				  callableStatement.setString(12, inPatientZipCode);// //Parameter #3
-				  callableStatement.setString(13, inPatientPrimaryPhone);// //Parameter #3
-				  callableStatement.setString(14, inPatientMobilePhone);// //Parameter #3
-				  callableStatement.setString(15, inPatientGender);// //Parameter #3
-				  callableStatement.setString(16, inPatientlangKey);// //Parameter #3
-				  callableStatement.setString(17, inPatientAddress);// //Parameter #3
-				  callableStatement.setString(18, inPatientCity);// //Parameter #3
-				  callableStatement.setString(19, inPatientState);// //Parameter #3
-				  callableStatement.setString(20, inPatientTrainingDate);// //Parameter #3
-				  callableStatement.setString(21, inPatientPrimaryDiagnosis);// //Parameter #3
-				  callableStatement.setString(22, inPatientgarmentType);// //Parameter #3
-				  callableStatement.setString(23, inPatientGarmentSize);// //Parameter #3
-				  callableStatement.setString(24, inPatientGarmentColor);// //Parameter #3				  
-				  callableStatement.registerOutParameter(25, Types.VARCHAR); //Output # 1
-				  callableStatement.registerOutParameter(26, Types.VARCHAR); //Output # 2
+				  callableStatement.setString(1, operationTypeIndicator);
+				  callableStatement.setString(2, inhillRomId);
+				  callableStatement.setString(3, inPatientHubId);
+				  callableStatement.setString(4, inPatientBluetoothId);
+				  callableStatement.setString(5, inPatientDeviceSerialNumber);
+				  callableStatement.setString(6, inPatientTitle);
+				  callableStatement.setString(7, inPatientFirstName);
+				  callableStatement.setString(8, inPatientMiddleName);
+				  callableStatement.setString(9, inPatientLastName);
+				  callableStatement.setString(10, inPatientdob);
+				  callableStatement.setString(11, inPatientEmail);
+				  callableStatement.setString(12, inPatientZipCode);
+				  callableStatement.setString(13, inPatientPrimaryPhone);
+				  callableStatement.setString(14, inPatientMobilePhone);
+				  callableStatement.setString(15, inPatientGender);
+				  callableStatement.setString(16, inPatientlangKey);
+				  callableStatement.setString(17, inPatientAddress);
+				  callableStatement.setString(18, inPatientCity);
+				  callableStatement.setString(19, inPatientState);
+				  callableStatement.setString(20, inPatientTrainingDate);
+				  callableStatement.setString(21, inPatientPrimaryDiagnosis);
+				  callableStatement.setString(22, inPatientgarmentType);
+				  callableStatement.setString(23, inPatientGarmentSize);
+				  callableStatement.setString(24, inPatientGarmentColor);			  
+				  callableStatement.registerOutParameter(25, Types.VARCHAR);
+				  callableStatement.registerOutParameter(26, Types.VARCHAR);
 				  callableStatement.execute();
 
 				  String outPatientId = callableStatement.getString(25);
@@ -135,7 +139,7 @@ public class TimsUserRepository{
 			public void createPatientProtocolMonarch(String typeKey,
 						  String operationType,
 						  String inPatientId,
-						  String inCreatedBy){
+						  String inCreatedBy) throws Exception{
 				entityManager
 				.createNativeQuery("call create_patient_protocol_monarch("
 				+ ":type_key,"
@@ -156,7 +160,7 @@ public class TimsUserRepository{
 			public void createPatientProtocol(String typeKey,
 					 String operationType,
 					 String inPatientId,
-					 String inCreatedBy){
+					 String inCreatedBy) throws Exception{
 			
 				entityManager
 				.createNativeQuery("call create_patient_protocol("
@@ -179,7 +183,7 @@ public class TimsUserRepository{
 			String inPatientoldDeviceSerialNumber,
 			String inPatientNewDeviceSerialNumber,
 			String inPatientBluetoothId,
-			String inPatientHubId){
+			String inPatientHubId) throws Exception{
 			
 				try{
 					entityManager
@@ -220,7 +224,7 @@ public class TimsUserRepository{
 			String inpatientDiagnosisCode4,
 			String inpatientGarmentType,
 			String inpatientGarmentSize,
-			String inpatientGarmentColor){
+			String inpatientGarmentColor) throws Exception{
 			
 			
 					entityManager
@@ -269,9 +273,9 @@ public class TimsUserRepository{
 			public void managePatientDeviceMonarch(String operationTypeIndicator,
 						String inPatientId,
 						String inPatientoldDeviceSerialNumber,
-						String inPatientNewDeviceSerialNumber){
+						String inPatientNewDeviceSerialNumber) throws Exception{
 			
-					List result = entityManager
+					entityManager
 					.createNativeQuery("call manage_patient_device_monarch("
 					+ ":operation_type_indicator,"
 					+ ":patient_id,"
@@ -281,9 +285,8 @@ public class TimsUserRepository{
 					.setParameter("patient_id", inPatientId)
 					.setParameter("pat_old_device_serial_number",inPatientoldDeviceSerialNumber)
 					.setParameter("pat_new_device_serial_number", inPatientNewDeviceSerialNumber)			
-					.getResultList();
-					
-					System.out.println("Returned values from manage_patient_device_monarch : " + result);
+					.executeUpdate();
+
 			}
    
 			
@@ -299,7 +302,7 @@ public class TimsUserRepository{
                                                                                 int min_pressure,
                                                                                 int max_pressure,
                                                                                 int to_be_inserted,
-                                                                                String user_id){
+                                                                                String user_id) throws Exception{
            
                          entityManager
                          .createNativeQuery("insert into protocol_data_temp_table("

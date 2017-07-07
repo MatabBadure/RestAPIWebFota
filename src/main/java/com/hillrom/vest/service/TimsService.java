@@ -455,7 +455,7 @@ public class TimsService {
 		
 		if((patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").isPresent()) ) {
 				String patientId = patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").get().getPatientId();	
-				if((patientInfoRepository.findOneById(patientId).getFirstName().equalsIgnoreCase("Hill-Rom")) && (patientInfoRepository.findOneById(patientId).getLastName().equalsIgnoreCase("Monarch")) ){
+				if((patientInfoRepository.findOneById(patientId).getFirstName().equalsIgnoreCase("Monarch")) && (patientInfoRepository.findOneById(patientId).getLastName().equalsIgnoreCase("Hill-Rom")) ){
 					log.debug("Checking isCurrentSerialNumberOwnedByShellMonarch ");	
 					return true;
 				}

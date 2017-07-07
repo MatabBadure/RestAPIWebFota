@@ -650,6 +650,8 @@ public class TimsService {
 			//createPatientProtocol()
 			try{
 				patientInfoDTO.setOperation_type("UPDATE");
+				patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get().getSerialNumber());
+				patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDevice(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");
@@ -838,6 +840,8 @@ public class TimsService {
 			
 			try{
 				patientInfoDTO.setOperation_type("INACTIVATE");
+				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+				patientInfoDTO.setNew_serial_number(null);
 				managePatientDevice(patientInfoDTO);
 			}catch(Exception ex){
 				ex.printStackTrace();
@@ -869,6 +873,8 @@ public class TimsService {
 				//Question : How do you know whether to pass a Normal or Custom protocol key ?
 				try{
 					patientInfoDTO.setOperation_type("UPDATE");
+					patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get().getSerialNumber());
+					patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
 					managePatientDevice(patientInfoDTO);
 					
 					patientInfoDTO.setOperation_type("CREATE");
@@ -1108,6 +1114,8 @@ public class TimsService {
 			//createPatientProtocolMonarch()
 			try{
 				patientInfoDTO.setOperation_type("UPDATE");
+				patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get().getSerialNumber());
+				patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDeviceMonarch(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");
@@ -1183,6 +1191,8 @@ public class TimsService {
 			//createPatientProtocolMonarch()
 			try{
 				patientInfoDTO.setOperation_type("INACTIVATE");
+				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+				patientInfoDTO.setNew_serial_number(null);
 				managePatientDeviceMonarch(patientInfoDTO);
 
 				patientInfoDTO.setOperation_type("CREATE");
@@ -1301,6 +1311,8 @@ public class TimsService {
 			
 			try{
 				patientInfoDTO.setOperation_type("INACTIVATE");
+				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+				patientInfoDTO.setNew_serial_number(null);
 				managePatientDeviceMonarch(patientInfoDTO);
 			}catch(Exception ex){
 				ex.printStackTrace();
@@ -1333,6 +1345,8 @@ public class TimsService {
 				//Question : How do you know whether to pass a Normal or Custom protocol key ?
 				try{
 					patientInfoDTO.setOperation_type("UPDATE");
+					patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get().getSerialNumber());
+					patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
 					managePatientDeviceMonarch(patientInfoDTO);
 					
 					patientInfoDTO.setOperation_type("CREATE");

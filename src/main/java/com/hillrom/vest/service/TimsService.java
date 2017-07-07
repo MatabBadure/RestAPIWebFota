@@ -542,6 +542,7 @@ public class TimsService {
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
 				
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDevice(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");
@@ -575,6 +576,7 @@ public class TimsService {
 			//createPatientProtocol()
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDevice(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");
@@ -612,6 +614,7 @@ public class TimsService {
 			//createPatientProtocol()
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDevice(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");
@@ -765,6 +768,7 @@ public class TimsService {
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
 				
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDevice(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");
@@ -798,6 +802,7 @@ public class TimsService {
 			//createPatientProtocol()
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDevice(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");
@@ -906,6 +911,7 @@ public class TimsService {
 				
 				try{
 					patientInfoDTO.setOperation_type("CREATE");
+					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 					managePatientDevice(patientInfoDTO);
 					
 					patientInfoDTO.setOperation_type("CREATE");
@@ -947,6 +953,7 @@ public class TimsService {
 				//createPatientProtocol()
 				try{
 					patientInfoDTO.setOperation_type("CREATE");
+					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 					managePatientDevice(patientInfoDTO);
 					
 					patientInfoDTO.setOperation_type("CREATE");
@@ -991,6 +998,7 @@ public class TimsService {
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
 				
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDeviceMonarch(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");
@@ -1024,6 +1032,7 @@ public class TimsService {
 			//createPatientProtocolMonarch()
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDeviceMonarch(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");
@@ -1061,6 +1070,7 @@ public class TimsService {
 			//createPatientProtocolMonarch()
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDeviceMonarch(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");
@@ -1217,6 +1227,7 @@ public class TimsService {
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
 				
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDeviceMonarch(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");
@@ -1252,6 +1263,7 @@ public class TimsService {
 			//createPatientProtocolMonarch()
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDeviceMonarch(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");
@@ -1363,6 +1375,7 @@ public class TimsService {
 				
 				try{
 					patientInfoDTO.setOperation_type("CREATE");
+					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 					managePatientDeviceMonarch(patientInfoDTO);
 					
 					patientInfoDTO.setOperation_type("CREATE");
@@ -1404,6 +1417,7 @@ public class TimsService {
 				//createPatientProtocolMonarch()
 				try{
 					patientInfoDTO.setOperation_type("CREATE");
+					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 					managePatientDeviceMonarch(patientInfoDTO);
 					
 					patientInfoDTO.setOperation_type("CREATE");

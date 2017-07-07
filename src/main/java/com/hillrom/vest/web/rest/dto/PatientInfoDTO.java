@@ -42,7 +42,7 @@ public class PatientInfoDTO {
 	private String new_serial_number;
 	private String old_patient_id;
 	private String is_active;
-	private String protocol_type_key;
+	private String protocol_type_key = "Normal";
 	private String created_by;
 	private String primary_phone;
 	private String mobile_phone;

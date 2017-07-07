@@ -119,7 +119,8 @@ public class TimsService {
 									                int min_pressure,
 									                int max_pressure,
 									                int to_be_inserted,
-									                String user_id) throws HillromException{		
+									                String user_id) throws HillromException{	
+			try{
 					timsUserRepository.insertIntoProtocolDataTempTable(patient_id,
 													type,
 									                treatments_per_day,
@@ -132,6 +133,9 @@ public class TimsService {
 									                max_pressure,
 									                to_be_inserted,
 									                user_id);
+			}catch(Exception ex){
+				throw new HillromException("Error While invoking Stored Procedure " , ex);
+			}
 		}
 	 
 	 /**
@@ -140,11 +144,15 @@ public class TimsService {
 	 * @return
 	 * @throws HillromException
 	 */
-	public void createPatientProtocolMonarch(PatientInfoDTO patientInfoDTO) throws HillromException{		
+	public void createPatientProtocolMonarch(PatientInfoDTO patientInfoDTO) throws HillromException{	
+		try{
 				timsUserRepository.createPatientProtocolMonarch(patientInfoDTO.getProtocol_type_key(),
 						 patientInfoDTO.getOperation_type(),
 						 patientInfoDTO.getPatient_id(),
 						 patientInfoDTO.getCreated_by());
+		}catch(Exception ex){
+			throw new HillromException("Error While invoking Stored Procedure " , ex);
+		}
 	}
 	
 	
@@ -155,11 +163,15 @@ public class TimsService {
 	 * @return
 	 * @throws HillromException
 	 */
-	public void createPatientProtocol(PatientInfoDTO patientInfoDTO) throws HillromException{		
+	public void createPatientProtocol(PatientInfoDTO patientInfoDTO) throws HillromException{	
+		try{
 			timsUserRepository.createPatientProtocol(patientInfoDTO.getProtocol_type_key(),
 												 patientInfoDTO.getOperation_type(),
 												 patientInfoDTO.getPatient_id(),
 												 patientInfoDTO.getCreated_by());
+		}catch(Exception ex){
+			throw new HillromException("Error While invoking Stored Procedure " , ex);
+		}
 	}
 
   //Start of my code
@@ -171,12 +183,16 @@ public class TimsService {
 	 */
 	public void managePatientDevice(PatientInfoDTO patientInfoDTO) throws HillromException{		
 		
-		timsUserRepository.managePatientDevice(patientInfoDTO.getOperation_type(), 
-											patientInfoDTO.getPatient_id(), 
-											patientInfoDTO.getOld_serial_number(), 
-											patientInfoDTO.getNew_serial_number(),
-											patientInfoDTO.getBluetooth_id(), 
-											patientInfoDTO.getHub_id());
+		try{
+			timsUserRepository.managePatientDevice(patientInfoDTO.getOperation_type(), 
+												patientInfoDTO.getPatient_id(), 
+												patientInfoDTO.getOld_serial_number(), 
+												patientInfoDTO.getNew_serial_number(),
+												patientInfoDTO.getBluetooth_id(), 
+												patientInfoDTO.getHub_id());
+		}catch(Exception ex){
+			throw new HillromException("Error While invoking Stored Procedure " , ex);
+		}
 	}
 
 
@@ -190,21 +206,25 @@ public class TimsService {
 	
 	public void managePatientDeviceAssociation(PatientInfoDTO patientInfoDTO) throws HillromException{	
 		
-		timsUserRepository.managePatientDeviceAssociation(patientInfoDTO.getOperation_type(),
-													  patientInfoDTO.getPatient_id(),
-													  patientInfoDTO.getDevice_type(),
-													  patientInfoDTO.getIs_active(),
-													  patientInfoDTO.getBluetooth_id(),
-													  patientInfoDTO.getTims_cust(),
-													  patientInfoDTO.getOld_patient_id(),
-													  patientInfoDTO.getTrain_dt(),
-													  patientInfoDTO.getDx1(),
-													  patientInfoDTO.getDx2(),
-													  patientInfoDTO.getDx3(),
-													  patientInfoDTO.getDx4(),
-													  patientInfoDTO.getGarment_type(),
-													  patientInfoDTO.getGarment_size(),
-													  patientInfoDTO.getGarment_color());
+		try{
+			timsUserRepository.managePatientDeviceAssociation(patientInfoDTO.getOperation_type(),
+														  patientInfoDTO.getPatient_id(),
+														  patientInfoDTO.getDevice_type(),
+														  patientInfoDTO.getIs_active(),
+														  patientInfoDTO.getBluetooth_id(),
+														  patientInfoDTO.getTims_cust(),
+														  patientInfoDTO.getOld_patient_id(),
+														  patientInfoDTO.getTrain_dt(),
+														  patientInfoDTO.getDx1(),
+														  patientInfoDTO.getDx2(),
+														  patientInfoDTO.getDx3(),
+														  patientInfoDTO.getDx4(),
+														  patientInfoDTO.getGarment_type(),
+														  patientInfoDTO.getGarment_size(),
+														  patientInfoDTO.getGarment_color());
+		}catch(Exception ex){
+			throw new HillromException("Error While invoking Stored Procedure " , ex);
+		}
 	}
 
 	
@@ -217,7 +237,7 @@ public class TimsService {
 	
 	public JSONObject managePatientUser(PatientInfoDTO patientInfoDTO) throws HillromException {	
 
-		// Question : Bluetooth Id and garment code,title in xls ?
+		try{
 		
 		return timsUserRepository.managePatientUser(patientInfoDTO.getOperation_type(), 
 													patientInfoDTO.getTims_cust(), 
@@ -243,6 +263,9 @@ public class TimsService {
 													null, 
 													null, 
 													null);
+		}catch(Exception ex){
+			throw new HillromException("Error While invoking Stored Procedure " , ex);
+		}
 		
 		
 	}
@@ -251,10 +274,14 @@ public class TimsService {
 	
 	public void managePatientDeviceMonarch(PatientInfoDTO patientInfoDTO) throws HillromException{		
 		
+		try{
 			timsUserRepository.managePatientDeviceMonarch(patientInfoDTO.getOperation_type(), 
 				patientInfoDTO.getPatient_id(), 
 				patientInfoDTO.getOld_serial_number(), 
 				patientInfoDTO.getNew_serial_number());
+		}catch(Exception ex){
+			throw new HillromException("Error While invoking Stored Procedure " , ex);
+		}
 	}
 	
 	

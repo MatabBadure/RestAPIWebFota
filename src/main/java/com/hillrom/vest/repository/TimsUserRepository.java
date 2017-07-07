@@ -16,6 +16,8 @@ import javax.persistence.StoredProcedureQuery;
 import net.minidev.json.JSONObject;
 
 import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
@@ -40,6 +42,8 @@ import org.joda.time.LocalDateTime;
  */
 @Repository
 public class TimsUserRepository{
+	
+	private final Logger log = LoggerFactory.getLogger("com.hillrom.vest.tims");
 	
 	@Inject
 	private EntityManager entityManager;
@@ -69,7 +73,7 @@ public class TimsUserRepository{
 										String inPatientPrimaryDiagnosis,
 										String inPatientgarmentType,
 										String inPatientGarmentSize,
-										String inPatientGarmentColor) {
+										String inPatientGarmentColor)  throws Exception{
 
 		
 			JSONObject returnValues = new JSONObject();
@@ -135,7 +139,7 @@ public class TimsUserRepository{
 			public void createPatientProtocolMonarch(String typeKey,
 						  String operationType,
 						  String inPatientId,
-						  String inCreatedBy){
+						  String inCreatedBy) throws Exception{
 				entityManager
 				.createNativeQuery("call create_patient_protocol_monarch("
 				+ ":type_key,"
@@ -156,7 +160,7 @@ public class TimsUserRepository{
 			public void createPatientProtocol(String typeKey,
 					 String operationType,
 					 String inPatientId,
-					 String inCreatedBy){
+					 String inCreatedBy) throws Exception{
 			
 				entityManager
 				.createNativeQuery("call create_patient_protocol("
@@ -179,7 +183,7 @@ public class TimsUserRepository{
 			String inPatientoldDeviceSerialNumber,
 			String inPatientNewDeviceSerialNumber,
 			String inPatientBluetoothId,
-			String inPatientHubId){
+			String inPatientHubId) throws Exception{
 			
 				try{
 					entityManager
@@ -220,7 +224,7 @@ public class TimsUserRepository{
 			String inpatientDiagnosisCode4,
 			String inpatientGarmentType,
 			String inpatientGarmentSize,
-			String inpatientGarmentColor){
+			String inpatientGarmentColor) throws Exception{
 			
 			
 					entityManager
@@ -269,9 +273,9 @@ public class TimsUserRepository{
 			public void managePatientDeviceMonarch(String operationTypeIndicator,
 						String inPatientId,
 						String inPatientoldDeviceSerialNumber,
-						String inPatientNewDeviceSerialNumber){
+						String inPatientNewDeviceSerialNumber) throws Exception{
 			
-					List result = entityManager
+					entityManager
 					.createNativeQuery("call manage_patient_device_monarch("
 					+ ":operation_type_indicator,"
 					+ ":patient_id,"
@@ -281,9 +285,8 @@ public class TimsUserRepository{
 					.setParameter("patient_id", inPatientId)
 					.setParameter("pat_old_device_serial_number",inPatientoldDeviceSerialNumber)
 					.setParameter("pat_new_device_serial_number", inPatientNewDeviceSerialNumber)			
-					.getResultList();
-					
-					System.out.println("Returned values from manage_patient_device_monarch : " + result);
+					.executeUpdate();
+
 			}
    
 			
@@ -299,7 +302,7 @@ public class TimsUserRepository{
                                                                                 int min_pressure,
                                                                                 int max_pressure,
                                                                                 int to_be_inserted,
-                                                                                String user_id){
+                                                                                String user_id) throws Exception{
            
                          entityManager
                          .createNativeQuery("insert into protocol_data_temp_table("

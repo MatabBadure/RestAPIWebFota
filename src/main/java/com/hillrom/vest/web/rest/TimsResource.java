@@ -267,33 +267,40 @@ public class TimsResource {
 		}
 		
 		
-		@RequestMapping(value = "/retrieveLogData/logs", method = RequestMethod.POST , produces = MediaType.TEXT_PLAIN_VALUE)
-	    public ResponseEntity<?> retrieveLogData( @RequestBody String logfilePath ,HttpServletRequest request) {
-			  
-		      	String logFileContent = ""; 
-		      	
-		      	JSONObject jsonObject = new JSONObject();
-		  		
-		     try {
-		   	  
-		   	  try {
-		   		  
-		   		logFileContent = timsService.retrieveLogData(logfilePath);
-					  return new ResponseEntity<>(logFileContent, HttpStatus.CREATED);
-				} catch (HillromException e) {
-					// TODO Auto-generated catch block
-					
-					return new ResponseEntity<>("ERROR"+e.getMessage() ,HttpStatus.BAD_REQUEST);
-				}
-		   	  	    	  
-		   	  
-		   	  	        
-		     } catch (Exception ex) {
-		   			    		
-					return new ResponseEntity<>("ERROR"+ex.getMessage() ,HttpStatus.BAD_REQUEST);
-		     }
+		@RequestMapping(value = "/retrieveLogData/logs", method = RequestMethod.POST , produces = MediaType.APPLICATION_JSON_VALUE)
+		   public ResponseEntity<?> retrieveLogData( @RequestBody JSONObject logfilePath ,HttpServletRequest request) {
+				 
+			     	String logFileContent = ""; 
+			     	
+			     	JSONObject jsonObject = new JSONObject();
+			 		
+			    try {
+			  	 
+			  	 try {
+			  		 
+			  		logFileContent = timsService.retrieveLogData(logfilePath.get("logfilePath").toString());
+			  		jsonObject.put("logFileContent", logFileContent);
+				  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
+					} catch (HillromException e) {
+						// TODO Auto-generated catch block
+						
+						
+						jsonObject.put("ERROR", e.getMessage());
+						
+						return new ResponseEntity<>(jsonObject ,HttpStatus.BAD_REQUEST);
+					}
+			  	 	    	  
+			  	 
+			  	 	        
+			    } catch (Exception ex) {
+			   	 
+			   	 jsonObject.put("ERROR", ex.getMessage());
+			  			   		
+						return new ResponseEntity<>(jsonObject ,HttpStatus.BAD_REQUEST);
+			    }
 
-		}
+			}
+
 		
 	//Use case specific implementation
 			@RequestMapping(value="/patientExistsWithNoDevice", method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)

@@ -1,5 +1,6 @@
 package com.hillrom.vest.service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -324,10 +325,15 @@ public class TimsService {
 		
     }
 	
-	public List<String> listLogDirectory(String logfilePath, String matchStr) throws HillromException {
+	public List<String> listLogDirectory(String logfilePath, String matchStr, String toDate, String fromDate) throws HillromException {
 		
 		File folder = new File(logfilePath);
-		File[] listOfFiles = folder.listFiles();
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		
+        FileFilterDateIntervalUtils filter =   new FileFilterDateIntervalUtils(toDate, fromDate);		
+		
+		File[] listOfFiles = folder.listFiles(filter);
 		
 		List<String> returnLogFiles = new LinkedList<>();
 		
@@ -342,8 +348,10 @@ public class TimsService {
 	                BufferedReader is = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 	                String line;
 	                Date lastModifiedDate = new Date(file.lastModified());
+	                String lastModifiedDateFormated = sdf.format(lastModifiedDate);
+	                
 	                while ((line = is.readLine()) != null) {
-	                    returnLogFiles.add(file.getName()+","+file+","+(Integer.parseInt(line)>0?"Success":"Failure")+","+lastModifiedDate);
+	                    returnLogFiles.add(file.getName()+","+file+","+(Integer.parseInt(line)>0?"Success":"Failure")+","+lastModifiedDateFormated);
 	                }			    	
 			    	
 		    	}catch(Exception ex){

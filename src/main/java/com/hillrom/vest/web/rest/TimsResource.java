@@ -1,14 +1,17 @@
 package com.hillrom.vest.web.rest;
 
 
+import static com.hillrom.vest.config.Constants.LOG_DIRECTORY;
+import static com.hillrom.vest.config.Constants.MATCH_STRING;
+
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import static com.hillrom.vest.config.Constants.LOG_DIRECTORY;
-import static com.hillrom.vest.config.Constants.MATCH_STRING;
+
 import net.minidev.json.JSONObject;
 
 import org.joda.time.DateTime;
@@ -52,20 +55,40 @@ public class TimsResource {
      * GET  /listLogDirectory
      */
 	@RequestMapping(value="/listLogDirectory", method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> listLogDirectory( @RequestParam(value = "page", required = false) Integer offset,
-			@RequestParam(value = "per_page", required = false) Integer limit){
+	public ResponseEntity<?> listLogDirectory(
+			@RequestParam(value = "page", required = false) Integer offset,
+			@RequestParam(value = "per_page", required = false) Integer limit,
+			@RequestParam(value = "status", required = false) String status,
+			@RequestParam(value = "toDate", required = false) String toDate,
+			@RequestParam(value = "fromDate", required = false) String fromDate) {
 
 		try{
-			List<String> returnVal = timsService.listLogDirectory(LOG_DIRECTORY, MATCH_STRING);
+			List<String> returnVal = timsService.listLogDirectory(LOG_DIRECTORY, MATCH_STRING,toDate,fromDate);
 			List<Object> valueObj = new LinkedList<>();
             for(String grepValue : returnVal){
                 HashMap<String, String> hmap = new HashMap<String, String>();
                     String[] grepVal = grepValue.split(",");
-                    hmap.put("file",grepVal[0]);
-                    hmap.put("path",grepVal[1]);
-                    hmap.put("status",grepVal[2]);
-                    hmap.put("lastMod",grepVal[3]);
-                    valueObj.add(hmap);
+                   if(grepVal[2].equalsIgnoreCase(status)){
+                	  // assignLogValuesToObj(grepVal);
+                	   hmap.put("file",grepVal[0]);
+                       hmap.put("path",grepVal[1]);
+                       hmap.put("status",grepVal[2]);
+                       hmap.put("lastMod",grepVal[3]);
+                       valueObj.add(hmap);
+                   } else if(grepVal[2].equalsIgnoreCase(status)){
+                	   hmap.put("file",grepVal[0]);
+                       hmap.put("path",grepVal[1]);
+                       hmap.put("status",grepVal[2]);
+                       hmap.put("lastMod",grepVal[3]);
+                       valueObj.add(hmap);
+                   } else if(grepVal[2].equalsIgnoreCase(status)){
+                	   hmap.put("file",grepVal[0]);
+                       hmap.put("path",grepVal[1]);
+                       hmap.put("status",grepVal[2]);
+                       hmap.put("lastMod",grepVal[3]);
+                       valueObj.add(hmap);
+                   }
+                   
             }
             Page<Object> page = new PageImpl<Object>(valueObj,
             		PaginationUtil.generatePageRequest(offset, limit), Long.valueOf(valueObj.size()));

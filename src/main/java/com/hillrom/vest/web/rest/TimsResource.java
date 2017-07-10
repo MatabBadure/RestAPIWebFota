@@ -1,62 +1,36 @@
 package com.hillrom.vest.web.rest;
 
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List; 
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.Objects;
+import java.util.List;
 
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.StoredProcedureQuery;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import static com.hillrom.vest.config.Constants.LOG_DIRECTORY;
+import static com.hillrom.vest.config.Constants.MATCH_STRING;
 import net.minidev.json.JSONObject;
 
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.data.domain.Page;
-
-import com.hillrom.vest.config.Constants;
-import com.hillrom.vest.domain.Announcements;
-import com.hillrom.vest.exceptionhandler.HillromException;
-import com.hillrom.vest.repository.TimsUserRepository;
-import com.hillrom.vest.security.AuthoritiesConstants;
-import com.hillrom.vest.service.AnnouncementsService;
-import com.hillrom.vest.service.TimsInputReaderService;
-import com.hillrom.vest.service.TimsService;
-import com.hillrom.vest.web.rest.dto.AnnouncementsDTO;
-import com.hillrom.vest.web.rest.dto.PatientInfoDTO;
-import com.hillrom.vest.web.rest.util.PaginationUtil;
-
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
-import static com.hillrom.vest.config.Constants.LOG_DIRECTORY;
-import static com.hillrom.vest.config.Constants.MATCH_STRING;
+import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.TimsUserRepository;
+import com.hillrom.vest.service.TimsInputReaderService;
+import com.hillrom.vest.service.TimsService;
+import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 
 @RestController
@@ -78,29 +52,30 @@ public class TimsResource {
      * GET  /listLogDirectory
      */
 	@RequestMapping(value="/listLogDirectory", method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> listLogDirectory(){
+	public ResponseEntity<?> listLogDirectory( @RequestParam(value = "page", required = false) Integer offset,
+			@RequestParam(value = "per_page", required = false) Integer limit){
 
-		JSONObject jsonObject = new JSONObject();
 		try{
-			
 			List<String> returnVal = timsService.listLogDirectory(LOG_DIRECTORY, MATCH_STRING);
-			
 			List<Object> valueObj = new LinkedList<>();
             for(String grepValue : returnVal){
                 HashMap<String, String> hmap = new HashMap<String, String>();
                     String[] grepVal = grepValue.split(",");
                     hmap.put("file",grepVal[0]);
-                    hmap.put("status",grepVal[1]);
-                    hmap.put("lastMod",grepVal[2]);
+                    hmap.put("path",grepVal[1]);
+                    hmap.put("status",grepVal[2]);
+                    hmap.put("lastMod",grepVal[3]);
                     valueObj.add(hmap);
             }
-		  jsonObject.put("fileDtls", valueObj);
-		  jsonObject.put("timsMsg", "Record in protocol data temp table created successfully");		  
-		  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
+            Page<Object> page = new PageImpl<Object>(valueObj,
+            		PaginationUtil.generatePageRequest(offset, limit), Long.valueOf(valueObj.size()));
+
+			HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/listLogDirectory", offset, limit);
+			return new ResponseEntity<>(page, headers, HttpStatus.OK);
+          
 		}catch(Exception ex){
-			jsonObject.put("ERROR", ex.getMessage());
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}		
+		}			
 	}
 	
 	/**

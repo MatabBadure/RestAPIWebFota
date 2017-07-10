@@ -211,7 +211,7 @@ public class TimsService {
 														  patientInfoDTO.getPatient_id(),
 														  patientInfoDTO.getDevice_type(),
 														  patientInfoDTO.getIs_active(),
-														  patientInfoDTO.getBluetooth_id(),
+														  patientInfoDTO.getSerial_num(),
 														  patientInfoDTO.getTims_cust(),
 														  patientInfoDTO.getOld_patient_id(),
 														  patientInfoDTO.getTrain_dt(),
@@ -455,7 +455,7 @@ public class TimsService {
 		
 		if((patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").isPresent()) ) {
 				String patientId = patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").get().getPatientId();	
-				if((patientInfoRepository.findOneById(patientId).getFirstName().equalsIgnoreCase("Hill-Rom")) && (patientInfoRepository.findOneById(patientId).getLastName().equalsIgnoreCase("Monarch")) ){
+				if((patientInfoRepository.findOneById(patientId).getFirstName().equalsIgnoreCase("Monarch")) && (patientInfoRepository.findOneById(patientId).getLastName().equalsIgnoreCase("Hill-Rom")) ){
 					log.debug("Checking isCurrentSerialNumberOwnedByShellMonarch ");	
 					return true;
 				}
@@ -694,7 +694,7 @@ public class TimsService {
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
 				
-				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());
@@ -1160,7 +1160,7 @@ public class TimsService {
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
 				
-				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,0,patientInfoDTO.getPatient_user_id());

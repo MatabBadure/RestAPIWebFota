@@ -338,8 +338,8 @@ public class TimsService {
 		
 		for (File file : listOfFiles) {
 		    if (file.isFile()) {
-		    	System.out.println("File Path :"+file);
-		    	System.out.println("File Path :"+file.getName());
+		    	//System.out.println("File Path :"+file);
+		    	//System.out.println("File Path :"+file.getName());
 		    	try {
 			    	log.debug(file.getName());
 			    	
@@ -352,7 +352,7 @@ public class TimsService {
 	                String lastModifiedDateFormated = sdf.format(lastModifiedDate);*/
 	                while ((line = is.readLine()) != null) {
 	                    returnLogFiles.add(file.getName()+","+file+","+(Integer.parseInt(line)>0?"Success":"Failure")+","+file.lastModified());
-	                    System.out.println("Execute grep command and single record :"+returnLogFiles);
+	                    //System.out.println("Execute grep command and single record :"+returnLogFiles);
 	                }			    	
 			    	
 		    	}catch(Exception ex){
@@ -362,7 +362,7 @@ public class TimsService {
 		}
 		
 		
-		System.out.println("Execute grep command and List of record :"+returnLogFiles);
+		//System.out.println("Execute grep command and List of record :"+returnLogFiles+"Execute grep command end");
 		return returnLogFiles;
 
     }

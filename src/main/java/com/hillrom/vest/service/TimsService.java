@@ -329,12 +329,17 @@ public class TimsService {
 	public List<String> listLogDirectory(String logfilePath, String matchStr, String toDate, String fromDate) throws HillromException {
 		
 		File folder = new File(logfilePath);
-		//SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		System.out.println("Folder :"+folder.length());
 		File[] listOfFiles = folder.listFiles();
+		
+		System.out.println("List of files :"+listOfFiles.length);
+		
 		List<String> returnLogFiles = new LinkedList<>();
 		
 		for (File file : listOfFiles) {
 		    if (file.isFile()) {
+		    	System.out.println("File Path :"+file);
+		    	System.out.println("File Path :"+file.getName());
 		    	try {
 			    	log.debug(file.getName());
 			    	
@@ -347,6 +352,7 @@ public class TimsService {
 	                String lastModifiedDateFormated = sdf.format(lastModifiedDate);*/
 	                while ((line = is.readLine()) != null) {
 	                    returnLogFiles.add(file.getName()+","+file+","+(Integer.parseInt(line)>0?"Success":"Failure")+","+file.lastModified());
+	                    System.out.println("Execute grep command and single record :"+returnLogFiles);
 	                }			    	
 			    	
 		    	}catch(Exception ex){
@@ -355,6 +361,8 @@ public class TimsService {
 		    }
 		}
 		
+		
+		System.out.println("Execute grep command and List of record :"+returnLogFiles);
 		return returnLogFiles;
 
     }

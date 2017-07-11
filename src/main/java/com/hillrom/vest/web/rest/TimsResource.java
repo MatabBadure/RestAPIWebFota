@@ -70,27 +70,37 @@ public class TimsResource {
 			@RequestParam(value = "fromDate", required = false) String fromDate) {
 
 		try{
+			System.out.println("Before list log dir");
 			List<String> returnVal = timsService.listLogDirectory(LOG_DIRECTORY, MATCH_STRING,toDate,fromDate);
+			System.out.println("End list log dir");
+			
 			DateFormat formatter = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy");
 			Calendar cal = Calendar.getInstance();
 			List<Object> valueObj = new LinkedList<>();
 			for (String grepValue : returnVal) {
 				HashMap<String, String> hmap = new HashMap<String, String>();
 				String[] grepVal = grepValue.split(",");
+				System.out.println("Converted String array :"+grepVal);
+				
 				if (grepVal[2].equalsIgnoreCase(status)
 						|| grepVal[2].equalsIgnoreCase("Both")) {
 					String modDate = grepVal[3];
 					Date date = (Date)formatter.parse(modDate);
 					cal.setTime(date);
 					String formatedDate = cal.get(Calendar.DATE)+"-"+(cal.get(Calendar.MONTH)+1) +"-"+cal.get(Calendar.YEAR);
+					System.out.println("Modfied Date :"+formatedDate);
 					if (intervalsCheck(toDate, fromDate, formatedDate )) {
 						hmap.put("file", grepVal[0]);
 						hmap.put("path", grepVal[1]);
 						hmap.put("status", grepVal[2]);
 						hmap.put("lastMod", grepVal[3]);
 						valueObj.add(hmap);
+						
+						System.out.println("Map object :"+valueObj);
 					}
 				}
+				
+				System.out.println("Map list object :"+valueObj);
 			}
             int firstResult = PaginationUtil.generatePageRequest(offset, limit).getOffset();
     		int maxResults = firstResult + PaginationUtil.generatePageRequest(offset, limit).getPageSize();

@@ -87,11 +87,12 @@ public class TimsResource {
 					System.out.println("Inside the status If check ");
 					String modDate = grepVal[3];
 					Date date = new Date(Long.valueOf(modDate));
+					String fDate = formatter.format(date); 
 					//System.out.println("modified date:"+modDate);
 					
-					//Date date = (Date)formatter.parse(d2);					
-					cal.setTime(date);
-					System.out.println("Date:"+date);
+					Date Mdate = formatter.parse(fDate);					
+					cal.setTime(Mdate);
+					System.out.println("Date:"+Mdate);
 					String formatedDate = cal.get(Calendar.DATE)+"-"+(cal.get(Calendar.MONTH)+1) +"-"+cal.get(Calendar.YEAR);
 					System.out.println("Modfied Date :"+formatedDate);
 					System.out.println("Bollean value:"+intervalsCheck(toDate, fromDate, formatedDate ));
@@ -129,7 +130,7 @@ public class TimsResource {
 	
 	private boolean intervalsCheck(String toDate, String fromDate,
 			String modifiedDate) {
-		return ((fromDate.compareTo(modifiedDate) <= 0 && (toDate
+		return ((fromDate.compareTo(modifiedDate) >= 0 && (toDate
 				.compareTo(modifiedDate) >= 0)));
 
 	}

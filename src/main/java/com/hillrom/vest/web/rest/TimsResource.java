@@ -129,7 +129,7 @@ public class TimsResource {
 	
 	private boolean intervalsCheck(String toDate, String fromDate,
 			String modifiedDate) {
-		return ((fromDate.compareTo(modifiedDate) >= 0 && (toDate
+		return ((fromDate.compareTo(modifiedDate) <= 0 && (toDate
 				.compareTo(modifiedDate) >= 0)));
 
 	}

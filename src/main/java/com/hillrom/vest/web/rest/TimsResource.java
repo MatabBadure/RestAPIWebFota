@@ -92,10 +92,15 @@ public class TimsResource {
 					//Date date = (Date)formatter.parse(d2);					
 					cal.setTime(date);
 					System.out.println("Date:"+date);
-					String formatedDate = cal.get(Calendar.DATE)+"-"+(cal.get(Calendar.MONTH)+1) +"-"+cal.get(Calendar.YEAR);
+					String formatedDate = cal.get(Calendar.DATE)+"/"+(cal.get(Calendar.MONTH)+1) +"/"+cal.get(Calendar.YEAR);
 					System.out.println("Modfied Date :"+formatedDate);
-					System.out.println("Boolean value:"+intervalsCheck(toDate, fromDate, formatedDate ));
-					if (!intervalsCheck(toDate, fromDate, formatedDate )) {
+					
+					Date compareDate = 	new SimpleDateFormat("dd/MM/yyyy").parse(formatedDate);
+					Date compareFromDate = new SimpleDateFormat("dd/MM/yyyy").parse(fromDate);
+					Date compareToDate = new SimpleDateFormat("dd/MM/yyyy").parse(toDate);
+					
+					System.out.println("Compare boolean value:"+(compareDate.after(compareFromDate) && compareDate.before(compareToDate)));
+					if(compareDate.after(compareFromDate) && compareDate.before(compareToDate)){
 						hmap.put("file", grepVal[0]);
 						hmap.put("path", grepVal[1]);
 						hmap.put("status", grepVal[2]);
@@ -127,12 +132,12 @@ public class TimsResource {
 		}			
 	}
 	
-	private boolean intervalsCheck(String toDate, String fromDate,
+	/*private boolean intervalsCheck(String toDate, String fromDate,
 			String modifiedDate) {
 		return ((fromDate.compareTo(modifiedDate) >= 0 && (toDate
 				.compareTo(modifiedDate) >= 0)));
 
-	}
+	}*/
 
 	/**
      * POST  /insertIntoProtocolDataTempTable

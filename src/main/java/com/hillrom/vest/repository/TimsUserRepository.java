@@ -4,6 +4,7 @@ import static com.hillrom.vest.config.Constants.RELATION_LABEL_SELF;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 
 import java.sql.CallableStatement;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.List;
 
@@ -251,7 +252,7 @@ public class TimsUserRepository{
 					.setParameter("pat_device_serial_number", inDeviceSerialNumber )
 					.setParameter("pat_hillrom_id", inpatientHillromId)
 					.setParameter("pat_old_id", inpatientOldId)
-					.setParameter("pat_training_date", inpatientTrainingDate)
+					.setParameter("pat_training_date", new Timestamp(inpatientTrainingDate.toDateTimeAtStartOfDay().getMillis()))
 					.setParameter("pat_diagnosis_code1", inpatientDiagnosisCode1)
 					.setParameter("pat_diagnosis_code2", inpatientDiagnosisCode2)
 					.setParameter("pat_diagnosis_code3", inpatientDiagnosisCode3)

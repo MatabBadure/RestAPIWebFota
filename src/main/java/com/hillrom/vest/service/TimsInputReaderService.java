@@ -142,7 +142,7 @@ public class TimsInputReaderService {
 	            while ((line = br.readLine()) != null) {
 
 	                // use comma as separator
-	               data = line.split(cvsSplitBy);
+	               data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"); //line.split(cvsSplitBy);
 	               
 	               PatientInfoDTO patientInfoDTO = new PatientInfoDTO();
 		            String record = "";

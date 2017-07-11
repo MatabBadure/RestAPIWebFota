@@ -84,6 +84,7 @@ public class TimsResource {
 				
 				if (grepVal[2].equalsIgnoreCase(status)
 						|| grepVal[2].equalsIgnoreCase("Both")) {
+					System.out.println("Inside the status If check ");
 					String modDate = grepVal[3];
 					Date date = (Date)formatter.parse(modDate);
 					cal.setTime(date);

@@ -94,6 +94,7 @@ public class TimsResource {
 					System.out.println("Date:"+date);
 					String formatedDate = cal.get(Calendar.DATE)+"-"+(cal.get(Calendar.MONTH)+1) +"-"+cal.get(Calendar.YEAR);
 					System.out.println("Modfied Date :"+formatedDate);
+					System.out.println("Bollean value:"+intervalsCheck(toDate, fromDate, formatedDate ));
 					if (intervalsCheck(toDate, fromDate, formatedDate )) {
 						hmap.put("file", grepVal[0]);
 						hmap.put("path", grepVal[1]);

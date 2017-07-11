@@ -80,23 +80,22 @@ public class TimsResource {
 			for (String grepValue : returnVal) {
 				HashMap<String, String> hmap = new HashMap<String, String>();
 				String[] grepVal = grepValue.split(",");
-				System.out.println("Converted String array : grepVal= "+grepVal[2]+"; status ="+status);
+				System.out.println("Converted String array : grepVal= "+grepVal[2]+"; status ="+status+":"+grepVal.length);
 				
 				if (grepVal[2].equalsIgnoreCase(status)
 						|| grepVal[2].equalsIgnoreCase("Both")) {
 					System.out.println("Inside the status If check ");
 					String modDate = grepVal[3];
 					Date date = new Date(Long.valueOf(modDate));
-					String fDate = formatter.format(date); 
 					//System.out.println("modified date:"+modDate);
 					
-					Date Mdate = formatter.parse(fDate);					
-					cal.setTime(Mdate);
-					System.out.println("Date:"+Mdate);
+					//Date date = (Date)formatter.parse(d2);					
+					cal.setTime(date);
+					System.out.println("Date:"+date);
 					String formatedDate = cal.get(Calendar.DATE)+"-"+(cal.get(Calendar.MONTH)+1) +"-"+cal.get(Calendar.YEAR);
 					System.out.println("Modfied Date :"+formatedDate);
-					System.out.println("Bollean value:"+intervalsCheck(toDate, fromDate, formatedDate ));
-					if (intervalsCheck(toDate, fromDate, formatedDate )) {
+					System.out.println("Boolean value:"+intervalsCheck(toDate, fromDate, formatedDate ));
+					if (!intervalsCheck(toDate, fromDate, formatedDate )) {
 						hmap.put("file", grepVal[0]);
 						hmap.put("path", grepVal[1]);
 						hmap.put("status", grepVal[2]);

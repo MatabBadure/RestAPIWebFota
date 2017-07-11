@@ -50,6 +50,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -328,30 +329,24 @@ public class TimsService {
 	public List<String> listLogDirectory(String logfilePath, String matchStr, String toDate, String fromDate) throws HillromException {
 		
 		File folder = new File(logfilePath);
-		
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		
-        FileFilterDateIntervalUtils filter =   new FileFilterDateIntervalUtils(toDate, fromDate);		
-		
-		File[] listOfFiles = folder.listFiles(filter);
-		
+		//SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		File[] listOfFiles = folder.listFiles();
 		List<String> returnLogFiles = new LinkedList<>();
 		
 		for (File file : listOfFiles) {
 		    if (file.isFile()) {
 		    	try {
 			    	log.debug(file.getName());
-
+			    	
 	                Runtime rt = Runtime.getRuntime();
 	                String[] cmd = { "/bin/sh", "-c", "grep -c '"+matchStr+"' '"+logfilePath+file.getName()+"' " };
 	                Process proc = rt.exec(cmd);
 	                BufferedReader is = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 	                String line;
-	                Date lastModifiedDate = new Date(file.lastModified());
-	                String lastModifiedDateFormated = sdf.format(lastModifiedDate);
-	                
+	               /* Date lastModifiedDate = new Date(file.lastModified());
+	                String lastModifiedDateFormated = sdf.format(lastModifiedDate);*/
 	                while ((line = is.readLine()) != null) {
-	                    returnLogFiles.add(file.getName()+","+file+","+(Integer.parseInt(line)>0?"Success":"Failure")+","+lastModifiedDateFormated);
+	                    returnLogFiles.add(file.getName()+","+file+","+(Integer.parseInt(line)>0?"Success":"Failure")+","+file.lastModified());
 	                }			    	
 			    	
 		    	}catch(Exception ex){

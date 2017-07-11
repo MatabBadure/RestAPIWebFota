@@ -80,7 +80,7 @@ public class TimsResource {
 			for (String grepValue : returnVal) {
 				HashMap<String, String> hmap = new HashMap<String, String>();
 				String[] grepVal = grepValue.split(",");
-				System.out.println("Converted String array :"+grepVal);
+				System.out.println("Converted String array : grepVal= "+grepVal[2]+"; status ="+status);
 				
 				if (grepVal[2].equalsIgnoreCase(status)
 						|| grepVal[2].equalsIgnoreCase("Both")) {

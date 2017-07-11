@@ -92,7 +92,7 @@ public class TimsInputReaderService {
 		    	//timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_VEST(record);
 		    	//timsService.CASE8_DeviceIsOrphanButPatientExist_VEST(record);
 		    	//timsService.CASE9_PatientHasDifferentVisivestSwap_VEST(record);
-		    	//timsService.CASE10_PatientHasMonarchAddVisivest_VEST(record);
+		    	timsService.CASE10_PatientHasMonarchAddVisivest_VEST(record);
 		    	//timsService.CASE11_PatientExistsWithNODevice_VEST(record);
 		    	
 		    }
@@ -108,7 +108,7 @@ public class TimsInputReaderService {
 		    	//timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_MONARCH(record);
 		    	//timsService.CASE8_DeviceIsOrphanButPatientExist_MONARCH(record);
 		    	//timsService.CASE9_PatientHasDifferentMonarchSwap_MONARCH(record);
-		    	//timsService.CASE10_PatientHasVisivestAddMonarch_MONARCH(record);
+		    	timsService.CASE10_PatientHasVisivestAddMonarch_MONARCH(record);
 		    	//timsService.CASE11_PatientExistsWithNODevice_MONARCH(record);		    	
 		    	
 		    }

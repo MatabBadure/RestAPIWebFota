@@ -1067,8 +1067,10 @@ public class TimsService {
 		
 		
 		
-		if((!isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
-				&& (isHillromIdExistInPatientDeviceAssocMonarch(patientInfoDTO.getTims_cust())) && (!isHillromIdHasMonarchDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
+		if((!isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) 
+				&& (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				//&& (isHillromIdExistInPatientDeviceAssocMonarch(patientInfoDTO.getTims_cust())) 
+				&& (!isHillromIdHasMonarchDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 			
 			log.debug("Inside CASE3_PatientHasVisivestAddMonarch_MONARCH ");
 			//managaPatientDeviceMonarch(CREATE)
@@ -1076,6 +1078,7 @@ public class TimsService {
 			//createPatientProtocolMonarch()
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDeviceMonarch(patientInfoDTO);
 				

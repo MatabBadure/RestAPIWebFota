@@ -326,33 +326,22 @@ public class TimsService {
 		
     }
 	
-	public List<String> listLogDirectory(String logfilePath, String matchStr, String toDate, String fromDate) throws HillromException {
+	public List<String> listLogDirectory(String logfilePath, String matchStr) throws HillromException {
 		
 		File folder = new File(logfilePath);
-		System.out.println("Folder :"+folder.length());
 		File[] listOfFiles = folder.listFiles();
-		
-		System.out.println("List of files :"+listOfFiles.length);
-		
 		List<String> returnLogFiles = new LinkedList<>();
-		
 		for (File file : listOfFiles) {
 		    if (file.isFile()) {
-		    	//System.out.println("File Path :"+file);
-		    	//System.out.println("File Path :"+file.getName());
 		    	try {
 			    	log.debug(file.getName());
-			    	
 	                Runtime rt = Runtime.getRuntime();
 	                String[] cmd = { "/bin/sh", "-c", "grep -c '"+matchStr+"' '"+logfilePath+file.getName()+"' " };
 	                Process proc = rt.exec(cmd);
 	                BufferedReader is = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 	                String line;
-	               /* Date lastModifiedDate = new Date(file.lastModified());
-	                String lastModifiedDateFormated = sdf.format(lastModifiedDate);*/
 	                while ((line = is.readLine()) != null) {
 	                    returnLogFiles.add(file.getName()+","+file+","+(Integer.parseInt(line)>0?"Success":"Failure")+","+file.lastModified());
-	                    //System.out.println("Execute grep command and single record :"+returnLogFiles);
 	                }			    	
 			    	
 		    	}catch(Exception ex){
@@ -361,8 +350,6 @@ public class TimsService {
 		    }
 		}
 		
-		
-		//System.out.println("Execute grep command and List of record :"+returnLogFiles+"Execute grep command end");
 		return returnLogFiles;
 
     }

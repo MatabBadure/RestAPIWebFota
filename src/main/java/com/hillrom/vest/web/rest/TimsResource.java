@@ -3,6 +3,7 @@ package com.hillrom.vest.web.rest;
 
 import static com.hillrom.vest.config.Constants.LOG_DIRECTORY;
 import static com.hillrom.vest.config.Constants.MATCH_STRING;
+import static com.hillrom.vest.config.Constants.ALL;
 
 import java.awt.print.Pageable;
 import java.io.File;
@@ -66,52 +67,34 @@ public class TimsResource {
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "status", required = false) String status,
-			@RequestParam(value = "toDate", required = false) String toDate,
-			@RequestParam(value = "fromDate", required = false) String fromDate) {
+			@RequestParam(value = "fromDate", required = false) String fromDate,
+			@RequestParam(value = "toDate", required = false) String toDate) {
 
 		try{
-			System.out.println("Before list log dir");
-			List<String> returnVal = timsService.listLogDirectory(LOG_DIRECTORY, MATCH_STRING,toDate,fromDate);
-			System.out.println("End list log dir");
-			
-			DateFormat formatter = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy");
+			List<String> returnVal = timsService.listLogDirectory(LOG_DIRECTORY, MATCH_STRING);
 			Calendar cal = Calendar.getInstance();
 			List<Object> valueObj = new LinkedList<>();
 			for (String grepValue : returnVal) {
 				HashMap<String, String> hmap = new HashMap<String, String>();
 				String[] grepVal = grepValue.split(",");
-				System.out.println("Converted String array : grepVal= "+grepVal[2]+"; status ="+status+":"+grepVal.length);
-				
 				if (grepVal[2].equalsIgnoreCase(status)
-						|| grepVal[2].equalsIgnoreCase("Both")) {
-					System.out.println("Inside the status If check ");
+						|| status.equalsIgnoreCase(ALL)) {
 					String modDate = grepVal[3];
 					Date date = new Date(Long.valueOf(modDate));
-					//System.out.println("modified date:"+modDate);
-					
-					//Date date = (Date)formatter.parse(d2);					
 					cal.setTime(date);
-					System.out.println("Date:"+date);
 					String formatedDate = cal.get(Calendar.DATE)+"/"+(cal.get(Calendar.MONTH)+1) +"/"+cal.get(Calendar.YEAR);
-					System.out.println("Modfied Date :"+formatedDate);
-					
 					Date compareDate = 	new SimpleDateFormat("dd/MM/yyyy").parse(formatedDate);
 					Date compareFromDate = new SimpleDateFormat("dd/MM/yyyy").parse(fromDate);
 					Date compareToDate = new SimpleDateFormat("dd/MM/yyyy").parse(toDate);
-					
-					System.out.println("Compare boolean value:"+(compareDate.after(compareFromDate) && compareDate.before(compareToDate)));
 					if(compareDate.after(compareFromDate) && compareDate.before(compareToDate)){
 						hmap.put("file", grepVal[0]);
 						hmap.put("path", grepVal[1]);
 						hmap.put("status", grepVal[2]);
 						hmap.put("lastMod", grepVal[3]);
 						valueObj.add(hmap);
-						
-						System.out.println("Map object :"+valueObj);
 					}
 				}
 				
-				System.out.println("Map list object :"+valueObj);
 			}
             int firstResult = PaginationUtil.generatePageRequest(offset, limit).getOffset();
     		int maxResults = firstResult + PaginationUtil.generatePageRequest(offset, limit).getPageSize();
@@ -120,7 +103,6 @@ public class TimsResource {
     			maxResults = maxResults > valueObj.size() ? valueObj.size() : maxResults;
     			valueObjSubList = valueObj.subList(firstResult, maxResults);
     		}
-
             Page<Object> page = new PageImpl<Object>(valueObjSubList,
             		PaginationUtil.generatePageRequest(offset, limit), Long.valueOf(valueObj.size()));
 
@@ -132,13 +114,6 @@ public class TimsResource {
 		}			
 	}
 	
-	/*private boolean intervalsCheck(String toDate, String fromDate,
-			String modifiedDate) {
-		return ((fromDate.compareTo(modifiedDate) >= 0 && (toDate
-				.compareTo(modifiedDate) >= 0)));
-
-	}*/
-
 	/**
      * POST  /insertIntoProtocolDataTempTable
      */

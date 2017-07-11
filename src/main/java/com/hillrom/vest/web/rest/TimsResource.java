@@ -86,8 +86,10 @@ public class TimsResource {
 						|| grepVal[2].equalsIgnoreCase("Both")) {
 					System.out.println("Inside the status If check ");
 					String modDate = grepVal[3];
-					Date date = (Date)formatter.parse(modDate);
+					System.out.println("modified date:"+modDate);
+					Date date = (Date)formatter.parse(modDate);					
 					cal.setTime(date);
+					System.out.println("Date:"+date);
 					String formatedDate = cal.get(Calendar.DATE)+"-"+(cal.get(Calendar.MONTH)+1) +"-"+cal.get(Calendar.YEAR);
 					System.out.println("Modfied Date :"+formatedDate);
 					if (intervalsCheck(toDate, fromDate, formatedDate )) {

@@ -351,5 +351,5 @@ public final class Constants {
 	public enum CONNECTIONTYPE {devWIFI, devLTE, devBT}	
 	
 	public static final String LOG_DIRECTORY = "/usr/tomcat/apache-tomcat-8.0.28/TIMS/logs/";
-	public static final String MATCH_STRING = "doing nothing";
+	public static final String MATCH_STRING = "Executed Successfully";
 }

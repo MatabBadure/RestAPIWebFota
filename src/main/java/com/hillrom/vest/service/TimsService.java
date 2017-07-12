@@ -611,7 +611,7 @@ public class TimsService {
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 			
-			log.debug("Inside CASE3_PatientHasMonarchAddVisivest_VEST ");
+			//log.debug("Inside CASE3_PatientHasMonarchAddVisivest_VEST ");
 			//managaPatientDevice(CREATE)
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
@@ -619,9 +619,11 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDevice(patientInfoDTO);
+				log.debug("Created Device for Patient Successfully");
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
+				log.debug("Associated Device for Patient Successfully");
 				
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -629,11 +631,12 @@ public class TimsService {
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
+				log.debug("Inserted Protocol for Patient Successfully");
 			}catch(Exception ex){
 				ex.printStackTrace();
 				return false;
 			}	
-			
+			log.debug("CASE3_PatientHasMonarchAddVisivest_VEST Executed Successfully");
 			return true;
 			
 		}
@@ -647,7 +650,7 @@ public class TimsService {
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) && (isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 			
-			log.debug("Inside CASE4_PatientHasDifferentVisivestSwap_VEST ");
+			//log.debug("Inside CASE4_PatientHasDifferentVisivestSwap_VEST ");
 			//managaPatientDevice(UPDATE)
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
@@ -656,9 +659,11 @@ public class TimsService {
 				patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get().getSerialNumber());
 				patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDevice(patientInfoDTO);
+				log.debug("Updated Device for Patient Successfully");
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
+				log.debug("Associated Device for Patient Successfully");
 				
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -666,11 +671,12 @@ public class TimsService {
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
+				log.debug("Inserted Protocol for Patient Successfully");
 			}catch(Exception ex){
 				ex.printStackTrace();
 				return false;
 			}		
-			
+			log.debug("CASE4_PatientHasDifferentVisivestSwap_VEST Executed Successfully");
 			return true;
 			
 			
@@ -916,7 +922,7 @@ public class TimsService {
 			
 			if( (isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 				
-				log.debug("Inside CASE10_PatientHasMonarchAddVisivest_VEST ");
+				//log.debug("Inside CASE10_PatientHasMonarchAddVisivest_VEST ");
 				//managePatientDevice(CREATE)
 				//managePatientDeviceAssociation(CREATE)
 				//createPatientProtocol()
@@ -924,13 +930,16 @@ public class TimsService {
 				try{
 					patientInfoDTO.setOperation_type("UPDATE");
 					managePatientUser(patientInfoDTO);
+					log.debug("Updated Patient Successfully");
 					 
 					patientInfoDTO.setOperation_type("CREATE");
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 					managePatientDevice(patientInfoDTO);
+					log.debug("Created Device for Patient Successfully");
 					
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
+					log.debug("Associated Device for Patient Successfully");
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -938,11 +947,12 @@ public class TimsService {
 					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocol(patientInfoDTO);
+					log.debug("Inserted Protocol for Patient Successfully");
 				}catch(Exception ex){
 					ex.printStackTrace();
 					return false;
 				}
-				
+				log.debug("CASE10_PatientHasMonarchAddVisivest_VEST Executed Successfully");
 				return true;
 			}
 			
@@ -1085,7 +1095,7 @@ public class TimsService {
 				//&& (isHillromIdExistInPatientDeviceAssocMonarch(patientInfoDTO.getTims_cust())) 
 				&& (!isHillromIdHasMonarchDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 			
-			log.debug("Inside CASE3_PatientHasVisivestAddMonarch_MONARCH ");
+			//log.debug("Inside CASE3_PatientHasVisivestAddMonarch_MONARCH ");
 			//managaPatientDeviceMonarch(CREATE)
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocolMonarch()
@@ -1094,9 +1104,11 @@ public class TimsService {
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDeviceMonarch(patientInfoDTO);
+				log.debug("Created Patient Successfully"+patientInfoDTO.getPatient_id());
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
+				log.debug("Associated Device for Patient Successfully");
 				
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -1104,11 +1116,12 @@ public class TimsService {
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
+				log.debug("Inserted Protocol for Patient Successfully");
 			}catch(Exception ex){
 				ex.printStackTrace();
 				return false;
 			}	
-			
+			log.debug("CASE3_PatientHasVisivestAddMonarch_MONARCH Executed Successfully");
 			return true;
 			
 		}
@@ -1124,7 +1137,7 @@ public class TimsService {
 		if((!isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (isHillromIdExistInPatientDeviceAssocMonarch(patientInfoDTO.getTims_cust())) && (isHillromIdHasMonarchDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 			
-			log.debug("Inside CASE4_PatientHasDifferentMonarchSwap_MONARCH ");
+			//log.debug("Inside CASE4_PatientHasDifferentMonarchSwap_MONARCH ");
 			//managaPatientDeviceMonarch(UPDATE)
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocolMonarch()
@@ -1133,9 +1146,11 @@ public class TimsService {
 				patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get().getSerialNumber());
 				patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDeviceMonarch(patientInfoDTO);
+				log.debug("Updated Device for Patient Successfully");
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
+				log.debug("Associated Device for Patient Successfully");
 				
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -1143,11 +1158,12 @@ public class TimsService {
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
+				log.debug("Inserted Protocol for Patient Successfully");
 			}catch(Exception ex){
 				ex.printStackTrace();
 				return false;
 			}		
-			
+			log.debug("CASE4_PatientHasDifferentMonarchSwap_MONARCH Executed Successfully");
 			return true;
 			
 			
@@ -1402,7 +1418,7 @@ public class TimsService {
 		
 			if( (isHillromIdExistInPatientDeviceAssocMonarch(patientInfoDTO.getTims_cust())) && (!isHillromIdHasMonarchDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 				
-				log.debug("Inside CASE10_PatientHasVisivestAddMonarch_MONARCH ");
+				//log.debug("Inside CASE10_PatientHasVisivestAddMonarch_MONARCH ");
 				//managePatientDeviceMonarch(CREATE)
 				//managePatientDeviceAssociation(CREATE)
 				//createPatientProtocolMonarch()
@@ -1410,13 +1426,16 @@ public class TimsService {
 				try{
 					patientInfoDTO.setOperation_type("UPDATE");
 					managePatientUser(patientInfoDTO);
+					log.debug("Updated Patient Successfully");
 					 
 					patientInfoDTO.setOperation_type("CREATE");
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 					managePatientDeviceMonarch(patientInfoDTO);
+					log.debug("Created Device for Patient Successfully");
 					
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
+					log.debug("Associated Device for Patient Successfully");
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -1424,11 +1443,12 @@ public class TimsService {
 					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocolMonarch(patientInfoDTO);
+					log.debug("Inserted Protocol for Patient Successfully");
 				}catch(Exception ex){
 					ex.printStackTrace();
 					return false;
 				}
-				
+				log.debug("CASE10_PatientHasVisivestAddMonarch_MONARCH Executed Successfully");
 				return true;
 			}
 			

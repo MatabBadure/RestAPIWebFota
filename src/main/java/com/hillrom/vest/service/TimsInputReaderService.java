@@ -85,19 +85,19 @@ public class TimsInputReaderService {
 		    	log.debug("Inside VEST loop ");
 		    	timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record);
 		    	//timsService.CASE2_PatientExistsWithNODevice_VEST(record);
-		    	timsService.CASE3_PatientHasMonarchAddVisivest_VEST(record);
+		    /*	timsService.CASE3_PatientHasMonarchAddVisivest_VEST(record);
 		    	timsService.CASE4_PatientHasDifferentVisivestSwap_VEST(record);
-		    	timsService.CASE5_DeviceOwnedByShell_VEST(record);
+		    	timsService.CASE5_DeviceOwnedByShell_VEST(record);*/
 		    	//timsService.CASE6_DeviceOwnedByDifferentPatient_VEST(record);
 		    	//timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_VEST(record);
 		    	//timsService.CASE8_DeviceIsOrphanButPatientExist_VEST(record);
 		    	//timsService.CASE9_PatientHasDifferentVisivestSwap_VEST(record);
-		    	timsService.CASE10_PatientHasMonarchAddVisivest_VEST(record);
+		    	//timsService.CASE10_PatientHasMonarchAddVisivest_VEST(record);
 		    	//timsService.CASE11_PatientExistsWithNODevice_VEST(record);
 		    	
 		    }
 
-		    if(record.getDevice_type().equalsIgnoreCase("MONARCH")){
+		    /*if(record.getDevice_type().equalsIgnoreCase("MONARCH")){
 		    	log.debug("Inside MONARCH loop ");
 		    	timsService.CASE1_NeitherPatientNorDeviceExist_MONARCH(record);
 		    	//timsService.CASE2_PatientExistsWithNODevice_MONARCH(record);
@@ -111,7 +111,7 @@ public class TimsInputReaderService {
 		    	timsService.CASE10_PatientHasVisivestAddMonarch_MONARCH(record);
 		    	//timsService.CASE11_PatientExistsWithNODevice_MONARCH(record);		    	
 		    	
-		    }
+		    }*/
 		    
 		}
 		
@@ -122,7 +122,8 @@ public class TimsInputReaderService {
 	{
 
 
-	        String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
+	      //String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
+		    String csvFile = "C:/flatfile.csv";
 	        log.debug("Started reading flat file : " + csvFile);
 	        String line = "";
 	        String cvsSplitBy = ",";
@@ -149,6 +150,7 @@ public class TimsInputReaderService {
 		            for(int i=0;i<27;i++){
 		            	try{
 		            		data[i] = Objects.nonNull(data[i]) ? data[i] : "";
+		            		
 		            		record = i==26?record + data[i]:record + data[i]+",";
 		            	}catch(ArrayIndexOutOfBoundsException ex){
 
@@ -183,6 +185,15 @@ public class TimsInputReaderService {
 			            patientInfoDTO.setMiddle_nm(data[12]);
 			            patientInfoDTO.setLast_nm(data[13]);
 			            patientInfoDTO.setEmail(data[14]);
+			            if(data[15].charAt(0)=='"'&&data[15].charAt(data[15].length()-1)=='"')
+			            {
+			            	data[15] = data[15].substring(1, data[15].length() - 1);
+			            }
+			            else
+			            {
+			            	data[15] = data[15];
+			            }
+			           
 			            patientInfoDTO.setAddress(data[15]);
 			            patientInfoDTO.setZip_cd(data[16]);
 			            patientInfoDTO.setPrimary_phone(data[17]);

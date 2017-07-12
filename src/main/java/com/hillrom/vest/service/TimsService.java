@@ -528,11 +528,7 @@ public class TimsService {
 		
 		
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))){
-			//log.debug("Inside CASE1_NeitherPatientNorDeviceExist_VEST ");
-			//managePatientUser(CREATE)
-			//managaPatientDevice(CREATE)
-			//managaPatientDeviceAssociation(CREATE)
-			//createPatientProtocol()
+
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				JSONObject returnValues =  managePatientUser(patientInfoDTO);
@@ -573,10 +569,7 @@ public class TimsService {
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) ){
 			
-			log.debug("Inside CASE2_PatientExistsWithNODevice_VEST ");
-			//managaPatientDevice(CREATE)
-			//managaPatientDeviceAssociation(CREATE)
-			//createPatientProtocol()
+
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
@@ -611,10 +604,7 @@ public class TimsService {
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 			
-			//log.debug("Inside CASE3_PatientHasMonarchAddVisivest_VEST ");
-			//managaPatientDevice(CREATE)
-			//managaPatientDeviceAssociation(CREATE)
-			//createPatientProtocol()
+
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
@@ -650,10 +640,7 @@ public class TimsService {
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) && (isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 			
-			//log.debug("Inside CASE4_PatientHasDifferentVisivestSwap_VEST ");
-			//managaPatientDevice(UPDATE)
-			//managaPatientDeviceAssociation(CREATE)
-			//createPatientProtocol()
+
 			try{
 				patientInfoDTO.setOperation_type("UPDATE");
 				patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get().getSerialNumber());
@@ -691,10 +678,7 @@ public class TimsService {
 		if((isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& isCurrentSerialNumberOwnedByShellVest(patientInfoDTO.getSerial_num()) ){
 			
-			//log.debug("Inside CASE5_DeviceOwnedByShell_VEST ");
-			//managePatientUser(UPDATE)
-			//managaPatientDeviceAssociation(CREATE)
-			//createPatientProtocol()
+
 			
 
 			try{
@@ -729,11 +713,7 @@ public class TimsService {
 				&& (!isCurrentSerialNumberOwnedByShellVest(patientInfoDTO.getSerial_num())) 
 				&& (isCurrentSerialNumberOwnedByDifferentPatientVest(patientInfoDTO.getSerial_num(), patientInfoDTO.getTims_cust())) ){
 		
-			log.debug("Inside CASE6_DeviceOwnedByDifferentPatient_VEST ");
-			//managaPatientDevice(INACTIVATE)
-			//managePatientUser(CREATE)
-			//managaPatientDeviceAssociation(CREATE)
-			//createPatientProtocol()
+
 			try{
 				String patient_id_of_serial_number_to_inactivate = patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(patientInfoDTO.getSerial_num(),"VEST").get().getPatientId();
 				patientInfoDTO.setPatient_id(patient_id_of_serial_number_to_inactivate);
@@ -770,11 +750,7 @@ public class TimsService {
 				&& (!isCurrentSerialNumberOwnedByShellVest(patientInfoDTO.getSerial_num())) 
 				&& (!isCurrentSerialNumberOwnedByDifferentPatientVest(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust() )) ){
 
-			log.debug("Inside CASE7_DeviceIsOrphanPatientDoesNotExist_VEST ");	
-			//managePatientUser(CREATE)
-			//managaPatientDevice(CREATE)
-			//managaPatientDeviceAssociation(CREATE)
-			//createPatientProtocol()
+
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
@@ -810,10 +786,7 @@ public class TimsService {
 				&& (!isCurrentSerialNumberOwnedByCurrentHillromIdVest(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust())) 
 				&& (isOwnerExistsForCurrentSerialNumberVest(patientInfoDTO.getSerial_num() )) ){
 
-			log.debug("Inside CASE8_DeviceIsOrphanButPatientExist_VEST ");	
-			//managaPatientDevice(CREATE)
-			//managaPatientDeviceAssociation(CREATE)
-			//createPatientProtocol()
+
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
@@ -848,7 +821,7 @@ public class TimsService {
 				&& (!isCurrentSerialNumberOwnedByCurrentHillromIdVest(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust())) 
 				&& (!isOwnerExistsForCurrentSerialNumberVest(patientInfoDTO.getSerial_num() )) ){
 			log.debug("Inside DeviceOwnedByDifferentPatient_VEST ");
-			//managePatientDevice(INACTIVATE)
+
 			
 			try{
 				patientInfoDTO.setOperation_type("INACTIVATE");
@@ -878,11 +851,7 @@ public class TimsService {
 			if( (isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) && (isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 				log.debug("Inside CASE9_PatientHasDifferentVisivestSwap_VEST ");
 	
-				//managePatientDevice(UPDATE)
-				//managePatientDeviceAssociation(CREATE)
-				//createPatientProtocol()
-				
-				//Question : How do you know whether to pass a Normal or Custom protocol key ?
+
 				try{
 					patientInfoDTO.setOperation_type("UPDATE");
 					patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get().getSerialNumber());
@@ -922,10 +891,7 @@ public class TimsService {
 			
 			if( (isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 				
-				//log.debug("Inside CASE10_PatientHasMonarchAddVisivest_VEST ");
-				//managePatientDevice(CREATE)
-				//managePatientDeviceAssociation(CREATE)
-				//createPatientProtocol()
+
 				
 				try{
 					patientInfoDTO.setOperation_type("UPDATE");
@@ -972,10 +938,7 @@ public class TimsService {
 			
 			if (!isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) {
 				
-				log.debug("Inside CASE11_PatientExistsWithNODevice_VEST ");
-				//managePatientDevice(CREATE)
-				//managePatientDeviceAssociation(CREATE)
-				//createPatientProtocol()
+
 				try{
 					patientInfoDTO.setOperation_type("CREATE");
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
@@ -1011,11 +974,7 @@ public class TimsService {
 		
 		
 		if((!isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))){
-			//log.debug("Inside CASE1_NeitherPatientNorDeviceExist_MONARCH ");
-			//managePatientUser(CREATE)
-			//managaPatientDeviceMonarch(CREATE)
-			//managaPatientDeviceAssociation(CREATE)
-			//createPatientProtocolMonarch()
+
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
@@ -1055,10 +1014,7 @@ public class TimsService {
 		if((!isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isHillromIdExistInPatientDeviceAssocMonarch(patientInfoDTO.getTims_cust())) ){
 			
-			log.debug("Inside CASE2_PatientExistsWithNODevice_MONARCH ");
-			//managaPatientDeviceMonarch(CREATE)
-			//managaPatientDeviceAssociation(CREATE)
-			//createPatientProtocolMonarch()
+
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
@@ -1095,10 +1051,7 @@ public class TimsService {
 				//&& (isHillromIdExistInPatientDeviceAssocMonarch(patientInfoDTO.getTims_cust())) 
 				&& (!isHillromIdHasMonarchDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 			
-			//log.debug("Inside CASE3_PatientHasVisivestAddMonarch_MONARCH ");
-			//managaPatientDeviceMonarch(CREATE)
-			//managaPatientDeviceAssociation(CREATE)
-			//createPatientProtocolMonarch()
+
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
@@ -1137,10 +1090,7 @@ public class TimsService {
 		if((!isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (isHillromIdExistInPatientDeviceAssocMonarch(patientInfoDTO.getTims_cust())) && (isHillromIdHasMonarchDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 			
-			//log.debug("Inside CASE4_PatientHasDifferentMonarchSwap_MONARCH ");
-			//managaPatientDeviceMonarch(UPDATE)
-			//managaPatientDeviceAssociation(CREATE)
-			//createPatientProtocolMonarch()
+
 			try{
 				patientInfoDTO.setOperation_type("UPDATE");
 				patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get().getSerialNumber());
@@ -1180,10 +1130,7 @@ public class TimsService {
 		if((isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& isCurrentSerialNumberOwnedByShellMonarch(patientInfoDTO.getSerial_num()) ){
 			
-			//log.debug("Inside CASE5_DeviceOwnedByShell_MONARCH ");
-			//managePatientUser(UPDATE)
-			//managaPatientDeviceAssociation(CREATE)
-			//createPatientProtocolMonarch()
+
 			
 
 			try{
@@ -1220,11 +1167,7 @@ public class TimsService {
 		if((isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isCurrentSerialNumberOwnedByShellMonarch(patientInfoDTO.getSerial_num())) 
 				&& (isCurrentSerialNumberOwnedByDifferentPatientMonarch(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust() )) ){
-			log.debug("Inside CASE6_DeviceOwnedByDifferentPatient_MONARCH ");	
-			//managaPatientDeviceMonarch(INACTIVATE)
-			//managePatientUser(CREATE)
-			//managaPatientDeviceAssociation(CREATE)
-			//createPatientProtocolMonarch()
+
 			try{
 				patientInfoDTO.setOperation_type("INACTIVATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
@@ -1261,11 +1204,7 @@ public class TimsService {
 				&& (!isCurrentSerialNumberOwnedByShellMonarch(patientInfoDTO.getSerial_num())) 
 				&& (!isCurrentSerialNumberOwnedByDifferentPatientMonarch(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust() )) ){
 
-			log.debug("Inside CASE7_DeviceIsOrphanPatientDoesNotExist_MONARCH ");	
-			//managePatientUser(CREATE)
-			//managaPatientDeviceMonarch(CREATE)
-			//managaPatientDeviceAssociation(CREATE)
-			//createPatientProtocolMonarch()
+
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
@@ -1303,10 +1242,7 @@ public class TimsService {
 				&& (!isCurrentSerialNumberOwnedByCurrentHillromIdMonarch(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust())) 
 				&& (isOwnerExistsForCurrentSerialNumberMonarch(patientInfoDTO.getSerial_num() )) ){
 
-			log.debug("Inside CASE8_DeviceIsOrphanButPatientExist_MONARCH ");	
-			//managaPatientDeviceMonarch(CREATE)
-			//managaPatientDeviceAssociation(CREATE)
-			//createPatientProtocolMonarch()
+
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
@@ -1343,7 +1279,7 @@ public class TimsService {
 				&& (!isCurrentSerialNumberOwnedByCurrentHillromIdMonarch(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust())) 
 				&& (!isOwnerExistsForCurrentSerialNumberMonarch(patientInfoDTO.getSerial_num() )) ){
 			log.debug("Inside DeviceOwnedByDifferentPatient_MONARCH ");
-			//managePatientDeviceMonarch(INACTIVATE)
+
 			
 			try{
 				patientInfoDTO.setOperation_type("INACTIVATE");
@@ -1373,10 +1309,7 @@ public class TimsService {
 		
 			if( (isHillromIdExistInPatientDeviceAssocMonarch(patientInfoDTO.getTims_cust())) && (isHillromIdHasMonarchDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 				
-				log.debug("Inside CASE9_PatientHasDifferentMonarchSwap_MONARCH ");
-				//managePatientDeviceMonarch(UPDATE)
-				//managePatientDeviceAssociation(CREATE)
-				//createPatientProtocolMonarch()
+
 				
 				//Question : How do you know whether to pass a Normal or Custom protocol key ?
 				try{
@@ -1418,10 +1351,7 @@ public class TimsService {
 		
 			if( (isHillromIdExistInPatientDeviceAssocMonarch(patientInfoDTO.getTims_cust())) && (!isHillromIdHasMonarchDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 				
-				//log.debug("Inside CASE10_PatientHasVisivestAddMonarch_MONARCH ");
-				//managePatientDeviceMonarch(CREATE)
-				//managePatientDeviceAssociation(CREATE)
-				//createPatientProtocolMonarch()
+
 				
 				try{
 					patientInfoDTO.setOperation_type("UPDATE");
@@ -1468,10 +1398,7 @@ public class TimsService {
 		
 			if (!isHillromIdExistInPatientDeviceAssocMonarch(patientInfoDTO.getTims_cust())) {
 				
-				log.debug("Inside CASE11_PatientExistsWithNODevice_MONARCH ");
-				//managePatientDeviceMonarch(CREATE)
-				//managePatientDeviceAssociation(CREATE)
-				//createPatientProtocolMonarch()
+
 				try{
 					patientInfoDTO.setOperation_type("CREATE");
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());

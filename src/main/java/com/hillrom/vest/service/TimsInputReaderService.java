@@ -112,7 +112,6 @@ public class TimsInputReaderService {
 		    	//timsService.CASE11_PatientExistsWithNODevice_MONARCH(record);		    	
 		    	
 		    }
-		    
 		}
 		
 	}
@@ -123,7 +122,7 @@ public class TimsInputReaderService {
 
 
 	        String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
-	        log.debug("Started reading flat file : " + csvFile);
+		    log.debug("Started reading flat file : " + csvFile);
 	        String line = "";
 	        String cvsSplitBy = ",";
 	        String Outdata = "";
@@ -149,6 +148,7 @@ public class TimsInputReaderService {
 		            for(int i=0;i<27;i++){
 		            	try{
 		            		data[i] = Objects.nonNull(data[i]) ? data[i] : "";
+		            		
 		            		record = i==26?record + data[i]:record + data[i]+",";
 		            	}catch(ArrayIndexOutOfBoundsException ex){
 
@@ -183,6 +183,15 @@ public class TimsInputReaderService {
 			            patientInfoDTO.setMiddle_nm(data[12]);
 			            patientInfoDTO.setLast_nm(data[13]);
 			            patientInfoDTO.setEmail(data[14]);
+			            if(data[15].charAt(0)=='"'&&data[15].charAt(data[15].length()-1)=='"')
+			            {
+			            	data[15] = data[15].substring(1, data[15].length() - 1);
+			            }
+			            else
+			            {
+			            	data[15] = data[15];
+			            }
+			           
 			            patientInfoDTO.setAddress(data[15]);
 			            patientInfoDTO.setZip_cd(data[16]);
 			            patientInfoDTO.setPrimary_phone(data[17]);

@@ -428,7 +428,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 							deviceDataMonarch.add(j, inCompleteEventMonarch);
 						}
 						TherapySessionMonarch therapySession = assignTherapyMatricsMonarch(groupEntriesMonarch);
-						//applyGlobalHMRMonarch(therapySession,latestInActiveDeviceHistory);
+						applyGlobalHMRMonarch(therapySession,latestInActiveDeviceHistory);
 						therapySessions.add(therapySession);
 						i=j; // to skip the events iterated, shouldn't be removed in any case
 						break;
@@ -461,7 +461,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 	
 	private static void applyGlobalHMRMonarch(TherapySessionMonarch therapySession,
 			PatientVestDeviceHistoryMonarch latestInActiveDeviceHistory)throws Exception {
-		if( Objects.nonNull(latestInActiveDeviceHistory) && (therapySession.getHmr() < latestInActiveDeviceHistory.getHmr())){
+		if( Objects.nonNull(latestInActiveDeviceHistory) ){
 			if(!(latestInActiveDeviceHistory.getSerialNumber().equalsIgnoreCase(therapySession.getSerialNumber()))){
 				therapySession.setHmr(therapySession.getHmr()+latestInActiveDeviceHistory.getHmr());
 			}

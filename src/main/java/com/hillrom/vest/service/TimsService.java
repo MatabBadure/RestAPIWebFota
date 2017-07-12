@@ -922,6 +922,9 @@ public class TimsService {
 				//createPatientProtocol()
 				
 				try{
+					patientInfoDTO.setOperation_type("UPDATE");
+					managePatientUser(patientInfoDTO);
+					 
 					patientInfoDTO.setOperation_type("CREATE");
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 					managePatientDevice(patientInfoDTO);
@@ -1405,6 +1408,9 @@ public class TimsService {
 				//createPatientProtocolMonarch()
 				
 				try{
+					patientInfoDTO.setOperation_type("UPDATE");
+					managePatientUser(patientInfoDTO);
+					 
 					patientInfoDTO.setOperation_type("CREATE");
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 					managePatientDeviceMonarch(patientInfoDTO);

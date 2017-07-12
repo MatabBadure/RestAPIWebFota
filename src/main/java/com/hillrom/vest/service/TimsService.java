@@ -334,7 +334,7 @@ public class TimsService {
 		for (File file : listOfFiles) {
 		    if (file.isFile()) {
 		    	try {
-			    	log.debug(file.getName());
+			    	//log.debug(file.getName());
 	                Runtime rt = Runtime.getRuntime();
 	                String[] cmd = { "/bin/sh", "-c", "grep -c '"+matchStr+"' '"+logfilePath+file.getName()+"' " };
 	                Process proc = rt.exec(cmd);

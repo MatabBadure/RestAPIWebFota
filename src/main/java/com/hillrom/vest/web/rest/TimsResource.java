@@ -1,14 +1,24 @@
 package com.hillrom.vest.web.rest;
 
 
+import static com.hillrom.vest.config.Constants.LOG_DIRECTORY;
+import static com.hillrom.vest.config.Constants.MATCH_STRING;
+import static com.hillrom.vest.config.Constants.ALL;
+
+import java.awt.print.Pageable;
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import static com.hillrom.vest.config.Constants.LOG_DIRECTORY;
-import static com.hillrom.vest.config.Constants.MATCH_STRING;
+
 import net.minidev.json.JSONObject;
 
 import org.joda.time.DateTime;
@@ -26,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hillrom.vest.domain.Announcements;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.TimsUserRepository;
 import com.hillrom.vest.service.TimsInputReaderService;
@@ -52,22 +63,47 @@ public class TimsResource {
      * GET  /listLogDirectory
      */
 	@RequestMapping(value="/listLogDirectory", method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> listLogDirectory( @RequestParam(value = "page", required = false) Integer offset,
-			@RequestParam(value = "per_page", required = false) Integer limit){
+	public ResponseEntity<?> listLogDirectory(
+			@RequestParam(value = "page", required = false) Integer offset,
+			@RequestParam(value = "per_page", required = false) Integer limit,
+			@RequestParam(value = "status", required = false) String status,
+			@RequestParam(value = "fromDate", required = false) String fromDate,
+			@RequestParam(value = "toDate", required = false) String toDate) {
 
 		try{
 			List<String> returnVal = timsService.listLogDirectory(LOG_DIRECTORY, MATCH_STRING);
+			Calendar cal = Calendar.getInstance();
 			List<Object> valueObj = new LinkedList<>();
-            for(String grepValue : returnVal){
-                HashMap<String, String> hmap = new HashMap<String, String>();
-                    String[] grepVal = grepValue.split(",");
-                    hmap.put("file",grepVal[0]);
-                    hmap.put("path",grepVal[1]);
-                    hmap.put("status",grepVal[2]);
-                    hmap.put("lastMod",grepVal[3]);
-                    valueObj.add(hmap);
-            }
-            Page<Object> page = new PageImpl<Object>(valueObj,
+			for (String grepValue : returnVal) {
+				HashMap<String, String> hmap = new HashMap<String, String>();
+				String[] grepVal = grepValue.split(",");
+				if (grepVal[2].equalsIgnoreCase(status)
+						|| status.equalsIgnoreCase(ALL)) {
+					String modDate = grepVal[3];
+					Date date = new Date(Long.valueOf(modDate));
+					cal.setTime(date);
+					String formatedDate = cal.get(Calendar.DATE)+"/"+(cal.get(Calendar.MONTH)+1) +"/"+cal.get(Calendar.YEAR);
+					Date compareDate = 	new SimpleDateFormat("dd/MM/yyyy").parse(formatedDate);
+					Date compareFromDate = new SimpleDateFormat("dd/MM/yyyy").parse(fromDate);
+					Date compareToDate = new SimpleDateFormat("dd/MM/yyyy").parse(toDate);
+					if(compareDate.after(compareFromDate) && compareDate.before(compareToDate)){
+						hmap.put("file", grepVal[0]);
+						hmap.put("path", grepVal[1]);
+						hmap.put("status", grepVal[2]);
+						hmap.put("lastMod", grepVal[3]);
+						valueObj.add(hmap);
+					}
+				}
+				
+			}
+            int firstResult = PaginationUtil.generatePageRequest(offset, limit).getOffset();
+    		int maxResults = firstResult + PaginationUtil.generatePageRequest(offset, limit).getPageSize();
+    		List<Object> valueObjSubList = new ArrayList<>();
+    		if (firstResult < valueObj.size()) {
+    			maxResults = maxResults > valueObj.size() ? valueObj.size() : maxResults;
+    			valueObjSubList = valueObj.subList(firstResult, maxResults);
+    		}
+            Page<Object> page = new PageImpl<Object>(valueObjSubList,
             		PaginationUtil.generatePageRequest(offset, limit), Long.valueOf(valueObj.size()));
 
 			HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/listLogDirectory", offset, limit);

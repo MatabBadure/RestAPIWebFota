@@ -191,7 +191,8 @@ public class TimsInputReaderService {
 			            {
 			            	data[15] = data[15];
 			            }
-			           
+
+
 			            patientInfoDTO.setAddress(data[15]);
 			            patientInfoDTO.setZip_cd(data[16]);
 			            patientInfoDTO.setPrimary_phone(data[17]);

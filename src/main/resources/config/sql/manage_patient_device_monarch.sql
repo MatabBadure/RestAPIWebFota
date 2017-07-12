@@ -30,7 +30,7 @@ SET created_by = 'JDE APP';
         
 IF operation_type_indicator = 'CREATE' THEN
 
-	SELECT `id`, `serial_number` INTO temp_patient_info_id, temp_serial_number FROM `PATIENT_INFO`
+	SELECT `patient_id`, `serial_number` INTO temp_patient_info_id, temp_serial_number FROM `PATIENT_DEVICES_ASSOC`
 	WHERE `serial_number` = pat_old_device_serial_number;
 
 
@@ -103,9 +103,9 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
             
 ELSEIF operation_type_indicator ='INACTIVATE' THEN
 
-		SELECT `id`, `serial_number` INTO temp_patient_info_id, temp_serial_number FROM `PATIENT_INFO`
+		SELECT `patient_id`, `serial_number` INTO temp_patient_info_id, temp_serial_number FROM `PATIENT_DEVICES_ASSOC`
 
-		WHERE `serial_number` = pat_old_device_serial_number  AND `id` = patient_id;
+		WHERE `serial_number` = pat_old_device_serial_number  AND `patient_id` = patient_id;
 
         
         IF temp_patient_info_id IS NULL THEN

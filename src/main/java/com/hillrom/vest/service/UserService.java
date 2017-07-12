@@ -529,21 +529,21 @@ public class UserService {
 		patientInfo = patientInfoRepository.save(patientInfo);
 		log.debug("Created Information for Patient : {}", patientInfo);
 		
-		
 		// /Insert Garament details in patient device ass info
+		
+
 		assignGarmentValuesToPatientDeviceAssocObj(userExtensionDTO,
 				patientDevicesAssoc);
 		patientDevicesAssoc.setPatientId(patientInfoId);
 		patientDevicesAssoc.setCreatedDate(new LocalDate());
 		patientDevicesAssoc.setHillromId(userExtensionDTO.getHillromId());
 		patientDevicesAssoc.setIsActive(true);
-		if (Objects.nonNull(userExtensionDTO.getDeviceType()))
-			patientDevicesAssoc.setDeviceType(userExtensionDTO.getDeviceType());
+		patientDevicesAssoc.setDeviceType(VEST);
 		patientDevicesAssoc = patientDevicesAssocRepository
 				.save(patientDevicesAssoc);
 		log.debug("Created Information for PatientDevice Association : {}",
 				patientDevicesAssoc);
-
+	
 		assignValuesToUserObj(userExtensionDTO, newUser);
 
 		newUser.setPassword(passwordEncoder
@@ -899,13 +899,24 @@ public class UserService {
 			// Looping through the patient devices
 			for (PatientDevicesAssoc updatePatientType : updatePatientTypeList) {
 				if(updatePatientType.getDeviceType().equals(VEST)){
-					assignGarmentValuesToPatientDeviceAssocObj(userExtensionDTO, updatePatientType);
+					if (Objects.nonNull(userExtensionDTO.getVestGarmentColor()))
+						updatePatientType.setGarmentColor(userExtensionDTO.getVestGarmentColor());
+					if (Objects.nonNull(userExtensionDTO.getVestGarmentSize()))
+						updatePatientType.setGarmentSize(userExtensionDTO.getVestGarmentSize());
+					if (Objects.nonNull(userExtensionDTO.getVestGarmentType()))
+						updatePatientType.setGarmentType(userExtensionDTO.getVestGarmentType());
 					patientDevicesAssocRepository.save(updatePatientType);
-					log.debug("Upadted Information for PatientDevice Association : {}", updatePatientType);
-				} else if(updatePatientType.getDeviceType().equals(MONARCH)){
-					assignGarmentValuesToPatientDeviceAssocObj(userExtensionDTO, updatePatientType);
+					log.debug("Upadted Information for PatientDevice Vest Association : {}", updatePatientType);
+				}
+				if(updatePatientType.getDeviceType().equals(MONARCH)){
+					if (Objects.nonNull(userExtensionDTO.getMonarchGarmentColor()))
+						updatePatientType.setGarmentColor(userExtensionDTO.getMonarchGarmentColor());
+					if (Objects.nonNull(userExtensionDTO.getMonarchGarmentSize()))
+						updatePatientType.setGarmentSize(userExtensionDTO.getMonarchGarmentSize());
+					if (Objects.nonNull(userExtensionDTO.getMonarchGarmentType()))
+						updatePatientType.setGarmentType(userExtensionDTO.getMonarchGarmentType());
 					patientDevicesAssocRepository.save(updatePatientType);
-					log.debug("Upadted Information for PatientDevice Association : {}", updatePatientType);
+					log.debug("Upadted Information for PatientDevice Monarch Association : {}", updatePatientType);
 				}
 				
 			}
@@ -1484,15 +1495,36 @@ public class UserService {
 		}
 		return Optional.of(patientUserVO);
 	}
-	public User getUser(Long id) throws HillromException{
+
+	public User getUser(Long id) throws HillromException {
 		User user = userRepository.findOne(id);
-		if(Objects.nonNull(user)) {
-			return user;
-		} else {
-			throw new HillromException(ExceptionConstants.HR_512);//No such user exist
+
+		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
+
+		List<PatientDevicesAssoc> patientDevicesAssocList = patientDevicesAssocRepository
+				.findByPatientId(patientInfo.getId());
+		// Garment Changes :Looping through the patient devices
+		for (PatientDevicesAssoc device : patientDevicesAssocList) {
+			if (device.getDeviceType().equals(VEST)) {
+				user.setVestGarmentColor(device.getGarmentColor());
+				user.setVestGarmentSize(device.getGarmentSize());
+				user.setVestGarmentType(device.getGarmentType());
+			} else if (device.getDeviceType().equals(MONARCH)) {
+				user.setMonarchGarmentColor(device.getGarmentColor());
+				user.setMonarchGarmentSize(device.getGarmentSize());
+				user.setMonarchGarmentType(device.getGarmentType());
+			}
 		}
 
-	 }
+		if (Objects.nonNull(user)) {
+			return user;
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);// No such
+																	// user
+																	// exist
+		}
+
+	}
 
 	public UserPatientAssoc createCaregiverUser(Long patientUserId, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException {
 		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
@@ -1854,6 +1886,24 @@ public class UserService {
 				Optional<ClinicPatientAssoc> clinicPatientAssoc = clinicPatientRepository.findOneByClinicIdAndPatientId(
 						clinicId, patientInfo.getId());
 				PatientUserVO patientUserVO = new PatientUserVO(patientUser, patientInfo);
+				List<PatientDevicesAssoc> patientDevicesAssocList = patientDevicesAssocRepository
+						.findByPatientId(patientInfo.getId());
+				// Garment Changes :Looping through the patient devices
+				for (PatientDevicesAssoc device : patientDevicesAssocList) {
+					if (device.getDeviceType().equals(VEST)) {
+						patientUserVO.setVestGarmentColor(device.getGarmentColor());
+						patientUserVO.setVestGarmentSize(device.getGarmentSize());
+						patientUserVO.setVestGarmentType(device.getGarmentType());
+					} else if (device.getDeviceType().equals(MONARCH)) {
+						patientUserVO.setMonarchGarmentColor(device
+								.getGarmentColor());
+						patientUserVO
+								.setMonarchGarmentSize(device.getGarmentSize());
+						patientUserVO
+								.setMonarchGarmentType(device.getGarmentType());
+					}
+				}
+				
 				if(clinicPatientAssoc.isPresent()){
 					Map<String,Object> clinicMRNId = new HashMap<>();
 					clinicMRNId.put("clinic", clinicPatientAssoc.get().getClinic());

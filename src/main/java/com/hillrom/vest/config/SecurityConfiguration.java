@@ -142,7 +142,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/loginAnalytics").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES,AuthoritiesConstants.ASSOCIATES, AuthoritiesConstants.CUSTOMER_SERVICES)
             .antMatchers("/api/survey/{id}/graph").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES,AuthoritiesConstants.ASSOCIATES, AuthoritiesConstants.CUSTOMER_SERVICES)
             //hill-1845
-            .antMatchers("/api/survey/{id}/graph").authenticated()        
+            .antMatchers("/api/survey/{id}/graph").authenticated()      
+            .antMatchers("/api/retrieveLogData/logs").permitAll()
+            .antMatchers("/api/executeTIMSJob").hasAuthority(AuthoritiesConstants.ADMIN)
         .and()
             .apply(securityConfigurerAdapter());
 

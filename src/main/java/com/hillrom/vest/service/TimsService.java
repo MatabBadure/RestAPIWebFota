@@ -1,5 +1,6 @@
 package com.hillrom.vest.service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -49,6 +50,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -328,22 +330,18 @@ public class TimsService {
 		
 		File folder = new File(logfilePath);
 		File[] listOfFiles = folder.listFiles();
-		
 		List<String> returnLogFiles = new LinkedList<>();
-		
 		for (File file : listOfFiles) {
 		    if (file.isFile()) {
 		    	try {
-			    	log.debug(file.getName());
-
+			    	//log.debug(file.getName());
 	                Runtime rt = Runtime.getRuntime();
 	                String[] cmd = { "/bin/sh", "-c", "grep -c '"+matchStr+"' '"+logfilePath+file.getName()+"' " };
 	                Process proc = rt.exec(cmd);
 	                BufferedReader is = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 	                String line;
-	                Date lastModifiedDate = new Date(file.lastModified());
 	                while ((line = is.readLine()) != null) {
-	                    returnLogFiles.add(file.getName()+","+file+","+(Integer.parseInt(line)>0?"Success":"Failure")+","+lastModifiedDate);
+	                    returnLogFiles.add(file.getName()+","+file+","+(Integer.parseInt(line)>0?"Success":"Failure")+","+file.lastModified());
 	                }			    	
 			    	
 		    	}catch(Exception ex){
@@ -530,7 +528,7 @@ public class TimsService {
 		
 		
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))){
-			log.debug("Inside CASE1_NeitherPatientNorDeviceExist_VEST ");
+			//log.debug("Inside CASE1_NeitherPatientNorDeviceExist_VEST ");
 			//managePatientUser(CREATE)
 			//managaPatientDevice(CREATE)
 			//managaPatientDeviceAssociation(CREATE)
@@ -540,22 +538,27 @@ public class TimsService {
 				JSONObject returnValues =  managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
+				log.debug("Created Patient Successfully"+returnValues.get("return_patient_id").toString());
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDevice(patientInfoDTO);
+				log.debug("Created Device for Patient Successfully");
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
+				log.debug("Associated Device for Patient Successfully");
 				
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
+				log.debug("Inserted Protocol for Patient Successfully");
 			}catch(Exception ex){
 				ex.printStackTrace();
 				return false;
 			}				
 			
+			log.debug("CASE1_NeitherPatientNorDeviceExist_VEST Executed Successfully");
 			return true;
 		}
 		
@@ -682,7 +685,7 @@ public class TimsService {
 		if((isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& isCurrentSerialNumberOwnedByShellVest(patientInfoDTO.getSerial_num()) ){
 			
-			log.debug("Inside CASE5_DeviceOwnedByShell_VEST ");
+			//log.debug("Inside CASE5_DeviceOwnedByShell_VEST ");
 			//managePatientUser(UPDATE)
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocol()
@@ -693,18 +696,21 @@ public class TimsService {
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
+				log.debug("Updated Patient Successfully"+returnValues.get("return_patient_id").toString());
 				
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
+				log.debug("Updated Associated Device for Patient Successfully");
 				
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
+				log.debug("Inserted Protocol for Patient Successfully");
 			}catch(Exception ex){
 				ex.printStackTrace();
 				return false;
 			}
-			
+			log.debug("CASE5_DeviceOwnedByShell_VEST Executed Successfully");
 			return true;
 		}
 		
@@ -992,7 +998,7 @@ public class TimsService {
 		
 		
 		if((!isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))){
-			log.debug("Inside CASE1_NeitherPatientNorDeviceExist_MONARCH ");
+			//log.debug("Inside CASE1_NeitherPatientNorDeviceExist_MONARCH ");
 			//managePatientUser(CREATE)
 			//managaPatientDeviceMonarch(CREATE)
 			//managaPatientDeviceAssociation(CREATE)
@@ -1002,22 +1008,26 @@ public class TimsService {
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
+				log.debug("Created Patient Successfully"+returnValues.get("return_patient_id").toString());
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDeviceMonarch(patientInfoDTO);
+				log.debug("Created Device for Patient Successfully");
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
+				log.debug("Associated Device for Patient Successfully");
 				
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
+				log.debug("Inserted Protocol for Patient Successfully");
 			}catch(Exception ex){
 				ex.printStackTrace();
 				return false;
 			}				
-			
+			log.debug("CASE1_NeitherPatientNorDeviceExist_MONARCH Executed Successfully");
 			return true;
 		}
 		
@@ -1151,7 +1161,7 @@ public class TimsService {
 		if((isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& isCurrentSerialNumberOwnedByShellMonarch(patientInfoDTO.getSerial_num()) ){
 			
-			log.debug("Inside CASE5_DeviceOwnedByShell_MONARCH ");
+			//log.debug("Inside CASE5_DeviceOwnedByShell_MONARCH ");
 			//managePatientUser(UPDATE)
 			//managaPatientDeviceAssociation(CREATE)
 			//createPatientProtocolMonarch()
@@ -1162,18 +1172,22 @@ public class TimsService {
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
+				log.debug("Updated Patient Successfully"+returnValues.get("return_patient_id").toString());
 				
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
+				log.debug("Updated Associated Device for Patient Successfully");
 				
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
+				log.debug("Inserted Protocol for Patient Successfully");
 			}catch(Exception ex){
 				ex.printStackTrace();
 				return false;
 			}
 			
+			log.debug("CASE5_DeviceOwnedByShell_MONARCH Executed Successfully");
 			return true;
 		}
 		

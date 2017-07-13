@@ -87,7 +87,7 @@ public class TimsResource {
 					Date compareFromDate = new SimpleDateFormat("dd/MM/yyyy").parse(fromDate);
 					Date compareToDate = new SimpleDateFormat("dd/MM/yyyy").parse(toDate);
 					
-					if( ( compareFromDate.equals(compareDate)||compareFromDate.before(compareDate)  )  && ( compareToDate.after(compareToDate)|| compareToDate.equals(compareDate) ) ){
+					if( ( compareFromDate.equals(compareDate)||compareFromDate.before(compareDate)  )  && ( compareToDate.before(compareDate)|| compareToDate.equals(compareDate) ) ){
 						hmap.put("file", grepVal[0]);
 						hmap.put("path", grepVal[1]);
 						hmap.put("status", grepVal[2]);

@@ -199,7 +199,11 @@ public class TimsInputReaderService {
 			            patientInfoDTO.setMobile_phone(data[18]);
 			            patientInfoDTO.setTrain_dt(data[19].equalsIgnoreCase("")? null: LocalDate.parse(data[19],dobFormat));
 			            patientInfoDTO.setDob(data[20].equalsIgnoreCase("")? null: LocalDate.parse(data[20],dobFormat));
-			            patientInfoDTO.setGender(data[21]);
+			            if(data.length >= 22){
+			            	patientInfoDTO.setGender(data[21]);
+			            }else{
+			            	patientInfoDTO.setGender(null);
+			            }
 			            if(data.length >= 23){
 			            	patientInfoDTO.setLang_key(data[22]);
 			            }else{

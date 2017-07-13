@@ -200,7 +200,11 @@ public class TimsInputReaderService {
 			            patientInfoDTO.setTrain_dt(data[19].equalsIgnoreCase("")? null: LocalDate.parse(data[19],dobFormat));
 			            patientInfoDTO.setDob(data[20].equalsIgnoreCase("")? null: LocalDate.parse(data[20],dobFormat));
 			            patientInfoDTO.setGender(data[21]);
-			            patientInfoDTO.setLang_key(data[22]);
+			            if(data.length >= 23){
+			            	patientInfoDTO.setLang_key(data[22]);
+			            }else{
+			            	patientInfoDTO.setLang_key(null);
+			            }
 			            if(data.length >= 24){
 			            	patientInfoDTO.setDx1(data[23]);
 			            }else{

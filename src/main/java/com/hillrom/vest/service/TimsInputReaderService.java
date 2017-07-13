@@ -8,12 +8,14 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,6 +75,9 @@ public class TimsInputReaderService {
 	//@Scheduled(cron="0/5 * * * * * ")
 	public void ExecuteTIMSJob() 
 	{
+		
+		MDC.put("logFileName", "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
+		
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
 		

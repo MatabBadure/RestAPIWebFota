@@ -82,11 +82,15 @@ public class TimsResource {
 					String modDate = grepVal[3];
 					Date date = new Date(Long.valueOf(modDate));
 					cal.setTime(date);
-					String formatedDate = cal.get(Calendar.DATE)+"/"+(cal.get(Calendar.MONTH)+1) +"/"+cal.get(Calendar.YEAR);
-					Date compareDate = 	new SimpleDateFormat("dd/MM/yyyy").parse(formatedDate);
-					Date compareFromDate = new SimpleDateFormat("dd/MM/yyyy").parse(fromDate);
-					Date compareToDate = new SimpleDateFormat("dd/MM/yyyy").parse(toDate);
-					if(compareDate.after(compareFromDate) && compareDate.before(compareToDate)){
+					String formatedDate = (cal.get(Calendar.MONTH)+1)+"/"+ +cal.get(Calendar.DATE)+"/"+cal.get(Calendar.YEAR);
+					Date compareDate = 	new SimpleDateFormat("MM/dd/yyyy").parse(formatedDate);
+					Date compareFromDate = new SimpleDateFormat("MM/dd/yyyyy").parse(fromDate);
+					Date compareToDate = new SimpleDateFormat("MM/dd/yyyy").parse(toDate);
+					
+					if( ( compareDate.equals(compareFromDate) ||
+							compareDate.after(compareFromDate)  )  && 
+								( compareDate.before(compareToDate) || 
+										compareDate.equals(compareToDate)) ){
 						hmap.put("file", grepVal[0]);
 						hmap.put("path", grepVal[1]);
 						hmap.put("status", grepVal[2]);

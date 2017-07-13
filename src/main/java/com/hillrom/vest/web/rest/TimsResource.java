@@ -87,21 +87,21 @@ public class TimsResource {
 					Date compareFromDate = new SimpleDateFormat("dd/MM/yyyy").parse(fromDate);
 					Date compareToDate = new SimpleDateFormat("dd/MM/yyyy").parse(toDate);
 					
-					if( ( compareFromDate.equals(compareDate)||compareFromDate.before(compareDate)  )  && ( compareToDate.before(compareDate)|| compareToDate.equals(compareDate) ) ){
-						hmap.put("file", grepVal[0]);
-						hmap.put("path", grepVal[1]);
-						hmap.put("status", grepVal[2]);
-						hmap.put("lastMod", grepVal[3]);
-						valueObj.add(hmap);
-					}
-					
-					/*if( ( compareDate.equals(compareFromDate)||compareDate.after(compareFromDate)  )  && ( compareDate.before(compareToDate)|| compareDate.equals(compareToDate)) ){
+					/*if( ( compareFromDate.equals(compareDate)||compareFromDate.before(compareDate)  )  && ( compareToDate.before(compareDate)|| compareToDate.equals(compareDate) ) ){
 						hmap.put("file", grepVal[0]);
 						hmap.put("path", grepVal[1]);
 						hmap.put("status", grepVal[2]);
 						hmap.put("lastMod", grepVal[3]);
 						valueObj.add(hmap);
 					}*/
+					
+					if( ( compareDate.equals(compareFromDate)||compareDate.after(compareFromDate)  )  && ( compareDate.before(compareToDate)|| compareDate.equals(compareToDate)) ){
+						hmap.put("file", grepVal[0]);
+						hmap.put("path", grepVal[1]);
+						hmap.put("status", grepVal[2]);
+						hmap.put("lastMod", grepVal[3]);
+						valueObj.add(hmap);
+					}
 				}
 				
 			}

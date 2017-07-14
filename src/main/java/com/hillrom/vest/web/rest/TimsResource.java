@@ -68,8 +68,9 @@ public class TimsResource {
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "status", required = false) String status,
 			@RequestParam(value = "fromDate", required = false) String fromDate,
-			@RequestParam(value = "toDate", required = false) String toDate) {
-
+			@RequestParam(value = "toDate", required = false) String toDate
+			) {
+	//	sort_by=date&asc=true
 		try{
 			List<String> returnVal = timsService.listLogDirectory(LOG_DIRECTORY, MATCH_STRING);
 			Calendar cal = Calendar.getInstance();
@@ -95,8 +96,11 @@ public class TimsResource {
 						hmap.put("path", grepVal[1]);
 						hmap.put("status", grepVal[2]);
 						hmap.put("lastMod", grepVal[3]);
+						
+						
 						valueObj.add(hmap);
-					}
+						
+						}
 				}
 				
 			}
@@ -379,11 +383,12 @@ public class TimsResource {
 
 		try{		  
 			  timsInputReaderService.ExecuteTIMSJob();
-			  jsonObject.put("timsMsg", "managaPatientUser stored procedure executed successfully");
+			  jsonObject.put("timsMsg", "TIMSJob Executed Successfully");
 			  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			
 		}catch(Exception ex){
-			jsonObject.put("ERROR", ex.getMessage());
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			
+			jsonObject.put("timsMsg", "TIMSJob NOT Executed Successfully");
+			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 		}		
 	}
 

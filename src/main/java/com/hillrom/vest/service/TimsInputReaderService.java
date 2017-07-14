@@ -195,11 +195,12 @@ public class TimsInputReaderService {
 				            {
 				            	data[15] = data[15].substring(1, data[15].length() - 1);
 				            }
-				            else
-				            {
-				            	data[15] = data[15];
-				            }
 			            }
+			            else
+			            {
+			            	data[15] = data[15];
+			            }
+			            
 
 
 			            patientInfoDTO.setAddress(data[15]);

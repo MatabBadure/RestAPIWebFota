@@ -190,7 +190,7 @@ public class TimsInputReaderService {
 			            patientInfoDTO.setMiddle_nm(data[12]);
 			            patientInfoDTO.setLast_nm(data[13]);
 			            patientInfoDTO.setEmail(data[14]);
-			            if(!data[15].isEmpty()|| data[15]!=null){
+			            if(!data[15].isEmpty() && data[15]!=null){
 				            if(data[15].charAt(0)=='"'&&data[15].charAt(data[15].length()-1)=='"')
 				            {
 				            	data[15] = data[15].substring(1, data[15].length() - 1);

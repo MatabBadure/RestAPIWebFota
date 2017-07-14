@@ -1428,6 +1428,34 @@ public class TimsService {
 		}
 		return false;	
 	}
+	
+	public boolean CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH_VEST(PatientInfoDTO patientInfoDTO){
+		
+		if((isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && 
+				(isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (!isHillromIdHasMonarchDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
+			
+
+			try{
+				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+
+				managePatientDeviceAssociation(patientInfoDTO);
+				log.debug("Merge Associated Device for Patient Successfully");
+				
+
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}	
+			log.debug("CASE12_PatientHasVisivestMergeExistingMonarch_VEST Executed Successfully");
+			return true;
+			
+		}
+		
+		return false;
+		
+	}
 
 }
 

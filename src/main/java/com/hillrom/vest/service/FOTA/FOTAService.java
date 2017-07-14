@@ -54,7 +54,7 @@ public class FOTAService {
 				if (len == 256) {
 					count = len;
 					jsonObject.put("Base64 Encoded ", encodedData);
-					jsonObject.put("ChunckSize:", count);
+					jsonObject.put("ChunkSize:", count);
 
 				}
 				break;

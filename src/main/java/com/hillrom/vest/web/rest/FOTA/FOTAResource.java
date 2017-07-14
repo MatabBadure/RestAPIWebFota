@@ -27,10 +27,10 @@ public class FOTAResource {
 	 */
 	@RequestMapping(value = "/processHexaToByte", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> processHexaToByteData(
-			@RequestParam(value = "chunckSize", required = false) Integer chunckSize) {
+			@RequestParam(value = "chunckSize", required = false) Integer chunkSize) {
 		JSONObject jsonObject = new JSONObject();
 		try {
-			jsonObject = fotaService.processHexaToByteData(HEXAFILEPATH, chunckSize);
+			jsonObject = fotaService.processHexaToByteData(HEXAFILEPATH, chunkSize);
 
 			return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
 

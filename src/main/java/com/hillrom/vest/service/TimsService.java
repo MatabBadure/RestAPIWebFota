@@ -968,7 +968,7 @@ public class TimsService {
 		return false;	
 	}
 	
-	public boolean CASE12_PatientHasVisivestMergeExistingMonarch_VEST(PatientInfoDTO patientInfoDTO){
+	public boolean CASE12_PatientHasMonarchMergeExistingVisivest_VEST(PatientInfoDTO patientInfoDTO){
 		
 		if((isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && 
 				(isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
@@ -987,7 +987,7 @@ public class TimsService {
 				ex.printStackTrace();
 				return false;
 			}	
-			log.debug("CASE12_PatientHasVisivestMergeExistingMonarch_VEST Executed Successfully");
+			log.debug("CASE12_PatientHasMonarchMergeExistingVisivest_VEST Executed Successfully");
 			return true;
 			
 		}

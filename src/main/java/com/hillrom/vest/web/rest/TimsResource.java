@@ -68,8 +68,9 @@ public class TimsResource {
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "status", required = false) String status,
 			@RequestParam(value = "fromDate", required = false) String fromDate,
-			@RequestParam(value = "toDate", required = false) String toDate) {
-
+			@RequestParam(value = "toDate", required = false) String toDate
+			) {
+	//	sort_by=date&asc=true
 		try{
 			List<String> returnVal = timsService.listLogDirectory(LOG_DIRECTORY, MATCH_STRING);
 			Calendar cal = Calendar.getInstance();
@@ -82,17 +83,24 @@ public class TimsResource {
 					String modDate = grepVal[3];
 					Date date = new Date(Long.valueOf(modDate));
 					cal.setTime(date);
-					String formatedDate = cal.get(Calendar.DATE)+"/"+(cal.get(Calendar.MONTH)+1) +"/"+cal.get(Calendar.YEAR);
-					Date compareDate = 	new SimpleDateFormat("dd/MM/yyyy").parse(formatedDate);
-					Date compareFromDate = new SimpleDateFormat("dd/MM/yyyy").parse(fromDate);
-					Date compareToDate = new SimpleDateFormat("dd/MM/yyyy").parse(toDate);
-					if(compareDate.after(compareFromDate) && compareDate.before(compareToDate)){
+					String formatedDate = (cal.get(Calendar.MONTH)+1)+"/"+ +cal.get(Calendar.DATE)+"/"+cal.get(Calendar.YEAR);
+					Date compareDate = 	new SimpleDateFormat("MM/dd/yyyy").parse(formatedDate);
+					Date compareFromDate = new SimpleDateFormat("MM/dd/yyyyy").parse(fromDate);
+					Date compareToDate = new SimpleDateFormat("MM/dd/yyyy").parse(toDate);
+					
+					if( ( compareDate.equals(compareFromDate) ||
+							compareDate.after(compareFromDate)  )  && 
+								( compareDate.before(compareToDate) || 
+										compareDate.equals(compareToDate)) ){
 						hmap.put("file", grepVal[0]);
 						hmap.put("path", grepVal[1]);
 						hmap.put("status", grepVal[2]);
 						hmap.put("lastMod", grepVal[3]);
+						
+						
 						valueObj.add(hmap);
-					}
+						
+						}
 				}
 				
 			}
@@ -375,11 +383,12 @@ public class TimsResource {
 
 		try{		  
 			  timsInputReaderService.ExecuteTIMSJob();
-			  jsonObject.put("timsMsg", "managaPatientUser stored procedure executed successfully");
+			  jsonObject.put("timsMsg", "TIMSJob Executed Successfully");
 			  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			
 		}catch(Exception ex){
-			jsonObject.put("ERROR", ex.getMessage());
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			
+			jsonObject.put("timsMsg", "TIMSJob NOT Executed Successfully");
+			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 		}		
 	}
 

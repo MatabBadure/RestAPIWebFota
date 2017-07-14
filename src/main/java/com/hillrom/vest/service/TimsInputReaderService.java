@@ -8,12 +8,14 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,6 +75,9 @@ public class TimsInputReaderService {
 	//@Scheduled(cron="0/5 * * * * * ")
 	public void ExecuteTIMSJob() 
 	{
+		
+		MDC.put("logFileName", "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
+		
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
 		
@@ -94,6 +99,7 @@ public class TimsInputReaderService {
 		    	//timsService.CASE9_PatientHasDifferentVisivestSwap_VEST(record);
 		    	timsService.CASE10_PatientHasMonarchAddVisivest_VEST(record);
 		    	//timsService.CASE11_PatientExistsWithNODevice_VEST(record);
+		    	timsService.CASE12_PatientHasMonarchMergeExistingVisivest_VEST(record);
 		    	
 		    }
 
@@ -109,10 +115,10 @@ public class TimsInputReaderService {
 		    	//timsService.CASE8_DeviceIsOrphanButPatientExist_MONARCH(record);
 		    	//timsService.CASE9_PatientHasDifferentMonarchSwap_MONARCH(record);
 		    	timsService.CASE10_PatientHasVisivestAddMonarch_MONARCH(record);
-		    	//timsService.CASE11_PatientExistsWithNODevice_MONARCH(record);		    	
+		    	//timsService.CASE11_PatientExistsWithNODevice_MONARCH(record);
+		    	timsService.CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH(record);
 		    	
 		    }
-		    
 		}
 		
 	}
@@ -123,7 +129,7 @@ public class TimsInputReaderService {
 
 
 	        String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
-	        log.debug("Started reading flat file : " + csvFile);
+		    log.debug("Started reading flat file : " + csvFile);
 	        String line = "";
 	        String cvsSplitBy = ",";
 	        String Outdata = "";
@@ -149,6 +155,7 @@ public class TimsInputReaderService {
 		            for(int i=0;i<27;i++){
 		            	try{
 		            		data[i] = Objects.nonNull(data[i]) ? data[i] : "";
+		            		
 		            		record = i==26?record + data[i]:record + data[i]+",";
 		            	}catch(ArrayIndexOutOfBoundsException ex){
 
@@ -183,14 +190,35 @@ public class TimsInputReaderService {
 			            patientInfoDTO.setMiddle_nm(data[12]);
 			            patientInfoDTO.setLast_nm(data[13]);
 			            patientInfoDTO.setEmail(data[14]);
+			            if(!data[15].isEmpty() && data[15]!=null){
+				            if(data[15].charAt(0)=='"'&&data[15].charAt(data[15].length()-1)=='"')
+				            {
+				            	data[15] = data[15].substring(1, data[15].length() - 1);
+				            }
+			            }
+			            else
+			            {
+			            	data[15] = data[15];
+			            }
+			            
+
+
 			            patientInfoDTO.setAddress(data[15]);
 			            patientInfoDTO.setZip_cd(data[16]);
 			            patientInfoDTO.setPrimary_phone(data[17]);
 			            patientInfoDTO.setMobile_phone(data[18]);
 			            patientInfoDTO.setTrain_dt(data[19].equalsIgnoreCase("")? null: LocalDate.parse(data[19],dobFormat));
 			            patientInfoDTO.setDob(data[20].equalsIgnoreCase("")? null: LocalDate.parse(data[20],dobFormat));
-			            patientInfoDTO.setGender(data[21]);
-			            patientInfoDTO.setLang_key(data[22]);
+			            if(data.length >= 22){
+			            	patientInfoDTO.setGender(data[21]);
+			            }else{
+			            	patientInfoDTO.setGender(null);
+			            }
+			            if(data.length >= 23){
+			            	patientInfoDTO.setLang_key(data[22]);
+			            }else{
+			            	patientInfoDTO.setLang_key(null);
+			            }
 			            if(data.length >= 24){
 			            	patientInfoDTO.setDx1(data[23]);
 			            }else{

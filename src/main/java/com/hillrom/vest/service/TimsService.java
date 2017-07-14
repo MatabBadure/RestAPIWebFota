@@ -643,12 +643,13 @@ public class TimsService {
 
 			try{
 				patientInfoDTO.setOperation_type("UPDATE");
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get().getSerialNumber());
 				patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDevice(patientInfoDTO);
 				log.debug("Updated Device for Patient Successfully");
 				
-				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				log.debug("Associated Device for Patient Successfully");
 				
@@ -967,6 +968,34 @@ public class TimsService {
 		return false;	
 	}
 	
+	public boolean CASE12_PatientHasMonarchMergeExistingVisivest_VEST(PatientInfoDTO patientInfoDTO){
+		
+		if((isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && 
+				(isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
+			
+
+			try{
+				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+
+				managePatientDeviceAssociation(patientInfoDTO);
+				log.debug("Merge Associated Device for Patient Successfully");
+				
+
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}	
+			log.debug("CASE12_PatientHasMonarchMergeExistingVisivest_VEST Executed Successfully");
+			return true;
+			
+		}
+		
+		return false;
+		
+	}
+	
 	// All Cases start below  <ScenarioName>Monarch
 	
 	public boolean CASE1_NeitherPatientNorDeviceExist_MONARCH(PatientInfoDTO patientInfoDTO){
@@ -1093,12 +1122,13 @@ public class TimsService {
 
 			try{
 				patientInfoDTO.setOperation_type("UPDATE");
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get().getSerialNumber());
 				patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDeviceMonarch(patientInfoDTO);
 				log.debug("Updated Device for Patient Successfully");
 				
-				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				log.debug("Associated Device for Patient Successfully");
 				
@@ -1425,6 +1455,34 @@ public class TimsService {
 		
 		}
 		return false;	
+	}
+	
+	public boolean CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH(PatientInfoDTO patientInfoDTO){
+		
+		if((isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && 
+				(isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (!isHillromIdHasMonarchDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
+			
+
+			try{
+				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+
+				managePatientDeviceAssociation(patientInfoDTO);
+				log.debug("Merge Associated Device for Patient Successfully");
+				
+
+			}catch(Exception ex){
+				ex.printStackTrace();
+				return false;
+			}	
+			log.debug("CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH Executed Successfully");
+			return true;
+			
+		}
+		
+		return false;
+		
 	}
 
 }

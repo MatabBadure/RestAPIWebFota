@@ -81,7 +81,7 @@ public class TimsResource {
 			List<String> returnVal = timsService.listLogDirectory(LOG_DIRECTORY, MATCH_STRING);
 			Calendar cal = Calendar.getInstance();
 			List<TimsListLog> valueObj = new LinkedList<>();
-			TimsListLog timsListLog = new TimsListLog();
+			
 			for (String grepValue : returnVal) {
 				HashMap<String, String> hmap = new HashMap<String, String>();
 				String[] grepVal = grepValue.split(",");
@@ -103,6 +103,7 @@ public class TimsResource {
 						hmap.put("path", grepVal[1]);
 						hmap.put("status", grepVal[2]);
 						hmap.put("lastMod", grepVal[3]);*/
+						TimsListLog timsListLog = new TimsListLog();
 						
 						timsListLog.setFile(grepVal[0]);
 						timsListLog.setPath(grepVal[1]);

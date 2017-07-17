@@ -120,9 +120,9 @@ public class TimsResource {
 			if(isAsc.equals("false")){
 				Collections.sort(valueObj,new TimsListLogCompratorDesc());
 			}
-			else if( isAsc.equals("true")){
+			/*else if( isAsc.equals("true")){
 				Collections.sort(valueObj,new TimsListLogCompratorAsc());
-			}
+			}*/
 			
             int firstResult = PaginationUtil.generatePageRequest(offset, limit).getOffset();
     		int maxResults = firstResult + PaginationUtil.generatePageRequest(offset, limit).getPageSize();

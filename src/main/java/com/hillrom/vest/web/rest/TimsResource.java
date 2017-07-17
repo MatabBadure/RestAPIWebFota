@@ -62,7 +62,6 @@ public class TimsResource {
 	private TimsUserRepository timsUserRepository;
 	
 	
-   
 	/**
      * GET  /listLogDirectory
      */
@@ -70,13 +69,13 @@ public class TimsResource {
 	public ResponseEntity<?> listLogDirectory(
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
+			@RequestParam(value = "sort_by", required = false) String sortBy,
 			@RequestParam(value = "status", required = false) String status,
 			@RequestParam(value = "fromDate", required = false) String fromDate,
-			@RequestParam(value = "toDate", required = false) String toDate,
-			@RequestParam(value = "sort_by", required = false) String sortBy,
-	        @RequestParam(value = "asc",required = false) Boolean isAscending
+			@RequestParam(value = "toDate", required = false) String toDate
+			     
 			) {
-	//	sort_by=date&asc=true
+	
 		try{
 			List<String> returnVal = timsService.listLogDirectory(LOG_DIRECTORY, MATCH_STRING);
 			Calendar cal = Calendar.getInstance();
@@ -86,7 +85,7 @@ public class TimsResource {
 				HashMap<String, String> hmap = new HashMap<String, String>();
 				String[] grepVal = grepValue.split(",");
 				if (grepVal[2].equalsIgnoreCase(status)
-						|| status.equalsIgnoreCase(ALL)) {
+						|| status.equalsIgnoreCase(ALL) || status.equalsIgnoreCase("FILTER")) {
 					String modDate = grepVal[3];
 					Date date = new Date(Long.valueOf(modDate));
 					cal.setTime(date);
@@ -116,10 +115,8 @@ public class TimsResource {
 				}
 				
 			}
-			if(sortBy.equals("date")&&isAscending==true)
-			{
-			
-			 Collections.sort(valueObj,new TimsListLogComprator());
+			if(sortBy.equals("date")){			
+				Collections.sort(valueObj,new TimsListLogComprator());
 			}
 			
             int firstResult = PaginationUtil.generatePageRequest(offset, limit).getOffset();

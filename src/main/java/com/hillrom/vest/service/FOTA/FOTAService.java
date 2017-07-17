@@ -1,16 +1,16 @@
 package com.hillrom.vest.service.FOTA;
 
 import java.io.FileInputStream;
+import java.math.BigInteger;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import net.minidev.json.JSONObject;
 
-import org.apache.commons.codec.binary.Base64;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -26,9 +26,8 @@ public class FOTAService {
 
 	public JSONObject processHexaToByteData(String HexaFilePath, Integer lines)
 			throws HillromException {
-		byte[] byteArray = new byte[256];
+		byte[] byteArray = new byte[lines-1];
 		JSONObject jsonObject = new JSONObject();
-		List<Integer> decimalValueList = new LinkedList<Integer>();
 		long count = 0;
 
 		try {
@@ -38,20 +37,22 @@ public class FOTAService {
 			int len;
 			// Read bytes until EOF is encountered.
 			do {
-				String decimalDataStr = "";
+				String hexDataStr = "";
 				len = fis.read(byteArray);
 
-				decimalValueList = getReadIntelHexFile(byteArray);
-				log.debug("Values in Decimal:" + decimalValueList);
+				hexDataStr = getDataInHexString(byteArray);
 
-				decimalDataStr = getStringFormatWithSapce(decimalValueList);
-				log.debug("Decimal Data in String:" + decimalDataStr.getBytes());
+				BigInteger bigint = new BigInteger(hexDataStr, 16);
 
-				byte[] encoded = convertToBas64Encode(decimalDataStr.getBytes());
+				StringBuilder sb = new StringBuilder();
+				byte[] bytes = Base64.encodeInteger(bigint);
+				for (byte b : bytes) {
+					sb.append((char) b);
+				}
 
-				String encodedData = new String(encoded);
+				String encodedData = new String(sb.toString());
 				log.debug("Ecoded bas64 data :" + encodedData);
-				if (len == 256) {
+				if (len == lines-1) {
 					count = len;
 					jsonObject.put("Base64 Encoded ", encodedData);
 					jsonObject.put("ChunkSize:", count);
@@ -66,6 +67,20 @@ public class FOTAService {
 			log.error("Error in Ecoded bas64 data :" + ex.getMessage());
 		}
 		return jsonObject;
+	}
+
+	private String getDataInHexString(byte[] byteArray) {
+		String data = "";
+		String trimData = "";
+		try {
+			data = new String(byteArray, 0, byteArray.length, "ASCII");
+			trimData = data.replace(":", "").replace("\n", "")
+					.replace("\r", "");
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			log.error("Error with getReadIntelHexFile:" + ex.getMessage());
+		}
+		return trimData;
 	}
 
 	private byte[] convertToBas64Encode(byte[] bas64Input) {
@@ -114,8 +129,11 @@ public class FOTAService {
 					.trim();
 			log.debug("Haxa Decimal with Space:" + result);
 
-			String[] hexaValues = result.split(" ", -1);
+			String[] hexaValues = trimData.split(" ", -1);
+			
 			for (String hex : hexaValues) {
+				
+				
 				int outputDecimal = Integer.parseInt(hex, 16);
 				decimalValueList.add(outputDecimal);
 

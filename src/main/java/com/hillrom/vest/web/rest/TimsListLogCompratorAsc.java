@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 
-public class TimsListLogComprator implements Comparator<TimsListLog>{
+public class TimsListLogCompratorAsc implements Comparator<TimsListLog>{
  
     @Override
     public int compare(TimsListLog e1, TimsListLog e2) {
@@ -17,10 +17,10 @@ public class TimsListLogComprator implements Comparator<TimsListLog>{
 			compareDate2 = 	new SimpleDateFormat("MM/dd/yyyy").parse(e2.getLastMod());
 
 	        if(compareDate1.after(compareDate2)){
-	            return +1;
+	            return -1;
 	        } 
 	        else if (compareDate1.before(compareDate2)){
-	            return -1;
+	            return +1;
 	        }
 	        else
 	        	return 0;

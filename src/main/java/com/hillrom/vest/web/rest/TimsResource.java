@@ -64,12 +64,14 @@ public class TimsResource {
 	
 	/**
      * GET  /listLogDirectory
+     * 
      */
 	@RequestMapping(value="/listLogDirectory", method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> listLogDirectory(
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,
+			@RequestParam(value = "asc", required = false) boolean asc,
 			@RequestParam(value = "status", required = false) String status,
 			@RequestParam(value = "fromDate", required = false) String fromDate,
 			@RequestParam(value = "toDate", required = false) String toDate
@@ -115,8 +117,11 @@ public class TimsResource {
 				}
 				
 			}
-			if(sortBy.equals("date")){			
-				Collections.sort(valueObj,new TimsListLogComprator());
+			if(sortBy.equals("date") && asc==false){			
+				Collections.sort(valueObj,new TimsListLogCompratorDesc());
+			}
+			if(sortBy.equals("date") && asc==true){			
+				Collections.sort(valueObj,new TimsListLogCompratorAsc());
 			}
 			
             int firstResult = PaginationUtil.generatePageRequest(offset, limit).getOffset();

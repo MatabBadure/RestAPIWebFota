@@ -71,7 +71,7 @@ public class TimsResource {
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,
-			@RequestParam(value = "asc", required = false) boolean asc,
+			@RequestParam(value = "asc", required = false) Boolean asc,
 			@RequestParam(value = "status", required = false) String status,
 			@RequestParam(value = "fromDate", required = false) String fromDate,
 			@RequestParam(value = "toDate", required = false) String toDate

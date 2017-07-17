@@ -117,10 +117,10 @@ public class TimsResource {
 				}
 				
 			}
-			if(isAsc.equals("false")){
+			/*if(isAsc.equals("false")){
 				Collections.sort(valueObj,new TimsListLogCompratorDesc());
 			}
-			/*else if( isAsc.equals("true")){
+			else if( isAsc.equals("true")){
 				Collections.sort(valueObj,new TimsListLogCompratorAsc());
 			}*/
 			

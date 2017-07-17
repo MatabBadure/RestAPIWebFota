@@ -71,7 +71,7 @@ public class TimsResource {
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,
-			@RequestParam(value = "asc", required = false) Boolean asc,
+			@RequestParam(value = "asc", required = false) Boolean isAsc,
 			@RequestParam(value = "status", required = false) String status,
 			@RequestParam(value = "fromDate", required = false) String fromDate,
 			@RequestParam(value = "toDate", required = false) String toDate
@@ -87,7 +87,7 @@ public class TimsResource {
 				HashMap<String, String> hmap = new HashMap<String, String>();
 				String[] grepVal = grepValue.split(",");
 				if (grepVal[2].equalsIgnoreCase(status)
-						|| status.equalsIgnoreCase(ALL) || status.equalsIgnoreCase("FILTER")) {
+						|| status.equalsIgnoreCase(ALL) ) {
 					String modDate = grepVal[3];
 					Date date = new Date(Long.valueOf(modDate));
 					cal.setTime(date);
@@ -117,10 +117,10 @@ public class TimsResource {
 				}
 				
 			}
-			if(sortBy.equals("date") && asc==false){			
+			if(isAsc==false){			
 				Collections.sort(valueObj,new TimsListLogCompratorDesc());
 			}
-			if(sortBy.equals("date") && asc==true){			
+			else if( isAsc==true){			
 				Collections.sort(valueObj,new TimsListLogCompratorAsc());
 			}
 			

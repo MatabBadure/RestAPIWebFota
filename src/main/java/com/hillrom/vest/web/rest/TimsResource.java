@@ -87,7 +87,7 @@ public class TimsResource {
 				HashMap<String, String> hmap = new HashMap<String, String>();
 				String[] grepVal = grepValue.split(",");
 				if (grepVal[2].equalsIgnoreCase(status)
-						|| status.equalsIgnoreCase(ALL) || status.equalsIgnoreCase(ALL)) {
+						|| status.equalsIgnoreCase(ALL) || status.equalsIgnoreCase("FILTER")) {
 					String modDate = grepVal[3];
 					Date date = new Date(Long.valueOf(modDate));
 					cal.setTime(date);
@@ -122,7 +122,7 @@ public class TimsResource {
 			}
 			else if( isAsc.equals("true")){
 				Collections.reverse(valueObj);
-				//Collections.sort(valueObj,new TimsListLogCompratorAsc());
+				
 			}
 			
             int firstResult = PaginationUtil.generatePageRequest(offset, limit).getOffset();

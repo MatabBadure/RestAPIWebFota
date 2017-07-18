@@ -146,6 +146,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/retrieveLogData/logs").permitAll()
             .antMatchers("/api/executeTIMSJob").hasAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/api/processHexaToByte").permitAll()
+            .antMatchers("/api/checkUpdate").permitAll()
         .and()
             .apply(securityConfigurerAdapter());
 

@@ -1,19 +1,25 @@
 package com.hillrom.vest.service.FOTA;
 
+import static com.hillrom.vest.config.FOTA.FOTAConstants.HEXAFILEPATH;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.RESULT;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.TOTAL_CHUNK;
+
 import java.io.FileInputStream;
 import java.math.BigInteger;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import net.minidev.json.JSONObject;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.exceptionhandler.HillromException;
-
+import com.hillrom.vest.service.util.FOTA.FOTAParseUtil;
 @Service
 @Transactional
 public class FOTAService {
@@ -37,7 +43,7 @@ public class FOTAService {
 		String hexDataStr = "";
 	    String [] output = null;
 	    String encodedData = null;
-	    int flag = 0;
+	    int flag = 1;
 	    if(flag == 0){
 	    	try {
 				Path pp = FileSystems.getDefault().getPath(HexaFilePath,
@@ -58,7 +64,7 @@ public class FOTAService {
 				ex.printStackTrace();
 				log.error("Error in Ecoded bas64 data :" + ex.getMessage());
 			}
-	    	output = hexDataStr.split("(?<=\\G.{256})");
+	    	output = hexDataStr.split("(?<=\\G.{512})");
 			storeChunk = new HashMap<Long, String>();
 			for(String str :output ){
 				storeChunk.put(count++, str);
@@ -165,6 +171,90 @@ public class FOTAService {
 		}
 
 		return decimalValueList;
+	}
+
+	public JSONObject checkUpdate(String rawMessage) {
+		String decoded_string = "";
+		JSONObject FOTAJsonData = new JSONObject();
+		Map<String, String> fotaJsonData = new LinkedHashMap<String, String>();
+		byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
+		String sout = "";
+		for (int i = 0; i < decoded.length; i++) {
+			int val = decoded[i] & 0xFF;
+			sout = sout + val + " ";
+		}
+		log.debug("Input Byte Array :" + sout);
+		decoded_string = new String(decoded);
+		log.error("Decoded value is " + decoded_string);
+		fotaJsonData = FOTAParseUtil
+				.getFOTAJsonDataFromRawMessage(decoded_string);
+		StringBuilder resposeString = new StringBuilder();
+		long totalChunk = readHexByteDataFromFile();
+		log.error("totalChunk: " + totalChunk);
+		
+		Random rand = new Random();
+		int  handleValue = rand.nextInt(100) + 1;
+		resposeString.append(RESULT);
+		resposeString.append("Yes");
+		resposeString.append("&");
+		resposeString.append(HANDLE);
+		resposeString.append(handleValue);
+		resposeString.append("&");
+		resposeString.append(TOTAL_CHUNK);
+		resposeString.append(totalChunk);
+		resposeString.append("&");
+		resposeString.append(CRC);
+		String crc = "";
+		for (Map.Entry<String, String> entry : fotaJsonData.entrySet()) {
+			if (entry.getKey().equals(CRC)) {
+				log.debug("CRC:" + entry.getValue());
+				crc = entry.getValue();
+				break;
+			}
+		}
+		resposeString.append(crc);
+		byte[] encoded = java.util.Base64.getEncoder().encode(
+				resposeString.toString().getBytes());
+		String encodedCheckUpdate = new String(encoded);
+		log.error("encodedCheckUpdate: " + encodedCheckUpdate);
+		FOTAJsonData.put("encodedCheckUpdate", encodedCheckUpdate);
+		return FOTAJsonData;
+	}
+
+	private long readHexByteDataFromFile() {
+		byte[] byteArray = new byte[906800];
+		long count = 0;
+		long totalChunk = 0L;
+		String hexDataStr = "";
+		String[] output = null;
+		try {
+			Path pp = FileSystems.getDefault().getPath(HEXAFILEPATH,
+					"193164_charger_mainboard.hex");
+			FileInputStream fis = new FileInputStream(pp.toFile());
+			int len;
+			// Read bytes until EOF is encountered.
+			do {
+
+				len = fis.read(byteArray);
+
+				hexDataStr = getDataInHexString(byteArray);
+
+			} while (len != -1);
+
+			fis.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			log.error("Error in Ecoded bas64 data :" + ex.getMessage());
+		}
+		output = hexDataStr.split("(?<=\\G.{512})");
+		storeChunk = new LinkedHashMap<Long, String>();
+		for (String str : output) {
+			storeChunk.put(count++, str);
+			log.debug("Output into chunk :" + str);
+		}
+		totalChunk = storeChunk.size() - 1;
+		log.debug("totalChunk :" + totalChunk);
+		return totalChunk;
 	}
 
 }

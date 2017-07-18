@@ -71,13 +71,12 @@ public class TimsResource {
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "sort_by", required = false) String sortBy,
+			@RequestParam(value = "asc", required = false) String isAsc,
 			@RequestParam(value = "status", required = false) String status,
 			@RequestParam(value = "fromDate", required = false) String fromDate,
 			@RequestParam(value = "toDate", required = false) String toDate
 			     
 			) {
-		
-		//@RequestParam(value = "asc", required = false) String isAsc,
 		JSONObject jsonObject = new JSONObject();
 	
 		try{
@@ -119,23 +118,12 @@ public class TimsResource {
 				}
 				
 			}
-		/*	if(isAsc.equals("false")){
+			if(isAsc.equals("false")){
 				Collections.sort(valueObj,new TimsListLogCompratorDesc());
 			}
 			else if( isAsc.equals("true")){
 				Collections.sort(valueObj,new TimsListLogCompratorAsc());
 			}
-*/
-			
-			if(sortBy.equals("date&acs=false")){
-				Collections.sort(valueObj,new TimsListLogCompratorDesc());
-			}
-			else if( sortBy.equals("date&acs=true")){
-				Collections.sort(valueObj,new TimsListLogCompratorAsc());
-			}
-			
-			
-			
 			
             int firstResult = PaginationUtil.generatePageRequest(offset, limit).getOffset();
     		int maxResults = firstResult + PaginationUtil.generatePageRequest(offset, limit).getPageSize();

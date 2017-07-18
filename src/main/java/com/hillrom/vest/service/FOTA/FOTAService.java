@@ -4,12 +4,16 @@ import java.io.FileInputStream;
 import java.math.BigInteger;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import net.minidev.json.JSONObject;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,49 +27,66 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 public class FOTAService {
 
 	private final Logger log = LoggerFactory.getLogger(FOTAService.class);
-
+	private static Map<Long,String> storeChunk ;
+	//private static Map<Long,String> storeChunk1 ;
 	public JSONObject processHexaToByteData(String HexaFilePath, Integer lines)
 			throws HillromException {
-		byte[] byteArray = new byte[lines-1];
+		byte[] byteArray = new byte[906800];
 		JSONObject jsonObject = new JSONObject();
 		long count = 0;
+		String hexDataStr = "";
+	    String [] output = null;
+	    String encodedData = null;
+	    int flag = 0;
+	    if(flag == 0){
+	    	try {
+				Path pp = FileSystems.getDefault().getPath(HexaFilePath,
+						"193164_charger_mainboard.hex");
+				FileInputStream fis = new FileInputStream(pp.toFile());
+				int len;
+				// Read bytes until EOF is encountered.
+				do {
+					
+					len = fis.read(byteArray);
 
-		try {
-			Path pp = FileSystems.getDefault().getPath(HexaFilePath,
-					"193164_charger_mainboard.hex");
-			FileInputStream fis = new FileInputStream(pp.toFile());
-			int len;
-			// Read bytes until EOF is encountered.
-			do {
-				String hexDataStr = "";
-				len = fis.read(byteArray);
+					hexDataStr = getDataInHexString(byteArray);
+	
+				} while (len != -1);
 
-				hexDataStr = getDataInHexString(byteArray);
-
-				BigInteger bigint = new BigInteger(hexDataStr, 16);
-
+				fis.close();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				log.error("Error in Ecoded bas64 data :" + ex.getMessage());
+			}
+	    	output = hexDataStr.split("(?<=\\G.{256})");
+			storeChunk = new HashMap<Long, String>();
+			for(String str :output ){
+				storeChunk.put(count++, str);
+				
+				log.debug("Output into chnuks :" + str);
+			}
+			log.debug("Output into chnuks :" + storeChunk.size());
+	    }
+		
+		//log.debug("Count :" + count);
+		for (Map.Entry<Long, String> entry : storeChunk.entrySet())
+		{
+			if(entry.getKey() == 0){
+				log.debug("Output into chnuks :" + entry.getValue());
+				BigInteger bigint = new BigInteger(entry.getValue(), 16);
+				count = entry.getValue().length();
 				StringBuilder sb = new StringBuilder();
 				byte[] bytes = Base64.encodeInteger(bigint);
 				for (byte b : bytes) {
 					sb.append((char) b);
 				}
-
-				String encodedData = new String(sb.toString());
+				encodedData = new String(sb.toString());
 				log.debug("Ecoded bas64 data :" + encodedData);
-				if (len == lines-1) {
-					count = len;
-					jsonObject.put("Base64 Encoded ", encodedData);
-					jsonObject.put("ChunkSize:", count);
-
-				}
-				break;
-			} while (len != -1);
-
-			fis.close();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			log.error("Error in Ecoded bas64 data :" + ex.getMessage());
+				
+			}
 		}
+		jsonObject.put("Base64 Encoded ", encodedData);
+		jsonObject.put("ChunkSize:", count);
 		return jsonObject;
 	}
 

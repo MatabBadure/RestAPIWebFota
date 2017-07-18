@@ -1,5 +1,7 @@
 package com.hillrom.vest.web.rest;
 
+import java.util.Date;
+
 
 
 public class TimsListLog {
@@ -7,10 +9,16 @@ public class TimsListLog {
 	private String file;
     private String path;
     private String status;
-    private String lastMod;
+    private Date lastMod;
     
 	     
-   public String getFile() {
+   public Date getLastMod() {
+		return lastMod;
+	}
+	public void setLastMod(Date lastMod) {
+		this.lastMod = lastMod;
+	}
+    public String getFile() {
 		return file;
 	}
 	public void setFile(String file) {
@@ -28,13 +36,7 @@ public class TimsListLog {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	public String getLastMod() {
-		return lastMod;
-	}
-	public void setLastMod(String lastMod) {
-		this.lastMod = lastMod;
-	}
-		
+	
 	    
 	   
 	    

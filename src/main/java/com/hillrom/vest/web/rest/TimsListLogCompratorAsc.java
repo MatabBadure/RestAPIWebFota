@@ -10,11 +10,9 @@ public class TimsListLogCompratorAsc implements Comparator<TimsListLog>{
     @Override
     public int compare(TimsListLog e1, TimsListLog e2) {
     	
-    	Date compareDate1;
-    	Date compareDate2;
-		try {
-			compareDate1 = new SimpleDateFormat("MM/dd/yyyy").parse(e1.getLastMod());
-			compareDate2 = 	new SimpleDateFormat("MM/dd/yyyy").parse(e2.getLastMod());
+    	Date compareDate1 = e1.getLastMod();
+    	Date compareDate2 = e2.getLastMod();
+		
 
 	        if(compareDate1.after(compareDate2)){
 	            return -1;
@@ -24,11 +22,7 @@ public class TimsListLogCompratorAsc implements Comparator<TimsListLog>{
 	        }
 	        else
 	        	return 0;
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return 0;
-		}
+		
 		
     	
     	

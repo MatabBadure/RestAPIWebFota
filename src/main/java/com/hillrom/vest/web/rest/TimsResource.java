@@ -77,6 +77,7 @@ public class TimsResource {
 			@RequestParam(value = "toDate", required = false) String toDate
 			     
 			) {
+		JSONObject jsonObject = new JSONObject();
 	
 		try{
 			List<String> returnVal = timsService.listLogDirectory(LOG_DIRECTORY, MATCH_STRING);
@@ -109,7 +110,7 @@ public class TimsResource {
 						timsListLog.setFile(grepVal[0]);
 						timsListLog.setPath(grepVal[1]);
 						timsListLog.setStatus(grepVal[2]);
-						timsListLog.setLastMod(grepVal[3]);
+						timsListLog.setLastMod(compareDate);
 						
 						valueObj.add(timsListLog);
 						
@@ -117,12 +118,11 @@ public class TimsResource {
 				}
 				
 			}
-			if(isAsc.equals("false")){
+			if(isAsc.equals("true")){
 				Collections.sort(valueObj,new TimsListLogCompratorDesc());
 			}
-			else if( isAsc.equals("true")){
-				Collections.reverse(valueObj);
-				
+			else if( isAsc.equals("false")){
+				Collections.sort(valueObj,new TimsListLogCompratorAsc());
 			}
 			
             int firstResult = PaginationUtil.generatePageRequest(offset, limit).getOffset();
@@ -133,13 +133,14 @@ public class TimsResource {
     			valueObjSubList = valueObj.subList(firstResult, maxResults);
     		}
             Page<TimsListLog> page = new PageImpl<TimsListLog>(valueObjSubList,
-            		PaginationUtil.generatePageRequest(offset, limit), Long.valueOf(valueObj.size()));
+            PaginationUtil.generatePageRequest(offset, limit), Long.valueOf(valueObj.size()));
 
 			HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/listLogDirectory", offset, limit);
 			return new ResponseEntity<>(page, headers, HttpStatus.OK);
           
 		}catch(Exception ex){
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			jsonObject.put("timsListMsg", "TIMSListing LogFile NOT Executed Successfully");
+			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 		}			
 	}
 	

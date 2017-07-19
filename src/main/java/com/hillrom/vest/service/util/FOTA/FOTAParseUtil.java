@@ -7,8 +7,12 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_MODEL;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_SN;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_VER;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.PREV_REQ_STATUS;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.SOFT_VER_DATE;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.RESULT;
+
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -33,6 +37,9 @@ public class FOTAParseUtil {
 		String devVer = rawMessage.indexOf(DEVICE_VER) < 0 ? null : rawMessage.substring(rawMessage.indexOf(DEVICE_VER)+DEVICE_VER.length()+1, getNextIndex(rawMessage,DEVICE_VER));
 		String softVerDate = rawMessage.indexOf(SOFT_VER_DATE) < 0 ? null : rawMessage.substring(rawMessage.indexOf(SOFT_VER_DATE)+SOFT_VER_DATE.length()+1 , getNextIndex(rawMessage,SOFT_VER_DATE));
 		String chunkSize = rawMessage.indexOf(CHUNK_SIZE) < 0 ? null : rawMessage.substring(rawMessage.indexOf(CHUNK_SIZE)+CHUNK_SIZE.length()+1 , getNextIndex(rawMessage,CHUNK_SIZE));
+		String handle = rawMessage.indexOf(HANDLE) < 0 ? null : rawMessage.substring(rawMessage.indexOf(HANDLE)+HANDLE.length()+1 , getNextIndex(rawMessage,HANDLE));
+		String prevReqStatus = rawMessage.indexOf(PREV_REQ_STATUS) < 0 ? null : rawMessage.substring(rawMessage.indexOf(PREV_REQ_STATUS)+PREV_REQ_STATUS.length()+1 , getNextIndex(rawMessage,PREV_REQ_STATUS));
+		String result = rawMessage.indexOf(RESULT) < 0 ? null : rawMessage.substring(rawMessage.indexOf(RESULT)+RESULT.length()+1 , getNextIndex(rawMessage,RESULT));
 		String devCrc = rawMessage.indexOf(CRC) < 0 ? null : rawMessage.substring(rawMessage.indexOf(CRC)+CRC.length()+1, rawMessage.length());
 		
 		if(Objects.nonNull(devModel)){
@@ -56,6 +63,16 @@ public class FOTAParseUtil {
 		if(Objects.nonNull(chunkSize)){			
 			fotaJsonData.put(CHUNK_SIZE, chunkSize);
 		}
+		if(Objects.nonNull(prevReqStatus)){			
+			fotaJsonData.put(PREV_REQ_STATUS, prevReqStatus);
+		}
+		if(Objects.nonNull(handle)){			
+			fotaJsonData.put(HANDLE, handle);
+		}
+		if(Objects.nonNull(result)){			
+			fotaJsonData.put(HANDLE, result);
+		}
+		
 		if(Objects.nonNull(devCrc)){
 			fotaJsonData.put(CRC, devCrc);
 		}
@@ -86,6 +103,12 @@ public class FOTAParseUtil {
 		case SOFT_VER_DATE:
 			return rawMessage.indexOf(CHUNK_SIZE) < 0 ? getNextIndex(rawMessage, CHUNK_SIZE) :  rawMessage.indexOf(CHUNK_SIZE)-1;
 		case CHUNK_SIZE:
+			return rawMessage.indexOf(HANDLE) < 0 ? getNextIndex(rawMessage, HANDLE) :  rawMessage.indexOf(HANDLE)-1;
+		case HANDLE:
+			return rawMessage.indexOf(PREV_REQ_STATUS) < 0 ? getNextIndex(rawMessage, PREV_REQ_STATUS) :  rawMessage.indexOf(PREV_REQ_STATUS)-1;
+		case PREV_REQ_STATUS:
+			return rawMessage.indexOf(RESULT) < 0 ? getNextIndex(rawMessage, RESULT) :  rawMessage.indexOf(RESULT)-1;
+		case RESULT:
 			return rawMessage.indexOf(CRC) < 0 ? rawMessage.length() :  rawMessage.indexOf(CRC)-1;
 		default:
 			return -1;

@@ -1,9 +1,21 @@
 package com.hillrom.vest.service.FOTA;
 
-import static com.hillrom.vest.config.FOTA.FOTAConstants.HEXAFILEPATH;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.AMPERSAND;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.BUFFER_EQ;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.BUFFER_LEN_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE_EQ;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.HEXAFILEPATH;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.INIT;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.NOT_OK;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.OK;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE1;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE2;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE3;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.RESULT;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.RESULT_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.TOTAL_CHUNK;
 
 import java.io.FileInputStream;
@@ -23,6 +35,8 @@ import net.minidev.json.JSONObject;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +48,16 @@ public class FOTAService {
 
 	private final Logger log = LoggerFactory.getLogger(FOTAService.class);
 	private static Map<Long,String> storeChunk ;
+	private static Map<Long,String> handleHolder ;
+	
+	private static long handleHolderCount ;
+	
+	private int bufferLen = 0;
+	
+	private String buffer = " ";
+	
+	private TaskScheduler scheduler = new ConcurrentTaskScheduler();
+	
 	//private static Map<Long,String> storeChunk1 ;
 	public JSONObject processHexaToByteData(String HexaFilePath, Integer lines)
 			throws HillromException {
@@ -43,7 +67,7 @@ public class FOTAService {
 		String hexDataStr = "";
 	    String [] output = null;
 	    String encodedData = null;
-	    int flag = 0;
+	    int flag = 1;
 	    if(flag == 0){
 	    	try {
 				Path pp = FileSystems.getDefault().getPath(HexaFilePath,
@@ -77,7 +101,7 @@ public class FOTAService {
 		//log.debug("Count :" + count);
 		for (Map.Entry<Long, String> entry : storeChunk.entrySet())
 		{
-			if(entry.getKey() == 0){
+			if(entry.getKey() == 1652){
 				log.debug("Output into chnuks :" + entry.getValue());
 				BigInteger bigint = new BigInteger(entry.getValue(), 16);
 				count = entry.getValue().length()/2;
@@ -238,6 +262,7 @@ public class FOTAService {
 				len = fis.read(byteArray);
 
 				hexDataStr = getDataInHexString(byteArray);
+				log.debug("hexa String :" + hexDataStr);
 
 			} while (len != -1);
 
@@ -252,9 +277,218 @@ public class FOTAService {
 			storeChunk.put(count++, str);
 			log.debug("Output into chunk :" + str);
 		}
-		totalChunk = storeChunk.size() - 1;
+		totalChunk = storeChunk.size()-1;
 		log.debug("totalChunk :" + totalChunk);
 		return totalChunk;
 	}
 
+	public String FOTAUpdate(String rawMessage) {
+
+		String decoded_string = "";
+
+		StringBuilder responseString = new StringBuilder();
+
+		Map<String, String> fotaJsonData = new LinkedHashMap<String, String>();
+
+		// Decoding raw data
+		decoded_string = decodeRawMessage(rawMessage);
+		// Parsing into key value pair
+		fotaJsonData = FOTAParseUtil
+				.getFOTAJsonDataFromRawMessage(decoded_string);
+
+		// Checking if request Type is 01 & //Checking if request Type is 02
+		for (Map.Entry<String, String> entry : fotaJsonData.entrySet()) {
+			long totalChunk = 0L;
+			int handleValue = 0;
+			// long handleCount = 0;
+			if (entry.getValue().equals(REQUEST_TYPE1)) {
+				handleHolder = new LinkedHashMap<Long, String>();
+				log.error("totalChunk: " + handleHolder.size());
+				totalChunk = readHexByteDataFromFile();
+				log.error("totalChunk: " + totalChunk);
+				Random rand = new Random();
+				handleValue = rand.nextInt(100) + 1;
+				responseString.append(RESULT_EQ);
+				responseString.append("Yes");
+				responseString.append(AMPERSAND);
+				responseString.append(HANDLE_EQ);
+				responseString.append(handleValue);
+				responseString.append(AMPERSAND);
+				responseString.append(TOTAL_CHUNK);
+				responseString.append(totalChunk);
+				responseString.append(AMPERSAND);
+				responseString.append(CRC_EQ);
+				String crc = "";
+				for (Map.Entry<String, String> entry1 : fotaJsonData.entrySet()) {
+					if (entry1.getKey().equals(CRC)) {
+						log.debug("CRC:" + entry1.getValue());
+						crc = entry1.getValue();
+						break;
+					}
+				}
+				responseString.append(crc);
+			} else if (entry.getValue().equals(REQUEST_TYPE2)) {
+				for (Map.Entry<String, String> entry1 : fotaJsonData.entrySet()) {
+					if (entry1.getValue().equals(INIT)) {
+						for (Map.Entry<Long, String> chunk : storeChunk
+								.entrySet()) {
+							if (chunk.getKey() == handleHolderCount) {
+								log.debug("Output into chnuks :"
+										+ chunk.getValue());
+								BigInteger bigint = new BigInteger(
+										chunk.getValue(), 16);
+								bufferLen = chunk.getValue().length() / 2;
+								StringBuilder sb = new StringBuilder();
+								byte[] bytes = Base64.encodeInteger(bigint);
+								for (byte b : bytes) {
+									sb.append((char) b);
+								}
+								buffer = new String(sb.toString());
+								log.debug("Ecoded bas64 data :" + buffer);
+								// handleHolder.put(chunk.getKey(), "OK");
+							}
+						}
+						 //handleHolderCount = handleHolderCount;
+						log.debug("handleHolderCount:"
+								+ handleHolderCount);
+					}
+					// handleHolder.put((long) handleCount++,
+					// entry1.getValue());
+					else if (entry1.getValue().equals(OK)) {
+						// handleCount = handleHolderCount;
+						// handleHolder.put(handleHolderCount++,
+						// entry1.getValue());
+						handleHolderCount = handleHolderCount+1;
+						for (Map.Entry<Long, String> chunk : storeChunk
+								.entrySet()) {
+							if (chunk.getKey() == handleHolderCount) {
+								log.debug("Output into chnuks :"
+										+ chunk.getValue());
+								BigInteger bigint = new BigInteger(
+										chunk.getValue(), 16);
+								bufferLen = chunk.getValue().length() / 2;
+								StringBuilder sb = new StringBuilder();
+								byte[] bytes = Base64.encodeInteger(bigint);
+								for (byte b : bytes) {
+									sb.append((char) b);
+								}
+								buffer = new String(sb.toString());
+								log.debug("Ecoded bas64 data :" + buffer);
+								// handleHolder.put(chunk.getKey(), "OK");
+							}
+						}
+						// handleHolderCount = handleCount;
+						log.debug("handleHolderCount:"
+								+ handleHolderCount);
+
+					} else if (entry1.getValue().equals(NOT_OK)) {
+						// handleCount = handleHolderCount;
+						// handleHolder.put(handleHolderCount--,
+						// entry1.getValue());
+						handleHolderCount = handleHolderCount-1;
+						for (Map.Entry<Long, String> chunk : storeChunk
+								.entrySet()) {
+							if (chunk.getKey() == handleHolderCount) {
+								log.debug("Output into chnuks :"
+										+ chunk.getValue());
+								BigInteger bigint = new BigInteger(
+										chunk.getValue(), 16);
+								bufferLen = chunk.getValue().length() / 2;
+								StringBuilder sb = new StringBuilder();
+								byte[] bytes = Base64.encodeInteger(bigint);
+								for (byte b : bytes) {
+									sb.append((char) b);
+								}
+								buffer = new String(sb.toString());
+								log.debug("Ecoded bas64 data :" + buffer);
+								// handleHolder.put(chunk.getKey(), "OK");
+							}
+						}
+						//handleHolderCount = handleHolderCount+1;
+						log.debug("handleHolderCount:"
+								+ handleHolderCount);
+						// handleHolderCount = handleCount;
+					}
+
+				}
+
+				String handle = "";
+				for (Map.Entry<String, String> entry1 : fotaJsonData.entrySet()) {
+					if (entry1.getKey().equals(HANDLE)) {
+						log.debug("HANDLE:" + entry1.getValue());
+						handle = entry1.getValue();
+						break;
+					}
+				}
+				responseString.append(HANDLE_EQ);
+				responseString.append(handle);
+				responseString.append(AMPERSAND);
+				responseString.append(BUFFER_LEN_EQ);
+				responseString.append(bufferLen);
+				responseString.append(AMPERSAND);
+				responseString.append(BUFFER_EQ);
+				responseString.append(buffer);
+				responseString.append(AMPERSAND);
+				String crc = "";
+				for (Map.Entry<String, String> entry1 : fotaJsonData.entrySet()) {
+					if (entry1.getKey().equals(CRC)) {
+						log.debug("CRC:" + entry1.getValue());
+						crc = entry1.getValue();
+						break;
+					}
+				}
+				responseString.append(CRC_EQ);
+				responseString.append(crc);
+
+			} else if (entry.getValue().equals(REQUEST_TYPE3)) {
+				for (Map.Entry<String, String> entry1 : fotaJsonData.entrySet()) {
+
+					if (entry1.getValue().equals(OK)) {
+						responseString.append("Download completed");
+
+					}
+
+					else if (entry1.getValue().equals(NOT_OK)) {
+						responseString.append("Download Failed");
+					}
+
+				}
+
+			}
+			
+		}
+
+		byte[] encoded = java.util.Base64.getEncoder().encode(
+				responseString.toString().getBytes());
+		String encodedCheckUpdate = new String(encoded);
+		log.error("encodedCheckUpdate: " + encodedCheckUpdate);
+		return encodedCheckUpdate;
+	}
+
+
+	/*@PostConstruct
+	private void executeJob() {
+		scheduler.scheduleAtFixedRate(new Runnable() {
+			@Override
+			public void run() {
+				
+			}
+		}, 5000);
+	}
+*/
+	private String decodeRawMessage(String rawMessage) {
+		String decoded_string = "";
+		byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
+		String sout = "";
+		for (int i = 0; i < decoded.length; i++) {
+			int val = decoded[i] & 0xFF;
+			sout = sout + val + " ";
+		}
+		log.debug("Input Byte Array :" + sout);
+		decoded_string = new String(decoded);
+		log.error("Decoded value is " + decoded_string);
+		return decoded_string;
+	}
+	
+	
 }

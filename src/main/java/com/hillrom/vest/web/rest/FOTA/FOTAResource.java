@@ -58,4 +58,18 @@ public class FOTAResource {
 		}
 	}
 	
+	@RequestMapping(value = "/FOTA", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> FOTA(
+			@RequestBody(required = true) String rawMessage) {
+		String FOTAencoded = " ";
+		try {
+			FOTAencoded = fotaService.FOTAUpdate(rawMessage);
+			return new ResponseEntity<>(FOTAencoded, HttpStatus.OK);
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return new ResponseEntity<>(ex.getMessage(), HttpStatus.OK);
+		}
+	}
+	
 }

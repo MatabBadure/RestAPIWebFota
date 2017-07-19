@@ -100,6 +100,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/chargerdevicedata/{id}").permitAll()            
             .antMatchers("/api/validateActivationKey").permitAll()
             .antMatchers("/api/validateResetKey").permitAll()
+               //FOTA
+            .antMatchers("/api/processHexaToByte").permitAll()
+            .antMatchers("/api/checkUpdate").permitAll()
+            .antMatchers("/api/FOTA").permitAll()
             .antMatchers("/api/users/{id}/exportVestDeviceData").authenticated()
             .antMatchers("/api/users/{id}/exportVestDeviceDataCSV").authenticated()
             .antMatchers("/api/users/{id}/exportTherapyData").authenticated()
@@ -145,8 +149,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/survey/{id}/graph").authenticated()      
             .antMatchers("/api/retrieveLogData/logs").permitAll()
             .antMatchers("/api/executeTIMSJob").hasAuthority(AuthoritiesConstants.ADMIN)
-            .antMatchers("/api/processHexaToByte").permitAll()
-            .antMatchers("/api/checkUpdate").permitAll()
+           
         .and()
             .apply(securityConfigurerAdapter());
 

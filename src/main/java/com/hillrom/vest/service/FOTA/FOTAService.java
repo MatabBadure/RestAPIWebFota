@@ -43,7 +43,7 @@ public class FOTAService {
 		String hexDataStr = "";
 	    String [] output = null;
 	    String encodedData = null;
-	    int flag = 1;
+	    int flag = 0;
 	    if(flag == 0){
 	    	try {
 				Path pp = FileSystems.getDefault().getPath(HexaFilePath,
@@ -80,7 +80,7 @@ public class FOTAService {
 			if(entry.getKey() == 0){
 				log.debug("Output into chnuks :" + entry.getValue());
 				BigInteger bigint = new BigInteger(entry.getValue(), 16);
-				count = entry.getValue().length();
+				count = entry.getValue().length()/2;
 				StringBuilder sb = new StringBuilder();
 				byte[] bytes = Base64.encodeInteger(bigint);
 				for (byte b : bytes) {

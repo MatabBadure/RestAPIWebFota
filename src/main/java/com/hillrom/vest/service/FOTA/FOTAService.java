@@ -335,17 +335,8 @@ public class FOTAService {
 							if (chunk.getKey() == handleHolderCount) {
 								log.debug("Output into chnuks :"
 										+ chunk.getValue());
-								BigInteger bigint = new BigInteger(
-										chunk.getValue(), 16);
+								buffer = chunk.getValue();
 								bufferLen = chunk.getValue().length() / 2;
-								StringBuilder sb = new StringBuilder();
-								byte[] bytes = Base64.encodeInteger(bigint);
-								for (byte b : bytes) {
-									sb.append((char) b);
-								}
-								buffer = new String(sb.toString());
-								log.debug("Ecoded bas64 data :" + buffer);
-								// handleHolder.put(chunk.getKey(), "OK");
 							}
 						}
 						 //handleHolderCount = handleHolderCount;
@@ -359,21 +350,14 @@ public class FOTAService {
 						// handleHolder.put(handleHolderCount++,
 						// entry1.getValue());
 						handleHolderCount = handleHolderCount+1;
+						 handleHolder.put(handleHolderCount,entry1.getValue());
 						for (Map.Entry<Long, String> chunk : storeChunk
 								.entrySet()) {
 							if (chunk.getKey() == handleHolderCount) {
 								log.debug("Output into chnuks :"
 										+ chunk.getValue());
-								BigInteger bigint = new BigInteger(
-										chunk.getValue(), 16);
+								buffer = chunk.getValue();
 								bufferLen = chunk.getValue().length() / 2;
-								StringBuilder sb = new StringBuilder();
-								byte[] bytes = Base64.encodeInteger(bigint);
-								for (byte b : bytes) {
-									sb.append((char) b);
-								}
-								buffer = new String(sb.toString());
-								log.debug("Ecoded bas64 data :" + buffer);
 								// handleHolder.put(chunk.getKey(), "OK");
 							}
 						}
@@ -385,28 +369,18 @@ public class FOTAService {
 						// handleCount = handleHolderCount;
 						// handleHolder.put(handleHolderCount--,
 						// entry1.getValue());
-						handleHolderCount = handleHolderCount-1;
+						handleHolderCount = handleHolderCount - 1;
 						for (Map.Entry<Long, String> chunk : storeChunk
 								.entrySet()) {
 							if (chunk.getKey() == handleHolderCount) {
 								log.debug("Output into chnuks :"
 										+ chunk.getValue());
-								BigInteger bigint = new BigInteger(
-										chunk.getValue(), 16);
+								buffer = chunk.getValue();
 								bufferLen = chunk.getValue().length() / 2;
-								StringBuilder sb = new StringBuilder();
-								byte[] bytes = Base64.encodeInteger(bigint);
-								for (byte b : bytes) {
-									sb.append((char) b);
-								}
-								buffer = new String(sb.toString());
-								log.debug("Ecoded bas64 data :" + buffer);
-								// handleHolder.put(chunk.getKey(), "OK");
 							}
 						}
-						//handleHolderCount = handleHolderCount+1;
-						log.debug("handleHolderCount:"
-								+ handleHolderCount);
+						// handleHolderCount = handleHolderCount+1;
+						log.debug("handleHolderCount:" + handleHolderCount);
 						// handleHolderCount = handleCount;
 					}
 
@@ -439,7 +413,7 @@ public class FOTAService {
 				}
 				responseString.append(CRC_EQ);
 				responseString.append(crc);
-
+				
 			} else if (entry.getValue().equals(REQUEST_TYPE3)) {
 				for (Map.Entry<String, String> entry1 : fotaJsonData.entrySet()) {
 
@@ -457,7 +431,12 @@ public class FOTAService {
 			}
 			
 		}
-
+		
+		for (Map.Entry<Long, String> handle : handleHolder.entrySet()) {
+			log.debug("HandleKey:"+handle.getKey()+"HandleValue:"+handle.getValue());
+		}
+		
+		
 		byte[] encoded = java.util.Base64.getEncoder().encode(
 				responseString.toString().getBytes());
 		String encodedCheckUpdate = new String(encoded);

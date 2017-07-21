@@ -55,7 +55,7 @@ public class FOTAService {
 	private  Map<Long,String> handleHolder ;
 	
 	
-	private static long handleHolderCount ;
+	private long handleHolderCount ;
 	
 	private int bufferLen = 0;
 	
@@ -277,7 +277,9 @@ public class FOTAService {
 			log.error("Error in Ecoded bas64 data :" + ex.getMessage());
 		}
 		output = hexDataStr.split("(?<=\\G.{512})");
+		
 		storeChunk = new LinkedHashMap<Long, String>();
+		
 		for (String str : output) {
 			storeChunk.put(count++, str);
 			log.debug("Output into chunk :" + str);
@@ -315,7 +317,7 @@ public class FOTAService {
 				totalChunk = readHexByteDataFromFile();
 				log.error("totalChunk: " + totalChunk);
 				Random rand = new Random();
-				handleValue = rand.nextInt(100) + 1;
+				handleValue = rand.nextInt(9) + 1;
 				responseString.append(RESULT_EQ);
 				responseString.append("Yes");
 				responseString.append(AMPERSAND);
@@ -345,7 +347,7 @@ public class FOTAService {
 					if (entry1.getValue().equals(INIT)) {
 						for (Map.Entry<Long, String> chunk : storeChunk
 								.entrySet()) {
-							if (chunk.getKey() == handleHolderCount) {
+							if (chunk.getKey() == 0) {
 								log.debug("Output into chnuks :"
 										+ chunk.getValue());
 								
@@ -373,7 +375,7 @@ public class FOTAService {
 						handleHolder.put(handleHolderCount, entry1.getValue());
 						for (Map.Entry<Long, String> chunk : storeChunk
 								.entrySet()) {
-							if (chunk.getKey() == handleHolderCount) {
+							if (chunk.getKey() == 0) {
 								log.debug("Output into chnuks :"
 										+ chunk.getValue());
 								/*buffer = chunk.getValue();
@@ -519,16 +521,7 @@ public class FOTAService {
 		 return new String(encoded);
 		}
 
-	/*@PostConstruct
-	private void executeJob() {
-		scheduler.scheduleAtFixedRate(new Runnable() {
-			@Override
-			public void run() {
-				
-			}
-		}, 5000);
-	}
-*/
+	
 	private String decodeRawMessage(String rawMessage) {
 		String decoded_string = "";
 		byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);

@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import javax.xml.bind.DatatypeConverter;
+
 import net.minidev.json.JSONObject;
 
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -47,16 +49,19 @@ import com.hillrom.vest.service.util.FOTA.FOTAParseUtil;
 public class FOTAService {
 
 	private final Logger log = LoggerFactory.getLogger(FOTAService.class);
-	private static Map<Long,String> storeChunk ;
-	private static Map<Long,String> handleHolder ;
+	/*private static Map<Long,String> storeChunk ;
+	private static Map<Long,String> handleHolder ;*/
+	private  Map<Long,String> storeChunk ;
+	private  Map<Long,String> handleHolder ;
+	
 	
 	private static long handleHolderCount ;
 	
 	private int bufferLen = 0;
 	
-	private String buffer = " ";
+	private byte[] buffer = null;
 	
-	private TaskScheduler scheduler = new ConcurrentTaskScheduler();
+	//private TaskScheduler scheduler = new ConcurrentTaskScheduler();
 	
 	//private static Map<Long,String> storeChunk1 ;
 	public JSONObject processHexaToByteData(String HexaFilePath, Integer lines)
@@ -335,13 +340,20 @@ public class FOTAService {
 							if (chunk.getKey() == handleHolderCount) {
 								log.debug("Output into chnuks :"
 										+ chunk.getValue());
-								buffer = chunk.getValue();
+								
+								//byte[] bufferInHex = new BigInteger(chunk.getValue(),16).toByteArray();
+								
+								
+								//log.debug("handleHolderCount:" + bigint);
+								//byte[] bytArray = Integer.toHexString(BigInteger.valueOf(val))
+								
+								buffer = hexToAscii(chunk.getValue());
+								log.debug("buffer in raw:" + buffer);
 								bufferLen = chunk.getValue().length() / 2;
 							}
 						}
-						 //handleHolderCount = handleHolderCount;
-						log.debug("handleHolderCount:"
-								+ handleHolderCount);
+						// handleHolderCount = handleHolderCount;
+						log.debug("handleHolderCount:" + handleHolderCount);
 					}
 					// handleHolder.put((long) handleCount++,
 					// entry1.getValue());
@@ -349,21 +361,32 @@ public class FOTAService {
 						// handleCount = handleHolderCount;
 						// handleHolder.put(handleHolderCount++,
 						// entry1.getValue());
-						handleHolderCount = handleHolderCount+1;
-						 handleHolder.put(handleHolderCount,entry1.getValue());
+						handleHolderCount = handleHolderCount + 1;
+						handleHolder.put(handleHolderCount, entry1.getValue());
 						for (Map.Entry<Long, String> chunk : storeChunk
 								.entrySet()) {
 							if (chunk.getKey() == handleHolderCount) {
 								log.debug("Output into chnuks :"
 										+ chunk.getValue());
-								buffer = chunk.getValue();
+								/*buffer = chunk.getValue();
+								bufferLen = chunk.getValue().length() / 2;*/
+								
+								//byte[] bufferInHex = new BigInteger(chunk.getValue(),16).toByteArray();
+								
+								
+								//log.debug("handleHolderCount:" + bigint);
+								//byte[] bytArray = Integer.toHexString(BigInteger.valueOf(val))
+								
+								//buffer = new String(bufferInHex);
+								buffer = hexToAscii(chunk.getValue());
+								log.debug("buffer in raw:" + buffer);
 								bufferLen = chunk.getValue().length() / 2;
+								
 								// handleHolder.put(chunk.getKey(), "OK");
 							}
 						}
 						// handleHolderCount = handleCount;
-						log.debug("handleHolderCount:"
-								+ handleHolderCount);
+						log.debug("handleHolderCount:" + handleHolderCount);
 
 					} else if (entry1.getValue().equals(NOT_OK)) {
 						// handleCount = handleHolderCount;
@@ -375,7 +398,8 @@ public class FOTAService {
 							if (chunk.getKey() == handleHolderCount) {
 								log.debug("Output into chnuks :"
 										+ chunk.getValue());
-								buffer = chunk.getValue();
+								//buffer = chunk.getValue();
+								buffer = hexToAscii(chunk.getValue());
 								bufferLen = chunk.getValue().length() / 2;
 							}
 						}
@@ -401,7 +425,7 @@ public class FOTAService {
 				responseString.append(bufferLen);
 				responseString.append(AMPERSAND);
 				responseString.append(BUFFER_EQ);
-				responseString.append(buffer);
+				responseString.append(new String(buffer));
 				responseString.append(AMPERSAND);
 				String crc = "";
 				for (Map.Entry<String, String> entry1 : fotaJsonData.entrySet()) {
@@ -413,7 +437,7 @@ public class FOTAService {
 				}
 				responseString.append(CRC_EQ);
 				responseString.append(crc);
-				
+
 			} else if (entry.getValue().equals(REQUEST_TYPE3)) {
 				for (Map.Entry<String, String> entry1 : fotaJsonData.entrySet()) {
 
@@ -429,14 +453,14 @@ public class FOTAService {
 				}
 
 			}
-			
+
 		}
-		
+
 		for (Map.Entry<Long, String> handle : handleHolder.entrySet()) {
-			log.debug("HandleKey:"+handle.getKey()+"HandleValue:"+handle.getValue());
+			log.debug("HandleKey:" + handle.getKey() + "HandleValue:"
+					+ handle.getValue());
 		}
-		
-		
+
 		byte[] encoded = java.util.Base64.getEncoder().encode(
 				responseString.toString().getBytes());
 		String encodedCheckUpdate = new String(encoded);
@@ -444,6 +468,28 @@ public class FOTAService {
 		return encodedCheckUpdate;
 	}
 
+
+	private byte[] hexToAscii(String hexStr) {
+		 String str = "";
+		 StringBuilder output = new StringBuilder("");
+		 try{
+				 for (int i = 0; i < hexStr.length()-2; i += 2) {
+					str =str+hexStr.substring(i, i + 2);
+
+				 }
+			 
+		 }catch(Exception ex){
+
+		 }
+		 
+		 byte[] raw = DatatypeConverter.parseHexBinary(str);
+
+		// byte[] encoded = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(str));
+		//System.out.println(new String(encoded));
+
+		//return DatatypeConverter.parseHexBinary(str);
+		 return raw;
+		}
 
 	/*@PostConstruct
 	private void executeJob() {

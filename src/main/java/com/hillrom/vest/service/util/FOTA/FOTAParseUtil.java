@@ -37,7 +37,10 @@ public class FOTAParseUtil {
 		String devVer = rawMessage.indexOf(DEVICE_VER) < 0 ? null : rawMessage.substring(rawMessage.indexOf(DEVICE_VER)+DEVICE_VER.length()+1, getNextIndex(rawMessage,DEVICE_VER));
 		String softVerDate = rawMessage.indexOf(SOFT_VER_DATE) < 0 ? null : rawMessage.substring(rawMessage.indexOf(SOFT_VER_DATE)+SOFT_VER_DATE.length()+1 , getNextIndex(rawMessage,SOFT_VER_DATE));
 		String chunkSize = rawMessage.indexOf(CHUNK_SIZE) < 0 ? null : rawMessage.substring(rawMessage.indexOf(CHUNK_SIZE)+CHUNK_SIZE.length()+1 , getNextIndex(rawMessage,CHUNK_SIZE));
+		log.debug("rawMessage:"+rawMessage);
+		log.debug("HANDLE:"+HANDLE);
 		String handle = rawMessage.indexOf(HANDLE) < 0 ? null : rawMessage.substring(rawMessage.indexOf(HANDLE)+HANDLE.length()+1 , getNextIndex(rawMessage,HANDLE));
+		log.debug("handle:"+handle);
 		String prevReqStatus = rawMessage.indexOf(PREV_REQ_STATUS) < 0 ? null : rawMessage.substring(rawMessage.indexOf(PREV_REQ_STATUS)+PREV_REQ_STATUS.length()+1 , getNextIndex(rawMessage,PREV_REQ_STATUS));
 		String result = rawMessage.indexOf(RESULT) < 0 ? null : rawMessage.substring(rawMessage.indexOf(RESULT)+RESULT.length()+1 , getNextIndex(rawMessage,RESULT));
 		String devCrc = rawMessage.indexOf(CRC) < 0 ? null : rawMessage.substring(rawMessage.indexOf(CRC)+CRC.length()+1, rawMessage.length());

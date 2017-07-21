@@ -348,7 +348,7 @@ public class FOTAService {
 					if (entry1.getValue().equals(INIT)) {
 						for (Map.Entry<Long, String> chunk : storeChunk
 								.entrySet()) {
-							if (chunk.getKey() == 0) {
+							if (chunk.getKey() == handleHolderCount) {
 								log.debug("Output into chnuks :"
 										+ chunk.getValue());
 								
@@ -376,7 +376,7 @@ public class FOTAService {
 						handleHolder.put(handleHolderCount, entry1.getValue());
 						for (Map.Entry<Long, String> chunk : storeChunk
 								.entrySet()) {
-							if (chunk.getKey() == 0) {
+							if (chunk.getKey() == handleHolderCount) {
 								log.debug("Output into chnuks :"
 										+ chunk.getValue());
 								/*buffer = chunk.getValue();

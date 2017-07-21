@@ -317,7 +317,8 @@ public class FOTAService {
 				totalChunk = readHexByteDataFromFile();
 				log.error("totalChunk: " + totalChunk);
 				Random rand = new Random();
-				handleValue = rand.nextInt(9) + 1;
+				//handleValue = rand.nextInt(9) + 0001;
+				handleValue = (int)(Math.random()*9000)+1000;
 				responseString.append(RESULT_EQ);
 				responseString.append("Yes");
 				responseString.append(AMPERSAND);

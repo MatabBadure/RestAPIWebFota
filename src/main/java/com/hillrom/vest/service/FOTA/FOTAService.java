@@ -502,9 +502,8 @@ public class FOTAService {
 
 	private String hexToAscii(String hexStr) {
 		 String str = "";
-		 StringBuilder output = new StringBuilder("");
 		 try{
-				 for (int i = 0; i < hexStr.length()-2; i += 2) {
+				 for (int i = 0; i < hexStr.length()-1; i += 2) {
 					str =str+hexStr.substring(i, i + 2);
 
 				 }

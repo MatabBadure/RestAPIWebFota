@@ -129,7 +129,7 @@ public class FOTAService {
 		String data = "";
 		String trimData = "";
 		try {
-			data = new String(byteArray, 0, byteArray.length, "ASCII");
+			data = new String(byteArray, 0, byteArray.length);
 			trimData = data.replace(":", "").replace("\n", "")
 					.replace("\r", "");
 		} catch (Exception ex) {
@@ -296,7 +296,7 @@ public class FOTAService {
 		StringBuilder responseString = new StringBuilder();
 		StringBuilder responseStringLast = new StringBuilder();
 		StringBuilder finalResponse = new StringBuilder();
-		String finalString = "";
+		String finalString = new String();
 
 		Map<String, String> fotaJsonData = new LinkedHashMap<String, String>();
 
@@ -329,20 +329,25 @@ public class FOTAService {
 				responseString.append(totalChunk);
 				responseString.append(AMPERSAND);
 				responseString.append(CRC_EQ);
-				String crc = "";
+				/*String crc = "";
 				for (Map.Entry<String, String> entry1 : fotaJsonData.entrySet()) {
 					if (entry1.getKey().equals(CRC)) {
 						log.debug("CRC:" + entry1.getValue());
 						crc = entry1.getValue();
 						break;
 					}
-				}
-				responseString.append(crc);
+				}*/
 				
-				byte[] encoded = java.util.Base64.getEncoder().encode(
+				
+				responseString.append(fotaJsonData.get(CRC));
+				//finalString = responseString.toString();
+				
+			/*	byte[] encoded = java.util.Base64.getEncoder().encode(
 						responseString.toString().getBytes());
-				finalString = new String(encoded);
-				log.error("finalString: " + finalString);
+				finalString = new String(encoded);*/
+				log.error("responseString: " + finalString);
+				finalString = asciiToHex(responseString.toString());
+				
 			} else if (entry.getValue().equals(REQUEST_TYPE2)) {
 				for (Map.Entry<String, String> entry1 : fotaJsonData.entrySet()) {
 					if (entry1.getValue().equals(INIT)) {
@@ -358,7 +363,9 @@ public class FOTAService {
 								//log.debug("handleHolderCount:" + bigint);
 								//byte[] bytArray = Integer.toHexString(BigInteger.valueOf(val))
 								
-								buffer = hexToAscii(chunk.getValue());
+								//buffer = hexToAscii(chunk.getValue());
+								buffer = hexToAscii(asciiToHex(chunk.getValue()));
+								//buffer = asciiToHex(chunk.getValue());
 								log.debug("buffer Encoded:" + buffer);
 								bufferLen = chunk.getValue().length() / 2;
 							}
@@ -389,7 +396,9 @@ public class FOTAService {
 								//byte[] bytArray = Integer.toHexString(BigInteger.valueOf(val))
 								
 								//buffer = new String(bufferInHex);
-								buffer = hexToAscii(chunk.getValue());
+								//buffer = hexToAscii(chunk.getValue());
+								buffer = hexToAscii(asciiToHex(chunk.getValue()));
+								//buffer = asciiToHex(chunk.getValue());
 								log.debug("buffer Encoded:" + buffer);
 								bufferLen = chunk.getValue().length() / 2;
 								
@@ -410,7 +419,7 @@ public class FOTAService {
 								log.debug("Output into chnuks :"
 										+ chunk.getValue());
 								//buffer = chunk.getValue();
-								buffer = hexToAscii(chunk.getValue());
+								buffer = asciiToHex(chunk.getValue());
 								bufferLen = chunk.getValue().length() / 2;
 							}
 						}
@@ -437,34 +446,39 @@ public class FOTAService {
 				responseString.append(AMPERSAND);
 				responseString.append(BUFFER_EQ);
 				
-				byte[] encoded = java.util.Base64.getEncoder().encode(
+				String str1 = asciiToHex(responseString.toString());
+				
+				log.error("str1: " + str1);
+				
+				//responseString.append(buffer);
+				
+				/*byte[] encoded = java.util.Base64.getEncoder().encode(
 						responseString.toString().getBytes());
 				String encodedCheckUpdate1 = new String(encoded);
-				log.error("encodedCheckUpdate1: " + encodedCheckUpdate1);
+				log.error("encodedCheckUpdate1: " + encodedCheckUpdate1);*/
 				/*finalResponse.append(encodedCheckUpdate1);
 				finalResponse.append(buffer);*/
 				log.error("buffer: " + buffer);
+				StringBuilder sbStr = new StringBuilder();
 				
-				//responseString.append(new String(buffer));
-				responseStringLast.append(AMPERSAND);
-				String crc = "";
-				for (Map.Entry<String, String> entry1 : fotaJsonData.entrySet()) {
-					if (entry1.getKey().equals(CRC)) {
-						log.debug("CRC:" + entry1.getValue());
-						crc = entry1.getValue();
-						break;
-					}
-				}
-				responseStringLast.append(CRC_EQ);
-				responseStringLast.append(crc);
+				sbStr.append(AMPERSAND);
+				sbStr.append(CRC_EQ);
+				sbStr.append(fotaJsonData.get(CRC));
 				
+				String str2 = asciiToHex(sbStr.toString());
+				
+				log.error("str2: " + str2);
+				
+				/*
 				byte[] encodedLast = java.util.Base64.getEncoder().encode(
 						responseStringLast.toString().getBytes());
 				String encodedCheckUpdateLast = new String(encodedLast);
 				log.error("encodedCheckUpdateLast: " + encodedCheckUpdateLast);
 				//finalResponse.append(encodedCheckUpdateLast);
-				finalString = encodedCheckUpdate1.concat(buffer).concat(encodedCheckUpdateLast) ;
-				log.error("finalString: " + finalString);
+				finalString = encodedCheckUpdate1.concat(buffer).concat(encodedCheckUpdateLast) ;*/
+				log.error("responseString: " + responseString);
+				
+				finalString = str1.concat(buffer).concat(str2);
 
 			} else if (entry.getValue().equals(REQUEST_TYPE3)) {
 				for (Map.Entry<String, String> entry1 : fotaJsonData.entrySet()) {
@@ -489,24 +503,41 @@ public class FOTAService {
 					+ handle.getValue());
 		}
 		
-		/*StringBuilder sb = new StringBuilder();
-
-		log.error("responseString: " + responseString.toString());
-		byte[] encoded = java.util.Base64.getEncoder().encode(
-				responseString.toString().getBytes());
-		String encodedCheckUpdate = new String(encoded);
-		log.error("encodedCheckUpdate: " + encodedCheckUpdate);*/
-		return finalString;
+		/*byte[] encoded = java.util.Base64.getEncoder().encode(
+				responseString.toString().getBytes());*/
+		
+		byte[] encoded = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(finalString));
+		String finalString1 = new String(encoded);
+		log.error("finalString1: " + finalString1);
+		return finalString1;
 	}
 
 
+	private  String asciiToHex(String asciiValue)
+    {
+        char[] chars = asciiValue.toCharArray();
+        StringBuffer hex = new StringBuffer();
+        for (int i = 0; i < chars.length; i++)
+        {
+            hex.append(Integer.toHexString((int) chars[i]));
+        }
+        return hex.toString();
+
+	}
+	
 	private String hexToAscii(String hexStr) {
 		 String str = "";
+		 StringBuilder output = new StringBuilder("");
 		 try{
-				 for (int i = 0; i < hexStr.length()-1; i += 2) {
+				/* for (int i = 0; i < hexStr.length()-1; i += 2) {
 					str =str+hexStr.substring(i, i + 2);
 
-				 }
+				 }*/
+			 for (int i = 0; i < hexStr.length(); i+=2) {
+			        str = hexStr.substring(i, i+2);
+			        output.append((char)Integer.parseInt(str, 16));
+			    }
+			    System.out.println(output);
 			 
 		 }catch(Exception ex){
 
@@ -514,11 +545,11 @@ public class FOTAService {
 		 
 		 //byte[] raw = DatatypeConverter.parseHexBinary(str);
 
-		byte[] encoded = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(str));
+		//byte[] encoded = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(str));
 		//System.out.println(new String(encoded));
 
 		//return DatatypeConverter.parseHexBinary(str);
-		 return new String(encoded);
+		 return new String(output.toString());
 		}
 
 	

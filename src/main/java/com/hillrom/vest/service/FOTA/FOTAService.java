@@ -5,12 +5,12 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.BUFFER_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.BUFFER_LEN_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC_EQ;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HEXAFILEPATH;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.INIT;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.NOT_OK;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.OK;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.PREV_REQ_STATUS;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE1;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE2;
@@ -53,6 +53,10 @@ public class FOTAService {
 	private  Map<Long,String> storeChunk ;
 	private  Map<Long,String> handleHolder ;
 	
+	public static final byte[] CRC_FIELD_NAME = new byte[]{38,99,114,99,61};
+	public static final byte[] CHUNK_SIZE = new byte[]{38,99,104,117,110,107,83,105,122,101,61};
+	public static final byte[] HANDLE = new byte[]{38,104,97,110,100,108,101,61};
+	
 	
 	private long handleHolderCount ;
 	
@@ -85,122 +89,145 @@ public class FOTAService {
 			log.error("totalChunk: " + handleHolder.size());
 			totalChunk = readHexByteDataFromFile();
 			log.error("totalChunk: " + totalChunk);
-			Random rand = new Random();
-			//handleValue = rand.nextInt(9) + 0001;
-			handleValue = (int)(Math.random()*9000)+1000;
+			
 			responseString.append(RESULT_EQ);
 			responseString.append("Yes");
 			responseString.append(AMPERSAND);
 			responseString.append(HANDLE_EQ);
-			responseString.append(handleValue);
-			responseString.append(AMPERSAND);
-			responseString.append(TOTAL_CHUNK);
-			responseString.append(totalChunk);
-			responseString.append(AMPERSAND);
-			responseString.append(CRC_EQ);
-			responseString.append(fotaJsonData.get(CRC));
-			log.error("responseString: " + finalString);
-			finalString = asciiToHex(responseString.toString());
+			String strResponseString = asciiToHex(responseString.toString());
+			log.error("strResponseString: " + strResponseString);
+			
+			//Converting raw for handle value
+			//$ random generator;
+			//handleValue = (int)(Math.random()*9000)+1000;
+			Random random = new Random();
+	        handleValue = random.nextInt();
+	        String strHandleValue =  hexToAscii(asciiToHex(Integer.toHexString(handleValue)));
+			log.error("strHandleValue: " + strHandleValue);
+			
+			StringBuilder responseString1 = new StringBuilder();
+			responseString1.append(AMPERSAND);
+			responseString1.append(TOTAL_CHUNK);
+			String strResponseString1 = asciiToHex(responseString1.toString());
+			log.error("strResponseString1: " + strResponseString1);
+			
+			//Converting raw for Total chunk value
+			BigInteger toHex=new BigInteger(String.valueOf(totalChunk),10);
+		    String totalChunkHexString =toHex.toString(16);
+		    totalChunkHexString= ("00000000" + totalChunkHexString).substring(totalChunkHexString.length());
+			String strTotalChunk = hexToAscii(asciiToHex(totalChunkHexString));
+			log.error("strTotalChunk: " + strTotalChunk);
+			
+			StringBuilder responseString2 = new StringBuilder();
+			responseString2.append(AMPERSAND);
+			responseString2.append(CRC_EQ);
+			String strResponseString2 = asciiToHex(responseString2.toString());
+			log.error("strResponseString2: " + strResponseString2);
+			
+					
+			 byte[] getCRCByte = java.util.Base64.getDecoder().decode(rawMessage);
+			 int start = returnMatch(getCRCByte,CRC_FIELD_NAME);
+			 int start1 = returnMatch(getCRCByte,CRC_FIELD_NAME)+1;
+			 StringBuilder crcHexBilder = new StringBuilder();
+			 
+			 crcHexBilder.append(Integer.toHexString(getCRCByte[start]& 0xFF));
+			 crcHexBilder.append(Integer.toHexString(getCRCByte[start1]& 0xFF));
+			
+			 log.error("crcHexBilder: " + crcHexBilder);
+			 String crcHexString = hexToAscii(asciiToHex(crcHexBilder.toString()));
+			 log.error("crcHexString: " + crcHexString);
+			 
+			finalString = strResponseString.concat(strHandleValue).concat(strResponseString1).concat(strTotalChunk).concat(strResponseString2).concat(crcHexString);
+			log.error("finalString: " + finalString);
 			
 		
 		}else if(fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE2)){
+			
+			if (fotaJsonData.get(PREV_REQ_STATUS).equals(INIT)) {
+				log.debug("0th Chunk :" + storeChunk.get(0L));
+				buffer = hexToAscii(asciiToHex(storeChunk.get(0L)));
+				log.debug("buffer Encoded:" + buffer);
+				bufferLen = storeChunk.get(0L).length() / 2;
+				handleHolderCount = 0L;
+				log.debug("handleHolderCount:" + handleHolderCount);
 
-			for (Map.Entry<String, String> entry1 : fotaJsonData.entrySet()) {
-				if (entry1.getValue().equals(INIT)) {
-					for (Map.Entry<Long, String> chunk : storeChunk
-							.entrySet()) {
-						if (chunk.getKey() == 0) {
-							log.debug("Output into chnuks :"
-									+ chunk.getValue());
-							buffer = hexToAscii(asciiToHex(chunk.getValue()));
-							log.debug("buffer Encoded:" + buffer);
-							bufferLen = chunk.getValue().length() / 2;
-						}
-					}
-					handleHolderCount = 0;
-					log.debug("handleHolderCount:" + handleHolderCount);
-				}
-				// handleHolder.put((long) handleCount++,
-				// entry1.getValue());
-				else if (entry1.getValue().equals(OK)) {
-					// handleCount = handleHolderCount;
-					// handleHolder.put(handleHolderCount++,
-					// entry1.getValue());
-					handleHolderCount = handleHolderCount + 1;
-					handleHolder.put(handleHolderCount, entry1.getValue());
-					for (Map.Entry<Long, String> chunk : storeChunk
-							.entrySet()) {
-						if (chunk.getKey() == handleHolderCount) {
-							log.debug("Output into chnuks :"
-									+ chunk.getValue());
-							
-							buffer = hexToAscii(asciiToHex(chunk.getValue()));
-							//buffer = asciiToHex(chunk.getValue());
-							log.debug("buffer Encoded:" + buffer);
-							bufferLen = chunk.getValue().length() / 2;
-							
-						}
-					}
-					// handleHolderCount = handleCount;
-					log.debug("handleHolderCount:" + handleHolderCount);
+			}else if (fotaJsonData.get(PREV_REQ_STATUS).equals(OK)) {
+				handleHolderCount = handleHolderCount + 1;
+				handleHolder.put(handleHolderCount, fotaJsonData.get(PREV_REQ_STATUS));
+				log.debug("Chunk By Chunk :" + storeChunk.get(handleHolderCount));
+				buffer = hexToAscii(asciiToHex(storeChunk.get(handleHolderCount)));
+				log.debug("buffer Encoded:" + buffer);
+				bufferLen = storeChunk.get(handleHolderCount).length() / 2;
+				log.debug("handleHolderCount:" + handleHolderCount);
+				
+			} else if (fotaJsonData.get(PREV_REQ_STATUS).equals(NOT_OK)) {
+				
+				handleHolderCount = handleHolderCount-1;
+				handleHolder.put(handleHolderCount, fotaJsonData.get(PREV_REQ_STATUS));
+				log.debug("Chunk By Chunk :" + storeChunk.get(handleHolderCount));
+				buffer = hexToAscii(asciiToHex(storeChunk.get(handleHolderCount)));
+				log.debug("buffer Encoded:" + buffer);
+				bufferLen = storeChunk.get(handleHolderCount).length() / 2;
+				log.debug("handleHolderCount:" + handleHolderCount);
 
-				} else if (entry1.getValue().equals(NOT_OK)) {
-					// handleCount = handleHolderCount;
-					// handleHolder.put(handleHolderCount--,
-					// entry1.getValue());
-					handleHolderCount = handleHolderCount - 1;
-					for (Map.Entry<Long, String> chunk : storeChunk
-							.entrySet()) {
-						if (chunk.getKey() == handleHolderCount) {
-							log.debug("Output into chnuks :"
-									+ chunk.getValue());
-							//buffer = chunk.getValue();
-							buffer = asciiToHex(chunk.getValue());
-							bufferLen = chunk.getValue().length() / 2;
-						}
-					}
-					// handleHolderCount = handleHolderCount+1;
-					log.debug("handleHolderCount:" + handleHolderCount);
-					// handleHolderCount = handleCount;
-				}
-
-			}
-
-			String handle = "";
-			for (Map.Entry<String, String> entry1 : fotaJsonData.entrySet()) {
-				if (entry1.getKey().equals(HANDLE)) {
-					log.debug("HANDLE:" + entry1.getValue());
-					handle = entry1.getValue();
-					break;
-				}
 			}
 			responseString.append(HANDLE_EQ);
-			responseString.append(handle);
-			responseString.append(AMPERSAND);
-			responseString.append(BUFFER_LEN_EQ);
-			responseString.append(bufferLen);
-			responseString.append(AMPERSAND);
-			responseString.append(BUFFER_EQ);
+			String str = asciiToHex(responseString.toString());
 			
-			String str1 = asciiToHex(responseString.toString());
+			byte[] getCRCByte1 = java.util.Base64.getDecoder().decode(rawMessage);
+			 int handleIndex = returnMatch(getCRCByte1,HANDLE);
+				log.error("str1: " + handleIndex);
+			StringBuilder handleRes = new StringBuilder();	
+			//handleRes.
+			handleRes.append(Integer.toHexString(getCRCByte1[handleIndex]& 0xFF));
+			handleRes.append(Integer.toHexString(getCRCByte1[handleIndex+1]& 0xFF));
+			handleRes.append(Integer.toHexString(getCRCByte1[handleIndex+2]& 0xFF));
+			handleRes.append(Integer.toHexString(getCRCByte1[handleIndex+3]& 0xFF));
+			
+			String handleString = hexToAscii(asciiToHex(handleRes.toString()));	
+			//responseString.append(handle);
+			
+			StringBuilder responseString1 = new StringBuilder();	
+			responseString1.append(AMPERSAND);
+			responseString1.append(BUFFER_LEN_EQ);
+			String str1 = asciiToHex(responseString1.toString());
+			
+			String bufferLen =  hexToAscii(asciiToHex(Integer.toHexString(128)));
+			
+			//responseString1.append(bufferLen);
+			
+			StringBuilder responseString2 = new StringBuilder();
+			responseString2.append(AMPERSAND);
+			responseString2.append(BUFFER_EQ);
+			
+			String str2 = asciiToHex(responseString2.toString());
 			
 			log.error("str1: " + str1);
 			
 			log.error("buffer: " + buffer);
-			StringBuilder responseString1 = new StringBuilder();
+			StringBuilder responseString3 = new StringBuilder();
 			
-			responseString1.append(AMPERSAND);
-			responseString1.append(CRC_EQ);
-			responseString1.append(fotaJsonData.get(CRC));
+			responseString3.append(AMPERSAND);
+			responseString3.append(CRC_EQ);
 			
-			String str2 = asciiToHex(responseString1.toString());
+			String str3 = asciiToHex(responseString3.toString());
 			
-			log.error("str2: " + str2);
+			 byte[] getCRCByte = java.util.Base64.getDecoder().decode(rawMessage);
+			 int crcIndex1 = returnMatch(getCRCByte,CRC_FIELD_NAME);
+			 int crcIndex2 = returnMatch(getCRCByte,CRC_FIELD_NAME)+1;
+			 StringBuilder crcHexBilder = new StringBuilder();
+			 
+			 crcHexBilder.append(Integer.toHexString(getCRCByte[crcIndex1]& 0xFF));
+			 crcHexBilder.append(Integer.toHexString(getCRCByte[crcIndex2]& 0xFF));
+			
+			
+			String crcHexString = hexToAscii(asciiToHex(crcHexBilder.toString()));
+			
+			log.error("crcHexString: " + crcHexString);
 			
 			log.error("responseString: " + responseString);
 			//Final String 
-			finalString = str1.concat(buffer).concat(str2);
-
+			finalString = str.concat(handleString).concat(str1).concat(bufferLen).concat(str2).concat(buffer).concat(str3).concat(crcHexString);
 		
 		} else if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE3)) {
 			if (fotaJsonData.get(RESULT).equals(OK)) {
@@ -225,6 +252,28 @@ public class FOTAService {
 		return finalString1;
 	}
 
+	
+	private int returnMatch(byte[] inputArray,byte[] matchArray){
+
+        for(int i=0;i<inputArray.length;i++){
+        	int val = inputArray[i] & 0xFF;
+        	boolean found = false;
+        	
+        	if((val == 38) && !found){
+        		int j=i;int k=0;
+        		while((inputArray[j++]==matchArray[k++]) && (k<matchArray.length)){
+        			
+        		}
+        		if(k==matchArray.length){
+        			found = true;
+        			return j;
+        		}
+        	}
+        }
+        
+        return -1;
+    	
+    }
 
 	private  String asciiToHex(String asciiValue)
     {

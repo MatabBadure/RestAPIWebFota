@@ -89,13 +89,12 @@ public class FOTAService {
 			
 			
 			if(fotaJsonData.get(DEVICE_PARTNUMBER).equals(DEVICE_PARTNUMBER_01)){
-				
 				int totalChunks = 0;
 				HM_part01 hmp01 = HM_part01.getInstance();
 				
 				String handleId = getHandleNumber();
 				
-				globalHandleHolder.getHandles().put(handleId,hmp01.getFileChunks());
+				globalHandleHolder.getHandles().put(handleId,0);
 				
 				totalChunks = hmp01.getTotalChunk();
 				// Response pair1
@@ -127,110 +126,71 @@ public class FOTAService {
 			String handleId = "";
 			int chunkCount = 0;
 			if (fotaJsonData.get(PREV_REQ_STATUS).equals(INIT)) {
-				
-				HM_part01 sendChunkCounterParticulaId = HM_part01.getInstance();
-				
 				//Get handle from request
 				handleId = getHandleFromRequest(rawMessage);
 				log.debug("handleId from Request:" + handleId);
 				
 				//get chunk based on handle
-				Map<Integer,String> getChunkBasedOnHandle = globalHandleHolder.getHandles().get(handleId);
+				int counter = globalHandleHolder.getHandles().get(handleId);
+				log.debug("counter:" + counter+"for"+handleId);
 				
-				//check counter Map
-				Map<String,Integer> checkCounterMap = globalHandleHolder.getSendChunkCounterHandle().get(handleId);
-				
-				sendChunkCounterParticulaId.getSendChunkCounter().put("chunkCounter",0);
-				
-					if(checkCounterMap == null){
-						globalHandleHolder.getSendChunkCounterHandle().put(handleId,sendChunkCounterParticulaId.getSendChunkCounter());
-						
-					}
+				if(counter == 0){
+					HM_part01 hmp01 = HM_part01.getInstance();
+					String zeroChunk = hmp01.getFileChunks().get(0);
+					//Zero the Chunk in raw format
+					buffer = hexToAscii(asciiToHex(zeroChunk));
+					log.debug("buffer Encoded:" + buffer);
 					
-					log.debug("Send request Counter Values: "+checkCounterMap.get("chunkCounter")+"for Handle id: "+handleId+"Init");
-				//Zero the Chunk in raw format
-				String zeroChunk = getChunkBasedOnHandle.get(0);
-				buffer = hexToAscii(asciiToHex(zeroChunk));
-				log.debug("buffer Encoded:" + buffer);
-				
-				//Chunk size in hex byte
-				bufferLen = zeroChunk.length() / 2;
-				log.debug("bufferLen:" + bufferLen);
-				
-				//Reset to initial count
-				//chunkCount = 0;
-				
+					//Chunk size in hex byte
+					bufferLen = zeroChunk.length() / 2;
+					log.debug("bufferLen:" + bufferLen);
+					
+				}
 
 			}else if (fotaJsonData.get(PREV_REQ_STATUS).equals(OK)) {
 				
-				HM_part01 sendChunkCounterParticulaId = HM_part01.getInstance();
-				
+				HM_part01 hmp01 = HM_part01.getInstance();
 				//Get handle from request
 				handleId = getHandleFromRequest(rawMessage);
 				log.debug("handleId from Request:" + handleId);
 				
 				//get chunk based on handle
-				Map<Integer,String> getChunkBasedOnHandle = globalHandleHolder.getHandles().get(handleId);
-				
-				log.debug("getChunkBasedOnHandle Ok:" + getChunkBasedOnHandle);
-				
-				//check counter Map
-				Map<String,Integer> checkCounterMap = globalHandleHolder.getSendChunkCounterHandle().get(handleId);
-				
-				//sendChunkCounterParticulaId.getSendChunkCounter().put("chunkCounter",0);
-				log.debug("Send request Counter Values:"+checkCounterMap.get("chunkCounter")+"for Handle id: "+handleId+"OK");
-				if(checkCounterMap != null){
-					chunkCount = checkCounterMap.get("chunkCounter")+1 ;
+				int counter = globalHandleHolder.getHandles().get(handleId);
+				if(counter == 0){
+					globalHandleHolder.getHandles().put(handleId, ++counter);
+					log.debug("counter:" + counter+"for"+handleId);
 					
+					//OK send Chunk in raw format
+					String okSendChunk = hmp01.getFileChunks().get(counter);
+					
+					//Buffer values
+					buffer = hexToAscii(asciiToHex(okSendChunk));
+					log.debug("buffer Encoded:" + buffer);
+					
+					//Chunk size in hex byte
+					bufferLen = okSendChunk.length() / 2;
+					log.debug("bufferLen:" + bufferLen);
 				}
-				
-				sendChunkCounterParticulaId.getSendChunkCounter().put("chunkCounter",chunkCount);
-				
-				globalHandleHolder.getSendChunkCounterHandle().put(handleId,sendChunkCounterParticulaId.getSendChunkCounter());
-				log.debug("update the send chunk counter:" + globalHandleHolder.getSendChunkCounterHandle());
-				
-				//Zero the Chunk in raw format
-				String okSendChunk = getChunkBasedOnHandle.get(chunkCount);
-				
-				buffer = hexToAscii(asciiToHex(okSendChunk));
-				
-				log.debug("buffer Encoded:" + buffer);
-				//Chunk size in hex byte
-				bufferLen = okSendChunk.length() / 2;
-				log.debug("bufferLen:" + bufferLen);
 				
 			} else if (fotaJsonData.get(PREV_REQ_STATUS).equals(NOT_OK)) {
-				HM_part01 sendChunkCounterParticulaId = HM_part01.getInstance();
+				HM_part01 hmp01 = HM_part01.getInstance();
 				
 				//Get handle from request
 				handleId = getHandleFromRequest(rawMessage);
 				log.debug("handleId from Request:" + handleId);
 				
-				//get chunk based on handle
-				Map<Integer,String> getChunkBasedOnHandle = globalHandleHolder.getHandles().get(handleId);
+				//Dont increment the counter
+				Integer counter = globalHandleHolder.getHandles().get(handleId);
+				globalHandleHolder.getHandles().put(handleId, counter);
+				log.debug("counter:" + counter+"for"+handleId);
 				
-				log.debug("getChunkBasedOnHandle Not Ok:" + getChunkBasedOnHandle);
+				//If not ok send previous Chunk in raw format
+				String okSendChunk = hmp01.getFileChunks().get(counter);;
 				
-				//check counter Map
-				Map<String,Integer> checkCounterMap = globalHandleHolder.getSendChunkCounterHandle().get(handleId);
-				
-				//sendChunkCounterParticulaId.getSendChunkCounter().put("chunkCounter",0);
-				if(checkCounterMap != null){
-					chunkCount = checkCounterMap.get("chunkCounter");
-				}
-				
-				sendChunkCounterParticulaId.getSendChunkCounter().put("chunkCounter",chunkCount);		
-				log.debug("Handle Holder counter values :" + sendChunkCounterParticulaId.getSendChunkCounter());
-				
-				globalHandleHolder.getSendChunkCounterHandle().put(handleId,sendChunkCounterParticulaId.getSendChunkCounter());
-				log.debug("Handle Holder counter values with id:" + globalHandleHolder.getSendChunkCounterHandle());
-				
-				//Zero the Chunk in raw format
-				String okSendChunk = getChunkBasedOnHandle.get(chunkCount);
-				
+				////Buffer values
 				buffer = hexToAscii(asciiToHex(okSendChunk));
-				
 				log.debug("buffer Encoded:" + buffer);
+				
 				//Chunk size in hex byte
 				bufferLen = okSendChunk.length() / 2;
 				log.debug("bufferLen:" + bufferLen);

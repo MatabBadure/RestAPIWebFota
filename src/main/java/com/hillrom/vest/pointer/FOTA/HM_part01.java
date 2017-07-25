@@ -15,7 +15,7 @@ public class HM_part01 {
 	
 	private static Map<Integer, String> fileChunks = new LinkedHashMap<Integer, String>();
 	
-	private static Map<String, Integer> sendChunkCounter = new LinkedHashMap<String, Integer>();
+	//private static Map<String, Integer> sendChunkCounter = new LinkedHashMap<String, Integer>();
 	
 	private static int totalChunk = 0;
 	private static HM_part01 instance;
@@ -100,13 +100,13 @@ public class HM_part01 {
 		HM_part01.totalChunk = totalChunk;
 	}
 
-	public static Map<String, Integer> getSendChunkCounter() {
+	/*public static Map<String, Integer> getSendChunkCounter() {
 		return sendChunkCounter;
 	}
 
 	public static void setSendChunkCounter(Map<String, Integer> sendChunkCounter) {
 		HM_part01.sendChunkCounter = sendChunkCounter;
 	}
-
+*/
 	
 }

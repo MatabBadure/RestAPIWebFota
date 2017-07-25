@@ -231,11 +231,21 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 		Optional<PatientDevicesAssoc> patientDevicesFromDB = patientDevicesAssocRepository.findOneBySerialNumber(deviceSerialNumber);
 		PatientInfo patientInfo = null;
 
+		List<PatientVestDeviceHistoryMonarch> patientMonarchDeviceHistoryList = new LinkedList<>();
+		patientMonarchDeviceHistoryList = patientMonarchDeviceRepository.findBySerialNumber(deviceSerialNumber);
+		
 		if (patientDevicesFromDB.isPresent()) {
+			
+			if(!patientMonarchDeviceHistoryList.isEmpty()){
+				PatientVestDeviceHistoryMonarch patientMonarchDevicePatient = patientMonarchDeviceHistoryList.get(0);
+				if(patientMonarchDevicePatient.isPending()){
+					patientMonarchDevicePatient.setPending(false);
+					patientMonarchDeviceRepository.save(patientMonarchDevicePatient);
+				}
+			}
+			
 			return retrieveUserPatientAssoc(patientDevicesFromDB.get().getPatientId());
 		} else {
-			
-			List<PatientVestDeviceHistoryMonarch> patientMonarchDeviceHistoryList = patientMonarchDeviceRepository.findBySerialNumber(deviceSerialNumber);
 			if(!patientMonarchDeviceHistoryList.isEmpty()){
 				PatientVestDeviceHistoryMonarch patientMonarchDevicePatient = patientMonarchDeviceHistoryList.get(0);
 			

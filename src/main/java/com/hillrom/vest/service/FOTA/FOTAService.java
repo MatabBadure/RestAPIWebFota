@@ -146,6 +146,8 @@ public class FOTAService {
 						globalHandleHolder.getSendChunkCounterHandle().put(handleId,sendChunkCounterParticulaId.getSendChunkCounter());
 						
 					}
+					
+					log.debug("Send OK request Counter Values: "+checkCounterMap.get("chunkCounter")+"Handle id: "+handleId);
 				//Zero the Chunk in raw format
 				String zeroChunk = getChunkBasedOnHandle.get(0);
 				buffer = hexToAscii(asciiToHex(zeroChunk));
@@ -174,8 +176,10 @@ public class FOTAService {
 				Map<String,Integer> checkCounterMap = globalHandleHolder.getSendChunkCounterHandle().get(handleId);
 				
 				//sendChunkCounterParticulaId.getSendChunkCounter().put("chunkCounter",0);
+				log.debug("Send OK request Counter Values: "+checkCounterMap.get("chunkCounter")+"Handle id: "+handleId);
 				if(checkCounterMap != null){
 					chunkCount = checkCounterMap.get("chunkCounter")+1 ;
+					
 				}
 				
 				sendChunkCounterParticulaId.getSendChunkCounter().put("chunkCounter",chunkCount);		

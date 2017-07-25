@@ -156,8 +156,8 @@ public class FOTAService {
 				
 				//get chunk based on handle
 				int counter = globalHandleHolder.getHandles().get(handleId);
-				if(counter == 0){
-					globalHandleHolder.getHandles().put(handleId, ++counter);
+				counter =counter +1;
+					globalHandleHolder.getHandles().put(handleId, counter);
 					log.debug("counter:" + counter+"for"+handleId);
 					
 					//OK send Chunk in raw format
@@ -170,7 +170,6 @@ public class FOTAService {
 					//Chunk size in hex byte
 					bufferLen = okSendChunk.length() / 2;
 					log.debug("bufferLen:" + bufferLen);
-				}
 				
 			} else if (fotaJsonData.get(PREV_REQ_STATUS).equals(NOT_OK)) {
 				HM_part01 hmp01 = HM_part01.getInstance();

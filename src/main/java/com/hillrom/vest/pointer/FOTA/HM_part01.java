@@ -1,5 +1,5 @@
 package com.hillrom.vest.pointer.FOTA;
-
+import static com.hillrom.vest.config.FOTA.FOTAConstants.HEXAFILEPATH;
 import java.io.FileInputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -39,7 +39,7 @@ public class HM_part01 {
 		String hexDataStr = "";
 		String[] output = null;
 		try {
-			Path pp = FileSystems.getDefault().getPath("D:/Matab/FOTA/Hexa",
+			Path pp = FileSystems.getDefault().getPath(HEXAFILEPATH,
 					"193164_charger_mainboard.hex");
 			FileInputStream fis = new FileInputStream(pp.toFile());
 			log.debug("File Length :" + (int) pp.toFile().length());

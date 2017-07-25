@@ -124,11 +124,11 @@ public class FOTAService {
 			
 		}else if(fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE2)){
 			
-			HM_part01 sendChunkCounterParticulaId = HM_part01.getInstance();
-
 			String handleId = "";
 			int chunkCount = 0;
 			if (fotaJsonData.get(PREV_REQ_STATUS).equals(INIT)) {
+				
+				HM_part01 sendChunkCounterParticulaId = HM_part01.getInstance();
 				
 				//Get handle from request
 				handleId = getHandleFromRequest(rawMessage);
@@ -147,7 +147,7 @@ public class FOTAService {
 						
 					}
 					
-					log.debug("Send OK request Counter Values: "+checkCounterMap.get("chunkCounter")+"Handle id: "+handleId);
+					log.debug("Send request Counter Values: "+checkCounterMap.get("chunkCounter")+"for Handle id: "+handleId+"Init");
 				//Zero the Chunk in raw format
 				String zeroChunk = getChunkBasedOnHandle.get(0);
 				buffer = hexToAscii(asciiToHex(zeroChunk));
@@ -163,6 +163,8 @@ public class FOTAService {
 
 			}else if (fotaJsonData.get(PREV_REQ_STATUS).equals(OK)) {
 				
+				HM_part01 sendChunkCounterParticulaId = HM_part01.getInstance();
+				
 				//Get handle from request
 				handleId = getHandleFromRequest(rawMessage);
 				log.debug("handleId from Request:" + handleId);
@@ -176,17 +178,16 @@ public class FOTAService {
 				Map<String,Integer> checkCounterMap = globalHandleHolder.getSendChunkCounterHandle().get(handleId);
 				
 				//sendChunkCounterParticulaId.getSendChunkCounter().put("chunkCounter",0);
-				log.debug("Send OK request Counter Values: "+checkCounterMap.get("chunkCounter")+"Handle id: "+handleId);
+				log.debug("Send request Counter Values:"+checkCounterMap.get("chunkCounter")+"for Handle id: "+handleId+"OK");
 				if(checkCounterMap != null){
 					chunkCount = checkCounterMap.get("chunkCounter")+1 ;
 					
 				}
 				
-				sendChunkCounterParticulaId.getSendChunkCounter().put("chunkCounter",chunkCount);		
-				log.debug("Handle Holder counter values :" + sendChunkCounterParticulaId.getSendChunkCounter());
+				sendChunkCounterParticulaId.getSendChunkCounter().put("chunkCounter",chunkCount);
 				
 				globalHandleHolder.getSendChunkCounterHandle().put(handleId,sendChunkCounterParticulaId.getSendChunkCounter());
-				log.debug("Handle Holder counter values with id:" + globalHandleHolder.getSendChunkCounterHandle());
+				log.debug("update the send chunk counter:" + globalHandleHolder.getSendChunkCounterHandle());
 				
 				//Zero the Chunk in raw format
 				String okSendChunk = getChunkBasedOnHandle.get(chunkCount);
@@ -199,6 +200,8 @@ public class FOTAService {
 				log.debug("bufferLen:" + bufferLen);
 				
 			} else if (fotaJsonData.get(PREV_REQ_STATUS).equals(NOT_OK)) {
+				HM_part01 sendChunkCounterParticulaId = HM_part01.getInstance();
+				
 				//Get handle from request
 				handleId = getHandleFromRequest(rawMessage);
 				log.debug("handleId from Request:" + handleId);

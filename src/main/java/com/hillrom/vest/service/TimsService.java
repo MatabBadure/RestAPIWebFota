@@ -366,7 +366,7 @@ public class TimsService {
 		
 		
 		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").isPresent()){
-			log.debug("Checking isSerialNoExistInPatientdeviceAssocVest ");
+			/*log.debug("Checking isSerialNoExistInPatientdeviceAssocVest ");*/
 			return true;
 		}
 			
@@ -377,7 +377,7 @@ public class TimsService {
 	public boolean isSerialNoExistInPatientdeviceAssocMonarch(String serialNumber){
 		
 		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").isPresent()){
-			log.debug("Checking isSerialNoExistInPatientdeviceAssocMonarch ");
+		/*log.debug("Checking isSerialNoExistInPatientdeviceAssocMonarch ");*/
 			return true;
 		}
 		
@@ -387,7 +387,7 @@ public class TimsService {
 	public boolean isHillromIdExistInPatientInfo(String hillromId){
 		
 		if(patientInfoService.findOneByHillromId(hillromId).isPresent()){
-			log.debug("Checking isHillromIdExistInPatientInfo ");
+			/*log.debug("Checking isHillromIdExistInPatientInfo ");*/
 				return true;
 		}
 		
@@ -397,7 +397,7 @@ public class TimsService {
 	public boolean isHillromIdExistInPatientDeviceAssocVest(String hillromId){
 		
 		if(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"VEST").isPresent()){
-				log.debug("Checking isHillromIdExistInPatientDeviceAssocVest ");
+				/*log.debug("Checking isHillromIdExistInPatientDeviceAssocVest ");*/
 				return true;
 		}
 		
@@ -407,7 +407,7 @@ public class TimsService {
 	public boolean isHillromIdExistInPatientDeviceAssocMonarch(String hillromId){
 		
 		if(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"MONARCH").isPresent()){
-				log.debug("Checking isHillromIdExistInPatientDeviceAssocMonarch ");
+				/*log.debug("Checking isHillromIdExistInPatientDeviceAssocMonarch ");*/
 				return true;
 		}
 		
@@ -418,7 +418,7 @@ public class TimsService {
 		
 		if((patientDevicesAssocRepository.findByHillromId(hillromId).isPresent()) 
 			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("VEST"))){
-				log.debug("Checking isHillromIdHasVestDeviceInPatientDeviceAssoc ");
+				/*log.debug("Checking isHillromIdHasVestDeviceInPatientDeviceAssoc ");*/
 				return true;
 		}
 		
@@ -429,7 +429,7 @@ public class TimsService {
 		
 		if((patientDevicesAssocRepository.findByHillromId(hillromId).isPresent()) 
 			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("MONARCH"))){
-				log.debug("Checking isHillromIdHasMonarchDeviceInPatientDeviceAssoc ");
+				/*log.debug("Checking isHillromIdHasMonarchDeviceInPatientDeviceAssoc ");*/
 				return true;
 		}
 		
@@ -441,7 +441,7 @@ public class TimsService {
 		
 		if((patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").isPresent()) ) {
 			if((patientInfoRepository.findOneById(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").get().getPatientId()).getFirstName().equalsIgnoreCase("Hill-Rom")) ){
-				log.debug("Checking isCurrentSerialNumberOwnedByShellVest ");	
+				/*log.debug("Checking isCurrentSerialNumberOwnedByShellVest ");	*/
 				return true;
 			}
 		}
@@ -454,7 +454,7 @@ public class TimsService {
 		if((patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").isPresent()) ) {
 				String patientId = patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").get().getPatientId();	
 				if((patientInfoRepository.findOneById(patientId).getFirstName().equalsIgnoreCase("Monarch")) && (patientInfoRepository.findOneById(patientId).getLastName().equalsIgnoreCase("Hill-Rom")) ){
-					log.debug("Checking isCurrentSerialNumberOwnedByShellMonarch ");	
+					/*log.debug("Checking isCurrentSerialNumberOwnedByShellMonarch ");*/	
 					return true;
 				}
 		}
@@ -485,7 +485,7 @@ public class TimsService {
 	public boolean isCurrentSerialNumberOwnedByCurrentHillromIdVest(String serialNumber,String hillromId){
 		
 		if(patientDevicesAssocRepository.findOneBySerialNumberAndHillromIdAndDeviceType(serialNumber,hillromId,"VEST").isPresent()){
-				log.debug("Checking isCurrentSerialNumberOwnedByCurrentHillromIdVest ");
+				/*log.debug("Checking isCurrentSerialNumberOwnedByCurrentHillromIdVest ");*/
 				return true;		
 		}
 		return false;
@@ -544,6 +544,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				log.debug("Associated Device for Patient Successfully");
+				log.debug("Patient Id "+returnValues.get("return_patient_id").toString());
 				
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
@@ -578,6 +579,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
+				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -614,6 +616,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				log.debug("Associated Device for Patient Successfully");
+				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -652,6 +655,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				log.debug("Associated Device for Patient Successfully");
+				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -692,7 +696,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				log.debug("Updated Associated Device for Patient Successfully");
-				
+				log.debug("Patient Id "+returnValues.get("return_patient_id").toString());
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
@@ -907,6 +911,7 @@ public class TimsService {
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
 					log.debug("Associated Device for Patient Successfully");
+					log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -981,7 +986,7 @@ public class TimsService {
 
 				managePatientDeviceAssociation(patientInfoDTO);
 				log.debug("Merge Associated Device for Patient Successfully");
-				
+				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 
 			}catch(Exception ex){
 				ex.printStackTrace();
@@ -1019,7 +1024,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				log.debug("Associated Device for Patient Successfully");
-				
+				log.debug("Patient Id "+returnValues.get("return_patient_id").toString());
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
@@ -1051,7 +1056,7 @@ public class TimsService {
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-				
+				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
@@ -1091,6 +1096,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				log.debug("Associated Device for Patient Successfully");
+				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -1131,6 +1137,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				log.debug("Associated Device for Patient Successfully");
+				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -1173,6 +1180,7 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				log.debug("Updated Associated Device for Patient Successfully");
+				log.debug("Patient Id "+returnValues.get("return_patient_id").toString());
 				
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
@@ -1396,6 +1404,7 @@ public class TimsService {
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
 					log.debug("Associated Device for Patient Successfully");
+					log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -1470,7 +1479,7 @@ public class TimsService {
 
 				managePatientDeviceAssociation(patientInfoDTO);
 				log.debug("Merge Associated Device for Patient Successfully");
-				
+				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 
 			}catch(Exception ex){
 				ex.printStackTrace();

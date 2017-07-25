@@ -81,11 +81,11 @@ public class TimsInputReaderService {
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
 		
-		log.debug("Starting to process records ");
+		/*log.debug("Starting to process records ");*/
 		for (Map.Entry<Integer, PatientInfoDTO> entry : fileRecords.entrySet()) {
 		    Integer position = entry.getKey();
 		    PatientInfoDTO record = entry.getValue();
-		    log.debug("Processing record position : "+position);
+		   /* log.debug("Processing record position : "+position);*/
 		    if(record.getDevice_type().equalsIgnoreCase("VEST")){
 		    	log.debug("Inside VEST loop ");
 		    	timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record);
@@ -129,7 +129,7 @@ public class TimsInputReaderService {
 
 
 	        String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
-		    log.debug("Started reading flat file : " + csvFile);
+		    /*log.debug("Started reading flat file : " + csvFile);*/
 	        String line = "";
 	        String cvsSplitBy = ",";
 	        String Outdata = "";

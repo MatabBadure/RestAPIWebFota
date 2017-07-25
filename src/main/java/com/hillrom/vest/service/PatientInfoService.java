@@ -23,14 +23,14 @@ public class PatientInfoService {
     
     
     public Optional<PatientInfo> findOneByHillromId(String hillRomId){
-    	log.debug("hillRomId :: "+hillRomId);
+    	/*log.debug("hillRomId :: "+hillRomId);*/
     	Optional<PatientInfo> patientInfo = patientInfoRepository.findOneByHillromId(hillRomId);
     	return patientInfo;
     }
     
     // To get the patient details by patient id
     public PatientInfo findOneById(String id){
-    	log.debug("id :: "+id);
+    	/*log.debug("id :: "+id);*/
     	PatientInfo patientInfo = patientInfoRepository.findOneById(id);
     	return patientInfo;
     }

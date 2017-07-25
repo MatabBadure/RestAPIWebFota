@@ -2635,6 +2635,12 @@ public class AdherenceCalculationServiceMonarch{
 			LocalDate firstTransmissionDateMonarch = null;
 			User userOld = null;
 			
+			// Added for the Monarch/Vest creation scenario from TIMS
+			if(flag == 2 && Objects.isNull(patDevice.getOldPatientId())){
+				flag = 1;
+			}
+			// End of added for the Monarch/Vest creation scenario from TIMS
+			
 			if(flag == 2){
 				// Get the Patient old details
 				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patDevice.getOldPatientId());

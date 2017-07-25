@@ -39,7 +39,7 @@
 
 			<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
 				<Pattern>
-					%d{yyyy-MM-dd HH:mm:ss} %mdc [%thread] %level %logger{35} - %msg%n
+					 - %msg%n
 				</Pattern>
 			</encoder>
 

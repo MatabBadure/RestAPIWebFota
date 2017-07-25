@@ -38,9 +38,7 @@
 			<file>${CATALINA_HOME}/TIMS/logs/${logFileName}.log</file>
 
 			<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-				<Pattern>
-					 - %msg%n
-				</Pattern>
+				<Pattern>%msg%n</Pattern>
 			</encoder>
 
 			<rollingPolicy

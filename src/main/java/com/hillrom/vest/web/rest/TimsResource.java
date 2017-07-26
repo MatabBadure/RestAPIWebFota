@@ -28,6 +28,8 @@ import net.minidev.json.JSONObject;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
@@ -52,6 +54,8 @@ import com.hillrom.vest.web.rest.util.PaginationUtil;
 @RequestMapping("/api")
 public class TimsResource {
 
+	private final Logger log = LoggerFactory.getLogger("com.hillrom.vest.tims");
+	
 	@Inject
 	private TimsService timsService;
 	
@@ -158,6 +162,8 @@ public class TimsResource {
 			return new ResponseEntity<>(page, headers, HttpStatus.OK);
           
 		}catch(Exception ex){
+			log.debug(ex.toString());
+			
 			jsonObject.put("timsListMsg", "TIMSListing LogFile NOT Executed Successfully");
 			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 		}			

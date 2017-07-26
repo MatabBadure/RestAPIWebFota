@@ -114,7 +114,7 @@ public class TimsResource {
 								+" "+cal.get(cal.HOUR_OF_DAY)+":"+cal.get(cal.MINUTE)+":"+cal.get(cal.SECOND);
 					
 					
-					Date compareDate = new Date(formatedDate_new);
+					DateTime compareDate = new DateTime(formatedDate_new);
 					log.debug(compareDate+" ");
 					
 					/*Date compareDate = 	new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(formatedDate_new);
@@ -126,20 +126,23 @@ public class TimsResource {
 					String[] toDate_Elements = toDate.split("/");
 					String	toDate_new	= toDate_Elements[2]+"/"+toDate_Elements[0]+"/"+toDate_Elements[1]+" "+"00:00:00";
 				
-					Date compareFromDate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(fromDate_new);
-					Date compareToDate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(toDate_new);
+					//DateTime compareFromDate = new D("yyyy/MM/dd HH:mm:ss").parse(fromDate_new);
+					DateTime compareFromDate = new DateTime(formatedDate_new);
+					DateTime compareToDate = new DateTime(toDate_new);
+					
+					//Date compareToDate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(toDate_new);
 						
 					log.debug(compareFromDate.toString()+" "+compareToDate.toString());
 					log.debug(formatedDate_new.toString());
 					log.debug(" "+compareDate.equals(compareFromDate));
-					log.debug(" "+compareDate.after(compareFromDate));
+					log.debug(" "+compareDate.isAfter(compareFromDate));
 					
-					log.debug(" "+compareDate.before(compareToDate));
+					log.debug(" "+compareDate.isBefore(compareToDate));
 					log.debug(" "+compareDate.equals(compareToDate));
 					
 					if( ( compareDate.equals(compareFromDate) ||
-							compareDate.after(compareFromDate)  )  && 
-								( compareDate.before(compareToDate) || 
+							compareDate.isAfter(compareFromDate)  )  && 
+								( compareDate.isBefore(compareToDate) || 
 										compareDate.equals(compareToDate)) ){
 					/*	hmap.put("file", grepVal[0]);
 						hmap.put("path", grepVal[1]);

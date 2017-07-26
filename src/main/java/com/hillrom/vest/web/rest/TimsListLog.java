@@ -2,6 +2,8 @@ package com.hillrom.vest.web.rest;
 
 import java.util.Date;
 
+import org.joda.time.DateTime;
+
 
 
 public class TimsListLog {
@@ -9,13 +11,13 @@ public class TimsListLog {
 	private String file;
     private String path;
     private String status;
-    private Date lastMod;
+    private DateTime lastMod;
     
 	     
-   public Date getLastMod() {
+   public DateTime getLastMod() {
 		return lastMod;
 	}
-	public void setLastMod(Date lastMod) {
+	public void setLastMod(DateTime lastMod) {
 		this.lastMod = lastMod;
 	}
     public String getFile() {

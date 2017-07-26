@@ -106,13 +106,13 @@ public class TimsResource {
 					Date compareDate = 	new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(formatedDate);
 					
 					String[] fromDate_Elements = fromDate.split("/");
-					fromDate= fromDate_Elements[2]+"-"+fromDate_Elements[0]+"-"+fromDate_Elements[1];
+					fromDate= fromDate_Elements[2]+"-"+fromDate_Elements[0]+"-"+fromDate_Elements[1]+" "+"00:00:00";
 					
 					String[] toDate_Elements = toDate.split("/");
-					toDate= toDate_Elements[2]+"-"+toDate_Elements[0]+"-"+toDate_Elements[1];
+					toDate= toDate_Elements[2]+"-"+toDate_Elements[0]+"-"+toDate_Elements[1]+" "+"00:00:00";
 				
-					Date compareFromDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(fromDate+" "+"00:00:00");
-					Date compareToDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(toDate+" "+"00:00:00");
+					Date compareFromDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(fromDate);
+					Date compareToDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(toDate);
 						
 					
 					

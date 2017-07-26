@@ -122,6 +122,8 @@ public class TimsResource {
 					Date compareToDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(toDate_new);
 						
 					log.debug(compareFromDate.toString()+" "+compareToDate.toString());
+					log.debug(compareDate.toString());
+					log.debug(" "+compareDate.equals(compareFromDate));
 					
 					if( ( compareDate.equals(compareFromDate) ||
 							compareDate.after(compareFromDate)  )  && 
@@ -131,6 +133,8 @@ public class TimsResource {
 						hmap.put("path", grepVal[1]);
 						hmap.put("status", grepVal[2]);
 						hmap.put("lastMod", grepVal[3]);*/
+						
+						log.debug("inside loop");
 						TimsListLog timsListLog = new TimsListLog();
 						
 						timsListLog.setFile(grepVal[0]);

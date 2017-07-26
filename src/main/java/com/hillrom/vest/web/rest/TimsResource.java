@@ -86,6 +86,7 @@ public class TimsResource {
 		try{
 			List<String> returnVal = timsService.listLogDirectory(LOG_DIRECTORY, MATCH_STRING);
 			Calendar cal = Calendar.getInstance();
+			
 			List<TimsListLog> valueObj = new LinkedList<>();
 			
 			for (String grepValue : returnVal) {
@@ -98,7 +99,8 @@ public class TimsResource {
 					log.debug(date.toString());
 					cal.setTime(date);
 					
-					log.debug("date information"+cal.get(cal.YEAR)+" "+cal.get(cal.MONTH)+" "+cal.get(cal.DATE));
+					log.debug("date information "+cal.get(cal.YEAR)+" "+cal.get(cal.MONTH)+" "+cal.get(cal.DATE)
+							);
 					
 					
 				/*	String formatedDate = (cal.get(Calendar.MONTH)+1)+"/"+ +cal.get(Calendar.DATE)+"/"+cal.get(Calendar.YEAR);
@@ -109,7 +111,7 @@ public class TimsResource {
 				*/	
 					
 					String formatedDate_new = cal.get(Calendar.YEAR)+"/"+cal.get(Calendar.MONTH)+1+"/"+cal.get(Calendar.DATE)
-								+" "+cal.get(Calendar.HOUR)+":"+cal.get(Calendar.MINUTE)+":"+cal.get(Calendar.SECOND);
+								+" "+cal.get(Calendar.HOUR_OF_DAY)+":"+cal.get(Calendar.MINUTE)+":"+cal.get(Calendar.SECOND);
 					
 					
 					

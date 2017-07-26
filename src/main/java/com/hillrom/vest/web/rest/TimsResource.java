@@ -101,11 +101,11 @@ public class TimsResource {
 					
 				*/	
 					
-					String formatedDate = cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+cal.get(Calendar.DATE)
+					String formatedDate = cal.get(Calendar.YEAR)+"-"+cal.get(Calendar.MONTH)+1+"-"+cal.get(Calendar.DATE)
 								+" "+cal.get(Calendar.HOUR)+":"+cal.get(Calendar.MINUTE)+":"+cal.get(Calendar.SECOND);
 					Date compareDate = 	new SimpleDateFormat("yyyy-MM-dd HH:MM:SS").parse(formatedDate);
-					Date compareFromDate = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS").parse(fromDate);
-					Date compareToDate = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS").parse(toDate);
+					Date compareFromDate = new SimpleDateFormat("yyyy-MM-dd").parse(fromDate);
+					Date compareToDate = new SimpleDateFormat("yyyy-MM-dd").parse(toDate);
 						
 					
 					

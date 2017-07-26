@@ -98,6 +98,8 @@ public class TimsResource {
 					log.debug(date.toString());
 					cal.setTime(date);
 					
+					log.debug(cal.get(cal.YEAR)+"");
+					
 					
 				/*	String formatedDate = (cal.get(Calendar.MONTH)+1)+"/"+ +cal.get(Calendar.DATE)+"/"+cal.get(Calendar.YEAR);
 					Date compareDate = 	new SimpleDateFormat("MM/dd/yyyy").parse(formatedDate);
@@ -106,7 +108,7 @@ public class TimsResource {
 					
 				*/	
 					
-					String formatedDate = cal.get(Calendar.YEAR)+"/"+cal.get(Calendar.MONTH)+1+"/"+cal.get(Calendar.DATE)
+					String formatedDate = cal.get(cal.YEAR)+"/"+cal.get(Calendar.MONTH)+1+"/"+cal.get(Calendar.DATE)
 								+" "+cal.get(Calendar.HOUR)+":"+cal.get(Calendar.MINUTE)+":"+cal.get(Calendar.SECOND);
 					
 					Date compareDate = 	new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(formatedDate);

@@ -106,20 +106,20 @@ public class TimsResource {
 					
 				*/	
 					
-					String formatedDate = cal.get(Calendar.YEAR)+"-"+cal.get(Calendar.MONTH)+1+"-"+cal.get(Calendar.DATE)
+					String formatedDate = cal.get(Calendar.YEAR)+"/"+cal.get(Calendar.MONTH)+1+"/"+cal.get(Calendar.DATE)
 								+" "+cal.get(Calendar.HOUR)+":"+cal.get(Calendar.MINUTE)+":"+cal.get(Calendar.SECOND);
 					
-					Date compareDate = 	new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(formatedDate);
+					Date compareDate = 	new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(formatedDate);
 					
 					String[] fromDate_Elements = fromDate.split("/");
 					log.debug(Arrays.toString(fromDate_Elements) +" "+fromDate_Elements.length);
-				String	fromDate_new = fromDate_Elements[2]+"-"+fromDate_Elements[0]+"-"+fromDate_Elements[1]+" "+"00:00:00";
+				String	fromDate_new = fromDate_Elements[2]+"/"+fromDate_Elements[0]+"/"+fromDate_Elements[1]+" "+"00:00:00";
 					
 					String[] toDate_Elements = toDate.split("/");
-					String	toDate_new	= toDate_Elements[2]+"-"+toDate_Elements[0]+"-"+toDate_Elements[1]+" "+"00:00:00";
+					String	toDate_new	= toDate_Elements[2]+"/"+toDate_Elements[0]+"/"+toDate_Elements[1]+" "+"00:00:00";
 				
-					Date compareFromDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(fromDate_new);
-					Date compareToDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(toDate_new);
+					Date compareFromDate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(fromDate_new);
+					Date compareToDate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(toDate_new);
 						
 					log.debug(compareFromDate.toString()+" "+compareToDate.toString());
 					log.debug(compareDate.toString());

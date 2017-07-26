@@ -121,7 +121,7 @@ public class TimsResource {
 					Date compareFromDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(fromDate_new);
 					Date compareToDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(toDate_new);
 						
-					
+					log.debug(compareFromDate.toString()+" "+compareToDate.toString());
 					
 					if( ( compareDate.equals(compareFromDate) ||
 							compareDate.after(compareFromDate)  )  && 

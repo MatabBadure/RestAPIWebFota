@@ -112,6 +112,7 @@ public class TimsResource {
 					Date compareDate = 	new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(formatedDate);
 					
 					String[] fromDate_Elements = fromDate.split("/");
+					log.debug(Arrays.toString(fromDate_Elements));
 					fromDate= fromDate_Elements[2]+"-"+fromDate_Elements[0]+"-"+fromDate_Elements[1]+" "+"00:00:00";
 					
 					String[] toDate_Elements = toDate.split("/");

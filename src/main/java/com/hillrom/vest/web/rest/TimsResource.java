@@ -110,8 +110,8 @@ public class TimsResource {
 					
 				*/	
 					
-					String formatedDate_new = cal.get(Calendar.YEAR)+"/"+cal.get(Calendar.MONTH)+1+"/"+cal.get(Calendar.DATE)
-								+" "+cal.get(Calendar.HOUR_OF_DAY)+":"+cal.get(Calendar.MINUTE)+":"+cal.get(Calendar.SECOND);
+					String formatedDate_new = cal.get(cal.YEAR)+"/"+cal.get(cal.MONTH)+1+"/"+cal.get(cal.DATE)
+								+" "+cal.get(cal.HOUR_OF_DAY)+":"+cal.get(cal.MINUTE)+":"+cal.get(cal.SECOND);
 					
 					
 					

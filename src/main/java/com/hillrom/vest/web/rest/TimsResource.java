@@ -95,6 +95,7 @@ public class TimsResource {
 						|| status.equalsIgnoreCase(ALL) || status.equalsIgnoreCase("FILTER")) {
 					String modDate = grepVal[3];
 					Date date = new Date(Long.valueOf(modDate));
+					log.debug(date.toString());
 					cal.setTime(date);
 					
 					
@@ -107,6 +108,7 @@ public class TimsResource {
 					
 					String formatedDate = cal.get(Calendar.YEAR)+"-"+cal.get(Calendar.MONTH)+1+"-"+cal.get(Calendar.DATE)
 								+" "+cal.get(Calendar.HOUR)+":"+cal.get(Calendar.MINUTE)+":"+cal.get(Calendar.SECOND);
+					
 					Date compareDate = 	new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(formatedDate);
 					
 					String[] fromDate_Elements = fromDate.split("/");
@@ -162,7 +164,7 @@ public class TimsResource {
 			return new ResponseEntity<>(page, headers, HttpStatus.OK);
           
 		}catch(Exception ex){
-			log.debug(ex.toString());
+			log.debug(Arrays.toString(ex.getStackTrace()));
 			
 			jsonObject.put("timsListMsg", "TIMSListing LogFile NOT Executed Successfully");
 			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);

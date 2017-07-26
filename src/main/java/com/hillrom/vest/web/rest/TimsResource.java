@@ -103,9 +103,16 @@ public class TimsResource {
 					
 					String formatedDate = cal.get(Calendar.YEAR)+"-"+cal.get(Calendar.MONTH)+1+"-"+cal.get(Calendar.DATE)
 								+" "+cal.get(Calendar.HOUR)+":"+cal.get(Calendar.MINUTE)+":"+cal.get(Calendar.SECOND);
-					Date compareDate = 	new SimpleDateFormat("yyyy-MM-dd HH:MM:SS").parse(formatedDate);
-					Date compareFromDate = new SimpleDateFormat("yyyy-MM-dd").parse(fromDate);
-					Date compareToDate = new SimpleDateFormat("yyyy-MM-dd").parse(toDate);
+					Date compareDate = 	new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(formatedDate);
+					
+					String[] fromDate_Elements = fromDate.split("/");
+					fromDate= fromDate_Elements[0]+"-"+fromDate_Elements[1]+"-"+fromDate_Elements[2];
+					
+					String[] toDate_Elements = toDate.split("/");
+					toDate= toDate_Elements[0]+"-"+toDate_Elements[1]+"-"+toDate_Elements[2];
+				
+					Date compareFromDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(fromDate+" "+"00:00:00");
+					Date compareToDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(toDate+" "+"00:00:00");
 						
 					
 					

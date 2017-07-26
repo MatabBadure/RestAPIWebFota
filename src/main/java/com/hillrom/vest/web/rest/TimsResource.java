@@ -92,10 +92,22 @@ public class TimsResource {
 					String modDate = grepVal[3];
 					Date date = new Date(Long.valueOf(modDate));
 					cal.setTime(date);
-					String formatedDate = (cal.get(Calendar.MONTH)+1)+"/"+ +cal.get(Calendar.DATE)+"/"+cal.get(Calendar.YEAR);
+					
+					
+				/*	String formatedDate = (cal.get(Calendar.MONTH)+1)+"/"+ +cal.get(Calendar.DATE)+"/"+cal.get(Calendar.YEAR);
 					Date compareDate = 	new SimpleDateFormat("MM/dd/yyyy").parse(formatedDate);
 					Date compareFromDate = new SimpleDateFormat("MM/dd/yyyyy").parse(fromDate);
 					Date compareToDate = new SimpleDateFormat("MM/dd/yyyy").parse(toDate);
+					
+				*/	
+					
+					String formatedDate = cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+cal.get(Calendar.DATE)
+								+" "+cal.get(Calendar.HOUR)+":"+cal.get(Calendar.MINUTE)+":"+cal.get(Calendar.SECOND);
+					Date compareDate = 	new SimpleDateFormat("yyyy-MM-dd HH:MM:SS").parse(formatedDate);
+					Date compareFromDate = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS").parse(fromDate);
+					Date compareToDate = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS").parse(toDate);
+						
+					
 					
 					if( ( compareDate.equals(compareFromDate) ||
 							compareDate.after(compareFromDate)  )  && 

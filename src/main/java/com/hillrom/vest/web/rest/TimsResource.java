@@ -124,6 +124,10 @@ public class TimsResource {
 					log.debug(compareFromDate.toString()+" "+compareToDate.toString());
 					log.debug(compareDate.toString());
 					log.debug(" "+compareDate.equals(compareFromDate));
+					log.debug(" "+compareDate.after(compareFromDate));
+					
+					log.debug(" "+compareDate.before(compareToDate));
+					log.debug(" "+compareDate.equals(compareToDate));
 					
 					if( ( compareDate.equals(compareFromDate) ||
 							compareDate.after(compareFromDate)  )  && 

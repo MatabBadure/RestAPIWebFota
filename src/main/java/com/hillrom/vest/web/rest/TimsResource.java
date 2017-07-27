@@ -134,7 +134,7 @@ public class TimsResource {
 					String[] toDate_Elements = toDate.split("/");
 					
 					
-					Date compareToDate = new 	Date(Integer.parseInt(toDate_Elements[2]),Integer.parseInt(toDate_Elements[0]),Integer.parseInt(toDate_Elements[1]),00,00,00);					
+					Date compareToDate = new 	Date(Integer.parseInt(toDate_Elements[2]),Integer.parseInt(toDate_Elements[0]),Integer.parseInt(toDate_Elements[1]),23,59,59);					
 					
 					String	toDate_new	= toDate_Elements[2]+"/"+toDate_Elements[0]+"/"+toDate_Elements[1]+" "+"23:59:59";
 				

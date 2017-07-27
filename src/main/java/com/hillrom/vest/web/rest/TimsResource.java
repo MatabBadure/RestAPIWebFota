@@ -109,40 +109,52 @@ public class TimsResource {
 					Date compareToDate = new SimpleDateFormat("MM/dd/yyyy").parse(toDate);
 					
 				*/	
-					
-					String formatedDate_new = cal.get(cal.YEAR)+"/"+cal.get(cal.MONTH)+1+"/"+cal.get(cal.DATE)
-								+" "+cal.get(cal.HOUR_OF_DAY)+":"+cal.get(cal.MINUTE)+":"+cal.get(cal.SECOND);
+					Date compareDate = new 	Date(cal.get(cal.YEAR),cal.get(cal.MONTH)+1,cal.get(cal.DATE),cal.get(cal.HOUR_OF_DAY),cal.get(cal.MINUTE),cal.get(cal.SECOND));
 					
 					
-					DateTime compareDate = new DateTime(formatedDate_new);
+					
+					
+				/*	String formatedDate_new = cal.get(cal.YEAR)+"/"+cal.get(cal.MONTH)+1+"/"+cal.get(cal.DATE)
+								+" "+cal.get(cal.HOUR_OF_DAY)+":"+cal.get(cal.MINUTE)+":"+cal.get(cal.SECOND);*/
+					
+					
+					//Date compareDate = new Date(formatedDate_new);
 					log.debug(compareDate+" ");
 					
 					/*Date compareDate = 	new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(formatedDate_new);
 					log.debug("compare date"+compareDate);*/
 					String[] fromDate_Elements = fromDate.split("/");
+					
+					Date compareFromDate = new 	Date(Integer.parseInt(fromDate_Elements[2]),Integer.parseInt(fromDate_Elements[0]),Integer.parseInt(fromDate_Elements[1]),00,00,00);
+					
+					
 					log.debug(Arrays.toString(fromDate_Elements) +" "+fromDate_Elements.length);
 				String	fromDate_new = fromDate_Elements[2]+"/"+fromDate_Elements[0]+"/"+fromDate_Elements[1]+" "+"00:00:00";
 					
 					String[] toDate_Elements = toDate.split("/");
+					
+					
+					Date compareToDate = new 	Date(Integer.parseInt(toDate_Elements[2]),Integer.parseInt(toDate_Elements[0]),Integer.parseInt(toDate_Elements[1]),00,00,00);					
+					
 					String	toDate_new	= toDate_Elements[2]+"/"+toDate_Elements[0]+"/"+toDate_Elements[1]+" "+"00:00:00";
 				
 					//DateTime compareFromDate = new D("yyyy/MM/dd HH:mm:ss").parse(fromDate_new);
-					DateTime compareFromDate = new DateTime(formatedDate_new);
-					DateTime compareToDate = new DateTime(toDate_new);
+					/*DateTime compareFromDate = new DateTime(formatedDate_new);
+					DateTime compareToDate = new DateTime(toDate_new);*/
 					
 					//Date compareToDate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(toDate_new);
 						
 					log.debug(compareFromDate.toString()+" "+compareToDate.toString());
-					log.debug(formatedDate_new.toString());
+			//		log.debug(formatedDate_new.toString());
 					log.debug(" "+compareDate.equals(compareFromDate));
-					log.debug(" "+compareDate.isAfter(compareFromDate));
+					log.debug(" "+compareDate.after(compareFromDate));
 					
-					log.debug(" "+compareDate.isBefore(compareToDate));
+					log.debug(" "+compareDate.before(compareToDate));
 					log.debug(" "+compareDate.equals(compareToDate));
 					
 					if( ( compareDate.equals(compareFromDate) ||
-							compareDate.isAfter(compareFromDate)  )  && 
-								( compareDate.isBefore(compareToDate) || 
+							compareDate.after(compareFromDate)  )  && 
+								( compareDate.before(compareToDate) || 
 										compareDate.equals(compareToDate)) ){
 					/*	hmap.put("file", grepVal[0]);
 						hmap.put("path", grepVal[1]);

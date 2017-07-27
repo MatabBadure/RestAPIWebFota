@@ -11,14 +11,14 @@ public class TimsListLog {
 	private String file;
     private String path;
     private String status;
-    private DateTime lastMod;
+    private Date lastMod;
     
 	     
-   public DateTime getLastMod() {
+   public Date getLastMod() {
 		return lastMod;
 	}
-	public void setLastMod(DateTime lastMod) {
-		this.lastMod = lastMod;
+	public void setLastMod(Date compareDate) {
+		this.lastMod = compareDate;
 	}
     public String getFile() {
 		return file;

@@ -85,6 +85,7 @@ public class TimsResource {
 	
 		try{
 			List<String> returnVal = timsService.listLogDirectory(LOG_DIRECTORY, MATCH_STRING);
+			
 			Calendar cal = Calendar.getInstance();
 			
 			List<TimsListLog> valueObj = new LinkedList<>();
@@ -92,84 +93,36 @@ public class TimsResource {
 			for (String grepValue : returnVal) {
 				HashMap<String, String> hmap = new HashMap<String, String>();
 				String[] grepVal = grepValue.split(",");
-				if (grepVal[2].equalsIgnoreCase(status)
-						|| status.equalsIgnoreCase(ALL) || status.equalsIgnoreCase("FILTER")) {
+				if (grepVal[2].equalsIgnoreCase(status)|| status.equalsIgnoreCase(ALL) || status.equalsIgnoreCase("FILTER")) {
 					String modDate = grepVal[3];
 					Date date = new Date(Long.valueOf(modDate));
-					log.debug(date.toString());
 					cal.setTime(date);
 					
-					log.debug("date information "+cal.get(cal.YEAR)+" "+cal.get(cal.MONTH)+" "+cal.get(cal.DATE)
-							+" " +cal.get(cal.HOUR_OF_DAY)+" "+cal.get(cal.MINUTE)+":"+cal.get(cal.SECOND)	+" "+cal.getTimeZone());
-					
-					
-				/*	String formatedDate = (cal.get(Calendar.MONTH)+1)+"/"+ +cal.get(Calendar.DATE)+"/"+cal.get(Calendar.YEAR);
-					Date compareDate = 	new SimpleDateFormat("MM/dd/yyyy").parse(formatedDate);
-					Date compareFromDate = new SimpleDateFormat("MM/dd/yyyyy").parse(fromDate);
-					Date compareToDate = new SimpleDateFormat("MM/dd/yyyy").parse(toDate);
-					
-				*/	
 					Date compareDate = new 	Date(cal.get(cal.YEAR),cal.get(cal.MONTH)+1,cal.get(cal.DATE),cal.get(cal.HOUR_OF_DAY),cal.get(cal.MINUTE),cal.get(cal.SECOND));
 					
-					
-					
-					
-				/*	String formatedDate_new = cal.get(cal.YEAR)+"/"+cal.get(cal.MONTH)+1+"/"+cal.get(cal.DATE)
-								+" "+cal.get(cal.HOUR_OF_DAY)+":"+cal.get(cal.MINUTE)+":"+cal.get(cal.SECOND);*/
-					
-					
-					//Date compareDate = new Date(formatedDate_new);
-					log.debug(compareDate+" ");
-					
-					/*Date compareDate = 	new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(formatedDate_new);
-					log.debug("compare date"+compareDate);*/
 					String[] fromDate_Elements = fromDate.split("/");
 					
 					Date compareFromDate = new 	Date(Integer.parseInt(fromDate_Elements[2]),Integer.parseInt(fromDate_Elements[0]),Integer.parseInt(fromDate_Elements[1]),00,00,00);
 					
-					
-					log.debug(Arrays.toString(fromDate_Elements) +" "+fromDate_Elements.length);
-				String	fromDate_new = fromDate_Elements[2]+"/"+fromDate_Elements[0]+"/"+fromDate_Elements[1]+" "+"00:00:00";
-					
 					String[] toDate_Elements = toDate.split("/");
-					
-					
+									
 					Date compareToDate = new 	Date(Integer.parseInt(toDate_Elements[2]),Integer.parseInt(toDate_Elements[0]),Integer.parseInt(toDate_Elements[1]),23,59,59);					
 					
 					String	toDate_new	= toDate_Elements[2]+"/"+toDate_Elements[0]+"/"+toDate_Elements[1]+" "+"23:59:59";
-				
-					//DateTime compareFromDate = new D("yyyy/MM/dd HH:mm:ss").parse(fromDate_new);
-					/*DateTime compareFromDate = new DateTime(formatedDate_new);
-					DateTime compareToDate = new DateTime(toDate_new);*/
-					
-					//Date compareToDate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(toDate_new);
-						
-					log.debug(compareFromDate.toString()+" "+compareToDate.toString());
-			//		log.debug(formatedDate_new.toString());
-					log.debug(" "+compareDate.equals(compareFromDate));
-					log.debug(" "+compareDate.after(compareFromDate));
-					
-					log.debug(" "+compareDate.before(compareToDate));
-					log.debug(" "+compareDate.equals(compareToDate));
+								
 					
 					if( ( compareDate.equals(compareFromDate) ||
 							compareDate.after(compareFromDate)  )  && 
 								( compareDate.before(compareToDate) || 
 										compareDate.equals(compareToDate)) ){
-					/*	hmap.put("file", grepVal[0]);
-						hmap.put("path", grepVal[1]);
-						hmap.put("status", grepVal[2]);
-						hmap.put("lastMod", grepVal[3]);*/
+					   TimsListLog timsListLog = new TimsListLog();
+					
+					   timsListLog.setFile(grepVal[0]);
+					   timsListLog.setPath(grepVal[1]);
+					   timsListLog.setStatus(grepVal[2]);
+					   timsListLog.setLastMod(compareDate);
 						
-						log.debug("inside loop");
-						TimsListLog timsListLog = new TimsListLog();
-						
-						timsListLog.setFile(grepVal[0]);
-						timsListLog.setPath(grepVal[1]);
-						timsListLog.setStatus(grepVal[2]);
-						timsListLog.setLastMod(compareDate);
-						
-						valueObj.add(timsListLog);
+					   valueObj.add(timsListLog);
 						
 						}
 				}
@@ -196,8 +149,7 @@ public class TimsResource {
 			return new ResponseEntity<>(page, headers, HttpStatus.OK);
           
 		}catch(Exception ex){
-			log.debug(Arrays.toString(ex.getStackTrace()));
-			
+					
 			jsonObject.put("timsListMsg", "TIMSListing LogFile NOT Executed Successfully");
 			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);
 		}			

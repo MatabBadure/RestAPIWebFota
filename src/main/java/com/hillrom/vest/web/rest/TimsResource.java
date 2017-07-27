@@ -1,35 +1,24 @@
 package com.hillrom.vest.web.rest;
 
 
+import static com.hillrom.vest.config.Constants.ALL;
 import static com.hillrom.vest.config.Constants.LOG_DIRECTORY;
 import static com.hillrom.vest.config.Constants.MATCH_STRING;
-import static com.hillrom.vest.config.Constants.ALL;
 
-import java.awt.print.Pageable;
-import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-
 import net.minidev.json.JSONObject;
-
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
@@ -41,8 +30,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.hillrom.vest.domain.Announcements;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.TimsUserRepository;
 import com.hillrom.vest.service.TimsInputReaderService;
@@ -54,8 +41,6 @@ import com.hillrom.vest.web.rest.util.PaginationUtil;
 @RequestMapping("/api")
 public class TimsResource {
 
-	private final Logger log = LoggerFactory.getLogger("com.hillrom.vest.tims");
-	
 	@Inject
 	private TimsService timsService;
 	

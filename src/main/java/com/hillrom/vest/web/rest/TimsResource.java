@@ -136,7 +136,7 @@ public class TimsResource {
 					
 					Date compareToDate = new 	Date(Integer.parseInt(toDate_Elements[2]),Integer.parseInt(toDate_Elements[0]),Integer.parseInt(toDate_Elements[1]),00,00,00);					
 					
-					String	toDate_new	= toDate_Elements[2]+"/"+toDate_Elements[0]+"/"+toDate_Elements[1]+" "+"00:00:00";
+					String	toDate_new	= toDate_Elements[2]+"/"+toDate_Elements[0]+"/"+toDate_Elements[1]+" "+"23:59:59";
 				
 					//DateTime compareFromDate = new D("yyyy/MM/dd HH:mm:ss").parse(fromDate_new);
 					/*DateTime compareFromDate = new DateTime(formatedDate_new);

@@ -92,7 +92,7 @@ BEGIN
 		VALUES(return_user_id,'PATIENT');
 
 		SET return_patient_id = @gen_patient_id;
-		IF pat_hub_id IS NULL THEN
+		IF pat_hub_id IS NULL OR TRIM(pat_hub_id)='' THEN
 		
 	        INSERT INTO `PATIENT_COMPLIANCE_MONARCH` (`patient_id`, `user_id`, `date`, `compliance_score`, `hmr_run_rate`, `hmr`,
 			`is_hmr_compliant`, `is_settings_deviated`, `missed_therapy_count`,

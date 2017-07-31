@@ -139,4 +139,5 @@
 	<include file="classpath:/config/liquibase/changelog/20171805160430_added_column_PATIENT_VEST_DEVICE_HISTORY.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20171805160930_added_column_PATIENT_VEST_DEVICE_HISTORY_MONARCH.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170615115400_hillrom_type_code_monarch_error_and_event_codes.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170731041700_create_optimus_data_table.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

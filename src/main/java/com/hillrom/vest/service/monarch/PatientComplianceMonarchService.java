@@ -26,7 +26,9 @@ import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATI
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_DISPLAY_VALUE;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_MONARCH_DISPLAY_VALUE;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_VEST_DISPLAY_VALUE;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_VEST;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_MONARCH;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_VEST;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_MONARCH;
 
 import java.util.Collection;
@@ -150,7 +152,7 @@ public class PatientComplianceMonarchService {
 		LocalDate fromDate = from.minusDays(1);
 		if(Objects.isNull(therapySession)){
 			toDate = to.minusDays(1);
-		} else if(!to.equals(therapySession.getDate())){
+		} else if(!to.equals(therapySession.getDate()) && !from.equals(to) ){
 			toDate = to.minusDays(1);
 		}
 		List<PatientComplianceMonarch> complianceList = complianceMonarchRepository.findByDateBetweenAndPatientUserIdIn(fromDate, toDate, patientUserIds);
@@ -249,9 +251,14 @@ public class PatientComplianceMonarchService {
 				trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_DISPLAY_VALUE, -HMR_NON_COMPLIANCE_POINTS);
 			else
 				trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_DISPLAY_VALUE, pointsChanged);
+		}else if(HMR_NON_COMPLIANCE_VEST.equalsIgnoreCase(notificationType)){
+			trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_VEST_DISPLAY_VALUE,
+					(pointsChanged > 0 ? (-HMR_NON_COMPLIANCE_POINTS) : pointsChanged));
 		}else if(HMR_NON_COMPLIANCE_MONARCH.equalsIgnoreCase(notificationType)){
 			trendVO.getNotificationPoints().put(HMR_NON_COMPLIANCE_MONARCH_DISPLAY_VALUE,
 					(pointsChanged > 0 ? (-HMR_NON_COMPLIANCE_POINTS) : pointsChanged));
+		}else if(SETTINGS_DEVIATION_VEST.equalsIgnoreCase(notificationType)){
+			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_VEST_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
 		}else if(SETTINGS_DEVIATION_MONARCH.equalsIgnoreCase(notificationType)){
 			trendVO.getNotificationPoints().put(SETTINGS_DEVIATION_MONARCH_DISPLAY_VALUE, -SETTING_DEVIATION_POINTS);
 		}else if(HMR_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)){

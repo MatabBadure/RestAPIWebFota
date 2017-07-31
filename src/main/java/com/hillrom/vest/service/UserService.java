@@ -581,8 +581,8 @@ public class UserService {
 	private void assignGarmentValuesToPatientDeviceAssocObj(
 			UserExtensionDTO userExtensionDTO,
 			PatientDevicesAssoc patientDevicesAssoc) {
-		if(Objects.nonNull(userExtensionDTO.getVestGarmentColor()) &&
-				Objects.nonNull(userExtensionDTO.getVestGarmentSize()) &&
+		if(Objects.nonNull(userExtensionDTO.getVestGarmentColor()) ||
+				Objects.nonNull(userExtensionDTO.getVestGarmentSize()) ||
 				Objects.nonNull(userExtensionDTO.getVestGarmentType())){
 			if (Objects.nonNull(userExtensionDTO.getVestGarmentColor()))
 				patientDevicesAssoc.setGarmentColor(userExtensionDTO.getVestGarmentColor());
@@ -591,8 +591,8 @@ public class UserService {
 			if (Objects.nonNull(userExtensionDTO.getVestGarmentType()))
 				patientDevicesAssoc.setGarmentType(userExtensionDTO.getVestGarmentType());
 		}
-		if(Objects.nonNull(userExtensionDTO.getMonarchGarmentColor()) &&
-				Objects.nonNull(userExtensionDTO.getMonarchGarmentSize()) &&
+		if(Objects.nonNull(userExtensionDTO.getMonarchGarmentColor()) ||
+				Objects.nonNull(userExtensionDTO.getMonarchGarmentSize()) ||
 				Objects.nonNull(userExtensionDTO.getMonarchGarmentType())){
 			if (Objects.nonNull(userExtensionDTO.getMonarchGarmentColor()))
 				patientDevicesAssoc.setGarmentColor(userExtensionDTO.getMonarchGarmentColor());
@@ -1501,18 +1501,20 @@ public class UserService {
 
 		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
 
-		List<PatientDevicesAssoc> patientDevicesAssocList = patientDevicesAssocRepository
-				.findByPatientId(patientInfo.getId());
-		// Garment Changes :Looping through the patient devices
-		for (PatientDevicesAssoc device : patientDevicesAssocList) {
-			if (device.getDeviceType().equals(VEST)) {
-				user.setVestGarmentColor(device.getGarmentColor());
-				user.setVestGarmentSize(device.getGarmentSize());
-				user.setVestGarmentType(device.getGarmentType());
-			} else if (device.getDeviceType().equals(MONARCH)) {
-				user.setMonarchGarmentColor(device.getGarmentColor());
-				user.setMonarchGarmentSize(device.getGarmentSize());
-				user.setMonarchGarmentType(device.getGarmentType());
+		if(Objects.nonNull(patientInfo)){
+			List<PatientDevicesAssoc> patientDevicesAssocList = patientDevicesAssocRepository
+					.findByPatientId(patientInfo.getId());
+			// Garment Changes :Looping through the patient devices
+			for (PatientDevicesAssoc device : patientDevicesAssocList) {
+				if (device.getDeviceType().equals(VEST)) {
+					user.setVestGarmentColor(device.getGarmentColor());
+					user.setVestGarmentSize(device.getGarmentSize());
+					user.setVestGarmentType(device.getGarmentType());
+				} else if (device.getDeviceType().equals(MONARCH)) {
+					user.setMonarchGarmentColor(device.getGarmentColor());
+					user.setMonarchGarmentSize(device.getGarmentSize());
+					user.setMonarchGarmentType(device.getGarmentType());
+				}
 			}
 		}
 

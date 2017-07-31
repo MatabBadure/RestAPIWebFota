@@ -4,6 +4,9 @@ public final class FOTAConstants {
 
 	public static final String HEXAFILEPATH = "/opt/FOTA/files";
 	//public static final String HEXAFILEPATH = "D:/Matab/FOTA/Hexa";
+	
+	public static final int CHUNK_SIZE_VALUE = 200;
+	
 
 	// Raw data constants
 	public static final String REQUEST_TYPE = "requestType";
@@ -17,7 +20,6 @@ public final class FOTAConstants {
 	public static final String DEVICE_SN = "devSN";
 	public static final String PREV_REQ_STATUS = "prevReqStatus";
 	public static final String HANDLE = "handle";
-
 	public static final String SOFT_VER_DATE = "softVerDate";
 	public static final String RESULT = "result";
 	public static final String RESULT_EQ = "result=";
@@ -32,7 +34,7 @@ public final class FOTAConstants {
 	public static final String REQUEST_TYPE1 = "01";
 	public static final String REQUEST_TYPE2 = "02";
 	public static final String REQUEST_TYPE3 = "03";
-	public static final String DEVICE_PARTNUMBER_01 = "0123456789012345";
+	public static final String DEVICE_PARTNUMBER_01 = "0000000000193164";
 	public static final String DEVICE_PARTNUMBER_02 = "0234567890123451";
 	public static final String DEVICE_PARTNUMBER_03 = "0345678901234512";
 	public static final String DEVICE_PARTNUMBER_04 = "0456789012345123";

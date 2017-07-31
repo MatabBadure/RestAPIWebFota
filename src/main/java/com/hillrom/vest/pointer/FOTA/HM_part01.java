@@ -1,5 +1,7 @@
 package com.hillrom.vest.pointer.FOTA;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HEXAFILEPATH;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.CHUNK_SIZE_VALUE;
+
 import java.io.FileInputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -13,6 +15,8 @@ public class HM_part01 {
 
 	private final static Logger log = LoggerFactory.getLogger(HM_part01.class);
 	
+	public static final byte[] CHUNK_SIZE = new byte[]{38,99,104,117,110,107,83,105,122,101,61};
+	
 	private static Map<Integer, String> fileChunks = new LinkedHashMap<Integer, String>();
 	
 	//private static Map<String, Integer> sendChunkCounter = new LinkedHashMap<String, Integer>();
@@ -23,17 +27,17 @@ public class HM_part01 {
 	private HM_part01() {
 	} // avoid instantiation.
 
-	public static HM_part01 getInstance() {
+	public static HM_part01 getInstance(String rawMessage) {
 		if (instance == null) {
 			instance = new HM_part01();
-			totalChunk = readHexByteDataFromFile();
+			totalChunk = readHexByteDataFromFile(rawMessage);
 			instance.setTotalChunk(totalChunk);
 			instance.setFileChunks(fileChunks);
 		}
 		return instance;
 	}
 
-	private static int readHexByteDataFromFile() {
+	private static int readHexByteDataFromFile(String rawMessage) {
 		int ctr = 0;
 		int totalChunk = 0;
 		String hexDataStr = "";
@@ -60,7 +64,14 @@ public class HM_part01 {
 			ex.printStackTrace();
 			log.error("Error in Ecoded bas64 data :" + ex.getMessage());
 		}
-		output = hexDataStr.split("(?<=\\G.{512})");
+		
+		//Get Chunk Size from request
+		String chunkStr = getChunk(rawMessage);
+		
+		//Decimal conversion
+		int chunkSize = hex2decimal(chunkStr);
+		
+		output = hexDataStr.split("(?<=\\G.{"+(chunkSize*2)+"})");
 		for (String str : output) {
 			fileChunks.put(ctr++, str);
 			log.debug("fileChunks :" + str);
@@ -70,6 +81,74 @@ public class HM_part01 {
 		return totalChunk;
 	}
 
+	private static String getChunk(String rawMessage) {
+		byte[] getChunkByte = java.util.Base64.getDecoder().decode(rawMessage);
+		int chunkByteIndex = returnMatch(getChunkByte, CHUNK_SIZE);
+		log.error("chunkByteIndex: " + chunkByteIndex);
+		//StringBuilder handleRes = new StringBuilder();
+		// handleRes.
+		//handleRes.append(Integer.toHexString(getChunkByte[chunkSize] & 0xFF));
+		int chunkSizeValue = getChunkByte[chunkByteIndex] & 0xFF;
+		int chunkSizeValue1 = getChunkByte[chunkByteIndex+1] & 0xFF;
+		
+		String chunkSize1 = Integer.toHexString(chunkSizeValue);
+		String chunkSize2 = Integer.toHexString(chunkSizeValue1);
+				
+		chunkSize1 =	("00"+ chunkSize1).substring(chunkSize1.length());
+		chunkSize2 =	("00"+ chunkSize2).substring(chunkSize2.length());
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(chunkSize1);
+		sb.append(chunkSize2);
+		
+		String littleEndianChunk = toLittleEndian(sb.toString());
+		return littleEndianChunk;
+	}
+
+		//To read non readable character
+		private static int returnMatch(byte[] inputArray,byte[] matchArray){
+
+	        for(int i=0;i<inputArray.length;i++){
+	        	int val = inputArray[i] & 0xFF;
+	        	boolean found = false;
+	        	
+	        	if((val == 38) && !found){
+	        		int j=i;int k=0;
+	        		while((inputArray[j++]==matchArray[k++]) && (k<matchArray.length)){
+	        			
+	        		}
+	        		if(k==matchArray.length){
+	        			found = true;
+	        			return j;
+	        		}
+	        	}
+	        }
+	        
+	        return -1;
+	    	
+	    }
+		private static String toLittleEndian(final String hex) {
+		    //int ret = 0;
+		    String hexLittleEndian = "";
+		    if (hex.length() % 2 != 0) return hexLittleEndian;
+		    for (int i = hex.length() - 2; i >= 0; i -= 2) {
+		        hexLittleEndian += hex.substring(i, i + 2);
+		    }
+		   // ret = Integer.parseInt(hexLittleEndian, 16);
+		    return hexLittleEndian;
+		}
+		
+		public static int hex2decimal(String s) {
+	         String digits = "0123456789ABCDEF";
+	         s = s.toUpperCase();
+	         int val = 0;
+	         for (int i = 0; i < s.length(); i++) {
+	             char c = s.charAt(i);
+	             int d = digits.indexOf(c);
+	             val = 16*val + d;
+	         }
+	         return val;
+	     }
 	private static String getDataInHexString(byte[] byteArray) {
 		String data = "";
 		String trimData = "";

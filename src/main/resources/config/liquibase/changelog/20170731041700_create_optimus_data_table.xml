@@ -17,6 +17,8 @@
 			</column>
   			<column name="created_time" type="timestamp" defaultValueDate="${now}"/>
 			<column name="device_data" type="longtext"/>
+			<column name="current_fragment" type="integer"/>
+        	<column name="total_fragments" type="integer"/>
 		</createTable>
 	</changeSet>
 </databaseChangeLog>

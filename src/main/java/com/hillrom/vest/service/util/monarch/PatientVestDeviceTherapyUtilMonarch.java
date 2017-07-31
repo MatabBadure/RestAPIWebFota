@@ -307,9 +307,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 		int totalDuration = 0;
 		for(int i = 0;i <deviceEventRecords.size();i++ ){
 			PatientVestDeviceDataMonarch eventRecord = deviceEventRecords.get(i);
-			if(!isInCompleteEventMonarch(eventRecord)){
-				totalDuration += eventRecord.getDuration();
-			}
+			totalDuration += eventRecord.getDuration();
 		}
 		return totalDuration;
 	}

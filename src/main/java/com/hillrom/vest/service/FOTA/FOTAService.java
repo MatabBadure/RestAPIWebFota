@@ -141,13 +141,22 @@ public class FOTAService {
 
 				// Response pair3 crc
 				responsePair3 = getResponePair3();
+				
+				//CRC calculation 
+				String crsRaw = responsePairResult.concat(resultValue).concat(responsePair1).concat(handleIdRaw).concat(responsePair2).concat(totalChunkRaw).concat(responsePair3);
 
+				byte[] encodedCRC = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(crsRaw));
+				String encodedString = new String(encodedCRC);
+				log.error("encodedString: " + encodedString);
+				
+				String crcstr = hexToAscii(asciiToHex(calculateCRCSendValue(encodedString)));;
+				
 				// CRC in raw format
-				String crcRaw = getCRC(rawMessage);
+				//String crcRaw = getCRC(rawMessage);
 
 				// Final response String
 				finalResponseStr = getAllResponseCheckUpdate(responsePairResult,resultValue,responsePair1, handleIdRaw,
-						responsePair2, totalChunkRaw, responsePair3, crcRaw);
+						responsePair2, totalChunkRaw, responsePair3, crcstr);
 				log.error("finalResponseStr: " + finalResponseStr);
 				
 			}
@@ -355,6 +364,60 @@ public class FOTAService {
 		
 	}
 		
+	private String calculateCRCSendValue(String encodedString) {
+		 
+		log.error("Inside  calculateCRC : " ,encodedString);
+		  
+	    int nCheckSum = 0;
+
+	    byte[] decoded = java.util.Base64.getDecoder().decode(encodedString);
+	    
+	    int nDecodeCount = 0;
+	    for ( ; nDecodeCount < (decoded.length-2); nDecodeCount++ )
+	    {
+	      int nValue = (decoded[nDecodeCount] & 0xFF);
+	      nCheckSum += nValue;
+	    }
+	    
+	    
+	    System.out.format("Inverted Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
+	    
+	    while ( nCheckSum >  65535 )
+	    {
+	      nCheckSum -= 65535;
+	    }
+	    
+	    int nMSB = decoded[nDecodeCount+1] & 0xFF;
+	    int nLSB = decoded[nDecodeCount] & 0xFF;
+	    
+	    System.out.format("MSB = %d [0x%x]\r\n" ,nMSB, nMSB);
+	    System.out.format("LSB = %d [0x%x]\r\n" ,nLSB, nLSB);
+	    log.error("Total Value = " + nCheckSum);
+	    nCheckSum = ((~nCheckSum)& 0xFFFF) + 1;
+	    System.out.format("Checksum Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
+	    
+	    String msb_digit = Integer.toHexString(nMSB);
+	    String lsb_digit = Integer.toHexString(nLSB);
+	    String checksum_num =  Integer.toHexString(nCheckSum);
+	    
+	    if(msb_digit.length()<2)
+	    	msb_digit = "0"+msb_digit;
+	    if(lsb_digit.length()<2)
+	    	lsb_digit = "0"+lsb_digit;
+	    
+	    System.out.println("MSB : " + msb_digit + " " +  "LSB : " + lsb_digit);
+	    System.out.println("Checksum : " + checksum_num);
+	    
+	    return checksum_num;
+	    
+	   /* if((msb_digit+lsb_digit).equalsIgnoreCase(checksum_num)){
+	    	return checksum_num;
+	    }else{
+	    	log.error("CRC VALIDATION FAILED :"); 
+	    	return null;
+	    }*/
+	}
+
 	private String getResponePairResult() {
 		
 		String getResponePairResult = asciiToHex(RESULT_EQ);

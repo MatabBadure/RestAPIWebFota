@@ -1,5 +1,6 @@
 package com.hillrom.vest.pointer.FOTA;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HEXAFILEPATH;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE1;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CHUNK_SIZE_VALUE;
 
 import java.io.FileInputStream;
@@ -16,9 +17,11 @@ public class HM_part01 {
 	private final static Logger log = LoggerFactory.getLogger(HM_part01.class);
 	
 	public static final byte[] CHUNK_SIZE = new byte[]{38,99,104,117,110,107,83,105,122,101,61};
+	private static Map<Integer, String> fileChunks = null;
 	
-	private static Map<Integer, String> fileChunks = new LinkedHashMap<Integer, String>();
-	
+	/*private static Map< String, Map<Integer, String>> fileChunks = new LinkedHashMap<String, Map<Integer,String>>();
+	private static Map<Integer, String> fileChunkBasedOnSize = new LinkedHashMap<Integer, String>();
+	*/
 	//private static Map<String, Integer> sendChunkCounter = new LinkedHashMap<String, Integer>();
 	
 	private static int totalChunk = 0;
@@ -27,8 +30,13 @@ public class HM_part01 {
 	private HM_part01() {
 	} // avoid instantiation.
 
-	public static HM_part01 getInstance(String rawMessage) {
+	public static HM_part01 getInstance(String rawMessage, String requestType) {
 		if (instance == null) {
+			instance = new HM_part01();
+			totalChunk = readHexByteDataFromFile(rawMessage);
+			instance.setTotalChunk(totalChunk);
+			instance.setFileChunks(fileChunks);
+		}else if(instance != null && requestType.equals(REQUEST_TYPE1) ){
 			instance = new HM_part01();
 			totalChunk = readHexByteDataFromFile(rawMessage);
 			instance.setTotalChunk(totalChunk);
@@ -72,11 +80,17 @@ public class HM_part01 {
 		int chunkSize = hex2decimal(chunkStr);
 		
 		output = hexDataStr.split("(?<=\\G.{"+(chunkSize*2)+"})");
+		fileChunks = new LinkedHashMap<Integer, String>();
 		for (String str : output) {
 			fileChunks.put(ctr++, str);
 			log.debug("fileChunks :" + str);
+			//fileChunkBasedOnSize.put(ctr++, str);
+			
 		}
-		totalChunk = fileChunks.size()-1;
+		
+		//fileChunks.put(String.valueOf(chunkSize), fileChunkBasedOnSize);
+		totalChunk = fileChunks.size();
+		//totalChunk = fileChunkBasedOnSize.size()-1;
 		log.debug("totalChunk :" + totalChunk);
 		return totalChunk;
 	}

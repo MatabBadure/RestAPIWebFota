@@ -91,6 +91,8 @@ public class FOTAService {
 		fotaJsonData = FOTAParseUtil
 				.getFOTAJsonDataFromRawMessage(decoded_string);
 		
+		
+		
 		//Global handler
 		HM_HandleHolder globalHandleHolder = HM_HandleHolder.getInstance();
 
@@ -98,8 +100,9 @@ public class FOTAService {
 		if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE1)) {
 			
 			if(fotaJsonData.get(DEVICE_PARTNUMBER).equals(DEVICE_PARTNUMBER_01)){
+				
 				int totalChunks = 0;
-				HM_part01 hmp01 = HM_part01.getInstance(rawMessage);
+				HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE));
 				
 				String handleId = getHandleNumber();
 				
@@ -160,14 +163,14 @@ public class FOTAService {
 					if(partDetail.getKey().equals(DEVICE_PARTNUMBER_01) && partDetail.getValue().equals(String.valueOf(0))){
 						updatePartNumberWithCount.put(partDetail.getKey(), String.valueOf(0));
 						globalHandleHolder.getHandleWithPartNumber().put(handleId,updatePartNumberWithCount);
-						HM_part01 hmp01 = HM_part01.getInstance(rawMessage);
+						HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE));
 						String zeroChunk = hmp01.getFileChunks().get(0);
 						//Zero the Chunk in raw format
 						buffer = hexToAscii(asciiToHex(zeroChunk));
 						log.debug("buffer Encoded:" + buffer);
 						
 						//Chunk size in hex byte
-						bufferLen = (zeroChunk.length() / 2)-1;
+						bufferLen = (zeroChunk.length() / 2);
 						log.debug("bufferLen:" + bufferLen);
 						
 					} else if(partDetail.getKey() == DEVICE_PARTNUMBER_02 && partDetail.getValue() == String.valueOf(0)){
@@ -180,7 +183,7 @@ public class FOTAService {
 						log.debug("buffer Encoded:" + buffer);
 						
 						//Chunk size in hex byte
-						bufferLen = (zeroChunk.length() / 2)-1;
+						bufferLen = (zeroChunk.length() / 2);
 						log.debug("bufferLen:" + bufferLen);
 						
 					}else if(partDetail.getKey() == DEVICE_PARTNUMBER_03 && partDetail.getValue() == String.valueOf(0)){
@@ -192,7 +195,7 @@ public class FOTAService {
 						buffer = hexToAscii(asciiToHex(zeroChunk));
 						log.debug("buffer Encoded:" + buffer);
 						//Chunk size in hex byte
-						bufferLen = (zeroChunk.length() / 2)-1;
+						bufferLen = (zeroChunk.length() / 2);
 						log.debug("bufferLen:" + bufferLen);
 						
 					}
@@ -233,7 +236,7 @@ public class FOTAService {
 					for(Map.Entry<String,String> partDetail : partNumberWithCount.entrySet()){
 						if(partDetail.getKey().equals(DEVICE_PARTNUMBER_01)){
 							//Part Number
-							HM_part01 hmp01 = HM_part01.getInstance(rawMessage);
+							HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE));
 							String countStr = partDetail.getValue();
 							int countInt = Integer.parseInt(countStr);
 							countInt = countInt + 1;
@@ -248,16 +251,9 @@ public class FOTAService {
 							log.debug("buffer Encoded:" + buffer);
 							
 							//Chunk size in hex byte
-							bufferLen = (okSendChunk.length() / 2)-1;
+							bufferLen = (okSendChunk.length() / 2);
 							log.debug("bufferLen:" + bufferLen);
 							
-							//Buffer values
-							buffer = hexToAscii(asciiToHex(okSendChunk));
-							log.debug("buffer Encoded:" + buffer);
-							
-							//Chunk size in hex byte
-							bufferLen = (okSendChunk.length() / 2)-1;
-							log.debug("bufferLen:" + bufferLen);
 							
 						} 
 					}	
@@ -274,7 +270,7 @@ public class FOTAService {
 					for(Map.Entry<String,String> partDetail : partNumberWithCount.entrySet()){
 						if(partDetail.getKey().equals(DEVICE_PARTNUMBER_01)){
 							//Part Number
-							HM_part01 hmp01 = HM_part01.getInstance(rawMessage);
+							HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE));
 							String countStr = partDetail.getValue();
 							int countInt = Integer.parseInt(countStr);
 							//countInt = countInt + 1;
@@ -284,19 +280,12 @@ public class FOTAService {
 							String okSendChunk = hmp01.getFileChunks().get(countInt);
 							//String zeroChunk = hmp01.getFileChunks().get(0);
 							//Zero the Chunk in raw format
-							buffer = hexToAscii(asciiToHex(okSendChunk));
-							log.debug("buffer Encoded:" + buffer);
-							
-							//Chunk size in hex byte
-							bufferLen = (okSendChunk.length() / 2)-1;
-							log.debug("bufferLen:" + bufferLen);
-							
 							//Buffer values
 							buffer = hexToAscii(asciiToHex(okSendChunk));
 							log.debug("buffer Encoded:" + buffer);
 							
 							//Chunk size in hex byte
-							bufferLen = (okSendChunk.length() / 2)-1;
+							bufferLen = (okSendChunk.length() / 2);
 							log.debug("bufferLen:" + bufferLen);
 							
 						} 

@@ -77,6 +77,7 @@ public class FOTAService {
 		String decoded_string = "";
 
 		StringBuilder responseString = new StringBuilder();
+		String responsePairResult = "";
 		String responsePair1 = "";
 		String responsePair2 = "";
 		String responsePair3 = "";
@@ -91,8 +92,13 @@ public class FOTAService {
 		fotaJsonData = FOTAParseUtil
 				.getFOTAJsonDataFromRawMessage(decoded_string);
 		
-		
-		
+		/*if(!calculateCRC(rawMessage)){
+			String result = "NOT OK";
+			
+		}else if(!calculateCRC(rawMessage)){
+			String result = "OK";
+		}
+		*/
 		//Global handler
 		HM_HandleHolder globalHandleHolder = HM_HandleHolder.getInstance();
 
@@ -116,7 +122,14 @@ public class FOTAService {
 				
 				totalChunks = hmp01.getTotalChunk();
 				// Response pair1
+				responsePairResult = getResponePairResult();
+				String resultValue = "";
+				if(calculateCRC(rawMessage)){
+					resultValue = asciiToHex("Yes");
+				}
+				
 				responsePair1 = getResponePair1();
+				
 				// Handle in raw format
 				String handleIdRaw = hexToAscii(asciiToHex(toLittleEndian((handleId))));
 
@@ -133,7 +146,7 @@ public class FOTAService {
 				String crcRaw = getCRC(rawMessage);
 
 				// Final response String
-				finalResponseStr = getAllResponseCheckUpdate(responsePair1, handleIdRaw,
+				finalResponseStr = getAllResponseCheckUpdate(responsePairResult,resultValue,responsePair1, handleIdRaw,
 						responsePair2, totalChunkRaw, responsePair3, crcRaw);
 				log.error("finalResponseStr: " + finalResponseStr);
 				
@@ -342,6 +355,66 @@ public class FOTAService {
 		
 	}
 		
+	private String getResponePairResult() {
+		
+		String getResponePairResult = asciiToHex(RESULT_EQ);
+		log.error("getResponePairResult: " + getResponePairResult);
+		//response.append("Yes");
+		return getResponePairResult;
+	}
+
+	private boolean calculateCRC(String rawMessage) {
+		 
+		log.error("Inside  calculateCRC : " ,rawMessage);
+		  
+	    int nCheckSum = 0;
+
+	    byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
+	    
+	    int nDecodeCount = 0;
+	    for ( ; nDecodeCount < (decoded.length-2); nDecodeCount++ )
+	    {
+	      int nValue = (decoded[nDecodeCount] & 0xFF);
+	      nCheckSum += nValue;
+	    }
+	    
+	    
+	    System.out.format("Inverted Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
+	    
+	    while ( nCheckSum >  65535 )
+	    {
+	      nCheckSum -= 65535;
+	    }
+	    
+	    int nMSB = decoded[nDecodeCount+1] & 0xFF;
+	    int nLSB = decoded[nDecodeCount] & 0xFF;
+	    
+	    System.out.format("MSB = %d [0x%x]\r\n" ,nMSB, nMSB);
+	    System.out.format("LSB = %d [0x%x]\r\n" ,nLSB, nLSB);
+	    log.error("Total Value = " + nCheckSum);
+	    nCheckSum = ((~nCheckSum)& 0xFFFF) + 1;
+	    System.out.format("Checksum Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
+	    
+	    String msb_digit = Integer.toHexString(nMSB);
+	    String lsb_digit = Integer.toHexString(nLSB);
+	    String checksum_num =  Integer.toHexString(nCheckSum);
+	    
+	    if(msb_digit.length()<2)
+	    	msb_digit = "0"+msb_digit;
+	    if(lsb_digit.length()<2)
+	    	lsb_digit = "0"+lsb_digit;
+	    
+	    System.out.println("MSB : " + msb_digit + " " +  "LSB : " + lsb_digit);
+	    System.out.println("Checksum : " + checksum_num);
+	    
+	    if((msb_digit+lsb_digit).equalsIgnoreCase(checksum_num)){
+	    	return true;
+	    }else{
+	    	log.error("CRC VALIDATION FAILED :"); 
+	    	return false;
+	    }
+	}
+
 	private String getBufferLenTwoHexByte(int bufferLen) {
 		//Convert to hex
 		String bufferLenHex =	Integer.toHexString(bufferLen);
@@ -427,10 +500,10 @@ public class FOTAService {
 	}
 
 
-	private String getAllResponseCheckUpdate(String responsePair1, String handleIdRaw,
+	private String getAllResponseCheckUpdate(String responsePair1Result,String responsePair1ResultValue, String responsePair1, String handleIdRaw,
 			String responsePair2, String totalChunkRaw, String responsePair3,
 			String crcRaw) {
-		String finalString = responsePair1.concat(handleIdRaw).concat(responsePair2)
+		String finalString = responsePair1Result.concat(responsePair1ResultValue).concat(responsePair1).concat(handleIdRaw).concat(responsePair2)
 				.concat(totalChunkRaw).concat(responsePair3).concat(crcRaw);
 		return finalString;
 	}
@@ -495,8 +568,8 @@ public class FOTAService {
 
 	private String getResponePair1() {
 		StringBuilder response = new StringBuilder();
-		response.append(RESULT_EQ);
-		response.append("Yes");
+		/*response.append(RESULT_EQ);
+		response.append("Yes");*/
 		response.append(AMPERSAND);
 		response.append(HANDLE_EQ);
 		String responePair1 = asciiToHex(response.toString());

@@ -555,6 +555,8 @@ public class TimsService {
 				return false;
 			}				
 			
+			log.debug(patientInfoDTO.getTims_cust()+ ": Created , with Device Serial Number is "+patientInfoDTO.getSerial_num());
+			
 			log.debug("CASE1_NeitherPatientNorDeviceExist_VEST Executed Successfully");
 			return true;
 		}
@@ -629,6 +631,9 @@ public class TimsService {
 				ex.printStackTrace();
 				return false;
 			}	
+			
+			log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
+			log.debug(patientInfoDTO.getTims_cust()+" for this Monarch patient new Vest Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
 			log.debug("CASE3_PatientHasMonarchAddVisivest_VEST Executed Successfully");
 			return true;
 			
@@ -667,7 +672,9 @@ public class TimsService {
 			}catch(Exception ex){
 				ex.printStackTrace();
 				return false;
-			}		
+			}	
+			log.debug(patientInfoDTO.getTims_cust()+":Swapped old Vest device is  "+patientInfoDTO.getOld_serial_number() +"   with new Vest Device is "+patientInfoDTO.getNew_serial_number());
+							
 			log.debug("CASE4_PatientHasDifferentVisivestSwap_VEST Executed Successfully");
 			return true;
 			
@@ -705,6 +712,8 @@ public class TimsService {
 				ex.printStackTrace();
 				return false;
 			}
+			
+			log.debug(patientInfoDTO.getSerial_num()+"Shell VEST Device allocated to patient"+patientInfoDTO.getTims_cust());
 			log.debug("CASE5_DeviceOwnedByShell_VEST Executed Successfully");
 			return true;
 		}
@@ -924,7 +933,12 @@ public class TimsService {
 					ex.printStackTrace();
 					return false;
 				}
+				
+				log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
+				log.debug(patientInfoDTO.getTims_cust()+" for this Monarch patient new Vest Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
+								
 				log.debug("CASE10_PatientHasMonarchAddVisivest_VEST Executed Successfully");
+								
 				return true;
 			}
 			
@@ -992,6 +1006,12 @@ public class TimsService {
 				ex.printStackTrace();
 				return false;
 			}	
+			
+			log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
+			log.debug(patientInfoDTO.getTims_cust()+" for this Monarch patient Existing Vest Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
+				
+			
+			
 			log.debug("CASE12_PatientHasMonarchMergeExistingVisivest_VEST Executed Successfully");
 			return true;
 			
@@ -1032,7 +1052,10 @@ public class TimsService {
 			}catch(Exception ex){
 				ex.printStackTrace();
 				return false;
-			}				
+			}	
+			
+			log.debug(patientInfoDTO.getTims_cust()+"  :New Patient Created , with Device Serial Number is "+patientInfoDTO.getSerial_num());
+			
 			log.debug("CASE1_NeitherPatientNorDeviceExist_MONARCH Executed Successfully");
 			return true;
 		}
@@ -1109,6 +1132,9 @@ public class TimsService {
 				ex.printStackTrace();
 				return false;
 			}	
+			
+			log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
+			log.debug(patientInfoDTO.getTims_cust()+" for this Vest patient new Monarch Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
 			log.debug("CASE3_PatientHasVisivestAddMonarch_MONARCH Executed Successfully");
 			return true;
 			
@@ -1150,6 +1176,8 @@ public class TimsService {
 				ex.printStackTrace();
 				return false;
 			}		
+			
+			log.debug(patientInfoDTO.getTims_cust()+":Swapped old Monarch device"+patientInfoDTO.getOld_serial_number() +"with new Monarch Device "+patientInfoDTO.getNew_serial_number());
 			log.debug("CASE4_PatientHasDifferentMonarchSwap_MONARCH Executed Successfully");
 			return true;
 			
@@ -1190,6 +1218,7 @@ public class TimsService {
 				ex.printStackTrace();
 				return false;
 			}
+			log.debug(patientInfoDTO.getSerial_num()+"  Shell MONARCH Device allocated to patient  "+patientInfoDTO.getTims_cust());
 			
 			log.debug("CASE5_DeviceOwnedByShell_MONARCH Executed Successfully");
 			return true;
@@ -1417,6 +1446,10 @@ public class TimsService {
 					ex.printStackTrace();
 					return false;
 				}
+				
+				log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
+				log.debug(patientInfoDTO.getTims_cust()+" for this Vest patient new Monarch Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
+								
 				log.debug("CASE10_PatientHasVisivestAddMonarch_MONARCH Executed Successfully");
 				return true;
 			}
@@ -1485,6 +1518,10 @@ public class TimsService {
 				ex.printStackTrace();
 				return false;
 			}	
+			
+			log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
+			log.debug(patientInfoDTO.getTims_cust()+" for this Vest patient Existing Monarch Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
+				
 			log.debug("CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH Executed Successfully");
 			return true;
 			

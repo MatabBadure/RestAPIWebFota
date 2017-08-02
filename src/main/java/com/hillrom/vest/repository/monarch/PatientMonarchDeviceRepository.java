@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
 import com.hillrom.vest.domain.PatientVestDevicePK;
 
@@ -41,5 +42,8 @@ public interface PatientMonarchDeviceRepository extends
 	@Query("from PatientVestDeviceHistoryMonarch pvd where pvd.patientVestDevicePK.patient.id = ?1 and pvd.pending = ?2")
 	Optional<PatientVestDeviceHistoryMonarch> findOneByPatientIdAndPendingStatus(
 			String patientId, Boolean pending);
+	
+	@Query("from PatientVestDeviceHistoryMonarch pvd where pvd.patientVestDevicePK.serialNumber = ?1  and pvd.active = true")
+	List<PatientVestDeviceHistoryMonarch> findOneBySerialNumberAndStatusActive(String serialNumber);
 	
 }

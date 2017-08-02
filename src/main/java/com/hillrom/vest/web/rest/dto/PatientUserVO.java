@@ -63,6 +63,13 @@ public class PatientUserVO {
 	private String serialNumber;
 	private String deviceType;
 	
+	private String vestGarmentColor;
+	private String vestGarmentSize;
+	private String vestGarmentType;
+	private String monarchGarmentColor;
+	private String monarchGarmentSize;
+	private String monarchGarmentType;
+	
 	public PatientUserVO(Long id, String email, String firstName,
 			String lastName, Boolean isDeleted, Integer zipcode, String address,
 			String city, LocalDate dob, String gender, String title,
@@ -187,6 +194,43 @@ public class PatientUserVO {
 		}
 	}
 
+	
+	public String getVestGarmentColor() {
+		return vestGarmentColor;
+	}
+	public void setVestGarmentColor(String vestGarmentColor) {
+		this.vestGarmentColor = vestGarmentColor;
+	}
+	public String getVestGarmentSize() {
+		return vestGarmentSize;
+	}
+	public void setVestGarmentSize(String vestGarmentSize) {
+		this.vestGarmentSize = vestGarmentSize;
+	}
+	public String getVestGarmentType() {
+		return vestGarmentType;
+	}
+	public void setVestGarmentType(String vestGarmentType) {
+		this.vestGarmentType = vestGarmentType;
+	}
+	public String getMonarchGarmentColor() {
+		return monarchGarmentColor;
+	}
+	public void setMonarchGarmentColor(String monarchGarmentColor) {
+		this.monarchGarmentColor = monarchGarmentColor;
+	}
+	public String getMonarchGarmentSize() {
+		return monarchGarmentSize;
+	}
+	public void setMonarchGarmentSize(String monarchGarmentSize) {
+		this.monarchGarmentSize = monarchGarmentSize;
+	}
+	public String getMonarchGarmentType() {
+		return monarchGarmentType;
+	}
+	public void setMonarchGarmentType(String monarchGarmentType) {
+		this.monarchGarmentType = monarchGarmentType;
+	}
 	public Long getId() {
 		return id;
 	}

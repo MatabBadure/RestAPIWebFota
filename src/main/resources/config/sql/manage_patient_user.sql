@@ -1,3 +1,6 @@
+DROP procedure IF EXISTS `manage_patient_user`;
+
+DELIMITER $$
 CREATE PROCEDURE `manage_patient_user`(
 	IN operation_type_indicator VARCHAR(10),
     IN hr_id varchar(255),
@@ -46,7 +49,7 @@ BEGIN
 	
 	IF operation_type_indicator = 'CREATE' THEN
     
-		SELECT `serial_number` INTO temp_serial_number FROM `PATIENT_INFO` WHERE `serial_number` = pat_device_serial_number;
+		SELECT `serial_number` INTO temp_serial_number FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number and `is_active` = 1;
         
 		-- When Hillrom id already exists
         IF temp_serial_number IS NOT NULL THEN
@@ -89,22 +92,39 @@ BEGIN
 		VALUES(return_user_id,'PATIENT');
 
 		SET return_patient_id = @gen_patient_id;
-        INSERT INTO `PATIENT_COMPLIANCE` (`patient_id`, `user_id`, `date`, `compliance_score`, `hmr_run_rate`, `hmr`,
-		`is_hmr_compliant`, `is_settings_deviated`, `missed_therapy_count`,
-		`last_therapy_session_date`, `settings_deviated_days_count`,`created_by`,`created_date`)
-		VALUES
-		(@gen_patient_id,return_user_id,now(),100,0,0,true,false,0,null,0,created_by,created_date);
-        
-        INSERT INTO `PATIENT_NO_EVENT` (`first_transmission_date`, `user_created_date`, `patient_id`, `user_id`)
-		VALUES
-		(null, curdate(),@gen_patient_id,return_user_id);
+		IF pat_hub_id IS NULL OR TRIM(pat_hub_id)='' THEN
+		
+	        INSERT INTO `PATIENT_COMPLIANCE_MONARCH` (`patient_id`, `user_id`, `date`, `compliance_score`, `hmr_run_rate`, `hmr`,
+			`is_hmr_compliant`, `is_settings_deviated`, `missed_therapy_count`,
+			`last_therapy_session_date`, `settings_deviated_days_count`,`created_by`,`created_date`)
+			VALUES
+			(@gen_patient_id,return_user_id,now(),100,0,0,true,false,0,null,0,created_by,created_date);
+	        
+	        INSERT INTO `PATIENT_NO_EVENT_MONARCH` (`first_transmission_date`, `user_created_date`, `patient_id`, `user_id`)
+			VALUES
+			(null, curdate(),@gen_patient_id,return_user_id);		
+		
+		ELSE
+
+	        INSERT INTO `PATIENT_COMPLIANCE` (`patient_id`, `user_id`, `date`, `compliance_score`, `hmr_run_rate`, `hmr`,
+			`is_hmr_compliant`, `is_settings_deviated`, `missed_therapy_count`,
+			`last_therapy_session_date`, `settings_deviated_days_count`,`created_by`,`created_date`)
+			VALUES
+			(@gen_patient_id,return_user_id,now(),100,0,0,true,false,0,null,0,created_by,created_date);
+	        
+	        INSERT INTO `PATIENT_NO_EVENT` (`first_transmission_date`, `user_created_date`, `patient_id`, `user_id`)
+			VALUES
+			(null, curdate(),@gen_patient_id,return_user_id);
+			
+		END IF;
+
         
 		COMMIT;
 	-- Update Patient user
     
 	ELSEIF operation_type_indicator = 'UPDATE' THEN 
     
-		SELECT `id` INTO return_patient_id FROM `PATIENT_INFO` WHERE `serial_number` = pat_device_serial_number;
+		SELECT `patient_id` INTO return_patient_id FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number;
 		SELECT `user_id` INTO return_user_id FROM `USER_PATIENT_ASSOC` WHERE `patient_id`= return_patient_id AND `user_role`= 'PATIENT';
         
         IF return_patient_id IS NULL THEN
@@ -165,7 +185,7 @@ BEGIN
         
 	ELSEIF operation_type_indicator = 'DELETE' THEN 
     
-		SELECT `id` INTO return_patient_id FROM `PATIENT_INFO` WHERE `serial_number` = pat_device_serial_number;
+		SELECT `patient_id` INTO return_patient_id FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number;
 		SELECT `user_id` INTO return_user_id FROM `USER_PATIENT_ASSOC` WHERE `patient_id`= return_patient_id;
         
         IF (return_user_id IS NULL) THEN 
@@ -179,4 +199,5 @@ BEGIN
 	ELSE
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Only CREATE, UPDATE and DELETE are supported as operation type ID';
     END IF;
-END
+END $$
+DELIMITER ;

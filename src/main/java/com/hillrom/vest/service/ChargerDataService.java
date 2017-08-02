@@ -241,6 +241,7 @@ public class ChargerDataService {
 			    //{
 			    //  nCheckSum -= 65535;
 			    //}
+			    log.error("MONARCH CRC calculation defect fix above :"); 
 			    
 			    int nMSB = decoded[nDecodeCount+1] & 0xFF;
 			    int nLSB = decoded[nDecodeCount] & 0xFF;

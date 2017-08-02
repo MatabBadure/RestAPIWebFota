@@ -147,28 +147,6 @@ public class FOTAService {
 				//CRC calculation 
 				String crsRaw = responsePairResult.concat(resultValue).concat(responsePair1).concat(handleIdRaw).concat(responsePair2).concat(totalChunkRaw).concat(responsePair3);
 				
-				/*StringBuilder str1 = new StringBuilder();
-				str1.append(AMPERSAND);
-				str1.append(HANDLE_EQ);
-				
-				StringBuilder str2 = new StringBuilder();
-				str2.append(AMPERSAND);
-				str2.append(TOTAL_CHUNK);
-				
-
-				BigInteger toHex = new BigInteger(String.valueOf(totalChunks),10);
-			    String totalChunkHexString = toHex.toString(16);
-			    totalChunkHexString = ("00000000" + totalChunkHexString).substring(totalChunkHexString.length());
-				//converting to little Endian
-			    String totalChunkStr= toLittleEndian((totalChunkHexString));
-				
-			    StringBuilder str3 = new StringBuilder();
-			    str3.append(AMPERSAND);
-			    str3.append(CRC_EQ);
-				
-				
-				String crsRaw = RESULT_EQ.concat(crcResult).concat(str1.toString()).concat(toLittleEndian((handleId))).concat(str2.toString()).concat(totalChunkStr).concat(str3.toString());
-				*/
 				//String validCRC = getValideCRC(crsRaw);
 				
 				
@@ -344,6 +322,14 @@ public class FOTAService {
 			//response Init Pair1 HANDLE_EQ
 			responsePair1 = asciiToHex(HANDLE_EQ);
 			
+			/*responsePairResult = getResponePairResult();
+			String resultValue = "";
+			String crcResult = "";
+			if(calculateCRC(rawMessage)){
+				crcResult = "Yes";
+				resultValue = asciiToHex(crcResult);
+			}*/
+			
 			//Handle in raw format(handle Value)
 			//String handleIdRaw = hexToAscii(asciiToHex(handleId));
 			String handleIdRaw = hexToAscii(asciiToHex(toLittleEndian((handleId))));
@@ -363,12 +349,21 @@ public class FOTAService {
 			// Response pair4 Init  crc
 			responsePair4 = getResponePair3();
 			
+			String crsRaw = responsePair1.concat(handleIdRaw).concat(responsePair2).concat(bufferLenRaw).concat(responsePair3).concat(buffer).concat(responsePair4);
+			
+			
+			byte[] encodedCRC = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(crsRaw));
+			String encodedString = new String(encodedCRC);
+			log.error("encodedString: " + encodedString);
+			
+			String crcstr = calculateCRCSendValue(encodedString);
+			
 			// CRC in raw format init request
-			String crcRaw = getCRC(rawMessage);
+			//String crcRaw = getCRC(rawMessage);
 			
 			// Final response String
 			finalResponseStr = getInitOKResponseSendChunk(responsePair1, handleIdRaw,
-					responsePair2, bufferLenRaw, responsePair3, buffer,responsePair4,crcRaw);
+					responsePair2, bufferLenRaw, responsePair3, buffer,responsePair4,crcstr);
 			log.error("finalResponseStr: " + finalResponseStr);
 			
 		}else if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE3)) {

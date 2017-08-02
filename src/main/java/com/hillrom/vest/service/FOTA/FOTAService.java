@@ -73,6 +73,8 @@ public class FOTAService {
 	private String buffer = null;
 	
 	public String FOTAUpdate(String rawMessage) {
+		
+		int countInt = 0;
 
 		String decoded_string = "";
 
@@ -105,14 +107,15 @@ public class FOTAService {
 		// Checking if request Type is 01 & //Checking if request Type is 02
 		if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE1)) {
 			
+		
 			if(fotaJsonData.get(DEVICE_PARTNUMBER).equals(DEVICE_PARTNUMBER_01)){
 				
 				int totalChunks = 0;
 				HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE));
 				
 				
-				String handleId = getHandleNumber();
 				Map<String,String> partNumberWithCount = new LinkedHashMap<String, String>();
+				String handleId = getHandleNumber();
 				SimpleDateFormat sdf = new SimpleDateFormat("MM.dd.yyyy.HH.mm.ss");
 				
 				partNumberWithCount.put(fotaJsonData.get(DEVICE_PARTNUMBER), String.valueOf(0));
@@ -152,7 +155,7 @@ public class FOTAService {
 				
 				byte[] encodedCRC = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(crsRaw));
 				String encodedString = new String(encodedCRC);
-				log.error("encodedString: " + encodedString);
+				log.debug("encodedString: " + encodedString);
 				
 				String crcstr = calculateCRCSendValue(encodedString);
 				
@@ -161,7 +164,7 @@ public class FOTAService {
 				// Final response String
 				finalResponseStr = getAllResponseCheckUpdate(responsePairResult,resultValue,responsePair1, handleIdRaw,
 						responsePair2, totalChunkRaw, responsePair3, crcstr);
-				log.error("finalResponseStr: " + finalResponseStr);
+				log.debug("finalResponseStr: " + finalResponseStr);
 				
 			}
 			
@@ -264,7 +267,7 @@ public class FOTAService {
 							//Part Number
 							HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE));
 							String countStr = partDetail.getValue();
-							int countInt = Integer.parseInt(countStr);
+							countInt = Integer.parseInt(countStr);
 							countInt = countInt + 1;
 							
 							updatePartNumberWithCount.put(partDetail.getKey(), String.valueOf(countInt));
@@ -298,7 +301,7 @@ public class FOTAService {
 							//Part Number
 							HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE));
 							String countStr = partDetail.getValue();
-							int countInt = Integer.parseInt(countStr);
+							countInt = Integer.parseInt(countStr);
 							//countInt = countInt + 1;
 							updatePartNumberWithCount.put(partDetail.getKey(), String.valueOf(countInt));
 							globalHandleHolder.getHandleWithPartNumber().put(handleId,updatePartNumberWithCount);
@@ -354,7 +357,7 @@ public class FOTAService {
 			
 			byte[] encodedCRC = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(crsRaw));
 			String encodedString = new String(encodedCRC);
-			log.error("encodedString: " + encodedString);
+			log.debug("encodedString: " + encodedString);
 			
 			String crcstr = calculateCRCSendValue(encodedString);
 			
@@ -363,8 +366,8 @@ public class FOTAService {
 			
 			// Final response String
 			finalResponseStr = getInitOKResponseSendChunk(responsePair1, handleIdRaw,
-					responsePair2, bufferLenRaw, responsePair3, buffer,responsePair4,crcstr);
-			log.error("finalResponseStr: " + finalResponseStr);
+					responsePair2, bufferLenRaw, responsePair3, buffer,responsePair4,crcstr,countInt);
+			log.debug("finalResponseStr: " + finalResponseStr);
 			
 		}else if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE3)) {
 			if (fotaJsonData.get(RESULT).equals(OK)) {
@@ -441,8 +444,6 @@ public class FOTAService {
 
 	    byte[] decoded = java.util.Base64.getDecoder().decode(encodedString);
 	    
-	    int lenght = decoded.length;
-	    
 	    int nDecodeCount = 0;
 	    for ( ; nDecodeCount <= (decoded.length-1); nDecodeCount++ )
 	    {
@@ -453,10 +454,11 @@ public class FOTAService {
 	    
 	    System.out.format("Inverted Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
 	    
-	    while ( nCheckSum >  65535 )
+	   /* while ( nCheckSum >  65535 )
 	    {
 	      nCheckSum -= 65535;
-	    }
+	    }*/
+	    nCheckSum = nCheckSum & 0xFFFF;
 	    
 
 	    log.error("Total Value = " + nCheckSum);
@@ -464,19 +466,19 @@ public class FOTAService {
 	    System.out.format("Checksum Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
 
 	    String checksum_num =  Integer.toHexString(nCheckSum);
+	   // String crcHex = asciiToHex(checksum_num);
+	    
+	    //String handleHexString = checksum_num.toString(16);
+	    checksum_num = ("0000" + checksum_num).substring(checksum_num.length());
+	    
+	    //checksum_num =	("00000000"+ checksum_num)+.substring(checksum_num.length());
 	   
 	    System.out.println("Checksum : " + checksum_num);
 	    
 	    
 	    
 	    return toLittleEndian(checksum_num);
-	    
-	   /* if((msb_digit+lsb_digit).equalsIgnoreCase(checksum_num)){
-	    	return checksum_num;
-	    }else{
-	    	log.error("CRC VALIDATION FAILED :"); 
-	    	return null;
-	    }*/
+	  
 	}
 
 	private String getResponePairResult() {
@@ -552,9 +554,12 @@ public class FOTAService {
 	private String getInitOKResponseSendChunk(String responsePair1,
 			String handleIdRaw, String responsePair2, String bufferLenRaw,
 			String responsePair3, String buffer, String responsePair4,
-			String crcRaw) {
+			String crcRaw, int countInt) {
 		//Final String 
+		//String finalString = responsePair1.concat(handleIdRaw).concat(responsePair2).concat(bufferLenRaw).concat(responsePair3).concat(buffer).concat(responsePair4).concat(crcRaw);
 		String finalString = responsePair1.concat(handleIdRaw).concat(responsePair2).concat(bufferLenRaw).concat(responsePair3).concat(buffer).concat(responsePair4).concat(crcRaw);
+		log.debug(" Chunk Number:"+countInt);
+		log.debug(" CRC value:"+crcRaw);
 		return finalString;
 	}
 
@@ -627,6 +632,10 @@ public class FOTAService {
 	private String getAllResponseCheckUpdate(String responsePair1Result,String responsePair1ResultValue, String responsePair1, String handleIdRaw,
 			String responsePair2, String totalChunkRaw, String responsePair3,
 			String crcRaw) {
+		/*StringBuilder sb = new StringBuilder();
+		sb.*/
+		log.debug("totalChunkRaw"+totalChunkRaw);
+		
 		String finalString = responsePair1Result.concat(responsePair1ResultValue).concat(responsePair1).concat(handleIdRaw).concat(responsePair2)
 				.concat(totalChunkRaw).concat(responsePair3).concat(crcRaw);
 		return finalString;

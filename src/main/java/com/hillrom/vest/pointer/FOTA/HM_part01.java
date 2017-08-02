@@ -52,7 +52,7 @@ public class HM_part01 {
 		String[] output = null;
 		try {
 			Path pp = FileSystems.getDefault().getPath(HEXAFILEPATH,
-					"193165_charger_pendant.hex");
+					"193164_charger_mainboard.hex");
 			FileInputStream fis = new FileInputStream(pp.toFile());
 			log.debug("File Length :" + (int) pp.toFile().length());
 			byte[] byteArray = new byte[(int) pp.toFile().length()];

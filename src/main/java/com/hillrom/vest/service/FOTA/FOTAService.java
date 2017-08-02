@@ -110,8 +110,8 @@ public class FOTAService {
 				int totalChunks = 0;
 				HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE));
 				
-				String handleId = getHandleNumber();
 				
+				String handleId = getHandleNumber();
 				Map<String,String> partNumberWithCount = new LinkedHashMap<String, String>();
 				SimpleDateFormat sdf = new SimpleDateFormat("MM.dd.yyyy.HH.mm.ss");
 				
@@ -124,8 +124,10 @@ public class FOTAService {
 				// Response pair1
 				responsePairResult = getResponePairResult();
 				String resultValue = "";
+				String crcResult = "";
 				if(calculateCRC(rawMessage)){
-					resultValue = asciiToHex("Yes");
+					crcResult = "Yes";
+					resultValue = asciiToHex(crcResult);
 				}
 				
 				responsePair1 = getResponePair1();
@@ -144,16 +146,40 @@ public class FOTAService {
 				
 				//CRC calculation 
 				String crsRaw = responsePairResult.concat(resultValue).concat(responsePair1).concat(handleIdRaw).concat(responsePair2).concat(totalChunkRaw).concat(responsePair3);
+				
+				/*StringBuilder str1 = new StringBuilder();
+				str1.append(AMPERSAND);
+				str1.append(HANDLE_EQ);
+				
+				StringBuilder str2 = new StringBuilder();
+				str2.append(AMPERSAND);
+				str2.append(TOTAL_CHUNK);
+				
 
+				BigInteger toHex = new BigInteger(String.valueOf(totalChunks),10);
+			    String totalChunkHexString = toHex.toString(16);
+			    totalChunkHexString = ("00000000" + totalChunkHexString).substring(totalChunkHexString.length());
+				//converting to little Endian
+			    String totalChunkStr= toLittleEndian((totalChunkHexString));
+				
+			    StringBuilder str3 = new StringBuilder();
+			    str3.append(AMPERSAND);
+			    str3.append(CRC_EQ);
+				
+				
+				String crsRaw = RESULT_EQ.concat(crcResult).concat(str1.toString()).concat(toLittleEndian((handleId))).concat(str2.toString()).concat(totalChunkStr).concat(str3.toString());
+				*/
+				//String validCRC = getValideCRC(crsRaw);
+				
+				
 				byte[] encodedCRC = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(crsRaw));
 				String encodedString = new String(encodedCRC);
 				log.error("encodedString: " + encodedString);
 				
-				String crcstr = hexToAscii(asciiToHex(calculateCRCSendValue(encodedString)));;
+				String crcstr = calculateCRCSendValue(encodedString);
 				
 				// CRC in raw format
 				//String crcRaw = getCRC(rawMessage);
-
 				// Final response String
 				finalResponseStr = getAllResponseCheckUpdate(responsePairResult,resultValue,responsePair1, handleIdRaw,
 						responsePair2, totalChunkRaw, responsePair3, crcstr);
@@ -364,13 +390,13 @@ public class FOTAService {
 		
 	}
 		
-	private String calculateCRCSendValue(String encodedString) {
-		 
-		log.error("Inside  calculateCRC : " ,encodedString);
+	private String getValideCRC(String crsRaw) {
+
+		
 		  
 	    int nCheckSum = 0;
 
-	    byte[] decoded = java.util.Base64.getDecoder().decode(encodedString);
+	    byte[] decoded = crsRaw.getBytes();
 	    
 	    int nDecodeCount = 0;
 	    for ( ; nDecodeCount < (decoded.length-2); nDecodeCount++ )
@@ -409,6 +435,46 @@ public class FOTAService {
 	    System.out.println("Checksum : " + checksum_num);
 	    
 	    return checksum_num;
+	
+	}
+
+	private String calculateCRCSendValue(String encodedString) {
+		 
+		log.error("Inside  calculateCRC : " ,encodedString);
+		  
+	    int nCheckSum = 0;
+
+	    byte[] decoded = java.util.Base64.getDecoder().decode(encodedString);
+	    
+	    int lenght = decoded.length;
+	    
+	    int nDecodeCount = 0;
+	    for ( ; nDecodeCount <= (decoded.length-1); nDecodeCount++ )
+	    {
+	      int nValue = (decoded[nDecodeCount] & 0xFF);
+	      nCheckSum += nValue;
+	    }
+	    
+	    
+	    System.out.format("Inverted Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
+	    
+	    while ( nCheckSum >  65535 )
+	    {
+	      nCheckSum -= 65535;
+	    }
+	    
+
+	    log.error("Total Value = " + nCheckSum);
+	    nCheckSum = ((~nCheckSum)& 0xFFFF) + 1;
+	    System.out.format("Checksum Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
+
+	    String checksum_num =  Integer.toHexString(nCheckSum);
+	   
+	    System.out.println("Checksum : " + checksum_num);
+	    
+	    
+	    
+	    return toLittleEndian(checksum_num);
 	    
 	   /* if((msb_digit+lsb_digit).equalsIgnoreCase(checksum_num)){
 	    	return checksum_num;

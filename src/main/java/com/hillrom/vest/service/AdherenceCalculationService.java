@@ -17,12 +17,12 @@ import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_MONARCH;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_VEST;
+import static com.hillrom.monarch.service.util.PatientVestDeviceTherapyUtilMonarch.calculateHMRRunRatePerSessionBoth;
 import static com.hillrom.vest.config.AdherenceScoreConstants.ADHERENCE_SETTING_DEFAULT_DAYS;
 import static com.hillrom.vest.service.util.DateUtil.getPlusOrMinusTodayLocalDate;
 import static com.hillrom.vest.service.util.DateUtil.getDateBeforeSpecificDays;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateCumulativeDuration;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateHMRRunRatePerSession;
-import static com.hillrom.vest.service.util.monarch.PatientVestDeviceTherapyUtilMonarch.calculateHMRRunRatePerSessionBoth;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 
 import java.io.PrintWriter;
@@ -76,11 +76,6 @@ import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PatientDevicesAssocRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
-import com.hillrom.vest.service.monarch.AdherenceCalculationServiceMonarch;
-import com.hillrom.vest.service.monarch.PatientComplianceMonarchService;
-import com.hillrom.vest.service.monarch.NotificationMonarchService;
-import com.hillrom.vest.service.monarch.PatientNoEventMonarchService;
-import com.hillrom.vest.service.monarch.TherapySessionServiceMonarch;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -88,12 +83,15 @@ import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.ClinicStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.PatientStatsVO;
-
+import com.hillrom.monarch.repository.PatientNoEventsMonarchRepository;
+import com.hillrom.monarch.service.AdherenceCalculationServiceMonarch;
+import com.hillrom.monarch.service.NotificationMonarchService;
+import com.hillrom.monarch.service.PatientComplianceMonarchService;
+import com.hillrom.monarch.service.PatientNoEventMonarchService;
+import com.hillrom.monarch.service.TherapySessionServiceMonarch;
 //hill-1956
 import com.hillrom.vest.domain.AdherenceReset;
 import com.hillrom.vest.repository.AdherenceResetRepository;
-import com.hillrom.vest.repository.monarch.PatientNoEventsMonarchRepository;
-//hill-1956
 
 
 @Service

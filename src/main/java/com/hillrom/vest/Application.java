@@ -7,9 +7,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.MetricFilterAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.MetricRepositoryAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.SimpleCommandLinePropertySource;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
 import com.google.common.base.Joiner;
 
 import javax.annotation.PostConstruct;
@@ -20,7 +24,10 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
 
-@ComponentScan
+@SpringBootApplication
+@ComponentScan(basePackages  = {"com.hillrom"})
+@EnableJpaRepositories(basePackages  = {"com.hillrom.vest","com.hillrom.monarch"})
+@EntityScan(basePackages  = {"com.hillrom.vest","com.hillrom.monarch"})
 @EnableAutoConfiguration(exclude = {MetricFilterAutoConfiguration.class, MetricRepositoryAutoConfiguration.class})
 public class Application {
 

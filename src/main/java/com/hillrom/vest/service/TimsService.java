@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.monarch.repository.PatientMonarchDeviceRepository;
 import com.hillrom.vest.domain.Announcements;
 import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
@@ -36,7 +37,6 @@ import com.hillrom.vest.repository.PatientDevicesAssocRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRepository;
 import com.hillrom.vest.repository.TimsUserRepository;
-import com.hillrom.vest.repository.monarch.PatientMonarchDeviceRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.RelationshipLabelConstants;

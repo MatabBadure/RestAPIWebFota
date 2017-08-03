@@ -4,7 +4,6 @@ public final class FOTAConstants {
 
 	public static final String HEXAFILEPATH = "/opt/FOTA/files";
 	//public static final String HEXAFILEPATH = "D:/Matab/FOTA/Hexa";
-	
 	public static final int CHUNK_SIZE_VALUE = 200;
 	
 
@@ -27,6 +26,7 @@ public final class FOTAConstants {
 	public static final String TOTAL_CHUNK = "totalChunk=";
 	public static final String NOT_OK = "NOT OK";
 	public static final String OK = "OK";
+	public static final String YES = "Yes";
 	public static final String INIT = "INIT";
 	public static final String BUFFER_EQ = "buffer=";
 	public static final String BUFFER_LEN_EQ = "bufferLen=";

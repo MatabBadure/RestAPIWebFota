@@ -25,7 +25,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * Optimus Device Data.
  */
 @Entity
-@Audited
 @Table(name = "OPTIMUS_DATA")
 public class OptimusData implements Serializable {
 

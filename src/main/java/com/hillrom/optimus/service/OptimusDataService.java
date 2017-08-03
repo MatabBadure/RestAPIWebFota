@@ -145,6 +145,8 @@ public class OptimusDataService {
 					OptimusData optimusData = new OptimusData();
 					optimusData.setDeviceData(encoded_string);
 					optimusData.setCreatedTime(new DateTime());
+					optimusData.setFragTotal(getFragTotal(encoded_string));
+					optimusData.setFragCurrent(getFragCurrent(encoded_string));
 					optimusDataRepository.save(optimusData);
 
 				return optimusJsonData;

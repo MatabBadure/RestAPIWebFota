@@ -43,34 +43,85 @@ public class OptimusData implements Serializable {
     private String deviceData;
     
 
+    @Column(name = "current_fragment")
+    private int fragCurrent;
+    
+    @Column(name = "total_fragments")
+    private int fragTotal;
 
-
+	/**
+	 * @return the id
+	 */
 	public Long getId() {
 		return id;
 	}
 
+	/**
+	 * @param id the id to set
+	 */
 	public void setId(Long id) {
 		this.id = id;
 	}
 
+	/**
+	 * @return the createdTime
+	 */
 	public DateTime getCreatedTime() {
 		return createdTime;
 	}
 
+	/**
+	 * @param createdTime the createdTime to set
+	 */
 	public void setCreatedTime(DateTime createdTime) {
 		this.createdTime = createdTime;
 	}
 
+	/**
+	 * @return the deviceData
+	 */
 	public String getDeviceData() {
 		return deviceData;
 	}
 
+	/**
+	 * @param deviceData the deviceData to set
+	 */
 	public void setDeviceData(String deviceData) {
 		this.deviceData = deviceData;
 	}
-	
-	
 
+	/**
+	 * @return the fragCurrent
+	 */
+	public int getFragCurrent() {
+		return fragCurrent;
+	}
+
+	/**
+	 * @param fragCurrent the fragCurrent to set
+	 */
+	public void setFragCurrent(int fragCurrent) {
+		this.fragCurrent = fragCurrent;
+	}
+
+	/**
+	 * @return the fragTotal
+	 */
+	public int getFragTotal() {
+		return fragTotal;
+	}
+
+	/**
+	 * @param fragTotal the fragTotal to set
+	 */
+	public void setFragTotal(int fragTotal) {
+		this.fragTotal = fragTotal;
+	}
+
+	/**
+	 * @return the serialversionuid
+	 */
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
@@ -84,6 +135,8 @@ public class OptimusData implements Serializable {
 		int result = 1;
 		result = prime * result + ((createdTime == null) ? 0 : createdTime.hashCode());
 		result = prime * result + ((deviceData == null) ? 0 : deviceData.hashCode());
+		result = prime * result + fragCurrent;
+		result = prime * result + fragTotal;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
@@ -110,6 +163,10 @@ public class OptimusData implements Serializable {
 				return false;
 		} else if (!deviceData.equals(other.deviceData))
 			return false;
+		if (fragCurrent != other.fragCurrent)
+			return false;
+		if (fragTotal != other.fragTotal)
+			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -123,8 +180,12 @@ public class OptimusData implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return "OptimusData [id=" + id + ", createdTime=" + createdTime + ", deviceData=" + deviceData +  "]";
+		return "OptimusData [id=" + id + ", createdTime=" + createdTime + ", deviceData=" + deviceData
+				+ ", fragCurrent=" + fragCurrent + ", fragTotal=" + fragTotal + "]";
 	}
+    
+
+    
 
 	
 	

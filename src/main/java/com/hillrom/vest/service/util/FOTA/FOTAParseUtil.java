@@ -73,17 +73,13 @@ public class FOTAParseUtil {
 			fotaJsonData.put(HANDLE, handle);
 		}
 		if(Objects.nonNull(result)){			
-			fotaJsonData.put(HANDLE, result);
+			fotaJsonData.put(RESULT, result);
 		}
 		
 		if(Objects.nonNull(devCrc)){
 			fotaJsonData.put(CRC, devCrc);
 		}
 		
-		
-		
-
-			
 		return fotaJsonData;
 	}
 

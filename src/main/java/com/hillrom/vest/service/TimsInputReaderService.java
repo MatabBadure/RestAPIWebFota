@@ -86,7 +86,7 @@ public class TimsInputReaderService {
 		    Integer position = entry.getKey();
 		    PatientInfoDTO record = entry.getValue();
 		    log.debug("Processing record position : "+position);
-		    if(record.getDevice_type().equalsIgnoreCase("VEST")){
+		  if(record.getDevice_type().equalsIgnoreCase("VEST")){
 		    	log.debug("Inside VEST loop ");
 		    	timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record);
 		    	//timsService.CASE2_PatientExistsWithNODevice_VEST(record);
@@ -107,7 +107,7 @@ public class TimsInputReaderService {
 		    	log.debug("Inside MONARCH loop ");
 		    	timsService.CASE1_NeitherPatientNorDeviceExist_MONARCH(record);
 		    	//timsService.CASE2_PatientExistsWithNODevice_MONARCH(record);
-		    	timsService.CASE3_PatientHasVisivestAddMonarch_MONARCH(record);
+		   	    timsService.CASE3_PatientHasVisivestAddMonarch_MONARCH(record);
 		    	timsService.CASE4_PatientHasDifferentMonarchSwap_MONARCH(record);
 		    	timsService.CASE5_DeviceOwnedByShell_MONARCH(record);
 		    	//timsService.CASE6_DeviceOwnedByDifferentPatient_MONARCH(record);
@@ -117,7 +117,7 @@ public class TimsInputReaderService {
 		    	timsService.CASE10_PatientHasVisivestAddMonarch_MONARCH(record);
 		    	//timsService.CASE11_PatientExistsWithNODevice_MONARCH(record);
 		    	timsService.CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH(record);
-		    	
+		   	
 		    }
 		}
 		
@@ -126,7 +126,7 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{
-
+		
 
 	        String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
 		    log.debug("Started reading flat file : " + csvFile);

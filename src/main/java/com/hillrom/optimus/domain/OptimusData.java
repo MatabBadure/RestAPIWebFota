@@ -48,6 +48,9 @@ public class OptimusData implements Serializable {
     
     @Column(name = "total_fragments")
     private int fragTotal;
+    
+    @Column(name = "serial_number")
+    private String serialNumber;
 
 	/**
 	 * @return the id
@@ -126,6 +129,20 @@ public class OptimusData implements Serializable {
 		return serialVersionUID;
 	}
 
+	/**
+	 * @return the serialNumber
+	 */
+	public String getSerialNumber() {
+		return serialNumber;
+	}
+
+	/**
+	 * @param serialNumber the serialNumber to set
+	 */
+	public void setSerialNumber(String serialNumber) {
+		this.serialNumber = serialNumber;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -138,6 +155,7 @@ public class OptimusData implements Serializable {
 		result = prime * result + fragCurrent;
 		result = prime * result + fragTotal;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((serialNumber == null) ? 0 : serialNumber.hashCode());
 		return result;
 	}
 
@@ -172,6 +190,11 @@ public class OptimusData implements Serializable {
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
+		if (serialNumber == null) {
+			if (other.serialNumber != null)
+				return false;
+		} else if (!serialNumber.equals(other.serialNumber))
+			return false;
 		return true;
 	}
 
@@ -181,9 +204,10 @@ public class OptimusData implements Serializable {
 	@Override
 	public String toString() {
 		return "OptimusData [id=" + id + ", createdTime=" + createdTime + ", deviceData=" + deviceData
-				+ ", fragCurrent=" + fragCurrent + ", fragTotal=" + fragTotal + "]";
+				+ ", fragCurrent=" + fragCurrent + ", fragTotal=" + fragTotal + ", serialNumber=" + serialNumber + "]";
 	}
-    
+
+
 
     
 

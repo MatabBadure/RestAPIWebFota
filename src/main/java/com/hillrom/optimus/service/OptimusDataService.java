@@ -55,6 +55,7 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVI
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_VER;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CRC;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_ADDRESS;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_BT;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_DATA;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_MODEL;
 
@@ -147,6 +148,7 @@ public class OptimusDataService {
 					optimusData.setCreatedTime(new DateTime());
 					optimusData.setFragTotal(getFragTotal(encoded_string));
 					optimusData.setFragCurrent(getFragCurrent(encoded_string));
+					optimusData.setSerialNumber(getDevSN(encoded_string,decoded_string));
 					optimusDataRepository.save(optimusData);
 
 				return optimusJsonData;
@@ -416,6 +418,11 @@ public class OptimusDataService {
 		
 			}
 
+			public String getDevSN(String encoded_string,String decoded_string) throws HillromException{
+				String devSn = decoded_string.indexOf(DEVICE_SN) < 0 ? null : decoded_string.substring(decoded_string.indexOf(DEVICE_SN)+DEVICE_SN.length()+1, getNextIndex(decoded_string,DEVICE_SN));
+				return devSn;
+			}
+			
 			public byte[] getDevSN(String encoded_string) throws HillromException{
 		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
 		        String sout = "";
@@ -626,6 +633,30 @@ public class OptimusDataService {
 	    	    return hexTotal;
 	    	}
 
+	    	public static Integer getNextIndex(String rawMessage,String namePair){
+	    		switch(namePair){
+	    		case DEVICE_MODEL:
+	    			return rawMessage.indexOf(DEVICE_SN) < 0 ? getNextIndex(rawMessage, DEVICE_SN) :  rawMessage.indexOf(DEVICE_SN)-1;			
+	    		case DEVICE_SN:
+	    			return rawMessage.indexOf(DEVICE_WIFI) < 0 ? getNextIndex(rawMessage, DEVICE_WIFI) :  rawMessage.indexOf(DEVICE_WIFI)-1;
+	    		case DEVICE_WIFI:
+	    			return rawMessage.indexOf(DEVICE_LTE) < 0 ? getNextIndex(rawMessage, DEVICE_LTE) :  rawMessage.indexOf(DEVICE_LTE)-1;
+	    		case DEVICE_LTE:
+	    			return rawMessage.indexOf(DEVICE_BT) < 0 ? getNextIndex(rawMessage, DEVICE_BT) :  rawMessage.indexOf(DEVICE_BT)-1;
+	    		case DEVICE_BT:
+	    			return rawMessage.indexOf(DEVICE_VER) < 0 ? getNextIndex(rawMessage, DEVICE_VER) :  rawMessage.indexOf(DEVICE_VER)-1;	
+	    		case DEVICE_VER:
+	    			return rawMessage.indexOf(FRAG_TOTAL) < 0 ? getNextIndex(rawMessage, FRAG_TOTAL) :  rawMessage.indexOf(FRAG_TOTAL)-1;
+	    		case FRAG_TOTAL:
+	    			return rawMessage.indexOf(FRAG_CURRENT) < 0 ? getNextIndex(rawMessage, FRAG_CURRENT) :  rawMessage.indexOf(FRAG_CURRENT)-1;
+	    		case FRAG_CURRENT:
+	    			return rawMessage.indexOf(DEVICE_DATA) < 0 ? getNextIndex(rawMessage, DEVICE_DATA) :  rawMessage.indexOf(DEVICE_DATA)-1;
+	    		case DEVICE_DATA:
+	    			return rawMessage.indexOf(CRC) < 0 ? rawMessage.length() :  rawMessage.indexOf(CRC)-1;
+	    		default:
+	    			return -1;
+	    		}		
+	    	}
 	
 	
 

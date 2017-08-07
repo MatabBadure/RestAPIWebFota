@@ -87,12 +87,12 @@ public class PatientOptimusDeviceDataResource {
 			optimusJsonDataPOC =   optimusDataService.saveOrUpdateChargerData(rawMessage,decoded_string);			
 
 			optimusJsonDataPOC.put("RESULT", "OK - ");
-			return new ResponseEntity<>(optimusJsonDataPOC,HttpStatus.CREATED);
+			return new ResponseEntity<>(optimusJsonDataPOC.get("RESULT") + " " + optimusJsonDataPOC.get("ERROR"),HttpStatus.CREATED);
 		}catch(Exception e){
 			e.printStackTrace();
 			JSONObject error = new JSONObject();
 			error.put("RESULT", "NOT OK - "+e.getMessage());
-			return new ResponseEntity<>(error,HttpStatus.PARTIAL_CONTENT);
+			return new ResponseEntity<>(optimusJsonDataPOC.get("RESULT") + " " + optimusJsonDataPOC.get("ERROR"),HttpStatus.PARTIAL_CONTENT);
 		}
 	}
 

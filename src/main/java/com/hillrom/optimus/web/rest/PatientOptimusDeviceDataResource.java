@@ -157,10 +157,11 @@ public class PatientOptimusDeviceDataResource {
 	@RequestMapping(value = "/optimusdevicedatalist",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<JSONObject> findAll() {
+	public ResponseEntity<JSONObject> findAll(@RequestParam(value = "page" , required = false) Integer offset,
+            @RequestParam(value = "per_page", required = false) Integer limit) {
 		try{	
 			JSONObject jsonObject = new JSONObject();
-			Page<OptimusData> optimusDataList = optimusDataService.findAll(new PageRequest(0, 10));
+			Page<OptimusData> optimusDataList = optimusDataService.findAll(new PageRequest(offset, limit));
 			jsonObject.put("device_data", optimusDataList);
 			if(Objects.nonNull(optimusDataList))
 				return new ResponseEntity<JSONObject>(jsonObject,HttpStatus.CREATED);

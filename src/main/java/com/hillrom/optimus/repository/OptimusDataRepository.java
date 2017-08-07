@@ -24,7 +24,7 @@ public interface OptimusDataRepository extends JpaRepository<OptimusData,String>
 	OptimusData findLatestData();
 	
 
-	@Query("Select id, createdTime from OptimusData optimus order by id desc")
+	@Query("Select id, createdTime,serialNumber from OptimusData optimus order by id desc")
 	Page<OptimusData> findAll(Pageable pageable);
 	
 

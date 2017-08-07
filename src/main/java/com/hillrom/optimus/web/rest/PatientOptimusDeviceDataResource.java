@@ -62,7 +62,7 @@ public class PatientOptimusDeviceDataResource {
 	@RequestMapping(value = "/receiveDataOptimus",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> receiveDataOptimus(@RequestBody(required=true)String rawMessage){
+	public String receiveDataOptimus(@RequestBody(required=true)String rawMessage){
 
 
 
@@ -87,12 +87,12 @@ public class PatientOptimusDeviceDataResource {
 			optimusJsonDataPOC =   optimusDataService.saveOrUpdateChargerData(rawMessage,decoded_string);			
 
 			optimusJsonDataPOC.put("RESULT", "OK - ");
-			return new ResponseEntity<>(optimusJsonDataPOC.get("RESULT") + " " + optimusJsonDataPOC.get("ERROR"),HttpStatus.CREATED);
+			return optimusJsonDataPOC.get("RESULT") + " " + optimusJsonDataPOC.get("ERROR");
 		}catch(Exception e){
 			e.printStackTrace();
 			JSONObject error = new JSONObject();
 			error.put("RESULT", "NOT OK - "+e.getMessage());
-			return new ResponseEntity<>(optimusJsonDataPOC.get("RESULT") + " " + optimusJsonDataPOC.get("ERROR"),HttpStatus.PARTIAL_CONTENT);
+			return optimusJsonDataPOC.get("RESULT") + " " + optimusJsonDataPOC.get("ERROR");
 		}
 	}
 

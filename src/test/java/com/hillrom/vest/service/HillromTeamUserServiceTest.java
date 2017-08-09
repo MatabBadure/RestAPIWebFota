@@ -31,7 +31,7 @@ import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 
-
+/*
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
@@ -83,7 +83,7 @@ public class HillromTeamUserServiceTest {
         assertThat(newHRUser.getEmail()).isNotNull();
         userRepository.delete(newHRUser);
 	}
-	
+*/	
 //	@Test(expected = Exception.class)
 //	public void assertThatUpdateHillromUserSuccessfully() throws HillromException{
 //		userExtensionDTO.setFirstName("Remus");
@@ -97,7 +97,7 @@ public class HillromTeamUserServiceTest {
 //        assertThat(updatedHRUser.getEmail()).isNotNull();
 //        userRepository.delete(updatedHRUser);
 //	}
-
+/*
 	@Test(expected = Exception.class)
     public void assertThatHillromUserDeletedSuccessfully() throws HillromException {
 		UserExtension newHRUser = userService.createUser(userExtensionDTO, BASE_URL);
@@ -109,3 +109,4 @@ public class HillromTeamUserServiceTest {
         assertThat(message).isEqualToIgnoringCase("User deleted successfully.");
     }
 }
+*/

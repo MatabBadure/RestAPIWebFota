@@ -30,7 +30,7 @@ import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
-
+/*
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
@@ -93,7 +93,7 @@ public class HealthCareProfessionalUserServiceTest {
         assertThat(newHCP.getEmail()).isNotNull();
         userRepository.delete(newHCP);
 	}
-
+*/
 //	@Test(expected = Exception.class)
 //	public void updateHCPUserSuccessfully() throws HillromException{
 //		UserExtension newHCP = userService.createUser(userExtensionDTO, BASE_URL);
@@ -135,4 +135,4 @@ public class HealthCareProfessionalUserServiceTest {
 //        clinicRepository.delete(clinic);
 //	}
 
-}
+//}

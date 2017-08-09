@@ -25,7 +25,7 @@ import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceDataPK;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.service.util.ParserUtil;
-
+/*
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
@@ -33,7 +33,7 @@ import com.hillrom.vest.service.util.ParserUtil;
 @IntegrationTest
 @Transactional
 public class ParserTest {
-
+*/
 	/*PatientVestDeviceRawLog patientVestDeviceRawLog = null;
 	List<PatientVestDeviceData> expectedLogEntries = new LinkedList<>();
 	List<PatientVestDeviceData> actualLogEntries = null;
@@ -127,4 +127,4 @@ public class ParserTest {
 		}
 	}
 */
-}
+//}

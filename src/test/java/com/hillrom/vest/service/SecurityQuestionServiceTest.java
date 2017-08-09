@@ -12,6 +12,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.hillrom.vest.Application;
 import com.hillrom.vest.domain.SecurityQuestion;
@@ -20,6 +21,7 @@ import com.hillrom.vest.repository.SecurityQuestionRepository;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
+@ActiveProfiles("dev")
 @IntegrationTest
 @Transactional
 public class SecurityQuestionServiceTest {

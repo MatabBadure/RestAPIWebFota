@@ -111,4 +111,4 @@ public class ClinicServiceTest {
 //        clinicRepository.delete(newClinic);
 //    }
     
-}
+//}

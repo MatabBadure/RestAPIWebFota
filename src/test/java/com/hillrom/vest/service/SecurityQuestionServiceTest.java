@@ -17,7 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import com.hillrom.vest.Application;
 import com.hillrom.vest.domain.SecurityQuestion;
 import com.hillrom.vest.repository.SecurityQuestionRepository;
-
+/*
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
@@ -77,4 +77,4 @@ public class SecurityQuestionServiceTest {
 		questionRepository.delete(question);
 	}
 
-}
+}*/

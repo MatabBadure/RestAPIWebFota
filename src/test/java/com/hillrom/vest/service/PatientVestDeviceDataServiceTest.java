@@ -25,7 +25,7 @@ import com.hillrom.vest.domain.PatientVestDeviceDataPK;
 import com.hillrom.vest.domain.PatientVestDeviceRawLog;
 import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
-
+/*
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
@@ -33,7 +33,7 @@ import com.hillrom.vest.repository.PatientVestDeviceRawLogRepository;
 @IntegrationTest
 @Transactional
 public class PatientVestDeviceDataServiceTest {
-
+*/
 /*	private static final String DEVICE_DATA_STRING = "JEkdAAZmYUwtATIuMDAoMDApAAA2LjE1AAAAEjYCAKokVgAAEQ4LEwEAKwEFAQEVJFYAABIOCxMBASsDAAAAGCRFT1Dw8PDw";
 
 	@Inject
@@ -127,4 +127,4 @@ public class PatientVestDeviceDataServiceTest {
 		pvdRawLogRepository.delete(rawLog);
 	}
 */	
-}
+//}

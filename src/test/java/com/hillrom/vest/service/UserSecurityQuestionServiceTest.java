@@ -30,7 +30,7 @@ import com.hillrom.vest.repository.SecurityQuestionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSecurityQuestionRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
-
+/*
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
@@ -135,3 +135,4 @@ public class UserSecurityQuestionServiceTest {
 		return questionRepository.save(question);
 	}
 }
+*/

@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -92,11 +93,21 @@ public class TimsResource {
 					String modDate = grepVal[3];
 					Date date = new Date(Long.valueOf(modDate));
 					cal.setTime(date);
-					String formatedDate = (cal.get(Calendar.MONTH)+1)+"/"+ +cal.get(Calendar.DATE)+"/"+cal.get(Calendar.YEAR);
-					Date compareDate = 	new SimpleDateFormat("MM/dd/yyyy").parse(formatedDate);
-					Date compareFromDate = new SimpleDateFormat("MM/dd/yyyyy").parse(fromDate);
-					Date compareToDate = new SimpleDateFormat("MM/dd/yyyy").parse(toDate);
 					
+					String formatedDate = (cal.get(Calendar.MONTH)+1)+"/"+ +cal.get(Calendar.DATE)+"/"+(cal.get(Calendar.YEAR))+" "+cal.get(Calendar.HOUR_OF_DAY)+":"+cal.get(Calendar.MINUTE)+":"+cal.get(Calendar.SECOND);
+					String[] fromDate_Elements = fromDate.split("/");
+					
+					fromDate = fromDate_Elements[0]+"/"+fromDate_Elements[1]+"/"+fromDate_Elements[2]+" "+"00:00:00";
+                    Date compareFromDate = 	new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.ENGLISH).parse(fromDate);
+					
+                    String[] toDate_Elements = toDate.split("/");
+					toDate = toDate_Elements[0]+"/"+toDate_Elements[1]+"/"+toDate_Elements[2]+" "+"23:59:59";	
+					
+					Date compareToDate = 	new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.ENGLISH).parse(toDate);
+					
+                    
+					Date compareDate = 	new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").parse(formatedDate);
+				
 					if( ( compareDate.equals(compareFromDate) ||
 							compareDate.after(compareFromDate)  )  && 
 								( compareDate.before(compareToDate) || 
@@ -113,6 +124,7 @@ public class TimsResource {
 						timsListLog.setLastMod(compareDate);
 						
 						valueObj.add(timsListLog);
+						
 						
 						}
 				}

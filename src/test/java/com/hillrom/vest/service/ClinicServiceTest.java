@@ -24,7 +24,8 @@ import static org.assertj.core.api.Assertions.*;
  *
  * @see UserService
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+
+/*@RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
 @ActiveProfiles("dev")
@@ -40,7 +41,7 @@ public class ClinicServiceTest {
     
     private Clinic clinic;
     
-    private ClinicDTO clinicDTO;
+    private ClinicDTO clinicDTO;*/
     
 //    @Before
 //    public void initTest() {

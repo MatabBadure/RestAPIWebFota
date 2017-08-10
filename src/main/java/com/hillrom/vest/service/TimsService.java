@@ -552,12 +552,13 @@ public class TimsService {
 				log.debug("Inserted Protocol for Patient Successfully");
 			}catch(Exception ex){
 				ex.printStackTrace();
+				log.debug("CASE1_NeitherPatientNorDeviceExist_VEST Execution Failed when creating the New Tims ID : "+ patientInfoDTO.getTims_cust() + " in VisiView with the new Vest Device Serail Number is : "+ patientInfoDTO.getSerial_num()+" and Reason for the failure is :  "+ex.getMessage());
 				return false;
 			}				
 			
-			log.debug(patientInfoDTO.getTims_cust()+ ": Created , with Device Serial Number is "+patientInfoDTO.getSerial_num());
-			
 			log.debug("CASE1_NeitherPatientNorDeviceExist_VEST Executed Successfully");
+			log.debug(patientInfoDTO.getTims_cust()+ "  :New Patient Created , with New Vest Device Serial Number is   "+patientInfoDTO.getSerial_num());
+			
 			return true;
 		}
 		
@@ -628,11 +629,12 @@ public class TimsService {
 				createPatientProtocol(patientInfoDTO);
 				log.debug("Inserted Protocol for Patient Successfully");
 			}catch(Exception ex){
+				log.debug("CASE3_PatientHasMonarchAddVisivest_VEST Execution Failed for the Monarch Patient with Tims ID : "+patientInfoDTO.getTims_cust()+" When adding new Vest Device which is having  the serial number is "+patientInfoDTO.getSerial_num()+" and Reason for the failure is : "+ex.getMessage());
 				ex.printStackTrace();
 				return false;
 			}	
 			
-			log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
+			log.debug(" Combo Patient Created Successfully with HillromID  "+patientInfoDTO.getTims_cust());
 			log.debug(patientInfoDTO.getTims_cust()+" for this Monarch patient new Vest Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
 			log.debug("CASE3_PatientHasMonarchAddVisivest_VEST Executed Successfully");
 			return true;
@@ -670,15 +672,13 @@ public class TimsService {
 				createPatientProtocol(patientInfoDTO);
 				log.debug("Inserted Protocol for Patient Successfully");
 			}catch(Exception ex){
+				log.debug("CASE4_PatientHasDifferentVisivestSwap_VEST Execution Failed for the Tims ID : "+ patientInfoDTO.getTims_cust()+" : when  Swapping his old Vest device   "+patientInfoDTO.getOld_serial_number() +"   with new Vest Device is "+patientInfoDTO.getNew_serial_number()+" and Reason for the failure is : "+ex.getMessage());
 				ex.printStackTrace();
 				return false;
 			}	
-			log.debug(patientInfoDTO.getTims_cust()+":Swapped old Vest device is  "+patientInfoDTO.getOld_serial_number() +"   with new Vest Device is "+patientInfoDTO.getNew_serial_number());
-							
 			log.debug("CASE4_PatientHasDifferentVisivestSwap_VEST Executed Successfully");
+			log.debug(patientInfoDTO.getTims_cust()+" : Swapped old Vest device is  "+patientInfoDTO.getOld_serial_number() +"   with new Vest Device is "+patientInfoDTO.getNew_serial_number());
 			return true;
-			
-			
 		}
 		
 		return false;		
@@ -709,12 +709,13 @@ public class TimsService {
 				createPatientProtocol(patientInfoDTO);
 				log.debug("Inserted Protocol for Patient Successfully");
 			}catch(Exception ex){
+				log.debug("CASE5_DeviceOwnedByShell_VEST Execution Failed when allocating  the Shell Vest Device : "+patientInfoDTO.getSerial_num()+" to the Tims ID "+ patientInfoDTO.getTims_cust()+" and Reason for the failure is : "+ex.getMessage() );
 				ex.printStackTrace();
 				return false;
 			}
 			
-			log.debug(patientInfoDTO.getSerial_num()+"Shell VEST Device allocated to patient"+patientInfoDTO.getTims_cust());
 			log.debug("CASE5_DeviceOwnedByShell_VEST Executed Successfully");
+            log.debug(patientInfoDTO.getSerial_num()+"Shell VEST Device allocated to patient"+patientInfoDTO.getTims_cust());
 			return true;
 		}
 		
@@ -930,14 +931,15 @@ public class TimsService {
 					createPatientProtocol(patientInfoDTO);
 					log.debug("Inserted Protocol for Patient Successfully");
 				}catch(Exception ex){
+					log.debug("CASE10_PatientHasMonarchAddVisivest_VEST Execution Failed for the Monarch Patient with Tims ID : "+patientInfoDTO.getTims_cust()+" When adding new Vest Device which is having  the serial number is "+patientInfoDTO.getSerial_num()+" and Reason for the failure is : "+ex.getMessage());
 					ex.printStackTrace();
 					return false;
 				}
-				
-				log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
+				log.debug("CASE10_PatientHasMonarchAddVisivest_VEST Executed Successfully");
+				log.debug("Combo Patient Created Successfully with HillromID : "+patientInfoDTO.getTims_cust());
 				log.debug(patientInfoDTO.getTims_cust()+" for this Monarch patient new Vest Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
 								
-				log.debug("CASE10_PatientHasMonarchAddVisivest_VEST Executed Successfully");
+				
 								
 				return true;
 			}
@@ -1003,16 +1005,13 @@ public class TimsService {
 				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 
 			}catch(Exception ex){
+				log.debug("CASE12_PatientHasMonarchMergeExistingVisivest_VEST Execution Failed when the Monarch patinet with the TimsID : "+patientInfoDTO.getTims_cust()+" merging with the existing visivest Device which is having  the serial number is "+patientInfoDTO.getSerial_num()+" and Reason for the failure is : "+ex.getMessage());
 				ex.printStackTrace();
 				return false;
 			}	
-			
+			log.debug("CASE12_PatientHasMonarchMergeExistingVisivest_VEST Executed Successfully");
 			log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
 			log.debug(patientInfoDTO.getTims_cust()+" for this Monarch patient Existing Vest Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
-				
-			
-			
-			log.debug("CASE12_PatientHasMonarchMergeExistingVisivest_VEST Executed Successfully");
 			return true;
 			
 		}
@@ -1050,13 +1049,12 @@ public class TimsService {
 				createPatientProtocolMonarch(patientInfoDTO);
 				log.debug("Inserted Protocol for Patient Successfully");
 			}catch(Exception ex){
+				log.debug("CASE1_NeitherPatientNorDeviceExist_Monarch Execution Failed when creating the New Tims ID : "+ patientInfoDTO.getTims_cust() + " in VisiView with the new Monarch Device Serail Number is : "+ patientInfoDTO.getSerial_num()+" and Reason for the failure is : "+ex.getMessage());
 				ex.printStackTrace();
 				return false;
 			}	
-			
-			log.debug(patientInfoDTO.getTims_cust()+"  :New Patient Created , with Device Serial Number is "+patientInfoDTO.getSerial_num());
-			
 			log.debug("CASE1_NeitherPatientNorDeviceExist_MONARCH Executed Successfully");
+			log.debug(patientInfoDTO.getTims_cust()+"  :New Patient Created , with New Monarch Device Serial Number is "+patientInfoDTO.getSerial_num());
 			return true;
 		}
 		
@@ -1129,13 +1127,14 @@ public class TimsService {
 				createPatientProtocolMonarch(patientInfoDTO);
 				log.debug("Inserted Protocol for Patient Successfully");
 			}catch(Exception ex){
+				log.debug("CASE3_PatientHasVisivestAddMonarch_MONARCH Execution Failed for the Vest Patient with Tims ID : "+patientInfoDTO.getTims_cust()+" When adding new Monarch Device which is having  the serial number is "+patientInfoDTO.getSerial_num()+" and Reason for the failure is : "+ex.getMessage());
 				ex.printStackTrace();
 				return false;
 			}	
-			
-			log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
+			log.debug(" CASE3_PatientHasVisivestAddMonarch_MONARCH Executed Successfully ");
+			log.debug("  Combo Patient Created Successfully with HillromID  "+patientInfoDTO.getTims_cust());
 			log.debug(patientInfoDTO.getTims_cust()+" for this Vest patient new Monarch Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
-			log.debug("CASE3_PatientHasVisivestAddMonarch_MONARCH Executed Successfully");
+			
 			return true;
 			
 		}
@@ -1173,6 +1172,7 @@ public class TimsService {
 				createPatientProtocolMonarch(patientInfoDTO);
 				log.debug("Inserted Protocol for Patient Successfully");
 			}catch(Exception ex){
+				log.debug("CASE4_PatientHasDifferentMonarchSwap_MONARCH Execution Failed for the Tims ID : "+ patientInfoDTO.getTims_cust()+" : when  Swapping his  old Monarch device   "+patientInfoDTO.getOld_serial_number() +"   with new Monarch Device is "+patientInfoDTO.getNew_serial_number()+" and Reason for the failure is : "+ex.getMessage());
 				ex.printStackTrace();
 				return false;
 			}		
@@ -1215,6 +1215,7 @@ public class TimsService {
 				createPatientProtocolMonarch(patientInfoDTO);
 				log.debug("Inserted Protocol for Patient Successfully");
 			}catch(Exception ex){
+				log.debug("CASE5_DeviceOwnedByShell_Monarch Execution Failed when allocating  the Shell Monarch Device : "+patientInfoDTO.getSerial_num()+" to the Tims ID "+ patientInfoDTO.getTims_cust() +" and Reason for the failure is : "+ex.getMessage());
 				ex.printStackTrace();
 				return false;
 			}
@@ -1443,13 +1444,13 @@ public class TimsService {
 					createPatientProtocolMonarch(patientInfoDTO);
 					log.debug("Inserted Protocol for Patient Successfully");
 				}catch(Exception ex){
+					log.debug("CASE10_PatientHasVisivestAddMonarch_MONARCH Execution Failed for the Vest Patient with Tims ID : "+patientInfoDTO.getTims_cust()+" When adding new Monarch Device which is having  the serial number is "+patientInfoDTO.getSerial_num()+" and Reason for the failure is : "+ex.getMessage());
 					ex.printStackTrace();
 					return false;
 				}
 				
 				log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
 				log.debug(patientInfoDTO.getTims_cust()+" for this Vest patient new Monarch Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
-								
 				log.debug("CASE10_PatientHasVisivestAddMonarch_MONARCH Executed Successfully");
 				return true;
 			}
@@ -1515,16 +1516,14 @@ public class TimsService {
 				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 
 			}catch(Exception ex){
+				log.debug("CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH Execution Failed when the Visivest patinet with the TimsID : "+patientInfoDTO.getTims_cust()+" merging with the existing Monarch Device which is having  the serial number is "+patientInfoDTO.getSerial_num()+" and Reason for the failure is : "+ex.getMessage());
 				ex.printStackTrace();
 				return false;
 			}	
-			
+			log.debug("CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH Executed Successfully");
 			log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
 			log.debug(patientInfoDTO.getTims_cust()+" for this Vest patient Existing Monarch Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
-				
-			log.debug("CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH Executed Successfully");
 			return true;
-			
 		}
 		
 		return false;

@@ -86,7 +86,7 @@ public class TimsInputReaderService {
 		    Integer position = entry.getKey();
 		    PatientInfoDTO record = entry.getValue();
 		    log.debug("Processing record position : "+position);
-		  if(record.getDevice_type().equalsIgnoreCase("VEST") && record.getBluetooth_id()!=null && (!record.getBluetooth_id().isEmpty())){
+		  if(record.getDevice_type().equalsIgnoreCase("VEST")){
 		    	log.debug("Inside VEST loop ");
 		    	timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record);
 		    	//timsService.CASE2_PatientExistsWithNODevice_VEST(record);
@@ -103,21 +103,26 @@ public class TimsInputReaderService {
 		    	
 		    }
 
-		    if(record.getDevice_type().equalsIgnoreCase("MONARCH") && record.getBluetooth_id()!=null && (!record.getBluetooth_id().isEmpty())){
-		    	log.debug("Inside MONARCH loop ");
-		    	timsService.CASE1_NeitherPatientNorDeviceExist_MONARCH(record);
-		    	//timsService.CASE2_PatientExistsWithNODevice_MONARCH(record);
-		   	    timsService.CASE3_PatientHasVisivestAddMonarch_MONARCH(record);
-		    	timsService.CASE4_PatientHasDifferentMonarchSwap_MONARCH(record);
-		    	timsService.CASE5_DeviceOwnedByShell_MONARCH(record);
-		    	//timsService.CASE6_DeviceOwnedByDifferentPatient_MONARCH(record);
-		    	//timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_MONARCH(record);
-		    	//timsService.CASE8_DeviceIsOrphanButPatientExist_MONARCH(record);
-		    	//timsService.CASE9_PatientHasDifferentMonarchSwap_MONARCH(record);
-		    	timsService.CASE10_PatientHasVisivestAddMonarch_MONARCH(record);
-		    	//timsService.CASE11_PatientExistsWithNODevice_MONARCH(record);
-		    	timsService.CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH(record);
-		   	
+		    if(record.getDevice_type().equalsIgnoreCase("MONARCH")){
+		    	
+		    	/*If the new monarch device added is  one without connectvity then ensure that 
+		    	you dont create a combo patient in TIMS visiview code.*/
+		    	if(record.getBluetooth_id()!=null && (!record.getBluetooth_id().isEmpty()))
+		    	{
+			    	log.debug("Inside MONARCH loop ");
+			    	timsService.CASE1_NeitherPatientNorDeviceExist_MONARCH(record);
+			    	//timsService.CASE2_PatientExistsWithNODevice_MONARCH(record);
+			   	    timsService.CASE3_PatientHasVisivestAddMonarch_MONARCH(record);
+			    	timsService.CASE4_PatientHasDifferentMonarchSwap_MONARCH(record);
+			    	timsService.CASE5_DeviceOwnedByShell_MONARCH(record);
+			    	//timsService.CASE6_DeviceOwnedByDifferentPatient_MONARCH(record);
+			    	//timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_MONARCH(record);
+			    	//timsService.CASE8_DeviceIsOrphanButPatientExist_MONARCH(record);
+			    	//timsService.CASE9_PatientHasDifferentMonarchSwap_MONARCH(record);
+			    	timsService.CASE10_PatientHasVisivestAddMonarch_MONARCH(record);
+			    	//timsService.CASE11_PatientExistsWithNODevice_MONARCH(record);
+			    	timsService.CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH(record);
+		    	}
 		    }
 		}
 		

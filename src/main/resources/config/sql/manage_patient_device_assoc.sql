@@ -18,7 +18,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `manage_patient_device_assoc`(
 	IN pat_diagnosis_code4 varchar(255),
 	IN pat_garment_type varchar(255),
     IN pat_garment_size varchar(255),
-    IN pat_garment_color varchar(255)
+    IN pat_garment_color varchar(255),
+    IN pat_created_by varchar(50)
     )
 BEGIN
 
@@ -31,7 +32,7 @@ DECLARE vest_device_hillrom_id  VARCHAR(50);
 DECLARE device_hillrom_id  VARCHAR(50);
 DECLARE temp_patient_info_id  VARCHAR(50);
 
-DECLARE created_by VARCHAR(50);
+-- DECLARE created_by VARCHAR(50);
 DECLARE latest_hmr DECIMAL(10,0);
 
 DECLARE no_of_rec integer(10);
@@ -39,7 +40,7 @@ DECLARE no_of_rec integer(10);
 
 
 SET today_date = now();
-SET created_by = 'JDE APP';
+-- SET created_by = 'JDE APP';
 SET device_patient_type = 'SD';
 
 -- All cases from Leah's document "VisiView Phase 3 Test Cases for TIMs Integration"

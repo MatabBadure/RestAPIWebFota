@@ -7,7 +7,8 @@ CREATE PROCEDURE `manage_patient_device`(
     IN pat_old_device_serial_number varchar(50),
     IN pat_new_device_serial_number varchar(50),
 	IN pat_bluetooth_id varchar(50),
-    IN pat_hub_id varchar(50)
+    IN pat_hub_id varchar(50),
+    IN pat_created_by varchar(50)
     )
 BEGIN
 
@@ -15,7 +16,7 @@ DECLARE today_date date;
 DECLARE temp_serial_number VARCHAR(50);
 DECLARE temp_patient_info_id VARCHAR(50);
 DECLARE temp_bluetooth_id VARCHAR(50);
-DECLARE created_by VARCHAR(50);
+--DECLARE created_by VARCHAR(50);
 DECLARE latest_hmr DECIMAL(10,0);
 DECLARE pvdh_patient_id VARCHAR(50); 
 DECLARE pvdh_serial_number VARCHAR(50); 
@@ -24,7 +25,7 @@ DECLARE pvdh_is_active VARCHAR(10);
 
 
 SET today_date = now();
-SET created_by = 'JDE APP';
+SET -- created_by = 'JDE APP';
 
 -- check if same serial number or bluetooth_id exists for any patient
 
@@ -67,7 +68,7 @@ IF operation_type_indicator = 'CREATE' THEN
 			INSERT INTO `PATIENT_VEST_DEVICE_HISTORY`
 				(`patient_id`, `serial_number`,	`bluetooth_id`,	`hub_id`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_active`,`hmr`)
 				VALUES
-				(patient_id,pat_old_device_serial_number, pat_bluetooth_id,pat_hub_id,created_by,today_date,created_by,today_date,1,0);
+				(patient_id,pat_old_device_serial_number, pat_bluetooth_id,pat_hub_id,pat_created_by,today_date,pat_created_by,today_date,1,0);
 		END IF;	
 			
 	  COMMIT;
@@ -86,7 +87,7 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 			INSERT INTO `PATIENT_VEST_DEVICE_HISTORY`
 				(`patient_id`, `serial_number`, `hub_id`,`bluetooth_id`,`created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_active`,`hmr`,`is_pending`)
 				VALUES
-				(patient_id,pat_new_device_serial_number, pat_hub_id,pat_bluetooth_id,created_by,today_date,created_by,today_date,1,0,1);
+				(patient_id,pat_new_device_serial_number, pat_hub_id,pat_bluetooth_id,pat_created_by,today_date,pat_created_by,today_date,1,0,1);
 			
 			UPDATE `PATIENT_VEST_DEVICE_HISTORY` pvdhm SET
 			`last_modified_date` = today_date,
@@ -121,7 +122,7 @@ ELSEIF operation_type_indicator ='INACTIVATE' THEN
 			
 			UPDATE `PATIENT_VEST_DEVICE_HISTORY` pvdh SET
 			`is_active` = 0, `hmr` = IFNULL(latest_hmr,0), 
-			`last_modified_by` = created_by,
+			`last_modified_by` = pat_created_by,
 			`last_modified_date` = today_date
 			WHERE pvdh.`patient_id` = patient_id
 			AND serial_number = pat_old_device_serial_number

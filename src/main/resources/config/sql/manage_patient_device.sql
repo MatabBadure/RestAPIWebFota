@@ -8,6 +8,7 @@ CREATE PROCEDURE `manage_patient_device`(
     IN pat_new_device_serial_number varchar(50),
 	IN pat_bluetooth_id varchar(50),
     IN pat_hub_id varchar(50)
+    IN created_by varchar(50)
     )
 BEGIN
 
@@ -15,7 +16,7 @@ DECLARE today_date date;
 DECLARE temp_serial_number VARCHAR(50);
 DECLARE temp_patient_info_id VARCHAR(50);
 DECLARE temp_bluetooth_id VARCHAR(50);
-DECLARE created_by VARCHAR(50);
+--DECLARE created_by VARCHAR(50);
 DECLARE latest_hmr DECIMAL(10,0);
 DECLARE pvdh_patient_id VARCHAR(50); 
 DECLARE pvdh_serial_number VARCHAR(50); 
@@ -24,7 +25,7 @@ DECLARE pvdh_is_active VARCHAR(10);
 
 
 SET today_date = now();
-SET created_by = 'JDE APP';
+-- SET created_by = 'JDE APP';
 
 -- check if same serial number or bluetooth_id exists for any patient
 

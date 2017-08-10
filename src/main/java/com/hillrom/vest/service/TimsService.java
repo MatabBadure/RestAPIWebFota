@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Announcements;
 import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
@@ -191,7 +192,8 @@ public class TimsService {
 												patientInfoDTO.getOld_serial_number(), 
 												patientInfoDTO.getNew_serial_number(),
 												patientInfoDTO.getBluetooth_id(), 
-												patientInfoDTO.getHub_id());
+												patientInfoDTO.getHub_id(),
+												patientInfoDTO.getCreated_by());
 		}catch(Exception ex){
 			throw new HillromException("Error While invoking Stored Procedure " , ex);
 		}
@@ -223,7 +225,8 @@ public class TimsService {
 														  patientInfoDTO.getDx4(),
 														  patientInfoDTO.getGarment_type(),
 														  patientInfoDTO.getGarment_size(),
-														  patientInfoDTO.getGarment_color());
+														  patientInfoDTO.getGarment_color(),
+														  patientInfoDTO.getCreated_by());
 		}catch(Exception ex){
 			throw new HillromException("Error While invoking Stored Procedure " , ex);
 		}
@@ -260,6 +263,7 @@ public class TimsService {
 													patientInfoDTO.getAddress(), 
 													patientInfoDTO.getCity(), 
 													patientInfoDTO.getState(), 
+													patientInfoDTO.getCreated_by(),
 													null, // Following fields no longer being used from this table 
 													null, 
 													null, 
@@ -280,7 +284,8 @@ public class TimsService {
 			timsUserRepository.managePatientDeviceMonarch(patientInfoDTO.getOperation_type(), 
 				patientInfoDTO.getPatient_id(), 
 				patientInfoDTO.getOld_serial_number(), 
-				patientInfoDTO.getNew_serial_number());
+				patientInfoDTO.getNew_serial_number(),
+				patientInfoDTO.getCreated_by());
 		}catch(Exception ex){
 			throw new HillromException("Error While invoking Stored Procedure " , ex);
 		}
@@ -531,6 +536,7 @@ public class TimsService {
 
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				JSONObject returnValues =  managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
@@ -611,6 +617,7 @@ public class TimsService {
 
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDevice(patientInfoDTO);
 				log.debug("Created Device for Patient Successfully");
@@ -651,6 +658,7 @@ public class TimsService {
 
 			try{
 				patientInfoDTO.setOperation_type("UPDATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get().getSerialNumber());
 				patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
@@ -695,6 +703,7 @@ public class TimsService {
 
 			try{
 				patientInfoDTO.setOperation_type("UPDATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
@@ -909,6 +918,7 @@ public class TimsService {
 				
 				try{
 					patientInfoDTO.setOperation_type("UPDATE");
+					patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 					managePatientUser(patientInfoDTO);
 					log.debug("Updated Patient Successfully");
 					 
@@ -997,7 +1007,7 @@ public class TimsService {
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
-
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				managePatientDeviceAssociation(patientInfoDTO);
 				log.debug("Merge Associated Device for Patient Successfully");
 				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
@@ -1031,6 +1041,7 @@ public class TimsService {
 
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
@@ -1111,6 +1122,7 @@ public class TimsService {
 
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDeviceMonarch(patientInfoDTO);
@@ -1154,6 +1166,7 @@ public class TimsService {
 
 			try{
 				patientInfoDTO.setOperation_type("UPDATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get().getSerialNumber());
 				patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
@@ -1200,6 +1213,7 @@ public class TimsService {
 
 			try{
 				patientInfoDTO.setOperation_type("UPDATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
@@ -1422,6 +1436,7 @@ public class TimsService {
 				
 				try{
 					patientInfoDTO.setOperation_type("UPDATE");
+					patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 					managePatientUser(patientInfoDTO);
 					log.debug("Updated Patient Successfully");
 					 
@@ -1509,7 +1524,7 @@ public class TimsService {
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
-
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				managePatientDeviceAssociation(patientInfoDTO);
 				log.debug("Merge Associated Device for Patient Successfully");
 				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());

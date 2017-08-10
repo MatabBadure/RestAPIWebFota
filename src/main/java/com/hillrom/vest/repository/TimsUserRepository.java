@@ -70,6 +70,7 @@ public class TimsUserRepository{
 										String inPatientAddress,
 										String inPatientCity,
 										String inPatientState,
+										String inCreatedBy,
 										String inPatientTrainingDate,
 										String inPatientPrimaryDiagnosis,
 										String inPatientgarmentType,
@@ -88,7 +89,7 @@ public class TimsUserRepository{
 
 
 				 
-				  CallableStatement callableStatement = connection.prepareCall("{call manage_patient_user(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+				  CallableStatement callableStatement = connection.prepareCall("{call manage_patient_user(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
 
 				  callableStatement.setString(1, operationTypeIndicator);
 				  callableStatement.setString(2, inhillRomId);
@@ -109,17 +110,18 @@ public class TimsUserRepository{
 				  callableStatement.setString(17, inPatientAddress);
 				  callableStatement.setString(18, inPatientCity);
 				  callableStatement.setString(19, inPatientState);
-				  callableStatement.setString(20, inPatientTrainingDate);
-				  callableStatement.setString(21, inPatientPrimaryDiagnosis);
-				  callableStatement.setString(22, inPatientgarmentType);
-				  callableStatement.setString(23, inPatientGarmentSize);
-				  callableStatement.setString(24, inPatientGarmentColor);			  
-				  callableStatement.registerOutParameter(25, Types.VARCHAR);
+				  callableStatement.setString(20, inCreatedBy); 
+				  callableStatement.setString(21, inPatientTrainingDate);
+				  callableStatement.setString(22, inPatientPrimaryDiagnosis);
+				  callableStatement.setString(23, inPatientgarmentType);
+				  callableStatement.setString(24, inPatientGarmentSize);
+				  callableStatement.setString(25, inPatientGarmentColor);			  
 				  callableStatement.registerOutParameter(26, Types.VARCHAR);
+				  callableStatement.registerOutParameter(27, Types.VARCHAR);
 				  callableStatement.execute();
 
-				  String outPatientId = callableStatement.getString(25);
-				  String outPatientUser = callableStatement.getString(26);
+				  String outPatientId = callableStatement.getString(26);
+				  String outPatientUser = callableStatement.getString(27);
 				
 				
 				returnValues.put("return_patient_id", outPatientId);
@@ -184,7 +186,8 @@ public class TimsUserRepository{
 			String inPatientoldDeviceSerialNumber,
 			String inPatientNewDeviceSerialNumber,
 			String inPatientBluetoothId,
-			String inPatientHubId) throws Exception{
+			String inPatientHubId,
+			String inCreatedBy) throws Exception{
 			
 				try{
 					entityManager
@@ -194,13 +197,15 @@ public class TimsUserRepository{
 					+ ":pat_old_device_serial_number,"
 					+ ":pat_new_device_serial_number,"
 					+ ":pat_bluetooth_id,"				   		
-					+ ":pat_hub_id)")
+					+ ":pat_hub_id,"
+					+ ":created_by)")
 					.setParameter("operation_type", operationType)
 					.setParameter("patient_id", inPatientId)
 					.setParameter("pat_old_device_serial_number",inPatientoldDeviceSerialNumber)
 					.setParameter("pat_new_device_serial_number", inPatientNewDeviceSerialNumber)
 					.setParameter("pat_bluetooth_id", inPatientBluetoothId)
-					.setParameter("pat_hub_id",inPatientHubId)					
+					.setParameter("pat_hub_id",inPatientHubId)	
+					.setParameter("created_by",inCreatedBy)
 					.executeUpdate();
 				}catch(Exception ex){
 					ex.printStackTrace();
@@ -225,7 +230,8 @@ public class TimsUserRepository{
 			String inpatientDiagnosisCode4,
 			String inpatientGarmentType,
 			String inpatientGarmentSize,
-			String inpatientGarmentColor) throws Exception{
+			String inpatientGarmentColor,
+			String inCreatedBy) throws Exception{
 			
 			
 					entityManager
@@ -244,7 +250,8 @@ public class TimsUserRepository{
 					+ ":pat_diagnosis_code4,"
 					+ ":pat_garment_type,"
 					+ ":pat_garment_size,"
-					+ ":pat_garment_color)")
+					+ ":pat_garment_color,"
+					+ ":created_by)")
 					.setParameter("operation_type_indicator", operationType)
 					.setParameter("pat_patient_id", inpatientPatientId)
 					.setParameter("pat_device_type",inpatientDeviceType)
@@ -260,6 +267,7 @@ public class TimsUserRepository{
 					.setParameter("pat_garment_type", inpatientGarmentType)
 					.setParameter("pat_garment_size", inpatientGarmentSize)
 					.setParameter("pat_garment_color", inpatientGarmentColor)
+					.setParameter("created_by", inCreatedBy)
 					.executeUpdate();
 					
 			
@@ -274,18 +282,21 @@ public class TimsUserRepository{
 			public void managePatientDeviceMonarch(String operationTypeIndicator,
 						String inPatientId,
 						String inPatientoldDeviceSerialNumber,
-						String inPatientNewDeviceSerialNumber) throws Exception{
+						String inPatientNewDeviceSerialNumber,
+						String inCreatedBy) throws Exception{
 			
 					entityManager
 					.createNativeQuery("call manage_patient_device_monarch("
 					+ ":operation_type_indicator,"
 					+ ":patient_id,"
 					+ ":pat_old_device_serial_number,"			   		
-					+ ":pat_new_device_serial_number)")
+					+ ":pat_new_device_serial_number,"
+					+ ":created_by)")
 					.setParameter("operation_type_indicator", operationTypeIndicator)
 					.setParameter("patient_id", inPatientId)
 					.setParameter("pat_old_device_serial_number",inPatientoldDeviceSerialNumber)
-					.setParameter("pat_new_device_serial_number", inPatientNewDeviceSerialNumber)			
+					.setParameter("pat_new_device_serial_number", inPatientNewDeviceSerialNumber)
+					.setParameter("created_by", inCreatedBy)
 					.executeUpdate();
 
 			}

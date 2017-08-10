@@ -21,6 +21,7 @@ CREATE PROCEDURE `manage_patient_user`(
 	IN pat_address varchar(255),
     IN pat_city varchar(255),
     IN pat_state varchar(255),
+    IN created_by varchar(50),
     IN pat_training_date datetime,
 	IN pat_primary_diagnosis varchar(255),
     IN pat_garment_type varchar(255),
@@ -31,7 +32,7 @@ CREATE PROCEDURE `manage_patient_user`(
 )
 BEGIN
 
-    DECLARE created_by varchar(255);
+   --  DECLARE created_by varchar(255);
     DECLARE created_date datetime;
     DECLARE encrypted_password varchar(60);
     DECLARE gen_patient_id varchar(255);
@@ -43,7 +44,7 @@ BEGIN
         RESIGNAL;
     END;
 		 
-	SET created_by = 'JDE APP';
+	-- SET created_by = 'JDE APP';
     SET encrypted_password = encrypt(CONCAT(CAST(pat_zipcode AS CHAR),SUBSTRING(pat_last_name,1,4),CAST(DATE_FORMAT(pat_dob,'%m%d%Y') AS CHAR)));
 -- Creare patient user when operation_type_indicator CREATE,
 	

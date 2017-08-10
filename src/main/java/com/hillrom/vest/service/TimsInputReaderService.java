@@ -86,7 +86,7 @@ public class TimsInputReaderService {
 		    Integer position = entry.getKey();
 		    PatientInfoDTO record = entry.getValue();
 		    log.debug("Processing record position : "+position);
-		  if(record.getDevice_type().equalsIgnoreCase("VEST")){
+		  if(record.getDevice_type().equalsIgnoreCase("VEST") && record.getBluetooth_id()!=null && (!record.getBluetooth_id().isEmpty())){
 		    	log.debug("Inside VEST loop ");
 		    	timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record);
 		    	//timsService.CASE2_PatientExistsWithNODevice_VEST(record);
@@ -103,7 +103,7 @@ public class TimsInputReaderService {
 		    	
 		    }
 
-		    if(record.getDevice_type().equalsIgnoreCase("MONARCH")){
+		    if(record.getDevice_type().equalsIgnoreCase("MONARCH") && record.getBluetooth_id()!=null && (!record.getBluetooth_id().isEmpty())){
 		    	log.debug("Inside MONARCH loop ");
 		    	timsService.CASE1_NeitherPatientNorDeviceExist_MONARCH(record);
 		    	//timsService.CASE2_PatientExistsWithNODevice_MONARCH(record);

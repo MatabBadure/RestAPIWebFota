@@ -4,6 +4,7 @@ import static com.hillrom.vest.config.Constants.RELATION_LABEL_SELF;
 import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
 
 import java.sql.CallableStatement;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.List;
@@ -74,7 +75,7 @@ public class TimsUserRepository{
 										String inPatientPrimaryDiagnosis,
 										String inPatientgarmentType,
 										String inPatientGarmentSize,
-										String inPatientGarmentColor)  throws Exception{
+										String inPatientGarmentColor)  throws SQLException,Exception{
 
 		
 			JSONObject returnValues = new JSONObject();
@@ -126,8 +127,14 @@ public class TimsUserRepository{
 				returnValues.put("return_user_id", outPatientUser);
 				
 			}
+			catch(SQLException se)
+			{
+				throw se;
+				//log.debug(se.getMessage());
+			}
 			catch(Exception ex){
-				ex.printStackTrace();
+			
+				//ex.printStackTrace();
 				return returnValues;
 			}
 				
@@ -140,7 +147,9 @@ public class TimsUserRepository{
 			public void createPatientProtocolMonarch(String typeKey,
 						  String operationType,
 						  String inPatientId,
-						  String inCreatedBy) throws Exception{
+						  String inCreatedBy) throws SQLException ,Exception{
+				try{
+				
 				entityManager
 				.createNativeQuery("call create_patient_protocol_monarch("
 				+ ":type_key,"
@@ -152,7 +161,11 @@ public class TimsUserRepository{
 				.setParameter("inPatientId",inPatientId)
 				.setParameter("inCreatedBy", inCreatedBy)
 				.executeUpdate();
-				
+				}
+						
+				catch(Exception ex){
+					ex.printStackTrace();
+				}
 
 			
 			}
@@ -161,8 +174,8 @@ public class TimsUserRepository{
 			public void createPatientProtocol(String typeKey,
 					 String operationType,
 					 String inPatientId,
-					 String inCreatedBy) throws Exception{
-			
+					 String inCreatedBy) throws SQLException,Exception{
+				try{
 				entityManager
 				.createNativeQuery("call create_patient_protocol("
 				+ ":type_key,"
@@ -174,6 +187,10 @@ public class TimsUserRepository{
 				.setParameter("inPatientId",inPatientId)
 				.setParameter("inCreatedBy", inCreatedBy)
 				.executeUpdate();
+				}
+				catch(Exception ex){
+					ex.printStackTrace();
+				}
 				
 			}
 			
@@ -184,7 +201,7 @@ public class TimsUserRepository{
 			String inPatientoldDeviceSerialNumber,
 			String inPatientNewDeviceSerialNumber,
 			String inPatientBluetoothId,
-			String inPatientHubId) throws Exception{
+			String inPatientHubId) throws SQLException,Exception{
 			
 				try{
 					entityManager
@@ -225,9 +242,9 @@ public class TimsUserRepository{
 			String inpatientDiagnosisCode4,
 			String inpatientGarmentType,
 			String inpatientGarmentSize,
-			String inpatientGarmentColor) throws Exception{
+			String inpatientGarmentColor) throws SQLException, Exception{
 			
-			
+				try{
 					entityManager
 					.createNativeQuery("call manage_patient_device_assoc("
 					+ ":operation_type_indicator,"
@@ -262,7 +279,9 @@ public class TimsUserRepository{
 					.setParameter("pat_garment_color", inpatientGarmentColor)
 					.executeUpdate();
 					
-			
+				}catch(Exception ex){
+					ex.printStackTrace();
+				}
 			
 			}
 			
@@ -274,8 +293,8 @@ public class TimsUserRepository{
 			public void managePatientDeviceMonarch(String operationTypeIndicator,
 						String inPatientId,
 						String inPatientoldDeviceSerialNumber,
-						String inPatientNewDeviceSerialNumber) throws Exception{
-			
+						String inPatientNewDeviceSerialNumber) throws SQLException ,Exception{
+				try{
 					entityManager
 					.createNativeQuery("call manage_patient_device_monarch("
 					+ ":operation_type_indicator,"
@@ -287,6 +306,9 @@ public class TimsUserRepository{
 					.setParameter("pat_old_device_serial_number",inPatientoldDeviceSerialNumber)
 					.setParameter("pat_new_device_serial_number", inPatientNewDeviceSerialNumber)			
 					.executeUpdate();
+				}catch(Exception ex){
+					ex.printStackTrace();
+				}
 
 			}
    
@@ -303,8 +325,8 @@ public class TimsUserRepository{
                                                                                 int min_pressure,
                                                                                 int max_pressure,
                                                                                 int to_be_inserted,
-                                                                                String user_id) throws Exception{
-           
+                                                                                String user_id) throws SQLException,Exception{
+				try{
                          entityManager
                          .createNativeQuery("insert into protocol_data_temp_table("
                                 + "patient_id,"
@@ -344,6 +366,11 @@ public class TimsUserRepository{
                          .setParameter("to_be_inserted",to_be_inserted)
                          .setParameter("id", user_id)                                 
                          .executeUpdate();
+				}
+				
+				catch(Exception ex){
+					ex.printStackTrace();
+				}
            
 
             }

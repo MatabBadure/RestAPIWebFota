@@ -43,7 +43,7 @@ public class HillromIdGenerator {
 		BigInteger id = (BigInteger) query.getSingleResult();
 		int idValue = id == null ? 0 : id.intValue(); 
 		String updateQuery = null;
-		if(null == id || id.equals(0)){
+		if(null == id || id.equals(new BigInteger("0"))){
 			++idValue;
 			updateQuery = "insert into clinic_id_sequence(id) values(1)";
 		}else{

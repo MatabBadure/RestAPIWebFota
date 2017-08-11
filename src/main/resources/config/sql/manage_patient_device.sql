@@ -25,7 +25,7 @@ DECLARE pvdh_is_active VARCHAR(10);
 
 
 SET today_date = now();
-SET -- created_by = 'JDE APP';
+-- SET created_by = 'JDE APP';
 
 -- check if same serial number or bluetooth_id exists for any patient
 

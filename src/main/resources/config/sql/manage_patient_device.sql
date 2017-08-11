@@ -16,7 +16,6 @@ DECLARE today_date date;
 DECLARE temp_serial_number VARCHAR(50);
 DECLARE temp_patient_info_id VARCHAR(50);
 DECLARE temp_bluetooth_id VARCHAR(50);
---DECLARE created_by VARCHAR(50);
 DECLARE latest_hmr DECIMAL(10,0);
 DECLARE pvdh_patient_id VARCHAR(50); 
 DECLARE pvdh_serial_number VARCHAR(50); 
@@ -25,7 +24,6 @@ DECLARE pvdh_is_active VARCHAR(10);
 
 
 SET today_date = now();
-SET -- created_by = 'JDE APP';
 
 -- check if same serial number or bluetooth_id exists for any patient
 

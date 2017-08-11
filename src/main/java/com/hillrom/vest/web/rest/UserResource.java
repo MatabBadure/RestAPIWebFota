@@ -1115,12 +1115,12 @@ public class UserResource {
 			List<PatientVestDeviceData>	vestdeviceData = new LinkedList<>();
 			List<PatientVestDeviceDataMonarch> monarchdeviceData = new LinkedList<>();
 
-			if(Objects.nonNull(checkPatientTypeMonarch.getOldPatientId())){
+			if(Objects.nonNull(checkPatientTypeMonarch) && Objects.nonNull(checkPatientTypeMonarch.getOldPatientId())){
 				patientId = checkPatientTypeMonarch.getOldPatientId();
 				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
 				monarchdeviceData.addAll(monarchdeviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
 
-			}else if(Objects.nonNull(checkPatientTypeVest.getOldPatientId())){
+			}else if(Objects.nonNull(checkPatientTypeVest) && Objects.nonNull(checkPatientTypeVest.getOldPatientId())){
 				patientId = checkPatientTypeVest.getOldPatientId();
 				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
 				vestdeviceData.addAll(deviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));

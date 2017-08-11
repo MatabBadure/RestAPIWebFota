@@ -5,14 +5,15 @@ CREATE PROCEDURE `manage_patient_device_monarch`(
 	IN operation_type_indicator VARCHAR(10),
     IN patient_id varchar(50), 
     IN pat_old_device_serial_number varchar(50),
-    IN pat_new_device_serial_number varchar(50)
+    IN pat_new_device_serial_number varchar(50),
+    IN pat_created_by varchar(50)
     )
 BEGIN
 
 DECLARE today_date date;
 DECLARE temp_serial_number VARCHAR(50);
 DECLARE temp_patient_info_id VARCHAR(50);
-DECLARE created_by VARCHAR(50);
+-- DECLARE created_by VARCHAR(50);
 DECLARE latest_hmr DECIMAL(10,0);
 
 DECLARE pvdhm_patient_id VARCHAR(50); 
@@ -23,7 +24,7 @@ DECLARE pvdhm_is_active VARCHAR(10);
 
 
 SET today_date = now();
-SET created_by = 'JDE APP';
+-- SET created_by = 'JDE APP';
 
 -- check if same serial number or bluetooth_id exists for any patient
 
@@ -68,7 +69,7 @@ IF operation_type_indicator = 'CREATE' THEN
 			INSERT INTO `PATIENT_VEST_DEVICE_HISTORY_MONARCH`
 				(`patient_id`, `serial_number`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_active`,`hmr`)
 				VALUES
-				(patient_id,pat_old_device_serial_number, created_by,today_date,created_by,today_date,1,0);
+				(patient_id,pat_old_device_serial_number, pat_created_by,today_date,pat_created_by,today_date,1,0);
 		END IF;		
 
 			
@@ -88,7 +89,7 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 			INSERT INTO `PATIENT_VEST_DEVICE_HISTORY_MONARCH`
 				(`patient_id`, `serial_number`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_active`,`hmr`,`is_pending`)
 				VALUES
-				(patient_id,pat_new_device_serial_number, created_by,today_date,created_by,today_date,1,0,1);
+				(patient_id,pat_new_device_serial_number, pat_created_by,today_date,pat_created_by,today_date,1,0,1);
 			
 			UPDATE `PATIENT_VEST_DEVICE_HISTORY_MONARCH` pvdhm SET
 			`last_modified_date` = today_date,
@@ -121,7 +122,7 @@ ELSEIF operation_type_indicator ='INACTIVATE' THEN
 			
 			UPDATE `PATIENT_VEST_DEVICE_HISTORY_MONARCH` pvdhm SET
 			`is_active` = 0, `hmr` = IFNULL(latest_hmr,0), 
-			`last_modified_by` = created_by,
+			`last_modified_by` = pat_created_by,
 			`last_modified_date` = today_date
 			WHERE pvdhm.`patient_id` = patient_id
 			AND serial_number = pat_old_device_serial_number;

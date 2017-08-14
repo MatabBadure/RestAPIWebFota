@@ -341,7 +341,7 @@ public class TimsService {
 	   	  content +=  line;
 	   	  while ((line = reader.readLine()) != null)
 	   	  {
-	   	     content += "\n" + line;
+	   	     content += line;
 	   	    	    	     
 	   	  }
 	   	
@@ -595,7 +595,7 @@ public class TimsService {
 								patientInfoDTO.getTims_cust() + 
 							" in VisiView with the new Vest Device Serial Number is : "+ 
 								patientInfoDTO.getSerial_num() +
-							" Reason for the failure is :  "+
+							", Reason for the failure is :  "+
 								se.getMessage()	);
 				
 				se.printStackTrace();
@@ -603,12 +603,12 @@ public class TimsService {
 			}
 			
 			catch(Exception ex){
-				/*log.debug("Execution Failed when creating the New TIMs ID : "+ 
+				log.debug("Execution Failed when creating the New TIMs ID : "+ 
 								patientInfoDTO.getTims_cust() + 
 							" in VisiView with the new Vest Device Serial Number is : "+ 
 								patientInfoDTO.getSerial_num() +
-							" Reason for the failure is :  "+
-								ex.getCause().getMessage());*/
+							", Reason for the failure is :  "+
+								ex.getCause().getMessage());
 				ex.printStackTrace();
 				return false;
 			}				
@@ -689,7 +689,7 @@ public class TimsService {
 								patientInfoDTO.getTims_cust()+
 							" when adding new Vest Device which is having  the serial number is "+
 								patientInfoDTO.getSerial_num() +
-							" Reason for the failure is : "+
+							", Reason for the failure is : "+
 								se.getMessage());
 				se.printStackTrace();
 				return false;
@@ -700,7 +700,7 @@ public class TimsService {
 								patientInfoDTO.getTims_cust()+
 							" when adding new Vest Device which is having  the serial number is "+
 								patientInfoDTO.getSerial_num() +
-							" Reason for the failure is : "+
+							", Reason for the failure is : "+
 								ex.getCause().getMessage());
 				ex.printStackTrace();
 				return false;
@@ -750,7 +750,7 @@ public class TimsService {
 								patientInfoDTO.getOld_serial_number() +
 							" with new Vest Device is "+
 								patientInfoDTO.getNew_serial_number() +
-							" Reason for the failure is : "+
+							", Reason for the failure is : "+
 								se.getMessage());
 				se.printStackTrace();
 				return false;
@@ -762,7 +762,7 @@ public class TimsService {
 								patientInfoDTO.getOld_serial_number() +
 							" with new Vest Device is "+
 								patientInfoDTO.getNew_serial_number() +
-							" Reason for the failure is : "+
+							", Reason for the failure is : "+
 								ex.getCause().getMessage());
 				
 				ex.printStackTrace();

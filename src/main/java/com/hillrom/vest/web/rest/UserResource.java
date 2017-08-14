@@ -1105,8 +1105,29 @@ public class UserResource {
 		
 		try{		
 		
+			PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(id);
+			
+			PatientDevicesAssoc checkPatientTypeVest = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
+			PatientDevicesAssoc checkPatientTypeMonarch = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
+			
+			String patientId;
+
+			List<PatientVestDeviceData>	vestdeviceData = new LinkedList<>();
+			List<PatientVestDeviceDataMonarch> monarchdeviceData = new LinkedList<>();
+
+			if(Objects.nonNull(checkPatientTypeMonarch) && Objects.nonNull(checkPatientTypeMonarch.getOldPatientId())){
+				patientId = checkPatientTypeMonarch.getOldPatientId();
+				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
+				monarchdeviceData.addAll(monarchdeviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
+
+			}else if(Objects.nonNull(checkPatientTypeVest) && Objects.nonNull(checkPatientTypeVest.getOldPatientId())){
+				patientId = checkPatientTypeVest.getOldPatientId();
+				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
+				vestdeviceData.addAll(deviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
+			}
+			
 			if(deviceType.equals("VEST")){
-				List<PatientVestDeviceData>	vestdeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
+				vestdeviceData.addAll(deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp));
 
 				if(!vestdeviceData.isEmpty() ){
 
@@ -1116,8 +1137,7 @@ public class UserResource {
 	            }
 	
 			}else if(deviceType.equals("MONARCH")){
-				List<PatientVestDeviceDataMonarch> monarchdeviceData = monarchdeviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
-
+				monarchdeviceData.addAll(monarchdeviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp));
 
 				if(!monarchdeviceData.isEmpty() ){
 
@@ -1128,26 +1148,8 @@ public class UserResource {
 
 			}else if(deviceType.equals("ALL")){
 				
-				PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(id);
-				
-				PatientDevicesAssoc checkPatientTypeVest = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
-				PatientDevicesAssoc checkPatientTypeMonarch = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
-				
-				String patientId;
-				String vestPatientId = patient.getId();
-				String monarchPatientId = patient.getId();
-				if(Objects.nonNull(checkPatientTypeMonarch.getOldPatientId())){
-					patientId = checkPatientTypeMonarch.getOldPatientId();
-					PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
-					monarchPatientId = patientInfoOld.getId();
-				}else if(Objects.nonNull(checkPatientTypeVest.getOldPatientId())){
-					patientId = checkPatientTypeVest.getOldPatientId();
-					PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
-					vestPatientId = patientInfoOld.getId();
-				}				
-				
-				List<PatientVestDeviceData>	vestdeviceData = deviceDataRepository.findByPatientIdAndTimestampBetween(vestPatientId, fromTimestamp, toTimestamp);				
-				List<PatientVestDeviceDataMonarch> monarchdeviceData = monarchdeviceDataRepository.findByPatientIdAndTimestampBetween(monarchPatientId, fromTimestamp, toTimestamp);
+				monarchdeviceData.addAll(monarchdeviceDataRepository.findByPatientIdAndTimestampBetween(patient.getId(), fromTimestamp, toTimestamp));
+				vestdeviceData.addAll(deviceDataRepository.findByPatientIdAndTimestampBetween(patient.getId(), fromTimestamp, toTimestamp));
 				
 				if(!vestdeviceData.isEmpty() && monarchdeviceData.isEmpty() ){
 	            	excelOutputService.createExcelOutputExcel(response, vestdeviceData);
@@ -1159,8 +1161,6 @@ public class UserResource {
 	            	response.setStatus(204);
 	            }
 			}
-
-		
 
         } catch (Exception ex) {
         	response.setStatus(500);

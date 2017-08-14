@@ -1199,7 +1199,7 @@ public class TimsService {
 			{
 				log.debug("Execution Failed when creating the New TIMs ID : "+ 
 								patientInfoDTO.getTims_cust() + 
-						" in VisiView with the new Monarch Device Serail Number is : "+ 
+						" in VisiView with the new Monarch Device Serial Number is : "+ 
 								patientInfoDTO.getSerial_num() +
 						", Reason for the failure is : "
 								+se.getMessage());
@@ -1210,7 +1210,7 @@ public class TimsService {
 			catch(Exception ex){
 				log.debug("Execution Failed when creating the New TIMs ID : "+ 
 								patientInfoDTO.getTims_cust() + 
-							" in VisiView with the new Monarch Device Serail Number is : "+ 
+							" in VisiView with the new Monarch Device Serial Number is : "+ 
 								patientInfoDTO.getSerial_num() +
 							", Reason for the failure is : "+
 								ex.getCause().getMessage());

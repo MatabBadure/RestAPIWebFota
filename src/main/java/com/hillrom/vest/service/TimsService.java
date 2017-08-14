@@ -595,7 +595,7 @@ public class TimsService {
 								patientInfoDTO.getTims_cust() + 
 							" in VisiView with the new Vest Device Serial Number is : "+ 
 								patientInfoDTO.getSerial_num() +
-							", \n Reason for the failure is :  "+
+							", Reason for the failure is :  "+
 								se.getMessage()	);
 				
 				se.printStackTrace();
@@ -607,7 +607,7 @@ public class TimsService {
 								patientInfoDTO.getTims_cust() + 
 							" in VisiView with the new Vest Device Serial Number is : "+ 
 								patientInfoDTO.getSerial_num() +
-							", \n Reason for the failure is :  "+
+							", Reason for the failure is :  "+
 								ex.getCause().getMessage());
 				ex.printStackTrace();
 				return false;
@@ -689,7 +689,7 @@ public class TimsService {
 								patientInfoDTO.getTims_cust()+
 							" when adding new Vest Device which is having  the serial number is "+
 								patientInfoDTO.getSerial_num() +
-							", \n Reason for the failure is : "+
+							", Reason for the failure is : "+
 								se.getMessage());
 				se.printStackTrace();
 				return false;
@@ -700,7 +700,7 @@ public class TimsService {
 								patientInfoDTO.getTims_cust()+
 							" when adding new Vest Device which is having  the serial number is "+
 								patientInfoDTO.getSerial_num() +
-							", \n Reason for the failure is : "+
+							", Reason for the failure is : "+
 								ex.getCause().getMessage());
 				ex.printStackTrace();
 				return false;
@@ -750,7 +750,7 @@ public class TimsService {
 								patientInfoDTO.getOld_serial_number() +
 							" with new Vest Device is "+
 								patientInfoDTO.getNew_serial_number() +
-							", \n Reason for the failure is : "+
+							", Reason for the failure is : "+
 								se.getMessage());
 				se.printStackTrace();
 				return false;
@@ -762,7 +762,7 @@ public class TimsService {
 								patientInfoDTO.getOld_serial_number() +
 							" with new Vest Device is "+
 								patientInfoDTO.getNew_serial_number() +
-							", \n Reason for the failure is : "+
+							", Reason for the failure is : "+
 								ex.getCause().getMessage());
 				
 				ex.printStackTrace();
@@ -808,7 +808,7 @@ public class TimsService {
 								patientInfoDTO.getSerial_num()+
 							" to the TIMs ID "+ 
 								patientInfoDTO.getTims_cust() +
-							", \n Reason for the failure is : "+
+							", Reason for the failure is : "+
 								se.getMessage());
 				se.printStackTrace();
 				return false;
@@ -819,7 +819,7 @@ public class TimsService {
 								patientInfoDTO.getSerial_num()+
 							" to the TIMs ID "+ 
 								patientInfoDTO.getTims_cust() +
-							", \n Reason for the failure is : "+ex.getCause().getMessage());
+							", Reason for the failure is : "+ex.getCause().getMessage());
 				
 				ex.printStackTrace();
 				return false;
@@ -1044,7 +1044,7 @@ public class TimsService {
 									patientInfoDTO.getTims_cust()+
 								" when adding new Vest Device which is having  the serial number is "+
 									patientInfoDTO.getSerial_num() +
-								", \n Reason for the failure is : "+
+								", Reason for the failure is : "+
 									se.getMessage());
 					
 					se.printStackTrace();
@@ -1056,7 +1056,7 @@ public class TimsService {
 									patientInfoDTO.getTims_cust()+
 								" when adding new Vest Device which is having  the serial number is "+
 									patientInfoDTO.getSerial_num()+
-								", \n Reason for the failure is : "+
+								", Reason for the failure is : "+
 									ex.getCause().getMessage());
 					
                     ex.printStackTrace();
@@ -1135,7 +1135,7 @@ public class TimsService {
 								patientInfoDTO.getTims_cust()+
 							" merging with the existing visivest Device which is having  the serial number is "+
 								patientInfoDTO.getSerial_num() +
-							", \n Reason for the failure is : "+se.getMessage());
+							", Reason for the failure is : "+se.getMessage());
 				
 				se.printStackTrace();
 				return false;
@@ -1146,7 +1146,7 @@ public class TimsService {
 								patientInfoDTO.getTims_cust()+
 						" merging with the existing visivest Device which is having  the serial number is "+
 								patientInfoDTO.getSerial_num() + 
-						", \n Reason for the failure is : "+
+						", Reason for the failure is : "+
 								ex.getCause().getMessage());
 				
 				ex.printStackTrace();
@@ -1201,7 +1201,7 @@ public class TimsService {
 								patientInfoDTO.getTims_cust() + 
 						" in VisiView with the new Monarch Device Serail Number is : "+ 
 								patientInfoDTO.getSerial_num() +
-						", \n Reason for the failure is : "
+						", Reason for the failure is : "
 								+se.getMessage());
 				
 				se.printStackTrace();
@@ -1212,7 +1212,7 @@ public class TimsService {
 								patientInfoDTO.getTims_cust() + 
 							" in VisiView with the new Monarch Device Serail Number is : "+ 
 								patientInfoDTO.getSerial_num() +
-							", \n Reason for the failure is : "+
+							", Reason for the failure is : "+
 								ex.getCause().getMessage());
 				
 				ex.printStackTrace();
@@ -1296,7 +1296,7 @@ public class TimsService {
 								patientInfoDTO.getTims_cust()+
 							" When adding new Monarch Device which is having  the serial number is "+
 								patientInfoDTO.getSerial_num() + 
-							", \n Reason for the failure is : "+
+							", Reason for the failure is : "+
 								se.getMessage());
 				
 				se.printStackTrace();
@@ -1307,7 +1307,7 @@ public class TimsService {
 								patientInfoDTO.getTims_cust()+
 						" When adding new Monarch Device which is having  the serial number is "+
 								patientInfoDTO.getSerial_num() + 
-						", \n Reason for the failure is : "+
+						", Reason for the failure is : "+
 								ex.getCause().getMessage());
 				
 				ex.printStackTrace();
@@ -1360,7 +1360,7 @@ public class TimsService {
 								patientInfoDTO.getOld_serial_number() +
 							" with new Monarch Device is "+
 								patientInfoDTO.getNew_serial_number() +
-							", \n Reason for the failure is : "+
+							", Reason for the failure is : "+
 								se.getMessage());
 				
 				se.printStackTrace();
@@ -1373,7 +1373,7 @@ public class TimsService {
 								patientInfoDTO.getOld_serial_number() +
 							" with new Monarch Device is "+
 								patientInfoDTO.getNew_serial_number() +
-							", \n Reason for the failure is : "+
+							", Reason for the failure is : "+
 								ex.getCause().getMessage());
 				
 				ex.printStackTrace();
@@ -1422,7 +1422,7 @@ public class TimsService {
 								patientInfoDTO.getSerial_num()+
 							" to the TIMs ID "+ 
 								patientInfoDTO.getTims_cust() +
-							", \n Reason for the failure is : "+
+							", Reason for the failure is : "+
 								se.getMessage());
 				
 				se.printStackTrace();
@@ -1433,7 +1433,7 @@ public class TimsService {
 								patientInfoDTO.getSerial_num()+
 							" to the TIMs ID "+ 
 								patientInfoDTO.getTims_cust() +
-							", \n Reason for the failure is : "+
+							", Reason for the failure is : "+
 								ex.getCause().getMessage());
 								
 				ex.printStackTrace();
@@ -1666,7 +1666,7 @@ public class TimsService {
 									patientInfoDTO.getTims_cust()+
 							" when adding new Monarch Device which is having  the serial number is "+
 									patientInfoDTO.getSerial_num() +
-							", \n Reason for the failure is : "+
+							", Reason for the failure is : "+
 									se.getMessage());
 					
 					se.printStackTrace();
@@ -1678,7 +1678,7 @@ public class TimsService {
 									patientInfoDTO.getTims_cust()+
 								" when adding new Monarch Device which is having  the serial number is "+
 									patientInfoDTO.getSerial_num() +
-								", \n Reason for the failure is : "+
+								", Reason for the failure is : "+
 									ex.getCause().getMessage()	);
 					
 					ex.printStackTrace();
@@ -1756,7 +1756,7 @@ public class TimsService {
 								patientInfoDTO.getTims_cust()+
 							" merging with the existing Monarch Device which is having  the serial number is "+
 								patientInfoDTO.getSerial_num() +
-							", \n Reason for the failure is : "+se.getMessage());
+							", Reason for the failure is : "+se.getMessage());
 				
 				se.printStackTrace();
 				return false;
@@ -1766,7 +1766,7 @@ public class TimsService {
 								patientInfoDTO.getTims_cust()+
 							" merging with the existing Monarch Device which is having  the serial number is "+
 								patientInfoDTO.getSerial_num() +
-							", \n Reason for the failure is : "+
+							", Reason for the failure is : "+
 								ex.getCause().getMessage());
 				
 				ex.printStackTrace();

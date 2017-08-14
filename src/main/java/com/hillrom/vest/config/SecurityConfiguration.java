@@ -93,11 +93,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/account/update_passwordsecurityquestion").permitAll()
             .antMatchers("/api/receiveData").permitAll()
             .antMatchers("/api/receiveDataCharger").permitAll()
+            .antMatchers("/api/receiveDataOptimus").permitAll()
             .antMatchers("/api/patient/{id}/vestdevicedata").permitAll()
             .antMatchers("/api/vestdevicedata").permitAll()
             .antMatchers("/api/chargerdevicedata").permitAll()
             .antMatchers("/api/chargerdevicedatalist").permitAll()
-            .antMatchers("/api/chargerdevicedata/{id}").permitAll()            
+            .antMatchers("/api/chargerdevicedata/{id}").permitAll() 
+            .antMatchers("/api/optimusdevicedata").permitAll()
+            .antMatchers("/api/optimusDeviceData/{id}").permitAll()
+            .antMatchers("/api/optimusdevicedatalist").permitAll()
             .antMatchers("/api/validateActivationKey").permitAll()
             .antMatchers("/api/validateResetKey").permitAll()
             .antMatchers("/api/users/{id}/exportVestDeviceData").authenticated()
@@ -130,7 +134,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/protected/**").authenticated()
             .antMatchers("/api/user/{id}/changeSecurityQuestion").authenticated()
             //hill-1845
-            .antMatchers("/api/user/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES)
+            .antMatchers("/api/user/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES,AuthoritiesConstants.RND_USER)
             //hill-1845
             .antMatchers("/api/patient/**").hasAnyAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/api/cityStateZipValuesByCity").authenticated()
@@ -138,7 +142,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/cityStateZipValuesByZipCode").authenticated()
             .antMatchers("/api/survey/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT, AuthoritiesConstants.CUSTOMER_SERVICES)
             //hill-1845
-            .antMatchers("/api/validateCredentials").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES)
+            .antMatchers("/api/validateCredentials").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES,AuthoritiesConstants.RND_USER)
             .antMatchers("/api/loginAnalytics").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES,AuthoritiesConstants.ASSOCIATES, AuthoritiesConstants.CUSTOMER_SERVICES)
             .antMatchers("/api/survey/{id}/graph").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES,AuthoritiesConstants.ASSOCIATES, AuthoritiesConstants.CUSTOMER_SERVICES)
             //hill-1845

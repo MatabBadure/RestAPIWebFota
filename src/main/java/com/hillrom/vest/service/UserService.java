@@ -435,6 +435,7 @@ public class UserService {
     	//hill-1845
     	rolesAdminCanModerate.add(AuthoritiesConstants.CUSTOMER_SERVICES);
     	//hill-1845
+    	rolesAdminCanModerate.add(AuthoritiesConstants.RND_USER);
 		return rolesAdminCanModerate;
 	}
 
@@ -694,8 +695,9 @@ public class UserService {
 
         	} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ASSOCIATES))
         			//hill-1845
-        			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))){
+        			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))
         			//hill-1845 
+        			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.RND_USER))){
         		if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
 
 	        	UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
@@ -799,6 +801,19 @@ public class UserService {
     		}
         }
         //hill-1845
+        else if (AuthoritiesConstants.RND_USER.equals(userExtensionDTO.getRole())) {
+           	UserExtension user = updateRNDUser(existingUser, userExtensionDTO);
+    		if(Objects.nonNull(user.getId())) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
+    				sendEmailNotification(baseUrl, user);
+    			}
+                return user;
+    		} else {
+
+    			throw new HillromException(ExceptionConstants.HR_580);//Unable to update RND User.
+
+    		}
+        }
         else {
         	throw new HillromException(ExceptionConstants.HR_555);//Incorrect data
     	}
@@ -965,6 +980,14 @@ public class UserService {
 		return customerServiceUser;
 	}
    //hill-1845
+    public UserExtension updateRNDUser(UserExtension rNDUser, UserExtensionDTO userExtensionDTO) {
+		assignValuesToUserObj(userExtensionDTO, rNDUser);
+		userExtensionRepository.saveAndFlush(rNDUser);
+
+		log.debug("Updated Information for R&D User : {}", rNDUser);
+
+		return rNDUser;
+	}
 
 	private void assignValuesToPatientInfoObj(UserExtensionDTO userExtensionDTO, PatientInfo patientInfo) {
 		patientInfo.setHillromId(userExtensionDTO.getHillromId());
@@ -1267,6 +1290,7 @@ public class UserService {
 							//hill-1845
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
 							//hill-1845
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN)))) {
 					//hill-1844
 					existingUser.setDeleted(true);
@@ -1278,14 +1302,16 @@ public class UserService {
 				}
 			} 
 			//hill-1845
-			else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))) {
+			else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))
+					|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))) {
 				if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 					deletePatientUser(existingUser);
 					sendDeactivationEmailNotification(baseUrl, existingUser);
 					jsonObject.put("message", MessageConstants.HR_214);
 				}
 			
-				else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))) {
+				else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
+						|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))) {
 					if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
 						throw new HillromException(ExceptionConstants.HR_520);
 					}
@@ -1323,6 +1349,7 @@ public class UserService {
 							//hill-1845
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
 							//hill-1845
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
@@ -1966,6 +1993,7 @@ public class UserService {
 							//hill-1845
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
 							//hill-1845
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CARE_GIVER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))) {
@@ -1988,6 +2016,7 @@ public class UserService {
 						jsonObject.put("message", MessageConstants.HR_215);
 						} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))) {
 						existingUser.setDeleted(false);
 						userExtensionRepository.saveAndFlush(existingUser);
@@ -2013,6 +2042,7 @@ public class UserService {
 							//hill-1845
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
 							//hill-1845
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))
@@ -2079,8 +2109,11 @@ public class UserService {
 							.contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES)) 
 					//hill-1845		
 					|| SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-						.contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))) {
+						.contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))
 					//hill-1845
+					|| SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+					.contains(new SimpleGrantedAuthority(AuthoritiesConstants.RND_USER))
+					) {
 				if (existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 					if (Objects.nonNull(existingUser.getLastLoggedInAt()) & !existingUser.getActivated()) {
 						if (Objects.nonNull(existingUser.getEmail())) {

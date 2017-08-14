@@ -341,6 +341,7 @@ public final class Constants {
 	//end:announcement changes
 		
 		public static final String TIMS_CSV_FILE_PATH = "/opt/tims-csv-files/";
+		public static final String CREATED_BY_TIMS = "TIMS Java App";
 		
 	//Device Type
 	public static final String VEST = "VEST";

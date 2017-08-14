@@ -68,7 +68,7 @@ public class TimsInputReaderService {
 
 	private final Logger log = LoggerFactory.getLogger("com.hillrom.vest.tims");
 	
-	public boolean processed_atleast_one = false;
+	public static boolean processed_atleast_one = false;
 	
 	
 	@Inject
@@ -84,7 +84,7 @@ public class TimsInputReaderService {
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
 		
 		
-		
+		this.processed_atleast_one = false;
 		for (Map.Entry<Integer, PatientInfoDTO> entry : fileRecords.entrySet()) {
 		    Integer position = entry.getKey();
 		    PatientInfoDTO record = entry.getValue();
@@ -138,6 +138,8 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{
+		
+		//String csvFile = "C:/flat_file.csv";
 			
 	     String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
 		  //  log.debug("Started reading flat file : " + csvFile);

@@ -1197,7 +1197,7 @@ public class TimsService {
 			}
 			catch(SQLException se)
 			{
-				log.debug("Execution Failed when creating the New TIMs ID : "+ 
+				log.debug("\\nExecution Failed when creating the New TIMs ID : "+ 
 								patientInfoDTO.getTims_cust() + 
 						" in VisiView with the new Monarch Device Serail Number is : "+ 
 								patientInfoDTO.getSerial_num() +

@@ -68,6 +68,8 @@ public class TimsInputReaderService {
 
 	private final Logger log = LoggerFactory.getLogger("com.hillrom.vest.tims");
 	
+	public boolean processed_atleast_one = false;
+	
 	
 	@Inject
 	private TimsService timsService;
@@ -80,6 +82,7 @@ public class TimsInputReaderService {
 		
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
+		
 		
 		
 		for (Map.Entry<Integer, PatientInfoDTO> entry : fileRecords.entrySet()) {
@@ -123,6 +126,10 @@ public class TimsInputReaderService {
 			    	timsService.CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH(record);
 		    	}
 		    }
+		}
+		
+		if(!processed_atleast_one){
+			log.debug("The csv file has already been executed or unable to process any of the records.");
 		}
 		
 	}

@@ -129,7 +129,14 @@ public class TimsInputReaderService {
 		}
 		
 		if(!processed_atleast_one){
+			
 			log.debug("The csv file has already been executed or unable to process any of the records.");
+			try {
+				throw new Exception("The csv file has already been executed or unable to process any of the records.");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 	}

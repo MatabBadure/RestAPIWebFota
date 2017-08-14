@@ -153,13 +153,18 @@ public class TimsService {
 	 * @return
 	 * @throws HillromException
 	 */
-	public void createPatientProtocolMonarch(PatientInfoDTO patientInfoDTO) throws HillromException{	
+	public void createPatientProtocolMonarch(PatientInfoDTO patientInfoDTO) throws SQLException, HillromException{	
 		try{
 				timsUserRepository.createPatientProtocolMonarch(patientInfoDTO.getProtocol_type_key(),
 						 patientInfoDTO.getOperation_type(),
 						 patientInfoDTO.getPatient_id(),
 						 patientInfoDTO.getCreated_by());
-		}catch(Exception ex){
+		}
+		catch(SQLException se)
+		{
+			throw se;
+		}
+		catch(Exception ex){
 			throw new HillromException("Error While invoking Stored Procedure " , ex);
 		}
 	}
@@ -570,22 +575,22 @@ public class TimsService {
 				JSONObject returnValues =  managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
-				log.debug("Created Patient Successfully"+returnValues.get("return_patient_id").toString());
+			//	log.debug("Created Patient Successfully"+returnValues.get("return_patient_id").toString());
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDevice(patientInfoDTO);
-				log.debug("Created Device for Patient Successfully");
+			//	log.debug("Created Device for Patient Successfully");
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Associated Device for Patient Successfully");
-				log.debug("Patient Id "+returnValues.get("return_patient_id").toString());
+			//	log.debug("Associated Device for Patient Successfully");
+			//	log.debug("Patient Id "+returnValues.get("return_patient_id").toString());
 				
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
-				log.debug("Inserted Protocol for Patient Successfully");
+			//	log.debug("Inserted Protocol for Patient Successfully");
 			}
 			catch(SQLException se)
 			{
@@ -661,12 +666,12 @@ public class TimsService {
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDevice(patientInfoDTO);
-				log.debug("Created Device for Patient Successfully");
+				//log.debug("Created Device for Patient Successfully");
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Associated Device for Patient Successfully");
-				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				//log.debug("Associated Device for Patient Successfully");
+				//log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -674,7 +679,7 @@ public class TimsService {
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
-				log.debug("Inserted Protocol for Patient Successfully");
+				//log.debug("Inserted Protocol for Patient Successfully");
 			}
 			catch(SQLException se)
 			{
@@ -713,12 +718,12 @@ public class TimsService {
 				patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get().getSerialNumber());
 				patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDevice(patientInfoDTO);
-				log.debug("Updated Device for Patient Successfully");
+				//log.debug("Updated Device for Patient Successfully");
 				
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Associated Device for Patient Successfully");
-				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				//log.debug("Associated Device for Patient Successfully");
+				//log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -726,7 +731,7 @@ public class TimsService {
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
-				log.debug("Inserted Protocol for Patient Successfully");
+				//log.debug("Inserted Protocol for Patient Successfully");
 			}
 			catch(SQLException se)
 			{
@@ -766,16 +771,16 @@ public class TimsService {
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
-				log.debug("Updated Patient Successfully"+returnValues.get("return_patient_id").toString());
+				//log.debug("Updated Patient Successfully"+returnValues.get("return_patient_id").toString());
 				
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Updated Associated Device for Patient Successfully");
-				log.debug("Patient Id "+returnValues.get("return_patient_id").toString());
+			//	log.debug("Updated Associated Device for Patient Successfully");
+			//	log.debug("Patient Id "+returnValues.get("return_patient_id").toString());
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
-				log.debug("Inserted Protocol for Patient Successfully");
+				//log.debug("Inserted Protocol for Patient Successfully");
 			}
 			catch(SQLException se)
 			{
@@ -989,17 +994,17 @@ public class TimsService {
 					patientInfoDTO.setOperation_type("UPDATE");
 					patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 					managePatientUser(patientInfoDTO);
-					log.debug("Updated Patient Successfully");
+					//log.debug("Updated Patient Successfully");
 					 
 					patientInfoDTO.setOperation_type("CREATE");
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 					managePatientDevice(patientInfoDTO);
-					log.debug("Created Device for Patient Successfully");
+					//log.debug("Created Device for Patient Successfully");
 					
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
-					log.debug("Associated Device for Patient Successfully");
-					log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+					//log.debug("Associated Device for Patient Successfully");
+					//log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -1007,7 +1012,7 @@ public class TimsService {
 					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocol(patientInfoDTO);
-					log.debug("Inserted Protocol for Patient Successfully");
+					//log.debug("Inserted Protocol for Patient Successfully");
 				}
 				catch(SQLException se)
 				{
@@ -1087,8 +1092,8 @@ public class TimsService {
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Merge Associated Device for Patient Successfully");
-				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				//log.debug("Merge Associated Device for Patient Successfully");
+				//log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 
 			}
 			catch(SQLException se)
@@ -1132,21 +1137,21 @@ public class TimsService {
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
-				log.debug("Created Patient Successfully"+returnValues.get("return_patient_id").toString());
+			//	log.debug("Created Patient Successfully"+returnValues.get("return_patient_id").toString());
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDeviceMonarch(patientInfoDTO);
-				log.debug("Created Device for Patient Successfully");
+		//		log.debug("Created Device for Patient Successfully");
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Associated Device for Patient Successfully");
-				log.debug("Patient Id "+returnValues.get("return_patient_id").toString());
+		//		log.debug("Associated Device for Patient Successfully");
+		//		log.debug("Patient Id "+returnValues.get("return_patient_id").toString());
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
-				log.debug("Inserted Protocol for Patient Successfully");
+		//		log.debug("Inserted Protocol for Patient Successfully");
 			}
 			catch(SQLException se)
 			{
@@ -1222,12 +1227,12 @@ public class TimsService {
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDeviceMonarch(patientInfoDTO);
-				log.debug("Created Patient Successfully"+patientInfoDTO.getPatient_id());
+				//log.debug("Created Patient Successfully"+patientInfoDTO.getPatient_id());
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Associated Device for Patient Successfully");
-				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				//log.debug("Associated Device for Patient Successfully");
+				//log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -1235,7 +1240,7 @@ public class TimsService {
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
-				log.debug("Inserted Protocol for Patient Successfully");
+				//log.debug("Inserted Protocol for Patient Successfully");
 			}
 			catch(SQLException se)
 			{
@@ -1275,12 +1280,12 @@ public class TimsService {
 				patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get().getSerialNumber());
 				patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDeviceMonarch(patientInfoDTO);
-				log.debug("Updated Device for Patient Successfully");
+				//log.debug("Updated Device for Patient Successfully");
 				
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Associated Device for Patient Successfully");
-				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				//log.debug("Associated Device for Patient Successfully");
+				//log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -1288,7 +1293,7 @@ public class TimsService {
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
-				log.debug("Inserted Protocol for Patient Successfully");
+				//log.debug("Inserted Protocol for Patient Successfully");
 			}
 			catch(SQLException se)
 			{
@@ -1329,17 +1334,17 @@ public class TimsService {
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
-				log.debug("Updated Patient Successfully"+returnValues.get("return_patient_id").toString());
+				//log.debug("Updated Patient Successfully"+returnValues.get("return_patient_id").toString());
 				
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Updated Associated Device for Patient Successfully");
-				log.debug("Patient Id "+returnValues.get("return_patient_id").toString());
+				//log.debug("Updated Associated Device for Patient Successfully");
+				//log.debug("Patient Id "+returnValues.get("return_patient_id").toString());
 				
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
-				log.debug("Inserted Protocol for Patient Successfully");
+				//log.debug("Inserted Protocol for Patient Successfully");
 			}
 			catch(SQLException se)
 			{
@@ -1558,17 +1563,17 @@ public class TimsService {
 					patientInfoDTO.setOperation_type("UPDATE");
 					patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 					managePatientUser(patientInfoDTO);
-					log.debug("Updated Patient Successfully");
+				//	log.debug("Updated Patient Successfully");
 					 
 					patientInfoDTO.setOperation_type("CREATE");
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 					managePatientDeviceMonarch(patientInfoDTO);
-					log.debug("Created Device for Patient Successfully");
+				//	log.debug("Created Device for Patient Successfully");
 					
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
-					log.debug("Associated Device for Patient Successfully");
-					log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				//	log.debug("Associated Device for Patient Successfully");
+				//	log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -1576,7 +1581,7 @@ public class TimsService {
 					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocolMonarch(patientInfoDTO);
-					log.debug("Inserted Protocol for Patient Successfully");
+				//	log.debug("Inserted Protocol for Patient Successfully");
 				}
 				catch(SQLException se)
 				{
@@ -1655,8 +1660,8 @@ public class TimsService {
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Merge Associated Device for Patient Successfully");
-				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				//log.debug("Merge Associated Device for Patient Successfully");
+				//log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 
 			}
 			catch(SQLException se)

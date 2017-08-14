@@ -81,13 +81,13 @@ public class TimsInputReaderService {
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
 		
-		log.debug("Starting to process records ");
+		//log.debug("Starting to process records ");
 		for (Map.Entry<Integer, PatientInfoDTO> entry : fileRecords.entrySet()) {
 		    Integer position = entry.getKey();
 		    PatientInfoDTO record = entry.getValue();
-		    log.debug("Processing record position : "+position);
+		  //  log.debug("Processing record position : "+position);
 		  if(record.getDevice_type().equalsIgnoreCase("VEST")){
-		    	log.debug("Inside VEST loop ");
+		    //	log.debug("Inside VEST loop ");
 		    	timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record);
 		    	//timsService.CASE2_PatientExistsWithNODevice_VEST(record);
 		    	timsService.CASE3_PatientHasMonarchAddVisivest_VEST(record);
@@ -109,7 +109,7 @@ public class TimsInputReaderService {
 		    	you dont create a combo patient in TIMS visiview code.*/
 		    	if(record.getBluetooth_id()!=null && (!record.getBluetooth_id().isEmpty()))
 		    	{
-			    	log.debug("Inside MONARCH loop ");
+			    	//log.debug("Inside MONARCH loop ");
 			    	timsService.CASE1_NeitherPatientNorDeviceExist_MONARCH(record);
 			    	//timsService.CASE2_PatientExistsWithNODevice_MONARCH(record);
 			   	    timsService.CASE3_PatientHasVisivestAddMonarch_MONARCH(record);
@@ -131,10 +131,10 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{
-		
+		// String csvFile = "C:/flat_file.csv";
 
-	        String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
-		    log.debug("Started reading flat file : " + csvFile);
+	      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
+		  //  log.debug("Started reading flat file : " + csvFile);
 	        String line = "";
 	        String cvsSplitBy = ",";
 	        String Outdata = "";
@@ -174,7 +174,7 @@ public class TimsInputReaderService {
 		            for(int j=0;j<data.length;j++){
 		            	s = s + "\t" + data[j];
 		            }
-		            log.debug("Excel File Read as : " + s);
+		        //    log.debug("Excel File Read as : " + s);
 
 		            
 		            
@@ -255,7 +255,7 @@ public class TimsInputReaderService {
 		            
 	            }
 	            
-	            log.debug("Excel File contents in HashSet : " + fileRecords);
+	          //  log.debug("Excel File contents in HashSet : " + fileRecords);
 	            return fileRecords;
 	            
 	        } catch (IOException e) {

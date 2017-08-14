@@ -75,7 +75,7 @@ public class TimsInputReaderService {
 	private TimsService timsService;
 	
 	//@Scheduled(cron="0/5 * * * * * ")
-	public void ExecuteTIMSJob() 
+	public void ExecuteTIMSJob() throws Exception
 	{
 		
 		MDC.put("logFileName", "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
@@ -129,14 +129,8 @@ public class TimsInputReaderService {
 		}
 		
 		if(!processed_atleast_one){
-			
 			log.debug("The csv file has already been executed or unable to process any of the records.");
-			try {
-				throw new Exception("The csv file has already been executed or unable to process any of the records.");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			throw new Exception("The csv file has already been executed or unable to process any of the records.");
 		}
 		
 	}

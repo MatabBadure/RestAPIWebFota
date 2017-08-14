@@ -237,11 +237,7 @@ public class ChargerDataService {
 			    
 			    System.out.format("Inverted Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
 			    
-			    //while ( nCheckSum >  65535 )
-			    //{
-			    //  nCheckSum -= 65535;
-			    //}
-			    log.error("MONARCH CRC calculation defect fix above :"); 
+
 			    
 			    int nMSB = decoded[nDecodeCount+1] & 0xFF;
 			    int nLSB = decoded[nDecodeCount] & 0xFF;

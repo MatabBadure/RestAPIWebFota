@@ -223,7 +223,8 @@ public class TimsUserRepository{
 					.setParameter("pat_hub_id",inPatientHubId)	
 					.setParameter("pat_created_by",inPatientCreatedBy)
 					.executeUpdate();
-				}catch(Exception ex){
+				}
+				catch(Exception ex){
 					ex.printStackTrace();
 				}
 				

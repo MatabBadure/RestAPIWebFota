@@ -505,7 +505,7 @@ public class TimsService {
 	public boolean isCurrentSerialNumberOwnedByDifferentPatientVest(String serialNumber,String hillromId){
 		
 		if(!patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").get().getHillromId().equalsIgnoreCase(hillromId)) {
-				log.debug("Checking isCurrentSerialNumberOwnedByDifferentPatientVest ");
+				//log.debug("Checking isCurrentSerialNumberOwnedByDifferentPatientVest ");
 				return true;
 		}
 		
@@ -515,7 +515,7 @@ public class TimsService {
 	public boolean isCurrentSerialNumberOwnedByDifferentPatientMonarch(String serialNumber,String hillromId){
 		
 		if(!patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").get().getHillromId().equalsIgnoreCase(hillromId)){ 
-			log.debug("Checking isCurrentSerialNumberOwnedByDifferentPatientMonarch ");	
+		//	log.debug("Checking isCurrentSerialNumberOwnedByDifferentPatientMonarch ");	
 			return true;
 		}
 		
@@ -534,7 +534,7 @@ public class TimsService {
 	public boolean isCurrentSerialNumberOwnedByCurrentHillromIdMonarch(String serialNumber,String hillromId){
 		
 		if(patientDevicesAssocRepository.findOneBySerialNumberAndHillromIdAndDeviceType(serialNumber,hillromId,"MONARCH").isPresent()) {
-			log.debug("Checking isCurrentSerialNumberOwnedByCurrentHillromIdMonarch ");
+		//	log.debug("Checking isCurrentSerialNumberOwnedByCurrentHillromIdMonarch ");
 			return true;	
 		}
 
@@ -544,7 +544,7 @@ public class TimsService {
 	public boolean isOwnerExistsForCurrentSerialNumberVest(String serialNumber){
 		
 		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").isPresent()) {
-				log.debug("Checking isOwnerExistsForCurrentSerialNumberVest ");
+				//log.debug("Checking isOwnerExistsForCurrentSerialNumberVest ");
 				return true;
 		}
 		
@@ -554,7 +554,7 @@ public class TimsService {
 	public boolean isOwnerExistsForCurrentSerialNumberMonarch(String serialNumber){
 		
 		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").isPresent()){ 
-				log.debug("Checking isOwnerExistsForCurrentSerialNumberMonarch ");
+			//	log.debug("Checking isOwnerExistsForCurrentSerialNumberMonarch ");
 				return true;
 		}
 		
@@ -570,7 +570,8 @@ public class TimsService {
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))){
 
 			try{
-				patientInfoDTO.setOperation_type("CREATE");
+				//patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setOperation_type("UPDATE");
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				JSONObject returnValues =  managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());

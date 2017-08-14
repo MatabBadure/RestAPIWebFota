@@ -570,8 +570,7 @@ public class TimsService {
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))){
 
 			try{
-				//patientInfoDTO.setOperation_type("CREATE");
-				patientInfoDTO.setOperation_type("UPDATE");
+				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				JSONObject returnValues =  managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
@@ -768,18 +767,18 @@ public class TimsService {
 			}
 			catch(SQLException se)
 			{
-				log.debug(" Execution Failed when allocating  the Shell Vest Device for the TimsID : "+patientInfoDTO.getSerial_num()+" to the Tims ID "+ patientInfoDTO.getTims_cust()+" and Reason for the failure is : "+se.getMessage() );
+				log.debug(" Execution Failed when allocating  the Shell Vest Device  : "+patientInfoDTO.getSerial_num()+" to the Tims ID "+ patientInfoDTO.getTims_cust()+" and Reason for the failure is : "+se.getMessage() );
 				se.printStackTrace();
 				return false;
 			}
 			catch(Exception ex){
 				
-				log.debug(" Execution Failed when allocating  the Shell Vest Device for the TimsID : "+patientInfoDTO.getSerial_num()+" to the Tims ID "+ patientInfoDTO.getTims_cust()+" and Reason for the failure is : "+ex.getCause().getMessage() );
+				log.debug(" Execution Failed when allocating  the Shell Vest Device  : "+patientInfoDTO.getSerial_num()+" to the Tims ID "+ patientInfoDTO.getTims_cust()+" and Reason for the failure is : "+ex.getCause().getMessage() );
 				ex.printStackTrace();
 				return false;
 			}
 			
-			log.debug(" Executed Successfully for TimsID : "+patientInfoDTO.getSerial_num()+"Shell VEST Device allocated to patient"+patientInfoDTO.getTims_cust());
+			log.debug(" Shell VEST Device allocation Executed Successfully for the device : "+patientInfoDTO.getSerial_num()+" to theTimsID "+patientInfoDTO.getTims_cust());
 			return true;
 		}
 		

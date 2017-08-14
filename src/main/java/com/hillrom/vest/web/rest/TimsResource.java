@@ -416,9 +416,9 @@ public class TimsResource {
 		JSONObject jsonObject = new JSONObject();
 
 		try{		  
-			  timsInputReaderService.ExecuteTIMSJob();
-			  jsonObject.put("timsMsg", "TIMSJob Executed Successfully");
-			  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			
+			timsInputReaderService.ExecuteTIMSJob();			  
+			jsonObject.put("timsMsg", "TIMSJob Executed Successfully");
+			return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			
 		}catch(Exception ex){
 			
 			jsonObject.put("timsMsg", "TIMSJob NOT Executed Successfully");

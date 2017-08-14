@@ -591,15 +591,24 @@ public class TimsService {
 			}
 			catch(SQLException se)
 			{
-				log.debug("Execution Failed when creating the New TIMs ID : "+ patientInfoDTO.getTims_cust() + " in VisiView with the new Vest Device Serial Number is : "+ patientInfoDTO.getSerial_num());
-				log.debug("Reason for the failure is :  "+se.getMessage());
+				log.debug("Execution Failed when creating the New TIMs ID : "+ 
+								patientInfoDTO.getTims_cust() + 
+							" in VisiView with the new Vest Device Serial Number is : "+ 
+								patientInfoDTO.getSerial_num() +
+							" Reason for the failure is :  "+
+								se.getMessage()	);
+				
 				se.printStackTrace();
 				return false;
 			}
 			
 			catch(Exception ex){
-				log.debug("Execution Failed when creating the New TIMs ID : "+ patientInfoDTO.getTims_cust() + " in VisiView with the new Vest Device Serial Number is : "+ patientInfoDTO.getSerial_num());
-				log.debug("Reason for the failure is :  "+ex.getCause().getMessage());
+				log.debug("Execution Failed when creating the New TIMs ID : "+ 
+								patientInfoDTO.getTims_cust() + 
+							" in VisiView with the new Vest Device Serial Number is : "+ 
+								patientInfoDTO.getSerial_num() +
+							" Reason for the failure is :  "+
+								ex.getCause().getMessage());
 				ex.printStackTrace();
 				return false;
 			}				
@@ -676,15 +685,23 @@ public class TimsService {
 			}
 			catch(SQLException se)
 			{
-				log.debug("Made Combo Execution Failed for the Monarch Patient with TIMs ID : "+patientInfoDTO.getTims_cust()+" When adding new Vest Device which is having  the serial number is "+patientInfoDTO.getSerial_num());
-				log.debug("Reason for the failure is : "+se.getMessage());
+				log.debug("Made Combo Execution Failed for the Monarch Patient with TIMs ID : "+
+								patientInfoDTO.getTims_cust()+
+							" when adding new Vest Device which is having  the serial number is "+
+								patientInfoDTO.getSerial_num() +
+							" Reason for the failure is : "+
+								se.getMessage());
 				se.printStackTrace();
 				return false;
 			}
 			catch(Exception ex){
 				
-				log.debug("Made Combo Execution Failed for the Monarch Patient with TIMs ID : "+patientInfoDTO.getTims_cust()+" When adding new Vest Device which is having  the serial number is "+patientInfoDTO.getSerial_num());
-				log.debug("Reason for the failure is : "+ex.getCause().getMessage());
+				log.debug("Made Combo Execution Failed for the Monarch Patient with TIMs ID : "+
+								patientInfoDTO.getTims_cust()+
+							" when adding new Vest Device which is having  the serial number is "+
+								patientInfoDTO.getSerial_num() +
+							" Reason for the failure is : "+
+								ex.getCause().getMessage());
 				ex.printStackTrace();
 				return false;
 			}	
@@ -727,14 +744,27 @@ public class TimsService {
 			}
 			catch(SQLException se)
 			{
-				log.debug("VestDevice Swapping Case Execution Failed for the TIMs ID : "+ patientInfoDTO.getTims_cust()+" : when  Swapping his old Vest device   "+patientInfoDTO.getOld_serial_number() +"   with new Vest Device is "+patientInfoDTO.getNew_serial_number());
-				log.debug("Reason for the failure is : "+se.getMessage());
+				log.debug("VestDevice Swapping Case Execution Failed for the TIMs ID : "+ 
+								patientInfoDTO.getTims_cust()+
+							" : when  Swapping his old Vest device "+
+								patientInfoDTO.getOld_serial_number() +
+							" with new Vest Device is "+
+								patientInfoDTO.getNew_serial_number() +
+							" Reason for the failure is : "+
+								se.getMessage());
 				se.printStackTrace();
 				return false;
 			}
 			catch(Exception ex){
-				log.debug("VestDevice Swapping Case  Execution Failed for the TIMs ID : "+ patientInfoDTO.getTims_cust()+" : when  Swapping his old Vest device   "+patientInfoDTO.getOld_serial_number() +"  with new Vest Device is "+patientInfoDTO.getNew_serial_number());
-				log.debug("Reason for the failure is : "+ex.getCause().getMessage());
+				log.debug("VestDevice Swapping Case  Execution Failed for the TIMs ID : "+ 
+								patientInfoDTO.getTims_cust()+
+							" : when  Swapping his old Vest device "+
+								patientInfoDTO.getOld_serial_number() +
+							" with new Vest Device is "+
+								patientInfoDTO.getNew_serial_number() +
+							" Reason for the failure is : "+
+								ex.getCause().getMessage());
+				
 				ex.printStackTrace();
 				return false;
 			}	
@@ -774,15 +804,23 @@ public class TimsService {
 			}
 			catch(SQLException se)
 			{
-				log.debug("Execution Failed when allocating  the Shell Vest Device : "+patientInfoDTO.getSerial_num()+" to the TIMs ID "+ patientInfoDTO.getTims_cust());
-				log.debug("Reason for the failure is : "+se.getMessage());
+				log.debug("Execution Failed when allocating  the Shell Vest Device : "+
+								patientInfoDTO.getSerial_num()+
+							" to the TIMs ID "+ 
+								patientInfoDTO.getTims_cust() +
+							", Reason for the failure is : "+
+								se.getMessage());
 				se.printStackTrace();
 				return false;
 			}
 			catch(Exception ex){
 				
-				log.debug("Execution Failed when allocating  the Shell Vest Device : "+patientInfoDTO.getSerial_num()+" to the TIMs ID "+ patientInfoDTO.getTims_cust());
-				log.debug("Reason for the failure is : "+ex.getCause().getMessage());
+				log.debug("Execution Failed when allocating  the Shell Vest Device : "+
+								patientInfoDTO.getSerial_num()+
+							" to the TIMs ID "+ 
+								patientInfoDTO.getTims_cust() +
+							", Reason for the failure is : "+ex.getCause().getMessage());
+				
 				ex.printStackTrace();
 				return false;
 			}
@@ -1002,15 +1040,25 @@ public class TimsService {
 				}
 				catch(SQLException se)
 				{
-					log.debug("Made Combo Execution Failed for the Monarch Patient with TIMs ID : "+patientInfoDTO.getTims_cust()+" When adding new Vest Device which is having  the serial number is "+patientInfoDTO.getSerial_num());
-					log.debug("Reason for the failure is : "+se.getMessage());
+					log.debug("Made Combo Execution Failed for the Monarch Patient with TIMs ID : "+
+									patientInfoDTO.getTims_cust()+
+								" when adding new Vest Device which is having  the serial number is "+
+									patientInfoDTO.getSerial_num() +
+								", Reason for the failure is : "+
+									se.getMessage());
+					
 					se.printStackTrace();
 					return false;
 				}
 				catch(Exception ex){
 					
-					log.debug("Made Combo Execution Failed for the Monarch Patient with TIMs ID : "+patientInfoDTO.getTims_cust()+" When adding new Vest Device which is having  the serial number is "+patientInfoDTO.getSerial_num());
-					log.debug("Reason for the failure is : "+ex.getCause().getMessage());
+					log.debug("Made Combo Execution Failed for the Monarch Patient with TIMs ID : "+
+									patientInfoDTO.getTims_cust()+
+								" when adding new Vest Device which is having  the serial number is "+
+									patientInfoDTO.getSerial_num()+
+								", Reason for the failure is : "+
+									ex.getCause().getMessage());
+					
                     ex.printStackTrace();
 					return false;
 				}
@@ -1083,15 +1131,24 @@ public class TimsService {
 			}
 			catch(SQLException se)
 			{
-				log.debug("Made Combo Execution Failed when the Monarch patinet with the TIMs ID : "+patientInfoDTO.getTims_cust()+" merging with the existing visivest Device which is having  the serial number is "+patientInfoDTO.getSerial_num());
-				log.debug("Reason for the failure is : "+se.getMessage());
+				log.debug("Made Combo Execution Failed when the Monarch patinet with the TIMs ID : "+
+								patientInfoDTO.getTims_cust()+
+							" merging with the existing visivest Device which is having  the serial number is "+
+								patientInfoDTO.getSerial_num() +
+							", Reason for the failure is : "+se.getMessage());
+				
 				se.printStackTrace();
 				return false;
 			}
 			catch(Exception ex){
 				
-				log.debug("Made Combo Execution Failed when the Monarch patinet with the TIMs ID : "+patientInfoDTO.getTims_cust()+" merging with the existing visivest Device which is having  the serial number is "+patientInfoDTO.getSerial_num());
-				log.debug("Reason for the failure is : "+ex.getCause().getMessage());
+				log.debug("Made Combo Execution Failed when the Monarch patinet with the TIMs ID : "+
+								patientInfoDTO.getTims_cust()+
+						" merging with the existing visivest Device which is having  the serial number is "+
+								patientInfoDTO.getSerial_num() + 
+						", Reason for the failure is : "+
+								ex.getCause().getMessage());
+				
 				ex.printStackTrace();
 				return false;
 			}	
@@ -1140,14 +1197,24 @@ public class TimsService {
 			}
 			catch(SQLException se)
 			{
-				log.debug("Execution Failed when creating the New TIMs ID : "+ patientInfoDTO.getTims_cust() + " in VisiView with the new Monarch Device Serail Number is : "+ patientInfoDTO.getSerial_num());
-				log.debug("Reason for the failure is : "+se.getMessage());
+				log.debug("Execution Failed when creating the New TIMs ID : "+ 
+								patientInfoDTO.getTims_cust() + 
+						" in VisiView with the new Monarch Device Serail Number is : "+ 
+								patientInfoDTO.getSerial_num() +
+						", Reason for the failure is : "
+								+se.getMessage());
+				
 				se.printStackTrace();
 				return false;
 			}
 			catch(Exception ex){
-				log.debug("Execution Failed when creating the New TIMs ID : "+ patientInfoDTO.getTims_cust() + " in VisiView with the new Monarch Device Serail Number is : "+ patientInfoDTO.getSerial_num());
-				log.debug("Reason for the failure is : "+ex.getCause().getMessage());
+				log.debug("Execution Failed when creating the New TIMs ID : "+ 
+								patientInfoDTO.getTims_cust() + 
+							" in VisiView with the new Monarch Device Serail Number is : "+ 
+								patientInfoDTO.getSerial_num() +
+							", Reason for the failure is : "+
+								ex.getCause().getMessage());
+				
 				ex.printStackTrace();
 				return false;
 			}	
@@ -1225,14 +1292,24 @@ public class TimsService {
 			}
 			catch(SQLException se)
 			{
-				log.debug("Made Combo Execution Failed for the Vest Patient with TIMs ID : "+patientInfoDTO.getTims_cust()+" When adding new Monarch Device which is having  the serial number is "+patientInfoDTO.getSerial_num());
-				log.debug("Reason for the failure is : "+se.getMessage());
+				log.debug("Made Combo Execution Failed for the Vest Patient with TIMs ID : "+
+								patientInfoDTO.getTims_cust()+
+							" When adding new Monarch Device which is having  the serial number is "+
+								patientInfoDTO.getSerial_num() + 
+							", Reason for the failure is : "+
+								se.getMessage());
+				
 				se.printStackTrace();
 				return false;
 			}
 			catch(Exception ex){
-				log.debug("Made Combo Execution Failed for the Vest Patient with TIMs ID : "+patientInfoDTO.getTims_cust()+" When adding new Monarch Device which is having  the serial number is "+patientInfoDTO.getSerial_num());
-				log.debug("Reason for the failure is : "+ex.getCause().getMessage());
+				log.debug("Made Combo Execution Failed for the Vest Patient with TIMs ID : "+
+								patientInfoDTO.getTims_cust()+
+						" When adding new Monarch Device which is having  the serial number is "+
+								patientInfoDTO.getSerial_num() + 
+						", Reason for the failure is : "+
+								ex.getCause().getMessage());
+				
 				ex.printStackTrace();
 				return false;
 			}	
@@ -1277,14 +1354,28 @@ public class TimsService {
 			}
 			catch(SQLException se)
 			{
-				log.debug("Swap Case Execution Failed for the TIMs ID : "+ patientInfoDTO.getTims_cust()+" : when  Swapping his  old Monarch device   "+patientInfoDTO.getOld_serial_number() +" with new Monarch Device is "+patientInfoDTO.getNew_serial_number());
-				log.debug("Reason for the failure is : "+se.getMessage());
+				log.debug("Swap Case Execution Failed for the TIMs ID : "+ 
+								patientInfoDTO.getTims_cust()+
+							" : when  Swapping his  old Monarch device "+
+								patientInfoDTO.getOld_serial_number() +
+							" with new Monarch Device is "+
+								patientInfoDTO.getNew_serial_number() +
+							", Reason for the failure is : "+
+								se.getMessage());
+				
 				se.printStackTrace();
 				return false;
 			}
 			catch(Exception ex){
-				log.debug("Swap Case Execution Failed for the TIMs ID : "+ patientInfoDTO.getTims_cust()+" : when  Swapping his  old Monarch device   "+patientInfoDTO.getOld_serial_number() +" with new Monarch Device is "+patientInfoDTO.getNew_serial_number());
-				log.debug("Reason for the failure is : "+ex.getCause().getMessage());
+				log.debug("Swap Case Execution Failed for the TIMs ID : "+ 
+								patientInfoDTO.getTims_cust()+
+							" : when  Swapping his  old Monarch device "+
+								patientInfoDTO.getOld_serial_number() +
+							" with new Monarch Device is "+
+								patientInfoDTO.getNew_serial_number() +
+							", Reason for the failure is : "+
+								ex.getCause().getMessage());
+				
 				ex.printStackTrace();
 				return false;
 			}		
@@ -1327,14 +1418,24 @@ public class TimsService {
 			}
 			catch(SQLException se)
 			{
-				log.debug("Execution Failed when allocating  the Shell Monarch Device : "+patientInfoDTO.getSerial_num()+" to the TIMs ID "+ patientInfoDTO.getTims_cust());
-				log.debug("Reason for the failure is : "+se.getMessage());
+				log.debug("Execution Failed when allocating  the Shell Monarch Device : "+
+								patientInfoDTO.getSerial_num()+
+							" to the TIMs ID "+ 
+								patientInfoDTO.getTims_cust() +
+							", Reason for the failure is : "+
+								se.getMessage());
+				
 				se.printStackTrace();
 				return false;
 			}
 			catch(Exception ex){
-				log.debug("Execution Failed when allocating  the Shell Monarch Device : "+patientInfoDTO.getSerial_num()+" to the TIMs ID "+ patientInfoDTO.getTims_cust());
-				log.debug("Reason for the failure is : "+ex.getCause().getMessage());
+				log.debug("Execution Failed when allocating  the Shell Monarch Device : "+
+								patientInfoDTO.getSerial_num()+
+							" to the TIMs ID "+ 
+								patientInfoDTO.getTims_cust() +
+							", Reason for the failure is : "+
+								ex.getCause().getMessage());
+								
 				ex.printStackTrace();
 				return false;
 			}
@@ -1561,15 +1662,25 @@ public class TimsService {
 				}
 				catch(SQLException se)
 				{
-					log.debug("Made Combo Execution Failed for the Vest Patient with TIMs ID : "+patientInfoDTO.getTims_cust()+" When adding new Monarch Device which is having  the serial number is "+patientInfoDTO.getSerial_num());
-					log.debug("Reason for the failure is : "+se.getMessage());
+					log.debug("Made Combo Execution Failed for the Vest Patient with TIMs ID : "+
+									patientInfoDTO.getTims_cust()+
+							" when adding new Monarch Device which is having  the serial number is "+
+									patientInfoDTO.getSerial_num() +
+							", Reason for the failure is : "+
+									se.getMessage());
+					
 					se.printStackTrace();
 					return false;
 				}
 				catch(Exception ex){
 					
-					log.debug("Made Combo Execution Failed for the Vest Patient with TIMs ID : "+patientInfoDTO.getTims_cust()+" When adding new Monarch Device which is having  the serial number is "+patientInfoDTO.getSerial_num());
-					log.debug("Reason for the failure is : "+ex.getCause().getMessage());
+					log.debug("Made Combo Execution Failed for the Vest Patient with TIMs ID : "+
+									patientInfoDTO.getTims_cust()+
+								" when adding new Monarch Device which is having  the serial number is "+
+									patientInfoDTO.getSerial_num() +
+								", Reason for the failure is : "+
+									ex.getCause().getMessage()	);
+					
 					ex.printStackTrace();
 					return false;
 				}
@@ -1641,14 +1752,23 @@ public class TimsService {
 			}
 			catch(SQLException se)
 			{
-				log.debug("Made Combo Execution Failed when the Visivest patinet with the TIMs ID : "+patientInfoDTO.getTims_cust()+" merging with the existing Monarch Device which is having  the serial number is "+patientInfoDTO.getSerial_num());
-				log.debug("Reason for the failure is : "+se.getMessage());
+				log.debug("Made Combo Execution Failed when the Visivest patinet with the TIMs ID : "+
+								patientInfoDTO.getTims_cust()+
+							" merging with the existing Monarch Device which is having  the serial number is "+
+								patientInfoDTO.getSerial_num() +
+							", Reason for the failure is : "+se.getMessage());
+				
 				se.printStackTrace();
 				return false;
 			}
 			catch(Exception ex){
-				log.debug("Made Combo Execution Failed when the Visivest patinet with the TIMs ID : "+patientInfoDTO.getTims_cust()+" merging with the existing Monarch Device which is having  the serial number is "+patientInfoDTO.getSerial_num());
-				log.debug("Reason for the failure is : "+ex.getCause().getMessage());
+				log.debug("Made Combo Execution Failed when the Visivest patinet with the TIMs ID : "+
+								patientInfoDTO.getTims_cust()+
+							" merging with the existing Monarch Device which is having  the serial number is "+
+								patientInfoDTO.getSerial_num() +
+							", Reason for the failure is : "+
+								ex.getCause().getMessage());
+				
 				ex.printStackTrace();
 				return false;
 			}	

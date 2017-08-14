@@ -341,7 +341,7 @@ public class TimsService {
 	   	  content +=  line;
 	   	  while ((line = reader.readLine()) != null)
 	   	  {
-	   	     content += "\n" + line;
+	   	     content += "\n\n" + line;
 	   	    	    	     
 	   	  }
 	   	

@@ -603,12 +603,12 @@ public class TimsService {
 			}
 			
 			catch(Exception ex){
-				log.debug("Execution Failed when creating the New TIMs ID : "+ 
+				/*log.debug("Execution Failed when creating the New TIMs ID : "+ 
 								patientInfoDTO.getTims_cust() + 
 							" in VisiView with the new Vest Device Serial Number is : "+ 
 								patientInfoDTO.getSerial_num() +
 							" Reason for the failure is :  "+
-								ex.getCause().getMessage());
+								ex.getCause().getMessage());*/
 				ex.printStackTrace();
 				return false;
 			}				

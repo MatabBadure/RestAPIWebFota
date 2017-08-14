@@ -82,6 +82,8 @@ public class TimsService {
 
 	private final Logger log = LoggerFactory.getLogger("com.hillrom.vest.tims");
 	
+	TimsInputReaderService tims = new TimsInputReaderService();
+	
 	
 	@Inject
 	private TimsUserRepository timsUserRepository;
@@ -570,6 +572,7 @@ public class TimsService {
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))){
 
 			try{
+				tims.processed_atleast_one = true;
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				JSONObject returnValues =  managePatientUser(patientInfoDTO);
@@ -618,6 +621,7 @@ public class TimsService {
 			return true;
 		}
 		
+				
 		return false;
 		
 	}
@@ -667,6 +671,7 @@ public class TimsService {
 			
 
 			try{
+				tims.processed_atleast_one = true;
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
@@ -723,6 +728,7 @@ public class TimsService {
 			
 
 			try{
+				tims.processed_atleast_one = true;
 				patientInfoDTO.setOperation_type("UPDATE");
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
@@ -787,6 +793,7 @@ public class TimsService {
 			
 
 			try{
+				tims.processed_atleast_one = true;
 				patientInfoDTO.setOperation_type("UPDATE");
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
@@ -1018,6 +1025,7 @@ public class TimsService {
 
 				
 				try{
+					tims.processed_atleast_one = true;
 					patientInfoDTO.setOperation_type("UPDATE");
 					patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 					managePatientUser(patientInfoDTO);
@@ -1122,6 +1130,7 @@ public class TimsService {
 			
 
 			try{
+				tims.processed_atleast_one = true;
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
@@ -1175,6 +1184,7 @@ public class TimsService {
 		if((!isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))){
 
 			try{
+				tims.processed_atleast_one = true;
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
@@ -1271,6 +1281,7 @@ public class TimsService {
 			
 
 			try{
+				tims.processed_atleast_one = true;
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
@@ -1332,6 +1343,7 @@ public class TimsService {
 			
 
 			try{
+				tims.processed_atleast_one = true;
 				patientInfoDTO.setOperation_type("UPDATE");
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
@@ -1400,6 +1412,7 @@ public class TimsService {
 			
 
 			try{
+				tims.processed_atleast_one = true;
 				patientInfoDTO.setOperation_type("UPDATE");
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
@@ -1640,6 +1653,7 @@ public class TimsService {
 
 				
 				try{
+					tims.processed_atleast_one = true;
 					patientInfoDTO.setOperation_type("UPDATE");
 					patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 					managePatientUser(patientInfoDTO);
@@ -1742,6 +1756,7 @@ public class TimsService {
 			
 
 			try{
+				tims.processed_atleast_one = true;
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);

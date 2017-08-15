@@ -1,4 +1,6 @@
-package com.hillrom.vest.service;
+package com.hillrom.optimus.service;
+
+
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -23,6 +25,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.optimus.domain.OptimusData;
+import com.hillrom.optimus.repository.OptimusDataRepository;
 import com.hillrom.vest.domain.ChargerData;
 import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.PatientInfo;
@@ -51,6 +55,7 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVI
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_VER;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.CRC;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_ADDRESS;
+import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_BT;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_DATA;
 import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEVICE_MODEL;
 
@@ -100,32 +105,29 @@ import static com.hillrom.vest.config.PatientVestDeviceRawLogModelConstants.DEV_
 
 @Service
 @Transactional
-public class ChargerDataService {
+public class OptimusDataService {
 
 
-			private final Logger log = LoggerFactory.getLogger(ChargerDataService.class);
+			private final Logger log = LoggerFactory.getLogger(OptimusDataService.class);
 		
 			@Inject
-			private ChargerDataRepository chargerDataRepository;
-
-			@Inject
-			private PingPongPingRepository pingPongPingRepository;
+			private OptimusDataRepository optimusDataRepository;
 			
 			
 			
-			public ChargerData findLatestData(){
-				ChargerData chargerData =  chargerDataRepository.findLatestData();
-					return chargerData;
+			public OptimusData findLatestData(){
+				OptimusData optimusData =  optimusDataRepository.findLatestData();
+					return optimusData;
 			}
 		
-			public ChargerData findById(Long id){
-				ChargerData chargerData =  chargerDataRepository.findById(id);
-					return chargerData;
+			public OptimusData findById(Long id){
+				OptimusData optimusData =  optimusDataRepository.findById(id);
+					return optimusData;
 			}
 		
-			public Page<ChargerData> findAll(Pageable pageable){
-				Page<ChargerData> chargerDataList =  chargerDataRepository.findAll(pageable);
-					return chargerDataList;
+			public Page<OptimusData> findAll(Pageable pageable){
+				Page<OptimusData> optimusDataList =  optimusDataRepository.findAll(pageable);
+					return optimusDataList;
 			}
 	
 	
@@ -138,21 +140,18 @@ public class ChargerDataService {
 				log.error("Encoded String : " + encoded_string);
 				log.error("Decoded String : " + decoded_string);
 				
-				JSONObject chargerJsonData = validateRequest(encoded_string,decoded_string);
+				JSONObject optimusJsonData = validateRequest(encoded_string,decoded_string);
 				
-				//if(chargerJsonData.get("DEVICE_DATA").equals("PING_PONG_PING")){
-				//	log.debug("deviceData is PING_PONG_PING" + " Insert into PING_PONG_PING table");
-				//	PingPongPing pingPongPingData = new PingPongPing();
-				//	pingPongPingData.setCreatedTime(new DateTime());
-				//	pingPongPingRepository.save(pingPongPingData);
-				//}
-				//if(chargerJsonData.get("RESULT").equals("OK")){
-					ChargerData chargerData = new ChargerData();
-					chargerData.setDeviceData(encoded_string);
-					chargerData.setCreatedTime(new DateTime());
-					chargerDataRepository.save(chargerData);
-				//}
-				return chargerJsonData;
+
+					OptimusData optimusData = new OptimusData();
+					optimusData.setDeviceData(encoded_string);
+					optimusData.setCreatedTime(new DateTime());
+					optimusData.setFragTotal(getFragTotal(encoded_string));
+					optimusData.setFragCurrent(getFragCurrent(encoded_string));
+					optimusData.setSerialNumber(getDevSN(encoded_string,decoded_string));
+					optimusDataRepository.save(optimusData);
+
+				return optimusJsonData;
 		
 			}
 	
@@ -162,55 +161,55 @@ public class ChargerDataService {
 				log.error("Inside validateRequest " + rawData);
 
 
-				JSONObject chargerJsonData = ParserUtil.getChargerJsonDataFromRawMessage(decoded_data);
+				JSONObject optimusJsonData = ParserUtil.getChargerJsonDataFromRawMessage(decoded_data);
 				String DEVICE_BT = "devBT";
 				String reqParams[] = new String[]{DEVICE_MODEL,DEVICE_SN,
 
 						DEVICE_WIFI,DEVICE_LTE,DEVICE_BT,DEVICE_VER,FRAG_TOTAL,FRAG_CURRENT,DEVICE_DATA,CRC};
 				
 				
-				if(Objects.isNull(chargerJsonData) || chargerJsonData.keySet().isEmpty()){
+				if(Objects.isNull(optimusJsonData) || optimusJsonData.keySet().isEmpty()){
 					throw new HillromException("Missing Params : "+String.join(",",reqParams));
-				}else if(Objects.nonNull(chargerJsonData)){
-					List<String> missingParams = RandomUtil.getDifference(Arrays.asList(reqParams), new ArrayList<String>(chargerJsonData.keySet()));
+				}else if(Objects.nonNull(optimusJsonData)){
+					List<String> missingParams = RandomUtil.getDifference(Arrays.asList(reqParams), new ArrayList<String>(optimusJsonData.keySet()));
 		
 					if(missingParams.size() > 0){
 						if(missingParams.contains(DEVICE_MODEL) || missingParams.contains(DEVICE_SN) || (missingParams.contains(DEVICE_WIFI) && missingParams.contains(DEVICE_LTE) && missingParams.contains(DEVICE_BT)) ||
 								missingParams.contains(DEVICE_VER) || missingParams.contains(DEVICE_DATA) || missingParams.contains(CRC) ||
 								missingParams.contains(FRAG_TOTAL) || missingParams.contains(FRAG_CURRENT)
 								){
-							chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
-							chargerJsonData.put("RESULT", "NOT OK");
-							chargerJsonData.put("ERROR","Missing Params");
-							return chargerJsonData;
+							optimusJsonData.put("DEVICE_DATA", getDeviceData(rawData));
+							optimusJsonData.put("RESULT", "NOT OK");
+							optimusJsonData.put("ERROR","Missing Params");
+							return optimusJsonData;
 						}else{
 							if(!calculateCRC(rawData)){
-								chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
-								chargerJsonData.put("RESULT", "NOT OK");
-								chargerJsonData.put("ERROR","CRC Validation Failed");
-								return chargerJsonData;
+								optimusJsonData.put("DEVICE_DATA", getDeviceData(rawData));
+								optimusJsonData.put("RESULT", "NOT OK");
+								optimusJsonData.put("ERROR","CRC Validation Failed");
+								return optimusJsonData;
 							}else{
-								chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
-								chargerJsonData.put("RESULT", "OK");
-								chargerJsonData.put("ERROR","");
-								return chargerJsonData;					
+								optimusJsonData.put("DEVICE_DATA", getDeviceData(rawData));
+								optimusJsonData.put("RESULT", "OK");
+								optimusJsonData.put("ERROR","");
+								return optimusJsonData;					
 							}
 						}
 					}else{
 						if(!calculateCRC(rawData)){
-							chargerJsonData.put("RESULT", "NOT OK");
-							chargerJsonData.put("ERROR","CRC Validation Failed");
-							return chargerJsonData;
+							optimusJsonData.put("RESULT", "NOT OK");
+							optimusJsonData.put("ERROR","CRC Validation Failed");
+							return optimusJsonData;
 						}else{
-							chargerJsonData.put("DEVICE_DATA", getDeviceData(rawData));
-							chargerJsonData.put("RESULT", "OK");
-							chargerJsonData.put("ERROR","");
-							return chargerJsonData;					
+							optimusJsonData.put("DEVICE_DATA", getDeviceData(rawData));
+							optimusJsonData.put("RESULT", "OK");
+							optimusJsonData.put("ERROR","");
+							return optimusJsonData;					
 						}
 					}
 				}
 				
-				return chargerJsonData;
+				return optimusJsonData;
 			}
 	
 
@@ -237,7 +236,10 @@ public class ChargerDataService {
 			    
 			    System.out.format("Inverted Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
 			    
-
+			  //  while ( nCheckSum >  65535 )
+			   // {
+			   //   nCheckSum -= 65535;
+			   // }
 			    
 			    int nMSB = decoded[nDecodeCount+1] & 0xFF;
 			    int nLSB = decoded[nDecodeCount] & 0xFF;
@@ -416,6 +418,11 @@ public class ChargerDataService {
 		
 			}
 
+			public String getDevSN(String encoded_string,String decoded_string) throws HillromException{
+				String devSn = decoded_string.indexOf(DEVICE_SN) < 0 ? null : decoded_string.substring(decoded_string.indexOf(DEVICE_SN)+DEVICE_SN.length()+1, getNextIndex(decoded_string,DEVICE_SN));
+				return devSn;
+			}
+			
 			public byte[] getDevSN(String encoded_string) throws HillromException{
 		        byte[] b = java.util.Base64.getDecoder().decode(encoded_string);
 		        String sout = "";
@@ -435,7 +442,7 @@ public class ChargerDataService {
 		        				returnMatch(b,DEV_WIFI)-DEV_WIFI.length;
 		        log.debug("start end : "+ start + " : " + end );
 		        
-		        byte[] devSNArray = new byte[end];
+		        byte[] devSNArray = new byte[end<0?0:end];
 		        int j=0;
 		        sout = "";
 		        for(int i=start;i<end;i++) {
@@ -626,6 +633,30 @@ public class ChargerDataService {
 	    	    return hexTotal;
 	    	}
 
+	    	public static Integer getNextIndex(String rawMessage,String namePair){
+	    		switch(namePair){
+	    		case DEVICE_MODEL:
+	    			return rawMessage.indexOf(DEVICE_SN) < 0 ? getNextIndex(rawMessage, DEVICE_SN) :  rawMessage.indexOf(DEVICE_SN)-1;			
+	    		case DEVICE_SN:
+	    			return rawMessage.indexOf(DEVICE_WIFI) < 0 ? getNextIndex(rawMessage, DEVICE_WIFI) :  rawMessage.indexOf(DEVICE_WIFI)-1;
+	    		case DEVICE_WIFI:
+	    			return rawMessage.indexOf(DEVICE_LTE) < 0 ? getNextIndex(rawMessage, DEVICE_LTE) :  rawMessage.indexOf(DEVICE_LTE)-1;
+	    		case DEVICE_LTE:
+	    			return rawMessage.indexOf(DEVICE_BT) < 0 ? getNextIndex(rawMessage, DEVICE_BT) :  rawMessage.indexOf(DEVICE_BT)-1;
+	    		case DEVICE_BT:
+	    			return rawMessage.indexOf(DEVICE_VER) < 0 ? getNextIndex(rawMessage, DEVICE_VER) :  rawMessage.indexOf(DEVICE_VER)-1;	
+	    		case DEVICE_VER:
+	    			return rawMessage.indexOf(FRAG_TOTAL) < 0 ? getNextIndex(rawMessage, FRAG_TOTAL) :  rawMessage.indexOf(FRAG_TOTAL)-1;
+	    		case FRAG_TOTAL:
+	    			return rawMessage.indexOf(FRAG_CURRENT) < 0 ? getNextIndex(rawMessage, FRAG_CURRENT) :  rawMessage.indexOf(FRAG_CURRENT)-1;
+	    		case FRAG_CURRENT:
+	    			return rawMessage.indexOf(DEVICE_DATA) < 0 ? getNextIndex(rawMessage, DEVICE_DATA) :  rawMessage.indexOf(DEVICE_DATA)-1;
+	    		case DEVICE_DATA:
+	    			return rawMessage.indexOf(CRC) < 0 ? rawMessage.length() :  rawMessage.indexOf(CRC)-1;
+	    		default:
+	    			return -1;
+	    		}		
+	    	}
 	
 	
 

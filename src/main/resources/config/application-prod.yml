@@ -47,6 +47,8 @@ spring:
         baseUrl: https://visiview-test.hill-rom.com
         accountActivationReminderInterval: 72
     survey:
-        surveyreportemailids: 
+
+        surveyreportemailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com,raghu.nt@lnttechservices.com 
     changePrescription:
-        changePrescriptionEmailids: 
+        changePrescriptionEmailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com,raghu.nt@lnttechservices.com
+

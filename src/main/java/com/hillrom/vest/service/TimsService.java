@@ -1,5 +1,6 @@
 package com.hillrom.vest.service;
 
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Announcements;
 import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
@@ -80,6 +82,8 @@ public class TimsService {
 
 	private final Logger log = LoggerFactory.getLogger("com.hillrom.vest.tims");
 	
+	TimsInputReaderService tims = new TimsInputReaderService();
+	
 	
 	@Inject
 	private TimsUserRepository timsUserRepository;
@@ -121,7 +125,7 @@ public class TimsService {
 									                int min_pressure,
 									                int max_pressure,
 									                int to_be_inserted,
-									                String user_id) throws HillromException{	
+									                String user_id) throws SQLException, HillromException{	
 			try{
 					timsUserRepository.insertIntoProtocolDataTempTable(patient_id,
 													type,
@@ -135,7 +139,12 @@ public class TimsService {
 									                max_pressure,
 									                to_be_inserted,
 									                user_id);
-			}catch(Exception ex){
+			}
+			catch(SQLException se)
+			{
+				throw se;
+			}
+			catch(Exception ex){
 				throw new HillromException("Error While invoking Stored Procedure " , ex);
 			}
 		}
@@ -146,13 +155,18 @@ public class TimsService {
 	 * @return
 	 * @throws HillromException
 	 */
-	public void createPatientProtocolMonarch(PatientInfoDTO patientInfoDTO) throws HillromException{	
+	public void createPatientProtocolMonarch(PatientInfoDTO patientInfoDTO) throws SQLException, HillromException{	
 		try{
 				timsUserRepository.createPatientProtocolMonarch(patientInfoDTO.getProtocol_type_key(),
 						 patientInfoDTO.getOperation_type(),
 						 patientInfoDTO.getPatient_id(),
 						 patientInfoDTO.getCreated_by());
-		}catch(Exception ex){
+		}
+		catch(SQLException se)
+		{
+			throw se;
+		}
+		catch(Exception ex){
 			throw new HillromException("Error While invoking Stored Procedure " , ex);
 		}
 	}
@@ -165,13 +179,18 @@ public class TimsService {
 	 * @return
 	 * @throws HillromException
 	 */
-	public void createPatientProtocol(PatientInfoDTO patientInfoDTO) throws HillromException{	
+	public void createPatientProtocol(PatientInfoDTO patientInfoDTO) throws SQLException, HillromException{	
 		try{
 			timsUserRepository.createPatientProtocol(patientInfoDTO.getProtocol_type_key(),
 												 patientInfoDTO.getOperation_type(),
 												 patientInfoDTO.getPatient_id(),
 												 patientInfoDTO.getCreated_by());
-		}catch(Exception ex){
+		}
+		catch(SQLException se)
+		{
+			throw se;
+		}
+		catch(Exception ex){
 			throw new HillromException("Error While invoking Stored Procedure " , ex);
 		}
 	}
@@ -183,7 +202,7 @@ public class TimsService {
 	 * @return
 	 * @throws HillromException
 	 */
-	public void managePatientDevice(PatientInfoDTO patientInfoDTO) throws HillromException{		
+	public void managePatientDevice(PatientInfoDTO patientInfoDTO) throws SQLException ,HillromException{		
 		
 		try{
 			timsUserRepository.managePatientDevice(patientInfoDTO.getOperation_type(), 
@@ -191,8 +210,13 @@ public class TimsService {
 												patientInfoDTO.getOld_serial_number(), 
 												patientInfoDTO.getNew_serial_number(),
 												patientInfoDTO.getBluetooth_id(), 
-												patientInfoDTO.getHub_id());
-		}catch(Exception ex){
+												patientInfoDTO.getHub_id(),
+												patientInfoDTO.getCreated_by());
+		}catch(SQLException se)
+		{
+			throw se;
+		}
+		catch(Exception ex){
 			throw new HillromException("Error While invoking Stored Procedure " , ex);
 		}
 	}
@@ -206,7 +230,7 @@ public class TimsService {
 	 */
 	
 	
-	public void managePatientDeviceAssociation(PatientInfoDTO patientInfoDTO) throws HillromException{	
+	public void managePatientDeviceAssociation(PatientInfoDTO patientInfoDTO) throws SQLException ,HillromException{	
 		
 		try{
 			timsUserRepository.managePatientDeviceAssociation(patientInfoDTO.getOperation_type(),
@@ -223,8 +247,14 @@ public class TimsService {
 														  patientInfoDTO.getDx4(),
 														  patientInfoDTO.getGarment_type(),
 														  patientInfoDTO.getGarment_size(),
-														  patientInfoDTO.getGarment_color());
-		}catch(Exception ex){
+														  patientInfoDTO.getGarment_color(),
+														  patientInfoDTO.getCreated_by());
+		}
+		catch(SQLException se)
+		{
+			throw se;
+		}
+		catch(Exception ex){
 			throw new HillromException("Error While invoking Stored Procedure " , ex);
 		}
 	}
@@ -237,7 +267,7 @@ public class TimsService {
 	 * @throws HillromException
 	 */
 	
-	public JSONObject managePatientUser(PatientInfoDTO patientInfoDTO) throws HillromException {	
+	public JSONObject managePatientUser(PatientInfoDTO patientInfoDTO) throws SQLException, HillromException {	
 
 		try{
 		
@@ -260,12 +290,18 @@ public class TimsService {
 													patientInfoDTO.getAddress(), 
 													patientInfoDTO.getCity(), 
 													patientInfoDTO.getState(), 
+													patientInfoDTO.getCreated_by(),
 													null, // Following fields no longer being used from this table 
 													null, 
 													null, 
 													null, 
 													null);
-		}catch(Exception ex){
+		}
+		catch(SQLException se)
+		{
+			throw se;
+		}
+		catch(Exception ex){
 			throw new HillromException("Error While invoking Stored Procedure " , ex);
 		}
 		
@@ -274,14 +310,20 @@ public class TimsService {
 	
 	
 	
-	public void managePatientDeviceMonarch(PatientInfoDTO patientInfoDTO) throws HillromException{		
+	public void managePatientDeviceMonarch(PatientInfoDTO patientInfoDTO) throws SQLException ,HillromException{		
 		
 		try{
 			timsUserRepository.managePatientDeviceMonarch(patientInfoDTO.getOperation_type(), 
 				patientInfoDTO.getPatient_id(), 
 				patientInfoDTO.getOld_serial_number(), 
-				patientInfoDTO.getNew_serial_number());
-		}catch(Exception ex){
+				patientInfoDTO.getNew_serial_number(),
+				patientInfoDTO.getCreated_by());
+		}
+		catch(SQLException se)
+		{
+			throw se;
+		}
+		catch(Exception ex){
 			throw new HillromException("Error While invoking Stored Procedure " , ex);
 		}
 	}
@@ -465,7 +507,7 @@ public class TimsService {
 	public boolean isCurrentSerialNumberOwnedByDifferentPatientVest(String serialNumber,String hillromId){
 		
 		if(!patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").get().getHillromId().equalsIgnoreCase(hillromId)) {
-				log.debug("Checking isCurrentSerialNumberOwnedByDifferentPatientVest ");
+				//log.debug("Checking isCurrentSerialNumberOwnedByDifferentPatientVest ");
 				return true;
 		}
 		
@@ -475,7 +517,7 @@ public class TimsService {
 	public boolean isCurrentSerialNumberOwnedByDifferentPatientMonarch(String serialNumber,String hillromId){
 		
 		if(!patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").get().getHillromId().equalsIgnoreCase(hillromId)){ 
-			log.debug("Checking isCurrentSerialNumberOwnedByDifferentPatientMonarch ");	
+		//	log.debug("Checking isCurrentSerialNumberOwnedByDifferentPatientMonarch ");	
 			return true;
 		}
 		
@@ -494,7 +536,7 @@ public class TimsService {
 	public boolean isCurrentSerialNumberOwnedByCurrentHillromIdMonarch(String serialNumber,String hillromId){
 		
 		if(patientDevicesAssocRepository.findOneBySerialNumberAndHillromIdAndDeviceType(serialNumber,hillromId,"MONARCH").isPresent()) {
-			log.debug("Checking isCurrentSerialNumberOwnedByCurrentHillromIdMonarch ");
+		//	log.debug("Checking isCurrentSerialNumberOwnedByCurrentHillromIdMonarch ");
 			return true;	
 		}
 
@@ -504,7 +546,7 @@ public class TimsService {
 	public boolean isOwnerExistsForCurrentSerialNumberVest(String serialNumber){
 		
 		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").isPresent()) {
-				log.debug("Checking isOwnerExistsForCurrentSerialNumberVest ");
+				//log.debug("Checking isOwnerExistsForCurrentSerialNumberVest ");
 				return true;
 		}
 		
@@ -514,7 +556,7 @@ public class TimsService {
 	public boolean isOwnerExistsForCurrentSerialNumberMonarch(String serialNumber){
 		
 		if(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").isPresent()){ 
-				log.debug("Checking isOwnerExistsForCurrentSerialNumberMonarch ");
+			//	log.debug("Checking isOwnerExistsForCurrentSerialNumberMonarch ");
 				return true;
 		}
 		
@@ -530,37 +572,57 @@ public class TimsService {
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))){
 
 			try{
+				
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				JSONObject returnValues =  managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
-				log.debug("Created Patient Successfully"+returnValues.get("return_patient_id").toString());
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDevice(patientInfoDTO);
-				log.debug("Created Device for Patient Successfully");
-				
+							
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Associated Device for Patient Successfully");
-				log.debug("Patient Id "+returnValues.get("return_patient_id").toString());
 				
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
-				log.debug("Inserted Protocol for Patient Successfully");
-			}catch(Exception ex){
+				tims.processed_atleast_one = true;
+			
+			}
+			catch(SQLException se)
+			{
+				log.debug("Execution Failed when creating the New TIMs ID : "+ 
+								patientInfoDTO.getTims_cust() + 
+							" in VisiView with the new Vest Device Serial Number is : "+ 
+								patientInfoDTO.getSerial_num() +
+							", Reason for the failure is :  "+
+								se.getMessage()	);
+				
+				se.printStackTrace();
+				return false;
+			}
+			
+			catch(Exception ex){
+				log.debug("Execution Failed when creating the New TIMs ID : "+ 
+								patientInfoDTO.getTims_cust() + 
+							" in VisiView with the new Vest Device Serial Number is : "+ 
+								patientInfoDTO.getSerial_num() +
+							", Reason for the failure is :  "+
+								ex.getCause().getMessage());
 				ex.printStackTrace();
 				return false;
 			}				
 			
-			log.debug(patientInfoDTO.getTims_cust()+ ": Created , with Device Serial Number is "+patientInfoDTO.getSerial_num());
+		
+			log.debug("Executed Successfully for creating the New TIMs ID : "+patientInfoDTO.getTims_cust()+ " in VisiView with new Vest Device Serial Number is: "+patientInfoDTO.getSerial_num());
 			
-			log.debug("CASE1_NeitherPatientNorDeviceExist_VEST Executed Successfully");
 			return true;
 		}
 		
+				
 		return false;
 		
 	}
@@ -610,31 +672,49 @@ public class TimsService {
 			
 
 			try{
+				
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDevice(patientInfoDTO);
-				log.debug("Created Device for Patient Successfully");
-				
+								
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Associated Device for Patient Successfully");
-				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
-				
+								
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
-				log.debug("Inserted Protocol for Patient Successfully");
-			}catch(Exception ex){
+				tims.processed_atleast_one = true;
+			}
+			catch(SQLException se)
+			{
+				log.debug("Made Combo Execution Failed for the Monarch Patient with TIMs ID : "+
+								patientInfoDTO.getTims_cust()+
+							" when adding new Vest Device which is having  the serial number is "+
+								patientInfoDTO.getSerial_num() +
+							", Reason for the failure is : "+
+								se.getMessage());
+				se.printStackTrace();
+				return false;
+			}
+			catch(Exception ex){
+				
+				log.debug("Made Combo Execution Failed for the Monarch Patient with TIMs ID : "+
+								patientInfoDTO.getTims_cust()+
+							" when adding new Vest Device which is having  the serial number is "+
+								patientInfoDTO.getSerial_num() +
+							", Reason for the failure is : "+
+								ex.getCause().getMessage());
 				ex.printStackTrace();
 				return false;
 			}	
 			
 			log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
-			log.debug(patientInfoDTO.getTims_cust()+" for this Monarch patient new Vest Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
-			log.debug("CASE3_PatientHasMonarchAddVisivest_VEST Executed Successfully");
+			log.debug("Made Combo Executed Successfully for create Combo Patient with HillromID: "+  patientInfoDTO.getTims_cust()+" for this Monarch patient new Vest Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
+			
 			return true;
 			
 		}
@@ -650,32 +730,54 @@ public class TimsService {
 			
 
 			try{
+				
 				patientInfoDTO.setOperation_type("UPDATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get().getSerialNumber());
 				patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDevice(patientInfoDTO);
-				log.debug("Updated Device for Patient Successfully");
-				
+							
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Associated Device for Patient Successfully");
-				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
-				
+								
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
-				log.debug("Inserted Protocol for Patient Successfully");
-			}catch(Exception ex){
+				tims.processed_atleast_one = true;
+				
+			}
+			catch(SQLException se)
+			{
+				log.debug("VestDevice Swapping Case Execution Failed for the TIMs ID : "+ 
+								patientInfoDTO.getTims_cust()+
+							" : when  Swapping his old Vest device "+
+								patientInfoDTO.getOld_serial_number() +
+							" with new Vest Device is "+
+								patientInfoDTO.getNew_serial_number() +
+							", Reason for the failure is : "+
+								se.getMessage());
+				se.printStackTrace();
+				return false;
+			}
+			catch(Exception ex){
+				log.debug("VestDevice Swapping Case  Execution Failed for the TIMs ID : "+ 
+								patientInfoDTO.getTims_cust()+
+							" : when  Swapping his old Vest device "+
+								patientInfoDTO.getOld_serial_number() +
+							" with new Vest Device is "+
+								patientInfoDTO.getNew_serial_number() +
+							", Reason for the failure is : "+
+								ex.getCause().getMessage());
+				
 				ex.printStackTrace();
 				return false;
 			}	
-			log.debug(patientInfoDTO.getTims_cust()+":Swapped old Vest device is  "+patientInfoDTO.getOld_serial_number() +"   with new Vest Device is "+patientInfoDTO.getNew_serial_number());
-							
-			log.debug("CASE4_PatientHasDifferentVisivestSwap_VEST Executed Successfully");
+		
+			log.debug("VestDevice Swapping Case Executed Successfully for "+patientInfoDTO.getTims_cust()+" : Swapped old Vest device is  "+patientInfoDTO.getOld_serial_number() +"   with new Vest Device is "+patientInfoDTO.getNew_serial_number());
 			return true;
 			
 			
@@ -694,27 +796,45 @@ public class TimsService {
 			
 
 			try{
+				
 				patientInfoDTO.setOperation_type("UPDATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
-				log.debug("Updated Patient Successfully"+returnValues.get("return_patient_id").toString());
-				
+								
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Updated Associated Device for Patient Successfully");
-				log.debug("Patient Id "+returnValues.get("return_patient_id").toString());
+			
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
-				log.debug("Inserted Protocol for Patient Successfully");
-			}catch(Exception ex){
+				tims.processed_atleast_one = true;
+			}
+			catch(SQLException se)
+			{
+				log.debug("Execution Failed when allocating  the Shell Vest Device : "+
+								patientInfoDTO.getSerial_num()+
+							" to the TIMs ID "+ 
+								patientInfoDTO.getTims_cust() +
+							", Reason for the failure is : "+
+								se.getMessage());
+				se.printStackTrace();
+				return false;
+			}
+			catch(Exception ex){
+				
+				log.debug("Execution Failed when allocating  the Shell Vest Device : "+
+								patientInfoDTO.getSerial_num()+
+							" to the TIMs ID "+ 
+								patientInfoDTO.getTims_cust() +
+							", Reason for the failure is : "+ex.getCause().getMessage());
+				
 				ex.printStackTrace();
 				return false;
 			}
 			
-			log.debug(patientInfoDTO.getSerial_num()+"Shell VEST Device allocated to patient"+patientInfoDTO.getTims_cust());
-			log.debug("CASE5_DeviceOwnedByShell_VEST Executed Successfully");
+			log.debug("Shell VEST Device allocation Executed Successfully for the device : "+patientInfoDTO.getSerial_num()+" to the TIMs ID "+patientInfoDTO.getTims_cust());
 			return true;
 		}
 		
@@ -908,36 +1028,55 @@ public class TimsService {
 
 				
 				try{
+					
 					patientInfoDTO.setOperation_type("UPDATE");
+					patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 					managePatientUser(patientInfoDTO);
-					log.debug("Updated Patient Successfully");
-					 
+										 
 					patientInfoDTO.setOperation_type("CREATE");
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 					managePatientDevice(patientInfoDTO);
-					log.debug("Created Device for Patient Successfully");
-					
+									
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
-					log.debug("Associated Device for Patient Successfully");
-					log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
-					
+										
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
 					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocol(patientInfoDTO);
-					log.debug("Inserted Protocol for Patient Successfully");
-				}catch(Exception ex){
-					ex.printStackTrace();
+					tims.processed_atleast_one = true;
+					
+				}
+				catch(SQLException se)
+				{
+					log.debug("Made Combo Execution Failed for the Monarch Patient with TIMs ID : "+
+									patientInfoDTO.getTims_cust()+
+								" when adding new Vest Device which is having  the serial number is "+
+									patientInfoDTO.getSerial_num() +
+								", Reason for the failure is : "+
+									se.getMessage());
+					
+					se.printStackTrace();
+					return false;
+				}
+				catch(Exception ex){
+					
+					log.debug("Made Combo Execution Failed for the Monarch Patient with TIMs ID : "+
+									patientInfoDTO.getTims_cust()+
+								" when adding new Vest Device which is having  the serial number is "+
+									patientInfoDTO.getSerial_num()+
+								", Reason for the failure is : "+
+									ex.getCause().getMessage());
+					
+                    ex.printStackTrace();
 					return false;
 				}
 				
-				log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
-				log.debug(patientInfoDTO.getTims_cust()+" for this Monarch patient new Vest Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
+				log.debug("Made Combo Executed Successfully for TIMs ID : "+patientInfoDTO.getTims_cust()+" for this Monarch patient new Vest Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
 								
-				log.debug("CASE10_PatientHasMonarchAddVisivest_VEST Executed Successfully");
+				
 								
 				return true;
 			}
@@ -995,24 +1134,43 @@ public class TimsService {
 			
 
 			try{
+				
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
-
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Merge Associated Device for Patient Successfully");
-				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
-
-			}catch(Exception ex){
+				tims.processed_atleast_one = true;
+			}
+			catch(SQLException se)
+			{
+				log.debug("Made Combo Execution Failed when the Monarch patinet with the TIMs ID : "+
+								patientInfoDTO.getTims_cust()+
+							" merging with the existing visivest Device which is having  the serial number is "+
+								patientInfoDTO.getSerial_num() +
+							", Reason for the failure is : "+se.getMessage());
+				
+				se.printStackTrace();
+				return false;
+			}
+			catch(Exception ex){
+				
+				log.debug("Made Combo Execution Failed when the Monarch patinet with the TIMs ID : "+
+								patientInfoDTO.getTims_cust()+
+						" merging with the existing visivest Device which is having  the serial number is "+
+								patientInfoDTO.getSerial_num() + 
+						", Reason for the failure is : "+
+								ex.getCause().getMessage());
+				
 				ex.printStackTrace();
 				return false;
 			}	
-			
+		
 			log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
-			log.debug(patientInfoDTO.getTims_cust()+" for this Monarch patient Existing Vest Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
+			log.debug("Made Combo Executed Successfully for the TIMs ID :  "+patientInfoDTO.getTims_cust()+" for this Monarch patient Existing Vest Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
 				
 			
 			
-			log.debug("CASE12_PatientHasMonarchMergeExistingVisivest_VEST Executed Successfully");
+		
 			return true;
 			
 		}
@@ -1030,33 +1188,51 @@ public class TimsService {
 		if((!isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))){
 
 			try{
+				
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
-				log.debug("Created Patient Successfully"+returnValues.get("return_patient_id").toString());
-				
+							
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDeviceMonarch(patientInfoDTO);
-				log.debug("Created Device for Patient Successfully");
-				
+						
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Associated Device for Patient Successfully");
-				log.debug("Patient Id "+returnValues.get("return_patient_id").toString());
+		
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
-				log.debug("Inserted Protocol for Patient Successfully");
-			}catch(Exception ex){
+				tims.processed_atleast_one = true;
+		
+			}
+			catch(SQLException se)
+			{
+				log.debug("Execution Failed when creating the New TIMs ID : "+ 
+								patientInfoDTO.getTims_cust() + 
+						" in VisiView with the new Monarch Device Serial Number is : "+ 
+								patientInfoDTO.getSerial_num() +
+						", Reason for the failure is : "
+								+se.getMessage());
+				
+				se.printStackTrace();
+				return false;
+			}
+			catch(Exception ex){
+				log.debug("Execution Failed when creating the New TIMs ID : "+ 
+								patientInfoDTO.getTims_cust() + 
+							" in VisiView with the new Monarch Device Serial Number is : "+ 
+								patientInfoDTO.getSerial_num() +
+							", Reason for the failure is : "+
+								ex.getCause().getMessage());
+				
 				ex.printStackTrace();
 				return false;
 			}	
-			
-			log.debug(patientInfoDTO.getTims_cust()+"  :New Patient Created , with Device Serial Number is "+patientInfoDTO.getSerial_num());
-			
-			log.debug("CASE1_NeitherPatientNorDeviceExist_MONARCH Executed Successfully");
+						
+			log.debug("Executed Successfully when creating the New TIMs ID: "+patientInfoDTO.getTims_cust()+"  in VisiView with new Monarch Device Serial Number is: "+patientInfoDTO.getSerial_num());
 			return true;
 		}
 		
@@ -1109,33 +1285,51 @@ public class TimsService {
 				&& (!isHillromIdHasMonarchDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 			
 
-			try{
+			try{				
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDeviceMonarch(patientInfoDTO);
-				log.debug("Created Patient Successfully"+patientInfoDTO.getPatient_id());
-				
+								
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Associated Device for Patient Successfully");
-				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
-				
+								
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
-				log.debug("Inserted Protocol for Patient Successfully");
-			}catch(Exception ex){
+				tims.processed_atleast_one = true;
+			}
+			catch(SQLException se)
+			{
+				log.debug("Made Combo Execution Failed for the Vest Patient with TIMs ID : "+
+								patientInfoDTO.getTims_cust()+
+							" When adding new Monarch Device which is having  the serial number is "+
+								patientInfoDTO.getSerial_num() + 
+							", Reason for the failure is : "+
+								se.getMessage());
+				
+				se.printStackTrace();
+				return false;
+			}
+			catch(Exception ex){
+				log.debug("Made Combo Execution Failed for the Vest Patient with TIMs ID : "+
+								patientInfoDTO.getTims_cust()+
+						" When adding new Monarch Device which is having  the serial number is "+
+								patientInfoDTO.getSerial_num() + 
+						", Reason for the failure is : "+
+								ex.getCause().getMessage());
+				
 				ex.printStackTrace();
 				return false;
 			}	
+		
+			log.debug("Made Combo Case Executed Successfully for the TIMs ID: "+patientInfoDTO.getTims_cust()+" for this Vest patient new Monarch Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
 			
-			log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
-			log.debug(patientInfoDTO.getTims_cust()+" for this Vest patient new Monarch Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
-			log.debug("CASE3_PatientHasVisivestAddMonarch_MONARCH Executed Successfully");
+		
 			return true;
 			
 		}
@@ -1152,33 +1346,55 @@ public class TimsService {
 				&& (isHillromIdExistInPatientDeviceAssocMonarch(patientInfoDTO.getTims_cust())) && (isHillromIdHasMonarchDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 			
 
-			try{
+			try{				
 				patientInfoDTO.setOperation_type("UPDATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get().getSerialNumber());
 				patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
 				managePatientDeviceMonarch(patientInfoDTO);
-				log.debug("Updated Device for Patient Successfully");
-				
+								
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Associated Device for Patient Successfully");
-				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
-				
+								
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
-				log.debug("Inserted Protocol for Patient Successfully");
-			}catch(Exception ex){
+				tims.processed_atleast_one = true;
+			}
+			catch(SQLException se)
+			{
+				log.debug("Swap Case Execution Failed for the TIMs ID : "+ 
+								patientInfoDTO.getTims_cust()+
+							" : when  Swapping his  old Monarch device "+
+								patientInfoDTO.getOld_serial_number() +
+							" with new Monarch Device is "+
+								patientInfoDTO.getNew_serial_number() +
+							", Reason for the failure is : "+
+								se.getMessage());
+				
+				se.printStackTrace();
+				return false;
+			}
+			catch(Exception ex){
+				log.debug("Swap Case Execution Failed for the TIMs ID : "+ 
+								patientInfoDTO.getTims_cust()+
+							" : when  Swapping his  old Monarch device "+
+								patientInfoDTO.getOld_serial_number() +
+							" with new Monarch Device is "+
+								patientInfoDTO.getNew_serial_number() +
+							", Reason for the failure is : "+
+								ex.getCause().getMessage());
+				
 				ex.printStackTrace();
 				return false;
 			}		
 			
-			log.debug(patientInfoDTO.getTims_cust()+":Swapped old Monarch device"+patientInfoDTO.getOld_serial_number() +"with new Monarch Device "+patientInfoDTO.getNew_serial_number());
-			log.debug("CASE4_PatientHasDifferentMonarchSwap_MONARCH Executed Successfully");
+			log.debug("Swap Case Executed Successfully for the HillromId:"+patientInfoDTO.getTims_cust()+":Swapped old Monarch device"+patientInfoDTO.getOld_serial_number() +" with new Monarch Device "+patientInfoDTO.getNew_serial_number());
+		
 			return true;
 			
 			
@@ -1200,27 +1416,45 @@ public class TimsService {
 
 			try{
 				patientInfoDTO.setOperation_type("UPDATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
-				log.debug("Updated Patient Successfully"+returnValues.get("return_patient_id").toString());
-				
+								
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Updated Associated Device for Patient Successfully");
-				log.debug("Patient Id "+returnValues.get("return_patient_id").toString());
-				
+								
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
-				log.debug("Inserted Protocol for Patient Successfully");
-			}catch(Exception ex){
+				tims.processed_atleast_one = true;
+			}
+			catch(SQLException se)
+			{
+				log.debug("Execution Failed when allocating  the Shell Monarch Device : "+
+								patientInfoDTO.getSerial_num()+
+							" to the TIMs ID "+ 
+								patientInfoDTO.getTims_cust() +
+							", Reason for the failure is : "+
+								se.getMessage());
+				
+				se.printStackTrace();
+				return false;
+			}
+			catch(Exception ex){
+				log.debug("Execution Failed when allocating  the Shell Monarch Device : "+
+								patientInfoDTO.getSerial_num()+
+							" to the TIMs ID "+ 
+								patientInfoDTO.getTims_cust() +
+							", Reason for the failure is : "+
+								ex.getCause().getMessage());
+								
 				ex.printStackTrace();
 				return false;
 			}
-			log.debug(patientInfoDTO.getSerial_num()+"  Shell MONARCH Device allocated to patient  "+patientInfoDTO.getTims_cust());
+			log.debug("Executed Successfully for  :"+patientInfoDTO.getSerial_num()+"  Shell MONARCH Device allocated to the TIMs ID  "+patientInfoDTO.getTims_cust());
 			
-			log.debug("CASE5_DeviceOwnedByShell_MONARCH Executed Successfully");
+			
 			return true;
 		}
 		
@@ -1422,18 +1656,15 @@ public class TimsService {
 				
 				try{
 					patientInfoDTO.setOperation_type("UPDATE");
+					patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 					managePatientUser(patientInfoDTO);
-					log.debug("Updated Patient Successfully");
-					 
+							 
 					patientInfoDTO.setOperation_type("CREATE");
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 					managePatientDeviceMonarch(patientInfoDTO);
-					log.debug("Created Device for Patient Successfully");
 					
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
-					log.debug("Associated Device for Patient Successfully");
-					log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -1441,16 +1672,36 @@ public class TimsService {
 					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocolMonarch(patientInfoDTO);
-					log.debug("Inserted Protocol for Patient Successfully");
-				}catch(Exception ex){
+					tims.processed_atleast_one = true;
+				}
+				catch(SQLException se)
+				{
+					log.debug("Made Combo Execution Failed for the Vest Patient with TIMs ID : "+
+									patientInfoDTO.getTims_cust()+
+							" when adding new Monarch Device which is having  the serial number is "+
+									patientInfoDTO.getSerial_num() +
+							", Reason for the failure is : "+
+									se.getMessage());
+					
+					se.printStackTrace();
+					return false;
+				}
+				catch(Exception ex){
+					
+					log.debug("Made Combo Execution Failed for the Vest Patient with TIMs ID : "+
+									patientInfoDTO.getTims_cust()+
+								" when adding new Monarch Device which is having  the serial number is "+
+									patientInfoDTO.getSerial_num() +
+								", Reason for the failure is : "+
+									ex.getCause().getMessage()	);
+					
 					ex.printStackTrace();
 					return false;
 				}
 				
-				log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
-				log.debug(patientInfoDTO.getTims_cust()+" for this Vest patient new Monarch Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
+			    log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
+				log.debug("Made Combo Executed Successfully for the TIMs ID : "+patientInfoDTO.getTims_cust()+" for this Vest patient new Monarch Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
 								
-				log.debug("CASE10_PatientHasVisivestAddMonarch_MONARCH Executed Successfully");
 				return true;
 			}
 			
@@ -1509,20 +1760,37 @@ public class TimsService {
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
-
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Merge Associated Device for Patient Successfully");
-				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
-
-			}catch(Exception ex){
+				tims.processed_atleast_one = true;
+			}
+			catch(SQLException se)
+			{
+				log.debug("Made Combo Execution Failed when the Visivest patinet with the TIMs ID : "+
+								patientInfoDTO.getTims_cust()+
+							" merging with the existing Monarch Device which is having  the serial number is "+
+								patientInfoDTO.getSerial_num() +
+							", Reason for the failure is : "+se.getMessage());
+				
+				se.printStackTrace();
+				return false;
+			}
+			catch(Exception ex){
+				log.debug("Made Combo Execution Failed when the Visivest patinet with the TIMs ID : "+
+								patientInfoDTO.getTims_cust()+
+							" merging with the existing Monarch Device which is having  the serial number is "+
+								patientInfoDTO.getSerial_num() +
+							", Reason for the failure is : "+
+								ex.getCause().getMessage());
+				
 				ex.printStackTrace();
 				return false;
 			}	
-			
-			log.debug("Combo Patient Created Successfully with HillromID"+patientInfoDTO.getTims_cust());
-			log.debug(patientInfoDTO.getTims_cust()+" for this Vest patient Existing Monarch Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
+		
+			log.debug("Combo Patient Created Successfully with TIMs ID"+patientInfoDTO.getTims_cust());
+			log.debug("Made Combo Executed Successfully for the TIMs ID : "+patientInfoDTO.getTims_cust()+" for this Vest patient Existing Monarch Device added sucessfully with the serialnumber  " +patientInfoDTO.getSerial_num());
 				
-			log.debug("CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH Executed Successfully");
+			
 			return true;
 			
 		}

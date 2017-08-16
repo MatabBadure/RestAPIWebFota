@@ -743,21 +743,21 @@ public class TimsService {
 			catch(SQLException se)
 			{
 				
-				log.debug("Swapped       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+				log.debug("Swapped      " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
 						+se.getMessage());
 						se.printStackTrace();
 				return false;
 			}
 			catch(Exception ex){
 				
-				log.debug("Swapped       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+				log.debug("Swapped      " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
 						+ "Error occured while swapping Vest device");
 				
 				ex.printStackTrace();
 				return false;
 			}	
 			
-			log.debug("Swapped       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
+			log.debug("Swapped      " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
 					+ "Patient Vest device swapped with new Vest device");
 		
 			return true;
@@ -1309,20 +1309,20 @@ public class TimsService {
 			catch(SQLException se)
 			{
 			
-				log.debug("Swapped       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+				log.debug("Swapped      " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
 						+se.getMessage());
 				se.printStackTrace();
 				return false;
 			}
 			catch(Exception ex){
 				
-				log.debug("Swapped       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+				log.debug("Swapped      " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
 						+ "Error occured while swapping Monarch device");
 				ex.printStackTrace();
 				return false;
 			}		
 			
-			log.debug("Swapped       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
+			log.debug("Swapped      " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
 					+ "Patient Monarch device swapped with new Monarch device");
 			
 			return true;

@@ -332,7 +332,7 @@ public class TimsResource {
 			  	 try {
 			  		 
 			  		logFileContent = timsService.retrieveLogData(logfilePath.get("logfilePath").toString());
-			  		jsonObject.put("logFileContent", logFileContent);
+			  		jsonObject.put("logFileContent", logFileContent.trim());
 				  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
 					} catch (HillromException e) {
 						// TODO Auto-generated catch block

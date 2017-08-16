@@ -82,7 +82,10 @@ public class TimsInputReaderService {
 		
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
-		log.debug("HillRomId    SerialNumber    Task    Remarks");
+		//log.debug("StaHillRomId    SerialNumber    Task    Remarks");
+		//log.debug("HillRomId    SerialNumber    Task    Remarks");
+	
+		//log.debug("Status        TIMS Id        Serial Number        Result        Remarks");
 		
 		this.processed_atleast_one = false;
 		for (Map.Entry<Integer, PatientInfoDTO> entry : fileRecords.entrySet()) {

@@ -136,7 +136,7 @@ public class TimsInputReaderService {
 		}
 		
 		if(!processed_atleast_one){
-			log.debug("FAILURE        NA        NA      Failure        The csv file has already been executed or unable to process any of the records.");
+			log.debug("FAILURE        NA            NA          Failure           The csv file has already been executed or unable to process any of the records.");
 			throw new Exception("The csv file has already been executed or unable to process any of the records.");
 		}
 		

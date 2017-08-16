@@ -594,8 +594,10 @@ public class TimsService {
 			}
 			catch(SQLException se)
 			{
-				log.debug("Status:  " +"CREATED " +" TIMS Id:  " + patientInfoDTO.getTims_cust()+ " Serial Number:  "   +patientInfoDTO.getSerial_num()+ "Result:  "+" Failure"+ " Remarks:  "
-						+ "Reason for Failure is "+se.getMessage());
+				/*log.debug("Status:  " +"CREATED " +" TIMS Id:  " + patientInfoDTO.getTims_cust()+ " Serial Number:  "   +patientInfoDTO.getSerial_num()+ "Result:  "+" Failure"+ " Remarks:  "
+						+ "Reason for Failure is "+se.getMessage());*/
+				log.debug("CREATED       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+				+ "Reason for Failure is "+se.getMessage());
 				//log.debug(patientInfoDTO.getTims_cust()+"    "+patientInfoDTO.getSerial_num()+"    "+"CREATED"+"	"+"Reason for failure is: "+se.getMessage());
 				
 			/*	log.debug("Execution Failed when creating the New TIMs ID : "+ 
@@ -625,8 +627,12 @@ public class TimsService {
 				return false;
 			}				
 			//log.debug("Status        TIMS Id        Serial Number        Result        Remarks");
-			log.debug("Status:  " +"CREATED " +" TIMS Id:  " + patientInfoDTO.getTims_cust()+ " Serial Number:  "   +patientInfoDTO.getSerial_num()+ "Result:  "+" Success"+ " Remarks:  "
+			/*log.debug("Status:  " +"CREATED " +" TIMS Id:  " + patientInfoDTO.getTims_cust()+ " Serial Number:  "   +patientInfoDTO.getSerial_num()+ "Result:  "+" Success"+ " Remarks:  "
+					+ "New patient created with new device");*/
+			
+			log.debug("CREATED       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
 					+ "New patient created with new device");
+					
 			//log.debug(patientInfoDTO.getTims_cust()+"    "+patientInfoDTO.getSerial_num()+"    "+"CREATED"+"    "+"new patient created with new device");
 		
 			//log.debug("Executed Successfully for creating the New TIMs ID : "+patientInfoDTO.getTims_cust()+ " in VisiView with new Vest Device Serial Number is: "+patientInfoDTO.getSerial_num());

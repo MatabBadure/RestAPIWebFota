@@ -337,7 +337,7 @@ public class TimsUserRepository{
                                                                                 int min_pressure,
                                                                                 int max_pressure,
                                                                                 int to_be_inserted,
-                                                                                String user_id) throws Exception{
+                                                                                String user_id) {
 				try{
                          entityManager
                          .createNativeQuery("insert into protocol_data_temp_table("

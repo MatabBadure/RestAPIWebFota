@@ -1,7 +1,5 @@
 package com.hillrom.vest.web.rest.FOTA;
-
-import static com.hillrom.vest.config.FOTA.FOTAConstants.HEXAFILEPATH;
-
+import static com.hillrom.vest.config.FOTA.FOTAConstants.FOTA_FILE_PATH;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,8 +9,6 @@ import java.nio.file.Paths;
 import java.util.Objects;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import net.minidev.json.JSONObject;
@@ -34,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.hillrom.vest.config.FOTA.FOTAConstants;
 import com.hillrom.vest.domain.FOTA.FOTAInfo;
 import com.hillrom.vest.service.FOTA.FOTAService;
-import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.web.rest.FOTA.dto.FOTAInfoDto;
 
 @RestController
@@ -53,7 +48,7 @@ public class FOTAResource {
 			@RequestParam(value = "chunckSize", required = false) Integer chunkSize) {
 		JSONObject jsonObject = new JSONObject();
 		try {
-			jsonObject = fotaService.processHexaToByteData(HEXAFILEPATH, chunkSize);
+			jsonObject = fotaService.processHexaToByteData(FOTA_FILE_PATH, chunkSize);
 
 			return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
 
@@ -95,7 +90,7 @@ public class FOTAResource {
 	}
 	
 	/**
-     * POST  /Announcement -> Create New Announcements
+     * POST  /FIOTA -> Create New FOTA
      */
 	@RequestMapping(value="/FOTA/create", method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> createFOTA(@Valid @RequestBody(required=true) FOTAInfoDto fotaInfoDto){

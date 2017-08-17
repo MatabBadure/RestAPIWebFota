@@ -1,7 +1,5 @@
 package com.hillrom.vest.pointer.FOTA;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.HEXAFILEPATH;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE1;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.CHUNK_SIZE_VALUE;
 
 import java.io.FileInputStream;
 import java.nio.file.FileSystems;

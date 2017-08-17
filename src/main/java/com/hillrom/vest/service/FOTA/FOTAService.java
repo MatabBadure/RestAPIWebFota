@@ -1,14 +1,12 @@
 package com.hillrom.vest.service.FOTA;
-
+import static com.hillrom.vest.config.FOTA.FOTAConstants.FOTA_FILE_PATH;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.AMPERSAND;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.BUFFER_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.BUFFER_LEN_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER_01;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE_EQ;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.HEXAFILEPATH;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.INIT;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.NOT_OK;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.OK;
@@ -47,15 +45,11 @@ import net.minidev.json.JSONObject;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hillrom.vest.domain.Announcements;
 import com.hillrom.vest.domain.FOTA.FOTAInfo;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.pointer.FOTA.HM_HandleHolder;
@@ -1032,7 +1026,7 @@ public class FOTAService {
 		String hexDataStr = "";
 		String[] output = null;
 		try {
-			Path pp = FileSystems.getDefault().getPath(HEXAFILEPATH,
+			Path pp = FileSystems.getDefault().getPath(FOTA_FILE_PATH,
 					"193164_charger_mainboard.hex");
 			FileInputStream fis = new FileInputStream(pp.toFile());
 			int len;

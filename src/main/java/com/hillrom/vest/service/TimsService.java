@@ -145,7 +145,8 @@ public class TimsService {
 				throw se;
 			}*/
 			catch(Exception ex){
-				throw new HillromException("Error While invoking Stored Procedure " , ex);
+				log.debug("In insert protocol exception"+ex.getMessage());
+				//throw new HillromException("Error While invoking Stored Procedure " , ex);
 			}
 		}
 	 
@@ -188,10 +189,12 @@ public class TimsService {
 		}
 		catch(SQLException se)
 		{
-			throw se;
+			//throw se;
+			log.debug("In create Patient protocol"+se.getMessage());
 		}
 		catch(Exception ex){
-			throw new HillromException("Error While invoking Stored Procedure " , ex);
+			//throw new HillromException("Error While invoking Stored Procedure " , ex);
+			log.debug("Error While invoking Stored Procedure" + ex.getMessage());
 		}
 	}
 

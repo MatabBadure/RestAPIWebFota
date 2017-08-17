@@ -17,12 +17,9 @@ public class HM_part01 {
 	private final static Logger log = LoggerFactory.getLogger(HM_part01.class);
 	
 	public static final byte[] CHUNK_SIZE = new byte[]{38,99,104,117,110,107,83,105,122,101,61};
+	
 	private static Map<Integer, String> fileChunks = null;
 	
-	/*private static Map< String, Map<Integer, String>> fileChunks = new LinkedHashMap<String, Map<Integer,String>>();
-	private static Map<Integer, String> fileChunkBasedOnSize = new LinkedHashMap<Integer, String>();
-	*/
-	//private static Map<String, Integer> sendChunkCounter = new LinkedHashMap<String, Integer>();
 	
 	private static int totalChunk = 0;
 	private static HM_part01 instance;
@@ -30,29 +27,30 @@ public class HM_part01 {
 	private HM_part01() {
 	} // avoid instantiation.
 
-	public static HM_part01 getInstance(String rawMessage, String requestType) {
+	public static HM_part01 getInstance(String rawMessage, String requestType, String filePath) {
 		if (instance == null) {
 			instance = new HM_part01();
-			totalChunk = readHexByteDataFromFile(rawMessage);
+			totalChunk = readHexByteDataFromFile(rawMessage,filePath);
 			instance.setTotalChunk(totalChunk);
 			instance.setFileChunks(fileChunks);
 		}else if(instance != null && requestType.equals(REQUEST_TYPE1) ){
 			instance = new HM_part01();
-			totalChunk = readHexByteDataFromFile(rawMessage);
+			totalChunk = readHexByteDataFromFile(rawMessage,filePath);
 			instance.setTotalChunk(totalChunk);
 			instance.setFileChunks(fileChunks);
 		}
 		return instance;
 	}
 
-	private static int readHexByteDataFromFile(String rawMessage) {
+	private static int readHexByteDataFromFile(String rawMessage, String filePath) {
 		int ctr = 0;
 		int totalChunk = 0;
 		String hexDataStr = "";
 		String[] output = null;
 		try {
-			Path pp = FileSystems.getDefault().getPath(HEXAFILEPATH,
-					"193164_charger_mainboard.hex");
+			/*Path pp = FileSystems.getDefault().getPath(HEXAFILEPATH,
+					"193165_charger_mainboard.hex");*/
+			Path pp = FileSystems.getDefault().getPath(filePath);
 			FileInputStream fis = new FileInputStream(pp.toFile());
 			log.debug("File Length :" + (int) pp.toFile().length());
 			byte[] byteArray = new byte[(int) pp.toFile().length()];

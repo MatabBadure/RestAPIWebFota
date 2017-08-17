@@ -7,9 +7,6 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER_01;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER_02;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER_03;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER_04;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HEXAFILEPATH;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.INIT;
@@ -31,6 +28,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,30 +37,42 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
+import javax.inject.Inject;
 import javax.xml.bind.DatatypeConverter;
 
 import net.minidev.json.JSONObject;
 
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.vest.domain.Announcements;
+import com.hillrom.vest.domain.FOTA.FOTAInfo;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.pointer.FOTA.HM_HandleHolder;
 import com.hillrom.vest.pointer.FOTA.HM_part01;
-import com.hillrom.vest.pointer.FOTA.HM_part02;
-import com.hillrom.vest.pointer.FOTA.HM_part03;
-import com.hillrom.vest.pointer.FOTA.HM_part04;
+import com.hillrom.vest.repository.FOTA.FOTARepository;
+import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.FOTA.FOTAParseUtil;
+import com.hillrom.vest.web.rest.FOTA.dto.FOTAInfoDto;
 @Service
 @Transactional
 public class FOTAService {
 
 	private final Logger log = LoggerFactory.getLogger(FOTAService.class);
+	@Inject
+	private FOTARepository fotaRepository;
+	
+	
 	private  Map<Long,String> storeChunk ;
 	private  Map<Long,String> handleHolder ;
 	
@@ -70,16 +80,14 @@ public class FOTAService {
 	public static final byte[] CHUNK_SIZE = new byte[]{38,99,104,117,110,107,83,105,122,101,61};
 	public static final byte[] HANDLE = new byte[]{38,104,97,110,100,108,101,61};
 	
+	public static final byte[] DEV_VER = new byte[]{38,100,101,118,86,101,114,61};
 	private int bufferLen = 0;
 	private String buffer = null;
 	
 	public String FOTAUpdate(String rawMessage) {
 		
 		int countInt = 0;
-
 		String decoded_string = "";
-
-		StringBuilder responseString = new StringBuilder();
 		String resultPair = "";
 		String handlePair = "";
 		String totalChunkPair = "";
@@ -106,12 +114,18 @@ public class FOTAService {
 		if(validateCRC(rawMessage)){
 			//crcResult = "Yes";
 			crsResultValue = asciiToHex(YES);
-		if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE1)) {
 			
-			if(fotaJsonData.get(DEVICE_PARTNUMBER).equals(DEVICE_PARTNUMBER_01)){
-				
+			//Get Fota Details based on part numbers.
+			
+			
+			if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE1)) {
+			//String diviceVer = getDeviceVersion(rawMessage);
+			//FOTAInfo fotaInfo = getFotaInforByPartNumber(fotaJsonData.get(DEVICE_PARTNUMBER),false);
+			FOTAInfo fotaInfo = fotaRepository.findFOTAInfo(fotaJsonData.get(DEVICE_PARTNUMBER),true);
+			if(fotaInfo != null){
+			if(fotaJsonData.get(DEVICE_PARTNUMBER).equals(fotaInfo.getDevicePartNumber())){
 				int totalChunks = 0;
-				HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE));
+				HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE),fotaInfo.getFilePath());
 				
 				Map<String,String> partNumberWithCount = new LinkedHashMap<String, String>();
 				String handleId = getHandleNumber();
@@ -154,6 +168,21 @@ public class FOTAService {
 				log.debug("finalResponseStr: " + finalResponseStr);
 				
 				}
+			}else{
+				crsResultValue = asciiToHex("NO");
+				resultPair = getResponePairResult();
+				crcPair = getResponePair3();
+				String crsRaw = resultPair.concat(crsResultValue).concat(
+						crcPair);
+
+				byte[] encodedCRC = java.util.Base64.getEncoder().encode(
+						DatatypeConverter.parseHexBinary(crsRaw));
+				String encodedString = new String(encodedCRC);
+				log.debug("encodedString: " + encodedString);
+				String crcValue = calculateCRC(encodedString);
+				
+				finalResponseStr = resultPair.concat(crsResultValue).concat(crcPair).concat(crcValue);
+			}
 			}else if(fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE2)){
 				String handleId = "";
 				int chunkCount = 0;
@@ -167,10 +196,11 @@ public class FOTAService {
 					Map<String,String> updatePartNumberWithCount = new LinkedHashMap<String, String>();
 					
 					for(Map.Entry<String,String> partDetail : partNumberWithCount.entrySet()){
-						if(partDetail.getKey().equals(DEVICE_PARTNUMBER_01) && partDetail.getValue().equals(String.valueOf(chunkCount))){
+						/*if(partDetail.getKey().equals(fotaInfo.getDevicePartNumber()) && partDetail.getValue().equals(String.valueOf(chunkCount))){*/
+						if(partDetail.getValue().equals(String.valueOf(chunkCount))){
 							updatePartNumberWithCount.put(partDetail.getKey(), String.valueOf(chunkCount));
 							globalHandleHolder.getHandleWithPartNumber().put(handleId,updatePartNumberWithCount);
-							HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE));
+							HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE),"");
 							String zeroChunk = hmp01.getFileChunks().get(chunkCount);
 							//Zero the Chunk in raw format
 							buffer = hexToAscii(asciiToHex(zeroChunk));
@@ -191,9 +221,9 @@ public class FOTAService {
 						
 						Map<String,String> updatePartNumberWithCount = new LinkedHashMap<String, String>();
 						for(Map.Entry<String,String> partDetail : partNumberWithCount.entrySet()){
-							if(partDetail.getKey().equals(DEVICE_PARTNUMBER_01)){
+							/*if(partDetail.getKey().equals(fotaInfo.getDevicePartNumber())){*/
 								//Part Number
-								HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE));
+								HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE),"");
 								String countStr = partDetail.getValue();
 								countInt = Integer.parseInt(countStr);
 								countInt = countInt + 1;
@@ -209,7 +239,7 @@ public class FOTAService {
 								//Chunk size in hex byte
 								bufferLen = (okSendChunk.length() / 2);
 								log.debug("bufferLen:" + bufferLen);
-							} 
+							//} 
 						}	
 						
 				} else if (fotaJsonData.get(PREV_REQ_STATUS).equals(NOT_OK)) {
@@ -220,9 +250,9 @@ public class FOTAService {
 						
 						Map<String,String> updatePartNumberWithCount = new LinkedHashMap<String, String>();
 						for(Map.Entry<String,String> partDetail : partNumberWithCount.entrySet()){
-							if(partDetail.getKey().equals(DEVICE_PARTNUMBER_01)){
+							/*if(partDetail.getKey().equals(fotaInfo.getDevicePartNumber())){*/
 								//Part Number
-								HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE));
+								HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE),"");
 								String countStr = partDetail.getValue();
 								countInt = Integer.parseInt(countStr);
 								//countInt = countInt + 1;
@@ -240,7 +270,7 @@ public class FOTAService {
 								bufferLen = (okSendChunk.length() / 2);
 								log.debug("bufferLen:" + bufferLen);
 								
-							} 
+							//} 
 						}	
 				}
 				// result pair1
@@ -320,7 +350,7 @@ public class FOTAService {
 					finalResponseStr = resultPair.concat(crsResultValue).concat(crcPair).concat(crcValue);
 				}
 			}
-
+		
 		}else if(!validateCRC(rawMessage)){
 			//crcResult = "NOT OK";
 			crsResultValue = asciiToHex(NOT_OK);
@@ -345,12 +375,44 @@ public class FOTAService {
 		
 	}
 	
+	private String getDeviceVersion(String rawMessage) {
+
+		byte[] getHandleByte = java.util.Base64.getDecoder().decode(rawMessage);
+		int deviceIndex = returnMatch(getHandleByte, DEV_VER);
+		log.error("str1: " + deviceIndex);
+		StringBuilder deviceRes = new StringBuilder();
+		String device1 = Integer.toHexString(getHandleByte[deviceIndex] & 0xFF);
+		String device2 = Integer
+				.toHexString(getHandleByte[deviceIndex + 1] & 0xFF);
+		String device3 = Integer
+				.toHexString(getHandleByte[deviceIndex + 2] & 0xFF);
+		String device4 = Integer
+				.toHexString(getHandleByte[deviceIndex + 3] & 0xFF);
+				
+		device1 =	("00"+ device1).substring(device1.length());
+		device2 =	("00"+ device2).substring(device2.length());
+		device3 =	("00"+ device3).substring(device3.length());
+		device4 =	("00"+ device4).substring(device4.length());
+		deviceRes.append(device1);
+		deviceRes.append(device2);
+		deviceRes.append(device3);
+		deviceRes.append(device4);
+		//written new code
+		String deviceVer = toLittleEndian(deviceRes.toString());
+		log.error("deviceVer: " + deviceVer);
+		return deviceVer;
+	}
+
+	public String getFotaInforByPartNumber(String partNumber, boolean isOldFile) {
+		String softVer = fotaRepository.findOneById(partNumber,isOldFile);
+		return softVer;
+	}
+
 	private String calculateCRC(String encodedString) {
 		 
 		log.debug("Inside  calculateCRC : " ,encodedString);
 		  
 	    int nCheckSum = 0;
-
 	    byte[] decoded = java.util.Base64.getDecoder().decode(encodedString);
 	    
 	    int nDecodeCount = 0;
@@ -1002,6 +1064,59 @@ public class FOTAService {
 		return totalChunk;
 	}
 
-	
-	
+	public FOTAInfo savFotaInfoData(FOTAInfoDto fotaInfoDto)
+			throws ParseException {
+
+		FOTAInfo fotaInfo = new FOTAInfo();
+		fotaInfo.setDevicePartNumber(fotaInfoDto.getDevicePartNumber());
+		fotaInfo.setSoftVersion(fotaInfoDto.getSoftVersion());
+
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMddyy");
+		simpleDateFormat.setLenient(false);
+		Date date2 = simpleDateFormat.parse(fotaInfoDto.getReleaseDate());
+		System.out.println("Date String 2 is '" + date2);
+		DateTime dt = new DateTime(date2);
+		System.out.println("Dt is '" + dt);
+		fotaInfo.setReleaseDate(dt);
+
+		fotaInfo.setProductType("Monarch");
+
+		fotaInfo.setFilePath(fotaInfoDto.getFilePath());
+
+		fotaInfo.setUploadUser(fotaInfoDto.getUploadUser());
+
+		fotaInfo.setUploadDatetime(DateUtil.getCurrentDateAndTime());
+		
+		SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("MMddyy");
+		simpleDateFormat1.setLenient(false);
+		Date date3 = simpleDateFormat1.parse(fotaInfoDto.getEffectiveDate());
+		DateTime effectiveDate = new DateTime(date3);
+		System.out.println(effectiveDate);
+		fotaInfo.setEffectiveDatetime(effectiveDate);
+		fotaInfo.setModelId(fotaInfoDto.getModelId());
+		fotaInfo.setBoardId(fotaInfoDto.getBoardId());
+		fotaInfo.setBedId(fotaInfoDto.getBedId());
+		fotaInfo.setBootCompVer(fotaInfoDto.getBootCompVer());
+		fotaInfo.setFilePattern(fotaInfoDto.getFilePattern());
+		fotaInfo.setMCUSize(fotaInfoDto.getmCUSize());
+		fotaInfo.setReleaseNumber(fotaInfoDto.getReleaseNumber());
+		fotaInfo.setChecksum(fotaInfoDto.getChecksum());
+		fotaInfo.setOldSoftFlag(true);
+		fotaRepository.save(fotaInfo);
+		log.debug("Created New Fota: {}", fotaInfo);
+		return fotaInfo;
+	}
+
+	public FOTAInfo softDeleteFOTA(String partNo, boolean isOldFile) {
+		FOTAInfo fotaInfo = fotaRepository.findFOTAInfo(partNo,isOldFile);
+		if(Objects.nonNull(fotaInfo))
+  	  {
+			fotaInfo.setOldSoftFlag(false);
+			fotaInfo.setUploadDatetime(DateUtil.getCurrentDateAndTime());
+			fotaRepository.save(fotaInfo);
+  	        log.debug("updated fotaInfo Details: {}", fotaInfo);
+  	  }
+		return fotaInfo;
+	}
+
 }

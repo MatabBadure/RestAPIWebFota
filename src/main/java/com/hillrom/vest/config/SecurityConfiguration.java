@@ -104,6 +104,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/processHexaToByte").permitAll()
             .antMatchers("/api/checkUpdate").permitAll()
             .antMatchers("/api/FOTA").permitAll()
+            .antMatchers("/api/FOTA/uploadFile").permitAll()
+            .antMatchers("/api/FOTA/create").permitAll()
+            .antMatchers("/api/FOTA/getSoftVersion/{partNoV}/{isOldFileV}").permitAll()
+            .antMatchers("/api//FOTA/softDeleteFOTA/{partNoD}/{isOldFileD}").permitAll()
+
             .antMatchers("/api/users/{id}/exportVestDeviceData").authenticated()
             .antMatchers("/api/users/{id}/exportVestDeviceDataCSV").authenticated()
             .antMatchers("/api/users/{id}/exportTherapyData").authenticated()

@@ -125,7 +125,7 @@ public class TimsService {
 									                int min_pressure,
 									                int max_pressure,
 									                int to_be_inserted,
-									                String user_id) throws SQLException, HillromException{	
+									                String user_id) throws  HillromException{	
 			try{
 					timsUserRepository.insertIntoProtocolDataTempTable(patient_id,
 													type,
@@ -140,10 +140,10 @@ public class TimsService {
 									                to_be_inserted,
 									                user_id);
 			}
-			catch(SQLException se)
+			/*catch(SQLException se)
 			{
 				throw se;
-			}
+			}*/
 			catch(Exception ex){
 				throw new HillromException("Error While invoking Stored Procedure " , ex);
 			}
@@ -572,8 +572,8 @@ public class TimsService {
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))){
 
 			try{
-				
-				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setOperation_type("UPDATE");
+				//patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				JSONObject returnValues =  managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
@@ -606,7 +606,8 @@ public class TimsService {
 				
 				log.debug("Created       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
 						+ "Error occured while creating new patient with new device");
-				
+				System.out.println("Logging Message" + ex.getMessage());
+				System.out.println("I am here ");
 				ex.printStackTrace();
 				return false;
 			}				

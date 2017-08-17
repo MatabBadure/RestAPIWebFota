@@ -801,14 +801,14 @@ public class TimsService {
 			catch(Exception ex){
 	
 				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
-						+"Error occured while updating Vest device");
+						+"Error occured while updating Vest patient");
 				
 				ex.printStackTrace();
 				return false;
 			}
 						
 			log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
-					+ "Shell Vest device updated");
+					+ "Vest patient updated");
 			
 			return true;
 		}
@@ -1272,6 +1272,7 @@ public class TimsService {
 			
 			log.debug("Made Combo    " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
 					+ "Patient updated as combo(Monarch device is added)");
+			
 			return true;
 			
 		}
@@ -1372,14 +1373,14 @@ public class TimsService {
 			catch(Exception ex){
 				
 				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
-						+"Error occured while updating Monarch device");
+						+"Error occured while updating Monarch patient");
 				
 				
 				ex.printStackTrace();
 				return false;
 			}
 			log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
-					+ "Shell Monarch device updated");
+					+ "Monarch patient updated");
 									
 			return true;
 		}

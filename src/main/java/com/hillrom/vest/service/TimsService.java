@@ -807,7 +807,7 @@ public class TimsService {
 			}
 						
 			log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
-					+ "Shell Vest device Updated");
+					+ "Shell Vest device updated");
 			
 			return true;
 		}
@@ -1378,7 +1378,7 @@ public class TimsService {
 				return false;
 			}
 			log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
-					+ "Shell Monarch device Updated");
+					+ "Shell Monarch device updated");
 									
 			return true;
 		}

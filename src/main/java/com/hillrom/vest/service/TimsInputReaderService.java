@@ -95,7 +95,7 @@ public class TimsInputReaderService {
 		    	//timsService.CASE2_PatientExistsWithNODevice_VEST(record);
 		    	timsService.CASE3_PatientHasMonarchAddVisivest_VEST(record);
 		    	timsService.CASE4_PatientHasDifferentVisivestSwap_VEST(record);
-		       timsService.CASE5_DeviceOwnedByShell_VEST(record);
+		        timsService.CASE5_DeviceOwnedByShell_VEST(record);
 		    	//timsService.CASE6_DeviceOwnedByDifferentPatient_VEST(record);
 		    	//timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_VEST(record);
 		    	//timsService.CASE8_DeviceIsOrphanButPatientExist_VEST(record);
@@ -144,9 +144,7 @@ public class TimsInputReaderService {
 	public Map readcsv() 
 	{
 		
-		// String csvFile = "C:/flat_file.csv";
-			
-	     String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
+		   String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
 		  //  log.debug("Started reading flat file : " + csvFile);
 	        String line = "";
 	        String cvsSplitBy = ",";

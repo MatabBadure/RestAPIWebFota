@@ -125,7 +125,7 @@ public class TimsService {
 									                int min_pressure,
 									                int max_pressure,
 									                int to_be_inserted,
-									                String user_id) {	
+									                String user_id) throws SQLException, HillromException{	
 			try{
 					timsUserRepository.insertIntoProtocolDataTempTable(patient_id,
 													type,
@@ -140,12 +140,12 @@ public class TimsService {
 									                to_be_inserted,
 									                user_id);
 			}
-			/*catch(SQLException se)
+			catch(SQLException se)
 			{
-				//throw se;
-			}*/
+				throw se;
+			}
 			catch(Exception ex){
-				//throw new HillromException("Error While invoking Stored Procedure " , ex);
+				throw new HillromException("Error While invoking Stored Procedure " , ex);
 			}
 		}
 	 

@@ -379,11 +379,9 @@ public class TimsUserRepository{
                          .setParameter("id", user_id)                                 
                          .executeUpdate();
 				}
-								
-				catch(Exception ex){
 				
+				catch(Exception ex){
 					ex.printStackTrace();
-					//throw new SQLException(ex);
 				}
            
 

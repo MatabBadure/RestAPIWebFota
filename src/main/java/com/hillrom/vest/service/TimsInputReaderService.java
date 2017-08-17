@@ -68,12 +68,14 @@ public class TimsInputReaderService {
 
 	private final Logger log = LoggerFactory.getLogger("com.hillrom.vest.tims");
 	
+	public static boolean processed_atleast_one = false;
+	
 	
 	@Inject
 	private TimsService timsService;
 	
 	//@Scheduled(cron="0/5 * * * * * ")
-	public void ExecuteTIMSJob() 
+	public void ExecuteTIMSJob() throws Exception
 	{
 		
 		MDC.put("logFileName", "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
@@ -81,18 +83,19 @@ public class TimsInputReaderService {
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
 		
-		log.debug("Starting to process records ");
+		log.debug("Status           TIMS Id        Serial Number        Result        Remarks");
+		
+		this.processed_atleast_one = false;
 		for (Map.Entry<Integer, PatientInfoDTO> entry : fileRecords.entrySet()) {
 		    Integer position = entry.getKey();
 		    PatientInfoDTO record = entry.getValue();
-		    log.debug("Processing record position : "+position);
+		
 		  if(record.getDevice_type().equalsIgnoreCase("VEST")){
-		    	log.debug("Inside VEST loop ");
-		    	timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record);
+		      	timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record);
 		    	//timsService.CASE2_PatientExistsWithNODevice_VEST(record);
 		    	timsService.CASE3_PatientHasMonarchAddVisivest_VEST(record);
 		    	timsService.CASE4_PatientHasDifferentVisivestSwap_VEST(record);
-		    	timsService.CASE5_DeviceOwnedByShell_VEST(record);
+		       timsService.CASE5_DeviceOwnedByShell_VEST(record);
 		    	//timsService.CASE6_DeviceOwnedByDifferentPatient_VEST(record);
 		    	//timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_VEST(record);
 		    	//timsService.CASE8_DeviceIsOrphanButPatientExist_VEST(record);
@@ -107,9 +110,9 @@ public class TimsInputReaderService {
 		    	
 		    	/*If the new monarch device added is  one without connectvity then ensure that 
 		    	you dont create a combo patient in TIMS visiview code.*/
-		    	if(record.getBluetooth_id()!=null && (!record.getBluetooth_id().isEmpty()))
+		 	if(record.getBluetooth_id()!=null && (!record.getBluetooth_id().isEmpty()))
 		    	{
-			    	log.debug("Inside MONARCH loop ");
+			    	
 			    	timsService.CASE1_NeitherPatientNorDeviceExist_MONARCH(record);
 			    	//timsService.CASE2_PatientExistsWithNODevice_MONARCH(record);
 			   	    timsService.CASE3_PatientHasVisivestAddMonarch_MONARCH(record);
@@ -125,6 +128,15 @@ public class TimsInputReaderService {
 		    	}
 		    }
 		}
+		if(processed_atleast_one){
+			log.debug(" ");
+			log.debug("All Records Executed Successfully");
+		}
+		
+		if(!processed_atleast_one){
+			log.debug("FAILURE        NA               NA             Failure           The csv file has already been executed or unable to process any of the records.");
+			throw new Exception("The csv file has already been executed or unable to process any of the records.");
+		}
 		
 	}
 
@@ -132,9 +144,10 @@ public class TimsInputReaderService {
 	public Map readcsv() 
 	{
 		
-
-	        String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
-		    log.debug("Started reading flat file : " + csvFile);
+		// String csvFile = "C:/flat_file.csv";
+			
+	     String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
+		  //  log.debug("Started reading flat file : " + csvFile);
 	        String line = "";
 	        String cvsSplitBy = ",";
 	        String Outdata = "";
@@ -174,7 +187,7 @@ public class TimsInputReaderService {
 		            for(int j=0;j<data.length;j++){
 		            	s = s + "\t" + data[j];
 		            }
-		            log.debug("Excel File Read as : " + s);
+		        //    log.debug("Excel File Read as : " + s);
 
 		            
 		            
@@ -255,7 +268,7 @@ public class TimsInputReaderService {
 		            
 	            }
 	            
-	            log.debug("Excel File contents in HashSet : " + fileRecords);
+	          //  log.debug("Excel File contents in HashSet : " + fileRecords);
 	            return fileRecords;
 	            
 	        } catch (IOException e) {

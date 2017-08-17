@@ -332,12 +332,11 @@ public class TimsResource {
 			  	 try {
 			  		 
 			  		logFileContent = timsService.retrieveLogData(logfilePath.get("logfilePath").toString());
-			  		jsonObject.put("logFileContent", logFileContent);
+			  		jsonObject.put("logFileContent", logFileContent.trim().replaceAll("All Records Executed Successfully",""));
 				  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
 					} catch (HillromException e) {
 						// TODO Auto-generated catch block
-						
-						
+												
 						jsonObject.put("ERROR", e.getMessage());
 						
 						return new ResponseEntity<>(jsonObject ,HttpStatus.BAD_REQUEST);
@@ -416,9 +415,9 @@ public class TimsResource {
 		JSONObject jsonObject = new JSONObject();
 
 		try{		  
-			  timsInputReaderService.ExecuteTIMSJob();
-			  jsonObject.put("timsMsg", "TIMSJob Executed Successfully");
-			  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			
+			timsInputReaderService.ExecuteTIMSJob();			  
+			jsonObject.put("timsMsg", "TIMSJob Executed Successfully");
+			return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			
 		}catch(Exception ex){
 			
 			jsonObject.put("timsMsg", "TIMSJob NOT Executed Successfully");

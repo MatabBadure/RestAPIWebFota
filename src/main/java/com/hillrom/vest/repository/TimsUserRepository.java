@@ -223,7 +223,8 @@ public class TimsUserRepository{
 					.setParameter("pat_hub_id",inPatientHubId)	
 					.setParameter("pat_created_by",inPatientCreatedBy)
 					.executeUpdate();
-				}catch(Exception ex){
+				}
+				catch(Exception ex){
 					ex.printStackTrace();
 				}
 				
@@ -378,9 +379,11 @@ public class TimsUserRepository{
                          .setParameter("id", user_id)                                 
                          .executeUpdate();
 				}
-				
+								
 				catch(Exception ex){
+				
 					ex.printStackTrace();
+					//throw new SQLException(ex);
 				}
            
 

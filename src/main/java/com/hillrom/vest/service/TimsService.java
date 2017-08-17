@@ -140,10 +140,10 @@ public class TimsService {
 									                to_be_inserted,
 									                user_id);
 			}
-			catch(SQLException se)
+			/*catch(SQLException se)
 			{
 				//throw se;
-			}
+			}*/
 			catch(Exception ex){
 				//throw new HillromException("Error While invoking Stored Procedure " , ex);
 			}

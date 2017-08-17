@@ -115,7 +115,9 @@ public class PatientVestDeviceDataResource {
 			log.error("Decoded value is " + decoded_string);
 			// Charger POC code addition end
 
+
 			JSONObject chargerJsonData = new JSONObject();
+
 
 			
 			ExitStatus exitStatus = deviceDataServiceMonarch.saveData(rawMessage);

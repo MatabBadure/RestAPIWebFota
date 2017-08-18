@@ -458,9 +458,9 @@ public class TimsService {
 	
 	public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 		
-		/*if((patientDevicesAssocRepository.findByHillromId(hillromId).isPresent()) 
-			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("VEST"))){*/
-		if(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"VEST").isPresent()){
+		if((patientDevicesAssocRepository.findByHillromId(hillromId).isPresent()) 
+			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("VEST"))){
+		
 				/*log.debug("Checking isHillromIdHasVestDeviceInPatientDeviceAssoc ");*/
 				return true;
 		}
@@ -480,21 +480,7 @@ public class TimsService {
 		
 		return false;
 	}
-	
-public boolean isHillromIdHasMonarchDeviceInPatientDeviceAssocCheckingComboPatient(String hillromId){
-		
-		/*if((patientDevicesAssocRepository.findByHillromId(hillromId).isPresent()) 
-			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("MONARCH")))*/
-		if(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"MONARCH").isPresent()){
-				/*log.debug("Checking isHillromIdHasMonarchDeviceInPatientDeviceAssoc ");*/
-			if(!(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"MONARCH").get().getPatientType()=="CD")){
-				return true;
-			}
-				
-		}
-		
-		return false;
-	}
+
 	public boolean isCurrentSerialNumberOwnedByShellVest(String serialNumber){
 		
 		if((patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").isPresent()) ) {
@@ -1689,7 +1675,7 @@ public boolean isHillromIdHasMonarchDeviceInPatientDeviceAssocCheckingComboPatie
 		
 		if((isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && 
 				(isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
-				&& (!isHillromIdHasMonarchDeviceInPatientDeviceAssocCheckingComboPatient(patientInfoDTO.getTims_cust())) ){
+				&& (!isHillromIdHasMonarchDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 			
 
 			try{

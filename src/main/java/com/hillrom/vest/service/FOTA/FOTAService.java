@@ -84,9 +84,8 @@ public class FOTAService {
 	private static Map<String,PartNoHolder> partNosBin = new LinkedHashMap<String, PartNoHolder>();
 	private static Map<String,HandleHolder> handleHolderBin = new LinkedHashMap<String, HandleHolder>();
 	private PartNoHolder partNoHolder;
-	private static HandleHolder handleHolder2 = new HandleHolder();
 	
-	private Map<Integer, String> storedChunks;
+	//private Map<Integer, String> storedChunks;
 
 	
 	
@@ -139,7 +138,19 @@ public class FOTAService {
 				int chunkSize = hex2decimal(chunkStr);
 				//PartNumber:Chunk Size
 				String storeChunk = fotaJsonData.get(DEVICE_PARTNUMBER).concat(":").concat(String.valueOf(chunkSize));
-				if(!partNosBin.containsKey(storeChunk)){
+				if(partNosBin.containsKey(storeChunk)){
+					partNoHolder =  partNosBin.get(storeChunk);
+					//partNosBin.put(storeChunk, partNoHolder);
+					//Initially 
+					HandleHolder holder = new HandleHolder();
+					holder.setCurrentChunk(String.valueOf(0));
+					holder.setPartNo(partNoHolder.getPart_No());
+					holder.setChunkSize(partNoHolder.getChunkSize());
+					holder.setPreviousChunkTransStatus("");
+					handleId = getHandleNumber();
+					handleHolderBin.put(handleId, holder);
+				
+				}else {
 					partNoHolder = new PartNoHolder(chunkSize, fotaInfo.getFilePath());
 					partNoHolder.setChunkSize(chunkSize);
 					partNoHolder.setPart_No(fotaJsonData.get(DEVICE_PARTNUMBER));
@@ -147,29 +158,15 @@ public class FOTAService {
 					partNoHolder.setEffectiveDate(new DateTime());
 					//PartNo with Chuck size
 					partNosBin.put(storeChunk, partNoHolder);
-					
-				
-				}else if(partNosBin.containsKey(storeChunk)){
-					partNoHolder =  partNosBin.get(storeChunk);
 					//Initially 
-					/*HandleHolder holder = new HandleHolder();
+					HandleHolder holder = new HandleHolder();
 					holder.setCurrentChunk(String.valueOf(0));
 					holder.setPartNo(partNoHolder.getPart_No());
 					holder.setChunkSize(partNoHolder.getChunkSize());
 					holder.setPreviousChunkTransStatus("");
 					handleId = getHandleNumber();
-					handleHolderBin.put(handleId, holder);*/
+					handleHolderBin.put(handleId, holder);
 				}
-				
-				//Initially 
-				//HandleHolder holder = new HandleHolder();
-				handleHolder2.setCurrentChunk(String.valueOf(0));
-				handleHolder2.setPartNo(partNoHolder.getPart_No());
-				handleHolder2.setChunkSize(partNoHolder.getChunkSize());
-				handleHolder2.setPreviousChunkTransStatus(String.valueOf(0));
-				log.debug("Holder"+handleHolder2);
-				log.debug("handleId"+handleId);
-				handleHolderBin.put(handleId, handleHolder2);
 				
 				totalChunks = partNoHolder.getTotalChunk();
 				// Response pair1

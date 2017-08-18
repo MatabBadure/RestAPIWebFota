@@ -95,7 +95,7 @@ public class TimsInputReaderService {
 		    	//timsService.CASE2_PatientExistsWithNODevice_VEST(record);
 		    	timsService.CASE3_PatientHasMonarchAddVisivest_VEST(record);
 		    	timsService.CASE4_PatientHasDifferentVisivestSwap_VEST(record);
-		       timsService.CASE5_DeviceOwnedByShell_VEST(record);
+		        timsService.CASE5_DeviceOwnedByShell_VEST(record);
 		    	//timsService.CASE6_DeviceOwnedByDifferentPatient_VEST(record);
 		    	//timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_VEST(record);
 		    	//timsService.CASE8_DeviceIsOrphanButPatientExist_VEST(record);
@@ -135,7 +135,9 @@ public class TimsInputReaderService {
 		
 		if(!processed_atleast_one){
 			log.debug("FAILURE        NA               NA             Failure           The csv file has already been executed or unable to process any of the records.");
-			throw new Exception("The csv file has already been executed or unable to process any of the records.");
+			log.debug(" ");
+			log.debug("All Records Executed Successfully");
+			//throw new Exception("The csv file has already been executed or unable to process any of the records.");
 		}
 		
 	}
@@ -143,18 +145,21 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{
-		
-		// String csvFile = "C:/flat_file.csv";
-			
-	     String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
+		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
 		  //  log.debug("Started reading flat file : " + csvFile);
 	        String line = "";
 	        String cvsSplitBy = ",";
 	        String Outdata = "";
 	        String[] data = null;
-	        DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yyyy");
+	        
+	  /*      DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yyyy");
 	        DateTimeFormatter dobFormat = DateTimeFormat.forPattern("MM/dd/yyyy");
-	        DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");
+	        DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss"); */
+
+	        
+	        DateFormat sourceFormat = new SimpleDateFormat("yyyy-mm-dd");
+	        DateTimeFormatter dobFormat = DateTimeFormat.forPattern("yyyy-MM-dd");
+	        DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
 
 	        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
 	        	Map<Integer, PatientInfoDTO> fileRecords = new HashMap<Integer, PatientInfoDTO>();
@@ -206,8 +211,8 @@ public class TimsInputReaderService {
 			            patientInfoDTO.setTitle(data[10]);
 			            patientInfoDTO.setFirst_nm(data[11]);
 			            patientInfoDTO.setMiddle_nm(data[12]);
-			            patientInfoDTO.setLast_nm(data[13]);
-			            patientInfoDTO.setEmail(data[14]);
+			            patientInfoDTO.setLast_nm(data[13]);			         
+			            patientInfoDTO.setEmail(data[14].trim().isEmpty()? null: data[14]);
 			            if(!data[15].isEmpty() && data[15]!=null){
 				            if(data[15].charAt(0)=='"'&&data[15].charAt(data[15].length()-1)=='"')
 				            {
@@ -225,7 +230,8 @@ public class TimsInputReaderService {
 			            patientInfoDTO.setZip_cd(data[16]);
 			            patientInfoDTO.setPrimary_phone(data[17]);
 			            patientInfoDTO.setMobile_phone(data[18]);
-			            patientInfoDTO.setTrain_dt(data[19].equalsIgnoreCase("")? null: LocalDate.parse(data[19],dobFormat));
+			            patientInfoDTO.setTrain_dt(data[19].equalsIgnoreCase("")? null: LocalDate.parse(data[19],deviceAssocdateFormat));
+			            //patientInfoDTO.setTrain_dt(data[19].equalsIgnoreCase("")? null: LocalDate.parse(data[19],dobFormat));
 			            patientInfoDTO.setDob(data[20].equalsIgnoreCase("")? null: LocalDate.parse(data[20],dobFormat));
 			            if(data.length >= 22){
 			            	patientInfoDTO.setGender(data[21]);

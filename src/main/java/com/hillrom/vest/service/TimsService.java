@@ -460,6 +460,7 @@ public class TimsService {
 		
 		if((patientDevicesAssocRepository.findByHillromId(hillromId).isPresent()) 
 			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("VEST"))){
+		
 				/*log.debug("Checking isHillromIdHasVestDeviceInPatientDeviceAssoc ");*/
 				return true;
 		}
@@ -473,6 +474,7 @@ public class TimsService {
 			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("MONARCH")))*/
 		if(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"MONARCH").isPresent()){
 				/*log.debug("Checking isHillromIdHasMonarchDeviceInPatientDeviceAssoc ");*/
+			
 				return true;
 		}
 		

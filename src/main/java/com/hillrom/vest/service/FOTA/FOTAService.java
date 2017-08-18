@@ -54,6 +54,8 @@ import com.hillrom.vest.domain.FOTA.FOTAInfo;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.pointer.FOTA.HM_HandleHolder;
 import com.hillrom.vest.pointer.FOTA.HM_part01;
+import com.hillrom.vest.pointer.FOTA.HandleHolder;
+import com.hillrom.vest.pointer.FOTA.PartNoHolder;
 import com.hillrom.vest.repository.FOTA.FOTARepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.FOTA.FOTAParseUtil;
@@ -78,6 +80,15 @@ public class FOTAService {
 	private int bufferLen = 0;
 	private String buffer = null;
 	
+	//Dynamic part number
+	private static Map<String,PartNoHolder> partNosBin = new LinkedHashMap<String, PartNoHolder>();
+	private static Map<String,HandleHolder> handleHolderBin = new LinkedHashMap<String, HandleHolder>();
+	private PartNoHolder partNoHolder;
+	
+	private Map<Integer, String> storedChunks;
+
+	
+	
 	public String FOTAUpdate(String rawMessage) {
 		
 		int countInt = 0;
@@ -89,6 +100,330 @@ public class FOTAService {
 		String bufferPair = "";
 		String crcPair = "";
 		String finalResponseStr = new String();
+		
+
+		Map<String, String> fotaJsonData = new LinkedHashMap<String, String>();
+
+		// Decoding raw data
+		decoded_string = decodeRawMessage(rawMessage);
+		// Parsing into key value pair
+		fotaJsonData = FOTAParseUtil
+				.getFOTAJsonDataFromRawMessage(decoded_string);
+
+		// Global handler
+	
+		
+		String crsResultValue = "";
+		
+		// Checking if request Type is 01 & //Checking if request Type is 02
+		
+		if(validateCRC(rawMessage)){
+			//crcResult = "Yes";
+			crsResultValue = asciiToHex(YES);
+			String handleId = "";
+			//
+			//Get Fota Details based on part numbers.
+			
+			if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE1)) {
+				
+				//Map<String,String> partNumberWithCount = globalHandleHolder.getHandleWithPartNumber().get(handleId);
+				FOTAInfo fotaInfo = fotaRepository.findFOTAInfo(fotaJsonData.get(DEVICE_PARTNUMBER),true);
+				if(fotaInfo != null){
+				int totalChunks = 0;
+				
+				handleId = getHandleNumber();
+				// Get Chunk Size from request
+				String chunkStr = getChunk(rawMessage);
+				// Decimal conversion
+				int chunkSize = hex2decimal(chunkStr);
+				//PartNumber:Chunk Size
+				String storeChunk = fotaJsonData.get(DEVICE_PARTNUMBER).concat(":").concat(String.valueOf(chunkSize));
+				if(!partNosBin.containsKey(storeChunk)){
+					partNoHolder = new PartNoHolder(chunkSize, fotaInfo.getFilePath());
+					partNoHolder.setChunkSize(chunkSize);
+					partNoHolder.setPart_No(fotaJsonData.get(DEVICE_PARTNUMBER));
+					partNoHolder.setVersion_No(fotaInfo.getSoftVersion());
+					partNoHolder.setEffectiveDate(new DateTime());
+					//PartNo with Chuck size
+					partNosBin.put(storeChunk, partNoHolder);
+					
+				
+				}else if(partNosBin.containsKey(storeChunk)){
+					partNoHolder =  partNosBin.get(storeChunk);
+					//Initially 
+					/*HandleHolder holder = new HandleHolder();
+					holder.setCurrentChunk(String.valueOf(0));
+					holder.setPartNo(partNoHolder.getPart_No());
+					holder.setChunkSize(partNoHolder.getChunkSize());
+					holder.setPreviousChunkTransStatus("");
+					handleId = getHandleNumber();
+					handleHolderBin.put(handleId, holder);*/
+				}
+				
+				//Initially 
+				HandleHolder holder = new HandleHolder();
+				holder.setCurrentChunk(String.valueOf(0));
+				holder.setPartNo(partNoHolder.getPart_No());
+				holder.setChunkSize(partNoHolder.getChunkSize());
+				holder.setPreviousChunkTransStatus(String.valueOf(0));
+				log.debug("Holder"+holder);
+				log.debug("handleId"+handleId);
+				handleHolderBin.put(handleId, holder);
+				
+				totalChunks = partNoHolder.getTotalChunk();
+				// Response pair1
+				resultPair = getResponePairResult();
+				
+				handlePair = getResponePair1();
+				
+				// Handle in raw format
+				String handleIdRaw = hexToAscii(asciiToHex(toLittleEndian((handleId))));
+
+				// Response pair2
+				totalChunkPair = getResponePair2();
+
+				// Total chunk in raw format
+				String totalChunkRaw = getChunkRaw(totalChunks);
+
+				// Response pair3 crc
+				crcPair = getResponePair3();
+				
+				//CRC calculation 
+				String crcInput = resultPair.concat(crsResultValue).concat(handlePair).concat(handleIdRaw).concat(totalChunkPair).concat(totalChunkRaw).concat(crcPair);
+				
+				byte[] encodedCRC = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(crcInput));
+				String encodedString = new String(encodedCRC);
+				log.debug("encodedString: " + encodedString);
+				
+				String crcstr = calculateCRC(encodedString);
+				// Final response String
+				finalResponseStr = getAllResponseCheckUpdate(resultPair,crsResultValue,handlePair, handleIdRaw,
+						totalChunkPair, totalChunkRaw, crcPair, crcstr);
+				log.debug("finalResponseStr: " + finalResponseStr);
+				
+				}else{
+				crsResultValue = asciiToHex("NO");
+				resultPair = getResponePairResult();
+				crcPair = getResponePair3();
+				String crsRaw = resultPair.concat(crsResultValue).concat(
+						crcPair);
+
+				byte[] encodedCRC = java.util.Base64.getEncoder().encode(
+						DatatypeConverter.parseHexBinary(crsRaw));
+				String encodedString = new String(encodedCRC);
+				log.debug("encodedString: " + encodedString);
+				String crcValue = calculateCRC(encodedString);
+				
+				finalResponseStr = resultPair.concat(crsResultValue).concat(crcPair).concat(crcValue);
+				}
+			}else if(fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE2)){
+				
+				if (fotaJsonData.get(PREV_REQ_STATUS).equals(INIT)) {
+					//Get handle from request
+					handleId = getHandleFromRequest(rawMessage);
+					//Initially 
+					HandleHolder holder = new HandleHolder();
+					holder = handleHolderBin.get(handleId);
+					
+					String storeChunk = holder.getPartNo().concat(":").concat(String.valueOf(holder.getChunkSize()));
+					
+					int chunkCount = Integer.parseInt(holder.getCurrentChunk());
+
+					partNoHolder =  partNosBin.get(storeChunk);
+					
+					String zeroChunk = partNoHolder.getFileChunks().get(chunkCount);
+					
+					holder.setCurrentChunk(holder.getCurrentChunk());
+					holder.setPreviousChunkTransStatus("INIT");
+					
+					handleHolderBin.put(handleId, holder);
+					
+					//Zero the Chunk in raw format
+					buffer = hexToAscii(asciiToHex(zeroChunk));
+					log.debug("buffer Encoded:" + buffer);
+					
+					//Chunk size in hex byte
+					bufferLen = (zeroChunk.length() / 2);
+					log.debug("bufferLen:" + bufferLen);
+					}else if (fotaJsonData.get(PREV_REQ_STATUS).equals(OK)){
+						//Get handle from request
+						handleId = getHandleFromRequest(rawMessage);
+						log.debug("handleId from Request:" + handleId);
+						
+						handleId = getHandleFromRequest(rawMessage);
+						//Initially 
+						HandleHolder holder = new HandleHolder();
+						holder = handleHolderBin.get(handleId);
+						
+						String storeChunk = holder.getPartNo().concat(":").concat(String.valueOf(holder.getChunkSize()));
+						
+						int chunkCount = Integer.parseInt(holder.getCurrentChunk())+1;
+
+						partNoHolder =  partNosBin.get(storeChunk);
+						
+						String zeroChunk = partNoHolder.getFileChunks().get(chunkCount);
+						
+						holder.setCurrentChunk(String.valueOf(chunkCount));
+						holder.setPreviousChunkTransStatus("OK");
+						handleHolderBin.put(handleId, holder);
+						
+						//Zero the Chunk in raw format
+						buffer = hexToAscii(asciiToHex(zeroChunk));
+						log.debug("buffer Encoded:" + buffer);
+						
+						//Chunk size in hex byte
+						bufferLen = (zeroChunk.length() / 2);
+						log.debug("bufferLen:" + bufferLen);
+						
+				}else if (fotaJsonData.get(PREV_REQ_STATUS).equals(NOT_OK)) {
+					//Get handle from request
+					handleId = getHandleFromRequest(rawMessage);
+					log.debug("handleId from Request:" + handleId);
+					
+					handleId = getHandleFromRequest(rawMessage);
+					//Initially 
+					HandleHolder holder = new HandleHolder();
+					holder = handleHolderBin.get(handleId);
+					
+					String storeChunk = holder.getPartNo().concat(":").concat(String.valueOf(holder.getChunkSize()));
+					
+					int chunkCount = Integer.parseInt(holder.getCurrentChunk());
+
+					partNoHolder =  partNosBin.get(storeChunk);
+					
+					String zeroChunk = partNoHolder.getFileChunks().get(chunkCount);
+					
+					holder.setCurrentChunk(String.valueOf(chunkCount));
+					holder.setPreviousChunkTransStatus("OK");
+					handleHolderBin.put(handleId, holder);
+					
+					//Zero the Chunk in raw format
+					buffer = hexToAscii(asciiToHex(zeroChunk));
+					log.debug("buffer Encoded:" + buffer);
+					
+					//Chunk size in hex byte
+					bufferLen = (zeroChunk.length() / 2);
+					log.debug("bufferLen:" + bufferLen);
+					
+				} 	
+					
+				// result pair1
+				resultPair = getResponePairResult();
+				
+				//Init and ok send result is ok
+				//crcResult = "OK";
+				crsResultValue = asciiToHex(OK);
+				
+				//handlePair Init Pair1 HANDLE_EQ
+				
+				handlePair = getResponePair1();
+				//handlePair = asciiToHex(HANDLE_EQ);
+				
+				//Handle in raw format(handle Value)
+				String handleIdRaw = hexToAscii(asciiToHex(toLittleEndian((handleId))));
+				
+				//bufferLenPair Init Pair2(BUFFER_LEN_EQ)
+				bufferLenPair = getInitResponsePair2();
+				
+				//String bufferLenRaw =  hexToAscii(asciiToHex(Integer.toHexString(bufferLen)));
+				String bufferLenRaw =  getBufferLenTwoHexByte(bufferLen);
+				
+				//bufferPair Init Pair2 BUFFER_EQ
+				bufferPair = getInitReponsePair3();
+				
+				//crcPair pair4 Init  crc
+				crcPair = getResponePair3();
+				
+				String crsRaw = resultPair.concat(crsResultValue).concat(handlePair).concat(handleIdRaw).concat(bufferLenPair).concat(bufferLenRaw).concat(bufferPair).concat(buffer).concat(crcPair);
+				
+				byte[] encodedCRC = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(crsRaw));
+				String encodedString = new String(encodedCRC);
+				log.debug("encodedString: " + encodedString);
+				
+				String crcstr = calculateCRC(encodedString);
+				
+				// Final response String
+				finalResponseStr = getInitOKResponseSendChunk(resultPair,crsResultValue,handlePair, handleIdRaw,
+						bufferLenPair, bufferLenRaw, bufferPair, buffer,crcPair,crcstr,countInt);
+				log.debug("finalResponseStr: " + finalResponseStr);
+				
+			
+			}else if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE3)) {
+				if (fotaJsonData.get(RESULT).equals(OK)) {
+					// result pair1
+					resultPair = getResponePairResult();
+					//crcResult = "OK";
+					crsResultValue = asciiToHex(OK);
+					crcPair = getResponePair3();
+					
+					String crsRaw = resultPair.concat(crsResultValue).concat(crcPair);
+					
+					byte[] encodedCRC = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(crsRaw));
+					String encodedString = new String(encodedCRC);
+					log.debug("encodedString: " + encodedString);
+					
+					String crcValue = calculateCRC(encodedString);
+					//Final String 
+					finalResponseStr = resultPair.concat(crsResultValue).concat(crcPair).concat(crcValue);
+				} else if (fotaJsonData.get(RESULT).equals(NOT_OK)) {
+					// result pair1
+					resultPair = getResponePairResult();
+					//crcResult = "OK";
+					crsResultValue = asciiToHex(NOT_OK);
+					crcPair = getResponePair3();
+					
+					String crsRaw = resultPair.concat(crsResultValue).concat(
+							crcPair);
+
+					byte[] encodedCRC = java.util.Base64.getEncoder().encode(
+							DatatypeConverter.parseHexBinary(crsRaw));
+					String encodedString = new String(encodedCRC);
+					log.debug("encodedString: " + encodedString);
+					String crcValue = calculateCRC(encodedString);
+					
+					//Final String 
+					finalResponseStr = resultPair.concat(crsResultValue).concat(crcPair).concat(crcValue);
+				}
+			}
+		
+		}else if(!validateCRC(rawMessage)){
+			//crcResult = "NOT OK";
+			crsResultValue = asciiToHex(NOT_OK);
+			resultPair = getResponePairResult();
+			crcPair = getResponePair3();
+			String crsRaw = resultPair.concat(crsResultValue).concat(
+					crcPair);
+
+			byte[] encodedCRC = java.util.Base64.getEncoder().encode(
+					DatatypeConverter.parseHexBinary(crsRaw));
+			String encodedString = new String(encodedCRC);
+			log.debug("encodedString: " + encodedString);
+			String crcValue = calculateCRC(encodedString);
+			
+			finalResponseStr = resultPair.concat(crsResultValue).concat(crcPair).concat(crcValue);
+		}
+		
+			byte[] encoded = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(finalResponseStr));
+			String finalString1 = new String(encoded);
+			log.error("finalString1: " + finalString1);
+			return finalString1;
+		
+	
+		
+	}
+	
+	public String FOTAUpdate1(String rawMessage) {
+		
+		int countInt = 0;
+		String decoded_string = "";
+		String resultPair = "";
+		String handlePair = "";
+		String totalChunkPair = "";
+		String bufferLenPair = "";
+		String bufferPair = "";
+		String crcPair = "";
+		String finalResponseStr = new String();
+		
 
 		Map<String, String> fotaJsonData = new LinkedHashMap<String, String>();
 
@@ -109,8 +444,9 @@ public class FOTAService {
 			//crcResult = "Yes";
 			crsResultValue = asciiToHex(YES);
 			
-			//Get Fota Details based on part numbers.
+			//
 			
+			//Get Fota Details based on part numbers.
 			
 			if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE1)) {
 			//String diviceVer = getDeviceVersion(rawMessage);
@@ -1112,5 +1448,43 @@ public class FOTAService {
   	  }
 		return fotaInfo;
 	}
+	private String getChunk(String rawMessage) {
 
+		byte[] getChunkByte = java.util.Base64.getDecoder().decode(rawMessage);
+		int chunkByteIndex = returnMatch(getChunkByte, CHUNK_SIZE);
+		log.error("chunkByteIndex: " + chunkByteIndex);
+		// StringBuilder handleRes = new StringBuilder();
+		// handleRes.
+		// handleRes.append(Integer.toHexString(getChunkByte[chunkSize] &
+		// 0xFF));
+		int chunkSizeValue = getChunkByte[chunkByteIndex] & 0xFF;
+		int chunkSizeValue1 = getChunkByte[chunkByteIndex + 1] & 0xFF;
+
+		String chunkSize1 = Integer.toHexString(chunkSizeValue);
+		String chunkSize2 = Integer.toHexString(chunkSizeValue1);
+
+		chunkSize1 = ("00" + chunkSize1).substring(chunkSize1.length());
+		chunkSize2 = ("00" + chunkSize2).substring(chunkSize2.length());
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(chunkSize1);
+		sb.append(chunkSize2);
+
+		String littleEndianChunk = toLittleEndian(sb.toString());
+		return littleEndianChunk;
+
+	}
+	
+	private int hex2decimal(String chunkStr) {
+
+		String digits = "0123456789ABCDEF";
+		chunkStr = chunkStr.toUpperCase();
+		int val = 0;
+		for (int i = 0; i < chunkStr.length(); i++) {
+			char c = chunkStr.charAt(i);
+			int d = digits.indexOf(c);
+			val = 16 * val + d;
+		}
+		return val;
+	}
 }

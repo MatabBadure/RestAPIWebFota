@@ -102,7 +102,7 @@ public class TimsInputReaderService {
 		    	//timsService.CASE9_PatientHasDifferentVisivestSwap_VEST(record);
 		    	timsService.CASE10_PatientHasMonarchAddVisivest_VEST(record);
 		    	//timsService.CASE11_PatientExistsWithNODevice_VEST(record);
-		    	//timsService.CASE12_PatientHasMonarchMergeExistingVisivest_VEST(record);
+		    	timsService.CASE12_PatientHasMonarchMergeExistingVisivest_VEST(record);
 		    	
 		    }
 

@@ -458,8 +458,9 @@ public class TimsService {
 	
 	public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 		
-		if((patientDevicesAssocRepository.findByHillromId(hillromId).isPresent()) 
-			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("VEST"))){
+		/*if((patientDevicesAssocRepository.findByHillromId(hillromId).isPresent()) 
+			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("VEST"))){*/
+		if(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"VEST").isPresent()){
 				/*log.debug("Checking isHillromIdHasVestDeviceInPatientDeviceAssoc ");*/
 				return true;
 		}

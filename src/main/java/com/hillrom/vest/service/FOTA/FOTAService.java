@@ -84,6 +84,7 @@ public class FOTAService {
 	private static Map<String,PartNoHolder> partNosBin = new LinkedHashMap<String, PartNoHolder>();
 	private static Map<String,HandleHolder> handleHolderBin = new LinkedHashMap<String, HandleHolder>();
 	private PartNoHolder partNoHolder;
+	private static HandleHolder handleHolder2 = new HandleHolder();
 	
 	private Map<Integer, String> storedChunks;
 
@@ -161,14 +162,14 @@ public class FOTAService {
 				}
 				
 				//Initially 
-				HandleHolder holder = new HandleHolder();
-				holder.setCurrentChunk(String.valueOf(0));
-				holder.setPartNo(partNoHolder.getPart_No());
-				holder.setChunkSize(partNoHolder.getChunkSize());
-				holder.setPreviousChunkTransStatus(String.valueOf(0));
-				log.debug("Holder"+holder);
+				//HandleHolder holder = new HandleHolder();
+				handleHolder2.setCurrentChunk(String.valueOf(0));
+				handleHolder2.setPartNo(partNoHolder.getPart_No());
+				handleHolder2.setChunkSize(partNoHolder.getChunkSize());
+				handleHolder2.setPreviousChunkTransStatus(String.valueOf(0));
+				log.debug("Holder"+handleHolder2);
 				log.debug("handleId"+handleId);
-				handleHolderBin.put(handleId, holder);
+				handleHolderBin.put(handleId, handleHolder2);
 				
 				totalChunks = partNoHolder.getTotalChunk();
 				// Response pair1

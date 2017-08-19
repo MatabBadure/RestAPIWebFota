@@ -128,6 +128,8 @@ public class TimsUserRepository{
 				returnValues.put("return_patient_id", outPatientId);
 				returnValues.put("return_user_id", outPatientUser);
 				
+				//System.out.println(returnValues);
+				
 			}
 			catch(SQLException se)
 			{

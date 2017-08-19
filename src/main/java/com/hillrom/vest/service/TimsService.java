@@ -105,6 +105,7 @@ public class TimsService {
 	
 
 	 DateTimeFormatter dobFormat = DateTimeFormat.forPattern("yyyy-MM-dd");
+	 DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
     /* DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");*/
  
 	
@@ -291,7 +292,8 @@ public class TimsService {
 													patientInfoDTO.getCity(), 
 													patientInfoDTO.getState(), 
 													patientInfoDTO.getCreated_by(),
-													null, // Following fields no longer being used from this table 
+												//patientInfoDTO.getTrain_dt().toString(deviceAssocdateFormat), // Following fields no longer being used from this table 
+													null,
 													null, 
 													null, 
 													null, 

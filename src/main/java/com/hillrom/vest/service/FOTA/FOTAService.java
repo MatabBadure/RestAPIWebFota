@@ -14,12 +14,12 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.NOT_OK;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.OK;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.PREV_REQ_STATUS;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.SOFT_VER_DATE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE1;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE2;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE3;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.RESULT;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.RESULT_EQ;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.SOFT_VER_DATE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.TOTAL_CHUNK;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.YES;
 
@@ -29,7 +29,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -138,18 +137,23 @@ public class FOTAService {
 				
 				//Map<String,String> partNumberWithCount = globalHandleHolder.getHandleWithPartNumber().get(handleId);
 				FOTAInfo fotaInfo = fotaRepository.findFOTAInfo(fotaJsonData.get(DEVICE_PARTNUMBER),true);
-				//Release date from DB 
-				DateTime dbRelaseDate = fotaInfo.getReleaseDate();
 				
-				//Release date from request
-				SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("MMddyy");
-				simpleDateFormat1.setLenient(false);
-				Date date3 = simpleDateFormat1.parse(fotaJsonData.get(SOFT_VER_DATE));
-				DateTime reqReleaseDate = new DateTime(date3);
-				
-				String reqDev = getDeviceVersion(rawMessage);
-				if(!reqDev.equals(fotaInfo.getSoftVersion())|| ((Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion()))&& fotaJsonData.get(DEVICE_PARTNUMBER).equals(fotaInfo.getDevicePartNumber())) || ((reqReleaseDate.isBefore(reqReleaseDate)&& reqReleaseDate.equals(dbRelaseDate)) && Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion())) || (fotaInfo.getDevicePartNumber() != null) && Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion())){
-				/*if(fotaJsonData.get(DEVICE_PARTNUMBER).equals(fotaInfo.getDevicePartNumber())){*/
+				if(fotaInfo != null){
+					//Release date from DB 
+					DateTime dbRelaseDate = fotaInfo.getReleaseDate();
+					
+					//Release date from request
+					SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("MMddyy");
+					simpleDateFormat1.setLenient(false);
+					Date date3 = simpleDateFormat1.parse(fotaJsonData.get(SOFT_VER_DATE));
+					DateTime reqReleaseDate = new DateTime(date3);
+					
+					String reqDev = getDeviceVersion(rawMessage);
+					if(!(reqDev.equals(fotaInfo.getSoftVersion())) && (Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion()))||((reqReleaseDate.isBefore(dbRelaseDate)&& reqReleaseDate.equals(dbRelaseDate)) && (Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion())))){
+					
+				//}else if(!reqDev.equals(fotaInfo.getSoftVersion())||((reqReleaseDate.isBefore(dbRelaseDate)&& reqReleaseDate.equals(dbRelaseDate)) && (Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion())))){
+				//if(((Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion()))&& (fotaJsonData.get(DEVICE_PARTNUMBER).equals(fotaInfo.getDevicePartNumber())))){
+				//if((!(reqReleaseDate.isBefore(dbRelaseDate) && (reqReleaseDate.isBefore(dbRelaseDate))) && reqReleaseDate.equals(dbRelaseDate)) && (Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion()))){
 				int totalChunks = 0;
 				
 				handleId = getHandleNumber();
@@ -225,7 +229,21 @@ public class FOTAService {
 				finalResponseStr = getAllResponseCheckUpdate(resultPair,crsResultValue,handlePair, handleIdRaw,
 						totalChunkPair, totalChunkRaw, crcPair, crcstr);
 				log.debug("finalResponseStr: " + finalResponseStr);
-				
+					}else{
+						crsResultValue = asciiToHex("No");
+						resultPair = getResponePairResult();
+						crcPair = getResponePair3();
+						String crsRaw = resultPair.concat(crsResultValue).concat(
+								crcPair);
+
+						byte[] encodedCRC = java.util.Base64.getEncoder().encode(
+								DatatypeConverter.parseHexBinary(crsRaw));
+						String encodedString = new String(encodedCRC);
+						log.debug("encodedString: " + encodedString);
+						String crcValue = calculateCRC(encodedString);
+						
+						finalResponseStr = resultPair.concat(crsResultValue).concat(crcPair).concat(crcValue);
+						}
 				}else{
 				crsResultValue = asciiToHex("No");
 				resultPair = getResponePairResult();

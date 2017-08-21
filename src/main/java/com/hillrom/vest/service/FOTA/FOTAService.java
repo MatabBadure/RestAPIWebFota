@@ -149,11 +149,9 @@ public class FOTAService {
 					DateTime reqReleaseDate = new DateTime(date3);
 					
 					String reqDev = getDeviceVersion(rawMessage);
-					if(!(reqDev.equals(fotaInfo.getSoftVersion())) && (Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion()))||((reqReleaseDate.isBefore(dbRelaseDate)&& reqReleaseDate.equals(dbRelaseDate)) && (Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion())))){
+					//if(!(reqDev.equals(fotaInfo.getSoftVersion())) && (Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion()))||((reqReleaseDate.isBefore(dbRelaseDate)|| reqReleaseDate.equals(dbRelaseDate)) && (Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion())))){
+					if((fotaInfo.getDevicePartNumber().equals(fotaJsonData.get(DEVICE_PARTNUMBER)) && (Integer.valueOf(fotaInfo.getSoftVersion())>Integer.valueOf(reqDev))) || (reqDev.equals(fotaInfo.getSoftVersion()) && dbRelaseDate.isAfter(reqReleaseDate))){
 					
-				//}else if(!reqDev.equals(fotaInfo.getSoftVersion())||((reqReleaseDate.isBefore(dbRelaseDate)&& reqReleaseDate.equals(dbRelaseDate)) && (Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion())))){
-				//if(((Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion()))&& (fotaJsonData.get(DEVICE_PARTNUMBER).equals(fotaInfo.getDevicePartNumber())))){
-				//if((!(reqReleaseDate.isBefore(dbRelaseDate) && (reqReleaseDate.isBefore(dbRelaseDate))) && reqReleaseDate.equals(dbRelaseDate)) && (Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion()))){
 				int totalChunks = 0;
 				
 				handleId = getHandleNumber();

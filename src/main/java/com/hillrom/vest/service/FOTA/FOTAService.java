@@ -148,7 +148,7 @@ public class FOTAService {
 				DateTime reqReleaseDate = new DateTime(date3);
 				
 				String reqDev = getDeviceVersion(rawMessage);
-				if(!reqDev.equals(fotaInfo.getSoftVersion())|| ((Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion()))&& fotaJsonData.get(DEVICE_PARTNUMBER).equals(fotaInfo.getDevicePartNumber())) || reqReleaseDate.isBefore(reqReleaseDate)&& reqReleaseDate.equals(dbRelaseDate) || fotaInfo.getDevicePartNumber() != null){
+				if(!reqDev.equals(fotaInfo.getSoftVersion())|| ((Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion()))&& fotaJsonData.get(DEVICE_PARTNUMBER).equals(fotaInfo.getDevicePartNumber())) || ((reqReleaseDate.isBefore(reqReleaseDate)&& reqReleaseDate.equals(dbRelaseDate)) && Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion())) || (fotaInfo.getDevicePartNumber() != null) && Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion())){
 				/*if(fotaJsonData.get(DEVICE_PARTNUMBER).equals(fotaInfo.getDevicePartNumber())){*/
 				int totalChunks = 0;
 				

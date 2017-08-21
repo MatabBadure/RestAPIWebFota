@@ -105,6 +105,7 @@ public class TimsService {
 	
 
 	 DateTimeFormatter dobFormat = DateTimeFormat.forPattern("yyyy-MM-dd");
+	 DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
     /* DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");*/
  
 	
@@ -291,7 +292,8 @@ public class TimsService {
 													patientInfoDTO.getCity(), 
 													patientInfoDTO.getState(), 
 													patientInfoDTO.getCreated_by(),
-													null, // Following fields no longer being used from this table 
+												//patientInfoDTO.getTrain_dt().toString(deviceAssocdateFormat), // Following fields no longer being used from this table 
+													null,
 													null, 
 													null, 
 													null, 
@@ -460,6 +462,7 @@ public class TimsService {
 		
 		if((patientDevicesAssocRepository.findByHillromId(hillromId).isPresent()) 
 			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("VEST"))){
+		
 				/*log.debug("Checking isHillromIdHasVestDeviceInPatientDeviceAssoc ");*/
 				return true;
 		}
@@ -469,9 +472,11 @@ public class TimsService {
 	
 	public boolean isHillromIdHasMonarchDeviceInPatientDeviceAssoc(String hillromId){
 		
-		if((patientDevicesAssocRepository.findByHillromId(hillromId).isPresent()) 
-			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("MONARCH"))){
+		/*if((patientDevicesAssocRepository.findByHillromId(hillromId).isPresent()) 
+			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("MONARCH")))*/
+		if(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"MONARCH").isPresent()){
 				/*log.debug("Checking isHillromIdHasMonarchDeviceInPatientDeviceAssoc ");*/
+			
 				return true;
 		}
 		
@@ -800,14 +805,14 @@ public class TimsService {
 			catch(Exception ex){
 	
 				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
-						+"Error occured while updating Vest device");
+						+"Error occured while updating Vest patient");
 				
 				ex.printStackTrace();
 				return false;
 			}
 						
 			log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
-					+ "Shell Vest device updated");
+					+ "Vest patient updated");
 			
 			return true;
 		}
@@ -1246,7 +1251,7 @@ public class TimsService {
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
 				tims.processed_atleast_one = true;
@@ -1271,6 +1276,7 @@ public class TimsService {
 			
 			log.debug("Made Combo    " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
 					+ "Patient updated as combo(Monarch device is added)");
+			
 			return true;
 			
 		}
@@ -1371,14 +1377,14 @@ public class TimsService {
 			catch(Exception ex){
 				
 				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
-						+"Error occured while updating Monarch device");
+						+"Error occured while updating Monarch patient");
 				
 				
 				ex.printStackTrace();
 				return false;
 			}
 			log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
-					+ "Shell Monarch device updated");
+					+ "Monarch patient updated");
 									
 			return true;
 		}

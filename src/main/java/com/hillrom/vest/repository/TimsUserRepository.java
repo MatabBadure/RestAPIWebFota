@@ -127,7 +127,7 @@ public class TimsUserRepository{
 				
 				returnValues.put("return_patient_id", outPatientId);
 				returnValues.put("return_user_id", outPatientUser);
-				
+								
 			}
 			catch(SQLException se)
 			{
@@ -351,7 +351,7 @@ public class TimsUserRepository{
                                 + "max_frequency,"        
                                 + "min_pressure,"         
                                 + "max_pressure,"         
-                                + "to_be_inserted,"       
+                                + "to_be_inserted,"
                                 + "id) values ("
                                 + ":patient_id,"
                                 + ":type,"
@@ -376,14 +376,12 @@ public class TimsUserRepository{
                          .setParameter("min_pressure", min_pressure)
                          .setParameter("max_pressure", max_pressure)
                          .setParameter("to_be_inserted",to_be_inserted)
-                         .setParameter("id", user_id)                                 
+                         .setParameter("id", 0)                                 
                          .executeUpdate();
 				}
-								
-				catch(Exception ex){
 				
+				catch(Exception ex){
 					ex.printStackTrace();
-					//throw new SQLException(ex);
 				}
            
 

@@ -102,7 +102,7 @@ public class TimsInputReaderService {
 		    	//timsService.CASE9_PatientHasDifferentVisivestSwap_VEST(record);
 		    	timsService.CASE10_PatientHasMonarchAddVisivest_VEST(record);
 		    	//timsService.CASE11_PatientExistsWithNODevice_VEST(record);
-		    	timsService.CASE12_PatientHasMonarchMergeExistingVisivest_VEST(record);
+		    	//timsService.CASE12_PatientHasMonarchMergeExistingVisivest_VEST(record);
 		    	
 		    }
 
@@ -145,9 +145,7 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{
-		
-		  //String csvFile = "C:/flatfile 08172017.csv";
-		     String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
+		  String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
 		  //  log.debug("Started reading flat file : " + csvFile);
 	        String line = "";
 	        String cvsSplitBy = ",";
@@ -156,7 +154,7 @@ public class TimsInputReaderService {
 	        
 	  /*      DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yyyy");
 	        DateTimeFormatter dobFormat = DateTimeFormat.forPattern("MM/dd/yyyy");
-	        DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss"); */
+	        DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("pass@word88931"); */
 
 	        
 	        DateFormat sourceFormat = new SimpleDateFormat("yyyy-mm-dd");

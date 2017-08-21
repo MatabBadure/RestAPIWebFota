@@ -55,6 +55,10 @@ public class FOTAParseUtil {
 			fotaJsonData.put(DEVICE_SN, devSn);
 		}
 		if(Objects.nonNull(connType)){
+			fotaJsonData.put(CONNECTION_TYPE, connType);
+		}
+		
+		if(Objects.nonNull(connType)){
 			fotaJsonData.put(DEVICE_PARTNUMBER, devPartNumber);
 		}
 		if(Objects.nonNull(devVer)){

@@ -1,11 +1,22 @@
 package com.hillrom.vest.web.rest.FOTA;
+import static com.hillrom.vest.config.Constants.ALL;
+import static com.hillrom.vest.config.Constants.LOG_DIRECTORY;
+import static com.hillrom.vest.config.Constants.MATCH_STRING;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.FOTA_FILE_PATH;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -15,6 +26,9 @@ import net.minidev.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +42,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hillrom.vest.config.FOTA.FOTAConstants;
+import com.hillrom.vest.domain.FOTA.FOTADeviceFWareUpdate;
 import com.hillrom.vest.domain.FOTA.FOTAInfo;
 import com.hillrom.vest.service.FOTA.FOTAService;
 import com.hillrom.vest.web.rest.FOTA.dto.FOTAInfoDto;
+import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 @RestController
 @RequestMapping("/api")
@@ -203,6 +219,68 @@ public class FOTAResource {
 	    jsonObject.put("FOTASoftDelete", "no record");
 	    return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
 	  } 
+	  
+	  
+	  /**
+	     * GET  /FOTAList
+	     */
+		@RequestMapping(value="/FOTAList", method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+		public ResponseEntity<?> FOTAList(
+				@RequestParam(value = "page", required = false) Integer offset,
+				@RequestParam(value = "per_page", required = false) Integer limit,
+				@RequestParam(value = "status", required = true) String status) {
+			try{
+				List<FOTAInfoDto> FOTAInfoDtoList = fotaService.FOTAList(status);
+				
+				
+	            int firstResult = PaginationUtil.generatePageRequest(offset, limit).getOffset();
+	    		int maxResults = firstResult + PaginationUtil.generatePageRequest(offset, limit).getPageSize();
+	    		List<FOTAInfoDto> FOTAInfoDtoSubList = new ArrayList<>();
+	    		if (firstResult < FOTAInfoDtoList.size()) {
+	    			maxResults = maxResults > FOTAInfoDtoList.size() ? FOTAInfoDtoList.size() : maxResults;
+	    			FOTAInfoDtoSubList = FOTAInfoDtoList.subList(firstResult, maxResults);
+	    		}
+	            Page<FOTAInfoDto> page = new PageImpl<FOTAInfoDto>(FOTAInfoDtoSubList,
+	            		PaginationUtil.generatePageRequest(offset, limit), Long.valueOf(FOTAInfoDtoList.size()));
+
+				HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/FOTAList", offset, limit);
+				return new ResponseEntity<>(page, headers, HttpStatus.OK);
+	          
+			}catch(Exception ex){
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}			
+		}
+		
+		/**
+	     * GET  /FOTADeviceList
+	     */
+		@RequestMapping(value="/FOTADeviceList", method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+		public ResponseEntity<?> FOTADeviceList(
+				@RequestParam(value = "page", required = false) Integer offset,
+				@RequestParam(value = "per_page", required = false) Integer limit,
+				@RequestParam(value = "status", required = false) String status) {
+			try{
+				List<FOTADeviceFWareUpdate> fotaDeviceList = fotaService.getFOTADeviceList(status);
+				
+	            int firstResult = PaginationUtil.generatePageRequest(offset, limit).getOffset();
+	    		int maxResults = firstResult + PaginationUtil.generatePageRequest(offset, limit).getPageSize();
+	    		
+	    		List<FOTADeviceFWareUpdate> fotaDeviceSubList = new ArrayList<FOTADeviceFWareUpdate>();
+	    		
+	    		if (firstResult < fotaDeviceList.size()) {
+	    			maxResults = maxResults > fotaDeviceList.size() ? fotaDeviceList.size() : maxResults;
+	    			fotaDeviceSubList = fotaDeviceList.subList(firstResult, maxResults);
+	    		}
+	            Page<FOTADeviceFWareUpdate> page = new PageImpl<FOTADeviceFWareUpdate>(fotaDeviceSubList,
+	            		PaginationUtil.generatePageRequest(offset, limit), Long.valueOf(fotaDeviceList.size()));
+	            
+				HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/FOTADeviceList", offset, limit);
+				return new ResponseEntity<>(page, headers, HttpStatus.OK);
+	          
+			}catch(Exception ex){
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}			
+		}
 	  
 	  public  synchronized File createUniqueDirectory(File rootDir, String seed) throws IOException {
 	      int index = seed.lastIndexOf('.');

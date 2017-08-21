@@ -8,8 +8,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 import org.joda.time.DateTime;
 @Entity
+@Audited
 @Table(name = "FOTA_INFO")
 public class FOTAInfo {
 	@Id

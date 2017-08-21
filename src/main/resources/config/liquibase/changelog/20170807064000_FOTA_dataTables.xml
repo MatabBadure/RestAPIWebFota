@@ -79,13 +79,13 @@
 			<column name="device_serial_number" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
-			<column name="current_date" type="timestamp">
+			<column name="completed_date" type="timestamp">
 				<constraints nullable="false" />
 			</column>
-			<column name="status" type="varchar(255)">
+			<column name="downloaded_status" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
-			<column name="download_time" type="timestamp">
+			<column name="download_time" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
 			<column name="connection_type" type="varchar(255)">
@@ -95,6 +95,7 @@
 			<addForeignKeyConstraint baseColumnNames="fota_info_id"
 			baseTableName="FOTA_DEVICE_FWARE_UPDATE_LOG" constraintName="fk_fota_id"
 			referencedColumnNames="id" referencedTableName="FOTA_INFO" />
+			
 	</changeSet>
 
 </databaseChangeLog>

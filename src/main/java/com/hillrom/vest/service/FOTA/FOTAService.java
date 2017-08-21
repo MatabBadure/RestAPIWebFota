@@ -1,17 +1,20 @@
 package com.hillrom.vest.service.FOTA;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.FOTA_FILE_PATH;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.AMPERSAND;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.BUFFER_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.BUFFER_LEN_EQ;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.CONNECTION_TYPE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_SN;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.FOTA_FILE_PATH;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.INIT;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.NOT_OK;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.OK;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.PREV_REQ_STATUS;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.SOFT_VER_DATE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE1;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE2;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE3;
@@ -26,8 +29,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,12 +55,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.vest.domain.FOTA.FOTADeviceFWareUpdate;
 import com.hillrom.vest.domain.FOTA.FOTAInfo;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.pointer.FOTA.HM_HandleHolder;
 import com.hillrom.vest.pointer.FOTA.HM_part01;
 import com.hillrom.vest.pointer.FOTA.HandleHolder;
 import com.hillrom.vest.pointer.FOTA.PartNoHolder;
+import com.hillrom.vest.repository.FOTA.FOTADeviceRepository;
 import com.hillrom.vest.repository.FOTA.FOTARepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.FOTA.FOTAParseUtil;
@@ -67,6 +74,9 @@ public class FOTAService {
 	private final Logger log = LoggerFactory.getLogger(FOTAService.class);
 	@Inject
 	private FOTARepository fotaRepository;
+	
+	@Inject
+	private FOTADeviceRepository fotaDeviceRepository;
 	
 	
 	private  Map<Long,String> storeChunk ;
@@ -89,7 +99,7 @@ public class FOTAService {
 
 	
 	
-	public String FOTAUpdate(String rawMessage) {
+	public String FOTAUpdate(String rawMessage) throws ParseException {
 		
 		int countInt = 0;
 		String decoded_string = "";
@@ -128,7 +138,18 @@ public class FOTAService {
 				
 				//Map<String,String> partNumberWithCount = globalHandleHolder.getHandleWithPartNumber().get(handleId);
 				FOTAInfo fotaInfo = fotaRepository.findFOTAInfo(fotaJsonData.get(DEVICE_PARTNUMBER),true);
-				if(fotaInfo != null){
+				//Release date from DB 
+				DateTime dbRelaseDate = fotaInfo.getReleaseDate();
+				
+				//Release date from request
+				SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("MMddyy");
+				simpleDateFormat1.setLenient(false);
+				Date date3 = simpleDateFormat1.parse(fotaJsonData.get(SOFT_VER_DATE));
+				DateTime reqReleaseDate = new DateTime(date3);
+				
+				String reqDev = getDeviceVersion(rawMessage);
+				if(!reqDev.equals(fotaInfo.getSoftVersion())|| ((Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion()))&& fotaJsonData.get(DEVICE_PARTNUMBER).equals(fotaInfo.getDevicePartNumber())) || reqReleaseDate.isBefore(reqReleaseDate)&& reqReleaseDate.equals(dbRelaseDate)){
+				/*if(fotaJsonData.get(DEVICE_PARTNUMBER).equals(fotaInfo.getDevicePartNumber())){*/
 				int totalChunks = 0;
 				
 				handleId = getHandleNumber();
@@ -146,10 +167,13 @@ public class FOTAService {
 					holder.setCurrentChunk(String.valueOf(0));
 					holder.setPartNo(partNoHolder.getPart_No());
 					holder.setChunkSize(partNoHolder.getChunkSize());
-					holder.setPreviousChunkTransStatus("");
+					holder.setFotaInfoId(fotaInfo.getId());
+					holder.setDeviceSerialNumber(fotaJsonData.get(DEVICE_SN));
+					holder.setConnectionType(fotaJsonData.get(CONNECTION_TYPE));
+					holder.setPreviousChunkTransStatus("CheckUpdate");
 					handleId = getHandleNumber();
 					handleHolderBin.put(handleId, holder);
-				
+					
 				}else {
 					partNoHolder = new PartNoHolder(chunkSize, fotaInfo.getFilePath());
 					partNoHolder.setChunkSize(chunkSize);
@@ -163,7 +187,10 @@ public class FOTAService {
 					holder.setCurrentChunk(String.valueOf(0));
 					holder.setPartNo(partNoHolder.getPart_No());
 					holder.setChunkSize(partNoHolder.getChunkSize());
-					holder.setPreviousChunkTransStatus("");
+					holder.setFotaInfoId(fotaInfo.getId());
+					holder.setDeviceSerialNumber(fotaJsonData.get(DEVICE_SN));
+					holder.setConnectionType(fotaJsonData.get(CONNECTION_TYPE));
+					holder.setPreviousChunkTransStatus("CheckUpdate");
 					handleId = getHandleNumber();
 					handleHolderBin.put(handleId, holder);
 				}
@@ -200,7 +227,7 @@ public class FOTAService {
 				log.debug("finalResponseStr: " + finalResponseStr);
 				
 				}else{
-				crsResultValue = asciiToHex("NO");
+				crsResultValue = asciiToHex("No");
 				resultPair = getResponePairResult();
 				crcPair = getResponePair3();
 				String crsRaw = resultPair.concat(crsResultValue).concat(
@@ -233,9 +260,9 @@ public class FOTAService {
 					
 					holder.setCurrentChunk(holder.getCurrentChunk());
 					holder.setPreviousChunkTransStatus("INIT");
+					holder.setDownloadStartTime(new DateTime());
 					
 					handleHolderBin.put(handleId, holder);
-					
 					//Zero the Chunk in raw format
 					buffer = hexToAscii(asciiToHex(zeroChunk));
 					log.debug("buffer Encoded:" + buffer);
@@ -348,6 +375,40 @@ public class FOTAService {
 			
 			}else if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE3)) {
 				if (fotaJsonData.get(RESULT).equals(OK)) {
+					//Get handle from request
+					handleId = getHandleFromRequest(rawMessage);
+					log.debug("handleId from Request:" + handleId);
+					
+					//Initially 
+					HandleHolder holder = new HandleHolder();
+					holder = handleHolderBin.get(handleId);
+					FOTADeviceFWareUpdate fotaDeviceFWareUpdate = new FOTADeviceFWareUpdate();
+					fotaDeviceFWareUpdate.setFotaInfoId(holder.getFotaInfoId());
+					fotaDeviceFWareUpdate.setDeviceSerialNumber(holder.getDeviceSerialNumber());
+					fotaDeviceFWareUpdate.setCurrentDate(new DateTime());
+					
+					//DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+					
+					//Date startTime = sdf.parse("handleHolderBin.get(handleId).getDownloadStartTime()");
+					
+					DateTime upadteTime = new DateTime();
+					
+					long elapsed = holder.getDownloadStartTime().getMillis() - upadteTime.getMillis();
+					
+					int hours = (int) Math.floor(elapsed / 3600000);
+		            
+		            int minutes = (int) Math.floor((elapsed - hours * 3600000) / 60000);
+		            
+		            int seconds = (int) Math.floor((elapsed - hours * 3600000 - minutes * 60000) / 1000);
+		            
+		            String totalDownloadTime = String.valueOf(hours).concat(":").concat(String.valueOf(minutes)).concat(":").concat(String.valueOf(seconds));
+					
+					fotaDeviceFWareUpdate.setDownloadTime(totalDownloadTime);
+					
+					fotaDeviceFWareUpdate.setConnectionType(holder.getConnectionType());
+					//if(holder.getPreviousChunkTransStatus().equals(anObject))
+					fotaDeviceFWareUpdate.setStatus("Success");
+					fotaDeviceRepository.save(fotaDeviceFWareUpdate);
 					// result pair1
 					resultPair = getResponePairResult();
 					//crcResult = "OK";
@@ -355,7 +416,6 @@ public class FOTAService {
 					crcPair = getResponePair3();
 					
 					String crsRaw = resultPair.concat(crsResultValue).concat(crcPair);
-					
 					byte[] encodedCRC = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(crsRaw));
 					String encodedString = new String(encodedCRC);
 					log.debug("encodedString: " + encodedString);
@@ -364,14 +424,46 @@ public class FOTAService {
 					//Final String 
 					finalResponseStr = resultPair.concat(crsResultValue).concat(crcPair).concat(crcValue);
 				} else if (fotaJsonData.get(RESULT).equals(NOT_OK)) {
+					//Get handle from request
+					handleId = getHandleFromRequest(rawMessage);
+					log.debug("handleId from Request:" + handleId);
+					
+					//Initially 
+					HandleHolder holder = new HandleHolder();
+					holder = handleHolderBin.get(handleId);
+					FOTADeviceFWareUpdate fotaDeviceFWareUpdate = new FOTADeviceFWareUpdate();
+					fotaDeviceFWareUpdate.setFotaInfoId(holder.getFotaInfoId());
+					fotaDeviceFWareUpdate.setDeviceSerialNumber(holder.getDeviceSerialNumber());
+					fotaDeviceFWareUpdate.setCurrentDate(new DateTime());
+					
+
+					DateTime upadteTime = new DateTime();
+					
+					long elapsed = (upadteTime.getMillis())-(holder.getDownloadStartTime().getMillis());
+					
+					int hours = (int) Math.floor(elapsed / 3600000);
+		            
+		            int minutes = (int) Math.floor((elapsed - hours * 3600000) / 60000);
+		            
+		            int seconds = (int) Math.floor((elapsed - hours * 3600000 - minutes * 60000) / 1000);
+		            
+		            String totalDownloadTime = String.valueOf(hours).concat(":").concat(String.valueOf(minutes)).concat(":").concat(String.valueOf(seconds));
+					
+					fotaDeviceFWareUpdate.setDownloadTime(totalDownloadTime);
+					
+					//fotaDeviceFWareUpdate.setDownloadTime(new DateTime());
+					fotaDeviceFWareUpdate.setConnectionType(holder.getConnectionType());
+					//if(holder.getPreviousChunkTransStatus().equals(anObject))
+					fotaDeviceFWareUpdate.setStatus("Failure");
+					fotaDeviceRepository.save(fotaDeviceFWareUpdate);
+					
 					// result pair1
 					resultPair = getResponePairResult();
 					//crcResult = "OK";
 					crsResultValue = asciiToHex(NOT_OK);
 					crcPair = getResponePair3();
 					
-					String crsRaw = resultPair.concat(crsResultValue).concat(
-							crcPair);
+					String crsRaw = resultPair.concat(crsResultValue).concat(crcPair);
 
 					byte[] encodedCRC = java.util.Base64.getEncoder().encode(
 							DatatypeConverter.parseHexBinary(crsRaw));
@@ -450,7 +542,8 @@ public class FOTAService {
 			//String diviceVer = getDeviceVersion(rawMessage);
 			//FOTAInfo fotaInfo = getFotaInforByPartNumber(fotaJsonData.get(DEVICE_PARTNUMBER),false);
 			FOTAInfo fotaInfo = fotaRepository.findFOTAInfo(fotaJsonData.get(DEVICE_PARTNUMBER),true);
-			if(fotaInfo != null){
+			String reqDev = getDeviceVersion(rawMessage);
+			if(reqDev.equals(fotaInfo.getSoftVersion()) ||  (fotaInfo != null)){
 			if(fotaJsonData.get(DEVICE_PARTNUMBER).equals(fotaInfo.getDevicePartNumber())){
 				int totalChunks = 0;
 				HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE),fotaInfo.getFilePath());
@@ -1484,5 +1577,90 @@ public class FOTAService {
 			val = 16 * val + d;
 		}
 		return val;
+	}
+
+	public List<FOTADeviceFWareUpdate> getFOTADeviceList(String status) {
+		
+		List<FOTADeviceFWareUpdate> FOTADeviceList = null;
+		
+		if(status.equals("Success")){
+			FOTADeviceList = new ArrayList<FOTADeviceFWareUpdate>();
+			FOTADeviceList = fotaDeviceRepository.getFOTADeviceListByStatus(status);
+		}else if(status.equals("Failure")){
+			FOTADeviceList = new ArrayList<FOTADeviceFWareUpdate>();
+			FOTADeviceList = fotaDeviceRepository.getFOTADeviceListByStatus(status);
+			
+		}else if(status.equals("All")){
+			String statusSuccess = "Success";
+			String statusFailure = "Failure";
+			FOTADeviceList = new ArrayList<FOTADeviceFWareUpdate>();
+			FOTADeviceList = fotaDeviceRepository.getFOTADeviceListByAll(statusSuccess,statusFailure);
+			
+		}
+		
+		return FOTADeviceList;
+	}
+
+	public List<FOTAInfoDto> FOTAList(String status) {
+		List<FOTAInfoDto> FOTAInfoDtoList = null;
+		List<FOTAInfo> FOTAInfoList = null;
+		if(status.equals("Active")){
+			FOTAInfoList = new ArrayList<FOTAInfo>();
+			FOTAInfoDtoList = new ArrayList<FOTAInfoDto>();
+			FOTAInfoList = fotaRepository.getFOTAListByStatus(true);
+			for(FOTAInfo info : FOTAInfoList){
+				FOTAInfoDto infoDto = new FOTAInfoDto();
+				infoDto.setBedId(info.getBedId());
+				infoDto.setBoardId(info.getBoardId());
+				infoDto.setBootCompVer(info.getBootCompVer());
+				infoDto.setDevicePartNumber(info.getDevicePartNumber());
+				/*DateFormat sdf = new SimpleDateFormat("yyyy/MM-dd'T'HH:mm:ss.SSSXXX");
+				
+				Date startTime = sdf.parse("handleHolderBin.get(handleId).getDownloadStartTime()");*/
+				infoDto.setEffectiveDate(String.valueOf(info.getEffectiveDatetime()));
+				infoDto.setFilePath(info.getFilePath());
+				infoDto.setFilePattern(info.getFilePattern());
+				infoDto.setmCUSize(info.getMCUSize());
+				infoDto.setChecksum(info.getChecksum());
+				infoDto.setReleaseNumber(info.getReleaseNumber());
+				infoDto.setSoftVersion(info.getSoftVersion());
+				infoDto.setReleaseDate(String.valueOf(info.getReleaseDate()));
+				infoDto.setUploadUser(info.getUploadUser());
+				infoDto.setModelId(info.getModelId());
+				infoDto.setOldSoftVerFlag(info.getOldSoftFlag());
+				FOTAInfoDtoList.add(infoDto);
+			}
+			
+			
+		}else if(status.equals("All")){
+			FOTAInfoList = new ArrayList<FOTAInfo>();
+			FOTAInfoList = fotaRepository.getFOTAListByStatus(true,false);
+			
+			for(FOTAInfo info : FOTAInfoList){
+				FOTAInfoDto infoDto = new FOTAInfoDto();
+				FOTAInfoDtoList = new ArrayList<FOTAInfoDto>();
+				infoDto.setBedId(info.getBedId());
+				infoDto.setBoardId(info.getBoardId());
+				infoDto.setBootCompVer(info.getBootCompVer());
+				infoDto.setDevicePartNumber(info.getDevicePartNumber());
+				/*DateFormat sdf = new SimpleDateFormat("yyyy/MM-dd'T'HH:mm:ss.SSSXXX");
+				
+				Date startTime = sdf.parse("handleHolderBin.get(handleId).getDownloadStartTime()");*/
+				infoDto.setEffectiveDate(String.valueOf(info.getEffectiveDatetime()));
+				infoDto.setFilePath(info.getFilePath());
+				infoDto.setFilePattern(info.getFilePattern());
+				infoDto.setmCUSize(info.getMCUSize());
+				infoDto.setChecksum(info.getChecksum());
+				infoDto.setReleaseNumber(info.getReleaseNumber());
+				infoDto.setSoftVersion(info.getSoftVersion());
+				infoDto.setReleaseDate(String.valueOf(info.getReleaseDate()));
+				infoDto.setUploadUser(info.getUploadUser());
+				infoDto.setModelId(info.getModelId());
+				infoDto.setOldSoftVerFlag(info.getOldSoftFlag());
+				FOTAInfoDtoList.add(infoDto);
+			}
+			
+		}
+		return FOTAInfoDtoList;
 	}
 }

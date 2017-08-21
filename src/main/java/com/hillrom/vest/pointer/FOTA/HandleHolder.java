@@ -1,11 +1,43 @@
 package com.hillrom.vest.pointer.FOTA;
 
+import org.joda.time.DateTime;
+
 public class HandleHolder {
 	private String currentChunk;
 	private String previousChunkTransStatus;
 	private String partNo;
+	private DateTime downloadStartTime;
+	private Long fotaInfoId;
+	private String deviceSerialNumber;
+	private String connectionType;
 	int chunkSize = 0;
 	
+	
+	public String getConnectionType() {
+		return connectionType;
+	}
+	public void setConnectionType(String connectionType) {
+		this.connectionType = connectionType;
+	}
+	public String getDeviceSerialNumber() {
+		return deviceSerialNumber;
+	}
+	public void setDeviceSerialNumber(String deviceSerialNumber) {
+		this.deviceSerialNumber = deviceSerialNumber;
+	}
+	public Long getFotaInfoId() {
+		return fotaInfoId;
+	}
+	public void setFotaInfoId(Long fotaInfoId) {
+		this.fotaInfoId = fotaInfoId;
+	}
+	
+	public DateTime getDownloadStartTime() {
+		return downloadStartTime;
+	}
+	public void setDownloadStartTime(DateTime downloadStartTime) {
+		this.downloadStartTime = downloadStartTime;
+	}
 	public int getChunkSize() {
 		return chunkSize;
 	}

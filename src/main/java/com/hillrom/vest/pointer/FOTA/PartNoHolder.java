@@ -16,7 +16,8 @@ public class PartNoHolder {
 			.getLogger(PartNoHolder.class);
 	private String part_No;
 	private String version_No;
-	DateTime effectiveDate;
+	private DateTime effectiveDate;
+	private DateTime downloadTime;
 	private int totalChunk = 0;
 	private int chunkSize = 0;
 	private Map<Integer, String> fileChunks = null;
@@ -37,6 +38,12 @@ public class PartNoHolder {
 		
 	}
 
+	public DateTime getDownloadTime() {
+		return downloadTime;
+	}
+	public void setDownloadTime(DateTime downloadTime) {
+		this.downloadTime = downloadTime;
+	}
 	public int hashCode() {
         return part_No.hashCode();
     }

@@ -7,6 +7,8 @@
     <changeSet author="jhipster" id="20180826125500">
    		<loadUpdateData encoding="UTF-8" file="config/liquibase/users_pass_update.csv"
 			separator=";" tableName="USER"  primaryKey="id">
+			<column name="activated" type="boolean" />
+			<column name="is_deleted" type="boolean" />
 		</loadUpdateData>
     </changeSet>
 </databaseChangeLog>

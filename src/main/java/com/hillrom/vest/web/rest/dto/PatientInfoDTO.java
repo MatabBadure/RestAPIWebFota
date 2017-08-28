@@ -52,6 +52,7 @@ public class PatientInfoDTO {
 	private String city;
 	private String state;
 	private String patient_user_id;
+	private String index;
 
 
 
@@ -745,6 +746,24 @@ public class PatientInfoDTO {
 
 
 
+	/**
+	 * @return the index
+	 */
+	public String getIndex() {
+		return index;
+	}
+
+
+
+	/**
+	 * @param index the index to set
+	 */
+	public void setIndex(String index) {
+		this.index = index;
+	}
+
+
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -770,6 +789,7 @@ public class PatientInfoDTO {
 		result = prime * result + ((garment_type == null) ? 0 : garment_type.hashCode());
 		result = prime * result + ((gender == null) ? 0 : gender.hashCode());
 		result = prime * result + ((hub_id == null) ? 0 : hub_id.hashCode());
+		result = prime * result + ((index == null) ? 0 : index.hashCode());
 		result = prime * result + ((is_active == null) ? 0 : is_active.hashCode());
 		result = prime * result + ((lang_key == null) ? 0 : lang_key.hashCode());
 		result = prime * result + ((last_nm == null) ? 0 : last_nm.hashCode());
@@ -897,6 +917,11 @@ public class PatientInfoDTO {
 				return false;
 		} else if (!hub_id.equals(other.hub_id))
 			return false;
+		if (index == null) {
+			if (other.index != null)
+				return false;
+		} else if (!index.equals(other.index))
+			return false;
 		if (is_active == null) {
 			if (other.is_active != null)
 				return false;
@@ -1018,8 +1043,9 @@ public class PatientInfoDTO {
 				+ ", is_active=" + is_active + ", protocol_type_key=" + protocol_type_key + ", created_by=" + created_by
 				+ ", primary_phone=" + primary_phone + ", mobile_phone=" + mobile_phone + ", gender=" + gender
 				+ ", lang_key=" + lang_key + ", address=" + address + ", city=" + city + ", state=" + state
-				+ ", patient_user_id=" + patient_user_id + "]";
+				+ ", patient_user_id=" + patient_user_id + ", index=" + index + "]";
 	}
+
 
 
 

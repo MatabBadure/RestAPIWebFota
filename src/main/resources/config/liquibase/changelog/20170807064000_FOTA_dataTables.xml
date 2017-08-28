@@ -36,7 +36,12 @@
 			<column name="upload_datetime" type="timestamp">
 				<constraints nullable="true" />
 			</column>
-			<column name="effective_datetime" type="timestamp">
+
+			<column name="published_user" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+
+			<column name="published_datetime" type="timestamp">
 				<constraints nullable="true" />
 			</column>
 			<column name="model_id" type="varchar(255)">
@@ -51,22 +56,44 @@
 			<column name="boot_comp_ver" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
-			<column name="file_pattern" type="varchar(255)">
+			<column name="fill_pattern" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
 			<column name="MCU_size" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
+
 			<column name="release_number" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
-			<column name="checksum" type="varchar(255)">
-				<constraints nullable="true" />
-			</column>
-			<column name="old_soft_flag" type="boolean" valueBoolean="false">
+
+			<column name="soft_delete_flag" type="boolean" value="false">
 				<constraints nullable="false" />
 			</column>
-			
+
+			<column name="active_published_flag" type="boolean" value="false">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="Region1_Start_Address" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="Region1_End_Address" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="Region1_CRC_Location" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="Region2_Start_Address" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="Region2_End_Address" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="Region2_CRC_Location" type="varchar(255)">
+				<constraints nullable="false" />
+			</column>
+
 		</createTable>
 
 		<createTable tableName="FOTA_DEVICE_FWARE_UPDATE_LOG">
@@ -79,23 +106,45 @@
 			<column name="device_serial_number" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
-			<column name="completed_date" type="timestamp">
-				<constraints nullable="false" />
-			</column>
-			<column name="downloaded_status" type="varchar(255)">
-				<constraints nullable="true" />
-			</column>
-			<column name="download_time" type="varchar(255)">
-				<constraints nullable="true" />
-			</column>
+
 			<column name="connection_type" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
-			</createTable>
-			<addForeignKeyConstraint baseColumnNames="fota_info_id"
+
+			<column name="device_software_version" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			
+			<column name="device_software_date_time" type="timestamp">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="updated_software_version" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+
+			<column name="checkupdate_date_time" type="timestamp">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="download_start_date_time" type="timestamp">
+				<constraints nullable="false" />
+			</column>
+			
+			<column name="download_end_date_time" type="timestamp">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="downloaded_status" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			
+
+		</createTable>
+		<addForeignKeyConstraint baseColumnNames="fota_info_id"
 			baseTableName="FOTA_DEVICE_FWARE_UPDATE_LOG" constraintName="fk_fota_id"
 			referencedColumnNames="id" referencedTableName="FOTA_INFO" />
-			
+
 	</changeSet>
 
 </databaseChangeLog>

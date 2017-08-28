@@ -1,40 +1,54 @@
 package com.hillrom.vest.web.rest.FOTA.dto;
 
+
 public class FOTAInfoDto {
 	private String modelId;
 	private String boardId;
 	private String bedId;
 	private String bootCompVer;
-	private String filePattern;
+	private String fillPattern;
 	private String mCUSize;
 	private String softVersion;
 	private String releaseNumber;
 	private String releaseDate;
 	private String devicePartNumber;
-	private String checksum;
+	//private String checksum;
 	private String filePath;
 	private String uploadUser;
-	private String effectiveDate;
-	private boolean oldSoftVerFlag;
-	/*private String filePath;
-	private String uploadUser;
-	private String uploadDatetime;
-	private String effectivedatetime;*/
+	private String publishedUser;
+	//added new attribute
+	//private boolean softDeleteFlag;
+	private String region1StartAddress;
+	private String region1EndAddress;
+	private String region1CRCLocation;
+	private String region2StartAddress;
+	private String region2EndAddress;
+	private String region2CRCLocation;
+	//Added new attribute
+	private String productType;
+	//oldRecord
+	private boolean oldRecord;
 	
+	public boolean getOldRecord() {
+		return oldRecord;
+	}
+	public void setOldRecord(boolean oldRecord) {
+		this.oldRecord = oldRecord;
+	}
+	public String getProductType() {
+		return productType;
+	}
+	public void setProductType(String productType) {
+		this.productType = productType;
+	}
+	public String getPublishedUser() {
+		return publishedUser;
+	}
+	public void setPublishedUser(String publishedUser) {
+		this.publishedUser = publishedUser;
+	}
 	public String getModelId() {
 		return modelId;
-	}
-	public boolean getOldSoftVerFlag() {
-		return oldSoftVerFlag;
-	}
-	public void setOldSoftVerFlag(boolean oldSoftVerFlag) {
-		this.oldSoftVerFlag = oldSoftVerFlag;
-	}
-	public String getEffectiveDate() {
-		return effectiveDate;
-	}
-	public void setEffectiveDate(String effectiveDate) {
-		this.effectiveDate = effectiveDate;
 	}
 	public void setModelId(String modelId) {
 		this.modelId = modelId;
@@ -57,27 +71,20 @@ public class FOTAInfoDto {
 	public void setBootCompVer(String bootCompVer) {
 		this.bootCompVer = bootCompVer;
 	}
-	public String getFilePattern() {
-		return filePattern;
+	public String getFillPattern() {
+		return fillPattern;
 	}
-	public void setFilePattern(String filePattern) {
-		this.filePattern = filePattern;
-	}
-	/*public String getMCUSize() {
-		return MCUSize;
-	}
-	public void setMCUSize(String mCUSize) {
-		MCUSize = mCUSize;
-	}*/
-	
-	public String getSoftVersion() {
-		return softVersion;
+	public void setFillPattern(String fillPattern) {
+		this.fillPattern = fillPattern;
 	}
 	public String getmCUSize() {
 		return mCUSize;
 	}
 	public void setmCUSize(String mCUSize) {
 		this.mCUSize = mCUSize;
+	}
+	public String getSoftVersion() {
+		return softVersion;
 	}
 	public void setSoftVersion(String softVersion) {
 		this.softVersion = softVersion;
@@ -100,37 +107,65 @@ public class FOTAInfoDto {
 	public void setDevicePartNumber(String devicePartNumber) {
 		this.devicePartNumber = devicePartNumber;
 	}
-	public String getChecksum() {
+	/*public String getChecksum() {
 		return checksum;
 	}
 	public void setChecksum(String checksum) {
 		this.checksum = checksum;
-	}
+	}*/
 	public String getFilePath() {
 		return filePath;
 	}
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
 	}
-	
 	public String getUploadUser() {
 		return uploadUser;
 	}
 	public void setUploadUser(String uploadUser) {
 		this.uploadUser = uploadUser;
 	}
-	/*
-	public String getUploadDatetime() {
-		return uploadDatetime;
+	/*public boolean getSoftDeleteFlag() {
+		return softDeleteFlag;
 	}
-	public void setUploadDatetime(String uploadDatetime) {
-		this.uploadDatetime = uploadDatetime;
-	}
-	public String getEffectivedatetime() {
-		return effectivedatetime;
-	}
-	public void setEffectivedatetime(String effectivedatetime) {
-		this.effectivedatetime = effectivedatetime;
+	public void setSoftDeleteFlag(boolean softDeleteFlag) {
+		this.softDeleteFlag = softDeleteFlag;
 	}*/
+	public String getRegion1StartAddress() {
+		return region1StartAddress;
+	}
+	public void setRegion1StartAddress(String region1StartAddress) {
+		this.region1StartAddress = region1StartAddress;
+	}
+	public String getRegion1EndAddress() {
+		return region1EndAddress;
+	}
+	public void setRegion1EndAddress(String region1EndAddress) {
+		this.region1EndAddress = region1EndAddress;
+	}
+	public String getRegion1CRCLocation() {
+		return region1CRCLocation;
+	}
+	public void setRegion1CRCLocation(String region1crcLocation) {
+		region1CRCLocation = region1crcLocation;
+	}
+	public String getRegion2StartAddress() {
+		return region2StartAddress;
+	}
+	public void setRegion2StartAddress(String region2StartAddress) {
+		this.region2StartAddress = region2StartAddress;
+	}
+	public String getRegion2EndAddress() {
+		return region2EndAddress;
+	}
+	public void setRegion2EndAddress(String region2EndAddress) {
+		this.region2EndAddress = region2EndAddress;
+	}
+	public String getRegion2CRCLocation() {
+		return region2CRCLocation;
+	}
+	public void setRegion2CRCLocation(String region2crcLocation) {
+		region2CRCLocation = region2crcLocation;
+	}
 	
 }

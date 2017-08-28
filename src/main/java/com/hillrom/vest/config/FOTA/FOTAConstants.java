@@ -2,13 +2,11 @@ package com.hillrom.vest.config.FOTA;
 
 public final class FOTAConstants {
 
-	//public static final String HEXAFILEPATH = "/opt/FOTA/files";
+	public static final String HEXAFILEPATH = "/opt/FOTA/files";
 	//public static final String HEXAFILEPATH = "D:/FOTA/Hex";
 	//public static final String FOTA_FILE_PATH = "D:/FOTA/UploadFile/";
 	public static final String FOTA_FILE_PATH = "/opt/FOTA/files";
 	public static final int CHUNK_SIZE_VALUE = 200;
-	
-
 	// Raw data constants
 	public static final String REQUEST_TYPE = "requestType";
 	public static final String CHUNK_SIZE = "chunkSize";
@@ -27,6 +25,7 @@ public final class FOTAConstants {
 	public static final String HANDLE_EQ = "handle=";
 	public static final String TOTAL_CHUNK = "totalChunk=";
 	public static final String NOT_OK = "NOT OK";
+	public static final String ABORTED = "ABORTED";
 	public static final String OK = "OK";
 	public static final String YES = "Yes";
 	public static final String INIT = "INIT";

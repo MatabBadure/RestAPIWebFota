@@ -18,26 +18,18 @@ public class FOTAInfo {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	
+	@Column(name="device_part_number")
+	private String devicePartNumber;
+	
 	@Column(name="software_version")
 	private String softVersion;
 	
 	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-    /*@JsonSerialize(using = MMDDYYYYLocalDateSerializer.class)
-    @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)*/
 	@Column(name="release_date")
 	private DateTime releaseDate;
 	
-	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-	@Column(name="upload_datetime")
-	private DateTime uploadDatetime;
-	
-	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-	@Column(name="effective_datetime")
-	private DateTime effectiveDatetime;
-	
-	
-	@Column(name="device_part_number")
-	private String devicePartNumber;
+	@Column(name="product_Type")
+	private String productType;
 	
 	@Column(name="file_path")
 	private String filePath;
@@ -45,8 +37,16 @@ public class FOTAInfo {
 	@Column(name="upload_user")
 	private String uploadUser;
 	
-	@Column(name="product_Type")
-	private String productType;
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+	@Column(name="upload_datetime")
+	private DateTime uploadDatetime;
+	
+	@Column(name="published_user")
+	private String publishedUser;
+	
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+	@Column(name="published_datetime")
+	private DateTime publishedDateTime;
 	
 	@Column(name="model_id")
 	private String modelId;
@@ -60,8 +60,8 @@ public class FOTAInfo {
 	@Column(name="boot_comp_ver")
 	private String bootCompVer;
 	
-	@Column(name="file_pattern")
-	private String filePattern;
+	@Column(name="fill_pattern")
+	private String fillPattern;
 	
 	@Column(name="MCU_size")
 	private String MCUSize;
@@ -69,27 +69,29 @@ public class FOTAInfo {
 	@Column(name="release_number")
 	private String releaseNumber;
 	
-	@Column(name="checksum")
-	private String checksum;
+	@Column(name="soft_delete_flag")
+	private boolean softDeleteFlag;
 	
-	@Column(name="old_soft_flag")
-	private boolean oldSoftFlag;
+	@Column(name="active_published_flag")
+	private boolean activePublishedFlag;
 	
-	public boolean getOldSoftFlag() {
-		return oldSoftFlag;
-	}
-
-	public void setOldSoftFlag(boolean oldSoftFlag) {
-		this.oldSoftFlag = oldSoftFlag;
-	}
-
-	public String getProductType() {
-		return productType;
-	}
-
-	public void setProductType(String productType) {
-		this.productType = productType;
-	}
+	@Column(name="Region1_Start_Address")
+	private String region1StartAddress = "";
+	
+	@Column(name="Region1_End_Address")
+	private String region1EndAddress = "";
+	
+	@Column(name="Region1_CRC_Location")
+	private String region1CRCLocation = "";
+	
+	@Column(name="Region2_Start_Address")
+	private String region2StartAddress = "";
+	
+	@Column(name="Region2_End_Address")
+	private String region2EndAddress = "";
+	
+	@Column(name="Region2_CRC_Location")
+	private String region2CRCLocation = "";
 
 	public Long getId() {
 		return id;
@@ -97,6 +99,14 @@ public class FOTAInfo {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getDevicePartNumber() {
+		return devicePartNumber;
+	}
+
+	public void setDevicePartNumber(String devicePartNumber) {
+		this.devicePartNumber = devicePartNumber;
 	}
 
 	public String getSoftVersion() {
@@ -115,28 +125,12 @@ public class FOTAInfo {
 		this.releaseDate = releaseDate;
 	}
 
-	public DateTime getUploadDatetime() {
-		return uploadDatetime;
+	public String getProductType() {
+		return productType;
 	}
 
-	public void setUploadDatetime(DateTime uploadDatetime) {
-		this.uploadDatetime = uploadDatetime;
-	}
-
-	public DateTime getEffectiveDatetime() {
-		return effectiveDatetime;
-	}
-
-	public void setEffectiveDatetime(DateTime effectiveDatetime) {
-		this.effectiveDatetime = effectiveDatetime;
-	}
-
-	public String getDevicePartNumber() {
-		return devicePartNumber;
-	}
-
-	public void setDevicePartNumber(String devicePartNumber) {
-		this.devicePartNumber = devicePartNumber;
+	public void setProductType(String productType) {
+		this.productType = productType;
 	}
 
 	public String getFilePath() {
@@ -153,6 +147,30 @@ public class FOTAInfo {
 
 	public void setUploadUser(String uploadUser) {
 		this.uploadUser = uploadUser;
+	}
+
+	public DateTime getUploadDatetime() {
+		return uploadDatetime;
+	}
+
+	public void setUploadDatetime(DateTime uploadDatetime) {
+		this.uploadDatetime = uploadDatetime;
+	}
+
+	public String getPublishedUser() {
+		return publishedUser;
+	}
+
+	public void setPublishedUser(String publishedUser) {
+		this.publishedUser = publishedUser;
+	}
+
+	public DateTime getPublishedDateTime() {
+		return publishedDateTime;
+	}
+
+	public void setPublishedDateTime(DateTime publishedDateTime) {
+		this.publishedDateTime = publishedDateTime;
 	}
 
 	public String getModelId() {
@@ -187,12 +205,12 @@ public class FOTAInfo {
 		this.bootCompVer = bootCompVer;
 	}
 
-	public String getFilePattern() {
-		return filePattern;
+	public String getFillPattern() {
+		return fillPattern;
 	}
 
-	public void setFilePattern(String filePattern) {
-		this.filePattern = filePattern;
+	public void setFillPattern(String fillPattern) {
+		this.fillPattern = fillPattern;
 	}
 
 	public String getMCUSize() {
@@ -211,13 +229,70 @@ public class FOTAInfo {
 		this.releaseNumber = releaseNumber;
 	}
 
-	public String getChecksum() {
-		return checksum;
+	public boolean getSoftDeleteFlag() {
+		return softDeleteFlag;
 	}
 
-	public void setChecksum(String checksum) {
-		this.checksum = checksum;
+	public void setSoftDeleteFlag(boolean softDeleteFlag) {
+		this.softDeleteFlag = softDeleteFlag;
+	}
+
+	public boolean getActivePublishedFlag() {
+		return activePublishedFlag;
+	}
+
+	public void setActivePublishedFlag(boolean activePublishedFlag) {
+		this.activePublishedFlag = activePublishedFlag;
+	}
+
+	public String getRegion1StartAddress() {
+		return region1StartAddress;
+	}
+
+	public void setRegion1StartAddress(String region1StartAddress) {
+		this.region1StartAddress = region1StartAddress;
+	}
+
+	public String getRegion1EndAddress() {
+		return region1EndAddress;
+	}
+
+	public void setRegion1EndAddress(String region1EndAddress) {
+		this.region1EndAddress = region1EndAddress;
+	}
+
+	public String getRegion1CRCLocation() {
+		return region1CRCLocation;
+	}
+
+	public void setRegion1CRCLocation(String region1crcLocation) {
+		region1CRCLocation = region1crcLocation;
+	}
+
+	public String getRegion2StartAddress() {
+		return region2StartAddress;
+	}
+
+	public void setRegion2StartAddress(String region2StartAddress) {
+		this.region2StartAddress = region2StartAddress;
+	}
+
+	public String getRegion2EndAddress() {
+		return region2EndAddress;
+	}
+
+	public void setRegion2EndAddress(String region2EndAddress) {
+		this.region2EndAddress = region2EndAddress;
+	}
+
+	public String getRegion2CRCLocation() {
+		return region2CRCLocation;
+	}
+
+	public void setRegion2CRCLocation(String region2crcLocation) {
+		region2CRCLocation = region2crcLocation;
 	}
 	
 	
+
 }

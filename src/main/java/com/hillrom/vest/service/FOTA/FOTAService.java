@@ -1,4 +1,5 @@
 package com.hillrom.vest.service.FOTA;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.ABORTED;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.AMPERSAND;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.BUFFER_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.BUFFER_LEN_EQ;
@@ -7,6 +8,7 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_SN;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_VER;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.FOTA_FILE_PATH;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.INIT;
@@ -23,7 +25,10 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.SOFT_VER_DATE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.TOTAL_CHUNK;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.YES;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -47,6 +52,7 @@ import javax.xml.bind.DatatypeConverter;
 
 import net.minidev.json.JSONObject;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -65,6 +71,7 @@ import com.hillrom.vest.repository.FOTA.FOTADeviceRepository;
 import com.hillrom.vest.repository.FOTA.FOTARepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.FOTA.FOTAParseUtil;
+import com.hillrom.vest.web.rest.FOTA.dto.CRC32Dto;
 import com.hillrom.vest.web.rest.FOTA.dto.FOTAInfoDto;
 @Service
 @Transactional
@@ -81,6 +88,8 @@ public class FOTAService {
 	private  Map<Long,String> storeChunk ;
 	private  Map<Long,String> handleHolder ;
 	
+	private static final int HEX = 16;
+	
 	public static final byte[] CRC_FIELD_NAME = new byte[]{38,99,114,99,61};
 	public static final byte[] CHUNK_SIZE = new byte[]{38,99,104,117,110,107,83,105,122,101,61};
 	public static final byte[] HANDLE = new byte[]{38,104,97,110,100,108,101,61};
@@ -96,9 +105,7 @@ public class FOTAService {
 	
 	//private Map<Integer, String> storedChunks;
 
-	
-	
-	public String FOTAUpdate(String rawMessage) throws ParseException {
+	public String FOTAUpdate(String rawMessage) throws Exception {
 		
 		int countInt = 0;
 		String decoded_string = "";
@@ -112,7 +119,6 @@ public class FOTAService {
 		
 
 		Map<String, String> fotaJsonData = new LinkedHashMap<String, String>();
-
 		// Decoding raw data
 		decoded_string = decodeRawMessage(rawMessage);
 		// Parsing into key value pair
@@ -120,113 +126,182 @@ public class FOTAService {
 				.getFOTAJsonDataFromRawMessage(decoded_string);
 
 		// Global handler
-	
-		
 		String crsResultValue = "";
 		
 		// Checking if request Type is 01 & //Checking if request Type is 02
-		
 		if(validateCRC(rawMessage)){
 			//crcResult = "Yes";
 			crsResultValue = asciiToHex(YES);
 			String handleId = "";
-			//
-			//Get Fota Details based on part numbers.
+			boolean softDeleteFlag = false;
+			boolean activePublishedFlag = false;
 			
+			
+			//check Update request.
 			if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE1)) {
 				
-				//Map<String,String> partNumberWithCount = globalHandleHolder.getHandleWithPartNumber().get(handleId);
-				FOTAInfo fotaInfo = fotaRepository.findFOTAInfo(fotaJsonData.get(DEVICE_PARTNUMBER),true);
+				//Get active pending FOTA details from the DB 
+				FOTAInfo fotaInfo = fotaRepository.FOTAByPartNumber(fotaJsonData.get(DEVICE_PARTNUMBER),softDeleteFlag,activePublishedFlag);
 				
+				// Date formating which is from request
+				SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat(
+						"MMddyy");
+				simpleDateFormat1.setLenient(false);
+				Date date3 = simpleDateFormat1.parse(fotaJsonData
+						.get(SOFT_VER_DATE));
+				
+				// Release date from request
+				DateTime reqReleaseDate = new DateTime(date3);
+				
+				//Check if null or no record exist and send response No to device
 				if(fotaInfo != null){
-					//Release date from DB 
+					// Get release date from DB
 					DateTime dbRelaseDate = fotaInfo.getReleaseDate();
-					
-					//Release date from request
-					SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("MMddyy");
-					simpleDateFormat1.setLenient(false);
-					Date date3 = simpleDateFormat1.parse(fotaJsonData.get(SOFT_VER_DATE));
-					DateTime reqReleaseDate = new DateTime(date3);
-					
+					// Get Software version from request
 					String reqDev = getDeviceVersion(rawMessage);
 					//if(!(reqDev.equals(fotaInfo.getSoftVersion())) && (Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion()))||((reqReleaseDate.isBefore(dbRelaseDate)|| reqReleaseDate.equals(dbRelaseDate)) && (Integer.valueOf(reqDev)<Integer.valueOf(fotaInfo.getSoftVersion())))){
-					if((fotaInfo.getDevicePartNumber().equals(fotaJsonData.get(DEVICE_PARTNUMBER)) && (Integer.valueOf(fotaInfo.getSoftVersion())>Integer.valueOf(reqDev))) || (reqDev.equals(fotaInfo.getSoftVersion()) && dbRelaseDate.isAfter(reqReleaseDate))){
-					
-				int totalChunks = 0;
-				
-				handleId = getHandleNumber();
-				// Get Chunk Size from request
-				String chunkStr = getChunk(rawMessage);
-				// Decimal conversion
-				int chunkSize = hex2decimal(chunkStr);
-				//PartNumber:Chunk Size
-				String storeChunk = fotaJsonData.get(DEVICE_PARTNUMBER).concat(":").concat(String.valueOf(chunkSize));
-				if(partNosBin.containsKey(storeChunk)){
-					partNoHolder =  partNosBin.get(storeChunk);
-					//partNosBin.put(storeChunk, partNoHolder);
-					//Initially 
-					HandleHolder holder = new HandleHolder();
-					holder.setCurrentChunk(String.valueOf(0));
-					holder.setPartNo(partNoHolder.getPart_No());
-					holder.setChunkSize(partNoHolder.getChunkSize());
-					holder.setFotaInfoId(fotaInfo.getId());
-					holder.setDeviceSerialNumber(fotaJsonData.get(DEVICE_SN));
-					holder.setConnectionType(fotaJsonData.get(CONNECTION_TYPE));
-					holder.setPreviousChunkTransStatus("CheckUpdate");
-					handleId = getHandleNumber();
-					handleHolderBin.put(handleId, holder);
-					
-				}else {
-					partNoHolder = new PartNoHolder(chunkSize, fotaInfo.getFilePath());
-					partNoHolder.setChunkSize(chunkSize);
-					partNoHolder.setPart_No(fotaJsonData.get(DEVICE_PARTNUMBER));
-					partNoHolder.setVersion_No(fotaInfo.getSoftVersion());
-					partNoHolder.setEffectiveDate(new DateTime());
-					//PartNo with Chuck size
-					partNosBin.put(storeChunk, partNoHolder);
-					//Initially 
-					HandleHolder holder = new HandleHolder();
-					holder.setCurrentChunk(String.valueOf(0));
-					holder.setPartNo(partNoHolder.getPart_No());
-					holder.setChunkSize(partNoHolder.getChunkSize());
-					holder.setFotaInfoId(fotaInfo.getId());
-					holder.setDeviceSerialNumber(fotaJsonData.get(DEVICE_SN));
-					holder.setConnectionType(fotaJsonData.get(CONNECTION_TYPE));
-					holder.setPreviousChunkTransStatus("CheckUpdate");
-					handleId = getHandleNumber();
-					handleHolderBin.put(handleId, holder);
-				}
-				
-				totalChunks = partNoHolder.getTotalChunk();
-				// Response pair1
-				resultPair = getResponePairResult();
-				
-				handlePair = getResponePair1();
-				
-				// Handle in raw format
-				String handleIdRaw = hexToAscii(asciiToHex(toLittleEndian((handleId))));
+					if ((fotaInfo.getDevicePartNumber().equals(
+							fotaJsonData.get(DEVICE_PARTNUMBER)) && (Integer
+							.valueOf(fotaInfo.getSoftVersion()) > Integer
+							.valueOf(reqDev)))
+							|| (reqDev.equals(fotaInfo.getSoftVersion()) && dbRelaseDate
+									.isAfter(reqReleaseDate))) {
 
-				// Response pair2
-				totalChunkPair = getResponePair2();
+						int totalChunks = 0;
+						//Generate Handle
+						handleId = getHandleNumber();
+						// Get Chunk Size from request
+						String chunkStr = getChunk(rawMessage);
+						// Decimal conversion
+						int chunkSize = hex2decimal(chunkStr);
+						// PartNumber:Chunk Size
+						String storeChunk = fotaJsonData.get(DEVICE_PARTNUMBER)
+								.concat(":").concat(String.valueOf(chunkSize)).concat(":").concat(fotaInfo.getSoftVersion());
+						boolean crcValid = false;
+						if (partNosBin.containsKey(storeChunk)) {
+							partNoHolder = partNosBin.get(storeChunk);
+							crcValid = partNoHolder.checkCRC32(fotaInfo);
+							if ( crcValid == true) {
+								// partNosBin.put(storeChunk, partNoHolder);
+								// Initially
+								HandleHolder holder = new HandleHolder();
+								holder.setCurrentChunk(String.valueOf(0));
+								holder.setPartNo(partNoHolder.getPart_No());
+								holder.setChunkSize(partNoHolder.getChunkSize());
+								holder.setFotaInfoId(fotaInfo.getId());
+								holder.setDeviceSerialNumber(fotaJsonData
+										.get(DEVICE_SN));
+								holder.setConnectionType(fotaJsonData
+										.get(CONNECTION_TYPE));
+								holder.setDeviceSoftwareVersion(reqDev);
+								//request Device software date
+								holder.setDeviceSoftwareDateTime(reqReleaseDate);
+								holder.setUpdatedSoftVersion(fotaInfo.getSoftVersion());
+								holder.setCheckupdateDateTime(new DateTime());
+								holder.setPreviousChunkTransStatus("CheckUpdate");
+								//added new stmt
+								holder.setSoftwareVersion(fotaInfo.getSoftVersion());
+								handleId = getHandleNumber();
+								handleHolderBin.put(handleId, holder);
+							} else {
+								//Abort case
+								partNoHolder.setAbortFlag(true);
+							}
+						} else {
+							partNoHolder = new PartNoHolder(chunkSize, fotaInfo);
+							crcValid = partNoHolder.checkCRC32(fotaInfo);
+							if ( crcValid == true)
+							{
+								partNoHolder.setChunkSize(chunkSize);
+								partNoHolder.setPart_No(fotaJsonData
+										.get(DEVICE_PARTNUMBER));
+								partNoHolder.setVersion_No(fotaInfo
+										.getSoftVersion());
+								partNoHolder.setEffectiveDate(new DateTime());
+								// PartNo with Chuck size
+								partNosBin.put(storeChunk, partNoHolder);
+								// Initially
+								HandleHolder holder = new HandleHolder();
+								holder.setCurrentChunk(String.valueOf(0));
+								holder.setPartNo(partNoHolder.getPart_No());
+								holder.setChunkSize(partNoHolder.getChunkSize());
+								holder.setFotaInfoId(fotaInfo.getId());
+								holder.setDeviceSerialNumber(fotaJsonData
+										.get(DEVICE_SN));
+								holder.setConnectionType(fotaJsonData
+										.get(CONNECTION_TYPE));
+								holder.setDeviceSoftwareVersion(reqDev);
+								//Request Device software date
+								holder.setDeviceSoftwareDateTime(reqReleaseDate);
+								holder.setUpdatedSoftVersion(fotaInfo.getSoftVersion());
+								holder.setCheckupdateDateTime(new DateTime());
+								holder.setPreviousChunkTransStatus("CheckUpdate");
+								//added new stmt
+								holder.setSoftwareVersion(fotaInfo.getSoftVersion());
+								handleId = getHandleNumber();
+								handleHolderBin.put(handleId, holder);
+							} else {
+								//Abort case
+								partNoHolder.setAbortFlag(true);
+							}
+						}
 
-				// Total chunk in raw format
-				String totalChunkRaw = getChunkRaw(totalChunks);
+						if (crcValid == false || partNoHolder.getAbortFlag()==true) {
+							crsResultValue = asciiToHex("No");
+							resultPair = getResponePairResult();
+							crcPair = getResponePair3();
+							String crsRaw = resultPair.concat(crsResultValue)
+									.concat(crcPair);
 
-				// Response pair3 crc
-				crcPair = getResponePair3();
-				
-				//CRC calculation 
-				String crcInput = resultPair.concat(crsResultValue).concat(handlePair).concat(handleIdRaw).concat(totalChunkPair).concat(totalChunkRaw).concat(crcPair);
-				
-				byte[] encodedCRC = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(crcInput));
-				String encodedString = new String(encodedCRC);
-				log.debug("encodedString: " + encodedString);
-				
-				String crcstr = calculateCRC(encodedString);
-				// Final response String
-				finalResponseStr = getAllResponseCheckUpdate(resultPair,crsResultValue,handlePair, handleIdRaw,
-						totalChunkPair, totalChunkRaw, crcPair, crcstr);
-				log.debug("finalResponseStr: " + finalResponseStr);
+							byte[] encodedCRC = java.util.Base64.getEncoder()
+									.encode(DatatypeConverter
+											.parseHexBinary(crsRaw));
+							String encodedString = new String(encodedCRC);
+							log.debug("encodedString: " + encodedString);
+							String crcValue = calculateCRC(encodedString);
+
+							finalResponseStr = resultPair
+									.concat(crsResultValue).concat(crcPair)
+									.concat(crcValue);
+						} else {
+							totalChunks = partNoHolder.getTotalChunk();
+							// Response pair1
+							resultPair = getResponePairResult();
+
+							handlePair = getResponePair1();
+
+							// Handle in raw format
+							String handleIdRaw = hexToAscii(asciiToHex(toLittleEndian((handleId))));
+
+							// Response pair2
+							totalChunkPair = getResponePair2();
+
+							// Total chunk in raw format
+							String totalChunkRaw = getChunkRaw(totalChunks);
+
+							// Response pair3 crc
+							crcPair = getResponePair3();
+
+							// CRC calculation
+							String crcInput = resultPair.concat(crsResultValue)
+									.concat(handlePair).concat(handleIdRaw)
+									.concat(totalChunkPair)
+									.concat(totalChunkRaw).concat(crcPair);
+
+							byte[] encodedCRC = java.util.Base64.getEncoder()
+									.encode(DatatypeConverter
+											.parseHexBinary(crcInput));
+							String encodedString = new String(encodedCRC);
+							log.debug("encodedString: " + encodedString);
+
+							String crcstr = calculateCRC(encodedString);
+							// Final response String
+							finalResponseStr = getAllResponseCheckUpdate(
+									resultPair, crsResultValue, handlePair,
+									handleIdRaw, totalChunkPair, totalChunkRaw,
+									crcPair, crcstr);
+							log.debug("finalResponseStr: " + finalResponseStr);
+						}
 					}else{
 						crsResultValue = asciiToHex("No");
 						resultPair = getResponePairResult();
@@ -258,36 +333,73 @@ public class FOTAService {
 				finalResponseStr = resultPair.concat(crsResultValue).concat(crcPair).concat(crcValue);
 				}
 			}else if(fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE2)){
-				
-				if (fotaJsonData.get(PREV_REQ_STATUS).equals(INIT)) {
+
 					//Get handle from request
 					handleId = getHandleFromRequest(rawMessage);
 					//Initially 
 					HandleHolder holder = new HandleHolder();
+					//Get handle object based on handleId
 					holder = handleHolderBin.get(handleId);
-					
-					String storeChunk = holder.getPartNo().concat(":").concat(String.valueOf(holder.getChunkSize()));
-					
-					int chunkCount = Integer.parseInt(holder.getCurrentChunk());
-
+					//Frame key to get partNumber details
+					String storeChunk = holder.getPartNo().concat(":").concat(String.valueOf(holder.getChunkSize())).concat(":").concat(holder.getSoftwareVersion());
 					partNoHolder =  partNosBin.get(storeChunk);
 					
-					String zeroChunk = partNoHolder.getFileChunks().get(chunkCount);
+				if(partNoHolder.getAbortFlag() == false){
 					
-					holder.setCurrentChunk(holder.getCurrentChunk());
-					holder.setPreviousChunkTransStatus("INIT");
-					holder.setDownloadStartTime(new DateTime());
-					
-					handleHolderBin.put(handleId, holder);
-					//Zero the Chunk in raw format
-					buffer = hexToAscii(asciiToHex(zeroChunk));
-					log.debug("buffer Encoded:" + buffer);
-					
-					//Chunk size in hex byte
-					bufferLen = (zeroChunk.length() / 2);
-					log.debug("bufferLen:" + bufferLen);
-					}else if (fotaJsonData.get(PREV_REQ_STATUS).equals(OK)){
-						//Get handle from request
+					if (fotaJsonData.get(PREV_REQ_STATUS).equals(INIT)) 
+					{
+						//Get current chunk count from handle holder object
+						int chunkCount = Integer.parseInt(holder.getCurrentChunk());
+						
+						//Get the particular chunk from the based chunk count
+						String zeroChunk = partNoHolder.getFileChunks().get(chunkCount);
+						
+						holder.setCurrentChunk(holder.getCurrentChunk());
+						holder.setPreviousChunkTransStatus("INIT");
+						holder.setDownloadStartDateTime(new DateTime());
+						
+						handleHolderBin.put(handleId, holder);
+						//Zero the Chunk in raw format
+						buffer = hexToAscii(asciiToHex(zeroChunk));
+						log.debug("buffer Encoded:" + buffer);
+						
+						//Chunk size in hex byte
+						bufferLen = (zeroChunk.length() / 2);
+						log.debug("bufferLen:" + bufferLen);
+						
+					}else if (fotaJsonData.get(PREV_REQ_STATUS).equals(OK))
+						{
+							/*//Get handle from request
+							handleId = getHandleFromRequest(rawMessage);
+							log.debug("handleId from Request:" + handleId);
+							
+							handleId = getHandleFromRequest(rawMessage);
+							//Initially 
+							HandleHolder holder = new HandleHolder();
+							holder = handleHolderBin.get(handleId);
+							
+							String storeChunk = holder.getPartNo().concat(":").concat(String.valueOf(holder.getChunkSize()));
+							
+							partNoHolder =  partNosBin.get(storeChunk);*/
+							
+							int chunkCount = Integer.parseInt(holder.getCurrentChunk())+1;
+							
+							String zeroChunk = partNoHolder.getFileChunks().get(chunkCount);
+							
+							holder.setCurrentChunk(String.valueOf(chunkCount));
+							holder.setPreviousChunkTransStatus("OK");
+							handleHolderBin.put(handleId, holder);
+							
+							//Zero the Chunk in raw format
+							buffer = hexToAscii(asciiToHex(zeroChunk));
+							log.debug("buffer Encoded:" + buffer);
+							
+							//Chunk size in hex byte
+							bufferLen = (zeroChunk.length() / 2);
+							log.debug("bufferLen:" + bufferLen);
+							
+					}else if (fotaJsonData.get(PREV_REQ_STATUS).equals(NOT_OK)) {
+						/*//Get handle from request
 						handleId = getHandleFromRequest(rawMessage);
 						log.debug("handleId from Request:" + handleId);
 						
@@ -298,10 +410,9 @@ public class FOTAService {
 						
 						String storeChunk = holder.getPartNo().concat(":").concat(String.valueOf(holder.getChunkSize()));
 						
-						int chunkCount = Integer.parseInt(holder.getCurrentChunk())+1;
-
-						partNoHolder =  partNosBin.get(storeChunk);
+						partNoHolder =  partNosBin.get(storeChunk);*/
 						
+						int chunkCount = Integer.parseInt(holder.getCurrentChunk());
 						String zeroChunk = partNoHolder.getFileChunks().get(chunkCount);
 						
 						holder.setCurrentChunk(String.valueOf(chunkCount));
@@ -316,67 +427,37 @@ public class FOTAService {
 						bufferLen = (zeroChunk.length() / 2);
 						log.debug("bufferLen:" + bufferLen);
 						
-				}else if (fotaJsonData.get(PREV_REQ_STATUS).equals(NOT_OK)) {
-					//Get handle from request
-					handleId = getHandleFromRequest(rawMessage);
-					log.debug("handleId from Request:" + handleId);
+					} 	
+						
+					// result pair1
+					resultPair = getResponePairResult();
 					
-					handleId = getHandleFromRequest(rawMessage);
-					//Initially 
-					HandleHolder holder = new HandleHolder();
-					holder = handleHolderBin.get(handleId);
+					//Init and ok send result is ok
+					//crcResult = "OK";
+					crsResultValue = asciiToHex(OK);
 					
-					String storeChunk = holder.getPartNo().concat(":").concat(String.valueOf(holder.getChunkSize()));
+					//handlePair Init Pair1 HANDLE_EQ
 					
-					int chunkCount = Integer.parseInt(holder.getCurrentChunk());
-
-					partNoHolder =  partNosBin.get(storeChunk);
+					handlePair = getResponePair1();
+					//handlePair = asciiToHex(HANDLE_EQ);
 					
-					String zeroChunk = partNoHolder.getFileChunks().get(chunkCount);
+					//Handle in raw format(handle Value)
+					String handleIdRaw = hexToAscii(asciiToHex(toLittleEndian((handleId))));
 					
-					holder.setCurrentChunk(String.valueOf(chunkCount));
-					holder.setPreviousChunkTransStatus("OK");
-					handleHolderBin.put(handleId, holder);
+					//bufferLenPair Init Pair2(BUFFER_LEN_EQ)
+					bufferLenPair = getInitResponsePair2();
 					
-					//Zero the Chunk in raw format
-					buffer = hexToAscii(asciiToHex(zeroChunk));
-					log.debug("buffer Encoded:" + buffer);
+					//String bufferLenRaw =  hexToAscii(asciiToHex(Integer.toHexString(bufferLen)));
+					String bufferLenRaw =  getBufferLenTwoHexByte(bufferLen);
 					
-					//Chunk size in hex byte
-					bufferLen = (zeroChunk.length() / 2);
-					log.debug("bufferLen:" + bufferLen);
+					//bufferPair Init Pair2 BUFFER_EQ
+					bufferPair = getInitReponsePair3();
 					
-				} 	
+					//crcPair pair4 Init  crc
+					crcPair = getResponePair3();
 					
-				// result pair1
-				resultPair = getResponePairResult();
-				
-				//Init and ok send result is ok
-				//crcResult = "OK";
-				crsResultValue = asciiToHex(OK);
-				
-				//handlePair Init Pair1 HANDLE_EQ
-				
-				handlePair = getResponePair1();
-				//handlePair = asciiToHex(HANDLE_EQ);
-				
-				//Handle in raw format(handle Value)
-				String handleIdRaw = hexToAscii(asciiToHex(toLittleEndian((handleId))));
-				
-				//bufferLenPair Init Pair2(BUFFER_LEN_EQ)
-				bufferLenPair = getInitResponsePair2();
-				
-				//String bufferLenRaw =  hexToAscii(asciiToHex(Integer.toHexString(bufferLen)));
-				String bufferLenRaw =  getBufferLenTwoHexByte(bufferLen);
-				
-				//bufferPair Init Pair2 BUFFER_EQ
-				bufferPair = getInitReponsePair3();
-				
-				//crcPair pair4 Init  crc
-				crcPair = getResponePair3();
-				
-				String crsRaw = resultPair.concat(crsResultValue).concat(handlePair).concat(handleIdRaw).concat(bufferLenPair).concat(bufferLenRaw).concat(bufferPair).concat(buffer).concat(crcPair);
-				
+					String crsRaw = resultPair.concat(crsResultValue).concat(handlePair).concat(handleIdRaw).concat(bufferLenPair).concat(bufferLenRaw).concat(bufferPair).concat(buffer).concat(crcPair);
+			
 				byte[] encodedCRC = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(crsRaw));
 				String encodedString = new String(encodedCRC);
 				log.debug("encodedString: " + encodedString);
@@ -387,7 +468,19 @@ public class FOTAService {
 				finalResponseStr = getInitOKResponseSendChunk(resultPair,crsResultValue,handlePair, handleIdRaw,
 						bufferLenPair, bufferLenRaw, bufferPair, buffer,crcPair,crcstr,countInt);
 				log.debug("finalResponseStr: " + finalResponseStr);
-				
+				}else{
+					crsResultValue = asciiToHex("ABORT");
+					resultPair = getResponePairResult();
+					crcPair = getResponePair3();
+					String crsRaw = resultPair.concat(crsResultValue).concat(
+							crcPair);
+					byte[] encodedCRC = java.util.Base64.getEncoder().encode(
+							DatatypeConverter.parseHexBinary(crsRaw));
+					String encodedString = new String(encodedCRC);
+					log.debug("encodedString: " + encodedString);
+					String crcValue = calculateCRC(encodedString);
+					finalResponseStr = resultPair.concat(crsResultValue).concat(crcPair).concat(crcValue);
+				}
 			
 			}else if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE3)) {
 				if (fotaJsonData.get(RESULT).equals(OK)) {
@@ -401,29 +494,15 @@ public class FOTAService {
 					FOTADeviceFWareUpdate fotaDeviceFWareUpdate = new FOTADeviceFWareUpdate();
 					fotaDeviceFWareUpdate.setFotaInfoId(holder.getFotaInfoId());
 					fotaDeviceFWareUpdate.setDeviceSerialNumber(holder.getDeviceSerialNumber());
-					fotaDeviceFWareUpdate.setCurrentDate(new DateTime());
-					
-					//DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-					
-					//Date startTime = sdf.parse("handleHolderBin.get(handleId).getDownloadStartTime()");
-					
-					DateTime upadteTime = new DateTime();
-					
-					long elapsed = holder.getDownloadStartTime().getMillis() - upadteTime.getMillis();
-					
-					int hours = (int) Math.floor(elapsed / 3600000);
-		            
-		            int minutes = (int) Math.floor((elapsed - hours * 3600000) / 60000);
-		            
-		            int seconds = (int) Math.floor((elapsed - hours * 3600000 - minutes * 60000) / 1000);
-		            
-		            String totalDownloadTime = String.valueOf(hours).concat(":").concat(String.valueOf(minutes)).concat(":").concat(String.valueOf(seconds));
-					
-					fotaDeviceFWareUpdate.setDownloadTime(totalDownloadTime);
-					
+					fotaDeviceFWareUpdate.setDeviceSoftVersion(holder.getSoftwareVersion());
+					fotaDeviceFWareUpdate.setUpdatedSoftVersion(holder.getUpdatedSoftVersion());
+					fotaDeviceFWareUpdate.setDeviceSoftwareDateTime(holder.getDeviceSoftwareDateTime());
+					fotaDeviceFWareUpdate.setCheckupdateDateTime(holder.getCheckupdateDateTime());
+					fotaDeviceFWareUpdate.setDownloadStartDateTime(holder.getDownloadStartDateTime());
+					fotaDeviceFWareUpdate.setDownloadEndDateTime(new DateTime());
 					fotaDeviceFWareUpdate.setConnectionType(holder.getConnectionType());
-					//if(holder.getPreviousChunkTransStatus().equals(anObject))
-					fotaDeviceFWareUpdate.setStatus("Success");
+					fotaDeviceFWareUpdate.setDownloadStatus("Success");
+					
 					fotaDeviceRepository.save(fotaDeviceFWareUpdate);
 					// result pair1
 					resultPair = getResponePairResult();
@@ -450,27 +529,15 @@ public class FOTAService {
 					FOTADeviceFWareUpdate fotaDeviceFWareUpdate = new FOTADeviceFWareUpdate();
 					fotaDeviceFWareUpdate.setFotaInfoId(holder.getFotaInfoId());
 					fotaDeviceFWareUpdate.setDeviceSerialNumber(holder.getDeviceSerialNumber());
-					fotaDeviceFWareUpdate.setCurrentDate(new DateTime());
-					
-
-					DateTime upadteTime = new DateTime();
-					
-					long elapsed = (upadteTime.getMillis())-(holder.getDownloadStartTime().getMillis());
-					
-					int hours = (int) Math.floor(elapsed / 3600000);
-		            
-		            int minutes = (int) Math.floor((elapsed - hours * 3600000) / 60000);
-		            
-		            int seconds = (int) Math.floor((elapsed - hours * 3600000 - minutes * 60000) / 1000);
-		            
-		            String totalDownloadTime = String.valueOf(hours).concat(":").concat(String.valueOf(minutes)).concat(":").concat(String.valueOf(seconds));
-					
-					fotaDeviceFWareUpdate.setDownloadTime(totalDownloadTime);
-					
-					//fotaDeviceFWareUpdate.setDownloadTime(new DateTime());
+					fotaDeviceFWareUpdate.setDeviceSoftVersion(holder.getSoftwareVersion());
+					fotaDeviceFWareUpdate.setUpdatedSoftVersion(holder.getUpdatedSoftVersion());
+					fotaDeviceFWareUpdate.setDeviceSoftwareDateTime(holder.getDeviceSoftwareDateTime());
+					fotaDeviceFWareUpdate.setCheckupdateDateTime(holder.getCheckupdateDateTime());
+					fotaDeviceFWareUpdate.setDownloadStartDateTime(holder.getDownloadStartDateTime());
+					fotaDeviceFWareUpdate.setDownloadEndDateTime(new DateTime());
 					fotaDeviceFWareUpdate.setConnectionType(holder.getConnectionType());
-					//if(holder.getPreviousChunkTransStatus().equals(anObject))
-					fotaDeviceFWareUpdate.setStatus("Failure");
+					fotaDeviceFWareUpdate.setDownloadStatus("Failure");
+					
 					fotaDeviceRepository.save(fotaDeviceFWareUpdate);
 					
 					// result pair1
@@ -489,6 +556,47 @@ public class FOTAService {
 					
 					//Final String 
 					finalResponseStr = resultPair.concat(crsResultValue).concat(crcPair).concat(crcValue);
+				} else if (fotaJsonData.get(RESULT).equals(ABORTED)) {
+
+					//Get handle from request
+					handleId = getHandleFromRequest(rawMessage);
+					log.debug("handleId from Request:" + handleId);
+					
+					//Initially 
+					HandleHolder holder = new HandleHolder();
+					holder = handleHolderBin.get(handleId);
+					FOTADeviceFWareUpdate fotaDeviceFWareUpdate = new FOTADeviceFWareUpdate();
+					fotaDeviceFWareUpdate.setFotaInfoId(holder.getFotaInfoId());
+					fotaDeviceFWareUpdate.setDeviceSerialNumber(holder.getDeviceSerialNumber());
+					fotaDeviceFWareUpdate.setDeviceSoftVersion(holder.getSoftwareVersion());
+					fotaDeviceFWareUpdate.setUpdatedSoftVersion(holder.getUpdatedSoftVersion());
+					fotaDeviceFWareUpdate.setDeviceSoftwareDateTime(holder.getDeviceSoftwareDateTime());
+					fotaDeviceFWareUpdate.setCheckupdateDateTime(holder.getCheckupdateDateTime());
+					fotaDeviceFWareUpdate.setDownloadStartDateTime(holder.getDownloadStartDateTime());
+					fotaDeviceFWareUpdate.setDownloadEndDateTime(new DateTime());
+					fotaDeviceFWareUpdate.setConnectionType(holder.getConnectionType());
+					fotaDeviceFWareUpdate.setDownloadStatus("Aborted");
+					
+					fotaDeviceRepository.save(fotaDeviceFWareUpdate);
+					
+					// result pair1
+					resultPair = getResponePairResult();
+					//crcResult = "OK";
+					crsResultValue = asciiToHex(ABORTED);
+					crcPair = getResponePair3();
+					
+					String crsRaw = resultPair.concat(crsResultValue).concat(crcPair);
+
+					byte[] encodedCRC = java.util.Base64.getEncoder().encode(
+							DatatypeConverter.parseHexBinary(crsRaw));
+					String encodedString = new String(encodedCRC);
+					log.debug("encodedString: " + encodedString);
+					String crcValue = calculateCRC(encodedString);
+					
+					//Final String 
+					finalResponseStr = resultPair.concat(crsResultValue).concat(crcPair).concat(crcValue);
+				
+					
 				}
 			}
 		
@@ -840,9 +948,17 @@ public class FOTAService {
 		return deviceVer;
 	}
 
-	public String getFotaInforByPartNumber(String partNumber, boolean isOldFile) {
-		String softVer = fotaRepository.findOneById(partNumber,isOldFile);
-		return softVer;
+	public boolean getFotaInfoByPartNumber(String partNumber) {
+		boolean softDeleteFlag = false;
+		boolean activePublishedFlag = false;
+		boolean oldVersion = false;
+		FOTAInfo fotaInfo = fotaRepository.FOTAByPartNumber(partNumber,softDeleteFlag,activePublishedFlag);
+		if(fotaInfo != null){
+			if(fotaInfo.getSoftDeleteFlag() == false && fotaInfo.getActivePublishedFlag() == false){
+				oldVersion = true;
+			}
+		}
+		return oldVersion;
 	}
 
 	private String calculateCRC(String encodedString) {
@@ -1503,11 +1619,21 @@ public class FOTAService {
 
 	public FOTAInfo savFotaInfoData(FOTAInfoDto fotaInfoDto)
 			throws ParseException {
-
+		//check is existing if yes update to inactive pending
+		if(fotaInfoDto.getOldRecord() == true){
+			FOTAInfo fotaInfo = fotaRepository.FOTAByPartNumber(fotaInfoDto.getDevicePartNumber(),false,false);
+			if(Objects.nonNull(fotaInfo))
+	  	  {
+				fotaInfo.setSoftDeleteFlag(true);
+				fotaInfo.setUploadDatetime(DateUtil.getCurrentDateAndTime());
+				fotaRepository.save(fotaInfo);
+	  	        log.debug("updated fotaInfo Details: with inactive pending {}", fotaInfo);
+	  	  }
+		}
 		FOTAInfo fotaInfo = new FOTAInfo();
 		fotaInfo.setDevicePartNumber(fotaInfoDto.getDevicePartNumber());
 		fotaInfo.setSoftVersion(fotaInfoDto.getSoftVersion());
-
+		
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMddyy");
 		simpleDateFormat.setLenient(false);
 		Date date2 = simpleDateFormat.parse(fotaInfoDto.getReleaseDate());
@@ -1515,8 +1641,8 @@ public class FOTAService {
 		DateTime dt = new DateTime(date2);
 		System.out.println("Dt is '" + dt);
 		fotaInfo.setReleaseDate(dt);
-
-		fotaInfo.setProductType("Monarch");
+		
+		fotaInfo.setProductType(fotaInfoDto.getProductType());
 
 		fotaInfo.setFilePath(fotaInfoDto.getFilePath());
 
@@ -1524,21 +1650,39 @@ public class FOTAService {
 
 		fotaInfo.setUploadDatetime(DateUtil.getCurrentDateAndTime());
 		
-		SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("MMddyy");
-		simpleDateFormat1.setLenient(false);
-		Date date3 = simpleDateFormat1.parse(fotaInfoDto.getEffectiveDate());
-		DateTime effectiveDate = new DateTime(date3);
-		System.out.println(effectiveDate);
-		fotaInfo.setEffectiveDatetime(effectiveDate);
+		if(StringUtils.isNotEmpty(fotaInfoDto.getPublishedUser())){
+			fotaInfo.setPublishedUser(fotaInfoDto.getPublishedUser());
+			fotaInfo.setPublishedDateTime(DateUtil.getCurrentDateAndTime());
+		}
+		
 		fotaInfo.setModelId(fotaInfoDto.getModelId());
 		fotaInfo.setBoardId(fotaInfoDto.getBoardId());
 		fotaInfo.setBedId(fotaInfoDto.getBedId());
 		fotaInfo.setBootCompVer(fotaInfoDto.getBootCompVer());
-		fotaInfo.setFilePattern(fotaInfoDto.getFilePattern());
+		fotaInfo.setFillPattern(fotaInfoDto.getFillPattern());
 		fotaInfo.setMCUSize(fotaInfoDto.getmCUSize());
 		fotaInfo.setReleaseNumber(fotaInfoDto.getReleaseNumber());
-		fotaInfo.setChecksum(fotaInfoDto.getChecksum());
-		fotaInfo.setOldSoftFlag(true);
+		//added new attribute
+		fotaInfo.setSoftDeleteFlag(false);
+		if(StringUtils.isNotEmpty(fotaInfoDto.getRegion1StartAddress())){
+			fotaInfo.setRegion1StartAddress(fotaInfoDto.getRegion1StartAddress());
+		}
+		if(StringUtils.isNotEmpty(fotaInfoDto.getRegion1EndAddress())){
+			fotaInfo.setRegion1EndAddress(fotaInfoDto.getRegion1EndAddress());
+		}
+		if(StringUtils.isNotEmpty(fotaInfoDto.getRegion1CRCLocation())){
+			fotaInfo.setRegion1CRCLocation(fotaInfoDto.getRegion1CRCLocation());
+		}
+		if(StringUtils.isNotEmpty(fotaInfoDto.getRegion2StartAddress())){
+			fotaInfo.setRegion2StartAddress(fotaInfoDto.getRegion2StartAddress());
+		}
+		if(StringUtils.isNotEmpty(fotaInfoDto.getRegion2EndAddress())){
+			fotaInfo.setRegion2EndAddress(fotaInfoDto.getRegion2EndAddress());
+		}
+		if(StringUtils.isNotEmpty(fotaInfoDto.getRegion2CRCLocation())){
+			fotaInfo.setRegion2CRCLocation(fotaInfoDto.getRegion2CRCLocation());
+		}
+		
 		fotaRepository.save(fotaInfo);
 		log.debug("Created New Fota: {}", fotaInfo);
 		return fotaInfo;
@@ -1548,7 +1692,7 @@ public class FOTAService {
 		FOTAInfo fotaInfo = fotaRepository.findFOTAInfo(partNo,isOldFile);
 		if(Objects.nonNull(fotaInfo))
   	  {
-			fotaInfo.setOldSoftFlag(false);
+			fotaInfo.setSoftDeleteFlag(false);
 			fotaInfo.setUploadDatetime(DateUtil.getCurrentDateAndTime());
 			fotaRepository.save(fotaInfo);
   	        log.debug("updated fotaInfo Details: {}", fotaInfo);
@@ -1633,17 +1777,17 @@ public class FOTAService {
 				/*DateFormat sdf = new SimpleDateFormat("yyyy/MM-dd'T'HH:mm:ss.SSSXXX");
 				
 				Date startTime = sdf.parse("handleHolderBin.get(handleId).getDownloadStartTime()");*/
-				infoDto.setEffectiveDate(String.valueOf(info.getEffectiveDatetime()));
+				//infoDto.setEffectiveDate(String.valueOf(info.getEffectiveDatetime()));
 				infoDto.setFilePath(info.getFilePath());
-				infoDto.setFilePattern(info.getFilePattern());
+				//infoDto.setFilePattern(info.getFilePattern());
 				infoDto.setmCUSize(info.getMCUSize());
-				infoDto.setChecksum(info.getChecksum());
+				//infoDto.setChecksum(info.getChecksum());
 				infoDto.setReleaseNumber(info.getReleaseNumber());
 				infoDto.setSoftVersion(info.getSoftVersion());
 				infoDto.setReleaseDate(String.valueOf(info.getReleaseDate()));
 				infoDto.setUploadUser(info.getUploadUser());
 				infoDto.setModelId(info.getModelId());
-				infoDto.setOldSoftVerFlag(info.getOldSoftFlag());
+				//infoDto.setOldSoftVerFlag(info.getOldSoftFlag());
 				FOTAInfoDtoList.add(infoDto);
 			}
 			
@@ -1662,21 +1806,298 @@ public class FOTAService {
 				/*DateFormat sdf = new SimpleDateFormat("yyyy/MM-dd'T'HH:mm:ss.SSSXXX");
 				
 				Date startTime = sdf.parse("handleHolderBin.get(handleId).getDownloadStartTime()");*/
-				infoDto.setEffectiveDate(String.valueOf(info.getEffectiveDatetime()));
+				//infoDto.setEffectiveDate(String.valueOf(info.getEffectiveDatetime()));
 				infoDto.setFilePath(info.getFilePath());
-				infoDto.setFilePattern(info.getFilePattern());
+				//infoDto.setFilePattern(info.getFilePattern());
 				infoDto.setmCUSize(info.getMCUSize());
-				infoDto.setChecksum(info.getChecksum());
+				//infoDto.setChecksum(info.getChecksum());
 				infoDto.setReleaseNumber(info.getReleaseNumber());
 				infoDto.setSoftVersion(info.getSoftVersion());
 				infoDto.setReleaseDate(String.valueOf(info.getReleaseDate()));
 				infoDto.setUploadUser(info.getUploadUser());
 				infoDto.setModelId(info.getModelId());
-				infoDto.setOldSoftVerFlag(info.getOldSoftFlag());
+				//infoDto.setOldSoftVerFlag(info.getOldSoftFlag());
 				FOTAInfoDtoList.add(infoDto);
 			}
 			
 		}
 		return FOTAInfoDtoList;
+	}
+	//CRC 32 validation method
+	@SuppressWarnings("resource")
+	public boolean CRC32Calculation(CRC32Dto crc32Dt0) throws Exception {
+	    boolean eof = false;
+	    boolean result = false;
+	    int recordIdx = 0;
+	    long upperAddress = 0;
+	   /* long crcStartAddress  = 0x08010070;
+	    long crcEndAddress = 0x080FFFFF;
+	    long crcLocationAddress = 0x0801006C;*/
+	    long crcStartAddress  = 0;
+	    long crcEndAddress = 0;
+	    long crcLocationAddress = 0;
+	    
+	    int crcValueInFile = 0;
+	    long dataStartAddress = 0;
+
+	   /* long crc2StartAddress = 0x60000070;
+	    long crc2EndAddress = 0x60FFFFFF;
+	    long crc2LocationAddress = 0x6000006C;*/
+	    long crc2StartAddress = 0;
+	    long crc2EndAddress = 0;
+	    long crc2LocationAddress = 0;
+	    
+	    int crc2ValueInFile = 0;
+	    long data2StartAddress = 0;
+
+	    ByteArrayOutputStream crcData = new ByteArrayOutputStream();
+	    ByteArrayOutputStream crcData2 = new ByteArrayOutputStream();
+
+	    int record_length;
+	    int record_address;
+	    byte[] record_data;
+	    
+	    FileInputStream fs = null;
+	    
+	    
+		if (StringUtils.isNotEmpty(crc32Dt0.getRegion1StartAddress())) {
+			crcStartAddress = Long.parseLong(crc32Dt0.getRegion1StartAddress(),16);
+		}
+		if (StringUtils.isNotEmpty(crc32Dt0.getRegion1EndAddress())) {
+			crcEndAddress = Long.parseLong(crc32Dt0.getRegion1EndAddress(),16);
+		}
+		
+		if (StringUtils.isNotEmpty(crc32Dt0.getRegion1CRCLocation())) {
+			crcLocationAddress = Long.parseLong(crc32Dt0.getRegion1CRCLocation(),16);
+		}
+		if (StringUtils.isNotEmpty(crc32Dt0.getRegion2StartAddress())) {
+			crc2StartAddress = Long.parseLong(crc32Dt0.getRegion2StartAddress(),16);
+		}
+		if (StringUtils.isNotEmpty(crc32Dt0.getRegion2EndAddress())) {
+			crc2EndAddress = Long.parseLong(crc32Dt0.getRegion2EndAddress(),16);
+		}
+		
+		if (StringUtils.isNotEmpty(crc32Dt0.getRegion2CRCLocation())) {
+			crc2LocationAddress = Long.parseLong(crc32Dt0.getRegion2CRCLocation(),16);
+		}
+		
+	    
+		
+		fs = new FileInputStream(crc32Dt0.getFilePath());
+		
+	    InputStreamReader isr = new InputStreamReader(fs);
+	    BufferedReader rdr =  new BufferedReader(isr);
+        eof = false;
+        recordIdx = 1;
+        upperAddress = 0;
+        String recordStr;
+        while ((recordStr = rdr.readLine()) != null) {
+            if (eof) {
+                throw new Exception("Data after eof (" + recordIdx + ")");
+            }
+
+            if (!recordStr.startsWith(":")) {
+                throw new Exception("Invalid Intel HEX record (" + recordIdx + ")");
+            }
+
+            int lineLength = recordStr.length();
+            byte[] hexRecord = new byte[lineLength / 2];
+
+            int sum = 0;
+            for (int i = 0; i < hexRecord.length; i++) {
+                String num = recordStr.substring(2 * i + 1, 2 * i + 3);
+                hexRecord[i] = (byte) Integer.parseInt(num, HEX);
+                sum += hexRecord[i] & 0xff;
+            }
+            sum &= 0xff;
+        	
+            if (sum != 0) {
+                throw new Exception("Invalid checksum (" + recordIdx + ")");
+            }
+
+            record_length = hexRecord[0];
+            if ((record_length + 5) != hexRecord.length) {
+                throw new Exception("Invalid record length (" + recordIdx + ")");
+            }
+            record_data = new byte[record_length];
+            System.arraycopy(hexRecord, 4, record_data, 0, record_length);
+    		
+
+            record_address = ((hexRecord[1] & 0xFF) << 8) + (hexRecord[2] & 0xFF);
+
+            long addr = record_address | upperAddress;
+            switch (hexRecord[3] & 0xFF) {
+                case 0:
+                	 long tmpAddr = addr;
+                	 long tmp2Addr = addr;
+                	  for(byte c: record_data)
+                	  {
+                		  if(tmpAddr >= crcLocationAddress && tmpAddr< (crcLocationAddress+4))
+                		  {
+                			   int diff = (int)(tmpAddr-crcLocationAddress);
+                			  	switch(diff)
+                			  	{
+                			  	case 0:
+                			  		crcValueInFile = ((int)c&0xFF);
+                			  		break;
+                			  	case 1:
+                			  		crcValueInFile |= (((int)c&0xFF) << 8);
+                			  		break;
+                			  	case 2:
+                			  		crcValueInFile |= (((int)c&0xFF) << 16);
+                			  		break;
+                			  	case 3:
+                			  		crcValueInFile |= (((int)c&0xFF)<< 24);
+                			  		break;
+                			  	default:
+                			  			
+                			  	}
+                		  }
+                		  tmpAddr++;
+                		  
+                    	  if(addr>=crcStartAddress && addr<= crcEndAddress)
+                    	  {
+                    		  if(dataStartAddress==0)
+                    		  {
+                    			  dataStartAddress = addr;
+                    		  }
+                    		  crcData.write(c);
+                    	  }
+
+                		  if(tmp2Addr >= crc2LocationAddress && tmp2Addr< (crc2LocationAddress+4))
+                		  {
+                			   int diff = (int)(tmp2Addr-crc2LocationAddress);
+                			  	switch(diff)
+                			  	{
+                			  	case 0:
+                			  		crc2ValueInFile = ((int)c&0xFF);
+                			  		break;
+                			  	case 1:
+                			  		crc2ValueInFile |= (((int)c&0xFF) << 8);
+                			  		break;
+                			  	case 2:
+                			  		crc2ValueInFile |= (((int)c&0xFF) << 16);
+                			  		break;
+                			  	case 3:
+                			  		crc2ValueInFile |= (((int)c&0xFF) << 24);
+                			  		break;
+                			  	default:
+                			  			
+                			  	}
+                		  }
+                		  tmp2Addr++;
+                		  
+                    	  if(addr>=crc2StartAddress && addr<= crc2EndAddress)
+                    	  {
+                    		  if(data2StartAddress==0)
+                    		  {
+                    			  data2StartAddress = addr;
+                    		  }
+                    		  crcData2.write(c);
+                    	  }                    	  
+                	  }
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    if (record_length == 2) {
+                        upperAddress = ((record_data[0] & 0xFF) << 12) +( ((record_data[1] & 0xFF)) << 4);
+                    } else {
+                        throw new Exception("Invalid SEG record (" + recordIdx + ")");
+                    }
+                    break;                	
+                case 4:
+                    if (record_length == 2) {
+                        upperAddress = ((record_data[0] & 0xFF) << 24) +( ((record_data[1] & 0xFF)) << 16);
+                    } else {
+                        throw new Exception("Invalid EXT_LIN record (" + recordIdx + ")");
+                    }
+                    break;
+                default:
+                    break;
+            }
+            recordIdx++;
+        };
+        rdr.close();
+        isr.close();
+        fs.close();
+        
+        // CRC Calculation Table initialize
+    int crc;
+    int i;
+    if(crcStartAddress != 0){
+        byte [] crcBytes = crcData.toByteArray();
+
+        crc  = 0xFFFFFFFF;       // initial contents of LFBSR
+        int poly = 0xEDB88320;   // reverse polynomial
+
+        for (byte b : crcBytes) {
+            int temp = (crc ^ b) & 0xff;
+
+            // read 8 bits one at a time
+            for (i = 0; i < 8; i++) {
+                if ((temp & 1) == 1) temp = (temp >>> 1) ^ poly;
+                else                 temp = (temp >>> 1);
+            }
+            crc = (crc >>> 8) ^ temp;
+        }
+      
+        long tmpEndAddress = dataStartAddress + crcBytes.length;
+        while(tmpEndAddress<=(crcEndAddress))
+        {
+            int temp = (crc ^ 0xFF) & 0xff;
+
+        	for (i = 0; i < 8; i++) {
+                if ((temp & 1) == 1) temp = (temp >>> 1) ^ poly;
+                else                 temp = (temp >>> 1);
+            }
+            crc = (crc >>> 8) ^ temp;
+            tmpEndAddress++;
+        }
+
+        // flip bits
+        crc = crc ^ 0xffffffff;
+
+		result = (crc == crcValueInFile);
+		crcData.close();
+       log.debug("Calculated Region1CRC32: " + (String.format("0x%08X", crc)) + "In file :" + (String.format("0x%08X", (crcValueInFile))));
+        
+    }
+    if(crc2StartAddress != 0 && result == true){
+    	byte [] crc2Bytes = crcData2.toByteArray();
+
+        crc  = 0xFFFFFFFF;       // initial contents of LFBSR
+        int poly2 = 0xEDB88320;   // reverse polynomial
+
+        for (byte b : crc2Bytes) {
+            int temp = (crc ^ b) & 0xff;
+
+            // read 8 bits one at a time
+            for (i = 0; i < 8; i++) {
+                if ((temp & 1) == 1) temp = (temp >>> 1) ^ poly2;
+                else                 temp = (temp >>> 1);
+            }
+            crc = (crc >>> 8) ^ temp;
+        }
+      
+        long tmp2EndAddress = data2StartAddress + crc2Bytes.length;
+        while(tmp2EndAddress<=(crc2EndAddress))
+        {
+            int temp = (crc ^ 0xFF) & 0xff;
+
+        	for (i = 0; i < 8; i++) {
+                if ((temp & 1) == 1) temp = (temp >>> 1) ^ poly2;
+                else                 temp = (temp >>> 1);
+            }
+            crc = (crc >>> 8) ^ temp;
+            tmp2EndAddress++;
+        }
+        // flip bits
+        crc = crc ^ 0xffffffff;
+        log.debug("Calculated Region2CRC32: " + (String.format("0x%08X", crc)) + "In file :" + (String.format("0x%08X", (crc2ValueInFile))));
+        result &= (crc == crc2ValueInFile);
+        crcData2.close();
+    }
+		return result;
 	}
 }

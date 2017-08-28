@@ -10,9 +10,58 @@ public class HandleHolder {
 	private Long fotaInfoId;
 	private String deviceSerialNumber;
 	private String connectionType;
+	private String softwareVersion;
+	private String deviceSoftwareVersion;
+	private DateTime deviceSoftwareDateTime;
+	private String updatedSoftVersion;
+	private DateTime checkupdateDateTime;
+	private DateTime downloadStartDateTime;
+	private DateTime downloadEndDateTime;
 	int chunkSize = 0;
 	
 	
+	public String getUpdatedSoftVersion() {
+		return updatedSoftVersion;
+	}
+	public void setUpdatedSoftVersion(String updatedSoftVersion) {
+		this.updatedSoftVersion = updatedSoftVersion;
+	}
+	public DateTime getCheckupdateDateTime() {
+		return checkupdateDateTime;
+	}
+	public void setCheckupdateDateTime(DateTime checkupdateDateTime) {
+		this.checkupdateDateTime = checkupdateDateTime;
+	}
+	public DateTime getDownloadStartDateTime() {
+		return downloadStartDateTime;
+	}
+	public void setDownloadStartDateTime(DateTime downloadStartDateTime) {
+		this.downloadStartDateTime = downloadStartDateTime;
+	}
+	public DateTime getDownloadEndDateTime() {
+		return downloadEndDateTime;
+	}
+	public void setDownloadEndDateTime(DateTime downloadEndDateTime) {
+		this.downloadEndDateTime = downloadEndDateTime;
+	}
+	public DateTime getDeviceSoftwareDateTime() {
+		return deviceSoftwareDateTime;
+	}
+	public void setDeviceSoftwareDateTime(DateTime deviceSoftwareDateTime) {
+		this.deviceSoftwareDateTime = deviceSoftwareDateTime;
+	}
+	public String getDeviceSoftwareVersion() {
+		return deviceSoftwareVersion;
+	}
+	public void setDeviceSoftwareVersion(String deviceSoftwareVersion) {
+		this.deviceSoftwareVersion = deviceSoftwareVersion;
+	}
+	public String getSoftwareVersion() {
+		return softwareVersion;
+	}
+	public void setSoftwareVersion(String softwareVersion) {
+		this.softwareVersion = softwareVersion;
+	}
 	public String getConnectionType() {
 		return connectionType;
 	}

@@ -25,18 +25,33 @@ public class FOTADeviceFWareUpdate {
 	@Column(name = "device_serial_number")
 	private String  deviceSerialNumber;
 	
-    @Column(name="download_time")
-	private String downloadTime;
-	
-	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-    @Column(name="completed_date")
-	private DateTime currentDate;
-	
-	@Column(name = "downloaded_status")
-	private String  status;
-	
 	@Column(name = "connection_type")
 	private String  connectionType;
+	
+	@Column(name="device_software_version")
+	private String deviceSoftVersion;
+	
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @Column(name="device_software_date_time")
+	private DateTime deviceSoftwareDateTime;
+    
+    @Column(name="updated_software_version")
+	private String updatedSoftVersion;
+	
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @Column(name="checkupdate_date_time")
+	private DateTime checkupdateDateTime;
+	
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @Column(name="download_start_date_time")
+	private DateTime downloadStartDateTime;
+	
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @Column(name="download_end_date_time")
+	private DateTime downloadEndDateTime;
+	
+	@Column(name = "downloaded_status")
+	private String  downloadStatus;
 
 	public Long getId() {
 		return id;
@@ -50,8 +65,8 @@ public class FOTADeviceFWareUpdate {
 		return fotaInfoId;
 	}
 
-	public void setFotaInfoId(Long long1) {
-		this.fotaInfoId = long1;
+	public void setFotaInfoId(Long fotaInfoId) {
+		this.fotaInfoId = fotaInfoId;
 	}
 
 	public String getDeviceSerialNumber() {
@@ -62,30 +77,6 @@ public class FOTADeviceFWareUpdate {
 		this.deviceSerialNumber = deviceSerialNumber;
 	}
 
-	public String getDownloadTime() {
-		return downloadTime;
-	}
-
-	public void setDownloadTime(String downloadTime) {
-		this.downloadTime = downloadTime;
-	}
-
-	public DateTime getCurrentDate() {
-		return currentDate;
-	}
-
-	public void setCurrentDate(DateTime currentDate) {
-		this.currentDate = currentDate;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
 	public String getConnectionType() {
 		return connectionType;
 	}
@@ -93,7 +84,64 @@ public class FOTADeviceFWareUpdate {
 	public void setConnectionType(String connectionType) {
 		this.connectionType = connectionType;
 	}
-	
-	
 
+	public String getDeviceSoftVersion() {
+		return deviceSoftVersion;
+	}
+
+	public void setDeviceSoftVersion(String deviceSoftVersion) {
+		this.deviceSoftVersion = deviceSoftVersion;
+	}
+
+	public DateTime getDeviceSoftwareDateTime() {
+		return deviceSoftwareDateTime;
+	}
+
+	public void setDeviceSoftwareDateTime(DateTime deviceSoftwareDateTime) {
+		this.deviceSoftwareDateTime = deviceSoftwareDateTime;
+	}
+
+
+	public String getUpdatedSoftVersion() {
+		return updatedSoftVersion;
+	}
+
+	public void setUpdatedSoftVersion(String updatedSoftVersion) {
+		this.updatedSoftVersion = updatedSoftVersion;
+	}
+
+	public DateTime getCheckupdateDateTime() {
+		return checkupdateDateTime;
+	}
+
+	public void setCheckupdateDateTime(DateTime checkupdateDateTime) {
+		this.checkupdateDateTime = checkupdateDateTime;
+	}
+
+	public DateTime getDownloadStartDateTime() {
+		return downloadStartDateTime;
+	}
+
+	public void setDownloadStartDateTime(DateTime downloadStartDateTime) {
+		this.downloadStartDateTime = downloadStartDateTime;
+	}
+
+	public DateTime getDownloadEndDateTime() {
+		return downloadEndDateTime;
+	}
+
+	public void setDownloadEndDateTime(DateTime downloadEndDateTime) {
+		this.downloadEndDateTime = downloadEndDateTime;
+	}
+
+	public String getDownloadStatus() {
+		return downloadStatus;
+	}
+
+	public void setDownloadStatus(String downloadStatus) {
+		this.downloadStatus = downloadStatus;
+	}
+	
+	
+	
 }

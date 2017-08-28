@@ -178,8 +178,25 @@ public class FOTAService {
 						String storeChunk = fotaJsonData.get(DEVICE_PARTNUMBER)
 								.concat(":").concat(fotaInfo.getSoftVersion()).concat(":").concat(String.valueOf(chunkSize));
 						boolean crcValid = false;
-						if (partNosBin.containsKey(storeChunk)) {
-							partNoHolder = partNosBin.get(storeChunk);
+						partNoHolder = null;
+						for(String key : partNosBin.keySet())
+						{
+							if(key.contains(storeChunk))
+							{
+								partNoHolder = partNosBin.get(storeChunk);
+								
+								if(partNoHolder.getAbortFlag()==false &&  partNoHolder.getChunkSize() == chunkSize)
+								{
+									break;
+								}
+								else
+								{
+									partNoHolder = null;
+								}
+							}
+						}
+						if (partNoHolder != null) {
+							//partNoHolder = partNosBin.get(storeChunk);
 							crcValid = partNoHolder.checkCRC32(fotaInfo);
 							if ( crcValid == true) {
 								// partNosBin.put(storeChunk, partNoHolder);

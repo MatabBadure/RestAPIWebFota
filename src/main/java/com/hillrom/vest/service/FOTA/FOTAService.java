@@ -599,7 +599,7 @@ public class FOTAService {
 					// result pair1
 					resultPair = getResponePairResult();
 					//crcResult = "OK";
-					crsResultValue = asciiToHex(ABORTED);
+					crsResultValue = asciiToHex(OK);
 					crcPair = getResponePair3();
 					
 					String crsRaw = resultPair.concat(crsResultValue).concat(crcPair);

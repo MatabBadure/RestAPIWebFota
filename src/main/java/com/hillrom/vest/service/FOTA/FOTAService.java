@@ -176,7 +176,7 @@ public class FOTAService {
 						int chunkSize = hex2decimal(chunkStr);
 						// PartNumber:Chunk Size
 						String storeChunk = fotaJsonData.get(DEVICE_PARTNUMBER)
-								.concat(":").concat(String.valueOf(chunkSize)).concat(":").concat(fotaInfo.getSoftVersion());
+								.concat(":").concat(fotaInfo.getSoftVersion()).concat(":").concat(String.valueOf(chunkSize));
 						boolean crcValid = false;
 						if (partNosBin.containsKey(storeChunk)) {
 							partNoHolder = partNosBin.get(storeChunk);
@@ -341,7 +341,7 @@ public class FOTAService {
 					//Get handle object based on handleId
 					holder = handleHolderBin.get(handleId);
 					//Frame key to get partNumber details
-					String storeChunk = holder.getPartNo().concat(":").concat(String.valueOf(holder.getChunkSize())).concat(":").concat(holder.getSoftwareVersion());
+					String storeChunk = holder.getPartNo().concat(":").concat(holder.getSoftwareVersion()).concat(":").concat(String.valueOf(holder.getChunkSize()));
 					partNoHolder =  partNosBin.get(storeChunk);
 					
 				if(partNoHolder.getAbortFlag() == false){
@@ -1629,6 +1629,17 @@ public class FOTAService {
 				fotaRepository.save(fotaInfo);
 	  	        log.debug("updated fotaInfo Details: with inactive pending {}", fotaInfo);
 	  	  }
+			String storeChunk = fotaInfo.getDevicePartNumber().concat(":").concat(fotaInfo.getSoftVersion());
+			
+			for(String key : partNosBin.keySet()){
+				
+				if(key.contains(storeChunk)){
+					partNoHolder = partNosBin.get(key);
+					log.debug("key :"+key);
+				}
+			}
+			partNoHolder.setAbortFlag(true);
+			log.debug("Abort flag is set:"+partNoHolder.getAbortFlag());
 		}
 		FOTAInfo fotaInfo = new FOTAInfo();
 		fotaInfo.setDevicePartNumber(fotaInfoDto.getDevicePartNumber());

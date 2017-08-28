@@ -143,6 +143,7 @@ public class TimsInputReaderService {
 		
 		}catch(Exception ex){
 			ex.printStackTrace();
+			throw new HillromException("Error in TIMS Script Execution " , ex);
 		}
 		
 	}

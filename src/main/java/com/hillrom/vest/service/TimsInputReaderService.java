@@ -203,7 +203,7 @@ public class TimsInputReaderService {
 		            
 		            
 		            if(!header){
-
+		            	patientInfoDTO.setIndex(data[0]);
 			            patientInfoDTO.setDevice_type(data[1]);
 			            patientInfoDTO.setTims_cust(data[2]);
 			            patientInfoDTO.setSerial_num(data[3]);

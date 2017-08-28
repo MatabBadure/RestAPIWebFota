@@ -78,6 +78,7 @@ public class TimsInputReaderService {
 	public void ExecuteTIMSJob() throws Exception
 	{
 		
+		try{
 		MDC.put("logFileName", "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
 		
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
@@ -138,6 +139,10 @@ public class TimsInputReaderService {
 			log.debug(" ");
 			log.debug("All Records Executed Successfully");
 			//throw new Exception("The csv file has already been executed or unable to process any of the records.");
+		}
+		
+		}catch(Exception ex){
+			ex.printStackTrace();
 		}
 		
 	}

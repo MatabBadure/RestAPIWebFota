@@ -43,17 +43,14 @@
 				</Pattern>
 			</encoder>
 
-			<!-- <rollingPolicy
+			<rollingPolicy
 				class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
 				<FileNamePattern>${CATALINA_HOME}/TIMS/logs/${logFileName}.%i.log.zip
 				</FileNamePattern>
 				<MinIndex>1</MinIndex>
-				<MaxIndex>10</MaxIndex>
-			</rollingPolicy> -->
-			<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-				<FileNamePattern>${CATALINA_HOME}/TIMS/logs/${logFileName}.%i.log
-				</FileNamePattern>
+				<MaxIndex>20</MaxIndex>
 			</rollingPolicy>
+
 
 			<triggeringPolicy
 				class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">

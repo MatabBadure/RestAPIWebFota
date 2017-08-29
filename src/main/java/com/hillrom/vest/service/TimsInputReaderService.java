@@ -70,6 +70,8 @@ public class TimsInputReaderService {
 	
 	public static boolean processed_atleast_one = false;
 	
+	public String logFileName;
+	
 	
 	@Inject
 	private TimsService timsService;
@@ -84,7 +86,8 @@ public class TimsInputReaderService {
 		
 
 		try{
-		MDC.put("logFileName", "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
+		logFileName  = "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());	
+		MDC.put("logFileName", logFileName);
 		
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
@@ -147,7 +150,7 @@ public class TimsInputReaderService {
 		}
 		
 		}catch(Exception ex){
-			mailService.sendTIMSLog();
+			mailService.sendTIMSLog(logFileName);
 			ex.printStackTrace();
 			throw new HillromException("Error in TIMS Script Execution " , ex);
 		}

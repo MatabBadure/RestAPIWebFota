@@ -85,10 +85,12 @@ public class TimsInputReaderService {
 	{
 		
 
-		try{
+		
 		logFileName  = "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());	
 		MDC.put("logFileName", logFileName);
+		log.debug("====================================================================================");
 		
+		try{
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
 		

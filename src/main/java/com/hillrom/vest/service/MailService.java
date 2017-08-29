@@ -601,7 +601,7 @@ public class MailService {
         
         //File file = RandomUtil.lastFileModified("/usr/tomcat/apache-tomcat-8.0.28/TIMS/logs/");
         File file = new File("/usr/tomcat/apache-tomcat-8.0.28/TIMS/logs/" + fileName + ".log");
-        log.debug("File", file);
+        log.debug("Name : " + fileName + "File : " +  file);
                 
 		content = "Emailing TIMS Log";//templateEngine.process("changePrescription", context);
         subject = "Tims Log"; //messageSource.getMessage("email.changePrescription.title", null, null) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);

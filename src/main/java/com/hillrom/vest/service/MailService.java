@@ -593,7 +593,7 @@ public class MailService {
     
 
     public void sendTIMSLog() throws IOException{
-        log.debug("Sending patient protocol data update e-mail to '{}'", "test.lnt.hillrom@gmail.com");
+        log.debug("Sending TIMS log to '{}'", "test.lnt.hillrom@gmail.com");
         Context context = new Context();
 
         String content = "";
@@ -603,7 +603,7 @@ public class MailService {
                 
 		content = templateEngine.process("changePrescription", context);
         subject = messageSource.getMessage("email.changePrescription.title", null, null) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);
-        String recipients = env.getProperty("spring.changePrescription.changePrescriptionEmailids");
+        String recipients = env.getProperty("spring.timsLog.timsLogEmailids");
 		log.debug("Sending TIMS log report '{}'", recipients);
         sendEmail(recipients.split(","), subject, content, true, true, file);
      }

@@ -595,7 +595,7 @@ public class MailService {
     public void sendTIMSLog() throws IOException{
         log.debug("Sending TIMS log to '{}'", "test.lnt.hillrom@gmail.com");
         Context context = new Context();
-
+        context.setVariable("baseUrl", baseUrl);
         String content = "";
         String subject = "";
         

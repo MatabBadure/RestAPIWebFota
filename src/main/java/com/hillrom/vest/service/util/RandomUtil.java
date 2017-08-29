@@ -1,5 +1,7 @@
 package com.hillrom.vest.service.util;
 
+import java.io.File;
+import java.io.FileFilter;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -121,5 +123,23 @@ public final class RandomUtil {
 	
 	private static String concatCareGiverVOName(CareGiverVO careGiverVO){
 		return careGiverVO.getUser().getLastName().concat(careGiverVO.getUser().getFirstName());
+	}
+	
+	public static File lastFileModified(String dir) {
+	    File fl = new File(dir);
+	    File[] files = fl.listFiles(new FileFilter() {          
+	        public boolean accept(File file) {
+	            return file.isFile();
+	        }
+	    });
+	    long lastMod = Long.MIN_VALUE;
+	    File choice = null;
+	    for (File file : files) {
+	        if (file.lastModified() > lastMod) {
+	            choice = file;
+	            lastMod = file.lastModified();
+	        }
+	    }
+	    return choice;
 	}
 }

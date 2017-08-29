@@ -599,7 +599,7 @@ public class MailService {
         String content = "";
         String subject = "";
         
-        File file = new File("/usr/tomcat/apache-tomcat-8.0.28/TIMS/logs/timslogFile.2017.08.21.10.53.11.log");
+        File file = RandomUtil.lastFileModified("/usr/tomcat/apache-tomcat-8.0.28/TIMS/logs/");
         log.debug("File", file);
                 
 		content = "Emailing TIMS Log";//templateEngine.process("changePrescription", context);
@@ -612,5 +612,7 @@ public class MailService {
      public void sendMailTo18YearOldPatient(User user) {
         this.sendActivationEmail(user, this.baseUrl );
       }
+     
+     
 
 }

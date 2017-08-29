@@ -602,8 +602,8 @@ public class MailService {
         File file = new File("/usr/tomcat/apache-tomcat-8.0.28/TIMS/logs/timslogFile.2017.08.21.10.53.11.log");
         log.debug("File", file);
                 
-		content = templateEngine.process("changePrescription", context);
-        subject = messageSource.getMessage("email.changePrescription.title", null, null) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);
+		content = "Emailing TIMS Log";//templateEngine.process("changePrescription", context);
+        subject = "Tims Log"; //messageSource.getMessage("email.changePrescription.title", null, null) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);
         String recipients = env.getProperty("spring.timsLog.timsLogEmailids");
 		log.debug("Sending TIMS log report '{}'", recipients);
         sendEmail(recipients.split(","), subject, content, true, true, file);

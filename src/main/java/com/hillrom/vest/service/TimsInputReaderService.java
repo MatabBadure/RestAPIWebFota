@@ -74,10 +74,15 @@ public class TimsInputReaderService {
 	@Inject
 	private TimsService timsService;
 	
+	@Inject
+	private MailService mailService;
+	
+	
 	//@Scheduled(cron="0/5 * * * * * ")
 	public void ExecuteTIMSJob() throws Exception
 	{
 		
+
 		try{
 		MDC.put("logFileName", "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
 		
@@ -142,6 +147,7 @@ public class TimsInputReaderService {
 		}
 		
 		}catch(Exception ex){
+			mailService.sendTIMSLog();
 			ex.printStackTrace();
 			throw new HillromException("Error in TIMS Script Execution " , ex);
 		}

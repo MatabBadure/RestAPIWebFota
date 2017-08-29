@@ -592,8 +592,23 @@ public class MailService {
      }
     
 
+    public void sendTIMSLog() throws IOException{
+        log.debug("Sending patient protocol data update e-mail to '{}'", "test.lnt.hillrom@gmail.com");
+        Context context = new Context();
+
+        String content = "";
+        String subject = "";
+        
+        File file = new File("../../TIMS/logs/timslogFile.2017.08.21.10.53.11.log");
+                
+		content = templateEngine.process("changePrescription", context);
+        subject = messageSource.getMessage("email.changePrescription.title", null, null) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);
+        String recipients = env.getProperty("spring.changePrescription.changePrescriptionEmailids");
+		log.debug("Sending TIMS log report '{}'", recipients);
+        sendEmail(recipients.split(","), subject, content, true, true, file);
+     }
     
-        public void sendMailTo18YearOldPatient(User user) {
+     public void sendMailTo18YearOldPatient(User user) {
         this.sendActivationEmail(user, this.baseUrl );
       }
 

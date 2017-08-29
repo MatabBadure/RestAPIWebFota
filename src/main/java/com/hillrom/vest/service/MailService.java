@@ -599,7 +599,7 @@ public class MailService {
         String content = "";
         String subject = "";
         
-        File file = new File("../../TIMS/logs/timslogFile.2017.08.21.10.53.11.log");
+        File file = new File("/usr/tomcat/apache-tomcat-8.0.28/TIMS/logs/timslogFile.2017.08.21.10.53.11.log");
         log.debug("File", file);
                 
 		content = templateEngine.process("changePrescription", context);

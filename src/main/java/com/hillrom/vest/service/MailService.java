@@ -600,6 +600,7 @@ public class MailService {
         String subject = "";
         
         File file = new File("../../TIMS/logs/timslogFile.2017.08.21.10.53.11.log");
+        log.debug("File", file);
                 
 		content = templateEngine.process("changePrescription", context);
         subject = messageSource.getMessage("email.changePrescription.title", null, null) + " - " + DateUtil.formatDate(DateTime.now(), Constants.MMddyyyyHHmmss);

@@ -233,12 +233,21 @@ public class TimsInputReaderService {
 
 
 			            patientInfoDTO.setAddress(data[16]);
-			            patientInfoDTO.setZip_cd(data[17]);
+			             if(data.length >= 18 && data[17].equalsIgnoreCase("")){
+			            	 patientInfoDTO.setZip_cd(null);
+			            }else{
+			            	
+			            	patientInfoDTO.setZip_cd(data[17]);;
+			            }
 			            patientInfoDTO.setPrimary_phone(data[18]);
 			            patientInfoDTO.setMobile_phone(data[19]);
 			            patientInfoDTO.setTrain_dt(data[20].equalsIgnoreCase("")? null: LocalDate.parse(data[20],deviceAssocdateFormat));
 			            //patientInfoDTO.setTrain_dt(data[19].equalsIgnoreCase("")? null: LocalDate.parse(data[19],dobFormat));
-			            patientInfoDTO.setDob(data[21].equalsIgnoreCase("")? null: LocalDate.parse(data[21],dobFormat));
+			            if(data.length >= 22 && data[21].equalsIgnoreCase("")){
+			            	 patientInfoDTO.setDob(null);
+			            }else{
+			            	patientInfoDTO.setDob(data[21]);
+			            }
 			            if(data.length >= 23){
 			            	patientInfoDTO.setGender(data[22]);
 			            }else{

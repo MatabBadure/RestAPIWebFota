@@ -280,7 +280,7 @@ public class TimsService {
 													patientInfoDTO.getFirst_nm(), 
 													patientInfoDTO.getMiddle_nm(), 
 													patientInfoDTO.getLast_nm(), 
-													patientInfoDTO.getDob().toString(dobFormat), 
+													patientInfoDTO.getDob(),
 													patientInfoDTO.getEmail(), 
 													patientInfoDTO.getZip_cd(), 
 													patientInfoDTO.getPrimary_phone(), 

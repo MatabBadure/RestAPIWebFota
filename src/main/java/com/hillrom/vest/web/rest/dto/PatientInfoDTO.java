@@ -31,7 +31,7 @@ public class PatientInfoDTO {
 	private String email;
 	private String zip_cd;
 	private LocalDate train_dt;
-	private LocalDate dob;
+	private String dob;
 	private String dx1;
 	private String dx2;
 	private String dx3;
@@ -389,7 +389,7 @@ public class PatientInfoDTO {
 	/**
 	 * @return the dob
 	 */
-	public LocalDate getDob() {
+	public String getDob() {
 		return dob;
 	}
 
@@ -398,7 +398,7 @@ public class PatientInfoDTO {
 	/**
 	 * @param dob the dob to set
 	 */
-	public void setDob(LocalDate dob) {
+	public void setDob(String dob) {
 		this.dob = dob;
 	}
 

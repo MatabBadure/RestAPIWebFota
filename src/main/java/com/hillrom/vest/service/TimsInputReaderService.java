@@ -71,6 +71,7 @@ public class TimsInputReaderService {
 	
 	public static boolean processed_atleast_one = false;
 	
+	public static boolean failureFlag = false;
 	
 	@Inject
 	private TimsService timsService;
@@ -86,7 +87,8 @@ public class TimsInputReaderService {
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
 		
-	
+	    boolean failureflag = true;
+	    this.failureFlag = false;
 		this.processed_atleast_one = false;
 		for (Map.Entry<Integer, PatientInfoDTO> entry : fileRecords.entrySet()) {
 		    Integer position = entry.getKey();
@@ -129,6 +131,9 @@ public class TimsInputReaderService {
 			    	timsService.CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH(record);
 		    	}
 		    }
+		}
+		if(failureFlag){
+			throw new Exception("any exceoption error.");
 		}
 		if(processed_atleast_one){
 			log.debug(" ");

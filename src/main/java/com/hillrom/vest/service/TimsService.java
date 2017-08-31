@@ -602,7 +602,7 @@ public class TimsService {
 						+ se.getMessage());
 				
 				se.printStackTrace();
-				
+				tims.failureFlag = true;
 				return false;
 			}
 			
@@ -613,6 +613,7 @@ public class TimsService {
 						+ "Error occured while creating new patient with new device");
 				
 				ex.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}				
 			
@@ -697,6 +698,7 @@ public class TimsService {
 						+se.getMessage());
 
 				se.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}
 			catch(Exception ex){
@@ -706,6 +708,7 @@ public class TimsService {
 						+"Error occured while creating combo patient");
 		
 				ex.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}	
 						log.debug("Made Combo    " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
@@ -753,6 +756,7 @@ public class TimsService {
 				log.debug("Swapped      " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
 						+se.getMessage());
 						se.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}
 			catch(Exception ex){
@@ -761,6 +765,7 @@ public class TimsService {
 						+ "Error occured while swapping Vest device");
 				
 				ex.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}	
 			
@@ -802,6 +807,7 @@ public class TimsService {
 				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
 						+se.getMessage());
 				se.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}
 			catch(Exception ex){
@@ -810,6 +816,7 @@ public class TimsService {
 						+"Error occured while updating Vest patient");
 				
 				ex.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}
 						
@@ -1037,6 +1044,7 @@ public class TimsService {
 							+se.getMessage());
 					
 					se.printStackTrace();
+					tims.failureFlag = true;
 					return false;
 				}
 				catch(Exception ex){
@@ -1045,6 +1053,7 @@ public class TimsService {
 							+"Error occured while creating combo patient");
 												
                     ex.printStackTrace();
+                    tims.failureFlag = true;
 					return false;
 				}
 				
@@ -1120,6 +1129,7 @@ public class TimsService {
 						+se.getMessage());
 				
 				se.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}
 			catch(Exception ex){
@@ -1128,6 +1138,7 @@ public class TimsService {
 						+"Error occured while creating combo patient");
 				
 				ex.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}	
 			
@@ -1179,6 +1190,7 @@ public class TimsService {
 						+ se.getMessage());
 			
 				se.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}
 			catch(Exception ex){
@@ -1187,6 +1199,7 @@ public class TimsService {
 						+"Error occured while creating new patient with new device");
 				
 				ex.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}	
 			log.debug("Created       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
@@ -1269,6 +1282,7 @@ public class TimsService {
 						+se.getMessage());
 						
 				se.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}
 			catch(Exception ex){
@@ -1277,6 +1291,7 @@ public class TimsService {
 						+"Error occured while creating combo patient");
 					
 				ex.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}	
 			
@@ -1324,6 +1339,7 @@ public class TimsService {
 				log.debug("Swapped      " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
 						+se.getMessage());
 				se.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}
 			catch(Exception ex){
@@ -1331,6 +1347,7 @@ public class TimsService {
 				log.debug("Swapped      " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
 						+ "Error occured while swapping Monarch device");
 				ex.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}		
 			
@@ -1378,7 +1395,7 @@ public class TimsService {
 						+se.getMessage());
 				
 					se.printStackTrace();
-					
+					tims.failureFlag = true;
 				return false;
 			}
 			catch(Exception ex){
@@ -1388,6 +1405,7 @@ public class TimsService {
 				
 				
 				ex.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}
 			log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
@@ -1619,6 +1637,7 @@ public class TimsService {
 							+se.getMessage());
 		
 					se.printStackTrace();
+					tims.failureFlag = true;
 					return false;
 				}
 				catch(Exception ex){
@@ -1628,6 +1647,7 @@ public class TimsService {
 			
 					
 					ex.printStackTrace();
+					tims.failureFlag = true;
 					return false;
 				}
 			
@@ -1698,18 +1718,20 @@ public class TimsService {
 			}
 			catch(SQLException se)
 			{    
-				
+				tims.processed_atleast_one = true;
 				log.debug("Made Combo    " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
 						+se.getMessage());
 				
 				se.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}
 			catch(Exception ex){
-				
+				tims.processed_atleast_one = true;
 				log.debug("Made Combo    " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
 						+"Error occured while creating combo patient");
 				ex.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}	
 			log.debug("Made Combo    " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "

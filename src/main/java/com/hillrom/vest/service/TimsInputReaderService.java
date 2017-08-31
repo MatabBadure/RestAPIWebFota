@@ -44,6 +44,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -85,7 +86,7 @@ public class TimsInputReaderService {
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
 		
-		
+	
 		this.processed_atleast_one = false;
 		for (Map.Entry<Integer, PatientInfoDTO> entry : fileRecords.entrySet()) {
 		    Integer position = entry.getKey();
@@ -151,7 +152,6 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{        
-		     
 		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
 		  //  log.debug("Started reading flat file : " + csvFile);
 	        String line = "";
@@ -234,21 +234,22 @@ public class TimsInputReaderService {
 
 
 			            patientInfoDTO.setAddress(data[16]);
-			             if(data.length >= 18 && data[17].equalsIgnoreCase("")){
+			           /*if(data.length >= 18 && data[17].equalsIgnoreCase("")){
 			            	 patientInfoDTO.setZip_cd(null);
 			            }else{
-			            	
-			            	patientInfoDTO.setZip_cd(data[17]);;
-			            }
+			            	patientInfoDTO.setZip_cd(data[17]);
+			            }*/
+			            patientInfoDTO.setZip_cd(data[17]);
 			            patientInfoDTO.setPrimary_phone(data[18]);
 			            patientInfoDTO.setMobile_phone(data[19]);
 			            patientInfoDTO.setTrain_dt(data[20].equalsIgnoreCase("")? null: LocalDate.parse(data[20],deviceAssocdateFormat));
 			            //patientInfoDTO.setTrain_dt(data[19].equalsIgnoreCase("")? null: LocalDate.parse(data[19],dobFormat));
-			            if(data.length >= 22 && data[21].equalsIgnoreCase("")){
+			           /*if(data.length >= 22 && data[21].equalsIgnoreCase("")){
 			            	 patientInfoDTO.setDob(null);
 			            }else{
 			            	patientInfoDTO.setDob(data[21]);
-			            }
+			            }*/
+			            patientInfoDTO.setDob(data[21]);
 			            if(data.length >= 23){
 			            	patientInfoDTO.setGender(data[22]);
 			            }else{

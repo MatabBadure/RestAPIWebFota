@@ -80,11 +80,11 @@ public class TimsInputReaderService {
 		
 		try{
 		MDC.put("logFileName", "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
+		log.debug("Status           TIMS Id        Serial Number        Result        Remarks");
 		
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
 		
-		log.debug("Status           TIMS Id        Serial Number        Result        Remarks");
 		
 		this.processed_atleast_one = false;
 		for (Map.Entry<Integer, PatientInfoDTO> entry : fileRecords.entrySet()) {
@@ -135,7 +135,7 @@ public class TimsInputReaderService {
 		}
 		
 		if(!processed_atleast_one){
-			log.debug("FAILURE        NA               NA             Failure           The csv file has already been executed or unable to process any of the records.");
+			log.debug("Success        NA               NA             Success           The csv file has already been executed or unable to process any of the records.");
 			log.debug(" ");
 			log.debug("All Records Executed Successfully");
 			//throw new Exception("The csv file has already been executed or unable to process any of the records.");
@@ -150,7 +150,8 @@ public class TimsInputReaderService {
 
 	
 	public Map readcsv() 
-	{
+	{        
+		     
 		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
 		  //  log.debug("Started reading flat file : " + csvFile);
 	        String line = "";

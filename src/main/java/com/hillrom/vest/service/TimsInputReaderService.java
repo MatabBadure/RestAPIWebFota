@@ -44,6 +44,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -70,6 +71,7 @@ public class TimsInputReaderService {
 	
 	public static boolean processed_atleast_one = false;
 	
+	public static boolean failureFlag = false;
 	
 	@Inject
 	private TimsService timsService;
@@ -80,12 +82,13 @@ public class TimsInputReaderService {
 		
 		try{
 		MDC.put("logFileName", "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
+		log.debug("Status           TIMS Id        Serial Number        Result        Remarks");
 		
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
 		
-		log.debug("Status           TIMS Id        Serial Number        Result        Remarks");
-		
+	    boolean failureflag = true;
+	    this.failureFlag = false;
 		this.processed_atleast_one = false;
 		for (Map.Entry<Integer, PatientInfoDTO> entry : fileRecords.entrySet()) {
 		    Integer position = entry.getKey();
@@ -129,13 +132,16 @@ public class TimsInputReaderService {
 		    	}
 		    }
 		}
+		if(failureFlag){
+			throw new Exception("any exceoption error.");
+		}
 		if(processed_atleast_one){
 			log.debug(" ");
 			log.debug("All Records Executed Successfully");
 		}
 		
 		if(!processed_atleast_one){
-			log.debug("FAILURE        NA               NA             Failure           The csv file has already been executed or unable to process any of the records.");
+			log.debug("Success        NA               NA             Success           The csv file has already been executed or unable to process any of the records.");
 			log.debug(" ");
 			log.debug("All Records Executed Successfully");
 			//throw new Exception("The csv file has already been executed or unable to process any of the records.");
@@ -150,7 +156,7 @@ public class TimsInputReaderService {
 
 	
 	public Map readcsv() 
-	{
+	{        
 		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
 		  //  log.debug("Started reading flat file : " + csvFile);
 	        String line = "";
@@ -233,12 +239,22 @@ public class TimsInputReaderService {
 
 
 			            patientInfoDTO.setAddress(data[16]);
+			           /*if(data.length >= 18 && data[17].equalsIgnoreCase("")){
+			            	 patientInfoDTO.setZip_cd(null);
+			            }else{
+			            	patientInfoDTO.setZip_cd(data[17]);
+			            }*/
 			            patientInfoDTO.setZip_cd(data[17]);
 			            patientInfoDTO.setPrimary_phone(data[18]);
 			            patientInfoDTO.setMobile_phone(data[19]);
 			            patientInfoDTO.setTrain_dt(data[20].equalsIgnoreCase("")? null: LocalDate.parse(data[20],deviceAssocdateFormat));
 			            //patientInfoDTO.setTrain_dt(data[19].equalsIgnoreCase("")? null: LocalDate.parse(data[19],dobFormat));
-			            patientInfoDTO.setDob(data[21].equalsIgnoreCase("")? null: LocalDate.parse(data[21],dobFormat));
+			           /*if(data.length >= 22 && data[21].equalsIgnoreCase("")){
+			            	 patientInfoDTO.setDob(null);
+			            }else{
+			            	patientInfoDTO.setDob(data[21]);
+			            }*/
+			            patientInfoDTO.setDob(data[21]);
 			            if(data.length >= 23){
 			            	patientInfoDTO.setGender(data[22]);
 			            }else{

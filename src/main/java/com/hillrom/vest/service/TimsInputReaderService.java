@@ -83,7 +83,7 @@ public class TimsInputReaderService {
 		try{
 		MDC.put("logFileName", "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
 		log.debug("Status           TIMS Id        Serial Number        Result        Remarks");
-		
+		this.mandatoryFieldFlag = true;
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
 		

@@ -340,7 +340,7 @@ public final class Constants {
 		public static final String ANNOUNCEMENT_FILE_PATH = "/opt/visiview-files/";
 	//end:announcement changes
 		
-		public static final String TIMS_CSV_FILE_PATH = "/opt/tims-csv-files/";
+		public static final String TIMS_CSV_FILE_PATH = "/home/brett/flat_file_script/";
 		public static final String CREATED_BY_TIMS = "TIMS Java App";
 		
 	//Device Type

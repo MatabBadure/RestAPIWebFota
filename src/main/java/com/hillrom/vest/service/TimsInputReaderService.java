@@ -173,7 +173,7 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{        
-		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
+		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
 		  //  log.debug("Started reading flat file : " + csvFile);
 	        String line = "";
 	        String cvsSplitBy = ",";

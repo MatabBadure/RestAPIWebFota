@@ -73,6 +73,7 @@ public class TimsInputReaderService {
 	
 	public static boolean failureFlag = false;
 	public static boolean mandatoryFieldFlag = true;
+	public static boolean monarchBluetoothFlag = true;
 	@Inject
 	private TimsService timsService;
 	
@@ -84,6 +85,7 @@ public class TimsInputReaderService {
 		MDC.put("logFileName", "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
 		log.debug("Status           TIMS Id        Serial Number        Result        Remarks");
 		this.mandatoryFieldFlag = true;
+		this.monarchBluetoothFlag = true;
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
 		
@@ -129,8 +131,17 @@ public class TimsInputReaderService {
 			    	timsService.CASE10_PatientHasVisivestAddMonarch_MONARCH(record);
 			    	//timsService.CASE11_PatientExistsWithNODevice_MONARCH(record);
 			    	timsService.CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH(record);
+		    	}else{
+		    		monarchBluetoothFlag = false;
+		    		log.debug("Created       " +record.getTims_cust()+ "        " +record.getSerial_num()+ "        "+"Failure"+ "        "
+							+ "Bluetooth Id / Connectivity Id is not present");
 		    	}
 		    }
+		}
+        if(!monarchBluetoothFlag){
+			
+			throw new Exception("any exceoption error.");
+			
 		}
 		if(!mandatoryFieldFlag){
 			

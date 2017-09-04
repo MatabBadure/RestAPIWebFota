@@ -89,6 +89,7 @@ public class TimsInputReaderService {
 		this.mandatoryFieldFlag = true;
 		this.monarchBluetoothFlag = true;
 		this.serialNumberFlag = true;
+	
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
 		
@@ -186,7 +187,7 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{        
-		     
+		   //   String csvFile = "C:/home/brett/flat_file_script/flatfile.csv";
 		    String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
 		      
 		      File flatFile = new File(csvFile);

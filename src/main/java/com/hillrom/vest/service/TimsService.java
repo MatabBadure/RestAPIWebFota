@@ -1748,7 +1748,7 @@ public class TimsService {
 		if((isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust() )  &&(! isCurrentSerialNumberOwnedByShellVest(patientInfoDTO.getSerial_num() ))))  {
 			log.debug("Created    " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
 					+ "Serial Number already present");
-			tims.serialNumberFlag = false;
+			TimsInputReaderService.serialNumberFlag = false;
 		}
 
 	}

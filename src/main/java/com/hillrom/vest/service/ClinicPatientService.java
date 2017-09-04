@@ -61,6 +61,9 @@ public class ClinicPatientService {
 	
 	@Inject
     private UserService userService;
+	
+	@Inject
+    private AdherenceCalculationService adherenceCalculationService;
     
     public List<ClinicVO> associateClinicsToPatient(Long id, List<Map<String, String>> clinicList) throws HillromException {
     	User patientUser = userRepository.findOne(id);
@@ -76,6 +79,10 @@ public class ClinicPatientService {
 		    	patientInfo.getClinicPatientAssoc().addAll(clinicPatientAssocList);
 		    	patientInfo.getUserPatientAssoc().addAll(userPatientAssocList);
 		    	patientInfoRepository.save(patientInfo);
+		    	
+		    	// Reset adherence score for the associated patient
+		    	adherenceCalculationService.adherenceSettingLinkPatientClinic(patientUser);
+		    	
 		    	return getClinicVOList(patientInfo);
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
@@ -127,6 +134,10 @@ public class ClinicPatientService {
 		    	getAssocObjLists(clinicList, patientInfo, clinicPatientAssocList, userPatientAssocList);
 		    	if (userPatientAssocList.size() > 0) userPatientRepository.delete(userPatientAssocList);
 		    	if (clinicPatientAssocList.size() > 0) clinicPatientRepository.delete(clinicPatientAssocList);
+		    	
+		    	// Reset adherence score for the dissociated patient to default
+		    	adherenceCalculationService.adherenceSettingLinkPatientClinic(patientUser);
+		    	
 		    	return getClinicVOList(patientInfo);
 	     	} else {
 	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist

@@ -24,6 +24,9 @@ import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calcula
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateHMRRunRatePerSession;
 import static com.hillrom.vest.service.util.monarch.PatientVestDeviceTherapyUtilMonarch.calculateHMRRunRatePerSessionBoth;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
+import static com.hillrom.vest.config.Constants.VEST;
+import static com.hillrom.vest.config.Constants.MONARCH;
+import static com.hillrom.vest.config.Constants.BOTH;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -416,6 +419,65 @@ public class AdherenceCalculationService {
 			log.debug(ex.getMessage());
 		}
 		return new AsyncResult<>("Adherence score recalculated successfully for all patients under clinic");
+	}
+	
+	public LocalDate getStartDate(User user, String deviceType){
+		
+		if(VEST.equals(deviceType)){
+			PatientNoEvent noEvent = noEventService.findByPatientUserId(user.getId());
+			
+			if(Objects.nonNull(noEvent) &&  Objects.nonNull(noEvent.getFirstTransmissionDate())){
+				return noEvent.getFirstTransmissionDate();
+			}
+		}else if(MONARCH.equals(deviceType)){
+			PatientNoEventMonarch noEventMonarch = noEventMonarchService.findByPatientUserId(user.getId());
+			
+			if(Objects.nonNull(noEventMonarch) &&  Objects.nonNull(noEventMonarch.getFirstTransmissionDate())){
+				return noEventMonarch.getFirstTransmissionDate();
+			}
+		}
+		return null;
+	}
+	
+	public void adherenceSettingLinkPatientClinic(User user){
+		
+		LocalDate startDate = fineOneByPatientUserIdLatestResetStartDate(user.getId());
+		LocalDate startDateMonarch = adherenceCalculationServiceMonarch.fineOneByPatientUserIdLatestResetStartDate(user.getId());
+		
+		PatientInfo patient = userService.getPatientInfoObjFromPatientUser(user);
+		String deviceType = getDeviceTypeValue(patient.getId());
+		
+		// flag for adherence setting / existing reset of score for adherence setting  
+		int resetFlagForSetting = 0;
+		
+		if( VEST.equals(deviceType)){			
+			if(Objects.nonNull(startDate) ){
+				resetFlagForSetting = 2;	
+			}else{
+				startDate = getStartDate(user,VEST);				
+			}
+			adherenceResetForPatient(user.getId(), patient.getId(), startDate, DEFAULT_COMPLIANCE_SCORE, resetFlagForSetting);
+		}else{
+			if(MONARCH.equals(deviceType)){
+				if(Objects.nonNull(startDateMonarch)){
+					resetFlagForSetting = 2;
+				}else{					
+					startDateMonarch = getStartDate(user,MONARCH);
+				}
+				adherenceCalculationServiceMonarch.adherenceResetForPatient(user.getId(), patient.getId(), startDateMonarch, DEFAULT_COMPLIANCE_SCORE, resetFlagForSetting);
+			}
+			else if(BOTH.equals(deviceType)){
+				if(Objects.nonNull(startDate) || Objects.nonNull(startDateMonarch)){
+					resetFlagForSetting = 2;	
+				}else{
+					startDate = getStartDate(user,VEST);
+					startDateMonarch = getStartDate(user,MONARCH);
+				}
+				
+				adherenceCalculationServiceMonarch.adherenceCalculationBoth(user.getId(), patient.getId(), startDate,
+							startDateMonarch, DEFAULT_COMPLIANCE_SCORE, user.getId(), resetFlagForSetting);
+			}
+		}		
 	}
 	
 	public LocalDate fineOneByPatientUserIdLatestResetStartDate(Long userId){    	

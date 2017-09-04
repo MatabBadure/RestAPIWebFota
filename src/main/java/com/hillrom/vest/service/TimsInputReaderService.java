@@ -72,7 +72,8 @@ public class TimsInputReaderService {
 	public static boolean processed_atleast_one = false;
 	
 	public static boolean failureFlag = false;
-	
+	public static boolean mandatoryFieldFlag = true;
+	public static boolean monarchBluetoothFlag = true;
 	@Inject
 	private TimsService timsService;
 	
@@ -83,7 +84,8 @@ public class TimsInputReaderService {
 		try{
 		MDC.put("logFileName", "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
 		log.debug("Status           TIMS Id        Serial Number        Result        Remarks");
-		
+		this.mandatoryFieldFlag = true;
+		this.monarchBluetoothFlag = true;
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
 		
@@ -129,8 +131,22 @@ public class TimsInputReaderService {
 			    	timsService.CASE10_PatientHasVisivestAddMonarch_MONARCH(record);
 			    	//timsService.CASE11_PatientExistsWithNODevice_MONARCH(record);
 			    	timsService.CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH(record);
+		    	}else{
+		    		monarchBluetoothFlag = false;
+		    		log.debug("Created       " +record.getTims_cust()+ "        " +record.getSerial_num()+ "        "+"Failure"+ "        "
+							+ "Bluetooth Id / Connectivity Id is not present");
 		    	}
 		    }
+		}
+        if(!monarchBluetoothFlag){
+			
+			throw new Exception("any exceoption error.");
+			
+		}
+		if(!mandatoryFieldFlag){
+			
+			throw new Exception("any exceoption error.");
+			
 		}
 		if(failureFlag){
 			throw new Exception("any exceoption error.");
@@ -157,7 +173,7 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{        
-		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
+		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
 		  //  log.debug("Started reading flat file : " + csvFile);
 	        String line = "";
 	        String cvsSplitBy = ",";
@@ -208,7 +224,34 @@ public class TimsInputReaderService {
 
 		            
 		            
-		            if(!header){
+		            if(!header){	            	
+		            	if(data.length >= 3 && data[2].equalsIgnoreCase("")){
+		            		log.debug("Created       " +"  NA  " + "        " +data[3]+ "       "+"Failure"+ "        "
+									+ "Tims Id is not present");
+		            		mandatoryFieldFlag = false;
+		            	}else if(data.length >= 4 && data[3].equalsIgnoreCase("")){
+		            		log.debug("Created       " +data[2]+ "        " +"  NA  "+ "          "+"Failure"+ "        "
+									+ "Serial number is not present");
+		            		mandatoryFieldFlag = false;
+		            	}
+		            	else if(data.length >= 13 && data[12].equalsIgnoreCase("")){
+		            		log.debug("Created       " +data[2]+ "        " +data[3]+ "        "+"Failure"+ "        "
+									+ "First name is not present");
+		            		mandatoryFieldFlag = false;
+		            	}
+		            	else if(data.length >= 15 && data[14].equalsIgnoreCase("")){
+		            		log.debug("Created       " +data[2]+ "        " +data[3]+ "        "+"Failure"+ "        "
+									+ "Last name is not present");
+		            		mandatoryFieldFlag = false;
+		            	}else if(data.length >= 18 && data[17].equalsIgnoreCase("")){
+		            		log.debug("Created       " +data[2]+ "        " +data[3]+ "        "+"Failure"+ "        "
+									+ "Zip code is not present");
+		            		mandatoryFieldFlag = false;
+		            	}else if(data.length >= 22 && data[21].equalsIgnoreCase("")){
+		            		log.debug("Created       " +data[2]+ "        " +data[3]+ "        "+"Failure"+ "        "
+									+ "DOB is not present");
+		            		mandatoryFieldFlag = false;
+		            	}else{ 
 		            	patientInfoDTO.setIndex(data[0]);
 			            patientInfoDTO.setDevice_type(data[1]);
 			            patientInfoDTO.setTims_cust(data[2]);
@@ -260,10 +303,11 @@ public class TimsInputReaderService {
 			            }else{
 			            	patientInfoDTO.setGender(null);
 			            }
-			            if(data.length >= 24){
-			            	patientInfoDTO.setLang_key(data[23]);
-			            }else{
+			            if(data.length >= 24 && data[23].equalsIgnoreCase("")){
 			            	patientInfoDTO.setLang_key(null);
+			            }else{
+			            	patientInfoDTO.setLang_key(data[23]);
+			            	
 			            }
 			            if(data.length >= 25){
 			            	patientInfoDTO.setDx1(data[24]);
@@ -289,8 +333,8 @@ public class TimsInputReaderService {
 	
 	
 			            fileRecords.put(k++, patientInfoDTO);
-		            }
-		            
+		           }
+		            } 
 		            header = false;
 		            
 		            

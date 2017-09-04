@@ -31,7 +31,7 @@ SET today_date = now();
 IF operation_type_indicator = 'CREATE' THEN
 
 	SELECT `patient_id`, `serial_number`, `bluetooth_id` INTO temp_patient_info_id, temp_serial_number, temp_bluetooth_id FROM `PATIENT_DEVICES_ASSOC`
-	WHERE `serial_number` = pat_old_device_serial_number OR `bluetooth_id` =  pat_bluetooth_id;
+	WHERE (`serial_number` = pat_old_device_serial_number  OR `bluetooth_id` =  pat_bluetooth_id )and (`is_active` = 1);
 
 	IF temp_patient_info_id IS NOT NULL THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Device Serial No. or Bluetooth ID already associated with a patient';

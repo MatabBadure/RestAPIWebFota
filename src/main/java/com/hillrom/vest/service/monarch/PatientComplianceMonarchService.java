@@ -154,7 +154,7 @@ public class PatientComplianceMonarchService {
 	public List<? extends Object> findAdherenceTrendByUserIdAndDateRangeBoth(Long patientUserId,LocalDate from,LocalDate to, String deviceType)
 			throws HillromException{
 		
-		List<? extends Object> adherenceTrendData = null;
+		LinkedList<? extends Object> adherenceTrendData = null;
 		
 		if(deviceType.equalsIgnoreCase(MONARCH))
 		{
@@ -162,10 +162,9 @@ public class PatientComplianceMonarchService {
 			return revisionMonarch;
 		}else
 		{
-			List<? extends Object> revisionBOTH = findAdherenceTrendByUserIdAndDateRange(patientUserId, from, to, deviceType);
-			adherenceTrendData = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(patientUserId, from, to);
-			List<? extends Object> revision = ListUtils.union(revisionBOTH,adherenceTrendData);
-			
+			LinkedList<? extends Object> revisionBOTH =(LinkedList) findAdherenceTrendByUserIdAndDateRange(patientUserId, from, to, deviceType);
+			adherenceTrendData = (LinkedList)patientComplianceService.findAdherenceTrendByUserIdAndDateRange(patientUserId, from, to);
+			LinkedList<? extends Object> revision = (LinkedList) ListUtils.union(adherenceTrendData,revisionBOTH);
 			return revision;
 		}
 	}

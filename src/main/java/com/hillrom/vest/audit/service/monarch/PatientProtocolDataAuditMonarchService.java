@@ -1,5 +1,7 @@
 package com.hillrom.vest.audit.service.monarch;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.SortedMap;
@@ -15,7 +17,9 @@ import org.springframework.stereotype.Component;
 import com.hillrom.vest.audit.repository.PatientProtocolDataAuditRepository;
 import com.hillrom.vest.audit.repository.monarch.PatientProtocolDataAuditMonarchRepository;
 import com.hillrom.vest.audit.service.AuditableService;
+import com.hillrom.vest.audit.service.PatientProtocolDataAuditService;
 import com.hillrom.vest.config.Constants;
+import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.ProtocolConstantsMonarch;
@@ -42,13 +46,18 @@ public class PatientProtocolDataAuditMonarchService extends AuditableService<Pat
 	@Inject
 	private ProtocolConstantsMonarchRepository protocolConstantsMonarchRepository;
 	
+	@Inject
+	private ProtocolConstantsRepository protocolConstantsRepository;
+	
+	@Inject
+	private PatientProtocolDataAuditService patientProtocolDataAuditService;
 
 	
 	public List<PatientProtocolDataMonarch> findProtocolRevisionsByUserIdAndDateRange(Long userId,DateTime datetime){
 		return protocolDataAuditMonarchRepository.findProtocolRevisionsByUserIdAndDateRange(userId);
 	}
 	
-	public SortedMap<DateTime,ProtocolRevisionMonarchVO> findProtocolRevisionsByUserIdTillDate(Long userId,DateTime dateTime) throws HillromException{
+	public SortedMap<DateTime,ProtocolRevisionMonarchVO> findProtocolRevisionsByUserIdTillDate(Long userId,DateTime dateTime, String deviceType) throws HillromException{
 		SortedMap<DateTime,ProtocolRevisionMonarchVO> protocolRevMap = new TreeMap<>();
 		List<PatientProtocolDataMonarch> revisionsList = findProtocolRevisionsByUserIdAndDateRange(userId,dateTime);
 		ProtocolConstantsMonarch defaultProtocol = protocolConstantsMonarchRepository.findOne(1L);

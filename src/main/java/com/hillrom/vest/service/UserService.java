@@ -3,6 +3,7 @@ package com.hillrom.vest.service;
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
 import static com.hillrom.vest.config.Constants.VEST;
 import static com.hillrom.vest.config.Constants.MONARCH;
+import static com.hillrom.vest.config.Constants.BOTH;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -532,35 +533,9 @@ public class UserService {
 		
 		// /Insert Garament details in patient device ass info
 		
-
-		if(!"BOTH".equalsIgnoreCase(userExtensionDTO.getDeviceType()))
-		{
-			assignGarmentValuesToPatientDeviceAssocObj(userExtensionDTO,
-					patientDevicesAssoc);
-			patientDevicesAssoc.setPatientId(patientInfoId);
-			patientDevicesAssoc.setCreatedDate(new LocalDate());
-			patientDevicesAssoc.setHillromId(userExtensionDTO.getHillromId());
-			patientDevicesAssoc.setIsActive(true);
-		}
-		
-		if("VEST".equalsIgnoreCase(userExtensionDTO.getDeviceType()))
-		{
-			patientDevicesAssoc.setDeviceType(VEST);
-			patientDevicesAssoc.setPatientType("SD");
-			patientDevicesAssoc = patientDevicesAssocRepository
-					.save(patientDevicesAssoc);
-			newUser = savePatientUser(userExtensionDTO,newUser,patientInfo);
-		}else if("MONARCH".equalsIgnoreCase(userExtensionDTO.getDeviceType()))
-		{
-			patientDevicesAssoc.setDeviceType(MONARCH);
-			patientDevicesAssoc.setPatientType("SD");
-			patientDevicesAssoc = patientDevicesAssocRepository
-					.save(patientDevicesAssoc);
-			newUser = savePatientUser(userExtensionDTO,newUser,patientInfo);
-		}else if("BOTH".equalsIgnoreCase(userExtensionDTO.getDeviceType()))
-		{
-			String deviceTypeB = "VEST";
-			for(int i =0; i<=1;i++)
+			String deviceTypeArray[] = userExtensionDTO.getDeviceType().split(",");
+			String deviceTypeB = deviceTypeArray[0];
+			for(int i =0; i<deviceTypeArray.length;i++)
 			{
 				PatientDevicesAssoc patientDevicesAssocB = new PatientDevicesAssoc();
 				userExtensionDTO.setDeviceType(deviceTypeB);
@@ -571,13 +546,18 @@ public class UserService {
 				patientDevicesAssocB.setHillromId(userExtensionDTO.getHillromId());
 				patientDevicesAssocB.setIsActive(true);
 				patientDevicesAssocB.setDeviceType(deviceTypeB);
-				patientDevicesAssocB.setPatientType("CD");
+				if(deviceTypeArray.length == 1)
+				{
+					patientDevicesAssocB.setPatientType("SD");
+				}else{
+					patientDevicesAssocB.setPatientType("CD");
+				}
 				patientDevicesAssocB = patientDevicesAssocRepository
 						.save(patientDevicesAssocB);
-				deviceTypeB = "MONARCH";
+				if(deviceTypeArray.length > i+1 )
+					deviceTypeB = deviceTypeArray[i+1];
 			}
 			newUser = savePatientUser(userExtensionDTO,newUser,patientInfo);
-		}
 		
 		return newUser;
 	}

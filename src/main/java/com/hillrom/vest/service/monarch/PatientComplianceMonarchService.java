@@ -30,7 +30,10 @@ import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIAN
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_MONARCH;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_VEST;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_MONARCH;
+import static com.hillrom.vest.config.Constants.VEST;
+import static com.hillrom.vest.config.Constants.MONARCH;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -46,6 +49,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import org.apache.commons.collections.ListUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -72,6 +76,7 @@ import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.repository.monarch.AdherenceResetMonarchRepository;
 import com.hillrom.vest.repository.monarch.PatientComplianceMonarchRepository;
 import com.hillrom.vest.repository.monarch.TherapySessionMonarchRepository;
+import com.hillrom.vest.service.PatientComplianceService;
 import com.hillrom.vest.web.rest.dto.AdherenceTrendVO;
 import com.hillrom.vest.web.rest.dto.ProtocolRevisionVO;
 import com.hillrom.vest.web.rest.dto.monarch.AdherenceTrendMonarchVO;
@@ -94,6 +99,9 @@ public class PatientComplianceMonarchService {
 	@Inject
 	@Qualifier("patientProtocolDataAuditMonarchService")
 	private PatientProtocolDataAuditMonarchService protocolAuditMonarchService;
+	
+	@Inject
+	private PatientComplianceService patientComplianceService;
 	
 	
 	/**
@@ -142,7 +150,27 @@ public class PatientComplianceMonarchService {
 		complianceMonarchRepository.save(complainces);
 	}
 	
-	public List<ProtocolRevisionMonarchVO> findAdherenceTrendByUserIdAndDateRange(Long patientUserId,LocalDate from,LocalDate to)
+	
+	public List<? extends Object> findAdherenceTrendByUserIdAndDateRangeBoth(Long patientUserId,LocalDate from,LocalDate to, String deviceType)
+			throws HillromException{
+		
+		List<? extends Object> adherenceTrendData = null;
+		
+		if(deviceType.equalsIgnoreCase(MONARCH))
+		{
+			List<? extends Object> revisionMonarch = findAdherenceTrendByUserIdAndDateRange(patientUserId, from, to, deviceType);
+			return revisionMonarch;
+		}else
+		{
+			List<? extends Object> revisionBOTH = findAdherenceTrendByUserIdAndDateRange(patientUserId, from, to, deviceType);
+			adherenceTrendData = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(patientUserId, from, to);
+			List<? extends Object> revision = ListUtils.union(revisionBOTH,adherenceTrendData);
+			
+			return revision;
+		}
+	}
+	
+	public List<? extends Object> findAdherenceTrendByUserIdAndDateRange(Long patientUserId,LocalDate from,LocalDate to, String deviceType)
 	throws HillromException{
 
 		List<Long> patientUserIds = new LinkedList<>();
@@ -170,7 +198,7 @@ public class PatientComplianceMonarchService {
 		
 		PatientComplianceMonarch lastCompliance = actualMapRequested.get(actualMapRequested.lastKey());
 		DateTime dateTime = Objects.nonNull(lastCompliance.getLastModifiedDate()) ? lastCompliance.getLastModifiedDate() : lastCompliance.getDate().toDateTimeAtStartOfDay();  
-		SortedMap<DateTime,ProtocolRevisionMonarchVO> revisionData = protocolAuditMonarchService.findProtocolRevisionsByUserIdTillDate(patientUserId,dateTime);
+		SortedMap<DateTime,ProtocolRevisionMonarchVO> revisionData = protocolAuditMonarchService.findProtocolRevisionsByUserIdTillDate(patientUserId,dateTime,deviceType);
 		// if no revisions found,create a dummy revision with isValid = false
 		if(revisionData.isEmpty()){
 			ProtocolRevisionMonarchVO revisionVO = new ProtocolRevisionMonarchVO(lastCompliance.getPatientUser().getCreatedDate(),null);

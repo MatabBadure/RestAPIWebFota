@@ -8,7 +8,8 @@ import com.hillrom.vest.web.rest.dto.monarch.ProtocolDataMonarchVO;
 
 public class ProtocolDataMonarchVOBuilder {
 	public static ProtocolDataMonarchVO convertProtocolDataMonarchToVO(PatientProtocolDataMonarch protocolData){
-		return new ProtocolDataMonarchVO(protocolData.getId(),protocolData.getType(),
+		String type = protocolData.getType();
+		return new ProtocolDataMonarchVO(protocolData.getId(),type + "(M)",
 				protocolData.getTreatmentsPerDay(), protocolData.getMinMinutesPerTreatment(),
 				protocolData.getTreatmentLabel(), protocolData.getMinFrequency(), protocolData.getMaxFrequency(), protocolData.getMinIntensity(),
 				protocolData.getMaxIntensity());

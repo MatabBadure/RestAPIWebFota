@@ -54,7 +54,7 @@ public class PatientProtocolDataAuditService extends AuditableService<PatientPro
 		return protocolRevMap;
 	}
 
-	private void prepareCurrentProtocolRevisions(
+	public void prepareCurrentProtocolRevisions(
 			SortedMap<DateTime, ProtocolRevisionVO> protocolRevMap,
 			List<PatientProtocolData> protocolsList,ProtocolConstants defaultProtocol) {
 		SortedMap<DateTime, List<PatientProtocolData>> protocolsMap = new TreeMap<>(protocolsList.stream().collect(Collectors.groupingBy(PatientProtocolData::getLastModifiedDate)));

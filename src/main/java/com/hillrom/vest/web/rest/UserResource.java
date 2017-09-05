@@ -4,6 +4,7 @@ import static com.hillrom.vest.security.AuthoritiesConstants.CLINIC_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
 import static com.hillrom.vest.config.Constants.VEST;
 import static com.hillrom.vest.config.Constants.MONARCH;
+
 //import static com.hillrom.vest.config.Constants.ALL;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -56,10 +57,8 @@ import org.supercsv.prefs.CsvPreference;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
-
 import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
-
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceData;
@@ -1504,7 +1503,7 @@ public class UserResource {
     		}
 
     		else{
-                List<ProtocolRevisionMonarchVO> adherenceTrends = patientComplianceMonarchService.findAdherenceTrendByUserIdAndDateRange(id,from,to);
+                List<? extends Object> adherenceTrends = patientComplianceMonarchService.findAdherenceTrendByUserIdAndDateRangeBoth(id, from, to, deviceType);
                 return new ResponseEntity<>(adherenceTrends,HttpStatus.OK);	
         	}
     		
@@ -1569,14 +1568,14 @@ public class UserResource {
     		try {
     			
     			List<ProtocolRevisionVO> adherenceTrendData = null;
-    			List<ProtocolRevisionMonarchVO> adherenceTrendDataMonarch = null;
+    			List<? extends Object> adherenceTrendDataMonarch = null;
     			
     			if(deviceType.equals(VEST)){
     				adherenceTrendData = patientComplianceService.findAdherenceTrendByUserIdAndDateRange(id, from, to);
 
     			}else {
 
-    				adherenceTrendDataMonarch = patientComplianceMonarchService.findAdherenceTrendByUserIdAndDateRange(id, from, to);
+    				adherenceTrendDataMonarch = patientComplianceMonarchService.findAdherenceTrendByUserIdAndDateRange(id, from, to,deviceType);
     			}
     			
     			if (Objects.nonNull(adherenceTrendData) &&  adherenceTrendData.size() > 0) {

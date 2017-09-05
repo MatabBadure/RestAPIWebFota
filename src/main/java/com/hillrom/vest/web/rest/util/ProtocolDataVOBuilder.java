@@ -6,7 +6,8 @@ import com.hillrom.vest.web.rest.dto.ProtocolDataVO;
 
 public class ProtocolDataVOBuilder {
 	public static ProtocolDataVO convertProtocolDataToVO(PatientProtocolData protocolData){
-		return new ProtocolDataVO(protocolData.getId(),protocolData.getType(),
+		String type = protocolData.getType();
+		return new ProtocolDataVO(protocolData.getId(),type + "(V)",
 				protocolData.getTreatmentsPerDay(), protocolData.getMinMinutesPerTreatment(),
 				protocolData.getTreatmentLabel(), protocolData.getMinFrequency(), protocolData.getMaxFrequency(), protocolData.getMinPressure(),
 				protocolData.getMaxPressure());

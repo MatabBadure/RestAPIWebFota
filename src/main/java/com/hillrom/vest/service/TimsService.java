@@ -1744,8 +1744,29 @@ public class TimsService {
 		return false;
 		
 	}
-	public void	CASE13_ExistedSerialNumberandDifferentHillromID(PatientInfoDTO patientInfoDTO){
-		if( ( isSerialNoExistInPatientdeviceAssocVest( patientInfoDTO.getSerial_num() )) && ( !isHillromIdExistInPatientInfo( patientInfoDTO.getTims_cust() )) &&(! isCurrentSerialNumberOwnedByShellVest(patientInfoDTO.getSerial_num() )))  {
+	public void	CASE13_ExistedSerialNumberandDifferentHillromID_VEST(PatientInfoDTO patientInfoDTO){
+		if(
+				 (  isSerialNoExistInPatientdeviceAssocVest ( patientInfoDTO.getSerial_num() ) )
+				 &&  
+				 ( !isHillromIdExistInPatientInfo ( patientInfoDTO.getTims_cust() ) )
+				 &&
+				 ( ! isCurrentSerialNumberOwnedByShellVest (patientInfoDTO.getSerial_num() ) )
+		   ) {
+			log.debug("Created    " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+					+ "Serial Number already present");
+			TimsInputReaderService.serialNumberFlag = false;
+		}
+
+	}
+	
+	public void	CASE13_ExistedSerialNumberandDifferentHillromID_MONARCH(PatientInfoDTO patientInfoDTO){
+		if(
+				 (  isSerialNoExistInPatientdeviceAssocMonarch ( patientInfoDTO.getSerial_num() ) )
+				 &&  
+				 ( !isHillromIdExistInPatientInfo ( patientInfoDTO.getTims_cust() ) )
+				 &&
+				 ( ! isCurrentSerialNumberOwnedByShellMonarch (patientInfoDTO.getSerial_num() ) )
+			 )  {
 			log.debug("Created    " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
 					+ "Serial Number already present");
 			TimsInputReaderService.serialNumberFlag = false;

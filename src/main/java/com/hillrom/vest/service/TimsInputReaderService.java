@@ -44,6 +44,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -68,31 +69,43 @@ public class TimsInputReaderService {
 
 	private final Logger log = LoggerFactory.getLogger("com.hillrom.vest.tims");
 	
+	public static boolean processed_atleast_one = false;
 	
+	public static boolean failureFlag = false;
+	public static boolean mandatoryFieldFlag = true;
+	public static boolean monarchBluetoothFlag = true;
+	public static boolean  serialNumberFlag = true;
+	public static boolean  CSVFileFlag = true;
 	@Inject
 	private TimsService timsService;
 	
-	//@Scheduled(cron="0/5 * * * * * ")
-	public void ExecuteTIMSJob() 
+	@Scheduled(cron="00 30 08 * * * ")
+	public void ExecuteTIMSJob() throws Exception
 	{
 		
+		try{
 		MDC.put("logFileName", "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
+		log.debug("Status           TIMS Id        Serial Number        Result        Remarks");
+		this.mandatoryFieldFlag = true;
+		this.monarchBluetoothFlag = true;
+		this.serialNumberFlag = true;
 		
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
 		
-		log.debug("Starting to process records ");
+	    boolean failureflag = true;
+	    this.failureFlag = false;
+		this.processed_atleast_one = false;
 		for (Map.Entry<Integer, PatientInfoDTO> entry : fileRecords.entrySet()) {
 		    Integer position = entry.getKey();
 		    PatientInfoDTO record = entry.getValue();
-		    log.debug("Processing record position : "+position);
+		
 		  if(record.getDevice_type().equalsIgnoreCase("VEST")){
-		    	log.debug("Inside VEST loop ");
-		    	timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record);
+		      	timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record);
 		    	//timsService.CASE2_PatientExistsWithNODevice_VEST(record);
 		    	timsService.CASE3_PatientHasMonarchAddVisivest_VEST(record);
 		    	timsService.CASE4_PatientHasDifferentVisivestSwap_VEST(record);
-		    	timsService.CASE5_DeviceOwnedByShell_VEST(record);
+		        timsService.CASE5_DeviceOwnedByShell_VEST(record);
 		    	//timsService.CASE6_DeviceOwnedByDifferentPatient_VEST(record);
 		    	//timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_VEST(record);
 		    	//timsService.CASE8_DeviceIsOrphanButPatientExist_VEST(record);
@@ -100,6 +113,7 @@ public class TimsInputReaderService {
 		    	timsService.CASE10_PatientHasMonarchAddVisivest_VEST(record);
 		    	//timsService.CASE11_PatientExistsWithNODevice_VEST(record);
 		    	timsService.CASE12_PatientHasMonarchMergeExistingVisivest_VEST(record);
+		    	timsService.CASE13_ExistedSerialNumberandDifferentHillromID_VEST(record);
 		    	
 		    }
 
@@ -107,9 +121,9 @@ public class TimsInputReaderService {
 		    	
 		    	/*If the new monarch device added is  one without connectvity then ensure that 
 		    	you dont create a combo patient in TIMS visiview code.*/
-		    	if(record.getBluetooth_id()!=null && (!record.getBluetooth_id().isEmpty()))
+		 	if(record.getBluetooth_id()!=null && (!record.getBluetooth_id().isEmpty()))
 		    	{
-			    	log.debug("Inside MONARCH loop ");
+			    	
 			    	timsService.CASE1_NeitherPatientNorDeviceExist_MONARCH(record);
 			    	//timsService.CASE2_PatientExistsWithNODevice_MONARCH(record);
 			   	    timsService.CASE3_PatientHasVisivestAddMonarch_MONARCH(record);
@@ -122,26 +136,78 @@ public class TimsInputReaderService {
 			    	timsService.CASE10_PatientHasVisivestAddMonarch_MONARCH(record);
 			    	//timsService.CASE11_PatientExistsWithNODevice_MONARCH(record);
 			    	timsService.CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH(record);
+			    	timsService.CASE13_ExistedSerialNumberandDifferentHillromID_MONARCH(record);
+		    	}else{
+		    		monarchBluetoothFlag = false;
+		    		log.debug("Created       " +record.getTims_cust()+ "        " +record.getSerial_num()+ "        "+"Failure"+ "        "
+							+ "Bluetooth Id / Connectivity Id is not present");
 		    	}
 		    }
+		}
+		if(!CSVFileFlag)
+		{
+			throw new Exception("any exceoption error.");
+		}
+		if(!serialNumberFlag)
+		{
+			throw new Exception("any exceoption error.");
+		}
+        if(!monarchBluetoothFlag){
+			
+			throw new Exception("any exceoption error.");
+			
+		}
+		if(!mandatoryFieldFlag){
+			
+			throw new Exception("any exceoption error.");
+			
+		}
+		if(failureFlag){
+			throw new Exception("any exceoption error.");
+		}
+		if(processed_atleast_one){
+			log.debug(" ");
+			log.debug("All Records Executed Successfully");
+		}
+		
+		if(!processed_atleast_one){
+			log.debug("Success        NA               NA             Success           The csv file has already been executed or unable to process any of the records.");
+			log.debug(" ");
+			log.debug("All Records Executed Successfully");
+			//throw new Exception("The csv file has already been executed or unable to process any of the records.");
+		}
+		
+		}catch(Exception ex){
+			ex.printStackTrace();
+			throw new HillromException("Error in TIMS Script Execution " , ex);
 		}
 		
 	}
 
 	
 	public Map readcsv() 
-	{
-		
-
-	        String csvFile = Constants.TIMS_CSV_FILE_PATH + "flat file.csv";
-		    log.debug("Started reading flat file : " + csvFile);
+	{        
+		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
+		      File flatFile = new File(csvFile);
+		      if(!flatFile.exists()) { 
+		    	  log.debug("Failure        NA               NA             Failure           The csv file is not present ");
+		    	  CSVFileFlag = false;
+		          
+		      }
+		  //  log.debug("Started reading flat file : " + csvFile);
 	        String line = "";
 	        String cvsSplitBy = ",";
 	        String Outdata = "";
 	        String[] data = null;
-	        DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yyyy");
+	        
+	  /*      DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yyyy");
 	        DateTimeFormatter dobFormat = DateTimeFormat.forPattern("MM/dd/yyyy");
-	        DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");
+	        DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss"); */
+
+	        
+	        DateFormat sourceFormat = new SimpleDateFormat("yyyy-mm-dd");
+	        DateTimeFormatter dobFormat = DateTimeFormat.forPattern("yyyy-MM-dd");
+	        DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
 
 	        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
 	        	Map<Integer, PatientInfoDTO> fileRecords = new HashMap<Integer, PatientInfoDTO>();
@@ -157,11 +223,11 @@ public class TimsInputReaderService {
 	               
 	               PatientInfoDTO patientInfoDTO = new PatientInfoDTO();
 		            String record = "";
-		            for(int i=0;i<27;i++){
+		            for(int i=0;i<28;i++){
 		            	try{
 		            		data[i] = Objects.nonNull(data[i]) ? data[i] : "";
 		            		
-		            		record = i==26?record + data[i]:record + data[i]+",";
+		            		record = i==27?record + data[i]:record + data[i]+",";
 		            	}catch(ArrayIndexOutOfBoundsException ex){
 
 		            	}
@@ -174,73 +240,112 @@ public class TimsInputReaderService {
 		            for(int j=0;j<data.length;j++){
 		            	s = s + "\t" + data[j];
 		            }
-		            log.debug("Excel File Read as : " + s);
+		        //    log.debug("Excel File Read as : " + s);
 
 		            
 		            
-		            if(!header){
-
-			            patientInfoDTO.setDevice_type(data[0]);
-			            patientInfoDTO.setTims_cust(data[1]);
-			            patientInfoDTO.setSerial_num(data[2]);
-			            patientInfoDTO.setShip_dt(data[3].equalsIgnoreCase("")? null: LocalDate.parse(data[3],dobFormat));
-			            patientInfoDTO.setHub_id(data[4]);
-			            patientInfoDTO.setBluetooth_id(data[5]);
-			            patientInfoDTO.setGarment_cd(data[6]);
-			            patientInfoDTO.setGarment_type(data[7]);
-			            patientInfoDTO.setGarment_size(data[8]);
-			            patientInfoDTO.setGarment_color(data[9]);
-			            patientInfoDTO.setTitle(data[10]);
-			            patientInfoDTO.setFirst_nm(data[11]);
-			            patientInfoDTO.setMiddle_nm(data[12]);
-			            patientInfoDTO.setLast_nm(data[13]);
-			            patientInfoDTO.setEmail(data[14]);
-			            if(!data[15].isEmpty() && data[15]!=null){
-				            if(data[15].charAt(0)=='"'&&data[15].charAt(data[15].length()-1)=='"')
+		            if(!header){	            	
+		            	if(data.length >= 3 && data[2].equalsIgnoreCase("")){
+		            		log.debug("Created       " +"  NA  " + "        " +data[3]+ "       "+"Failure"+ "        "
+									+ "Tims Id is not present");
+		            		mandatoryFieldFlag = false;
+		            	}else if(data.length >= 4 && data[3].equalsIgnoreCase("")){
+		            		log.debug("Created       " +data[2]+ "        " +"  NA  "+ "          "+"Failure"+ "        "
+									+ "Serial number is not present");
+		            		mandatoryFieldFlag = false;
+		            	}
+		            	else if(data.length >= 13 && data[12].equalsIgnoreCase("")){
+		            		log.debug("Created       " +data[2]+ "        " +data[3]+ "        "+"Failure"+ "        "
+									+ "First name is not present");
+		            		mandatoryFieldFlag = false;
+		            	}
+		            	else if(data.length >= 15 && data[14].equalsIgnoreCase("")){
+		            		log.debug("Created       " +data[2]+ "        " +data[3]+ "        "+"Failure"+ "        "
+									+ "Last name is not present");
+		            		mandatoryFieldFlag = false;
+		            	}else if(data.length >= 18 && data[17].equalsIgnoreCase("")){
+		            		log.debug("Created       " +data[2]+ "        " +data[3]+ "        "+"Failure"+ "        "
+									+ "Zip code is not present");
+		            		mandatoryFieldFlag = false;
+		            	}else if(data.length >= 22 && data[21].equalsIgnoreCase("")){
+		            		log.debug("Created       " +data[2]+ "        " +data[3]+ "        "+"Failure"+ "        "
+									+ "DOB is not present");
+		            		mandatoryFieldFlag = false;
+		            	}else{ 
+		            	patientInfoDTO.setIndex(data[0]);
+			            patientInfoDTO.setDevice_type(data[1]);
+			            patientInfoDTO.setTims_cust(data[2]);
+			            patientInfoDTO.setSerial_num(data[3]);
+			            patientInfoDTO.setShip_dt(data[4].equalsIgnoreCase("")? null: LocalDate.parse(data[4],dobFormat));
+			            patientInfoDTO.setHub_id(data[5]);
+			            patientInfoDTO.setBluetooth_id(data[6]);
+			            patientInfoDTO.setGarment_cd(data[7]);
+			            patientInfoDTO.setGarment_type(data[8]);
+			            patientInfoDTO.setGarment_size(data[9]);
+			            patientInfoDTO.setGarment_color(data[10]);
+			            patientInfoDTO.setTitle(data[11]);
+			            patientInfoDTO.setFirst_nm(data[12]);
+			            patientInfoDTO.setMiddle_nm(data[13]);
+			            patientInfoDTO.setLast_nm(data[14]);			         
+			            patientInfoDTO.setEmail(data[15].trim().isEmpty()? null: data[15]);
+			            if(!data[16].isEmpty() && data[16]!=null){
+				            if(data[16].charAt(0)=='"'&&data[16].charAt(data[16].length()-1)=='"')
 				            {
-				            	data[15] = data[15].substring(1, data[15].length() - 1);
+				            	data[16] = data[16].substring(1, data[16].length() - 1);
 				            }
 			            }
 			            else
 			            {
-			            	data[15] = data[15];
+			            	data[16] = data[16];
 			            }
 			            
 
 
-			            patientInfoDTO.setAddress(data[15]);
-			            patientInfoDTO.setZip_cd(data[16]);
-			            patientInfoDTO.setPrimary_phone(data[17]);
-			            patientInfoDTO.setMobile_phone(data[18]);
-			            patientInfoDTO.setTrain_dt(data[19].equalsIgnoreCase("")? null: LocalDate.parse(data[19],dobFormat));
-			            patientInfoDTO.setDob(data[20].equalsIgnoreCase("")? null: LocalDate.parse(data[20],dobFormat));
-			            if(data.length >= 22){
-			            	patientInfoDTO.setGender(data[21]);
+			            patientInfoDTO.setAddress(data[16]);
+			           /*if(data.length >= 18 && data[17].equalsIgnoreCase("")){
+			            	 patientInfoDTO.setZip_cd(null);
+			            }else{
+			            	patientInfoDTO.setZip_cd(data[17]);
+			            }*/
+			            patientInfoDTO.setZip_cd(data[17]);
+			            patientInfoDTO.setPrimary_phone(data[18]);
+			            patientInfoDTO.setMobile_phone(data[19]);
+			            patientInfoDTO.setTrain_dt(data[20].equalsIgnoreCase("")? null: LocalDate.parse(data[20],deviceAssocdateFormat));
+			            //patientInfoDTO.setTrain_dt(data[19].equalsIgnoreCase("")? null: LocalDate.parse(data[19],dobFormat));
+			           /*if(data.length >= 22 && data[21].equalsIgnoreCase("")){
+			            	 patientInfoDTO.setDob(null);
+			            }else{
+			            	patientInfoDTO.setDob(data[21]);
+			            }*/
+			            patientInfoDTO.setDob(data[21]);
+			            if(data.length >= 23){
+			            	patientInfoDTO.setGender(data[22]);
 			            }else{
 			            	patientInfoDTO.setGender(null);
 			            }
-			            if(data.length >= 23){
-			            	patientInfoDTO.setLang_key(data[22]);
-			            }else{
+			            if(data.length >= 24 && data[23].equalsIgnoreCase("")){
 			            	patientInfoDTO.setLang_key(null);
+			            }else{
+			            	patientInfoDTO.setLang_key(data[23]);
+			            	
 			            }
-			            if(data.length >= 24){
-			            	patientInfoDTO.setDx1(data[23]);
+			            if(data.length >= 25){
+			            	patientInfoDTO.setDx1(data[24]);
 			            }else{
 			            	patientInfoDTO.setDx1(null);
 			            }
-			            if(data.length >= 25){
-			            	patientInfoDTO.setDx2(data[24]);
+			            if(data.length >= 26){
+			            	patientInfoDTO.setDx2(data[25]);
 			            }else{
 			            	patientInfoDTO.setDx2(null);
 			            }
-			            if(data.length >= 26){
-			            	patientInfoDTO.setDx3(data[25]);
+			            if(data.length >= 27){
+			            	patientInfoDTO.setDx3(data[26]);
 			            }else{
 			            	patientInfoDTO.setDx3(null);
 			            }
-			            if(data.length >= 27){
-			            	patientInfoDTO.setDx4(data[26]);
+			            if(data.length >= 28){
+			            	patientInfoDTO.setDx4(data[27]);
 			            }else{
 			            	patientInfoDTO.setDx4(null);
 			            }
@@ -248,14 +353,14 @@ public class TimsInputReaderService {
 	
 	
 			            fileRecords.put(k++, patientInfoDTO);
-		            }
-		            
+		           }
+		            } 
 		            header = false;
 		            
 		            
 	            }
 	            
-	            log.debug("Excel File contents in HashSet : " + fileRecords);
+	          //  log.debug("Excel File contents in HashSet : " + fileRecords);
 	            return fileRecords;
 	            
 	        } catch (IOException e) {

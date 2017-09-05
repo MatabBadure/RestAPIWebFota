@@ -434,8 +434,10 @@ public class UserService {
     	rolesAdminCanModerate.add(AuthoritiesConstants.ADMIN);
     	//hill-1845
     	rolesAdminCanModerate.add(AuthoritiesConstants.CUSTOMER_SERVICES);
-    	//hill-1845
-    	rolesAdminCanModerate.add(AuthoritiesConstants.RND_USER);
+    	//hill-1845 Added FOTA ADMIN and FOTA APPROVER
+    	/*rolesAdminCanModerate.add(AuthoritiesConstants.RND_USER);*/
+    	rolesAdminCanModerate.add(AuthoritiesConstants.FOTA_ADMIN);
+    	rolesAdminCanModerate.add(AuthoritiesConstants.FOTA_APPROVER);
 		return rolesAdminCanModerate;
 	}
 
@@ -696,8 +698,8 @@ public class UserService {
         	} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ASSOCIATES))
         			//hill-1845
         			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))
-        			//hill-1845 
-        			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.RND_USER))){
+        			//hill-1845 Added new roles FOTA ADMIN and FOTA APPROVER
+        			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.FOTA_ADMIN))||SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.FOTA_APPROVER))){
         		if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
 
 	        	UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
@@ -800,8 +802,22 @@ public class UserService {
 
     		}
         }
-        //hill-1845
-        else if (AuthoritiesConstants.RND_USER.equals(userExtensionDTO.getRole())) {
+        //hill-1845 Modified to FOTA ADMIN
+        else if (AuthoritiesConstants.FOTA_ADMIN.equals(userExtensionDTO.getRole())) {
+           	UserExtension user = updateRNDUser(existingUser, userExtensionDTO);
+    		if(Objects.nonNull(user.getId())) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
+    				sendEmailNotification(baseUrl, user);
+    			}
+                return user;
+    		} else {
+
+    			throw new HillromException(ExceptionConstants.HR_580);//Unable to update RND User.
+
+    		}
+        }
+        //Added New Role FOTA APPROVER
+        else if (AuthoritiesConstants.FOTA_APPROVER.equals(userExtensionDTO.getRole())) {
            	UserExtension user = updateRNDUser(existingUser, userExtensionDTO);
     		if(Objects.nonNull(user.getId())) {
     			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
@@ -984,7 +1000,7 @@ public class UserService {
 		assignValuesToUserObj(userExtensionDTO, rNDUser);
 		userExtensionRepository.saveAndFlush(rNDUser);
 
-		log.debug("Updated Information for R&D User : {}", rNDUser);
+		log.debug("Updated Information for FOTA Users : {}", rNDUser);
 
 		return rNDUser;
 	}
@@ -1289,8 +1305,9 @@ public class UserService {
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CARE_GIVER))
 							//hill-1845
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
-							//hill-1845
-							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))
+							//hill-1845 Added New role FOTA ADMIN and FOTA APPROVER
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.FOTA_ADMIN))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.FOTA_APPROVER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN)))) {
 					//hill-1844
 					existingUser.setDeleted(true);
@@ -1301,9 +1318,9 @@ public class UserService {
 					throw new HillromException(ExceptionConstants.HR_513);//Unable to delete User
 				}
 			} 
-			//hill-1845
+			//hill-1845 Added new Role FOTA ADMIN and FOTA APPROVER
 			else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))
-					|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))) {
+					|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.FOTA_ADMIN))|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.FOTA_APPROVER))) {
 				if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 					deletePatientUser(existingUser);
 					sendDeactivationEmailNotification(baseUrl, existingUser);
@@ -1311,7 +1328,8 @@ public class UserService {
 				}
 			
 				else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
-						|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))) {
+						|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.FOTA_ADMIN))
+						|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.FOTA_APPROVER))) {
 					if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
 						throw new HillromException(ExceptionConstants.HR_520);
 					}
@@ -1348,8 +1366,9 @@ public class UserService {
 				} else if((existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ACCT_SERVICES))
 							//hill-1845
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
-							//hill-1845
-							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))
+							//hill-1845 added new role for FOTA ADMIN and FOTA APPROVER
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.FOTA_ADMIN))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.FOTA_APPROVER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
@@ -1990,8 +2009,9 @@ public class UserService {
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ACCT_SERVICES))
 							//hill-1845
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
-							//hill-1845
-							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))
+							//hill-1845 added new Role FOTA ADMIN and FOTA APPROVER
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.FOTA_ADMIN))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.FOTA_APPROVER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CARE_GIVER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))) {
@@ -2009,12 +2029,13 @@ public class UserService {
 				else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))){
 					if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 						reactivatePatientUser(existingUser);
-						//hill-2178
+						//hill-2178 added new roles FOTA ADMIN and FOTA APPROVER
 						mailService.sendReactivationEmail(existingUser,baseUrl);
 						jsonObject.put("message", MessageConstants.HR_215);
 						} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
-							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.FOTA_ADMIN))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.FOTA_APPROVER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))) {
 						existingUser.setDeleted(false);
 						userExtensionRepository.saveAndFlush(existingUser);
@@ -2039,8 +2060,9 @@ public class UserService {
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ACCT_SERVICES))
 							//hill-1845
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
-							//hill-1845
-							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))
+							//hill-1845 Added new roles FOTA ADMIN and FOTA APPROVER
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.FOTA_ADMIN))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.FOTA_APPROVER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))
@@ -2108,9 +2130,11 @@ public class UserService {
 					//hill-1845		
 					|| SecurityContextHolder.getContext().getAuthentication().getAuthorities()
 						.contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))
-					//hill-1845
+					//hill-1845 added new role FOTA ADMIN and FOTA APPROVER
 					|| SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-					.contains(new SimpleGrantedAuthority(AuthoritiesConstants.RND_USER))
+					.contains(new SimpleGrantedAuthority(AuthoritiesConstants.FOTA_ADMIN))
+					|| SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+					.contains(new SimpleGrantedAuthority(AuthoritiesConstants.FOTA_APPROVER))
 					) {
 				if (existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 					if (Objects.nonNull(existingUser.getLastLoggedInAt()) & !existingUser.getActivated()) {

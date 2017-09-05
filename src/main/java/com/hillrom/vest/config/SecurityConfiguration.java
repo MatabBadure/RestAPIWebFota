@@ -100,17 +100,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/chargerdevicedata/{id}").permitAll()            
             .antMatchers("/api/validateActivationKey").permitAll()
             .antMatchers("/api/validateResetKey").permitAll()
-               //FOTA
+             //FOTA API
             .antMatchers("/api/processHexaToByte").permitAll()
             .antMatchers("/api/checkUpdate").permitAll()
             .antMatchers("/api/FOTA").permitAll()
             .antMatchers("/api/FOTA/uploadFile").permitAll()
             .antMatchers("/api/FOTA/create").permitAll()
-            .antMatchers("/api/FOTA/getOldVersion/{partNoV}").permitAll()
-            .antMatchers("/api/FOTA/softDeleteFOTA/{partNoD}/{isOldFileD}").permitAll()
             .antMatchers("/api/FOTAList").permitAll()
             .antMatchers("/api/FOTADeviceList").permitAll()
             .antMatchers("/api/FOTA/CRC32Calculation").permitAll()
+            .antMatchers("/api/FOTA/{id}/getFirmware").permitAll()
+            .antMatchers("/api/FOTA/validateApproverCRC32").permitAll()
+            .antMatchers("/api/FOTA/{id}/{userRole}/firmwareDelete").permitAll()
+         
             .antMatchers("/api/users/{id}/exportVestDeviceData").authenticated()
             .antMatchers("/api/users/{id}/exportVestDeviceDataCSV").authenticated()
             .antMatchers("/api/users/{id}/exportTherapyData").authenticated()
@@ -141,7 +143,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/protected/**").authenticated()
             .antMatchers("/api/user/{id}/changeSecurityQuestion").authenticated()
             //hill-1845
-            .antMatchers("/api/user/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES,AuthoritiesConstants.RND_USER)
+            .antMatchers("/api/user/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES,AuthoritiesConstants.FOTA_ADMIN, AuthoritiesConstants.FOTA_APPROVER)
             //hill-1845
             .antMatchers("/api/patient/**").hasAnyAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/api/cityStateZipValuesByCity").authenticated()
@@ -149,7 +151,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/cityStateZipValuesByZipCode").authenticated()
             .antMatchers("/api/survey/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT, AuthoritiesConstants.CUSTOMER_SERVICES)
             //hill-1845
-            .antMatchers("/api/validateCredentials").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES,AuthoritiesConstants.RND_USER)
+            .antMatchers("/api/validateCredentials").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES,AuthoritiesConstants.FOTA_ADMIN, AuthoritiesConstants.FOTA_APPROVER)
             .antMatchers("/api/loginAnalytics").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES,AuthoritiesConstants.ASSOCIATES, AuthoritiesConstants.CUSTOMER_SERVICES)
             .antMatchers("/api/survey/{id}/graph").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES,AuthoritiesConstants.ASSOCIATES, AuthoritiesConstants.CUSTOMER_SERVICES)
             //hill-1845

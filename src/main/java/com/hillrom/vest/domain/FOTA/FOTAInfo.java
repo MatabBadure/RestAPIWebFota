@@ -6,10 +6,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.joda.time.DateTime;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @Entity
 @Audited
 @Table(name = "FOTA_INFO")
@@ -75,6 +79,9 @@ public class FOTAInfo {
 	@Column(name="active_published_flag")
 	private boolean activePublishedFlag;
 	
+	@Column(name="delete_request_flag")
+	private boolean deleteRequestFlag;
+	
 	@Column(name="Region1_Start_Address")
 	private String region1StartAddress = "";
 	
@@ -92,6 +99,32 @@ public class FOTAInfo {
 	
 	@Column(name="Region2_CRC_Location")
 	private String region2CRCLocation = "";
+
+	@Transient
+	@JsonSerialize
+	@JsonDeserialize
+	private String FOTAStatus;
+	
+	
+	
+
+	
+
+	public boolean getDeleteRequestFlag() {
+		return deleteRequestFlag;
+	}
+
+	public void setDeleteRequestFlag(boolean deleteRequestFlag) {
+		this.deleteRequestFlag = deleteRequestFlag;
+	}
+
+	public String getFOTAStatus() {
+		return FOTAStatus;
+	}
+
+	public void setFOTAStatus(String fOTAStatus) {
+		FOTAStatus = fOTAStatus;
+	}
 
 	public Long getId() {
 		return id;

@@ -74,7 +74,11 @@
 			<column name="active_published_flag" type="boolean" value="false">
 				<constraints nullable="false" />
 			</column>
-
+			
+			<column name="delete_request_flag" type="boolean" value="false">
+				<constraints nullable="false" />
+			</column>
+			
 			<column name="Region1_Start_Address" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>

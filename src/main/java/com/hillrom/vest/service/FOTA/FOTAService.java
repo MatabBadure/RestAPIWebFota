@@ -8,7 +8,6 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_SN;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_VER;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.FOTA_FILE_PATH;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.INIT;
@@ -28,6 +27,7 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.YES;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -71,6 +71,7 @@ import com.hillrom.vest.repository.FOTA.FOTADeviceRepository;
 import com.hillrom.vest.repository.FOTA.FOTARepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.FOTA.FOTAParseUtil;
+import com.hillrom.vest.web.rest.FOTA.dto.ApproverCRCDto;
 import com.hillrom.vest.web.rest.FOTA.dto.CRC32Dto;
 import com.hillrom.vest.web.rest.FOTA.dto.FOTAInfoDto;
 @Service
@@ -134,8 +135,7 @@ public class FOTAService {
 			crsResultValue = asciiToHex(YES);
 			String handleId = "";
 			boolean softDeleteFlag = false;
-			boolean activePublishedFlag = false;
-			
+			boolean activePublishedFlag = true;
 			
 			//check Update request.
 			if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE1)) {
@@ -677,12 +677,11 @@ public class FOTAService {
 			
 			//
 			
-			//Get Fota Details based on part numbers.
-			
+			//Get Fota Details based on part numbers
 			if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE1)) {
 			//String diviceVer = getDeviceVersion(rawMessage);
-			//FOTAInfo fotaInfo = getFotaInforByPartNumber(fotaJsonData.get(DEVICE_PARTNUMBER),false);
-			FOTAInfo fotaInfo = fotaRepository.findFOTAInfo(fotaJsonData.get(DEVICE_PARTNUMBER),true);
+			//get Active published version for download
+			FOTAInfo fotaInfo = fotaRepository.FOTAByPartNumber(fotaJsonData.get(DEVICE_PARTNUMBER),false,true);
 			String reqDev = getDeviceVersion(rawMessage);
 			if(reqDev.equals(fotaInfo.getSoftVersion()) ||  (fotaInfo != null)){
 			if(fotaJsonData.get(DEVICE_PARTNUMBER).equals(fotaInfo.getDevicePartNumber())){
@@ -1647,16 +1646,17 @@ public class FOTAService {
 	  	        log.debug("updated fotaInfo Details: with inactive pending {}", fotaInfo);
 	  	  }
 			String storeChunk = fotaInfo.getDevicePartNumber().concat(":").concat(fotaInfo.getSoftVersion());
-			
-			for(String key : partNosBin.keySet()){
-				
-				if(key.contains(storeChunk)){
-					partNoHolder = partNosBin.get(key);
-					log.debug("key :"+key);
+			if(partNoHolder !=null){
+				for(String key : partNosBin.keySet()){
+					
+					if(key.contains(storeChunk)){
+						partNoHolder = partNosBin.get(key);
+						log.debug("key :"+key);
+					}
 				}
+				partNoHolder.setAbortFlag(true);
+				log.debug("Abort flag is set:"+partNoHolder.getAbortFlag());	
 			}
-			partNoHolder.setAbortFlag(true);
-			log.debug("Abort flag is set:"+partNoHolder.getAbortFlag());
 		}
 		FOTAInfo fotaInfo = new FOTAInfo();
 		fotaInfo.setDevicePartNumber(fotaInfoDto.getDevicePartNumber());
@@ -1716,7 +1716,7 @@ public class FOTAService {
 		return fotaInfo;
 	}
 
-	public FOTAInfo softDeleteFOTA(String partNo, boolean isOldFile) {
+	/*public FOTAInfo softDeleteFOTA(String partNo, boolean isOldFile) {
 		FOTAInfo fotaInfo = fotaRepository.findFOTAInfo(partNo,isOldFile);
 		if(Objects.nonNull(fotaInfo))
   	  {
@@ -1726,7 +1726,7 @@ public class FOTAService {
   	        log.debug("updated fotaInfo Details: {}", fotaInfo);
   	  }
 		return fotaInfo;
-	}
+	}*/
 	private String getChunk(String rawMessage) {
 
 		byte[] getChunkByte = java.util.Base64.getDecoder().decode(rawMessage);
@@ -1789,69 +1789,68 @@ public class FOTAService {
 		return FOTADeviceList;
 	}
 
-	public List<FOTAInfoDto> FOTAList(String status) {
-		List<FOTAInfoDto> FOTAInfoDtoList = null;
+	public List<FOTAInfo> FOTAList(String status, String partNumberSearch) {
 		List<FOTAInfo> FOTAInfoList = null;
-		if(status.equals("Active")){
+		List<FOTAInfo> FOTAInfoListUpdate = null;
+		FOTAInfoListUpdate = new ArrayList<FOTAInfo>();
+		if(status.equals("ActivePending")){
 			FOTAInfoList = new ArrayList<FOTAInfo>();
-			FOTAInfoDtoList = new ArrayList<FOTAInfoDto>();
-			FOTAInfoList = fotaRepository.getFOTAListByStatus(true);
-			for(FOTAInfo info : FOTAInfoList){
-				FOTAInfoDto infoDto = new FOTAInfoDto();
-				infoDto.setBedId(info.getBedId());
-				infoDto.setBoardId(info.getBoardId());
-				infoDto.setBootCompVer(info.getBootCompVer());
-				infoDto.setDevicePartNumber(info.getDevicePartNumber());
-				/*DateFormat sdf = new SimpleDateFormat("yyyy/MM-dd'T'HH:mm:ss.SSSXXX");
-				
-				Date startTime = sdf.parse("handleHolderBin.get(handleId).getDownloadStartTime()");*/
-				//infoDto.setEffectiveDate(String.valueOf(info.getEffectiveDatetime()));
-				infoDto.setFilePath(info.getFilePath());
-				//infoDto.setFilePattern(info.getFilePattern());
-				infoDto.setmCUSize(info.getMCUSize());
-				//infoDto.setChecksum(info.getChecksum());
-				infoDto.setReleaseNumber(info.getReleaseNumber());
-				infoDto.setSoftVersion(info.getSoftVersion());
-				infoDto.setReleaseDate(String.valueOf(info.getReleaseDate()));
-				infoDto.setUploadUser(info.getUploadUser());
-				infoDto.setModelId(info.getModelId());
-				//infoDto.setOldSoftVerFlag(info.getOldSoftFlag());
-				FOTAInfoDtoList.add(infoDto);
+			boolean softDeleteFlag = false;
+			boolean activePublishedFlag = false;
+			boolean deleteRequest = true;
+			if(StringUtils.isNotEmpty(partNumberSearch)){
+				FOTAInfoList = fotaRepository.getFOTAListByPendingAndSearchStr(false,false,false,false,true,true,partNumberSearch);
+			}else{
+				FOTAInfoList = fotaRepository.getFOTAListByPendingAndSearchStr(false,false,false,false,true,true," ");
 			}
+			for(FOTAInfo info : FOTAInfoList){
+				if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == false && info.getDeleteRequestFlag() == false ){
+					info.setFOTAStatus("Active Pending");
+				}else if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == true && info.getDeleteRequestFlag() == true ){
+					info.setFOTAStatus("Delete Requested");
+				}
+				FOTAInfoListUpdate.add(info);
+			}
+		}else if(status.equals("ActivePublished")){
+			FOTAInfoList = new ArrayList<FOTAInfo>();
+			boolean softDeleteFlag = false;
+			boolean activePublishedFlag = true;
 			
-			
+			FOTAInfoList = fotaRepository.getFOTAListByPublishedAndSearchStr(softDeleteFlag,activePublishedFlag,partNumberSearch);
+			for(FOTAInfo info : FOTAInfoList){
+				if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == true){
+					info.setFOTAStatus("Active Published");
+				}else if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == true){
+					info.setFOTAStatus("Active Published");
+				}
+				FOTAInfoListUpdate.add(info);
+			}
 		}else if(status.equals("All")){
 			FOTAInfoList = new ArrayList<FOTAInfo>();
-			FOTAInfoList = fotaRepository.getFOTAListByStatus(true,false);
-			
+			//To get all active pending and active published
+			FOTAInfoList = fotaRepository.getFOTAListByAllAndSearchStr();
 			for(FOTAInfo info : FOTAInfoList){
-				FOTAInfoDto infoDto = new FOTAInfoDto();
-				FOTAInfoDtoList = new ArrayList<FOTAInfoDto>();
-				infoDto.setBedId(info.getBedId());
-				infoDto.setBoardId(info.getBoardId());
-				infoDto.setBootCompVer(info.getBootCompVer());
-				infoDto.setDevicePartNumber(info.getDevicePartNumber());
-				/*DateFormat sdf = new SimpleDateFormat("yyyy/MM-dd'T'HH:mm:ss.SSSXXX");
-				
-				Date startTime = sdf.parse("handleHolderBin.get(handleId).getDownloadStartTime()");*/
-				//infoDto.setEffectiveDate(String.valueOf(info.getEffectiveDatetime()));
-				infoDto.setFilePath(info.getFilePath());
-				//infoDto.setFilePattern(info.getFilePattern());
-				infoDto.setmCUSize(info.getMCUSize());
-				//infoDto.setChecksum(info.getChecksum());
-				infoDto.setReleaseNumber(info.getReleaseNumber());
-				infoDto.setSoftVersion(info.getSoftVersion());
-				infoDto.setReleaseDate(String.valueOf(info.getReleaseDate()));
-				infoDto.setUploadUser(info.getUploadUser());
-				infoDto.setModelId(info.getModelId());
-				//infoDto.setOldSoftVerFlag(info.getOldSoftFlag());
-				FOTAInfoDtoList.add(infoDto);
+				if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == false){
+					info.setFOTAStatus("Active Pending");
+				}
+				else if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == true){
+					info.setFOTAStatus("Active Published");
+				}else if(info.getSoftDeleteFlag() == true && info.getActivePublishedFlag() == false){
+					info.setFOTAStatus("Inactive Pending");
+				}
+				else if(info.getSoftDeleteFlag() == true && info.getActivePublishedFlag() == true){
+					info.setFOTAStatus("Inactive Published");
+				}/*else if(info.getSoftDeleteFlag() == true && info.getActivePublishedFlag() == true && info.getDeleteRequestFlag() == true){
+					info.setFOTAStatus("Inactive Published deleted");
+				}else if(info.getSoftDeleteFlag() == true && info.getActivePublishedFlag() == false && info.getDeleteRequestFlag() == true){
+					info.setFOTAStatus("Inactive Pending deleted");
+				}*/
+				FOTAInfoListUpdate.add(info);
 			}
-			
 		}
-		return FOTAInfoDtoList;
+		return FOTAInfoListUpdate;
 	}
-	//CRC 32 validation method
+	//CRC 32 validation when user i
 	@SuppressWarnings("resource")
 	public boolean CRC32Calculation(CRC32Dto crc32Dt0) throws Exception {
 	    boolean eof = false;
@@ -2127,5 +2126,341 @@ public class FOTAService {
         crcData2.close();
     }
 		return result;
+	}
+
+	
+	
+	//Get Firmware details to view 
+	public FOTAInfo getFirmwareDetails(Long id) {
+		FOTAInfo fotaInfo = null;
+		fotaInfo = fotaRepository.findOneById(id);
+		if (Objects.nonNull(fotaInfo)) {
+			if (fotaInfo.getSoftDeleteFlag() == false
+					&& fotaInfo.getActivePublishedFlag() == false) {
+				fotaInfo.setFOTAStatus("Active Pending");
+			} else if (fotaInfo.getSoftDeleteFlag() == false
+					&& fotaInfo.getActivePublishedFlag() == true && fotaInfo.getDeleteRequestFlag() == false) {
+				fotaInfo.setFOTAStatus("Active Published");
+			}else if(fotaInfo.getSoftDeleteFlag() == false && fotaInfo.getActivePublishedFlag() == true && fotaInfo.getDeleteRequestFlag() == true ){
+				fotaInfo.setFOTAStatus("Delete Requested");
+			}else if(fotaInfo.getSoftDeleteFlag() == true && fotaInfo.getActivePublishedFlag() == true && fotaInfo.getDeleteRequestFlag() == true ){
+				fotaInfo.setFOTAStatus("Inactive Published");
+			}else if(fotaInfo.getSoftDeleteFlag() == true  && fotaInfo.getDeleteRequestFlag() == true ){
+				fotaInfo.setFOTAStatus("Inactive Pending");
+			}
+		}
+		return fotaInfo;
+	}
+	//ValidateApprover key in CRC 32
+	public boolean validateApproverCRC32(ApproverCRCDto apprDto)
+			throws Exception {
+		FOTAInfo fotaInfo = null;
+		FOTAInfo fotaInfoExist = null;
+		boolean result = false;
+		
+		if(apprDto.getIsValideCRC32()){
+			//Get Active pending FOTA info to approve
+			fotaInfo = fotaRepository.findOneById(apprDto.getFotaId());
+			fotaInfoExist = fotaRepository.FOTAByPartNumber(fotaInfo.getDevicePartNumber(), false, true);
+			if (Objects.nonNull(fotaInfoExist)) {
+				fotaInfoExist.setSoftDeleteFlag(true);
+				fotaRepository.save(fotaInfoExist);
+				log.debug("FotaInfo Details: with Inactive published {}", fotaInfo);
+			}
+			if (Objects.nonNull(fotaInfo)) {
+				fotaInfo.setActivePublishedFlag(true);
+				fotaInfo.setPublishedDateTime(DateUtil.getCurrentDateAndTime());
+				fotaInfo.setPublishedUser(apprDto.getPublishedUser());
+				fotaRepository.save(fotaInfo);
+				log.debug("FotaInfo Details: with active published {}", fotaInfo);
+			}
+			//After active published
+			result = apprDto.getIsValideCRC32();
+		}else{
+			//Get Active pending FOTA info to approve
+			fotaInfo = fotaRepository.findOneById(apprDto.getFotaId());
+			
+			//Approve key in CRC32 calculations
+			result = validateApproverCRC32(fotaInfo,apprDto.getRegion1CRC(), apprDto.getRegion2CRC());
+		}
+		return result;
+	}
+
+	//Approve key in CRC32 calculations
+	@SuppressWarnings("resource")
+	private boolean validateApproverCRC32(FOTAInfo fotaInfo, String region1crc,
+			String region2crc) throws Exception {
+
+		boolean eof = false;
+		boolean result = false;
+		int recordIdx = 0;
+		long upperAddress = 0;
+		
+		long crcStartAddress = 0;
+		long crcEndAddress = 0;
+
+		long crcValueInFile = 0;
+		long dataStartAddress = 0;
+
+		long crc2StartAddress = 0;
+		long crc2EndAddress = 0;
+		//long crc2LocationAddress = 0;
+
+		long crc2ValueInFile = 0;
+		long data2StartAddress = 0;
+
+		ByteArrayOutputStream crcData = new ByteArrayOutputStream();
+		ByteArrayOutputStream crcData2 = new ByteArrayOutputStream();
+
+		int record_length;
+		int record_address;
+		byte[] record_data;
+
+		FileInputStream fs = null;
+
+		if (StringUtils.isNotEmpty(fotaInfo.getRegion1StartAddress())) {
+			crcStartAddress = Long.parseLong(fotaInfo.getRegion1StartAddress(),
+					16);
+		}
+		if (StringUtils.isNotEmpty(fotaInfo.getRegion1EndAddress())) {
+			crcEndAddress = Long.parseLong(fotaInfo.getRegion1EndAddress(), 16);
+		}
+		if (StringUtils.isNotEmpty(fotaInfo.getRegion2StartAddress())) {
+			crc2StartAddress = Long.parseLong(
+					fotaInfo.getRegion2StartAddress(), 16);
+		}
+		if (StringUtils.isNotEmpty(fotaInfo.getRegion2EndAddress())) {
+			crc2EndAddress = Long
+					.parseLong(fotaInfo.getRegion2EndAddress(), 16);
+		}
+		
+		if (StringUtils.isNotEmpty(region1crc)) {
+			crcValueInFile = Long.parseLong(toLittleEndian(region1crc),16);
+		}
+		if (StringUtils.isNotEmpty(region2crc)) {
+			crc2ValueInFile = Long.parseLong(toLittleEndian(region2crc),16);
+		}
+		fs = new FileInputStream(fotaInfo.getFilePath());
+
+		InputStreamReader isr = new InputStreamReader(fs);
+		BufferedReader rdr = new BufferedReader(isr);
+		eof = false;
+		recordIdx = 1;
+		upperAddress = 0;
+		String recordStr;
+		while ((recordStr = rdr.readLine()) != null) {
+			if (eof) {
+				throw new Exception("Data after eof (" + recordIdx + ")");
+			}
+
+			if (!recordStr.startsWith(":")) {
+				throw new Exception("Invalid Intel HEX record (" + recordIdx
+						+ ")");
+			}
+
+			int lineLength = recordStr.length();
+			byte[] hexRecord = new byte[lineLength / 2];
+
+			int sum = 0;
+			for (int i = 0; i < hexRecord.length; i++) {
+				String num = recordStr.substring(2 * i + 1, 2 * i + 3);
+				hexRecord[i] = (byte) Integer.parseInt(num, HEX);
+				sum += hexRecord[i] & 0xff;
+			}
+			sum &= 0xff;
+
+			if (sum != 0) {
+				throw new Exception("Invalid checksum (" + recordIdx + ")");
+			}
+
+			record_length = hexRecord[0];
+			if ((record_length + 5) != hexRecord.length) {
+				throw new Exception("Invalid record length (" + recordIdx + ")");
+			}
+			record_data = new byte[record_length];
+			System.arraycopy(hexRecord, 4, record_data, 0, record_length);
+
+			record_address = ((hexRecord[1] & 0xFF) << 8)
+					+ (hexRecord[2] & 0xFF);
+
+			long addr = record_address | upperAddress;
+			switch (hexRecord[3] & 0xFF) {
+			case 0:
+				for (byte c : record_data) {
+					if (addr >= crcStartAddress && addr <= crcEndAddress) {
+						if (dataStartAddress == 0) {
+							dataStartAddress = addr;
+						}
+						crcData.write(c);
+					}
+
+					if (addr >= crc2StartAddress && addr <= crc2EndAddress) {
+						if (data2StartAddress == 0) {
+							data2StartAddress = addr;
+						}
+						crcData2.write(c);
+					}
+				}
+				break;
+			case 1:
+				break;
+			case 2:
+				if (record_length == 2) {
+					upperAddress = ((record_data[0] & 0xFF) << 12)
+							+ (((record_data[1] & 0xFF)) << 4);
+				} else {
+					throw new Exception("Invalid SEG record (" + recordIdx
+							+ ")");
+				}
+				break;
+			case 4:
+				if (record_length == 2) {
+					upperAddress = ((record_data[0] & 0xFF) << 24)
+							+ (((record_data[1] & 0xFF)) << 16);
+				} else {
+					throw new Exception("Invalid EXT_LIN record (" + recordIdx
+							+ ")");
+				}
+				break;
+			default:
+				break;
+			}
+			recordIdx++;
+		}
+		;
+		rdr.close();
+		isr.close();
+		fs.close();
+
+		// CRC Calculation Table initialize
+		int crc;
+		int i;
+		if (crcStartAddress != 0) {
+			byte[] crcBytes = crcData.toByteArray();
+
+			crc = 0xFFFFFFFF; // initial contents of LFBSR
+			int poly = 0xEDB88320; // reverse polynomial
+
+			for (byte b : crcBytes) {
+				int temp = (crc ^ b) & 0xff;
+
+				// read 8 bits one at a time
+				for (i = 0; i < 8; i++) {
+					if ((temp & 1) == 1)
+						temp = (temp >>> 1) ^ poly;
+					else
+						temp = (temp >>> 1);
+				}
+				crc = (crc >>> 8) ^ temp;
+			}
+
+			long tmpEndAddress = dataStartAddress + crcBytes.length;
+			while (tmpEndAddress <= (crcEndAddress)) {
+				int temp = (crc ^ 0xFF) & 0xff;
+
+				for (i = 0; i < 8; i++) {
+					if ((temp & 1) == 1)
+						temp = (temp >>> 1) ^ poly;
+					else
+						temp = (temp >>> 1);
+				}
+				crc = (crc >>> 8) ^ temp;
+				tmpEndAddress++;
+			}
+
+			// flip bits
+			crc = crc ^ 0xffffffff;
+			//crcValueInFile = ((int) c & 0xFF);
+			result = (crc == (int) (long) crcValueInFile);
+			crcData.close();
+			log.debug("Calculated Region1CRC32: "
+					+ (String.format("0x%08X", crc)) + "In file :"
+					+ (String.format("0x%08X", (crcValueInFile))));
+
+		}
+		if (crc2StartAddress != 0 && result == true) {
+			byte[] crc2Bytes = crcData2.toByteArray();
+
+			crc = 0xFFFFFFFF; // initial contents of LFBSR
+			int poly2 = 0xEDB88320; // reverse polynomial
+
+			for (byte b : crc2Bytes) {
+				int temp = (crc ^ b) & 0xff;
+
+				// read 8 bits one at a time
+				for (i = 0; i < 8; i++) {
+					if ((temp & 1) == 1)
+						temp = (temp >>> 1) ^ poly2;
+					else
+						temp = (temp >>> 1);
+				}
+				crc = (crc >>> 8) ^ temp;
+			}
+
+			long tmp2EndAddress = data2StartAddress + crc2Bytes.length;
+			while (tmp2EndAddress <= (crc2EndAddress)) {
+				int temp = (crc ^ 0xFF) & 0xff;
+
+				for (i = 0; i < 8; i++) {
+					if ((temp & 1) == 1)
+						temp = (temp >>> 1) ^ poly2;
+					else
+						temp = (temp >>> 1);
+				}
+				crc = (crc >>> 8) ^ temp;
+				tmp2EndAddress++;
+			}
+			// flip bits
+			crc = crc ^ 0xffffffff;
+			log.debug("Calculated Region2CRC32: "
+					+ (String.format("0x%08X", crc)) + "In file :"
+					+ (String.format("0x%08X", (crc2ValueInFile))));
+			result &= (crc == (int) (long) crc2ValueInFile);
+			crcData2.close();
+		}
+		return result;
+
+	}
+
+	public FOTAInfo firmwareDelete(Long id, String userRole) {
+
+		FOTAInfo fotaInfo = null;
+		fotaInfo = fotaRepository.findOneById(id);
+		if (Objects.nonNull(fotaInfo)) {
+			//If FOTA ADMIN delete & //If FOTA APPROVER delete
+			if(userRole.equals("FOTA_ADMIN")){
+				//Active pending delete & else Active published  delete request
+				if (fotaInfo.getSoftDeleteFlag() == false
+						&& fotaInfo.getActivePublishedFlag() == false) {
+					fotaInfo.setSoftDeleteFlag(true);
+					fotaInfo.setDeleteRequestFlag(true);
+					fotaRepository.save(fotaInfo);
+				}else if (fotaInfo.getSoftDeleteFlag() == false
+						&& fotaInfo.getActivePublishedFlag() == true) {
+					fotaInfo.setDeleteRequestFlag(true);
+					fotaRepository.save(fotaInfo);
+				}
+				
+			}else if(userRole.equals("FOTA_APPROVER")){
+				if (fotaInfo.getSoftDeleteFlag() == false
+						&& fotaInfo.getActivePublishedFlag() == false) {
+					fotaInfo.setSoftDeleteFlag(true);
+					fotaInfo.setDeleteRequestFlag(true);
+					fotaRepository.save(fotaInfo);
+				}else if (fotaInfo.getSoftDeleteFlag() == false
+						&& fotaInfo.getActivePublishedFlag() == true && fotaInfo.getDeleteRequestFlag() == false) {
+					fotaInfo.setSoftDeleteFlag(true);
+					fotaInfo.setDeleteRequestFlag(true);
+					fotaRepository.save(fotaInfo);
+				}else if (fotaInfo.getSoftDeleteFlag() == false
+						&& fotaInfo.getActivePublishedFlag() == true
+						&& fotaInfo.getDeleteRequestFlag() == true) {
+					fotaInfo.setSoftDeleteFlag(true);
+					fotaRepository.save(fotaInfo);
+				}
+			}
+		}
+
+		return fotaInfo;
 	}
 }

@@ -74,10 +74,12 @@ public class TimsInputReaderService {
 	public static boolean failureFlag = false;
 	public static boolean mandatoryFieldFlag = true;
 	public static boolean monarchBluetoothFlag = true;
+	public static boolean  serialNumberFlag = true;
+	public static boolean  CSVFileFlag = true;
 	@Inject
 	private TimsService timsService;
 	
-	//@Scheduled(cron="0/5 * * * * * ")
+	@Scheduled(cron="00 30 02 * * * ")
 	public void ExecuteTIMSJob() throws Exception
 	{
 		
@@ -86,6 +88,8 @@ public class TimsInputReaderService {
 		log.debug("Status           TIMS Id        Serial Number        Result        Remarks");
 		this.mandatoryFieldFlag = true;
 		this.monarchBluetoothFlag = true;
+		this.serialNumberFlag = true;
+		
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
 		
@@ -109,6 +113,7 @@ public class TimsInputReaderService {
 		    	timsService.CASE10_PatientHasMonarchAddVisivest_VEST(record);
 		    	//timsService.CASE11_PatientExistsWithNODevice_VEST(record);
 		    	timsService.CASE12_PatientHasMonarchMergeExistingVisivest_VEST(record);
+		    	timsService.CASE13_ExistedSerialNumberandDifferentHillromID(record);
 		    	
 		    }
 
@@ -131,12 +136,21 @@ public class TimsInputReaderService {
 			    	timsService.CASE10_PatientHasVisivestAddMonarch_MONARCH(record);
 			    	//timsService.CASE11_PatientExistsWithNODevice_MONARCH(record);
 			    	timsService.CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH(record);
+			    	timsService.CASE13_ExistedSerialNumberandDifferentHillromID(record);
 		    	}else{
 		    		monarchBluetoothFlag = false;
 		    		log.debug("Created       " +record.getTims_cust()+ "        " +record.getSerial_num()+ "        "+"Failure"+ "        "
 							+ "Bluetooth Id / Connectivity Id is not present");
 		    	}
 		    }
+		}
+		if(!CSVFileFlag)
+		{
+			throw new Exception("any exceoption error.");
+		}
+		if(!serialNumberFlag)
+		{
+			throw new Exception("any exceoption error.");
 		}
         if(!monarchBluetoothFlag){
 			
@@ -173,7 +187,14 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{        
+		     // String csvFile = "C:/home/brett/flat_file_script/flatfile.csv";
 		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
+		      File flatFile = new File(csvFile);
+		      if(!flatFile.exists()) { 
+		    	  log.debug("Failure        NA               NA             Failure           The csv file is not present ");
+		    	  CSVFileFlag = false;
+		          
+		      }
 		  //  log.debug("Started reading flat file : " + csvFile);
 	        String line = "";
 	        String cvsSplitBy = ",";

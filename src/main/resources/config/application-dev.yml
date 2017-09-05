@@ -52,5 +52,5 @@ spring:
     changePrescription:
         changePrescriptionEmailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com
         
- timsLog:
+    timsLog:
         timsLogEmailids: abhishek.tiwari@lnttechservices.com

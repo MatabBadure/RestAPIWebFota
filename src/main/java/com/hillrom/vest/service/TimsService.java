@@ -350,7 +350,9 @@ public class TimsService {
 	  }
 	  catch(IOException e)
 	  {
-		log.error("Exception Occured"+e.getMessage());
+		  log.error("Exception Occured"+e.getMessage()); 
+	  
+		  
 	  }
 	  finally
 	  {
@@ -373,6 +375,7 @@ public class TimsService {
 		File folder = new File(logfilePath);
 		File[] listOfFiles = folder.listFiles();
 		List<String> returnLogFiles = new LinkedList<>();
+		BufferedReader br = null;
 		for (File file : listOfFiles) {
 		    if (file.isFile()) {
 		    	try {
@@ -380,17 +383,30 @@ public class TimsService {
 	                Runtime rt = Runtime.getRuntime();
 	                String[] cmd = { "/bin/sh", "-c", "grep -c '"+matchStr+"' '"+logfilePath+file.getName()+"' " };
 	                Process proc = rt.exec(cmd);
-	                BufferedReader is = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+	                 br = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 	                String line;
-	                while ((line = is.readLine()) != null) {
+	                while ((line = br.readLine()) != null) {
 	                    returnLogFiles.add(file.getName()+","+file+","+(Integer.parseInt(line)>0?"Success":"Failure")+","+file.lastModified());
 	                }			    	
 			    	
-		    	}catch(Exception ex){
+		    	   }catch(Exception ex){
 		    		ex.printStackTrace();
+		    	 }
+		    	finally
+		    	{
+		    		try {
+		    			if(br!=null){
+						br.close();
+		    			}
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 		    	}
+		    	      	
 		    }
 		}
+		
 		
 		return returnLogFiles;
 

@@ -50,3 +50,5 @@ spring:
         surveyreportemailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com
     changePrescription:
         changePrescriptionEmailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com
+    timsLog:
+        timsLogEmailids: abhishek.tiwari@lnttechservices.com,Raghu.NT@Lnttechservices.com,nagendra.tv@lnttechservices.com,vijayanand.jayapal@lnttechservices.com

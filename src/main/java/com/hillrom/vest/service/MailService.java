@@ -167,6 +167,29 @@ public class MailService {
     }
 
     @Async
+    public void sendEmail(String[] to, String subject, String content, boolean isMultipart, boolean isHtml, File attachmentFile, boolean isTimsLog) {
+        log.debug("Send e-mail[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
+                isMultipart, isHtml, to, subject, content);
+
+        // Prepare message using a Spring helper
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, CharEncoding.UTF_8);
+            message.setTo(to);
+            message.setFrom(from);
+            message.setSubject(subject);
+            message.setText(content, isHtml);
+            message.addAttachment(attachmentFile.getName(), attachmentFile);
+            
+            javaMailSender.send(mimeMessage);
+            log.debug("Sent e-mail to User '{}'", to);
+        } catch (Exception e) {
+            log.warn("E-mail could not be sent to user '{}', exception is: {}", to, e.getMessage());
+        }
+        
+    }
+   
+    @Async
     public void sendActivationEmail(User user, String baseUrl) {
         log.debug("Sending activation e-mail to '{}'", user.getEmail());
         Locale locale = getLocale(user);
@@ -592,6 +615,23 @@ public class MailService {
      }
     
 
+    public void sendTIMSLog(String fileName) throws IOException{
+        log.debug("Sending TIMS log to '{}'", "test.lnt.hillrom@gmail.com");
+        Context context = new Context();
+        context.setVariable("baseUrl", baseUrl);
+        String content = "";
+        String subject = "";
+               
+        File file = new File(Constants.TIMS_LOG_LOCATION + fileName + ".log");
+        
+        log.debug("Name : " + fileName + " File : " +  file);
+        
+		content = "Emailing TIMS Log";
+        subject = "Tims Log"; 
+        String recipients = env.getProperty("spring.timsLog.timsLogEmailids");
+		log.debug("Sending TIMS log report '{}'", recipients);
+        sendEmail(recipients.split(","), subject, content, true,true, file,true);
+     }
     
         public void sendMailTo18YearOldPatient(User user) {
         this.sendActivationEmail(user, this.baseUrl );

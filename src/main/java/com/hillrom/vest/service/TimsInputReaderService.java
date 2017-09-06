@@ -71,6 +71,7 @@ public class TimsInputReaderService {
 	
 	public static boolean processed_atleast_one = false;
 	
+	public String logFileName;
 	public static boolean failureFlag = false;
 	public static boolean mandatoryFieldFlag = true;
 	public static boolean monarchBluetoothFlag = true;
@@ -79,12 +80,16 @@ public class TimsInputReaderService {
 	@Inject
 	private TimsService timsService;
 	
+	@Inject
+	private MailService mailService;
 	@Scheduled(cron="00 30 08 * * * ")
 	public void ExecuteTIMSJob() throws Exception
 	{
 		
+		logFileName  = "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());	
 		try{
-		MDC.put("logFileName", "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
+    MDC.put("logFileName", logFileName);
+
 		log.debug("Status           TIMS Id        Serial Number        Result        Remarks");
 		this.mandatoryFieldFlag = true;
 		this.monarchBluetoothFlag = true;
@@ -178,6 +183,7 @@ public class TimsInputReaderService {
 		}
 		
 		}catch(Exception ex){
+			mailService.sendTIMSLog(logFileName);
 			ex.printStackTrace();
 			throw new HillromException("Error in TIMS Script Execution " , ex);
 		}

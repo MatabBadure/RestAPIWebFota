@@ -457,7 +457,7 @@ public class QueryConstants {
 			+ " lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString) or "
 
 			+ " lower(user.hillrom_id) like lower(:queryString)) "			
-			+ " where clinic.id= ':clinicId' and patient_dev_assoc.ptype in ('VEST','ALL')";
+			+ " where clinic.id= ':clinicId' and (pc.last_therapy_session_date is null || pc.last_therapy_session_date=(select max(last_therapy_session_date) from PATIENT_COMPLIANCE_MONARCH where user_id=user.id)) and patient_dev_assoc.ptype in ('VEST','ALL')";
 	
 	
 	public static String QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_ADMIN_MONARCH_DEVTYPE_PART1 = " select user.id,user.email,user.first_name as firstName,user.last_name as lastName,  "

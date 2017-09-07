@@ -107,7 +107,7 @@ public class TimsInputReaderService {
 		
 		  if(record.getDevice_type().equalsIgnoreCase("VEST")){
 		      	timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record);
-		    	//timsService.CASE2_PatientExistsWithNODevice_VEST(record);
+		    	timsService.CASE2_PatientExistsWithNODevice_VEST(record);
 		    	timsService.CASE3_PatientHasMonarchAddVisivest_VEST(record);
 		    	timsService.CASE4_PatientHasDifferentVisivestSwap_VEST(record);
 		        timsService.CASE5_DeviceOwnedByShell_VEST(record);
@@ -193,6 +193,7 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{        
+		    //  String csvFile = "C:/home/brett/flat_file_script/flatfile.csv";
 		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
 		      File flatFile = new File(csvFile);
 		      if(!flatFile.exists()) { 

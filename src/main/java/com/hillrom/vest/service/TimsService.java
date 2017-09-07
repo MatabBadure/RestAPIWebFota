@@ -845,6 +845,7 @@ public class TimsService {
 				managePatientDevice(patientInfoDTO);
 
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				JSONObject returnValues =   managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());

@@ -32,7 +32,7 @@ SET today_date = now();
 IF operation_type_indicator = 'CREATE' THEN
 
 	SELECT `patient_id`, `serial_number` INTO temp_patient_info_id, temp_serial_number FROM `PATIENT_DEVICES_ASSOC`
-	WHERE `serial_number` = pat_old_device_serial_number and `is_active` = 1;
+	WHERE `serial_number` = pat_old_device_serial_number;
 
 
 	

@@ -46,6 +46,7 @@ import com.hillrom.vest.domain.FOTA.FOTAInfo;
 import com.hillrom.vest.service.FOTA.FOTAService;
 import com.hillrom.vest.web.rest.FOTA.dto.ApproverCRCDto;
 import com.hillrom.vest.web.rest.FOTA.dto.CRC32Dto;
+import com.hillrom.vest.web.rest.FOTA.dto.FOTADeviceDto;
 import com.hillrom.vest.web.rest.FOTA.dto.FOTAInfoDto;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
@@ -230,14 +231,7 @@ public class FOTAResource {
 			@RequestParam(value = "status", required = true) String status,
 			@RequestParam(value = "searchString", required = true) String searchString) {
 		try {
-			// FOTA Part Number search string
-			// String partNumbberSearch =
-			// "lower(device_part_number) like lower(:searchString)";
-			// This is applicable only when search is performed by HCP or
-			// FOTA product type search string
-			// String productTypeSerach =
-			// " lower(product_type) like lower(:queryString)";
-
+			
 			List<FOTAInfo> FOTAInfoList = fotaService.FOTAList(status,
 					searchString);
 
@@ -277,8 +271,9 @@ public class FOTAResource {
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "status", required = false) String status) {
 		try {
-			List<FOTADeviceFWareUpdate> fotaDeviceList = fotaService
+			List<FOTADeviceDto> fotaDeviceList = fotaService
 					.getFOTADeviceList(status);
+			
 
 			int firstResult = PaginationUtil.generatePageRequest(offset, limit)
 					.getOffset();
@@ -286,7 +281,7 @@ public class FOTAResource {
 					+ PaginationUtil.generatePageRequest(offset, limit)
 							.getPageSize();
 
-			List<FOTADeviceFWareUpdate> fotaDeviceSubList = new ArrayList<FOTADeviceFWareUpdate>();
+			List<FOTADeviceDto> fotaDeviceSubList = new ArrayList<FOTADeviceDto>();
 
 			if (firstResult < fotaDeviceList.size()) {
 				maxResults = maxResults > fotaDeviceList.size() ? fotaDeviceList
@@ -294,7 +289,7 @@ public class FOTAResource {
 				fotaDeviceSubList = fotaDeviceList.subList(firstResult,
 						maxResults);
 			}
-			Page<FOTADeviceFWareUpdate> page = new PageImpl<FOTADeviceFWareUpdate>(
+			Page<FOTADeviceDto> page = new PageImpl<FOTADeviceDto>(
 					fotaDeviceSubList, PaginationUtil.generatePageRequest(
 							offset, limit), Long.valueOf(fotaDeviceList.size()));
 

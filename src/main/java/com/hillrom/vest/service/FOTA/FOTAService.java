@@ -24,6 +24,12 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.SOFT_VER_DATE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.TOTAL_CHUNK;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.YES;
 
+import static com.hillrom.vest.config.FOTA.FOTAConstants.SUCCESS_LIST;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.FAILURE_LIST;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.ABORTED_LIST;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.ALL;
+
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -55,6 +61,7 @@ import net.minidev.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.joda.time.DateTime;
+import org.omg.CORBA.Object;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -73,6 +80,7 @@ import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.FOTA.FOTAParseUtil;
 import com.hillrom.vest.web.rest.FOTA.dto.ApproverCRCDto;
 import com.hillrom.vest.web.rest.FOTA.dto.CRC32Dto;
+import com.hillrom.vest.web.rest.FOTA.dto.FOTADeviceDto;
 import com.hillrom.vest.web.rest.FOTA.dto.FOTAInfoDto;
 @Service
 @Transactional
@@ -643,298 +651,6 @@ public class FOTAService {
 		
 	}
 	
-	public String FOTAUpdate1(String rawMessage) {
-		
-		int countInt = 0;
-		String decoded_string = "";
-		String resultPair = "";
-		String handlePair = "";
-		String totalChunkPair = "";
-		String bufferLenPair = "";
-		String bufferPair = "";
-		String crcPair = "";
-		String finalResponseStr = new String();
-		
-
-		Map<String, String> fotaJsonData = new LinkedHashMap<String, String>();
-
-		// Decoding raw data
-		decoded_string = decodeRawMessage(rawMessage);
-		// Parsing into key value pair
-		fotaJsonData = FOTAParseUtil
-				.getFOTAJsonDataFromRawMessage(decoded_string);
-
-		// Global handler
-		HM_HandleHolder globalHandleHolder = HM_HandleHolder.getInstance();
-		
-		String crsResultValue = "";
-		
-		// Checking if request Type is 01 & //Checking if request Type is 02
-		
-		if(validateCRC(rawMessage)){
-			//crcResult = "Yes";
-			crsResultValue = asciiToHex(YES);
-			
-			//
-			
-			//Get Fota Details based on part numbers
-			if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE1)) {
-			//String diviceVer = getDeviceVersion(rawMessage);
-			//get Active published version for download
-			FOTAInfo fotaInfo = fotaRepository.FOTAByPartNumber(fotaJsonData.get(DEVICE_PARTNUMBER),false,true);
-			String reqDev = getDeviceVersion(rawMessage);
-			if(reqDev.equals(fotaInfo.getSoftVersion()) ||  (fotaInfo != null)){
-			if(fotaJsonData.get(DEVICE_PARTNUMBER).equals(fotaInfo.getDevicePartNumber())){
-				int totalChunks = 0;
-				HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE),fotaInfo.getFilePath());
-				
-				Map<String,String> partNumberWithCount = new LinkedHashMap<String, String>();
-				String handleId = getHandleNumber();
-				SimpleDateFormat sdf = new SimpleDateFormat("MM.dd.yyyy.HH.mm.ss");
-				
-				partNumberWithCount.put(fotaJsonData.get(DEVICE_PARTNUMBER), String.valueOf(0));
-				partNumberWithCount.put("TimeStamp", sdf.format(new Date()));
-				
-				globalHandleHolder.getHandleWithPartNumber().put(handleId,partNumberWithCount);
-				
-				totalChunks = hmp01.getTotalChunk();
-				// Response pair1
-				resultPair = getResponePairResult();
-				
-				handlePair = getResponePair1();
-				
-				// Handle in raw format
-				String handleIdRaw = hexToAscii(asciiToHex(toLittleEndian((handleId))));
-
-				// Response pair2
-				totalChunkPair = getResponePair2();
-
-				// Total chunk in raw format
-				String totalChunkRaw = getChunkRaw(totalChunks);
-
-				// Response pair3 crc
-				crcPair = getResponePair3();
-				
-				//CRC calculation 
-				String crcInput = resultPair.concat(crsResultValue).concat(handlePair).concat(handleIdRaw).concat(totalChunkPair).concat(totalChunkRaw).concat(crcPair);
-				
-				byte[] encodedCRC = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(crcInput));
-				String encodedString = new String(encodedCRC);
-				log.debug("encodedString: " + encodedString);
-				
-				String crcstr = calculateCRC(encodedString);
-				// Final response String
-				finalResponseStr = getAllResponseCheckUpdate(resultPair,crsResultValue,handlePair, handleIdRaw,
-						totalChunkPair, totalChunkRaw, crcPair, crcstr);
-				log.debug("finalResponseStr: " + finalResponseStr);
-				
-				}
-			}else{
-				crsResultValue = asciiToHex("NO");
-				resultPair = getResponePairResult();
-				crcPair = getResponePair3();
-				String crsRaw = resultPair.concat(crsResultValue).concat(
-						crcPair);
-
-				byte[] encodedCRC = java.util.Base64.getEncoder().encode(
-						DatatypeConverter.parseHexBinary(crsRaw));
-				String encodedString = new String(encodedCRC);
-				log.debug("encodedString: " + encodedString);
-				String crcValue = calculateCRC(encodedString);
-				
-				finalResponseStr = resultPair.concat(crsResultValue).concat(crcPair).concat(crcValue);
-			}
-			}else if(fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE2)){
-				String handleId = "";
-				int chunkCount = 0;
-				if (fotaJsonData.get(PREV_REQ_STATUS).equals(INIT)) {
-					//Get handle from request
-					handleId = getHandleFromRequest(rawMessage);
-					log.debug("handleId from Request:" + handleId);
-					
-					Map<String,String> partNumberWithCount = globalHandleHolder.getHandleWithPartNumber().get(handleId);
-					
-					Map<String,String> updatePartNumberWithCount = new LinkedHashMap<String, String>();
-					
-					for(Map.Entry<String,String> partDetail : partNumberWithCount.entrySet()){
-						/*if(partDetail.getKey().equals(fotaInfo.getDevicePartNumber()) && partDetail.getValue().equals(String.valueOf(chunkCount))){*/
-						if(partDetail.getValue().equals(String.valueOf(chunkCount))){
-							updatePartNumberWithCount.put(partDetail.getKey(), String.valueOf(chunkCount));
-							globalHandleHolder.getHandleWithPartNumber().put(handleId,updatePartNumberWithCount);
-							HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE),"");
-							String zeroChunk = hmp01.getFileChunks().get(chunkCount);
-							//Zero the Chunk in raw format
-							buffer = hexToAscii(asciiToHex(zeroChunk));
-							log.debug("buffer Encoded:" + buffer);
-							
-							//Chunk size in hex byte
-							bufferLen = (zeroChunk.length() / 2);
-							log.debug("bufferLen:" + bufferLen);
-							
-						} 
-					}
-				}else if (fotaJsonData.get(PREV_REQ_STATUS).equals(OK)) {
-						//Get handle from request
-						handleId = getHandleFromRequest(rawMessage);
-						log.debug("handleId from Request:" + handleId);
-						
-						Map<String,String> partNumberWithCount = globalHandleHolder.getHandleWithPartNumber().get(handleId);
-						
-						Map<String,String> updatePartNumberWithCount = new LinkedHashMap<String, String>();
-						for(Map.Entry<String,String> partDetail : partNumberWithCount.entrySet()){
-							/*if(partDetail.getKey().equals(fotaInfo.getDevicePartNumber())){*/
-								//Part Number
-								HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE),"");
-								String countStr = partDetail.getValue();
-								countInt = Integer.parseInt(countStr);
-								countInt = countInt + 1;
-								
-								updatePartNumberWithCount.put(partDetail.getKey(), String.valueOf(countInt));
-								globalHandleHolder.getHandleWithPartNumber().put(handleId,updatePartNumberWithCount);
-								
-								String okSendChunk = hmp01.getFileChunks().get(countInt);
-								//OK Chunk in raw format
-								buffer = hexToAscii(asciiToHex(okSendChunk));
-								log.debug("buffer Encoded:" + buffer);
-								
-								//Chunk size in hex byte
-								bufferLen = (okSendChunk.length() / 2);
-								log.debug("bufferLen:" + bufferLen);
-							//} 
-						}	
-						
-				} else if (fotaJsonData.get(PREV_REQ_STATUS).equals(NOT_OK)) {
-						//Get handle from request
-						handleId = getHandleFromRequest(rawMessage);
-						log.debug("handleId from Request:" + handleId);
-						Map<String,String> partNumberWithCount = globalHandleHolder.getHandleWithPartNumber().get(handleId);
-						
-						Map<String,String> updatePartNumberWithCount = new LinkedHashMap<String, String>();
-						for(Map.Entry<String,String> partDetail : partNumberWithCount.entrySet()){
-							/*if(partDetail.getKey().equals(fotaInfo.getDevicePartNumber())){*/
-								//Part Number
-								HM_part01 hmp01 = HM_part01.getInstance(rawMessage,fotaJsonData.get(REQUEST_TYPE),"");
-								String countStr = partDetail.getValue();
-								countInt = Integer.parseInt(countStr);
-								//countInt = countInt + 1;
-								updatePartNumberWithCount.put(partDetail.getKey(), String.valueOf(countInt));
-								globalHandleHolder.getHandleWithPartNumber().put(handleId,updatePartNumberWithCount);
-								
-								//Previous Chunk
-								String okSendChunk = hmp01.getFileChunks().get(countInt);
-								
-								//Buffer values
-								buffer = hexToAscii(asciiToHex(okSendChunk));
-								log.debug("buffer Encoded:" + buffer);
-
-								//Chunk size in hex byte
-								bufferLen = (okSendChunk.length() / 2);
-								log.debug("bufferLen:" + bufferLen);
-								
-							//} 
-						}	
-				}
-				// result pair1
-				resultPair = getResponePairResult();
-				
-				//Init and ok send result is ok
-				//crcResult = "OK";
-				crsResultValue = asciiToHex(OK);
-				
-				//handlePair Init Pair1 HANDLE_EQ
-				
-				handlePair = getResponePair1();
-				//handlePair = asciiToHex(HANDLE_EQ);
-				
-				//Handle in raw format(handle Value)
-				String handleIdRaw = hexToAscii(asciiToHex(toLittleEndian((handleId))));
-				
-				//bufferLenPair Init Pair2(BUFFER_LEN_EQ)
-				bufferLenPair = getInitResponsePair2();
-				
-				//String bufferLenRaw =  hexToAscii(asciiToHex(Integer.toHexString(bufferLen)));
-				String bufferLenRaw =  getBufferLenTwoHexByte(bufferLen);
-				
-				//bufferPair Init Pair2 BUFFER_EQ
-				bufferPair = getInitReponsePair3();
-				
-				//crcPair pair4 Init  crc
-				crcPair = getResponePair3();
-				
-				String crsRaw = resultPair.concat(crsResultValue).concat(handlePair).concat(handleIdRaw).concat(bufferLenPair).concat(bufferLenRaw).concat(bufferPair).concat(buffer).concat(crcPair);
-				
-				byte[] encodedCRC = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(crsRaw));
-				String encodedString = new String(encodedCRC);
-				log.debug("encodedString: " + encodedString);
-				
-				String crcstr = calculateCRC(encodedString);
-				
-				// Final response String
-				finalResponseStr = getInitOKResponseSendChunk(resultPair,crsResultValue,handlePair, handleIdRaw,
-						bufferLenPair, bufferLenRaw, bufferPair, buffer,crcPair,crcstr,countInt);
-				log.debug("finalResponseStr: " + finalResponseStr);
-				
-			}else if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE3)) {
-				if (fotaJsonData.get(RESULT).equals(OK)) {
-					// result pair1
-					resultPair = getResponePairResult();
-					//crcResult = "OK";
-					crsResultValue = asciiToHex(OK);
-					crcPair = getResponePair3();
-					
-					String crsRaw = resultPair.concat(crsResultValue).concat(crcPair);
-					
-					byte[] encodedCRC = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(crsRaw));
-					String encodedString = new String(encodedCRC);
-					log.debug("encodedString: " + encodedString);
-					
-					String crcValue = calculateCRC(encodedString);
-					//Final String 
-					finalResponseStr = resultPair.concat(crsResultValue).concat(crcPair).concat(crcValue);
-				} else if (fotaJsonData.get(RESULT).equals(NOT_OK)) {
-					// result pair1
-					resultPair = getResponePairResult();
-					//crcResult = "OK";
-					crsResultValue = asciiToHex(NOT_OK);
-					crcPair = getResponePair3();
-					
-					String crsRaw = resultPair.concat(crsResultValue).concat(
-							crcPair);
-
-					byte[] encodedCRC = java.util.Base64.getEncoder().encode(
-							DatatypeConverter.parseHexBinary(crsRaw));
-					String encodedString = new String(encodedCRC);
-					log.debug("encodedString: " + encodedString);
-					String crcValue = calculateCRC(encodedString);
-					
-					//Final String 
-					finalResponseStr = resultPair.concat(crsResultValue).concat(crcPair).concat(crcValue);
-				}
-			}
-		
-		}else if(!validateCRC(rawMessage)){
-			//crcResult = "NOT OK";
-			crsResultValue = asciiToHex(NOT_OK);
-			resultPair = getResponePairResult();
-			crcPair = getResponePair3();
-			String crsRaw = resultPair.concat(crsResultValue).concat(
-					crcPair);
-
-			byte[] encodedCRC = java.util.Base64.getEncoder().encode(
-					DatatypeConverter.parseHexBinary(crsRaw));
-			String encodedString = new String(encodedCRC);
-			log.debug("encodedString: " + encodedString);
-			String crcValue = calculateCRC(encodedString);
-			
-			finalResponseStr = resultPair.concat(crsResultValue).concat(crcPair).concat(crcValue);
-		}
-		
-			byte[] encoded = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(finalResponseStr));
-			String finalString1 = new String(encoded);
-			log.error("finalString1: " + finalString1);
-			return finalString1;
-		
-	}
 	
 	private String getDeviceVersion(String rawMessage) {
 
@@ -1645,18 +1361,7 @@ public class FOTAService {
 				fotaRepository.save(fotaInfo);
 	  	        log.debug("updated fotaInfo Details: with inactive pending {}", fotaInfo);
 	  	  }
-			String storeChunk = fotaInfo.getDevicePartNumber().concat(":").concat(fotaInfo.getSoftVersion());
-			if(partNoHolder !=null){
-				for(String key : partNosBin.keySet()){
-					
-					if(key.contains(storeChunk)){
-						partNoHolder = partNosBin.get(key);
-						log.debug("key :"+key);
-					}
-				}
-				partNoHolder.setAbortFlag(true);
-				log.debug("Abort flag is set:"+partNoHolder.getAbortFlag());	
-			}
+			
 		}
 		FOTAInfo fotaInfo = new FOTAInfo();
 		fotaInfo.setDevicePartNumber(fotaInfoDto.getDevicePartNumber());
@@ -1767,26 +1472,91 @@ public class FOTAService {
 		return val;
 	}
 
-	public List<FOTADeviceFWareUpdate> getFOTADeviceList(String status) {
-		
+	public List<FOTADeviceDto> getFOTADeviceList(String status) {
+
 		List<FOTADeviceFWareUpdate> FOTADeviceList = null;
-		
-		if(status.equals("Success")){
+		List<FOTADeviceDto> FOTADeviceDtoList = null;
+
+		if (status.equals(SUCCESS_LIST)) {
 			FOTADeviceList = new ArrayList<FOTADeviceFWareUpdate>();
-			FOTADeviceList = fotaDeviceRepository.getFOTADeviceListByStatus(status);
-		}else if(status.equals("Failure")){
-			FOTADeviceList = new ArrayList<FOTADeviceFWareUpdate>();
-			FOTADeviceList = fotaDeviceRepository.getFOTADeviceListByStatus(status);
+			FOTADeviceList = fotaDeviceRepository
+					.getFOTADeviceListByStatus(status);
+			FOTADeviceDtoList = setDeviceValues(FOTADeviceList);
 			
-		}else if(status.equals("All")){
-			String statusSuccess = "Success";
-			String statusFailure = "Failure";
-			FOTADeviceList = new ArrayList<FOTADeviceFWareUpdate>();
-			FOTADeviceList = fotaDeviceRepository.getFOTADeviceListByAll(statusSuccess,statusFailure);
 			
+		} else if (status.equals(FAILURE_LIST)) {
+			FOTADeviceList = new ArrayList<FOTADeviceFWareUpdate>();
+			FOTADeviceList = fotaDeviceRepository
+					.getFOTADeviceListByStatus(status);
+			FOTADeviceDtoList = setDeviceValues(FOTADeviceList);
+
+		} else if (status.equals(ABORTED_LIST)) {
+			FOTADeviceList = new ArrayList<FOTADeviceFWareUpdate>();
+			FOTADeviceList = fotaDeviceRepository
+					.getFOTADeviceListByStatus(status);
+			FOTADeviceDtoList = setDeviceValues(FOTADeviceList);
+
+		} else if (status.equals(ALL)) {
+			
+			FOTADeviceList = new ArrayList<FOTADeviceFWareUpdate>();
+			FOTADeviceList = fotaDeviceRepository.getFOTADeviceListByAll(SUCCESS_LIST, FAILURE_LIST,ABORTED_LIST);
+			FOTADeviceDtoList = setDeviceValues(FOTADeviceList);
 		}
+		return FOTADeviceDtoList;
+	}
+
+	private List<FOTADeviceDto> setDeviceValues(
+			List<FOTADeviceFWareUpdate> FOTADeviceList) {
+		List<FOTADeviceDto> FOTADeviceDtoList = new ArrayList<FOTADeviceDto>();
 		
-		return FOTADeviceList;
+		for (FOTADeviceFWareUpdate fwareObj : FOTADeviceList) {
+			FOTAInfo fotaInfo = null;
+			FOTADeviceDto fwareDtoObj = new FOTADeviceDto();
+			fotaInfo = fotaRepository.findOneById(fwareObj.getFotaInfoId());
+			fwareDtoObj.setId(fwareObj.getId());
+			fwareDtoObj.setFotaInfoId(fwareObj.getFotaInfoId());
+			fwareDtoObj.setDeviceSerialNumber(fwareObj.getDeviceSerialNumber());
+			fwareDtoObj.setConnectionType(fwareObj.getConnectionType());
+			fwareDtoObj.setDeviceSoftVersion(fwareObj.getDeviceSoftVersion());
+			fwareDtoObj.setDeviceSoftwareDateTime(fwareObj
+					.getDeviceSoftwareDateTime());
+			fwareDtoObj.setUpdatedSoftVersion(fwareObj.getUpdatedSoftVersion());
+			fwareDtoObj.setCheckupdateDateTime(fwareObj
+					.getCheckupdateDateTime());
+			fwareDtoObj.setDownloadStartDateTime(fwareObj
+					.getDownloadStartDateTime());
+			fwareDtoObj.setDownloadEndDateTime(fwareObj
+					.getDownloadEndDateTime());
+			fwareDtoObj.setDownloadStatus(fwareObj.getDownloadStatus());
+			if(fotaInfo != null){
+				fwareDtoObj.setProductType(fotaInfo.getProductType());
+				fwareDtoObj.setDevicePartNumber(fotaInfo.getDevicePartNumber());
+			}
+			//Calculate Download Time
+			String totalDownloadTime = getDownLoadTime(fwareObj.getDownloadEndDateTime(),fwareObj.getDownloadStartDateTime());
+			fwareDtoObj.setDownloadTime(totalDownloadTime);
+			FOTADeviceDtoList.add(fwareDtoObj);
+		}
+		return FOTADeviceDtoList;
+	}
+
+	private String getDownLoadTime(DateTime downloadEndDateTime,
+			DateTime downloadStartDateTime) {
+		long elapsed = (downloadEndDateTime.getMillis())
+				- (downloadStartDateTime.getMillis());
+
+		int hours = (int) Math.floor(elapsed / 3600000);
+
+		int minutes = (int) Math.floor((elapsed - hours * 3600000) / 60000);
+
+		int seconds = (int) Math
+				.floor((elapsed - hours * 3600000 - minutes * 60000) / 1000);
+
+		String totalDownloadTime = String.valueOf(hours).concat("Hr:")
+				.concat(String.valueOf(minutes)).concat("Min:")
+				.concat(String.valueOf(seconds)).concat("Sec");
+
+		return totalDownloadTime;
 	}
 
 	public List<FOTAInfo> FOTAList(String status, String partNumberSearch) {
@@ -1795,9 +1565,9 @@ public class FOTAService {
 		FOTAInfoListUpdate = new ArrayList<FOTAInfo>();
 		if(status.equals("ActivePending")){
 			FOTAInfoList = new ArrayList<FOTAInfo>();
-			boolean softDeleteFlag = false;
+			/*boolean softDeleteFlag = false;
 			boolean activePublishedFlag = false;
-			boolean deleteRequest = true;
+			boolean deleteRequest = true;*/
 			if(StringUtils.isNotEmpty(partNumberSearch)){
 				FOTAInfoList = fotaRepository.getFOTAListByPendingAndSearchStr(false,false,false,false,true,true,partNumberSearch);
 			}else{
@@ -1840,11 +1610,7 @@ public class FOTAService {
 				}
 				else if(info.getSoftDeleteFlag() == true && info.getActivePublishedFlag() == true){
 					info.setFOTAStatus("Inactive Published");
-				}/*else if(info.getSoftDeleteFlag() == true && info.getActivePublishedFlag() == true && info.getDeleteRequestFlag() == true){
-					info.setFOTAStatus("Inactive Published deleted");
-				}else if(info.getSoftDeleteFlag() == true && info.getActivePublishedFlag() == false && info.getDeleteRequestFlag() == true){
-					info.setFOTAStatus("Inactive Pending deleted");
-				}*/
+				}
 				FOTAInfoListUpdate.add(info);
 			}
 		}
@@ -2127,8 +1893,6 @@ public class FOTAService {
     }
 		return result;
 	}
-
-	
 	
 	//Get Firmware details to view 
 	public FOTAInfo getFirmwareDetails(Long id) {
@@ -2166,6 +1930,19 @@ public class FOTAService {
 				fotaInfoExist.setSoftDeleteFlag(true);
 				fotaRepository.save(fotaInfoExist);
 				log.debug("FotaInfo Details: with Inactive published {}", fotaInfo);
+				
+				String storeChunk = fotaInfo.getDevicePartNumber().concat(":").concat(fotaInfo.getSoftVersion());
+				if(partNoHolder !=null){
+					for(String key : partNosBin.keySet()){
+						
+						if(key.contains(storeChunk)){
+							partNoHolder = partNosBin.get(key);
+							log.debug("key :"+key);
+						}
+					}
+					partNoHolder.setAbortFlag(true);
+					log.debug("Abort flag is set:"+partNoHolder.getAbortFlag());	
+				}
 			}
 			if (Objects.nonNull(fotaInfo)) {
 				fotaInfo.setActivePublishedFlag(true);

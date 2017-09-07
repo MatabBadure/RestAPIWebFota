@@ -13,8 +13,8 @@ public interface FOTADeviceRepository extends JpaRepository<FOTADeviceFWareUpdat
 	@Query(nativeQuery=true,value= "SELECT * from FOTA_DEVICE_FWARE_UPDATE_LOG where downloaded_status =:status")
 	List<FOTADeviceFWareUpdate> getFOTADeviceListByStatus(@Param("status") String status);
 	
-	@Query(nativeQuery=true,value= "SELECT * from FOTA_DEVICE_FWARE_UPDATE_LOG where downloaded_status IN (:statusSuccess,:statusFailure")
-	List<FOTADeviceFWareUpdate> getFOTADeviceListByAll(@Param("statusSuccess")String statusSuccess, @Param("statusFailure")	String statusFailure);
+	@Query(nativeQuery=true,value= "SELECT * from FOTA_DEVICE_FWARE_UPDATE_LOG where downloaded_status IN (:statusSuccess,:statusFailure,:statusAborted)")
+	List<FOTADeviceFWareUpdate> getFOTADeviceListByAll(@Param("statusSuccess")String statusSuccess, @Param("statusFailure")	String statusFailure,@Param("statusAborted")String statusAborted);
 	
 
 }

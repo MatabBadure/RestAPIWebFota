@@ -12,6 +12,10 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.PREV_REQ_STATUS;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.SOFT_VER_DATE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.RESULT;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.CONNECTION_TYPE_ZERO;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.CONNECTION_TYPE_ONE;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.ONE;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.ZERO;
 
 
 import java.util.LinkedHashMap;
@@ -55,7 +59,12 @@ public class FOTAParseUtil {
 			fotaJsonData.put(DEVICE_SN, devSn);
 		}
 		if(Objects.nonNull(connType)){
-			fotaJsonData.put(CONNECTION_TYPE, connType);
+			if(connType.equals(ZERO)){
+				fotaJsonData.put(CONNECTION_TYPE, CONNECTION_TYPE_ZERO);
+			}else if(connType.equals(ONE)){
+				fotaJsonData.put(CONNECTION_TYPE, CONNECTION_TYPE_ONE);
+			}
+			
 		}
 		
 		if(Objects.nonNull(connType)){

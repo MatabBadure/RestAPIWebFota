@@ -71,6 +71,7 @@ public class TimsInputReaderService {
 	
 	public static boolean processed_atleast_one = false;
 	
+	public String logFileName;
 	public static boolean failureFlag = false;
 	public static boolean mandatoryFieldFlag = true;
 	public static boolean monarchBluetoothFlag = true;
@@ -79,12 +80,16 @@ public class TimsInputReaderService {
 	@Inject
 	private TimsService timsService;
 	
+	@Inject
+	private MailService mailService;
 	@Scheduled(cron="00 30 08 * * * ")
 	public void ExecuteTIMSJob() throws Exception
 	{
 		
+		logFileName  = "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());	
 		try{
-		MDC.put("logFileName", "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
+    MDC.put("logFileName", logFileName);
+
 		log.debug("Status           TIMS Id        Serial Number        Result        Remarks");
 		this.mandatoryFieldFlag = true;
 		this.monarchBluetoothFlag = true;
@@ -102,18 +107,18 @@ public class TimsInputReaderService {
 		
 		  if(record.getDevice_type().equalsIgnoreCase("VEST")){
 		      	timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record);
-		    	//timsService.CASE2_PatientExistsWithNODevice_VEST(record);
+		    	timsService.CASE2_PatientExistsWithNODevice_VEST(record);
 		    	timsService.CASE3_PatientHasMonarchAddVisivest_VEST(record);
 		    	timsService.CASE4_PatientHasDifferentVisivestSwap_VEST(record);
 		        timsService.CASE5_DeviceOwnedByShell_VEST(record);
-		    	//timsService.CASE6_DeviceOwnedByDifferentPatient_VEST(record);
+		        //timsService.CASE6_DeviceOwnedByDifferentPatient_VEST(record);
 		    	//timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_VEST(record);
 		    	//timsService.CASE8_DeviceIsOrphanButPatientExist_VEST(record);
 		    	//timsService.CASE9_PatientHasDifferentVisivestSwap_VEST(record);
 		    	timsService.CASE10_PatientHasMonarchAddVisivest_VEST(record);
 		    	//timsService.CASE11_PatientExistsWithNODevice_VEST(record);
 		    	timsService.CASE12_PatientHasMonarchMergeExistingVisivest_VEST(record);
-		    	timsService.CASE13_ExistedSerialNumberandDifferentHillromID_VEST(record);
+		    //	timsService.CASE13_ExistedSerialNumberandDifferentHillromID_VEST(record);
 		    	
 		    }
 
@@ -136,7 +141,7 @@ public class TimsInputReaderService {
 			    	timsService.CASE10_PatientHasVisivestAddMonarch_MONARCH(record);
 			    	//timsService.CASE11_PatientExistsWithNODevice_MONARCH(record);
 			    	timsService.CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH(record);
-			    	timsService.CASE13_ExistedSerialNumberandDifferentHillromID_MONARCH(record);
+			    //	timsService.CASE13_ExistedSerialNumberandDifferentHillromID_MONARCH(record);
 		    	}else{
 		    		monarchBluetoothFlag = false;
 		    		log.debug("Created       " +record.getTims_cust()+ "        " +record.getSerial_num()+ "        "+"Failure"+ "        "
@@ -178,6 +183,7 @@ public class TimsInputReaderService {
 		}
 		
 		}catch(Exception ex){
+			mailService.sendTIMSLog(logFileName);
 			ex.printStackTrace();
 			throw new HillromException("Error in TIMS Script Execution " , ex);
 		}
@@ -187,6 +193,7 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{        
+		    //  String csvFile = "C:/home/brett/flat_file_script/flatfile.csv";
 		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
 		      File flatFile = new File(csvFile);
 		      if(!flatFile.exists()) { 

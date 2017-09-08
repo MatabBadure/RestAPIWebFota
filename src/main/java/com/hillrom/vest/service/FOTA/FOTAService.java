@@ -1552,9 +1552,16 @@ public class FOTAService {
 		int seconds = (int) Math
 				.floor((elapsed - hours * 3600000 - minutes * 60000) / 1000);
 
-		String totalDownloadTime = String.valueOf(hours).concat(":")
-				.concat(String.valueOf(minutes)).concat(":")
-				.concat(String.valueOf(seconds));
+		
+		String hr =	("00"+ String.valueOf(hours)).substring(String.valueOf(hours).length());
+		
+		String min =	("00"+ String.valueOf(minutes)).substring(String.valueOf(minutes).length());
+		
+		String sec =	("00"+ String.valueOf(seconds)).substring(String.valueOf(seconds).length());
+		
+		String totalDownloadTime = hr.concat(":")
+				.concat(String.valueOf(min)).concat(":")
+				.concat(String.valueOf(sec));
 
 		return totalDownloadTime;
 	}

@@ -238,6 +238,8 @@ public class TimsService {
 														  patientInfoDTO.getDevice_type(),
 														  patientInfoDTO.getIs_active(),
 														  patientInfoDTO.getSerial_num(),
+														  patientInfoDTO.getHub_id(),
+														  patientInfoDTO.getBluetooth_id(),
 														  patientInfoDTO.getTims_cust(),
 														  patientInfoDTO.getOld_patient_id(),
 														  patientInfoDTO.getTrain_dt(),

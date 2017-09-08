@@ -1530,7 +1530,7 @@ public class FOTAService {
 			fwareDtoObj.setDownloadStatus(fwareObj.getDownloadStatus());
 			if(fotaInfo != null){
 				fwareDtoObj.setProductType(fotaInfo.getProductType());
-				fwareDtoObj.setDevicePartNumber(fotaInfo.getDevicePartNumber());
+				fwareDtoObj.setDevicePartNumber(Long.valueOf(fotaInfo.getDevicePartNumber()));
 			}
 			//Calculate Download Time
 			String totalDownloadTime = getDownLoadTime(fwareObj.getDownloadEndDateTime(),fwareObj.getDownloadStartDateTime());
@@ -1552,9 +1552,9 @@ public class FOTAService {
 		int seconds = (int) Math
 				.floor((elapsed - hours * 3600000 - minutes * 60000) / 1000);
 
-		String totalDownloadTime = String.valueOf(hours).concat("Hr:")
-				.concat(String.valueOf(minutes)).concat("Min:")
-				.concat(String.valueOf(seconds)).concat("Sec");
+		String totalDownloadTime = String.valueOf(hours).concat(":")
+				.concat(String.valueOf(minutes)).concat(":")
+				.concat(String.valueOf(seconds));
 
 		return totalDownloadTime;
 	}
@@ -1907,9 +1907,10 @@ public class FOTAService {
 				fotaInfo.setFOTAStatus("Active Published");
 			}else if(fotaInfo.getSoftDeleteFlag() == false && fotaInfo.getActivePublishedFlag() == true && fotaInfo.getDeleteRequestFlag() == true ){
 				fotaInfo.setFOTAStatus("Delete Requested");
-			}else if(fotaInfo.getSoftDeleteFlag() == true && fotaInfo.getActivePublishedFlag() == true && fotaInfo.getDeleteRequestFlag() == true ){
+			}else if((fotaInfo.getSoftDeleteFlag() == true && fotaInfo.getActivePublishedFlag() == true && fotaInfo.getDeleteRequestFlag() == true )||fotaInfo.getSoftDeleteFlag() == true && fotaInfo.getActivePublishedFlag() == true && fotaInfo.getDeleteRequestFlag() == false ){
 				fotaInfo.setFOTAStatus("Inactive Published");
-			}else if(fotaInfo.getSoftDeleteFlag() == true  && fotaInfo.getDeleteRequestFlag() == true ){
+			}
+			else if((fotaInfo.getSoftDeleteFlag() == true  && fotaInfo.getDeleteRequestFlag() == true )|| (fotaInfo.getSoftDeleteFlag() == true  && fotaInfo.getDeleteRequestFlag() == false )){
 				fotaInfo.setFOTAStatus("Inactive Pending");
 			}
 		}

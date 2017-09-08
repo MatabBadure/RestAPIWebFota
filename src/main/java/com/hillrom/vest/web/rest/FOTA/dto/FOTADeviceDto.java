@@ -27,7 +27,7 @@ public class FOTADeviceDto {
 	
 	private String  downloadStatus;
 	
-	private String devicePartNumber;
+	private long devicePartNumber;
 	
 	private String productType;
 	
@@ -128,11 +128,11 @@ public class FOTADeviceDto {
 		this.downloadStatus = downloadStatus;
 	}
 
-	public String getDevicePartNumber() {
+	public long getDevicePartNumber() {
 		return devicePartNumber;
 	}
 
-	public void setDevicePartNumber(String devicePartNumber) {
+	public void setDevicePartNumber(long devicePartNumber) {
 		this.devicePartNumber = devicePartNumber;
 	}
 

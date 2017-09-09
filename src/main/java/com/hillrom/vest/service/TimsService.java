@@ -655,7 +655,9 @@ public class TimsService {
 
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				managePatientDevice(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");

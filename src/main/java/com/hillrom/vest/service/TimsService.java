@@ -534,6 +534,30 @@ public class TimsService {
 	}
 	
 	public boolean isCurrentSerialNumberOwnedByDifferentPatientMonarch(String serialNumber,String hillromId){
+		String another_patient_hillrom_id = "";
+		try{
+			another_patient_hillrom_id = patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").get().getHillromId();
+		}catch(Exception ex){
+			another_patient_hillrom_id = "";
+		}
+		log.debug("hillromId " + hillromId);
+		log.debug("another_patient_hillrom_id " + another_patient_hillrom_id);
+	
+		if((another_patient_hillrom_id!=null)&& (!another_patient_hillrom_id.equalsIgnoreCase(""))) {
+       	 if(!another_patient_hillrom_id.equalsIgnoreCase(hillromId)){
+                     //log.debug("Checking isCurrentSerialNumberOwnedByDifferentPatientVest ");
+                     return true;
+       	 }
+       		 
+        }
+        else{
+       	 return true;
+        }
+		
+		return false;
+	}
+	
+/*	public boolean isCurrentSerialNumberOwnedByDifferentPatientMonarch(String serialNumber,String hillromId){
 		
 		if(!patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").get().getHillromId().equalsIgnoreCase(hillromId)){ 
 		//	log.debug("Checking isCurrentSerialNumberOwnedByDifferentPatientMonarch ");	
@@ -541,7 +565,7 @@ public class TimsService {
 		}
 		
 		return false;
-	}
+	}*/
 
 	public boolean isCurrentSerialNumberOwnedByCurrentHillromIdVest(String serialNumber,String hillromId){
 		
@@ -929,7 +953,7 @@ public class TimsService {
 		
 		if((isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isCurrentSerialNumberOwnedByCurrentHillromIdVest(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust())) 
-				&& (isOwnerExistsForCurrentSerialNumberVest(patientInfoDTO.getSerial_num() )) ){
+				&& (!isOwnerExistsForCurrentSerialNumberVest(patientInfoDTO.getSerial_num() )) ){
 
 
 			try{
@@ -964,7 +988,7 @@ public class TimsService {
 		
 		if((isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isCurrentSerialNumberOwnedByCurrentHillromIdVest(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust())) 
-				&& (!isOwnerExistsForCurrentSerialNumberVest(patientInfoDTO.getSerial_num() )) ){
+				&& (isOwnerExistsForCurrentSerialNumberVest(patientInfoDTO.getSerial_num() )) ){
 			log.debug("Inside DeviceOwnedByDifferentPatient_VEST ");
 
 			
@@ -1462,6 +1486,9 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
+		/*		patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceMonarch(patientInfoDTO);*/   //if it's required please uncomment
+				
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
@@ -1520,7 +1547,7 @@ public class TimsService {
 		
 		if((isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isCurrentSerialNumberOwnedByCurrentHillromIdMonarch(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust())) 
-				&& (isOwnerExistsForCurrentSerialNumberMonarch(patientInfoDTO.getSerial_num() )) ){
+				&& (!isOwnerExistsForCurrentSerialNumberMonarch(patientInfoDTO.getSerial_num() )) ){
 
 
 			try{
@@ -1557,7 +1584,7 @@ public class TimsService {
 		
 		if((isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isCurrentSerialNumberOwnedByCurrentHillromIdMonarch(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust())) 
-				&& (!isOwnerExistsForCurrentSerialNumberMonarch(patientInfoDTO.getSerial_num() )) ){
+				&& (isOwnerExistsForCurrentSerialNumberMonarch(patientInfoDTO.getSerial_num() )) ){
 			log.debug("Inside DeviceOwnedByDifferentPatient_MONARCH ");
 
 			

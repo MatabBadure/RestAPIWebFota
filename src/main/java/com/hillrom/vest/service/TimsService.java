@@ -510,16 +510,54 @@ public class TimsService {
 	}
 	
 	public boolean isCurrentSerialNumberOwnedByDifferentPatientVest(String serialNumber,String hillromId){
-		
-		if(!patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").get().getHillromId().equalsIgnoreCase(hillromId)) {
-				//log.debug("Checking isCurrentSerialNumberOwnedByDifferentPatientVest ");
-				return true;
+		String another_patient_hillrom_id = "";
+		try{
+			another_patient_hillrom_id = patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"VEST").get().getHillromId();
+		}catch(Exception ex){
+			another_patient_hillrom_id = "";
 		}
+		log.debug("hillromId " + hillromId);
+		log.debug("another_patient_hillrom_id " + another_patient_hillrom_id);
+	
+		if((another_patient_hillrom_id!=null)&& (!another_patient_hillrom_id.equalsIgnoreCase(""))) {
+       	 if(!another_patient_hillrom_id.equalsIgnoreCase(hillromId)){
+                     //log.debug("Checking isCurrentSerialNumberOwnedByDifferentPatientVest ");
+                     return true;
+       	 }
+       		 
+        }
+        else{
+       	 return true;
+        }
 		
 		return false;
 	}
 	
 	public boolean isCurrentSerialNumberOwnedByDifferentPatientMonarch(String serialNumber,String hillromId){
+		String another_patient_hillrom_id = "";
+		try{
+			another_patient_hillrom_id = patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").get().getHillromId();
+		}catch(Exception ex){
+			another_patient_hillrom_id = "";
+		}
+		log.debug("hillromId " + hillromId);
+		log.debug("another_patient_hillrom_id " + another_patient_hillrom_id);
+	
+		if((another_patient_hillrom_id!=null)&& (!another_patient_hillrom_id.equalsIgnoreCase(""))) {
+       	 if(!another_patient_hillrom_id.equalsIgnoreCase(hillromId)){
+                     //log.debug("Checking isCurrentSerialNumberOwnedByDifferentPatientVest ");
+                     return true;
+       	 }
+       		 
+        }
+        else{
+       	 return true;
+        }
+		
+		return false;
+	}
+	
+/*	public boolean isCurrentSerialNumberOwnedByDifferentPatientMonarch(String serialNumber,String hillromId){
 		
 		if(!patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(serialNumber,"MONARCH").get().getHillromId().equalsIgnoreCase(hillromId)){ 
 		//	log.debug("Checking isCurrentSerialNumberOwnedByDifferentPatientMonarch ");	
@@ -527,7 +565,7 @@ public class TimsService {
 		}
 		
 		return false;
-	}
+	}*/
 
 	public boolean isCurrentSerialNumberOwnedByCurrentHillromIdVest(String serialNumber,String hillromId){
 		
@@ -641,7 +679,9 @@ public class TimsService {
 
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				managePatientDevice(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");
@@ -844,6 +884,7 @@ public class TimsService {
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				patientInfoDTO.setNew_serial_number(null);
 				patientInfoDTO.setOperation_type("INACTIVATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				managePatientDevice(patientInfoDTO);
 
 				patientInfoDTO.setOperation_type("CREATE");
@@ -854,6 +895,9 @@ public class TimsService {
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
+				
+				patientInfoDTO.setOperation_type("CREATE");
+				managePatientDevice(patientInfoDTO);
 				
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
@@ -909,12 +953,14 @@ public class TimsService {
 		
 		if((isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isCurrentSerialNumberOwnedByCurrentHillromIdVest(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust())) 
-				&& (isOwnerExistsForCurrentSerialNumberVest(patientInfoDTO.getSerial_num() )) ){
+				&& (!isOwnerExistsForCurrentSerialNumberVest(patientInfoDTO.getSerial_num() )) ){
 
 
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				managePatientDevice(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");
@@ -944,12 +990,14 @@ public class TimsService {
 		
 		if((isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isCurrentSerialNumberOwnedByCurrentHillromIdVest(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust())) 
-				&& (!isOwnerExistsForCurrentSerialNumberVest(patientInfoDTO.getSerial_num() )) ){
+				&& (isOwnerExistsForCurrentSerialNumberVest(patientInfoDTO.getSerial_num() )) ){
 			log.debug("Inside DeviceOwnedByDifferentPatient_VEST ");
 
 			
 			try{
 				patientInfoDTO.setOperation_type("INACTIVATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				patientInfoDTO.setNew_serial_number(null);
 				managePatientDevice(patientInfoDTO);
@@ -1000,7 +1048,16 @@ public class TimsService {
 				return true;
 			}
 			
-			return false;
+			if(CASE10_PatientHasMonarchAddVisivest_VEST(patientInfoDTO)){
+				return true;
+			}
+			else if(CASE11_PatientExistsWithNODevice_VEST(patientInfoDTO)){
+				return true;
+			}else{
+				return false;
+			}
+			
+
 		}
 		
 		return false;
@@ -1012,7 +1069,7 @@ public class TimsService {
 		
 		
 		
-		if(DeviceOwnedByDifferentPatient_VEST(patientInfoDTO)){
+		//if(DeviceOwnedByDifferentPatient_VEST(patientInfoDTO)){
 			
 			if( (isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 				
@@ -1067,9 +1124,9 @@ public class TimsService {
 			
 			return false;
 		
-		}
+		//}
 		
-		return false;
+		//return false;
 		
 	}
 	
@@ -1077,14 +1134,16 @@ public class TimsService {
 		
 		
 		
-		if(DeviceOwnedByDifferentPatient_VEST(patientInfoDTO)){
+		//if(DeviceOwnedByDifferentPatient_VEST(patientInfoDTO)){
 			
 			if (!isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) {
 				
 
 				try{
 					patientInfoDTO.setOperation_type("CREATE");
+					patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					managePatientDevice(patientInfoDTO);
 					
 					patientInfoDTO.setOperation_type("CREATE");
@@ -1106,8 +1165,8 @@ public class TimsService {
 			
 			return false;
 		
-		}
-		return false;	
+		//}
+		//return false;	
 	}
 	
 	public boolean CASE12_PatientHasMonarchMergeExistingVisivest_VEST(PatientInfoDTO patientInfoDTO){
@@ -1441,6 +1500,9 @@ public class TimsService {
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
+				
+		/*		patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceMonarch(patientInfoDTO);*/   //if it's required please uncomment
 				
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");

@@ -115,8 +115,8 @@ public class TimsInputReaderService {
 		    	timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_VEST(record);
 		    	timsService.CASE8_DeviceIsOrphanButPatientExist_VEST(record);
 		    	timsService.CASE9_PatientHasDifferentVisivestSwap_VEST(record);
-		    	timsService.CASE10_PatientHasMonarchAddVisivest_VEST(record);
-		    	timsService.CASE11_PatientExistsWithNODevice_VEST(record);
+		    	//timsService.CASE10_PatientHasMonarchAddVisivest_VEST(record);
+		    	//timsService.CASE11_PatientExistsWithNODevice_VEST(record);
 		    	timsService.CASE12_PatientHasMonarchMergeExistingVisivest_VEST(record);
 		    //	timsService.CASE13_ExistedSerialNumberandDifferentHillromID_VEST(record);
 		    	
@@ -193,7 +193,7 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{        
-		    //  String csvFile = "C:/home/brett/flat_file_script/flatfile.csv";
+		    
 		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
 		      File flatFile = new File(csvFile);
 		      if(!flatFile.exists()) { 

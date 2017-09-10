@@ -676,7 +676,7 @@ public class TimsService {
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) ){
 			
-           log.debug("Inside CASE2_PatientExistsWithNODevice_VEST ");
+        
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
@@ -695,6 +695,7 @@ public class TimsService {
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
+				tims.processed_atleast_one = true;
 			}catch(Exception ex){
 				ex.printStackTrace();
 				return false;
@@ -997,7 +998,9 @@ public class TimsService {
 			try{
 				patientInfoDTO.setOperation_type("INACTIVATE");
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
-				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+			//	patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				String patient_id_of_serial_number_to_inactivate = patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(patientInfoDTO.getSerial_num(),"VEST").get().getPatientId();
+				patientInfoDTO.setPatient_id(patient_id_of_serial_number_to_inactivate);				
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				patientInfoDTO.setNew_serial_number(null);
 				managePatientDevice(patientInfoDTO);
@@ -1029,10 +1032,11 @@ public class TimsService {
 					patientInfoDTO.setOperation_type("UPDATE");
 					patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get().getSerialNumber());
 					patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
+					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					managePatientDevice(patientInfoDTO);
 					
-					patientInfoDTO.setOperation_type("CREATE");
-					managePatientDeviceAssociation(patientInfoDTO);
+				/*	patientInfoDTO.setOperation_type("CREATE");
+					managePatientDeviceAssociation(patientInfoDTO);*/
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -1083,6 +1087,7 @@ public class TimsService {
 										 
 					patientInfoDTO.setOperation_type("CREATE");
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					managePatientDevice(patientInfoDTO);
 									
 					patientInfoDTO.setOperation_type("CREATE");

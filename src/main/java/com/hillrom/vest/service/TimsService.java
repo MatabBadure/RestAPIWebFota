@@ -676,7 +676,7 @@ public class TimsService {
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) ){
 			
-
+           log.debug("Inside CASE2_PatientExistsWithNODevice_VEST ");
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
@@ -713,7 +713,7 @@ public class TimsService {
 		
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
-			
+		    log.debug("Inside CASE3_PatientHasMonarchAddVisivest_VEST ");
 
 			try{
 				
@@ -768,7 +768,7 @@ public class TimsService {
 		
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) && (isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
-			
+			log.debug("Inside CASE4_PatientHasDifferentVisivestSwap_VEST ");
 
 			try{
 				
@@ -826,7 +826,7 @@ public class TimsService {
 		
 		if((isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& isCurrentSerialNumberOwnedByShellVest(patientInfoDTO.getSerial_num()) ){
-			
+			log.debug("Inside CASE5_DeviceOwnedByShell_VEST ");
 			try{
 				
 				patientInfoDTO.setOperation_type("UPDATE");
@@ -877,7 +877,7 @@ public class TimsService {
 				&& (!isCurrentSerialNumberOwnedByShellVest(patientInfoDTO.getSerial_num())) 
 				&& (isCurrentSerialNumberOwnedByDifferentPatientVest(patientInfoDTO.getSerial_num(), patientInfoDTO.getTims_cust())) ){
 		
-
+			log.debug("Inside CASE6_DeviceOwnedByDifferentPatient_VEST ");
 			try{
 				String patient_id_of_serial_number_to_inactivate = patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(patientInfoDTO.getSerial_num(),"VEST").get().getPatientId();
 				patientInfoDTO.setPatient_id(patient_id_of_serial_number_to_inactivate);
@@ -919,7 +919,7 @@ public class TimsService {
 				&& (!isCurrentSerialNumberOwnedByShellVest(patientInfoDTO.getSerial_num())) 
 				&& (!isCurrentSerialNumberOwnedByDifferentPatientVest(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust() )) ){
 
-
+			log.debug("Inside CASE7_DeviceIsOrphanPatientDoesNotExist_VEST ");
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
@@ -954,7 +954,7 @@ public class TimsService {
 		if((isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isCurrentSerialNumberOwnedByCurrentHillromIdVest(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust())) 
 				&& (!isOwnerExistsForCurrentSerialNumberVest(patientInfoDTO.getSerial_num() )) ){
-
+			log.debug("Inside CASE8_DeviceIsOrphanButPatientExist_VEST ");
 
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
@@ -1073,7 +1073,7 @@ public class TimsService {
 			
 			if( (isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 				
-
+				log.debug("Inside CASE10_PatientHasMonarchAddVisivest_VEST ");
 				
 				try{
 					

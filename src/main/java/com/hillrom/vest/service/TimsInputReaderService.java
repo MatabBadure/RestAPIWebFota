@@ -106,15 +106,23 @@ public class TimsInputReaderService {
 		    PatientInfoDTO record = entry.getValue();
 		
 		  if(record.getDevice_type().equalsIgnoreCase("VEST")){
-		      	timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record);
-		    	timsService.CASE2_PatientExistsWithNODevice_VEST(record);
-		    	timsService.CASE3_PatientHasMonarchAddVisivest_VEST(record);
-		    	timsService.CASE4_PatientHasDifferentVisivestSwap_VEST(record);
-		        timsService.CASE5_DeviceOwnedByShell_VEST(record);
-		        timsService.CASE6_DeviceOwnedByDifferentPatient_VEST(record);
-		    	timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_VEST(record);
-		    	timsService.CASE8_DeviceIsOrphanButPatientExist_VEST(record);
-		    	timsService.CASE9_PatientHasDifferentVisivestSwap_VEST(record);
+		      	if(!timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record)){
+			    	if(!timsService.CASE2_PatientExistsWithNODevice_VEST(record)){
+				    	if(!timsService.CASE3_PatientHasMonarchAddVisivest_VEST(record)){
+					    	if(!timsService.CASE4_PatientHasDifferentVisivestSwap_VEST(record)){
+						        if(!timsService.CASE5_DeviceOwnedByShell_VEST(record)){
+							        if(!timsService.CASE6_DeviceOwnedByDifferentPatient_VEST(record)){
+								    	if(!timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_VEST(record)){
+									    	if(!timsService.CASE8_DeviceIsOrphanButPatientExist_VEST(record)){
+									    		timsService.CASE9_PatientHasDifferentVisivestSwap_VEST(record);
+									    	}
+								    	}
+							        }
+						        }
+					    	}
+				    	}
+			    	}
+		      	}
 		    	//timsService.CASE10_PatientHasMonarchAddVisivest_VEST(record);
 		    	//timsService.CASE11_PatientExistsWithNODevice_VEST(record);
 		    	//timsService.CASE12_PatientHasMonarchMergeExistingVisivest_VEST(record);
@@ -193,7 +201,6 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{        
-		    
 		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
 		      File flatFile = new File(csvFile);
 		      if(!flatFile.exists()) { 

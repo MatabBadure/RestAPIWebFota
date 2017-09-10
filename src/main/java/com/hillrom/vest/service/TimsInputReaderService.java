@@ -106,18 +106,26 @@ public class TimsInputReaderService {
 		    PatientInfoDTO record = entry.getValue();
 		
 		  if(record.getDevice_type().equalsIgnoreCase("VEST")){
-		      	timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record);
-		    	timsService.CASE2_PatientExistsWithNODevice_VEST(record);
-		    	timsService.CASE3_PatientHasMonarchAddVisivest_VEST(record);
-		    	timsService.CASE4_PatientHasDifferentVisivestSwap_VEST(record);
-		        timsService.CASE5_DeviceOwnedByShell_VEST(record);
-		        //timsService.CASE6_DeviceOwnedByDifferentPatient_VEST(record);
-		    	//timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_VEST(record);
-		    	//timsService.CASE8_DeviceIsOrphanButPatientExist_VEST(record);
-		    	//timsService.CASE9_PatientHasDifferentVisivestSwap_VEST(record);
-		    	timsService.CASE10_PatientHasMonarchAddVisivest_VEST(record);
+		      	if(!timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record)){
+			    	if(!timsService.CASE2_PatientExistsWithNODevice_VEST(record)){
+				    	if(!timsService.CASE3_PatientHasMonarchAddVisivest_VEST(record)){
+					    	if(!timsService.CASE4_PatientHasDifferentVisivestSwap_VEST(record)){
+						        if(!timsService.CASE5_DeviceOwnedByShell_VEST(record)){
+							        if(!timsService.CASE6_DeviceOwnedByDifferentPatient_VEST(record)){
+								    	if(!timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_VEST(record)){
+									    	if(!timsService.CASE8_DeviceIsOrphanButPatientExist_VEST(record)){
+									    		timsService.CASE9_PatientHasDifferentVisivestSwap_VEST(record);
+									    	}
+								    	}
+							        }
+						        }
+					    	}
+				    	}
+			    	}
+		      	}
+		    	//timsService.CASE10_PatientHasMonarchAddVisivest_VEST(record);
 		    	//timsService.CASE11_PatientExistsWithNODevice_VEST(record);
-		    	timsService.CASE12_PatientHasMonarchMergeExistingVisivest_VEST(record);
+		    	//timsService.CASE12_PatientHasMonarchMergeExistingVisivest_VEST(record);
 		    //	timsService.CASE13_ExistedSerialNumberandDifferentHillromID_VEST(record);
 		    	
 		    }
@@ -130,16 +138,16 @@ public class TimsInputReaderService {
 		    	{
 			    	
 			    	timsService.CASE1_NeitherPatientNorDeviceExist_MONARCH(record);
-			    	//timsService.CASE2_PatientExistsWithNODevice_MONARCH(record);
+			    	timsService.CASE2_PatientExistsWithNODevice_MONARCH(record);
 			   	    timsService.CASE3_PatientHasVisivestAddMonarch_MONARCH(record);
 			    	timsService.CASE4_PatientHasDifferentMonarchSwap_MONARCH(record);
 			    	timsService.CASE5_DeviceOwnedByShell_MONARCH(record);
-			    	//timsService.CASE6_DeviceOwnedByDifferentPatient_MONARCH(record);
-			    	//timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_MONARCH(record);
-			    	//timsService.CASE8_DeviceIsOrphanButPatientExist_MONARCH(record);
-			    	//timsService.CASE9_PatientHasDifferentMonarchSwap_MONARCH(record);
+			    	timsService.CASE6_DeviceOwnedByDifferentPatient_MONARCH(record);
+			    	timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_MONARCH(record);
+			    	timsService.CASE8_DeviceIsOrphanButPatientExist_MONARCH(record);
+			    	timsService.CASE9_PatientHasDifferentMonarchSwap_MONARCH(record);
 			    	timsService.CASE10_PatientHasVisivestAddMonarch_MONARCH(record);
-			    	//timsService.CASE11_PatientExistsWithNODevice_MONARCH(record);
+			    	timsService.CASE11_PatientExistsWithNODevice_MONARCH(record);
 			    	timsService.CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH(record);
 			    //	timsService.CASE13_ExistedSerialNumberandDifferentHillromID_MONARCH(record);
 		    	}else{
@@ -193,7 +201,6 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{        
-		    //  String csvFile = "C:/home/brett/flat_file_script/flatfile.csv";
 		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
 		      File flatFile = new File(csvFile);
 		      if(!flatFile.exists()) { 

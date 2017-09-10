@@ -238,6 +238,8 @@ public class TimsUserRepository{
 			String inpatientDeviceType,
 			String inpatientDeviceIsActive,
 			String inDeviceSerialNumber,
+			String inHubId,
+			String inBluetoothId,
 			String inpatientHillromId,
 			String inpatientOldId,
 			LocalDate inpatientTrainingDate,//Need to check for datetime
@@ -258,6 +260,8 @@ public class TimsUserRepository{
 					+ ":pat_device_type,"
 					+ ":pat_device_is_active,"
 					+ ":pat_device_serial_number,"
+					+ ":pat_hub_id,"
+					+ ":pat_bluetooth_id,"
 					+ ":pat_hillrom_id,"
 					+ ":pat_old_id,"
 					+ ":pat_training_date,"
@@ -274,6 +278,8 @@ public class TimsUserRepository{
 					.setParameter("pat_device_type",inpatientDeviceType)
 					.setParameter("pat_device_is_active", inpatientDeviceIsActive)
 					.setParameter("pat_device_serial_number", inDeviceSerialNumber )
+					.setParameter("pat_hub_id", inHubId )
+					.setParameter("pat_bluetooth_id", inBluetoothId )
 					.setParameter("pat_hillrom_id", inpatientHillromId)
 					.setParameter("pat_old_id", inpatientOldId)
 					.setParameter("pat_training_date", (inpatientTrainingDate==null)?inpatientTrainingDate:new Timestamp(inpatientTrainingDate.toDateTimeAtStartOfDay().getMillis())) 

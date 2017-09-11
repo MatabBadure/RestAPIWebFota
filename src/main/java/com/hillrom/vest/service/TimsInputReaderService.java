@@ -107,8 +107,8 @@ public class TimsInputReaderService {
 		
 		  if(record.getDevice_type().equalsIgnoreCase("VEST")){
 		      	if(!timsService.CASE1_NeitherPatientNorDeviceExist_VEST(record)){
-			    	if(!timsService.CASE2_PatientExistsWithNODevice_VEST(record)){
-				    	if(!timsService.CASE3_PatientHasMonarchAddVisivest_VEST(record)){
+			    	if(!timsService.CASE3_PatientHasMonarchAddVisivest_VEST(record)){
+				    	if(!timsService.CASE2_PatientExistsWithNODevice_VEST(record)){
 					    	if(!timsService.CASE4_PatientHasDifferentVisivestSwap_VEST(record)){
 						        if(!timsService.CASE5_DeviceOwnedByShell_VEST(record)){
 							        if(!timsService.CASE6_DeviceOwnedByDifferentPatient_VEST(record)){

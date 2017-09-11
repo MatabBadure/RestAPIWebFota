@@ -262,6 +262,38 @@ public class TimsService {
 	}
 
 	
+public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO) throws SQLException ,HillromException{	
+		
+		try{
+			timsUserRepository.managePatientDeviceAssociationMonarch(patientInfoDTO.getOperation_type(),
+														  patientInfoDTO.getPatient_id(),
+														  patientInfoDTO.getDevice_type(),
+														  patientInfoDTO.getIs_active(),
+														  patientInfoDTO.getSerial_num(),
+														  patientInfoDTO.getHub_id(),
+														  patientInfoDTO.getBluetooth_id(),
+														  patientInfoDTO.getTims_cust(),
+														  patientInfoDTO.getOld_patient_id(),
+														  patientInfoDTO.getTrain_dt(),
+														  patientInfoDTO.getDx1(),
+														  patientInfoDTO.getDx2(),
+														  patientInfoDTO.getDx3(),
+														  patientInfoDTO.getDx4(),
+														  patientInfoDTO.getGarment_type(),
+														  patientInfoDTO.getGarment_size(),
+														  patientInfoDTO.getGarment_color(),
+														  patientInfoDTO.getCreated_by());
+		}
+		catch(SQLException se)
+		{
+			throw se;
+		}
+		catch(Exception ex){
+			throw new HillromException("Error While invoking Stored Procedure " , ex);
+		}
+	}
+	
+	
 	/**This need to remove not required 
 	 * 
 	 * @param
@@ -713,7 +745,10 @@ public class TimsService {
 		
 		
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
-				&& (isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
+			&& (patientDevicesAssocRepository.findByHillromId(patientInfoDTO.getTims_cust()).isPresent()) 
+			
+			
+		/*	(isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust()))*/ && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 		    log.debug("Inside CASE3_PatientHasMonarchAddVisivest_VEST ");
 
 			try{
@@ -721,10 +756,13 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());	
 				managePatientDevice(patientInfoDTO);
-								
+				
+						
 				patientInfoDTO.setOperation_type("CREATE");
-				managePatientDeviceAssociation(patientInfoDTO);
+				
+				managePatientDeviceAssociationMonarch(patientInfoDTO);
 								
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -1036,8 +1074,8 @@ public class TimsService {
 					managePatientDevice(patientInfoDTO);
 					
 				/*	patientInfoDTO.setOperation_type("CREATE");
-					managePatientDeviceAssociation(patientInfoDTO);*/
-					
+					managePatientDeviceAssociation(patientInfoDTO);
+					*/
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());

@@ -1496,6 +1496,9 @@ public class TimsService {
 				patientInfoDTO.setOperation_type("INACTIVATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				patientInfoDTO.setNew_serial_number(null);
+				String patientIdOfSrNumToInactive = patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(patientInfoDTO.getSerial_num(),"MONARCH").get().getPatientId();
+				patientInfoDTO.setPatient_id(patientIdOfSrNumToInactive);
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				managePatientDeviceMonarch(patientInfoDTO);
 
 				patientInfoDTO.setOperation_type("CREATE");

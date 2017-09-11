@@ -137,7 +137,27 @@ public class TimsInputReaderService {
 		 	if(record.getBluetooth_id()!=null && (!record.getBluetooth_id().isEmpty()))
 		    	{
 			    	
-			    	timsService.CASE1_NeitherPatientNorDeviceExist_MONARCH(record);
+
+				      	if(!timsService.CASE1_NeitherPatientNorDeviceExist_MONARCH(record)){
+					    	if(!timsService.CASE3_PatientHasVisivestAddMonarch_MONARCH(record)){
+						    	if(!timsService.CASE2_PatientExistsWithNODevice_MONARCH(record)){
+							    	if(!timsService.CASE4_PatientHasDifferentMonarchSwap_MONARCH(record)){
+								        if(!timsService.CASE5_DeviceOwnedByShell_MONARCH(record)){
+									        if(!timsService.CASE6_DeviceOwnedByDifferentPatient_MONARCH(record)){
+										    	if(!timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_MONARCH(record)){
+											    	if(!timsService.CASE8_DeviceIsOrphanButPatientExist_MONARCH(record)){
+											    		timsService.CASE9_PatientHasDifferentMonarchSwap_MONARCH(record);
+											    	}
+										    	}
+									        }
+								        }
+							    	}
+						    	}
+					    	}
+				      	}
+
+
+/*			    	timsService.CASE1_NeitherPatientNorDeviceExist_MONARCH(record);
 			    	timsService.CASE2_PatientExistsWithNODevice_MONARCH(record);
 			   	    timsService.CASE3_PatientHasVisivestAddMonarch_MONARCH(record);
 			    	timsService.CASE4_PatientHasDifferentMonarchSwap_MONARCH(record);
@@ -149,7 +169,7 @@ public class TimsInputReaderService {
 			    	timsService.CASE10_PatientHasVisivestAddMonarch_MONARCH(record);
 			    	timsService.CASE11_PatientExistsWithNODevice_MONARCH(record);
 			    	timsService.CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH(record);
-			    //	timsService.CASE13_ExistedSerialNumberandDifferentHillromID_MONARCH(record);
+*/		
 		    	}else{
 		    		monarchBluetoothFlag = false;
 		    		log.debug("Created       " +record.getTims_cust()+ "        " +record.getSerial_num()+ "        "+"Failure"+ "        "

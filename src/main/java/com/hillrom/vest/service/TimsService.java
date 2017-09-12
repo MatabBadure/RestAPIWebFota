@@ -728,10 +728,30 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
 				tims.processed_atleast_one = true;
-			}catch(Exception ex){
+			}
+			catch(SQLException se)
+			{
+				tims.processed_atleast_one = true;
+				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+						+ se.getMessage());
+				
+				se.printStackTrace();
+				tims.failureFlag = true;
+				return false;
+			}
+			catch(Exception ex){
+				tims.processed_atleast_one = true;
+				
+				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+						+ "Error occured while assigning the patient with new device");
+				
 				ex.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}	
+			
+			log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
+					+ "patient assigned with new device");
 			
 			return true;
 		}
@@ -749,7 +769,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 			
 			
 		/*	(isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust()))*/ && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
-		    log.debug("Inside CASE3_PatientHasMonarchAddVisivest_VEST ");
+		 //   log.debug("Inside CASE3_PatientHasMonarchAddVisivest_VEST ");
 
 			try{
 				
@@ -807,7 +827,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 		
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) && (isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
-			log.debug("Inside CASE4_PatientHasDifferentVisivestSwap_VEST ");
+		//	log.debug("Inside CASE4_PatientHasDifferentVisivestSwap_VEST ");
 
 			try{
 				
@@ -865,7 +885,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 		
 		if((isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (!isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& isCurrentSerialNumberOwnedByShellVest(patientInfoDTO.getSerial_num()) ){
-			log.debug("Inside CASE5_DeviceOwnedByShell_VEST ");
+		//	log.debug("Inside CASE5_DeviceOwnedByShell_VEST ");
 			try{
 				
 				patientInfoDTO.setOperation_type("UPDATE");
@@ -916,7 +936,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				&& (!isCurrentSerialNumberOwnedByShellVest(patientInfoDTO.getSerial_num())) 
 				&& (isCurrentSerialNumberOwnedByDifferentPatientVest(patientInfoDTO.getSerial_num(), patientInfoDTO.getTims_cust())) ){
 		
-			log.debug("Inside CASE6_DeviceOwnedByDifferentPatient_VEST ");
+		//	log.debug("Inside CASE6_DeviceOwnedByDifferentPatient_VEST ");
 			try{
 				String patient_id_of_serial_number_to_inactivate = patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(patientInfoDTO.getSerial_num(),"VEST").get().getPatientId();
 				patientInfoDTO.setPatient_id(patient_id_of_serial_number_to_inactivate);
@@ -941,10 +961,29 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
-			}catch(Exception ex){
-				ex.printStackTrace();
+				tims.processed_atleast_one = true;
+			}
+			catch(SQLException se)
+			{
+				tims.processed_atleast_one = true;
+				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+						+se.getMessage());
+				se.printStackTrace();
+				tims.failureFlag = true;
 				return false;
-			}			
+			}
+			catch(Exception ex){
+				tims.processed_atleast_one = true;
+				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+						+"Error occured while assigning  device to the patient  ");
+				
+				ex.printStackTrace();
+				tims.failureFlag = true;
+				return false;
+			}
+						
+			log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
+					+ "Device assigned to patient");		
 			
 			return true;
 		}
@@ -958,7 +997,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				&& (!isCurrentSerialNumberOwnedByShellVest(patientInfoDTO.getSerial_num())) 
 				&& (!isCurrentSerialNumberOwnedByDifferentPatientVest(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust() )) ){
 
-			log.debug("Inside CASE7_DeviceIsOrphanPatientDoesNotExist_VEST ");
+		//	log.debug("Inside CASE7_DeviceIsOrphanPatientDoesNotExist_VEST ");
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
@@ -975,10 +1014,29 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
-			}catch(Exception ex){
-				ex.printStackTrace();
+				tims.processed_atleast_one = true;
+			}
+			catch(SQLException se)
+			{
+				tims.processed_atleast_one = true;
+				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+						+se.getMessage());
+				se.printStackTrace();
+				tims.failureFlag = true;
 				return false;
-			}	
+			}
+			catch(Exception ex){
+				tims.processed_atleast_one = true;
+				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+						+"Error occured while assigning device to the new patient");
+				
+				ex.printStackTrace();
+				tims.failureFlag = true;
+				return false;
+			}
+						
+			log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
+					+ "Device assigned to new patient");	
 			
 			return true;
 		}
@@ -993,7 +1051,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 		if((isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isCurrentSerialNumberOwnedByCurrentHillromIdVest(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust())) 
 				&& (!isOwnerExistsForCurrentSerialNumberVest(patientInfoDTO.getSerial_num() )) ){
-			log.debug("Inside CASE8_DeviceIsOrphanButPatientExist_VEST ");
+		//	log.debug("Inside CASE8_DeviceIsOrphanButPatientExist_VEST ");
 
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
@@ -1011,10 +1069,29 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
-			}catch(Exception ex){
-				ex.printStackTrace();
+				tims.processed_atleast_one = true;
+			}
+			catch(SQLException se)
+			{
+				tims.processed_atleast_one = true;
+				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+						+se.getMessage());
+				se.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}
+			catch(Exception ex){
+				tims.processed_atleast_one = true;
+				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+						+"Error occured while assigning device to the patient ");
+				
+				ex.printStackTrace();
+				tims.failureFlag = true;
+				return false;
+			}
+						
+			log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
+					+ "Device assigned to the patient");	
 			
 			return true;
 		}
@@ -1030,7 +1107,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 		if((isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isCurrentSerialNumberOwnedByCurrentHillromIdVest(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust())) 
 				&& (isOwnerExistsForCurrentSerialNumberVest(patientInfoDTO.getSerial_num() )) ){
-			log.debug("Inside DeviceOwnedByDifferentPatient_VEST ");
+			 //log.debug("Inside DeviceOwnedByDifferentPatient_VEST ");
 
 			
 			try{
@@ -1063,7 +1140,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 		if(DeviceOwnedByDifferentPatient_VEST(patientInfoDTO)){
 			
 			if( (isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) && (isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
-				log.debug("Inside CASE9_PatientHasDifferentVisivestSwap_VEST ");
+		//		log.debug("Inside CASE9_PatientHasDifferentVisivestSwap_VEST ");
 	
 
 				try{
@@ -1082,10 +1159,30 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocol(patientInfoDTO);
-				}catch(Exception ex){
-					ex.printStackTrace();
+					tims.processed_atleast_one = true;
+				}
+				catch(SQLException se)
+				{
+					tims.processed_atleast_one = true;
+					
+					log.debug("Swapped      " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+							+se.getMessage());
+							se.printStackTrace();
+					tims.failureFlag = true;
 					return false;
 				}
+				catch(Exception ex){
+					tims.processed_atleast_one = true;
+					log.debug("Swapped      " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+							+ "Error occured while swapping Vest device");
+					
+					ex.printStackTrace();
+					tims.failureFlag = true;
+					return false;
+				}	
+				
+				log.debug("Swapped      " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
+						+ "Patient Vest device swapped with existed Vest device");
 				
 				return true;
 			}
@@ -1116,7 +1213,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 			if( (patientDevicesAssocRepository.findByHillromId(patientInfoDTO.getTims_cust()).isPresent()) 
 					/*(isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust()))*/ && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 				
-				log.debug("Inside CASE10_PatientHasMonarchAddVisivest_VEST ");
+			//	log.debug("Inside CASE10_PatientHasMonarchAddVisivest_VEST ");
 				
 				try{
 					
@@ -1201,12 +1298,33 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocol(patientInfoDTO);
-				}catch(Exception ex){
-					ex.printStackTrace();
+					tims.processed_atleast_one = true;
+				}
+				catch(SQLException se)
+				{
+					tims.processed_atleast_one = true;
+					log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+							+ se.getMessage());
+					
+					se.printStackTrace();
+					tims.failureFlag = true;
 					return false;
 				}
+				catch(Exception ex){
+					tims.processed_atleast_one = true;
+					
+					log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+							+ "Error occured while assigning the patient with new device");
+					
+					ex.printStackTrace();
+					tims.failureFlag = true;
+					return false;
+				}	
 				
+				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
+						+ "patient assigned with new device");
 				return true;
+				
 			}
 			
 			return false;
@@ -1298,10 +1416,31 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
-			}catch(Exception ex){
+				tims.processed_atleast_one = true;
+			}catch(SQLException se)
+			{
+				tims.processed_atleast_one = true;
+				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+						+ se.getMessage());
+				
+				se.printStackTrace();
+				tims.failureFlag = true;
+				return false;
+			}
+			catch(Exception ex){
+				tims.processed_atleast_one = true;
+				
+				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+						+ "Error occured while assigning the patient with new device");
+				
 				ex.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}	
+			
+			log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
+					+ "patient assigned with new device");
+			
 			
 			return true;
 		}
@@ -1512,10 +1651,30 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
-			}catch(Exception ex){
-				ex.printStackTrace();
+				tims.processed_atleast_one = true;
+			}
+			catch(SQLException se)
+			{
+				tims.processed_atleast_one = true;
+				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+						+se.getMessage());
+				se.printStackTrace();
+				tims.failureFlag = true;
 				return false;
-			}			
+			}
+			catch(Exception ex){
+				tims.processed_atleast_one = true;
+				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+						+"Error occured while assigning  device to the patient  ");
+				
+				ex.printStackTrace();
+				tims.failureFlag = true;
+				return false;
+			}
+						
+			log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
+					+ "Device assigned to patient");		
+					
 			
 			return true;
 		}
@@ -1548,10 +1707,28 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
-			}catch(Exception ex){
-				ex.printStackTrace();
+				tims.processed_atleast_one = true;
+			}catch(SQLException se)
+			{
+				tims.processed_atleast_one = true;
+				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+						+se.getMessage());
+				se.printStackTrace();
+				tims.failureFlag = true;
 				return false;
-			}	
+			}
+			catch(Exception ex){
+				tims.processed_atleast_one = true;
+				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+						+"Error occured while assigning device to the new patient");
+				
+				ex.printStackTrace();
+				tims.failureFlag = true;
+				return false;
+			}
+						
+			log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
+					+ "Device assigned to new patient");	
 			
 			return true;
 		}
@@ -1567,7 +1744,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 		
 		if((isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isCurrentSerialNumberOwnedByCurrentHillromIdMonarch(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust())) 
-				&& (isOwnerExistsForCurrentSerialNumberMonarch(patientInfoDTO.getSerial_num() )) ){
+				&& (!isOwnerExistsForCurrentSerialNumberMonarch(patientInfoDTO.getSerial_num() )) ){
 
 
 			try{
@@ -1584,10 +1761,28 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
-			}catch(Exception ex){
-				ex.printStackTrace();
+				tims.processed_atleast_one = true;
+			}catch(SQLException se)
+			{
+				tims.processed_atleast_one = true;
+				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+						+se.getMessage());
+				se.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}
+			catch(Exception ex){
+				tims.processed_atleast_one = true;
+				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+						+"Error occured while assigning device to the patient ");
+				
+				ex.printStackTrace();
+				tims.failureFlag = true;
+				return false;
+			}
+						
+			log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
+					+ "Device assigned to the patient");	
 			
 			return true;
 		}
@@ -1604,22 +1799,36 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 		
 		if((isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
 				&& (!isCurrentSerialNumberOwnedByCurrentHillromIdMonarch(patientInfoDTO.getSerial_num(),patientInfoDTO.getTims_cust())) 
-				&& (!isOwnerExistsForCurrentSerialNumberMonarch(patientInfoDTO.getSerial_num() )) ){
-			log.debug("Inside DeviceOwnedByDifferentPatient_MONARCH ");
-
-			
+				&& (isOwnerExistsForCurrentSerialNumberMonarch(patientInfoDTO.getSerial_num() )) ){
+				
 			try{
 				patientInfoDTO.setOperation_type("INACTIVATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				patientInfoDTO.setNew_serial_number(null);
 				managePatientDeviceMonarch(patientInfoDTO);
-			}catch(Exception ex){
-				ex.printStackTrace();
+				tims.processed_atleast_one = true;
+			}catch(SQLException se)
+			{
+				tims.processed_atleast_one = true;
+				log.debug("Inactivate       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+						+se.getMessage());
+				se.printStackTrace();
+				tims.failureFlag = true;
 				return false;
 			}
-			
-
-			
+			catch(Exception ex){
+				tims.processed_atleast_one = true;
+				log.debug("Inactivate       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+						+"Error occured while Inactivating monarch device  ");
+				
+				ex.printStackTrace();
+				tims.failureFlag = true;
+				return false;
+			}
+						
+			log.debug("Inactivate       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
+					+ "Monarch Device Inactivated");	
+						
 			return true;
 		}
 		
@@ -1654,15 +1863,43 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocolMonarch(patientInfoDTO);
-				}catch(Exception ex){
-					ex.printStackTrace();
+					tims.processed_atleast_one = true;
+				}catch(SQLException se)
+				{
+					tims.processed_atleast_one = true;
+					
+					log.debug("Swapped      " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+							+se.getMessage());
+							se.printStackTrace();
+					tims.failureFlag = true;
 					return false;
 				}
+				catch(Exception ex){
+					tims.processed_atleast_one = true;
+					log.debug("Swapped      " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+							+ "Error occured while swapping Monarch device");
+					
+					ex.printStackTrace();
+					tims.failureFlag = true;
+					return false;
+				}	
+				
+				log.debug("Swapped      " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
+						+ "Patient Monarch device swapped with Existed Monarch device");
 				
 				return true;
 			}
 			
-			return false;
+			if(CASE10_PatientHasVisivestAddMonarch_MONARCH(patientInfoDTO)){
+				return true;
+			}
+			else if(CASE11_PatientExistsWithNODevice_MONARCH(patientInfoDTO)){
+				return true;
+			}else{
+				return false;
+			}
+			
+					
 		}
 		
 		return false;
@@ -1758,10 +1995,31 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocolMonarch(patientInfoDTO);
-				}catch(Exception ex){
-					ex.printStackTrace();
+					tims.processed_atleast_one = true;
+				}
+				catch(SQLException se)
+				{
+					tims.processed_atleast_one = true;
+					log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+							+ se.getMessage());
+					
+					se.printStackTrace();
+					tims.failureFlag = true;
 					return false;
 				}
+				catch(Exception ex){
+					tims.processed_atleast_one = true;
+					
+					log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
+							+ "Error occured while assigning the patient with new device");
+					
+					ex.printStackTrace();
+					tims.failureFlag = true;
+					return false;
+				}	
+				
+				log.debug("Updated       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
+						+ "patient assigned with new device");
 				
 				return true;
 			}

@@ -111,7 +111,7 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 				 UPDATE `PATIENT_DEVICES_ASSOC` pda SET
 				`serial_number` = pat_new_device_serial_number
 				 WHERE pda.`patient_id` = patient_id AND `serial_number` IS NULL;			 
-			 END IF
+			 END IF;
 			 
 			COMMIT;
             

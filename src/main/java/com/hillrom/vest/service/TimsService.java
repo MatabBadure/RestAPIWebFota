@@ -1200,7 +1200,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					managePatientDevice(patientInfoDTO);
 									
-					patientInfoDTO.setPatient_id(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceTypeInactive(patientInfoDTO.getSerial_num(),"VEST").get().getPatientId());
+					patientInfoDTO.setPatient_id(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getSerial_num(),"VEST").get().getPatientId());
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociationMonarch(patientInfoDTO);
 										
@@ -1904,7 +1904,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 					
 					managePatientDeviceMonarch(patientInfoDTO);
 					
-					patientInfoDTO.setPatient_id(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceTypeInactive(patientInfoDTO.getSerial_num(),"MONARCH").get().getPatientId());
+					patientInfoDTO.setPatient_id(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getSerial_num(),"MONARCH").get().getPatientId());
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);
 					

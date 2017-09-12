@@ -347,10 +347,15 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 	public void managePatientDeviceMonarch(PatientInfoDTO patientInfoDTO) throws SQLException ,HillromException{		
 		
 		try{
+			
+			
+			
 			timsUserRepository.managePatientDeviceMonarch(patientInfoDTO.getOperation_type(), 
 				patientInfoDTO.getPatient_id(), 
 				patientInfoDTO.getOld_serial_number(), 
 				patientInfoDTO.getNew_serial_number(),
+				patientInfoDTO.getBluetooth_id(),
+				patientInfoDTO.getHub_id(),
 				patientInfoDTO.getCreated_by());
 		}
 		catch(SQLException se)
@@ -1353,6 +1358,9 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 							
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+				patientInfoDTO.setNew_serial_number(null);
+					
+				
 				managePatientDeviceMonarch(patientInfoDTO);
 						
 				patientInfoDTO.setOperation_type("CREATE");
@@ -1405,6 +1413,10 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
+				
+				
+				
 				managePatientDeviceMonarch(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");

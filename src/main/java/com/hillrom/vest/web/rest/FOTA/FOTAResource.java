@@ -4,9 +4,11 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.FOTA_FILE_PATH;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -15,10 +17,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import net.minidev.json.JSONObject;
@@ -31,6 +33,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,8 +44,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hillrom.vest.config.FOTA.FOTAConstants;
-import com.hillrom.vest.domain.FOTA.FOTADeviceFWareUpdate;
 import com.hillrom.vest.domain.FOTA.FOTAInfo;
+import com.hillrom.vest.repository.FOTA.FOTARepository;
 import com.hillrom.vest.service.FOTA.FOTAService;
 import com.hillrom.vest.web.rest.FOTA.dto.ApproverCRCDto;
 import com.hillrom.vest.web.rest.FOTA.dto.CRC32Dto;
@@ -57,6 +60,9 @@ public class FOTAResource {
 
 	@Inject
 	private FOTAService fotaService;
+	
+	@Inject
+	private FOTARepository fotaRepository;
 
 	/**
 	 * POST /processHexa to byte array
@@ -269,10 +275,11 @@ public class FOTAResource {
 	public ResponseEntity<?> FOTADeviceList(
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
-			@RequestParam(value = "status", required = false) String status) {
+			@RequestParam(value = "status", required = false) String status,
+			@RequestParam(value = "searchString", required = true) String searchString) {
 		try {
 			List<FOTADeviceDto> fotaDeviceList = fotaService
-					.getFOTADeviceList(status);
+					.getFOTADeviceList(status, searchString);
 			
 
 			int firstResult = PaginationUtil.generatePageRequest(offset, limit)
@@ -381,5 +388,43 @@ public class FOTAResource {
 						HttpStatus.BAD_REQUEST);
 			}
 		}
+		
+		 /**
+		   * 
+		   * @param fileName
+		   * @param response
+		   */
+		  @RequestMapping(value = "/FOTA/{id}/download", method = RequestMethod.GET)
+		  public ResponseEntity<?> FOTAGetFile(
+				  @PathVariable Long id, 
+		      HttpServletResponse response) {
+			  
+			  		JSONObject jsonObject = new JSONObject();
+		      try {
+		    	  // get your file as InputStream
+		    	  
+		    	// Save the file locally
+					/*BufferedOutputStream stream = new BufferedOutputStream(
+							new FileOutputStream(new File(fileName)));*/
+		    	  
+		    	 // File initialFile = new File(Constants.ANNOUNCEMENT_FILE_PATH + fileName + ".pdf");
+		    	  FOTAInfo fotaInfo = null;
+		  		  fotaInfo = fotaRepository.findOneById(id);
+		  		 
+		  			 InputStream is = new FileInputStream(fotaInfo.getFilePath());
+		  			 response.addHeader("Content-disposition", "inline;filename="+fotaInfo.getFilePath());
+		  			  response.setContentType("application/octet-stream");
+				        // copy it to response's OutputStream
+				        FileCopyUtils.copy(is, response.getOutputStream());
+				        response.flushBuffer();
+		        jsonObject.put("response", response);
+		        return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
+		        
+		      } catch (IOException ex) {
+		    		jsonObject.put("ERROR", ex.getMessage());
+					return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		      }
+
+		  }
 		
 }

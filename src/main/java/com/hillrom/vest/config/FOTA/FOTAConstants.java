@@ -3,8 +3,9 @@ package com.hillrom.vest.config.FOTA;
 public final class FOTAConstants {
 
 	//public static final String HEXAFILEPATH = "/opt/FOTA/files";
-	public static final String HEXAFILEPATH = "D:/FOTA/Hex";
-	//public static final String FOTA_FILE_PATH = "D:/FOTA/UploadFile/";
+	/*public static final String HEXAFILEPATH = "D:/FOTA/Hex";
+	public static final String FOTA_FILE_PATH = "D:/FOTA/UploadFile/";*/
+	public static final String HEXAFILEPATH = "/opt/FOTA/files";
 	public static final String FOTA_FILE_PATH = "/opt/FOTA/files";
 	public static final int CHUNK_SIZE_VALUE = 200;
 	// Raw data constants
@@ -56,6 +57,18 @@ public final class FOTAConstants {
 	public static final String DEVICE_PARTNUMBER_02 = "0234567890123451";
 	public static final String DEVICE_PARTNUMBER_03 = "0345678901234512";
 	public static final String DEVICE_PARTNUMBER_04 = "0456789012345123";
+	
+	//Device listing query 
+	public static final String DEVICE_QUERYSTR = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where ";
+	public static final String DEVICE_QUERYSTR1 ="(d.downloaded_status ='";
+	public static final String DEVICE_QUERYSTR2 = "' and lower(f.device_part_number) like lower(";
+	public static final String DEVICE_QUERYSTR3 = "' and lower(f.product_type) like lower(";
+	public static final String DEVICE_QUERYSTR4 = ") and d.fota_info_id = f.id)";
+	
+	//For All
+	
+	
+	
 	
 	
 	

@@ -1,5 +1,7 @@
 package com.hillrom.vest.service.FOTA;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.ABORTED;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.ABORTED_LIST;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.ALL;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.AMPERSAND;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.BUFFER_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.BUFFER_LEN_EQ;
@@ -8,6 +10,7 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_SN;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.FAILURE_LIST;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.FOTA_FILE_PATH;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.INIT;
@@ -21,19 +24,18 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE3;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.RESULT;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.RESULT_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.SOFT_VER_DATE;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.SUCCESS_LIST;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.TOTAL_CHUNK;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.YES;
-
-import static com.hillrom.vest.config.FOTA.FOTAConstants.SUCCESS_LIST;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.FAILURE_LIST;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.ABORTED_LIST;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.ALL;
-
+import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR1;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR2;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR3;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR4;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -54,24 +56,25 @@ import java.util.Objects;
 import java.util.Random;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.xml.bind.DatatypeConverter;
 
 import net.minidev.json.JSONObject;
+import net.wimpi.telnetd.io.terminal.vt100;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.joda.time.DateTime;
-import org.omg.CORBA.Object;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.vest.config.FOTA.FOTAConstants;
 import com.hillrom.vest.domain.FOTA.FOTADeviceFWareUpdate;
 import com.hillrom.vest.domain.FOTA.FOTAInfo;
 import com.hillrom.vest.exceptionhandler.HillromException;
-import com.hillrom.vest.pointer.FOTA.HM_HandleHolder;
-import com.hillrom.vest.pointer.FOTA.HM_part01;
 import com.hillrom.vest.pointer.FOTA.HandleHolder;
 import com.hillrom.vest.pointer.FOTA.PartNoHolder;
 import com.hillrom.vest.repository.FOTA.FOTADeviceRepository;
@@ -92,6 +95,9 @@ public class FOTAService {
 	
 	@Inject
 	private FOTADeviceRepository fotaDeviceRepository;
+	
+	@Inject
+	private EntityManager entityManager;
 	
 	
 	private  Map<Long,String> storeChunk ;
@@ -1472,68 +1478,111 @@ public class FOTAService {
 		return val;
 	}
 
-	public List<FOTADeviceDto> getFOTADeviceList(String status) {
+	public List<FOTADeviceDto> getFOTADeviceList(String status, String searchString) {
 
 		List<FOTADeviceFWareUpdate> FOTADeviceList = null;
 		List<FOTADeviceDto> FOTADeviceDtoList = null;
 
+		String queryString = new StringBuilder("'%").append(searchString)
+				.append("%'").toString();
+		
 		if (status.equals(SUCCESS_LIST)) {
 			FOTADeviceList = new ArrayList<FOTADeviceFWareUpdate>();
-			FOTADeviceList = fotaDeviceRepository
-					.getFOTADeviceListByStatus(status);
-			FOTADeviceDtoList = setDeviceValues(FOTADeviceList);
 			
+			String queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4;
+			
+			Query jpaQuery = entityManager.createNativeQuery(queryStr);
+			
+			List<Object[]> resultList = jpaQuery.getResultList();
+			
+			FOTADeviceDtoList = setDeviceValues(resultList);
+			
+			/*
+			FOTADeviceList = fotaDeviceRepository
+					.getFOTADeviceListByStatus(status, queryString);
+			FOTADeviceDtoList = setDeviceValues(resultList);
+			*/
 			
 		} else if (status.equals(FAILURE_LIST)) {
 			FOTADeviceList = new ArrayList<FOTADeviceFWareUpdate>();
-			FOTADeviceList = fotaDeviceRepository
-					.getFOTADeviceListByStatus(status);
-			FOTADeviceDtoList = setDeviceValues(FOTADeviceList);
+			
+
+			String queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4;
+			
+			Query jpaQuery = entityManager.createNativeQuery(queryStr);
+			
+			List<Object[]> resultList = jpaQuery.getResultList();
+			
+			FOTADeviceDtoList = setDeviceValues(resultList);
+			/*FOTADeviceList = fotaDeviceRepository
+					.getFOTADeviceListByStatus(status, queryString);
+			FOTADeviceDtoList = setDeviceValues(FOTADeviceList);*/
 
 		} else if (status.equals(ABORTED_LIST)) {
 			FOTADeviceList = new ArrayList<FOTADeviceFWareUpdate>();
-			FOTADeviceList = fotaDeviceRepository
-					.getFOTADeviceListByStatus(status);
-			FOTADeviceDtoList = setDeviceValues(FOTADeviceList);
+			/*FOTADeviceList = fotaDeviceRepository
+					.getFOTADeviceListByStatus(status, queryString);
+			FOTADeviceDtoList = setDeviceValues(FOTADeviceList);*/
+			
+
+			String queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4;
+			
+			Query jpaQuery = entityManager.createNativeQuery(queryStr);
+			
+			List<Object[]> resultList = jpaQuery.getResultList();
+			
+			FOTADeviceDtoList = setDeviceValues(resultList);
 
 		} else if (status.equals(ALL)) {
 			
 			FOTADeviceList = new ArrayList<FOTADeviceFWareUpdate>();
-			FOTADeviceList = fotaDeviceRepository.getFOTADeviceListByAll(SUCCESS_LIST, FAILURE_LIST,ABORTED_LIST);
-			FOTADeviceDtoList = setDeviceValues(FOTADeviceList);
+			//SUCCESS_LIST, FAILURE_LIST, ABORTED_LIST
+
+			String queryStr =	DEVICE_QUERYSTR+"(d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"')"+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+"(d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"')"+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4;
+			
+			Query jpaQuery = entityManager.createNativeQuery(queryStr);
+			
+			List<Object[]> resultList = jpaQuery.getResultList();
+			
+			FOTADeviceDtoList = setDeviceValues(resultList);
+			
+			/*FOTADeviceList = fotaDeviceRepository.getFOTADeviceListByAll(SUCCESS_LIST, FAILURE_LIST, ABORTED_LIST, queryString);
+			FOTADeviceDtoList = setDeviceValues(FOTADeviceList);*/
 		}
 		return FOTADeviceDtoList;
 	}
 
 	private List<FOTADeviceDto> setDeviceValues(
-			List<FOTADeviceFWareUpdate> FOTADeviceList) {
+			List<Object[]> FOTADeviceList) {
 		List<FOTADeviceDto> FOTADeviceDtoList = new ArrayList<FOTADeviceDto>();
 		
-		for (FOTADeviceFWareUpdate fwareObj : FOTADeviceList) {
-			FOTAInfo fotaInfo = null;
+		for (Object[] fwareObj : FOTADeviceList) {
+			//FOTAInfo fotaInfo = null;
 			FOTADeviceDto fwareDtoObj = new FOTADeviceDto();
-			fotaInfo = fotaRepository.findOneById(fwareObj.getFotaInfoId());
-			fwareDtoObj.setId(fwareObj.getId());
-			fwareDtoObj.setFotaInfoId(fwareObj.getFotaInfoId());
-			fwareDtoObj.setDeviceSerialNumber(fwareObj.getDeviceSerialNumber());
-			fwareDtoObj.setConnectionType(fwareObj.getConnectionType());
-			fwareDtoObj.setDeviceSoftVersion(fwareObj.getDeviceSoftVersion());
-			fwareDtoObj.setDeviceSoftwareDateTime(fwareObj
-					.getDeviceSoftwareDateTime());
-			fwareDtoObj.setUpdatedSoftVersion(fwareObj.getUpdatedSoftVersion());
-			fwareDtoObj.setCheckupdateDateTime(fwareObj
-					.getCheckupdateDateTime());
-			fwareDtoObj.setDownloadStartDateTime(fwareObj
-					.getDownloadStartDateTime());
-			fwareDtoObj.setDownloadEndDateTime(fwareObj
-					.getDownloadEndDateTime());
-			fwareDtoObj.setDownloadStatus(fwareObj.getDownloadStatus());
-			if(fotaInfo != null){
-				fwareDtoObj.setProductType(fotaInfo.getProductType());
-				fwareDtoObj.setDevicePartNumber(Long.valueOf(fotaInfo.getDevicePartNumber()));
-			}
+			
+			/*Long longNumber= fwareDtoObj[0].longValue();
+			
+			Integer grandChildCount = ((BigInteger) fwareDtoObj[0]).intValue();*/
+			//fotaInfo = fotaRepository.findOneById((Long)fwareObj[1]);
+			
+			//BigInteger bi = new BigInteger(String.valueOf((Long)fwareObj[0]));
+			
+			//fwareDtoObj.setId((Long)(String.valueOf(fwareObj[0])));
+			/*Number fotaId = (Number) fwareObj[0];
+			fwareDtoObj.setFotaInfoId((Long) fotaId);*/
+			fwareDtoObj.setDeviceSerialNumber((String)fwareObj[2]);
+			fwareDtoObj.setConnectionType((String)fwareObj[3]);
+			fwareDtoObj.setDeviceSoftVersion((String)fwareObj[4]);
+			fwareDtoObj.setDeviceSoftwareDateTime(new DateTime(fwareObj[5]));
+			fwareDtoObj.setUpdatedSoftVersion((String)fwareObj[6]);
+			fwareDtoObj.setCheckupdateDateTime(new DateTime(fwareObj[7]));
+			fwareDtoObj.setDownloadStartDateTime(new DateTime(fwareObj[8]));
+			fwareDtoObj.setDownloadEndDateTime(new DateTime(fwareObj[9]));
+			fwareDtoObj.setDownloadStatus((String)fwareObj[10]);
+			fwareDtoObj.setProductType((String)fwareObj[12]);
+			fwareDtoObj.setDevicePartNumber(Long.valueOf((String)fwareObj[11]));
 			//Calculate Download Time
-			String totalDownloadTime = getDownLoadTime(fwareObj.getDownloadEndDateTime(),fwareObj.getDownloadStartDateTime());
+			String totalDownloadTime = getDownLoadTime(new DateTime(fwareObj[9]),new DateTime(fwareObj[8]));
 			fwareDtoObj.setDownloadTime(totalDownloadTime);
 			FOTADeviceDtoList.add(fwareDtoObj);
 		}
@@ -1566,20 +1615,15 @@ public class FOTAService {
 		return totalDownloadTime;
 	}
 
-	public List<FOTAInfo> FOTAList(String status, String partNumberSearch) {
+	public List<FOTAInfo> FOTAList(String status, String searchString) {
 		List<FOTAInfo> FOTAInfoList = null;
 		List<FOTAInfo> FOTAInfoListUpdate = null;
 		FOTAInfoListUpdate = new ArrayList<FOTAInfo>();
+		String queryString = new StringBuilder("%").append(searchString)
+				.append("%").toString();
 		if(status.equals("ActivePending")){
 			FOTAInfoList = new ArrayList<FOTAInfo>();
-			/*boolean softDeleteFlag = false;
-			boolean activePublishedFlag = false;
-			boolean deleteRequest = true;*/
-			if(StringUtils.isNotEmpty(partNumberSearch)){
-				FOTAInfoList = fotaRepository.getFOTAListByPendingAndSearchStr(false,false,false,false,true,true,partNumberSearch);
-			}else{
-				FOTAInfoList = fotaRepository.getFOTAListByPendingAndSearchStr(false,false,false,false,true,true," ");
-			}
+			FOTAInfoList = fotaRepository.getFOTAListByPendingAndSearchStr(false,false,false,false,true,true,queryString);
 			for(FOTAInfo info : FOTAInfoList){
 				if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == false && info.getDeleteRequestFlag() == false ){
 					info.setFOTAStatus("Active Pending");
@@ -1593,7 +1637,10 @@ public class FOTAService {
 			boolean softDeleteFlag = false;
 			boolean activePublishedFlag = true;
 			
-			FOTAInfoList = fotaRepository.getFOTAListByPublishedAndSearchStr(softDeleteFlag,activePublishedFlag,partNumberSearch);
+			String queryString1 = new StringBuilder("%").append(searchString)
+					.append("%").toString();
+			
+			FOTAInfoList = fotaRepository.getFOTAListByPublishedAndSearchStr(softDeleteFlag,activePublishedFlag,queryString1);
 			for(FOTAInfo info : FOTAInfoList){
 				if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == true){
 					info.setFOTAStatus("Active Published");
@@ -1605,7 +1652,7 @@ public class FOTAService {
 		}else if(status.equals("All")){
 			FOTAInfoList = new ArrayList<FOTAInfo>();
 			//To get all active pending and active published
-			FOTAInfoList = fotaRepository.getFOTAListByAllAndSearchStr();
+			FOTAInfoList = fotaRepository.getFOTAListByAllAndSearchStr(queryString);
 			for(FOTAInfo info : FOTAInfoList){
 				if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == false){
 					info.setFOTAStatus("Active Pending");

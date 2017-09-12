@@ -62,17 +62,17 @@ IF operation_type_indicator = 'CREATE' THEN
 		 -- make insert device into patient_vest_device_history_monarch with active.
 
 
---		IF pvdhm_is_active IS NOT NULL THEN
---			IF pvdhm_is_active =0 THEN
---					UPDATE `PATIENT_VEST_DEVICE_HISTORY_MONARCH` pvdhm SET
---					`is_active` = 1 WHERE pvdhm.`serial_number` = pvdhm_serial_number and pvdhm.`patient_id` = pvdhm_patient_id;
---			END IF;
---		ELSE 		 
+		IF pvdhm_is_active IS NOT NULL THEN
+			IF pvdhm_is_active =0 THEN
+					UPDATE `PATIENT_VEST_DEVICE_HISTORY_MONARCH` pvdhm SET
+					`is_active` = 1 WHERE pvdhm.`serial_number` = pvdhm_serial_number and pvdhm.`patient_id` = pvdhm_patient_id;
+			END IF;
+		ELSE 		 
 			INSERT INTO `PATIENT_VEST_DEVICE_HISTORY_MONARCH`
 				(`patient_id`, `serial_number`, `bluetooth_id`,	`hub_id`,`created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_active`,`hmr`)
 				VALUES
 				(patient_id,pat_old_device_serial_number,pat_bluetooth_id,pat_hub_id, pat_created_by,today_date,pat_created_by,today_date,1,0);
---		END IF;		
+		END IF;		
 
 			
 	  COMMIT;

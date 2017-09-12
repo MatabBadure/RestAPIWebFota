@@ -1523,7 +1523,7 @@ public class FOTAService {
 			FOTADeviceDtoList = setDeviceValues(FOTADeviceList);*/
 			
 
-			String queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4;
+			String queryStr = DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4;
 			
 			Query jpaQuery = entityManager.createNativeQuery(queryStr);
 			
@@ -1536,7 +1536,7 @@ public class FOTAService {
 			FOTADeviceList = new ArrayList<FOTADeviceFWareUpdate>();
 			//SUCCESS_LIST, FAILURE_LIST, ABORTED_LIST
 
-			String queryStr =	DEVICE_QUERYSTR+"(d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"')"+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+"(d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"')"+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4;
+			String queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id)";
 			
 			Query jpaQuery = entityManager.createNativeQuery(queryStr);
 			

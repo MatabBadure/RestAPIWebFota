@@ -90,14 +90,28 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 				VALUES
 				(patient_id,pat_new_device_serial_number, pat_hub_id,pat_bluetooth_id,pat_created_by,today_date,pat_created_by,today_date,1,0,1);
 			
-			UPDATE `PATIENT_VEST_DEVICE_HISTORY` pvdhm SET
-			`last_modified_date` = today_date,
-            `is_active` = 0
-			 WHERE pvdhm.`patient_id` = patient_id AND `serial_number` = pat_old_device_serial_number;
+			IF pat_old_device_serial_number IS NOT NULL THEN	
+				 UPDATE `PATIENT_VEST_DEVICE_HISTORY` pvdhm SET
+				`last_modified_date` = today_date,
+	            `is_active` = 0
+				 WHERE pvdhm.`patient_id` = patient_id AND `serial_number` = pat_old_device_serial_number;
+				 
+				 
+				 UPDATE `PATIENT_DEVICES_ASSOC` pda SET
+				`serial_number` = pat_new_device_serial_number
+				 WHERE pda.`patient_id` = patient_id AND `serial_number` = pat_old_device_serial_number;
+			 ELSE
+				 UPDATE `PATIENT_VEST_DEVICE_HISTORY` pvdhm SET
+				`last_modified_date` = today_date,
+	            `is_active` = 0
+				 WHERE pvdhm.`patient_id` = patient_id AND `serial_number` IS NULL;
+				 
+				 
+				 UPDATE `PATIENT_DEVICES_ASSOC` pda SET
+				`serial_number` = pat_new_device_serial_number
+				 WHERE pda.`patient_id` = patient_id AND `serial_number` IS NULL;
 			 
-			 UPDATE `PATIENT_DEVICES_ASSOC` pda SET
-			`serial_number` = pat_new_device_serial_number
-			 WHERE pda.`patient_id` = patient_id AND `serial_number` = pat_old_device_serial_number;
+			 END IF;
 			 			 
 			COMMIT;
 
@@ -135,4 +149,5 @@ ELSEIF operation_type_indicator ='INACTIVATE' THEN
 		COMMIT;
 ELSE  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Operation not supported';
 END IF;
-END
+END $$
+DELIMITER ;

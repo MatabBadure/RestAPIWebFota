@@ -9,6 +9,11 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.CONNECTION_TYPE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR1;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR2;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR3;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR4;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_SN;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.FAILURE_LIST;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.FOTA_FILE_PATH;
@@ -27,11 +32,6 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.SOFT_VER_DATE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.SUCCESS_LIST;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.TOTAL_CHUNK;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.YES;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR1;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR2;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR3;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR4;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -61,7 +61,6 @@ import javax.persistence.Query;
 import javax.xml.bind.DatatypeConverter;
 
 import net.minidev.json.JSONObject;
-import net.wimpi.telnetd.io.terminal.vt100;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -71,7 +70,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hillrom.vest.config.FOTA.FOTAConstants;
 import com.hillrom.vest.domain.FOTA.FOTADeviceFWareUpdate;
 import com.hillrom.vest.domain.FOTA.FOTAInfo;
 import com.hillrom.vest.exceptionhandler.HillromException;

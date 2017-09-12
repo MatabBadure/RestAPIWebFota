@@ -472,7 +472,8 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 	
 	public boolean isHillromIdExistInPatientDeviceAssocVest(String hillromId){
 		
-		if(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"VEST").isPresent()){
+		//if(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"VEST").isPresent()){
+		if(patientDevicesAssocRepository.findByHillromIdAndDeviceTypeActiveOrInactive(hillromId,"VEST").isPresent()){
 				/*log.debug("Checking isHillromIdExistInPatientDeviceAssocVest ");*/
 				return true;
 		}
@@ -1399,12 +1400,15 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 		
 		
 		if((!isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (!patientDevicesAssocRepository.findByHillromId(patientInfoDTO.getTims_cust()).isPresent())
 				&& (!isHillromIdExistInPatientDeviceAssocMonarch(patientInfoDTO.getTims_cust())) ){
 			
 
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				managePatientDeviceMonarch(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");
@@ -1456,6 +1460,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 		
 		if((!isSerialNoExistInPatientdeviceAssocMonarch(patientInfoDTO.getSerial_num())) 
 				&& (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
+				&& (patientDevicesAssocRepository.findByHillromId(patientInfoDTO.getTims_cust()).isPresent()) 
 				//&& (isHillromIdExistInPatientDeviceAssocMonarch(patientInfoDTO.getTims_cust())) 
 				&& (!isHillromIdHasMonarchDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 			

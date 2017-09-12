@@ -347,10 +347,15 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 	public void managePatientDeviceMonarch(PatientInfoDTO patientInfoDTO) throws SQLException ,HillromException{		
 		
 		try{
+			
+			
+			
 			timsUserRepository.managePatientDeviceMonarch(patientInfoDTO.getOperation_type(), 
 				patientInfoDTO.getPatient_id(), 
 				patientInfoDTO.getOld_serial_number(), 
 				patientInfoDTO.getNew_serial_number(),
+				patientInfoDTO.getBluetooth_id(),
+				patientInfoDTO.getHub_id(),
 				patientInfoDTO.getCreated_by());
 		}
 		catch(SQLException se)
@@ -1150,8 +1155,8 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					managePatientDevice(patientInfoDTO);
 					
-				    patientInfoDTO.setOperation_type("CREATE");
-					managePatientDeviceAssociation(patientInfoDTO);
+					/* patientInfoDTO.setOperation_type("CREATE");
+					managePatientDeviceAssociation(patientInfoDTO);*/
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -1289,7 +1294,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					managePatientDevice(patientInfoDTO);
 					
-					patientInfoDTO.setOperation_type("CREATE");
+					patientInfoDTO.setOperation_type("UPDATE");
 					managePatientDeviceAssociation(patientInfoDTO);
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
@@ -1353,6 +1358,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 							
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+										
 				managePatientDeviceMonarch(patientInfoDTO);
 						
 				patientInfoDTO.setOperation_type("CREATE");
@@ -1405,11 +1411,15 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				managePatientDeviceMonarch(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+			
+				//	log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
@@ -1466,6 +1476,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+							
 				managePatientDeviceMonarch(patientInfoDTO);
 								
 				patientInfoDTO.setOperation_type("CREATE");
@@ -1524,6 +1535,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get().getSerialNumber());
 				patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
+				
 				managePatientDeviceMonarch(patientInfoDTO);
 								
 				patientInfoDTO.setOperation_type("UPDATE");
@@ -1636,6 +1648,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				String patientIdOfSrNumToInactive = patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(patientInfoDTO.getSerial_num(),"MONARCH").get().getPatientId();
 				patientInfoDTO.setPatient_id(patientIdOfSrNumToInactive);
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
+				
 				managePatientDeviceMonarch(patientInfoDTO);
 
 				patientInfoDTO.setOperation_type("CREATE");
@@ -1700,6 +1713,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+				
 				managePatientDeviceMonarch(patientInfoDTO);
 				
 				patientInfoDTO.setOperation_type("CREATE");
@@ -1751,7 +1765,12 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
+				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				
 				managePatientDeviceMonarch(patientInfoDTO);
+			
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
@@ -1810,27 +1829,11 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				patientInfoDTO.setNew_serial_number(null);
 				managePatientDeviceMonarch(patientInfoDTO);
 				tims.processed_atleast_one = true;
-			}catch(SQLException se)
-			{
-				tims.processed_atleast_one = true;
-				log.debug("Inactivate       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
-						+se.getMessage());
-				se.printStackTrace();
-				tims.failureFlag = true;
-				return false;
-			}
-			catch(Exception ex){
-				tims.processed_atleast_one = true;
-				log.debug("Inactivate       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Failure"+ "        "
-						+"Error occured while Inactivating monarch device  ");
-				
+			}catch(Exception ex){
 				ex.printStackTrace();
-				tims.failureFlag = true;
 				return false;
 			}
-						
-			log.debug("Inactivate       " +patientInfoDTO.getTims_cust()+ "        " +patientInfoDTO.getSerial_num()+ "        "+"Success"+ "        "
-					+ "Monarch Device Inactivated");	
+				
 						
 			return true;
 		}
@@ -1857,10 +1860,12 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 					patientInfoDTO.setOperation_type("UPDATE");
 					patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get().getSerialNumber());
 					patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
+					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+								
 					managePatientDeviceMonarch(patientInfoDTO);
 					
-					patientInfoDTO.setOperation_type("CREATE");
-					managePatientDeviceAssociation(patientInfoDTO);
+					/*patientInfoDTO.setOperation_type("CREATE");
+					managePatientDeviceAssociation(patientInfoDTO);*/
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -1932,11 +1937,13 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 					patientInfoDTO.setOperation_type("CREATE");
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+						
+					
 					managePatientDeviceMonarch(patientInfoDTO);
 					
 					patientInfoDTO.setPatient_id(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceTypeInactive(patientInfoDTO.getSerial_num(),"MONARCH").get().getPatientId());
 					patientInfoDTO.setOperation_type("CREATE");
-					managePatientDeviceAssociationMonarch(patientInfoDTO);
+					managePatientDeviceAssociation(patientInfoDTO);
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -1993,9 +2000,12 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				try{
 					patientInfoDTO.setOperation_type("CREATE");
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
+					patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
+					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+					
 					managePatientDeviceMonarch(patientInfoDTO);
 					
-					patientInfoDTO.setOperation_type("CREATE");
+					patientInfoDTO.setOperation_type("UPDATE");
 					managePatientDeviceAssociation(patientInfoDTO);
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());

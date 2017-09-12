@@ -553,8 +553,8 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 		}catch(Exception ex){
 			another_patient_hillrom_id = "";
 		}
-		log.debug("hillromId " + hillromId);
-		log.debug("another_patient_hillrom_id " + another_patient_hillrom_id);
+	/*	log.debug("hillromId " + hillromId);
+		log.debug("another_patient_hillrom_id " + another_patient_hillrom_id);*/
 	
 		if((another_patient_hillrom_id!=null)&& (!another_patient_hillrom_id.equalsIgnoreCase(""))) {
        	 if(!another_patient_hillrom_id.equalsIgnoreCase(hillromId)){
@@ -577,8 +577,8 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 		}catch(Exception ex){
 			another_patient_hillrom_id = "";
 		}
-		log.debug("hillromId " + hillromId);
-		log.debug("another_patient_hillrom_id " + another_patient_hillrom_id);
+	/*	log.debug("hillromId " + hillromId);
+		log.debug("another_patient_hillrom_id " + another_patient_hillrom_id);*/
 	
 		if((another_patient_hillrom_id!=null)&& (!another_patient_hillrom_id.equalsIgnoreCase(""))) {
        	 if(!another_patient_hillrom_id.equalsIgnoreCase(hillromId)){
@@ -724,7 +724,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+			//	log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().

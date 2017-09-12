@@ -1,7 +1,10 @@
-DROP procedure IF EXISTS `manage_patient_device_monarch`;
-
+-- --------------------------------------------------------------------------------
+-- Routine DDL
+-- Note: comments before and after the routine body will not be stored by the server
+-- --------------------------------------------------------------------------------
 DELIMITER $$
-CREATE PROCEDURE `manage_patient_device_monarch`(
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `manage_patient_device_monarch`(
 	IN operation_type_indicator VARCHAR(10),
     IN patient_id varchar(50), 
     IN pat_old_device_serial_number varchar(50),
@@ -32,7 +35,7 @@ SET today_date = now();
 IF operation_type_indicator = 'CREATE' THEN
 
 	SELECT `patient_id`, `serial_number` INTO temp_patient_info_id, temp_serial_number FROM `PATIENT_DEVICES_ASSOC`
-	WHERE `serial_number` = pat_old_device_serial_number and `is_active` = 'true';
+	WHERE `serial_number` = pat_old_device_serial_number and `is_active` = true;
 
 
 	
@@ -137,5 +140,3 @@ ELSEIF operation_type_indicator ='INACTIVATE' THEN
 ELSE  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Operation not supported';
 END IF;
 END
-$$
-DELIMITER ;

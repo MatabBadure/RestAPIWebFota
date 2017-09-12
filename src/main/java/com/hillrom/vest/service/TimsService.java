@@ -1113,23 +1113,26 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 		
 		//if(DeviceOwnedByDifferentPatient_VEST(patientInfoDTO)){
 			
-			if( (isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust())) && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
+			if( (patientDevicesAssocRepository.findByHillromId(patientInfoDTO.getTims_cust()).isPresent()) 
+					/*(isHillromIdExistInPatientDeviceAssocVest(patientInfoDTO.getTims_cust()))*/ && (!isHillromIdHasVestDeviceInPatientDeviceAssoc(patientInfoDTO.getTims_cust())) ){
 				
 				log.debug("Inside CASE10_PatientHasMonarchAddVisivest_VEST ");
 				
 				try{
 					
-					patientInfoDTO.setOperation_type("UPDATE");
+				/*	patientInfoDTO.setOperation_type("UPDATE");
 					patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
-					managePatientUser(patientInfoDTO);
-										 
+					managePatientUser(patientInfoDTO);*/
+					patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
+					
 					patientInfoDTO.setOperation_type("CREATE");
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					managePatientDevice(patientInfoDTO);
 									
+					patientInfoDTO.setPatient_id(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceTypeInactive(patientInfoDTO.getSerial_num(),"VEST").get().getPatientId());
 					patientInfoDTO.setOperation_type("CREATE");
-					managePatientDeviceAssociation(patientInfoDTO);
+					managePatientDeviceAssociationMonarch(patientInfoDTO);
 										
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().

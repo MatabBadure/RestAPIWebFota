@@ -1636,8 +1636,8 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-		/*		patientInfoDTO.setOperation_type("CREATE");
-				managePatientDeviceMonarch(patientInfoDTO);*/   //if it's required please uncomment
+             	patientInfoDTO.setOperation_type("CREATE");
+				managePatientDeviceMonarch(patientInfoDTO);   //if it's required please uncomment
 				
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");

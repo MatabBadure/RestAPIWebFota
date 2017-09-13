@@ -84,29 +84,59 @@ IF operation_type_indicator = 'CREATE' THEN
 						IF temp_patient_info_id <> pat_patient_id AND temp_serial_number = pat_device_serial_number 
 							AND temp_device_type = 'VEST' THEN
 							
-							UPDATE `PATIENT_INFO` SET
-							`expired` = 1,
-							`expired_date` = today_date
-							WHERE `id` = temp_patient_info_id;
+							IF temp_hillrom_id = '' or temp_hillrom_id IS NULL THEN
+								UPDATE `PATIENT_INFO` SET
+								`expired` = 1,
+								`expired_date` = today_date
+								WHERE `id` = temp_patient_info_id;
+								
+								UPDATE PATIENT_DEVICES_ASSOC PVDA SET 
+								`patient_id` = pat_patient_id,
+								`hillrom_id` =  pat_hillrom_id,
+								`patient_type` ='CD', 
+								`modified_date` = today_date,
+								`old_patient_id` = temp_patient_info_id,
+								`hub_id` = pat_hub_id,
+								`bluetooth_id` = pat_bluetooth_id,
+								`diagnosis1` = pat_diagnosis_code1,
+								`diagnosis2` = pat_diagnosis_code2,
+								`diagnosis3` = pat_diagnosis_code3,
+								`diagnosis4` = pat_diagnosis_code4,
+								`garment_type` = pat_garment_type,
+								`garment_size` = pat_garment_size,
+								`garment_color` = pat_garment_color
+								where PVDA.`serial_number` = pat_device_serial_number  
+								AND  (PVDA.`hillrom_id` = '' OR PVDA.`hillrom_id` IS NULL) AND PVDA. `patient_type` = 'SD' 
+								AND PVDA.`device_type` = 'VEST' ;
+							ELSE
 							
-							UPDATE PATIENT_DEVICES_ASSOC PVDA SET 
-							`patient_id` = pat_patient_id,
-							`hillrom_id` =  pat_hillrom_id,
-							`patient_type` ='CD', 
-							`modified_date` = today_date,
-							`old_patient_id` = temp_patient_info_id,
-							`hub_id` = pat_hub_id,
-							`bluetooth_id` = pat_bluetooth_id,
-							`diagnosis1` = pat_diagnosis_code1,
-							`diagnosis2` = pat_diagnosis_code2,
-							`diagnosis3` = pat_diagnosis_code3,
-							`diagnosis4` = pat_diagnosis_code4,
-							`garment_type` = pat_garment_type,
-							`garment_size` = pat_garment_size,
-							`garment_color` = pat_garment_color
-							where PVDA.`serial_number` = pat_device_serial_number  
-							AND  (PVDA.`hillrom_id` = '' OR PVDA.`hillrom_id` IS NULL) AND PVDA. `patient_type` = 'SD' 
-							AND PVDA.`device_type` = 'VEST' ;
+							     -- we need update the old patient as SD and mark the old vest as inactive
+								 UPDATE PATIENT_DEVICES_ASSOC PVDA SET 
+								`patient_type` ='SD', 
+								`modified_date` = today_date,
+								`old_patient_id` = temp_patient_info_id,
+								`is_active` = 0
+								where PVDA.`patient_id` = temp_patient_info_id; 
+									
+								IF temp_device_type = 'CD' THEN
+									
+									
+									-- update the old monarch as SD	
+									 UPDATE PATIENT_DEVICES_ASSOC PVDA SET 
+									`patient_type` ='SD', 
+									`modified_date` = today_date,
+									`old_patient_id` = temp_patient_info_id
+									where PVDA.`patient_id` = temp_patient_info_id 
+									AND PVDA.`device_type` = 'MONARCH' ;
+
+								END IF;
+									-- INsert the new for new patient device associated CD vest
+									INSERT INTO `PATIENT_DEVICES_ASSOC`
+									(`patient_id`, `device_type`, `is_active`, `serial_number`,`hub_id`,`bluetooth_id`, `hillrom_id`, `patient_type`, `created_date`, `modified_date`,
+									`old_patient_id`,`training_date`,`diagnosis1`,`diagnosis2`,`diagnosis3`,`diagnosis4`,`garment_type`,`garment_size`,`garment_color`)
+									VALUES	(pat_patient_id,pat_device_type,1,pat_device_serial_number,pat_hub_id,pat_bluetooth_id,pat_hillrom_id,'CD',today_date,today_date,pat_old_id,pat_training_date,pat_diagnosis_code1,pat_diagnosis_code2,pat_diagnosis_code3,pat_diagnosis_code4,pat_garment_type,pat_garment_size,pat_garment_color);
+
+							END IF;
 							
 						ELSE
 						

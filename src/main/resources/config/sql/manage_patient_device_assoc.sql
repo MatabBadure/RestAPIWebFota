@@ -33,6 +33,7 @@ DECLARE temp_device_type VARCHAR(50);
 DECLARE vest_device_hillrom_id  VARCHAR(50);
 DECLARE device_hillrom_id  VARCHAR(50);
 DECLARE temp_patient_info_id  VARCHAR(50);
+DECLARE temp_hillrom_id  VARCHAR(50);
 
 -- DECLARE created_by VARCHAR(50);
 DECLARE latest_hmr DECIMAL(10,0);
@@ -76,7 +77,7 @@ IF operation_type_indicator = 'CREATE' THEN
 						where PVDA.`hillrom_id` =  pat_hillrom_id 
 						AND PVDA.`device_type` = 'VEST' ;
 
-						SELECT  `patient_id` ,`serial_number` ,`device_type` INTO temp_patient_info_id , temp_serial_number , temp_device_type
+						SELECT  `patient_id` ,`serial_number` ,`device_type`,`hillrom_id` INTO temp_patient_info_id , temp_serial_number , temp_device_type,temp_hillrom_id
 						FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number AND `device_type` = 'MONARCH';
 						
 						IF temp_patient_info_id <> pat_patient_id AND temp_serial_number = pat_device_serial_number 

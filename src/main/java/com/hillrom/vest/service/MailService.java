@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Locale;
@@ -621,12 +623,19 @@ public class MailService {
         context.setVariable("baseUrl", baseUrl);
         String content = "";
         String subject = "";
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        Date date = new Date();
+        String timsLogFailDate = dateFormat.format(date).toString();
                
+        content= "<i>The TIMS job execution failed on  ";
+        content += timsLogFailDate +".</i><br>";
+        content += "<br> Please refer the attached log file for more details.<br>";
+        content += "<br> - TIMs Migration Service.</br>";
         File file = new File(Constants.TIMS_LOG_LOCATION + fileName + ".log");
         
         log.debug("Name : " + fileName + " File : " +  file);
         
-		content = "Emailing TIMS Log";
+		//content = "Emailing TIMS Log";
         subject = "Tims Log"; 
         String recipients = env.getProperty("spring.timsLog.timsLogEmailids");
 		log.debug("Sending TIMS log report '{}'", recipients);

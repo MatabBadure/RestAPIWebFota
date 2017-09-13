@@ -114,7 +114,7 @@ IF operation_type_indicator = 'CREATE' THEN
 								`patient_type` ='SD', 
 								`modified_date` = today_date,
 								`old_patient_id` = temp_patient_info_id,
-								`is_active` = 0
+								`is_active` = false
 								where PVDA.`patient_id` = temp_patient_info_id; 
 									
 								IF temp_device_type = 'CD' THEN

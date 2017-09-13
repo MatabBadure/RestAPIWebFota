@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Announcements;
 import com.hillrom.vest.domain.PatientDevicesAssoc;
+import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.AnnouncementsPermissionRepository;
 import com.hillrom.vest.repository.AnnouncementsRepository;
@@ -41,6 +42,7 @@ import com.hillrom.vest.repository.PatientVestDeviceRepository;
 import com.hillrom.vest.repository.TimsUserRepository;
 import com.hillrom.vest.repository.monarch.PatientMonarchDeviceRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.service.monarch.PatientVestDeviceMonarchService;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.AnnouncementsDTO;
@@ -104,7 +106,12 @@ public class TimsService {
 	@Inject
 	private PatientMonarchDeviceRepository patientMonarchDeviceRepository;
 	
-
+	@Inject
+	private PatientVestDeviceService patientVestDeviceService;
+	
+	@Inject
+	private PatientVestDeviceMonarchService patientVestDeviceMonarchService;
+	
 	 DateTimeFormatter dobFormat = DateTimeFormat.forPattern("yyyy-MM-dd");
     /* DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");*/
  
@@ -1256,8 +1263,16 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 					patientInfoDTO.setOperation_type("CREATE");
 					patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
-					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
-					managePatientDevice(patientInfoDTO);
+					
+				
+					PatientInfo patientInfo = patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get();
+					
+					patientInfoDTO.setPatient_id(patientInfo.getId());
+					/*patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+					managePatientDevice(patientInfoDTO);*/
+					
+					patientVestDeviceService.updateDeviceHistoryForTims(patientInfo, patientInfoDTO.getSerial_num(),
+																			patientInfoDTO.getBluetooth_id(), patientInfoDTO.getHub_id());
 					
 					patientInfoDTO.setOperation_type("UPDATE");
 					managePatientDeviceAssociation(patientInfoDTO);
@@ -1960,9 +1975,17 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 					patientInfoDTO.setOperation_type("CREATE");
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 					patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
-					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					
-					managePatientDeviceMonarch(patientInfoDTO);
+					
+					PatientInfo patientInfo = patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get();					
+					patientInfoDTO.setPatient_id(patientInfo.getId());					
+					
+					/*patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());					
+					managePatientDeviceMonarch(patientInfoDTO);*/
+					
+					patientVestDeviceMonarchService.updateDeviceHistoryForTims(patientInfo, patientInfoDTO.getSerial_num(),
+							patientInfoDTO.getBluetooth_id(), patientInfoDTO.getHub_id());
+					
 					
 					patientInfoDTO.setOperation_type("UPDATE");
 					managePatientDeviceAssociation(patientInfoDTO);

@@ -96,7 +96,6 @@ public class TimsInputReaderService {
 		this.serialNumberFlag = true;
 		
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
-		//Map<Integer, ProtocolDataTempDTO> protocolfileRecords =readProtocolcsv();
 		
 	    boolean failureflag = true;
 	    this.failureFlag = false;
@@ -123,10 +122,7 @@ public class TimsInputReaderService {
 				    	}
 			    	}
 		      	}
-		    	//timsService.CASE10_PatientHasMonarchAddVisivest_VEST(record);
-		    	//timsService.CASE11_PatientExistsWithNODevice_VEST(record);
-		    	//timsService.CASE12_PatientHasMonarchMergeExistingVisivest_VEST(record);
-		    //	timsService.CASE13_ExistedSerialNumberandDifferentHillromID_VEST(record);
+
 		    	
 		    }
 
@@ -157,19 +153,7 @@ public class TimsInputReaderService {
 				      	}
 
 
-/*			    	timsService.CASE1_NeitherPatientNorDeviceExist_MONARCH(record);
-			    	timsService.CASE2_PatientExistsWithNODevice_MONARCH(record);
-			   	    timsService.CASE3_PatientHasVisivestAddMonarch_MONARCH(record);
-			    	timsService.CASE4_PatientHasDifferentMonarchSwap_MONARCH(record);
-			    	timsService.CASE5_DeviceOwnedByShell_MONARCH(record);
-			    	timsService.CASE6_DeviceOwnedByDifferentPatient_MONARCH(record);
-			    	timsService.CASE7_DeviceIsOrphanPatientDoesNotExist_MONARCH(record);
-			    	timsService.CASE8_DeviceIsOrphanButPatientExist_MONARCH(record);
-			    	timsService.CASE9_PatientHasDifferentMonarchSwap_MONARCH(record);
-			    	timsService.CASE10_PatientHasVisivestAddMonarch_MONARCH(record);
-			    	timsService.CASE11_PatientExistsWithNODevice_MONARCH(record);
-			    	timsService.CASE12_PatientHasVisivestMergeExistingMonarch_MONARCH(record);
-*/		
+
 		    	}else{
 		    		monarchBluetoothFlag = false;
 		    		log.debug("Created       " +record.getTims_cust()+ "        " +record.getSerial_num()+ "        "+"Failure"+ "        "
@@ -207,7 +191,6 @@ public class TimsInputReaderService {
 			log.debug("Success        NA               NA             Success           The csv file has already been executed or unable to process any of the records.");
 			log.debug(" ");
 			log.debug("All Records Executed Successfully");
-			//throw new Exception("The csv file has already been executed or unable to process any of the records.");
 		}
 		
 		}catch(Exception ex){
@@ -228,15 +211,13 @@ public class TimsInputReaderService {
 		    	  CSVFileFlag = false;
 		          
 		      }
-		  //  log.debug("Started reading flat file : " + csvFile);
+
 	        String line = "";
 	        String cvsSplitBy = ",";
 	        String Outdata = "";
 	        String[] data = null;
 	        
-	  /*      DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yyyy");
-	        DateTimeFormatter dobFormat = DateTimeFormat.forPattern("MM/dd/yyyy");
-	        DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss"); */
+
 
 	        
 	        DateFormat sourceFormat = new SimpleDateFormat("yyyy-mm-dd");
@@ -336,21 +317,10 @@ public class TimsInputReaderService {
 
 
 			            patientInfoDTO.setAddress(data[16]);
-			           /*if(data.length >= 18 && data[17].equalsIgnoreCase("")){
-			            	 patientInfoDTO.setZip_cd(null);
-			            }else{
-			            	patientInfoDTO.setZip_cd(data[17]);
-			            }*/
 			            patientInfoDTO.setZip_cd(data[17]);
 			            patientInfoDTO.setPrimary_phone(data[18]);
 			            patientInfoDTO.setMobile_phone(data[19]);
 			            patientInfoDTO.setTrain_dt(data[20].equalsIgnoreCase("")? null: LocalDate.parse(data[20],deviceAssocdateFormat));
-			            //patientInfoDTO.setTrain_dt(data[19].equalsIgnoreCase("")? null: LocalDate.parse(data[19],dobFormat));
-			           /*if(data.length >= 22 && data[21].equalsIgnoreCase("")){
-			            	 patientInfoDTO.setDob(null);
-			            }else{
-			            	patientInfoDTO.setDob(data[21]);
-			            }*/
 			            patientInfoDTO.setDob(data[21]);
 			            if(data.length >= 23){
 			            	patientInfoDTO.setGender(data[22]);
@@ -394,7 +364,6 @@ public class TimsInputReaderService {
 		            
 	            }
 	            
-	          //  log.debug("Excel File contents in HashSet : " + fileRecords);
 	            return fileRecords;
 	            
 	        } catch (IOException e) {

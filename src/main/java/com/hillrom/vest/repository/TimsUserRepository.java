@@ -374,6 +374,8 @@ public class TimsUserRepository{
 						String inPatientId,
 						String inPatientoldDeviceSerialNumber,
 						String inPatientNewDeviceSerialNumber,
+						String inBluetoothID,
+						String inHubID,
 						String inPatientCreatedBy) throws SQLException ,Exception{
 			try{
 					entityManager
@@ -382,11 +384,15 @@ public class TimsUserRepository{
 					+ ":patient_id,"
 					+ ":pat_old_device_serial_number,"			   		
 					+ ":pat_new_device_serial_number,"
+					+":pat_bluetooth_id,"
+					+":pat_hub_id,"
 					+ ":pat_created_by)")
 					.setParameter("operation_type_indicator", operationTypeIndicator)
 					.setParameter("patient_id", inPatientId)
 					.setParameter("pat_old_device_serial_number",inPatientoldDeviceSerialNumber)
 					.setParameter("pat_new_device_serial_number", inPatientNewDeviceSerialNumber)
+					.setParameter("pat_bluetooth_id", inPatientNewDeviceSerialNumber)
+					.setParameter("pat_hub_id", inHubID)
 					.setParameter("pat_created_by", inPatientCreatedBy)
 					.executeUpdate();
 	}catch(Exception ex){

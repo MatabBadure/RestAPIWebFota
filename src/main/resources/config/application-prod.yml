@@ -51,3 +51,5 @@ spring:
         surveyreportemailids: Dana.Elzea@hill-rom.com,julie.ells@hill-rom.com,Megan.Nelson@hill-rom.com
     changePrescription:
         changePrescriptionEmailids: mhrcaripatientrecords@hill-rom.com
+    timsLog:
+        timsLogEmailids: Ravichandran.Kaliappan@hill-rom.com

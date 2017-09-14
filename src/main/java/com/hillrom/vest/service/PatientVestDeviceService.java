@@ -192,6 +192,22 @@ public class PatientVestDeviceService {
 		return patientInfo;
 	}
 	
+	public void updateDeviceHistoryForTims(PatientInfo patient, String serialNumber,String bluetoothId, String hubId) throws HillromException {
+		if(patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(patient.getId(),serialNumber).isPresent()){
+			Optional<PatientVestDeviceHistory> patientDeviceHistoryRecord = patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(patient.getId(),serialNumber);
+			if(patientDeviceHistoryRecord.isPresent() && !patientDeviceHistoryRecord.get().isActive()){
+				patientDeviceHistoryRecord.get().setActive(true);
+				patientVestDeviceRepository.save(patientDeviceHistoryRecord.get());
+			}
+		}else{
+			PatientVestDeviceHistory patientDeviceHistoryRecord = new PatientVestDeviceHistory(new PatientVestDevicePK(patient, serialNumber),
+					bluetoothId, hubId, true);
+			patientDeviceHistoryRecord.setCreatedDate(new DateTime());
+			patientDeviceHistoryRecord.setLastModifiedDate(new DateTime());
+     		patientVestDeviceRepository.save(patientDeviceHistoryRecord);
+		}
+	}
+	
 	public String deactivateVestDeviceFromPatient(Long id, String serialNumber) throws HillromException {
     	User patientUser = userRepository.findOne(id);
     	if(patientUser != null) {

@@ -21,7 +21,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+
+import net.minidev.json.JSONObject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -31,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,9 +44,9 @@ import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.ClinicPatientAssoc;
 import com.hillrom.vest.domain.EntityUserAssoc;
 import com.hillrom.vest.domain.Note;
-import com.hillrom.vest.domain.NoteMonarch;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
+import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.User;
@@ -59,6 +59,7 @@ import com.hillrom.vest.repository.AuthorityRepository;
 import com.hillrom.vest.repository.ClinicPatientRepository;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.EntityUserRepository;
+import com.hillrom.vest.repository.PatientDevicesAssocRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
@@ -79,9 +80,6 @@ import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
-
-import net.minidev.json.JSONObject;
-import org.springframework.scheduling.annotation.Scheduled;
 
 /**
  * Service class for managing users.
@@ -109,6 +107,9 @@ public class UserService {
 
     @Inject
     private PatientInfoRepository patientInfoRepository;
+    
+    @Inject
+    private PatientDevicesAssocRepository patientDevicesAssocRepository;
 
     @Inject
     private PatientInfoService patientInfoService;
@@ -434,6 +435,7 @@ public class UserService {
     	//hill-1845
     	rolesAdminCanModerate.add(AuthoritiesConstants.CUSTOMER_SERVICES);
     	//hill-1845
+    	rolesAdminCanModerate.add(AuthoritiesConstants.RND_USER);
 		return rolesAdminCanModerate;
 	}
 
@@ -520,13 +522,29 @@ public class UserService {
 		UserExtension newUser = new UserExtension();
 		String patientInfoId = patientInfoRepository.id();
 		PatientInfo patientInfo = new PatientInfo();
+		PatientDevicesAssoc patientDevicesAssoc = new PatientDevicesAssoc();
 		assignValuesToPatientInfoObj(userExtensionDTO, patientInfo);
 
 		// Assigns Next Patient HillromId from Stored Procedure
 		patientInfo.setId(patientInfoId);
 		patientInfo = patientInfoRepository.save(patientInfo);
 		log.debug("Created Information for Patient : {}", patientInfo);
+		
+		// /Insert Garament details in patient device ass info
+		
 
+		assignGarmentValuesToPatientDeviceAssocObj(userExtensionDTO,
+				patientDevicesAssoc);
+		patientDevicesAssoc.setPatientId(patientInfoId);
+		patientDevicesAssoc.setCreatedDate(new LocalDate());
+		patientDevicesAssoc.setHillromId(userExtensionDTO.getHillromId());
+		patientDevicesAssoc.setIsActive(true);
+		patientDevicesAssoc.setDeviceType(VEST);
+		patientDevicesAssoc = patientDevicesAssocRepository
+				.save(patientDevicesAssoc);
+		log.debug("Created Information for PatientDevice Association : {}",
+				patientDevicesAssoc);
+	
 		assignValuesToUserObj(userExtensionDTO, newUser);
 
 		newUser.setPassword(passwordEncoder
@@ -559,6 +577,31 @@ public class UserService {
 		compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
 		complianceService.createOrUpdate(compliance);
 		return newUser;
+	}
+
+	private void assignGarmentValuesToPatientDeviceAssocObj(
+			UserExtensionDTO userExtensionDTO,
+			PatientDevicesAssoc patientDevicesAssoc) {
+		if(Objects.nonNull(userExtensionDTO.getVestGarmentColor()) ||
+				Objects.nonNull(userExtensionDTO.getVestGarmentSize()) ||
+				Objects.nonNull(userExtensionDTO.getVestGarmentType())){
+			if (Objects.nonNull(userExtensionDTO.getVestGarmentColor()))
+				patientDevicesAssoc.setGarmentColor(userExtensionDTO.getVestGarmentColor());
+			if (Objects.nonNull(userExtensionDTO.getVestGarmentSize()))
+				patientDevicesAssoc.setGarmentSize(userExtensionDTO.getVestGarmentSize());
+			if (Objects.nonNull(userExtensionDTO.getVestGarmentType()))
+				patientDevicesAssoc.setGarmentType(userExtensionDTO.getVestGarmentType());
+		}
+		if(Objects.nonNull(userExtensionDTO.getMonarchGarmentColor()) ||
+				Objects.nonNull(userExtensionDTO.getMonarchGarmentSize()) ||
+				Objects.nonNull(userExtensionDTO.getMonarchGarmentType())){
+			if (Objects.nonNull(userExtensionDTO.getMonarchGarmentColor()))
+				patientDevicesAssoc.setGarmentColor(userExtensionDTO.getMonarchGarmentColor());
+			if (Objects.nonNull(userExtensionDTO.getMonarchGarmentSize()))
+				patientDevicesAssoc.setGarmentSize(userExtensionDTO.getMonarchGarmentSize());
+			if (Objects.nonNull(userExtensionDTO.getMonarchGarmentType()))
+				patientDevicesAssoc.setGarmentType(userExtensionDTO.getMonarchGarmentType());
+		}
 	}
 
 	public UserPatientAssoc createUserPatientAssociation(UserExtension newUser,
@@ -652,8 +695,9 @@ public class UserService {
 
         	} else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.ASSOCIATES))
         			//hill-1845
-        			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))){
+        			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))
         			//hill-1845 
+        			|| SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.RND_USER))){
         		if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
 
 	        	UserExtension user = updateHillromTeamUser(existingUser, userExtensionDTO);
@@ -757,6 +801,19 @@ public class UserService {
     		}
         }
         //hill-1845
+        else if (AuthoritiesConstants.RND_USER.equals(userExtensionDTO.getRole())) {
+           	UserExtension user = updateRNDUser(existingUser, userExtensionDTO);
+    		if(Objects.nonNull(user.getId())) {
+    			if(StringUtils.isNotBlank(userExtensionDTO.getEmail()) && StringUtils.isNotBlank(currentEmail) && !userExtensionDTO.getEmail().equals(currentEmail) && !user.isDeleted()) {
+    				sendEmailNotification(baseUrl, user);
+    			}
+                return user;
+    		} else {
+
+    			throw new HillromException(ExceptionConstants.HR_580);//Unable to update RND User.
+
+    		}
+        }
         else {
         	throw new HillromException(ExceptionConstants.HR_555);//Incorrect data
     	}
@@ -851,6 +908,34 @@ public class UserService {
 			}
 			assignValuesToPatientInfoObj(userExtensionDTO, patient.get());
     		patientInfoRepository.save(patient.get());
+    		
+    		//Updating into Patient Device association
+    		List<PatientDevicesAssoc> updatePatientTypeList = patientDevicesAssocRepository.findByPatientId(patient.get().getId());
+			// Looping through the patient devices
+			for (PatientDevicesAssoc updatePatientType : updatePatientTypeList) {
+				if(updatePatientType.getDeviceType().equals(VEST)){
+					if (Objects.nonNull(userExtensionDTO.getVestGarmentColor()))
+						updatePatientType.setGarmentColor(userExtensionDTO.getVestGarmentColor());
+					if (Objects.nonNull(userExtensionDTO.getVestGarmentSize()))
+						updatePatientType.setGarmentSize(userExtensionDTO.getVestGarmentSize());
+					if (Objects.nonNull(userExtensionDTO.getVestGarmentType()))
+						updatePatientType.setGarmentType(userExtensionDTO.getVestGarmentType());
+					patientDevicesAssocRepository.save(updatePatientType);
+					log.debug("Upadted Information for PatientDevice Vest Association : {}", updatePatientType);
+				}
+				if(updatePatientType.getDeviceType().equals(MONARCH)){
+					if (Objects.nonNull(userExtensionDTO.getMonarchGarmentColor()))
+						updatePatientType.setGarmentColor(userExtensionDTO.getMonarchGarmentColor());
+					if (Objects.nonNull(userExtensionDTO.getMonarchGarmentSize()))
+						updatePatientType.setGarmentSize(userExtensionDTO.getMonarchGarmentSize());
+					if (Objects.nonNull(userExtensionDTO.getMonarchGarmentType()))
+						updatePatientType.setGarmentType(userExtensionDTO.getMonarchGarmentType());
+					patientDevicesAssocRepository.save(updatePatientType);
+					log.debug("Upadted Information for PatientDevice Monarch Association : {}", updatePatientType);
+				}
+				
+			}
+    		
     		assignValuesToUserObj(userExtensionDTO, user);
 			userExtensionRepository.save(user);
 			log.debug("Updated Information for Patient User: {}", user);
@@ -895,6 +980,14 @@ public class UserService {
 		return customerServiceUser;
 	}
    //hill-1845
+    public UserExtension updateRNDUser(UserExtension rNDUser, UserExtensionDTO userExtensionDTO) {
+		assignValuesToUserObj(userExtensionDTO, rNDUser);
+		userExtensionRepository.saveAndFlush(rNDUser);
+
+		log.debug("Updated Information for R&D User : {}", rNDUser);
+
+		return rNDUser;
+	}
 
 	private void assignValuesToPatientInfoObj(UserExtensionDTO userExtensionDTO, PatientInfo patientInfo) {
 		patientInfo.setHillromId(userExtensionDTO.getHillromId());
@@ -1197,6 +1290,7 @@ public class UserService {
 							//hill-1845
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
 							//hill-1845
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN)))) {
 					//hill-1844
 					existingUser.setDeleted(true);
@@ -1208,14 +1302,16 @@ public class UserService {
 				}
 			} 
 			//hill-1845
-			else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))) {
+			else if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))
+					|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))) {
 				if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 					deletePatientUser(existingUser);
 					sendDeactivationEmailNotification(baseUrl, existingUser);
 					jsonObject.put("message", MessageConstants.HR_214);
 				}
 			
-				else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))) {
+				else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
+						|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))) {
 					if(SecurityUtils.getCurrentLogin().equalsIgnoreCase(existingUser.getEmail())) {
 						throw new HillromException(ExceptionConstants.HR_520);
 					}
@@ -1253,6 +1349,7 @@ public class UserService {
 							//hill-1845
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
 							//hill-1845
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
@@ -1354,6 +1451,10 @@ public class UserService {
 		if(null == user)
 			return Optional.empty();
 		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
+		
+		// Garment changes : Repository call for patient device info 
+		List<PatientDevicesAssoc> patientDevicesAssocList = patientDevicesAssocRepository
+				.findByPatientId(patientInfo.getId());
 		if(null == patientInfo)
 			return Optional.empty();
 		String deviceType = patientVestDeviceService.getDeviceType(user);
@@ -1373,10 +1474,27 @@ public class UserService {
 		List<ClinicPatientAssoc> clinicPatientAssocList = clinicPatientRepository.findOneByPatientId(patientInfo.getId());
 		
 		PatientUserVO patientUserVO;
-		if(Objects.nonNull(deviceType))
+		if(Objects.nonNull(deviceType)){
 			patientUserVO =  new PatientUserVO(user,patientInfo,deviceType);
-		else
-			patientUserVO =  new PatientUserVO(user,patientInfo);
+		
+			// Garment Changes :Looping through the patient devices
+			for (PatientDevicesAssoc device : patientDevicesAssocList) {
+				if (device.getDeviceType().equals(VEST)) {
+					patientUserVO.setVestGarmentColor(device.getGarmentColor());
+					patientUserVO.setVestGarmentSize(device.getGarmentSize());
+					patientUserVO.setVestGarmentType(device.getGarmentType());
+				} else if (device.getDeviceType().equals(MONARCH)) {
+					patientUserVO.setMonarchGarmentColor(device
+							.getGarmentColor());
+					patientUserVO
+							.setMonarchGarmentSize(device.getGarmentSize());
+					patientUserVO
+							.setMonarchGarmentType(device.getGarmentType());
+				}
+			}
+		} else {
+			patientUserVO = new PatientUserVO(user, patientInfo);
+		}
 
 		if(Objects.nonNull(deviceType) && deviceType.equals(VEST)){
 			if(Objects.nonNull(compliance))
@@ -1404,15 +1522,38 @@ public class UserService {
 		}
 		return Optional.of(patientUserVO);
 	}
-	public User getUser(Long id) throws HillromException{
+
+	public User getUser(Long id) throws HillromException {
 		User user = userRepository.findOne(id);
-		if(Objects.nonNull(user)) {
-			return user;
-		} else {
-			throw new HillromException(ExceptionConstants.HR_512);//No such user exist
+
+		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
+
+		if(Objects.nonNull(patientInfo)){
+			List<PatientDevicesAssoc> patientDevicesAssocList = patientDevicesAssocRepository
+					.findByPatientId(patientInfo.getId());
+			// Garment Changes :Looping through the patient devices
+			for (PatientDevicesAssoc device : patientDevicesAssocList) {
+				if (device.getDeviceType().equals(VEST)) {
+					user.setVestGarmentColor(device.getGarmentColor());
+					user.setVestGarmentSize(device.getGarmentSize());
+					user.setVestGarmentType(device.getGarmentType());
+				} else if (device.getDeviceType().equals(MONARCH)) {
+					user.setMonarchGarmentColor(device.getGarmentColor());
+					user.setMonarchGarmentSize(device.getGarmentSize());
+					user.setMonarchGarmentType(device.getGarmentType());
+				}
+			}
 		}
 
-	 }
+		if (Objects.nonNull(user)) {
+			return user;
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);// No such
+																	// user
+																	// exist
+		}
+
+	}
 
 	public UserPatientAssoc createCaregiverUser(Long patientUserId, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException {
 		UserExtension patientUser = userExtensionRepository.findOne(patientUserId);
@@ -1774,6 +1915,24 @@ public class UserService {
 				Optional<ClinicPatientAssoc> clinicPatientAssoc = clinicPatientRepository.findOneByClinicIdAndPatientId(
 						clinicId, patientInfo.getId());
 				PatientUserVO patientUserVO = new PatientUserVO(patientUser, patientInfo);
+				List<PatientDevicesAssoc> patientDevicesAssocList = patientDevicesAssocRepository
+						.findByPatientId(patientInfo.getId());
+				// Garment Changes :Looping through the patient devices
+				for (PatientDevicesAssoc device : patientDevicesAssocList) {
+					if (device.getDeviceType().equals(VEST)) {
+						patientUserVO.setVestGarmentColor(device.getGarmentColor());
+						patientUserVO.setVestGarmentSize(device.getGarmentSize());
+						patientUserVO.setVestGarmentType(device.getGarmentType());
+					} else if (device.getDeviceType().equals(MONARCH)) {
+						patientUserVO.setMonarchGarmentColor(device
+								.getGarmentColor());
+						patientUserVO
+								.setMonarchGarmentSize(device.getGarmentSize());
+						patientUserVO
+								.setMonarchGarmentType(device.getGarmentType());
+					}
+				}
+				
 				if(clinicPatientAssoc.isPresent()){
 					Map<String,Object> clinicMRNId = new HashMap<>();
 					clinicMRNId.put("clinic", clinicPatientAssoc.get().getClinic());
@@ -1834,6 +1993,7 @@ public class UserService {
 							//hill-1845
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
 							//hill-1845
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CARE_GIVER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))) {
@@ -1856,6 +2016,7 @@ public class UserService {
 						jsonObject.put("message", MessageConstants.HR_215);
 						} else if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))) {
 						existingUser.setDeleted(false);
 						userExtensionRepository.saveAndFlush(existingUser);
@@ -1881,6 +2042,7 @@ public class UserService {
 							//hill-1845
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CUSTOMER_SERVICES))
 							//hill-1845
+							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.RND_USER))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.ASSOCIATES))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))
@@ -1947,8 +2109,11 @@ public class UserService {
 							.contains(new SimpleGrantedAuthority(AuthoritiesConstants.ACCT_SERVICES)) 
 					//hill-1845		
 					|| SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-						.contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))) {
+						.contains(new SimpleGrantedAuthority(AuthoritiesConstants.CUSTOMER_SERVICES))
 					//hill-1845
+					|| SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+					.contains(new SimpleGrantedAuthority(AuthoritiesConstants.RND_USER))
+					) {
 				if (existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 					if (Objects.nonNull(existingUser.getLastLoggedInAt()) & !existingUser.getActivated()) {
 						if (Objects.nonNull(existingUser.getEmail())) {

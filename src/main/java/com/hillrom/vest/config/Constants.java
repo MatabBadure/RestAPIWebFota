@@ -340,6 +340,10 @@ public final class Constants {
 		public static final String ANNOUNCEMENT_FILE_PATH = "/opt/visiview-files/";
 	//end:announcement changes
 		
+		public static final String TIMS_CSV_FILE_PATH = "/home/brett/flat_file_script/";
+		public static final String CREATED_BY_TIMS = "TIMS Java App";
+		public static final String TIMS_LOG_LOCATION = "/usr/tomcat/apache-tomcat-8.0.28/TIMS/logs/";
+		
 	//Device Type
 	public static final String VEST = "VEST";
 	public static final String MONARCH = "MONARCH";
@@ -347,4 +351,7 @@ public final class Constants {
 	public static final String INTENSITY = "Intensity";
 	
 	public enum CONNECTIONTYPE {devWIFI, devLTE, devBT}	
+	
+	public static final String LOG_DIRECTORY = "/usr/tomcat/apache-tomcat-8.0.28/TIMS/logs/";
+	public static final String MATCH_STRING = "Executed Successfully";
 }

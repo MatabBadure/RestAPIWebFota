@@ -9,6 +9,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `manage_patient_device_assoc`(
 	IN pat_device_type varchar(50),
 	IN pat_device_is_active varchar(10),	
 	IN pat_device_serial_number varchar(50),
+	IN pat_hub_id varchar(255),
+	IN pat_bluetooth_id varchar(255),	
 	IN pat_hillrom_id varchar(50),
 	IN pat_old_id varchar(50),
 	IN pat_training_date datetime,
@@ -18,7 +20,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `manage_patient_device_assoc`(
 	IN pat_diagnosis_code4 varchar(255),
 	IN pat_garment_type varchar(255),
     IN pat_garment_size varchar(255),
-    IN pat_garment_color varchar(255)
+    IN pat_garment_color varchar(255),
+    IN pat_created_by varchar(50)
     )
 BEGIN
 
@@ -30,8 +33,9 @@ DECLARE temp_device_type VARCHAR(50);
 DECLARE vest_device_hillrom_id  VARCHAR(50);
 DECLARE device_hillrom_id  VARCHAR(50);
 DECLARE temp_patient_info_id  VARCHAR(50);
+DECLARE temp_hillrom_id  VARCHAR(50);
 
-DECLARE created_by VARCHAR(50);
+-- DECLARE created_by VARCHAR(50);
 DECLARE latest_hmr DECIMAL(10,0);
 
 DECLARE no_of_rec integer(10);
@@ -39,7 +43,7 @@ DECLARE no_of_rec integer(10);
 
 
 SET today_date = now();
-SET created_by = 'JDE APP';
+-- SET created_by = 'JDE APP';
 SET device_patient_type = 'SD';
 
 -- All cases from Leah's document "VisiView Phase 3 Test Cases for TIMs Integration"
@@ -73,40 +77,73 @@ IF operation_type_indicator = 'CREATE' THEN
 						where PVDA.`hillrom_id` =  pat_hillrom_id 
 						AND PVDA.`device_type` = 'VEST' ;
 
-						SELECT  `patient_id` ,`serial_number` ,`device_type` INTO temp_patient_info_id , temp_serial_number , temp_device_type
+						SELECT  `patient_id` ,`serial_number` ,`device_type`,`hillrom_id` INTO temp_patient_info_id , temp_serial_number , temp_device_type,temp_hillrom_id
 						FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number AND `device_type` = 'MONARCH';
 						
 						IF temp_patient_info_id <> pat_patient_id AND temp_serial_number = pat_device_serial_number 
 							AND temp_device_type = 'MONARCH' THEN
 							
-							UPDATE `PATIENT_INFO` SET
-							`expired` = 1,
-							`expired_date` = today_date
-							WHERE `id` = temp_patient_info_id;
+							IF temp_hillrom_id = '' or temp_hillrom_id IS NULL THEN
+								UPDATE `PATIENT_INFO` SET
+								`expired` = 1,
+								`expired_date` = today_date
+								WHERE `id` = temp_patient_info_id;
+								
+								UPDATE PATIENT_DEVICES_ASSOC PVDA SET 
+								`patient_id` = pat_patient_id,
+								`hillrom_id` =  pat_hillrom_id,
+								`patient_type` ='CD', 
+								`modified_date` = today_date,
+								`old_patient_id` = temp_patient_info_id,
+								`hub_id` = pat_hub_id,
+								`bluetooth_id` = pat_bluetooth_id,
+								`diagnosis1` = pat_diagnosis_code1,
+								`diagnosis2` = pat_diagnosis_code2,
+								`diagnosis3` = pat_diagnosis_code3,
+								`diagnosis4` = pat_diagnosis_code4,
+								`garment_type` = pat_garment_type,
+								`garment_size` = pat_garment_size,
+								`garment_color` = pat_garment_color
+								where PVDA.`serial_number` = pat_device_serial_number  
+								AND  (PVDA.`hillrom_id` = '' OR PVDA.`hillrom_id` IS NULL) AND PVDA. `patient_type` = 'SD' 
+								AND PVDA.`device_type` = 'MONARCH' ;
+							ELSE
 							
-							UPDATE PATIENT_DEVICES_ASSOC PVDA SET 
-							`patient_id` = pat_patient_id,
-							`hillrom_id` =  pat_hillrom_id,
-							`patient_type` ='CD', 
-							`modified_date` = today_date,
-							`old_patient_id` = temp_patient_info_id,
-							`diagnosis1` = pat_diagnosis_code1,
-							`diagnosis2` = pat_diagnosis_code2,
-							`diagnosis3` = pat_diagnosis_code3,
-							`diagnosis4` = pat_diagnosis_code4,
-							`garment_type` = pat_garment_type,
-							`garment_size` = pat_garment_size,
-							`garment_color` = pat_garment_color
-							where PVDA.`serial_number` = pat_device_serial_number  
-							AND  (PVDA.`hillrom_id` = '' OR PVDA.`hillrom_id` IS NULL) AND PVDA. `patient_type` = 'SD' 
-							AND PVDA.`device_type` = 'MONARCH' ;
+							     -- we need update the old patient as SD and mark the old vest as inactive
+								 UPDATE PATIENT_DEVICES_ASSOC PVDA SET 
+								`patient_type` ='SD', 
+								`modified_date` = today_date,
+								`old_patient_id` = temp_patient_info_id,
+								`is_active` = false
+								where PVDA.`patient_id` = temp_patient_info_id; 
+									
+								IF temp_device_type = 'CD' THEN
+									
+									
+									-- update the old vest as SD	
+									 UPDATE PATIENT_DEVICES_ASSOC PVDA SET 
+									`patient_type` ='SD', 
+									`modified_date` = today_date,
+									`old_patient_id` = temp_patient_info_id
+									where PVDA.`patient_id` = temp_patient_info_id 
+									AND PVDA.`device_type` = 'VEST' ;
+
+								END IF;
+									-- INsert the new for new patient device associated CD Monarch
+									INSERT INTO `PATIENT_DEVICES_ASSOC`
+									(`patient_id`, `device_type`, `is_active`, `serial_number`,`hub_id`,`bluetooth_id`, `hillrom_id`, `patient_type`, `created_date`, `modified_date`,
+									`old_patient_id`,`training_date`,`diagnosis1`,`diagnosis2`,`diagnosis3`,`diagnosis4`,`garment_type`,`garment_size`,`garment_color`)
+									VALUES	(pat_patient_id,pat_device_type,1,pat_device_serial_number,pat_hub_id,pat_bluetooth_id,pat_hillrom_id,'CD',today_date,today_date,pat_old_id,pat_training_date,pat_diagnosis_code1,pat_diagnosis_code2,pat_diagnosis_code3,pat_diagnosis_code4,pat_garment_type,pat_garment_size,pat_garment_color);
+
+							END IF;
+							
 							
 						ELSE
 						
 							INSERT INTO `PATIENT_DEVICES_ASSOC`
-							(`patient_id`, `device_type`, `is_active`, `serial_number`, `hillrom_id`, `patient_type`, `created_date`, `modified_date`,
+							(`patient_id`, `device_type`, `is_active`, `serial_number`,`hub_id`,`bluetooth_id`, `hillrom_id`, `patient_type`, `created_date`, `modified_date`,
 							`old_patient_id`,`training_date`,`diagnosis1`,`diagnosis2`,`diagnosis3`,`diagnosis4`,`garment_type`,`garment_size`,`garment_color`)
-							VALUES	(pat_patient_id,pat_device_type,1,pat_device_serial_number,pat_hillrom_id,'CD',today_date,today_date,pat_old_id,pat_training_date,pat_diagnosis_code1,pat_diagnosis_code2,pat_diagnosis_code3,pat_diagnosis_code4,pat_garment_type,pat_garment_size,pat_garment_color);
+							VALUES	(pat_patient_id,pat_device_type,1,pat_device_serial_number,pat_hub_id,pat_bluetooth_id,pat_hillrom_id,'CD',today_date,today_date,pat_old_id,pat_training_date,pat_diagnosis_code1,pat_diagnosis_code2,pat_diagnosis_code3,pat_diagnosis_code4,pat_garment_type,pat_garment_size,pat_garment_color);
 							
 						END IF;
 						
@@ -117,10 +154,10 @@ IF operation_type_indicator = 'CREATE' THEN
 					START TRANSACTION;
 				
 						INSERT INTO `PATIENT_DEVICES_ASSOC`
-						(`patient_id`, `device_type`, `is_active`, `serial_number`, `hillrom_id`, `patient_type`, `created_date`, `modified_date`,
+						(`patient_id`, `device_type`, `is_active`, `serial_number`,`hub_id`,`bluetooth_id`, `hillrom_id`, `patient_type`, `created_date`, `modified_date`,
 						`old_patient_id`,`training_date`,`diagnosis1`,`diagnosis2`,`diagnosis3`,`diagnosis4`,`garment_type`,`garment_size`,`garment_color`)
 						VALUES
-						(pat_patient_id,pat_device_type,1,pat_device_serial_number,pat_hillrom_id,device_patient_type,today_date,null,pat_old_id,pat_training_date,pat_diagnosis_code1,pat_diagnosis_code2,pat_diagnosis_code3,pat_diagnosis_code4,pat_garment_type,pat_garment_size,pat_garment_color);
+						(pat_patient_id,pat_device_type,1,pat_device_serial_number,pat_hub_id,pat_bluetooth_id,pat_hillrom_id,device_patient_type,today_date,null,pat_old_id,pat_training_date,pat_diagnosis_code1,pat_diagnosis_code2,pat_diagnosis_code3,pat_diagnosis_code4,pat_garment_type,pat_garment_size,pat_garment_color);
 					
 					COMMIT;
 				END IF;
@@ -129,10 +166,10 @@ IF operation_type_indicator = 'CREATE' THEN
 			START TRANSACTION;
 				
 				INSERT INTO `PATIENT_DEVICES_ASSOC`
-				(`patient_id`, `device_type`, `is_active`, `serial_number`, `hillrom_id`, `patient_type`, `created_date`, `modified_date`,
+				(`patient_id`, `device_type`, `is_active`, `serial_number`,`hub_id`,`bluetooth_id`, `hillrom_id`, `patient_type`, `created_date`, `modified_date`,
 				`old_patient_id`,`training_date`,`diagnosis1`,`diagnosis2`,`diagnosis3`,`diagnosis4`,`garment_type`,`garment_size`,`garment_color`)
 				VALUES
-				(pat_patient_id,pat_device_type,1,pat_device_serial_number,pat_hillrom_id,device_patient_type,today_date,null,pat_old_id,pat_training_date,
+				(pat_patient_id,pat_device_type,1,pat_device_serial_number,pat_hub_id,pat_bluetooth_id,pat_hillrom_id,device_patient_type,today_date,null,pat_old_id,pat_training_date,
 				pat_diagnosis_code1,pat_diagnosis_code2,pat_diagnosis_code3,pat_diagnosis_code4,pat_garment_type,pat_garment_size,pat_garment_color);	
 				
 			COMMIT;
@@ -166,7 +203,8 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 					`patient_id` = vest_device_patient_id,
 					`hillrom_id` = vest_device_hillrom_id ,
 					`patient_type` ='CD', 
-
+					`hub_id` = pat_hub_id,
+					`bluetooth_id` = pat_bluetooth_id,
 					`modified_date` = today_date,
 					`old_patient_id` = pat_patient_id,
 					`training_date` = pat_training_date,
@@ -202,6 +240,8 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 				`device_type` = pat_device_type,
 				`is_active` = 1,
 				`serial_number` = pat_device_serial_number,
+				`hub_id` = pat_hub_id,
+				`bluetooth_id` = pat_bluetooth_id,
 				`hillrom_id` = pat_hillrom_id,
 				`patient_type` = device_patient_type,
 				`old_patient_id` = pat_old_id,

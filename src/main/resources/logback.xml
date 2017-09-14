@@ -21,6 +21,47 @@
         </encoder>
     </appender>
 
+<appender name="TIMSLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
+
+		<!-- This is MDC value -->
+		<!-- We will assign a value to 'logFileName' via Java code -->
+		<discriminator>
+			<key>logFileName</key>
+			<defaultValue>head0</defaultValue>
+		</discriminator>
+
+		<sift>
+
+		  <!-- A standard RollingFileAppender, the log file is based on 'logFileName' at runtime  -->
+		  <appender name="FILE-${logFileName}"
+			class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<file>${CATALINA_HOME}/TIMS/logs/${logFileName}.log</file>
+
+			<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+				<Pattern>
+				             %msg%n
+				</Pattern>
+			</encoder>
+
+			<rollingPolicy
+				class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+				<FileNamePattern>${CATALINA_HOME}/TIMS/logs/${logFileName}.%i.log.zip
+				</FileNamePattern>
+				<MinIndex>1</MinIndex>
+				<MaxIndex>20</MaxIndex>
+			</rollingPolicy>
+
+
+			<triggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+				<MaxFileSize>10MB</MaxFileSize>
+			</triggeringPolicy>
+
+		  </appender>
+
+		</sift>
+	</appender>
+	    
     <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
         <queueSize>512</queueSize>
         <appender-ref ref="FILE"/>
@@ -76,6 +117,11 @@
     <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
         <resetJUL>true</resetJUL>
     </contextListener>
+
+	<logger name="com.hillrom.vest.tims" level="debug"
+		additivity="false">
+        <appender-ref ref="TIMSLOGFILE" />
+	</logger>
 
     <root level="${logback.loglevel}">
         <appender-ref ref="CONSOLE"/>

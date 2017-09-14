@@ -18,6 +18,7 @@ import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
+import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
 import com.hillrom.vest.domain.PatientVestDevicePK;
 import com.hillrom.vest.domain.User;
@@ -216,6 +217,23 @@ public class PatientVestDeviceMonarchService {
     		throw new HillromException(ExceptionConstants.HR_512);//No such user exist
      	}
     }
+	
+	public void updateDeviceHistoryForTims(PatientInfo patient, String serialNumber,String wifiId, String hubId) throws HillromException {
+		if(patientMonarchDeviceRepository.findOneByPatientIdAndSerialNumber(patient.getId(),serialNumber).isPresent()){
+			Optional<PatientVestDeviceHistoryMonarch> patientDeviceHistoryRecord = patientMonarchDeviceRepository.findOneByPatientIdAndSerialNumber(patient.getId(),serialNumber);
+			if(patientDeviceHistoryRecord.isPresent() && !patientDeviceHistoryRecord.get().isActive()){
+				patientDeviceHistoryRecord.get().setActive(true);
+				patientMonarchDeviceRepository.save(patientDeviceHistoryRecord.get());
+			}
+		}else{
+			PatientVestDeviceHistoryMonarch patientDeviceHistoryRecord = new PatientVestDeviceHistoryMonarch(new PatientVestDevicePK(patient, serialNumber),
+					wifiId, hubId, true);
+			patientDeviceHistoryRecord.setCreatedDate(new DateTime());
+			patientDeviceHistoryRecord.setLastModifiedDate(new DateTime());
+			patientMonarchDeviceRepository.save(patientDeviceHistoryRecord);
+		}
+	}
+	
 	
 	public PatientVestDeviceHistoryMonarch deactivateActiveDeviceForPatient(Long id, DateTime dateTime) throws HillromException {
 		 User patientUser = userRepository.findOne(id);

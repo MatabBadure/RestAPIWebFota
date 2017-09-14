@@ -77,6 +77,16 @@ public class PatientDevicesAssoc implements Serializable {
     @Column(name = "created_by")
     private String createdBy;
     
+    
+  //Garments changes
+    @Column(name = "garment_type")
+    private String garmentType;
+    
+    @Column(name = "garment_size")
+    private String garmentSize;
+    
+    @Column(name = "garment_color")
+    private String garmentColor;
 
     public PatientDevicesAssoc() {
 		super();
@@ -111,6 +121,31 @@ public class PatientDevicesAssoc implements Serializable {
 
 	}
     
+	
+	public String getGarmentType() {
+		return garmentType;
+	}
+
+	public void setGarmentType(String garmentType) {
+		this.garmentType = garmentType;
+	}
+
+	public String getGarmentSize() {
+		return garmentSize;
+	}
+
+	public void setGarmentSize(String garmentSize) {
+		this.garmentSize = garmentSize;
+	}
+
+	public String getGarmentColor() {
+		return garmentColor;
+	}
+
+	public void setGarmentColor(String garmentColor) {
+		this.garmentColor = garmentColor;
+	}
+
 	/**
 	 * @return the id
 	 */

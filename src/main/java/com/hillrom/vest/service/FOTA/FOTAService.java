@@ -45,6 +45,7 @@ import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -77,6 +78,7 @@ import com.hillrom.vest.pointer.FOTA.HandleHolder;
 import com.hillrom.vest.pointer.FOTA.PartNoHolder;
 import com.hillrom.vest.repository.FOTA.FOTADeviceRepository;
 import com.hillrom.vest.repository.FOTA.FOTARepository;
+import com.hillrom.vest.service.MailService;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.FOTA.FOTAParseUtil;
 import com.hillrom.vest.web.rest.FOTA.dto.ApproverCRCDto;
@@ -96,6 +98,9 @@ public class FOTAService {
 	
 	@Inject
 	private EntityManager entityManager;
+	
+	@Inject
+    private MailService mailService;
 	
 	
 	private  Map<Long,String> storeChunk ;
@@ -235,6 +240,9 @@ public class FOTAService {
 							} else {
 								//Abort case
 								partNoHolder.setAbortFlag(true);
+								
+								//Send email notification for CRC validation failed
+								sendCRCFailedNotification();
 							}
 						} else {
 							partNoHolder = new PartNoHolder(chunkSize, fotaInfo);
@@ -651,11 +659,26 @@ public class FOTAService {
 			log.error("finalString1: " + finalString1);
 			return finalString1;
 		
-	
 		
 	}
 	
 	
+	private void sendCRCFailedNotification() {
+
+		String roleName = "FOTA_APPROVER";
+		String roleName1 = "FOTA_ADMIN";
+		String queryStr = "SELECT u.email, u.last_name FROM hillromvest_dev.user_authority a, hillromvest_dev.user u where a.authority_name IN ('"+roleName+"','"+roleName1+"') and a.user_id = u.id";
+		
+		Query jpaQuery = entityManager.createNativeQuery(queryStr);
+		
+		List<Object[]> resultList = jpaQuery.getResultList();
+		
+		for(Object[] result : resultList){
+			mailService.sendFotaCRCFailedNotificationEmail((String)result[0], (String)result[1]);
+			}
+	}
+
+
 	private String getDeviceVersion(String rawMessage) {
 
 		byte[] getHandleByte = java.util.Base64.getDecoder().decode(rawMessage);
@@ -1353,7 +1376,7 @@ public class FOTAService {
 		return totalChunk;
 	}
 
-	public FOTAInfo savFotaInfoData(FOTAInfoDto fotaInfoDto)
+	public FOTAInfo savFotaInfoData(FOTAInfoDto fotaInfoDto, String baseUrl)
 			throws ParseException {
 		//check is existing if yes update to inactive pending
 		if(fotaInfoDto.getOldRecord() == true){
@@ -1422,20 +1445,33 @@ public class FOTAService {
 		
 		fotaRepository.save(fotaInfo);
 		log.debug("Created New Fota: {}", fotaInfo);
+		//Email notification to approver
+		sendNotification(baseUrl,"");
+		
 		return fotaInfo;
 	}
 
-	/*public FOTAInfo softDeleteFOTA(String partNo, boolean isOldFile) {
-		FOTAInfo fotaInfo = fotaRepository.findFOTAInfo(partNo,isOldFile);
-		if(Objects.nonNull(fotaInfo))
-  	  {
-			fotaInfo.setSoftDeleteFlag(false);
-			fotaInfo.setUploadDatetime(DateUtil.getCurrentDateAndTime());
-			fotaRepository.save(fotaInfo);
-  	        log.debug("updated fotaInfo Details: {}", fotaInfo);
-  	  }
-		return fotaInfo;
-	}*/
+	//Email notification to approver
+	private void sendNotification(String baseUrl, String userRole) {
+		String roleName = "FOTA_APPROVER";
+		String queryStr = "SELECT u.email, u.last_name FROM hillromvest_dev.user_authority a, hillromvest_dev.user u where a.authority_name = '"+roleName+"' and a.user_id = u.id";
+		
+		Query jpaQuery = entityManager.createNativeQuery(queryStr);
+		
+		List<Object[]> resultList = jpaQuery.getResultList();
+		
+		if(userRole.equals("FOTA_ADMIN")){
+			for(Object[] result : resultList){
+			mailService.sendFotaDeleteNotificationEmail((String)result[0], (String)result[1],baseUrl);
+			}
+		}else if(userRole.equals("")){
+			for(Object[] result : resultList){
+				mailService.sendFotaUploadNotificationEmail((String)result[0], (String)result[1],baseUrl);
+			}
+		}
+		
+	}
+
 	private String getChunk(String rawMessage) {
 
 		byte[] getChunkByte = java.util.Base64.getDecoder().decode(rawMessage);
@@ -1476,55 +1512,167 @@ public class FOTAService {
 		return val;
 	}
 
-	public List<FOTADeviceDto> getFOTADeviceList(String status, String searchString) {
+	public List<FOTADeviceDto> getFOTADeviceList(String status, String searchString, String sortBy, boolean isAscending) {
 
-		List<FOTADeviceFWareUpdate> FOTADeviceList = null;
 		List<FOTADeviceDto> FOTADeviceDtoList = null;
-
 		String queryString = new StringBuilder("'%").append(searchString)
 				.append("%'").toString();
-		
+		String queryStr = "";
 		if (status.equals(SUCCESS_LIST)) {
-			FOTADeviceList = new ArrayList<FOTADeviceFWareUpdate>();
-			
-			String queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4;
+			if(sortBy.equals("")&& isAscending == false){
+				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.id desc";
+			}else if(sortBy.equals("partNumber")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by f.device_part_number desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by f.device_part_number asc";
+				}
+			}else if(sortBy.equals("productName")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by f.product_Type desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by f.product_Type asc";
+				}
+			}
+			else if(sortBy.equals("serialNumber")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.device_serial_number desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.device_serial_number asc";
+				}
+			}else if(sortBy.equals("connectionType")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.connection_type desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.connection_type asc";
+				}
+			}else if(sortBy.equals("startDatetime")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.download_start_date_time desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.download_start_date_time asc";
+				}
+			}else if(sortBy.equals("endDateTime")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.download_end_date_time desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.download_end_date_time asc";
+				}
+			}else if(sortBy.equals("status")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.downloaded_status desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.downloaded_status asc";
+				}
+			}
 			
 			Query jpaQuery = entityManager.createNativeQuery(queryStr);
 			
 			List<Object[]> resultList = jpaQuery.getResultList();
 			
 			FOTADeviceDtoList = setDeviceValues(resultList);
-			
-			/*
-			FOTADeviceList = fotaDeviceRepository
-					.getFOTADeviceListByStatus(status, queryString);
-			FOTADeviceDtoList = setDeviceValues(resultList);
-			*/
 			
 		} else if (status.equals(FAILURE_LIST)) {
-			FOTADeviceList = new ArrayList<FOTADeviceFWareUpdate>();
-			
-
-			String queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4;
-			
+			if(sortBy.equals("")&& isAscending == false){
+				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.id desc";
+			}else if(sortBy.equals("partNumber")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by f.device_part_number desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by f.device_part_number asc";
+				}
+			}else if(sortBy.equals("productName")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by f.product_Type desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by f.product_Type asc";
+				}
+			}
+			else if(sortBy.equals("serialNumber")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.device_serial_number desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.device_serial_number asc";
+				}
+			}else if(sortBy.equals("connectionType")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.connection_type desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.connection_type asc";
+				}
+			}else if(sortBy.equals("startDatetime")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.download_start_date_time desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.download_start_date_time asc";
+				}
+			}else if(sortBy.equals("endDateTime")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.download_end_date_time desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.download_end_date_time asc";
+				}
+			}else if(sortBy.equals("status")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.downloaded_status desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.downloaded_status asc";
+				}
+			}
 			Query jpaQuery = entityManager.createNativeQuery(queryStr);
 			
 			List<Object[]> resultList = jpaQuery.getResultList();
 			
 			FOTADeviceDtoList = setDeviceValues(resultList);
-			/*FOTADeviceList = fotaDeviceRepository
-					.getFOTADeviceListByStatus(status, queryString);
-			FOTADeviceDtoList = setDeviceValues(FOTADeviceList);*/
+			
 
 		} else if (status.equals(ABORTED_LIST)) {
-			FOTADeviceList = new ArrayList<FOTADeviceFWareUpdate>();
-			/*FOTADeviceList = fotaDeviceRepository
-					.getFOTADeviceListByStatus(status, queryString);
-			FOTADeviceDtoList = setDeviceValues(FOTADeviceList);*/
-			
-
-			String queryStr = DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4;
-			
+			if(sortBy.equals("")&& isAscending == false){
+				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.id desc";
+			}else if(sortBy.equals("partNumber")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by f.device_part_number desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by f.device_part_number asc";
+				}
+			}else if(sortBy.equals("productName")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by f.product_Type desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by f.product_Type asc";
+				}
+			}
+			else if(sortBy.equals("serialNumber")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.device_serial_number desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.device_serial_number asc";
+				}
+			}else if(sortBy.equals("connectionType")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.connection_type desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.connection_type asc";
+				}
+			}else if(sortBy.equals("startDatetime")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.download_start_date_time desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.download_start_date_time asc";
+				}
+			}else if(sortBy.equals("endDateTime")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.download_end_date_time desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.download_end_date_time asc";
+				}
+			}else if(sortBy.equals("status")){
+				if(isAscending){
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.downloaded_status desc";
+				}else{
+					queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.downloaded_status asc";
+				}
+			}
 			Query jpaQuery = entityManager.createNativeQuery(queryStr);
 			
 			List<Object[]> resultList = jpaQuery.getResultList();
@@ -1532,20 +1680,72 @@ public class FOTAService {
 			FOTADeviceDtoList = setDeviceValues(resultList);
 
 		} else if (status.equals(ALL)) {
-			
-			FOTADeviceList = new ArrayList<FOTADeviceFWareUpdate>();
 			//SUCCESS_LIST, FAILURE_LIST, ABORTED_LIST
-
-			String queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id)";
 			
+			if(sortBy.equals("")&& isAscending == false){
+				queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.id desc";
+			}else if(sortBy.equals("partNumber")){
+				if(isAscending){
+					queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by f.device_part_number desc";
+				}else{
+					queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by f.device_part_number asc";
+				}
+			}else if(sortBy.equals("productName")){
+				if(isAscending){
+					queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by f.product_Type desc";
+				}else{
+					queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by f.product_Type asc";
+				}
+			}
+			else if(sortBy.equals("serialNumber")){
+				if(isAscending){
+					queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.device_serial_number desc";
+				}else{
+					queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.device_serial_number asc";
+				}
+			}else if(sortBy.equals("connectionType")){
+				if(isAscending){
+					queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.connection_type desc";
+				}else{
+					queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.connection_type asc";
+				}
+			}else if(sortBy.equals("startDatetime")){
+				if(isAscending){
+					queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.download_start_date_time desc";
+				}else{
+					queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.download_start_date_time asc";
+				}
+			}else if(sortBy.equals("endDateTime")){
+				if(isAscending){
+					queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.download_end_date_time desc";
+				}else{
+					queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.download_end_date_time asc";
+				}
+			}else if(sortBy.equals("status")){
+				if(isAscending){
+					queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.downloaded_status desc";
+				}else{
+					queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.downloaded_status asc";
+				}
+			}else if(sortBy.equals("downloadTime")){
+					queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id)";
+			}
+
 			Query jpaQuery = entityManager.createNativeQuery(queryStr);
 			
 			List<Object[]> resultList = jpaQuery.getResultList();
 			
 			FOTADeviceDtoList = setDeviceValues(resultList);
-			
-			/*FOTADeviceList = fotaDeviceRepository.getFOTADeviceListByAll(SUCCESS_LIST, FAILURE_LIST, ABORTED_LIST, queryString);
-			FOTADeviceDtoList = setDeviceValues(FOTADeviceList);*/
+		}
+		if (sortBy.equals("downloadTime")) {
+			if (isAscending) {
+				Collections.sort(FOTADeviceDtoList,
+						FOTADeviceDto.downLoadTimeDescComparator);
+			} else {
+				Collections.sort(FOTADeviceDtoList,
+						FOTADeviceDto.downLoadTimeAscComparator);
+			}
+
 		}
 		return FOTADeviceDtoList;
 	}
@@ -1557,17 +1757,6 @@ public class FOTAService {
 		for (Object[] fwareObj : FOTADeviceList) {
 			//FOTAInfo fotaInfo = null;
 			FOTADeviceDto fwareDtoObj = new FOTADeviceDto();
-			
-			/*Long longNumber= fwareDtoObj[0].longValue();
-			
-			Integer grandChildCount = ((BigInteger) fwareDtoObj[0]).intValue();*/
-			//fotaInfo = fotaRepository.findOneById((Long)fwareObj[1]);
-			
-			//BigInteger bi = new BigInteger(String.valueOf((Long)fwareObj[0]));
-			
-			//fwareDtoObj.setId((Long)(String.valueOf(fwareObj[0])));
-			/*Number fotaId = (Number) fwareObj[0];
-			fwareDtoObj.setFotaInfoId((Long) fotaId);*/
 			fwareDtoObj.setDeviceSerialNumber((String)fwareObj[2]);
 			fwareDtoObj.setConnectionType((String)fwareObj[3]);
 			fwareDtoObj.setDeviceSoftVersion((String)fwareObj[4]);
@@ -1586,7 +1775,7 @@ public class FOTAService {
 		}
 		return FOTADeviceDtoList;
 	}
-
+	//Calculate
 	private String getDownLoadTime(DateTime downloadEndDateTime,
 			DateTime downloadStartDateTime) {
 		long elapsed = (downloadEndDateTime.getMillis())
@@ -1612,62 +1801,162 @@ public class FOTAService {
 
 		return totalDownloadTime;
 	}
-
-	public List<FOTAInfo> FOTAList(String status, String searchString) {
+	//Get Firmware list
+	public List<FOTAInfo> FOTAList(String status, String searchString, String sortBy, boolean isAscending) {
 		List<FOTAInfo> FOTAInfoList = null;
+		
+		if(status.equals("ActivePending")){
+			FOTAInfoList = getSortPendingFirmwareList(searchString,sortBy,isAscending);
+			
+		}else if(status.equals("ActivePublished")){
+			
+			FOTAInfoList = getSortActivePublishdFirmwareList(searchString,sortBy,isAscending);
+			
+		}else if(status.equals("All")){
+			FOTAInfoList = getSortAllFirmwareList(searchString,sortBy,isAscending);
+			
+		}
+		return FOTAInfoList;
+	}
+	private List<FOTAInfo> getSortAllFirmwareList(String searchString,
+			String sortBy, boolean isAscending) {
+		List<FOTAInfo> FOTAInfoList = new ArrayList<FOTAInfo>();
 		List<FOTAInfo> FOTAInfoListUpdate = null;
 		FOTAInfoListUpdate = new ArrayList<FOTAInfo>();
 		String queryString = new StringBuilder("%").append(searchString)
 				.append("%").toString();
-		if(status.equals("ActivePending")){
-			FOTAInfoList = new ArrayList<FOTAInfo>();
-			FOTAInfoList = fotaRepository.getFOTAListByPendingAndSearchStr(false,false,false,false,true,true,queryString);
-			for(FOTAInfo info : FOTAInfoList){
-				if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == false && info.getDeleteRequestFlag() == false ){
-					info.setFOTAStatus("Active Pending");
-				}else if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == true && info.getDeleteRequestFlag() == true ){
-					info.setFOTAStatus("Delete Requested");
-				}
-				FOTAInfoListUpdate.add(info);
+		FOTAInfoList = fotaRepository.getFOTAListByAllAndSearchStr(queryString);
+		
+		for(FOTAInfo info : FOTAInfoList){
+			if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == false){
+				info.setFOTAStatus("Active Pending");
 			}
-		}else if(status.equals("ActivePublished")){
-			FOTAInfoList = new ArrayList<FOTAInfo>();
-			boolean softDeleteFlag = false;
-			boolean activePublishedFlag = true;
-			
-			String queryString1 = new StringBuilder("%").append(searchString)
-					.append("%").toString();
-			
-			FOTAInfoList = fotaRepository.getFOTAListByPublishedAndSearchStr(softDeleteFlag,activePublishedFlag,queryString1);
-			for(FOTAInfo info : FOTAInfoList){
-				if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == true){
-					info.setFOTAStatus("Active Published");
-				}else if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == true){
-					info.setFOTAStatus("Active Published");
-				}
-				FOTAInfoListUpdate.add(info);
+			else if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == true){
+				info.setFOTAStatus("Active Published");
+			}else if(info.getSoftDeleteFlag() == true && info.getActivePublishedFlag() == false){
+				info.setFOTAStatus("Inactive Pending");
 			}
-		}else if(status.equals("All")){
-			FOTAInfoList = new ArrayList<FOTAInfo>();
-			//To get all active pending and active published
-			FOTAInfoList = fotaRepository.getFOTAListByAllAndSearchStr(queryString);
-			for(FOTAInfo info : FOTAInfoList){
-				if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == false){
-					info.setFOTAStatus("Active Pending");
-				}
-				else if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == true){
-					info.setFOTAStatus("Active Published");
-				}else if(info.getSoftDeleteFlag() == true && info.getActivePublishedFlag() == false){
-					info.setFOTAStatus("Inactive Pending");
-				}
-				else if(info.getSoftDeleteFlag() == true && info.getActivePublishedFlag() == true){
-					info.setFOTAStatus("Inactive Published");
-				}
-				FOTAInfoListUpdate.add(info);
+			else if(info.getSoftDeleteFlag() == true && info.getActivePublishedFlag() == true){
+				info.setFOTAStatus("Inactive Published");
 			}
+			FOTAInfoListUpdate.add(info);
 		}
+		FOTAInfoListUpdate = getSortingData(FOTAInfoListUpdate,sortBy,isAscending);
 		return FOTAInfoListUpdate;
 	}
+
+
+	//getSortActivePublishdFirmwareList
+	private List<FOTAInfo> getSortActivePublishdFirmwareList(
+			String searchString, String sortBy, boolean isAscending) {
+		List<FOTAInfo> FOTAInfoList = new ArrayList<FOTAInfo>();
+		List<FOTAInfo> FOTAInfoListUpdate = null;
+		FOTAInfoListUpdate = new ArrayList<FOTAInfo>();
+		boolean softDeleteFlag = false;
+		boolean activePublishedFlag = true;
+		String queryString1 = new StringBuilder("%").append(searchString)
+				.append("%").toString();
+		
+		FOTAInfoList = fotaRepository.getFOTAListByPublishedAndSearchStr(softDeleteFlag,activePublishedFlag,queryString1);
+		for(FOTAInfo info : FOTAInfoList){
+			if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == true){
+				info.setFOTAStatus("Active Published");
+			}else if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == true){
+				info.setFOTAStatus("Active Published");
+			}
+			FOTAInfoListUpdate.add(info);
+		}
+		FOTAInfoListUpdate = getSortingData(FOTAInfoListUpdate,sortBy,isAscending);
+		return FOTAInfoListUpdate;
+	}
+
+	//getSortPendingFirmwareList
+	private List<FOTAInfo> getSortPendingFirmwareList(String searchString,
+			String sortBy, boolean isAscending) {
+		List<FOTAInfo> FOTAInfoList = new ArrayList<FOTAInfo>();
+		List<FOTAInfo> FOTAInfoListUpdate = null;
+		FOTAInfoListUpdate = new ArrayList<FOTAInfo>();
+		String queryString = new StringBuilder("%").append(searchString)
+				.append("%").toString();
+		FOTAInfoList = fotaRepository.getFOTAListByPendingAndSearchStr(false,false,false,false,true,true,queryString);
+		for(FOTAInfo info : FOTAInfoList){
+			if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == false && info.getDeleteRequestFlag() == false ){
+				info.setFOTAStatus("Active Pending");
+			}else if(info.getSoftDeleteFlag() == false && info.getActivePublishedFlag() == true && info.getDeleteRequestFlag() == true ){
+				info.setFOTAStatus("Delete Requested");
+			}
+			FOTAInfoListUpdate.add(info);
+		}
+		FOTAInfoListUpdate = getSortingData(FOTAInfoListUpdate,sortBy,isAscending);
+				return FOTAInfoListUpdate;
+	}
+
+	//Firmware sorting common method
+	private List<FOTAInfo> getSortingData(List<FOTAInfo> FOTAInfoList, String sortBy, boolean isAscending) {
+
+		if(sortBy.equals("") && isAscending == false){
+			Collections.sort(FOTAInfoList,FOTAInfo.idDesc);
+		}else if(sortBy.equals("partNumber")){
+			if(isAscending){
+				Collections.sort(FOTAInfoList,FOTAInfo.devicePartDescComparator);
+			}else{
+				Collections.sort(FOTAInfoList,FOTAInfo.devicePartAscComparator);
+			}
+		}else if(sortBy.equals("productName")){
+			if(isAscending){
+				Collections.sort(FOTAInfoList,FOTAInfo.productNameDescComparator);
+			}else{
+				Collections.sort(FOTAInfoList,FOTAInfo.productNameAscComparator);
+			}
+		}else if(sortBy.equals("softwareVersion")){
+			if(isAscending){
+				Collections.sort(FOTAInfoList,FOTAInfo.softVerDescComparator);
+			}else{
+				Collections.sort(FOTAInfoList,FOTAInfo.softVerAscComparator);
+			}
+		}else if(sortBy.equals("softwareDate")){
+			if(isAscending){
+				Collections.sort(FOTAInfoList,FOTAInfo.softDateDescComparator);
+			}else{
+				Collections.sort(FOTAInfoList,FOTAInfo.softDateAscComparator);
+			}
+		}else if(sortBy.equals("uploadBy")){
+			if(isAscending){
+				Collections.sort(FOTAInfoList,FOTAInfo.uploadByDescComparator);
+			}else{
+				Collections.sort(FOTAInfoList,FOTAInfo.uploadByAscComparator);
+			}
+		}else if(sortBy.equals("uploadDate")){
+			if(isAscending){
+				Collections.sort(FOTAInfoList,FOTAInfo.uploadDateDescComparator);
+			}else{
+				Collections.sort(FOTAInfoList,FOTAInfo.uploadDateAscComparator);
+			}
+		}else if(sortBy.equals("publishedBy")){
+			if(isAscending){
+				Collections.sort(FOTAInfoList,FOTAInfo.publishedByDescComparator);
+			}else{
+				Collections.sort(FOTAInfoList,FOTAInfo.publishedByAscComparator);
+			}
+		}else if(sortBy.equals("publishedDate")){
+			if(isAscending){
+				Collections.sort(FOTAInfoList,FOTAInfo.publishedDateDescComparator);
+			}else{
+				Collections.sort(FOTAInfoList,FOTAInfo.publishedDateAscComparator);
+			}
+		}else if(sortBy.equals("status")){
+			if(isAscending){
+				Collections.sort(FOTAInfoList,FOTAInfo.statusDescComparator);
+			}else{
+				Collections.sort(FOTAInfoList,FOTAInfo.statusAscComparator);
+			}
+		}
+		
+
+		return FOTAInfoList;
+	}
+
+
 	//CRC 32 validation when user i
 	@SuppressWarnings("resource")
 	public boolean CRC32Calculation(CRC32Dto crc32Dt0) throws Exception {
@@ -2252,7 +2541,7 @@ public class FOTAService {
 
 	}
 
-	public FOTAInfo firmwareDelete(Long id, String userRole) {
+	public FOTAInfo firmwareDelete(Long id, String userRole, String baseUrl) {
 
 		FOTAInfo fotaInfo = null;
 		fotaInfo = fotaRepository.findOneById(id);
@@ -2269,6 +2558,12 @@ public class FOTAService {
 						&& fotaInfo.getActivePublishedFlag() == true) {
 					fotaInfo.setDeleteRequestFlag(true);
 					fotaRepository.save(fotaInfo);
+					
+					//Send Notification to approver for delete request
+					
+					//Email notification to approver
+					sendNotification(baseUrl, userRole);
+	
 				}
 				
 			}else if(userRole.equals("FOTA_APPROVER")){

@@ -1,5 +1,7 @@
 package com.hillrom.vest.web.rest.FOTA.dto;
 
+import java.util.Comparator;
+
 import org.joda.time.DateTime;
 
 public class FOTADeviceDto {
@@ -31,7 +33,26 @@ public class FOTADeviceDto {
 	
 	private String productType;
 	
+	
+	public static Comparator<FOTADeviceDto> downLoadTimeAscComparator = new Comparator<FOTADeviceDto>() {
 
+		public int compare(FOTADeviceDto s1, FOTADeviceDto s2) {
+			String downloadTime1 = s1.getDownloadTime();
+			String downloadTime2 = s2.getDownloadTime();
+
+			// ascending order
+			return downloadTime1.compareTo(downloadTime2);
+		}
+	};
+	public static Comparator<FOTADeviceDto> downLoadTimeDescComparator = new Comparator<FOTADeviceDto>() {
+		public int compare(FOTADeviceDto s1, FOTADeviceDto s2) {
+			String downloadTime1 = s1.getDownloadTime();
+			String downloadTime2 = s2.getDownloadTime();
+			// descending order
+			return downloadTime2.compareTo(downloadTime1);
+		}
+	};
+		
 	public String getDownloadTime() {
 		return downloadTime;
 	}

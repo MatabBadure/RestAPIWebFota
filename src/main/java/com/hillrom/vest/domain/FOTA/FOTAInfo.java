@@ -1,5 +1,7 @@
 package com.hillrom.vest.domain.FOTA;
 
+import java.util.Comparator;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -107,9 +109,214 @@ public class FOTAInfo {
 	
 	
 	
+	public static Comparator<FOTAInfo> idDesc = new Comparator<FOTAInfo>() {
 
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+			Long id1 = s1.getId();
+			Long id2 = s2.getId();
+			// desc order
+			return id2.compareTo(id1);
+		}
+	};
+	public static Comparator<FOTAInfo> devicePartAscComparator = new Comparator<FOTAInfo>() {
+
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+			String devicePartNumber1 = s1.getDevicePartNumber();
+			String devicePartNumber2 = s2.getDevicePartNumber();
+			// ascending order
+			return devicePartNumber1.compareTo(devicePartNumber2);
+		}
+	};
+	public static Comparator<FOTAInfo> devicePartDescComparator = new Comparator<FOTAInfo>() {
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+			String devicePartNumber1 = s1.getDevicePartNumber();
+			String devicePartNumber2 = s2.getDevicePartNumber();
+			// Descending order
+			return devicePartNumber2.compareTo(devicePartNumber1);
+		}
+	};
 	
+	
+	public static Comparator<FOTAInfo> productNameAscComparator = new Comparator<FOTAInfo>() {
 
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+			String productName1 = s1.getProductType();
+			String productName2 = s2.getProductType();
+			// ascending order
+			return productName1.compareTo(productName2);
+		}
+	};
+	public static Comparator<FOTAInfo> productNameDescComparator = new Comparator<FOTAInfo>() {
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+			String productName1 = s1.getProductType();
+			String productName2 = s2.getProductType();
+			// Descending order
+			return productName2.compareTo(productName1);
+		}
+	};
+	
+	public static Comparator<FOTAInfo> softVerAscComparator = new Comparator<FOTAInfo>() {
+
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+			String softVer1 = s1.getSoftVersion();
+			String softVer2 = s2.getSoftVersion();
+			// ascending order
+			return softVer1.compareTo(softVer2);
+		}
+	};
+	public static Comparator<FOTAInfo> softVerDescComparator = new Comparator<FOTAInfo>() {
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+			String softVer1 = s1.getSoftVersion();
+			String softVer2 = s2.getSoftVersion();
+			// Descending order
+			return softVer2.compareTo(softVer1);
+		}
+	}; 
+	public static Comparator<FOTAInfo> softDateAscComparator = new Comparator<FOTAInfo>() {
+
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+			DateTime softDate1 = s1.getReleaseDate();
+			DateTime softDate2 = s2.getReleaseDate();
+			// ascending order
+			return softDate1.compareTo(softDate2);
+		}
+	};
+	public static Comparator<FOTAInfo> softDateDescComparator = new Comparator<FOTAInfo>() {
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+			DateTime softDate1 = s1.getReleaseDate();
+			DateTime softDate2 = s2.getReleaseDate();
+			// ascending order
+			return softDate2.compareTo(softDate1);
+		}
+	};
+	
+	public static Comparator<FOTAInfo> uploadByAscComparator = new Comparator<FOTAInfo>() {
+
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+			String uploadBy1 = s1.getUploadUser();
+			String uploadBy2 = s2.getUploadUser();
+			// ascending order
+			return uploadBy1.compareTo(uploadBy2);
+		}
+	};
+	public static Comparator<FOTAInfo> uploadByDescComparator = new Comparator<FOTAInfo>() {
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+			String uploadBy1 = s1.getUploadUser();
+			String uploadBy2 = s2.getUploadUser();
+			// ascending order
+			return uploadBy2.compareTo(uploadBy1);
+		}
+	};
+	
+	public static Comparator<FOTAInfo> uploadDateAscComparator = new Comparator<FOTAInfo>() {
+
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+			DateTime uploadDate1 = s1.getUploadDatetime();
+			DateTime uploadDate2 = s2.getUploadDatetime();
+			// ascending order
+			return uploadDate1.compareTo(uploadDate2);
+		}
+	};
+	public static Comparator<FOTAInfo> uploadDateDescComparator = new Comparator<FOTAInfo>() {
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+			DateTime uploadDate1 = s1.getUploadDatetime();
+			DateTime uploadDate2 = s2.getUploadDatetime();
+			// ascending order
+			return uploadDate2.compareTo(uploadDate1);
+		}
+	};
+	
+	public static Comparator<FOTAInfo> publishedByAscComparator = new Comparator<FOTAInfo>() {
+
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+			if(s1.getPublishedUser() == null && s2.getPublishedUser()== null){
+				return 0;
+			}else if(s1.getPublishedUser() == null){
+				return -1;
+			}else if(s1.getPublishedUser() == null){
+				return 1;
+			}else if(s1.getPublishedUser() != null && s2.getPublishedUser() != null){
+				return s1.getPublishedUser().compareTo(s2.getPublishedUser());
+			}else{
+				return 0;
+			}
+			
+		}
+	};
+	public static Comparator<FOTAInfo> publishedByDescComparator = new Comparator<FOTAInfo>() {
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+
+			if(s1.getPublishedUser() == null && s2.getPublishedUser()== null){
+				return 0;
+			}else if(s1.getPublishedUser() == null){
+				return 1;
+			}else if(s1.getPublishedUser() == null){
+				return -1;
+			}else if(s1.getPublishedUser() != null && s2.getPublishedUser() != null){
+				return s2.getPublishedUser().compareTo(s1.getPublishedUser());
+			}else{
+				return 0;
+			}
+			
+		
+			
+		}
+	};
+	
+	
+	public static Comparator<FOTAInfo> publishedDateAscComparator = new Comparator<FOTAInfo>() {
+
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+			if(s1.getPublishedDateTime() == null && s2.getPublishedDateTime()== null){
+				return 0;
+			}else if(s1.getPublishedDateTime() == null){
+				return -1;
+			}else if(s1.getPublishedDateTime() == null){
+				return 1;
+			}else if(s1.getPublishedDateTime() != null && s2.getPublishedDateTime() != null){
+				return s1.getPublishedDateTime().compareTo(s2.getPublishedDateTime());
+			}else{
+				return 0;
+			}
+			
+		}
+	};
+	public static Comparator<FOTAInfo> publishedDateDescComparator = new Comparator<FOTAInfo>() {
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+			if(s1.getPublishedDateTime() == null && s2.getPublishedDateTime()== null){
+				return 0;
+			}else if(s1.getPublishedDateTime() != null && s2.getPublishedDateTime() != null){
+				return s2.getPublishedDateTime().compareTo(s1.getPublishedDateTime());
+			}else if(s1.getPublishedDateTime() == null){
+				return 1;
+			}else  if(s1.getPublishedDateTime() == null){
+				return -1;
+			}else{
+				return 0;
+			}
+		}
+	};
+	
+	
+	public static Comparator<FOTAInfo> statusAscComparator = new Comparator<FOTAInfo>() {
+		/*if(s1.getPublishedDateTime() != null && s2.getPublishedDateTime() != null){
+		return s1.getPublishedDateTime().compareTo(s2.getPublishedDateTime());*/
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+			String status1 = s1.getFOTAStatus();
+			String status2 = s2.getFOTAStatus();
+			// ascending order
+			return status1.compareTo(status2);
+		}
+	};
+	public static Comparator<FOTAInfo> statusDescComparator = new Comparator<FOTAInfo>() {
+		public int compare(FOTAInfo s1, FOTAInfo s2) {
+			String status1 = s1.getFOTAStatus();
+			String status2 = s2.getFOTAStatus();
+			// ascending order
+			return status2.compareTo(status1);
+		}
+	};
+	
 	public boolean getDeleteRequestFlag() {
 		return deleteRequestFlag;
 	}

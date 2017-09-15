@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -118,13 +119,15 @@ public class FOTAResource {
 	 */
 	@RequestMapping(value = "/FOTA/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> createFOTA(
-			@Valid @RequestBody(required = true) FOTAInfoDto fotaInfoDto) {
+			@Valid @RequestBody(required = true) FOTAInfoDto fotaInfoDto, HttpServletRequest request) {
 
+		log.debug("REST request to save FOTA info : {}", fotaInfoDto);
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
 		JSONObject jsonObject = new JSONObject();
 
 		try {
 
-			FOTAInfo fotaInfo = fotaService.savFotaInfoData(fotaInfoDto);
+			FOTAInfo fotaInfo = fotaService.savFotaInfoData(fotaInfoDto,baseUrl);
 			jsonObject.put("fotaInfo", fotaInfo);
 			if (Objects.nonNull(fotaInfo)) {
 				jsonObject.put("statusMsg", "fotaInfo created successfully");
@@ -211,12 +214,14 @@ public class FOTAResource {
 		// Delete Firmware 
 		@RequestMapping(value = "/FOTA/{id}/{userRole}/firmwareDelete", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
 		@ResponseBody
-		public ResponseEntity<?> firmwareDelete(@PathVariable Long id, @PathVariable String userRole) {
-			JSONObject jsonObject = new JSONObject();
+		public ResponseEntity<?> firmwareDelete(@PathVariable Long id, @PathVariable String userRole, HttpServletRequest request) {
+				log.debug("REST request to delete FOTA info : {}", id);
+		        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+				JSONObject jsonObject = new JSONObject();
 
 			try {
 				// Get the firmware
-				FOTAInfo fotaInfo = fotaService.firmwareDelete(id,userRole);
+				FOTAInfo fotaInfo = fotaService.firmwareDelete(id,userRole,baseUrl);
 				jsonObject.put("fotaInfo", fotaInfo);
 				return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
 			} catch (Exception ex) {
@@ -235,11 +240,13 @@ public class FOTAResource {
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "status", required = true) String status,
-			@RequestParam(value = "searchString", required = true) String searchString) {
+			@RequestParam(value = "searchString", required = true) String searchString,
+			@RequestParam(value = "sort_by", required = false) String sortBy,
+			@RequestParam(value = "asc", required = false) boolean isAscending) {
 		try {
 			
 			List<FOTAInfo> FOTAInfoList = fotaService.FOTAList(status,
-					searchString);
+					searchString,sortBy,isAscending);
 
 			int firstResult = PaginationUtil.generatePageRequest(offset, limit)
 					.getOffset();
@@ -276,10 +283,12 @@ public class FOTAResource {
 			@RequestParam(value = "page", required = false) Integer offset,
 			@RequestParam(value = "per_page", required = false) Integer limit,
 			@RequestParam(value = "status", required = false) String status,
-			@RequestParam(value = "searchString", required = true) String searchString) {
+			@RequestParam(value = "searchString", required = true) String searchString,
+			@RequestParam(value = "sort_by", required = false) String sortBy,
+			@RequestParam(value = "asc", required = false) boolean isAscending) {
 		try {
 			List<FOTADeviceDto> fotaDeviceList = fotaService
-					.getFOTADeviceList(status, searchString);
+					.getFOTADeviceList(status, searchString,sortBy,isAscending);
 			
 
 			int firstResult = PaginationUtil.generatePageRequest(offset, limit)

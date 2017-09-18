@@ -32,6 +32,7 @@ import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
+import com.hillrom.vest.config.Constants;
 
 /**
  * Service class for managing users.
@@ -193,17 +194,23 @@ public class PatientVestDeviceService {
 	}
 	
 	public void updateDeviceHistoryForTims(PatientInfo patient, String serialNumber,String bluetoothId, String hubId) throws HillromException {
+		String createModifyBy = Constants.CREATED_BY_TIMS;
 		if(patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(patient.getId(),serialNumber).isPresent()){
 			Optional<PatientVestDeviceHistory> patientDeviceHistoryRecord = patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(patient.getId(),serialNumber);
 			if(patientDeviceHistoryRecord.isPresent() && !patientDeviceHistoryRecord.get().isActive()){
 				patientDeviceHistoryRecord.get().setActive(true);
+				patientDeviceHistoryRecord.get().setLastModifiedDate(new DateTime());
+				patientDeviceHistoryRecord.get().setLastModifiedBy(createModifyBy);
 				patientVestDeviceRepository.save(patientDeviceHistoryRecord.get());
 			}
 		}else{
 			PatientVestDeviceHistory patientDeviceHistoryRecord = new PatientVestDeviceHistory(new PatientVestDevicePK(patient, serialNumber),
 					bluetoothId, hubId, true);
+			patientDeviceHistoryRecord.setPending(false);
 			patientDeviceHistoryRecord.setCreatedDate(new DateTime());
+			patientDeviceHistoryRecord.setCreatedBy(createModifyBy);
 			patientDeviceHistoryRecord.setLastModifiedDate(new DateTime());
+			patientDeviceHistoryRecord.setLastModifiedBy(createModifyBy);
      		patientVestDeviceRepository.save(patientDeviceHistoryRecord);
 		}
 	}

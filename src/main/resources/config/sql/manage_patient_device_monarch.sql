@@ -69,9 +69,9 @@ IF operation_type_indicator = 'CREATE' THEN
 --			END IF;
 --		ELSE 		 
 			INSERT INTO `PATIENT_VEST_DEVICE_HISTORY_MONARCH`
-				(`patient_id`, `serial_number`, `bluetooth_id`,	`hub_id`,`created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_active`,`hmr`)
+				(`patient_id`, `serial_number`, `bluetooth_id`,	`hub_id`,`created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_active`,`hmr`,`is_pending`)
 				VALUES
-				(patient_id,pat_old_device_serial_number,pat_bluetooth_id,pat_hub_id, pat_created_by,today_date,pat_created_by,today_date,1,0);
+				(patient_id,pat_old_device_serial_number,pat_bluetooth_id,pat_hub_id, pat_created_by,today_date,pat_created_by,today_date,1,0,0);
 --		END IF;		
 
 			

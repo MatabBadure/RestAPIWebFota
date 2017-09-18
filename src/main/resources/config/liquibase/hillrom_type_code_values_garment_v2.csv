@@ -1,0 +1,51 @@
+id,type,type_code,type_code_value
+171,garment_type_vest,C3 Washable,C3 Washable
+172,garment_type_vest,Wrap,Wrap
+173,garment_type_vest,Chest Vest,Chest Vest
+174,garment_type_vest,Full Vest,Full Vest
+175,garment_type_monarch,Monarch Shell,Monarch Shell
+176,garment_size_vest,Child Small,Child Small
+177,garment_size_vest,Child Medium,Child Medium
+178,garment_size_vest,Child Large,Child Large
+179,garment_size_vest,Adult X-Small,Adult X-Small
+180,garment_size_vest,Adult Small,Adult Small
+181,garment_size_vest,Adult Medium,Adult Medium
+182,garment_size_vest,Adult Large,Adult Large
+183,garment_size_vest,Adult XLarge,Adult XLarge
+184,garment_size_vest,Child Small Short,Child Small Short
+185,garment_size_vest,Child X Small,Child X Small
+186,garment_size_vest,X-Small,X-Small
+187,garment_size_vest,Small,Small
+188,garment_size_vest,Medium,Medium
+189,garment_size_vest,Large,Large
+190,garment_size_vest,X-Large,X-Large
+191,garment_size_vest,2X-Large,2X-Large
+192,garment_size_monarch,One Size Fits All,One Size Fits All
+193,garment_color_vest,Calming Black,Calming Black
+194,garment_color_vest,Coastal Blue,Coastal Blue
+195,garment_color_vest,Cashmere Rose,Cashmere Rose
+196,garment_color_vest,Color Me Purple,Color Me Purple
+197,garment_color_vest,Cool Camo,Cool Camo
+198,garment_color_vest,Pink Camo,Pink Camo
+199,garment_color_vest,Green,Green
+200,garment_color_vest,Black,Black
+201,garment_color_vest,Blue,Blue
+202,garment_color_vest,Graphite Orange,Graphite Orange
+203,garment_color_vest,Ocean Blue,Ocean Blue
+204,garment_color_vest,Adventure Green,Adventure Green
+205,garment_color_vest,Zesty Pink,Zesty Pink
+206,garment_color_vest,Techno Red,Techno Red
+207,garment_color_monarch,Calming Black,Calming Black
+208,garment_color_monarch,Coastal Blue,Coastal Blue
+209,garment_color_monarch,Cashmere Rose,Cashmere Rose
+210,garment_color_monarch,Color Me Purple,Color Me Purple
+211,garment_color_monarch,Cool Camo,Cool Camo
+212,garment_color_monarch,Pink Camo,Pink Camo
+213,garment_color_monarch,Green,Green
+214,garment_color_monarch,Black,Black
+215,garment_color_monarch,Blue,Blue
+217,garment_color_monarch,Graphite Orange,Graphite Orange
+218,garment_color_monarch,Ocean Blue,Ocean Blue
+219,garment_color_monarch,Adventure Green,Adventure Green
+220,garment_color_monarch,Zesty Pink,Zesty Pink
+221,garment_color_monarch,Techno Red,Techno Red

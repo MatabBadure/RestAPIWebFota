@@ -238,7 +238,7 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 			
 			if(!patientMonarchDeviceHistoryList.isEmpty()){
 				for(PatientVestDeviceHistoryMonarch patientMonarchDevicePatient : patientMonarchDeviceHistoryList){
-					if(patientMonarchDevicePatient.isPending() 
+					if(Objects.nonNull(patientMonarchDevicePatient) && patientMonarchDevicePatient.isPending() 
 							&& deviceSerialNumber.equalsIgnoreCase(patientMonarchDevicePatient.getSerialNumber())){
 						patientMonarchDevicePatient.setPending(false);
 						patientMonarchDeviceRepository.save(patientMonarchDevicePatient);

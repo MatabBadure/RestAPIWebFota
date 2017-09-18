@@ -1422,7 +1422,7 @@ public class FOTAService {
 	//Email notification to approver
 	private void sendNotification(String baseUrl, String userRole) {
 		String roleName = "FOTA_APPROVER";
-		String queryStr = "SELECT u.email, u.last_name FROM hillromvest_dev.user_authority a, hillromvest_dev.user u where a.authority_name = '"+roleName+"' and a.user_id = u.id";
+		String queryStr = "SELECT u.email, u.last_name FROM hillromvest_dev.USER_AUTHORITY a, hillromvest_dev.USER u where a.authority_name = '"+roleName+"' and a.user_id = u.id";
 		
 		Query jpaQuery = entityManager.createNativeQuery(queryStr);
 		

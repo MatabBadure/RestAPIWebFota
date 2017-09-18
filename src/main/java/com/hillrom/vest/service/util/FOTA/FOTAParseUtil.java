@@ -2,21 +2,20 @@ package com.hillrom.vest.service.util.FOTA;
 
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CHUNK_SIZE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CONNECTION_TYPE;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.CONNECTION_TYPE_ONE;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.CONNECTION_TYPE_ZERO;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_MODEL;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_SN;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_VER;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.ONE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.PREV_REQ_STATUS;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.SOFT_VER_DATE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.RESULT;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.CONNECTION_TYPE_ZERO;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.CONNECTION_TYPE_ONE;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.ONE;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.SOFT_VER_DATE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.ZERO;
-
 
 import java.util.LinkedHashMap;
 import java.util.Map;

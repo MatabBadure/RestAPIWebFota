@@ -1,7 +1,5 @@
 package com.hillrom.vest.web.rest.FOTA;
 
-import static com.hillrom.vest.config.FOTA.FOTAConstants.FOTA_FILE_PATH;
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -61,46 +59,17 @@ public class FOTAResource {
 
 	@Inject
 	private FOTAService fotaService;
-	
+
 	@Inject
 	private FOTARepository fotaRepository;
 
 	/**
-	 * POST /processHexa to byte array
+	 * FOTA update
+	 * 
+	 * @param rawMessage
+	 * @return
 	 */
-	@RequestMapping(value = "/processHexaToByte", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> processHexaToByteData(
-			@RequestParam(value = "chunckSize", required = false) Integer chunkSize) {
-		JSONObject jsonObject = new JSONObject();
-		try {
-			jsonObject = fotaService.processHexaToByteData(FOTA_FILE_PATH,
-					chunkSize);
-
-			return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			jsonObject.put("Error Message", ex.getMessage());
-			return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
-		}
-	}
-
-	@RequestMapping(value = "/checkUpdate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> checkUpdate(
-			@RequestBody(required = true) String rawMessage) {
-		JSONObject jsonObject = new JSONObject();
-		try {
-			jsonObject = fotaService.checkUpdate(rawMessage);
-			return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			jsonObject.put("Error Message", ex.getMessage());
-			return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
-		}
-	}
-
-	@RequestMapping(value = "/FOTA", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/FOTA/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> FOTA(
 			@RequestBody(required = true) String rawMessage) {
 		String FOTAencoded = " ";
@@ -119,15 +88,18 @@ public class FOTAResource {
 	 */
 	@RequestMapping(value = "/FOTA/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> createFOTA(
-			@Valid @RequestBody(required = true) FOTAInfoDto fotaInfoDto, HttpServletRequest request) {
+			@Valid @RequestBody(required = true) FOTAInfoDto fotaInfoDto,
+			HttpServletRequest request) {
 
 		log.debug("REST request to save FOTA info : {}", fotaInfoDto);
-        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+		String baseUrl = request.getScheme() + "://" + request.getServerName()
+				+ ":" + request.getServerPort();
 		JSONObject jsonObject = new JSONObject();
 
 		try {
 
-			FOTAInfo fotaInfo = fotaService.savFotaInfoData(fotaInfoDto,baseUrl);
+			FOTAInfo fotaInfo = fotaService.savFotaInfoData(fotaInfoDto,
+					baseUrl);
 			jsonObject.put("fotaInfo", fotaInfo);
 			if (Objects.nonNull(fotaInfo)) {
 				jsonObject.put("statusMsg", "fotaInfo created successfully");
@@ -193,7 +165,12 @@ public class FOTAResource {
 		}
 	}
 
-	// Get Firmware list
+	/**
+	 * Get Firmware list
+	 * 
+	 * @param id
+	 * @return
+	 */
 	@RequestMapping(value = "/FOTA/{id}/getFirmware", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<?> getFirmwareDetails(@PathVariable Long id) {
@@ -210,28 +187,37 @@ public class FOTAResource {
 					HttpStatus.BAD_REQUEST);
 		}
 	}
-	
-		// Delete Firmware 
-		@RequestMapping(value = "/FOTA/{id}/{userRole}/firmwareDelete", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-		@ResponseBody
-		public ResponseEntity<?> firmwareDelete(@PathVariable Long id, @PathVariable String userRole, HttpServletRequest request) {
-				log.debug("REST request to delete FOTA info : {}", id);
-		        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-				JSONObject jsonObject = new JSONObject();
 
-			try {
-				// Get the firmware
-				FOTAInfo fotaInfo = fotaService.firmwareDelete(id,userRole,baseUrl);
-				jsonObject.put("fotaInfo", fotaInfo);
-				return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
-			} catch (Exception ex) {
-				jsonObject.put("ERROR", ex.getMessage());
-				return new ResponseEntity<JSONObject>(jsonObject,
-						HttpStatus.BAD_REQUEST);
-			}
+	/**
+	 * Delete Firmware
+	 * 
+	 * @param id
+	 * @param userRole
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/FOTA/{id}/{userRole}/firmwareDelete", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<?> firmwareDelete(@PathVariable Long id,
+			@PathVariable String userRole, HttpServletRequest request) {
+		log.debug("REST request to delete FOTA info : {}", id);
+		String baseUrl = request.getScheme() + "://" + request.getServerName()
+				+ ":" + request.getServerPort();
+		JSONObject jsonObject = new JSONObject();
+
+		try {
+			// Get the firmware
+			FOTAInfo fotaInfo = fotaService.firmwareDelete(id, userRole,
+					baseUrl);
+			jsonObject.put("fotaInfo", fotaInfo);
+			return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
+		} catch (Exception ex) {
+			jsonObject.put("ERROR", ex.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject,
+					HttpStatus.BAD_REQUEST);
 		}
-	
-	
+	}
+
 	/**
 	 * GET /FOTAList
 	 */
@@ -244,9 +230,9 @@ public class FOTAResource {
 			@RequestParam(value = "sort_by", required = false) String sortBy,
 			@RequestParam(value = "asc", required = false) boolean isAscending) {
 		try {
-			
+
 			List<FOTAInfo> FOTAInfoList = fotaService.FOTAList(status,
-					searchString,sortBy,isAscending);
+					searchString, sortBy, isAscending);
 
 			int firstResult = PaginationUtil.generatePageRequest(offset, limit)
 					.getOffset();
@@ -273,8 +259,6 @@ public class FOTAResource {
 		}
 	}
 
-	
-
 	/**
 	 * GET /FOTADeviceList
 	 */
@@ -287,9 +271,8 @@ public class FOTAResource {
 			@RequestParam(value = "sort_by", required = false) String sortBy,
 			@RequestParam(value = "asc", required = false) boolean isAscending) {
 		try {
-			List<FOTADeviceDto> fotaDeviceList = fotaService
-					.getFOTADeviceList(status, searchString,sortBy,isAscending);
-			
+			List<FOTADeviceDto> fotaDeviceList = fotaService.getFOTADeviceList(
+					status, searchString, sortBy, isAscending);
 
 			int firstResult = PaginationUtil.generatePageRequest(offset, limit)
 					.getOffset();
@@ -318,6 +301,11 @@ public class FOTAResource {
 		}
 	}
 
+	/**
+	 * 
+	 * @param crc32Dt0
+	 * @return
+	 */
 	@RequestMapping(value = "/FOTA/CRC32Calculation", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<?> CRC32Calculation(
@@ -344,6 +332,13 @@ public class FOTAResource {
 		}
 	}
 
+	/**
+	 * 
+	 * @param rootDir
+	 * @param seed
+	 * @return
+	 * @throws IOException
+	 */
 	public synchronized File createUniqueDirectory(File rootDir, String seed)
 			throws IOException {
 		int index = seed.lastIndexOf('.');
@@ -364,6 +359,11 @@ public class FOTAResource {
 		return result;
 	}
 
+	/**
+	 * deleteUploadFile
+	 * 
+	 * @param filePath
+	 */
 	public void deleteUploadFile(String filePath) {
 		Path path = FileSystems.getDefault().getPath(filePath);
 		try {
@@ -379,61 +379,60 @@ public class FOTAResource {
 		}
 
 	}
-	
-		// Get validatApproverCRC32
-		@RequestMapping(value = "/FOTA/validateApproverCRC32", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-		@ResponseBody
-		public ResponseEntity<?> validateApproverCRC32(
-				@Valid @RequestBody(required = true) ApproverCRCDto apprDto) {
-			JSONObject jsonObject = new JSONObject();
-			try {
-				// Validate approver crc 32
-				boolean result = fotaService.validateApproverCRC32(apprDto);
-				jsonObject.put("apvrCRC32", result);
-				return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
-			} catch (Exception ex) {
-				jsonObject.put("ERROR", ex.getMessage());
-				return new ResponseEntity<JSONObject>(jsonObject,
-						HttpStatus.BAD_REQUEST);
-			}
-		}
-		
-		 /**
-		   * 
-		   * @param fileName
-		   * @param response
-		   */
-		  @RequestMapping(value = "/FOTA/{id}/download", method = RequestMethod.GET)
-		  public ResponseEntity<?> FOTAGetFile(
-				  @PathVariable Long id, 
-		      HttpServletResponse response) {
-			  
-			  		JSONObject jsonObject = new JSONObject();
-		      try {
-		    	  // get your file as InputStream
-		    	  
-		    	// Save the file locally
-					/*BufferedOutputStream stream = new BufferedOutputStream(
-							new FileOutputStream(new File(fileName)));*/
-		    	  
-		    	 // File initialFile = new File(Constants.ANNOUNCEMENT_FILE_PATH + fileName + ".pdf");
-		    	  FOTAInfo fotaInfo = null;
-		  		  fotaInfo = fotaRepository.findOneById(id);
-		  		 
-		  			 InputStream is = new FileInputStream(fotaInfo.getFilePath());
-		  			 response.addHeader("Content-disposition", "inline;filename="+fotaInfo.getFilePath());
-		  			  response.setContentType("application/octet-stream");
-				        // copy it to response's OutputStream
-				        FileCopyUtils.copy(is, response.getOutputStream());
-				        response.flushBuffer();
-		        jsonObject.put("response", response);
-		        return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
-		        
-		      } catch (IOException ex) {
-		    		jsonObject.put("ERROR", ex.getMessage());
-					return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		      }
 
-		  }
-		
+	/**
+	 * Get validatApproverCRC32
+	 * 
+	 * @param apprDto
+	 * @return
+	 */
+	@RequestMapping(value = "/FOTA/validateApproverCRC32", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<?> validateApproverCRC32(
+			@Valid @RequestBody(required = true) ApproverCRCDto apprDto) {
+		JSONObject jsonObject = new JSONObject();
+		try {
+			// Validate approver crc 32
+			boolean result = fotaService.validateApproverCRC32(apprDto);
+			jsonObject.put("apvrCRC32", result);
+			return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
+		} catch (Exception ex) {
+			jsonObject.put("ERROR", ex.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject,
+					HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * 
+	 * @param fileName
+	 * @param response
+	 */
+	@RequestMapping(value = "/FOTA/{id}/download", method = RequestMethod.GET)
+	public ResponseEntity<?> FOTAGetFile(@PathVariable Long id,
+			HttpServletResponse response) {
+
+		JSONObject jsonObject = new JSONObject();
+		try {
+			// Save the file locally
+			FOTAInfo fotaInfo = null;
+			fotaInfo = fotaRepository.findOneById(id);
+
+			InputStream is = new FileInputStream(fotaInfo.getFilePath());
+			response.addHeader("Content-disposition", "inline;filename="
+					+ fotaInfo.getFilePath());
+			response.setContentType("application/octet-stream");
+			// copy it to response's OutputStream
+			FileCopyUtils.copy(is, response.getOutputStream());
+			response.flushBuffer();
+			jsonObject.put("response", response);
+			return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
+
+		} catch (IOException ex) {
+			jsonObject.put("ERROR", ex.getMessage());
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+	}
+
 }

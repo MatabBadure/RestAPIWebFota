@@ -45,15 +45,6 @@ public class PartNoHolder {
 		partNoHolder.setAbortFlag(false);
 		
 	}
-	/*public PartNoHolder(int chunkSize, String filePath) throws Exception {
-		partNoHolder = new PartNoHolder(chunkSize, filePath);
-		partNoHolder = new PartNoHolder();
-		totalChunk = readHexByteDataFromFile(chunkSize, filePath);
-		partNoHolder.setTotalChunk(totalChunk);
-		partNoHolder.setFileChunks(fileChunks);
-		
-	}*/
-
 	
 	private int readHexByteDataFromFile(int chunkSize, FOTAInfo fotaInfo) throws Exception {
         String hexDataStr = null;

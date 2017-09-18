@@ -101,9 +101,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/validateActivationKey").permitAll()
             .antMatchers("/api/validateResetKey").permitAll()
              //FOTA API
-            .antMatchers("/api/processHexaToByte").permitAll()
-            .antMatchers("/api/checkUpdate").permitAll()
-            .antMatchers("/api/FOTA").permitAll()
+            .antMatchers("/api/FOTA/update").permitAll()
             .antMatchers("/api/FOTA/uploadFile").permitAll()
             .antMatchers("/api/FOTA/create").permitAll()
             .antMatchers("/api/FOTAList").permitAll()
@@ -112,7 +110,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/FOTA/{id}/getFirmware").permitAll()
             .antMatchers("/api/FOTA/validateApproverCRC32").permitAll()
             .antMatchers("/api/FOTA/{id}/{userRole}/firmwareDelete").permitAll()
-             .antMatchers("/api/FOTA/{id}/download").permitAll()
+            .antMatchers("/api/FOTA/{id}/download").permitAll()
            
             .antMatchers("/api/users/{id}/exportVestDeviceData").authenticated()
             .antMatchers("/api/users/{id}/exportVestDeviceDataCSV").authenticated()
@@ -150,11 +148,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/cityStateZipValuesByCity").authenticated()
             .antMatchers("/api/cityStateZipValuesBystate").authenticated()
             .antMatchers("/api/cityStateZipValuesByZipCode").authenticated()
-            .antMatchers("/api/survey/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT, AuthoritiesConstants.CUSTOMER_SERVICES)
+            .antMatchers("/api/survey/**").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.PATIENT, AuthoritiesConstants.CUSTOMER_SERVICES,AuthoritiesConstants.FOTA_ADMIN, AuthoritiesConstants.FOTA_APPROVER)
             //hill-1845
             .antMatchers("/api/validateCredentials").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES,AuthoritiesConstants.FOTA_ADMIN, AuthoritiesConstants.FOTA_APPROVER)
-            .antMatchers("/api/loginAnalytics").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES,AuthoritiesConstants.ASSOCIATES, AuthoritiesConstants.CUSTOMER_SERVICES)
-            .antMatchers("/api/survey/{id}/graph").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES,AuthoritiesConstants.ASSOCIATES, AuthoritiesConstants.CUSTOMER_SERVICES)
+            .antMatchers("/api/loginAnalytics").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES,AuthoritiesConstants.ASSOCIATES, AuthoritiesConstants.CUSTOMER_SERVICES, AuthoritiesConstants.FOTA_ADMIN, AuthoritiesConstants.FOTA_APPROVER)
+            .antMatchers("/api/survey/{id}/graph").hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES,AuthoritiesConstants.ASSOCIATES, AuthoritiesConstants.CUSTOMER_SERVICES, AuthoritiesConstants.FOTA_ADMIN, AuthoritiesConstants.FOTA_APPROVER)
             //hill-1845
             .antMatchers("/api/survey/{id}/graph").authenticated()      
             .antMatchers("/api/retrieveLogData/logs").permitAll()

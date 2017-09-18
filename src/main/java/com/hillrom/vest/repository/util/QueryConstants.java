@@ -127,7 +127,7 @@ public class QueryConstants {
 			+ " clinic.id as pclinicid,  GROUP_CONCAT(clinic.name)"
 			+ " as clinicName,  user.expired as isExpired, "
 			+ " pc.compliance_score as adherence,   "
-			+ " pc.last_therapy_session_date as last_date, "
+			+ " max(pc.last_therapy_session_date) as last_date, "
 			+ " pc.is_hmr_compliant as isHMRNonCompliant,"
 			+ " pc.is_settings_deviated as isSettingsDeviated,"
 			+ " pc.missed_therapy_count as isMissedTherapy, "
@@ -165,7 +165,7 @@ public class QueryConstants {
 			+ " isDeleted, user.zipcode as pzipcode,  patInfo.address paddress,patInfo.city as pcity,user.dob as pdob, user.gender as pgender,  "
 			+ " user.title as ptitle,  user.hillrom_id as phillrom_id,user.created_date as createdAt,  user.activated as isActivated, patInfo.state as state ,"
 			+ " user_clinic.mrn_id as mrnid,  clinic.id as pclinicid,  GROUP_CONCAT(clinic.name) as clinicName, user.expired as isExpired, "
-			+ " pc.compliance_score as adherence,   pc.last_therapy_session_date  as last_date,pc.is_hmr_compliant as isHMRNonCompliant,"
+			+ " pc.compliance_score as adherence,   max(pc.last_therapy_session_date)  as last_date,pc.is_hmr_compliant as isHMRNonCompliant,"
 			+ " pc.is_settings_deviated  as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy,  clinic.adherence_setting as adherencesetting,"
 			+ " patient_dev_assoc.ptype as devType  "
 			+ " from USER user "
@@ -202,7 +202,7 @@ public class QueryConstants {
 				+" as pcity,user.dob as pdob, user.gender as pgender,user.title as ptitle,  user.hillrom_id as phillrom_id,"
 				+" user.created_date as createdAt, user.activated as isActivated, patInfo.state as state , "
 				+" user_clinic.mrn_id as mrnid, clinic.id as pclinicid,  GROUP_CONCAT(clinic.name) as clinicName, "
-				+" user.expired as isExpired, pc.compliance_score as adherence,   pc.last_therapy_session_date as last_date, "
+				+" user.expired as isExpired, pc.compliance_score as adherence,   max(pc.last_therapy_session_date) as last_date, "
 				+" pc.is_hmr_compliant as isHMRNonCompliant, pc.is_settings_deviated as isSettingsDeviated, "
 
 				+" pc.missed_therapy_count as isMissedTherapy, clinic.adherence_setting as adherencesetting,patient_dev_assoc.ptype as devType " 
@@ -258,7 +258,7 @@ public class QueryConstants {
 				+" user.title as ptitle,  user.hillrom_id as phillrom_id,user.created_date as createdAt, "
 				+" user.activated as isActivated, patInfo.state as state ,  user_clinic.mrn_id as mrnid, "
 				+" clinic.id as pclinicid,  GROUP_CONCAT(clinic.name) as clinicName, user.expired as isExpired, "
-				+" pc.compliance_score as adherence,   pc.last_therapy_session_date "
+				+" pc.compliance_score as adherence,   max(pc.last_therapy_session_date) "
 				+" as last_date,pc.is_hmr_compliant as isHMRNonCompliant, pc.is_settings_deviated "
 				+" as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy, " 
 
@@ -319,7 +319,7 @@ public class QueryConstants {
 			+ " user.gender as pgender,user.title as ptitle,  user.hillrom_id as phillrom_id,user.created_date as createdAt,"
 			+ " user.activated as isActivated, patInfo.state as state ,  user_clinic.mrn_id as mrnid, clinic.id as pclinicid, "
 			+ " GROUP_CONCAT(clinic.name) as clinicName, user.expired as isExpired, pc.compliance_score as adherence,  "
-			+ " pc.last_therapy_session_date as last_date,pc.is_hmr_compliant as isHMRNonCompliant,"
+			+ " max(pc.last_therapy_session_date) as last_date,pc.is_hmr_compliant as isHMRNonCompliant,"
 			+ " pc.is_settings_deviated as isSettingsDeviated,"
 
 			+ " pc.missed_therapy_count as isMissedTherapy, clinic.adherence_setting as adherencesetting,patient_dev_assoc.ptype as devType from USER user join USER_PATIENT_ASSOC  upa on user.id = upa.user_id "
@@ -457,7 +457,7 @@ public class QueryConstants {
 			+ " lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString) or "
 
 			+ " lower(user.hillrom_id) like lower(:queryString)) "			
-			+ " where clinic.id= ':clinicId' and patient_dev_assoc.ptype in ('VEST','ALL')";
+			+ " where clinic.id= ':clinicId' and patient_dev_assoc.ptype in ('VEST')";
 	
 	
 	public static String QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_ADMIN_MONARCH_DEVTYPE_PART1 = " select user.id,user.email,user.first_name as firstName,user.last_name as lastName,  "
@@ -518,5 +518,13 @@ public class QueryConstants {
 	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH_ALL = " and patient_dev_assoc.ptype in ('MONARCH','ALL')";
 	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH_DEVTYPE = " and patient_dev_assoc.ptype in ('MONARCH')";
 
+	public static final String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_ALL_DEVTYPE = " and patient_dev_assoc.ptype in ('ALL')";
+	
+	public static final String QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_ADMIN_SELECT = " select id,email,firstName,lastName, isDeleted, zipcode, address,"
+			+ " city, dob, gender, title,hillrom_id,createdAt, isActivated, state, adherence, "
+			+ " last_date, clinicname, hcpname, mrnid, isExpired, isHMRNonCompliant, "
+			+ " isSettingsDeviated, isMissedTherapy, adherencesetting, devType ";
+	
+	public static final String QUERY_ASSOCIATED_PATIENT_SEARCH_UNDER_CLINIC_ADMIN_ORDERBY = " order by last_date desc ";
 
 }

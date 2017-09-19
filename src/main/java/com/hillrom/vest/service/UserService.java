@@ -589,12 +589,21 @@ public class UserService {
 		log.debug("Updated Information for Patient User: {}", newUser);
 		noEventService.createIfNotExists(new PatientNoEvent(newUser.getCreatedDate().toLocalDate(),null, patientInfo, newUser));
 		// All New Patient User should have default compliance Score 100.
-		PatientCompliance compliance = new PatientCompliance();
-		compliance.setPatient(patientInfo);
-		compliance.setPatientUser(newUser);
-		compliance.setDate(newUser.getCreatedDate().toLocalDate());
-		compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
-		complianceService.createOrUpdate(compliance);
+		if(userExtensionDTO.getDeviceType().equals(Constants.VEST)){
+			PatientCompliance compliance = new PatientCompliance();
+			compliance.setPatient(patientInfo);
+			compliance.setPatientUser(newUser);
+			compliance.setDate(newUser.getCreatedDate().toLocalDate());
+			compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
+			complianceService.createOrUpdate(compliance);
+		}else{
+			PatientComplianceMonarch compliance = new PatientComplianceMonarch();
+			compliance.setPatient(patientInfo);
+			compliance.setPatientUser(newUser);
+			compliance.setDate(newUser.getCreatedDate().toLocalDate());
+			compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
+			complianceMonarchService.createOrUpdate(compliance);
+		}
 		return newUser;
     }
     

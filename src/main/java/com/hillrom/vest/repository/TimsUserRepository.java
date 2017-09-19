@@ -238,6 +238,8 @@ public class TimsUserRepository{
 			String inpatientDeviceType,
 			String inpatientDeviceIsActive,
 			String inDeviceSerialNumber,
+			String inHubId,
+			String inBluetoothId,
 			String inpatientHillromId,
 			String inpatientOldId,
 			LocalDate inpatientTrainingDate,//Need to check for datetime
@@ -258,6 +260,8 @@ public class TimsUserRepository{
 					+ ":pat_device_type,"
 					+ ":pat_device_is_active,"
 					+ ":pat_device_serial_number,"
+					+ ":pat_hub_id,"
+					+ ":pat_bluetooth_id,"
 					+ ":pat_hillrom_id,"
 					+ ":pat_old_id,"
 					+ ":pat_training_date,"
@@ -274,6 +278,8 @@ public class TimsUserRepository{
 					.setParameter("pat_device_type",inpatientDeviceType)
 					.setParameter("pat_device_is_active", inpatientDeviceIsActive)
 					.setParameter("pat_device_serial_number", inDeviceSerialNumber )
+					.setParameter("pat_hub_id", inHubId )
+					.setParameter("pat_bluetooth_id", inBluetoothId )
 					.setParameter("pat_hillrom_id", inpatientHillromId)
 					.setParameter("pat_old_id", inpatientOldId)
 					.setParameter("pat_training_date", (inpatientTrainingDate==null)?inpatientTrainingDate:new Timestamp(inpatientTrainingDate.toDateTimeAtStartOfDay().getMillis())) 
@@ -295,7 +301,72 @@ public class TimsUserRepository{
 			}
 			
 			
+			public void managePatientDeviceAssociationMonarch(String operationType,
+			String inpatientPatientId,//Need Clarification
+			String inpatientDeviceType,
+			String inpatientDeviceIsActive,
+			String inDeviceSerialNumber,
+			String inHubId,
+			String inBluetoothId,
+			String inpatientHillromId,
+			String inpatientOldId,
+			LocalDate inpatientTrainingDate,//Need to check for datetime
+			String inpatientDiagnosisCode1,
+			String inpatientDiagnosisCode2,
+			String inpatientDiagnosisCode3,
+			String inpatientDiagnosisCode4,
+			String inpatientGarmentType,
+			String inpatientGarmentSize,
+			String inpatientGarmentColor,
+			String inpatientCreatedBy) throws SQLException, Exception{
 			
+				try{
+					entityManager
+					.createNativeQuery("call manage_patient_device_assoc_monarch("
+					+ ":operation_type_indicator,"
+					+ ":pat_patient_id,"
+					+ ":pat_device_type,"
+					+ ":pat_device_is_active,"
+					+ ":pat_device_serial_number,"
+					+ ":pat_hub_id,"
+					+ ":pat_bluetooth_id,"
+					+ ":pat_hillrom_id,"
+					+ ":pat_old_id,"
+					+ ":pat_training_date,"
+					+ ":pat_diagnosis_code1,"
+					+ ":pat_diagnosis_code2,"
+					+ ":pat_diagnosis_code3,"
+					+ ":pat_diagnosis_code4,"
+					+ ":pat_garment_type,"
+					+ ":pat_garment_size,"
+					+ ":pat_garment_color,"
+					+ ":pat_created_by)")
+					.setParameter("operation_type_indicator", operationType)
+					.setParameter("pat_patient_id", inpatientPatientId)
+					.setParameter("pat_device_type",inpatientDeviceType)
+					.setParameter("pat_device_is_active", inpatientDeviceIsActive)
+					.setParameter("pat_device_serial_number", inDeviceSerialNumber )
+					.setParameter("pat_hub_id", inHubId )
+					.setParameter("pat_bluetooth_id", inBluetoothId )
+					.setParameter("pat_hillrom_id", inpatientHillromId)
+					.setParameter("pat_old_id", inpatientOldId)
+					.setParameter("pat_training_date", (inpatientTrainingDate==null)?inpatientTrainingDate:new Timestamp(inpatientTrainingDate.toDateTimeAtStartOfDay().getMillis())) 
+					.setParameter("pat_diagnosis_code1", inpatientDiagnosisCode1)
+					.setParameter("pat_diagnosis_code2", inpatientDiagnosisCode2)
+					.setParameter("pat_diagnosis_code3", inpatientDiagnosisCode3)
+					.setParameter("pat_diagnosis_code4", inpatientDiagnosisCode4)
+					.setParameter("pat_garment_type", inpatientGarmentType)
+					.setParameter("pat_garment_size", inpatientGarmentSize)
+					.setParameter("pat_garment_color", inpatientGarmentColor)
+					.setParameter("pat_created_by", inpatientCreatedBy)
+					.executeUpdate();
+					
+                       }catch(Exception ex){
+					ex.printStackTrace();
+				}
+			
+			
+			}			
 			
 			
 			
@@ -303,6 +374,8 @@ public class TimsUserRepository{
 						String inPatientId,
 						String inPatientoldDeviceSerialNumber,
 						String inPatientNewDeviceSerialNumber,
+						String inBluetoothID,
+						String inHubID,
 						String inPatientCreatedBy) throws SQLException ,Exception{
 			try{
 					entityManager
@@ -311,11 +384,15 @@ public class TimsUserRepository{
 					+ ":patient_id,"
 					+ ":pat_old_device_serial_number,"			   		
 					+ ":pat_new_device_serial_number,"
+					+":pat_bluetooth_id,"
+					+":pat_hub_id,"
 					+ ":pat_created_by)")
 					.setParameter("operation_type_indicator", operationTypeIndicator)
 					.setParameter("patient_id", inPatientId)
 					.setParameter("pat_old_device_serial_number",inPatientoldDeviceSerialNumber)
 					.setParameter("pat_new_device_serial_number", inPatientNewDeviceSerialNumber)
+					.setParameter("pat_bluetooth_id", inPatientNewDeviceSerialNumber)
+					.setParameter("pat_hub_id", inHubID)
 					.setParameter("pat_created_by", inPatientCreatedBy)
 					.executeUpdate();
 	}catch(Exception ex){

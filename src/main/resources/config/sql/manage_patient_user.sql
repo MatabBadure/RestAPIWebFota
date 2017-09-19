@@ -1,7 +1,7 @@
 DROP procedure IF EXISTS `manage_patient_user`;
 
 DELIMITER $$
-CREATE PROCEDURE `manage_patient_user`(
+CREATE DEFINER=`root`@`%` PROCEDURE `manage_patient_user`(
 	IN operation_type_indicator VARCHAR(10),
     IN hr_id varchar(255),
 	IN pat_hub_id varchar(255),

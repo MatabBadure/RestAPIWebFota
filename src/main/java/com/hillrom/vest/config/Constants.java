@@ -342,6 +342,7 @@ public final class Constants {
 		
 		public static final String TIMS_CSV_FILE_PATH = "/home/brett/flat_file_script/";
 		public static final String CREATED_BY_TIMS = "TIMS Java App";
+		public static final String TIMS_LOG_LOCATION = "/usr/tomcat/apache-tomcat-8.0.28/TIMS/logs/";
 		
 	//Device Type
 	public static final String VEST = "VEST";

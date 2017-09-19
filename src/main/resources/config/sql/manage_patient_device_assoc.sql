@@ -2,7 +2,7 @@ DROP procedure IF EXISTS `manage_patient_device_assoc`;
 
 DELIMITER $$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `manage_patient_device_assoc`(
+CREATE DEFINER=`root`@`%` PROCEDURE `manage_patient_device_assoc`(
 
 	IN operation_type_indicator VARCHAR(10),
     IN pat_patient_id varchar(50),

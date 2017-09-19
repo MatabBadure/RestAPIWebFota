@@ -142,4 +142,5 @@
 	<include file="classpath:/config/liquibase/changelog/20170731041700_create_optimus_data_table.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170807044400_added_column_serial_number_OPTIMUS_DATA.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170826125500_update_portaladmin_pass.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170918120718_updated_patient_garment_details.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

@@ -1,7 +1,7 @@
 DROP procedure IF EXISTS `manage_patient_device_monarch`;
 
 DELIMITER $$
-CREATE PROCEDURE `manage_patient_device_monarch`(
+CREATE DEFINER=`root`@`%` PROCEDURE `manage_patient_device_monarch`(
 	IN operation_type_indicator VARCHAR(10),
     IN patient_id varchar(50), 
     IN pat_old_device_serial_number varchar(50),
@@ -69,9 +69,9 @@ IF operation_type_indicator = 'CREATE' THEN
 --			END IF;
 --		ELSE 		 
 			INSERT INTO `PATIENT_VEST_DEVICE_HISTORY_MONARCH`
-				(`patient_id`, `serial_number`, `bluetooth_id`,	`hub_id`,`created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_active`,`hmr`)
+				(`patient_id`, `serial_number`, `bluetooth_id`,	`hub_id`,`created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_active`,`hmr`,`is_pending`)
 				VALUES
-				(patient_id,pat_old_device_serial_number,pat_bluetooth_id,pat_hub_id, pat_created_by,today_date,pat_created_by,today_date,1,0);
+				(patient_id,pat_old_device_serial_number,pat_bluetooth_id,pat_hub_id, pat_created_by,today_date,pat_created_by,today_date,1,0,0);
 --		END IF;		
 
 			

@@ -216,6 +216,35 @@ public class ClinicService {
 		//end: HILL-2004
 				
 	}
+	
+	public boolean checkAllNullExceptDelete(ClinicDTO clinicDTO){
+		boolean checkAll = true;
+		if (clinicDTO.getName() != null)
+			checkAll = false;
+		if (clinicDTO.getAddress() != null)
+			checkAll = false;
+		if (clinicDTO.getAddress2() != null)
+			checkAll = false;
+		if (clinicDTO.getCity() != null)
+			checkAll = false;
+		if (clinicDTO.getState() != null)
+			checkAll = false;
+		if (clinicDTO.getZipcode() != null)
+			checkAll = false;
+		if (clinicDTO.getPhoneNumber() != null)
+			checkAll = false;
+		if (clinicDTO.getFaxNumber() != null)
+			checkAll = false;
+		if (clinicDTO.getSpeciality() != null)
+			checkAll = false;
+		if (clinicDTO.getHillromId() != null)
+			checkAll = false;
+		if (clinicDTO.getClinicAdminId() != null)
+			checkAll = false;
+		if (clinicDTO.getAdherenceSetting() != null)
+			checkAll = false;
+		return checkAll;
+	}
 
 	public Set<UserExtension> getHCPUsers(List<String> idList) throws HillromException, EntityNotFoundException {
 		Set<UserExtension> hcpUserList = new HashSet<>();

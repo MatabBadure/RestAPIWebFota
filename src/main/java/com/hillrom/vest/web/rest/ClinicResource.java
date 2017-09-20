@@ -119,7 +119,8 @@ public class ClinicResource {
 	        	jsonObject.put("ERROR", ExceptionConstants.HR_543);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
-	        	if(clinicService.checkAllNullExceptDelete(clinicDTO) && !clinicDTO.getDeleted())
+	        	if(clinicService.checkAllNullExceptDelete(clinicDTO) 
+	        			&& Objects.nonNull(clinicDTO.getDeleted()) && !clinicDTO.getDeleted())
 	        		successMessage = MessageConstants.HR_225;
 	        	
 				jsonObject.put("message", successMessage);	        	

@@ -1,5 +1,9 @@
 package com.hillrom.vest.service;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import scala.collection.concurrent.Debug;
 
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.EntityUserAssoc;
@@ -218,32 +224,30 @@ public class ClinicService {
 	}
 	
 	public boolean checkAllNullExceptDelete(ClinicDTO clinicDTO){
-		boolean checkAll = true;
-		if (clinicDTO.getName() != null)
-			checkAll = false;
-		if (clinicDTO.getAddress() != null)
-			checkAll = false;
-		if (clinicDTO.getAddress2() != null)
-			checkAll = false;
-		if (clinicDTO.getCity() != null)
-			checkAll = false;
-		if (clinicDTO.getState() != null)
-			checkAll = false;
-		if (clinicDTO.getZipcode() != null)
-			checkAll = false;
-		if (clinicDTO.getPhoneNumber() != null)
-			checkAll = false;
-		if (clinicDTO.getFaxNumber() != null)
-			checkAll = false;
-		if (clinicDTO.getSpeciality() != null)
-			checkAll = false;
-		if (clinicDTO.getHillromId() != null)
-			checkAll = false;
-		if (clinicDTO.getClinicAdminId() != null)
-			checkAll = false;
-		if (clinicDTO.getAdherenceSetting() != null)
-			checkAll = false;
-		return checkAll;
+		
+		try {
+			for(PropertyDescriptor propDesc :
+			    Introspector.getBeanInfo(ClinicDTO.class).getPropertyDescriptors()){
+				
+				if(!propDesc.getReadMethod().getName().equals("getChildClinicList") &&
+					!propDesc.getReadMethod().getName().equals("getClass") &&
+					!propDesc.getReadMethod().getName().equals("getDeleted") &&
+					!propDesc.getReadMethod().getName().equals("getParentClinic")&&
+					Objects.nonNull(propDesc.getReadMethod().invoke(clinicDTO))){
+					return false;
+				}
+			}
+			return true;
+		} catch (IntrospectionException e) {
+			log.debug(e.getMessage());
+		} catch (IllegalAccessException e) {
+			log.debug(e.getMessage());
+		} catch (IllegalArgumentException e) {
+			log.debug(e.getMessage());
+		} catch (InvocationTargetException e) {
+			log.debug(e.getMessage());
+		}
+		return false;
 	}
 
 	public Set<UserExtension> getHCPUsers(List<String> idList) throws HillromException, EntityNotFoundException {

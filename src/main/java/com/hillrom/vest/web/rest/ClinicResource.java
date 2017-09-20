@@ -106,8 +106,8 @@ public class ClinicResource {
         log.debug("REST request to update Clinic : {}", clinicDTO);
         JSONObject jsonObject = new JSONObject();
 		try {
-			ClinicVO clinicVO = clinicService.updateClinic(id, clinicDTO);
 			
+			ClinicVO clinicVO = clinicService.updateClinic(id, clinicDTO);
 			String successMessage = MessageConstants.HR_222;
 			if(Objects.nonNull(clinicDTO.getAdherenceSettingFlag()) && clinicDTO.getAdherenceSettingFlag()){
 				adherenceCalculationService.adherenceSettingForClinic(id);
@@ -119,6 +119,10 @@ public class ClinicResource {
 	        	jsonObject.put("ERROR", ExceptionConstants.HR_543);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
+	        	if(clinicService.checkAllNullExceptDelete(clinicDTO) 
+	        			&& Objects.nonNull(clinicDTO.getDeleted()) && !clinicDTO.getDeleted())
+	        		successMessage = MessageConstants.HR_225;
+	        	
 				jsonObject.put("message", successMessage);	        	
 	            jsonObject.put("Clinic", clinicVO);
 	            if(Objects.nonNull(clinicDTO.getParent()) && clinicDTO.getParent()) {

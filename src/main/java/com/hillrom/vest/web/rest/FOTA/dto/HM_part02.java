@@ -1,20 +1,20 @@
-package com.hillrom.vest.pointer.FOTA;
+package com.hillrom.vest.web.rest.FOTA.dto;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class HM_part03 {
+public class HM_part02 {
 
-	private Map<Integer, String> fileChunks = new LinkedHashMap<Integer, String>();
+	private Map<Integer, String> fileChunks = new LinkedHashMap<>();
 
-	private static HM_part03 instance;
+	private static HM_part02 instance;
 
-	private HM_part03() {
+	private HM_part02() {
 	} // avoid instantiation.
 
-	public static HM_part03 getInstance() {
+	public static HM_part02 getInstance() {
 		if (instance == null) {
-			instance = new HM_part03();
+			instance = new HM_part02();
 			// Read the file here
 		}
 		return instance;

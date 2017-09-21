@@ -1,4 +1,4 @@
-package com.hillrom.vest.pointer.FOTA;
+package com.hillrom.vest.web.rest.FOTA.dto;
 
 import org.joda.time.DateTime;
 

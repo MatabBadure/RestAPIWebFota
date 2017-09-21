@@ -1,4 +1,4 @@
-package com.hillrom.vest.pointer.FOTA;
+package com.hillrom.vest.web.rest.FOTA.dto;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE1;
 
 import java.io.FileInputStream;

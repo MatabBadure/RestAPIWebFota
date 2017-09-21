@@ -59,8 +59,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.FOTA.FOTADeviceFWareUpdate;
 import com.hillrom.vest.domain.FOTA.FOTAInfo;
-import com.hillrom.vest.pointer.FOTA.HandleHolder;
-import com.hillrom.vest.pointer.FOTA.PartNoHolder;
 import com.hillrom.vest.repository.FOTA.FOTADeviceRepository;
 import com.hillrom.vest.repository.FOTA.FOTARepository;
 import com.hillrom.vest.repository.FOTA.FOTARepositoryUtils;
@@ -71,6 +69,8 @@ import com.hillrom.vest.web.rest.FOTA.dto.ApproverCRCDto;
 import com.hillrom.vest.web.rest.FOTA.dto.CRC32Dto;
 import com.hillrom.vest.web.rest.FOTA.dto.FOTADeviceDto;
 import com.hillrom.vest.web.rest.FOTA.dto.FOTAInfoDto;
+import com.hillrom.vest.web.rest.FOTA.dto.HandleHolder;
+import com.hillrom.vest.web.rest.FOTA.dto.PartNoHolder;
 @Service
 @Transactional
 public class FOTAService {

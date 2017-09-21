@@ -40,33 +40,12 @@ import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserSurveyAnswer;
-import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.PatientStatsVO;
 import com.hillrom.vest.web.rest.dto.UserSurveyAnswerDTO;
-
-
-
-
-
-import javax.servlet.http.HttpServletRequest;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-
-import com.hillrom.vest.service.util.DateUtil;
-import com.hillrom.vest.util.ExceptionConstants;
-
-import org.apache.commons.lang.StringUtils;
-
-import java.util.Calendar;
 
 /**
  * Service for sending e-mails.
@@ -646,4 +625,45 @@ public class MailService {
         this.sendActivationEmail(user, this.baseUrl );
       }
 
+	@Async
+	public void sendFotaUploadNotificationEmail(String email, String userName, String baseUrl) {
+		String langKey = "en";
+		Context context = new Context(Locale.forLanguageTag(langKey));
+		context.setVariable("userName", FOTAUserNameStringFormatting(userName));
+		context.setVariable("fotaBaseUrl", baseUrl);
+		String content = templateEngine.process("fotaPendingApproval", context);
+		String subject = messageSource.getMessage("email.pending.title", null,
+				Locale.forLanguageTag(langKey));
+		sendEmail(email.split(","), subject, content, true, true);
+	}
+
+	@Async
+	public void sendFotaDeleteNotificationEmail(String email, String userName,
+			String baseUrl) {
+		String langKey = "en";
+		Context context = new Context(Locale.forLanguageTag(langKey));
+		context.setVariable("userName", FOTAUserNameStringFormatting(userName));
+		context.setVariable("fotaBaseUrl", baseUrl);
+		String content = templateEngine.process("fotaDelete", context);
+		String subject = messageSource.getMessage("email.pending.title", null,
+				Locale.forLanguageTag(langKey));
+		sendEmail(email.split(","), subject, content, true, true);
+	}
+	@Async
+	public void sendFotaCRCFailedNotificationEmail(String email, String userName) {
+		String langKey = "en";
+		Context context = new Context(Locale.forLanguageTag(langKey));
+		context.setVariable("userName", FOTAUserNameStringFormatting(userName));
+		context.setVariable("fotaBaseUrl", baseUrl);
+		String content = templateEngine.process("fotaCRC", context);
+		String subject = messageSource.getMessage("email.crc.title", null,
+				Locale.forLanguageTag(langKey));
+		sendEmail(email.split(","), subject, content, true, true);
+	}
+	private String FOTAUserNameStringFormatting(String userName) {
+		return userName.substring(0, 1).toUpperCase()
+				+ userName.substring(1).toLowerCase();
+	}
+
+	
 }

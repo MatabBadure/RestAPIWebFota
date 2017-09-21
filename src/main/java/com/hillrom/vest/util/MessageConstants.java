@@ -20,7 +20,8 @@ public class MessageConstants {
     public static final String HR_221 = "Clinic created successfully.";
     public static final String HR_222 = "Clinic updated successfully.";
     public static final String HR_223 = "Clinic fetched successfully.";
-    public static final String HR_224 = "Clinic deleted successfully.";
+    public static final String HR_224 = "Clinic deactivated successfully.";
+    public static final String HR_225 = "Clinic activated successfully.";
     
     public static final String HR_231 = "Hillrom User created successfully.";
     public static final String HR_232 = "Hillrom User updated successfully.";

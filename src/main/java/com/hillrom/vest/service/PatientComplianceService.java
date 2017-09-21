@@ -144,7 +144,7 @@ public class PatientComplianceService {
 		LocalDate fromDate = from.minusDays(1);
 		if(Objects.isNull(therapySession)){
 			toDate = to.minusDays(1);
-		} else if(!to.equals(therapySession.getDate())){
+		} else if(!to.equals(therapySession.getDate()) && !from.equals(to)){
 			toDate = to.minusDays(1);
 		}
 		List<PatientCompliance> complianceList = complianceRepository.findByDateBetweenAndPatientUserIdIn(fromDate, toDate, patientUserIds);

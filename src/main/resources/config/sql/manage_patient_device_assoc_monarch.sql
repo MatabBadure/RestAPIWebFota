@@ -1,8 +1,8 @@
-DROP procedure IF EXISTS `manage_patient_device_assoc`;
+DROP procedure IF EXISTS `manage_patient_device_assoc_monarch`;
 
 DELIMITER $$
 
-CREATE DEFINER=`root`@`%` PROCEDURE `manage_patient_device_assoc`(
+CREATE DEFINER=`root`@`%` PROCEDURE `manage_patient_device_assoc_monarch`(
 
 	IN operation_type_indicator VARCHAR(10),
     IN pat_patient_id varchar(50),
@@ -32,8 +32,8 @@ DECLARE device_patient_type VARCHAR(50);
 DECLARE temp_device_type VARCHAR(50);
 DECLARE vest_device_hillrom_id  VARCHAR(50);
 DECLARE device_hillrom_id  VARCHAR(50);
-DECLARE temp_patient_info_id  VARCHAR(50);
 DECLARE temp_hillrom_id  VARCHAR(50);
+DECLARE temp_patient_info_id  VARCHAR(50);
 
 -- DECLARE created_by VARCHAR(50);
 DECLARE latest_hmr DECIMAL(10,0);
@@ -63,10 +63,10 @@ IF operation_type_indicator = 'CREATE' THEN
 		FROM `PATIENT_DEVICES_ASSOC`
 		WHERE `patient_id` = pat_patient_id;
 		
-		IF  pat_device_type = 'MONARCH' AND device_hillrom_id IS NOT NULL THEN
+		IF  pat_device_type = 'VEST' AND device_hillrom_id IS NOT NULL THEN
 		
 				SELECT `hillrom_id`,`patient_id` INTO vest_device_hillrom_id ,vest_device_patient_id FROM `PATIENT_DEVICES_ASSOC` 
-				WHERE `hillrom_id` = pat_hillrom_id AND `device_type` = 'VEST';
+				WHERE `hillrom_id` = pat_hillrom_id AND `device_type` = 'MONARCH';
 				
 				IF  vest_device_hillrom_id IS NOT NULL THEN
 				
@@ -75,13 +75,13 @@ IF operation_type_indicator = 'CREATE' THEN
 						UPDATE PATIENT_DEVICES_ASSOC PVDA SET 
 						`patient_type` ='CD'
 						where PVDA.`hillrom_id` =  pat_hillrom_id 
-						AND PVDA.`device_type` = 'VEST' ;
+						AND PVDA.`device_type` = 'MONARCH' ;
 
-						SELECT  `patient_id` ,`serial_number` ,`device_type`,`hillrom_id` INTO temp_patient_info_id , temp_serial_number , temp_device_type,temp_hillrom_id
-						FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number AND `device_type` = 'MONARCH';
+						SELECT  `patient_id` ,`serial_number` ,`device_type`,`hillrom_id` INTO temp_patient_info_id , temp_serial_number , temp_device_type, temp_hillrom_id
+						FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number AND `device_type` = 'VEST';
 						
 						IF temp_patient_info_id <> pat_patient_id AND temp_serial_number = pat_device_serial_number 
-							AND temp_device_type = 'MONARCH' THEN
+							AND temp_device_type = 'VEST' THEN
 							
 							IF temp_hillrom_id = '' or temp_hillrom_id IS NULL THEN
 								UPDATE `PATIENT_INFO` SET
@@ -106,7 +106,7 @@ IF operation_type_indicator = 'CREATE' THEN
 								`garment_color` = pat_garment_color
 								where PVDA.`serial_number` = pat_device_serial_number  
 								AND  (PVDA.`hillrom_id` = '' OR PVDA.`hillrom_id` IS NULL) AND PVDA. `patient_type` = 'SD' 
-								AND PVDA.`device_type` = 'MONARCH' ;
+								AND PVDA.`device_type` = 'VEST' ;
 							ELSE
 							
 							     -- we need update the old patient as SD and mark the old vest as inactive
@@ -120,23 +120,22 @@ IF operation_type_indicator = 'CREATE' THEN
 								IF temp_device_type = 'CD' THEN
 									
 									
-									-- update the old vest as SD	
+									-- update the old monarch as SD	
 									 UPDATE PATIENT_DEVICES_ASSOC PVDA SET 
 									`patient_type` ='SD', 
 									`modified_date` = today_date,
 									`old_patient_id` = temp_patient_info_id
 									where PVDA.`patient_id` = temp_patient_info_id 
-									AND PVDA.`device_type` = 'VEST' ;
+									AND PVDA.`device_type` = 'MONARCH' ;
 
 								END IF;
-									-- INsert the new for new patient device associated CD Monarch
+									-- INsert the new for new patient device associated CD vest
 									INSERT INTO `PATIENT_DEVICES_ASSOC`
 									(`patient_id`, `device_type`, `is_active`, `serial_number`,`hub_id`,`bluetooth_id`, `hillrom_id`, `patient_type`, `created_date`, `modified_date`,
 									`old_patient_id`,`training_date`,`diagnosis1`,`diagnosis2`,`diagnosis3`,`diagnosis4`,`garment_type`,`garment_size`,`garment_color`)
 									VALUES	(pat_patient_id,pat_device_type,1,pat_device_serial_number,pat_hub_id,pat_bluetooth_id,pat_hillrom_id,'CD',today_date,today_date,pat_old_id,pat_training_date,pat_diagnosis_code1,pat_diagnosis_code2,pat_diagnosis_code3,pat_diagnosis_code4,pat_garment_type,pat_garment_size,pat_garment_color);
 
 							END IF;
-							
 							
 						ELSE
 						
@@ -217,7 +216,7 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 					`garment_color` = pat_garment_color
 					where PVDA.`serial_number` = pat_device_serial_number  
 					AND  (PVDA.`hillrom_id` = '' OR PVDA.`hillrom_id` IS NULL) AND PVDA. `patient_type` = device_patient_type 
-					AND PVDA.`device_type` = 'MONARCH' ;
+					AND PVDA.`device_type` = 'VEST' ;
 					
 
 					UPDATE `PATIENT_INFO` SET
@@ -262,5 +261,5 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 
 ELSE  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Operation not supported';
 END IF;
-END$$
+END $$
 DELIMITER ;

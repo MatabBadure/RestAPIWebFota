@@ -39,7 +39,7 @@
 
 			<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
 				<Pattern>
-					%d{yyyy-MM-dd HH:mm:ss} %mdc [%thread] %level %logger{35} - %msg%n
+				             %msg%n
 				</Pattern>
 			</encoder>
 
@@ -48,8 +48,9 @@
 				<FileNamePattern>${CATALINA_HOME}/TIMS/logs/${logFileName}.%i.log.zip
 				</FileNamePattern>
 				<MinIndex>1</MinIndex>
-				<MaxIndex>10</MaxIndex>
+				<MaxIndex>20</MaxIndex>
 			</rollingPolicy>
+
 
 			<triggeringPolicy
 				class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">

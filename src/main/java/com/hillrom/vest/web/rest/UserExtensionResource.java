@@ -40,6 +40,7 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
+import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.ClinicPatientService;
 import com.hillrom.vest.service.ClinicService;
 import com.hillrom.vest.service.HCPClinicService;
@@ -100,6 +101,9 @@ public class UserExtensionResource {
     @Inject
     private PatientNoEventMonarchService patientNoEventMonarchService;
     
+    @Inject
+    private AdherenceCalculationService adherenceCalculationService;    
+
     /**
      * POST  /user -> Create a new User.
      */
@@ -515,6 +519,10 @@ public class UserExtensionResource {
 		    } else {
 	        	jsonObject.put("message", MessageConstants.HR_273);
 		    	jsonObject.put("clinics", clinics);
+		    	
+		    	// Reset adherence score for the associated patient
+		    	adherenceCalculationService.adherenceSettingLinkPatientClinic(id);		    	
+		    	
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }
 		} catch (HillromException e) {
@@ -540,6 +548,10 @@ public class UserExtensionResource {
 				jsonObject.put("clinics", clinics);
 			}
 			jsonObject.put("message", MessageConstants.HR_274);
+			
+			// Reset adherence score for the associated patient
+	    	adherenceCalculationService.adherenceSettingLinkPatientClinic(id);
+	    	
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 		} catch (HillromException e) {
 			jsonObject.put("ERROR", e.getMessage());

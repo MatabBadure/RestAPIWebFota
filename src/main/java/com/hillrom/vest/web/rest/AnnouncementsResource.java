@@ -102,7 +102,7 @@ public class AnnouncementsResource {
 			if(userType.equalsIgnoreCase(AuthoritiesConstants.CLINIC_ADMIN) || userType.equalsIgnoreCase(AuthoritiesConstants.HCP)){
 				announcementsList = announcementsService.findVisibleAnnouncementsById(userType,userId,null,filterClinicId,PaginationUtil.generatePageRequest(offset, limit, sortOrder),sortOrder);	
 			}
-			if(userType.equalsIgnoreCase(AuthoritiesConstants.PATIENT)){
+			if(userType.equalsIgnoreCase(AuthoritiesConstants.PATIENT) || userType.equalsIgnoreCase(AuthoritiesConstants.CARE_GIVER)){
 				announcementsList = announcementsService.findVisibleAnnouncementsById(userType,null,patientId,null,PaginationUtil.generatePageRequest(offset, limit, sortOrder),sortOrder);	
 			}
 			

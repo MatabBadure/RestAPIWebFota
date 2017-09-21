@@ -5,19 +5,17 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.ALL;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.AMPERSAND;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.BUFFER_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.BUFFER_LEN_EQ;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.CHUNK_SIZE_RAW;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CONNECTION_TYPE;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.CRC_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR1;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR2;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR3;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_QUERYSTR4;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_SN;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.DEV_VER_RAW;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.FAILURE_LIST;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.FOTA_FILE_PATH;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.FOTA_ADMIN;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE_EQ;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE_RAW;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.HEX;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.INIT;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.NOT_OK;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.OK;
@@ -38,33 +36,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.xml.bind.DatatypeConverter;
 
-import net.minidev.json.JSONObject;
-
 import org.apache.commons.lang.StringUtils;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,11 +59,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.FOTA.FOTADeviceFWareUpdate;
 import com.hillrom.vest.domain.FOTA.FOTAInfo;
-import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.pointer.FOTA.HandleHolder;
 import com.hillrom.vest.pointer.FOTA.PartNoHolder;
 import com.hillrom.vest.repository.FOTA.FOTADeviceRepository;
 import com.hillrom.vest.repository.FOTA.FOTARepository;
+import com.hillrom.vest.repository.FOTA.FOTARepositoryUtils;
 import com.hillrom.vest.service.MailService;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.FOTA.FOTAParseUtil;
@@ -97,20 +83,11 @@ public class FOTAService {
 	private FOTADeviceRepository fotaDeviceRepository;
 	
 	@Inject
-	private EntityManager entityManager;
+	private FOTARepositoryUtils fotaRepositoryUtils;
 	
 	@Inject
     private MailService mailService;
 	
-	private  Map<Long,String> storeChunk ;
-	
-	private static final int HEX = 16;
-	
-	public static final byte[] CRC_FIELD_NAME = new byte[]{38,99,114,99,61};
-	public static final byte[] CHUNK_SIZE = new byte[]{38,99,104,117,110,107,83,105,122,101,61};
-	public static final byte[] HANDLE = new byte[]{38,104,97,110,100,108,101,61};
-	
-	public static final byte[] DEV_VER = new byte[]{38,100,101,118,86,101,114,61};
 	private int bufferLen = 0;
 	private String buffer = null;
 	
@@ -142,14 +119,13 @@ public class FOTAService {
 		// Checking if request Type is 01 & //Checking if request Type is 02
 		if(validateCRC(rawMessage)){
 			//crcResult = "Yes";
-			crsResultValue = asciiToHex(YES);
+			crsResultValue = FOTAParseUtil.asciiToHex(YES);
 			String handleId = "";
 			boolean softDeleteFlag = false;
 			boolean activePublishedFlag = true;
 			
 			//check Update request.
 			if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE1)) {
-				
 				//Get active pending FOTA details from the DB 
 				FOTAInfo fotaInfo = fotaRepository.FOTAByPartNumber(fotaJsonData.get(DEVICE_PARTNUMBER),softDeleteFlag,activePublishedFlag);
 				
@@ -159,10 +135,8 @@ public class FOTAService {
 				simpleDateFormat1.setLenient(false);
 				Date date3 = simpleDateFormat1.parse(fotaJsonData
 						.get(SOFT_VER_DATE));
-				
 				// Release date from request
 				DateTime reqReleaseDate = new DateTime(date3);
-				
 				//Check if null or no record exist and send response No to device
 				if(fotaInfo != null){
 					// Get release date from DB
@@ -182,7 +156,7 @@ public class FOTAService {
 						// Get Chunk Size from request
 						String chunkStr = getChunk(rawMessage);
 						// Decimal conversion
-						int chunkSize = hex2decimal(chunkStr);
+						int chunkSize = FOTAParseUtil.hex2decimal(chunkStr);
 						// PartNumber:Chunk Size
 						String storeChunk = fotaJsonData.get(DEVICE_PARTNUMBER)
 								.concat(":").concat(fotaInfo.getSoftVersion()).concat(":").concat(String.valueOf(chunkSize));
@@ -277,7 +251,7 @@ public class FOTAService {
 						}
 
 						if (crcValid == false || partNoHolder.getAbortFlag()==true) {
-							crsResultValue = asciiToHex("No");
+							crsResultValue = FOTAParseUtil.asciiToHex("No");
 							resultPair = getResponePairResult();
 							crcPair = getResponePair3();
 							String crsRaw = resultPair.concat(crsResultValue)
@@ -301,7 +275,7 @@ public class FOTAService {
 							handlePair = getResponePair1();
 
 							// Handle in raw format
-							String handleIdRaw = hexToAscii(asciiToHex(toLittleEndian((handleId))));
+							String handleIdRaw = FOTAParseUtil.hexToAscii(FOTAParseUtil.asciiToHex(FOTAParseUtil.toLittleEndian((handleId))));
 
 							// Response pair2
 							totalChunkPair = getResponePair2();
@@ -333,7 +307,7 @@ public class FOTAService {
 							log.debug("finalResponseStr: " + finalResponseStr);
 						}
 					}else{
-						crsResultValue = asciiToHex("No");
+						crsResultValue = FOTAParseUtil.asciiToHex("No");
 						resultPair = getResponePairResult();
 						crcPair = getResponePair3();
 						String crsRaw = resultPair.concat(crsResultValue).concat(
@@ -348,7 +322,7 @@ public class FOTAService {
 						finalResponseStr = resultPair.concat(crsResultValue).concat(crcPair).concat(crcValue);
 						}
 				}else{
-				crsResultValue = asciiToHex("No");
+				crsResultValue = FOTAParseUtil.asciiToHex("No");
 				resultPair = getResponePairResult();
 				crcPair = getResponePair3();
 				String crsRaw = resultPair.concat(crsResultValue).concat(
@@ -390,7 +364,7 @@ public class FOTAService {
 						
 						handleHolderBin.put(handleId, holder);
 						//Zero the Chunk in raw format
-						buffer = hexToAscii(asciiToHex(zeroChunk));
+						buffer = FOTAParseUtil.hexToAscii(FOTAParseUtil.asciiToHex(zeroChunk));
 						log.debug("buffer Encoded:" + buffer);
 						
 						//Chunk size in hex byte
@@ -408,7 +382,7 @@ public class FOTAService {
 							handleHolderBin.put(handleId, holder);
 							
 							//Zero the Chunk in raw format
-							buffer = hexToAscii(asciiToHex(zeroChunk));
+							buffer = FOTAParseUtil.hexToAscii(FOTAParseUtil.asciiToHex(zeroChunk));
 							log.debug("buffer Encoded:" + buffer);
 							
 							//Chunk size in hex byte
@@ -425,7 +399,7 @@ public class FOTAService {
 						handleHolderBin.put(handleId, holder);
 						
 						//Zero the Chunk in raw format
-						buffer = hexToAscii(asciiToHex(zeroChunk));
+						buffer = FOTAParseUtil.hexToAscii(FOTAParseUtil.asciiToHex(zeroChunk));
 						log.debug("buffer Encoded:" + buffer);
 						
 						//Chunk size in hex byte
@@ -439,7 +413,7 @@ public class FOTAService {
 					
 					//Init and ok send result is ok
 					//crcResult = "OK";
-					crsResultValue = asciiToHex(OK);
+					crsResultValue = FOTAParseUtil.asciiToHex(OK);
 					
 					//handlePair Init Pair1 HANDLE_EQ
 					
@@ -447,7 +421,7 @@ public class FOTAService {
 					//handlePair = asciiToHex(HANDLE_EQ);
 					
 					//Handle in raw format(handle Value)
-					String handleIdRaw = hexToAscii(asciiToHex(toLittleEndian((handleId))));
+					String handleIdRaw = FOTAParseUtil.hexToAscii(FOTAParseUtil.asciiToHex(FOTAParseUtil.toLittleEndian((handleId))));
 					
 					//bufferLenPair Init Pair2(BUFFER_LEN_EQ)
 					bufferLenPair = getInitResponsePair2();
@@ -474,7 +448,7 @@ public class FOTAService {
 						bufferLenPair, bufferLenRaw, bufferPair, buffer,crcPair,crcstr,countInt);
 				log.debug("finalResponseStr: " + finalResponseStr);
 				}else{
-					crsResultValue = asciiToHex("ABORT");
+					crsResultValue = FOTAParseUtil.asciiToHex("ABORT");
 					resultPair = getResponePairResult();
 					crcPair = getResponePair3();
 					String crsRaw = resultPair.concat(crsResultValue).concat(
@@ -512,7 +486,7 @@ public class FOTAService {
 					// result pair1
 					resultPair = getResponePairResult();
 					//crcResult = "OK";
-					crsResultValue = asciiToHex(OK);
+					crsResultValue = FOTAParseUtil.asciiToHex(OK);
 					crcPair = getResponePair3();
 					
 					String crsRaw = resultPair.concat(crsResultValue).concat(crcPair);
@@ -548,7 +522,7 @@ public class FOTAService {
 					// result pair1
 					resultPair = getResponePairResult();
 					//crcResult = "OK";
-					crsResultValue = asciiToHex(NOT_OK);
+					crsResultValue = FOTAParseUtil.asciiToHex(NOT_OK);
 					crcPair = getResponePair3();
 					
 					String crsRaw = resultPair.concat(crsResultValue).concat(crcPair);
@@ -587,7 +561,7 @@ public class FOTAService {
 					// result pair1
 					resultPair = getResponePairResult();
 					//crcResult = "OK";
-					crsResultValue = asciiToHex(OK);
+					crsResultValue = FOTAParseUtil.asciiToHex(OK);
 					crcPair = getResponePair3();
 					
 					String crsRaw = resultPair.concat(crsResultValue).concat(crcPair);
@@ -607,7 +581,7 @@ public class FOTAService {
 		
 		}else if(!validateCRC(rawMessage)){
 			//crcResult = "NOT OK";
-			crsResultValue = asciiToHex(NOT_OK);
+			crsResultValue = FOTAParseUtil.asciiToHex(NOT_OK);
 			resultPair = getResponePairResult();
 			crcPair = getResponePair3();
 			String crsRaw = resultPair.concat(crsResultValue).concat(
@@ -632,25 +606,18 @@ public class FOTAService {
 	
 	
 	private void sendCRCFailedNotification() {
-
-		String roleName = "FOTA_APPROVER";
-		String roleName1 = "FOTA_ADMIN";
-		String queryStr = "SELECT u.email, u.last_name FROM hillromvest_dev.user_authority a, hillromvest_dev.user u where a.authority_name IN ('"+roleName+"','"+roleName1+"') and a.user_id = u.id";
-		
-		Query jpaQuery = entityManager.createNativeQuery(queryStr);
-		
-		List<Object[]> resultList = jpaQuery.getResultList();
-		
-		for(Object[] result : resultList){
-			mailService.sendFotaCRCFailedNotificationEmail((String)result[0], (String)result[1]);
-			}
+		List<Object[]> resultList = fotaRepositoryUtils.getFOATUsers();
+		for (Object[] result : resultList) {
+			mailService.sendFotaCRCFailedNotificationEmail((String) result[0],
+					(String) result[1]);
+		}
 	}
 
 
 	private String getDeviceVersion(String rawMessage) {
 
 		byte[] getHandleByte = java.util.Base64.getDecoder().decode(rawMessage);
-		int deviceIndex = returnMatch(getHandleByte, DEV_VER);
+		int deviceIndex = returnMatch(getHandleByte, DEV_VER_RAW);
 		log.error("str1: " + deviceIndex);
 		StringBuilder deviceRes = new StringBuilder();
 		String device1 = Integer.toHexString(getHandleByte[deviceIndex] & 0xFF);
@@ -670,7 +637,7 @@ public class FOTAService {
 		deviceRes.append(device3);
 		deviceRes.append(device4);
 		//written new code
-		String deviceVer = toLittleEndian(deviceRes.toString());
+		String deviceVer = FOTAParseUtil.toLittleEndian(deviceRes.toString());
 		log.error("deviceVer: " + deviceVer);
 		return deviceVer;
 	}
@@ -712,13 +679,13 @@ public class FOTAService {
 	    //String handleHexString = checksum_num.toString(16);
 	    checksum_num = ("0000" + checksum_num).substring(checksum_num.length());
 	    System.out.println("Checksum : " + checksum_num);
-	    return toLittleEndian(checksum_num);
+	    return FOTAParseUtil.toLittleEndian(checksum_num);
 	  
 	}
 
 	private String getResponePairResult() {
 		
-		String getResponePairResult = asciiToHex(RESULT_EQ);
+		String getResponePairResult = FOTAParseUtil.asciiToHex(RESULT_EQ);
 		log.error("getResponePairResult: " + getResponePairResult);
 		//response.append("Yes");
 		return getResponePairResult;
@@ -778,69 +745,13 @@ public class FOTAService {
 	    }
 	}
 	
-	private String validateInvalideCRC(String rawMessage) {
-		 
-		log.error("Inside  calculateCRC : " ,rawMessage);
-		  
-	    int nCheckSum = 0;
-
-	    byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
-	    
-	    int nDecodeCount = 0;
-	    for ( ; nDecodeCount < (decoded.length-2); nDecodeCount++ )
-	    {
-	      int nValue = (decoded[nDecodeCount] & 0xFF);
-	      nCheckSum += nValue;
-	    }
-	    
-	    
-	    System.out.format("Inverted Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
-	    
-	   /* while ( nCheckSum >  65535 )
-	    {
-	      nCheckSum -= 65535;
-	    }*/
-	    nCheckSum = nCheckSum & 0xFFFF;
-	    
-	    int nMSB = decoded[nDecodeCount+1] & 0xFF;
-	    int nLSB = decoded[nDecodeCount] & 0xFF;
-	    
-	    System.out.format("MSB = %d [0x%x]\r\n" ,nMSB, nMSB);
-	    System.out.format("LSB = %d [0x%x]\r\n" ,nLSB, nLSB);
-	    log.error("Total Value = " + nCheckSum);
-	    nCheckSum = ((~nCheckSum)& 0xFFFF) + 1;
-	    System.out.format("Checksum Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
-	    
-	    String msb_digit = Integer.toHexString(nMSB);
-	    String lsb_digit = Integer.toHexString(nLSB);
-	    String checksum_num =  Integer.toHexString(nCheckSum);
-	    
-	    if(msb_digit.length()<2)
-	    	msb_digit = "0"+msb_digit;
-	    if(lsb_digit.length()<2)
-	    	lsb_digit = "0"+lsb_digit;
-	    
-	    System.out.println("MSB : " + msb_digit + " " +  "LSB : " + lsb_digit);
-	    System.out.println("Checksum : " + checksum_num);
-	    checksum_num = ("0000" + checksum_num).substring(checksum_num.length());
-	    
-	    return checksum_num;
-	   /* if((msb_digit+lsb_digit).equalsIgnoreCase(checksum_num)){
-	    	return true;
-	    }else{
-	    	log.error("CRC VALIDATION FAILED :"); 
-	    	return false;
-	    }*/
-	}
-
-
 	private String getBufferLenTwoHexByte(int bufferLen) {
 		//Convert to hex
 		String bufferLenHex =	Integer.toHexString(bufferLen);
 		//convert in two byte format
 		bufferLenHex = ("0000" + bufferLenHex).substring(bufferLenHex.length());
 		//converting to little Endian 
-		String bufferInLsb = hexToAscii(asciiToHex(toLittleEndian((bufferLenHex))));
+		String bufferInLsb = FOTAParseUtil.hexToAscii(FOTAParseUtil.asciiToHex(FOTAParseUtil.toLittleEndian((bufferLenHex))));
 		return bufferInLsb;
 	}
 
@@ -866,19 +777,10 @@ public class FOTAService {
 	private String getHandleFromRequest(String rawMessage) {
 
 		byte[] getHandleByte = java.util.Base64.getDecoder().decode(rawMessage);
-		int handleIndex = returnMatch(getHandleByte, HANDLE);
+		int handleIndex = returnMatch(getHandleByte, HANDLE_RAW);
 		log.error("str1: " + handleIndex);
 		StringBuilder handleRes = new StringBuilder();
 		// handleRes.
-	/*	handleRes
-				.append(Integer.toHexString(getHandleByte[handleIndex] & 0xFF));
-		handleRes.append(Integer
-				.toHexString(getHandleByte[handleIndex + 1] & 0xFF));
-		handleRes.append(Integer
-				.toHexString(getHandleByte[handleIndex + 2] & 0xFF));
-		handleRes.append(Integer
-				.toHexString(getHandleByte[handleIndex + 3] & 0xFF));*/
-		
 		String handle1 = Integer.toHexString(getHandleByte[handleIndex] & 0xFF);
 		String handle2 = Integer
 				.toHexString(getHandleByte[handleIndex + 1] & 0xFF);
@@ -898,11 +800,7 @@ public class FOTAService {
 		handleRes.append(handle3);
 		handleRes.append(handle4);
 		//written new code
-		String handleId = toLittleEndian(handleRes.toString());
-		/*BigInteger toHex = new BigInteger(handleId,10);
-	    String handleIdString = toHex.toString(16);*/
-		//handleId = ("00000000"+ handleId).substring(handleId.length());
-		//String handleIdStringHex = hexToAscii(asciiToHex(handleId));
+		String handleId = FOTAParseUtil.toLittleEndian(handleRes.toString());
 		log.error("handleId: " + handleId);
 		return handleId;
 	}
@@ -912,7 +810,7 @@ public class FOTAService {
 		StringBuilder response = new StringBuilder();	
 		response.append(AMPERSAND);
 		response.append(BUFFER_EQ);
-		String initResponsePair3 = asciiToHex(response.toString());
+		String initResponsePair3 = FOTAParseUtil.asciiToHex(response.toString());
 		return initResponsePair3;
 	}
 
@@ -921,7 +819,7 @@ public class FOTAService {
 		StringBuilder response = new StringBuilder();	
 		response.append(AMPERSAND);
 		response.append(BUFFER_LEN_EQ);
-		String initResponsePair3 = asciiToHex(response.toString());
+		String initResponsePair3 = FOTAParseUtil.asciiToHex(response.toString());
 		return initResponsePair3;
 	}
 
@@ -938,38 +836,11 @@ public class FOTAService {
 		return finalString;
 	}
 
-
-	private String getCRC(String rawMessage) {
-		byte[] getCRCByte = java.util.Base64.getDecoder().decode(rawMessage);
-		int start = returnMatch(getCRCByte, CRC_FIELD_NAME);
-		int start1 = returnMatch(getCRCByte, CRC_FIELD_NAME) + 1;
-		/*StringBuilder crcHexBilder = new StringBuilder();
-
-		crcHexBilder.append(Integer.toHexString(getCRCByte[start] & 0xFF));
-		crcHexBilder.append(Integer.toHexString(getCRCByte[start1] & 0xFF));*/
-		
-		String crc1 = Integer.toHexString(getCRCByte[start] & 0xFF);
-		String crc2 = Integer.toHexString(getCRCByte[start1] & 0xFF);
-				
-		crc1 =	("00"+ crc1).substring(crc1.length());
-		crc2 =	("00"+ crc2).substring(crc2.length());
-		StringBuilder sb = new StringBuilder();
-		sb.append(crc1);
-		sb.append(crc2);
-		log.error("crcHexBilder: " + sb.toString());
-		//To convert little Indian
-		//String crcHexString = hexToAscii(asciiToHex(toLittleEndian((sb.toString()))));
-		String crcHexString = hexToAscii(asciiToHex((sb.toString())));
-		log.error("crcHexString: " + crcHexString);
-		return crcHexString;
-	}
-
-
 	private String getResponePair3() {
 		StringBuilder response = new StringBuilder();
 		response.append(AMPERSAND);
 		response.append(CRC_EQ);
-		String responePair3 = asciiToHex(response.toString());
+		String responePair3 = FOTAParseUtil.asciiToHex(response.toString());
 		log.error("responePair3: " + responePair3);
 		return responePair3;
 	}
@@ -980,7 +851,7 @@ public class FOTAService {
 	    String totalChunkHexString = toHex.toString(16);
 	    totalChunkHexString = ("00000000" + totalChunkHexString).substring(totalChunkHexString.length());
 		//converting to little Indian
-	    String strTotalChunk = hexToAscii(asciiToHex(toLittleEndian((totalChunkHexString))));
+	    String strTotalChunk = FOTAParseUtil.hexToAscii(FOTAParseUtil.asciiToHex(FOTAParseUtil.toLittleEndian((totalChunkHexString))));
 		log.error("strTotalChunk: " + strTotalChunk);
 		return strTotalChunk;
 	}
@@ -990,7 +861,7 @@ public class FOTAService {
 		StringBuilder response = new StringBuilder();
 		response.append(AMPERSAND);
 		response.append(TOTAL_CHUNK);
-		String responePair2 = asciiToHex(response.toString());
+		String responePair2 = FOTAParseUtil.asciiToHex(response.toString());
 		log.error("responePair2: " + responePair2);
 		return responePair2;
 	}
@@ -1002,7 +873,7 @@ public class FOTAService {
 		response.append("Yes");*/
 		response.append(AMPERSAND);
 		response.append(HANDLE_EQ);
-		String responePair1 = asciiToHex(response.toString());
+		String responePair1 = FOTAParseUtil.asciiToHex(response.toString());
 		log.error("responePair1: " + responePair1);
 		return responePair1;
 	}
@@ -1019,36 +890,6 @@ public class FOTAService {
         //String lsb = getLSBValue(handleHexString);
         String handleInlsb = (handleHexString);
         return handleInlsb;
-	}
-
-	
-	
-	private  String toLittleEndian(final String hex) {
-	    //int ret = 0;
-	    String hexLittleEndian = "";
-	    if (hex.length() % 2 != 0) return hexLittleEndian;
-	    for (int i = hex.length() - 2; i >= 0; i -= 2) {
-	        hexLittleEndian += hex.substring(i, i + 2);
-	    }
-	   // ret = Integer.parseInt(hexLittleEndian, 16);
-	    return hexLittleEndian;
-	}
-	
-	private String getLSBValue(String handleHexString) {
-		int value = Integer.parseInt(handleHexString, 16);
-		// Flip byte order using ByteBuffer
-		ByteBuffer buffer = ByteBuffer.allocate(4);
-		buffer.order(ByteOrder.BIG_ENDIAN);
-		buffer.asIntBuffer().put(value);
-		buffer.order(ByteOrder.LITTLE_ENDIAN);
-		int flipped = buffer.asIntBuffer().get();
-		log.debug("handleHexString:"+handleHexString);
-		log.debug("flipped:"+flipped);
-		BigInteger bigInt = new BigInteger(String.valueOf(flipped), 10);
-		String str = bigInt.toString(16);
-		System.out.println(str);
-
-		return null;
 	}
 
 	//To read non readable character
@@ -1073,34 +914,7 @@ public class FOTAService {
         return -1;
     	
     }
-	// Convert String to ASCII
-	private  String asciiToHex(String asciiValue)
-    {
-        char[] chars = asciiValue.toCharArray();
-        StringBuffer hex = new StringBuffer();
-        for (int i = 0; i < chars.length; i++)
-        {
-            hex.append(Integer.toHexString((int) chars[i]));
-        }
-        return hex.toString();
-
-	}
-	//Make it ready for raw data 
-	private String hexToAscii(String hexStr) {
-		 String str = "";
-		 StringBuilder output = new StringBuilder("");
-		 try{
-			 for (int i = 0; i < hexStr.length(); i+=2) {
-			        str = hexStr.substring(i, i+2);
-			        output.append((char)Integer.parseInt(str, 16));
-			    }
-			    System.out.println(output);
-			 
-		 }catch(Exception ex){
-
-		 }
-		 return new String(output.toString());
-		}
+	
 
 	//DecodeRawMessage
 	private String decodeRawMessage(String rawMessage) {
@@ -1116,234 +930,14 @@ public class FOTAService {
 		log.error("Decoded value is " + decoded_string);
 		return decoded_string;
 	}
-	
-	
-	////Initial code starts
-	public JSONObject processHexaToByteData(String HexaFilePath, Integer lines)
-			throws HillromException {
-		byte[] byteArray = new byte[906800];
-		JSONObject jsonObject = new JSONObject();
-		long count = 0;
-		String hexDataStr = "";
-	    String [] output = null;
-	    String encodedData = null;
-	    int flag = 1;
-	    if(flag == 0){
-	    	try {
-				Path pp = FileSystems.getDefault().getPath(HexaFilePath,
-						"193164_charger_mainboard.hex");
-				FileInputStream fis = new FileInputStream(pp.toFile());
-				int len;
-				// Read bytes until EOF is encountered.
-				do {
-					
-					len = fis.read(byteArray);
 
-					hexDataStr = getDataInHexString(byteArray);
-	
-				} while (len != -1);
-
-				fis.close();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				log.error("Error in Ecoded bas64 data :" + ex.getMessage());
-			}
-	    	output = hexDataStr.split("(?<=\\G.{512})");
-			storeChunk = new HashMap<Long, String>();
-			for(String str :output ){
-				storeChunk.put(count++, str);
-				
-				log.debug("Output into chnuks :" + str);
-			}
-			log.debug("Output into chnuks :" + storeChunk.size());
-	    }
-		
-		//log.debug("Count :" + count);
-		for (Map.Entry<Long, String> entry : storeChunk.entrySet())
-		{
-			if(entry.getKey() == 1652){
-				log.debug("Output into chnuks :" + entry.getValue());
-				BigInteger bigint = new BigInteger(entry.getValue(), 16);
-				count = entry.getValue().length()/2;
-				StringBuilder sb = new StringBuilder();
-				byte[] bytes = Base64.encodeInteger(bigint);
-				for (byte b : bytes) {
-					sb.append((char) b);
-				}
-				encodedData = new String(sb.toString());
-				log.debug("Ecoded bas64 data :" + encodedData);
-				
-			}
-		}
-		jsonObject.put("Base64 Encoded ", encodedData);
-		jsonObject.put("ChunkSize:", count);
-		return jsonObject;
-	}
-
-	private String getDataInHexString(byte[] byteArray) {
-		String data = "";
-		String trimData = "";
-		try {
-			data = new String(byteArray, 0, byteArray.length);
-			trimData = data.replace(":", "").replace("\n", "")
-					.replace("\r", "");
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			log.error("Error with getReadIntelHexFile:" + ex.getMessage());
-		}
-		return trimData;
-	}
-
-	private byte[] convertToBas64Encode(byte[] bas64Input) {
-		byte[] encoded = null;
-		if (bas64Input != null) {
-			encoded = Base64.encodeBase64(bas64Input);
-		}
-		return encoded;
-	}
-
-	private byte[] convertToBas64Decode(byte[] bas64Input) {
-		byte[] decoded = null;
-		if (bas64Input != null) {
-			decoded = Base64.decodeBase64(bas64Input);
-		}
-		return decoded;
-	}
-
-	private String getStringFormatWithSapce(List<Integer> decimalValueList) {
-
-		StringBuilder strbul = new StringBuilder();
-		String bas64Input = "";
-		Iterator<Integer> iter = decimalValueList.iterator();
-		while (iter.hasNext()) {
-			strbul.append(iter.next());
-			if (iter.hasNext()) {
-				strbul.append(" ");
-			}
-		}
-		bas64Input = strbul.toString();
-
-		return bas64Input;
-	}
-
-	private List<Integer> getReadIntelHexFile(byte[] byteArray) {
-		String data = "";
-		String trimData = "";
-		List<Integer> decimalValueList = new LinkedList<Integer>();
-		try {
-			data = new String(byteArray, 0, byteArray.length, "ASCII");
-			trimData = data.replace(":", "").replace("\n", "")
-					.replace("\r", "");
-
-			String val = "2";
-			String result = trimData.replaceAll("(.{" + val + "})", "$1 ")
-					.trim();
-			log.debug("Haxa Decimal with Space:" + result);
-
-			String[] hexaValues = trimData.split(" ", -1);
-			
-			for (String hex : hexaValues) {
-				
-				
-				int outputDecimal = Integer.parseInt(hex, 16);
-				decimalValueList.add(outputDecimal);
-
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			log.error("Error with getReadIntelHexFile:" + ex.getMessage());
-		}
-
-		return decimalValueList;
-	}
-
-	public JSONObject checkUpdate(String rawMessage) {
-		String decoded_string = "";
-		JSONObject FOTAJsonData = new JSONObject();
-		Map<String, String> fotaJsonData = new LinkedHashMap<String, String>();
-		byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
-		String sout = "";
-		for (int i = 0; i < decoded.length; i++) {
-			int val = decoded[i] & 0xFF;
-			sout = sout + val + " ";
-		}
-		log.debug("Input Byte Array :" + sout);
-		decoded_string = new String(decoded);
-		log.error("Decoded value is " + decoded_string);
-		fotaJsonData = FOTAParseUtil
-				.getFOTAJsonDataFromRawMessage(decoded_string);
-		StringBuilder resposeString = new StringBuilder();
-		long totalChunk = readHexByteDataFromFile();
-		log.error("totalChunk: " + totalChunk);
-		
-		Random rand = new Random();
-		int  handleValue = rand.nextInt(100) + 1;
-		resposeString.append(RESULT);
-		resposeString.append("Yes");
-		resposeString.append("&");
-		resposeString.append(HANDLE);
-		resposeString.append(handleValue);
-		resposeString.append("&");
-		resposeString.append(TOTAL_CHUNK);
-		resposeString.append(totalChunk);
-		resposeString.append("&");
-		resposeString.append(CRC);
-		String crc = "";
-		for (Map.Entry<String, String> entry : fotaJsonData.entrySet()) {
-			if (entry.getKey().equals(CRC)) {
-				log.debug("CRC:" + entry.getValue());
-				crc = entry.getValue();
-				break;
-			}
-		}
-		resposeString.append(crc);
-		byte[] encoded = java.util.Base64.getEncoder().encode(
-				resposeString.toString().getBytes());
-		String encodedCheckUpdate = new String(encoded);
-		log.error("encodedCheckUpdate: " + encodedCheckUpdate);
-		FOTAJsonData.put("encodedCheckUpdate", encodedCheckUpdate);
-		return FOTAJsonData;
-	}
-
-	private long readHexByteDataFromFile() {
-		byte[] byteArray = new byte[906800];
-		long count = 0;
-		long totalChunk = 0L;
-		String hexDataStr = "";
-		String[] output = null;
-		try {
-			Path pp = FileSystems.getDefault().getPath(FOTA_FILE_PATH,
-					"193164_charger_mainboard.hex");
-			FileInputStream fis = new FileInputStream(pp.toFile());
-			int len;
-			// Read bytes until EOF is encountered.
-			do {
-
-				len = fis.read(byteArray);
-
-				hexDataStr = getDataInHexString(byteArray);
-				log.debug("hexa String :" + hexDataStr);
-
-			} while (len != -1);
-
-			fis.close();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			log.error("Error in Ecoded bas64 data :" + ex.getMessage());
-		}
-		output = hexDataStr.split("(?<=\\G.{512})");
-		
-		storeChunk = new LinkedHashMap<Long, String>();
-		
-		for (String str : output) {
-			storeChunk.put(count++, str);
-			log.debug("Output into chunk :" + str);
-		}
-		totalChunk = storeChunk.size()-1;
-		log.debug("totalChunk :" + totalChunk);
-		return totalChunk;
-	}
-
+	/**
+	 * savFotaInfoData
+	 * @param fotaInfoDto
+	 * @param baseUrl
+	 * @return
+	 * @throws ParseException
+	 */
 	public FOTAInfo savFotaInfoData(FOTAInfoDto fotaInfoDto, String baseUrl)
 			throws ParseException {
 		//check is existing if yes update to inactive pending
@@ -1419,67 +1013,14 @@ public class FOTAService {
 		return fotaInfo;
 	}
 
-	//Email notification to approver
-	private void sendNotification(String baseUrl, String userRole) {
-		String roleName = "FOTA_APPROVER";
-		String queryStr = "SELECT u.email, u.last_name FROM hillromvest_dev.USER_AUTHORITY a, hillromvest_dev.USER u where a.authority_name = '"+roleName+"' and a.user_id = u.id";
-		
-		Query jpaQuery = entityManager.createNativeQuery(queryStr);
-		
-		List<Object[]> resultList = jpaQuery.getResultList();
-		
-		if(userRole.equals("FOTA_ADMIN")){
-			for(Object[] result : resultList){
-			mailService.sendFotaDeleteNotificationEmail((String)result[0], (String)result[1],baseUrl);
-			}
-		}else if(userRole.equals("")){
-			for(Object[] result : resultList){
-				mailService.sendFotaUploadNotificationEmail((String)result[0], (String)result[1],baseUrl);
-			}
-		}
-		
-	}
-
-	private String getChunk(String rawMessage) {
-
-		byte[] getChunkByte = java.util.Base64.getDecoder().decode(rawMessage);
-		int chunkByteIndex = returnMatch(getChunkByte, CHUNK_SIZE);
-		log.error("chunkByteIndex: " + chunkByteIndex);
-		// StringBuilder handleRes = new StringBuilder();
-		// handleRes.
-		// handleRes.append(Integer.toHexString(getChunkByte[chunkSize] &
-		// 0xFF));
-		int chunkSizeValue = getChunkByte[chunkByteIndex] & 0xFF;
-		int chunkSizeValue1 = getChunkByte[chunkByteIndex + 1] & 0xFF;
-
-		String chunkSize1 = Integer.toHexString(chunkSizeValue);
-		String chunkSize2 = Integer.toHexString(chunkSizeValue1);
-
-		chunkSize1 = ("00" + chunkSize1).substring(chunkSize1.length());
-		chunkSize2 = ("00" + chunkSize2).substring(chunkSize2.length());
-
-		StringBuilder sb = new StringBuilder();
-		sb.append(chunkSize1);
-		sb.append(chunkSize2);
-
-		String littleEndianChunk = toLittleEndian(sb.toString());
-		return littleEndianChunk;
-
-	}
-	
-	private int hex2decimal(String chunkStr) {
-
-		String digits = "0123456789ABCDEF";
-		chunkStr = chunkStr.toUpperCase();
-		int val = 0;
-		for (int i = 0; i < chunkStr.length(); i++) {
-			char c = chunkStr.charAt(i);
-			int d = digits.indexOf(c);
-			val = 16 * val + d;
-		}
-		return val;
-	}
-
+		/**
+	 * getFOTADeviceList
+	 * @param status
+	 * @param searchString
+	 * @param sortBy
+	 * @param isAscending
+	 * @return
+	 */
 	public List<FOTADeviceDto> getFOTADeviceList(String status, String searchString, String sortBy, boolean isAscending) {
 
 		List<FOTADeviceDto> FOTADeviceDtoList = null;
@@ -1488,24 +1029,24 @@ public class FOTAService {
 		
 		if (status.equals(SUCCESS_LIST)) {
 
-			List<Object[]> resultList = getSuccesList(status,queryString,sortBy,isAscending);
+			List<Object[]> resultList = fotaRepositoryUtils.getSuccesList(status,queryString,sortBy,isAscending);
 			
 			FOTADeviceDtoList = setDeviceValues(resultList);
 			
 		} else if (status.equals(FAILURE_LIST)) {
-			List<Object[]> resultList = getFailureList(status,queryString,sortBy,isAscending);
+			List<Object[]> resultList = fotaRepositoryUtils.getFailureList(status,queryString,sortBy,isAscending);
 			
 			FOTADeviceDtoList = setDeviceValues(resultList);
 
 		} else if (status.equals(ABORTED_LIST)) {
 			
-			List<Object[]> resultList = getAbortList(status,queryString,sortBy,isAscending);
+			List<Object[]> resultList = fotaRepositoryUtils.getAbortList(status,queryString,sortBy,isAscending);
 						
 			FOTADeviceDtoList = setDeviceValues(resultList);
 
 		} else if (status.equals(ALL)) {
 			
-			List<Object[]> resultList = getAllList(status,queryString,sortBy,isAscending);
+			List<Object[]> resultList = fotaRepositoryUtils.getAllList(status,queryString,sortBy,isAscending);
 			
 			FOTADeviceDtoList = setDeviceValues(resultList);
 		}
@@ -1523,238 +1064,11 @@ public class FOTAService {
 		return FOTADeviceDtoList;
 	}
 
-	private List<Object[]> getAllList(String status, String queryString,
-			String sortBy, boolean isAscending) {
-		//SUCCESS_LIST, FAILURE_LIST, ABORTED_LIST
-		String queryStr = "";
-		if(sortBy.equals("")&& isAscending == false){
-			queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.id desc";
-		}else if(sortBy.equals("partNumber")){
-			if(isAscending){
-				queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by f.device_part_number desc";
-			}else{
-				queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by f.device_part_number asc";
-			}
-		}else if(sortBy.equals("productName")){
-			if(isAscending){
-				queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by f.product_Type desc";
-			}else{
-				queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by f.product_Type asc";
-			}
-		}
-		else if(sortBy.equals("serialNumber")){
-			if(isAscending){
-				queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.device_serial_number desc";
-			}else{
-				queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.device_serial_number asc";
-			}
-		}else if(sortBy.equals("connectionType")){
-			if(isAscending){
-				queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.connection_type desc";
-			}else{
-				queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.connection_type asc";
-			}
-		}else if(sortBy.equals("startDatetime")){
-			if(isAscending){
-				queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.download_start_date_time desc";
-			}else{
-				queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.download_start_date_time asc";
-			}
-		}else if(sortBy.equals("endDateTime")){
-			if(isAscending){
-				queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.download_end_date_time desc";
-			}else{
-				queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.download_end_date_time asc";
-			}
-		}else if(sortBy.equals("status")){
-			if(isAscending){
-				queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.downloaded_status desc";
-			}else{
-				queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id) order by d.downloaded_status asc";
-			}
-		}else if(sortBy.equals("downloadTime")){
-				queryStr = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.device_part_number) like lower("+queryString+") and d.fota_info_id = f.id) or (d.downloaded_status in ('"+SUCCESS_LIST+"','"+FAILURE_LIST+"','"+ABORTED_LIST+"') and lower(f.product_type) like lower("+queryString+") and d.fota_info_id = f.id)";
-		}
-
-		Query jpaQuery = entityManager.createNativeQuery(queryStr);
-		
-		List<Object[]> resultList = jpaQuery.getResultList();
-		return resultList;
-	}
-
-
-	private List<Object[]> getAbortList(String status, String queryString,
-			String sortBy, boolean isAscending) {
-		String queryStr = "";
-		if(sortBy.equals("")&& isAscending == false){
-			queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.id desc";
-		}else if(sortBy.equals("partNumber")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by f.device_part_number desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by f.device_part_number asc";
-			}
-		}else if(sortBy.equals("productName")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by f.product_Type desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by f.product_Type asc";
-			}
-		}
-		else if(sortBy.equals("serialNumber")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.device_serial_number desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.device_serial_number asc";
-			}
-		}else if(sortBy.equals("connectionType")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.connection_type desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.connection_type asc";
-			}
-		}else if(sortBy.equals("startDatetime")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.download_start_date_time desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.download_start_date_time asc";
-			}
-		}else if(sortBy.equals("endDateTime")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.download_end_date_time desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.download_end_date_time asc";
-			}
-		}else if(sortBy.equals("status")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.downloaded_status desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.downloaded_status asc";
-			}
-		}
-		Query jpaQuery = entityManager.createNativeQuery(queryStr);
-		
-		List<Object[]> resultList = jpaQuery.getResultList();
-
-		return resultList;
-	}
-
-
-	private List<Object[]> getFailureList(String status, String queryString,
-			String sortBy, boolean isAscending) {
-		String queryStr = "";
-		if(sortBy.equals("")&& isAscending == false){
-			queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.id desc";
-		}else if(sortBy.equals("partNumber")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by f.device_part_number desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by f.device_part_number asc";
-			}
-		}else if(sortBy.equals("productName")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by f.product_Type desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by f.product_Type asc";
-			}
-		}
-		else if(sortBy.equals("serialNumber")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.device_serial_number desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.device_serial_number asc";
-			}
-		}else if(sortBy.equals("connectionType")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.connection_type desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.connection_type asc";
-			}
-		}else if(sortBy.equals("startDatetime")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.download_start_date_time desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.download_start_date_time asc";
-			}
-		}else if(sortBy.equals("endDateTime")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.download_end_date_time desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.download_end_date_time asc";
-			}
-		}else if(sortBy.equals("status")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.downloaded_status desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.downloaded_status asc";
-			}
-		}
-		Query jpaQuery = entityManager.createNativeQuery(queryStr);
-		
-		List<Object[]> resultList = jpaQuery.getResultList();
-		
-		return resultList;
-	}
-
-
-	private List<Object[]> getSuccesList(String status, String queryString, String sortBy, boolean isAscending) {
-		String queryStr = "";
-		
-		if(sortBy.equals("")&& isAscending == false){
-			queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.id desc";
-		}else if(sortBy.equals("partNumber")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by f.device_part_number desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by f.device_part_number asc";
-			}
-		}else if(sortBy.equals("productName")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by f.product_Type desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by f.product_Type asc";
-			}
-		}
-		else if(sortBy.equals("serialNumber")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.device_serial_number desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.device_serial_number asc";
-			}
-		}else if(sortBy.equals("connectionType")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.connection_type desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.connection_type asc";
-			}
-		}else if(sortBy.equals("startDatetime")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.download_start_date_time desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.download_start_date_time asc";
-			}
-		}else if(sortBy.equals("endDateTime")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.download_end_date_time desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.download_end_date_time asc";
-			}
-		}else if(sortBy.equals("status")){
-			if(isAscending){
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.downloaded_status desc";
-			}else{
-				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+"order by d.downloaded_status asc";
-			}
-		}
-		
-		Query jpaQuery = entityManager.createNativeQuery(queryStr);
-		
-		List<Object[]> resultList = jpaQuery.getResultList();
-		
-		return resultList;
-	}
-
-
+	/**
+	 * setDeviceValues
+	 * @param FOTADeviceList
+	 * @return
+	 */
 	private List<FOTADeviceDto> setDeviceValues(
 			List<Object[]> FOTADeviceList) {
 		List<FOTADeviceDto> FOTADeviceDtoList = new ArrayList<FOTADeviceDto>();
@@ -1780,7 +1094,12 @@ public class FOTAService {
 		}
 		return FOTADeviceDtoList;
 	}
-	//Calculate
+	/**
+	 * getDownLoadTime
+	 * @param downloadEndDateTime
+	 * @param downloadStartDateTime
+	 * @return
+	 */
 	private String getDownLoadTime(DateTime downloadEndDateTime,
 			DateTime downloadStartDateTime) {
 		long elapsed = (downloadEndDateTime.getMillis())
@@ -1806,7 +1125,14 @@ public class FOTAService {
 
 		return totalDownloadTime;
 	}
-	//Get Firmware list
+	/**
+	 * Get Firmware list
+	 * @param status
+	 * @param searchString
+	 * @param sortBy
+	 * @param isAscending
+	 * @return
+	 */
 	public List<FOTAInfo> FOTAList(String status, String searchString, String sortBy, boolean isAscending) {
 		List<FOTAInfo> FOTAInfoList = null;
 		
@@ -1823,6 +1149,13 @@ public class FOTAService {
 		}
 		return FOTAInfoList;
 	}
+	/**
+	 * getSortAllFirmwareList
+	 * @param searchString
+	 * @param sortBy
+	 * @param isAscending
+	 * @return
+	 */
 	private List<FOTAInfo> getSortAllFirmwareList(String searchString,
 			String sortBy, boolean isAscending) {
 		List<FOTAInfo> FOTAInfoList = new ArrayList<FOTAInfo>();
@@ -1851,7 +1184,13 @@ public class FOTAService {
 	}
 
 
-	//getSortActivePublishdFirmwareList
+	/**
+	 * getSortActivePublishdFirmwareList
+	 * @param searchString
+	 * @param sortBy
+	 * @param isAscending
+	 * @return
+	 */
 	private List<FOTAInfo> getSortActivePublishdFirmwareList(
 			String searchString, String sortBy, boolean isAscending) {
 		List<FOTAInfo> FOTAInfoList = new ArrayList<FOTAInfo>();
@@ -1875,7 +1214,13 @@ public class FOTAService {
 		return FOTAInfoListUpdate;
 	}
 
-	//getSortPendingFirmwareList
+	/**
+	 * getSortPendingFirmwareList
+	 * @param searchString
+	 * @param sortBy
+	 * @param isAscending
+	 * @return
+	 */
 	private List<FOTAInfo> getSortPendingFirmwareList(String searchString,
 			String sortBy, boolean isAscending) {
 		List<FOTAInfo> FOTAInfoList = new ArrayList<FOTAInfo>();
@@ -1896,7 +1241,13 @@ public class FOTAService {
 				return FOTAInfoListUpdate;
 	}
 
-	//Firmware sorting common method
+	/**
+	 * Firmware sorting common method
+	 * @param FOTAInfoList
+	 * @param sortBy
+	 * @param isAscending
+	 * @return
+	 */
 	private List<FOTAInfo> getSortingData(List<FOTAInfo> FOTAInfoList, String sortBy, boolean isAscending) {
 
 		if(sortBy.equals("") && isAscending == false){
@@ -1957,35 +1308,30 @@ public class FOTAService {
 			}
 		}
 		
-
 		return FOTAInfoList;
 	}
 
 
-	//CRC 32 validation when user i
+	/**
+	 * CRC 32 validation
+	 * @param crc32Dt0
+	 * @return
+	 * @throws Exception
+	 */
 	@SuppressWarnings("resource")
 	public boolean CRC32Calculation(CRC32Dto crc32Dt0) throws Exception {
 	    boolean eof = false;
 	    boolean result = false;
 	    int recordIdx = 0;
 	    long upperAddress = 0;
-	   /* long crcStartAddress  = 0x08010070;
-	    long crcEndAddress = 0x080FFFFF;
-	    long crcLocationAddress = 0x0801006C;*/
 	    long crcStartAddress  = 0;
 	    long crcEndAddress = 0;
 	    long crcLocationAddress = 0;
-	    
 	    int crcValueInFile = 0;
 	    long dataStartAddress = 0;
-
-	   /* long crc2StartAddress = 0x60000070;
-	    long crc2EndAddress = 0x60FFFFFF;
-	    long crc2LocationAddress = 0x6000006C;*/
 	    long crc2StartAddress = 0;
 	    long crc2EndAddress = 0;
 	    long crc2LocationAddress = 0;
-	    
 	    int crc2ValueInFile = 0;
 	    long data2StartAddress = 0;
 
@@ -2240,7 +1586,11 @@ public class FOTAService {
 		return result;
 	}
 	
-	//Get Firmware details to view 
+	/**
+	 * Get Firmware details to view 
+	 * @param id
+	 * @return
+	 */
 	public FOTAInfo getFirmwareDetails(Long id) {
 		FOTAInfo fotaInfo = null;
 		fotaInfo = fotaRepository.findOneById(id);
@@ -2262,7 +1612,12 @@ public class FOTAService {
 		}
 		return fotaInfo;
 	}
-	//ValidateApprover key in CRC 32
+	/**
+	 * ValidateApprover key in CRC 32
+	 * @param apprDto
+	 * @return
+	 * @throws Exception
+	 */
 	public boolean validateApproverCRC32(ApproverCRCDto apprDto)
 			throws Exception {
 		FOTAInfo fotaInfo = null;
@@ -2310,7 +1665,14 @@ public class FOTAService {
 		return result;
 	}
 
-	//Approve key in CRC32 calculations
+	/**
+	 * Approve key in CRC32 calculations
+	 * @param fotaInfo
+	 * @param region1crc
+	 * @param region2crc
+	 * @return
+	 * @throws Exception
+	 */
 	@SuppressWarnings("resource")
 	private boolean validateApproverCRC32(FOTAInfo fotaInfo, String region1crc,
 			String region2crc) throws Exception {
@@ -2359,10 +1721,10 @@ public class FOTAService {
 		}
 		
 		if (StringUtils.isNotEmpty(region1crc)) {
-			crcValueInFile = Long.parseLong(toLittleEndian(region1crc),16);
+			crcValueInFile = Long.parseLong(FOTAParseUtil.toLittleEndian(region1crc),16);
 		}
 		if (StringUtils.isNotEmpty(region2crc)) {
-			crc2ValueInFile = Long.parseLong(toLittleEndian(region2crc),16);
+			crc2ValueInFile = Long.parseLong(FOTAParseUtil.toLittleEndian(region2crc),16);
 		}
 		fs = new FileInputStream(fotaInfo.getFilePath());
 
@@ -2545,9 +1907,14 @@ public class FOTAService {
 		return result;
 
 	}
-
+	/**
+	 * firmwareDelete
+	 * @param id
+	 * @param userRole
+	 * @param baseUrl
+	 * @return
+	 */
 	public FOTAInfo firmwareDelete(Long id, String userRole, String baseUrl) {
-
 		FOTAInfo fotaInfo = null;
 		fotaInfo = fotaRepository.findOneById(id);
 		if (Objects.nonNull(fotaInfo)) {
@@ -2563,12 +1930,9 @@ public class FOTAService {
 						&& fotaInfo.getActivePublishedFlag() == true) {
 					fotaInfo.setDeleteRequestFlag(true);
 					fotaRepository.save(fotaInfo);
-					
 					//Send Notification to approver for delete request
-					
 					//Email notification to approver
 					sendNotification(baseUrl, userRole);
-	
 				}
 				
 			}else if(userRole.equals("FOTA_APPROVER")){
@@ -2593,4 +1957,55 @@ public class FOTAService {
 
 		return fotaInfo;
 	}
+	/**
+	 * Email notification to approver
+	 * 
+	 * @param baseUrl
+	 * @param userRole
+	 */
+	private void sendNotification(String baseUrl, String userRole) {
+
+		List<Object[]> resultList = fotaRepositoryUtils.getFOTAAprUsers();
+		// Only for when FOTA Admin requests
+		if (userRole.equals(FOTA_ADMIN)) {
+			for (Object[] result : resultList) {
+				mailService.sendFotaDeleteNotificationEmail((String) result[0],
+						(String) result[1], baseUrl);
+			}
+		} else if (userRole.equals("")) {
+			for (Object[] result : resultList) {
+				mailService.sendFotaUploadNotificationEmail((String) result[0],
+						(String) result[1], baseUrl);
+			}
+		}
+	}
+
+	/**
+	 * getChunk
+	 * @param rawMessage
+	 * @return
+	 */
+	private String getChunk(String rawMessage) {
+
+		byte[] getChunkByte = java.util.Base64.getDecoder().decode(rawMessage);
+		int chunkByteIndex = returnMatch(getChunkByte, CHUNK_SIZE_RAW);
+		log.error("chunkByteIndex: " + chunkByteIndex);
+		int chunkSizeValue = getChunkByte[chunkByteIndex] & 0xFF;
+		int chunkSizeValue1 = getChunkByte[chunkByteIndex + 1] & 0xFF;
+
+		String chunkSize1 = Integer.toHexString(chunkSizeValue);
+		String chunkSize2 = Integer.toHexString(chunkSizeValue1);
+
+		chunkSize1 = ("00" + chunkSize1).substring(chunkSize1.length());
+		chunkSize2 = ("00" + chunkSize2).substring(chunkSize2.length());
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(chunkSize1);
+		sb.append(chunkSize2);
+
+		String littleEndianChunk = FOTAParseUtil.toLittleEndian(sb.toString());
+		return littleEndianChunk;
+
+	}
+
 }

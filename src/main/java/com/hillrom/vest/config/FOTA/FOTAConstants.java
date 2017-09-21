@@ -5,7 +5,7 @@ public final class FOTAConstants {
 	//public static final String HEXAFILEPATH = "/opt/FOTA/files";
 	/*public static final String HEXAFILEPATH = "D:/FOTA/Hex";
 	public static final String FOTA_FILE_PATH = "D:/FOTA/UploadFile/";*/
-	public static final String HEXAFILEPATH = "/opt/FOTA/files";
+	public static final String HEXAFILEPATH = "D:/FOTA/Hex";
 	public static final String FOTA_FILE_PATH = "/opt/FOTA/files";
 	public static final int CHUNK_SIZE_VALUE = 200;
 	// Raw data constants
@@ -47,16 +47,12 @@ public final class FOTAConstants {
 	public static final String ABORTED_LIST = "Aborted";
 	public static final String ALL = "All";
 	
+	//Firmware List constants
 	public static final String ACTIVE_PENDING = "Active Pending";
 	public static final String ACTIVE_PUBLISHED = "Active Published";
 	public static final String INACTIVE_PENDING = "Inactive Pending";
 	public static final String INACTIVE_PUBLISHED = "Inactive Published";
 	public static final String DELETE_REQUESTED = "Delete Requested";
-	
-	public static final String DEVICE_PARTNUMBER_01 = "0000000000193164";
-	public static final String DEVICE_PARTNUMBER_02 = "0234567890123451";
-	public static final String DEVICE_PARTNUMBER_03 = "0345678901234512";
-	public static final String DEVICE_PARTNUMBER_04 = "0456789012345123";
 	
 	//Device listing query 
 	public static final String DEVICE_QUERYSTR = "SELECT d.id,d.fota_info_id,d.device_serial_number,d.connection_type,d.device_software_version,d.device_software_date_time,d.updated_software_version,d.checkupdate_date_time,d.download_start_date_time,d.download_end_date_time,d.downloaded_status,f.device_part_number,f.product_Type from FOTA_DEVICE_FWARE_UPDATE_LOG d, FOTA_INFO f where ";
@@ -65,13 +61,15 @@ public final class FOTAConstants {
 	public static final String DEVICE_QUERYSTR3 = "' and lower(f.product_type) like lower(";
 	public static final String DEVICE_QUERYSTR4 = ") and d.fota_info_id = f.id)";
 	
-	//For All
+	//Constants for Raw calculation
+	public static final int HEX = 16;
+	public static final byte[] CRC_FIELD_NAME_RAW = new byte[]{38,99,114,99,61};
+	public static final byte[] CHUNK_SIZE_RAW = new byte[]{38,99,104,117,110,107,83,105,122,101,61};
+	public static final byte[] HANDLE_RAW = new byte[]{38,104,97,110,100,108,101,61};
+	public static final byte[] DEV_VER_RAW = new byte[]{38,100,101,118,86,101,114,61};
 	
+	//FOTA roles
+	public static final String FOTA_APPROVER = "FOTA_APPROVER";
+	public static final String FOTA_ADMIN = "FOTA_ADMIN";
 	
-	
-	
-	
-	
-	
-
 }

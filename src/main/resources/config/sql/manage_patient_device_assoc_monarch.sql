@@ -1,10 +1,8 @@
--- --------------------------------------------------------------------------------
--- Routine DDL
--- Note: comments before and after the routine body will not be stored by the server
--- --------------------------------------------------------------------------------
+DROP procedure IF EXISTS `manage_patient_device_assoc_monarch`;
+
 DELIMITER $$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `manage_patient_device_assoc_monarch`(
+CREATE DEFINER=`root`@`%` PROCEDURE `manage_patient_device_assoc_monarch`(
 
 	IN operation_type_indicator VARCHAR(10),
     IN pat_patient_id varchar(50),

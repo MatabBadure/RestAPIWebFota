@@ -532,20 +532,39 @@ public class UserService {
 		
 		// /Insert Garament details in patient device ass info
 		
-
-		assignGarmentValuesToPatientDeviceAssocObj(userExtensionDTO,
-				patientDevicesAssoc);
-		patientDevicesAssoc.setPatientId(patientInfoId);
-		patientDevicesAssoc.setCreatedDate(new LocalDate());
-		patientDevicesAssoc.setHillromId(userExtensionDTO.getHillromId());
-		patientDevicesAssoc.setIsActive(true);
-		patientDevicesAssoc.setDeviceType(VEST);
-		patientDevicesAssoc = patientDevicesAssocRepository
-				.save(patientDevicesAssoc);
-		log.debug("Created Information for PatientDevice Association : {}",
-				patientDevicesAssoc);
-	
-		assignValuesToUserObj(userExtensionDTO, newUser);
+			String deviceTypeArray[] = userExtensionDTO.getDeviceType().split(",");
+			String deviceTypeB = deviceTypeArray[0];
+			for(int i =0; i<deviceTypeArray.length;i++)
+			{
+				PatientDevicesAssoc patientDevicesAssocB = new PatientDevicesAssoc();
+				userExtensionDTO.setDeviceType(deviceTypeB);
+				assignGarmentValuesToPatientDeviceAssocObj(userExtensionDTO,
+						patientDevicesAssocB);
+				patientDevicesAssocB.setPatientId(patientInfoId);
+				patientDevicesAssocB.setCreatedDate(new LocalDate());
+				patientDevicesAssocB.setHillromId(userExtensionDTO.getHillromId());
+				patientDevicesAssocB.setIsActive(true);
+				patientDevicesAssocB.setDeviceType(deviceTypeB);
+				if(deviceTypeArray.length == 1)
+				{
+					patientDevicesAssocB.setPatientType("SD");
+				}else{
+					patientDevicesAssocB.setPatientType("CD");
+				}
+				patientDevicesAssocB = patientDevicesAssocRepository
+						.save(patientDevicesAssocB);
+				if(deviceTypeArray.length > i+1 )
+					deviceTypeB = deviceTypeArray[i+1];
+			}
+			newUser = savePatientUser(userExtensionDTO,newUser,patientInfo);
+		
+		return newUser;
+	}
+    
+    private UserExtension savePatientUser(UserExtensionDTO userExtensionDTO,UserExtension newUser,PatientInfo patientInfo)
+    {
+    	//log.debug("Created Information for PatientDevice Association : {}",patientDevicesAssoc);
+    	assignValuesToUserObj(userExtensionDTO, newUser);
 
 		newUser.setPassword(passwordEncoder
 				.encode(generateDefaultPassword((User) newUser)));
@@ -577,30 +596,38 @@ public class UserService {
 		compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
 		complianceService.createOrUpdate(compliance);
 		return newUser;
-	}
+    }
+    
+    
 
 	private void assignGarmentValuesToPatientDeviceAssocObj(
 			UserExtensionDTO userExtensionDTO,
 			PatientDevicesAssoc patientDevicesAssoc) {
-		if(Objects.nonNull(userExtensionDTO.getVestGarmentColor()) ||
-				Objects.nonNull(userExtensionDTO.getVestGarmentSize()) ||
-				Objects.nonNull(userExtensionDTO.getVestGarmentType())){
-			if (Objects.nonNull(userExtensionDTO.getVestGarmentColor()))
-				patientDevicesAssoc.setGarmentColor(userExtensionDTO.getVestGarmentColor());
-			if (Objects.nonNull(userExtensionDTO.getVestGarmentSize()))
-				patientDevicesAssoc.setGarmentSize(userExtensionDTO.getVestGarmentSize());
-			if (Objects.nonNull(userExtensionDTO.getVestGarmentType()))
-				patientDevicesAssoc.setGarmentType(userExtensionDTO.getVestGarmentType());
+		if("VEST".equalsIgnoreCase(userExtensionDTO.getDeviceType()))
+		{
+			if(Objects.nonNull(userExtensionDTO.getVestGarmentColor()) ||
+					Objects.nonNull(userExtensionDTO.getVestGarmentSize()) ||
+					Objects.nonNull(userExtensionDTO.getVestGarmentType())){
+				if (Objects.nonNull(userExtensionDTO.getVestGarmentColor()))
+					patientDevicesAssoc.setGarmentColor(userExtensionDTO.getVestGarmentColor());
+				if (Objects.nonNull(userExtensionDTO.getVestGarmentSize()))
+					patientDevicesAssoc.setGarmentSize(userExtensionDTO.getVestGarmentSize());
+				if (Objects.nonNull(userExtensionDTO.getVestGarmentType()))
+					patientDevicesAssoc.setGarmentType(userExtensionDTO.getVestGarmentType());
+			}
 		}
-		if(Objects.nonNull(userExtensionDTO.getMonarchGarmentColor()) ||
-				Objects.nonNull(userExtensionDTO.getMonarchGarmentSize()) ||
-				Objects.nonNull(userExtensionDTO.getMonarchGarmentType())){
-			if (Objects.nonNull(userExtensionDTO.getMonarchGarmentColor()))
-				patientDevicesAssoc.setGarmentColor(userExtensionDTO.getMonarchGarmentColor());
-			if (Objects.nonNull(userExtensionDTO.getMonarchGarmentSize()))
-				patientDevicesAssoc.setGarmentSize(userExtensionDTO.getMonarchGarmentSize());
-			if (Objects.nonNull(userExtensionDTO.getMonarchGarmentType()))
-				patientDevicesAssoc.setGarmentType(userExtensionDTO.getMonarchGarmentType());
+		if("MONARCH".equalsIgnoreCase(userExtensionDTO.getDeviceType()))
+		{
+			if(Objects.nonNull(userExtensionDTO.getMonarchGarmentColor()) ||
+					Objects.nonNull(userExtensionDTO.getMonarchGarmentSize()) ||
+					Objects.nonNull(userExtensionDTO.getMonarchGarmentType())){
+				if (Objects.nonNull(userExtensionDTO.getMonarchGarmentColor()))
+					patientDevicesAssoc.setGarmentColor(userExtensionDTO.getMonarchGarmentColor());
+				if (Objects.nonNull(userExtensionDTO.getMonarchGarmentSize()))
+					patientDevicesAssoc.setGarmentSize(userExtensionDTO.getMonarchGarmentSize());
+				if (Objects.nonNull(userExtensionDTO.getMonarchGarmentType()))
+					patientDevicesAssoc.setGarmentType(userExtensionDTO.getMonarchGarmentType());
+			}
 		}
 	}
 

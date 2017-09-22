@@ -105,7 +105,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/validateActivationKey").permitAll()
             .antMatchers("/api/validateResetKey").permitAll()
              //FOTA API
-            .antMatchers("/api/FOTA/update").permitAll()
+            .antMatchers("/api/FOTA").permitAll()
             .antMatchers("/api/FOTA/uploadFile").permitAll()
             .antMatchers("/api/FOTA/create").permitAll()
             .antMatchers("/api/FOTAList").permitAll()

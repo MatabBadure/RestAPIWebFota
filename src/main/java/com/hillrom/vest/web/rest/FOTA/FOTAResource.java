@@ -69,7 +69,7 @@ public class FOTAResource {
 	 * @param rawMessage
 	 * @return
 	 */
-	@RequestMapping(value = "/FOTA/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/FOTA", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> FOTA(
 			@RequestBody(required = true) String rawMessage) {
 		String FOTAencoded = " ";

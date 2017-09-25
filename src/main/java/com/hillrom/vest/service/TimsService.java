@@ -2002,7 +2002,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 					
 					
 					patientInfoDTO.setOperation_type("UPDATE");
-					managePatientDeviceAssociation(patientInfoDTO);
+					managePatientDeviceAssociationMonarch(patientInfoDTO);
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().

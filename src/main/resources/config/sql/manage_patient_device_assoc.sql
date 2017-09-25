@@ -1,5 +1,7 @@
-DROP procedure IF EXISTS `manage_patient_device_assoc`;
-
+-- --------------------------------------------------------------------------------
+-- Routine DDL
+-- Note: comments before and after the routine body will not be stored by the server
+-- --------------------------------------------------------------------------------
 DELIMITER $$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `manage_patient_device_assoc`(
@@ -61,7 +63,7 @@ IF operation_type_indicator = 'CREATE' THEN
     
 		SELECT `patient_id`, `serial_number` ,`patient_type` ,`device_type`,`hillrom_id` INTO temp_patient_info_id, temp_serial_number ,device_patient_type , temp_device_type,device_hillrom_id
 		FROM `PATIENT_DEVICES_ASSOC`
-		WHERE `patient_id` = pat_patient_id;
+		WHERE `patient_id` = pat_patient_id ;
 		
 		IF  pat_device_type = 'MONARCH' AND device_hillrom_id IS NOT NULL THEN
 		
@@ -181,7 +183,7 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 
 		SELECT `patient_id`, `serial_number` ,`patient_type` ,`device_type`,`hillrom_id` INTO temp_patient_info_id, temp_serial_number ,device_patient_type , temp_device_type,device_hillrom_id
 		FROM `PATIENT_DEVICES_ASSOC`
-		WHERE `patient_id` = pat_patient_id;
+		WHERE `patient_id` = pat_patient_id AND `device_type` = 'VEST';
 		
 		IF temp_patient_info_id IS NULL THEN
 			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Device Serial No.  not associated with the patient';
@@ -262,5 +264,4 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 
 ELSE  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Operation not supported';
 END IF;
-END$$
-DELIMITER ;
+END

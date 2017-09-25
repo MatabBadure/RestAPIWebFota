@@ -105,7 +105,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/validateActivationKey").permitAll()
             .antMatchers("/api/validateResetKey").permitAll()
              //FOTA API
-            /*.antMatchers("/api/FOTA").permitAll()
+            .antMatchers("/api/FOTA").permitAll()
+            /*
             .antMatchers("/api/FOTA/uploadFile").permitAll()
             .antMatchers("/api/FOTA/create").permitAll()
             .antMatchers("/api/FOTAList").permitAll()
@@ -162,7 +163,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/retrieveLogData/logs").permitAll()
             .antMatchers("/api/executeTIMSJob").hasAuthority(AuthoritiesConstants.ADMIN)
             //Configuration for FOTA
-            .antMatchers("/api/FOTA").authenticated()
+            ///.antMatchers("/api/FOTA").authenticated()
             .antMatchers("/api/FOTA/uploadFile").authenticated()
             .antMatchers("/api/FOTA/create").authenticated()
             .antMatchers("/api/FOTAList").authenticated()

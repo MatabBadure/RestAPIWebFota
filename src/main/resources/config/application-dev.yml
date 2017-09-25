@@ -45,6 +45,7 @@ spring:
         patientDashboardUrl: http://devserver.hillromvest.com
         careGiverDashboardUrl: http://devserver.hillromvest.com
         baseUrl: http://devserver.hillromvest.com
+        fotaBaseUrl: http://fata.hillromvest.com
         accountActivationReminderInterval: 72
 
     survey:

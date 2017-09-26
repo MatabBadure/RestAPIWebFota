@@ -498,11 +498,21 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 		return false;
 	}
 	
-	public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
+/*	public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 		
 		if((patientDevicesAssocRepository.findByHillromId(hillromId).isPresent()) 
 			&& (patientDevicesAssocRepository.findByHillromId(hillromId).get().getDeviceType().equalsIgnoreCase("VEST"))){
 		
+				return true;
+		}
+		
+		return false;
+	} */
+	
+public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
+		
+		if(patientDevicesAssocRepository.findByHillromIdAndDeviceType(hillromId,"VEST").isPresent()){
+			
 				return true;
 		}
 		
@@ -1516,7 +1526,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				managePatientDeviceMonarch(patientInfoDTO);
 								
 				patientInfoDTO.setOperation_type("UPDATE");
-				managePatientDeviceAssociation(patientInfoDTO);
+				managePatientDeviceAssociationMonarch(patientInfoDTO);
 								
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -1574,7 +1584,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
 								
 				patientInfoDTO.setOperation_type("UPDATE");
-				managePatientDeviceAssociation(patientInfoDTO);
+				managePatientDeviceAssociationMonarch(patientInfoDTO);
 								
 				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
@@ -1837,6 +1847,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 					patientInfoDTO.setOperation_type("UPDATE");
 					patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get().getSerialNumber());
 					patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
+					patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 								
 					managePatientDeviceMonarch(patientInfoDTO);
@@ -1988,7 +1999,7 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 					
 					
 					patientInfoDTO.setOperation_type("UPDATE");
-					managePatientDeviceAssociation(patientInfoDTO);
+					managePatientDeviceAssociationMonarch(patientInfoDTO);
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().

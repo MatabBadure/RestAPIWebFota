@@ -391,7 +391,7 @@ public class TimsUserRepository{
 					.setParameter("patient_id", inPatientId)
 					.setParameter("pat_old_device_serial_number",inPatientoldDeviceSerialNumber)
 					.setParameter("pat_new_device_serial_number", inPatientNewDeviceSerialNumber)
-					.setParameter("pat_bluetooth_id", inPatientNewDeviceSerialNumber)
+					.setParameter("pat_bluetooth_id", inBluetoothID)
 					.setParameter("pat_hub_id", inHubID)
 					.setParameter("pat_created_by", inPatientCreatedBy)
 					.executeUpdate();

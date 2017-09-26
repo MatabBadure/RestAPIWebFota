@@ -1218,6 +1218,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					managePatientDevice(patientInfoDTO);
 									
 					patientInfoDTO.setOperation_type("CREATE");
+					patientInfoDTO.setOld_patient_id(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceTypeInactive(patientInfoDTO.getSerial_num(),"VEST").get().getPatientId());
+					
 					managePatientDeviceAssociationMonarch(patientInfoDTO);
 										
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
@@ -1694,6 +1696,7 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 
 			try{
 				patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				JSONObject returnValues = managePatientUser(patientInfoDTO);
 				patientInfoDTO.setPatient_id(returnValues.get("return_patient_id").toString());
 				patientInfoDTO.setPatient_user_id(returnValues.get("return_user_id").toString());
@@ -1930,6 +1933,7 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					managePatientDeviceMonarch(patientInfoDTO);
 					
 					patientInfoDTO.setOperation_type("CREATE");
+					patientInfoDTO.setOld_patient_id(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceTypeInactive(patientInfoDTO.getSerial_num(),"MONARCH").get().getPatientId());
 					managePatientDeviceAssociation(patientInfoDTO);
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());

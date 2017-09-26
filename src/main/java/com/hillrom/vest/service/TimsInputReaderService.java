@@ -130,9 +130,9 @@ public class TimsInputReaderService {
 		    	
 		    	/*If the new monarch device added is  one without connectvity then ensure that 
 		    	you dont create a combo patient in TIMS visiview code.*/
-		 	if(record.getBluetooth_id()!=null && (!record.getBluetooth_id().isEmpty()))
+		 /*	if(record.getBluetooth_id()!=null && (!record.getBluetooth_id().isEmpty()))
 		    	{
-			    	
+			    	*/
 
 				      	if(!timsService.CASE1_NeitherPatientNorDeviceExist_MONARCH(record)){
 					    	if(!timsService.CASE3_PatientHasVisivestAddMonarch_MONARCH(record)){
@@ -154,11 +154,11 @@ public class TimsInputReaderService {
 
 
 
-		    	}else{
+		    /*	}else{
 		    		monarchBluetoothFlag = false;
 		    		log.debug("Created       " +record.getTims_cust()+ "        " +record.getSerial_num()+ "        "+"Failure"+ "        "
 							+ "Bluetooth Id / Connectivity Id is not present");
-		    	}
+		    	}*/
 		    }
 		}
 		if(!CSVFileFlag)
@@ -204,7 +204,8 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{        
-		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
+		 //  String csvFile = "C:/home/brett/flat_file_script/flatfile.csv";
+		     String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
 		      File flatFile = new File(csvFile);
 		      if(!flatFile.exists()) { 
 		    	  log.debug("Failure        NA               NA             Failure           The csv file is not present ");

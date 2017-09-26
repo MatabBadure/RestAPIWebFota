@@ -204,8 +204,8 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{        
-		 //  String csvFile = "C:/home/brett/flat_file_script/flatfile.csv";
-		     String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
+		 // String csvFile = "C:/home/brett/flat_file_script/flatfile.csv";
+		    String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
 		      File flatFile = new File(csvFile);
 		      if(!flatFile.exists()) { 
 		    	  log.debug("Failure        NA               NA             Failure           The csv file is not present ");

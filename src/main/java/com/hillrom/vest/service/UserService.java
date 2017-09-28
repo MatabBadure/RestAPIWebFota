@@ -1586,41 +1586,41 @@ public class UserService {
 			aut = (Authority) itr.next();
 			//System.out.println(aut.getName());
 		}
-		if(aut.getName().equals(FOTA_ADMIN) ||aut.getName().equals(FOTA_APPROVER) || (aut.getName().equals(ADMIN) && user.getUserPatientAssoc().isEmpty())){
+		
+		if(!user.getUserPatientAssoc().isEmpty()){
+
+			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
+
+			List<PatientDevicesAssoc> patientDevicesAssocList = patientDevicesAssocRepository
+					.findByPatientId(patientInfo.getId());
+			// Garment Changes :Looping through the patient devices
+			for (PatientDevicesAssoc device : patientDevicesAssocList) {
+				if (device.getDeviceType().equals(VEST)) {
+					user.setVestGarmentColor(device.getGarmentColor());
+					user.setVestGarmentSize(device.getGarmentSize());
+					user.setVestGarmentType(device.getGarmentType());
+				} else if (device.getDeviceType().equals(MONARCH)) {
+					user.setMonarchGarmentColor(device.getGarmentColor());
+					user.setMonarchGarmentSize(device.getGarmentSize());
+					user.setMonarchGarmentType(device.getGarmentType());
+					}
+				}
 			if (Objects.nonNull(user)) {
 				return user;
 			} else {
 				throw new HillromException(ExceptionConstants.HR_512);// No such
 																		// user
 																		// exist
-			}
-		}else{
-		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
-
-		List<PatientDevicesAssoc> patientDevicesAssocList = patientDevicesAssocRepository
-				.findByPatientId(patientInfo.getId());
-		// Garment Changes :Looping through the patient devices
-		for (PatientDevicesAssoc device : patientDevicesAssocList) {
-			if (device.getDeviceType().equals(VEST)) {
-				user.setVestGarmentColor(device.getGarmentColor());
-				user.setVestGarmentSize(device.getGarmentSize());
-				user.setVestGarmentType(device.getGarmentType());
-			} else if (device.getDeviceType().equals(MONARCH)) {
-				user.setMonarchGarmentColor(device.getGarmentColor());
-				user.setMonarchGarmentSize(device.getGarmentSize());
-				user.setMonarchGarmentType(device.getGarmentType());
 				}
-			}
-		if (Objects.nonNull(user)) {
-			return user;
-		} else {
-			throw new HillromException(ExceptionConstants.HR_512);// No such
-																	// user
-																	// exist
-			}
+		}else{
+			if (Objects.nonNull(user)) {
+				return user;
+			} else {
+				throw new HillromException(ExceptionConstants.HR_512);// No such
+																		// user
+																		// exist
+				}
 		}
-		
-
 	}
 
 	public UserPatientAssoc createCaregiverUser(Long patientUserId, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException {

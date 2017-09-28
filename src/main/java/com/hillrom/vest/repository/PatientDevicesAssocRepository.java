@@ -27,6 +27,9 @@ public interface PatientDevicesAssocRepository extends JpaRepository<PatientDevi
 	@Query("from PatientDevicesAssoc where patientId = ?1 and isActive=1")	 
 	List<PatientDevicesAssoc> findByPatientId(String patientId);
 	
+	@Query("from PatientDevicesAssoc where patientId = ?1")	 
+	List<PatientDevicesAssoc> findByPatientIdActiveInactive(String patientId);
+	
 	@Query("from PatientDevicesAssoc where oldPatientId = ?1 and isActive=1 ")	 
 	List<PatientDevicesAssoc> findByOldPatientId(String oldPatientId);
 	
@@ -34,24 +37,31 @@ public interface PatientDevicesAssocRepository extends JpaRepository<PatientDevi
 	@Query("from PatientDevicesAssoc PDA where PDA.patientId = ?1 and deviceType=?2 and isActive=1")
 	PatientDevicesAssoc findOneByPatientIdAndDeviceType(String patientId, String deviceType);
 	
- /*
 	@Query("from PatientDevicesAssoc PDA where PDA.hillromId = ?1 and isActive=1")
 	Optional<PatientDevicesAssoc> findByHillromId(String hillromId);
-	*/
-
-	@Query(nativeQuery=true,value=" SELECT * from PATIENT_DEVICES_ASSOC where hillrom_id=:hillromId and is_active=1 LIMIT 1")
-	Optional<PatientDevicesAssoc> findByHillromId(@Param("hillromId")String hillromId);
 	
 	@Query("from PatientDevicesAssoc PDA where PDA.hillromId = ?1 and deviceType=?2 and isActive=1")
 	Optional<PatientDevicesAssoc> findByHillromIdAndDeviceType(String hillromId, String deviceType);
 	
+	@Query("from PatientDevicesAssoc PDA where PDA.hillromId = ?1 and deviceType=?2")
+	Optional<PatientDevicesAssoc> findByHillromIdAndDeviceTypeActiveInactive(String hillromId, String deviceType);
+	
 	@Query("from PatientDevicesAssoc PDA where PDA.serialNumber = ?1 and deviceType=?2 and isActive=1")
 	Optional<PatientDevicesAssoc> findOneBySerialNumberAndDeviceType(String deviceAddress, String deviceType);
+	
+	@Query("from PatientDevicesAssoc PDA where PDA.serialNumber = ?1 and deviceType=?2")
+	Optional<PatientDevicesAssoc> findOneBySerialNumberAndDeviceTypeActiveInactive(String deviceAddress, String deviceType);
+	
+	@Query("from PatientDevicesAssoc PDA where PDA.hillromId = ?1 and deviceType=?2 and patientType?3")
+	Optional<PatientDevicesAssoc> findByHillromIdAndDeviceTypeAndPatientType(String hillromId, String deviceType,String patientType);
 	
 	@Query("from PatientDevicesAssoc PDA where PDA.serialNumber = ?1 and deviceType=?2 and isActive=0")
 	Optional<PatientDevicesAssoc> findOneBySerialNumberAndDeviceTypeInactive(String deviceAddress, String deviceType);
 	
 	@Query("from PatientDevicesAssoc PDA where PDA.serialNumber = ?1 and PDA.hillromId = ?2 and deviceType=?3 and isActive=1")
 	Optional<PatientDevicesAssoc> findOneBySerialNumberAndHillromIdAndDeviceType(String deviceAddress, String hillromId, String deviceType);
+	
+	@Query("from PatientDevicesAssoc PDA where PDA.serialNumber = ?1 and PDA.hillromId = ?2 and deviceType=?3 and patientType=?4")
+	Optional<PatientDevicesAssoc> findOneBySerialNumberAndHillromIdAndDeviceTypeAndPatientType(String deviceAddress, String hillromId, String deviceType,String patientType);
 
 }

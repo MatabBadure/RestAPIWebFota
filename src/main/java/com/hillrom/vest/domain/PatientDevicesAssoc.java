@@ -51,6 +51,9 @@ public class PatientDevicesAssoc implements Serializable {
     @Column(name = "serial_number")
     private String serialNumber;
     
+    @Column(name = "hub_id")
+    private String hubId;
+    
     @Column(name = "hillrom_id")
     private String hillromId = null;
     
@@ -288,6 +291,21 @@ public class PatientDevicesAssoc implements Serializable {
 		this.modifiedDate = modifiedDate;
 	}
 
+	
+
+	/**
+	 * @return the hubId
+	 */
+	public String getHubId() {
+		return hubId;
+	}
+
+	/**
+	 * @param hubId the hubId to set
+	 */
+	public void setHubId(String hubId) {
+		this.hubId = hubId;
+	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -296,10 +314,21 @@ public class PatientDevicesAssoc implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((createdBy == null) ? 0 : createdBy.hashCode());
+		result = prime * result + ((createdDate == null) ? 0 : createdDate.hashCode());
 		result = prime * result + ((deviceType == null) ? 0 : deviceType.hashCode());
+		result = prime * result + ((garmentColor == null) ? 0 : garmentColor.hashCode());
+		result = prime * result + ((garmentSize == null) ? 0 : garmentSize.hashCode());
+		result = prime * result + ((garmentType == null) ? 0 : garmentType.hashCode());
+		result = prime * result + ((hillromId == null) ? 0 : hillromId.hashCode());
+		result = prime * result + ((hubId == null) ? 0 : hubId.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((isActive == null) ? 0 : isActive.hashCode());
+		result = prime * result + ((modifiedDate == null) ? 0 : modifiedDate.hashCode());
+		result = prime * result + ((oldPatientId == null) ? 0 : oldPatientId.hashCode());
 		result = prime * result + ((patientId == null) ? 0 : patientId.hashCode());
+		result = prime * result + ((patientType == null) ? 0 : patientType.hashCode());
+		result = prime * result + ((serialNumber == null) ? 0 : serialNumber.hashCode());
 		return result;
 	}
 
@@ -315,10 +344,45 @@ public class PatientDevicesAssoc implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		PatientDevicesAssoc other = (PatientDevicesAssoc) obj;
+		if (createdBy == null) {
+			if (other.createdBy != null)
+				return false;
+		} else if (!createdBy.equals(other.createdBy))
+			return false;
+		if (createdDate == null) {
+			if (other.createdDate != null)
+				return false;
+		} else if (!createdDate.equals(other.createdDate))
+			return false;
 		if (deviceType == null) {
 			if (other.deviceType != null)
 				return false;
 		} else if (!deviceType.equals(other.deviceType))
+			return false;
+		if (garmentColor == null) {
+			if (other.garmentColor != null)
+				return false;
+		} else if (!garmentColor.equals(other.garmentColor))
+			return false;
+		if (garmentSize == null) {
+			if (other.garmentSize != null)
+				return false;
+		} else if (!garmentSize.equals(other.garmentSize))
+			return false;
+		if (garmentType == null) {
+			if (other.garmentType != null)
+				return false;
+		} else if (!garmentType.equals(other.garmentType))
+			return false;
+		if (hillromId == null) {
+			if (other.hillromId != null)
+				return false;
+		} else if (!hillromId.equals(other.hillromId))
+			return false;
+		if (hubId == null) {
+			if (other.hubId != null)
+				return false;
+		} else if (!hubId.equals(other.hubId))
 			return false;
 		if (id == null) {
 			if (other.id != null)
@@ -330,10 +394,30 @@ public class PatientDevicesAssoc implements Serializable {
 				return false;
 		} else if (!isActive.equals(other.isActive))
 			return false;
+		if (modifiedDate == null) {
+			if (other.modifiedDate != null)
+				return false;
+		} else if (!modifiedDate.equals(other.modifiedDate))
+			return false;
+		if (oldPatientId == null) {
+			if (other.oldPatientId != null)
+				return false;
+		} else if (!oldPatientId.equals(other.oldPatientId))
+			return false;
 		if (patientId == null) {
 			if (other.patientId != null)
 				return false;
 		} else if (!patientId.equals(other.patientId))
+			return false;
+		if (patientType == null) {
+			if (other.patientType != null)
+				return false;
+		} else if (!patientType.equals(other.patientType))
+			return false;
+		if (serialNumber == null) {
+			if (other.serialNumber != null)
+				return false;
+		} else if (!serialNumber.equals(other.serialNumber))
 			return false;
 		return true;
 	}
@@ -344,7 +428,12 @@ public class PatientDevicesAssoc implements Serializable {
 	@Override
 	public String toString() {
 		return "PatientDevicesAssoc [id=" + id + ", patientId=" + patientId + ", deviceType=" + deviceType
-				+ ", isActive=" + isActive + "]";
+				+ ", isActive=" + isActive + ", serialNumber=" + serialNumber + ", hubId=" + hubId + ", hillromId="
+				+ hillromId + ", createdDate=" + createdDate + ", oldPatientId=" + oldPatientId + ", patientType="
+				+ patientType + ", modifiedDate=" + modifiedDate + ", createdBy=" + createdBy + ", garmentType="
+				+ garmentType + ", garmentSize=" + garmentSize + ", garmentColor=" + garmentColor + "]";
 	}
+
+
 
 }

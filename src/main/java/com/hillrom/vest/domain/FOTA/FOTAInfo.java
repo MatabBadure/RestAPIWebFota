@@ -9,25 +9,26 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Type;
-import org.hibernate.envers.Audited;
 import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @Entity
-@Audited
 @Table(name = "FOTA_INFO")
 public class FOTAInfo {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	
-	@Column(name="device_part_number")
+	@Size(max = 16)
+	@Column(name="device_part_number", length = 16)
 	private String devicePartNumber;
 	
-	@Column(name="software_version")
+	@Size(max = 8)
+	@Column(name="software_version", length = 8)
 	private String softVersion;
 	
 	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
@@ -54,25 +55,33 @@ public class FOTAInfo {
 	@Column(name="published_datetime")
 	private DateTime publishedDateTime;
 	
-	@Column(name="model_id")
+	
+	@Size(max = 2)
+	@Column(name="model_id", length = 2)
 	private String modelId;
 	
-	@Column(name="board_id")
+	@Size(max = 2)
+	@Column(name="board_id", length = 2)
 	private String boardId;
 	
-	@Column(name="bed_id")
+	@Size(max = 2)
+	@Column(name="bed_id", length = 2)
 	private String bedId;
 
-	@Column(name="boot_comp_ver")
+	@Size(max = 2)
+	@Column(name="boot_comp_ver", length = 2)
 	private String bootCompVer;
 	
-	@Column(name="fill_pattern")
+	@Size(max = 8)
+	@Column(name="fill_pattern", length = 8)
 	private String fillPattern;
 	
-	@Column(name="MCU_size")
+	@Size(max = 8)
+	@Column(name="MCU_size", length = 8)
 	private String MCUSize;
 	
-	@Column(name="release_number")
+	@Size(max = 8)
+	@Column(name="release_number", length = 8)
 	private String releaseNumber;
 	
 	@Column(name="soft_delete_flag")
@@ -84,22 +93,25 @@ public class FOTAInfo {
 	@Column(name="delete_request_flag")
 	private boolean deleteRequestFlag;
 	
-	@Column(name="Region1_Start_Address")
+	@Size(max = 8)
+	@Column(name="Region1_Start_Address", length = 8)
 	private String region1StartAddress = "";
 	
-	@Column(name="Region1_End_Address")
+	@Size(max = 8)
+	@Column(name="Region1_End_Address", length = 8)
 	private String region1EndAddress = "";
 	
-	@Column(name="Region1_CRC_Location")
+	@Size(max = 8)
+	@Column(name="Region1_CRC_Location", length = 8)
 	private String region1CRCLocation = "";
 	
-	@Column(name="Region2_Start_Address")
+	@Column(name="Region2_Start_Address", length = 8)
 	private String region2StartAddress = "";
 	
-	@Column(name="Region2_End_Address")
+	@Column(name="Region2_End_Address", length = 8)
 	private String region2EndAddress = "";
 	
-	@Column(name="Region2_CRC_Location")
+	@Column(name="Region2_CRC_Location", length = 8)
 	private String region2CRCLocation = "";
 
 	@Transient

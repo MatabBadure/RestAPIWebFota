@@ -6,13 +6,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Type;
-import org.hibernate.envers.Audited;
 import org.joda.time.DateTime;
 
 @Entity
-@Audited
 @Table(name = "FOTA_DEVICE_FWARE_UPDATE_LOG")
 public class FOTADeviceFWareUpdate {
 	@Id
@@ -22,20 +21,23 @@ public class FOTADeviceFWareUpdate {
 	@Column(name = "fota_info_id")
 	private Long fotaInfoId;
 	
-	@Column(name = "device_serial_number")
+	@Size(max = 10)
+	@Column(name="device_serial_number", length = 10)
 	private String  deviceSerialNumber;
 	
 	@Column(name = "connection_type")
 	private String  connectionType;
 	
-	@Column(name="device_software_version")
+	@Size(max = 8)
+	@Column(name="device_software_version", length = 8)
 	private String deviceSoftVersion;
 	
 	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name="device_software_date_time")
 	private DateTime deviceSoftwareDateTime;
     
-    @Column(name="updated_software_version")
+	@Size(max = 8)
+    @Column(name="updated_software_version", length = 8)
 	private String updatedSoftVersion;
 	
 	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")

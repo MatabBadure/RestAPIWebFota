@@ -71,5 +71,6 @@ public final class FOTAConstants {
 	//FOTA roles
 	public static final String FOTA_APPROVER = "FOTA_APPROVER";
 	public static final String FOTA_ADMIN = "FOTA_ADMIN";
+	public static final String ADMIN = "ADMIN";
 	
 }

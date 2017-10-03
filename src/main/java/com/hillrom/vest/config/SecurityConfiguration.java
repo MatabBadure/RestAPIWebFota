@@ -106,16 +106,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/validateResetKey").permitAll()
              //FOTA API
             .antMatchers("/api/FOTA").permitAll()
-            .antMatchers("/api/FOTA/uploadFile").permitAll()
-            .antMatchers("/api/FOTA/create").permitAll()
-            .antMatchers("/api/FOTAList").permitAll()
-            .antMatchers("/api/FOTADeviceList").permitAll()
-            .antMatchers("/api/FOTA/CRC32Calculation").permitAll()
-            .antMatchers("/api/FOTA/{id}/getFirmware").permitAll()
-            .antMatchers("/api/FOTA/validateApproverCRC32").permitAll()
-            .antMatchers("/api/FOTA/{id}/{userRole}/firmwareDelete").permitAll()
-            .antMatchers("/api/FOTA/{id}/download").permitAll()
-           
             .antMatchers("/api/users/{id}/exportVestDeviceData").authenticated()
             .antMatchers("/api/users/{id}/exportVestDeviceDataCSV").authenticated()
             .antMatchers("/api/users/{id}/exportTherapyData").authenticated()
@@ -161,6 +151,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/survey/{id}/graph").authenticated()      
             .antMatchers("/api/retrieveLogData/logs").permitAll()
             .antMatchers("/api/executeTIMSJob").hasAuthority(AuthoritiesConstants.ADMIN)
+            //Configuration for FOTA
+            ///.antMatchers("/api/FOTA").authenticated()
+            .antMatchers("/api/FOTA/uploadFile").authenticated()
+            .antMatchers("/api/FOTA/create").authenticated()
+            .antMatchers("/api/FOTAList").authenticated()
+            .antMatchers("/api/FOTADeviceList").authenticated()
+            .antMatchers("/api/FOTA/CRC32Calculation").authenticated()
+            .antMatchers("/api/FOTA/{id}/getFirmware").authenticated()
+            .antMatchers("/api/FOTA/validateApproverCRC32").authenticated()
+            .antMatchers("/api/FOTA/{id}/{userRole}/firmwareDelete").authenticated()
+            .antMatchers("/api/FOTA/{id}/download").authenticated()
            
         .and()
             .apply(securityConfigurerAdapter());

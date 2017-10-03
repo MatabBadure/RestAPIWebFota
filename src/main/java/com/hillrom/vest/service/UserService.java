@@ -1,8 +1,8 @@
 package com.hillrom.vest.service;
 
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
-import static com.hillrom.vest.config.Constants.VEST;
 import static com.hillrom.vest.config.Constants.MONARCH;
+import static com.hillrom.vest.config.Constants.VEST;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

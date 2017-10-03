@@ -3,9 +3,6 @@ package com.hillrom.vest.service;
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
 import static com.hillrom.vest.config.Constants.MONARCH;
 import static com.hillrom.vest.config.Constants.VEST;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.ADMIN;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.FOTA_ADMIN;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.FOTA_APPROVER;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -13,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -1574,10 +1570,11 @@ public class UserService {
 	}
 
 	public User getUser(Long id) throws HillromException {
-		
-		
 		User user = userRepository.findOne(id);
-			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
+
+		PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
+
+		if(Objects.nonNull(patientInfo)){
 			List<PatientDevicesAssoc> patientDevicesAssocList = patientDevicesAssocRepository
 					.findByPatientId(patientInfo.getId());
 			// Garment Changes :Looping through the patient devices
@@ -1590,14 +1587,18 @@ public class UserService {
 					user.setMonarchGarmentColor(device.getGarmentColor());
 					user.setMonarchGarmentSize(device.getGarmentSize());
 					user.setMonarchGarmentType(device.getGarmentType());
-					}
 				}
-			if (Objects.nonNull(user)) {
-				return user;
-			} else {
-				throw new HillromException(ExceptionConstants.HR_512);// No such
-																		// user
-				}
+			}
+		}
+
+		if (Objects.nonNull(user)) {
+			return user;
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);// No such
+																	// user
+																	// exist
+		}
+
 	}
 
 	public UserPatientAssoc createCaregiverUser(Long patientUserId, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException {

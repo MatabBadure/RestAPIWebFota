@@ -106,17 +106,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/validateResetKey").permitAll()
              //FOTA API
             .antMatchers("/api/FOTA").permitAll()
-            /*
-            .antMatchers("/api/FOTA/uploadFile").permitAll()
-            .antMatchers("/api/FOTA/create").permitAll()
-            .antMatchers("/api/FOTAList").permitAll()
-            .antMatchers("/api/FOTADeviceList").permitAll()
-            .antMatchers("/api/FOTA/CRC32Calculation").permitAll()
-            .antMatchers("/api/FOTA/{id}/getFirmware").permitAll()
-            .antMatchers("/api/FOTA/validateApproverCRC32").permitAll()
-            .antMatchers("/api/FOTA/{id}/{userRole}/firmwareDelete").permitAll()
-            .antMatchers("/api/FOTA/{id}/download").permitAll()*/
-           
             .antMatchers("/api/users/{id}/exportVestDeviceData").authenticated()
             .antMatchers("/api/users/{id}/exportVestDeviceDataCSV").authenticated()
             .antMatchers("/api/users/{id}/exportTherapyData").authenticated()

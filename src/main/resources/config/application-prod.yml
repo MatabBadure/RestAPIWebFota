@@ -45,6 +45,7 @@ spring:
         patientDashboardUrl: https://visiview-test.hill-rom.com
         careGiverDashboardUrl: https://visiview-test.hill-rom.com
         baseUrl: https://visiview-test.hill-rom.com
+        fotaBaseUrl: http://fota.hillromvest.com
         accountActivationReminderInterval: 72
     survey:
 

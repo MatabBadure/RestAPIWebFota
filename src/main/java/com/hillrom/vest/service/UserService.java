@@ -1577,20 +1577,7 @@ public class UserService {
 		
 		
 		User user = userRepository.findOne(id);
-		//Admin profile changes for FOTA Application
-		Set<Authority> authority = user.getAuthorities();
-		
-		Iterator itr = authority.iterator();
-		Authority aut = null;
-		while(itr.hasNext()){
-			aut = (Authority) itr.next();
-			//System.out.println(aut.getName());
-		}
-		
-		if(!user.getUserPatientAssoc().isEmpty()){
-
 			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(user);
-
 			List<PatientDevicesAssoc> patientDevicesAssocList = patientDevicesAssocRepository
 					.findByPatientId(patientInfo.getId());
 			// Garment Changes :Looping through the patient devices
@@ -1610,17 +1597,7 @@ public class UserService {
 			} else {
 				throw new HillromException(ExceptionConstants.HR_512);// No such
 																		// user
-																		// exist
 				}
-		}else{
-			if (Objects.nonNull(user)) {
-				return user;
-			} else {
-				throw new HillromException(ExceptionConstants.HR_512);// No such
-																		// user
-																		// exist
-				}
-		}
 	}
 
 	public UserPatientAssoc createCaregiverUser(Long patientUserId, UserExtensionDTO userExtensionDTO, String baseUrl) throws HillromException {

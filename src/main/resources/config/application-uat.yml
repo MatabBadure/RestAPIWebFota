@@ -45,6 +45,7 @@ spring:
         patientDashboardUrl: http://indoffshre01v.hillromvest.com
         careGiverDashboardUrl: http://indoffshre01v.hillromvest.com
         baseUrl: http://indoffshre01v.hillromvest.com
+        fotaBaseUrl: http://fota.hillromvest.com
         accountActivationReminderInterval: 72
     survey:
         surveyreportemailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com

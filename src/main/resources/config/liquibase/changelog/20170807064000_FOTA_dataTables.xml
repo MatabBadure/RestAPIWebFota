@@ -15,10 +15,10 @@
 			<column name="id" type="bigint(20)" autoIncrement="${autoIncrement}">
 				<constraints primaryKey="true" nullable="false" />
 			</column>
-			<column name="device_part_number" type="varchar(16)">
+			<column name="device_part_number" type="varchar(255)">
 				<constraints nullable="false" />
 			</column>
-			<column name="software_version" type="varchar(8)">
+			<column name="software_version" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
 			<column name="release_date" type="timestamp">
@@ -44,26 +44,26 @@
 			<column name="published_datetime" type="timestamp">
 				<constraints nullable="true" />
 			</column>
-			<column name="model_id" type="varchar(2)">
+			<column name="model_id" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
-			<column name="board_id" type="varchar(2)">
+			<column name="board_id" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
-			<column name="bed_id" type="varchar(2)">
+			<column name="bed_id" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
-			<column name="boot_comp_ver" type="varchar(2)">
+			<column name="boot_comp_ver" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
-			<column name="fill_pattern" type="varchar(8)">
+			<column name="fill_pattern" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
-			<column name="MCU_size" type="varchar(8)">
+			<column name="MCU_size" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
 
-			<column name="release_number" type="varchar(8)">
+			<column name="release_number" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
 
@@ -79,22 +79,22 @@
 				<constraints nullable="false" />
 			</column>
 			
-			<column name="Region1_Start_Address" type="varchar(8)">
+			<column name="Region1_Start_Address" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
-			<column name="Region1_End_Address" type="varchar(8)">
+			<column name="Region1_End_Address" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
-			<column name="Region1_CRC_Location" type="varchar(8)">
+			<column name="Region1_CRC_Location" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
-			<column name="Region2_Start_Address" type="varchar(8)">
+			<column name="Region2_Start_Address" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
-			<column name="Region2_End_Address" type="varchar(8)">
+			<column name="Region2_End_Address" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
-			<column name="Region2_CRC_Location" type="varchar(8)">
+			<column name="Region2_CRC_Location" type="varchar(255)">
 				<constraints nullable="false" />
 			</column>
 
@@ -107,7 +107,7 @@
 			<column name="fota_info_id" type="bigint(20)">
 				<constraints nullable="false" />
 			</column>
-			<column name="device_serial_number" type="varchar(10)">
+			<column name="device_serial_number" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
 
@@ -115,7 +115,7 @@
 				<constraints nullable="true" />
 			</column>
 
-			<column name="device_software_version" type="varchar(8)">
+			<column name="device_software_version" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
 			
@@ -123,7 +123,7 @@
 				<constraints nullable="false" />
 			</column>
 
-			<column name="updated_software_version" type="varchar(8)">
+			<column name="updated_software_version" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
 

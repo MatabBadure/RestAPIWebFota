@@ -6,7 +6,7 @@
 	
     <changeSet author="jhipster" id="20170814021114">
     	<loadUpdateData encoding="UTF-8"
-		file="config/liquibase/csa_authority_20170814021114.csv" tableName="AUTHORITY" primaryKey="name">
+		file="config/liquibase/fota_authority_20170814021114.csv" tableName="AUTHORITY" primaryKey="name">
    	</loadUpdateData>
     </changeSet>
 </databaseChangeLog>

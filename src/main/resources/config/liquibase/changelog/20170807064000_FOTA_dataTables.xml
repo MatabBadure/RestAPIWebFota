@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<property name="now" value="now()" dbms="mysql,h2" />
+	<property name="now" value="current_timestamp" dbms="postgresql" />
+	<property name="now" value="sysdate" dbms="oracle" />
+
+	<property name="autoIncrement" value="true" dbms="mysql,h2,postgresql" />
+	<property name="autoIncrement" value="false" dbms="oracle" />
+
+	<changeSet id="20170807064000" author="LnT Technology Services">
+		<createTable tableName="FOTA_INFO">
+			<column name="id" type="bigint(20)" autoIncrement="${autoIncrement}">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="device_part_number" type="varchar(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="software_version" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="release_date" type="timestamp">
+				<constraints nullable="false" />
+			</column>
+			<column name="product_Type" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="file_path" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="upload_user" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="upload_datetime" type="timestamp">
+				<constraints nullable="true" />
+			</column>
+
+			<column name="published_user" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+
+			<column name="published_datetime" type="timestamp">
+				<constraints nullable="true" />
+			</column>
+			<column name="model_id" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="board_id" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="bed_id" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="boot_comp_ver" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="fill_pattern" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="MCU_size" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+
+			<column name="release_number" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+
+			<column name="soft_delete_flag" type="boolean" value="false">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="active_published_flag" type="boolean" value="false">
+				<constraints nullable="false" />
+			</column>
+			
+			<column name="delete_request_flag" type="boolean" value="false">
+				<constraints nullable="false" />
+			</column>
+			
+			<column name="Region1_Start_Address" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="Region1_End_Address" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="Region1_CRC_Location" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="Region2_Start_Address" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="Region2_End_Address" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="Region2_CRC_Location" type="varchar(255)">
+				<constraints nullable="false" />
+			</column>
+
+		</createTable>
+
+		<createTable tableName="FOTA_DEVICE_FWARE_UPDATE_LOG">
+			<column name="id" type="bigint(20)" autoIncrement="${autoIncrement}">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="fota_info_id" type="bigint(20)">
+				<constraints nullable="false" />
+			</column>
+			<column name="device_serial_number" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+
+			<column name="connection_type" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+
+			<column name="device_software_version" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			
+			<column name="device_software_date_time" type="timestamp">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="updated_software_version" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+
+			<column name="checkupdate_date_time" type="timestamp">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="download_start_date_time" type="timestamp">
+				<constraints nullable="false" />
+			</column>
+			
+			<column name="download_end_date_time" type="timestamp">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="downloaded_status" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			
+
+		</createTable>
+		<addForeignKeyConstraint baseColumnNames="fota_info_id"
+			baseTableName="FOTA_DEVICE_FWARE_UPDATE_LOG" constraintName="fk_fota_id"
+			referencedColumnNames="id" referencedTableName="FOTA_INFO" />
+
+	</changeSet>
+
+</databaseChangeLog>

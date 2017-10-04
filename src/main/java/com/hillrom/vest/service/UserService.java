@@ -38,6 +38,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.monarch.service.NoteServiceMonarch;
+import com.hillrom.monarch.service.PatientComplianceMonarchService;
 import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.Clinic;
@@ -68,8 +70,6 @@ import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.OnCredentialsChangeEvent;
 import com.hillrom.vest.security.SecurityUtils;
-import com.hillrom.vest.service.monarch.NoteServiceMonarch;
-import com.hillrom.vest.service.monarch.PatientComplianceMonarchService;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.service.util.RequestUtil;
 import com.hillrom.vest.util.ExceptionConstants;

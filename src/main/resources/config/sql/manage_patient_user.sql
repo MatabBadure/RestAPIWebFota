@@ -51,7 +51,7 @@ BEGIN
 	IF operation_type_indicator = 'CREATE' THEN
     
 		SELECT `serial_number` INTO temp_serial_number FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number and `is_active` = 1;
-        
+		        
 		-- When Hillrom id already exists
         IF temp_serial_number IS NOT NULL THEN
 			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Patient with same device serial number already exits.';
@@ -61,6 +61,9 @@ BEGIN
         -- Get Hillrom ID
 		call get_next_patient_hillromid(@gen_patient_id);
 		SET created_date = now();
+        
+        SELECT `primary_city`,`state` INTO pat_city,pat_state FROM `CITY_STATE_ZIP_MAP` WHERE `zip` = pat_zipcode;
+        
         
 		INSERT INTO `PATIENT_INFO` (`id`, `hillrom_id`, `hub_id`, `serial_number`, `bluetooth_id`, `title`, `first_name`, `middle_name`,
 		`last_name`, `dob`, `email`, `zipcode`, `web_login_created`, `primary_phone`, `mobile_phone`, `gender`, `lang_key`, `expired`, 
@@ -128,9 +131,12 @@ BEGIN
 		SELECT `patient_id` INTO return_patient_id FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number;
 		SELECT `user_id` INTO return_user_id FROM `USER_PATIENT_ASSOC` WHERE `patient_id`= return_patient_id AND `user_role`= 'PATIENT';
         
+        
         IF return_patient_id IS NULL THEN
 			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Patient with given device number does not exist.';
 		END IF;
+    
+    	SELECT `primary_city`,`state` INTO pat_city,pat_state FROM `CITY_STATE_ZIP_MAP` WHERE `zip` = pat_zipcode;
     
 		START TRANSACTION;
 		UPDATE `PATIENT_INFO`   SET

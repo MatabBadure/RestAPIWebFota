@@ -7,9 +7,6 @@ CREATE DEFINER=`root`@`%` FUNCTION `str_random_date`(p_date_start VARCHAR(20)
 BEGIN
     /**
     * String function. Returns a random date string
-    * <br>
-    * %author Ronald Speelman
-    * %version 1.0
     * Example usage:
     * SELECT str_random_date('1980-01-01','2012-01-01','%Y-%m-%d') AS MysqlDate;
     * See more complex examples and a description on www.moinne.com/blog/ronald

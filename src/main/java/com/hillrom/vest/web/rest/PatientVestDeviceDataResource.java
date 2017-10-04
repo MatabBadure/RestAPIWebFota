@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hillrom.monarch.service.PatientVestDeviceDataServiceMonarch;
 import com.hillrom.vest.domain.ChargerData;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.UserExtension;
@@ -36,7 +37,6 @@ import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.ChargerDataService;
 import com.hillrom.vest.service.PatientVestDeviceDataService;
-import com.hillrom.vest.service.monarch.PatientVestDeviceDataServiceMonarch;
 import com.hillrom.vest.service.util.ParserUtil;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.util.PaginationUtil;

@@ -29,14 +29,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hillrom.monarch.service.NoteServiceMonarch;
 import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.NoteMonarch;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.NoteService;
-import com.hillrom.vest.service.monarch.NoteServiceMonarch;
-import com.hillrom.vest.service.monarch.NoteServiceMonarch;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.web.rest.dto.NoteDTO;
 import com.hillrom.vest.web.rest.dto.UserDTO;

@@ -4,9 +4,6 @@ CREATE DEFINER=`root`@`%` FUNCTION `str_random`(p_pattern VARCHAR(200)) RETURNS 
 BEGIN
     /**
     * String function. Returns a random string based on a mask
-    * <br>
-    * %author Ronald Speelman
-    * %version 2.3
     * Example usage:
     * SELECT str_random('dddd CC') AS DutchZipCode;
     * SELECT str_random('d{4} C{2}') AS DutchZipCode;

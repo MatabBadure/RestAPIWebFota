@@ -34,6 +34,7 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.YES;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.text.ParseException;
@@ -95,7 +96,8 @@ public class FOTAService {
 	private static Map<String,PartNoHolder> partNosBin = new LinkedHashMap<String, PartNoHolder>();
 	private static Map<String,HandleHolder> handleHolderBin = new LinkedHashMap<String, HandleHolder>();
 	private PartNoHolder partNoHolder;
-
+	
+	@Transactional
 	public String FOTAUpdate(String rawMessage) throws Exception {
 		int countInt = 0;
 		String decoded_string = "";
@@ -925,7 +927,7 @@ public class FOTAService {
 			int val = decoded[i] & 0xFF;
 			sout = sout + val + " ";
 		}
-		log.debug("Input Byte Array :" + sout);
+		log.error("Input Byte Array :" + sout);
 		decoded_string = new String(decoded);
 		log.error("Decoded value is " + decoded_string);
 		return decoded_string;
@@ -938,6 +940,7 @@ public class FOTAService {
 	 * @return
 	 * @throws ParseException
 	 */
+	@Transactional
 	public FOTAInfo savFotaInfoData(FOTAInfoDto fotaInfoDto, String baseUrl)
 			throws ParseException {
 		//check is existing if yes update to inactive pending
@@ -1021,6 +1024,7 @@ public class FOTAService {
 	 * @param isAscending
 	 * @return
 	 */
+	@Transactional
 	public List<FOTADeviceDto> getFOTADeviceList(String status, String searchString, String sortBy, boolean isAscending) {
 
 		List<FOTADeviceDto> FOTADeviceDtoList = null;
@@ -1133,6 +1137,7 @@ public class FOTAService {
 	 * @param isAscending
 	 * @return
 	 */
+	@Transactional
 	public List<FOTAInfo> FOTAList(String status, String searchString, String sortBy, boolean isAscending) {
 		List<FOTAInfo> FOTAInfoList = null;
 		
@@ -1318,8 +1323,8 @@ public class FOTAService {
 	 * @return
 	 * @throws Exception
 	 */
-	@SuppressWarnings("resource")
-	public boolean CRC32Calculation(CRC32Dto crc32Dt0) throws Exception {
+	@Transactional
+	public boolean CRC32Calculation(CRC32Dto crc32Dt0){
 	    boolean eof = false;
 	    boolean result = false;
 	    int recordIdx = 0;
@@ -1337,6 +1342,8 @@ public class FOTAService {
 
 	    ByteArrayOutputStream crcData = new ByteArrayOutputStream();
 	    ByteArrayOutputStream crcData2 = new ByteArrayOutputStream();
+	    InputStreamReader isr = null;
+	    BufferedReader rdr =  null;
 
 	    int record_length;
 	    int record_address;
@@ -1344,6 +1351,7 @@ public class FOTAService {
 	    
 	    FileInputStream fs = null;
 	    
+	    try{
 	    
 		if (StringUtils.isNotEmpty(crc32Dt0.getRegion1StartAddress())) {
 			crcStartAddress = Long.parseLong(crc32Dt0.getRegion1StartAddress(),16);
@@ -1366,23 +1374,28 @@ public class FOTAService {
 			crc2LocationAddress = Long.parseLong(crc32Dt0.getRegion2CRCLocation(),16);
 		}
 		
-	    
-		
 		fs = new FileInputStream(crc32Dt0.getFilePath());
-		
-	    InputStreamReader isr = new InputStreamReader(fs);
-	    BufferedReader rdr =  new BufferedReader(isr);
+	    isr = new InputStreamReader(fs);
+	    rdr =  new BufferedReader(isr);
         eof = false;
         recordIdx = 1;
         upperAddress = 0;
         String recordStr;
         while ((recordStr = rdr.readLine()) != null) {
             if (eof) {
-                throw new Exception("Data after eof (" + recordIdx + ")");
+                try {
+					throw new Exception("Data after eof (" + recordIdx + ")");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
             }
 
             if (!recordStr.startsWith(":")) {
-                throw new Exception("Invalid Intel HEX record (" + recordIdx + ")");
+                try {
+					throw new Exception("Invalid Intel HEX record (" + recordIdx + ")");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
             }
 
             int lineLength = recordStr.length();
@@ -1397,16 +1410,23 @@ public class FOTAService {
             sum &= 0xff;
         	
             if (sum != 0) {
-                throw new Exception("Invalid checksum (" + recordIdx + ")");
+                try {
+					throw new Exception("Invalid checksum (" + recordIdx + ")");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
             }
 
             record_length = hexRecord[0];
             if ((record_length + 5) != hexRecord.length) {
-                throw new Exception("Invalid record length (" + recordIdx + ")");
+                try {
+					throw new Exception("Invalid record length (" + recordIdx + ")");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
             }
             record_data = new byte[record_length];
             System.arraycopy(hexRecord, 4, record_data, 0, record_length);
-    		
 
             record_address = ((hexRecord[1] & 0xFF) << 8) + (hexRecord[2] & 0xFF);
 
@@ -1488,14 +1508,22 @@ public class FOTAService {
                     if (record_length == 2) {
                         upperAddress = ((record_data[0] & 0xFF) << 12) +( ((record_data[1] & 0xFF)) << 4);
                     } else {
-                        throw new Exception("Invalid SEG record (" + recordIdx + ")");
+                        try {
+							throw new Exception("Invalid SEG record (" + recordIdx + ")");
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
                     }
                     break;                	
                 case 4:
                     if (record_length == 2) {
                         upperAddress = ((record_data[0] & 0xFF) << 24) +( ((record_data[1] & 0xFF)) << 16);
                     } else {
-                        throw new Exception("Invalid EXT_LIN record (" + recordIdx + ")");
+                        try {
+							throw new Exception("Invalid EXT_LIN record (" + recordIdx + ")");
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
                     }
                     break;
                 default:
@@ -1503,11 +1531,8 @@ public class FOTAService {
             }
             recordIdx++;
         };
-        rdr.close();
-        isr.close();
-        fs.close();
         
-        // CRC Calculation Table initialize
+    // CRC Calculation Table initialize
     int crc;
     int i;
     if(crcStartAddress != 0){
@@ -1544,7 +1569,7 @@ public class FOTAService {
         crc = crc ^ 0xffffffff;
 
 		result = (crc == crcValueInFile);
-		crcData.close();
+		//crcData.close();
        log.debug("Calculated Region1CRC32: " + (String.format("0x%08X", crc)) + "In file :" + (String.format("0x%08X", (crcValueInFile))));
         
     }
@@ -1581,8 +1606,22 @@ public class FOTAService {
         crc = crc ^ 0xffffffff;
         log.debug("Calculated Region2CRC32: " + (String.format("0x%08X", crc)) + "In file :" + (String.format("0x%08X", (crc2ValueInFile))));
         result &= (crc == crc2ValueInFile);
-        crcData2.close();
-    }
+        //crcData2.close();
+    		}
+	    }catch(IOException ex){
+	    	ex.printStackTrace();
+	    }
+	    finally{
+	    	try {
+	    		rdr.close();
+	            isr.close();
+	            fs.close();
+	    		crcData.close();
+				crcData2.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}	
+	    }
 		return result;
 	}
 	
@@ -1591,6 +1630,7 @@ public class FOTAService {
 	 * @param id
 	 * @return
 	 */
+	@Transactional
 	public FOTAInfo getFirmwareDetails(Long id) {
 		FOTAInfo fotaInfo = null;
 		fotaInfo = fotaRepository.findOneById(id);
@@ -1618,6 +1658,7 @@ public class FOTAService {
 	 * @return
 	 * @throws Exception
 	 */
+	@Transactional
 	public boolean validateApproverCRC32(ApproverCRCDto apprDto)
 			throws Exception {
 		FOTAInfo fotaInfo = null;
@@ -1914,6 +1955,7 @@ public class FOTAService {
 	 * @param baseUrl
 	 * @return
 	 */
+	@Transactional
 	public FOTAInfo firmwareDelete(Long id, String userRole, String baseUrl) {
 		FOTAInfo fotaInfo = null;
 		fotaInfo = fotaRepository.findOneById(id);

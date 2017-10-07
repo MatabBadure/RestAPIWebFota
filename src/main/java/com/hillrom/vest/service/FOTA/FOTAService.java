@@ -204,6 +204,16 @@ public class FOTAService {
 								handleId = getHandleNumber();
 								handleHolderBin.put(handleId, holder);
 							} else {
+								//Remove failed CRC spawned object
+								//Initially 
+								HandleHolder holder = new HandleHolder();
+								//Get handle object based on handleId
+								holder = handleHolderBin.get(handleId);
+								//Frame key to get partNumber details
+								String storeChunk1 = holder.getPartNo().concat(":").concat(holder.getSoftwareVersion()).concat(":").concat(String.valueOf(holder.getChunkSize()));
+								//partNoHolder =  partNosBin.get(storeChunk1);
+								partNosBin.remove(storeChunk1);
+								
 								//Send email notification for CRC validation failed
 								sendCRCFailedNotification();
 								//Abort case
@@ -243,8 +253,17 @@ public class FOTAService {
 								//added new stmt
 								holder.setSoftwareVersion(fotaInfo.getSoftVersion());
 								handleId = getHandleNumber();
+								//spawned object time capture to identify the ideal download time to clean for performance
+								holder.setSpwanedObject(new DateTime());
 								handleHolderBin.put(handleId, holder);
 							} else {
+								//Initially 
+								HandleHolder holder = new HandleHolder();
+								//Get handle object based on handleId
+								holder = handleHolderBin.get(handleId);
+								//Frame key to get partNumber details
+								String storeChunk2 = holder.getPartNo().concat(":").concat(holder.getSoftwareVersion()).concat(":").concat(String.valueOf(holder.getChunkSize()));
+								partNosBin.remove(storeChunk2);
 								//Send email notification for CRC validation failed
 								sendCRCFailedNotification();
 								//Abort case

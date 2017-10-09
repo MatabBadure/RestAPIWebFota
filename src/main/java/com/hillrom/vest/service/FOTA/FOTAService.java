@@ -242,6 +242,7 @@ public class FOTAService {
 								holder.setPreviousChunkTransStatus("CheckUpdate");
 								//added new stmt
 								holder.setSoftwareVersion(fotaInfo.getSoftVersion());
+								holder.setSpwanedObject(new DateTime());
 								handleId = getHandleNumber();
 								handleHolderBin.put(handleId, holder);
 							} else {
@@ -600,7 +601,7 @@ public class FOTAService {
 		
 			byte[] encoded = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(finalResponseStr));
 			String finalString1 = new String(encoded);
-			log.error("finalString1: " + finalString1);
+			log.debug("finalString1: " + finalString1);
 			return finalString1;
 		
 		
@@ -620,7 +621,7 @@ public class FOTAService {
 
 		byte[] getHandleByte = java.util.Base64.getDecoder().decode(rawMessage);
 		int deviceIndex = returnMatch(getHandleByte, DEV_VER_RAW);
-		log.error("str1: " + deviceIndex);
+		log.debug("str1: " + deviceIndex);
 		StringBuilder deviceRes = new StringBuilder();
 		String device1 = Integer.toHexString(getHandleByte[deviceIndex] & 0xFF);
 		String device2 = Integer
@@ -640,7 +641,7 @@ public class FOTAService {
 		deviceRes.append(device4);
 		//written new code
 		String deviceVer = FOTAParseUtil.toLittleEndian(deviceRes.toString());
-		log.error("deviceVer: " + deviceVer);
+		log.debug("deviceVer: " + deviceVer);
 		return deviceVer;
 	}
 
@@ -673,7 +674,7 @@ public class FOTAService {
 	    
 	    System.out.format("Inverted Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
 	    nCheckSum = nCheckSum & 0xFFFF;
-	    log.error("Total Value = " + nCheckSum);
+	    log.debug("Total Value = " + nCheckSum);
 	    nCheckSum = ((~nCheckSum)& 0xFFFF) + 1;
 	    System.out.format("Checksum Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
 
@@ -688,14 +689,14 @@ public class FOTAService {
 	private String getResponePairResult() {
 		
 		String getResponePairResult = FOTAParseUtil.asciiToHex(RESULT_EQ);
-		log.error("getResponePairResult: " + getResponePairResult);
+		log.debug("getResponePairResult: " + getResponePairResult);
 		//response.append("Yes");
 		return getResponePairResult;
 	}
 
 	private boolean validateCRC(String rawMessage) {
 		 
-		log.error("Inside  calculateCRC : " ,rawMessage);
+		log.debug("Inside  calculateCRC : " ,rawMessage);
 		  
 	    int nCheckSum = 0;
 
@@ -722,7 +723,7 @@ public class FOTAService {
 	    
 	    System.out.format("MSB = %d [0x%x]\r\n" ,nMSB, nMSB);
 	    System.out.format("LSB = %d [0x%x]\r\n" ,nLSB, nLSB);
-	    log.error("Total Value = " + nCheckSum);
+	    log.debug("Total Value = " + nCheckSum);
 	    nCheckSum = ((~nCheckSum)& 0xFFFF) + 1;
 	    System.out.format("Checksum Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
 	    
@@ -780,7 +781,7 @@ public class FOTAService {
 
 		byte[] getHandleByte = java.util.Base64.getDecoder().decode(rawMessage);
 		int handleIndex = returnMatch(getHandleByte, HANDLE_RAW);
-		log.error("str1: " + handleIndex);
+		log.debug("str1: " + handleIndex);
 		StringBuilder handleRes = new StringBuilder();
 		// handleRes.
 		String handle1 = Integer.toHexString(getHandleByte[handleIndex] & 0xFF);
@@ -803,7 +804,7 @@ public class FOTAService {
 		handleRes.append(handle4);
 		//written new code
 		String handleId = FOTAParseUtil.toLittleEndian(handleRes.toString());
-		log.error("handleId: " + handleId);
+		log.debug("handleId: " + handleId);
 		return handleId;
 	}
 
@@ -843,7 +844,7 @@ public class FOTAService {
 		response.append(AMPERSAND);
 		response.append(CRC_EQ);
 		String responePair3 = FOTAParseUtil.asciiToHex(response.toString());
-		log.error("responePair3: " + responePair3);
+		log.debug("responePair3: " + responePair3);
 		return responePair3;
 	}
 
@@ -854,7 +855,7 @@ public class FOTAService {
 	    totalChunkHexString = ("00000000" + totalChunkHexString).substring(totalChunkHexString.length());
 		//converting to little Indian
 	    String strTotalChunk = FOTAParseUtil.hexToAscii(FOTAParseUtil.asciiToHex(FOTAParseUtil.toLittleEndian((totalChunkHexString))));
-		log.error("strTotalChunk: " + strTotalChunk);
+		log.debug("strTotalChunk: " + strTotalChunk);
 		return strTotalChunk;
 	}
 
@@ -864,7 +865,7 @@ public class FOTAService {
 		response.append(AMPERSAND);
 		response.append(TOTAL_CHUNK);
 		String responePair2 = FOTAParseUtil.asciiToHex(response.toString());
-		log.error("responePair2: " + responePair2);
+		log.debug("responePair2: " + responePair2);
 		return responePair2;
 	}
 
@@ -876,7 +877,7 @@ public class FOTAService {
 		response.append(AMPERSAND);
 		response.append(HANDLE_EQ);
 		String responePair1 = FOTAParseUtil.asciiToHex(response.toString());
-		log.error("responePair1: " + responePair1);
+		log.debug("responePair1: " + responePair1);
 		return responePair1;
 	}
 
@@ -927,9 +928,9 @@ public class FOTAService {
 			int val = decoded[i] & 0xFF;
 			sout = sout + val + " ";
 		}
-		log.error("Input Byte Array :" + sout);
+		log.debug("Input Byte Array :" + sout);
 		decoded_string = new String(decoded);
-		log.error("Decoded value is " + decoded_string);
+		log.debug("Decoded value is " + decoded_string);
 		return decoded_string;
 	}
 
@@ -2031,7 +2032,7 @@ public class FOTAService {
 
 		byte[] getChunkByte = java.util.Base64.getDecoder().decode(rawMessage);
 		int chunkByteIndex = returnMatch(getChunkByte, CHUNK_SIZE_RAW);
-		log.error("chunkByteIndex: " + chunkByteIndex);
+		log.debug("chunkByteIndex: " + chunkByteIndex);
 		int chunkSizeValue = getChunkByte[chunkByteIndex] & 0xFF;
 		int chunkSizeValue1 = getChunkByte[chunkByteIndex + 1] & 0xFF;
 

@@ -1,7 +1,6 @@
 package com.hillrom.vest.web.rest.FOTA.dto;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -28,15 +27,11 @@ public class PartNoHolder {
 	private int chunkSize = 0;
 	private boolean abortFlag;
 	private static Map<Integer, String> fileChunks = null;
-
-	public static final byte[] CHUNK_SIZE = new byte[] { 38, 99, 104, 117, 110,
-			107, 83, 105, 122, 101, 61 };
 	private static final int HEX = 16;
-	
 	PartNoHolder partNoHolder = null;
 	
 	public PartNoHolder() {
-		// TODO Auto-generated constructor stub
+		// Default constructor
 	}
 	public PartNoHolder(int chunkSize, FOTAInfo fotaInfo){
 		partNoHolder = new PartNoHolder();
@@ -536,147 +531,6 @@ public class PartNoHolder {
 
 	public void setAbortFlag(boolean abortFlag) {
 		this.abortFlag = abortFlag;
-	}
-
-	private int readHexByteDataFromFile1(int chunkSize, FOTAInfo fotaInfo) {
-		int ctr = 0;
-		int totalChunk = 0;
-		String hexDataStr = "";
-		String[] output = null;
-		try {
-			Path pp = FileSystems.getDefault().getPath("D:/FOTA/Hex/Pendant/193165_charger_pendant.hex");
-			FileInputStream fis = new FileInputStream(pp.toFile());
-			log.debug("File Length :" + (int) pp.toFile().length());
-			byte[] byteArray = new byte[(int) pp.toFile().length()];
-			int len;
-			// Read bytes until EOF is encountered.
-			do {
-
-				len = fis.read(byteArray);
-
-				hexDataStr = getDataInHexString(byteArray);
-				log.debug("hexa String :" + hexDataStr);
-
-			} while (len != -1);
-
-			fis.close();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			log.error("Error in Ecoded bas64 data :" + ex.getMessage());
-		}
-
-		/*// Get Chunk Size from request
-		String chunkStr = getChunk(chunkSize);
-
-		// Decimal conversion
-		int chunkSize = hex2decimal(chunkStr);*/
-
-		output = hexDataStr.split("(?<=\\G.{" + (chunkSize * 2) + "})");
-		fileChunks = new LinkedHashMap<Integer, String>();
-		for (String str : output) {
-			fileChunks.put(ctr++, str);
-			log.debug("fileChunks :" + str);
-		}
-
-		// fileChunks.put(String.valueOf(chunkSize), fileChunkBasedOnSize);
-		totalChunk = fileChunks.size();
-		// totalChunk = fileChunkBasedOnSize.size()-1;
-		log.debug("totalChunk :" + totalChunk);
-		return totalChunk;
-	}
-
-	private int hex2decimal(String chunkStr) {
-
-		String digits = "0123456789ABCDEF";
-		chunkStr = chunkStr.toUpperCase();
-		int val = 0;
-		for (int i = 0; i < chunkStr.length(); i++) {
-			char c = chunkStr.charAt(i);
-			int d = digits.indexOf(c);
-			val = 16 * val + d;
-		}
-		return val;
-
-	}
-
-	private String getChunk(String rawMessage) {
-
-		byte[] getChunkByte = java.util.Base64.getDecoder().decode(rawMessage);
-		int chunkByteIndex = returnMatch(getChunkByte, CHUNK_SIZE);
-		log.error("chunkByteIndex: " + chunkByteIndex);
-		// StringBuilder handleRes = new StringBuilder();
-		// handleRes.
-		// handleRes.append(Integer.toHexString(getChunkByte[chunkSize] &
-		// 0xFF));
-		int chunkSizeValue = getChunkByte[chunkByteIndex] & 0xFF;
-		int chunkSizeValue1 = getChunkByte[chunkByteIndex + 1] & 0xFF;
-
-		String chunkSize1 = Integer.toHexString(chunkSizeValue);
-		String chunkSize2 = Integer.toHexString(chunkSizeValue1);
-
-		chunkSize1 = ("00" + chunkSize1).substring(chunkSize1.length());
-		chunkSize2 = ("00" + chunkSize2).substring(chunkSize2.length());
-
-		StringBuilder sb = new StringBuilder();
-		sb.append(chunkSize1);
-		sb.append(chunkSize2);
-
-		String littleEndianChunk = toLittleEndian(sb.toString());
-		return littleEndianChunk;
-
-	}
-
-	// To read non readable character
-	private static int returnMatch(byte[] inputArray, byte[] matchArray) {
-
-		for (int i = 0; i < inputArray.length; i++) {
-			int val = inputArray[i] & 0xFF;
-			boolean found = false;
-
-			if ((val == 38) && !found) {
-				int j = i;
-				int k = 0;
-				while ((inputArray[j++] == matchArray[k++])
-						&& (k < matchArray.length)) {
-
-				}
-				if (k == matchArray.length) {
-					found = true;
-					return j;
-				}
-			}
-		}
-
-		return -1;
-
-	}
-
-	private String getDataInHexString(byte[] byteArray) {
-
-		String data = "";
-		String trimData = "";
-		try {
-			data = new String(byteArray, 0, byteArray.length);
-			trimData = data.replace(":", "").replace("\n", "")
-					.replace("\r", "");
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			log.error("Error with getReadIntelHexFile:" + ex.getMessage());
-		}
-		return trimData;
-
-	}
-
-	private static String toLittleEndian(final String hex) {
-		// int ret = 0;
-		String hexLittleEndian = "";
-		if (hex.length() % 2 != 0)
-			return hexLittleEndian;
-		for (int i = hex.length() - 2; i >= 0; i -= 2) {
-			hexLittleEndian += hex.substring(i, i + 2);
-		}
-		// ret = Integer.parseInt(hexLittleEndian, 16);
-		return hexLittleEndian;
 	}
 
 }

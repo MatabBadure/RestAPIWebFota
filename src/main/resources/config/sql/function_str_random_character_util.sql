@@ -4,9 +4,6 @@ CREATE DEFINER=`root`@`%` FUNCTION `str_random_character`(p_char VARCHAR(1)) RET
 BEGIN
     /**
     * String function. Returns random character based on a mask
-    * <br>
-    * %author Ronald Speelman
-    * %version 1.5
     * Example usage:
     * SELECT str_random_character('d') AS digit;
     * SELECT str_random_character('C') AS UPPER;

@@ -38,7 +38,7 @@ import com.hillrom.vest.repository.PatientNoEventsRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
-import com.hillrom.vest.repository.monarch.PatientComplianceMonarchRepository;
+import com.hillrom.monarch.repository.PatientComplianceMonarchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.RandomUtil;

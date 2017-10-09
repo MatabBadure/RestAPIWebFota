@@ -53,6 +53,7 @@ import com.hillrom.vest.web.rest.FOTA.dto.FOTAInfoDto;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 @RestController
+
 @RequestMapping("/api")
 public class FOTAResource {
 	private final Logger log = LoggerFactory.getLogger(FOTAResource.class);
@@ -137,7 +138,7 @@ public class FOTAResource {
 		String filepath = null;
 
 		JSONObject jsonObject = new JSONObject();
-
+		BufferedOutputStream stream = null;
 		try {
 			// Get the filename and build the local file path
 			filename = uploadfile.getOriginalFilename();
@@ -146,7 +147,7 @@ public class FOTAResource {
 					"File");
 			filepath = Paths.get(filePathDir.toString(), filename).toString();
 			// Save the file locally
-			BufferedOutputStream stream = new BufferedOutputStream(
+			stream = new BufferedOutputStream(
 					new FileOutputStream(new File(filepath)));
 			stream.write(uploadfile.getBytes());
 			stream.close();
@@ -162,6 +163,13 @@ public class FOTAResource {
 			jsonObject.put("ERROR", ex.getMessage());
 			return new ResponseEntity<JSONObject>(jsonObject,
 					HttpStatus.BAD_REQUEST);
+		}
+		finally{
+			try {
+				stream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -413,12 +421,12 @@ public class FOTAResource {
 			HttpServletResponse response) {
 
 		JSONObject jsonObject = new JSONObject();
+		InputStream is = null;
 		try {
 			// Save the file locally
 			FOTAInfo fotaInfo = null;
 			fotaInfo = fotaRepository.findOneById(id);
-
-			InputStream is = new FileInputStream(fotaInfo.getFilePath());
+			is = new FileInputStream(fotaInfo.getFilePath());
 			response.addHeader("Content-disposition", "inline;filename="
 					+ fotaInfo.getFilePath());
 			response.setContentType("application/octet-stream");
@@ -431,6 +439,13 @@ public class FOTAResource {
 		} catch (IOException ex) {
 			jsonObject.put("ERROR", ex.getMessage());
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		finally{
+			try {
+				is.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 	}

@@ -53,6 +53,17 @@ import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.io.ICsvBeanWriter;
 import org.supercsv.prefs.CsvPreference;
 
+import com.hillrom.monarch.repository.PatientComplianceMonarchRepository;
+import com.hillrom.monarch.repository.PatientMonarchDeviceDataRepository;
+import com.hillrom.monarch.service.AdherenceCalculationServiceMonarch;
+import com.hillrom.monarch.service.PatientComplianceMonarchService;
+import com.hillrom.monarch.service.PatientHCPMonarchService;
+import com.hillrom.monarch.service.PatientProtocolMonarchService;
+import com.hillrom.monarch.service.PatientVestDeviceMonarchService;
+import com.hillrom.monarch.service.TherapySessionServiceMonarch;
+import com.hillrom.monarch.web.rest.dto.ProtocolMonarchDTO;
+import com.hillrom.monarch.web.rest.dto.ProtocolRevisionMonarchVO;
+import com.hillrom.monarch.web.rest.dto.TherapyDataMonarchVO;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
@@ -80,8 +91,6 @@ import com.hillrom.vest.repository.PatientVestDeviceDataRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.repository.UserSearchRepository;
-import com.hillrom.vest.repository.monarch.PatientComplianceMonarchRepository;
-import com.hillrom.vest.repository.monarch.PatientMonarchDeviceDataRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.AdherenceCalculationService;
@@ -93,12 +102,6 @@ import com.hillrom.vest.service.PatientProtocolService;
 import com.hillrom.vest.service.PatientVestDeviceService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.UserService;
-import com.hillrom.vest.service.monarch.PatientHCPMonarchService;
-import com.hillrom.vest.service.monarch.PatientProtocolMonarchService;
-import com.hillrom.vest.service.monarch.PatientVestDeviceMonarchService;
-import com.hillrom.vest.service.monarch.TherapySessionServiceMonarch;
-import com.hillrom.vest.service.monarch.AdherenceCalculationServiceMonarch;
-import com.hillrom.vest.service.monarch.PatientComplianceMonarchService;
 import com.hillrom.vest.service.util.CsvUtil;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.ExceptionConstants;
@@ -112,9 +115,6 @@ import com.hillrom.vest.web.rest.dto.ProtocolRevisionVO;
 import com.hillrom.vest.web.rest.dto.StatisticsVO;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
-import com.hillrom.vest.web.rest.dto.monarch.ProtocolMonarchDTO;
-import com.hillrom.vest.web.rest.dto.monarch.ProtocolRevisionMonarchVO;
-import com.hillrom.vest.web.rest.dto.monarch.TherapyDataMonarchVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 import net.minidev.json.JSONObject;
@@ -1105,8 +1105,29 @@ public class UserResource {
 		
 		try{		
 		
+			PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(id);
+			
+			PatientDevicesAssoc checkPatientTypeVest = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
+			PatientDevicesAssoc checkPatientTypeMonarch = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
+			
+			String patientId;
+
+			List<PatientVestDeviceData>	vestdeviceData = new LinkedList<>();
+			List<PatientVestDeviceDataMonarch> monarchdeviceData = new LinkedList<>();
+
+			if(Objects.nonNull(checkPatientTypeMonarch) && Objects.nonNull(checkPatientTypeMonarch.getOldPatientId())){
+				patientId = checkPatientTypeMonarch.getOldPatientId();
+				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
+				monarchdeviceData.addAll(monarchdeviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
+
+			}else if(Objects.nonNull(checkPatientTypeVest) && Objects.nonNull(checkPatientTypeVest.getOldPatientId())){
+				patientId = checkPatientTypeVest.getOldPatientId();
+				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
+				vestdeviceData.addAll(deviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
+			}
+			
 			if(deviceType.equals("VEST")){
-				List<PatientVestDeviceData>	vestdeviceData = deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
+				vestdeviceData.addAll(deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp));
 
 				if(!vestdeviceData.isEmpty() ){
 
@@ -1116,8 +1137,7 @@ public class UserResource {
 	            }
 	
 			}else if(deviceType.equals("MONARCH")){
-				List<PatientVestDeviceDataMonarch> monarchdeviceData = monarchdeviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp);
-
+				monarchdeviceData.addAll(monarchdeviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp));
 
 				if(!monarchdeviceData.isEmpty() ){
 
@@ -1128,26 +1148,8 @@ public class UserResource {
 
 			}else if(deviceType.equals("ALL")){
 				
-				PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(id);
-				
-				PatientDevicesAssoc checkPatientTypeVest = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "VEST");
-				PatientDevicesAssoc checkPatientTypeMonarch = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(patient.getId(), "MONARCH");
-				
-				String patientId;
-				String vestPatientId = patient.getId();
-				String monarchPatientId = patient.getId();
-				if(Objects.nonNull(checkPatientTypeMonarch.getOldPatientId())){
-					patientId = checkPatientTypeMonarch.getOldPatientId();
-					PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
-					monarchPatientId = patientInfoOld.getId();
-				}else if(Objects.nonNull(checkPatientTypeVest.getOldPatientId())){
-					patientId = checkPatientTypeVest.getOldPatientId();
-					PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
-					vestPatientId = patientInfoOld.getId();
-				}				
-				
-				List<PatientVestDeviceData>	vestdeviceData = deviceDataRepository.findByPatientIdAndTimestampBetween(vestPatientId, fromTimestamp, toTimestamp);				
-				List<PatientVestDeviceDataMonarch> monarchdeviceData = monarchdeviceDataRepository.findByPatientIdAndTimestampBetween(monarchPatientId, fromTimestamp, toTimestamp);
+				monarchdeviceData.addAll(monarchdeviceDataRepository.findByPatientIdAndTimestampBetween(patient.getId(), fromTimestamp, toTimestamp));
+				vestdeviceData.addAll(deviceDataRepository.findByPatientIdAndTimestampBetween(patient.getId(), fromTimestamp, toTimestamp));
 				
 				if(!vestdeviceData.isEmpty() && monarchdeviceData.isEmpty() ){
 	            	excelOutputService.createExcelOutputExcel(response, vestdeviceData);
@@ -1159,8 +1161,6 @@ public class UserResource {
 	            	response.setStatus(204);
 	            }
 			}
-
-		
 
         } catch (Exception ex) {
         	response.setStatus(500);

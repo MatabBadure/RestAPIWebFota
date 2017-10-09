@@ -237,10 +237,7 @@ public class ChargerDataService {
 			    
 			    System.out.format("Inverted Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
 			    
-			    while ( nCheckSum >  65535 )
-			    {
-			      nCheckSum -= 65535;
-			    }
+
 			    
 			    int nMSB = decoded[nDecodeCount+1] & 0xFF;
 			    int nLSB = decoded[nDecodeCount] & 0xFF;
@@ -438,7 +435,7 @@ public class ChargerDataService {
 		        				returnMatch(b,DEV_WIFI)-DEV_WIFI.length;
 		        log.debug("start end : "+ start + " : " + end );
 		        
-		        byte[] devSNArray = new byte[end<0?0:end];
+		        byte[] devSNArray = new byte[end];
 		        int j=0;
 		        sout = "";
 		        for(int i=start;i<end;i++) {

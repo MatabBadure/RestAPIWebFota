@@ -201,7 +201,7 @@ public class PatientVestDeviceDataDeltaReader implements ItemReader<List<Patient
 			
 			if(!patientVestDeviceHistoryList.isEmpty()){
 				for(PatientVestDeviceHistory patientVestDevicePatient : patientVestDeviceHistoryList){
-					if(patientVestDevicePatient.isPending() 
+					if(Objects.nonNull(patientVestDevicePatient) && patientVestDevicePatient.isPending() 
 							&& deviceSerialNumber.equalsIgnoreCase(patientVestDevicePatient.getSerialNumber())){
 						patientVestDevicePatient.setPending(false);
 						patientVestDeviceRepository.save(patientVestDevicePatient);

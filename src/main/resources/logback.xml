@@ -48,8 +48,9 @@
 				<FileNamePattern>${CATALINA_HOME}/TIMS/logs/${logFileName}.%i.log.zip
 				</FileNamePattern>
 				<MinIndex>1</MinIndex>
-				<MaxIndex>10</MaxIndex>
+				<MaxIndex>20</MaxIndex>
 			</rollingPolicy>
+
 
 			<triggeringPolicy
 				class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">

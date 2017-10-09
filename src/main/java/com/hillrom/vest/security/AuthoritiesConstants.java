@@ -29,4 +29,8 @@ public final class AuthoritiesConstants {
     //hill-1845
     public static final String CUSTOMER_SERVICES = "CUSTOMER_SERVICES";
     //hill-1845 
+    
+   // public static final String RND_USER = "RND_USER";
+    public static final String FOTA_ADMIN = "FOTA_ADMIN";
+    public static final String FOTA_APPROVER = "FOTA_APPROVER";
 }

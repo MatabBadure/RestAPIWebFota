@@ -8,7 +8,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -38,33 +41,12 @@ import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserSurveyAnswer;
-import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.PatientStatsVO;
 import com.hillrom.vest.web.rest.dto.UserSurveyAnswerDTO;
-
-
-
-
-
-import javax.servlet.http.HttpServletRequest;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-
-import com.hillrom.vest.service.util.DateUtil;
-import com.hillrom.vest.util.ExceptionConstants;
-
-import org.apache.commons.lang.StringUtils;
-
-import java.util.Calendar;
 
 /**
  * Service for sending e-mails.
@@ -166,6 +148,29 @@ public class MailService {
         }
     }
 
+    @Async
+    public void sendEmail(String[] to, String subject, String content, boolean isMultipart, boolean isHtml, File attachmentFile, boolean isTimsLog) {
+        log.debug("Send e-mail[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
+                isMultipart, isHtml, to, subject, content);
+
+        // Prepare message using a Spring helper
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, CharEncoding.UTF_8);
+            message.setTo(to);
+            message.setFrom(from);
+            message.setSubject(subject);
+            message.setText(content, isHtml);
+            message.addAttachment(attachmentFile.getName(), attachmentFile);
+            
+            javaMailSender.send(mimeMessage);
+            log.debug("Sent e-mail to User '{}'", to);
+        } catch (Exception e) {
+            log.warn("E-mail could not be sent to user '{}', exception is: {}", to, e.getMessage());
+        }
+        
+    }
+   
     @Async
     public void sendActivationEmail(User user, String baseUrl) {
         log.debug("Sending activation e-mail to '{}'", user.getEmail());
@@ -592,9 +597,74 @@ public class MailService {
      }
     
 
+    public void sendTIMSLog(String fileName) throws IOException{
+        log.debug("Sending TIMS log to '{}'", "test.lnt.hillrom@gmail.com");
+        Context context = new Context();
+        context.setVariable("baseUrl", baseUrl);
+        String content = "";
+        String subject = "";
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        Date date = new Date();
+        String timsLogFailDate = dateFormat.format(date).toString();
+               
+        content= "<i>The TIMS job execution failed on  ";
+        content += timsLogFailDate +".</i><br>";
+        content += "<br> Please refer the attached log file for more details.<br>";
+        content += "<br> - TIMs Migration Service.</br>";
+        File file = new File(Constants.TIMS_LOG_LOCATION + fileName + ".log");
+        
+        log.debug("Name : " + fileName + " File : " +  file);
+        
+		//content = "Emailing TIMS Log";
+        subject = "Tims Log"; 
+        String recipients = env.getProperty("spring.timsLog.timsLogEmailids");
+		log.debug("Sending TIMS log report '{}'", recipients);
+        sendEmail(recipients.split(","), subject, content, true,true, file,true);
+     }
     
         public void sendMailTo18YearOldPatient(User user) {
         this.sendActivationEmail(user, this.baseUrl );
       }
 
+	@Async
+	public void sendFotaUploadNotificationEmail(String email, String userName, String baseUrl) {
+		String langKey = "en";
+		Context context = new Context(Locale.forLanguageTag(langKey));
+		context.setVariable("userName", FOTAUserNameStringFormatting(userName));
+		context.setVariable("fotaBaseUrl", baseUrl);
+		String content = templateEngine.process("fotaPendingApproval", context);
+		String subject = messageSource.getMessage("email.pending.title", null,
+				Locale.forLanguageTag(langKey));
+		sendEmail(email.split(","), subject, content, true, true);
+	}
+
+	@Async
+	public void sendFotaDeleteNotificationEmail(String email, String userName,
+			String baseUrl) {
+		String langKey = "en";
+		Context context = new Context(Locale.forLanguageTag(langKey));
+		context.setVariable("userName", FOTAUserNameStringFormatting(userName));
+		context.setVariable("fotaBaseUrl", baseUrl);
+		String content = templateEngine.process("fotaDelete", context);
+		String subject = messageSource.getMessage("email.pending.title", null,
+				Locale.forLanguageTag(langKey));
+		sendEmail(email.split(","), subject, content, true, true);
+	}
+	@Async
+	public void sendFotaCRCFailedNotificationEmail(String email, String userName) {
+		String langKey = "en";
+		Context context = new Context(Locale.forLanguageTag(langKey));
+		context.setVariable("userName", FOTAUserNameStringFormatting(userName));
+		context.setVariable("fotaBaseUrl", baseUrl);
+		String content = templateEngine.process("fotaCRC", context);
+		String subject = messageSource.getMessage("email.crc.title", null,
+				Locale.forLanguageTag(langKey));
+		sendEmail(email.split(","), subject, content, true, true);
+	}
+	private String FOTAUserNameStringFormatting(String userName) {
+		return userName.substring(0, 1).toUpperCase()
+				+ userName.substring(1).toLowerCase();
+	}
+
+	
 }

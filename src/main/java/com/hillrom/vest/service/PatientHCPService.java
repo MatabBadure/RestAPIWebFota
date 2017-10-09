@@ -38,6 +38,7 @@ import com.hillrom.vest.repository.PatientNoEventsRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.monarch.repository.PatientComplianceMonarchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.RandomUtil;
@@ -85,7 +86,13 @@ public class PatientHCPService {
     
     @Inject
     private ClinicPatientRepository clinicPatientRepository;
-
+    
+    @Inject
+    private AdherenceCalculationService adherenceCalculationService;
+    
+    @Inject
+    private PatientComplianceMonarchRepository patientComplianceMonarchRepository;
+    
     public List<User> associateHCPToPatient(Long id, List<Map<String, String>> hcpList) throws HillromException {
     	List<User> users = new LinkedList<>();
     	User patientUser = userRepository.findOne(id);
@@ -259,12 +266,42 @@ public class PatientHCPService {
 			date = LocalDate.now().minusDays(1);// yester days data, HCP and Clinic Admin would see yesterdays data
 			Map<LocalDate,Integer> datePatientNoEventCountMap = getPatientsWithNoEvents(date,date,patientUserIds);
 			int patientsWithNoEventRecorded = Objects.nonNull(datePatientNoEventCountMap.get(date))? datePatientNoEventCountMap.get(date):0;
-			statistics.put("patientsWithHmrNonCompliance", patientComplianceRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, patientUserIds).size());
-			statistics.put("patientsWithSettingDeviation", patientComplianceRepository.findByDateAndIsSettingsDeviatedAndPatientUserIdIn(date, true, patientUserIds).size());
-			statistics.put("patientsWithMissedTherapy", patientComplianceRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date, patientUserIds).size());
+			
+			List<Long> vestPatientUserIds = new LinkedList<>();
+			List<Long> bothPatientUserIds = new LinkedList<>();
+			
+			for(Long patientUserId : patientUserIds){
+				
+				PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(patientUserId);
+				String deviceType = adherenceCalculationService.getDeviceTypeValue(patient.getId());
+				if(deviceType.equals("VEST")){
+					vestPatientUserIds.add(patientUserId);
+				}else if(deviceType.equals("BOTH")){
+					bothPatientUserIds.add(patientUserId);
+				}
+			}
+			
+			int patientsWithHmrNonCompliance = (bothPatientUserIds.isEmpty() ? 0 : 
+												patientComplianceMonarchRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, bothPatientUserIds).size()) 
+													+ (vestPatientUserIds.isEmpty() ? 0 : 
+														patientComplianceRepository.findByDateAndIsHmrCompliantAndPatientUserIdIn(date, false, vestPatientUserIds).size());
+			
+			int patientsWithSettingDeviation = (bothPatientUserIds.isEmpty() ? 0 :
+												patientComplianceMonarchRepository.findByDateAndIsSettingsDeviatedAndPatientUserIdIn(date, true, bothPatientUserIds).size()) 
+													+ (vestPatientUserIds.isEmpty() ? 0 :
+														patientComplianceRepository.findByDateAndIsSettingsDeviatedAndPatientUserIdIn(date, true, vestPatientUserIds).size());
+			
+			int patientsWithMissedTherapy =  (bothPatientUserIds.isEmpty() ? 0 :
+												patientComplianceMonarchRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date, bothPatientUserIds).size()) 
+													+ (vestPatientUserIds.isEmpty() ? 0 :
+														patientComplianceRepository.findByDateAndMissedtherapyAndPatientUserIdIn(date, vestPatientUserIds).size());
+			
+			statistics.put("patientsWithHmrNonCompliance", patientsWithHmrNonCompliance);
+			statistics.put("patientsWithSettingDeviation", patientsWithSettingDeviation);
+			statistics.put("patientsWithMissedTherapy", patientsWithMissedTherapy);
 			statistics.put("patientsWithNoEventRecorded", patientsWithNoEventRecorded);
 			statistics.put("date", date.toString());
-			statistics.put("totalPatientCount", patientUserIds.size());
+			statistics.put("totalPatientCount", patientUserIds.size());			
 		}
 		return statistics;
 	}

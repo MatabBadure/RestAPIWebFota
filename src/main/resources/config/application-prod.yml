@@ -41,12 +41,16 @@ spring:
     recaptcha:
         recaptchaPrivateKey: 6LcXjQkTAAAAACiA7rx7o7wlifQ7n3VQ_It-sncc
     notification:
-        hcpOrClinicAdminDashboardUrl: https://visiview.hill-rom.com
-        patientDashboardUrl: https://visiview.hill-rom.com
-        careGiverDashboardUrl: https://visiview.hill-rom.com
-        baseUrl: https://visiview.hill-rom.com
+        hcpOrClinicAdminDashboardUrl: https://visiview-test.hill-rom.com
+        patientDashboardUrl: https://visiview-test.hill-rom.com
+        careGiverDashboardUrl: https://visiview-test.hill-rom.com
+        baseUrl: https://visiview-test.hill-rom.com
+        fotaBaseUrl: https://visiview-test.hill-rom.com
         accountActivationReminderInterval: 72
     survey:
-        surveyreportemailids: joelpreetham.fernandes4@hill-rom.com,nagendra.shetty@razorfish.com,amit.saurabh@razorfish.com,anubhav.sinha@razorfish.com,nagendra@neevtech.com,amit.saurabh@neevtech.com 
+
+        surveyreportemailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com,raghu.nt@lnttechservices.com 
     changePrescription:
-        changePrescriptionEmailids: joelpreetham.fernandes4@hill-rom.com,nagendra.shetty@razorfish.com,amit.saurabh@razorfish.com,anubhav.sinha@razorfish.com,nagendra@neevtech.com,amit.saurabh@neevtech.com,rohan.kushwaha@razorfish.com
+        changePrescriptionEmailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com,raghu.nt@lnttechservices.com
+    timsLog:
+        timsLogEmailids: nagendra.tv@lnttechservices.com,vijayanand.jayapal@lnttechservices.com

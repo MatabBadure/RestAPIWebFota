@@ -1,7 +1,7 @@
 DROP procedure IF EXISTS `manage_patient_user`;
 
 DELIMITER $$
-CREATE PROCEDURE `manage_patient_user`(
+CREATE DEFINER=`root`@`%` PROCEDURE `manage_patient_user`(
 	IN operation_type_indicator VARCHAR(10),
     IN hr_id varchar(255),
 	IN pat_hub_id varchar(255),
@@ -21,6 +21,7 @@ CREATE PROCEDURE `manage_patient_user`(
 	IN pat_address varchar(255),
     IN pat_city varchar(255),
     IN pat_state varchar(255),
+    IN pat_created_by varchar(50),
     IN pat_training_date datetime,
 	IN pat_primary_diagnosis varchar(255),
     IN pat_garment_type varchar(255),
@@ -31,7 +32,7 @@ CREATE PROCEDURE `manage_patient_user`(
 )
 BEGIN
 
-    DECLARE created_by varchar(255);
+   --  DECLARE created_by varchar(255);
     DECLARE created_date datetime;
     DECLARE encrypted_password varchar(60);
     DECLARE gen_patient_id varchar(255);
@@ -42,15 +43,15 @@ BEGIN
 		ROLLBACK;
         RESIGNAL;
     END;
-		 
-	SET created_by = 'JDE APP';
+    
+	 -- SET created_by = 'JDE APP';
     SET encrypted_password = encrypt(CONCAT(CAST(pat_zipcode AS CHAR),SUBSTRING(pat_last_name,1,4),CAST(DATE_FORMAT(pat_dob,'%m%d%Y') AS CHAR)));
 -- Creare patient user when operation_type_indicator CREATE,
 	
 	IF operation_type_indicator = 'CREATE' THEN
     
 		SELECT `serial_number` INTO temp_serial_number FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number and `is_active` = 1;
-        
+		        
 		-- When Hillrom id already exists
         IF temp_serial_number IS NOT NULL THEN
 			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Patient with same device serial number already exits.';
@@ -60,6 +61,9 @@ BEGIN
         -- Get Hillrom ID
 		call get_next_patient_hillromid(@gen_patient_id);
 		SET created_date = now();
+        
+        SELECT `primary_city`,`state` INTO pat_city,pat_state FROM `CITY_STATE_ZIP_MAP` WHERE `zip` = pat_zipcode;
+        
         
 		INSERT INTO `PATIENT_INFO` (`id`, `hillrom_id`, `hub_id`, `serial_number`, `bluetooth_id`, `title`, `first_name`, `middle_name`,
 		`last_name`, `dob`, `email`, `zipcode`, `web_login_created`, `primary_phone`, `mobile_phone`, `gender`, `lang_key`, `expired`, 
@@ -76,7 +80,7 @@ BEGIN
 		`terms_condition_accepted_date`, `dob`, `hillrom_id`,`activation_link_sent_date`)
 		VALUES(
 		pat_email, encrypted_password, pat_title, pat_first_name, pat_middle_name, pat_last_name, 1, pat_lang_key,NULL, NULL,
-		created_by, created_date, NULL, NULL, created_by, 
+		pat_created_by, created_date, NULL, NULL, pat_created_by, 
 		created_date, 0, pat_gender, pat_zipcode,0,
 		NULL, pat_dob, hr_id, NULL);
 		 
@@ -98,7 +102,7 @@ BEGIN
 			`is_hmr_compliant`, `is_settings_deviated`, `missed_therapy_count`,
 			`last_therapy_session_date`, `settings_deviated_days_count`,`created_by`,`created_date`)
 			VALUES
-			(@gen_patient_id,return_user_id,now(),100,0,0,true,false,0,null,0,created_by,created_date);
+			(@gen_patient_id,return_user_id,now(),100,0,0,true,false,0,null,0,pat_created_by,created_date);
 	        
 	        INSERT INTO `PATIENT_NO_EVENT_MONARCH` (`first_transmission_date`, `user_created_date`, `patient_id`, `user_id`)
 			VALUES
@@ -110,7 +114,7 @@ BEGIN
 			`is_hmr_compliant`, `is_settings_deviated`, `missed_therapy_count`,
 			`last_therapy_session_date`, `settings_deviated_days_count`,`created_by`,`created_date`)
 			VALUES
-			(@gen_patient_id,return_user_id,now(),100,0,0,true,false,0,null,0,created_by,created_date);
+			(@gen_patient_id,return_user_id,now(),100,0,0,true,false,0,null,0,pat_created_by,created_date);
 	        
 	        INSERT INTO `PATIENT_NO_EVENT` (`first_transmission_date`, `user_created_date`, `patient_id`, `user_id`)
 			VALUES
@@ -127,9 +131,12 @@ BEGIN
 		SELECT `patient_id` INTO return_patient_id FROM `PATIENT_DEVICES_ASSOC` WHERE `serial_number` = pat_device_serial_number;
 		SELECT `user_id` INTO return_user_id FROM `USER_PATIENT_ASSOC` WHERE `patient_id`= return_patient_id AND `user_role`= 'PATIENT';
         
+        
         IF return_patient_id IS NULL THEN
 			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Patient with given device number does not exist.';
 		END IF;
+    
+    	SELECT `primary_city`,`state` INTO pat_city,pat_state FROM `CITY_STATE_ZIP_MAP` WHERE `zip` = pat_zipcode;
     
 		START TRANSACTION;
 		UPDATE `PATIENT_INFO`   SET
@@ -166,7 +173,7 @@ BEGIN
 			`middle_name` = pat_middle_name,
 			`last_name` = pat_last_name,
 			`lang_key` = pat_lang_key,
-			`last_modified_by` = created_by,
+			`last_modified_by` = pat_created_by,
 			`last_modified_date` = now(),
 			`gender` = pat_gender,
 			`zipcode` = pat_zipcode,

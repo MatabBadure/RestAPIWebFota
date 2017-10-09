@@ -34,6 +34,7 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.YES;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.text.ParseException;
@@ -95,7 +96,8 @@ public class FOTAService {
 	private static Map<String,PartNoHolder> partNosBin = new LinkedHashMap<String, PartNoHolder>();
 	private static Map<String,HandleHolder> handleHolderBin = new LinkedHashMap<String, HandleHolder>();
 	private PartNoHolder partNoHolder;
-
+	
+	@Transactional
 	public String FOTAUpdate(String rawMessage) throws Exception {
 		int countInt = 0;
 		String decoded_string = "";
@@ -240,6 +242,7 @@ public class FOTAService {
 								holder.setPreviousChunkTransStatus("CheckUpdate");
 								//added new stmt
 								holder.setSoftwareVersion(fotaInfo.getSoftVersion());
+								holder.setSpwanedObject(new DateTime());
 								handleId = getHandleNumber();
 								handleHolderBin.put(handleId, holder);
 							} else {
@@ -598,7 +601,7 @@ public class FOTAService {
 		
 			byte[] encoded = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(finalResponseStr));
 			String finalString1 = new String(encoded);
-			log.error("finalString1: " + finalString1);
+			log.debug("finalString1: " + finalString1);
 			return finalString1;
 		
 		
@@ -618,7 +621,7 @@ public class FOTAService {
 
 		byte[] getHandleByte = java.util.Base64.getDecoder().decode(rawMessage);
 		int deviceIndex = returnMatch(getHandleByte, DEV_VER_RAW);
-		log.error("str1: " + deviceIndex);
+		log.debug("str1: " + deviceIndex);
 		StringBuilder deviceRes = new StringBuilder();
 		String device1 = Integer.toHexString(getHandleByte[deviceIndex] & 0xFF);
 		String device2 = Integer
@@ -638,7 +641,7 @@ public class FOTAService {
 		deviceRes.append(device4);
 		//written new code
 		String deviceVer = FOTAParseUtil.toLittleEndian(deviceRes.toString());
-		log.error("deviceVer: " + deviceVer);
+		log.debug("deviceVer: " + deviceVer);
 		return deviceVer;
 	}
 
@@ -671,7 +674,7 @@ public class FOTAService {
 	    
 	    System.out.format("Inverted Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
 	    nCheckSum = nCheckSum & 0xFFFF;
-	    log.error("Total Value = " + nCheckSum);
+	    log.debug("Total Value = " + nCheckSum);
 	    nCheckSum = ((~nCheckSum)& 0xFFFF) + 1;
 	    System.out.format("Checksum Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
 
@@ -686,14 +689,14 @@ public class FOTAService {
 	private String getResponePairResult() {
 		
 		String getResponePairResult = FOTAParseUtil.asciiToHex(RESULT_EQ);
-		log.error("getResponePairResult: " + getResponePairResult);
+		log.debug("getResponePairResult: " + getResponePairResult);
 		//response.append("Yes");
 		return getResponePairResult;
 	}
 
 	private boolean validateCRC(String rawMessage) {
 		 
-		log.error("Inside  calculateCRC : " ,rawMessage);
+		log.debug("Inside  calculateCRC : " ,rawMessage);
 		  
 	    int nCheckSum = 0;
 
@@ -720,7 +723,7 @@ public class FOTAService {
 	    
 	    System.out.format("MSB = %d [0x%x]\r\n" ,nMSB, nMSB);
 	    System.out.format("LSB = %d [0x%x]\r\n" ,nLSB, nLSB);
-	    log.error("Total Value = " + nCheckSum);
+	    log.debug("Total Value = " + nCheckSum);
 	    nCheckSum = ((~nCheckSum)& 0xFFFF) + 1;
 	    System.out.format("Checksum Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
 	    
@@ -778,7 +781,7 @@ public class FOTAService {
 
 		byte[] getHandleByte = java.util.Base64.getDecoder().decode(rawMessage);
 		int handleIndex = returnMatch(getHandleByte, HANDLE_RAW);
-		log.error("str1: " + handleIndex);
+		log.debug("str1: " + handleIndex);
 		StringBuilder handleRes = new StringBuilder();
 		// handleRes.
 		String handle1 = Integer.toHexString(getHandleByte[handleIndex] & 0xFF);
@@ -801,7 +804,7 @@ public class FOTAService {
 		handleRes.append(handle4);
 		//written new code
 		String handleId = FOTAParseUtil.toLittleEndian(handleRes.toString());
-		log.error("handleId: " + handleId);
+		log.debug("handleId: " + handleId);
 		return handleId;
 	}
 
@@ -841,7 +844,7 @@ public class FOTAService {
 		response.append(AMPERSAND);
 		response.append(CRC_EQ);
 		String responePair3 = FOTAParseUtil.asciiToHex(response.toString());
-		log.error("responePair3: " + responePair3);
+		log.debug("responePair3: " + responePair3);
 		return responePair3;
 	}
 
@@ -852,7 +855,7 @@ public class FOTAService {
 	    totalChunkHexString = ("00000000" + totalChunkHexString).substring(totalChunkHexString.length());
 		//converting to little Indian
 	    String strTotalChunk = FOTAParseUtil.hexToAscii(FOTAParseUtil.asciiToHex(FOTAParseUtil.toLittleEndian((totalChunkHexString))));
-		log.error("strTotalChunk: " + strTotalChunk);
+		log.debug("strTotalChunk: " + strTotalChunk);
 		return strTotalChunk;
 	}
 
@@ -862,7 +865,7 @@ public class FOTAService {
 		response.append(AMPERSAND);
 		response.append(TOTAL_CHUNK);
 		String responePair2 = FOTAParseUtil.asciiToHex(response.toString());
-		log.error("responePair2: " + responePair2);
+		log.debug("responePair2: " + responePair2);
 		return responePair2;
 	}
 
@@ -874,7 +877,7 @@ public class FOTAService {
 		response.append(AMPERSAND);
 		response.append(HANDLE_EQ);
 		String responePair1 = FOTAParseUtil.asciiToHex(response.toString());
-		log.error("responePair1: " + responePair1);
+		log.debug("responePair1: " + responePair1);
 		return responePair1;
 	}
 
@@ -927,7 +930,7 @@ public class FOTAService {
 		}
 		log.debug("Input Byte Array :" + sout);
 		decoded_string = new String(decoded);
-		log.error("Decoded value is " + decoded_string);
+		log.debug("Decoded value is " + decoded_string);
 		return decoded_string;
 	}
 
@@ -938,6 +941,7 @@ public class FOTAService {
 	 * @return
 	 * @throws ParseException
 	 */
+	@Transactional
 	public FOTAInfo savFotaInfoData(FOTAInfoDto fotaInfoDto, String baseUrl)
 			throws ParseException {
 		//check is existing if yes update to inactive pending
@@ -1021,6 +1025,7 @@ public class FOTAService {
 	 * @param isAscending
 	 * @return
 	 */
+	@Transactional
 	public List<FOTADeviceDto> getFOTADeviceList(String status, String searchString, String sortBy, boolean isAscending) {
 
 		List<FOTADeviceDto> FOTADeviceDtoList = null;
@@ -1133,6 +1138,7 @@ public class FOTAService {
 	 * @param isAscending
 	 * @return
 	 */
+	@Transactional
 	public List<FOTAInfo> FOTAList(String status, String searchString, String sortBy, boolean isAscending) {
 		List<FOTAInfo> FOTAInfoList = null;
 		
@@ -1318,8 +1324,8 @@ public class FOTAService {
 	 * @return
 	 * @throws Exception
 	 */
-	@SuppressWarnings("resource")
-	public boolean CRC32Calculation(CRC32Dto crc32Dt0) throws Exception {
+	@Transactional
+	public boolean CRC32Calculation(CRC32Dto crc32Dt0){
 	    boolean eof = false;
 	    boolean result = false;
 	    int recordIdx = 0;
@@ -1337,6 +1343,8 @@ public class FOTAService {
 
 	    ByteArrayOutputStream crcData = new ByteArrayOutputStream();
 	    ByteArrayOutputStream crcData2 = new ByteArrayOutputStream();
+	    InputStreamReader isr = null;
+	    BufferedReader rdr =  null;
 
 	    int record_length;
 	    int record_address;
@@ -1344,6 +1352,7 @@ public class FOTAService {
 	    
 	    FileInputStream fs = null;
 	    
+	    try{
 	    
 		if (StringUtils.isNotEmpty(crc32Dt0.getRegion1StartAddress())) {
 			crcStartAddress = Long.parseLong(crc32Dt0.getRegion1StartAddress(),16);
@@ -1366,23 +1375,28 @@ public class FOTAService {
 			crc2LocationAddress = Long.parseLong(crc32Dt0.getRegion2CRCLocation(),16);
 		}
 		
-	    
-		
 		fs = new FileInputStream(crc32Dt0.getFilePath());
-		
-	    InputStreamReader isr = new InputStreamReader(fs);
-	    BufferedReader rdr =  new BufferedReader(isr);
+	    isr = new InputStreamReader(fs);
+	    rdr =  new BufferedReader(isr);
         eof = false;
         recordIdx = 1;
         upperAddress = 0;
         String recordStr;
         while ((recordStr = rdr.readLine()) != null) {
             if (eof) {
-                throw new Exception("Data after eof (" + recordIdx + ")");
+                try {
+					throw new Exception("Data after eof (" + recordIdx + ")");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
             }
 
             if (!recordStr.startsWith(":")) {
-                throw new Exception("Invalid Intel HEX record (" + recordIdx + ")");
+                try {
+					throw new Exception("Invalid Intel HEX record (" + recordIdx + ")");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
             }
 
             int lineLength = recordStr.length();
@@ -1397,16 +1411,23 @@ public class FOTAService {
             sum &= 0xff;
         	
             if (sum != 0) {
-                throw new Exception("Invalid checksum (" + recordIdx + ")");
+                try {
+					throw new Exception("Invalid checksum (" + recordIdx + ")");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
             }
 
             record_length = hexRecord[0];
             if ((record_length + 5) != hexRecord.length) {
-                throw new Exception("Invalid record length (" + recordIdx + ")");
+                try {
+					throw new Exception("Invalid record length (" + recordIdx + ")");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
             }
             record_data = new byte[record_length];
             System.arraycopy(hexRecord, 4, record_data, 0, record_length);
-    		
 
             record_address = ((hexRecord[1] & 0xFF) << 8) + (hexRecord[2] & 0xFF);
 
@@ -1488,14 +1509,22 @@ public class FOTAService {
                     if (record_length == 2) {
                         upperAddress = ((record_data[0] & 0xFF) << 12) +( ((record_data[1] & 0xFF)) << 4);
                     } else {
-                        throw new Exception("Invalid SEG record (" + recordIdx + ")");
+                        try {
+							throw new Exception("Invalid SEG record (" + recordIdx + ")");
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
                     }
                     break;                	
                 case 4:
                     if (record_length == 2) {
                         upperAddress = ((record_data[0] & 0xFF) << 24) +( ((record_data[1] & 0xFF)) << 16);
                     } else {
-                        throw new Exception("Invalid EXT_LIN record (" + recordIdx + ")");
+                        try {
+							throw new Exception("Invalid EXT_LIN record (" + recordIdx + ")");
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
                     }
                     break;
                 default:
@@ -1503,11 +1532,8 @@ public class FOTAService {
             }
             recordIdx++;
         };
-        rdr.close();
-        isr.close();
-        fs.close();
         
-        // CRC Calculation Table initialize
+    // CRC Calculation Table initialize
     int crc;
     int i;
     if(crcStartAddress != 0){
@@ -1544,7 +1570,7 @@ public class FOTAService {
         crc = crc ^ 0xffffffff;
 
 		result = (crc == crcValueInFile);
-		crcData.close();
+		//crcData.close();
        log.debug("Calculated Region1CRC32: " + (String.format("0x%08X", crc)) + "In file :" + (String.format("0x%08X", (crcValueInFile))));
         
     }
@@ -1581,8 +1607,22 @@ public class FOTAService {
         crc = crc ^ 0xffffffff;
         log.debug("Calculated Region2CRC32: " + (String.format("0x%08X", crc)) + "In file :" + (String.format("0x%08X", (crc2ValueInFile))));
         result &= (crc == crc2ValueInFile);
-        crcData2.close();
-    }
+        //crcData2.close();
+    		}
+	    }catch(IOException ex){
+	    	ex.printStackTrace();
+	    }
+	    finally{
+	    	try {
+	    		rdr.close();
+	            isr.close();
+	            fs.close();
+	    		crcData.close();
+				crcData2.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}	
+	    }
 		return result;
 	}
 	
@@ -1591,6 +1631,7 @@ public class FOTAService {
 	 * @param id
 	 * @return
 	 */
+	@Transactional
 	public FOTAInfo getFirmwareDetails(Long id) {
 		FOTAInfo fotaInfo = null;
 		fotaInfo = fotaRepository.findOneById(id);
@@ -1618,6 +1659,7 @@ public class FOTAService {
 	 * @return
 	 * @throws Exception
 	 */
+	@Transactional
 	public boolean validateApproverCRC32(ApproverCRCDto apprDto)
 			throws Exception {
 		FOTAInfo fotaInfo = null;
@@ -1914,6 +1956,7 @@ public class FOTAService {
 	 * @param baseUrl
 	 * @return
 	 */
+	@Transactional
 	public FOTAInfo firmwareDelete(Long id, String userRole, String baseUrl) {
 		FOTAInfo fotaInfo = null;
 		fotaInfo = fotaRepository.findOneById(id);
@@ -1989,7 +2032,7 @@ public class FOTAService {
 
 		byte[] getChunkByte = java.util.Base64.getDecoder().decode(rawMessage);
 		int chunkByteIndex = returnMatch(getChunkByte, CHUNK_SIZE_RAW);
-		log.error("chunkByteIndex: " + chunkByteIndex);
+		log.debug("chunkByteIndex: " + chunkByteIndex);
 		int chunkSizeValue = getChunkByte[chunkByteIndex] & 0xFF;
 		int chunkSizeValue1 = getChunkByte[chunkByteIndex + 1] & 0xFF;
 

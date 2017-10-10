@@ -93,8 +93,8 @@ public class FOTAService {
 	private String buffer = null;
 	
 	//Dynamic part number
-	private static Map<String,PartNoHolder> partNosBin = new LinkedHashMap<String, PartNoHolder>();
-	private static Map<String,HandleHolder> handleHolderBin = new LinkedHashMap<String, HandleHolder>();
+	private  Map<String,PartNoHolder> partNosBin = new LinkedHashMap<String, PartNoHolder>();
+	private  Map<String,HandleHolder> handleHolderBin = new LinkedHashMap<String, HandleHolder>();
 	private PartNoHolder partNoHolder;
 	
 	@Transactional

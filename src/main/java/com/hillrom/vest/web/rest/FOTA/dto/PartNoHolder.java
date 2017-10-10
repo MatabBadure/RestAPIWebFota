@@ -26,7 +26,7 @@ public class PartNoHolder {
 	private int totalChunk = 0;
 	private int chunkSize = 0;
 	private boolean abortFlag;
-	private static Map<Integer, String> fileChunks = null;
+	private Map<Integer, String> fileChunks = null;
 	private static final int HEX = 16;
 	PartNoHolder partNoHolder = null;
 	
@@ -47,7 +47,6 @@ public class PartNoHolder {
         String[] output = null;
         int ctr = 0;
         try {
-              //Path pp = FileSystems.getDefault().getPath("D:/FOTA/Hex/193164_charger_mainboard.hex");
         	//Path pp = FileSystems.getDefault().getPath(fotaInfo.getFilePath());
         	Path pp = FileSystems.getDefault().getPath(fotaInfo.getFilePath());
               hexDataStr = new String(Files.readAllBytes(pp)).replace(":", "").replace("\n","").replace("\r","");
@@ -58,10 +57,11 @@ public class PartNoHolder {
               for (String str : output) {
               	fileChunks.put(ctr++, str);
               }
-              totalChunk = fileChunks.size();
+            totalChunk = fileChunks.size();
 	    } catch (IOException ex) {
 	        ex.printStackTrace();
 	    }
+        
         return totalChunk;
     }
 	

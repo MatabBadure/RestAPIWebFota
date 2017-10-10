@@ -242,7 +242,7 @@ public class FOTAService {
 								holder.setPreviousChunkTransStatus("CheckUpdate");
 								//added new stmt
 								holder.setSoftwareVersion(fotaInfo.getSoftVersion());
-								holder.setSpwanedObject(new DateTime());
+								//holder.setSpwanedObject(new DateTime());
 								handleId = getHandleNumber();
 								handleHolderBin.put(handleId, holder);
 							} else {

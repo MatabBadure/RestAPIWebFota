@@ -49,7 +49,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             + " where MONTH(pi.dob) = ?2  "
             + " and DAY(pi.dob) = ?3 and YEAR(pi.dob) + 18 = ?1 "
             + " and upa.relationshipLabel = 'Caregiver' and upa.userRole = 'CARE_GIVER'")
-       List<Object[]> findUserPatientsMaturityDobAfter90Days(int year, int month, int day);
+       List<Object[]> findUserPatientsMaturityDobAfterDays(int year, int month, int day);
 
     
     

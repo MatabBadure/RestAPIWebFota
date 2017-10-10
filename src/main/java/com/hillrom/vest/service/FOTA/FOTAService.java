@@ -95,8 +95,8 @@ public class FOTAService {
 	//Dynamic part number
 	private static Map<String,PartNoHolder> partNosBin = new LinkedHashMap<String, PartNoHolder>();
 	private static Map<String,HandleHolder> handleHolderBin = new LinkedHashMap<String, HandleHolder>();
-	private PartNoHolder partNoHolder;
-	
+	private static Map<String,String> chunkSizeHolder = new LinkedHashMap<>();
+
 	@Transactional
 	public String FOTAUpdate(String rawMessage) throws Exception {
 		int countInt = 0;
@@ -130,7 +130,6 @@ public class FOTAService {
 			if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE1)) {
 				//Get active pending FOTA details from the DB 
 				FOTAInfo fotaInfo = fotaRepository.FOTAByPartNumber(fotaJsonData.get(DEVICE_PARTNUMBER),softDeleteFlag,activePublishedFlag);
-				
 				// Date formating which is from request
 				SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat(
 						"MMddyy");
@@ -159,23 +158,27 @@ public class FOTAService {
 						String chunkStr = getChunk(rawMessage);
 						// Decimal conversion
 						int chunkSize = FOTAParseUtil.hex2decimal(chunkStr);
-						// PartNumber:Chunk Size
-						String storeChunk = fotaJsonData.get(DEVICE_PARTNUMBER)
+						// PartNumber:Version:Chunk Size
+						String storePartNoKey = fotaJsonData.get(DEVICE_PARTNUMBER)
 								.concat(":").concat(fotaInfo.getSoftVersion()).concat(":").concat(String.valueOf(chunkSize));
+						String storePartNoChunk = fotaJsonData.get(DEVICE_PARTNUMBER)
+								.concat(":").concat(fotaInfo.getSoftVersion());
+						
+						log.debug("Store PartNumber:Version:Chunk Size:"+storePartNoKey);
 						boolean crcValid = false;
-						partNoHolder = null;
+						log.debug("PartNoSize:"+partNosBin.keySet().size());
+						PartNoHolder partNoHolder = null;
 						for(String key : partNosBin.keySet())
 						{
-							if(key.contains(storeChunk))
-							{
-								partNoHolder = partNosBin.get(storeChunk);
-								
-								if(partNoHolder.getAbortFlag()==false &&  partNoHolder.getChunkSize() == chunkSize)
+							if(key.contains(storePartNoKey))
+							{	
+								log.debug("Already spawned partNosBin="+storePartNoKey+"count="+partNosBin.size());
+								partNoHolder = new PartNoHolder();
+								partNoHolder = partNosBin.get(storePartNoKey);
+								if(partNoHolder.getAbortFlag() == false &&  partNoHolder.getChunkSize() == chunkSize)
 								{
 									break;
-								}
-								else
-								{
+								}else{
 									partNoHolder = null;
 								}
 							}
@@ -203,12 +206,12 @@ public class FOTAService {
 								holder.setSoftwareVersion(fotaInfo.getSoftVersion());
 								handleId = getHandleNumber();
 								handleHolderBin.put(handleId, holder);
+								log.debug("handleId="+handleId+":reqDev="+reqDev+":chunksize="+partNoHolder.getChunkSize());
 							} else {
 								//Send email notification for CRC validation failed
 								sendCRCFailedNotification();
 								//Abort case
 								partNoHolder.setAbortFlag(true);
-								
 								
 							}
 						} else {
@@ -223,7 +226,7 @@ public class FOTAService {
 										.getSoftVersion());
 								partNoHolder.setEffectiveDate(new DateTime());
 								// PartNo with Chuck size
-								partNosBin.put(storeChunk, partNoHolder);
+								partNosBin.put(storePartNoKey, partNoHolder);
 								// Initially
 								HandleHolder holder = new HandleHolder();
 								holder.setCurrentChunk(String.valueOf(0));
@@ -244,6 +247,9 @@ public class FOTAService {
 								holder.setSoftwareVersion(fotaInfo.getSoftVersion());
 								handleId = getHandleNumber();
 								handleHolderBin.put(handleId, holder);
+								//To capture chunk size
+								chunkSizeHolder.put(storePartNoChunk, String.valueOf(chunkSize));
+								log.debug("handleId="+handleId+":reqDev="+reqDev+":chunksize="+partNoHolder.getChunkSize());
 							} else {
 								//Send email notification for CRC validation failed
 								sendCRCFailedNotification();
@@ -252,7 +258,7 @@ public class FOTAService {
 							}
 						}
 
-						if (crcValid == false || partNoHolder.getAbortFlag()==true) {
+						if (crcValid == false || partNoHolder.getAbortFlag() == true) {
 							crsResultValue = FOTAParseUtil.asciiToHex("No");
 							resultPair = getResponePairResult();
 							crcPair = getResponePair3();
@@ -344,11 +350,13 @@ public class FOTAService {
 					handleId = getHandleFromRequest(rawMessage);
 					//Initially 
 					HandleHolder holder = new HandleHolder();
+					
+					PartNoHolder partNoHolder = new PartNoHolder();
 					//Get handle object based on handleId
 					holder = handleHolderBin.get(handleId);
 					//Frame key to get partNumber details
-					String storeChunk = holder.getPartNo().concat(":").concat(holder.getSoftwareVersion()).concat(":").concat(String.valueOf(holder.getChunkSize()));
-					partNoHolder =  partNosBin.get(storeChunk);
+					String storePartNoKey = holder.getPartNo().concat(":").concat(holder.getSoftwareVersion()).concat(":").concat(String.valueOf(holder.getChunkSize()));
+					partNoHolder =  partNosBin.get(storePartNoKey);
 					
 				if(partNoHolder.getAbortFlag() == false){
 					
@@ -361,7 +369,7 @@ public class FOTAService {
 						String zeroChunk = partNoHolder.getFileChunks().get(chunkCount);
 						
 						holder.setCurrentChunk(holder.getCurrentChunk());
-						holder.setPreviousChunkTransStatus("INIT");
+						holder.setPreviousChunkTransStatus(INIT);
 						holder.setDownloadStartDateTime(new DateTime());
 						
 						handleHolderBin.put(handleId, holder);
@@ -380,7 +388,7 @@ public class FOTAService {
 							String zeroChunk = partNoHolder.getFileChunks().get(chunkCount);
 							
 							holder.setCurrentChunk(String.valueOf(chunkCount));
-							holder.setPreviousChunkTransStatus("OK");
+							holder.setPreviousChunkTransStatus(OK);
 							handleHolderBin.put(handleId, holder);
 							
 							//Zero the Chunk in raw format
@@ -397,7 +405,7 @@ public class FOTAService {
 						String zeroChunk = partNoHolder.getFileChunks().get(chunkCount);
 						
 						holder.setCurrentChunk(String.valueOf(chunkCount));
-						holder.setPreviousChunkTransStatus("OK");
+						holder.setPreviousChunkTransStatus(OK);
 						handleHolderBin.put(handleId, holder);
 						
 						//Zero the Chunk in raw format
@@ -409,12 +417,10 @@ public class FOTAService {
 						log.debug("bufferLen:" + bufferLen);
 						
 					} 	
-						
 					// result pair1
 					resultPair = getResponePairResult();
 					
 					//Init and ok send result is ok
-					//crcResult = "OK";
 					crsResultValue = FOTAParseUtil.asciiToHex(OK);
 					
 					//handlePair Init Pair1 HANDLE_EQ
@@ -1675,7 +1681,26 @@ public class FOTAService {
 				log.debug("FotaInfo Details: with Inactive published {}", fotaInfo);
 				
 				String storeChunk = fotaInfo.getDevicePartNumber().concat(":").concat(fotaInfo.getSoftVersion());
-				if(partNoHolder !=null){
+				
+				for(String partNoChunkSize : chunkSizeHolder.keySet()){
+					if(partNoChunkSize.contains(storeChunk)){
+						String chunkSize = chunkSizeHolder.get(partNoChunkSize);
+						log.debug("chunkSize :"+chunkSize);
+						String storePartNoKey = storeChunk.concat(":").concat(chunkSize);
+						for(String key : partNosBin.keySet()){
+							if(key.contains(storePartNoKey)){
+								PartNoHolder partNoHolder = new PartNoHolder();
+								partNoHolder = partNosBin.get(key);
+								partNoHolder.setAbortFlag(true);
+								log.debug("key :"+key);
+								partNosBin.put(key, partNoHolder);
+							}
+						}
+					}
+				}
+				
+				
+				/*if(partNoHolder !=null){
 					for(String key : partNosBin.keySet()){
 						
 						if(key.contains(storeChunk)){
@@ -1683,9 +1708,9 @@ public class FOTAService {
 							log.debug("key :"+key);
 						}
 					}
-					partNoHolder.setAbortFlag(true);
+					
 					log.debug("Abort flag is set:"+partNoHolder.getAbortFlag());	
-				}
+				}*/
 			}
 			if (Objects.nonNull(fotaInfo)) {
 				fotaInfo.setActivePublishedFlag(true);
@@ -1701,7 +1726,7 @@ public class FOTAService {
 			fotaInfo = fotaRepository.findOneById(apprDto.getFotaId());
 			
 			//Approve key in CRC32 calculations
-			result = validateApproverCRC32(fotaInfo,apprDto.getRegion1CRC(), apprDto.getRegion2CRC());
+			result = validateApprCRC32(fotaInfo,apprDto.getRegion1CRC(), apprDto.getRegion2CRC());
 		}
 		return result;
 	}
@@ -1715,7 +1740,7 @@ public class FOTAService {
 	 * @throws Exception
 	 */
 	@SuppressWarnings("resource")
-	private boolean validateApproverCRC32(FOTAInfo fotaInfo, String region1crc,
+	private boolean validateApprCRC32(FOTAInfo fotaInfo, String region1crc,
 			String region2crc) throws Exception {
 
 		boolean eof = false;

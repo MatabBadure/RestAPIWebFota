@@ -33,7 +33,7 @@ public class PartNoHolder {
 	public PartNoHolder() {
 		// Default constructor
 	}
-	public PartNoHolder(int chunkSize, FOTAInfo fotaInfo){
+	public PartNoHolder(int chunkSize, FOTAInfo fotaInfo) throws IOException{
 		partNoHolder = new PartNoHolder();
 		totalChunk = readHexByteDataFromFile(chunkSize, fotaInfo);
 		partNoHolder.setTotalChunk(totalChunk);
@@ -42,11 +42,10 @@ public class PartNoHolder {
 		
 	}
 	
-	private int readHexByteDataFromFile(int chunkSize, FOTAInfo fotaInfo){
+	private int readHexByteDataFromFile(int chunkSize, FOTAInfo fotaInfo) throws IOException{
         String hexDataStr = null;
         String[] output = null;
         int ctr = 0;
-        try {
         	//Path pp = FileSystems.getDefault().getPath(fotaInfo.getFilePath());
         	Path pp = FileSystems.getDefault().getPath(fotaInfo.getFilePath());
               hexDataStr = new String(Files.readAllBytes(pp)).replace(":", "").replace("\n","").replace("\r","");
@@ -58,10 +57,6 @@ public class PartNoHolder {
               	fileChunks.put(ctr++, str);
               }
             totalChunk = fileChunks.size();
-	    } catch (IOException ex) {
-	        ex.printStackTrace();
-	    }
-        
         return totalChunk;
     }
 	

@@ -27,7 +27,7 @@ public class PartNoHolder {
 	private int totalChunk = 0;
 	private int chunkSize = 0;
 	private boolean abortFlag;
-	private static Map<Integer, String> fileChunks = null;
+	private Map<Integer, String> fileChunks = null;
 
 	public static final byte[] CHUNK_SIZE = new byte[] { 38, 99, 104, 117, 110,
 			107, 83, 105, 122, 101, 61 };

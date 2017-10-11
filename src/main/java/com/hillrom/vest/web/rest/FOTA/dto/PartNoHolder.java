@@ -33,13 +33,12 @@ public class PartNoHolder {
 			107, 83, 105, 122, 101, 61 };
 	private static final int HEX = 16;
 	
-	PartNoHolder partNoHolder = null;
 	
 	public PartNoHolder() {
 		// TODO Auto-generated constructor stub
 	}
 	public PartNoHolder(int chunkSize, FOTAInfo fotaInfo){
-		partNoHolder = new PartNoHolder();
+		PartNoHolder partNoHolder = new PartNoHolder();
 		totalChunk = readHexByteDataFromFile(chunkSize, fotaInfo);
 		partNoHolder.setTotalChunk(totalChunk);
 		partNoHolder.setFileChunks(fileChunks);

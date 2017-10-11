@@ -27,19 +27,18 @@ public class PartNoHolder {
 	private int totalChunk = 0;
 	private int chunkSize = 0;
 	private boolean abortFlag;
-	private static Map<Integer, String> fileChunks = null;
+	private Map<Integer, String> fileChunks = null;
 
 	public static final byte[] CHUNK_SIZE = new byte[] { 38, 99, 104, 117, 110,
 			107, 83, 105, 122, 101, 61 };
 	private static final int HEX = 16;
 	
-	PartNoHolder partNoHolder = null;
 	
 	public PartNoHolder() {
 		// TODO Auto-generated constructor stub
 	}
 	public PartNoHolder(int chunkSize, FOTAInfo fotaInfo){
-		partNoHolder = new PartNoHolder();
+		PartNoHolder partNoHolder = new PartNoHolder();
 		totalChunk = readHexByteDataFromFile(chunkSize, fotaInfo);
 		partNoHolder.setTotalChunk(totalChunk);
 		partNoHolder.setFileChunks(fileChunks);
@@ -52,18 +51,18 @@ public class PartNoHolder {
         String[] output = null;
         int ctr = 0;
         try {
-              //Path pp = FileSystems.getDefault().getPath("D:/FOTA/Hex/193164_charger_mainboard.hex");
+            //Path pp = FileSystems.getDefault().getPath("D:/FOTA/Hex/193164_charger_mainboard.hex");
         	//Path pp = FileSystems.getDefault().getPath(fotaInfo.getFilePath());
         	Path pp = FileSystems.getDefault().getPath(fotaInfo.getFilePath());
-              hexDataStr = new String(Files.readAllBytes(pp)).replace(":", "").replace("\n","").replace("\r","");
+            hexDataStr = new String(Files.readAllBytes(pp)).replace(":", "").replace("\n","").replace("\r","");
             //Splitting in hex format
-              output = hexDataStr.split("(?<=\\G.{" + (chunkSize * 2) + "})");
-              //Storing chunks into hash map
-              fileChunks = new LinkedHashMap<Integer, String>();
-              for (String str : output) {
+            output = hexDataStr.split("(?<=\\G.{" + (chunkSize * 2) + "})");
+            //Storing chunks into hash map
+            fileChunks = new LinkedHashMap<Integer, String>();
+            for (String str : output) {
               	fileChunks.put(ctr++, str);
               }
-              totalChunk = fileChunks.size();
+            totalChunk = fileChunks.size();
 	    } catch (IOException ex) {
 	        ex.printStackTrace();
 	    }

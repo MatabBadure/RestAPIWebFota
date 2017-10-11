@@ -91,11 +91,9 @@ public class FOTAService {
 	
 	private int bufferLen = 0;
 	private String buffer = null;
-	
 	//Dynamic part number
 	private static Map<String,PartNoHolder> partNosBin = new LinkedHashMap<String, PartNoHolder>();
 	private static Map<String,HandleHolder> handleHolderBin = new LinkedHashMap<String, HandleHolder>();
-	private static Map<String,String> chunkSizeHolder = new LinkedHashMap<>();
 
 	@Transactional
 	public String FOTAUpdate(String rawMessage) throws Exception {
@@ -247,8 +245,6 @@ public class FOTAService {
 								holder.setSoftwareVersion(fotaInfo.getSoftVersion());
 								handleId = getHandleNumber();
 								handleHolderBin.put(handleId, holder);
-								//To capture chunk size
-								chunkSizeHolder.put(storePartNoChunk, String.valueOf(chunkSize));
 								log.debug("handleId="+handleId+":software version="+fotaInfo.getSoftVersion()+":chunksize="+partNoHolder.getChunkSize());
 							} else {
 								//Send email notification for CRC validation failed
@@ -612,6 +608,55 @@ public class FOTAService {
 		
 	}
 	
+	public boolean validateCRC(String rawMessage) {
+		 
+		log.error("Inside  calculateCRC : " ,rawMessage);
+		  
+	    int nCheckSum = 0;
+
+	    byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
+	    
+	    int nDecodeCount = 0;
+	    for ( ; nDecodeCount < (decoded.length-2); nDecodeCount++ )
+	    {
+	      int nValue = (decoded[nDecodeCount] & 0xFF);
+	      nCheckSum += nValue;
+	    }
+	    
+	    System.out.format("Inverted Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
+	    
+	    nCheckSum = nCheckSum & 0xFFFF;
+	    
+	    int nMSB = decoded[nDecodeCount+1] & 0xFF;
+	    int nLSB = decoded[nDecodeCount] & 0xFF;
+	    
+	    System.out.format("MSB = %d [0x%x]\r\n" ,nMSB, nMSB);
+	    System.out.format("LSB = %d [0x%x]\r\n" ,nLSB, nLSB);
+	    log.error("Total Value = " + nCheckSum);
+	    nCheckSum = ((~nCheckSum)& 0xFFFF) + 1;
+	    System.out.format("Checksum Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
+	    
+	    String msb_digit = Integer.toHexString(nMSB);
+	    String lsb_digit = Integer.toHexString(nLSB);
+	    String checksum_num =  Integer.toHexString(nCheckSum);
+	    checksum_num = ("0000" + checksum_num).substring(checksum_num.length());
+	    
+	    if(msb_digit.length()<2)
+	    	msb_digit = "0"+msb_digit;
+	    if(lsb_digit.length()<2)
+	    	lsb_digit = "0"+lsb_digit;
+	    
+	    System.out.println("MSB : " + msb_digit + " " +  "LSB : " + lsb_digit);
+	    System.out.println("Checksum : " + checksum_num);
+	    
+	    if((msb_digit+lsb_digit).equalsIgnoreCase(checksum_num)){
+	    	return true;
+	    }else{
+	    	log.error("CRC VALIDATION FAILED :"); 
+	    	return false;
+	    }
+	}
+
 	
 	private void sendCRCFailedNotification() {
 		List<Object[]> resultList = fotaRepositoryUtils.getFOATUsers();
@@ -692,67 +737,12 @@ public class FOTAService {
 	}
 
 	private String getResponePairResult() {
-		
 		String getResponePairResult = asciiToHex(RESULT_EQ);
 		log.error("getResponePairResult: " + getResponePairResult);
-		//response.append("Yes");
 		return getResponePairResult;
 	}
 
-	private boolean validateCRC(String rawMessage) {
-		 
-		log.error("Inside  calculateCRC : " ,rawMessage);
-		  
-	    int nCheckSum = 0;
-
-	    byte[] decoded = java.util.Base64.getDecoder().decode(rawMessage);
-	    
-	    int nDecodeCount = 0;
-	    for ( ; nDecodeCount < (decoded.length-2); nDecodeCount++ )
-	    {
-	      int nValue = (decoded[nDecodeCount] & 0xFF);
-	      nCheckSum += nValue;
-	    }
-	    
-	    
-	    System.out.format("Inverted Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
-	    
-	   /* while ( nCheckSum >  65535 )
-	    {
-	      nCheckSum -= 65535;
-	    }*/
-	    nCheckSum = nCheckSum & 0xFFFF;
-	    
-	    int nMSB = decoded[nDecodeCount+1] & 0xFF;
-	    int nLSB = decoded[nDecodeCount] & 0xFF;
-	    
-	    System.out.format("MSB = %d [0x%x]\r\n" ,nMSB, nMSB);
-	    System.out.format("LSB = %d [0x%x]\r\n" ,nLSB, nLSB);
-	    log.error("Total Value = " + nCheckSum);
-	    nCheckSum = ((~nCheckSum)& 0xFFFF) + 1;
-	    System.out.format("Checksum Value = %d [0X%x] \r\n" ,nCheckSum,nCheckSum);
-	    
-	    String msb_digit = Integer.toHexString(nMSB);
-	    String lsb_digit = Integer.toHexString(nLSB);
-	    String checksum_num =  Integer.toHexString(nCheckSum);
-	    checksum_num = ("0000" + checksum_num).substring(checksum_num.length());
-	    
-	    if(msb_digit.length()<2)
-	    	msb_digit = "0"+msb_digit;
-	    if(lsb_digit.length()<2)
-	    	lsb_digit = "0"+lsb_digit;
-	    
-	    System.out.println("MSB : " + msb_digit + " " +  "LSB : " + lsb_digit);
-	    System.out.println("Checksum : " + checksum_num);
-	    
-	    if((msb_digit+lsb_digit).equalsIgnoreCase(checksum_num)){
-	    	return true;
-	    }else{
-	    	log.error("CRC VALIDATION FAILED :"); 
-	    	return false;
-	    }
-	}
-	
+		
 	private String getBufferLenTwoHexByte(int bufferLen) {
 		//Convert to hex
 		String bufferLenHex =	Integer.toHexString(bufferLen);
@@ -769,7 +759,6 @@ public class FOTAService {
 			String buffer, String crcPair, String crcstr, int countInt) {
 		
 		//Final String 
-		//String finalString = responsePair1.concat(handleIdRaw).concat(responsePair2).concat(bufferLenRaw).concat(responsePair3).concat(buffer).concat(responsePair4).concat(crcRaw);
 		String finalString = resultPair.concat(crsResultValue)
 				.concat(handlePair).concat(handleIdRaw).concat(bufferLenPair)
 				.concat(bufferLenRaw).concat(bufferPair).concat(buffer)
@@ -1678,37 +1667,19 @@ public class FOTAService {
 				fotaRepository.save(fotaInfoExist);
 				log.debug("FotaInfo Details: with Inactive published {}", fotaInfo);
 				
-				String storeChunk = fotaInfo.getDevicePartNumber().concat(":").concat(fotaInfo.getSoftVersion());
-				
-				for(String partNoChunkSize : chunkSizeHolder.keySet()){
-					if(partNoChunkSize.contains(storeChunk)){
-						String chunkSize = chunkSizeHolder.get(partNoChunkSize);
-						log.debug("chunkSize :"+chunkSize);
-						String storePartNoKey = storeChunk.concat(":").concat(chunkSize);
-						for(String key : partNosBin.keySet()){
-							if(key.contains(storePartNoKey)){
-								PartNoHolder partNoHolder = new PartNoHolder();
-								partNoHolder = partNosBin.get(key);
-								partNoHolder.setAbortFlag(true);
-								log.debug("key :"+key);
-								partNosBin.put(key, partNoHolder);
-							}
-						}
+				String partNo = fotaInfo.getDevicePartNumber();
+
+				for(Map.Entry<String,PartNoHolder> entry : partNosBin.entrySet()){
+					String key = entry.getKey();
+					String[] str = key.split(":");
+					if(str[0].equals(partNo)){
+						PartNoHolder partNoHolder = new PartNoHolder();
+						partNoHolder = partNosBin.get(key);
+						partNoHolder.setAbortFlag(true);
+						log.debug("key :"+key);
+						partNosBin.put(key, partNoHolder);
 					}
 				}
-				
-				
-				/*if(partNoHolder !=null){
-					for(String key : partNosBin.keySet()){
-						
-						if(key.contains(storeChunk)){
-							partNoHolder = partNosBin.get(key);
-							log.debug("key :"+key);
-						}
-					}
-					
-					log.debug("Abort flag is set:"+partNoHolder.getAbortFlag());	
-				}*/
 			}
 			if (Objects.nonNull(fotaInfo)) {
 				fotaInfo.setActivePublishedFlag(true);

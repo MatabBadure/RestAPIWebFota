@@ -193,7 +193,13 @@ public class TimsInputReaderService {
 			log.debug("All Records Executed Successfully");
 		}
 		
-		}catch(Exception ex){
+		}catch(javax.persistence.RollbackException jr){
+		//	log.debug("RollbackException");
+		}
+		catch(org.springframework.transaction.TransactionSystemException tse){
+		//	log.debug("TransactionSystemException");
+		}    
+		catch(Exception ex){
 			mailService.sendTIMSLog(logFileName);
 			ex.printStackTrace();
 			throw new HillromException("Error in TIMS Script Execution " , ex);
@@ -204,7 +210,7 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{        
-		     String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
+		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
 		      File flatFile = new File(csvFile);
 		      if(!flatFile.exists()) { 
 		    	  log.debug("Failure        NA               NA             Failure           The csv file is not present ");

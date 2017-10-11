@@ -121,7 +121,7 @@ public class FOTAService {
 		// Checking if request Type is 01 & //Checking if request Type is 02
 		if(validateCRC(rawMessage)){
 			//crcResult = "Yes";
-			crsResultValue = FOTAParseUtil.asciiToHex(YES);
+			crsResultValue = asciiToHex(YES);
 			String handleId = "";
 			boolean softDeleteFlag = false;
 			boolean activePublishedFlag = true;
@@ -157,7 +157,7 @@ public class FOTAService {
 						// Get Chunk Size from request
 						String chunkStr = getChunk(rawMessage);
 						// Decimal conversion
-						int chunkSize = FOTAParseUtil.hex2decimal(chunkStr);
+						int chunkSize = hex2decimal(chunkStr);
 						// PartNumber:Version:Chunk Size
 						String storePartNoKey = fotaJsonData.get(DEVICE_PARTNUMBER)
 								.concat(":").concat(fotaInfo.getSoftVersion()).concat(":").concat(String.valueOf(chunkSize));
@@ -196,9 +196,9 @@ public class FOTAService {
 										.get(DEVICE_SN));
 								holder.setConnectionType(fotaJsonData
 										.get(CONNECTION_TYPE));
-								holder.setDeviceSoftwareVersion(reqDev);
+								holder.setDeviceSoftwareVersion(fotaInfo.getSoftVersion());
 								//request Device software date
-								holder.setDeviceSoftwareDateTime(reqReleaseDate);
+								holder.setDeviceSoftwareDateTime(fotaInfo.getReleaseDate());
 								holder.setUpdatedSoftVersion(fotaInfo.getSoftVersion());
 								holder.setCheckupdateDateTime(new DateTime());
 								holder.setPreviousChunkTransStatus("CheckUpdate");
@@ -206,13 +206,12 @@ public class FOTAService {
 								holder.setSoftwareVersion(fotaInfo.getSoftVersion());
 								handleId = getHandleNumber();
 								handleHolderBin.put(handleId, holder);
-								log.debug("handleId="+handleId+":reqDev="+reqDev+":chunksize="+partNoHolder.getChunkSize());
+								log.debug("handleId="+handleId+":SoftwareVersion="+fotaInfo.getSoftVersion()+":chunksize="+partNoHolder.getChunkSize());
 							} else {
 								//Send email notification for CRC validation failed
 								sendCRCFailedNotification();
 								//Abort case
 								partNoHolder.setAbortFlag(true);
-								
 							}
 						} else {
 							partNoHolder = new PartNoHolder(chunkSize, fotaInfo);
@@ -230,16 +229,17 @@ public class FOTAService {
 								// Initially
 								HandleHolder holder = new HandleHolder();
 								holder.setCurrentChunk(String.valueOf(0));
-								holder.setPartNo(partNoHolder.getPart_No());
-								holder.setChunkSize(partNoHolder.getChunkSize());
+								holder.setPartNo(fotaJsonData
+										.get(DEVICE_PARTNUMBER));
+								holder.setChunkSize(chunkSize);
 								holder.setFotaInfoId(fotaInfo.getId());
 								holder.setDeviceSerialNumber(fotaJsonData
 										.get(DEVICE_SN));
 								holder.setConnectionType(fotaJsonData
 										.get(CONNECTION_TYPE));
-								holder.setDeviceSoftwareVersion(reqDev);
+								holder.setDeviceSoftwareVersion(fotaInfo.getSoftVersion());
 								//Request Device software date
-								holder.setDeviceSoftwareDateTime(reqReleaseDate);
+								holder.setDeviceSoftwareDateTime(fotaInfo.getReleaseDate());
 								holder.setUpdatedSoftVersion(fotaInfo.getSoftVersion());
 								holder.setCheckupdateDateTime(new DateTime());
 								holder.setPreviousChunkTransStatus("CheckUpdate");
@@ -249,7 +249,7 @@ public class FOTAService {
 								handleHolderBin.put(handleId, holder);
 								//To capture chunk size
 								chunkSizeHolder.put(storePartNoChunk, String.valueOf(chunkSize));
-								log.debug("handleId="+handleId+":reqDev="+reqDev+":chunksize="+partNoHolder.getChunkSize());
+								log.debug("handleId="+handleId+":software version="+fotaInfo.getSoftVersion()+":chunksize="+partNoHolder.getChunkSize());
 							} else {
 								//Send email notification for CRC validation failed
 								sendCRCFailedNotification();
@@ -259,7 +259,7 @@ public class FOTAService {
 						}
 
 						if (crcValid == false || partNoHolder.getAbortFlag() == true) {
-							crsResultValue = FOTAParseUtil.asciiToHex("No");
+							crsResultValue = asciiToHex("No");
 							resultPair = getResponePairResult();
 							crcPair = getResponePair3();
 							String crsRaw = resultPair.concat(crsResultValue)
@@ -283,7 +283,7 @@ public class FOTAService {
 							handlePair = getResponePair1();
 
 							// Handle in raw format
-							String handleIdRaw = FOTAParseUtil.hexToAscii(FOTAParseUtil.asciiToHex(FOTAParseUtil.toLittleEndian((handleId))));
+							String handleIdRaw = hexToAscii(asciiToHex(toLittleEndian(handleId)));
 
 							// Response pair2
 							totalChunkPair = getResponePair2();
@@ -315,7 +315,7 @@ public class FOTAService {
 							log.debug("finalResponseStr: " + finalResponseStr);
 						}
 					}else{
-						crsResultValue = FOTAParseUtil.asciiToHex("No");
+						crsResultValue = asciiToHex("No");
 						resultPair = getResponePairResult();
 						crcPair = getResponePair3();
 						String crsRaw = resultPair.concat(crsResultValue).concat(
@@ -330,7 +330,7 @@ public class FOTAService {
 						finalResponseStr = resultPair.concat(crsResultValue).concat(crcPair).concat(crcValue);
 						}
 				}else{
-				crsResultValue = FOTAParseUtil.asciiToHex("No");
+				crsResultValue = asciiToHex("No");
 				resultPair = getResponePairResult();
 				crcPair = getResponePair3();
 				String crsRaw = resultPair.concat(crsResultValue).concat(
@@ -374,7 +374,7 @@ public class FOTAService {
 						
 						handleHolderBin.put(handleId, holder);
 						//Zero the Chunk in raw format
-						buffer = FOTAParseUtil.hexToAscii(FOTAParseUtil.asciiToHex(zeroChunk));
+						buffer = hexToAscii(asciiToHex(zeroChunk));
 						log.debug("buffer Encoded:" + buffer);
 						
 						//Chunk size in hex byte
@@ -392,7 +392,7 @@ public class FOTAService {
 							handleHolderBin.put(handleId, holder);
 							
 							//Zero the Chunk in raw format
-							buffer = FOTAParseUtil.hexToAscii(FOTAParseUtil.asciiToHex(zeroChunk));
+							buffer = hexToAscii(asciiToHex(zeroChunk));
 							log.debug("buffer Encoded:" + buffer);
 							
 							//Chunk size in hex byte
@@ -409,7 +409,7 @@ public class FOTAService {
 						handleHolderBin.put(handleId, holder);
 						
 						//Zero the Chunk in raw format
-						buffer = FOTAParseUtil.hexToAscii(FOTAParseUtil.asciiToHex(zeroChunk));
+						buffer = hexToAscii(asciiToHex(zeroChunk));
 						log.debug("buffer Encoded:" + buffer);
 						
 						//Chunk size in hex byte
@@ -421,7 +421,7 @@ public class FOTAService {
 					resultPair = getResponePairResult();
 					
 					//Init and ok send result is ok
-					crsResultValue = FOTAParseUtil.asciiToHex(OK);
+					crsResultValue = asciiToHex(OK);
 					
 					//handlePair Init Pair1 HANDLE_EQ
 					
@@ -429,7 +429,7 @@ public class FOTAService {
 					//handlePair = asciiToHex(HANDLE_EQ);
 					
 					//Handle in raw format(handle Value)
-					String handleIdRaw = FOTAParseUtil.hexToAscii(FOTAParseUtil.asciiToHex(FOTAParseUtil.toLittleEndian((handleId))));
+					String handleIdRaw = hexToAscii(asciiToHex(toLittleEndian(handleId)));
 					
 					//bufferLenPair Init Pair2(BUFFER_LEN_EQ)
 					bufferLenPair = getInitResponsePair2();
@@ -456,7 +456,7 @@ public class FOTAService {
 						bufferLenPair, bufferLenRaw, bufferPair, buffer,crcPair,crcstr,countInt);
 				log.debug("finalResponseStr: " + finalResponseStr);
 				}else{
-					crsResultValue = FOTAParseUtil.asciiToHex("ABORT");
+					crsResultValue = asciiToHex("ABORT");
 					resultPair = getResponePairResult();
 					crcPair = getResponePair3();
 					String crsRaw = resultPair.concat(crsResultValue).concat(
@@ -494,7 +494,7 @@ public class FOTAService {
 					// result pair1
 					resultPair = getResponePairResult();
 					//crcResult = "OK";
-					crsResultValue = FOTAParseUtil.asciiToHex(OK);
+					crsResultValue = asciiToHex(OK);
 					crcPair = getResponePair3();
 					
 					String crsRaw = resultPair.concat(crsResultValue).concat(crcPair);
@@ -530,7 +530,7 @@ public class FOTAService {
 					// result pair1
 					resultPair = getResponePairResult();
 					//crcResult = "OK";
-					crsResultValue = FOTAParseUtil.asciiToHex(NOT_OK);
+					crsResultValue = asciiToHex(NOT_OK);
 					crcPair = getResponePair3();
 					
 					String crsRaw = resultPair.concat(crsResultValue).concat(crcPair);
@@ -569,7 +569,7 @@ public class FOTAService {
 					// result pair1
 					resultPair = getResponePairResult();
 					//crcResult = "OK";
-					crsResultValue = FOTAParseUtil.asciiToHex(OK);
+					crsResultValue = asciiToHex(OK);
 					crcPair = getResponePair3();
 					
 					String crsRaw = resultPair.concat(crsResultValue).concat(crcPair);
@@ -589,7 +589,7 @@ public class FOTAService {
 		
 		}else if(!validateCRC(rawMessage)){
 			//crcResult = "NOT OK";
-			crsResultValue = FOTAParseUtil.asciiToHex(NOT_OK);
+			crsResultValue = asciiToHex(NOT_OK);
 			resultPair = getResponePairResult();
 			crcPair = getResponePair3();
 			String crsRaw = resultPair.concat(crsResultValue).concat(
@@ -645,7 +645,7 @@ public class FOTAService {
 		deviceRes.append(device3);
 		deviceRes.append(device4);
 		//written new code
-		String deviceVer = FOTAParseUtil.toLittleEndian(deviceRes.toString());
+		String deviceVer = toLittleEndian(deviceRes.toString());
 		log.error("deviceVer: " + deviceVer);
 		return deviceVer;
 	}
@@ -687,13 +687,13 @@ public class FOTAService {
 	    //String handleHexString = checksum_num.toString(16);
 	    checksum_num = ("0000" + checksum_num).substring(checksum_num.length());
 	    System.out.println("Checksum : " + checksum_num);
-	    return FOTAParseUtil.toLittleEndian(checksum_num);
+	    return toLittleEndian(checksum_num);
 	  
 	}
 
 	private String getResponePairResult() {
 		
-		String getResponePairResult = FOTAParseUtil.asciiToHex(RESULT_EQ);
+		String getResponePairResult = asciiToHex(RESULT_EQ);
 		log.error("getResponePairResult: " + getResponePairResult);
 		//response.append("Yes");
 		return getResponePairResult;
@@ -759,7 +759,7 @@ public class FOTAService {
 		//convert in two byte format
 		bufferLenHex = ("0000" + bufferLenHex).substring(bufferLenHex.length());
 		//converting to little Endian 
-		String bufferInLsb = FOTAParseUtil.hexToAscii(FOTAParseUtil.asciiToHex(FOTAParseUtil.toLittleEndian((bufferLenHex))));
+		String bufferInLsb = hexToAscii(asciiToHex(toLittleEndian((bufferLenHex))));
 		return bufferInLsb;
 	}
 
@@ -808,7 +808,7 @@ public class FOTAService {
 		handleRes.append(handle3);
 		handleRes.append(handle4);
 		//written new code
-		String handleId = FOTAParseUtil.toLittleEndian(handleRes.toString());
+		String handleId = toLittleEndian(handleRes.toString());
 		log.error("handleId: " + handleId);
 		return handleId;
 	}
@@ -818,7 +818,7 @@ public class FOTAService {
 		StringBuilder response = new StringBuilder();	
 		response.append(AMPERSAND);
 		response.append(BUFFER_EQ);
-		String initResponsePair3 = FOTAParseUtil.asciiToHex(response.toString());
+		String initResponsePair3 = asciiToHex(response.toString());
 		return initResponsePair3;
 	}
 
@@ -827,7 +827,7 @@ public class FOTAService {
 		StringBuilder response = new StringBuilder();	
 		response.append(AMPERSAND);
 		response.append(BUFFER_LEN_EQ);
-		String initResponsePair3 = FOTAParseUtil.asciiToHex(response.toString());
+		String initResponsePair3 = asciiToHex(response.toString());
 		return initResponsePair3;
 	}
 
@@ -848,7 +848,7 @@ public class FOTAService {
 		StringBuilder response = new StringBuilder();
 		response.append(AMPERSAND);
 		response.append(CRC_EQ);
-		String responePair3 = FOTAParseUtil.asciiToHex(response.toString());
+		String responePair3 = asciiToHex(response.toString());
 		log.error("responePair3: " + responePair3);
 		return responePair3;
 	}
@@ -859,7 +859,7 @@ public class FOTAService {
 	    String totalChunkHexString = toHex.toString(16);
 	    totalChunkHexString = ("00000000" + totalChunkHexString).substring(totalChunkHexString.length());
 		//converting to little Indian
-	    String strTotalChunk = FOTAParseUtil.hexToAscii(FOTAParseUtil.asciiToHex(FOTAParseUtil.toLittleEndian((totalChunkHexString))));
+	    String strTotalChunk = hexToAscii(asciiToHex(toLittleEndian((totalChunkHexString))));
 		log.error("strTotalChunk: " + strTotalChunk);
 		return strTotalChunk;
 	}
@@ -869,7 +869,7 @@ public class FOTAService {
 		StringBuilder response = new StringBuilder();
 		response.append(AMPERSAND);
 		response.append(TOTAL_CHUNK);
-		String responePair2 = FOTAParseUtil.asciiToHex(response.toString());
+		String responePair2 = asciiToHex(response.toString());
 		log.error("responePair2: " + responePair2);
 		return responePair2;
 	}
@@ -877,11 +877,9 @@ public class FOTAService {
 
 	private String getResponePair1() {
 		StringBuilder response = new StringBuilder();
-		/*response.append(RESULT_EQ);
-		response.append("Yes");*/
 		response.append(AMPERSAND);
 		response.append(HANDLE_EQ);
-		String responePair1 = FOTAParseUtil.asciiToHex(response.toString());
+		String responePair1 = asciiToHex(response.toString());
 		log.error("responePair1: " + responePair1);
 		return responePair1;
 	}
@@ -1787,10 +1785,10 @@ public class FOTAService {
 		}
 		
 		if (StringUtils.isNotEmpty(region1crc)) {
-			crcValueInFile = Long.parseLong(FOTAParseUtil.toLittleEndian(region1crc),16);
+			crcValueInFile = Long.parseLong(toLittleEndian(region1crc),16);
 		}
 		if (StringUtils.isNotEmpty(region2crc)) {
-			crc2ValueInFile = Long.parseLong(FOTAParseUtil.toLittleEndian(region2crc),16);
+			crc2ValueInFile = Long.parseLong(toLittleEndian(region2crc),16);
 		}
 		fs = new FileInputStream(fotaInfo.getFilePath());
 
@@ -2070,9 +2068,60 @@ public class FOTAService {
 		sb.append(chunkSize1);
 		sb.append(chunkSize2);
 
-		String littleEndianChunk = FOTAParseUtil.toLittleEndian(sb.toString());
+		String littleEndianChunk = toLittleEndian(sb.toString());
 		return littleEndianChunk;
 
 	}
+	public int hex2decimal(String chunkStr) {
 
+		String digits = "0123456789ABCDEF";
+		chunkStr = chunkStr.toUpperCase();
+		int val = 0;
+		for (int i = 0; i < chunkStr.length(); i++) {
+			char c = chunkStr.charAt(i);
+			int d = digits.indexOf(c);
+			val = 16 * val + d;
+		}
+		return val;
+	}
+
+	// Convert String to ASCII
+	public String asciiToHex(String asciiValue) {
+		char[] chars = asciiValue.toCharArray();
+		StringBuffer hex = new StringBuffer();
+		for (int i = 0; i < chars.length; i++) {
+			hex.append(Integer.toHexString((int) chars[i]));
+		}
+		return hex.toString();
+
+	}
+
+	// Make it ready for raw data
+	public String hexToAscii(String hexStr) {
+		String str = "";
+		StringBuilder output = new StringBuilder("");
+		try {
+			for (int i = 0; i < hexStr.length(); i += 2) {
+				str = hexStr.substring(i, i + 2);
+				output.append((char) Integer.parseInt(str, 16));
+			}
+			System.out.println(output);
+
+		} catch (Exception ex) {
+
+		}
+		return new String(output.toString());
+	}
+
+	public String toLittleEndian(final String hex) {
+		String hexLittleEndian = "";
+		if (hex.length() % 2 != 0)
+			return hexLittleEndian;
+		for (int i = hex.length() - 2; i >= 0; i -= 2) {
+			hexLittleEndian += hex.substring(i, i + 2);
+		}
+		return hexLittleEndian;
+	}
+	
+	
 }

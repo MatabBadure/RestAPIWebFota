@@ -178,20 +178,7 @@ public class FOTAParseUtil {
 
 	}
 
-	public static int hex2decimal(String chunkStr) {
-
-		String digits = "0123456789ABCDEF";
-		chunkStr = chunkStr.toUpperCase();
-		int val = 0;
-		for (int i = 0; i < chunkStr.length(); i++) {
-			char c = chunkStr.charAt(i);
-			int d = digits.indexOf(c);
-			val = 16 * val + d;
-		}
-		return val;
-	}
-
-	public static String getBufferLenTwoHexByte(int bufferLen) {
+	/*public String getBufferLenTwoHexByte(int bufferLen) {
 		// Convert to hex
 		String bufferLenHex = Integer.toHexString(bufferLen);
 		// convert in two byte format
@@ -199,45 +186,6 @@ public class FOTAParseUtil {
 		// converting to little Endian
 		String bufferInLsb = hexToAscii(asciiToHex(toLittleEndian((bufferLenHex))));
 		return bufferInLsb;
-	}
-
-	// Convert String to ASCII
-	public static String asciiToHex(String asciiValue) {
-		char[] chars = asciiValue.toCharArray();
-		StringBuffer hex = new StringBuffer();
-		for (int i = 0; i < chars.length; i++) {
-			hex.append(Integer.toHexString((int) chars[i]));
-		}
-		return hex.toString();
-
-	}
-
-	// Make it ready for raw data
-	public static String hexToAscii(String hexStr) {
-		String str = "";
-		StringBuilder output = new StringBuilder("");
-		try {
-			for (int i = 0; i < hexStr.length(); i += 2) {
-				str = hexStr.substring(i, i + 2);
-				output.append((char) Integer.parseInt(str, 16));
-			}
-			System.out.println(output);
-
-		} catch (Exception ex) {
-
-		}
-		return new String(output.toString());
-	}
-
-	public static String toLittleEndian(final String hex) {
-		// int ret = 0;
-		String hexLittleEndian = "";
-		if (hex.length() % 2 != 0)
-			return hexLittleEndian;
-		for (int i = hex.length() - 2; i >= 0; i -= 2) {
-			hexLittleEndian += hex.substring(i, i + 2);
-		}
-		return hexLittleEndian;
-	}
+	}*/
 
 }

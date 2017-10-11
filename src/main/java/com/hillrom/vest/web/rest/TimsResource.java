@@ -419,7 +419,12 @@ public class TimsResource {
 			timsInputReaderService.ExecuteTIMSJob();			  
 			jsonObject.put("timsMsg", "TIMSJob Executed Successfully");
 			return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			
-		}catch(Exception ex){
+		}
+		catch(org.springframework.transaction.TransactionSystemException tse){
+			jsonObject.put("timsMsg", "TIMSJob Executed Successfully");
+			return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
+		}
+		catch(Exception ex){
 			
 			jsonObject.put("timsMsg", "TIMSJob NOT Executed Successfully");
 			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);

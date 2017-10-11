@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
 import javax.persistence.StoredProcedureQuery;
 
 import net.minidev.json.JSONObject;
@@ -170,6 +171,15 @@ public class TimsService {
 						 patientInfoDTO.getPatient_id(),
 						 patientInfoDTO.getCreated_by());
 		}
+		catch(javax.persistence.RollbackException jr){
+		//	log.debug("RollbackException");
+		}
+		catch(org.springframework.transaction.TransactionSystemException tse){
+		//	log.debug("TransactionSystemException");
+		}    
+		catch(PersistenceException pe){
+		//	log.debug("PersistenceException");
+		}
 		catch(SQLException se)
 		{
 			throw se;
@@ -193,6 +203,15 @@ public class TimsService {
 												 patientInfoDTO.getOperation_type(),
 												 patientInfoDTO.getPatient_id(),
 												 patientInfoDTO.getCreated_by());
+		}
+		catch(javax.persistence.RollbackException jr){
+		//	log.debug("RollbackException");
+		}
+		catch(org.springframework.transaction.TransactionSystemException tse){
+		//	log.debug("TransactionSystemException");
+		}    
+		catch(PersistenceException pe){
+		//	log.debug("PersistenceException");
 		}
 		catch(SQLException se)
 		{

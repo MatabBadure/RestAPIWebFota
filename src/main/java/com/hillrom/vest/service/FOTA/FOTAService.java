@@ -65,7 +65,6 @@ import com.hillrom.vest.repository.FOTA.FOTARepository;
 import com.hillrom.vest.repository.FOTA.FOTARepositoryUtils;
 import com.hillrom.vest.service.MailService;
 import com.hillrom.vest.service.util.DateUtil;
-import com.hillrom.vest.service.util.FOTA.CommonFOTAUtil;
 import com.hillrom.vest.service.util.FOTA.FOTAParseUtil;
 import com.hillrom.vest.web.rest.FOTA.dto.ApproverCRCDto;
 import com.hillrom.vest.web.rest.FOTA.dto.CRC32Dto;

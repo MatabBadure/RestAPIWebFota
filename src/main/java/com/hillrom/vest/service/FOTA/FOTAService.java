@@ -199,8 +199,8 @@ public class FOTAService {
 							} else {
 								//Send email notification for CRC validation failed
 								sendCRCFailedNotification();
-								//Abort case
-								partNoHolder.setAbortFlag(true);
+								/*//Abort case
+								partNoHolder.setAbortFlag(true);*/
 							}
 						} else {
 							partNoHolder = new PartNoHolder(chunkSize, fotaInfo);
@@ -241,8 +241,8 @@ public class FOTAService {
 							} else {
 								//Send email notification for CRC validation failed
 								sendCRCFailedNotification();
-								//Abort case
-								partNoHolder.setAbortFlag(true);
+								/*//Abort case
+								partNoHolder.setAbortFlag(true);*/
 							}
 						}
 

@@ -153,7 +153,7 @@ public class FOTAService {
 						// PartNumber:Version:Chunk Size
 						String storePartNoKey = fotaJsonData.get(DEVICE_PARTNUMBER)
 								.concat(":").concat(fotaInfo.getSoftVersion()).concat(":").concat(String.valueOf(chunkSize));
-						log.debug("Store PartNumber:Version:Chunk Size:"+storePartNoKey);
+						log.debug("Check upadte Framed Part No key:"+storePartNoKey);
 						boolean crcValid = false;
 						log.debug("PartNoSize:"+partNosBin.keySet().size());
 						PartNoHolder partNoHolder = null;
@@ -161,9 +161,9 @@ public class FOTAService {
 						{
 							if(key.contains(storePartNoKey))
 							{	
-								log.debug("Already spawned partNosBin="+storePartNoKey+"count="+partNosBin.size());
 								partNoHolder = new PartNoHolder();
 								partNoHolder = partNosBin.get(storePartNoKey);
+								log.debug("Part Number Key already exist for same chunk Size="+storePartNoKey);
 								if(partNoHolder.getAbortFlag() == false &&  partNoHolder.getChunkSize() == chunkSize)
 								{
 									break;
@@ -195,7 +195,7 @@ public class FOTAService {
 								holder.setSoftwareVersion(fotaInfo.getSoftVersion());
 								handleId = getHandleNumber();
 								handleHolderBin.put(handleId, holder);
-								log.debug("handleId="+handleId+":SoftwareVersion="+fotaInfo.getSoftVersion()+":chunksize="+partNoHolder.getChunkSize());
+								log.debug("New handleId="+handleId+": Same SoftwareVersion="+fotaInfo.getSoftVersion()+":same chunksize="+partNoHolder.getChunkSize());
 							} else {
 								//Send email notification for CRC validation failed
 								sendCRCFailedNotification();
@@ -215,6 +215,7 @@ public class FOTAService {
 								partNoHolder.setEffectiveDate(new DateTime());
 								// PartNo with Chuck size
 								partNosBin.put(storePartNoKey, partNoHolder);
+								log.debug("New Part Number Key for different chunk Size="+storePartNoKey);
 								// Initially
 								HandleHolder holder = new HandleHolder();
 								holder.setCurrentChunk(String.valueOf(0));
@@ -237,7 +238,7 @@ public class FOTAService {
 								handleId = getHandleNumber();
 								handleHolderBin.put(handleId, holder);
 								//To capture chunk size
-								log.debug("handleId="+handleId+":software version="+fotaInfo.getSoftVersion()+":chunksize="+partNoHolder.getChunkSize());
+								log.debug("New handleId="+handleId+":New software version="+fotaInfo.getSoftVersion()+":New chunksize="+partNoHolder.getChunkSize());
 							} else {
 								//Send email notification for CRC validation failed
 								sendCRCFailedNotification();
@@ -301,9 +302,9 @@ public class FOTAService {
 
 					//Get handle from request
 					handleId = coUtil.getHandleFromRequest(rawMessage);
+					log.debug("Send Chunk Handle Id ="+handleId);
 					//Initially 
 					HandleHolder holder = new HandleHolder();
-					
 					PartNoHolder partNoHolder = new PartNoHolder();
 					//Get handle object based on handleId
 					holder = handleHolderBin.get(handleId);
@@ -312,7 +313,6 @@ public class FOTAService {
 					partNoHolder =  partNosBin.get(storePartNoKey);
 					
 				if(partNoHolder.getAbortFlag() == false){
-					
 					if (fotaJsonData.get(PREV_REQ_STATUS).equals(INIT)) 
 					{
 						//Get current chunk count from handle holder object
@@ -324,15 +324,21 @@ public class FOTAService {
 						holder.setCurrentChunk(holder.getCurrentChunk());
 						holder.setPreviousChunkTransStatus(INIT);
 						holder.setDownloadStartDateTime(new DateTime());
-						
+
 						handleHolderBin.put(handleId, holder);
+						
+						log.debug("Init Send  Chunk Handle Id ="+handleId);
+						log.debug("Init Counter ="+holder.getCurrentChunk());
+						log.debug("Init ChunkSize ="+holder.getChunkSize());
+						log.debug("Send chunk Framed Part No key:"+storePartNoKey+"Part No Obj="+partNoHolder);
 						//Zero the Chunk in raw format
 						buffer = coUtil.hexToAscii(coUtil.asciiToHex(zeroChunk));
 						log.debug("buffer Encoded:" + buffer);
 						
 						//Chunk size in hex byte
 						bufferLen = zeroChunk.length() / 2;
-						log.debug("bufferLen:" + bufferLen);
+						log.debug("Init bufferLen:" + bufferLen);
+						log.debug("Init Count:" + chunkCount);
 						
 					}else if (fotaJsonData.get(PREV_REQ_STATUS).equals(OK))
 						{
@@ -344,13 +350,19 @@ public class FOTAService {
 							holder.setPreviousChunkTransStatus(OK);
 							handleHolderBin.put(handleId, holder);
 							
+							log.debug("Ok Send  Chunk Handle Id ="+handleId);
+							log.debug("Ok Counter ="+holder.getCurrentChunk());
+							log.debug("OK ChunkSize ="+holder.getChunkSize());
+							log.debug("Send chunk Framed Part No key:"+storePartNoKey+"Part No Obj="+partNoHolder);
+							
 							//Zero the Chunk in raw format
 							buffer = coUtil.hexToAscii(coUtil.asciiToHex(zeroChunk));
 							log.debug("buffer Encoded:" + buffer);
 							
 							//Chunk size in hex byte
 							bufferLen = zeroChunk.length() / 2;
-							log.debug("bufferLen:" + bufferLen);
+							log.debug("Ok BufferLen:" + bufferLen);
+							log.debug("OK Count:" + chunkCount);
 							
 					}else if (fotaJsonData.get(PREV_REQ_STATUS).equals(NOT_OK)) {
 						
@@ -361,6 +373,10 @@ public class FOTAService {
 						holder.setPreviousChunkTransStatus(OK);
 						handleHolderBin.put(handleId, holder);
 						
+						log.debug("Not Ok Send  Chunk Handle Id ="+handleId);
+						log.debug("Not Ok Counter ="+holder.getCurrentChunk());
+						log.debug("Not OK ChunkSize ="+holder.getChunkSize());
+						log.debug("Send chunk Framed Part No key:"+storePartNoKey+"Part No Obj="+partNoHolder);
 						//Zero the Chunk in raw format
 						buffer = coUtil.hexToAscii(coUtil.asciiToHex(zeroChunk));
 						log.debug("buffer Encoded:" + buffer);
@@ -368,6 +384,7 @@ public class FOTAService {
 						//Chunk size in hex byte
 						bufferLen = zeroChunk.length() / 2;
 						log.debug("bufferLen:" + bufferLen);
+						log.debug("OK Count:" + chunkCount);
 						
 					} 	
 					// result pair1
@@ -425,7 +442,6 @@ public class FOTAService {
 			}
 		
 		}else if(!coUtil.validateCRC(rawMessage)){
-			
 			//Added NOT OK Response
 			finalResponseStr = coUtil.failedResponse(finalResponseStr,crsResultValue,NOT_OK,resultPair,crcPair);
 		}

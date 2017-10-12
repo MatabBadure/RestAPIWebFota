@@ -82,6 +82,8 @@ public class TimsInputReaderService {
 	
 	@Inject
 	private MailService mailService;
+	
+	@Transactional
 	@Scheduled(cron="00 30 08 * * * ")
 	public void ExecuteTIMSJob() throws Exception
 	{

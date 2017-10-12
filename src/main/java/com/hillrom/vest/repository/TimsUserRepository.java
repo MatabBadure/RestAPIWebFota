@@ -49,7 +49,7 @@ public class TimsUserRepository{
 	private final Logger log = LoggerFactory.getLogger("com.hillrom.vest.tims");
 	
 	@Inject
-	private EntityManager entityManager;
+	public EntityManager entityManager;
 
 	@SuppressWarnings("unchecked")
 

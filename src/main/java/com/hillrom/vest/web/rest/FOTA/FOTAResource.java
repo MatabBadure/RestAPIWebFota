@@ -166,7 +166,9 @@ public class FOTAResource {
 		}
 		finally{
 			try {
-				stream.close();
+				if(stream != null){
+					stream.close();
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -442,7 +444,9 @@ public class FOTAResource {
 		}
 		finally{
 			try {
-				is.close();
+				if(is != null){
+					is.close();	
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

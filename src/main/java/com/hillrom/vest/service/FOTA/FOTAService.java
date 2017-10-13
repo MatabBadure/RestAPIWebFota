@@ -88,8 +88,8 @@ public class FOTAService {
 	private CommonFOTAUtil  coUtil = new CommonFOTAUtil();
 	
 	//Dynamic part number
-	private static Map<String,PartNoHolder> partNosBin = new LinkedHashMap<>();
-	private static Map<String,HandleHolder> handleHolderBin = new LinkedHashMap<>();
+	private static Map<String,PartNoHolder> partNosBin = Collections.synchronizedMap(new LinkedHashMap<>());
+	private static Map<String,HandleHolder> handleHolderBin = Collections.synchronizedMap(new LinkedHashMap<>());
 
 	@Transactional
 	public String FOTAUpdate(String rawMessage) throws Exception {

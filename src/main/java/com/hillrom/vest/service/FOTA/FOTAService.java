@@ -331,6 +331,7 @@ public class FOTAService {
 						log.debug("Init Counter ="+holder.getCurrentChunk());
 						log.debug("Init ChunkSize ="+holder.getChunkSize());
 						log.debug("Send chunk Framed Part No key:"+storePartNoKey+"Part No Obj="+partNoHolder);
+						log.debug("Send chunk value in Hex Str:"+zeroChunk);
 						//Zero the Chunk in raw format
 						buffer = coUtil.hexToAscii(coUtil.asciiToHex(zeroChunk));
 						log.debug("buffer Encoded:" + buffer);
@@ -354,7 +355,7 @@ public class FOTAService {
 							log.debug("Ok Counter ="+holder.getCurrentChunk());
 							log.debug("OK ChunkSize ="+holder.getChunkSize());
 							log.debug("Send chunk Framed Part No key:"+storePartNoKey+"Part No Obj="+partNoHolder);
-							
+							log.debug("OK chunk value in Hex Str:"+zeroChunk);
 							//Zero the Chunk in raw format
 							buffer = coUtil.hexToAscii(coUtil.asciiToHex(zeroChunk));
 							log.debug("buffer Encoded:" + buffer);
@@ -377,6 +378,7 @@ public class FOTAService {
 						log.debug("Not Ok Counter ="+holder.getCurrentChunk());
 						log.debug("Not OK ChunkSize ="+holder.getChunkSize());
 						log.debug("Send chunk Framed Part No key:"+storePartNoKey+"Part No Obj="+partNoHolder);
+						log.debug("Send chunk value if not ok in Hex Str:"+zeroChunk);
 						//Zero the Chunk in raw format
 						buffer = coUtil.hexToAscii(coUtil.asciiToHex(zeroChunk));
 						log.debug("buffer Encoded:" + buffer);

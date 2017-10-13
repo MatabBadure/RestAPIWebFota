@@ -18,8 +18,15 @@ public class HandleHolder {
 	private DateTime downloadStartDateTime;
 	private DateTime downloadEndDateTime;
 	int chunkSize = 0;
+	private DateTime spwanedObject;
 	
 	
+	public DateTime getSpwanedObject() {
+		return spwanedObject;
+	}
+	public void setSpwanedObject(DateTime spwanedObject) {
+		this.spwanedObject = spwanedObject;
+	}
 	public String getUpdatedSoftVersion() {
 		return updatedSoftVersion;
 	}

@@ -235,6 +235,7 @@ public class FOTAService {
 								holder.setPreviousChunkTransStatus("CheckUpdate");
 								//added new stmt
 								holder.setSoftwareVersion(fotaInfo.getSoftVersion());
+								holder.setSpwanedObject(new DateTime());
 								handleId = getHandleNumber();
 								handleHolderBin.put(handleId, holder);
 								//To capture chunk size
@@ -449,7 +450,7 @@ public class FOTAService {
 		}
 			byte[] encoded = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(finalResponseStr));
 			String finalString1 = new String(encoded);
-			log.error("finalString1: " + finalString1);
+			log.debug("finalString1: " + finalString1);
 			return finalString1;
 		
 		
@@ -512,6 +513,7 @@ public class FOTAService {
 	}
 
 
+
 	
 	public boolean getFotaInfoByPartNumber(String partNumber) {
 		boolean softDeleteFlag = false;
@@ -525,6 +527,7 @@ public class FOTAService {
 		}
 		return oldVersion;
 	}
+
 
 	
 	private String getInitOKResponseSendChunk(String resultPair,
@@ -543,6 +546,7 @@ public class FOTAService {
 	}
 
 
+
 	private String getAllResponseCheckUpdate(String responsePair1Result,String responsePair1ResultValue, String responsePair1, String handleIdRaw,
 			String responsePair2, String totalChunkRaw, String responsePair3,
 			String crcRaw) {
@@ -554,7 +558,9 @@ public class FOTAService {
 	}
 
 
+
 	
+
 
 	
 	//Generating unique handle id
@@ -582,9 +588,9 @@ public class FOTAService {
 			int val = decoded[i] & 0xFF;
 			sout = sout + val + " ";
 		}
-		log.error("Input Byte Array :" + sout);
+		log.debug("Input Byte Array :" + sout);
 		decoded_string = new String(decoded);
-		log.error("Decoded value is " + decoded_string);
+		log.debug("Decoded value is " + decoded_string);
 		return decoded_string;
 	}
 
@@ -1413,6 +1419,7 @@ public class FOTAService {
 			}
 		}
 	}
+
 
 		
 }

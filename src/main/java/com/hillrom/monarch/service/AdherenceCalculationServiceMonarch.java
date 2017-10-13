@@ -206,6 +206,7 @@ public class AdherenceCalculationServiceMonarch{
 	private TherapySessionRepository therapySessionRepository;
 	
 	@Inject
+	@Lazy
 	private TherapySessionServiceMonarch therapySessionMonarchService;
 	
 

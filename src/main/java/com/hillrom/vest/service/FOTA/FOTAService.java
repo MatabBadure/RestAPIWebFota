@@ -185,9 +185,9 @@ public class FOTAService {
 										.get(DEVICE_SN));
 								holder.setConnectionType(fotaJsonData
 										.get(CONNECTION_TYPE));
-								holder.setDeviceSoftwareVersion(fotaInfo.getSoftVersion());
+								holder.setDeviceSoftwareVersion(reqDev);
 								//request Device software date
-								holder.setDeviceSoftwareDateTime(fotaInfo.getReleaseDate());
+								holder.setDeviceSoftwareDateTime(reqReleaseDate);
 								holder.setUpdatedSoftVersion(fotaInfo.getSoftVersion());
 								holder.setCheckupdateDateTime(new DateTime());
 								holder.setPreviousChunkTransStatus("CheckUpdate");
@@ -227,9 +227,9 @@ public class FOTAService {
 										.get(DEVICE_SN));
 								holder.setConnectionType(fotaJsonData
 										.get(CONNECTION_TYPE));
-								holder.setDeviceSoftwareVersion(fotaInfo.getSoftVersion());
+								holder.setDeviceSoftwareVersion(reqDev);
 								//Request Device software date
-								holder.setDeviceSoftwareDateTime(fotaInfo.getReleaseDate());
+								holder.setDeviceSoftwareDateTime(reqReleaseDate);
 								holder.setUpdatedSoftVersion(fotaInfo.getSoftVersion());
 								holder.setCheckupdateDateTime(new DateTime());
 								holder.setPreviousChunkTransStatus("CheckUpdate");
@@ -309,7 +309,7 @@ public class FOTAService {
 					//Get handle object based on handleId
 					holder = handleHolderBin.get(handleId);
 					//Frame key to get partNumber details
-					String storePartNoKey = holder.getPartNo().concat(":").concat(holder.getSoftwareVersion()).concat(":").concat(String.valueOf(holder.getChunkSize()));
+					String storePartNoKey = holder.getPartNo().concat(":").concat(holder.getUpdatedSoftVersion()).concat(":").concat(String.valueOf(holder.getChunkSize()));
 					partNoHolder =  partNosBin.get(storePartNoKey);
 					
 				if(partNoHolder.getAbortFlag() == false){

@@ -82,13 +82,15 @@ public class TimsInputReaderService {
 	
 	@Inject
 	private MailService mailService;
+	
+	@Transactional
 	@Scheduled(cron="00 30 08 * * * ")
 	public void ExecuteTIMSJob() throws Exception
 	{
 		
 		logFileName  = "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());	
 		try{
-    MDC.put("logFileName", logFileName);
+       MDC.put("logFileName", logFileName);
 
 		log.debug("Status           TIMS Id        Serial Number        Result        Remarks");
 		this.mandatoryFieldFlag = true;
@@ -193,7 +195,13 @@ public class TimsInputReaderService {
 			log.debug("All Records Executed Successfully");
 		}
 		
-		}catch(Exception ex){
+		}catch(javax.persistence.RollbackException jr){
+		//	log.debug("RollbackException");
+		}
+		catch(org.springframework.transaction.TransactionSystemException tse){
+		//	log.debug("TransactionSystemException");
+		}    
+		catch(Exception ex){
 			mailService.sendTIMSLog(logFileName);
 			ex.printStackTrace();
 			throw new HillromException("Error in TIMS Script Execution " , ex);
@@ -204,7 +212,8 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{        
-		     String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
+		
+		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
 		      File flatFile = new File(csvFile);
 		      if(!flatFile.exists()) { 
 		    	  log.debug("Failure        NA               NA             Failure           The csv file is not present ");

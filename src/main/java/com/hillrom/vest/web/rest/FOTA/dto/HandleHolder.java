@@ -119,10 +119,10 @@ public class HandleHolder {
 		this.partNo = partNo;
 	}
 	
-	public int hashCode() {
+	/*public int hashCode() {
         return partNo.hashCode();
     }
-
+*/
    /* public boolean equals(HandleHolder hh) {
         if (hh == null)
             return false;
@@ -133,7 +133,7 @@ public class HandleHolder {
     }
 	*/
 	
-	public boolean equals(Object o) {
+/*	public boolean equals(Object o) {
 	    if (o == null)
 	        return false;
 	    if (!(o instanceof HandleHolder))
@@ -144,5 +144,5 @@ public class HandleHolder {
 	        return true;
 	    else
 	        return false;
-	}
+	}*/
 }

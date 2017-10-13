@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Parameter;
 import javax.persistence.ParameterMode;
+import javax.persistence.PersistenceException;
 import javax.persistence.StoredProcedureQuery;
 
 import net.minidev.json.JSONObject;
@@ -163,6 +164,9 @@ public class TimsUserRepository{
 				.setParameter("inCreatedBy", inCreatedBy)
 				.executeUpdate();
 				}
+				catch(PersistenceException pe){
+					//	log.debug("PersistenceException");
+					}
 						
 				catch(Exception ex){
 					ex.printStackTrace();
@@ -189,6 +193,9 @@ public class TimsUserRepository{
 				.setParameter("inCreatedBy", inCreatedBy)
 				.executeUpdate();
 				}
+				catch(PersistenceException pe){
+					//	log.debug("PersistenceException");
+					}
 				catch(Exception ex){
 					ex.printStackTrace();
 				}

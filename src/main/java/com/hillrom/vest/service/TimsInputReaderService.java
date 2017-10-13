@@ -82,13 +82,15 @@ public class TimsInputReaderService {
 	
 	@Inject
 	private MailService mailService;
+	
+	@Transactional
 	@Scheduled(cron="00 30 08 * * * ")
 	public void ExecuteTIMSJob() throws Exception
 	{
 		
 		logFileName  = "timslogFile." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());	
 		try{
-    MDC.put("logFileName", logFileName);
+       MDC.put("logFileName", logFileName);
 
 		log.debug("Status           TIMS Id        Serial Number        Result        Remarks");
 		this.mandatoryFieldFlag = true;
@@ -210,6 +212,7 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{        
+		
 		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
 		      File flatFile = new File(csvFile);
 		      if(!flatFile.exists()) { 

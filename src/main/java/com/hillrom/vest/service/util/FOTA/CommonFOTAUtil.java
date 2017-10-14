@@ -373,26 +373,26 @@ public class CommonFOTAUtil {
 
 		FileInputStream fs = null;
 
-		if (StringUtils.isNotEmpty(fotaInfo.getRegion1StartAddress())) {
+		if (StringUtils.isNotEmpty(fotaInfo.getRegion1StartAddress()) && fotaInfo.getRegion1StartAddress().length() == 8) {
 			crcStartAddress = Long.parseLong(fotaInfo.getRegion1StartAddress(),
 					16);
 		}
-		if (StringUtils.isNotEmpty(fotaInfo.getRegion1EndAddress())) {
+		if (StringUtils.isNotEmpty(fotaInfo.getRegion1EndAddress()) && fotaInfo.getRegion1EndAddress().length() == 8) {
 			crcEndAddress = Long.parseLong(fotaInfo.getRegion1EndAddress(), 16);
 		}
-		if (StringUtils.isNotEmpty(fotaInfo.getRegion2StartAddress())) {
+		if (StringUtils.isNotEmpty(fotaInfo.getRegion2StartAddress()) && fotaInfo.getRegion2StartAddress().length() == 8) {
 			crc2StartAddress = Long.parseLong(
 					fotaInfo.getRegion2StartAddress(), 16);
 		}
-		if (StringUtils.isNotEmpty(fotaInfo.getRegion2EndAddress())) {
+		if (StringUtils.isNotEmpty(fotaInfo.getRegion2EndAddress()) && fotaInfo.getRegion2EndAddress().length() == 8) {
 			crc2EndAddress = Long
 					.parseLong(fotaInfo.getRegion2EndAddress(), 16);
 		}
 		
-		if (StringUtils.isNotEmpty(region1crc)) {
+		if (StringUtils.isNotEmpty(region1crc) && region1crc.length() == 8 ) {
 			crcValueInFile = Long.parseLong(toLittleEndian(region1crc),16);
 		}
-		if (StringUtils.isNotEmpty(region2crc)) {
+		if (StringUtils.isNotEmpty(region2crc) && region2crc.length() == 8) {
 			crc2ValueInFile = Long.parseLong(toLittleEndian(region2crc),16);
 		}
 		fs = new FileInputStream(fotaInfo.getFilePath());

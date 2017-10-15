@@ -212,7 +212,6 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{        
-		
 		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
 		      File flatFile = new File(csvFile);
 		      if(!flatFile.exists()) { 

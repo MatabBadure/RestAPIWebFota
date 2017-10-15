@@ -2784,4 +2784,170 @@ public class AdherenceCalculationServiceMonarch{
 		}
 	}
 	
+	/**
+	 * Runs every morning 9:15AM after the TIMS job executed to integrate the old patient who is swapped after identified from swapped date
+	 */	
+	@Scheduled(cron="0 15 9 * * * ")
+	public void processMergeSwapDeviceDetails(){
+		try{
+			LocalDate today = LocalDate.now();
+			log.debug("Started Device details "+DateTime.now()+","+today);
+			
+			// Get list of patient device assoc from the todays swapped date
+			List<PatientDevicesAssoc> patDevAssList = patientDevicesAssocRepository.findBySwappedDate(today.toString());
+			
+			// Calling swap process
+			executeSwapMergingProcess(patDevAssList);
+			
+		}catch(Exception ex){
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter( writer );
+			ex.printStackTrace( printWriter );
+			mailService.sendJobFailureNotificationMonarch("processDeviceDetails",writer.toString());
+		}
+	}
+
+	public void executeSwapMergingProcess(List<PatientDevicesAssoc> patDevAssList){		
+		
+		// Getting all no events of Vest and monarch patients for first transmission date
+		Map<Long,PatientNoEventMonarch> userIdNoEventMap = noEventMonarchService.findAllGroupByPatientUserId();			
+		Map<Long,PatientNoEvent> userIdNoEventMapVest = noEventMonarchServiceVest.findAllGroupByPatientUserId();
+	
+		// Looping through all the patient device association, for device update only once loop will be executed
+		for(PatientDevicesAssoc patDevice : patDevAssList){
+			executeSwapMergingProcessLoop(userIdNoEventMap, userIdNoEventMapVest, patDevice);	
+		}
+	}
+
+	public void executeSwapMergingProcessLoop(Map<Long,PatientNoEventMonarch> userIdNoEventMap,
+			Map<Long,PatientNoEvent> userIdNoEventMapVest,
+			PatientDevicesAssoc patDevice){
+		
+		// Verification of the device type
+		if(patDevice.getDeviceType().equals("MONARCH")){
+			
+			// Get Patient and User object
+			PatientInfo patientInfo = patientInfoRepository.findOneById(patDevice.getPatientId());
+			User user = userService.getUserObjFromPatientInfo(patientInfo);
+			
+			// Get the Patient & User of old shell details
+			PatientInfo patientInfoOld = patientInfoRepository.findOneById(patDevice.getSwappedPatientId());
+			User userOld = userService.getUserObjFromPatientInfo(patientInfoOld);
+			
+			// Getting compliance list of old patient
+			List<PatientComplianceMonarch> patientComplianceList = patientComplianceMonarchRepository.findByPatientUserId(userOld.getId());
+			
+			// Getting compliance list of new patient
+			List<PatientComplianceMonarch> existpatientCompliance = patientComplianceMonarchRepository.findByPatientUserId(user.getId());
+			
+			// Getting the dates from existing compliance 
+			List<LocalDate> existComplianceDate = new LinkedList<>();
+			for(PatientComplianceMonarch tmpPatientCompliance : existpatientCompliance){
+				existComplianceDate.add(tmpPatientCompliance.getDate());
+			}
+			
+			List <PatientComplianceMonarch> complianceListToSave = new LinkedList<>();			
+			for(PatientComplianceMonarch patientCompliance : patientComplianceList){
+				
+				Double hmr = 0.0;
+				
+				if(!existComplianceDate.contains(patientCompliance.getDate())){
+					PatientComplianceMonarch compliance = new PatientComplianceMonarch(patientCompliance.getScore(),
+						patientCompliance.getDate(),
+						patientInfo,
+						user,
+						patientCompliance.getHmrRunRate(),
+						patientCompliance.getHmr(),						
+						patientCompliance.isHmrCompliant(),
+						patientCompliance.isSettingsDeviated(),
+						patientCompliance.getMissedTherapyCount(),
+						patientCompliance.getLatestTherapyDate(),
+						patientCompliance.getSettingsDeviatedDaysCount(),
+						patientCompliance.getGlobalHMRNonAdherenceCounter(),
+						patientCompliance.getGlobalSettingsDeviationCounter(),
+						patientCompliance.getGlobalMissedTherapyCounter(),
+						hmr);
+					
+					complianceListToSave.add(compliance);
+				}
+			}
+			
+			// Adding all the shell patient complaiance to new patient 
+			complianceMonarchService.saveAll(complianceListToSave);
+			
+			
+			// Getting notification list of old patient
+			List<NotificationMonarch> notificationList = notificationMonarchRepository.findByPatientUserId(userOld.getId());
+			
+			// Getting notification list of new patient
+			List<NotificationMonarch> existNotificationList = notificationMonarchRepository.findByPatientUserId(user.getId());
+			
+			// Getting the dates from existing notification
+			List<LocalDate> existNotificationDate = new LinkedList<>();
+			for(NotificationMonarch tmpNotificationMonarch : existNotificationList){
+				existNotificationDate.add(tmpNotificationMonarch.getDate());
+			}
+			
+			List <NotificationMonarch> notificationListToSave = new LinkedList<>();			
+			for(NotificationMonarch patientNotification : notificationList){
+				if(!existNotificationDate.contains(patientNotification.getDate())){
+					NotificationMonarch notification = new NotificationMonarch(
+							patientNotification.getNotificationType(),
+							patientNotification.getDate(),
+							user,
+							patientInfo,
+							patientNotification.isAcknowledged());
+							
+					notificationListToSave.add(notification);
+				}
+			}
+			
+			// Adding all the shell patient notification to new patient
+			notificationMonarchService.saveAll(notificationListToSave);
+			
+			// Getting the therapy details of the shell patient
+			List<TherapySessionMonarch> therapySessionMonarchList = therapySessionMonarchRepository.findByPatientUserId(userOld.getId());
+				
+			List <TherapySessionMonarch> therapySessionListToSave = new LinkedList<>();				
+			for(TherapySessionMonarch patientTherapySession : therapySessionMonarchList){
+				TherapySessionMonarch therapySession = new TherapySessionMonarch(patientInfo, user, 
+							patientTherapySession.getDate(), patientTherapySession.getSessionNo(),
+							patientTherapySession.getSessionType(), patientTherapySession.getStartTime(), patientTherapySession.getEndTime(),
+							patientTherapySession.getFrequency(), patientTherapySession.getIntensity(), patientTherapySession.getDurationInMinutes(),
+							patientTherapySession.getProgrammedCaughPauses(), patientTherapySession.getNormalCaughPauses(),
+							patientTherapySession.getCaughPauseDuration(), patientTherapySession.getHmr(), patientTherapySession.getSerialNumber(),
+							patientTherapySession.getBluetoothId(), patientTherapySession.getTherapyIndex(),
+							patientTherapySession.getStartBatteryLevel(), patientTherapySession.getEndBatteryLevel(),
+							patientTherapySession.getNumberOfEvents(), patientTherapySession.getNumberOfPods(), patientTherapySession.getDevWifi(),
+							patientTherapySession.getDevLte(),patientTherapySession.getDevBt(),
+							patientTherapySession.getDevVersion());
+						
+					therapySessionListToSave.add(therapySession);
+			}
+			
+			// Adding all the shell patient therapy to new patient
+			therapySessionMonarchService.saveAll(therapySessionListToSave);
+			
+			// Getting the no event from old patient
+			PatientNoEventMonarch patientNoEventMonarch = noEventRepositoryMonarch.findByPatientUserId(userOld.getId());
+			
+			// Getting the no event from new patient
+			PatientNoEventMonarch patientNoEventMonarchExist = noEventRepositoryMonarch.findByPatientUserId(user.getId());
+
+			// Create if not exist
+			if(Objects.isNull(patientNoEventMonarchExist)){
+				PatientNoEventMonarch noEventMonarchToSave = new PatientNoEventMonarch(patientNoEventMonarch.getUserCreatedDate(),
+						patientNoEventMonarch.getFirstTransmissionDate(), patientInfo, user);
+				noEventMonarchService.save(noEventMonarchToSave);
+			}else{
+				// update first transmission date, if exist
+				patientNoEventMonarchExist.setFirstTransmissionDate(patientNoEventMonarch.getFirstTransmissionDate());
+				noEventRepositoryMonarch.save(patientNoEventMonarchExist);
+			}
+			
+			// Adherence reset from the shell first transmission date
+			adherenceResetForPatient(user.getId(), patientInfo.getId(),patientNoEventMonarch.getFirstTransmissionDate(), DEFAULT_COMPLIANCE_SCORE, 1);
+		}
+	}
+	
 }

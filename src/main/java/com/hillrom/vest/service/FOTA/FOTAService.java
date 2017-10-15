@@ -983,24 +983,24 @@ public class FOTAService {
 	    
 	    try{
 	    
-		if (StringUtils.isNotEmpty(crc32Dt0.getRegion1StartAddress())) {
+		if (StringUtils.isNotEmpty(crc32Dt0.getRegion1StartAddress()) && crc32Dt0.getRegion1StartAddress().length() == 8) {
 			crcStartAddress = Long.parseLong(crc32Dt0.getRegion1StartAddress(),16);
 		}
-		if (StringUtils.isNotEmpty(crc32Dt0.getRegion1EndAddress())) {
+		if (StringUtils.isNotEmpty(crc32Dt0.getRegion1EndAddress()) && crc32Dt0.getRegion1EndAddress().length() == 8) {
 			crcEndAddress = Long.parseLong(crc32Dt0.getRegion1EndAddress(),16);
 		}
 		
-		if (StringUtils.isNotEmpty(crc32Dt0.getRegion1CRCLocation())) {
+		if (StringUtils.isNotEmpty(crc32Dt0.getRegion1CRCLocation()) && crc32Dt0.getRegion1CRCLocation().length() == 8) {
 			crcLocationAddress = Long.parseLong(crc32Dt0.getRegion1CRCLocation(),16);
 		}
-		if (StringUtils.isNotEmpty(crc32Dt0.getRegion2StartAddress())) {
+		if (StringUtils.isNotEmpty(crc32Dt0.getRegion2StartAddress()) && crc32Dt0.getRegion2StartAddress().length() == 8) {
 			crc2StartAddress = Long.parseLong(crc32Dt0.getRegion2StartAddress(),16);
 		}
-		if (StringUtils.isNotEmpty(crc32Dt0.getRegion2EndAddress())) {
+		if (StringUtils.isNotEmpty(crc32Dt0.getRegion2EndAddress()) && crc32Dt0.getRegion2EndAddress().length() == 8) {
 			crc2EndAddress = Long.parseLong(crc32Dt0.getRegion2EndAddress(),16);
 		}
 		
-		if (StringUtils.isNotEmpty(crc32Dt0.getRegion2CRCLocation())) {
+		if (StringUtils.isNotEmpty(crc32Dt0.getRegion2CRCLocation()) && crc32Dt0.getRegion2CRCLocation().length() == 8) {
 			crc2LocationAddress = Long.parseLong(crc32Dt0.getRegion2CRCLocation(),16);
 		}
 		
@@ -1314,7 +1314,7 @@ public class FOTAService {
 				fotaRepository.save(fotaInfoExist);
 				log.debug("FotaInfo Details: with Inactive published {}", fotaInfo);
 				
-				String partNo = fotaInfo.getDevicePartNumber();
+				String partNo = fotaInfoExist.getDevicePartNumber();
 
 				for(Map.Entry<String,PartNoHolder> entry : partNosBin.entrySet()){
 					String key = entry.getKey();

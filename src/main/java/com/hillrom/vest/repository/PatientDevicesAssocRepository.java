@@ -53,5 +53,8 @@ public interface PatientDevicesAssocRepository extends JpaRepository<PatientDevi
 	
 	@Query("from PatientDevicesAssoc PDA where PDA.serialNumber = ?1 and PDA.hillromId = ?2 and deviceType=?3 and isActive=1")
 	Optional<PatientDevicesAssoc> findOneBySerialNumberAndHillromIdAndDeviceType(String deviceAddress, String hillromId, String deviceType);
+	
+	@Query(nativeQuery=true,value=" SELECT * from PATIENT_DEVICES_ASSOC where is_active=1 and date(swapped_date)=:swappedDate ")
+	List<PatientDevicesAssoc> findBySwappedDate(@Param("swappedDate")String swappedDate);
 
 }

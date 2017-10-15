@@ -84,29 +84,29 @@ public class PartNoHolder {
 			long crc2LocationAddress = 0;
 			int crc2ValueInFile = 0;
 
-			if (StringUtils.isNotEmpty(fotaInfo.getRegion1StartAddress())) {
+			if (StringUtils.isNotEmpty(fotaInfo.getRegion1StartAddress()) && fotaInfo.getRegion1StartAddress().length() == 8) {
 				crcStartAddress = Long.parseLong(
 						fotaInfo.getRegion1StartAddress(), 16);
 			}
-			if (StringUtils.isNotEmpty(fotaInfo.getRegion1EndAddress())) {
+			if (StringUtils.isNotEmpty(fotaInfo.getRegion1EndAddress()) && fotaInfo.getRegion1EndAddress().length() == 8) {
 				crcEndAddress = Long.parseLong(fotaInfo.getRegion1EndAddress(),
 						16);
 			}
 
-			if (StringUtils.isNotEmpty(fotaInfo.getRegion1CRCLocation())) {
+			if (StringUtils.isNotEmpty(fotaInfo.getRegion1CRCLocation()) && fotaInfo.getRegion1CRCLocation().length() == 8) {
 				crcLocationAddress = Long.parseLong(
 						fotaInfo.getRegion1CRCLocation(), 16);
 			}
-			if (StringUtils.isNotEmpty(fotaInfo.getRegion2StartAddress())) {
+			if (StringUtils.isNotEmpty(fotaInfo.getRegion2StartAddress()) && fotaInfo.getRegion2StartAddress().length() == 8) {
 				crc2StartAddress = Long.parseLong(
 						fotaInfo.getRegion2StartAddress(), 16);
 			}
-			if (StringUtils.isNotEmpty(fotaInfo.getRegion2EndAddress())) {
+			if (StringUtils.isNotEmpty(fotaInfo.getRegion2EndAddress()) && fotaInfo.getRegion2EndAddress().length() == 8) {
 				crc2EndAddress = Long.parseLong(
 						fotaInfo.getRegion2EndAddress(), 16);
 			}
 
-			if (StringUtils.isNotEmpty(fotaInfo.getRegion2CRCLocation())) {
+			if (StringUtils.isNotEmpty(fotaInfo.getRegion2CRCLocation()) && fotaInfo.getRegion2CRCLocation().length() == 8) {
 				crc2LocationAddress = Long.parseLong(
 						fotaInfo.getRegion2CRCLocation(), 16);
 			}

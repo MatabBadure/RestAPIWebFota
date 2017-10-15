@@ -189,9 +189,9 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 
 		-- Case 4:	New Monarch, Existing VisiVest (initially created from VisiView.with hillrom_id null).Subsequently following details coming in from TIMS
 
-		IF temp_serial_number =  pat_device_serial_number AND  device_patient_type ='SD' AND temp_device_type = 'MONARCH' AND device_hillrom_id = null THEN
+		IF temp_serial_number =  pat_device_serial_number AND  device_patient_type ='SD' AND temp_device_type = 'VEST' AND device_hillrom_id = null THEN
 		
-			SELECT `hillrom_id`,`patient_id` INTO vest_device_hillrom_id ,vest_device_patient_id FROM `PATIENT_DEVICES_ASSOC` WHERE `hillrom_id` = pat_hillrom_id AND `device_type` = 'VEST' AND `patient_type` = 'SD';
+			SELECT `hillrom_id`,`patient_id` INTO vest_device_hillrom_id ,vest_device_patient_id FROM `PATIENT_DEVICES_ASSOC` WHERE `hillrom_id` = pat_hillrom_id AND `device_type` = 'MONARCH' AND `patient_type` = 'SD';
 
 			
 			IF  temp_patient_info_id IS NOT NULL THEN
@@ -252,7 +252,7 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 				`garment_type` = pat_garment_type,
 				`garment_size` = pat_garment_size,
 				`garment_color` = pat_garment_color
-				 WHERE pvda.`patient_id` = pat_patient_id AND pvda.`serial_number` = pat_device_serial_number;
+				 WHERE pvda.`patient_id` = pat_patient_id;
 
 				COMMIT;
 			END IF;

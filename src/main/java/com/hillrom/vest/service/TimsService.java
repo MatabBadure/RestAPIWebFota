@@ -1453,9 +1453,18 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				managePatientDeviceMonarch(patientInfoDTO);
 				
+			
+				
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 			
+			/*	String Shell_Patient_PatientID2 =		patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(),  "MONARCH").get().getPatientId();
+				entityManager.refresh(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get());
+						
+		        PatientDevicesAssoc patientDevicesAssoc2 =	patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get();
+		        patientDevicesAssoc2.setSwappedDate( LocalDate.now());
+		        patientDevicesAssoc2.setSwappedPatientId(Shell_Patient_PatientID2);
+		        patientDevicesAssocRepository.save(patientDevicesAssoc2);*/
 				
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
@@ -2064,9 +2073,23 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					patientVestDeviceMonarchService.updateDeviceHistoryForTims(patientInfo, patientInfoDTO.getSerial_num(),
 							patientInfoDTO.getBluetooth_id(), patientInfoDTO.getHub_id());
 					
-					
+				//	String Shell_Patient_PatientID =		patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(patientInfoDTO.getSerial_num(), "MONARCH").get().getPatientId();
 					patientInfoDTO.setOperation_type("UPDATE");
 					managePatientDeviceAssociationMonarch(patientInfoDTO);
+					
+					String Shell_Patient_PatientID =		patientDevicesAssocRepository.findOneBySerialNumberAndDeviceTypeInactive(patientInfoDTO.getSerial_num(), "MONARCH").get().getPatientId();
+					entityManager.refresh(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(patientInfoDTO.getSerial_num(), "MONARCH").get());
+							
+			        PatientDevicesAssoc patientDevicesAssoc =	patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(patientInfoDTO.getSerial_num(), "MONARCH").get();
+			        patientDevicesAssoc.setSwappedDate( LocalDate.now());
+			        patientDevicesAssoc.setSwappedPatientId(Shell_Patient_PatientID);
+			        patientDevicesAssocRepository.save(patientDevicesAssoc);
+					
+					
+						
+					
+					
+					
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().

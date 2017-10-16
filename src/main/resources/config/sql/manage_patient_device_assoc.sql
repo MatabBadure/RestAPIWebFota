@@ -253,7 +253,7 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 				`garment_type` = pat_garment_type,
 				`garment_size` = pat_garment_size,
 				`garment_color` = pat_garment_color
-				 WHERE pvda.`patient_id` = pat_patient_id AND pvda.`serial_number` = pat_device_serial_number;
+				 WHERE pvda.`patient_id` = pat_patient_id;
 
 				COMMIT;
 			END IF;

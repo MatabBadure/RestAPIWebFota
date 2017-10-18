@@ -455,7 +455,8 @@ public class AdherenceCalculationService {
 			}else{
 				startDate = getStartDate(user,VEST);
 			}
-			adherenceResetForPatient(user, patient.getId(), startDate, DEFAULT_COMPLIANCE_SCORE, resetFlagForSetting);
+			if(Objects.nonNull(startDate))
+				adherenceResetForPatient(user, patient.getId(), startDate, DEFAULT_COMPLIANCE_SCORE, resetFlagForSetting);
 		}else{
 			if(MONARCH.equals(deviceType)){
 				if(Objects.nonNull(startDateMonarch)){
@@ -463,7 +464,8 @@ public class AdherenceCalculationService {
 				}else{					
 					startDateMonarch = getStartDate(user,MONARCH);
 				}
-				adherenceCalculationServiceMonarch.adherenceResetForPatient(user, patient.getId(), startDateMonarch, DEFAULT_COMPLIANCE_SCORE, resetFlagForSetting);
+				if(Objects.nonNull(startDateMonarch))
+					adherenceCalculationServiceMonarch.adherenceResetForPatient(user, patient.getId(), startDateMonarch, DEFAULT_COMPLIANCE_SCORE, resetFlagForSetting);
 			}
 			else if(BOTH.equals(deviceType)){
 				if(Objects.nonNull(startDate) || Objects.nonNull(startDateMonarch)){
@@ -472,8 +474,8 @@ public class AdherenceCalculationService {
 					startDate = getStartDate(user,VEST);
 					startDateMonarch = getStartDate(user,MONARCH);
 				}
-				
-				adherenceCalculationServiceMonarch.adherenceCalculationBoth(user, patient.getId(), startDate,
+				if(Objects.nonNull(startDate))
+					adherenceCalculationServiceMonarch.adherenceCalculationBoth(user, patient.getId(), startDate,
 							startDateMonarch, DEFAULT_COMPLIANCE_SCORE, user, resetFlagForSetting);
 			}
 		}		

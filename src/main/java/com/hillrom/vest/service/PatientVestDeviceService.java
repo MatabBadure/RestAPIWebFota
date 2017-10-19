@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -64,6 +65,14 @@ public class PatientVestDeviceService {
     
 	@Inject
 	public EntityManager entityManager;
+	
+	
+
+    @PersistenceContext
+    public void setEntityManager(EntityManager em)
+      {
+      this.entityManager = em;
+      }
     
     public String getDeviceType(Long userId){
 		PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(userId);		

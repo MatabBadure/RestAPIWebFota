@@ -55,8 +55,6 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 	@Column(name="hub_id")
 	private String hubId;
 	
-	@Column(name="is_active")
-	private Boolean active = false;
 	
 	@Column(name="is_pending")
 	private Boolean pending = false;
@@ -106,7 +104,6 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 		this.patientVestDevicePK = patientVestDevicePK;
 		this.wifiId = wifiId;
 		this.hubId = hubId;
-		this.active = active;
 		this.deviceType = "MONARCH";
 	}
 
@@ -134,11 +131,11 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 		getPatientVestDevicePK().setSerialNumber(serialNumber);
 	}
 	
-	public boolean isPKActive() {
+	public Boolean isActive() {
 		return getPatientVestDevicePK().isActive();
 	}
 
-	public void setPKActive(boolean active) {
+	public void setActive(Boolean active) {
 		getPatientVestDevicePK().setActive(active);
 	}
 	
@@ -174,13 +171,6 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 		this.hubId = hubId;
 	}
 
-	public Boolean isActive() {
-		return active;
-	}
-
-	public void setActive(Boolean active) {
-		this.active = active;
-	}
 	
 	public Boolean isPending() {
 		return pending;
@@ -294,7 +284,6 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((active == null) ? 0 : active.hashCode());
 		result = prime * result
 				+ ((wifiId == null) ? 0 : wifiId.hashCode());
 		result = prime * result + ((hubId == null) ? 0 : hubId.hashCode());
@@ -314,11 +303,6 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		PatientVestDeviceHistoryMonarch other = (PatientVestDeviceHistoryMonarch) obj;
-		if (active == null) {
-			if (other.active != null)
-				return false;
-		} else if (!active.equals(other.active))
-			return false;
 		if (wifiId == null) {
 			if (other.wifiId != null)
 				return false;
@@ -343,7 +327,7 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 	@Override
 	public String toString() {
 		return "PatientVestDeviceHistoryMonarch [patientVestDevicePK=" + patientVestDevicePK + ", wifiId="
-				+ wifiId + ", hubId=" + hubId + ", active=" + active + ", createdBy=" + createdBy
+				+ wifiId + ", hubId=" + hubId + ",createdBy=" + createdBy
 				+ ", createdDate=" + createdDate + ", lastModifiedBy=" + lastModifiedBy + ", lastModifiedDate="
 				+ lastModifiedDate + ", hmr=" + hmr + "]";
 	}

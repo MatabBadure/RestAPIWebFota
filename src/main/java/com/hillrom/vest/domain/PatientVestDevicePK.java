@@ -21,7 +21,7 @@ public class PatientVestDevicePK implements Serializable {
 	private String serialNumber;
 	
 	@Column(name = "is_active")
-	private boolean active;
+	private Boolean active;
 	
 	public PatientVestDevicePK() {
 		super();
@@ -59,14 +59,14 @@ public class PatientVestDevicePK implements Serializable {
 	/**
 	 * @return the active
 	 */
-	public boolean isActive() {
+	public Boolean isActive() {
 		return active;
 	}
 
 	/**
 	 * @param active the active to set
 	 */
-	public void setActive(boolean active) {
+	public void setActive(Boolean active) {
 		this.active = active;
 	}
 

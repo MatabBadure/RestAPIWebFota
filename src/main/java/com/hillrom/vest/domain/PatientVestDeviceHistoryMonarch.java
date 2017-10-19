@@ -134,6 +134,14 @@ public class PatientVestDeviceHistoryMonarch implements Serializable {
 		getPatientVestDevicePK().setSerialNumber(serialNumber);
 	}
 	
+	public boolean isPKActive() {
+		return getPatientVestDevicePK().isActive();
+	}
+
+	public void setPKActive(boolean active) {
+		getPatientVestDevicePK().setActive(active);
+	}
+	
 	public String getDevBt() {
 		return devBt;
 	}

@@ -94,7 +94,7 @@ public class TimsInputReaderService {
 
 		log.debug("Status           TIMS Id        Serial Number        Result        Remarks");
 		this.mandatoryFieldFlag = true;
-		this.monarchBluetoothFlag = true;
+	//	this.monarchBluetoothFlag = true;
 		this.serialNumberFlag = true;
 		
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
@@ -171,11 +171,11 @@ public class TimsInputReaderService {
 		{
 			throw new Exception("any exceoption error.");
 		}
-        if(!monarchBluetoothFlag){
+     /*   if(!monarchBluetoothFlag){
 			
 			throw new Exception("any exceoption error.");
 			
-		}
+		}*/
 		if(!mandatoryFieldFlag){
 			
 			throw new Exception("any exceoption error.");
@@ -212,7 +212,9 @@ public class TimsInputReaderService {
 	
 	public Map readcsv() 
 	{        
-		      String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
+		//String csvFile = "C:/home/brett/flat_file_script/flatfile2017_10_17_08_00_01.csv";
+		
+		  String csvFile = Constants.TIMS_CSV_FILE_PATH + "flatfile.csv";
 		      File flatFile = new File(csvFile);
 		      if(!flatFile.exists()) { 
 		    	  log.debug("Failure        NA               NA             Failure           The csv file is not present ");

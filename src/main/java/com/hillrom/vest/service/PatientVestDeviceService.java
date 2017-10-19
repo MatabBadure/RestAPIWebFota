@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -60,6 +61,9 @@ public class PatientVestDeviceService {
 
     @Inject
     PatientDevicesAssocRepository patientDevicesAssoc;
+    
+	@Inject
+	public EntityManager entityManager;
     
     public String getDeviceType(Long userId){
 		PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(userId);		
@@ -166,6 +170,8 @@ public class PatientVestDeviceService {
     	if(Objects.nonNull(patientUser)) {
 	    	PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
 	     	if(Objects.nonNull(patientInfo)){
+				entityManager.refresh(patientVestDeviceRepository.findByPatientId(patientInfo.getId()));
+
 	     		deviceList = patientVestDeviceRepository.findByPatientId(patientInfo.getId());
 	     		/*if(Objects.nonNull(patientInfo.getSerialNumber())){
 		     		PatientVestDeviceHistory activeDevice = new PatientVestDeviceHistory(new PatientVestDevicePK(patientInfo, patientInfo.getSerialNumber()),

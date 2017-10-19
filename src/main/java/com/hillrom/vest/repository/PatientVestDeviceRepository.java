@@ -19,18 +19,18 @@ public interface PatientVestDeviceRepository extends
 	@Query("from PatientVestDeviceHistory pvd where pvd.patientVestDevicePK.serialNumber = ?1")
 	List<PatientVestDeviceHistory> findBySerialNumber(String serialNumber);
 	
-	@Query("from PatientVestDeviceHistory pvd where pvd.patientVestDevicePK.serialNumber = ?1  and pvd.active = true")
+	@Query("from PatientVestDeviceHistory pvd where pvd.patientVestDevicePK.serialNumber = ?1  and patientVestDevicePK.active = true")
 	List<PatientVestDeviceHistory> findOneBySerialNumberAndStatusActive(String serialNumber);
 
 	@Query("from PatientVestDeviceHistory pvd where pvd.patientVestDevicePK.patient.id = ?1 and pvd.patientVestDevicePK.serialNumber = ?2")
 	Optional<PatientVestDeviceHistory> findOneByPatientIdAndSerialNumber(
 			String patientId, String serialNumber);
 
-	@Query("from PatientVestDeviceHistory pvd where pvd.patientVestDevicePK.patient.id = ?1 and pvd.active = ?2")
+	@Query("from PatientVestDeviceHistory pvd where pvd.patientVestDevicePK.patient.id = ?1 and patientVestDevicePK.active = ?2")
 	Optional<PatientVestDeviceHistory> findOneByPatientIdAndActiveStatus(
 			String patientId, Boolean active);
 
-	@Query("from PatientVestDeviceHistory pvd where pvd.bluetoothId = ?1 and pvd.active = true")
+	@Query("from PatientVestDeviceHistory pvd where pvd.bluetoothId = ?1 and patientVestDevicePK.active = true")
 	Optional<PatientVestDeviceHistory> findByBluetoothIdAndStatusActive(
 			String bluetoothId);
 

@@ -24,11 +24,11 @@ public interface PatientMonarchDeviceRepository extends
 	Optional<PatientVestDeviceHistoryMonarch> findOneByPatientIdAndSerialNumber(
 			String patientId, String serialNumber);
 
-	@Query("from PatientVestDeviceHistoryMonarch pvd where pvd.patientVestDevicePK.patient.id = ?1 and patientVestDevicePK.active = ?2")
+	@Query("from PatientVestDeviceHistoryMonarch pvd where pvd.patientVestDevicePK.patient.id = ?1 and pvd.patientVestDevicePK.active = ?2")
 	Optional<PatientVestDeviceHistoryMonarch> findOneByPatientIdAndActiveStatus(
 			String patientId, Boolean active);
 
-	@Query("from PatientVestDeviceHistoryMonarch pvd where pvd.wifiId = ?1 or pvd.lteId = ?1 and patientVestDevicePK.active = true")
+	@Query("from PatientVestDeviceHistoryMonarch pvd where pvd.wifiId = ?1 or pvd.lteId = ?1 and pvd.patientVestDevicePK.active = true")
 	List<PatientVestDeviceHistoryMonarch> findByWifiIdAndStatusActive(
 			String wifiId);
 
@@ -43,7 +43,7 @@ public interface PatientMonarchDeviceRepository extends
 	Optional<PatientVestDeviceHistoryMonarch> findOneByPatientIdAndPendingStatus(
 			String patientId, Boolean pending);
 	
-	@Query("from PatientVestDeviceHistoryMonarch pvd where pvd.patientVestDevicePK.serialNumber = ?1  and pvd.active = true")
+	@Query("from PatientVestDeviceHistoryMonarch pvd where pvd.patientVestDevicePK.serialNumber = ?1  and pvd.patientVestDevicePK.active = true")
 	List<PatientVestDeviceHistoryMonarch> findOneBySerialNumberAndStatusActive(String serialNumber);
 	
 }

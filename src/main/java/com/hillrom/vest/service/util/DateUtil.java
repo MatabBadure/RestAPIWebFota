@@ -9,7 +9,14 @@ import static com.hillrom.vest.config.Constants.YYYY_MM_DD;
 
 import java.security.InvalidParameterException;
 import java.text.DateFormatSymbols;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -294,4 +301,37 @@ public class DateUtil {
 		return dateTime;
 		}
 		//hill-1847
+		
+		
+	   public static Map<String, String> getTimeZoneList() {
+
+	        Map<String, String> sortedMap = new LinkedHashMap<>();
+
+	        List<String> zoneList = new ArrayList<>(ZoneId.getAvailableZoneIds());
+
+	        Map<String, String> result = new HashMap<>();
+
+	        LocalDateTime dt = LocalDateTime.now();
+
+	        for (String zoneId : zoneList) {
+
+	            ZoneId zone = ZoneId.of(zoneId);
+	            ZonedDateTime zdt = dt.atZone(zone);
+	            ZoneOffset zos = zdt.getOffset();
+
+	            //replace Z to +00:00
+	            String offset = zos.getId().replaceAll("Z", "+00:00");
+
+	            result.put(zone.toString(), offset);
+
+	        }
+
+			return(result);
+	   }
+	   
+
+
+
+
+
 }

@@ -68,11 +68,11 @@ public class PatientVestDeviceService {
 	
 	
 
-    @PersistenceContext
+ /*   @PersistenceContext
     public void setEntityManager(EntityManager em)
       {
       this.entityManager = em;
-      }
+      }*/
     
     public String getDeviceType(Long userId){
 		PatientInfo patient = userService.getPatientInfoObjFromPatientUserId(userId);		
@@ -179,7 +179,8 @@ public class PatientVestDeviceService {
     	if(Objects.nonNull(patientUser)) {
 	    	PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
 	     	if(Objects.nonNull(patientInfo)){
-				entityManager.refresh(patientVestDeviceRepository.findOneByPatientIdAndActiveStatus(patientInfo.getId(),true));
+			//	entityManager.refresh(patientVestDeviceRepository.findOneByPatientIdAndActiveStatus(patientInfo.getId(),true));
+	     		entityManager.merge(patientVestDeviceRepository.findOneByPatientIdAndActiveStatus(patientInfo.getId(),true));
      //entityManager.getEntityManagerFactory().getCache().evictAll();
  
 

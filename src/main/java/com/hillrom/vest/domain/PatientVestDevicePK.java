@@ -20,6 +20,9 @@ public class PatientVestDevicePK implements Serializable {
 	@Column(name = "serial_number")
 	private String serialNumber;
 	
+	@Column(name = "is_active")
+	private boolean active;
+	
 	public PatientVestDevicePK() {
 		super();
 	}
@@ -28,6 +31,13 @@ public class PatientVestDevicePK implements Serializable {
 		super();
 		this.patient = patient;
 		this.serialNumber = serialNumber;
+	}
+	
+	public PatientVestDevicePK(PatientInfo patient, String serialNumber,boolean active) {
+		super();
+		this.patient = patient;
+		this.serialNumber = serialNumber;
+		this.active = active;
 	}
 
 	public PatientInfo getPatient() {
@@ -46,16 +56,36 @@ public class PatientVestDevicePK implements Serializable {
 		this.serialNumber = serialNumber;
 	}
 
+	/**
+	 * @return the active
+	 */
+	public boolean isActive() {
+		return active;
+	}
+
+	/**
+	 * @param active the active to set
+	 */
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + (active ? 1231 : 1237);
 		result = prime * result + ((patient == null) ? 0 : patient.hashCode());
-		result = prime * result
-				+ ((serialNumber == null) ? 0 : serialNumber.hashCode());
+		result = prime * result + ((serialNumber == null) ? 0 : serialNumber.hashCode());
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -65,6 +95,8 @@ public class PatientVestDevicePK implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		PatientVestDevicePK other = (PatientVestDevicePK) obj;
+		if (active != other.active)
+			return false;
 		if (patient == null) {
 			if (other.patient != null)
 				return false;
@@ -78,9 +110,15 @@ public class PatientVestDevicePK implements Serializable {
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
-		return "PatientVestDevicePK [patient=" + patient + ", serialNumber="
-				+ serialNumber + "]";
+		return "PatientVestDevicePK [patient=" + patient + ", serialNumber=" + serialNumber + ", active=" + active
+				+ "]";
 	}
+	
+	
+
 }

@@ -170,8 +170,8 @@ public class PatientVestDeviceService {
     	if(Objects.nonNull(patientUser)) {
 	    	PatientInfo patientInfo = getPatientInfoObjFromPatientUser(patientUser);
 	     	if(Objects.nonNull(patientInfo)){
-			//	entityManager.refresh(patientVestDeviceRepository.findByPatientId(patientInfo.getId()));
-entityManager.getEntityManagerFactory().getCache().evictAll();
+				entityManager.refresh(patientVestDeviceRepository.findOneByPatientIdAndActiveStatus(patientInfo.getId(),true));
+     //entityManager.getEntityManagerFactory().getCache().evictAll();
  
 
 	     		deviceList = patientVestDeviceRepository.findByPatientId(patientInfo.getId());

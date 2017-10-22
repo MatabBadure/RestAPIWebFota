@@ -84,6 +84,10 @@ public class TherapySession implements Comparable<TherapySession>{
     @Column(name = "bluetooth_id")
 	private String bluetoothId;
 
+    public TherapySession() {
+		super();
+    }
+    
     public TherapySession(PatientInfo patientInfo,
 			User patientUser, LocalDate date, Integer sessionNo,
 			String sessionType, DateTime startTime, DateTime endTime,

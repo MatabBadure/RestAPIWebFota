@@ -187,6 +187,32 @@ public class PatientCompliance extends AbstractAuditingEntity implements Seriali
 		this.hmr = hmr;
 	}
 	
+	public PatientCompliance(Integer score, LocalDate date,
+			PatientInfo patient, User patientUser,Integer hmrRunRate,Boolean isHMRCompliant,
+			Boolean isSettingsDeviated,Integer missedTherapyCount,
+			LocalDate lastTherapySessionDate,Integer settingDeviatedDaysCount,
+			Integer globalHMRNonAdherenceCounter,Integer globalSettingDeviationCounter,
+			Integer globalMissedTherapyCounter,double hmr) {
+		super();
+		this.score = score;
+		this.date = date;
+		this.patient = patient;
+		this.patientUser = patientUser;
+		this.hmrRunRate = hmrRunRate;
+		this.isHmrCompliant = isHMRCompliant;
+		this.isSettingsDeviated = isSettingsDeviated;
+		this.missedTherapyCount = 0;
+		this.latestTherapyDate = date;
+		
+		this.settingsDeviatedDaysCount = settingDeviatedDaysCount;
+		this.globalHMRNonAdherenceCounter = globalHMRNonAdherenceCounter;
+		this.globalSettingsDeviationCounter = globalSettingDeviationCounter;
+		this.globalMissedTherapyCounter = globalMissedTherapyCounter;		
+		
+		this.hmr = hmr;
+	}
+	
+	
 	public Long getId() {
 		return id;
 	}

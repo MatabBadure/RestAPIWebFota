@@ -29,6 +29,7 @@ import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.TherapySession;
+import com.hillrom.vest.domain.TherapySessionMonarch;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.PatientNoEventsRepository;
@@ -306,5 +307,8 @@ public class TherapySessionService {
 			responseList.add(dataVO);
 		}
 		return responseList;
+	}
+	public void saveAll(Collection<TherapySession> therapySession){
+		therapySessionRepository.save(therapySession);
 	}
 }

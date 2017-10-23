@@ -46,6 +46,8 @@ public class PatientVestDeviceHistory implements Serializable {
 	@Column(name="hub_id")
 	private String hubId;
 	
+	@Column(name="is_active")
+	private Boolean active = false;
 	
 	@Column(name="is_pending")
 	private Boolean pending = false;
@@ -87,6 +89,7 @@ public class PatientVestDeviceHistory implements Serializable {
 		this.patientVestDevicePK = patientVestDevicePK;
 		this.bluetoothId = bluetoothId;
 		this.hubId = hubId;
+		this.active = active;
 		this.deviceType = "VEST";
 	}
 	
@@ -96,6 +99,7 @@ public class PatientVestDeviceHistory implements Serializable {
 		this.patientVestDevicePK = patientVestDevicePK;
 		this.bluetoothId = bluetoothId;
 		this.hubId = hubId;
+		this.active = active;
 		this.lastModifiedDate = ModifiedDate;
 		this.deviceType = "VEST";
 	}
@@ -124,14 +128,6 @@ public class PatientVestDeviceHistory implements Serializable {
 		getPatientVestDevicePK().setSerialNumber(serialNumber);
 	}
 	
-	public Boolean isActive() {
-		return getPatientVestDevicePK().isActive();
-	}
-
-	public void setActive(Boolean active) {
-		getPatientVestDevicePK().setActive(active);
-	}
-	
 	public String getBluetoothId() {
 		return bluetoothId;
 	}
@@ -148,6 +144,13 @@ public class PatientVestDeviceHistory implements Serializable {
 		this.hubId = hubId;
 	}
 
+	public Boolean isActive() {
+		return active;
+	}
+
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
 	
 	public Boolean isPending() {
 		return pending;
@@ -219,6 +222,7 @@ public class PatientVestDeviceHistory implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((active == null) ? 0 : active.hashCode());
 		result = prime * result
 				+ ((bluetoothId == null) ? 0 : bluetoothId.hashCode());
 		result = prime * result + ((hubId == null) ? 0 : hubId.hashCode());
@@ -238,6 +242,11 @@ public class PatientVestDeviceHistory implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		PatientVestDeviceHistory other = (PatientVestDeviceHistory) obj;
+		if (active == null) {
+			if (other.active != null)
+				return false;
+		} else if (!active.equals(other.active))
+			return false;
 		if (bluetoothId == null) {
 			if (other.bluetoothId != null)
 				return false;
@@ -260,6 +269,6 @@ public class PatientVestDeviceHistory implements Serializable {
 	public String toString() {
 		return "PatientVestDeviceHistory [patientVestDevicePK="
 				+ patientVestDevicePK + ", bluetoothId=" + bluetoothId
-				+ ", hubId=" + hubId +  "]";
+				+ ", hubId=" + hubId + ", active=" + active + "]";
 	}
 }

@@ -631,12 +631,13 @@ public class AdherenceCalculationService {
 					
 					// Commenting the existing repository call and calling the the new method for getting the current day therapy details				
 					//List<TherapySession> therapyData = therapySessionRepository.findByPatientUserIdAndDate(userId, currentCompliance.getDate());					
-					List<TherapySession> therapyData = getTherapyForDay(sortedTherapy, currentCompliance.getDate());
+					List<TherapySession> therapyData = new LinkedList<>(); 
+					therapyData = getTherapyForDay(sortedTherapy, currentCompliance.getDate());
 					
 					if(adherenceSettingDay == 1 && adherenceStartDate.equals(currentCompliance.getDate())){
 						initialPrevScoreFor1Day = adherenceScore;
 					}						
-					if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && !currentCompliance.getDate().equals(todayDate)){
+					if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && !currentCompliance.getDate().equals(todayDate) && therapyData.isEmpty()){
 						// Adding the prevCompliance object for previous day compliance and existingNotificationofTheDay object for the current date Notification object
 						// Missed therapy days
 						complianceListToStore.add(calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, patient, patientUser, initialPrevScoreFor1Day, prevCompliance, existingNotificationofTheDay));
@@ -2337,10 +2338,6 @@ public class AdherenceCalculationService {
 		List <PatientCompliance> complianceListToSave = new LinkedList<>();			
 		for(PatientCompliance patientCompliance : patientComplianceList){
 			
-			DateTime dateTime = new DateTime();
-			
-			Double hmr = 0.0;
-			
 			if(!existComplianceDate.contains(patientCompliance.getDate())){
 				PatientCompliance compliance = new PatientCompliance(patientCompliance.getScore(),
 					patientCompliance.getDate(),
@@ -2354,8 +2351,8 @@ public class AdherenceCalculationService {
 					patientCompliance.getSettingsDeviatedDaysCount(),
 					patientCompliance.getGlobalHMRNonAdherenceCounter(),
 					patientCompliance.getGlobalSettingsDeviationCounter(),
-					patientCompliance.getGlobalMissedTherapyCounter(),						
-					hmr);
+					patientCompliance.getGlobalMissedTherapyCounter(),
+					patientCompliance.getHmr());
 				
 				complianceListToSave.add(compliance);
 			}

@@ -338,7 +338,8 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 
 		try{
 		
-		return timsUserRepository.managePatientUser(patientInfoDTO.getOperation_type(), 
+		return timsUserRepository.managePatientUser(patientInfoDTO.getOperation_type(),
+													patientInfoDTO.getDevice_type(),
 													patientInfoDTO.getTims_cust(), 
 													patientInfoDTO.getHub_id(), 
 													patientInfoDTO.getBluetooth_id(), 

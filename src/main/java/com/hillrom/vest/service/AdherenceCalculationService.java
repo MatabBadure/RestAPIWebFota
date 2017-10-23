@@ -637,7 +637,7 @@ public class AdherenceCalculationService {
 					if(adherenceSettingDay == 1 && adherenceStartDate.equals(currentCompliance.getDate())){
 						initialPrevScoreFor1Day = adherenceScore;
 					}						
-					if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && !currentCompliance.getDate().equals(todayDate) && therapyData.isEmpty()){
+					if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && !currentCompliance.getDate().equals(todayDate) && (Objects.isNull(therapyData) || (Objects.nonNull(therapyData) && therapyData.isEmpty()) ) ){
 						// Adding the prevCompliance object for previous day compliance and existingNotificationofTheDay object for the current date Notification object
 						// Missed therapy days
 						complianceListToStore.add(calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, patient, patientUser, initialPrevScoreFor1Day, prevCompliance, existingNotificationofTheDay));
@@ -2416,19 +2416,30 @@ public class AdherenceCalculationService {
 		// Getting the no event from new patient
 		PatientNoEvent patientNoEventExist = noEventRepository.findByPatientUserId(user.getId());
 
+		
+		LocalDate updatedFirstTransmissionDate;
+		if(Objects.isNull(patientNoEvent.getFirstTransmissionDate())){
+			updatedFirstTransmissionDate = patientNoEventExist.getFirstTransmissionDate();
+		}else if(Objects.isNull(patientNoEventExist.getFirstTransmissionDate())){
+			updatedFirstTransmissionDate = patientNoEvent.getFirstTransmissionDate();
+		}else{
+			updatedFirstTransmissionDate = patientNoEvent.getFirstTransmissionDate().isBefore(patientNoEventExist.getFirstTransmissionDate())?
+													patientNoEvent.getFirstTransmissionDate() : patientNoEventExist.getFirstTransmissionDate();
+		}
+		
 		// Create if not exist
 		if(Objects.isNull(patientNoEventExist)){
 			PatientNoEvent noEventToSave = new PatientNoEvent(patientNoEvent.getUserCreatedDate(),
-					patientNoEvent.getFirstTransmissionDate(), patientInfo, user);
+					updatedFirstTransmissionDate, patientInfo, user);
 			noEventRepository.save(noEventToSave);
 		}else{
 			// update first transmission date, if exist
-			patientNoEventExist.setFirstTransmissionDate(patientNoEvent.getFirstTransmissionDate());
+			patientNoEventExist.setFirstTransmissionDate(updatedFirstTransmissionDate);
 			noEventRepository.save(patientNoEventExist);
 		}
 		
 		// Adherence reset from the shell first transmission date
-		adherenceResetForPatient(user.getId(), patientInfo.getId(),patientNoEvent.getFirstTransmissionDate(), DEFAULT_COMPLIANCE_SCORE, 1);
+		adherenceResetForPatient(user.getId(), patientInfo.getId(),updatedFirstTransmissionDate, DEFAULT_COMPLIANCE_SCORE, 0);
 	}
 	
 }

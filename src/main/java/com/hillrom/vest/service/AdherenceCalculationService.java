@@ -2416,8 +2416,16 @@ public class AdherenceCalculationService {
 		// Getting the no event from new patient
 		PatientNoEvent patientNoEventExist = noEventRepository.findByPatientUserId(user.getId());
 
-		LocalDate updatedFirstTransmissionDate = patientNoEvent.getFirstTransmissionDate().isBefore(patientNoEventExist.getFirstTransmissionDate())?
+		
+		LocalDate updatedFirstTransmissionDate;
+		if(Objects.isNull(patientNoEvent.getFirstTransmissionDate())){
+			updatedFirstTransmissionDate = patientNoEventExist.getFirstTransmissionDate();
+		}else if(Objects.isNull(patientNoEventExist.getFirstTransmissionDate())){
+			updatedFirstTransmissionDate = patientNoEvent.getFirstTransmissionDate();
+		}else{
+			updatedFirstTransmissionDate = patientNoEvent.getFirstTransmissionDate().isBefore(patientNoEventExist.getFirstTransmissionDate())?
 													patientNoEvent.getFirstTransmissionDate() : patientNoEventExist.getFirstTransmissionDate();
+		}
 		
 		// Create if not exist
 		if(Objects.isNull(patientNoEventExist)){

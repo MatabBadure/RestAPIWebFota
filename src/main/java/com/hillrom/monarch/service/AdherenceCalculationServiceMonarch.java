@@ -1393,6 +1393,7 @@ public class AdherenceCalculationServiceMonarch{
 			if(Objects.nonNull(existingNotificationofTheDay))
 				notificationMonarchRepository.delete(existingNotificationofTheDay);
 			newCompliance.setScore(score);
+			newCompliance.setMissedTherapyCount(0);
 			return newCompliance;
 		}
 		
@@ -2945,19 +2946,22 @@ public class AdherenceCalculationServiceMonarch{
 		// Getting the no event from new patient
 		PatientNoEventMonarch patientNoEventMonarchExist = noEventRepositoryMonarch.findByPatientUserId(user.getId());
 
+		LocalDate firstTransmisionDate = patientNoEventMonarch.getFirstTransmissionDate().isBefore(patientNoEventMonarchExist.getFirstTransmissionDate()) ? 
+				patientNoEventMonarch.getFirstTransmissionDate() : patientNoEventMonarchExist.getFirstTransmissionDate();
+				
 		// Create if not exist
 		if(Objects.isNull(patientNoEventMonarchExist)){
 			PatientNoEventMonarch noEventMonarchToSave = new PatientNoEventMonarch(patientNoEventMonarch.getUserCreatedDate(),
-					patientNoEventMonarch.getFirstTransmissionDate(), patientInfo, user);
+					firstTransmisionDate, patientInfo, user);
 			noEventMonarchService.save(noEventMonarchToSave);
 		}else{
 			// update first transmission date, if exist
-			patientNoEventMonarchExist.setFirstTransmissionDate(patientNoEventMonarch.getFirstTransmissionDate());
+			patientNoEventMonarchExist.setFirstTransmissionDate(firstTransmisionDate);
 			noEventRepositoryMonarch.save(patientNoEventMonarchExist);
 		}
 		
 		// Adherence reset from the shell first transmission date
-		adherenceResetForPatient(user.getId(), patientInfo.getId(),patientNoEventMonarch.getFirstTransmissionDate(), DEFAULT_COMPLIANCE_SCORE, 1);
+		adherenceResetForPatient(user.getId(), patientInfo.getId(),firstTransmisionDate, DEFAULT_COMPLIANCE_SCORE, 1);
 	}
 	
 }

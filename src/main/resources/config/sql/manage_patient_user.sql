@@ -3,6 +3,7 @@ DROP procedure IF EXISTS `manage_patient_user`;
 DELIMITER $$
 CREATE DEFINER=`root`@`%` PROCEDURE `manage_patient_user`(
 	IN operation_type_indicator VARCHAR(10),
+	IN device_type_indicator VARCHAR(10),
     IN hr_id varchar(255),
 	IN pat_hub_id varchar(255),
 	IN pat_bluetooth_id varchar(255),
@@ -96,7 +97,7 @@ BEGIN
 		VALUES(return_user_id,'PATIENT');
 
 		SET return_patient_id = @gen_patient_id;
-		IF pat_hub_id IS NULL OR TRIM(pat_hub_id)='' THEN
+		IF device_type_indicator = 'MONARCH' THEN
 		
 	        INSERT INTO `PATIENT_COMPLIANCE_MONARCH` (`patient_id`, `user_id`, `date`, `compliance_score`, `hmr_run_rate`, `hmr`,
 			`is_hmr_compliant`, `is_settings_deviated`, `missed_therapy_count`,

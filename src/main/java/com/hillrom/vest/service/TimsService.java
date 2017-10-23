@@ -1181,9 +1181,12 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					entityManager.refresh(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get());
 							
 			        PatientDevicesAssoc patientDevicesAssoc =	patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get();
-			        patientDevicesAssoc.setSwappedDate( LocalDate.now());
-			        patientDevicesAssoc.setSwappedPatientId(Shell_Patient_PatientID);
-			        patientDevicesAssocRepository.save(patientDevicesAssoc);
+			        if(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getFirstName().equalsIgnoreCase("Hill-Rom")){
+				        patientDevicesAssoc.setSwappedDate( LocalDate.now());
+				        patientDevicesAssoc.setSwappedPatientId(Shell_Patient_PatientID);
+				        patientDevicesAssocRepository.save(patientDevicesAssoc);
+			        }
+			        
 					
 					
 					/* patientInfoDTO.setOperation_type("CREATE");
@@ -1919,9 +1922,13 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					entityManager.refresh(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get());
 							
 			        PatientDevicesAssoc patientDevicesAssoc =	patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get();
-			        patientDevicesAssoc.setSwappedDate( LocalDate.now());
-			        patientDevicesAssoc.setSwappedPatientId(Shell_Patient_PatientID);
-			        patientDevicesAssocRepository.save(patientDevicesAssoc);
+			        if(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getFirstName().equalsIgnoreCase("Monarch") && 
+			        		patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getLastName().equalsIgnoreCase("Hill-Rom")){
+				        patientDevicesAssoc.setSwappedDate( LocalDate.now());
+				        patientDevicesAssoc.setSwappedPatientId(Shell_Patient_PatientID);
+				        patientDevicesAssocRepository.save(patientDevicesAssoc);
+			        }
+			        
 					
 					/*patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);*/

@@ -2946,19 +2946,22 @@ public class AdherenceCalculationServiceMonarch{
 		// Getting the no event from new patient
 		PatientNoEventMonarch patientNoEventMonarchExist = noEventRepositoryMonarch.findByPatientUserId(user.getId());
 
+		LocalDate updatedFirstTransmissionDate = patientNoEventMonarch.getFirstTransmissionDate().isBefore(patientNoEventMonarchExist.getFirstTransmissionDate())?
+				patientNoEventMonarch.getFirstTransmissionDate() : patientNoEventMonarchExist.getFirstTransmissionDate();
+
 		// Create if not exist
 		if(Objects.isNull(patientNoEventMonarchExist)){
 			PatientNoEventMonarch noEventMonarchToSave = new PatientNoEventMonarch(patientNoEventMonarch.getUserCreatedDate(),
-					patientNoEventMonarch.getFirstTransmissionDate(), patientInfo, user);
+					updatedFirstTransmissionDate, patientInfo, user);
 			noEventMonarchService.save(noEventMonarchToSave);
 		}else{
 			// update first transmission date, if exist
-			patientNoEventMonarchExist.setFirstTransmissionDate(patientNoEventMonarch.getFirstTransmissionDate());
+			patientNoEventMonarchExist.setFirstTransmissionDate(updatedFirstTransmissionDate);
 			noEventRepositoryMonarch.save(patientNoEventMonarchExist);
 		}
 		
 		// Adherence reset from the shell first transmission date
-		adherenceResetForPatient(user.getId(), patientInfo.getId(),patientNoEventMonarch.getFirstTransmissionDate(), DEFAULT_COMPLIANCE_SCORE, 1);
+		adherenceResetForPatient(user.getId(), patientInfo.getId(),patientNoEventMonarch.getFirstTransmissionDate(), DEFAULT_COMPLIANCE_SCORE, 0);
 	}
 	
 }

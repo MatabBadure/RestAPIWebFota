@@ -2416,19 +2416,22 @@ public class AdherenceCalculationService {
 		// Getting the no event from new patient
 		PatientNoEvent patientNoEventExist = noEventRepository.findByPatientUserId(user.getId());
 
+		LocalDate updatedFirstTransmissionDate = patientNoEvent.getFirstTransmissionDate().isBefore(patientNoEventExist.getFirstTransmissionDate())?
+													patientNoEvent.getFirstTransmissionDate() : patientNoEventExist.getFirstTransmissionDate();
+		
 		// Create if not exist
 		if(Objects.isNull(patientNoEventExist)){
 			PatientNoEvent noEventToSave = new PatientNoEvent(patientNoEvent.getUserCreatedDate(),
-					patientNoEvent.getFirstTransmissionDate(), patientInfo, user);
+					updatedFirstTransmissionDate, patientInfo, user);
 			noEventRepository.save(noEventToSave);
 		}else{
 			// update first transmission date, if exist
-			patientNoEventExist.setFirstTransmissionDate(patientNoEvent.getFirstTransmissionDate());
+			patientNoEventExist.setFirstTransmissionDate(updatedFirstTransmissionDate);
 			noEventRepository.save(patientNoEventExist);
 		}
 		
 		// Adherence reset from the shell first transmission date
-		adherenceResetForPatient(user.getId(), patientInfo.getId(),patientNoEvent.getFirstTransmissionDate(), DEFAULT_COMPLIANCE_SCORE, 1);
+		adherenceResetForPatient(user.getId(), patientInfo.getId(),patientNoEvent.getFirstTransmissionDate(), DEFAULT_COMPLIANCE_SCORE, 0);
 	}
 	
 }

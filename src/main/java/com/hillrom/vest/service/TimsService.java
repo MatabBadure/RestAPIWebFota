@@ -1193,9 +1193,11 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				        	Optional<PatientVestDeviceHistory> shellHistory =  patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(Shell_Patient_PatientID,patientInfoDTO.getSerial_num());
 				        	Double shellHmr = 0.0; Double nonshellHmr = 0.0;
 				        	if(shellHistory.isPresent())
-				        		shellHmr = shellHistory.get().getHmr();
+				        		if(Objects.nonNull(shellHistory.get().getHmr()))
+				        			shellHmr = shellHistory.get().getHmr();
 				        	if(nonShellHistory.isPresent())
-				        		nonshellHmr = nonShellHistory.get().getHmr();
+				        		if(Objects.nonNull(nonShellHistory.get().getHmr()))
+				        			nonshellHmr = nonShellHistory.get().getHmr();
 				        	nonShellHistory.get().setHmr(nonshellHmr + shellHmr);
 				        }
 			        }
@@ -1946,9 +1948,11 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				        	Optional<PatientVestDeviceHistoryMonarch> shellHistory =  patientMonarchDeviceRepository.findOneByPatientIdAndSerialNumber(Shell_Patient_PatientID,patientInfoDTO.getSerial_num());
 				        	Double shellHmr = 0.0; Double nonshellHmr = 0.0;
 				        	if(shellHistory.isPresent())
-				        		shellHmr = shellHistory.get().getHmr();
+				        		if(Objects.nonNull(shellHistory.get().getHmr()))
+				        			shellHmr = shellHistory.get().getHmr();
 				        	if(nonShellHistory.isPresent())
-				        		nonshellHmr = nonShellHistory.get().getHmr();
+				        		if(Objects.nonNull(nonShellHistory.get().getHmr()))
+				        			nonshellHmr = nonShellHistory.get().getHmr();
 				        	nonShellHistory.get().setHmr(nonshellHmr + shellHmr);
 				        }
 			        }

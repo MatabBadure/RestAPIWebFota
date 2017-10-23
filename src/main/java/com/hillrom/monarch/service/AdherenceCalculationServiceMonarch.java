@@ -2961,7 +2961,7 @@ public class AdherenceCalculationServiceMonarch{
 		}
 		
 		// Adherence reset from the shell first transmission date
-		adherenceResetForPatient(user.getId(), patientInfo.getId(),patientNoEventMonarch.getFirstTransmissionDate(), DEFAULT_COMPLIANCE_SCORE, 0);
+		adherenceResetForPatient(user.getId(), patientInfo.getId(),updatedFirstTransmissionDate, DEFAULT_COMPLIANCE_SCORE, 0);
 	}
 	
 }

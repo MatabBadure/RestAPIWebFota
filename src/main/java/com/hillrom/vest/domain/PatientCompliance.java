@@ -201,7 +201,7 @@ public class PatientCompliance extends AbstractAuditingEntity implements Seriali
 		this.hmrRunRate = hmrRunRate;
 		this.isHmrCompliant = isHMRCompliant;
 		this.isSettingsDeviated = isSettingsDeviated;
-		this.missedTherapyCount = 0;
+		this.missedTherapyCount = missedTherapyCount;
 		this.latestTherapyDate = date;
 		
 		this.settingsDeviatedDaysCount = settingDeviatedDaysCount;
@@ -384,10 +384,7 @@ public class PatientCompliance extends AbstractAuditingEntity implements Seriali
 				+ "]";
 	}
 
-	@Override
-	public String getCreatedBy() {
-		return patientUser.getEmail();
-	}
+
 	
 	
 }

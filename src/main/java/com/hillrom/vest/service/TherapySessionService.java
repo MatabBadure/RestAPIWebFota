@@ -307,4 +307,7 @@ public class TherapySessionService {
 		}
 		return responseList;
 	}
+	public void saveAll(Collection<TherapySession> therapySession){
+		therapySessionRepository.save(therapySession);
+	}
 }

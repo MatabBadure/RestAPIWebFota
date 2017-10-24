@@ -23,7 +23,11 @@ public interface PatientMonarchDeviceRepository extends
 	@Query("from PatientVestDeviceHistoryMonarch pvd where pvd.patientVestDevicePK.patient.id = ?1 and pvd.patientVestDevicePK.serialNumber = ?2")
 	Optional<PatientVestDeviceHistoryMonarch> findOneByPatientIdAndSerialNumber(
 			String patientId, String serialNumber);
-
+	
+	@Query("from PatientVestDeviceHistoryMonarch pvd where pvd.patientVestDevicePK.patient.id = ?1 and pvd.patientVestDevicePK.serialNumber = ?2 and pvd.active = false")
+	Optional<PatientVestDeviceHistoryMonarch> findOneByPatientIdAndSerialNumberAndStatusInActive(
+			String patientId, String serialNumber);
+	
 	@Query("from PatientVestDeviceHistoryMonarch pvd where pvd.patientVestDevicePK.patient.id = ?1 and pvd.active = ?2")
 	Optional<PatientVestDeviceHistoryMonarch> findOneByPatientIdAndActiveStatus(
 			String patientId, Boolean active);

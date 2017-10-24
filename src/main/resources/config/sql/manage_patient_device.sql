@@ -125,7 +125,7 @@ ELSEIF operation_type_indicator ='INACTIVATE' THEN
         START TRANSACTION;
 			SELECT max(hmr) INTO latest_hmr FROM PATIENT_VEST_DEVICE_DATA
 			WHERE patient_id = patient_id AND serial_number = pat_old_device_serial_number
-			AND bluetooth_id = temp_bluetooth_id LIMIT 1;
+		--	AND bluetooth_id = temp_bluetooth_id LIMIT 1;
 
 			UPDATE `PATIENT_INFO` SET
             `serial_number`=null,
@@ -149,3 +149,4 @@ ELSE  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Operation not supported';
 END IF;
 END $$
 DELIMITER ;
+

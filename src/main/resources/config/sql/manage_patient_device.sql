@@ -1,5 +1,7 @@
-DROP procedure IF EXISTS `manage_patient_device`;
-
+-- --------------------------------------------------------------------------------
+-- Routine DDL
+-- Note: comments before and after the routine body will not be stored by the server
+-- --------------------------------------------------------------------------------
 DELIMITER $$
 
 CREATE DEFINER=`root`@`%` PROCEDURE `manage_patient_device`(
@@ -125,7 +127,8 @@ ELSEIF operation_type_indicator ='INACTIVATE' THEN
         START TRANSACTION;
 			SELECT max(hmr) INTO latest_hmr FROM PATIENT_VEST_DEVICE_DATA
 			WHERE patient_id = patient_id AND serial_number = pat_old_device_serial_number
-			AND bluetooth_id = temp_bluetooth_id LIMIT 1;
+			-- AND bluetooth_id = temp_bluetooth_id 
+			LIMIT 1;
 
 			UPDATE `PATIENT_INFO` SET
             `serial_number`=null,

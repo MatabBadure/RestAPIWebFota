@@ -1175,6 +1175,7 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 
 				try{
 					patientInfoDTO.setOperation_type("UPDATE");
+					patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 					patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get().getSerialNumber());
 					patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
@@ -1189,16 +1190,18 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				        patientDevicesAssocRepository.save(patientDevicesAssoc);
 				        
 				        if(patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(patientInfoDTO.getPatient_id(),patientInfoDTO.getSerial_num()).isPresent()){
-				        	Optional<PatientVestDeviceHistory> nonShellHistory =  patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(patientInfoDTO.getPatient_id(),patientInfoDTO.getSerial_num());
+				        	Optional<PatientVestDeviceHistory> inactiveNonShellHistory =  patientVestDeviceRepository.findOneByPatientIdAndSerialNumberAndStatusInActive(patientInfoDTO.getPatient_id(),patientInfoDTO.getOld_serial_number());
 				        	Optional<PatientVestDeviceHistory> shellHistory =  patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(Shell_Patient_PatientID,patientInfoDTO.getSerial_num());
+				        	Optional<PatientVestDeviceHistory> nonShellHistory =  patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(patientInfoDTO.getPatient_id(),patientInfoDTO.getSerial_num());
 				        	Double shellHmr = 0.0; Double nonshellHmr = 0.0;
 				        	if(shellHistory.isPresent())
 				        		if(Objects.nonNull(shellHistory.get().getHmr()))
 				        			shellHmr = shellHistory.get().getHmr();
-				        	if(nonShellHistory.isPresent())
-				        		if(Objects.nonNull(nonShellHistory.get().getHmr()))
-				        			nonshellHmr = nonShellHistory.get().getHmr();
+				        	if(inactiveNonShellHistory.isPresent())
+				        		if(Objects.nonNull(inactiveNonShellHistory.get().getHmr()))
+				        			nonshellHmr = inactiveNonShellHistory.get().getHmr();
 				        	nonShellHistory.get().setHmr(nonshellHmr + shellHmr);
+				        	patientVestDeviceRepository.save(nonShellHistory.get());
 				        }
 			        }
 			        
@@ -1944,16 +1947,18 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				        patientDevicesAssocRepository.save(patientDevicesAssoc);
 				        
 				        if(patientMonarchDeviceRepository.findOneByPatientIdAndSerialNumber(patientInfoDTO.getPatient_id(),patientInfoDTO.getSerial_num()).isPresent()){
+				        	Optional<PatientVestDeviceHistoryMonarch> inactiveNonShellHistory =  patientMonarchDeviceRepository.findOneByPatientIdAndSerialNumberAndStatusInActive(patientInfoDTO.getPatient_id(),patientInfoDTO.getOld_serial_number());
 				        	Optional<PatientVestDeviceHistoryMonarch> nonShellHistory =  patientMonarchDeviceRepository.findOneByPatientIdAndSerialNumber(patientInfoDTO.getPatient_id(),patientInfoDTO.getSerial_num());
 				        	Optional<PatientVestDeviceHistoryMonarch> shellHistory =  patientMonarchDeviceRepository.findOneByPatientIdAndSerialNumber(Shell_Patient_PatientID,patientInfoDTO.getSerial_num());
 				        	Double shellHmr = 0.0; Double nonshellHmr = 0.0;
 				        	if(shellHistory.isPresent())
 				        		if(Objects.nonNull(shellHistory.get().getHmr()))
 				        			shellHmr = shellHistory.get().getHmr();
-				        	if(nonShellHistory.isPresent())
-				        		if(Objects.nonNull(nonShellHistory.get().getHmr()))
-				        			nonshellHmr = nonShellHistory.get().getHmr();
+				        	if(inactiveNonShellHistory.isPresent())
+				        		if(Objects.nonNull(inactiveNonShellHistory.get().getHmr()))
+				        			nonshellHmr = inactiveNonShellHistory.get().getHmr();
 				        	nonShellHistory.get().setHmr(nonshellHmr + shellHmr);
+				        	patientMonarchDeviceRepository.save(nonShellHistory.get());
 				        }
 			        }
 			        

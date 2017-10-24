@@ -179,6 +179,7 @@ public class AdherenceCalculationService {
 	private PatientInfoRepository patientInfoRepository;
 
 	@Inject
+	@Lazy
 	private TherapySessionService therapySessionService;
 	
 	@Inject

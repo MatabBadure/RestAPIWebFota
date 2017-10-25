@@ -743,7 +743,9 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				managePatientDevice(patientInfoDTO);
 				
-				patientInfoDTO.setOperation_type("CREATE");
+				//patientInfoDTO.setOperation_type("CREATE");
+				
+				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
 		//		log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
@@ -1481,7 +1483,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				managePatientDeviceMonarch(patientInfoDTO);
 						
-				patientInfoDTO.setOperation_type("CREATE");
+			//	patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 						
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());

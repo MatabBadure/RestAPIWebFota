@@ -2446,9 +2446,10 @@ public class AdherenceCalculationService {
 
 		
 		LocalDate updatedFirstTransmissionDate;
-		if(Objects.isNull(patientNoEvent.getFirstTransmissionDate())){
-			updatedFirstTransmissionDate = patientNoEventExist.getFirstTransmissionDate();
-		}else if(Objects.isNull(patientNoEventExist.getFirstTransmissionDate())){
+		if(Objects.isNull(patientNoEvent) || Objects.isNull(patientNoEvent.getFirstTransmissionDate())){
+			updatedFirstTransmissionDate = Objects.nonNull(patientNoEventExist.getFirstTransmissionDate())?
+												patientNoEventExist.getFirstTransmissionDate() : null;
+		}else if(Objects.isNull(patientNoEventExist) || Objects.isNull(patientNoEventExist.getFirstTransmissionDate())){
 			updatedFirstTransmissionDate = patientNoEvent.getFirstTransmissionDate();
 		}else{
 			updatedFirstTransmissionDate = patientNoEvent.getFirstTransmissionDate().isBefore(patientNoEventExist.getFirstTransmissionDate())?
@@ -2467,7 +2468,8 @@ public class AdherenceCalculationService {
 		}
 		
 		// Adherence reset from the shell first transmission date
-		adherenceResetForPatient(user.getId(), patientInfo.getId(),updatedFirstTransmissionDate, DEFAULT_COMPLIANCE_SCORE, 0);
+		if(Objects.nonNull(updatedFirstTransmissionDate))		
+			adherenceResetForPatient(user.getId(), patientInfo.getId(),updatedFirstTransmissionDate, DEFAULT_COMPLIANCE_SCORE, 0);
 	}
 	
 }

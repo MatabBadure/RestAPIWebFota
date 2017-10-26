@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.monarch.service.NoteServiceMonarch;
 import com.hillrom.monarch.service.PatientComplianceMonarchService;
+import com.hillrom.monarch.service.PatientNoEventMonarchService;
 import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.Clinic;
@@ -51,6 +52,7 @@ import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
+import com.hillrom.vest.domain.PatientNoEventMonarch;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.domain.UserPatientAssoc;
@@ -153,6 +155,9 @@ public class UserService {
     @Inject
     private PatientComplianceMonarchService complianceMonarchService;
 
+    @Inject
+    private PatientNoEventMonarchService noEventMonarchService;
+    
     public String generateDefaultPassword(User patientUser) {
 		StringBuilder defaultPassword = new StringBuilder();
 		String zipcode = patientUser.getZipcode().toString();
@@ -555,8 +560,10 @@ public class UserService {
 				}
 				patientDevicesAssocB = patientDevicesAssocRepository
 						.save(patientDevicesAssocB);
+					
 				if(deviceTypeArray.length > i+1 )
 					deviceTypeB = deviceTypeArray[i+1];
+				
 			}
 			newUser = savePatientUser(userExtensionDTO,newUser,patientInfo);
 		
@@ -589,14 +596,37 @@ public class UserService {
 		newUser.getUserPatientAssoc().add(userPatientAssoc);
 		userExtensionRepository.save(newUser);
 		log.debug("Updated Information for Patient User: {}", newUser);
-		noEventService.createIfNotExists(new PatientNoEvent(newUser.getCreatedDate().toLocalDate(),null, patientInfo, newUser));
+		
+		String deviceTypeArray[] = userExtensionDTO.getDeviceType().split(",");
+		String deviceTypeB = deviceTypeArray[0];
+		for(int i =0; i<deviceTypeArray.length;i++)
+		{
+			if(deviceTypeB.equals(VEST))
+				noEventService.createIfNotExists(new PatientNoEvent(newUser.getCreatedDate().toLocalDate(),null, patientInfo, newUser));
+			else if(deviceTypeB.equals(MONARCH))
+				noEventMonarchService.createIfNotExists(new PatientNoEventMonarch(newUser.getCreatedDate().toLocalDate(),null, patientInfo, newUser));
+			if(deviceTypeArray.length > i+1 )
+				deviceTypeB = deviceTypeArray[i+1];
+		}
+		//noEventService.createIfNotExists(new PatientNoEvent(newUser.getCreatedDate().toLocalDate(),null, patientInfo, newUser));
+		
 		// All New Patient User should have default compliance Score 100.
-		PatientCompliance compliance = new PatientCompliance();
-		compliance.setPatient(patientInfo);
-		compliance.setPatientUser(newUser);
-		compliance.setDate(newUser.getCreatedDate().toLocalDate());
-		compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
-		complianceService.createOrUpdate(compliance);
+		if(userExtensionDTO.getDeviceType().equals(VEST)){			
+			PatientCompliance compliance = new PatientCompliance();
+			compliance.setPatient(patientInfo);
+			compliance.setPatientUser(newUser);
+			compliance.setDate(newUser.getCreatedDate().toLocalDate());
+			compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
+			complianceService.createOrUpdate(compliance);
+		}else {					
+			// All New Patient User should have default compliance Score 100.
+			PatientComplianceMonarch compliance = new PatientComplianceMonarch();
+			compliance.setPatient(patientInfo);
+			compliance.setPatientUser(newUser);
+			compliance.setDate(newUser.getCreatedDate().toLocalDate());
+			compliance.setScore(DEFAULT_COMPLIANCE_SCORE);
+			complianceMonarchService.createOrUpdate(compliance);
+		}
 		return newUser;
     }
     

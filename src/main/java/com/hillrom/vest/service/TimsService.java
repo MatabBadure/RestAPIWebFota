@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
 import javax.persistence.StoredProcedureQuery;
 
 import net.minidev.json.JSONObject;
@@ -35,6 +36,8 @@ import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Announcements;
 import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
+import com.hillrom.vest.domain.PatientVestDeviceHistory;
+import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.AnnouncementsPermissionRepository;
 import com.hillrom.vest.repository.AnnouncementsRepository;
@@ -88,6 +91,7 @@ public class TimsService {
 	TimsInputReaderService tims = new TimsInputReaderService();
 	
 	
+	
 	@Inject
 	private TimsUserRepository timsUserRepository;
 	
@@ -111,6 +115,11 @@ public class TimsService {
 	
 	@Inject
 	private PatientVestDeviceMonarchService patientVestDeviceMonarchService;
+	
+	@Inject
+	public EntityManager entityManager;
+	
+	
 	
 	 DateTimeFormatter dobFormat = DateTimeFormat.forPattern("yyyy-MM-dd");
     /* DateTimeFormatter deviceAssocdateFormat = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");*/
@@ -170,6 +179,15 @@ public class TimsService {
 						 patientInfoDTO.getPatient_id(),
 						 patientInfoDTO.getCreated_by());
 		}
+		catch(javax.persistence.RollbackException jr){
+		//	log.debug("RollbackException");
+		}
+		catch(org.springframework.transaction.TransactionSystemException tse){
+		//	log.debug("TransactionSystemException");
+		}    
+		catch(PersistenceException pe){
+		//	log.debug("PersistenceException");
+		}
 		catch(SQLException se)
 		{
 			throw se;
@@ -193,6 +211,15 @@ public class TimsService {
 												 patientInfoDTO.getOperation_type(),
 												 patientInfoDTO.getPatient_id(),
 												 patientInfoDTO.getCreated_by());
+		}
+		catch(javax.persistence.RollbackException jr){
+		//	log.debug("RollbackException");
+		}
+		catch(org.springframework.transaction.TransactionSystemException tse){
+		//	log.debug("TransactionSystemException");
+		}    
+		catch(PersistenceException pe){
+		//	log.debug("PersistenceException");
 		}
 		catch(SQLException se)
 		{
@@ -313,7 +340,8 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 
 		try{
 		
-		return timsUserRepository.managePatientUser(patientInfoDTO.getOperation_type(), 
+		return timsUserRepository.managePatientUser(patientInfoDTO.getOperation_type(),
+													patientInfoDTO.getDevice_type(),
 													patientInfoDTO.getTims_cust(), 
 													patientInfoDTO.getHub_id(), 
 													patientInfoDTO.getBluetooth_id(), 
@@ -659,7 +687,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
 				tims.processed_atleast_one = true;
@@ -714,7 +743,9 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				managePatientDevice(patientInfoDTO);
 				
-				patientInfoDTO.setOperation_type("CREATE");
+				//patientInfoDTO.setOperation_type("CREATE");
+				
+				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
 		//		log.debug("Patient Id "+patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
@@ -722,7 +753,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
 				tims.processed_atleast_one = true;
@@ -783,7 +815,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
 				tims.processed_atleast_one = true;
@@ -818,7 +851,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 		return false;
 		
 	}
-	
+
+	@Transactional
 	public boolean CASE4_PatientHasDifferentVisivestSwap_VEST(PatientInfoDTO patientInfoDTO){
 		
 		if((!isSerialNoExistInPatientdeviceAssocVest(patientInfoDTO.getSerial_num())) && (isHillromIdExistInPatientInfo(patientInfoDTO.getTims_cust()))
@@ -832,7 +866,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get().getSerialNumber());
 				patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
+				
 				managePatientDevice(patientInfoDTO);
+				entityManager.refresh(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get());
+
 							
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
@@ -840,7 +877,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
 				tims.processed_atleast_one = true;
@@ -893,7 +931,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 			
-				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
 				tims.processed_atleast_one = true;
@@ -953,7 +992,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDevice(patientInfoDTO);
 				
-				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
 				tims.processed_atleast_one = true;
@@ -1005,7 +1045,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
 				tims.processed_atleast_one = true;
@@ -1059,7 +1100,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocol(patientInfoDTO);
 				tims.processed_atleast_one = true;
@@ -1135,10 +1177,37 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 
 				try{
 					patientInfoDTO.setOperation_type("UPDATE");
+					patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 					patientInfoDTO.setOld_serial_number(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get().getSerialNumber());
 					patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					managePatientDevice(patientInfoDTO);
+					String Shell_Patient_PatientID =		patientDevicesAssocRepository.findOneBySerialNumberAndDeviceTypeInactive(patientInfoDTO.getSerial_num(), "VEST").get().getPatientId();
+					entityManager.refresh(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get());
+							
+			        PatientDevicesAssoc patientDevicesAssoc =	patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get();
+			        if(patientInfoService.findOneById(Shell_Patient_PatientID).getFirstName().equalsIgnoreCase("Hill-Rom")){
+				        patientDevicesAssoc.setSwappedDate( LocalDate.now());
+				        patientDevicesAssoc.setSwappedPatientId(Shell_Patient_PatientID);
+				        patientDevicesAssocRepository.save(patientDevicesAssoc);
+				        
+				        if(patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(patientInfoDTO.getPatient_id(),patientInfoDTO.getSerial_num()).isPresent()){
+				        	Optional<PatientVestDeviceHistory> inactiveNonShellHistory =  patientVestDeviceRepository.findOneByPatientIdAndSerialNumberAndStatusInActive(patientInfoDTO.getPatient_id(),patientInfoDTO.getOld_serial_number());
+				        	Optional<PatientVestDeviceHistory> shellHistory =  patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(Shell_Patient_PatientID,patientInfoDTO.getSerial_num());
+				        	Optional<PatientVestDeviceHistory> nonShellHistory =  patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(patientInfoDTO.getPatient_id(),patientInfoDTO.getSerial_num());
+				        	Double shellHmr = 0.0; Double nonshellHmr = 0.0;
+				        	if(shellHistory.isPresent())
+				        		if(Objects.nonNull(shellHistory.get().getHmr()))
+				        			shellHmr = shellHistory.get().getHmr();
+				        	if(inactiveNonShellHistory.isPresent())
+				        		if(Objects.nonNull(inactiveNonShellHistory.get().getHmr()))
+				        			nonshellHmr = inactiveNonShellHistory.get().getHmr();
+				        	nonShellHistory.get().setHmr(nonshellHmr + shellHmr);
+				        	patientVestDeviceRepository.save(nonShellHistory.get());
+				        }
+			        }
+			        
+					
 					
 					/* patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);*/
@@ -1146,7 +1215,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocol(patientInfoDTO);
 					tims.processed_atleast_one = true;
@@ -1223,7 +1293,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocol(patientInfoDTO);
 					tims.processed_atleast_one = true;
@@ -1287,10 +1358,17 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					patientInfoDTO.setOperation_type("UPDATE");
 					managePatientDeviceAssociation(patientInfoDTO);
 					
+					String Shell_Patient_PatientID =		patientDevicesAssocRepository.findOneBySerialNumberAndDeviceTypeInactive(patientInfoDTO.getSerial_num(), "VEST").get().getPatientId();
+					entityManager.refresh(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get());
+					PatientDevicesAssoc patientDevicesAssoc =	patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get();
+			        patientDevicesAssoc.setSwappedDate( LocalDate.now());
+			        patientDevicesAssoc.setSwappedPatientId(Shell_Patient_PatientID);
+			        patientDevicesAssocRepository.save(patientDevicesAssoc);
+					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocol(patientInfoDTO);
 					tims.processed_atleast_one = true;
@@ -1353,7 +1431,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 		
-				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
 				tims.processed_atleast_one = true;
@@ -1403,15 +1482,16 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				managePatientDeviceMonarch(patientInfoDTO);
-				
-				patientInfoDTO.setOperation_type("CREATE");
+						
+			//	patientInfoDTO.setOperation_type("CREATE");
+				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
-			
-				
+						
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
 				tims.processed_atleast_one = true;
@@ -1472,7 +1552,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id()+new Random().nextInt(6));
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id()+new Random().nextInt(6));
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
 				tims.processed_atleast_one = true;
@@ -1524,6 +1605,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setNew_serial_number(patientInfoDTO.getSerial_num());
 				
 				managePatientDeviceMonarch(patientInfoDTO);
+				entityManager.refresh(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get());
+
 								
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociationMonarch(patientInfoDTO);
@@ -1531,7 +1614,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
 				tims.processed_atleast_one = true;
@@ -1586,7 +1670,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociationMonarch(patientInfoDTO);
 								
-				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
 				tims.processed_atleast_one = true;
@@ -1649,7 +1734,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
              	patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceMonarch(patientInfoDTO);   //if it's required please uncomment
 				
-				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
 				tims.processed_atleast_one = true;
@@ -1706,7 +1792,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
 				tims.processed_atleast_one = true;
@@ -1765,7 +1852,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 				patientInfoDTO.setOperation_type("Insert");
 				createPatientProtocolMonarch(patientInfoDTO);
 				tims.processed_atleast_one = true;
@@ -1851,6 +1939,32 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 								
 					managePatientDeviceMonarch(patientInfoDTO);
+					String Shell_Patient_PatientID =		patientDevicesAssocRepository.findOneBySerialNumberAndDeviceTypeInactive(patientInfoDTO.getSerial_num(), "MONARCH").get().getPatientId();
+					entityManager.refresh(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get());
+							
+			        PatientDevicesAssoc patientDevicesAssoc =	patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get();
+			        if(patientInfoService.findOneById(Shell_Patient_PatientID).getFirstName().equalsIgnoreCase("Monarch") && 
+			        		patientInfoService.findOneById(Shell_Patient_PatientID).getLastName().equalsIgnoreCase("Hill-Rom")){
+				        patientDevicesAssoc.setSwappedDate( LocalDate.now());
+				        patientDevicesAssoc.setSwappedPatientId(Shell_Patient_PatientID);
+				        patientDevicesAssocRepository.save(patientDevicesAssoc);
+				        
+				        if(patientMonarchDeviceRepository.findOneByPatientIdAndSerialNumber(patientInfoDTO.getPatient_id(),patientInfoDTO.getSerial_num()).isPresent()){
+				        	Optional<PatientVestDeviceHistoryMonarch> inactiveNonShellHistory =  patientMonarchDeviceRepository.findOneByPatientIdAndSerialNumberAndStatusInActive(patientInfoDTO.getPatient_id(),patientInfoDTO.getOld_serial_number());
+				        	Optional<PatientVestDeviceHistoryMonarch> nonShellHistory =  patientMonarchDeviceRepository.findOneByPatientIdAndSerialNumber(patientInfoDTO.getPatient_id(),patientInfoDTO.getSerial_num());
+				        	Optional<PatientVestDeviceHistoryMonarch> shellHistory =  patientMonarchDeviceRepository.findOneByPatientIdAndSerialNumber(Shell_Patient_PatientID,patientInfoDTO.getSerial_num());
+				        	Double shellHmr = 0.0; Double nonshellHmr = 0.0;
+				        	if(shellHistory.isPresent())
+				        		if(Objects.nonNull(shellHistory.get().getHmr()))
+				        			shellHmr = shellHistory.get().getHmr();
+				        	if(inactiveNonShellHistory.isPresent())
+				        		if(Objects.nonNull(inactiveNonShellHistory.get().getHmr()))
+				        			nonshellHmr = inactiveNonShellHistory.get().getHmr();
+				        	nonShellHistory.get().setHmr(nonshellHmr + shellHmr);
+				        	patientMonarchDeviceRepository.save(nonShellHistory.get());
+				        }
+			        }
+			        
 					
 					/*patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);*/
@@ -1858,7 +1972,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocolMonarch(patientInfoDTO);
 					tims.processed_atleast_one = true;
@@ -1935,7 +2050,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocolMonarch(patientInfoDTO);
 					tims.processed_atleast_one = true;
@@ -1997,14 +2113,29 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					patientVestDeviceMonarchService.updateDeviceHistoryForTims(patientInfo, patientInfoDTO.getSerial_num(),
 							patientInfoDTO.getBluetooth_id(), patientInfoDTO.getHub_id());
 					
-					
+				
 					patientInfoDTO.setOperation_type("UPDATE");
 					managePatientDeviceAssociationMonarch(patientInfoDTO);
+					
+					String Shell_Patient_PatientID =		patientDevicesAssocRepository.findOneBySerialNumberAndDeviceTypeInactive(patientInfoDTO.getSerial_num(), "MONARCH").get().getPatientId();
+					entityManager.refresh(patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(patientInfoDTO.getSerial_num(), "MONARCH").get());
+							
+			        PatientDevicesAssoc patientDevicesAssoc =	patientDevicesAssocRepository.findOneBySerialNumberAndDeviceType(patientInfoDTO.getSerial_num(), "MONARCH").get();
+			        patientDevicesAssoc.setSwappedDate( LocalDate.now());
+			        patientDevicesAssoc.setSwappedPatientId(Shell_Patient_PatientID);
+			        patientDevicesAssocRepository.save(patientDevicesAssoc);
+					
+					
+						
+					
+					
+					
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
 					patientInfoDTO.setOperation_type("Insert");
 					createPatientProtocolMonarch(patientInfoDTO);
 					tims.processed_atleast_one = true;

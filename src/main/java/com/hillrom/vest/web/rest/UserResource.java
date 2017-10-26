@@ -1126,6 +1126,17 @@ public class UserResource {
 				vestdeviceData.addAll(deviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
 			}
 			
+			if(Objects.nonNull(checkPatientTypeMonarch) && Objects.nonNull(checkPatientTypeMonarch.getSwappedPatientId())){
+				patientId = checkPatientTypeMonarch.getSwappedPatientId();
+				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
+				monarchdeviceData.addAll(monarchdeviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
+
+			}else if(Objects.nonNull(checkPatientTypeVest) && Objects.nonNull(checkPatientTypeVest.getSwappedPatientId())){
+				patientId = checkPatientTypeVest.getSwappedPatientId();
+				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
+				vestdeviceData.addAll(deviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
+			}
+			
 			if(deviceType.equals("VEST")){
 				vestdeviceData.addAll(deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp));
 
@@ -1641,4 +1652,18 @@ public class UserResource {
 		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
     }
     
+    /**
+     * GET  /users/:userId/clinics/:clinicId/statistics -> get the patient statistics for clinic Badge associated with user.
+     */
+    @RequestMapping(value = "/testingSwappingDeviceCron",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<?> getTestingSwapDeviceCron() throws HillromException {
+        log.debug("REST request to get testing Device Swapping Cron");
+        JSONObject jsonObject = new JSONObject();        
+		adherenceCalculationServiceMonarch.processMergeSwapDeviceDetails();        	
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    }  
 }

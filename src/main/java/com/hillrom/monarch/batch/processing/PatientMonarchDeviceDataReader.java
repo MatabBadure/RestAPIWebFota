@@ -24,6 +24,7 @@ import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 
 import com.hillrom.monarch.repository.PatientMonarchDeviceDataRepository;
 import com.hillrom.monarch.repository.PatientMonarchDeviceRawLogRepository;
@@ -137,7 +138,7 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 		
 		if(!patientVestDeviceEventsMonarch.isEmpty())
 		{
-			UserPatientAssoc userPatientAssoc = createPatientUserIfNotExists(deviceRawLogMonarch, deviceSerialNumber);
+			UserPatientAssoc userPatientAssoc = createPatientUserIfNotExists(deviceRawLogMonarch, deviceSerialNumber,patientVestDeviceEventsMonarch);
 			assignDefaultValuesToVestDeviceDataTempMonarch(deviceRawLogMonarch, patientVestDeviceEventsMonarch, userPatientAssoc);
 		}
 		return patientVestDeviceEventsMonarch;
@@ -226,13 +227,20 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 
 	@Transactional
 	private synchronized UserPatientAssoc createPatientUserIfNotExists(PatientVestDeviceRawLogMonarch deviceRawLog,
-			String deviceSerialNumber) throws Exception{
+			String deviceSerialNumber,List<PatientVestDeviceDataMonarch> patientVestDeviceEventsMonarch) throws Exception{
 		
 		Optional<PatientDevicesAssoc> patientDevicesFromDB = patientDevicesAssocRepository.findOneBySerialNumber(deviceSerialNumber);
 		PatientInfo patientInfo = null;
+		String devBT=null; String dev_wifi=null; String dev_lte=null;
 
 		List<PatientVestDeviceHistoryMonarch> patientMonarchDeviceHistoryList = new LinkedList<>();
 		patientMonarchDeviceHistoryList = patientMonarchDeviceRepository.findBySerialNumber(deviceSerialNumber);
+		
+		if(!patientVestDeviceEventsMonarch.isEmpty()){
+			devBT = patientVestDeviceEventsMonarch.get(0).getDevBt();
+			dev_wifi = patientVestDeviceEventsMonarch.get(0).getDevWifi();
+			dev_lte = patientVestDeviceEventsMonarch.get(0).getDevLte();
+		}
 		
 		if (patientDevicesFromDB.isPresent()) {
 			
@@ -241,6 +249,13 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 					if(Objects.nonNull(patientMonarchDevicePatient) && patientMonarchDevicePatient.isPending() 
 							&& deviceSerialNumber.equalsIgnoreCase(patientMonarchDevicePatient.getSerialNumber())){
 						patientMonarchDevicePatient.setPending(false);
+						patientMonarchDeviceRepository.save(patientMonarchDevicePatient);
+					}
+					if(Objects.nonNull(patientMonarchDevicePatient) && patientMonarchDevicePatient.isActive() 
+							&& deviceSerialNumber.equalsIgnoreCase(patientMonarchDevicePatient.getSerialNumber())){
+						patientMonarchDevicePatient.setDevBt(devBT);
+						patientMonarchDevicePatient.setWifiId(dev_wifi);
+						patientMonarchDevicePatient.setLteId(dev_lte);
 						patientMonarchDeviceRepository.save(patientMonarchDevicePatient);
 					}
 				}
@@ -306,6 +321,9 @@ public class PatientMonarchDeviceDataReader implements ItemReader<List<PatientVe
 			// Create Patient Device History
 			PatientVestDeviceHistoryMonarch deviceHistoryMonarch = new PatientVestDeviceHistoryMonarch(new PatientVestDevicePK(patientInfo, patientInfo.getSerialNumber()),
 					patientInfo.getBluetoothId(), patientInfo.getHubId(), true);
+			deviceHistoryMonarch.setDevBt(devBT);
+			deviceHistoryMonarch.setWifiId(dev_wifi);
+			deviceHistoryMonarch.setLteId(dev_lte);
 			patientMonarchDeviceRepository.save(deviceHistoryMonarch);
 			
 			PatientDevicesAssoc deviceAssoc = new PatientDevicesAssoc(patientInfo.getId(), "MONARCH", true, deviceSerialNumber);

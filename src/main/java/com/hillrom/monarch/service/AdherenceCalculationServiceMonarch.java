@@ -68,6 +68,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.NotificationMonarch;
@@ -2628,10 +2629,10 @@ public class AdherenceCalculationServiceMonarch{
 			
 			// Looping through the patient devices
 			for(PatientDevicesAssoc device : devAssForPatientList){
-				if(device.getDeviceType().equals("VEST")){
+				if(Constants.VEST.equals(device.getDeviceType())){
 					vestCreatedDate = device.getCreatedDate();
 					vestSerialNumber = device.getSerialNumber();
-				}else if(device.getDeviceType().equals("MONARCH")){
+				}else if(Constants.MONARCH.equals(device.getDeviceType())){
 					monarchCreatedDate = device.getCreatedDate();
 					monarchSerialNumber = device.getSerialNumber();
 				}
@@ -2646,6 +2647,7 @@ public class AdherenceCalculationServiceMonarch{
 			User user = userService.getUserObjFromPatientInfo(patientInfo);
 			
 			LocalDate firstTransmissionDateMonarch = null;
+			LocalDate firstTransmissionDateVest = null;
 			User userOld = null;
 			
 			// Added for the Monarch/Vest creation scenario from TIMS
@@ -2659,24 +2661,40 @@ public class AdherenceCalculationServiceMonarch{
 				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patDevice.getOldPatientId());
 				userOld = userService.getUserObjFromPatientInfo(patientInfoOld);
 				
-				PatientNoEventMonarch noEventMonarch = userIdNoEventMap.get(userOld.getId());
-				
+				if(Constants.MONARCH.equals(patDevice.getDeviceType())){
+					PatientNoEventMonarch noEventMonarch = userIdNoEventMap.get(userOld.getId());
+					
+					if(Objects.nonNull(noEventMonarch) && (Objects.nonNull(noEventMonarch.getFirstTransmissionDate()))){
+						firstTransmissionDateMonarch = noEventMonarch.getFirstTransmissionDate();
+					}
+				}else if(Constants.VEST.equals(patDevice.getDeviceType())){
+					PatientNoEvent noEvent = userIdNoEventMapVest.get(userOld.getId());
+					
+					if(Objects.nonNull(noEvent) && (Objects.nonNull(noEvent.getFirstTransmissionDate()))){
+						firstTransmissionDateVest = noEvent.getFirstTransmissionDate();
+					}
+				}
+			}
+			
+			
+			if(Constants.MONARCH.equals(patDevice.getDeviceType())){
+				PatientNoEvent noEventVest = userIdNoEventMapVest.get(user.getId());
+			
+				if(Objects.nonNull(noEventVest) && (Objects.nonNull(noEventVest.getFirstTransmissionDate()))){
+					firstTransmissionDateVest = noEventVest.getFirstTransmissionDate();
+				}
+			}else if(Constants.VEST.equals(patDevice.getDeviceType())){
+				PatientNoEventMonarch noEventMonarch = userIdNoEventMap.get(user.getId());
+			
 				if(Objects.nonNull(noEventMonarch) && (Objects.nonNull(noEventMonarch.getFirstTransmissionDate()))){
 					firstTransmissionDateMonarch = noEventMonarch.getFirstTransmissionDate();
 				}
 			}
 			
-			LocalDate firstTransmissionDateVest = null;
-			
-			PatientNoEvent noEventVest = userIdNoEventMapVest.get(user.getId());
-			
-			if(Objects.nonNull(noEventVest) && (Objects.nonNull(noEventVest.getFirstTransmissionDate()))){
-				firstTransmissionDateVest = noEventVest.getFirstTransmissionDate();
-			}
-			
 			// Identifying the new device is Monarch and old device is Vest
 			if(Objects.nonNull(vestCreatedDate) && Objects.nonNull(monarchCreatedDate) && 
-					(vestCreatedDate.isBefore(monarchCreatedDate) || vestCreatedDate.isEqual(monarchCreatedDate))){
+					(vestCreatedDate.isBefore(monarchCreatedDate) || (vestCreatedDate.isEqual(monarchCreatedDate) 
+								&& Constants.MONARCH.equals(patDevice.getDeviceType())) )){
 				
 				List<PatientCompliance> patientComplianceList = patientComplianceRepository.findByPatientUserId(user.getId());
 				List <PatientComplianceMonarch> complianceListToSave = new LinkedList<>();
@@ -2793,9 +2811,37 @@ public class AdherenceCalculationServiceMonarch{
 					
 					adherenceCalculationBoth(user.getId(), null, firstTransmissionDateMonarch, firstTransmissionDateVest, DEFAULT_COMPLIANCE_SCORE, userOld.getId(), 4);
 				}
-			}else if( Objects.nonNull(vestCreatedDate) && Objects.nonNull(monarchCreatedDate) && vestCreatedDate.isAfter(monarchCreatedDate) ){
-				if(flag == 2)
+			}else if( Objects.nonNull(vestCreatedDate) && Objects.nonNull(monarchCreatedDate) && (vestCreatedDate.isAfter(monarchCreatedDate) 
+													|| (vestCreatedDate.isEqual(monarchCreatedDate) && Constants.VEST.equals(patDevice.getDeviceType())) )){
+				if(flag == 2){
+					List<TherapySession> therapySessionList = therapySessionRepository.findByPatientUserId(userOld.getId());
+					
+					List <TherapySession> therapySessionListToSave = new LinkedList<>();
+					
+					for(TherapySession patientTherapySession : therapySessionList){
+						TherapySession therapySession = new TherapySession(patientInfo, user, 
+								patientTherapySession.getDate(), patientTherapySession.getSessionNo(),
+								patientTherapySession.getSessionType(), patientTherapySession.getStartTime(), patientTherapySession.getEndTime(),
+								patientTherapySession.getFrequency(), patientTherapySession.getPressure(), patientTherapySession.getDurationInMinutes(),
+								patientTherapySession.getProgrammedCaughPauses(), patientTherapySession.getNormalCaughPauses(),
+								patientTherapySession.getCaughPauseDuration(), patientTherapySession.getHmr(), patientTherapySession.getSerialNumber(),
+								patientTherapySession.getBluetoothId());
+							
+						therapySessionListToSave.add(therapySession);
+					}
+					therapySessionService.saveAll(therapySessionListToSave);
+					
+					
+					PatientNoEvent patientNoEvent = noEventRepository.findByPatientUserId(userOld.getId());
+					
+					PatientNoEvent noEventToSave = new PatientNoEvent(patientNoEvent.getUserCreatedDate(),
+							patientNoEvent.getFirstTransmissionDate(), patientInfo, user);
+					
+					noEventService.save(noEventToSave);
+					
 					adherenceCalculationBoth(user.getId(), null, firstTransmissionDateVest, firstTransmissionDateMonarch, DEFAULT_COMPLIANCE_SCORE, userOld.getId(), 3);
+				}	
+					
 			}
 		}
 	}

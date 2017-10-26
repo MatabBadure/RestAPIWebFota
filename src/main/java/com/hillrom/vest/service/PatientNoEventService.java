@@ -12,6 +12,7 @@ import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.vest.domain.PatientNoEvent;
+import com.hillrom.vest.domain.PatientNoEventMonarch;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.PatientNoEventsRepository;
 import com.hillrom.vest.util.ExceptionConstants;
@@ -79,5 +80,8 @@ public class PatientNoEventService {
 			userIdNoEventsMap.put(patientNoEvent.getPatientUser().getId(), patientNoEvent);
 		}
 		return userIdNoEventsMap;
+	}
+	public void save(PatientNoEvent patientNoEvent){
+		noEventsRepository.save(patientNoEvent);
 	}
 }

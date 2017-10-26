@@ -1126,6 +1126,17 @@ public class UserResource {
 				vestdeviceData.addAll(deviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
 			}
 			
+			if(Objects.nonNull(checkPatientTypeMonarch) && Objects.nonNull(checkPatientTypeMonarch.getSwappedPatientId())){
+				patientId = checkPatientTypeMonarch.getSwappedPatientId();
+				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
+				monarchdeviceData.addAll(monarchdeviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
+
+			}else if(Objects.nonNull(checkPatientTypeVest) && Objects.nonNull(checkPatientTypeVest.getSwappedPatientId())){
+				patientId = checkPatientTypeVest.getSwappedPatientId();
+				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
+				vestdeviceData.addAll(deviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
+			}
+			
 			if(deviceType.equals("VEST")){
 				vestdeviceData.addAll(deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp));
 

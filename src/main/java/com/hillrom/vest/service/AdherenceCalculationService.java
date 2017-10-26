@@ -1617,7 +1617,7 @@ public class AdherenceCalculationService {
 			Integer adherenceSettingDay) throws Exception{
 		
 		LocalDate latestComplianceDate;
-		if(existingComplianceMap.isEmpty()){		
+		if(!existingComplianceMap.isEmpty()){
 			latestComplianceDate = existingComplianceMap.lastKey();
 		}else{
 			latestComplianceDate = existingComplianceMonarchMap.lastKey();

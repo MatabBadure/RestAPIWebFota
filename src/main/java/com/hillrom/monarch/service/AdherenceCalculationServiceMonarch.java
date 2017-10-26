@@ -700,7 +700,7 @@ public class AdherenceCalculationServiceMonarch{
 			
 			for(PatientComplianceMonarch currentCompliance : patientComplianceList){
 				
-				if(resetFlag == 1 || resetFlag == 2 || (resetFlag == 3 && !currentCompliance.getDate().isBefore(adherenceStartDate))){
+				if(resetFlag == 0 || resetFlag == 1 || resetFlag == 2 || (resetFlag == 3 && !currentCompliance.getDate().isBefore(adherenceStartDate))){
 				
 					PatientInfo patient = currentCompliance.getPatient();
 					User patientUser = currentCompliance.getPatientUser();
@@ -771,6 +771,7 @@ public class AdherenceCalculationServiceMonarch{
 						if(adherenceSettingDay == 1 && adherenceStartDate.equals(currentCompliance.getDate())){
 							initialPrevScoreFor1Day = adherenceScore;
 						}
+						// Verifying missed therapy count is greater than the adherence window and not having therapy for today  
 						if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && 
 								!currentCompliance.getDate().equals(todayDate) && 
 									( Objects.isNull(therapyData) || 
@@ -2946,7 +2947,7 @@ public class AdherenceCalculationServiceMonarch{
 			
 			double hmrExistsForDay = 0;
 			if(Objects.nonNull(dayTherapyList) && !dayTherapyList.isEmpty())
-				hmrExistsForDay = dayTherapyList.get(dayTherapyList.size()-1).getHmr();																			
+				hmrExistsForDay = dayTherapyList.get(dayTherapyList.size()-1).getHmr();
 																
 			TherapySessionMonarch therapySession = new TherapySessionMonarch(patientInfo, user, 
 						patientTherapySession.getDate(), patientTherapySession.getSessionNo(),
@@ -2975,9 +2976,10 @@ public class AdherenceCalculationServiceMonarch{
 		PatientNoEventMonarch patientNoEventMonarchExist = noEventRepositoryMonarch.findByPatientUserId(user.getId());
 		
 		LocalDate updatedFirstTransmissionDate;
-		if(Objects.isNull(patientNoEventMonarch.getFirstTransmissionDate())){
-			updatedFirstTransmissionDate = patientNoEventMonarchExist.getFirstTransmissionDate();
-		}else if(Objects.isNull(patientNoEventMonarchExist.getFirstTransmissionDate())){
+		if(Objects.isNull(patientNoEventMonarch) || Objects.isNull(patientNoEventMonarch.getFirstTransmissionDate())){
+			updatedFirstTransmissionDate = Objects.nonNull(patientNoEventMonarchExist.getFirstTransmissionDate()) ? 
+												patientNoEventMonarchExist.getFirstTransmissionDate() : null;
+		}else if(Objects.isNull(patientNoEventMonarchExist) || Objects.isNull(patientNoEventMonarchExist.getFirstTransmissionDate())){
 			updatedFirstTransmissionDate = patientNoEventMonarch.getFirstTransmissionDate();
 		}else{
 			updatedFirstTransmissionDate = patientNoEventMonarch.getFirstTransmissionDate().isBefore(patientNoEventMonarchExist.getFirstTransmissionDate())?
@@ -2996,7 +2998,8 @@ public class AdherenceCalculationServiceMonarch{
 		}
 		
 		// Adherence reset from the shell first transmission date
-		adherenceResetForPatient(user.getId(), patientInfo.getId(),updatedFirstTransmissionDate, DEFAULT_COMPLIANCE_SCORE, 0);
+		if(Objects.nonNull(updatedFirstTransmissionDate))
+			adherenceResetForPatient(user.getId(), patientInfo.getId(),updatedFirstTransmissionDate, DEFAULT_COMPLIANCE_SCORE, 0);
 	}
 	
 }

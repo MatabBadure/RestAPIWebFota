@@ -17,6 +17,7 @@ public interface PatientNoEventsMonarchRepository extends
 	
 	PatientNoEventMonarch findByPatientId(String patientId);
 	
+	
 	List<PatientNoEventMonarch> findByPatientUserIdIn(List<Long> userIds);
 	
 }

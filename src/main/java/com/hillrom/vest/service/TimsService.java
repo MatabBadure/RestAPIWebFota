@@ -727,7 +727,7 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 		return false;
 		
 	}
-	//JIRA-ID HILL-2521
+	//JIRA-ID HILL-2521 ,HILL-2549
 	public boolean CASE2_PatientExistsWithNODevice_VEST(PatientInfoDTO patientInfoDTO){
 		
 		
@@ -790,7 +790,7 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 		
 		
 	}
-	//JIRA-ID HILL-2414
+	//JIRA-ID HILL-2414 , HILL-2548
 	public boolean CASE3_PatientHasMonarchAddVisivest_VEST(PatientInfoDTO patientInfoDTO){
 		
 		
@@ -807,8 +807,9 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());	
 				managePatientDevice(patientInfoDTO);
 				
-						
 				patientInfoDTO.setOperation_type("CREATE");
+				String monarch_patient_id = patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get().getPatientId();
+				patientInfoDTO.setOld_patient_id(monarch_patient_id);
 				
 				managePatientDeviceAssociationMonarch(patientInfoDTO);
 								
@@ -1168,7 +1169,7 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 	}
 
 
-	//JIRA-ID -- HILL-2523
+	//JIRA-ID -- HILL-2523  , HILL-2547
 	public boolean CASE9_PatientHasDifferentVisivestSwap_VEST(PatientInfoDTO patientInfoDTO){
 		
 		
@@ -1332,7 +1333,7 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 
 		
 	}
-	//JIRA-ID -- HILL-2525
+	//JIRA-ID -- HILL-2525 ,HILL-2549
 	public boolean CASE11_PatientExistsWithNODevice_VEST(PatientInfoDTO patientInfoDTO){
 		
 		
@@ -1530,7 +1531,7 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 		
 	}
 	
-	//JIRA-ID -- HILL-2496
+	//JIRA-ID -- HILL-2496 ,HILL-2548
 	public boolean CASE3_PatientHasVisivestAddMonarch_MONARCH(PatientInfoDTO patientInfoDTO){
 		
 		
@@ -1549,6 +1550,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 							
 				managePatientDeviceMonarch(patientInfoDTO);
 								
+				String visivest_patient_id = patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get().getPatientId();
+				patientInfoDTO.setOld_patient_id(visivest_patient_id);	
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 								
@@ -1922,7 +1925,7 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 	}
 
 
-	//JIRA-ID -- HILL-2519
+	//JIRA-ID -- HILL-2519 , HILL-2547
 	public boolean CASE9_PatientHasDifferentMonarchSwap_MONARCH(PatientInfoDTO patientInfoDTO){
 		
 		

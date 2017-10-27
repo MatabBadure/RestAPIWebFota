@@ -1254,6 +1254,7 @@ public class AdherenceCalculationServiceMonarch{
 			if(Objects.nonNull(existingNotificationofTheDay))
 				notificationMonarchRepository.delete(existingNotificationofTheDay);
 			newCompliance.setScore(score);
+			newCompliance.setMissedTherapyCount(0);
 			return newCompliance;
 		}
 		
@@ -2621,7 +2622,7 @@ public class AdherenceCalculationServiceMonarch{
 		
 		// Identifying both device patient by the size more than 1
 		List<PatientDevicesAssoc> devAssForPatientList = patientDevicesAssocRepository.findByPatientId(patDevice.getPatientId());
-		if(devAssForPatientList.size()>1){
+		if(devAssForPatientList.size()>1 && !patDevice.getOldPatientId().equals(patDevice.getPatientId())){
 			LocalDate vestCreatedDate = null;
 			LocalDate monarchCreatedDate = null;
 			String vestSerialNumber = null;
@@ -2804,12 +2805,17 @@ public class AdherenceCalculationServiceMonarch{
 					
 					PatientNoEventMonarch patientNoEventMonarch = noEventRepositoryMonarch.findByPatientUserId(userOld.getId());
 					
-					PatientNoEventMonarch noEventMonarchToSave = new PatientNoEventMonarch(patientNoEventMonarch.getUserCreatedDate(),
-							patientNoEventMonarch.getFirstTransmissionDate(), patientInfo, user);
+					PatientNoEventMonarch patientNoEventExist = noEventRepositoryMonarch.findByPatientUserId(user.getId());
+					if(Objects.isNull(patientNoEventExist)){
+						
+						PatientNoEventMonarch noEventMonarchToSave = new PatientNoEventMonarch(patientNoEventMonarch.getUserCreatedDate(),
+								patientNoEventMonarch.getFirstTransmissionDate(), patientInfo, user);
+						
+						noEventMonarchService.save(noEventMonarchToSave);
+					}
 					
-					noEventMonarchService.save(noEventMonarchToSave);
-					
-					adherenceCalculationBoth(user.getId(), null, firstTransmissionDateMonarch, firstTransmissionDateVest, DEFAULT_COMPLIANCE_SCORE, userOld.getId(), 4);
+					if(Objects.nonNull(firstTransmissionDateMonarch) && Objects.nonNull(firstTransmissionDateVest))
+						adherenceCalculationBoth(user.getId(), null, firstTransmissionDateMonarch, firstTransmissionDateVest, DEFAULT_COMPLIANCE_SCORE, userOld.getId(), 4);
 				}
 			}else if( Objects.nonNull(vestCreatedDate) && Objects.nonNull(monarchCreatedDate) && (vestCreatedDate.isAfter(monarchCreatedDate) 
 													|| (vestCreatedDate.isEqual(monarchCreatedDate) && Constants.VEST.equals(patDevice.getDeviceType())) )){
@@ -2834,12 +2840,17 @@ public class AdherenceCalculationServiceMonarch{
 					
 					PatientNoEvent patientNoEvent = noEventRepository.findByPatientUserId(userOld.getId());
 					
-					PatientNoEvent noEventToSave = new PatientNoEvent(patientNoEvent.getUserCreatedDate(),
-							patientNoEvent.getFirstTransmissionDate(), patientInfo, user);
+					PatientNoEvent patientNoEventExist = noEventRepository.findByPatientUserId(user.getId());
+					if(Objects.isNull(patientNoEventExist)){
 					
-					noEventService.save(noEventToSave);
+						PatientNoEvent noEventToSave = new PatientNoEvent(patientNoEvent.getUserCreatedDate(),
+								patientNoEvent.getFirstTransmissionDate(), patientInfo, user);
 					
-					adherenceCalculationBoth(user.getId(), null, firstTransmissionDateVest, firstTransmissionDateMonarch, DEFAULT_COMPLIANCE_SCORE, userOld.getId(), 3);
+						noEventService.save(noEventToSave);
+					}
+					
+					if(Objects.nonNull(firstTransmissionDateVest) && Objects.nonNull(firstTransmissionDateMonarch))
+						adherenceCalculationBoth(user.getId(), null, firstTransmissionDateVest, firstTransmissionDateMonarch, DEFAULT_COMPLIANCE_SCORE, userOld.getId(), 3);
 				}	
 					
 			}

@@ -41,6 +41,8 @@ public interface PatientComplianceMonarchRepository extends
 	List<PatientComplianceMonarch> findByDateBetweenAndPatientUserIdIn(LocalDate from,LocalDate to,List<Long> patientUserIds);
 	
 	List<PatientComplianceMonarch> findByPatientUserId(Long patientUserId);
+	
+	List<PatientComplianceMonarch> findByPatientId(String patientId);
 
 	@Query(nativeQuery=true,value=" SELECT id,patient_id,user_id,date,compliance_score,hmr_run_rate,hmr,is_hmr_compliant,"
 			+ "is_settings_deviated,missed_therapy_count,last_therapy_session_date,settings_deviated_days_count,"

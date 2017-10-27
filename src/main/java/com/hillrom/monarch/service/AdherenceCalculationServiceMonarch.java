@@ -1254,6 +1254,7 @@ public class AdherenceCalculationServiceMonarch{
 			if(Objects.nonNull(existingNotificationofTheDay))
 				notificationMonarchRepository.delete(existingNotificationofTheDay);
 			newCompliance.setScore(score);
+			newCompliance.setMissedTherapyCount(0);
 			return newCompliance;
 		}
 		

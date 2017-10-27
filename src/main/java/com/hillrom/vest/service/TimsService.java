@@ -842,7 +842,7 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					patientComplianceRepository.save(newPatientCompliance);
 				}
 				
-				if(patientNoEventsRepository.findPatientsById(patientInfoDTO.getPatient_id()).isEmpty()){
+				if(Objects.isNull(patientNoEventsRepository.findByPatientId(patientInfoDTO.getPatient_id()))){
 					PatientNoEvent patientNoEvent = new PatientNoEvent(new LocalDate(),null, patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get(),
 							patientUser);
 					patientNoEventsRepository.save(patientNoEvent);
@@ -1603,7 +1603,7 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					patientComplianceMonarchRepository.save(newPatientComplianceMonarch);
 				}
 				
-				if(patientNoEventsMonarchRepository.findPatientsById(patientInfoDTO.getPatient_id()).isEmpty()){
+				if(Objects.isNull(patientNoEventsMonarchRepository.findByPatientId(patientInfoDTO.getPatient_id()))){
 					PatientNoEventMonarch patientNoEventMonarch = new PatientNoEventMonarch(new LocalDate(),null, patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get(),
 							patientUser);
 					patientNoEventsMonarchRepository.save(patientNoEventMonarch);

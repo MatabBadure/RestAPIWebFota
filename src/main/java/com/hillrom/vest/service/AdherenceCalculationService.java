@@ -638,11 +638,16 @@ public class AdherenceCalculationService {
 					if(adherenceSettingDay == 1 && adherenceStartDate.equals(currentCompliance.getDate())){
 						initialPrevScoreFor1Day = adherenceScore;
 					}						
-					if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && !currentCompliance.getDate().equals(todayDate) && (Objects.isNull(therapyData) || (Objects.nonNull(therapyData) && therapyData.isEmpty()) ) ){
+					if(currentCompliance.getMissedTherapyCount() >= adherenceSettingDay && 
+							!currentCompliance.getDate().equals(todayDate) && 
+							(Objects.isNull(therapyData) || 
+									(Objects.nonNull(therapyData) && therapyData.isEmpty()) ) ){
 						// Adding the prevCompliance object for previous day compliance and existingNotificationofTheDay object for the current date Notification object
 						// Missed therapy days
 						complianceListToStore.add(calculateUserMissedTherapy(currentCompliance,currentCompliance.getDate(), userId, patient, patientUser, initialPrevScoreFor1Day, prevCompliance, existingNotificationofTheDay));
-					}else if( ( Objects.isNull(therapyData) || (Objects.nonNull(therapyData) && therapyData.isEmpty()) ) && currentCompliance.getDate().equals(todayDate)){
+					}else if( ( Objects.isNull(therapyData) || 
+									(Objects.nonNull(therapyData) && 
+											therapyData.isEmpty()) ) && currentCompliance.getDate().equals(todayDate)){
 						// Passing prevCompliance for avoiding the repository call to retrieve the previous day compliance
 						// Setting the previous day compliance details for the no therapy done for today 
 						complianceListToStore.add(setPrevDayCompliance(currentCompliance, userId, prevCompliance));
@@ -873,6 +878,7 @@ public class AdherenceCalculationService {
 			if(Objects.nonNull(existingNotificationofTheDay))
 				notificationRepository.delete(existingNotificationofTheDay);
 			newCompliance.setScore(score);
+			newCompliance.setMissedTherapyCount(0);
 			return newCompliance;
 		}
 		
@@ -886,6 +892,9 @@ public class AdherenceCalculationService {
 		
 		// Setting the new score with respect to the compliance deduction
 		newCompliance.setScore(score);
+
+		// Setting the missed therapy count to 0, since having therapy
+		newCompliance.setMissedTherapyCount(0);
 		
 		// Saving the updated score for the specific date of compliance
 		//patientComplianceRepository.save(newCompliance);
@@ -1610,7 +1619,7 @@ public class AdherenceCalculationService {
 			Integer adherenceSettingDay) throws Exception{
 		
 		LocalDate latestComplianceDate;
-		if(existingComplianceMap.isEmpty()){		
+		if(!existingComplianceMap.isEmpty()){
 			latestComplianceDate = existingComplianceMap.lastKey();
 		}else{
 			latestComplianceDate = existingComplianceMonarchMap.lastKey();
@@ -2394,18 +2403,38 @@ public class AdherenceCalculationService {
 		
 		// Getting the therapy details of the shell patient
 		List<TherapySession> therapySessionList = therapySessionRepository.findByPatientUserId(userOld.getId());
-			
-		List <TherapySession> therapySessionListToSave = new LinkedList<>();				
+		List<TherapySession> therapySessionMonarchListExist = therapySessionRepository.findByPatientUserId(user.getId());
+		
+		SortedMap<LocalDate,List<TherapySession>> sortedExistTherapy = null;
+		if(Objects.nonNull(therapySessionMonarchListExist) && !therapySessionMonarchListExist.isEmpty())
+			sortedExistTherapy = groupTherapySessionsByDate(therapySessionMonarchListExist);
+		
+		List <TherapySession> therapySessionListToSave = new LinkedList<>();
+		
 		for(TherapySession patientTherapySession : therapySessionList){
+			
+			List<TherapySession> dayTherapyList = null;
+			if(Objects.nonNull(sortedExistTherapy))
+				dayTherapyList = Objects.nonNull(sortedExistTherapy.get(patientTherapySession.getDate())) ? 
+													sortedExistTherapy.get(patientTherapySession.getDate()) :
+														Objects.nonNull(sortedExistTherapy.get(sortedExistTherapy.lastKey())) ? 
+																sortedExistTherapy.get(sortedExistTherapy.lastKey()) : null ;
+			
+			double hmrExistsForDay = 0;
+			if(Objects.nonNull(dayTherapyList) && !dayTherapyList.isEmpty())
+				hmrExistsForDay = dayTherapyList.get(dayTherapyList.size()-1).getHmr();
+						
 			TherapySession therapySession = new TherapySession(patientInfo, user, 
 						patientTherapySession.getDate(), patientTherapySession.getSessionNo(),
 						patientTherapySession.getSessionType(), patientTherapySession.getStartTime(), patientTherapySession.getEndTime(),
 						patientTherapySession.getFrequency(), patientTherapySession.getPressure(), patientTherapySession.getDurationInMinutes(),
 						patientTherapySession.getProgrammedCaughPauses(), patientTherapySession.getNormalCaughPauses(),
-						patientTherapySession.getCaughPauseDuration(), patientTherapySession.getHmr(), patientTherapySession.getSerialNumber(),
+						patientTherapySession.getCaughPauseDuration(), 
+						patientTherapySession.getHmr()+hmrExistsForDay, 
+						patientTherapySession.getSerialNumber(),
 						patientTherapySession.getBluetoothId());
 					
-				therapySessionListToSave.add(therapySession);
+			therapySessionListToSave.add(therapySession);
 		}
 		
 		// Adding all the shell patient therapy to new patient
@@ -2419,9 +2448,10 @@ public class AdherenceCalculationService {
 
 		
 		LocalDate updatedFirstTransmissionDate;
-		if(Objects.isNull(patientNoEvent.getFirstTransmissionDate())){
-			updatedFirstTransmissionDate = patientNoEventExist.getFirstTransmissionDate();
-		}else if(Objects.isNull(patientNoEventExist.getFirstTransmissionDate())){
+		if(Objects.isNull(patientNoEvent) || Objects.isNull(patientNoEvent.getFirstTransmissionDate())){
+			updatedFirstTransmissionDate = Objects.nonNull(patientNoEventExist.getFirstTransmissionDate())?
+												patientNoEventExist.getFirstTransmissionDate() : null;
+		}else if(Objects.isNull(patientNoEventExist) || Objects.isNull(patientNoEventExist.getFirstTransmissionDate())){
 			updatedFirstTransmissionDate = patientNoEvent.getFirstTransmissionDate();
 		}else{
 			updatedFirstTransmissionDate = patientNoEvent.getFirstTransmissionDate().isBefore(patientNoEventExist.getFirstTransmissionDate())?
@@ -2440,7 +2470,8 @@ public class AdherenceCalculationService {
 		}
 		
 		// Adherence reset from the shell first transmission date
-		adherenceResetForPatient(user.getId(), patientInfo.getId(),updatedFirstTransmissionDate, DEFAULT_COMPLIANCE_SCORE, 0);
+		if(Objects.nonNull(updatedFirstTransmissionDate))		
+			adherenceResetForPatient(user.getId(), patientInfo.getId(),updatedFirstTransmissionDate, DEFAULT_COMPLIANCE_SCORE, 0);
 	}
 	
 }

@@ -8,10 +8,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.hillrom.vest.domain.PatientCompliance;
+import com.hillrom.vest.domain.PatientComplianceMonarch;
 
 public interface PatientComplianceRepository extends
 		JpaRepository<PatientCompliance, Long> {
 
+	List<PatientCompliance> findByPatientId(String patientId);
+	
 	PatientCompliance findTop1ByPatientUserIdOrderByDateDesc(Long patientUserId);
 	
 	PatientCompliance findByPatientUserIdAndDate(Long patientUSerId,LocalDate date);

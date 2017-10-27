@@ -135,7 +135,10 @@ public class AdvancedSearchResource {
 	private AdvancedSearchRepository advancedSearchRepository;
 
 
-   @RequestMapping(value = "/clinics/advanced/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    /**
+     * POST  /clinics/advanced/search -> Advanced Search for clinics.
+     */
+   @RequestMapping(value = "/clinics/advanced/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	
   	public ResponseEntity<?> searchPatientAssociatedToHcpInAdmin(@RequestBody AdvancedClinicDTO advancedClinicDTO,
   			@RequestParam(value = "page", required = false) Integer offset,

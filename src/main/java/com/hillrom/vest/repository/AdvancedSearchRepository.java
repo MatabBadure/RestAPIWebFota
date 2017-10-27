@@ -154,6 +154,24 @@ public class AdvancedSearchRepository {
 		return page;
 	}
 	 
+	
+//	SELECT cl.name, ux.speciality,ux.credentials,cszm.country,ux.city,ux.state,us.zipcode,us.is_deleted 
+//	from hillromvest_prod.USER us
+//	left outer join hillromvest_prod.USER_EXTENSION ux on us.id = ux.user_id
+//	left outer join hillromvest_prod.CLINIC_USER_ASSOC cua on cua.users_id = us.id
+//	left outer join hillromvest_prod.CLINIC cl on cl.id = cua.clinics_id
+//	left outer join hillromvest_prod.USER_AUTHORITY ua on ua.user_id = us.id
+//	left outer join hillromvest_prod.CITY_STATE_ZIP_MAP cszm on us.zipcode = cszm.zip
+//	where ua.authority_name = 'HCP' AND
+//	cl.name IS null or cl.name like '%%' AND
+//	ux.speciality IS null or ux.speciality  like '%%' AND
+//	ux.credentials IS null or ux.credentials  like '%%' AND
+//	cszm.country  like '%%' AND
+//	ux.city  like '%%' AND
+//	ux.state  like '%%' AND
+//	us.zipcode  like '%%' AND
+//	us.is_deleted in (false,true)
+	
 	private void setPaginationParams(Pageable pageable, Query query) {
 
 		int firstResult = pageable.getOffset();

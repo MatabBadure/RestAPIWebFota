@@ -30,19 +30,28 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.monarch.repository.PatientComplianceMonarchRepository;
 import com.hillrom.monarch.repository.PatientMonarchDeviceRepository;
+import com.hillrom.monarch.repository.PatientNoEventsMonarchRepository;
 import com.hillrom.monarch.service.PatientVestDeviceMonarchService;
 import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Announcements;
+import com.hillrom.vest.domain.PatientCompliance;
+import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
+import com.hillrom.vest.domain.PatientNoEvent;
+import com.hillrom.vest.domain.PatientNoEventMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
+import com.hillrom.vest.domain.User;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.AnnouncementsPermissionRepository;
 import com.hillrom.vest.repository.AnnouncementsRepository;
+import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PatientDevicesAssocRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
+import com.hillrom.vest.repository.PatientNoEventsRepository;
 import com.hillrom.vest.repository.PatientVestDeviceRepository;
 import com.hillrom.vest.repository.TimsUserRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
@@ -109,6 +118,18 @@ public class TimsService {
 	
 	@Inject
 	private PatientMonarchDeviceRepository patientMonarchDeviceRepository;
+	
+	@Inject
+	private PatientComplianceRepository patientComplianceRepository;
+	
+	@Inject
+	private PatientComplianceMonarchRepository patientComplianceMonarchRepository;
+	
+	@Inject
+	private PatientNoEventsRepository patientNoEventsRepository;
+	
+	@Inject
+	private PatientNoEventsMonarchRepository patientNoEventsMonarchRepository;
 	
 	@Inject
 	private PatientVestDeviceService patientVestDeviceService;
@@ -801,11 +822,31 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 
 			try{
 				
+				
+				
 				patientInfoDTO.setOperation_type("CREATE");
 				patientInfoDTO.setCreated_by(Constants.CREATED_BY_TIMS);
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());	
 				managePatientDevice(patientInfoDTO);
+
+				//Added for the case when no shell record exists either for VEST or Monarch and their records are added from TIMS
+				User patientUser = patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
+						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser();
+				
+				if(patientComplianceRepository.findByPatientId(patientInfoDTO.getPatient_id()).isEmpty()){
+					
+					
+					PatientCompliance newPatientCompliance = new PatientCompliance(100, new LocalDate(),
+							patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get(), patientUser,0,true,true,0.0);
+					patientComplianceRepository.save(newPatientCompliance);
+				}
+				
+				if(Objects.isNull(patientNoEventsRepository.findByPatientId(patientInfoDTO.getPatient_id()))){
+					PatientNoEvent patientNoEvent = new PatientNoEvent(new LocalDate(),null, patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get(),
+							patientUser);
+					patientNoEventsRepository.save(patientNoEvent);
+				}
 				
 				patientInfoDTO.setOperation_type("CREATE");
 				String monarch_patient_id = patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get().getPatientId();
@@ -1549,7 +1590,25 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 							
 				managePatientDeviceMonarch(patientInfoDTO);
-								
+				
+				//Added for the case when no shell record exists either for VEST or Monarch and their records are added from TIMS
+				User patientUser = patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
+						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser();
+				
+				if(patientComplianceMonarchRepository.findByPatientId(patientInfoDTO.getPatient_id()).isEmpty()){
+					
+					
+					PatientComplianceMonarch newPatientComplianceMonarch = new PatientComplianceMonarch(100, new LocalDate(),
+							patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get(), patientUser,0,true,true,0.0);
+					patientComplianceMonarchRepository.save(newPatientComplianceMonarch);
+				}
+				
+				if(Objects.isNull(patientNoEventsMonarchRepository.findByPatientId(patientInfoDTO.getPatient_id()))){
+					PatientNoEventMonarch patientNoEventMonarch = new PatientNoEventMonarch(new LocalDate(),null, patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get(),
+							patientUser);
+					patientNoEventsMonarchRepository.save(patientNoEventMonarch);
+				}
+				
 				String visivest_patient_id = patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get().getPatientId();
 				patientInfoDTO.setOld_patient_id(visivest_patient_id);	
 				patientInfoDTO.setOperation_type("CREATE");

@@ -2622,7 +2622,7 @@ public class AdherenceCalculationServiceMonarch{
 		
 		// Identifying both device patient by the size more than 1
 		List<PatientDevicesAssoc> devAssForPatientList = patientDevicesAssocRepository.findByPatientId(patDevice.getPatientId());
-		if(devAssForPatientList.size()>1){
+		if(devAssForPatientList.size()>1 && !patDevice.getOldPatientId().equals(patDevice.getPatientId())){
 			LocalDate vestCreatedDate = null;
 			LocalDate monarchCreatedDate = null;
 			String vestSerialNumber = null;
@@ -2806,7 +2806,7 @@ public class AdherenceCalculationServiceMonarch{
 					PatientNoEventMonarch patientNoEventMonarch = noEventRepositoryMonarch.findByPatientUserId(userOld.getId());
 					
 					PatientNoEventMonarch patientNoEventExist = noEventRepositoryMonarch.findByPatientUserId(user.getId());
-					if(Objects.nonNull(patientNoEventExist)){
+					if(Objects.isNull(patientNoEventExist)){
 						
 						PatientNoEventMonarch noEventMonarchToSave = new PatientNoEventMonarch(patientNoEventMonarch.getUserCreatedDate(),
 								patientNoEventMonarch.getFirstTransmissionDate(), patientInfo, user);
@@ -2841,7 +2841,7 @@ public class AdherenceCalculationServiceMonarch{
 					PatientNoEvent patientNoEvent = noEventRepository.findByPatientUserId(userOld.getId());
 					
 					PatientNoEvent patientNoEventExist = noEventRepository.findByPatientUserId(user.getId());
-					if(Objects.nonNull(patientNoEventExist)){
+					if(Objects.isNull(patientNoEventExist)){
 					
 						PatientNoEvent noEventToSave = new PatientNoEvent(patientNoEvent.getUserCreatedDate(),
 								patientNoEvent.getFirstTransmissionDate(), patientInfo, user);

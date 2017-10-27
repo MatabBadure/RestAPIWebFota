@@ -877,6 +877,7 @@ public class AdherenceCalculationService {
 			if(Objects.nonNull(existingNotificationofTheDay))
 				notificationRepository.delete(existingNotificationofTheDay);
 			newCompliance.setScore(score);
+			newCompliance.setMissedTherapyCount(0);
 			return newCompliance;
 		}
 		

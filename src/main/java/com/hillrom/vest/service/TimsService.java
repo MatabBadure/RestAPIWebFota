@@ -267,7 +267,8 @@ public class TimsService {
 												patientInfoDTO.getNew_serial_number(),
 												patientInfoDTO.getBluetooth_id(), 
 												patientInfoDTO.getHub_id(),
-												patientInfoDTO.getCreated_by());
+												patientInfoDTO.getCreated_by(),
+												patientInfoDTO.getHmr());
 		}catch(SQLException se)
 		{
 			throw se;
@@ -413,7 +414,9 @@ public void managePatientDeviceAssociationMonarch(PatientInfoDTO patientInfoDTO)
 				patientInfoDTO.getNew_serial_number(),
 				patientInfoDTO.getBluetooth_id(),
 				patientInfoDTO.getHub_id(),
-				patientInfoDTO.getCreated_by());
+				patientInfoDTO.getCreated_by(),
+				patientInfoDTO.getHmr()
+				);
 		}
 		catch(SQLException se)
 		{
@@ -1329,8 +1332,14 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					patientInfoDTO.setOperation_type("CREATE");
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
+				    String Shell_Patient_PatientID =		patientDevicesAssocRepository.findOneBySerialNumberAndDeviceTypeInactive(patientInfoDTO.getSerial_num(), "VEST").get().getPatientId();
+					Double shell_hmr = patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(Shell_Patient_PatientID,patientInfoDTO.getSerial_num()).get().getHmr();
+					String bt_id =  patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(Shell_Patient_PatientID,patientInfoDTO.getSerial_num()).get().getBluetoothId();
+					patientInfoDTO.setHmr(shell_hmr);
+					patientInfoDTO.setBluetooth_id(bt_id);
 					managePatientDevice(patientInfoDTO);
 									
+					
 					patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociationMonarch(patientInfoDTO);
 										
@@ -2007,7 +2016,7 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 								
 					managePatientDeviceMonarch(patientInfoDTO);
 					String Shell_Patient_PatientID =		patientDevicesAssocRepository.findOneBySerialNumberAndDeviceTypeInactive(patientInfoDTO.getSerial_num(), "MONARCH").get().getPatientId();
-					entityManager.refresh(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get());
+					//entityManager.refresh(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get());
 							
 			        PatientDevicesAssoc patientDevicesAssoc =	patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get();
 			        if(patientInfoService.findOneById(Shell_Patient_PatientID).getFirstName().equalsIgnoreCase("Monarch") && 
@@ -2108,7 +2117,9 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setOld_serial_number(patientInfoDTO.getSerial_num());
 						
-					
+				    String Shell_Patient_PatientID =		patientDevicesAssocRepository.findOneBySerialNumberAndDeviceTypeInactive(patientInfoDTO.getSerial_num(), "MONARCH").get().getPatientId();
+					Double shell_hmr = patientMonarchDeviceRepository.findOneByPatientIdAndSerialNumber(Shell_Patient_PatientID,patientInfoDTO.getSerial_num()).get().getHmr();
+					patientInfoDTO.setHmr(shell_hmr);
 					managePatientDeviceMonarch(patientInfoDTO);
 					
 					patientInfoDTO.setOperation_type("CREATE");

@@ -1231,6 +1231,7 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					managePatientDevice(patientInfoDTO);
 					String Shell_Patient_PatientID =		patientDevicesAssocRepository.findOneBySerialNumberAndDeviceTypeInactive(patientInfoDTO.getSerial_num(), "VEST").get().getPatientId();
 					entityManager.refresh(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get());
+					entityManager.refresh(patientInfoService.findOneById(Shell_Patient_PatientID));
 							
 			        PatientDevicesAssoc patientDevicesAssoc =	patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "VEST").get();
 			        if(patientInfoService.findOneById(Shell_Patient_PatientID).getFirstName().equalsIgnoreCase("Hill-Rom")){
@@ -1252,7 +1253,17 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				        	nonShellHistory.get().setHmr(nonshellHmr + shellHmr);
 				        	patientVestDeviceRepository.save(nonShellHistory.get());
 				        }
+				       
 			        }
+			        
+			        /*else{
+			        patientDevicesAssoc.setSwappedDate( LocalDate.now());
+			        patientDevicesAssoc.setSwappedPatientId(Shell_Patient_PatientID);
+			        patientDevicesAssocRepository.save(patientDevicesAssoc);
+			        }*/
+			        
+			        
+			        
 			        
 					
 					
@@ -2016,8 +2027,8 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 								
 					managePatientDeviceMonarch(patientInfoDTO);
 					String Shell_Patient_PatientID =		patientDevicesAssocRepository.findOneBySerialNumberAndDeviceTypeInactive(patientInfoDTO.getSerial_num(), "MONARCH").get().getPatientId();
-					//entityManager.refresh(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get());
-							
+					entityManager.refresh(patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get());
+					entityManager.refresh(patientInfoService.findOneById(Shell_Patient_PatientID));		
 			        PatientDevicesAssoc patientDevicesAssoc =	patientDevicesAssocRepository.findByHillromIdAndDeviceType(patientInfoDTO.getTims_cust(), "MONARCH").get();
 			        if(patientInfoService.findOneById(Shell_Patient_PatientID).getFirstName().equalsIgnoreCase("Monarch") && 
 			        		patientInfoService.findOneById(Shell_Patient_PatientID).getLastName().equalsIgnoreCase("Hill-Rom")){

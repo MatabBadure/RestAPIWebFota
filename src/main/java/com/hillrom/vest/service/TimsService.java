@@ -1256,18 +1256,7 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				       
 			        }
 			        
-			        /*else{
-			        patientDevicesAssoc.setSwappedDate( LocalDate.now());
-			        patientDevicesAssoc.setSwappedPatientId(Shell_Patient_PatientID);
-			        patientDevicesAssocRepository.save(patientDevicesAssoc);
-			        }*/
-			        
-			        
-			        
-			        
-					
-					
-					/* patientInfoDTO.setOperation_type("CREATE");
+			       	/* patientInfoDTO.setOperation_type("CREATE");
 					managePatientDeviceAssociation(patientInfoDTO);*/
 					
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());

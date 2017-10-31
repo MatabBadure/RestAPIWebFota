@@ -877,6 +877,7 @@ public class AdherenceCalculationService {
 			if(Objects.nonNull(existingNotificationofTheDay))
 				notificationRepository.delete(existingNotificationofTheDay);
 			newCompliance.setScore(score);
+			newCompliance.setMissedTherapyCount(0);
 			return newCompliance;
 		}
 		
@@ -1617,7 +1618,7 @@ public class AdherenceCalculationService {
 			Integer adherenceSettingDay) throws Exception{
 		
 		LocalDate latestComplianceDate;
-		if(existingComplianceMap.isEmpty()){		
+		if(!existingComplianceMap.isEmpty()){
 			latestComplianceDate = existingComplianceMap.lastKey();
 		}else{
 			latestComplianceDate = existingComplianceMonarchMap.lastKey();

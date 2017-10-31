@@ -212,7 +212,8 @@ public class TimsUserRepository{
 			String inPatientNewDeviceSerialNumber,
 			String inPatientBluetoothId,
 			String inPatientHubId,
-			String inPatientCreatedBy) throws SQLException, Exception{
+			String inPatientCreatedBy,
+			double inHmr) throws SQLException, Exception{
 			
 				try{
 					entityManager
@@ -223,7 +224,8 @@ public class TimsUserRepository{
 					+ ":pat_new_device_serial_number,"
 					+ ":pat_bluetooth_id,"				   		
 					+ ":pat_hub_id,"
-					+ ":pat_created_by)")
+					+ ":pat_created_by,"
+					+ ":pat_hmr)")
 					.setParameter("operation_type", operationType)
 					.setParameter("patient_id", inPatientId)
 					.setParameter("pat_old_device_serial_number",inPatientoldDeviceSerialNumber)
@@ -231,6 +233,7 @@ public class TimsUserRepository{
 					.setParameter("pat_bluetooth_id", inPatientBluetoothId)
 					.setParameter("pat_hub_id",inPatientHubId)	
 					.setParameter("pat_created_by",inPatientCreatedBy)
+					.setParameter("pat_hmr",inHmr)
 					.executeUpdate();
 				}
 				catch(Exception ex){
@@ -385,7 +388,8 @@ public class TimsUserRepository{
 						String inPatientNewDeviceSerialNumber,
 						String inBluetoothID,
 						String inHubID,
-						String inPatientCreatedBy) throws SQLException ,Exception{
+						String inPatientCreatedBy,
+						double inHmr) throws SQLException ,Exception{
 			try{
 					entityManager
 					.createNativeQuery("call manage_patient_device_monarch("
@@ -395,7 +399,8 @@ public class TimsUserRepository{
 					+ ":pat_new_device_serial_number,"
 					+":pat_bluetooth_id,"
 					+":pat_hub_id,"
-					+ ":pat_created_by)")
+					+ ":pat_created_by,"
+					+ ":pat_hmr)")
 					.setParameter("operation_type_indicator", operationTypeIndicator)
 					.setParameter("patient_id", inPatientId)
 					.setParameter("pat_old_device_serial_number",inPatientoldDeviceSerialNumber)
@@ -403,6 +408,7 @@ public class TimsUserRepository{
 					.setParameter("pat_bluetooth_id", inBluetoothID)
 					.setParameter("pat_hub_id", inHubID)
 					.setParameter("pat_created_by", inPatientCreatedBy)
+					.setParameter("pat_hmr", inHmr)
 					.executeUpdate();
 	}catch(Exception ex){
 					ex.printStackTrace();

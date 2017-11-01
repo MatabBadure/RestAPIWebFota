@@ -1249,7 +1249,7 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				        	if(inactiveNonShellHistory.isPresent())
 				        		if(Objects.nonNull(inactiveNonShellHistory.get().getHmr()))
 				        			nonshellHmr = inactiveNonShellHistory.get().getHmr();
-				        	nonShellHistory.get().setHmr(nonshellHmr + shellHmr);
+				        	nonShellHistory.get().setHmr(shellHmr);
 				        	patientVestDeviceRepository.save(nonShellHistory.get());
 				        }
 			        }
@@ -1430,7 +1430,7 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				        	if(inactiveNonShellHistory.isPresent())
 				        		if(Objects.nonNull(inactiveNonShellHistory.get().getHmr()))
 				        			nonshellHmr = inactiveNonShellHistory.get().getHmr();
-				        	nonShellHistory.get().setHmr(nonshellHmr + shellHmr);
+				        	nonShellHistory.get().setHmr(shellHmr);
 				        	patientVestDeviceRepository.save(nonShellHistory.get());
 				        }
 			        }
@@ -2054,7 +2054,7 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				        	if(inactiveNonShellHistory.isPresent())
 				        		if(Objects.nonNull(inactiveNonShellHistory.get().getHmr()))
 				        			nonshellHmr = inactiveNonShellHistory.get().getHmr();
-				        	nonShellHistory.get().setHmr(nonshellHmr + shellHmr);
+				        	nonShellHistory.get().setHmr(shellHmr);
 				        	patientMonarchDeviceRepository.save(nonShellHistory.get());
 				        }
 			        }
@@ -2235,7 +2235,7 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				        	if(inactiveNonShellHistory.isPresent())
 				        		if(Objects.nonNull(inactiveNonShellHistory.get().getHmr()))
 				        			nonshellHmr = inactiveNonShellHistory.get().getHmr();
-				        	nonShellHistory.get().setHmr(nonshellHmr + shellHmr);
+				        	nonShellHistory.get().setHmr(shellHmr);
 				        	patientMonarchDeviceRepository.save(nonShellHistory.get());
 				        }
 			        }

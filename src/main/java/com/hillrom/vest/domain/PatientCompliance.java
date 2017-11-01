@@ -202,7 +202,7 @@ public class PatientCompliance extends AbstractAuditingEntity implements Seriali
 		this.isHmrCompliant = isHMRCompliant;
 		this.isSettingsDeviated = isSettingsDeviated;
 		this.missedTherapyCount = missedTherapyCount;
-		this.latestTherapyDate = date;
+		this.latestTherapyDate = lastTherapySessionDate;
 		
 		this.settingsDeviatedDaysCount = settingDeviatedDaysCount;
 		this.globalHMRNonAdherenceCounter = globalHMRNonAdherenceCounter;

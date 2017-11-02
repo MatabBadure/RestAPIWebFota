@@ -62,7 +62,7 @@ public class TimsResource {
 	@Inject
 	private TimsUserRepository timsUserRepository;
 	
-	
+	//JIRA-ID -- HILL-2416
 	/**
      * GET  /listLogDirectory
      * 
@@ -319,7 +319,7 @@ public class TimsResource {
 			}
 		}
 		
-		
+		//JIRA-ID -- HILL-2416
 		@RequestMapping(value = "/retrieveLogData/logs", method = RequestMethod.POST , produces = MediaType.APPLICATION_JSON_VALUE)
 		   public ResponseEntity<?> retrieveLogData( @RequestBody JSONObject logfilePath ,HttpServletRequest request) {
 				 
@@ -408,8 +408,8 @@ public class TimsResource {
 
 
 
-
-
+    
+    // JIRA-ID -- HILL-2443 
 	@RequestMapping(value="/executeTIMSJob", method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> executeTIMSJob(){
 
@@ -419,7 +419,12 @@ public class TimsResource {
 			timsInputReaderService.ExecuteTIMSJob();			  
 			jsonObject.put("timsMsg", "TIMSJob Executed Successfully");
 			return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			
-		}catch(Exception ex){
+		}
+		catch(org.springframework.transaction.TransactionSystemException tse){
+			jsonObject.put("timsMsg", "TIMSJob Executed Successfully");
+			return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
+		}
+		catch(Exception ex){
 			
 			jsonObject.put("timsMsg", "TIMSJob NOT Executed Successfully");
 			return new ResponseEntity<>(jsonObject,HttpStatus.BAD_REQUEST);

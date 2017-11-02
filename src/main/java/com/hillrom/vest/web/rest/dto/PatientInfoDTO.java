@@ -53,6 +53,7 @@ public class PatientInfoDTO {
 	private String state;
 	private String patient_user_id;
 	private String index;
+	private double hmr;
 
 
 
@@ -764,6 +765,24 @@ public class PatientInfoDTO {
 
 
 
+	/**
+	 * @return the hmr
+	 */
+	public double getHmr() {
+		return hmr;
+	}
+
+
+
+	/**
+	 * @param hmr the hmr to set
+	 */
+	public void setHmr(double hmr) {
+		this.hmr = hmr;
+	}
+
+
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -788,6 +807,9 @@ public class PatientInfoDTO {
 		result = prime * result + ((garment_size == null) ? 0 : garment_size.hashCode());
 		result = prime * result + ((garment_type == null) ? 0 : garment_type.hashCode());
 		result = prime * result + ((gender == null) ? 0 : gender.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(hmr);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result + ((hub_id == null) ? 0 : hub_id.hashCode());
 		result = prime * result + ((index == null) ? 0 : index.hashCode());
 		result = prime * result + ((is_active == null) ? 0 : is_active.hashCode());
@@ -911,6 +933,8 @@ public class PatientInfoDTO {
 			if (other.gender != null)
 				return false;
 		} else if (!gender.equals(other.gender))
+			return false;
+		if (Double.doubleToLongBits(hmr) != Double.doubleToLongBits(other.hmr))
 			return false;
 		if (hub_id == null) {
 			if (other.hub_id != null)
@@ -1043,7 +1067,7 @@ public class PatientInfoDTO {
 				+ ", is_active=" + is_active + ", protocol_type_key=" + protocol_type_key + ", created_by=" + created_by
 				+ ", primary_phone=" + primary_phone + ", mobile_phone=" + mobile_phone + ", gender=" + gender
 				+ ", lang_key=" + lang_key + ", address=" + address + ", city=" + city + ", state=" + state
-				+ ", patient_user_id=" + patient_user_id + ", index=" + index + "]";
+				+ ", patient_user_id=" + patient_user_id + ", index=" + index + ", hmr=" + hmr + "]";
 	}
 
 

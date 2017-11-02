@@ -143,4 +143,7 @@
 	<include file="classpath:/config/liquibase/changelog/20170807044400_added_column_serial_number_OPTIMUS_DATA.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170826125500_update_portaladmin_pass.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170918120718_updated_patient_garment_details.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170807064000_FOTA_dataTables.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20170814021114_add_fota_role.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20171013203400_swapped_columns_PATIENT_DEVICES_ASSOC.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

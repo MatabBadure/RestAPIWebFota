@@ -84,6 +84,36 @@ public class TherapySession implements Comparable<TherapySession>{
     @Column(name = "bluetooth_id")
 	private String bluetoothId;
 
+    public TherapySession() {
+		super();
+    }
+    
+    public TherapySession(PatientInfo patientInfo,
+			User patientUser, LocalDate date, Integer sessionNo,
+			String sessionType, DateTime startTime, DateTime endTime,
+			Integer frequency, Integer pressure, int durationInMinutes,
+			Integer programmedCaughPauses, Integer normalCaughPauses,
+			Integer caughPauseDuration, Double hmr, String serialNumber,
+			String bluetoothId) {
+		super();		
+		this.patientInfo = patientInfo;
+		this.patientUser = patientUser;
+		this.date = date;
+		this.sessionNo = sessionNo;
+		this.sessionType = sessionType;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.frequency = frequency;
+		this.pressure = pressure;
+		this.durationInMinutes = durationInMinutes;
+		this.programmedCaughPauses = programmedCaughPauses;
+		this.normalCaughPauses = normalCaughPauses;
+		this.caughPauseDuration = caughPauseDuration;
+		this.hmr = hmr;
+		this.serialNumber = serialNumber;
+		this.bluetoothId = bluetoothId;
+	}
+    
 	public Long getId() {
 		return id;
 	}

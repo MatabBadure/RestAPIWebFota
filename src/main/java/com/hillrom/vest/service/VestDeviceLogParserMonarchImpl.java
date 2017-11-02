@@ -93,6 +93,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.hillrom.monarch.service.util.ParserUtilMonarch;
 import com.hillrom.vest.batch.processing.PatientVestDeviceDataDeltaReader;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
@@ -101,7 +102,6 @@ import com.hillrom.vest.domain.PatientVestDeviceRawLogMonarch;
 import com.hillrom.vest.domain.PingPongPing;
 import com.hillrom.vest.repository.PingPongPingRepository;
 import com.hillrom.vest.service.util.ParserUtil;
-import com.hillrom.vest.service.util.monarch.ParserUtilMonarch;
 
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.getEventStringByEventCode;
 import static com.hillrom.vest.config.VestDeviceRawLogOffsetConstants.INFO_PACKET_HEADER;

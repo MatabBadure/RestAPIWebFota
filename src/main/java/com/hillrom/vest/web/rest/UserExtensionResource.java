@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hillrom.monarch.service.PatientNoEventMonarchService;
 import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
@@ -48,7 +49,6 @@ import com.hillrom.vest.service.PatientHCPService;
 import com.hillrom.vest.service.PatientNoEventService;
 import com.hillrom.vest.service.RelationshipLabelService;
 import com.hillrom.vest.service.UserService;
-import com.hillrom.vest.service.monarch.PatientNoEventMonarchService;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.CareGiverVO;
@@ -138,7 +138,7 @@ public class UserExtensionResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CLINIC_ADMIN, AuthoritiesConstants.ASSOCIATES, AuthoritiesConstants.CUSTOMER_SERVICES, AuthoritiesConstants.RND_USER})
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CLINIC_ADMIN, AuthoritiesConstants.ASSOCIATES, AuthoritiesConstants.CUSTOMER_SERVICES, AuthoritiesConstants.FOTA_ADMIN, AuthoritiesConstants.FOTA_APPROVER})
     public ResponseEntity<JSONObject> update(@PathVariable Long id, @RequestBody UserExtensionDTO userExtensionDTO, HttpServletRequest request) {
         log.debug("REST request to update User : {}", userExtensionDTO);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
@@ -208,7 +208,7 @@ public class UserExtensionResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     //hill-1845
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES, AuthoritiesConstants.RND_USER})
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES, AuthoritiesConstants.FOTA_ADMIN,AuthoritiesConstants.FOTA_APPROVER})
     //hill-1845
     public ResponseEntity<JSONObject> delete(@PathVariable Long id, HttpServletRequest request) {
         log.debug("REST request to delete UserExtension : {}", id);
@@ -1049,7 +1049,7 @@ public class UserExtensionResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     //hill-1845
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES, AuthoritiesConstants.RND_USER})
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES, AuthoritiesConstants.FOTA_ADMIN, AuthoritiesConstants.FOTA_APPROVER})
     //hill-1845,
     public ResponseEntity<JSONObject> reactivateUser(@PathVariable Long id, HttpServletRequest request) {
         log.debug("REST request to reactivate User : {}", id);
@@ -1079,7 +1079,7 @@ public class UserExtensionResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     //hill-1845
-    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES, AuthoritiesConstants.RND_USER})
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES, AuthoritiesConstants.FOTA_ADMIN, AuthoritiesConstants.FOTA_APPROVER})
     //hill-1845
     public ResponseEntity<JSONObject> userReactivation(@PathVariable Long id, HttpServletRequest request) {
         log.debug("REST request to User Reactivation : {}", id);

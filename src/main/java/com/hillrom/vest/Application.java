@@ -26,8 +26,8 @@ import java.util.Collection;
 
 @SpringBootApplication
 @ComponentScan(basePackages  = {"com.hillrom"})
-@EnableJpaRepositories(basePackages  = {"com.hillrom.vest","com.hillrom.optimus"})
-@EntityScan(basePackages  = {"com.hillrom.vest","com.hillrom.optimus"})
+@EnableJpaRepositories(basePackages  = {"com.hillrom.vest","com.hillrom.optimus","com.hillrom.monarch"})
+@EntityScan(basePackages  = {"com.hillrom.vest","com.hillrom.optimus","com.hillrom.monarch"})
 @EnableAutoConfiguration(exclude = {MetricFilterAutoConfiguration.class, MetricRepositoryAutoConfiguration.class})
 public class Application {
 

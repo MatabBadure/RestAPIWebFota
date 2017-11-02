@@ -1269,8 +1269,10 @@ public class AdherenceCalculationServiceMonarch{
 		// Setting the new score with respect to the compliance deduction
 		newCompliance.setScore(score);
 		
-		// Setting the missed therapy count to 0, since having therapy
-		newCompliance.setMissedTherapyCount(0);
+		if(Objects.isNull(sortedTherapy.get(complianceDate))){	
+			// Setting the missed therapy count to 0, since having therapy
+			newCompliance.setMissedTherapyCount(0);
+		}
 		
 		// Saving the updated score for the specific date of compliance		
 		return newCompliance;
@@ -2912,6 +2914,22 @@ public class AdherenceCalculationServiceMonarch{
 		// Get the Patient & User of old shell details
 		PatientInfo patientInfoOld = patientInfoRepository.findOneById(patDevice.getSwappedPatientId());
 		User userOld = userService.getUserObjFromPatientInfo(patientInfoOld);
+
+		// Getting the therapy details of the shell patient
+		List<TherapySessionMonarch> therapySessionMonarchList = therapySessionMonarchRepository.findByPatientUserId(userOld.getId());
+		
+		List<TherapySessionMonarch> therapySessionMonarchListExist = therapySessionMonarchRepository.findByPatientUserId(user.getId());
+		
+		SortedMap<LocalDate,List<TherapySessionMonarch>> sortedExistTherapy = null;
+		if(Objects.nonNull(therapySessionMonarchListExist) && !therapySessionMonarchListExist.isEmpty())
+			sortedExistTherapy = groupTherapySessionsByDate(therapySessionMonarchListExist);
+		
+		SortedMap<LocalDate,List<TherapySessionMonarch>> sortedTherapyToValidate = null;
+		
+		if(Objects.nonNull(therapySessionMonarchList) && !therapySessionMonarchList.isEmpty()){
+			therapySessionMonarchList.addAll(therapySessionMonarchListExist);
+			sortedTherapyToValidate = groupTherapySessionsByDate(therapySessionMonarchList);			
+		}
 		
 		// Getting compliance list of old patient
 		List<PatientComplianceMonarch> patientComplianceList = patientComplianceMonarchRepository.findByPatientUserId(userOld.getId());
@@ -2928,6 +2946,8 @@ public class AdherenceCalculationServiceMonarch{
 		List <PatientComplianceMonarch> complianceListToSave = new LinkedList<>();			
 		for(PatientComplianceMonarch patientCompliance : patientComplianceList){
 			
+			LocalDate lastestTransmissionDate = Objects.nonNull(sortedTherapyToValidate) ? sortedTherapyToValidate.lastKey() : null;
+			
 			if(!existComplianceDate.contains(patientCompliance.getDate())){
 				PatientComplianceMonarch compliance = new PatientComplianceMonarch(patientCompliance.getScore(),
 					patientCompliance.getDate(),
@@ -2938,7 +2958,7 @@ public class AdherenceCalculationServiceMonarch{
 					patientCompliance.isHmrCompliant(),
 					patientCompliance.isSettingsDeviated(),
 					patientCompliance.getMissedTherapyCount(),
-					patientCompliance.getLatestTherapyDate(),
+					Objects.nonNull(lastestTransmissionDate) ? lastestTransmissionDate : patientCompliance.getLatestTherapyDate(),
 					patientCompliance.getSettingsDeviatedDaysCount(),
 					patientCompliance.getGlobalHMRNonAdherenceCounter(),
 					patientCompliance.getGlobalSettingsDeviationCounter(),
@@ -2946,6 +2966,9 @@ public class AdherenceCalculationServiceMonarch{
 					patientCompliance.getHmrVest());
 				
 				complianceListToSave.add(compliance);
+			}else if(Objects.nonNull(lastestTransmissionDate) && !lastestTransmissionDate.equals(patientCompliance.getLatestTherapyDate())){
+				patientCompliance.setLatestTherapyDate(lastestTransmissionDate);
+				complianceListToSave.add(patientCompliance);
 			}
 		}
 		
@@ -2982,14 +3005,7 @@ public class AdherenceCalculationServiceMonarch{
 		// Adding all the shell patient notification to new patient
 		notificationMonarchService.saveAll(notificationListToSave);
 		
-		// Getting the therapy details of the shell patient
-		List<TherapySessionMonarch> therapySessionMonarchList = therapySessionMonarchRepository.findByPatientUserId(userOld.getId());
 		
-		List<TherapySessionMonarch> therapySessionMonarchListExist = therapySessionMonarchRepository.findByPatientUserId(user.getId());
-		
-		SortedMap<LocalDate,List<TherapySessionMonarch>> sortedExistTherapy = null;
-		if(Objects.nonNull(therapySessionMonarchListExist) && !therapySessionMonarchListExist.isEmpty())
-			sortedExistTherapy = groupTherapySessionsByDate(therapySessionMonarchListExist);
 		
 		List <TherapySessionMonarch> therapySessionListToSave = new LinkedList<>();
 		

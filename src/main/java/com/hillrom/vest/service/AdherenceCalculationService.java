@@ -892,8 +892,10 @@ public class AdherenceCalculationService {
 		// Setting the new score with respect to the compliance deduction
 		newCompliance.setScore(score);
 
-		// Setting the missed therapy count to 0, since having therapy
-		newCompliance.setMissedTherapyCount(0);
+		if(Objects.isNull(sortedTherapy.get(complianceDate))){	
+			// Setting the missed therapy count to 0, since having therapy
+			newCompliance.setMissedTherapyCount(0);
+		}
 		
 		// Saving the updated score for the specific date of compliance
 		//patientComplianceRepository.save(newCompliance);
@@ -2331,6 +2333,22 @@ public class AdherenceCalculationService {
 		// Get the Patient & User of old shell details
 		PatientInfo patientInfoOld = patientInfoRepository.findOneById(patDevice.getSwappedPatientId());
 		User userOld = userService.getUserObjFromPatientInfo(patientInfoOld);
+
+		// Getting the therapy details of the shell patient
+		List<TherapySession> therapySessionList = therapySessionRepository.findByPatientUserId(userOld.getId());
+		List<TherapySession> therapySessionListExist = therapySessionRepository.findByPatientUserId(user.getId());
+		
+		SortedMap<LocalDate,List<TherapySession>> sortedExistTherapy = null;
+		if(Objects.nonNull(therapySessionListExist) && !therapySessionListExist.isEmpty())
+			sortedExistTherapy = groupTherapySessionsByDate(therapySessionListExist);		
+
+		SortedMap<LocalDate,List<TherapySession>> sortedTherapyToValidate = null;
+		
+		if(Objects.nonNull(therapySessionList) && !therapySessionList.isEmpty()){
+			therapySessionList.addAll(therapySessionListExist);
+			sortedTherapyToValidate = groupTherapySessionsByDate(therapySessionList);			
+		}
+
 		
 		// Getting compliance list of old patient
 		List<PatientCompliance> patientComplianceList = patientComplianceRepository.findByPatientUserId(userOld.getId());
@@ -2347,6 +2365,8 @@ public class AdherenceCalculationService {
 		List <PatientCompliance> complianceListToSave = new LinkedList<>();			
 		for(PatientCompliance patientCompliance : patientComplianceList){
 			
+			LocalDate lastestTransmissionDate = Objects.nonNull(sortedTherapyToValidate) ? sortedTherapyToValidate.lastKey() : null;
+			
 			if(!existComplianceDate.contains(patientCompliance.getDate())){
 				PatientCompliance compliance = new PatientCompliance(patientCompliance.getScore(),
 					patientCompliance.getDate(),
@@ -2356,7 +2376,7 @@ public class AdherenceCalculationService {
 					patientCompliance.isHmrCompliant(),
 					patientCompliance.isSettingsDeviated(),
 					patientCompliance.getMissedTherapyCount(),
-					patientCompliance.getLatestTherapyDate(),
+					Objects.nonNull(lastestTransmissionDate) ? lastestTransmissionDate : patientCompliance.getLatestTherapyDate(),
 					patientCompliance.getSettingsDeviatedDaysCount(),
 					patientCompliance.getGlobalHMRNonAdherenceCounter(),
 					patientCompliance.getGlobalSettingsDeviationCounter(),
@@ -2364,6 +2384,9 @@ public class AdherenceCalculationService {
 					patientCompliance.getHmr());
 				
 				complianceListToSave.add(compliance);
+			}else if(Objects.nonNull(lastestTransmissionDate) && !lastestTransmissionDate.equals(patientCompliance.getLatestTherapyDate())){
+				patientCompliance.setLatestTherapyDate(lastestTransmissionDate);
+				complianceListToSave.add(patientCompliance);
 			}
 		}
 		
@@ -2399,14 +2422,6 @@ public class AdherenceCalculationService {
 		
 		// Adding all the shell patient notification to new patient
 		notificationService.saveAll(notificationListToSave);
-		
-		// Getting the therapy details of the shell patient
-		List<TherapySession> therapySessionList = therapySessionRepository.findByPatientUserId(userOld.getId());
-		List<TherapySession> therapySessionMonarchListExist = therapySessionRepository.findByPatientUserId(user.getId());
-		
-		SortedMap<LocalDate,List<TherapySession>> sortedExistTherapy = null;
-		if(Objects.nonNull(therapySessionMonarchListExist) && !therapySessionMonarchListExist.isEmpty())
-			sortedExistTherapy = groupTherapySessionsByDate(therapySessionMonarchListExist);
 		
 		List <TherapySession> therapySessionListToSave = new LinkedList<>();
 		

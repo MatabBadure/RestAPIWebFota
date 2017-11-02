@@ -58,7 +58,7 @@ public class Clinic implements Serializable,Comparable<Clinic> {
     private String address2;
 
     @Column(name = "zipcode")
-    private Integer zipcode;
+    private String zipcode;
 
     @Column(name = "city")
     private String city;
@@ -153,11 +153,11 @@ public class Clinic implements Serializable,Comparable<Clinic> {
 		this.address2 = address2;
 	}
 
-	public Integer getZipcode() {
+	public String getZipcode() {
         return zipcode;
     }
 
-    public void setZipcode(Integer zipcode) {
+    public void setZipcode(String zipcode) {
         this.zipcode = zipcode;
     }
 

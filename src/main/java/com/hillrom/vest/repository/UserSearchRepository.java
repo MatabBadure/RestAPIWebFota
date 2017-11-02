@@ -192,7 +192,7 @@ public class UserSearchRepository {
 			String firstName = (String) record[2];
 			String lastName = (String) record[3];
 			Boolean isDeleted = (Boolean) record[4];
-			Integer zipcode = (Integer) record[5];
+			String zipcode = (String) record[5];
 			String address = (String) record[6];
 			String city = (String) record[7];
 			String credentials = (String) record[8];
@@ -310,7 +310,7 @@ public class UserSearchRepository {
 			String firstName = (String) record[2];
 			String lastName = (String) record[3];
 			Boolean isDeleted = (Boolean) record[4];
-			Integer zipcode = (Integer) record[5];
+			String zipcode = (String) record[5];
 			String address = (String) record[6];
 			String city = (String) record[7];
 			String credentials = (String) record[8];
@@ -395,7 +395,7 @@ public class UserSearchRepository {
 			String firstName = (String) record[2];
 			String lastName = (String) record[3];
 			Boolean isDeleted = (Boolean) record[4];
-			Integer zipcode = (Integer) record[5];
+			String zipcode = (String) record[5];
 			String address = (String) record[6];
 			String city = (String) record[7];
 			String credentials = (String) record[8];
@@ -505,7 +505,7 @@ public class UserSearchRepository {
 			String firstName = (String) record[2];
 			String lastName = (String) record[3];
 			Boolean isDeleted = (Boolean) record[4];
-			Integer zipcode = (Integer) record[5];
+			String zipcode = (String) record[5];
 			String address = (String) record[6];
 			String city = (String) record[7];
 			Date dob = (Date) record[8];
@@ -559,7 +559,7 @@ public class UserSearchRepository {
 			String firstName = (String) record[2];
 			String lastName = (String) record[3];
 			Boolean isDeleted = (Boolean) record[4];
-			Integer zipcode = (Integer) record[5];
+			String zipcode = (String) record[5];
 			String address = (String) record[6];
 			String city = (String) record[7];
 			Date dob = (Date) record[8];
@@ -752,7 +752,7 @@ public class UserSearchRepository {
 			String firstName = (String) record[2];
 			String lastName = (String) record[3];
 			Boolean isDeleted = getIsDeletedValue(record[4]);
-			Integer zipcode = (Integer) record[5];
+			String zipcode = (String) record[5];
 			String address = (String) record[6];
 			String city = (String) record[7];
 			Date dob = (Date) record[8];
@@ -889,7 +889,7 @@ public class UserSearchRepository {
 			String firstName = (String) record[2];
 			String lastName = (String) record[3];
 			Boolean isDeleted = getIsDeletedValue(record[4]);
-			Integer zipcode = (Integer) record[5];
+			String zipcode = (String) record[5];
 			String address = (String) record[6];
 			String city = (String) record[7];
 			Date dob = (Date) record[8];
@@ -985,7 +985,7 @@ public class UserSearchRepository {
 			String firstName = (String) record[2];
 			String lastName = (String) record[3];
 			Boolean isDeleted = getIsDeletedValue(record[4]);
-			Integer zipcode = (Integer) record[5];
+			String zipcode = (String) record[5];
 			String address = (String) record[6];
 			String city = (String) record[7];
 			Date dob = (Date) record[8];
@@ -1184,7 +1184,7 @@ public class UserSearchRepository {
 			String firstName = (String) record[2];
 			String lastName = (String) record[3];
 			Boolean isDeleted = getIsDeletedValue(record[4]);			
-			Integer zipcode = (Integer) record[5];
+			String zipcode = (String) record[5];
 			String address = (String) record[6];
 			String city = (String) record[7];
 			Date dob = (Date) record[8];

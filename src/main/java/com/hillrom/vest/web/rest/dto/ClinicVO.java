@@ -19,7 +19,7 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
     
     private String address2;
 
-    private Integer zipcode;
+    private String zipcode;
 
     private String city;
 
@@ -58,7 +58,7 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
     @JsonIgnore
     private List<ClinicVO> childClinicVOs = new LinkedList<>();
 
-    public ClinicVO(String id,String name, String address, String address2, Integer zipcode, String city,
+    public ClinicVO(String id,String name, String address, String address2, String zipcode, String city,
 			String state, String phoneNumber, String faxNumber, String speciality, Long clinicAdminId,
 			Boolean parent, String hillromId,Boolean deleted,DateTime createdAt,Integer adherenceSetting, DateTime adherenceSettingModifiedDte
 			) {
@@ -132,7 +132,7 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
         this.name = name;
     }
 
-    public Integer getZipcode() {
+    public String getZipcode() {
         return zipcode;
     }
 
@@ -152,7 +152,7 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
 		this.address2 = address2;
 	}
 
-	public void setZipcode(Integer zipcode) {
+	public void setZipcode(String zipcode) {
         this.zipcode = zipcode;
     }
 

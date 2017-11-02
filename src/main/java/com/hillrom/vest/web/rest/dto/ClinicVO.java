@@ -86,7 +86,7 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
 				
 	}
     
-    public ClinicVO(String id,String name, String address, String address2, Integer zipcode, String city,
+    public ClinicVO(String id,String name, String address, String address2, String zipcode, String city,
 			String state, String country, String phoneNumber, String faxNumber, String speciality, Long clinicAdminId,
 			Boolean parent,String parentClinicId, String hillromId,Boolean deleted,DateTime createdAt,Integer adherenceSetting, DateTime adherenceSettingModifiedDte
 			) {

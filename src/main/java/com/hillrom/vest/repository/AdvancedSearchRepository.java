@@ -126,7 +126,7 @@ public class AdvancedSearchRepository {
 			String id = ((String) record[0]);
 			String name = (String) record[1];
 			String address = (String) record[2];
-			Integer zipcode = ((Integer) record[3]);
+			String zipcode = (String) record[3];
 			String country = (String) record[4];
 			String city = (String) record[5];
 			String state = (String) record[6];

@@ -28,7 +28,7 @@ public class PatientUserVO {
 	private String firstName;
 	private String lastName;
 	private Boolean isDeleted;
-	private Integer zipcode;
+	private String zipcode;
 	private String address;
 	private String city;
 	
@@ -71,7 +71,7 @@ public class PatientUserVO {
 	private String monarchGarmentType;
 	
 	public PatientUserVO(Long id, String email, String firstName,
-			String lastName, Boolean isDeleted, Integer zipcode, String address,
+			String lastName, Boolean isDeleted, String zipcode, String address,
 			String city, LocalDate dob, String gender, String title,
 			String hillromId,DateTime createdAt,Boolean isActivated, String state,int adherence, 
 			Date lastTransmissionDate, String deviceType) {
@@ -96,7 +96,7 @@ public class PatientUserVO {
 		this.deviceType = deviceType;
 				}
 	public PatientUserVO(Long id, String email, String firstName,
-			String lastName, Boolean isDeleted, Integer zipcode, String address,
+			String lastName, Boolean isDeleted, String zipcode, String address,
 			String city, LocalDate dob, String gender, String title,
 			String hillromId,DateTime createdAt,Boolean isActivated, String state,int adherence, 
 			Date lastTransmissionDate) {
@@ -120,7 +120,7 @@ public class PatientUserVO {
 		this.lastTransmissionDate= lastTransmissionDate;
 				}
 	public PatientUserVO(Long id, String email, String firstName,
-			String lastName, Boolean isDeleted, Integer zipcode, String address,
+			String lastName, Boolean isDeleted, String zipcode, String address,
 			String city, LocalDate dob, String gender, String title,
 			String hillromId,DateTime createdAt,Boolean isActivated, String state) {
 		super();
@@ -271,11 +271,11 @@ public class PatientUserVO {
 		this.isDeleted = isDeleted;
 	}
 
-	public Integer getZipcode() {
+	public String getZipcode() {
 		return zipcode;
 	}
 
-	public void setZipcode(Integer zipcode) {
+	public void setZipcode(String zipcode) {
 		this.zipcode = zipcode;
 	}
 

@@ -12,7 +12,7 @@ public class HcpVO {
 	private String email;
 	private String firstName;
 	private String lastName;
-	private Integer zipcode;
+	private String zipcode;
 	private String address;
 	private String city;
 	private String credentials;
@@ -28,7 +28,7 @@ public class HcpVO {
 	private String npiNumber;
 	
 	public HcpVO(Long id, String firstName, String lastName, String email,boolean isDeleted,
-			Integer zipcode, String address, String city, String credentials,
+			String zipcode, String address, String city, String credentials,
 			String faxNumber, String primaryPhone, String mobilePhone, String speciality, 
 			String state,DateTime createdAt,boolean isActivated,String npiNumber) {
 		super();
@@ -75,10 +75,10 @@ public class HcpVO {
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
-	public Integer getZipcode() {
+	public String getZipcode() {
 		return zipcode;
 	}
-	public void setZipcode(Integer zipcode) {
+	public void setZipcode(String zipcode) {
 		this.zipcode = zipcode;
 	}
 	public String getAddress() {

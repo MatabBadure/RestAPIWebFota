@@ -23,7 +23,7 @@ public class ClinicDTO {
     private String address2;
 
 	@Size(max = 50)
-    private Integer zipcode;
+    private String zipcode;
 
 	@Size(max = 50)
     private String city;
@@ -68,7 +68,7 @@ public class ClinicDTO {
 		super();
 	}
 
-	public ClinicDTO(String name, String address, String address2, Integer zipcode, String city,
+	public ClinicDTO(String name, String address, String address2, String zipcode, String city,
 			String state, String phoneNumber, String faxNumber, String speciality, Long clinicAdminId,
 			Boolean parent, Boolean deleted, String hillromId, Integer adherenceSetting) {
 		super();
@@ -125,11 +125,11 @@ public class ClinicDTO {
 		this.address2 = address2;
 	}
 
-	public Integer getZipcode() {
+	public String getZipcode() {
 		return zipcode;
 	}
 
-	public void setZipcode(Integer zipcode) {
+	public void setZipcode(String zipcode) {
 		this.zipcode = zipcode;
 	}
 

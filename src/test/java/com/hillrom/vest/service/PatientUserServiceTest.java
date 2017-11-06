@@ -69,7 +69,7 @@ public class PatientUserServiceTest {
 		userExtensionDTO.setLastName(LAST_NAME);
 		userExtensionDTO.setGender(GENDER);
 		userExtensionDTO.setLangKey(LANG_KEY);
-		userExtensionDTO.setZipcode(Integer.parseInt(ZIPCODE));
+		userExtensionDTO.setZipcode(ZIPCODE);
 		userExtensionDTO.setRole(ROLE);
 		userExtensionDTO.setDob(DOB);
 		

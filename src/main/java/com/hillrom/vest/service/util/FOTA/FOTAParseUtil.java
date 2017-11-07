@@ -16,7 +16,7 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.RESULT;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.SOFT_VER_DATE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.ZERO;
-
+import static com.hillrom.vest.config.FOTA.FOTAConstants.CHUNKNUMBER;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -77,6 +77,9 @@ public class FOTAParseUtil {
 		String result = rawMessage.indexOf(RESULT) < 0 ? null : rawMessage
 				.substring(rawMessage.indexOf(RESULT) + RESULT.length() + 1,
 						getNextIndex(rawMessage, RESULT));
+		String chunkNumber = rawMessage.indexOf(CHUNKNUMBER) < 0 ? null : rawMessage
+				.substring(rawMessage.indexOf(CHUNKNUMBER) + CHUNKNUMBER.length() + 1,
+						getNextIndex(rawMessage, CHUNKNUMBER));
 		String devCrc = rawMessage.indexOf(CRC) < 0 ? null : rawMessage
 				.substring(rawMessage.indexOf(CRC) + CRC.length() + 1,
 						rawMessage.length());
@@ -120,7 +123,9 @@ public class FOTAParseUtil {
 		if (Objects.nonNull(result)) {
 			fotaJsonData.put(RESULT, result);
 		}
-
+		if (Objects.nonNull(chunkNumber)) {
+			fotaJsonData.put(CHUNKNUMBER, chunkNumber);
+		}
 		if (Objects.nonNull(devCrc)) {
 			fotaJsonData.put(CRC, devCrc);
 		}

@@ -4,6 +4,11 @@ import static com.hillrom.vest.security.AuthoritiesConstants.CLINIC_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
 import static com.hillrom.vest.config.Constants.VEST;
 import static com.hillrom.vest.config.Constants.MONARCH;
+
+
+
+
+
 //import static com.hillrom.vest.config.Constants.ALL;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -64,13 +69,12 @@ import com.hillrom.monarch.service.TherapySessionServiceMonarch;
 import com.hillrom.monarch.web.rest.dto.ProtocolMonarchDTO;
 import com.hillrom.monarch.web.rest.dto.ProtocolRevisionMonarchVO;
 import com.hillrom.monarch.web.rest.dto.TherapyDataMonarchVO;
+import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
-
 import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
-
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceData;
@@ -95,6 +99,7 @@ import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.AdherenceCalculationService;
+import com.hillrom.vest.service.AdvancedSearchService;
 import com.hillrom.vest.service.ExcelOutputService;
 import com.hillrom.vest.service.GraphService;
 import com.hillrom.vest.service.PatientComplianceService;
@@ -108,9 +113,11 @@ import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.AdvancedClinicDTO;
+import com.hillrom.vest.web.rest.dto.AdvancedPatientDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.dto.Filter;
 import com.hillrom.vest.web.rest.dto.Graph;
+import com.hillrom.vest.web.rest.dto.HcpVO;
 import com.hillrom.vest.web.rest.dto.PatientComplianceVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.ProtocolDTO;
@@ -121,18 +128,16 @@ import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
 import net.minidev.json.JSONObject;
-/**
- * REST controller for managing users.
- */
+
 @RestController
 @RequestMapping("/api")
 public class AdvancedSearchResource {
 
-	private final Logger log = LoggerFactory.getLogger(AdvancedSearchResource.class);
+private final Logger log = LoggerFactory.getLogger(AdvancedSearchResource.class);
 
 	
   	@Inject
-	private AdvancedSearchRepository advancedSearchRepository;
+	private AdvancedSearchService advancedSearchService;
 
 
     /**
@@ -156,15 +161,11 @@ public class AdvancedSearchResource {
   		Page<ClinicVO> page;
   		
   		try {
-  			page = advancedSearchRepository.advancedSearchClinics(advancedClinicDTO,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+  			page = advancedSearchService.advancedSearchClinics(advancedClinicDTO,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
   			HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/clinics/advanced/search", offset, limit);
   			return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
   		} catch (HillromException e) {
   			return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
   		}
-  		
-
   	}
-
-  
 }

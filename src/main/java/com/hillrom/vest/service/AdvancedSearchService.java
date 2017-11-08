@@ -82,35 +82,44 @@ import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.AdvancedClinicDTO;
+import com.hillrom.vest.web.rest.dto.AdvancedPatientDTO;
 import com.hillrom.vest.web.rest.dto.CareGiverVO;
 import com.hillrom.vest.web.rest.dto.ClinicStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
+import com.hillrom.vest.web.rest.dto.HcpVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.UserDTO;
 import com.hillrom.vest.web.rest.dto.UserExtensionDTO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 
-/**
- * Service class for managing users.
- */
 @Service
 @Transactional
 public class AdvancedSearchService {
-
+	
 	private final Logger log = LoggerFactory.getLogger(AdvancedSearchService.class);
 
-     
+    
     @Inject
 	private AdvancedSearchRepository advancedSearchRepository;
     
      
-
-	
-    public Page<ClinicVO> advancedSearchClinics(AdvancedClinicDTO advancedClinicDTO,Integer offset, Integer limit,Map<String, Boolean> sortOrder)  throws HillromException {
-    	Page<ClinicVO> page = advancedSearchRepository.advancedSearchClinics(advancedClinicDTO, PaginationUtil.generatePageRequest(offset, limit),sortOrder);
+	/*By Name/Hill-Rom ID/Email/Gender/Age range/Country/City/State/Zip/Clinic Level Status/Diagnosis/
+    * Adherence Score Range/Device Type/Device Type/Device Status/Device Active date range/
+    * Serial No/HMR Range/Adherence Reset/No Transmission Recorded/Below Frequency Setting/
+    * Below Therapy Minutes/Missed Therapy Days
+    * */
+	/*public PatientInfo advancedPatientSearch(AdvancedPatientDTO advancedDTO){
+		PatientInfo patientInfo= new PatientInfo();		
+		
+		patientInfo = advancedSearchRepository.findAdvancedPatientBy(advancedDTO);
+		
+		
+		return patientInfo;
+	}
+*/
+	public Page<ClinicVO> advancedSearchClinics(AdvancedClinicDTO advancedClinicDTO, Pageable pageable,Map<String, Boolean> sortOrder) throws HillromException {
+		Page<ClinicVO> page = advancedSearchRepository.advancedSearchClinics(advancedClinicDTO, pageable,sortOrder);
     	return page;
-    }
+	}
 	
-     
 }
-

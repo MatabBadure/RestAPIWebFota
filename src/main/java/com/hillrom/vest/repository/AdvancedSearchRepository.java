@@ -11,7 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.commons.lang.StringUtils;
-import org.assertj.core.util.Collections;
+//import org.assertj.core.util.Collections;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,19 +43,16 @@ public class AdvancedSearchRepository {
 	@Inject
 	private UserPatientRepository userPatientRepository;
 
-	@Inject
-	private AuthorityRepository authorityRepository;
-
+	/*
+	 * This method takes the DTO object, pageable and sortOrder paramters
+	 * Returns Page<ClinicVO>
+	 */
 	public Page<ClinicVO> advancedSearchClinics(AdvancedClinicDTO advancedClinicDTO, Pageable pageable,Map<String, Boolean> sortOrder) throws HillromException {
 		
-		List<String> clinicCity = advancedClinicDTO.getCity();
-		List<String> clinicState = advancedClinicDTO.getState();
 		String advancedSearchClinicsQuery = "";
 		String whereClause = " WHERE ";
 		StringBuilder filter = new StringBuilder();
-	
 		StringBuilder finalQuery = new StringBuilder();
-		String value = "";
 		
 		try{
 
@@ -82,9 +79,11 @@ public class AdvancedSearchRepository {
 										    " LEFT OUTER JOIN CITY_STATE_ZIP_MAP city_state_zip_map on clinic.zipcode =  city_state_zip_map.zip";
 		
 		
-											
+											/*Query formation is done from here
+											 * filter is the StringBuilder object which is used to append the values from AdvancedClinicDTO which are passed from UI (JSON object) 
+											 */
 											if(!StringUtils.isBlank(advancedClinicDTO.getName())){
-												filter = filter.append("clinic.name like").append(" '%").append(advancedClinicDTO.getName()).append("%' ");
+												filter = filter.append("clinic.name like").append(" '%").append(advancedClinicDTO.getName()).append("%' "); 
 											}
 										    
 											filter= (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getClinicType())) ? (filter.append(" AND ")) : (filter.append(""));
@@ -111,28 +110,21 @@ public class AdvancedSearchRepository {
 										    }
 										    
 										    
-										    filter= (filter.length()>0) &&(!Collections.isNullOrEmpty(advancedClinicDTO.getState())) ? (filter.append(" AND ")) : (filter.append(""));
-										    if(!Collections.isNullOrEmpty(advancedClinicDTO.getState())){
-										    	String csvStates = String.join("','", advancedClinicDTO.getState());
+										    filter= (filter.length()>0) &&(advancedClinicDTO.getState().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
+										    if(advancedClinicDTO.getState().size()>0){
+										    	String csvStates = String.join("','", advancedClinicDTO.getState());  //Here forming the list with comma & single quote separated 
 										    	filter = filter.append("clinic.state IN('").append(csvStates).append("') ");
 										    }
 										    
 										    
-										    filter= (filter.length()>0) &&(!Collections.isNullOrEmpty(advancedClinicDTO.getCity())) ? (filter.append(" AND ")) : (filter.append(""));
-										    if(!Collections.isNullOrEmpty(advancedClinicDTO.getCity())){
+										    filter= (filter.length()>0) &&(advancedClinicDTO.getCity().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
+										    		//Collections.isNullOrEmpty(advancedClinicDTO.getCity())) ? (filter.append(" AND ")) : (filter.append(""));
+										    //if(!Collections.isNullOrEmpty(advancedClinicDTO.getCity())){
+										    if(advancedClinicDTO.getCity().size()>0){
 										    	String csvCities = String.join("','", advancedClinicDTO.getCity());
 										    	filter = filter.append("clinic.city IN('").append(csvCities).append("') ");
 										    }
 										    
-										    /*filter= (filter.length()>0) &&(!Objects.isNull((advancedClinicDTO.getState())) ? (filter.append(" AND ")) : (filter.append(""));
-										    if(!StringUtils.isBlank(advancedClinicDTO.getState())){
-										    	filter = filter.append("clinic.state like").append(" '%").append(advancedClinicDTO.getState()).append("%' ");
-										    }
-										    
-										    filter= (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getCity())) ? (filter.append(" AND ")) : (filter.append(""));
-										    if(!StringUtils.isBlank(advancedClinicDTO.getCity())){
-										    	filter = filter.append("clinic.city like").append(" '%").append(advancedClinicDTO.getCity()).append("%' ");
-										    }*/
 										    
 										    filter= (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getZipcode())) ? (filter.append(" AND ")) : (filter.append(""));
 										    if(!StringUtils.isBlank(advancedClinicDTO.getZipcode())){
@@ -158,7 +150,8 @@ public class AdvancedSearchRepository {
 										    }
 										    
 										    
-		finalQuery=finalQuery.append(advancedSearchClinicsQuery);							    
+		finalQuery=finalQuery.append(advancedSearchClinicsQuery);
+		//finalQuery = whereClause + filter
 		if(filter.length()>0){
 			finalQuery.append(whereClause);
 			finalQuery.append(filter);

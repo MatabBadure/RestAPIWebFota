@@ -80,6 +80,7 @@ public class CityStateZipMapResource {
 		}
 	}
 	
+	// To get the state list along with cities
 	@RequestMapping(value = "/availableStatesAdv", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getAvailableStateAdv() {
 		return new ResponseEntity<>(cityStateZipMapService.getAvailableStatesAdv(), HttpStatus.OK);

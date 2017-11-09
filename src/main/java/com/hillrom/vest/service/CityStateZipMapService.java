@@ -78,6 +78,7 @@ public class CityStateZipMapService {
 			return cityStateZipMaps;
 	}
 	
+	// To get the state list along with cities
 	public Map<String, List<String>> getAvailableStatesAdv() {
 		return cityStateZipMapCustomRepository.getExistingStateAndCitiesMapInAll();
 	}

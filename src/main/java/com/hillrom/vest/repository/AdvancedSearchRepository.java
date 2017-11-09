@@ -11,7 +11,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.commons.lang.StringUtils;
-//import org.assertj.core.util.Collections;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,8 +78,8 @@ public class AdvancedSearchRepository {
 										    " LEFT OUTER JOIN CITY_STATE_ZIP_MAP city_state_zip_map on clinic.zipcode =  city_state_zip_map.zip";
 		
 		
-											/*Query formation is done from here
-											 * filter is the StringBuilder object which is used to append the values from AdvancedClinicDTO which are passed from UI (JSON object) 
+											/*Query formation
+											 * filter: used to append the values from AdvancedClinicDTO
 											 */
 											if(!StringUtils.isBlank(advancedClinicDTO.getName())){
 												filter = filter.append("clinic.name like").append(" '%").append(advancedClinicDTO.getName()).append("%' "); 
@@ -112,14 +111,11 @@ public class AdvancedSearchRepository {
 										    
 										    filter= (filter.length()>0) &&(advancedClinicDTO.getState().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 										    if(advancedClinicDTO.getState().size()>0){
-										    	String csvStates = String.join("','", advancedClinicDTO.getState());  //Here forming the list with comma & single quote separated 
+										    	String csvStates = String.join("','", advancedClinicDTO.getState());  //Forming the comma & single quote separated list
 										    	filter = filter.append("clinic.state IN('").append(csvStates).append("') ");
 										    }
 										    
-										    
-										    filter= (filter.length()>0) &&(advancedClinicDTO.getCity().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
-										    		//Collections.isNullOrEmpty(advancedClinicDTO.getCity())) ? (filter.append(" AND ")) : (filter.append(""));
-										    //if(!Collections.isNullOrEmpty(advancedClinicDTO.getCity())){
+										    filter= (filter.length()>0) &&(advancedClinicDTO.getState().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 										    if(advancedClinicDTO.getCity().size()>0){
 										    	String csvCities = String.join("','", advancedClinicDTO.getCity());
 										    	filter = filter.append("clinic.city IN('").append(csvCities).append("') ");
@@ -151,7 +147,7 @@ public class AdvancedSearchRepository {
 										    
 										    
 		finalQuery=finalQuery.append(advancedSearchClinicsQuery);
-		//finalQuery = whereClause + filter
+		//checking if the filter object is null , if not finalQuery = where+filter 
 		if(filter.length()>0){
 			finalQuery.append(whereClause);
 			finalQuery.append(filter);
@@ -185,7 +181,6 @@ public class AdvancedSearchRepository {
 			Boolean deleted = (Boolean) record[11];
 			Boolean	parent = (Boolean) record[12];
 			String clinicAdminId = Objects.nonNull(record[13])?record[13].toString():null; 
-//			Long clinicAdminId= ((BigInteger) record[0]).longValue();
 			DateTime createdAt = new DateTime(record[14]);
 			String address2 = (String) record[15];
 			String speciality = (String) record[16];
@@ -193,9 +188,9 @@ public class AdvancedSearchRepository {
 			DateTime adherenceSettingModifiedDte = new DateTime( record[18]);
 
 				    
-			ClinicVO advancedSearchClinicVO = new ClinicVO(id,name, address, address2, zipcode, city,
-					state, phoneNumber, faxNumber, speciality, clinicAdminId,
-					parent, hillromId,deleted,createdAt,adherenceSetting, adherenceSettingModifiedDte);
+			ClinicVO advancedSearchClinicVO = new ClinicVO(id, name, address,address2, zipcode, country, city, state,
+					phoneNumber, faxNumber, speciality,	clinicAdminId, parent, parentClinicId, hillromId,
+					deleted, createdAt, adherenceSetting, adherenceSettingModifiedDte);
 			
 			advancedSearchClinicsList.add(advancedSearchClinicVO); 
 			
@@ -212,28 +207,6 @@ public class AdvancedSearchRepository {
 		}
 		return null;
 	}
-
-	// catch block should come here
-
-	// SELECT cl.name,
-	// ux.speciality,ux.credentials,cszm.country,ux.city,ux.state,us.zipcode,us.is_deleted
-	// from hillromvest_prod.USER us
-	// left outer join hillromvest_prod.USER_EXTENSION ux on us.id = ux.user_id
-	// left outer join hillromvest_prod.CLINIC_USER_ASSOC cua on cua.users_id =
-	// us.id
-	// left outer join hillromvest_prod.CLINIC cl on cl.id = cua.clinics_id
-	// left outer join hillromvest_prod.USER_AUTHORITY ua on ua.user_id = us.id
-	// left outer join hillromvest_prod.CITY_STATE_ZIP_MAP cszm on us.zipcode =
-	// cszm.zip
-	// where ua.authority_name = 'HCP' AND
-	// cl.name IS null or cl.name like '%%' AND
-	// ux.speciality IS null or ux.speciality like '%%' AND
-	// ux.credentials IS null or ux.credentials like '%%' AND
-	// cszm.country like '%%' AND
-	// ux.city like '%%' AND
-	// ux.state like '%%' AND
-	// us.zipcode like '%%' AND
-	// us.is_deleted in (false,true)
 
 	private void setPaginationParams(Pageable pageable, Query query) {
 

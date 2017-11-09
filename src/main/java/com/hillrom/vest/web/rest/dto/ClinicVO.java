@@ -61,7 +61,8 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
 
     public ClinicVO(String id,String name, String address, String address2, String zipcode, String city,
 			String state, String phoneNumber, String faxNumber, String speciality, Long clinicAdminId,
-			Boolean parent, String hillromId,Boolean deleted,DateTime createdAt,Integer adherenceSetting, DateTime adherenceSettingModifiedDte
+			Boolean parent, String hillromId,Boolean deleted,DateTime createdAt,Integer adherenceSetting, 
+			DateTime adherenceSettingModifiedDte, Boolean adherenceSettingFlag
 			) {
 		super();
 		this.id = id;
@@ -118,9 +119,9 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
 	}
     
     public ClinicVO(String id, String name, String address,
-			String address2, String zipcode, String city, String state,
+			String address2, String zipcode, String country,String city, String state,
 			String phoneNumber, String faxNumber, String speciality,
-			String clinicAdminId, Boolean parent, String hillromId,
+			String clinicAdminId, Boolean parent, String parentClinicId, String hillromId,
 			Boolean deleted, DateTime createdAt, Integer adherenceSetting,
 			DateTime adherenceSettingModifiedDte) {
     	super();
@@ -144,7 +145,6 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
 		this.adherenceSetting = adherenceSetting;
 		//start: HILL-2004
 		this.adherenceSettingModifiedDte = adherenceSettingModifiedDte;
-		this.adherenceSettingFlag = adherenceSettingFlag;
 		//end: HILL-2004
 				
 		// TODO Auto-generated constructor stub

@@ -32,6 +32,7 @@ public class CityStateZipMapCustomRepository {
 		return stateCityMap;
 	}
 	
+	// Returns the states and cities list
 	public Map<String,List<String>> getExistingStateAndCitiesMapInAll(){
 		String query = "SELECT distinct(state), group_concat(distinct primary_city) from CITY_STATE_ZIP_MAP group by state having state is NOT NULL";
 		List<Object[]> resultSet = entityManager.createNativeQuery(query).getResultList();

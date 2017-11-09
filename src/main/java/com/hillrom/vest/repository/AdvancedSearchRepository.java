@@ -1,61 +1,29 @@
 package com.hillrom.vest.repository;
 
-import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_SETTINGS_DEVIATION_COUNT;
-import static com.hillrom.vest.config.AdherenceScoreConstants.ADHERENCE_SETTING_DEFAULT_DAYS;
-import static com.hillrom.vest.security.AuthoritiesConstants.CLINIC_ADMIN;
-import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
-import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
-import static com.hillrom.vest.util.RelationshipLabelConstants.SELF;
-
 import java.math.BigInteger;
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.commons.lang.StringUtils;
-import org.hamcrest.text.IsEmptyString;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.hillrom.vest.config.Constants;
-import com.hillrom.vest.domain.Authority;
-import com.hillrom.vest.domain.Clinic;
-import com.hillrom.vest.domain.PatientInfo;
-import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
-import com.hillrom.vest.repository.util.QueryConstants;
-import com.hillrom.vest.security.AuthoritiesConstants;
-import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.HCPClinicService;
-import com.hillrom.vest.util.ExceptionConstants;
-import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.AdvancedClinicDTO;
-import com.hillrom.vest.web.rest.dto.AdvancedPatientDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
-import com.hillrom.vest.web.rest.dto.HcpVO;
-import com.hillrom.vest.web.rest.dto.HillRomUserVO;
-import com.hillrom.vest.web.rest.dto.PatientUserVO;
 
 @Repository
 public class AdvancedSearchRepository {

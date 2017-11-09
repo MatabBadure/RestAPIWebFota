@@ -77,4 +77,8 @@ public class CityStateZipMapService {
 		else
 			return cityStateZipMaps;
 	}
+	
+	public Map<String, List<String>> getAvailableStatesAdv() {
+		return cityStateZipMapCustomRepository.getExistingStateAndCitiesMapInAll();
+	}
 }

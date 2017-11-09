@@ -79,4 +79,9 @@ public class CityStateZipMapResource {
 			return new ResponseEntity<>(json, HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@RequestMapping(value = "/availableStatesAdv", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getAvailableStateAdv() {
+		return new ResponseEntity<>(cityStateZipMapService.getAvailableStatesAdv(), HttpStatus.OK);
+	}
 }

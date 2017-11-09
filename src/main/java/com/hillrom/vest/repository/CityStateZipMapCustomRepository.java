@@ -31,4 +31,18 @@ public class CityStateZipMapCustomRepository {
 		}
 		return stateCityMap;
 	}
+	
+	public Map<String,List<String>> getExistingStateAndCitiesMapInAll(){
+		String query = "SELECT distinct(state), group_concat(distinct primary_city) from CITY_STATE_ZIP_MAP group by state having state is NOT NULL";
+		List<Object[]> resultSet = entityManager.createNativeQuery(query).getResultList();
+		Map<String,List<String>> stateCityMap = new LinkedHashMap<>();
+		for (Object[] stateCities : resultSet) {
+			stateCityMap.put((String) stateCities[0],
+					Objects.nonNull(stateCities[1])
+							? new LinkedList<String>(Arrays.asList(((String) stateCities[1]).split(",")))
+							: new LinkedList<String>());
+		}
+		return stateCityMap;
+	}
+	
 }

@@ -245,11 +245,7 @@ public class ClinicResource {
     		 isAscending =  (isAscending != null)?  isAscending : true;
     		 sortOrder.put(sortBy, isAscending);
     	 }
-    	 
     	
- 		/*List<Clinic> emptyList = new ArrayList<Clinic>(); 
-    	//Pageable pageable ;
-    	Page<Clinic> page = new PageImpl<Clinic>(emptyList);*/
 		if(!StringUtils.isBlank(searchString)) {
 	    	 Map<String,String> paramsMap = getSearchParams(filter);
 	    	 String isDeleted = paramsMap.get("isDeleted");

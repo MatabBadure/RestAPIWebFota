@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.commons.lang.StringUtils;
+import org.assertj.core.util.Collections;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,17 +111,17 @@ public class AdvancedSearchRepository {
 										    }
 										    
 										    
-										    filter= (filter.length()>0) &&((advancedClinicDTO.getState())!=null) ? (filter.append(" AND ")) : (filter.append(""));
-										    if(advancedClinicDTO.getState() != null){
-										    	String csvStates = String.join(",", advancedClinicDTO.getState());
-										    	filter = filter.append("clinic.state IN(").append(csvStates).append(") ");
+										    filter= (filter.length()>0) &&(!Collections.isNullOrEmpty(advancedClinicDTO.getState())) ? (filter.append(" AND ")) : (filter.append(""));
+										    if(!Collections.isNullOrEmpty(advancedClinicDTO.getState())){
+										    	String csvStates = String.join("','", advancedClinicDTO.getState());
+										    	filter = filter.append("clinic.state IN('").append(csvStates).append("') ");
 										    }
 										    
 										    
-										    filter= (filter.length()>0) &&((advancedClinicDTO.getCity())!=null) ? (filter.append(" AND ")) : (filter.append(""));
-										    if(advancedClinicDTO.getCity()!=null){
-										    	String csvCities = String.join(",", advancedClinicDTO.getCity());
-										    	filter = filter.append("clinic.city IN(").append(csvCities).append(") ");
+										    filter= (filter.length()>0) &&(!Collections.isNullOrEmpty(advancedClinicDTO.getCity())) ? (filter.append(" AND ")) : (filter.append(""));
+										    if(!Collections.isNullOrEmpty(advancedClinicDTO.getCity())){
+										    	String csvCities = String.join("','", advancedClinicDTO.getCity());
+										    	filter = filter.append("clinic.city IN('").append(csvCities).append("') ");
 										    }
 										    
 										    /*filter= (filter.length()>0) &&(!Objects.isNull((advancedClinicDTO.getState())) ? (filter.append(" AND ")) : (filter.append(""));
@@ -134,7 +135,7 @@ public class AdvancedSearchRepository {
 										    }*/
 										    
 										    filter= (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getZipcode())) ? (filter.append(" AND ")) : (filter.append(""));
-										    if(!Objects.isNull(advancedClinicDTO.getZipcode())){
+										    if(!StringUtils.isBlank(advancedClinicDTO.getZipcode())){
 										    	filter = filter.append("clinic.zipcode like ").append(" '%").append(advancedClinicDTO.getZipcode()).append("%' ");
 										    }
 										    
@@ -151,7 +152,7 @@ public class AdvancedSearchRepository {
 											    	filter = filter.append("clinic.is_deleted =").append(" 1 ");
 										    }
 										    
-										    filter= (filter.length()>0)&&(!Objects.isNull(advancedClinicDTO.getAdherenceWindowSelected())) ? (filter.append(" AND ")) : (filter.append(""));
+										    filter= (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getAdherenceWindowSelected())) ? (filter.append(" AND ")) : (filter.append(""));
 										    if(!StringUtils.isBlank(advancedClinicDTO.getAdherenceWindowSelected())){
 										    	filter = filter.append("clinic.adherence_setting = ").append(advancedClinicDTO.getAdherenceWindowSelected());
 										    }

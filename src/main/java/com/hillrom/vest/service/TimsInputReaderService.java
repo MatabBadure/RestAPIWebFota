@@ -96,6 +96,7 @@ public class TimsInputReaderService {
 		this.mandatoryFieldFlag = true;
 		this.monarchBluetoothFlag = true;
 		this.serialNumberFlag = true;
+		this.CSVFileFlag = true;
 		
 		Map<Integer, PatientInfoDTO> fileRecords = readcsv();
 		

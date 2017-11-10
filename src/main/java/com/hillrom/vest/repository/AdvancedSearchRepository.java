@@ -115,7 +115,7 @@ public class AdvancedSearchRepository {
 										    	filter = filter.append("clinic.state IN('").append(csvStates).append("') ");
 										    }
 										    
-										    filter= (filter.length()>0) &&(advancedClinicDTO.getState().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
+										    filter= (filter.length()>0) &&(advancedClinicDTO.getCity().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 										    if(advancedClinicDTO.getCity().size()>0){
 										    	String csvCities = String.join("','", advancedClinicDTO.getCity());
 										    	filter = filter.append("clinic.city IN('").append(csvCities).append("') ");

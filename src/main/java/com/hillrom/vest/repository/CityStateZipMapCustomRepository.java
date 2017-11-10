@@ -47,16 +47,9 @@ public class CityStateZipMapCustomRepository {
 		cBuilder = cBuilder.append("('").append(csvCountries).append("') ");
 		sBuilder = sBuilder.append("('").append(csvStates).append("') ");
 		
-		String query = "SELECT distinct(primary_city),true FROM `hillrom-everest`.city_state_zip_map "+
+		String query = "SELECT distinct(primary_city),true FROM CITY_STATE_ZIP_MAP "+
 			 	       "WHERE country IN"+cBuilder+" AND state IN"+sBuilder;
 		List<Object[]> resultSet = entityManager.createNativeQuery(query).getResultList();
-		/*List<CityNewVo> cityList = new ArrayList<>();
-		resultSet.stream().forEach((record) -> {
-			String c = ((String) record[0]);
-			Boolean ticked = (Boolean) record[1];
-			CityNewVo cityNewVO= new CityNewVo(c, ticked);
-			cityList.add(cityNewVO);
-		});*/
 		List<CityNewVo> cityList = new ArrayList<>();
 		for(Object[] result : resultSet){
 			CityNewVo newObj = new CityNewVo();

@@ -15,7 +15,9 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.CityStateZipMapCustomRepository;
 import com.hillrom.vest.repository.CityStateZipMapRepository;
 import com.hillrom.vest.util.ExceptionConstants;
+import com.hillrom.vest.web.rest.dto.CityNewVo;
 import com.hillrom.vest.web.rest.dto.CityVO;
+import com.hillrom.vest.web.rest.dto.CountryStateDTO;
 import com.hillrom.vest.web.rest.dto.StateVO;
 
 @Service
@@ -79,7 +81,15 @@ public class CityStateZipMapService {
 	}
 	
 	// To get the state list along with cities
-	public Map<String, List<String>> getAvailableStatesAdv() {
-		return cityStateZipMapCustomRepository.getExistingStateAndCitiesMapInAll();
+	public List<CityNewVo> getAvailableCitiesAdv(CountryStateDTO countryStateDTO) {
+		return cityStateZipMapCustomRepository.getExistingCities(countryStateDTO);
+	}
+	
+	//To get list of states from country code
+	public List<CityStateZipMap> getStateVOByCountryCode(String country) throws HillromException {
+		if (StringUtils.isEmpty(country))
+			throw new HillromException(ExceptionConstants.HR_724);
+		List<CityStateZipMap> stateZipMaps = cityStateZipMapJpaRepository.findByCountry(country);
+		return stateZipMaps;
 	}
 }

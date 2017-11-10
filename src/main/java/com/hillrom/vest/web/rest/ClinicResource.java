@@ -19,6 +19,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -243,24 +245,33 @@ public class ClinicResource {
     		 isAscending =  (isAscending != null)?  isAscending : true;
     		 sortOrder.put(sortBy, isAscending);
     	 }
+    	
+		if(!StringUtils.isBlank(searchString)) {
+	    	 Map<String,String> paramsMap = getSearchParams(filter);
+	    	 String isDeleted = paramsMap.get("isDeleted");
+	    	 
+	    	 List<Boolean> isDel = new ArrayList<Boolean>();
+	    	 if("All".equalsIgnoreCase(isDeleted) || StringUtils.isEmpty(isDeleted)){
+	     		isDel.add(true);
+	     		isDel.add(false);
+	     	 }
+	     	 if("1".equalsIgnoreCase(isDeleted)){
+	      		isDel.add(true);
+	      	 }
+	     	 if("0".equalsIgnoreCase(isDeleted)){
+	       		isDel.add(false);
+	       	 }
+	     	 
+	     	Page<Clinic> page = clinicRepository.findBy(queryString,isDel,PaginationUtil.generatePageRequest(offset, limit, sortOrder));
     	 
-    	 Map<String,String> paramsMap = getSearchParams(filter);
-    	 String isDeleted = paramsMap.get("isDeleted");
-    	 
-    	 List<Boolean> isDel = new ArrayList<Boolean>();
-    	 if("All".equalsIgnoreCase(isDeleted) || StringUtils.isEmpty(isDeleted)){
-     		isDel.add(true);
-     		isDel.add(false);
-     	 }
-     	 if("1".equalsIgnoreCase(isDeleted)){
-      		isDel.add(true);
-      	 }
-     	 if("0".equalsIgnoreCase(isDeleted)){
-       		isDel.add(false);
-       	 }
-    	 Page<Clinic> page = clinicRepository.findBy(queryString,isDel,PaginationUtil.generatePageRequest(offset, limit, sortOrder));
-         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/clinics/search", offset, limit);
+    	 HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/clinics/search", offset, limit);
          return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+		}
+		else{
+			List<Clinic> emptyList = new ArrayList<Clinic>();
+			return new ResponseEntity<>(emptyList,HttpStatus.OK); 
+		}
+			
     }
     
     /**

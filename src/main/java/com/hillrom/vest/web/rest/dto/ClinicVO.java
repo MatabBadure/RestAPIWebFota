@@ -3,6 +3,7 @@ package com.hillrom.vest.web.rest.dto;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import org.joda.time.DateTime;
 
@@ -60,7 +61,8 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
 
     public ClinicVO(String id,String name, String address, String address2, String zipcode, String city,
 			String state, String phoneNumber, String faxNumber, String speciality, Long clinicAdminId,
-			Boolean parent, String hillromId,Boolean deleted,DateTime createdAt,Integer adherenceSetting, DateTime adherenceSettingModifiedDte
+			Boolean parent, String hillromId,Boolean deleted,DateTime createdAt,Integer adherenceSetting, 
+			DateTime adherenceSettingModifiedDte
 			) {
 		super();
 		this.id = id;
@@ -116,7 +118,39 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
 				
 	}
     
-    public String getId() {
+    public ClinicVO(String id, String name, String address,
+			String address2, String zipcode, String country,String city, String state,
+			String phoneNumber, String faxNumber, String speciality,
+			String clinicAdminId, Boolean parent, String parentClinicId, String hillromId,
+			Boolean deleted, DateTime createdAt, Integer adherenceSetting,
+			DateTime adherenceSettingModifiedDte) {
+    	super();
+		this.id = id;
+		this.name = name;
+		this.address = address;
+		this.address2 = address2;
+		this.zipcode = zipcode;
+		this.city = city;
+		this.state = state;
+		this.country = country;
+		this.phoneNumber = phoneNumber;
+		this.faxNumber = faxNumber;
+		this.speciality = speciality;
+		this.clinicAdminId = Objects.nonNull(clinicAdminId)?Long.parseLong(clinicAdminId):null;
+		this.parent = parent;
+		this.parentClinicId = parentClinicId;
+		this.hillromId = hillromId;
+		this.deleted = deleted;
+		this.createdAt = createdAt;
+		this.adherenceSetting = adherenceSetting;
+		//start: HILL-2004
+		this.adherenceSettingModifiedDte = adherenceSettingModifiedDte;
+		//end: HILL-2004
+				
+		// TODO Auto-generated constructor stub
+	}
+
+	public String getId() {
 		return id;
 	}
 

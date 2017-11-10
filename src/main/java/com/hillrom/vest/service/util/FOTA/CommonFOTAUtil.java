@@ -13,8 +13,8 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_SN;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEV_VER_RAW;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE_EQ;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE_RAW;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HEX;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.No;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.OK;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.RESULT_EQ;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.TOTAL_CHUNK;
@@ -25,9 +25,9 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
@@ -35,9 +35,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hillrom.vest.domain.FOTA.FOTADeviceFWareUpdate;
 import com.hillrom.vest.domain.FOTA.FOTAInfo;
-import com.hillrom.vest.repository.FOTA.FOTADeviceRepository;
 import com.hillrom.vest.web.rest.FOTA.dto.HandleHolder;
 import com.hillrom.vest.web.rest.FOTA.dto.PartNoHolder;
 
@@ -46,9 +44,6 @@ public class CommonFOTAUtil {
 	private static final Logger log = LoggerFactory
 			.getLogger(CommonFOTAUtil.class);
 
-	@Inject
-	private FOTADeviceRepository fotaDeviceRepository;
-	
 	public boolean validateCRC(String rawMessage) {
 
 		log.debug("Inside  calculateCRC : ", rawMessage);
@@ -328,7 +323,7 @@ public class CommonFOTAUtil {
 				.substring(totalChunkHexString.length());
 		// converting to little Indian
 		String strTotalChunk = hexToAscii(asciiToHex(toLittleEndian((totalChunkHexString))));
-		log.debug("strTotalChunk: " + strTotalChunk);
+		log.debug("totalChunks: " + totalChunks);
 		return strTotalChunk;
 	}
 
@@ -598,18 +593,20 @@ public class CommonFOTAUtil {
 	 * @param rawMessage
 	 * @return
 	 */
-	public String getChunk(String rawMessage) {
+	public String getChunkSize(String rawMessage) {
 
 		byte[] getChunkByte = java.util.Base64.getDecoder().decode(rawMessage);
 		int chunkByteIndex = returnMatch(getChunkByte, CHUNK_SIZE_RAW);
 		log.debug("chunkByteIndex: " + chunkByteIndex);
 		int chunkSizeValue = getChunkByte[chunkByteIndex] & 0xFF;
 		int chunkSizeValue1 = getChunkByte[chunkByteIndex + 1] & 0xFF;
+		int chunkSizeValue2 = getChunkByte[chunkByteIndex + 2] & 0xFF;
+		int chunkSizeValue3 = getChunkByte[chunkByteIndex + 3] & 0xFF;
 
 		String chunkSize1 = Integer.toHexString(chunkSizeValue);
 		String chunkSize2 = Integer.toHexString(chunkSizeValue1);
-		String chunkSize3 = Integer.toHexString(chunkSizeValue);
-		String chunkSize4 = Integer.toHexString(chunkSizeValue1);
+		String chunkSize3 = Integer.toHexString(chunkSizeValue2);
+		String chunkSize4 = Integer.toHexString(chunkSizeValue3);
 
 		chunkSize1 = ("00" + chunkSize1).substring(chunkSize1.length());
 		chunkSize2 = ("00" + chunkSize2).substring(chunkSize2.length());
@@ -674,52 +671,7 @@ public class CommonFOTAUtil {
 	    return handleId;
 	}
 	
-	public void saveDeviceDetails(String handleId, String status,
-			String rawMessage, Map<String, HandleHolder> handleHolderBin) {
-		//Get handle from request
-		handleId = getValuesFromRequest(rawMessage,HANDLE_RAW);
-		log.debug("handleId from Request:" + handleId);
-		//Initially 
-		HandleHolder holder = new HandleHolder();
-		holder = handleHolderBin.get(handleId);
-		FOTADeviceFWareUpdate fotaDeviceFWareUpdate = new FOTADeviceFWareUpdate();
-		//Get FOTADevice 
-		fotaDeviceFWareUpdate = fotaDeviceRepository.getFOTADeviceFWwareDetailsByDevSN(holder.getDeviceSerialNumber());
-		if(fotaDeviceFWareUpdate != null){
-			fotaDeviceFWareUpdate.setDownloadStatus(status);
-			fotaDeviceRepository.save(fotaDeviceFWareUpdate);
-		}
-		/*
-		fotaDeviceFWareUpdate.setFotaInfoId(holder.getFotaInfoId());
-		fotaDeviceFWareUpdate.setDeviceSerialNumber(holder.getDeviceSerialNumber());
-		fotaDeviceFWareUpdate.setDeviceSoftVersion(holder.getSoftwareVersion());
-		fotaDeviceFWareUpdate.setUpdatedSoftVersion(holder.getUpdatedSoftVersion());
-		fotaDeviceFWareUpdate.setDeviceSoftwareDateTime(holder.getDeviceSoftwareDateTime());
-		fotaDeviceFWareUpdate.setCheckupdateDateTime(holder.getCheckupdateDateTime());
-		fotaDeviceFWareUpdate.setDownloadStartDateTime(holder.getDownloadStartDateTime());
-		fotaDeviceFWareUpdate.setDownloadEndDateTime(new DateTime());
-		fotaDeviceFWareUpdate.setConnectionType(holder.getConnectionType());
-		fotaDeviceFWareUpdate.setDownloadStatus(status);
-		fotaDeviceRepository.save(fotaDeviceFWareUpdate);
-		*/
-		
-	}
-
-	public void saveInprogressDeviceDetails(HandleHolder holder) {
-		FOTADeviceFWareUpdate fotaDeviceFWareUpdate = new FOTADeviceFWareUpdate();
-		fotaDeviceFWareUpdate.setFotaInfoId(holder.getFotaInfoId());
-		fotaDeviceFWareUpdate.setDeviceSerialNumber(holder.getDeviceSerialNumber());
-		fotaDeviceFWareUpdate.setDeviceSoftVersion(holder.getSoftwareVersion());
-		fotaDeviceFWareUpdate.setUpdatedSoftVersion(holder.getUpdatedSoftVersion());
-		fotaDeviceFWareUpdate.setDeviceSoftwareDateTime(holder.getDeviceSoftwareDateTime());
-		fotaDeviceFWareUpdate.setCheckupdateDateTime(holder.getCheckupdateDateTime());
-		fotaDeviceFWareUpdate.setDownloadStartDateTime(holder.getDownloadStartDateTime());
-		fotaDeviceFWareUpdate.setDownloadEndDateTime(new DateTime());
-		fotaDeviceFWareUpdate.setConnectionType(holder.getConnectionType());
-		fotaDeviceFWareUpdate.setDownloadStatus("In progress");
-		fotaDeviceRepository.save(fotaDeviceFWareUpdate);
-		
-	}
+	
 
 	//FOTA CR
 	public String getChunkWithChunkNumber(String rawMessage, String handleId, Map<String, HandleHolder> handleHolderBin, Map<String, PartNoHolder> partNosBin) {
@@ -739,82 +691,97 @@ public class CommonFOTAUtil {
 		//Get handle object based on handleId
 		holder = handleHolderBin.get(handleId);
 		//Frame key to get partNumber details
-		String storePartNoKey = holder.getPartNo().concat(":").concat(holder.getUpdatedSoftVersion()).concat(":").concat(String.valueOf(holder.getChunkSize()));
-		partNoHolder =  partNosBin.get(storePartNoKey);
-		
+		if(Objects.nonNull(holder)){
+			String storePartNoKey = holder.getPartNo().concat(":").concat(holder.getUpdatedSoftVersion()).concat(":").concat(String.valueOf(holder.getChunkSize()));
+			partNoHolder =  partNosBin.get(storePartNoKey);
+			log.debug("Send  Chunk with chunk number Framed Part No key:"+storePartNoKey+"Part No Obj="+partNoHolder);
+		}else{
+			//Added No Response
+			finalResponseStr = failedResponse(finalResponseStr,crsResultValue,No,resultPair,crcPair);
+			return finalResponseStr;
+		}
 		//Check If the file is no longer the latest version 
-		if(partNoHolder.getAbortFlag() == false){
+		if(Objects.nonNull(partNoHolder)){
+			if(partNoHolder.getAbortFlag() == false){
 			//Get Chunk Number value from the request
 			String chunkNumberStr = getValuesFromRequest(rawMessage,CHUNK_NUMBER_RAW);
 			//Hex to decimal
 			int chunkNumber = hex2decimal(chunkNumberStr);
-			
-			//Get the particular chunk from the based chunk count
-			String zeroChunk = partNoHolder.getFileChunks().get(chunkNumber);
-			log.debug("Send  Chunk with chunk number Handle Id ="+handleId);
-			log.debug("Chunk Number ="+chunkNumber);
-			log.debug("Send  Chunk with chunk number ="+holder.getChunkSize());
-			log.debug("Send  Chunk with chunk number Framed Part No key:"+storePartNoKey+"Part No Obj="+partNoHolder);
-			log.debug("Send  Chunk with chunk number value in Hex Str:"+zeroChunk);
-			//Zero the Chunk in raw format
-			String buffer = hexToAscii(asciiToHex(zeroChunk));
-			log.debug("buffer Encoded:" + buffer);
-			
-			//Chunk size in hex byte
-			int bufferLen = zeroChunk.length() / 2;
-			log.debug("Send  Chunk with chunk number bufferLen:" + bufferLen);
-			log.debug("Send  Chunk with chunk number :" + chunkNumber);
-			
-			//result pair1
-			resultPair = getResponePairResult();
-			
-			//Result OK send chunk with chunk number
-			crsResultValue = asciiToHex(OK);
-			
-			//handlePair for send chunk number with chunk number Pair1 HANDLE_EQ
-			handlePair = getResponePair1();
-			
-			//Handle in raw format(handle Value)
-			String handleIdRaw = hexToAscii(asciiToHex(toLittleEndian(handleId)));
-			
-			//Chunk number pair
-			String chunkNumberPair = getChunkNumberResponsePair();
-			
-			//Chunk number raw
-			String chunkNumberRaw = hexToAscii(asciiToHex(toLittleEndian(chunkNumberStr)));
-			
-			bufferLenPair = getInitResponsePair2();
-			
-			String bufferLenRaw =  getBufferLen4HexByte(bufferLen);
-			
-			//bufferPair send chunk number with chunk number Pair2 BUFFER_EQ
-			bufferPair = getInitReponsePair3();
-			
-			//crcPair pair4 send chunk number with chunk number crc
-			crcPair = getResponePair3();
-			
-			String crsRaw = resultPair.concat(crsResultValue).concat(handlePair).concat(handleIdRaw).concat(chunkNumberPair)
-					.concat(chunkNumberRaw).concat(bufferLenPair).concat(bufferLenRaw).concat(bufferPair).concat(buffer).concat(crcPair);
+			if(chunkNumber < partNoHolder.getTotalChunk() ){
+				//Get the particular chunk from the based chunk count
+				String zeroChunk = partNoHolder.getFileChunks().get(chunkNumber);
+				log.debug("Send  Chunk with chunk number Handle Id ="+handleId);
+				log.debug("Chunk Number ="+chunkNumber);
+				log.debug("Send  Chunk with chunk number ="+holder.getChunkSize());
+				log.debug("Send  Chunk with chunk number value in Hex Str:"+zeroChunk);
+				//Zero the Chunk in raw format
+				String buffer = hexToAscii(asciiToHex(zeroChunk));
+				log.debug("buffer Encoded:" + buffer);
+				
+				//Chunk size in hex byte
+				int bufferLen = zeroChunk.length() / 2;
+				log.debug("Send  Chunk with chunk number bufferLen:" + bufferLen);
+				log.debug("Send  Chunk with chunk number :" + chunkNumber);
+				
+				//result pair1
+				resultPair = getResponePairResult();
+				
+				//Result OK send chunk with chunk number
+				crsResultValue = asciiToHex(OK);
+				
+				//handlePair for send chunk number with chunk number Pair1 HANDLE_EQ
+				handlePair = getResponePair1();
+				
+				//Handle in raw format(handle Value)
+				String handleIdRaw = hexToAscii(asciiToHex(toLittleEndian(handleId)));
+				
+				//Chunk number pair
+				String chunkNumberPair = getChunkNumberResponsePair();
+				
+				//Chunk number raw
+				String chunkNumberRaw = hexToAscii(asciiToHex(toLittleEndian(chunkNumberStr)));
+				
+				bufferLenPair = getInitResponsePair2();
+				
+				String bufferLenRaw =  getBufferLen4HexByte(bufferLen);
+				
+				//bufferPair send chunk number with chunk number Pair2 BUFFER_EQ
+				bufferPair = getInitReponsePair3();
+				
+				//crcPair pair4 send chunk number with chunk number crc
+				crcPair = getResponePair3();
+				
+				String crsRaw = resultPair.concat(crsResultValue).concat(handlePair).concat(handleIdRaw).concat(chunkNumberPair)
+						.concat(chunkNumberRaw).concat(bufferLenPair).concat(bufferLenRaw).concat(bufferPair).concat(buffer).concat(crcPair);
 
-			byte[] encodedCRC = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(crsRaw));
-			String encodedString = new String(encodedCRC);
-			log.debug("encodedString: " + encodedString);
-			String crcstr = calculateCRC(encodedString);
-			log.debug(" CRC value:" + crcstr);
-			// Final String
-			finalResponseStr = resultPair.concat(crsResultValue)
-					.concat(handlePair).concat(handleIdRaw).concat(chunkNumberPair)
-					.concat(chunkNumberRaw).concat(bufferLenPair)
-					.concat(bufferLenRaw).concat(bufferPair).concat(buffer)
-					.concat(crcPair).concat(crcstr);
-			log.debug(" Chunk Number:" + chunkNumber);
-			return finalResponseStr;	
+				byte[] encodedCRC = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(crsRaw));
+				String encodedString = new String(encodedCRC);
+				log.debug(" EncodedString: " + encodedString);
+				String crcstr = calculateCRC(encodedString);
+				log.debug(" CRC value:" + crcstr);
+				// Final String
+				finalResponseStr = resultPair.concat(crsResultValue)
+						.concat(handlePair).concat(handleIdRaw).concat(chunkNumberPair)
+						.concat(chunkNumberRaw).concat(bufferLenPair)
+						.concat(bufferLenRaw).concat(bufferPair).concat(buffer)
+						.concat(crcPair).concat(crcstr);
+				log.debug(" Chunk Number:" + chunkNumber);
+				return finalResponseStr;
+			}else{
+				//Added No Response
+				finalResponseStr = failedResponse(finalResponseStr,crsResultValue,No,resultPair,crcPair);
+				return finalResponseStr;
+			}
 		}else{
 			//Added ABORT Response
 			finalResponseStr = failedResponse(finalResponseStr,crsResultValue,ABORT,resultPair,crcPair);
 			return finalResponseStr;
+			}
+		}else{
+			//Added No Response
+			finalResponseStr = failedResponse(finalResponseStr,crsResultValue,No,resultPair,crcPair);
+			return finalResponseStr;
 		}
-		
 	}
 
 	private String getChunkNumberResponsePair() {

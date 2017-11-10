@@ -72,7 +72,7 @@ public final class FOTAConstants {
 	public static final byte[] HANDLE_RAW = new byte[]{38,104,97,110,100,108,101,61};
 	public static final byte[] DEV_VER_RAW = new byte[]{38,100,101,118,86,101,114,61};
 	//FOTA CR
-	public static final byte[] CHUNK_NUMBER_RAW = new byte[]{99,104,117,110,107,78,117,109,98,101,114,61};
+	public static final byte[] CHUNK_NUMBER_RAW = new byte[]{38,99,104,117,110,107,78,117,109,98,101,114,61};
 	
 	//FOTA roles
 	public static final String FOTA_APPROVER = "FOTA_APPROVER";

@@ -175,6 +175,9 @@ public class FOTAParseUtil {
 			return rawMessage.indexOf(RESULT) < 0 ? getNextIndex(rawMessage,
 					RESULT) : rawMessage.indexOf(RESULT) - 1;
 		case RESULT:
+			return rawMessage.indexOf(CHUNKNUMBER) < 0 ? getNextIndex(rawMessage,
+					CHUNKNUMBER) : rawMessage.indexOf(CHUNKNUMBER) - 1;	
+		case CHUNKNUMBER:
 			return rawMessage.indexOf(CRC) < 0 ? rawMessage.length()
 					: rawMessage.indexOf(CRC) - 1;
 		default:

@@ -58,6 +58,7 @@ import com.hillrom.vest.service.MailService;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.FOTA.CommonFOTAUtil;
 import com.hillrom.vest.service.util.FOTA.FOTAParseUtil;
+import com.hillrom.vest.service.util.FOTA.FOTAServiceUtil;
 import com.hillrom.vest.web.rest.FOTA.dto.ApproverCRCDto;
 import com.hillrom.vest.web.rest.FOTA.dto.CRC32Dto;
 import com.hillrom.vest.web.rest.FOTA.dto.FOTADeviceDto;
@@ -74,6 +75,9 @@ public class FOTAService {
 	
 	@Inject
 	private FOTARepositoryUtils fotaRepositoryUtils;
+	
+	@Inject
+	private FOTAServiceUtil utilService;
 	
 	@Inject
     private MailService mailService;
@@ -140,10 +144,10 @@ public class FOTAService {
 									.isAfter(reqReleaseDate))) {
 
 						int totalChunks;
-						//Generate Handle
-						handleId = getHandleNumber();
+						//Generate Handle commented FOTA CR
+						//handleId = getHandleNumber();
 						// Get Chunk Size from request
-						String chunkStr = coUtil.getChunk(rawMessage);
+						String chunkStr = coUtil.getChunkSize(rawMessage);
 						// Decimal conversion
 						int chunkSize = coUtil.hex2decimal(chunkStr);
 						// PartNumber:Version:Chunk Size
@@ -179,9 +183,10 @@ public class FOTAService {
 										.get(DEVICE_SN));
 								if(handleId == null){
 									handleId = getHandleNumber();
+									//Save device details to DB
+									utilService.saveInprogressDeviceDetails(holder);
 								}
-								//Save device details to DB
-								coUtil.saveInprogressDeviceDetails(holder);
+								holder.setHandleId(handleId);
 								handleHolderBin.put(handleId, holder);
 								log.debug("New handleId="+handleId+": Same SoftwareVersion="+fotaInfo.getSoftVersion()+":same chunksize="+partNoHolder.getChunkSize());
 							} else {
@@ -211,7 +216,10 @@ public class FOTAService {
 										.get(DEVICE_SN));
 								if(handleId == null){
 									handleId = getHandleNumber();
+									//Save device details to DB
+									utilService.saveInprogressDeviceDetails(holder);
 								}
+								holder.setHandleId(handleId);
 								handleHolderBin.put(handleId, holder);
 								//To capture chunk size
 								log.debug("New handleId="+handleId+":New software version="+fotaInfo.getSoftVersion()+":New chunksize="+partNoHolder.getChunkSize());
@@ -441,7 +449,7 @@ public class FOTAService {
 			String resultPair, String crsResultValue, String crcPair) {
 
 		//Save device details to DB
-		coUtil.saveDeviceDetails(handleId,status,rawMessage,handleHolderBin);
+		utilService.saveDeviceDetails(handleId,status,rawMessage,handleHolderBin);
 		// Result pair1
 		resultPair = coUtil.getResponePairResult();
 
@@ -523,8 +531,6 @@ public class FOTAService {
         String handleInlsb = (handleHexString);
         return handleInlsb;
 	}
-
-	
 
 	//DecodeRawMessage
 	private String decodeRawMessage(String rawMessage) {
@@ -1367,5 +1373,4 @@ public class FOTAService {
 		}
 	}
 
-		
 }

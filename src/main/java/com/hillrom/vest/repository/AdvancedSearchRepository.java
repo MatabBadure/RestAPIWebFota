@@ -81,8 +81,8 @@ public class AdvancedSearchRepository {
 											/*Query formation
 											 * filter: used to append the values from AdvancedClinicDTO
 											 */
-											if(!StringUtils.isBlank(advancedClinicDTO.getName())){
-												filter = filter.append("clinic.name like").append(" '%").append(advancedClinicDTO.getName()).append("%' "); 
+											if(!StringUtils.isBlank(advancedClinicDTO.getClinicName())){
+												filter = filter.append("clinic.name like").append(" '%").append(advancedClinicDTO.getClinicName()).append("%' "); 
 											}
 										    
 											filter= (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getClinicType())) ? (filter.append(" AND ")) : (filter.append(""));
@@ -98,9 +98,9 @@ public class AdvancedSearchRepository {
 												}
 											}
 											
-											filter= (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getSpecialty())) ? (filter.append(" AND ")) : (filter.append(""));
-										    if(!StringUtils.isBlank(advancedClinicDTO.getSpecialty())){
-										    	filter = filter.append("clinic.speciality like").append(" '%").append(advancedClinicDTO.getSpecialty()).append("%' ");
+											filter= (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getClinicSpecialty())) ? (filter.append(" AND ")) : (filter.append(""));
+										    if(!StringUtils.isBlank(advancedClinicDTO.getClinicSpecialty())){
+										    	filter = filter.append("clinic.speciality like").append(" '%").append(advancedClinicDTO.getClinicSpecialty()).append("%' ");
 										    }
 										    
 										    filter= (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getCountry())) ? (filter.append(" AND ")) : (filter.append(""));
@@ -115,7 +115,7 @@ public class AdvancedSearchRepository {
 										    	filter = filter.append("clinic.state IN('").append(csvStates).append("') ");
 										    }
 										    
-										    filter= (filter.length()>0) &&(advancedClinicDTO.getState().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
+										    filter= (filter.length()>0) &&(advancedClinicDTO.getCity().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 										    if(advancedClinicDTO.getCity().size()>0){
 										    	String csvCities = String.join("','", advancedClinicDTO.getCity());
 										    	filter = filter.append("clinic.city IN('").append(csvCities).append("') ");
@@ -124,19 +124,19 @@ public class AdvancedSearchRepository {
 										    
 										    filter= (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getZipcode())) ? (filter.append(" AND ")) : (filter.append(""));
 										    if(!StringUtils.isBlank(advancedClinicDTO.getZipcode())){
-										    	filter = filter.append("clinic.zipcode like ").append(" '%").append(advancedClinicDTO.getZipcode()).append("%' ");
+										    	filter = filter.append("clinic.zipcode = ").append(advancedClinicDTO.getZipcode());
 										    }
 										    
 										    
-										    filter= (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getStatus())) ? (filter.append(" AND ")) : (filter.append(""));
-										    if(!StringUtils.isBlank(advancedClinicDTO.getStatus())){
-										    	if(advancedClinicDTO.getStatus().equalsIgnoreCase("All"))
+										    filter= (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getClinicStatus())) ? (filter.append(" AND ")) : (filter.append(""));
+										    if(!StringUtils.isBlank(advancedClinicDTO.getClinicStatus())){
+										    	if(advancedClinicDTO.getClinicStatus().equalsIgnoreCase("All"))
 										    	{
-										    		filter = filter.append("clinic.is_deleted like").append(" '%%' ");
+										    		filter = filter.append("clinic.is_deleted IN(0,1)");
 										    	}
-										    	else if(advancedClinicDTO.getStatus().equalsIgnoreCase("Active"))
+										    	else if(advancedClinicDTO.getClinicStatus().equalsIgnoreCase("Active"))
 										    	filter = filter.append("clinic.is_deleted =").append(" 0 ");
-										    	else if(advancedClinicDTO.getStatus().equalsIgnoreCase("Inactive"))
+										    	else if(advancedClinicDTO.getClinicStatus().equalsIgnoreCase("Inactive"))
 											    	filter = filter.append("clinic.is_deleted =").append(" 1 ");
 										    }
 										    

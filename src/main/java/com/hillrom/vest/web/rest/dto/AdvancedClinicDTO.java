@@ -4,11 +4,11 @@ import java.util.List;
 
 public class AdvancedClinicDTO {
 
-	private String name;
+	private String clinicName;
 	
 	private String clinicType;
 	
-	private String specialty;
+	private String clinicSpecialty;
 	
 	private String country;
 	
@@ -20,7 +20,7 @@ public class AdvancedClinicDTO {
 	
 	private String adherenceWindowSelected;
 	
-	private String status;
+	private String clinicStatus;
 
 	public AdvancedClinicDTO() {
 		super();
@@ -30,24 +30,18 @@ public class AdvancedClinicDTO {
 			String country, List<String> city, List<String> state, String zipcode,
 			String adherenceWindowSelected, String status) {
 		super();
-		this.name = name;
+		this.clinicName = name;
 		this.clinicType = clinicType;
-		this.specialty = specialty;
+		this.clinicSpecialty = specialty;
 		this.country = country;
 		this.city = city;
 		this.state = state;
 		this.zipcode = zipcode;
 		this.adherenceWindowSelected = adherenceWindowSelected;
-		this.status = status;
+		this.clinicStatus = status;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
+	
 
 	public String getClinicType() {
 		return clinicType;
@@ -57,13 +51,7 @@ public class AdvancedClinicDTO {
 		this.clinicType = clinicType;
 	}
 
-	public String getSpecialty() {
-		return specialty;
-	}
-
-	public void setSpecialty(String specialty) {
-		this.specialty = specialty;
-	}
+	
 
 	public String getCountry() {
 		return country;
@@ -88,12 +76,11 @@ public class AdvancedClinicDTO {
 	public void setState(List<String> state) {
 		this.state = state;
 	}
-
 	public String getZipcode() {
 		return zipcode;
 	}
 
-	public void setZip(String zipcode) {
+	public void setZipcode(String zipcode) {
 		this.zipcode = zipcode;
 	}
 
@@ -105,12 +92,29 @@ public class AdvancedClinicDTO {
 		this.adherenceWindowSelected = adherenceWindowSelected;
 	}
 
-	public String getStatus() {
-		return status;
+	public String getClinicName() {
+		return clinicName;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public void setClinicName(String clinicName) {
+		this.clinicName = clinicName;
 	}
+
+	public String getClinicSpecialty() {
+		return clinicSpecialty;
+	}
+
+	public void setClinicSpecialty(String clinicSpecialty) {
+		this.clinicSpecialty = clinicSpecialty;
+	}
+
+	public String getClinicStatus() {
+		return clinicStatus;
+	}
+
+	public void setClinicStatus(String clinicStatus) {
+		this.clinicStatus = clinicStatus;
+	}
+
 	
 }

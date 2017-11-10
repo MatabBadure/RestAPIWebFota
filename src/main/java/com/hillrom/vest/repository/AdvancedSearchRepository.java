@@ -100,7 +100,7 @@ public class AdvancedSearchRepository {
 											
 											filter= (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getClinicSpecialty())) ? (filter.append(" AND ")) : (filter.append(""));
 										    if(!StringUtils.isBlank(advancedClinicDTO.getClinicSpecialty())){
-										    	filter = filter.append("clinic.speciality ").append(" '%").append(advancedClinicDTO.getClinicSpecialty()).append("%' ");
+										    	filter = filter.append("clinic.speciality like").append(" '%").append(advancedClinicDTO.getClinicSpecialty()).append("%' ");
 										    }
 										    
 										    filter= (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getCountry())) ? (filter.append(" AND ")) : (filter.append(""));

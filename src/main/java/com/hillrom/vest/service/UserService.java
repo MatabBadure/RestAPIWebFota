@@ -150,13 +150,13 @@ public class UserService {
 	private UserSearchRepository userSearchRepository;
     
     @Inject
-	private NoteServiceMonarch noteServiceMonarch;
-    
-    @Inject
     private PatientComplianceMonarchService complianceMonarchService;
 
     @Inject
     private PatientNoEventMonarchService noEventMonarchService;
+    
+    @Inject
+    private ClinicService clinicService;
     
     public String generateDefaultPassword(User patientUser) {
 		StringBuilder defaultPassword = new StringBuilder();
@@ -931,6 +931,13 @@ public class UserService {
 		else 
 			log.warn("Email Id not present to sent deactivation mail.");
 	}
+	// Sending email with CC by passing all the CLINIC_ADMIN emails by using comma separated string
+	private void sendDeactivationEmailNotificationWithCC(String baseUrl, UserExtension user,String clinicAdminEmails) {
+		if (Objects.nonNull(user.getEmail()))			
+			mailService.sendDeactivationEmailWithCC(user, baseUrl,clinicAdminEmails);			
+		else 
+			log.warn("Email Id not present to sent deactivation mail.");
+		}
 
     public UserExtension updateHillromTeamUser(UserExtension user, UserExtensionDTO userExtensionDTO) {
 		assignValuesToUserObj(userExtensionDTO, user);
@@ -1433,7 +1440,45 @@ public class UserService {
 							|| existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CARE_GIVER)))) {
 					existingUser.setDeleted(true);
 					userExtensionRepository.save(existingUser);
-					sendDeactivationEmailNotification(baseUrl, existingUser);
+				    
+					// Checking whether CLINIC_ADMIN or HCP
+					if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN)) || 
+							existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.HCP))){
+						
+						Set<Clinic> cName = new HashSet<Clinic>();
+						// for CLINIC_ADMINs 
+						if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.CLINIC_ADMIN))){	
+							// Getting the CLINIC_ADMIN ID's by using their role from entity_user_repository
+							List<EntityUserAssoc> entityUserAssocs = 
+									entityUserRepository.findByUserIdAndUserRole(existingUser.getId(), 
+																					AuthoritiesConstants.CLINIC_ADMIN);
+							// Getting all the clinics from each id and adding them to hash set
+					    	for(EntityUserAssoc entityUserAssoc : entityUserAssocs){
+					    		cName.add(entityUserAssoc.getClinic());
+					    	}
+						}
+						// for HCP's
+						else{
+							cName.addAll(existingUser.getClinics());
+						}
+						// After getting all the clincs from the related HCP's or CLINIC_ADMIN's
+					    Set<String> cAdminEmailId = new HashSet<String>();
+						for(Clinic cNameEach : cName){
+							// Getting CLINIC_ADMIN ID's list from the each clinic 
+							List<User> userList = clinicService.getClinicAdmin(cNameEach.getId());
+							for(User user : userList) {									
+								if(!user.getEmail().equals(existingUser.getEmail()))
+									cAdminEmailId.add(user.getEmail());									
+							}
+						}
+						// Changing all list of the emails to comma separated string
+                        String clinicAdminMails = String.join(",",cAdminEmailId);
+                       // Sending a Deactivation email(Which including the remaining CLINIC_ADMINs emails in CC)
+                        sendDeactivationEmailNotificationWithCC(baseUrl, existingUser,clinicAdminMails);
+					}
+					else {
+						sendDeactivationEmailNotification(baseUrl, existingUser);
+					}
 					jsonObject.put("message", MessageConstants.HR_204);
 				} else {
 					throw new HillromException(ExceptionConstants.HR_513);//Unable to delete User

@@ -37,7 +37,7 @@ public class UserDTO {
     private String gender;
     
     @Size(max = 50)
-    private Integer zipcode;
+    private String zipcode;
     
     @Size(min = 2, max = 5)
     private String langKey;
@@ -54,7 +54,7 @@ public class UserDTO {
 
 	public UserDTO(String password, String title, String firstName,
 			String middleName, String lastName, String email, String gender,
-			Integer zipcode, String langKey, List<String> roles) {
+			String zipcode, String langKey, List<String> roles) {
 		super();
 		this.password = password;
 		this.title = title;
@@ -70,7 +70,7 @@ public class UserDTO {
 	
 	public UserDTO(String password, String title, String firstName,
 			String middleName, String lastName, String email, String gender,
-			Integer zipcode, String langKey, List<String> roles, String deviceType) {
+			String zipcode, String langKey, List<String> roles, String deviceType) {
 		this.password = password;
 		this.title = title;
 		this.firstName = firstName;
@@ -140,11 +140,11 @@ public class UserDTO {
 		this.gender = gender;
 	}
 
-	public Integer getZipcode() {
+	public String getZipcode() {
 		return zipcode;
 	}
 
-	public void setZipcode(Integer zipcode) {
+	public void setZipcode(String zipcode) {
 		this.zipcode = zipcode;
 	}
 

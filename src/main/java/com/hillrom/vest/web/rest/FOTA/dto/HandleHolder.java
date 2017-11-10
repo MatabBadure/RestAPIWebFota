@@ -18,8 +18,15 @@ public class HandleHolder {
 	private DateTime downloadStartDateTime;
 	private DateTime downloadEndDateTime;
 	int chunkSize = 0;
+	private String handleId;
 	
 	
+	public String getHandleId() {
+		return handleId;
+	}
+	public void setHandleId(String handleId) {
+		this.handleId = handleId;
+	}
 	public String getUpdatedSoftVersion() {
 		return updatedSoftVersion;
 	}

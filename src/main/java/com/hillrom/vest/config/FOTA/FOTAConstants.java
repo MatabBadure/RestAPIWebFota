@@ -22,10 +22,13 @@ public final class FOTAConstants {
 	public static final String HANDLE = "handle";
 	public static final String SOFT_VER_DATE = "softVerDate";
 	public static final String RESULT = "result";
+	public static final String CHUNKNUMBER = "chunkNumber";
 	public static final String RESULT_EQ = "result=";
 	public static final String HANDLE_EQ = "handle=";
 	public static final String TOTAL_CHUNK = "totalChunk=";
 	public static final String NOT_OK = "NOT OK";
+	//FOTA CR
+	public static final String CHUNK_NUMBER_EQ = "chunkNumber=";
 	//Added
 	public static final String No = "No";
 	public static final String ABORT = "ABORT";
@@ -40,6 +43,7 @@ public final class FOTAConstants {
 	public static final String REQUEST_TYPE1 = "01";
 	public static final String REQUEST_TYPE2 = "02";
 	public static final String REQUEST_TYPE3 = "03";
+	public static final String REQUEST_TYPE12 = "12";
 	
 	//Device List constants
 	public static final String SUCCESS_LIST = "Success";
@@ -67,6 +71,8 @@ public final class FOTAConstants {
 	public static final byte[] CHUNK_SIZE_RAW = new byte[]{38,99,104,117,110,107,83,105,122,101,61};
 	public static final byte[] HANDLE_RAW = new byte[]{38,104,97,110,100,108,101,61};
 	public static final byte[] DEV_VER_RAW = new byte[]{38,100,101,118,86,101,114,61};
+	//FOTA CR
+	public static final byte[] CHUNK_NUMBER_RAW = new byte[]{38,99,104,117,110,107,78,117,109,98,101,114,61};
 	
 	//FOTA roles
 	public static final String FOTA_APPROVER = "FOTA_APPROVER";

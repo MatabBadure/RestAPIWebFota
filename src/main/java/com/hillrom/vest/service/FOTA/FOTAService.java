@@ -3,11 +3,11 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.ABORT;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.ABORTED;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.ABORTED_LIST;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.ALL;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.CONNECTION_TYPE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_SN;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.FAILURE_LIST;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.FOTA_ADMIN;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE_RAW;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HEX;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.INIT;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.NOT_OK;
@@ -16,6 +16,7 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.OK;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.PREV_REQ_STATUS;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE1;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE12;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE2;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE3;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.RESULT;
@@ -50,15 +51,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hillrom.vest.domain.FOTA.FOTADeviceFWareUpdate;
 import com.hillrom.vest.domain.FOTA.FOTAInfo;
-import com.hillrom.vest.repository.FOTA.FOTADeviceRepository;
 import com.hillrom.vest.repository.FOTA.FOTARepository;
 import com.hillrom.vest.repository.FOTA.FOTARepositoryUtils;
 import com.hillrom.vest.service.MailService;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.FOTA.CommonFOTAUtil;
 import com.hillrom.vest.service.util.FOTA.FOTAParseUtil;
+import com.hillrom.vest.service.util.FOTA.FOTAServiceUtil;
 import com.hillrom.vest.web.rest.FOTA.dto.ApproverCRCDto;
 import com.hillrom.vest.web.rest.FOTA.dto.CRC32Dto;
 import com.hillrom.vest.web.rest.FOTA.dto.FOTADeviceDto;
@@ -74,10 +74,10 @@ public class FOTAService {
 	private FOTARepository fotaRepository;
 	
 	@Inject
-	private FOTADeviceRepository fotaDeviceRepository;
+	private FOTARepositoryUtils fotaRepositoryUtils;
 	
 	@Inject
-	private FOTARepositoryUtils fotaRepositoryUtils;
+	private FOTAServiceUtil utilService;
 	
 	@Inject
     private MailService mailService;
@@ -102,6 +102,7 @@ public class FOTAService {
 		String bufferPair = new String();
 		String crcPair = new String();
 		String finalResponseStr = new String();
+		String crsResultValue = new String();
 
 		Map<String, String> fotaJsonData = new LinkedHashMap<>();
 		// Decoding raw data
@@ -109,8 +110,7 @@ public class FOTAService {
 		// Parsing into key value pair
 		fotaJsonData = FOTAParseUtil
 				.getFOTAJsonDataFromRawMessage(decoded_string);
-		// Global handler
-		String crsResultValue = new String();
+		
 		// Checking if request Type is 01 & //Checking if request Type is 02
 		if(coUtil.validateCRC(rawMessage)){
 			crsResultValue = coUtil.asciiToHex(YES);
@@ -144,10 +144,10 @@ public class FOTAService {
 									.isAfter(reqReleaseDate))) {
 
 						int totalChunks;
-						//Generate Handle
-						handleId = getHandleNumber();
+						//Generate Handle commented FOTA CR
+						//handleId = getHandleNumber();
 						// Get Chunk Size from request
-						String chunkStr = coUtil.getChunk(rawMessage);
+						String chunkStr = coUtil.getChunkSize(rawMessage);
 						// Decimal conversion
 						int chunkSize = coUtil.hex2decimal(chunkStr);
 						// PartNumber:Version:Chunk Size
@@ -176,24 +176,17 @@ public class FOTAService {
 							crcValid = partNoHolder.checkCRC32(fotaInfo);
 							if ( crcValid == true) {
 								// Initially
-								HandleHolder holder = new HandleHolder();
-								holder.setCurrentChunk(String.valueOf(0));
-								holder.setPartNo(partNoHolder.getPart_No());
-								holder.setChunkSize(partNoHolder.getChunkSize());
-								holder.setFotaInfoId(fotaInfo.getId());
-								holder.setDeviceSerialNumber(fotaJsonData
+								HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
+								
+								//Get Old Handle Id
+								handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
 										.get(DEVICE_SN));
-								holder.setConnectionType(fotaJsonData
-										.get(CONNECTION_TYPE));
-								holder.setDeviceSoftwareVersion(reqDev);
-								//request Device software date
-								holder.setDeviceSoftwareDateTime(reqReleaseDate);
-								holder.setUpdatedSoftVersion(fotaInfo.getSoftVersion());
-								holder.setCheckupdateDateTime(new DateTime());
-								holder.setPreviousChunkTransStatus("CheckUpdate");
-								//added new stmt
-								holder.setSoftwareVersion(fotaInfo.getSoftVersion());
-								handleId = getHandleNumber();
+								if(handleId == null){
+									handleId = getHandleNumber();
+									//Save device details to DB
+									utilService.saveInprogressDeviceDetails(holder);
+								}
+								holder.setHandleId(handleId);
 								handleHolderBin.put(handleId, holder);
 								log.debug("New handleId="+handleId+": Same SoftwareVersion="+fotaInfo.getSoftVersion()+":same chunksize="+partNoHolder.getChunkSize());
 							} else {
@@ -212,30 +205,21 @@ public class FOTAService {
 										.get(DEVICE_PARTNUMBER));
 								partNoHolder.setVersion_No(fotaInfo
 										.getSoftVersion());
-								partNoHolder.setEffectiveDate(new DateTime());
+								
 								// PartNo with Chuck size
 								partNosBin.put(storePartNoKey, partNoHolder);
 								log.debug("New Part Number Key for different chunk Size="+storePartNoKey);
 								// Initially
-								HandleHolder holder = new HandleHolder();
-								holder.setCurrentChunk(String.valueOf(0));
-								holder.setPartNo(fotaJsonData
-										.get(DEVICE_PARTNUMBER));
-								holder.setChunkSize(chunkSize);
-								holder.setFotaInfoId(fotaInfo.getId());
-								holder.setDeviceSerialNumber(fotaJsonData
+								HandleHolder holder = coUtil.getHandleHolderValuesForNewPartNo(chunkSize,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
+								//Get Old Handle Id
+								handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
 										.get(DEVICE_SN));
-								holder.setConnectionType(fotaJsonData
-										.get(CONNECTION_TYPE));
-								holder.setDeviceSoftwareVersion(reqDev);
-								//Request Device software date
-								holder.setDeviceSoftwareDateTime(reqReleaseDate);
-								holder.setUpdatedSoftVersion(fotaInfo.getSoftVersion());
-								holder.setCheckupdateDateTime(new DateTime());
-								holder.setPreviousChunkTransStatus("CheckUpdate");
-								//added new stmt
-								holder.setSoftwareVersion(fotaInfo.getSoftVersion());
-								handleId = getHandleNumber();
+								if(handleId == null){
+									handleId = getHandleNumber();
+									//Save device details to DB
+									utilService.saveInprogressDeviceDetails(holder);
+								}
+								holder.setHandleId(handleId);
 								handleHolderBin.put(handleId, holder);
 								//To capture chunk size
 								log.debug("New handleId="+handleId+":New software version="+fotaInfo.getSoftVersion()+":New chunksize="+partNoHolder.getChunkSize());
@@ -301,7 +285,7 @@ public class FOTAService {
 			}else if(fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE2)){
 
 					//Get handle from request
-					handleId = coUtil.getHandleFromRequest(rawMessage);
+					handleId = coUtil.getValuesFromRequest(rawMessage,HANDLE_RAW);
 					log.debug("Send Chunk Handle Id ="+handleId);
 					//Initially 
 					HandleHolder holder = new HandleHolder();
@@ -403,7 +387,7 @@ public class FOTAService {
 					
 					bufferLenPair = coUtil.getInitResponsePair2();
 					
-					String bufferLenRaw =  coUtil.getBufferLenTwoHexByte(bufferLen);
+					String bufferLenRaw =  coUtil.getBufferLen4HexByte(bufferLen);
 					
 					//bufferPair Init Pair2 BUFFER_EQ
 					bufferPair = coUtil.getInitReponsePair3();
@@ -418,7 +402,6 @@ public class FOTAService {
 				log.debug("encodedString: " + encodedString);
 				
 				String crcstr = coUtil.calculateCRC(encodedString);
-				
 				// Final response String
 				finalResponseStr = getInitOKResponseSendChunk(resultPair,crsResultValue,handlePair, handleIdRaw,
 						bufferLenPair, bufferLenRaw, bufferPair, buffer,crcPair,crcstr,countInt);
@@ -441,6 +424,13 @@ public class FOTAService {
 					//Added method to store device details
 					finalResponseStr = requestType3Response(finalResponseStr,handleId,ABORTED_LIST,rawMessage,resultPair,crsResultValue,crcPair);
 				}
+			}else if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE12)) {
+				
+				//Get Handle from the request
+				handleId = coUtil.getValuesFromRequest(rawMessage,HANDLE_RAW);
+				log.debug("Send Chunk With chunk Number Handle Id ="+handleId);
+				//getChunkWithChunkNumber
+				finalResponseStr = coUtil.getChunkWithChunkNumber(rawMessage,handleId,handleHolderBin,partNosBin);
 			}
 		
 		}else if(!coUtil.validateCRC(rawMessage)){
@@ -449,9 +439,8 @@ public class FOTAService {
 		}
 			byte[] encoded = java.util.Base64.getEncoder().encode(DatatypeConverter.parseHexBinary(finalResponseStr));
 			String finalString1 = new String(encoded);
-			log.error("finalString1: " + finalString1);
+			log.error("finalString1: " +finalString1);
 			return finalString1;
-		
 		
 	}
 	
@@ -460,8 +449,8 @@ public class FOTAService {
 			String resultPair, String crsResultValue, String crcPair) {
 
 		//Save device details to DB
-		saveDeviceDetails(handleId,status,rawMessage);
-		// result pair1
+		utilService.saveDeviceDetails(handleId,status,rawMessage,handleHolderBin);
+		// Result pair1
 		resultPair = coUtil.getResponePairResult();
 
 		crsResultValue = coUtil.asciiToHex(OK);
@@ -479,30 +468,6 @@ public class FOTAService {
 		return finalResponseStr;
 	}
 	
-	private void saveDeviceDetails(String handleId, String status,
-			String rawMessage) {
-		//Get handle from request
-		handleId = coUtil.getHandleFromRequest(rawMessage);
-		log.debug("handleId from Request:" + handleId);
-		//Initially 
-		HandleHolder holder = new HandleHolder();
-		holder = handleHolderBin.get(handleId);
-		FOTADeviceFWareUpdate fotaDeviceFWareUpdate = new FOTADeviceFWareUpdate();
-		fotaDeviceFWareUpdate.setFotaInfoId(holder.getFotaInfoId());
-		fotaDeviceFWareUpdate.setDeviceSerialNumber(holder.getDeviceSerialNumber());
-		fotaDeviceFWareUpdate.setDeviceSoftVersion(holder.getSoftwareVersion());
-		fotaDeviceFWareUpdate.setUpdatedSoftVersion(holder.getUpdatedSoftVersion());
-		fotaDeviceFWareUpdate.setDeviceSoftwareDateTime(holder.getDeviceSoftwareDateTime());
-		fotaDeviceFWareUpdate.setCheckupdateDateTime(holder.getCheckupdateDateTime());
-		fotaDeviceFWareUpdate.setDownloadStartDateTime(holder.getDownloadStartDateTime());
-		fotaDeviceFWareUpdate.setDownloadEndDateTime(new DateTime());
-		fotaDeviceFWareUpdate.setConnectionType(holder.getConnectionType());
-		fotaDeviceFWareUpdate.setDownloadStatus(status);
-		fotaDeviceRepository.save(fotaDeviceFWareUpdate);
-		
-	}
-
-
 	private void sendCRCFailedNotification() {
 		List<Object[]> resultList = fotaRepositoryUtils.getFOATUsers();
 		for (Object[] result : resultList) {
@@ -553,10 +518,6 @@ public class FOTAService {
 		return finalString;
 	}
 
-
-	
-
-	
 	//Generating unique handle id
 	private String getHandleNumber() {
 		Random random = new Random();
@@ -570,8 +531,6 @@ public class FOTAService {
         String handleInlsb = (handleHexString);
         return handleInlsb;
 	}
-
-	
 
 	//DecodeRawMessage
 	private String decodeRawMessage(String rawMessage) {
@@ -1414,5 +1373,4 @@ public class FOTAService {
 		}
 	}
 
-		
 }

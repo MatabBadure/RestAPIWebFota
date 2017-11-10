@@ -58,7 +58,7 @@ private final Logger log = LoggerFactory.getLogger(AdvancedSearchResource.class)
   		
   		try {
   			page = advancedSearchService.advancedSearchClinics(advancedClinicDTO,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
-  			HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/clinics/advanced/search", offset, limit);
+  			HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/clinics/advanced/search", offset, limit);
   			return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
   		} catch (HillromException e) {
   			return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);

@@ -87,7 +87,13 @@ public class CityStateZipMapResource {
 	// To get the state list along with cities
 	@RequestMapping(value = "/cityByCountryAndState", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getCityByCountryAndState(@RequestBody CountryStateDTO countryStateDTO){
-		return new ResponseEntity<>(cityStateZipMapService.getAvailableCitiesAdv(countryStateDTO), HttpStatus.OK);
+		try {
+			return new ResponseEntity<>(cityStateZipMapService.getAvailableCitiesAdv(countryStateDTO),HttpStatus.OK);
+		} catch (Exception e) {
+			JSONObject json = new JSONObject();
+			json.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(json, HttpStatus.BAD_REQUEST);
+		}
 	}
 	
 	//To get unique states from country code

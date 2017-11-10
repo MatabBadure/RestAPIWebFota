@@ -31,6 +31,7 @@ import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
+import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.util.ClinicVOBuilder;
@@ -135,7 +136,32 @@ public class ClinicPatientService {
     		throw new HillromException(ExceptionConstants.HR_512);//No such user exist
      	}
     }
-
+    
+    public String dissociateClinicToPatients(String id) throws HillromException {
+    
+    	//	List<ClinicPatientAssoc> patientClinicAssocList = clinicPatientRepository.findOneByClinicId(id);
+    	List<User> userList = getUserListForClinic(id);    	
+    	
+    	if(userList.isEmpty()){
+    		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
+    	}else{
+    		for(User patientUser : userList ){
+    			PatientInfo patientInfo = getPatientInfoObjeFromPatientUser(patientUser);
+    			if(patientInfo != null){
+    	     		List<ClinicPatientAssoc> clinicPatientAssocList = new ArrayList<>();
+    	     		List<UserPatientAssoc> userPatientAssocList = new ArrayList<>();
+    	     		getAssocObjLists(id, patientInfo, clinicPatientAssocList, userPatientAssocList);
+    		    	if (userPatientAssocList.size() > 0) userPatientRepository.delete(userPatientAssocList);
+    		    	if (clinicPatientAssocList.size() > 0) clinicPatientRepository.delete(clinicPatientAssocList);
+    		    	return MessageConstants.HR_214;
+    		    } else {
+    	     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
+    	     	}
+    		}
+    	}
+		return id;   
+    }
+    
 	private PatientInfo getPatientInfoObjeFromPatientUser(User patientUser) {
 		PatientInfo patientInfo = null;
 		for(UserPatientAssoc patientAssoc : patientUser.getUserPatientAssoc()){
@@ -165,9 +191,28 @@ public class ClinicPatientService {
 				}
 			}
 		}
-	}
-	
-	
+	}	
+		
+	private void getAssocObjLists(String clinicList,
+			PatientInfo patientInfo,
+			List<ClinicPatientAssoc> clinicPatientAssocList,
+			List<UserPatientAssoc> userPatientAssocList) {
+		
+			
+			Clinic clinic = clinicRepository.findOne(clinicList);
+			if(clinic != null) {
+				ClinicPatientAssoc clinicPatientAssoc = new ClinicPatientAssoc(new ClinicPatientAssocPK(patientInfo, clinic));
+				clinicPatientAssocList.add(clinicPatientAssoc);
+				if (clinic.getClinicAdminId() != null) {
+					User clinicAdminUser = userRepository.findOne(clinic.getClinicAdminId());
+					if(Objects.nonNull(clinicAdminUser)) {
+						UserPatientAssoc clinicAdminPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, clinicAdminUser), AuthoritiesConstants.CLINIC_ADMIN, RelationshipLabelConstants.CLINIC_ADMIN);
+						clinicAdminPatientAssoc.setCreatedBy(SecurityUtils.getCurrentLogin());
+						userPatientAssocList.add(clinicAdminPatientAssoc);
+					}
+				}			
+		}
+	}	
    //start:HILL-2004
 	/*
 		Method invoked from adherence calculation service to get the clinic with the latest adherence setting

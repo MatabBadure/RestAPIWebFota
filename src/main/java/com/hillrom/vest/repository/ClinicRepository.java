@@ -18,7 +18,7 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
 import com.hillrom.vest.domain.Clinic;
-import com.hillrom.vest.web.rest.dto.ClinicStatsNotificationVO;
+import com.hillrom.vest.domain.UserExtension;
 
 /**
  * Spring Data JPA repository for the Clinic entity.
@@ -128,4 +128,9 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 			 		+ " group by PDA.device_type "
 			 		+ " order by count desc) b on a.dtype = b.pdtype " )
 	List<Object[]> findByDeviceTypeAndPatientCount(@Param("clinicId")String clinicId);
+	
+	@Query(nativeQuery=true,
+			 value="SELECT users_id from Clinic clinic join "
+			 		+ "CLINIC_USER_ASSOC cua on clinic.id = cua.clinics_id where cua.clinics_id=:clinicId")			     
+	List<Long> findHcpUsersByClinicId(@Param("clinicId")String clinicId);
 }

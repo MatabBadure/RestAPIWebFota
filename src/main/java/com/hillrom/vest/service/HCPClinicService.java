@@ -20,6 +20,7 @@ import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.UserExtensionRepository;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
+import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.util.ClinicVOBuilder;
 
@@ -30,80 +31,110 @@ import com.hillrom.vest.web.rest.util.ClinicVOBuilder;
 @Transactional
 public class HCPClinicService {
 
-    private final Logger log = LoggerFactory.getLogger(HCPClinicService.class);
+	private final Logger log = LoggerFactory.getLogger(HCPClinicService.class);
 
-    @Inject
-    private ClinicRepository clinicRepository;
-    
-    @Inject
-    private UserExtensionRepository userExtensionRepository;
-    
-    public UserExtension dissociateClinicFromHCP(Long id, List<Map<String, String>> clinicList) {
-    	UserExtension hcpUser = userExtensionRepository.getOne(id);
-    	for(Map<String, String> clinicId : clinicList) {
-    		Clinic clinic = clinicRepository.getOne(clinicId.get("id"));
-    		if(clinic.getUsers().contains(hcpUser)){
-    			clinic.getUsers().remove(hcpUser);
-    		}
-    		clinicRepository.save(clinic);
-    		if(hcpUser.getClinics().contains(clinic)){
-    			hcpUser.getClinics().remove(clinic);
-    		}
-    		userExtensionRepository.saveAndFlush(hcpUser);
-    	}
-    	return hcpUser;
-    }
-    
-    public List<ClinicVO> getAssociatedClinicsForHCP(Long id) throws HillromException {
+	@Inject
+	private ClinicRepository clinicRepository;
+
+	@Inject
+	private UserExtensionRepository userExtensionRepository;
+
+	public UserExtension dissociateClinicFromHCP(Long id,
+			List<Map<String, String>> clinicList) {
+		UserExtension hcpUser = userExtensionRepository.getOne(id);
+		for (Map<String, String> clinicId : clinicList) {
+			Clinic clinic = clinicRepository.getOne(clinicId.get("id"));
+			if (clinic.getUsers().contains(hcpUser)) {
+				clinic.getUsers().remove(hcpUser);
+			}
+			clinicRepository.save(clinic);
+			if (hcpUser.getClinics().contains(clinic)) {
+				hcpUser.getClinics().remove(clinic);
+			}
+			userExtensionRepository.saveAndFlush(hcpUser);
+		}
+		return hcpUser;
+	}
+
+	public String dissociateHCPfromClinic(String clinicId) {
+
+		List<UserExtension> hcpUser = new ArrayList<UserExtension>();
+
+		List<Long> users = clinicRepository.findHcpUsersByClinicId(clinicId);
+
+		for (Long usr : users) {
+			hcpUser.add(userExtensionRepository.getOne(usr));
+		}
+
+		Clinic clinic = clinicRepository.getOne(clinicId);
+
+		for (UserExtension user : hcpUser) {
+			if (clinic.getUsers().contains(user)) {
+				clinic.getUsers().remove(user);
+			}
+			clinicRepository.save(clinic);
+			if (user.getClinics().contains(clinic)) {
+				user.getClinics().remove(clinic);
+				userExtensionRepository.saveAndFlush(user);
+			}
+		}
+		return MessageConstants.HR_272;
+	}
+
+	public List<ClinicVO> getAssociatedClinicsForHCP(Long id)
+			throws HillromException {
 		UserExtension hcpUser = userExtensionRepository.findOne(id);
 		List<ClinicVO> clinics = new ArrayList<>();
-	    if(Objects.isNull(hcpUser)){
-	    	throw new HillromException(ExceptionConstants.HR_512);
-	    } else {
-	    	for(Clinic clinic : hcpUser.getClinics()){
-	    		clinics.add(ClinicVOBuilder.build(clinic));
-	    	}
-	    	return RandomUtil.sortClinicVOListByName(clinics);
-	    }
-    }
-    
-    public Set<UserExtension> associateHCPToClinic(String id, List<Map<String, String>> hcpList) throws HillromException {
-    	Clinic clinic = clinicRepository.findOne(id);
-    	if(Objects.nonNull(clinic)) {
-	    	for(Map<String, String> hcpId : hcpList) {
-	    		UserExtension hcpUser = userExtensionRepository.findOne(Long.parseLong(hcpId.get("id")));
-	    		if(Objects.nonNull(hcpUser)) {
-		    		clinic.getUsers().add(hcpUser);
-		    		hcpUser.getClinics().add(clinic);
-		    		clinicRepository.saveAndFlush(clinic);
-		    		userExtensionRepository.saveAndFlush(hcpUser);
-	    		} else {
-	    			throw new HillromException(ExceptionConstants.HR_532);
-	    		}
-	    	}
-	    	return clinic.getUsers();
-    	} else {
-     		throw new HillromException(ExceptionConstants.HR_544);
-     	}
-    }
-    
-	 //Get Clinic Ids Associated with HCP Users Flattened
-    public String getFlattenedAssociatedClinicsIdForHCP(Long id) throws HillromException {
+		if (Objects.isNull(hcpUser)) {
+			throw new HillromException(ExceptionConstants.HR_512);
+		} else {
+			for (Clinic clinic : hcpUser.getClinics()) {
+				clinics.add(ClinicVOBuilder.build(clinic));
+			}
+			return RandomUtil.sortClinicVOListByName(clinics);
+		}
+	}
+
+	public Set<UserExtension> associateHCPToClinic(String id,
+			List<Map<String, String>> hcpList) throws HillromException {
+		Clinic clinic = clinicRepository.findOne(id);
+		if (Objects.nonNull(clinic)) {
+			for (Map<String, String> hcpId : hcpList) {
+				UserExtension hcpUser = userExtensionRepository.findOne(Long
+						.parseLong(hcpId.get("id")));
+				if (Objects.nonNull(hcpUser)) {
+					clinic.getUsers().add(hcpUser);
+					hcpUser.getClinics().add(clinic);
+					clinicRepository.saveAndFlush(clinic);
+					userExtensionRepository.saveAndFlush(hcpUser);
+				} else {
+					throw new HillromException(ExceptionConstants.HR_532);
+				}
+			}
+			return clinic.getUsers();
+		} else {
+			throw new HillromException(ExceptionConstants.HR_544);
+		}
+	}
+
+	// Get Clinic Ids Associated with HCP Users Flattened
+	public String getFlattenedAssociatedClinicsIdForHCP(Long id)
+			throws HillromException {
 		UserExtension hcpUser = userExtensionRepository.findOne(id);
 		StringBuilder clinicIdsString = new StringBuilder();
-	    if(Objects.isNull(hcpUser)){
-	    	throw new HillromException(ExceptionConstants.HR_512);
-	    } else {
-	    	for(Clinic clinic : hcpUser.getClinics()){
-	    		clinicIdsString.append("'");
-	    		clinicIdsString.append(clinic.getId());
-	    		clinicIdsString.append("',");
-	    	}
-	    	if(clinicIdsString.indexOf(",") < 0)
-	    		return "";
-	    	else 
-	    		return clinicIdsString.deleteCharAt(clinicIdsString.lastIndexOf(",")).toString();
-	    }
-    }
+		if (Objects.isNull(hcpUser)) {
+			throw new HillromException(ExceptionConstants.HR_512);
+		} else {
+			for (Clinic clinic : hcpUser.getClinics()) {
+				clinicIdsString.append("'");
+				clinicIdsString.append(clinic.getId());
+				clinicIdsString.append("',");
+			}
+			if (clinicIdsString.indexOf(",") < 0)
+				return "";
+			else
+				return clinicIdsString.deleteCharAt(
+						clinicIdsString.lastIndexOf(",")).toString();
+		}
+	}
 }
-

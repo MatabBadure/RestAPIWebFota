@@ -78,6 +78,12 @@ public class ClinicPatientAssoc extends AbstractAuditingEntity implements Serial
 		this.mrnId = mrnId;
 		this.notes = notes;
 	}
+	
+	public ClinicPatientAssoc(ClinicPatientAssocPK clinicPatientAssocPK) {
+		super();
+		this.clinicPatientAssocPK = clinicPatientAssocPK;
+		
+	}
 
 	public ClinicPatientAssocPK getClinicPatientAssocPK() {
 		return clinicPatientAssocPK;

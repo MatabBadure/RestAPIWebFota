@@ -7,13 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
+
+import net.minidev.json.JSONObject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -38,7 +39,9 @@ import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.PredicateBuilder;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.AdherenceCalculationService;
+import com.hillrom.vest.service.ClinicPatientService;
 import com.hillrom.vest.service.ClinicService;
+import com.hillrom.vest.service.HCPClinicService;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
@@ -46,8 +49,6 @@ import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
 import com.mysema.query.types.expr.BooleanExpression;
-
-import net.minidev.json.JSONObject;
 
 /**
  * REST controller for managing Clinic.
@@ -67,6 +68,11 @@ public class ClinicResource {
 	@Inject
     private AdherenceCalculationService adherenceCalculationService;
 
+	@Inject
+	private ClinicPatientService clinicPatientService;
+	
+	@Inject 
+	private HCPClinicService hcpClinicService;
     /**
      * POST  /clinics -> Create a new clinic.
      */
@@ -174,8 +180,7 @@ public class ClinicResource {
      */
     @RequestMapping(value = "/clinics/{id}",
             method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    
+            produces = MediaType.APPLICATION_JSON_VALUE)    
     public ResponseEntity<JSONObject> get(@PathVariable String id) {
         log.debug("REST request to get Clinic : {}", id);
         JSONObject jsonObject = new JSONObject();
@@ -214,6 +219,49 @@ public class ClinicResource {
 	        	jsonObject.put("ERROR", ExceptionConstants.HR_549);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        } else {
+	        	jsonObject.put("message", message);
+	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+	        }
+        } catch (HillromException e) {
+        	jsonObject.put("ERROR", e.getMessage());
+        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+		}
+    }
+    
+    /**
+     * DELETE & DISASSOCIATE  /clinics/:id -> delete the "id" clinic.
+     */
+    @RequestMapping(value = "/clinicsDelete/{id}",
+            method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES})
+    public ResponseEntity<JSONObject> deleteAndDisassociate(@PathVariable String id) {
+    	log.debug("REST request to delete and disassociate Clinic : {}", id);
+    	JSONObject jsonObject = new JSONObject();
+		try {
+			System.out.println("id: "+id);
+			String msg = clinicService.dissociateClinicAdmin(id);
+			
+			if (StringUtils.isBlank(msg)) {
+	        	jsonObject.put("ERROR", ExceptionConstants.HR_549);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        }
+			String statusMsg = clinicPatientService.dissociateClinicToPatients(id);
+			if (StringUtils.isBlank(statusMsg)) {
+	        	jsonObject.put("ERROR", ExceptionConstants.HR_549);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        }
+			String HcpStatus= hcpClinicService.dissociateHCPfromClinic(id);
+			if (StringUtils.isBlank(HcpStatus)) {
+	        	jsonObject.put("ERROR", ExceptionConstants.HR_549);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        }
+			String message = clinicService.deleteAndDissociateClinic(id);			
+			if (StringUtils.isBlank(message)) {
+	        	jsonObject.put("ERROR", ExceptionConstants.HR_549);
+	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
+	        }else{
 	        	jsonObject.put("message", message);
 	            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
 	        }
@@ -538,8 +586,7 @@ public class ClinicResource {
        }
     }
 
-    
-	private Map<String,String> getSearchParams(String filterString){
+   	private Map<String,String> getSearchParams(String filterString){
 		
 		Map<String,String> filterMap = new HashMap<>();
 		if(StringUtils.isEmpty(filterString))

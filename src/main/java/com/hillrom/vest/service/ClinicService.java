@@ -78,7 +78,8 @@ public class ClinicService {
     @Inject
     private EntityUserRepository entityUserRepository;
     
-    
+    @Inject
+    private HCPClinicService hcpClinicService;
     
 
     public Clinic createClinic(ClinicDTO clinicDTO) throws HillromException {
@@ -174,6 +175,35 @@ public class ClinicService {
 					clinicRepository.save(existingClinic.getChildClinics());
 					existingClinic.setParent(false);
 				}
+				clinicRepository.delete(existingClinic);
+				return MessageConstants.HR_224;
+			}
+		} else {
+			throw new HillromException(ExceptionConstants.HR_544);
+		}
+    }
+    
+    /**
+     * deleteAndDissociateClinic
+     * @param id
+     * @return
+     * @throws HillromException
+     */
+    public String deleteAndDissociateClinic(String id) throws HillromException {
+    	Clinic existingClinic = clinicRepository.findOne(id);
+		if(existingClinic != null) {
+			if(existingClinic.getClinicAdminId() != null) {
+				throw new HillromException(ExceptionConstants.HR_545);//Unable to delete Clinic. Clinic admin exists
+			} else if(existingClinic.getUsers().size() > 0) {
+				throw new HillromException(ExceptionConstants.HR_546);//Unable to delete Clinic. Healthcare Professionals are associated with it
+			} else {
+				if(existingClinic.isParent()) {
+					existingClinic.getChildClinics().forEach(childClinic -> {
+						childClinic.setParentClinic(null);
+					});
+					clinicRepository.save(existingClinic.getChildClinics());
+					existingClinic.setParent(false);
+				}			
 				clinicRepository.delete(existingClinic);
 				return MessageConstants.HR_224;
 			}
@@ -399,6 +429,22 @@ public class ClinicService {
 			throw new HillromException(ExceptionConstants.HR_548);
 		}
 	}
+	
+	public String dissociateClinicAdmin(String clinicId) throws HillromException {
+		Clinic clinic = clinicRepository.findOne(clinicId);
+		if (Objects.nonNull(clinic)) {
+			List<EntityUserAssoc> entityUserAssoc = entityUserRepository.findByClinicIdAndUserRole(clinicId,AuthoritiesConstants.CLINIC_ADMIN);
+			if (entityUserAssoc.isEmpty()) {
+				throw new HillromException(ExceptionConstants.HR_550);
+			}else{
+				if (entityUserAssoc.size() > 0) 
+					entityUserRepository.delete(entityUserAssoc);
+				return MessageConstants.HR_289;
+			}				
+		}		
+		throw new HillromException(ExceptionConstants.HR_538);
+	}
+	
 	
 	public int getAssociatedPatientUsersCountWithClinic(String clinicId) throws HillromException {
     	Clinic clinic = clinicRepository.getOne(clinicId);

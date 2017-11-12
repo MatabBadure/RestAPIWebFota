@@ -2,6 +2,7 @@ package com.hillrom.vest.service.FOTA;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.ABORT;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.ABORTED;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.ABORTED_LIST;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.INPROGRESS_LIST;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.ALL;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_SN;
@@ -647,22 +648,28 @@ public class FOTAService {
 		
 		if (status.equals(SUCCESS_LIST)) {
 
-			List<Object[]> resultList = fotaRepositoryUtils.getSuccesList(status,queryString,sortBy,isAscending);
+			List<Object[]> resultList = fotaRepositoryUtils.getDeviceListByStatus(status,queryString,sortBy,isAscending);
 			
 			FOTADeviceDtoList = setDeviceValues(resultList);
 			
 		} else if (status.equals(FAILURE_LIST)) {
-			List<Object[]> resultList = fotaRepositoryUtils.getFailureList(status,queryString,sortBy,isAscending);
+			List<Object[]> resultList = fotaRepositoryUtils.getDeviceListByStatus(status,queryString,sortBy,isAscending);
 			
 			FOTADeviceDtoList = setDeviceValues(resultList);
 
 		} else if (status.equals(ABORTED_LIST)) {
 			
-			List<Object[]> resultList = fotaRepositoryUtils.getAbortList(status,queryString,sortBy,isAscending);
+			List<Object[]> resultList = fotaRepositoryUtils.getDeviceListByStatus(status,queryString,sortBy,isAscending);
 						
 			FOTADeviceDtoList = setDeviceValues(resultList);
 
-		} else if (status.equals(ALL)) {
+		}else if (status.equals(INPROGRESS_LIST)) {
+			
+			List<Object[]> resultList = fotaRepositoryUtils.getDeviceListByStatus(status,queryString,sortBy,isAscending);
+						
+			FOTADeviceDtoList = setDeviceValues(resultList);
+
+		}else if (status.equals(ALL)) {
 			
 			List<Object[]> resultList = fotaRepositoryUtils.getAllList(status,queryString,sortBy,isAscending);
 			

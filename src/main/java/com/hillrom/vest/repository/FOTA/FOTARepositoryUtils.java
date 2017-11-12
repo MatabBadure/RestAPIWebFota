@@ -108,8 +108,65 @@ public class FOTARepositoryUtils {
 		return resultList;
 	}
 
+	
+	public List<Object[]> getDeviceListByStatus(String status, String queryString,
+			String sortBy, boolean isAscending) {
+		String queryStr = "";
+		if(sortBy.equals("")&& isAscending == false){
+			queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.id desc";
+		}else if(sortBy.equals("partNumber")){
+			if(isAscending){
+				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by f.device_part_number desc";
+			}else{
+				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by f.device_part_number asc";
+			}
+		}else if(sortBy.equals("productName")){
+			if(isAscending){
+				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by f.product_Type desc";
+			}else{
+				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by f.product_Type asc";
+			}
+		}
+		else if(sortBy.equals("serialNumber")){
+			if(isAscending){
+				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.device_serial_number desc";
+			}else{
+				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.device_serial_number asc";
+			}
+		}else if(sortBy.equals("connectionType")){
+			if(isAscending){
+				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.connection_type desc";
+			}else{
+				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.connection_type asc";
+			}
+		}else if(sortBy.equals("startDatetime")){
+			if(isAscending){
+				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.download_start_date_time desc";
+			}else{
+				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.download_start_date_time asc";
+			}
+		}else if(sortBy.equals("endDateTime")){
+			if(isAscending){
+				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.download_end_date_time desc";
+			}else{
+				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.download_end_date_time asc";
+			}
+		}else if(sortBy.equals("status")){
+			if(isAscending){
+				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.downloaded_status desc";
+			}else{
+				queryStr =	DEVICE_QUERYSTR+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR2+queryString+DEVICE_QUERYSTR4+" or "+DEVICE_QUERYSTR1+status+DEVICE_QUERYSTR3+queryString+DEVICE_QUERYSTR4+" order by d.downloaded_status asc";
+			}
+		}
+		Query jpaQuery = entityManager.createNativeQuery(queryStr);
+		
+		List<Object[]> resultList = jpaQuery.getResultList();
 
-	public List<Object[]> getAbortList(String status, String queryString,
+		return resultList;
+	}
+
+
+	/*public List<Object[]> getAbortList(String status, String queryString,
 			String sortBy, boolean isAscending) {
 		String queryStr = "";
 		if(sortBy.equals("")&& isAscending == false){
@@ -279,5 +336,5 @@ public class FOTARepositoryUtils {
 		
 		return resultList;
 	}
-
+*/
 }

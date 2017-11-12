@@ -49,6 +49,7 @@ public final class FOTAConstants {
 	public static final String SUCCESS_LIST = "Success";
 	public static final String FAILURE_LIST= "Failure";
 	public static final String ABORTED_LIST = "Aborted";
+	public static final String INPROGRESS_LIST = "In progress";
 	public static final String ALL = "All";
 	
 	//Firmware List constants

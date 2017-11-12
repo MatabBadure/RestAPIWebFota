@@ -77,9 +77,6 @@ public class FOTAParseUtil {
 		String result = rawMessage.indexOf(RESULT) < 0 ? null : rawMessage
 				.substring(rawMessage.indexOf(RESULT) + RESULT.length() + 1,
 						getNextIndex(rawMessage, RESULT));
-		String chunkNumber = rawMessage.indexOf(CHUNKNUMBER) < 0 ? null : rawMessage
-				.substring(rawMessage.indexOf(CHUNKNUMBER) + CHUNKNUMBER.length() + 1,
-						getNextIndex(rawMessage, CHUNKNUMBER));
 		String devCrc = rawMessage.indexOf(CRC) < 0 ? null : rawMessage
 				.substring(rawMessage.indexOf(CRC) + CRC.length() + 1,
 						rawMessage.length());
@@ -123,13 +120,9 @@ public class FOTAParseUtil {
 		if (Objects.nonNull(result)) {
 			fotaJsonData.put(RESULT, result);
 		}
-		if (Objects.nonNull(chunkNumber)) {
-			fotaJsonData.put(CHUNKNUMBER, chunkNumber);
-		}
 		if (Objects.nonNull(devCrc)) {
 			fotaJsonData.put(CRC, devCrc);
 		}
-
 		return fotaJsonData;
 	}
 
@@ -175,9 +168,6 @@ public class FOTAParseUtil {
 			return rawMessage.indexOf(RESULT) < 0 ? getNextIndex(rawMessage,
 					RESULT) : rawMessage.indexOf(RESULT) - 1;
 		case RESULT:
-			return rawMessage.indexOf(CHUNKNUMBER) < 0 ? getNextIndex(rawMessage,
-					CHUNKNUMBER) : rawMessage.indexOf(CHUNKNUMBER) - 1;	
-		case CHUNKNUMBER:
 			return rawMessage.indexOf(CRC) < 0 ? rawMessage.length()
 					: rawMessage.indexOf(CRC) - 1;
 		default:

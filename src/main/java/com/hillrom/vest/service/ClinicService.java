@@ -78,7 +78,11 @@ public class ClinicService {
     @Inject
     private EntityUserRepository entityUserRepository;
     
+    @Inject
+    private HCPClinicService hcpClinicService;
     
+    @Inject
+    private ClinicPatientService clinicPatientService;
     
 
     public Clinic createClinic(ClinicDTO clinicDTO) throws HillromException {
@@ -159,6 +163,7 @@ public class ClinicService {
 	    return ClinicVOBuilder.buildWithChildClinics(clinic);
     }
     
+    /*
     public String deleteClinic(String id) throws HillromException {
     	Clinic existingClinic = clinicRepository.findOne(id);
 		if(existingClinic != null) {
@@ -177,6 +182,61 @@ public class ClinicService {
 				clinicRepository.delete(existingClinic);
 				return MessageConstants.HR_224;
 			}
+		} else {
+			throw new HillromException(ExceptionConstants.HR_544);
+		}
+    }*/
+    
+    public String deleteClinic(String id) throws HillromException {
+    	Clinic existingClinic = clinicRepository.findOne(id);
+		if(existingClinic != null) {
+			
+			//Dissociate Clinic Admins attached to Clinic
+			List<User> userList = getClinicAdmin(existingClinic.getId());
+			if(!userList.isEmpty()){
+					Map<String,String> clinicAdminMap = new HashMap<String,String>();
+					for(User user : userList){
+						clinicAdminMap.put("id", user.getId().toString());
+					}
+					dissociateClinicAdmin(id, clinicAdminMap);
+				
+			}
+			
+			//Dissociate HCPS attached to Clinic
+			Set<UserExtension> userExtList = existingClinic.getUsers();
+			Map<String,String> hm = new HashMap<String,String>();
+			hm.put("id", existingClinic.getId());
+			List<Map<String,String>> clinicList =  new ArrayList<>();
+			clinicList.add(hm);
+			if(userExtList.size() > 0){
+				for(UserExtension userExt : userExtList){
+					hcpClinicService.dissociateClinicFromHCP(userExt.getId(), clinicList);
+				}
+			}
+			
+			//Dissociate PatientUsers attached to Clinic
+			List<String> idList = new ArrayList<>();
+			idList.add(existingClinic.getId());
+			List<Map<String,Object>> patientUserList = getAssociatedPatientUsers(idList);
+			if(!patientUserList.isEmpty()){
+				for(Map<String,Object> patientUser : patientUserList){
+					UserExtension uExtPatient = (UserExtension) patientUser.get("patient");
+					clinicPatientService.dissociateClinicsToPatient(uExtPatient.getId(), clinicList);
+				}
+				
+			}
+			
+
+			if(existingClinic.isParent()) {
+				existingClinic.getChildClinics().forEach(childClinic -> {
+					childClinic.setParentClinic(null);
+				});
+				clinicRepository.save(existingClinic.getChildClinics());
+				existingClinic.setParent(false);
+			}
+			clinicRepository.delete(existingClinic);
+			return MessageConstants.HR_224;
+
 		} else {
 			throw new HillromException(ExceptionConstants.HR_544);
 		}

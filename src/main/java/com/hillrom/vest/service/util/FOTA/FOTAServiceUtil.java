@@ -44,34 +44,21 @@ public class FOTAServiceUtil {
 			fotaDeviceFWareUpdate.setDownloadStatus(status);
 			fotaDeviceRepository.save(fotaDeviceFWareUpdate);
 		}
-		/*
-		fotaDeviceFWareUpdate.setFotaInfoId(holder.getFotaInfoId());
-		fotaDeviceFWareUpdate.setDeviceSerialNumber(holder.getDeviceSerialNumber());
-		fotaDeviceFWareUpdate.setDeviceSoftVersion(holder.getSoftwareVersion());
-		fotaDeviceFWareUpdate.setUpdatedSoftVersion(holder.getUpdatedSoftVersion());
-		fotaDeviceFWareUpdate.setDeviceSoftwareDateTime(holder.getDeviceSoftwareDateTime());
-		fotaDeviceFWareUpdate.setCheckupdateDateTime(holder.getCheckupdateDateTime());
-		fotaDeviceFWareUpdate.setDownloadStartDateTime(holder.getDownloadStartDateTime());
-		fotaDeviceFWareUpdate.setDownloadEndDateTime(new DateTime());
-		fotaDeviceFWareUpdate.setConnectionType(holder.getConnectionType());
-		fotaDeviceFWareUpdate.setDownloadStatus(status);
-		fotaDeviceRepository.save(fotaDeviceFWareUpdate);
-		*/
-		
 	}
 	
 	public void saveInprogressDeviceDetails(HandleHolder holder) {
 		try{
 			FOTADeviceFWareUpdate fotaDeviceFWareUpdate = new FOTADeviceFWareUpdate();
-			fotaDeviceFWareUpdate.setFotaInfoId(holder.getFotaInfoId());
-			fotaDeviceFWareUpdate.setDeviceSerialNumber(holder.getDeviceSerialNumber());
-			fotaDeviceFWareUpdate.setDeviceSoftVersion(holder.getSoftwareVersion());
-			fotaDeviceFWareUpdate.setUpdatedSoftVersion(holder.getUpdatedSoftVersion());
-			fotaDeviceFWareUpdate.setDeviceSoftwareDateTime(holder.getDeviceSoftwareDateTime());
-			fotaDeviceFWareUpdate.setCheckupdateDateTime(holder.getCheckupdateDateTime());
-			fotaDeviceFWareUpdate.setConnectionType(holder.getConnectionType());
-			fotaDeviceFWareUpdate.setDownloadStatus("In progress");
-			fotaDeviceRepository.save(fotaDeviceFWareUpdate);
+				fotaDeviceFWareUpdate.setFotaInfoId(holder.getFotaInfoId());
+				fotaDeviceFWareUpdate.setDeviceSerialNumber(holder.getDeviceSerialNumber());
+				fotaDeviceFWareUpdate.setDeviceSoftVersion(holder.getSoftwareVersion());
+				fotaDeviceFWareUpdate.setUpdatedSoftVersion(holder.getUpdatedSoftVersion());
+				fotaDeviceFWareUpdate.setDeviceSoftwareDateTime(holder.getDeviceSoftwareDateTime());
+				fotaDeviceFWareUpdate.setCheckupdateDateTime(holder.getCheckupdateDateTime());
+				fotaDeviceFWareUpdate.setConnectionType(holder.getConnectionType());
+				fotaDeviceFWareUpdate.setDownloadStatus("In progress");
+				fotaDeviceRepository.save(fotaDeviceFWareUpdate);	
+			
 		}catch(Exception ex){
 		log.error(ex.getMessage());
 		ex.printStackTrace();

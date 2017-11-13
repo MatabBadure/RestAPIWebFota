@@ -16,7 +16,7 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.RESULT;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.SOFT_VER_DATE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.ZERO;
-import static com.hillrom.vest.config.FOTA.FOTAConstants.CHUNKNUMBER;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -175,15 +175,5 @@ public class FOTAParseUtil {
 		}
 
 	}
-
-	/*public String getBufferLenTwoHexByte(int bufferLen) {
-		// Convert to hex
-		String bufferLenHex = Integer.toHexString(bufferLen);
-		// convert in two byte format
-		bufferLenHex = ("0000" + bufferLenHex).substring(bufferLenHex.length());
-		// converting to little Endian
-		String bufferInLsb = hexToAscii(asciiToHex(toLittleEndian((bufferLenHex))));
-		return bufferInLsb;
-	}*/
 
 }

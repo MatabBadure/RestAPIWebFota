@@ -78,10 +78,6 @@ public class ClinicService {
     @Inject
     private EntityUserRepository entityUserRepository;
     
-    @Inject
-    private HCPClinicService hcpClinicService;
-    
-
     public Clinic createClinic(ClinicDTO clinicDTO) throws HillromException {
     	Clinic newClinic = new Clinic();
     	if(Objects.nonNull(clinicDTO.getHillromId())) {
@@ -181,36 +177,8 @@ public class ClinicService {
 		} else {
 			throw new HillromException(ExceptionConstants.HR_544);
 		}
-    }
-    
-    /**
-     * deleteAndDissociateClinic
-     * @param id
-     * @return
-     * @throws HillromException
-     */
-    public String deleteAndDissociateClinic(String id) throws HillromException {
-    	Clinic existingClinic = clinicRepository.findOne(id);
-		if(existingClinic != null) {
-			if(existingClinic.getClinicAdminId() != null) {
-				throw new HillromException(ExceptionConstants.HR_545);//Unable to delete Clinic. Clinic admin exists
-			} else if(existingClinic.getUsers().size() > 0) {
-				throw new HillromException(ExceptionConstants.HR_546);//Unable to delete Clinic. Healthcare Professionals are associated with it
-			} else {
-				if(existingClinic.isParent()) {
-					existingClinic.getChildClinics().forEach(childClinic -> {
-						childClinic.setParentClinic(null);
-					});
-					clinicRepository.save(existingClinic.getChildClinics());
-					existingClinic.setParent(false);
-				}			
-				clinicRepository.delete(existingClinic);
-				return MessageConstants.HR_224;
-			}
-		} else {
-			throw new HillromException(ExceptionConstants.HR_544);
-		}
-    }
+    }    
+   
 
 	/**
 	 * @param clinicDTO

@@ -249,6 +249,7 @@ public class UserExtensionResource {
         }
     }
     
+        
     /**
      * GET  /user/search -> get all HillromTeamUser.
      */
@@ -558,7 +559,7 @@ public class UserExtensionResource {
 			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 		}
      
-    }
+    } 
     
 	/**
      * POST  /patient/{id}/caregiver -> Create a caregiver for a patient with {id}. 

@@ -257,7 +257,7 @@ public class ClinicResource {
 	        	jsonObject.put("ERROR", ExceptionConstants.HR_549);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
 	        }
-			String message = clinicService.deleteAndDissociateClinic(id);			
+			String message = clinicService.deleteClinic(id);			
 			if (StringUtils.isBlank(message)) {
 	        	jsonObject.put("ERROR", ExceptionConstants.HR_549);
 	        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);

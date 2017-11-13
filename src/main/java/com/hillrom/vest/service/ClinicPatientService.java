@@ -137,10 +137,10 @@ public class ClinicPatientService {
      	}
     }
     
-    public String dissociateClinicToPatients(String id) throws HillromException {
+    public String dissociateClinicToPatients(String clinicId) throws HillromException {
     
     	//	List<ClinicPatientAssoc> patientClinicAssocList = clinicPatientRepository.findOneByClinicId(id);
-    	List<User> userList = getUserListForClinic(id);    	
+    	List<User> userList = getUserListForClinic(clinicId);    	
     	
     	if(userList.isEmpty()){
     		throw new HillromException(ExceptionConstants.HR_523);//No such patient exist
@@ -150,7 +150,7 @@ public class ClinicPatientService {
     			if(patientInfo != null){
     	     		List<ClinicPatientAssoc> clinicPatientAssocList = new ArrayList<>();
     	     		List<UserPatientAssoc> userPatientAssocList = new ArrayList<>();
-    	     		getAssocObjLists(id, patientInfo, clinicPatientAssocList, userPatientAssocList);
+    	     		getAssocObjLists(clinicId, patientInfo, clinicPatientAssocList, userPatientAssocList);
     		    	if (userPatientAssocList.size() > 0) userPatientRepository.delete(userPatientAssocList);
     		    	if (clinicPatientAssocList.size() > 0) clinicPatientRepository.delete(clinicPatientAssocList);
     		    	return MessageConstants.HR_214;
@@ -159,7 +159,7 @@ public class ClinicPatientService {
     	     	}
     		}
     	}
-		return id;   
+		return clinicId;   
     }
     
 	private PatientInfo getPatientInfoObjeFromPatientUser(User patientUser) {

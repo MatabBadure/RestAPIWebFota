@@ -7,12 +7,15 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.persistence.EntityNotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gemstone.gemfire.internal.tools.gfsh.app.commands.get;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.exceptionhandler.HillromException;
@@ -38,6 +41,10 @@ public class HCPClinicService {
 
 	@Inject
 	private UserExtensionRepository userExtensionRepository;
+	
+	@Inject
+	@Lazy
+	private ClinicService clinicServce;
 
 	public UserExtension dissociateClinicFromHCP(Long id,
 			List<Map<String, String>> clinicList) {
@@ -56,16 +63,13 @@ public class HCPClinicService {
 		return hcpUser;
 	}
 
-	public String dissociateHCPfromClinic(String clinicId) {
+	public String dissociateHCPfromClinic(String clinicId) throws EntityNotFoundException, HillromException {
 
-		List<UserExtension> hcpUser = new ArrayList<UserExtension>();
-
-		List<Long> users = clinicRepository.findHcpUsersByClinicId(clinicId);
-
-		for (Long usr : users) {
-			hcpUser.add(userExtensionRepository.getOne(usr));
-		}
-
+		List<String> idList = new ArrayList<String>();
+		idList.add(clinicId);
+		
+		Set<UserExtension> hcpUser = clinicServce.getHCPUsers(idList);
+		
 		Clinic clinic = clinicRepository.getOne(clinicId);
 
 		for (UserExtension user : hcpUser) {

@@ -211,7 +211,7 @@ public class ClinicService {
 			if(userExtList.size() > 0){
 				for(UserExtension userExt : userExtList){
 					hcpClinicService.dissociateClinicFromHCP(userExt.getId(), clinicList);
-					userExtList.remove(userExt);
+					//userExtList.remove(userExt);
 				}
 			}
 			
@@ -223,7 +223,7 @@ public class ClinicService {
 				for(Map<String,Object> patientUser : patientUserList){
 					UserExtension uExtPatient = (UserExtension) patientUser.get("patient");
 					clinicPatientService.dissociateClinicsToPatient(uExtPatient.getId(), clinicList);
-					patientUserList.remove(patientUser);
+					//patientUserList.remove(patientUser);
 				}
 				
 			}

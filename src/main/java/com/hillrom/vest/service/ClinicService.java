@@ -208,16 +208,10 @@ public class ClinicService {
 			hm.put("id", existingClinic.getId());
 			List<Map<String,String>> clinicList =  new ArrayList<>();
 			clinicList.add(hm);
-
-			List<String> hcpIdList = new ArrayList<>();
-			hcpIdList.add(existingClinic.getId());
-			List<Map<String,Object>> hcpUserList = getAssociatedPatientUsers(hcpIdList);
-			if(!hcpUserList.isEmpty()){
-				for(Map<String,Object> hcpUser : hcpUserList){
-					UserExtension uExtHCP = (UserExtension) hcpUser.get("hcp");
-					hcpClinicService.dissociateClinicFromHCP(uExtHCP.getId(), clinicList);
+			if(userExtList.size() > 0){
+				for(UserExtension userExt : userExtList){
+					hcpClinicService.dissociateClinicFromHCP(userExt.getId(), clinicList);
 				}
-				
 			}
 			
 			//Dissociate PatientUsers attached to Clinic
@@ -228,7 +222,6 @@ public class ClinicService {
 				for(Map<String,Object> patientUser : patientUserList){
 					UserExtension uExtPatient = (UserExtension) patientUser.get("patient");
 					clinicPatientService.dissociateClinicsToPatient(uExtPatient.getId(), clinicList);
-					//patientUserList.remove(patientUser);
 				}
 				
 			}

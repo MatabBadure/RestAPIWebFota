@@ -17,7 +17,7 @@ mail:
     host: smtp.gmail.com
     port: 587
     username: test.lnt.hillrom@gmail.com
-    password: hillrom12345
+    password: hillrom123456
     protocol: smtp
     tls: true
     auth: true

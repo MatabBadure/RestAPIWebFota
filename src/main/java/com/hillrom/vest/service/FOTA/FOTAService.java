@@ -699,7 +699,6 @@ public class FOTAService {
 		List<FOTADeviceDto> FOTADeviceDtoList = new ArrayList<>();
 		
 		for (Object[] fwareObj : FOTADeviceList) {
-			//FOTAInfo fotaInfo = null;
 			FOTADeviceDto fwareDtoObj = new FOTADeviceDto();
 			fwareDtoObj.setDeviceSerialNumber((String)fwareObj[2]);
 			fwareDtoObj.setConnectionType((String)fwareObj[3]);
@@ -707,6 +706,8 @@ public class FOTAService {
 			fwareDtoObj.setDeviceSoftwareDateTime(new DateTime(fwareObj[5]));
 			fwareDtoObj.setUpdatedSoftVersion((String)fwareObj[6]);
 			fwareDtoObj.setCheckupdateDateTime(new DateTime(fwareObj[7]));
+			log.debug("download start time",fwareObj[8]);
+			log.debug("download End time",fwareObj[9]);
 			if(Objects.nonNull(fwareObj[8])){
 				fwareDtoObj.setDownloadStartDateTime(new DateTime(fwareObj[8]));	
 			}

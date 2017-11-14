@@ -707,8 +707,12 @@ public class FOTAService {
 			fwareDtoObj.setDeviceSoftwareDateTime(new DateTime(fwareObj[5]));
 			fwareDtoObj.setUpdatedSoftVersion((String)fwareObj[6]);
 			fwareDtoObj.setCheckupdateDateTime(new DateTime(fwareObj[7]));
-			fwareDtoObj.setDownloadStartDateTime(new DateTime(fwareObj[8]));
-			fwareDtoObj.setDownloadEndDateTime(new DateTime(fwareObj[9]));
+			if(Objects.nonNull(fwareObj[8])){
+				fwareDtoObj.setDownloadStartDateTime(new DateTime(fwareObj[8]));	
+			}
+			if(Objects.nonNull(fwareObj[9])){
+				fwareDtoObj.setDownloadEndDateTime(new DateTime(fwareObj[9]));
+			}
 			fwareDtoObj.setDownloadStatus((String)fwareObj[10]);
 			fwareDtoObj.setProductType((String)fwareObj[12]);
 			fwareDtoObj.setDevicePartNumber(Long.valueOf((String)fwareObj[11]));

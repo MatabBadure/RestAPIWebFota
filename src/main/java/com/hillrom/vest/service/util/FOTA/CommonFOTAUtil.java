@@ -634,26 +634,33 @@ public class CommonFOTAUtil {
 			DateTime downloadStartDateTime) {
 		long elapsed = (downloadEndDateTime.getMillis())
 				- (downloadStartDateTime.getMillis());
+		String totalDownloadTime = "";
+		if(elapsed>0){
 
-		int hours = (int) Math.floor(elapsed / 3600000);
+			int hours = (int) Math.floor(elapsed / 3600000);
 
-		int minutes = (int) Math.floor((elapsed - hours * 3600000) / 60000);
+			int minutes = (int) Math.floor((elapsed - hours * 3600000) / 60000);
 
-		int seconds = (int) Math
-				.floor((elapsed - hours * 3600000 - minutes * 60000) / 1000);
+			int seconds = (int) Math
+					.floor((elapsed - hours * 3600000 - minutes * 60000) / 1000);
 
-		
-		String hr =	("00"+ String.valueOf(hours)).substring(String.valueOf(hours).length());
-		
-		String min =	("00"+ String.valueOf(minutes)).substring(String.valueOf(minutes).length());
-		
-		String sec =	("00"+ String.valueOf(seconds)).substring(String.valueOf(seconds).length());
-		
-		String totalDownloadTime = hr.concat(":")
-				.concat(String.valueOf(min)).concat(":")
-				.concat(String.valueOf(sec));
+			
+			String hr =	("00"+ String.valueOf(hours)).substring(String.valueOf(hours).length());
+			
+			String min =	("00"+ String.valueOf(minutes)).substring(String.valueOf(minutes).length());
+			
+			String sec =	("00"+ String.valueOf(seconds)).substring(String.valueOf(seconds).length());
+			
+			totalDownloadTime = hr.concat(":")
+					.concat(String.valueOf(min)).concat(":")
+					.concat(String.valueOf(sec));
 
-		return totalDownloadTime;
+			return totalDownloadTime;
+		}else{
+			totalDownloadTime = "00:00:00";
+			return totalDownloadTime;
+		}
+
 	}
 
 	public String getOldHandle(Map<String, HandleHolder> handleHolderBin, String devSN) {

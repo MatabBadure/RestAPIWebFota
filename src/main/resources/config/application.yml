@@ -16,7 +16,7 @@ async:
 mail:
     host: smtp.gmail.com
     port: 587
-    username: test.hillrom@gmail.com
+    username: test.lnt.hillrom@gmail.com
     password: hillrom12345
     protocol: smtp
     tls: true

@@ -1565,47 +1565,6 @@ public class UserService {
 		return new JSONObject();
 	}
 	
-	// Reset password and secrity question
-	public JSONObject resetPasswordSecurityQuestion(Map<String,String> params) throws HillromException{
-		String requiredParams[] = {"key","password","questionId","answer","termsAndConditionsAccepted"};
-		JSONObject errorsJson = RequestUtil.checkRequiredParams(params, requiredParams);
-		if(errorsJson.containsKey("ERROR")){
-			return errorsJson;
-		}
-
-		String password = params.get("password");
-		if(!checkPasswordConstraints(password)){
-			throw new HillromException(ExceptionConstants.HR_506);//Incorrect Password
-		}
-
-		String key = params.get("key");
-		Optional<User> existingUser = userRepository.findOneByActivationKey(key);
-		User currentUser = null;
-		if(existingUser.isPresent()){
-			currentUser = existingUser.get();
-		}else{
-			throw new HillromException(ExceptionConstants.HR_553);//Invalid Activation Key
-		}
-
-		Long qid = Long.parseLong(params.get("questionId"));
-		String answer = params.get("answer");
-		Optional<UserSecurityQuestion> opUserSecQ = userSecurityQuestionService.saveOrUpdate(currentUser.getId(), qid, answer);
-
-		if(opUserSecQ.isPresent()){
-			currentUser.setActivationKey(null);
-			currentUser.setLastLoggedInAt(DateTime.now());
-			currentUser.setLastModifiedDate(DateTime.now());
-			currentUser.setPassword(passwordEncoder.encode(params.get("password")));
-			currentUser.setTermsConditionAccepted(true);
-			currentUser.setTermsConditionAcceptedDate(DateTime.now());
-			userRepository.save(currentUser);
-		}else{
-			throw new HillromException(ExceptionConstants.HR_557);//Invalid Security Question or Answer
-
-		}
-		return new JSONObject();
-	}
-
 	public UserExtension getHCPUser(Long id) throws HillromException{
 		UserExtension hcpUser = userExtensionRepository.findOne(id);
 		if(Objects.nonNull(hcpUser))

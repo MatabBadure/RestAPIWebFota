@@ -242,8 +242,7 @@ public class MailService {
         context.setVariable("user", userNameFormatting(user));
         context.setVariable("baseUrl", baseUrl);
         String content = templateEngine.process("resetPasswordEmail", context);
-        String subject = "HillRomVest Account Password Reset";
-        //String subject = messageSource.getMessage("email.resetPassword.title", null, locale);
+        String subject = messageSource.getMessage("email.resetPassword.title", null, locale);
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
 

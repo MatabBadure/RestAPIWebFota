@@ -339,6 +339,26 @@ public class AccountResource {
     }
     
     /**
+     * PUT  /reset_passwordAndSecurityQuestion -> changes the current user's password and security question
+     */
+    @RequestMapping(value = "/reset_password",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    public ResponseEntity<JSONObject> resetPasswordSecurityQuestion(@RequestBody(required=true) Map<String,String> params) {
+    	JSONObject errorsJsonObject = new JSONObject();
+		try {
+			errorsJsonObject = userService.resetPasswordSecurityQuestion(params);
+			if(null != errorsJsonObject.get("ERROR"))
+	    		return ResponseEntity.badRequest().body(errorsJsonObject);
+	        return new ResponseEntity<>(HttpStatus.OK);
+		} catch (HillromException e) {
+			errorsJsonObject.put("ERROR", e.getMessage());
+			return ResponseEntity.badRequest().body(errorsJsonObject);
+		}
+    }
+    
+    /**
      * PUT  /user/{id}/update_password -> update the current user's password
      */
     @RequestMapping(value = "/user/{id}/update_password",

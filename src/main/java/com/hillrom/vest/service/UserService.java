@@ -2210,20 +2210,22 @@ public class UserService {
     	UserExtension existingUser = userExtensionRepository.findOne(id);// Getting user object by "id"
     	if(Objects.nonNull(existingUser)) {
     		// Checking whether user is Active ,Inactive or Pending state
-    	   if(existingUser.getActivated() == true && (existingUser.isDeleted() == true || existingUser.isDeleted() == false)) {
-    		sendEmailNotificationResetPassword(baseUrl, existingUser);// User is active sending email notification
-    	     }else if(existingUser.getActivated() == false && existingUser.isDeleted() == false) {
-    		throw new HillromException(ExceptionConstants.HR_514);//User is in Pending state
-    	     }else if(existingUser.isDeleted() == true && existingUser.getActivated() == false) {
-    		throw new HillromException(ExceptionConstants.HR_514);//User is Inactive state
-    	   }
+    		 if(existingUser.getActivated() == true ) {
+    				sendEmailNotificationResetPassword(baseUrl, existingUser);// User is active sending email notification
+    		     }else {
+    					if(existingUser.isDeleted() == false) {
+    						throw new HillromException(ExceptionConstants.HR_514);//User is in Pending state
+    					}else {
+    						throw new HillromException(ExceptionConstants.HR_514);//User is Inactive state
+    					}
+    			}
     	}
-    	else {
+    	  else {
     		throw new HillromException(ExceptionConstants.HR_512);//No such user is exist
-    	}
+    	    }
     	return jsonObject;
-    	
 	}
+	
 	private void reactivatePatientUser(UserExtension existingUser) throws HillromException {
 		List<UserPatientAssoc> caregiverAssocList = getListOfCaregiversAssociatedToPatientUser(existingUser);
 		List<UserExtension> caregiverToBeActivated = new LinkedList<>();

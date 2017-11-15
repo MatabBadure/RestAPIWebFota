@@ -233,6 +233,7 @@ public class MailService {
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
     
+    // Sending the reset password email to the active user
     @Async
     public void sendResetPasswordEmail(User user, String baseUrl) {
         log.debug("sending Reset password e-mail to '{}'", user.getEmail());

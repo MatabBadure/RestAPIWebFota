@@ -1091,7 +1091,8 @@ public class UserExtensionResource {
 			 if (jsonObject.containsKey("ERROR")) {
 		        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
 		        } else {
-		            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+		        	jsonObject.put("message", MessageConstants.HR_316);
+		            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);		            
 		        }
 		} catch (HillromException e) {
 			jsonObject.put("ERROR", e.getMessage());

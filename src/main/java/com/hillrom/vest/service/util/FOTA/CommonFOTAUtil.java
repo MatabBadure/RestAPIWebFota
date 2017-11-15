@@ -13,6 +13,7 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_SN;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEV_VER_RAW;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE_EQ;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE_RAW;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HEX;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.No;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.OK;
@@ -690,11 +691,14 @@ public class CommonFOTAUtil {
 		String crcPair = new String();
 		String finalResponseStr = new String();
 		String crsResultValue = new String();
-		
-		log.debug("Send Chunk With chunk Number Handle Id ="+handleId);
 		//Initially 
 		HandleHolder holder = new HandleHolder();
 		PartNoHolder partNoHolder = new PartNoHolder();
+		
+		//Get Handle from the request
+		handleId = getValuesFromRequest(rawMessage,HANDLE_RAW);
+		log.debug("Send Chunk With chunk Number Handle Id ="+handleId);
+		
 		//Get handle object based on handleId
 		holder = handleHolderBin.get(handleId);
 		//Frame key to get partNumber details
@@ -820,7 +824,6 @@ public class CommonFOTAUtil {
 		holder.setPreviousChunkTransStatus("CheckUpdate");
 		//added new stmt
 		holder.setSoftwareVersion(fotaInfo.getSoftVersion());
-		//handleId = getHandleNumber();
 		return holder;
 	}
 

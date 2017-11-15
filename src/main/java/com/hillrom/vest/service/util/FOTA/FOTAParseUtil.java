@@ -120,11 +120,9 @@ public class FOTAParseUtil {
 		if (Objects.nonNull(result)) {
 			fotaJsonData.put(RESULT, result);
 		}
-
 		if (Objects.nonNull(devCrc)) {
 			fotaJsonData.put(CRC, devCrc);
 		}
-
 		return fotaJsonData;
 	}
 
@@ -177,15 +175,5 @@ public class FOTAParseUtil {
 		}
 
 	}
-
-	/*public String getBufferLenTwoHexByte(int bufferLen) {
-		// Convert to hex
-		String bufferLenHex = Integer.toHexString(bufferLen);
-		// convert in two byte format
-		bufferLenHex = ("0000" + bufferLenHex).substring(bufferLenHex.length());
-		// converting to little Endian
-		String bufferInLsb = hexToAscii(asciiToHex(toLittleEndian((bufferLenHex))));
-		return bufferInLsb;
-	}*/
 
 }

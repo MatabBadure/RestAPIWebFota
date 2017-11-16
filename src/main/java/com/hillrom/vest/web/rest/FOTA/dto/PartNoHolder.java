@@ -26,6 +26,7 @@ public class PartNoHolder {
 	private int totalChunk;
 	private int chunkSize;
 	private boolean abortFlag;
+
 	private Map<Integer, String> fileChunks = null;
 	private static final int HEX = 16;
 

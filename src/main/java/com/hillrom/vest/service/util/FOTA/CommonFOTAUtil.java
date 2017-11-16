@@ -721,6 +721,11 @@ public class CommonFOTAUtil {
 			if(chunkNumber < partNoHolder.getTotalChunk() ){
 				//Get the particular chunk from the based chunk count
 				String zeroChunk = partNoHolder.getFileChunks().get(chunkNumber);
+				//Start time for only when 0th chunk number
+				if(chunkNumber == 0){
+					holder.setDownloadStartDateTime(new DateTime());
+					handleHolderBin.put(handleId, holder);
+				}
 				log.debug("Send  Chunk with chunk number Handle Id ="+handleId);
 				log.debug("Chunk Number ="+chunkNumber);
 				log.debug("Send  Chunk with chunk number ="+holder.getChunkSize());

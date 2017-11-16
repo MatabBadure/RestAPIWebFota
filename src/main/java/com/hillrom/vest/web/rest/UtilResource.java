@@ -8,6 +8,7 @@ import net.minidev.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hillrom.vest.domain.HillromTypeCodeFormat;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.HillromTypeCodeFormatRepository;
+import com.hillrom.vest.service.HillromTypeCodeFormatService;
 import com.hillrom.vest.util.MessageConstants;
 
 
@@ -33,7 +35,7 @@ public class UtilResource {
     private final Logger log = LoggerFactory.getLogger(UtilResource.class);
 
     @Inject
-    private HillromTypeCodeFormatRepository hillromTypeCodeFormatRepository;   
+    private HillromTypeCodeFormatService hillromTypeCodeFormatService;
     
     
     /**
@@ -45,7 +47,7 @@ public class UtilResource {
     public ResponseEntity<JSONObject> getListTypeCode(@PathVariable String codeType) throws HillromException {
         log.debug("REST request to get List of Type code : {}", codeType);
         JSONObject jsonObject = new JSONObject();
-        List<String> typeCodeList = hillromTypeCodeFormatRepository.findCodeValuesList(codeType);
+        List<String> typeCodeList = hillromTypeCodeFormatService.findCodeValuesList(codeType);
         if(typeCodeList.isEmpty()){
         	jsonObject.put("message", MessageConstants.HR_312);
         }else{        
@@ -65,7 +67,7 @@ public class UtilResource {
         log.debug("REST request to get List of Patient Diagnosis : {}", searchString);
         JSONObject jsonObject = new JSONObject();
         searchString = "%"+searchString+"%";
-        List<HillromTypeCodeFormat> typeCodeList = hillromTypeCodeFormatRepository.findDiagnosisTypeCode(searchString);
+        List<HillromTypeCodeFormat> typeCodeList = hillromTypeCodeFormatService.getDiagnosisTypeCode(searchString);
         if(typeCodeList.isEmpty()){
         	jsonObject.put("message", MessageConstants.HR_312);
         }else{        

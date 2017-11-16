@@ -149,4 +149,5 @@
 	<include file="classpath:/config/liquibase/changelog/20171031100100_altered_datatype_zipcode.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20171107055300_upload_canada_zip_codes.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20171114160100_upload_patient_diagnostic_codes.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20171116020900_create_city_state_zip_map_index.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

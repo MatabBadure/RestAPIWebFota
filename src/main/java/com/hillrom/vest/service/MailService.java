@@ -232,6 +232,19 @@ public class MailService {
         String subject = messageSource.getMessage("email.reactivation.title", null, locale);
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
+    
+    // Sending the reset password email to the active user
+    @Async
+    public void sendResetPasswordEmail(User user, String baseUrl) {
+        log.debug("sending Reset password e-mail to '{}'", user.getEmail());
+        Locale locale = getLocale(user);
+        Context context = new Context(locale);
+        context.setVariable("user", userNameFormatting(user));
+        context.setVariable("baseUrl", baseUrl);
+        String content = templateEngine.process("resetPasswordEmail", context);
+        String subject = messageSource.getMessage("email.resetPassword.title", null, locale);
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
 
     @Async
     public void sendPasswordResetMail(User user, String baseUrl) {

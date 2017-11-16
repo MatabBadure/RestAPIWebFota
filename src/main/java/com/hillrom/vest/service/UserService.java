@@ -916,6 +916,16 @@ public class UserService {
 		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
 	}
 	
+	// Sending the reset password email to the requested user
+	private void sendEmailNotificationResetPassword(String baseUrl, UserExtension user) {
+		user.setActivationKey(RandomUtil.generateActivationKey());
+		user.setActivated(false);
+		user.setActivationLinkSentDate(DateTime.now());
+		userRepository.saveAndFlush(user);
+		mailService.sendResetPasswordEmail(user, baseUrl);
+		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
+	}
+	
 	private void reSendEmailNotification(String baseUrl, UserExtension user) {
 		user.setActivationKey(RandomUtil.generateActivationKey());
 		user.setActivated(false);
@@ -1554,7 +1564,7 @@ public class UserService {
 		}
 		return new JSONObject();
 	}
-
+	
 	public UserExtension getHCPUser(Long id) throws HillromException{
 		UserExtension hcpUser = userExtensionRepository.findOne(id);
 		if(Objects.nonNull(hcpUser))
@@ -2155,7 +2165,7 @@ public class UserService {
 					if(existingUser.getAuthorities().contains(authorityMap.get(AuthoritiesConstants.PATIENT))) {
 						reactivatePatientUser(existingUser);
 						//hill-2178
-
+						
 						//mailService.sendReactivationEmail(existingUser,baseUrl);
 						sendEmailNotificationReactivate(baseUrl, existingUser);
 
@@ -2194,7 +2204,28 @@ public class UserService {
 		return jsonObject;
     }
 
-
+	// Reset password for the particular user
+	public JSONObject resetPassword(Long id,String baseUrl) throws HillromException {
+    	JSONObject jsonObject = new JSONObject();
+    	UserExtension existingUser = userExtensionRepository.findOne(id);// Getting user object by "id"
+    	if(Objects.nonNull(existingUser)) {
+    		// Checking whether user is Active ,Inactive or Pending state
+    		 if(existingUser.getActivated() == true ) {
+    				sendEmailNotificationResetPassword(baseUrl, existingUser);// User is active sending email notification
+    		     }else {
+    					if(existingUser.isDeleted() == false) {
+    						throw new HillromException(ExceptionConstants.HR_514);//User is in Pending state
+    					}else {
+    						throw new HillromException(ExceptionConstants.HR_514);//User is Inactive state
+    					}
+    			}
+    	}
+    	  else {
+    		throw new HillromException(ExceptionConstants.HR_512);//No such user is exist
+    	    }
+    	return jsonObject;
+	}
+	
 	private void reactivatePatientUser(UserExtension existingUser) throws HillromException {
 		List<UserPatientAssoc> caregiverAssocList = getListOfCaregiversAssociatedToPatientUser(existingUser);
 		List<UserExtension> caregiverToBeActivated = new LinkedList<>();

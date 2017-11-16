@@ -10,13 +10,14 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Size;
-
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 import org.joda.time.DateTime;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 @Entity
+@Audited
 @Table(name = "FOTA_INFO")
 public class FOTAInfo {
 	@Id
@@ -311,8 +312,6 @@ public class FOTAInfo {
 	
 	
 	public static Comparator<FOTAInfo> statusAscComparator = new Comparator<FOTAInfo>() {
-		/*if(s1.getPublishedDateTime() != null && s2.getPublishedDateTime() != null){
-		return s1.getPublishedDateTime().compareTo(s2.getPublishedDateTime());*/
 		public int compare(FOTAInfo s1, FOTAInfo s2) {
 			String status1 = s1.getFOTAStatus();
 			String status2 = s2.getFOTAStatus();

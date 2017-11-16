@@ -75,7 +75,8 @@ public class FOTAService {
 	@Inject
     private MailService mailService;
 	
-	private CommonFOTAUtil  coUtil = new CommonFOTAUtil();
+	@Inject
+	private CommonFOTAUtil  coUtil;
 	
 	//Dynamic part number
 	private static Map<String,PartNoHolder> partNosBin = Collections.synchronizedMap(new LinkedHashMap<>());

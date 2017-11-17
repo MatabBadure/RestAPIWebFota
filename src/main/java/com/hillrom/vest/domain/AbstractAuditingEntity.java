@@ -31,6 +31,7 @@ import javax.validation.constraints.NotNull;
 public abstract class AbstractAuditingEntity {
 
     @CreatedBy
+    @NotNull
     @Column(name = "created_by", nullable = false, length = 50, updatable = false)
     @JsonIgnore
     private String createdBy = "Visiview App";

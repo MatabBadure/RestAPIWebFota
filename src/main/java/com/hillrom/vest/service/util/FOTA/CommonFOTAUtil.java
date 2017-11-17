@@ -87,8 +87,8 @@ public class CommonFOTAUtil {
 		if (lsb_digit.length() < 2)
 			lsb_digit = "0" + lsb_digit;
 
-		System.out.println("MSB : " + msb_digit + " " + "LSB : " + lsb_digit);
-		System.out.println("Checksum : " + checksum_num);
+		log.debug("MSB : " + msb_digit + " " + "LSB : " + lsb_digit);
+		log.debug("Checksum : " + checksum_num);
 
 		if ((msb_digit + lsb_digit).equalsIgnoreCase(checksum_num)) {
 			return true;
@@ -106,8 +106,6 @@ public class CommonFOTAUtil {
 				str = hexStr.substring(i, i + 2);
 				output.append((char) Integer.parseInt(str, 16));
 			}
-			System.out.println(output);
-
 		} catch (Exception ex) {
 
 		}
@@ -137,7 +135,7 @@ public class CommonFOTAUtil {
 
 		String checksum_num = Integer.toHexString(nCheckSum);
 		checksum_num = ("0000" + checksum_num).substring(checksum_num.length());
-		System.out.println("Checksum : " + checksum_num);
+		log.debug("Checksum : " + checksum_num);
 		return toLittleEndian(checksum_num);
 
 	}

@@ -1552,7 +1552,7 @@ public class UserService {
 
 		if(opUserSecQ.isPresent()){
 			currentUser.setActivationKey(null);
-			if(!currentUser.getActivated)
+			if(!currentUser.getActivated())
 				currentUser.setActivated(true);
 			currentUser.setLastLoggedInAt(DateTime.now());
 			currentUser.setLastModifiedDate(DateTime.now());

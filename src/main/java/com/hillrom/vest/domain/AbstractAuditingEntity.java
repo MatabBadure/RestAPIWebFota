@@ -35,9 +35,8 @@ public abstract class AbstractAuditingEntity {
     private String createdBy = "Visiview App";
 
     @CreatedDate
-    @NotNull
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-    @Column(name = "created_date", nullable = false)
+    @Column(name = "created_date")
     private DateTime createdDate = DateTime.now();
 
     @LastModifiedBy

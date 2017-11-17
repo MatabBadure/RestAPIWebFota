@@ -24,7 +24,7 @@ import javax.inject.Inject;
 
 import net.minidev.json.JSONObject;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils; 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
@@ -2209,6 +2209,7 @@ public class UserService {
     	JSONObject jsonObject = new JSONObject();
     	UserExtension existingUser = userExtensionRepository.findOne(id);// Getting user object by "id"
     	if(Objects.nonNull(existingUser)) {
+    		if(!StringUtils.isBlank(existingUser.getEmail())) {
     		// Checking whether user is Active ,Inactive or Pending state
     		 if(existingUser.getActivated() == true ) {
     				sendEmailNotificationResetPassword(baseUrl, existingUser);// User is active sending email notification
@@ -2219,6 +2220,11 @@ public class UserService {
     						throw new HillromException(ExceptionConstants.HR_514);//User is Inactive state
     					}
     			}
+    	
+    	    }
+    		else {
+    			throw new HillromException(ExceptionConstants.HR_508);
+    		}
     	}
     	  else {
     		throw new HillromException(ExceptionConstants.HR_512);//No such user is exist

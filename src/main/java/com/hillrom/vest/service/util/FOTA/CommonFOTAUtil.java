@@ -35,11 +35,14 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.domain.FOTA.FOTAInfo;
 import com.hillrom.vest.web.rest.FOTA.dto.HandleHolder;
 import com.hillrom.vest.web.rest.FOTA.dto.PartNoHolder;
-
+@Service
+@Transactional
 public class CommonFOTAUtil {
 
 	private static final Logger log = LoggerFactory

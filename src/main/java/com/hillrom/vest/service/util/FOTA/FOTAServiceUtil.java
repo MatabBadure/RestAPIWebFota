@@ -56,8 +56,10 @@ public class FOTAServiceUtil {
 	
 	@Inject
 	private MailService mailService;
-
-	private CommonFOTAUtil coUtil = new CommonFOTAUtil();
+	
+	@Inject
+	private CommonFOTAUtil coUtil;
+	
 	private String resultPair = new String();
 	private String handlePair = new String();
 	private String totalChunkPair = new String();

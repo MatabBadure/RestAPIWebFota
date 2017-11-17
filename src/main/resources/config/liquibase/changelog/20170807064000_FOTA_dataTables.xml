@@ -128,15 +128,15 @@
 			</column>
 
 			<column name="checkupdate_date_time" type="timestamp">
-				<constraints nullable="false" />
+				<constraints nullable="true" />
 			</column>
 
 			<column name="download_start_date_time" type="timestamp">
-				<constraints nullable="false" />
+				<constraints nullable="true" />
 			</column>
 			
 			<column name="download_end_date_time" type="timestamp">
-				<constraints nullable="false" />
+				<constraints nullable="true" />
 			</column>
 
 			<column name="downloaded_status" type="varchar(255)">

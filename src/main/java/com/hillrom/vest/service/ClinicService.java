@@ -178,7 +178,7 @@ public class ClinicService {
 			}
 			
 			//Dissociate HCPS attached to Clinic
-			Set<UserExtension> userExtList = existingClinic.getUsers();
+//			Set<UserExtension> userExtList = existingClinic.getUsers();
 			Map<String,String> hm = new HashMap<String,String>();
 			hm.put("id", existingClinic.getId());
 			List<Map<String,String>> clinicList =  new ArrayList<>();
@@ -346,9 +346,7 @@ public class ClinicService {
 	        		hcpMap.put("hcp", hcpUser);
 	        		hcpUserList.add(hcpMap);
 
-	        	});
-
-	        	
+	        	});    	
 	        	
 	        }
 		}

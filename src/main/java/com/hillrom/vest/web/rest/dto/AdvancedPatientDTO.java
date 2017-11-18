@@ -1,6 +1,7 @@
 package com.hillrom.vest.web.rest.dto;
 
 import java.util.Date;
+import java.util.List;
 
 public class AdvancedPatientDTO {
 	
@@ -12,35 +13,35 @@ public class AdvancedPatientDTO {
 
 	    private String gender;
 
-	    private Integer age;
+	    private List<String> age;
 
 	    private String country;
 
-	    private String city;
+	    private List<String> state;
+	    
+	    private List<String> city;
 
-	    private String state;
-
-	    private Integer zipcode;
+	    private String zipcode;
 
 	    private String clinicLevelStatus;
 
 	    private String diagnosis;
 
-	    private Integer adherenceScoreRange;
+	    private List<String> adherenceScoreRange;
 
 	    private String deviceType;
 
 	    private String deviceStatus;
 		
-	    private Date deviceActiveDateFrom;
+	    private String deviceActiveDateFrom;
 
-	    private Date deviceActiveDateTo;
+	    private String deviceActiveDateTo;
 
-	    private Integer serialNo;
+	    private String serialNo;
 
-	    private Integer minHMRRange;
+	    private String minHMRRange;
 
-	    private Integer maxHMRRange;
+	    private String maxHMRRange;
 		
 	    private String adherenceReset;
 
@@ -61,15 +62,15 @@ public class AdvancedPatientDTO {
 		}
 
 		public AdvancedPatientDTO(String name, String hillromId, String email,
-				String gender, Integer age, String country, String city,
-				String state, Integer zipcode, String clinicLevelStatus,
-				String diagnosis, Integer adherenceScoreRange,
+				String gender, List<String> age, String country, List<String> state,
+				List<String> city, String zipcode, String clinicLevelStatus,
+				String diagnosis, List<String> adherenceScoreRange,
 				String deviceType, String deviceStatus,
-				Date deviceActiveDateFrom, Date deviceActiveDateTo,
-				Integer serialNo, Integer minHMRRange, Integer maxHMRRange,
+				String deviceActiveDateFrom, String deviceActiveDateTo,
+				String serialNo, String minHMRRange, String maxHMRRange,
 				String adherenceReset, String noTransmissionRecorded,
 				String belowFrequencySetting, String belowTherapyMin,
-				String missedTherapyDays) {
+				String missedTherapyDays, Boolean parent, Boolean deleted) {
 			super();
 			this.name = name;
 			this.hillromId = hillromId;
@@ -77,8 +78,8 @@ public class AdvancedPatientDTO {
 			this.gender = gender;
 			this.age = age;
 			this.country = country;
-			this.city = city;
 			this.state = state;
+			this.city = city;
 			this.zipcode = zipcode;
 			this.clinicLevelStatus = clinicLevelStatus;
 			this.diagnosis = diagnosis;
@@ -95,8 +96,10 @@ public class AdvancedPatientDTO {
 			this.belowFrequencySetting = belowFrequencySetting;
 			this.belowTherapyMin = belowTherapyMin;
 			this.missedTherapyDays = missedTherapyDays;
+			this.parent = parent;
+			this.deleted = deleted;
 		}
-	    
+
 		public String getName() {
 			return name;
 		}
@@ -129,11 +132,11 @@ public class AdvancedPatientDTO {
 			this.gender = gender;
 		}
 
-		public Integer getAge() {
+		public List<String> getAge() {
 			return age;
 		}
 
-		public void setAge(Integer age) {
+		public void setAge(List<String> age) {
 			this.age = age;
 		}
 
@@ -145,27 +148,27 @@ public class AdvancedPatientDTO {
 			this.country = country;
 		}
 
-		public String getCity() {
-			return city;
-		}
-
-		public void setCity(String city) {
-			this.city = city;
-		}
-
-		public String getState() {
+		public List<String> getState() {
 			return state;
 		}
 
-		public void setState(String state) {
+		public void setState(List<String> state) {
 			this.state = state;
 		}
 
-		public Integer getZipcode() {
+		public List<String> getCity() {
+			return city;
+		}
+
+		public void setCity(List<String> city) {
+			this.city = city;
+		}
+
+		public String getZipcode() {
 			return zipcode;
 		}
 
-		public void setZipcode(Integer zipcode) {
+		public void setZipcode(String zipcode) {
 			this.zipcode = zipcode;
 		}
 
@@ -185,11 +188,11 @@ public class AdvancedPatientDTO {
 			this.diagnosis = diagnosis;
 		}
 
-		public Integer getAdherenceScoreRange() {
+		public List<String> getAdherenceScoreRange() {
 			return adherenceScoreRange;
 		}
 
-		public void setAdherenceScoreRange(Integer adherenceScoreRange) {
+		public void setAdherenceScoreRange(List<String> adherenceScoreRange) {
 			this.adherenceScoreRange = adherenceScoreRange;
 		}
 
@@ -209,43 +212,43 @@ public class AdvancedPatientDTO {
 			this.deviceStatus = deviceStatus;
 		}
 
-		public Date getDeviceActiveDateFrom() {
+		public String getDeviceActiveDateFrom() {
 			return deviceActiveDateFrom;
 		}
 
-		public void setDeviceActiveDateFrom(Date deviceActiveDateFrom) {
+		public void setDeviceActiveDateFrom(String deviceActiveDateFrom) {
 			this.deviceActiveDateFrom = deviceActiveDateFrom;
 		}
 
-		public Date getDeviceActiveDateTo() {
+		public String getDeviceActiveDateTo() {
 			return deviceActiveDateTo;
 		}
 
-		public void setDeviceActiveDateTo(Date deviceActiveDateTo) {
+		public void setDeviceActiveDateTo(String deviceActiveDateTo) {
 			this.deviceActiveDateTo = deviceActiveDateTo;
 		}
 
-		public Integer getSerialNo() {
+		public String getSerialNo() {
 			return serialNo;
 		}
 
-		public void setSerialNo(Integer serialNo) {
+		public void setSerialNo(String serialNo) {
 			this.serialNo = serialNo;
 		}
 
-		public Integer getMinHMRRange() {
+		public String getMinHMRRange() {
 			return minHMRRange;
 		}
 
-		public void setMinHMRRange(Integer minHMRRange) {
+		public void setMinHMRRange(String minHMRRange) {
 			this.minHMRRange = minHMRRange;
 		}
 
-		public Integer getMaxHMRRange() {
+		public String getMaxHMRRange() {
 			return maxHMRRange;
 		}
 
-		public void setMaxHMRRange(Integer maxHMRRange) {
+		public void setMaxHMRRange(String maxHMRRange) {
 			this.maxHMRRange = maxHMRRange;
 		}
 
@@ -287,6 +290,22 @@ public class AdvancedPatientDTO {
 
 		public void setMissedTherapyDays(String missedTherapyDays) {
 			this.missedTherapyDays = missedTherapyDays;
+		}
+
+		public Boolean getParent() {
+			return parent;
+		}
+
+		public void setParent(Boolean parent) {
+			this.parent = parent;
+		}
+
+		public Boolean getDeleted() {
+			return deleted;
+		}
+
+		public void setDeleted(Boolean deleted) {
+			this.deleted = deleted;
 		}
 
 		

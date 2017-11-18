@@ -4,6 +4,7 @@ import static com.hillrom.vest.security.AuthoritiesConstants.CLINIC_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
 import static com.hillrom.vest.config.Constants.VEST;
 import static com.hillrom.vest.config.Constants.MONARCH;
+
 //import static com.hillrom.vest.config.Constants.ALL;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -64,13 +65,12 @@ import com.hillrom.monarch.service.TherapySessionServiceMonarch;
 import com.hillrom.monarch.web.rest.dto.ProtocolMonarchDTO;
 import com.hillrom.monarch.web.rest.dto.ProtocolRevisionMonarchVO;
 import com.hillrom.monarch.web.rest.dto.TherapyDataMonarchVO;
+import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
-
 import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
-
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceData;
@@ -272,9 +272,10 @@ public class UserResource {
 			@RequestParam(value = "asc", required = false) Boolean isAscending,
 			@RequestParam(value = "deviceType", required = true) String deviceType)
 			throws URISyntaxException {
-		if(searchString.endsWith("_")){
- 		   searchString = searchString.replace("_", "\\\\_");
-		}
+		if(!StringUtils.isBlank(searchString)) {
+			if(searchString.endsWith("_")){
+				searchString = searchString.replace("_", "\\\\_");
+			}
 		String queryString = new StringBuilder("'%").append(searchString)
 				.append("%'").toString();
 		Map<String, Boolean> sortOrder = new HashMap<>();
@@ -290,7 +291,11 @@ public class UserResource {
 		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
 				page, "/user/patient/search", offset, limit);
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
-
+		}
+		else{
+			List<Clinic> emptyList = new ArrayList<Clinic>();
+			return new ResponseEntity<>(emptyList,HttpStatus.OK); 
+		}
 	}
 	
 	//HCP log in. Patient associated to  to HCP

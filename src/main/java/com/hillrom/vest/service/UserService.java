@@ -1478,7 +1478,7 @@ public class UserService {
 							List<User> userList = clinicService.getClinicAdmin(cNameEach.getId());
 							for(User user : userList) {									
 								if(!user.getEmail().equals(existingUser.getEmail()) &&
-									!user.isDeleted() && !user.getActivated())
+									!user.isDeleted() && user.getActivated())
 									cAdminEmailId.add(user.getEmail());									
 							}
 						}

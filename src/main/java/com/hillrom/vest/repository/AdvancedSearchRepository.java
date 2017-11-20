@@ -227,15 +227,17 @@ public class AdvancedSearchRepository {
 	    	filter = filter.append("kt.pemail like ").append("'%").append(advancedPatientDTO.getEmail()).append("%' ");
 	    }
 		
-		filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getGender())) ? (filter.append(" AND ")) : (filter.append(""));
-	    if(!StringUtils.isBlank(advancedPatientDTO.getGender())){
-	    	if(advancedPatientDTO.getGender().equalsIgnoreCase("Male"))
-	    		filter = filter.append("kt.pgender IN").append("('Male')");
-	    	else if(advancedPatientDTO.getGender().equalsIgnoreCase("Female"))
-		    	filter = filter.append("kt.pgender IN").append("('Female')");
-	    	else if(advancedPatientDTO.getGender().equalsIgnoreCase("Other"))
-		    	filter = filter.append("kt.pgender IN").append("('Other')");
-	    }
+		if(!advancedPatientDTO.getGender().equalsIgnoreCase("All")){
+			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getGender())) ? (filter.append(" AND ")) : (filter.append(""));
+			if(!StringUtils.isBlank(advancedPatientDTO.getGender())){
+				if(advancedPatientDTO.getGender().equalsIgnoreCase("Male"))
+					filter = filter.append("kt.pgender IN").append("('Male')");
+				else if(advancedPatientDTO.getGender().equalsIgnoreCase("Female"))
+					filter = filter.append("kt.pgender IN").append("('Female')");
+				else if(advancedPatientDTO.getGender().equalsIgnoreCase("Other"))
+					filter = filter.append("kt.pgender IN").append("('Other')");
+			}
+		}
 	    
 	    filter = (filter.length()>0)&&(advancedPatientDTO.getAge().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 	    if(advancedPatientDTO.getAge().size()>0){

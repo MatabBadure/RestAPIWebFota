@@ -292,7 +292,7 @@ public class AdvancedSearchRepository {
 	    
 	    filter= (filter.length()>0)&&(advancedPatientDTO.getAdherenceScoreRange().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 	    if(advancedPatientDTO.getAdherenceScoreRange().size()>0){
-	    	filter = filter.append("kt.adherence").append(rangeBuilder(advancedPatientDTO.getAdherenceScoreRange(),"adherence"));
+	    	filter = filter.append("(kt.adherence").append(rangeBuilder(advancedPatientDTO.getAdherenceScoreRange(),"adherence")).append(")");
 	    	// rangeBuilder method used to form the where clause for adherence 
 	    }
 			
@@ -320,11 +320,20 @@ public class AdvancedSearchRepository {
 		    	filter = filter.append("kt.deviceActiveInactive IN(false)");	
 	    }
 	    
-	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateFrom())) ? (filter.append(" AND ")) : (filter.append(""));
-	    if(!StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateFrom())){
-	    	filter = filter.append("(kt.activeDeviceAddedDate BETWEEN '").append(dateFormat(advancedPatientDTO.getDeviceActiveDateFrom())).append("'")
-	    			 .append(" AND ").append("'").append(dateFormat(advancedPatientDTO.getDeviceActiveDateTo())).append("')");
-	    }
+	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateFrom()) 
+				|| !StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateTo())) ? (filter.append(" AND ")) : (filter.append(""));
+				if(!StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateFrom())||!StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateTo())){
+					if(!StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateFrom())&&!StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateTo())){
+						filter = filter.append("(date(kt.activeDeviceAddedDate) BETWEEN '").append(dateFormat(advancedPatientDTO.getDeviceActiveDateFrom())).append("'")
+								.append(" AND ").append("'").append(dateFormat(advancedPatientDTO.getDeviceActiveDateTo())).append("')");
+					}
+					else if(!StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateFrom())){
+						filter = filter.append("date(kt.activeDeviceAddedDate) >= '").append(dateFormat(advancedPatientDTO.getDeviceActiveDateFrom())).append("' ");
+					}
+					else if(!StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateTo())){
+						filter = filter.append("date(kt.activeDeviceAddedDate) <= '").append(dateFormat(advancedPatientDTO.getDeviceActiveDateTo())).append("' ");
+					}
+				}
 	    
 	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getSerialNo())) ? (filter.append(" AND ")) : (filter.append(""));
 	    if(!StringUtils.isBlank(advancedPatientDTO.getSerialNo())){

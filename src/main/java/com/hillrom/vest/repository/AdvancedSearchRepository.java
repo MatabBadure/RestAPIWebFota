@@ -342,14 +342,14 @@ public class AdvancedSearchRepository {
 	    					|| !StringUtils.isBlank(advancedPatientDTO.getMaxHMRRange())) ? (filter.append(" AND ")) : (filter.append(""));
 	    if(!StringUtils.isBlank(advancedPatientDTO.getMinHMRRange())||!StringUtils.isBlank(advancedPatientDTO.getMaxHMRRange())){
 	    	if(!StringUtils.isBlank(advancedPatientDTO.getMinHMRRange())&&!StringUtils.isBlank(advancedPatientDTO.getMaxHMRRange())){
-	    	filter = filter.append("(kt.hmr BETWEEN '").append(Integer.parseInt(advancedPatientDTO.getMinHMRRange())).append("'")
-	    			 .append(" AND ").append("'").append(Integer.parseInt(advancedPatientDTO.getMaxHMRRange())).append("')");
+	    	filter = filter.append("(kt.hmr BETWEEN '").append(Integer.parseInt(advancedPatientDTO.getMinHMRRange())*60).append("'") //converting hmr mins into seconds
+	    			 .append(" AND ").append("'").append(Integer.parseInt(advancedPatientDTO.getMaxHMRRange())*60).append("')");
 	    	}
 	    	else if(!StringUtils.isBlank(advancedPatientDTO.getMinHMRRange())){
-	    		filter = filter.append("kt.hmr >= ").append(Integer.parseInt(advancedPatientDTO.getMinHMRRange()));
+	    		filter = filter.append("kt.hmr >= ").append(Integer.parseInt(advancedPatientDTO.getMinHMRRange())*60);
 		    }
 		    else if(!StringUtils.isBlank(advancedPatientDTO.getMaxHMRRange())){
-		    	filter = filter.append("kt.hmr <= ").append(Integer.parseInt(advancedPatientDTO.getMaxHMRRange()));
+		    	filter = filter.append("kt.hmr <= ").append(Integer.parseInt(advancedPatientDTO.getMaxHMRRange())*60);
 		    }
 	    }
 	    

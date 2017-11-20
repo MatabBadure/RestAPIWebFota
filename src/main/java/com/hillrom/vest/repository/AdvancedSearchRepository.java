@@ -229,12 +229,8 @@ public class AdvancedSearchRepository {
 		
 		filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getGender())) ? (filter.append(" AND ")) : (filter.append(""));
 	    if(!StringUtils.isBlank(advancedPatientDTO.getGender())){
-	    	if(advancedPatientDTO.getGender().equalsIgnoreCase("All"))
-	    	{
-	    		filter = filter.append("kt.pgender IN").append("('Male','Female','Other') ");
-	    	}
-	    	else if(advancedPatientDTO.getGender().equalsIgnoreCase("Male"))
-	    	filter = filter.append("kt.pgender IN").append("('Male')");
+	    	if(advancedPatientDTO.getGender().equalsIgnoreCase("Male"))
+	    		filter = filter.append("kt.pgender IN").append("('Male')");
 	    	else if(advancedPatientDTO.getGender().equalsIgnoreCase("Female"))
 		    	filter = filter.append("kt.pgender IN").append("('Female')");
 	    	else if(advancedPatientDTO.getGender().equalsIgnoreCase("Other"))
@@ -518,8 +514,12 @@ public class AdvancedSearchRepository {
 				+ sb.toString());
 		return jpaQuery;
 	}
-	
-	// Query builder for age/adherence_score range
+	/**
+	 * Query builder for age/adherence_score range
+	 * @param rangeList
+	 * @param specifier
+	 * @return
+	 */
 	public String rangeBuilder(List<String> rangeList, String specifier){
 		
 		String sqlQuery = " BETWEEN ";
@@ -527,27 +527,35 @@ public class AdvancedSearchRepository {
 				String list = String.join(" ", rangeList);
 				String newlist = list.replaceAll("-","AND");
 				String splitStr[]= newlist.split(" ");
-				 
+
 				StringBuilder builder = new StringBuilder(sqlQuery);
-				 
+
 				for (String s : splitStr )
 				{
-				s=s.replaceAll("AND"," AND ");
-				if(specifier.equalsIgnoreCase("age")){
-					builder = builder.append(s).append(" or TIMESTAMPDIFF(YEAR,kt.pdob,CURDATE()) BETWEEN ");
-				}
-				else if(specifier.equalsIgnoreCase("adherence"))
-				builder = builder.append(s).append(" or kt.adherence BETWEEN ");
+					s=s.replaceAll("above","200");
+					s=s.replaceAll("AND"," AND ");
+
+					if(specifier.equalsIgnoreCase("age")){
+						builder = builder.append(s).append(" or TIMESTAMPDIFF(YEAR,kt.pdob,CURDATE()) BETWEEN ");
+					}
+					else if(specifier.equalsIgnoreCase("adherence"))
+						builder = builder.append(s).append(" or kt.adherence BETWEEN ");
 				}  
-				
+
 				String newStr = new String(builder);
 				int i =newStr.lastIndexOf("or");
 				newStr =newStr.substring(0, i).concat("");
-				
+
 				return newStr;
 		}
+	/**
+	 * 
+	 * To convert the date format
+	 * @param dt
+	 * @return
+	 * @throws ParseException
+	 */
 	
-	// To convert the date format
 	public static String dateFormat(String dt) throws ParseException{
 		Date initDate =  new SimpleDateFormat("MM/dd/yyyy").parse(dt);
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");

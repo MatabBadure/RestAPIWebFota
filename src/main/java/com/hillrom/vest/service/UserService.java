@@ -1477,7 +1477,8 @@ public class UserService {
 							// Getting CLINIC_ADMIN ID's list from the each clinic 
 							List<User> userList = clinicService.getClinicAdmin(cNameEach.getId());
 							for(User user : userList) {									
-								if(!user.getEmail().equals(existingUser.getEmail()))
+								if(!user.getEmail().equals(existingUser.getEmail()) &&
+									!user.isDeleted() && user.getActivated())
 									cAdminEmailId.add(user.getEmail());									
 							}
 						}

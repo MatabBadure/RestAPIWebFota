@@ -435,7 +435,7 @@ public class AdvancedSearchRepository {
 			DateTime createdAtDatetime = new DateTime(createdAt);
 			String state = (String) record[15];
 			Integer adherence = (Integer) record[16];
-			Date lastTransmissionDate = (Date) record[17];
+			Date lastTransmissionDate = (Date) record[36];
 			String mrnId = (String) record[18];
 			String hcpNamesCSV = (String) record[19];
 			String clinicNamesCSV = (String) record[20];

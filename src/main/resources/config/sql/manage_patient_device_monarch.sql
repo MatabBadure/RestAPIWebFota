@@ -8,7 +8,8 @@ CREATE DEFINER=`root`@`%` PROCEDURE `manage_patient_device_monarch`(
     IN pat_new_device_serial_number varchar(50),
     IN pat_bluetooth_id varchar(50),
     IN pat_hub_id varchar(50),
-    IN pat_created_by varchar(50)
+    IN pat_created_by varchar(50),
+    IN pat_hmr decimal
     )
 BEGIN
 
@@ -71,7 +72,7 @@ IF operation_type_indicator = 'CREATE' THEN
 			INSERT INTO `PATIENT_VEST_DEVICE_HISTORY_MONARCH`
 				(`patient_id`, `serial_number`, `bluetooth_id`,	`hub_id`,`created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_active`,`hmr`,`is_pending`)
 				VALUES
-				(patient_id,pat_old_device_serial_number,pat_bluetooth_id,pat_hub_id, pat_created_by,today_date,pat_created_by,today_date,1,0,0);
+				(patient_id,pat_old_device_serial_number,pat_bluetooth_id,pat_hub_id, pat_created_by,today_date,pat_created_by,today_date,1,pat_hmr,0);
 --		END IF;		
 
 			
@@ -91,7 +92,7 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 			INSERT INTO `PATIENT_VEST_DEVICE_HISTORY_MONARCH`
 				(`patient_id`, `serial_number`,`hub_id`,`bluetooth_id`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `is_active`,`hmr`,`is_pending`)
 				VALUES
-				(patient_id,pat_new_device_serial_number, pat_hub_id,pat_bluetooth_id,pat_created_by,today_date,pat_created_by,today_date,1,0,1);
+				(patient_id,pat_new_device_serial_number, pat_hub_id,pat_bluetooth_id,pat_created_by,today_date,pat_created_by,today_date,1,pat_hmr,1);
 			
 			IF pat_old_device_serial_number IS NOT NULL THEN
 				UPDATE `PATIENT_VEST_DEVICE_HISTORY_MONARCH` pvdhm SET

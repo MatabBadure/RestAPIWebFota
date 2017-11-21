@@ -86,7 +86,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private String gender;
     
     @Column(name = "zipcode")
-    private Integer zipcode;
+    private String zipcode;
 
     @Column(nullable = false)
     private boolean activated = false;
@@ -396,11 +396,11 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.gender = gender;
 	}
 
-	public Integer getZipcode() {
+	public String getZipcode() {
 		return zipcode;
 	}
 
-	public void setZipcode(Integer zipcode) {
+	public void setZipcode(String zipcode) {
 		this.zipcode = zipcode;
 	}
 

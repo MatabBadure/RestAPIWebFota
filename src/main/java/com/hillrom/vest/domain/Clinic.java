@@ -58,7 +58,7 @@ public class Clinic implements Serializable,Comparable<Clinic> {
     private String address2;
 
     @Column(name = "zipcode")
-    private Integer zipcode;
+    private String zipcode;
 
     @Column(name = "city")
     private String city;
@@ -107,6 +107,11 @@ public class Clinic implements Serializable,Comparable<Clinic> {
     @JsonIgnore
     private Set<ClinicPatientAssoc> clinicPatientAssoc = new HashSet<>();
     
+    @NotAudited
+    @OneToMany(mappedBy = "clinicUserAssocPK.clinic",fetch=FetchType.LAZY)
+    @JsonIgnore
+    private Set<ClinicUserAssoc> clinicUserAssoc = new HashSet<>();
+    
     @ManyToMany(mappedBy="clinics")
     @JsonBackReference
     private Set<UserExtension> users = new HashSet<>();
@@ -153,11 +158,11 @@ public class Clinic implements Serializable,Comparable<Clinic> {
 		this.address2 = address2;
 	}
 
-	public Integer getZipcode() {
+	public String getZipcode() {
         return zipcode;
     }
 
-    public void setZipcode(Integer zipcode) {
+    public void setZipcode(String zipcode) {
         this.zipcode = zipcode;
     }
 
@@ -263,6 +268,14 @@ public class Clinic implements Serializable,Comparable<Clinic> {
 
 	public void setClinicPatientAssoc(Set<ClinicPatientAssoc> clinicPatientAssoc) {
 		this.clinicPatientAssoc = clinicPatientAssoc;
+	}
+	
+	public Set<ClinicUserAssoc> getClinicUserAssoc() {
+		return clinicUserAssoc;
+	}
+
+	public void setClinicUserAssoc(Set<ClinicUserAssoc> clinicUserAssoc) {
+		this.clinicUserAssoc = clinicUserAssoc;
 	}
 
 	public DateTime getCreatedAt() {

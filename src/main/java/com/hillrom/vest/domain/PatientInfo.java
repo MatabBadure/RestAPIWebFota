@@ -79,7 +79,7 @@ public class PatientInfo implements Serializable {
     private String address;
     
     @Column(name="zipcode")
-    private Integer zipcode;
+    private String zipcode;
     
     @Column(name = "city")
     private String city;
@@ -230,11 +230,11 @@ public class PatientInfo implements Serializable {
         this.webLoginCreated = webLoginCreated;
     }
 
-    public Integer getZipcode() {
+    public String getZipcode() {
 		return zipcode;
 	}
 
-	public void setZipcode(Integer zipcode) {
+	public void setZipcode(String zipcode) {
 		this.zipcode = zipcode;
 	}
 

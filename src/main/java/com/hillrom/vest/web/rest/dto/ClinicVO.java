@@ -3,6 +3,7 @@ package com.hillrom.vest.web.rest.dto;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import org.joda.time.DateTime;
 
@@ -19,11 +20,13 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
     
     private String address2;
 
-    private Integer zipcode;
+    private String zipcode;
 
     private String city;
 
     private String state;
+    
+    private String country;
 
     private String phoneNumber;
 
@@ -35,6 +38,8 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
     
     private Long clinicAdminId;
 
+    private String parentClinicId;
+    
     private ClinicVO parentClinic;
  
     private boolean deleted = false;
@@ -54,9 +59,10 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
     @JsonIgnore
     private List<ClinicVO> childClinicVOs = new LinkedList<>();
 
-    public ClinicVO(String id,String name, String address, String address2, Integer zipcode, String city,
+    public ClinicVO(String id,String name, String address, String address2, String zipcode, String city,
 			String state, String phoneNumber, String faxNumber, String speciality, Long clinicAdminId,
-			Boolean parent, String hillromId,Boolean deleted,DateTime createdAt,Integer adherenceSetting, DateTime adherenceSettingModifiedDte
+			Boolean parent, String hillromId,Boolean deleted,DateTime createdAt,Integer adherenceSetting, 
+			DateTime adherenceSettingModifiedDte
 			) {
 		super();
 		this.id = id;
@@ -82,7 +88,69 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
 				
 	}
     
-    public String getId() {
+    public ClinicVO(String id,String name, String address, String address2, String zipcode, String city,
+			String state, String country, String phoneNumber, String faxNumber, String speciality, Long clinicAdminId,
+			Boolean parent,String parentClinicId, String hillromId,Boolean deleted,DateTime createdAt,Integer adherenceSetting, DateTime adherenceSettingModifiedDte
+			) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.address = address;
+		this.address2 = address2;
+		this.zipcode = zipcode;
+		this.city = city;
+		this.state = state;
+		this.country = country;
+		this.phoneNumber = phoneNumber;
+		this.faxNumber = faxNumber;
+		this.speciality = speciality;
+		this.clinicAdminId = clinicAdminId;
+		this.parent = parent;
+		this.parentClinicId = parentClinicId;
+		this.hillromId = hillromId;
+		this.deleted = deleted;
+		this.createdAt = createdAt;
+		this.adherenceSetting = adherenceSetting;
+		//start: HILL-2004
+		this.adherenceSettingModifiedDte = adherenceSettingModifiedDte;
+		this.adherenceSettingFlag = adherenceSettingFlag;
+		//end: HILL-2004
+				
+	}
+    
+    public ClinicVO(String id, String name, String address,
+			String address2, String zipcode, String country,String city, String state,
+			String phoneNumber, String faxNumber, String speciality,
+			String clinicAdminId, Boolean parent, String parentClinicId, String hillromId,
+			Boolean deleted, DateTime createdAt, Integer adherenceSetting,
+			DateTime adherenceSettingModifiedDte) {
+    	super();
+		this.id = id;
+		this.name = name;
+		this.address = address;
+		this.address2 = address2;
+		this.zipcode = zipcode;
+		this.city = city;
+		this.state = state;
+		this.country = country;
+		this.phoneNumber = phoneNumber;
+		this.faxNumber = faxNumber;
+		this.speciality = speciality;
+		this.clinicAdminId = Objects.nonNull(clinicAdminId)?Long.parseLong(clinicAdminId):null;
+		this.parent = parent;
+		this.parentClinicId = parentClinicId;
+		this.hillromId = hillromId;
+		this.deleted = deleted;
+		this.createdAt = createdAt;
+		this.adherenceSetting = adherenceSetting;
+		//start: HILL-2004
+		this.adherenceSettingModifiedDte = adherenceSettingModifiedDte;
+		//end: HILL-2004
+				
+		// TODO Auto-generated constructor stub
+	}
+
+	public String getId() {
 		return id;
 	}
 
@@ -98,7 +166,7 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
         this.name = name;
     }
 
-    public Integer getZipcode() {
+    public String getZipcode() {
         return zipcode;
     }
 
@@ -118,7 +186,7 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
 		this.address2 = address2;
 	}
 
-	public void setZipcode(Integer zipcode) {
+	public void setZipcode(String zipcode) {
         this.zipcode = zipcode;
     }
 
@@ -137,8 +205,24 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
     public void setState(String state) {
         this.state = state;
     }
+    
+    
 
-    public String getPhoneNumber() {
+    /**
+	 * @return the country
+	 */
+	public String getCountry() {
+		return country;
+	}
+
+	/**
+	 * @param country the country to set
+	 */
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	public String getPhoneNumber() {
         return phoneNumber;
     }
 
@@ -242,7 +326,23 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
 		public void setAdherenceSettingFlag(Boolean adherenceSettingFlag) {
 			this.adherenceSettingFlag = adherenceSettingFlag;
 		}
+		
   //end: HILL-2004
+		
+		/**
+		 * @return the parentClinicId
+		 */
+		public String getParentClinicId() {
+			return parentClinicId;
+		}
+
+		/**
+		 * @param parentClinicId the parentClinicId to set
+		 */
+		public void setParentClinicId(String parentClinicId) {
+			this.parentClinicId = parentClinicId;
+		}
+	
 		
 		@Override
 		public int compareTo(ClinicVO clinicVO) {
@@ -257,5 +357,6 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
 			 
 			return this.getAdherenceSettingModifiedDte().compareTo(clinicVO.getAdherenceSettingModifiedDte());
 		}
-	
+
+
 }

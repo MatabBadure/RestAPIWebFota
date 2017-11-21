@@ -200,7 +200,8 @@ public class AdvancedSearchRepository {
 	// Advanced Patient Search for Admin log in
 	public Page<PatientUserVO> advancedSearchPatients(AdvancedPatientDTO advancedPatientDTO, Pageable pageable,Map<String, Boolean> sortOrder) {      
 		
-		String BaseQuery = "select * from ("+QueryConstants.QUERY_ADVANCED_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN+") kt";
+		//String BaseQuery = "select * from ("+QueryConstants.QUERY_ADVANCED_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN+") kt";
+		String BaseQuery = QueryConstants.QUERY_ADVANCED_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN_UNIONS;
 		String age = "TIMESTAMPDIFF(YEAR,kt.pdob,CURDATE())"; // used to calculate age from dob field
 		String whereClause = " WHERE ";
 		StringBuilder filter = new StringBuilder();

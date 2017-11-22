@@ -1518,6 +1518,7 @@ public class AdherenceCalculationServiceMonarch{
 		
 		return isNonHMRNotificationCheck(patientUser, notificationType) ||
 				isSettingDeviationNotificationCheck(patientUser, notificationType) ||
+			        (patientUser.isMissedTherapyNotification() && MISSED_THERAPY.equalsIgnoreCase(notificationType)) ||
 				isNonHMRSettingDeviationNotificationCheck(patientUser, notificationType); 
 				
 		

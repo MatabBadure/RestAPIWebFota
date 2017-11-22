@@ -1472,27 +1472,36 @@ public class AdherenceCalculationServiceMonarch{
 	public void processPatientNotificationsMonarch(){
 		LocalDate yesterday = LocalDate.now().minusDays(1);
 		List<NotificationMonarch> notifications = notificationMonarchRepository.findByDate(yesterday);
+		log.debug("Notification Count:"+notifications.size()+"----");
 		if(notifications.size() > 0){
 			List<Long> patientUserIds = new LinkedList<>();
-			for(NotificationMonarch notification : notifications){
+			for(NotificationMonarch notification : notifications){				
 				patientUserIds.add(notification.getPatientUser().getId());
+				log.debug("Patient user id:"+notification.getPatientUser().getId()+"----");
 			}
 			List<PatientComplianceMonarch> complianceList = patientComplianceMonarchRepository.findByDateBetweenAndPatientUserIdIn(yesterday,
 					yesterday,patientUserIds);
+			log.debug("Compliance Count:"+complianceList.size()+"----");			
+			
 			Map<User,Integer> complianceMap = new HashMap<>();
 			for(PatientComplianceMonarch compliance : complianceList){
 				complianceMap.put(compliance.getPatientUser(), compliance.getMissedTherapyCount());
 			}
 			try{
-				notifications.forEach(notification -> {
+				notifications.forEach(notification -> {					
 					User patientUser = notification.getPatientUser();
+					log.debug("Patient user under notifiation:"+patientUser.getEmail()+"----");
 					if(Objects.nonNull(patientUser.getEmail())){
+						log.debug("Inside Patient user under notifiation:"+patientUser.getEmail()+"----");
 						// integrated Accepting mail notifications
 						String notificationType = notification.getNotificationType();
 						int missedTherapyCount = complianceMap.get(patientUser);
 						if(isPatientUserAcceptNotification(patientUser,
 								notificationType))
+						{
+							log.debug("Patient user accepted notifiations:"+patientUser.getEmail()+"----");
 							mailService.sendNotificationMailToPatientMonarch(patientUser,notificationType,missedTherapyCount);
+						}
 					}
 				});
 			}catch(Exception ex){

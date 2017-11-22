@@ -469,6 +469,7 @@ public class UserService {
     		UserExtension user = createHillromTeamUser(userExtensionDTO);
     		if(Objects.nonNull(user.getId())) {
     			if(StringUtils.isNotBlank(userExtensionDTO.getEmail())) {
+    				 log.debug("baseUrl in create Method", baseUrl);
     				mailService.sendActivationEmail(user, baseUrl);
     			}
                 return user;

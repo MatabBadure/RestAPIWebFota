@@ -203,6 +203,7 @@ public class MailService {
         Context context = new Context(locale);
         context.setVariable("user", userNameFormatting(user));
         context.setVariable("baseUrl", baseUrl);
+        log.debug("baseUrl", baseUrl);
         String content = templateEngine.process("activationEmail", context);
         String subject = messageSource.getMessage("email.activation.title", null, locale);
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);

@@ -58,6 +58,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.jndi.local.localContextRoot;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -1473,8 +1474,10 @@ public class AdherenceCalculationServiceMonarch{
 		LocalDate yesterday = LocalDate.now().minusDays(1);
 		List<NotificationMonarch> notifications = notificationMonarchRepository.findByDate(yesterday);
 		if(notifications.size() > 0){
+			
 			List<Long> patientUserIds = new LinkedList<>();
 			for(NotificationMonarch notification : notifications){
+				
 				patientUserIds.add(notification.getPatientUser().getId());
 			}
 			List<PatientComplianceMonarch> complianceList = patientComplianceMonarchRepository.findByDateBetweenAndPatientUserIdIn(yesterday,
@@ -1509,6 +1512,7 @@ public class AdherenceCalculationServiceMonarch{
 		
 		return isNonHMRNotificationCheck(patientUser, notificationType) ||
 				isSettingDeviationNotificationCheck(patientUser, notificationType) ||
+				(patientUser.isMissedTherapyNotification() && MISSED_THERAPY.equalsIgnoreCase(notificationType)) ||
 				isNonHMRSettingDeviationNotificationCheck(patientUser, notificationType); 
 				
 		

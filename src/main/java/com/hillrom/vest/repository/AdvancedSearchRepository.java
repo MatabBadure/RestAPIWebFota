@@ -234,11 +234,11 @@ public class AdvancedSearchRepository {
 			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getGender())) ? (filter.append(" AND ")) : (filter.append(""));
 			if(!StringUtils.isBlank(advancedPatientDTO.getGender())){
 				if(advancedPatientDTO.getGender().equalsIgnoreCase("Male"))
-					filter = filter.append("kt.pgender IN").append("('Male')");
+					filter = filter.append("kt.pgender IN ").append("('Male')");
 				else if(advancedPatientDTO.getGender().equalsIgnoreCase("Female"))
-					filter = filter.append("kt.pgender IN").append("('Female')");
+					filter = filter.append("kt.pgender IN ").append("('Female')");
 				else if(advancedPatientDTO.getGender().equalsIgnoreCase("Other"))
-					filter = filter.append("kt.pgender IN").append("('Other')");
+					filter = filter.append("kt.pgender IN ").append("('Other')");
 			}
 		}
 	    
@@ -251,20 +251,20 @@ public class AdvancedSearchRepository {
 	    if(!advancedPatientDTO.getCountry().equalsIgnoreCase("All")){
 	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getCountry())) ? (filter.append(" AND ")) : (filter.append(""));
 	    	if(!StringUtils.isBlank(advancedPatientDTO.getCountry())){
-	    		filter = filter.append("kt.pcountry IN").append("('").append(advancedPatientDTO.getCountry()).append("') ");
+	    		filter = filter.append("kt.pcountry IN ").append("('").append(advancedPatientDTO.getCountry()).append("') ");
 	    	}
 	    }
 	    
 	    filter = (filter.length()>0) &&(advancedPatientDTO.getState().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 	    if(advancedPatientDTO.getState().size()>0){
 	    	String csvStates = String.join("','", advancedPatientDTO.getState());  //Forming the comma & single quote separated list
-	    	filter = filter.append("kt.state IN('").append(csvStates).append("') ");
+	    	filter = filter.append("kt.state IN ('").append(csvStates).append("') ");
 	    }
 	    
 	    filter = (filter.length()>0) &&(advancedPatientDTO.getCity().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 	    if(advancedPatientDTO.getCity().size()>0){
 	    	String csvCities = String.join("','", advancedPatientDTO.getCity());	//Forming the comma & single quote separated list
-	    	filter = filter.append("kt.pcity IN('").append(csvCities).append("') ");
+	    	filter = filter.append("kt.pcity IN ('").append(csvCities).append("') ");
 	    }
 	    
 	    
@@ -277,12 +277,12 @@ public class AdvancedSearchRepository {
 	    if(!StringUtils.isBlank(advancedPatientDTO.getClinicLevelStatus())){
 	    	if(advancedPatientDTO.getClinicLevelStatus().equalsIgnoreCase("All"))
 	    	{
-	    		filter = filter.append("kt.isDeleted IN(true,false)");
+	    		filter = filter.append("kt.isDeleted IN (true,false)");
 	    	}
 	    	else if(advancedPatientDTO.getClinicLevelStatus().equalsIgnoreCase("Active"))
-	    	filter = filter.append("kt.isDeleted IN").append("(false)");
+	    	filter = filter.append("kt.isDeleted IN ").append("(false)");
 	    	else if(advancedPatientDTO.getClinicLevelStatus().equalsIgnoreCase("Inactive"))
-		    	filter = filter.append("kt.isDeleted IN").append("(true)");	
+		    	filter = filter.append("kt.isDeleted IN ").append("(true)");	
 	    }
 		
 	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getDiagnosis())) ? (filter.append(" AND ")) : (filter.append(""));
@@ -298,28 +298,26 @@ public class AdvancedSearchRepository {
 	    	// rangeBuilder method used to form the where clause for adherence 
 	    }
 
+	    if(!advancedPatientDTO.getDeviceType().equalsIgnoreCase("All")){
 	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getDeviceType())) ? (filter.append(" AND ")) : (filter.append(""));
 	    if(!StringUtils.isBlank(advancedPatientDTO.getDeviceType())){
-	    	if(advancedPatientDTO.getDeviceType().equalsIgnoreCase("ALL"))
-	    	{
-	    		filter = filter.append("kt.devType IN('ALL','VEST','MONARCH')");
-	    	}
-	    	else if(advancedPatientDTO.getDeviceType().equalsIgnoreCase("VEST"))
-	    	filter = filter.append("kt.devType IN('ALL','VEST') ");
+	    	if(advancedPatientDTO.getDeviceType().equalsIgnoreCase("VEST"))
+	    		filter = filter.append("kt.devType IN ('ALL','VEST') ");
 	    	else if(advancedPatientDTO.getDeviceType().equalsIgnoreCase("MONARCH"))
-		    	filter = filter.append("kt.devType IN('ALL','MONARCH') ");
+		    	filter = filter.append("kt.devType IN ('ALL','MONARCH') ");
+	    	}
 	    }
 	    
 	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getDeviceStatus())) ? (filter.append(" AND ")) : (filter.append(""));
 	    if(!StringUtils.isBlank(advancedPatientDTO.getDeviceStatus())){
 	    	if(advancedPatientDTO.getDeviceStatus().equalsIgnoreCase("All"))
 	    	{
-	    		filter = filter.append("kt.deviceActiveInactive IN(false,true)");
+	    		filter = filter.append("(kt.deviceActiveInactive IN (false,true) OR kt.deviceActiveInactive IS NULL)");
 	    	}
 	    	else if(advancedPatientDTO.getDeviceStatus().equalsIgnoreCase("Active"))
-	    	filter = filter.append("kt.deviceActiveInactive IN(true)");
+	    	filter = filter.append("kt.deviceActiveInactive IN (true)");
 	    	else if(advancedPatientDTO.getDeviceStatus().equalsIgnoreCase("Inactive"))
-		    	filter = filter.append("kt.deviceActiveInactive IN(false)");	
+		    	filter = filter.append("kt.deviceActiveInactive IN (false)");	
 	    }
 	    
 	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateFrom()) 

@@ -58,7 +58,6 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.jndi.local.localContextRoot;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;

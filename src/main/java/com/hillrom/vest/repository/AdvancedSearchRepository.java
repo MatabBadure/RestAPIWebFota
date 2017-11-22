@@ -248,7 +248,7 @@ public class AdvancedSearchRepository {
 	    
 	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getCountry())) ? (filter.append(" AND ")) : (filter.append(""));
 	    if(!StringUtils.isBlank(advancedPatientDTO.getCountry())){
-	    	filter = filter.append("kt.pcountry like").append(" '%").append(advancedPatientDTO.getCountry()).append("%' ");
+	    	filter = filter.append("kt.pcountry IN").append("('").append(advancedPatientDTO.getCountry()).append("') ");
 	    }
 	    
 	    
@@ -294,7 +294,7 @@ public class AdvancedSearchRepository {
 	    	filter = filter.append("(kt.adherence").append(rangeBuilder(advancedPatientDTO.getAdherenceScoreRange(),"adherence")).append(")");
 	    	// rangeBuilder method used to form the where clause for adherence 
 	    }
-			
+
 	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getDeviceType())) ? (filter.append(" AND ")) : (filter.append(""));
 	    if(!StringUtils.isBlank(advancedPatientDTO.getDeviceType())){
 	    	if(advancedPatientDTO.getDeviceType().equalsIgnoreCase("ALL"))
@@ -302,9 +302,9 @@ public class AdvancedSearchRepository {
 	    		filter = filter.append("kt.devType IN('ALL','VEST','MONARCH')");
 	    	}
 	    	else if(advancedPatientDTO.getDeviceType().equalsIgnoreCase("VEST"))
-	    	filter = filter.append("kt.devType = 'VEST' ");
+	    	filter = filter.append("kt.devType IN('ALL','VEST') ");
 	    	else if(advancedPatientDTO.getDeviceType().equalsIgnoreCase("MONARCH"))
-		    	filter = filter.append("kt.devType = 'MONARCH' ");	
+		    	filter = filter.append("kt.devType IN('ALL','MONARCH') ");
 	    }
 	    
 	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getDeviceStatus())) ? (filter.append(" AND ")) : (filter.append(""));

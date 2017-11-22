@@ -1515,12 +1515,14 @@ public class AdherenceCalculationServiceMonarch{
 	
 	private boolean isPatientUserAcceptNotification(User patientUser,
 			String notificationType) {
-		
+		try{
 		return isNonHMRNotificationCheck(patientUser, notificationType) ||
 				isSettingDeviationNotificationCheck(patientUser, notificationType) ||
 			        (patientUser.isMissedTherapyNotification() && MISSED_THERAPY.equalsIgnoreCase(notificationType)) ||
 				isNonHMRSettingDeviationNotificationCheck(patientUser, notificationType); 
-				
+		}catch(Exception ex){
+			ex.printStackTrace( printWriter );
+		}		
 		
 		/*return (patientUser.isNonHMRNotification() && HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType)) || 
 				(patientUser.isSettingDeviationNotification() && SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)) ||
@@ -1530,7 +1532,7 @@ public class AdherenceCalculationServiceMonarch{
 	}
 	
 	private boolean isNonHMRNotificationCheck(User patientUser,
-			String notificationType){
+			String notificationType) throws Exception {
 		return patientUser.isNonHMRNotification() && 
 					(HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType) ||
 					HMR_NON_COMPLIANCE_VEST.equalsIgnoreCase(notificationType) ||
@@ -1538,7 +1540,7 @@ public class AdherenceCalculationServiceMonarch{
 	}
 	
 	private boolean isSettingDeviationNotificationCheck(User patientUser,
-			String notificationType){
+			String notificationType)  throws Exception{
 		return patientUser.isSettingDeviationNotification() && 
 					(SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) ||
 					SETTINGS_DEVIATION_VEST.equalsIgnoreCase(notificationType) ||
@@ -1546,7 +1548,7 @@ public class AdherenceCalculationServiceMonarch{
 	}
 	
 	private boolean isNonHMRSettingDeviationNotificationCheck(User patientUser,
-			String notificationType){
+			String notificationType)  throws Exception{
 		return (HMR_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) ||
 				
 				HMR_AND_SETTINGS_DEVIATION_VEST.equalsIgnoreCase(notificationType) ||

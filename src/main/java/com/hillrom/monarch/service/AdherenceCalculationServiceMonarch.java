@@ -1524,7 +1524,7 @@ public class AdherenceCalculationServiceMonarch{
 			ex.printStackTrace();
 			return false;
 		}		
-		return false;
+		
 		/*return (patientUser.isNonHMRNotification() && HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType)) || 
 				(patientUser.isSettingDeviationNotification() && SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)) ||
 				(patientUser.isMissedTherapyNotification() && MISSED_THERAPY.equalsIgnoreCase(notificationType) ||

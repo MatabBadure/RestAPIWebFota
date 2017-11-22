@@ -353,6 +353,21 @@ public class AdherenceResource {
     }
     
     /**
+     * GET  /testingBothOrMonarchMissedTherapyCron -> to Initiate the daily missed therapy CRON.
+     */
+    @RequestMapping(value = "/testingBothOrMonarchMissedTherapyCron",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN})
+    public ResponseEntity<?> initiateBothOrMonarchMissedTherapyCron() throws HillromException {
+    	log.debug("REST request to initiate both or Monarch missed therapy cron");
+    	JSONObject jsonObject = new JSONObject();
+		adherenceCalculationServiceMonarch.processMissedTherapySessionsMonarch();
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    }
+    
+    /**
      * GET  /testingVestProcessNotificationCron -> to Initiate the daily notification CRON.
      */
     @RequestMapping(value = "/testingVestProcessNotificationCron",
@@ -364,6 +379,21 @@ public class AdherenceResource {
     	log.debug("REST request to initiate notification cron");
     	JSONObject jsonObject = new JSONObject();
 		adherenceCalculationService.processPatientNotifications();
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    }
+    
+    /**
+     * GET  /testingVestProcessNotificationCron -> to Initiate the daily notification CRON.
+     */
+    @RequestMapping(value = "/testingBothOrMonarchProcessNotificationCron",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN})
+    public ResponseEntity<?> initiateBothOrMonarchNotificationCron() throws HillromException {
+    	log.debug("REST request to initiate notification cron");
+    	JSONObject jsonObject = new JSONObject();
+		adherenceCalculationServiceMonarch.processPatientNotificationsMonarch();
 		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
     }
 

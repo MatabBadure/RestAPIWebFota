@@ -996,6 +996,9 @@ public class AdherenceCalculationService {
 			}
 			List<PatientCompliance> complianceList = patientComplianceRepository.findByDateBetweenAndPatientUserIdIn(yesterday,
 					yesterday,patientUserIds);
+			
+			Map<String, List<PatientDevicesAssoc>> vestOnlyDevicesPatientsMap = getVestOnlyDevicePatientsMap();
+			
 			Map<User,Integer> complianceMap = new HashMap<>();
 			for(PatientCompliance compliance : complianceList){
 				complianceMap.put(compliance.getPatientUser(), compliance.getMissedTherapyCount());
@@ -1007,9 +1010,11 @@ public class AdherenceCalculationService {
 						// integrated Accepting mail notifications
 						String notificationType = notification.getNotificationType();
 						int missedTherapyCount = complianceMap.get(patientUser);
-						if(isPatientUserAcceptNotification(patientUser,
-								notificationType))
-							mailService.sendNotificationMailToPatient(patientUser,notificationType,missedTherapyCount);
+						if(vestOnlyDevicesPatientsMap.containsKey(patientUser.getId())){
+							if(isPatientUserAcceptNotification(patientUser,
+									notificationType))
+								mailService.sendNotificationMailToPatient(patientUser,notificationType,missedTherapyCount);
+						}
 					}
 				});
 			}catch(Exception ex){

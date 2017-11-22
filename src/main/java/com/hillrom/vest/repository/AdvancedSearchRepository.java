@@ -30,8 +30,10 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.util.QueryConstants;
 import com.hillrom.vest.service.HCPClinicService;
 import com.hillrom.vest.web.rest.dto.AdvancedClinicDTO;
+import com.hillrom.vest.web.rest.dto.AdvancedHcpDTO;
 import com.hillrom.vest.web.rest.dto.AdvancedPatientDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
+import com.hillrom.vest.web.rest.dto.HcpVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 
 @Repository
@@ -245,12 +247,13 @@ public class AdvancedSearchRepository {
 	    	filter = filter.append("(").append(age).append(rangeBuilder(advancedPatientDTO.getAge(),"age")).append(")"); 
 	    	// rangeBuilder method used to form the where clause for age 
 	    }
-	    
+	   
+	    if(!advancedPatientDTO.getCountry().equalsIgnoreCase("All")){
 	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getCountry())) ? (filter.append(" AND ")) : (filter.append(""));
-	    if(!StringUtils.isBlank(advancedPatientDTO.getCountry())){
-	    	filter = filter.append("kt.pcountry IN").append("('").append(advancedPatientDTO.getCountry()).append("') ");
+	    	if(!StringUtils.isBlank(advancedPatientDTO.getCountry())){
+	    		filter = filter.append("kt.pcountry IN").append("('").append(advancedPatientDTO.getCountry()).append("') ");
+	    	}
 	    }
-	    
 	    
 	    filter = (filter.length()>0) &&(advancedPatientDTO.getState().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 	    if(advancedPatientDTO.getState().size()>0){
@@ -402,7 +405,7 @@ public class AdvancedSearchRepository {
 			finalQuery.append(filter);
 		}
 
-		log.debug("Query : " + finalQuery);
+		log.debug("Advanced Patient Search Query : " + finalQuery);
 
 		String countSqlQuery = "select count(patientUsers.patientId) from ( " + finalQuery + "  )  patientUsers";
 
@@ -474,6 +477,35 @@ public class AdvancedSearchRepository {
 	return null;
 }
 	
+	//----------------------------------------------------------------------------------------------------------------------------------------------
+	
+	/*public Page<HcpVO> advancedSearchHcps(AdvancedHcpDTO advancedHcpDTO,
+			Pageable pageable, Map<String, Boolean> sortOrder) {
+		
+		String baseQuery = QueryConstants.QUERY_ADVANCED_HCP_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN;
+		String whereClause = " WHERE ";
+		StringBuilder filter = new StringBuilder();
+		StringBuilder finalQuery = new StringBuilder();
+		try{
+		
+			Query formation
+			 * filter: used to append the values from AdvancedPatientDTO
+			 
+			if(!StringUtils.isBlank(advancedHcpDTO.getName())){
+				filter = filter.append("(kt.pfirstName like ").append("'%").append(advancedHcpDTO.getName()).append("%'"); 
+				filter = filter.append(" OR ").append("kt.plastName like ").append("'%").append(advancedHcpDTO.getName()).append("%') ");
+			} 
+			
+			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedHcpDTO.getHillromId())) ? (filter.append(" AND ")) : (filter.append(""));
+			if(!StringUtils.isBlank(advancedHcpDTO.getHillromId())){
+		    	filter = filter.append("kt.phillrom_id like ").append("'%").append(advancedHcpDTO.getHillromId()).append("%' ");
+		    }
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+	}*/
 	//----------------------------------------------------------------------------------------------------------------------------------------------
 
 	private void setPaginationParams(Pageable pageable, Query query) {
@@ -565,4 +597,5 @@ public class AdvancedSearchRepository {
 		String parsedDate = formatter.format(initDate);
 		return parsedDate.toString();
 	}
+
 }

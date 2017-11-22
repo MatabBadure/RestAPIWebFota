@@ -681,7 +681,7 @@ public class MailService {
 		String langKey = "en";
 		Context context = new Context(Locale.forLanguageTag(langKey));
 		context.setVariable("userName", FOTAUserNameStringFormatting(userName));
-		context.setVariable("fotaBaseUrl", baseUrl);
+		context.setVariable("baseUrl", baseUrl);
 		String content = templateEngine.process("fotaPendingApproval", context);
 		String subject = messageSource.getMessage("email.pending.title", null,
 				Locale.forLanguageTag(langKey));
@@ -694,7 +694,7 @@ public class MailService {
 		String langKey = "en";
 		Context context = new Context(Locale.forLanguageTag(langKey));
 		context.setVariable("userName", FOTAUserNameStringFormatting(userName));
-		context.setVariable("fotaBaseUrl", baseUrl);
+		context.setVariable("baseUrl", baseUrl);
 		String content = templateEngine.process("fotaDelete", context);
 		String subject = messageSource.getMessage("email.pending.title", null,
 				Locale.forLanguageTag(langKey));
@@ -705,7 +705,7 @@ public class MailService {
 		String langKey = "en";
 		Context context = new Context(Locale.forLanguageTag(langKey));
 		context.setVariable("userName", FOTAUserNameStringFormatting(userName));
-		context.setVariable("fotaBaseUrl", baseUrl);
+		context.setVariable("baseUrl", baseUrl);
 		String content = templateEngine.process("fotaCRC", context);
 		String subject = messageSource.getMessage("email.crc.title", null,
 				Locale.forLanguageTag(langKey));

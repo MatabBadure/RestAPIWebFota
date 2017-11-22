@@ -96,7 +96,7 @@ public class AccountResource {
                     request.getServerName() +              // "myhost"
                     ":" +                                  // ":"
                     request.getServerPort();               // "80"
-
+                    log.debug("baseUrl in register API", baseUrl);
                     mailService.sendActivationEmail(user, baseUrl);
                     return new ResponseEntity<>(HttpStatus.CREATED);
                 });
